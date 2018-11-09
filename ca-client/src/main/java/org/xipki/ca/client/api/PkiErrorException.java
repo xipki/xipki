@@ -37,10 +37,10 @@ public class PkiErrorException extends Exception {
   private final String statusMessage;
 
   public PkiErrorException(PKIStatusInfo statusInfo) {
-    this(new org.xipki.cmp.PkiStatusInfo(statusInfo));
+    this(new org.xipki.security.cmp.PkiStatusInfo(statusInfo));
   }
 
-  public PkiErrorException(org.xipki.cmp.PkiStatusInfo statusInfo) {
+  public PkiErrorException(org.xipki.security.cmp.PkiStatusInfo statusInfo) {
     this(statusInfo.status(), statusInfo.pkiFailureInfo(), statusInfo.statusMessage());
   }
 

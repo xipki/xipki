@@ -152,17 +152,17 @@ import org.xipki.ca.client.api.dto.RevokeCertResultEntry;
 import org.xipki.ca.client.api.dto.RevokeCertResultType;
 import org.xipki.ca.client.api.dto.UnrevokeOrRemoveCertEntry;
 import org.xipki.ca.client.api.dto.UnrevokeOrRemoveCertRequest;
-import org.xipki.cmp.CmpUtf8Pairs;
-import org.xipki.cmp.CmpUtil;
-import org.xipki.cmp.PkiResponse;
-import org.xipki.cmp.ProtectionResult;
-import org.xipki.cmp.ProtectionVerificationResult;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.XiSecurityConstants;
+import org.xipki.security.cmp.CmpUtf8Pairs;
+import org.xipki.security.cmp.CmpUtil;
+import org.xipki.security.cmp.PkiResponse;
+import org.xipki.security.cmp.ProtectionResult;
+import org.xipki.security.cmp.ProtectionVerificationResult;
 import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
@@ -499,8 +499,8 @@ abstract class ClientCmpAgent {
   protected PkiErrorException buildErrorResult(ErrorMsgContent bodyContent) {
     ParamUtil.requireNonNull("bodyContent", bodyContent);
 
-    org.xipki.cmp.PkiStatusInfo statusInfo =
-        new org.xipki.cmp.PkiStatusInfo(bodyContent.getPKIStatusInfo());
+    org.xipki.security.cmp.PkiStatusInfo statusInfo =
+        new org.xipki.security.cmp.PkiStatusInfo(bodyContent.getPKIStatusInfo());
     return new PkiErrorException(statusInfo.status(), statusInfo.pkiFailureInfo(),
         statusInfo.statusMessage());
   }

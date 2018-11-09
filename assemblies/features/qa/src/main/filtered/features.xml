@@ -28,7 +28,7 @@
     <bundle>mvn:org.xipki.shells/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki.shells/security-shell/${project.version}</bundle>
   </feature>
-  <feature name="xipki-camgmt" version="${project.version}" description="CA management shell">
+  <feature name="xipki-camgmt" version="${project.version}" description="CA management">
     <feature>xipki-security</feature>
     <bundle>mvn:org.xipki/util/${project.version}</bundle>
     <bundle>mvn:org.xipki/password/${project.version}</bundle>
@@ -40,7 +40,7 @@
     <bundle>mvn:org.xipki.shells/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki.shells/ca-mgmt-shell/${project.version}</bundle>
   </feature>
-  <feature name="xipki-ocspmgmt" version="${project.version}" description="OCSP management shell">
+  <feature name="xipki-ocspmgmt" version="${project.version}" description="OCSP management">
     <bundle>mvn:org.xipki/util/${project.version}</bundle>
     <bundle>mvn:org.xipki/password/${project.version}</bundle>
     <bundle>mvn:org.xipki/ocsp-mgmt-api/${project.version}</bundle>
@@ -54,18 +54,13 @@
     <feature>xipki-security</feature>
     <bundle>mvn:org.xipki/util/${project.version}</bundle>
     <bundle>mvn:org.xipki/password/${project.version}</bundle>
-    <bundle>mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
-    <bundle>mvn:org.xipki/datasource/${project.version}</bundle>
     <bundle>mvn:org.yaml/snakeyaml/${snakeyaml.version}</bundle>
     <bundle>mvn:org.liquibase/liquibase-core/${liquibase.version}</bundle>
     <bundle>mvn:org.xipki/dbtool/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ca-dbtool/${project.version}</bundle>
     <bundle>mvn:org.xipki.shells/dbtool-shell/${project.version}</bundle>
-    <bundle>mvn:org.xipki.shells/ca-dbtool-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-caclient" version="${project.version}" description="CA client">
     <feature>xipki-security</feature>
-    <bundle>mvn:org.xipki/cmp/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-client/${project.version}</bundle>
     <bundle>mvn:org.xipki.shells/ca-client-shell/${project.version}</bundle>
   </feature>
@@ -83,7 +78,7 @@
     <bundle>mvn:org.xipki/ocsp-client/${project.version}</bundle>
     <bundle>mvn:org.xipki.shells/ocsp-client-shell/${project.version}</bundle>
   </feature>
-  <feature name="xipki-qa" version="${project.version}" description="CA QA shell">
+  <feature name="xipki-qa" version="${project.version}" description="QA">
     <feature>xipki-camgmt</feature>
     <feature>xipki-ocspclient</feature>
     <feature>xipki-caclient</feature>

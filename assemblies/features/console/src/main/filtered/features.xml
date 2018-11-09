@@ -36,7 +36,6 @@
     <bundle>mvn:org.xipki.iaik/pkcs11-constants/${pkcs11-wrapper.version}</bundle>
     <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
-    <bundle>mvn:org.xipki/cmp/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-client/${project.version}</bundle>
     <bundle>mvn:org.xipki.shells/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki.shells/ca-client-shell/${project.version}</bundle>
@@ -71,30 +70,22 @@
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
-    <bundle>mvn:org.xipki/cmp/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-api/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-mgmt-api/${project.version}</bundle>
-    <bundle start-level="80"><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
+    <bundle><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
     <bundle>mvn:org.xipki/ca-mgmt-client/${project.version}</bundle>
     <bundle>mvn:org.xipki.shells/shell-base/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.shells/ca-mgmt-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shells/ca-mgmt-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-dbtool" version="${project.version}" description="Database tool">
     <!--feature>intern-xipki-jdbc</feature-->
     <bundle>mvn:org.xipki/util/${project.version}</bundle>
     <bundle>mvn:org.xipki/password/${project.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
-    <bundle>mvn:org.xipki/security/${project.version}</bundle>
-    <bundle start-level="70">mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
-    <bundle start-level="70">mvn:org.xipki/datasource/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.yaml/snakeyaml/${snakeyaml.version}</bundle>
-    <bundle start-level="80">mvn:org.liquibase/liquibase-core/${liquibase.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki/dbtool/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki/ca-dbtool/${project.version}</bundle>
+    <bundle>mvn:org.yaml/snakeyaml/${snakeyaml.version}</bundle>
+    <bundle>mvn:org.liquibase/liquibase-core/${liquibase.version}</bundle>
+    <bundle>mvn:org.xipki/dbtool/${project.version}</bundle>
     <bundle>mvn:org.xipki.shells/shell-base/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.shells/dbtool-shell/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.shells/ca-dbtool-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shells/dbtool-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-qa" version="${project.version}" description="CA client">
     <feature>xipki-security</feature>

@@ -70,7 +70,6 @@
   <modules>
     <!-- Base components -->
     <module>util</module>
-    <module>cmp</module>
     <module>audit</module>
     <module>datasource</module>
     <module>dbtool</module>
@@ -82,10 +81,8 @@
     <!-- PKI -->
     <module>ca-api</module>
     <module>ca-mgmt-api</module>
-    <module>ca-server-api</module>
     <module>ca-server</module>
     <module>ca-servlet</module>
-    <module>ca-dbtool</module>
     <module>ca-mgmt-client</module>
     <module>certprofile-xml</module>
     <module>ocsp-api</module>

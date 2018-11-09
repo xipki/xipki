@@ -32,7 +32,7 @@
   <dependencies>
     <dependency>
       <groupId>org.xipki</groupId>
-      <artifactId>ca-mgmt-api</artifactId>
+      <artifactId>ca-mgmt-client</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

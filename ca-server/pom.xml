@@ -29,11 +29,6 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>ca-server-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>ca-mgmt-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -41,6 +36,15 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>ca-api</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>audit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.scep</groupId>
+      <artifactId>scep-common</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

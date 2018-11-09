@@ -140,13 +140,13 @@ import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.PermissionConstants;
 import org.xipki.ca.server.mgmt.api.RequestorInfo;
 import org.xipki.ca.server.util.CaUtil;
-import org.xipki.cmp.CmpUtf8Pairs;
-import org.xipki.cmp.CmpUtil;
 import org.xipki.security.AlgorithmValidator;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.CrlReason;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.XiSecurityConstants;
+import org.xipki.security.cmp.CmpUtf8Pairs;
+import org.xipki.security.cmp.CmpUtil;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
@@ -438,8 +438,8 @@ public class CmpResponderImpl extends BaseCmpResponder {
     if (respBody.getType() == PKIBody.TYPE_ERROR) {
       ErrorMsgContent errorMsgContent = (ErrorMsgContent) respBody.getContent();
 
-      org.xipki.cmp.PkiStatusInfo pkiStatus =
-          new org.xipki.cmp.PkiStatusInfo(errorMsgContent.getPKIStatusInfo());
+      org.xipki.security.cmp.PkiStatusInfo pkiStatus =
+          new org.xipki.security.cmp.PkiStatusInfo(errorMsgContent.getPKIStatusInfo());
 
       event.setStatus(AuditStatus.FAILED);
       String statusString = pkiStatus.statusMessage();

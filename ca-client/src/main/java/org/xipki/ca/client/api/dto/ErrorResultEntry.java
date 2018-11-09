@@ -17,7 +17,7 @@
 
 package org.xipki.ca.client.api.dto;
 
-import org.xipki.cmp.PkiStatusInfo;
+import org.xipki.security.cmp.PkiStatusInfo;
 import org.xipki.util.ParamUtil;
 
 /**
