@@ -37,13 +37,11 @@ import org.xipki.shell.completer.DirCompleter;
 @Service
 public class ImportOcspFromCaAction extends DbPortAction {
 
-  private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ocsp-db.properties";
-
   private static final String DFLT_PUBLISHER = "ocsp-publisher";
 
-  @Option(name = "--db-conf", description = "database configuration file")
+  @Option(name = "--db-conf", required = true, description = "database configuration file")
   @Completion(FileCompleter.class)
-  private String dbconfFile = DFLT_DBCONF_FILE;
+  private String dbconfFile;
 
   @Option(name = "--in-dir", required = true, description = "input directory")
   @Completion(DirCompleter.class)

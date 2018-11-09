@@ -378,7 +378,6 @@ class CaCertstoreDbExporter extends DbPorter {
 
             ((CertsWriter) entriesInCurrentFile).add(cert);
           } else if (CaDbEntryType.CRL == type) {
-            System.out.println(rs.getString("CRL"));
             byte[] crlBytes = Base64.decodeFast(rs.getString("CRL"));
 
             X509CRL x509Crl = null;

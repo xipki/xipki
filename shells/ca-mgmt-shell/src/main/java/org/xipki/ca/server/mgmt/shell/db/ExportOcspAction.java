@@ -36,11 +36,9 @@ import org.xipki.shell.completer.DirCompleter;
 @Service
 public class ExportOcspAction extends DbPortAction {
 
-  private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ocsp-db.properties";
-
-  @Option(name = "--db-conf", description = "database configuration file.")
+  @Option(name = "--db-conf", required = true, description = "database configuration file.")
   @Completion(FileCompleter.class)
-  private String dbconfFile = DFLT_DBCONF_FILE;
+  private String dbconfFile;
 
   @Option(name = "--out-dir", required = true, description = "output directory")
   @Completion(DirCompleter.class)

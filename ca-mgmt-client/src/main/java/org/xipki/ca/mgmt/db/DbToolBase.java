@@ -299,7 +299,7 @@ public class DbToolBase implements Closeable {
   }
 
   public void releaseResources(Statement ps, ResultSet rs) {
-    datasource.releaseResources(ps, rs);
+    datasource.releaseResources(ps, rs, false);
   }
 
 }

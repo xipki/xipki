@@ -28,17 +28,17 @@ source xipki/qa/setenv.script
 xi:initdb \
   --force \
   --db-conf ${XIPKI_DIR}/etc/ca/ca-db.properties \
-  --db-schema ${XIPKI_DIR}/sql/ca-init.xml
+  --db-schema xipki/sql/ca-init.xml
 
 xi:initdb \
   --force \
   --db-conf ${XIPKI_DIR}/etc/ca/ocsp-db.properties \
-  --db-schema ${XIPKI_DIR}/sql/ocsp-init.xml
+  --db-schema xipki/sql/ocsp-init.xml
 
 xi:initdb --force \
   --db-conf  ${XIPKI_DIR}/etc/ocsp/ocsp-cache-db.properties \
-  --db-schema ${XIPKI_DIR}/sql/ocsp-cache-init.xml
+  --db-schema xipki/sql/ocsp-cache-init.xml
 
 xi:initdb --force \
   --db-conf  ${XIPKI_DIR}/etc/ocsp/ocsp-crl-db.properties \
-  --db-schema ${XIPKI_DIR}/sql/ocsp-init.xml
+  --db-schema xipki/sql/ocsp-init.xml
