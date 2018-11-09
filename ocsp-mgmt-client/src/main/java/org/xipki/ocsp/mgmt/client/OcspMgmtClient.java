@@ -97,7 +97,7 @@ public class OcspMgmtClient implements OcspManager {
 
     if (sslContextConf != null && sslContextConf.isUseSslConf()) {
       try {
-        sslSocketFactory = sslContextConf.buildSslContext().getSocketFactory();
+        sslSocketFactory = sslContextConf.getSslSocketFactory();
         hostnameVerifier = sslContextConf.buildHostnameVerifier();
       } catch (ObjectCreationException ex) {
         initException = new OcspMgmtException(

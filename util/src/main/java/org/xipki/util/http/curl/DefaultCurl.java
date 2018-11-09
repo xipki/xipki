@@ -66,7 +66,7 @@ public class DefaultCurl implements Curl {
 
     if (sslContextConf != null && sslContextConf.isUseSslConf()) {
       try {
-        sslSocketFactory = sslContextConf.buildSslContext().getSocketFactory();
+        sslSocketFactory = sslContextConf.getSslSocketFactory();
         hostnameVerifier = sslContextConf.buildHostnameVerifier();
       } catch (ObjectCreationException ex) {
         initException = new ObjectCreationException(

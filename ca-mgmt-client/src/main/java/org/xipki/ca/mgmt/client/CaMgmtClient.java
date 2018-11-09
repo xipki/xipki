@@ -161,7 +161,7 @@ public class CaMgmtClient implements CaManager {
 
     if (sslContextConf != null && sslContextConf.isUseSslConf()) {
       try {
-        sslSocketFactory = sslContextConf.buildSslContext().getSocketFactory();
+        sslSocketFactory = sslContextConf.getSslSocketFactory();
         hostnameVerifier = sslContextConf.buildHostnameVerifier();
       } catch (ObjectCreationException ex) {
         initException = new CaMgmtException(

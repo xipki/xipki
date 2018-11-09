@@ -27,6 +27,7 @@ import java.security.cert.CertificateException;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
 
 import org.xipki.util.ObjectCreationException;
 
@@ -50,6 +51,10 @@ public class SslContextConf {
   private String sslTruststorePassword;
 
   private String sslHostnameVerifier;
+
+  private SSLContext sslContext;
+
+  private SSLSocketFactory sslSocketFactory;
 
   public boolean isUseSslConf() {
     return useSslConf;
@@ -107,33 +112,50 @@ public class SslContextConf {
     this.sslHostnameVerifier = emptyAsNull(sslHostnameVerifier);
   }
 
-  public SSLContext buildSslContext() throws ObjectCreationException {
+  public SSLContext getSslContext() throws ObjectCreationException {
     if (!useSslConf) {
       return null;
     }
 
-    SSLContextBuilder builder = new SSLContextBuilder();
-    if (sslStoreType != null) {
-      builder.setKeyStoreType(sslStoreType);
-    }
-
-    try {
-      if (sslKeystore != null) {
-        char[] password = sslKeystorePassword == null ? null : sslKeystorePassword.toCharArray();
-        builder.loadKeyMaterial(new File(sslKeystore), password, password);
+    if (sslContext == null) {
+      SSLContextBuilder builder = new SSLContextBuilder();
+      if (sslStoreType != null) {
+        builder.setKeyStoreType(sslStoreType);
       }
 
-      if (sslTruststorePassword != null) {
-        char[] password = sslTruststorePassword == null
-            ? null : sslTruststorePassword.toCharArray();
-        builder.loadTrustMaterial(new File(sslTruststore), password);
-      }
+      try {
+        if (sslKeystore != null) {
+          char[] password = sslKeystorePassword == null ? null : sslKeystorePassword.toCharArray();
+          builder.loadKeyMaterial(new File(sslKeystore), password, password);
+        }
 
-      return builder.build();
-    } catch (IOException | UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException
-        | CertificateException | KeyManagementException ex) {
-      throw new ObjectCreationException("could not build SSLContext: " + ex.getMessage(), ex);
+        if (sslTruststorePassword != null) {
+          char[] password = sslTruststorePassword == null
+              ? null : sslTruststorePassword.toCharArray();
+          builder.loadTrustMaterial(new File(sslTruststore), password);
+        }
+
+        sslContext = builder.build();
+      } catch (IOException | UnrecoverableKeyException | NoSuchAlgorithmException
+          | KeyStoreException | CertificateException | KeyManagementException ex) {
+        throw new ObjectCreationException("could not build SSLContext: " + ex.getMessage(), ex);
+      }
     }
+
+    return sslContext;
+  }
+
+  public SSLSocketFactory getSslSocketFactory() throws ObjectCreationException {
+    if (!useSslConf) {
+      return null;
+    }
+
+    if (sslSocketFactory == null) {
+      getSslContext();
+      sslSocketFactory = sslContext.getSocketFactory();
+    }
+
+    return sslSocketFactory;
   }
 
   public HostnameVerifier buildHostnameVerifier() throws ObjectCreationException {
