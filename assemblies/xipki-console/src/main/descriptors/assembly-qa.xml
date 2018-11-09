@@ -17,44 +17,46 @@
 <assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
-  <id>main</id>
+  <id>qa</id>
   <includeBaseDirectory>true</includeBaseDirectory>
   <formats>
     <format>tar.gz</format>
   </formats>
   <fileSets>
     <fileSet>
-      <directory>../shared/conf/xipki/etc</directory>
-      <outputDirectory>etc</outputDirectory>
-      <includes>
-        <include>org.xipki.*</include>
-      </includes>
+      <directory>../shared/license</directory>
+      <outputDirectory>license</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
       <directory>../shared/conf/xipki</directory>
-      <outputDirectory>xipki</outputDirectory>
       <includes>
-        <include>etc/ca/**</include>
-        <include>etc/ocsp/**</include>
-        <include>security/**</include>
+        <include>etc/**</include>
       </includes>
-      <excludes>
-        <exclude>etc/ocsp/ocsp-responder.xml</exclude>
-      </excludes>
+      <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>${output.directory}</directory>
+      <directory>../shared/conf/xipki</directory>
       <excludes>
-        <exclude>bin/*.bat</exclude>
+        <exclude>etc/**</exclude>
       </excludes>
+      <outputDirectory>xipki</outputDirectory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <!-- ${output.directory} -->
+    <fileSet>
+      <directory>${output.directory}</directory>
       <includes>
         <include>bin/**</include>
         <include>**/*.sh</include>
       </includes>
+      <excludes>
+        <exclude>bin/*.bat</exclude>
+      </excludes>
       <outputDirectory>.</outputDirectory>
       <lineEnding>unix</lineEnding>
       <fileMode>0755</fileMode>
@@ -76,6 +78,13 @@
         <exclude>bin/**</exclude>
         <exclude>**/*.sh</exclude>
       </excludes>
+      <outputDirectory>.</outputDirectory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <!-- QA -->
+    <fileSet>
+      <directory>src/qa/unfiltered</directory>
       <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
@@ -122,11 +131,36 @@
     </fileSet>
   </fileSets>
   <files>
-   <file>
-      <source>${output.directory}/xipki/client-config/template.ca-client-signature.xml</source>
+    <file>
+      <source>src/qa/unfiltered/xipki/client-config/template.ca-client-signature.xml</source>
       <outputDirectory>xipki/client-config</outputDirectory>
       <destName>template.ca-client.xml</destName>
       <fileMode>0644</fileMode>
     </file>
+    <file>
+      <source>${project.basedir}/../../README.md</source>
+      <outputDirectory>xipki</outputDirectory>
+      <destName>README.md</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>${project.basedir}/../../LICENSE</source>
+      <outputDirectory>license</outputDirectory>
+      <destName>xipki-LICENSE</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>${project.build.directory}/apache-karaf-minimal-${karaf.version}/LICENSE</source>
+      <outputDirectory>license</outputDirectory>
+      <destName>karaf-LICENSE.txt</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>${project.basedir}/../../commands.md</source>
+      <outputDirectory>xipki</outputDirectory>
+      <destName>commands.md</destName>
+      <fileMode>0644</fileMode>
+    </file>
   </files>
+
 </assembly>

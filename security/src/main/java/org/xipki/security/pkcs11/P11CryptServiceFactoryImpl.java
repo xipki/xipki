@@ -53,7 +53,7 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
 
   private P11ModuleFactoryRegister p11ModuleFactoryRegister;
 
-  public synchronized void init() throws InvalidConfException, IOException {
+  public synchronized void init() throws InvalidConfException {
     if (p11Conf != null) {
       return;
     }
@@ -62,7 +62,11 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
       return;
     }
 
-    this.p11Conf = new P11Conf(Files.newInputStream(Paths.get(pkcs11ConfFile)), passwordResolver);
+    try {
+      this.p11Conf = new P11Conf(Files.newInputStream(Paths.get(pkcs11ConfFile)), passwordResolver);
+    } catch (IOException ex) {
+      throw new InvalidConfException("could not create P11Conf: " + ex.getMessage(), ex);
+    }
   }
 
   public void setP11ModuleFactoryRegister(P11ModuleFactoryRegister p11ModuleFactoryRegister) {
@@ -71,6 +75,13 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
 
   public synchronized P11CryptService getP11CryptService(String moduleName)
       throws XiSecurityException, P11TokenException {
+    try {
+      init();
+    } catch (InvalidConfException ex) {
+      throw new IllegalStateException(
+          "could not initialize P11CryptServiceFactory: " + ex.getMessage(), ex);
+    }
+
     if (p11Conf == null) {
       throw new IllegalStateException("please set pkcs11ConfFile and then call init() first");
     }
@@ -115,8 +126,11 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
 
   @Override
   public Set<String> getModuleNames() {
-    if (p11Conf == null) {
-      throw new IllegalStateException("pkcs11ConfFile is not set");
+    try {
+      init();
+    } catch (InvalidConfException ex) {
+      throw new IllegalStateException(
+          "could not initialize P11CryptServiceFactory: " + ex.getMessage(), ex);
     }
     return p11Conf.getModuleNames();
   }

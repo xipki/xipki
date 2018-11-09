@@ -180,8 +180,7 @@ public class Securities implements Closeable {
   }
 
   private void initSecurityPkcs11(String pkcs11ConfFile,
-      SignerFactoryRegisterImpl signerFactoryRegister)
-      throws IOException, InvalidConfException {
+      SignerFactoryRegisterImpl signerFactoryRegister) throws InvalidConfException {
     p11ModuleFactoryRegister = new P11ModuleFactoryRegisterImpl();
     p11ModuleFactoryRegister.registFactory(new EmulatorP11ModuleFactory());
     p11ModuleFactoryRegister.registFactory(new IaikP11ModuleFactory());

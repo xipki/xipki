@@ -17,7 +17,7 @@
 <assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
-  <id>main</id>
+  <id>qa</id>
   <includeBaseDirectory>true</includeBaseDirectory>
   <formats>
     <format>tar.gz</format>
@@ -30,34 +30,33 @@
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>../shared/conf/xipki/etc</directory>
-      <outputDirectory>etc</outputDirectory>
+      <directory>../shared/conf/xipki</directory>
       <includes>
-        <include>org.xipki.password.cfg</include>
-        <include>org.xipki.security.cfg</include>
-        <include>org.xipki.security.pkcs11.cfg</include>
+        <include>etc/**</include>
       </includes>
+      <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
       <directory>../shared/conf/xipki</directory>
+      <excludes>
+        <exclude>etc/**</exclude>
+      </excludes>
       <outputDirectory>xipki</outputDirectory>
-      <includes>
-        <include>security/**</include>
-      </includes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
+    <!-- ${output.directory} -->
     <fileSet>
       <directory>${output.directory}</directory>
-      <excludes>
-        <exclude>bin/*.bat</exclude>
-      </excludes>
       <includes>
         <include>bin/**</include>
         <include>**/*.sh</include>
       </includes>
+      <excludes>
+        <exclude>bin/*.bat</exclude>
+      </excludes>
       <outputDirectory>.</outputDirectory>
       <lineEnding>unix</lineEnding>
       <fileMode>0755</fileMode>
@@ -78,7 +77,6 @@
       <excludes>
         <exclude>bin/**</exclude>
         <exclude>**/*.sh</exclude>
-        <exclude>xipki/qa/**</exclude>
       </excludes>
       <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>

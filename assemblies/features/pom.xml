@@ -28,7 +28,6 @@
   <name>XiPKI :: Assemblies :: Features</name>
   <packaging>pom</packaging>
   <modules>
-    <module>qa</module>
     <module>console</module>
   </modules>
   <profiles>

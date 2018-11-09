@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.ca.shell.cert;
+package org.xipki.qa.ca.cert.shell;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.server.mgmt.shell.cert.RemoveCertAction;
+import org.xipki.ca.server.mgmt.shell.cert.UnrevokeCertAction;
 import org.xipki.shell.CmdFailure;
 
 /**
@@ -28,13 +28,14 @@ import org.xipki.shell.CmdFailure;
  * @since 2.0.0
  */
 
-@Command(scope = "caqa", name = "neg-rm-cert", description = "remove certificate (negative, QA)")
+@Command(scope = "caqa", name = "neg-unrevoke-cert",
+    description = "unrevoke certificate (negative, QA)")
 @Service
-public class NegRemoveCertAction extends RemoveCertAction {
+public class NegUnrevokeCertAction extends UnrevokeCertAction {
 
   @Override
   protected Object execute0() throws Exception {
-    println("neg-remove-cert");
+    println("neg-unrevoke-cert");
 
     try {
       super.execute0();

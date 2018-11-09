@@ -77,7 +77,7 @@
 
   <bean id="p11CryptServiceFactory"
       class="org.xipki.security.pkcs11.P11CryptServiceFactoryImpl"
-      init-method="init" destroy-method="close">
+      destroy-method="close">
     <property name="pkcs11ConfFile" value="${pkcs11.confFile}"/>
     <property name="passwordResolver" ref="passwordResolver"/>
     <property name="p11ModuleFactoryRegister" ref="p11ModuleFactoryRegister"/>

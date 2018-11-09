@@ -73,6 +73,8 @@
     <bundle>mvn:org.xipki/ca-api/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-mgmt-api/${project.version}</bundle>
     <bundle><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
+    <bundle>mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
+    <bundle>mvn:org.xipki/datasource/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-mgmt-client/${project.version}</bundle>
     <bundle>mvn:org.xipki.shells/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki.shells/ca-mgmt-shell/${project.version}</bundle>
@@ -87,11 +89,21 @@
     <bundle>mvn:org.xipki.shells/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki.shells/dbtool-shell/${project.version}</bundle>
   </feature>
-  <feature name="xipki-qa" version="${project.version}" description="CA client">
-    <feature>xipki-security</feature>
-    <feature>xipki-caclient</feature>
-    <feature>xipki-ocspclient</feature>
+  <feature name="xipki-ocspmgmt" version="${project.version}" description="OCSP management">
+    <bundle>mvn:org.xipki/util/${project.version}</bundle>
+    <bundle>mvn:org.xipki/password/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ocsp-mgmt-api/${project.version}</bundle>
+    <bundle><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
+    <bundle>mvn:org.xipki/ocsp-mgmt-client/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shells/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shells/ocsp-mgmt-shell/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-qa" version="${project.version}" description="QA">
     <feature>xipki-camgmt</feature>
+    <feature>xipki-ocspclient</feature>
+    <feature>xipki-caclient</feature>
+    <bundle>mvn:org.xipki/certprofile-xml/${project.version}</bundle>
+    <bundle>mvn:org.xipki/qa/${project.version}</bundle>
     <bundle>mvn:org.xipki.shells/qa-shell/${project.version}</bundle>
   </feature>
 </features>

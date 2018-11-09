@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.ca.shell.cert;
+package org.xipki.qa.ca.cert.shell;
 
 import java.io.File;
 import java.util.Set;
