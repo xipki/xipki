@@ -59,7 +59,7 @@ public class RequestorCheckAction extends RequestorUpdateAction {
         throw new CmdFailure("Cert: is not configured explicitly as expected");
       }
 
-      if (!Arrays.equals(ex, Base64.decode(conf))) {
+      if (!MgmtQaShellUtil.certEquals(ex, Base64.decode(conf))) {
         throw new CmdFailure("Cert: the expected one and the actual one differ");
       }
     } else {

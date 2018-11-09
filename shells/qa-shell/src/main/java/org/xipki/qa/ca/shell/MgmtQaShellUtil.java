@@ -17,9 +17,11 @@
 
 package org.xipki.qa.ca.shell;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 import org.xipki.ca.server.mgmt.api.CaManager;
+import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 
 /**
@@ -62,6 +64,22 @@ public class MgmtQaShellUtil {
     boolean bo = (ex == null) ? (is == null) : ex.equals(is);
     if (!bo) {
       throw new CmdFailure(desc + ": is '" + is + "', but expected '" + ex + "'");
+    }
+  }
+
+  public static boolean certEquals(byte[] certBytes1, byte[] certBytes2) {
+    if (certBytes1 == null && certBytes2 == null) {
+      return true;
+    } else if (certBytes1 != null && certBytes2 != null) {
+      try {
+        byte[] encoded1 = X509Util.parseBcCert(certBytes1).getEncoded();
+        byte[] encoded2 = X509Util.parseBcCert(certBytes2).getEncoded();
+        return Arrays.equals(encoded1, encoded2);
+      } catch (Exception ex) {
+        return false;
+      }
+    } else {
+      return false;
     }
   }
 

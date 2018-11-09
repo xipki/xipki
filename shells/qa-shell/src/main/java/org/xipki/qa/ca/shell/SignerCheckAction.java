@@ -17,8 +17,6 @@
 
 package org.xipki.qa.ca.shell;
 
-import java.util.Arrays;
-
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CaManager;
@@ -56,7 +54,7 @@ public class SignerCheckAction extends SignerUpdateAction {
       if (cr.getBase64Cert() == null) {
         throw new CmdFailure("Cert: is not configured explicitly as expected");
       }
-      if (!Arrays.equals(ex, Base64.decode(cr.getBase64Cert()))) {
+      if (!MgmtQaShellUtil.certEquals(ex, Base64.decode(cr.getBase64Cert()))) {
         throw new CmdFailure("Cert: the expected one and the actual one differ");
       }
     }
