@@ -51,6 +51,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -1089,6 +1090,15 @@ public final class CaClientImpl implements CaClient {
 
     try {
       HttpURLConnection httpUrlConnection = IoUtil.openHttpConn(serverUrl);
+      if (httpUrlConnection instanceof HttpsURLConnection) {
+        if (ca.getHostnameVerifier() != null) {
+          ((HttpsURLConnection) httpUrlConnection).setHostnameVerifier(ca.getHostnameVerifier());
+        }
+        if (ca.getSslSocketFactory() != null) {
+          ((HttpsURLConnection) httpUrlConnection).setSSLSocketFactory(ca.getSslSocketFactory());
+        }
+      }
+
       InputStream inputStream = httpUrlConnection.getInputStream();
       int responseCode = httpUrlConnection.getResponseCode();
       if (responseCode != HttpURLConnection.HTTP_OK
