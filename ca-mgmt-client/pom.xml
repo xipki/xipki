@@ -29,7 +29,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>ca-mgmt-api</artifactId>
+      <artifactId>ca-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

@@ -27,15 +27,18 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <packaging>bundle</packaging>
   <dependencies>
-    <!--dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>cmp</artifactId>
-      <version>${project.version}</version>
-    </dependency-->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>security</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.jvnet.jaxb2.maven2</groupId>
+        <artifactId>maven-jaxb2-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 </project>

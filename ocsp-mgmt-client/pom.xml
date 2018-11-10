@@ -29,7 +29,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>ocsp-mgmt-api</artifactId>
+      <artifactId>ocsp-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

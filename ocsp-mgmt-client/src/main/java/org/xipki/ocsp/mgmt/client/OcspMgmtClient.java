@@ -30,12 +30,12 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 
-import org.xipki.ocsp.server.mgmt.api.OcspManager;
-import org.xipki.ocsp.server.mgmt.api.OcspMgmtException;
-import org.xipki.ocsp.server.mgmt.msg.CommAction;
-import org.xipki.ocsp.server.mgmt.msg.CommRequest;
-import org.xipki.ocsp.server.mgmt.msg.CommResponse;
-import org.xipki.ocsp.server.mgmt.msg.NameRequest;
+import org.xipki.ocsp.mgmt.api.OcspManager;
+import org.xipki.ocsp.mgmt.api.OcspMgmtException;
+import org.xipki.ocsp.mgmt.msg.CommAction;
+import org.xipki.ocsp.mgmt.msg.CommRequest;
+import org.xipki.ocsp.mgmt.msg.CommResponse;
+import org.xipki.ocsp.mgmt.msg.NameRequest;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
 import org.xipki.util.ObjectCreationException;

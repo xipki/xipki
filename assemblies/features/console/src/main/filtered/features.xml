@@ -69,10 +69,9 @@
     <bundle>mvn:org.xipki/password/${project.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
+    <bundle><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ca-mgmt-api/${project.version}</bundle>
-    <bundle><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
     <bundle>mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
     <bundle>mvn:org.xipki/datasource/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-mgmt-client/${project.version}</bundle>
@@ -92,8 +91,11 @@
   <feature name="xipki-ocspmgmt" version="${project.version}" description="OCSP management">
     <bundle>mvn:org.xipki/util/${project.version}</bundle>
     <bundle>mvn:org.xipki/password/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ocsp-mgmt-api/${project.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
     <bundle><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
+    <bundle>mvn:org.xipki/security/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ocsp-api/${project.version}</bundle>
     <bundle>mvn:org.xipki/ocsp-mgmt-client/${project.version}</bundle>
     <bundle>mvn:org.xipki.shells/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki.shells/ocsp-mgmt-shell/${project.version}</bundle>

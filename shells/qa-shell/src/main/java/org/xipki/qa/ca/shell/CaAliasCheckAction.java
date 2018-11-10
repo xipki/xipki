@@ -21,8 +21,8 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.server.mgmt.shell.CaAction;
-import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.ca.mgmt.shell.CaAction;
+import org.xipki.ca.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.shell.CmdFailure;
 
 /**

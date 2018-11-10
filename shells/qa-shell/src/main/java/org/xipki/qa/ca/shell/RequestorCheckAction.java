@@ -21,8 +21,8 @@ import java.util.Arrays;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.server.mgmt.api.RequestorEntry;
-import org.xipki.ca.server.mgmt.shell.RequestorUpdateAction;
+import org.xipki.ca.mgmt.api.RequestorEntry;
+import org.xipki.ca.mgmt.shell.RequestorUpdateAction;
 import org.xipki.shell.CmdFailure;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;

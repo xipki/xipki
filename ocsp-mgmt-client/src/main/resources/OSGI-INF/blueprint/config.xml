@@ -44,5 +44,5 @@
     <property name="sslContextConf" ref="sslContextConf"/>
   </bean>
 
-  <service ref="ocspManager" interface="org.xipki.ocsp.server.mgmt.api.OcspManager"/>
+  <service ref="ocspManager" interface="org.xipki.ocsp.mgmt.api.OcspManager"/>
 </blueprint>

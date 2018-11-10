@@ -20,10 +20,10 @@ package org.xipki.qa.ca.shell;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.api.CaUris;
-import org.xipki.ca.server.mgmt.api.CaEntry;
-import org.xipki.ca.server.mgmt.api.ChangeCaEntry;
-import org.xipki.ca.server.mgmt.api.CmpControl;
-import org.xipki.ca.server.mgmt.shell.CaUpdateAction;
+import org.xipki.ca.mgmt.api.CaEntry;
+import org.xipki.ca.mgmt.api.ChangeCaEntry;
+import org.xipki.ca.mgmt.api.CmpControl;
+import org.xipki.ca.mgmt.shell.CaUpdateAction;
 import org.xipki.shell.CmdFailure;
 import org.xipki.util.ConfPairs;
 

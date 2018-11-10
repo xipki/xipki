@@ -19,7 +19,7 @@ package org.xipki.qa.ca.shell;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.server.mgmt.shell.RequestorUpdateAction;
+import org.xipki.ca.mgmt.shell.RequestorUpdateAction;
 import org.xipki.shell.CmdFailure;
 
 /**

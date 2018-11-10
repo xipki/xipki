@@ -19,9 +19,9 @@ package org.xipki.qa.ca.shell;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.server.mgmt.api.CaManager;
-import org.xipki.ca.server.mgmt.api.SignerEntry;
-import org.xipki.ca.server.mgmt.shell.SignerUpdateAction;
+import org.xipki.ca.mgmt.api.CaManager;
+import org.xipki.ca.mgmt.api.SignerEntry;
+import org.xipki.ca.mgmt.shell.SignerUpdateAction;
 import org.xipki.shell.CmdFailure;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;

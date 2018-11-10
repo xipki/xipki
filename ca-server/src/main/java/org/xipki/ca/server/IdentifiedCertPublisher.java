@@ -26,7 +26,7 @@ import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
-import org.xipki.ca.server.mgmt.api.PublisherEntry;
+import org.xipki.ca.mgmt.api.PublisherEntry;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;

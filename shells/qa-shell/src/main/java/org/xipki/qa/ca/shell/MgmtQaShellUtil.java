@@ -20,7 +20,7 @@ package org.xipki.qa.ca.shell;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.xipki.ca.server.mgmt.api.CaManager;
+import org.xipki.ca.mgmt.api.CaManager;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 

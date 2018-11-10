@@ -71,7 +71,7 @@ import org.xipki.ca.api.profile.KeypairGenControl;
 import org.xipki.ca.api.profile.SubjectDnSpec;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.X509CertVersion;
-import org.xipki.ca.server.mgmt.api.CertprofileEntry;
+import org.xipki.ca.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.util.CaUtil;
 import org.xipki.security.ExtensionExistence;
 import org.xipki.security.HashAlgo;

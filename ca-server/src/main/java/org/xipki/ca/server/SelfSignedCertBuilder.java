@@ -58,7 +58,7 @@ import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.SubjectInfo;
-import org.xipki.ca.server.mgmt.api.CaEntry;
+import org.xipki.ca.mgmt.api.CaEntry;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;

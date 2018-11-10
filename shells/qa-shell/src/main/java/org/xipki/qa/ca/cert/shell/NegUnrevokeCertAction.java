@@ -19,7 +19,7 @@ package org.xipki.qa.ca.cert.shell;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.server.mgmt.shell.cert.UnrevokeCertAction;
+import org.xipki.ca.mgmt.shell.cert.UnrevokeCertAction;
 import org.xipki.shell.CmdFailure;
 
 /**
