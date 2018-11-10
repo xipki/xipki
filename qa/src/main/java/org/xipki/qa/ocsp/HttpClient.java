@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.ocsp.benchmark;
+package org.xipki.qa.ocsp;
 
 import java.io.IOException;
 import java.io.InputStream;
