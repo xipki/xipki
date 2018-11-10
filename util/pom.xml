@@ -26,6 +26,9 @@
   <packaging>bundle</packaging>
   <artifactId>util</artifactId>
   <name>XiPKI :: ${project.artifactId}</name>
+  <properties>
+    <DynamicImport-Package>*</DynamicImport-Package>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -46,7 +49,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <properties>
-    <DynamicImport-Package>*</DynamicImport-Package>
-  </properties>
 </project>

@@ -47,9 +47,9 @@
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
-    <!-- ${output.directory} -->
+    <!-- ${project.build.directory}/classes -->
     <fileSet>
-      <directory>${output.directory}</directory>
+      <directory>${project.build.directory}/classes</directory>
       <includes>
         <include>bin/**</include>
         <include>**/*.sh</include>
@@ -63,7 +63,7 @@
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>${output.directory}</directory>
+      <directory>${project.build.directory}/classes</directory>
       <includes>
         <include>bin/*.bat</include>
       </includes>
@@ -73,7 +73,7 @@
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>${output.directory}</directory>
+      <directory>${project.build.directory}/classes</directory>
       <excludes>
         <exclude>bin/**</exclude>
         <exclude>**/*.sh</exclude>

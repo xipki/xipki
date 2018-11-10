@@ -25,6 +25,12 @@
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
+    <fileSet>
+      <directory>${project.build.directory}/lib</directory>
+      <outputDirectory>lib</outputDirectory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
   </fileSets>
   <files>
     <file>

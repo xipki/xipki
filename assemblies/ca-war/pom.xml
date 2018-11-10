@@ -65,6 +65,31 @@
             </configuration>
           </execution>
           <execution>
+            <!-- Copy the JDBC jars -->
+            <id>jdbc</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <stripVersion>false</stripVersion>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.mariadb.jdbc</groupId>
+                  <artifactId>mariadb-java-client</artifactId>
+                  <version>${jdbc.mariadb.version}</version>
+                  <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.postgresql</groupId>
+                  <artifactId>postgresql</artifactId>
+                  <version>${jdbc.postgresql.version}</version>
+                  <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+          <execution>
             <!-- Extract the SQL scripts -->
             <id>unpack-sql</id>
             <phase>generate-resources</phase>

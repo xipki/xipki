@@ -28,7 +28,6 @@
   <name>XiPKI :: Assemblies :: ${project.artifactId}</name>
   <properties>
     <app.name>SDK</app.name>
-    <output.directory>${project.build.directory}/classes</output.directory>
     <shared.dir>${project.basedir}/../shared</shared.dir>
     <patchkaraf.repos>mvn:org.xipki.features/console/${project.version}/xml/features,file:lib/jdbc/features.xml</patchkaraf.repos>
     <patchkaraf.features>(aries-blueprint/${karaf.version},wrap),xipki-security,xipki-caclient,xipki-scepclient,xipki-ocspclient,xipki-camgmt,xipki-dbtool</patchkaraf.features>
@@ -107,13 +106,13 @@
                   <groupId>org.mariadb.jdbc</groupId>
                   <artifactId>mariadb-java-client</artifactId>
                   <version>${jdbc.mariadb.version}</version>
-                  <outputDirectory>${output.directory}/lib/jdbc</outputDirectory>
+                  <outputDirectory>${project.build.directory}/classes/lib/jdbc</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.postgresql</groupId>
                   <artifactId>postgresql</artifactId>
                   <version>${jdbc.postgresql.version}</version>
-                  <outputDirectory>${output.directory}/lib/jdbc</outputDirectory>
+                  <outputDirectory>${project.build.directory}/classes/lib/jdbc</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -145,7 +144,7 @@
               <goal>unpack</goal>
             </goals>
             <configuration>
-              <outputDirectory>${output.directory}/xipki</outputDirectory>
+              <outputDirectory>${project.build.directory}/classes/xipki</outputDirectory>
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xipki</groupId>
@@ -172,7 +171,7 @@
               <goal>unpack</goal>
             </goals>
             <configuration>
-              <outputDirectory>${output.directory}/xipki</outputDirectory>
+              <outputDirectory>${project.build.directory}/classes/xipki</outputDirectory>
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xipki</groupId>
@@ -227,7 +226,7 @@
               <goal>unpack</goal>
             </goals>
             <configuration>
-              <outputDirectory>${output.directory}/xipki/keycerts/tlskeys</outputDirectory>
+              <outputDirectory>${project.build.directory}/classes/xipki/keycerts/tlskeys</outputDirectory>
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xipki.tools</groupId>
@@ -253,7 +252,7 @@
               <goal>features-add-to-repository</goal>
             </goals>
             <configuration>
-              <repository>${output.directory}/system</repository>
+              <repository>${project.build.directory}/classes/system</repository>
               <descriptors>
                 <descriptor>mvn:org.xipki.features/console/${project.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
@@ -307,7 +306,7 @@
                   <arg file="src/main/patchkaraf/org.ops4j.pax.logging.cfg.patch"/>
                 </java>
                 <replace
-                    file="${output.directory}/system/org/xipki/features/console/${project.version}/console-${project.version}-features.xml"
+                    file="${project.build.directory}/classes/system/org/xipki/features/console/${project.version}/console-${project.version}-features.xml"
                     token="&lt;!--feature&gt;intern-xipki-jdbc&lt;/feature--&gt;"
                     value="&lt;feature&gt;intern-xipki-jdbc&lt;/feature&gt;"/>
               </target>
