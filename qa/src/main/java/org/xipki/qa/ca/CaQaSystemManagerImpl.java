@@ -57,9 +57,9 @@ import org.xml.sax.SAXException;
  * @since 2.0.0
  */
 
-public class QaSystemManagerImpl implements QaSystemManager {
+public class CaQaSystemManagerImpl implements CaQaSystemManager {
 
-  private static final Logger LOG = LoggerFactory.getLogger(QaSystemManagerImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CaQaSystemManagerImpl.class);
 
   private final Unmarshaller jaxbUnmarshaller;
 
@@ -71,12 +71,12 @@ public class QaSystemManagerImpl implements QaSystemManager {
 
   private AtomicBoolean initialized = new AtomicBoolean(false);
 
-  public QaSystemManagerImpl() throws JAXBException, SAXException {
+  public CaQaSystemManagerImpl() throws JAXBException, SAXException {
     JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
     jaxbUnmarshaller = context.createUnmarshaller();
 
     final SchemaFactory schemaFact = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-    URL url = QaSystemManagerImpl.class.getResource("/xsd/caqa-conf.xsd");
+    URL url = CaQaSystemManagerImpl.class.getResource("/xsd/caqa-conf.xsd");
     jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
   }
 
@@ -88,20 +88,16 @@ public class QaSystemManagerImpl implements QaSystemManager {
     this.confFile = ParamUtil.requireNonBlank("confFile", confFile);
   }
 
-  public boolean isInitialized() {
-    return initialized.get();
-  }
-
-  public void init() {
+  @Override
+  public boolean init() {
     if (StringUtil.isBlank(confFile)) {
       throw new IllegalStateException("confFile must not be null and empty");
     }
 
     LOG.info("initializing ...");
-    if (initialized.get()) {
-      LOG.info("already initialized, skipping ...");
-      return;
-    }
+    initialized.set(false);
+    x509IssuerInfoMap.clear();
+    x509IssuerInfoMap.clear();
 
     QaconfType qaConf;
     try {
@@ -110,7 +106,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
     } catch (IOException | JAXBException | SAXException ex) {
       final String message = "could not parse the QA configuration";
       LogUtil.error(LOG, ex, message);
-      return;
+      return false;
     }
 
     if (qaConf.getIssuers() != null) {
@@ -133,7 +129,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
           cutoffNotAfter = false;
         } else {
           LOG.error("invalid validityMode {}", str);
-          return;
+          return false;
         }
 
         IssuerInfo issuerInfo;
@@ -168,6 +164,8 @@ public class QaSystemManagerImpl implements QaSystemManager {
 
     initialized.set(true);
     LOG.info("initialized");
+
+    return true;
   } // method init
 
   @Override
@@ -176,21 +174,25 @@ public class QaSystemManagerImpl implements QaSystemManager {
 
   @Override
   public Set<String> getIssuerNames() {
+    assertInitialized();
     return Collections.unmodifiableSet(x509IssuerInfoMap.keySet());
   }
 
   @Override
   public IssuerInfo getIssuer(String issuerName) {
+    assertInitialized();
     return x509IssuerInfoMap.get(ParamUtil.requireNonNull("issuerName", issuerName));
   }
 
   @Override
   public Set<String> getCertprofileNames() {
+    assertInitialized();
     return Collections.unmodifiableSet(x509ProfileMap.keySet());
   }
 
   @Override
   public CertprofileQa getCertprofile(String certprofileName) {
+    assertInitialized();
     return x509ProfileMap.get(ParamUtil.requireNonNull("certprofileName", certprofileName));
   }
 
@@ -208,6 +210,12 @@ public class QaSystemManagerImpl implements QaSystemManager {
       return (QaconfType) rootElement.getValue();
     } else {
       throw new SAXException("invalid root element type");
+    }
+  }
+
+  private void assertInitialized() {
+    if (!initialized.get()) {
+      throw new IllegalStateException("CaQaSystemManager is not started yet");
     }
   }
 

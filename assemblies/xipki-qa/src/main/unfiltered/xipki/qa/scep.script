@@ -21,7 +21,6 @@ SCEP_URL = http://localhost:8080/ca/scep/subcawithcrl/ocsp/pkiclient.exe
 echo "#################################################################"
 echo "#               Enroll Certificate via SCEP                     #"
 echo "#################################################################"
-feature:install xipki-scepclient
 
 # Prepare
 
@@ -129,4 +128,3 @@ xi:update-cert-p12 \
   --ca-cert output/subcawithcrl1.crt \
   --ca-cert output/rootca1.crt
 
-feature:uninstall xipki-scepclient

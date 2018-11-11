@@ -67,7 +67,6 @@ if { $printUsage equals "true" } then {
   }
 
   if { "$action" equals "enroll" } then {
-    feature:install xipki-qa
 
     echo "Sleeping 1 second"
     sleep 1
@@ -83,9 +82,7 @@ if { $printUsage equals "true" } then {
       --key-type RSA --subject "CN=xipki.org,O=example PKI company RSA,C=DE" \
       --profile TLS -n 3 --random-dn O
 
-    feature:uninstall xipki-qa
   } elif { "$action" equals "ocsp" } then {
-    feature:install xipki-qa
 
     URL = http://localhost:8080/ocsp/responder1
     URL_CRL = http://localhost:8080/ocsp/responder2
@@ -100,6 +97,5 @@ if { $printUsage equals "true" } then {
     xiqa:benchmark-ocsp-status --duration $duration --thread $threads \
       --issuer output/subcawithcrl1.crt --cert output/ocsp2.crt --url $URL_CRL
 
-    feature:uninstall xipki-qa
   }
 }

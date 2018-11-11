@@ -134,7 +134,6 @@ if { $printUsage equals "true" } then {
   echo "options"
   echo "    -l               configure CAs using command 'load-conf'"
 } else {
-  feature:install xipki-qa
 
   source file:./xipki/qa/qa.d/prepare-keys.script
 
@@ -696,5 +695,3 @@ if { $printUsage equals "true" } then {
     --duplicate-key yes \
     --validity-mode cutoff
 
-  feature:uninstall xipki-qa
-}

@@ -21,7 +21,7 @@ import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.qa.ca.QaSystemManager;
+import org.xipki.qa.ca.CaQaSystemManager;
 import org.xipki.shell.completer.AbstractDynamicEnumCompleter;
 
 /**
@@ -34,7 +34,7 @@ import org.xipki.shell.completer.AbstractDynamicEnumCompleter;
 public class CertprofileNameCompleter extends AbstractDynamicEnumCompleter {
 
   @Reference
-  private QaSystemManager qaSystemManager;
+  private CaQaSystemManager qaSystemManager;
 
   @Override
   protected Set<String> getEnums() {

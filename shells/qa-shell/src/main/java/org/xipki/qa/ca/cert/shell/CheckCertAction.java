@@ -36,7 +36,7 @@ import org.xipki.qa.ValidationIssue;
 import org.xipki.qa.ValidationResult;
 import org.xipki.qa.ca.CertprofileQa;
 import org.xipki.qa.ca.IssuerInfo;
-import org.xipki.qa.ca.QaSystemManager;
+import org.xipki.qa.ca.CaQaSystemManager;
 import org.xipki.qa.ca.shell.completer.CertprofileNameCompleter;
 import org.xipki.qa.ca.shell.completer.IssuerNameCompleter;
 import org.xipki.security.util.X509Util;
@@ -76,7 +76,7 @@ public class CheckCertAction extends XiAction {
   private Boolean verbose = Boolean.FALSE;
 
   @Reference
-  private QaSystemManager qaSystemManager;
+  private CaQaSystemManager qaSystemManager;
 
   @Override
   protected Object execute0() throws Exception {

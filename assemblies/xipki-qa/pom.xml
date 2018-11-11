@@ -30,7 +30,7 @@
     <app.name>QA</app.name>
     <shared.dir>${project.basedir}/../shared</shared.dir>
     <patchkaraf.repos>mvn:org.xipki.features/qa/${project.version}/xml/features,file:lib/jdbc/features.xml</patchkaraf.repos>
-    <patchkaraf.features>(aries-blueprint/${karaf.version},wrap),xipki-security,xipki-caclient,xipki-scepclient,xipki-ocspclient,xipki-camgmt,xipki-dbtool</patchkaraf.features>
+    <patchkaraf.features>(aries-blueprint/${karaf.version},wrap),xipki-security,xipki-caclient,xipki-scepclient,xipki-ocspclient,xipki-camgmt,,xipki-ocspmgmt,xipki-dbtool,xipki-qa</patchkaraf.features>
   </properties>
   <dependencies>
     <dependency>

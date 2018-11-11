@@ -269,8 +269,6 @@ if { $printUsage equals "true" } then {
   xi:copy-file -f ${XIPKI_DIR}/etc/ocsp/foo.crl.UPDATEME \
     ${XIPKI_DIR}/etc/ocsp/crls/subcawithcrl1/crl.crl.UPDATEME
 
-  feature:install xipki-ocspmgmt
-
   if { $TOKEN_TYPE equals "pkcs11" } then {
     ocsp:refresh-token --type pkcs11
   }

@@ -40,7 +40,8 @@ ca:enroll-cert --ca rootca1 --profile cross \
 echo "#################################################################"
 echo "#              Manage certificate with RA Client                #"
 echo "#################################################################"
-feature:install xipki-caclient
+
+xi:init-caclient
 
 echo "Sleeping 1 second"
 sleep 1
@@ -387,7 +388,6 @@ xi:cmp-getcrl --ca subcawithcrl1 \
 echo "#################################################################"
 echo "#              Uninstall unneeded features                      #"
 echo "#################################################################"
-feature:uninstall xipki-caclient
 
 source file:./xipki/qa/scep.script
 

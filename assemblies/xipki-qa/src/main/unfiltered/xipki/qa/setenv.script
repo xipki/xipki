@@ -1,1 +1,2 @@
 XIPKI_DIR=~/tools/apache-tomcat-8.5.34/xipki
+XIPKI_DIR=~/tools/jetty-distribution-9.4.12.v20180830/xipki

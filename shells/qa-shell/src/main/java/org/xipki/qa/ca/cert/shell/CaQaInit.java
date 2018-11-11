@@ -15,14 +15,13 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.ca.shell.completer;
+package org.xipki.qa.ca.cert.shell;
 
-import java.util.Set;
-
+import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.qa.ca.CaQaSystemManager;
-import org.xipki.shell.completer.AbstractDynamicEnumCompleter;
+import org.xipki.shell.XiAction;
 
 /**
  * TODO.
@@ -30,15 +29,22 @@ import org.xipki.shell.completer.AbstractDynamicEnumCompleter;
  * @since 2.0.0
  */
 
+@Command(scope = "caqa", name = "init", description = "initialize the CA QA manager")
 @Service
-public class IssuerNameCompleter extends AbstractDynamicEnumCompleter {
+public class CaQaInit extends XiAction {
 
   @Reference
   private CaQaSystemManager qaSystemManager;
 
   @Override
-  protected Set<String> getEnums() {
-    return qaSystemManager.getIssuerNames();
-  }
+  protected Object execute0() throws Exception {
+    boolean succ = qaSystemManager.init();
+    if (succ) {
+      println("CA QA system initialized successfully");
+    } else {
+      println("CA QA system initialization failed");
+    }
+    return null;
+  } // method execute0
 
 }
