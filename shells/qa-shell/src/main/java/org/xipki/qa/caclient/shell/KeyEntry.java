@@ -23,6 +23,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.SecureRandom;
 import java.security.interfaces.DSAPublicKey;
+import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -35,10 +36,8 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
-import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
-import org.bouncycastle.math.ec.ECPoint;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.Base64;
@@ -291,8 +290,10 @@ public static final class ECKeyEntry extends KeyEntry {
       kpgen.initialize(spec);
       KeyPair kp = kpgen.generateKeyPair();
 
-      ECPoint baseQ = ((BCECPublicKey) kp.getPublic()).getQ();
-      spki = new SubjectPublicKeyInfo(algId, baseQ.getEncoded(false));
+      ECPublicKey pub = (ECPublicKey) kp.getPublic();
+      int orderBitLength = pub.getParams().getOrder().bitLength();
+      byte[] keyData = KeyUtil.getUncompressedEncodedECPoint(pub.getW(), orderBitLength);
+      spki = new SubjectPublicKeyInfo(algId, keyData);
     }
 
     @Override

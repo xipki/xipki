@@ -43,6 +43,7 @@ import java.security.spec.DSAParameterSpec;
 import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.ECGenParameterSpec;
 import java.security.spec.ECParameterSpec;
+import java.security.spec.ECPoint;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.security.spec.RSAPublicKeySpec;
@@ -405,6 +406,40 @@ public class KeyUtil {
   private static ASN1ObjectIdentifier detectCurveOid(ECParameterSpec paramSpec) {
     org.bouncycastle.jce.spec.ECParameterSpec bcParamSpec = EC5Util.convertSpec(paramSpec, false);
     return ECUtil.getNamedCurveOid(bcParamSpec);
+  }
+
+  // CHECKSTYLE:SKIP
+  public static byte[] getUncompressedEncodedECPoint(ECPoint point, int orderBitLength) {
+    int orderByteLength = (orderBitLength + 7) / 8;
+    byte[] keyData = new byte[1 + orderByteLength * 2];
+    keyData[0] = 4;
+    unsignedByteArrayCopy(keyData, 1, orderByteLength, point.getAffineX());
+    unsignedByteArrayCopy(keyData, 1 + orderByteLength, orderByteLength, point.getAffineY());
+    return keyData;
+  }
+
+  /**
+   * Write the passed in value as an unsigned byte array to the {@code out} from offset
+   * {@code outOffset}.
+   *
+   * @param value value to be converted.
+   * @return a byte array without a leading zero byte if present in the signed encoding.
+   */
+  private static void unsignedByteArrayCopy(byte[] dest, int destPos,
+      int length, BigInteger value) {
+    byte[] bytes = value.toByteArray();
+    if (bytes.length == length) {
+      System.arraycopy(bytes, 0, dest, destPos, length);
+    } else {
+      int start = bytes[0] == 0 ? 1 : 0;
+      int count = bytes.length - start;
+
+      if (count > length) {
+        throw new IllegalArgumentException("standard length exceeded for value");
+      }
+
+      System.arraycopy(bytes, start, dest, destPos + length - count, count);
+    }
   }
 
 }

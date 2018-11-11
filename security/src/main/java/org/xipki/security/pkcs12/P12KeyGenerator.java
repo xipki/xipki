@@ -29,6 +29,7 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPrivateKey;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
@@ -47,7 +48,6 @@ import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
-import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.bc.BcContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcDSAContentSignerBuilder;
@@ -188,8 +188,10 @@ public class P12KeyGenerator {
     KeyPair kp = KeyUtil.generateECKeypair(curveOid, random);
     AlgorithmIdentifier algId = new AlgorithmIdentifier(
         X9ObjectIdentifiers.id_ecPublicKey, curveOid);
-    BCECPublicKey pub = (BCECPublicKey) kp.getPublic();
-    byte[] keyData = pub.getQ().getEncoded(false);
+
+    ECPublicKey pub = (ECPublicKey) kp.getPublic();
+    int orderBitLength = pub.getParams().getOrder().bitLength();
+    byte[] keyData = KeyUtil.getUncompressedEncodedECPoint(pub.getW(), orderBitLength);
     SubjectPublicKeyInfo subjectPublicKeyInfo = new SubjectPublicKeyInfo(algId, keyData);
 
     return new KeyPairWithSubjectPublicKeyInfo(kp, subjectPublicKeyInfo);

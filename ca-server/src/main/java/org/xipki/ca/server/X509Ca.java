@@ -48,6 +48,7 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPrivateKey;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
@@ -103,7 +104,6 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v2CRLBuilder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.crypto.RuntimeCryptoException;
-import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
@@ -2127,9 +2127,10 @@ public class X509Ca implements Closeable {
           KeypairGenControl.ECKeypairGenControl tkg = (KeypairGenControl.ECKeypairGenControl) kg;
           ASN1ObjectIdentifier curveOid = tkg.getCurveOid();
           KeyPair kp = KeyUtil.generateECKeypair(curveOid, random);
-          BCECPublicKey pub = (BCECPublicKey) kp.getPublic();
-          byte[] keyData = pub.getQ().getEncoded(false);
+          ECPublicKey pub = (ECPublicKey) kp.getPublic();
+          int orderBitLength = pub.getParams().getOrder().bitLength();
 
+          byte[] keyData = KeyUtil.getUncompressedEncodedECPoint(pub.getW(), orderBitLength);
           grantedPublicKeyInfo = new SubjectPublicKeyInfo(tkg.getKeyAlgorithm(), keyData);
 
           /*
@@ -2148,7 +2149,6 @@ public class X509Ca implements Closeable {
            * Cryptoki.
            */
           ECPrivateKey priv = (ECPrivateKey) kp.getPrivate();
-          int orderBitLength = pub.getParams().getOrder().bitLength();
           privateKey = new PrivateKeyInfo(tkg.getKeyAlgorithm(),
               new org.bouncycastle.asn1.sec.ECPrivateKey(orderBitLength, priv.getS()));
         } else if (kg instanceof KeypairGenControl.DSAKeypairGenControl) {
