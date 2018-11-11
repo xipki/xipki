@@ -19,8 +19,8 @@ package org.xipki.dbtool.shell;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.dbtool.InitDbMain;
 import org.xipki.dbtool.LiquibaseDatabaseConf;
-import org.xipki.dbtool.LiquibaseMain;
 
 /**
  * TODO.
@@ -44,15 +44,7 @@ public class InitDbAction extends LiquibaseAction {
       }
     }
 
-    LiquibaseMain liquibase = new LiquibaseMain(dbConf, dbSchemaFile);
-    try {
-      liquibase.init();
-      liquibase.releaseLocks();
-      liquibase.dropAll();
-      liquibase.update();
-    } finally {
-      liquibase.close();
-    }
+    InitDbMain.initDb(dbConf, dbSchemaFile);
 
     return null;
   }

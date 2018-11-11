@@ -81,9 +81,6 @@ Feature xipki-dbtool (not started by default)
 
      reset and initialize database
 
-   * `xi:updatedb`
-     update the database schema
-
 Feature xipki-security-shell (not started by default)
 -----
 
