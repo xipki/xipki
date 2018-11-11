@@ -23,7 +23,7 @@
     <artifactId>xipki-parent</artifactId>
     <version>5.0.0-SNAPSHOT</version>
   </parent>
-  <groupId>org.xipki.shells</groupId>
+  <groupId>org.xipki.shell</groupId>
   <artifactId>shells</artifactId>
   <packaging>pom</packaging>
   <name>XiPKI :: Shells</name>

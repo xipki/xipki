@@ -19,13 +19,13 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xipki.shells</groupId>
+    <groupId>org.xipki.shell</groupId>
     <artifactId>shells</artifactId>
     <version>5.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>dbtool-shell</artifactId>
   <packaging>bundle</packaging>
-  <name>XiPKI :: Shells :: ${project.artifactId}</name>
+  <name>XiPKI :: ${project.artifactId}</name>
   <properties>
     <Karaf-Commands>*</Karaf-Commands>
   </properties>

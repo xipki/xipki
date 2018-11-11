@@ -25,8 +25,8 @@
     <bundle>mvn:org.xipki.iaik/pkcs11-constants/${pkcs11-wrapper.version}</bundle>
     <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
-    <bundle>mvn:org.xipki.shells/shell-base/${project.version}</bundle>
-    <bundle>mvn:org.xipki.shells/security-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/security-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-caclient" version="${project.version}" description="CA client">
     <bundle>mvn:org.xipki/util/${project.version}</bundle>
@@ -37,8 +37,8 @@
     <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-client/${project.version}</bundle>
-    <bundle>mvn:org.xipki.shells/shell-base/${project.version}</bundle>
-    <bundle>mvn:org.xipki.shells/ca-client-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/ca-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-scepclient" version="${project.version}"
       description="SCEP client shell">
@@ -49,8 +49,8 @@
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
     <bundle>mvn:org.xipki.scep/scep-common/${xipki.scep.version}</bundle>
     <bundle>mvn:org.xipki.scep/scep-client/${xipki.scep.version}</bundle>
-    <bundle>mvn:org.xipki.shells/shell-base/${project.version}</bundle>
-    <bundle>mvn:org.xipki.shells/scep-client-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/scep-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-ocspclient" version="${project.version}" description="OCSP client shell">
     <bundle>mvn:org.xipki/util/${project.version}</bundle>
@@ -61,8 +61,8 @@
     <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
     <bundle>mvn:org.xipki/ocsp-client/${project.version}</bundle>
-    <bundle>mvn:org.xipki.shells/shell-base/${project.version}</bundle>
-    <bundle>mvn:org.xipki.shells/ocsp-client-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/ocsp-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-camgmt" version="${project.version}" description="CA management shell">
     <bundle>mvn:org.xipki/util/${project.version}</bundle>
@@ -75,8 +75,8 @@
     <bundle>mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
     <bundle>mvn:org.xipki/datasource/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-mgmt-client/${project.version}</bundle>
-    <bundle>mvn:org.xipki.shells/shell-base/${project.version}</bundle>
-    <bundle>mvn:org.xipki.shells/ca-mgmt-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/ca-mgmt-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-ocspmgmt" version="${project.version}" description="OCSP management">
     <bundle>mvn:org.xipki/util/${project.version}</bundle>
@@ -87,7 +87,7 @@
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
     <bundle>mvn:org.xipki/ocsp-api/${project.version}</bundle>
     <bundle>mvn:org.xipki/ocsp-mgmt-client/${project.version}</bundle>
-    <bundle>mvn:org.xipki.shells/shell-base/${project.version}</bundle>
-    <bundle>mvn:org.xipki.shells/ocsp-mgmt-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/ocsp-mgmt-shell/${project.version}</bundle>
   </feature>
 </features>

@@ -23,9 +23,9 @@
     <artifactId>xipki-parent</artifactId>
     <version>5.0.0-SNAPSHOT</version>
   </parent>
-  <groupId>org.xipki.assemblies</groupId>
+  <groupId>org.xipki.assembly</groupId>
   <artifactId>assemblies</artifactId>
-  <name>XiPKI :: Assemblies</name>
+  <name>XiPKI :: ${project.artifactId}</name>
   <packaging>pom</packaging>
   <modules>
     <module>features</module>
