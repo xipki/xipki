@@ -44,7 +44,7 @@ public class LiquibaseDatabaseConf {
 
   private final String schema;
 
-  private LiquibaseDatabaseConf(String driver, String username, String password,
+  public LiquibaseDatabaseConf(String driver, String username, String password,
       String url, String schema) {
     this.driver = driver;
     this.username = Objects.requireNonNull(username, "username must not be null");

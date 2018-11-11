@@ -20,6 +20,7 @@ package org.xipki.util;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
+import java.io.Console;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -224,4 +225,25 @@ public class IoUtil {
     }
     throw new IOException(url.toString() + " is not of protocol HTTP: " + url.getProtocol());
   }
+
+  public static char[] readPasswordFromConsole(String prompt) {
+    Console console = System.console();
+    if (console == null) {
+      throw new IllegalStateException("No console is available for input");
+    }
+    System.out.println(prompt == null ? "Enter the password" : prompt);
+    return console.readPassword();
+  }
+
+  public static String readLineFromConsole(String prompt) {
+    Console console = System.console();
+    if (console == null) {
+      throw new IllegalStateException("No console is available for input");
+    }
+    if (prompt != null) {
+      System.out.println(prompt);
+    }
+    return console.readLine();
+  }
+
 }
