@@ -547,24 +547,6 @@ public final class CaClientImpl implements CaClient {
       LOG.info("configuring CAs {}", autoConfCaNames);
       Set<String> failedCaNames = autoConfCas(autoConfCaNames);
 
-      // try to re-configure the failed CAs
-      if (CollectionUtil.isNonEmpty(failedCaNames)) {
-        for (int i = 0; i < 3; i++) {
-          LOG.info("configuring ({}-th retry) CAs {}", i + 1, failedCaNames);
-
-          failedCaNames = autoConfCas(failedCaNames);
-          if (CollectionUtil.isEmpty(failedCaNames)) {
-            break;
-          }
-
-          try {
-            Thread.sleep(10000);
-          } catch (InterruptedException ex) {
-            LOG.warn("interrupted", ex);
-          }
-        }
-      }
-
       if (CollectionUtil.isNonEmpty(failedCaNames)) {
         LOG.error("could not configure following CAs {}", failedCaNames);
         return false;
