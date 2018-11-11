@@ -25,6 +25,7 @@ HASH = SHA256
 # Signature type: RSA or RSAandMGF1
 SIGTYPE=RSA
 
+# Please adapt me
 P11_LABEL = myca1-rsa
 
 KEYCERTS_DIR = xipki/ca-setup/keycerts

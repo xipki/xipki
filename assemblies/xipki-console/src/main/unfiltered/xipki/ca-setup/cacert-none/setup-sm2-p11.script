@@ -19,6 +19,7 @@
 # Please adapt me
 CA_SUBJECT="CN=myca1,O=xipki,C=DE"
 
+# Please adapt me
 P11_LABEL = myca1-sm2
 
 KEYCERTS_DIR = xipki/ca-setup/keycerts

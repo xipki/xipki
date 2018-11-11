@@ -22,6 +22,7 @@ CA_SUBJECT="CN=myca1,O=xipki,C=DE"
 # Please adapt me
 HASH = SHA256
 
+# Please adapt me
 P11_LABEL = myca1-dsa
 
 KEYCERTS_DIR = xipki/ca-setup/keycerts

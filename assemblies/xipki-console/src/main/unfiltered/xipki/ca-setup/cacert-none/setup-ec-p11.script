@@ -25,6 +25,7 @@ HASH = SHA256
 # Please adapt me
 CURVE = secp256r1
 
+# Please adapt me
 P11_LABEL = myca1-ec
 
 KEYCERTS_DIR = xipki/ca-setup/keycerts

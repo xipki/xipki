@@ -6,4 +6,3 @@
   in the file `xipki/etc/org.xipki.ocsp.server.cfg`.
 - Databases used by this QA must be one of MySQL, MariaDB, PostgreSQL, Oracle and DB2.
   In tomcat, you can just add the jar file to the folder `webapps/ca/WEB-INF/lib`. 
-  
