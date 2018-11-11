@@ -23,20 +23,20 @@
     <artifactId>assemblies</artifactId>
     <version>5.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xipki-console</artifactId>
+  <artifactId>xipki-qa</artifactId>
   <packaging>pom</packaging>
   <name>XiPKI :: Assemblies :: ${project.artifactId}</name>
   <properties>
-    <app.name>console</app.name>
+    <app.name>QA</app.name>
     <shared.dir>${project.basedir}/../shared</shared.dir>
-    <patchkaraf.repos>mvn:org.xipki.features/console/${project.version}/xml/features</patchkaraf.repos>
-    <patchkaraf.features>(aries-blueprint/${karaf.version},wrap),xipki-security,xipki-caclient,xipki-scepclient,xipki-ocspclient,xipki-camgmt</patchkaraf.features>
+    <patchkaraf.repos>mvn:org.xipki.features/qa/${project.version}/xml/features,file:lib/jdbc/features.xml</patchkaraf.repos>
+    <patchkaraf.features>(aries-blueprint/${karaf.version},wrap),xipki-security,xipki-caclient,xipki-scepclient,xipki-ocspclient,xipki-camgmt,xipki-dbtool</patchkaraf.features>
   </properties>
   <dependencies>
     <dependency>
       <!-- project base features -->
       <groupId>org.xipki.features</groupId>
-      <artifactId>console</artifactId>
+      <artifactId>qa</artifactId>
       <version>${project.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
@@ -51,6 +51,17 @@
       <resource>
         <directory>src/main/unfiltered</directory>
         <filtering>false</filtering>
+      </resource>
+      <resource>
+        <directory>../xipki-console/src/main/filtered</directory>
+        <filtering>true</filtering>
+      </resource>
+      <resource>
+        <directory>../xipki-console/src/main/unfiltered</directory>
+        <filtering>false</filtering>
+        <excludes>
+          <exclude>xipki/**</exclude>
+        </excludes>
       </resource>
     </resources>
     <plugins>
@@ -73,6 +84,31 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
+            <!-- Copy the JDBC jars -->
+            <id>jdbc</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <stripVersion>false</stripVersion>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.mariadb.jdbc</groupId>
+                  <artifactId>mariadb-java-client</artifactId>
+                  <version>${jdbc.mariadb.version}</version>
+                  <outputDirectory>${project.build.directory}/classes/lib/jdbc</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.postgresql</groupId>
+                  <artifactId>postgresql</artifactId>
+                  <version>${jdbc.postgresql.version}</version>
+                  <outputDirectory>${project.build.directory}/classes/lib/jdbc</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+          <execution>
             <!-- Uncompress the standard Karaf distribution -->
             <id>unpack</id>
             <phase>generate-resources</phase>
@@ -92,8 +128,8 @@
             </configuration>
           </execution>
           <execution>
-            <!-- Extract the XSD schemas -->
-            <id>unpack-xsd</id>
+            <!-- Extract the SQL scripts -->
+            <id>unpack-sql</id>
             <phase>generate-resources</phase>
             <goals>
               <goal>unpack</goal>
@@ -103,38 +139,17 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xipki</groupId>
-                  <artifactId>security</artifactId>
+                  <artifactId>ca-server</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
-                  <includes>xsd/**</includes>
+                  <includes>sql/**</includes>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki</groupId>
-                  <artifactId>certprofile-xml</artifactId>
+                  <artifactId>ocsp-server</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
-                  <includes>xsd/**</includes>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki</groupId>
-                  <artifactId>ca-client</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>xsd/**</includes>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki</groupId>
-                  <artifactId>ca-mgmt-client</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>xsd/**</includes>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki</groupId>
-                  <artifactId>ca-api</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>xsd/**</includes>
+                  <includes>sql/**</includes>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -175,7 +190,7 @@
             <configuration>
               <repository>${project.build.directory}/classes/system</repository>
               <descriptors>
-                <descriptor>mvn:org.xipki.features/console/${project.version}/xml/features</descriptor>
+                <descriptor>mvn:org.xipki.features/qa/${project.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
               </descriptors>
               <features>
@@ -186,8 +201,10 @@
                 <feature>xipki-caclient</feature>
                 <feature>xipki-ocspclient</feature>
                 <feature>xipki-scepclient</feature>
+                <feature>xipki-dbtool</feature>
                 <feature>xipki-camgmt</feature>
                 <feature>xipki-ocspmgmt</feature>
+                <feature>xipki-qa</feature>
               </features>
             </configuration>
           </execution>
@@ -222,8 +239,12 @@
                   <arg value="--file"/>
                   <arg file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/org.ops4j.pax.logging.cfg"/>
                   <arg value="--value-file"/>
-                  <arg file="src/main/patchkaraf/org.ops4j.pax.logging.cfg.patch"/>
+                  <arg file="../xipki-console/src/main/patchkaraf/org.ops4j.pax.logging.cfg.patch"/>
                 </java>
+                <replace
+                    file="${project.build.directory}/classes/system/org/xipki/features/qa/${project.version}/qa-${project.version}-features.xml"
+                    token="&lt;!--feature&gt;intern-xipki-jdbc&lt;/feature--&gt;"
+                    value="&lt;feature&gt;intern-xipki-jdbc&lt;/feature&gt;"/>
               </target>
             </configuration>
             <goals>

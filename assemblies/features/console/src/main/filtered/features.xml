@@ -78,16 +78,6 @@
     <bundle>mvn:org.xipki.shells/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki.shells/ca-mgmt-shell/${project.version}</bundle>
   </feature>
-  <feature name="xipki-dbtool" version="${project.version}" description="Database tool">
-    <!--feature>intern-xipki-jdbc</feature-->
-    <bundle>mvn:org.xipki/util/${project.version}</bundle>
-    <bundle>mvn:org.xipki/password/${project.version}</bundle>
-    <bundle>mvn:org.yaml/snakeyaml/${snakeyaml.version}</bundle>
-    <bundle>mvn:org.liquibase/liquibase-core/${liquibase.version}</bundle>
-    <bundle>mvn:org.xipki/dbtool/${project.version}</bundle>
-    <bundle>mvn:org.xipki.shells/shell-base/${project.version}</bundle>
-    <bundle>mvn:org.xipki.shells/dbtool-shell/${project.version}</bundle>
-  </feature>
   <feature name="xipki-ocspmgmt" version="${project.version}" description="OCSP management">
     <bundle>mvn:org.xipki/util/${project.version}</bundle>
     <bundle>mvn:org.xipki/password/${project.version}</bundle>
@@ -99,13 +89,5 @@
     <bundle>mvn:org.xipki/ocsp-mgmt-client/${project.version}</bundle>
     <bundle>mvn:org.xipki.shells/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki.shells/ocsp-mgmt-shell/${project.version}</bundle>
-  </feature>
-  <feature name="xipki-qa" version="${project.version}" description="QA">
-    <feature>xipki-camgmt</feature>
-    <feature>xipki-ocspclient</feature>
-    <feature>xipki-caclient</feature>
-    <bundle>mvn:org.xipki/certprofile-xml/${project.version}</bundle>
-    <bundle>mvn:org.xipki/qa/${project.version}</bundle>
-    <bundle>mvn:org.xipki.shells/qa-shell/${project.version}</bundle>
   </feature>
 </features>

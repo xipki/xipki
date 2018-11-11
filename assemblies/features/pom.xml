@@ -29,6 +29,7 @@
   <packaging>pom</packaging>
   <modules>
     <module>console</module>
+    <module>qa</module>
   </modules>
   <profiles>
     <profile>

@@ -8,28 +8,27 @@
   </formats>
   <fileSets>
     <fileSet>
-      <directory>../shared/conf/xipki</directory>
-      <outputDirectory>xipki</outputDirectory>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <directory>src/assembly/unfiltered</directory>
+      <directory>${project.build.directory}</directory>
+      <includes>
+        <include>xipki/**/*.sh</include>
+        <include>lib/**/*.sh</include>
+        <include>dbtool/**/*.sh</include>
+      </includes>
       <outputDirectory>.</outputDirectory>
-      <fileMode>0644</fileMode>
+      <fileMode>0755</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>${project.build.directory}/xipki</directory>
-      <outputDirectory>xipki</outputDirectory>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <directory>${project.build.directory}/lib</directory>
-      <outputDirectory>lib</outputDirectory>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
+      <directory>${project.build.directory}</directory>
+      <includes>
+        <include>xipki/**</include>
+        <include>lib/**</include>
+        <include>dbtool/**</include>
+      </includes>
+      <excludes>
+        <exclude>**/*.sh</exclude>
+      </excludes>
+      <outputDirectory>.</outputDirectory>
     </fileSet>
   </fileSets>
   <files>
@@ -40,19 +39,19 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>src/assembly/unfiltered/xipki/etc/ocsp/example/mariadb.ocsp-db.properties</source>
+      <source>${project.build.directory}/xipki/etc/ocsp/example/mariadb.ocsp-db.properties</source>
       <outputDirectory>xipki/etc/ocsp</outputDirectory>
       <destName>ocsp-db.properties</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>src/assembly/unfiltered/xipki/etc/ocsp/example/mariadb.ocsp-cache-db.properties</source>
+      <source>${project.build.directory}/xipki/etc/ocsp/example/mariadb.ocsp-cache-db.properties</source>
       <outputDirectory>xipki/etc/ocsp</outputDirectory>
       <destName>ocsp-cache-db.properties</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>src/assembly/unfiltered/xipki/etc/ocsp/example/mariadb.ocsp-crl-db.properties</source>
+    <source>${project.build.directory}/xipki/etc/ocsp/example/mariadb.ocsp-crl-db.properties</source>
       <outputDirectory>xipki/etc/ocsp</outputDirectory>
       <destName>ocsp-crl-db.properties</destName>
       <fileMode>0644</fileMode>

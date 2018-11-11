@@ -26,7 +26,50 @@
   <artifactId>ca-war</artifactId>
   <packaging>pom</packaging>
   <name>XiPKI :: Assemblies :: ${project.artifactId}</name>
+  <dependencies>
+    <dependency>
+      <groupId>org.xipki</groupId>
+      <artifactId>dbtool</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>${logback.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
   <build>
+    <resources>
+      <resource>
+        <directory>src/assembly/filtered</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>src/assembly/unfiltered</directory>
+        <filtering>false</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>../shared/conf</directory>
+        <filtering>false</filtering>
+        <includes>
+          <include>xipki/**</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>../shared</directory>
+        <filtering>false</filtering>
+        <includes>
+          <include>dbtool/**</include>
+        </includes>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -38,6 +81,9 @@
             <goals>
               <goal>resources</goal>
             </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}</outputDirectory>
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -45,6 +91,16 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/dbtool/lib</outputDirectory>
+            </configuration>
+          </execution>
           <execution>
             <id>copy-war</id>
             <phase>generate-resources</phase>
@@ -102,6 +158,13 @@
                 <artifactItem>
                   <groupId>org.xipki</groupId>
                   <artifactId>ca-server</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <includes>sql/**</includes>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki</groupId>
+                  <artifactId>ocsp-server</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>sql/**</includes>

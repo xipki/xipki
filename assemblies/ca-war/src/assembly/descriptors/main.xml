@@ -8,26 +8,27 @@
   </formats>
   <fileSets>
     <fileSet>
-      <directory>../shared/conf/xipki</directory>
-      <outputDirectory>xipki</outputDirectory>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <directory>src/assembly/unfiltered</directory>
+      <directory>${project.build.directory}</directory>
+      <includes>
+        <include>xipki/**/*.sh</include>
+        <include>lib/**/*.sh</include>
+        <include>dbtool/**/*.sh</include>
+      </includes>
       <outputDirectory>.</outputDirectory>
-      <fileMode>0644</fileMode>
+      <fileMode>0755</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>${project.build.directory}/xipki</directory>
-      <outputDirectory>xipki</outputDirectory>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <directory>${project.build.directory}/lib</directory>
-      <outputDirectory>lib</outputDirectory>
+      <directory>${project.build.directory}</directory>
+      <includes>
+        <include>xipki/**</include>
+        <include>lib/**</include>
+        <include>dbtool/**</include>
+      </includes>
+      <excludes>
+        <exclude>**/*.sh</exclude>
+      </excludes>
+      <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
@@ -40,13 +41,13 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>src/assembly/unfiltered/xipki/etc/ca/example/mariadb.ca-db.properties</source>
+      <source>${project.build.directory}/xipki/etc/ca/example/mariadb.ca-db.properties</source>
       <outputDirectory>xipki/etc/ca</outputDirectory>
       <destName>ca-db.properties</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>src/assembly/unfiltered/xipki/etc/ca/example/mariadb.ocsp-db.properties</source>
+      <source>${project.build.directory}/xipki/etc/ca/example/mariadb.ocsp-db.properties</source>
       <outputDirectory>xipki/etc/ca</outputDirectory>
       <destName>ocsp-db.properties</destName>
       <fileMode>0644</fileMode>
