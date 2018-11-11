@@ -42,6 +42,8 @@ import org.xipki.util.ReqRespDebug;
 
 public interface CaClient extends Closeable {
 
+  boolean init();
+
   Set<String> getCaNames() throws CaClientException;
 
   /**

@@ -253,7 +253,7 @@ public final class CaClientImpl implements CaClient {
     return caNamesWithError;
   } // method autoConfCas
 
-  private synchronized void init() throws CaClientException {
+  private synchronized void initIfNotInitialized() throws CaClientException {
     if (confFile == null) {
       throw new IllegalStateException("confFile is not set");
     }
@@ -266,6 +266,12 @@ public final class CaClientImpl implements CaClient {
       return;
     }
 
+    if (init()) {
+      throw new CaClientException("initialization of CA client failed");
+    }
+  }
+
+  public synchronized boolean init() {
     // reset
     this.casMap.clear();
     this.autoConfCaNames.clear();
@@ -277,14 +283,16 @@ public final class CaClientImpl implements CaClient {
     LOG.info("initializing ...");
     File configFile = new File(IoUtil.expandFilepath(confFile));
     if (!configFile.exists()) {
-      throw new CaClientException("could not find configuration file " + confFile);
+      LOG.error("could not find configuration file {}", confFile);
+      return false;
     }
 
     CaclientType config;
     try {
       config = parse(Files.newInputStream(configFile.toPath()));
-    } catch (IOException ex) {
-      throw new CaClientException("could not read file " + confFile);
+    } catch (IOException | CaClientException ex) {
+      LOG.error("could not read file {}", confFile);
+      return false;
     }
 
     if (config.getCas().getCa().isEmpty()) {
@@ -320,8 +328,9 @@ public final class CaClientImpl implements CaClient {
         } catch (IOException | UnrecoverableKeyException | NoSuchAlgorithmException
             | KeyStoreException | CertificateException | KeyManagementException
             | ObjectCreationException ex) {
-          throw new CaClientException("could not initialize SSL configuration " + ssl.getName()
+          LOG.error("could not initialize SSL configuration " + ssl.getName()
               + ": " + ex.getMessage(), ex);
+          return false;
         }
       }
     }
@@ -334,7 +343,7 @@ public final class CaClientImpl implements CaClient {
         cert = X509Util.parseCert(readData(m.getCert()));
       } catch (CertificateException | IOException ex) {
         LogUtil.error(LOG, ex, "could not configure responder " + m.getName());
-        throw new CaClientException(ex.getMessage(), ex);
+        return false;
       }
 
       ClientCmpResponder responder;
@@ -347,7 +356,8 @@ public final class CaClientImpl implements CaClient {
         try {
           sigAlgoValidator = new CollectionAlgorithmValidator(algoNames);
         } catch (NoSuchAlgorithmException ex) {
-          throw new CaClientException(ex.getMessage());
+          LogUtil.error(LOG, ex, "could not initialize CollectionAlgorithmValidator");
+          return false;
         }
 
         responder = new SignatureClientCmpResponder(cert, sigAlgoValidator);
@@ -369,15 +379,16 @@ public final class CaClientImpl implements CaClient {
         // responder
         ClientCmpResponder responder = responders.get(caType.getResponder());
         if (responder == null) {
-          throw new CaClientException("no responder named " + caType.getResponder()
-              + " is configured");
+          LOG.error("no responder named {} is configured", caType.getResponder());
+          return false;
         }
 
         SslConf sslConf = null;
         if (caType.getSsl() != null) {
           sslConf = sslConfs.get(caType.getSsl());
           if (sslConf == null) {
-            throw new CaClientException("no ssl named " + caType.getSsl() + " is configured");
+            LOG.error("no ssl named {} is configured", caType.getSsl());
+            return false;
           }
         }
 
@@ -434,7 +445,7 @@ public final class CaClientImpl implements CaClient {
         }
       } catch (IOException | CertificateException ex) {
         LogUtil.error(LOG, ex, "could not configure CA " + caName);
-        throw new CaClientException(ex.getMessage(), ex);
+        return false;
       }
     }
 
@@ -455,7 +466,9 @@ public final class CaClientImpl implements CaClient {
           try {
             requestorCert = X509Util.parseCert(readData(cf.getCert()));
           } catch (Exception ex) {
-            throw new CaClientException(ex.getMessage(), ex);
+            LogUtil.error(LOG, ex,
+                "could not parse certificate of rquestor " + requestorConf.getName());
+            return false;
           }
         }
 
@@ -467,14 +480,16 @@ public final class CaClientImpl implements CaClient {
             requestor = new SignatureClientCmpRequestor(
                 signRequest, requestorSigner, securityFactory);
           } catch (ObjectCreationException ex) {
-            throw new CaClientException(ex.getMessage(), ex);
+            LogUtil.error(LOG, ex, "could not create rquestor " + requestorConf.getName());
+            return false;
           }
         } else {
           if (signRequest) {
-            throw new CaClientException("signer of requestor must be configured");
+            LOG.error("signer of requestor must be configured");
+            return false;
           } else if (requestorCert == null) {
-            throw new CaClientException(
-                "at least one of certificate and signer of requestor must be configured");
+            LOG.error("at least one of certificate and signer of requestor must be configured");
+            return false;
           } else {
             requestor = new SignatureClientCmpRequestor(requestorCert);
           }
@@ -487,7 +502,8 @@ public final class CaClientImpl implements CaClient {
         try {
           mac = AlgorithmUtil.getMacAlgId(cf.getMac());
         } catch (NoSuchAlgorithmException ex) {
-          throw new CaClientException("Unknown MAC algorithm " + cf.getMac());
+          LOG.error("Unknown MAC algorithm {}", cf.getMac());
+          return false;
         }
 
         requestor = new PbmMacClientCmpRequestor(signRequest, x500name,
@@ -499,7 +515,8 @@ public final class CaClientImpl implements CaClient {
 
     for (ClientCaConf ca :cas) {
       if (this.casMap.containsKey(ca.getName())) {
-        throw new CaClientException("duplicate CAs with the same name " + ca.getName());
+        LOG.error("duplicate CAs with the same name {}", ca.getName());
+        return false;
       }
 
       String requestorName = ca.getRequestorName();
@@ -510,8 +527,8 @@ public final class CaClientImpl implements CaClient {
             ca.getSslSocketFactory(), ca.getHostnameVerifier());
         ca.setAgent(agent);
       } else {
-        throw new CaClientException("could not find requestor named " + requestorName
-                + " for CA " + ca.getName());
+        LOG.error("could not find requestor named {} for CA {}", requestorName, ca.getName());
+        return false;
       }
 
       this.casMap.put(ca.getName(), ca);
@@ -549,7 +566,8 @@ public final class CaClientImpl implements CaClient {
       }
 
       if (CollectionUtil.isNonEmpty(failedCaNames)) {
-        throw new CaClientException("could not configure following CAs " + failedCaNames);
+        LOG.error("could not configure following CAs {}", failedCaNames);
+        return false;
       }
 
       if (caInfoUpdateInterval > 0) {
@@ -561,6 +579,7 @@ public final class CaClientImpl implements CaClient {
 
     initialized.set(true);
     LOG.info("initialized");
+    return true;
   } // method init
 
   @Override
@@ -584,7 +603,7 @@ public final class CaClientImpl implements CaClient {
       throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("csr", csr);
 
-    init();
+    initIfNotInitialized();
 
     if (caName == null) {
       caName = getCaNameForProfile(profile);
@@ -619,7 +638,7 @@ public final class CaClientImpl implements CaClient {
       return null;
     }
 
-    init();
+    initIfNotInitialized();
 
     boolean bo = (caName != null);
     if (caName == null) {
@@ -693,7 +712,7 @@ public final class CaClientImpl implements CaClient {
   public CertIdOrError revokeCert(String caName, X509Certificate cert, int reason,
       Date invalidityDate, ReqRespDebug debug) throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("cert", cert);
-    init();
+    initIfNotInitialized();
     ClientCaConf ca = getCa(caName);
     assertIssuedByCa(cert, ca);
     return revokeCert(ca, cert.getSerialNumber(), reason, invalidityDate, debug);
@@ -702,7 +721,7 @@ public final class CaClientImpl implements CaClient {
   @Override
   public CertIdOrError revokeCert(String caName, BigInteger serial, int reason, Date invalidityDate,
       ReqRespDebug debug) throws CaClientException, PkiErrorException {
-    init();
+    initIfNotInitialized();
     ClientCaConf ca = getCa(caName);
     return revokeCert(ca, serial, reason, invalidityDate, debug);
   }
@@ -743,7 +762,7 @@ public final class CaClientImpl implements CaClient {
       }
     }
 
-    init();
+    initIfNotInitialized();
 
     final String caName = getCaNameByIssuer(issuer);
     ClientCaConf caConf = casMap.get(caName);
@@ -794,7 +813,7 @@ public final class CaClientImpl implements CaClient {
   public X509CRL downloadCrl(String caName, BigInteger crlNumber, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
     caName = ParamUtil.requireNonBlankLower("caName", caName);
-    init();
+    initIfNotInitialized();
 
     ClientCaConf ca = casMap.get(caName);
     if (ca == null) {
@@ -813,7 +832,7 @@ public final class CaClientImpl implements CaClient {
       throws CaClientException, PkiErrorException {
     caName = ParamUtil.requireNonBlankLower("caName", caName);
 
-    init();
+    initIfNotInitialized();
 
     ClientCaConf ca = casMap.get(caName);
     if (ca == null) {
@@ -827,7 +846,7 @@ public final class CaClientImpl implements CaClient {
   public String getCaNameByIssuer(X500Name issuer) throws CaClientException {
     ParamUtil.requireNonNull("issuer", issuer);
 
-    init();
+    initIfNotInitialized();
 
     for (String name : casMap.keySet()) {
       final ClientCaConf ca = casMap.get(name);
@@ -881,7 +900,7 @@ public final class CaClientImpl implements CaClient {
 
   @Override
   public Set<String> getCaNames() throws CaClientException {
-    init();
+    initIfNotInitialized();
     return casMap.keySet();
   }
 
@@ -922,7 +941,7 @@ public final class CaClientImpl implements CaClient {
   public CertIdOrError unrevokeCert(String caName, X509Certificate cert, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("cert", cert);
-    init();
+    initIfNotInitialized();
 
     ClientCaConf ca = getCa(caName);
     assertIssuedByCa(cert, ca);
@@ -932,7 +951,7 @@ public final class CaClientImpl implements CaClient {
   @Override
   public CertIdOrError unrevokeCert(String caName, BigInteger serial, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
-    init();
+    initIfNotInitialized();
     ClientCaConf ca = getCa(caName);
     return unrevokeCert(ca, serial, debug);
   }
@@ -958,7 +977,7 @@ public final class CaClientImpl implements CaClient {
       ReqRespDebug debug) throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("request", request);
 
-    init();
+    initIfNotInitialized();
     List<UnrevokeOrRemoveCertEntry> requestEntries = request.getRequestEntries();
     if (CollectionUtil.isEmpty(requestEntries)) {
       return Collections.emptyMap();
@@ -982,7 +1001,7 @@ public final class CaClientImpl implements CaClient {
   public CertIdOrError removeCert(String caName, X509Certificate cert, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("cert", cert);
-    init();
+    initIfNotInitialized();
     ClientCaConf ca = getCa(caName);
     assertIssuedByCa(cert, ca);
     return removeCert(ca, cert.getSerialNumber(), debug);
@@ -991,7 +1010,7 @@ public final class CaClientImpl implements CaClient {
   @Override
   public CertIdOrError removeCert(String caName, BigInteger serial, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
-    init();
+    initIfNotInitialized();
     ClientCaConf ca = getCa(caName);
     return removeCert(ca, serial, debug);
   }
@@ -1017,7 +1036,7 @@ public final class CaClientImpl implements CaClient {
       ReqRespDebug debug) throws CaClientException, PkiErrorException {
     ParamUtil.requireNonNull("request", request);
 
-    init();
+    initIfNotInitialized();
     List<UnrevokeOrRemoveCertEntry> requestEntries = request.getRequestEntries();
     if (CollectionUtil.isEmpty(requestEntries)) {
       return Collections.emptyMap();
@@ -1041,7 +1060,7 @@ public final class CaClientImpl implements CaClient {
   public Set<CertprofileInfo> getCertprofiles(String caName) throws CaClientException {
     caName = ParamUtil.requireNonBlankLower("caName", caName);
 
-    init();
+    initIfNotInitialized();
     ClientCaConf ca = casMap.get(caName);
     if (ca == null) {
       return Collections.emptySet();
@@ -1067,7 +1086,7 @@ public final class CaClientImpl implements CaClient {
     HealthCheckResult healthCheckResult = new HealthCheckResult(name);
 
     try {
-      init();
+      initIfNotInitialized();
     } catch (CaClientException ex) {
       LogUtil.error(LOG, ex, "could not initialize CaCleint");
       healthCheckResult.setHealthy(false);
@@ -1315,7 +1334,7 @@ public final class CaClientImpl implements CaClient {
 
   @Override
   public java.security.cert.Certificate getCaCert(String caName) throws CaClientException {
-    init();
+    initIfNotInitialized();
 
     ClientCaConf ca = casMap.get(caName.toLowerCase());
     return ca == null ? null : ca.getCert();
@@ -1323,7 +1342,7 @@ public final class CaClientImpl implements CaClient {
 
   @Override
   public X500Name getCaCertSubject(String caName) throws CaClientException {
-    init();
+    initIfNotInitialized();
     ClientCaConf ca = casMap.get(caName.toLowerCase());
     return ca == null ? null : ca.getSubject();
   }
