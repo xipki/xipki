@@ -88,8 +88,9 @@ public abstract class BenchmarkExecutor {
       }
     }
     sb.append("threads: ").append(threads).append("\n");
-    sb.append("duration: ").append(StringUtil.formatTime(duration, false));
-    sb.append("unit: ").append(unit).append("\n");
+    sb.append("duration: ").append(StringUtil.formatTime(duration, false)).append("\n");
+    sb.append("unit: ").append(unit);
+
     System.out.println(sb.toString());
 
     resetStartTime();
