@@ -30,7 +30,7 @@
     <app.name>console</app.name>
     <shared.dir>${project.basedir}/../shared</shared.dir>
     <patchkaraf.repos>mvn:org.xipki.feature/console/${project.version}/xml/features</patchkaraf.repos>
-    <patchkaraf.features>(-jaas,-ssh,-config,aries-blueprint/${karaf.version},wrap),xipki-security,xipki-caclient,xipki-scepclient,xipki-ocspclient,xipki-camgmt,xipki-ocspmgmt</patchkaraf.features>
+    <patchkaraf.features>(-framework,-jaas,-ssh,-config,aries-blueprint/${karaf.version},wrap),xipki-security,xipki-caclient,xipki-scepclient,xipki-ocspclient,xipki-camgmt,xipki-ocspmgmt</patchkaraf.features>
   </properties>
   <dependencies>
     <dependency>
@@ -234,6 +234,10 @@
                     file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/bin/inc"
                     token="-Dcom.sun.management.jmxremote"
                     value=""/>
+                <replace
+                    file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/startup.properties"
+                    token="mvn\:org.apache.servicemix"
+                    value="#mvn\:org.apache.servicemix"/>
               </target>
             </configuration>
             <goals>

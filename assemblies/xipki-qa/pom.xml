@@ -30,7 +30,7 @@
     <app.name>QA</app.name>
     <shared.dir>${project.basedir}/../shared</shared.dir>
     <patchkaraf.repos>mvn:org.xipki.feature/qa/${project.version}/xml/features,file:lib/jdbc/features.xml</patchkaraf.repos>
-    <patchkaraf.features>(-jaas,-ssh,-config,aries-blueprint/${karaf.version},wrap),xipki-security,xipki-caclient,xipki-scepclient,xipki-ocspclient,xipki-camgmt,,xipki-ocspmgmt,xipki-dbtool,xipki-qa</patchkaraf.features>
+    <patchkaraf.features>(-framework,-jaas,-ssh,-config,aries-blueprint/${karaf.version},wrap),xipki-security,xipki-caclient,xipki-scepclient,xipki-ocspclient,xipki-camgmt,,xipki-ocspmgmt,xipki-dbtool,xipki-qa</patchkaraf.features>
   </properties>
   <dependencies>
     <dependency>
@@ -249,6 +249,10 @@
                     file="${project.build.directory}/classes/system/org/xipki/feature/qa/${project.version}/qa-${project.version}-features.xml"
                     token="&lt;!--feature&gt;intern-xipki-jdbc&lt;/feature--&gt;"
                     value="&lt;feature&gt;intern-xipki-jdbc&lt;/feature&gt;"/>
+                <replace
+                    file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/startup.properties"
+                    token="mvn\:org.apache.servicemix"
+                    value="#mvn\:org.apache.servicemix"/>
               </target>
             </configuration>
             <goals>
