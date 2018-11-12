@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<qaconf xmlns="http://xipki.org/ca/qa/qa/conf/v2">
+<qaconf xmlns="http://xipki.org/ca/qa/conf/v2">
   <issuers>
     <issuer name="rootca">
       <cert>

@@ -15,26 +15,4 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.security.benchmark.pkcs11;
-
-import org.xipki.security.pkcs11.P11IdentityId;
-import org.xipki.security.pkcs11.P11Slot;
-
-/**
- * TODO.
- * @author Lijun Liao
- * @since 2.0.0
- */
-// CHECKSTYLE:SKIP
-public class P11SM2KeyGenSpeed extends P11KeyGenSpeed {
-  public P11SM2KeyGenSpeed(P11Slot slot, byte[] id) throws Exception {
-    super(slot, id, "PKCS#11 SM2 key generation");
-  }
-
-  @Override
-  protected void genKeypair() throws Exception {
-    P11IdentityId objId = slot.generateSM2Keypair(getControl());
-    slot.removeIdentity(objId);
-  }
-
-}
+package org.xipki.qa.ocsp.benchmark;

@@ -22,10 +22,13 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.StringsCompleter;
-import org.xipki.qa.caclient.shell.BenchmarkEntry.RandomDn;
-import org.xipki.qa.caclient.shell.KeyEntry.DSAKeyEntry;
-import org.xipki.qa.caclient.shell.KeyEntry.ECKeyEntry;
-import org.xipki.qa.caclient.shell.KeyEntry.RSAKeyEntry;
+import org.xipki.qa.ca.benchmark.BenchmarkEntry;
+import org.xipki.qa.ca.benchmark.CaBenchmarkEnroll;
+import org.xipki.qa.ca.benchmark.KeyEntry;
+import org.xipki.qa.ca.benchmark.BenchmarkEntry.RandomDn;
+import org.xipki.qa.ca.benchmark.KeyEntry.DSAKeyEntry;
+import org.xipki.qa.ca.benchmark.KeyEntry.ECKeyEntry;
+import org.xipki.qa.ca.benchmark.KeyEntry.RSAKeyEntry;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.completer.ECCurveNameCompleter;
 import org.xipki.util.StringUtil;
@@ -86,8 +89,7 @@ public class CaBenchmarkEnrollAction extends CaBenchmarkAction {
     }
 
     String description = StringUtil.concatObjectsCap(200, "subjectTemplate: ", subjectTemplate,
-        "\nprofile: ", certprofile, "\nkeyType: ", keyType, "\nmaxRequests: ", maxRequests,
-        "\nunit: ", num, " certificate", (num > 1 ? "s" : ""));
+        "\nprofile: ", certprofile, "\nkeyType: ", keyType, "\nmaxRequests: ", maxRequests);
 
     RandomDn randomDn = null;
     if (randomDnStr != null) {
@@ -115,6 +117,7 @@ public class CaBenchmarkEnrollAction extends CaBenchmarkAction {
 
     benchmark.setDuration(duration);
     benchmark.setThreads(numThreads);
+    benchmark.setUnit(num + (num > 1 ? " certificates" : " certificate"));
     benchmark.execute();
 
     return null;

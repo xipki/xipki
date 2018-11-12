@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.security.pkcs11;
+package org.xipki.qa.security.benchmark.pkcs11;
 
 import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11Slot;

@@ -22,7 +22,7 @@ import java.util.Queue;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.qa.security.pkcs11.P11RSAKeyGenSpeed;
+import org.xipki.qa.security.benchmark.pkcs11.P11RSAKeyGenSpeed;
 import org.xipki.qa.security.shell.RSAControl;
 import org.xipki.util.BenchmarkExecutor;
 

@@ -42,4 +42,10 @@
         </jxb:schemaBindings>
     </jxb:bindings>
 
+    <jxb:bindings schemaLocation="../resources/xsd/benchmark.xsd" node="/xsd:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="org.xipki.qa.ca.benchmark.jaxb"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+
 </jxb:bindings>

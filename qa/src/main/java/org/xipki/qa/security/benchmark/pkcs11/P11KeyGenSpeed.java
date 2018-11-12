@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.security.pkcs11;
+package org.xipki.qa.security.benchmark.pkcs11;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.jline.utils.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.security.pkcs11.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.util.BenchmarkExecutor;
@@ -42,7 +43,7 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
           genKeypair();
           account(1, 0);
         } catch (Exception ex) {
-          Log.error("P11KeyGenSpeed.Testor.run()", ex);
+          LOG.error("P11KeyGenSpeed.Testor.run()", ex);
           account(1, 1);
         }
       }
@@ -51,6 +52,8 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
   } // class Testor
 
   protected final P11Slot slot;
+
+  private static final Logger LOG = LoggerFactory.getLogger(P11KeyGenSpeed.class);
 
   private byte[] id;
 

@@ -36,7 +36,7 @@ import org.xipki.ocsp.client.shell.CommonOcspStatusAction;
 import org.xipki.qa.BigIntegerRange;
 import org.xipki.qa.FileBigIntegerIterator;
 import org.xipki.qa.RangeBigIntegerIterator;
-import org.xipki.qa.ocsp.OcspBenchmark;
+import org.xipki.qa.ocsp.benchmark.OcspBenchmark;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.CollectionUtil;

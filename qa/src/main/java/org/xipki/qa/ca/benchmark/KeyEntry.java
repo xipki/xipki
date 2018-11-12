@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.caclient.shell;
+package org.xipki.qa.ca.benchmark;
 
 import java.io.IOException;
 import java.math.BigInteger;

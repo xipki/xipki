@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.caclient.shell;
+package org.xipki.qa.ca.benchmark;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERUTF8String;

@@ -15,12 +15,11 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.security.pkcs11;
+package org.xipki.qa.security.benchmark.pkcs11;
 
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 
-import org.jline.utils.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.ConcurrentContentSigner;
@@ -66,7 +65,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
           signer.sign(data);
           account(batch, 0);
         } catch (Exception ex) {
-          Log.error("P11SignSpeed.Testor.run()", ex);
+          LOG.error("P11SignSpeed.Testor.run()", ex);
           account(batch, batch);
         }
       }

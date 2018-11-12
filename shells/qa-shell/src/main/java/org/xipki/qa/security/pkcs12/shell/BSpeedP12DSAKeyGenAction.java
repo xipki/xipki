@@ -22,7 +22,7 @@ import java.util.Queue;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.qa.security.pkcs12.P12DSAKeyGenSpeed;
+import org.xipki.qa.security.benchmark.pkcs12.P12DSAKeyGenSpeed;
 import org.xipki.qa.security.shell.BatchSpeedAction;
 import org.xipki.qa.security.shell.DSAControl;
 import org.xipki.util.BenchmarkExecutor;

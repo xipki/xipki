@@ -20,7 +20,7 @@ package org.xipki.qa.security.pkcs11.shell;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.qa.security.pkcs11.P11DSAKeyGenSpeed;
+import org.xipki.qa.security.benchmark.pkcs11.P11DSAKeyGenSpeed;
 import org.xipki.util.BenchmarkExecutor;
 
 /**

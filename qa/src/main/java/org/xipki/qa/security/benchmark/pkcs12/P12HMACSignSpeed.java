@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.security.pkcs12;
+package org.xipki.qa.security.benchmark.pkcs12;
 
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.pkcs12.KeystoreGenerationParameters;

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.caclient.shell;
+package org.xipki.qa.ca.benchmark;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,8 +52,8 @@ import org.xipki.ca.client.api.PkiErrorException;
 import org.xipki.ca.client.api.dto.EnrollCertRequest;
 import org.xipki.ca.client.api.dto.EnrollCertRequest.Type;
 import org.xipki.ca.client.api.dto.EnrollCertRequestEntry;
-import org.xipki.ca.client.benchmark.shell.jaxb.EnrollCertType;
-import org.xipki.ca.client.benchmark.shell.jaxb.EnrollTemplateType;
+import org.xipki.qa.ca.benchmark.jaxb.EnrollCertType;
+import org.xipki.qa.ca.benchmark.jaxb.EnrollTemplateType;
 import org.xipki.util.BenchmarkExecutor;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ParamUtil;
@@ -246,12 +246,12 @@ public class CaBenchmarkTemplateEnroll extends BenchmarkExecutor {
       try {
         if (jaxbUnmarshaller == null) {
           JAXBContext context = JAXBContext.newInstance(
-              org.xipki.ca.client.benchmark.shell.jaxb.ObjectFactory.class);
+              org.xipki.qa.ca.benchmark.jaxb.ObjectFactory.class);
           jaxbUnmarshaller = context.createUnmarshaller();
 
           final SchemaFactory schemaFact = SchemaFactory.newInstance(
               javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-          URL url = org.xipki.ca.client.benchmark.shell.jaxb.ObjectFactory.class
+          URL url = org.xipki.qa.ca.benchmark.jaxb.ObjectFactory.class
                       .getResource("/xsd/benchmark.xsd");
           jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
         }

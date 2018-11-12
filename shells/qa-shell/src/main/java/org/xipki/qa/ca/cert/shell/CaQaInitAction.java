@@ -31,7 +31,7 @@ import org.xipki.shell.XiAction;
 
 @Command(scope = "caqa", name = "init", description = "initialize the CA QA manager")
 @Service
-public class CaQaInit extends XiAction {
+public class CaQaInitAction extends XiAction {
 
   @Reference
   private CaQaSystemManager qaSystemManager;

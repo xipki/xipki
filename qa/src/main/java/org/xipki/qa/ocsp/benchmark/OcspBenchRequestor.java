@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.ocsp;
+package org.xipki.qa.ocsp.benchmark;
 
 import java.io.Closeable;
 import java.io.IOException;

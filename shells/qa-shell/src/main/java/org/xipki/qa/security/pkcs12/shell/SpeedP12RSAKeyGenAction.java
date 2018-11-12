@@ -20,7 +20,7 @@ package org.xipki.qa.security.pkcs12.shell;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.qa.security.pkcs12.P12RSAKeyGenSpeed;
+import org.xipki.qa.security.benchmark.pkcs12.P12RSAKeyGenSpeed;
 import org.xipki.qa.security.shell.SingleSpeedAction;
 import org.xipki.util.BenchmarkExecutor;
 
