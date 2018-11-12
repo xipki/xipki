@@ -30,7 +30,7 @@
     <app.name>console</app.name>
     <shared.dir>${project.basedir}/../shared</shared.dir>
     <patchkaraf.repos>mvn:org.xipki.feature/console/${project.version}/xml/features</patchkaraf.repos>
-    <patchkaraf.features>(aries-blueprint/${karaf.version},wrap),xipki-security,xipki-caclient,xipki-scepclient,xipki-ocspclient,xipki-camgmt,xipki-ocspmgmt</patchkaraf.features>
+    <patchkaraf.features>(-jaas,-ssh,-config,aries-blueprint/${karaf.version},wrap),xipki-security,xipki-caclient,xipki-scepclient,xipki-ocspclient,xipki-camgmt,xipki-ocspmgmt</patchkaraf.features>
   </properties>
   <dependencies>
     <dependency>
@@ -201,6 +201,8 @@
             <configuration>
               <target>
                 <java failonerror="true" classname="org.xipki.patchkaraf.PatchFeature">
+                  <arg value="--backup"/>
+                  <arg value="no"/>
                   <arg value="--file"/>
                   <arg file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/org.apache.karaf.features.cfg"/>
                   <arg value="--repos"/>
@@ -209,10 +211,14 @@
                   <arg value="${patchkaraf.features}"/>
                 </java>
                 <java failonerror="true" classname="org.xipki.patchkaraf.PatchPaxUrlMvn">
+                  <arg value="--backup"/>
+                  <arg value="no"/>
                   <arg value="--file"/>
                   <arg file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/org.ops4j.pax.url.mvn.cfg"/>
                 </java>
                 <java failonerror="true" classname="org.xipki.patchkaraf.PatchPaxLogging">
+                  <arg value="--backup"/>
+                  <arg value="no"/>
                   <arg value="--file"/>
                   <arg file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/org.ops4j.pax.logging.cfg"/>
                 </java>
@@ -224,6 +230,10 @@
                   <arg value="--value-file"/>
                   <arg file="src/main/patchkaraf/org.ops4j.pax.logging.cfg.patch"/>
                 </java>
+                <replace
+                    file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/bin/inc"
+                    token="-Dcom.sun.management.jmxremote"
+                    value=""/>
               </target>
             </configuration>
             <goals>

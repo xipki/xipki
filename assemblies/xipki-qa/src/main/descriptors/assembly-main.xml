@@ -90,11 +90,14 @@
       <directoryMode>0755</directoryMode>
     </fileSet>
     <!-- Copy over start scripts -->
+    <!-- Copy over start scripts -->
     <fileSet>
       <directory>${project.build.directory}/apache-karaf-minimal-${karaf.version}/bin</directory>
-      <excludes>
-        <exclude>*.bat</exclude>
-      </excludes>
+      <includes>
+        <include>inc</include>
+        <include>karaf</include>
+        <include>setenv</include>
+      </includes>
       <outputDirectory>bin/</outputDirectory>
       <lineEnding>unix</lineEnding>
       <fileMode>0755</fileMode>
@@ -103,7 +106,8 @@
     <fileSet>
       <directory>${project.build.directory}/apache-karaf-minimal-${karaf.version}/bin</directory>
       <includes>
-        <include>*.bat</include>
+        <include>karaf.bat</include>
+        <include>setenv.bat</include>
       </includes>
       <outputDirectory>bin/</outputDirectory>
       <lineEnding>dos</lineEnding>
@@ -124,7 +128,16 @@
         <exclude>karaf-manual*</exclude>
         <exclude>*.md</exclude>
         <!-- We use only the OSGi core apache felix instead of eclipse.osgi. -->
-        <exclude>**/org.eclipse.osgi/**</exclude>
+        <exclude>system/**/org.eclipse.osgi/**</exclude>
+        <exclude>system/org/apache/karaf/config/**</exclude>
+        <exclude>system/org/apache/karaf/jaas/blueprint/**</exclude>
+        <exclude>system/org/apache/karaf/jaas/org.apache.karaf.jaas.config/**</exclude>
+        <exclude>system/org/apache/karaf/jaas/org.apache.karaf.jaas.modules/**</exclude>
+        <exclude>system/org/apache/karaf/jaas/org.apache.karaf.jaas.command/**</exclude>
+        <exclude>system/org/apache/sshd/**</exclude>
+        <exclude>system/org/apache/sshd/**</exclude>
+        <exclude>system/org/apache/servicemix/bundles/org.apache.servicemix.bundles.not-yet-commons-ssl/**</exclude>
+        <exclude>system/org/apache/karaf/shell/org.apache.karaf.shell.ssh/**</exclude>
       </excludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
