@@ -266,7 +266,7 @@ public final class CaClientImpl implements CaClient {
       return;
     }
 
-    if (init()) {
+    if (!init()) {
       throw new CaClientException("initialization of CA client failed");
     }
   }
