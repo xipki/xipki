@@ -32,11 +32,6 @@
   <dependencies>
     <dependency>
       <groupId>org.xipki</groupId>
-      <artifactId>ca-client</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xipki</groupId>
       <artifactId>qa</artifactId>
       <version>${project.version}</version>
     </dependency>
