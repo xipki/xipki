@@ -130,6 +130,10 @@
         <exclude>system/org/apache/sshd/**</exclude>
         <exclude>system/org/apache/servicemix/bundles/org.apache.servicemix.bundles.not-yet-commons-ssl/**</exclude>
         <exclude>system/org/apache/karaf/shell/org.apache.karaf.shell.ssh/**</exclude>
+        <exclude>etc/equinox-debug.properties</exclude>
+        <exclude>etc/org.apache.karaf.features.repos.cfg</exclude>
+        <exclude>etc/org.apache.karaf.jaas.cfg</exclude>
+        <exclude>etc/org.apache.karaf.kar</exclude>
       </excludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
