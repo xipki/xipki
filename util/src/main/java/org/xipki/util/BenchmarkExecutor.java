@@ -61,6 +61,10 @@ public abstract class BenchmarkExecutor {
 
   protected abstract Runnable getTestor() throws Exception;
 
+  protected int getRealAccount(int account) {
+    return account;
+  }
+
   public void close() {
   }
 
@@ -174,9 +178,9 @@ public abstract class BenchmarkExecutor {
   }
 
   public void account(int all, int failed) {
-    processLog.addNumProcessed(all);
+    processLog.addNumProcessed(getRealAccount(all));
     if (failed != 0) {
-      errorAccount.addAndGet(failed);
+      errorAccount.addAndGet(getRealAccount(failed));
     }
   }
 

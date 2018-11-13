@@ -152,6 +152,8 @@ public class CaBenchmarkTemplateEnroll extends BenchmarkExecutor {
 
   private final List<BenchmarkEntry> benchmarkEntries;
 
+  private final int num;
+
   private final int maxRequests;
 
   private AtomicInteger processedRequests = new AtomicInteger(0);
@@ -197,7 +199,14 @@ public class CaBenchmarkTemplateEnroll extends BenchmarkExecutor {
       benchmarkEntries.add(
           new BenchmarkEntry(entry.getCertprofile(), keyEntry, entry.getSubject(), randomDn));
     }
+
+    num = benchmarkEntries.size();
   } // constructor
+
+  @Override
+  protected int getRealAccount(int account) {
+    return num * account;
+  }
 
   @Override
   protected Runnable getTestor() throws Exception {

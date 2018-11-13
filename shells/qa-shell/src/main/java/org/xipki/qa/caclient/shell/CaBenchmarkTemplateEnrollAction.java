@@ -63,7 +63,6 @@ public class CaBenchmarkTemplateEnrollAction extends CaBenchmarkAction {
 
     EnrollTemplateType template = CaBenchmarkTemplateEnroll.parse(
         Files.newInputStream(Paths.get(templateFile)));
-    int size = template.getEnrollCert().size();
 
     String description = StringUtil.concatObjectsCap(200, "template: ", templateFile,
         "\nmaxRequests: ", maxRequests, "\n");
@@ -72,7 +71,6 @@ public class CaBenchmarkTemplateEnrollAction extends CaBenchmarkAction {
         maxRequests, description);
     loadTest.setDuration(duration);
     loadTest.setThreads(numThreads);
-    loadTest.setUnit(size + (size > 1 ? " certificates" : " certificate"));
     loadTest.execute();
 
     return null;

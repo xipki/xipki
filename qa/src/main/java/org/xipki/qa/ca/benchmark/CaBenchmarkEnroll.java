@@ -135,6 +135,11 @@ public class CaBenchmarkEnroll extends BenchmarkExecutor {
     return new Testor();
   }
 
+  @Override
+  protected int getRealAccount(int account) {
+    return num * account;
+  }
+
   private Map<Integer, CertRequest> nextCertRequests() {
     if (maxRequests > 0) {
       int num = processedRequests.getAndAdd(1);

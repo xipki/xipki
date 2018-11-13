@@ -117,7 +117,6 @@ public class CaBenchmarkEnrollAction extends CaBenchmarkAction {
 
     benchmark.setDuration(duration);
     benchmark.setThreads(numThreads);
-    benchmark.setUnit(num + (num > 1 ? " certificates" : " certificate"));
     benchmark.execute();
 
     return null;
