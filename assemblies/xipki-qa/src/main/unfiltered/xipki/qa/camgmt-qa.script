@@ -694,4 +694,4 @@ if { $printUsage equals "true" } then {
     --duplicate-subject yes \
     --duplicate-key yes \
     --validity-mode cutoff
-
+}

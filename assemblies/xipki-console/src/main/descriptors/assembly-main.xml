@@ -147,6 +147,12 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
+      <source>../shared/conf/xipki/security/example/pkcs11-emulator.xml</source>
+      <outputDirectory>xipki/security</outputDirectory>
+      <destName>pkcs11.xml</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
       <source>${project.basedir}/../../README.md</source>
       <outputDirectory>xipki</outputDirectory>
       <destName>README.md</destName>

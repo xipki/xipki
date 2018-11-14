@@ -22,7 +22,7 @@
       <cm:property name="key.strongrandom.enabled" value="false"/>
       <cm:property name="sign.strongrandom.enabled" value="false"/>
       <cm:property name="defaultSignerParallelism" value="32"/>
-      <cm:property name="pkcs11.confFile" value="xipki/security/pkcs11-hsm.xml"/>
+      <cm:property name="pkcs11.confFile" value="xipki/security/pkcs11.xml"/>
     </cm:default-properties>
   </cm:property-placeholder>
 

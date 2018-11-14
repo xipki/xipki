@@ -150,7 +150,7 @@ public class Securities implements Closeable {
     initSecurityPkcs12(signerFactoryRegister);
 
     // PKCS#11
-    String pkcs11ConfFile = getString(props, "pkcs11.confFile", "xipki/security/pkcs11-hsm.xml");
+    String pkcs11ConfFile = getString(props, "pkcs11.confFile", "xipki/security/pkcs11.xml");
     initSecurityPkcs11(pkcs11ConfFile, signerFactoryRegister);
 
     // register additional SignerFactories

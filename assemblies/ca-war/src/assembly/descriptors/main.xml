@@ -21,6 +21,7 @@
     <fileSet>
       <directory>${project.build.directory}</directory>
       <includes>
+        <include>README.md</include>
         <include>xipki/**</include>
         <include>lib/**</include>
         <include>dbtool/**</include>
@@ -38,6 +39,12 @@
       <source>${project.build.directory}/webapps/ca-servlet.war</source>
       <outputDirectory>webapps</outputDirectory>
       <destName>ca.war</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>${project.build.directory}/xipki/security/example/pkcs11-emulator.xml</source>
+      <outputDirectory>xipki/security</outputDirectory>
+      <destName>pkcs11.xml</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>
