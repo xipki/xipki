@@ -21,7 +21,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -46,10 +46,10 @@ class DigestEntry {
 
   public DigestEntry(BigInteger serialNumber, boolean revoked, Integer revReason, Long revTime,
       Long revInvTime, String base64HashValue) {
-    ParamUtil.requireNonNull("base64HashValue", base64HashValue);
+    Args.notNull(base64HashValue, "base64HashValue");
     if (revoked) {
-      ParamUtil.requireNonNull("revReason", revReason);
-      ParamUtil.requireNonNull("revTime", revTime);
+      Args.notNull(revReason, "revReason");
+      Args.notNull(revTime, "revTime");
     }
     this.base64HashValue = base64HashValue;
 
@@ -136,7 +136,7 @@ class DigestEntry {
   } // method contentEquals
 
   public static DigestEntry decode(String encoded) {
-    ParamUtil.requireNonNull("encoded", encoded);
+    Args.notNull(encoded, "encoded");
 
     List<Integer> indexes = getIndexes(encoded);
     if (indexes.size() != 5) {

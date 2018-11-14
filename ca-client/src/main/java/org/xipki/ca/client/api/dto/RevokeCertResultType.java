@@ -20,7 +20,7 @@ package org.xipki.ca.client.api.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -37,7 +37,7 @@ public class RevokeCertResultType {
   }
 
   public void addResultEntry(ResultEntry resultEntry) {
-    ParamUtil.requireNonNull("resultEntry", resultEntry);
+    Args.notNull(resultEntry, "resultEntry");
     if (!(resultEntry instanceof RevokeCertResultEntry
         || resultEntry instanceof ErrorResultEntry)) {
       throw new IllegalArgumentException("unaccepted parameter of class "

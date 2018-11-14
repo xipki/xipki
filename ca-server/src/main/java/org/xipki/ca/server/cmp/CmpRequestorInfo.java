@@ -23,7 +23,7 @@ import org.xipki.ca.api.NameId;
 import org.xipki.ca.mgmt.api.CaHasRequestorEntry;
 import org.xipki.ca.mgmt.api.PermissionConstants;
 import org.xipki.ca.mgmt.api.RequestorInfo;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -42,17 +42,17 @@ public class CmpRequestorInfo implements RequestorInfo {
   private final byte[] keyId;
 
   public CmpRequestorInfo(CaHasRequestorEntry caHasRequestor, CertWithDbId cert) {
-    this.caHasRequestor = ParamUtil.requireNonNull("caHasRequestor", caHasRequestor);
-    this.cert = ParamUtil.requireNonNull("cert", cert);
+    this.caHasRequestor = Args.notNull(caHasRequestor, "caHasRequestor");
+    this.cert = Args.notNull(cert, "cert");
     this.password = null;
     this.keyId = null;
   }
 
   public CmpRequestorInfo(CaHasRequestorEntry caHasRequestor, char[] password, byte[] keyId) {
-    this.caHasRequestor = ParamUtil.requireNonNull("caHasRequestor", caHasRequestor);
+    this.caHasRequestor = Args.notNull(caHasRequestor, "caHasRequestor");
     this.cert = null;
-    this.password = ParamUtil.requireNonNull("password", password);
-    this.keyId = ParamUtil.requireNonNull("keyId", keyId);
+    this.password = Args.notNull(password, "password");
+    this.keyId = Args.notNull(keyId, "keyId");
   }
 
   public CaHasRequestorEntry getCaHasRequestor() {

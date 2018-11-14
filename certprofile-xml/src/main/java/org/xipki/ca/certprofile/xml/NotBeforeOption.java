@@ -21,7 +21,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -46,7 +46,7 @@ public class NotBeforeOption {
   }
 
   static NotBeforeOption getOffsetOption(long offsetSeconds) {
-    ParamUtil.requireMin("offsetSeconds", offsetSeconds, -600);
+    Args.min(offsetSeconds, "offsetSeconds", -600);
     return new NotBeforeOption(null, offsetSeconds);
   }
 

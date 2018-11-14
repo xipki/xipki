@@ -29,7 +29,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.util.IoUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -64,7 +64,7 @@ public class ReplaceFileAction extends XiAction {
       return null;
     }
 
-    ParamUtil.requireNonBlank("old", oldText);
+    Args.notBlank(oldText, "oldText");
     replaceFile(sourceFile, oldText, newText);
 
     return null;

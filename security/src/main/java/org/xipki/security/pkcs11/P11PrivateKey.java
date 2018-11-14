@@ -25,7 +25,7 @@ import java.security.interfaces.RSAPublicKey;
 
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.exception.P11TokenException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -49,8 +49,8 @@ public class P11PrivateKey implements PrivateKey {
 
   public P11PrivateKey(P11CryptService p11CryptService, P11IdentityId identityId)
       throws P11TokenException {
-    this.p11CryptService = ParamUtil.requireNonNull("identityId", p11CryptService);
-    this.identityId = ParamUtil.requireNonNull("entityId", identityId);
+    this.p11CryptService = Args.notNull(p11CryptService, "p11CryptService");
+    this.identityId = Args.notNull(identityId, "identityId");
 
     this.publicKey = p11CryptService.getIdentity(identityId).getPublicKey();
 

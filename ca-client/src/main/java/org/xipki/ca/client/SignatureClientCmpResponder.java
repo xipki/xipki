@@ -22,7 +22,7 @@ import java.security.cert.X509Certificate;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.xipki.security.AlgorithmValidator;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -39,8 +39,8 @@ class SignatureClientCmpResponder implements ClientCmpResponder {
   private final GeneralName name;
 
   public SignatureClientCmpResponder(X509Certificate cert, AlgorithmValidator sigAlgoValidator) {
-    this.cert = ParamUtil.requireNonNull("cert", cert);
-    this.sigAlgoValidator = ParamUtil.requireNonNull("sigAlgoValidator", sigAlgoValidator);
+    this.cert = Args.notNull(cert, "cert");
+    this.sigAlgoValidator = Args.notNull(sigAlgoValidator, "sigAlgoValidator");
     this.name = new GeneralName(X500Name.getInstance(cert.getSubjectX500Principal().getEncoded()));
   }
 

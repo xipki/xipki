@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * The CRLReason enumeration specifies the reason that a certificate
@@ -163,7 +163,7 @@ public enum CrlReason {
   }
 
   public static CrlReason forNameOrText(String text) {
-    ParamUtil.requireNonNull("text", text);
+    Args.notNull(text, "text");
     for (CrlReason value : values()) {
       if (value.desription.equalsIgnoreCase(text)
           || value.name().equalsIgnoreCase(text)

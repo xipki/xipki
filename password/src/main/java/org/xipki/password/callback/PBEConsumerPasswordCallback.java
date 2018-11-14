@@ -23,7 +23,7 @@ import org.xipki.password.PBEPasswordService;
 import org.xipki.password.PasswordProducer;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.util.ConfPairs;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -81,7 +81,7 @@ public class PBEConsumerPasswordCallback implements PasswordCallback {
 
   @Override
   public void init(String conf) throws PasswordResolverException {
-    ParamUtil.requireNonBlank("conf", conf);
+    Args.notBlank(conf, "conf");
     ConfPairs pairs = new ConfPairs(conf);
     String str = pairs.value("name");
     if (StringUtil.isBlank(str)) {

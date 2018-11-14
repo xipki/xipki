@@ -18,7 +18,7 @@
 package org.xipki.ca.mgmt.api;
 
 import org.xipki.ca.api.NameId;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -41,9 +41,9 @@ public class AddUserEntry {
   }
 
   public AddUserEntry(NameId ident, boolean active, String password) throws CaMgmtException {
-    this.ident = ParamUtil.requireNonNull("ident", ident);
+    this.ident = Args.notNull(ident, "ident");
     this.active = active;
-    this.password = ParamUtil.requireNonBlank("password", password);
+    this.password = Args.notBlank(password, "password");
   }
 
   public void setIdent(NameId ident) {

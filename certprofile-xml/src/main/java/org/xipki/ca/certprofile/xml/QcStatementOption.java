@@ -19,7 +19,7 @@ package org.xipki.ca.certprofile.xml;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.qualified.QCStatement;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -36,7 +36,7 @@ class QcStatementOption {
   private final MonetaryValueOption monetaryValueOption;
 
   public QcStatementOption(QCStatement statement) {
-    this.statement = ParamUtil.requireNonNull("statement", statement);
+    this.statement = Args.notNull(statement, "statement");
     this.statementId = null;
     this.monetaryValueOption = null;
   }
@@ -44,9 +44,8 @@ class QcStatementOption {
   public QcStatementOption(ASN1ObjectIdentifier statementId,
       MonetaryValueOption monetaryValueOption) {
     this.statement = null;
-    this.statementId = ParamUtil.requireNonNull("statementId", statementId);
-    this.monetaryValueOption = ParamUtil.requireNonNull("monetaryValueOption",
-        monetaryValueOption);
+    this.statementId = Args.notNull(statementId, "statementId");
+    this.monetaryValueOption = Args.notNull(monetaryValueOption, "monetaryValueOption");
   }
 
   public QCStatement getStatement() {

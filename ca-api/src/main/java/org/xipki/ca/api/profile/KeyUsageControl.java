@@ -18,7 +18,7 @@
 package org.xipki.ca.api.profile;
 
 import org.xipki.security.KeyUsage;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -33,7 +33,7 @@ public class KeyUsageControl {
   private final boolean required;
 
   public KeyUsageControl(KeyUsage keyUsage, boolean required) {
-    this.keyUsage = ParamUtil.requireNonNull("keyUsage", keyUsage);
+    this.keyUsage = Args.notNull(keyUsage, "keyUsage");
     this.required = required;
   }
 

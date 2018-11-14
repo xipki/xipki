@@ -37,7 +37,7 @@ import org.xipki.util.Base64;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -61,7 +61,7 @@ public class OcspServlet extends HttpServlet {
   private OcspServer server;
 
   public void setServer(OcspServer server) {
-    this.server = ParamUtil.requireNonNull("server", server);
+    this.server = Args.notNull(server, "server");
   }
 
   @Override

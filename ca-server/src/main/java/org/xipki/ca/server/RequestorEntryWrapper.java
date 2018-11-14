@@ -31,7 +31,7 @@ import org.xipki.password.PasswordResolverException;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -54,7 +54,7 @@ public class RequestorEntryWrapper {
   }
 
   public void setDbEntry(RequestorEntry dbEntry, PasswordResolver passwordResolver) {
-    this.dbEntry = ParamUtil.requireNonNull("dbEntry", dbEntry);
+    this.dbEntry = Args.notNull(dbEntry, "dbEntry");
     String type = dbEntry.getType();
     String conf = dbEntry.getConf();
 

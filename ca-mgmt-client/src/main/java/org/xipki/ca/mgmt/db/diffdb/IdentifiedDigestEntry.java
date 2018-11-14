@@ -17,7 +17,7 @@
 
 package org.xipki.ca.mgmt.db.diffdb;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -34,7 +34,7 @@ class IdentifiedDigestEntry {
   private final long id;
 
   public IdentifiedDigestEntry(DigestEntry content, long id) {
-    this.content = ParamUtil.requireNonNull("content", content);
+    this.content = Args.notNull(content, "content");
     this.id = id;
   }
 

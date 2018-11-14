@@ -21,7 +21,7 @@ import java.security.cert.X509Certificate;
 import java.util.Set;
 
 import org.xipki.ca.client.api.CertprofileInfo;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -39,9 +39,9 @@ class ClientCaInfo {
 
   ClientCaInfo(X509Certificate cert, ClientCmpControl cmpControl,
       Set<CertprofileInfo> certprofiles) {
-    this.cert = ParamUtil.requireNonNull("cert", cert);
-    this.cmpControl = ParamUtil.requireNonNull("cmpControl", cmpControl);
-    this.certprofiles = ParamUtil.requireNonNull("certprofiles", certprofiles);
+    this.cert = Args.notNull(cert, "cert");
+    this.cmpControl = Args.notNull(cmpControl, "cmpControl");
+    this.certprofiles = Args.notNull(certprofiles, "certprofiles");
   }
 
   X509Certificate getCert() {

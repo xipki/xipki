@@ -113,7 +113,7 @@ public class StringUtil {
   }
 
   public static boolean isNumber(String str, int radix) {
-    ParamUtil.requireNonNull("str", str);
+    Args.notNull(str, "str");
     try {
       Integer.parseInt(str, radix);
       return true;
@@ -123,7 +123,7 @@ public class StringUtil {
   }
 
   public static String formatText(String text, int minLen) {
-    ParamUtil.requireNonNull("text", text);
+    Args.notNull(text, "text");
     int len = text.length();
     if (len >= minLen) {
       return text;

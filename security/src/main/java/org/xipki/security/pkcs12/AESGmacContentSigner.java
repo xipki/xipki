@@ -40,7 +40,7 @@ import org.bouncycastle.util.Arrays;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.util.IoUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -93,8 +93,8 @@ public class AESGmacContentSigner implements XiContentSigner {
 
   public AESGmacContentSigner(ASN1ObjectIdentifier oid, SecretKey signingKey)
       throws XiSecurityException {
-    this.oid = ParamUtil.requireNonNull("oid", oid);
-    this.signingKey = ParamUtil.requireNonNull("signingKey", signingKey);
+    this.oid = Args.notNull(oid, "oid");
+    this.signingKey = Args.notNull(signingKey, "signingKey");
 
     Cipher cipher0;
     try {

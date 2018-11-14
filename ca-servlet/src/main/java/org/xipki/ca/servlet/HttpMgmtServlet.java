@@ -108,7 +108,7 @@ import org.xipki.ca.mgmt.msg.UnrevokeCertificateRequest;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 import com.alibaba.fastjson.JSON;
 
@@ -145,11 +145,11 @@ public class HttpMgmtServlet extends HttpServlet {
   private CaManager caManager;
 
   public void setMgmtCerts(Set<X509Certificate> mgmtCerts) {
-    this.mgmtCerts = new HashSet<>(ParamUtil.requireNonEmpty("mgmtCerts", mgmtCerts));
+    this.mgmtCerts = new HashSet<>(Args.notEmpty(mgmtCerts, "mgmtCerts"));
   }
 
   public void setCaManager(CaManager caManager) {
-    this.caManager = ParamUtil.requireNonNull("caManager", caManager);;
+    this.caManager = Args.notNull(caManager, "caManager");
   }
 
   @Override

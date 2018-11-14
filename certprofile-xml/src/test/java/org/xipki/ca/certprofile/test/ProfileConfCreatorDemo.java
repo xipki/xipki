@@ -131,7 +131,7 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.TlsExtensionType;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.IoUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 import org.xipki.util.XmlUtil;
 import org.xml.sax.SAXException;
@@ -1868,7 +1868,7 @@ public class ProfileConfCreatorDemo {
   }
 
   private static List<ASN1ObjectIdentifier> sortOidList(List<ASN1ObjectIdentifier> oids) {
-    ParamUtil.requireNonNull("oids", oids);
+    Args.notNull(oids, "oids");
     List<String> list = new ArrayList<>(oids.size());
     for (ASN1ObjectIdentifier m : oids) {
       list.add(m.getId());

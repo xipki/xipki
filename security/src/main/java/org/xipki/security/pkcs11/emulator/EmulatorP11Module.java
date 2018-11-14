@@ -36,7 +36,7 @@ import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.util.IoUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -205,7 +205,7 @@ public class EmulatorP11Module extends AbstractP11Module {
   } // constructor
 
   public static P11Module getInstance(P11ModuleConf moduleConf) throws P11TokenException {
-    ParamUtil.requireNonNull("moduleConf", moduleConf);
+    Args.notNull(moduleConf, "moduleConf");
     return new EmulatorP11Module(moduleConf);
   }
 

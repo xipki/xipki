@@ -23,7 +23,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -40,7 +40,7 @@ public class SignatureClientCmpRequestor implements ClientCmpRequestor {
   private final boolean signRequest;
 
   public SignatureClientCmpRequestor(X509Certificate cert) {
-    ParamUtil.requireNonNull("cert", cert);
+    Args.notNull(cert, "cert");
     X500Name x500Name = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
     this.name = new GeneralName(x500Name);
     this.signer = null;
@@ -49,7 +49,7 @@ public class SignatureClientCmpRequestor implements ClientCmpRequestor {
 
   public SignatureClientCmpRequestor(boolean signRequest, ConcurrentContentSigner signer,
       SecurityFactory securityFactory) {
-    this.signer = ParamUtil.requireNonNull("signer", signer);
+    this.signer = Args.notNull(signer, "signer");
     if (signer.getCertificate() == null) {
       throw new IllegalArgumentException("requestor without certificate is not allowed");
     }

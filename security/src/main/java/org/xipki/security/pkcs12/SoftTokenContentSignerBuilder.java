@@ -73,7 +73,7 @@ import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.SignerUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -195,8 +195,8 @@ public class SoftTokenContentSignerBuilder {
 
   public SoftTokenContentSignerBuilder(PrivateKey privateKey, PublicKey publicKey)
       throws XiSecurityException {
-    this.key = ParamUtil.requireNonNull("privateKey", privateKey);
-    this.publicKey = ParamUtil.requireNonNull("publicKey", publicKey);
+    this.key = Args.notNull(privateKey, "privateKey");
+    this.publicKey = Args.notNull(publicKey, "publicKey");
     this.certificateChain = null;
   }
 
@@ -207,9 +207,9 @@ public class SoftTokenContentSignerBuilder {
       throw new IllegalArgumentException("unsupported keystore type: " + keystoreType);
     }
 
-    ParamUtil.requireNonNull("keystoreStream", keystoreStream);
-    ParamUtil.requireNonNull("keystorePassword", keystorePassword);
-    ParamUtil.requireNonNull("keyPassword", keyPassword);
+    Args.notNull(keystoreStream, "keystoreStream");
+    Args.notNull(keystorePassword, "keystorePassword");
+    Args.notNull(keyPassword, "keyPassword");
 
     try {
       KeyStore ks = KeyUtil.getKeyStore(keystoreType);
@@ -270,8 +270,8 @@ public class SoftTokenContentSignerBuilder {
 
   public ConcurrentContentSigner createSigner(AlgorithmIdentifier signatureAlgId, int parallelism,
       SecureRandom random) throws XiSecurityException, NoSuchPaddingException {
-    ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
-    ParamUtil.requireMin("parallelism", parallelism, 1);
+    Args.notNull(signatureAlgId, "signatureAlgId");
+    Args.positive(parallelism, "parallelism");
 
     List<XiContentSigner> signers = new ArrayList<>(parallelism);
 

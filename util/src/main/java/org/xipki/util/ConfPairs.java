@@ -214,8 +214,8 @@ public class ConfPairs {
   } // constructor
 
   public void putPair(String name, String value) {
-    ParamUtil.requireNonBlank("name", name);
-    ParamUtil.requireNonNull("value", value);
+    Args.notBlank(name, "name");
+    Args.notNull(value, "value");
 
     char ch = name.charAt(0);
     if (ch >= '0' && ch <= '9') {
@@ -225,12 +225,12 @@ public class ConfPairs {
   }
 
   public void removePair(String name) {
-    ParamUtil.requireNonNull("name", name);
+    Args.notBlank(name, "name");
     pairs.remove(name);
   }
 
   public String value(String name) {
-    ParamUtil.requireNonNull("name", name);
+    Args.notBlank(name, "name");
     return pairs.get(name);
   }
 

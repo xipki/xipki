@@ -31,7 +31,7 @@ import javax.net.ssl.SSLSocketFactory;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.client.api.CertprofileInfo;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -77,10 +77,10 @@ class ClientCaConf {
   ClientCaConf(String name, String url, String healthUrl, String requestorName,
       ClientCmpResponder responder,
       SSLSocketFactory sslSocketFactory, HostnameVerifier hostnameVerifier) {
-    this.name = ParamUtil.requireNonBlankLower("name", name);
-    this.url = ParamUtil.requireNonBlank("url", url);
-    this.requestorName = ParamUtil.requireNonNull("requestorName", requestorName);
-    this.responder = ParamUtil.requireNonNull("responder", responder);
+    this.name = Args.toNonBlankLower(name, "name");
+    this.url = Args.notBlank(url, "url");
+    this.requestorName = Args.notNull(requestorName, "requestorName");
+    this.responder = Args.notNull(responder, "responder");
     this.healthUrl = StringUtil.isBlank(healthUrl) ? url.replace("cmp", "health") : healthUrl;
     this.sslSocketFactory = sslSocketFactory;
     this.hostnameVerifier = hostnameVerifier;
@@ -129,11 +129,11 @@ class ClientCaConf {
   }
 
   public boolean supportsProfile(String profileName) {
-    return profiles.containsKey(ParamUtil.requireNonBlankLower("profileName", profileName));
+    return profiles.containsKey(Args.toNonBlankLower(profileName, "profileName"));
   }
 
   public CertprofileInfo getProfile(String profileName) {
-    return profiles.get(ParamUtil.requireNonBlankLower("profileName", profileName));
+    return profiles.get(Args.toNonBlankLower(profileName, "profileName"));
   }
 
   public boolean isCaInfoConfigured() {

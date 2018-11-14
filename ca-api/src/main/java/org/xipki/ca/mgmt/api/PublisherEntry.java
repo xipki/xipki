@@ -19,7 +19,7 @@ package org.xipki.ca.mgmt.api;
 
 import org.xipki.ca.api.NameId;
 import org.xipki.util.CompareUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -44,13 +44,13 @@ public class PublisherEntry {
   }
 
   public PublisherEntry(NameId ident, String type, String conf) {
-    this.ident = ParamUtil.requireNonNull("ident", ident);
-    this.type = ParamUtil.requireNonBlankLower("type", type);
+    this.ident = Args.notNull(ident, "ident");
+    this.type = Args.toNonBlankLower(type, "type");
     this.conf = conf;
   }
 
   public void setIdent(NameId ident) {
-    this.ident = ParamUtil.requireNonNull("ident", ident);
+    this.ident = Args.notNull(ident, "ident");
   }
 
   public NameId getIdent() {
@@ -58,7 +58,7 @@ public class PublisherEntry {
   }
 
   public void setType(String type) {
-    this.type = ParamUtil.requireNonBlankLower("type", type);
+    this.type = Args.toNonBlankLower(type, "type");
   }
 
   public String getType() {

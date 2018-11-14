@@ -24,7 +24,7 @@ import java.security.cert.X509Certificate;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.xipki.util.ObjectCreationException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -44,14 +44,14 @@ public abstract class AbstractSecurityFactory implements SecurityFactory {
   @Override
   public ContentVerifierProvider getContentVerifierProvider(X509Certificate cert)
       throws InvalidKeyException {
-    ParamUtil.requireNonNull("cert", cert);
+    Args.notNull(cert, "cert");
     return getContentVerifierProvider(cert.getPublicKey());
   }
 
   @Override
   public ContentVerifierProvider getContentVerifierProvider(X509CertificateHolder cert)
       throws InvalidKeyException {
-    ParamUtil.requireNonNull("cert", cert);
+    Args.notNull(cert, "cert");
     PublicKey publicKey = generatePublicKey(cert.getSubjectPublicKeyInfo());
     return getContentVerifierProvider(publicKey);
   }

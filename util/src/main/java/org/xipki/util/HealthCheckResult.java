@@ -46,7 +46,7 @@ public class HealthCheckResult {
    * @param name Name of the check result.
    */
   public HealthCheckResult(String name) {
-    this.name = ParamUtil.requireNonBlank("name", name);
+    this.name = Args.notBlank(name, "name");
   }
 
   public void setHealthy(boolean healthy) {
@@ -66,7 +66,7 @@ public class HealthCheckResult {
   }
 
   public void addChildCheck(HealthCheckResult childCheck) {
-    ParamUtil.requireNonNull("childCheck", childCheck);
+    Args.notNull(childCheck, "childCheck");
     this.childChecks.add(childCheck);
   }
 

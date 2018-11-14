@@ -25,7 +25,7 @@ import org.xipki.ca.mgmt.api.CaHasUserEntry;
 import org.xipki.ca.mgmt.api.PermissionConstants;
 import org.xipki.ca.mgmt.api.RequestorInfo;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -40,8 +40,8 @@ public class ByUserRequestorInfo implements RequestorInfo {
   private final CaHasUserEntry caHasUser;
 
   public ByUserRequestorInfo(NameId ident, CaHasUserEntry caHasUser) {
-    this.ident = ParamUtil.requireNonNull("ident", ident);
-    this.caHasUser = ParamUtil.requireNonNull("caHasUser", caHasUser);
+    this.ident = Args.notNull(ident, "ident");
+    this.caHasUser = Args.notNull(caHasUser, "caHasUser");
   }
 
   @Override

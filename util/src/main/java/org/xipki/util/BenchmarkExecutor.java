@@ -55,7 +55,7 @@ public abstract class BenchmarkExecutor {
   private String unit = "";
 
   public BenchmarkExecutor(String description) {
-    this.description = ParamUtil.requireNonNull("description", description);
+    this.description = Args.notNull(description, "description");
     this.processLog = new ProcessLog(0);
   }
 
@@ -130,7 +130,7 @@ public abstract class BenchmarkExecutor {
   }
 
   public void setDuration(String duration) {
-    ParamUtil.requireNonBlank("duration", duration);
+    Args.notBlank(duration, "duration");
     char unit = duration.charAt(duration.length() - 1);
 
     String numStr;
@@ -206,7 +206,7 @@ public abstract class BenchmarkExecutor {
   }
 
   public void setUnit(String unit) {
-    this.unit = ParamUtil.requireNonNull("unit", unit);
+    this.unit = Args.notNull(unit, "unit");
   }
 
   protected void printSummary() {

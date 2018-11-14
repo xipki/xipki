@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.xipki.ca.certprofile.xml.jaxb.CertificatePolicies;
 import org.xipki.ca.certprofile.xml.jaxb.CertificatePolicyInformationType;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -40,7 +40,7 @@ public class QaCertificatePolicies extends QaExtension {
     private final QaPolicyQualifiers policyQualifiers;
 
     public QaCertificatePolicyInformation(CertificatePolicyInformationType jaxb) {
-      ParamUtil.requireNonNull("jaxb", jaxb);
+      Args.notNull(jaxb, "jaxb");
       this.policyId = jaxb.getPolicyIdentifier().getValue();
       this.policyQualifiers = (jaxb.getPolicyQualifiers() == null) ? null
           : new QaPolicyQualifiers(jaxb.getPolicyQualifiers());
@@ -59,7 +59,7 @@ public class QaCertificatePolicies extends QaExtension {
   private final List<QaCertificatePolicyInformation> policyInformations;
 
   public QaCertificatePolicies(CertificatePolicies jaxb) {
-    ParamUtil.requireNonNull("jaxb", jaxb);
+    Args.notNull(jaxb, "jaxb");
     List<CertificatePolicyInformationType> types = jaxb.getCertificatePolicyInformation();
     List<QaCertificatePolicyInformation> list = new LinkedList<>();
     for (CertificatePolicyInformationType type : types) {
@@ -74,7 +74,7 @@ public class QaCertificatePolicies extends QaExtension {
   }
 
   public QaCertificatePolicyInformation getPolicyInformation(String policyId) {
-    ParamUtil.requireNonBlank("policyId", policyId);
+    Args.notBlank(policyId, "policyId");
     for (QaCertificatePolicyInformation entry : policyInformations) {
       if (entry.getPolicyId().equals(policyId)) {
         return entry;

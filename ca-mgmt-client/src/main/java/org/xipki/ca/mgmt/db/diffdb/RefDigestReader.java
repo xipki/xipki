@@ -44,7 +44,7 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -184,9 +184,9 @@ class RefDigestReader implements Closeable {
 
   private RefDigestReader(DataSourceWrapper datasource, X509Certificate caCert, int totalAccount,
       long minId, int numBlocksToRead, AtomicBoolean stopMe) throws Exception {
-    this.datasource = ParamUtil.requireNonNull("datasource", datasource);
-    this.caCert = ParamUtil.requireNonNull("caCert", caCert);
-    this.stopMe = ParamUtil.requireNonNull("stopMe", stopMe);
+    this.datasource = Args.notNull(datasource, "datasource");
+    this.caCert = Args.notNull(caCert, "caCert");
+    this.stopMe = Args.notNull(stopMe, "stopMe");
     this.totalAccount = totalAccount;
     this.caSubjectName = X509Util.getRfc4519Name(caCert.getSubjectX500Principal());
     this.lastProcessedId = minId - 1;
@@ -240,7 +240,7 @@ class RefDigestReader implements Closeable {
   public static RefDigestReader getInstance(DataSourceWrapper datasource, DbControl dbControl,
       HashAlgo certhashAlgo, int caId, int numBlocksToRead, int numPerSelect, AtomicBoolean stopMe)
       throws Exception {
-    ParamUtil.requireNonNull("datasource", datasource);
+    Args.notNull(datasource, "datasource");
 
     Statement stmt = null;
     ResultSet rs = null;

@@ -21,7 +21,7 @@ import org.xipki.ocsp.server.jaxb.CacheType;
 import org.xipki.ocsp.server.jaxb.EmbedCertsMode;
 import org.xipki.ocsp.server.jaxb.ResponseOptionType;
 import org.xipki.util.InvalidConfException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -44,7 +44,7 @@ public class ResponseOption {
   private final Long cacheMaxAge;
 
   ResponseOption(ResponseOptionType conf) throws InvalidConfException {
-    ParamUtil.requireNonNull("conf", conf);
+    Args.notNull(conf, "conf");
     this.responderIdByName = getBoolean(conf.isResponderIdByName(), true);
     this.includeInvalidityDate = getBoolean(conf.isIncludeInvalidityDate(), true);
     this.includeRevReason = getBoolean(conf.isIncludeRevReason(), true);

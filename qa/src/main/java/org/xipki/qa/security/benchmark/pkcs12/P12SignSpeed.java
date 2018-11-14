@@ -35,7 +35,7 @@ import org.xipki.util.Base64;
 import org.xipki.util.BenchmarkExecutor;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.IoUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -88,9 +88,9 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
           throws Exception {
     super(description);
 
-    ParamUtil.requireNonNull("securityFactory", securityFactory);
-    ParamUtil.requireNonBlank("signatureAlgorithm", signatureAlgorithm);
-    ParamUtil.requireNonNull("keystore", keystore);
+    Args.notNull(securityFactory, "securityFactory");
+    Args.notBlank(signatureAlgorithm, "signatureAlgorithm");
+    Args.notNull(keystore, "keystore");
 
     SignerConf signerConf = getKeystoreSignerConf(new ByteArrayInputStream(keystore), PASSWORD,
         signatureAlgorithm, threads + Math.max(2, threads * 5 / 4));

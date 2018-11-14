@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.xipki.security.X509Cert;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -55,7 +55,7 @@ public class P11SlotRefreshResult {
   }
 
   public void addIdentity(P11Identity identity) {
-    ParamUtil.requireNonNull("identity", identity);
+    Args.notNull(identity, "identity");
     this.identities.put(identity.getId().getKeyId(), identity);
   }
 
@@ -64,8 +64,8 @@ public class P11SlotRefreshResult {
   }
 
   public void addCertificate(P11ObjectIdentifier objectId, X509Cert certificate) {
-    ParamUtil.requireNonNull("objectId", objectId);
-    ParamUtil.requireNonNull("certificate", certificate);
+    Args.notNull(objectId, "objectId");
+    Args.notNull(certificate, "certificate");
     this.certificates.put(objectId, certificate);
   }
 

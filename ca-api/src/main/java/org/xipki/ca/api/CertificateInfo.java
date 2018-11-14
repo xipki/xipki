@@ -21,7 +21,7 @@ import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -61,13 +61,13 @@ public class CertificateInfo {
 
   public CertificateInfo(CertWithDbId cert, PrivateKeyInfo privateKey, NameId issuer,
       X509Cert issuerCert, byte[] subjectPublicKey, NameId profile, NameId requestor) {
-    this.profile = ParamUtil.requireNonNull("profile", profile);
-    this.cert = ParamUtil.requireNonNull("cert", cert);
+    this.profile = Args.notNull(profile, "profile");
+    this.cert = Args.notNull(cert, "cert");
     this.privateKey = privateKey;
-    this.subjectPublicKey = ParamUtil.requireNonNull("subjectPublicKey", subjectPublicKey);
-    this.issuer = ParamUtil.requireNonNull("issuer", issuer);
-    this.issuerCert = ParamUtil.requireNonNull("issuerCert", issuerCert);
-    this.requestor = ParamUtil.requireNonNull("requestor", requestor);
+    this.subjectPublicKey = Args.notNull(subjectPublicKey, "subjectPublicKey");
+    this.issuer = Args.notNull(issuer, "issuer");
+    this.issuerCert = Args.notNull(issuerCert, "issuerCert");
+    this.requestor = Args.notNull(requestor, "requestor");
   }
 
   public byte[] getSubjectPublicKey() {

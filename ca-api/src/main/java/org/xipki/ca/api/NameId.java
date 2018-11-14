@@ -18,7 +18,7 @@
 package org.xipki.ca.api;
 
 import org.xipki.util.CompareUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -40,7 +40,7 @@ public class NameId {
 
   public NameId(Integer id, String name) {
     this.id = id;
-    this.name = ParamUtil.requireNonBlankLower("name", name);
+    this.name = Args.toNonBlankLower(name, "name");
   }
 
   public void setId(Integer id) {
@@ -52,7 +52,7 @@ public class NameId {
   }
 
   public void setName(String name) {
-    this.name = ParamUtil.requireNonBlankLower("name", name);
+    this.name = Args.toNonBlankLower(name, "name");
   }
 
   public String getName() {

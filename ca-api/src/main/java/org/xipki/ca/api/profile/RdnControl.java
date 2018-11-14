@@ -20,7 +20,7 @@ package org.xipki.ca.api.profile;
 import java.util.regex.Pattern;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -58,7 +58,7 @@ public class RdnControl {
           String.format("illegal minOccurs=%s, maxOccurs=%s", minOccurs, maxOccurs));
     }
 
-    this.type = ParamUtil.requireNonNull("type", type);
+    this.type = Args.notNull(type, "type");
     this.minOccurs = minOccurs;
     this.maxOccurs = maxOccurs;
   }

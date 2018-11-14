@@ -18,7 +18,7 @@
 package org.xipki.ca.client.api.dto;
 
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -33,8 +33,8 @@ public class CsrEnrollCertEntry {
   private final String profile;
 
   public CsrEnrollCertEntry(CertificationRequest csr, String profile) {
-    this.csr = ParamUtil.requireNonNull("csr", csr);
-    this.profile = ParamUtil.requireNonNull("profile", profile);
+    this.csr = Args.notNull(csr, "csr");
+    this.profile = Args.notNull(profile, "profile");
   }
 
   public CertificationRequest getCsr() {

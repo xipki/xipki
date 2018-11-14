@@ -60,7 +60,7 @@ import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.DateUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -73,7 +73,7 @@ public class OcspQa {
   private final SecurityFactory securityFactory;
 
   public OcspQa(SecurityFactory securityFactory) {
-    this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
+    this.securityFactory = Args.notNull(securityFactory, "securityFactory");
   }
 
   public ValidationResult checkOcsp(OCSPResp response, IssuerHash issuerHash,
@@ -110,10 +110,10 @@ public class OcspQa {
       OcspError expectedOcspError, Map<BigInteger, OcspCertStatus> expectedOcspStatuses,
       Map<BigInteger, Date> expectedRevTimes, OcspResponseOption responseOption,
       boolean noSigVerify) {
-    ParamUtil.requireNonNull("response", response);
-    ParamUtil.requireNonEmpty("serialNumbers", serialNumbers);
-    ParamUtil.requireNonEmpty("expectedOcspStatuses", expectedOcspStatuses);
-    ParamUtil.requireNonNull("responseOption", responseOption);
+    Args.notNull(response, "response");
+    Args.notEmpty(serialNumbers, "serialNumbers");
+    Args.notEmpty(expectedOcspStatuses, "expectedOcspStatuses");
+    Args.notNull(responseOption, "responseOption");
 
     List<ValidationIssue> resultIssues = new LinkedList<ValidationIssue>();
 

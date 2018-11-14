@@ -26,7 +26,7 @@ import javax.xml.bind.JAXBElement;
 import org.xipki.ca.certprofile.xml.jaxb.CertificatePolicyInformationType.PolicyQualifiers;
 import org.xipki.qa.ca.internal.QaPolicyQualifierInfo.QaCpsUriPolicyQualifier;
 import org.xipki.qa.ca.internal.QaPolicyQualifierInfo.QaUserNoticePolicyQualifierInfo;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -39,7 +39,7 @@ public class QaPolicyQualifiers {
   private final List<QaPolicyQualifierInfo> policyQualifiers;
 
   public QaPolicyQualifiers(PolicyQualifiers jaxb) {
-    ParamUtil.requireNonNull("jaxb", jaxb);
+    Args.notNull(jaxb, "jaxb");
     List<QaPolicyQualifierInfo> list = new LinkedList<>();
     List<JAXBElement<String>> elements = jaxb.getCpsUriOrUserNotice();
     for (JAXBElement<String> element : elements) {

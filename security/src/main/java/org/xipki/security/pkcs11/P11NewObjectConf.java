@@ -22,7 +22,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.xipki.security.pkcs11.jaxb.NewObjectConfType;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
@@ -94,8 +94,7 @@ public class P11NewObjectConf {
   }
 
   public void setSetCertObjectAttributes(Set<Long> setCertObjectAttributes) {
-    this.setCertObjectAttributes =
-        ParamUtil.requireNonNull("setCertObjectAttributes", setCertObjectAttributes);
+    this.setCertObjectAttributes = Args.notNull(setCertObjectAttributes, "setCertObjectAttributes");
   }
 
 }

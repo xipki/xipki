@@ -18,7 +18,7 @@
 package org.xipki.ca.api.profile;
 
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -33,7 +33,7 @@ public class SubjectInfo {
   private final String warning;
 
   public SubjectInfo(X500Name grantedSubject, String warning) {
-    this.grantedSubject = ParamUtil.requireNonNull("grantedSubject", grantedSubject);
+    this.grantedSubject = Args.notNull(grantedSubject, "grantedSubject");
     this.warning = warning;
   }
 

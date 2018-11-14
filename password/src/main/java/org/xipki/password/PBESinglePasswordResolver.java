@@ -23,7 +23,7 @@ import org.xipki.password.callback.OBFPasswordCallback;
 import org.xipki.password.callback.PBEConsumerPasswordCallback;
 import org.xipki.password.callback.PBEGuiPasswordCallback;
 import org.xipki.password.callback.PasswordCallback;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -128,7 +128,7 @@ public class PBESinglePasswordResolver implements SinglePasswordResolver {
   }
 
   public void setMasterPasswordCallback(String masterPasswordCallback) {
-    ParamUtil.requireNonBlank("masterPasswordCallback", masterPasswordCallback);
+    Args.notBlank(masterPasswordCallback, "masterPasswordCallback");
     this.masterPasswordCallback = masterPasswordCallback.trim();
   }
 

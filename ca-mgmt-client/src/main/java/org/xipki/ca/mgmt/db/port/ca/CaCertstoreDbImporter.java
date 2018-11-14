@@ -72,7 +72,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.ProcessLog;
 import org.xipki.util.StringUtil;
 import org.xipki.util.XmlUtil;
@@ -111,7 +111,7 @@ class CaCertstoreDbImporter extends DbPorter {
       boolean resume, AtomicBoolean stopMe) throws Exception {
     super(datasource, srcDir, stopMe);
 
-    this.numCertsPerCommit = ParamUtil.requireMin("numCertsPerCommit", numCertsPerCommit, 1);
+    this.numCertsPerCommit = Args.positive(numCertsPerCommit, "numCertsPerCommit");
     this.resume = resume;
 
     File processLogFile = new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);

@@ -77,7 +77,7 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -148,11 +148,11 @@ public class ImportCrl {
   public ImportCrl(DataSourceWrapper datasource, boolean useCrlUpdates, X509CRL crl, String crlUrl,
       X509Certificate caCert, X509Certificate issuerCert, CertRevocationInfo caRevInfo,
       String certsDirName) throws ImportCrlException, DataAccessException {
-    this.datasource = ParamUtil.requireNonNull("datasource", datasource);
+    this.datasource = Args.notNull(datasource, "datasource");
     this.certhashAlgo = DbCertStatusStore.getCertHashAlgo(datasource);
     this.useCrlUpdates = useCrlUpdates;
-    this.crl = ParamUtil.requireNonNull("crl", crl);
-    this.caCert = ParamUtil.requireNonNull("caCert", caCert);
+    this.crl = Args.notNull(crl, "crl");
+    this.caCert = Args.notNull(caCert, "caCert");
     this.x500PrincipalCaSubject = caCert.getSubjectX500Principal();
     this.caSubject = X500Name.getInstance(x500PrincipalCaSubject.getEncoded());
     try {

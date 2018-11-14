@@ -26,7 +26,7 @@ import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.util.ObjectCreationException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -48,7 +48,7 @@ public class SignerEntryWrapper {
   }
 
   public void setDbEntry(SignerEntry dbEntry) {
-    this.dbEntry = ParamUtil.requireNonNull("dbEntry", dbEntry);
+    this.dbEntry = Args.notNull(dbEntry, "dbEntry");
     signer = null;
     if (dbEntry.getCertificate() != null) {
       subjectAsX500Name = X500Name.getInstance(
@@ -62,7 +62,7 @@ public class SignerEntryWrapper {
   }
 
   public void initSigner(SecurityFactory securityFactory) throws ObjectCreationException {
-    ParamUtil.requireNonNull("securityFactory", securityFactory);
+    Args.notNull(securityFactory, "securityFactory");
     if (signer != null) {
       return;
     }

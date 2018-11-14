@@ -17,7 +17,7 @@
 
 package org.xipki.datasource;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -37,18 +37,17 @@ public enum DatabaseType {
   UNKNOWN;
 
   public static DatabaseType forDriver(String driverClass) {
-    ParamUtil.requireNonNull("driverClass", driverClass);
+    Args.notNull(driverClass, "driverClass");
     return getDatabaseType(driverClass);
   }
 
   public static DatabaseType forDataSourceClass(String datasourceClass) {
-    ParamUtil.requireNonNull("datasourceClass", datasourceClass);
+    Args.notNull(datasourceClass, "datasourceClass");
     return getDatabaseType(datasourceClass);
   }
 
   public static DatabaseType forJdbcUrl(String url) {
-    ParamUtil.requireNonNull("url", url);
-    url = url.toLowerCase();
+    url = Args.notNull(url, "url").toLowerCase();
     if (url.startsWith("jdbc:db2")) {
       return DB2;
     } else if (url.startsWith("jdbc:h2")) {

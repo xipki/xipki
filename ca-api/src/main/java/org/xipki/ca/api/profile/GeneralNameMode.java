@@ -22,7 +22,7 @@ import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -38,12 +38,12 @@ public class GeneralNameMode {
   private final Set<ASN1ObjectIdentifier> allowedTypes;
 
   public GeneralNameMode(GeneralNameTag tag) {
-    this.tag = ParamUtil.requireNonNull("tag", tag);
+    this.tag = Args.notNull(tag, "tag");
     this.allowedTypes = null;
   }
 
   public GeneralNameMode(GeneralNameTag tag, Set<ASN1ObjectIdentifier> allowedTypes) {
-    this.tag = ParamUtil.requireNonNull("tag", tag);
+    this.tag = Args.notNull(tag, "tag");
     this.allowedTypes = CollectionUtil.isEmpty(allowedTypes) ? Collections.emptySet()
         : CollectionUtil.unmodifiableSet(allowedTypes);
   }

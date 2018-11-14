@@ -32,7 +32,7 @@ import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 import iaik.pkcs.pkcs11.DefaultInitializeArgs;
@@ -69,7 +69,7 @@ public class IaikP11Module extends AbstractP11Module {
 
   private IaikP11Module(Module module, P11ModuleConf moduleConf) throws P11TokenException {
     super(moduleConf);
-    this.module = ParamUtil.requireNonNull("module", module);
+    this.module = Args.notNull(module, "module");
 
     String library = moduleConf.getNativeLibrary();
     Vendor vendor;
@@ -170,10 +170,9 @@ public class IaikP11Module extends AbstractP11Module {
   }
 
   public static P11Module getInstance(P11ModuleConf moduleConf) throws P11TokenException {
-    ParamUtil.requireNonNull("moduleConf", moduleConf);
+    Args.notNull(moduleConf, "moduleConf");
 
     Module module;
-
     try {
       module = Module.getInstance(moduleConf.getNativeLibrary());
     } catch (IOException ex) {

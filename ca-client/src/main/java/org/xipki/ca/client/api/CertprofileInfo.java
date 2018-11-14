@@ -17,7 +17,7 @@
 
 package org.xipki.ca.client.api;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -35,7 +35,7 @@ public class CertprofileInfo {
   private final String conf;
 
   public CertprofileInfo(String name, String type, String conf) {
-    this.name = ParamUtil.requireNonBlankLower("name", name);
+    this.name = Args.toNonBlankLower(name, "name");
     this.type = StringUtil.isBlank(type) ? null : type;
     this.conf = StringUtil.isBlank(conf) ? null : conf;
   }

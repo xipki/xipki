@@ -18,7 +18,7 @@
 package org.xipki.security.pkcs11;
 
 import org.xipki.util.CompareUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -49,8 +49,8 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
    */
   public P11IdentityId(P11SlotIdentifier slotId, P11ObjectIdentifier keyId,
       String publicKeyLabel, String certLabel) {
-    this.slotId = ParamUtil.requireNonNull("slotId", slotId);
-    this.keyId = ParamUtil.requireNonNull("keyId", keyId);
+    this.slotId = Args.notNull(slotId, "slotId");
+    this.keyId = Args.notNull(keyId, "keyId");
     if (publicKeyLabel != null) {
       this.publicKeyId = publicKeyLabel.equals(keyId.getLabel())
           ? keyId : new P11ObjectIdentifier(keyId.getId(), publicKeyLabel);
@@ -116,7 +116,7 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
   }
 
   public boolean match(P11SlotIdentifier slotId, String keyLabel) {
-    ParamUtil.requireNonNull("objectLabel", keyLabel);
+    Args.notNull(keyLabel, "objectLabel");
     return this.slotId.equals(slotId) && keyLabel.equals(this.keyId.getLabel());
   }
 

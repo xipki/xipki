@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -74,7 +74,7 @@ public class P11MechanismFilter {
   }
 
   void addEntry(Set<P11SlotIdFilter> slots, Collection<Long> mechanisms) {
-    ParamUtil.requireNonNull("mechanismis", mechanisms);
+    Args.notNull(mechanisms, "mechanismis");
     singleFilters.add(new SingleFilter(slots, mechanisms));
   }
 
@@ -83,7 +83,7 @@ public class P11MechanismFilter {
   }
 
   public boolean isMechanismPermitted(P11SlotIdentifier slotId, long mechanism) {
-    ParamUtil.requireNonNull("slotId", slotId);
+    Args.notNull(slotId, "slotId");
     if (CollectionUtil.isEmpty(singleFilters)) {
       return true;
     }

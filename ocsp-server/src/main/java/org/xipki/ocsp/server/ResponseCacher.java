@@ -51,7 +51,7 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.concurrent.ConcurrentBag;
 import org.xipki.util.concurrent.ConcurrentBagEntry;
 
@@ -140,9 +140,9 @@ class ResponseCacher implements Closeable {
   private ScheduledFuture<?> issuerUpdater;
 
   ResponseCacher(DataSourceWrapper datasource, boolean master, int validity) {
-    this.datasource = ParamUtil.requireNonNull("datasource", datasource);
+    this.datasource = Args.notNull(datasource, "datasource");
     this.master = master;
-    this.validity = ParamUtil.requireMin("validity", validity, 1);
+    this.validity = Args.positive(validity, "validity");
     this.sqlSelectIssuerCert = datasource.buildSelectFirstSql(1, "CERT FROM ISSUER WHERE ID=?");
     this.sqlSelectOcsp = datasource.buildSelectFirstSql(1,
         "IID,IDENT,THIS_UPDATE,NEXT_UPDATE,RESP FROM OCSP WHERE ID=?");

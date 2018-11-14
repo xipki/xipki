@@ -17,7 +17,7 @@
 
 package org.xipki.qa.security.shell;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -30,7 +30,7 @@ public class ECControl {
   private final String curveName;
 
   public ECControl(String curveName) {
-    this.curveName = ParamUtil.requireNonBlank("curveName", curveName);
+    this.curveName = Args.notBlank(curveName, "curveName");
   }
 
   public String curveName() {

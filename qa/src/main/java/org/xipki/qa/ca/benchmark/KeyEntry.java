@@ -41,7 +41,7 @@ import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.Base64;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -270,7 +270,7 @@ public static final class ECKeyEntry extends KeyEntry {
     private final SubjectPublicKeyInfo spki;
 
     public ECKeyEntry(final String curveNameOrOid) throws Exception {
-      ParamUtil.requireNonNull("curveNameOrOid", curveNameOrOid);
+      Args.notNull(curveNameOrOid, "curveNameOrOid");
 
       ASN1ObjectIdentifier curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
       if (curveOid == null) {

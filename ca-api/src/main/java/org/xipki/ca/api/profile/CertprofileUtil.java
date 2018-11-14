@@ -29,7 +29,7 @@ import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.xipki.ca.api.BadCertTemplateException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -52,7 +52,7 @@ public class CertprofileUtil {
    */
   public static GeneralName createGeneralName(GeneralName requestedName, Set<GeneralNameMode> modes)
       throws BadCertTemplateException {
-    ParamUtil.requireNonNull("requestedName", requestedName);
+    Args.notNull(requestedName, "requestedName");
 
     int tag = requestedName.getTagNo();
     GeneralNameMode mode = null;

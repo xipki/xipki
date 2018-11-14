@@ -20,7 +20,7 @@ package org.xipki.security.pkcs12;
 import java.security.KeyStore;
 
 import org.xipki.security.KeypairGenerationResult;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -35,7 +35,7 @@ public class P12KeyGenerationResult extends KeypairGenerationResult {
   private KeyStore keystoreObject;
 
   public P12KeyGenerationResult(byte[] keystore) {
-    this.keystore = ParamUtil.requireNonNull("keystore", keystore);
+    this.keystore = Args.notNull(keystore, "keystore");
   }
 
   public byte[] keystore() {

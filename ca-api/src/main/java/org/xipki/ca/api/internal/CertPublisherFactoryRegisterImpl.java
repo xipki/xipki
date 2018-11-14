@@ -28,7 +28,7 @@ import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherFactory;
 import org.xipki.ca.api.publisher.CertPublisherFactoryRegister;
 import org.xipki.util.ObjectCreationException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -54,7 +54,7 @@ public class CertPublisherFactoryRegisterImpl implements CertPublisherFactoryReg
 
   @Override
   public CertPublisher newPublisher(String type) throws ObjectCreationException {
-    ParamUtil.requireNonBlank("type", type);
+    Args.notBlank(type, "type");
 
     for (CertPublisherFactory service : factories) {
       if (service.canCreatePublisher(type)) {

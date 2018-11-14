@@ -17,7 +17,7 @@
 
 package org.xipki.qa.ocsp;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -44,7 +44,7 @@ public enum OcspError {
   }
 
   public static OcspError forName(String name) {
-    ParamUtil.requireNonNull("name", name);
+    Args.notNull(name, "name");
     for (OcspError entry : values()) {
       if (entry.name().equals(name)) {
         return entry;

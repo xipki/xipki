@@ -18,7 +18,7 @@
 package org.xipki.ca.api.profile;
 
 import org.bouncycastle.asn1.ASN1Encodable;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -34,7 +34,7 @@ public class ExtensionValue {
 
   public ExtensionValue(boolean critical, ASN1Encodable value) {
     this.critical = critical;
-    this.value = ParamUtil.requireNonNull("value", value);
+    this.value = Args.notNull(value, "value");
   }
 
   public boolean isCritical() {

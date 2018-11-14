@@ -18,7 +18,7 @@
 package org.xipki.ca.api.profile;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -33,7 +33,7 @@ public class ExtKeyUsageControl {
   private final boolean required;
 
   public ExtKeyUsageControl(ASN1ObjectIdentifier extKeyUsage, boolean required) {
-    this.extKeyUsage = ParamUtil.requireNonNull("extKeyUsage", extKeyUsage);
+    this.extKeyUsage = Args.notNull(extKeyUsage, "extKeyUsage");
     this.required = required;
   }
 

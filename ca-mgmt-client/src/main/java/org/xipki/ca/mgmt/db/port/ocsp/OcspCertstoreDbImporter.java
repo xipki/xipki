@@ -48,7 +48,7 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.ProcessLog;
 import org.xipki.util.XmlUtil;
 
@@ -76,7 +76,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
     unmarshaller = jaxbContext.createUnmarshaller();
     unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ocsp.xsd"));
 
-    this.numCertsPerCommit = ParamUtil.requireMin("numCertsPerCommit", numCertsPerCommit, 1);
+    this.numCertsPerCommit = Args.positive(numCertsPerCommit, "numCertsPerCommit");
     File processLogFile = new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
     if (resume) {
       if (!processLogFile.exists()) {

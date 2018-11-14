@@ -65,7 +65,7 @@ import org.xipki.security.cmp.ProtectionVerificationResult;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.RandomUtil;
 
 /**
@@ -85,7 +85,7 @@ abstract class BaseCmpResponder implements CmpResponder {
   private final SecureRandom random = new SecureRandom();
 
   protected BaseCmpResponder(SecurityFactory securityFactory) {
-    this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
+    this.securityFactory = Args.notNull(securityFactory, "securityFactory");
   }
 
   protected abstract ConcurrentContentSigner getSigner();
@@ -150,8 +150,8 @@ abstract class BaseCmpResponder implements CmpResponder {
   @Override
   public PKIMessage processPkiMessage(PKIMessage pkiMessage, X509Certificate tlsClientCert,
       Map<String, String> parameters, AuditEvent event) {
-    ParamUtil.requireNonNull("pkiMessage", pkiMessage);
-    ParamUtil.requireNonNull("event", event);
+    Args.notNull(pkiMessage, "pkiMessage");
+    Args.notNull(event, "event");
     GeneralPKIMessage message = new GeneralPKIMessage(pkiMessage);
 
     PKIHeader reqHeader = message.getHeader();

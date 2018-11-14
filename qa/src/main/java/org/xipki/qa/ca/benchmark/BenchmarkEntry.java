@@ -24,7 +24,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -45,7 +45,7 @@ public class BenchmarkEntry {
     CN;
 
     public static RandomDn getInstance(String text) {
-      ParamUtil.requireNonNull("text", text);
+      Args.notNull(text, "text");
       for (RandomDn value : values()) {
         if (value.name().equalsIgnoreCase(text)) {
           return value;
@@ -63,8 +63,8 @@ public class BenchmarkEntry {
     private final ASN1ObjectIdentifier subjectRdnForIncrement;
 
     private IncreasableSubject(String subjectTemplate, RandomDn randomDn) {
-      ParamUtil.requireNonBlank("subjectTemplate", subjectTemplate);
-      ParamUtil.requireNonNull("randomDn", randomDn);
+      Args.notBlank(subjectTemplate, "subjectTemplate");
+      Args.notNull(randomDn, "randomDn");
 
       this.subjectTemplate = new X500Name(subjectTemplate);
 
@@ -133,8 +133,8 @@ public class BenchmarkEntry {
 
   public BenchmarkEntry(String certprofile, KeyEntry keyEntry, String subjectTemplate,
         RandomDn randomDn) {
-    this.certprofile = ParamUtil.requireNonBlank("certprofile", certprofile);
-    this.keyEntry = ParamUtil.requireNonNull("keyEntry", keyEntry);
+    this.certprofile = Args.notBlank(certprofile, "certprofile");
+    this.keyEntry = Args.notNull(keyEntry, "keyEntry");
     this.subject = new IncreasableSubject(subjectTemplate, randomDn);
   }
 

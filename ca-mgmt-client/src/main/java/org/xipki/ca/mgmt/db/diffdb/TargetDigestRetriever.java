@@ -39,7 +39,7 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.datasource.DatabaseType;
 import org.xipki.security.HashAlgo;
 import org.xipki.util.Base64;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.ProcessLog;
 import org.xipki.util.StringUtil;
 
@@ -174,14 +174,14 @@ class TargetDigestRetriever implements Closeable {
       DigestDiffReporter reporter, DataSourceWrapper datasource, DbControl dbControl,
       HashAlgo certHashAlgo, int caId, int numPerSelect, int numThreads, AtomicBoolean stopMe)
       throws DataAccessException {
-    this.processLog = ParamUtil.requireNonNull("processLog", processLog);
+    this.processLog = Args.notNull(processLog, "processLog");
     this.numPerSelect = numPerSelect;
-    this.dbControl = ParamUtil.requireNonNull("dbControl", dbControl);
-    this.reader = ParamUtil.requireNonNull("reader", reader);
-    this.reporter = ParamUtil.requireNonNull("reporter", reporter);
-    this.stopMe = ParamUtil.requireNonNull("stopMe", stopMe);
-    this.datasource = ParamUtil.requireNonNull("datasource", datasource);
-    this.certhashAlgo = ParamUtil.requireNonNull("certhashAlgo", certHashAlgo);
+    this.dbControl = Args.notNull(dbControl, "dbControl");
+    this.reader = Args.notNull(reader, "reader");
+    this.reporter = Args.notNull(reporter, "reporter");
+    this.stopMe = Args.notNull(stopMe, "stopMe");
+    this.datasource = Args.notNull(datasource, "datasource");
+    this.certhashAlgo = Args.notNull(certHashAlgo, "certhashAlgo");
 
     if (dbControl == DbControl.XIPKI_OCSP_v4) {
       String certHashAlgoInDb = datasource.getFirstValue(

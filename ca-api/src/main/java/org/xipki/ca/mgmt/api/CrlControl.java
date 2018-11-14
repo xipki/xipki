@@ -25,7 +25,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.InvalidConfException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 import org.xipki.util.TripleState;
 
@@ -115,7 +115,7 @@ public class CrlControl {
     }
 
     public static UpdateMode forName(String mode) {
-      ParamUtil.requireNonNull("mode", mode);
+      Args.notNull(mode, "mode");
       for (UpdateMode v : values()) {
         if (v.mode.equalsIgnoreCase(mode)) {
           return v;
@@ -134,8 +134,8 @@ public class CrlControl {
     private final int minute;
 
     public HourMinute(int hour, int minute) {
-      this.hour = ParamUtil.requireRange("hour", hour, 0, 23);
-      this.minute = ParamUtil.requireRange("minute", minute, 0, 59);
+      this.hour = Args.range(hour, "hour", 0, 23);
+      this.minute = Args.range(minute, "minute", 0, 59);
     }
 
     public int getHour() {

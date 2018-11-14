@@ -55,7 +55,7 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -96,8 +96,8 @@ public class CaInfo {
   private RevokeSuspendedCertsControl revokeSuspendedCertsControl;
 
   public CaInfo(CaEntry caEntry, CertStore certStore) throws OperationException {
-    this.caEntry = ParamUtil.requireNonNull("caEntry", caEntry);
-    this.certStore = ParamUtil.requireNonNull("certStore", certStore);
+    this.caEntry = Args.notNull(caEntry, "caEntry");
+    this.certStore = Args.notNull(certStore, "certStore");
 
     X509Certificate cert = caEntry.getCert();
     this.notBefore = cert.getNotBefore();

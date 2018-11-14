@@ -17,7 +17,7 @@
 
 package org.xipki.ca.server;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -34,8 +34,8 @@ class SystemEvent {
   private final long eventTime;
 
   SystemEvent(String name, String owner, long eventTime) {
-    this.name = ParamUtil.requireNonBlank("name", name);
-    this.owner = ParamUtil.requireNonBlank("owner", owner);
+    this.name = Args.notBlank(name, "name");
+    this.owner = Args.notBlank(owner, "owner");
     this.eventTime = eventTime;
   }
 

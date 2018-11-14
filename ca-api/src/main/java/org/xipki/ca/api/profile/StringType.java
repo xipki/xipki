@@ -23,7 +23,7 @@ import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERT61String;
 import org.bouncycastle.asn1.DERUTF8String;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -40,7 +40,7 @@ public enum StringType {
   ia5String;
 
   public ASN1Encodable createString(String text) {
-    ParamUtil.requireNonNull("text", text);
+    Args.notNull(text, "text");
 
     if (teletexString == this) {
       return new DERT61String(text);

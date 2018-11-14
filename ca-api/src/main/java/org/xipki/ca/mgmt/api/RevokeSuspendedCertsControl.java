@@ -20,7 +20,7 @@ package org.xipki.ca.mgmt.api;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.security.CrlReason;
 import org.xipki.util.ConfPairs;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * Example configuration
@@ -53,8 +53,8 @@ public class RevokeSuspendedCertsControl {
   }
 
   public RevokeSuspendedCertsControl(CrlReason targetReason, CertValidity unchangedSince) {
-    this.targetReason = ParamUtil.requireNonNull("targetReason", targetReason);
-    this.unchangedSince = ParamUtil.requireNonNull("unchangedSince", unchangedSince);
+    this.targetReason = Args.notNull(targetReason, "targetReason");
+    this.unchangedSince = Args.notNull(unchangedSince, "unchangedSince");
 
     switch (targetReason) {
       case AFFILIATION_CHANGED:

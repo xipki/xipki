@@ -26,7 +26,7 @@ import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.Base64;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.IoUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -42,9 +42,9 @@ public class ShellUtil {
 
   public static String canonicalizeSignerConf(String keystoreType, String signerConf,
       PasswordResolver passwordResolver, SecurityFactory securityFactory) throws Exception {
-    ParamUtil.requireNonBlank("keystoreType", keystoreType);
-    ParamUtil.requireNonBlank("signerConf", signerConf);
-    ParamUtil.requireNonNull("securityFactory", securityFactory);
+    Args.notBlank(keystoreType, "keystoreType");
+    Args.notBlank(signerConf, "signerConf");
+    Args.notNull(securityFactory, "securityFactory");
 
     if (!signerConf.contains("file:") && !signerConf.contains("base64:")
         && !signerConf.contains("FILE:") && !signerConf.contains("BASE64:")) {

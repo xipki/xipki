@@ -20,7 +20,7 @@ package org.xipki.security;
 import java.util.Date;
 
 import org.xipki.util.ConfPairs;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -51,8 +51,8 @@ public class CertRevocationInfo {
   }
 
   public CertRevocationInfo(CrlReason reason, Date revocationTime, Date invalidityTime) {
-    this.reason = ParamUtil.requireNonNull("reason", reason);
-    this.revocationTime = ParamUtil.requireNonNull("revocationTime", revocationTime);
+    this.reason = Args.notNull(reason, "reason");
+    this.revocationTime = Args.notNull(revocationTime, "revocationTime");
     this.invalidityTime = invalidityTime;
   }
 
@@ -65,13 +65,13 @@ public class CertRevocationInfo {
   }
 
   public CertRevocationInfo(int reasonCode, Date revocationTime, Date invalidityTime) {
-    this.revocationTime = ParamUtil.requireNonNull("revocationTime", revocationTime);
+    this.revocationTime = Args.notNull(revocationTime, "revocationTime");
     this.reason = CrlReason.forReasonCode(reasonCode);
     this.invalidityTime = invalidityTime;
   }
 
   public void setReason(CrlReason reason) {
-    this.reason = ParamUtil.requireNonNull("reason", reason);
+    this.reason = Args.notNull(reason, "reason");
   }
 
   public CrlReason getReason() {
@@ -79,7 +79,7 @@ public class CertRevocationInfo {
   }
 
   public void setRevocationTime(Date revocationTime) {
-    this.revocationTime = ParamUtil.requireNonNull("revocationTime", revocationTime);
+    this.revocationTime = Args.notNull(revocationTime, "revocationTime");
   }
 
   /**

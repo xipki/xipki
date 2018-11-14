@@ -21,7 +21,7 @@ import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.List;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -42,7 +42,7 @@ public class RangeBigIntegerIterator implements Iterator<BigInteger> {
   private BigInteger currentNumber;
 
   public RangeBigIntegerIterator(List<BigIntegerRange> ranges, boolean loop) {
-    this.ranges = ParamUtil.requireNonEmpty("ranges", ranges);
+    this.ranges = Args.notEmpty(ranges, "ranges");
     this.sizeRanges = ranges.size();
     this.loop = loop;
     this.currentIndex = 0;

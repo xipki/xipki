@@ -28,7 +28,7 @@ import org.xipki.password.OBFPasswordService;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.IoUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -86,7 +86,7 @@ public class FilePasswordCallback implements PasswordCallback {
 
   @Override
   public void init(String conf) throws PasswordResolverException {
-    ParamUtil.requireNonBlank("conf", conf);
+    Args.notBlank(conf, "conf");
     ConfPairs pairs = new ConfPairs(conf);
     passwordFile = pairs.value("file");
     if (StringUtil.isBlank(passwordFile)) {

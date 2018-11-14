@@ -99,7 +99,7 @@ import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 import iaik.pkcs.pkcs11.constants.Functions;
@@ -266,11 +266,11 @@ class EmulatorP11Slot extends P11Slot {
       P11NewObjectConf newObjectConf, int maxSessions, Vendor vendor) throws P11TokenException {
     super(moduleName, slotId, readOnly, mechanismFilter);
 
-    this.newObjectConf = ParamUtil.requireNonNull("newObjectConf", newObjectConf);
-    this.slotDir = ParamUtil.requireNonNull("slotDir", slotDir);
-    this.password = ParamUtil.requireNonNull("password", password);
-    this.privateKeyCryptor = ParamUtil.requireNonNull("privateKeyCryptor", privateKeyCryptor);
-    this.maxSessions = ParamUtil.requireMin("maxSessions", maxSessions, 1);
+    this.newObjectConf = Args.notNull(newObjectConf, "newObjectConf");
+    this.slotDir = Args.notNull(slotDir, "slotDir");
+    this.password = Args.notNull(password, "password");
+    this.privateKeyCryptor = Args.notNull(privateKeyCryptor, "privateKeyCryptor");
+    this.maxSessions = Args.positive(maxSessions, "maxSessions");
     this.vendor = (vendor == null) ? Vendor.GENERAL : vendor;
 
     this.privKeyDir = new File(slotDir, DIR_PRIV_KEY);
@@ -757,13 +757,12 @@ class EmulatorP11Slot extends P11Slot {
 
   private void savePkcs11Entry(File dir, byte[] id, String label, byte[] value)
       throws P11TokenException {
-    ParamUtil.requireNonNull("dir", dir);
-    ParamUtil.requireNonNull("id", id);
-    ParamUtil.requireNonBlank("label", label);
-    ParamUtil.requireNonNull("value", value);
+    Args.notNull(dir, "dir");
+    Args.notNull(id, "id");
+    Args.notBlank(label, "label");
+    Args.notNull(value, "value");
 
     assertValidId(id);
-
     String hexId = hex(id);
 
     String str = StringUtil.concat(PROP_ID, "=", hexId, "\n", PROP_LABEL, "=", label, "\n",

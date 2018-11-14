@@ -56,7 +56,7 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.LruCache;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -92,7 +92,7 @@ public abstract class BaseCertprofile extends Certprofile {
   @Override
   public SubjectInfo getSubject(X500Name requestedSubject)
       throws CertprofileException, BadCertTemplateException {
-    ParamUtil.requireNonNull("requestedSubject", requestedSubject);
+    Args.notNull(requestedSubject, "requestedSubject");
 
     verifySubjectDnOccurence(requestedSubject);
 
@@ -205,7 +205,7 @@ public abstract class BaseCertprofile extends Certprofile {
   @Override
   public SubjectPublicKeyInfo checkPublicKey(SubjectPublicKeyInfo publicKey)
       throws CertprofileException, BadCertTemplateException {
-    ParamUtil.requireNonNull("publicKey", publicKey);
+    Args.notNull(publicKey, "publicKey");
 
     Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = getKeyAlgorithms();
     if (CollectionUtil.isEmpty(keyAlgorithms)) {
@@ -313,7 +313,7 @@ public abstract class BaseCertprofile extends Certprofile {
 
   protected void verifySubjectDnOccurence(X500Name requestedSubject)
       throws BadCertTemplateException {
-    ParamUtil.requireNonNull("requestedSubject", requestedSubject);
+    Args.notNull(requestedSubject, "requestedSubject");
 
     SubjectControl occurences = getSubjectControl();
     if (occurences == null) {
@@ -367,7 +367,7 @@ public abstract class BaseCertprofile extends Certprofile {
 
   private static RDN createDateOfBirthRdn(ASN1ObjectIdentifier type, ASN1Encodable rdnValue)
       throws BadCertTemplateException {
-    ParamUtil.requireNonNull("type", type);
+    Args.notNull(type, "type");
 
     String text;
     ASN1Encodable newRdnValue = null;
@@ -394,7 +394,7 @@ public abstract class BaseCertprofile extends Certprofile {
 
   private static RDN createPostalAddressRdn(ASN1ObjectIdentifier type, ASN1Encodable rdnValue,
       RdnControl control, int index) throws BadCertTemplateException {
-    ParamUtil.requireNonNull("type", type);
+    Args.notNull(type, "type");
 
     if (!(rdnValue instanceof ASN1Sequence)) {
       throw new BadCertTemplateException("rdnValue of RDN postalAddress has incorrect syntax");
@@ -426,8 +426,8 @@ public abstract class BaseCertprofile extends Certprofile {
   }
 
   private static RDN[] getRdns(RDN[] rdns, ASN1ObjectIdentifier type) {
-    ParamUtil.requireNonNull("rdns", rdns);
-    ParamUtil.requireNonNull("type", type);
+    Args.notNull(rdns, "rdns");
+    Args.notNull(type, "type");
 
     List<RDN> ret = new ArrayList<>(1);
     for (int i = 0; i < rdns.length; i++) {
@@ -505,9 +505,9 @@ public abstract class BaseCertprofile extends Certprofile {
 
   private static void checkEcSubjectPublicKeyInfo(ASN1ObjectIdentifier curveOid, byte[] encoded)
       throws BadCertTemplateException {
-    ParamUtil.requireNonNull("curveOid", curveOid);
-    ParamUtil.requireNonNull("encoded", encoded);
-    ParamUtil.requireMin("encoded.length", encoded.length, 1);
+    Args.notNull(curveOid, "curveOid");
+    Args.notNull(encoded, "encoded");
+    Args.positive(encoded.length, "encoded.length");
 
     Integer expectedLength = ecCurveFieldSizes.get(curveOid);
     if (expectedLength == null) {

@@ -108,13 +108,13 @@ import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.CompareUtil;
 import org.xipki.util.HealthCheckResult;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
-import org.xipki.util.ParamUtil;
 import org.xipki.util.ReqRespDebug;
 import org.xipki.util.XmlUtil;
 import org.xipki.util.http.ssl.SSLContextBuilder;
@@ -583,7 +583,7 @@ public final class CaClientImpl implements CaClient {
   public EnrollCertResult enrollCert(String caName, CertificationRequest csr, String profile,
       Date notBefore, Date notAfter, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
-    ParamUtil.requireNonNull("csr", csr);
+    Args.notNull(csr, "csr");
 
     initIfNotInitialized();
 
@@ -613,9 +613,8 @@ public final class CaClientImpl implements CaClient {
   @Override
   public EnrollCertResult enrollCerts(String caName, EnrollCertRequest request,
       ReqRespDebug debug) throws CaClientException, PkiErrorException {
-    ParamUtil.requireNonNull("request", request);
-
-    List<EnrollCertRequestEntry> requestEntries = request.getRequestEntries();
+    List<EnrollCertRequestEntry> requestEntries =
+          Args.notNull(request, "request").getRequestEntries();
     if (CollectionUtil.isEmpty(requestEntries)) {
       return null;
     }
@@ -693,7 +692,7 @@ public final class CaClientImpl implements CaClient {
   @Override
   public CertIdOrError revokeCert(String caName, X509Certificate cert, int reason,
       Date invalidityDate, ReqRespDebug debug) throws CaClientException, PkiErrorException {
-    ParamUtil.requireNonNull("cert", cert);
+    Args.notNull(cert, "cert");
     initIfNotInitialized();
     ClientCaConf ca = getCa(caName);
     assertIssuedByCa(cert, ca);
@@ -710,8 +709,8 @@ public final class CaClientImpl implements CaClient {
 
   private CertIdOrError revokeCert(ClientCaConf ca, BigInteger serial, int reason,
       Date invalidityDate, ReqRespDebug debug) throws CaClientException, PkiErrorException {
-    ParamUtil.requireNonNull("ca", ca);
-    ParamUtil.requireNonNull("serial", serial);
+    Args.notNull(ca, "ca");
+    Args.notNull(serial, "serial");
 
     final String id = "cert-1";
     RevokeCertRequestEntry entry = new RevokeCertRequestEntry(id, ca.getSubject(), serial, reason,
@@ -729,9 +728,8 @@ public final class CaClientImpl implements CaClient {
   @Override
   public Map<String, CertIdOrError> revokeCerts(RevokeCertRequest request, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
-    ParamUtil.requireNonNull("request", request);
-
-    List<RevokeCertRequestEntry> requestEntries = request.getRequestEntries();
+    List<RevokeCertRequestEntry> requestEntries =
+          Args.notNull(request, "request").getRequestEntries();
     if (CollectionUtil.isEmpty(requestEntries)) {
       return Collections.emptyMap();
     }
@@ -787,14 +785,14 @@ public final class CaClientImpl implements CaClient {
   @Override
   public X509CRL downloadCrl(String caName, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
-    caName = ParamUtil.requireNonBlankLower("caName", caName);
+    caName = Args.toNonBlankLower(caName, "caName");
     return downloadCrl(caName, (BigInteger) null, debug);
   }
 
   @Override
   public X509CRL downloadCrl(String caName, BigInteger crlNumber, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
-    caName = ParamUtil.requireNonBlankLower("caName", caName);
+    caName = Args.toNonBlankLower(caName, "caName");
     initIfNotInitialized();
 
     ClientCaConf ca = casMap.get(caName);
@@ -812,7 +810,7 @@ public final class CaClientImpl implements CaClient {
   @Override
   public X509CRL generateCrl(String caName, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
-    caName = ParamUtil.requireNonBlankLower("caName", caName);
+    caName = Args.toNonBlankLower(caName, "caName");
 
     initIfNotInitialized();
 
@@ -826,7 +824,7 @@ public final class CaClientImpl implements CaClient {
 
   @Override
   public String getCaNameByIssuer(X500Name issuer) throws CaClientException {
-    ParamUtil.requireNonNull("issuer", issuer);
+    Args.notNull(issuer, "issuer");
 
     initIfNotInitialized();
 
@@ -877,7 +875,7 @@ public final class CaClientImpl implements CaClient {
   }
 
   public void setConfFile(String confFile) {
-    this.confFile = ParamUtil.requireNonBlank("confFile", confFile);
+    this.confFile = Args.notBlank(confFile, "confFile");
   }
 
   @Override
@@ -922,7 +920,7 @@ public final class CaClientImpl implements CaClient {
   @Override
   public CertIdOrError unrevokeCert(String caName, X509Certificate cert, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
-    ParamUtil.requireNonNull("cert", cert);
+    Args.notNull(cert, "cert");
     initIfNotInitialized();
 
     ClientCaConf ca = getCa(caName);
@@ -940,8 +938,8 @@ public final class CaClientImpl implements CaClient {
 
   private CertIdOrError unrevokeCert(ClientCaConf ca, BigInteger serial, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
-    ParamUtil.requireNonNull("ca", ca);
-    ParamUtil.requireNonNull("serial", serial);
+    Args.notNull(ca, "ca");
+    Args.notNull(serial, "serial");
     final String id = "cert-1";
     UnrevokeOrRemoveCertEntry entry = new UnrevokeOrRemoveCertEntry(id, ca.getSubject(), serial);
     if (ca.getCmpControl().isRrAkiRequired()) {
@@ -957,7 +955,7 @@ public final class CaClientImpl implements CaClient {
   @Override
   public Map<String, CertIdOrError> unrevokeCerts(UnrevokeOrRemoveCertRequest request,
       ReqRespDebug debug) throws CaClientException, PkiErrorException {
-    ParamUtil.requireNonNull("request", request);
+    Args.notNull(request, "request");
 
     initIfNotInitialized();
     List<UnrevokeOrRemoveCertEntry> requestEntries = request.getRequestEntries();
@@ -982,7 +980,7 @@ public final class CaClientImpl implements CaClient {
   @Override
   public CertIdOrError removeCert(String caName, X509Certificate cert, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
-    ParamUtil.requireNonNull("cert", cert);
+    Args.notNull(cert, "cert");
     initIfNotInitialized();
     ClientCaConf ca = getCa(caName);
     assertIssuedByCa(cert, ca);
@@ -999,8 +997,8 @@ public final class CaClientImpl implements CaClient {
 
   private CertIdOrError removeCert(ClientCaConf ca, BigInteger serial, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
-    ParamUtil.requireNonNull("ca", ca);
-    ParamUtil.requireNonNull("serial", serial);
+    Args.notNull(ca, "ca");
+    Args.notNull(serial, "serial");
     final String id = "cert-1";
     UnrevokeOrRemoveCertEntry entry = new UnrevokeOrRemoveCertEntry(id, ca.getSubject(), serial);
     if (ca.getCmpControl().isRrAkiRequired()) {
@@ -1016,7 +1014,7 @@ public final class CaClientImpl implements CaClient {
   @Override
   public Map<String, CertIdOrError> removeCerts(UnrevokeOrRemoveCertRequest request,
       ReqRespDebug debug) throws CaClientException, PkiErrorException {
-    ParamUtil.requireNonNull("request", request);
+    Args.notNull(request, "request");
 
     initIfNotInitialized();
     List<UnrevokeOrRemoveCertEntry> requestEntries = request.getRequestEntries();
@@ -1040,7 +1038,7 @@ public final class CaClientImpl implements CaClient {
 
   @Override
   public Set<CertprofileInfo> getCertprofiles(String caName) throws CaClientException {
-    caName = ParamUtil.requireNonBlankLower("caName", caName);
+    caName = Args.toNonBlankLower(caName, "caName");
 
     initIfNotInitialized();
     ClientCaConf ca = casMap.get(caName);
@@ -1062,7 +1060,7 @@ public final class CaClientImpl implements CaClient {
 
   @Override
   public HealthCheckResult getHealthCheckResult(String caName) throws CaClientException {
-    caName = ParamUtil.requireNonBlankLower("caName", caName);
+    caName = Args.toNonBlankLower(caName, "caName");
 
     String name = "X509CA";
     HealthCheckResult healthCheckResult = new HealthCheckResult(name);

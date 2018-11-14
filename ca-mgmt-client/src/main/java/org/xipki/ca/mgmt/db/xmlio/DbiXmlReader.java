@@ -24,7 +24,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -44,8 +44,8 @@ public abstract class DbiXmlReader {
 
   public DbiXmlReader(String rootElementName, InputStream xmlStream)
       throws XMLStreamException, InvalidDataObjectException {
-    this.rootElementName = ParamUtil.requireNonBlank("rootElementName", rootElementName);
-    ParamUtil.requireNonNull("xmlStream", xmlStream);
+    this.rootElementName = Args.notBlank(rootElementName, "rootElementName");
+    Args.notNull(xmlStream, "xmlStream");
 
     synchronized (factory) {
       reader = factory.createXMLStreamReader(xmlStream);

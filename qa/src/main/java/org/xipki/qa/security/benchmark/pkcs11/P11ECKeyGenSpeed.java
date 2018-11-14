@@ -19,7 +19,7 @@ package org.xipki.qa.security.benchmark.pkcs11;
 
 import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -33,7 +33,7 @@ public class P11ECKeyGenSpeed extends P11KeyGenSpeed {
 
   public P11ECKeyGenSpeed(P11Slot slot, byte[] id, String curveNameOrOid) throws Exception {
     super(slot, id, "PKCS#11 EC key generation\ncurve: " + curveNameOrOid);
-    this.curveNameOrOid = ParamUtil.requireNonNull("curveNameOrOid", curveNameOrOid);
+    this.curveNameOrOid = Args.notNull(curveNameOrOid, "curveNameOrOid");
   }
 
   @Override

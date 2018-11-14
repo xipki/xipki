@@ -40,7 +40,7 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.DateUtil;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -90,8 +90,8 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
 
   @Override
   public void init(String conf, DataSourceWrapper datasource) throws OcspStoreException {
-    ParamUtil.requireNonBlank("conf", conf);
-    this.datasource = ParamUtil.requireNonNull("datasource", datasource);
+    Args.notBlank(conf, "conf");
+    this.datasource = Args.notNull(datasource, "datasource");
 
     CrlStoreConf storeConf = new CrlStoreConf(conf);
     this.crlFilename = IoUtil.expandFilepath(storeConf.getCrFile());

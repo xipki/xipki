@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.operator.RuntimeOperatorException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.concurrent.ConcurrentBag;
 import org.xipki.util.concurrent.ConcurrentBagEntry;
 
@@ -57,7 +57,7 @@ public class FpIdCalculator {
    * @return long represented of the first 8 bytes
    */
   public static long hash(String data) {
-    ParamUtil.requireNonNull("data", data);
+    Args.notNull(data, "data");
     byte[] encoded;
     try {
       encoded = data.getBytes("UTF-8");
@@ -73,7 +73,7 @@ public class FpIdCalculator {
    * @return long represented of the first 8 bytes
    */
   public static long hash(byte[] data) {
-    ParamUtil.requireNonNull("data", data);
+    Args.notNull(data, "data");
 
     ConcurrentBagEntry<Digest> md0 = null;
     for (int i = 0; i < 3; i++) {

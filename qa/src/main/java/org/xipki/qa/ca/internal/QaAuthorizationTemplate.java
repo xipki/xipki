@@ -18,7 +18,7 @@
 package org.xipki.qa.ca.internal;
 
 import org.xipki.ca.certprofile.xml.jaxb.AuthorizationTemplate;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -33,7 +33,7 @@ public class QaAuthorizationTemplate extends QaExtension {
   private final byte[] accessRights;
 
   public QaAuthorizationTemplate(AuthorizationTemplate jaxb) {
-    ParamUtil.requireNonNull("jaxb", jaxb);
+    Args.notNull(jaxb, "jaxb");
     this.type = jaxb.getType().getValue();
     this.accessRights = jaxb.getAccessRights().getValue();
   }

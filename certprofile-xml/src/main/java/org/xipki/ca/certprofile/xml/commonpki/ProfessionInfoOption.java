@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.isismtt.x509.NamingAuthority;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -45,7 +45,7 @@ public class ProfessionInfoOption {
       List<ASN1ObjectIdentifier> professionOids, RegistrationNumberOption registrationNumberOption,
       byte[] addProfessionalInfo) {
     this.namingAuthority = namingAuthority;
-    this.professionItems = ParamUtil.requireNonEmpty("professionItems", professionItems);
+    this.professionItems = Args.notEmpty(professionItems, "professionItems");
     this.professionOids = professionOids;
     this.registrationNumberOption = registrationNumberOption;
     this.addProfessionalInfo = addProfessionalInfo;

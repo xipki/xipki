@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -34,7 +34,7 @@ public class SubjectDirectoryAttributesControl {
   private final List<ASN1ObjectIdentifier> types;
 
   public SubjectDirectoryAttributesControl(List<ASN1ObjectIdentifier> types) {
-    ParamUtil.requireNonEmpty("types", types);
+    Args.notEmpty(types, "types");
     this.types = new ArrayList<>(types);
   }
 

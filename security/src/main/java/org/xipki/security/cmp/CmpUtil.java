@@ -42,7 +42,7 @@ import org.bouncycastle.cert.crmf.jcajce.JcePKMACValuesCalculator;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.exception.NoIdleSignerException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -57,8 +57,8 @@ public class CmpUtil {
 
   public static PKIMessage addProtection(PKIMessage pkiMessage, ConcurrentContentSigner signer,
       GeneralName signerName, boolean addSignerCert) throws CMPException, NoIdleSignerException {
-    ParamUtil.requireNonNull("pkiMessage", pkiMessage);
-    ParamUtil.requireNonNull("signer", signer);
+    Args.notNull(pkiMessage, "pkiMessage");
+    Args.notNull(signer, "signer");
 
     final GeneralName tmpSignerName;
     if (signerName != null) {
@@ -157,7 +157,7 @@ public class CmpUtil {
   }
 
   public static boolean isImplictConfirm(PKIHeader header) {
-    ParamUtil.requireNonNull("header", header);
+    Args.notNull(header, "header");
 
     InfoTypeAndValue[] regInfos = header.getGeneralInfo();
     if (regInfos != null) {
@@ -202,13 +202,13 @@ public class CmpUtil {
   }
 
   public static InfoTypeAndValue buildInfoTypeAndValue(CmpUtf8Pairs utf8Pairs) {
-    ParamUtil.requireNonNull("utf8Pairs", utf8Pairs);
+    Args.notNull(utf8Pairs, "utf8Pairs");
     return new InfoTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
         new DERUTF8String(utf8Pairs.encoded()));
   }
 
   public static AttributeTypeAndValue buildAttributeTypeAndValue(CmpUtf8Pairs utf8Pairs) {
-    ParamUtil.requireNonNull("utf8Pairs", utf8Pairs);
+    Args.notNull(utf8Pairs, "utf8Pairs");
     return new AttributeTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
         new DERUTF8String(utf8Pairs.encoded()));
   }

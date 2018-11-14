@@ -28,7 +28,7 @@ import org.xipki.ca.api.CertificateInfo;
 import org.xipki.security.HashAlgo;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.Hex;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -49,8 +49,8 @@ class PendingCertificatePool {
     private final byte[] certHash;
 
     MyEntry(BigInteger certReqId, long waitForConfirmTill, CertificateInfo certInfo) {
-      this.certReqId = ParamUtil.requireNonNull("certReqId", certReqId);
-      this.certInfo = ParamUtil.requireNonNull("certInfo", certInfo);
+      this.certReqId = Args.notNull(certReqId, "certReqId");
+      this.certInfo = Args.notNull(certInfo, "certInfo");
       this.waitForConfirmTill = waitForConfirmTill;
       this.certHash = HashAlgo.SHA1.hash(certInfo.getCert().getEncodedCert());
     }
@@ -81,8 +81,8 @@ class PendingCertificatePool {
 
   void addCertificate(byte[] transactionId, BigInteger certReqId, CertificateInfo certInfo,
       long waitForConfirmTill) {
-    ParamUtil.requireNonNull("transactionId", transactionId);
-    ParamUtil.requireNonNull("certInfo", certInfo);
+    Args.notNull(transactionId, "transactionId");
+    Args.notNull(certInfo, "certInfo");
     if (certInfo.isAlreadyIssued()) {
       return;
     }
@@ -100,9 +100,9 @@ class PendingCertificatePool {
   }
 
   CertificateInfo removeCertificate(byte[] transactionId, BigInteger certReqId, byte[] certHash) {
-    ParamUtil.requireNonNull("transactionId", transactionId);
-    ParamUtil.requireNonNull("certReqId", certReqId);
-    ParamUtil.requireNonNull("certHash", certHash);
+    Args.notNull(transactionId, "transactionId");
+    Args.notNull(certReqId, "certReqId");
+    Args.notNull(certHash, "certHash");
 
     String hexTid = Hex.encode(transactionId);
     MyEntry retEntry = null;
@@ -135,7 +135,7 @@ class PendingCertificatePool {
   }
 
   Set<CertificateInfo> removeCertificates(byte[] transactionId) {
-    ParamUtil.requireNonNull("transactionId", transactionId);
+    Args.notNull(transactionId, "transactionId");
 
     String hexId = Hex.encode(transactionId);
     Set<MyEntry> entries;

@@ -25,7 +25,7 @@ import org.xipki.ocsp.api.OcspStore;
 import org.xipki.ocsp.api.OcspStoreFactory;
 import org.xipki.ocsp.api.OcspStoreFactoryRegister;
 import org.xipki.util.ObjectCreationException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -43,7 +43,7 @@ public class OcspStoreFactoryRegisterImpl implements OcspStoreFactoryRegister {
 
   @Override
   public OcspStore newOcspStore(String type) throws ObjectCreationException {
-    ParamUtil.requireNonBlank("type", type);
+    Args.notBlank(type, "type");
 
     for (OcspStoreFactory service : factories) {
       if (service.canCreateOcspStore(type)) {

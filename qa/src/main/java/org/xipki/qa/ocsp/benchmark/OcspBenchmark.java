@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ocsp.client.api.OcspRequestorException;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.util.BenchmarkExecutor;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -103,11 +103,11 @@ public class OcspBenchmark extends BenchmarkExecutor {
       Iterator<BigInteger> serials, int maxRequests, boolean parseResponse, String description) {
     super(description);
 
-    this.issuerCert = ParamUtil.requireNonNull("issuerCert", issuerCert);
-    this.responderUrl = ParamUtil.requireNonNull("responderUrl", responderUrl);
-    this.requestOptions = ParamUtil.requireNonNull("requestOptions", requestOptions);
+    this.issuerCert = Args.notNull(issuerCert, "issuerCert");
+    this.responderUrl = Args.notNull(responderUrl, "responderUrl");
+    this.requestOptions = Args.notNull(requestOptions, "requestOptions");
     this.maxRequests = maxRequests;
-    this.serials = ParamUtil.requireNonNull("serials", serials);
+    this.serials = Args.notNull(serials, "serials");
     this.parseResponse = parseResponse;
   }
 

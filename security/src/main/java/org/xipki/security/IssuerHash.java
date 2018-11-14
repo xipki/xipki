@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -37,18 +37,18 @@ public class IssuerHash {
   private final byte[] issuerKeyHash;
 
   public IssuerHash(HashAlgo hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash) {
-    this.hashAlgo = ParamUtil.requireNonNull("hashAlgo", hashAlgo);
-    this.issuerNameHash = ParamUtil.requireNonNull("issuerNameHash", issuerNameHash);
-    this.issuerKeyHash = ParamUtil.requireNonNull("issuerKeyHash", issuerKeyHash);
+    this.hashAlgo = Args.notNull(hashAlgo, "hashAlgo");
+    this.issuerNameHash = Args.notNull(issuerNameHash, "issuerNameHash");
+    this.issuerKeyHash = Args.notNull(issuerKeyHash, "issuerKeyHash");
 
     final int len = hashAlgo.getLength();
-    ParamUtil.requireRange("issuerNameHash.length", issuerNameHash.length, len, len);
-    ParamUtil.requireRange("issuerKeyHash.length", issuerKeyHash.length, len, len);
+    Args.range(issuerNameHash.length, "issuerNameHash.length", len, len);
+    Args.range(issuerKeyHash.length, "issuerKeyHash.length", len, len);
   }
 
   public IssuerHash(HashAlgo hashAlgo, Certificate issuerCert) throws IOException {
-    this.hashAlgo = ParamUtil.requireNonNull("hashAlgo", hashAlgo);
-    ParamUtil.requireNonNull("issuerCert", issuerCert);
+    this.hashAlgo = Args.notNull(hashAlgo, "hashAlgo");
+    Args.notNull(issuerCert, "issuerCert");
 
     byte[] encodedName = issuerCert.getSubject().getEncoded();
     byte[] encodedKey = issuerCert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
@@ -69,9 +69,9 @@ public class IssuerHash {
   }
 
   public boolean match(HashAlgo hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash) {
-    ParamUtil.requireNonNull("hashAlgo", hashAlgo);
-    ParamUtil.requireNonNull("issuerNameHash", issuerNameHash);
-    ParamUtil.requireNonNull("issuerKeyHash", issuerKeyHash);
+    Args.notNull(hashAlgo, "hashAlgo");
+    Args.notNull(issuerNameHash, "issuerNameHash");
+    Args.notNull(issuerKeyHash, "issuerKeyHash");
 
     return this.hashAlgo == hashAlgo
         && Arrays.equals(this.issuerNameHash, issuerNameHash)

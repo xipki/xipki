@@ -51,7 +51,7 @@ import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * Construction of alias is as follows.
@@ -98,8 +98,8 @@ public class XiKeyStoreSpi extends KeyStoreSpi {
     private Certificate[] chain;
 
     KeyCertEntry(PrivateKey key, Certificate[] chain) {
-      this.key = ParamUtil.requireNonNull("key", key);
-      this.chain = ParamUtil.requireNonNull("chain", chain);
+      this.key = Args.notNull(key, "key");
+      this.chain = Args.notNull(chain, "chain");
       if (chain.length < 1) {
         throw new IllegalArgumentException("chain does not contain any certificate");
       }

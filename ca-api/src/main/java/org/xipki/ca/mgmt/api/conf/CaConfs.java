@@ -56,7 +56,7 @@ import org.xipki.util.Base64;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 import org.xipki.util.XmlUtil;
 import org.xml.sax.SAXException;
@@ -77,8 +77,8 @@ public class CaConfs {
 
   public static void marshal(CaconfType jaxb, OutputStream out)
       throws JAXBException, SAXException {
-    ParamUtil.requireNonNull("jaxb", jaxb);
-    ParamUtil.requireNonNull("out", out);
+    Args.notNull(jaxb, "jaxb");
+    Args.notNull(out, "out");
 
     try {
       JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
@@ -98,7 +98,7 @@ public class CaConfs {
 
   public static InputStream convertFileConfToZip(String confFilename)
       throws IOException, JAXBException, InvalidConfException, SAXException {
-    ParamUtil.requireNonNull("confFilename", confFilename);
+    Args.notNull(confFilename, "confFilename");
 
     ByteArrayOutputStream bytesStream = new ByteArrayOutputStream(1048576); // initial 1M
     ZipOutputStream zipStream = new ZipOutputStream(bytesStream);

@@ -33,7 +33,7 @@ import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.ConfPairs;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -65,7 +65,7 @@ public class PublicCaInfo {
 
   public PublicCaInfo(X509Certificate caCert, CaUris caUris, ConfPairs extraControl)
       throws OperationException {
-    ParamUtil.requireNonNull("caCert", caCert);
+    Args.notNull(caCert, "caCert");
     this.caUris = (caUris == null) ? CaUris.EMPTY_INSTANCE : caUris;
 
     this.caCert = new X509Cert(caCert);
@@ -98,8 +98,8 @@ public class PublicCaInfo {
   public PublicCaInfo(X500Name subject, BigInteger serialNumber, GeneralNames subjectAltName,
       byte[] subjectKeyIdentifier, CaUris caUris, ConfPairs extraControl)
       throws OperationException {
-    this.x500Subject = ParamUtil.requireNonNull("subject", subject);
-    this.serialNumber = ParamUtil.requireNonNull("serialNumber", serialNumber);
+    this.x500Subject = Args.notNull(subject, "subject");
+    this.serialNumber = Args.notNull(serialNumber, "serialNumber");
     this.caUris = (caUris == null) ? CaUris.EMPTY_INSTANCE : caUris;
 
     this.caCert = null;

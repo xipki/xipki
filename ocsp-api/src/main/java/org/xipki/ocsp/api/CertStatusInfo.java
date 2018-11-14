@@ -22,7 +22,7 @@ import java.util.Date;
 import org.bouncycastle.asn1.ocsp.CrlID;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.HashAlgo;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -52,8 +52,8 @@ public class CertStatusInfo {
 
   private CertStatusInfo(CertStatus certStatus, Date thisUpdate, Date nextUpdate,
       String certprofile) {
-    this.certStatus = ParamUtil.requireNonNull("certStatus", certStatus);
-    this.thisUpdate = ParamUtil.requireNonNull("thisUpdate", thisUpdate);
+    this.certStatus = Args.notNull(certStatus, "certStatus");
+    this.thisUpdate = Args.notNull(thisUpdate, "thisUpdate");
     this.nextUpdate = nextUpdate;
     this.certprofile = certprofile;
   }

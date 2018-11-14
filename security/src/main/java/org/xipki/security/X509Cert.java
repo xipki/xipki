@@ -27,7 +27,7 @@ import javax.security.auth.x500.X500Principal;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -54,7 +54,7 @@ public class X509Cert {
   }
 
   public X509Cert(X509Certificate cert, byte[] encodedCert) {
-    this.cert = ParamUtil.requireNonNull("cert", cert);
+    this.cert = Args.notNull(cert, "cert");
 
     X500Principal x500Subject = cert.getSubjectX500Principal();
     this.subject = X509Util.getRfc4519Name(x500Subject);

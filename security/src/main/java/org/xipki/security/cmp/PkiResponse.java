@@ -18,7 +18,7 @@
 package org.xipki.security.cmp;
 
 import org.bouncycastle.cert.cmp.GeneralPKIMessage;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -33,7 +33,7 @@ public class PkiResponse {
   private ProtectionVerificationResult protectionVerificationResult;
 
   public PkiResponse(GeneralPKIMessage pkiMessage) {
-    this.pkiMessage = ParamUtil.requireNonNull("pkiMessage", pkiMessage);
+    this.pkiMessage = Args.notNull(pkiMessage,"pkiMessage");
   }
 
   public boolean hasProtection() {

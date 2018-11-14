@@ -25,7 +25,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -43,7 +43,7 @@ public class PasswordProducer {
   private static ConcurrentHashMap<String, Boolean> nameResultMap = new ConcurrentHashMap<>();
 
   public static void registerPasswordConsumer(String name) {
-    ParamUtil.requireNonBlank("name", name);
+    Args.notBlank(name, "name");
     BlockingQueue<char[]> queue = new LinkedBlockingQueue<>(1);
     nameResultMap.remove(name);
     namePasswordsMap.put(name, queue);
@@ -53,7 +53,7 @@ public class PasswordProducer {
   }
 
   public static void unregisterPasswordConsumer(String name) {
-    ParamUtil.requireNonBlank("name", name);
+    Args.notBlank(name, "name");
     namePasswordsMap.remove(name);
     final String str = "unregistered password consumer " + name;
     System.out.println(str);
@@ -61,7 +61,7 @@ public class PasswordProducer {
   }
 
   public static void setPasswordCorrect(String name, boolean correct) {
-    ParamUtil.requireNonBlank("name", name);
+    Args.notBlank(name, "name");
     nameResultMap.put(name, correct);
     final String str = "set result of password consumer " + name + ": "
         + (correct ? "valid" : "invalid");
@@ -75,7 +75,7 @@ public class PasswordProducer {
 
   public static char[] takePassword(String name)
       throws InterruptedException, PasswordResolverException {
-    ParamUtil.requireNonBlank("name", name);
+    Args.notBlank(name, "name");
     if (!namePasswordsMap.containsKey(name)) {
       throw new PasswordResolverException("password consumer '" + name + "' is not registered ");
     }
@@ -88,7 +88,7 @@ public class PasswordProducer {
 
   public static void putPassword(String name, char[] password)
       throws InterruptedException, PasswordResolverException {
-    ParamUtil.requireNonBlank("name", name);
+    Args.notBlank(name, "name");
     if (!namePasswordsMap.containsKey(name)) {
       throw new PasswordResolverException("password consumer '" + name + "' is not registered ");
     }
@@ -101,7 +101,7 @@ public class PasswordProducer {
   }
 
   public static boolean needsPassword(String name) {
-    ParamUtil.requireNonBlank("name", name);
+    Args.notBlank(name, "name");
     if (!namePasswordsMap.containsKey(name)) {
       return false;
     }

@@ -32,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -70,7 +70,7 @@ class DigestDiffReporter implements Closeable {
   private AtomicInteger numError = new AtomicInteger(0);
 
   public DigestDiffReporter(String reportDirname, byte[] caCertBytes) throws IOException {
-    this.reportDirname = ParamUtil.requireNonBlank("reportDirname", reportDirname);
+    this.reportDirname = Args.notBlank(reportDirname, "reportDirname");
     File dir = new File(reportDirname);
     dir.mkdirs();
     IoUtil.save(new File(dir, "ca.der"), caCertBytes);
@@ -110,8 +110,8 @@ class DigestDiffReporter implements Closeable {
   }
 
   public void addDiff(DigestEntry refCert, DigestEntry targetCert) throws IOException {
-    ParamUtil.requireNonNull("refCert", refCert);
-    ParamUtil.requireNonNull("targetCert", targetCert);
+    Args.notNull(refCert, "refCert");
+    Args.notNull(targetCert, "targetCert");
 
     if (refCert.getSerialNumber().equals(targetCert.getSerialNumber())) {
       throw new IllegalArgumentException("refCert and targetCert are not of the same serialNumber");
@@ -126,7 +126,7 @@ class DigestDiffReporter implements Closeable {
   }
 
   public void addError(String errorMessage) throws IOException {
-    ParamUtil.requireNonNull("errorMessage", errorMessage);
+    Args.notNull(errorMessage, "errorMessage");
 
     numError.incrementAndGet();
     String msg = StringUtil.concat(errorMessage, "\n");

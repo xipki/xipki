@@ -18,7 +18,7 @@
 package org.xipki.qa.ca.internal;
 
 import org.xipki.ca.certprofile.xml.jaxb.PolicyConstraints;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -33,7 +33,7 @@ public class QaPolicyConstraints extends QaExtension {
   private final Integer inhibitPolicyMapping;
 
   public QaPolicyConstraints(PolicyConstraints jaxb) {
-    ParamUtil.requireNonNull("jaxb", jaxb);
+    Args.notNull(jaxb, "jaxb");
     if (jaxb.getRequireExplicitPolicy() == null && jaxb.getInhibitPolicyMapping() == null) {
       throw new IllegalArgumentException(
           "at least one of requireExplicitPolicy and inhibitPolicyMapping must be set");

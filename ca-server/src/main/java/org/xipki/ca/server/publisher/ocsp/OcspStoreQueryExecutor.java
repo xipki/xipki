@@ -43,7 +43,7 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -80,7 +80,7 @@ class OcspStoreQueryExecutor {
 
   OcspStoreQueryExecutor(DataSourceWrapper datasource, boolean publishGoodCerts)
       throws DataAccessException, NoSuchAlgorithmException {
-    this.datasource = ParamUtil.requireNonNull("datasource", datasource);
+    this.datasource = Args.notNull(datasource, "datasource");
     this.issuerStore = initIssuerStore();
     this.publishGoodCerts = publishGoodCerts;
 
@@ -156,7 +156,7 @@ class OcspStoreQueryExecutor {
 
   private void addOrUpdateCert(X509Cert issuer, CertWithDbId certificate,
       CertRevocationInfo revInfo) throws DataAccessException, OperationException {
-    ParamUtil.requireNonNull("issuer", issuer);
+    Args.notNull(issuer, "issuer");
 
     boolean revoked = (revInfo != null);
     int issuerId = getIssuerId(issuer);
@@ -274,8 +274,8 @@ class OcspStoreQueryExecutor {
   }
 
   void unrevokeCert(X509Cert issuer, CertWithDbId cert) throws DataAccessException {
-    ParamUtil.requireNonNull("issuer", issuer);
-    ParamUtil.requireNonNull("cert", cert);
+    Args.notNull(issuer, "issuer");
+    Args.notNull(cert, "cert");
 
     Integer issuerId = issuerStore.getIdForCert(issuer.getEncodedCert());
     if (issuerId == null) {
@@ -325,8 +325,8 @@ class OcspStoreQueryExecutor {
   } // method unrevokeCert
 
   void removeCert(X509Cert issuer, CertWithDbId cert) throws DataAccessException {
-    ParamUtil.requireNonNull("issuer", issuer);
-    ParamUtil.requireNonNull("cert", cert);
+    Args.notNull(issuer, "issuer");
+    Args.notNull(cert, "cert");
 
     Integer issuerId = issuerStore.getIdForCert(issuer.getEncodedCert());
     if (issuerId == null) {
@@ -348,8 +348,8 @@ class OcspStoreQueryExecutor {
   } // method removeCert
 
   void revokeCa(X509Cert caCert, CertRevocationInfo revInfo) throws DataAccessException {
-    ParamUtil.requireNonNull("caCert", caCert);
-    ParamUtil.requireNonNull("revInfo", revInfo);
+    Args.notNull(caCert, "caCert");
+    Args.notNull(revInfo, "revInfo");
 
     int issuerId = getIssuerId(caCert);
     final String sql = "UPDATE ISSUER SET REV_INFO=? WHERE ID=?";
@@ -383,7 +383,7 @@ class OcspStoreQueryExecutor {
   } // method unrevokeCa
 
   private int getIssuerId(X509Cert issuerCert) throws DataAccessException {
-    ParamUtil.requireNonNull("issuerCert", issuerCert);
+    Args.notNull(issuerCert, "issuerCert");
     Integer id = issuerStore.getIdForCert(issuerCert.getEncodedCert());
     if (id == null) {
       throw new IllegalStateException("could not find issuer, "

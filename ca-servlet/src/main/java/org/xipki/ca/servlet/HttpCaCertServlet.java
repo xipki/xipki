@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.server.api.ResponderManager;
 import org.xipki.security.X509Cert;
 import org.xipki.util.HttpConstants;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -47,8 +47,7 @@ public class HttpCaCertServlet extends HttpServlet {
   private ResponderManager responderManager;
 
   public void setResponderManager(ResponderManager responderManager) {
-    this.responderManager =
-        ParamUtil.requireNonNull("responderManager", responderManager);;
+    this.responderManager = Args.notNull(responderManager, "responderManager");
   }
 
   @Override

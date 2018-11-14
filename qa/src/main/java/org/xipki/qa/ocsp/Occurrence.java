@@ -17,7 +17,7 @@
 
 package org.xipki.qa.ocsp;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -32,7 +32,7 @@ public enum Occurrence {
   forbidden;
 
   public static Occurrence forName(String name) {
-    ParamUtil.requireNonNull("name", name);
+    Args.notNull(name, "name");
     for (Occurrence entry : values()) {
       if (entry.name().equals(name)) {
         return entry;

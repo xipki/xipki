@@ -45,7 +45,7 @@ import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.security.util.SignerUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
@@ -134,15 +134,15 @@ class P11RSAPSSContentSigner implements XiContentSigner {
   P11RSAPSSContentSigner(P11CryptService cryptService, P11IdentityId identityId,
       AlgorithmIdentifier signatureAlgId, SecureRandom random)
       throws XiSecurityException, P11TokenException {
-    this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
-    this.identityId = ParamUtil.requireNonNull("identityId", identityId);
-    this.algorithmIdentifier = ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
+    this.cryptService = Args.notNull(cryptService, "cryptService");
+    this.identityId = Args.notNull(identityId, "identityId");
+    this.algorithmIdentifier = Args.notNull(signatureAlgId, "signatureAlgId");
     try {
       this.encodedAlgorithmIdentifier = algorithmIdentifier.getEncoded();
     } catch (IOException ex) {
       throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
     }
-    ParamUtil.requireNonNull("random", random);
+    Args.notNull(random, "random");
 
     if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(signatureAlgId.getAlgorithm())) {
       throw new XiSecurityException("unsupported signature algorithm "

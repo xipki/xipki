@@ -23,7 +23,7 @@ import java.io.OutputStream;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.operator.ContentSigner;
 import org.xipki.security.exception.XiSecurityException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -38,7 +38,7 @@ public class XiWrappedContentSigner implements XiContentSigner {
 
   public XiWrappedContentSigner(ContentSigner signer, boolean fixedAlgorithmIdentifier)
       throws XiSecurityException {
-    this.signer = ParamUtil.requireNonNull("signer",signer);
+    this.signer = Args.notNull(signer, "signer");
     if (fixedAlgorithmIdentifier) {
       try {
         this.encodedAlgorithmIdentifier = signer.getAlgorithmIdentifier().getEncoded();

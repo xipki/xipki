@@ -42,7 +42,7 @@ import org.xipki.security.pkcs11.jaxb.ObjectFactory;
 import org.xipki.security.pkcs11.jaxb.Pkcs11ConfType;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xml.sax.SAXException;
 
 /**
@@ -61,7 +61,7 @@ public class P11Conf {
 
   public P11Conf(InputStream confStream, PasswordResolver passwordResolver)
       throws InvalidConfException, IOException {
-    ParamUtil.requireNonNull("confStream", confStream);
+    Args.notNull(confStream, "confStream");
     try {
       JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
       Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();

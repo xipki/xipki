@@ -47,7 +47,7 @@ import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.TripleState;
 
 /**
@@ -99,7 +99,7 @@ public class RequestOption {
   private final CertpathValidationModel certpathValidationModel;
 
   RequestOption(RequestOptionType conf) throws InvalidConfException {
-    ParamUtil.requireNonNull("conf", conf);
+    Args.notNull(conf, "conf");
 
     supportsHttpGet = conf.isSupportsHttpGet();
     signatureRequired = conf.isSignatureRequired();
@@ -273,7 +273,7 @@ public class RequestOption {
   private static Set<X509Certificate> getCerts(CertCollectionType conf)
       throws KeyStoreException, NoSuchAlgorithmException, NoSuchProviderException,
         CertificateException, IOException {
-    ParamUtil.requireNonNull("conf", conf);
+    Args.notNull(conf, "conf");
     Set<X509Certificate> tmpCerts = new HashSet<>();
 
     if (conf.getKeystore() != null) {

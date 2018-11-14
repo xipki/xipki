@@ -24,7 +24,7 @@ import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -37,8 +37,8 @@ public class ExtensionValues {
   private final Map<ASN1ObjectIdentifier, ExtensionValue> extensions = new HashMap<>();
 
   public boolean addExtension(ASN1ObjectIdentifier type, boolean critical, ASN1Encodable value) {
-    ParamUtil.requireNonNull("type", type);
-    ParamUtil.requireNonNull("value", value);
+    Args.notNull(type, "type");
+    Args.notNull(value, "value");
 
     if (extensions.containsKey(type)) {
       return false;
@@ -48,8 +48,8 @@ public class ExtensionValues {
   }
 
   public boolean addExtension(ASN1ObjectIdentifier type, ExtensionValue value) {
-    ParamUtil.requireNonNull("type", type);
-    ParamUtil.requireNonNull("value", value);
+    Args.notNull(type, "type");
+    Args.notNull(value, "value");
 
     if (extensions.containsKey(type)) {
       return false;
@@ -63,18 +63,15 @@ public class ExtensionValues {
   }
 
   public ExtensionValue getExtensionValue(ASN1ObjectIdentifier type) {
-    ParamUtil.requireNonNull("type", type);
-    return extensions.get(type);
+    return extensions.get(Args.notNull(type, "type"));
   }
 
   public boolean removeExtensionTuple(ASN1ObjectIdentifier type) {
-    ParamUtil.requireNonNull("type", type);
-    return extensions.remove(type) != null;
+    return extensions.remove(Args.notNull(type, "type")) != null;
   }
 
   public boolean containsExtension(ASN1ObjectIdentifier type) {
-    ParamUtil.requireNonNull("type", type);
-    return extensions.containsKey(type);
+    return extensions.containsKey(Args.notNull(type, "type"));
   }
 
   public int size() {

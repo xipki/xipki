@@ -25,7 +25,7 @@ import java.util.Set;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -91,7 +91,7 @@ public class P11PasswordsRetriever {
   }
 
   public List<char[]> getPassword(P11SlotIdentifier slotId) throws PasswordResolverException {
-    ParamUtil.requireNonNull("slotId", slotId);
+    Args.notNull(slotId, "slotId");
     if (CollectionUtil.isEmpty(singleRetrievers)) {
       return null;
     }

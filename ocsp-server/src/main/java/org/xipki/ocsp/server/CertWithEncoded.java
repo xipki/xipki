@@ -21,7 +21,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -38,7 +38,7 @@ public class CertWithEncoded {
   private final byte[] encoded;
 
   public CertWithEncoded(X509Certificate cert) throws CertificateEncodingException {
-    this.cert = ParamUtil.requireNonNull("cert", cert);
+    this.cert = Args.notNull(cert, "cert");
     this.className = cert.getClass().getName();
     this.encoded = cert.getEncoded();
   }

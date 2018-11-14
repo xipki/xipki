@@ -22,7 +22,7 @@ import java.util.Date;
 
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -41,14 +41,14 @@ public class CertRevInfoWithSerial extends CertRevocationInfo
       Date revocationTime, Date invalidityTime) {
     super(reason, revocationTime, invalidityTime);
     this.id = id;
-    this.serial = ParamUtil.requireNonNull("serial", serial);
+    this.serial = Args.notNull(serial, "serial");
   }
 
   public CertRevInfoWithSerial(long id, BigInteger serial, int reasonCode,
       Date revocationTime, Date invalidityTime) {
     super(reasonCode, revocationTime, invalidityTime);
     this.id = id;
-    this.serial = ParamUtil.requireNonNull("serial", serial);
+    this.serial = Args.notNull(serial, "serial");
   }
 
   public BigInteger getSerial() {

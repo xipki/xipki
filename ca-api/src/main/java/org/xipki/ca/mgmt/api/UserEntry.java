@@ -18,7 +18,7 @@
 package org.xipki.ca.mgmt.api;
 
 import org.xipki.ca.api.NameId;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -41,13 +41,13 @@ public class UserEntry {
   }
 
   public UserEntry(NameId ident, boolean active, String hashedPassword) throws CaMgmtException {
-    this.ident = ParamUtil.requireNonNull("ident", ident);
+    this.ident = Args.notNull(ident, "ident");
     this.active = active;
-    this.hashedPassword = ParamUtil.requireNonBlank("hashedPassword", hashedPassword);
+    this.hashedPassword = Args.notBlank(hashedPassword, "hashedPassword");
   }
 
   public void setIdent(NameId ident) {
-    this.ident = ParamUtil.requireNonNull("ident", ident);
+    this.ident = Args.notNull(ident, "ident");
   }
 
   public NameId getIdent() {
@@ -63,7 +63,7 @@ public class UserEntry {
   }
 
   public void setHashedPassword(String hashedPassword) {
-    this.hashedPassword = ParamUtil.requireNonBlank("hashedPassword", hashedPassword);
+    this.hashedPassword = Args.notBlank(hashedPassword, "hashedPassword");
   }
 
   public String getHashedPassword() {

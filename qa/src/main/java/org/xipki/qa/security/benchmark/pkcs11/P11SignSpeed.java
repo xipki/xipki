@@ -35,7 +35,7 @@ import org.xipki.util.ConfPairs;
 import org.xipki.util.Hex;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -88,14 +88,12 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
           throws ObjectCreationException {
     super(description + "\nsignature algorithm: " + signatureAlgorithm);
 
-    ParamUtil.requireNonNull("securityFactory", securityFactory);
-    ParamUtil.requireNonNull("slot", slot);
-    ParamUtil.requireNonBlank("signatureAlgorithm", signatureAlgorithm);
-    ParamUtil.requireNonNull("objectId", objectId);
+    Args.notNull(securityFactory, "securityFactory");
+    this.slot = Args.notNull(slot, "slot");
+    Args.notBlank(signatureAlgorithm, "signatureAlgorithm");
+    this.objectId = Args.notNull(objectId, "objectId");
 
     this.deleteKeyAfterTest = deleteKeyAfterTest;
-    this.slot = slot;
-    this.objectId = objectId;
 
     P11SlotIdentifier slotId = slot.getSlotId();
     SignerConf signerConf = getPkcs11SignerConf(slot.getModuleName(),

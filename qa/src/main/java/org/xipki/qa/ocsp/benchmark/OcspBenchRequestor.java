@@ -45,7 +45,7 @@ import org.xipki.ocsp.client.api.OcspRequestorException;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -77,8 +77,8 @@ class OcspBenchRequestor implements Closeable {
 
   public void init(String responderUrl, Certificate issuerCert, RequestOptions requestOptions,
       boolean parseResponse) throws Exception {
-    ParamUtil.requireNonNull("issuerCert", issuerCert);
-    this.requestOptions = ParamUtil.requireNonNull("requestOptions", requestOptions);
+    Args.notNull(issuerCert, "issuerCert");
+    this.requestOptions = Args.notNull(requestOptions, "requestOptions");
 
     HashAlgo hashAlgo = HashAlgo.getInstance(requestOptions.getHashAlgorithmId());
     if (hashAlgo == null) {

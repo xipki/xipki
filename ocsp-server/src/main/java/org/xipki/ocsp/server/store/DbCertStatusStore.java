@@ -59,7 +59,7 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -479,8 +479,8 @@ public class DbCertStatusStore extends OcspStore {
 
   @Override
   public void init(String conf, DataSourceWrapper datasource) throws OcspStoreException {
-    ParamUtil.requireNonNull("conf", conf);
-    this.datasource = ParamUtil.requireNonNull("datasource", datasource);
+    Args.notNull(conf, "conf");
+    this.datasource = Args.notNull(datasource, "datasource");
 
     sqlCs = datasource.buildSelectFirstSql(1,
         "NBEFORE,NAFTER,REV,RR,RT,RIT FROM CERT WHERE IID=? AND SN=?");

@@ -40,7 +40,7 @@ import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.concurrent.ConcurrentBag;
 
 /**
@@ -100,7 +100,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
 
   public DfltConcurrentContentSigner(boolean mac, List<XiContentSigner> signers, Key signingKey)
       throws NoSuchAlgorithmException {
-    ParamUtil.requireNonEmpty("signers", signers);
+    Args.notEmpty(signers, "signers");
 
     this.mac = mac;
     AlgorithmIdentifier algorithmIdentifier = signers.get(0).getAlgorithmIdentifier();

@@ -47,7 +47,7 @@ import org.xipki.qa.ca.jaxb.ObjectFactory;
 import org.xipki.qa.ca.jaxb.QaconfType;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 import org.xml.sax.SAXException;
 
@@ -85,7 +85,7 @@ public class CaQaSystemManagerImpl implements CaQaSystemManager {
   }
 
   public void setConfFile(String confFile) {
-    this.confFile = ParamUtil.requireNonBlank("confFile", confFile);
+    this.confFile = Args.notBlank(confFile, "confFile");
   }
 
   @Override
@@ -181,7 +181,7 @@ public class CaQaSystemManagerImpl implements CaQaSystemManager {
   @Override
   public IssuerInfo getIssuer(String issuerName) {
     assertInitialized();
-    return x509IssuerInfoMap.get(ParamUtil.requireNonNull("issuerName", issuerName));
+    return x509IssuerInfoMap.get(Args.notNull(issuerName, "issuerName"));
   }
 
   @Override
@@ -193,7 +193,7 @@ public class CaQaSystemManagerImpl implements CaQaSystemManager {
   @Override
   public CertprofileQa getCertprofile(String certprofileName) {
     assertInitialized();
-    return x509ProfileMap.get(ParamUtil.requireNonNull("certprofileName", certprofileName));
+    return x509ProfileMap.get(Args.notNull(certprofileName, "certprofileName"));
   }
 
   private QaconfType parseQaConf(InputStream confStream)

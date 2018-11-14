@@ -17,7 +17,7 @@
 
 package org.xipki.qa.ca.internal;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -32,7 +32,7 @@ public abstract class QaPolicyQualifierInfo {
     private final String cpsUri;
 
     public QaCpsUriPolicyQualifier(String cpsUri) {
-      this.cpsUri = ParamUtil.requireNonBlank("cpsUri", cpsUri);
+      this.cpsUri = Args.notBlank(cpsUri, "cpsUri");
     }
 
     public String getCpsUri() {
@@ -46,7 +46,7 @@ public abstract class QaPolicyQualifierInfo {
     private final String userNotice;
 
     public QaUserNoticePolicyQualifierInfo(String userNotice) {
-      this.userNotice = ParamUtil.requireNonBlank("userNotice", userNotice);
+      this.userNotice = Args.notBlank(userNotice, "userNotice");
     }
 
     public String getUserNotice() {

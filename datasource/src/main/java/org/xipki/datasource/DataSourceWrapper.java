@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException.Reason;
 import org.xipki.util.LogUtil;
 import org.xipki.util.LruCache;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 import com.zaxxer.hikari.HikariConfig;
@@ -387,8 +387,8 @@ public abstract class DataSourceWrapper implements Closeable {
   private final LruCache<String, String> cacheSeqNameSqls;
 
   private DataSourceWrapper(String name, HikariDataSource service, DatabaseType dbType) {
-    this.service = ParamUtil.requireNonNull("service", service);
-    this.databaseType = ParamUtil.requireNonNull("dbType", dbType);
+    this.service = Args.notNull(service, "service");
+    this.databaseType = Args.notNull(dbType, "dbType");
     this.name = name;
     this.sqlErrorCodes = SqlErrorCodes.newInstance(dbType);
     this.sqlStateCodes = SqlStateCodes.newInstance(dbType);
@@ -456,7 +456,7 @@ public abstract class DataSourceWrapper implements Closeable {
   }
 
   public Statement createStatement(Connection conn) throws DataAccessException {
-    ParamUtil.requireNonNull("conn", conn);
+    Args.notNull(conn, "conn");
     try {
       return conn.createStatement();
     } catch (SQLException ex) {
@@ -482,7 +482,7 @@ public abstract class DataSourceWrapper implements Closeable {
 
   public PreparedStatement prepareStatement(Connection conn, String sqlQuery)
       throws DataAccessException {
-    ParamUtil.requireNonNull("conn", conn);
+    Args.notNull(conn, "conn");
     try {
       return conn.prepareStatement(sqlQuery);
     } catch (SQLException ex) {
@@ -580,8 +580,8 @@ public abstract class DataSourceWrapper implements Closeable {
 
   public long getMin(Connection conn, String table, String column, String condition)
       throws DataAccessException {
-    ParamUtil.requireNonBlank("table", table);
-    ParamUtil.requireNonBlank("column", column);
+    Args.notBlank(table, "table");
+    Args.notBlank(column, "column");
 
     String sql = StringUtil.concat("SELECT MIN(", column, ") FROM ", table,
         (StringUtil.isBlank(condition) ? "" : " WHERE " + condition));
@@ -601,7 +601,7 @@ public abstract class DataSourceWrapper implements Closeable {
   }
 
   public int getCount(Connection conn, String table) throws DataAccessException {
-    ParamUtil.requireNonBlank("table", table);
+    Args.notBlank(table, "table");
 
     final String sql = StringUtil.concat("SELECT COUNT(*) FROM ", table);
 
@@ -625,8 +625,8 @@ public abstract class DataSourceWrapper implements Closeable {
 
   public long getMax(Connection conn, String table, String column, String condition)
       throws DataAccessException {
-    ParamUtil.requireNonBlank("table", table);
-    ParamUtil.requireNonBlank("column", column);
+    Args.notBlank(table, "table");
+    Args.notBlank(column, "column");
 
     final String sql = StringUtil.concat("SELECT MAX(", column, ") FROM ", table,
         (StringUtil.isBlank(condition) ? "" : " WHERE " + condition));
@@ -646,8 +646,8 @@ public abstract class DataSourceWrapper implements Closeable {
   }
 
   public boolean deleteFromTable(Connection conn, String table, String idColumn, long id) {
-    ParamUtil.requireNonBlank("table", table);
-    ParamUtil.requireNonBlank("idColumn", idColumn);
+    Args.notBlank(table, "table");
+    Args.notBlank(idColumn, "idColumn");
     final String sql = StringUtil.concat("DELETE FROM ", table, " WHERE ", idColumn,
         "=", Long.toString(id));
 
@@ -669,9 +669,9 @@ public abstract class DataSourceWrapper implements Closeable {
 
   public boolean columnExists(Connection conn, String table, String column, Object value)
       throws DataAccessException {
-    ParamUtil.requireNonBlank("table", table);
-    ParamUtil.requireNonBlank("column", column);
-    ParamUtil.requireNonNull("value", value);
+    Args.notBlank(table, "table");
+    Args.notBlank(column, "column");
+    Args.notNull(value, "value");
 
     String coreSql = StringUtil.concat(column, " FROM ", table, " WHERE ", column, "=?");
     String sql = buildSelectFirstSql(1, coreSql);
@@ -700,8 +700,8 @@ public abstract class DataSourceWrapper implements Closeable {
 
   public boolean tableHasColumn(Connection conn, String table, String column)
       throws DataAccessException {
-    ParamUtil.requireNonBlank("table", table);
-    ParamUtil.requireNonBlank("column", column);
+    Args.notBlank(table, "table");
+    Args.notBlank(column, "column");
 
     String coreSql = StringUtil.concat(column, " FROM ", table);
     final String sql = buildSelectFirstSql(1, coreSql);
@@ -719,7 +719,7 @@ public abstract class DataSourceWrapper implements Closeable {
   }
 
   public boolean tableExists(Connection conn, String table) throws DataAccessException {
-    ParamUtil.requireNonBlank("table", table);
+    Args.notBlank(table, "table");
 
     final String sql = buildSelectFirstSql(1, StringUtil.concat("1 FROM ", table));
     Statement stmt = null;
@@ -765,7 +765,7 @@ public abstract class DataSourceWrapper implements Closeable {
   }
 
   public void createSequence(String sequenceName, long startValue) throws DataAccessException {
-    ParamUtil.requireNonBlank("sequenceName", sequenceName);
+    Args.notBlank(sequenceName, "sequenceName");
     final String sql = buildCreateSequenceSql(sequenceName, startValue);
     Statement stmt = null;
     try {
@@ -780,7 +780,7 @@ public abstract class DataSourceWrapper implements Closeable {
   }
 
   public void dropSequence(String sequenceName) throws DataAccessException {
-    ParamUtil.requireNonBlank("sequenceName", sequenceName);
+    Args.notBlank(sequenceName, "sequenceName");
     final String sql = buildDropSequenceSql(sequenceName);
     Statement stmt = null;
     try {
@@ -795,12 +795,12 @@ public abstract class DataSourceWrapper implements Closeable {
   }
 
   public void setLastUsedSeqValue(String sequenceName, long sequenceValue) {
-    ParamUtil.requireNonBlank("sequenceName", sequenceName);
+    Args.notBlank(sequenceName, "sequenceName");
     lastUsedSeqValues.put(sequenceName, sequenceValue);
   }
 
   public long nextSeqValue(Connection conn, String sequenceName) throws DataAccessException {
-    ParamUtil.requireNonBlank("sequenceName", sequenceName);
+    Args.notBlank(sequenceName, "sequenceName");
     final String sql = buildAndCacheNextSeqValueSql(sequenceName);
     Statement stmt = null;
 
@@ -838,8 +838,8 @@ public abstract class DataSourceWrapper implements Closeable {
   } // method nextSeqValue
 
   protected String getSqlToDropPrimaryKey(String primaryKeyName, String table) {
-    ParamUtil.requireNonBlank("primaryKeyName", primaryKeyName);
-    ParamUtil.requireNonBlank("table", table);
+    Args.notBlank(primaryKeyName, "primaryKeyName");
+    Args.notBlank(table, "table");
     return StringUtil.concat("ALTER TABLE ", table, " DROP PRIMARY KEY ");
   }
 
@@ -849,8 +849,8 @@ public abstract class DataSourceWrapper implements Closeable {
   }
 
   protected String getSqlToAddPrimaryKey(String primaryKeyName, String table, String... columns) {
-    ParamUtil.requireNonBlank("primaryKeyName", primaryKeyName);
-    ParamUtil.requireNonBlank("table", table);
+    Args.notBlank(primaryKeyName, "primaryKeyName");
+    Args.notBlank(table, "table");
 
     final StringBuilder sb = new StringBuilder(100);
     sb.append("ALTER TABLE ").append(table);
@@ -875,8 +875,8 @@ public abstract class DataSourceWrapper implements Closeable {
 
   protected String getSqlToDropForeignKeyConstraint(String constraintName, String baseTable)
       throws DataAccessException {
-    ParamUtil.requireNonBlank("constraintName", constraintName);
-    ParamUtil.requireNonBlank("baseTable", baseTable);
+    Args.notBlank(constraintName, "constraintName");
+    Args.notBlank(baseTable, "baseTable");
 
     return StringUtil.concat("ALTER TABLE ", baseTable, " DROP CONSTRAINT ", constraintName);
   }
@@ -889,13 +889,13 @@ public abstract class DataSourceWrapper implements Closeable {
   protected String getSqlToAddForeignKeyConstraint(String constraintName, String baseTable,
       String baseColumn, String referencedTable, String referencedColumn, String onDeleteAction,
       String onUpdateAction) {
-    ParamUtil.requireNonBlank("constraintName", constraintName);
-    ParamUtil.requireNonBlank("baseTable", baseTable);
-    ParamUtil.requireNonBlank("baseColumn", baseColumn);
-    ParamUtil.requireNonBlank("referencedTable", referencedTable);
-    ParamUtil.requireNonBlank("referencedColumn", referencedColumn);
-    ParamUtil.requireNonBlank("onDeleteAction", onDeleteAction);
-    ParamUtil.requireNonBlank("onUpdateAction", onUpdateAction);
+    Args.notBlank(constraintName, "constraintName");
+    Args.notBlank(baseTable, "baseTable");
+    Args.notBlank(baseColumn, "baseColumn");
+    Args.notBlank(referencedTable, "referencedTable");
+    Args.notBlank(referencedColumn, "referencedColumn");
+    Args.notBlank(onDeleteAction, "onDeleteAction");
+    Args.notBlank(onUpdateAction, "onUpdateAction");
 
     return StringUtil.concat("ALTER TABLE ", baseTable, " ADD CONSTRAINT ", constraintName,
       " FOREIGN KEY (", baseColumn, ")", " REFERENCES ", referencedTable,
@@ -911,7 +911,7 @@ public abstract class DataSourceWrapper implements Closeable {
   }
 
   protected String getSqlToDropIndex(String table, String indexName) {
-    ParamUtil.requireNonBlank("indexName", indexName);
+    Args.notBlank(indexName, "indexName");
     return "DROP INDEX " + indexName;
   }
 
@@ -921,8 +921,8 @@ public abstract class DataSourceWrapper implements Closeable {
   }
 
   protected String getSqlToCreateIndex(String indexName, String table, String... columns) {
-    ParamUtil.requireNonBlank("indexName", indexName);
-    ParamUtil.requireNonBlank("table", table);
+    Args.notBlank(indexName, "indexName");
+    Args.notBlank(table, "table");
     if (columns == null || columns.length == 0) {
       throw new IllegalArgumentException("columns must not be null and empty");
     }
@@ -931,7 +931,7 @@ public abstract class DataSourceWrapper implements Closeable {
     sb.append("CREATE INDEX ").append(indexName);
     sb.append(" ON ").append(table).append("(");
     for (String column : columns) {
-      ParamUtil.requireNonBlank("column", column);
+      Args.notBlank(column, "column");
       sb.append(column).append(',');
     }
     sb.deleteCharAt(sb.length() - 1); // delete the last ","
@@ -945,8 +945,8 @@ public abstract class DataSourceWrapper implements Closeable {
   }
 
   protected String getSqlToDropUniqueConstraint(String constraintName, String table) {
-    ParamUtil.requireNonBlank("table", table);
-    ParamUtil.requireNonBlank("constraintName", constraintName);
+    Args.notBlank(table, "table");
+    Args.notBlank(constraintName, "constraintName");
 
     return StringUtil.concat("ALTER TABLE ", table, " DROP CONSTRAINT ", constraintName);
   }
@@ -958,8 +958,8 @@ public abstract class DataSourceWrapper implements Closeable {
 
   protected String getSqlToAddUniqueConstrain(String constraintName, String table,
       String... columns) {
-    ParamUtil.requireNonBlank("constraintName", constraintName);
-    ParamUtil.requireNonBlank("table", table);
+    Args.notBlank(constraintName, "constraintName");
+    Args.notBlank(table, "table");
 
     final StringBuilder sb = new StringBuilder(100);
     sb.append("ALTER TABLE ").append(table).append(" ADD CONSTRAINT ")
@@ -980,7 +980,7 @@ public abstract class DataSourceWrapper implements Closeable {
   }
 
   public DataAccessException translate(String sql, SQLException ex) {
-    ParamUtil.requireNonNull("ex", ex);
+    Args.notNull(ex, "ex");
 
     if (sql == null) {
       sql = "";
@@ -1121,8 +1121,8 @@ public abstract class DataSourceWrapper implements Closeable {
 
   static DataSourceWrapper createDataSource(String name, Properties props,
       DatabaseType databaseType) {
-    ParamUtil.requireNonNull("props", props);
-    ParamUtil.requireNonNull("databaseType", databaseType);
+    Args.notNull(props, "props");
+    Args.notNull(databaseType, "databaseType");
 
     // The DB2 schema name is case-sensitive, and must be specified in uppercase characters
     String datasourceClassName = props.getProperty("dataSourceClassName");

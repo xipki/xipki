@@ -17,7 +17,7 @@
 
 package org.xipki.security;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -63,7 +63,7 @@ public enum KeyUsage {
   }
 
   public static KeyUsage getKeyUsage(String usage) {
-    ParamUtil.requireNonNull("usage", usage);
+    Args.notNull(usage, "usage");
 
     for (KeyUsage ku : KeyUsage.values()) {
       for (String name : ku.names) {

@@ -17,7 +17,7 @@
 
 package org.xipki.qa;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -36,8 +36,8 @@ public class ValidationIssue {
   private String failureMessage;
 
   public ValidationIssue(String code, String description) {
-    this.code = ParamUtil.requireNonBlank("code", code);
-    this.description = ParamUtil.requireNonBlank("description", description);
+    this.code = Args.notBlank(code, "code");
+    this.description = Args.notBlank(description, "description");
     this.failed = false;
   }
 
@@ -50,7 +50,7 @@ public class ValidationIssue {
   }
 
   public void setFailureMessage(String failureMessage) {
-    this.failureMessage = ParamUtil.requireNonNull("failureMessage", failureMessage);
+    this.failureMessage = Args.notNull(failureMessage, "failureMessage");
     this.failed = true;
   }
 

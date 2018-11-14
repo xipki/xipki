@@ -24,7 +24,7 @@ import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.operator.RuntimeOperatorException;
 import org.xipki.util.Base64;
 import org.xipki.util.Hex;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.concurrent.ConcurrentBag;
 import org.xipki.util.concurrent.ConcurrentBagEntry;
 
@@ -127,8 +127,8 @@ class HashCalculator {
   }
 
   public static byte[] hash(HashAlgo hashAlgo, byte[] data, int offset, int len) {
-    ParamUtil.requireNonNull("hashAlgo", hashAlgo);
-    ParamUtil.requireNonNull("data", data);
+    Args.notNull(hashAlgo, "hashAlgo");
+    Args.notNull(data, "data");
 
     if (data.length - offset < len) {
       throw new IndexOutOfBoundsException("data.length - offset < len");

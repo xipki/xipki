@@ -20,7 +20,7 @@ package org.xipki.ca.server;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntBinaryOperator;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * Unique Identifier Generator.
@@ -62,8 +62,8 @@ public class UniqueIdGenerator {
   private final IntBinaryOperator accumulatorFunction;
 
   public UniqueIdGenerator(long epoch, int shardId) {
-    this.epoch = ParamUtil.requireMin("epoch", epoch, 0);
-    this.shardId = ParamUtil.requireRange("shardId", shardId, 0, 127);
+    this.epoch = Args.notNegative(epoch, "epoch");
+    this.shardId = Args.range(shardId, "shardId", 0, 127);
     this.accumulatorFunction = new OffsetIncrement();
   }
 

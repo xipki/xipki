@@ -113,7 +113,7 @@ import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 import org.xipki.util.TripleState;
 import org.xipki.util.XmlUtil;
@@ -132,7 +132,7 @@ public class OcspServerImpl implements OcspServer {
     private String str;
 
     public SizeComparableString(String str) {
-      this.str = ParamUtil.requireNonNull("str", str);
+      this.str = Args.notNull(str, "str");
     }
 
     @Override
@@ -252,7 +252,7 @@ public class OcspServerImpl implements OcspServer {
   }
 
   public ResponderImpl getResponder(String name) {
-    ParamUtil.requireNonBlank("name", name);
+    Args.notBlank(name, "name");
     return responders.get(name);
   }
 

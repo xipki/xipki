@@ -40,7 +40,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.KeyUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -54,7 +54,7 @@ public class SoftTokenMacContentSignerBuilder {
 
   public SoftTokenMacContentSignerBuilder(SecretKey key)
       throws XiSecurityException {
-    this.key = ParamUtil.requireNonNull("key", key);
+    this.key = Args.notNull(key, "key");
   }
 
   public SoftTokenMacContentSignerBuilder(String keystoreType, InputStream keystoreStream,
@@ -62,9 +62,9 @@ public class SoftTokenMacContentSignerBuilder {
     if (!"JCEKS".equalsIgnoreCase(keystoreType)) {
       throw new IllegalArgumentException("unsupported keystore type: " + keystoreType);
     }
-    ParamUtil.requireNonNull("keystoreStream", keystoreStream);
-    ParamUtil.requireNonNull("keystorePassword", keystorePassword);
-    ParamUtil.requireNonNull("keyPassword", keyPassword);
+    Args.notNull(keystoreStream, "keystoreStream");
+    Args.notNull(keystorePassword, "keystorePassword");
+    Args.notNull(keyPassword, "keyPassword");
 
     try {
       KeyStore ks = KeyUtil.getKeyStore(keystoreType);
@@ -95,8 +95,8 @@ public class SoftTokenMacContentSignerBuilder {
 
   public ConcurrentContentSigner createSigner(AlgorithmIdentifier signatureAlgId,
       int parallelism, SecureRandom random) throws XiSecurityException {
-    ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
-    ParamUtil.requireMin("parallelism", parallelism, 1);
+    Args.notNull(signatureAlgId, "signatureAlgId");
+    Args.positive(parallelism, "parallelism");
 
     List<XiContentSigner> signers = new ArrayList<>(parallelism);
 

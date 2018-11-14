@@ -30,7 +30,7 @@ import org.xipki.ca.mgmt.api.PublisherEntry;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -45,8 +45,8 @@ class IdentifiedCertPublisher implements Closeable {
   private final CertPublisher certPublisher;
 
   IdentifiedCertPublisher(PublisherEntry entry, CertPublisher certPublisher) {
-    this.entry = ParamUtil.requireNonNull("entry", entry);
-    this.certPublisher = ParamUtil.requireNonNull("certPublisher", certPublisher);
+    this.entry = Args.notNull(entry, "entry");
+    this.certPublisher = Args.notNull(certPublisher, "certPublisher");
   }
 
   public void initialize(PasswordResolver passwordResolver,

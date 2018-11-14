@@ -32,7 +32,7 @@ import org.bouncycastle.crypto.params.ECPublicKeyParameters;
 import org.bouncycastle.crypto.params.ParametersWithRandom;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.SignerUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -63,7 +63,7 @@ public class DSAPlainDigestSigner implements Signer {
         ? (AsymmetricKeyParameter) ((ParametersWithRandom) parameters).getParameters()
         : (AsymmetricKeyParameter) parameters;
 
-    ParamUtil.requireNonNull("param", param);
+    Args.notNull(param, "param");
     if (param instanceof ECPublicKeyParameters) {
       keyBitLen = ((ECPublicKeyParameters) param).getParameters().getCurve().getFieldSize();
     } else if (param instanceof ECPrivateKeyParameters) {

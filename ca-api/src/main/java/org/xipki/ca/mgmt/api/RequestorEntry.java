@@ -23,7 +23,7 @@ import java.security.cert.X509Certificate;
 import org.xipki.ca.api.NameId;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -57,19 +57,19 @@ public class RequestorEntry {
   }
 
   public RequestorEntry(NameId ident, String type, String conf) {
-    this.ident = ParamUtil.requireNonNull("ident", ident);
+    this.ident = Args.notNull(ident, "ident");
     String name = ident.getName();
     if (RequestorInfo.NAME_BY_USER.equalsIgnoreCase(name)
         || RequestorInfo.NAME_BY_CA.equalsIgnoreCase(name)) {
       throw new IllegalArgumentException("Requestor name could not be " + name);
     }
 
-    this.type = ParamUtil.requireNonBlank("type", type);
-    this.conf = ParamUtil.requireNonBlank("conf", conf);
+    this.type = Args.notBlank(type, "type");
+    this.conf = Args.notBlank(conf, "conf");
   }
 
   public void setIdent(NameId ident) {
-    this.ident = ParamUtil.requireNonNull("ident", ident);
+    this.ident = Args.notNull(ident, "ident");
     String name = ident.getName();
     if (RequestorInfo.NAME_BY_USER.equalsIgnoreCase(name)
         || RequestorInfo.NAME_BY_CA.equalsIgnoreCase(name)) {
@@ -78,11 +78,11 @@ public class RequestorEntry {
   }
 
   public void setType(String type) {
-    this.type = ParamUtil.requireNonBlank("type", type);
+    this.type = Args.notBlank(type, "type");
   }
 
   public void setConf(String conf) {
-    this.conf = ParamUtil.requireNonBlank("conf", conf);
+    this.conf = Args.notBlank(conf, "conf");
   }
 
   public NameId getIdent() {

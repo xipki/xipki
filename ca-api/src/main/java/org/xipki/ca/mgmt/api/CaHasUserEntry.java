@@ -22,7 +22,7 @@ import java.util.Set;
 import org.xipki.ca.api.NameId;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.CompareUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -45,7 +45,7 @@ public class CaHasUserEntry {
   }
 
   public CaHasUserEntry(NameId userIdent) {
-    this.userIdent = ParamUtil.requireNonNull("userIdent", userIdent);
+    this.userIdent = Args.notNull(userIdent, "userIdent");
   }
 
   public int getPermission() {

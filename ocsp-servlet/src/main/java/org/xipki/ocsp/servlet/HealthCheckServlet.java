@@ -32,7 +32,7 @@ import org.xipki.ocsp.api.ResponderAndPath;
 import org.xipki.util.HealthCheckResult;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -51,7 +51,7 @@ public class HealthCheckServlet extends HttpServlet {
   private OcspServer server;
 
   public void setServer(OcspServer server) {
-    this.server = ParamUtil.requireNonNull("server", server);
+    this.server = Args.notNull(server, "server");
   }
 
   @Override

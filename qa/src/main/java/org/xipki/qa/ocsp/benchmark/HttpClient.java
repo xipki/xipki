@@ -30,7 +30,7 @@ import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.xipki.ocsp.client.api.OcspRequestorException;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -61,8 +61,8 @@ public class HttpClient {
   }
 
   public void send(byte[] request) throws IOException, OcspRequestorException {
-    ParamUtil.requireNonNull("request", request);
-    ParamUtil.requireNonNull("responderUrl", responderUrl);
+    Args.notNull(request, "request");
+    Args.notNull(responderUrl, "responderUrl");
 
     int size = request.length;
     HttpURLConnection httpUrlConnection;

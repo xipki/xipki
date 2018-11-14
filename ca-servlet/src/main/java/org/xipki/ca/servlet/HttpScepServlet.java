@@ -51,7 +51,7 @@ import org.xipki.util.Base64;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.RandomUtil;
 
 /**
@@ -75,8 +75,7 @@ public class HttpScepServlet extends HttpServlet {
   private ResponderManager responderManager;
 
   public void setResponderManager(ResponderManager responderManager) {
-    this.responderManager =
-        ParamUtil.requireNonNull("responderManager", responderManager);;
+    this.responderManager = Args.notNull(responderManager, "responderManager");
   }
 
   @Override

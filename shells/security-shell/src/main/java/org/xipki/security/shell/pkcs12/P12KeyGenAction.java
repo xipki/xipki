@@ -26,7 +26,7 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.security.pkcs12.KeystoreGenerationParameters;
 import org.xipki.security.pkcs12.P12KeyGenerationResult;
 import org.xipki.security.shell.KeyGenAction;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -44,7 +44,7 @@ public abstract class P12KeyGenAction extends KeyGenAction {
   protected String password;
 
   protected void saveKey(P12KeyGenerationResult keyGenerationResult) throws IOException {
-    ParamUtil.requireNonNull("keyGenerationResult", keyGenerationResult);
+    Args.notNull(keyGenerationResult, "keyGenerationResult");
     saveVerbose("saved PKCS#12 keystore to file", keyOutFile, keyGenerationResult.keystore());
   }
 

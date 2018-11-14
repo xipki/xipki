@@ -68,7 +68,7 @@ import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -97,11 +97,11 @@ public class CertprofileQa {
   private final XmlCertprofile certprofile;
 
   public CertprofileQa(String data) throws CertprofileException {
-    this(ParamUtil.requireNonNull("data", data).getBytes());
+    this(Args.notNull(data, "data").getBytes());
   }
 
   public CertprofileQa(byte[] dataBytes) throws CertprofileException {
-    ParamUtil.requireNonNull("dataBytes", dataBytes);
+    Args.notNull(dataBytes, "dataBytes");
     try {
       X509ProfileType conf = XmlCertprofileUtil.parse(new ByteArrayInputStream(dataBytes));
 
@@ -121,10 +121,10 @@ public class CertprofileQa {
   public ValidationResult checkCert(byte[] certBytes, IssuerInfo issuerInfo,
       X500Name requestedSubject, SubjectPublicKeyInfo requestedPublicKey,
       Extensions requestedExtensions) {
-    ParamUtil.requireNonNull("certBytes", certBytes);
-    ParamUtil.requireNonNull("issuerInfo", issuerInfo);
-    ParamUtil.requireNonNull("requestedSubject", requestedSubject);
-    ParamUtil.requireNonNull("requestedPublicKey", requestedPublicKey);
+    Args.notNull(certBytes, "certBytes");
+    Args.notNull(issuerInfo, "issuerInfo");
+    Args.notNull(requestedSubject, "requestedSubject");
+    Args.notNull(requestedPublicKey, "requestedPublicKey");
 
     List<ValidationIssue> resultIssues = new LinkedList<ValidationIssue>();
 

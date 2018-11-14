@@ -27,7 +27,7 @@ import org.xipki.security.shell.completer.P11KeyUsageCompleter;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.Hex;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -58,7 +58,7 @@ public abstract class P11KeyGenAction extends P11SecurityAction {
   private List<String> keyusages;
 
   protected void finalize(String keyType, P11IdentityId identityId) throws Exception {
-    ParamUtil.requireNonNull("identityId", identityId);
+    Args.notNull(identityId, "identityId");
     println("generated " + keyType + " key \"" + identityId + "\"");
   }
 

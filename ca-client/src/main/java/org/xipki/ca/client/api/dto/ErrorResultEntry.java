@@ -18,7 +18,7 @@
 package org.xipki.ca.client.api.dto;
 
 import org.xipki.security.cmp.PkiStatusInfo;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -32,7 +32,7 @@ public class ErrorResultEntry extends ResultEntry {
 
   public ErrorResultEntry(String id, PkiStatusInfo statusInfo) {
     super(id);
-    this.statusInfo = ParamUtil.requireNonNull("statusInfo", statusInfo);
+    this.statusInfo = Args.notNull(statusInfo, "statusInfo");
   }
 
   public ErrorResultEntry(String id, int status, int pkiFailureInfo, String statusMessage) {

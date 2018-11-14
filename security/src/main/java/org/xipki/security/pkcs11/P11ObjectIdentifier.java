@@ -21,7 +21,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 
 import org.xipki.util.Hex;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -45,8 +45,8 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
    *          Label. Must not be {@code null}.
    */
   public P11ObjectIdentifier(byte[] id, String label) {
-    this.id = ParamUtil.requireNonNull("id", id);
-    this.label = ParamUtil.requireNonNull("label", label);
+    this.id = Args.notNull(id, "id");
+    this.label = Args.notNull(label, "label");
     this.idHex = Hex.encode(id);
   }
 
@@ -96,7 +96,7 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
 
   @Override
   public int compareTo(P11ObjectIdentifier obj) {
-    ParamUtil.requireNonNull("obj", obj);
+    Args.notNull(obj, "obj");
     if (this == obj) {
       return 0;
     }

@@ -22,7 +22,7 @@ import java.util.Set;
 
 import org.xipki.ca.certprofile.xml.jaxb.IntWithDescType;
 import org.xipki.ca.certprofile.xml.jaxb.TlsFeature;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -35,7 +35,7 @@ public class QaTlsFeature extends QaExtension {
   private final Set<Integer> features;
 
   public QaTlsFeature(TlsFeature jaxb) {
-    ParamUtil.requireNonNull("jaxb", jaxb);
+    Args.notNull(jaxb, "jaxb");
     this.features = new HashSet<>();
     for (IntWithDescType m : jaxb.getFeature()) {
       features.add(m.getValue());

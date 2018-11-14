@@ -24,7 +24,7 @@ import java.security.SecureRandom;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.params.KeyParameter;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * PBKDF2 salted password hashing.
@@ -61,7 +61,7 @@ public class PasswordHash {
    *
    */
   public static String createHash(String password) {
-    ParamUtil.requireNonBlank("password", password);
+    Args.notBlank(password, "password");
     return createHash(password.getBytes());
   }
 
@@ -85,7 +85,7 @@ public class PasswordHash {
    * @return a salted PBKDF2 hash of the password
    */
   public static String createHash(byte[] password, int saltSize, int iterations, int dkSize) {
-    ParamUtil.requireNonNull("password", password);
+    Args.notNull(password, "password");
     // Generate a random salt
     SecureRandom random = new SecureRandom();
     byte[] salt = new byte[saltSize];
@@ -105,7 +105,7 @@ public class PasswordHash {
    * @return true if the password is correct, false if not
    */
   public static boolean validatePassword(String password, String correctHash) {
-    ParamUtil.requireNonBlank("password", password);
+    Args.notBlank(password, "password");
     return validatePassword(password.getBytes(), correctHash);
   }
 
@@ -117,7 +117,7 @@ public class PasswordHash {
    * @return true if the password is correct, false if not
    */
   public static boolean validatePassword(byte[] password, String correctHash) {
-    ParamUtil.requireNonNull("password", password);
+    Args.notNull(password, "password");
     // Decode the hash into its parameters
     String[] params = correctHash.split(":");
     int iterations = Integer.parseInt(params[ITERATION_INDEX]);

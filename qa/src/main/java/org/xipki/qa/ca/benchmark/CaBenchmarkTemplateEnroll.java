@@ -56,7 +56,7 @@ import org.xipki.qa.ca.benchmark.jaxb.EnrollCertType;
 import org.xipki.qa.ca.benchmark.jaxb.EnrollTemplateType;
 import org.xipki.util.BenchmarkExecutor;
 import org.xipki.util.InvalidConfException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.XmlUtil;
 import org.xml.sax.SAXException;
 
@@ -164,9 +164,9 @@ public class CaBenchmarkTemplateEnroll extends BenchmarkExecutor {
       int maxRequests, String description) throws Exception {
     super(description);
 
-    ParamUtil.requireNonNull("template", template);
+    Args.notNull(template, "template");
     this.maxRequests = maxRequests;
-    this.caClient = ParamUtil.requireNonNull("caClient", caClient);
+    this.caClient = Args.notNull(caClient, "caClient");
 
     Calendar baseTime = Calendar.getInstance(Locale.UK);
     baseTime.set(Calendar.YEAR, 2014);
@@ -248,7 +248,7 @@ public class CaBenchmarkTemplateEnroll extends BenchmarkExecutor {
   } // method nextCertRequests
 
   public static EnrollTemplateType parse(InputStream configStream) throws InvalidConfException {
-    ParamUtil.requireNonNull("configStream", configStream);
+    Args.notNull(configStream, "configStream");
     Object root;
 
     synchronized (jaxbUnmarshallerLock) {

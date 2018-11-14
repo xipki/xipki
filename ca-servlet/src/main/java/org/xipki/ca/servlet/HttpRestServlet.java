@@ -39,7 +39,7 @@ import org.xipki.ca.server.api.RestResponder;
 import org.xipki.ca.server.api.RestResponse;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -55,8 +55,7 @@ public class HttpRestServlet extends HttpServlet {
   private ResponderManager responderManager;
 
   public void setResponderManager(ResponderManager responderManager) {
-    this.responderManager =
-        ParamUtil.requireNonNull("responderManager", responderManager);;
+    this.responderManager = Args.notNull(responderManager, "responderManager");
   }
 
   @Override

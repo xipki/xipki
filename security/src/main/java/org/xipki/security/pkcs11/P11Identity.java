@@ -30,7 +30,7 @@ import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.security.pkcs11.exception.P11UnsupportedMechanismException;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 import iaik.pkcs.pkcs11.constants.Functions;
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
@@ -56,16 +56,16 @@ public abstract class P11Identity implements Comparable<P11Identity> {
   protected X509Certificate[] certificateChain;
 
   protected P11Identity(P11Slot slot, P11IdentityId id, int signatureBitLen) {
-    this.slot = ParamUtil.requireNonNull("slot", slot);
-    this.id = ParamUtil.requireNonNull("id", id);
+    this.slot = Args.notNull(slot, "slot");
+    this.id = Args.notNull(id, "id");
     this.publicKey = null;
     this.signatureKeyBitLength = signatureBitLen;
   } // constructor
 
   protected P11Identity(P11Slot slot, P11IdentityId id, PublicKey publicKey,
       X509Certificate[] certificateChain) {
-    this.slot = ParamUtil.requireNonNull("slot", slot);
-    this.id = ParamUtil.requireNonNull("id", id);
+    this.slot = Args.notNull(slot, "slot");
+    this.id = Args.notNull(id, "id");
 
     if (certificateChain != null && certificateChain.length > 0 && certificateChain[0] != null) {
       this.publicKey = certificateChain[0].getPublicKey();
@@ -93,7 +93,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
 
   public byte[] sign(long mechanism, P11Params parameters, byte[] content)
       throws P11TokenException {
-    ParamUtil.requireNonNull("content", content);
+    Args.notNull(content, "content");
     slot.assertMechanismSupported(mechanism);
     if (!supportsMechanism(mechanism, parameters)) {
       throw new P11UnsupportedMechanismException(mechanism, id);

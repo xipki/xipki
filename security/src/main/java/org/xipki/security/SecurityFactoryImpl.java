@@ -62,7 +62,7 @@ import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -129,7 +129,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
   @Override
   public ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey)
       throws InvalidKeyException {
-    ParamUtil.requireNonNull("publicKey", publicKey);
+    Args.notNull(publicKey, "publicKey");
 
     String keyAlg = publicKey.getAlgorithm().toUpperCase();
     BcContentVerifierProviderBuilder builder = VERIFIER_PROVIDER_BUILDER.get(keyAlg);
@@ -207,8 +207,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
   }
 
   public void setDefaultSignerParallelism(int defaultSignerParallelism) {
-    this.defaultSignerParallelism = ParamUtil.requireMin("defaultSignerParallelism",
-        defaultSignerParallelism, 1);
+    this.defaultSignerParallelism = Args.positive(
+        defaultSignerParallelism, "defaultSignerParallelism");
   }
 
   public void setSignerFactoryRegister(SignerFactoryRegister signerFactoryRegister) {
@@ -252,8 +252,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
   @Override
   public byte[] extractMinimalKeyStore(String keystoreType, byte[] keystoreBytes, String keyname,
       char[] password, X509Certificate[] newCertChain) throws KeyStoreException {
-    ParamUtil.requireNonBlank("keystoreType", keystoreType);
-    ParamUtil.requireNonNull("keystoreBytes", keystoreBytes);
+    Args.notBlank(keystoreType, "keystoreType");
+    Args.notNull(keystoreBytes, "keystoreBytes");
 
     try {
       KeyStore ks = KeyUtil.getKeyStore(keystoreType);

@@ -23,7 +23,7 @@ import java.util.Set;
 import org.xipki.ca.api.NameId;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.CompareUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -48,7 +48,7 @@ public class CaHasRequestorEntry {
   }
 
   public CaHasRequestorEntry(NameId requestorIdent) {
-    this.requestorIdent = ParamUtil.requireNonNull("requestorIdent", requestorIdent);
+    this.requestorIdent = Args.notNull(requestorIdent, "requestorIdent");
   }
 
   public boolean isRa() {

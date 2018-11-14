@@ -172,7 +172,7 @@ import org.xipki.util.CollectionUtil;
 import org.xipki.util.DateUtil;
 import org.xipki.util.Hex;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.ReqRespDebug;
 import org.xipki.util.ReqRespDebug.ReqRespPair;
 import org.xipki.util.StringUtil;
@@ -222,9 +222,9 @@ abstract class ClientCmpAgent {
 
   public ClientCmpAgent(ClientCmpRequestor requestor, ClientCmpResponder responder,
       SecurityFactory securityFactory) {
-    this.requestor = ParamUtil.requireNonNull("requestor", requestor);
-    this.responder = ParamUtil.requireNonNull("responder", responder);
-    this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
+    this.requestor = Args.notNull(requestor, "requestor");
+    this.responder = Args.notNull(responder, "responder");
+    this.securityFactory = Args.notNull(securityFactory, "securityFactory");
 
     boolean bothSignatureBased = (requestor instanceof SignatureClientCmpRequestor)
         && (responder instanceof SignatureClientCmpResponder);
@@ -242,7 +242,7 @@ abstract class ClientCmpAgent {
   protected abstract byte[] send(byte[] request) throws IOException;
 
   protected PKIMessage sign(PKIMessage request) throws CaClientException {
-    ParamUtil.requireNonNull("request", request);
+    Args.notNull(request, "request");
     if (requestor == null) {
       throw new CaClientException("no request signer is configured");
     }
@@ -268,7 +268,7 @@ abstract class ClientCmpAgent {
 
   protected PkiResponse signAndSend(PKIMessage request, ReqRespDebug debug)
       throws CaClientException {
-    ParamUtil.requireNonNull("request", request);
+    Args.notNull(request, "request");
     PKIMessage tmpRequest = requestor.signRequest() ? sign(request) : request;
 
     byte[] encodedRequest;
@@ -353,15 +353,14 @@ abstract class ClientCmpAgent {
 
   protected ASN1Encodable extractGeneralRepContent(PkiResponse response, String expectedType)
       throws CaClientException, PkiErrorException {
-    ParamUtil.requireNonNull("response", response);
-    ParamUtil.requireNonNull("expectedType", expectedType);
-    return extractGeneralRepContent(response, expectedType, true);
+    return extractGeneralRepContent(Args.notNull(response, "response"),
+        Args.notNull(expectedType, "expectedType"), true);
   }
 
   private ASN1Encodable extractGeneralRepContent(PkiResponse response, String expectedType,
       boolean requireProtectionCheck) throws CaClientException, PkiErrorException {
-    ParamUtil.requireNonNull("response", response);
-    ParamUtil.requireNonNull("expectedType", expectedType);
+    Args.notNull(response, "response");
+    Args.notNull(expectedType, "expectedType");
     if (requireProtectionCheck) {
       checkProtection(response);
     }
@@ -402,18 +401,16 @@ abstract class ClientCmpAgent {
 
   protected ASN1Encodable extractXipkiActionRepContent(PkiResponse response, int action)
       throws CaClientException, PkiErrorException {
-    ParamUtil.requireNonNull("response", response);
-    ASN1Encodable itvValue = extractGeneralRepContent(response,
+    ASN1Encodable itvValue = extractGeneralRepContent(Args.notNull(response, "response"),
         ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId(), true);
     return extractXiActionContent(itvValue, action);
   }
 
   protected ASN1Encodable extractXiActionContent(ASN1Encodable itvValue, int action)
       throws CaClientException {
-    ParamUtil.requireNonNull("itvValue", itvValue);
     ASN1Sequence seq;
     try {
-      seq = ASN1Sequence.getInstance(itvValue);
+      seq = ASN1Sequence.getInstance(Args.notNull(itvValue, "itvValue"));
     } catch (IllegalArgumentException ex) {
       throw new CaClientException("invalid syntax of the response");
     }
@@ -497,7 +494,7 @@ abstract class ClientCmpAgent {
   } // method buildPkiHeader
 
   protected PkiErrorException buildErrorResult(ErrorMsgContent bodyContent) {
-    ParamUtil.requireNonNull("bodyContent", bodyContent);
+    Args.notNull(bodyContent, "bodyContent");
 
     org.xipki.security.cmp.PkiStatusInfo statusInfo =
         new org.xipki.security.cmp.PkiStatusInfo(bodyContent.getPKIStatusInfo());
@@ -618,7 +615,7 @@ abstract class ClientCmpAgent {
 
   protected PKIMessage buildMessageWithGeneralMsgContent(ASN1ObjectIdentifier type,
       ASN1Encodable value) {
-    ParamUtil.requireNonNull("type", type);
+    Args.notNull(type, "type");
 
     PKIHeader header = buildPkiHeader(null);
     InfoTypeAndValue itv = (value != null) ? new InfoTypeAndValue(type, value)
@@ -629,7 +626,7 @@ abstract class ClientCmpAgent {
   }
 
   protected void checkProtection(PkiResponse response) throws PkiErrorException {
-    ParamUtil.requireNonNull("response", response);
+    Args.notNull(response, "response");
 
     if (!response.hasProtection()) {
       return;
@@ -880,9 +877,7 @@ abstract class ClientCmpAgent {
 
   private X509CRL evaluateCrlResponse(PkiResponse response, Integer xipkiAction)
       throws CaClientException, PkiErrorException {
-    ParamUtil.requireNonNull("response", response);
-
-    checkProtection(response);
+    checkProtection(Args.notNull(response, "response"));
 
     PKIBody respBody = response.getPkiMessage().getBody();
     int bodyType = respBody.getType();
@@ -934,18 +929,14 @@ abstract class ClientCmpAgent {
 
   public RevokeCertResultType revokeCertificate(RevokeCertRequest request,
       ReqRespDebug debug) throws CaClientException, PkiErrorException {
-    ParamUtil.requireNonNull("request", request);
-
-    PKIMessage reqMessage = buildRevokeCertRequest(request);
+    PKIMessage reqMessage = buildRevokeCertRequest(Args.notNull(request, "request"));
     PkiResponse response = signAndSend(reqMessage, debug);
     return parse(response, request.getRequestEntries());
   }
 
   public RevokeCertResultType unrevokeCertificate(UnrevokeOrRemoveCertRequest request,
       ReqRespDebug debug) throws CaClientException, PkiErrorException {
-    ParamUtil.requireNonNull("request", request);
-
-    PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(request,
+    PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(Args.notNull(request, "request"),
         CrlReason.REMOVE_FROM_CRL.getCode());
     PkiResponse response = signAndSend(reqMessage, debug);
     return parse(response, request.getRequestEntries());
@@ -953,9 +944,7 @@ abstract class ClientCmpAgent {
 
   public RevokeCertResultType removeCertificate(UnrevokeOrRemoveCertRequest request,
       ReqRespDebug debug) throws CaClientException, PkiErrorException {
-    ParamUtil.requireNonNull("request", request);
-
-    PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(request,
+    PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(Args.notNull(request, "request"),
             XiSecurityConstants.CMP_CRL_REASON_REMOVE);
     PkiResponse response = signAndSend(reqMessage, debug);
     return parse(response, request.getRequestEntries());
@@ -963,9 +952,7 @@ abstract class ClientCmpAgent {
 
   private RevokeCertResultType parse(PkiResponse response,
       List<? extends IssuerSerialEntry> reqEntries) throws CaClientException, PkiErrorException {
-    ParamUtil.requireNonNull("response", response);
-
-    checkProtection(response);
+    checkProtection(Args.notNull(response, "response"));
 
     PKIBody respBody = response.getPkiMessage().getBody();
     int bodyType = respBody.getType();
@@ -1037,9 +1024,7 @@ abstract class ClientCmpAgent {
 
   public EnrollCertResultResp requestCertificate(CsrEnrollCertRequest csr, Date notBefore,
       Date notAfter, ReqRespDebug debug) throws CaClientException, PkiErrorException {
-    ParamUtil.requireNonNull("csr", csr);
-
-    PKIMessage request = buildPkiMessage(csr, notBefore, notAfter);
+    PKIMessage request = buildPkiMessage(Args.notNull(csr, "csr"), notBefore, notAfter);
     Map<BigInteger, String> reqIdIdMap = new HashMap<>();
     reqIdIdMap.put(MINUS_ONE, csr.getId());
     return requestCertificate0(request, reqIdIdMap, PKIBody.TYPE_CERT_REP, debug);
@@ -1047,9 +1032,7 @@ abstract class ClientCmpAgent {
 
   public EnrollCertResultResp requestCertificate(EnrollCertRequest req, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
-    ParamUtil.requireNonNull("req", req);
-
-    PKIMessage request = buildPkiMessage(req);
+    PKIMessage request = buildPkiMessage(Args.notNull(req, "req"));
     Map<BigInteger, String> reqIdIdMap = new HashMap<>();
     List<EnrollCertRequestEntry> reqEntries = req.getRequestEntries();
 
@@ -1388,7 +1371,7 @@ abstract class ClientCmpAgent {
 
   public ClientCaInfo retrieveCaInfo(String caName, ReqRespDebug debug)
       throws CaClientException, PkiErrorException {
-    ParamUtil.requireNonBlank("caName", caName);
+    Args.notBlank(caName, "caName");
 
     ASN1EncodableVector vec = new ASN1EncodableVector();
     vec.add(new ASN1Integer(2));

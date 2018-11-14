@@ -23,7 +23,7 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -58,9 +58,8 @@ public class CertTemplateData {
       Date notBefore, Date notAfter, Extensions extensions, String certprofileName,
       ASN1Integer certReqId, boolean caGenerateKeypair) {
     this.publicKeyInfo = publicKeyInfo;
-    this.subject = ParamUtil.requireNonNull("subject", subject);
-    this.certprofileName = ParamUtil.requireNonBlank("certprofileName", certprofileName)
-        .toLowerCase();
+    this.subject = Args.notNull(subject, "subject");
+    this.certprofileName = Args.toNonBlankLower(certprofileName, "certprofileName");
     this.extensions = extensions;
     this.notBefore = notBefore;
     this.notAfter = notAfter;

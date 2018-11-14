@@ -17,7 +17,7 @@
 
 package org.xipki.ca.server;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -45,8 +45,8 @@ public class SqlColumn {
 
   public SqlColumn(ColumnType type, String name, Object value, boolean sensitive,
       boolean signerConf) {
-    this.type = ParamUtil.requireNonNull("type", type);
-    this.name = ParamUtil.requireNonNull("name", name);
+    this.type = Args.notNull(type, "type");
+    this.name = Args.notNull(name, "name");
     this.value = value;
     this.sensitive = sensitive;
     this.signerConf = signerConf;

@@ -19,7 +19,7 @@ package org.xipki.ca.mgmt.api;
 
 import org.xipki.ca.api.NameId;
 import org.xipki.util.CompareUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -44,8 +44,8 @@ public class CertprofileEntry {
   }
 
   public CertprofileEntry(NameId ident, String type, String conf) {
-    this.ident = ParamUtil.requireNonNull("ident", ident);
-    this.type = ParamUtil.requireNonBlankLower("type", type);
+    this.ident = Args.notNull(ident, "ident");
+    this.type = Args.toNonBlankLower(type, "type");
     this.conf = conf;
     if ("all".equalsIgnoreCase(ident.getName()) || "null".equalsIgnoreCase(ident.getName())) {
       throw new IllegalArgumentException("certificate profile name must not be 'all' and 'null'");
@@ -56,11 +56,11 @@ public class CertprofileEntry {
     if ("all".equalsIgnoreCase(ident.getName()) || "null".equalsIgnoreCase(ident.getName())) {
       throw new IllegalArgumentException("certificate profile name must not be 'all' and 'null'");
     }
-    this.ident = ParamUtil.requireNonNull("ident", ident);
+    this.ident = Args.notNull(ident, "ident");
   }
 
   public void setType(String type) {
-    this.type = ParamUtil.requireNonBlankLower("type", type);
+    this.type = Args.toNonBlankLower(type, "type");
   }
 
   public void setConf(String conf) {

@@ -33,7 +33,7 @@ import org.xipki.security.XiContentSigner;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
@@ -60,9 +60,9 @@ class P11MacContentSigner implements XiContentSigner {
 
   P11MacContentSigner(P11CryptService cryptService, P11IdentityId identityId,
       AlgorithmIdentifier macAlgId) throws XiSecurityException, P11TokenException {
-    this.identityId = ParamUtil.requireNonNull("identityId", identityId);
-    this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
-    this.algorithmIdentifier = ParamUtil.requireNonNull("macAlgId", macAlgId);
+    this.identityId = Args.notNull(identityId, "identityId");
+    this.cryptService = Args.notNull(cryptService, "cryptService");
+    this.algorithmIdentifier = Args.notNull(macAlgId, "macAlgId");
     try {
       this.encodedAlgorithmIdentifier = algorithmIdentifier.getEncoded();
     } catch (IOException ex) {

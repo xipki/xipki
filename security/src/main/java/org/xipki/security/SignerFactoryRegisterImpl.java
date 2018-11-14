@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.util.ObjectCreationException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -84,7 +84,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
   @Override
   public ConcurrentContentSigner newSigner(SecurityFactory securityFactory, String type,
       SignerConf conf, X509Certificate[] certificateChain) throws ObjectCreationException {
-    ParamUtil.requireNonBlank("type", type);
+    Args.notBlank(type, "type");
 
     for (SignerFactory service : factories) {
       if (service.canCreateSigner(type)) {

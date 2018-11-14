@@ -155,7 +155,7 @@ import org.xipki.util.CollectionUtil;
 import org.xipki.util.CompareUtil;
 import org.xipki.util.Hex;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -210,9 +210,9 @@ public class ExtensionsChecker {
 
   public ExtensionsChecker(X509ProfileType conf, XmlCertprofile certprofile)
       throws CertprofileException {
-    this.certprofile = ParamUtil.requireNonNull("certprofile", certprofile);
+    this.certprofile = Args.notNull(certprofile, "certprofile");
 
-    ParamUtil.requireNonNull("conf", conf);
+    Args.notNull(conf, "conf");
 
     // Extensions
     ExtensionsType extensionsType = conf.getExtensions();
@@ -374,8 +374,8 @@ public class ExtensionsChecker {
 
   public List<ValidationIssue> checkExtensions(Certificate cert, IssuerInfo issuerInfo,
       Extensions requestedExtns, X500Name requestedSubject) {
-    ParamUtil.requireNonNull("cert", cert);
-    ParamUtil.requireNonNull("issuerInfo", issuerInfo);
+    Args.notNull(cert, "cert");
+    Args.notNull(issuerInfo, "issuerInfo");
 
     X509Certificate jceCert;
     try {

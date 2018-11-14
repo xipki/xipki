@@ -52,7 +52,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * Builder for {@link javax.net.ssl.SSLContext} instances.
@@ -211,7 +211,7 @@ public class SSLContextBuilder {
   public SSLContextBuilder loadTrustMaterial(
       final File file,
       final char[] storePassword) throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
-    ParamUtil.requireNonNull("Truststore file", file);
+    Args.notNull(file, "Truststore file");
     final KeyStore trustStore = KeyStore.getInstance(keyStoreType);
     final FileInputStream instream = new FileInputStream(file);
     try {
@@ -243,7 +243,7 @@ public class SSLContextBuilder {
       final File file,
       final char[] storePassword,
       final char[] keyPassword) throws NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException, CertificateException, IOException {
-    ParamUtil.requireNonNull("Keystore file", file);
+    Args.notNull(file, "Keystore file");
     final KeyStore identityStore = KeyStore.getInstance(keyStoreType);
     final FileInputStream instream = new FileInputStream(file);
     try {

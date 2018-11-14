@@ -69,7 +69,7 @@ import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.ReqRespDebug;
 import org.xipki.util.ReqRespDebug.ReqRespPair;
 import org.xipki.util.StringUtil;
@@ -118,8 +118,8 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
   public OCSPResp ask(X509Certificate issuerCert, X509Certificate cert, URL responderUrl,
       RequestOptions requestOptions, ReqRespDebug debug)
       throws OcspResponseException, OcspRequestorException {
-    ParamUtil.requireNonNull("issuerCert", issuerCert);
-    ParamUtil.requireNonNull("cert", cert);
+    Args.notNull(issuerCert, "issuerCert");
+    Args.notNull(cert, "cert");
 
     try {
       if (!X509Util.issues(issuerCert, cert)) {
@@ -137,9 +137,9 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
   public OCSPResp ask(X509Certificate issuerCert, X509Certificate[] certs, URL responderUrl,
       RequestOptions requestOptions, ReqRespDebug debug)
       throws OcspResponseException, OcspRequestorException {
-    ParamUtil.requireNonNull("issuerCert", issuerCert);
-    ParamUtil.requireNonNull("certs", certs);
-    ParamUtil.requireMin("certs.length", certs.length, 1);
+    Args.notNull(issuerCert, "issuerCert");
+    Args.notNull(certs, "certs");
+    Args.positive(certs.length, "certs.length");
 
     BigInteger[] serialNumbers = new BigInteger[certs.length];
     for (int i = 0; i < certs.length; i++) {
@@ -169,9 +169,9 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
   public OCSPResp ask(X509Certificate issuerCert, BigInteger[] serialNumbers, URL responderUrl,
       RequestOptions requestOptions, ReqRespDebug debug)
       throws OcspResponseException, OcspRequestorException {
-    ParamUtil.requireNonNull("issuerCert", issuerCert);
-    ParamUtil.requireNonNull("requestOptions", requestOptions);
-    ParamUtil.requireNonNull("responderUrl", responderUrl);
+    Args.notNull(issuerCert, "issuerCert");
+    Args.notNull(requestOptions, "requestOptions");
+    Args.notNull(responderUrl, "responderUrl");
 
     byte[] nonce = null;
     if (requestOptions.isUseNonce()) {

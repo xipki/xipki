@@ -25,7 +25,7 @@ import org.bouncycastle.asn1.ocsp.CrlID;
 import org.xipki.util.Base64;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.DateUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -93,12 +93,12 @@ public class CrlInfo {
 
   public CrlInfo(BigInteger crlNumber, BigInteger baseCrlNumber, boolean useCrlUpdate,
       Date thisUpdate, Date nextUpdate, CrlID crlId) {
-    this.crlNumber = ParamUtil.requireNonNull("crlNumber", crlNumber);
+    this.crlNumber = Args.notNull(crlNumber, "crlNumber");
     this.baseCrlNumber = baseCrlNumber;
     this.useCrlUpdates = useCrlUpdate;
-    this.thisUpdate = ParamUtil.requireNonNull("thisUpdate", thisUpdate);
-    this.nextUpdate = ParamUtil.requireNonNull("nextUpdate", nextUpdate);
-    this.crlId = ParamUtil.requireNonNull("crlId", crlId);
+    this.thisUpdate = Args.notNull(thisUpdate, "thisUpdate");
+    this.nextUpdate = Args.notNull(nextUpdate, "nextUpdate");
+    this.crlId = Args.notNull(crlId, "crlId");
   }
 
   public String getEncoded() throws IOException {
@@ -119,7 +119,7 @@ public class CrlInfo {
   }
 
   public void setCrlNumber(BigInteger crlNumber) {
-    this.crlNumber = ParamUtil.requireNonNull("crlNumber", crlNumber);
+    this.crlNumber = Args.notNull(crlNumber, "crlNumber");
   }
 
   public BigInteger getBaseCrlNumber() {
@@ -135,7 +135,7 @@ public class CrlInfo {
   }
 
   public void setThisUpdate(Date thisUpdate) {
-    this.thisUpdate = ParamUtil.requireNonNull("thisUpdate", thisUpdate);
+    this.thisUpdate = Args.notNull(thisUpdate, "thisUpdate");
   }
 
   public Date getNextUpdate() {
@@ -143,7 +143,7 @@ public class CrlInfo {
   }
 
   public void setNextUpdate(Date nextUpdate) {
-    this.nextUpdate = ParamUtil.requireNonNull("nextUpdate", nextUpdate);
+    this.nextUpdate = Args.notNull(nextUpdate, "nextUpdate");
   }
 
   public boolean isUseCrlUpdates() {

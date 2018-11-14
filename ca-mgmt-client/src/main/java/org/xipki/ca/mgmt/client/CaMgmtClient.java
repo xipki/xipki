@@ -116,7 +116,7 @@ import org.xipki.util.HttpConstants;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.ObjectCreationException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 import org.xipki.util.http.ssl.SslContextConf;
 
@@ -174,7 +174,7 @@ public class CaMgmtClient implements CaManager {
   }
 
   public void setServerUrl(String serverUrl) throws MalformedURLException {
-    ParamUtil.requireNonBlank("serverUrl", serverUrl);
+    Args.notBlank(serverUrl, "serverUrl");
     this.serverUrl = serverUrl.endsWith("/") ? serverUrl : serverUrl + "/";
 
     for (CommAction action : CommAction.values()) {

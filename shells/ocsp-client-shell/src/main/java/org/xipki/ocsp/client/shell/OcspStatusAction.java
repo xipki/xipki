@@ -60,7 +60,7 @@ import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.util.Hex;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -79,16 +79,16 @@ public class OcspStatusAction extends BaseOcspStatusAction {
   @Override
   protected void checkParameters(X509Certificate respIssuer, List<BigInteger> serialNumbers,
       Map<BigInteger, byte[]> encodedCerts) throws Exception {
-    ParamUtil.requireNonEmpty("serialNunmbers", serialNumbers);
+    Args.notEmpty(serialNumbers, "serialNunmbers");
   }
 
   @Override
   protected Object processResponse(OCSPResp response, X509Certificate respIssuer,
       IssuerHash issuerHash, List<BigInteger> serialNumbers,
       Map<BigInteger, byte[]> encodedCerts) throws Exception {
-    ParamUtil.requireNonNull("response", response);
-    ParamUtil.requireNonNull("issuerHash", issuerHash);
-    ParamUtil.requireNonNull("serialNumbers", serialNumbers);
+    Args.notNull(response, "response");
+    Args.notNull(issuerHash, "issuerHash");
+    Args.notNull(serialNumbers, "serialNumbers");
 
     BasicOCSPResp basicResp = OcspUtils.extractBasicOcspResp(response);
 

@@ -25,7 +25,7 @@ import java.net.URL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.util.IoUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 import liquibase.CatalogAndSchema;
 import liquibase.Liquibase;
@@ -61,9 +61,8 @@ public class LiquibaseMain implements Closeable {
   private Liquibase liquibase;
 
   public LiquibaseMain(LiquibaseDatabaseConf dbConf, String changeLogFile) {
-    this.dbConf = ParamUtil.requireNonNull("dbConf", dbConf);
-    this.changeLogFile = IoUtil.expandFilepath(
-        ParamUtil.requireNonBlank("changeLogFile", changeLogFile));
+    this.dbConf = Args.notNull(dbConf, "dbConf");
+    this.changeLogFile = IoUtil.expandFilepath(Args.notBlank(changeLogFile, "changeLogFile"));
   }
 
   public void init() throws Exception {

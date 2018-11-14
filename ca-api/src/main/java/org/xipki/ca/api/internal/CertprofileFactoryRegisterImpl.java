@@ -28,7 +28,7 @@ import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileFactory;
 import org.xipki.ca.api.profile.CertprofileFactoryRegister;
 import org.xipki.util.ObjectCreationException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -63,7 +63,7 @@ public class CertprofileFactoryRegisterImpl implements CertprofileFactoryRegiste
 
   @Override
   public Certprofile newCertprofile(String type) throws ObjectCreationException {
-    ParamUtil.requireNonBlank("type", type);
+    Args.notBlank(type, "type");
 
     for (CertprofileFactory service : factories) {
       if (service.canCreateProfile(type)) {

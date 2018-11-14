@@ -145,7 +145,7 @@ import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -284,7 +284,7 @@ public class XmlCertprofile extends BaseCertprofile {
 
   @Override
   public void initialize(String data) throws CertprofileException {
-    ParamUtil.requireNonBlank("data", data);
+    Args.notBlank(data, "data");
 
     reset();
     try {
@@ -305,7 +305,7 @@ public class XmlCertprofile extends BaseCertprofile {
   } // method initialize
 
   public void initialize(X509ProfileType conf) throws CertprofileException {
-    ParamUtil.requireNonNull("conf", conf);
+    Args.notNull(conf, "conf");
 
     reset();
     try {
@@ -1236,9 +1236,9 @@ public class XmlCertprofile extends BaseCertprofile {
       return values;
     }
 
-    ParamUtil.requireNonNull("requestedSubject", requestedSubject);
-    ParamUtil.requireNonNull("notBefore", notBefore);
-    ParamUtil.requireNonNull("notAfter", notAfter);
+    Args.notNull(requestedSubject, "requestedSubject");
+    Args.notNull(notBefore, "notBefore");
+    Args.notNull(notAfter, "notAfter");
 
     Set<ASN1ObjectIdentifier> occurences = new HashSet<>(extensionOccurences.keySet());
 

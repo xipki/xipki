@@ -40,7 +40,7 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.ProcessLog;
 import org.xipki.util.StringUtil;
 
@@ -79,12 +79,12 @@ class DigestDiff {
   public DigestDiff(DataSourceWrapper refDatasource, DataSourceWrapper targetDatasource,
       String reportDirName, boolean revokedOnly, AtomicBoolean stopMe, int numPerSelect,
       int numThreads) throws IOException, DataAccessException {
-    this.refDatasource = ParamUtil.requireNonNull("refDatasource", refDatasource);
+    this.refDatasource = Args.notNull(refDatasource, "refDatasource");
     this.revokedOnly = revokedOnly;
-    this.targetDatasource = ParamUtil.requireNonNull("targetDatasource", targetDatasource);
-    this.reportDirName = ParamUtil.requireNonNull("reportDirName", reportDirName);
-    this.stopMe = ParamUtil.requireNonNull("stopMe", stopMe);
-    this.numPerSelect = ParamUtil.requireMin("numPerSelect", numPerSelect, 1);
+    this.targetDatasource = Args.notNull(targetDatasource, "targetDatasource");
+    this.reportDirName = Args.notNull(reportDirName, "reportDirName");
+    this.stopMe = Args.notNull(stopMe, "stopMe");
+    this.numPerSelect = Args.positive(numPerSelect, "numPerSelect");
 
     this.refDbControl = detectDbControl(refDatasource);
     this.targetDbControl = detectDbControl(targetDatasource);

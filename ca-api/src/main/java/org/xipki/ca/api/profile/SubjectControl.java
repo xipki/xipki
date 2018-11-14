@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -48,7 +48,7 @@ public class SubjectControl {
   private final List<ASN1ObjectIdentifier> types;
 
   public SubjectControl(List<RdnControl> controls, boolean keepRdnOrder) {
-    ParamUtil.requireNonEmpty("controls", controls);
+    Args.notEmpty(controls, "controls");
     this.typeGroups = new HashMap<>();
 
     List<ASN1ObjectIdentifier> sortedOids = new ArrayList<>(controls.size());
@@ -105,18 +105,16 @@ public class SubjectControl {
   } // constructor
 
   public RdnControl getControl(ASN1ObjectIdentifier type) {
-    ParamUtil.requireNonNull("type", type);
+    Args.notNull(type, "type");
     return controls.isEmpty() ? SubjectDnSpec.getRdnControl(type) : controls.get(type);
   }
 
   public String getGroup(ASN1ObjectIdentifier type) {
-    ParamUtil.requireNonNull("type", type);
-    return typeGroups.get(type);
+    return typeGroups.get(Args.notNull(type, "type"));
   }
 
   public Set<ASN1ObjectIdentifier> getTypesForGroup(String group) {
-    ParamUtil.requireNonNull("group", group);
-    return groupTypes.get(group);
+    return groupTypes.get(Args.notNull(group, "group"));
   }
 
   public Set<String> getGroups() {

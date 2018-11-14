@@ -21,7 +21,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -36,8 +36,8 @@ class CertsBundle {
   private List<BigInteger> serialNumbers;
 
   public CertsBundle(Map<BigInteger, DigestEntry> certs, List<BigInteger> serialNumbers) {
-    this.certs = ParamUtil.requireNonEmpty("certs", certs);
-    this.serialNumbers = ParamUtil.requireNonEmpty("serialNumbers", serialNumbers);
+    this.certs = Args.notEmpty(certs, "certs");
+    this.serialNumbers = Args.notEmpty(serialNumbers, "serialNumbers");
   }
 
   public Map<BigInteger, DigestEntry> getCerts() {

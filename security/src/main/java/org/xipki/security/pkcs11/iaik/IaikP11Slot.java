@@ -64,7 +64,7 @@ import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.concurrent.ConcurrentBag;
 import org.xipki.util.concurrent.ConcurrentBagEntry;
 
@@ -142,10 +142,10 @@ class IaikP11Slot extends P11Slot {
       P11NewObjectConf newObjectConf, Vendor vendor) throws P11TokenException {
     super(moduleName, slotId, readOnly, mechanismFilter);
 
-    this.newObjectConf = ParamUtil.requireNonNull("newObjectConf", newObjectConf);
-    this.slot = ParamUtil.requireNonNull("slot", slot);
-    this.maxMessageSize = ParamUtil.requireMin("maxMessageSize", maxMessageSize, 1);
-    this.vendor = ParamUtil.requireNonNull("vendor", vendor);
+    this.newObjectConf = Args.notNull(newObjectConf, "newObjectConf");
+    this.slot = Args.notNull(slot, "slot");
+    this.maxMessageSize = Args.positive(maxMessageSize, "maxMessageSize");
+    this.vendor = Args.notNull(vendor,"vendo r");
 
     this.userType = userType;
     if (userType == PKCS11Constants.CKU_SO) {
@@ -358,7 +358,7 @@ class IaikP11Slot extends P11Slot {
   }
 
   byte[] digestKey(long mechanism, IaikP11Identity identity) throws P11TokenException {
-    ParamUtil.requireNonNull("identity", identity);
+    Args.notNull(identity, "identity");
     assertMechanismSupported(mechanism);
     Key key = identity.getSigningKey();
     if (!(key instanceof SecretKey)) {
@@ -427,7 +427,7 @@ class IaikP11Slot extends P11Slot {
 
   byte[] sign(long mechanism, P11Params parameters, byte[] content, IaikP11Identity identity)
       throws P11TokenException {
-    ParamUtil.requireNonNull("content", content);
+    Args.notNull(content, "content");
     assertMechanismSupported(mechanism);
 
     int expectedSignatureLen;
@@ -1638,7 +1638,7 @@ class IaikP11Slot extends P11Slot {
   }
 
   private static boolean labelExists(Session session, char[] keyLabel) throws P11TokenException {
-    ParamUtil.requireNonNull("keyLabel", keyLabel);
+    Args.notNull(keyLabel, "keyLabel");
     Key key = new Key();
     key.getLabel().setCharArrayValue(keyLabel);
 

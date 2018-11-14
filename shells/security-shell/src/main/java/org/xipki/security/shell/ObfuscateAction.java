@@ -23,7 +23,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.password.OBFPasswordService;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -45,7 +45,7 @@ public class ObfuscateAction extends SecurityAction {
 
   @Override
   protected Object execute0() throws Exception {
-    ParamUtil.requireRange("k", quorum, 1, 10);
+    Args.range(quorum, "k", 1, 10);
 
     char[] password;
     if (quorum == 1) {

@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * JDBC error codes for a particular database.
@@ -161,7 +161,7 @@ class SqlErrorCodes {
   }
 
   static SqlErrorCodes newInstance(DatabaseType dbType) {
-    ParamUtil.requireNonNull("dbType", dbType);
+    Args.notNull(dbType, "dbType");
     switch (dbType) {
       case DB2:
         return new DB2();

@@ -28,7 +28,7 @@ import java.util.Arrays;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.operator.RuntimeOperatorException;
 import org.xipki.security.exception.XiSecurityException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -85,9 +85,9 @@ public class SignatureSigner implements XiContentSigner {
 
   public SignatureSigner(AlgorithmIdentifier sigAlgId, Signature signer, PrivateKey key)
       throws XiSecurityException {
-    this.sigAlgId = ParamUtil.requireNonNull("sigAlgId", sigAlgId);
-    this.signer = ParamUtil.requireNonNull("signer", signer);
-    this.key = ParamUtil.requireNonNull("key", key);
+    this.sigAlgId = Args.notNull(sigAlgId, "sigAlgId");
+    this.signer = Args.notNull(signer, "signer");
+    this.key = Args.notNull(key, "key");
     try {
       this.encodedSigAlgId = sigAlgId.getEncoded();
     } catch (IOException ex) {

@@ -19,7 +19,7 @@ package org.xipki.qa.ca.internal;
 
 import java.util.Arrays;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -34,7 +34,7 @@ public class QaExtensionValue {
   private final byte[] value;
 
   public QaExtensionValue(boolean critical, byte[] value) {
-    ParamUtil.requireNonNull("value", value);
+    Args.notNull(value, "value");
     this.critical = critical;
     this.value = Arrays.copyOf(value, value.length);
   }

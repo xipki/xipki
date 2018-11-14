@@ -23,7 +23,7 @@ import javax.xml.stream.XMLStreamException;
 
 import org.xipki.ca.mgmt.db.xmlio.DbiXmlWriter;
 import org.xipki.ca.mgmt.db.xmlio.InvalidDataObjectException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -38,9 +38,7 @@ public class OcspCertsWriter extends DbiXmlWriter {
   }
 
   public void add(OcspCertType cert) throws InvalidDataObjectException, XMLStreamException {
-    ParamUtil.requireNonNull("cert", cert);
-
-    cert.validate();
+    Args.notNull(cert, "cert").validate();
     cert.writeTo(this);
   }
 

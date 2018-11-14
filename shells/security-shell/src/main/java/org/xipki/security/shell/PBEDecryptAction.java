@@ -26,7 +26,7 @@ import org.xipki.password.OBFPasswordService;
 import org.xipki.password.PBEPasswordService;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.IoUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -63,7 +63,7 @@ public class PBEDecryptAction extends SecurityAction {
 
   @Override
   protected Object execute0() throws Exception {
-    ParamUtil.requireRange("mk", mquorum, 1, 10);
+    Args.range(mquorum, "mk", 1, 10);
     if (!(passwordHint == null ^ passwordFile == null)) {
       throw new IllegalCmdParamException(
           "exactly one of password and password-file must be specified");

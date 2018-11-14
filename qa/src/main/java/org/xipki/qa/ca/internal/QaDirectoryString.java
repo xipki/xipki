@@ -18,7 +18,7 @@
 package org.xipki.qa.ca.internal;
 
 import org.xipki.ca.certprofile.xml.DirectoryStringType;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -33,8 +33,8 @@ public class QaDirectoryString {
   private final String text;
 
   public QaDirectoryString(DirectoryStringType type, String text) {
-    this.type = ParamUtil.requireNonNull("type", type);
-    this.text = ParamUtil.requireNonBlank("text", text);
+    this.type = Args.notNull(type, "type");
+    this.text = Args.notBlank(text, "text");
   }
 
   public DirectoryStringType getType() {

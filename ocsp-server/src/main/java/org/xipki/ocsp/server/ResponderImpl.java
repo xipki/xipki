@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.xipki.ocsp.api.OcspStore;
 import org.xipki.ocsp.api.Responder;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -43,11 +43,11 @@ public class ResponderImpl implements Responder {
 
   ResponderImpl(ResponderOption responderOption, RequestOption requestOption,
       ResponseOption responseOption, ResponderSigner signer, List<OcspStore> stores) {
-    this.responderOption = ParamUtil.requireNonNull("responderOption", responderOption);
-    this.requestOption = ParamUtil.requireNonNull("requestOption", requestOption);
-    this.responseOption = ParamUtil.requireNonNull("responseOption", responseOption);
-    this.signer = ParamUtil.requireNonNull("signer", signer);
-    this.stores = ParamUtil.requireNonEmpty("stores", stores);
+    this.responderOption = Args.notNull(responderOption, "responderOption");
+    this.requestOption = Args.notNull(requestOption, "requestOption");
+    this.responseOption = Args.notNull(responseOption, "responseOption");
+    this.signer = Args.notNull(signer, "signer");
+    this.stores = Args.notEmpty(stores, "stores");
   }
 
   public ResponderOption getResponderOption() {

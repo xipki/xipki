@@ -23,7 +23,7 @@ import java.util.Set;
 
 import org.xipki.ca.certprofile.xml.jaxb.PolicyIdMappingType;
 import org.xipki.ca.certprofile.xml.jaxb.PolicyMappings;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -36,7 +36,7 @@ public class QaPolicyMappingsOption extends QaExtension {
   private final Map<String, String> policyMappings;
 
   public QaPolicyMappingsOption(PolicyMappings jaxb) {
-    ParamUtil.requireNonNull("jaxb", jaxb);
+    Args.notNull(jaxb, "jaxb");
     this.policyMappings = new HashMap<>();
     for (PolicyIdMappingType type : jaxb.getMapping()) {
       String issuerDomainPolicy = type.getIssuerDomainPolicy().getValue();
@@ -46,7 +46,7 @@ public class QaPolicyMappingsOption extends QaExtension {
   }
 
   public String addSubjectDomainPolicy(String issuerDomainPolicy) {
-    ParamUtil.requireNonNull("issuerDomainPolicy", issuerDomainPolicy);
+    Args.notNull(issuerDomainPolicy, "issuerDomainPolicy");
     return policyMappings.get(issuerDomainPolicy);
   }
 

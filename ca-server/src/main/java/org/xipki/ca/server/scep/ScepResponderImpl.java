@@ -95,7 +95,7 @@ import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.Hex;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -144,8 +144,8 @@ public class ScepResponderImpl implements ScepResponder {
   }
 
   public ScepResponderImpl(CaManagerImpl caManager, CaEntry caEntry) throws CaMgmtException {
-    this.caManager = ParamUtil.requireNonNull("caManager", caManager);
-    this.caIdent = ParamUtil.requireNonNull("caEntry", caEntry).getIdent();
+    this.caManager = Args.notNull(caManager, "caManager");
+    this.caIdent = Args.notNull(caEntry, "caEntry").getIdent();
     this.control = caEntry.getScepControl();
     String responderName = caEntry.getScepResponderName();
 
@@ -254,10 +254,9 @@ public class ScepResponderImpl implements ScepResponder {
   private PkiMessage servicePkiOperation0(CMSSignedData requestContent,
       DecodedPkiMessage req, String certprofileName, String msgId, AuditEvent event)
       throws MessageDecodingException, OperationException {
-    ParamUtil.requireNonNull("requestContent", requestContent);
-    ParamUtil.requireNonNull("req", req);
+    Args.notNull(requestContent, "requestContent");
 
-    String tid = req.getTransactionId().getId();
+    String tid = Args.notNull(req, "req").getTransactionId().getId();
     // verify and decrypt the request
     audit(event, CaAuditConstants.NAME_tid, tid);
     if (req.getFailureMessage() != null) {
@@ -624,8 +623,8 @@ public class ScepResponderImpl implements ScepResponder {
 
   private ContentInfo encodeResponse(PkiMessage response, DecodedPkiMessage request)
       throws OperationException {
-    ParamUtil.requireNonNull("response", response);
-    ParamUtil.requireNonNull("request", request);
+    Args.notNull(response, "response");
+    Args.notNull(request, "request");
 
     String signatureAlgorithm = getSignatureAlgorithm(responderKey, request.getDigestAlgorithm());
     ContentInfo ci;

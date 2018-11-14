@@ -40,7 +40,7 @@ import org.bouncycastle.pkcs.PKCSException;
 import org.bouncycastle.pkcs.jcajce.JcePKCSPBEInputDecryptorProviderBuilder;
 import org.bouncycastle.pkcs.jcajce.JcePKCSPBEOutputEncryptorBuilder;
 import org.xipki.security.pkcs11.exception.P11TokenException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -57,7 +57,7 @@ class PrivateKeyCryptor {
   private InputDecryptorProvider decryptorProvider;
 
   PrivateKeyCryptor(char[] password) throws P11TokenException {
-    ParamUtil.requireNonNull("password", password);
+    Args.notNull(password, "password");
     JcePKCSPBEOutputEncryptorBuilder eb = new JcePKCSPBEOutputEncryptorBuilder(ALGO);
     eb.setProvider("BC");
     eb.setIterationCount(ITERATION_COUNT);
@@ -73,7 +73,7 @@ class PrivateKeyCryptor {
 
   PrivateKey decrypt(PKCS8EncryptedPrivateKeyInfo encryptedPrivateKeyInfo)
       throws P11TokenException {
-    ParamUtil.requireNonNull("encryptedPrivateKeyInfo", encryptedPrivateKeyInfo);
+    Args.notNull(encryptedPrivateKeyInfo, "encryptedPrivateKeyInfo");
     PrivateKeyInfo privateKeyInfo;
     synchronized (decryptorProvider) {
       try {
@@ -108,7 +108,7 @@ class PrivateKeyCryptor {
   }
 
   PKCS8EncryptedPrivateKeyInfo encrypt(PrivateKey privateKey) {
-    ParamUtil.requireNonNull("privateKey", privateKey);
+    Args.notNull(privateKey, "privateKey");
     PrivateKeyInfo privateKeyInfo = PrivateKeyInfo.getInstance(privateKey.getEncoded());
     PKCS8EncryptedPrivateKeyInfoBuilder builder = new PKCS8EncryptedPrivateKeyInfoBuilder(
         privateKeyInfo);

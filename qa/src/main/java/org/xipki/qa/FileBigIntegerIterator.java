@@ -28,7 +28,7 @@ import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -51,7 +51,7 @@ public class FileBigIntegerIterator implements Iterator<BigInteger>, Closeable {
   private BigInteger currentNumber;
 
   public FileBigIntegerIterator(String fileName, boolean hex, boolean loop) throws IOException {
-    this.fileName = ParamUtil.requireNonBlank("fileName", fileName);
+    this.fileName = Args.notBlank(fileName, "fileName");
     this.hex = hex;
     this.loop = loop;
     this.reader = Files.newBufferedReader(Paths.get(fileName));

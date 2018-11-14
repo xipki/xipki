@@ -23,7 +23,7 @@ import java.util.Properties;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.util.IoUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -75,7 +75,7 @@ public class LiquibaseDatabaseConf {
 
   public static LiquibaseDatabaseConf getInstance(Properties dbProps,
       PasswordResolver passwordResolver) throws PasswordResolverException {
-    ParamUtil.requireNonNull("dbProps", dbProps);
+    Args.notNull(dbProps, "dbProps");
 
     String schema = dbProps.getProperty("liquibase.schema");
     if (schema != null) {

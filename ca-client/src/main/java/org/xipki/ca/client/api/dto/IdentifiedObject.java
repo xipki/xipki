@@ -17,7 +17,7 @@
 
 package org.xipki.ca.client.api.dto;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -30,7 +30,7 @@ public class IdentifiedObject {
   private final String id;
 
   public IdentifiedObject(String id) {
-    this.id = ParamUtil.requireNonBlank("id", id);
+    this.id = Args.notBlank(id, "id");
   }
 
   public String getId() {

@@ -40,7 +40,7 @@ public enum TripleState {
   }
 
   public static TripleState forValue(String textValue) {
-    ParamUtil.requireNonNull("textValue", textValue);
+    Args.notNull(textValue, "textValue");
 
     for (TripleState ts : TripleState.values()) {
       if (ts.value.equalsIgnoreCase(textValue)) {

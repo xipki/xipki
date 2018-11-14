@@ -26,7 +26,7 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.style.RFC4519Style;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -493,13 +493,13 @@ public class ObjectIdentifiers {
   }
 
   public static String oidToDisplayName(ASN1ObjectIdentifier type) {
-    ParamUtil.requireNonNull("type", type);
+    Args.notNull(type, "type");
     String name = getName(type);
     return (name == null) ? type.getId() : type.getId() + " (" + name + ")";
   }
 
   public static String getName(ASN1ObjectIdentifier type) {
-    ParamUtil.requireNonNull("type", type);
+    Args.notNull(type, "type");
     String name = oidNameMap.get(type);
 
     if (StringUtil.isBlank(name)) {
@@ -512,7 +512,7 @@ public class ObjectIdentifiers {
   }
 
   public static ASN1ObjectIdentifier nameToOid(String name) {
-    ParamUtil.requireNonNull("name", name);
+    Args.notNull(name, "name");
     for (ASN1ObjectIdentifier oid : oidNameMap.keySet()) {
       if (oidNameMap.get(oid).equalsIgnoreCase(name)) {
         return oid;

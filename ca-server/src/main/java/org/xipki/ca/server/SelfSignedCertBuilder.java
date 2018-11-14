@@ -71,7 +71,7 @@ import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ObjectCreationException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -111,11 +111,11 @@ class SelfSignedCertBuilder {
       String signerType, String signerConf, IdentifiedCertprofile certprofile,
       CertificationRequest csr, BigInteger serialNumber, CaUris caUris, ConfPairs extraControl)
           throws OperationException, InvalidConfException {
-    ParamUtil.requireNonNull("securityFactory", securityFactory);
-    ParamUtil.requireNonBlank("signerType", signerType);
-    ParamUtil.requireNonNull("certprofile", certprofile);
-    ParamUtil.requireNonNull("csr", csr);
-    ParamUtil.requireNonNull("serialNumber", serialNumber);
+    Args.notNull(securityFactory, "securityFactory");
+    Args.notBlank(signerType, "signerType");
+    Args.notNull(certprofile, "certprofile");
+    Args.notNull(csr, "csr");
+    Args.notNull(serialNumber, "serialNumber");
     if (serialNumber.compareTo(BigInteger.ZERO) != 1) {
       throw new IllegalArgumentException(
           "serialNumber must not be non-positive: " + serialNumber);
@@ -306,7 +306,7 @@ class SelfSignedCertBuilder {
 
   public static AsymmetricKeyParameter generatePublicKeyParameter(PublicKey key)
       throws InvalidKeyException {
-    ParamUtil.requireNonNull("key", key);
+    Args.notNull(key, "key");
     if (key instanceof RSAPublicKey) {
       RSAPublicKey rsakey = (RSAPublicKey) key;
       return new RSAKeyParameters(false, rsakey.getModulus(), rsakey.getPublicExponent());

@@ -50,7 +50,7 @@ import org.xipki.shell.completer.YesNoCompleter;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.IoUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -175,7 +175,7 @@ public class CaUpdateAction extends CaAction {
     ChangeCaEntry entry = new ChangeCaEntry(new NameId(null, caName));
 
     if (snBitLen != null) {
-      ParamUtil.requireRange("sn-bitlen", snBitLen, 63, 159);
+      Args.range(snBitLen, "sn-bitlen", 63, 159);
       entry.setSerialNoBitLen(snBitLen);
     }
 

@@ -19,7 +19,7 @@ package org.xipki.ca.client.api;
 
 import org.bouncycastle.asn1.crmf.CertId;
 import org.xipki.security.cmp.PkiStatusInfo;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -34,13 +34,13 @@ public class CertIdOrError {
   private final PkiStatusInfo error;
 
   public CertIdOrError(CertId certId) {
-    this.certId = ParamUtil.requireNonNull("certId", certId);
+    this.certId = Args.notNull(certId, "certId");
     this.error = null;
   }
 
   public CertIdOrError(PkiStatusInfo error) {
     this.certId = null;
-    this.error = ParamUtil.requireNonNull("error", error);
+    this.error = Args.notNull(error, "error");
   }
 
   public CertId getCertId() {

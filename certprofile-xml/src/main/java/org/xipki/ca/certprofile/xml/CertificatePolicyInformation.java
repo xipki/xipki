@@ -20,7 +20,7 @@ package org.xipki.ca.certprofile.xml;
 import java.util.List;
 
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -36,7 +36,7 @@ public class CertificatePolicyInformation {
 
   public CertificatePolicyInformation(String certPolicyId,
       List<CertificatePolicyQualifier> qualifiers) {
-    this.certPolicyId = ParamUtil.requireNonBlank("certPolicyId", certPolicyId);
+    this.certPolicyId = Args.notBlank(certPolicyId, "certPolicyId");
     this.qualifiers = CollectionUtil.unmodifiableList(qualifiers);
   }
 

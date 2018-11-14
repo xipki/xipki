@@ -33,7 +33,7 @@ import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.InvalidConfException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -113,9 +113,7 @@ public class CmpControl {
   private final CollectionAlgorithmValidator popoAlgoValidator;
 
   public CmpControl(String conf) throws InvalidConfException {
-    ParamUtil.requireNonNull("conf", conf);
-
-    ConfPairs pairs = new ConfPairs(conf);
+    ConfPairs pairs = new ConfPairs(Args.notNull(conf, "conf"));
     this.confirmCert = getBoolean(pairs, KEY_CONFIRM_CERT, false);
     this.sendCaCert = getBoolean(pairs, KEY_SEND_CA, false);
     this.sendResponderCert = getBoolean(pairs, KEY_SEND_RESPONDER, true);
@@ -186,7 +184,7 @@ public class CmpControl {
       List<String> pbmOwfs, List<String> pbmMacs, Integer pbmIterationCount)
       throws InvalidConfException {
     if (confirmWaitTime != null) {
-      ParamUtil.requireMin("confirmWaitTime", confirmWaitTime, 0);
+      Args.notNegative(confirmWaitTime, "confirmWaitTime");
     }
 
     ConfPairs pairs = new ConfPairs();

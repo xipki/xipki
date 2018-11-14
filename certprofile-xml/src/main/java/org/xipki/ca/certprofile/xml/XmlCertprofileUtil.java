@@ -110,7 +110,7 @@ import org.xipki.ca.certprofile.xml.jaxb.X509ProfileType.KeyAlgorithms;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 import org.xipki.util.XmlUtil;
 import org.xml.sax.SAXException;
@@ -133,7 +133,7 @@ public class XmlCertprofileUtil {
   }
 
   public static X509ProfileType parse(InputStream xmlConfStream) throws CertprofileException {
-    ParamUtil.requireNonNull("xmlConfStream", xmlConfStream);
+    Args.notNull(xmlConfStream, "xmlConfStream");
     synchronized (JAXB_LOCK) {
       JAXBElement<?> rootElement;
       try {
@@ -207,7 +207,7 @@ public class XmlCertprofileUtil {
 
   public static PolicyMappings buildPolicyMappings(
       org.xipki.ca.certprofile.xml.jaxb.PolicyMappings type) {
-    ParamUtil.requireNonNull("type", type);
+    Args.notNull(type, "type");
     List<PolicyIdMappingType> mappings = type.getMapping();
     final int n = mappings.size();
 
@@ -230,7 +230,7 @@ public class XmlCertprofileUtil {
   public static NameConstraints buildNameConstrains(
       org.xipki.ca.certprofile.xml.jaxb.NameConstraints type)
       throws CertprofileException {
-    ParamUtil.requireNonNull("type", type);
+    Args.notNull(type, "type");
     GeneralSubtree[] permitted = buildGeneralSubtrees(type.getPermittedSubtrees());
     GeneralSubtree[] excluded = buildGeneralSubtrees(type.getExcludedSubtrees());
     return (permitted == null && excluded == null) ? null
@@ -255,7 +255,7 @@ public class XmlCertprofileUtil {
 
   private static GeneralSubtree buildGeneralSubtree(GeneralSubtreeBaseType type)
       throws CertprofileException {
-    ParamUtil.requireNonNull("type", type);
+    Args.notNull(type, "type");
     GeneralName base = null;
     if (type.getDirectoryName() != null) {
       base = new GeneralName(X509Util.reverse(new X500Name(type.getDirectoryName())));
@@ -289,7 +289,7 @@ public class XmlCertprofileUtil {
 
   public static ASN1Sequence buildPolicyConstrains(PolicyConstraints type)
       throws CertprofileException {
-    ParamUtil.requireNonNull("type", type);
+    Args.notNull(type, "type");
     Integer requireExplicitPolicy = type.getRequireExplicitPolicy();
     if (requireExplicitPolicy != null && requireExplicitPolicy < 0) {
       throw new CertprofileException(
@@ -323,7 +323,7 @@ public class XmlCertprofileUtil {
 
   public static Set<GeneralNameMode> buildGeneralNameMode(GeneralNameType name)
       throws CertprofileException {
-    ParamUtil.requireNonNull("name", name);
+    Args.notNull(name, "name");
 
     Set<GeneralNameMode> ret = new HashSet<>();
     if (name.getOtherName() != null) {
@@ -386,7 +386,7 @@ public class XmlCertprofileUtil {
 
   public static Map<ASN1ObjectIdentifier, KeyParametersOption> buildKeyAlgorithms(
       KeyAlgorithms keyAlgos) throws CertprofileException {
-    ParamUtil.requireNonNull("keyAlgos", keyAlgos);
+    Args.notNull(keyAlgos, "keyAlgos");
     Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = new HashMap<>();
     for (AlgorithmType type : keyAlgos.getAlgorithm()) {
       List<OidWithDescType> algIds = type.getAlgorithm();
@@ -409,7 +409,7 @@ public class XmlCertprofileUtil {
 
   public static Map<ASN1ObjectIdentifier, ExtensionControl> buildExtensionControls(
       ExtensionsType extensionsType) throws CertprofileException {
-    ParamUtil.requireNonNull("extensionsType", extensionsType);
+    Args.notNull(extensionsType, "extensionsType");
     // Extension controls
     Map<ASN1ObjectIdentifier, ExtensionControl> controls = new HashMap<>();
     for (ExtensionType m : extensionsType.getExtension()) {
@@ -440,7 +440,7 @@ public class XmlCertprofileUtil {
 
   public static Set<KeyUsageControl> buildKeyUsageOptions(
       org.xipki.ca.certprofile.xml.jaxb.KeyUsage extConf) {
-    ParamUtil.requireNonNull("extConf", extConf);
+    Args.notNull(extConf, "extConf");
     List<UsageType> usages = extConf.getUsage();
     Set<KeyUsageControl> controls = new HashSet<>();
 
@@ -484,7 +484,7 @@ public class XmlCertprofileUtil {
   } // method buildKeyUsageOptions
 
   public static Set<ExtKeyUsageControl> buildExtKeyUsageOptions(ExtendedKeyUsage extConf) {
-    ParamUtil.requireNonNull("extConf", extConf);
+    Args.notNull(extConf, "extConf");
     List<Usage> usages = extConf.getUsage();
     Set<ExtKeyUsageControl> controls = new HashSet<>();
 
@@ -614,7 +614,7 @@ public class XmlCertprofileUtil {
 
   private static KeyParametersOption convertKeyParametersOption(AlgorithmType type)
       throws CertprofileException {
-    ParamUtil.requireNonNull("type", type);
+    Args.notNull(type, "type");
     if (type.getParameters() == null || type.getParameters().getAny() == null) {
       return KeyParametersOption.ALLOW_ALL;
     }
@@ -745,7 +745,7 @@ public class XmlCertprofileUtil {
 
   public static org.bouncycastle.asn1.x509.CertificatePolicies createCertificatePolicies(
       List<CertificatePolicyInformation> policyInfos) throws CertprofileException {
-    ParamUtil.requireNonEmpty("policyInfos", policyInfos);
+    Args.notEmpty(policyInfos, "policyInfos");
 
     int size = policyInfos.size();
     PolicyInformation[] infos = new PolicyInformation[size];
@@ -770,7 +770,7 @@ public class XmlCertprofileUtil {
 
   private static ASN1Sequence createPolicyQualifiers(
       List<CertificatePolicyQualifier> qualifiers) {
-    ParamUtil.requireNonNull("qualifiers", qualifiers);
+    Args.notNull(qualifiers, "qualifiers");
     List<PolicyQualifierInfo> qualifierInfos = new ArrayList<>(qualifiers.size());
     for (CertificatePolicyQualifier qualifier : qualifiers) {
       PolicyQualifierInfo qualifierInfo;

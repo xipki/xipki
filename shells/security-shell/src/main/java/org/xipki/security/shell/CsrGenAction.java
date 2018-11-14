@@ -76,7 +76,7 @@ import org.xipki.shell.completer.HashAlgCompleter;
 import org.xipki.shell.completer.KeyusageCompleter;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.IoUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -360,8 +360,7 @@ public abstract class CsrGenAction extends SecurityAction {
   } // method execute0
 
   protected X500Name getSubject(String subjectText) {
-    ParamUtil.requireNonBlank("subjectText", subjectText);
-    return new X500Name(subjectText);
+    return new X500Name(Args.notBlank(subjectText, "subjectText"));
   }
 
   protected List<String> getAdditionalNeedExtensionTypes() {
@@ -409,9 +408,9 @@ public abstract class CsrGenAction extends SecurityAction {
   private PKCS10CertificationRequest generateRequest(ConcurrentContentSigner signer,
       SubjectPublicKeyInfo subjectPublicKeyInfo, X500Name subjectDn,
       Map<ASN1ObjectIdentifier, ASN1Encodable> attributes) throws XiSecurityException {
-    ParamUtil.requireNonNull("signer", signer);
-    ParamUtil.requireNonNull("subjectPublicKeyInfo", subjectPublicKeyInfo);
-    ParamUtil.requireNonNull("subjectDn", subjectDn);
+    Args.notNull(signer, "signer");
+    Args.notNull(subjectPublicKeyInfo, "subjectPublicKeyInfo");
+    Args.notNull(subjectDn, "subjectDn");
     PKCS10CertificationRequestBuilder csrBuilder =
         new PKCS10CertificationRequestBuilder(subjectDn, subjectPublicKeyInfo);
     if (CollectionUtil.isNonEmpty(attributes)) {

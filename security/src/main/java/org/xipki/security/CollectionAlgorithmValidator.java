@@ -25,7 +25,7 @@ import java.util.Set;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.xipki.security.util.AlgorithmUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -60,7 +60,7 @@ public class CollectionAlgorithmValidator implements AlgorithmValidator {
 
   @Override
   public boolean isAlgorithmPermitted(AlgorithmIdentifier algId) {
-    ParamUtil.requireNonNull("algId", algId);
+    Args.notNull(algId, "algId");
 
     if (algoNames.isEmpty()) {
       return true;
@@ -78,7 +78,7 @@ public class CollectionAlgorithmValidator implements AlgorithmValidator {
 
   @Override
   public boolean isAlgorithmPermitted(String algoName) {
-    ParamUtil.requireNonBlank("algoName", algoName);
+    Args.notBlank(algoName, "algoName");
 
     if (algoNames.isEmpty()) {
       return true;

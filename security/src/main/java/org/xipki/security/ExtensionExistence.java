@@ -31,7 +31,7 @@ import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -81,7 +81,7 @@ public class ExtensionExistence extends ASN1Object {
     for (int i = 0; i < size; i++) {
       ASN1TaggedObject tagObject = ASN1TaggedObject.getInstance(seq.getObjectAt(i));
       int tag = tagObject.getTagNo();
-      ParamUtil.requireRange("tag", tag, 0, 1);
+      Args.range(tag, "tag", 0, 1);
       ASN1Sequence subSeq = ASN1Sequence.getInstance(tagObject.getObject());
       List<ASN1ObjectIdentifier> oids = new LinkedList<>();
       int subSize = subSeq.size();

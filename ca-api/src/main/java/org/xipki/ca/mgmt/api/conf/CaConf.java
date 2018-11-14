@@ -93,7 +93,7 @@ import org.xipki.util.ConfPairs;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.ObjectCreationException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.XmlUtil;
 import org.xml.sax.SAXException;
 
@@ -122,19 +122,16 @@ public class CaConf {
 
   public CaConf(File confFile, SecurityFactory securityFactory)
       throws IOException, InvalidConfException, CaMgmtException, JAXBException, SAXException {
-    ParamUtil.requireNonNull("confFile", confFile);
-    ParamUtil.requireNonNull("securityFactory", securityFactory);
-    confFile = IoUtil.expandFilepath(confFile);
+    Args.notNull(securityFactory, "securityFactory");
+    confFile = IoUtil.expandFilepath(Args.notNull(confFile, "confFile"));
 
     init(Files.newInputStream(confFile.toPath()), securityFactory);
   }
 
   public CaConf(InputStream confFileZipStream, SecurityFactory securityFactory)
       throws IOException, InvalidConfException, CaMgmtException, JAXBException, SAXException {
-    ParamUtil.requireNonNull("confFileZipStream", confFileZipStream);
-    ParamUtil.requireNonNull("securityFactory", securityFactory);
-
-    init(confFileZipStream, securityFactory);
+    init(Args.notNull(
+        confFileZipStream, "confFileZipStream"), Args.notNull(securityFactory, "securityFactory"));
   }
 
   private final void init(InputStream zipFileStream, SecurityFactory securityFactory)
@@ -423,7 +420,7 @@ public class CaConf {
   }
 
   public void addSigner(SignerEntry signer) {
-    ParamUtil.requireNonNull("signer", signer);
+    Args.notNull(signer, "signer");
     this.signers.put(signer.getName(), signer);
   }
 
@@ -432,21 +429,21 @@ public class CaConf {
   }
 
   public SignerEntry getSigner(String name) {
-    return signers.get(ParamUtil.requireNonNull("name", name));
+    return signers.get(Args.notNull(name, "name"));
   }
 
   public void addRequestor(RequestorEntry requestor) {
-    ParamUtil.requireNonNull("requestor", requestor);
+    Args.notNull(requestor, "requestor");
     this.requestors.put(requestor.getIdent().getName(), requestor);
   }
 
   public void addUser(UserEntry user) {
-    ParamUtil.requireNonNull("user", user);
+    Args.notNull(user, "user");
     this.users.put(user.getIdent().getName(), user);
   }
 
   public void addUser(AddUserEntry user) {
-    ParamUtil.requireNonNull("user", user);
+    Args.notNull(user, "user");
     this.users.put(user.getIdent().getName(), user);
   }
 
@@ -455,7 +452,7 @@ public class CaConf {
   }
 
   public RequestorEntry getRequestor(String name) {
-    return requestors.get(ParamUtil.requireNonNull("name", name));
+    return requestors.get(Args.notNull(name, "name"));
   }
 
   public Set<String> getUserNames() {
@@ -463,11 +460,11 @@ public class CaConf {
   }
 
   public Object getUser(String name) {
-    return users.get(ParamUtil.requireNonNull("name", name));
+    return users.get(Args.notNull(name, "name"));
   }
 
   public void addPublisher(PublisherEntry publisher) {
-    ParamUtil.requireNonNull("publisher", publisher);
+    Args.notNull(publisher, "publisher");
     this.publishers.put(publisher.getIdent().getName(), publisher);
   }
 
@@ -476,11 +473,11 @@ public class CaConf {
   }
 
   public PublisherEntry getPublisher(String name) {
-    return publishers.get(ParamUtil.requireNonNull("name", name));
+    return publishers.get(Args.notNull(name, "name"));
   }
 
   public void addProfile(CertprofileEntry profile) {
-    ParamUtil.requireNonNull("profile", profile);
+    Args.notNull(profile, "profile");
     this.certprofiles.put(profile.getIdent().getName(), profile);
   }
 
@@ -489,11 +486,11 @@ public class CaConf {
   }
 
   public CertprofileEntry getCertprofile(String name) {
-    return certprofiles.get(ParamUtil.requireNonNull("name", name));
+    return certprofiles.get(Args.notNull(name, "name"));
   }
 
   public void addSingleCa(SingleCaConf singleCa) {
-    ParamUtil.requireNonNull("singleCa", singleCa);
+    Args.notNull(singleCa, "singleCa");
     this.cas.put(singleCa.getName(), singleCa);
   }
 
@@ -502,7 +499,7 @@ public class CaConf {
   }
 
   public SingleCaConf getCa(String name) {
-    return cas.get(ParamUtil.requireNonNull("name", name));
+    return cas.get(Args.notNull(name, "name"));
   }
 
   private String getValue(FileOrValueType fileOrValue, Map<String, byte[]> zipEntries)

@@ -39,7 +39,7 @@ import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.security.util.SignerUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
@@ -101,9 +101,9 @@ class P11RSAContentSigner implements XiContentSigner {
 
   P11RSAContentSigner(P11CryptService cryptService, P11IdentityId identityId,
       AlgorithmIdentifier signatureAlgId) throws XiSecurityException, P11TokenException {
-    this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
-    this.identityId = ParamUtil.requireNonNull("identityId", identityId);
-    this.algorithmIdentifier = ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
+    this.cryptService = Args.notNull(cryptService, "cryptService");
+    this.identityId = Args.notNull(identityId, "identityId");
+    this.algorithmIdentifier = Args.notNull(signatureAlgId, "signatureAlgId");
     try {
       this.encodedAlgorithmIdentifier = algorithmIdentifier.getEncoded();
     } catch (IOException ex) {

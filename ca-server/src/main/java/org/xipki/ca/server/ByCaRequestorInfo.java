@@ -20,7 +20,7 @@ package org.xipki.ca.server;
 import org.xipki.ca.api.InsuffientPermissionException;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.mgmt.api.RequestorInfo;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -33,7 +33,7 @@ public class ByCaRequestorInfo implements RequestorInfo {
   private final NameId ident;
 
   public ByCaRequestorInfo(NameId ident) {
-    this.ident = ParamUtil.requireNonNull("ident", ident);
+    this.ident = Args.notNull(ident, "ident");
   }
 
   @Override

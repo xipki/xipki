@@ -34,7 +34,7 @@ import org.bouncycastle.asn1.x509.GeneralName;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -58,7 +58,7 @@ public class AdmissionSyntaxOption {
       List<AdmissionsOption> admissionsList) {
     this.critical = critical;
     this.admissionAuthority = admissionAuthority;
-    this.admissionsList = ParamUtil.requireNonEmpty("admissionsList", admissionsList);
+    this.admissionsList = Args.notEmpty(admissionsList, "admissionsList");
 
     boolean bo = false;
     for (AdmissionsOption ao : admissionsList) {

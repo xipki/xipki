@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.CompareUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -37,7 +37,7 @@ class NameIdStore {
   private final Map<String, Integer> entries;
 
   NameIdStore(String table, Map<String, Integer> entries) {
-    this.table = ParamUtil.requireNonNull("table", table);
+    this.table = Args.notNull(table, "table");
     this.entries = new HashMap<>();
 
     if (CollectionUtil.isNonEmpty(entries)) {
@@ -48,8 +48,8 @@ class NameIdStore {
   }
 
   final void addEntry(String name, Integer id) {
-    ParamUtil.requireNonBlank("name", name);
-    ParamUtil.requireNonNull("id", id);
+    Args.notBlank(name, "name");
+    Args.notNull(id, "id");
 
     if (entries.containsKey(name)) {
       throw new IllegalArgumentException("entry with the same name " + name + " already available");

@@ -154,7 +154,7 @@ import org.xipki.util.DateUtil;
 import org.xipki.util.HealthCheckResult;
 import org.xipki.util.Hex;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 import org.xipki.util.concurrent.ConcurrentBag;
 import org.xipki.util.concurrent.ConcurrentBagEntry;
@@ -1999,7 +1999,7 @@ public class CmpResponderImpl extends BaseCmpResponder {
 
   public CertificateList getCrl(CmpRequestorInfo requestor, BigInteger crlNumber)
       throws OperationException {
-    ParamUtil.requireNonNull("requestor", requestor);
+    Args.notNull(requestor, "requestor");
     try {
       checkPermission(requestor, PermissionConstants.GET_CRL);
     } catch (InsuffientPermissionException ex) {
@@ -2011,7 +2011,7 @@ public class CmpResponderImpl extends BaseCmpResponder {
 
   public X509CRL generateCrlOnDemand(CmpRequestorInfo requestor, RequestType reqType, String msgId)
       throws OperationException {
-    ParamUtil.requireNonNull("requestor", requestor);
+    Args.notNull(requestor, "requestor");
     try {
       checkPermission(requestor, PermissionConstants.GEN_CRL);
     } catch (InsuffientPermissionException ex) {
@@ -2023,7 +2023,7 @@ public class CmpResponderImpl extends BaseCmpResponder {
 
   public void revokeCert(CmpRequestorInfo requestor, BigInteger serialNumber, CrlReason reason,
       Date invalidityDate, RequestType reqType, String msgId) throws OperationException {
-    ParamUtil.requireNonNull("requestor", requestor);
+    Args.notNull(requestor, "requestor");
 
     int permission;
     if (reason == CrlReason.REMOVE_FROM_CRL) {
@@ -2053,7 +2053,7 @@ public class CmpResponderImpl extends BaseCmpResponder {
 
   public void removeCert(CmpRequestorInfo requestor, BigInteger serialNumber, RequestType reqType,
       String msgId) throws OperationException {
-    ParamUtil.requireNonNull("requestor", requestor);
+    Args.notNull(requestor, "requestor");
     try {
       checkPermission(requestor, PermissionConstants.REMOVE_CERT);
     } catch (InsuffientPermissionException ex) {

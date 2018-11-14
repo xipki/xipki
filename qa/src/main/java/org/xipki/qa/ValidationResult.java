@@ -22,7 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -43,7 +43,7 @@ public class ValidationResult {
   }
 
   public ValidationResult(List<ValidationIssue> validationIssues) {
-    this.validationIssues = ParamUtil.requireNonEmpty("validationIssues", validationIssues);
+    this.validationIssues = Args.notEmpty(validationIssues, "validationIssues");
 
     List<ValidationIssue> failedIssues = new LinkedList<>();
     List<ValidationIssue> successfulIssues = new LinkedList<>();

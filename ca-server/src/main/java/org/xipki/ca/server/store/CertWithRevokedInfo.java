@@ -18,7 +18,7 @@
 package org.xipki.ca.server.store;
 
 import org.xipki.ca.api.CertWithDbId;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -33,7 +33,7 @@ public class CertWithRevokedInfo {
   private final boolean revoked;
 
   public CertWithRevokedInfo(CertWithDbId cert, boolean revoked) {
-    this.cert = ParamUtil.requireNonNull("cert", cert);
+    this.cert = Args.notNull(cert, "cert");
     this.revoked = revoked;
   }
 

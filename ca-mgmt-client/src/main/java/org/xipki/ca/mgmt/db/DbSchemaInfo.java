@@ -27,7 +27,7 @@ import java.util.Set;
 
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -40,7 +40,7 @@ public class DbSchemaInfo {
   private final Map<String, String> variables = new HashMap<>();
 
   public DbSchemaInfo(DataSourceWrapper datasource) throws DataAccessException {
-    ParamUtil.requireNonNull("datasource", datasource);
+    Args.notNull(datasource, "datasource");
 
     final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
 
@@ -69,8 +69,7 @@ public class DbSchemaInfo {
   }
 
   public String getVariableValue(String variableName) {
-    ParamUtil.requireNonNull("variableName", variableName);
-    return variables.get(variableName);
+    return variables.get(Args.notNull(variableName, "variableName"));
   }
 
   public void setVariable(String name, String value) {

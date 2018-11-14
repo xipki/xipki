@@ -19,7 +19,7 @@ package org.xipki.ca.server.rest;
 
 import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditStatus;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -50,9 +50,9 @@ public class HttpRespAuditException extends Exception {
       String auditMessage, AuditLevel auditLevel, AuditStatus auditStatus) {
     this.httpStatus = httpStatus;
     this.httpErrorMessage = httpErrorMessage;
-    this.auditMessage = ParamUtil.requireNonBlank("auditMessage", auditMessage);
-    this.auditLevel = ParamUtil.requireNonNull("auditLevel", auditLevel);
-    this.auditStatus = ParamUtil.requireNonNull("auditStatus", auditStatus);
+    this.auditMessage = Args.notBlank(auditMessage, "auditMessage");
+    this.auditLevel = Args.notNull(auditLevel, "auditLevel");
+    this.auditStatus = Args.notNull(auditStatus, "auditStatus");
   }
 
   public int getHttpStatus() {

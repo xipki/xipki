@@ -27,7 +27,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.DSAParameter;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.xipki.security.util.DSAParameterCache;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -107,7 +107,7 @@ public class KeypairGenControl {
 
     public ECKeypairGenControl(ASN1ObjectIdentifier curveOid,
         ASN1ObjectIdentifier keyAlgorithmOid) {
-      this.curveOid = ParamUtil.requireNonNull("curveOid", curveOid);
+      this.curveOid = Args.notNull(curveOid, "curveOid");
       this.keyAlgorithm = new AlgorithmIdentifier(
           (keyAlgorithmOid != null) ? keyAlgorithmOid : X9ObjectIdentifiers.id_ecPublicKey,
            curveOid);

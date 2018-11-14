@@ -40,7 +40,7 @@ import org.xipki.password.PasswordResolverException;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.InvalidConfException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 import com.alibaba.fastjson.JSON;
 
@@ -77,11 +77,11 @@ public class HttpMgmtServlet extends HttpServlet {
   private OcspServerImpl ocspServer;
 
   public void setMgmtCerts(Set<X509Certificate> mgmtCerts) {
-    this.mgmtCerts = new HashSet<>(ParamUtil.requireNonEmpty("mgmtCerts", mgmtCerts));
+    this.mgmtCerts = new HashSet<>(Args.notEmpty(mgmtCerts, "mgmtCerts"));
   }
 
   public void setOcspServer(OcspServerImpl ocspServer) {
-    this.ocspServer = ParamUtil.requireNonNull("ocspServer", ocspServer);;
+    this.ocspServer = Args.notNull(ocspServer, "ocspServer");
   }
 
   @Override

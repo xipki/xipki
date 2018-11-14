@@ -27,7 +27,7 @@ import org.xipki.ca.certprofile.xml.jaxb.BiometricInfo;
 import org.xipki.ca.certprofile.xml.jaxb.BiometricTypeType;
 import org.xipki.ca.certprofile.xml.jaxb.TripleState;
 import org.xipki.security.util.AlgorithmUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -46,7 +46,7 @@ public class BiometricInfoOption {
   private final TripleState sourceDataUriOccurrence;
 
   public BiometricInfoOption(BiometricInfo jaxb) throws NoSuchAlgorithmException {
-    ParamUtil.requireNonNull("jaxb", jaxb);
+    Args.notNull(jaxb, "jaxb");
 
     this.sourceDataUriOccurrence = jaxb.getIncludeSourceDataUri();
     this.hashAlgorithms = XmlCertprofileUtil.toOidSet(jaxb.getHashAlgorithm());
@@ -69,7 +69,7 @@ public class BiometricInfoOption {
   }
 
   public boolean isTypePermitted(TypeOfBiometricData type) {
-    ParamUtil.requireNonNull("type", type);
+    Args.notNull(type, "type");
 
     if (type.isPredefined()) {
       return predefinedTypes.contains(type.getPredefinedBiometricType());
@@ -79,7 +79,7 @@ public class BiometricInfoOption {
   }
 
   public boolean isHashAlgorithmPermitted(ASN1ObjectIdentifier hashAlgorithm) {
-    ParamUtil.requireNonNull("hashAlgorithm", hashAlgorithm);
+    Args.notNull(hashAlgorithm, "hashAlgorithm");
     return hashAlgorithms.contains(hashAlgorithm);
   }
 

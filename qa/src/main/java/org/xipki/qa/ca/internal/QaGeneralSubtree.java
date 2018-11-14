@@ -18,7 +18,7 @@
 package org.xipki.qa.ca.internal;
 
 import org.xipki.ca.certprofile.xml.jaxb.GeneralSubtreeBaseType;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -31,15 +31,15 @@ public class QaGeneralSubtree {
   private final GeneralSubtreeBaseType jaxb;
 
   public QaGeneralSubtree(GeneralSubtreeBaseType jaxb) {
-    this.jaxb = ParamUtil.requireNonNull("jaxb", jaxb);
+    this.jaxb = Args.notNull(jaxb, "jaxb");
     Integer min = jaxb.getMinimum();
     if (min != null) {
-      ParamUtil.requireMin("jaxb.getMinimum()", min.intValue(), 0);
+      Args.notNegative(min.intValue(), "jaxb.getMinimum()");
     }
 
     Integer max = jaxb.getMaximum();
     if (max != null) {
-      ParamUtil.requireMin("jaxb.getMaximum()", max.intValue(), 0);
+      Args.notNegative(max.intValue(), "jaxb.getMaximum()");
     }
   }
 

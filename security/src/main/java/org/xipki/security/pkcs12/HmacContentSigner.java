@@ -30,7 +30,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -76,13 +76,13 @@ public class HmacContentSigner implements XiContentSigner {
 
   public HmacContentSigner(HashAlgo hashAlgo, AlgorithmIdentifier algorithmIdentifier,
       SecretKey signingKey) throws XiSecurityException {
-    this.algorithmIdentifier = ParamUtil.requireNonNull("algorithmIdentifier", algorithmIdentifier);
+    this.algorithmIdentifier = Args.notNull(algorithmIdentifier, "algorithmIdentifier");
+    Args.notNull(signingKey, "signingKey");
     try {
       this.encodedAlgorithmIdentifier = algorithmIdentifier.getEncoded();
     } catch (IOException ex) {
       throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
     }
-    ParamUtil.requireNonNull("signingKey", signingKey);
     if (hashAlgo == null) {
       hashAlgo = AlgorithmUtil.extractHashAlgoFromMacAlg(algorithmIdentifier);
     }

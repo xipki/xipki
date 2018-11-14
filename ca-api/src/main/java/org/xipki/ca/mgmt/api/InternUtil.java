@@ -24,7 +24,7 @@ import org.xipki.security.SignerConf;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -65,7 +65,7 @@ class InternUtil {
 
   static String signerConfToString(String signerConf, boolean verbose,
       boolean ignoreSensitiveInfo) {
-    ParamUtil.requireNonBlank("signerConf", signerConf);
+    Args.notBlank(signerConf, "signerConf");
     if (ignoreSensitiveInfo) {
       signerConf = SignerConf.eraseSensitiveData(signerConf);
     }

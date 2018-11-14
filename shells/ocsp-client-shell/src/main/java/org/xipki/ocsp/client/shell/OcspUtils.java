@@ -22,7 +22,7 @@ import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.xipki.ocsp.client.api.InvalidOcspResponseException;
 import org.xipki.ocsp.client.api.OcspResponseException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -37,7 +37,7 @@ public class OcspUtils {
 
   public static BasicOCSPResp extractBasicOcspResp(OCSPResp response)
       throws OcspResponseException {
-    ParamUtil.requireNonNull("response", response);
+    Args.notNull(response, "response");
     int status = response.getStatus();
     if (status == 0) {
       BasicOCSPResp basicOcspResp;

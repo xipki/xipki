@@ -48,7 +48,7 @@ import org.xipki.shell.CmdFailure;
 import org.xipki.shell.completer.HashAlgCompleter;
 import org.xipki.shell.completer.SigAlgCompleter;
 import org.xipki.util.DateUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -117,7 +117,7 @@ public class OcspQaStatusAction extends BaseOcspStatusAction {
   @Override
   protected void checkParameters(X509Certificate respIssuer, List<BigInteger> serialNumbers,
       Map<BigInteger, byte[]> encodedCerts) throws Exception {
-    ParamUtil.requireNonEmpty("serialNunmbers", serialNumbers);
+    Args.notEmpty(serialNumbers, "serialNunmbers");
 
     if (isBlank(errorText) && isEmpty(statusTexts)) {
       throw new IllegalArgumentException(

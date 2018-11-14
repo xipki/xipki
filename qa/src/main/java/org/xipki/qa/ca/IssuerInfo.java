@@ -29,7 +29,7 @@ import java.util.Set;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -62,7 +62,7 @@ public class IssuerInfo {
   public IssuerInfo(List<String> caIssuerUrls, List<String> ocspUrls, List<String> crlUrls,
       List<String> deltaCrlUrls, byte[] certBytes, boolean cutoffNotAfter)
       throws CertificateException {
-    ParamUtil.requireNonNull("certBytes", certBytes);
+    Args.notNull(certBytes, "certBytes");
 
     this.cutoffNotAfter = cutoffNotAfter;
 

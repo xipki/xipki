@@ -30,7 +30,7 @@ import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 import org.xipki.util.CompareUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -54,7 +54,7 @@ public class IssuerEntry {
 
   public IssuerEntry(int id, X509Certificate cert) throws CertificateEncodingException {
     this.id = id;
-    this.cert = ParamUtil.requireNonNull("cert", cert);
+    this.cert = Args.notNull(cert, "cert");
     this.notBefore = cert.getNotBefore();
     this.issuerHashMap = getIssuerHashAndKeys(cert.getEncoded());
   }
@@ -111,7 +111,7 @@ public class IssuerEntry {
   }
 
   public void setRevocationInfo(Date revocationTime) {
-    ParamUtil.requireNonNull("revocationTime", revocationTime);
+    Args.notNull(revocationTime, "revocationTime");
     this.revocationInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE,
         revocationTime, null);
   }

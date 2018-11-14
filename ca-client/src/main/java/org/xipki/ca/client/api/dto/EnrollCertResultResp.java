@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bouncycastle.asn1.cmp.CMPCertificate;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -46,7 +46,7 @@ public class EnrollCertResultResp {
   }
 
   public void addResultEntry(ResultEntry resultEntry) {
-    ParamUtil.requireNonNull("resultEntry", resultEntry);
+    Args.notNull(resultEntry, "resultEntry");
 
     if (!(resultEntry instanceof EnrollCertResultEntry
         || resultEntry instanceof ErrorResultEntry)) {

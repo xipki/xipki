@@ -49,7 +49,7 @@ public class LruCache<K, V> {
    *     this is the maximum sum of the sizes of the entries in this cache.
    */
   public LruCache(int maxSize) {
-    this.maxSize = ParamUtil.requireMin("maxSize", maxSize, 1);
+    this.maxSize = Args.positive(maxSize, "maxSize");
     this.map = new LinkedHashMap<>(0, 0.75f, true);
   }
 
@@ -60,7 +60,7 @@ public class LruCache<K, V> {
    */
   public void resize(int maxSize) {
     synchronized (this) {
-      this.maxSize = ParamUtil.requireMin("maxSize", maxSize, 1);
+      this.maxSize = Args.positive(maxSize, "maxSize");
     }
     trimToSize(maxSize);
   }

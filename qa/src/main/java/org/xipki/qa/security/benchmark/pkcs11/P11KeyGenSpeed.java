@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.security.pkcs11.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.util.BenchmarkExecutor;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -61,7 +61,7 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
 
   public P11KeyGenSpeed(P11Slot slot, byte[] id, String description) {
     super(description);
-    this.slot = ParamUtil.requireNonNull("slot", slot);
+    this.slot = Args.notNull(slot, "slot");
     this.id = id;
   }
 

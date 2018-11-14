@@ -18,7 +18,7 @@
 package org.xipki.security;
 
 import org.xipki.util.ConfPairs;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -38,8 +38,7 @@ public class SignerConf {
   public SignerConf(String conf) {
     this.hashAlgo = null;
     this.signatureAlgoControl = null;
-    ParamUtil.requireNonBlank("conf", conf);
-    this.confPairs = new ConfPairs(conf);
+    this.confPairs = new ConfPairs(Args.notBlank(conf, "conf"));
     if (getConfValue("algo") == null) {
       throw new IllegalArgumentException("conf must contain the entry 'algo'");
     }
@@ -47,10 +46,9 @@ public class SignerConf {
 
   public SignerConf(String confWithoutAlgo, HashAlgo hashAlgo,
       SignatureAlgoControl signatureAlgoControl) {
-    ParamUtil.requireNonBlank("confWithoutAlgo", confWithoutAlgo);
-    this.hashAlgo = ParamUtil.requireNonNull("hashAlgo", hashAlgo);
+    this.hashAlgo = Args.notNull(hashAlgo, "hashAlgo");
     this.signatureAlgoControl = signatureAlgoControl;
-    this.confPairs = new ConfPairs(confWithoutAlgo);
+    this.confPairs = new ConfPairs(Args.notBlank(confWithoutAlgo, "confWithoutAlgo"));
     if (getConfValue("algo") != null) {
       throw new IllegalArgumentException("confWithoutAlgo must not contain the entry 'algo'");
     }

@@ -27,7 +27,7 @@ import java.net.URLEncoder;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -51,9 +51,9 @@ public class DfltHttpOcspRequestor extends AbstractOcspRequestor {
   @Override
   protected byte[] send(byte[] request, URL responderUrl, RequestOptions requestOptions)
       throws IOException {
-    ParamUtil.requireNonNull("request", request);
-    ParamUtil.requireNonNull("responderUrl", responderUrl);
-    ParamUtil.requireNonNull("requestOptions", requestOptions);
+    Args.notNull(request, "request");
+    Args.notNull(responderUrl, "responderUrl");
+    Args.notNull(requestOptions, "requestOptions");
 
     int size = request.length;
     HttpURLConnection httpUrlConnection;

@@ -21,7 +21,7 @@ import java.security.cert.Certificate;
 import java.util.Map;
 import java.util.Set;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -36,7 +36,7 @@ public class EnrollCertResult {
   private final Map<String, CertifiedKeyPairOrError> certsOrErrors;
 
   public EnrollCertResult(Certificate caCert, Map<String, CertifiedKeyPairOrError> certsOrErrors) {
-    this.certsOrErrors = ParamUtil.requireNonEmpty("certsOrErrors", certsOrErrors);
+    this.certsOrErrors = Args.notEmpty(certsOrErrors, "certsOrErrors");
     this.caCert = caCert;
   }
 
@@ -45,7 +45,7 @@ public class EnrollCertResult {
   }
 
   public CertifiedKeyPairOrError getCertOrError(String id) {
-    ParamUtil.requireNonBlank("id", id);
+    Args.notBlank(id, "id");
     return certsOrErrors.get(id);
   }
 

@@ -17,7 +17,7 @@
 
 package org.xipki.ca.certprofile.xml;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -45,12 +45,12 @@ public class CertificatePolicyQualifier {
   }
 
   public static CertificatePolicyQualifier getInstanceForUserNotice(String userNotice) {
-    ParamUtil.requireNonNull("userNotice", userNotice);
+    Args.notNull(userNotice, "userNotice");
     return new CertificatePolicyQualifier(null, userNotice);
   }
 
   public static CertificatePolicyQualifier getInstanceForCpsUri(String cpsUri) {
-    ParamUtil.requireNonNull("cpsUri", cpsUri);
+    Args.notNull(cpsUri, "cpsUri");
     return new CertificatePolicyQualifier(cpsUri, null);
   }
 

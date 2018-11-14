@@ -21,7 +21,7 @@ import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.util.ConfPairs;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -89,11 +89,11 @@ public class ChangeCaEntry {
   }
 
   public ChangeCaEntry(NameId ident) throws CaMgmtException {
-    this.ident = ParamUtil.requireNonNull("ident", ident);
+    this.ident = Args.notNull(ident, "ident");
   }
 
   public void setIdent(NameId ident) {
-    this.ident = ParamUtil.requireNonNull("ident", ident);
+    this.ident = Args.notNull(ident, "ident");
   }
 
   public NameId getIdent() {
@@ -274,7 +274,7 @@ public class ChangeCaEntry {
 
   public void setSerialNoBitLen(Integer serialNoBitLen) {
     if (serialNoBitLen != null) {
-      ParamUtil.requireRange("serialNoBitLen", serialNoBitLen, 63, 159);
+      Args.range(serialNoBitLen, "serialNoBitLen", 63, 159);
     }
     this.serialNoBitLen = serialNoBitLen;
   }

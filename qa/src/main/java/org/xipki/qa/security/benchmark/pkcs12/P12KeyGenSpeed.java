@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.SecurityFactory;
 import org.xipki.util.BenchmarkExecutor;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -56,7 +56,7 @@ public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
 
   public P12KeyGenSpeed(String description, SecurityFactory securityFactory) {
     super(description);
-    this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
+    this.securityFactory = Args.notNull(securityFactory, "securityFactory");
   }
 
   protected abstract void generateKeypair(SecureRandom random) throws Exception;

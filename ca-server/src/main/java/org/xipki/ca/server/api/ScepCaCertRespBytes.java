@@ -27,7 +27,7 @@ import org.bouncycastle.cms.CMSAbsentContent;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -41,8 +41,8 @@ public class ScepCaCertRespBytes {
 
   public ScepCaCertRespBytes(X509Certificate caCert, X509Certificate responderCert)
       throws CMSException, CertificateException {
-    ParamUtil.requireNonNull("caCert", caCert);
-    ParamUtil.requireNonNull("responderCert", responderCert);
+    Args.notNull(caCert, "caCert");
+    Args.notNull(responderCert, "responderCert");
 
     CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
     try {

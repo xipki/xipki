@@ -18,7 +18,7 @@
 package org.xipki.security.pkcs11;
 
 import org.xipki.security.KeypairGenerationResult;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -31,7 +31,7 @@ public class P11KeypairGenerationResult extends KeypairGenerationResult {
   private final P11IdentityId identityId;
 
   public P11KeypairGenerationResult(P11IdentityId identityId) {
-    this.identityId = ParamUtil.requireNonNull("identityId", identityId);
+    this.identityId = Args.notNull(identityId, "identityId");
   }
 
   public P11IdentityId getIdentityId() {

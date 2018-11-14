@@ -33,7 +33,7 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.util.IoUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -65,7 +65,7 @@ public class DigestDiffWorker extends DbPortWorker {
       int numCertsPerSelect, int numThreads, Set<byte[]> includeCaCerts)
       throws PasswordResolverException, IOException {
     this.reportDir = reportDirName;
-    this.numThreads = ParamUtil.requireMin("numThreads", numThreads, 1);
+    this.numThreads = Args.positive(numThreads, "numThreads");
     this.numCertsPerSelect = numCertsPerSelect;
     this.includeCaCerts = includeCaCerts;
     this.revokedOnly = revokedOnly;

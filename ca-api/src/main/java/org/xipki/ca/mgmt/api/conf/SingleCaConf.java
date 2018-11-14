@@ -22,7 +22,7 @@ import java.util.List;
 import org.xipki.ca.mgmt.api.CaEntry;
 import org.xipki.ca.mgmt.api.CaHasRequestorEntry;
 import org.xipki.ca.mgmt.api.CaHasUserEntry;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -51,7 +51,7 @@ public class SingleCaConf {
   public SingleCaConf(String name, GenSelfIssued genSelfIssued, CaEntry caEntry,
       List<String> aliases, List<String> profileNames, List<CaHasRequestorEntry> requestors,
       List<CaHasUserEntry> users, List<String> publisherNames) {
-    this.name = ParamUtil.requireNonBlank("name", name);
+    this.name = Args.notBlank(name, "name");
     if (genSelfIssued != null) {
       if (caEntry == null) {
         throw new IllegalArgumentException("caEntry must not be null if genSelfIssued is non-null");

@@ -60,7 +60,7 @@ import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.security.util.GMUtil;
 import org.xipki.security.util.SignerUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.concurrent.ConcurrentBag;
 import org.xipki.util.concurrent.ConcurrentBagEntry;
 
@@ -91,8 +91,8 @@ public class EmulatorP11Identity extends P11Identity {
   public EmulatorP11Identity(P11Slot slot, P11IdentityId identityId,
       SecretKey signingKey, int maxSessions, SecureRandom random) {
     super(slot, identityId, 0);
-    this.signingKey = ParamUtil.requireNonNull("signingKey", signingKey);
-    this.random = ParamUtil.requireNonNull("random", random);
+    this.signingKey = Args.notNull(signingKey, "signingKey");
+    this.random = Args.notNull(random, "random");
   } // constructor
 
   public EmulatorP11Identity(P11Slot slot, P11IdentityId identityId, PrivateKey privateKey,
@@ -100,8 +100,8 @@ public class EmulatorP11Identity extends P11Identity {
       SecureRandom random)
       throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
     super(slot, identityId, publicKey, certificateChain);
-    this.signingKey = ParamUtil.requireNonNull("privateKey", privateKey);
-    this.random = ParamUtil.requireNonNull("random", random);
+    this.signingKey = Args.notNull(privateKey, "privateKey");
+    this.random = Args.notNull(random, "random");
 
     if (this.publicKey instanceof RSAPublicKey) {
       String providerName = "BC";

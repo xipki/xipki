@@ -32,7 +32,7 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.util.IoUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -58,9 +58,9 @@ public class OcspDbExportWorker extends DbPortWorker {
   public OcspDbExportWorker(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
       String dbConfFile, String destFolder, boolean resume, int numCertsInBundle,
       int numCertsPerSelect) throws PasswordResolverException, IOException {
-    ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
-    ParamUtil.requireNonNull("dbConfFile", dbConfFile);
-    this.destFolder = ParamUtil.requireNonNull(destFolder, destFolder);
+    Args.notNull(datasourceFactory, "datasourceFactory");
+    Args.notBlank(dbConfFile, "dbConfFile");
+    this.destFolder = Args.notBlank(destFolder, destFolder);
 
     Properties props = DbPorter.getDbConfProperties(
         Files.newInputStream(Paths.get(IoUtil.expandFilepath(dbConfFile))));

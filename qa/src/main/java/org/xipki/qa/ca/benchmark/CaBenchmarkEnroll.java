@@ -40,7 +40,7 @@ import org.xipki.ca.client.api.dto.EnrollCertRequest;
 import org.xipki.ca.client.api.dto.EnrollCertRequest.Type;
 import org.xipki.ca.client.api.dto.EnrollCertRequestEntry;
 import org.xipki.util.BenchmarkExecutor;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -70,9 +70,9 @@ public class CaBenchmarkEnroll extends BenchmarkExecutor {
       int num, String description) {
     super(description);
     this.maxRequests = maxRequests;
-    this.num = ParamUtil.requireMin("num", num, 1);
-    this.benchmarkEntry = ParamUtil.requireNonNull("benchmarkEntry", benchmarkEntry);
-    this.caClient = ParamUtil.requireNonNull("caClient", caClient);
+    this.num = Args.positive(num, "num");
+    this.benchmarkEntry = Args.notNull(benchmarkEntry, "benchmarkEntry");
+    this.caClient = Args.notNull(caClient, "caClient");
     this.index = new AtomicLong(getSecureIndex());
   }
 

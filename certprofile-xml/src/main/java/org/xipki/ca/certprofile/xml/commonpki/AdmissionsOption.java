@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.bouncycastle.asn1.isismtt.x509.NamingAuthority;
 import org.bouncycastle.asn1.x509.GeneralName;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -41,7 +41,7 @@ public class AdmissionsOption {
       List<ProfessionInfoOption> professionInfos) {
     this.admissionAuthority = admissionAuthority;
     this.namingAuthority = namingAuthority;
-    this.professionInfos = ParamUtil.requireNonEmpty("professionInfos", professionInfos);
+    this.professionInfos = Args.notEmpty(professionInfos, "professionInfos");
   }
 
   public GeneralName getAdmissionAuthority() {

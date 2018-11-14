@@ -23,7 +23,7 @@ import javax.xml.stream.XMLStreamException;
 
 import org.xipki.ca.mgmt.db.xmlio.DbiXmlWriter;
 import org.xipki.ca.mgmt.db.xmlio.InvalidDataObjectException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -38,8 +38,7 @@ public class RequestCertsWriter extends DbiXmlWriter {
   }
 
   public void add(RequestCertType entry) throws InvalidDataObjectException, XMLStreamException {
-    ParamUtil.requireNonNull("entry", entry);
-    entry.validate();
+    Args.notNull(entry, "entry").validate();
     entry.writeTo(this);
   }
 

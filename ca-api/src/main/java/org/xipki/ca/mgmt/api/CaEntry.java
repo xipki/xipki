@@ -37,7 +37,7 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.CompareUtil;
 import org.xipki.util.ConfPairs;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -111,14 +111,14 @@ public class CaEntry {
 
   public CaEntry(NameId ident, int serialNoBitLen, long nextCrlNumber, String signerType,
       String signerConf, CaUris caUris, int numCrls, int expirationPeriod) {
-    this.ident = ParamUtil.requireNonNull("ident", ident);
-    this.signerType = ParamUtil.requireNonBlankLower("signerType", signerType);
-    this.expirationPeriod = ParamUtil.requireMin("expirationPeriod", expirationPeriod, 0);
-    this.signerConf = ParamUtil.requireNonBlank("signerConf", signerConf);
+    this.ident = Args.notNull(ident, "ident");
+    this.signerType = Args.toNonBlankLower(signerType, "signerType");
+    this.expirationPeriod = Args.notNegative(expirationPeriod, "expirationPeriod");
+    this.signerConf = Args.notBlank(signerConf, "signerConf");
 
-    this.numCrls = ParamUtil.requireMin("numCrls", numCrls, 1);
-    this.serialNoBitLen = ParamUtil.requireRange("serialNoBitLen", serialNoBitLen, 63, 159);
-    this.nextCrlNumber = ParamUtil.requireMin("nextCrlNumber", nextCrlNumber, 1);
+    this.numCrls = Args.positive(numCrls, "numCrls");
+    this.serialNoBitLen = Args.range(serialNoBitLen, "serialNoBitLen", 63, 159);
+    this.nextCrlNumber = Args.positive(nextCrlNumber, "nextCrlNumber");
     this.caUris = (caUris == null) ? CaUris.EMPTY_INSTANCE : caUris;
   }
 
@@ -170,7 +170,7 @@ public class CaEntry {
   }
 
   public void setSignerConf(String signerConf) {
-    this.signerConf = ParamUtil.requireNonBlank("signerConf", signerConf);
+    this.signerConf = Args.notBlank(signerConf, "signerConf");
   }
 
   public String getSignerConf() {
@@ -274,7 +274,7 @@ public class CaEntry {
   }
 
   public void setValidityMode(ValidityMode mode) {
-    this.validityMode = ParamUtil.requireNonNull("mode", mode);
+    this.validityMode = Args.notNull(mode, "mode");
   }
 
   public int getPermission() {
@@ -446,7 +446,7 @@ public class CaEntry {
   }
 
   public void setSerialNoBitLen(int serialNoBitLen) {
-    this.serialNoBitLen = ParamUtil.requireMin("serialNoBitLen", serialNoBitLen, 63);
+    this.serialNoBitLen = Args.min(serialNoBitLen, "serialNoBitLen", 63);
   }
 
   public long getNextCrlNumber() {

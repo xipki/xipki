@@ -19,7 +19,7 @@ package org.xipki.security.pkcs12;
 
 import java.security.SecureRandom;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -34,7 +34,7 @@ public class KeystoreGenerationParameters {
   private SecureRandom random;
 
   public KeystoreGenerationParameters(char[] password) {
-    this.password = ParamUtil.requireNonNull("password", password);
+    this.password = Args.notNull(password, "password");
   }
 
   public SecureRandom getRandom() {

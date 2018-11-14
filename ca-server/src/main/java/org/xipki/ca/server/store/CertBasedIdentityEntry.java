@@ -20,7 +20,7 @@ package org.xipki.ca.server.store;
 import java.util.Arrays;
 
 import org.xipki.util.Base64;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -39,12 +39,10 @@ class CertBasedIdentityEntry {
   private final byte[] cert;
 
   CertBasedIdentityEntry(int id, String subject, String b64Sha1Fp, String b64Cert) {
-    ParamUtil.requireNonBlank("b64Sha1Fp", b64Sha1Fp);
-    ParamUtil.requireNonBlank("b64Cert", b64Cert);
     this.id = id;
     this.subject = subject;
-    this.sha1Fp = Base64.decode(b64Sha1Fp);
-    this.cert = Base64.decode(b64Cert);
+    this.sha1Fp = Base64.decode(Args.notBlank(b64Sha1Fp, "b64Sha1Fp"));
+    this.cert = Base64.decode(Args.notBlank(b64Cert, "b64Cert"));
   }
 
   int getId() {

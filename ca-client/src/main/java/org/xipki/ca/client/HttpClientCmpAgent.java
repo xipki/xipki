@@ -30,7 +30,7 @@ import javax.net.ssl.SSLSocketFactory;
 
 import org.xipki.security.SecurityFactory;
 import org.xipki.util.IoUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -54,7 +54,7 @@ class HttpClientCmpAgent extends ClientCmpAgent {
       String serverUrl, SecurityFactory securityFactory,
       SSLSocketFactory sslSocketFactory, HostnameVerifier hostnameVerifier) {
     super(requestor, responder, securityFactory);
-    ParamUtil.requireNonBlank("serverUrl", serverUrl);
+    Args.notBlank(serverUrl, "serverUrl");
 
     this.sslSocketFactory = sslSocketFactory;
     this.hostnameVerifier = hostnameVerifier;
@@ -67,7 +67,7 @@ class HttpClientCmpAgent extends ClientCmpAgent {
 
   @Override
   public byte[] send(byte[] request) throws IOException {
-    ParamUtil.requireNonNull("request", request);
+    Args.notNull(request, "request");
     HttpURLConnection httpUrlConnection = IoUtil.openHttpConn(serverUrl);
     if (httpUrlConnection instanceof HttpsURLConnection) {
       if (sslSocketFactory != null) {

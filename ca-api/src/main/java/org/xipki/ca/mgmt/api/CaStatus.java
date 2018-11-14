@@ -17,7 +17,7 @@
 
 package org.xipki.ca.mgmt.api;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -41,7 +41,7 @@ public enum CaStatus {
   }
 
   public static CaStatus forName(String status) {
-    ParamUtil.requireNonNull("status", status);
+    Args.notNull(status, "status");
     for (CaStatus value : values()) {
       if (value.status.equalsIgnoreCase(status)) {
         return value;

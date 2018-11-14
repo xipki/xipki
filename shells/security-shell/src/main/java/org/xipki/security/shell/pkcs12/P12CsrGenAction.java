@@ -40,7 +40,7 @@ import org.xipki.security.shell.CsrGenAction;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.ObjectCreationException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -80,7 +80,7 @@ public class P12CsrGenAction extends CsrGenAction {
   @Override
   protected ConcurrentContentSigner getSigner(SignatureAlgoControl signatureAlgoControl)
       throws ObjectCreationException {
-    ParamUtil.requireNonNull("signatureAlgoControl", signatureAlgoControl);
+    Args.notNull(signatureAlgoControl, "signatureAlgoControl");
     char[] pwd;
     try {
       pwd = getPassword();

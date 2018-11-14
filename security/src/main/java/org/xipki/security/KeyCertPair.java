@@ -20,7 +20,7 @@ package org.xipki.security;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -35,8 +35,8 @@ public class KeyCertPair {
   private final X509Certificate certificate;
 
   public KeyCertPair(PrivateKey privateKey, X509Certificate certificate) {
-    this.privateKey = ParamUtil.requireNonNull("privateKey", privateKey);
-    this.certificate = ParamUtil.requireNonNull("certificate", certificate);
+    this.privateKey = Args.notNull(privateKey, "privateKey");
+    this.certificate = Args.notNull(certificate, "certificate");
   }
 
   public PrivateKey getPrivateKey() {

@@ -21,7 +21,7 @@ import java.security.cert.Certificate;
 
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.xipki.security.cmp.PkiStatusInfo;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -38,7 +38,7 @@ public class CertifiedKeyPairOrError {
   private final PkiStatusInfo error;
 
   public CertifiedKeyPairOrError(Certificate certificate, PrivateKeyInfo privateKeyInfo) {
-    this.certificate = ParamUtil.requireNonNull("certificate", certificate);
+    this.certificate = Args.notNull(certificate, "certificate");
     this.privateKeyInfo = privateKeyInfo;
     this.error = null;
   }
@@ -46,7 +46,7 @@ public class CertifiedKeyPairOrError {
   public CertifiedKeyPairOrError(PkiStatusInfo error) {
     this.certificate = null;
     this.privateKeyInfo = null;
-    this.error = ParamUtil.requireNonNull("error", error);
+    this.error = Args.notNull(error, "error");
   }
 
   public Certificate getCertificate() {

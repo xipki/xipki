@@ -43,7 +43,7 @@ import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.xipki.ca.api.profile.CertLevel;
 import org.xipki.ca.api.profile.SubjectDnSpec;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -57,7 +57,7 @@ public class CaUtil {
   }
 
   public static Extensions getExtensions(CertificationRequestInfo csr) {
-    ParamUtil.requireNonNull("csr", csr);
+    Args.notNull(csr, "csr");
     ASN1Set attrs = csr.getAttributes();
     for (int i = 0; i < attrs.size(); i++) {
       Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
@@ -69,7 +69,7 @@ public class CaUtil {
   }
 
   public static String getChallengePassword(CertificationRequestInfo csr) {
-    ParamUtil.requireNonNull("csr", csr);
+    Args.notNull(csr, "csr");
     ASN1Set attrs = csr.getAttributes();
     for (int i = 0; i < attrs.size(); i++) {
       Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
@@ -123,7 +123,7 @@ public class CaUtil {
 
   public static CRLDistPoint createCrlDistributionPoints(List<String> crlUris, X500Name caSubject,
       X500Name crlSignerSubject) {
-    ParamUtil.requireNonEmpty("crlUris", crlUris);
+    Args.notEmpty(crlUris, "crlUris");
     int size = crlUris.size();
     DistributionPoint[] points = new DistributionPoint[1];
 
@@ -147,7 +147,7 @@ public class CaUtil {
   }
 
   public static X500Name sortX509Name(X500Name name) {
-    ParamUtil.requireNonNull("name", name);
+    Args.notNull(name, "name");
     RDN[] requstedRdns = name.getRDNs();
 
     List<RDN> rdns = new LinkedList<>();
@@ -173,8 +173,8 @@ public class CaUtil {
   }
 
   private static RDN[] getRdns(RDN[] rdns, ASN1ObjectIdentifier type) {
-    ParamUtil.requireNonNull("rdns", rdns);
-    ParamUtil.requireNonNull("type", type);
+    Args.notNull(rdns, "rdns");
+    Args.notNull(type, "type");
     List<RDN> ret = new ArrayList<>(1);
     for (int i = 0; i < rdns.length; i++) {
       RDN rdn = rdns[i];

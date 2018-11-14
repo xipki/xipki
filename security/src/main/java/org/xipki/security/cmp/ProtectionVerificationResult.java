@@ -17,7 +17,7 @@
 
 package org.xipki.security.cmp;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -33,7 +33,7 @@ public class ProtectionVerificationResult {
 
   public ProtectionVerificationResult(Object requestor, ProtectionResult protectionResult) {
     this.requestor = requestor;
-    this.protectionResult = ParamUtil.requireNonNull("protectionResult", protectionResult);
+    this.protectionResult = Args.notNull(protectionResult, "protectionResult");
   }
 
   public Object getRequestor() {

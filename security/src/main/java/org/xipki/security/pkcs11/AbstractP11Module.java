@@ -27,7 +27,7 @@ import java.util.Set;
 import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.security.pkcs11.exception.P11UnknownEntityException;
 import org.xipki.util.CompareUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -44,7 +44,7 @@ public abstract class AbstractP11Module implements P11Module {
   private final List<P11SlotIdentifier> slotIds = new ArrayList<>();
 
   public AbstractP11Module(P11ModuleConf conf) {
-    this.conf = ParamUtil.requireNonNull("conf", conf);
+    this.conf = Args.notNull(conf, "conf");
   }
 
   @Override
@@ -74,7 +74,7 @@ public abstract class AbstractP11Module implements P11Module {
   }
 
   public P11Slot getSlot(P11SlotIdentifier slotId) throws P11TokenException {
-    ParamUtil.requireNonNull("slotId", slotId);
+    Args.notNull(slotId, "slotId");
     P11Slot slot = slots.get(slotId);
     if (slot == null) {
       throw new P11UnknownEntityException(slotId);

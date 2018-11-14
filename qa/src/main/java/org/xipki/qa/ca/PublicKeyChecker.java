@@ -44,7 +44,7 @@ import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LruCache;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -68,8 +68,8 @@ public class PublicKeyChecker {
 
   public List<ValidationIssue> checkPublicKey(SubjectPublicKeyInfo publicKey,
       SubjectPublicKeyInfo requestedPublicKey) {
-    ParamUtil.requireNonNull("publicKey", publicKey);
-    ParamUtil.requireNonNull("requestedPublicKey", requestedPublicKey);
+    Args.notNull(publicKey, "publicKey");
+    Args.notNull(requestedPublicKey, "requestedPublicKey");
 
     List<ValidationIssue> resultIssues = new LinkedList<>();
     if (keyAlgorithms != null) {

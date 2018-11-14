@@ -38,7 +38,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.ObjectIdentifiers;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -450,23 +450,19 @@ public class SubjectDnSpec {
   }
 
   public static Range getStringLengthRange(ASN1ObjectIdentifier rdnType) {
-    ParamUtil.requireNonNull("rdnType", rdnType);
-    return RANGES.get(rdnType);
+    return RANGES.get(Args.notNull(rdnType, "rdnType"));
   }
 
   public static Pattern getPattern(ASN1ObjectIdentifier rdnType) {
-    ParamUtil.requireNonNull("rdnType", rdnType);
-    return PATTERNS.get(rdnType);
+    return PATTERNS.get(Args.notNull(rdnType, "rdnType"));
   }
 
   public static StringType getStringType(ASN1ObjectIdentifier rdnType) {
-    ParamUtil.requireNonNull("rdnType", rdnType);
-    return DFLT_STRING_TYPES.get(rdnType);
+    return DFLT_STRING_TYPES.get(Args.notNull(rdnType, "rdnType"));
   }
 
   public static RdnControl getRdnControl(ASN1ObjectIdentifier rdnType) {
-    ParamUtil.requireNonNull("rdnType", rdnType);
-    RdnControl control = CONTROLS.get(rdnType);
+    RdnControl control = CONTROLS.get(Args.notNull(rdnType, "rdnType"));
     if (control == null) {
       // minOccurs = 0, maxOccurs = 9
       control = new RdnControl(rdnType, 0, 9);
@@ -476,7 +472,7 @@ public class SubjectDnSpec {
   } // static
 
   public static void fixRdnControl(RdnControl control) throws CertprofileException {
-    ParamUtil.requireNonNull("control", control);
+    Args.notNull(control, "control");
 
     ASN1ObjectIdentifier type = control.getType();
     StringType stringType = control.getStringType();
@@ -539,7 +535,7 @@ public class SubjectDnSpec {
   }
 
   public static boolean isValidCountryAreaCode(String code) {
-    ParamUtil.requireNonBlank("code", code);
+    Args.notBlank(code, "code");
     return COUNTRY_AREA_CODES.isEmpty() ? true : COUNTRY_AREA_CODES.contains(code.toUpperCase());
   }
 

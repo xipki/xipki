@@ -18,7 +18,7 @@
 package org.xipki.ca.mgmt.api;
 
 import org.xipki.ca.api.NameId;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -40,11 +40,11 @@ public class ChangeUserEntry {
   }
 
   public ChangeUserEntry(NameId ident) throws CaMgmtException {
-    this.ident = ParamUtil.requireNonNull("ident", ident);
+    this.ident = Args.notNull(ident, "ident");
   }
 
   public void setIdent(NameId ident) {
-    this.ident = ParamUtil.requireNonNull("ident", ident);
+    this.ident = Args.notNull(ident, "ident");
   }
 
   public NameId getIdent() {

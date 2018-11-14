@@ -17,7 +17,7 @@
 
 package org.xipki.ca.mgmt.api;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -32,7 +32,7 @@ public enum ValidityMode {
   CUTOFF;
 
   public static ValidityMode forName(String text) {
-    ParamUtil.requireNonNull("text", text);
+    Args.notNull(text, "text");
 
     for (ValidityMode value : values()) {
       if (value.name().equalsIgnoreCase(text)) {

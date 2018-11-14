@@ -19,7 +19,7 @@ package org.xipki.ca.client.api.dto;
 
 import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.ProofOfPossession;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -41,26 +41,21 @@ public class EnrollCertRequestEntry extends IdentifiedObject {
       ProofOfPossession popo) {
     super(id);
 
-    this.certprofile = ParamUtil.requireNonBlank("certprofile", certprofile);
-    this.certReq = ParamUtil.requireNonNull("certReq", certReq);
+    this.certprofile = Args.notBlank(certprofile, "certprofile");
+    this.certReq = Args.notNull(certReq, "certReq");
     this.caGenerateKeypair = false;
-    this.popo = ParamUtil.requireNonNull("popo", popo);
+    this.popo = Args.notNull(popo, "popo");
   }
 
   public EnrollCertRequestEntry(String id, String certprofile, CertRequest certReq,
       ProofOfPossession popo, boolean caGenerateKeypair, boolean kup) {
     super(id);
 
-    if (kup) {
-      this.certprofile = certprofile;
-    } else {
-      this.certprofile = ParamUtil.requireNonBlank("certprofile", certprofile);
-    }
-
-    this.certReq = ParamUtil.requireNonNull("certReq", certReq);
+    this.certprofile = kup ? certprofile : Args.notBlank(certprofile, "certprofile");
+    this.certReq = Args.notNull(certReq, "certReq");
     this.caGenerateKeypair = caGenerateKeypair;
     if (!caGenerateKeypair) {
-      ParamUtil.requireNonNull("popo", popo);
+      Args.notNull(popo, "popo");
     }
     this.popo = popo;
   }

@@ -17,7 +17,7 @@
 
 package org.xipki.security.pkcs11;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -33,7 +33,7 @@ public class P11NewObjectControl {
 
   public P11NewObjectControl(byte[] id, String label) {
     this.id = id;
-    this.label = ParamUtil.requireNonBlank("label", label);
+    this.label = Args.notBlank(label, "label");
   }
 
   public byte[] getId() {

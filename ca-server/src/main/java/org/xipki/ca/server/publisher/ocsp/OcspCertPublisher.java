@@ -44,7 +44,7 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -70,7 +70,7 @@ public class OcspCertPublisher extends CertPublisher {
   @Override
   public void initialize(String conf, PasswordResolver passwordResolver,
       Map<String, String> datasourceConfFiles) throws CertPublisherException {
-    ParamUtil.requireNonNull("conf", conf);
+    Args.notNull(conf, "conf");
 
     ConfPairs pairs = new ConfPairs(conf);
     String str = pairs.value("publish.goodcerts");

@@ -19,7 +19,7 @@ package org.xipki.password.callback;
 
 import org.xipki.password.OBFPasswordService;
 import org.xipki.password.PasswordResolverException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -43,7 +43,7 @@ public class OBFPasswordCallback implements PasswordCallback {
 
   @Override
   public void init(String conf) throws PasswordResolverException {
-    ParamUtil.requireNonBlank("conf", conf);
+    Args.notBlank(conf, "conf");
     this.password = OBFPasswordService.deobfuscate(conf).toCharArray();
   }
 

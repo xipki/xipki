@@ -39,7 +39,7 @@ import org.xipki.security.pkcs11.jaxb.SlotType;
 import org.xipki.security.pkcs11.jaxb.SlotsType;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.InvalidConfException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 import iaik.pkcs.pkcs11.constants.Functions;
@@ -79,8 +79,8 @@ public class P11ModuleConf {
 
   public P11ModuleConf(ModuleType moduleType, MechnanismSetsType mechanismSetsType,
       PasswordResolver passwordResolver) throws InvalidConfException {
-    ParamUtil.requireNonNull("moduleType", moduleType);
-    ParamUtil.requireNonNull("mechanismSetsType", mechanismSetsType);
+    Args.notNull(moduleType, "moduleType");
+    Args.notNull(mechanismSetsType, "mechanismSetsType");
     this.name = moduleType.getName();
     this.readOnly = moduleType.isReadonly();
 
@@ -252,7 +252,7 @@ public class P11ModuleConf {
   }
 
   public boolean isSlotIncluded(P11SlotIdentifier slotId) {
-    ParamUtil.requireNonNull("slotId", slotId);
+    Args.notNull(slotId, "slotId");
     boolean included;
     if (CollectionUtil.isEmpty(includeSlots)) {
       included = true;

@@ -21,7 +21,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -69,12 +69,12 @@ public class CertValidity implements Comparable<CertValidity> {
   }
 
   public CertValidity(int validity, Unit unit) {
-    this.validity = ParamUtil.requireMin("validity", validity, 1);
-    this.unit = ParamUtil.requireNonNull("unit", unit);
+    this.validity = Args.positive(validity, "validity");
+    this.unit = Args.notNull(unit, "unit");
   }
 
   public static CertValidity getInstance(String validityS) {
-    ParamUtil.requireNonBlank("validityS", validityS);
+    Args.notBlank(validityS, "validityS");
 
     final int len = validityS.length();
     final char suffix = validityS.charAt(len - 1);
@@ -109,7 +109,7 @@ public class CertValidity implements Comparable<CertValidity> {
   } // method getInstance
 
   public void setValidity(int validity) {
-    this.validity = ParamUtil.requireMin("validity", validity, 1);
+    this.validity = Args.positive(validity, "validity");
   }
 
   public int getValidity() {
@@ -117,7 +117,7 @@ public class CertValidity implements Comparable<CertValidity> {
   }
 
   public void setUnit(Unit unit) {
-    this.unit = ParamUtil.requireNonNull("unit", unit);
+    this.unit = Args.notNull(unit, "unit");
   }
 
   public Unit getUnit() {
@@ -176,7 +176,7 @@ public class CertValidity implements Comparable<CertValidity> {
 
   @Override
   public int compareTo(CertValidity obj) {
-    ParamUtil.requireNonNull("obj", obj);
+    Args.notNull(obj, "obj");
     if (unit == obj.unit) {
       if (validity == obj.validity) {
         return 0;

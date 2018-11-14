@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -34,7 +34,7 @@ public class RevokeCertRequest {
   private final List<RevokeCertRequestEntry> requestEntries = new LinkedList<>();
 
   public boolean addRequestEntry(RevokeCertRequestEntry requestEntry) {
-    ParamUtil.requireNonNull("requestEntry", requestEntry);
+    Args.notNull(requestEntry, "requestEntry");
     for (RevokeCertRequestEntry re : requestEntries) {
       if (re.getId().equals(requestEntry.getId())) {
         return false;

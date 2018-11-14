@@ -29,7 +29,7 @@ import org.xipki.security.SignerConf;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.Hex;
 import org.xipki.util.ObjectCreationException;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -76,8 +76,8 @@ public class P11UpdateCertAction extends UpdateCertAction {
 
   public static SignerConf getPkcs11SignerConf(String pkcs11ModuleName, Integer slotIndex,
       String keyLabel, byte[] keyId, HashAlgo hashAlgo, SignatureAlgoControl signatureAlgoControl) {
-    ParamUtil.requireNonNull("hashAlgo", hashAlgo);
-    ParamUtil.requireNonNull("slotIndex", slotIndex);
+    Args.notNull(hashAlgo, "hashAlgo");
+    Args.notNull(slotIndex, "slotIndex");
 
     if (keyId == null && keyLabel == null) {
       throw new IllegalArgumentException("at least one of keyId and keyLabel must not be null");

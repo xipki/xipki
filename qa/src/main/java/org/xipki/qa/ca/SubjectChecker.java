@@ -36,7 +36,6 @@ import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.api.BadCertTemplateException;
-import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.RdnControl;
 import org.xipki.ca.api.profile.StringType;
 import org.xipki.ca.api.profile.SubjectControl;
@@ -44,8 +43,8 @@ import org.xipki.ca.api.profile.SubjectDnSpec;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.ParamUtil;
 
 /**
  * TODO.
@@ -57,13 +56,13 @@ public class SubjectChecker {
 
   private final SubjectControl subjectControl;
 
-  public SubjectChecker(SubjectControl subjectControl) throws CertprofileException {
-    this.subjectControl = ParamUtil.requireNonNull("subjectControl", subjectControl);
+  public SubjectChecker(SubjectControl subjectControl) {
+    this.subjectControl = Args.notNull(subjectControl, "subjectControl");
   }
 
   public List<ValidationIssue> checkSubject(X500Name subject, X500Name requestedSubject) {
-    ParamUtil.requireNonNull("subject", subject);
-    ParamUtil.requireNonNull("requestedSubject", requestedSubject);
+    Args.notNull(subject, "subject");
+    Args.notNull(requestedSubject, "requestedSubject");
 
     // collect subject attribute types to check
     Set<ASN1ObjectIdentifier> oids = new HashSet<>();

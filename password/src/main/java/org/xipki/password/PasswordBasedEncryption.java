@@ -26,7 +26,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -58,10 +58,10 @@ public class PasswordBasedEncryption {
    */
   public static byte[] encrypt(PBEAlgo algo, byte[] plaintext, char[] password,
       int iterationCount, byte[] salt) throws GeneralSecurityException {
-    ParamUtil.requireNonNull("plaintext", plaintext);
-    ParamUtil.requireNonNull("password", password);
-    ParamUtil.requireMin("iterationCount", iterationCount, 1);
-    ParamUtil.requireNonNull("salt", salt);
+    Args.notNull(plaintext, "plaintext");
+    Args.notNull(password, "password");
+    Args.positive(iterationCount, "iterationCount");
+    Args.notNull(salt, "salt");
 
     SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(algo.algoName());
 
@@ -93,10 +93,10 @@ public class PasswordBasedEncryption {
 
   public static byte[] decrypt(PBEAlgo algo, byte[] cipherTextWithIv, char[] password,
       int iterationCount, byte[] salt) throws GeneralSecurityException {
-    ParamUtil.requireNonNull("cipherTextWithIv", cipherTextWithIv);
-    ParamUtil.requireNonNull("password", password);
-    ParamUtil.requireMin("iterationCount", iterationCount, 1);
-    ParamUtil.requireNonNull("salt", salt);
+    Args.notNull(cipherTextWithIv, "cipherTextWithIv");
+    Args.notNull(password, "password");
+    Args.positive(iterationCount, "iterationCount");
+    Args.notNull(salt, "salt");
 
     PBEKeySpec pbeKeySpec = new PBEKeySpec(password);
 

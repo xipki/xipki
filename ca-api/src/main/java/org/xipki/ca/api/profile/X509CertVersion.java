@@ -17,7 +17,7 @@
 
 package org.xipki.ca.api.profile;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -42,7 +42,7 @@ public enum X509CertVersion {
   }
 
   public static X509CertVersion forName(String version) {
-    ParamUtil.requireNonNull("version", version);
+    Args.notNull(version, "version");
 
     for (X509CertVersion m : values()) {
       if (m.name().equalsIgnoreCase(version)) {

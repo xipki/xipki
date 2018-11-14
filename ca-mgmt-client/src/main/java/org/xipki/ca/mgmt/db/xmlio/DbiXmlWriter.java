@@ -25,7 +25,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -44,7 +44,7 @@ public class DbiXmlWriter {
   private boolean flushed;
 
   public DbiXmlWriter(String rootElementName, String version) throws XMLStreamException {
-    ParamUtil.requireNonBlank("version", version);
+    Args.notBlank(version, "version");
 
     stream = new ByteArrayOutputStream();
 
@@ -54,13 +54,12 @@ public class DbiXmlWriter {
     writer.writeStartDocument("UTF-8", "1.0");
     writeNewline();
     writer.writeStartElement(rootElementName);
-    writer.writeAttribute("version", version);
+    writer.writeAttribute(version, "version");
     writeNewline();
   }
 
   public void writeStartElement(String localName) throws XMLStreamException {
-    ParamUtil.requireNonNull("localName", localName);
-    writer.writeStartElement(localName);
+    writer.writeStartElement(Args.notNull("localName", localName));
   }
 
   public void writeEndElement() throws XMLStreamException {
@@ -68,8 +67,8 @@ public class DbiXmlWriter {
   }
 
   public void writeElement(String localName, String value) throws XMLStreamException {
-    ParamUtil.requireNonNull("localName", localName);
-    ParamUtil.requireNonNull("value", value);
+    Args.notNull(localName, "localName");
+    Args.notNull(value, "value");
     writer.writeStartElement(localName);
     writer.writeCharacters(value);
     writer.writeEndElement();
@@ -93,7 +92,7 @@ public class DbiXmlWriter {
 
   public void rewriteToZipStream(ZipOutputStream zipStream)
       throws IOException, XMLStreamException {
-    ParamUtil.requireNonNull("zipStream", zipStream);
+    Args.notNull(zipStream, "zipStream");
     flush();
     zipStream.write(stream.toByteArray());
   }

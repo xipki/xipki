@@ -22,7 +22,7 @@ import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -191,7 +191,7 @@ public class KeyParametersOption {
     }
 
     public boolean allowsCurve(ASN1ObjectIdentifier curveOid) {
-      ParamUtil.requireNonNull("curveOid", curveOid);
+      Args.notNull(curveOid, "curveOid");
       return (curveOids == null) ? true : curveOids.contains(curveOid);
     }
 
@@ -228,27 +228,18 @@ public class KeyParametersOption {
     }
 
     public boolean allowsPublicKeyParamSet(ASN1ObjectIdentifier oid) {
-      if (publicKeyParamSets == null) {
-        return true;
-      }
-      ParamUtil.requireNonNull("oid", oid);
-      return publicKeyParamSets.contains(oid);
+      return publicKeyParamSets == null
+          ? true : publicKeyParamSets.contains(Args.notNull(oid, "oid"));
     }
 
     public boolean allowsDigestParamSet(ASN1ObjectIdentifier oid) {
-      if (digestParamSets == null) {
-        return true;
-      }
-      ParamUtil.requireNonNull("oid", oid);
-      return digestParamSets.contains(oid);
+      return digestParamSets == null
+          ?  true : digestParamSets.contains(Args.notNull(oid, "oid"));
     }
 
     public boolean allowsEncryptionParamSet(ASN1ObjectIdentifier oid) {
-      if (encryptionParamSets == null) {
-        return true;
-      }
-      ParamUtil.requireNonNull("oid", oid);
-      return encryptionParamSets.contains(oid);
+      return encryptionParamSets == null
+          ?  true : encryptionParamSets.contains(Args.notNull(oid, "oid"));
     }
 
   } // class GostParametersOption

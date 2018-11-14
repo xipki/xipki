@@ -18,7 +18,7 @@
 package org.xipki.ca.server.scep;
 
 import org.xipki.scep.transaction.FailInfo;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -44,7 +44,7 @@ public class FailInfoException extends Exception {
   private final FailInfo failInfo;
 
   private FailInfoException(FailInfo failInfo) {
-    this.failInfo = ParamUtil.requireNonNull("failInfo", failInfo);
+    this.failInfo = Args.notNull(failInfo, "failInfo");
   }
 
   public FailInfo getFailInfo() {

@@ -32,7 +32,7 @@ import org.bouncycastle.crypto.digests.SHA384Digest;
 import org.bouncycastle.crypto.digests.SHA3Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.crypto.digests.SM3Digest;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -115,7 +115,7 @@ public enum HashAlgo {
   }
 
   public static HashAlgo getInstance(ASN1ObjectIdentifier oid) {
-    ParamUtil.requireNonNull("oid", oid);
+    Args.notNull(oid, "oid");
     for (HashAlgo hashAlgo : values()) {
       if (hashAlgo.oid.equals(oid)) {
         return hashAlgo;

@@ -52,7 +52,7 @@ import org.xipki.ca.mgmt.db.xmlio.ocsp.OcspCertsWriter;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.util.IoUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.ProcessLog;
 import org.xipki.util.XmlUtil;
 
@@ -82,8 +82,8 @@ class OcspCertstoreDbExporter extends DbPorter {
       int numCertsPerSelect, boolean resume, AtomicBoolean stopMe) throws Exception {
     super(datasource, baseDir, stopMe);
 
-    this.numCertsInBundle = ParamUtil.requireMin("numCertsInBundle", numCertsInBundle, 1);
-    this.numCertsPerSelect = ParamUtil.requireMin("numCertsPerSelect", numCertsPerSelect, 1);
+    this.numCertsInBundle = Args.positive(numCertsInBundle, "numCertsInBundle");
+    this.numCertsPerSelect = Args.positive(numCertsPerSelect, "numCertsPerSelect");
 
     JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
     marshaller = jaxbContext.createMarshaller();

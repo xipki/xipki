@@ -31,7 +31,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -71,8 +71,8 @@ public abstract class UnRevRemoveCertAction extends ClientAction {
       caName = caName.toLowerCase();
     }
 
-    ParamUtil.requireNonNull("cert", cert);
-    ParamUtil.requireNonNull("caCert", caCert);
+    Args.notNull(cert, "cert");
+    Args.notNull(caCert, "caCert");
 
     if (!cert.getIssuerX500Principal().equals(caCert.getSubjectX500Principal())) {
       return "the given certificate is not issued by the given issuer";

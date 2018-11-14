@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.security.X509Cert;
 import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -40,7 +40,7 @@ public class P11CryptService {
   private P11Module module;
 
   public P11CryptService(P11Module module) throws P11TokenException {
-    this.module = ParamUtil.requireNonNull("module", module);
+    this.module = Args.notNull(module, "module");
   }
 
   public synchronized void refresh() throws P11TokenException {

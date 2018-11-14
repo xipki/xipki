@@ -19,7 +19,7 @@ package org.xipki.ca.mgmt.api.conf;
 
 import java.math.BigInteger;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -39,8 +39,8 @@ public class GenSelfIssued {
 
   public GenSelfIssued(String profile, byte[] csr, BigInteger serialNumber,
       String certOutputFormat) {
-    this.profile = ParamUtil.requireNonBlank("profile", profile);
-    this.csr = ParamUtil.requireNonNull("csr", csr);
+    this.profile = Args.notBlank(profile, "profile");
+    this.csr = Args.notNull(csr, "csr");
     this.serialNumber = serialNumber;
     this.certOutputFormat = certOutputFormat;
   }

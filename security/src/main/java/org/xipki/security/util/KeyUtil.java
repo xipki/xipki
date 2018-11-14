@@ -71,7 +71,7 @@ import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSAUtil;
 import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.util.BigIntegers;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -89,7 +89,7 @@ public class KeyUtil {
   }
 
   public static KeyStore getKeyStore(String storeType) throws KeyStoreException {
-    ParamUtil.requireNonBlank("storeType", storeType);
+    Args.notBlank(storeType, "storeType");
     if ("JKS".equalsIgnoreCase(storeType) || "JCEKS".equalsIgnoreCase(storeType)) {
       return KeyStore.getInstance(storeType);
     } else {
@@ -154,7 +154,7 @@ public class KeyUtil {
   // CHECKSTYLE:SKIP
   public static DSAPublicKey generateDSAPublicKey(DSAPublicKeySpec keySpec)
       throws InvalidKeySpecException {
-    ParamUtil.requireNonNull("keySpec", keySpec);
+    Args.notNull(keySpec, "keySpec");
     KeyFactory kf = getKeyFactory("DSA");
     synchronized (kf) {
       return (DSAPublicKey) kf.generatePublic(keySpec);
@@ -175,7 +175,7 @@ public class KeyUtil {
   // CHECKSTYLE:SKIP
   public static KeyPair generateECKeypair(ASN1ObjectIdentifier curveId, SecureRandom random)
       throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
-    ParamUtil.requireNonNull("curveId", curveId);
+    Args.notNull(curveId, "curveId");
 
     ECGenParameterSpec spec = new ECGenParameterSpec(curveId.getId());
     KeyPairGenerator kpGen = getKeyPairGenerator("EC");
@@ -231,7 +231,7 @@ public class KeyUtil {
 
   public static PublicKey generatePublicKey(SubjectPublicKeyInfo pkInfo)
       throws NoSuchAlgorithmException, InvalidKeySpecException {
-    ParamUtil.requireNonNull("pkInfo", pkInfo);
+    Args.notNull(pkInfo, "pkInfo");
 
     X509EncodedKeySpec keyspec;
     try {
@@ -261,7 +261,7 @@ public class KeyUtil {
   // CHECKSTYLE:SKIP
   public static RSAPublicKey generateRSAPublicKey(RSAPublicKeySpec keySpec)
       throws InvalidKeySpecException {
-    ParamUtil.requireNonNull("keySpec", keySpec);
+    Args.notNull(keySpec, "keySpec");
     KeyFactory kf = getKeyFactory("RSA");
     synchronized (kf) {
       return (RSAPublicKey) kf.generatePublic(keySpec);
@@ -270,7 +270,7 @@ public class KeyUtil {
 
   public static AsymmetricKeyParameter generatePrivateKeyParameter(PrivateKey key)
       throws InvalidKeyException {
-    ParamUtil.requireNonNull("key", key);
+    Args.notNull(key, "key");
 
     if (key instanceof RSAPrivateCrtKey) {
       RSAPrivateCrtKey rsaKey = (RSAPrivateCrtKey) key;
@@ -292,7 +292,7 @@ public class KeyUtil {
 
   public static AsymmetricKeyParameter generatePublicKeyParameter(PublicKey key)
       throws InvalidKeyException {
-    ParamUtil.requireNonNull("key", key);
+    Args.notNull(key, "key");
 
     if (key instanceof RSAPublicKey) {
       RSAPublicKey rsaKey = (RSAPublicKey) key;
@@ -308,7 +308,7 @@ public class KeyUtil {
 
   public static SubjectPublicKeyInfo createSubjectPublicKeyInfo(PublicKey publicKey)
       throws InvalidKeyException {
-    ParamUtil.requireNonNull("publicKey", publicKey);
+    Args.notNull(publicKey, "publicKey");
 
     if (publicKey instanceof DSAPublicKey) {
       DSAPublicKey dsaPubKey = (DSAPublicKey) publicKey;
@@ -374,8 +374,8 @@ public class KeyUtil {
   // CHECKSTYLE:SKIP
   public static ECPublicKey createECPublicKey(byte[] encodedAlgorithmIdParameters,
       byte[] encodedPoint) throws InvalidKeySpecException {
-    ParamUtil.requireNonNull("encodedAlgorithmIdParameters", encodedAlgorithmIdParameters);
-    ParamUtil.requireNonNull("encodedPoint", encodedPoint);
+    Args.notNull(encodedAlgorithmIdParameters, "encodedAlgorithmIdParameters");
+    Args.notNull(encodedPoint, "encodedPoint");
 
     ASN1Encodable algParams;
     if (encodedAlgorithmIdParameters[0] == 6) {

@@ -19,7 +19,7 @@ package org.xipki.ca.certprofile.xml;
 
 import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
 import org.xipki.ca.certprofile.xml.jaxb.Range2Type;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -39,9 +39,9 @@ class MonetaryValueOption {
 
   public MonetaryValueOption(Iso4217CurrencyCode currency, Range2Type amountRange,
       Range2Type exponentRange) {
-    this.currency = ParamUtil.requireNonNull("currency", currency);
-    this.amountRange = ParamUtil.requireNonNull("amountRange", amountRange);
-    this.exponentRange = ParamUtil.requireNonNull("exponentRange", exponentRange);
+    this.currency = Args.notNull(currency, "currency");
+    this.amountRange = Args.notNull(amountRange, "amountRange");
+    this.exponentRange = Args.notNull(exponentRange, "exponentRange");
 
     this.currencyString = currency.isAlphabetic() ? currency.getAlphabetic().toUpperCase()
         : Integer.toString(currency.getNumeric());

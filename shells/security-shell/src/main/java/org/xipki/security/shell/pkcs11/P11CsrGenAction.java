@@ -31,7 +31,7 @@ import org.xipki.security.shell.CsrGenAction;
 import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.Hex;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -64,7 +64,7 @@ public class P11CsrGenAction extends CsrGenAction {
   @Override
   protected ConcurrentContentSigner getSigner(SignatureAlgoControl signatureAlgoControl)
       throws Exception {
-    ParamUtil.requireNonNull("signatureAlgoControl", signatureAlgoControl);
+    Args.notNull(signatureAlgoControl, "signatureAlgoControl");
 
     byte[] idBytes = null;
     if (id != null) {
@@ -79,8 +79,8 @@ public class P11CsrGenAction extends CsrGenAction {
   public static SignerConf getPkcs11SignerConf(String pkcs11ModuleName, Integer slotIndex,
       String keyLabel, byte[] keyId, int parallelism, HashAlgo hashAlgo,
       SignatureAlgoControl signatureAlgoControl) {
-    ParamUtil.requireMin("parallelism", parallelism, 1);
-    ParamUtil.requireNonNull("hashAlgo", hashAlgo);
+    Args.positive(parallelism, "parallelism");
+    Args.notNull(hashAlgo, "hashAlgo");
 
     if (slotIndex == null) {
       throw new IllegalArgumentException("slotIndex must not be null");

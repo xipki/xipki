@@ -36,7 +36,7 @@ import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xml.sax.SAXException;
 
 /**
@@ -148,7 +148,7 @@ public class DbPorter extends DbToolBase {
       return null;
     }
 
-    ParamUtil.requireNonNull("fileName", fileName);
+    Args.notNull(fileName, "fileName");
 
     FileOrValueType ret = new FileOrValueType();
     if (content.length() < 256) {
@@ -190,7 +190,7 @@ public class DbPorter extends DbToolBase {
       return null;
     }
 
-    ParamUtil.requireNonNull("fileName", fileName);
+    Args.notNull(fileName, "fileName");
 
     FileOrBinaryType ret = new FileOrBinaryType();
     if (content.length < 256) {
@@ -220,7 +220,7 @@ public class DbPorter extends DbToolBase {
   }
 
   public static final Schema retrieveSchema(String schemaPath) throws JAXBException {
-    ParamUtil.requireNonNull("schemaPath", schemaPath);
+    Args.notNull(schemaPath, "schemaPath");
 
     URL schemaUrl = DbPorter.class.getResource(schemaPath);
     final SchemaFactory schemaFact = SchemaFactory.newInstance(
@@ -234,8 +234,8 @@ public class DbPorter extends DbToolBase {
   }
 
   public static void echoToFile(String content, File file) throws IOException {
-    ParamUtil.requireNonNull("content", content);
-    ParamUtil.requireNonNull("file", file);
+    Args.notNull(content, "content");
+    Args.notNull(file, "file");
 
     OutputStream out = null;
     try {

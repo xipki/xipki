@@ -18,7 +18,7 @@
 package org.xipki.ca.client.api.dto;
 
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -34,8 +34,8 @@ public class CsrEnrollCertRequest extends IdentifiedObject {
 
   public CsrEnrollCertRequest(String id, String certprofile, CertificationRequest csr) {
     super(id);
-    this.certprofile = ParamUtil.requireNonBlank("certprofile", certprofile);
-    this.csr = ParamUtil.requireNonNull("csr", csr);
+    this.certprofile = Args.notBlank(certprofile, "certprofile");
+    this.csr = Args.notNull(csr, "csr");
   }
 
   public CertificationRequest getCsr() {

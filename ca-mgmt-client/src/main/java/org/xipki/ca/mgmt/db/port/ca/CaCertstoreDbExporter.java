@@ -70,7 +70,7 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.ProcessLog;
 import org.xipki.util.StringUtil;
 import org.xipki.util.XmlUtil;
@@ -100,8 +100,8 @@ class CaCertstoreDbExporter extends DbPorter {
           throws DataAccessException, JAXBException {
     super(datasource, baseDir, stopMe);
 
-    this.numCertsInBundle = ParamUtil.requireMin("numCertsInBundle", numCertsInBundle, 1);
-    this.numCertsPerSelect = ParamUtil.requireMin("numCertsPerSelect", numCertsPerSelect, 1);
+    this.numCertsInBundle = Args.positive(numCertsInBundle, "numCertsInBundle");
+    this.numCertsPerSelect = Args.positive(numCertsPerSelect, "numCertsPerSelect");
     this.resume = resume;
 
     Schema schema = DbPorter.retrieveSchema("/xsd/dbi-ca.xsd");

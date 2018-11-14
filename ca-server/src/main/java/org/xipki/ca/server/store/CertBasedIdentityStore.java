@@ -20,7 +20,7 @@ package org.xipki.ca.server.store;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -36,8 +36,8 @@ class CertBasedIdentityStore {
   private final List<CertBasedIdentityEntry> entries;
 
   CertBasedIdentityStore(String table, List<CertBasedIdentityEntry> entries) {
-    this.table = ParamUtil.requireNonNull("table", table);
-    ParamUtil.requireNonNull("entries", entries);
+    this.table = Args.notNull(table, "table");
+    Args.notNull(entries, "entries");
     this.entries = new ArrayList<>(entries.size());
 
     for (CertBasedIdentityEntry entry : entries) {
@@ -46,7 +46,7 @@ class CertBasedIdentityStore {
   }
 
   final void addIdentityEntry(CertBasedIdentityEntry entry) {
-    ParamUtil.requireNonNull("entry", entry);
+    Args.notNull(entry, "entry");
 
     for (CertBasedIdentityEntry existingEntry : entries) {
       if (existingEntry.getId() == entry.getId()) {

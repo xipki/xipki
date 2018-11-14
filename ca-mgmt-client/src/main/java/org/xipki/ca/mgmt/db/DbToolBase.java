@@ -42,7 +42,7 @@ import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -69,9 +69,9 @@ public class DbToolBase implements Closeable {
 
   public DbToolBase(DataSourceWrapper datasource, String baseDir, AtomicBoolean stopMe)
       throws DataAccessException {
-    ParamUtil.requireNonBlank("baseDir", baseDir);
-    this.stopMe = ParamUtil.requireNonNull("stopMe", stopMe);
-    this.datasource = ParamUtil.requireNonNull("datasource", datasource);
+    Args.notBlank(baseDir, "baseDir");
+    this.stopMe = Args.notNull(stopMe, "stopMe");
+    this.datasource = Args.notNull(datasource, "datasource");
     this.connection = datasource.getConnection();
     try {
       this.connectionAutoCommit = connection.getAutoCommit();
@@ -172,8 +172,7 @@ public class DbToolBase implements Closeable {
   }
 
   protected DataAccessException translate(String sql, SQLException ex) {
-    ParamUtil.requireNonNull("ex", ex);
-    return datasource.translate(sql, ex);
+    return datasource.translate(sql, Args.notNull(ex, "ex"));
   }
 
   protected void disableAutoCommit() throws DataAccessException {
@@ -194,7 +193,7 @@ public class DbToolBase implements Closeable {
   }
 
   protected void commit(String task) throws DataAccessException {
-    ParamUtil.requireNonBlank("task", task);
+    Args.notBlank(task, "task");
     try {
       connection.commit();
     } catch (SQLException ex) {
@@ -244,8 +243,8 @@ public class DbToolBase implements Closeable {
   }
 
   public static void deleteTmpFiles(String dirName, String prefix) {
-    ParamUtil.requireNonBlank("dirName", dirName);
-    ParamUtil.requireNonBlank("prefix", prefix);
+    Args.notBlank(dirName, "dirName");
+    Args.notBlank(prefix, "prefix");
 
     // delete the temporary files
     File dir = new File(dirName);
@@ -266,8 +265,8 @@ public class DbToolBase implements Closeable {
 
   public static String buildFilename(String prefix, String suffix, long minIdOfCurrentFile,
       long maxIdOfCurrentFile, long maxId) {
-    ParamUtil.requireNonNull("prefix", prefix);
-    ParamUtil.requireNonNull("suffix", suffix);
+    Args.notNull(prefix, "prefix");
+    Args.notNull(suffix, "suffix");
 
     StringBuilder sb = new StringBuilder();
     sb.append(prefix);

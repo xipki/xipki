@@ -35,7 +35,7 @@ import org.xipki.ca.api.OperationException;
 import org.xipki.ca.server.store.CertStore;
 import org.xipki.security.X509Cert;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.ProcessLog;
 
 /**
@@ -64,7 +64,7 @@ class CertRepublisher {
     private final SerialWithId serialWithId;
 
     public SerialWithIdQueueEntry(SerialWithId serialWithId) {
-      this.serialWithId = ParamUtil.requireNonNull("serialWithId", serialWithId);
+      this.serialWithId = Args.notNull(serialWithId, "serialWithId");
     }
 
     public SerialWithId serialWithId() {
@@ -208,13 +208,13 @@ class CertRepublisher {
 
   CertRepublisher(NameId ca, X509Cert caCert, CaIdNameMap caIdNameMap, CertStore certstore,
       List<IdentifiedCertPublisher> publishers, boolean onlyRevokedCerts, int numThreads) {
-    this.ca = ParamUtil.requireNonNull("ca", ca);
-    this.caCert = ParamUtil.requireNonNull("caCert", caCert);
-    this.caIdNameMap = ParamUtil.requireNonNull("caIdNameMap", caIdNameMap);
-    this.certstore = ParamUtil.requireNonNull("certstore", certstore);
-    this.publishers = ParamUtil.requireNonEmpty("publishers", publishers);
+    this.ca = Args.notNull(ca, "ca");
+    this.caCert = Args.notNull(caCert, "caCert");
+    this.caIdNameMap = Args.notNull(caIdNameMap, "caIdNameMap");
+    this.certstore = Args.notNull(certstore, "certstore");
+    this.publishers = Args.notEmpty(publishers, "publishers");
     this.onlyRevokedCerts = onlyRevokedCerts;
-    this.numThreads = ParamUtil.requireMin("numThreads", numThreads, 1);
+    this.numThreads = Args.positive(numThreads, "numThreads");
   }
 
   boolean republish() {

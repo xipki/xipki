@@ -26,7 +26,7 @@ import org.xipki.password.OBFPasswordService;
 import org.xipki.password.PBEAlgo;
 import org.xipki.password.PBEPasswordService;
 import org.xipki.util.IoUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -61,9 +61,9 @@ public class PBEEncryptAction extends SecurityAction {
 
   @Override
   protected Object execute0() throws Exception {
-    ParamUtil.requireRange("iterationCount", iterationCount, 1, 65535);
-    ParamUtil.requireRange("k", quorum, 1, 10);
-    ParamUtil.requireRange("mk", mquorum, 1, 10);
+    Args.range(iterationCount, "iterationCount", 1, 65535);
+    Args.range(quorum, "k", 1, 10);
+    Args.range(mquorum, "mk", 1, 10);
 
     char[] masterPassword;
     if (masterPasswordFile != null) {

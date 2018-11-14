@@ -79,7 +79,7 @@ import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -154,8 +154,8 @@ class IdentifiedCertprofile implements Closeable {
 
   IdentifiedCertprofile(CertprofileEntry dbEntry, Certprofile certprofile)
       throws CertprofileException {
-    this.dbEntry = ParamUtil.requireNonNull("entry", dbEntry);
-    this.certprofile = ParamUtil.requireNonNull("certprofile", certprofile);
+    this.dbEntry = Args.notNull(dbEntry, "dbEntry");
+    this.certprofile = Args.notNull(certprofile, "certprofile");
 
     this.certprofile.initialize(dbEntry.getConf());
   } // constructor
@@ -225,7 +225,7 @@ class IdentifiedCertprofile implements Closeable {
       Extensions requestedExtensions, SubjectPublicKeyInfo publicKeyInfo, PublicCaInfo publicCaInfo,
       X509Certificate crlSignerCert, Date notBefore, Date notAfter)
       throws CertprofileException, BadCertTemplateException {
-    ParamUtil.requireNonNull("publicKeyInfo", publicKeyInfo);
+    Args.notNull(publicKeyInfo, "publicKeyInfo");
     ExtensionValues values = new ExtensionValues();
 
     Map<ASN1ObjectIdentifier, ExtensionControl> controls
@@ -508,8 +508,7 @@ class IdentifiedCertprofile implements Closeable {
 
   public SubjectPublicKeyInfo checkPublicKey(SubjectPublicKeyInfo publicKey)
       throws CertprofileException, BadCertTemplateException {
-    ParamUtil.requireNonNull("publicKey", publicKey);
-    return certprofile.checkPublicKey(publicKey);
+    return certprofile.checkPublicKey(Args.notNull(publicKey, "publicKey"));
   }
 
   public boolean incSerialNumberIfSubjectExists() {

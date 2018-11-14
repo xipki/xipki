@@ -27,7 +27,7 @@ import java.util.Iterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -45,7 +45,7 @@ public class DbPortFileNameIterator implements Iterator<String>, Closeable {
   private String nextFilename;
 
   public DbPortFileNameIterator(String filename) throws IOException {
-    ParamUtil.requireNonNull("filename", filename);
+    Args.notNull(filename, "filename");
 
     this.reader = Files.newBufferedReader(Paths.get(filename));
     this.nextFilename = readNextFilenameLine();

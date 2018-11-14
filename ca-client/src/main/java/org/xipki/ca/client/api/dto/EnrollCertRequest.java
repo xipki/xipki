@@ -22,7 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.bouncycastle.asn1.ASN1Integer;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -46,7 +46,7 @@ public class EnrollCertRequest {
   private final List<EnrollCertRequestEntry> requestEntries = new LinkedList<>();
 
   public EnrollCertRequest(Type type) {
-    this.type = ParamUtil.requireNonNull("type", type);
+    this.type = Args.notNull(type, "type");
   }
 
   public Type getType() {
@@ -54,7 +54,7 @@ public class EnrollCertRequest {
   }
 
   public boolean addRequestEntry(EnrollCertRequestEntry requestEntry) {
-    ParamUtil.requireNonNull("requestEntry", requestEntry);
+    Args.notNull(requestEntry, "requestEntry");
     String id = requestEntry.getId();
     ASN1Integer certReqId = requestEntry.getCertReq().getCertReqId();
     for (EnrollCertRequestEntry re : requestEntries) {

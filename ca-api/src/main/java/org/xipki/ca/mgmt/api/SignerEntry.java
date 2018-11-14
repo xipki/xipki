@@ -24,7 +24,7 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.CompareUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -49,8 +49,8 @@ public class SignerEntry {
   private X509Certificate certificate;
 
   public SignerEntry(String name, String type, String conf, String base64Cert) {
-    this.name = ParamUtil.requireNonBlankLower("name", name);
-    this.type = ParamUtil.requireNonBlankLower("type", type);
+    this.name = Args.toNonBlankLower(name, "name");
+    this.type = Args.toNonBlankLower(type, "type");
     this.conf = conf;
     this.base64Cert = base64Cert;
 

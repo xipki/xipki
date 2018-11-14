@@ -158,7 +158,7 @@ public class IoUtil {
   }
 
   public static String expandFilepath(String path) {
-    ParamUtil.requireNonBlank("path", path);
+    Args.notBlank(path, "path");
     return path.startsWith("~") ? USER_HOME + path.substring(1) : path;
   }
 
@@ -218,7 +218,7 @@ public class IoUtil {
   }
 
   public static HttpURLConnection openHttpConn(URL url) throws IOException {
-    ParamUtil.requireNonNull("url", url);
+    Args.notNull(url, "url");
     URLConnection conn = url.openConnection();
     if (conn instanceof HttpURLConnection) {
       return (HttpURLConnection) conn;

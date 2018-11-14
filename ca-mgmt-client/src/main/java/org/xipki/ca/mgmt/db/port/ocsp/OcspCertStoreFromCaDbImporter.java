@@ -59,7 +59,7 @@ import org.xipki.util.Base64;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.ProcessLog;
 import org.xipki.util.XmlUtil;
 
@@ -85,9 +85,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
       int numCertsPerCommit, boolean resume, AtomicBoolean stopMe) throws Exception {
     super(datasource, srcDir, stopMe);
 
-    ParamUtil.requireNonBlank("publisherName", publisherName);
-    this.publisherName = publisherName.toLowerCase();
-    this.numCertsPerCommit = ParamUtil.requireMin("numCertsPerCommit", numCertsPerCommit, 1);
+    this.publisherName = Args.toNonBlankLower(publisherName, "publisherName");;
+    this.numCertsPerCommit = Args.positive(numCertsPerCommit, "numCertsPerCommit");
 
     JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
     unmarshaller = jaxbContext.createUnmarshaller();

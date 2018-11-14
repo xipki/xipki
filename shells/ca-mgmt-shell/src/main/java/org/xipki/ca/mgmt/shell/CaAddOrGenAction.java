@@ -42,7 +42,7 @@ import org.xipki.password.PasswordResolver;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.completer.YesNoCompleter;
 import org.xipki.util.ConfPairs;
-import org.xipki.util.ParamUtil;
+import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -163,7 +163,7 @@ public abstract class CaAddOrGenAction extends CaAction {
   private PasswordResolver passwordResolver;
 
   protected CaEntry getCaEntry() throws Exception {
-    ParamUtil.requireRange("sn-bitlen", snBitLen, 63, 159);
+    Args.range(snBitLen, "sn-bitlen", 63, 159);
 
     if (nextCrlNumber < 1) {
       throw new IllegalCmdParamException("invalid CRL number: " + nextCrlNumber);
