@@ -27,18 +27,18 @@ import org.xipki.util.Args;
  * @since 2.0.0
  */
 
-public class CmpCertIdOrError {
+public class CertIdOrError {
 
   private final CertId certId;
 
   private final PkiStatusInfo error;
 
-  public CmpCertIdOrError(CertId certId) {
+  public CertIdOrError(CertId certId) {
     this.certId = Args.notNull(certId, "certId");
     this.error = null;
   }
 
-  public CmpCertIdOrError(PkiStatusInfo error) {
+  public CertIdOrError(PkiStatusInfo error) {
     this.certId = null;
     this.error = Args.notNull(error, "error");
   }

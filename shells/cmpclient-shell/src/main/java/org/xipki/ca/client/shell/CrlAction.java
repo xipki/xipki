@@ -23,8 +23,8 @@ import java.util.Set;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.support.completers.FileCompleter;
-import org.xipki.casdk.cmp.CmpCaSdkException;
-import org.xipki.casdk.cmp.PkiErrorException;
+import org.xipki.cmpclient.CmpClientException;
+import org.xipki.cmpclient.PkiErrorException;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.completer.DerPemCompleter;
@@ -49,7 +49,7 @@ public abstract class CrlAction extends ClientAction {
   @Completion(FileCompleter.class)
   protected String outFile;
 
-  protected abstract X509CRL retrieveCrl() throws CmpCaSdkException, PkiErrorException;
+  protected abstract X509CRL retrieveCrl() throws CmpClientException, PkiErrorException;
 
   @Override
   protected Object execute0() throws Exception {
@@ -57,7 +57,7 @@ public abstract class CrlAction extends ClientAction {
       caName = caName.toLowerCase();
     }
 
-    Set<String> caNames = caSdk.getCaNames();
+    Set<String> caNames = client.getCaNames();
     if (isEmpty(caNames)) {
       throw new CmdFailure("no CA is configured");
     }

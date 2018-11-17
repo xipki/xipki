@@ -40,8 +40,8 @@ import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.Time;
-import org.xipki.casdk.cmp.EnrollCertRequest;
-import org.xipki.casdk.cmp.EnrollCertResult;
+import org.xipki.cmpclient.EnrollCertRequest;
+import org.xipki.cmpclient.EnrollCertResult;
 import org.xipki.security.ExtensionExistence;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
@@ -102,7 +102,7 @@ public abstract class UpdateAction extends ClientAction {
       String id, String profile, CertRequest certRequest) throws Exception;
 
   protected EnrollCertResult enroll() throws Exception {
-    Set<String> caNames = caSdk.getCaNames();
+    Set<String> caNames = client.getCaNames();
     if (caName != null) {
       caName = caName.toLowerCase();
       if (!caNames.contains(caName)) {
@@ -173,7 +173,7 @@ public abstract class UpdateAction extends ClientAction {
       Certificate oldCert = X509Util.parseBcCert(new File(oldCertFile));
       oldCertId = new CertId(new GeneralName(oldCert.getIssuer()), oldCert.getSerialNumber());
     } else {
-      X500Name issuer = caSdk.getCaCertSubject(caName);
+      X500Name issuer = client.getCaCertSubject(caName);
       oldCertId = new CertId(new GeneralName(issuer), toBigInt(oldCSerialNumber));
     }
 
@@ -189,7 +189,7 @@ public abstract class UpdateAction extends ClientAction {
     ReqRespDebug debug = getReqRespDebug();
     EnrollCertResult result;
     try {
-      result = caSdk.enrollCerts(caName, request, debug);
+      result = client.enrollCerts(caName, request, debug);
     } finally {
       saveRequestResponse(debug);
     }

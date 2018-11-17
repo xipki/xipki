@@ -27,8 +27,8 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.xipki.casdk.cmp.EnrollCertResult;
-import org.xipki.casdk.cmp.EnrollCertResult.CertifiedKeyPairOrError;
+import org.xipki.cmpclient.EnrollCertResult;
+import org.xipki.cmpclient.EnrollCertResult.CertifiedKeyPairOrError;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.completer.DerPemCompleter;
@@ -88,7 +88,7 @@ public class CsrEnrollCertAction extends ClientAction {
     EnrollCertResult result;
     ReqRespDebug debug = getReqRespDebug();
     try {
-      result = caSdk.enrollCert(caName, csr, profile, notBefore, notAfter, debug);
+      result = client.enrollCert(caName, csr, profile, notBefore, notAfter, debug);
     } finally {
       saveRequestResponse(debug);
     }

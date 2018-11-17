@@ -50,7 +50,7 @@ public class HealthAction extends ClientAction {
       caName = caName.toLowerCase();
     }
 
-    Set<String> caNames = caSdk.getCaNames();
+    Set<String> caNames = client.getCaNames();
     if (isEmpty(caNames)) {
       throw new IllegalCmdParamException("no CA is configured");
     }
@@ -69,7 +69,7 @@ public class HealthAction extends ClientAction {
       }
     }
 
-    HealthCheckResult healthResult = caSdk.getHealthCheckResult(caName);
+    HealthCheckResult healthResult = client.getHealthCheckResult(caName);
     String str = StringUtil.concat("healthy status for CA ", caName, ": ",
         (healthResult.isHealthy() ? "healthy" : "not healthy"));
     if (verbose) {

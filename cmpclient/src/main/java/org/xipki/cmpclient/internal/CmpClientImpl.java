@@ -69,7 +69,7 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.cmpclient.CertprofileInfo;
-import org.xipki.cmpclient.CmpCertIdOrError;
+import org.xipki.cmpclient.CertIdOrError;
 import org.xipki.cmpclient.CmpClient;
 import org.xipki.cmpclient.CmpClientException;
 import org.xipki.cmpclient.EnrollCertRequest;
@@ -680,7 +680,7 @@ public final class CmpClientImpl implements CmpClient {
   }
 
   @Override
-  public CmpCertIdOrError revokeCert(String caName, X509Certificate cert, int reason,
+  public CertIdOrError revokeCert(String caName, X509Certificate cert, int reason,
       Date invalidityDate, ReqRespDebug debug) throws CmpClientException, PkiErrorException {
     Args.notNull(cert, "cert");
     initIfNotInitialized();
@@ -690,14 +690,14 @@ public final class CmpClientImpl implements CmpClient {
   }
 
   @Override
-  public CmpCertIdOrError revokeCert(String caName, BigInteger serial, int reason, Date invalidityDate,
+  public CertIdOrError revokeCert(String caName, BigInteger serial, int reason, Date invalidityDate,
       ReqRespDebug debug) throws CmpClientException, PkiErrorException {
     initIfNotInitialized();
     CaConf ca = getCa(caName);
     return revokeCert(ca, serial, reason, invalidityDate, debug);
   }
 
-  private CmpCertIdOrError revokeCert(CaConf ca, BigInteger serial, int reason,
+  private CertIdOrError revokeCert(CaConf ca, BigInteger serial, int reason,
       Date invalidityDate, ReqRespDebug debug) throws CmpClientException, PkiErrorException {
     Args.notNull(ca, "ca");
     Args.notNull(serial, "serial");
@@ -711,12 +711,12 @@ public final class CmpClientImpl implements CmpClient {
 
     RevokeCertRequest request = new RevokeCertRequest();
     request.addRequestEntry(entry);
-    Map<String, CmpCertIdOrError> result = revokeCerts(request, debug);
+    Map<String, CertIdOrError> result = revokeCerts(request, debug);
     return (result == null) ? null : result.get(id);
   }
 
   @Override
-  public Map<String, CmpCertIdOrError> revokeCerts(RevokeCertRequest request, ReqRespDebug debug)
+  public Map<String, CertIdOrError> revokeCerts(RevokeCertRequest request, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     List<RevokeCertRequest.Entry> requestEntries =
           Args.notNull(request, "request").getRequestEntries();
@@ -750,18 +750,18 @@ public final class CmpClientImpl implements CmpClient {
     return parseRevokeCertResult(result);
   }
 
-  private Map<String, CmpCertIdOrError> parseRevokeCertResult(RevokeCertResponse result)
+  private Map<String, CertIdOrError> parseRevokeCertResult(RevokeCertResponse result)
       throws CmpClientException {
-    Map<String, CmpCertIdOrError> ret = new HashMap<>();
+    Map<String, CertIdOrError> ret = new HashMap<>();
 
     for (ResultEntry re : result.getResultEntries()) {
-      CmpCertIdOrError certIdOrError;
+      CertIdOrError certIdOrError;
       if (re instanceof ResultEntry.RevokeCert) {
         ResultEntry.RevokeCert entry = (ResultEntry.RevokeCert) re;
-        certIdOrError = new CmpCertIdOrError(entry.getCertId());
+        certIdOrError = new CertIdOrError(entry.getCertId());
       } else if (re instanceof ResultEntry.Error) {
         ResultEntry.Error entry = (ResultEntry.Error) re;
-        certIdOrError = new CmpCertIdOrError(entry.getStatusInfo());
+        certIdOrError = new CertIdOrError(entry.getStatusInfo());
       } else {
         throw new CmpClientException("unknown type " + re.getClass().getName());
       }
@@ -908,7 +908,7 @@ public final class CmpClientImpl implements CmpClient {
   } // method verify
 
   @Override
-  public CmpCertIdOrError unrevokeCert(String caName, X509Certificate cert, ReqRespDebug debug)
+  public CertIdOrError unrevokeCert(String caName, X509Certificate cert, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     Args.notNull(cert, "cert");
     initIfNotInitialized();
@@ -919,14 +919,14 @@ public final class CmpClientImpl implements CmpClient {
   }
 
   @Override
-  public CmpCertIdOrError unrevokeCert(String caName, BigInteger serial, ReqRespDebug debug)
+  public CertIdOrError unrevokeCert(String caName, BigInteger serial, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     initIfNotInitialized();
     CaConf ca = getCa(caName);
     return unrevokeCert(ca, serial, debug);
   }
 
-  private CmpCertIdOrError unrevokeCert(CaConf ca, BigInteger serial, ReqRespDebug debug)
+  private CertIdOrError unrevokeCert(CaConf ca, BigInteger serial, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     Args.notNull(ca, "ca");
     Args.notNull(serial, "serial");
@@ -942,12 +942,12 @@ public final class CmpClientImpl implements CmpClient {
         entry.getId(), entry.getIssuer(), entry.getSerialNumber());
     entry2.setAuthorityKeyIdentifier(entry.getAuthorityKeyIdentifier());
     request.addRequestEntry(entry2);
-    Map<String, CmpCertIdOrError> result = unrevokeCerts(request, debug);
+    Map<String, CertIdOrError> result = unrevokeCerts(request, debug);
     return (result == null) ? null : result.get(id);
   }
 
   @Override
-  public Map<String, CmpCertIdOrError> unrevokeCerts(UnrevokeOrRemoveCertRequest request,
+  public Map<String, CertIdOrError> unrevokeCerts(UnrevokeOrRemoveCertRequest request,
       ReqRespDebug debug) throws CmpClientException, PkiErrorException {
     Args.notNull(request, "request");
 
@@ -972,7 +972,7 @@ public final class CmpClientImpl implements CmpClient {
   } // method unrevokeCerts
 
   @Override
-  public CmpCertIdOrError removeCert(String caName, X509Certificate cert, ReqRespDebug debug)
+  public CertIdOrError removeCert(String caName, X509Certificate cert, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     Args.notNull(cert, "cert");
     initIfNotInitialized();
@@ -982,14 +982,14 @@ public final class CmpClientImpl implements CmpClient {
   }
 
   @Override
-  public CmpCertIdOrError removeCert(String caName, BigInteger serial, ReqRespDebug debug)
+  public CertIdOrError removeCert(String caName, BigInteger serial, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     initIfNotInitialized();
     CaConf ca = getCa(caName);
     return removeCert(ca, serial, debug);
   }
 
-  private CmpCertIdOrError removeCert(CaConf ca, BigInteger serial, ReqRespDebug debug)
+  private CertIdOrError removeCert(CaConf ca, BigInteger serial, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     Args.notNull(ca, "ca");
     Args.notNull(serial, "serial");
@@ -1002,12 +1002,12 @@ public final class CmpClientImpl implements CmpClient {
 
     UnrevokeOrRemoveCertRequest request = new UnrevokeOrRemoveCertRequest();
     request.addRequestEntry(entry);
-    Map<String, CmpCertIdOrError> result = removeCerts(request, debug);
+    Map<String, CertIdOrError> result = removeCerts(request, debug);
     return (result == null) ? null : result.get(id);
   }
 
   @Override
-  public Map<String, CmpCertIdOrError> removeCerts(UnrevokeOrRemoveCertRequest request,
+  public Map<String, CertIdOrError> removeCerts(UnrevokeOrRemoveCertRequest request,
       ReqRespDebug debug) throws CmpClientException, PkiErrorException {
     Args.notNull(request, "request");
 

@@ -29,8 +29,8 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x509.Extension;
-import org.xipki.casdk.cmp.CmpCaSdkException;
-import org.xipki.casdk.cmp.PkiErrorException;
+import org.xipki.cmpclient.CmpClientException;
+import org.xipki.cmpclient.PkiErrorException;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.ReqRespDebug;
@@ -55,10 +55,10 @@ public class GetCrlAction extends CrlAction {
   private String baseCrlOut;
 
   @Override
-  protected X509CRL retrieveCrl() throws CmpCaSdkException, PkiErrorException {
+  protected X509CRL retrieveCrl() throws CmpClientException, PkiErrorException {
     ReqRespDebug debug = getReqRespDebug();
     try {
-      return caSdk.downloadCrl(caName, debug);
+      return client.downloadCrl(caName, debug);
     } finally {
       saveRequestResponse(debug);
     }
@@ -70,7 +70,7 @@ public class GetCrlAction extends CrlAction {
       caName = caName.toLowerCase();
     }
 
-    Set<String> caNames = caSdk.getCaNames();
+    Set<String> caNames = client.getCaNames();
     if (isEmpty(caNames)) {
       throw new IllegalCmdParamException("no CA is configured");
     }
@@ -120,7 +120,7 @@ public class GetCrlAction extends CrlAction {
 
     ReqRespDebug debug = getReqRespDebug();
     try {
-      crl = caSdk.downloadCrl(caName, baseCrlNumber, debug);
+      crl = client.downloadCrl(caName, baseCrlNumber, debug);
     } catch (PkiErrorException ex) {
       throw new CmdFailure("received no baseCRL from server: " + ex.getMessage());
     } finally {

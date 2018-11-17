@@ -23,7 +23,7 @@
     <artifactId>xipki-parent</artifactId>
     <version>5.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>cmp-client</artifactId>
+  <artifactId>cmpclient</artifactId>
   <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>

@@ -47,8 +47,8 @@ import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.completer.HashAlgCompleter;
 import org.xipki.shell.completer.SigAlgCompleter;
-import org.xipki.util.DateUtil;
 import org.xipki.util.Args;
+import org.xipki.util.DateUtil;
 
 /**
  * TODO.

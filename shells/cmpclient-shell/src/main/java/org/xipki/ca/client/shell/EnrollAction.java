@@ -50,8 +50,8 @@ import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
 import org.bouncycastle.asn1.x509.qualified.MonetaryValue;
 import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
-import org.xipki.casdk.cmp.EnrollCertRequest;
-import org.xipki.casdk.cmp.EnrollCertResult;
+import org.xipki.cmpclient.EnrollCertRequest;
+import org.xipki.cmpclient.EnrollCertResult;
 import org.xipki.security.ExtensionExistence;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
@@ -329,7 +329,7 @@ public abstract class EnrollAction extends ClientAction {
     ReqRespDebug debug = getReqRespDebug();
     EnrollCertResult result;
     try {
-      result = caSdk.enrollCerts(caName, request, debug);
+      result = client.enrollCerts(caName, request, debug);
     } finally {
       saveRequestResponse(debug);
     }

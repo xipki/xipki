@@ -58,7 +58,7 @@ public class GetCaCertAction extends ClientAction {
       caName = caName.toLowerCase();
     }
 
-    Set<String> caNames = caSdk.getCaNames();
+    Set<String> caNames = client.getCaNames();
     if (isEmpty(caNames)) {
       throw new CmdFailure("no CA is configured");
     }
@@ -79,7 +79,7 @@ public class GetCaCertAction extends ClientAction {
 
     Certificate caCert;
     try {
-      caCert = caSdk.getCaCert(caName);
+      caCert = client.getCaCert(caName);
     } catch (Exception ex) {
       throw new CmdFailure("Error while retrieving CA certificate: " + ex.getMessage());
     }

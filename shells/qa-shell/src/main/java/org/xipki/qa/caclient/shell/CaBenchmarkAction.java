@@ -18,7 +18,7 @@
 package org.xipki.qa.caclient.shell;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
-import org.xipki.cmpclient.CmpCaSdk;
+import org.xipki.cmpclient.CmpClient;
 import org.xipki.shell.XiAction;
 
 /**
@@ -30,7 +30,7 @@ import org.xipki.shell.XiAction;
 public abstract class CaBenchmarkAction extends XiAction {
 
   @Reference
-  protected CmpCaSdk caSdk;
+  protected CmpClient client;
 
   protected CaBenchmarkAction() {
   }

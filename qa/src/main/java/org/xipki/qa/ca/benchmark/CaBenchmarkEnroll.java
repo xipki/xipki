@@ -31,13 +31,13 @@ import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.casdk.cmp.CmpCaSdk;
-import org.xipki.casdk.cmp.CmpCaSdkException;
-import org.xipki.casdk.cmp.EnrollCertRequest;
-import org.xipki.casdk.cmp.EnrollCertRequest.EnrollType;
-import org.xipki.casdk.cmp.EnrollCertResult;
-import org.xipki.casdk.cmp.EnrollCertResult.CertifiedKeyPairOrError;
-import org.xipki.casdk.cmp.PkiErrorException;
+import org.xipki.cmpclient.CmpClient;
+import org.xipki.cmpclient.CmpClientException;
+import org.xipki.cmpclient.EnrollCertRequest;
+import org.xipki.cmpclient.EnrollCertRequest.EnrollType;
+import org.xipki.cmpclient.EnrollCertResult;
+import org.xipki.cmpclient.EnrollCertResult.CertifiedKeyPairOrError;
+import org.xipki.cmpclient.PkiErrorException;
 import org.xipki.util.Args;
 import org.xipki.util.BenchmarkExecutor;
 
@@ -53,7 +53,7 @@ public class CaBenchmarkEnroll extends BenchmarkExecutor {
 
   private static final Logger LOG = LoggerFactory.getLogger(CaBenchmarkEnroll.class);
 
-  private final CmpCaSdk caSdk;
+  private final CmpClient client;
 
   private final BenchmarkEntry benchmarkEntry;
 
@@ -65,13 +65,13 @@ public class CaBenchmarkEnroll extends BenchmarkExecutor {
 
   private AtomicInteger processedRequests = new AtomicInteger(0);
 
-  public CaBenchmarkEnroll(CmpCaSdk caClient, BenchmarkEntry benchmarkEntry, int maxRequests,
+  public CaBenchmarkEnroll(CmpClient client, BenchmarkEntry benchmarkEntry, int maxRequests,
       int num, String description) {
     super(description);
     this.maxRequests = maxRequests;
     this.num = Args.positive(num, "num");
     this.benchmarkEntry = Args.notNull(benchmarkEntry, "benchmarkEntry");
-    this.caSdk = Args.notNull(caClient, "caSdk");
+    this.client = Args.notNull(client, "client");
     this.index = new AtomicLong(getSecureIndex());
   }
 
@@ -100,8 +100,8 @@ public class CaBenchmarkEnroll extends BenchmarkExecutor {
           request.addRequestEntry(requestEntry);
         }
 
-        result = caSdk.enrollCerts(null, request, null);
-      } catch (CmpCaSdkException | PkiErrorException ex) {
+        result = client.enrollCerts(null, request, null);
+      } catch (CmpClientException | PkiErrorException ex) {
         LOG.warn("{}: {}", ex.getClass().getName(), ex.getMessage());
         return false;
       } catch (Throwable th) {

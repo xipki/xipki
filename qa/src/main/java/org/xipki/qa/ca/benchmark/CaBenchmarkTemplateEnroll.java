@@ -44,13 +44,13 @@ import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.casdk.cmp.CmpCaSdk;
-import org.xipki.casdk.cmp.CmpCaSdkException;
-import org.xipki.casdk.cmp.EnrollCertRequest;
-import org.xipki.casdk.cmp.EnrollCertRequest.EnrollType;
-import org.xipki.casdk.cmp.EnrollCertResult;
-import org.xipki.casdk.cmp.EnrollCertResult.CertifiedKeyPairOrError;
-import org.xipki.casdk.cmp.PkiErrorException;
+import org.xipki.cmpclient.CmpClient;
+import org.xipki.cmpclient.CmpClientException;
+import org.xipki.cmpclient.EnrollCertRequest;
+import org.xipki.cmpclient.EnrollCertRequest.EnrollType;
+import org.xipki.cmpclient.EnrollCertResult;
+import org.xipki.cmpclient.EnrollCertResult.CertifiedKeyPairOrError;
+import org.xipki.cmpclient.PkiErrorException;
 import org.xipki.qa.ca.benchmark.jaxb.EnrollCertType;
 import org.xipki.qa.ca.benchmark.jaxb.EnrollTemplateType;
 import org.xipki.util.Args;
@@ -107,8 +107,8 @@ public class CaBenchmarkTemplateEnroll extends BenchmarkExecutor {
           request.addRequestEntry(requestEntry);
         }
 
-        result = caSdk.enrollCerts(null, request, null);
-      } catch (CmpCaSdkException | PkiErrorException ex) {
+        result = client.enrollCerts(null, request, null);
+      } catch (CmpClientException | PkiErrorException ex) {
         LOG.warn("{}: {}", ex.getClass().getName(), ex.getMessage());
         return false;
       } catch (Throwable th) {
@@ -147,7 +147,7 @@ public class CaBenchmarkTemplateEnroll extends BenchmarkExecutor {
 
   private static Unmarshaller jaxbUnmarshaller;
 
-  private final CmpCaSdk caSdk;
+  private final CmpClient client;
 
   private final List<BenchmarkEntry> benchmarkEntries;
 
@@ -159,13 +159,13 @@ public class CaBenchmarkTemplateEnroll extends BenchmarkExecutor {
 
   private final AtomicLong index;
 
-  public CaBenchmarkTemplateEnroll(CmpCaSdk caSdk, EnrollTemplateType template,
+  public CaBenchmarkTemplateEnroll(CmpClient client, EnrollTemplateType template,
       int maxRequests, String description) throws Exception {
     super(description);
 
     Args.notNull(template, "template");
     this.maxRequests = maxRequests;
-    this.caSdk = Args.notNull(caSdk, "caSdk");
+    this.client = Args.notNull(client, "client");
 
     Calendar baseTime = Calendar.getInstance(Locale.UK);
     baseTime.set(Calendar.YEAR, 2014);

@@ -21,8 +21,8 @@ import java.security.cert.X509CRL;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.casdk.cmp.CmpCaSdkException;
-import org.xipki.casdk.cmp.PkiErrorException;
+import org.xipki.cmpclient.CmpClientException;
+import org.xipki.cmpclient.PkiErrorException;
 import org.xipki.util.ReqRespDebug;
 
 /**
@@ -36,10 +36,10 @@ import org.xipki.util.ReqRespDebug;
 public class GenCrlAction extends CrlAction {
 
   @Override
-  protected X509CRL retrieveCrl() throws CmpCaSdkException, PkiErrorException {
+  protected X509CRL retrieveCrl() throws CmpClientException, PkiErrorException {
     ReqRespDebug debug = getReqRespDebug();
     try {
-      return caSdk.generateCrl(caName, debug);
+      return client.generateCrl(caName, debug);
     } finally {
       saveRequestResponse(debug);
     }

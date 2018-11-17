@@ -23,9 +23,9 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.StringsCompleter;
 import org.xipki.qa.ca.benchmark.BenchmarkEntry;
+import org.xipki.qa.ca.benchmark.BenchmarkEntry.RandomDn;
 import org.xipki.qa.ca.benchmark.CaBenchmarkEnroll;
 import org.xipki.qa.ca.benchmark.KeyEntry;
-import org.xipki.qa.ca.benchmark.BenchmarkEntry.RandomDn;
 import org.xipki.qa.ca.benchmark.KeyEntry.DSAKeyEntry;
 import org.xipki.qa.ca.benchmark.KeyEntry.ECKeyEntry;
 import org.xipki.qa.ca.benchmark.KeyEntry.RSAKeyEntry;
@@ -112,7 +112,7 @@ public class CaBenchmarkEnrollAction extends CaBenchmarkAction {
 
     BenchmarkEntry benchmarkEntry = new BenchmarkEntry(certprofile, keyEntry, subjectTemplate,
         randomDn);
-    CaBenchmarkEnroll benchmark = new CaBenchmarkEnroll(caSdk, benchmarkEntry, maxRequests, num,
+    CaBenchmarkEnroll benchmark = new CaBenchmarkEnroll(client, benchmarkEntry, maxRequests, num,
         description);
 
     benchmark.setDuration(duration);

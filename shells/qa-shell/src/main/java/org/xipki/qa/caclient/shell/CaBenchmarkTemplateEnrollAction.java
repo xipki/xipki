@@ -25,8 +25,8 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
-import org.xipki.qa.ca.benchmark.jaxb.EnrollTemplateType;
 import org.xipki.qa.ca.benchmark.CaBenchmarkTemplateEnroll;
+import org.xipki.qa.ca.benchmark.jaxb.EnrollTemplateType;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.StringUtil;
 
@@ -67,7 +67,7 @@ public class CaBenchmarkTemplateEnrollAction extends CaBenchmarkAction {
     String description = StringUtil.concatObjectsCap(200, "template: ", templateFile,
         "\nmaxRequests: ", maxRequests, "\n");
 
-    CaBenchmarkTemplateEnroll loadTest = new CaBenchmarkTemplateEnroll(caSdk, template,
+    CaBenchmarkTemplateEnroll loadTest = new CaBenchmarkTemplateEnroll(client, template,
         maxRequests, description);
     loadTest.setDuration(duration);
     loadTest.setThreads(numThreads);

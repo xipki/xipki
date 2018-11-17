@@ -115,7 +115,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  CmpCertIdOrError revokeCert(String caName, BigInteger serial, int reason, Date invalidityTime,
+  CertIdOrError revokeCert(String caName, BigInteger serial, int reason, Date invalidityTime,
       ReqRespDebug debug) throws CmpClientException, PkiErrorException;
 
   /**
@@ -138,7 +138,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  CmpCertIdOrError revokeCert(String caName, X509Certificate cert, int reason, Date invalidityTime,
+  CertIdOrError revokeCert(String caName, X509Certificate cert, int reason, Date invalidityTime,
       ReqRespDebug debug) throws CmpClientException, PkiErrorException;
 
   /**
@@ -154,7 +154,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  Map<String, CmpCertIdOrError> revokeCerts(RevokeCertRequest request, ReqRespDebug debug)
+  Map<String, CertIdOrError> revokeCerts(RevokeCertRequest request, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException;
 
   /**
@@ -231,7 +231,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  CmpCertIdOrError unrevokeCert(String caName, BigInteger serial, ReqRespDebug debug)
+  CertIdOrError unrevokeCert(String caName, BigInteger serial, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException;
 
   /**
@@ -249,7 +249,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  CmpCertIdOrError unrevokeCert(String caName, X509Certificate cert, ReqRespDebug debug)
+  CertIdOrError unrevokeCert(String caName, X509Certificate cert, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException;
 
   /**
@@ -264,7 +264,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  Map<String, CmpCertIdOrError> unrevokeCerts(UnrevokeOrRemoveCertRequest request, ReqRespDebug debug)
+  Map<String, CertIdOrError> unrevokeCerts(UnrevokeOrRemoveCertRequest request, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException;
 
   /**
@@ -282,7 +282,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  CmpCertIdOrError removeCert(String caName, BigInteger serial, ReqRespDebug debug)
+  CertIdOrError removeCert(String caName, BigInteger serial, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException;
 
   /**
@@ -300,7 +300,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  CmpCertIdOrError removeCert(String caName, X509Certificate cert, ReqRespDebug debug)
+  CertIdOrError removeCert(String caName, X509Certificate cert, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException;
 
   /**
@@ -315,7 +315,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  Map<String, CmpCertIdOrError> removeCerts(UnrevokeOrRemoveCertRequest request, ReqRespDebug debug)
+  Map<String, CertIdOrError> removeCerts(UnrevokeOrRemoveCertRequest request, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException;
 
   /**

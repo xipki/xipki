@@ -22,7 +22,7 @@ import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.casdk.cmp.CertIdOrError;
+import org.xipki.cmpclient.CertIdOrError;
 import org.xipki.security.cmp.PkiStatusInfo;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
@@ -50,9 +50,9 @@ public class RemoveCertAction extends UnRevRemoveCertAction {
     try {
       if (certFile != null) {
         X509Certificate cert = X509Util.parseCert(new File(certFile));
-        certIdOrError = caSdk.removeCert(caName, cert, debug);
+        certIdOrError = client.removeCert(caName, cert, debug);
       } else {
-        certIdOrError = caSdk.removeCert(caName, getSerialNumber(), debug);
+        certIdOrError = client.removeCert(caName, getSerialNumber(), debug);
       }
     } finally {
       saveRequestResponse(debug);

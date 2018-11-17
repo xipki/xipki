@@ -23,7 +23,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.support.completers.FileCompleter;
-import org.xipki.casdk.cmp.CmpCaSdk;
+import org.xipki.cmpclient.CmpClient;
 import org.xipki.shell.XiAction;
 import org.xipki.util.IoUtil;
 import org.xipki.util.ReqRespDebug;
@@ -38,7 +38,7 @@ import org.xipki.util.ReqRespDebug.ReqRespPair;
 public abstract class ClientAction extends XiAction {
 
   @Reference
-  protected CmpCaSdk caSdk;
+  protected CmpClient client;
 
   @Option(name = "--req-out", description = "where to save the request")
   @Completion(FileCompleter.class)

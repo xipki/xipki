@@ -32,7 +32,7 @@ public class ClientInitAction extends ClientAction {
 
   @Override
   protected Object execute0() throws Exception {
-    boolean succ = caSdk.init();
+    boolean succ = client.init();
     if (succ) {
       println("CA client initialized successfully");
     } else {

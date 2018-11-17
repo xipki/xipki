@@ -22,8 +22,8 @@ import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.casdk.cmp.CmpCaSdk;
-import org.xipki.casdk.cmp.CmpCaSdkException;
+import org.xipki.cmpclient.CmpClient;
+import org.xipki.cmpclient.CmpClientException;
 import org.xipki.shell.completer.AbstractDynamicEnumCompleter;
 
 /**
@@ -36,13 +36,13 @@ import org.xipki.shell.completer.AbstractDynamicEnumCompleter;
 public class CaNameCompleter extends AbstractDynamicEnumCompleter {
 
   @Reference
-  protected CmpCaSdk caSdk;
+  protected CmpClient client;
 
   @Override
   protected Set<String> getEnums() {
     try {
-      return caSdk.getCaNames();
-    } catch (CmpCaSdkException ex) {
+      return client.getCaNames();
+    } catch (CmpClientException ex) {
       return Collections.emptySet();
     }
   }

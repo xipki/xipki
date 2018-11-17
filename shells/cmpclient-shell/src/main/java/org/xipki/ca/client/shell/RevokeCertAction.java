@@ -25,7 +25,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.casdk.cmp.CertIdOrError;
+import org.xipki.cmpclient.CertIdOrError;
 import org.xipki.security.CrlReason;
 import org.xipki.security.cmp.PkiStatusInfo;
 import org.xipki.security.util.X509Util;
@@ -75,10 +75,10 @@ public class RevokeCertAction extends UnRevRemoveCertAction {
     try {
       if (certFile != null) {
         X509Certificate cert = X509Util.parseCert(new File(certFile));
-        certIdOrError = caSdk.revokeCert(caName, cert, crlReason.getCode(), invalidityDate,
+        certIdOrError = client.revokeCert(caName, cert, crlReason.getCode(), invalidityDate,
             debug);
       } else {
-        certIdOrError = caSdk.revokeCert(caName, getSerialNumber(), crlReason.getCode(),
+        certIdOrError = client.revokeCert(caName, getSerialNumber(), crlReason.getCode(),
             invalidityDate, debug);
       }
     } finally {

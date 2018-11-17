@@ -76,7 +76,7 @@
     <module>password</module>
     <module>security</module>
     <!-- PKI SDK/Client -->
-    <module>ca-sdk</module>
+    <module>cmpclient</module>
     <module>ocsp-client</module>
     <!-- PKI -->
     <module>ca-api</module>
