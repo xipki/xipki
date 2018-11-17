@@ -22,10 +22,10 @@
     </cm:default-properties>
   </cm:property-placeholder>
   <reference id="securityFactory" interface="org.xipki.security.SecurityFactory"/>
-  <bean id="caSdk" class="org.xipki.cmpclient.internal.CmpCaSdkImpl"
+  <bean id="cmpClient" class="org.xipki.cmpclient.internal.CmpClientImpl"
       destroy-method="close">
     <property name="securityFactory" ref="securityFactory"/>
     <property name="confFile" value="${confFile}"/>
   </bean>
-  <service ref="caClient" interface="org.xipki.cmpclient.CmpCaClient"/>
+  <service ref="cmpClient" interface="org.xipki.cmpclient.CmpClient"/>
 </blueprint>

@@ -41,7 +41,7 @@ echo "#################################################################"
 echo "#              Manage certificate with RA Client                #"
 echo "#################################################################"
 
-xi:init-caclient
+xi:cmp-init
 
 echo "Sleeping 1 second"
 sleep 1

@@ -26,7 +26,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
  * @since 2.0.0
  */
 
-@Command(scope = "xi", name = "init-caclient", description = "initialize CA client")
+@Command(scope = "xi", name = "cmp-init", description = "initialize CMP client")
 @Service
 public class ClientInitAction extends ClientAction {
 

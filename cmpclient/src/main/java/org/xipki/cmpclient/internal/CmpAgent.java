@@ -249,7 +249,7 @@ class CmpAgent {
     this.recipientName = (X500Name) responder.getName().getName();
 
     this.xmlDocBuilder = newDocumentBuilder();
-    
+
       this.sslSocketFactory = sslSocketFactory;
       this.hostnameVerifier = hostnameVerifier;
       try {
