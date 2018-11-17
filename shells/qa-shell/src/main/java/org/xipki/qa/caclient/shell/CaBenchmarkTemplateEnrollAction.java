@@ -67,7 +67,7 @@ public class CaBenchmarkTemplateEnrollAction extends CaBenchmarkAction {
     String description = StringUtil.concatObjectsCap(200, "template: ", templateFile,
         "\nmaxRequests: ", maxRequests, "\n");
 
-    CaBenchmarkTemplateEnroll loadTest = new CaBenchmarkTemplateEnroll(caClient, template,
+    CaBenchmarkTemplateEnroll loadTest = new CaBenchmarkTemplateEnroll(caSdk, template,
         maxRequests, description);
     loadTest.setDuration(duration);
     loadTest.setThreads(numThreads);

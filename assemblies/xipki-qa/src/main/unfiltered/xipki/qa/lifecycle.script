@@ -151,11 +151,11 @@ if { $printUsage equals "true" } then {
     xipki/etc/ocsp/ocsp-responder.xml
 
   ## CA client configuration
-  xi:copy-file -f xipki/client-config/template.ca-client.xml \
-    xipki/client-config/ca-client.xml
+  xi:copy-file -f xipki/cmpclient/template.cmpclient.xml \
+    xipki/cmpclient/cmpclient.xml
 
   xi:replace --old "REPLACEME-CMP_SIGALGO" --new "$CMP_SIGALGO" \
-    xipki/client-config/ca-client.xml
+    xipki/cmpclient/cmpclient.xml
 
   ## Prepare scripts
   xi:copy-file -f xipki/qa/template.rest.script xipki/qa/rest.script

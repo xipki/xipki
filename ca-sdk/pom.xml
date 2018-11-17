@@ -23,19 +23,22 @@
     <artifactId>xipki-parent</artifactId>
     <version>5.0.0-SNAPSHOT</version>
   </parent>
-  <groupId>org.xipki.shell</groupId>
-  <artifactId>shells</artifactId>
-  <packaging>pom</packaging>
-  <name>XiPKI :: Shells</name>
-  <modules>
-    <module>shell-base</module>
-    <module>security-shell</module>
-    <module>cmpclient-shell</module>
-    <module>ocsp-client-shell</module>
-    <module>scep-client-shell</module>
-    <module>ca-mgmt-shell</module>
-    <module>ocsp-mgmt-shell</module>
-    <module>dbtool-shell</module>
-    <module>qa-shell</module>
-  </modules>
+  <artifactId>cmp-client</artifactId>
+  <packaging>bundle</packaging>
+  <name>XiPKI :: ${project.artifactId}</name>
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>security</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.jvnet.jaxb2.maven2</groupId>
+        <artifactId>maven-jaxb2-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 </project>

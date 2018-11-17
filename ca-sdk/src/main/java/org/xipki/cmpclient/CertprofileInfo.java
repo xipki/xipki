@@ -15,11 +15,10 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.caclient.shell;
+package org.xipki.cmpclient;
 
-import org.apache.karaf.shell.api.action.lifecycle.Reference;
-import org.xipki.cmpclient.CmpCaSdk;
-import org.xipki.shell.XiAction;
+import org.xipki.util.Args;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.
@@ -27,12 +26,30 @@ import org.xipki.shell.XiAction;
  * @since 2.0.0
  */
 
-public abstract class CaBenchmarkAction extends XiAction {
+public class CertprofileInfo {
 
-  @Reference
-  protected CmpCaSdk caSdk;
+  private final String name;
 
-  protected CaBenchmarkAction() {
+  private final String type;
+
+  private final String conf;
+
+  public CertprofileInfo(String name, String type, String conf) {
+    this.name = Args.toNonBlankLower(name, "name");
+    this.type = StringUtil.isBlank(type) ? null : type;
+    this.conf = StringUtil.isBlank(conf) ? null : conf;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public String getConf() {
+    return conf;
   }
 
 }

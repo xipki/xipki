@@ -36,9 +36,9 @@
     <bundle>mvn:org.xipki.iaik/pkcs11-constants/${pkcs11-wrapper.version}</bundle>
     <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ca-client/${project.version}</bundle>
+    <bundle>mvn:org.xipki/cmpclient/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
-    <bundle>mvn:org.xipki.shell/ca-client-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/cmpclient-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-scepclient" version="${project.version}"
       description="SCEP client shell">

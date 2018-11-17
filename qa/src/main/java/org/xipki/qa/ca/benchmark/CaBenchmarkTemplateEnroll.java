@@ -44,19 +44,18 @@ import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.client.api.CaClient;
-import org.xipki.ca.client.api.CaClientException;
-import org.xipki.ca.client.api.CertifiedKeyPairOrError;
-import org.xipki.ca.client.api.EnrollCertResult;
-import org.xipki.ca.client.api.PkiErrorException;
-import org.xipki.ca.client.api.dto.EnrollCertRequest;
-import org.xipki.ca.client.api.dto.EnrollCertRequest.Type;
-import org.xipki.ca.client.api.dto.EnrollCertRequestEntry;
+import org.xipki.casdk.cmp.CmpCaSdk;
+import org.xipki.casdk.cmp.CmpCaSdkException;
+import org.xipki.casdk.cmp.EnrollCertRequest;
+import org.xipki.casdk.cmp.EnrollCertRequest.EnrollType;
+import org.xipki.casdk.cmp.EnrollCertResult;
+import org.xipki.casdk.cmp.EnrollCertResult.CertifiedKeyPairOrError;
+import org.xipki.casdk.cmp.PkiErrorException;
 import org.xipki.qa.ca.benchmark.jaxb.EnrollCertType;
 import org.xipki.qa.ca.benchmark.jaxb.EnrollTemplateType;
+import org.xipki.util.Args;
 import org.xipki.util.BenchmarkExecutor;
 import org.xipki.util.InvalidConfException;
-import org.xipki.util.Args;
 import org.xipki.util.XmlUtil;
 import org.xml.sax.SAXException;
 
@@ -100,16 +99,16 @@ public class CaBenchmarkTemplateEnroll extends BenchmarkExecutor {
     private boolean testNext(Map<Integer, CertRequestWithProfile> certRequests) {
       EnrollCertResult result;
       try {
-        EnrollCertRequest request = new EnrollCertRequest(Type.CERT_REQ);
+        EnrollCertRequest request = new EnrollCertRequest(EnrollType.CERT_REQ);
         for (Integer certId : certRequests.keySet()) {
           CertRequestWithProfile certRequest = certRequests.get(certId);
-          EnrollCertRequestEntry requestEntry = new EnrollCertRequestEntry("id-" + certId,
+          EnrollCertRequest.Entry requestEntry = new EnrollCertRequest.Entry("id-" + certId,
                   certRequest.certprofile, certRequest.certRequest, RA_VERIFIED);
           request.addRequestEntry(requestEntry);
         }
 
-        result = caClient.enrollCerts(null, request, null);
-      } catch (CaClientException | PkiErrorException ex) {
+        result = caSdk.enrollCerts(null, request, null);
+      } catch (CmpCaSdkException | PkiErrorException ex) {
         LOG.warn("{}: {}", ex.getClass().getName(), ex.getMessage());
         return false;
       } catch (Throwable th) {
@@ -148,7 +147,7 @@ public class CaBenchmarkTemplateEnroll extends BenchmarkExecutor {
 
   private static Unmarshaller jaxbUnmarshaller;
 
-  private final CaClient caClient;
+  private final CmpCaSdk caSdk;
 
   private final List<BenchmarkEntry> benchmarkEntries;
 
@@ -160,13 +159,13 @@ public class CaBenchmarkTemplateEnroll extends BenchmarkExecutor {
 
   private final AtomicLong index;
 
-  public CaBenchmarkTemplateEnroll(CaClient caClient, EnrollTemplateType template,
+  public CaBenchmarkTemplateEnroll(CmpCaSdk caSdk, EnrollTemplateType template,
       int maxRequests, String description) throws Exception {
     super(description);
 
     Args.notNull(template, "template");
     this.maxRequests = maxRequests;
-    this.caClient = Args.notNull(caClient, "caClient");
+    this.caSdk = Args.notNull(caSdk, "caSdk");
 
     Calendar baseTime = Calendar.getInstance(Locale.UK);
     baseTime.set(Calendar.YEAR, 2014);

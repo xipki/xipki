@@ -15,11 +15,10 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.caclient.shell;
+package org.xipki.ca.client.shell;
 
-import org.apache.karaf.shell.api.action.lifecycle.Reference;
-import org.xipki.cmpclient.CmpCaSdk;
-import org.xipki.shell.XiAction;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * TODO.
@@ -27,12 +26,19 @@ import org.xipki.shell.XiAction;
  * @since 2.0.0
  */
 
-public abstract class CaBenchmarkAction extends XiAction {
+@Command(scope = "xi", name = "init-caclient", description = "initialize CA client")
+@Service
+public class ClientInitAction extends ClientAction {
 
-  @Reference
-  protected CmpCaSdk caSdk;
-
-  protected CaBenchmarkAction() {
+  @Override
+  protected Object execute0() throws Exception {
+    boolean succ = caSdk.init();
+    if (succ) {
+      println("CA client initialized successfully");
+    } else {
+      println("CA client initialization failed");
+    }
+    return null;
   }
 
 }

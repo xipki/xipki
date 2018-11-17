@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.caclient.shell;
+package org.xipki.cmpclient;
 
-import org.apache.karaf.shell.api.action.lifecycle.Reference;
-import org.xipki.cmpclient.CmpCaSdk;
-import org.xipki.shell.XiAction;
+import org.bouncycastle.asn1.crmf.CertId;
+import org.xipki.security.cmp.PkiStatusInfo;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -27,12 +27,28 @@ import org.xipki.shell.XiAction;
  * @since 2.0.0
  */
 
-public abstract class CaBenchmarkAction extends XiAction {
+public class CmpCertIdOrError {
 
-  @Reference
-  protected CmpCaSdk caSdk;
+  private final CertId certId;
 
-  protected CaBenchmarkAction() {
+  private final PkiStatusInfo error;
+
+  public CmpCertIdOrError(CertId certId) {
+    this.certId = Args.notNull(certId, "certId");
+    this.error = null;
+  }
+
+  public CmpCertIdOrError(PkiStatusInfo error) {
+    this.certId = null;
+    this.error = Args.notNull(error, "error");
+  }
+
+  public CertId getCertId() {
+    return certId;
+  }
+
+  public PkiStatusInfo getError() {
+    return error;
   }
 
 }

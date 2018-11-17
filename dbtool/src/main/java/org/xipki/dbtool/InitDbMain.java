@@ -228,21 +228,42 @@ public class InitDbMain {
    */
   private static void dropLiquibaseTables(LiquibaseDatabaseConf dbConf) {
     List<String> tables = Arrays.asList("DATABASECHANGELOG", "DATABASECHANGELOGLOCK");
-    try {
-      Connection conn = DriverManager.getConnection(dbConf.getUrl(),
-          dbConf.getUsername(), dbConf.getPassword());
-      if (dbConf.getSchema() != null) {
-        conn.setSchema(dbConf.getSchema());
-      }
 
-      Statement stmt = conn.createStatement();
+    Connection conn = null;
+    Statement stmt;
+
+    try {
+      try {
+        conn = DriverManager.getConnection(dbConf.getUrl(),
+            dbConf.getUsername(), dbConf.getPassword());
+        if (dbConf.getSchema() != null) {
+          conn.setSchema(dbConf.getSchema());
+        }
+
+        stmt = conn.createStatement();
+      } catch (SQLException ex) {
+        LOG.info("Could not create statement, message: {}, this is OK", ex.getMessage());
+        LOG.info("Could not create statement, this is OK", ex);
+        return;
+      }
 
       for (String table : tables) {
-        stmt.executeQuery("DROP TABLE " + table);
+        try {
+          stmt.execute("DROP TABLE " + table);
+        } catch (SQLException ex) {
+          LOG.info("Could not drop table {}, this is OK", table);
+          LOG.debug("Could not drop table" + table, ex);
+        }
       }
-    } catch (SQLException | RuntimeException ex) {
-      LOG.info("Could not drop tables {}, this is OK", tables);
-      LOG.debug("Could not drop tables {}, this is OK", tables);
+    } finally {
+      if (conn != null) {
+        try {
+          conn.close();
+        } catch (SQLException ex) {
+          LOG.info("Could not close database connection, this is OK");
+          LOG.debug("Could not close database connection", ex);
+        }
+      }
     }
   }
 

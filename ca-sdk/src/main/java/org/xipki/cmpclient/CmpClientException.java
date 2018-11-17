@@ -15,11 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.caclient.shell;
-
-import org.apache.karaf.shell.api.action.lifecycle.Reference;
-import org.xipki.cmpclient.CmpCaSdk;
-import org.xipki.shell.XiAction;
+package org.xipki.cmpclient;
 
 /**
  * TODO.
@@ -27,12 +23,23 @@ import org.xipki.shell.XiAction;
  * @since 2.0.0
  */
 
-public abstract class CaBenchmarkAction extends XiAction {
+public class CmpClientException extends Exception {
 
-  @Reference
-  protected CmpCaSdk caSdk;
+  private static final long serialVersionUID = 1L;
 
-  protected CaBenchmarkAction() {
+  public CmpClientException() {
+  }
+
+  public CmpClientException(String message) {
+    super(message);
+  }
+
+  public CmpClientException(Throwable cause) {
+    super(cause);
+  }
+
+  public CmpClientException(String message, Throwable cause) {
+    super(message, cause);
   }
 
 }

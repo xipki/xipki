@@ -149,9 +149,9 @@
   </fileSets>
   <files>
     <file>
-      <source>src/main/unfiltered/xipki/client-config/template.ca-client-signature.xml</source>
-      <outputDirectory>xipki/client-config</outputDirectory>
-      <destName>template.ca-client.xml</destName>
+      <source>src/main/unfiltered/xipki/cmpclient/template.cmpclient-signature.xml</source>
+      <outputDirectory>xipki/cmpclient</outputDirectory>
+      <destName>template.cmpclient.xml</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>

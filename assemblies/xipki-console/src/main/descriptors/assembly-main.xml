@@ -141,9 +141,9 @@
   </fileSets>
   <files>
       <file>
-      <source>${project.build.directory}/classes/xipki/client-config/ca-client-signature.xml</source>
-      <outputDirectory>xipki/client-config</outputDirectory>
-      <destName>ca-client.xml</destName>
+      <source>${project.build.directory}/classes/xipki/cmpclient/cmpclient-signature.xml</source>
+      <outputDirectory>xipki/cmpclient</outputDirectory>
+      <destName>cmpclient.xml</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>

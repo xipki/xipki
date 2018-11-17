@@ -15,24 +15,4 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.caclient.shell;
-
-import org.apache.karaf.shell.api.action.lifecycle.Reference;
-import org.xipki.cmpclient.CmpCaSdk;
-import org.xipki.shell.XiAction;
-
-/**
- * TODO.
- * @author Lijun Liao
- * @since 2.0.0
- */
-
-public abstract class CaBenchmarkAction extends XiAction {
-
-  @Reference
-  protected CmpCaSdk caSdk;
-
-  protected CaBenchmarkAction() {
-  }
-
-}
+package org.xipki.cmpclient;

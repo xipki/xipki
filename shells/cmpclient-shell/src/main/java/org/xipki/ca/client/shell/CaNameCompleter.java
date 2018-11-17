@@ -15,11 +15,16 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.caclient.shell;
+package org.xipki.ca.client.shell;
+
+import java.util.Collections;
+import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
-import org.xipki.cmpclient.CmpCaSdk;
-import org.xipki.shell.XiAction;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.casdk.cmp.CmpCaSdk;
+import org.xipki.casdk.cmp.CmpCaSdkException;
+import org.xipki.shell.completer.AbstractDynamicEnumCompleter;
 
 /**
  * TODO.
@@ -27,12 +32,19 @@ import org.xipki.shell.XiAction;
  * @since 2.0.0
  */
 
-public abstract class CaBenchmarkAction extends XiAction {
+@Service
+public class CaNameCompleter extends AbstractDynamicEnumCompleter {
 
   @Reference
   protected CmpCaSdk caSdk;
 
-  protected CaBenchmarkAction() {
+  @Override
+  protected Set<String> getEnums() {
+    try {
+      return caSdk.getCaNames();
+    } catch (CmpCaSdkException ex) {
+      return Collections.emptySet();
+    }
   }
 
 }

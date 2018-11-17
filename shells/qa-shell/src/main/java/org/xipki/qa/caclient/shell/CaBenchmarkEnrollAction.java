@@ -112,7 +112,7 @@ public class CaBenchmarkEnrollAction extends CaBenchmarkAction {
 
     BenchmarkEntry benchmarkEntry = new BenchmarkEntry(certprofile, keyEntry, subjectTemplate,
         randomDn);
-    CaBenchmarkEnroll benchmark = new CaBenchmarkEnroll(caClient, benchmarkEntry, maxRequests, num,
+    CaBenchmarkEnroll benchmark = new CaBenchmarkEnroll(caSdk, benchmarkEntry, maxRequests, num,
         description);
 
     benchmark.setDuration(duration);

@@ -15,11 +15,9 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.caclient.shell;
+package org.xipki.cmpclient;
 
-import org.apache.karaf.shell.api.action.lifecycle.Reference;
-import org.xipki.cmpclient.CmpCaSdk;
-import org.xipki.shell.XiAction;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -27,12 +25,16 @@ import org.xipki.shell.XiAction;
  * @since 2.0.0
  */
 
-public abstract class CaBenchmarkAction extends XiAction {
+public class IdentifiedObject {
 
-  @Reference
-  protected CmpCaSdk caSdk;
+  private final String id;
 
-  protected CaBenchmarkAction() {
+  public IdentifiedObject(String id) {
+    this.id = Args.notBlank(id, "id");
+  }
+
+  public String getId() {
+    return id;
   }
 
 }

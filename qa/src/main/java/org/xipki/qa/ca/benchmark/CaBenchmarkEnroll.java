@@ -31,16 +31,15 @@ import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.client.api.CaClient;
-import org.xipki.ca.client.api.CaClientException;
-import org.xipki.ca.client.api.CertifiedKeyPairOrError;
-import org.xipki.ca.client.api.EnrollCertResult;
-import org.xipki.ca.client.api.PkiErrorException;
-import org.xipki.ca.client.api.dto.EnrollCertRequest;
-import org.xipki.ca.client.api.dto.EnrollCertRequest.Type;
-import org.xipki.ca.client.api.dto.EnrollCertRequestEntry;
-import org.xipki.util.BenchmarkExecutor;
+import org.xipki.casdk.cmp.CmpCaSdk;
+import org.xipki.casdk.cmp.CmpCaSdkException;
+import org.xipki.casdk.cmp.EnrollCertRequest;
+import org.xipki.casdk.cmp.EnrollCertRequest.EnrollType;
+import org.xipki.casdk.cmp.EnrollCertResult;
+import org.xipki.casdk.cmp.EnrollCertResult.CertifiedKeyPairOrError;
+import org.xipki.casdk.cmp.PkiErrorException;
 import org.xipki.util.Args;
+import org.xipki.util.BenchmarkExecutor;
 
 /**
  * TODO.
@@ -54,7 +53,7 @@ public class CaBenchmarkEnroll extends BenchmarkExecutor {
 
   private static final Logger LOG = LoggerFactory.getLogger(CaBenchmarkEnroll.class);
 
-  private final CaClient caClient;
+  private final CmpCaSdk caSdk;
 
   private final BenchmarkEntry benchmarkEntry;
 
@@ -66,13 +65,13 @@ public class CaBenchmarkEnroll extends BenchmarkExecutor {
 
   private AtomicInteger processedRequests = new AtomicInteger(0);
 
-  public CaBenchmarkEnroll(CaClient caClient, BenchmarkEntry benchmarkEntry, int maxRequests,
+  public CaBenchmarkEnroll(CmpCaSdk caClient, BenchmarkEntry benchmarkEntry, int maxRequests,
       int num, String description) {
     super(description);
     this.maxRequests = maxRequests;
     this.num = Args.positive(num, "num");
     this.benchmarkEntry = Args.notNull(benchmarkEntry, "benchmarkEntry");
-    this.caClient = Args.notNull(caClient, "caClient");
+    this.caSdk = Args.notNull(caClient, "caSdk");
     this.index = new AtomicLong(getSecureIndex());
   }
 
@@ -94,15 +93,15 @@ public class CaBenchmarkEnroll extends BenchmarkExecutor {
     private boolean testNext(Map<Integer, CertRequest> certRequests) {
       EnrollCertResult result;
       try {
-        EnrollCertRequest request = new EnrollCertRequest(Type.CERT_REQ);
+        EnrollCertRequest request = new EnrollCertRequest(EnrollType.CERT_REQ);
         for (Integer certId : certRequests.keySet()) {
-          EnrollCertRequestEntry requestEntry = new EnrollCertRequestEntry("id-" + certId,
+          EnrollCertRequest.Entry requestEntry = new EnrollCertRequest.Entry("id-" + certId,
               benchmarkEntry.getCertprofile(), certRequests.get(certId), RA_VERIFIED);
           request.addRequestEntry(requestEntry);
         }
 
-        result = caClient.enrollCerts(null, request, null);
-      } catch (CaClientException | PkiErrorException ex) {
+        result = caSdk.enrollCerts(null, request, null);
+      } catch (CmpCaSdkException | PkiErrorException ex) {
         LOG.warn("{}: {}", ex.getClass().getName(), ex.getMessage());
         return false;
       } catch (Throwable th) {
