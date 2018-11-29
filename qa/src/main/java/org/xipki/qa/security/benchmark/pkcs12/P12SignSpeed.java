@@ -31,11 +31,11 @@ import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.BenchmarkExecutor;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.IoUtil;
-import org.xipki.util.Args;
 
 /**
  * TODO.

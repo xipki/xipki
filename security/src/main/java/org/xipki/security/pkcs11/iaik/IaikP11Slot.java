@@ -62,9 +62,9 @@ import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.security.pkcs11.iaik.IaikP11Module.Vendor;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.Args;
 import org.xipki.util.concurrent.ConcurrentBag;
 import org.xipki.util.concurrent.ConcurrentBagEntry;
 
@@ -899,7 +899,7 @@ class IaikP11Slot extends P11Slot {
   private int removeObjects(byte[] id, char[] label) throws P11TokenException {
     boolean labelNotBlank = (label != null && label.length != 0);
     if ((id == null || id.length == 0) && !labelNotBlank) {
-      throw new IllegalArgumentException("at least one of id and label must not be null");
+      throw new IllegalArgumentException("at least one of id and label may not be null");
     }
 
     Key keyTemplate = new Key();

@@ -19,8 +19,6 @@ package org.xipki.util;
 
 import java.math.BigInteger;
 
-import javax.xml.bind.JAXBException;
-
 import org.slf4j.Logger;
 
 /**
@@ -44,9 +42,9 @@ public class LogUtil {
     if (traces.length > 2) {
       StackTraceElement trace = traces[2];
       log.error("({} {}), {}: {}", trace.getMethodName(), trace.getLineNumber(),
-          th.getClass().getName(), getMessage(th));
+          th.getClass().getName(), th.getMessage());
     } else {
-      log.error("{}: {}", th.getClass().getName(), getMessage(th));
+      log.error("{}: {}", th.getClass().getName(), th.getMessage());
     }
     log.debug("Exception", th);
   }
@@ -61,9 +59,9 @@ public class LogUtil {
     if (traces.length > 2) {
       StackTraceElement trace = traces[2];
       log.error("({} {}) {}, {}: {}", trace.getMethodName(), trace.getLineNumber(), msg,
-          th.getClass().getName(), getMessage(th));
+          th.getClass().getName(), th.getMessage());
     } else {
-      log.error("{}, {}: {}", msg, th.getClass().getName(), getMessage(th));
+      log.error("{}, {}: {}", msg, th.getClass().getName(), th.getMessage());
     }
     log.debug(msg, th);
   }
@@ -78,9 +76,9 @@ public class LogUtil {
     if (traces.length > 2) {
       StackTraceElement trace = traces[2];
       log.error("({} {}), {}: {}", trace.getMethodName(), trace.getLineNumber(),
-          th.getClass().getName(), getMessage(th));
+          th.getClass().getName(), th.getMessage());
     } else {
-      log.warn("{}: {}", th.getClass().getName(), getMessage(th));
+      log.warn("{}: {}", th.getClass().getName(), th.getMessage());
     }
     log.debug("Exception", th);
   }
@@ -95,9 +93,9 @@ public class LogUtil {
     if (traces.length > 2) {
       StackTraceElement trace = traces[2];
       log.warn("({} {}) {}, {}: {}", trace.getMethodName(), trace.getLineNumber(), msg,
-          th.getClass().getName(), getMessage(th));
+          th.getClass().getName(), th.getMessage());
     } else {
-      log.warn("{}, {}: {}", msg, th.getClass().getName(), getMessage(th));
+      log.warn("{}, {}: {}", msg, th.getClass().getName(), th.getMessage());
     }
     log.debug(msg, th);
   }
@@ -109,10 +107,6 @@ public class LogUtil {
    */
   public static String formatCsn(BigInteger serialNumber) {
     return "0x" + Hex.encode(serialNumber.toByteArray());
-  }
-
-  private static String getMessage(Throwable th) {
-    return (th instanceof JAXBException) ? XmlUtil.getMessage((JAXBException) th) : th.getMessage();
   }
 
 }

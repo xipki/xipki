@@ -855,12 +855,12 @@ public class X509Ca implements Closeable {
         Date invalidityTime = revInfo.getInvalidityTime();
 
         switch (crlControl.getInvalidityDateMode()) {
-          case FORBIDDEN:
+          case forbidden:
             invalidityTime = null;
             break;
-          case OPTIONAL:
+          case optional:
             break;
-          case REQUIRED:
+          case required:
             if (invalidityTime == null) {
               invalidityTime = revocationTime;
             }
@@ -2035,7 +2035,7 @@ public class X509Ca implements Closeable {
     }
 
     if (grantedNotBefore.before(caInfo.getNotBefore())) {
-      // notBefore must not be before CA's notBefore
+      // notBefore may not be before CA's notBefore
       grantedNotBefore = caInfo.getNotBefore();
     }
 
@@ -2535,7 +2535,8 @@ public class X509Ca implements Closeable {
   } // method removeExpirtedCerts
 
   public HealthCheckResult healthCheck() {
-    HealthCheckResult result = new HealthCheckResult("X509CA");
+    HealthCheckResult result = new HealthCheckResult();
+    result.setName("X509CA");
 
     boolean healthy = true;
 
@@ -2544,7 +2545,8 @@ public class X509Ca implements Closeable {
       boolean caSignerHealthy = signer.isHealthy();
       healthy &= caSignerHealthy;
 
-      HealthCheckResult signerHealth = new HealthCheckResult("Signer");
+      HealthCheckResult signerHealth = new HealthCheckResult();
+      signerHealth.setName("Signer");
       signerHealth.setHealthy(caSignerHealthy);
       result.addChildCheck(signerHealth);
     }
@@ -2552,7 +2554,8 @@ public class X509Ca implements Closeable {
     boolean databaseHealthy = certstore.isHealthy();
     healthy &= databaseHealthy;
 
-    HealthCheckResult databaseHealth = new HealthCheckResult("Database");
+    HealthCheckResult databaseHealth = new HealthCheckResult();
+    databaseHealth.setName("Database");
     databaseHealth.setHealthy(databaseHealthy);
     result.addChildCheck(databaseHealth);
 
@@ -2561,7 +2564,8 @@ public class X509Ca implements Closeable {
       boolean crlSignerHealthy = crlSigner.getSigner().isHealthy();
       healthy &= crlSignerHealthy;
 
-      HealthCheckResult crlSignerHealth = new HealthCheckResult("CRLSigner");
+      HealthCheckResult crlSignerHealth = new HealthCheckResult();
+      crlSignerHealth.setName("CRLSigner");
       crlSignerHealth.setHealthy(crlSignerHealthy);
       result.addChildCheck(crlSignerHealth);
     }
@@ -2570,7 +2574,8 @@ public class X509Ca implements Closeable {
       boolean ph = publisher.isHealthy();
       healthy &= ph;
 
-      HealthCheckResult publisherHealth = new HealthCheckResult("Publisher");
+      HealthCheckResult publisherHealth = new HealthCheckResult();
+      publisherHealth.setName("Publisher");
       publisherHealth.setHealthy(publisher.isHealthy());
       result.addChildCheck(publisherHealth);
     }

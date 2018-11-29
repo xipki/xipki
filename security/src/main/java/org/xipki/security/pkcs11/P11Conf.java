@@ -22,28 +22,18 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolver;
-import org.xipki.security.pkcs11.jaxb.MechnanismSetsType;
-import org.xipki.security.pkcs11.jaxb.ModuleType;
-import org.xipki.security.pkcs11.jaxb.ModulesType;
-import org.xipki.security.pkcs11.jaxb.ObjectFactory;
-import org.xipki.security.pkcs11.jaxb.Pkcs11ConfType;
-import org.xipki.util.InvalidConfException;
-import org.xipki.util.LogUtil;
+import org.xipki.security.pkcs11.conf.MechanismSetType;
+import org.xipki.security.pkcs11.conf.ModuleType;
+import org.xipki.security.pkcs11.conf.Pkcs11conf;
 import org.xipki.util.Args;
-import org.xml.sax.SAXException;
+import org.xipki.util.conf.InvalidConfException;
+
+import com.alibaba.fastjson.JSON;
 
 /**
  * TODO.
@@ -53,8 +43,6 @@ import org.xml.sax.SAXException;
 
 public class P11Conf {
 
-  private static final Logger LOG = LoggerFactory.getLogger(P11Conf.class);
-
   private final Map<String, P11ModuleConf> moduleConfs;
 
   private final Set<String> moduleNames;
@@ -63,21 +51,14 @@ public class P11Conf {
       throws InvalidConfException, IOException {
     Args.notNull(confStream, "confStream");
     try {
-      JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
-      Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-      SchemaFactory schemaFact = SchemaFactory.newInstance(
-          javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-      Schema schema = schemaFact.newSchema(getClass().getResource("/xsd/pkcs11-conf.xsd"));
-      unmarshaller.setSchema(schema);
-      @SuppressWarnings("unchecked")
-      JAXBElement<Pkcs11ConfType> rootElement = (JAXBElement<Pkcs11ConfType>)
-          unmarshaller.unmarshal(confStream);
-      Pkcs11ConfType pkcs11Conf = rootElement.getValue();
-      ModulesType modulesType = pkcs11Conf.getModules();
+      Pkcs11conf pkcs11Conf = JSON.parseObject(confStream, Pkcs11conf.class);
+      pkcs11Conf.validate();
 
-      MechnanismSetsType mechanismSets = pkcs11Conf.getMechanismSets();
+      List<ModuleType> moduleTypes = pkcs11Conf.getModules();
+      List<MechanismSetType> mechanismSets = pkcs11Conf.getMechanismSets();
+
       Map<String, P11ModuleConf> confs = new HashMap<>();
-      for (ModuleType moduleType : modulesType.getModule()) {
+      for (ModuleType moduleType : moduleTypes) {
         P11ModuleConf conf = new P11ModuleConf(moduleType, mechanismSets, passwordResolver);
         confs.put(conf.getName(), conf);
       }
@@ -88,11 +69,8 @@ public class P11Conf {
       }
       this.moduleConfs = Collections.unmodifiableMap(confs);
       this.moduleNames = Collections.unmodifiableSet(new HashSet<>(confs.keySet()));
-    } catch (JAXBException | SAXException ex) {
-      final String exceptionMsg = (ex instanceof JAXBException)
-          ? getMessage((JAXBException) ex) : ex.getMessage();
-      LogUtil.error(LOG, ex, exceptionMsg);
-      throw new InvalidConfException("invalid PKCS#11 configuration");
+    } catch (IOException | RuntimeException ex) {
+      throw new InvalidConfException("invalid PKCS#11 configuration", ex);
     } finally {
       confStream.close();
     }
@@ -104,14 +82,6 @@ public class P11Conf {
 
   public P11ModuleConf getModuleConf(String moduleName) {
     return moduleConfs.get(moduleName);
-  }
-
-  private static String getMessage(JAXBException ex) {
-    String ret = ex.getMessage();
-    if (ret == null && ex.getLinkedException() != null) {
-      ret = ex.getLinkedException().getMessage();
-    }
-    return ret;
   }
 
 }

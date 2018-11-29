@@ -44,15 +44,15 @@ import org.xipki.ca.api.internal.CertPublisherFactoryRegisterImpl;
 import org.xipki.ca.api.internal.CertprofileFactoryRegisterImpl;
 import org.xipki.ca.api.profile.CertprofileFactory;
 import org.xipki.ca.api.profile.CertprofileFactoryRegister;
-import org.xipki.ca.certprofile.xml.internal.CertprofileFactoryImpl;
+import org.xipki.ca.certprofile.xijson.CertprofileFactoryImpl;
 import org.xipki.ca.server.CaManagerImpl;
 import org.xipki.ca.server.publisher.ocsp.OcspCertPublisherFactory;
 import org.xipki.security.Securities;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.HttpConstants;
-import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
+import org.xipki.util.conf.InvalidConfException;
 
 /**
  * TODO.

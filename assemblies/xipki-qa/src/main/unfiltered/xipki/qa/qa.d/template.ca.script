@@ -33,14 +33,14 @@ list = [ cross subca subca-complex ocsp scep multiple-ous \
   multi-valued-rdn qc ee-complex tls tls-c tls-inc-sn max-time ]
 
 each ($list) {
-  ca:profile-add --type xml --name ${it} \
-    --conf-file xipki/qa/certprofile/certprofile-${it}.xml
+  ca:profile-add --type xijson --name ${it} \
+    --conf-file xipki/qa/certprofile/certprofile-${it}.json
 }
 
 ca:profile-add \
   --name tlsa \
-  --type xml \
-  --conf-file xipki/qa/certprofile/certprofile-tls.xml
+  --type xijson \
+  --conf-file xipki/qa/certprofile/certprofile-tls.json
 
 ## Publishers
 ca:publisher-add \
@@ -72,8 +72,8 @@ echo "#################################################################"
 ## Add the profile rootca
 ca:profile-add \
   --name rootca \
-  --type xml \
-  --conf-file xipki/qa/certprofile/certprofile-rootca.xml
+  --type xijson \
+  --conf-file xipki/qa/certprofile/certprofile-rootca.json
 
 ## Create the CSR for the command caqa:check-cert in QA
 if { $TOKEN_TYPE equals "pkcs11" } then {

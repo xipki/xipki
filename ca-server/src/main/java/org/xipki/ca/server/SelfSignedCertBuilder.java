@@ -69,8 +69,8 @@ import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
-import org.xipki.util.InvalidConfException;
 import org.xipki.util.ObjectCreationException;
+import org.xipki.util.conf.InvalidConfException;
 import org.xipki.util.Args;
 
 /**
@@ -118,7 +118,7 @@ class SelfSignedCertBuilder {
     Args.notNull(serialNumber, "serialNumber");
     if (serialNumber.compareTo(BigInteger.ZERO) != 1) {
       throw new IllegalArgumentException(
-          "serialNumber must not be non-positive: " + serialNumber);
+          "serialNumber may not be non-positive: " + serialNumber);
     }
 
     CertLevel level = certprofile.getCertLevel();

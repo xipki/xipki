@@ -35,7 +35,7 @@ public enum AuditStatus {
   }
 
   public static AuditStatus forName(final String name) {
-    Objects.requireNonNull(name, "name must not be null");
+    Objects.requireNonNull(name, "name may not be null");
     for (final AuditStatus v : values()) {
       if (v.name().equals(name)) {
         return v;

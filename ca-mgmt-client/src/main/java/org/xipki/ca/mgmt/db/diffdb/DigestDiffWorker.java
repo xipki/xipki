@@ -48,8 +48,6 @@ public class DigestDiffWorker extends DbPortWorker {
 
   private final boolean revokedOnly;
 
-  private final DataSourceWrapper refDatasource;
-
   private final Set<byte[]> includeCaCerts;
 
   private final DataSourceWrapper targetDatasource;
@@ -64,6 +62,7 @@ public class DigestDiffWorker extends DbPortWorker {
       boolean revokedOnly, String refDbConfFile, String targetDbConfFile, String reportDirName,
       int numCertsPerSelect, int numThreads, Set<byte[]> includeCaCerts)
       throws PasswordResolverException, IOException {
+    super(datasourceFactory, passwordResolver, refDbConfFile);
     this.reportDir = reportDirName;
     this.numThreads = Args.positive(numThreads, "numThreads");
     this.numCertsPerSelect = numCertsPerSelect;
@@ -92,11 +91,6 @@ public class DigestDiffWorker extends DbPortWorker {
         Files.newInputStream(Paths.get(IoUtil.expandFilepath(targetDbConfFile))));
     this.targetDatasource = datasourceFactory.createDataSource(
         "ds-" + targetDbConfFile, props, passwordResolver);
-
-    Properties refProps = DbPorter.getDbConfProperties(
-        Files.newInputStream(Paths.get(IoUtil.expandFilepath(refDbConfFile))));
-    this.refDatasource = datasourceFactory.createDataSource(
-        "ds-" + refDbConfFile, refProps, passwordResolver);
   } // constructor
 
   @Override
@@ -104,13 +98,13 @@ public class DigestDiffWorker extends DbPortWorker {
     long start = System.currentTimeMillis();
 
     try {
-      DigestDiff diff = new DigestDiff(refDatasource, targetDatasource, reportDir, revokedOnly,
+      DigestDiff diff = new DigestDiff(datasource, targetDatasource, reportDir, revokedOnly,
           stopMe, numCertsPerSelect, numThreads);
       diff.setIncludeCaCerts(includeCaCerts);
       diff.diff();
     } finally {
       try {
-        refDatasource.close();
+        datasource.close();
       } catch (Throwable th) {
         LOG.error("refDatasource.close()", th);
       }

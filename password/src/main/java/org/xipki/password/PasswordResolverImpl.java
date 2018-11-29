@@ -90,7 +90,7 @@ public class PasswordResolverImpl implements PasswordResolver {
 
   @Override
   public char[] resolvePassword(String passwordHint) throws PasswordResolverException {
-    Objects.requireNonNull(passwordHint, "passwordHint must not be null");
+    Objects.requireNonNull(passwordHint, "passwordHint may not be null");
     int index = passwordHint.indexOf(':');
     if (index == -1) {
       return passwordHint.toCharArray();
@@ -110,8 +110,8 @@ public class PasswordResolverImpl implements PasswordResolver {
 
   @Override
   public String protectPassword(String protocol, char[] password) throws PasswordResolverException {
-    Objects.requireNonNull(protocol, "protocol must not be null");
-    Objects.requireNonNull(password, "password must not be null");
+    Objects.requireNonNull(protocol, "protocol may not be null");
+    Objects.requireNonNull(password, "password may not be null");
 
     for (SinglePasswordResolver resolver : resolvers) {
       if (resolver.canResolveProtocol(protocol)) {

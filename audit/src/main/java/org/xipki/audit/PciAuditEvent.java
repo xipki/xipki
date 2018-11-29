@@ -94,7 +94,7 @@ public class PciAuditEvent {
   private AuditLevel level;
 
   public PciAuditEvent(Date date) {
-    Objects.requireNonNull(date, "date must not be null");
+    Objects.requireNonNull(date, "date may not be null");
     LocalDateTime localDate = LocalDateTime.ofInstant(date.toInstant(), ZONE_UTC);
     this.date = DATE_FORMATTER.format(localDate);
     this.time = TIME_FORMATTER.format(localDate);
@@ -106,7 +106,7 @@ public class PciAuditEvent {
   }
 
   public void setLevel(AuditLevel level) {
-    this.level = Objects.requireNonNull(level, "level must not be null");
+    this.level = Objects.requireNonNull(level, "level may not be null");
   }
 
   public String getUserId() {

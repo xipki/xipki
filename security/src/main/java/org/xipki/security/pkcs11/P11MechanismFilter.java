@@ -22,8 +22,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.xipki.util.CollectionUtil;
 import org.xipki.util.Args;
+import org.xipki.util.CollectionUtil;
 
 /**
  * TODO.

@@ -46,7 +46,7 @@ public enum AuditLevel {
   }
 
   public static AuditLevel forName(String name) {
-    Objects.requireNonNull("name", "name must not be null");
+    Objects.requireNonNull("name", "name may not be null");
     for (AuditLevel value : values()) {
       if (value.name().equals(name)) {
         return value;

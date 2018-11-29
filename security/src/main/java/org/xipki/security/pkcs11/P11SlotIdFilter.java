@@ -31,7 +31,7 @@ class P11SlotIdFilter {
 
   P11SlotIdFilter(Integer index, Long id) {
     if (index == null && id == null) {
-      throw new IllegalArgumentException("at least one of index and id must not be null");
+      throw new IllegalArgumentException("at least one of index and id may not be null");
     }
     this.index = index;
     this.id = id;

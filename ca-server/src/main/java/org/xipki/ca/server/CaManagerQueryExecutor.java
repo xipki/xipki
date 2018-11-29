@@ -72,10 +72,10 @@ import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.ConfPairs;
-import org.xipki.util.InvalidConfException;
 import org.xipki.util.ObjectCreationException;
 import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
+import org.xipki.util.conf.InvalidConfException;
 
 /**
  * TODO.

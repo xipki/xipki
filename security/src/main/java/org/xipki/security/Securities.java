@@ -37,7 +37,7 @@ import org.xipki.security.pkcs11.PKCS11SignerFactory;
 import org.xipki.security.pkcs11.emulator.EmulatorP11ModuleFactory;
 import org.xipki.security.pkcs11.iaik.IaikP11ModuleFactory;
 import org.xipki.security.pkcs12.PKCS12SignerFactory;
-import org.xipki.util.InvalidConfException;
+import org.xipki.util.conf.InvalidConfException;
 
 /**
  * TODO.
@@ -150,7 +150,7 @@ public class Securities implements Closeable {
     initSecurityPkcs12(signerFactoryRegister);
 
     // PKCS#11
-    String pkcs11ConfFile = getString(props, "pkcs11.confFile", "xipki/security/pkcs11.xml");
+    String pkcs11ConfFile = getString(props, "pkcs11.confFile", "xipki/security/pkcs11.json");
     initSecurityPkcs11(pkcs11ConfFile, signerFactoryRegister);
 
     // register additional SignerFactories

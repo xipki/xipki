@@ -34,7 +34,7 @@ import org.xipki.util.ObjectCreationException;
 
 public class CertprofileFactoryImpl implements CertprofileFactory {
 
-  private static final String TYPE = "demoxml";
+  private static final String TYPE = "demo-profiletype";
   private static final Set<String> types = Collections.unmodifiableSet(
       new HashSet<>(Arrays.asList(TYPE)));
 

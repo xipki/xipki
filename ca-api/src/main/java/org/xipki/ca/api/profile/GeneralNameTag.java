@@ -27,12 +27,12 @@ public enum GeneralNameTag {
 
   otherName(0),
   rfc822Name(1),
-  dNSName(2),
+  DNSName(2),
   x400Adress(3),
   directoryName(4),
   ediPartyName(5),
   uniformResourceIdentifier(6),
-  iPAddress(7),
+  IPAddress(7),
   registeredID(8);
 
   private final int tag;

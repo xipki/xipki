@@ -31,7 +31,7 @@ public class IdRange {
 
   public IdRange(long from, long to) {
     if (from > to) {
-      throw new IllegalArgumentException("from must not be greater than to: " + from + " > " + to);
+      throw new IllegalArgumentException("from may not be greater than to: " + from + " > " + to);
     }
 
     this.from = from;

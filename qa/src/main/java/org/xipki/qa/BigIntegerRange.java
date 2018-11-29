@@ -33,7 +33,7 @@ public class BigIntegerRange {
   public BigIntegerRange(BigInteger from, BigInteger to) {
     if (from.compareTo(to) > 0) {
       throw new IllegalArgumentException(
-          "from (" + from + ") must not be larger than to (" + to + ")");
+          "from (" + from + ") may not be larger than to (" + to + ")");
     }
     this.from = from;
     this.to = to;

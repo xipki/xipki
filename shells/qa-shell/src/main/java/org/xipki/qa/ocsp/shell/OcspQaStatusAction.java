@@ -33,7 +33,6 @@ import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.xipki.ocsp.client.shell.BaseOcspStatusAction;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.qa.ValidationResult;
-import org.xipki.qa.ocsp.Occurrence;
 import org.xipki.qa.ocsp.OcspCertStatus;
 import org.xipki.qa.ocsp.OcspError;
 import org.xipki.qa.ocsp.OcspQa;
@@ -49,6 +48,7 @@ import org.xipki.shell.completer.HashAlgCompleter;
 import org.xipki.shell.completer.SigAlgCompleter;
 import org.xipki.util.Args;
 import org.xipki.util.DateUtil;
+import org.xipki.util.TripleState;
 
 /**
  * TODO.
@@ -81,13 +81,13 @@ public class OcspQaStatusAction extends BaseOcspStatusAction {
 
   @Option(name = "--exp-nextupdate", description = "occurrence of nextUpdate")
   @Completion(OccurrenceCompleter.class)
-  private String nextUpdateOccurrenceText = Occurrence.optional.name();
+  private String nextUpdateOccurrenceText = TripleState.optional.name();
 
   @Option(name = "--exp-certhash",
       description = "occurrence of certHash, "
           + "will be set to forbidden for status unknown and issuerUnknown")
   @Completion(OccurrenceCompleter.class)
-  private String certhashOccurrenceText = Occurrence.optional.name();
+  private String certhashOccurrenceText = TripleState.optional.name();
 
   @Option(name = "--exp-certhash-alg", description = "occurrence of certHash")
   @Completion(HashAlgCompleter.class)
@@ -95,7 +95,7 @@ public class OcspQaStatusAction extends BaseOcspStatusAction {
 
   @Option(name = "--exp-nonce", description = "occurrence of nonce")
   @Completion(OccurrenceCompleter.class)
-  private String nonceOccurrenceText = Occurrence.optional.name();
+  private String nonceOccurrenceText = TripleState.optional.name();
 
   @Reference
   private SecurityFactory securityFactory;
@@ -108,11 +108,11 @@ public class OcspQaStatusAction extends BaseOcspStatusAction {
 
   private Map<BigInteger, Date> expecteRevTimes;
 
-  private Occurrence expectedNextUpdateOccurrence;
+  private TripleState expectedNextUpdateOccurrence;
 
-  private Occurrence expectedCerthashOccurrence;
+  private TripleState expectedCerthashOccurrence;
 
-  private Occurrence expectedNonceOccurrence;
+  private TripleState expectedNonceOccurrence;
 
   @Override
   protected void checkParameters(X509Certificate respIssuer, List<BigInteger> serialNumbers,
@@ -164,9 +164,9 @@ public class OcspQaStatusAction extends BaseOcspStatusAction {
       }
     }
 
-    expectedCerthashOccurrence = Occurrence.forName(certhashOccurrenceText);
-    expectedNextUpdateOccurrence = Occurrence.forName(nextUpdateOccurrenceText);
-    expectedNonceOccurrence = Occurrence.forName(nonceOccurrenceText);
+    expectedCerthashOccurrence = TripleState.valueOf(certhashOccurrenceText);
+    expectedNextUpdateOccurrence = TripleState.valueOf(nextUpdateOccurrenceText);
+    expectedNonceOccurrence = TripleState.valueOf(nonceOccurrenceText);
   } // method checkParameters
 
   @Override

@@ -26,7 +26,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.qa.ca.benchmark.CaBenchmarkTemplateEnroll;
-import org.xipki.qa.ca.benchmark.jaxb.EnrollTemplateType;
+import org.xipki.qa.ca.benchmark.EnrollTemplateType;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.StringUtil;
 

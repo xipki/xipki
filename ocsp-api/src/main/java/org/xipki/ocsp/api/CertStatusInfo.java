@@ -130,7 +130,7 @@ public class CertStatusInfo {
       HashAlgo certHashAlgo, byte[] certHash, Date thisUpdate, Date nextUpdate,
       String certprofile) {
     if (revocationInfo == null) {
-      throw new IllegalArgumentException("revocationInfo must not be null");
+      throw new IllegalArgumentException("revocationInfo may not be null");
     }
     CertStatusInfo ret = new CertStatusInfo(CertStatus.REVOKED, thisUpdate, nextUpdate,
         certprofile);
@@ -143,7 +143,7 @@ public class CertStatusInfo {
   public static CertStatusInfo getRevokedCertStatusInfo(CertRevocationInfo revocationInfo,
       Date thisUpdate, Date nextUpdate) {
     if (revocationInfo == null) {
-      throw new IllegalArgumentException("revocationInfo must not be null");
+      throw new IllegalArgumentException("revocationInfo may not be null");
     }
     CertStatusInfo ret = new CertStatusInfo(CertStatus.REVOKED, thisUpdate, nextUpdate, null);
     ret.revocationInfo = revocationInfo;

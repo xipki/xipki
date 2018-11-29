@@ -60,9 +60,9 @@ import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
-import org.xipki.util.Args;
 
 /**
  * TODO.

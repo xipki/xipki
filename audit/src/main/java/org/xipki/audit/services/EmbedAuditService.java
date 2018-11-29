@@ -82,7 +82,7 @@ public class EmbedAuditService implements AuditService {
   }
 
   protected static String createMessage(AuditEvent event) {
-    Objects.requireNonNull(event, "event must not be null");
+    Objects.requireNonNull(event, "event may not be null");
     String applicationName = event.getApplicationName();
     if (applicationName == null) {
       applicationName = "undefined";

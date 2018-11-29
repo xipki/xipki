@@ -23,6 +23,7 @@ import java.security.cert.X509Certificate;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.StringUtil;
+import org.xipki.util.TripleState;
 
 /**
  * TODO.
@@ -34,11 +35,11 @@ public class OcspResponseOption {
 
   private X509Certificate respIssuer;
 
-  private Occurrence nonceOccurrence;
+  private TripleState nonceOccurrence;
 
-  private Occurrence certhashOccurrence;
+  private TripleState certhashOccurrence;
 
-  private Occurrence nextUpdateOccurrence;
+  private TripleState nextUpdateOccurrence;
 
   private ASN1ObjectIdentifier certhashAlgId;
 
@@ -55,27 +56,27 @@ public class OcspResponseOption {
     this.respIssuer = respIssuer;
   }
 
-  public Occurrence getNonceOccurrence() {
+  public TripleState getNonceOccurrence() {
     return nonceOccurrence;
   }
 
-  public void setNonceOccurrence(Occurrence nonceOccurrence) {
+  public void setNonceOccurrence(TripleState nonceOccurrence) {
     this.nonceOccurrence = nonceOccurrence;
   }
 
-  public Occurrence getCerthashOccurrence() {
+  public TripleState getCerthashOccurrence() {
     return certhashOccurrence;
   }
 
-  public void setCerthashOccurrence(Occurrence certhashOccurrence) {
+  public void setCerthashOccurrence(TripleState certhashOccurrence) {
     this.certhashOccurrence = certhashOccurrence;
   }
 
-  public Occurrence getNextUpdateOccurrence() {
+  public TripleState getNextUpdateOccurrence() {
     return nextUpdateOccurrence;
   }
 
-  public void setNextUpdateOccurrence(Occurrence nextUpdateOccurrence) {
+  public void setNextUpdateOccurrence(TripleState nextUpdateOccurrence) {
     this.nextUpdateOccurrence = nextUpdateOccurrence;
   }
 

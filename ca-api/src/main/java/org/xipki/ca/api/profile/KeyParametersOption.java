@@ -161,10 +161,6 @@ public class KeyParametersOption {
   } // class DSAParametersOption
 
   // CHECKSTYLE:SKIP
-  public static class DHParametersOption extends DSAParametersOption {
-  } // class DHParametersOption
-
-  // CHECKSTYLE:SKIP
   public static class ECParamatersOption extends KeyParametersOption {
 
     private Set<ASN1ObjectIdentifier> curveOids;

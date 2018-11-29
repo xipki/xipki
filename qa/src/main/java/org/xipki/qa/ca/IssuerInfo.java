@@ -28,8 +28,8 @@ import java.util.Set;
 
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.CollectionUtil;
 import org.xipki.util.Args;
+import org.xipki.util.CollectionUtil;
 
 /**
  * TODO.

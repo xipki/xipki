@@ -569,7 +569,7 @@ class IdentifiedCertprofile implements Closeable {
     }
 
     if (CollectionUtil.isNonEmpty(set)) {
-      msg.append("extensions ").append(toString(set)).append(" must not be contained in request, ");
+      msg.append("extensions ").append(toString(set)).append(" may not be contained in request, ");
     }
 
     CertLevel level = getCertLevel();

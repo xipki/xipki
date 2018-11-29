@@ -104,7 +104,7 @@ public class CmpUtf8Pairs {
 
     char ch = name.charAt(0);
     if (ch >= '0' && ch <= '9') {
-      throw new IllegalArgumentException("name must not begin with " + ch);
+      throw new IllegalArgumentException("name may not begin with " + ch);
     }
     pairs.put(name, value);
   }

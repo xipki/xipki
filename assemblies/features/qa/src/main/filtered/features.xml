@@ -32,7 +32,7 @@
     <feature>xipki-camgmt</feature>
     <feature>xipki-ocspclient</feature>
     <feature>xipki-caclient</feature>
-    <bundle>mvn:org.xipki/certprofile-xml/${project.version}</bundle>
+    <bundle>mvn:org.xipki/certprofile-xijson/${project.version}</bundle>
     <bundle>mvn:org.xipki/qa/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/qa-shell/${project.version}</bundle>
   </feature>

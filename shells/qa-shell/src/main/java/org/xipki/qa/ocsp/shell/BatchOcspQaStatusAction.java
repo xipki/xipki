@@ -45,7 +45,6 @@ import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.ocsp.client.shell.CommonOcspStatusAction;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.qa.ValidationResult;
-import org.xipki.qa.ocsp.Occurrence;
 import org.xipki.qa.ocsp.OcspCertStatus;
 import org.xipki.qa.ocsp.OcspQa;
 import org.xipki.qa.ocsp.OcspResponseOption;
@@ -65,6 +64,7 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.ReqRespDebug;
 import org.xipki.util.ReqRespDebug.ReqRespPair;
 import org.xipki.util.StringUtil;
+import org.xipki.util.TripleState;
 
 /**
  * TODO.
@@ -123,13 +123,13 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
 
   @Option(name = "--exp-nextupdate", description = "occurrence of nextUpdate")
   @Completion(OccurrenceCompleter.class)
-  private String nextUpdateOccurrenceText = Occurrence.optional.name();
+  private String nextUpdateOccurrenceText = TripleState.optional.name();
 
   @Option(name = "--exp-certhash",
       description = "occurrence of certHash, "
           + "will be set to forbidden for status unknown and issuerUnknown")
   @Completion(OccurrenceCompleter.class)
-  private String certhashOccurrenceText = Occurrence.optional.name();
+  private String certhashOccurrenceText = TripleState.optional.name();
 
   @Option(name = "--exp-certhash-alg", description = "occurrence of certHash")
   @Completion(HashAlgCompleter.class)
@@ -137,7 +137,7 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
 
   @Option(name = "--exp-nonce", description = "occurrence of nonce")
   @Completion(OccurrenceCompleter.class)
-  private String nonceOccurrenceText = Occurrence.optional.name();
+  private String nonceOccurrenceText = TripleState.optional.name();
 
   @Reference
   private SecurityFactory securityFactory;
@@ -145,17 +145,17 @@ public class BatchOcspQaStatusAction extends CommonOcspStatusAction {
   @Reference
   private OcspRequestor requestor;
 
-  private Occurrence expectedCerthashOccurrence;
+  private TripleState expectedCerthashOccurrence;
 
-  private Occurrence expectedNextUpdateOccurrence;
+  private TripleState expectedNextUpdateOccurrence;
 
-  private Occurrence expectedNonceOccurrence;
+  private TripleState expectedNonceOccurrence;
 
   @Override
   protected final Object execute0() throws Exception {
-    expectedCerthashOccurrence = Occurrence.forName(certhashOccurrenceText);
-    expectedNextUpdateOccurrence = Occurrence.forName(nextUpdateOccurrenceText);
-    expectedNonceOccurrence = Occurrence.forName(nonceOccurrenceText);
+    expectedCerthashOccurrence = TripleState.valueOf(certhashOccurrenceText);
+    expectedNextUpdateOccurrence = TripleState.valueOf(nextUpdateOccurrenceText);
+    expectedNonceOccurrence = TripleState.valueOf(nonceOccurrenceText);
 
     File outDir = new File(outDirStr);
     File messageDir = new File(outDir, "messages");

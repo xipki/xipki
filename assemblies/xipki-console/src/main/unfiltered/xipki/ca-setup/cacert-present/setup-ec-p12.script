@@ -20,20 +20,20 @@
 HASH = SHA256
 
 echo "#################################################################"
-echo "#                          Load ca-conf.xml                     #"
+echo "#                          Load ca-conf.json                     #"
 echo "#################################################################"
 
-xi:copy-file -f xipki/ca-setup/cacert-present/template.ca-conf.xml \
-  xipki/ca-setup/cacert-present/ca-conf.xml
+xi:copy-file -f xipki/ca-setup/cacert-present/template.ca-conf.json \
+  xipki/ca-setup/cacert-present/ca-conf.json
 
-xi:replace --old "REPLACEME_TOKEN_TYPE" --new "PKCS12" \
-  xipki/ca-setup/cacert-present/ca-conf.xml
+xi:replace --old "REPLACEME-TOKEN_TYPE" --new "PKCS12" \
+  xipki/ca-setup/cacert-present/ca-conf.json
 
-xi:replace --old "REPLACEME_CA_SIGNERCONF" \
+xi:replace --old "REPLACEME-CA_SIGNERCONF" \
   --new "algo=${HASH}withECDSA,password=1234,keystore=file:xipki/ca-setup/keycerts/myca1.p12" \
-  xipki/ca-setup/cacert-present/ca-conf.xml
+  xipki/ca-setup/cacert-present/ca-conf.json
 
-ca:load-conf --conf-file xipki/ca-setup/cacert-present/ca-conf.xml
+ca:load-conf --conf-file xipki/ca-setup/cacert-present/ca-conf.json
 
 echo "create initial CRL"
 ca:gencrl --ca myca1

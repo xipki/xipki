@@ -1,0 +1,18 @@
+{
+	"enrollCerts":[{
+		"certprofile":"tls",
+		"randomDn":"O",
+		"subject":"CN=xipki.org,O=example PKI TLS RSA,C=DE",
+		"keyspec":"RSA:2048"
+	},{
+		"certprofile":"tls",
+		"randomDn":"O",
+		"subject":"CN=xipki.org,O=example PKI TLS DSA,C=DE",
+		"keyspec":"DSA:2048"
+	},{
+		"certprofile":"tls",
+		"randomDn":"O",
+		"subject":"CN=xipki.org,O=example PKI EC,C=DE",
+		"keyspec":"EC:secp256r1"
+	}]
+}

@@ -36,20 +36,20 @@ xi:csr-p11 --hash SM3 --gm --slot 0 --label ${P11_LABEL} \
 ca:refresh-token --type pkcs11
 
 echo "#################################################################"
-echo "#                          Load ca-conf.xml                     #"
+echo "#                          Load ca-conf.json                     #"
 echo "#################################################################"
 
-xi:copy-file -f xipki/ca-setup/cacert-none/template.ca-conf.xml \
-  xipki/ca-setup/cacert-none/ca-conf.xml
+xi:copy-file -f xipki/ca-setup/cacert-none/template.ca-conf.json \
+  xipki/ca-setup/cacert-none/ca-conf.json
 
-xi:replace --old "REPLACEME_TOKEN_TYPE" --new "pkcs11" \
-  xipki/ca-setup/cacert-none/ca-conf.xml
+xi:replace --old "REPLACEME-TOKEN_TYPE" --new "pkcs11" \
+  xipki/ca-setup/cacert-none/ca-conf.json
 
-xi:replace --old "REPLACEME_CA_SIGNERCONF" \
+xi:replace --old "REPLACEME-CA_SIGNERCONF" \
   --new "algo=SM3withSM2,slot=0,key-label=${P11_LABEL}" \
-  xipki/ca-setup/cacert-none/ca-conf.xml
+  xipki/ca-setup/cacert-none/ca-conf.json
 
-ca:load-conf --conf-file xipki/ca-setup/cacert-none/ca-conf.xml \
+ca:load-conf --conf-file xipki/ca-setup/cacert-none/ca-conf.json \
   --out-dir ${KEYCERTS_DIR}
 
 xi:move-file ${KEYCERTS_DIR}/ca-myca1.der ${KEYCERTS_DIR}/myca1.der

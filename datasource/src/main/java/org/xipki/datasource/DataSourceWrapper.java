@@ -924,7 +924,7 @@ public abstract class DataSourceWrapper implements Closeable {
     Args.notBlank(indexName, "indexName");
     Args.notBlank(table, "table");
     if (columns == null || columns.length == 0) {
-      throw new IllegalArgumentException("columns must not be null and empty");
+      throw new IllegalArgumentException("columns may not be null and empty");
     }
 
     final StringBuilder sb = new StringBuilder(200);

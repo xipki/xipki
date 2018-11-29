@@ -35,7 +35,6 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -52,8 +51,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import javax.xml.bind.JAXBException;
 
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.pkcs.Attribute;
@@ -85,6 +82,7 @@ import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertPublisherFactoryRegister;
 import org.xipki.ca.mgmt.api.AddUserEntry;
+import org.xipki.ca.mgmt.api.CaConf;
 import org.xipki.ca.mgmt.api.CaEntry;
 import org.xipki.ca.mgmt.api.CaHasRequestorEntry;
 import org.xipki.ca.mgmt.api.CaHasUserEntry;
@@ -106,10 +104,16 @@ import org.xipki.ca.mgmt.api.RequestorInfo;
 import org.xipki.ca.mgmt.api.RevokeSuspendedCertsControl;
 import org.xipki.ca.mgmt.api.SignerEntry;
 import org.xipki.ca.mgmt.api.UserEntry;
-import org.xipki.ca.mgmt.api.conf.CaConf;
-import org.xipki.ca.mgmt.api.conf.CaConfs;
-import org.xipki.ca.mgmt.api.conf.GenSelfIssued;
-import org.xipki.ca.mgmt.api.conf.SingleCaConf;
+import org.xipki.ca.mgmt.conf.CaHasRequestorType;
+import org.xipki.ca.mgmt.conf.CaHasUserType;
+import org.xipki.ca.mgmt.conf.CaInfoType;
+import org.xipki.ca.mgmt.conf.CaType;
+import org.xipki.ca.mgmt.conf.CaUrisType;
+import org.xipki.ca.mgmt.conf.CaconfType;
+import org.xipki.ca.mgmt.conf.NameTypeConf;
+import org.xipki.ca.mgmt.conf.RequestorType;
+import org.xipki.ca.mgmt.conf.SignerType;
+import org.xipki.ca.mgmt.conf.UserType;
 import org.xipki.ca.server.SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.ca.server.api.CaAuditConstants;
 import org.xipki.ca.server.api.CmpResponder;
@@ -117,24 +121,6 @@ import org.xipki.ca.server.api.ResponderManager;
 import org.xipki.ca.server.api.RestResponder;
 import org.xipki.ca.server.api.ScepResponder;
 import org.xipki.ca.server.cmp.CmpResponderImpl;
-import org.xipki.ca.mgmt.api.conf.jaxb.AliasesType;
-import org.xipki.ca.mgmt.api.conf.jaxb.CaHasRequestorType;
-import org.xipki.ca.mgmt.api.conf.jaxb.CaHasUserType;
-import org.xipki.ca.mgmt.api.conf.jaxb.CaInfoType;
-import org.xipki.ca.mgmt.api.conf.jaxb.CaType;
-import org.xipki.ca.mgmt.api.conf.jaxb.CaUrisType;
-import org.xipki.ca.mgmt.api.conf.jaxb.CaconfType;
-import org.xipki.ca.mgmt.api.conf.jaxb.FileOrBinaryType;
-import org.xipki.ca.mgmt.api.conf.jaxb.FileOrValueType;
-import org.xipki.ca.mgmt.api.conf.jaxb.PermissionsType;
-import org.xipki.ca.mgmt.api.conf.jaxb.ProfileType;
-import org.xipki.ca.mgmt.api.conf.jaxb.ProfilesType;
-import org.xipki.ca.mgmt.api.conf.jaxb.PublisherType;
-import org.xipki.ca.mgmt.api.conf.jaxb.PublishersType;
-import org.xipki.ca.mgmt.api.conf.jaxb.RequestorType;
-import org.xipki.ca.mgmt.api.conf.jaxb.SignerType;
-import org.xipki.ca.mgmt.api.conf.jaxb.UrisType;
-import org.xipki.ca.mgmt.api.conf.jaxb.UserType;
 import org.xipki.ca.server.rest.RestResponderImpl;
 import org.xipki.ca.server.scep.ScepResponderImpl;
 import org.xipki.ca.server.store.CertStore;
@@ -153,17 +139,21 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.DateUtil;
-import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
-import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
-import org.xml.sax.SAXException;
+import org.xipki.util.conf.FileOrBinary;
+import org.xipki.util.conf.FileOrValue;
+import org.xipki.util.conf.InvalidConfException;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 
 /**
  * TODO: unify the LOG, make sure that all events are audited even exception is thrown.
@@ -2608,7 +2598,7 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
     CaConf conf;
     try {
       conf = new CaConf(zippedConfStream, securityFactory);
-    } catch (IOException | InvalidConfException | JAXBException | SAXException ex) {
+    } catch (IOException | InvalidConfException ex) {
       throw new CaMgmtException("could not parse the CA configuration", ex);
     } catch (RuntimeException ex) {
       throw new CaMgmtException("caught RuntimeException while parsing the CA configuration", ex);
@@ -2752,8 +2742,8 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
 
     // CA
     for (String caName : conf.getCaNames()) {
-      SingleCaConf scc = conf.getCa(caName);
-      GenSelfIssued genSelfIssued = scc.getGenSelfIssued();
+      CaConf.SingleCa scc = conf.getCa(caName);
+      CaConf.GenSelfIssued genSelfIssued = scc.getGenSelfIssued();
       CaEntry caEntry = scc.getCaEntry();
       if (caEntry != null) {
         if (caInfos.containsKey(caName)) {
@@ -2961,8 +2951,8 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
       Set<String> includeUserNames = new HashSet<>();
 
       // users
-      root.setUsers(new CaconfType.Users());
-      List<UserType> users = root.getUsers().getUser();
+      List<UserType> users = new LinkedList<>();
+      root.setUsers(users);
 
       // cas
       if (CollectionUtil.isNonEmpty(caNames)) {
@@ -2973,65 +2963,57 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
             continue;
           }
 
-          CaType jaxb = new CaType();
-          jaxb.setName(name);
+          CaType ca = new CaType();
+          ca.setName(name);
 
           Set<String> strs = getAliasesForCa(name);
           if (CollectionUtil.isNonEmpty(strs)) {
-            AliasesType type = new AliasesType();
-            for (String str : strs) {
-              type.getAlias().add(str);
-            }
-            jaxb.setAliases(type);
+            ca.setAliases(new ArrayList<>(strs));
           }
 
           strs = caHasProfiles.get(name);
           if (CollectionUtil.isNonEmpty(strs)) {
             includeProfileNames.addAll(strs);
-            jaxb.setProfiles(createProfiles(strs));
+            ca.setProfiles(new ArrayList<>(strs));
           }
 
           strs = caHasPublishers.get(name);
           if (CollectionUtil.isNonEmpty(strs)) {
             includePublisherNames.addAll(strs);
-            PublishersType type = new PublishersType();
-            for (String str : strs) {
-              type.getPublisher().add(str);
-            }
-            jaxb.setPublishers(type);
+            ca.setPublishers(new ArrayList<>(strs));
           }
 
           // CaHasRequestors
           Set<CaHasRequestorEntry> requestors = caHasRequestors.get(name);
           if (CollectionUtil.isNonEmpty(requestors)) {
-            jaxb.setRequestors(new CaType.Requestors());
+            ca.setRequestors(new ArrayList<>());
 
             for (CaHasRequestorEntry m : requestors) {
               String requestorName = m.getRequestorIdent().getName();
               includeRequestorNames.add(requestorName);
 
-              CaHasRequestorType jaxb2 = new CaHasRequestorType();
-              jaxb2.setRequestorName(requestorName);
-              jaxb2.setRa(m.isRa());
-              jaxb2.setProfiles(createProfiles(m.getProfiles()));
-              jaxb2.setPermissions(getPermissions(m.getPermission()));
+              CaHasRequestorType chr = new CaHasRequestorType();
+              chr.setRequestorName(requestorName);
+              chr.setRa(m.isRa());
+              chr.setProfiles(new ArrayList<>(m.getProfiles()));
+              chr.setPermissions(getPermissions(m.getPermission()));
 
-              jaxb.getRequestors().getRequestor().add(jaxb2);
+              ca.getRequestors().add(chr);
             }
           }
 
           // CaHasUsers
           List<CaHasUserEntry> caHasUsers = queryExecutor.getCaHasUsersForCa(name, idNameMap);
           if (CollectionUtil.isNonEmpty(caHasUsers)) {
-            jaxb.setUsers(new CaType.Users());
-            List<CaHasUserType> list2 = jaxb.getUsers().getUser();
+            ca.setUsers(new ArrayList<>());
+
             for (CaHasUserEntry m : caHasUsers) {
               String username = m.getUserIdent().getName();
-              CaHasUserType jaxb2 = new CaHasUserType();
-              jaxb2.setUserName(username);
-              jaxb2.setPermissions(getPermissions(m.getPermission()));
-              jaxb2.setProfiles(createProfiles(m.getProfiles()));
-              list2.add(jaxb2);
+              CaHasUserType chu = new CaHasUserType();
+              chu.setUserName(username);
+              chu.setProfiles(new ArrayList<>(m.getProfiles()));
+              chu.setPermissions(getPermissions(m.getPermission()));
+              ca.getUsers().add(chu);
 
               if (includeUserNames.contains(username)) {
                 continue;
@@ -3039,13 +3021,13 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
 
               // add also the user to the users
               UserEntry userEntry = queryExecutor.getUser(username);
-              UserType jaxb3 = new UserType();
+              UserType userType = new UserType();
               if (!userEntry.isActive()) {
-                jaxb3.setActive(Boolean.FALSE);
+                userType.setActive(Boolean.FALSE);
               }
-              jaxb3.setName(username);
-              jaxb3.setHashedPassword(userEntry.getHashedPassword());
-              users.add(jaxb3);
+              userType.setName(username);
+              userType.setHashedPassword(userEntry.getHashedPassword());
+              users.add(userType);
 
               includeUserNames.add(username);
             }
@@ -3078,24 +3060,27 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
           }
 
           if (entry.getCmpControl() != null) {
-            ciJaxb.setCmpControl(entry.getCmpControl().getConf());
+            ciJaxb.setCmpControl(
+                new ConfPairs(entry.getCmpControl().getConf()).asMap());
           }
 
           if (entry.getCrlControl() != null) {
-            ciJaxb.setCrlControl(entry.getCrlControl().getConf());
+            ciJaxb.setCrlControl(
+                new ConfPairs(entry.getCrlControl().getConf()).asMap());
           }
 
           if (entry.getScepControl() != null) {
-            ciJaxb.setScepControl(entry.getScepControl().getConf());
+            ciJaxb.setScepControl(
+                new ConfPairs(entry.getScepControl().getConf()).asMap());
           }
 
           CaUris caUris = entry.getCaUris();
           if (caUris != null) {
             CaUrisType caUrisType = new CaUrisType();
-            caUrisType.setCacertUris(createUris(caUris.getCacertUris()));
-            caUrisType.setOcspUris(createUris(caUris.getOcspUris()));
-            caUrisType.setCrlUris(createUris(caUris.getCrlUris()));
-            caUrisType.setDeltacrlUris(createUris(caUris.getDeltaCrlUris()));
+            caUrisType.setCacertUris(caUris.getCacertUris());
+            caUrisType.setOcspUris(caUris.getOcspUris());
+            caUrisType.setCrlUris(caUris.getCrlUris());
+            caUrisType.setDeltacrlUris(caUris.getDeltaCrlUris());
             ciJaxb.setCaUris(caUrisType);
           }
 
@@ -3103,9 +3088,7 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
           ciJaxb.setDuplicateSubject(entry.isDuplicateSubjectPermitted());
           ciJaxb.setExpirationPeriod(entry.getExpirationPeriod());
           if (entry.getExtraControl() != null) {
-            ciJaxb.setExtraControl(
-                createFileOrValue(zipStream, entry.getExtraControl().getEncoded(),
-                    concat("files/ca-", name, "-extracontrol.conf")));
+            ciJaxb.setExtraControl(entry.getExtraControl().asMap());
           }
           ciJaxb.setKeepExpiredCertDays(entry.getKeepExpiredCertInDays());
           ciJaxb.setMaxValidity(entry.getMaxValidity().toString());
@@ -3119,16 +3102,16 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
           ciJaxb.setSnSize(entry.getSerialNoBitLen());
           ciJaxb.setStatus(entry.getStatus().getStatus());
           ciJaxb.setValidityMode(entry.getValidityMode().name());
-          ciJaxb.setProtocolSupport(entry.getProtocoSupport().getEncoded());
+          ciJaxb.setProtocolSupport(
+              StringUtil.splitAsSet(entry.getProtocoSupport().getEncoded(), ","));
 
-          jaxb.setCaInfo(ciJaxb);
+          ca.setCaInfo(ciJaxb);
 
-          list.add(jaxb);
+          list.add(ca);
         }
 
         if (!list.isEmpty()) {
-          root.setCas(new CaconfType.Cas());
-          root.getCas().getCa().addAll(list);
+          root.setCas(list);
         }
       }
 
@@ -3140,76 +3123,75 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
       // requestors
       if (CollectionUtil.isNonEmpty(requestorDbEntries)) {
         List<RequestorType> list = new LinkedList<>();
+
         for (String name : requestorDbEntries.keySet()) {
           if (!includeRequestorNames.contains(name)) {
             continue;
           }
 
           RequestorEntry entry = requestorDbEntries.get(name);
-          RequestorType jaxb = new RequestorType();
-          jaxb.setName(name);
-          jaxb.setType(entry.getType());
+          RequestorType type = new RequestorType();
+          type.setName(name);
+          type.setType(entry.getType());
 
           if (RequestorEntry.TYPE_CERT.equalsIgnoreCase(entry.getType())) {
-            FileOrBinaryType fob = createFileOrBinary(zipStream,
+            FileOrBinary fob = createFileOrBinary(zipStream,
                 Base64.decode(entry.getConf()), concat("files/requestor-", name, ".der"));
-            jaxb.setBinaryConf(fob);
+            type.setBinaryConf(fob);
           } else {
-            FileOrValueType fov = createFileOrValue(zipStream,
+            FileOrValue fov = createFileOrValue(zipStream,
                 entry.getConf(), concat("files/requestor-", name, ".conf"));
-            jaxb.setConf(fov);
+            type.setConf(fov);
           }
 
-          list.add(jaxb);
+          list.add(type);
         }
 
         if (!list.isEmpty()) {
-          root.setRequestors(new CaconfType.Requestors());
-          root.getRequestors().getRequestor().addAll(list);
+          root.setRequestors(list);
         }
       }
 
       // publishers
       if (CollectionUtil.isNonEmpty(publisherDbEntries)) {
-        List<PublisherType> list = new LinkedList<>();
+        List<NameTypeConf> list = new LinkedList<>();
+
         for (String name : publisherDbEntries.keySet()) {
           if (!includePublisherNames.contains(name)) {
             continue;
           }
           PublisherEntry entry = publisherDbEntries.get(name);
-          PublisherType jaxb = new PublisherType();
-          jaxb.setName(name);
-          jaxb.setType(entry.getType());
-          jaxb.setConf(createFileOrValue(zipStream, entry.getConf(),
+          NameTypeConf conf = new NameTypeConf();
+          conf.setName(name);
+          conf.setType(entry.getType());
+          conf.setConf(createFileOrValue(zipStream, entry.getConf(),
               concat("files/publisher-", name, ".conf")));
-          list.add(jaxb);
+          list.add(conf);
         }
 
         if (!list.isEmpty()) {
-          root.setPublishers(new CaconfType.Publishers());
-          root.getPublishers().getPublisher().addAll(list);
+          root.setPublishers(list);
         }
       }
 
       // profiles
       if (CollectionUtil.isNonEmpty(certprofileDbEntries)) {
-        List<ProfileType> list = new LinkedList<>();
+        List<NameTypeConf> list = new LinkedList<>();
         for (String name : certprofileDbEntries.keySet()) {
           if (!includeProfileNames.contains(name)) {
             continue;
           }
           CertprofileEntry entry = certprofileDbEntries.get(name);
-          ProfileType jaxb = new ProfileType();
-          jaxb.setName(name);
-          jaxb.setType(entry.getType());
-          jaxb.setConf(createFileOrValue(zipStream, entry.getConf(),
+          NameTypeConf conf = new NameTypeConf();
+          conf.setName(name);
+          conf.setType(entry.getType());
+          conf.setConf(createFileOrValue(zipStream, entry.getConf(),
               concat("files/certprofile-", name, ".conf")));
-          list.add(jaxb);
+          list.add(conf);
         }
 
         if (!list.isEmpty()) {
-          root.setProfiles(new CaconfType.Profiles());
-          root.getProfiles().getProfile().addAll(list);
+          root.setProfiles(list);
         }
       }
 
@@ -3223,35 +3205,35 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
           }
 
           SignerEntry entry = signerDbEntries.get(name);
-          SignerType jaxb = new SignerType();
-          jaxb.setName(name);
-          jaxb.setType(entry.getType());
-          jaxb.setConf(createFileOrValue(zipStream, entry.getConf(),
+          SignerType conf = new SignerType();
+          conf.setName(name);
+          conf.setType(entry.getType());
+          conf.setConf(createFileOrValue(zipStream, entry.getConf(),
               concat("files/signer-", name, ".conf")));
-          jaxb.setCert(createFileOrBase64Value(zipStream, entry.getBase64Cert(),
+          conf.setCert(createFileOrBase64Value(zipStream, entry.getBase64Cert(),
               concat("files/signer-", name, ".der")));
 
-          list.add(jaxb);
+          list.add(conf);
         }
 
         if (!list.isEmpty()) {
-          root.setSigners(new CaconfType.Signers());
-          root.getSigners().getSigner().addAll(list);
+          root.setSigners(list);
         }
       }
 
       // add the CAConf XML file
       ByteArrayOutputStream bout = new ByteArrayOutputStream();
       try {
-        CaConfs.marshal(root, bout);
-      } catch (JAXBException | SAXException ex) {
+        root.validate();
+        JSON.writeJSONString(bout, root, SerializerFeature.PrettyFormat);
+      } catch (InvalidConfException ex) {
         LogUtil.error(LOG, ex, "could not marshal CAConf");
         throw new CaMgmtException(concat("could not marshal CAConf: ", ex.getMessage()), ex);
       } finally {
         bout.flush();
       }
 
-      zipStream.putNextEntry(new ZipEntry("caconf.xml"));
+      zipStream.putNextEntry(new ZipEntry("caconf.json"));
       try {
         zipStream.write(bout.toByteArray());
       } finally {
@@ -3264,13 +3246,13 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
     return new ByteArrayInputStream(bytesStream.toByteArray());
   }
 
-  private static FileOrValueType createFileOrValue(ZipOutputStream zipStream,
+  private static FileOrValue createFileOrValue(ZipOutputStream zipStream,
       String content, String fileName) throws IOException {
     if (StringUtil.isBlank(content)) {
       return null;
     }
 
-    FileOrValueType ret = new FileOrValueType();
+    FileOrValue ret = new FileOrValue();
     if (content.length() < 256) {
       ret.setValue(content);
     } else {
@@ -3286,7 +3268,7 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
     return ret;
   }
 
-  private static FileOrBinaryType createFileOrBase64Value(ZipOutputStream zipStream,
+  private static FileOrBinary createFileOrBase64Value(ZipOutputStream zipStream,
       String b64Content, String fileName) throws IOException {
     if (StringUtil.isBlank(b64Content)) {
       return null;
@@ -3295,13 +3277,13 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
     return createFileOrBinary(zipStream, Base64.decode(b64Content), fileName);
   }
 
-  private static FileOrBinaryType createFileOrBinary(ZipOutputStream zipStream,
+  private static FileOrBinary createFileOrBinary(ZipOutputStream zipStream,
       byte[] content, String fileName) throws IOException {
     if (content == null || content.length == 0) {
       return null;
     }
 
-    FileOrBinaryType ret = new FileOrBinaryType();
+    FileOrBinary ret = new FileOrBinary();
     if (content.length < 256) {
       ret.setBinary(content);
     } else {
@@ -3313,30 +3295,6 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
       } finally {
         zipStream.closeEntry();
       }
-    }
-    return ret;
-  }
-
-  private static UrisType createUris(Collection<String> uris) {
-    if (CollectionUtil.isEmpty(uris)) {
-      return null;
-    }
-
-    UrisType ret = new UrisType();
-    for (String uri : uris) {
-      ret.getUri().add(uri);
-    }
-    return ret;
-  }
-
-  private static ProfilesType createProfiles(Collection<String> profiles) {
-    if (CollectionUtil.isEmpty(profiles)) {
-      return null;
-    }
-
-    ProfilesType ret = new ProfilesType();
-    for (String profile : profiles) {
-      ret.getProfile().add(profile);
     }
     return ret;
   }
@@ -3355,7 +3313,7 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
     return new CaMgmtException(msg);
   }
 
-  private static PermissionsType getPermissions(int permission) {
+  private static List<String> getPermissions(int permission) {
     List<String> list = new LinkedList<>();
     if (PermissionConstants.ALL == permission) {
       list.add(PermissionConstants.getTextForCode(permission));
@@ -3366,9 +3324,8 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
         }
       }
     }
-    PermissionsType ret = new PermissionsType();
-    ret.getPermission().addAll(list);
-    return ret;
+
+    return list;
   }
 
 }

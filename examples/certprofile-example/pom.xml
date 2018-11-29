@@ -29,7 +29,7 @@
   <dependencies>
     <dependency>
       <groupId>org.xipki</groupId>
-      <artifactId>certprofile-xml</artifactId>
+      <artifactId>certprofile-xijson</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

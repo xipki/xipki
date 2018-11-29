@@ -138,24 +138,24 @@ if { $printUsage equals "true" } then {
 
   ## Prepare OCSP responder configuration
   xi:copy-file -f \
-    xipki/etc/ocsp/template.ocsp-responder.xml \
-    xipki/etc/ocsp/ocsp-responder.xml
+    xipki/etc/ocsp/template.ocsp-responder.json \
+    xipki/etc/ocsp/ocsp-responder.json
 
   xi:replace --old "REPLACEME-TOKENTYPE" --new "$TOKEN_TYPE" \
-    xipki/etc/ocsp/ocsp-responder.xml
+    xipki/etc/ocsp/ocsp-responder.json
 
   xi:replace --old "REPLACEME-TOKENKEY" --new "$OCSP_KEYCONF" \
-    xipki/etc/ocsp/ocsp-responder.xml
+    xipki/etc/ocsp/ocsp-responder.json
 
   xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
-    xipki/etc/ocsp/ocsp-responder.xml
+    xipki/etc/ocsp/ocsp-responder.json
 
   ## CA client configuration
-  xi:copy-file -f xipki/cmpclient/template.cmpclient.xml \
-    xipki/cmpclient/cmpclient.xml
+  xi:copy-file -f xipki/cmpclient/template.cmpclient.json \
+    xipki/cmpclient/cmpclient.json
 
   xi:replace --old "REPLACEME-CMP_SIGALGO" --new "$CMP_SIGALGO" \
-    xipki/cmpclient/cmpclient.xml
+    xipki/cmpclient/cmpclient.json
 
   ## Prepare scripts
   xi:copy-file -f xipki/qa/template.rest.script xipki/qa/rest.script
@@ -251,8 +251,8 @@ if { $printUsage equals "true" } then {
 
   # Copy the configuration of OCSP responder
   xi:copy-file -f \
-    xipki/etc/ocsp/ocsp-responder.xml \
-    ${XIPKI_DIR}/etc/ocsp/ocsp-responder.xml
+    xipki/etc/ocsp/ocsp-responder.json \
+    ${XIPKI_DIR}/etc/ocsp/ocsp-responder.json
 
   if { "$TOKEN_TYPE" equals "pkcs12" } then {
     xi:copy-file -f output/ocsp99.p12 \

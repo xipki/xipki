@@ -28,9 +28,9 @@ import org.bouncycastle.cert.ocsp.BasicOCSPResp;
 import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.xipki.ocsp.client.api.OcspRequestorException;
+import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
-import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**

@@ -267,7 +267,7 @@ public class Base64 {
    * is about twice as fast as {@link #decode(char[])}. The preconditions are:<br>
    * + The array must have a line length of 76 chars OR no line separators at all (one line).<br>
    * + Line separator must be "\r\n", as specified in RFC 2045
-   * + The array must not contain illegal characters within the encoded string<br>
+   * + The array may not contain illegal characters within the encoded string<br>
    * + The array CAN have illegal characters at the beginning and end, those will be dealt with
    * appropriately.<br>
    * @param sArr
@@ -481,7 +481,7 @@ public class Base64 {
    * is about twice as fast as {@link #decode(byte[])}. The preconditions are:<br>
    * + The array must have a line length of 76 chars OR no line separators at all (one line).<br>
    * + Line separator must be "\r\n", as specified in RFC 2045
-   * + The array must not contain illegal characters within the encoded string<br>
+   * + The array may not contain illegal characters within the encoded string<br>
    * + The array CAN have illegal characters at the beginning and end, those will be dealt with
    *   appropriately.<br>
    * @param sArr
@@ -661,7 +661,7 @@ public class Base64 {
    * about twice as fast as {@link #decode(String)}. The preconditions are:<br>
    * + The array must have a line length of 76 chars OR no line separators at all (one line).<br>
    * + Line separator must be "\r\n", as specified in RFC 2045
-   * + The array must not contain illegal characters within the encoded string<br>
+   * + The array may not contain illegal characters within the encoded string<br>
    * + The array CAN have illegal characters at the beginning and end, those will be dealt with
    *    appropriately.<br>
    * @param s

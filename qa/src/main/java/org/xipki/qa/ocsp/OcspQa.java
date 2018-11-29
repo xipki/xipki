@@ -59,8 +59,9 @@ import org.xipki.security.SecurityFactory;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.DateUtil;
 import org.xipki.util.Args;
+import org.xipki.util.DateUtil;
+import org.xipki.util.TripleState;
 
 /**
  * TODO.
@@ -319,11 +320,11 @@ public class OcspQa {
 
   private List<ValidationIssue> checkSingleCert(int index, SingleResp singleResp,
       IssuerHash issuerHash, OcspCertStatus expectedStatus, byte[] encodedCert,
-      Date expectedRevTime, boolean extendedRevoke, Occurrence nextupdateOccurrence,
-      Occurrence certhashOccurrence, ASN1ObjectIdentifier certhashAlg) {
+      Date expectedRevTime, boolean extendedRevoke, TripleState nextupdateOccurrence,
+      TripleState certhashOccurrence, ASN1ObjectIdentifier certhashAlg) {
     if (expectedStatus == OcspCertStatus.unknown
         || expectedStatus == OcspCertStatus.issuerUnknown) {
-      certhashOccurrence = Occurrence.forbidden;
+      certhashOccurrence = TripleState.forbidden;
     }
 
     List<ValidationIssue> issues = new LinkedList<>();
@@ -476,13 +477,13 @@ public class OcspQa {
   } // method checkSingleCert
 
   private static ValidationIssue checkOccurrence(String targetName, Object target,
-      Occurrence occurrence) {
+      TripleState occurrence) {
     ValidationIssue issue = new ValidationIssue(targetName, targetName);
-    if (occurrence == Occurrence.forbidden) {
+    if (occurrence == TripleState.forbidden) {
       if (target != null) {
         issue.setFailureMessage("is present, but none is expected");
       }
-    } else if (occurrence == Occurrence.required) {
+    } else if (occurrence == TripleState.required) {
       if (target == null) {
         issue.setFailureMessage("is absent, but it is expected");
       }

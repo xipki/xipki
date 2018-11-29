@@ -28,8 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.server.api.ResponderManager;
 import org.xipki.security.X509Cert;
-import org.xipki.util.HttpConstants;
 import org.xipki.util.Args;
+import org.xipki.util.HttpConstants;
 
 /**
  * TODO.

@@ -34,21 +34,19 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.xipki.ocsp.server.jaxb.CertCollectionType;
-import org.xipki.ocsp.server.jaxb.CertCollectionType.Keystore;
-import org.xipki.ocsp.server.jaxb.NonceType;
-import org.xipki.ocsp.server.jaxb.RequestOptionType;
-import org.xipki.ocsp.server.jaxb.RequestOptionType.CertpathValidation;
-import org.xipki.ocsp.server.jaxb.RequestOptionType.HashAlgorithms;
-import org.xipki.ocsp.server.jaxb.VersionsType;
+import org.xipki.ocsp.server.conf.CertCollectionType;
+import org.xipki.ocsp.server.conf.NonceType;
+import org.xipki.ocsp.server.conf.RequestOptionType;
+import org.xipki.ocsp.server.conf.CertCollectionType.Keystore;
+import org.xipki.ocsp.server.conf.RequestOptionType.CertpathValidation;
 import org.xipki.security.CertpathValidationModel;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.Args;
 import org.xipki.util.TripleState;
+import org.xipki.util.conf.InvalidConfException;
 
 /**
  * TODO.
@@ -111,11 +109,11 @@ public class RequestOption {
     int maxLen = 32;
     String str = nonceConf.getOccurrence().toLowerCase();
     if ("forbidden".equals(str)) {
-      nonceOccurrence = TripleState.FORBIDDEN;
+      nonceOccurrence = TripleState.forbidden;
     } else if ("optional".equals(str)) {
-      nonceOccurrence = TripleState.OPTIONAL;
+      nonceOccurrence = TripleState.optional;
     } else if ("required".equals(str)) {
-      nonceOccurrence = TripleState.REQUIRED;
+      nonceOccurrence = TripleState.required;
     } else {
       throw new InvalidConfException("invalid nonce.occurrence '" + str
           + "', only forbidded, optional, and required are allowed");
@@ -144,9 +142,8 @@ public class RequestOption {
 
     // Request versions
 
-    VersionsType versionsConf = conf.getVersions();
     this.versions = new HashSet<>();
-    for (String m : versionsConf.getVersion()) {
+    for (String m : conf.getVersions()) {
       if ("v1".equalsIgnoreCase(m)) {
         this.versions.add(0);
       } else {
@@ -157,9 +154,10 @@ public class RequestOption {
     // Request hash algorithms
     hashAlgos = new HashSet<>();
 
-    HashAlgorithms reqHashAlgosConf = conf.getHashAlgorithms();
-    if (reqHashAlgosConf != null) {
-      for (String token : reqHashAlgosConf.getAlgorithm()) {
+    if (conf.getHashAlgorithms().isEmpty()) {
+      hashAlgos.addAll(SUPPORTED_HASH_ALGORITHMS);
+    } else {
+      for (String token : conf.getHashAlgorithms()) {
         HashAlgo algo = HashAlgo.getInstance(token);
         if (algo != null && SUPPORTED_HASH_ALGORITHMS.contains(algo)) {
           hashAlgos.add(algo);
@@ -167,8 +165,6 @@ public class RequestOption {
           throw new InvalidConfException("hash algorithm " + token + " is unsupported");
         }
       }
-    } else {
-      hashAlgos.addAll(SUPPORTED_HASH_ALGORITHMS);
     }
 
     // certpath validation
@@ -283,7 +279,7 @@ public class RequestOption {
       String fileName = ksConf.getKeystore().getFile();
       InputStream is = (fileName != null)
           ? Files.newInputStream(Paths.get(IoUtil.expandFilepath(fileName)))
-          : new ByteArrayInputStream(ksConf.getKeystore().getValue());
+          : new ByteArrayInputStream(ksConf.getKeystore().getBinary());
 
       char[] password = (ksConf.getPassword() == null)  ? null
           : ksConf.getPassword().toCharArray();

@@ -47,9 +47,9 @@ import org.xipki.password.PasswordResolverException;
 import org.xipki.security.Securities;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.HttpConstants;
-import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
+import org.xipki.util.conf.InvalidConfException;
 
 /**
  * TODO.
@@ -62,7 +62,7 @@ public class OcspServletFilter implements Filter {
 
   private static final String DFLT_OCSP_SERVER_CFG = "xipki/etc/org.xipki.ocsp.server.cfg";
 
-  private static final String DFLT_CONF_FILE = "xipki/etc/ocsp/ocsp-responder.xml";
+  private static final String DFLT_CONF_FILE = "xipki/etc/ocsp/ocsp-responder.json";
 
   private Securities securities;
 

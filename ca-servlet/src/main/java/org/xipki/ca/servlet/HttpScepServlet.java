@@ -47,11 +47,11 @@ import org.xipki.ca.server.api.ScepResponder;
 import org.xipki.scep.exception.MessageDecodingException;
 import org.xipki.scep.transaction.Operation;
 import org.xipki.scep.util.ScepConstants;
+import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.Args;
 import org.xipki.util.RandomUtil;
 
 /**

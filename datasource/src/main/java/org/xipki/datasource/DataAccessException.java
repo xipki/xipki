@@ -214,7 +214,7 @@ public class DataAccessException extends Exception {
    */
   public DataAccessException(Reason reason, String msg) {
     super(reason + " - " + msg);
-    this.reason = Objects.requireNonNull(reason, "reason must not be null");
+    this.reason = Objects.requireNonNull(reason, "reason may not be null");
   }
 
   /**
@@ -234,7 +234,7 @@ public class DataAccessException extends Exception {
    */
   public DataAccessException(Reason reason, String msg, Throwable cause) {
     super(reason + " - " + msg, cause);
-    this.reason = Objects.requireNonNull(reason, "reason must not be null");
+    this.reason = Objects.requireNonNull(reason, "reason may not be null");
   }
 
   public Reason getReason() {

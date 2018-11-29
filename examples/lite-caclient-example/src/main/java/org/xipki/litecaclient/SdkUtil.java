@@ -137,13 +137,13 @@ public class SdkUtil {
   }
 
   public static <T> T requireNonNull(String objName, T obj) {
-    return Objects.requireNonNull(obj, objName + " must not be null");
+    return Objects.requireNonNull(obj, objName + " may not be null");
   }
 
   public static String requireNonBlank(String objName, String obj) {
-    Objects.requireNonNull(obj, objName + " must not be null");
+    Objects.requireNonNull(obj, objName + " may not be null");
     if (obj.isEmpty()) {
-      throw new IllegalArgumentException(objName + " must not be blank");
+      throw new IllegalArgumentException(objName + " may not be blank");
     }
     return obj;
   }

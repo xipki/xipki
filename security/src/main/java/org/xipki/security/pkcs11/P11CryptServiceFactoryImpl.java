@@ -29,9 +29,9 @@ import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.exception.P11TokenException;
-import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
+import org.xipki.util.conf.InvalidConfException;
 
 /**
  * TODO.

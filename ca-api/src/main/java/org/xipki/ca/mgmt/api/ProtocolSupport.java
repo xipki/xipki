@@ -17,6 +17,7 @@
 
 package org.xipki.ca.mgmt.api;
 
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.xipki.util.StringUtil;
@@ -46,6 +47,22 @@ public class ProtocolSupport {
   private ProtocolSupport() {
   }
 
+  public ProtocolSupport(Set<String> protocols) {
+    if (protocols == null) {
+      return;
+    }
+
+    for (String protocol : protocols) {
+      if (CMP.equalsIgnoreCase(protocol)) {
+        cmp = true;
+      } else if (REST.equalsIgnoreCase(protocol)) {
+        rest = true;
+      } else if (SCEP.equalsIgnoreCase(protocol)) {
+        scep = true;
+      }
+    }
+  }
+
   public ProtocolSupport(String encoded) {
     if (StringUtil.isBlank(encoded)) {
       return;
@@ -53,12 +70,12 @@ public class ProtocolSupport {
 
     StringTokenizer st = new StringTokenizer(encoded, ",");
     while (st.hasMoreTokens()) {
-      String token = st.nextToken();
-      if (CMP.equalsIgnoreCase(token)) {
+      String protocol = st.nextToken();
+      if (CMP.equalsIgnoreCase(protocol)) {
         cmp = true;
-      } else if (REST.equalsIgnoreCase(token)) {
+      } else if (REST.equalsIgnoreCase(protocol)) {
         rest = true;
-      } else if (SCEP.equalsIgnoreCase(token)) {
+      } else if (SCEP.equalsIgnoreCase(protocol)) {
         scep = true;
       }
     }

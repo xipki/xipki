@@ -32,11 +32,11 @@ public class AuditEventData {
   private String value;
 
   public AuditEventData(String name, Object value) {
-    Objects.requireNonNull(name, "name must not be null");
+    Objects.requireNonNull(name, "name may not be null");
     if (name.isEmpty()) {
-      throw new IllegalArgumentException("name must not be empty");
+      throw new IllegalArgumentException("name may not be empty");
     }
-    Objects.requireNonNull(value, "value must not be null");
+    Objects.requireNonNull(value, "value may not be null");
     this.name = name;
     if (value instanceof String) {
       this.value = (String) value;

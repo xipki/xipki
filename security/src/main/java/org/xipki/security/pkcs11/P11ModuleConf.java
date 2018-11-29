@@ -27,20 +27,16 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolver;
-import org.xipki.security.pkcs11.jaxb.MechanismFilterType;
-import org.xipki.security.pkcs11.jaxb.MechanismFiltersType;
-import org.xipki.security.pkcs11.jaxb.MechanismSetType;
-import org.xipki.security.pkcs11.jaxb.MechnanismSetsType;
-import org.xipki.security.pkcs11.jaxb.ModuleType;
-import org.xipki.security.pkcs11.jaxb.NativeLibraryType;
-import org.xipki.security.pkcs11.jaxb.PasswordSetsType;
-import org.xipki.security.pkcs11.jaxb.PasswordsType;
-import org.xipki.security.pkcs11.jaxb.SlotType;
-import org.xipki.security.pkcs11.jaxb.SlotsType;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.InvalidConfException;
+import org.xipki.security.pkcs11.conf.MechanimFilterType;
+import org.xipki.security.pkcs11.conf.MechanismSetType;
+import org.xipki.security.pkcs11.conf.ModuleType;
+import org.xipki.security.pkcs11.conf.NativeLibraryType;
+import org.xipki.security.pkcs11.conf.PasswordSetType;
+import org.xipki.security.pkcs11.conf.SlotType;
 import org.xipki.util.Args;
+import org.xipki.util.CollectionUtil;
 import org.xipki.util.StringUtil;
+import org.xipki.util.conf.InvalidConfException;
 
 import iaik.pkcs.pkcs11.constants.Functions;
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
@@ -77,10 +73,10 @@ public class P11ModuleConf {
 
   private final P11NewObjectConf newObjectConf;
 
-  public P11ModuleConf(ModuleType moduleType, MechnanismSetsType mechanismSetsType,
+  public P11ModuleConf(ModuleType moduleType, List<MechanismSetType> mechanismSets,
       PasswordResolver passwordResolver) throws InvalidConfException {
     Args.notNull(moduleType, "moduleType");
-    Args.notNull(mechanismSetsType, "mechanismSetsType");
+    Args.notEmpty(mechanismSets, "mechanismSets");
     this.name = moduleType.getName();
     this.readOnly = moduleType.isReadonly();
 
@@ -103,23 +99,22 @@ public class P11ModuleConf {
       }
     }
 
-    this.maxMessageSize = moduleType.getMaxMessageSize().intValue();
+    this.maxMessageSize = moduleType.getMaxMessageSize();
     this.type = moduleType.getType();
     if (maxMessageSize < 128) {
       throw new InvalidConfException("invalid maxMessageSize (< 128): " + maxMessageSize);
     }
 
     // parse mechanismSets
-    List<MechanismSetType> list = mechanismSetsType.getMechanismSet();
-    Map<String, Set<Long>> mechanismSetsMap = new HashMap<>(list.size() * 3 / 2);
-    for (MechanismSetType m : list) {
+    Map<String, Set<Long>> mechanismSetsMap = new HashMap<>(mechanismSets.size() * 3 / 2);
+    for (MechanismSetType m : mechanismSets) {
       String name = m.getName();
       if (mechanismSetsMap.containsKey(name)) {
         throw new InvalidConfException("Duplication mechanismSets named " + name);
       }
 
       Set<Long> mechanisms = new HashSet<>();
-      for (String mechStr : m.getMechanism()) {
+      for (String mechStr : m.getMechanisms()) {
         mechStr = mechStr.trim().toUpperCase();
         if (mechStr.equals("ALL")) {
           mechanisms = null; // accept all mechanisms
@@ -161,9 +156,9 @@ public class P11ModuleConf {
     // Mechanism filter
     mechanismFilter = new P11MechanismFilter();
 
-    MechanismFiltersType mechFilters = moduleType.getMechanismFilters();
-    if (mechFilters != null && CollectionUtil.isNonEmpty(mechFilters.getMechanismFilter())) {
-      for (MechanismFilterType filterType : mechFilters.getMechanismFilter()) {
+    List<MechanimFilterType> mechFilters = moduleType.getMechanismFilters();
+    if (mechFilters != null && CollectionUtil.isNonEmpty(mechFilters)) {
+      for (MechanimFilterType filterType : mechFilters) {
         Set<P11SlotIdFilter> slots = getSlotIdFilters(filterType.getSlots());
         String mechanismSetName = filterType.getMechanismSet();
 
@@ -182,12 +177,12 @@ public class P11ModuleConf {
 
     // Password retriever
     passwordRetriever = new P11PasswordsRetriever();
-    PasswordSetsType passwordsList = moduleType.getPasswordSets();
-    if (passwordsList != null && CollectionUtil.isNonEmpty(passwordsList.getPasswords())) {
+    List<PasswordSetType> passwordsList = moduleType.getPasswordSets();
+    if (passwordsList != null && CollectionUtil.isNonEmpty(passwordsList)) {
       passwordRetriever.setPasswordResolver(passwordResolver);
-      for (PasswordsType passwordType : passwordsList.getPasswords()) {
+      for (PasswordSetType passwordType : passwordsList) {
         Set<P11SlotIdFilter> slots = getSlotIdFilters(passwordType.getSlots());
-        passwordRetriever.addPasswordEntry(slots, new ArrayList<>(passwordType.getPassword()));
+        passwordRetriever.addPasswordEntry(slots, new ArrayList<>(passwordType.getPasswords()));
       }
     }
 
@@ -196,8 +191,8 @@ public class P11ModuleConf {
 
     final String osName = System.getProperty("os.name").toLowerCase();
     String nativeLibraryPath = null;
-    for (NativeLibraryType library : moduleType.getNativeLibraries().getNativeLibrary()) {
-      List<String> osNames = library.getOs();
+    for (NativeLibraryType library : moduleType.getNativeLibraries()) {
+      List<String> osNames = library.getOperationSystems();
       if (CollectionUtil.isEmpty(osNames)) {
         nativeLibraryPath = library.getPath();
       } else {
@@ -291,14 +286,14 @@ public class P11ModuleConf {
     return newObjectConf;
   }
 
-  private static Set<P11SlotIdFilter> getSlotIdFilters(SlotsType type)
+  private static Set<P11SlotIdFilter> getSlotIdFilters(List<SlotType> slotTypes)
       throws InvalidConfException {
-    if (type == null || CollectionUtil.isEmpty(type.getSlot())) {
+    if (CollectionUtil.isEmpty(slotTypes)) {
       return null;
     }
 
     Set<P11SlotIdFilter> filters = new HashSet<>();
-    for (SlotType slotType : type.getSlot()) {
+    for (SlotType slotType : slotTypes) {
       Long slotId = null;
       if (slotType.getId() != null) {
         String str = slotType.getId().trim();

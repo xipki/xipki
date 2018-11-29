@@ -29,10 +29,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.server.api.CmpResponder;
 import org.xipki.ca.server.api.ResponderManager;
+import org.xipki.util.Args;
 import org.xipki.util.HealthCheckResult;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.LogUtil;
-import org.xipki.util.Args;
+
+import com.alibaba.fastjson.JSON;
 
 /**
  * TODO.
@@ -92,7 +94,7 @@ public class HealthCheckServlet extends HttpServlet {
       int status = healthResult.isHealthy()
           ? HttpServletResponse.SC_OK
           : HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-      byte[] respBytes = healthResult.toJsonMessage(true).getBytes();
+      byte[] respBytes = JSON.toJSONBytes(healthResult);
       resp.setStatus(status);
       resp.setContentLength(respBytes.length);
       resp.setContentType(CT_RESPONSE);

@@ -48,9 +48,9 @@ import org.xipki.security.pkcs11.exception.P11UnsupportedMechanismException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.DSAParameterCache;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.Hex;
 import org.xipki.util.LogUtil;
-import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 import iaik.pkcs.pkcs11.constants.Functions;
@@ -273,7 +273,7 @@ public abstract class P11Slot implements Closeable {
   /**
    * TODO.
    * @param id
-   *         Id of the objects to be deleted. At least one of id and label must not be {@code null}.
+   *         Id of the objects to be deleted. At least one of id and label may not be {@code null}.
    * @param label
    *         Label of the objects to be deleted
    * @return how many objects have been deleted

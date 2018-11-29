@@ -312,7 +312,7 @@ public class SyslogAuditService implements AuditService {
   }
 
   public void setHost(String host) {
-    this.host = Objects.requireNonNull(host, "host must not be null");
+    this.host = Objects.requireNonNull(host, "host may not be null");
   }
 
   public void setPort(int port) {
@@ -320,7 +320,7 @@ public class SyslogAuditService implements AuditService {
   }
 
   public void setProtocol(String protocol) {
-    this.protocol = Objects.requireNonNull(protocol, "protocol must not be null");
+    this.protocol = Objects.requireNonNull(protocol, "protocol may not be null");
   }
 
   public void setLocalname(String localname) {
@@ -328,7 +328,7 @@ public class SyslogAuditService implements AuditService {
   }
 
   public void setMessageFormat(String messageFormat) {
-    this.messageFormat = Objects.requireNonNull(messageFormat, "messageFormat must not be null");
+    this.messageFormat = Objects.requireNonNull(messageFormat, "messageFormat may not be null");
   }
 
   public void setWriteRetries(int writeRetries) {

@@ -149,15 +149,15 @@
   </fileSets>
   <files>
     <file>
-      <source>src/main/unfiltered/xipki/cmpclient/template.cmpclient-signature.xml</source>
+      <source>src/main/unfiltered/xipki/cmpclient/template.cmpclient-signature.json</source>
       <outputDirectory>xipki/cmpclient</outputDirectory>
-      <destName>template.cmpclient.xml</destName>
+      <destName>template.cmpclient.json</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>../shared/conf/xipki/security/example/pkcs11-emulator.xml</source>
+      <source>../shared/conf/xipki/security/example/pkcs11-emulator.json</source>
       <outputDirectory>xipki/security</outputDirectory>
-      <destName>pkcs11.xml</destName>
+      <destName>pkcs11.json</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>

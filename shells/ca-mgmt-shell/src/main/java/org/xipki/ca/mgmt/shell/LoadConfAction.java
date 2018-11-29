@@ -29,8 +29,8 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
+import org.xipki.ca.mgmt.api.CaConfs;
 import org.xipki.ca.mgmt.api.CaMgmtException;
-import org.xipki.ca.mgmt.api.conf.CaConfs;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.completer.DerPemCompleter;
 import org.xipki.util.CollectionUtil;
@@ -63,7 +63,7 @@ public class LoadConfAction extends CaAction {
     String msg = "configuration " + confFile;
     try {
       InputStream confStream;
-      if (confFile.endsWith(".xml")) {
+      if (confFile.endsWith(".json")) {
         confStream = CaConfs.convertFileConfToZip(confFile);
       } else {
         confStream = Files.newInputStream(Paths.get(confFile));

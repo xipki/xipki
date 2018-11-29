@@ -22,8 +22,8 @@ import java.security.SecureRandom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.SecurityFactory;
-import org.xipki.util.BenchmarkExecutor;
 import org.xipki.util.Args;
+import org.xipki.util.BenchmarkExecutor;
 
 /**
  * TODO.

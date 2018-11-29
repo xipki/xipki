@@ -18,7 +18,6 @@
 package org.xipki.ocsp.server;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -42,12 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -73,18 +66,15 @@ import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.ocsp.api.OcspStoreFactoryRegister;
 import org.xipki.ocsp.api.Responder;
 import org.xipki.ocsp.api.ResponderAndPath;
-import org.xipki.ocsp.server.jaxb.DatasourceType;
-import org.xipki.ocsp.server.jaxb.EmbedCertsMode;
-import org.xipki.ocsp.server.jaxb.FileOrPlainValueType;
-import org.xipki.ocsp.server.jaxb.FileOrValueType;
-import org.xipki.ocsp.server.jaxb.ObjectFactory;
-import org.xipki.ocsp.server.jaxb.Ocspserver;
-import org.xipki.ocsp.server.jaxb.RequestOptionType;
-import org.xipki.ocsp.server.jaxb.ResponderType;
-import org.xipki.ocsp.server.jaxb.ResponseCacheType;
-import org.xipki.ocsp.server.jaxb.ResponseOptionType;
-import org.xipki.ocsp.server.jaxb.SignerType;
-import org.xipki.ocsp.server.jaxb.StoreType;
+import org.xipki.ocsp.server.conf.DatasourceType;
+import org.xipki.ocsp.server.conf.OcspserverType;
+import org.xipki.ocsp.server.conf.OcspserverType.EmbedCertsMode;
+import org.xipki.ocsp.server.conf.RequestOptionType;
+import org.xipki.ocsp.server.conf.ResponderType;
+import org.xipki.ocsp.server.conf.ResponseCacheType;
+import org.xipki.ocsp.server.conf.ResponseOptionType;
+import org.xipki.ocsp.server.conf.SignerType;
+import org.xipki.ocsp.server.conf.StoreType;
 import org.xipki.ocsp.server.type.CertID;
 import org.xipki.ocsp.server.type.EncodingException;
 import org.xipki.ocsp.server.type.ExtendedExtension;
@@ -106,18 +96,20 @@ import org.xipki.security.SignerConf;
 import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.HealthCheckResult;
 import org.xipki.util.Hex;
-import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
-import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 import org.xipki.util.TripleState;
-import org.xipki.util.XmlUtil;
-import org.xml.sax.SAXException;
+import org.xipki.util.conf.FileOrBinary;
+import org.xipki.util.conf.FileOrValue;
+import org.xipki.util.conf.InvalidConfException;
+
+import com.alibaba.fastjson.JSON;
 
 /**
  * TODO.
@@ -194,7 +186,7 @@ public class OcspServerImpl implements OcspServer {
 
   private Map<String, RequestOption> requestOptions = new HashMap<>();
 
-  private Map<String, ResponseOption> responseOptions = new HashMap<>();
+  private Map<String, ResponseOptionType> responseOptions = new HashMap<>();
 
   private Map<String, OcspStore> stores = new HashMap<>();
 
@@ -326,13 +318,13 @@ public class OcspServerImpl implements OcspServer {
     servletPaths.clear();
     path2responderMap.clear();
 
-    Ocspserver conf = parseConf(confFile);
+    OcspserverType conf = parseConf(confFile);
 
     //-- check the duplication names
     Set<String> set = new HashSet<>();
 
     // Duplication name check: responder
-    for (ResponderType m : conf.getResponders().getResponder()) {
+    for (ResponderType m : conf.getResponders()) {
       String name = m.getName();
 
       if ("health".equalsIgnoreCase(name) || "mgmt".equalsIgnoreCase(name)) {
@@ -344,7 +336,7 @@ public class OcspServerImpl implements OcspServer {
       }
 
       if (StringUtil.isBlank(name)) {
-        throw new InvalidConfException("responder name must not be empty");
+        throw new InvalidConfException("responder name may not be empty");
       }
 
       for (int i = 0; i < name.length(); i++) {
@@ -359,7 +351,7 @@ public class OcspServerImpl implements OcspServer {
 
     // Duplication name check: signer
     set.clear();
-    for (SignerType m : conf.getSigners().getSigner()) {
+    for (SignerType m : conf.getSigners()) {
       String name = m.getName();
       if (set.contains(name)) {
         throw new InvalidConfException(
@@ -370,7 +362,7 @@ public class OcspServerImpl implements OcspServer {
 
     // Duplication name check: requests
     set.clear();
-    for (RequestOptionType m : conf.getRequestOptions().getRequestOption()) {
+    for (RequestOptionType m : conf.getRequestOptions()) {
       String name = m.getName();
       if (set.contains(name)) {
         throw new InvalidConfException(
@@ -381,7 +373,7 @@ public class OcspServerImpl implements OcspServer {
 
     // Duplication name check: response
     set.clear();
-    for (ResponseOptionType m : conf.getResponseOptions().getResponseOption()) {
+    for (ResponseOptionType m : conf.getResponseOptions()) {
       String name = m.getName();
       if (set.contains(name)) {
         throw new InvalidConfException(
@@ -392,7 +384,7 @@ public class OcspServerImpl implements OcspServer {
 
     // Duplication name check: store
     set.clear();
-    for (StoreType m : conf.getStores().getStore()) {
+    for (StoreType m : conf.getStores()) {
       String name = m.getName();
       if (set.contains(name)) {
         throw new InvalidConfException("duplicated definition of store named '" + name + "'");
@@ -402,7 +394,7 @@ public class OcspServerImpl implements OcspServer {
     // Duplication name check: datasource
     set.clear();
     if (conf.getDatasources() != null) {
-      for (DatasourceType m : conf.getDatasources().getDatasource()) {
+      for (DatasourceType m : conf.getDatasources()) {
         String name = m.getName();
         if (set.contains(name)) {
           throw new InvalidConfException(
@@ -435,27 +427,26 @@ public class OcspServerImpl implements OcspServer {
 
     //-- initializes the responders
     // signers
-    for (SignerType m : conf.getSigners().getSigner()) {
+    for (SignerType m : conf.getSigners()) {
       ResponderSigner signer = initSigner(m);
       signers.put(m.getName(), signer);
     }
 
     // requests
-    for (RequestOptionType m : conf.getRequestOptions().getRequestOption()) {
+    for (RequestOptionType m : conf.getRequestOptions()) {
       RequestOption option = new RequestOption(m);
       requestOptions.put(m.getName(), option);
     }
 
     // responses
-    for (ResponseOptionType m : conf.getResponseOptions().getResponseOption()) {
-      ResponseOption option = new ResponseOption(m);
-      responseOptions.put(m.getName(), option);
+    for (ResponseOptionType m : conf.getResponseOptions()) {
+      responseOptions.put(m.getName(), m);
     }
 
     // datasources
     Map<String, DataSourceWrapper> datasources = new HashMap<>();
     if (conf.getDatasources() != null) {
-      for (DatasourceType m : conf.getDatasources().getDatasource()) {
+      for (DatasourceType m : conf.getDatasources()) {
         String name = m.getName();
         DataSourceWrapper datasource;
         InputStream dsStream = null;
@@ -475,7 +466,7 @@ public class OcspServerImpl implements OcspServer {
     // responders
     Map<String, ResponderOption> responderOptions = new HashMap<>();
 
-    for (ResponderType m : conf.getResponders().getResponder()) {
+    for (ResponderType m : conf.getResponders()) {
       ResponderOption option = new ResponderOption(m);
 
       String optName = option.getSignerName();
@@ -494,7 +485,7 @@ public class OcspServerImpl implements OcspServer {
       }
 
       // required HashAlgorithms for certificate
-      List<StoreType> storeDefs = conf.getStores().getStore();
+      List<StoreType> storeDefs = conf.getStores();
       Set<String> storeNames = new HashSet<>(storeDefs.size());
       for (StoreType storeDef : storeDefs) {
         storeNames.add(storeDef.getName());
@@ -504,7 +495,7 @@ public class OcspServerImpl implements OcspServer {
     } // end for
 
     // stores
-    for (StoreType m : conf.getStores().getStore()) {
+    for (StoreType m : conf.getStores()) {
       OcspStore store = newStore(m, datasources);
       stores.put(m.getName(), store);
     }
@@ -518,7 +509,7 @@ public class OcspServerImpl implements OcspServer {
         statusStores.add(stores.get(storeName));
       }
 
-      ResponseOption responseOption = responseOptions.get(option.getResponseOptionName());
+      ResponseOptionType responseOption = responseOptions.get(option.getResponseOptionName());
       ResponderSigner signer = signers.get(option.getSignerName());
       if (signer.isMacSigner()) {
         if (responseOption.isResponderIdByName()) {
@@ -597,7 +588,7 @@ public class OcspServerImpl implements OcspServer {
     }
 
     ResponderSigner signer = responder.getSigner();
-    ResponseOption repOpt = responder.getResponseOption();
+    ResponseOptionType repOpt = responder.getResponseOption();
 
     try {
       Object reqOrRrrorResp = checkSignature(request, reqOpt);
@@ -624,7 +615,7 @@ public class OcspServerImpl implements OcspServer {
 
       ExtendedExtension nonceExtn = removeExtension(reqExtensions, OID.ID_PKIX_OCSP_NONCE);
       if (nonceExtn != null) {
-        if (reqOpt.getNonceOccurrence() == TripleState.FORBIDDEN) {
+        if (reqOpt.getNonceOccurrence() == TripleState.forbidden) {
           LOG.warn("nonce forbidden, but is present in the request");
           return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
         }
@@ -641,7 +632,7 @@ public class OcspServerImpl implements OcspServer {
         repControl.canCacheInfo = false;
         respExtensions.add(nonceExtn);
       } else {
-        if (reqOpt.getNonceOccurrence() == TripleState.REQUIRED) {
+        if (reqOpt.getNonceOccurrence() == TripleState.required) {
           LOG.warn("nonce required, but is not present in the request");
           return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
         }
@@ -810,7 +801,7 @@ public class OcspServerImpl implements OcspServer {
   } // method ask
 
   private OcspRespWithCacheInfo processCertReq(CertID certId, OCSPRespBuilder builder,
-      ResponderImpl responder, RequestOption reqOpt, ResponseOption repOpt,
+      ResponderImpl responder, RequestOption reqOpt, ResponseOptionType repOpt,
       OcspRespControl repControl) throws IOException {
     HashAlgo reqHashAlgo = certId.getIssuer().hashAlgorithm();
     if (!reqOpt.allows(reqHashAlgo)) {
@@ -846,7 +837,7 @@ public class OcspServerImpl implements OcspServer {
       }
     } // end if
 
-    // certStatusInfo must not be null in any case, since at least one store is configured
+    // certStatusInfo may not be null in any case, since at least one store is configured
     Date thisUpdate = certStatusInfo.getThisUpdate();
     if (thisUpdate == null) {
       thisUpdate = new Date();
@@ -945,14 +936,16 @@ public class OcspServerImpl implements OcspServer {
   @Override
   public HealthCheckResult healthCheck(Responder responder2) {
     ResponderImpl responder = (ResponderImpl) responder2;
-    HealthCheckResult result = new HealthCheckResult("OCSPResponder");
+    HealthCheckResult result = new HealthCheckResult();
+    result.setName("OCSPResponder");
     boolean healthy = true;
 
     for (OcspStore store : responder.getStores()) {
       boolean storeHealthy = store.isHealthy();
       healthy &= storeHealthy;
 
-      HealthCheckResult storeHealth = new HealthCheckResult("CertStatusStore." + store.getName());
+      HealthCheckResult storeHealth = new HealthCheckResult();
+      storeHealth.setName("CertStatusStore." + store.getName());
       storeHealth.setHealthy(storeHealthy);
       result.addChildCheck(storeHealth);
     }
@@ -960,7 +953,8 @@ public class OcspServerImpl implements OcspServer {
     boolean signerHealthy = responder.getSigner().isHealthy();
     healthy &= signerHealthy;
 
-    HealthCheckResult signerHealth = new HealthCheckResult("Signer");
+    HealthCheckResult signerHealth = new HealthCheckResult();
+    signerHealth.setName("Signer");
     signerHealth.setHealthy(signerHealthy);
     result.addChildCheck(signerHealth);
 
@@ -989,7 +983,7 @@ public class OcspServerImpl implements OcspServer {
       if (signerType.getCaCerts() != null) {
         caCerts = new HashSet<>();
 
-        for (FileOrValueType certConf : signerType.getCaCerts().getCaCert()) {
+        for (FileOrBinary certConf : signerType.getCaCerts()) {
           caCerts.add(parseCert(certConf));
         }
       }
@@ -1000,7 +994,7 @@ public class OcspServerImpl implements OcspServer {
     String responderSignerType = signerType.getType();
     String responderKeyConf = signerType.getKey();
 
-    List<String> sigAlgos = signerType.getAlgorithms().getAlgorithm();
+    List<String> sigAlgos = signerType.getAlgorithms();
     List<ConcurrentContentSigner> singleSigners = new ArrayList<>(sigAlgos.size());
     for (String sigAlgo : sigAlgos) {
       try {
@@ -1034,13 +1028,13 @@ public class OcspServerImpl implements OcspServer {
     Integer interval = conf.getRetentionInterval();
     int retentionInterva = (interval == null) ? -1 : interval.intValue();
     store.setRetentionInterval(retentionInterva);
-    store.setUnknownSerialAsGood(getBoolean(conf.isUnknownSerialAsGood(), false));
+    store.setUnknownSerialAsGood(getBoolean(conf.getUnknownSerialAsGood(), false));
 
-    store.setIncludeArchiveCutoff(getBoolean(conf.isIncludeArchiveCutoff(), true));
-    store.setIncludeCrlId(getBoolean(conf.isIncludeCrlId(), true));
+    store.setIncludeArchiveCutoff(getBoolean(conf.getIncludeArchiveCutoff(), true));
+    store.setIncludeCrlId(getBoolean(conf.getIncludeCrlId(), true));
 
-    store.setIgnoreExpiredCert(getBoolean(conf.isIgnoreExpiredCert(), true));
-    store.setIgnoreNotYetValidCert(getBoolean(conf.isIgnoreNotYetValidCert(), true));
+    store.setIgnoreExpiredCert(getBoolean(conf.getIgnoreExpiredCert(), true));
+    store.setIgnoreNotYetValidCert(getBoolean(conf.getIgnoreNotYetValidCert(), true));
 
     String datasourceName = conf.getSource().getDatasource();
     DataSourceWrapper datasource = null;
@@ -1051,8 +1045,10 @@ public class OcspServerImpl implements OcspServer {
       }
     }
     try {
-      store.init(conf.getSource().getConf(), datasource);
-    } catch (OcspStoreException ex) {
+      FileOrValue sourceConf = conf.getSource().getConf();
+
+      store.init(sourceConf == null ? null : sourceConf.readContent(), datasource);
+    } catch (OcspStoreException | IOException ex) {
       throw new InvalidConfException("CertStatusStoreException of store " + conf.getName()
           + ":" + ex.getMessage(), ex);
     }
@@ -1188,13 +1184,13 @@ public class OcspServerImpl implements OcspServer {
     return (bo == null) ? defaultValue : bo.booleanValue();
   }
 
-  private static InputStream getInputStream(FileOrValueType conf) throws IOException {
+  private static InputStream getInputStream(FileOrBinary conf) throws IOException {
     return (conf.getFile() != null)
         ? Files.newInputStream(Paths.get(IoUtil.expandFilepath(conf.getFile())))
-        : new ByteArrayInputStream(conf.getValue());
+        : new ByteArrayInputStream(conf.getBinary());
   }
 
-  private static InputStream getInputStream(FileOrPlainValueType conf) throws IOException {
+  private static InputStream getInputStream(FileOrValue conf) throws IOException {
     return (conf.getFile() != null)
         ? Files.newInputStream(Paths.get(IoUtil.expandFilepath(conf.getFile())))
         : new ByteArrayInputStream(conf.getValue().getBytes());
@@ -1212,7 +1208,7 @@ public class OcspServerImpl implements OcspServer {
     }
   }
 
-  private static X509Certificate parseCert(FileOrValueType certConf) throws InvalidConfException {
+  private static X509Certificate parseCert(FileOrBinary certConf) throws InvalidConfException {
     InputStream is = null;
     try {
       is = getInputStream(certConf);
@@ -1228,20 +1224,13 @@ public class OcspServerImpl implements OcspServer {
     }
   }
 
-  private static Ocspserver parseConf(String confFilename) throws InvalidConfException {
-    try {
-      JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
-      Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-      SchemaFactory schemaFact = SchemaFactory.newInstance(
-          javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-      Schema schema = schemaFact.newSchema(OcspServerImpl.class.getResource("/xsd/ocsp-conf.xsd"));
-      unmarshaller.setSchema(schema);
-      return (Ocspserver) unmarshaller.unmarshal(new File(IoUtil.expandFilepath(confFilename)));
-    } catch (SAXException ex) {
+  private static OcspserverType parseConf(String confFilename) throws InvalidConfException {
+    try (InputStream is = Files.newInputStream(Paths.get(confFilename))) {
+      OcspserverType root = JSON.parseObject(is, OcspserverType.class);
+      root.validate();
+      return root;
+    } catch (IOException | RuntimeException ex) {
       throw new InvalidConfException("parse profile failed, message: " + ex.getMessage(), ex);
-    } catch (JAXBException ex) {
-      throw new InvalidConfException(
-          "parse profile failed, message: " + XmlUtil.getMessage(ex), ex);
     }
   }
 

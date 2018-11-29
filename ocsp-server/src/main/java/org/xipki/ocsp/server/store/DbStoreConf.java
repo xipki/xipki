@@ -42,7 +42,15 @@ class DbStoreConf {
 
   private final Set<String> caCertsExcludes = new HashSet<>();
 
+  /**
+   * Constructor
+   * @param propsConf the properties configuration
+   * @throws OcspStoreException
+   */
   DbStoreConf(String propsConf) throws OcspStoreException {
+    if (propsConf == null) {
+      propsConf = "";
+    }
     Properties props = new Properties();
     try {
       props.load(new ByteArrayInputStream(propsConf.getBytes()));

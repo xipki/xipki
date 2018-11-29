@@ -170,7 +170,7 @@ public class ImportCrl {
     if (!x500PrincipalCaSubject.equals(issuer)) {
       caAsCrlIssuer = false;
       if (issuerCert == null) {
-        throw new IllegalArgumentException("issuerCert must not be null");
+        throw new IllegalArgumentException("issuerCert may not be null");
       }
 
       if (!issuerCert.getSubjectX500Principal().equals(issuer)) {
@@ -532,7 +532,7 @@ public class ImportCrl {
       }
 
       if (!certsDir.canRead()) {
-        LOG.warn("the folder {} must not be read, ignore it", certsDirName);
+        LOG.warn("the folder {} may not be read, ignore it", certsDirName);
         return;
       }
 

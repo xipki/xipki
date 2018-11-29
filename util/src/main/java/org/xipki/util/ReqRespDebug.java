@@ -60,7 +60,7 @@ public class ReqRespDebug {
 
   public ReqRespDebug(boolean saveRequest, boolean saveResponse) {
     if (!(saveRequest || saveResponse)) {
-      throw new IllegalArgumentException("saveRequest and saveResponse must not be both false");
+      throw new IllegalArgumentException("saveRequest and saveResponse may not be both false");
     }
     this.saveRequest = saveRequest;
     this.saveResponse = saveResponse;

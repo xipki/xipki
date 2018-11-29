@@ -22,9 +22,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.xipki.ocsp.api.OcspMode;
-import org.xipki.ocsp.server.jaxb.ResponderType;
-import org.xipki.util.InvalidConfException;
+import org.xipki.ocsp.server.conf.ResponderType;
 import org.xipki.util.Args;
+import org.xipki.util.conf.InvalidConfException;
 
 /**
  * TODO.
@@ -64,10 +64,10 @@ class ResponderOption {
     this.responseOptionName = conf.getResponse();
     this.inheritCaRevocation = conf.isInheritCaRevocation();
 
-    List<String> list = new ArrayList<>(conf.getStores().getStore());
+    List<String> list = new ArrayList<>(conf.getStores());
     this.storeNames = Collections.unmodifiableList(list);
 
-    List<String> paths = conf.getServletPaths().getServletPath();
+    List<String> paths = conf.getServletPaths();
     for (String path : paths) {
       if (path.isEmpty()) {
         continue;

@@ -103,11 +103,17 @@ public class ConfPairs {
 
   private final Map<String, String> pairs = new HashMap<>();
 
+  public ConfPairs() {
+  }
+
   public ConfPairs(String name, String value) {
     putPair(name, value);
   }
 
-  public ConfPairs() {
+  public ConfPairs(Map<String, String> pairs) {
+    for (String name : pairs.keySet()) {
+      putPair(name, pairs.get(name));
+    }
   }
 
   public ConfPairs(String confPairs) {
@@ -236,6 +242,10 @@ public class ConfPairs {
 
   public Set<String> names() {
     return Collections.unmodifiableSet(pairs.keySet());
+  }
+
+  public Map<String, String> asMap() {
+    return Collections.unmodifiableMap(pairs);
   }
 
   public String getEncoded() {

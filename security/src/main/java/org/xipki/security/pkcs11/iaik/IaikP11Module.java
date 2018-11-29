@@ -31,8 +31,8 @@ import org.xipki.security.pkcs11.P11ModuleConf;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.pkcs11.exception.P11TokenException;
-import org.xipki.util.LogUtil;
 import org.xipki.util.Args;
+import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 
 import iaik.pkcs.pkcs11.DefaultInitializeArgs;

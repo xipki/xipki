@@ -80,7 +80,7 @@ public class P11UpdateCertAction extends UpdateCertAction {
     Args.notNull(slotIndex, "slotIndex");
 
     if (keyId == null && keyLabel == null) {
-      throw new IllegalArgumentException("at least one of keyId and keyLabel must not be null");
+      throw new IllegalArgumentException("at least one of keyId and keyLabel may not be null");
     }
 
     ConfPairs conf = new ConfPairs();

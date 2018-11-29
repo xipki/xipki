@@ -91,7 +91,7 @@ public class AuditEvent {
 
   public void setApplicationName(String applicationName) {
     this.applicationName = Objects.requireNonNull(applicationName,
-        "applicationName must not be null");
+        "applicationName may not be null");
   }
 
   public Date getTimestamp() {
@@ -111,7 +111,7 @@ public class AuditEvent {
   }
 
   public AuditEventData addEventData(AuditEventData eventData) {
-    Objects.requireNonNull(eventData, "eventData must not be null");
+    Objects.requireNonNull(eventData, "eventData may not be null");
 
     int idx = -1;
     for (int i = 0; i < eventDatas.size(); i++) {
@@ -133,7 +133,7 @@ public class AuditEvent {
   }
 
   public boolean removeEventData(String eventDataName) {
-    Objects.requireNonNull(eventDataName, "eventDataName must not be null");
+    Objects.requireNonNull(eventDataName, "eventDataName may not be null");
 
     boolean removed = false;
     for (final AuditEventData ed : eventDatas) {
@@ -152,7 +152,7 @@ public class AuditEvent {
   }
 
   public void setStatus(AuditStatus status) {
-    this.status = Objects.requireNonNull(status, "status must not be null");
+    this.status = Objects.requireNonNull(status, "status may not be null");
   }
 
   public void finish() {

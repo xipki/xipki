@@ -85,7 +85,7 @@ public class PBEConsumerPasswordCallback implements PasswordCallback {
     ConfPairs pairs = new ConfPairs(conf);
     String str = pairs.value("name");
     if (StringUtil.isBlank(str)) {
-      throw new PasswordResolverException("name must not be null");
+      throw new PasswordResolverException("name may not be null");
     }
     this.passwordName = str;
     PasswordProducer.registerPasswordConsumer(this.passwordName);

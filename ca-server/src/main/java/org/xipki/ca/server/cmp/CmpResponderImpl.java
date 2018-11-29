@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -126,6 +127,7 @@ import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.InsuffientPermissionException;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
+import org.xipki.ca.api.RequestType;
 import org.xipki.ca.mgmt.api.CaMgmtException;
 import org.xipki.ca.mgmt.api.CaStatus;
 import org.xipki.ca.mgmt.api.CertWithRevocationInfo;
@@ -133,7 +135,6 @@ import org.xipki.ca.mgmt.api.CertprofileEntry;
 import org.xipki.ca.mgmt.api.CmpControl;
 import org.xipki.ca.mgmt.api.PermissionConstants;
 import org.xipki.ca.mgmt.api.RequestorInfo;
-import org.xipki.ca.api.RequestType;
 import org.xipki.ca.server.CaInfo;
 import org.xipki.ca.server.CaManagerImpl;
 import org.xipki.ca.server.CertTemplateData;
@@ -148,16 +149,18 @@ import org.xipki.security.XiSecurityConstants;
 import org.xipki.security.cmp.CmpUtf8Pairs;
 import org.xipki.security.cmp.CmpUtil;
 import org.xipki.security.util.AlgorithmUtil;
-import org.xipki.util.Base64;
+import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.DateUtil;
 import org.xipki.util.HealthCheckResult;
 import org.xipki.util.Hex;
 import org.xipki.util.LogUtil;
-import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 import org.xipki.util.concurrent.ConcurrentBag;
 import org.xipki.util.concurrent.ConcurrentBagEntry;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 
 /**
  * TODO.
@@ -318,7 +321,8 @@ public class CmpResponderImpl extends BaseCmpResponder {
         caManager.getSignerWrapper(getResponderName()).getSigner().isHealthy();
     healthy &= responderHealthy;
 
-    HealthCheckResult responderHealth = new HealthCheckResult("Responder");
+    HealthCheckResult responderHealth = new HealthCheckResult();
+    responderHealth.setName("Responder");
     responderHealth.setHealthy(responderHealthy);
     result.addChildCheck(responderHealth);
 
@@ -1592,7 +1596,6 @@ public class CmpResponderImpl extends BaseCmpResponder {
   private String getSystemInfo(CmpRequestorInfo requestor, Set<Integer> acceptVersions)
       throws OperationException {
     X509Ca ca = getCa();
-    StringBuilder sb = new StringBuilder(2000);
     // current maximal support version is 2
     int version = 2;
     if (CollectionUtil.isNonEmpty(acceptVersions) && !acceptVersions.contains(version)) {
@@ -1611,63 +1614,43 @@ public class CmpResponderImpl extends BaseCmpResponder {
       }
     }
 
-    sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
-    sb.append("<systemInfo version=\"").append(version).append("\">");
-    if (version == 2) {
-      // CACert
-      sb.append("<CACert>");
-      sb.append(Base64.encodeToString(ca.getCaInfo().getCert().getEncodedCert()));
-      sb.append("</CACert>");
+    JSONObject root = new JSONObject(false);
+    root.put("version", version);
+    root.put("caCert", ca.getCaInfo().getCert().getEncodedCert());
 
-      // CMP control
-      sb.append("<cmpControl>");
-      sb.append("<rrAkiRequired>").append(getCmpControl().isRrAkiRequired())
-        .append("</rrAkiRequired>");
-      sb.append("</cmpControl>");
+    JSONObject jsonCmpControl = new JSONObject(false);
+    jsonCmpControl.put("rrAkiRequired", getCmpControl().isRrAkiRequired());
+    root.put("cmpControl", jsonCmpControl);
 
-      // Profiles
-      Set<String> requestorProfiles = requestor.getCaHasRequestor().getProfiles();
-
-      Set<String> supportedProfileNames = new HashSet<>();
-      Set<String> caProfileNames =
-          ca.getCaManager().getCertprofilesForCa(ca.getCaInfo().getIdent().getName());
-      for (String caProfileName : caProfileNames) {
-        if (requestorProfiles.contains("all") || requestorProfiles.contains(caProfileName)) {
-          supportedProfileNames.add(caProfileName);
-        }
+    // Profiles
+    Set<String> requestorProfiles = requestor.getCaHasRequestor().getProfiles();
+    Set<String> supportedProfileNames = new HashSet<>();
+    Set<String> caProfileNames =
+        ca.getCaManager().getCertprofilesForCa(ca.getCaInfo().getIdent().getName());
+    for (String caProfileName : caProfileNames) {
+      if (requestorProfiles.contains("all") || requestorProfiles.contains(caProfileName)) {
+        supportedProfileNames.add(caProfileName);
       }
-
-      if (CollectionUtil.isNonEmpty(supportedProfileNames)) {
-        sb.append("<certprofiles>");
-        for (String name : supportedProfileNames) {
-          CertprofileEntry entry = ca.getCaManager().getCertprofile(name);
-          if (entry.isFaulty()) {
-            continue;
-          }
-
-          sb.append("<certprofile>");
-          sb.append("<name>").append(name).append("</name>");
-          sb.append("<type>").append(entry.getType()).append("</type>");
-          sb.append("<conf>");
-          String conf = entry.getConf();
-          if (StringUtil.isNotBlank(conf)) {
-            sb.append("<![CDATA[");
-            sb.append(conf);
-            sb.append("]]>");
-          }
-          sb.append("</conf>");
-          sb.append("</certprofile>");
-        }
-
-        sb.append("</certprofiles>");
-      }
-
-      sb.append("</systemInfo>");
-    } else {
-      throw new OperationException(ErrorCode.BAD_REQUEST, "unsupported version " + version);
     }
 
-    return sb.toString();
+    if (CollectionUtil.isNonEmpty(supportedProfileNames)) {
+      List<JSONObject> jsonCertprofiles = new LinkedList<>();
+      root.put("certprofiles", jsonCertprofiles);
+      for (String name : supportedProfileNames) {
+        CertprofileEntry entry = ca.getCaManager().getCertprofile(name);
+        if (entry.isFaulty()) {
+          continue;
+        }
+
+        JSONObject jsonCertprofile = new JSONObject(false);
+        jsonCertprofile.put("name", name);
+        jsonCertprofile.put("type", entry.getType());
+        jsonCertprofile.put("conf", entry.getConf());
+        jsonCertprofiles.add(jsonCertprofile);
+      }
+    }
+
+    return JSON.toJSONString(root, false);
   } // method getSystemInfo
 
   @Override

@@ -41,10 +41,10 @@ import org.xipki.ca.api.RequestType;
 import org.xipki.ca.server.api.CaAuditConstants;
 import org.xipki.ca.server.api.CmpResponder;
 import org.xipki.ca.server.api.ResponderManager;
+import org.xipki.util.Args;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.Args;
 
 /**
  * TODO.

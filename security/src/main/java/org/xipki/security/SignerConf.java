@@ -17,8 +17,8 @@
 
 package org.xipki.security;
 
-import org.xipki.util.ConfPairs;
 import org.xipki.util.Args;
+import org.xipki.util.ConfPairs;
 import org.xipki.util.StringUtil;
 
 /**
@@ -50,7 +50,7 @@ public class SignerConf {
     this.signatureAlgoControl = signatureAlgoControl;
     this.confPairs = new ConfPairs(Args.notBlank(confWithoutAlgo, "confWithoutAlgo"));
     if (getConfValue("algo") != null) {
-      throw new IllegalArgumentException("confWithoutAlgo must not contain the entry 'algo'");
+      throw new IllegalArgumentException("confWithoutAlgo may not contain the entry 'algo'");
     }
   }
 

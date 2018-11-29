@@ -21,8 +21,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.qa.ocsp.Occurrence;
 import org.xipki.shell.completer.AbstractEnumCompleter;
+import org.xipki.util.TripleState;
 
 /**
  * TODO.
@@ -34,7 +34,7 @@ public class OccurrenceCompleter extends AbstractEnumCompleter {
 
   public OccurrenceCompleter() {
     List<String> enums = new LinkedList<>();
-    for (Occurrence entry : Occurrence.values()) {
+    for (TripleState entry : TripleState.values()) {
       enums.add(entry.name());
     }
     setTokens(enums);

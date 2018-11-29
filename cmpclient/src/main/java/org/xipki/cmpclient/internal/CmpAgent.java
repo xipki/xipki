@@ -17,7 +17,6 @@
 
 package org.xipki.cmpclient.internal;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -57,9 +56,6 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -141,8 +137,6 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.xipki.cmpclient.CertprofileInfo;
 import org.xipki.cmpclient.CmpClientException;
 import org.xipki.cmpclient.EnrollCertRequest;
@@ -174,9 +168,10 @@ import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ReqRespDebug;
 import org.xipki.util.ReqRespDebug.ReqRespPair;
-import org.xipki.util.StringUtil;
-import org.xipki.util.XmlUtil;
-import org.xml.sax.SAXException;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 /**
  * TODO.
@@ -219,8 +214,6 @@ class CmpAgent {
 
   private boolean sendRequestorCert;
 
-  private final DocumentBuilder xmlDocBuilder;
-
   private boolean implicitConfirm = true;
 
   private final URL serverUrl;
@@ -248,15 +241,13 @@ class CmpAgent {
 
     this.recipientName = (X500Name) responder.getName().getName();
 
-    this.xmlDocBuilder = newDocumentBuilder();
-
-      this.sslSocketFactory = sslSocketFactory;
-      this.hostnameVerifier = hostnameVerifier;
-      try {
-        this.serverUrl = new URL(serverUrl);
-      } catch (MalformedURLException ex) {
-        throw new IllegalArgumentException("invalid URL: " + serverUrl);
-      }
+    this.sslSocketFactory = sslSocketFactory;
+    this.hostnameVerifier = hostnameVerifier;
+    try {
+      this.serverUrl = new URL(serverUrl);
+    } catch (MalformedURLException ex) {
+      throw new IllegalArgumentException("invalid URL: " + serverUrl);
+    }
   }
 
   private byte[] send(byte[] request) throws IOException {
@@ -1438,55 +1429,46 @@ class CmpAgent {
     String systemInfoStr = utf8Str.getString();
 
     LOG.debug("CAInfo for CA {}: {}", caName, systemInfoStr);
-    Document doc;
+    JSONObject root;
     try {
-      doc = xmlDocBuilder.parse(new ByteArrayInputStream(systemInfoStr.getBytes("UTF-8")));
-    } catch (SAXException | IOException ex) {
+      root = JSON.parseObject(systemInfoStr);
+    } catch (RuntimeException ex) {
       throw new CmpClientException("could not parse the returned systemInfo for CA "
           + caName + ": " + ex.getMessage(), ex);
     }
 
-    final String namespace = null;
-    Element root = doc.getDocumentElement();
-    String str = root.getAttribute("version");
-    if (StringUtil.isBlank(str)) {
-      str = root.getAttributeNS(namespace, "version");
-    }
-
-    int version = StringUtil.isBlank(str) ? 1 : Integer.parseInt(str);
+    int version = root.getIntValue("version");
 
     if (version == 2) {
       // CACert
       X509Certificate caCert;
-      String b64CaCert = XmlUtil.getValueOfFirstElementChild(root, namespace, "CACert");
+      byte[] certBytes = root.getBytes("caCert");
       try {
-        caCert = X509Util.parseCert(b64CaCert.getBytes());
+        caCert = X509Util.parseCert(certBytes);
       } catch (CertificateException ex) {
         throw new CmpClientException("could no parse the CA certificate", ex);
       }
 
       // CmpControl
       CmpControl cmpControl = null;
-      Element cmpCtrlElement = XmlUtil.getFirstElementChild(root, namespace, "cmpControl");
-      if (cmpCtrlElement != null) {
-        String tmpStr = XmlUtil.getValueOfFirstElementChild(cmpCtrlElement, namespace,
-            "rrAkiRequired");
-        boolean required = (tmpStr == null) ? false : Boolean.parseBoolean(tmpStr);
+      JSONObject jsonCmpControl = root.getJSONObject("cmpControl");
+      if (jsonCmpControl != null) {
+        Boolean tmpBool = jsonCmpControl.getBoolean("rrAkiRequired");
+        boolean required = (tmpBool == null) ? false : tmpBool.booleanValue();
         cmpControl = new CmpControl(required);
       }
 
       // certprofiles
       Set<String> profileNames = new HashSet<>();
-      Element profilesElement = XmlUtil.getFirstElementChild(root, namespace, "certprofiles");
+      JSONArray jsonProfiles = root.getJSONArray("certprofiles");
       Set<CertprofileInfo> profiles = new HashSet<>();
-      if (profilesElement != null) {
-        List<Element> profileElements = XmlUtil.getElementChilden(profilesElement, namespace,
-            "certprofile");
-
-        for (Element element : profileElements) {
-          String name = XmlUtil.getValueOfFirstElementChild(element, namespace, "name");
-          String type = XmlUtil.getValueOfFirstElementChild(element, namespace, "type");
-          String conf = XmlUtil.getValueOfFirstElementChild(element, namespace, "conf");
+      if (jsonProfiles != null) {
+        final int size = jsonProfiles.size();
+        for (int i = 0; i < size; i++) {
+          JSONObject jsonProfile = jsonProfiles.getJSONObject(i);
+          String name = jsonProfile.getString("name");
+          String type = jsonProfile.getString("type");
+          String conf = jsonProfile.getString("conf");
           CertprofileInfo profile = new CertprofileInfo(name, type, conf);
           profiles.add(profile);
           profileNames.add(name);
@@ -1501,16 +1483,6 @@ class CmpAgent {
       throw new CmpClientException("unknown CAInfo version " + version);
     }
   } // method retrieveCaInfo
-
-  private static DocumentBuilder newDocumentBuilder() {
-    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-    dbf.setNamespaceAware(true);
-    try {
-      return dbf.newDocumentBuilder();
-    } catch (ParserConfigurationException ex) {
-      throw new IllegalStateException("could not create XML document builder", ex);
-    }
-  }
 
   private static Extensions getCertTempExtensions(byte[] authorityKeyIdentifier)
       throws CmpClientException {

@@ -53,11 +53,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.SchemaFactory;
 
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.cmp.PKIFailureInfo;
@@ -68,8 +63,8 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.cmpclient.CertprofileInfo;
 import org.xipki.cmpclient.CertIdOrError;
+import org.xipki.cmpclient.CertprofileInfo;
 import org.xipki.cmpclient.CmpClient;
 import org.xipki.cmpclient.CmpClientException;
 import org.xipki.cmpclient.EnrollCertRequest;
@@ -77,20 +72,18 @@ import org.xipki.cmpclient.EnrollCertResult;
 import org.xipki.cmpclient.PkiErrorException;
 import org.xipki.cmpclient.RevokeCertRequest;
 import org.xipki.cmpclient.UnrevokeOrRemoveCertRequest;
+import org.xipki.cmpclient.conf.CaType;
+import org.xipki.cmpclient.conf.CertprofileType;
+import org.xipki.cmpclient.conf.CertprofileType.Certprofiles;
+import org.xipki.cmpclient.conf.CmpclientType;
+import org.xipki.cmpclient.conf.CmpcontrolType;
+import org.xipki.cmpclient.conf.RequestorType;
+import org.xipki.cmpclient.conf.RequestorType.PbmMac;
+import org.xipki.cmpclient.conf.RequestorType.Signature;
+import org.xipki.cmpclient.conf.ResponderType;
+import org.xipki.cmpclient.conf.SslType;
 import org.xipki.cmpclient.internal.Requestor.PbmMacCmpRequestor;
 import org.xipki.cmpclient.internal.Requestor.SignatureCmpRequestor;
-import org.xipki.cmpclient.jaxb.CaType;
-import org.xipki.cmpclient.jaxb.CaclientType;
-import org.xipki.cmpclient.jaxb.CertprofileType;
-import org.xipki.cmpclient.jaxb.CertprofilesType;
-import org.xipki.cmpclient.jaxb.CmpcontrolType;
-import org.xipki.cmpclient.jaxb.FileOrValueType;
-import org.xipki.cmpclient.jaxb.ObjectFactory;
-import org.xipki.cmpclient.jaxb.RequestorType;
-import org.xipki.cmpclient.jaxb.RequestorType.PbmMac;
-import org.xipki.cmpclient.jaxb.RequestorType.Signature;
-import org.xipki.cmpclient.jaxb.ResponderType;
-import org.xipki.cmpclient.jaxb.SslType;
 import org.xipki.security.AlgorithmValidator;
 import org.xipki.security.CollectionAlgorithmValidator;
 import org.xipki.security.ConcurrentContentSigner;
@@ -107,10 +100,11 @@ import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
 import org.xipki.util.ReqRespDebug;
-import org.xipki.util.XmlUtil;
+import org.xipki.util.conf.InvalidConfException;
 import org.xipki.util.http.ssl.SSLContextBuilder;
 import org.xipki.util.http.ssl.SslUtil;
-import org.xml.sax.SAXException;
+
+import com.alibaba.fastjson.JSON;
 
 /**
  * TODO.
@@ -183,10 +177,6 @@ public final class CmpClientImpl implements CmpClient {
 
   private static final Logger LOG = LoggerFactory.getLogger(CmpClientImpl.class);
 
-  private static Object jaxbUnmarshallerLock = new Object();
-
-  private static Unmarshaller jaxbUnmarshaller;
-
   private final Map<String, CaConf> casMap = new HashMap<>();
 
   private final Set<String> autoConfCaNames = new HashSet<>();
@@ -208,7 +198,7 @@ public final class CmpClientImpl implements CmpClient {
 
   /**
    * TODO.
-   * @return names of CAs which must not been configured.
+   * @return names of CAs which may not been configured.
    */
   private Set<String> autoConfCas(Set<String> caNames) {
     if (caNames.isEmpty()) {
@@ -278,7 +268,7 @@ public final class CmpClientImpl implements CmpClient {
       return false;
     }
 
-    CaclientType config;
+    CmpclientType config;
     try {
       config = parse(Files.newInputStream(configFile.toPath()));
     } catch (IOException | CmpClientException ex) {
@@ -286,14 +276,14 @@ public final class CmpClientImpl implements CmpClient {
       return false;
     }
 
-    if (config.getCas().getCa().isEmpty()) {
+    if (CollectionUtil.isEmpty(config.getCas())) {
       LOG.warn("no CA is configured");
     }
 
     // ssl configurations
     Map<String, SslConf> sslConfs = new HashMap<>();
     if (config.getSsls() != null) {
-      for (SslType ssl : config.getSsls().getSsl()) {
+      for (SslType ssl : config.getSsls()) {
         SSLContextBuilder builder = new SSLContextBuilder();
         if (ssl.getStoreType() != null) {
           builder.setKeyStoreType(ssl.getStoreType());
@@ -328,10 +318,10 @@ public final class CmpClientImpl implements CmpClient {
 
     // responders
     Map<String, Responder> responders = new HashMap<>();
-    for (ResponderType m : config.getResponders().getResponder()) {
+    for (ResponderType m : config.getResponders()) {
       X509Certificate cert;
       try {
-        cert = X509Util.parseCert(readData(m.getCert()));
+        cert = X509Util.parseCert(m.getCert().readContent());
       } catch (CertificateException | IOException ex) {
         LogUtil.error(LOG, ex, "could not configure responder " + m.getName());
         return false;
@@ -340,7 +330,7 @@ public final class CmpClientImpl implements CmpClient {
       Responder responder;
       if (m.getSignature() != null) {
         Set<String> algoNames = new HashSet<>();
-        for (String algo : m.getSignature().getSignatureAlgos().getAlgo()) {
+        for (String algo : m.getSignature().getSignatureAlgos()) {
           algoNames.add(algo);
         }
         AlgorithmValidator sigAlgoValidator;
@@ -355,8 +345,7 @@ public final class CmpClientImpl implements CmpClient {
       } else { // if (m.getPbmMac() != null)
         ResponderType.PbmMac mac = m.getPbmMac();
         X500Name subject = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
-        responder = new Responder.PbmMacCmpResponder(subject, mac.getOwfAlgos().getAlgo(),
-            mac.getMacAlgos().getAlgo());
+        responder = new Responder.PbmMacCmpResponder(subject, mac.getOwfAlgos(), mac.getMacAlgos());
       }
 
       responders.put(m.getName(), responder);
@@ -364,7 +353,7 @@ public final class CmpClientImpl implements CmpClient {
 
     // CA;
     Set<CaConf> cas = new HashSet<>();
-    for (CaType caType : config.getCas().getCa()) {
+    for (CaType caType : config.getCas()) {
       String caName = caType.getName();
       try {
         // responder
@@ -388,32 +377,28 @@ public final class CmpClientImpl implements CmpClient {
             sslConf.getSslSocketFactory(), sslConf.getHostnameVerifier());
 
         // CA cert
-        if (caType.getCaCert().getAutoconf() != null) {
+        if (caType.getCaCert().isAutoconf()) {
           ca.setCertAutoconf(true);
         } else {
           ca.setCertAutoconf(false);
-          ca.setCert(X509Util.parseCert(readData(caType.getCaCert().getCert())));
+          ca.setCert(X509Util.parseCert(caType.getCaCert().getCert().getBinary()));
         }
 
         // CMPControl
         CmpcontrolType cmpCtrlType = caType.getCmpcontrol();
-        if (cmpCtrlType.getAutoconf() != null) {
-          ca.setCmpControlAutoconf(true);
-        } else {
-          ca.setCmpControlAutoconf(false);
-          Boolean tmpBo = cmpCtrlType.isRrAkiRequired();
+        ca.setCmpControlAutoconf(cmpCtrlType.isAutoconf());
+        if (!ca.isCmpControlAutoconf()) {
+          Boolean tmpBo = cmpCtrlType.getRrAkiRequired();
           CaConf.CmpControl control = new CaConf.CmpControl(
               (tmpBo == null) ? false : tmpBo.booleanValue());
           ca.setCmpControl(control);
         }
 
         // Certprofiles
-        CertprofilesType certprofilesType = caType.getCertprofiles();
-        if (certprofilesType.getAutoconf() != null) {
-          ca.setCertprofilesAutoconf(true);
-        } else {
-          ca.setCertprofilesAutoconf(false);
-          List<CertprofileType> types = certprofilesType.getCertprofile();
+        Certprofiles certprofilesType = caType.getCertprofiles();
+        ca.setCertprofilesAutoconf(certprofilesType.isAutoconf());
+        if (!ca.isCertprofilesAutoconf()) {
+          List<CertprofileType> types = certprofilesType.getProfiles();
           Set<CertprofileInfo> profiles = new HashSet<>(types.size());
           for (CertprofileType m : types) {
             String conf = null;
@@ -443,7 +428,7 @@ public final class CmpClientImpl implements CmpClient {
     // requestors
     Map<String, Requestor> requestors = new HashMap<>();
 
-    for (RequestorType requestorConf : config.getRequestors().getRequestor()) {
+    for (RequestorType requestorConf : config.getRequestors()) {
       boolean signRequest = requestorConf.isSignRequest();
       String name = requestorConf.getName();
       Requestor requestor;
@@ -455,7 +440,7 @@ public final class CmpClientImpl implements CmpClient {
         X509Certificate requestorCert = null;
         if (cf.getCert() != null) {
           try {
-            requestorCert = X509Util.parseCert(readData(cf.getCert()));
+            requestorCert = X509Util.parseCert(cf.getCert().getBinary());
           } catch (Exception ex) {
             LogUtil.error(LOG, ex,
                 "could not parse certificate of rquestor " + requestorConf.getName());
@@ -525,7 +510,7 @@ public final class CmpClientImpl implements CmpClient {
     }
 
     if (!autoConfCaNames.isEmpty()) {
-      Integer caInfoUpdateInterval = config.getCas().getCainfoUpdateInterval();
+      Integer caInfoUpdateInterval = config.getCainfoUpdateInterval();
       if (caInfoUpdateInterval == null) {
         caInfoUpdateInterval = 10;
       } else if (caInfoUpdateInterval <= 0) {
@@ -1058,7 +1043,8 @@ public final class CmpClientImpl implements CmpClient {
     caName = Args.toNonBlankLower(caName, "caName");
 
     String name = "X509CA";
-    HealthCheckResult healthCheckResult = new HealthCheckResult(name);
+    HealthCheckResult healthCheckResult = new HealthCheckResult();
+    healthCheckResult.setName(name);
 
     try {
       initIfNotInitialized();
@@ -1119,13 +1105,12 @@ public final class CmpClientImpl implements CmpClient {
       if (responseBytes.length == 0) {
         healthCheckResult.setHealthy(responseCode == HttpURLConnection.HTTP_OK);
       } else {
-        String response = new String(responseBytes);
         try {
-          healthCheckResult = HealthCheckResult.getInstanceFromJsonMessage(name, response);
-        } catch (IllegalArgumentException ex) {
+          healthCheckResult = JSON.parseObject(responseBytes, HealthCheckResult.class);
+        } catch (RuntimeException ex) {
           LogUtil.error(LOG, ex, "IOException while parsing the health json message");
           if (LOG.isDebugEnabled()) {
-            LOG.debug("json message: {}", response);
+            LOG.debug("json message: {}", new String(responseBytes));
           }
           healthCheckResult.setHealthy(false);
         }
@@ -1218,50 +1203,32 @@ public final class CmpClientImpl implements CmpClient {
     return new EnrollCertResult(caCert, certOrErrors);
   } // method parseEnrollCertResult
 
-  private static CaclientType parse(InputStream configStream) throws CmpClientException {
-    Object root;
-    synchronized (jaxbUnmarshallerLock) {
+  private static CmpclientType parse(InputStream configStream)
+      throws CmpClientException {
+    CmpclientType conf;
+    try {
+      conf = JSON.parseObject(configStream, CmpclientType.class);
+      conf.validate();
+    } catch (IOException | InvalidConfException | RuntimeException ex) {
+      throw new CmpClientException("parsing profile failed, message: " + ex.getMessage(), ex);
+    } finally {
       try {
-        if (jaxbUnmarshaller == null) {
-          JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
-          jaxbUnmarshaller = context.createUnmarshaller();
-
-          final SchemaFactory schemaFact = SchemaFactory.newInstance(
-                  javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-          URL url = CaclientType.class.getResource("/xsd/caclient-conf.xsd");
-          jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
-        }
-
-        root = jaxbUnmarshaller.unmarshal(configStream);
-      } catch (SAXException ex) {
-        throw new CmpClientException("parsing profile failed, message: " + ex.getMessage(), ex);
-      } catch (JAXBException ex) {
-        throw new CmpClientException("parsing profile failed, message: " + XmlUtil.getMessage(ex),
-            ex);
+        configStream.close();
+      } catch (IOException ex) {
+        LOG.warn("could not close confStream: {}", ex.getMessage());
       }
     }
 
-    try {
-      configStream.close();
-    } catch (IOException ex) {
-      LOG.warn("could not close xmlConfStream: {}", ex.getMessage());
-    }
-
-    if (!(root instanceof JAXBElement)) {
-      throw new CmpClientException("invalid root element type");
-    }
-
-    CaclientType conf = (CaclientType) ((JAXBElement<?>) root).getValue();
     // canonicalize the names
-    for (RequestorType m : conf.getRequestors().getRequestor()) {
+    for (RequestorType m : conf.getRequestors()) {
       m.setName(m.getName().toLowerCase());
     }
 
-    for (ResponderType m : conf.getResponders().getResponder()) {
+    for (ResponderType m : conf.getResponders()) {
       m.setName(m.getName().toLowerCase());
     }
 
-    for (CaType ca : conf.getCas().getCa()) {
+    for (CaType ca : conf.getCas()) {
       ca.setName(ca.getName().toLowerCase());
       ca.setRequestor(ca.getRequestor().toLowerCase());
       ca.setResponder(ca.getResponder().toLowerCase());
@@ -1269,14 +1236,6 @@ public final class CmpClientImpl implements CmpClient {
 
     return conf;
   } // method parse
-
-  private static byte[] readData(FileOrValueType fileOrValue) throws IOException {
-    byte[] data = fileOrValue.getValue();
-    if (data == null) {
-      data = IoUtil.read(fileOrValue.getFile());
-    }
-    return data;
-  }
 
   private CaConf getCa(String caName) throws CmpClientException {
     if (caName == null) {

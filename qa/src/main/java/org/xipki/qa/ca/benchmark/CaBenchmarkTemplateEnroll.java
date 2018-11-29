@@ -19,7 +19,6 @@ package org.xipki.qa.ca.benchmark;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -30,12 +29,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.SchemaFactory;
 
 import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.CertTemplate;
@@ -51,13 +44,13 @@ import org.xipki.cmpclient.EnrollCertRequest.EnrollType;
 import org.xipki.cmpclient.EnrollCertResult;
 import org.xipki.cmpclient.EnrollCertResult.CertifiedKeyPairOrError;
 import org.xipki.cmpclient.PkiErrorException;
-import org.xipki.qa.ca.benchmark.jaxb.EnrollCertType;
-import org.xipki.qa.ca.benchmark.jaxb.EnrollTemplateType;
+import org.xipki.qa.ca.benchmark.BenchmarkEntry.RandomDn;
+import org.xipki.qa.ca.benchmark.EnrollTemplateType.EnrollCertType;
 import org.xipki.util.Args;
 import org.xipki.util.BenchmarkExecutor;
-import org.xipki.util.InvalidConfException;
-import org.xipki.util.XmlUtil;
-import org.xml.sax.SAXException;
+import org.xipki.util.conf.InvalidConfException;
+
+import com.alibaba.fastjson.JSON;
 
 /**
  * TODO.
@@ -143,10 +136,6 @@ public class CaBenchmarkTemplateEnroll extends BenchmarkExecutor {
 
   private static final ProofOfPossession RA_VERIFIED = new ProofOfPossession();
 
-  private static Object jaxbUnmarshallerLock = new Object();
-
-  private static Unmarshaller jaxbUnmarshaller;
-
   private final CmpClient client;
 
   private final List<BenchmarkEntry> benchmarkEntries;
@@ -174,29 +163,32 @@ public class CaBenchmarkTemplateEnroll extends BenchmarkExecutor {
 
     this.index = new AtomicLong(getSecureIndex());
 
-    List<EnrollCertType> list = template.getEnrollCert();
+    List<EnrollCertType> list = template.getEnrollCerts();
     benchmarkEntries = new ArrayList<>(list.size());
 
-    for (EnrollCertType entry : list) {
+    for (EnrollCertType m : list) {
+      String keyspec = m.getKeyspec().toUpperCase();
       KeyEntry keyEntry;
-      if (entry.getEcKey() != null) {
-        keyEntry = new KeyEntry.ECKeyEntry(entry.getEcKey().getCurve());
-      } else if (entry.getRsaKey() != null) {
-        keyEntry = new KeyEntry.RSAKeyEntry(entry.getRsaKey().getModulusLength());
-      } else if (entry.getDsaKey() != null) {
-        keyEntry = new KeyEntry.DSAKeyEntry(entry.getDsaKey().getPLength());
+      if (keyspec.startsWith("EC:")) {
+        String curve = keyspec.substring("EC:".length());
+        keyEntry = new KeyEntry.ECKeyEntry(curve);
+      } else if (keyspec.startsWith("RSA:")) {
+        int modulusLength = Integer.parseInt(keyspec.substring("RSA:".length()));
+        keyEntry = new KeyEntry.RSAKeyEntry(modulusLength);
+      } else if (keyspec.startsWith("DSA:")) {
+        int pLength = Integer.parseInt(keyspec.substring("DSA:".length()));
+        keyEntry = new KeyEntry.DSAKeyEntry(pLength);
       } else {
         throw new IllegalStateException("should not reach here, unknown child of KeyEntry");
       }
 
-      String randomDnStr = entry.getRandomDn();
-      BenchmarkEntry.RandomDn randomDn = BenchmarkEntry.RandomDn.getInstance(randomDnStr);
+      RandomDn randomDn = m.getRandomDn();
       if (randomDn == null) {
-        throw new InvalidConfException("invalid randomDn " + randomDnStr);
+        throw new InvalidConfException("randomDn unspecified");
       }
 
       benchmarkEntries.add(
-          new BenchmarkEntry(entry.getCertprofile(), keyEntry, entry.getSubject(), randomDn));
+          new BenchmarkEntry(m.getCertprofile(), keyEntry, m.getSubject(), randomDn));
     }
 
     num = benchmarkEntries.size();
@@ -246,43 +238,20 @@ public class CaBenchmarkTemplateEnroll extends BenchmarkExecutor {
     return certRequests;
   } // method nextCertRequests
 
-  public static EnrollTemplateType parse(InputStream configStream) throws InvalidConfException {
-    Args.notNull(configStream, "configStream");
-    Object root;
-
-    synchronized (jaxbUnmarshallerLock) {
-      try {
-        if (jaxbUnmarshaller == null) {
-          JAXBContext context = JAXBContext.newInstance(
-              org.xipki.qa.ca.benchmark.jaxb.ObjectFactory.class);
-          jaxbUnmarshaller = context.createUnmarshaller();
-
-          final SchemaFactory schemaFact = SchemaFactory.newInstance(
-              javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-          URL url = org.xipki.qa.ca.benchmark.jaxb.ObjectFactory.class
-                      .getResource("/xsd/benchmark.xsd");
-          jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
-        }
-
-        root = jaxbUnmarshaller.unmarshal(configStream);
-      } catch (SAXException ex) {
-        throw new InvalidConfException("parsing profile failed, message: " + ex.getMessage(), ex);
-      } catch (JAXBException ex) {
-        throw new InvalidConfException("parsing profile failed, message: " + XmlUtil.getMessage(ex),
-            ex);
-      }
-    }
+  public static EnrollTemplateType parse(InputStream confStream)
+      throws InvalidConfException, IOException {
+    Args.notNull(confStream, "confStream");
 
     try {
-      configStream.close();
-    } catch (IOException ex) {
-      LOG.warn("could not close xmlConfStream: {}", ex.getMessage());
-    }
-
-    if (root instanceof JAXBElement) {
-      return (EnrollTemplateType) ((JAXBElement<?>) root).getValue();
-    } else {
-      throw new InvalidConfException("invalid root element type");
+      EnrollTemplateType root = JSON.parseObject(confStream, EnrollTemplateType.class);
+      root.validate();
+      return root;
+    } finally {
+      try {
+        confStream.close();
+      } catch (IOException ex) {
+        LOG.warn("could not close confStream: {}", ex.getMessage());
+      }
     }
   } // method parse
 

@@ -19,12 +19,12 @@ package org.xipki.security.pkcs11;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-import org.xipki.security.pkcs11.jaxb.NewObjectConfType;
+import org.xipki.security.pkcs11.conf.NewObjectConfType;
+import org.xipki.security.pkcs11.conf.NewObjectConfType.CertAttribute;
 import org.xipki.util.Args;
-
-import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
 /**
  * TODO.
@@ -40,30 +40,18 @@ public class P11NewObjectConf {
 
   private Set<Long> setCertObjectAttributes;
 
-  public P11NewObjectConf(NewObjectConfType jaxb) {
-    Boolean bb = jaxb.isIgnoreLabel();
+  public P11NewObjectConf(NewObjectConfType conf) {
+    Boolean bb = conf.getIgnoreLabel();
     this.ignoreLabel = (bb == null) ? false : bb.booleanValue();
 
-    Integer ii = jaxb.getIdLength();
+    Integer ii = conf.getIdLength();
     this.idLength = (ii == null) ? 8 : ii.intValue();
 
-    NewObjectConfType.CertAttributes attrs = jaxb.getCertAttributes();
+    List<CertAttribute> attrs = conf.getCertAttributes();
     Set<Long> set = new HashSet<>();
     if (attrs != null) {
-      for (String attr : attrs.getAttribute()) {
-        attr = attr.toUpperCase();
-
-        if ("CKA_START_DATE".equals(attr)) {
-          set.add(PKCS11Constants.CKA_START_DATE);
-        } else if ("CKA_END_DATE".equals(attr)) {
-          set.add(PKCS11Constants.CKA_END_DATE);
-        } else if ("CKA_SUBJECT".equals(attr)) {
-          set.add(PKCS11Constants.CKA_SUBJECT);
-        } else if ("CKA_ISSUER".equals(attr)) {
-          set.add(PKCS11Constants.CKA_ISSUER);
-        } else if ("CKA_SERIAL_NUMBER".equals(attr)) {
-          set.add(PKCS11Constants.CKA_SERIAL_NUMBER);
-        }
+      for (CertAttribute attr : attrs) {
+        set.add(attr.getPkcs11CkaCode());
       }
     }
     this.setCertObjectAttributes = Collections.unmodifiableSet(set);

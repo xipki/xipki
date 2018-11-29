@@ -88,6 +88,10 @@ class CrlStoreConf {
   private String certsDir;
 
   CrlStoreConf(String propsConf) throws OcspStoreException {
+    if (propsConf == null) {
+      propsConf = "";
+    }
+
     Properties props = new Properties();
     try {
       props.load(new ByteArrayInputStream(propsConf.getBytes()));
@@ -150,7 +154,7 @@ class CrlStoreConf {
     }
     String ret = str.trim();
     if (StringUtil.isBlank(ret)) {
-      throw new OcspStoreException("property " + propKey + " must not be blank");
+      throw new OcspStoreException("property " + propKey + " may not be blank");
     }
     return str.trim();
   }

@@ -39,7 +39,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
 }
 
 echo "#################################################################"
-echo "#                         Load rootca.xml                       #"
+echo "#                        Load rootca.json                       #"
 echo "#################################################################"
 
 if { $TOKEN_TYPE equals "pkcs11" } then {
@@ -48,31 +48,31 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
   CA_SIGNER_CONF = "password=1234,keystore=file:output/rootca1.p12,algo=$SIGALGO"
 }
 
-xi:copy-file -f xipki/qa/qa.d/template.rootca.xml xipki/qa/qa.d/rootca.xml
+xi:copy-file -f xipki/qa/qa.d/template.rootca.json xipki/qa/qa.d/rootca.json
 
 xi:replace --old "REPLACEME-CMP_SIGALGO" --new "$CMP_SIGALGO" \
-  xipki/qa/qa.d/rootca.xml
+  xipki/qa/qa.d/rootca.json
 
 xi:replace --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
-  xipki/qa/qa.d/rootca.xml
+  xipki/qa/qa.d/rootca.json
 
 xi:replace --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
-  xipki/qa/qa.d/rootca.xml
+  xipki/qa/qa.d/rootca.json
 
 xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
-  xipki/qa/qa.d/rootca.xml
+  xipki/qa/qa.d/rootca.json
 
 xi:replace --old "REPLACEME-HASH" --new "$STDHASH" \
-  xipki/qa/qa.d/rootca.xml
+  xipki/qa/qa.d/rootca.json
 
 xi:replace --old "REPLACEME-OUTFORM" --new "$OUTFORM" \
-  xipki/qa/qa.d/rootca.xml
+  xipki/qa/qa.d/rootca.json
 
 if { $TOKEN_TYPE equals "pkcs11" } then {
   ca:refresh-token --type pkcs11
 }
 
-ca:load-conf --conf-file xipki/qa/qa.d/rootca.xml \
+ca:load-conf --conf-file xipki/qa/qa.d/rootca.json \
   --out-dir output
 
 xi:move-file output/ca-rootca1.der output/rootca1.crt
@@ -203,24 +203,24 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
   CA_SIGNER_CONF = "password=1234,keystore=file:output/subca1.p12,algo=$SIGALGO"
 }
 
-xi:copy-file -f xipki/qa/qa.d/template.subca.xml xipki/qa/qa.d/subca.xml
+xi:copy-file -f xipki/qa/qa.d/template.subca.json xipki/qa/qa.d/subca.json
 
 xi:replace --old "REPLACEME-CMP_SIGALGO" --new "$CMP_SIGALGO" \
-  xipki/qa/qa.d/subca.xml
+  xipki/qa/qa.d/subca.json
 
 xi:replace --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
-  xipki/qa/qa.d/subca.xml
+  xipki/qa/qa.d/subca.json
 
 xi:replace --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
-  xipki/qa/qa.d/subca.xml
+  xipki/qa/qa.d/subca.json
 
 xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
-  xipki/qa/qa.d/subca.xml
+  xipki/qa/qa.d/subca.json
 
 xi:replace --old "REPLACEME-HASH" --new "$STDHASH" \
-  xipki/qa/qa.d/subca.xml
+  xipki/qa/qa.d/subca.json
 
-ca:load-conf --conf-file xipki/qa/qa.d/subca.xml
+ca:load-conf --conf-file xipki/qa/qa.d/subca.json
 
 # Remove CertProfile rootca
 
@@ -240,24 +240,24 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
   CA_SIGNER_CONF = "password=1234,keystore=file:output/subcawithcrl1.p12,algo=$SIGALGO"
 }
 
-xi:copy-file -f xipki/qa/qa.d/template.subcawithcrl.xml \
-  xipki/qa/qa.d/subcawithcrl.xml
+xi:copy-file -f xipki/qa/qa.d/template.subcawithcrl.json \
+  xipki/qa/qa.d/subcawithcrl.json
 
 xi:replace --old "REPLACEME-CMP_SIGALGO" --new "$CMP_SIGALGO" \
-  xipki/qa/qa.d/subcawithcrl.xml
+  xipki/qa/qa.d/subcawithcrl.json
 
 xi:replace --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
-  xipki/qa/qa.d/subcawithcrl.xml
+  xipki/qa/qa.d/subcawithcrl.json
 
 xi:replace --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
-  xipki/qa/qa.d/subcawithcrl.xml
+  xipki/qa/qa.d/subcawithcrl.json
 
 xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
-  xipki/qa/qa.d/subcawithcrl.xml
+  xipki/qa/qa.d/subcawithcrl.json
 
 xi:replace --old "REPLACEME-HASH" --new "$STDHASH" \
-  xipki/qa/qa.d/subcawithcrl.xml
+  xipki/qa/qa.d/subcawithcrl.json
 
-ca:load-conf --conf-file xipki/qa/qa.d/subcawithcrl.xml
+ca:load-conf --conf-file xipki/qa/qa.d/subcawithcrl.json
 
 source file:./xipki/qa/qa.d/scep-server.script

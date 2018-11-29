@@ -297,7 +297,7 @@ public class EmulatorP11Identity extends P11Identity {
   // TODO: check the correctness
   private byte[] aesGmac(P11Params params, byte[] contentToSign) throws P11TokenException {
     if (params == null) {
-      throw new P11TokenException("iv must not be null");
+      throw new P11TokenException("iv may not be null");
     }
 
     byte[] iv;
@@ -447,7 +447,7 @@ public class EmulatorP11Identity extends P11Identity {
   private byte[] sm2Sign(P11Params params, byte[] dataToSign, HashAlgo hash)
       throws P11TokenException {
     if (params == null) {
-      throw new P11TokenException("userId must not be null");
+      throw new P11TokenException("userId may not be null");
     }
 
     byte[] userId;

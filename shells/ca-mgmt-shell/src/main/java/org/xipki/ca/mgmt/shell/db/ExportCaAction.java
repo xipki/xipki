@@ -23,7 +23,6 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.mgmt.db.port.DbPortWorker;
-import org.xipki.ca.mgmt.db.port.ca.CaDbExportWorker;
 import org.xipki.shell.completer.DirCompleter;
 
 /**
@@ -55,8 +54,8 @@ public class ExportCaAction extends DbPortAction {
 
   @Override
   protected DbPortWorker getDbPortWorker() throws Exception {
-    return new CaDbExportWorker(datasourceFactory, passwordResolver, dbconfFile, outdir, resume,
-        numCertsInBundle, numCertsPerCommit);
+    return new DbPortWorker.ExportCaDb(datasourceFactory, passwordResolver, dbconfFile, outdir,
+        resume, numCertsInBundle, numCertsPerCommit);
   }
 
 }

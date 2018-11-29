@@ -49,11 +49,11 @@ import org.xipki.security.AlgorithmCode;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
-import org.xipki.util.InvalidConfException;
 import org.xipki.util.LogUtil;
 import org.xipki.util.Args;
 import org.xipki.util.concurrent.ConcurrentBag;
 import org.xipki.util.concurrent.ConcurrentBagEntry;
+import org.xipki.util.conf.InvalidConfException;
 
 /**
  * TODO.

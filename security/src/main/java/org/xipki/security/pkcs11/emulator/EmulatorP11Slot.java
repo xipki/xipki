@@ -97,9 +97,9 @@ import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.security.pkcs11.exception.P11UnknownEntityException;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 import iaik.pkcs.pkcs11.constants.Functions;
@@ -779,7 +779,7 @@ class EmulatorP11Slot extends P11Slot {
   @Override
   public int removeObjects(byte[] id, String label) throws P11TokenException {
     if ((id == null || id.length == 0) && StringUtil.isBlank(label)) {
-      throw new IllegalArgumentException("at least one of id and label must not be null");
+      throw new IllegalArgumentException("at least one of id and label may not be null");
     }
 
     int num = deletePkcs11Entry(privKeyDir, id, label);

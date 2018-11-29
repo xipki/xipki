@@ -72,8 +72,8 @@ import org.xipki.security.util.GMUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.SignerUtil;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.CollectionUtil;
 import org.xipki.util.Args;
+import org.xipki.util.CollectionUtil;
 
 /**
  * TODO.

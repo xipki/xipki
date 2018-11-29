@@ -26,8 +26,8 @@ import java.util.Set;
 
 import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.security.pkcs11.exception.P11UnknownEntityException;
-import org.xipki.util.CompareUtil;
 import org.xipki.util.Args;
+import org.xipki.util.CompareUtil;
 
 /**
  * TODO.

@@ -33,11 +33,11 @@ import org.xipki.ocsp.api.OcspServer;
 import org.xipki.ocsp.api.Responder;
 import org.xipki.ocsp.api.ResponderAndPath;
 import org.xipki.security.HashAlgo;
+import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**

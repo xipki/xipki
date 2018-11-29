@@ -25,29 +25,8 @@ package org.xipki.util;
 
 public enum TripleState {
 
-  REQUIRED("required"),
-  OPTIONAL("optional"),
-  FORBIDDEN("forbidden");
-
-  private final String value;
-
-  TripleState(String value) {
-    this.value = value;
-  }
-
-  public String getValue() {
-    return value;
-  }
-
-  public static TripleState forValue(String textValue) {
-    Args.notNull(textValue, "textValue");
-
-    for (TripleState ts : TripleState.values()) {
-      if (ts.value.equalsIgnoreCase(textValue)) {
-        return ts;
-      }
-    }
-    throw new IllegalArgumentException("invalid TripleState " + textValue);
-  }
+  required,
+  optional,
+  forbidden;
 
 }

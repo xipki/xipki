@@ -23,7 +23,6 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.mgmt.db.port.DbPortWorker;
-import org.xipki.ca.mgmt.db.port.ocsp.OcspFromCaDbImportWorker;
 import org.xipki.shell.completer.DirCompleter;
 
 /**
@@ -61,7 +60,7 @@ public class ImportOcspFromCaAction extends DbPortAction {
 
   @Override
   protected DbPortWorker getDbPortWorker() throws Exception {
-    return new OcspFromCaDbImportWorker(datasourceFactory, passwordResolver, dbconfFile,
+    return new DbPortWorker.ImportOcspFromCaDb(datasourceFactory, passwordResolver, dbconfFile,
         publisherName, resume, indir, numCertsPerCommit.intValue(), testOnly.booleanValue());
   }
 

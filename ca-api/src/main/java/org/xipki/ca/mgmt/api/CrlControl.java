@@ -24,10 +24,10 @@ import java.util.Set;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
-import org.xipki.util.InvalidConfException;
 import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 import org.xipki.util.TripleState;
+import org.xipki.util.conf.InvalidConfException;
 
 /**
  *<pre>
@@ -227,7 +227,7 @@ public class CrlControl {
 
   private boolean excludeReason;
 
-  private TripleState invalidityDateMode = TripleState.OPTIONAL;
+  private TripleState invalidityDateMode = TripleState.optional;
 
   private final Set<String> extensionOids;
 
@@ -244,7 +244,7 @@ public class CrlControl {
 
     str = props.value(KEY_INVALIDITY_DATE);
     if (str != null) {
-      this.invalidityDateMode = TripleState.forValue(str);
+      this.invalidityDateMode = TripleState.valueOf(str);
     }
 
     this.includeExpiredCerts = getBoolean(props, KEY_EXPIRED_CERTS_INCLUDED, false);
@@ -451,18 +451,18 @@ public class CrlControl {
 
     if (fullCrlIntervals < deltaCrlIntervals) {
       throw new InvalidConfException(
-          "fullCRLIntervals must not be less than deltaCRLIntervals "
+          "fullCRLIntervals may not be less than deltaCRLIntervals "
           + fullCrlIntervals + " < " + deltaCrlIntervals);
     }
 
     if (fullCrlIntervals < 1) {
       throw new InvalidConfException(
-          "fullCRLIntervals must not be less than 1: " + fullCrlIntervals);
+          "fullCRLIntervals may not be less than 1: " + fullCrlIntervals);
     }
 
     if (deltaCrlIntervals < 0) {
       throw new InvalidConfException(
-          "deltaCRLIntervals must not be less than 0: " + deltaCrlIntervals);
+          "deltaCRLIntervals may not be less than 0: " + deltaCrlIntervals);
     }
   }
 

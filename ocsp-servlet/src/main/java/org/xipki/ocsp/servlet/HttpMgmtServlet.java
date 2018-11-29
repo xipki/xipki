@@ -31,16 +31,16 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException;
-import org.xipki.ocsp.server.OcspServerImpl;
 import org.xipki.ocsp.mgmt.api.OcspMgmtException;
 import org.xipki.ocsp.mgmt.msg.CommAction;
 import org.xipki.ocsp.mgmt.msg.CommRequest;
 import org.xipki.ocsp.mgmt.msg.NameRequest;
+import org.xipki.ocsp.server.OcspServerImpl;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.exception.XiSecurityException;
-import org.xipki.util.HttpConstants;
-import org.xipki.util.InvalidConfException;
 import org.xipki.util.Args;
+import org.xipki.util.HttpConstants;
+import org.xipki.util.conf.InvalidConfException;
 
 import com.alibaba.fastjson.JSON;
 

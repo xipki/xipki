@@ -29,7 +29,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>certprofile-xml</artifactId>
+      <artifactId>certprofile-xijson</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -58,12 +58,4 @@
       <version>4.4.10</version>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.jvnet.jaxb2.maven2</groupId>
-        <artifactId>maven-jaxb2-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
 </project>

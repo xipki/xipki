@@ -27,11 +27,9 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TimeZone;
 
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
@@ -51,24 +49,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.CertprofileException;
-import org.xipki.ca.api.profile.Range;
 import org.xipki.ca.api.profile.X509CertVersion;
-import org.xipki.ca.certprofile.xml.XmlCertprofile;
-import org.xipki.ca.certprofile.xml.XmlCertprofileUtil;
-import org.xipki.ca.certprofile.xml.jaxb.ConstantExtValue;
-import org.xipki.ca.certprofile.xml.jaxb.ExtensionType;
-import org.xipki.ca.certprofile.xml.jaxb.ExtensionsType;
-import org.xipki.ca.certprofile.xml.jaxb.RangeType;
-import org.xipki.ca.certprofile.xml.jaxb.RangesType;
-import org.xipki.ca.certprofile.xml.jaxb.X509ProfileType;
+import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
+import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
+import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.qa.ValidationResult;
-import org.xipki.qa.ca.internal.QaExtensionValue;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -94,7 +85,7 @@ public class CertprofileQa {
 
   private final ExtensionsChecker extensionsChecker;
 
-  private final XmlCertprofile certprofile;
+  private final XijsonCertprofile certprofile;
 
   public CertprofileQa(String data) throws CertprofileException {
     this(Args.notNull(data, "data").getBytes());
@@ -103,9 +94,9 @@ public class CertprofileQa {
   public CertprofileQa(byte[] dataBytes) throws CertprofileException {
     Args.notNull(dataBytes, "dataBytes");
     try {
-      X509ProfileType conf = XmlCertprofileUtil.parse(new ByteArrayInputStream(dataBytes));
+      X509ProfileType conf = X509ProfileType.parse(new ByteArrayInputStream(dataBytes));
 
-      certprofile = new XmlCertprofile();
+      certprofile = new XijsonCertprofile();
       certprofile.initialize(conf);
 
       this.publicKeyChecker = new PublicKeyChecker(certprofile.getKeyAlgorithms());
@@ -244,9 +235,9 @@ public class CertprofileQa {
     resultIssues.add(issue);
 
     if (cert.getNotAfter().before(cert.getNotBefore())) {
-      issue.setFailureMessage("notAfter must not be before notBefore");
+      issue.setFailureMessage("notAfter may not be before notBefore");
     } else if (cert.getNotBefore().before(issuerInfo.getCaNotBefore())) {
-      issue.setFailureMessage("notBefore must not be before CA's notBefore");
+      issue.setFailureMessage("notBefore may not be before CA's notBefore");
     } else {
       CertValidity validity = certprofile.getValidity();
       Date expectedNotAfter = validity.add(cert.getNotBefore());
@@ -311,48 +302,34 @@ public class CertprofileQa {
     return new ValidationResult(resultIssues);
   } // method checkCert
 
-  static Set<Range> buildParametersMap(RangesType ranges) {
-    if (ranges == null) {
-      return null;
-    }
-
-    Set<Range> ret = new HashSet<>();
-    for (RangeType range : ranges.getRange()) {
-      if (range.getMin() != null || range.getMax() != null) {
-        ret.add(new Range(range.getMin(), range.getMax()));
-      }
-    }
-    return ret;
-  }
-
   public static Map<ASN1ObjectIdentifier, QaExtensionValue> buildConstantExtesions(
-      ExtensionsType extensionsType) throws CertprofileException {
+      Map<String, ExtensionType> extensionsType) throws CertprofileException {
     if (extensionsType == null) {
       return null;
     }
 
     Map<ASN1ObjectIdentifier, QaExtensionValue> map = new HashMap<>();
 
-    for (ExtensionType m : extensionsType.getExtension()) {
-      if (m.getValue() == null || !(m.getValue().getAny() instanceof ConstantExtValue)) {
+    for (String type : extensionsType.keySet()) {
+      ExtensionType extn = extensionsType.get(type);
+      if (extn.getConstant() == null) {
         continue;
       }
 
-      ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getType().getValue());
+      ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(type);
       if (Extension.subjectAlternativeName.equals(oid) || Extension.subjectInfoAccess.equals(oid)
           || Extension.biometricInfo.equals(oid)) {
         continue;
       }
 
-      ConstantExtValue extConf = (ConstantExtValue) m.getValue().getAny();
-      byte[] encodedValue = extConf.getValue();
+      byte[] encodedValue = extn.getConstant().getValue();
       ASN1StreamParser parser = new ASN1StreamParser(encodedValue);
       try {
         parser.readObject();
       } catch (IOException ex) {
         throw new CertprofileException("could not parse the constant extension value", ex);
       }
-      QaExtensionValue extension = new QaExtensionValue(m.isCritical(), encodedValue);
+      QaExtensionValue extension = new QaExtensionValue(extn.isCritical(), encodedValue);
       map.put(oid, extension);
     }
 

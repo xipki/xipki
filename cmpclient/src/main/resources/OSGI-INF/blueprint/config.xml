@@ -18,7 +18,7 @@
     xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0">
   <cm:property-placeholder persistent-id="org.xipki.cmpclient">
     <cm:default-properties>
-      <cm:property name="confFile" value="xipki/cmpclient/cmpclient.xml"/>
+      <cm:property name="confFile" value="xipki/cmpclient/cmpclient.json"/>
     </cm:default-properties>
   </cm:property-placeholder>
   <reference id="securityFactory" interface="org.xipki.security.SecurityFactory"/>

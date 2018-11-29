@@ -38,9 +38,9 @@ import org.xipki.password.PasswordResolver;
 import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.Args;
 import org.xipki.util.concurrent.ConcurrentBag;
 
 /**

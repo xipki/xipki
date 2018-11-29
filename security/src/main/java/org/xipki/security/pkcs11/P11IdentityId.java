@@ -17,8 +17,8 @@
 
 package org.xipki.security.pkcs11;
 
-import org.xipki.util.CompareUtil;
 import org.xipki.util.Args;
+import org.xipki.util.CompareUtil;
 
 /**
  * TODO.

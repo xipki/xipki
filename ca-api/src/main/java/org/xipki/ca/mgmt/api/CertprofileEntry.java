@@ -48,13 +48,13 @@ public class CertprofileEntry {
     this.type = Args.toNonBlankLower(type, "type");
     this.conf = conf;
     if ("all".equalsIgnoreCase(ident.getName()) || "null".equalsIgnoreCase(ident.getName())) {
-      throw new IllegalArgumentException("certificate profile name must not be 'all' and 'null'");
+      throw new IllegalArgumentException("certificate profile name may not be 'all' and 'null'");
     }
   }
 
   public void setIdent(NameId ident) {
     if ("all".equalsIgnoreCase(ident.getName()) || "null".equalsIgnoreCase(ident.getName())) {
-      throw new IllegalArgumentException("certificate profile name must not be 'all' and 'null'");
+      throw new IllegalArgumentException("certificate profile name may not be 'all' and 'null'");
     }
     this.ident = Args.notNull(ident, "ident");
   }

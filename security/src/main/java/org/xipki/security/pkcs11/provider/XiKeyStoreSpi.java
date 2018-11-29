@@ -50,8 +50,8 @@ import org.xipki.security.pkcs11.P11PrivateKey;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.pkcs11.exception.P11TokenException;
-import org.xipki.util.LogUtil;
 import org.xipki.util.Args;
+import org.xipki.util.LogUtil;
 
 /**
  * Construction of alias is as follows.

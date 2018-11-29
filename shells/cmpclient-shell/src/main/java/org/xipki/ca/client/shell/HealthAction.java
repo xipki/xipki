@@ -27,6 +27,8 @@ import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.HealthCheckResult;
 import org.xipki.util.StringUtil;
 
+import com.alibaba.fastjson.JSON;
+
 /**
  * TODO.
  * @author Lijun Liao
@@ -73,7 +75,7 @@ public class HealthAction extends ClientAction {
     String str = StringUtil.concat("healthy status for CA ", caName, ": ",
         (healthResult.isHealthy() ? "healthy" : "not healthy"));
     if (verbose) {
-      str = StringUtil.concat(str, "\n", healthResult.toJsonMessage(true));
+      str = StringUtil.concat(str, "\n", JSON.toJSONString(healthResult, true));
     }
     System.out.println(str);
     return null;

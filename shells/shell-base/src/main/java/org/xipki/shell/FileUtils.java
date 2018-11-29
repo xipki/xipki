@@ -82,7 +82,7 @@ class FileUtils {
    */
   private static boolean isSymlink(File file) throws IOException {
     if (file == null) {
-      throw new NullPointerException("File must not be null");
+      throw new NullPointerException("File may not be null");
     }
 
     if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
@@ -141,11 +141,11 @@ class FileUtils {
    * The difference between File.delete() and this method are:
    * <ul>
    * <li>A directory to be deleted does not have to be empty.</li>
-   * <li>You get exceptions when a file or directory must not be deleted.
+   * <li>You get exceptions when a file or directory may not be deleted.
    *        (java.io.File methods returns a boolean)</li>
    * </ul>
    *
-   * @param file - file or directory to delete, must not be {@code null}
+   * @param file - file or directory to delete, may not be {@code null}
    * @throws NullPointerException if the directory is {@code null}
    * @throws FileNotFoundException if the file was not found
    * @throws IOException in case deletion is unsuccessful
@@ -176,8 +176,8 @@ class FileUtils {
    * input file is truncated part way
    * through copying the data and the new file size is less than the current position.
    *
-   * @param srcFile - the validated source file, must not be {@code null}
-   * @param destFile - the validated destination file, must not be {@code null}
+   * @param srcFile - the validated source file, may not be {@code null}
+   * @param destFile - the validated destination file, may not be {@code null}
    * @param preserveFileDate whether to preserve the file date
    * @throws IOException if an error occurs
    * @throws IOException if the output file length is not the same as the input
@@ -206,8 +206,8 @@ class FileUtils {
    * <p/>
    * Internal copy directory method.
    *
-   * @param srcDir - the validated source directory, must not be {@code null}
-   * @param destDir - the validated destination directory, must not be {@code null}
+   * @param srcDir - the validated source directory, may not be {@code null}
+   * @param destDir - the validated destination directory, may not be {@code null}
    * @param filter - the filter to apply, null means copy all directories and files
    * @param preserveFileDate - whether to preserve the file date
    * @param exclusionList - List of files and directories to exclude from the copy, may be null

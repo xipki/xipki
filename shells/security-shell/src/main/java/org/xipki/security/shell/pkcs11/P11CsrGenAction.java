@@ -83,11 +83,11 @@ public class P11CsrGenAction extends CsrGenAction {
     Args.notNull(hashAlgo, "hashAlgo");
 
     if (slotIndex == null) {
-      throw new IllegalArgumentException("slotIndex must not be null");
+      throw new IllegalArgumentException("slotIndex may not be null");
     }
 
     if (keyId == null && keyLabel == null) {
-      throw new IllegalArgumentException("at least one of keyId and keyLabel must not be null");
+      throw new IllegalArgumentException("at least one of keyId and keyLabel may not be null");
     }
 
     ConfPairs conf = new ConfPairs();

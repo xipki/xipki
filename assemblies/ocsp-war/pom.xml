@@ -173,33 +173,6 @@
             </configuration>
           </execution>
           <execution>
-            <!-- Extract the XSD schemas -->
-            <id>unpack-xsd</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/xipki</outputDirectory>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.xipki</groupId>
-                  <artifactId>security</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>xsd/**</includes>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki</groupId>
-                  <artifactId>ocsp-server</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>xsd/**</includes>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-          <execution>
             <id>unpack-tlskeys</id>
             <phase>generate-resources</phase>
             <goals>

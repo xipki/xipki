@@ -20,24 +20,18 @@ package org.xipki.ca.mgmt.db.port;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URL;
 import java.nio.file.Files;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-
 import org.xipki.ca.mgmt.db.DbSchemaInfo;
 import org.xipki.ca.mgmt.db.DbToolBase;
-import org.xipki.ca.mgmt.db.jaxb.ca.FileOrBinaryType;
-import org.xipki.ca.mgmt.db.jaxb.ca.FileOrValueType;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
-import org.xipki.util.Args;
-import org.xml.sax.SAXException;
+import org.xipki.util.conf.FileOrBinary;
+import org.xipki.util.conf.FileOrValue;
 
 /**
  * TODO.
@@ -108,11 +102,11 @@ public class DbPorter extends DbToolBase {
 
   }
 
-  public static final String FILENAME_CA_CONFIGURATION = "ca-configuration.xml";
+  public static final String FILENAME_CA_CONFIGURATION = "ca-configuration.json";
 
-  public static final String FILENAME_CA_CERTSTORE = "ca-certstore.xml";
+  public static final String FILENAME_CA_CERTSTORE = "ca-certstore.json";
 
-  public static final String FILENAME_OCSP_CERTSTORE = "ocsp-certstore.xml";
+  public static final String FILENAME_OCSP_CERTSTORE = "ocsp-certstore.json";
 
   public static final String DIRNAME_CRL = "crl";
 
@@ -143,14 +137,14 @@ public class DbPorter extends DbToolBase {
     this.maxX500nameLen = Integer.parseInt(dbSchemaInfo.getVariableValue("X500NAME_MAXLEN"));
   }
 
-  protected FileOrValueType buildFileOrValue(String content, String fileName) throws IOException {
+  protected FileOrValue buildFileOrValue(String content, String fileName) throws IOException {
     if (content == null) {
       return null;
     }
 
     Args.notNull(fileName, "fileName");
 
-    FileOrValueType ret = new FileOrValueType();
+    FileOrValue ret = new FileOrValue();
     if (content.length() < 256) {
       ret.setValue(content);
       return ret;
@@ -164,20 +158,7 @@ public class DbPorter extends DbToolBase {
     return ret;
   }
 
-  protected String value(FileOrValueType fileOrValue) throws IOException {
-    if (fileOrValue == null) {
-      return null;
-    }
-
-    if (fileOrValue.getValue() != null) {
-      return fileOrValue.getValue();
-    }
-
-    File file = new File(baseDir, fileOrValue.getFile());
-    return new String(IoUtil.read(file), "UTF-8");
-  }
-
-  protected FileOrBinaryType buildFileOrBase64Binary(String base64Content, String fileName)
+  protected FileOrBinary buildFileOrBase64Binary(String base64Content, String fileName)
       throws IOException {
     if (base64Content == null) {
       return null;
@@ -185,14 +166,14 @@ public class DbPorter extends DbToolBase {
     return buildFileOrBinary(Base64.decode(base64Content), fileName);
   }
 
-  protected FileOrBinaryType buildFileOrBinary(byte[] content, String fileName) throws IOException {
+  protected FileOrBinary buildFileOrBinary(byte[] content, String fileName) throws IOException {
     if (content == null) {
       return null;
     }
 
     Args.notNull(fileName, "fileName");
 
-    FileOrBinaryType ret = new FileOrBinaryType();
+    FileOrBinary ret = new FileOrBinary();
     if (content.length < 256) {
       ret.setBinary(content);
       return ret;
@@ -204,33 +185,6 @@ public class DbPorter extends DbToolBase {
 
     ret.setFile(fileName);
     return ret;
-  }
-
-  protected byte[] binary(FileOrBinaryType fileOrValue) throws IOException {
-    if (fileOrValue == null) {
-      return null;
-    }
-
-    if (fileOrValue.getBinary() != null) {
-      return fileOrValue.getBinary();
-    }
-
-    File file = new File(baseDir, fileOrValue.getFile());
-    return IoUtil.read(file);
-  }
-
-  public static final Schema retrieveSchema(String schemaPath) throws JAXBException {
-    Args.notNull(schemaPath, "schemaPath");
-
-    URL schemaUrl = DbPorter.class.getResource(schemaPath);
-    final SchemaFactory schemaFact = SchemaFactory.newInstance(
-        javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-    try {
-      return schemaFact.newSchema(schemaUrl);
-    } catch (SAXException ex) {
-      throw new JAXBException("could not load schemas for the specified classes\nDetails:\n"
-          + ex.getMessage());
-    }
   }
 
   public static void echoToFile(String content, File file) throws IOException {

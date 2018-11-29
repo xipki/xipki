@@ -18,7 +18,7 @@
     xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0">
   <cm:property-placeholder persistent-id="org.xipki.qa.ca">
     <cm:default-properties>
-      <cm:property name="confFile" value="xipki/ca-qa/caqa-conf.xml"/>
+      <cm:property name="confFile" value="xipki/ca-qa/caqa-conf.json"/>
     </cm:default-properties>
   </cm:property-placeholder>
   <bean id="qaCaSystemManager" class="org.xipki.qa.ca.CaQaSystemManagerImpl"

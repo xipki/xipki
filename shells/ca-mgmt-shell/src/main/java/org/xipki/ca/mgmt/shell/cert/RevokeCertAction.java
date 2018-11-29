@@ -29,7 +29,7 @@ import org.xipki.security.CrlReason;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.completer.ClientCrlReasonCompleter;
 import org.xipki.util.DateUtil;
-import org.xipki.util.InvalidConfException;
+import org.xipki.util.conf.InvalidConfException;
 
 /**
  * TODO.

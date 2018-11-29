@@ -18,8 +18,8 @@
 package org.xipki.ca.mgmt.api;
 
 import org.xipki.util.ConfPairs;
-import org.xipki.util.InvalidConfException;
 import org.xipki.util.StringUtil;
+import org.xipki.util.conf.InvalidConfException;
 
 /**
  * Example configuration.

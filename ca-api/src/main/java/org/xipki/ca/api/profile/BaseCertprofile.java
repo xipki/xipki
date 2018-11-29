@@ -79,7 +79,7 @@ public abstract class BaseCertprofile extends Certprofile {
   /**
    * Get the SubjectControl.
    *
-   * @return the SubjectControl, must not be <code>null</code>.
+   * @return the SubjectControl, may not be <code>null</code>.
    */
   protected abstract SubjectControl getSubjectControl();
 

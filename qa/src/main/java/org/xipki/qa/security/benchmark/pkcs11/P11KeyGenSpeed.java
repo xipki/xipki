@@ -23,8 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.pkcs11.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.util.BenchmarkExecutor;
 import org.xipki.util.Args;
+import org.xipki.util.BenchmarkExecutor;
 
 /**
  * TODO.

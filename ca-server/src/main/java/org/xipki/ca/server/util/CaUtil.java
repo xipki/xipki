@@ -97,7 +97,7 @@ public class CaUtil {
   public static AuthorityInformationAccess createAuthorityInformationAccess(
       List<String> caIssuerUris, List<String> ocspUris) {
     if (CollectionUtil.isEmpty(caIssuerUris) && CollectionUtil.isEmpty(ocspUris)) {
-      throw new IllegalArgumentException("caIssuerUris and ospUris must not be both empty");
+      throw new IllegalArgumentException("caIssuerUris and ospUris may not be both empty");
     }
 
     List<AccessDescription> accessDescriptions = new ArrayList<>(ocspUris.size());

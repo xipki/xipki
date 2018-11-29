@@ -51,21 +51,21 @@ public class RequestorCheckAction extends RequestorUpdateAction {
       byte[] ex = IoUtil.read(certFile);
       String expType = RequestorEntry.TYPE_CERT;
       if (!cr.getType().equals(expType)) {
-        throw new CmdFailure("Requestor type is not " + expType);
+        throw new CmdFailure("IdNameTypeConf type is not " + expType);
       }
 
       String conf = cr.getConf();
       if (conf == null) {
-        throw new CmdFailure("Cert: is not configured explicitly as expected");
+        throw new CmdFailure("CaCert: is not configured explicitly as expected");
       }
 
       if (!MgmtQaShellUtil.certEquals(ex, Base64.decode(conf))) {
-        throw new CmdFailure("Cert: the expected one and the actual one differ");
+        throw new CmdFailure("CaCert: the expected one and the actual one differ");
       }
     } else {
       String expType = RequestorEntry.TYPE_PBM;
       if (!cr.getType().equals(expType)) {
-        throw new CmdFailure("Requestor type is not " + expType);
+        throw new CmdFailure("IdNameTypeConf type is not " + expType);
       }
 
       char[] ex = password.toCharArray();

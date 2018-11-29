@@ -47,15 +47,15 @@ public class SignerCheckAction extends SignerUpdateAction {
 
     if (CaManager.NULL.equalsIgnoreCase(certFile)) {
       if (cr.getBase64Cert() != null) {
-        throw new CmdFailure("Cert: is configured but expected is none");
+        throw new CmdFailure("CaCert: is configured but expected is none");
       }
     } else if (certFile != null) {
       byte[] ex = IoUtil.read(certFile);
       if (cr.getBase64Cert() == null) {
-        throw new CmdFailure("Cert: is not configured explicitly as expected");
+        throw new CmdFailure("CaCert: is not configured explicitly as expected");
       }
       if (!MgmtQaShellUtil.certEquals(ex, Base64.decode(cr.getBase64Cert()))) {
-        throw new CmdFailure("Cert: the expected one and the actual one differ");
+        throw new CmdFailure("CaCert: the expected one and the actual one differ");
       }
     }
 
