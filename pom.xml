@@ -83,7 +83,7 @@
     <module>ca-server</module>
     <module>ca-servlet</module>
     <module>ca-mgmt-client</module>
-    <module>certprofile-xml</module>
+    <module>certprofile-xijson</module>
     <module>ocsp-api</module>
     <module>ocsp-server</module>
     <module>ocsp-servlet</module>
