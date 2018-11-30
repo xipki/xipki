@@ -33,6 +33,9 @@ import org.xipki.util.Args;
 
 public abstract class OcspStore implements Closeable {
 
+  public static interface SourceConf {
+  }
+
   protected static final long DAY = 24L * 60 * 60 * 1000;
 
   protected String name;
@@ -90,12 +93,12 @@ public abstract class OcspStore implements Closeable {
 
   /**
    * TODO.
-   * @param conf
-   *          Configuration. Could be {@code null}.
+   * @param sourceConf
+   *          Source configuration. Could be {@code null}.
    * @param datasource
    *          Datasource. Could be {@code null}.
    */
-  public abstract void init(String conf, DataSourceWrapper datasource)
+  public abstract void init(SourceConf sourceConf, DataSourceWrapper datasource)
       throws OcspStoreException;
 
   public abstract boolean isHealthy();

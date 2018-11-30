@@ -123,7 +123,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 
 public class ProfileConfCreatorDemo {
 
-  private static class ExtnDemoWithConf {
+  public static class ExtnDemoWithConf {
     private List<String> texts;
 
     public List<String> getTexts() {

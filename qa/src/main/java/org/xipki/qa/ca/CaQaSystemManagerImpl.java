@@ -169,7 +169,11 @@ public class CaQaSystemManagerImpl implements CaQaSystemManager {
 
   private void assertInitialized() {
     if (!initialized.get()) {
-      throw new IllegalStateException("CaQaSystemManager is not started yet");
+      init();
+    }
+
+    if (!initialized.get()) {
+      throw new IllegalStateException("Could not start CaQaSystemManager.");
     }
   }
 

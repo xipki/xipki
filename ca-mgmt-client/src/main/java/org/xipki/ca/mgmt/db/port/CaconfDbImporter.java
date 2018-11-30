@@ -105,13 +105,13 @@ class CaconfDbImporter extends DbPorter {
 
       for (Signer signer : signers) {
         String b64Cert = (signer.getCert() == null) ? null
-            : Base64.encodeToString(signer.getCert().getBinary());
+            : Base64.encodeToString(readContent(signer.getCert()));
         try {
           int idx = 1;
           ps.setString(idx++, signer.getName());
           ps.setString(idx++, signer.getType());
           ps.setString(idx++, b64Cert);
-          ps.setString(idx++, signer.getConf().readContent());
+          ps.setString(idx++, readContent(signer.getConf()));
 
           ps.executeUpdate();
         } catch (SQLException ex) {
@@ -139,7 +139,7 @@ class CaconfDbImporter extends DbPorter {
           ps.setInt(1, requestor.getId());
           ps.setString(2, requestor.getName());
           ps.setString(3, requestor.getType());
-          ps.setString(4, requestor.getConf().readContent());
+          ps.setString(4, readContent(requestor.getConf()));
 
           ps.executeUpdate();
         } catch (SQLException ex) {
@@ -192,7 +192,7 @@ class CaconfDbImporter extends DbPorter {
           ps.setInt(idx++, publisher.getId());
           ps.setString(idx++, publisher.getName());
           ps.setString(idx++, publisher.getType());
-          ps.setString(idx++, publisher.getConf().readContent());
+          ps.setString(idx++, readContent(publisher.getConf()));
 
           ps.executeUpdate();
         } catch (SQLException ex) {
@@ -219,7 +219,7 @@ class CaconfDbImporter extends DbPorter {
           ps.setInt(idx++, certprofile.getId());
           ps.setString(idx++, certprofile.getName());
           ps.setString(idx++, certprofile.getType());
-          ps.setString(idx++, certprofile.getConf().readContent());
+          ps.setString(idx++, readContent(certprofile.getConf()));
 
           ps.executeUpdate();
         } catch (SQLException ex) {
@@ -252,7 +252,7 @@ class CaconfDbImporter extends DbPorter {
 
       for (Ca ca : cas) {
         try {
-          byte[] certBytes = ca.getCert().getBinary();
+          byte[] certBytes = readContent(ca.getCert());
           X509Certificate cert = X509Util.parseCert(certBytes);
 
           int idx = 1;
@@ -285,7 +285,7 @@ class CaconfDbImporter extends DbPorter {
           ps.setString(idx++, ca.getRevInfo());
           ps.setString(idx++, ca.getValidityMode());
           ps.setString(idx++, ca.getExtraControl());
-          ps.setString(idx++, ca.getSignerConf().readContent());
+          ps.setString(idx++, readContent(ca.getSignerConf()));
 
           ps.executeUpdate();
         } catch (SQLException ex) {

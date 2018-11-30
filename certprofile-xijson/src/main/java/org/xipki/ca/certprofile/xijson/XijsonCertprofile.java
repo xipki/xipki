@@ -1046,6 +1046,16 @@ public class XijsonCertprofile extends BaseCertprofile {
     tlsFeature = new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
   }
 
+  /**
+   * See <a href="https://www.hrz.tu-darmstadt.de/itsicherheit/object_identifier/oids_der_informatik__cdc/index.de.jsp#validity_models">Validity Model</a>
+   * for details.
+   * <pre>
+   * SEQUENCE {
+   *    validityModelId OBJECT IDENTIFIER,
+   *    validityModelInfo ANY DEFINED BY validityModelId OPTIONAL
+   *  }
+   * </pre>
+   */
   private void initValidityModel(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
     ASN1ObjectIdentifier type = ObjectIdentifiers.id_extension_validityModel;

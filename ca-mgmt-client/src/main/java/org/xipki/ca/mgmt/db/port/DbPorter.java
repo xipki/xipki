@@ -187,6 +187,32 @@ public class DbPorter extends DbToolBase {
     return ret;
   }
 
+  protected byte[] readContent(FileOrBinary fileOrBinary) throws IOException {
+    if (fileOrBinary == null) {
+      return null;
+    }
+
+    if (fileOrBinary.getBinary() != null) {
+      return fileOrBinary.getBinary();
+    }
+
+    File file = new File(baseDir, fileOrBinary.getFile());
+    return IoUtil.read(file);
+  }
+
+  protected String readContent(FileOrValue fileOrValue) throws IOException {
+    if (fileOrValue == null) {
+      return null;
+    }
+
+    if (fileOrValue.getValue() != null) {
+      return fileOrValue.getValue();
+    }
+
+    File file = new File(baseDir, fileOrValue.getFile());
+    return new String(IoUtil.read(file), "UTF-8");
+  }
+
   public static void echoToFile(String content, File file) throws IOException {
     Args.notNull(content, "content");
     Args.notNull(file, "file");

@@ -47,7 +47,7 @@ public class OcspCert extends IdentifidDbObject {
     }
 
     public void add(OcspCert cert) {
-      certs.add(cert);
+      getCerts().add(cert);
     }
 
     @Override

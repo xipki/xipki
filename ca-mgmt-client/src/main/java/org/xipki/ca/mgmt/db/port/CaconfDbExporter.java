@@ -18,6 +18,9 @@
 package org.xipki.ca.mgmt.db.port;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -38,6 +41,9 @@ import org.xipki.ca.mgmt.db.message.User;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.util.conf.InvalidConfException;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 
 /**
  * TODO.
@@ -70,6 +76,10 @@ class CaconfDbExporter extends DbPorter {
     exportCaHasPublisher(caconf);
     exportCaHasProfile(caconf);
 
+    caconf.validate();
+    try (OutputStream os = Files.newOutputStream(Paths.get(baseDir, FILENAME_CA_CONFIGURATION))) {
+      JSON.writeJSONString(os, caconf, SerializerFeature.PrettyFormat);
+    }
     System.out.println(" exported CA configuration from database");
   }
 

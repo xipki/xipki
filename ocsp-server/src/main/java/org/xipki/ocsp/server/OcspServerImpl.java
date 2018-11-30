@@ -62,6 +62,7 @@ import org.xipki.ocsp.api.OcspRespWithCacheInfo;
 import org.xipki.ocsp.api.OcspRespWithCacheInfo.ResponseCacheInfo;
 import org.xipki.ocsp.api.OcspServer;
 import org.xipki.ocsp.api.OcspStore;
+import org.xipki.ocsp.api.OcspStore.SourceConf;
 import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.ocsp.api.OcspStoreFactoryRegister;
 import org.xipki.ocsp.api.Responder;
@@ -275,10 +276,10 @@ public class OcspServerImpl implements OcspServer {
       throw ex;
     } catch (Error ex) {
       LOG.error("could not start OCSP responder", ex);
-      throw (Error) ex;
+      throw ex;
     } catch (RuntimeException ex) {
       LOG.error("could not start OCSP responder", ex);
-      throw (RuntimeException) ex;
+      throw ex;
     } catch (Throwable th) {
       LOG.error("could not start OCSP responder", th);
       throw new IllegalStateException(th);
@@ -1045,10 +1046,9 @@ public class OcspServerImpl implements OcspServer {
       }
     }
     try {
-      FileOrValue sourceConf = conf.getSource().getConf();
-
-      store.init(sourceConf == null ? null : sourceConf.readContent(), datasource);
-    } catch (OcspStoreException | IOException ex) {
+      SourceConf sourceConf = conf.getSource().getConf();
+      store.init(sourceConf, datasource);
+    } catch (OcspStoreException ex) {
       throw new InvalidConfException("CertStatusStoreException of store " + conf.getName()
           + ":" + ex.getMessage(), ex);
     }

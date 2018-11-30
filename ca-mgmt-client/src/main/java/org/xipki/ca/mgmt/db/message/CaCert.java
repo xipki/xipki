@@ -46,10 +46,7 @@ public class CaCert extends IdentifidDbObject {
     }
 
     public void add(CaCert cert) {
-      if (certs == null) {
-        certs = new LinkedList<>();
-      }
-      certs.add(cert);
+      getCerts().add(cert);
     }
 
     @Override

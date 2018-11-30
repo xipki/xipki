@@ -142,7 +142,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
         throw new Exception("Unkwown publisher type " + type);
       }
 
-      ConfPairs confPairs = new ConfPairs(publisherType.getConf().readContent());
+      ConfPairs confPairs = new ConfPairs(readContent(publisherType.getConf()));
       String str = confPairs.value("publish.goodcerts");
       boolean revokedOnly = false;
       if (str != null) {
@@ -185,12 +185,12 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
   private List<Integer> getIssuerIds(List<Ca> cas) throws IOException {
     List<Integer> relatedCaIds = new LinkedList<>();
     for (Ca issuer : cas) {
-      byte[] encodedCert = issuer.getCert() == null ? null : issuer.getCert().getBinary();
+      byte[] encodedCert = issuer.getCert() == null ? null : readContent(issuer.getCert());
 
       // retrieve the revocation information of the CA, if possible
       Ca ca = null;
       for (Ca caType : cas) {
-        byte[] certBytes = caType.getCert() == null ? null : caType.getCert().getBinary();
+        byte[] certBytes = caType.getCert() == null ? null : readContent(caType.getCert());
         if (Arrays.equals(encodedCert, certBytes)) {
           ca = caType;
           break;
@@ -228,7 +228,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
   private void importIssuer0(Ca issuer, String sql, PreparedStatement ps,
       List<Integer> relatedCaIds) throws IOException, DataAccessException, CertificateException {
     try {
-      byte[] encodedCert = issuer.getCert().getBinary();
+      byte[] encodedCert = readContent(issuer.getCert());
       relatedCaIds.add(issuer.getId());
 
       Certificate cert;

@@ -462,7 +462,7 @@ class IdentifiedCertprofile implements Closeable {
         if (requestedExtensions != null && extControl.isRequest()) {
           Extension reqExt = requestedExtensions.getExtension(type);
           if (reqExt != null) {
-            value = new ExtensionValue(reqExt.isCritical(), reqExt.getParsedValue());
+            value = new ExtensionValue(extControl.isCritical(), reqExt.getParsedValue());
           }
         }
 

@@ -26,6 +26,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -52,14 +53,17 @@ import org.xipki.ocsp.api.IssuerStore;
 import org.xipki.ocsp.api.OcspStore;
 import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.ocsp.api.RequestIssuer;
+import org.xipki.ocsp.server.conf.StoreType.CaCerts;
+import org.xipki.ocsp.server.conf.StoreType.DbSourceConf;
+import org.xipki.ocsp.server.conf.StoreType.SourceConfImpl;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -478,8 +482,20 @@ public class DbCertStatusStore extends OcspStore {
   }
 
   @Override
-  public void init(String conf, DataSourceWrapper datasource) throws OcspStoreException {
-    Args.notNull(conf, "conf");
+  public void init(SourceConf conf, DataSourceWrapper datasource)
+      throws OcspStoreException {
+    if (conf != null && !(conf instanceof SourceConfImpl)) {
+      throw new OcspStoreException("unknown conf " + conf.getClass().getName());
+    }
+
+    CaCerts caCerts = null;
+    if (conf != null) {
+      DbSourceConf conf0 = ((SourceConfImpl) conf).getDbSource();
+      if (conf0 != null) {
+        caCerts = conf0.getCaCerts();
+      }
+    }
+
     this.datasource = Args.notNull(datasource, "datasource");
 
     sqlCs = datasource.buildSelectFirstSql(1,
@@ -499,18 +515,18 @@ public class DbCertStatusStore extends OcspStore {
           "Could not retrieve the certhash's algorithm from the database", ex);
     }
 
-    DbStoreConf storeConf = new DbStoreConf(conf);
-
     try {
       Set<X509Certificate> includeIssuers = null;
       Set<X509Certificate> excludeIssuers = null;
 
-      if (CollectionUtil.isNonEmpty(storeConf.getCaCertsIncludes())) {
-        includeIssuers = parseCerts(storeConf.getCaCertsIncludes());
-      }
+      if (caCerts != null) {
+        if (CollectionUtil.isNonEmpty(caCerts.getIncludes())) {
+          includeIssuers = parseCerts(caCerts.getIncludes());
+        }
 
-      if (CollectionUtil.isNonEmpty(storeConf.getCaCertsExcludes())) {
-        excludeIssuers = parseCerts(storeConf.getCaCertsExcludes());
+        if (CollectionUtil.isNonEmpty(caCerts.getExcludes())) {
+          excludeIssuers = parseCerts(caCerts.getExcludes());
+        }
       }
 
       this.issuerFilter = new IssuerFilter(includeIssuers, excludeIssuers);
@@ -573,7 +589,7 @@ public class DbCertStatusStore extends OcspStore {
     return initializationFailed;
   }
 
-  private static Set<X509Certificate> parseCerts(Set<String> certFiles)
+  private static Set<X509Certificate> parseCerts(Collection<String> certFiles)
       throws OcspStoreException {
     Set<X509Certificate> certs = new HashSet<>(certFiles.size());
     for (String certFile : certFiles) {

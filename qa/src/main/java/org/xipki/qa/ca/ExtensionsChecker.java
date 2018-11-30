@@ -1864,19 +1864,12 @@ public class ExtensionsChecker {
     if (conf == null) {
       checkConstantExtnValue(ObjectIdentifiers.id_extension_validityModel,
           failureMsg, extensionValue, requestedExtns, extControl);
-
-      byte[] expected = getExpectedExtValue(ObjectIdentifiers.id_extension_validityModel,
-          requestedExtns, extControl);
-      if (!Arrays.equals(expected, extensionValue)) {
-        addViolation(failureMsg, "extension values", hex(extensionValue),
-            (expected == null) ? "not present" : hex(expected));
+    } else {
+      ASN1Sequence seq = ASN1Sequence.getInstance(extensionValue);
+      ASN1ObjectIdentifier extValue = ASN1ObjectIdentifier.getInstance(seq.getObjectAt(0));
+      if (!conf.equals(extValue)) {
+        addViolation(failureMsg, "content", extValue, conf);
       }
-      return;
-    }
-
-    ASN1ObjectIdentifier extValue = ASN1ObjectIdentifier.getInstance(extensionValue);
-    if (!conf.equals(extValue)) {
-      addViolation(failureMsg, "content", extValue, conf);
     }
   } // method checkExtnValidityModel
 

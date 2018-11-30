@@ -17,7 +17,9 @@
 
 package org.xipki.ocsp.server.conf;
 
-import org.xipki.util.conf.FileOrValue;
+import java.util.List;
+
+import org.xipki.ocsp.api.OcspStore.SourceConf;
 import org.xipki.util.conf.InvalidConfException;
 import org.xipki.util.conf.ValidatableConf;
 
@@ -119,7 +121,7 @@ public class StoreType extends ValidatableConf {
 
     private String datasource;
 
-    private FileOrValue conf;
+    private SourceConfImpl conf;
 
     public String getType() {
       return type;
@@ -137,17 +139,225 @@ public class StoreType extends ValidatableConf {
       this.datasource = value;
     }
 
-    public FileOrValue getConf() {
+    public SourceConfImpl getConf() {
       return conf;
     }
 
-    public void setConf(FileOrValue value) {
+    public void setConf(SourceConfImpl value) {
       this.conf = value;
     }
 
     @Override
     public void validate() throws InvalidConfException {
       notEmpty(type, "type");
+    }
+
+  }
+
+  public static class SourceConfImpl extends ValidatableConf implements SourceConf {
+
+    private DbSourceConf dbSource;
+
+    private CrlSourceConf crlSource;
+
+    private Object custom;
+
+    public DbSourceConf getDbSource() {
+      return dbSource;
+    }
+
+    public void setDbSource(DbSourceConf dbSource) {
+      this.dbSource = dbSource;
+    }
+
+    public CrlSourceConf getCrlSource() {
+      return crlSource;
+    }
+
+    public void setCrlSource(CrlSourceConf crlSource) {
+      this.crlSource = crlSource;
+    }
+
+    public Object getCustom() {
+      return custom;
+    }
+
+    public void setCustom(Object custom) {
+      this.custom = custom;
+    }
+
+    @Override
+    public void validate() throws InvalidConfException {
+      int occurrences = 0;
+      if (dbSource != null) {
+        occurrences++;
+      }
+
+      if (crlSource == null) {
+        occurrences++;
+      }
+
+      if (custom != null) {
+        occurrences++;
+      }
+
+      if (occurrences > 1) {
+        throw new InvalidConfException("maximal one of dbSource, crlSource and custom may be set");
+      }
+    }
+
+  }
+
+  public static class CaCerts extends ValidatableConf {
+
+    /**
+     * Files of CA certificates to be considered
+     *
+     * optional. Default is all.
+     */
+    private List<String> includes;
+
+    /**
+     * Comma-separated files of CA certificates to be not considered
+     * optional. Default is none.
+     */
+    private List<String> excludes;
+
+    public List<String> getIncludes() {
+      return includes;
+    }
+
+    public void setIncludes(List<String> includes) {
+      this.includes = includes;
+    }
+
+    public List<String> getExcludes() {
+      return excludes;
+    }
+
+    public void setExcludes(List<String> excludes) {
+      this.excludes = excludes;
+    }
+
+    @Override
+    public void validate() throws InvalidConfException {
+    }
+
+  }
+
+  public static class DbSourceConf extends ValidatableConf {
+
+    private CaCerts caCerts;
+
+    public CaCerts getCaCerts() {
+      return caCerts;
+    }
+
+    public void setCaCerts(CaCerts caCerts) {
+      this.caCerts = caCerts;
+    }
+
+    @Override
+    public void validate() throws InvalidConfException {
+    }
+
+  }
+
+  public static class CrlSourceConf extends ValidatableConf {
+
+    /**
+     * CRL file
+     *
+     * The optional file ${crlFile}.revocation contains the revocation information of the CA itself.
+     *
+     *Just create the file ${crlFile}.UPDATEME to tell responder to update the CRL.
+     *
+     * required
+     */
+    private String crlFile;
+
+    /**
+     * CRL url
+     * optional, default is none
+     */
+    private String crlUrl;
+
+    /**
+     * Where use thisUpdate and nextUpdate of CRL in the corresponding fields
+     * of OCSP response. The default value is true.
+     * optional. Default is true
+     */
+    private boolean useUpdateDatesFromCrl = true;
+
+    /**
+     * CA cert file
+     */
+    private String caCertFile;
+
+    /**
+     * certificate used to verify the CRL signature.
+     * Required for indirect CRL, otherwise optional
+     */
+    private String issuerCertFile;
+
+    /**
+     * Folder containing the DER-encoded certificates suffixed with ".der" and ".crt"
+     * optional.
+     */
+    private String certsDir;
+
+    public String getCrlFile() {
+      return crlFile;
+    }
+
+    public void setCrlFile(String crlFile) {
+      this.crlFile = crlFile;
+    }
+
+    public String getCrlUrl() {
+      return crlUrl;
+    }
+
+    public void setCrlUrl(String crlUrl) {
+      this.crlUrl = crlUrl;
+    }
+
+    public boolean isUseUpdateDatesFromCrl() {
+      return useUpdateDatesFromCrl;
+    }
+
+    public void setUseUpdateDatesFromCrl(boolean useUpdateDatesFromCrl) {
+      this.useUpdateDatesFromCrl = useUpdateDatesFromCrl;
+    }
+
+    public String getCaCertFile() {
+      return caCertFile;
+    }
+
+    public void setCaCertFile(String caCertFile) {
+      this.caCertFile = caCertFile;
+    }
+
+    public String getIssuerCertFile() {
+      return issuerCertFile;
+    }
+
+    public void setIssuerCertFile(String issuerCertFile) {
+      this.issuerCertFile = issuerCertFile;
+    }
+
+    public String getCertsDir() {
+      return certsDir;
+    }
+
+    public void setCertsDir(String certsDir) {
+      this.certsDir = certsDir;
+    }
+
+    @Override
+    public void validate() throws InvalidConfException {
+      notEmpty(crlFile, "crlFile");
+      notEmpty(caCertFile, "caCertFile");
     }
 
   }

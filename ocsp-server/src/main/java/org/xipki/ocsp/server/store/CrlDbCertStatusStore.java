@@ -34,13 +34,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.ocsp.api.OcspStoreException;
+import org.xipki.ocsp.server.conf.StoreType.CrlSourceConf;
+import org.xipki.ocsp.server.conf.StoreType.SourceConfImpl;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.DateUtil;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -88,23 +90,31 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
 
   private boolean crlUpdateFailed;
 
-  @Override
-  public void init(String conf, DataSourceWrapper datasource) throws OcspStoreException {
-    Args.notBlank(conf, "conf");
+  public void init(SourceConf conf, DataSourceWrapper datasource)
+      throws OcspStoreException {
+    Args.notNull(conf, "conf");
+    if (!(conf instanceof SourceConfImpl)) {
+      throw new OcspStoreException("unknown conf " + conf.getClass().getName());
+    }
+
+    CrlSourceConf conf0 = ((SourceConfImpl) conf).getCrlSource();
+    if (conf0 == null) {
+      throw new OcspStoreException("conf.getDbSource() may not be null");
+    }
+
     this.datasource = Args.notNull(datasource, "datasource");
 
-    CrlStoreConf storeConf = new CrlStoreConf(conf);
-    this.crlFilename = IoUtil.expandFilepath(storeConf.getCrFile());
-    this.crlUrl = storeConf.getCrlUrl();
-    this.certsDirName = (storeConf.getCertsDir() == null) ? null
-        : IoUtil.expandFilepath(storeConf.getCertsDir());
-    this.caCert = parseCert(storeConf.getCaCertFile());
-    if (storeConf.getIssuerCertFile() != null) {
-      this.issuerCert = parseCert(storeConf.getIssuerCertFile());
+    this.crlFilename = IoUtil.expandFilepath(conf0.getCrlFile());
+    this.crlUrl = conf0.getCrlUrl();
+    this.certsDirName = (conf0.getCertsDir() == null) ? null
+        : IoUtil.expandFilepath(conf0.getCertsDir());
+    this.caCert = parseCert(conf0.getCaCertFile());
+    if (conf0.getIssuerCertFile() != null) {
+      this.issuerCert = parseCert(conf0.getIssuerCertFile());
     } else {
       this.issuerCert = null;
     }
-    this.useUpdateDatesFromCrl = storeConf.isUseUpdateDatesFromCrl();
+    this.useUpdateDatesFromCrl = conf0.isUseUpdateDatesFromCrl();
 
     initializeStore(datasource);
 
