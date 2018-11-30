@@ -23,20 +23,20 @@
     <artifactId>assemblies</artifactId>
     <version>5.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xipki-console</artifactId>
+  <artifactId>xipki-cli</artifactId>
   <packaging>pom</packaging>
   <name>XiPKI :: assembly :: ${project.artifactId}</name>
   <properties>
-    <app.name>console</app.name>
+    <app.name>cli</app.name>
     <shared.dir>${project.basedir}/../shared</shared.dir>
-    <patchkaraf.repos>mvn:org.xipki.feature/console/${project.version}/xml/features</patchkaraf.repos>
+    <patchkaraf.repos>mvn:org.xipki.feature/cli/${project.version}/xml/features</patchkaraf.repos>
     <patchkaraf.features>(-framework,-jaas,-ssh,-config,aries-blueprint/${karaf.version},wrap),xipki-security,xipki-caclient,xipki-scepclient,xipki-ocspclient,xipki-camgmt,xipki-ocspmgmt</patchkaraf.features>
   </properties>
   <dependencies>
     <dependency>
       <!-- project base features -->
       <groupId>org.xipki.feature</groupId>
-      <artifactId>console</artifactId>
+      <artifactId>cli</artifactId>
       <version>${project.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
@@ -127,7 +127,7 @@
             <configuration>
               <repository>${project.build.directory}/classes/system</repository>
               <descriptors>
-                <descriptor>mvn:org.xipki.feature/console/${project.version}/xml/features</descriptor>
+                <descriptor>mvn:org.xipki.feature/cli/${project.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
               </descriptors>
               <features>

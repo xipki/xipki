@@ -29,7 +29,7 @@
   <packaging>pom</packaging>
   <modules>
     <module>features</module>
-    <module>xipki-console</module>
+    <module>xipki-cli</module>
     <module>xipki-qa</module>
     <module>ocsp-war</module>
     <module>ca-war</module>

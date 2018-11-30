@@ -53,11 +53,11 @@
         <filtering>false</filtering>
       </resource>
       <resource>
-        <directory>../xipki-console/src/main/filtered</directory>
+        <directory>../xipki-cli/src/main/filtered</directory>
         <filtering>true</filtering>
       </resource>
       <resource>
-        <directory>../xipki-console/src/main/unfiltered</directory>
+        <directory>../xipki-cli/src/main/unfiltered</directory>
         <filtering>false</filtering>
         <excludes>
           <exclude>xipki/**</exclude>
@@ -239,7 +239,7 @@
                   <arg value="--file"/>
                   <arg file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/org.ops4j.pax.logging.cfg"/>
                   <arg value="--value-file"/>
-                  <arg file="../xipki-console/src/main/patchkaraf/org.ops4j.pax.logging.cfg.patch"/>
+                  <arg file="../xipki-cli/src/main/patchkaraf/org.ops4j.pax.logging.cfg.patch"/>
                 </java>
                 <replace
                     file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/bin/inc"

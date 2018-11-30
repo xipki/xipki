@@ -17,7 +17,7 @@
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="pki-${project.version}"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
-  <repository>mvn:org.xipki.feature/console/${project.version}/xml/features</repository>
+  <repository>mvn:org.xipki.feature/cli/${project.version}/xml/features</repository>
   <feature name="xipki-dbtool" version="${project.version}" description="Database tool">
     <!--feature>intern-xipki-jdbc</feature-->
     <bundle>mvn:org.xipki/util/${project.version}</bundle>
