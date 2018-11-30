@@ -2,7 +2,7 @@
 //	"responseCache":{
 //		"datasource":{
 //			"conf":{
-//				"file":"xipki/etc/ocsp/ocsp-cache-db.properties"
+//				"file":"xipki/etc/ocsp/database/ocsp-cache-db.properties"
 //			},
 //			"name":"datasource-cache"
 //		},
@@ -12,7 +12,7 @@
 	"datasources":[{
 		"name":"datasource1",
 		"conf":{
-			"file":"xipki/etc/ocsp/ocsp-db.properties"
+			"file":"xipki/etc/ocsp/database/ocsp-db.properties"
 		}
 	}],
 	"requestOptions":[{
@@ -29,11 +29,7 @@
 			},
 			"validationModel":"PKIX"
 		},
-		"hashAlgorithms":[
-			"SHA1",
-			"SHA256",
-			"SHA384",
-			"SHA512"
+		"hashAlgorithms":["SHA1","SHA256","SHA384","SHA512"
 		],
 		"maxRequestListCount":10,
 		"maxRequestSize":4096,
@@ -45,9 +41,7 @@
 		"signatureRequired":false,
 		"supportsHttpGet":false,
 		"validateSignature":true,
-		"versions":[
-			"v1"
-		]
+		"versions":["v1"]
 	}],
 	"responders":[{
 		"name":"responder1",
@@ -55,13 +49,9 @@
 		"mode":"RFC6960",
 		"request":"request1",
 		"response":"response1",
-		"servletPaths":[
-			"/responder1"
-		],
+		"servletPaths":["/responder1"],
 		"signer":"signer1",
-		"stores":[
-			"dbstore1"
-		]
+		"stores":["dbstore1"]
 	}],
 	"responseOptions":[{
 		"name":"response1",
@@ -74,9 +64,7 @@
 	"signers":[{
 		"name":"signer1",
 		"type":"pkcs12",
-		"algorithms":[
-			"SHA256withRSA"
-		],
+		"algorithms":["SHA256withRSA"],
 		"caCerts":[],
 		"key":"password=1234,keystore=file:xipki/keycerts/ocsp1.p12"
 	}],
@@ -91,7 +79,12 @@
 			"datasource":"datasource1",
 			"type":"xipki-db",
 			"conf":{
-				"file":"xipki/etc/ocsp/xipki-db-source-dbstore1.properties"
+				"dbSource":{
+//					"caCerts": {
+//						"includes":[],
+//						"excludes":[],
+//					}
+				}
 			}
 		},
 		"unknownSerialAsGood":false

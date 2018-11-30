@@ -39,7 +39,7 @@ xi:csr-p11 --hash ${HASH} --slot 0 --label ${P11_LABEL} \
 ca:refresh-token --type pkcs11
 
 echo "#################################################################"
-echo "#                          Load ca-conf.json                     #"
+echo "#                       Load ca-conf.json                       #"
 echo "#################################################################"
 
 xi:copy-file -f xipki/ca-setup/cacert-none/template.ca-conf.json \

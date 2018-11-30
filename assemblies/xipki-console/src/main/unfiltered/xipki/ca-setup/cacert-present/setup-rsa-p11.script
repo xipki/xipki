@@ -25,7 +25,7 @@ SIGTYPE=RSA
 P11_LABEL = myca1-rsa
 
 echo "#################################################################"
-echo "#                          Load ca-conf.json                     #"
+echo "#                       Load ca-conf.json                       #"
 echo "#################################################################"
 
 xi:copy-file -f xipki/ca-setup/cacert-present/template.ca-conf.json \

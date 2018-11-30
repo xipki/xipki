@@ -33,7 +33,7 @@ echo "||                             Export CA Database                         
 echo "============================================================================"
 
 ca:export-ca --out-dir output/dbexport/ca \
-  --db-conf ${XIPKI_DIR}/etc/ca/ca-db.properties
+  --db-conf ${XIPKI_DIR}/etc/ca/database/ca-db.properties
 
 ## Export OCSP
 
@@ -42,7 +42,7 @@ echo "||                            Export OCSP Database                        
 echo "============================================================================"
 
 ca:export-ocsp --out-dir output/dbexport/ocsp \
-  --db-conf ${XIPKI_DIR}/etc/ca/ocsp-db.properties
+  --db-conf ${XIPKI_DIR}/etc/ca/database/ocsp-db.properties
 
 # Reset the CA and OCSP database
 
@@ -54,11 +54,11 @@ echo "==========================================================================
 
 xi:initdb \
   --force \
-  --db-conf ${XIPKI_DIR}/etc/ca/ca-db.properties \
+  --db-conf ${XIPKI_DIR}/etc/ca/database/ca-db.properties \
   --db-schema xipki/sql/ca-init.xml
 
 ca:import-ca --in-dir output/dbexport/ca \
-  --db-conf ${XIPKI_DIR}/etc/ca/ca-db.properties
+  --db-conf ${XIPKI_DIR}/etc/ca/database/ca-db.properties
 
 ## Import OCSP
 
@@ -68,11 +68,11 @@ echo "==========================================================================
 
 xi:initdb \
   --force \
-  --db-conf ${XIPKI_DIR}/etc/ca/ocsp-db.properties \
+  --db-conf ${XIPKI_DIR}/etc/ca/database/ocsp-db.properties \
   --db-schema xipki/sql/ocsp-init.xml
 
 ca:import-ocsp --in-dir output/dbexport/ocsp \
-  --db-conf ${XIPKI_DIR}/etc/ca/ocsp-db.properties
+  --db-conf ${XIPKI_DIR}/etc/ca/database/ocsp-db.properties
 
 ## Import OCSP FROM CA
 
@@ -82,11 +82,11 @@ echo "==========================================================================
 
 xi:initdb \
   --force \
-  --db-conf ${XIPKI_DIR}/etc/ca/ocsp-db.properties \
+  --db-conf ${XIPKI_DIR}/etc/ca/database/ocsp-db.properties \
   --db-schema xipki/sql/ocsp-init.xml
 
 ca:import-ocspfromca --in-dir output/dbexport/ca \
-  --db-conf ${XIPKI_DIR}/etc/ca/ocsp-db.properties
+  --db-conf ${XIPKI_DIR}/etc/ca/database/ocsp-db.properties
 
 ## Restart the CA
 

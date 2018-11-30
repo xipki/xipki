@@ -3,7 +3,7 @@
 //		"datasource":{
 //			"name":"datasource-cache",
 //			"conf":{
-//				"file":"xipki/etc/ocsp/ocsp-cache-db.properties"
+//				"file":"xipki/etc/ocsp/database/ocsp-cache-db.properties"
 //			},
 //		},
 //		"validity":86400
@@ -12,12 +12,12 @@
 	"datasources":[{
 		"name":"datasource1",
 		"conf":{
-			"file":"xipki/etc/ocsp/ocsp-db.properties"
+			"file":"xipki/etc/ocsp/database/ocsp-db.properties"
 		}
 	},{
 		"name":"datasource-crl",
 		"conf":{
-			"file":"xipki/etc/ocsp/ocsp-crl-db.properties"
+			"file":"xipki/etc/ocsp/database/ocsp-crl-db.properties"
 		}
 	}],
 	"requestOptions":[{
@@ -34,12 +34,7 @@
 			},
 			"validationModel":"PKIX"
 		},
-		"hashAlgorithms":[
-			"SHA1",
-			"SHA256",
-			"SHA384",
-			"SHA512"
-		],
+		"hashAlgorithms":["SHA1","SHA256","SHA384","SHA512"],
 		"maxRequestListCount":10,
 		"maxRequestSize":4096,
 		"nonce":{
@@ -50,9 +45,7 @@
 		"signatureRequired":false,
 		"supportsHttpGet":true,
 		"validateSignature":true,
-		"versions":[
-			"v1"
-		]
+		"versions":["v1"]
 	}],
 	"responders":[{
 		"name":"responder1",
@@ -60,26 +53,18 @@
 		"mode":"RFC6960",
 		"request":"request1",
 		"response":"response1",
-		"servletPaths":[
-			"/responder1"
-		],
+		"servletPaths":["/responder1"],
 		"signer":"signer1",
-		"stores":[
-			"dbstore1"
-		]
+		"stores":["dbstore1"]
 	},{
 		"name":"responder2",
 		"inheritCaRevocation":true,
 		"mode":"RFC6960",
 		"request":"request1",
 		"response":"response2",
-		"servletPaths":[
-			"/responder1"
-		],
+		"servletPaths":["/responder2"],
 		"signer":"signer1",
-		"stores":[
-			"crlstore1"
-		]
+		"stores":["crlstore1"]
 	}],
 	"responseOptions":[{
 		"name":"response1",
@@ -116,7 +101,12 @@
 			"datasource":"datasource1",
 			"type":"xipki-db",
 			"conf":{
-				"file":"xipki/etc/ocsp/xipki-db-source-dbstore1.properties"
+				"dbSource":{
+//					"caCerts": {
+//						"includes":[],
+//						"excludes":[],
+//					}
+				}
 			}
 		},
 		"unknownSerialAsGood":false
@@ -131,7 +121,13 @@
 			"datasource":"datasource-crl",
 			"type":"crl",
 			"conf":{
-				"file":"xipki/etc/ocsp/crl-source-crlstore1.properties"
+				"crlSource":{
+					"crlFile":"xipki/etc/ocsp/crls/subcawithcrl1/crl.crl",
+					"crlUrl":"http://example.org/crl",
+					"useUpdateDatesFromCrl":false,
+					"caCertFile":"xipki/etc/ocsp/crls/subcawithcrl1/ca.crt",
+					"certsDir":"xipki/etc/ocsp/crls/subcawithcrl1/certs/"
+				}
 			}
 		},
 		"unknownSerialAsGood":true
