@@ -44,7 +44,8 @@ public class FailInfoException extends Exception {
   private final FailInfo failInfo;
 
   private FailInfoException(FailInfo failInfo) {
-    this.failInfo = Args.notNull(failInfo, "failInfo");
+    super(Args.notNull(failInfo, "failInfo").name());
+    this.failInfo = failInfo;
   }
 
   public FailInfo getFailInfo() {

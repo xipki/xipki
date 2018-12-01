@@ -52,7 +52,7 @@ if { $SIG_TYPE equals "rsa" } then {
   KEY_DIR = "ec"
   SIGALGO = "${HASH}withPlainECDSA"
 } elif { $SIG_TYPE equals "dsa" } then {
-  KEY_TYPE = "DSA"
+  KEY_TYPE = "dsa"
   KEY_DIR = "dsa"
   SIGALGO = "${HASH}withDSA"
 } elif { $SIG_TYPE equals "sm2" } then {
@@ -102,9 +102,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
     }
   }
 
-}
-
-if { $TOKEN_TYPE equals "pkcs12" } then {
+} elif { $TOKEN_TYPE equals "pkcs12" } then {
 
   OCSP_KEYCONF = "password=1234,keystore=file:xipki/keycerts/ocsp99.p12"
 

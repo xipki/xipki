@@ -110,7 +110,7 @@
 			"protocolSupport":["cmp","rest","scep"],
 			"saveReq":false,
 			"scepControl":{
-				"cacert.included":"false",
+				"cacert.included":"true",
 				"signercert.included":"true",
 				"support.getcrl":"true"
 			},

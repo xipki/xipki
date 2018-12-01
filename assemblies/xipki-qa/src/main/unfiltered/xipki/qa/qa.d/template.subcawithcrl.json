@@ -52,7 +52,7 @@
 			"scepControl":{
 				"cacert.included":"true",
 				"signercert.included":"true",
-				"support.getcrl":"false"
+				"support.getcrl":"true"
 			},
 			"signerType":"${token.type}",
 			"signerConf":{
