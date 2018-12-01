@@ -75,6 +75,7 @@ public class ScepControl {
     ConfPairs pairs = new ConfPairs();
     pairs.putPair(KEY_CACERT_INCLUDED, Boolean.toString(includeCaCert));
     pairs.putPair(KEY_SIGNERCERT_INCLUDED, Boolean.toString(includeSignerCert));
+    pairs.putPair(KEY_SUPPORT_GETCRL, Boolean.toString(supportGetCrl));
 
     return pairs.getEncoded();
   }
