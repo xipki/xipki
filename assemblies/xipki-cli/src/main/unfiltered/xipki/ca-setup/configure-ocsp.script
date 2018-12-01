@@ -1,0 +1,6 @@
+echo "=================BEGIN OCSP==================="
+echo "|| Copy xipki/ca-setup/keycerts/ocsp1.p12 to"
+echo "||   to the installation folder of OCSP server"
+echo "||   <INST ROOT>/xipki/keycerts/ocsp1.p12"
+echo "|| and then restart the OCSP server."
+echo "================= END OCSP ==================="

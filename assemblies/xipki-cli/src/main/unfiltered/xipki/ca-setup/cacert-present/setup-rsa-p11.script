@@ -42,3 +42,5 @@ ca:load-conf --conf-file xipki/ca-setup/cacert-present/ca-conf.json
 
 echo "create initial CRL"
 ca:gencrl --ca myca1
+
+source xipki/ca-setup/configure-ocsp.script

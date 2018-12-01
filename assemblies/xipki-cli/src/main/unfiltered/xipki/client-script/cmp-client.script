@@ -75,17 +75,29 @@ xi:cmp-csr-enroll --csr ${OUT_DIR}/${CN}.csr --out ${OUT_DIR}/${CN}.der --profil
 xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --cert ${OUT_DIR}/${CN}.der
 
+echo "Current OCSP Status"
+xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der
+
 echo "=====CMP: Suspend certificate====="
 
 xi:cmp-revoke --ca myca --cert ${OUT_DIR}/${CN}.der --reason certificateHold
+
+echo "Current OCSP Status"
+xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der
 
 echo "=====CMP: Unsuspend certificate====="
 
 xi:cmp-unrevoke --ca myca --cert ${OUT_DIR}/${CN}.der
 
+echo "Current OCSP Status"
+xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der
+
 echo "=====CMP: Revocate certificate====="
 
 xi:cmp-revoke --ca myca --cert ${OUT_DIR}/${CN}.der --reason affiliationChanged
+
+echo "Current OCSP Status"
+xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der
 
 echo "=====CMP: Generate CRL====="
 

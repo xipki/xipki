@@ -234,6 +234,9 @@ public class CaServletFilter implements Filter {
 
     // register additional SignerFactories
     String list = props.getProperty("Additional.CertprofileFactories");
+    if (list == null) {
+      list = props.getProperty("additional.certprofileFactories");
+    }
     String[] classNames = list == null ? null : list.split(", ");
     if (classNames != null) {
       for (String className : classNames) {
