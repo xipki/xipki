@@ -210,7 +210,7 @@
             </goals>
             <configuration>
               <descriptors>
-                <descriptor>src/main/descriptors/assembly-main.xml</descriptor>
+                <descriptor>src/main/descriptors/main.xml</descriptor>
               </descriptors>
               <appendAssemblyId>false</appendAssemblyId>
               <tarLongFileMode>posix</tarLongFileMode>
