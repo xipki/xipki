@@ -3241,6 +3241,7 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
       }
     } finally {
       zipStream.flush();
+      zipStream.close();
     }
 
     return new ByteArrayInputStream(bytesStream.toByteArray());

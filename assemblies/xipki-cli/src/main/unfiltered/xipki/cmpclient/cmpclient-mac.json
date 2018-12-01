@@ -1,7 +1,7 @@
 {
 	"cainfoUpdateInterval":10,
 	"cas":[{
-		"name":"MYCA",
+		"name":"myca",
 		"requestor":"requestor1",
 		"responder":"responder1",
 		"ssl":"ssl1",
@@ -48,7 +48,7 @@
 		"hostnameVerifier":"default",
 		"keystoreFile":"xipki/keycerts/tlskeys/client/tls-client.p12",
 		"keystorePassword":"1234",
-		"storeType":"PKCS12",
+		"storeType":"pkcs12",
 		"truststoreFile":"xipki/keycerts/tlskeys/ca/tls-ca-cert.p12",
 		"truststorePassword":"1234"
 	}]

@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.xipki.util.StringUtil;
+
 /**
  * TODO.
  * @author Lijun Liao
@@ -80,6 +82,8 @@ public class PermissionConstants {
       return null;
     } else if ("all".equalsIgnoreCase(text)) {
       return ALL;
+    } else if (StringUtil.isNumber(text)) {
+      return Integer.parseInt(text);
     } else {
       return textCodeMap.get(text.toLowerCase());
     }
