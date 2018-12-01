@@ -3061,17 +3061,17 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
 
           if (entry.getCmpControl() != null) {
             ciJaxb.setCmpControl(
-                new ConfPairs(entry.getCmpControl().getConf()).asMap());
+                new HashMap<>(new ConfPairs(entry.getCmpControl().getConf()).asMap()));
           }
 
           if (entry.getCrlControl() != null) {
             ciJaxb.setCrlControl(
-                new ConfPairs(entry.getCrlControl().getConf()).asMap());
+                new HashMap<>(new ConfPairs(entry.getCrlControl().getConf()).asMap()));
           }
 
           if (entry.getScepControl() != null) {
             ciJaxb.setScepControl(
-                new ConfPairs(entry.getScepControl().getConf()).asMap());
+                new HashMap<>(new ConfPairs(entry.getScepControl().getConf()).asMap()));
           }
 
           CaUris caUris = entry.getCaUris();

@@ -110,9 +110,10 @@ public class ConfPairs {
     putPair(name, value);
   }
 
-  public ConfPairs(Map<String, String> pairs) {
+  public ConfPairs(Map<String, ? extends Object> pairs) {
     for (String name : pairs.keySet()) {
-      putPair(name, pairs.get(name));
+      Object value = pairs.get(name);
+      putPair(name, value == null ? null : value.toString());
     }
   }
 

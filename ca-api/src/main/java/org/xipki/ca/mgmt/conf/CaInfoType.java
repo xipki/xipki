@@ -58,11 +58,11 @@ public class CaInfoType extends ValidatableConf {
 
   private String maxValidity;
 
-  private Map<String, String> cmpControl;
+  private Map<String, Object> cmpControl;
 
-  private Map<String, String> crlControl;
+  private Map<String, Object> crlControl;
 
-  private Map<String, String> scepControl;
+  private Map<String, Object> scepControl;
 
   private String cmpResponderName;
 
@@ -168,27 +168,27 @@ public class CaInfoType extends ValidatableConf {
     this.maxValidity = maxValidity;
   }
 
-  public Map<String, String> getCmpControl() {
+  public Map<String, Object> getCmpControl() {
     return cmpControl;
   }
 
-  public void setCmpControl(Map<String, String> cmpControl) {
+  public void setCmpControl(Map<String, Object> cmpControl) {
     this.cmpControl = cmpControl;
   }
 
-  public Map<String, String> getCrlControl() {
+  public Map<String, Object> getCrlControl() {
     return crlControl;
   }
 
-  public void setCrlControl(Map<String, String> crlControl) {
+  public void setCrlControl(Map<String, Object> crlControl) {
     this.crlControl = crlControl;
   }
 
-  public Map<String, String> getScepControl() {
+  public Map<String, Object> getScepControl() {
     return scepControl;
   }
 
-  public void setScepControl(Map<String, String> scepControl) {
+  public void setScepControl(Map<String, Object> scepControl) {
     this.scepControl = scepControl;
   }
 

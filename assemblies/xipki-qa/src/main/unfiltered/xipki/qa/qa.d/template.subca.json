@@ -19,10 +19,10 @@
 				]
 			},
 			"cmpControl":{
-				"send.ca":"true",
-				"messagetime.bias":"300",
-				"rr.aki.required":"true",
-				"group.enroll":"true",
+				"send.ca":true,
+				"messagetime.bias":300,
+				"rr.aki.required":true,
+				"group.enroll":true,
 				"protection.sigalgo":"REPLACEME-CMP_SIGALGO",
 				"popo.sigalgo":"REPLACEME-SIGALGO:REPLACEME-HASHwithRSA:REPLACEME-HASHwithECDSA:REPLACEME-HASHwithDSA:SM3withSM2"
 			},
@@ -31,7 +31,7 @@
 			"duplicateSubject":true,
 			"expirationPeriod":365,
 			"extraControl":{
-				"revokeSuspendedCerts.enabled":"true",
+				"revokeSuspendedCerts.enabled":true,
 				"revokeSuspendedCerts.targetReason":"cessationOfOperation",
 				"revokeSuspendedCerts.unchangedSince":"15d"
 			},

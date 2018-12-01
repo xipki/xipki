@@ -83,18 +83,18 @@
 				]
 			},
 			"cmpControl":{
-				"send.ca":"true",
-				"messagetime.bias":"300",
-				"rr.aki.required":"true",
-				"group.enroll":"true",
+				"send.ca":true,
+				"messagetime.bias":300,
+				"rr.aki.required":true,
+				"group.enroll":true,
 				"protection.sigalgo":"SHA256withRSA:SHA256withECDSA",
 				"popo.sigalgo":"SHA256withRSA:SHA256withECDSA:SHA256withDSA:SM3withSM2"
 			},
 			"cmpResponderName":"responder1",
 			"crlControl":{
 				"update.mode":"interval",
-				"fullcrl.intervals":"1",
-				"overlap.minutes":"90",
+				"fullcrl.intervals":1,
+				"overlap.minutes":90,
 				"interval.time":"02:00"
 			},
 			"duplicateKey":true,
@@ -115,9 +115,9 @@
 			"protocolSupport":["cmp","rest","scep"],
 			"saveReq":false,
 			"scepControl":{
-				"cacert.included":"true",
-				"signercert.included":"true",
-				"support.getcrl":"true"
+				"cacert.included":true,
+				"signercert.included":true,
+				"support.getcrl":true
 			},
 			"signerType":"${token.type}",
 			"signerConf":{
