@@ -101,7 +101,7 @@
 			"duplicateSubject":true,
 			"expirationPeriod":365,
 			"genSelfIssued":{
-				"certOutform":"REPLACEME-OUTFORM",
+				"certOutform":"der",
 				"csr":{
 					"file":"xipki/ca-setup/keycerts/myca1.csr"
 				},
