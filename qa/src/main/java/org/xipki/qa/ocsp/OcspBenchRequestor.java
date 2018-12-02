@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.ocsp.benchmark;
+package org.xipki.qa.ocsp;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -44,6 +44,8 @@ import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
 import org.xipki.ocsp.client.api.OcspRequestorException;
 import org.xipki.ocsp.client.api.RequestOptions;
+import org.xipki.qa.BenchmarkHttpClient;
+import org.xipki.qa.BenchmarkHttpClient.HttpClientException;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.util.Args;
@@ -71,7 +73,7 @@ class OcspBenchRequestor {
 
   private final SecureRandom random = new SecureRandom();
 
-  private static final ConcurrentHashMap<BigInteger, byte[]> requests = new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<BigInteger, byte[]> requests = new ConcurrentHashMap<>();
 
   private AlgorithmIdentifier issuerhashAlg;
 
@@ -87,7 +89,7 @@ class OcspBenchRequestor {
 
   private String responderRawPathGet;
 
-  private HttpClient httpClient;
+  private BenchmarkHttpClient httpClient;
 
   public void init(OcspBenchmark responseHandler, String responderUrl, Certificate issuerCert,
       RequestOptions requestOptions, int queueSize) throws Exception {
@@ -135,7 +137,7 @@ class OcspBenchRequestor {
     } else {
       this.responderRawPathGet = this.responderRawPathPost + "/";
     }
-    this.httpClient = new HttpClient(responderUrl, responseHandler, queueSize);
+    this.httpClient = new BenchmarkHttpClient(responderUrl, responseHandler, queueSize);
     this.httpClient.start();
   }
 
@@ -143,7 +145,7 @@ class OcspBenchRequestor {
     httpClient.shutdown();
   }
 
-  public void ask(BigInteger[] serialNumbers) throws OcspRequestorException {
+  public void ask(BigInteger[] serialNumbers) throws OcspRequestorException, HttpClientException {
     byte[] ocspReq = buildRequest(serialNumbers);
     int size = ocspReq.length;
 

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.ocsp.benchmark;
+package org.xipki.qa.ocsp;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ocsp.client.api.OcspRequestorException;
 import org.xipki.ocsp.client.api.RequestOptions;
+import org.xipki.qa.BenchmarkHttpClient.ResponseHandler;
 import org.xipki.util.Args;
 import org.xipki.util.BenchmarkExecutor;
 
@@ -44,7 +45,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
  * @since 2.0.0
  */
 
-public class OcspBenchmark extends BenchmarkExecutor {
+public class OcspBenchmark extends BenchmarkExecutor implements ResponseHandler {
 
   final class Testor implements Runnable {
 
@@ -138,6 +139,7 @@ public class OcspBenchmark extends BenchmarkExecutor {
     }
   }
 
+  @Override
   public void onComplete(FullHttpResponse response) {
     boolean success;
     try {
@@ -150,6 +152,7 @@ public class OcspBenchmark extends BenchmarkExecutor {
     account(1, success ? 0 : 1);
   }
 
+  @Override
   public synchronized void onError() {
     account(1, 1);
   }

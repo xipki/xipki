@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.ocsp.benchmark;
+package org.xipki.qa;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -26,7 +26,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ocsp.client.api.OcspRequestorException;
 import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
 import org.xipki.util.concurrent.CountLatch;
@@ -57,9 +56,31 @@ import io.netty.handler.timeout.WriteTimeoutHandler;
  * @since 2.2.0
  */
 
-final class HttpClient {
+public class BenchmarkHttpClient {
 
-  private static final Logger LOG = LoggerFactory.getLogger(HttpClient.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BenchmarkHttpClient.class);
+
+  public static interface ResponseHandler {
+
+    void onComplete(FullHttpResponse response);
+
+    void onError();
+
+  }
+
+  public static class HttpClientException extends Exception {
+
+   private static final long serialVersionUID = 1L;
+
+   public HttpClientException(String message) {
+     super(message);
+   }
+
+   public HttpClientException(String message, Throwable cause) {
+     super(message, cause);
+   }
+
+ }
 
   private class HttpClientInitializer extends ChannelInitializer<SocketChannel> {
 
@@ -108,7 +129,7 @@ final class HttpClient {
 
   private String uri;
 
-  private OcspBenchmark responseHandler;
+  private ResponseHandler responseHandler;
 
   private EventLoopGroup workerGroup;
 
@@ -120,7 +141,7 @@ final class HttpClient {
 
   static {
     String os = System.getProperty("os.name").toLowerCase();
-    ClassLoader loader = HttpClient.class.getClassLoader();
+    ClassLoader loader = BenchmarkHttpClient.class.getClassLoader();
     if (os.contains("linux")) {
       try {
         Class<?> checkClazz = Class.forName("io.netty.channel.epoll.Epoll", false, loader);
@@ -151,7 +172,7 @@ final class HttpClient {
     }
   }
 
-  public HttpClient(String uri, OcspBenchmark responseHandler, int queueSize)
+  public BenchmarkHttpClient(String uri, ResponseHandler responseHandler, int queueSize)
       throws MalformedURLException {
     this.uri = Args.notNull(uri, "uri");
     if (queueSize > 0) {
@@ -240,16 +261,16 @@ final class HttpClient {
     this.channel = bootstrap.connect(host, port).syncUninterruptibly().channel();
   }
 
-  public void send(FullHttpRequest request) throws OcspRequestorException {
+  public void send(FullHttpRequest request) throws HttpClientException {
     request.headers().add(HttpHeaderNames.HOST, hostHeader);
     if (!channel.isActive()) {
-      throw new OcspRequestorException("channel is not active");
+      throw new HttpClientException("channel is not active");
     }
 
     try {
       latch.await(5, TimeUnit.SECONDS);
     } catch (InterruptedException ex) {
-      throw new OcspRequestorException("sending poll is full");
+      throw new HttpClientException("sending poll is full");
     }
     incrementPendingRequests();
     ChannelFuture future = this.channel.writeAndFlush(request);
