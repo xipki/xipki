@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.security.benchmark.pkcs11;
+package org.xipki.qa.security;
 
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
@@ -27,28 +27,28 @@ import org.xipki.security.pkcs11.P11Slot;
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
-public class P11DSASignSpeed extends P11SignSpeed {
+public class P11ECSignSpeed extends P11SignSpeed {
 
-  public P11DSASignSpeed(SecurityFactory securityFactory, P11Slot slot, byte[] keyId,
-      String signatureAlgorithm, int threads, int plength, int qlength) throws Exception {
-    this(false, securityFactory, slot, keyId, null, signatureAlgorithm, threads, plength, qlength);
+  public P11ECSignSpeed(SecurityFactory securityFactory, P11Slot slot, byte[] keyId,
+      String signatureAlgorithm, int threads, String curveNameOrOid) throws Exception {
+    this(false, securityFactory, slot, keyId, null, signatureAlgorithm, threads, curveNameOrOid);
   }
 
-  public P11DSASignSpeed(boolean keyPresent, SecurityFactory securityFactory, P11Slot slot,
-      byte[] keyId, String keyLabel, String signatureAlgorithm, int threads,
-      int plength, int qlength) throws Exception {
+  public P11ECSignSpeed(boolean keyPresent, SecurityFactory securityFactory, P11Slot slot,
+      byte[] keyId, String keyLabel, String signatureAlgorithm, int threads, String curveNameOrOid)
+          throws Exception {
     super(securityFactory, slot, signatureAlgorithm, !keyPresent,
-        generateKey(keyPresent, slot, keyId, keyLabel, plength, qlength),
-        "PKCS#11 DSA signature creation\npLength: " + plength + "\nqLength: " + qlength, threads);
+        generateKey(keyPresent, slot, keyId, keyLabel, curveNameOrOid),
+        "PKCS#11 EC signature creation\ncurve: " + curveNameOrOid, threads);
   }
 
   private static P11ObjectIdentifier generateKey(boolean keyPresent, P11Slot slot, byte[] keyId,
-      String keyLabel, int plength, int qlength) throws Exception {
+      String keyLabel, String curveNameOrOid) throws Exception {
     if (keyPresent) {
       return getNonNullKeyId(slot, keyId, keyLabel);
     }
 
-    return slot.generateDSAKeypair(plength, qlength, getNewKeyControl(keyId, keyLabel)).getKeyId();
+    return slot.generateECKeypair(curveNameOrOid, getNewKeyControl(keyId, keyLabel)).getKeyId();
   }
 
 }

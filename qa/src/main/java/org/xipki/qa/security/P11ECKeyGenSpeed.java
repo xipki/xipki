@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.security.benchmark.pkcs11;
+package org.xipki.qa.security;
 
 import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11Slot;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -26,21 +27,18 @@ import org.xipki.security.pkcs11.P11Slot;
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
-public class P11DSAKeyGenSpeed extends P11KeyGenSpeed {
+public class P11ECKeyGenSpeed extends P11KeyGenSpeed {
 
-  private final int plength;
+  private final String curveNameOrOid;
 
-  private final int qlength;
-
-  public P11DSAKeyGenSpeed(P11Slot slot, byte[] id, int plength, int qlength) throws Exception {
-    super(slot, id, "PKCS#11 DSA key generation\nplength: " + plength + "\nqlength: " + qlength);
-    this.plength = plength;
-    this.qlength = qlength;
+  public P11ECKeyGenSpeed(P11Slot slot, byte[] id, String curveNameOrOid) throws Exception {
+    super(slot, id, "PKCS#11 EC key generation\ncurve: " + curveNameOrOid);
+    this.curveNameOrOid = Args.notNull(curveNameOrOid, "curveNameOrOid");
   }
 
   @Override
   protected void genKeypair() throws Exception {
-    P11IdentityId objId = slot.generateDSAKeypair(plength, qlength, getControl());
+    P11IdentityId objId = slot.generateECKeypair(curveNameOrOid, getControl());
     slot.removeIdentity(objId);
   }
 

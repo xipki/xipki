@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.security.benchmark.pkcs12;
+package org.xipki.qa.security;
 
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.pkcs12.KeystoreGenerationParameters;
@@ -28,32 +28,36 @@ import org.xipki.security.pkcs12.P12KeyGenerator;
  * @since 2.2.0
  */
 // CHECKSTYLE:SKIP
-public class P12AESGmacSignSpeed extends P12SignSpeed {
+public class P12HMACSignSpeed extends P12SignSpeed {
 
-  public P12AESGmacSignSpeed(SecurityFactory securityFactory, String signatureAlgorithm,
-      int threads) throws Exception {
+  public P12HMACSignSpeed(SecurityFactory securityFactory, String signatureAlgorithm, int threads)
+      throws Exception {
     super("JCEKS", securityFactory, signatureAlgorithm, generateKeystore(signatureAlgorithm),
-        "JCEKS AES-GMAC signature creation", threads);
+        "JCEKS HMAC signature creation", threads);
   }
 
   private static byte[] generateKeystore(String signatureAlgorithm) throws Exception {
     int keysize = getKeysize(signatureAlgorithm);
     P12KeyGenerationResult identity = new P12KeyGenerator().generateSecretKey(
-        "AES", keysize, new KeystoreGenerationParameters(PASSWORD.toCharArray()));
+        "GENERIC", keysize, new KeystoreGenerationParameters(PASSWORD.toCharArray()));
     return identity.keystore();
   }
 
-  public static int getKeysize(String hmacAlgorithm) {
+  private static int getKeysize(String hmacAlgorithm) {
     hmacAlgorithm = hmacAlgorithm.toUpperCase();
     int keysize;
-    if ("AES128-GMAC".equals(hmacAlgorithm)) {
-      keysize = 128;
-    } else if ("AES192-GMAC".equals(hmacAlgorithm)) {
-      keysize = 192;
-    } else if ("AES256-GMAC".equals(hmacAlgorithm)) {
+    if ("HMACSHA1".equals(hmacAlgorithm)) {
+      keysize = 160;
+    } else if ("HMACSHA224".equals(hmacAlgorithm) || "HMACSHA3-224".equals(hmacAlgorithm)) {
+      keysize = 224;
+    } else if ("HMACSHA256".equals(hmacAlgorithm) || "HMACSHA3-256".equals(hmacAlgorithm)) {
       keysize = 256;
+    } else if ("HMACSHA384".equals(hmacAlgorithm) || "HMACSHA3-384".equals(hmacAlgorithm)) {
+      keysize = 384;
+    } else if ("HMACSHA512".equals(hmacAlgorithm) || "HMACSHA3-512".equals(hmacAlgorithm)) {
+      keysize = 512;
     } else {
-      throw new IllegalArgumentException("unknown GMAC algorithm " + hmacAlgorithm);
+      throw new IllegalArgumentException("unknown HMAC algorithm " + hmacAlgorithm);
     }
     return keysize;
   }

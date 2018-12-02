@@ -15,14 +15,13 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.security.benchmark.pkcs11;
+package org.xipki.qa.security;
 
-import java.util.concurrent.atomic.AtomicLong;
+import java.security.SecureRandom;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.pkcs11.P11NewKeyControl;
-import org.xipki.security.pkcs11.P11Slot;
+import org.xipki.security.SecurityFactory;
 import org.xipki.util.Args;
 import org.xipki.util.BenchmarkExecutor;
 
@@ -32,7 +31,7 @@ import org.xipki.util.BenchmarkExecutor;
  * @since 2.0.0
  */
 
-public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
+public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
 
   class Testor implements Runnable {
 
@@ -40,10 +39,10 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
     public void run() {
       while (!stop() && getErrorAccout() < 1) {
         try {
-          genKeypair();
+          generateKeypair(securityFactory.getRandom4Key());
           account(1, 0);
         } catch (Exception ex) {
-          LOG.error("P11KeyGenSpeed.Testor.run()", ex);
+          LOG.error("P12KeyGenSpeed.Testor.run()", ex);
           account(1, 1);
         }
       }
@@ -51,25 +50,16 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
 
   } // class Testor
 
-  protected final P11Slot slot;
+  private static final Logger LOG = LoggerFactory.getLogger(P12KeyGenSpeed.class);
 
-  private static final Logger LOG = LoggerFactory.getLogger(P11KeyGenSpeed.class);
+  private final SecurityFactory securityFactory;
 
-  private byte[] id;
-
-  private AtomicLong idx = new AtomicLong(System.currentTimeMillis());
-
-  public P11KeyGenSpeed(P11Slot slot, byte[] id, String description) {
+  public P12KeyGenSpeed(String description, SecurityFactory securityFactory) {
     super(description);
-    this.slot = Args.notNull(slot, "slot");
-    this.id = id;
+    this.securityFactory = Args.notNull(securityFactory, "securityFactory");
   }
 
-  protected abstract void genKeypair() throws Exception;
-
-  protected P11NewKeyControl getControl() {
-    return new P11NewKeyControl(id, "speed-" + idx.getAndIncrement());
-  }
+  protected abstract void generateKeypair(SecureRandom random) throws Exception;
 
   @Override
   protected Runnable getTestor() throws Exception {

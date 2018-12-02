@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.security.benchmark.pkcs12;
+package org.xipki.qa.security;
 
-import java.math.BigInteger;
 import java.security.SecureRandom;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 
 /**
@@ -29,23 +30,24 @@ import org.xipki.security.util.KeyUtil;
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
-public class P12RSAKeyGenSpeed extends P12KeyGenSpeed {
+public class P12ECKeyGenSpeed extends P12KeyGenSpeed {
 
-  private final int keysize;
-  private final BigInteger publicExponent;
+  private final ASN1ObjectIdentifier curveOid;
 
-  public P12RSAKeyGenSpeed(int keysize, BigInteger publicExponent,
-      SecurityFactory securityFactory) throws Exception {
-    super("PKCS#12 RSA key generation\nkeysize: " + keysize
-        + "\npublic exponent: " + publicExponent, securityFactory);
+  public P12ECKeyGenSpeed(String curveNameOrOid, SecurityFactory securityFactory) throws Exception {
+    super("PKCS#12 EC key generation\ncurve: " + curveNameOrOid, securityFactory);
 
-    this.keysize = keysize;
-    this.publicExponent = publicExponent;
+    ASN1ObjectIdentifier oid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
+    if (oid == null) {
+      throw new IllegalArgumentException("invalid curve name or OID " + curveNameOrOid);
+    }
+
+    this.curveOid = oid;
   }
 
   @Override
   protected void generateKeypair(SecureRandom random) throws Exception {
-    KeyUtil.generateRSAKeypair(keysize, publicExponent, random);
+    KeyUtil.generateECKeypair(curveOid, random);
   }
 
 }

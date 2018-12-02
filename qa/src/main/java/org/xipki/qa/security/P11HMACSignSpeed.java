@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.security.benchmark.pkcs11;
+package org.xipki.qa.security;
 
 import java.security.SecureRandom;
 

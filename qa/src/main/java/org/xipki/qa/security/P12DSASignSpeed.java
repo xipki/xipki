@@ -15,9 +15,8 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.security.benchmark.pkcs12;
+package org.xipki.qa.security;
 
-import java.math.BigInteger;
 import java.security.SecureRandom;
 
 import org.xipki.security.SecurityFactory;
@@ -31,24 +30,23 @@ import org.xipki.security.pkcs12.P12KeyGenerator;
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
-public class P12RSASignSpeed extends P12SignSpeed {
+public class P12DSASignSpeed extends P12SignSpeed {
 
-  public P12RSASignSpeed(SecurityFactory securityFactory, String signatureAlgorithm, int threads,
-      int keysize, BigInteger publicExponent) throws Exception {
-    super(securityFactory, signatureAlgorithm, generateKeystore(keysize, publicExponent),
-        "PKCS#12 RSA signature creation\nkeysize: " + keysize
-            + "\npublic exponent: " + publicExponent, threads);
+  public P12DSASignSpeed(SecurityFactory securityFactory, String signatureAlgorithm, int threads,
+      int plength, int qlength) throws Exception {
+    super(securityFactory, signatureAlgorithm,
+        generateKeystore(plength, qlength), "PKCS#12 DSA signature creation\nplength: " + plength
+            + "\nqlength: " + qlength, threads);
   }
 
-  private static byte[] generateKeystore(int keysize, BigInteger publicExponent)
-      throws Exception {
-    byte[] keystoreBytes = getPrecomputedRSAKeystore(keysize, publicExponent);
+  private static byte[] generateKeystore(int plength, int qlength) throws Exception {
+    byte[] keystoreBytes = getPrecomputedDSAKeystore(plength, qlength);
     if (keystoreBytes == null) {
       KeystoreGenerationParameters params = new KeystoreGenerationParameters(
           PASSWORD.toCharArray());
       params.setRandom(new SecureRandom());
-      P12KeyGenerationResult identity = new P12KeyGenerator().generateRSAKeypair(
-          keysize, publicExponent, params, null);
+      P12KeyGenerationResult identity = new P12KeyGenerator().generateDSAKeypair(
+          plength, qlength, params, null);
       keystoreBytes = identity.keystore();
     }
     return keystoreBytes;

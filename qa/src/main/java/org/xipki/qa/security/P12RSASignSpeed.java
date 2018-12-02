@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.security.benchmark.pkcs12;
+package org.xipki.qa.security;
 
+import java.math.BigInteger;
 import java.security.SecureRandom;
 
 import org.xipki.security.SecurityFactory;
@@ -30,22 +31,24 @@ import org.xipki.security.pkcs12.P12KeyGenerator;
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
-public class P12ECSignSpeed extends P12SignSpeed {
+public class P12RSASignSpeed extends P12SignSpeed {
 
-  public P12ECSignSpeed(SecurityFactory securityFactory, String signatureAlgorithm, int threads,
-      String curveNameOrOid) throws Exception {
-    super(securityFactory, signatureAlgorithm, generateKeystore(curveNameOrOid),
-        "PKCS#12 EC signature creation\ncurve: " + curveNameOrOid, threads);
+  public P12RSASignSpeed(SecurityFactory securityFactory, String signatureAlgorithm, int threads,
+      int keysize, BigInteger publicExponent) throws Exception {
+    super(securityFactory, signatureAlgorithm, generateKeystore(keysize, publicExponent),
+        "PKCS#12 RSA signature creation\nkeysize: " + keysize
+            + "\npublic exponent: " + publicExponent, threads);
   }
 
-  private static byte[] generateKeystore(String curveNameOrOid) throws Exception {
-    byte[] keystoreBytes = getPrecomputedECKeystore(curveNameOrOid);
+  private static byte[] generateKeystore(int keysize, BigInteger publicExponent)
+      throws Exception {
+    byte[] keystoreBytes = getPrecomputedRSAKeystore(keysize, publicExponent);
     if (keystoreBytes == null) {
       KeystoreGenerationParameters params = new KeystoreGenerationParameters(
           PASSWORD.toCharArray());
       params.setRandom(new SecureRandom());
-      P12KeyGenerationResult identity = new P12KeyGenerator().generateECKeypair(
-          curveNameOrOid, params, null);
+      P12KeyGenerationResult identity = new P12KeyGenerator().generateRSAKeypair(
+          keysize, publicExponent, params, null);
       keystoreBytes = identity.keystore();
     }
     return keystoreBytes;

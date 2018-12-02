@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.security.benchmark.pkcs11;
+package org.xipki.qa.security;
 
 import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11Slot;
@@ -26,14 +26,21 @@ import org.xipki.security.pkcs11.P11Slot;
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
-public class P11SM2KeyGenSpeed extends P11KeyGenSpeed {
-  public P11SM2KeyGenSpeed(P11Slot slot, byte[] id) throws Exception {
-    super(slot, id, "PKCS#11 SM2 key generation");
+public class P11DSAKeyGenSpeed extends P11KeyGenSpeed {
+
+  private final int plength;
+
+  private final int qlength;
+
+  public P11DSAKeyGenSpeed(P11Slot slot, byte[] id, int plength, int qlength) throws Exception {
+    super(slot, id, "PKCS#11 DSA key generation\nplength: " + plength + "\nqlength: " + qlength);
+    this.plength = plength;
+    this.qlength = qlength;
   }
 
   @Override
   protected void genKeypair() throws Exception {
-    P11IdentityId objId = slot.generateSM2Keypair(getControl());
+    P11IdentityId objId = slot.generateDSAKeypair(plength, qlength, getControl());
     slot.removeIdentity(objId);
   }
 
