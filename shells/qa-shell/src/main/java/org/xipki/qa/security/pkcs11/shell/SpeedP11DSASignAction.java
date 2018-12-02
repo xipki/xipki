@@ -21,7 +21,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.qa.security.benchmark.pkcs11.P11DSASignSpeed;
+import org.xipki.qa.security.P11DSASignSpeed;
 import org.xipki.qa.security.shell.completer.DSASigAlgCompleter;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.BenchmarkExecutor;
