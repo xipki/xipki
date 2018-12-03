@@ -92,15 +92,12 @@ public class OcspBenchmark extends BenchmarkExecutor implements ResponseHandler 
 
   private final int maxRequests;
 
-  private final boolean parseResponse;
-
   private final int queueSize;
 
   private AtomicInteger processedRequests = new AtomicInteger(0);
 
   public OcspBenchmark(Certificate issuerCert, String responderUrl, RequestOptions requestOptions,
-      Iterator<BigInteger> serials, int maxRequests, boolean parseResponse, int queueSize,
-      String description) {
+      Iterator<BigInteger> serials, int maxRequests, int queueSize, String description) {
     super(description);
 
     this.issuerCert = Args.notNull(issuerCert, "issuerCert");
@@ -108,7 +105,6 @@ public class OcspBenchmark extends BenchmarkExecutor implements ResponseHandler 
     this.requestOptions = Args.notNull(requestOptions, "requestOptions");
     this.maxRequests = maxRequests;
     this.serials = Args.notNull(serials, "serials");
-    this.parseResponse = parseResponse;
     this.queueSize = queueSize;
   }
 
@@ -182,16 +178,6 @@ public class OcspBenchmark extends BenchmarkExecutor implements ResponseHandler 
     }
     byte[] respBytes = new byte[buf.readableBytes()];
     buf.getBytes(buf.readerIndex(), respBytes);
-
-    if (!parseResponse) {
-      // a valid response should at least of size 10.
-      if (respBytes.length < 10) {
-        LOG.warn("bad response: response too short");
-        return false;
-      } else {
-        return true;
-      }
-    }
 
     OCSPResp ocspResp;
     try {

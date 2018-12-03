@@ -230,8 +230,6 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
 
   private final SecureRandom random = new SecureRandom();
 
-  private final boolean parseResponse;
-
   private final int num;
 
   private final int queueSize;
@@ -249,14 +247,12 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
   private final SslContext sslContext;
 
   public CaEnrollBenchmark(CaEnrollBenchEntry benchmarkEntry, int maxRequests, int num,
-      boolean parseResponse, int queueSize, String description)
-          throws IOException, InvalidConfException {
+      int queueSize, String description) throws IOException, InvalidConfException {
     super(description);
     this.maxRequests = maxRequests;
     this.num = Args.positive(num, "num");
     this.benchmarkEntry = Args.notNull(benchmarkEntry, "benchmarkEntry");
     this.index = new AtomicLong(getSecureIndex());
-    this.parseResponse = parseResponse;
     this.queueSize = queueSize;
 
     try (InputStream is = Files.newInputStream(Paths.get(CONf_FILE))) {
@@ -382,16 +378,6 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
     }
     byte[] respBytes = new byte[buf.readableBytes()];
     buf.getBytes(buf.readerIndex(), respBytes);
-
-    if (!parseResponse) {
-      // a valid response should at least of size 10.
-      if (respBytes.length < 10) {
-        LOG.warn("bad response: response too short");
-        return false;
-      } else {
-        return true;
-      }
-    }
 
     PKIMessage cmpResponse = PKIMessage.getInstance(respBytes);
     try {

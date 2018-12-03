@@ -63,10 +63,6 @@ public class CaBenchmarkEnrollAction extends XiAction {
   @Option(name = "--thread", description = "number of threads")
   private Integer numThreads = 5;
 
-  @Option(name = "--analyze-response",
-      description = "whether to analyze the received OCSP response")
-  private Boolean analyzeResponse = Boolean.FALSE;
-
   @Option(name = "--key-type", description = "key type to be requested")
   private String keyType = "RSA";
 
@@ -123,7 +119,7 @@ public class CaBenchmarkEnrollAction extends XiAction {
     CaEnrollBenchEntry benchmarkEntry = new CaEnrollBenchEntry(certprofile, keyEntry,
         subjectTemplate, randomDn);
     CaEnrollBenchmark benchmark = new CaEnrollBenchmark(benchmarkEntry, maxRequests, num,
-        analyzeResponse, queueSize, description);
+        queueSize, description);
 
     benchmark.setDuration(duration);
     benchmark.setThreads(numThreads);

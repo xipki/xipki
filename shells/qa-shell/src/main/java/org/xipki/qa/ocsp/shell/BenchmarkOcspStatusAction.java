@@ -74,10 +74,6 @@ public class BenchmarkOcspStatusAction extends CommonOcspStatusAction {
   @Option(name = "--thread", description = "number of threads")
   private Integer numThreads = 5;
 
-  @Option(name = "--analyze-response",
-      description = "whether to analyze the received OCSP response")
-  private Boolean analyzeResponse = Boolean.FALSE;
-
   @Option(name = "--url", required = true, description = "OCSP responder URL")
   private String serverUrl;
 
@@ -153,7 +149,7 @@ public class BenchmarkOcspStatusAction extends CommonOcspStatusAction {
 
       RequestOptions options = getRequestOptions();
       OcspBenchmark loadTest = new OcspBenchmark(issuerCert, serverUrl, options,
-          serialNumberIterator, maxRequests, analyzeResponse, queueSize, description.toString());
+          serialNumberIterator, maxRequests, queueSize, description.toString());
       loadTest.setDuration(duration);
       loadTest.setThreads(numThreads);
       loadTest.execute();
