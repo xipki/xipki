@@ -71,11 +71,6 @@ if { $printUsage equals "true" } then {
     echo "Sleeping 1 second"
     sleep 1
 
-    # Loadtest Template
-    echo "Template enroll benchmark"
-    xiqa:cmp-benchmark-template-enroll --duration $duration --thread $threads \
-      --template xipki/qa/qa.d/benchmark-template.json
-
     # Loadtest RSA key
     echo "Enroll benchmark"
     xiqa:cmp-benchmark-enroll  --duration $duration --thread $threads \

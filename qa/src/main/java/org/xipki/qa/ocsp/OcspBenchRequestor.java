@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -42,10 +43,11 @@ import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.cert.ocsp.CertificateID;
 import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
+import org.xipki.http.benchmark.BenchmarkHttpClient;
+import org.xipki.http.benchmark.BenchmarkHttpClient.HttpClientException;
+import org.xipki.http.benchmark.BenchmarkHttpClient.ResponseHandler;
 import org.xipki.ocsp.client.api.OcspRequestorException;
 import org.xipki.ocsp.client.api.RequestOptions;
-import org.xipki.qa.BenchmarkHttpClient;
-import org.xipki.qa.BenchmarkHttpClient.HttpClientException;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.util.Args;
@@ -91,8 +93,9 @@ class OcspBenchRequestor {
 
   private BenchmarkHttpClient httpClient;
 
-  public void init(OcspBenchmark responseHandler, String responderUrl, Certificate issuerCert,
-      RequestOptions requestOptions, int queueSize) throws Exception {
+  public void init(ResponseHandler responseHandler, String responderUrl, Certificate issuerCert,
+      RequestOptions requestOptions, int queueSize)
+          throws OcspRequestorException, IOException, URISyntaxException {
     Args.notNull(issuerCert, "issuerCert");
     Args.notNull(responseHandler, "responseHandler");
     this.requestOptions = Args.notNull(requestOptions, "requestOptions");
@@ -137,7 +140,21 @@ class OcspBenchRequestor {
     } else {
       this.responderRawPathGet = this.responderRawPathPost + "/";
     }
-    this.httpClient = new BenchmarkHttpClient(responderUrl, responseHandler, queueSize);
+
+    int port = uri.getPort();
+    if (port == -1) {
+      final String scheme = uri.getScheme();
+      if ("http".equalsIgnoreCase(scheme)) {
+        port = 80;
+      } else if ("https".equalsIgnoreCase(scheme)) {
+        port = 443;
+      } else {
+        throw new OcspRequestorException("unknown scheme " + scheme);
+      }
+    }
+
+    this.httpClient = new BenchmarkHttpClient(uri.getHost(), uri.getPort(), null,
+        responseHandler, queueSize);
     this.httpClient.start();
   }
 

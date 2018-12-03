@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.ca.benchmark;
+package org.xipki.qa.ca;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -49,10 +49,10 @@ import org.xipki.util.Base64;
  * @since 2.0.0
  */
 
-public abstract class KeyEntry {
+public abstract class CaEnrollBenchKeyEntry {
 
   // CHECKSTYLE:SKIP
-  public static final class RSAKeyEntry extends KeyEntry {
+  public static final class RSAKeyEntry extends CaEnrollBenchKeyEntry {
 
     private static final String N_1024 =
         "ALI9Q2yy0KKsfuJw6tOfXBY3aJevCKyCQYM4DWK0eL1noqh6Uk6Ro3AsLVcoJDlZ"
@@ -139,7 +139,7 @@ public abstract class KeyEntry {
   } // class RSAKeyEntry
 
   // CHECKSTYLE:SKIP
-  public static final class DSAKeyEntry extends KeyEntry {
+  public static final class DSAKeyEntry extends CaEnrollBenchKeyEntry {
 
     private static final String P_1024 =
         "AM/6AjYLnnzRa99zmdhuMmikFKF/HhotHagBxoHlT4alq415sX94psaJPI3D5+/e"
@@ -265,7 +265,7 @@ public abstract class KeyEntry {
   } // class DSAKeyEntry
 
 //CHECKSTYLE:SKIP
-public static final class ECKeyEntry extends KeyEntry {
+public static final class ECKeyEntry extends CaEnrollBenchKeyEntry {
 
     private final SubjectPublicKeyInfo spki;
 

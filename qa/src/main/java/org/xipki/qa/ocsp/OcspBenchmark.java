@@ -29,9 +29,8 @@ import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ocsp.client.api.OcspRequestorException;
+import org.xipki.http.benchmark.BenchmarkHttpClient.ResponseHandler;
 import org.xipki.ocsp.client.api.RequestOptions;
-import org.xipki.qa.BenchmarkHttpClient.ResponseHandler;
 import org.xipki.util.Args;
 import org.xipki.util.BenchmarkExecutor;
 
@@ -63,7 +62,13 @@ public class OcspBenchmark extends BenchmarkExecutor implements ResponseHandler 
         if (sn == null) {
           break;
         }
-        testNext(sn);
+
+        try {
+          requestor.ask(new BigInteger[]{sn});
+        } catch (Throwable th) {
+          LOG.warn("{}: {}", th.getClass().getName(), th.getMessage());
+          account(1, 1);
+        }
       }
 
       try {
@@ -72,18 +77,6 @@ public class OcspBenchmark extends BenchmarkExecutor implements ResponseHandler 
         LOG.warn("got IOException in requestor.stop()");
       }
     }
-
-    private void testNext(BigInteger sn) {
-      try {
-        requestor.ask(new BigInteger[]{sn});
-      } catch (OcspRequestorException ex) {
-        LOG.warn("OCSPRequestorException: {}", ex.getMessage());
-        account(1, 1);
-      } catch (Throwable th) {
-        LOG.warn("{}: {}", th.getClass().getName(), th.getMessage());
-        account(1, 1);
-      }
-    } // method testNext
 
   } // class Testor
 

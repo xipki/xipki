@@ -1,0 +1,13 @@
+{
+	"caUrl":"https://localhost:8443/ca/cmp/subca",
+	"requestorCert":"xipki/keycerts/tlskeys/client/tls-client-cert.der",
+	"responderCert":"xipki/keycerts/tlskeys/server/tls-server-cert.der",
+	"ssl":{
+		"storeType":"PKCS12",
+		"keystore":"xipki/keycerts/tlskeys/client/tls-client.p12",
+		"keystorePassword":"1234",
+		"truststore":"xipki/keycerts/tlskeys/server/tls-server-cert.p12",
+		"truststorePassword":"1234"
+	}
+}
+

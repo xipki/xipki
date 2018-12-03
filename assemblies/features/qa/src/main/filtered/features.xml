@@ -28,7 +28,7 @@
     <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/dbtool-shell/${project.version}</bundle>
   </feature>
-  <feature name="netty" version="${project.version}" description="netty">
+  <feature name="http-benchmark" version="${xipki.http.version}" description="netty">
     <bundle>mvn:io.netty/netty-common/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-codec/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-codec-http/${netty.version}</bundle>
@@ -39,12 +39,13 @@
     <bundle>mvn:io.netty/netty-transport-native-unix-common/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-transport-native-epoll/${netty.version}/jar/linux-x86_64</bundle>
     <bundle>mvn:io.netty/netty-tcnative/${netty-tcnative.version}/jar/linux-x86_64</bundle>
+    <bundle>mvn:org.xipki.http/http-benchmark/${xipki.http.version}</bundle>
   </feature>
   <feature name="xipki-qa" version="${project.version}" description="QA">
     <feature>xipki-camgmt</feature>
     <feature>xipki-ocspclient</feature>
     <feature>xipki-caclient</feature>
-    <feature>netty</feature>
+    <feature>http-benchmark</feature>
     <bundle>mvn:org.xipki/certprofile-xijson/${project.version}</bundle>
     <bundle>mvn:org.xipki/qa/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/qa-shell/${project.version}</bundle>

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.ca.benchmark;
+package org.xipki.qa.ca;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERUTF8String;
@@ -32,7 +32,7 @@ import org.xipki.util.Args;
  * @since 2.0.0
  */
 
-public class BenchmarkEntry {
+public class CaEnrollBenchEntry {
 
   public enum RandomDn {
 
@@ -127,12 +127,12 @@ public class BenchmarkEntry {
 
   private final String certprofile;
 
-  private final KeyEntry keyEntry;
+  private final CaEnrollBenchKeyEntry keyEntry;
 
   private final IncreasableSubject subject;
 
-  public BenchmarkEntry(String certprofile, KeyEntry keyEntry, String subjectTemplate,
-        RandomDn randomDn) {
+  public CaEnrollBenchEntry(String certprofile, CaEnrollBenchKeyEntry keyEntry,
+      String subjectTemplate, RandomDn randomDn) {
     this.certprofile = Args.notBlank(certprofile, "certprofile");
     this.keyEntry = Args.notNull(keyEntry, "keyEntry");
     this.subject = new IncreasableSubject(subjectTemplate, randomDn);

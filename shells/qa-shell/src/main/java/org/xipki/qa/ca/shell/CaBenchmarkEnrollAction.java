@@ -15,21 +15,22 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.caclient.shell;
+package org.xipki.qa.ca.shell;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.StringsCompleter;
-import org.xipki.qa.ca.benchmark.BenchmarkEntry;
-import org.xipki.qa.ca.benchmark.BenchmarkEntry.RandomDn;
-import org.xipki.qa.ca.benchmark.CaBenchmarkEnroll;
-import org.xipki.qa.ca.benchmark.KeyEntry;
-import org.xipki.qa.ca.benchmark.KeyEntry.DSAKeyEntry;
-import org.xipki.qa.ca.benchmark.KeyEntry.ECKeyEntry;
-import org.xipki.qa.ca.benchmark.KeyEntry.RSAKeyEntry;
+import org.xipki.qa.ca.CaEnrollBenchEntry;
+import org.xipki.qa.ca.CaEnrollBenchKeyEntry;
+import org.xipki.qa.ca.CaEnrollBenchmark;
+import org.xipki.qa.ca.CaEnrollBenchEntry.RandomDn;
+import org.xipki.qa.ca.CaEnrollBenchKeyEntry.DSAKeyEntry;
+import org.xipki.qa.ca.CaEnrollBenchKeyEntry.ECKeyEntry;
+import org.xipki.qa.ca.CaEnrollBenchKeyEntry.RSAKeyEntry;
 import org.xipki.shell.IllegalCmdParamException;
+import org.xipki.shell.XiAction;
 import org.xipki.shell.completer.ECCurveNameCompleter;
 import org.xipki.util.StringUtil;
 
@@ -42,7 +43,7 @@ import org.xipki.util.StringUtil;
 @Command(scope = "xiqa", name = "cmp-benchmark-enroll",
     description = "CA client enroll (benchmark)")
 @Service
-public class CaBenchmarkEnrollAction extends CaBenchmarkAction {
+public class CaBenchmarkEnrollAction extends XiAction {
 
   @Option(name = "--profile", aliases = "-p", required = true,
       description =  "certificate profile that allows duplication of public key")
@@ -62,6 +63,10 @@ public class CaBenchmarkEnrollAction extends CaBenchmarkAction {
   @Option(name = "--thread", description = "number of threads")
   private Integer numThreads = 5;
 
+  @Option(name = "--analyze-response",
+      description = "whether to analyze the received OCSP response")
+  private Boolean analyzeResponse = Boolean.FALSE;
+
   @Option(name = "--key-type", description = "key type to be requested")
   private String keyType = "RSA";
 
@@ -77,6 +82,11 @@ public class CaBenchmarkEnrollAction extends CaBenchmarkAction {
 
   @Option(name = "--max-num", description = "maximal number of requests\n0 for unlimited")
   private Integer maxRequests = 0;
+
+  @Option(name = "--queue-size",
+      description = "Number of maximal HTTP requests in the sending queue\n"
+          + "0 for implemention default")
+  private Integer queueSize = 0;
 
   @Override
   protected Object execute0() throws Exception {
@@ -99,7 +109,7 @@ public class CaBenchmarkEnrollAction extends CaBenchmarkAction {
       }
     }
 
-    KeyEntry keyEntry;
+    CaEnrollBenchKeyEntry keyEntry;
     if ("EC".equalsIgnoreCase(keyType)) {
       keyEntry = new ECKeyEntry(curveName);
     } else if ("RSA".equalsIgnoreCase(keyType)) {
@@ -110,10 +120,10 @@ public class CaBenchmarkEnrollAction extends CaBenchmarkAction {
       throw new IllegalCmdParamException("invalid keyType " + keyType);
     }
 
-    BenchmarkEntry benchmarkEntry = new BenchmarkEntry(certprofile, keyEntry, subjectTemplate,
-        randomDn);
-    CaBenchmarkEnroll benchmark = new CaBenchmarkEnroll(client, benchmarkEntry, maxRequests, num,
-        description);
+    CaEnrollBenchEntry benchmarkEntry = new CaEnrollBenchEntry(certprofile, keyEntry,
+        subjectTemplate, randomDn);
+    CaEnrollBenchmark benchmark = new CaEnrollBenchmark(benchmarkEntry, maxRequests, num,
+        analyzeResponse, queueSize, description);
 
     benchmark.setDuration(duration);
     benchmark.setThreads(numThreads);
