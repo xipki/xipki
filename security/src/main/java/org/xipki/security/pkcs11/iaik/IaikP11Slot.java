@@ -59,6 +59,7 @@ import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.pkcs11.P11SlotRefreshResult;
 import org.xipki.security.pkcs11.exception.P11TokenException;
+import org.xipki.security.pkcs11.exception.P11UnknownEntityException;
 import org.xipki.security.pkcs11.iaik.IaikP11Module.Vendor;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
@@ -1468,7 +1469,12 @@ class IaikP11Slot extends P11Slot {
   @Override
   protected void updateCertificate0(P11ObjectIdentifier keyId, X509Certificate newCert)
       throws P11TokenException {
-    removeCerts(keyId);
+    try {
+      removeCerts(keyId);
+    } catch (P11UnknownEntityException ex) {
+      // CHECKSTYLE: certificates do not exist, do nothing
+    }
+
     try {
       Thread.sleep(1000);
     } catch (InterruptedException ex) {
