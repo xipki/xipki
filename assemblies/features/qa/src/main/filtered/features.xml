@@ -31,7 +31,10 @@
   <feature name="netty-tcnative" version="${netty-tcnative.version}" description="netty-tcnative">
     <bundle>mvn:io.netty/netty-tcnative-boringssl-static/${netty-tcnative.version}</bundle>
   </feature>
-  <feature name="http-benchmark" version="${xipki.http.version}" description="netty">
+  <feature name="xipki-qa" version="${project.version}" description="QA">
+    <feature>xipki-camgmt</feature>
+    <feature>xipki-ocspclient</feature>
+    <feature>xipki-caclient</feature>
     <bundle>mvn:io.netty/netty-common/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-codec/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-codec-http/${netty.version}</bundle>
@@ -41,13 +44,6 @@
     <bundle>mvn:io.netty/netty-handler/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-transport-native-unix-common/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-transport-native-epoll/${netty.version}/jar/linux-x86_64</bundle>
-    <bundle>mvn:org.xipki.http/http-benchmark/${xipki.http.version}</bundle>
-  </feature>
-  <feature name="xipki-qa" version="${project.version}" description="QA">
-    <feature>xipki-camgmt</feature>
-    <feature>xipki-ocspclient</feature>
-    <feature>xipki-caclient</feature>
-    <feature>http-benchmark</feature>
     <bundle>mvn:org.xipki/certprofile-xijson/${project.version}</bundle>
     <bundle>mvn:org.xipki/qa/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/qa-shell/${project.version}</bundle>

@@ -29,8 +29,8 @@ import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.http.benchmark.BenchmarkHttpClient.ResponseHandler;
 import org.xipki.ocsp.client.api.RequestOptions;
+import org.xipki.qa.BenchmarkHttpClient.ResponseHandler;
 import org.xipki.util.Args;
 import org.xipki.util.BenchmarkExecutor;
 
