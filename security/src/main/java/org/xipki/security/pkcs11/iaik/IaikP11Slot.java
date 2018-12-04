@@ -653,9 +653,14 @@ class IaikP11Slot extends P11Slot {
       session.login(userType, tmpPin);
       LOG.info("login successful as user " + userTypeText);
     } catch (TokenException ex) {
-      LOG.info("login failed as user " + userTypeText);
-      throw new P11TokenException(
-          "login failed as user " + userTypeText + ": " + ex.getMessage(), ex);
+      // 0x100: user already logged in
+      if (ex instanceof PKCS11Exception && ((PKCS11Exception) ex).getErrorCode() == 0x100) {
+        LOG.info("user already logged in");
+      } else {
+        LOG.info("login failed as user " + userTypeText);
+        throw new P11TokenException(
+            "login failed as user " + userTypeText + ": " + ex.getMessage(), ex);
+      }
     }
   }
 

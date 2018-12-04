@@ -75,7 +75,7 @@ if { $printUsage equals "true" } then {
     echo "Enroll benchmark"
     xiqa:cmp-benchmark-enroll  --duration $duration --thread $threads \
       --key-type RSA --subject "CN=xipki.org,O=example PKI company RSA,C=DE" \
-      --profile TLS -n 3 --random-dn O
+      --profile TLS -n 5 --random-dn O
 
   } elif { "$action" equals "ocsp" } then {
 
