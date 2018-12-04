@@ -31,7 +31,7 @@ import org.xipki.util.conf.ValidatableConf;
 public class MechanimFilterType extends ValidatableConf {
 
   /**
-   * name of the mechanismSet
+   * name of the mechanismSet.
    */
   private String mechanismSet;
 

@@ -81,7 +81,7 @@ public abstract class Describable extends ValidatableConf {
      *
      */
     public int getValue() {
-        return value;
+      return value;
     }
 
     public void setValue(int value) {

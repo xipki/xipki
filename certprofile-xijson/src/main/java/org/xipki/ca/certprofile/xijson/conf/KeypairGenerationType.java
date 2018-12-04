@@ -45,6 +45,7 @@ public class KeypairGenerationType extends ValidatableConf {
   public static final String PARAM_qlength = "qlength";
 
   @JSONField(ordinal = 1)
+  // CHECKSTYLE:SKIP
   private boolean inheritCA;
 
   @JSONField(ordinal = 2)
@@ -82,10 +83,12 @@ public class KeypairGenerationType extends ValidatableConf {
   @JSONField(ordinal = 5)
   private Map<String, String> parameters;
 
+  // CHECKSTYLE:SKIP
   public boolean isInheritCA() {
     return inheritCA;
   }
 
+  // CHECKSTYLE:SKIP
   public void setInheritCA(boolean inheritCA) {
     this.inheritCA = inheritCA;
   }

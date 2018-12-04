@@ -211,8 +211,7 @@ public class StoreType extends ValidatableConf {
   public static class CaCerts extends ValidatableConf {
 
     /**
-     * Files of CA certificates to be considered
-     *
+     * Files of CA certificates to be considered.<br/>
      * optional. Default is all.
      */
     private List<String> includes;
@@ -266,19 +265,17 @@ public class StoreType extends ValidatableConf {
   public static class CrlSourceConf extends ValidatableConf {
 
     /**
-     * CRL file
-     *
-     * The optional file ${crlFile}.revocation contains the revocation information of the CA itself.
-     *
-     *Just create the file ${crlFile}.UPDATEME to tell responder to update the CRL.
-     *
+     * CRL file.<br/>
+     * The optional file ${crlFile}.revocation contains the revocation information
+     * of the CA itself.<br/>
+     * Just create the file ${crlFile}.UPDATEME to tell responder to update the CRL.<br/>
      * required
      */
     private String crlFile;
 
     /**
-     * CRL url
-     * optional, default is none
+     * CRL url<br/>
+     * optional, default is none.
      */
     private String crlUrl;
 
@@ -290,7 +287,7 @@ public class StoreType extends ValidatableConf {
     private boolean useUpdateDatesFromCrl = true;
 
     /**
-     * CA cert file
+     * CA cert file.
      */
     private String caCertFile;
 

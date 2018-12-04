@@ -36,9 +36,9 @@ public class CmpclientType extends ValidatableConf {
   private List<ResponderType> responders;
 
   /**
-   * Interval in minutes to update the CA information if autoconf is activated,
-   * default to be 10, value between 1 and 4 will be converted to 5, value less than 1
-   * disables the interval update
+   * Interval in minutes to update the CA information if autoconf is activated.
+   * Default to be 10, value between 1 and 4 will be converted to 5, value less than 1
+   * disables the interval update.
    */
   private Integer cainfoUpdateInterval;
 

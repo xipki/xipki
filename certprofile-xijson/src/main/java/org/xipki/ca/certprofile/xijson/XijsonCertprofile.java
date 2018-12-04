@@ -400,7 +400,7 @@ public class XijsonCertprofile extends BaseCertprofile {
       midnightTimeZone = TimeZone.getTimeZone(timezoneId);
     } else if ("current".equalsIgnoreCase(str)) {
       offsetSeconds = 0L;
-    } else if (str.length() > 2){
+    } else if (str.length() > 2) {
       char sign = str.charAt(0);
       char suffix = str.charAt(str.length() - 1);
       if (sign == '+' || sign == '-') {

@@ -35,7 +35,7 @@ public class GenSelfIssuedType extends ValidatableConf {
   private String serialNumber;
 
   /**
-   * Output format of the generated certificate
+   * Output format of the generated certificate.
    */
   private String certOutform;
 

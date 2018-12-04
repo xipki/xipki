@@ -48,7 +48,7 @@ public class CaInfoType extends ValidatableConf {
   private Map<String, String> extraControl;
 
   /**
-   * A new self-issued CA certificate will be generated
+   * A new self-issued CA certificate will be generated.
    */
   private GenSelfIssuedType genSelfIssued;
 

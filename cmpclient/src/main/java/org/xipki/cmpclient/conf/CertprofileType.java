@@ -78,6 +78,7 @@ public class CertprofileType extends ValidatableConf {
   public String getName() {
     return name;
   }
+
   public void setName(String value) {
     this.name = value;
   }
@@ -97,6 +98,7 @@ public class CertprofileType extends ValidatableConf {
   public void setConf(FileOrValue value) {
     this.conf = value;
   }
+
   @Override
   public void validate() throws InvalidConfException {
     notEmpty(name, "name");

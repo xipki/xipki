@@ -185,18 +185,18 @@ public class HttpMgmtServlet extends HttpServlet {
 
       switch (action) {
         case addCa: {
-            AddCaRequest req = parse(in, AddCaRequest.class);
-            CaEntry caEntry;
-            try {
-              caEntry = req.getCaEntry().toCaEntry();
-            } catch (CertificateException | InvalidConfException ex) {
-              LOG.error(action + ": could not build the CaEntry", ex);
-              throw new MyException(HttpServletResponse.SC_BAD_REQUEST,
-                  "could not build the CaEntry: " + ex.getMessage());
-            }
-            caManager.addCa(caEntry);
-            resp = null;
-            break;
+          AddCaRequest req = parse(in, AddCaRequest.class);
+          CaEntry caEntry;
+          try {
+            caEntry = req.getCaEntry().toCaEntry();
+          } catch (CertificateException | InvalidConfException ex) {
+            LOG.error(action + ": could not build the CaEntry", ex);
+            throw new MyException(HttpServletResponse.SC_BAD_REQUEST,
+                "could not build the CaEntry: " + ex.getMessage());
+          }
+          caManager.addCa(caEntry);
+          resp = null;
+          break;
         }
         case addCaAlias: {
           AddCaAliasRequest req = parse(in, AddCaAliasRequest.class);

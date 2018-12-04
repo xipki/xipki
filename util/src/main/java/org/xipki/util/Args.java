@@ -167,7 +167,7 @@ public class Args {
     return argument;
   }
 
-  public static <K,V> Dictionary<K,V> notEmpty( Dictionary<K,V> argument, String name) {
+  public static <K,V> Dictionary<K,V> notEmpty(Dictionary<K,V> argument, String name) {
     Objects.requireNonNull(argument, name + " may not be null");
     if (argument.isEmpty()) {
       throw new IllegalArgumentException(name + " may not be empty");
@@ -177,14 +177,14 @@ public class Args {
 
   private static boolean isBlank(final CharSequence text) {
     if (text == null) {
-        return true;
+      return true;
     }
     for (int i = 0; i < text.length(); i++) {
-        if (!Character.isWhitespace(text.charAt(i))) {
-            return false;
-        }
+      if (!Character.isWhitespace(text.charAt(i))) {
+        return false;
+      }
     }
     return true;
-}
+  }
 
 }

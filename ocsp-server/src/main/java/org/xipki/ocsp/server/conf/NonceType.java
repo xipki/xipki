@@ -27,7 +27,7 @@ import org.xipki.util.conf.ValidatableConf;
 public class NonceType extends ValidatableConf {
 
   /**
-   * valid values are forbidden, optional and required
+   * valid values are forbidden, optional and required.
    */
   private String occurrence;
 

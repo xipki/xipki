@@ -34,7 +34,6 @@ public class CaconfType extends ValidatableConf {
 
   /**
    * Specify the base directory for relative path specified in this
-   *
    * configuration file. Use 'APP_DIR' for application working directory.
    * Default is the directory where this configuration file locates. Will be
    * ignored if this configuration file is contained in a ZIP file.

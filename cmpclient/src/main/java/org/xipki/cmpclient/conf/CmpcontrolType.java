@@ -26,27 +26,28 @@ import org.xipki.util.conf.ValidatableConf;
  */
 public class CmpcontrolType extends ValidatableConf {
 
-    private boolean autoconf;
+  private boolean autoconf;
 
-    private Boolean rrAkiRequired;
+  private Boolean rrAkiRequired;
 
-    public boolean isAutoconf() {
-      return autoconf;
-    }
+  public boolean isAutoconf() {
+    return autoconf;
+  }
 
-    public void setAutoconf(boolean autoconf) {
-      this.autoconf = autoconf;
-    }
+  public void setAutoconf(boolean autoconf) {
+    this.autoconf = autoconf;
+  }
 
-    public Boolean getRrAkiRequired() {
-      return autoconf ? null : rrAkiRequired;
-    }
+  public Boolean getRrAkiRequired() {
+    return autoconf ? null : rrAkiRequired;
+  }
 
-    public void setRrAkiRequired(Boolean rrAkiRequired) {
-      this.rrAkiRequired = rrAkiRequired;
-    }
+  public void setRrAkiRequired(Boolean rrAkiRequired) {
+    this.rrAkiRequired = rrAkiRequired;
+  }
 
-    @Override
-    public void validate() throws InvalidConfException {
-    }
+  @Override
+  public void validate() throws InvalidConfException {
+  }
+
 }

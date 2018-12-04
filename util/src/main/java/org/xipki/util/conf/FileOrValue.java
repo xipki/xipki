@@ -62,12 +62,7 @@ public class FileOrValue extends ValidatableConf {
 
   @Override
   public void validate() throws InvalidConfException {
-    if (file == null && value == null) {
-      throw new InvalidConfException("file and value may not both be null");
-    }
-    else if (file != null && value != null) {
-      throw new InvalidConfException("file and value may not both be non-null");
-    }
+    exactOne(file, "file", value, "value");
   }
 
   public String readContent() throws IOException {

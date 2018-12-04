@@ -322,7 +322,6 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
       certReqMsgs[i] = new CertReqMsg(certRequest, RA_VERIFIED, atvs);
     }
 
-    PKIBody body = new PKIBody(PKIBody.TYPE_CERT_REQ, new CertReqMessages(certReqMsgs));
     PKIHeaderBuilder builder = new PKIHeaderBuilder(
         PKIHeader.CMP_2000, conf.requestor(), conf.responder());
     builder.setMessageTime(new ASN1GeneralizedTime(new Date()));
@@ -330,6 +329,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
     builder.setSenderNonce(randomBytes(8));
     builder.setGeneralInfo(IMPLICIT_CONFIRM);
 
+    PKIBody body = new PKIBody(PKIBody.TYPE_CERT_REQ, new CertReqMessages(certReqMsgs));
     return new PKIMessage(builder.build(), body);
   }
 

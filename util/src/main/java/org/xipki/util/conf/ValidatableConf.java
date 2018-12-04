@@ -75,6 +75,7 @@ public abstract class ValidatableConf {
     }
   }
 
+  // CHECKSTYLE:SKIP
   public abstract void validate() throws InvalidConfException;
 
 }

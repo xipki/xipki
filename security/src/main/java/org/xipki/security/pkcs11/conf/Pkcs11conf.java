@@ -31,7 +31,7 @@ import org.xipki.util.conf.ValidatableConf;
 public class Pkcs11conf extends ValidatableConf {
 
   /**
-   * exactly one module must have the name 'default'
+   * exactly one module must have the name 'default'.
    */
   private List<ModuleType> modules;
 

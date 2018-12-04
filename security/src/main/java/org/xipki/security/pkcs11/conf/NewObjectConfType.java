@@ -54,7 +54,7 @@ public class NewObjectConfType extends ValidatableConf {
   private Boolean ignoreLabel;
 
   /**
-   * If ID is generated randomly, specifies the number of bytes of an ID
+   * If ID is generated randomly, specifies the number of bytes of an ID.
    */
   private Integer idLength;
 

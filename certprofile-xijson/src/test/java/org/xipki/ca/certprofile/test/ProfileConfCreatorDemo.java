@@ -209,7 +209,7 @@ public class ProfileConfCreatorDemo {
     try {
       Path path = Paths.get("tmp", filename);
       IoUtil.mkdirsParent(path);
-      try (OutputStream out = Files.newOutputStream(path) ) {
+      try (OutputStream out = Files.newOutputStream(path)) {
         JSON.writeJSONString(out, profile,
             SerializerFeature.PrettyFormat, SerializerFeature.SortField);
       }
@@ -830,8 +830,7 @@ public class ProfileConfCreatorDemo {
     // Extensions - extenedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, true));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-      new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_timeStamping},
-      null));
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_timeStamping}, null));
 
     // privateKeyUsagePeriod
     list.add(createExtension(Extension.privateKeyUsagePeriod, true, false));
@@ -951,7 +950,7 @@ public class ProfileConfCreatorDemo {
     // additionalInformation
     list.add(createExtension(ObjectIdentifiers.id_extension_additionalInformation, true, false));
     last(list).setAdditionalInformation(createAdditionalInformation(DirectoryStringType.utf8String,
-      "demo additional information"));
+        "demo additional information"));
 
     // validationModel
     list.add(createExtension(ObjectIdentifiers.id_extension_validityModel, true, false));
@@ -1478,17 +1477,19 @@ public class ProfileConfCreatorDemo {
   private static NameConstraints createNameConstraints() {
     NameConstraints ret = new NameConstraints();
     List<GeneralSubtreeType> permitted = new LinkedList<>();
+    ret.setPermittedSubtrees(permitted);
+
     GeneralSubtreeType single = new GeneralSubtreeType();
     single.setBase(new GeneralSubtreeType.Base());
     single.getBase().setDirectoryName("O=example organization, C=DE");
     permitted.add(single);
-    ret.setPermittedSubtrees(permitted);
 
     List<GeneralSubtreeType> excluded = new LinkedList<>();
     single = new GeneralSubtreeType();
+    excluded.add(single);
+
     single.setBase(new GeneralSubtreeType.Base());
     single.getBase().setDirectoryName("OU=bad OU, O=example organization, C=DE");
-    excluded.add(single);
     ret.setExcludedSubtrees(excluded);
 
     return ret;
@@ -1737,7 +1738,7 @@ public class ProfileConfCreatorDemo {
   }
 
   private static <T> T last(List<T> list) {
-    if(list == null || list.isEmpty()) {
+    if (list == null || list.isEmpty()) {
       return null;
     } else {
       return list.get(list.size() - 1);

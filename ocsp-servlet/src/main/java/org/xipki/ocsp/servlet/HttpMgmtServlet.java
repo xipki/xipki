@@ -116,14 +116,14 @@ public class HttpMgmtServlet extends HttpServlet {
 
       switch (action) {
         case restartServer: {
-            try {
-              ocspServer.init(true);
-            } catch (InvalidConfException | DataAccessException | PasswordResolverException ex) {
-              LOG.warn(action + ": could not restart OCSP server", ex);
-              throw new MyException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                  "could not build the CaEntry: " + ex.getMessage());
-            }
-            break;
+          try {
+            ocspServer.init(true);
+          } catch (InvalidConfException | DataAccessException | PasswordResolverException ex) {
+            LOG.warn(action + ": could not restart OCSP server", ex);
+            throw new MyException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                "could not build the CaEntry: " + ex.getMessage());
+          }
+          break;
         }
         case refreshTokenForSignerType: {
           String type = getNameFromRequest(in);

@@ -29,7 +29,7 @@ public class SlotType extends ValidatableConf {
 
   private Integer index;
   /**
-   * slot identifier (decimal or with the prefix 0x for heximal)
+   * slot identifier (decimal or with the prefix 0x for heximal).
    */
   private String id;
 

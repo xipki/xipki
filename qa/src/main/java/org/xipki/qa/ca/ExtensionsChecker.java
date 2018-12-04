@@ -283,7 +283,7 @@ public class ExtensionsChecker {
       for (SmimeCapability m : list) {
         ASN1ObjectIdentifier oid = m.getCapabilityId().toXiOid();
         ASN1Encodable params = null;
-         SmimeCapabilityParameter capParam = m.getParameter();
+        SmimeCapabilityParameter capParam = m.getParameter();
         if (capParam != null) {
           if (capParam.getInteger() != null) {
             params = new ASN1Integer(capParam.getInteger());

@@ -81,7 +81,7 @@ public class ExtensionType extends ValidatableConf {
 
   /**
    * Critical will be considered if both values (true and false) are allowed,
-   * otherwise it will be ignored
+   * otherwise it will be ignored.
    */
   @JSONField(ordinal = 2)
   private boolean critical;
@@ -132,13 +132,13 @@ public class ExtensionType extends ValidatableConf {
   private KeyUsage keyUsage;
 
   /**
-   * Only for CA, at least one of permittedSubtrees and excludedSubtrees must be present
+   * Only for CA, at least one of permittedSubtrees and excludedSubtrees must be present.
    */
   @JSONField(ordinal = 5)
   private NameConstraints nameConstraints;
 
   /**
-   * Only for CA
+   * Only for CA.
    */
   @JSONField(ordinal = 5)
   private PolicyMappings policyMappings;
@@ -841,8 +841,8 @@ public class ExtensionType extends ValidatableConf {
           qualifiers = new ArrayList<>(policyQualifiers.size());
           for (PolicyQualifier m : policyQualifiers) {
             CertificatePolicyQualifier qualifier = m.getType() == PolicyQualfierType.cpsUri
-              ? CertificatePolicyQualifier.getInstanceForCpsUri(m.getValue())
-              : CertificatePolicyQualifier.getInstanceForUserNotice(m.getValue());
+                ? CertificatePolicyQualifier.getInstanceForCpsUri(m.getValue())
+                : CertificatePolicyQualifier.getInstanceForUserNotice(m.getValue());
             qualifiers.add(qualifier);
           }
         }

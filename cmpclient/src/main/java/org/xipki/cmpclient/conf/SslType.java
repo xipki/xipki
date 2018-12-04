@@ -40,7 +40,7 @@ public class SslType extends ValidatableConf {
 
   /**
    * Valid values are {@code null}, no_op, default, or java:{qualified class name}
-   * (without the brackets)
+   * (without the brackets).
    */
   private String hostnameVerifier;
 

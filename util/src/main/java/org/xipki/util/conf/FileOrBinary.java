@@ -62,12 +62,7 @@ public class FileOrBinary extends ValidatableConf {
 
   @Override
   public void validate() throws InvalidConfException {
-    if (file == null && binary == null) {
-      throw new InvalidConfException("file and binary may not both be null");
-    }
-    else if (file != null && binary != null) {
-      throw new InvalidConfException("file and binary may not both be non-null");
-    }
+    exactOne(file, "file", binary, "binary");
   }
 
   public byte[] readContent() throws IOException {

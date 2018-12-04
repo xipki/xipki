@@ -42,7 +42,7 @@ public class RequestOptionType extends ValidatableConf {
   private int maxRequestListCount;
 
   /**
-   * Maximal size in byte of a request
+   * Maximal size in byte of a request.
    */
   private int maxRequestSize;
 

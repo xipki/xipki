@@ -72,8 +72,8 @@ public class NotBeforeOption {
   private Date setToMidnight(long date) {
     Calendar cal = Calendar.getInstance(midNightTimeZone);
     // the next midnight time
-    final long DAY_IN_MS = 24L * 60 * 60 * 1000;
-    cal.setTime(new Date(date + DAY_IN_MS - 1));
+    final long dayInMs = 24L * 60 * 60 * 1000;
+    cal.setTime(new Date(date + dayInMs - 1));
     cal.set(Calendar.HOUR_OF_DAY, 0);
     cal.set(Calendar.MINUTE, 0);
     cal.set(Calendar.SECOND, 0);

@@ -78,29 +78,34 @@ public class X509ProfileType extends ValidatableConf {
   /**
    * The validity of the certificate to be generated, namely notAfter - notBefore.
    * Examples are:
-   *  - 5y: 5 years
-   *  - 365d: 365 days
-   *  - 120h: 120 hours
-   *  - 100m: 100 minutes
+   * <ul>
+   *   <li>5y: 5 years</li>
+   *   <li>365d: 365 days</li>
+   *   <li>120h: 120 hours</li>
+   *   <li>100m: 100 minutes</li>
+   * </ul>
    */
   @JSONField(ordinal = 6)
   private String validity;
 
   /**
-   * Value of the notBefore field:
-   *  - 'current': current time
-   *  - 'midnight'[:timezone]: the next mid night time for the given timezone.
-   *               Valid timezones are: GMT+0, GMT+1, ..., GMT+12,
-   *                                          GMT-1, ..., GMT-12
-   *  - '+'offset: offset after current time,
-   *  - '-'offset: before after current time, In the current implementation,
-   *               offset of maximal 10 minutes is allowed.
-   *
-   *               The offset must have following suffixes:
-   *               - 'd' for day, e.g. '2d' for 2 days,
-   *               - 'h' for day, e.g. '2h' for 2 hours,
-   *               - 'm' for day, e.g. '2m' for 2 minutes,
-   *               - 's' for day, e.g. '2s' for 2 seconds.
+   * Value of the notBefore field.
+   * <ul>
+   *   <li>'current': current time</li>
+   *   <li>'midnight'[:timezone]: the next mid night time for the given timezone.
+   *        Valid timezones are: GMT+0, GMT+1, ..., GMT+12, GMT-1, ..., GMT-12</li>
+   *   <li>'+'offset: offset after current time</li>
+   *   <li>'-'offset: before after current time, In the current implementation,
+   *        offset of maximal 10 minutes is allowed.
+   *        The offset must have following suffixes:
+   *        <ul>
+   *          <li>'d' for day, e.g. '2d' for 2 days,</li>
+   *          <li>'h' for day, e.g. '2h' for 2 hours,</li>
+   *          <li>'m' for day, e.g. '2m' for 2 minutes,</li>
+   *          <li>'s' for day, e.g. '2s' for 2 seconds.</li>
+   *        </ul>
+   *   </li>
+   * </ul>
    */
   @JSONField(ordinal = 7)
   private String notBeforeTime;
