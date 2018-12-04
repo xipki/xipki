@@ -1,19 +1,11 @@
-XiPKI PKI Commands
+XiPKI CLI Commands
 =====
 
-The karaf feature can be installed via the command `feature:install <feature name>` and uninstalled
-in the OSGi console via the command `feature:uninstall <feature name>`. The possible feature can be
-auto-completed by typing the `TAB` key.
-
-Some features in XiPKI are listed below, a list of all available features can be retrieved via the
-command `feature:list  | grep xipki` in OSGi console.
-
-For the usage of OSGi commands, just use the option `--help`. Most XiPKI commands can 
+For the usage of CLI commands, just use the option `--help`. Most XiPKI commands can
 auto-completing the options and arguments by the `TAB` key.
 
-Feature xipki-shell-base (started by default)
------
-
+Basic Commands
+--
    * `xi:confirm`
 
      confirm an action
@@ -50,7 +42,7 @@ Feature xipki-shell-base (started by default)
 
      transfer a URL
 
-Feature xipki-dbtool (not started by default)
+Database Commands
 -----
 
    * `ca:diff-digest-db`
@@ -81,7 +73,7 @@ Feature xipki-dbtool (not started by default)
 
      reset and initialize database
 
-Feature xipki-security-shell (not started by default)
+Security Commands
 -----
 
    * `xi:cert-info`
@@ -194,19 +186,19 @@ Feature xipki-security-shell (not started by default)
    * `xi:refresh-p11`
 
      refresh PKCS#11 module
-     
+
    * `xi:import-secretkey-p11`
-     
+
      import secret key with given value in PKCS#11 device
 
    * `xi:secretkey-p11`
-     
+
      generate secret key in PKCS#11 device
-     
+
    * `xi:secretkey-p12`
-     
+
      generate secret key in JCEKS (not PKCS#12) keystore
-     
+
    * `xi:rsa-p11`
 
      generate RSA keypair in PKCS#11 device
@@ -330,7 +322,18 @@ Feature xipki-security-shell (not started by default)
 
      performance test of PKCS#12 RSA signature creation (batch)
 
-Feature xipki-camgmt-shell (started by default)
+OCSP Management Commands
+-----
+
+* `refresh-token`
+
+  refresh token for signers
+
+* `ocsp:restart-server`
+
+  restart OCSP server
+
+CA Management Commands
 -----
 
    * `ca:ca-add`
@@ -420,6 +423,10 @@ Feature xipki-camgmt-shell (started by default)
    * `ca:notify-change`
 
      notify the change of CA system
+
+   * `ca:refresh-token`
+
+    refresh token for signers
 
    * `ca:restart`
 
@@ -576,4 +583,3 @@ Feature xipki-camgmt-shell (started by default)
    * `ca:get-request`
 
      get certificate request
-

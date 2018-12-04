@@ -18,7 +18,7 @@ Just create [issues](https://github.com/xipki/xipki/issues).
 ## Prerequisite
 * OS: Linux, Windows, MacOS
 * JRE / JDK 8 (build 162+), 9, 10, 11
-* Database: DB2, H2, HSQLDB, MariaDB, MySQL, Oracle, PostgreSQL
+* Database: DB2, MariaDB, MySQL, Oracle, PostgreSQL
 
 ## Tested PKCS#11 Devices
 * [Softhsm v1 & v2](https://www.opendnssec.org/download/packages/),
@@ -31,9 +31,10 @@ Just create [issues](https://github.com/xipki/xipki/issues).
   Set the environment variable `JAVA_HOME` to point to root directory of the to
   the JRE/JDK installation.
 
-### CA and OCSP Responder
+### CA Server and OCSP Responder
 
-Download the binary package `xipki-pki-<version>.tar.gz` from
+Download the binaries `ca-war-<version>.zip`, `ocsp-war-<version>.zip` and
+`xipki-cli-<version>.tar.gz` from
 [XiPKI releases](https://github.com/xipki/xipki/releases).
 
 Only if you want to use the development version, build it from source code as
@@ -50,49 +51,57 @@ follows.
   mvn clean install -DskipTests
   ```
 
-  Then you will find `xipki-pki-*.tar.gz` in the directory
-  `assemblies/xipki-pki/target`.
+  Then you will find the following binaries:
+   - CA: assembles/ca-war/target/ca-war-<version>.zip
+   - OCSP: assembles/ocsp-war/target/ocsp-war-<version>.zip
+   - Command Line Interface: assembles/xipki-cli/target/xipki-cli-<version>.tar.gz
 
-## Configure the CA and OCSP Responder
+## Install CA Server
 
-1. Unpack the binary `xipki-pki-<version>.tar.gz` file
+1. Unpack the binary `ca-war-<version>.zip` and install CA as described in the
+   unpacked README file.
 
-    ```sh
-    tar xvf xipki-pki-<version>.tar.gz
-    ```
-    The following steps use `$XIPKI_HOME` to point to the unpacked root folder.
-    
-    **The next steps can be skipped if you just want to try out.**
+2. Adapt the database configurations ${CONTAINER_ROOT}/xipki/etc/ca/database/{ca|ocsp}-db.properties.
+   - If you use database other than MariaDB and MySQL, you need to overwrite the configuration templates
+   from the sub folder.
+   - If you use database other than MariaDB, MySQL and PostgreSQL, you need to get the JDBC drivers and copy
+     it to the container directory for external jars (e.g. `lib` in tomcat, and `lib/ext` in jetty`).   
 
-2. Adapt the database configuration (optional)
+3. Create new databases configured in Step 2.
 
-  This step may be skipped if you just want to try out XiPKI.
+4. Initialize the databases configured in Step 2.
 
-  In the folder `$XIPKI_HOME/xipki/ca-config`, copy the CA database
-  configuration template file `example/ca-db.properties-<type>` to
-  `ca-db.properties`, and the OCSP database configuration file
-  `example/ocsp-db.properties-<type>` to `ocsp-db.properties`, and then adapt
-  them.
+```
+ ca-war-<version>/dbtool/bin/initdb.sh \
+   --db-conf xipki/etc/ca/database/{ca|ocsp}-db.properties \
+   --db-schema xipki/sql/{ca|ocsp}-init.xml
+```
 
-  The database users must have both the read and write permissions.
+## Install OCSP Responder
 
-3. Configure PKCS#11 device (optional)
+Note that CA and OCSP can be installed in the same servlet container.
+
+1. Unpack the binary `ocsp-war-<version>.zip` and install OCSP responder as described in the
+   unpacked README file.
+
+2. Adapt the database configuration ${CONTAINER_ROOT}/xipki/etc/ocsp/database/ocsp-crl-db.properties.
+   - If you use database other than MariaDB and MySQL, you need to overwrite the configuration templates
+   from the sub folder.
+   - If you use database other than MariaDB, MySQL and PostgreSQL, you need to get the JDBC drivers and copy
+     it to the container directory for external jars (e.g. `lib` in tomcat, and `lib/ext` in jetty`).   
+
+## Install Command Line Interface
+
+1. Unpack the binary `xipki-cli-<version>.tar.gz`
+
+## Configure PKCS#11 device (optional)
 
    This step is only required if the real PKCS#11 device instead of the emulator
    is used.
 
-  * In file etc/org.xipki.security.pkcs11.cfg, change the pkcs11.confFile as
-    follows:
+  * Copy `xipki/security/example/pkcs11-hsm.json` to `xipki/security/pkcs11.json`, and adapt the PKCS#11 configuration.
 
-    ```sh
-    pkcs11.confFile = xipki/security/pkcs11-hsm.xml
-
-    #pkcs11.confFile = xipki/security/pkcs11-emulator.xml
-    ```
-  * In file xipki/security/pkcs11-hsm.xml, change the PKCS#11
-    configuration.
-
-4. Configure how to handle SSL client certificate (optional)
+## Configure how to handle SSL client certificate (optional)
 
   This step is only required if the CA is behind a reverse proxy apache httpd.
 
@@ -115,115 +124,34 @@ follows.
       * [Jetty: Tricks to do client certificate authentications behind a reverse proxy](http://www.zeitoun.net/articles/client-certificate-x509-authentication-behind-reverse-proxy/start)
       * [Apache Module mod_ssl](http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#envvars)
 
-5. Add JDBC drivers (optional)
+## Setup CA Server and OCSP Responder
 
-  This step is only required if you want to use database other than PostGres, MariaDB (MySQL database can also be accessed via the MariaDB JDBC driver).
-
-Database Software | Driver | Download URL
-------------------|--------|-------------
-Oracle | ojdbc7.jar | http://www.oracle.com/technetwork/database/features/jdbc/jdbc-drivers-12c-download-1958347.html
-DB2 | db2jcc4.jar |
-MySQL | mysql-connector-java.jar | https://dev.mysql.com/downloads/connector/j, In debian, use the `mysql-connector-java.jar` from the package `libmysql-java` (e.g. under /usr/share/java/mysql-connector-java.jar)
-
-  * Copy the jar file to the folder `lib/jdbc`.
-
-  * Append the bundle URL to the feature `xipki-jdbc` in the file
-    `lib/jdbc/features.xml`, And comment the unneeded jdbc drivers.
-
-    ```sh
-    <feature name="xipki-jdbc" description="JDBC drivers">
-      ...
-      <bundle start-level="75">file:lib/jdbc/....jar</bundle>
-    </feature>
-    ```
-    Note that if the bundle is not an OSGi-bundle, the URL must be prepended by
-    the prefix "wrap:". In general, a bundle contains the header Export-Package
-    in the manifest file META-INF/MANIFEST.MF.
-
-    ```sh
-    <feature name="xipki-jdbc" description="JDBC drivers">
-      ...
-      <bundle start-level="75">wrap:file:..</bundle>
-    </feature>
-    ```
-
-6. Use the native features (optional)
-
-  In Linux-X86_64 and OSX-X56_64 environment, openssl as SSL engine and the OS
-  native transport mechanism (Epoll in Linux and KQueue in OSX) can be used in
-  XiPKI. Please refer to the configuration file
-  `etc/org.apache.karaf.features.cfg` for more details.
-
-
-## Setup CA and OCSP Responder
-
-1. Prepare the configuration and scripts
-
-  This step is not required if you setup a new root CA (self-signed) using
-  RSA keys which will be generated during the installation process, and the keys
-  are saved in PKCS#12 keystore.
-
-  - If you use the existing CA certificate, OCSP Responder certificate, and SCEP
-    certificate
-
-     - Copy the certificates to the directory to `xipki/setup/keycerts`.
-
-     - In case of the key and certificate are saved in PKCS#12 keystore file,
-      copy the PKCS#12 files to the directory `xipki/setup/keycerts`.
-      Note that the key and certificate must be under the same alias in keystore.
-
-     - Adapt the CA configuration file `xipki/setup/cacert-present-ca-conf.xml`
-
-2. Start XiPKI
-
-2.1 Alternative: Start XiPKI as a normal application
-
-In folder `xipki-pki-<version>`
-```sh
-bin/karaf
-```
-
+1. Start the servlet container  
 HSM devices of Thales, e.g. nCipher, can use Thales preload to manage the
-PKCS#11 sessions. In this case, XiPKI should be started as follows
+PKCS#11 sessions. In this case, the servlet container should be started as follows
 ```sh
-preload bin/karaf
+preload <start script>
 ```
-2.2 Alternative: Start XiPKI as a daemon
 
-The same as Alternative 1 except the command `bin/start` instead of
-`bin/karaf` is used.
-    
-For both alternatives, if the content within folder `etc` or `system` has been
-changed, please delete the folder `data/cache` before starting XiPKI.
-
-3. Setup the CA and OCSP responder
-
-3.1. In case XiPKI is started as a normal application 
-
- * In case of using new keys and certificates, in OSGi console:  
+2. Set up CA in CLI
+ 1. Start CLI.
+  `bin/karf`
+ * In case of using new keys and certificates, in CLI:  
    `source xipki/setup/cacert-none/setup-*.script`
    where * is place holder.
 
- * In case of using existing keys and certificates, in OSGi console:  
+ * In case of using existing keys and certificates, in CLI:  
     `source xipki/setup/cacert-present/setup-*.script`
    where * is place holder.
 
- * Verify the installation, execute the OSGi command  
-   `ca-info MYCA1`
+ * Verify the installation, execute the command in CLI:  
+   `ca-info myca1`
 
-3.2. In case XiPKI is started as a daemon 
-
- * In case of using new keys and certificates, in shell console:
-   `bin/client "source xipki/setup/cacert-none/setup-*.script"`
-
- * In case of using existing keys and certificates, in shell console:  
-   `bin/client "source xipki/setup/cacert-present/setup*.script"`
-
-4. Enroll/Revoke Certificate and Get CRL via Shell (optional)
+## Enroll/Revoke Certificate and Get CRL via Shell (optional)
 
 - The following shell script demonstrates how to enroll and revoke certificates, and how to get the current CRL:
-  `xipki/client-script/rest.sh`
-  
+  `<CLI_ROOT>/xipki/client-script/rest.sh`
+
   Note that this script tells CA to generate real certificates. DO NOT use it in the production environment.
 
 ## Enroll/Revoke Certificate
@@ -231,36 +159,21 @@ changed, please delete the folder `data/cache` before starting XiPKI.
 * SCEP  
   Any SCEP client. XiPKI provides also a SCEP client.
 
-* XiPKI SDK  
-  XiPKI SDK provides both the full-featured CA client and the lite version to enroll and
+* XiPKI CLI
+  XiPKI CLI provides both the full-featured client and the lite version to enroll and
   revoke certificates via CMP.
 
-  The binary `xipki-sdk-<version>`.tar.gz contains several example scripts in the folder xipki/client-script.
-  They can be executed in the karaf shell as follows:  
-  - `source xipki/client-script/cmp-client.script` 
+  The binary `xipki-cli-<version>`.tar.gz contains several example scripts in the folder xipki/client-script.
+  They can be executed in the CLI as follows:  
+  - `source xipki/client-script/cmp-client.script`
   - `source xipki/client-script/rest-client.script`
   - `source xipki/client-script/scep-client.script`
 
 * REST API  
-  The shell script `xipki/client-script/rest.sh` of the `xipki-pki` demonstrates
+  The shell script `xipki/client-script/rest.sh` of the `xipki-cli` demonstrates
   the use of REST API.
 
-Karaf Features
------
-
-The karaf feature can be installed via the command
-`feature:install -r <feature name>` (the flag -r disables the refreshing of
-already installed bundles) and uninstalled in the OSGi console via the command
-`feature:uninstall <feature name>`. The possible feature can be auto-completed
-by typing the `TAB` key.
-
-A list of all available XiPKI features can be retrieved via the command
-`feature:list  | grep xipki` in OSGi console.
-
-For details of karaf features please refer to
-[Karaf Manual: Provisioning](https://karaf.apache.org/manual/latest/provisioning)
-
-Karaf Commands
+CLI Commands
 -----
 Please refer to [commands.md](commands.md) for more details.
 
