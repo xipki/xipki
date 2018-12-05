@@ -17,9 +17,9 @@
 
 package org.xipki.ca.mgmt.conf;
 
-import org.xipki.util.conf.FileOrValue;
-import org.xipki.util.conf.InvalidConfException;
-import org.xipki.util.conf.ValidatableConf;
+import org.xipki.util.FileOrValue;
+import org.xipki.util.InvalidConfException;
+import org.xipki.util.ValidatableConf;
 
 /**
  * TODO.

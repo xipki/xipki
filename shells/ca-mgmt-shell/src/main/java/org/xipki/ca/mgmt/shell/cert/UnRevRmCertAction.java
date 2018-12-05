@@ -29,7 +29,7 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.mgmt.api.CaEntry;
 import org.xipki.ca.mgmt.api.CaMgmtException;
 import org.xipki.ca.mgmt.shell.CaAction;
-import org.xipki.ca.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.ca.mgmt.shell.CaCompleters;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.IllegalCmdParamException;
@@ -43,7 +43,7 @@ import org.xipki.shell.IllegalCmdParamException;
 public abstract class UnRevRmCertAction extends CaAction {
 
   @Option(name = "--ca", required = true, description = "CA name")
-  @Completion(CaNameCompleter.class)
+  @Completion(CaCompleters.CaNameCompleter.class)
   protected String caName;
 
   @Option(name = "--cert", aliases = "-c",

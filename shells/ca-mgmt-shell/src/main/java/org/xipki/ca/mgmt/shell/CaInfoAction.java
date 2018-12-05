@@ -26,7 +26,6 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.mgmt.api.CaEntry;
 import org.xipki.ca.mgmt.api.CaStatus;
-import org.xipki.ca.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.shell.CmdFailure;
 
 /**
@@ -40,7 +39,7 @@ import org.xipki.shell.CmdFailure;
 public class CaInfoAction extends CaAction {
 
   @Argument(index = 0, name = "name", description = "CA name")
-  @Completion(CaNameCompleter.class)
+  @Completion(CaCompleters.CaNameCompleter.class)
   private String name;
 
   @Option(name = "--verbose", aliases = "-v", description = "show CA information verbosely")

@@ -61,10 +61,10 @@ import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
+import org.xipki.util.InvalidConfException;
 import org.xipki.util.StringUtil;
 import org.xipki.util.TripleState;
-import org.xipki.util.conf.InvalidConfException;
-import org.xipki.util.conf.ValidatableConf;
+import org.xipki.util.ValidatableConf;
 
 import com.alibaba.fastjson.annotation.JSONField;
 

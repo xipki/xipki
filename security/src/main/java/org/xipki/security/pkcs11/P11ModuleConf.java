@@ -35,8 +35,8 @@ import org.xipki.security.pkcs11.conf.PasswordSetType;
 import org.xipki.security.pkcs11.conf.SlotType;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
+import org.xipki.util.InvalidConfException;
 import org.xipki.util.StringUtil;
-import org.xipki.util.conf.InvalidConfException;
 
 import iaik.pkcs.pkcs11.constants.Functions;
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;

@@ -27,7 +27,6 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.mgmt.api.PublisherEntry;
-import org.xipki.ca.mgmt.shell.completer.PublisherNameCompleter;
 import org.xipki.shell.CmdFailure;
 
 /**
@@ -41,7 +40,7 @@ import org.xipki.shell.CmdFailure;
 public class PublisherInfoAction extends CaAction {
 
   @Argument(index = 0, name = "name", description = "publisher name")
-  @Completion(PublisherNameCompleter.class)
+  @Completion(CaCompleters.PublisherNameCompleter.class)
   private String name;
 
   @Override

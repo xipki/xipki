@@ -30,7 +30,7 @@ import org.xipki.security.pkcs11.P11Module;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.shell.SecurityAction;
-import org.xipki.security.shell.completer.P11ModuleNameCompleter;
+import org.xipki.security.shell.SecurityCompleters;
 import org.xipki.shell.IllegalCmdParamException;
 
 /**
@@ -47,7 +47,7 @@ public class P11TokenInfoAction extends SecurityAction {
   private Boolean verbose = Boolean.FALSE;
 
   @Option(name = "--module", description = "name of the PKCS#11 module.")
-  @Completion(P11ModuleNameCompleter.class)
+  @Completion(SecurityCompleters.P11ModuleNameCompleter.class)
   private String moduleName = P11SecurityAction.DEFAULT_P11MODULE_NAME;
 
   @Option(name = "--slot", description = "slot index")

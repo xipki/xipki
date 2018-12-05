@@ -25,7 +25,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.security.pkcs11.P11CryptService;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.security.shell.SecurityAction;
-import org.xipki.security.shell.completer.P11ModuleNameCompleter;
+import org.xipki.security.shell.SecurityCompleters;
 import org.xipki.shell.IllegalCmdParamException;
 
 /**
@@ -39,7 +39,7 @@ import org.xipki.shell.IllegalCmdParamException;
 public class P11RefreshAction extends SecurityAction {
 
   @Option(name = "--module",  description = "name of the PKCS#11 module.")
-  @Completion(P11ModuleNameCompleter.class)
+  @Completion(SecurityCompleters.P11ModuleNameCompleter.class)
   private String moduleName = P11SecurityAction.DEFAULT_P11MODULE_NAME;
 
   @Reference

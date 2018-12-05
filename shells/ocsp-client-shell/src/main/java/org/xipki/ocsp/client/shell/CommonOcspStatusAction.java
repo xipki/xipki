@@ -25,9 +25,8 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.shell.Completers;
 import org.xipki.shell.XiAction;
-import org.xipki.shell.completer.HashAlgCompleter;
-import org.xipki.shell.completer.SigAlgCompleter;
 
 /**
  * TODO.
@@ -49,12 +48,12 @@ public abstract class CommonOcspStatusAction extends XiAction {
   protected Integer nonceLen;
 
   @Option(name = "--hash", description = "hash algorithm name")
-  @Completion(HashAlgCompleter.class)
+  @Completion(Completers.HashAlgCompleter.class)
   protected String hashAlgo = "SHA256";
 
   @Option(name = "--sig-alg", multiValued = true,
       description = "comma-separated preferred signature algorithms")
-  @Completion(SigAlgCompleter.class)
+  @Completion(Completers.SigAlgCompleter.class)
   protected List<String> prefSigAlgs;
 
   @Option(name = "--http-get", description = "use HTTP GET for small request")

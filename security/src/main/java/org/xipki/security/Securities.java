@@ -37,7 +37,7 @@ import org.xipki.security.pkcs11.PKCS11SignerFactory;
 import org.xipki.security.pkcs11.emulator.EmulatorP11ModuleFactory;
 import org.xipki.security.pkcs11.iaik.IaikP11ModuleFactory;
 import org.xipki.security.pkcs12.PKCS12SignerFactory;
-import org.xipki.util.conf.InvalidConfException;
+import org.xipki.util.InvalidConfException;
 
 /**
  * TODO.

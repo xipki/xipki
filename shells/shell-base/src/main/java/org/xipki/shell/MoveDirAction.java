@@ -23,7 +23,6 @@ import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.shell.completer.DirCompleter;
 
 /**
  * TODO.
@@ -38,11 +37,11 @@ public class MoveDirAction extends XiAction {
 
   @Argument(index = 0, name = "source", required = true,
       description = "content of this directory will be copied")
-  @Completion(DirCompleter.class)
+  @Completion(Completers.DirCompleter.class)
   private String source;
 
   @Argument(index = 1, name = "destination", required = true, description = "destination directory")
-  @Completion(DirCompleter.class)
+  @Completion(Completers.DirCompleter.class)
   private String dest;
 
   @Override

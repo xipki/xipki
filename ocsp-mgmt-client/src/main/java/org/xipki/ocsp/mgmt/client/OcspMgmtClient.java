@@ -41,7 +41,7 @@ import org.xipki.util.IoUtil;
 import org.xipki.util.ObjectCreationException;
 import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
-import org.xipki.util.http.ssl.SslContextConf;
+import org.xipki.util.http.SslContextConf;
 
 import com.alibaba.fastjson.JSON;
 

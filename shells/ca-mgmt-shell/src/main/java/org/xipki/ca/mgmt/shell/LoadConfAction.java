@@ -32,7 +32,7 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.mgmt.api.CaConfs;
 import org.xipki.ca.mgmt.api.CaMgmtException;
 import org.xipki.shell.CmdFailure;
-import org.xipki.shell.completer.DerPemCompleter;
+import org.xipki.shell.Completers;
 import org.xipki.util.CollectionUtil;
 
 /**
@@ -50,7 +50,7 @@ public class LoadConfAction extends CaAction {
   private String confFile;
 
   @Option(name = "--outform", description = "output format of the root certificates")
-  @Completion(DerPemCompleter.class)
+  @Completion(Completers.DerPemCompleter.class)
   protected String outform = "der";
 
   @Option(name = "--out-dir",

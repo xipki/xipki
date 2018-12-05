@@ -32,9 +32,9 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
+import org.xipki.util.InvalidConfException;
 import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
-import org.xipki.util.conf.InvalidConfException;
 
 /**
  * TODO.

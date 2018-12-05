@@ -28,7 +28,7 @@
     </cm:default-properties>
   </cm:property-placeholder>
 
-  <bean id="sslContextConf" class="org.xipki.util.http.ssl.SslContextConf">
+  <bean id="sslContextConf" class="org.xipki.util.http.SslContextConf">
     <property name="useSslConf" value="${useSslConf}"/>
     <property name="sslStoreType" value="${sslStoreType}"/>
     <property name="sslKeystore" value="${sslKeystore}"/>
@@ -38,9 +38,9 @@
     <property name="sslHostnameVerifier" value="${sslHostnameVerifier}"/>
   </bean>
 
-  <bean id="curl" class="org.xipki.util.http.curl.DefaultCurl">
+  <bean id="curl" class="org.xipki.util.DefaultCurl">
     <property name="sslContextConf" ref="sslContextConf"/>
   </bean>
 
-  <service ref="curl" interface="org.xipki.util.http.curl.Curl"/>
+  <service ref="curl" interface="org.xipki.util.Curl"/>
 </blueprint>

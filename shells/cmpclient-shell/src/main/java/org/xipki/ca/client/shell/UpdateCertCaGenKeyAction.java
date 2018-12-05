@@ -37,7 +37,7 @@ import org.xipki.cmpclient.EnrollCertRequest;
 import org.xipki.cmpclient.EnrollCertResult;
 import org.xipki.cmpclient.EnrollCertResult.CertifiedKeyPairOrError;
 import org.xipki.shell.CmdFailure;
-import org.xipki.shell.completer.DerPemCompleter;
+import org.xipki.shell.Completers;
 import org.xipki.util.StringUtil;
 
 /**
@@ -52,7 +52,7 @@ import org.xipki.util.StringUtil;
 public class UpdateCertCaGenKeyAction extends UpdateAction {
 
   @Option(name = "--cert-outform", description = "output format of the certificate")
-  @Completion(DerPemCompleter.class)
+  @Completion(Completers.DerPemCompleter.class)
   private String certOutform = "der";
 
   @Option(name = "--cert-out", description = "where to save the certificate")

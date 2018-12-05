@@ -26,9 +26,6 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.mgmt.api.CaHasUserEntry;
 import org.xipki.ca.mgmt.api.CaMgmtException;
-import org.xipki.ca.mgmt.shell.completer.CaNameCompleter;
-import org.xipki.ca.mgmt.shell.completer.PermissionCompleter;
-import org.xipki.ca.mgmt.shell.completer.ProfileNameAndAllCompleter;
 import org.xipki.shell.CmdFailure;
 
 /**
@@ -42,19 +39,19 @@ import org.xipki.shell.CmdFailure;
 public class CaUserAddAction extends CaAction {
 
   @Option(name = "--ca", required = true, description = "CA name")
-  @Completion(CaNameCompleter.class)
+  @Completion(CaCompleters.CaNameCompleter.class)
   private String caName;
 
   @Option(name = "--user", required = true, description = "user name")
   private String userName;
 
   @Option(name = "--permission", required = true, multiValued = true, description = "permission")
-  @Completion(PermissionCompleter.class)
+  @Completion(CaCompleters.PermissionCompleter.class)
   private Set<String> permissions;
 
   @Option(name = "--profile", required = true, multiValued = true,
       description = "profile name or 'all' for all profiles")
-  @Completion(ProfileNameAndAllCompleter.class)
+  @Completion(CaCompleters.ProfileNameAndAllCompleter.class)
   private Set<String> profiles;
 
   @Override

@@ -23,7 +23,6 @@ import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.shell.completer.DirCompleter;
 
 /**
  * TODO.
@@ -36,7 +35,7 @@ import org.xipki.shell.completer.DirCompleter;
 public class MkdirAction extends XiAction {
 
   @Argument(index = 0, name = "directory", required = true, description = "directory to be created")
-  @Completion(DirCompleter.class)
+  @Completion(Completers.DirCompleter.class)
   private String dirName;
 
   @Override

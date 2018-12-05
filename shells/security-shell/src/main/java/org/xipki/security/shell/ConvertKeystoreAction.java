@@ -31,7 +31,6 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
-import org.xipki.security.shell.completer.KeystoreTypeCompleter;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.CompareUtil;
 import org.xipki.util.IoUtil;
@@ -51,7 +50,7 @@ public class ConvertKeystoreAction extends SecurityAction {
   private String inFile;
 
   @Option(name = "--intype", required = true, description = "type of the source keystore")
-  @Completion(KeystoreTypeCompleter.class)
+  @Completion(SecurityCompleters.KeystoreTypeCompleter.class)
   private String inType;
 
   @Option(name = "--inpwd", description = "password of the source keystore")
@@ -62,7 +61,7 @@ public class ConvertKeystoreAction extends SecurityAction {
   private String outFile;
 
   @Option(name = "--outtype", required = true, description = "type of the destination keystore")
-  @Completion(KeystoreTypeCompleter.class)
+  @Completion(SecurityCompleters.KeystoreTypeCompleter.class)
   private String outType;
 
   @Option(name = "--outpwd", description = "password of the destination keystore")

@@ -33,7 +33,6 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
-import org.xipki.security.shell.completer.KeystoreTypeCompleter;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.IoUtil;
 
@@ -52,7 +51,7 @@ public class ImportCertAction extends SecurityAction {
   private String ksFile;
 
   @Option(name = "--type", required = true, description = "type of the keystore")
-  @Completion(KeystoreTypeCompleter.class)
+  @Completion(SecurityCompleters.KeystoreTypeCompleter.class)
   private String ksType;
 
   @Option(name = "--password", description = "password of the keystore")

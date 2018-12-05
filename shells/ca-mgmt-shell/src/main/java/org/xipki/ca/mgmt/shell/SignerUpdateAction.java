@@ -29,8 +29,6 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.ca.mgmt.api.CaManager;
 import org.xipki.ca.mgmt.api.CaMgmtException;
 import org.xipki.ca.mgmt.api.SignerEntry;
-import org.xipki.ca.mgmt.shell.completer.SignerNameCompleter;
-import org.xipki.ca.mgmt.shell.completer.SignerTypeCompleter;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
@@ -51,11 +49,11 @@ public class SignerUpdateAction extends CaAction {
   protected PasswordResolver passwordResolver;
 
   @Option(name = "--name", aliases = "-n", required = true, description = "signer name")
-  @Completion(SignerNameCompleter.class)
+  @Completion(CaCompleters.SignerNameCompleter.class)
   protected String name;
 
   @Option(name = "--type", description = "type of the signer")
-  @Completion(SignerTypeCompleter.class)
+  @Completion(CaCompleters.SignerTypeCompleter.class)
   protected String type;
 
   @Option(name = "--cert", description = "certificate file or 'null'")

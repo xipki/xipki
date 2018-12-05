@@ -59,11 +59,8 @@ import org.xipki.security.SecurityFactory;
 import org.xipki.security.exception.InvalidOidOrNameException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
-import org.xipki.shell.completer.ExtKeyusageCompleter;
-import org.xipki.shell.completer.ExtensionNameCompleter;
-import org.xipki.shell.completer.HashAlgCompleter;
-import org.xipki.shell.completer.KeyusageCompleter;
 import org.xipki.util.DateUtil;
 import org.xipki.util.IoUtil;
 import org.xipki.util.ReqRespDebug;
@@ -99,12 +96,12 @@ public abstract class EnrollAction extends ClientAction {
   private String caName;
 
   @Option(name = "--keyusage", multiValued = true, description = "keyusage")
-  @Completion(KeyusageCompleter.class)
+  @Completion(Completers.KeyusageCompleter.class)
   private List<String> keyusages;
 
   @Option(name = "--ext-keyusage", multiValued = true,
       description = "extended keyusage (name or OID")
-  @Completion(ExtKeyusageCompleter.class)
+  @Completion(Completers.ExtKeyusageCompleter.class)
   private List<String> extkeyusages;
 
   @Option(name = "--subject-alt-name", multiValued = true, description = "subjectAltName")
@@ -121,7 +118,7 @@ public abstract class EnrollAction extends ClientAction {
   private String biometricType;
 
   @Option(name = "--biometric-hash", description = "Biometric hash algorithm")
-  @Completion(HashAlgCompleter.class)
+  @Completion(Completers.HashAlgCompleter.class)
   private String biometricHashAlgo;
 
   @Option(name = "--biometric-file", description = "Biometric hash algorithm")
@@ -133,13 +130,13 @@ public abstract class EnrollAction extends ClientAction {
 
   @Option(name = "--need-extension", multiValued = true,
       description = "type (name or OID) of extension that must be contained in the certificate")
-  @Completion(ExtensionNameCompleter.class)
+  @Completion(Completers.ExtensionNameCompleter.class)
   private List<String> needExtensionTypes;
 
   @Option(name = "--want-extension", multiValued = true,
       description = "type (name or OID) of extension that should be contained in the"
           + " certificate if possible")
-  @Completion(ExtensionNameCompleter.class)
+  @Completion(Completers.ExtensionNameCompleter.class)
   private List<String> wantExtensionTypes;
 
   protected abstract SubjectPublicKeyInfo getPublicKey() throws Exception;
@@ -172,7 +169,7 @@ public abstract class EnrollAction extends ClientAction {
     if (extkeyusages != null) {
       List<String> list = new ArrayList<>(extkeyusages.size());
       for (String m : extkeyusages) {
-        String id = ExtKeyusageCompleter.getIdForUsageName(m);
+        String id = Completers.ExtKeyusageCompleter.getIdForUsageName(m);
         if (id == null) {
           try {
             id = new ASN1ObjectIdentifier(m).getId();
@@ -360,7 +357,7 @@ public abstract class EnrollAction extends ClientAction {
   static List<String> resolveExtensionTypes(List<String> types) throws IllegalCmdParamException {
     List<String> list = new ArrayList<>(types.size());
     for (String m : types) {
-      String id = ExtensionNameCompleter.getIdForExtensionName(m);
+      String id = Completers.ExtensionNameCompleter.getIdForExtensionName(m);
       if (id == null) {
         try {
           id = new ASN1ObjectIdentifier(m).getId();

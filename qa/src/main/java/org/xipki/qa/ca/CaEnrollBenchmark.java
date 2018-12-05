@@ -66,8 +66,8 @@ import org.xipki.qa.BenchmarkHttpClient.SslConf;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.BenchmarkExecutor;
-import org.xipki.util.conf.InvalidConfException;
-import org.xipki.util.conf.ValidatableConf;
+import org.xipki.util.InvalidConfException;
+import org.xipki.util.ValidatableConf;
 
 import com.alibaba.fastjson.JSON;
 

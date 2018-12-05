@@ -26,8 +26,8 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.cmpclient.CmpClientException;
 import org.xipki.cmpclient.PkiErrorException;
 import org.xipki.shell.CmdFailure;
+import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
-import org.xipki.shell.completer.DerPemCompleter;
 
 /**
  * TODO.
@@ -42,7 +42,7 @@ public abstract class CrlAction extends ClientAction {
   protected String caName;
 
   @Option(name = "--outform", description = "output format of the CRL")
-  @Completion(DerPemCompleter.class)
+  @Completion(Completers.DerPemCompleter.class)
   protected String outform = "der";
 
   @Option(name = "--out", aliases = "-o", required = true, description = "where to save the CRL")

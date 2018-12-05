@@ -33,8 +33,8 @@ import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.profile.ExtensionValue;
-import org.xipki.util.CollectionUtil;
 import org.xipki.util.Args;
+import org.xipki.util.CollectionUtil;
 
 /**
  * TODO.

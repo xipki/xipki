@@ -27,10 +27,9 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.mgmt.api.CaEntry;
 import org.xipki.ca.mgmt.shell.CaAction;
-import org.xipki.ca.mgmt.shell.completer.CaNameCompleter;
-import org.xipki.ca.mgmt.shell.completer.ProfileNameCompleter;
+import org.xipki.ca.mgmt.shell.CaCompleters;
 import org.xipki.shell.CmdFailure;
-import org.xipki.shell.completer.DerPemCompleter;
+import org.xipki.shell.Completers;
 import org.xipki.util.DateUtil;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
@@ -46,7 +45,7 @@ import org.xipki.util.StringUtil;
 public class EnrollCertAction extends CaAction {
 
   @Option(name = "--ca", required = true, description = "CA name")
-  @Completion(CaNameCompleter.class)
+  @Completion(CaCompleters.CaNameCompleter.class)
   private String caName;
 
   @Option(name = "--csr", required = true, description = "CSR file")
@@ -54,7 +53,7 @@ public class EnrollCertAction extends CaAction {
   private String csrFile;
 
   @Option(name = "--outform", description = "output format of the certificate")
-  @Completion(DerPemCompleter.class)
+  @Completion(Completers.DerPemCompleter.class)
   protected String outform = "der";
 
   @Option(name = "--out", aliases = "-o", required = true,
@@ -63,7 +62,7 @@ public class EnrollCertAction extends CaAction {
   private String outFile;
 
   @Option(name = "--profile", aliases = "-p", required = true, description = "profile name")
-  @Completion(ProfileNameCompleter.class)
+  @Completion(CaCompleters.ProfileNameCompleter.class)
   private String profileName;
 
   @Option(name = "--not-before", description = "notBefore, UTC time of format yyyyMMddHHmmss")

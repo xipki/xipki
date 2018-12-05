@@ -33,14 +33,9 @@ import org.xipki.ca.mgmt.api.CrlControl;
 import org.xipki.ca.mgmt.api.ProtocolSupport;
 import org.xipki.ca.mgmt.api.ScepControl;
 import org.xipki.ca.mgmt.api.ValidityMode;
-import org.xipki.ca.mgmt.shell.completer.CaStatusCompleter;
-import org.xipki.ca.mgmt.shell.completer.PermissionCompleter;
-import org.xipki.ca.mgmt.shell.completer.SignerNameCompleter;
-import org.xipki.ca.mgmt.shell.completer.SignerTypeCompleter;
-import org.xipki.ca.mgmt.shell.completer.ValidityModeCompleter;
 import org.xipki.password.PasswordResolver;
+import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
-import org.xipki.shell.completer.YesNoCompleter;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
@@ -57,11 +52,11 @@ public abstract class CaAddOrGenAction extends CaAction {
   private String caName;
 
   @Option(name = "--status", description = "CA status")
-  @Completion(CaStatusCompleter.class)
+  @Completion(CaCompleters.CaStatusCompleter.class)
   private String caStatus = "active";
 
   @Option(name = "--rest-status", description = "REST API status")
-  @Completion(CaStatusCompleter.class)
+  @Completion(CaCompleters.CaStatusCompleter.class)
   private String restStatus = "inactive";
 
   @Option(name = "--ca-cert-uri", multiValued = true, description = "CA certificate URI")
@@ -77,7 +72,7 @@ public abstract class CaAddOrGenAction extends CaAction {
   private List<String> deltaCrlUris;
 
   @Option(name = "--permission", required = true, multiValued = true, description = "permission")
-  @Completion(PermissionCompleter.class)
+  @Completion(CaCompleters.PermissionCompleter.class)
   private Set<String> permissions;
 
   @Option(name = "--sn-bitlen",
@@ -94,15 +89,15 @@ public abstract class CaAddOrGenAction extends CaAction {
   private Integer keepExpiredCertInDays = -1;
 
   @Option(name = "--crl-signer", description = "CRL signer name")
-  @Completion(SignerNameCompleter.class)
+  @Completion(CaCompleters.SignerNameCompleter.class)
   private String crlSignerName;
 
   @Option(name = "--cmp-responder", description = "CMP responder name")
-  @Completion(SignerNameCompleter.class)
+  @Completion(CaCompleters.SignerNameCompleter.class)
   private String cmpResponderName;
 
   @Option(name = "--scep-responder", description = "SCEP responder name")
-  @Completion(SignerNameCompleter.class)
+  @Completion(CaCompleters.SignerNameCompleter.class)
   private String scepResponderName;
 
   @Option(name = "--cmp-control", description = "CMP control")
@@ -122,38 +117,38 @@ public abstract class CaAddOrGenAction extends CaAction {
   private Integer expirationPeriod = 365;
 
   @Option(name = "--signer-type", required = true, description = "CA signer type")
-  @Completion(SignerTypeCompleter.class)
+  @Completion(CaCompleters.SignerTypeCompleter.class)
   private String signerType;
 
   @Option(name = "--signer-conf", required = true, description = "CA signer configuration")
   private String signerConf;
 
   @Option(name = "--duplicate-key", description = "whether duplicate key is permitted")
-  @Completion(YesNoCompleter.class)
+  @Completion(Completers.YesNoCompleter.class)
   private String duplicateKeyS = "yes";
 
   @Option(name = "--duplicate-subject", description = "whether duplicate subject is permitted")
-  @Completion(YesNoCompleter.class)
+  @Completion(Completers.YesNoCompleter.class)
   private String duplicateSubjectS = "yes";
 
   @Option(name = "--support-cmp", description = "whether the CMP protocol is supported")
-  @Completion(YesNoCompleter.class)
+  @Completion(Completers.YesNoCompleter.class)
   private String supportCmpS = "no";
 
   @Option(name = "--support-rest", description = "whether the REST protocol is supported")
-  @Completion(YesNoCompleter.class)
+  @Completion(Completers.YesNoCompleter.class)
   private String supportRestS = "no";
 
   @Option(name = "--support-scep", description = "whether the SCEP protocol is supported")
-  @Completion(YesNoCompleter.class)
+  @Completion(Completers.YesNoCompleter.class)
   private String supportScepS = "no";
 
   @Option(name = "--save-req", description = "whether the request is saved")
-  @Completion(YesNoCompleter.class)
+  @Completion(Completers.YesNoCompleter.class)
   private String saveReqS = "no";
 
   @Option(name = "--validity-mode", description = "mode of valditity")
-  @Completion(ValidityModeCompleter.class)
+  @Completion(CaCompleters.ValidityModeCompleter.class)
   private String validityModeS = "STRICT";
 
   @Option(name = "--extra-control", description = "extra control")

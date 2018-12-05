@@ -107,8 +107,8 @@ import org.xipki.ca.mgmt.msg.StringSetResponse;
 import org.xipki.ca.mgmt.msg.UnrevokeCertificateRequest;
 import org.xipki.util.Args;
 import org.xipki.util.HttpConstants;
+import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
-import org.xipki.util.conf.InvalidConfException;
 
 import com.alibaba.fastjson.JSON;
 

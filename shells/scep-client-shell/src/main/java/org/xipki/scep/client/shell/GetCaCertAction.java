@@ -28,8 +28,8 @@ import org.xipki.scep.client.CaCertValidator;
 import org.xipki.scep.client.CaIdentifier;
 import org.xipki.scep.client.ScepClient;
 import org.xipki.shell.CmdFailure;
+import org.xipki.shell.Completers;
 import org.xipki.shell.XiAction;
-import org.xipki.shell.completer.DerPemCompleter;
 
 /**
  * TODO.
@@ -48,7 +48,7 @@ public class GetCaCertAction extends XiAction {
   private String caId;
 
   @Option(name = "--outform", description = "output format of the certificate")
-  @Completion(DerPemCompleter.class)
+  @Completion(Completers.DerPemCompleter.class)
   protected String outform = "der";
 
   @Option(name = "--out", aliases = "-o", required = true,

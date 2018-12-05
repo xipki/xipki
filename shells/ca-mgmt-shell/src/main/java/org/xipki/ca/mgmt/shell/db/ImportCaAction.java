@@ -23,7 +23,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.mgmt.db.port.DbPortWorker;
-import org.xipki.shell.completer.DirCompleter;
+import org.xipki.shell.Completers;
 
 /**
  * TODO.
@@ -40,7 +40,7 @@ public class ImportCaAction extends DbPortAction {
   private String dbconfFile;
 
   @Option(name = "--in-dir", required = true, description = "input directory")
-  @Completion(DirCompleter.class)
+  @Completion(Completers.DirCompleter.class)
   private String indir;
 
   @Option(name = "-k", description = "number of certificates per commit")

@@ -23,7 +23,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.security.pkcs12.P12KeyGenerationResult;
 import org.xipki.security.pkcs12.P12KeyGenerator;
-import org.xipki.shell.completer.ECCurveNameCompleter;
+import org.xipki.shell.Completers;
 
 /**
  * TODO.
@@ -41,7 +41,7 @@ public class P12ECKeyGenAction extends P12KeyGenAction {
   protected String subject;
 
   @Option(name = "--curve", description = "EC curve name or OID")
-  @Completion(ECCurveNameCompleter.class)
+  @Completion(Completers.ECCurveNameCompleter.class)
   private String curveName = "secp256r1";
 
   @Override

@@ -23,7 +23,6 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.mgmt.api.CertprofileEntry;
-import org.xipki.ca.mgmt.shell.completer.ProfileNameCompleter;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.StringUtil;
 
@@ -39,7 +38,7 @@ import org.xipki.util.StringUtil;
 public class ProfileExportAction extends CaAction {
 
   @Option(name = "--name", aliases = "-n", required = true, description = "profile name")
-  @Completion(ProfileNameCompleter.class)
+  @Completion(CaCompleters.ProfileNameCompleter.class)
   private String name;
 
   @Option(name = "--out", aliases = "-o", required = true,

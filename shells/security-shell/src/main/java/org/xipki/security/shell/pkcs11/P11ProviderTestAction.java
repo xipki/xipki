@@ -34,7 +34,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.XiSecurityConstants;
 import org.xipki.security.util.AlgorithmUtil;
-import org.xipki.shell.completer.HashAlgCompleter;
+import org.xipki.shell.Completers;
 import org.xipki.util.StringUtil;
 
 /**
@@ -62,7 +62,7 @@ public class P11ProviderTestAction extends P11SecurityAction {
   private Boolean verbose = Boolean.FALSE;
 
   @Option(name = "--hash", description = "hash algorithm name")
-  @Completion(HashAlgCompleter.class)
+  @Completion(Completers.HashAlgCompleter.class)
   protected String hashAlgo = "SHA256";
 
   @Option(name = "--rsa-mgf1",

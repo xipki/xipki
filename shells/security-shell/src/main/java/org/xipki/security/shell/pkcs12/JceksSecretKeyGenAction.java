@@ -23,7 +23,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.security.pkcs12.P12KeyGenerationResult;
 import org.xipki.security.pkcs12.P12KeyGenerator;
-import org.xipki.security.shell.completer.SecretKeyTypeCompleter;
+import org.xipki.security.shell.SecurityCompleters;
 import org.xipki.shell.IllegalCmdParamException;
 
 /**
@@ -38,7 +38,7 @@ public class JceksSecretKeyGenAction extends P12KeyGenAction {
 
   @Option(name = "--key-type", required = true,
       description = "keytype, current only AES, DES3 and GENERIC are supported")
-  @Completion(SecretKeyTypeCompleter.class)
+  @Completion(SecurityCompleters.SecretKeyTypeCompleter.class)
    private String keyType;
 
   @Option(name = "--key-size", required = true, description = "keysize in bit")

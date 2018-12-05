@@ -22,7 +22,6 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.password.PasswordProducer;
-import org.xipki.shell.completer.PasswordNameCompleter;
 import org.xipki.util.StringUtil;
 
 /**
@@ -36,7 +35,7 @@ import org.xipki.util.StringUtil;
 public class ProducePasswordAction extends XiAction {
 
   @Option(name = "--name", required = true, description = "name of the password")
-  @Completion(PasswordNameCompleter.class)
+  @Completion(Completers.PasswordNameCompleter.class)
   private String name;
 
   @Option(name = "-k", description = "quorum of the password parts")

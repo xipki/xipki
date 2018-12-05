@@ -28,8 +28,8 @@ import org.xipki.ca.api.profile.KeyParametersOption;
 import org.xipki.ca.api.profile.Range;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.conf.InvalidConfException;
-import org.xipki.util.conf.ValidatableConf;
+import org.xipki.util.InvalidConfException;
+import org.xipki.util.ValidatableConf;
 
 import com.alibaba.fastjson.annotation.JSONField;
 

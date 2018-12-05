@@ -28,7 +28,6 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.mgmt.api.CaMgmtException;
 import org.xipki.ca.mgmt.api.SignerEntry;
-import org.xipki.ca.mgmt.shell.completer.SignerTypeCompleter;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
@@ -48,7 +47,7 @@ public class SignererAddAction extends CaAction {
   private String name;
 
   @Option(name = "--type", required = true, description = "type of the signer")
-  @Completion(SignerTypeCompleter.class)
+  @Completion(CaCompleters.SignerTypeCompleter.class)
   private String type;
 
   @Option(name = "--conf", required = true, description = "conf of the signer")

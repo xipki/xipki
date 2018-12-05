@@ -29,7 +29,7 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.scep.client.ScepClient;
 import org.xipki.shell.CmdFailure;
-import org.xipki.shell.completer.DerPemCompleter;
+import org.xipki.shell.Completers;
 
 /**
  * TODO.
@@ -45,7 +45,7 @@ public class GetCertAction extends ClientAction {
   private String serialNumber;
 
   @Option(name = "--outform", description = "output format of the certificate")
-  @Completion(DerPemCompleter.class)
+  @Completion(Completers.DerPemCompleter.class)
   protected String outform = "der";
 
   @Option(name = "--out", aliases = "-o", required = true,

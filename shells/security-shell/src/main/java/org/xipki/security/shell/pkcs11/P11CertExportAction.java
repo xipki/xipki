@@ -27,7 +27,7 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.shell.CmdFailure;
-import org.xipki.shell.completer.DerPemCompleter;
+import org.xipki.shell.Completers;
 
 /**
  * TODO.
@@ -51,7 +51,7 @@ public class P11CertExportAction extends P11SecurityAction {
   protected String label;
 
   @Option(name = "--outform", description = "output format of the certificate")
-  @Completion(DerPemCompleter.class)
+  @Completion(Completers.DerPemCompleter.class)
   protected String outform = "der";
 
   @Option(name = "--out", aliases = "-o", required = true,

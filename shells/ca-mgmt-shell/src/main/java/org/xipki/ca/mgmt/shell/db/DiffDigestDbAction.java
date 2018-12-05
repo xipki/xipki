@@ -30,7 +30,7 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.mgmt.db.diffdb.DigestDiffWorker;
 import org.xipki.ca.mgmt.db.port.DbPortWorker;
 import org.xipki.security.util.X509Util;
-import org.xipki.shell.completer.DirCompleter;
+import org.xipki.shell.Completers;
 
 /**
  * TODO.
@@ -53,7 +53,7 @@ public class DiffDigestDbAction extends DbPortAction {
   private String dbconfFile;
 
   @Option(name = "--report-dir", required = true, description = "report directory")
-  @Completion(DirCompleter.class)
+  @Completion(Completers.DirCompleter.class)
   private String reportDir;
 
   @Option(name = "--revoked-only", description = "considers only the revoked certificates")

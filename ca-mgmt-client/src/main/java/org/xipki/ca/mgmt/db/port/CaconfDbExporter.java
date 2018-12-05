@@ -40,7 +40,7 @@ import org.xipki.ca.mgmt.db.message.Signer;
 import org.xipki.ca.mgmt.db.message.User;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.util.conf.InvalidConfException;
+import org.xipki.util.InvalidConfException;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;

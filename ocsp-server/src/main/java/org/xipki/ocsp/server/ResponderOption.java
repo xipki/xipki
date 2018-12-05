@@ -24,7 +24,7 @@ import java.util.List;
 import org.xipki.ocsp.api.OcspMode;
 import org.xipki.ocsp.server.conf.ResponderType;
 import org.xipki.util.Args;
-import org.xipki.util.conf.InvalidConfException;
+import org.xipki.util.InvalidConfException;
 
 /**
  * TODO.

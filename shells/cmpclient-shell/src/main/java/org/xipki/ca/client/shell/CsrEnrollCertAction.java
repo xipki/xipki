@@ -31,7 +31,7 @@ import org.xipki.cmpclient.EnrollCertResult;
 import org.xipki.cmpclient.EnrollCertResult.CertifiedKeyPairOrError;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
-import org.xipki.shell.completer.DerPemCompleter;
+import org.xipki.shell.Completers;
 import org.xipki.util.DateUtil;
 import org.xipki.util.ReqRespDebug;
 import org.xipki.util.StringUtil;
@@ -60,7 +60,7 @@ public class CsrEnrollCertAction extends ClientAction {
   private String notAfterS;
 
   @Option(name = "--outform", description = "output format of the certificate")
-  @Completion(DerPemCompleter.class)
+  @Completion(Completers.DerPemCompleter.class)
   private String outform = "der";
 
   @Option(name = "--out", aliases = "-o", required = true,

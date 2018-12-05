@@ -39,8 +39,8 @@ import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Base64;
 import org.xipki.util.Args;
+import org.xipki.util.Base64;
 import org.xipki.util.ProcessLog;
 import org.xipki.util.StringUtil;
 

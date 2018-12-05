@@ -32,7 +32,7 @@ import org.xipki.scep.client.EnrolmentResponse;
 import org.xipki.scep.client.ScepClient;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
-import org.xipki.shell.completer.DerPemCompleter;
+import org.xipki.shell.Completers;
 import org.xipki.util.StringUtil;
 
 /**
@@ -49,7 +49,7 @@ public class EnrollCertAction extends ClientAction {
   private String csrFile;
 
   @Option(name = "--outform", description = "output format of the certificate")
-  @Completion(DerPemCompleter.class)
+  @Completion(Completers.DerPemCompleter.class)
   protected String outform = "der";
 
   @Option(name = "--out", aliases = "-o", required = true,

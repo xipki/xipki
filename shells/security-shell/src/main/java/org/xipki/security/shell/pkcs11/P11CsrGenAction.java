@@ -28,10 +28,10 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.SignerConf;
 import org.xipki.security.shell.CsrGenAction;
-import org.xipki.security.shell.completer.P11ModuleNameCompleter;
+import org.xipki.security.shell.SecurityCompleters;
+import org.xipki.util.Args;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.Hex;
-import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -58,7 +58,7 @@ public class P11CsrGenAction extends CsrGenAction {
 
   @Option(name = "--module",
       description = "name of the PKCS#11 module")
-  @Completion(P11ModuleNameCompleter.class)
+  @Completion(SecurityCompleters.P11ModuleNameCompleter.class)
   private String moduleName = "default";
 
   @Override

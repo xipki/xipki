@@ -22,8 +22,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.xipki.util.conf.InvalidConfException;
-import org.xipki.util.conf.ValidatableConf;
+import org.xipki.util.InvalidConfException;
+import org.xipki.util.ValidatableConf;
 
 /**
  * TODO.

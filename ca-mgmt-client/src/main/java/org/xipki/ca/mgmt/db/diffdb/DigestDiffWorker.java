@@ -32,8 +32,8 @@ import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
-import org.xipki.util.IoUtil;
 import org.xipki.util.Args;
+import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
 /**

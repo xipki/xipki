@@ -20,10 +20,10 @@ package org.xipki.qa.ca;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.xipki.util.conf.FileOrBinary;
-import org.xipki.util.conf.FileOrValue;
-import org.xipki.util.conf.InvalidConfException;
-import org.xipki.util.conf.ValidatableConf;
+import org.xipki.util.FileOrBinary;
+import org.xipki.util.FileOrValue;
+import org.xipki.util.InvalidConfException;
+import org.xipki.util.ValidatableConf;
 
 /**
  * TODO.

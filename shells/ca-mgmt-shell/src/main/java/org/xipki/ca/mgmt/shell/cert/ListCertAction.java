@@ -28,8 +28,8 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.mgmt.api.CertListInfo;
 import org.xipki.ca.mgmt.api.CertListOrderBy;
 import org.xipki.ca.mgmt.shell.CaAction;
-import org.xipki.ca.mgmt.shell.completer.CaNameCompleter;
-import org.xipki.ca.mgmt.shell.completer.CertListSortByCompleter;
+import org.xipki.ca.mgmt.shell.CaCompleters;
+import org.xipki.ca.mgmt.shell.CaCompleters.CertListSortByCompleter;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.DateUtil;
 import org.xipki.util.StringUtil;
@@ -45,7 +45,7 @@ import org.xipki.util.StringUtil;
 public class ListCertAction extends CaAction {
 
   @Option(name = "--ca", required = true, description = "CA name")
-  @Completion(CaNameCompleter.class)
+  @Completion(CaCompleters.CaNameCompleter.class)
   protected String caName;
 
   @Option(name = "--subject", description = "the subject pattern, * is allowed.")

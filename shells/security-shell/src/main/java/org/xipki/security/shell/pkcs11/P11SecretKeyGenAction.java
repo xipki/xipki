@@ -30,7 +30,7 @@ import org.xipki.security.pkcs11.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.exception.P11UnsupportedMechanismException;
-import org.xipki.security.shell.completer.SecretKeyTypeCompleter;
+import org.xipki.security.shell.SecurityCompleters;
 import org.xipki.shell.IllegalCmdParamException;
 
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
@@ -51,7 +51,7 @@ public class P11SecretKeyGenAction extends P11KeyGenAction {
 
   @Option(name = "--key-type", required = true,
       description = "keytype, current only AES, DES3 and GENERIC are supported")
-  @Completion(SecretKeyTypeCompleter.class)
+  @Completion(SecurityCompleters.SecretKeyTypeCompleter.class)
   private String keyType;
 
   @Option(name = "--key-size", required = true, description = "keysize in bit")

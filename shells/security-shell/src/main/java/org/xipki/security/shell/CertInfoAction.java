@@ -27,7 +27,7 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.util.X509Util;
-import org.xipki.shell.completer.HashAlgCompleter;
+import org.xipki.shell.Completers;
 import org.xipki.util.Hex;
 import org.xipki.util.IoUtil;
 
@@ -67,7 +67,7 @@ public class CertInfoAction extends SecurityAction {
   private Boolean fingerprint;
 
   @Option(name = "--hash", description = "hash algorithm name")
-  @Completion(HashAlgCompleter.class)
+  @Completion(Completers.HashAlgCompleter.class)
   protected String hashAlgo = "SHA256";
 
   @Override

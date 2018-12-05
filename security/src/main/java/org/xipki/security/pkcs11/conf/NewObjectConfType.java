@@ -20,8 +20,8 @@ package org.xipki.security.pkcs11.conf;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.xipki.util.conf.InvalidConfException;
-import org.xipki.util.conf.ValidatableConf;
+import org.xipki.util.InvalidConfException;
+import org.xipki.util.ValidatableConf;
 
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 

@@ -17,8 +17,8 @@
 
 package org.xipki.ocsp.server.conf;
 
-import org.xipki.util.conf.InvalidConfException;
-import org.xipki.util.conf.ValidatableConf;
+import org.xipki.util.InvalidConfException;
+import org.xipki.util.ValidatableConf;
 
 /**
  * TODO.

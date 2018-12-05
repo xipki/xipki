@@ -24,7 +24,6 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.mgmt.api.CaHasRequestorEntry;
-import org.xipki.ca.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.shell.CmdFailure;
 
 /**
@@ -38,7 +37,7 @@ import org.xipki.shell.CmdFailure;
 public class CaRequestorInfoAction extends CaAction {
 
   @Option(name = "--ca", required = true, description = "CA name")
-  @Completion(CaNameCompleter.class)
+  @Completion(CaCompleters.CaNameCompleter.class)
   private String caName;
 
   @Override

@@ -34,7 +34,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.security.shell.completer.SecretKeyTypeCompleter;
+import org.xipki.security.shell.SecurityCompleters;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.IoUtil;
 
@@ -54,7 +54,7 @@ public class P11SecretKeyImportAction extends P11KeyGenAction {
 
   @Option(name = "--key-type", required = true,
       description = "keytype, current only AES, DES3 and GENERIC are supported")
-  @Completion(SecretKeyTypeCompleter.class)
+  @Completion(SecurityCompleters.SecretKeyTypeCompleter.class)
   private String keyType;
 
   @Option(name = "--keystore", required = true,

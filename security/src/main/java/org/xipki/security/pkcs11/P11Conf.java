@@ -31,7 +31,7 @@ import org.xipki.security.pkcs11.conf.MechanismSetType;
 import org.xipki.security.pkcs11.conf.ModuleType;
 import org.xipki.security.pkcs11.conf.Pkcs11conf;
 import org.xipki.util.Args;
-import org.xipki.util.conf.InvalidConfException;
+import org.xipki.util.InvalidConfException;
 
 import com.alibaba.fastjson.JSON;
 

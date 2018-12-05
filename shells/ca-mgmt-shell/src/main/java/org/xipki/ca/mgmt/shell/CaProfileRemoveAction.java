@@ -24,8 +24,6 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.mgmt.api.CaMgmtException;
-import org.xipki.ca.mgmt.shell.completer.CaNameCompleter;
-import org.xipki.ca.mgmt.shell.completer.ProfileNameCompleter;
 import org.xipki.shell.CmdFailure;
 import org.xipki.util.StringUtil;
 
@@ -40,12 +38,12 @@ import org.xipki.util.StringUtil;
 public class CaProfileRemoveAction extends CaAction {
 
   @Option(name = "--ca", required = true, description = "CA name")
-  @Completion(CaNameCompleter.class)
+  @Completion(CaCompleters.CaNameCompleter.class)
   private String caName;
 
   @Option(name = "--profile", required = true, multiValued = true,
       description = "certificate profile name")
-  @Completion(ProfileNameCompleter.class)
+  @Completion(CaCompleters.ProfileNameCompleter.class)
   private List<String> profileNames;
 
   @Option(name = "--force", aliases = "-f", description = "without prompt")

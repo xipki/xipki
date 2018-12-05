@@ -28,8 +28,8 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
-import org.xipki.util.IoUtil;
 import org.xipki.util.Args;
+import org.xipki.util.IoUtil;
 
 /**
  * TODO.

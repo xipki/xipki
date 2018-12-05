@@ -40,7 +40,7 @@ import org.xipki.password.PasswordResolverException;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.util.Args;
 import org.xipki.util.HttpConstants;
-import org.xipki.util.conf.InvalidConfException;
+import org.xipki.util.InvalidConfException;
 
 import com.alibaba.fastjson.JSON;
 

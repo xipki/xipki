@@ -34,10 +34,10 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.util.Args;
+import org.xipki.util.InvalidConfException;
 import org.xipki.util.LogUtil;
+import org.xipki.util.ValidatableConf;
 import org.xipki.util.concurrent.CountLatch;
-import org.xipki.util.conf.InvalidConfException;
-import org.xipki.util.conf.ValidatableConf;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -69,7 +69,7 @@ import io.netty.handler.timeout.WriteTimeoutHandler;
  */
 
 public class BenchmarkHttpClient {
-  
+
   public static class SslConf extends ValidatableConf {
 
     private String storeType;

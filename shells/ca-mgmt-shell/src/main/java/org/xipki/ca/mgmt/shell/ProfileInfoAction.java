@@ -28,7 +28,6 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.mgmt.api.CertprofileEntry;
-import org.xipki.ca.mgmt.shell.completer.ProfileNameCompleter;
 import org.xipki.shell.CmdFailure;
 
 /**
@@ -43,7 +42,7 @@ import org.xipki.shell.CmdFailure;
 public class ProfileInfoAction extends CaAction {
 
   @Argument(index = 0, name = "name", description = "certificate profile name")
-  @Completion(ProfileNameCompleter.class)
+  @Completion(CaCompleters.ProfileNameCompleter.class)
   private String name;
 
   @Option(name = "--verbose", aliases = "-v",

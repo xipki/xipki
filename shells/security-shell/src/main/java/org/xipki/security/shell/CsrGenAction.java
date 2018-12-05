@@ -68,15 +68,12 @@ import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.shell.Completers;
+import org.xipki.shell.Completers.ExtensionNameCompleter;
 import org.xipki.shell.IllegalCmdParamException;
-import org.xipki.shell.completer.DerPemCompleter;
-import org.xipki.shell.completer.ExtKeyusageCompleter;
-import org.xipki.shell.completer.ExtensionNameCompleter;
-import org.xipki.shell.completer.HashAlgCompleter;
-import org.xipki.shell.completer.KeyusageCompleter;
+import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.IoUtil;
-import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -88,7 +85,7 @@ import org.xipki.util.StringUtil;
 public abstract class CsrGenAction extends SecurityAction {
 
   @Option(name = "--hash", description = "hash algorithm name")
-  @Completion(HashAlgCompleter.class)
+  @Completion(Completers.HashAlgCompleter.class)
   protected String hashAlgo = "SHA256";
 
   @Option(name = "--subject-alt-name", multiValued = true, description = "subjectAltName")
@@ -115,7 +112,7 @@ public abstract class CsrGenAction extends SecurityAction {
   private Boolean gm = Boolean.FALSE;
 
   @Option(name = "--outform", description = "output format of the CSR")
-  @Completion(DerPemCompleter.class)
+  @Completion(Completers.DerPemCompleter.class)
   protected String outform = "der";
 
   @Option(name = "--out", aliases = "-o", required = true, description = "CSR file")
@@ -126,12 +123,12 @@ public abstract class CsrGenAction extends SecurityAction {
   private String challengePassword;
 
   @Option(name = "--keyusage", multiValued = true, description = "keyusage")
-  @Completion(KeyusageCompleter.class)
+  @Completion(Completers.KeyusageCompleter.class)
   private List<String> keyusages;
 
   @Option(name = "--ext-keyusage", multiValued = true,
       description = "extended keyusage (name or OID)")
-  @Completion(ExtKeyusageCompleter.class)
+  @Completion(Completers.ExtKeyusageCompleter.class)
   private List<String> extkeyusages;
 
   @Option(name = "--qc-eu-limit", multiValued = true,
@@ -142,7 +139,7 @@ public abstract class CsrGenAction extends SecurityAction {
   private String biometricType;
 
   @Option(name = "--biometric-hash", description = "Biometric hash algorithm")
-  @Completion(HashAlgCompleter.class)
+  @Completion(Completers.HashAlgCompleter.class)
   private String biometricHashAlgo;
 
   @Option(name = "--biometric-file", description = "Biometric hash algorithm")
@@ -154,13 +151,13 @@ public abstract class CsrGenAction extends SecurityAction {
 
   @Option(name = "--need-extension", multiValued = true,
       description = "types (name or OID) of extension that must be contained in the certificate")
-  @Completion(ExtensionNameCompleter.class)
+  @Completion(Completers.ExtensionNameCompleter.class)
   private List<String> needExtensionTypes;
 
   @Option(name = "--want-extension", multiValued = true,
       description = "types (name or OID) of extension that should be contained in the certificate "
                     + "if possible")
-  @Completion(ExtensionNameCompleter.class)
+  @Completion(Completers.ExtensionNameCompleter.class)
   private List<String> wantExtensionTypes;
 
   /**
@@ -194,7 +191,7 @@ public abstract class CsrGenAction extends SecurityAction {
     if (extkeyusages != null) {
       List<String> list = new ArrayList<>(extkeyusages.size());
       for (String m : extkeyusages) {
-        String id = ExtKeyusageCompleter.getIdForUsageName(m);
+        String id = Completers.ExtKeyusageCompleter.getIdForUsageName(m);
         if (id == null) {
           try {
             id = new ASN1ObjectIdentifier(m).getId();

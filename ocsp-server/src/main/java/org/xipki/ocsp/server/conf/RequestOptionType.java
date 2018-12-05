@@ -21,8 +21,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.xipki.ocsp.server.conf.OcspserverType.ValidationModel;
-import org.xipki.util.conf.InvalidConfException;
-import org.xipki.util.conf.ValidatableConf;
+import org.xipki.util.InvalidConfException;
+import org.xipki.util.ValidatableConf;
 
 /**
  * TODO.

@@ -24,7 +24,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.cmpclient.CmpClient;
 import org.xipki.cmpclient.CmpClientException;
-import org.xipki.shell.completer.AbstractDynamicEnumCompleter;
+import org.xipki.shell.AbstractDynamicEnumCompleter;
 
 /**
  * TODO.

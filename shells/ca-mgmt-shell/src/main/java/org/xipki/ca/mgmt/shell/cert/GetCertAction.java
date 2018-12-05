@@ -24,8 +24,8 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.mgmt.api.CertWithRevocationInfo;
 import org.xipki.ca.mgmt.shell.CaAction;
-import org.xipki.ca.mgmt.shell.completer.CaNameCompleter;
-import org.xipki.shell.completer.DerPemCompleter;
+import org.xipki.ca.mgmt.shell.CaCompleters;
+import org.xipki.shell.Completers;
 
 /**
  * TODO.
@@ -38,14 +38,14 @@ import org.xipki.shell.completer.DerPemCompleter;
 public class GetCertAction extends CaAction {
 
   @Option(name = "--ca", required = true, description = "CA name")
-  @Completion(CaNameCompleter.class)
+  @Completion(CaCompleters.CaNameCompleter.class)
   protected String caName;
 
   @Option(name = "--serial", aliases = "-s", required = true, description = "serial number")
   private String serialNumberS;
 
   @Option(name = "--outform", description = "output format of the certificate")
-  @Completion(DerPemCompleter.class)
+  @Completion(Completers.DerPemCompleter.class)
   protected String outform = "der";
 
   @Option(name = "--out", aliases = "-o", required = true,

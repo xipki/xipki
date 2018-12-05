@@ -30,8 +30,8 @@ import org.xipki.security.CrlReason;
 import org.xipki.security.cmp.PkiStatusInfo;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
+import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
-import org.xipki.shell.completer.ClientCrlReasonCompleter;
 import org.xipki.util.DateUtil;
 import org.xipki.util.ReqRespDebug;
 
@@ -46,7 +46,7 @@ import org.xipki.util.ReqRespDebug;
 public class RevokeCertAction extends UnRevRemoveCertAction {
 
   @Option(name = "--reason", aliases = "-r", required = true, description = "CRL reason")
-  @Completion(ClientCrlReasonCompleter.class)
+  @Completion(Completers.ClientCrlReasonCompleter.class)
   private String reason;
 
   @Option(name = "--inv-date", description = "invalidity date, UTC time of format yyyyMMddHHmmss")

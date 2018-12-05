@@ -27,7 +27,6 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.mgmt.api.CaMgmtException;
 import org.xipki.ca.mgmt.api.RequestorEntry;
-import org.xipki.ca.mgmt.shell.completer.RequestorNameCompleter;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.util.Base64;
@@ -44,7 +43,7 @@ import org.xipki.util.IoUtil;
 public class RequestorUpdateAction extends CaAction {
 
   @Option(name = "--name", aliases = "-n", required = true, description = "requestor name")
-  @Completion(RequestorNameCompleter.class)
+  @Completion(CaCompleters.RequestorNameCompleter.class)
   protected String name;
 
   @Option(name = "--cert", description = "requestor certificate file\n"

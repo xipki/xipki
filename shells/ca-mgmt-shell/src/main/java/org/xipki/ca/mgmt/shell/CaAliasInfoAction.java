@@ -26,7 +26,6 @@ import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.mgmt.shell.completer.CaAliasCompleter;
 import org.xipki.shell.CmdFailure;
 
 /**
@@ -40,7 +39,7 @@ import org.xipki.shell.CmdFailure;
 public class CaAliasInfoAction extends CaAction {
 
   @Argument(index = 0, name = "alias", description = "CA alias")
-  @Completion(CaAliasCompleter.class)
+  @Completion(CaCompleters.CaAliasCompleter.class)
   private String caAlias;
 
   @Override

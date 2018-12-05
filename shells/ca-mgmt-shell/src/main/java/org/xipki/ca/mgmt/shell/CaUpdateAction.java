@@ -37,20 +37,14 @@ import org.xipki.ca.mgmt.api.CaMgmtException;
 import org.xipki.ca.mgmt.api.CaStatus;
 import org.xipki.ca.mgmt.api.ChangeCaEntry;
 import org.xipki.ca.mgmt.api.ValidityMode;
-import org.xipki.ca.mgmt.shell.completer.CaNameCompleter;
-import org.xipki.ca.mgmt.shell.completer.CaStatusCompleter;
-import org.xipki.ca.mgmt.shell.completer.PermissionCompleter;
-import org.xipki.ca.mgmt.shell.completer.SignerNamePlusNullCompleter;
-import org.xipki.ca.mgmt.shell.completer.SignerTypeCompleter;
-import org.xipki.ca.mgmt.shell.completer.ValidityModeCompleter;
 import org.xipki.password.PasswordResolver;
 import org.xipki.shell.CmdFailure;
+import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
-import org.xipki.shell.completer.YesNoCompleter;
+import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.IoUtil;
-import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -63,7 +57,7 @@ import org.xipki.util.Args;
 public class CaUpdateAction extends CaAction {
 
   @Option(name = "--name", aliases = "-n", required = true, description = "CA name")
-  @Completion(CaNameCompleter.class)
+  @Completion(CaCompleters.CaNameCompleter.class)
   private String caName;
 
   @Option(name = "--sn-bitlen",
@@ -71,7 +65,7 @@ public class CaUpdateAction extends CaAction {
   private Integer snBitLen;
 
   @Option(name = "--status", description = "CA status")
-  @Completion(CaStatusCompleter.class)
+  @Completion(CaCompleters.CaStatusCompleter.class)
   private String caStatus;
 
   @Option(name = "--ca-cert-uri", multiValued = true, description = "CA certificate URI")
@@ -89,7 +83,7 @@ public class CaUpdateAction extends CaAction {
   private List<String> deltaCrlUris;
 
   @Option(name = "--permission", multiValued = true, description = "permission")
-  @Completion(PermissionCompleter.class)
+  @Completion(CaCompleters.PermissionCompleter.class)
   private Set<String> permissions;
 
   @Option(name = "--max-validity", description = "maximal validity")
@@ -103,15 +97,15 @@ public class CaUpdateAction extends CaAction {
   private Integer keepExpiredCertInDays;
 
   @Option(name = "--crl-signer", description = "CRL signer name or 'null'")
-  @Completion(SignerNamePlusNullCompleter.class)
+  @Completion(CaCompleters.SignerNamePlusNullCompleter.class)
   private String crlSignerName;
 
   @Option(name = "--cmp-responder", description = "CMP responder name or 'null'")
-  @Completion(SignerNamePlusNullCompleter.class)
+  @Completion(CaCompleters.SignerNamePlusNullCompleter.class)
   private String cmpResponderName;
 
   @Option(name = "--scep-responder", description = "SCEP responder name or 'null'")
-  @Completion(SignerNamePlusNullCompleter.class)
+  @Completion(CaCompleters.SignerNamePlusNullCompleter.class)
   private String scepResponderName;
 
   @Option(name = "--cmp-control", description = "CMP control or 'null'")
@@ -131,38 +125,38 @@ public class CaUpdateAction extends CaAction {
   private String certFile;
 
   @Option(name = "--signer-type", description = "CA signer type")
-  @Completion(SignerTypeCompleter.class)
+  @Completion(CaCompleters.SignerTypeCompleter.class)
   private String signerType;
 
   @Option(name = "--signer-conf", description = "CA signer configuration or 'null'")
   private String signerConf;
 
   @Option(name = "--duplicate-key", description = "whether duplicate key is permitted")
-  @Completion(YesNoCompleter.class)
+  @Completion(Completers.YesNoCompleter.class)
   private String duplicateKeyS;
 
   @Option(name = "--duplicate-subject", description = "whether duplicate subject is permitted")
-  @Completion(YesNoCompleter.class)
+  @Completion(Completers.YesNoCompleter.class)
   private String duplicateSubjectS;
 
   @Option(name = "--support-cmp", description = "whether the CMP protocol is supported")
-  @Completion(YesNoCompleter.class)
+  @Completion(Completers.YesNoCompleter.class)
   private String supportCmpS;
 
   @Option(name = "--support-rest", description = "whether the REST protocol is supported")
-  @Completion(YesNoCompleter.class)
+  @Completion(Completers.YesNoCompleter.class)
   private String supportRestS;
 
   @Option(name = "--support-scep", description = "whether the SCEP protocol is supported")
-  @Completion(YesNoCompleter.class)
+  @Completion(Completers.YesNoCompleter.class)
   private String supportScepS;
 
   @Option(name = "--save-req", description = "whether the request is saved")
-  @Completion(YesNoCompleter.class)
+  @Completion(Completers.YesNoCompleter.class)
   private String saveReqS;
 
   @Option(name = "--validity-mode", description = "mode of valditity")
-  @Completion(ValidityModeCompleter.class)
+  @Completion(CaCompleters.ValidityModeCompleter.class)
   private String validityModeS;
 
   @Option(name = "--extra-control", description = "extra control")

@@ -24,8 +24,6 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.mgmt.api.CaMgmtException;
-import org.xipki.ca.mgmt.shell.completer.CaNameCompleter;
-import org.xipki.ca.mgmt.shell.completer.PublisherNamePlusAllCompleter;
 import org.xipki.shell.CmdFailure;
 
 /**
@@ -42,12 +40,12 @@ public class RepublishAction extends CaAction {
   private Integer numThreads = 5;
 
   @Option(name = "--ca", required = true, description = "CA name")
-  @Completion(CaNameCompleter.class)
+  @Completion(CaCompleters.CaNameCompleter.class)
   private String caName;
 
   @Option(name = "--publisher", required = true, multiValued = true,
       description = "publisher name or 'all' for all publishers")
-  @Completion(PublisherNamePlusAllCompleter.class)
+  @Completion(CaCompleters.PublisherNamePlusAllCompleter.class)
   private List<String> publisherNames;
 
   @Override

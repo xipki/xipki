@@ -43,11 +43,11 @@ import org.xipki.ca.mgmt.conf.SignerType;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.ConfPairs;
+import org.xipki.util.FileOrBinary;
+import org.xipki.util.FileOrValue;
+import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
-import org.xipki.util.conf.FileOrBinary;
-import org.xipki.util.conf.FileOrValue;
-import org.xipki.util.conf.InvalidConfException;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;

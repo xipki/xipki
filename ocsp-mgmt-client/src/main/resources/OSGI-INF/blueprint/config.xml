@@ -29,7 +29,7 @@
     </cm:default-properties>
   </cm:property-placeholder>
 
-  <bean id="sslContextConf" class="org.xipki.util.http.ssl.SslContextConf">
+  <bean id="sslContextConf" class="org.xipki.util.http.SslContextConf">
     <property name="useSslConf" value="${useSslConf}"/>
     <property name="sslStoreType" value="${sslStoreType}"/>
     <property name="sslKeystore" value="${sslKeystore}"/>

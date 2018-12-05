@@ -24,8 +24,6 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.mgmt.api.CaMgmtException;
-import org.xipki.ca.mgmt.shell.completer.CaNamePlusAllCompleter;
-import org.xipki.ca.mgmt.shell.completer.PublisherNamePlusAllCompleter;
 import org.xipki.shell.CmdFailure;
 
 /**
@@ -39,12 +37,12 @@ import org.xipki.shell.CmdFailure;
 public class ClearPublishQueueAction extends CaAction {
 
   @Option(name = "--ca", required = true, description = "CA name or 'all' for all CAs")
-  @Completion(CaNamePlusAllCompleter.class)
+  @Completion(CaCompleters.CaNamePlusAllCompleter.class)
   private String caName;
 
   @Option(name = "--publisher", required = true, multiValued = true,
       description = "publisher name or 'all' for all publishers")
-  @Completion(PublisherNamePlusAllCompleter.class)
+  @Completion(CaCompleters.PublisherNamePlusAllCompleter.class)
   private List<String> publisherNames;
 
   @Override

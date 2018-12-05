@@ -21,7 +21,6 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.mgmt.shell.completer.SignerTypeCompleter;
 
 /**
  * TODO.
@@ -33,7 +32,7 @@ import org.xipki.ca.mgmt.shell.completer.SignerTypeCompleter;
 public class RefreshTokenAction extends CaAction {
 
   @Option(name = "--type", required = true, description = "type of the signer")
-  @Completion(SignerTypeCompleter.class)
+  @Completion(CaCompleters.SignerTypeCompleter.class)
   protected String type;
 
   @Override

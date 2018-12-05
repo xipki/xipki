@@ -18,8 +18,8 @@
 package org.xipki.ca.certprofile.xijson.conf;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.util.conf.InvalidConfException;
-import org.xipki.util.conf.ValidatableConf;
+import org.xipki.util.InvalidConfException;
+import org.xipki.util.ValidatableConf;
 
 import com.alibaba.fastjson.annotation.JSONField;
 

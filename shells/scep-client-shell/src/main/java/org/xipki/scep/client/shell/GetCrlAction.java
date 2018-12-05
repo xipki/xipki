@@ -29,7 +29,7 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.scep.client.ScepClient;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
-import org.xipki.shell.completer.DerPemCompleter;
+import org.xipki.shell.Completers;
 
 /**
  * TODO.
@@ -47,7 +47,7 @@ public class GetCrlAction extends ClientAction {
   private String certFile;
 
   @Option(name = "--outform", description = "output format of the CRL")
-  @Completion(DerPemCompleter.class)
+  @Completion(Completers.DerPemCompleter.class)
   protected String outform = "der";
 
   @Option(name = "--out", aliases = "-o", required = true, description = "where to save the CRL")

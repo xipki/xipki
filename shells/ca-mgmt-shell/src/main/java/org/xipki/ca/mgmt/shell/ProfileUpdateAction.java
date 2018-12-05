@@ -23,8 +23,6 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.mgmt.api.CaMgmtException;
-import org.xipki.ca.mgmt.shell.completer.ProfileNameCompleter;
-import org.xipki.ca.mgmt.shell.completer.ProfileTypeCompleter;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.IoUtil;
@@ -40,11 +38,11 @@ import org.xipki.util.IoUtil;
 public class ProfileUpdateAction extends CaAction {
 
   @Option(name = "--name", aliases = "-n", required = true, description = "profile name")
-  @Completion(ProfileNameCompleter.class)
+  @Completion(CaCompleters.ProfileNameCompleter.class)
   protected String name;
 
   @Option(name = "--type", description = "profile type")
-  @Completion(ProfileTypeCompleter.class)
+  @Completion(CaCompleters.ProfileTypeCompleter.class)
   protected String type;
 
   @Option(name = "--conf", description = "certificate profile configuration or 'null'")

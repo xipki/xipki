@@ -23,7 +23,6 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.mgmt.api.CaMgmtException;
-import org.xipki.ca.mgmt.shell.completer.CaAliasCompleter;
 import org.xipki.shell.CmdFailure;
 
 /**
@@ -37,7 +36,7 @@ import org.xipki.shell.CmdFailure;
 public class CaAliasRemoveAction extends CaAction {
 
   @Argument(index = 0, name = "alias", description = "CA alias", required = true)
-  @Completion(CaAliasCompleter.class)
+  @Completion(CaCompleters.CaAliasCompleter.class)
   private String caAlias;
 
   @Option(name = "--force", aliases = "-f", description = "without prompt")

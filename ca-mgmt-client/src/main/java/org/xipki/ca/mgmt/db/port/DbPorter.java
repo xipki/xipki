@@ -29,9 +29,9 @@ import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
+import org.xipki.util.FileOrBinary;
+import org.xipki.util.FileOrValue;
 import org.xipki.util.IoUtil;
-import org.xipki.util.conf.FileOrBinary;
-import org.xipki.util.conf.FileOrValue;
 
 /**
  * TODO.

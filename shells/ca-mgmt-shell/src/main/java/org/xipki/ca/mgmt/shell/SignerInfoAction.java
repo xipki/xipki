@@ -28,7 +28,6 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.mgmt.api.SignerEntry;
-import org.xipki.ca.mgmt.shell.completer.SignerNameCompleter;
 import org.xipki.shell.CmdFailure;
 
 /**
@@ -42,7 +41,7 @@ import org.xipki.shell.CmdFailure;
 public class SignerInfoAction extends CaAction {
 
   @Argument(index = 0, name = "name", description = "signer name")
-  @Completion(SignerNameCompleter.class)
+  @Completion(CaCompleters.SignerNameCompleter.class)
   private String name;
 
   @Option(name = "--verbose", aliases = "-v", description = "show signer information verbosely")

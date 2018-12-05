@@ -46,8 +46,8 @@ import org.xipki.security.ExtensionExistence;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.util.X509Util;
+import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
-import org.xipki.shell.completer.ExtensionNameCompleter;
 import org.xipki.util.DateUtil;
 import org.xipki.util.ReqRespDebug;
 import org.xipki.util.StringUtil;
@@ -87,13 +87,13 @@ public abstract class UpdateAction extends ClientAction {
 
   @Option(name = "--need-extension", multiValued = true,
       description = "type (name or OID) of extension that must be contained in the certificate")
-  @Completion(ExtensionNameCompleter.class)
+  @Completion(Completers.ExtensionNameCompleter.class)
   private List<String> needExtensionTypes;
 
   @Option(name = "--want-extension", multiValued = true,
       description = "type (name or OID) of extension that should be contained in the"
           + " certificate if possible")
-  @Completion(ExtensionNameCompleter.class)
+  @Completion(Completers.ExtensionNameCompleter.class)
   private List<String> wantExtensionTypes;
 
   protected abstract SubjectPublicKeyInfo getPublicKey() throws Exception;

@@ -17,10 +17,10 @@
 
 package org.xipki.ca.mgmt.db.message;
 
-import org.xipki.util.conf.FileOrBinary;
-import org.xipki.util.conf.FileOrValue;
-import org.xipki.util.conf.InvalidConfException;
-import org.xipki.util.conf.ValidatableConf;
+import org.xipki.util.FileOrBinary;
+import org.xipki.util.FileOrValue;
+import org.xipki.util.InvalidConfException;
+import org.xipki.util.ValidatableConf;
 
 /**
  * TODO.

@@ -69,8 +69,8 @@ import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
+import org.xipki.util.InvalidConfException;
 import org.xipki.util.ObjectCreationException;
-import org.xipki.util.conf.InvalidConfException;
 import org.xipki.util.Args;
 
 /**

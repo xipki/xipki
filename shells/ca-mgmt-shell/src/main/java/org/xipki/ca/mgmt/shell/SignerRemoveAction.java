@@ -23,7 +23,6 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.mgmt.api.CaMgmtException;
-import org.xipki.ca.mgmt.shell.completer.SignerNameCompleter;
 import org.xipki.shell.CmdFailure;
 
 /**
@@ -37,7 +36,7 @@ import org.xipki.shell.CmdFailure;
 public class SignerRemoveAction extends CaAction {
 
   @Argument(index = 0, name = "name", required = true, description = "signer name")
-  @Completion(SignerNameCompleter.class)
+  @Completion(CaCompleters.SignerNameCompleter.class)
   private String name;
 
   @Option(name = "--force", aliases = "-f", description = "without prompt")

@@ -96,13 +96,13 @@ import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.CompareUtil;
 import org.xipki.util.HealthCheckResult;
+import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
 import org.xipki.util.ReqRespDebug;
-import org.xipki.util.conf.InvalidConfException;
-import org.xipki.util.http.ssl.SSLContextBuilder;
-import org.xipki.util.http.ssl.SslUtil;
+import org.xipki.util.http.HostnameVerifiers;
+import org.xipki.util.http.SSLContextBuilder;
 
 import com.alibaba.fastjson.JSON;
 
@@ -304,7 +304,7 @@ public final class CmpClientImpl implements CmpClient {
 
           SSLSocketFactory socketFactory = builder.build().getSocketFactory();
           HostnameVerifier hostnameVerifier =
-              SslUtil.createHostnameVerifier(ssl.getHostnameVerifier());
+              HostnameVerifiers.createHostnameVerifier(ssl.getHostnameVerifier());
           sslConfs.put(ssl.getName(), new SslConf(socketFactory, hostnameVerifier));
         } catch (IOException | UnrecoverableKeyException | NoSuchAlgorithmException
             | KeyStoreException | CertificateException | KeyManagementException

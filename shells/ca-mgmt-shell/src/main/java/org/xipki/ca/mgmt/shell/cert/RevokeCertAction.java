@@ -27,9 +27,9 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.mgmt.api.CaMgmtException;
 import org.xipki.security.CrlReason;
 import org.xipki.shell.CmdFailure;
-import org.xipki.shell.completer.ClientCrlReasonCompleter;
+import org.xipki.shell.Completers;
 import org.xipki.util.DateUtil;
-import org.xipki.util.conf.InvalidConfException;
+import org.xipki.util.InvalidConfException;
 
 /**
  * TODO.
@@ -42,7 +42,7 @@ import org.xipki.util.conf.InvalidConfException;
 public class RevokeCertAction extends UnRevRmCertAction {
 
   @Option(name = "--reason", aliases = "-r", required = true, description = "CRL reason")
-  @Completion(ClientCrlReasonCompleter.class)
+  @Completion(Completers.ClientCrlReasonCompleter.class)
   private String reason;
 
   @Option(name = "--inv-date", description = "invalidity date, UTC time of format yyyyMMddHHmmss")

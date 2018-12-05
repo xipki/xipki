@@ -24,8 +24,6 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.mgmt.api.CaMgmtException;
-import org.xipki.ca.mgmt.shell.completer.CaNameCompleter;
-import org.xipki.ca.mgmt.shell.completer.RequestorNameCompleter;
 import org.xipki.shell.CmdFailure;
 
 /**
@@ -39,11 +37,11 @@ import org.xipki.shell.CmdFailure;
 public class CaRequestorRemoveAction extends CaAction {
 
   @Option(name = "--ca", required = true, description = "CA name")
-  @Completion(CaNameCompleter.class)
+  @Completion(CaCompleters.CaNameCompleter.class)
   private String caName;
 
   @Option(name = "--requestor", required = true, multiValued = true, description = "requestor name")
-  @Completion(RequestorNameCompleter.class)
+  @Completion(CaCompleters.RequestorNameCompleter.class)
   private List<String> requestorNames;
 
   @Option(name = "--force", aliases = "-f", description = "without prompt")

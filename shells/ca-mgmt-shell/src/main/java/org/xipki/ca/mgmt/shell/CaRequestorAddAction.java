@@ -26,12 +26,8 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.mgmt.api.CaHasRequestorEntry;
 import org.xipki.ca.mgmt.api.CaMgmtException;
-import org.xipki.ca.mgmt.shell.completer.CaNameCompleter;
-import org.xipki.ca.mgmt.shell.completer.PermissionCompleter;
-import org.xipki.ca.mgmt.shell.completer.ProfileNameAndAllCompleter;
-import org.xipki.ca.mgmt.shell.completer.RequestorNameCompleter;
 import org.xipki.shell.CmdFailure;
-import org.xipki.shell.completer.YesNoCompleter;
+import org.xipki.shell.Completers;
 
 /**
  * TODO.
@@ -44,24 +40,24 @@ import org.xipki.shell.completer.YesNoCompleter;
 public class CaRequestorAddAction extends CaAction {
 
   @Option(name = "--ca", required = true, description = "CA name")
-  @Completion(CaNameCompleter.class)
+  @Completion(CaCompleters.CaNameCompleter.class)
   private String caName;
 
   @Option(name = "--requestor", required = true, description = "requestor name")
-  @Completion(RequestorNameCompleter.class)
+  @Completion(CaCompleters.RequestorNameCompleter.class)
   private String requestorName;
 
   @Option(name = "--ra", description = "whether as RA")
-  @Completion(YesNoCompleter.class)
+  @Completion(Completers.YesNoCompleter.class)
   private String raS = "no";
 
   @Option(name = "--permission", required = true, multiValued = true, description = "permission")
-  @Completion(PermissionCompleter.class)
+  @Completion(CaCompleters.PermissionCompleter.class)
   private Set<String> permissions;
 
   @Option(name = "--profile", multiValued = true,
       description = "profile name or 'all' for all profiles")
-  @Completion(ProfileNameAndAllCompleter.class)
+  @Completion(CaCompleters.ProfileNameAndAllCompleter.class)
   private Set<String> profiles;
 
   @Override

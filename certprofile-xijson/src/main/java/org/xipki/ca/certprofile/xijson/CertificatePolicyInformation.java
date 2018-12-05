@@ -19,8 +19,8 @@ package org.xipki.ca.certprofile.xijson;
 
 import java.util.List;
 
-import org.xipki.util.CollectionUtil;
 import org.xipki.util.Args;
+import org.xipki.util.CollectionUtil;
 
 /**
  * TODO.

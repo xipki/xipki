@@ -29,7 +29,7 @@ import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.security.shell.SecurityAction;
-import org.xipki.security.shell.completer.P11ModuleNameCompleter;
+import org.xipki.security.shell.SecurityCompleters;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.Hex;
 
@@ -48,7 +48,7 @@ public abstract class P11SecurityAction extends SecurityAction {
   protected Integer slotIndex;
 
   @Option(name = "--module", description = "name of the PKCS#11 module")
-  @Completion(P11ModuleNameCompleter.class)
+  @Completion(SecurityCompleters.P11ModuleNameCompleter.class)
   protected String moduleName = DEFAULT_P11MODULE_NAME;
 
   @Reference (optional = true)

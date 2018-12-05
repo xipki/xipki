@@ -26,8 +26,8 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.shell.CmdFailure;
+import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
-import org.xipki.shell.completer.DerPemCompleter;
 
 /**
  * TODO.
@@ -44,7 +44,7 @@ public class GetCaCertAction extends ClientAction {
   private String caName;
 
   @Option(name = "--outform", description = "output format of the certificate")
-  @Completion(DerPemCompleter.class)
+  @Completion(Completers.DerPemCompleter.class)
   private String outform = "der";
 
   @Option(name = "--out", aliases = "-o", required = true,

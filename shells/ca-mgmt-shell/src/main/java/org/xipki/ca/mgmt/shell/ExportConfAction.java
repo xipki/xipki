@@ -27,7 +27,6 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.mgmt.api.CaMgmtException;
-import org.xipki.ca.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.shell.CmdFailure;
 import org.xipki.util.IoUtil;
 
@@ -48,7 +47,7 @@ public class ExportConfAction extends CaAction {
 
   @Option(name = "--ca", multiValued = true,
       description = "CAs whose configuration should be exported. Empty list means all CAs")
-  @Completion(CaNameCompleter.class)
+  @Completion(CaCompleters.CaNameCompleter.class)
   private List<String> caNames;
 
   @Override

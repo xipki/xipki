@@ -34,7 +34,7 @@ import org.xipki.ca.mgmt.api.ValidityMode;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.ConfPairs;
-import org.xipki.util.conf.InvalidConfException;
+import org.xipki.util.InvalidConfException;
 
 /**
  * TODO.

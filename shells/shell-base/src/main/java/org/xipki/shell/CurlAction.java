@@ -29,10 +29,10 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
+import org.xipki.util.Curl;
+import org.xipki.util.Curl.CurlResult;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
-import org.xipki.util.http.curl.Curl;
-import org.xipki.util.http.curl.CurlResult;
 
 /**
  * TODO.

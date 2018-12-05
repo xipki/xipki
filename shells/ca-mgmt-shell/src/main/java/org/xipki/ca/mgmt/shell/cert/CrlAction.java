@@ -23,9 +23,9 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.xipki.ca.mgmt.api.CaEntry;
 import org.xipki.ca.mgmt.shell.CaAction;
-import org.xipki.ca.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.ca.mgmt.shell.CaCompleters;
 import org.xipki.shell.CmdFailure;
-import org.xipki.shell.completer.DerPemCompleter;
+import org.xipki.shell.Completers;
 
 /**
  * TODO.
@@ -36,11 +36,11 @@ import org.xipki.shell.completer.DerPemCompleter;
 public abstract class CrlAction extends CaAction {
 
   @Option(name = "--ca", required = true, description = "CA name")
-  @Completion(CaNameCompleter.class)
+  @Completion(CaCompleters.CaNameCompleter.class)
   protected String caName;
 
   @Option(name = "--outform", description = "output format of the CRL")
-  @Completion(DerPemCompleter.class)
+  @Completion(Completers.DerPemCompleter.class)
   protected String outform = "der";
 
   protected abstract X509CRL retrieveCrl() throws Exception;

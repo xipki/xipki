@@ -45,8 +45,8 @@ import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.IoUtil;
 import org.xipki.util.Args;
+import org.xipki.util.InvalidConfException;
 import org.xipki.util.TripleState;
-import org.xipki.util.conf.InvalidConfException;
 
 /**
  * TODO.

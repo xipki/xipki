@@ -28,8 +28,6 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.mgmt.api.CaMgmtException;
-import org.xipki.ca.mgmt.shell.completer.CaCrlReasonCompleter;
-import org.xipki.ca.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.shell.CmdFailure;
@@ -53,11 +51,11 @@ public class CaRevokeAction extends CaAction {
         CrlReason.CERTIFICATE_HOLD, CrlReason.PRIVILEGE_WITHDRAWN}));
 
   @Argument(index = 0, name = "name", description = "CA name", required = true)
-  @Completion(CaNameCompleter.class)
+  @Completion(CaCompleters.CaNameCompleter.class)
   private String caName;
 
   @Option(name = "--reason", required = true, description = "CRL reason")
-  @Completion(CaCrlReasonCompleter.class)
+  @Completion(CaCompleters.CaCrlReasonCompleter.class)
   private String reason;
 
   @Option(name = "--rev-date", valueToShowInHelp = "current time",

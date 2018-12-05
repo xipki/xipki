@@ -28,7 +28,6 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.mgmt.api.RequestorEntry;
-import org.xipki.ca.mgmt.shell.completer.RequestorNameCompleter;
 import org.xipki.shell.CmdFailure;
 
 /**
@@ -42,7 +41,7 @@ import org.xipki.shell.CmdFailure;
 public class RequestorInfoAction extends CaAction {
 
   @Argument(index = 0, name = "name", description = "requestor name")
-  @Completion(RequestorNameCompleter.class)
+  @Completion(CaCompleters.RequestorNameCompleter.class)
   private String name;
 
   @Option(name = "--verbose", aliases = "-v", description = "show requestor information verbosely")

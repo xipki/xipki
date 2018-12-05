@@ -35,7 +35,7 @@ import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.shell.CmdFailure;
-import org.xipki.shell.completer.DerPemCompleter;
+import org.xipki.shell.Completers;
 import org.xipki.util.ObjectCreationException;
 
 /**
@@ -50,7 +50,7 @@ public abstract class UpdateCertAction extends UpdateAction {
   protected String hashAlgo = "SHA256";
 
   @Option(name = "--outform", description = "output format of the certificate")
-  @Completion(DerPemCompleter.class)
+  @Completion(Completers.DerPemCompleter.class)
   private String outform = "der";
 
   @Option(name = "--out", aliases = "-o", required = true,
