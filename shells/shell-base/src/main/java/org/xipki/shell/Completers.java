@@ -36,7 +36,7 @@ import org.xipki.password.PasswordProducer;
 public class Completers {
 
   @Service
-  public static class ClientCrlReasonCompleter extends AbstractEnumCompleter {
+  public static class ClientCrlReasonCompleter extends EnumCompleter {
 
     public ClientCrlReasonCompleter() {
       setTokens("unspecified", "keyCompromise", "affiliationChanged", "superseded",
@@ -46,7 +46,7 @@ public class Completers {
   }
 
   @Service
-  public static class DerPemCompleter extends AbstractEnumCompleter {
+  public static class DerPemCompleter extends EnumCompleter {
 
     public DerPemCompleter() {
       setTokens("pem", "der");
@@ -66,7 +66,7 @@ public class Completers {
 
   @Service
   //CHECKSTYLE:SKIP
-  public static class ECCurveNameCompleter extends AbstractEnumCompleter {
+  public static class ECCurveNameCompleter extends EnumCompleter {
 
     public ECCurveNameCompleter() {
       setTokens("b-163", "b-233", "b-283", "b-409", "b-571",
@@ -90,7 +90,7 @@ public class Completers {
   }
 
   @Service
-  public static class ExtensionNameCompleter extends AbstractEnumCompleter {
+  public static class ExtensionNameCompleter extends EnumCompleter {
 
     private static final Map<String, String> nameToIdMap = new HashMap<>();
 
@@ -150,7 +150,7 @@ public class Completers {
   }
 
   @Service
-  public static class ExtKeyusageCompleter extends AbstractEnumCompleter {
+  public static class ExtKeyusageCompleter extends EnumCompleter {
 
     private static final Map<String, String> nameToIdMap = new HashMap<>();
 
@@ -185,7 +185,7 @@ public class Completers {
   }
 
   @Service
-  public static class HashAlgCompleter extends AbstractEnumCompleter {
+  public static class HashAlgCompleter extends EnumCompleter {
 
     public HashAlgCompleter() {
       setTokens("SHA1", "SHA224", "SHA256", "SHA384", "SHA512",
@@ -195,7 +195,7 @@ public class Completers {
   }
 
   @Service
-  public static class KeyusageCompleter extends AbstractEnumCompleter {
+  public static class KeyusageCompleter extends EnumCompleter {
 
     public KeyusageCompleter() {
       setTokens("digitalSignature", "contentCommitment", "keyEncipherment", "dataEncipherment",
@@ -205,8 +205,7 @@ public class Completers {
   }
 
   @Service
-  //CHECKSTYLE:SKIP
-  public static class PasswordNameCompleter extends AbstractDynamicEnumCompleter {
+  public static class PasswordNameCompleter extends DynamicEnumCompleter {
 
     @Override
     protected Set<String> getEnums() {
@@ -216,7 +215,7 @@ public class Completers {
   }
 
   @Service
-  public static class SigAlgCompleter extends AbstractEnumCompleter {
+  public static class SigAlgCompleter extends EnumCompleter {
 
     public SigAlgCompleter() {
       String[] encAlgs = {"RSA", "RSAandMGF1", "ECDSA", "DSA"};
@@ -242,7 +241,7 @@ public class Completers {
   }
 
   @Service
-  public static class SignerTypeCompleter extends AbstractEnumCompleter {
+  public static class SignerTypeCompleter extends EnumCompleter {
 
     public SignerTypeCompleter() {
       setTokens("JKS", "PKCS11", "PKCS12");
@@ -251,7 +250,7 @@ public class Completers {
   }
 
   @Service
-  public static class YesNoCompleter extends AbstractEnumCompleter {
+  public static class YesNoCompleter extends EnumCompleter {
 
     public YesNoCompleter() {
       setTokens("yes", "no");

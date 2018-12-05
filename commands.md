@@ -45,7 +45,7 @@ Basic Commands
 Database Commands
 -----
 
-   * `ca:diff-digest-db`
+   * `ca:diff-digest`
 
      diff digest XiPKI databases
 

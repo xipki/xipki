@@ -88,7 +88,6 @@ public class PbmMacCmpCaClientExample extends CaClientExample {
       X509Certificate caCert = SdkUtil.parseCert(encodedCaCert);
       // CHECKSTYLE:SKIP
       X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
-
       X509Certificate responderCert = SdkUtil.parseCert(new File(expandPath(RESPONDER_CERT_FILE)));
 
       X500Name requestorSubject = new X500Name("CN=PBMMAC");

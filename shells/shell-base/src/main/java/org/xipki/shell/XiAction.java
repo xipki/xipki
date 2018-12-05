@@ -291,19 +291,19 @@ public abstract class XiAction implements Action {
     return new BigInteger(tmpStr, defaultHex ? 16 : 10);
   }
 
-  protected byte[] encodeCert(byte[] data, String encodeForm) {
+  protected static byte[] encodeCert(byte[] data, String encodeForm) {
     return derPemEncode(data, encodeForm, PemLabel.CERTIFICATE);
   }
 
-  protected byte[] encodeCrl(byte[] data, String encodeForm) {
+  protected static byte[] encodeCrl(byte[] data, String encodeForm) {
     return derPemEncode(data, encodeForm, PemLabel.X509_CRL);
   }
 
-  protected byte[] encodeCsr(byte[] data, String encodeForm) {
+  protected static byte[] encodeCsr(byte[] data, String encodeForm) {
     return derPemEncode(data, encodeForm, PemLabel.CERTIFICATE_REQUEST);
   }
 
-  protected byte[] derPemEncode(byte[] data, String encodeForm, PemLabel pemLabel) {
+  protected static byte[] derPemEncode(byte[] data, String encodeForm, PemLabel pemLabel) {
     return "pem".equalsIgnoreCase(encodeForm) ? PemEncoder.encode(data, pemLabel) : data;
   }
 

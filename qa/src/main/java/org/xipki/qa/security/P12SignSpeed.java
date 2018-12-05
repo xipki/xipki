@@ -30,6 +30,9 @@ import org.slf4j.LoggerFactory;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
+import org.xipki.security.pkcs12.KeystoreGenerationParameters;
+import org.xipki.security.pkcs12.P12KeyGenerationResult;
+import org.xipki.security.pkcs12.P12KeyGenerator;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
@@ -44,6 +47,174 @@ import org.xipki.util.IoUtil;
  */
 
 public abstract class P12SignSpeed extends BenchmarkExecutor {
+
+  // CHECKSTYLE:SKIP
+  public static class AESGmac extends P12SignSpeed {
+
+    public AESGmac(SecurityFactory securityFactory, String signatureAlgorithm,
+        int threads) throws Exception {
+      super("JCEKS", securityFactory, signatureAlgorithm, generateKeystore(signatureAlgorithm),
+          "JCEKS AES-GMAC signature creation", threads);
+    }
+
+    private static byte[] generateKeystore(String signatureAlgorithm) throws Exception {
+      int keysize = getKeysize(signatureAlgorithm);
+      P12KeyGenerationResult identity = new P12KeyGenerator().generateSecretKey(
+          "AES", keysize, new KeystoreGenerationParameters(PASSWORD.toCharArray()));
+      return identity.keystore();
+    }
+
+    public static int getKeysize(String hmacAlgorithm) {
+      hmacAlgorithm = hmacAlgorithm.toUpperCase();
+      int keysize;
+      if ("AES128-GMAC".equals(hmacAlgorithm)) {
+        keysize = 128;
+      } else if ("AES192-GMAC".equals(hmacAlgorithm)) {
+        keysize = 192;
+      } else if ("AES256-GMAC".equals(hmacAlgorithm)) {
+        keysize = 256;
+      } else {
+        throw new IllegalArgumentException("unknown GMAC algorithm " + hmacAlgorithm);
+      }
+      return keysize;
+    }
+
+  }
+
+  // CHECKSTYLE:SKIP
+  public static class DSA extends P12SignSpeed {
+
+    public DSA(SecurityFactory securityFactory, String signatureAlgorithm, int threads,
+        int plength, int qlength) throws Exception {
+      super(securityFactory, signatureAlgorithm,
+          generateKeystore(plength, qlength), "PKCS#12 DSA signature creation\nplength: " + plength
+              + "\nqlength: " + qlength, threads);
+    }
+
+    private static byte[] generateKeystore(int plength, int qlength) throws Exception {
+      byte[] keystoreBytes = getPrecomputedDSAKeystore(plength, qlength);
+      if (keystoreBytes == null) {
+        KeystoreGenerationParameters params = new KeystoreGenerationParameters(
+            PASSWORD.toCharArray());
+        params.setRandom(new SecureRandom());
+        P12KeyGenerationResult identity = new P12KeyGenerator().generateDSAKeypair(
+            plength, qlength, params, null);
+        keystoreBytes = identity.keystore();
+      }
+      return keystoreBytes;
+    }
+
+  }
+
+  // CHECKSTYLE:SKIP
+  public static class EC extends P12SignSpeed {
+
+    public EC(SecurityFactory securityFactory, String signatureAlgorithm, int threads,
+        String curveNameOrOid) throws Exception {
+      super(securityFactory, signatureAlgorithm, generateKeystore(curveNameOrOid),
+          "PKCS#12 EC signature creation\ncurve: " + curveNameOrOid, threads);
+    }
+
+    private static byte[] generateKeystore(String curveNameOrOid) throws Exception {
+      byte[] keystoreBytes = getPrecomputedECKeystore(curveNameOrOid);
+      if (keystoreBytes == null) {
+        KeystoreGenerationParameters params = new KeystoreGenerationParameters(
+            PASSWORD.toCharArray());
+        params.setRandom(new SecureRandom());
+        P12KeyGenerationResult identity = new P12KeyGenerator().generateECKeypair(
+            curveNameOrOid, params, null);
+        keystoreBytes = identity.keystore();
+      }
+      return keystoreBytes;
+    }
+
+  }
+
+  // CHECKSTYLE:SKIP
+  public static class HMAC extends P12SignSpeed {
+
+    public HMAC(SecurityFactory securityFactory, String signatureAlgorithm, int threads)
+        throws Exception {
+      super("JCEKS", securityFactory, signatureAlgorithm, generateKeystore(signatureAlgorithm),
+          "JCEKS HMAC signature creation", threads);
+    }
+
+    private static byte[] generateKeystore(String signatureAlgorithm) throws Exception {
+      int keysize = getKeysize(signatureAlgorithm);
+      P12KeyGenerationResult identity = new P12KeyGenerator().generateSecretKey(
+          "GENERIC", keysize, new KeystoreGenerationParameters(PASSWORD.toCharArray()));
+      return identity.keystore();
+    }
+
+    private static int getKeysize(String hmacAlgorithm) {
+      hmacAlgorithm = hmacAlgorithm.toUpperCase();
+      int keysize;
+      if ("HMACSHA1".equals(hmacAlgorithm)) {
+        keysize = 160;
+      } else if ("HMACSHA224".equals(hmacAlgorithm) || "HMACSHA3-224".equals(hmacAlgorithm)) {
+        keysize = 224;
+      } else if ("HMACSHA256".equals(hmacAlgorithm) || "HMACSHA3-256".equals(hmacAlgorithm)) {
+        keysize = 256;
+      } else if ("HMACSHA384".equals(hmacAlgorithm) || "HMACSHA3-384".equals(hmacAlgorithm)) {
+        keysize = 384;
+      } else if ("HMACSHA512".equals(hmacAlgorithm) || "HMACSHA3-512".equals(hmacAlgorithm)) {
+        keysize = 512;
+      } else {
+        throw new IllegalArgumentException("unknown HMAC algorithm " + hmacAlgorithm);
+      }
+      return keysize;
+    }
+
+  }
+
+  // CHECKSTYLE:SKIP
+  public static class RSA extends P12SignSpeed {
+
+    public RSA(SecurityFactory securityFactory, String signatureAlgorithm, int threads,
+        int keysize, BigInteger publicExponent) throws Exception {
+      super(securityFactory, signatureAlgorithm, generateKeystore(keysize, publicExponent),
+          "PKCS#12 RSA signature creation\nkeysize: " + keysize
+              + "\npublic exponent: " + publicExponent, threads);
+    }
+
+    private static byte[] generateKeystore(int keysize, BigInteger publicExponent)
+        throws Exception {
+      byte[] keystoreBytes = getPrecomputedRSAKeystore(keysize, publicExponent);
+      if (keystoreBytes == null) {
+        KeystoreGenerationParameters params = new KeystoreGenerationParameters(
+            PASSWORD.toCharArray());
+        params.setRandom(new SecureRandom());
+        P12KeyGenerationResult identity = new P12KeyGenerator().generateRSAKeypair(
+            keysize, publicExponent, params, null);
+        keystoreBytes = identity.keystore();
+      }
+      return keystoreBytes;
+    }
+
+  }
+
+  // CHECKSTYLE:SKIP
+  public static class SM2 extends P12SignSpeed {
+
+    public SM2(SecurityFactory securityFactory, int threads) throws Exception {
+      super(securityFactory, "SM3WITHSM2", generateKeystore("sm2p256v1"),
+          "PKCS#12 SM2 signature creation", threads);
+    }
+
+    private static byte[] generateKeystore(String curveNameOrOid) throws Exception {
+      byte[] keystoreBytes = getPrecomputedECKeystore(curveNameOrOid);
+      if (keystoreBytes == null) {
+        KeystoreGenerationParameters params = new KeystoreGenerationParameters(
+            PASSWORD.toCharArray());
+        params.setRandom(new SecureRandom());
+        P12KeyGenerationResult identity = new P12KeyGenerator().generateECKeypair(
+            curveNameOrOid, params, null);
+        keystoreBytes = identity.keystore();
+      }
+      return keystoreBytes;
+    }
+
+  }
 
   class Testor implements Runnable {
 
@@ -125,7 +296,7 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
   }
 
   private static byte[] getPrecomputedKeystore(String filename) throws IOException {
-    InputStream in = P12ECSignSpeed.class.getResourceAsStream("/testkeys/" + filename);
+    InputStream in = P12SignSpeed.class.getResourceAsStream("/testkeys/" + filename);
     return (in == null) ? null : IoUtil.read(in);
   }
 

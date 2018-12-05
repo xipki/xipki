@@ -26,8 +26,8 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.security.pkcs11.P11NewKeyControl.KeyUsage;
-import org.xipki.shell.AbstractDynamicEnumCompleter;
-import org.xipki.shell.AbstractEnumCompleter;
+import org.xipki.shell.DynamicEnumCompleter;
+import org.xipki.shell.EnumCompleter;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.CollectionUtil;
 
@@ -38,7 +38,7 @@ import org.xipki.util.CollectionUtil;
 public class SecurityCompleters {
 
   @Service
-  public static class KeystoreTypeCompleter extends AbstractEnumCompleter {
+  public static class KeystoreTypeCompleter extends EnumCompleter {
 
     public KeystoreTypeCompleter() {
       setTokens("PKCS12", "JKS", "JCEKS");
@@ -46,7 +46,7 @@ public class SecurityCompleters {
   }
 
   @Service
-  public static class P11KeyUsageCompleter extends AbstractEnumCompleter {
+  public static class P11KeyUsageCompleter extends EnumCompleter {
 
     public P11KeyUsageCompleter() {
       Set<String> names = new HashSet<>();
@@ -72,7 +72,7 @@ public class SecurityCompleters {
   }
 
   @Service
-  public static class P11ModuleNameCompleter extends AbstractDynamicEnumCompleter {
+  public static class P11ModuleNameCompleter extends DynamicEnumCompleter {
 
     @Reference (optional = true)
     private P11CryptServiceFactory p11CryptServiceFactory;
@@ -89,7 +89,7 @@ public class SecurityCompleters {
   }
 
   @Service
-  public static class SecretKeyTypeCompleter extends AbstractEnumCompleter {
+  public static class SecretKeyTypeCompleter extends EnumCompleter {
 
     public SecretKeyTypeCompleter() {
       setTokens("DES3", "AES", "GENERIC");

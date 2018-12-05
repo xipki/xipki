@@ -37,7 +37,6 @@ import org.xipki.util.Args;
 
 public class KeypairGenControl {
 
-  // CHECKSTYLE:SKIP
   public static class ForbiddenKeypairGenControl extends KeypairGenControl {
     public static final ForbiddenKeypairGenControl INSTANCE = new ForbiddenKeypairGenControl();
 

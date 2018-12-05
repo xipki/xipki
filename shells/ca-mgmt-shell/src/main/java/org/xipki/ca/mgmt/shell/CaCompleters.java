@@ -33,8 +33,8 @@ import org.xipki.ca.mgmt.api.CertListOrderBy;
 import org.xipki.ca.mgmt.api.RequestorInfo;
 import org.xipki.ca.mgmt.api.ValidityMode;
 import org.xipki.security.CrlReason;
-import org.xipki.shell.AbstractDynamicEnumCompleter;
-import org.xipki.shell.AbstractEnumCompleter;
+import org.xipki.shell.DynamicEnumCompleter;
+import org.xipki.shell.EnumCompleter;
 
 /**
  * TODO.
@@ -42,7 +42,7 @@ import org.xipki.shell.AbstractEnumCompleter;
  */
 public class CaCompleters {
 
-  public abstract static class CaMgmtCompleter extends AbstractDynamicEnumCompleter {
+  public abstract static class CaMgmtCompleter extends DynamicEnumCompleter {
 
     @Reference
     protected CaManager caManager;
@@ -64,11 +64,11 @@ public class CaCompleters {
   }
 
   @Service
-  public static class CaCrlReasonCompleter extends AbstractEnumCompleter {
+  public static class CaCrlReasonCompleter extends EnumCompleter {
 
     public CaCrlReasonCompleter() {
       List<String> enums = new LinkedList<>();
-      for (CrlReason reason : CaRevokeAction.PERMITTED_REASONS) {
+      for (CrlReason reason : CaActions.CaRevoke.PERMITTED_REASONS) {
         enums.add(reason.getDescription());
       }
       setTokens(enums);
@@ -108,7 +108,7 @@ public class CaCompleters {
   }
 
   @Service
-  public static class CaStatusCompleter extends AbstractEnumCompleter {
+  public static class CaStatusCompleter extends EnumCompleter {
 
     public CaStatusCompleter() {
       setTokens("active", "inactive");
@@ -117,7 +117,7 @@ public class CaCompleters {
   }
 
   @Service
-  public static class CertListSortByCompleter extends AbstractEnumCompleter {
+  public static class CertListSortByCompleter extends EnumCompleter {
 
     public CertListSortByCompleter() {
       List<String> enums = new LinkedList<>();
@@ -130,7 +130,7 @@ public class CaCompleters {
   }
 
   @Service
-  public static class PermissionCompleter extends AbstractEnumCompleter {
+  public static class PermissionCompleter extends EnumCompleter {
 
     public PermissionCompleter() {
       setTokens("enroll_cert", "revoke_cert", "unrevoke_cert", "remove_cert",
@@ -323,7 +323,7 @@ public class CaCompleters {
   }
 
   @Service
-  public static class ValidityModeCompleter extends AbstractEnumCompleter {
+  public static class ValidityModeCompleter extends EnumCompleter {
 
     public ValidityModeCompleter() {
       List<String> enums = new LinkedList<>();

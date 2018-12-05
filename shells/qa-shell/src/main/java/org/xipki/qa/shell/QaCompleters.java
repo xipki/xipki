@@ -17,6 +17,7 @@
 
 package org.xipki.qa.shell;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -26,8 +27,10 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.qa.ca.CaQaSystemManager;
 import org.xipki.qa.ocsp.OcspCertStatus;
 import org.xipki.qa.ocsp.OcspError;
-import org.xipki.shell.AbstractDynamicEnumCompleter;
-import org.xipki.shell.AbstractEnumCompleter;
+import org.xipki.security.pkcs11.P11CryptServiceFactory;
+import org.xipki.shell.DynamicEnumCompleter;
+import org.xipki.shell.EnumCompleter;
+import org.xipki.util.CollectionUtil;
 import org.xipki.util.TripleState;
 
 /**
@@ -38,7 +41,7 @@ import org.xipki.util.TripleState;
 public class QaCompleters {
 
   @Service
-  public static class CertprofileNameCompleter extends AbstractDynamicEnumCompleter {
+  public static class CertprofileNameCompleter extends DynamicEnumCompleter {
 
     @Reference
     private CaQaSystemManager qaSystemManager;
@@ -50,7 +53,7 @@ public class QaCompleters {
 
   }
 
-  public static class CertStatusCompleter extends AbstractEnumCompleter {
+  public static class CertStatusCompleter extends EnumCompleter {
 
     public CertStatusCompleter() {
       List<String> enums = new LinkedList<>();
@@ -64,7 +67,7 @@ public class QaCompleters {
 
   @Service
   //CHECKSTYLE:SKIP
-  public static class DSASigAlgCompleter extends AbstractEnumCompleter {
+  public static class DSASigAlgCompleter extends EnumCompleter {
 
     public DSASigAlgCompleter() {
       String[] hashAlgs = {"SHA1", "SHA224", "SHA256", "SHA384", "SHA512",
@@ -80,7 +83,7 @@ public class QaCompleters {
 
   @Service
   //CHECKSTYLE:SKIP
-  public static class ECDSASigAlgCompleter extends AbstractEnumCompleter {
+  public static class ECDSASigAlgCompleter extends EnumCompleter {
 
     public ECDSASigAlgCompleter() {
       String[] hashAlgs = {"SHA1", "SHA224", "SHA256", "SHA384", "SHA512",
@@ -100,7 +103,7 @@ public class QaCompleters {
 
   @Service
   //CHECKSTYLE:SKIP
-  public static class GMACSigAlgCompleter extends AbstractEnumCompleter {
+  public static class GMACSigAlgCompleter extends EnumCompleter {
 
     public GMACSigAlgCompleter() {
       setTokens("AES128-GMAC", "AES192-GMAC", "AES256-GMAC");
@@ -109,7 +112,7 @@ public class QaCompleters {
   }
 
   @Service
-  public static class IssuerNameCompleter extends AbstractDynamicEnumCompleter {
+  public static class IssuerNameCompleter extends DynamicEnumCompleter {
 
     @Reference
     private CaQaSystemManager qaSystemManager;
@@ -123,7 +126,7 @@ public class QaCompleters {
 
   @Service
   //CHECKSTYLE:SKIP
-  public static class HMACSigAlgCompleter extends AbstractEnumCompleter {
+  public static class HMACSigAlgCompleter extends EnumCompleter {
 
     public HMACSigAlgCompleter() {
       setTokens("HMACSHA1", "HMACSHA224", "HMACSHA256", "HMACSHA384", "HMACSHA512",
@@ -133,7 +136,7 @@ public class QaCompleters {
   }
 
   @Service
-  public static class OccurrenceCompleter extends AbstractEnumCompleter {
+  public static class OccurrenceCompleter extends EnumCompleter {
 
     public OccurrenceCompleter() {
       List<String> enums = new LinkedList<>();
@@ -146,7 +149,7 @@ public class QaCompleters {
   }
 
   @Service
-  public static class OcspErrorCompleter extends AbstractEnumCompleter {
+  public static class OcspErrorCompleter extends EnumCompleter {
 
     public OcspErrorCompleter() {
       List<String> enums = new LinkedList<>();
@@ -159,8 +162,25 @@ public class QaCompleters {
   }
 
   @Service
+  public static class P11ModuleNameCompleter extends DynamicEnumCompleter {
+
+    @Reference (optional = true)
+    private P11CryptServiceFactory p11CryptServiceFactory;
+
+    @Override
+    protected Set<String> getEnums() {
+      Set<String> names = p11CryptServiceFactory.getModuleNames();
+      if (CollectionUtil.isEmpty(names)) {
+        return Collections.emptySet();
+      }
+      return names;
+    }
+
+  }
+
+  @Service
   //CHECKSTYLE:SKIP
-  public static class RSASigAlgCompleter extends AbstractEnumCompleter {
+  public static class RSASigAlgCompleter extends EnumCompleter {
 
     public RSASigAlgCompleter() {
       String[] hashAlgs = {"SHA1", "SHA224", "SHA256", "SHA384", "SHA512",

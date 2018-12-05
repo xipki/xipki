@@ -17,10 +17,12 @@
 
 package org.xipki.qa.security;
 
+import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.util.Args;
@@ -33,6 +35,82 @@ import org.xipki.util.BenchmarkExecutor;
  */
 
 public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
+
+  // CHECKSTYLE:SKIP
+  public static class DSA extends P11KeyGenSpeed {
+
+    private final int plength;
+
+    private final int qlength;
+
+    public DSA(P11Slot slot, byte[] id, int plength, int qlength) throws Exception {
+      super(slot, id, "PKCS#11 DSA key generation\nplength: " + plength + "\nqlength: " + qlength);
+      this.plength = plength;
+      this.qlength = qlength;
+    }
+
+    @Override
+    protected void genKeypair() throws Exception {
+      P11IdentityId objId = slot.generateDSAKeypair(plength, qlength, getControl());
+      slot.removeIdentity(objId);
+    }
+
+  }
+
+  //CHECKSTYLE:SKIP
+  public static class EC extends P11KeyGenSpeed {
+
+    private final String curveNameOrOid;
+
+    public EC(P11Slot slot, byte[] id, String curveNameOrOid) throws Exception {
+      super(slot, id, "PKCS#11 EC key generation\ncurve: " + curveNameOrOid);
+      this.curveNameOrOid = Args.notNull(curveNameOrOid, "curveNameOrOid");
+    }
+
+    @Override
+    protected void genKeypair() throws Exception {
+      P11IdentityId objId = slot.generateECKeypair(curveNameOrOid, getControl());
+      slot.removeIdentity(objId);
+    }
+
+  }
+
+  //CHECKSTYLE:SKIP
+  public static class RSA extends P11KeyGenSpeed {
+
+    private final int keysize;
+
+    private final BigInteger publicExponent;
+
+    public RSA(P11Slot slot, byte[] id, int keysize, BigInteger publicExponent)
+        throws Exception {
+      super(slot, id, "PKCS#11 RSA key generation\nkeysize: " + keysize
+          + "\npublic exponent: " + publicExponent);
+      this.keysize = keysize;
+      this.publicExponent = publicExponent;
+    }
+
+    @Override
+    protected void genKeypair() throws Exception {
+      P11IdentityId objId = slot.generateRSAKeypair(keysize, publicExponent, getControl());
+      slot.removeIdentity(objId);
+    }
+
+  }
+
+  //CHECKSTYLE:SKIP
+  public static class SM2 extends P11KeyGenSpeed {
+    public SM2(P11Slot slot, byte[] id) throws Exception {
+      super(slot, id, "PKCS#11 SM2 key generation");
+    }
+
+    @Override
+    protected void genKeypair() throws Exception {
+      P11IdentityId objId = slot.generateSM2Keypair(getControl());
+      slot.removeIdentity(objId);
+    }
+
+  }
 
   class Testor implements Runnable {
 

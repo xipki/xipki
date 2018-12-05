@@ -83,8 +83,7 @@ class SM2Signer {
     this.digest = HashAlgo.SM3.createDigest();
   }
 
-  public byte[] generateSignatureForMessage(byte[] userId, byte[] message)
-      throws CryptoException {
+  public byte[] generateSignatureForMessage(byte[] userId, byte[] message) throws CryptoException {
     // CHECKSTYLE:SKIP
     byte[] z;
     if (userId == null) {

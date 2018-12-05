@@ -17,11 +17,15 @@
 
 package org.xipki.qa.security;
 
+import java.math.BigInteger;
 import java.security.SecureRandom;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.security.util.KeyUtil;
 import org.xipki.util.Args;
 import org.xipki.util.BenchmarkExecutor;
 
@@ -32,6 +36,71 @@ import org.xipki.util.BenchmarkExecutor;
  */
 
 public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
+
+  // CHECKSTYLE:SKIP
+  public static class DSA extends P12KeyGenSpeed {
+    private final int plength;
+    private final int qlength;
+
+    public DSA(int plength, int qlength, SecurityFactory securityFactory) throws Exception {
+      super("PKCS#12 DSA key generation\nplength: " + plength + "\nqlength: " + qlength,
+          securityFactory);
+
+      this.plength = plength;
+      this.qlength = qlength;
+    }
+
+    @Override
+    protected void generateKeypair(SecureRandom random) throws Exception {
+      KeyUtil.generateDSAKeypair(plength, qlength, random);
+    }
+
+  }
+
+  // CHECKSTYLE:SKIP
+  public static class EC extends P12KeyGenSpeed {
+
+    private final ASN1ObjectIdentifier curveOid;
+
+    public EC(String curveNameOrOid, SecurityFactory securityFactory) throws Exception {
+      super("PKCS#12 EC key generation\ncurve: " + curveNameOrOid, securityFactory);
+
+      ASN1ObjectIdentifier oid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
+      if (oid == null) {
+        throw new IllegalArgumentException("invalid curve name or OID " + curveNameOrOid);
+      }
+
+      this.curveOid = oid;
+    }
+
+    @Override
+    protected void generateKeypair(SecureRandom random) throws Exception {
+      KeyUtil.generateECKeypair(curveOid, random);
+    }
+
+  }
+
+  // CHECKSTYLE:SKIP
+  public static class RSA extends P12KeyGenSpeed {
+
+    private final int keysize;
+    private final BigInteger publicExponent;
+
+    public RSA(int keysize, BigInteger publicExponent, SecurityFactory securityFactory)
+        throws Exception {
+      super("PKCS#12 RSA key generation\nkeysize: " + keysize
+          + "\npublic exponent: " + publicExponent, securityFactory);
+
+      this.keysize = keysize;
+      this.publicExponent = publicExponent;
+    }
+
+    @Override
+    protected void generateKeypair(SecureRandom random) throws Exception {
+      KeyUtil.generateRSAKeypair(keysize, publicExponent, random);
+    }
+
+  }
 
   class Testor implements Runnable {
 
