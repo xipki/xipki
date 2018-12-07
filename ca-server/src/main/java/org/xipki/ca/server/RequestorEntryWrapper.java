@@ -25,13 +25,13 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CertWithDbId;
-import org.xipki.ca.mgmt.api.RequestorEntry;
+import org.xipki.ca.mgmt.api.MgmtEntry;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.LogUtil;
 import org.xipki.util.Args;
+import org.xipki.util.LogUtil;
 
 /**
  * TODO.
@@ -42,7 +42,7 @@ import org.xipki.util.Args;
 public class RequestorEntryWrapper {
   private static final Logger LOG = LoggerFactory.getLogger(RequestorEntryWrapper.class);
 
-  private RequestorEntry dbEntry;
+  private MgmtEntry.Requestor dbEntry;
 
   private CertWithDbId cert;
 
@@ -53,13 +53,13 @@ public class RequestorEntryWrapper {
   public RequestorEntryWrapper() {
   }
 
-  public void setDbEntry(RequestorEntry dbEntry, PasswordResolver passwordResolver) {
+  public void setDbEntry(MgmtEntry.Requestor dbEntry, PasswordResolver passwordResolver) {
     this.dbEntry = Args.notNull(dbEntry, "dbEntry");
     String type = dbEntry.getType();
     String conf = dbEntry.getConf();
 
     dbEntry.setFaulty(true);
-    if (RequestorEntry.TYPE_CERT.equalsIgnoreCase(type)) {
+    if (MgmtEntry.Requestor.TYPE_CERT.equalsIgnoreCase(type)) {
       try {
         X509Certificate x509Cert = X509Util.parseCert(conf.getBytes());
         dbEntry.setFaulty(false);
@@ -67,7 +67,7 @@ public class RequestorEntryWrapper {
       } catch (CertificateException ex) {
         LogUtil.error(LOG, ex, "error while parsing certificate of requestor" + dbEntry.getIdent());
       }
-    } else if (RequestorEntry.TYPE_PBM.equalsIgnoreCase(type)) {
+    } else if (MgmtEntry.Requestor.TYPE_PBM.equalsIgnoreCase(type)) {
       try {
         this.keyId = HashAlgo.SHA1.hash(dbEntry.getIdent().getName().getBytes("UTF-8"));
         this.password = passwordResolver.resolvePassword(conf);
@@ -82,7 +82,7 @@ public class RequestorEntryWrapper {
     return cert;
   }
 
-  public RequestorEntry getDbEntry() {
+  public MgmtEntry.Requestor getDbEntry() {
     return dbEntry;
   }
 

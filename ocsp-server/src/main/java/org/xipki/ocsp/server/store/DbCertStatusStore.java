@@ -53,9 +53,7 @@ import org.xipki.ocsp.api.IssuerStore;
 import org.xipki.ocsp.api.OcspStore;
 import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.ocsp.api.RequestIssuer;
-import org.xipki.ocsp.server.conf.StoreType.CaCerts;
-import org.xipki.ocsp.server.conf.StoreType.DbSourceConf;
-import org.xipki.ocsp.server.conf.StoreType.SourceConfImpl;
+import org.xipki.ocsp.server.OcspServerConf;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
@@ -484,13 +482,13 @@ public class DbCertStatusStore extends OcspStore {
   @Override
   public void init(SourceConf conf, DataSourceWrapper datasource)
       throws OcspStoreException {
-    if (conf != null && !(conf instanceof SourceConfImpl)) {
+    if (conf != null && !(conf instanceof OcspServerConf.SourceConfImpl)) {
       throw new OcspStoreException("unknown conf " + conf.getClass().getName());
     }
 
-    CaCerts caCerts = null;
+    OcspServerConf.CaCerts caCerts = null;
     if (conf != null) {
-      DbSourceConf conf0 = ((SourceConfImpl) conf).getDbSource();
+      OcspServerConf.DbSourceConf conf0 = ((OcspServerConf.SourceConfImpl) conf).getDbSource();
       if (conf0 != null) {
         caCerts = conf0.getCaCerts();
       }

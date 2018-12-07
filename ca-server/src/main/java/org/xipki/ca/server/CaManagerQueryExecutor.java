@@ -38,29 +38,18 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
-import org.xipki.ca.api.profile.CertValidity;
-import org.xipki.ca.mgmt.api.AddUserEntry;
-import org.xipki.ca.mgmt.api.CaEntry;
-import org.xipki.ca.mgmt.api.CaHasRequestorEntry;
-import org.xipki.ca.mgmt.api.CaHasUserEntry;
+import org.xipki.ca.api.profile.Certprofile.CertValidity;
 import org.xipki.ca.mgmt.api.CaManager;
 import org.xipki.ca.mgmt.api.CaMgmtException;
 import org.xipki.ca.mgmt.api.CaStatus;
-import org.xipki.ca.mgmt.api.CertprofileEntry;
-import org.xipki.ca.mgmt.api.ChangeCaEntry;
-import org.xipki.ca.mgmt.api.ChangeUserEntry;
 import org.xipki.ca.mgmt.api.CmpControl;
 import org.xipki.ca.mgmt.api.CrlControl;
+import org.xipki.ca.mgmt.api.MgmtEntry;
 import org.xipki.ca.mgmt.api.ProtocolSupport;
-import org.xipki.ca.mgmt.api.PublisherEntry;
-import org.xipki.ca.mgmt.api.RequestorEntry;
 import org.xipki.ca.mgmt.api.ScepControl;
-import org.xipki.ca.mgmt.api.SignerEntry;
-import org.xipki.ca.mgmt.api.UserEntry;
 import org.xipki.ca.mgmt.api.ValidityMode;
 import org.xipki.ca.server.SqlColumn.ColumnType;
 import org.xipki.ca.server.store.CertStore;
-import org.xipki.ca.server.util.PasswordHash;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
@@ -70,11 +59,11 @@ import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ObjectCreationException;
-import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -257,7 +246,7 @@ class CaManagerQueryExecutor {
     return map;
   } // method createCaAliases
 
-  CertprofileEntry createCertprofile(String name) throws CaMgmtException {
+  MgmtEntry.Certprofile createCertprofile(String name) throws CaMgmtException {
     PreparedStatement stmt = null;
     ResultSet rs = null;
     final String sql = sqlSelectProfile;
@@ -270,7 +259,7 @@ class CaManagerQueryExecutor {
         throw new CaMgmtException("unknown CA " + name);
       }
 
-      return new CertprofileEntry(new NameId(rs.getInt("ID"), name),
+      return new MgmtEntry.Certprofile(new NameId(rs.getInt("ID"), name),
           rs.getString("TYPE"), rs.getString("CONF"));
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource.translate(sql, ex));
@@ -307,7 +296,7 @@ class CaManagerQueryExecutor {
     }
   } // method getNamesFromTable
 
-  PublisherEntry createPublisher(String name) throws CaMgmtException {
+  MgmtEntry.Publisher createPublisher(String name) throws CaMgmtException {
     final String sql = sqlSelectPublisher;
     PreparedStatement stmt = null;
     ResultSet rs = null;
@@ -320,7 +309,7 @@ class CaManagerQueryExecutor {
         throw new CaMgmtException("unkown Publisher " + name);
       }
 
-      return new PublisherEntry(new NameId(rs.getInt("ID"), name),
+      return new MgmtEntry.Publisher(new NameId(rs.getInt("ID"), name),
           rs.getString("TYPE"), rs.getString("CONF"));
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource.translate(sql, ex));
@@ -351,7 +340,7 @@ class CaManagerQueryExecutor {
     }
   }
 
-  RequestorEntry createRequestor(String name) throws CaMgmtException {
+  MgmtEntry.Requestor createRequestor(String name) throws CaMgmtException {
     final String sql = sqlSelectRequestor;
     PreparedStatement stmt = null;
     ResultSet rs = null;
@@ -365,7 +354,7 @@ class CaManagerQueryExecutor {
         throw new CaMgmtException("unknown Requestor " + name);
       }
 
-      return new RequestorEntry(new NameId(rs.getInt("ID"), name),
+      return new MgmtEntry.Requestor(new NameId(rs.getInt("ID"), name),
           rs.getString("TYPE"), rs.getString("CONF"));
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource.translate(sql, ex));
@@ -374,7 +363,7 @@ class CaManagerQueryExecutor {
     }
   } // method createRequestor
 
-  SignerEntry createSigner(String name) throws CaMgmtException {
+  MgmtEntry.Signer createSigner(String name) throws CaMgmtException {
     final String sql = sqlSelectSigner;
     PreparedStatement stmt = null;
     ResultSet rs = null;
@@ -388,7 +377,7 @@ class CaManagerQueryExecutor {
         throw new CaMgmtException("unknown signer " + name);
       }
 
-      return new SignerEntry(name, rs.getString("TYPE"), rs.getString("CONF"),
+      return new MgmtEntry.Signer(name, rs.getString("TYPE"), rs.getString("CONF"),
           rs.getString("CERT"));
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource.translate(sql, ex));
@@ -412,7 +401,7 @@ class CaManagerQueryExecutor {
 
       String caUrisText = rs.getString("CA_URIS");
       CaUris caUris = (caUrisText == null) ? null : CaUris.decode(caUrisText);
-      CaEntry entry = new CaEntry(new NameId(rs.getInt("ID"), name), rs.getInt("SN_SIZE"),
+      MgmtEntry.Ca entry = new MgmtEntry.Ca(new NameId(rs.getInt("ID"), name), rs.getInt("SN_SIZE"),
           rs.getLong("NEXT_CRLNO"), rs.getString("SIGNER_TYPE"), rs.getString("SIGNER_CONF"),
           caUris, rs.getInt("NUM_CRLS"), rs.getInt("EXPIRATION_PERIOD"));
       entry.setCert(generateCert(rs.getString("CERT")));
@@ -493,7 +482,7 @@ class CaManagerQueryExecutor {
     }
   } // method createCaInfo
 
-  Set<CaHasRequestorEntry> createCaHasRequestors(NameId ca) throws CaMgmtException {
+  Set<MgmtEntry.CaHasRequestor> createCaHasRequestors(NameId ca) throws CaMgmtException {
     Map<Integer, String> idNameMap = getIdNameMap("REQUESTOR");
 
     final String sql =
@@ -505,14 +494,14 @@ class CaManagerQueryExecutor {
       stmt.setInt(1, ca.getId());
       rs = stmt.executeQuery();
 
-      Set<CaHasRequestorEntry> ret = new HashSet<>();
+      Set<MgmtEntry.CaHasRequestor> ret = new HashSet<>();
       while (rs.next()) {
         int id = rs.getInt("REQUESTOR_ID");
         String name = idNameMap.get(id);
 
         List<String> list = StringUtil.split(rs.getString("PROFILES"), ",");
         Set<String> profiles = (list == null) ? null : new HashSet<>(list);
-        CaHasRequestorEntry entry = new CaHasRequestorEntry(new NameId(id, name));
+        MgmtEntry.CaHasRequestor entry = new MgmtEntry.CaHasRequestor(new NameId(id, name));
         entry.setRa(rs.getBoolean("RA"));
         entry.setPermission(rs.getInt("PERMISSION"));
         entry.setProfiles(profiles);
@@ -591,7 +580,7 @@ class CaManagerQueryExecutor {
     }
   } // method deleteRowWithName
 
-  void addCa(CaEntry caEntry) throws CaMgmtException {
+  void addCa(MgmtEntry.Ca caEntry) throws CaMgmtException {
     Args.notNull(caEntry, "caEntry");
 
     try {
@@ -691,7 +680,7 @@ class CaManagerQueryExecutor {
     }
   } // method addCaAlias
 
-  void addCertprofile(CertprofileEntry dbEntry) throws CaMgmtException {
+  void addCertprofile(MgmtEntry.Certprofile dbEntry) throws CaMgmtException {
     Args.notNull(dbEntry, "dbEntry");
     final String sql = "INSERT INTO PROFILE (ID,NAME,TYPE,CONF) VALUES (?,?,?,?)";
 
@@ -745,7 +734,7 @@ class CaManagerQueryExecutor {
     }
   } // method addCertprofileToCa
 
-  void addRequestor(RequestorEntry dbEntry) throws CaMgmtException {
+  void addRequestor(MgmtEntry.Requestor dbEntry) throws CaMgmtException {
     Args.notNull(dbEntry, "dbEntry");
 
     try {
@@ -813,7 +802,7 @@ class CaManagerQueryExecutor {
     }
   }
 
-  void addRequestorToCa(CaHasRequestorEntry requestor, NameId ca) throws CaMgmtException {
+  void addRequestorToCa(MgmtEntry.CaHasRequestor requestor, NameId ca) throws CaMgmtException {
     Args.notNull(requestor, "requestor");
     Args.notNull(ca, "ca");
 
@@ -846,7 +835,7 @@ class CaManagerQueryExecutor {
     }
   } // method addRequestorToCa
 
-  void addPublisher(PublisherEntry dbEntry) throws CaMgmtException {
+  void addPublisher(MgmtEntry.Publisher dbEntry) throws CaMgmtException {
     Args.notNull(dbEntry, "dbEntry");
     final String sql = "INSERT INTO PUBLISHER (ID,NAME,TYPE,CONF) VALUES (?,?,?,?)";
 
@@ -898,7 +887,7 @@ class CaManagerQueryExecutor {
     }
   } // method addPublisherToCa
 
-  void changeCa(ChangeCaEntry changeCaEntry, CaEntry currentCaEntry,
+  void changeCa(MgmtEntry.ChangeCa changeCaEntry, MgmtEntry.Ca currentCaEntry,
       SecurityFactory securityFactory) throws CaMgmtException {
     Args.notNull(changeCaEntry, "changeCaEntry");
     Args.notNull(securityFactory, "securityFactory");
@@ -960,7 +949,7 @@ class CaManagerQueryExecutor {
         }
 
         try {
-          List<String[]> signerConfs = CaEntry.splitCaSignerConfs(signerConf);
+          List<String[]> signerConfs = MgmtEntry.Ca.splitCaSignerConfs(signerConf);
           for (String[] m : signerConfs) {
             securityFactory.createSigner(signerType, new SignerConf(m[1]), cert);
           }
@@ -1107,8 +1096,8 @@ class CaManagerQueryExecutor {
 
   IdentifiedCertprofile changeCertprofile(NameId nameId, String type, String conf,
       CaManagerImpl caManager) throws CaMgmtException {
-    CertprofileEntry currentDbEntry = createCertprofile(nameId.getName());
-    CertprofileEntry newDbEntry = new CertprofileEntry(currentDbEntry.getIdent(),
+    MgmtEntry.Certprofile currentDbEntry = createCertprofile(nameId.getName());
+    MgmtEntry.Certprofile newDbEntry = new MgmtEntry.Certprofile(currentDbEntry.getIdent(),
         str(type, currentDbEntry.getType()), str(conf, currentDbEntry.getConf()));
 
     IdentifiedCertprofile profile = caManager.createCertprofile(newDbEntry);
@@ -1244,7 +1233,7 @@ class CaManagerQueryExecutor {
     Args.notNull(nameId, "nameId");
     RequestorEntryWrapper requestor = new RequestorEntryWrapper();
 
-    if (RequestorEntry.TYPE_PBM.equalsIgnoreCase(type)) {
+    if (MgmtEntry.Requestor.TYPE_PBM.equalsIgnoreCase(type)) {
       if (!StringUtil.startsWithIgnoreCase(conf, "PBE:")) {
         try {
           conf = passwordResolver.protectPassword("PBE", conf.toCharArray());
@@ -1254,7 +1243,7 @@ class CaManagerQueryExecutor {
       }
     }
 
-    requestor.setDbEntry(new RequestorEntry(nameId, type, conf), passwordResolver);
+    requestor.setDbEntry(new MgmtEntry.Requestor(nameId, type, conf), passwordResolver);
 
     if (requestor.getDbEntry().isFaulty()) {
       throw new CaMgmtException("invalid requestor configuration");
@@ -1270,13 +1259,13 @@ class CaManagerQueryExecutor {
     Args.notBlank(name, "name");
     Args.notNull(caManager, "caManager");
 
-    SignerEntry dbEntry = createSigner(name);
+    MgmtEntry.Signer dbEntry = createSigner(name);
     String tmpType = (type == null ? dbEntry.getType() : type);
     if (conf != null) {
       conf = CaManagerImpl.canonicalizeSignerConf(tmpType, conf, null, securityFactory);
     }
 
-    SignerEntry newDbEntry = new SignerEntry(name, tmpType,
+    MgmtEntry.Signer newDbEntry = new MgmtEntry.Signer(name, tmpType,
         (conf == null ? dbEntry.getConf() : conf),
         (base64Cert == null ? dbEntry.getBase64Cert() : base64Cert));
     SignerEntryWrapper responder = caManager.createSigner(newDbEntry);
@@ -1291,8 +1280,8 @@ class CaManagerQueryExecutor {
     Args.notBlank(name, "name");
     Args.notNull(caManager, "caManager");
 
-    PublisherEntry currentDbEntry = createPublisher(name);
-    PublisherEntry dbEntry = new PublisherEntry(currentDbEntry.getIdent(),
+    MgmtEntry.Publisher currentDbEntry = createPublisher(name);
+    MgmtEntry.Publisher dbEntry = new MgmtEntry.Publisher(currentDbEntry.getIdent(),
         (type == null ? currentDbEntry.getType() : type),
         (conf == null ? currentDbEntry.getConf() : conf));
     IdentifiedCertPublisher publisher = caManager.createPublisher(dbEntry);
@@ -1425,7 +1414,7 @@ class CaManagerQueryExecutor {
     }
   } // method revokeCa
 
-  void addSigner(SignerEntry dbEntry) throws CaMgmtException {
+  void addSigner(MgmtEntry.Signer dbEntry) throws CaMgmtException {
     Args.notNull(dbEntry, "dbEntry");
     final String sql = "INSERT INTO SIGNER (NAME,TYPE,CERT,CONF) VALUES (?,?,?,?)";
 
@@ -1485,13 +1474,13 @@ class CaManagerQueryExecutor {
     }
   } // method unrevokeCa
 
-  void addUser(AddUserEntry userEntry) throws CaMgmtException {
+  void addUser(MgmtEntry.AddUser userEntry) throws CaMgmtException {
     Args.notNull(userEntry, "userEntry");
     String hashedPassword = PasswordHash.createHash(userEntry.getPassword());
     addUser(userEntry.getIdent().getName(), userEntry.isActive(), hashedPassword);
   } // method addUser
 
-  void addUser(UserEntry userEntry) throws CaMgmtException {
+  void addUser(MgmtEntry.User userEntry) throws CaMgmtException {
     Args.notNull(userEntry, "userEntry");
     addUser(userEntry.getIdent().getName(), userEntry.isActive(), userEntry.getHashedPassword());
   }
@@ -1533,7 +1522,7 @@ class CaManagerQueryExecutor {
     LOG.info("added user '{}'", name);
   } // method addUser
 
-  void changeUser(ChangeUserEntry userEntry) throws CaMgmtException {
+  void changeUser(MgmtEntry.ChangeUser userEntry) throws CaMgmtException {
     String username = userEntry.getIdent().getName();
 
     Integer existingId = getIdForName(sqlSelectUserId, username);
@@ -1576,7 +1565,7 @@ class CaManagerQueryExecutor {
     }
   } // method removeRequestorFromCa
 
-  void addUserToCa(CaHasUserEntry user, NameId ca) throws CaMgmtException {
+  void addUserToCa(MgmtEntry.CaHasUser user, NameId ca) throws CaMgmtException {
     Args.notNull(user, "user");
     Args.notNull(ca, "ca");
 
@@ -1623,7 +1612,7 @@ class CaManagerQueryExecutor {
     }
   } // method addUserToCa
 
-  Map<String, CaHasUserEntry> getCaHasUsersForUser(String user, CaIdNameMap idNameMap)
+  Map<String, MgmtEntry.CaHasUser> getCaHasUsersForUser(String user, CaIdNameMap idNameMap)
       throws CaMgmtException {
     Integer existingId = getIdForName(sqlSelectUserId, user);
     if (existingId == null) {
@@ -1638,11 +1627,11 @@ class CaManagerQueryExecutor {
       ps.setInt(1, existingId);
       rs = ps.executeQuery();
 
-      Map<String, CaHasUserEntry> ret = new HashMap<>();
+      Map<String, MgmtEntry.CaHasUser> ret = new HashMap<>();
       while (rs.next()) {
         List<String> list = StringUtil.split(rs.getString("PROFILES"), ",");
         Set<String> profiles = (list == null) ? null : new HashSet<>(list);
-        CaHasUserEntry caHasUser = new CaHasUserEntry(new NameId(existingId, user));
+        MgmtEntry.CaHasUser caHasUser = new MgmtEntry.CaHasUser(new NameId(existingId, user));
         caHasUser.setPermission(rs.getInt("PERMISSION"));
         caHasUser.setProfiles(profiles);
 
@@ -1659,7 +1648,7 @@ class CaManagerQueryExecutor {
     }
   }  // method getCaHasUsersForUser
 
-  List<CaHasUserEntry> getCaHasUsersForCa(String caName, CaIdNameMap idNameMap)
+  List<MgmtEntry.CaHasUser> getCaHasUsersForCa(String caName, CaIdNameMap idNameMap)
       throws CaMgmtException {
     NameId caIdent = idNameMap.getCa(caName);
     if (caIdent == null) {
@@ -1675,11 +1664,12 @@ class CaManagerQueryExecutor {
       ps.setInt(1, caIdent.getId().intValue());
       rs = ps.executeQuery();
 
-      List<CaHasUserEntry> ret = new LinkedList<>();
+      List<MgmtEntry.CaHasUser> ret = new LinkedList<>();
       while (rs.next()) {
         List<String> list = StringUtil.split(rs.getString("PROFILES"), ",");
         Set<String> profiles = (list == null) ? null : new HashSet<>(list);
-        CaHasUserEntry caHasUser = new CaHasUserEntry(new NameId(null, rs.getString("NAME")));
+        MgmtEntry.CaHasUser caHasUser =
+            new MgmtEntry.CaHasUser(new NameId(null, rs.getString("NAME")));
         caHasUser.setPermission(rs.getInt("PERMISSION"));
         caHasUser.setProfiles(profiles);
 
@@ -1693,11 +1683,11 @@ class CaManagerQueryExecutor {
     }
   } // method getCaHasUsersForCa
 
-  UserEntry getUser(String username) throws CaMgmtException {
+  MgmtEntry.User getUser(String username) throws CaMgmtException {
     return getUser(username, false);
   }
 
-  UserEntry getUser(String username, boolean nullable) throws CaMgmtException {
+  MgmtEntry.User getUser(String username, boolean nullable) throws CaMgmtException {
     Args.notBlank(username, "username");
     NameId ident = new NameId(null, username);
 
@@ -1719,7 +1709,7 @@ class CaManagerQueryExecutor {
       }
 
       ident.setId(rs.getInt("ID"));
-      return new UserEntry(ident, rs.getBoolean("ACTIVE"), rs.getString("PASSWORD"));
+      return new MgmtEntry.User(ident, rs.getBoolean("ACTIVE"), rs.getString("PASSWORD"));
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource.translate(sql, ex));
     } finally {

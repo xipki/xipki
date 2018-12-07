@@ -34,8 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.ocsp.api.OcspStoreException;
-import org.xipki.ocsp.server.conf.StoreType.CrlSourceConf;
-import org.xipki.ocsp.server.conf.StoreType.SourceConfImpl;
+import org.xipki.ocsp.server.OcspServerConf;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.util.X509Util;
@@ -93,11 +92,11 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
   public void init(SourceConf conf, DataSourceWrapper datasource)
       throws OcspStoreException {
     Args.notNull(conf, "conf");
-    if (!(conf instanceof SourceConfImpl)) {
+    if (!(conf instanceof OcspServerConf.SourceConfImpl)) {
       throw new OcspStoreException("unknown conf " + conf.getClass().getName());
     }
 
-    CrlSourceConf conf0 = ((SourceConfImpl) conf).getCrlSource();
+    OcspServerConf.CrlSourceConf conf0 = ((OcspServerConf.SourceConfImpl) conf).getCrlSource();
     if (conf0 == null) {
       throw new OcspStoreException("conf.getDbSource() may not be null");
     }

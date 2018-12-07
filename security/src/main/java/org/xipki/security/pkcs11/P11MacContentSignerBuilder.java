@@ -59,7 +59,7 @@ public class P11MacContentSignerBuilder {
 
     List<XiContentSigner> signers = new ArrayList<>(parallelism);
     for (int i = 0; i < parallelism; i++) {
-      XiContentSigner signer = new P11MacContentSigner(cryptService, identityId, signatureAlgId);
+      XiContentSigner signer = new P11ContentSigner.Mac(cryptService, identityId, signatureAlgId);
       signers.add(signer);
     } // end for
 

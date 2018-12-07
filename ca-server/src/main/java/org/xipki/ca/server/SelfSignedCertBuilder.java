@@ -52,13 +52,11 @@ import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.PublicCaInfo;
-import org.xipki.ca.api.profile.CertLevel;
-import org.xipki.ca.api.profile.CertValidity;
+import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
-import org.xipki.ca.api.profile.SubjectInfo;
-import org.xipki.ca.mgmt.api.CaEntry;
+import org.xipki.ca.mgmt.api.MgmtEntry;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
@@ -67,11 +65,11 @@ import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ObjectCreationException;
-import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -121,9 +119,10 @@ class SelfSignedCertBuilder {
           "serialNumber may not be non-positive: " + serialNumber);
     }
 
-    CertLevel level = certprofile.getCertLevel();
-    if (CertLevel.RootCA != level) {
-      throw new IllegalArgumentException("certprofile is not of level " + CertLevel.RootCA);
+    Certprofile.CertLevel level = certprofile.getCertLevel();
+    if (Certprofile.CertLevel.RootCA != level) {
+      throw new IllegalArgumentException(
+          "certprofile is not of level " + Certprofile.CertLevel.RootCA);
     }
 
     if (!securityFactory.verifyPopo(csr, null)) {
@@ -141,7 +140,7 @@ class SelfSignedCertBuilder {
 
     ConcurrentContentSigner signer;
     try {
-      List<String[]> signerConfs = CaEntry.splitCaSignerConfs(signerConf);
+      List<String[]> signerConfs = MgmtEntry.Ca.splitCaSignerConfs(signerConf);
       List<String> restrictedSigAlgos = certprofile.getSignatureAlgorithms();
 
       String thisSignerConf = null;
@@ -224,7 +223,7 @@ class SelfSignedCertBuilder {
 
     X500Name requestedSubject = csr.getCertificationRequestInfo().getSubject();
 
-    SubjectInfo subjectInfo;
+    Certprofile.SubjectInfo subjectInfo;
     // subject
     try {
       subjectInfo = certprofile.getSubject(requestedSubject);
@@ -241,7 +240,7 @@ class SelfSignedCertBuilder {
       notBefore = new Date();
     }
 
-    CertValidity validity = certprofile.getValidity();
+    Certprofile.CertValidity validity = certprofile.getValidity();
     if (validity == null) {
       throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
           "no validity specified in the profile " + certprofile.getIdent());

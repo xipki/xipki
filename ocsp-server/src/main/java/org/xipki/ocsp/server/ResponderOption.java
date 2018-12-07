@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.xipki.ocsp.api.OcspMode;
-import org.xipki.ocsp.server.conf.ResponderType;
 import org.xipki.util.Args;
 import org.xipki.util.InvalidConfException;
 
@@ -48,7 +47,7 @@ class ResponderOption {
 
   private final List<String> servletPaths;
 
-  ResponderOption(ResponderType conf) throws InvalidConfException {
+  ResponderOption(OcspServerConf.Responder conf) throws InvalidConfException {
     Args.notNull(conf, "conf");
     String str = conf.getMode();
     if (str == null || "RFC6960".equalsIgnoreCase(str) || "RFC 6960".equalsIgnoreCase(str)) {

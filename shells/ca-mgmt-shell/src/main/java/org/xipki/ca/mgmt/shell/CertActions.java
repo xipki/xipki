@@ -35,11 +35,11 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
-import org.xipki.ca.mgmt.api.CaEntry;
 import org.xipki.ca.mgmt.api.CaMgmtException;
 import org.xipki.ca.mgmt.api.CertListInfo;
 import org.xipki.ca.mgmt.api.CertListOrderBy;
 import org.xipki.ca.mgmt.api.CertWithRevocationInfo;
+import org.xipki.ca.mgmt.api.MgmtEntry;
 import org.xipki.ca.mgmt.shell.CaActions.CaAction;
 import org.xipki.security.CrlReason;
 import org.xipki.security.util.X509Util;
@@ -107,7 +107,7 @@ public class CertActions {
 
     @Override
     protected Object execute0() throws Exception {
-      CaEntry ca = caManager.getCa(caName);
+      MgmtEntry.Ca ca = caManager.getCa(caName);
       if (ca == null) {
         throw new CmdFailure("CA " + caName + " not available");
       }
@@ -167,7 +167,7 @@ public class CertActions {
 
     @Override
     protected Object execute0() throws Exception {
-      CaEntry ca = caManager.getCa(caName);
+      MgmtEntry.Ca ca = caManager.getCa(caName);
       if (ca == null) {
         throw new CmdFailure("CA " + caName + " not available");
       }
@@ -269,7 +269,7 @@ public class CertActions {
 
     @Override
     protected Object execute0() throws Exception {
-      CaEntry ca = caManager.getCa(caName);
+      MgmtEntry.Ca ca = caManager.getCa(caName);
       if (ca == null) {
         throw new CmdFailure("CA " + caName + " not available");
       }
@@ -539,7 +539,7 @@ public class CertActions {
     protected BigInteger getSerialNumber()
         throws CmdFailure, IllegalCmdParamException, CertificateException, IOException,
           CaMgmtException  {
-      CaEntry ca = caManager.getCa(caName);
+      MgmtEntry.Ca ca = caManager.getCa(caName);
       if (ca == null) {
         throw new CmdFailure("CA " + caName + " not available");
       }

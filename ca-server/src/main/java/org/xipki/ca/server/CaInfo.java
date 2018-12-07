@@ -35,12 +35,12 @@ import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
+import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.PublicCaInfo;
-import org.xipki.ca.api.profile.CertValidity;
-import org.xipki.ca.mgmt.api.CaEntry;
 import org.xipki.ca.mgmt.api.CaStatus;
 import org.xipki.ca.mgmt.api.CmpControl;
 import org.xipki.ca.mgmt.api.CrlControl;
+import org.xipki.ca.mgmt.api.MgmtEntry;
 import org.xipki.ca.mgmt.api.PermissionConstants;
 import org.xipki.ca.mgmt.api.ProtocolSupport;
 import org.xipki.ca.mgmt.api.RevokeSuspendedCertsControl;
@@ -53,9 +53,9 @@ import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -69,7 +69,7 @@ public class CaInfo {
 
   private static final long MS_PER_DAY = 24L * 60 * 60 * 1000;
 
-  private final CaEntry caEntry;
+  private final MgmtEntry.Ca caEntry;
 
   private long noNewCertificateAfter;
 
@@ -95,7 +95,7 @@ public class CaInfo {
 
   private RevokeSuspendedCertsControl revokeSuspendedCertsControl;
 
-  public CaInfo(CaEntry caEntry, CertStore certStore) throws OperationException {
+  public CaInfo(MgmtEntry.Ca caEntry, CertStore certStore) throws OperationException {
     this.caEntry = Args.notNull(caEntry, "caEntry");
     this.certStore = Args.notNull(certStore, "certStore");
 
@@ -153,7 +153,7 @@ public class CaInfo {
     return noNewCertificateAfter;
   }
 
-  public CaEntry getCaEntry() {
+  public MgmtEntry.Ca getCaEntry() {
     return caEntry;
   }
 
@@ -165,11 +165,11 @@ public class CaInfo {
     return caEntry.getCaUris();
   }
 
-  public CertValidity getMaxValidity() {
+  public Certprofile.CertValidity getMaxValidity() {
     return caEntry.getMaxValidity();
   }
 
-  public void setMaxValidity(CertValidity maxValidity) {
+  public void setMaxValidity(Certprofile.CertValidity maxValidity) {
     caEntry.setMaxValidity(maxValidity);
   }
 
@@ -368,7 +368,7 @@ public class CaInfo {
     }
     dfltSigner = null;
 
-    List<String[]> signerConfs = CaEntry.splitCaSignerConfs(caEntry.getSignerConf());
+    List<String[]> signerConfs = MgmtEntry.Ca.splitCaSignerConfs(caEntry.getSignerConf());
 
     Map<String, ConcurrentContentSigner> tmpSigners = new HashMap<>();
     for (String[] m : signerConfs) {

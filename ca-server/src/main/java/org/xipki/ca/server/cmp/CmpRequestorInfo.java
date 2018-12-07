@@ -20,7 +20,7 @@ package org.xipki.ca.server.cmp;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.InsuffientPermissionException;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.mgmt.api.CaHasRequestorEntry;
+import org.xipki.ca.mgmt.api.MgmtEntry;
 import org.xipki.ca.mgmt.api.PermissionConstants;
 import org.xipki.ca.mgmt.api.RequestorInfo;
 import org.xipki.util.Args;
@@ -33,7 +33,7 @@ import org.xipki.util.Args;
 
 public class CmpRequestorInfo implements RequestorInfo {
 
-  private final CaHasRequestorEntry caHasRequestor;
+  private final MgmtEntry.CaHasRequestor caHasRequestor;
 
   private final CertWithDbId cert;
 
@@ -41,21 +41,21 @@ public class CmpRequestorInfo implements RequestorInfo {
 
   private final byte[] keyId;
 
-  public CmpRequestorInfo(CaHasRequestorEntry caHasRequestor, CertWithDbId cert) {
+  public CmpRequestorInfo(MgmtEntry.CaHasRequestor caHasRequestor, CertWithDbId cert) {
     this.caHasRequestor = Args.notNull(caHasRequestor, "caHasRequestor");
     this.cert = Args.notNull(cert, "cert");
     this.password = null;
     this.keyId = null;
   }
 
-  public CmpRequestorInfo(CaHasRequestorEntry caHasRequestor, char[] password, byte[] keyId) {
+  public CmpRequestorInfo(MgmtEntry.CaHasRequestor caHasRequestor, char[] password, byte[] keyId) {
     this.caHasRequestor = Args.notNull(caHasRequestor, "caHasRequestor");
     this.cert = null;
     this.password = Args.notNull(password, "password");
     this.keyId = Args.notNull(keyId, "keyId");
   }
 
-  public CaHasRequestorEntry getCaHasRequestor() {
+  public MgmtEntry.CaHasRequestor getCaHasRequestor() {
     return caHasRequestor;
   }
 

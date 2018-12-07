@@ -43,13 +43,6 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.mgmt.db.message.CaCert;
-import org.xipki.ca.mgmt.db.message.CaCertstore;
-import org.xipki.ca.mgmt.db.message.Crl;
-import org.xipki.ca.mgmt.db.message.DeltaCrlCacheEntry;
-import org.xipki.ca.mgmt.db.message.ReqCert;
-import org.xipki.ca.mgmt.db.message.Request;
-import org.xipki.ca.mgmt.db.message.ToPublish;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.FpIdCalculator;
@@ -209,13 +202,14 @@ class CaCertstoreDbImporter extends DbPorter {
     System.out.println(" imported CA certstore to database");
   } // method importToDb
 
-  private void importPublishQueue(List<ToPublish> publishQueue) throws DataAccessException {
+  private void importPublishQueue(List<CaCertstore.ToPublish> publishQueue)
+      throws DataAccessException {
     final String sql = "INSERT INTO PUBLISHQUEUE (CID,PID,CA_ID) VALUES (?,?,?)";
     System.out.println("importing table PUBLISHQUEUE");
     PreparedStatement ps = prepareStatement(sql);
 
     try {
-      for (ToPublish tbp : publishQueue) {
+      for (CaCertstore.ToPublish tbp : publishQueue) {
         try {
           ps.setLong(1, tbp.getCertId());
           ps.setInt(2, tbp.getPubId());
@@ -234,7 +228,7 @@ class CaCertstoreDbImporter extends DbPorter {
     System.out.println(" imported table PUBLISHQUEUE");
   } // method importPublishQueue
 
-  private void importDeltaCrlCache(List<DeltaCrlCacheEntry> deltaCrlCache)
+  private void importDeltaCrlCache(List<CaCertstore.DeltaCrlCacheEntry> deltaCrlCache)
       throws DataAccessException {
     final String sql = "INSERT INTO DELTACRL_CACHE (ID,SN,CA_ID) VALUES (?,?,?)";
     System.out.println("importing table DELTACRL_CACHE");
@@ -242,7 +236,7 @@ class CaCertstoreDbImporter extends DbPorter {
 
     try {
       long id = 1;
-      for (DeltaCrlCacheEntry entry : deltaCrlCache) {
+      for (CaCertstore.DeltaCrlCacheEntry entry : deltaCrlCache) {
         try {
           ps.setLong(1, id++);
           ps.setString(2, entry.getSerial());
@@ -397,9 +391,9 @@ class CaCertstoreDbImporter extends DbPorter {
     ZipFile zipFile = new ZipFile(new File(entriesZipFile));
     ZipEntry entriesEntry = zipFile.getEntry("overview.json");
 
-    CaCert.Certs certs;
+    CaCertstore.Certs certs;
     try {
-      certs = JSON.parseObject(zipFile.getInputStream(entriesEntry), CaCert.Certs.class);
+      certs = JSON.parseObject(zipFile.getInputStream(entriesEntry), CaCertstore.Certs.class);
     } catch (Exception ex) {
       try {
         zipFile.close();
@@ -417,11 +411,11 @@ class CaCertstoreDbImporter extends DbPorter {
       int numEntriesInBatch = 0;
       long lastSuccessfulEntryId = 0;
 
-      List<CaCert> list = certs.getCerts();
+      List<CaCertstore.Cert> list = certs.getCerts();
       final int n = list.size();
 
       for (int i = 0; i < n; i++) {
-        CaCert cert = list.get(i);
+        CaCertstore.Cert cert = list.get(i);
 
         if (stopMe.get()) {
           throw new InterruptedException("interrupted by the user");
@@ -553,9 +547,9 @@ class CaCertstoreDbImporter extends DbPorter {
     ZipFile zipFile = new ZipFile(new File(entriesZipFile));
     ZipEntry entriesEntry = zipFile.getEntry("overview.json");
 
-    Crl.Crls crls;
+    CaCertstore.Crls crls;
     try {
-      crls = JSON.parseObject(zipFile.getInputStream(entriesEntry), Crl.Crls.class);
+      crls = JSON.parseObject(zipFile.getInputStream(entriesEntry), CaCertstore.Crls.class);
     } catch (Exception ex) {
       try {
         zipFile.close();
@@ -573,11 +567,11 @@ class CaCertstoreDbImporter extends DbPorter {
       int numEntriesInBatch = 0;
       long lastSuccessfulEntryId = 0;
 
-      List<Crl> list = crls.getCrls();
+      List<CaCertstore.Crl> list = crls.getCrls();
       final int n = list.size();
 
       for (int i = 0; i < n; i++) {
-        Crl crl = list.get(i);
+        CaCertstore.Crl crl = list.get(i);
 
         long id = crl.getId();
         if (id < minId) {
@@ -698,9 +692,9 @@ class CaCertstoreDbImporter extends DbPorter {
     ZipFile zipFile = new ZipFile(new File(entriesZipFile));
     ZipEntry entriesEntry = zipFile.getEntry("overview.json");
 
-    Request.Requests requests;
+    CaCertstore.Requests requests;
     try {
-      requests = JSON.parseObject(zipFile.getInputStream(entriesEntry), Request.Requests.class);
+      requests = JSON.parseObject(zipFile.getInputStream(entriesEntry), CaCertstore.Requests.class);
     } catch (Exception ex) {
       try {
         zipFile.close();
@@ -718,11 +712,11 @@ class CaCertstoreDbImporter extends DbPorter {
       int numEntriesInBatch = 0;
       long lastSuccessfulEntryId = 0;
 
-      List<Request> list = requests.getRequests();
+      List<CaCertstore.Request> list = requests.getRequests();
       final int n = list.size();
 
       for (int i = 0; i < n; i++) {
-        Request request = list.get(i);
+        CaCertstore.Request request = list.get(i);
 
         if (stopMe.get()) {
           throw new InterruptedException("interrupted by the user");
@@ -797,9 +791,9 @@ class CaCertstoreDbImporter extends DbPorter {
     ZipFile zipFile = new ZipFile(new File(entriesZipFile));
     ZipEntry entriesEntry = zipFile.getEntry("overview.json");
 
-    ReqCert.ReqCerts reqCerts;
+    CaCertstore.ReqCerts reqCerts;
     try {
-      reqCerts = JSON.parseObject(zipFile.getInputStream(entriesEntry), ReqCert.ReqCerts.class);
+      reqCerts = JSON.parseObject(zipFile.getInputStream(entriesEntry), CaCertstore.ReqCerts.class);
     } catch (Exception ex) {
       try {
         zipFile.close();
@@ -817,11 +811,11 @@ class CaCertstoreDbImporter extends DbPorter {
       int numEntriesInBatch = 0;
       long lastSuccessfulEntryId = 0;
 
-      List<ReqCert> list = reqCerts.getReqCerts();
+      List<CaCertstore.ReqCert> list = reqCerts.getReqCerts();
       final int n = list.size();
 
       for (int i = 0; i < n; i++) {
-        ReqCert reqCert = list.get(i);
+        CaCertstore.ReqCert reqCert = list.get(i);
         if (stopMe.get()) {
           throw new InterruptedException("interrupted by the user");
         }

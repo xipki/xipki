@@ -158,7 +158,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void addCa(CaEntry caEntry) throws CaMgmtException;
+  void addCa(MgmtEntry.Ca caEntry) throws CaMgmtException;
 
   /**
    * Gets the CA named {@code caName}.
@@ -168,7 +168,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  CaEntry getCa(String caName) throws CaMgmtException;
+  MgmtEntry.Ca getCa(String caName) throws CaMgmtException;
 
   /**
    * Changes a CA.
@@ -178,7 +178,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void changeCa(ChangeCaEntry changeCaEntry) throws CaMgmtException;
+  void changeCa(MgmtEntry.ChangeCa changeCaEntry) throws CaMgmtException;
 
   /**
    * Removes the support of the certprofile {@code profileName} from the CA {@code caName}.
@@ -243,7 +243,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  Set<CaHasRequestorEntry> getRequestorsForCa(String caName) throws CaMgmtException;
+  Set<MgmtEntry.CaHasRequestor> getRequestorsForCa(String caName) throws CaMgmtException;
 
   /**
    * Returns the requestor named {@code name}.
@@ -253,7 +253,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  RequestorEntry getRequestor(String name) throws CaMgmtException;
+  MgmtEntry.Requestor getRequestor(String name) throws CaMgmtException;
 
   /**
    * Adds requstor.
@@ -262,7 +262,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void addRequestor(RequestorEntry requestorEntry) throws CaMgmtException;
+  void addRequestor(MgmtEntry.Requestor requestorEntry) throws CaMgmtException;
 
   /**
    * Removes requestor named {@code requestorName}.
@@ -306,7 +306,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void addRequestorToCa(CaHasRequestorEntry requestor, String caName) throws CaMgmtException;
+  void addRequestorToCa(MgmtEntry.CaHasRequestor requestor, String caName) throws CaMgmtException;
 
   /**
    * Removes the user {@code userName} from the CA {@code caName}.
@@ -328,7 +328,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void addUserToCa(CaHasUserEntry user, String caName) throws CaMgmtException;
+  void addUserToCa(MgmtEntry.CaHasUser user, String caName) throws CaMgmtException;
 
   /**
    * Returns map between CA name an CaHasUserEntry for given user.
@@ -337,7 +337,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  Map<String, CaHasUserEntry> getCaHasUsersForUser(String user) throws CaMgmtException;
+  Map<String, MgmtEntry.CaHasUser> getCaHasUsersForUser(String user) throws CaMgmtException;
 
   /**
    * Returns the certificate profile named {@code profileName}.
@@ -347,7 +347,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  CertprofileEntry getCertprofile(String profileName) throws CaMgmtException;
+  MgmtEntry.Certprofile getCertprofile(String profileName) throws CaMgmtException;
 
   /**
    * Removes the certificate profile {@code profileName}.
@@ -378,7 +378,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void addCertprofile(CertprofileEntry certprofileEntry) throws CaMgmtException;
+  void addCertprofile(MgmtEntry.Certprofile certprofileEntry) throws CaMgmtException;
 
   /**
    * Adds a signer.
@@ -387,7 +387,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void addSigner(SignerEntry signerEntry) throws CaMgmtException;
+  void addSigner(MgmtEntry.Signer signerEntry) throws CaMgmtException;
 
   /**
    * Removes the signer named {@code name}.
@@ -406,7 +406,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  SignerEntry getSigner(String name) throws CaMgmtException;
+  MgmtEntry.Signer getSigner(String name) throws CaMgmtException;
 
   /**
    * Changes the signer {@code name}.
@@ -431,7 +431,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void addPublisher(PublisherEntry entry) throws CaMgmtException;
+  void addPublisher(MgmtEntry.Publisher entry) throws CaMgmtException;
 
   /**
    * Returns publishers for the CA {@code caName}.
@@ -441,7 +441,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  List<PublisherEntry> getPublishersForCa(String caName) throws CaMgmtException;
+  List<MgmtEntry.Publisher> getPublishersForCa(String caName) throws CaMgmtException;
 
   /**
    * Returns the publisher.
@@ -451,7 +451,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  PublisherEntry getPublisher(String publisherName) throws CaMgmtException;
+  MgmtEntry.Publisher getPublisher(String publisherName) throws CaMgmtException;
 
   /**
    * Removes the publisher {@code publisherName}.
@@ -572,7 +572,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  X509Certificate generateRootCa(CaEntry caEntry, String certprofileName, byte[] encodedCsr,
+  X509Certificate generateRootCa(MgmtEntry.Ca caEntry, String certprofileName, byte[] encodedCsr,
       BigInteger serialNumber) throws CaMgmtException;
 
   /**
@@ -582,7 +582,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void addUser(AddUserEntry addUserEntry) throws CaMgmtException;
+  void addUser(MgmtEntry.AddUser addUserEntry) throws CaMgmtException;
 
   /**
    * Change the user.
@@ -591,7 +591,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void changeUser(ChangeUserEntry changeUserEntry) throws CaMgmtException;
+  void changeUser(MgmtEntry.ChangeUser changeUserEntry) throws CaMgmtException;
 
   /**
    * Remove the name {@code username}.
@@ -610,7 +610,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  UserEntry getUser(String username) throws CaMgmtException;
+  MgmtEntry.User getUser(String username) throws CaMgmtException;
 
   /**
    * Generates a new CRL for CA {@code caName}.

@@ -35,9 +35,6 @@ import java.util.zip.ZipFile;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.mgmt.db.message.OcspCert;
-import org.xipki.ca.mgmt.db.message.OcspCertstore;
-import org.xipki.ca.mgmt.db.message.OcspIssuer;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.util.X509Util;
@@ -126,13 +123,13 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
     }
   }
 
-  private void importIssuer(List<OcspIssuer> issuers)
+  private void importIssuer(List<OcspCertstore.Issuer> issuers)
       throws DataAccessException, CertificateException, IOException {
     System.out.println("importing table ISSUER");
     PreparedStatement ps = prepareStatement(SQL_ADD_ISSUER);
 
     try {
-      for (OcspIssuer issuer : issuers) {
+      for (OcspCertstore.Issuer issuer : issuers) {
         try {
           String certFilename = issuer.getCertFile();
           String b64Cert = new String(IoUtil.read(new File(baseDir, certFilename)));
@@ -252,10 +249,10 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
     ZipFile zipFile = new ZipFile(new File(certsZipFile));
     ZipEntry certsEntry = zipFile.getEntry("certs.json");
 
-    OcspCert.Certs certs;
+    OcspCertstore.Certs certs;
     try {
       certs = JSON.parseObject(zipFile.getInputStream(certsEntry), Charset.forName("UTF-8"),
-          OcspCert.Certs.class);
+                OcspCertstore.Certs.class);
     } catch (Exception ex) {
       try {
         zipFile.close();
@@ -273,7 +270,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
       int numEntriesInBatch = 0;
       long lastSuccessfulCertId = 0;
 
-      List<OcspCert> list = certs.getCerts();
+      List<OcspCertstore.Cert> list = certs.getCerts();
       final int n = list.size();
 
       for (int i = 0; i < n; i++) {
@@ -281,7 +278,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
           throw new InterruptedException("interrupted by the user");
         }
 
-        OcspCert cert = list.get(i);
+        OcspCertstore.Cert cert = list.get(i);
         long id = cert.getId();
         if (id < minId) {
           continue;

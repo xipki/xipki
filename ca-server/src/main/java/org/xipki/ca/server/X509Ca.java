@@ -119,15 +119,11 @@ import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.RequestType;
-import org.xipki.ca.api.profile.CertValidity;
+import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.KeypairGenControl;
-import org.xipki.ca.api.profile.SubjectInfo;
-import org.xipki.ca.api.profile.X509CertVersion;
-import org.xipki.ca.mgmt.api.CaHasRequestorEntry;
-import org.xipki.ca.mgmt.api.CaHasUserEntry;
 import org.xipki.ca.mgmt.api.CaMgmtException;
 import org.xipki.ca.mgmt.api.CaStatus;
 import org.xipki.ca.mgmt.api.CertListInfo;
@@ -135,15 +131,14 @@ import org.xipki.ca.mgmt.api.CertListOrderBy;
 import org.xipki.ca.mgmt.api.CertWithRevocationInfo;
 import org.xipki.ca.mgmt.api.CmpControl;
 import org.xipki.ca.mgmt.api.CrlControl;
-import org.xipki.ca.mgmt.api.RequestorEntry;
-import org.xipki.ca.mgmt.api.RequestorInfo;
-import org.xipki.ca.mgmt.api.ValidityMode;
 import org.xipki.ca.mgmt.api.CrlControl.HourMinute;
 import org.xipki.ca.mgmt.api.CrlControl.UpdateMode;
+import org.xipki.ca.mgmt.api.MgmtEntry;
+import org.xipki.ca.mgmt.api.RequestorInfo;
+import org.xipki.ca.mgmt.api.ValidityMode;
 import org.xipki.ca.server.api.CaAuditConstants;
 import org.xipki.ca.server.cmp.CmpRequestorInfo;
 import org.xipki.ca.server.store.CertStore;
-import org.xipki.ca.server.util.CaUtil;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
@@ -157,12 +152,12 @@ import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.RSABrokenKey;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.CompareUtil;
 import org.xipki.util.DateUtil;
 import org.xipki.util.HealthCheckResult;
 import org.xipki.util.LogUtil;
-import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -616,7 +611,7 @@ public class X509Ca implements Closeable {
   }
 
   public ByUserRequestorInfo getByUserRequestor(NameId userIdent) throws OperationException {
-    CaHasUserEntry caHasUser = certstore.getCaHasUser(caIdent, userIdent);
+    MgmtEntry.CaHasUser caHasUser = certstore.getCaHasUser(caIdent, userIdent);
     return (caHasUser == null) ? null : caManager.createByUserRequestor(caHasUser);
   }
 
@@ -1996,7 +1991,7 @@ public class X509Ca implements Closeable {
     }
 
     final NameId certprofileIdent = certprofile.getIdent();
-    if (certprofile.getVersion() != X509CertVersion.v3) {
+    if (certprofile.getVersion() != Certprofile.X509CertVersion.v3) {
       throw new OperationException(SYSTEM_FAILURE,
           "unknown cert version " + certprofile.getVersion());
     }
@@ -2184,7 +2179,7 @@ public class X509Ca implements Closeable {
     }
 
     // subject
-    SubjectInfo subjectInfo;
+    Certprofile.SubjectInfo subjectInfo;
     try {
       subjectInfo = certprofile.getSubject(requestedSubject);
     } catch (CertprofileException ex) {
@@ -2236,7 +2231,7 @@ public class X509Ca implements Closeable {
       msgBuilder.append(", ").append(subjectInfo.getWarning());
     }
 
-    CertValidity validity = certprofile.getValidity();
+    Certprofile.CertValidity validity = certprofile.getValidity();
 
     if (validity == null) {
       validity = caInfo.getMaxValidity();
@@ -2303,12 +2298,13 @@ public class X509Ca implements Closeable {
   }
 
   public CmpRequestorInfo getRequestor(X500Name requestorSender) {
-    Set<CaHasRequestorEntry> requestorEntries = caManager.getRequestorsForCa(caIdent.getName());
+    Set<MgmtEntry.CaHasRequestor> requestorEntries =
+        caManager.getRequestorsForCa(caIdent.getName());
     if (CollectionUtil.isEmpty(requestorEntries)) {
       return null;
     }
 
-    for (CaHasRequestorEntry m : requestorEntries) {
+    for (MgmtEntry.CaHasRequestor m : requestorEntries) {
       RequestorEntryWrapper entry =
           caManager.getRequestorWrapper(m.getRequestorIdent().getName());
 
@@ -2316,7 +2312,7 @@ public class X509Ca implements Closeable {
         continue;
       }
 
-      if (!RequestorEntry.TYPE_CERT.equals(entry.getDbEntry().getType())) {
+      if (!MgmtEntry.Requestor.TYPE_CERT.equals(entry.getDbEntry().getType())) {
         continue;
       }
 
@@ -2329,15 +2325,16 @@ public class X509Ca implements Closeable {
   } // method getRequestor
 
   public CmpRequestorInfo getRequestor(X509Certificate requestorCert) {
-    Set<CaHasRequestorEntry> requestorEntries = caManager.getRequestorsForCa(caIdent.getName());
+    Set<MgmtEntry.CaHasRequestor> requestorEntries =
+        caManager.getRequestorsForCa(caIdent.getName());
     if (CollectionUtil.isEmpty(requestorEntries)) {
       return null;
     }
 
-    for (CaHasRequestorEntry m : requestorEntries) {
+    for (MgmtEntry.CaHasRequestor m : requestorEntries) {
       RequestorEntryWrapper entry =
           caManager.getRequestorWrapper(m.getRequestorIdent().getName());
-      if (!RequestorEntry.TYPE_CERT.equals(entry.getDbEntry().getType())) {
+      if (!MgmtEntry.Requestor.TYPE_CERT.equals(entry.getDbEntry().getType())) {
         continue;
       }
 
@@ -2351,15 +2348,16 @@ public class X509Ca implements Closeable {
 
   // CHECKSTYLE:SKIP
   public CmpRequestorInfo getMacRequestor(X500Name sender, byte[] senderKID) {
-    Set<CaHasRequestorEntry> requestorEntries = caManager.getRequestorsForCa(caIdent.getName());
+    Set<MgmtEntry.CaHasRequestor> requestorEntries =
+        caManager.getRequestorsForCa(caIdent.getName());
     if (CollectionUtil.isEmpty(requestorEntries)) {
       return null;
     }
 
-    for (CaHasRequestorEntry m : requestorEntries) {
+    for (MgmtEntry.CaHasRequestor m : requestorEntries) {
       RequestorEntryWrapper entry =
           caManager.getRequestorWrapper(m.getRequestorIdent().getName());
-      if (!RequestorEntry.TYPE_PBM.equals(entry.getDbEntry().getType())) {
+      if (!MgmtEntry.Requestor.TYPE_PBM.equals(entry.getDbEntry().getType())) {
         continue;
       }
 
@@ -2491,7 +2489,7 @@ public class X509Ca implements Closeable {
 
     final int numEntries = 100;
 
-    CertValidity val = caInfo.revokeSuspendedCertsControl().getUnchangedSince();
+    Certprofile.CertValidity val = caInfo.revokeSuspendedCertsControl().getUnchangedSince();
     long ms;
     switch (val.getUnit()) {
       case DAY:

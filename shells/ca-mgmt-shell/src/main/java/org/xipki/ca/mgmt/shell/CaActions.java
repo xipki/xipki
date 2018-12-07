@@ -43,27 +43,17 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.profile.CertValidity;
-import org.xipki.ca.mgmt.api.AddUserEntry;
+import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.mgmt.api.CaConfs;
-import org.xipki.ca.mgmt.api.CaEntry;
-import org.xipki.ca.mgmt.api.CaHasRequestorEntry;
-import org.xipki.ca.mgmt.api.CaHasUserEntry;
 import org.xipki.ca.mgmt.api.CaManager;
 import org.xipki.ca.mgmt.api.CaMgmtException;
 import org.xipki.ca.mgmt.api.CaStatus;
 import org.xipki.ca.mgmt.api.CaSystemStatus;
-import org.xipki.ca.mgmt.api.CertprofileEntry;
-import org.xipki.ca.mgmt.api.ChangeCaEntry;
-import org.xipki.ca.mgmt.api.ChangeUserEntry;
 import org.xipki.ca.mgmt.api.CmpControl;
 import org.xipki.ca.mgmt.api.CrlControl;
+import org.xipki.ca.mgmt.api.MgmtEntry;
 import org.xipki.ca.mgmt.api.ProtocolSupport;
-import org.xipki.ca.mgmt.api.PublisherEntry;
-import org.xipki.ca.mgmt.api.RequestorEntry;
 import org.xipki.ca.mgmt.api.ScepControl;
-import org.xipki.ca.mgmt.api.SignerEntry;
-import org.xipki.ca.mgmt.api.UserEntry;
 import org.xipki.ca.mgmt.api.ValidityMode;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.CertRevocationInfo;
@@ -153,7 +143,7 @@ public class CaActions {
 
     @Override
     protected Object execute0() throws Exception {
-      CaEntry caEntry = getCaEntry();
+      MgmtEntry.Ca caEntry = getCaEntry();
       if (certFile != null) {
         X509Certificate caCert = X509Util.parseCert(new File(certFile));
         caEntry.setCert(caCert);
@@ -282,7 +272,7 @@ public class CaActions {
     @Reference
     private PasswordResolver passwordResolver;
 
-    protected CaEntry getCaEntry() throws Exception {
+    protected MgmtEntry.Ca getCaEntry() throws Exception {
       Args.range(snBitLen, "sn-bitlen", 63, 159);
 
       if (nextCrlNumber < 1) {
@@ -303,7 +293,7 @@ public class CaActions {
       }
 
       CaUris caUris = new CaUris(caCertUris, ocspUris, crlUris, deltaCrlUris);
-      CaEntry entry = new CaEntry(new NameId(null, caName), snBitLen, nextCrlNumber,
+      MgmtEntry.Ca entry = new MgmtEntry.Ca(new NameId(null, caName), snBitLen, nextCrlNumber,
           signerType, signerConf, caUris, numCrls.intValue(), expirationPeriod.intValue());
 
       entry.setKeepExpiredCertInDays(keepExpiredCertInDays.intValue());
@@ -350,7 +340,7 @@ public class CaActions {
         entry.setCrlSignerName(crlSignerName);
       }
 
-      CertValidity tmpMaxValidity = CertValidity.getInstance(maxValidity);
+      Certprofile.CertValidity tmpMaxValidity = Certprofile.CertValidity.getInstance(maxValidity);
       entry.setMaxValidity(tmpMaxValidity);
 
       entry.setKeepExpiredCertInDays(keepExpiredCertInDays);
@@ -491,7 +481,7 @@ public class CaActions {
 
     @Override
     protected Object execute0() throws Exception {
-      CaEntry caEntry = getCaEntry();
+      MgmtEntry.Ca caEntry = getCaEntry();
       byte[] csr = IoUtil.read(csrFile);
       BigInteger serialNumber = null;
       if (serialS != null) {
@@ -535,7 +525,7 @@ public class CaActions {
         sb.append("inactive CAs:\n");
         printCaNames(sb, caManager.getInactiveCaNames(), prefix);
       } else {
-        CaEntry entry = caManager.getCa(name);
+        MgmtEntry.Ca entry = caManager.getCa(name);
         if (entry == null) {
           throw new CmdFailure("could not find CA '" + name + "'");
         } else {
@@ -696,11 +686,11 @@ public class CaActions {
         throw new CmdFailure("could not find CA '" + caName + "'");
       }
 
-      List<PublisherEntry> entries = caManager.getPublishersForCa(caName);
+      List<MgmtEntry.Publisher> entries = caManager.getPublishersForCa(caName);
       if (isNotEmpty(entries)) {
         StringBuilder sb = new StringBuilder();
         sb.append("publishers for CA ").append(caName).append("\n");
-        for (PublisherEntry entry : entries) {
+        for (MgmtEntry.Publisher entry : entries) {
           sb.append("\t").append(entry.getIdent().getName()).append("\n");
         }
         println(sb.toString());
@@ -804,7 +794,8 @@ public class CaActions {
     protected Object execute0() throws Exception {
       boolean ra = isEnabled(raS, false, "ra");
 
-      CaHasRequestorEntry entry = new CaHasRequestorEntry(new NameId(null, requestorName));
+      MgmtEntry.CaHasRequestor entry =
+          new MgmtEntry.CaHasRequestor(new NameId(null, requestorName));
       entry.setRa(ra);
       entry.setProfiles(profiles);
       int intPermission = ShellUtil.getPermission(permissions);
@@ -838,10 +829,10 @@ public class CaActions {
 
       StringBuilder sb = new StringBuilder();
 
-      Set<CaHasRequestorEntry> entries = caManager.getRequestorsForCa(caName);
+      Set<MgmtEntry.CaHasRequestor> entries = caManager.getRequestorsForCa(caName);
       if (isNotEmpty(entries)) {
         sb.append("requestors trusted by CA " + caName).append("\n");
-        for (CaHasRequestorEntry entry : entries) {
+        for (MgmtEntry.CaHasRequestor entry : entries) {
           sb.append("\t").append(entry).append("\n");
         }
       } else {
@@ -1087,8 +1078,8 @@ public class CaActions {
     @Reference
     private PasswordResolver passwordResolver;
 
-    protected ChangeCaEntry getChangeCaEntry() throws Exception {
-      ChangeCaEntry entry = new ChangeCaEntry(new NameId(null, caName));
+    protected MgmtEntry.ChangeCa getChangeCaEntry() throws Exception {
+      MgmtEntry.ChangeCa entry = new MgmtEntry.ChangeCa(new NameId(null, caName));
 
       if (snBitLen != null) {
         Args.range(snBitLen, "sn-bitlen", 63, 159);
@@ -1116,7 +1107,7 @@ public class CaActions {
       if (signerConf != null) {
         String tmpSignerType = signerType;
         if (tmpSignerType == null) {
-          CaEntry caEntry = caManager.getCa(caName);
+          MgmtEntry.Ca caEntry = caManager.getCa(caName);
           if (caEntry == null) {
             throw new IllegalCmdParamException("please specify the signerType");
           }
@@ -1167,7 +1158,7 @@ public class CaActions {
       }
 
       if (maxValidity != null) {
-        entry.setMaxValidity(CertValidity.getInstance(maxValidity));
+        entry.setMaxValidity(Certprofile.CertValidity.getInstance(maxValidity));
       }
 
       if (cmpControl != null) {
@@ -1257,7 +1248,7 @@ public class CaActions {
 
     @Override
     protected Object execute0() throws Exception {
-      CaHasUserEntry entry = new CaHasUserEntry(new NameId(null, userName));
+      MgmtEntry.CaHasUser entry = new MgmtEntry.CaHasUser(new NameId(null, userName));
       entry.setProfiles(profiles);
       int intPermission = ShellUtil.getPermission(permissions);
       entry.setPermission(intPermission);
@@ -1469,7 +1460,7 @@ public class CaActions {
         conf = new String(IoUtil.read(confFile));
       }
 
-      CertprofileEntry entry = new CertprofileEntry(new NameId(null, name), type, conf);
+      MgmtEntry.Certprofile entry = new MgmtEntry.Certprofile(new NameId(null, name), type, conf);
       String msg = "certificate profile " + name;
       try {
         caManager.addCertprofile(entry);
@@ -1498,7 +1489,7 @@ public class CaActions {
 
     @Override
     protected Object execute0() throws Exception {
-      CertprofileEntry entry = caManager.getCertprofile(name);
+      MgmtEntry.Certprofile entry = caManager.getCertprofile(name);
       if (entry == null) {
         throw new IllegalCmdParamException("no certificate profile named " + name + " is defined");
       }
@@ -1549,7 +1540,7 @@ public class CaActions {
           sb.append("\t").append(entry).append("\n");
         }
       } else {
-        CertprofileEntry entry = caManager.getCertprofile(name);
+        MgmtEntry.Certprofile entry = caManager.getCertprofile(name);
         if (entry == null) {
           throw new CmdFailure("\tno certificate profile named '" + name + "' is configured");
         } else {
@@ -1655,7 +1646,7 @@ public class CaActions {
         conf = new String(IoUtil.read(confFile));
       }
 
-      PublisherEntry entry = new PublisherEntry(new NameId(null, name), type, conf);
+      MgmtEntry.Publisher entry = new MgmtEntry.Publisher(new NameId(null, name), type, conf);
       String msg = "publisher " + name;
       try {
         caManager.addPublisher(entry);
@@ -1683,7 +1674,7 @@ public class CaActions {
 
     @Override
     protected Object execute0() throws Exception {
-      PublisherEntry entry = caManager.getPublisher(name);
+      MgmtEntry.Publisher entry = caManager.getPublisher(name);
       if (entry == null) {
         throw new IllegalCmdParamException("no publisher named " + name + " is defined");
       }
@@ -1729,7 +1720,7 @@ public class CaActions {
         }
         println(sb.toString());
       } else {
-        PublisherEntry entry = caManager.getPublisher(name);
+        MgmtEntry.Publisher entry = caManager.getPublisher(name);
         if (entry == null) {
           throw new CmdFailure("\tno publisher named '" + name + "' is configured");
         } else {
@@ -1897,13 +1888,14 @@ public class CaActions {
         throw new CmdFailure("exactly one of cert and password must be specified");
       }
 
-      RequestorEntry entry;
+      MgmtEntry.Requestor entry;
       if (certFile != null) {
         X509Certificate cert = X509Util.parseCert(IoUtil.read(certFile));
-        entry = new RequestorEntry(new NameId(null, name), RequestorEntry.TYPE_CERT,
+        entry = new MgmtEntry.Requestor(new NameId(null, name), MgmtEntry.Requestor.TYPE_CERT,
             Base64.encodeToString(cert.getEncoded()));
       } else {
-        entry = new RequestorEntry(new NameId(null, name), RequestorEntry.TYPE_PBM, password);
+        entry = new MgmtEntry.Requestor(
+                  new NameId(null, name), MgmtEntry.Requestor.TYPE_PBM, password);
         String keyId = HashAlgo.SHA1.hexHash(entry.getIdent().getName().getBytes("UTF-8"));
         println("The key ID is " + keyId);
       }
@@ -1955,7 +1947,7 @@ public class CaActions {
           sb.append("\t").append(entry).append("\n");
         }
       } else {
-        RequestorEntry entry = caManager.getRequestor(name);
+        MgmtEntry.Requestor entry = caManager.getRequestor(name);
         if (entry == null) {
           throw new CmdFailure("could not find CMP requestor '" + name + "'");
         } else {
@@ -2022,11 +2014,11 @@ public class CaActions {
       String type;
       String conf;
       if (certFile != null) {
-        type = RequestorEntry.TYPE_CERT;
+        type = MgmtEntry.Requestor.TYPE_CERT;
         X509Certificate cert = X509Util.parseCert(IoUtil.read(certFile));
         conf = Base64.encodeToString(cert.getEncoded());
       } else {
-        type = RequestorEntry.TYPE_PBM;
+        type = MgmtEntry.Requestor.TYPE_PBM;
         conf = password;
       }
 
@@ -2104,7 +2096,7 @@ public class CaActions {
       if ("PKCS12".equalsIgnoreCase(type) || "JKS".equalsIgnoreCase(type)) {
         conf = ShellUtil.canonicalizeSignerConf(type, conf, passwordResolver, securityFactory);
       }
-      SignerEntry entry = new SignerEntry(name, type, conf, base64Cert);
+      MgmtEntry.Signer entry = new MgmtEntry.Signer(name, type, conf, base64Cert);
 
       String msg = "signer " + name;
       try {
@@ -2150,7 +2142,7 @@ public class CaActions {
           sb.append("\t").append(entry).append("\n");
         }
       } else {
-        SignerEntry entry = caManager.getSigner(name);
+        MgmtEntry.Signer entry = caManager.getSigner(name);
         if (entry == null) {
           throw new CmdFailure("could not find signer " + name);
         } else {
@@ -2219,7 +2211,7 @@ public class CaActions {
       }
       String tmpType = type;
       if (tmpType == null) {
-        SignerEntry entry = caManager.getSigner(name);
+        MgmtEntry.Signer entry = caManager.getSigner(name);
         if (entry == null) {
           throw new IllegalCmdParamException("please specify the type");
         }
@@ -2304,7 +2296,8 @@ public class CaActions {
       if (password == null) {
         password = new String(readPassword());
       }
-      AddUserEntry userEntry = new AddUserEntry(new NameId(null, name), !inactive, password);
+      MgmtEntry.AddUser userEntry =
+          new MgmtEntry.AddUser(new NameId(null, name), !inactive, password);
       String msg = "user " + name;
       try {
         caManager.addUser(userEntry);
@@ -2326,7 +2319,7 @@ public class CaActions {
 
     @Override
     protected Object execute0() throws Exception {
-      UserEntry userEntry = caManager.getUser(name);
+      MgmtEntry.User userEntry = caManager.getUser(name);
       if (userEntry == null) {
         throw new CmdFailure("no user named '" + name + "' is configured");
       }
@@ -2334,9 +2327,9 @@ public class CaActions {
       StringBuilder sb = new StringBuilder();
       sb.append(userEntry);
 
-      Map<String, CaHasUserEntry> caHasUsers = caManager.getCaHasUsersForUser(name);
+      Map<String, MgmtEntry.CaHasUser> caHasUsers = caManager.getCaHasUsersForUser(name);
       for (String ca : caHasUsers.keySet()) {
-        CaHasUserEntry entry = caHasUsers.get(ca);
+        MgmtEntry.CaHasUser entry = caHasUsers.get(ca);
         sb.append("\n----- CA ").append(ca).append("-----");
         sb.append("\nprofiles: ").append(entry.getProfiles());
         sb.append("\npermission: ").append(entry.getPermission());
@@ -2403,7 +2396,7 @@ public class CaActions {
         realActive = null;
       }
 
-      ChangeUserEntry entry = new ChangeUserEntry(new NameId(null, name));
+      MgmtEntry.ChangeUser entry = new MgmtEntry.ChangeUser(new NameId(null, name));
       if (realActive != null) {
         entry.setActive(realActive);
       }

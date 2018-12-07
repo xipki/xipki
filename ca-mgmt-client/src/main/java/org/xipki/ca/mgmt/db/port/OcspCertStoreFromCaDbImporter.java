@@ -40,12 +40,6 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.mgmt.db.message.Ca;
-import org.xipki.ca.mgmt.db.message.CaCert;
-import org.xipki.ca.mgmt.db.message.CaCertstore;
-import org.xipki.ca.mgmt.db.message.CaHasEntry.CaHasPublisher;
-import org.xipki.ca.mgmt.db.message.Caconf;
-import org.xipki.ca.mgmt.db.message.IdNameTypeConf;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.HashAlgo;
@@ -108,9 +102,9 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
           + certstore.getVersion());
     }
 
-    Caconf caconf;
+    CaCertstore.Caconf caconf;
     try (InputStream is = Files.newInputStream(Paths.get(baseDir, FILENAME_CA_CONFIGURATION))) {
-      caconf = JSON.parseObject(is, Caconf.class);
+      caconf = JSON.parseObject(is, CaCertstore.Caconf.class);
     }
     caconf.validate();
 
@@ -125,8 +119,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
         dropIndexes();
       }
 
-      IdNameTypeConf publisherType = null;
-      for (IdNameTypeConf type : caconf.getPublishers()) {
+      CaCertstore.IdNameTypeConf publisherType = null;
+      for (CaCertstore.IdNameTypeConf type : caconf.getPublishers()) {
         if (publisherName.equals(type.getName())) {
           publisherType = type;
           break;
@@ -150,14 +144,14 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
       }
 
       Set<Integer> relatedCaIds = new HashSet<>();
-      for (CaHasPublisher ctype : caconf.getCaHasPublishers()) {
+      for (CaCertstore.CaHasPublisher ctype : caconf.getCaHasPublishers()) {
         if (ctype.getPublisherId() == publisherType.getId()) {
           relatedCaIds.add(ctype.getCaId());
         }
       }
 
-      List<Ca> relatedCas = new LinkedList<>();
-      for (Ca m : caconf.getCas()) {
+      List<CaCertstore.Ca> relatedCas = new LinkedList<>();
+      for (CaCertstore.Ca m : caconf.getCas()) {
         if (relatedCaIds.contains(m.getId())) {
           relatedCas.add(m);
         }
@@ -182,14 +176,14 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
     System.out.println(" imported OCSP certstore to database");
   } // method importToDb
 
-  private List<Integer> getIssuerIds(List<Ca> cas) throws IOException {
+  private List<Integer> getIssuerIds(List<CaCertstore.Ca> cas) throws IOException {
     List<Integer> relatedCaIds = new LinkedList<>();
-    for (Ca issuer : cas) {
+    for (CaCertstore.Ca issuer : cas) {
       byte[] encodedCert = issuer.getCert() == null ? null : readContent(issuer.getCert());
 
       // retrieve the revocation information of the CA, if possible
-      Ca ca = null;
-      for (Ca caType : cas) {
+      CaCertstore.Ca ca = null;
+      for (CaCertstore.Ca caType : cas) {
         byte[] certBytes = caType.getCert() == null ? null : readContent(caType.getCert());
         if (Arrays.equals(encodedCert, certBytes)) {
           ca = caType;
@@ -205,7 +199,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
     return relatedCaIds;
   }
 
-  private List<Integer> importIssuer(List<Ca> cas)
+  private List<Integer> importIssuer(List<CaCertstore.Ca> cas)
       throws DataAccessException, CertificateException, IOException {
     System.out.println("importing table ISSUER");
     final String sql = SQL_ADD_ISSUER;
@@ -214,7 +208,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
     List<Integer> relatedCaIds = new LinkedList<>();
 
     try {
-      for (Ca issuer : cas) {
+      for (CaCertstore.Ca issuer : cas) {
         importIssuer0(issuer, sql, ps, relatedCaIds);
       }
     } finally {
@@ -225,7 +219,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
     return relatedCaIds;
   }
 
-  private void importIssuer0(Ca issuer, String sql, PreparedStatement ps,
+  private void importIssuer0(CaCertstore.Ca issuer, String sql, PreparedStatement ps,
       List<Integer> relatedCaIds) throws IOException, DataAccessException, CertificateException {
     try {
       byte[] encodedCert = readContent(issuer.getCert());
@@ -344,10 +338,10 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
     ZipFile zipFile = new ZipFile(new File(certsZipFile));
     ZipEntry certsEntry = zipFile.getEntry("overview.json");
 
-    CaCert.Certs certs;
+    CaCertstore.Certs certs;
     try {
       certs = JSON.parseObject(zipFile.getInputStream(certsEntry), Charset.forName("UTF-8"),
-          CaCert.Certs.class);
+          CaCertstore.Certs.class);
     } catch (Exception ex) {
       try {
         zipFile.close();
@@ -366,7 +360,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
       int numImportedEntriesInBatch = 0;
       long lastSuccessfulCertId = 0;
 
-      List<CaCert> list = certs.getCerts();
+      List<CaCertstore.Cert> list = certs.getCerts();
       final int n = list.size();
 
       for (int i = 0; i < n; i++) {
@@ -374,7 +368,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
           throw new InterruptedException("interrupted by the user");
         }
 
-        CaCert cert = list.get(i);
+        CaCertstore.Cert cert = list.get(i);
 
         long id = cert.getId();
         lastSuccessfulCertId = id;

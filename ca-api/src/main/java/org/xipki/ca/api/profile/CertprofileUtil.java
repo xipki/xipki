@@ -50,14 +50,15 @@ public class CertprofileUtil {
    * @throws BadCertTemplateException
    *         If requestedName is invalid or contains entries which are not allowed in the modes.
    */
-  public static GeneralName createGeneralName(GeneralName requestedName, Set<GeneralNameMode> modes)
+  public static GeneralName createGeneralName(GeneralName requestedName,
+      Set<Certprofile.GeneralNameMode> modes)
       throws BadCertTemplateException {
     Args.notNull(requestedName, "requestedName");
 
     int tag = requestedName.getTagNo();
-    GeneralNameMode mode = null;
+    Certprofile.GeneralNameMode mode = null;
     if (modes != null) {
-      for (GeneralNameMode m : modes) {
+      for (Certprofile.GeneralNameMode m : modes) {
         if (m.getTag().getTag() == tag) {
           mode = m;
           break;

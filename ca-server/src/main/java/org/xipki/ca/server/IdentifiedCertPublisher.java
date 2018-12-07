@@ -26,7 +26,7 @@ import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
-import org.xipki.ca.mgmt.api.PublisherEntry;
+import org.xipki.ca.mgmt.api.MgmtEntry;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
@@ -40,11 +40,11 @@ import org.xipki.util.Args;
 
 class IdentifiedCertPublisher implements Closeable {
 
-  private final PublisherEntry entry;
+  private final MgmtEntry.Publisher entry;
 
   private final CertPublisher certPublisher;
 
-  IdentifiedCertPublisher(PublisherEntry entry, CertPublisher certPublisher) {
+  IdentifiedCertPublisher(MgmtEntry.Publisher entry, CertPublisher certPublisher) {
     this.entry = Args.notNull(entry, "entry");
     this.certPublisher = Args.notNull(certPublisher, "certPublisher");
   }
@@ -71,7 +71,7 @@ class IdentifiedCertPublisher implements Closeable {
     return certPublisher.crlAdded(caCert, crl);
   }
 
-  public PublisherEntry getDbEntry() {
+  public MgmtEntry.Publisher getDbEntry() {
     return entry;
   }
 

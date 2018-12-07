@@ -46,7 +46,7 @@ import org.xipki.ca.api.profile.CertprofileFactory;
 import org.xipki.ca.api.profile.CertprofileFactoryRegister;
 import org.xipki.ca.certprofile.xijson.CertprofileFactoryImpl;
 import org.xipki.ca.server.CaManagerImpl;
-import org.xipki.ca.server.publisher.ocsp.OcspCertPublisherFactory;
+import org.xipki.ca.server.publisher.OcspCertPublisherFactory;
 import org.xipki.security.Securities;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.HttpConstants;

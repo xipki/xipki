@@ -28,16 +28,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.xipki.ca.mgmt.db.message.Ca;
-import org.xipki.ca.mgmt.db.message.CaHasEntry.CaHasProfile;
-import org.xipki.ca.mgmt.db.message.CaHasEntry.CaHasPublisher;
-import org.xipki.ca.mgmt.db.message.CaHasEntry.CaHasRequestor;
-import org.xipki.ca.mgmt.db.message.CaHasEntry.CaHasUser;
-import org.xipki.ca.mgmt.db.message.Caalias;
-import org.xipki.ca.mgmt.db.message.Caconf;
-import org.xipki.ca.mgmt.db.message.IdNameTypeConf;
-import org.xipki.ca.mgmt.db.message.Signer;
-import org.xipki.ca.mgmt.db.message.User;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.util.X509Util;
@@ -59,9 +49,9 @@ class CaconfDbImporter extends DbPorter {
   }
 
   public void importToDb() throws Exception {
-    Caconf caconf;
+    CaCertstore.Caconf caconf;
     try (InputStream is = Files.newInputStream(Paths.get(baseDir, FILENAME_CA_CONFIGURATION))) {
-      caconf = JSON.parseObject(is, Caconf.class);
+      caconf = JSON.parseObject(is, CaCertstore.Caconf.class);
     }
     caconf.validate();
 
@@ -91,7 +81,8 @@ class CaconfDbImporter extends DbPorter {
     System.out.println(" imported CA configuration to database");
   } // method importToDb
 
-  private void importSigner(List<Signer> signers) throws DataAccessException, IOException {
+  private void importSigner(List<CaCertstore.Signer> signers)
+      throws DataAccessException, IOException {
     System.out.println("importing table SIGNER");
     if (signers == null) {
       System.out.println(" imported table SIGNER: nothing to import");
@@ -103,7 +94,7 @@ class CaconfDbImporter extends DbPorter {
     try {
       ps = prepareStatement(sql);
 
-      for (Signer signer : signers) {
+      for (CaCertstore.Signer signer : signers) {
         String b64Cert = (signer.getCert() == null) ? null
             : Base64.encodeToString(readContent(signer.getCert()));
         try {
@@ -126,7 +117,7 @@ class CaconfDbImporter extends DbPorter {
     System.out.println(" imported table SIGNER");
   } // method importSigner
 
-  private void importRequestor(List<IdNameTypeConf> requestors)
+  private void importRequestor(List<CaCertstore.IdNameTypeConf> requestors)
       throws DataAccessException, IOException {
     System.out.println("importing table REQUESTOR");
     final String sql = "INSERT INTO REQUESTOR (ID,NAME,TYPE,CONF) VALUES (?,?,?,?)";
@@ -134,7 +125,7 @@ class CaconfDbImporter extends DbPorter {
     try {
       ps = prepareStatement(sql);
 
-      for (IdNameTypeConf requestor : requestors) {
+      for (CaCertstore.IdNameTypeConf requestor : requestors) {
         try {
           ps.setInt(1, requestor.getId());
           ps.setString(2, requestor.getName());
@@ -153,14 +144,14 @@ class CaconfDbImporter extends DbPorter {
     System.out.println(" imported table REQUESTOR");
   } // method importRequestor
 
-  private void importUser(List<User> users) throws DataAccessException, IOException {
+  private void importUser(List<CaCertstore.User> users) throws DataAccessException, IOException {
     System.out.println("importing table TUSER");
     final String sql = "INSERT INTO TUSER (ID,NAME,ACTIVE,PASSWORD) VALUES (?,?,?,?)";
     PreparedStatement ps = null;
     try {
       ps = prepareStatement(sql);
 
-      for (User user : users) {
+      for (CaCertstore.User user : users) {
         try {
           ps.setInt(1, user.getId());
           ps.setString(2, user.getName());
@@ -179,14 +170,14 @@ class CaconfDbImporter extends DbPorter {
     System.out.println(" imported table TUSER");
   } // method importUser
 
-  private void importPublisher(List<IdNameTypeConf> publishers)
+  private void importPublisher(List<CaCertstore.IdNameTypeConf> publishers)
       throws DataAccessException, IOException {
     System.out.println("importing table PUBLISHER");
     final String sql = "INSERT INTO PUBLISHER (ID,NAME,TYPE,CONF) VALUES (?,?,?,?)";
     PreparedStatement ps = null;
     try {
       ps = prepareStatement(sql);
-      for (IdNameTypeConf publisher : publishers) {
+      for (CaCertstore.IdNameTypeConf publisher : publishers) {
         try {
           int idx = 1;
           ps.setInt(idx++, publisher.getId());
@@ -206,14 +197,14 @@ class CaconfDbImporter extends DbPorter {
     System.out.println(" imported table PUBLISHER");
   } // method importPublisher
 
-  private void importProfile(List<IdNameTypeConf> profiles)
+  private void importProfile(List<CaCertstore.IdNameTypeConf> profiles)
       throws DataAccessException, IOException {
     System.out.println("importing table PROFILE");
     final String sql = "INSERT INTO PROFILE (ID,NAME,TYPE,CONF) VALUES (?,?,?,?)";
     PreparedStatement ps = null;
     try {
       ps = prepareStatement(sql);
-      for (IdNameTypeConf certprofile : profiles) {
+      for (CaCertstore.IdNameTypeConf certprofile : profiles) {
         try {
           int idx = 1;
           ps.setInt(idx++, certprofile.getId());
@@ -236,7 +227,7 @@ class CaconfDbImporter extends DbPorter {
     System.out.println(" imported table PROFILE");
   } // method importProfile
 
-  private void importCa(List<Ca> cas)
+  private void importCa(List<CaCertstore.Ca> cas)
       throws DataAccessException, CertificateException, IOException {
     System.out.println("importing table CA");
     String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CA_URIS,MAX_VALIDITY,"
@@ -250,7 +241,7 @@ class CaconfDbImporter extends DbPorter {
     try {
       ps = prepareStatement(sql);
 
-      for (Ca ca : cas) {
+      for (CaCertstore.Ca ca : cas) {
         try {
           byte[] certBytes = readContent(ca.getCert());
           X509Certificate cert = X509Util.parseCert(certBytes);
@@ -303,12 +294,12 @@ class CaconfDbImporter extends DbPorter {
     System.out.println(" imported table CA");
   } // method importCa
 
-  private void importCaalias(List<Caalias> caaliases) throws DataAccessException {
+  private void importCaalias(List<CaCertstore.Caalias> caaliases) throws DataAccessException {
     System.out.println("importing table CAALIAS");
     final String sql = "INSERT INTO CAALIAS (NAME,CA_ID) VALUES (?,?)";
     PreparedStatement ps = prepareStatement(sql);
     try {
-      for (Caalias caalias : caaliases) {
+      for (CaCertstore.Caalias caalias : caaliases) {
         try {
           ps.setString(1, caalias.getName());
           ps.setInt(2, caalias.getCaId());
@@ -325,14 +316,14 @@ class CaconfDbImporter extends DbPorter {
     System.out.println(" imported table CAALIAS");
   } // method importCaalias
 
-  private void importCaHasRequestor(List<CaHasRequestor> caHasRequestors)
+  private void importCaHasRequestor(List<CaCertstore.CaHasRequestor> caHasRequestors)
       throws DataAccessException {
     System.out.println("importing table CA_HAS_REQUESTOR");
     final String sql = "INSERT INTO CA_HAS_REQUESTOR (CA_ID,REQUESTOR_ID,RA,PERMISSION,PROFILES)"
         + " VALUES (?,?,?,?,?)";
     PreparedStatement ps = prepareStatement(sql);
     try {
-      for (CaHasRequestor entry : caHasRequestors) {
+      for (CaCertstore.CaHasRequestor entry : caHasRequestors) {
         try {
           int idx = 1;
           ps.setInt(idx++, entry.getCaId());
@@ -354,13 +345,13 @@ class CaconfDbImporter extends DbPorter {
     System.out.println(" imported table CA_HAS_REQUESTOR");
   } // method importCaHasRequestor
 
-  private void importCaHasUser(List<CaHasUser> caHasUsers) throws DataAccessException {
+  private void importCaHasUser(List<CaCertstore.CaHasUser> caHasUsers) throws DataAccessException {
     System.out.println("importing table CA_HAS_USER");
     final String sql = "INSERT INTO CA_HAS_USER (ID,CA_ID,USER_ID,PERMISSION,PROFILES)"
         + " VALUES (?,?,?,?,?)";
     PreparedStatement ps = prepareStatement(sql);
     try {
-      for (CaHasUser entry : caHasUsers) {
+      for (CaCertstore.CaHasUser entry : caHasUsers) {
         try {
           int idx = 1;
           ps.setInt(idx++, entry.getId());
@@ -382,12 +373,13 @@ class CaconfDbImporter extends DbPorter {
     System.out.println(" imported table CA_HAS_USER");
   } // method importCaHasRequestor
 
-  private void importCaHasPublisher(List<CaHasPublisher> caHasPublishers) throws Exception {
+  private void importCaHasPublisher(List<CaCertstore.CaHasPublisher> caHasPublishers)
+      throws Exception {
     System.out.println("importing table CA_HAS_PUBLISHER");
     final String sql = "INSERT INTO CA_HAS_PUBLISHER (CA_ID,PUBLISHER_ID) VALUES (?,?)";
     PreparedStatement ps = prepareStatement(sql);
     try {
-      for (CaHasPublisher entry : caHasPublishers) {
+      for (CaCertstore.CaHasPublisher entry : caHasPublishers) {
         try {
           ps.setInt(1, entry.getCaId());
           ps.setInt(2, entry.getPublisherId());
@@ -405,13 +397,13 @@ class CaconfDbImporter extends DbPorter {
     System.out.println(" imported table CA_HAS_PUBLISHER");
   } // method importCaHasPublisher
 
-  private void importCaHasCertprofile(List<CaHasProfile> caHasCertprofiles)
+  private void importCaHasCertprofile(List<CaCertstore.CaHasProfile> caHasCertprofiles)
       throws DataAccessException {
     System.out.println("importing table CA_HAS_PROFILE");
     final String sql = "INSERT INTO CA_HAS_PROFILE (CA_ID,PROFILE_ID) VALUES (?,?)";
     PreparedStatement ps = prepareStatement(sql);
     try {
-      for (CaHasProfile entry : caHasCertprofiles) {
+      for (CaCertstore.CaHasProfile entry : caHasCertprofiles) {
         try {
           ps.setInt(1, entry.getCaId());
           ps.setInt(2, entry.getProfileId());

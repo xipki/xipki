@@ -17,7 +17,7 @@
 
 package org.xipki.ca.mgmt.msg;
 
-import org.xipki.ca.mgmt.api.SignerEntry;
+import org.xipki.ca.mgmt.api.MgmtEntry;
 import org.xipki.util.Base64;
 
 /**
@@ -40,7 +40,7 @@ public class SignerEntryWrapper {
   public SignerEntryWrapper() {
   }
 
-  public SignerEntryWrapper(SignerEntry signerEntry) {
+  public SignerEntryWrapper(MgmtEntry.Signer signerEntry) {
     this.name = signerEntry.getName();
     this.type = signerEntry.getType();
     this.conf = signerEntry.getConf();
@@ -90,13 +90,13 @@ public class SignerEntryWrapper {
     this.faulty = faulty;
   }
 
-  public SignerEntry toSignerEntry() {
+  public MgmtEntry.Signer toSignerEntry() {
     String base64Cert = null;
     if (encodedCert != null) {
       base64Cert = Base64.encodeToString(encodedCert);
     }
 
-    SignerEntry ret = new SignerEntry(name, type, conf, base64Cert);
+    MgmtEntry.Signer ret = new MgmtEntry.Signer(name, type, conf, base64Cert);
     ret.setConfFaulty(faulty);
     return ret;
   }

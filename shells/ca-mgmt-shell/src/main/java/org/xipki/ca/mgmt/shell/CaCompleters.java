@@ -26,10 +26,10 @@ import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.mgmt.api.CaEntry;
 import org.xipki.ca.mgmt.api.CaManager;
 import org.xipki.ca.mgmt.api.CaMgmtException;
 import org.xipki.ca.mgmt.api.CertListOrderBy;
+import org.xipki.ca.mgmt.api.MgmtEntry;
 import org.xipki.ca.mgmt.api.RequestorInfo;
 import org.xipki.ca.mgmt.api.ValidityMode;
 import org.xipki.security.CrlReason;
@@ -243,7 +243,7 @@ public class CaCompleters {
       Set<String> ret = new HashSet<>();
 
       for (String name : caNames) {
-        CaEntry caEntry;
+        MgmtEntry.Ca caEntry;
         try {
           caEntry = caManager.getCa(name);
         } catch (CaMgmtException ex) {

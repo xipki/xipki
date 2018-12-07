@@ -66,22 +66,13 @@ import org.slf4j.LoggerFactory;
 import org.xipki.cmpclient.CertIdOrError;
 import org.xipki.cmpclient.CertprofileInfo;
 import org.xipki.cmpclient.CmpClient;
+import org.xipki.cmpclient.CmpClientConf;
 import org.xipki.cmpclient.CmpClientException;
 import org.xipki.cmpclient.EnrollCertRequest;
 import org.xipki.cmpclient.EnrollCertResult;
 import org.xipki.cmpclient.PkiErrorException;
 import org.xipki.cmpclient.RevokeCertRequest;
 import org.xipki.cmpclient.UnrevokeOrRemoveCertRequest;
-import org.xipki.cmpclient.conf.CaType;
-import org.xipki.cmpclient.conf.CertprofileType;
-import org.xipki.cmpclient.conf.CertprofileType.Certprofiles;
-import org.xipki.cmpclient.conf.CmpclientType;
-import org.xipki.cmpclient.conf.CmpcontrolType;
-import org.xipki.cmpclient.conf.RequestorType;
-import org.xipki.cmpclient.conf.RequestorType.PbmMac;
-import org.xipki.cmpclient.conf.RequestorType.Signature;
-import org.xipki.cmpclient.conf.ResponderType;
-import org.xipki.cmpclient.conf.SslType;
 import org.xipki.cmpclient.internal.Requestor.PbmMacCmpRequestor;
 import org.xipki.cmpclient.internal.Requestor.SignatureCmpRequestor;
 import org.xipki.security.AlgorithmValidator;
@@ -268,22 +259,22 @@ public final class CmpClientImpl implements CmpClient {
       return false;
     }
 
-    CmpclientType config;
+    CmpClientConf conf;
     try {
-      config = parse(Files.newInputStream(configFile.toPath()));
+      conf = parse(Files.newInputStream(configFile.toPath()));
     } catch (IOException | CmpClientException ex) {
       LOG.error("could not read file {}", confFile);
       return false;
     }
 
-    if (CollectionUtil.isEmpty(config.getCas())) {
+    if (CollectionUtil.isEmpty(conf.getCas())) {
       LOG.warn("no CA is configured");
     }
 
     // ssl configurations
     Map<String, SslConf> sslConfs = new HashMap<>();
-    if (config.getSsls() != null) {
-      for (SslType ssl : config.getSsls()) {
+    if (conf.getSsls() != null) {
+      for (CmpClientConf.Ssl ssl : conf.getSsls()) {
         SSLContextBuilder builder = new SSLContextBuilder();
         if (ssl.getStoreType() != null) {
           builder.setKeyStoreType(ssl.getStoreType());
@@ -318,7 +309,7 @@ public final class CmpClientImpl implements CmpClient {
 
     // responders
     Map<String, Responder> responders = new HashMap<>();
-    for (ResponderType m : config.getResponders()) {
+    for (CmpClientConf.Responder m : conf.getResponders()) {
       X509Certificate cert;
       try {
         cert = X509Util.parseCert(m.getCert().readContent());
@@ -343,7 +334,7 @@ public final class CmpClientImpl implements CmpClient {
 
         responder = new Responder.SignaturetCmpResponder(cert, sigAlgoValidator);
       } else { // if (m.getPbmMac() != null)
-        ResponderType.PbmMac mac = m.getPbmMac();
+        CmpClientConf.Responder.PbmMac mac = m.getPbmMac();
         X500Name subject = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
         responder = new Responder.PbmMacCmpResponder(subject, mac.getOwfAlgos(), mac.getMacAlgos());
       }
@@ -353,7 +344,7 @@ public final class CmpClientImpl implements CmpClient {
 
     // CA;
     Set<CaConf> cas = new HashSet<>();
-    for (CaType caType : config.getCas()) {
+    for (CmpClientConf.Ca caType : conf.getCas()) {
       String caName = caType.getName();
       try {
         // responder
@@ -385,7 +376,7 @@ public final class CmpClientImpl implements CmpClient {
         }
 
         // CMPControl
-        CmpcontrolType cmpCtrlType = caType.getCmpcontrol();
+        CmpClientConf.Cmpcontrol cmpCtrlType = caType.getCmpcontrol();
         ca.setCmpControlAutoconf(cmpCtrlType.isAutoconf());
         if (!ca.isCmpControlAutoconf()) {
           Boolean tmpBo = cmpCtrlType.getRrAkiRequired();
@@ -395,21 +386,21 @@ public final class CmpClientImpl implements CmpClient {
         }
 
         // Certprofiles
-        Certprofiles certprofilesType = caType.getCertprofiles();
+        CmpClientConf.Certprofiles certprofilesType = caType.getCertprofiles();
         ca.setCertprofilesAutoconf(certprofilesType.isAutoconf());
         if (!ca.isCertprofilesAutoconf()) {
-          List<CertprofileType> types = certprofilesType.getProfiles();
+          List<CmpClientConf.Certprofile> types = certprofilesType.getProfiles();
           Set<CertprofileInfo> profiles = new HashSet<>(types.size());
-          for (CertprofileType m : types) {
-            String conf = null;
+          for (CmpClientConf.Certprofile m : types) {
+            String conf0 = null;
             if (m.getConf() != null) {
-              conf = m.getConf().getValue();
-              if (conf == null) {
-                conf = new String(IoUtil.read(m.getConf().getFile()));
+              conf0 = m.getConf().getValue();
+              if (conf0 == null) {
+                conf0 = new String(IoUtil.read(m.getConf().getFile()));
               }
             }
 
-            CertprofileInfo profile = new CertprofileInfo(m.getName(), m.getType(), conf);
+            CertprofileInfo profile = new CertprofileInfo(m.getName(), m.getType(), conf0);
             profiles.add(profile);
           }
           ca.setCertprofiles(profiles);
@@ -428,13 +419,13 @@ public final class CmpClientImpl implements CmpClient {
     // requestors
     Map<String, Requestor> requestors = new HashMap<>();
 
-    for (RequestorType requestorConf : config.getRequestors()) {
+    for (CmpClientConf.Requestor requestorConf : conf.getRequestors()) {
       boolean signRequest = requestorConf.isSignRequest();
       String name = requestorConf.getName();
       Requestor requestor;
 
       if (requestorConf.getSignature() != null) {
-        Signature cf = requestorConf.getSignature();
+        CmpClientConf.Requestor.Signature cf = requestorConf.getSignature();
         //requestorSignRequests.put(name, cf.isSignRequest());
 
         X509Certificate requestorCert = null;
@@ -471,7 +462,7 @@ public final class CmpClientImpl implements CmpClient {
           }
         }
       } else {
-        PbmMac cf = requestorConf.getPbmMac();
+        CmpClientConf.Requestor.PbmMac cf = requestorConf.getPbmMac();
         X500Name x500name = new X500Name(cf.getSender());
         AlgorithmIdentifier owf = HashAlgo.getNonNullInstance(cf.getOwf()).getAlgorithmIdentifier();
         AlgorithmIdentifier mac;
@@ -510,7 +501,7 @@ public final class CmpClientImpl implements CmpClient {
     }
 
     if (!autoConfCaNames.isEmpty()) {
-      Integer caInfoUpdateInterval = config.getCainfoUpdateInterval();
+      Integer caInfoUpdateInterval = conf.getCainfoUpdateInterval();
       if (caInfoUpdateInterval == null) {
         caInfoUpdateInterval = 10;
       } else if (caInfoUpdateInterval <= 0) {
@@ -1203,11 +1194,10 @@ public final class CmpClientImpl implements CmpClient {
     return new EnrollCertResult(caCert, certOrErrors);
   } // method parseEnrollCertResult
 
-  private static CmpclientType parse(InputStream configStream)
-      throws CmpClientException {
-    CmpclientType conf;
+  private static CmpClientConf parse(InputStream configStream) throws CmpClientException {
+    CmpClientConf conf;
     try {
-      conf = JSON.parseObject(configStream, CmpclientType.class);
+      conf = JSON.parseObject(configStream, CmpClientConf.class);
       conf.validate();
     } catch (IOException | InvalidConfException | RuntimeException ex) {
       throw new CmpClientException("parsing profile failed, message: " + ex.getMessage(), ex);
@@ -1220,15 +1210,15 @@ public final class CmpClientImpl implements CmpClient {
     }
 
     // canonicalize the names
-    for (RequestorType m : conf.getRequestors()) {
+    for (CmpClientConf.Requestor m : conf.getRequestors()) {
       m.setName(m.getName().toLowerCase());
     }
 
-    for (ResponderType m : conf.getResponders()) {
+    for (CmpClientConf.Responder m : conf.getResponders()) {
       m.setName(m.getName().toLowerCase());
     }
 
-    for (CaType ca : conf.getCas()) {
+    for (CmpClientConf.Ca ca : conf.getCas()) {
       ca.setName(ca.getName().toLowerCase());
       ca.setRequestor(ca.getRequestor().toLowerCase());
       ca.setResponder(ca.getResponder().toLowerCase());

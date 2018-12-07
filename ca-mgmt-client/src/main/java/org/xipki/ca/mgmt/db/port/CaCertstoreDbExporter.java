@@ -42,13 +42,6 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x509.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.mgmt.db.message.CaCert;
-import org.xipki.ca.mgmt.db.message.CaCertstore;
-import org.xipki.ca.mgmt.db.message.Crl;
-import org.xipki.ca.mgmt.db.message.DeltaCrlCacheEntry;
-import org.xipki.ca.mgmt.db.message.ReqCert;
-import org.xipki.ca.mgmt.db.message.Request;
-import org.xipki.ca.mgmt.db.message.ToPublish;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.HashAlgo;
@@ -303,7 +296,7 @@ class CaCertstoreDbExporter extends DbPorter {
               currentEntriesZip.closeEntry();
             }
 
-            CaCert cert = new CaCert();
+            CaCertstore.Cert cert = new CaCertstore.Cert();
             cert.setId(id);
             cert.setCaId(rs.getInt("CA_ID"));
             cert.setEe(rs.getBoolean("EE"));
@@ -344,7 +337,7 @@ class CaCertstoreDbExporter extends DbPorter {
             }
 
             cert.validate();
-            ((CaCert.Certs) entriesInCurrentFile).add(cert);
+            ((CaCertstore.Certs) entriesInCurrentFile).add(cert);
           } else if (CaDbEntryType.CRL == type) {
             byte[] crlBytes = Base64.decodeFast(rs.getString("CRL"));
 
@@ -375,7 +368,7 @@ class CaCertstoreDbExporter extends DbPorter {
               currentEntriesZip.closeEntry();
             }
 
-            Crl crl = new Crl();
+            CaCertstore.Crl crl = new CaCertstore.Crl();
             crl.setId(id);
 
             crl.setCaId(rs.getInt("CA_ID"));
@@ -386,7 +379,7 @@ class CaCertstoreDbExporter extends DbPorter {
             crl.setFile(crlFilename);
 
             crl.validate();
-            ((Crl.Crls) entriesInCurrentFile).add(crl);
+            ((CaCertstore.Crls) entriesInCurrentFile).add(crl);
           } else if (CaDbEntryType.REQUEST == type) {
             byte[] dataBytes = Base64.decodeFast(rs.getString("DATA"));
             String sha1 = HashAlgo.SHA1.hexHash(dataBytes);
@@ -399,21 +392,21 @@ class CaCertstoreDbExporter extends DbPorter {
               currentEntriesZip.closeEntry();
             }
 
-            Request entry = new Request();
+            CaCertstore.Request entry = new CaCertstore.Request();
             entry.setId(id);
             entry.setUpdate(rs.getLong("LUPDATE"));
             entry.setFile(dataFilename);
 
             entry.validate();
-            ((Request.Requests) entriesInCurrentFile).add(entry);
+            ((CaCertstore.Requests) entriesInCurrentFile).add(entry);
           } else if (CaDbEntryType.REQCERT == type) {
-            ReqCert entry = new ReqCert();
+            CaCertstore.ReqCert entry = new CaCertstore.ReqCert();
             entry.setId(id);
             entry.setCid(rs.getLong("CID"));
             entry.setRid(rs.getLong("RID"));
 
             entry.validate();
-            ((ReqCert.ReqCerts) entriesInCurrentFile).add(entry);
+            ((CaCertstore.ReqCerts) entriesInCurrentFile).add(entry);
           } else {
             throw new IllegalStateException("unknown CaDbEntryType " + type);
           }
@@ -492,7 +485,7 @@ class CaCertstoreDbExporter extends DbPorter {
     final int minId = (int) min("PUBLISHQUEUE", "CID");
     final int maxId = (int) max("PUBLISHQUEUE", "CID");
 
-    List<ToPublish> queue = new LinkedList<>();
+    List<CaCertstore.ToPublish> queue = new LinkedList<>();
     certstore.setPublishQueue(queue);
     if (maxId == 0) {
       System.out.println(" exported table PUBLISHQUEUE");
@@ -512,7 +505,7 @@ class CaCertstoreDbExporter extends DbPorter {
         rs = ps.executeQuery();
 
         while (rs.next()) {
-          ToPublish toPub = new ToPublish();
+          CaCertstore.ToPublish toPub = new CaCertstore.ToPublish();
           toPub.setPubId(rs.getInt("PID"));
           toPub.setCertId(rs.getInt("CID"));
           toPub.setCaId(rs.getInt("CA_ID"));
@@ -535,7 +528,7 @@ class CaCertstoreDbExporter extends DbPorter {
 
     final String sql = "SELECT SN,CA_ID FROM DELTACRL_CACHE";
 
-    List<DeltaCrlCacheEntry> deltaCache = new LinkedList<>();
+    List<CaCertstore.DeltaCrlCacheEntry> deltaCache = new LinkedList<>();
     certstore.setDeltaCrlCache(deltaCache);
 
     PreparedStatement ps = prepareStatement(sql);
@@ -545,7 +538,7 @@ class CaCertstoreDbExporter extends DbPorter {
       rs = ps.executeQuery();
 
       while (rs.next()) {
-        DeltaCrlCacheEntry entry = new DeltaCrlCacheEntry();
+        CaCertstore.DeltaCrlCacheEntry entry = new CaCertstore.DeltaCrlCacheEntry();
         entry.setCaId(rs.getInt("CA_ID"));
         entry.setSerial(rs.getString("SN"));
 
@@ -577,13 +570,13 @@ class CaCertstoreDbExporter extends DbPorter {
   private static Object createContainer(CaDbEntryType type) throws IOException {
     switch (type) {
       case CERT:
-        return new CaCert.Certs();
+        return new CaCertstore.Certs();
       case CRL:
-        return new Crl.Crls();
+        return new CaCertstore.Crls();
       case REQUEST:
-        return new Request.Requests();
+        return new CaCertstore.Requests();
       case REQCERT:
-        return new ReqCert.ReqCerts();
+        return new CaCertstore.ReqCerts();
       default:
         throw new IllegalStateException("unknown CaDbEntryType " + type);
     }

@@ -131,16 +131,16 @@ import org.xipki.ca.api.RequestType;
 import org.xipki.ca.mgmt.api.CaMgmtException;
 import org.xipki.ca.mgmt.api.CaStatus;
 import org.xipki.ca.mgmt.api.CertWithRevocationInfo;
-import org.xipki.ca.mgmt.api.CertprofileEntry;
 import org.xipki.ca.mgmt.api.CmpControl;
+import org.xipki.ca.mgmt.api.MgmtEntry;
 import org.xipki.ca.mgmt.api.PermissionConstants;
 import org.xipki.ca.mgmt.api.RequestorInfo;
 import org.xipki.ca.server.CaInfo;
 import org.xipki.ca.server.CaManagerImpl;
+import org.xipki.ca.server.CaUtil;
 import org.xipki.ca.server.CertTemplateData;
 import org.xipki.ca.server.X509Ca;
 import org.xipki.ca.server.api.CaAuditConstants;
-import org.xipki.ca.server.util.CaUtil;
 import org.xipki.security.AlgorithmValidator;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.CrlReason;
@@ -1637,7 +1637,7 @@ public class CmpResponderImpl extends BaseCmpResponder {
       List<JSONObject> jsonCertprofiles = new LinkedList<>();
       root.put("certprofiles", jsonCertprofiles);
       for (String name : supportedProfileNames) {
-        CertprofileEntry entry = ca.getCaManager().getCertprofile(name);
+        MgmtEntry.Certprofile entry = ca.getCaManager().getCertprofile(name);
         if (entry.isFaulty()) {
           continue;
         }

@@ -56,19 +56,19 @@ import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.RequestType;
-import org.xipki.ca.mgmt.api.CaHasUserEntry;
 import org.xipki.ca.mgmt.api.CertListInfo;
 import org.xipki.ca.mgmt.api.CertListOrderBy;
 import org.xipki.ca.mgmt.api.CertWithRevocationInfo;
+import org.xipki.ca.mgmt.api.MgmtEntry;
 import org.xipki.ca.server.CaIdNameMap;
+import org.xipki.ca.server.CaUtil;
 import org.xipki.ca.server.CertRevInfoWithSerial;
 import org.xipki.ca.server.CertStatus;
 import org.xipki.ca.server.DbSchemaInfo;
 import org.xipki.ca.server.KnowCertResult;
+import org.xipki.ca.server.PasswordHash;
 import org.xipki.ca.server.SerialWithId;
 import org.xipki.ca.server.UniqueIdGenerator;
-import org.xipki.ca.server.util.CaUtil;
-import org.xipki.ca.server.util.PasswordHash;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.CertRevocationInfo;
@@ -78,10 +78,10 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.LogUtil;
 import org.xipki.util.LruCache;
-import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -1492,7 +1492,7 @@ public class CertStore {
     }
   } // method authenticateUser
 
-  public CaHasUserEntry getCaHasUser(NameId ca, NameId user) throws OperationException {
+  public MgmtEntry.CaHasUser getCaHasUser(NameId ca, NameId user) throws OperationException {
     final String sql = sqlCaHasUser;
     ResultSet rs = null;
     PreparedStatement ps = borrowPreparedStatement(sql);
@@ -1509,7 +1509,7 @@ public class CertStore {
       List<String> list = StringUtil.split(rs.getString("PROFILES"), ",");
       Set<String> profiles = (list == null) ? null : new HashSet<>(list);
 
-      CaHasUserEntry entry = new CaHasUserEntry(user);
+      MgmtEntry.CaHasUser entry = new MgmtEntry.CaHasUser(user);
       entry.setPermission(rs.getInt("PERMISSION"));
       entry.setProfiles(profiles);
       return entry;

@@ -34,12 +34,6 @@ import java.util.zip.ZipOutputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.mgmt.conf.CaInfoType;
-import org.xipki.ca.mgmt.conf.CaType;
-import org.xipki.ca.mgmt.conf.CaconfType;
-import org.xipki.ca.mgmt.conf.NameTypeConf;
-import org.xipki.ca.mgmt.conf.RequestorType;
-import org.xipki.ca.mgmt.conf.SignerType;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.ConfPairs;
@@ -66,7 +60,7 @@ public class CaConfs {
   private CaConfs() {
   }
 
-  public static void marshal(CaconfType root, OutputStream out)
+  public static void marshal(CaConfType.CaSystem root, OutputStream out)
       throws InvalidConfException, IOException {
     Args.notNull(root, "root");
     Args.notNull(out, "out");
@@ -90,7 +84,7 @@ public class CaConfs {
 
     try {
       caConfStream = Files.newInputStream(confFile.toPath());
-      CaconfType root = JSON.parseObject(caConfStream, CaconfType.class);
+      CaConfType.CaSystem root = JSON.parseObject(caConfStream, CaConfType.CaSystem.class);
 
       baseDir = root.getBasedir();
       if (StringUtil.isBlank(baseDir)) {
@@ -110,7 +104,7 @@ public class CaConfs {
 
       // Signers
       if (root.getSigners() != null) {
-        for (SignerType m : root.getSigners()) {
+        for (CaConfType.Signer m : root.getSigners()) {
           String name = m.getName();
 
           if (m.getConf() != null) {
@@ -137,7 +131,7 @@ public class CaConfs {
 
       // Requestors
       if (root.getRequestors() != null) {
-        for (RequestorType m : root.getRequestors()) {
+        for (CaConfType.Requestor m : root.getRequestors()) {
           String name = m.getName();
 
           if (m.getConf() != null && m.getConf().getFile() != null) {
@@ -158,7 +152,7 @@ public class CaConfs {
 
       // Publishers
       if (root.getPublishers() != null) {
-        for (NameTypeConf m : root.getPublishers()) {
+        for (CaConfType.NameTypeConf m : root.getPublishers()) {
           String name = m.getName();
 
           if (m.getConf() != null && m.getConf().getFile() != null) {
@@ -172,7 +166,7 @@ public class CaConfs {
 
       // Profiles
       if (root.getProfiles() != null) {
-        for (NameTypeConf m : root.getProfiles()) {
+        for (CaConfType.NameTypeConf m : root.getProfiles()) {
           String name = m.getName();
 
           if (m.getConf() != null && m.getConf().getFile() != null) {
@@ -186,11 +180,11 @@ public class CaConfs {
 
       // CAs
       if (root.getCas() != null) {
-        for (CaType m : root.getCas()) {
+        for (CaConfType.Ca m : root.getCas()) {
           String name = m.getName();
 
           if (m.getCaInfo() != null) {
-            CaInfoType ci = m.getCaInfo();
+            CaConfType.CaInfo ci = m.getCaInfo();
 
             if (ci.getSignerConf() != null) {
               String conf = convertSignerConf(ci.getSignerConf(), properties, baseDir);

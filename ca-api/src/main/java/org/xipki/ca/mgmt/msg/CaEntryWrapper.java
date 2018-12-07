@@ -22,12 +22,12 @@ import java.security.cert.CertificateException;
 
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.profile.CertValidity;
-import org.xipki.ca.mgmt.api.CaEntry;
+import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.mgmt.api.CaMgmtException;
 import org.xipki.ca.mgmt.api.CaStatus;
 import org.xipki.ca.mgmt.api.CmpControl;
 import org.xipki.ca.mgmt.api.CrlControl;
+import org.xipki.ca.mgmt.api.MgmtEntry;
 import org.xipki.ca.mgmt.api.ProtocolSupport;
 import org.xipki.ca.mgmt.api.ScepControl;
 import org.xipki.ca.mgmt.api.ValidityMode;
@@ -47,7 +47,7 @@ public class CaEntryWrapper {
 
   private CaStatus status;
 
-  private CertValidity maxValidity;
+  private Certprofile.CertValidity maxValidity;
 
   private String signerType;
 
@@ -98,7 +98,7 @@ public class CaEntryWrapper {
   public CaEntryWrapper() {
   }
 
-  public CaEntryWrapper(CaEntry caEntry) {
+  public CaEntryWrapper(MgmtEntry.Ca caEntry) {
     ident = caEntry.getIdent();
     status = caEntry.getStatus();
     maxValidity = caEntry.getMaxValidity();
@@ -169,11 +169,11 @@ public class CaEntryWrapper {
     this.status = status;
   }
 
-  public CertValidity getMaxValidity() {
+  public Certprofile.CertValidity getMaxValidity() {
     return maxValidity;
   }
 
-  public void setMaxValidity(CertValidity maxValidity) {
+  public void setMaxValidity(Certprofile.CertValidity maxValidity) {
     this.maxValidity = maxValidity;
   }
 
@@ -361,9 +361,10 @@ public class CaEntryWrapper {
     this.revocationInfo = revocationInfo;
   }
 
-  public CaEntry toCaEntry() throws CertificateException, CaMgmtException, InvalidConfException {
-    CaEntry rv = new CaEntry(ident, serialNoBitLen, nextCrlNumber, signerType, signerConf, caUris,
-        numCrls, expirationPeriod);
+  public MgmtEntry.Ca toCaEntry()
+      throws CertificateException, CaMgmtException, InvalidConfException {
+    MgmtEntry.Ca rv = new MgmtEntry.Ca(ident, serialNoBitLen, nextCrlNumber, signerType, signerConf,
+                        caUris, numCrls, expirationPeriod);
     if (certBytes != null) {
       rv.setCert(X509Util.parseCert(certBytes));
     }

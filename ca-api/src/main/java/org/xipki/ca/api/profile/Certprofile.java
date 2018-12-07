@@ -18,18 +18,35 @@
 package org.xipki.ca.api.profile;
 
 import java.io.Closeable;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
+import java.util.regex.Pattern;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.DERBMPString;
+import org.bouncycastle.asn1.DERIA5String;
+import org.bouncycastle.asn1.DERPrintableString;
+import org.bouncycastle.asn1.DERT61String;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.BadFormatException;
 import org.xipki.ca.api.PublicCaInfo;
+import org.xipki.security.KeyUsage;
+import org.xipki.util.Args;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.
@@ -38,6 +55,635 @@ import org.xipki.ca.api.PublicCaInfo;
  */
 
 public abstract class Certprofile implements Closeable {
+
+  public static class AuthorityInfoAccessControl {
+
+    private final boolean includesCaIssuers;
+
+    private final boolean includesOcsp;
+
+    public AuthorityInfoAccessControl(boolean includesCaIssuers, boolean includesOcsp) {
+      this.includesCaIssuers = includesCaIssuers;
+      this.includesOcsp = includesOcsp;
+    }
+
+    public boolean isIncludesCaIssuers() {
+      return includesCaIssuers;
+    }
+
+    public boolean isIncludesOcsp() {
+      return includesOcsp;
+    }
+
+  }
+
+  public enum CertLevel {
+    RootCA,
+    SubCA,
+    EndEntity
+  }
+
+  public static class CertValidity implements Comparable<CertValidity> {
+
+    public enum Unit {
+
+      YEAR("y"),
+      DAY("d"),
+      HOUR("h"),
+      MINUTE("m");
+
+      private String suffix;
+
+      private Unit(String suffix) {
+        this.suffix = suffix;
+      }
+
+      public String getSuffix() {
+        return suffix;
+      }
+
+    } // enum Unit
+
+    private static final long SECOND = 1000L;
+
+    private static final long MINUTE = 60L * SECOND;
+
+    private static final long HOUR = 60L * MINUTE;
+
+    private static final long DAY = 24L * HOUR;
+
+    private static final TimeZone TIMEZONE_UTC = TimeZone.getTimeZone("UTC");
+
+    private int validity;
+    private Unit unit;
+
+    // For the deserialization only
+    @SuppressWarnings("unused")
+    private CertValidity() {
+    }
+
+    public CertValidity(int validity, Unit unit) {
+      this.validity = Args.positive(validity, "validity");
+      this.unit = Args.notNull(unit, "unit");
+    }
+
+    public static CertValidity getInstance(String validityS) {
+      Args.notBlank(validityS, "validityS");
+
+      final int len = validityS.length();
+      final char suffix = validityS.charAt(len - 1);
+      Unit unit;
+      String numValdityS;
+      if (suffix == 'y' || suffix == 'Y') {
+        unit = Unit.YEAR;
+        numValdityS = validityS.substring(0, len - 1);
+      } else if (suffix == 'd' || suffix == 'D') {
+        unit = Unit.DAY;
+        numValdityS = validityS.substring(0, len - 1);
+      } else if (suffix == 'h' || suffix == 'H') {
+        unit = Unit.HOUR;
+        numValdityS = validityS.substring(0, len - 1);
+      } else if (suffix == 'm' || suffix == 'M') {
+        unit = Unit.MINUTE;
+        numValdityS = validityS.substring(0, len - 1);
+      } else if (suffix >= '0' && suffix <= '9') {
+        unit = Unit.DAY;
+        numValdityS = validityS;
+      } else {
+        throw new IllegalArgumentException(String.format("invalid validityS: %s", validityS));
+      }
+
+      int validity;
+      try {
+        validity = Integer.parseInt(numValdityS);
+      } catch (NumberFormatException ex) {
+        throw new IllegalArgumentException(String.format("invalid validityS: %s", validityS));
+      }
+      return new CertValidity(validity, unit);
+    } // method getInstance
+
+    public void setValidity(int validity) {
+      this.validity = Args.positive(validity, "validity");
+    }
+
+    public int getValidity() {
+      return validity;
+    }
+
+    public void setUnit(Unit unit) {
+      this.unit = Args.notNull(unit, "unit");
+    }
+
+    public Unit getUnit() {
+      return unit;
+    }
+
+    public Date add(Date referenceDate) {
+      switch (unit) {
+        case DAY:
+          return new Date(referenceDate.getTime() + DAY - SECOND);
+        case YEAR:
+          Calendar cal = Calendar.getInstance(TIMEZONE_UTC);
+          cal.setTime(referenceDate);
+          cal.add(Calendar.YEAR, validity);
+          cal.add(Calendar.SECOND, -1);
+
+          int month = cal.get(Calendar.MONTH);
+          // February
+          if (month == 1) {
+            int day = cal.get(Calendar.DAY_OF_MONTH);
+            if (day > 28) {
+              int year = cal.get(Calendar.YEAR);
+              day = isLeapYear(year) ? 29 : 28;
+            }
+          }
+
+          return cal.getTime();
+        case HOUR:
+          return new Date(referenceDate.getTime() + HOUR - SECOND);
+        case MINUTE:
+          return new Date(referenceDate.getTime() + MINUTE - SECOND);
+        default:
+          throw new IllegalStateException(String.format(
+              "should not reach here, unknown CertValidity.Unit %s", unit));
+      }
+    } // method add
+
+    private int approxMinutes() {
+      switch (unit) {
+        case HOUR:
+          return 60 * validity;
+        case DAY:
+          return 24 * 60 * validity;
+        case YEAR:
+          return (365 * 24 * validity + 6 * validity) * 60;
+        default:
+          throw new IllegalStateException(String.format(
+              "should not reach here, unknown CertValidity.Unit %s", unit));
+      }
+    }
+
+    @Override
+    public int hashCode() {
+      return toString().hashCode();
+    }
+
+    @Override
+    public int compareTo(CertValidity obj) {
+      Args.notNull(obj, "obj");
+      if (unit == obj.unit) {
+        if (validity == obj.validity) {
+          return 0;
+        }
+
+        return (validity < obj.validity) ? -1 : 1;
+      } else {
+        int thisMinutes = approxMinutes();
+        int thatMinutes = obj.approxMinutes();
+        if (thisMinutes == thatMinutes) {
+          return 0;
+        } else {
+          return (thisMinutes < thatMinutes) ? -1 : 1;
+        }
+      }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) {
+        return true;
+      } else if (!(obj instanceof CertValidity)) {
+        return false;
+      }
+
+      CertValidity other = (CertValidity) obj;
+      return unit == other.unit && validity == other.validity;
+    }
+
+    @Override
+    public String toString() {
+      switch (unit) {
+        case HOUR:
+          return validity + "h";
+        case DAY:
+          return validity + "d";
+        case YEAR:
+          return validity + "y";
+        default:
+          throw new IllegalStateException(String.format(
+              "should not reach here, unknown CertValidity.Unit %s", unit));
+      }
+    }
+
+    private static boolean isLeapYear(int year) {
+      if (year % 4 != 0) {
+        return false;
+      } else if (year % 100 != 0) {
+        return true;
+      } else {
+        return year % 400 == 0;
+      }
+    }
+
+  }
+
+  public static class ExtensionControl {
+
+    private final boolean critical;
+
+    private final boolean required;
+
+    private final boolean request;
+
+    public ExtensionControl(boolean critical, boolean required, boolean request) {
+      this.critical = critical;
+      this.required = required;
+      this.request = request;
+    }
+
+    public boolean isCritical() {
+      return critical;
+    }
+
+    public boolean isRequired() {
+      return required;
+    }
+
+    public boolean isRequest() {
+      return request;
+    }
+
+  }
+
+  public static class ExtKeyUsageControl {
+
+    private final ASN1ObjectIdentifier extKeyUsage;
+
+    private final boolean required;
+
+    public ExtKeyUsageControl(ASN1ObjectIdentifier extKeyUsage, boolean required) {
+      this.extKeyUsage = Args.notNull(extKeyUsage, "extKeyUsage");
+      this.required = required;
+    }
+
+    public ASN1ObjectIdentifier getExtKeyUsage() {
+      return extKeyUsage;
+    }
+
+    public boolean isRequired() {
+      return required;
+    }
+
+  }
+
+  public enum GeneralNameTag {
+
+    otherName(0),
+    rfc822Name(1),
+    DNSName(2),
+    x400Adress(3),
+    directoryName(4),
+    ediPartyName(5),
+    uniformResourceIdentifier(6),
+    IPAddress(7),
+    registeredID(8);
+
+    private final int tag;
+
+    private GeneralNameTag(int tag) {
+      this.tag = tag;
+    }
+
+    public int getTag() {
+      return tag;
+    }
+
+  }
+
+  public static class GeneralNameMode {
+
+    private final GeneralNameTag tag;
+
+    // not applied to all tags, currently only for tag otherName
+    private final Set<ASN1ObjectIdentifier> allowedTypes;
+
+    public GeneralNameMode(GeneralNameTag tag) {
+      this.tag = Args.notNull(tag, "tag");
+      this.allowedTypes = null;
+    }
+
+    public GeneralNameMode(GeneralNameTag tag, Set<ASN1ObjectIdentifier> allowedTypes) {
+      this.tag = Args.notNull(tag, "tag");
+      this.allowedTypes = CollectionUtil.isEmpty(allowedTypes) ? Collections.emptySet()
+          : CollectionUtil.unmodifiableSet(allowedTypes);
+    }
+
+    public GeneralNameTag getTag() {
+      return tag;
+    }
+
+    public Set<ASN1ObjectIdentifier> getAllowedTypes() {
+      return allowedTypes;
+    }
+
+  }
+
+  public static class KeyUsageControl {
+
+    private final KeyUsage keyUsage;
+
+    private final boolean required;
+
+    public KeyUsageControl(KeyUsage keyUsage, boolean required) {
+      this.keyUsage = Args.notNull(keyUsage, "keyUsage");
+      this.required = required;
+    }
+
+    public KeyUsage getKeyUsage() {
+      return keyUsage;
+    }
+
+    public boolean isRequired() {
+      return required;
+    }
+
+  }
+
+  public static class RdnControl {
+
+    private final int minOccurs;
+
+    private final int maxOccurs;
+
+    private final ASN1ObjectIdentifier type;
+
+    private Pattern pattern;
+
+    private StringType stringType;
+
+    private Range stringLengthRange;
+
+    private String prefix;
+
+    private String suffix;
+
+    private String group;
+
+    public RdnControl(ASN1ObjectIdentifier type) {
+      this(type, 1, 1);
+    }
+
+    public RdnControl(ASN1ObjectIdentifier type, int minOccurs, int maxOccurs) {
+      if (minOccurs < 0 || maxOccurs < 1 || minOccurs > maxOccurs) {
+        throw new IllegalArgumentException(
+            String.format("illegal minOccurs=%s, maxOccurs=%s", minOccurs, maxOccurs));
+      }
+
+      this.type = Args.notNull(type, "type");
+      this.minOccurs = minOccurs;
+      this.maxOccurs = maxOccurs;
+    }
+
+    public int getMinOccurs() {
+      return minOccurs;
+    }
+
+    public int getMaxOccurs() {
+      return maxOccurs;
+    }
+
+    public ASN1ObjectIdentifier getType() {
+      return type;
+    }
+
+    public StringType getStringType() {
+      return stringType;
+    }
+
+    public Pattern getPattern() {
+      return pattern;
+    }
+
+    public Range getStringLengthRange() {
+      return stringLengthRange;
+    }
+
+    public void setStringType(StringType stringType) {
+      this.stringType = stringType;
+    }
+
+    public void setStringLengthRange(Range stringLengthRange) {
+      this.stringLengthRange = stringLengthRange;
+    }
+
+    public void setPattern(Pattern pattern) {
+      this.pattern = pattern;
+    }
+
+    public String getPrefix() {
+      return prefix;
+    }
+
+    public void setPrefix(String prefix) {
+      this.prefix = prefix;
+    }
+
+    public String getSuffix() {
+      return suffix;
+    }
+
+    public void setSuffix(String suffix) {
+      this.suffix = suffix;
+    }
+
+    public String getGroup() {
+      return group;
+    }
+
+    public void setGroup(String group) {
+      this.group = group;
+    }
+
+  }
+
+  public enum StringType {
+
+    teletexString,
+    printableString,
+    utf8String,
+    bmpString,
+    ia5String;
+
+    public ASN1Encodable createString(String text) {
+      Args.notNull(text, "text");
+
+      if (teletexString == this) {
+        return new DERT61String(text);
+      } else if (printableString == this) {
+        return new DERPrintableString(text);
+      } else if (utf8String == this) {
+        return new DERUTF8String(text);
+      } else if (bmpString == this) {
+        return new DERBMPString(text);
+      } else if (ia5String == this) {
+        return new DERIA5String(text, true);
+      } else {
+        throw new IllegalStateException("should not reach here, unknown StringType " + this.name());
+      }
+    }
+
+  }
+
+  public static class SubjectControl {
+
+    private final Map<ASN1ObjectIdentifier, RdnControl> controls;
+
+    private final Map<ASN1ObjectIdentifier, String> typeGroups;
+
+    private final Map<String, Set<ASN1ObjectIdentifier>> groupTypes;
+
+    private final Set<String> groups;
+
+    private final List<ASN1ObjectIdentifier> types;
+
+    public SubjectControl(List<RdnControl> controls, boolean keepRdnOrder) {
+      Args.notEmpty(controls, "controls");
+      this.typeGroups = new HashMap<>();
+
+      List<ASN1ObjectIdentifier> sortedOids = new ArrayList<>(controls.size());
+      if (keepRdnOrder) {
+        for (RdnControl m : controls) {
+          sortedOids.add(m.getType());
+        }
+      } else {
+        Set<ASN1ObjectIdentifier> oidSet = new HashSet<>();
+        for (RdnControl m : controls) {
+          oidSet.add(m.getType());
+        }
+
+        List<ASN1ObjectIdentifier> oids = SubjectDnSpec.getForwardDNs();
+
+        for (ASN1ObjectIdentifier oid : oids) {
+          if (oidSet.contains(oid)) {
+            sortedOids.add(oid);
+          }
+        }
+
+        for (ASN1ObjectIdentifier oid : oidSet) {
+          if (!sortedOids.contains(oid)) {
+            sortedOids.add(oid);
+          }
+        }
+      }
+
+      this.types = Collections.unmodifiableList(sortedOids);
+
+      Set<String> groupSet = new HashSet<>();
+      this.groupTypes = new HashMap<>();
+      this.controls = new HashMap<>();
+
+      for (RdnControl control : controls) {
+        ASN1ObjectIdentifier type = control.getType();
+        this.controls.put(type, control);
+        String group = control.getGroup();
+        if (StringUtil.isBlank(group)) {
+          continue;
+        }
+
+        groupSet.add(group);
+        typeGroups.put(type, group);
+        Set<ASN1ObjectIdentifier> typeSet = groupTypes.get(group);
+        if (typeSet == null) {
+          typeSet = new HashSet<>();
+          groupTypes.put(group, typeSet);
+        }
+        typeSet.add(type);
+      }
+
+      this.groups = Collections.unmodifiableSet(groupSet);
+    } // constructor
+
+    public RdnControl getControl(ASN1ObjectIdentifier type) {
+      Args.notNull(type, "type");
+      return controls.isEmpty() ? SubjectDnSpec.getRdnControl(type) : controls.get(type);
+    }
+
+    public String getGroup(ASN1ObjectIdentifier type) {
+      return typeGroups.get(Args.notNull(type, "type"));
+    }
+
+    public Set<ASN1ObjectIdentifier> getTypesForGroup(String group) {
+      return groupTypes.get(Args.notNull(group, "group"));
+    }
+
+    public Set<String> getGroups() {
+      return groups;
+    }
+
+    public List<ASN1ObjectIdentifier> getTypes() {
+      return types;
+    }
+
+  }
+
+  public static class SubjectInfo {
+
+    private final X500Name grantedSubject;
+
+    private final String warning;
+
+    public SubjectInfo(X500Name grantedSubject, String warning) {
+      this.grantedSubject = Args.notNull(grantedSubject, "grantedSubject");
+      this.warning = warning;
+    }
+
+    public X500Name getGrantedSubject() {
+      return grantedSubject;
+    }
+
+    public String getWarning() {
+      return warning;
+    }
+
+  }
+
+  public enum X509CertVersion {
+
+    v1(1),
+    v2(2),
+    v3(3);
+
+    private int versionNumber;
+
+    X509CertVersion(int versionNumber) {
+      this.versionNumber = versionNumber;
+    }
+
+    public int getVersionNumber() {
+      return versionNumber;
+    }
+
+    public static X509CertVersion forName(String version) {
+      Args.notNull(version, "version");
+
+      for (X509CertVersion m : values()) {
+        if (m.name().equalsIgnoreCase(version)) {
+          return m;
+        }
+      }
+      throw new IllegalArgumentException("invalid X509CertVersion " + version);
+    }
+
+    public static X509CertVersion forValue(int versionNumber) {
+      for (X509CertVersion m : values()) {
+        if (m.versionNumber == versionNumber) {
+          return m;
+        }
+      }
+      throw new IllegalArgumentException("invalid X509CertVersion " + versionNumber);
+    }
+
+  }
 
   public boolean isOnlyForRa() {
     return false;

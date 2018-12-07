@@ -39,15 +39,9 @@ import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.xipki.ca.api.CaUris;
-import org.xipki.ca.mgmt.api.CaEntry;
-import org.xipki.ca.mgmt.api.CaHasRequestorEntry;
 import org.xipki.ca.mgmt.api.CaManager;
-import org.xipki.ca.mgmt.api.CertprofileEntry;
-import org.xipki.ca.mgmt.api.ChangeCaEntry;
 import org.xipki.ca.mgmt.api.CmpControl;
-import org.xipki.ca.mgmt.api.PublisherEntry;
-import org.xipki.ca.mgmt.api.RequestorEntry;
-import org.xipki.ca.mgmt.api.SignerEntry;
+import org.xipki.ca.mgmt.api.MgmtEntry;
 import org.xipki.ca.mgmt.shell.CaActions;
 import org.xipki.ca.mgmt.shell.CaActions.CaAction;
 import org.xipki.ca.mgmt.shell.CaCompleters;
@@ -328,11 +322,11 @@ public class QaCaActions {
 
     @Override
     protected Object execute0() throws Exception {
-      ChangeCaEntry ey = getChangeCaEntry();
+      MgmtEntry.ChangeCa ey = getChangeCaEntry();
       String caName = ey.getIdent().getName();
       println("checking CA " + caName);
 
-      CaEntry ca = caManager.getCa(caName);
+      MgmtEntry.Ca ca = caManager.getCa(caName);
       if (ca == null) {
         throw new CmdFailure("could not find CA '" + caName + "'");
       }
@@ -508,10 +502,10 @@ public class QaCaActions {
         throw new CmdFailure("could not find CA '" + caName + "'");
       }
 
-      List<PublisherEntry> entries = caManager.getPublishersForCa(caName);
+      List<MgmtEntry.Publisher> entries = caManager.getPublishersForCa(caName);
 
       String upPublisherName = publisherName.toLowerCase();
-      for (PublisherEntry m : entries) {
+      for (MgmtEntry.Publisher m : entries) {
         if (m.getIdent().getName().equals(upPublisherName)) {
           println(" checked CA publisher CA='" + caName + "', publisher='" + publisherName + "'");
           return null;
@@ -557,10 +551,10 @@ public class QaCaActions {
         throw new UnexpectedException("could not find CA '" + caName + "'");
       }
 
-      Set<CaHasRequestorEntry> entries = caManager.getRequestorsForCa(caName);
-      CaHasRequestorEntry entry = null;
+      Set<MgmtEntry.CaHasRequestor> entries = caManager.getRequestorsForCa(caName);
+      MgmtEntry.CaHasRequestor entry = null;
       String upRequestorName = requestorName.toLowerCase();
-      for (CaHasRequestorEntry m : entries) {
+      for (MgmtEntry.CaHasRequestor m : entries) {
         if (m.getRequestorIdent().getName().equals(upRequestorName)) {
           entry = m;
           break;
@@ -956,7 +950,7 @@ public class QaCaActions {
         conf = new String(IoUtil.read(confFile));
       }
 
-      CertprofileEntry cp = caManager.getCertprofile(name);
+      MgmtEntry.Certprofile cp = caManager.getCertprofile(name);
       if (cp == null) {
         throw new CmdFailure("certificate profile named '" + name + "' is not configured");
       }
@@ -1040,7 +1034,7 @@ public class QaCaActions {
     protected Object execute0() throws Exception {
       println("checking publisher " + name);
 
-      PublisherEntry cp = caManager.getPublisher(name);
+      MgmtEntry.Publisher cp = caManager.getPublisher(name);
       if (cp == null) {
         throw new CmdFailure("publisher named '" + name + "' is not configured");
       }
@@ -1147,14 +1141,14 @@ public class QaCaActions {
     protected Object execute0() throws Exception {
       println("checking requestor " + name);
 
-      RequestorEntry cr = caManager.getRequestor(name);
+      MgmtEntry.Requestor cr = caManager.getRequestor(name);
       if (cr == null) {
         throw new CmdFailure("requestor named '" + name + "' is not configured");
       }
 
       if (certFile != null) {
         byte[] ex = IoUtil.read(certFile);
-        String expType = RequestorEntry.TYPE_CERT;
+        String expType = MgmtEntry.Requestor.TYPE_CERT;
         if (!cr.getType().equals(expType)) {
           throw new CmdFailure("IdNameTypeConf type is not " + expType);
         }
@@ -1168,7 +1162,7 @@ public class QaCaActions {
           throw new CmdFailure("CaCert: the expected one and the actual one differ");
         }
       } else {
-        String expType = RequestorEntry.TYPE_PBM;
+        String expType = MgmtEntry.Requestor.TYPE_PBM;
         if (!cr.getType().equals(expType)) {
           throw new CmdFailure("IdNameTypeConf type is not " + expType);
         }
@@ -1292,7 +1286,7 @@ public class QaCaActions {
     protected Object execute0() throws Exception {
       println("checking signer " + name);
 
-      SignerEntry cr = caManager.getSigner(name);
+      MgmtEntry.Signer cr = caManager.getSigner(name);
       if (cr == null) {
         throw new CmdFailure("signer named '" + name + "' is not configured");
       }

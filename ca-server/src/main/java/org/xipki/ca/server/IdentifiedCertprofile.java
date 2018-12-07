@@ -55,31 +55,30 @@ import org.xipki.ca.api.BadFormatException;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.PublicCaInfo;
-import org.xipki.ca.api.profile.AuthorityInfoAccessControl;
-import org.xipki.ca.api.profile.CertLevel;
-import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.Certprofile;
+import org.xipki.ca.api.profile.Certprofile.AuthorityInfoAccessControl;
+import org.xipki.ca.api.profile.Certprofile.CertLevel;
+import org.xipki.ca.api.profile.Certprofile.CertValidity;
+import org.xipki.ca.api.profile.Certprofile.ExtKeyUsageControl;
+import org.xipki.ca.api.profile.Certprofile.ExtensionControl;
+import org.xipki.ca.api.profile.Certprofile.GeneralNameMode;
+import org.xipki.ca.api.profile.Certprofile.KeyUsageControl;
+import org.xipki.ca.api.profile.Certprofile.SubjectInfo;
+import org.xipki.ca.api.profile.Certprofile.X509CertVersion;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.CertprofileUtil;
-import org.xipki.ca.api.profile.ExtKeyUsageControl;
-import org.xipki.ca.api.profile.ExtensionControl;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
-import org.xipki.ca.api.profile.GeneralNameMode;
-import org.xipki.ca.api.profile.KeyUsageControl;
 import org.xipki.ca.api.profile.KeypairGenControl;
 import org.xipki.ca.api.profile.SubjectDnSpec;
-import org.xipki.ca.api.profile.SubjectInfo;
-import org.xipki.ca.api.profile.X509CertVersion;
-import org.xipki.ca.mgmt.api.CertprofileEntry;
-import org.xipki.ca.server.util.CaUtil;
+import org.xipki.ca.mgmt.api.MgmtEntry;
 import org.xipki.security.ExtensionExistence;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.CollectionUtil;
 import org.xipki.util.Args;
+import org.xipki.util.CollectionUtil;
 
 /**
  * TODO.
@@ -149,10 +148,10 @@ class IdentifiedCertprofile implements Closeable {
     REQUIRED_EE_EXTENSION_TYPES.add(Extension.subjectKeyIdentifier);
   } // end static
 
-  private final CertprofileEntry dbEntry;
+  private final MgmtEntry.Certprofile dbEntry;
   private final Certprofile certprofile;
 
-  IdentifiedCertprofile(CertprofileEntry dbEntry, Certprofile certprofile)
+  IdentifiedCertprofile(MgmtEntry.Certprofile dbEntry, Certprofile certprofile)
       throws CertprofileException {
     this.dbEntry = Args.notNull(dbEntry, "dbEntry");
     this.certprofile = Args.notNull(certprofile, "certprofile");
@@ -164,7 +163,7 @@ class IdentifiedCertprofile implements Closeable {
     return dbEntry.getIdent();
   }
 
-  public CertprofileEntry getDbEntry() {
+  public MgmtEntry.Certprofile getDbEntry() {
     return dbEntry;
   }
 

@@ -37,9 +37,6 @@ import java.util.zip.ZipOutputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.mgmt.db.message.OcspCert;
-import org.xipki.ca.mgmt.db.message.OcspCertstore;
-import org.xipki.ca.mgmt.db.message.OcspIssuer;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.util.Args;
@@ -130,7 +127,7 @@ class OcspCertstoreDbExporter extends DbPorter {
 
   private void exportIssuer(OcspCertstore certstore) throws DataAccessException, IOException {
     System.out.println("exporting table ISSUER");
-    List<OcspIssuer> issuers = new LinkedList<>();
+    List<OcspCertstore.Issuer> issuers = new LinkedList<>();
     certstore.setIssuers(issuers);
     final String sql = "SELECT ID,CERT,REV_INFO FROM ISSUER";
 
@@ -144,7 +141,7 @@ class OcspCertstoreDbExporter extends DbPorter {
       while (rs.next()) {
         int id = rs.getInt("ID");
 
-        OcspIssuer issuer = new OcspIssuer();
+        OcspCertstore.Issuer issuer = new OcspCertstore.Issuer();
         issuer.setId(id);
 
         String certFileName = "issuer-conf/cert-issuer-" + id;
@@ -219,7 +216,7 @@ class OcspCertstoreDbExporter extends DbPorter {
     int sum = 0;
     int numCertInCurrentFile = 0;
 
-    OcspCert.Certs certsInCurrentFile = new OcspCert.Certs();
+    OcspCertstore.Certs certsInCurrentFile = new OcspCertstore.Certs();
 
     File currentCertsZipFile = new File(baseDir,
         "tmp-certs-" + System.currentTimeMillis() + ".zip");
@@ -271,7 +268,7 @@ class OcspCertstoreDbExporter extends DbPorter {
             maxCertIdOfCurrentFile = id;
           }
 
-          OcspCert cert = new OcspCert();
+          OcspCertstore.Cert cert = new OcspCertstore.Cert();
 
           cert.setId(id);
 
@@ -330,7 +327,7 @@ class OcspCertstoreDbExporter extends DbPorter {
             processLog.printStatus();
 
             // reset
-            certsInCurrentFile = new OcspCert.Certs();
+            certsInCurrentFile = new OcspCertstore.Certs();
             numCertInCurrentFile = 0;
             minCertIdOfCurrentFile = -1;
             maxCertIdOfCurrentFile = -1;
@@ -378,7 +375,7 @@ class OcspCertstoreDbExporter extends DbPorter {
     System.out.println(" exported " + processLog.numProcessed() + " certificates from tables CERT");
   } // method exportCert0
 
-  private void finalizeZip(ZipOutputStream zipOutStream, OcspCert.Certs certs)
+  private void finalizeZip(ZipOutputStream zipOutStream, OcspCertstore.Certs certs)
       throws IOException {
     ZipEntry certZipEntry = new ZipEntry("certs.json");
     zipOutStream.putNextEntry(certZipEntry);

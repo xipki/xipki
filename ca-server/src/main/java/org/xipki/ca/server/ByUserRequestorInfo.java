@@ -21,11 +21,11 @@ import java.util.Set;
 
 import org.xipki.ca.api.InsuffientPermissionException;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.mgmt.api.CaHasUserEntry;
+import org.xipki.ca.mgmt.api.MgmtEntry;
 import org.xipki.ca.mgmt.api.PermissionConstants;
 import org.xipki.ca.mgmt.api.RequestorInfo;
-import org.xipki.util.CollectionUtil;
 import org.xipki.util.Args;
+import org.xipki.util.CollectionUtil;
 
 /**
  * TODO.
@@ -37,9 +37,9 @@ public class ByUserRequestorInfo implements RequestorInfo {
 
   private final NameId ident;
 
-  private final CaHasUserEntry caHasUser;
+  private final MgmtEntry.CaHasUser caHasUser;
 
-  public ByUserRequestorInfo(NameId ident, CaHasUserEntry caHasUser) {
+  public ByUserRequestorInfo(NameId ident, MgmtEntry.CaHasUser caHasUser) {
     this.ident = Args.notNull(ident, "ident");
     this.caHasUser = Args.notNull(caHasUser, "caHasUser");
   }
@@ -58,7 +58,7 @@ public class ByUserRequestorInfo implements RequestorInfo {
     return caHasUser.getUserIdent().getId();
   }
 
-  public CaHasUserEntry getCaHasUser() {
+  public MgmtEntry.CaHasUser getCaHasUser() {
     return caHasUser;
   }
 

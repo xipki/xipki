@@ -189,17 +189,17 @@ public class P11ContentSignerBuilder {
   private XiContentSigner createRSAContentSigner(AlgorithmIdentifier signatureAlgId)
       throws XiSecurityException, P11TokenException {
     if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(signatureAlgId.getAlgorithm())) {
-      return new P11RSAPSSContentSigner(cryptService, identityId, signatureAlgId,
+      return new P11ContentSigner.RSAPSS(cryptService, identityId, signatureAlgId,
           securityFactory.getRandom4Sign());
     } else {
-      return new P11RSAContentSigner(cryptService, identityId, signatureAlgId);
+      return new P11ContentSigner.RSA(cryptService, identityId, signatureAlgId);
     }
   }
 
   // CHECKSTYLE:SKIP
   private XiContentSigner createECContentSigner(AlgorithmIdentifier signatureAlgId)
       throws XiSecurityException, P11TokenException {
-    return new P11ECDSAContentSigner(cryptService, identityId, signatureAlgId,
+    return new P11ContentSigner.ECDSA(cryptService, identityId, signatureAlgId,
         AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId));
   }
 
@@ -207,14 +207,14 @@ public class P11ContentSignerBuilder {
   private XiContentSigner createSM2ContentSigner(AlgorithmIdentifier signatureAlgId,
       ASN1ObjectIdentifier curveOid, BigInteger pubPointX, BigInteger pubPointy)
       throws XiSecurityException, P11TokenException {
-    return new P11SM2ContentSigner(cryptService, identityId, signatureAlgId,
+    return new P11ContentSigner.SM2(cryptService, identityId, signatureAlgId,
         curveOid, pubPointX, pubPointy);
   }
 
   // CHECKSTYLE:SKIP
   private XiContentSigner createDSAContentSigner(AlgorithmIdentifier signatureAlgId)
       throws XiSecurityException, P11TokenException {
-    return new P11DSAContentSigner(cryptService, identityId, signatureAlgId,
+    return new P11ContentSigner.DSA(cryptService, identityId, signatureAlgId,
         AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId));
   }
 

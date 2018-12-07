@@ -30,7 +30,6 @@ import org.bouncycastle.asn1.x509.Extensions;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.profile.CertprofileException;
-import org.xipki.ca.api.profile.ExtensionControl;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.certprofile.xijson.XijsonCertprofile;

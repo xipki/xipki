@@ -34,18 +34,14 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.xipki.ocsp.server.conf.CertCollectionType;
-import org.xipki.ocsp.server.conf.NonceType;
-import org.xipki.ocsp.server.conf.RequestOptionType;
-import org.xipki.ocsp.server.conf.CertCollectionType.Keystore;
-import org.xipki.ocsp.server.conf.RequestOptionType.CertpathValidation;
+import org.xipki.ocsp.server.OcspServerConf.CertCollection.Keystore;
 import org.xipki.security.CertpathValidationModel;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.IoUtil;
 import org.xipki.util.Args;
 import org.xipki.util.InvalidConfException;
+import org.xipki.util.IoUtil;
 import org.xipki.util.TripleState;
 
 /**
@@ -96,7 +92,7 @@ public class RequestOption {
 
   private final CertpathValidationModel certpathValidationModel;
 
-  RequestOption(RequestOptionType conf) throws InvalidConfException {
+  RequestOption(OcspServerConf.RequestOption conf) throws InvalidConfException {
     Args.notNull(conf, "conf");
 
     supportsHttpGet = conf.isSupportsHttpGet();
@@ -104,7 +100,7 @@ public class RequestOption {
     validateSignature = conf.isValidateSignature();
 
     // Request nonce
-    NonceType nonceConf = conf.getNonce();
+    OcspServerConf.Nonce nonceConf = conf.getNonce();
     int minLen = 4;
     int maxLen = 32;
     String str = nonceConf.getOccurrence().toLowerCase();
@@ -168,7 +164,7 @@ public class RequestOption {
     }
 
     // certpath validation
-    CertpathValidation certpathConf = conf.getCertpathValidation();
+    OcspServerConf.RequestOption.CertpathValidation certpathConf = conf.getCertpathValidation();
     if (certpathConf == null) {
       if (validateSignature) {
         throw new InvalidConfException("certpathValidation is not specified");
@@ -202,7 +198,7 @@ public class RequestOption {
           "could not initialize the trustAnchors: " + ex.getMessage(), ex);
     }
 
-    CertCollectionType certsType = certpathConf.getCerts();
+    OcspServerConf.CertCollection certsType = certpathConf.getCerts();
     try {
       this.certs = (certsType == null) ? null : getCerts(certsType);
     } catch (Exception ex) {
@@ -266,7 +262,7 @@ public class RequestOption {
     return certs;
   }
 
-  private static Set<X509Certificate> getCerts(CertCollectionType conf)
+  private static Set<X509Certificate> getCerts(OcspServerConf.CertCollection conf)
       throws KeyStoreException, NoSuchAlgorithmException, NoSuchProviderException,
         CertificateException, IOException {
     Args.notNull(conf, "conf");
