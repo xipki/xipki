@@ -33,8 +33,8 @@ import org.xipki.ocsp.server.type.SingleResponse;
 import org.xipki.ocsp.server.type.TaggedCertSequence;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.XiContentSigner;
-import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.util.Hex;
 
 /**

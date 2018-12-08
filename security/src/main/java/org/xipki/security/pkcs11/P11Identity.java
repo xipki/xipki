@@ -26,9 +26,7 @@ import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkcs11.exception.P11TokenException;
-import org.xipki.security.pkcs11.exception.P11UnsupportedMechanismException;
+import org.xipki.security.XiSecurityException;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 
@@ -206,7 +204,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
           || PKCS11Constants.CKM_SHA256_RSA_PKCS_PSS == mechanism
           || PKCS11Constants.CKM_SHA384_RSA_PKCS_PSS == mechanism
           || PKCS11Constants.CKM_SHA512_RSA_PKCS_PSS == mechanism) {
-        return parameters instanceof P11RSAPkcsPssParams;
+        return parameters instanceof P11Params.P11RSAPkcsPssParams;
       } else if (PKCS11Constants.CKM_RSA_X_509 == mechanism) {
         return parameters == null;
       }
@@ -232,7 +230,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
           || PKCS11Constants.CKM_VENDOR_SM2 == mechanism) {
         return parameters == null;
       } else if (PKCS11Constants.CKM_VENDOR_SM2_SM3 == mechanism) {
-        return parameters instanceof P11ByteArrayParams;
+        return parameters instanceof P11Params.P11ByteArrayParams;
       }
     }
 

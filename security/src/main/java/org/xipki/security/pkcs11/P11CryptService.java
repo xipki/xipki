@@ -23,7 +23,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.X509Cert;
-import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
 

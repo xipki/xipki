@@ -22,7 +22,6 @@ import java.security.InvalidKeyException;
 import java.security.interfaces.RSAPublicKey;
 
 import org.bouncycastle.crypto.params.RSAKeyParameters;
-import org.xipki.security.pkcs11.exception.P11TokenException;
 import org.xipki.util.Args;
 
 /**

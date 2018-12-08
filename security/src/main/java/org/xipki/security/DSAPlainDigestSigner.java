@@ -30,7 +30,6 @@ import org.bouncycastle.crypto.params.DSAPublicKeyParameters;
 import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
 import org.bouncycastle.crypto.params.ECPublicKeyParameters;
 import org.bouncycastle.crypto.params.ParametersWithRandom;
-import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.SignerUtil;
 import org.xipki.util.Args;
 

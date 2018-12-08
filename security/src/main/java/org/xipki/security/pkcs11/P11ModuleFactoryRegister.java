@@ -19,8 +19,6 @@ package org.xipki.security.pkcs11;
 
 import java.io.Closeable;
 
-import org.xipki.security.pkcs11.exception.P11TokenException;
-
 /**
  * TODO.
  * @author Lijun Liao

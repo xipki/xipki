@@ -31,8 +31,8 @@ import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.password.OBFSinglePasswordResolver;
 import org.xipki.password.PBEPasswordService;
+import org.xipki.password.SinglePasswordResolver;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
@@ -107,7 +107,7 @@ public class InitDbMain {
     if (password != null) {
       char[] newPassword = null;
       if (StringUtil.startsWithIgnoreCase(password, "OBF:")) {
-        OBFSinglePasswordResolver resolver = new OBFSinglePasswordResolver();
+        SinglePasswordResolver.OBF resolver = new SinglePasswordResolver.OBF();
         newPassword = resolver.resolvePassword(password);
       } else if (StringUtil.startsWithIgnoreCase(password, "PBE:")) {
         char[] masterPassword = IoUtil.readPasswordFromConsole("Enter the master password");

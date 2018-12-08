@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.server.api.ResponderManager;
+import org.xipki.ca.server.CaManagerImpl;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.HttpConstants;
@@ -44,9 +44,9 @@ public class HttpCaCertServlet extends HttpServlet {
 
   private static final String CT_RESPONSE = "application/pkix-cert";
 
-  private ResponderManager responderManager;
+  private CaManagerImpl responderManager;
 
-  public void setResponderManager(ResponderManager responderManager) {
+  public void setResponderManager(CaManagerImpl responderManager) {
     this.responderManager = Args.notNull(responderManager, "responderManager");
   }
 

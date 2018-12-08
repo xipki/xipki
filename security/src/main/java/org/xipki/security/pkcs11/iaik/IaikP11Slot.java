@@ -42,9 +42,7 @@ import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.X509Cert;
-import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkcs11.P11ByteArrayParams;
-import org.xipki.security.pkcs11.P11IVParams;
+import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.P11Identity;
 import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11MechanismFilter;
@@ -54,12 +52,11 @@ import org.xipki.security.pkcs11.P11NewObjectConf;
 import org.xipki.security.pkcs11.P11NewObjectControl;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Params;
-import org.xipki.security.pkcs11.P11RSAPkcsPssParams;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.pkcs11.P11SlotRefreshResult;
-import org.xipki.security.pkcs11.exception.P11TokenException;
-import org.xipki.security.pkcs11.exception.P11UnknownEntityException;
+import org.xipki.security.pkcs11.P11TokenException;
+import org.xipki.security.pkcs11.P11UnknownEntityException;
 import org.xipki.security.pkcs11.iaik.IaikP11Module.Vendor;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
@@ -515,14 +512,14 @@ class IaikP11Slot extends P11Slot {
     }
 
     Params paramObj;
-    if (parameters instanceof P11RSAPkcsPssParams) {
-      P11RSAPkcsPssParams param = (P11RSAPkcsPssParams) parameters;
+    if (parameters instanceof P11Params.P11RSAPkcsPssParams) {
+      P11Params.P11RSAPkcsPssParams param = (P11Params.P11RSAPkcsPssParams) parameters;
       paramObj = new RSAPkcsPssParams(Mechanism.get(param.getHashAlgorithm()),
           param.getMaskGenerationFunction(), param.getSaltLength());
-    } else if (parameters instanceof P11ByteArrayParams) {
-      paramObj = new OpaqueParams(((P11ByteArrayParams) parameters).getBytes());
-    } else if (parameters instanceof P11IVParams) {
-      paramObj = new IVParams(((P11IVParams) parameters).getIV());
+    } else if (parameters instanceof P11Params.P11ByteArrayParams) {
+      paramObj = new OpaqueParams(((P11Params.P11ByteArrayParams) parameters).getBytes());
+    } else if (parameters instanceof P11Params.P11IVParams) {
+      paramObj = new IVParams(((P11Params.P11IVParams) parameters).getIV());
     } else {
       throw new P11TokenException("unknown P11Parameters " + parameters.getClass().getName());
     }

@@ -30,7 +30,6 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.xipki.password.PasswordResolver;
-import org.xipki.security.exception.XiSecurityException;
 import org.xipki.util.ObjectCreationException;
 
 /**

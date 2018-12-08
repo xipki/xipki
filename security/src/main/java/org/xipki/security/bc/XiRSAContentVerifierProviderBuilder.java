@@ -24,7 +24,7 @@ import org.bouncycastle.crypto.signers.RSADigestSigner;
 import org.bouncycastle.operator.DigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcRSAContentVerifierProviderBuilder;
-import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.SignerUtil;
 
 /**

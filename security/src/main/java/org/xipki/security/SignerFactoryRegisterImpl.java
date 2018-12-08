@@ -25,7 +25,6 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.exception.XiSecurityException;
 import org.xipki.util.Args;
 import org.xipki.util.ObjectCreationException;
 

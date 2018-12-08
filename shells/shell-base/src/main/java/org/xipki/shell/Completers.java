@@ -27,7 +27,6 @@ import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
-import org.xipki.password.PasswordProducer;
 
 /**
  * TODO.
@@ -200,16 +199,6 @@ public class Completers {
     public KeyusageCompleter() {
       setTokens("digitalSignature", "contentCommitment", "keyEncipherment", "dataEncipherment",
           "keyAgreement", "keyCertSign", "cRLSign", "encipherOnly", "decipherOnly");
-    }
-
-  }
-
-  @Service
-  public static class PasswordNameCompleter extends DynamicEnumCompleter {
-
-    @Override
-    protected Set<String> getEnums() {
-      return new HashSet<>(PasswordProducer.getNames());
     }
 
   }

@@ -52,7 +52,7 @@
   <service ref="securityFactory" interface="org.xipki.security.SecurityFactory"/>
 
   <bean id="pkcs12SignerFactory"
-      class="org.xipki.security.pkcs12.PKCS12SignerFactory">
+      class="org.xipki.security.pkcs12.P12SignerFactory">
     <property name="securityFactory" ref="securityFactory"/>
   </bean>
 

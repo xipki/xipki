@@ -41,7 +41,7 @@ import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
 import org.bouncycastle.crypto.signers.PSSSigner;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.XiSecurityException;
 import org.xipki.util.Args;
 import org.xipki.util.Hex;
 

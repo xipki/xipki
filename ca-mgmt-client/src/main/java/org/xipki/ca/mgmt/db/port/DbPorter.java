@@ -19,7 +19,6 @@ package org.xipki.ca.mgmt.db.port;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -214,19 +213,8 @@ public class DbPorter extends DbToolBase {
   }
 
   public static void echoToFile(String content, File file) throws IOException {
-    Args.notNull(content, "content");
-    Args.notNull(file, "file");
-
-    OutputStream out = null;
-    try {
-      out = Files.newOutputStream(file.toPath());
-      out.write(content.getBytes());
-    } finally {
-      if (out != null) {
-        out.flush();
-        out.close();
-      }
-    }
+    Files.write(Args.notNull(file, "file").toPath(),
+        Args.notNull(content, "content").getBytes());
   }
 
 }

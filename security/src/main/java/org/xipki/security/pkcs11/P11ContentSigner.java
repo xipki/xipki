@@ -47,8 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.XiContentSigner;
-import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkcs11.exception.P11TokenException;
+import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.GMUtil;
 import org.xipki.security.util.SignerUtil;
 import org.xipki.util.Args;
@@ -546,7 +545,7 @@ abstract class P11ContentSigner implements XiContentSigner {
 
     private final long mechanism;
 
-    private final P11RSAPkcsPssParams parameters;
+    private final P11Params.P11RSAPkcsPssParams parameters;
 
     private final OutputStream outputStream;
 
@@ -572,7 +571,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       P11Slot slot = cryptService.getSlot(slotId);
       if (slot.supportsMechanism(PKCS11Constants.CKM_RSA_PKCS_PSS)) {
         this.mechanism = PKCS11Constants.CKM_RSA_PKCS_PSS;
-        this.parameters = new P11RSAPkcsPssParams(asn1Params);
+        this.parameters = new P11Params.P11RSAPkcsPssParams(asn1Params);
         Digest digest = hashAlgo.createDigest();
         this.outputStream = new DigestOutputStream(digest);
       } else if (slot.supportsMechanism(PKCS11Constants.CKM_RSA_X_509)) {
@@ -598,7 +597,7 @@ abstract class P11ContentSigner implements XiContentSigner {
           throw new XiSecurityException("unsupported signature algorithm "
               + PKCSObjectIdentifiers.id_RSASSA_PSS.getId() + " with " + hashAlgo);
         }
-        this.parameters = new P11RSAPkcsPssParams(asn1Params);
+        this.parameters = new P11Params.P11RSAPkcsPssParams(asn1Params);
         this.outputStream = new ByteArrayOutputStream();
       }
     }
@@ -731,10 +730,10 @@ abstract class P11ContentSigner implements XiContentSigner {
 
     private byte[] getPlainSignature() throws XiSecurityException, P11TokenException {
       byte[] dataToSign;
-      P11ByteArrayParams params;
+      P11Params.P11ByteArrayParams params;
       if (outputStream instanceof ByteArrayOutputStream) {
         // dataToSign is the real message
-        params = new P11ByteArrayParams(GMUtil.getDefaultIDA());
+        params = new P11Params.P11ByteArrayParams(GMUtil.getDefaultIDA());
         dataToSign = ((ByteArrayOutputStream) outputStream).toByteArray();
       } else {
         // dataToSign is Hash(Z||Real Message)

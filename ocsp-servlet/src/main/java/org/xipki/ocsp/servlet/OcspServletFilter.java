@@ -40,7 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException;
-import org.xipki.ocsp.api.internal.OcspStoreFactoryRegisterImpl;
+import org.xipki.ocsp.api.OcspStoreFactoryRegister;
 import org.xipki.ocsp.server.OcspServerImpl;
 import org.xipki.ocsp.server.store.OcspStoreFactoryImpl;
 import org.xipki.password.PasswordResolverException;
@@ -101,7 +101,7 @@ public class OcspServletFilter implements Filter {
     OcspServerImpl ocspServer = new OcspServerImpl();
     ocspServer.setSecurityFactory(securities.getSecurityFactory());
 
-    OcspStoreFactoryRegisterImpl ocspStoreFactoryRegister = new OcspStoreFactoryRegisterImpl();
+    OcspStoreFactoryRegister ocspStoreFactoryRegister = new OcspStoreFactoryRegister();
     ocspStoreFactoryRegister.registFactory(new OcspStoreFactoryImpl());
 
     ocspServer.setOcspStoreFactoryRegister(ocspStoreFactoryRegister);

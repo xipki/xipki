@@ -36,7 +36,7 @@ import org.xipki.security.pkcs11.P11ModuleFactoryRegisterImpl;
 import org.xipki.security.pkcs11.PKCS11SignerFactory;
 import org.xipki.security.pkcs11.emulator.EmulatorP11ModuleFactory;
 import org.xipki.security.pkcs11.iaik.IaikP11ModuleFactory;
-import org.xipki.security.pkcs12.PKCS12SignerFactory;
+import org.xipki.security.pkcs12.P12SignerFactory;
 import org.xipki.util.InvalidConfException;
 
 /**
@@ -115,7 +115,7 @@ public class Securities implements Closeable {
     passwordResolver.init();
 
     // register additional SinglePasswordResolvers
-    String list = getString(props, "Additional.SinglePasswordResolvers", null);
+    String list = getString(props, "additional.singlePasswordResolvers", null);
     String[] classNames = list == null ? null : list.split(", ");
     if (classNames != null) {
       for (String className : classNames) {
@@ -154,7 +154,7 @@ public class Securities implements Closeable {
     initSecurityPkcs11(pkcs11ConfFile, signerFactoryRegister);
 
     // register additional SignerFactories
-    String list = getString(props, "Additional.SignerFactories", null);
+    String list = getString(props, "additional.signerFactories", null);
     String[] classNames = list == null ? null : list.split(", ");
     if (classNames != null) {
       for (String className : classNames) {
@@ -174,7 +174,7 @@ public class Securities implements Closeable {
 
   private void initSecurityPkcs12(SignerFactoryRegisterImpl signerFactoryRegister)
       throws IOException {
-    PKCS12SignerFactory p12SignerFactory = new PKCS12SignerFactory();
+    P12SignerFactory p12SignerFactory = new P12SignerFactory();
     p12SignerFactory.setSecurityFactory(securityFactory);
     signerFactoryRegister.registFactory(p12SignerFactory);
   }

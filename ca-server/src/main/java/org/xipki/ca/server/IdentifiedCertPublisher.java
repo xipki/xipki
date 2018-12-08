@@ -49,8 +49,8 @@ class IdentifiedCertPublisher implements Closeable {
     this.certPublisher = Args.notNull(certPublisher, "certPublisher");
   }
 
-  public void initialize(PasswordResolver passwordResolver,
-      Map<String, String> datasourceConfFiles) throws CertPublisherException {
+  public void initialize(PasswordResolver passwordResolver, Map<String, String> datasourceConfFiles)
+      throws CertPublisherException {
     certPublisher.initialize(entry.getConf(), passwordResolver, datasourceConfFiles);
   }
 
@@ -62,8 +62,8 @@ class IdentifiedCertPublisher implements Closeable {
     return certPublisher.certificateAdded(certInfo);
   }
 
-  public boolean certificateRevoked(X509Cert caCert, CertWithDbId cert,
-      String certprofile, CertRevocationInfo revInfo) {
+  public boolean certificateRevoked(X509Cert caCert, CertWithDbId cert, String certprofile,
+      CertRevocationInfo revInfo) {
     return certPublisher.certificateRevoked(caCert, cert, certprofile, revInfo);
   }
 

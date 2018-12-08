@@ -27,12 +27,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolver;
-import org.xipki.security.pkcs11.conf.MechanimFilterType;
-import org.xipki.security.pkcs11.conf.MechanismSetType;
-import org.xipki.security.pkcs11.conf.ModuleType;
-import org.xipki.security.pkcs11.conf.NativeLibraryType;
-import org.xipki.security.pkcs11.conf.PasswordSetType;
-import org.xipki.security.pkcs11.conf.SlotType;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.InvalidConfException;
@@ -73,7 +67,7 @@ public class P11ModuleConf {
 
   private final P11NewObjectConf newObjectConf;
 
-  public P11ModuleConf(ModuleType moduleType, List<MechanismSetType> mechanismSets,
+  public P11ModuleConf(Pkcs11conf.Module moduleType, List<Pkcs11conf.MechanismSet> mechanismSets,
       PasswordResolver passwordResolver) throws InvalidConfException {
     Args.notNull(moduleType, "moduleType");
     Args.notEmpty(mechanismSets, "mechanismSets");
@@ -107,7 +101,7 @@ public class P11ModuleConf {
 
     // parse mechanismSets
     Map<String, Set<Long>> mechanismSetsMap = new HashMap<>(mechanismSets.size() * 3 / 2);
-    for (MechanismSetType m : mechanismSets) {
+    for (Pkcs11conf.MechanismSet m : mechanismSets) {
       String name = m.getName();
       if (mechanismSetsMap.containsKey(name)) {
         throw new InvalidConfException("Duplication mechanismSets named " + name);
@@ -156,9 +150,9 @@ public class P11ModuleConf {
     // Mechanism filter
     mechanismFilter = new P11MechanismFilter();
 
-    List<MechanimFilterType> mechFilters = moduleType.getMechanismFilters();
+    List<Pkcs11conf.MechanimFilter> mechFilters = moduleType.getMechanismFilters();
     if (mechFilters != null && CollectionUtil.isNonEmpty(mechFilters)) {
-      for (MechanimFilterType filterType : mechFilters) {
+      for (Pkcs11conf.MechanimFilter filterType : mechFilters) {
         Set<P11SlotIdFilter> slots = getSlotIdFilters(filterType.getSlots());
         String mechanismSetName = filterType.getMechanismSet();
 
@@ -177,10 +171,10 @@ public class P11ModuleConf {
 
     // Password retriever
     passwordRetriever = new P11PasswordsRetriever();
-    List<PasswordSetType> passwordsList = moduleType.getPasswordSets();
+    List<Pkcs11conf.PasswordSet> passwordsList = moduleType.getPasswordSets();
     if (passwordsList != null && CollectionUtil.isNonEmpty(passwordsList)) {
       passwordRetriever.setPasswordResolver(passwordResolver);
-      for (PasswordSetType passwordType : passwordsList) {
+      for (Pkcs11conf.PasswordSet passwordType : passwordsList) {
         Set<P11SlotIdFilter> slots = getSlotIdFilters(passwordType.getSlots());
         passwordRetriever.addPasswordEntry(slots, new ArrayList<>(passwordType.getPasswords()));
       }
@@ -191,7 +185,7 @@ public class P11ModuleConf {
 
     final String osName = System.getProperty("os.name").toLowerCase();
     String nativeLibraryPath = null;
-    for (NativeLibraryType library : moduleType.getNativeLibraries()) {
+    for (Pkcs11conf.NativeLibrary library : moduleType.getNativeLibraries()) {
       List<String> osNames = library.getOperationSystems();
       if (CollectionUtil.isEmpty(osNames)) {
         nativeLibraryPath = library.getPath();
@@ -286,14 +280,14 @@ public class P11ModuleConf {
     return newObjectConf;
   }
 
-  private static Set<P11SlotIdFilter> getSlotIdFilters(List<SlotType> slotTypes)
+  private static Set<P11SlotIdFilter> getSlotIdFilters(List<Pkcs11conf.Slot> slotTypes)
       throws InvalidConfException {
     if (CollectionUtil.isEmpty(slotTypes)) {
       return null;
     }
 
     Set<P11SlotIdFilter> filters = new HashSet<>();
-    for (SlotType slotType : slotTypes) {
+    for (Pkcs11conf.Slot slotType : slotTypes) {
       Long slotId = null;
       if (slotType.getId() != null) {
         String str = slotType.getId().trim();

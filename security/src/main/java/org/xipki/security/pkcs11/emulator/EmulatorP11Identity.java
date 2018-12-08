@@ -49,15 +49,12 @@ import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkcs11.P11ByteArrayParams;
-import org.xipki.security.pkcs11.P11IVParams;
+import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.P11Identity;
 import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11Params;
-import org.xipki.security.pkcs11.P11RSAPkcsPssParams;
 import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.security.pkcs11.exception.P11TokenException;
+import org.xipki.security.pkcs11.P11TokenException;
 import org.xipki.security.util.GMUtil;
 import org.xipki.security.util.SignerUtil;
 import org.xipki.util.Args;
@@ -301,8 +298,8 @@ public class EmulatorP11Identity extends P11Identity {
     }
 
     byte[] iv;
-    if (params instanceof P11IVParams) {
-      iv = ((P11IVParams) params).getIV();
+    if (params instanceof P11Params.P11IVParams) {
+      iv = ((P11Params.P11IVParams) params).getIV();
     } else {
       throw new P11TokenException("params must be instanceof P11IVParams");
     }
@@ -319,12 +316,12 @@ public class EmulatorP11Identity extends P11Identity {
 
   private byte[] rsaPkcsPssSign(P11Params parameters, byte[] contentToSign,
       HashAlgo hashAlgo) throws P11TokenException {
-    if (!(parameters instanceof P11RSAPkcsPssParams)) {
+    if (!(parameters instanceof P11Params.P11RSAPkcsPssParams)) {
       throw new P11TokenException("the parameters is not of "
-          + P11RSAPkcsPssParams.class.getName());
+          + P11Params.P11RSAPkcsPssParams.class.getName());
     }
 
-    P11RSAPkcsPssParams pssParam = (P11RSAPkcsPssParams) parameters;
+    P11Params.P11RSAPkcsPssParams pssParam = (P11Params.P11RSAPkcsPssParams) parameters;
     HashAlgo contentHash = getHashAlgoForPkcs11HashMech(pssParam.getHashAlgorithm());
     if (contentHash == null) {
       throw new P11TokenException("unsupported HashAlgorithm " + pssParam.getHashAlgorithm());
@@ -451,8 +448,8 @@ public class EmulatorP11Identity extends P11Identity {
     }
 
     byte[] userId;
-    if (params instanceof P11ByteArrayParams) {
-      userId = ((P11ByteArrayParams) params).getBytes();
+    if (params instanceof P11Params.P11ByteArrayParams) {
+      userId = ((P11Params.P11ByteArrayParams) params).getBytes();
     } else {
       throw new P11TokenException("params must be instanceof P11ByteArrayParams");
     }

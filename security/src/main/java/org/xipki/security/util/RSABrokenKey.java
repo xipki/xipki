@@ -72,12 +72,6 @@ public class RSABrokenKey {
     }
   }
 
-  public static void main(String[] args) {
-    for (BigInteger s : markers) {
-      System.out.println("\"" + s.toString(16) + "\",");
-    }
-  }
-
   public static boolean isAffected(BigInteger modulus) {
     for (int i = 0; i < primes.length; i++) {
       BigInteger bi = ONE.shiftLeft(modulus.remainder(primes[i]).intValue());

@@ -27,9 +27,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.xipki.password.PasswordResolver;
-import org.xipki.security.pkcs11.conf.MechanismSetType;
-import org.xipki.security.pkcs11.conf.ModuleType;
-import org.xipki.security.pkcs11.conf.Pkcs11conf;
 import org.xipki.util.Args;
 import org.xipki.util.InvalidConfException;
 
@@ -54,11 +51,11 @@ public class P11Conf {
       Pkcs11conf pkcs11Conf = JSON.parseObject(confStream, Pkcs11conf.class);
       pkcs11Conf.validate();
 
-      List<ModuleType> moduleTypes = pkcs11Conf.getModules();
-      List<MechanismSetType> mechanismSets = pkcs11Conf.getMechanismSets();
+      List<Pkcs11conf.Module> moduleTypes = pkcs11Conf.getModules();
+      List<Pkcs11conf.MechanismSet> mechanismSets = pkcs11Conf.getMechanismSets();
 
       Map<String, P11ModuleConf> confs = new HashMap<>();
-      for (ModuleType moduleType : moduleTypes) {
+      for (Pkcs11conf.Module moduleType : moduleTypes) {
         P11ModuleConf conf = new P11ModuleConf(moduleType, mechanismSets, passwordResolver);
         confs.put(conf.getName(), conf);
       }

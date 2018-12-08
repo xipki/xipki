@@ -34,7 +34,7 @@ import org.xipki.ca.api.profile.Certprofile.CertValidity;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
-import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;

@@ -91,4 +91,5 @@ public class OBFPasswordService {
     return (str.length() < prefix.length()) ? false
         : prefix.equalsIgnoreCase(str.substring(0, prefix.length()));
   }
+
 }

@@ -47,9 +47,9 @@ public class PasswordResolverImpl implements PasswordResolver {
       return;
     }
 
-    resolvers.add(new OBFSinglePasswordResolver());
+    resolvers.add(new SinglePasswordResolver.OBF());
 
-    PBESinglePasswordResolver pbe = new PBESinglePasswordResolver();
+    SinglePasswordResolver.PBE pbe = new SinglePasswordResolver.PBE();
     if (masterPasswordCallback != null) {
       pbe.setMasterPasswordCallback(masterPasswordCallback);
     }

@@ -607,8 +607,8 @@ class IdentifiedCertprofile implements Closeable {
     }
 
     if (CollectionUtil.isNonEmpty(set)) {
-      msg.append("critical only extensions are marked as non-critical ");
-      msg.append(toString(set)).append(", ");
+      msg.append("critical only extensions are marked as non-critical ")
+        .append(toString(set)).append(", ");
     }
 
     // make sure that non-critical only extensions are not marked as critical.

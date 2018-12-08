@@ -25,8 +25,6 @@ import java.security.cert.X509Certificate;
 
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.xipki.password.PasswordResolver;
-import org.xipki.security.exception.NoIdleSignerException;
-import org.xipki.security.exception.XiSecurityException;
 
 /**
  * TODO.

@@ -40,7 +40,7 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.P11CryptService;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.security.pkcs11.P11Identity;
@@ -49,7 +49,7 @@ import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11PrivateKey;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
-import org.xipki.security.pkcs11.exception.P11TokenException;
+import org.xipki.security.pkcs11.P11TokenException;
 import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
 

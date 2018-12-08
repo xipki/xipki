@@ -41,7 +41,7 @@ import org.bouncycastle.cert.crmf.PKMACBuilder;
 import org.bouncycastle.cert.crmf.jcajce.JcePKMACValuesCalculator;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.exception.NoIdleSignerException;
+import org.xipki.security.NoIdleSignerException;
 import org.xipki.util.Args;
 
 /**

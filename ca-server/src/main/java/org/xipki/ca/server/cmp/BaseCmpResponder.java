@@ -55,17 +55,16 @@ import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditStatus;
 import org.xipki.ca.mgmt.api.CmpControl;
 import org.xipki.ca.mgmt.api.RequestorInfo;
-import org.xipki.ca.server.api.CaAuditConstants;
-import org.xipki.ca.server.api.CmpResponder;
+import org.xipki.ca.server.CaAuditConstants;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.cmp.CmpUtil;
 import org.xipki.security.cmp.ProtectionResult;
 import org.xipki.security.cmp.ProtectionVerificationResult;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.LogUtil;
-import org.xipki.util.Args;
 import org.xipki.util.RandomUtil;
 
 /**
@@ -74,7 +73,7 @@ import org.xipki.util.RandomUtil;
  * @since 2.0.0
  */
 
-abstract class BaseCmpResponder implements CmpResponder {
+abstract class BaseCmpResponder {
 
   private static final Logger LOG = LoggerFactory.getLogger(BaseCmpResponder.class);
 
@@ -147,7 +146,6 @@ abstract class BaseCmpResponder implements CmpResponder {
       ASN1OctetString transactionId, GeneralPKIMessage pkiMessage, String msgId,
       Map<String, String> parameters, AuditEvent event);
 
-  @Override
   public PKIMessage processPkiMessage(PKIMessage pkiMessage, X509Certificate tlsClientCert,
       Map<String, String> parameters, AuditEvent event) {
     Args.notNull(pkiMessage, "pkiMessage");

@@ -28,10 +28,10 @@ import java.security.SignatureSpi;
 import java.security.spec.AlgorithmParameterSpec;
 
 import org.xipki.security.HashAlgo;
-import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.DigestOutputStream;
 import org.xipki.security.pkcs11.P11PrivateKey;
-import org.xipki.security.pkcs11.exception.P11TokenException;
+import org.xipki.security.pkcs11.P11TokenException;
 import org.xipki.security.util.SignerUtil;
 
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;

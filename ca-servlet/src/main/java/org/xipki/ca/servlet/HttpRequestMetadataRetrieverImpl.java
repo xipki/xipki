@@ -22,7 +22,7 @@ import java.security.cert.X509Certificate;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.xipki.ca.server.api.HttpRequestMetadataRetriever;
+import org.xipki.ca.server.HttpRequestMetadataRetriever;
 
 /**
  * TODO.

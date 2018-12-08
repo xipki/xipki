@@ -30,10 +30,6 @@ Basic Commands
 
      make directories
 
-   * `xi:produce-password`
-
-     produce password
-
    * `xi:replace`
 
      replace text in file

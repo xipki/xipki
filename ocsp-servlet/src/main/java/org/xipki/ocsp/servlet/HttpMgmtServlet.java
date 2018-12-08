@@ -32,12 +32,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.ocsp.mgmt.api.OcspMgmtException;
-import org.xipki.ocsp.mgmt.msg.CommAction;
-import org.xipki.ocsp.mgmt.msg.CommRequest;
-import org.xipki.ocsp.mgmt.msg.NameRequest;
+import org.xipki.ocsp.mgmt.msg.MgmtAction;
+import org.xipki.ocsp.mgmt.msg.MgmtRequest;
 import org.xipki.ocsp.server.OcspServerImpl;
 import org.xipki.password.PasswordResolverException;
-import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.XiSecurityException;
 import org.xipki.util.Args;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.InvalidConfException;
@@ -106,7 +105,7 @@ public class HttpMgmtServlet extends HttpServlet {
       }
 
       String actionStr = path.substring(1);
-      CommAction action = CommAction.ofName(actionStr);
+      MgmtAction action = MgmtAction.ofName(actionStr);
       if (action == null) {
         throw new MyException(HttpServletResponse.SC_NOT_FOUND,
             "unknown action '" + actionStr + "'");
@@ -156,11 +155,11 @@ public class HttpMgmtServlet extends HttpServlet {
   } // method service
 
   private static String getNameFromRequest(InputStream in) throws OcspMgmtException {
-    NameRequest req = parse(in, NameRequest.class);
+    MgmtRequest.Name req = parse(in, MgmtRequest.Name.class);
     return req.getName();
   }
 
-  private static <T extends CommRequest> T parse(InputStream in, Class<?> clazz)
+  private static <T extends MgmtRequest> T parse(InputStream in, Class<?> clazz)
       throws OcspMgmtException {
     try {
       return JSON.parseObject(in, clazz);

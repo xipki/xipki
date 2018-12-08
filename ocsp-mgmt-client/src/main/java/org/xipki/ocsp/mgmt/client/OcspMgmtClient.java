@@ -32,14 +32,13 @@ import javax.net.ssl.SSLSocketFactory;
 
 import org.xipki.ocsp.mgmt.api.OcspManager;
 import org.xipki.ocsp.mgmt.api.OcspMgmtException;
-import org.xipki.ocsp.mgmt.msg.CommAction;
-import org.xipki.ocsp.mgmt.msg.CommRequest;
-import org.xipki.ocsp.mgmt.msg.CommResponse;
-import org.xipki.ocsp.mgmt.msg.NameRequest;
+import org.xipki.ocsp.mgmt.msg.MgmtAction;
+import org.xipki.ocsp.mgmt.msg.MgmtRequest;
+import org.xipki.ocsp.mgmt.msg.MgmtResponse;
+import org.xipki.util.Args;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
 import org.xipki.util.ObjectCreationException;
-import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 import org.xipki.util.http.SslContextConf;
 
@@ -56,7 +55,7 @@ public class OcspMgmtClient implements OcspManager {
 
   private static final String RESPONSE_CT = "application/json";
 
-  private final Map<CommAction, URL> actionUrlMap = new HashMap<>(50);
+  private final Map<MgmtAction, URL> actionUrlMap = new HashMap<>(50);
 
   private String serverUrl;
 
@@ -77,7 +76,7 @@ public class OcspMgmtClient implements OcspManager {
     Args.notBlank(serverUrl, "serverUrl");
     this.serverUrl = serverUrl.endsWith("/") ? serverUrl : serverUrl + "/";
 
-    for (CommAction action : CommAction.values()) {
+    for (MgmtAction action : MgmtAction.values()) {
       actionUrlMap.put(action, new URL(this.serverUrl + action));
     }
   }
@@ -111,25 +110,25 @@ public class OcspMgmtClient implements OcspManager {
 
   @Override
   public void restartOcspServer() throws OcspMgmtException {
-    voidTransmit(CommAction.restartServer, null);
+    voidTransmit(MgmtAction.restartServer, null);
   }
 
   @Override
   public void refreshTokenForSignerType(String signerType) throws OcspMgmtException {
-    NameRequest req = new NameRequest(signerType);
-    voidTransmit(CommAction.refreshTokenForSignerType, req);
+    MgmtRequest.Name req = new MgmtRequest.Name(signerType);
+    voidTransmit(MgmtAction.refreshTokenForSignerType, req);
   }
 
-  private void voidTransmit(CommAction action, CommRequest req) throws OcspMgmtException {
+  private void voidTransmit(MgmtAction action, MgmtRequest req) throws OcspMgmtException {
     transmit(action, req, true);
   }
 
   @SuppressWarnings("unused")
-  private byte[] transmit(CommAction action, CommRequest req) throws OcspMgmtException {
+  private byte[] transmit(MgmtAction action, MgmtRequest req) throws OcspMgmtException {
     return transmit(action, req, false);
   }
 
-  private byte[] transmit(CommAction action, CommRequest req, boolean voidReturn)
+  private byte[] transmit(MgmtAction action, MgmtRequest req, boolean voidReturn)
       throws OcspMgmtException {
     initIfNotDone();
 
@@ -204,7 +203,7 @@ public class OcspMgmtClient implements OcspManager {
   }
 
   @SuppressWarnings("unused")
-  private static <T extends CommResponse> T parse(byte[] bytes, Class<?> clazz)
+  private static <T extends MgmtResponse> T parse(byte[] bytes, Class<?> clazz)
       throws OcspMgmtException {
     try {
       return JSON.parseObject(bytes, clazz);

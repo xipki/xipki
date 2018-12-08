@@ -27,7 +27,6 @@ import java.util.Arrays;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.operator.RuntimeOperatorException;
-import org.xipki.security.exception.XiSecurityException;
 import org.xipki.util.Args;
 
 /**

@@ -96,12 +96,7 @@ import org.xipki.ca.mgmt.api.PermissionConstants;
 import org.xipki.ca.mgmt.api.RequestorInfo;
 import org.xipki.ca.mgmt.api.RevokeSuspendedCertsControl;
 import org.xipki.ca.server.SelfSignedCertBuilder.GenerateSelfSignedResult;
-import org.xipki.ca.server.api.CaAuditConstants;
-import org.xipki.ca.server.api.CmpResponder;
-import org.xipki.ca.server.api.ResponderManager;
-import org.xipki.ca.server.api.RestResponder;
-import org.xipki.ca.server.api.ScepResponder;
-import org.xipki.ca.server.cmp.CmpResponderImpl;
+import org.xipki.ca.server.cmp.CmpResponder;
 import org.xipki.ca.server.store.CertStore;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceFactory;
@@ -114,7 +109,7 @@ import org.xipki.security.CrlReason;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
-import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
@@ -140,7 +135,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
  * @since 2.0.0
  */
 
-public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
+public class CaManagerImpl implements CaManager, Closeable {
 
   private class CertsInQueuePublisher implements Runnable {
 
@@ -284,15 +279,15 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
 
   private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
-  private final Map<String, CmpResponderImpl> cmpResponders = new ConcurrentHashMap<>();
+  private final Map<String, CmpResponder> cmpResponders = new ConcurrentHashMap<>();
 
-  private final Map<String, ScepResponderImpl> scepResponders = new ConcurrentHashMap<>();
+  private final Map<String, ScepResponder> scepResponders = new ConcurrentHashMap<>();
 
   private final Map<String, X509Ca> x509cas = new ConcurrentHashMap<>();
 
   private final DataSourceFactory datasourceFactory;
 
-  private final RestResponderImpl restResponder;
+  private final RestResponder restResponder;
 
   private Properties confProperties;
 
@@ -355,7 +350,7 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
     }
 
     this.lockInstanceId = (hostAddress == null) ? calockId : hostAddress + "/" + calockId;
-    this.restResponder = new RestResponderImpl(this);
+    this.restResponder = new RestResponder(this);
   } // constructor
 
   public SecurityFactory getSecurityFactory() {
@@ -749,9 +744,9 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
     }
 
     x509cas.put(caName, ca);
-    CmpResponderImpl caResponder;
+    CmpResponder caResponder;
     try {
-      caResponder = new CmpResponderImpl(this, caName);
+      caResponder = new CmpResponder(this, caName);
     } catch (NoSuchAlgorithmException ex) {
       LogUtil.error(LOG, ex, concat("CmpResponderImpl.<init> (ca=", caName, ")"));
       return false;
@@ -761,7 +756,7 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
 
     if (caEntry.getScepResponderName() != null) {
       try {
-        scepResponders.put(caName, new ScepResponderImpl(this, caEntry.getCaEntry()));
+        scepResponders.put(caName, new ScepResponder(this, caEntry.getCaEntry()));
       } catch (CaMgmtException ex) {
         LogUtil.error(LOG, ex, concat("X509CA.<init> (scep=", caName, ")"));
         return false;
@@ -835,7 +830,6 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
     LOG.info("stopped CA system");
   } // method shutdown
 
-  @Override
   public CmpResponder getX509CaResponder(String name) {
     return cmpResponders.get(Args.toNonBlankLower(name, "name"));
   }
@@ -1869,7 +1863,6 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
     return caAliases.keySet();
   }
 
-  @Override
   public X509Cert getCaCert(String caName) {
     caName = Args.toNonBlankLower(caName, "caName");
     X509Ca ca = x509cas.get(caName);
@@ -2436,7 +2429,6 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
     }
   } // method getCurrentCrl
 
-  @Override
   public ScepResponder getScepResponder(String name) {
     name = Args.toNonBlankLower(name, "name");
     return (scepResponders == null) ? null : scepResponders.get(name);
@@ -3279,7 +3271,6 @@ public class CaManagerImpl implements CaManager, ResponderManager, Closeable {
     return ret;
   }
 
-  @Override
   public RestResponder getRestResponder() {
     return restResponder;
   }

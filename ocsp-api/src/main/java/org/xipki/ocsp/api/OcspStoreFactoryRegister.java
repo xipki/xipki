@@ -17,6 +17,11 @@
 
 package org.xipki.ocsp.api;
 
+import java.util.concurrent.ConcurrentLinkedDeque;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.util.Args;
 import org.xipki.util.ObjectCreationException;
 
 /**
@@ -25,7 +30,12 @@ import org.xipki.util.ObjectCreationException;
  * @since 2.0.0
  */
 
-public interface OcspStoreFactoryRegister {
+public class OcspStoreFactoryRegister {
+
+  private static final Logger LOG = LoggerFactory.getLogger(OcspStoreFactoryRegister.class);
+
+  private ConcurrentLinkedDeque<OcspStoreFactory> factories =
+      new ConcurrentLinkedDeque<OcspStoreFactory>();
 
   /**
    * TODO.
@@ -34,6 +44,46 @@ public interface OcspStoreFactoryRegister {
    * @return new OcspStore.
    * @throws ObjectCreationException if OcspStore could not be created.
    */
-  OcspStore newOcspStore(String type) throws ObjectCreationException;
+  public OcspStore newOcspStore(String type) throws ObjectCreationException {
+    Args.notBlank(type, "type");
+
+    for (OcspStoreFactory service : factories) {
+      if (service.canCreateOcspStore(type)) {
+        LOG.info("found factory to create OcspStore of type '" + type + "'");
+        return service.newOcspStore(type);
+      }
+    }
+
+    throw new ObjectCreationException(
+        "could not find factory to create OcspStore of type '" + type + "'");
+  }
+
+  public void registFactory(OcspStoreFactory factory) {
+    //might be null if dependency is optional
+    if (factory == null) {
+      LOG.info("registFactory invoked with null.");
+      return;
+    }
+
+    boolean replaced = factories.remove(factory);
+    factories.add(factory);
+
+    String action = replaced ? "replaced" : "added";
+    LOG.info("{} CertStatusStoreFactory binding for {}", action, factory);
+  }
+
+  public void unregistFactory(OcspStoreFactory factory) {
+    //might be null if dependency is optional
+    if (factory == null) {
+      LOG.info("unregistFactory invoked with null.");
+      return;
+    }
+
+    if (factories.remove(factory)) {
+      LOG.info("removed CertStatusStoreFactory binding for {}", factory);
+    } else {
+      LOG.info("no CertStatusStoreFactory binding found to remove for '{}'", factory);
+    }
+  }
 
 }

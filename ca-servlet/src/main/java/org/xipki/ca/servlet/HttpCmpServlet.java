@@ -38,9 +38,9 @@ import org.xipki.audit.AuditService;
 import org.xipki.audit.AuditStatus;
 import org.xipki.audit.Audits;
 import org.xipki.ca.api.RequestType;
-import org.xipki.ca.server.api.CaAuditConstants;
-import org.xipki.ca.server.api.CmpResponder;
-import org.xipki.ca.server.api.ResponderManager;
+import org.xipki.ca.server.CaAuditConstants;
+import org.xipki.ca.server.CaManagerImpl;
+import org.xipki.ca.server.cmp.CmpResponder;
 import org.xipki.util.Args;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
@@ -61,9 +61,9 @@ public class HttpCmpServlet extends HttpServlet {
 
   private static final String CT_RESPONSE = "application/pkixcmp";
 
-  private ResponderManager responderManager;
+  private CaManagerImpl responderManager;
 
-  public void setResponderManager(ResponderManager responderManager) {
+  public void setResponderManager(CaManagerImpl responderManager) {
     this.responderManager = Args.notNull(responderManager, "responderManager");
   }
 

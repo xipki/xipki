@@ -33,10 +33,10 @@ import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditService;
 import org.xipki.audit.AuditStatus;
 import org.xipki.audit.Audits;
-import org.xipki.ca.server.api.HttpRequestMetadataRetriever;
-import org.xipki.ca.server.api.ResponderManager;
-import org.xipki.ca.server.api.RestResponder;
-import org.xipki.ca.server.api.RestResponse;
+import org.xipki.ca.server.CaManagerImpl;
+import org.xipki.ca.server.HttpRequestMetadataRetriever;
+import org.xipki.ca.server.RestResponder;
+import org.xipki.ca.server.RestResponse;
 import org.xipki.util.Args;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
@@ -52,9 +52,9 @@ public class HttpRestServlet extends HttpServlet {
 
   private static Logger LOG = LoggerFactory.getLogger(HttpRestServlet.class);
 
-  private ResponderManager responderManager;
+  private CaManagerImpl responderManager;
 
-  public void setResponderManager(ResponderManager responderManager) {
+  public void setResponderManager(CaManagerImpl responderManager) {
     this.responderManager = Args.notNull(responderManager, "responderManager");
   }
 

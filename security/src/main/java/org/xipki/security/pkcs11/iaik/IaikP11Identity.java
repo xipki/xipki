@@ -26,7 +26,7 @@ import java.security.interfaces.RSAPublicKey;
 import org.xipki.security.pkcs11.P11Identity;
 import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11Params;
-import org.xipki.security.pkcs11.exception.P11TokenException;
+import org.xipki.security.pkcs11.P11TokenException;
 import org.xipki.util.Args;
 
 import iaik.pkcs.pkcs11.objects.Key;

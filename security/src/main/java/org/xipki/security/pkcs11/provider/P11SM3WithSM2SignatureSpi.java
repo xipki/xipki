@@ -32,12 +32,12 @@ import java.security.spec.ECPoint;
 
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.DigestOutputStream;
-import org.xipki.security.pkcs11.P11ByteArrayParams;
+import org.xipki.security.pkcs11.P11Params.P11ByteArrayParams;
 import org.xipki.security.pkcs11.P11Params;
 import org.xipki.security.pkcs11.P11PrivateKey;
-import org.xipki.security.pkcs11.exception.P11TokenException;
+import org.xipki.security.pkcs11.P11TokenException;
 import org.xipki.security.util.GMUtil;
 import org.xipki.security.util.SignerUtil;
 

@@ -20,9 +20,6 @@ package org.xipki.security.pkcs11;
 import java.io.Closeable;
 import java.util.List;
 
-import org.xipki.security.pkcs11.exception.P11TokenException;
-import org.xipki.security.pkcs11.exception.P11UnknownEntityException;
-
 /**
  * TODO.
  * @author Lijun Liao

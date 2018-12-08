@@ -233,7 +233,7 @@ public class CaServletFilter implements Filter {
     certprofileFactoryRegister.registFactory(new CertprofileFactoryImpl());
 
     // register additional SignerFactories
-    String list = props.getProperty("Additional.CertprofileFactories");
+    String list = props.getProperty("additional.certprofileFactories");
     if (list == null) {
       list = props.getProperty("additional.certprofileFactories");
     }

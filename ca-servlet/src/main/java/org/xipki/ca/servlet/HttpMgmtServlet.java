@@ -46,7 +46,7 @@ import org.xipki.ca.mgmt.api.CertListInfo;
 import org.xipki.ca.mgmt.api.CertWithRevocationInfo;
 import org.xipki.ca.mgmt.api.MgmtEntry;
 import org.xipki.ca.mgmt.msg.CaEntryWrapper;
-import org.xipki.ca.mgmt.msg.CommAction;
+import org.xipki.ca.mgmt.msg.MgmtAction;
 import org.xipki.ca.mgmt.msg.MgmtRequest;
 import org.xipki.ca.mgmt.msg.MgmtResponse;
 import org.xipki.ca.mgmt.msg.SignerEntryWrapper;
@@ -119,7 +119,7 @@ public class HttpMgmtServlet extends HttpServlet {
       }
 
       String actionStr = path.substring(1);
-      CommAction action = CommAction.ofName(actionStr);
+      MgmtAction action = MgmtAction.ofName(actionStr);
       if (action == null) {
         throw new MyException(HttpServletResponse.SC_NOT_FOUND,
             "unknown action '" + actionStr + "'");
@@ -639,7 +639,7 @@ public class HttpMgmtServlet extends HttpServlet {
     }
   } // method service
 
-  private static MgmtResponse.ByteArray toByteArray(CommAction action, X509Certificate cert)
+  private static MgmtResponse.ByteArray toByteArray(MgmtAction action, X509Certificate cert)
       throws MyException {
     if (cert == null) {
       return new MgmtResponse.ByteArray(null);
@@ -657,7 +657,7 @@ public class HttpMgmtServlet extends HttpServlet {
     return new MgmtResponse.ByteArray(encoded);
   }
 
-  private static MgmtResponse.ByteArray toByteArray(CommAction action, X509CRL crl)
+  private static MgmtResponse.ByteArray toByteArray(MgmtAction action, X509CRL crl)
       throws MyException {
     if (crl == null) {
       return new MgmtResponse.ByteArray(null);

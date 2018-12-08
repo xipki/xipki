@@ -34,7 +34,6 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.util.Curl.CurlResult;
-import org.xipki.password.PasswordProducer;
 import org.xipki.util.Args;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
@@ -406,54 +405,6 @@ public class Actions {
       FileUtils.copyFile(sourceFile, destFile, true);
       sourceFile.delete();
 
-      return null;
-    }
-
-  }
-
-  @Command(scope = "xi", name = "produce-password", description = "produce password")
-  @Service
-  public static class ProducePassword extends XiAction {
-
-    @Option(name = "--name", required = true, description = "name of the password")
-    @Completion(Completers.PasswordNameCompleter.class)
-    private String name;
-
-    @Option(name = "-k", description = "quorum of the password parts")
-    private Integer quorum = 1;
-
-    @Override
-    protected Object execute0() throws Exception {
-      if (!PasswordProducer.needsPassword(name)) {
-        throw new IllegalCmdParamException("password named '" + name  + "' will not be requested");
-      }
-
-      while (PasswordProducer.needsPassword(name)) {
-        char[] password;
-        if (quorum == 1) {
-          password = readPassword("Password");
-        } else {
-          char[][] parts = new char[quorum][];
-          for (int i = 0; i < quorum; i++) {
-            parts[i] = readPassword("Password (part " + (i + 1) + "/" + quorum + ")");
-          }
-          password = StringUtil.merge(parts);
-        }
-        PasswordProducer.putPassword(name, password);
-
-        final int n = 10;
-        for (int i = 0; i < n; i++) {
-          Thread.sleep(500);
-          Boolean correct = PasswordProducer.removePasswordCorrect(name);
-          if (correct != null) {
-            println("\rthe given password is "
-                + (correct ? "correct            " : "not correct        "));
-            break;
-          } else {
-            println("\rthe given password is still under process");
-          }
-        }
-      }
       return null;
     }
 

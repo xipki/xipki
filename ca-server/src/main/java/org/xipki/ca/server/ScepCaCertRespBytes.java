@@ -1,0 +1,62 @@
+/*
+ *
+ * Copyright (c) 2013 - 2018 Lijun Liao
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.xipki.ca.server;
+
+import java.io.IOException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
+
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cms.CMSAbsentContent;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.CMSSignedData;
+import org.bouncycastle.cms.CMSSignedDataGenerator;
+import org.xipki.util.Args;
+
+/**
+ * TODO.
+ * @author Lijun Liao
+ * @since 2.0.0
+ */
+
+public class ScepCaCertRespBytes {
+
+  private final byte[] bytes;
+
+  public ScepCaCertRespBytes(X509Certificate caCert, X509Certificate responderCert)
+      throws CMSException, CertificateException {
+    Args.notNull(caCert, "caCert");
+    Args.notNull(responderCert, "responderCert");
+
+    CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
+    try {
+      cmsSignedDataGen.addCertificate(new X509CertificateHolder(caCert.getEncoded()));
+      cmsSignedDataGen.addCertificate(new X509CertificateHolder(responderCert.getEncoded()));
+      CMSSignedData degenerateSignedData = cmsSignedDataGen.generate(new CMSAbsentContent());
+      bytes = degenerateSignedData.getEncoded();
+    } catch (IOException ex) {
+      throw new CMSException("could not build CMS SignedDta");
+    }
+  }
+
+  public byte[] getBytes() {
+    return Arrays.copyOf(bytes, bytes.length);
+  }
+
+}

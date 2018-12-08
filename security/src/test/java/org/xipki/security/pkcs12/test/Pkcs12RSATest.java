@@ -31,7 +31,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.pkcs12.SoftTokenContentSignerBuilder;
+import org.xipki.security.pkcs12.P12ContentSignerBuilder;
 import org.xipki.security.util.X509Util;
 
 /**
@@ -74,7 +74,7 @@ public abstract class Pkcs12RSATest {
 
     InputStream ks = Files.newInputStream(Paths.get(getPkcs12File()));
     char[] password = getPassword().toCharArray();
-    SoftTokenContentSignerBuilder builder = new SoftTokenContentSignerBuilder("PKCS12", ks,
+    P12ContentSignerBuilder builder = new P12ContentSignerBuilder("PKCS12", ks,
         password, null, password, new X509Certificate[]{cert});
     signer = builder.createSigner(getSignatureAlgorithm(), 1, new SecureRandom());
     return signer;

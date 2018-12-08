@@ -27,8 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.DfltConcurrentContentSigner;
 import org.xipki.security.XiContentSigner;
-import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkcs11.exception.P11TokenException;
+import org.xipki.security.XiSecurityException;
 import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
 

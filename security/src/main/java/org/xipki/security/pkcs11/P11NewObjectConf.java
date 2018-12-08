@@ -22,8 +22,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.xipki.security.pkcs11.conf.NewObjectConfType;
-import org.xipki.security.pkcs11.conf.NewObjectConfType.CertAttribute;
 import org.xipki.util.Args;
 
 /**
@@ -40,17 +38,17 @@ public class P11NewObjectConf {
 
   private Set<Long> setCertObjectAttributes;
 
-  public P11NewObjectConf(NewObjectConfType conf) {
+  public P11NewObjectConf(Pkcs11conf.NewObjectConf conf) {
     Boolean bb = conf.getIgnoreLabel();
     this.ignoreLabel = (bb == null) ? false : bb.booleanValue();
 
     Integer ii = conf.getIdLength();
     this.idLength = (ii == null) ? 8 : ii.intValue();
 
-    List<CertAttribute> attrs = conf.getCertAttributes();
+    List<Pkcs11conf.NewObjectConf.CertAttribute> attrs = conf.getCertAttributes();
     Set<Long> set = new HashSet<>();
     if (attrs != null) {
-      for (CertAttribute attr : attrs) {
+      for (Pkcs11conf.NewObjectConf.CertAttribute attr : attrs) {
         set.add(attr.getPkcs11CkaCode());
       }
     }

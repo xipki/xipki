@@ -41,9 +41,9 @@ import org.xipki.audit.Audits;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.RequestType;
-import org.xipki.ca.server.api.CaAuditConstants;
-import org.xipki.ca.server.api.ResponderManager;
-import org.xipki.ca.server.api.ScepResponder;
+import org.xipki.ca.server.CaAuditConstants;
+import org.xipki.ca.server.CaManagerImpl;
+import org.xipki.ca.server.ScepResponder;
 import org.xipki.scep.exception.MessageDecodingException;
 import org.xipki.scep.transaction.Operation;
 import org.xipki.scep.util.ScepConstants;
@@ -72,9 +72,9 @@ public class HttpScepServlet extends HttpServlet {
 
   private static final String CT_RESPONSE = ScepConstants.CT_PKI_MESSAGE;
 
-  private ResponderManager responderManager;
+  private CaManagerImpl responderManager;
 
-  public void setResponderManager(ResponderManager responderManager) {
+  public void setResponderManager(CaManagerImpl responderManager) {
     this.responderManager = Args.notNull(responderManager, "responderManager");
   }
 
