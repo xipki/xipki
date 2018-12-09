@@ -40,10 +40,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.Audits;
-import org.xipki.ca.api.internal.CertPublisherFactoryRegisterImpl;
-import org.xipki.ca.api.internal.CertprofileFactoryRegisterImpl;
 import org.xipki.ca.api.profile.CertprofileFactory;
 import org.xipki.ca.api.profile.CertprofileFactoryRegister;
+import org.xipki.ca.api.publisher.CertPublisherFactoryRegister;
 import org.xipki.ca.certprofile.xijson.CertprofileFactoryImpl;
 import org.xipki.ca.server.CaManagerImpl;
 import org.xipki.ca.server.publisher.OcspCertPublisherFactory;
@@ -114,8 +113,7 @@ public class CaServletFilter implements Filter {
         initCertprofileFactoryRegister(props));
 
     // Publisher
-    CertPublisherFactoryRegisterImpl publiserFactoryRegister =
-        new CertPublisherFactoryRegisterImpl();
+    CertPublisherFactoryRegister publiserFactoryRegister = new CertPublisherFactoryRegister();
     publiserFactoryRegister.registFactory(new OcspCertPublisherFactory());
     caManager.setCertPublisherFactoryRegister(publiserFactoryRegister);
 
@@ -228,8 +226,7 @@ public class CaServletFilter implements Filter {
 
   private CertprofileFactoryRegister initCertprofileFactoryRegister(Properties props)
       throws ServletException {
-    CertprofileFactoryRegisterImpl certprofileFactoryRegister =
-        new CertprofileFactoryRegisterImpl();
+    CertprofileFactoryRegister certprofileFactoryRegister = new CertprofileFactoryRegister();
     certprofileFactoryRegister.registFactory(new CertprofileFactoryImpl());
 
     // register additional SignerFactories

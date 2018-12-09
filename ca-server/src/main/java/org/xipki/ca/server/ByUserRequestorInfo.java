@@ -21,9 +21,9 @@ import java.util.Set;
 
 import org.xipki.ca.api.InsuffientPermissionException;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.mgmt.api.MgmtEntry;
-import org.xipki.ca.mgmt.api.PermissionConstants;
-import org.xipki.ca.mgmt.api.RequestorInfo;
+import org.xipki.ca.api.mgmt.MgmtEntry;
+import org.xipki.ca.api.mgmt.PermissionConstants;
+import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 

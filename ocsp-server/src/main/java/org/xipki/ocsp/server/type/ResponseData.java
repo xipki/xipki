@@ -20,8 +20,6 @@ package org.xipki.ocsp.server.type;
 import java.util.Date;
 import java.util.List;
 
-import org.xipki.ocsp.api.ASN1Type;
-
 /**
  * TODO.
  * @author Lijun Liao

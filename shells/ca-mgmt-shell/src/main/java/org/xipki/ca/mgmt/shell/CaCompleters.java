@@ -26,12 +26,12 @@ import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.mgmt.api.CaManager;
-import org.xipki.ca.mgmt.api.CaMgmtException;
-import org.xipki.ca.mgmt.api.CertListOrderBy;
-import org.xipki.ca.mgmt.api.MgmtEntry;
-import org.xipki.ca.mgmt.api.RequestorInfo;
-import org.xipki.ca.mgmt.api.ValidityMode;
+import org.xipki.ca.api.mgmt.CaManager;
+import org.xipki.ca.api.mgmt.CaMgmtException;
+import org.xipki.ca.api.mgmt.CertListOrderBy;
+import org.xipki.ca.api.mgmt.MgmtEntry;
+import org.xipki.ca.api.mgmt.RequestorInfo;
+import org.xipki.ca.api.mgmt.ValidityMode;
 import org.xipki.security.CrlReason;
 import org.xipki.shell.DynamicEnumCompleter;
 import org.xipki.shell.EnumCompleter;

@@ -53,10 +53,18 @@ public class RequestIssuer {
     data[offset++] = 0x00;
 
     this.nameHashFrom = offset;
-    offset += ASN1Type.arraycopy(hashData, data, offset);
+
+    System.arraycopy(hashData, 0, data, offset, hashData.length);
+    offset += hashData.length;
+
     this.from = 0;
     this.length = offset;
     this.hashAlgo = hashAlgo;
+  }
+
+  public static int arraycopy(byte[] hashData, byte[] data, int offset) {
+    System.arraycopy(hashData, 0, data, offset, hashData.length);
+    return hashData.length;
   }
 
   public RequestIssuer(byte[] data) {

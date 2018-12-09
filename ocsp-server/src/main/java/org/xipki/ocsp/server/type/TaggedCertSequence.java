@@ -17,8 +17,6 @@
 
 package org.xipki.ocsp.server.type;
 
-import org.xipki.ocsp.api.ASN1Type;
-
 /**
  * TODO.
  * @author Lijun Liao

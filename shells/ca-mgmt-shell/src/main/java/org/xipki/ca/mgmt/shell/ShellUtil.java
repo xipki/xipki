@@ -19,7 +19,7 @@ package org.xipki.ca.mgmt.shell;
 
 import java.util.Set;
 
-import org.xipki.ca.mgmt.api.PermissionConstants;
+import org.xipki.ca.api.mgmt.PermissionConstants;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.SecurityFactory;
 import org.xipki.shell.IllegalCmdParamException;

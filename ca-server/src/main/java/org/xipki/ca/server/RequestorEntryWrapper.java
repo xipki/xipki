@@ -25,7 +25,7 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CertWithDbId;
-import org.xipki.ca.mgmt.api.MgmtEntry;
+import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.HashAlgo;

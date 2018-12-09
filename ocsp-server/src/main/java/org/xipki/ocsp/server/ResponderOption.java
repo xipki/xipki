@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.xipki.ocsp.api.OcspMode;
 import org.xipki.util.Args;
 import org.xipki.util.InvalidConfException;
 
@@ -32,6 +31,13 @@ import org.xipki.util.InvalidConfException;
  */
 
 class ResponderOption {
+
+  public enum OcspMode {
+
+    RFC2560,
+    RFC6960
+
+  }
 
   private final OcspMode mode;
 

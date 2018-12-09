@@ -1,0 +1,114 @@
+/*
+ *
+ * Copyright (c) 2013 - 2018 Lijun Liao
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.xipki.ca.api.mgmt;
+
+import org.xipki.ca.api.profile.Certprofile;
+import org.xipki.security.CrlReason;
+import org.xipki.util.ConfPairs;
+import org.xipki.util.Args;
+
+/**
+ * Example configuration
+ *<pre>
+ * revokeSuspendedCerts.enabled=&lt;true|false&gt;, \
+ *   [revokeSuspendedCerts.targetReason=&lt;CRL reason&gt;,\
+ *    revokeSuspendedCerts.unchangedSince=&lt;duration&gt;]
+ *</pre>
+ * where duration is of format &lt;n&gt;h, &lt;n&gt;d, &lt;n&gt;y.
+ *
+ * @author Lijun Liao
+ * @since 2.0.0
+ */
+
+public class RevokeSuspendedCertsControl {
+
+  public static final String KEY_REVOCATION_ENABLED = "revokeSuspendedCerts.enabled";
+
+  public static final String KEY_REVOCATION_REASON = "revokeSuspendedCerts.targetReason";
+
+  public static final String KEY_UNCHANGED_SINCE = "revokeSuspendedCerts.unchangedSince";
+
+  private CrlReason targetReason;
+
+  private Certprofile.CertValidity unchangedSince;
+
+  // For the deserialization only
+  @SuppressWarnings("unused")
+  private RevokeSuspendedCertsControl() {
+  }
+
+  public RevokeSuspendedCertsControl(CrlReason targetReason,
+      Certprofile.CertValidity unchangedSince) {
+    this.targetReason = Args.notNull(targetReason, "targetReason");
+    this.unchangedSince = Args.notNull(unchangedSince, "unchangedSince");
+
+    switch (targetReason) {
+      case AFFILIATION_CHANGED:
+      case CESSATION_OF_OPERATION:
+      case KEY_COMPROMISE:
+      case PRIVILEGE_WITHDRAWN:
+      case SUPERSEDED:
+      case UNSPECIFIED:
+        break;
+      default:
+        throw new IllegalArgumentException("invalid targetReason " + targetReason);
+    }
+  } // constructor
+
+  public void setUnchangedSince(Certprofile.CertValidity unchangedSince) {
+    this.unchangedSince = unchangedSince;
+  }
+
+  public void setTargetReason(CrlReason targetReason) {
+    this.targetReason = targetReason;
+  }
+
+  public CrlReason getTargetReason() {
+    return targetReason;
+  }
+
+  public Certprofile.CertValidity getUnchangedSince() {
+    return unchangedSince;
+  }
+
+  @Override
+  public String toString() {
+    ConfPairs pairs = new ConfPairs();
+    pairs.putPair(KEY_REVOCATION_REASON, targetReason.getDescription());
+    pairs.putPair(KEY_UNCHANGED_SINCE, unchangedSince.toString());
+    return pairs.getEncoded();
+  }
+
+  @Override
+  public int hashCode() {
+    return toString().hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    } else if (!(obj instanceof RevokeSuspendedCertsControl)) {
+      return false;
+    }
+
+    RevokeSuspendedCertsControl obj2 = (RevokeSuspendedCertsControl) obj;
+    return (targetReason == obj2.targetReason) && (unchangedSince != obj2.unchangedSince);
+  }
+
+}

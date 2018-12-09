@@ -17,8 +17,14 @@
 
 package org.xipki.ca.api.profile;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.util.Args;
 import org.xipki.util.ObjectCreationException;
 
 /**
@@ -27,13 +33,23 @@ import org.xipki.util.ObjectCreationException;
  * @since 2.0.0
  */
 
-public interface CertprofileFactoryRegister {
+public class CertprofileFactoryRegister {
+
+  private static final Logger LOG = LoggerFactory.getLogger(CertprofileFactoryRegister.class);
+
+  private ConcurrentLinkedDeque<CertprofileFactory> factories = new ConcurrentLinkedDeque<>();
 
   /**
    * Retrieves the types of supported certificate profiles.
    * @return types of supported certificate profiles, never {@code null}.
    */
-  Set<String> getSupportedTypes();
+  public Set<String> getSupportedTypes() {
+    Set<String> types = new HashSet<>();
+    for (CertprofileFactory service : factories) {
+      types.addAll(service.getSupportedTypes());
+    }
+    return Collections.unmodifiableSet(types);
+  }
 
   /**
    * TODO.
@@ -41,7 +57,14 @@ public interface CertprofileFactoryRegister {
    *          Type of the certificate profile. Must not be {@code null}.
    * @return whether certificate profile of this type can be created.
    */
-  boolean canCreateProfile(String type);
+  public boolean canCreateProfile(String type) {
+    for (CertprofileFactory service : factories) {
+      if (service.canCreateProfile(type)) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   /**
    * TODO.
@@ -51,6 +74,46 @@ public interface CertprofileFactoryRegister {
    * @throws AuditServiceRuntimeException
    *           If certificate profile could not be created.
    */
-  Certprofile newCertprofile(String type) throws ObjectCreationException;
+  public Certprofile newCertprofile(String type) throws ObjectCreationException {
+    Args.notBlank(type, "type");
+
+    for (CertprofileFactory service : factories) {
+      if (service.canCreateProfile(type)) {
+        return service.newCertprofile(type);
+      }
+    }
+
+    throw new ObjectCreationException(
+        "could not find factory to create Certprofile of type '" + type + "'");
+  }
+
+  public void registFactory(CertprofileFactory factory) {
+    //might be null if dependency is optional
+    if (factory == null) {
+      LOG.info("registFactroy invoked with null.");
+      return;
+    }
+
+    boolean replaced = factories.remove(factory);
+    factories.add(factory);
+
+    String action = replaced ? "replaced" : "added";
+    LOG.info("{} CertprofileFactory binding for {}", action, factory);
+  }
+
+  public void unregistFactory(CertprofileFactory factory) {
+    //might be null if dependency is optional
+    if (factory == null) {
+      LOG.debug("unregistFactory invoked with null.");
+      return;
+    }
+
+    if (factories.remove(factory)) {
+      LOG.info("removed CertprofileFactory binding for {}", factory);
+    } else {
+      LOG.info("no CertprofileFactory binding found to remove for '{}'", factory);
+    }
+  }
 
 }
+

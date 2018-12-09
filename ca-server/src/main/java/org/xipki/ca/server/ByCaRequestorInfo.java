@@ -19,7 +19,7 @@ package org.xipki.ca.server;
 
 import org.xipki.ca.api.InsuffientPermissionException;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.mgmt.api.RequestorInfo;
+import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.util.Args;
 
 /**
