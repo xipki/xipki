@@ -45,9 +45,9 @@ import org.xipki.util.ObjectCreationException;
  */
 
 // CHECKSTYLE:SKIP
-public class PKCS11SignerFactory implements SignerFactory {
+public class P11SignerFactory implements SignerFactory {
 
-  private static final Logger LOG = LoggerFactory.getLogger(PKCS11SignerFactory.class);
+  private static final Logger LOG = LoggerFactory.getLogger(P11SignerFactory.class);
 
   private static final String TYPE = "pkcs11";
 

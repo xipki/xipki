@@ -87,7 +87,7 @@
       interface="org.xipki.security.pkcs11.P11CryptServiceFactory"/>
 
   <bean id="pkcs11SignerFactory"
-      class="org.xipki.security.pkcs11.PKCS11SignerFactory">
+      class="org.xipki.security.pkcs11.P11SignerFactory">
     <property name="securityFactory" ref="securityFactory"/>
     <property name="p11CryptServiceFactory" ref="p11CryptServiceFactory"/>
   </bean>

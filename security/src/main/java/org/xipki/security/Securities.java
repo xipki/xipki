@@ -33,7 +33,7 @@ import org.xipki.password.PasswordResolverImpl;
 import org.xipki.password.SinglePasswordResolver;
 import org.xipki.security.pkcs11.P11CryptServiceFactoryImpl;
 import org.xipki.security.pkcs11.P11ModuleFactoryRegisterImpl;
-import org.xipki.security.pkcs11.PKCS11SignerFactory;
+import org.xipki.security.pkcs11.P11SignerFactory;
 import org.xipki.security.pkcs11.emulator.EmulatorP11ModuleFactory;
 import org.xipki.security.pkcs11.iaik.IaikP11ModuleFactory;
 import org.xipki.security.pkcs12.P12SignerFactory;
@@ -192,7 +192,7 @@ public class Securities implements Closeable {
 
     p11CryptServiceFactory.init();
 
-    PKCS11SignerFactory p11SignerFactory = new PKCS11SignerFactory();
+    P11SignerFactory p11SignerFactory = new P11SignerFactory();
     p11SignerFactory.setSecurityFactory(securityFactory);
     p11SignerFactory.setP11CryptServiceFactory(p11CryptServiceFactory);
 
