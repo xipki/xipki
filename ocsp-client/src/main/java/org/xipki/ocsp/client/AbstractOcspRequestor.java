@@ -51,14 +51,6 @@ import org.bouncycastle.cert.ocsp.CertificateID;
 import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.cert.ocsp.SingleResp;
-import org.xipki.ocsp.client.api.InvalidOcspResponseException;
-import org.xipki.ocsp.client.api.OcspNonceUnmatchedException;
-import org.xipki.ocsp.client.api.OcspRequestor;
-import org.xipki.ocsp.client.api.OcspRequestorException;
-import org.xipki.ocsp.client.api.OcspResponseException;
-import org.xipki.ocsp.client.api.OcspTargetUnmatchedException;
-import org.xipki.ocsp.client.api.RequestOptions;
-import org.xipki.ocsp.client.api.ResponderUnreachableException;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
@@ -199,7 +191,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     try {
       encodedResp = send(encodedReq, responderUrl, requestOptions);
     } catch (IOException ex) {
-      throw new ResponderUnreachableException("IOException: " + ex.getMessage(), ex);
+      throw new OcspResponseException.ResponderUnreachable("IOException: " + ex.getMessage(), ex);
     }
 
     if (msgPair != null && debug.saveResponse()) {
@@ -210,14 +202,14 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     try {
       ocspResp = new OCSPResp(encodedResp);
     } catch (IOException ex) {
-      throw new InvalidOcspResponseException("IOException: " + ex.getMessage(), ex);
+      throw new OcspResponseException.InvalidResponse("IOException: " + ex.getMessage(), ex);
     }
 
     Object respObject;
     try {
       respObject = ocspResp.getResponseObject();
     } catch (OCSPException ex) {
-      throw new InvalidOcspResponseException("responseObject is invalid");
+      throw new OcspResponseException.InvalidResponse("responseObject is invalid");
     }
 
     if (ocspResp.getStatus() != 0) {
@@ -233,12 +225,12 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     if (nonce != null) {
       Extension nonceExtn = basicOcspResp.getExtension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
       if (nonceExtn == null) {
-        throw new OcspNonceUnmatchedException(nonce, null);
+        throw new OcspResponseException.OcspNonceUnmatched(nonce, null);
       }
 
       byte[] receivedNonce = nonceExtn.getExtnValue().getOctets();
       if (!Arrays.equals(nonce, receivedNonce)) {
-        throw new OcspNonceUnmatchedException(nonce, receivedNonce);
+        throw new OcspResponseException.OcspNonceUnmatched(nonce, receivedNonce);
       }
     }
 
@@ -246,7 +238,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     if (singleResponses == null || singleResponses.length == 0) {
       String msg = StringUtil.concat("response with no singleResponse is returned, expected is ",
           Integer.toString(serialNumbers.length));
-      throw new OcspTargetUnmatchedException(msg);
+      throw new OcspResponseException.OcspTargetUnmatched(msg);
     }
 
     final int countSingleResponses = singleResponses.length;
@@ -255,7 +247,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
       String msg = StringUtil.concat("response with ", Integer.toString(countSingleResponses),
           " singleResponse", (countSingleResponses > 1 ? "s" : ""),
           " is returned, expected is ", Integer.toString(serialNumbers.length));
-      throw new OcspTargetUnmatchedException(msg);
+      throw new OcspResponseException.OcspTargetUnmatched(msg);
     }
 
     Request reqAt0 = Request.getInstance(ocspReq.getTbsRequest().getRequestList().getObjectAt(0));
@@ -273,12 +265,12 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
           && Arrays.equals(issuerNameHash, cid.getIssuerNameHash());
 
       if (!issuerMatch) {
-        throw new OcspTargetUnmatchedException("the issuer is not requested");
+        throw new OcspResponseException.OcspTargetUnmatched("the issuer is not requested");
       }
 
       BigInteger serialNumber = cid.getSerialNumber();
       if (!serialNumbers[0].equals(serialNumber)) {
-        throw new OcspTargetUnmatchedException("the serialNumber is not requested");
+        throw new OcspResponseException.OcspTargetUnmatched("the serialNumber is not requested");
       }
     } else {
       List<BigInteger> tmpSerials1 = Arrays.asList(serialNumbers);
@@ -292,17 +284,18 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
             && Arrays.equals(issuerNameHash, cid.getIssuerNameHash());
 
         if (!issuerMatch) {
-          throw new OcspTargetUnmatchedException(
+          throw new OcspResponseException.OcspTargetUnmatched(
               "the issuer specified in singleResponse[" + i + "] is not requested");
         }
 
         BigInteger serialNumber = cid.getSerialNumber();
         if (!tmpSerials2.remove(serialNumber)) {
           if (tmpSerials1.contains(serialNumber)) {
-            throw new OcspTargetUnmatchedException("serialNumber " + LogUtil.formatCsn(serialNumber)
-                + "is contained in at least two singleResponses");
+            throw new OcspResponseException.OcspTargetUnmatched("serialNumber "
+                + LogUtil.formatCsn(serialNumber) + "is contained in at least two singleResponses");
           } else {
-            throw new OcspTargetUnmatchedException("serialNumber " + LogUtil.formatCsn(serialNumber)
+            throw new OcspResponseException.OcspTargetUnmatched("serialNumber "
+                + LogUtil.formatCsn(serialNumber)
                 + " specified in singleResponse[" + i + "] is not requested");
           }
         }

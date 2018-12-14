@@ -56,6 +56,7 @@ import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.mgmt.MgmtEntry;
+import org.xipki.ca.api.profile.BaseCertprofile;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.Certprofile.AuthorityInfoAccessControl;
 import org.xipki.ca.api.profile.Certprofile.CertLevel;
@@ -67,7 +68,6 @@ import org.xipki.ca.api.profile.Certprofile.KeyUsageControl;
 import org.xipki.ca.api.profile.Certprofile.SubjectInfo;
 import org.xipki.ca.api.profile.Certprofile.X509CertVersion;
 import org.xipki.ca.api.profile.CertprofileException;
-import org.xipki.ca.api.profile.CertprofileUtil;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.KeypairGenControl;
@@ -796,7 +796,7 @@ class IdentifiedCertprofile implements Closeable {
             + accessMethod.getId() + " is not allowed");
       }
 
-      GeneralName accessLocation = CertprofileUtil.createGeneralName(
+      GeneralName accessLocation = BaseCertprofile.createGeneralName(
           ad.getAccessLocation(), generalNameModes);
       vec.add(new AccessDescription(accessMethod, accessLocation));
     } // end for

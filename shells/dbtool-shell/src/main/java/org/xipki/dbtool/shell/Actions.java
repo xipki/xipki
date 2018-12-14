@@ -32,7 +32,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.dbtool.InitDbMain;
-import org.xipki.dbtool.LiquibaseDatabaseConf;
+import org.xipki.dbtool.LiquibaseMain;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.shell.XiAction;
@@ -51,7 +51,7 @@ public class Actions {
 
     @Override
     protected Object execute0() throws Exception {
-      LiquibaseDatabaseConf dbConf = getDatabaseConf();
+      LiquibaseMain.DatabaseConf dbConf = getDatabaseConf();
 
       printDatabaseInfo(dbConf, dbSchemaFile);
       if (!force) {
@@ -86,7 +86,7 @@ public class Actions {
     @Completion(FileCompleter.class)
     private String dbConfFile;
 
-    static void printDatabaseInfo(LiquibaseDatabaseConf dbParams, String schemaFile) {
+    static void printDatabaseInfo(LiquibaseMain.DatabaseConf dbParams, String schemaFile) {
       String msg = StringUtil.concat("\n--------------------------------------------",
           "\n     driver: ", dbParams.getDriver(),  "\n       user: ", dbParams.getUsername(),
           "\n        URL: ", dbParams.getUrl(),
@@ -96,11 +96,11 @@ public class Actions {
       System.out.println(msg);
     }
 
-    protected LiquibaseDatabaseConf getDatabaseConf()
+    protected LiquibaseMain.DatabaseConf getDatabaseConf()
         throws IOException, PasswordResolverException {
       Properties props = new Properties();
       props.load(Files.newInputStream(Paths.get(IoUtil.expandFilepath(dbConfFile))));
-      return LiquibaseDatabaseConf.getInstance(props, passwordResolver);
+      return LiquibaseMain.DatabaseConf.getInstance(props, passwordResolver);
     }
 
     protected static Properties getPropertiesFromFile(String propFile) throws IOException {

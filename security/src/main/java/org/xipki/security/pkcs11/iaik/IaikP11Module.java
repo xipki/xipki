@@ -25,7 +25,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolverException;
-import org.xipki.security.pkcs11.AbstractP11Module;
 import org.xipki.security.pkcs11.P11Module;
 import org.xipki.security.pkcs11.P11ModuleConf;
 import org.xipki.security.pkcs11.P11Slot;
@@ -50,7 +49,7 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
  * @since 2.0.0
  */
 
-public class IaikP11Module extends AbstractP11Module {
+public class IaikP11Module extends P11Module {
 
   public enum Vendor {
 

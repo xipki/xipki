@@ -39,4 +39,53 @@ public class P11TokenException extends Exception {
     super(cause);
   }
 
+  public static class P11DuplicateEntityException extends P11TokenException {
+
+    private static final long serialVersionUID = 1L;
+
+    public P11DuplicateEntityException(P11IdentityId identityId) {
+      super("duplicate identity '" + identityId + "'");
+    }
+
+    public P11DuplicateEntityException(P11SlotIdentifier slotId, P11ObjectIdentifier objectId) {
+      super("duplicate entity 'slot " + slotId + ", object " + objectId + "'");
+    }
+
+    public P11DuplicateEntityException(String message) {
+      super(message);
+    }
+
+  }
+
+  public static class P11PermissionException extends P11TokenException {
+
+    private static final long serialVersionUID = 1L;
+
+    public P11PermissionException(String message) {
+      super(message);
+    }
+
+  }
+
+  public class P11UnknownEntityException extends P11TokenException {
+
+    private static final long serialVersionUID = 1L;
+
+    public P11UnknownEntityException(P11IdentityId identityId) {
+      super("unknown identity '" + identityId + "'");
+    }
+
+    public P11UnknownEntityException(P11SlotIdentifier slotId) {
+      super("unknown slot '" + slotId + "'");
+    }
+
+    public P11UnknownEntityException(P11SlotIdentifier slotId, P11ObjectIdentifier objectId) {
+      super("unknown entity 'slot " + slotId + ", object " + objectId + "'");
+    }
+
+    public P11UnknownEntityException(String message) {
+      super(message);
+    }
+
+  }
 }

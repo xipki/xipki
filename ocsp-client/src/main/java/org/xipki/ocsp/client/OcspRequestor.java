@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ocsp.client.api;
+package org.xipki.ocsp.client;
 
 import java.math.BigInteger;
 import java.net.URL;

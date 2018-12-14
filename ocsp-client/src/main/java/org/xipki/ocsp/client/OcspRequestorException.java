@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ocsp.client.api;
+package org.xipki.ocsp.client;
 
 /**
  * TODO.
@@ -23,23 +23,23 @@ package org.xipki.ocsp.client.api;
  * @since 2.0.0
  */
 
-@SuppressWarnings("serial")
-public class ResponderUnreachableException extends OcspResponseException {
+public class OcspRequestorException extends Exception {
 
-  public ResponderUnreachableException() {
-    super();
+  private static final long serialVersionUID = 1L;
+
+  public OcspRequestorException() {
   }
 
-  public ResponderUnreachableException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
-  public ResponderUnreachableException(String message) {
+  public OcspRequestorException(String message) {
     super(message);
   }
 
-  public ResponderUnreachableException(Throwable cause) {
+  public OcspRequestorException(Throwable cause) {
     super(cause);
+  }
+
+  public OcspRequestorException(String message, Throwable cause) {
+    super(message, cause);
   }
 
 }

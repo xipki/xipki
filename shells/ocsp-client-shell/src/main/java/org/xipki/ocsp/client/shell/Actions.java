@@ -63,13 +63,15 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.ocsp.BasicOCSPResp;
 import org.bouncycastle.cert.ocsp.CertificateID;
 import org.bouncycastle.cert.ocsp.CertificateStatus;
+import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.cert.ocsp.RevokedStatus;
 import org.bouncycastle.cert.ocsp.SingleResp;
 import org.bouncycastle.cert.ocsp.UnknownStatus;
 import org.bouncycastle.operator.ContentVerifierProvider;
-import org.xipki.ocsp.client.api.OcspRequestor;
-import org.xipki.ocsp.client.api.RequestOptions;
+import org.xipki.ocsp.client.OcspRequestor;
+import org.xipki.ocsp.client.OcspResponseException;
+import org.xipki.ocsp.client.RequestOptions;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.IssuerHash;
@@ -458,7 +460,17 @@ public class Actions {
       Args.notNull(issuerHash, "issuerHash");
       Args.notNull(serialNumbers, "serialNumbers");
 
-      BasicOCSPResp basicResp = OcspUtils.extractBasicOcspResp(response);
+      int statusCode = response.getStatus();
+      if (statusCode != 0) {
+        throw new OcspResponseException.Unsuccessful(statusCode);
+      }
+
+      BasicOCSPResp basicResp;
+      try {
+        basicResp = (BasicOCSPResp) response.getResponseObject();
+      } catch (OCSPException ex) {
+        throw new OcspResponseException.InvalidResponse(ex.getMessage(), ex);
+      }
 
       boolean extendedRevoke = basicResp.getExtension(
           ObjectIdentifiers.id_pkix_ocsp_extendedRevoke) != null;

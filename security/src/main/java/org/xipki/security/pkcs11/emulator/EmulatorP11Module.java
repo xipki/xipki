@@ -29,7 +29,6 @@ import java.util.StringTokenizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolverException;
-import org.xipki.security.pkcs11.AbstractP11Module;
 import org.xipki.security.pkcs11.P11Module;
 import org.xipki.security.pkcs11.P11ModuleConf;
 import org.xipki.security.pkcs11.P11Slot;
@@ -45,7 +44,7 @@ import org.xipki.util.StringUtil;
  * @since 2.0.0
  */
 
-public class EmulatorP11Module extends AbstractP11Module {
+public class EmulatorP11Module extends P11Module {
 
   public static enum Vendor {
 

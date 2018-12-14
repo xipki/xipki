@@ -30,5 +30,5 @@
     <property name="signerConf" value="${signer.conf}"/>
     <property name="signerCertFile" value="${signer.cert}"/>
   </bean>
-  <service ref="ocspRequestor" interface="org.xipki.ocsp.client.api.OcspRequestor"/>
+  <service ref="ocspRequestor" interface="org.xipki.ocsp.client.OcspRequestor"/>
 </blueprint>

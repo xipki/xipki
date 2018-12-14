@@ -45,16 +45,12 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.P11Identity;
 import org.xipki.security.pkcs11.P11IdentityId;
-import org.xipki.security.pkcs11.P11MechanismFilter;
-import org.xipki.security.pkcs11.P11NewKeyControl;
-import org.xipki.security.pkcs11.P11NewKeyControl.KeyUsage;
-import org.xipki.security.pkcs11.P11NewObjectConf;
-import org.xipki.security.pkcs11.P11NewObjectControl;
+import org.xipki.security.pkcs11.P11ModuleConf.P11MechanismFilter;
+import org.xipki.security.pkcs11.P11ModuleConf.P11NewObjectConf;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Params;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
-import org.xipki.security.pkcs11.P11SlotRefreshResult;
 import org.xipki.security.pkcs11.P11TokenException;
 import org.xipki.security.pkcs11.P11UnknownEntityException;
 import org.xipki.security.pkcs11.iaik.IaikP11Module.Vendor;
@@ -1050,11 +1046,11 @@ class IaikP11Slot extends P11Slot {
       template.getSensitive().setBooleanValue(control.getSensitive());
     }
 
-    Set<KeyUsage> usages = control.getUsages();
+    Set<P11KeyUsage> usages = control.getUsages();
     // CHECKSTYLE:SKIP
     final Boolean TRUE = Boolean.TRUE;
     if (CollectionUtil.isNonEmpty(usages)) {
-      for (KeyUsage usage : usages) {
+      for (P11KeyUsage usage : usages) {
         switch (usage) {
           case DECRYPT:
             template.getDecrypt().setBooleanValue(TRUE);
@@ -1132,11 +1128,11 @@ class IaikP11Slot extends P11Slot {
 
     template.getValue().setByteArrayValue(keyValue);
 
-    Set<KeyUsage> usages = control.getUsages();
+    Set<P11KeyUsage> usages = control.getUsages();
     // CHECKSTYLE:SKIP
     final Boolean TRUE = Boolean.TRUE;
     if (CollectionUtil.isNonEmpty(usages)) {
-      for (KeyUsage usage : usages) {
+      for (P11KeyUsage usage : usages) {
         switch (usage) {
           case DECRYPT:
             template.getDecrypt().setBooleanValue(TRUE);
@@ -1417,11 +1413,11 @@ class IaikP11Slot extends P11Slot {
         privateKey.getSensitive().setBooleanValue(control.getSensitive());
       }
 
-      Set<KeyUsage> usages = control.getUsages();
+      Set<P11KeyUsage> usages = control.getUsages();
       // CHECKSTYLE:SKIP
       final Boolean TRUE = Boolean.TRUE;
       if (CollectionUtil.isNonEmpty(usages)) {
-        for (KeyUsage usage : usages) {
+        for (P11KeyUsage usage : usages) {
           switch (usage) {
             case DECRYPT:
               privateKey.getDecrypt().setBooleanValue(TRUE);

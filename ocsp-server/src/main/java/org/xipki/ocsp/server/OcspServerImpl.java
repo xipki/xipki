@@ -65,6 +65,7 @@ import org.xipki.ocsp.api.OcspStore.SourceConf;
 import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.ocsp.api.OcspStoreFactoryRegister;
 import org.xipki.ocsp.api.Responder;
+import org.xipki.ocsp.api.ResponderAndPath;
 import org.xipki.ocsp.server.OcspServerConf.EmbedCertsMode;
 import org.xipki.ocsp.server.ResponderOption.OcspMode;
 import org.xipki.ocsp.server.type.CertID;

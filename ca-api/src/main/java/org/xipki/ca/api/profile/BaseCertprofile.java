@@ -33,12 +33,16 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1String;
+import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.DERUniversalString;
 import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
+import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
@@ -364,6 +368,98 @@ public abstract class BaseCertprofile extends Certprofile {
     ASN1Encodable rdnValue = createRdnValue(text, type, option, index);
     return (rdnValue == null) ? null : new RDN(type, rdnValue);
   }
+
+  /**
+   * Creates GeneralName.
+   *
+   * @param requestedName
+   *          Requested name. Must not be {@code null}.
+   * @param modes
+   *          Modes to be considered. Must not be {@code null}.
+   * @return the created GeneralName
+   * @throws BadCertTemplateException
+   *         If requestedName is invalid or contains entries which are not allowed in the modes.
+   */
+  public static GeneralName createGeneralName(GeneralName requestedName,
+      Set<Certprofile.GeneralNameMode> modes)
+      throws BadCertTemplateException {
+    Args.notNull(requestedName, "requestedName");
+
+    int tag = requestedName.getTagNo();
+    Certprofile.GeneralNameMode mode = null;
+    if (modes != null) {
+      for (Certprofile.GeneralNameMode m : modes) {
+        if (m.getTag().getTag() == tag) {
+          mode = m;
+          break;
+        }
+      }
+
+      if (mode == null) {
+        throw new BadCertTemplateException("generalName tag " + tag + " is not allowed");
+      }
+    }
+
+    switch (tag) {
+      case GeneralName.rfc822Name:
+      case GeneralName.dNSName:
+      case GeneralName.uniformResourceIdentifier:
+      case GeneralName.iPAddress:
+      case GeneralName.registeredID:
+      case GeneralName.directoryName:
+        return new GeneralName(tag, requestedName.getName());
+      case GeneralName.otherName:
+        ASN1Sequence reqSeq = ASN1Sequence.getInstance(requestedName.getName());
+        int size = reqSeq.size();
+        if (size != 2) {
+          throw new BadCertTemplateException("invalid otherName sequence: size is not 2: " + size);
+        }
+
+        ASN1ObjectIdentifier type = ASN1ObjectIdentifier.getInstance(reqSeq.getObjectAt(0));
+        if (mode != null && !mode.getAllowedTypes().contains(type)) {
+          throw new BadCertTemplateException("otherName.type " + type.getId() + " is not allowed");
+        }
+
+        ASN1Encodable asn1 = reqSeq.getObjectAt(1);
+        if (! (asn1 instanceof ASN1TaggedObject)) {
+          throw new BadCertTemplateException("otherName.value is not tagged Object");
+        }
+
+        int tagNo = ASN1TaggedObject.getInstance(asn1).getTagNo();
+        if (tagNo != 0) {
+          throw new BadCertTemplateException("otherName.value does not have tag 0: " + tagNo);
+        }
+
+        ASN1EncodableVector vector = new ASN1EncodableVector();
+        vector.add(type);
+        vector.add(new DERTaggedObject(true, 0, ASN1TaggedObject.getInstance(asn1).getObject()));
+        return new GeneralName(GeneralName.otherName, new DERSequence(vector));
+      case GeneralName.ediPartyName:
+        reqSeq = ASN1Sequence.getInstance(requestedName.getName());
+
+        size = reqSeq.size();
+        String nameAssigner = null;
+        int idx = 0;
+        if (size > 1) {
+          DirectoryString ds = DirectoryString.getInstance(
+              ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx++)).getObject());
+          nameAssigner = ds.getString();
+        }
+
+        DirectoryString ds = DirectoryString.getInstance(
+            ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx++)).getObject());
+        String partyName = ds.getString();
+
+        vector = new ASN1EncodableVector();
+        if (nameAssigner != null) {
+          vector.add(new DERTaggedObject(false, 0, new DirectoryString(nameAssigner)));
+        }
+        vector.add(new DERTaggedObject(false, 1, new DirectoryString(partyName)));
+        return new GeneralName(GeneralName.ediPartyName, new DERSequence(vector));
+      default:
+        throw new IllegalStateException("should not reach here, unknown GeneralName tag " + tag);
+    } // end switch (tag)
+  } // method createGeneralName
 
   private static RDN createDateOfBirthRdn(ASN1ObjectIdentifier type, ASN1Encodable rdnValue)
       throws BadCertTemplateException {

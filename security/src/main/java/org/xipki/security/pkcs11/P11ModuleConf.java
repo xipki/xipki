@@ -18,8 +18,11 @@
 package org.xipki.security.pkcs11;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,6 +30,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolver;
+import org.xipki.password.PasswordResolverException;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.InvalidConfException;
@@ -38,10 +42,247 @@ import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 /**
  * TODO.
  * @author Lijun Liao
- * @since 2.0.0
+ *
  */
-
 public class P11ModuleConf {
+
+  private static class P11SlotIdFilter {
+
+    private final Integer index;
+
+    private final Long id;
+
+    P11SlotIdFilter(Integer index, Long id) {
+      if (index == null && id == null) {
+        throw new IllegalArgumentException("at least one of index and id may not be null");
+      }
+      this.index = index;
+      this.id = id;
+    }
+
+    boolean match(P11SlotIdentifier slotId) {
+      if (index != null) {
+        if (index.intValue() != slotId.getIndex()) {
+          return false;
+        }
+      }
+
+      if (id != null) {
+        if (id.longValue() != slotId.getId()) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+  }
+
+  private static final class P11SingleMechanismFilter {
+
+    private final Set<P11SlotIdFilter> slots;
+
+    private final Collection<Long> mechanisms;
+
+    private P11SingleMechanismFilter(Set<P11SlotIdFilter> slots, Collection<Long> mechanisms) {
+      this.slots = slots;
+      this.mechanisms = CollectionUtil.isEmpty(mechanisms) ? null : mechanisms;
+    }
+
+    public boolean match(P11SlotIdentifier slot) {
+      if (slots == null) {
+        return true;
+      }
+      for (P11SlotIdFilter m : slots) {
+        if (m.match(slot)) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    public boolean isMechanismSupported(long mechanism) {
+      if (mechanisms == null) {
+        return true;
+      }
+
+      return mechanisms.contains(mechanism);
+    }
+
+  } // class SingleFilter
+
+  public static class P11MechanismFilter {
+
+    private final List<P11SingleMechanismFilter> singleFilters;
+
+    P11MechanismFilter() {
+      singleFilters = new LinkedList<>();
+    }
+
+    void addEntry(Set<P11SlotIdFilter> slots, Collection<Long> mechanisms) {
+      Args.notNull(mechanisms, "mechanismis");
+      singleFilters.add(new P11SingleMechanismFilter(slots, mechanisms));
+    }
+
+    void addAcceptAllEntry(Set<P11SlotIdFilter> slots) {
+      singleFilters.add(new P11SingleMechanismFilter(slots, null));
+    }
+
+    public boolean isMechanismPermitted(P11SlotIdentifier slotId, long mechanism) {
+      Args.notNull(slotId, "slotId");
+      if (CollectionUtil.isEmpty(singleFilters)) {
+        return true;
+      }
+
+      for (P11SingleMechanismFilter sr : singleFilters) {
+        if (sr.match(slotId)) {
+          return sr.isMechanismSupported(mechanism);
+        }
+      }
+
+      return true;
+    }
+
+  }
+
+  public static class P11PasswordsRetriever {
+
+    private static final class P11SinglePasswordRetriever {
+
+      private final Set<P11SlotIdFilter> slots;
+
+      private final List<String> passwords;
+
+      private P11SinglePasswordRetriever(Set<P11SlotIdFilter> slots, List<String> passwords) {
+        this.slots = slots;
+        this.passwords = CollectionUtil.isEmpty(passwords) ? null : passwords;
+      }
+
+      public boolean match(P11SlotIdentifier slot) {
+        if (slots == null) {
+          return true;
+        }
+        for (P11SlotIdFilter m : slots) {
+          if (m.match(slot)) {
+            return true;
+          }
+        }
+
+        return false;
+      }
+
+      public List<char[]> getPasswords(PasswordResolver passwordResolver)
+              throws PasswordResolverException {
+        if (passwords == null) {
+          return null;
+        }
+
+        List<char[]> ret = new ArrayList<char[]>(passwords.size());
+        for (String password : passwords) {
+          if (passwordResolver == null) {
+            ret.add(password.toCharArray());
+          } else {
+            ret.add(passwordResolver.resolvePassword(password));
+          }
+        }
+
+        return ret;
+      }
+
+    } // class SingleRetriever
+
+    private final List<P11SinglePasswordRetriever> singleRetrievers;
+    private PasswordResolver passwordResolver;
+
+    P11PasswordsRetriever() {
+      singleRetrievers = new LinkedList<>();
+    }
+
+    void addPasswordEntry(Set<P11SlotIdFilter> slots, List<String> passwords) {
+      singleRetrievers.add(new P11SinglePasswordRetriever(slots, passwords));
+    }
+
+    public List<char[]> getPassword(P11SlotIdentifier slotId) throws PasswordResolverException {
+      Args.notNull(slotId, "slotId");
+      if (CollectionUtil.isEmpty(singleRetrievers)) {
+        return null;
+      }
+
+      for (P11SinglePasswordRetriever sr : singleRetrievers) {
+        if (sr.match(slotId)) {
+          return sr.getPasswords(passwordResolver);
+        }
+      }
+
+      return null;
+    }
+
+    public PasswordResolver getPasswordResolver() {
+      return passwordResolver;
+    }
+
+    public void setPasswordResolver(PasswordResolver passwordResolver) {
+      this.passwordResolver = passwordResolver;
+    }
+
+  }
+
+  public static class P11NewObjectConf {
+
+    private boolean ignoreLabel;
+
+    private int idLength = 8;
+
+    private Set<Long> setCertObjectAttributes;
+
+    public P11NewObjectConf(Pkcs11conf.NewObjectConf conf) {
+      Boolean bb = conf.getIgnoreLabel();
+      this.ignoreLabel = (bb == null) ? false : bb.booleanValue();
+
+      Integer ii = conf.getIdLength();
+      this.idLength = (ii == null) ? 8 : ii.intValue();
+
+      List<Pkcs11conf.NewObjectConf.CertAttribute> attrs = conf.getCertAttributes();
+      Set<Long> set = new HashSet<>();
+      if (attrs != null) {
+        for (Pkcs11conf.NewObjectConf.CertAttribute attr : attrs) {
+          set.add(attr.getPkcs11CkaCode());
+        }
+      }
+      this.setCertObjectAttributes = Collections.unmodifiableSet(set);
+    }
+
+    public P11NewObjectConf() {
+      this.setCertObjectAttributes = Collections.emptySet();
+    }
+
+    public boolean isIgnoreLabel() {
+      return ignoreLabel;
+    }
+
+    public void setIgnoreLabel(boolean ignoreLabel) {
+      this.ignoreLabel = ignoreLabel;
+    }
+
+    public int getIdLength() {
+      return idLength;
+    }
+
+    public void setIdLength(int idLength) {
+      this.idLength = idLength;
+    }
+
+    public Set<Long> getSetCertObjectAttributes() {
+      return setCertObjectAttributes;
+    }
+
+    public void setSetCertObjectAttributes(Set<Long> setCertObjectAttributes) {
+      this.setCertObjectAttributes =
+          Args.notNull(setCertObjectAttributes, "setCertObjectAttributes");
+    }
+
+  }
 
   private static final Logger LOG = LoggerFactory.getLogger(P11ModuleConf.class);
 
@@ -157,7 +398,8 @@ public class P11ModuleConf {
         String mechanismSetName = filterType.getMechanismSet();
 
         if (!mechanismSetsMap.containsKey(mechanismSetName)) {
-          throw new InvalidConfException("MechanismSet '" +  mechanismSetName + "' is not defined");
+          throw new InvalidConfException("MechanismSet '" +  mechanismSetName
+              + "' is not defined");
         }
 
         Set<Long> mechanisms = mechanismSetsMap.get(mechanismSetName);
@@ -307,3 +549,4 @@ public class P11ModuleConf {
   }
 
 }
+

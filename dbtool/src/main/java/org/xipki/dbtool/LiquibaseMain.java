@@ -21,10 +21,15 @@ import java.io.Closeable;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Objects;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.util.IoUtil;
+import org.xipki.util.StringUtil;
+import org.xipki.password.PasswordResolver;
+import org.xipki.password.PasswordResolverException;
 import org.xipki.util.Args;
 
 import liquibase.CatalogAndSchema;
@@ -50,9 +55,180 @@ import liquibase.resource.ResourceAccessor;
 
 public class LiquibaseMain implements Closeable {
 
+  public static class DatabaseConf {
+
+    private final String driver;
+
+    private final String username;
+
+    private final String password;
+
+    private final String url;
+
+    private final String schema;
+
+    public DatabaseConf(String driver, String username, String password,
+        String url, String schema) {
+      this.driver = driver;
+      this.username = Objects.requireNonNull(username, "username may not be null");
+      this.password = password;
+      this.url = Objects.requireNonNull(url, "url may not be null");
+      this.schema = schema;
+    }
+
+    public String getDriver() {
+      return driver;
+    }
+
+    public String getUsername() {
+      return username;
+    }
+
+    public String getPassword() {
+      return password;
+    }
+
+    public String getUrl() {
+      return url;
+    }
+
+    public String getSchema() {
+      return schema;
+    }
+
+    public static DatabaseConf getInstance(Properties dbProps, PasswordResolver passwordResolver)
+        throws PasswordResolverException {
+      Args.notNull(dbProps, "dbProps");
+
+      String schema = dbProps.getProperty("liquibase.schema");
+      if (schema != null) {
+        schema = schema.trim();
+        if (schema.isEmpty()) {
+          schema = null;
+        }
+      }
+
+      String user = dbProps.getProperty("dataSource.user");
+      if (user == null) {
+        user = dbProps.getProperty("username");
+      }
+
+      String password = dbProps.getProperty("dataSource.password");
+      if (password == null) {
+        password = dbProps.getProperty("password");
+      }
+
+      if (passwordResolver != null && (password != null && !password.isEmpty())) {
+        password = new String(passwordResolver.resolvePassword(password));
+      }
+
+      String url = dbProps.getProperty("jdbcUrl");
+      if (url != null) {
+        String driverClassName = dbProps.getProperty("driverClassName");
+        return new DatabaseConf(driverClassName, user, password, url, schema);
+      }
+
+      String datasourceClassName = dbProps.getProperty("dataSourceClassName");
+      if (datasourceClassName == null) {
+        throw new IllegalArgumentException("unsupported configuration");
+      }
+
+      StringBuilder urlBuilder = new StringBuilder();
+
+      datasourceClassName = datasourceClassName.toLowerCase();
+      String driverClassName;
+
+      if (datasourceClassName.contains("org.h2.")) {
+        driverClassName = "org.h2.Driver";
+        String dataSourceUrl = dbProps.getProperty("dataSource.url");
+        String prefix = "jdbc:h2:";
+        if (dataSourceUrl.startsWith(prefix + "~")) {
+          urlBuilder.append(prefix)
+            .append(IoUtil.expandFilepath(dataSourceUrl.substring(prefix.length())));
+        } else {
+          urlBuilder.append(dataSourceUrl);
+        }
+
+        if (schema != null) {
+          urlBuilder.append(";INIT=CREATE SCHEMA IF NOT EXISTS ").append(schema);
+        }
+      } else if (datasourceClassName.contains("mysql.")) {
+        driverClassName = "com.mysql.jdbc.Driver";
+        urlBuilder.append("jdbc:mysql://")
+          .append(dbProps.getProperty("dataSource.serverName")).append(":")
+          .append(dbProps.getProperty("dataSource.port")).append("/")
+          .append(dbProps.getProperty("dataSource.databaseName"));
+      } else if (datasourceClassName.contains("mariadb.")) {
+        driverClassName = "org.mariadb.jdbc.Driver";
+        String str = dbProps.getProperty("dataSource.url");
+        if (StringUtil.isNotBlank(str)) {
+          urlBuilder.append(str);
+        } else {
+          urlBuilder.append("jdbc:mariadb://")
+            .append(dbProps.getProperty("dataSource.serverName")).append(":")
+            .append(dbProps.getProperty("dataSource.port")).append("/")
+            .append(dbProps.getProperty("dataSource.databaseName"));
+        }
+      } else if (datasourceClassName.contains("oracle.")) {
+        driverClassName = "oracle.jdbc.driver.OracleDriver";
+        String str = dbProps.getProperty("dataSource.URL");
+        if (StringUtil.isNotBlank(str)) {
+          urlBuilder.append(str);
+        } else {
+          urlBuilder.append("jdbc:oracle:thin:@")
+            .append(dbProps.getProperty("dataSource.serverName")).append(":")
+            .append(dbProps.getProperty("dataSource.portNumber")).append(":")
+            .append(dbProps.getProperty("dataSource.databaseName"));
+        }
+      } else if (datasourceClassName.contains("com.ibm.db2.")) {
+        driverClassName = "com.ibm.db2.jcc.DB2Driver";
+        schema = dbProps.getProperty("dataSource.currentSchema");
+
+        urlBuilder.append("jdbc:db2://")
+          .append(dbProps.getProperty("dataSource.serverName")).append(":")
+          .append(dbProps.getProperty("dataSource.portNumber")).append("/")
+          .append(dbProps.getProperty("dataSource.databaseName"));
+      } else if (datasourceClassName.contains("postgresql.")
+          || datasourceClassName.contains("impossibl.postgres.")) {
+        String serverName;
+        String portNumber;
+        String databaseName;
+        if (datasourceClassName.contains("postgresql.")) {
+          serverName = dbProps.getProperty("dataSource.serverName");
+          portNumber = dbProps.getProperty("dataSource.portNumber");
+          databaseName = dbProps.getProperty("dataSource.databaseName");
+        } else {
+          serverName = dbProps.getProperty("dataSource.host");
+          portNumber = dbProps.getProperty("dataSource.port");
+          databaseName = dbProps.getProperty("dataSource.database");
+        }
+        driverClassName = "org.postgresql.Driver";
+        urlBuilder.append("jdbc:postgresql://")
+          .append(serverName).append(":").append(portNumber).append("/").append(databaseName);
+      } else if (datasourceClassName.contains("hsqldb.")) {
+        driverClassName = "org.hsqldb.jdbc.JDBCDriver";
+        String dataSourceUrl = dbProps.getProperty("dataSource.url");
+        String prefix = "jdbc:hsqldb:file:";
+        if (dataSourceUrl.startsWith(prefix + "~")) {
+          urlBuilder.append(prefix)
+            .append(IoUtil.expandFilepath(dataSourceUrl.substring(prefix.length())));
+        } else {
+          urlBuilder.append(dataSourceUrl);
+        }
+      } else {
+        throw new IllegalArgumentException("unsupported database type " + datasourceClassName);
+      }
+
+      url = urlBuilder.toString();
+
+      return new DatabaseConf(driverClassName, user, password, url, schema);
+    } // method getInstance
+
+  }
+
   private static Logger LOG = LoggerFactory.getLogger(LiquibaseMain.class);
 
-  private final LiquibaseDatabaseConf dbConf;
+  private final DatabaseConf dbConf;
 
   private final String changeLogFile;
 
@@ -60,7 +236,7 @@ public class LiquibaseMain implements Closeable {
 
   private Liquibase liquibase;
 
-  public LiquibaseMain(LiquibaseDatabaseConf dbConf, String changeLogFile) {
+  public LiquibaseMain(DatabaseConf dbConf, String changeLogFile) {
     this.dbConf = Args.notNull(dbConf, "dbConf");
     this.changeLogFile = IoUtil.expandFilepath(Args.notBlank(changeLogFile, "changeLogFile"));
   }

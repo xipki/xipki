@@ -75,7 +75,6 @@ import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.profile.BaseCertprofile;
 import org.xipki.ca.api.profile.CertprofileException;
-import org.xipki.ca.api.profile.CertprofileUtil;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.KeyParametersOption;
@@ -1649,8 +1648,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     if (reqNames != null) {
       GeneralName[] reqL = reqNames.getNames();
       for (int i = 0; i < reqL.length; i++) {
-        grantedNames.add(
-            CertprofileUtil.createGeneralName(reqL[i], subjectAltNameModes));
+        grantedNames.add(createGeneralName(reqL[i], subjectAltNameModes));
       }
     }
 

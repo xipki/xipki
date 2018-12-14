@@ -18,9 +18,13 @@
 package org.xipki.security.pkcs11;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,6 +35,8 @@ import org.xipki.security.XiSecurityException;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
+
+import com.alibaba.fastjson.JSON;
 
 /**
  * TODO.
@@ -46,14 +52,16 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
 
   private PasswordResolver passwordResolver;
 
-  private P11Conf p11Conf;
+  private Map<String, P11ModuleConf> moduleConfs;
+
+  private Set<String> moduleNames;
 
   private String pkcs11ConfFile;
 
   private P11ModuleFactoryRegister p11ModuleFactoryRegister;
 
   public synchronized void init() throws InvalidConfException {
-    if (p11Conf != null) {
+    if (moduleConfs != null) {
       return;
     }
     if (StringUtil.isBlank(pkcs11ConfFile)) {
@@ -61,9 +69,26 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
       return;
     }
 
-    try {
-      this.p11Conf = new P11Conf(Files.newInputStream(Paths.get(pkcs11ConfFile)), passwordResolver);
-    } catch (IOException ex) {
+    try (InputStream confStream = Files.newInputStream(Paths.get(pkcs11ConfFile))) {
+      Pkcs11conf pkcs11Conf = JSON.parseObject(confStream, Pkcs11conf.class);
+      pkcs11Conf.validate();
+
+      List<Pkcs11conf.Module> moduleTypes = pkcs11Conf.getModules();
+      List<Pkcs11conf.MechanismSet> mechanismSets = pkcs11Conf.getMechanismSets();
+
+      Map<String, P11ModuleConf> confs = new HashMap<>();
+      for (Pkcs11conf.Module moduleType : moduleTypes) {
+        P11ModuleConf conf = new P11ModuleConf(moduleType, mechanismSets, passwordResolver);
+        confs.put(conf.getName(), conf);
+      }
+
+      if (!confs.containsKey(P11CryptServiceFactory.DEFAULT_P11MODULE_NAME)) {
+        throw new InvalidConfException("module '"
+            + P11CryptServiceFactory.DEFAULT_P11MODULE_NAME + "' is not defined");
+      }
+      this.moduleConfs = Collections.unmodifiableMap(confs);
+      this.moduleNames = Collections.unmodifiableSet(new HashSet<>(confs.keySet()));
+    } catch (IOException | RuntimeException ex) {
       throw new InvalidConfException("could not create P11Conf: " + ex.getMessage(), ex);
     }
   }
@@ -81,12 +106,12 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
           "could not initialize P11CryptServiceFactory: " + ex.getMessage(), ex);
     }
 
-    if (p11Conf == null) {
+    if (moduleConfs == null) {
       throw new IllegalStateException("please set pkcs11ConfFile and then call init() first");
     }
 
     final String name = getModuleName(moduleName);
-    P11ModuleConf conf = p11Conf.getModuleConf(name);
+    P11ModuleConf conf = moduleConfs.get(name);
     if (conf == null) {
       throw new XiSecurityException("PKCS#11 module " + name + " is not defined");
     }
@@ -131,7 +156,7 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
       throw new IllegalStateException(
           "could not initialize P11CryptServiceFactory: " + ex.getMessage(), ex);
     }
-    return p11Conf.getModuleNames();
+    return moduleNames;
   }
 
 }

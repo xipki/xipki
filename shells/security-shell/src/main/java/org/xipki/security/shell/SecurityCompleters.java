@@ -25,7 +25,7 @@ import java.util.Set;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
-import org.xipki.security.pkcs11.P11NewKeyControl.KeyUsage;
+import org.xipki.security.pkcs11.P11Slot.P11KeyUsage;
 import org.xipki.shell.DynamicEnumCompleter;
 import org.xipki.shell.EnumCompleter;
 import org.xipki.shell.IllegalCmdParamException;
@@ -50,17 +50,17 @@ public class SecurityCompleters {
 
     public P11KeyUsageCompleter() {
       Set<String> names = new HashSet<>();
-      for (KeyUsage usage : KeyUsage.values()) {
+      for (P11KeyUsage usage : P11KeyUsage.values()) {
         names.add(usage.name());
       }
       setTokens(names);
     }
 
-    public static Set<KeyUsage> parseUsages(List<String> usageTexts)
+    public static Set<P11KeyUsage> parseUsages(List<String> usageTexts)
         throws IllegalCmdParamException {
-      Set<KeyUsage> usages = new HashSet<>();
+      Set<P11KeyUsage> usages = new HashSet<>();
       for (String usageText : usageTexts) {
-        KeyUsage usage = KeyUsage.valueOf(usageText.toUpperCase());
+        P11KeyUsage usage = P11KeyUsage.valueOf(usageText.toUpperCase());
         if (usage == null) {
           throw new IllegalCmdParamException("invalid usage " + usageText);
         }

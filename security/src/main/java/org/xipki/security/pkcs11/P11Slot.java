@@ -29,9 +29,11 @@ import java.security.spec.DSAParameterSpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -40,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
+import org.xipki.security.pkcs11.P11ModuleConf.P11MechanismFilter;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.DSAParameterCache;
 import org.xipki.security.util.X509Util;
@@ -58,6 +61,146 @@ import iaik.pkcs.pkcs11.constants.PKCS11Constants;
  */
 
 public abstract class P11Slot implements Closeable {
+
+  public static class P11SlotRefreshResult {
+
+    private final Map<P11ObjectIdentifier, P11Identity> identities = new HashMap<>();
+
+    private final Map<P11ObjectIdentifier, X509Cert> certificates = new HashMap<>();
+
+    private final Set<Long> mechanisms = new HashSet<>();
+
+    public P11SlotRefreshResult() {
+    }
+
+    public Map<P11ObjectIdentifier, P11Identity> getIdentities() {
+      return identities;
+    }
+
+    public Map<P11ObjectIdentifier, X509Cert> getCertificates() {
+      return certificates;
+    }
+
+    public Set<Long> getMechanisms() {
+      return mechanisms;
+    }
+
+    public void addIdentity(P11Identity identity) {
+      Args.notNull(identity, "identity");
+      this.identities.put(identity.getId().getKeyId(), identity);
+    }
+
+    public void addMechanism(long mechanism) {
+      this.mechanisms.add(mechanism);
+    }
+
+    public void addCertificate(P11ObjectIdentifier objectId, X509Cert certificate) {
+      Args.notNull(objectId, "objectId");
+      Args.notNull(certificate, "certificate");
+      this.certificates.put(objectId, certificate);
+    }
+
+    /**
+     * Returns the certificate of the given identifier {@code id}.
+     * @param id
+     *          Identifier. Must not be {@code null}.
+     * @return the certificate of the given identifier.
+     */
+    public X509Cert getCertForId(byte[] id) {
+      for (P11ObjectIdentifier objId : certificates.keySet()) {
+        if (objId.matchesId(id)) {
+          return certificates.get(objId);
+        }
+      }
+      return null;
+    }
+
+    /**
+     * Returns the PKCS#11 label for certificate of the given {@code id}.
+     * @param id
+     *          Identifier. Must not be {@code null}.
+     * @return the label.
+     */
+    public String getCertLabelForId(byte[] id) {
+      for (P11ObjectIdentifier objId : certificates.keySet()) {
+        if (objId.matchesId(id)) {
+          return objId.getLabel();
+        }
+      }
+      return null;
+    }
+
+  }
+
+  public static class P11NewObjectControl {
+
+    private final byte[] id;
+
+    private final String label;
+
+    public P11NewObjectControl(byte[] id, String label) {
+      this.id = id;
+      this.label = Args.notBlank(label, "label");
+    }
+
+    public byte[] getId() {
+      return id;
+    }
+
+    public String getLabel() {
+      return label;
+    }
+
+  }
+
+  public static enum P11KeyUsage {
+    DECRYPT,
+    DERIVE,
+    SIGN,
+    SIGN_RECOVER,
+    UNWRAP
+  }
+
+  public static class P11NewKeyControl extends P11NewObjectControl {
+
+    private Boolean extractable;
+
+    private Boolean sensitive;
+
+    private Set<P11KeyUsage> usages;
+
+    public P11NewKeyControl(byte[] id, String label) {
+      super(id, label);
+    }
+
+    public Boolean getExtractable() {
+      return extractable;
+    }
+
+    public void setExtractable(Boolean extractable) {
+      this.extractable = extractable;
+    }
+
+    public Boolean getSensitive() {
+      return sensitive;
+    }
+
+    public void setSensitive(Boolean sensitive) {
+      this.sensitive = sensitive;
+    }
+
+    public Set<P11KeyUsage> getUsages() {
+      if (usages == null) {
+        usages = new HashSet<>();
+      }
+      return usages;
+    }
+
+    public void setUsages(Set<P11KeyUsage> usages) {
+      this.usages = usages;
+    }
+
+  }
 
   private static final Logger LOG = LoggerFactory.getLogger(P11Slot.class);
 
