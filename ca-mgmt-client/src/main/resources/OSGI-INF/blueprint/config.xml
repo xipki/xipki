@@ -44,5 +44,5 @@
     <property name="sslContextConf" ref="sslContextConf"/>
   </bean>
 
-  <service ref="caManager" interface="org.xipki.ca.mgmt.api.CaManager"/>
+  <service ref="caManager" interface="org.xipki.ca.api.mgmt.CaManager"/>
 </blueprint>
