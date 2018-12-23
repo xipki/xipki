@@ -19,23 +19,23 @@
   <cm:property-placeholder persistent-id="org.xipki.util.curl">
     <cm:default-properties>
       <cm:property name="useSslConf" value="false" />
-      <cm:property name="sslStoreType" value="" />
-      <cm:property name="sslKeystore" value="" />
-      <cm:property name="sslKeystorePassword" value="" />
-      <cm:property name="sslTruststore" value="" />
-      <cm:property name="sslKeystorePassword" value="" />
-      <cm:property name="sslHostnameVerifier" value="default" />
+      <cm:property name="ssl.storeType" value="" />
+      <cm:property name="ssl.keystore" value="" />
+      <cm:property name="ssl.keystorePassword" value="" />
+      <cm:property name="ssl.truststore" value="" />
+      <cm:property name="ssl.truststorePassword" value="" />
+      <cm:property name="ssl.hostnameVerifier" value="default" />
     </cm:default-properties>
   </cm:property-placeholder>
 
   <bean id="sslContextConf" class="org.xipki.util.http.SslContextConf">
     <property name="useSslConf" value="${useSslConf}"/>
-    <property name="sslStoreType" value="${sslStoreType}"/>
-    <property name="sslKeystore" value="${sslKeystore}"/>
-    <property name="sslKeystorePassword" value="${sslKeystorePassword}"/>
-    <property name="sslTruststore" value="${sslTruststore}"/>
-    <property name="sslTruststorePassword" value="${sslTruststorePassword}"/>
-    <property name="sslHostnameVerifier" value="${sslHostnameVerifier}"/>
+    <property name="sslStoreType" value="${ssl.storeType}"/>
+    <property name="sslKeystore" value="${ssl.keystore}"/>
+    <property name="sslKeystorePassword" value="${ssl.keystorePassword}"/>
+    <property name="sslTruststore" value="${ssl.truststore}"/>
+    <property name="sslTruststorePassword" value="${ssl.truststorePassword}"/>
+    <property name="sslHostnameVerifier" value="${ssl.hostnameVerifier}"/>
   </bean>
 
   <bean id="curl" class="org.xipki.util.DefaultCurl">
