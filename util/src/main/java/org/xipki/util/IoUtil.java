@@ -182,6 +182,15 @@ public class IoUtil {
     return sb.toString();
   }
 
+  public static void writeShort(short value, byte[] dest, int destOffset) {
+    dest[destOffset++] = (byte) (value >> 8);
+    dest[destOffset] = (byte) (0xFF & value);
+  }
+
+  public static short parseShort(byte[] bytes, int offset) {
+    return (short) ((0xFF & bytes[offset++]) << 8 | 0xFF & bytes[offset]);
+  }
+
   public static void writeInt(int value, byte[] dest, int destOffset) {
     dest[destOffset++] = (byte)         (value >> 24);
     dest[destOffset++] = (byte) (0xFF & (value >> 16));

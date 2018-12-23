@@ -31,11 +31,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolverImpl;
 import org.xipki.password.SinglePasswordResolver;
+import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.security.pkcs11.P11CryptServiceFactoryImpl;
 import org.xipki.security.pkcs11.P11ModuleFactoryRegisterImpl;
 import org.xipki.security.pkcs11.P11SignerFactory;
 import org.xipki.security.pkcs11.emulator.EmulatorP11ModuleFactory;
 import org.xipki.security.pkcs11.iaik.IaikP11ModuleFactory;
+import org.xipki.security.pkcs11.proxy.ProxyP11ModuleFactory;
 import org.xipki.security.pkcs12.P12SignerFactory;
 import org.xipki.util.InvalidConfException;
 
@@ -74,6 +76,10 @@ public class Securities implements Closeable {
 
   public SecurityFactory getSecurityFactory() {
     return securityFactory;
+  }
+
+  public P11CryptServiceFactory getP11CryptServiceFactory() {
+    return p11CryptServiceFactory;
   }
 
   public void init() throws IOException, InvalidConfException {
@@ -184,6 +190,7 @@ public class Securities implements Closeable {
     p11ModuleFactoryRegister = new P11ModuleFactoryRegisterImpl();
     p11ModuleFactoryRegister.registFactory(new EmulatorP11ModuleFactory());
     p11ModuleFactoryRegister.registFactory(new IaikP11ModuleFactory());
+    p11ModuleFactoryRegister.registFactory(new ProxyP11ModuleFactory());
 
     p11CryptServiceFactory = new P11CryptServiceFactoryImpl();
     p11CryptServiceFactory.setP11ModuleFactoryRegister(p11ModuleFactoryRegister);

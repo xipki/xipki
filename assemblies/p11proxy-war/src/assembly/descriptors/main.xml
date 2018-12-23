@@ -1,0 +1,33 @@
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
+  <id>main</id>
+  <includeBaseDirectory>true</includeBaseDirectory>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <fileSets>
+    <fileSet>
+      <directory>${project.build.directory}</directory>
+      <includes>
+        <include>xipki/**</include>
+        <include>README.md</include>
+      </includes>
+      <outputDirectory>.</outputDirectory>
+    </fileSet>
+  </fileSets>
+  <files>
+    <file>
+      <source>${project.build.directory}/webapps/p11proxy-servlet.war</source>
+      <outputDirectory>webapps</outputDirectory>
+      <destName>p11proxy.war</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>${project.build.directory}/xipki/security/example/pkcs11-emulator.json</source>
+      <outputDirectory>xipki/security</outputDirectory>
+      <destName>pkcs11.json</destName>
+      <fileMode>0644</fileMode>
+    </file>
+  </files>
+</assembly>

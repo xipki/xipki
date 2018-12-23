@@ -74,6 +74,7 @@
     <module>dbtool</module>
     <module>password</module>
     <module>security</module>
+    <module>p11proxy-servlet</module>
     <!-- PKI SDK/Client -->
     <module>cmpclient</module>
     <module>ocsp-client</module>

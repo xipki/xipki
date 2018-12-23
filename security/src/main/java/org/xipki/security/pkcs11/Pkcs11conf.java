@@ -262,7 +262,6 @@ public class Pkcs11conf extends ValidatableConf {
       validate(newObjectConf);
       validate(includeSlots);
       validate(excludeSlots);
-      notEmpty(passwordSets, "passwordSets");
       validate(passwordSets);
       notEmpty(mechanismFilters, "mechanismFilters");
       validate(mechanismFilters);

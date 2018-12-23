@@ -1141,6 +1141,9 @@ public abstract class P11Slot implements Closeable {
     }
 
     updateCertificate0(keyId, newCert);
+
+    certificates.put(keyId, new X509Cert(newCert));
+
     P11IdentityId identityId = identity.getId();
     identityId.setCertLabel(keyId.getLabel());
     identity.setCertificates(new X509Certificate[]{newCert});

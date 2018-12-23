@@ -117,4 +117,12 @@
   <service ref="iaikP11ModuleFactory"
       interface="org.xipki.security.pkcs11.P11ModuleFactory"/>
 
+  <!-- PKCS#11 Proxy -->
+  <bean id="proxyP11ModuleFactory"
+      class="org.xipki.security.pkcs11.proxy.ProxyP11ModuleFactory">
+  </bean>
+
+  <service ref="proxyP11ModuleFactory"
+      interface="org.xipki.security.pkcs11.P11ModuleFactory"/>
+
 </blueprint>

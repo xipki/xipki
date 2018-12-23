@@ -15,27 +15,4 @@
  * limitations under the License.
  */
 
-package org.xipki.security.pkcs11;
-
-/**
- * TODO.
- * @author Lijun Liao
- * @since 2.0.0
- */
-
-public class P11TokenException extends Exception {
-
-  private static final long serialVersionUID = 1L;
-
-  public P11TokenException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
-  public P11TokenException(String message) {
-    super(message);
-  }
-
-  public P11TokenException(Throwable cause) {
-    super(cause);
-  }
-}
+package org.xipki.security.pkcs11.proxy;

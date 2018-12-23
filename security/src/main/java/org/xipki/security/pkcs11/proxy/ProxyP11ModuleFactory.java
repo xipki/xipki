@@ -15,27 +15,31 @@
  * limitations under the License.
  */
 
-package org.xipki.security.pkcs11;
+package org.xipki.security.pkcs11.proxy;
+
+import org.xipki.security.pkcs11.P11Module;
+import org.xipki.security.pkcs11.P11ModuleConf;
+import org.xipki.security.pkcs11.P11ModuleFactory;
+import org.xipki.security.pkcs11.P11TokenException;
 
 /**
  * TODO.
  * @author Lijun Liao
- * @since 2.0.0
+ *
  */
+public class ProxyP11ModuleFactory implements P11ModuleFactory {
 
-public class P11TokenException extends Exception {
-
-  private static final long serialVersionUID = 1L;
-
-  public P11TokenException(String message, Throwable cause) {
-    super(message, cause);
+  public ProxyP11ModuleFactory() {
   }
 
-  public P11TokenException(String message) {
-    super(message);
+  @Override
+  public boolean canCreateModule(String type) {
+    return ProxyP11Module.TYPE.equalsIgnoreCase(type);
   }
 
-  public P11TokenException(Throwable cause) {
-    super(cause);
+  @Override
+  public P11Module newModule(P11ModuleConf conf) throws P11TokenException {
+    return ProxyP11Module.getInstance(conf);
   }
+
 }
