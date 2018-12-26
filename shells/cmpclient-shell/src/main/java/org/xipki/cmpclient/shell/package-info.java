@@ -15,4 +15,4 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.client.shell;
+package org.xipki.cmpclient.shell;

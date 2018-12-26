@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.client.shell;
+package org.xipki.cmpclient.shell;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
