@@ -189,9 +189,9 @@ public class CertActions {
 
   }
 
-  @Command(scope = "ca", name = "gencrl", description = "generate CRL")
+  @Command(scope = "ca", name = "gen-crl", description = "generate CRL")
   @Service
-  public static class Gencrl extends CrlAction {
+  public static class GenCrl extends CrlAction {
 
     @Option(name = "--out", aliases = "-o", description = "where to save the CRL")
     @Completion(FileCompleter.class)
@@ -245,9 +245,9 @@ public class CertActions {
 
   }
 
-  @Command(scope = "ca", name = "getcrl", description = "download CRL")
+  @Command(scope = "ca", name = "getCrl", description = "download CRL")
   @Service
-  public static class Getcrl extends CrlAction {
+  public static class GetCrl extends CrlAction {
 
     @Option(name = "--with-basecrl",
         description = "whether to retrieve the baseCRL if the current CRL is a delta CRL")

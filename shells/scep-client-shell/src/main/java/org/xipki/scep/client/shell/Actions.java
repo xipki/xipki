@@ -277,9 +277,9 @@ public class Actions {
 
   }
 
-  @Command(scope = "xi", name = "scep-getcert", description = "download certificate")
+  @Command(scope = "xi", name = "scep-get-cert", description = "download certificate")
   @Service
-  public static class ScepGetcert extends ClientAction {
+  public static class ScepGetCert extends ClientAction {
 
     @Option(name = "--serial", aliases = "-s", required = true, description = "serial number")
     private String serialNumber;
@@ -312,9 +312,9 @@ public class Actions {
 
   }
 
-  @Command(scope = "xi", name = "scep-getcrl", description = "download CRL")
+  @Command(scope = "xi", name = "scep-get-crl", description = "download CRL")
   @Service
-  public static class ScepGetcrl extends ClientAction {
+  public static class ScepGetCrl extends ClientAction {
 
     @Option(name = "--cert", aliases = "-c", required = true,
         description = "certificate file")

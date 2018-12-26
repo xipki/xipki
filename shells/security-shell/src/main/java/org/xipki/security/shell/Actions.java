@@ -832,7 +832,7 @@ public class Actions {
 
   }
 
-  @Command(scope = "xi", name = "import-cert", description = "Import certificates to a keystore")
+  @Command(scope = "xi", name = "import-cert", description = "import certificates to a keystore")
   @Service
   public static class ImportCert extends SecurityAction {
 

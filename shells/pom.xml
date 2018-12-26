@@ -26,7 +26,7 @@
   <groupId>org.xipki.shell</groupId>
   <artifactId>shells</artifactId>
   <packaging>pom</packaging>
-  <name>XiPKI :: Shells</name>
+  <name>XiPKI :: ${project.artifactId}</name>
   <modules>
     <module>shell-base</module>
     <module>security-shell</module>

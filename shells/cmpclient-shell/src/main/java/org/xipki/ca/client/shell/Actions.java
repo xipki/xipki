@@ -856,9 +856,9 @@ public class Actions {
 
   }
 
-  @Command(scope = "xi", name = "cmp-gencrl", description = "generate CRL")
+  @Command(scope = "xi", name = "cmp-gen-crl", description = "generate CRL")
   @Service
-  public static class CmpGencrl extends CrlAction {
+  public static class CmpGenCrl extends CrlAction {
 
     @Override
     protected X509CRL retrieveCrl() throws CmpClientException, PkiErrorException {
@@ -932,9 +932,9 @@ public class Actions {
 
   }
 
-  @Command(scope = "xi", name = "cmp-getcrl", description = "download CRL")
+  @Command(scope = "xi", name = "cmp-get-crl", description = "download CRL")
   @Service
-  public static class CmpGetcrl extends CrlAction {
+  public static class CmpGetCrl extends CrlAction {
 
     @Option(name = "--with-basecrl",
         description = "whether to retrieve the baseCRL if the current CRL is a delta CRL")
