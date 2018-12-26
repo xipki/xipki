@@ -18,25 +18,29 @@ Basic Commands
 
      copy file
 
-   * `xi:ls`
+   * `xi:curl`
 
-     list directory contents
-
-   * `xi:rm`
-
-     remove file or directory
+     transfer a URL
 
    * `xi:mkdir`
 
      make directories
 
+   * `xi:move-dir`
+
+     move content of the directory to destination
+
+   * `xi:move-file`
+
+     move file
+
    * `xi:replace`
 
      replace text in file
 
-   * `xi:curl`
+   * `xi:rm`
 
-     transfer a URL
+     remove file or directory
 
 Database Commands
 -----
@@ -65,12 +69,12 @@ Database Commands
 
      reset and initialize the CA and OCSP databases
 
-   * `xi:initdb`
-
-     reset and initialize database
-
 Security Commands
 -----
+
+   * `xi:add-cert-p11`
+
+     add certificate to PKCS#11 device
 
    * `xi:cert-info`
 
@@ -80,46 +84,6 @@ Security Commands
 
      print CRL information
 
-   * `xi:validate-csr`
-
-     validate CSR
-
-   * `xi:deobfuscate`
-
-     deobfuscate password
-
-   * `xi:extract-cert`
-
-     extract certificates from CRL
-
-   * `xi:obfuscate`
-
-     obfuscate password
-
-   * `xi:pbe-dec`
-
-     decrypt password with master password
-
-   * `xi:pbe-enc`
-
-     encrypt password with master password
-
-   * `xi:add-cert-p11`
-
-     add certificate to PKCS#11 device
-
-   * `xi:rm-cert-p11`
-
-     remove certificate from PKCS#11 device
-
-   * `xi:export-cert-p11`
-
-     export certificate from PKCS#11 device
-
-   * `xi:export-cert-p12`
-
-     export certificate from PKCS#12 keystore
-
    * `xi:csr-p11`
 
      generate CSR with PKCS#11 device
@@ -128,13 +92,21 @@ Security Commands
 
      generate CSR with PKCS#12 keystore
 
-   * `xi:update-cert-p11`
+   * `xi:delete-cert-p11`
 
-     update certificate in PKCS#11 device
+     remove certificate from PKCS#11 device
 
-   * `xi:update-cert-p12`
+   * `xi:delete-key-p11`
 
-     update certificate in PKCS#12 keystore
+     delete key and cert in PKCS#11 device
+
+   * `xi:delete-objects-p11`
+
+     delete objects in PKCS#11 device
+
+   * `xi:deobfuscate`
+
+     deobfuscate password
 
    * `xi:dsa-p11`
 
@@ -152,24 +124,32 @@ Security Commands
 
      generate EC keypair in PKCS#12 keystore
 
-   * `xi:sm2-p11`
+   * `xi:export-cert-p11`
 
-     generate SM2 keypair in PKCS#11 device
+     export certificate from PKCS#11 device
 
-   * `xi:sm2-p12`
+   * `xi:export-cert-p12`
 
-     generate SM2 keypair in PKCS#12 keystore
-   * `xi:delete-key-p11`
+     export certificate from PKCS#12 keystore
 
-     delete key and cert in PKCS#11 device
+   * `xi:extract-cert`
 
-   * `xi:token-info-p11`
+     extract certificates from CRL
 
-     list objects in PKCS#11 device
+   * `xi:import-cert`
 
-   * `xi:delete-objects-p11`
+     import certificates to a keystore
 
-     delete objects in PKCS#11 device
+   * `xi:import-secretkey-p11`
+
+     import secret key with given value in PKCS#11 device
+
+   * `xi:keystore-convert`
+     convert the keystore format
+
+   * `xi:obfuscate`
+
+     obfuscate password
 
    * `xi:p11prov-test`
 
@@ -179,21 +159,17 @@ Security Commands
 
      test the SM2 implementation of the Xipki PKCS#11 JCA/JCE provider
 
+   * `xi:pbe-dec`
+
+     decrypt password with master password
+
+   * `xi:pbe-enc`
+
+     encrypt password with master password
+
    * `xi:refresh-p11`
 
      refresh PKCS#11 module
-
-   * `xi:import-secretkey-p11`
-
-     import secret key with given value in PKCS#11 device
-
-   * `xi:secretkey-p11`
-
-     generate secret key in PKCS#11 device
-
-   * `xi:secretkey-p12`
-
-     generate secret key in JCEKS (not PKCS#12) keystore
 
    * `xi:rsa-p11`
 
@@ -203,125 +179,42 @@ Security Commands
 
      generate RSA keypair in PKCS#12 keystore
 
-   * `keystore-convert`
-     convert the keystore format
+   * `xi:secretkey-p11`
 
-   * `xi:speed-dsa-gen-p11`
+     generate secret key in PKCS#11 device
 
-     performance test of PKCS#11 DSA key generation
+   * `xi:secretkey-p12`
 
-   * `xi:speed-dsa-gen-p12`
+     generate secret key in JCEKS (not PKCS#12) keystore
 
-     performance test of PKCS#12 DSA key generation
+   * `xi:sm2-p11`
 
-   * `xi:speed-dsa-sign-p11`
+     generate SM2 keypair in PKCS#11 device
 
-     performance test of PKCS#11 DSA signature creation
+   * `xi:sm2-p12`
 
-   * `xi:speed-dsa-sign-p12`
+     generate SM2 keypair in PKCS#12 keystore
 
-     performance test of PKCS#12 DSA signature creation
+   * `xi:token-info-p11`
 
-   * `xi:speed-ec-gen-p11`
+     list objects in PKCS#11 device
 
-     performance test of PKCS#11 EC key generation
+   * `xi:update-cert-p11`
 
-   * `xi:speed-ec-gen-p12`
+     update certificate in PKCS#11 device
 
-     performance test of PKCS#12 EC key generation
+   * `xi:update-cert-p12`
 
-   * `xi:speed-ec-sign-p11`
+     update certificate in PKCS#12 keystore
 
-     performance test of PKCS#11 EC signature creation
+   * `xi:validate-csr`
 
-   * `xi:speed-ec-sign-p12`
-
-     performance test of PKCS#12 EC signature creation
-
-   * `xi:speed-sm2-gen-p11`
-
-     performance test of PKCS#11 SM2 key generation
-
-   * `xi:speed-sm2-gen-p12`
-
-     performance test of PKCS#12 SM2 key generation
-
-   * `xi:speed-sm2-sign-p11`
-
-     performance test of PKCS#11 SM2 signature creation
-
-   * `xi:speed-sm2-sign-p12`
-
-     performance test of PKCS#12 SM2 signature creation
-
-   * `xi:speed-rsa-gen-p11`
-
-     performance test of PKCS#11 RSA key generation
-
-   * `xi:speed-rsa-gen-p12`
-
-     performance test of PKCS#12 RSA key generation
-
-   * `xi:speed-rsa-sign-p11`
-
-     performance test of PKCS#11 RSA signature creation
-
-   * `xi:speed-rsa-sign-p12`
-
-     performance test of PKCS#12 RSA signature creation
-
-   * `xi:bspeed-dsa-gen-p11`
-
-     performance test of PKCS#11 DSA key generation (batch)
-
-   * `xi:bspeed-dsa-gen-p12`
-
-     performance test of PKCS#12 DSA key generation (batch)
-
-   * `xi:bspeed-dsa-sign-p11`
-
-     performance test of PKCS#11 DSA signature creation (batch)
-
-   * `xi:bspeed-dsa-sign-p12`
-
-     performance test of PKCS#12 DSA signature creation (batch)
-
-   * `xi:bspeed-ec-gen-p11`
-
-     performance test of PKCS#11 EC key generation (batch)
-
-   * `xi:bspeed-ec-gen-p12`
-
-     performance test of PKCS#12 EC key generation (batch)
-
-   * `xi:bspeed-ec-sign-p11`
-
-     performance test of PKCS#11 EC signature creation (batch)
-
-   * `xi:bspeed-ec-sign-p12`
-
-     performance test of PKCS#12 EC signature creation (batch)
-
-   * `xi:bspeed-rsa-gen-p11`
-
-     performance test of PKCS#11 RSA key generation (batch)
-
-   * `xi:bspeed-rsa-gen-p12`
-
-     performance test of PKCS#12 RSA key generation (batch)
-
-   * `xi:bspeed-rsa-sign-p11`
-
-     performance test of PKCS#11 RSA signature creation (batch)
-
-   * `xi:bspeed-rsa-sign-p12`
-
-     performance test of PKCS#12 RSA signature creation (batch)
+     validate CSR
 
 OCSP Management Commands
 -----
 
-* `refresh-token`
+* `ocsp:refresh-token`
 
   refresh token for signers
 
@@ -336,6 +229,26 @@ CA Management Commands
 
      add CA
 
+   * `ca:ca-info`
+
+     show information of CA
+
+   * `ca:ca-rm`
+
+     remove CA
+
+   * `ca:ca-revoke`
+
+     revoke CA
+
+   * `ca:ca-unrevoke`
+
+     unrevoke CA
+
+   * `ca:ca-up`
+
+     update CA
+
    * `ca:caalias-add`
 
      add CA alias
@@ -347,14 +260,6 @@ CA Management Commands
    * `ca:caalias-rm`
 
      remove CA alias
-
-   * `ca:gen-rootca`
-
-     generate selfsigned CA
-
-   * `ca:ca-info`
-
-     show information of CA
 
    * `ca:caprofile-add`
 
@@ -380,10 +285,6 @@ CA Management Commands
 
      remove publisher from CA
 
-   * `ca:ca-rm`
-
-     remove CA
-
    * `ca:careq-add`
 
      add requestor to CA
@@ -404,13 +305,45 @@ CA Management Commands
 
      remove user from CA
 
-   * `ca:ca-revoke`
+   * `ca:cert-status`
 
-     revoke CA
+     show certificate status
+
+   * `ca:clear-publishqueue`
+
+     clear publish queue
+
+   * `ca:enroll-cert`
+
+     enroll certificate
 
    * `ca:export-conf`
 
      export configuration to zip file
+
+   * `ca:gen-crl`
+
+     generate CRL
+
+   * `ca:gen-rootca`
+
+     generate selfsigned CA
+
+   * `ca:get-cert`
+
+     get certificate
+
+   * `ca:get-request`
+
+     get certificate request
+
+   * `ca:get-crl`
+
+     download CRL
+
+   * `ca:list-cert`
+
+     show a list of certificates
 
    * `ca:load-conf`
 
@@ -435,18 +368,6 @@ CA Management Commands
    * `ca:unlock`
 
      unlock CA system
-
-   * `ca:ca-unrevoke`
-
-     unrevoke CA
-
-   * `ca:ca-up`
-
-     update CA
-
-   * `ca:clear-publishqueue`
-
-     clear publish queue
 
    * `ca:profile-add`
 
@@ -508,6 +429,14 @@ CA Management Commands
 
      update requestor
 
+   * `ca:revoke-cert`
+
+     revoke certificate
+
+   * `ca:rm-cert`
+
+     remove certificate
+
    * `ca:signer-add`
 
      add signer
@@ -523,6 +452,10 @@ CA Management Commands
    * `ca:signer-up`
 
      update signer
+
+   * `ca:unrevoke-cert`
+
+     unrevoke certificate
 
    * `ca:user-add`
 
@@ -540,42 +473,96 @@ CA Management Commands
 
      update user
 
-   * `ca:cert-status`
+CMP Client Commands
+-----
 
-     show certificate status
+   * `xi:cmp-cacert`
 
-   * `ca:enroll-cert`
+     get CA certificate
 
-     enroll certificate
+   * `xi:cmp-csr-enroll`
 
-   * `ca:gencrl`
+     enroll certificate via CSR
+
+   * `xi:cmp-enroll-cagenkey`
+
+      enroll certificate (keypair will be generated by the CA)
+
+   * `xi:cmp-enroll-p11`
+
+     enroll certificate (PKCS#11 token)
+
+   * `xi:cmp-enroll-p12`
+
+     enroll certificate (PKCS#12 keystore)
+
+   * `xi:cmp-gen-crl`
 
      generate CRL
 
-   * `ca:getcrl`
+   * `xi:cmp-get-crl`
 
      download CRL
 
-   * `ca:rm-cert`
+   * `xi:cmp-health`
+
+     check healthy status of CA
+
+   * `xi:cmp-init`
+
+     initialize CMP client
+
+   * `xi:cmp-rm-cert`
 
      remove certificate
 
-   * `ca:revoke-cert`
+   * `xi:cmp-revoke`
 
      revoke certificate
 
-   * `ca:unrevoke-cert`
+   * `xi:cmp-unrevoke`
 
      unrevoke certificate
 
-   * `ca:list-cert`
+   * `xi:cmp-update-cagenkey`
 
-     show a list of certificates
+     update certificate (keypair will be generated by the CA)
 
-   * `ca:get-cert`
+   * `xi:cmp-update-p11`
 
-     get certificate
+     update certificate (PKCS#11 token)
 
-   * `ca:get-request`
+   * `xi:cmp-update-p12`
 
-     get certificate request
+     update certificate (PKCS#12 token)
+
+SCEP Client Commands
+-----
+
+   * `xi:scep-cacert`
+
+     get CA certificate
+
+
+   * `xi:scep-certpoll`
+
+     poll certificate
+
+   * `xi:scep-enroll`
+
+     enroll certificate
+
+   * `xi:scep-get-cert`
+
+     download certificate
+
+   * `xi:scep-get-crl`
+
+     download CRL
+
+OCSP Client Commands
+-----
+
+   * `xi:ocsp-status`
+
+     request certificate status
