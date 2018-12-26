@@ -68,7 +68,7 @@ xi:update-cert-p12 \
   --ca-cert output/rootca1.crt
 
 ## Get CRL
-xi:scep-getcrl \
+xi:scep-get-crl \
   --url $SCEP_URL \
   --ca-cert output/subcawithcrl1.crt \
   --cert output/scep-ocsp1.crt \

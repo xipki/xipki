@@ -17,12 +17,12 @@
 ################################################################################
 
 ## Generate CRL
-ca:gencrl --ca subcawithcrl1 \
+ca:gen-crl --ca subcawithcrl1 \
   --outform $OUTFORM \
   --out output/subcawithcrl1-camgmt-gen.crl
 
 ## Get CRL
-ca:getcrl --ca subcawithcrl1 \
+ca:get-crl --ca subcawithcrl1 \
   --outform $OUTFORM \
   --out output/subcawithcrl1-camgmt-get.crl
 
@@ -376,12 +376,12 @@ xi:cmp-getcrl --ca subcawithcrl1 \
   --out output/subcawithcrl1-1-get.crl
 
 ## Generate CRL
-xi:cmp-gencrl --ca subcawithcrl1 \
+xi:cmp-gen-crl --ca subcawithcrl1 \
   --outform $OUTFORM \
   --out output/subcawithcrl1.crl
 
 ## Get CRL
-xi:cmp-getcrl --ca subcawithcrl1 \
+xi:cmp-get-crl --ca subcawithcrl1 \
   --outform $OUTFORM \
   --out output/subcawithcrl1-get.crl
 

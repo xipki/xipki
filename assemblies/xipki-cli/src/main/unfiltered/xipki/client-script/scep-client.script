@@ -60,7 +60,7 @@ echo "# Get Cert"
 
 SERIAL = $(xi:cert-info --serial --hex --in ${OUT_DIR}/${CN}-certpoll.der)
 
-xi:scep-getcert --url ${URL} --ca-cert ${CACERT} \
+xi:scep-get-cert --url ${URL} --ca-cert ${CACERT} \
   --p12 ${OUT_DIR}/${CN}.p12 --password 1234 --out ${OUT_DIR}/${CN}-getcert.der \
   --serial ${SERIAL}
 
@@ -69,7 +69,7 @@ xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --cert ${OUT_DIR}/${CN}.der --ca-cert ${CACERT}
 
 echo "# Get CRL"
-xi:scep-getcrl --url ${URL} --ca-cert ${CACERT} --cert ${OUT_DIR}/${CN}.der \
+xi:scep-get-crl --url ${URL} --ca-cert ${CACERT} --cert ${OUT_DIR}/${CN}.der \
   --p12 ${OUT_DIR}/${CN}.p12 --password 1234 --out ${OUT_DIR}/myca1-scep.crl
 
 echo "# Renewal"

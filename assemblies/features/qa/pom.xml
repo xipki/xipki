@@ -27,7 +27,7 @@
   <packaging>pom</packaging>
   <name>XiPKI :: feature :: ${project.artifactId}</name>
   <properties>
-    <netty.version>4.1.30.Final</netty.version>
-    <netty-tcnative.version>2.0.18.Final</netty-tcnative.version>
+    <netty.version>4.1.32.Final</netty.version>
+    <netty-tcnative.version>2.0.20.Final</netty-tcnative.version>
   </properties>
 </project>

@@ -108,8 +108,8 @@ xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der
 
 echo "=====CMP: Generate CRL====="
 
-xi:cmp-gencrl --ca myca --out ${OUT_DIR}/cmp-myca-gen.crl
+xi:cmp-gen-crl --ca myca --out ${OUT_DIR}/cmp-myca-gen.crl
 
 echo "=====CMP: Get CRL===="
-xi:cmp-getcrl --ca myca --out ${OUT_DIR}/cmp-myca-get.crl
+xi:cmp-get-crl --ca myca --out ${OUT_DIR}/cmp-myca-get.crl
 
