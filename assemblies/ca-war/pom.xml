@@ -189,6 +189,7 @@
                   <type>zip</type>
                 </artifactItem>
               </artifactItems>
+              <includes>ca/tls-ca-cert.p12,ca/tls-ca-cert.pem,server/*,client/tls-client.p12,client2/tls-client2-cert.der</includes>
             </configuration>
           </execution>
         </executions>
