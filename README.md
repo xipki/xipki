@@ -54,7 +54,7 @@ follows.
   Then you will find the following binaries:
    - CA: `assembles/ca-war/target/ca-war-<version>.zip`
    - OCSP: `assembles/ocsp-war/target/ocsp-war-<version>.zip`
-   - CLI (Command Line Interface): assembles/xipki-cli/target/xipki-cli-<version>.tar.gz`
+   - CLI (Command Line Interface): `assembles/xipki-cli/target/xipki-cli-<version>.tar.gz`
 
 ## Install CA Server
 
@@ -93,6 +93,7 @@ Note that CA and OCSP can be installed in the same servlet container.
 ## Install Command Line Interface
 
 1. Unpack the binary `xipki-cli-<version>.tar.gz`
+2. Adapt the CMP client configuration `xipki/cmpclient/cmpclient.json`
 
 ## Configure PKCS#11 device (optional)
 
@@ -185,7 +186,7 @@ CLI Commands
 -----
 Please refer to [commands.md](commands.md) for more details.
 
-Components
+Features
 -----
 - CA (Certification Authority)
 
