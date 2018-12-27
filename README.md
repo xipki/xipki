@@ -52,9 +52,9 @@ follows.
   ```
 
   Then you will find the following binaries:
-   - CA: assembles/ca-war/target/ca-war-<version>.zip
-   - OCSP: assembles/ocsp-war/target/ocsp-war-<version>.zip
-   - Command Line Interface: assembles/xipki-cli/target/xipki-cli-<version>.tar.gz
+   - CA: `assembles/ca-war/target/ca-war-<version>.zip`
+   - OCSP: `assembles/ocsp-war/target/ocsp-war-<version>.zip`
+   - CLI (Command Line Interface): assembles/xipki-cli/target/xipki-cli-<version>.tar.gz`
 
 ## Install CA Server
 
@@ -64,8 +64,8 @@ follows.
 2. Adapt the database configurations ${CONTAINER_ROOT}/xipki/etc/ca/database/{ca|ocsp}-db.properties.
    - If you use database other than MariaDB and MySQL, you need to overwrite the configuration templates
    from the sub folder.
-   - If you use database other than MariaDB, MySQL and PostgreSQL, you need to get the JDBC drivers and copy
-     it to the container directory for external jars (e.g. `lib` in tomcat, and `lib/ext` in jetty`).   
+   - If you use database other than MariaDB, MySQL and PostgreSQL, you need to get the JDBC driver and copy
+     it to the container directory for external jars (e.g. `lib` in tomcat, and `lib/ext` in jetty).   
 
 3. Create new databases configured in Step 2.
 
@@ -84,11 +84,11 @@ Note that CA and OCSP can be installed in the same servlet container.
 1. Unpack the binary `ocsp-war-<version>.zip` and install OCSP responder as described in the
    unpacked README file.
 
-2. Adapt the database configuration ${CONTAINER_ROOT}/xipki/etc/ocsp/database/ocsp-crl-db.properties.
+2. Adapt the database configuration ${CONTAINER_ROOT}/xipki/etc/ocsp/database/ocsp-db.properties.
    - If you use database other than MariaDB and MySQL, you need to overwrite the configuration templates
    from the sub folder.
    - If you use database other than MariaDB, MySQL and PostgreSQL, you need to get the JDBC drivers and copy
-     it to the container directory for external jars (e.g. `lib` in tomcat, and `lib/ext` in jetty`).   
+     it to the container directory for external jars (e.g. `lib` in tomcat, and `lib/ext` in jetty).   
 
 ## Install Command Line Interface
 
@@ -133,19 +133,21 @@ PKCS#11 sessions. In this case, the servlet container should be started as follo
 preload <start script>
 ```
 
-2. Set up CA in CLI
- 1. Start CLI.
-  `bin/karf`
- * In case of using new keys and certificates, in CLI:  
-   `source xipki/setup/cacert-none/setup-*.script`
-   where * is place holder.
+2. Setup CA in CLI
+   * Start CLI.
+      `bin/karaf`
+ 
+   * Setup CA
+      * In case of using new keys and certificates, in CLI:  
+        `source xipki/setup/cacert-none/setup-*.script`
+         where * is place holder.
 
- * In case of using existing keys and certificates, in CLI:  
-    `source xipki/setup/cacert-present/setup-*.script`
-   where * is place holder.
+      * In case of using existing keys and certificates, in CLI:  
+        `source xipki/setup/cacert-present/setup-*.script`
+         where * is place holder.
 
- * Verify the installation, execute the command in CLI:  
-   `ca-info myca1`
+   * Verify the installation, execute the command in CLI:  
+     `ca-info myca1`
 
 ## Enroll/Revoke Certificate and Get CRL via Shell (optional)
 
@@ -157,22 +159,28 @@ preload <start script>
 ## Enroll/Revoke Certificate
 
 * SCEP  
-  Any SCEP client. XiPKI provides also a SCEP client.
+  Using any SCEP client. XiPKI provides also a SCEP client.
+
+  The binary `xipki-cli-<version>`.tar.gz contains an example script in the folder xipki/client-script.
+  It can be executed in the CLI as follows:  
+  - `source xipki/client-script/scep-client.script`
 
 * XiPKI CLI
   XiPKI CLI provides both the full-featured client and the lite version to enroll and
   revoke certificates via CMP.
 
-  The binary `xipki-cli-<version>`.tar.gz contains several example scripts in the folder xipki/client-script.
-  They can be executed in the CLI as follows:  
+  The binary `xipki-cli-<version>`.tar.gz contains an example script in the folder xipki/client-script.
+  It can be executed in the CLI as follows:  
   - `source xipki/client-script/cmp-client.script`
-  - `source xipki/client-script/rest-client.script`
-  - `source xipki/client-script/scep-client.script`
 
 * REST API  
   The shell script `xipki/client-script/rest.sh` of the `xipki-cli` demonstrates
   the use of REST API.
 
+  The binary `xipki-cli-<version>`.tar.gz contains an example script in the folder xipki/client-script.
+  It can be executed in the CLI as follows:  
+  - `source xipki/client-script/rest-client.script`
+ 
 CLI Commands
 -----
 Please refer to [commands.md](commands.md) for more details.
