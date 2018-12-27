@@ -37,7 +37,7 @@ Just create [issues](https://github.com/xipki/xipki/issues).
 
 Download the binaries `ca-war-<version>.zip`, `ocsp-war-<version>.zip` and
 `xipki-cli-<version>.tar.gz` from
-[XiPKI releases](https://github.com/xipki/xipki/releases).
+[releases](https://github.com/xipki/xipki/releases).
 
 Only if you want to use the development version, build it from source code as
 follows.
