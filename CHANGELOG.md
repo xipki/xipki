@@ -4,7 +4,7 @@
 See also <https://github.com/xipki/xipki/releases>
 
 ## 5.0.0
- - Release date: Dec 26, 2018
+ - Release date: Dec 28, 2018
  - Optimized the file operations
  - Merged modules
  - Change the distributions
