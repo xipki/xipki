@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.xipki.ocsp.api.OcspStore;
 import org.xipki.ocsp.api.Responder;
+import org.xipki.ocsp.server.OcspServerConf.ResponseOption;
 import org.xipki.util.Args;
 
 /**
@@ -35,15 +36,14 @@ public class ResponderImpl implements Responder {
 
   private final RequestOption requestOption;
 
-  private final OcspServerConf.ResponseOption responseOption;
+  private final ResponseOption responseOption;
 
   private final ResponderSigner signer;
 
   private final List<OcspStore> stores;
 
   ResponderImpl(ResponderOption responderOption, RequestOption requestOption,
-      OcspServerConf.ResponseOption responseOption, ResponderSigner signer,
-      List<OcspStore> stores) {
+      ResponseOption responseOption, ResponderSigner signer, List<OcspStore> stores) {
     this.responderOption = Args.notNull(responderOption, "responderOption");
     this.requestOption = Args.notNull(requestOption, "requestOption");
     this.responseOption = Args.notNull(responseOption, "responseOption");
@@ -59,7 +59,7 @@ public class ResponderImpl implements Responder {
     return requestOption;
   }
 
-  public OcspServerConf.ResponseOption getResponseOption() {
+  public ResponseOption getResponseOption() {
     return responseOption;
   }
 

@@ -89,8 +89,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
 
   private boolean crlUpdateFailed;
 
-  public void init(SourceConf conf, DataSourceWrapper datasource)
-      throws OcspStoreException {
+  public void init(SourceConf conf, DataSourceWrapper datasource) throws OcspStoreException {
     Args.notNull(conf, "conf");
     if (!(conf instanceof OcspServerConf.SourceConfImpl)) {
       throw new OcspStoreException("unknown conf " + conf.getClass().getName());
@@ -98,7 +97,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
 
     OcspServerConf.CrlSourceConf conf0 = ((OcspServerConf.SourceConfImpl) conf).getCrlSource();
     if (conf0 == null) {
-      throw new OcspStoreException("conf.getDbSource() may not be null");
+      throw new OcspStoreException("conf.getCrlSource() may not be null");
     }
 
     this.datasource = Args.notNull(datasource, "datasource");
@@ -108,15 +107,11 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     this.certsDirName = (conf0.getCertsDir() == null) ? null
         : IoUtil.expandFilepath(conf0.getCertsDir());
     this.caCert = parseCert(conf0.getCaCertFile());
-    if (conf0.getIssuerCertFile() != null) {
-      this.issuerCert = parseCert(conf0.getIssuerCertFile());
-    } else {
-      this.issuerCert = null;
-    }
+    this.issuerCert = (conf0.getIssuerCertFile() == null) ? null
+        : parseCert(conf0.getIssuerCertFile());
     this.useUpdateDatesFromCrl = conf0.isUseUpdateDatesFromCrl();
 
     initializeStore(datasource);
-
     super.init(conf, datasource);
   }
 
@@ -162,7 +157,6 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     }
 
     try {
-
       File fullCrlFile = new File(crlFilename);
       if (!fullCrlFile.exists()) {
         // file does not exist

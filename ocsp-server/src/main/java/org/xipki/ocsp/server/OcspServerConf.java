@@ -21,9 +21,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.xipki.ocsp.api.OcspStore.SourceConf;
+import org.xipki.security.CertpathValidationModel;
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.FileOrValue;
 import org.xipki.util.InvalidConfException;
+import org.xipki.util.TripleState;
 import org.xipki.util.ValidatableConf;
 
 /**
@@ -38,16 +40,11 @@ public class OcspServerConf extends ValidatableConf {
     SIGNER_AND_CA;
   }
 
-  public enum ValidationModel {
-    PKIX,
-    CHAIN;
-  }
-
   public static class CertCollection extends ValidatableConf {
 
     private String dir;
 
-    private CertCollection.Keystore keystore;
+    private Keystore keystore;
 
     public String getDir() {
       return dir;
@@ -57,11 +54,11 @@ public class OcspServerConf extends ValidatableConf {
       this.dir = value;
     }
 
-    public CertCollection.Keystore getKeystore() {
+    public Keystore getKeystore() {
       return keystore;
     }
 
-    public void setKeystore(CertCollection.Keystore value) {
+    public void setKeystore(Keystore value) {
       this.keystore = value;
     }
 
@@ -71,44 +68,44 @@ public class OcspServerConf extends ValidatableConf {
       validate(keystore);
     }
 
-    public static class Keystore extends ValidatableConf {
+  }
 
-      private String type;
+  public static class Keystore extends ValidatableConf {
 
-      private FileOrBinary keystore;
+    private String type;
 
-      private String password;
+    private FileOrBinary keystore;
 
-      public String getType() {
-        return type;
-      }
+    private String password;
 
-      public void setType(String value) {
-        this.type = value;
-      }
+    public String getType() {
+      return type;
+    }
 
-      public FileOrBinary getKeystore() {
-        return keystore;
-      }
+    public void setType(String value) {
+      this.type = value;
+    }
 
-      public void setKeystore(FileOrBinary value) {
-        this.keystore = value;
-      }
+    public FileOrBinary getKeystore() {
+      return keystore;
+    }
 
-      public String getPassword() {
-        return password;
-      }
+    public void setKeystore(FileOrBinary value) {
+      this.keystore = value;
+    }
 
-      public void setPassword(String value) {
-        this.password = value;
-      }
+    public String getPassword() {
+      return password;
+    }
 
-      @Override
-      public void validate() throws InvalidConfException {
-        notEmpty(type, "type");
-        validate(keystore);
-      }
+    public void setPassword(String value) {
+      this.password = value;
+    }
 
+    @Override
+    public void validate() throws InvalidConfException {
+      notEmpty(type, "type");
+      validate(keystore);
     }
 
   }
@@ -149,17 +146,17 @@ public class OcspServerConf extends ValidatableConf {
     /**
      * valid values are forbidden, optional and required.
      */
-    private String occurrence;
+    private TripleState occurrence;
 
     private Integer minLen;
 
     private Integer maxLen;
 
-    public String getOccurrence() {
+    public TripleState getOccurrence() {
       return occurrence;
     }
 
-    public void setOccurrence(String occurrence) {
+    public void setOccurrence(TripleState occurrence) {
       this.occurrence = occurrence;
     }
 
@@ -181,7 +178,7 @@ public class OcspServerConf extends ValidatableConf {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(occurrence, "occurrence");
+      notNull(occurrence, "occurrence");
     }
 
   }
@@ -217,7 +214,7 @@ public class OcspServerConf extends ValidatableConf {
 
     private List<String> hashAlgorithms;
 
-    private RequestOption.CertpathValidation certpathValidation;
+    private CertpathValidation certpathValidation;
 
     private String name;
 
@@ -312,46 +309,46 @@ public class OcspServerConf extends ValidatableConf {
       validate(certpathValidation);
     }
 
-    public static class CertpathValidation extends ValidatableConf {
+  }
 
-      private ValidationModel validationModel;
+  public static class CertpathValidation extends ValidatableConf {
 
-      private CertCollection trustAnchors;
+    private CertpathValidationModel validationModel;
 
-      private CertCollection certs;
+    private CertCollection trustAnchors;
 
-      public ValidationModel getValidationModel() {
-        return validationModel;
-      }
+    private CertCollection certs;
 
-      public void setValidationModel(ValidationModel validationModel) {
-        this.validationModel = validationModel;
-      }
+    public CertpathValidationModel getValidationModel() {
+      return validationModel;
+    }
 
-      public CertCollection getTrustAnchors() {
-        return trustAnchors;
-      }
+    public void setValidationModel(CertpathValidationModel validationModel) {
+      this.validationModel = validationModel;
+    }
 
-      public void setTrustAnchors(CertCollection trustAnchors) {
-        this.trustAnchors = trustAnchors;
-      }
+    public CertCollection getTrustAnchors() {
+      return trustAnchors;
+    }
 
-      public CertCollection getCerts() {
-        return certs;
-      }
+    public void setTrustAnchors(CertCollection trustAnchors) {
+      this.trustAnchors = trustAnchors;
+    }
 
-      public void setCerts(CertCollection certs) {
-        this.certs = certs;
-      }
+    public CertCollection getCerts() {
+      return certs;
+    }
 
-      @Override
-      public void validate() throws InvalidConfException {
-        notNull(validationModel, "validationModel");
-        notNull(trustAnchors, "trustAnchors");
-        validate(trustAnchors);
-        validate(certs);
-      }
+    public void setCerts(CertCollection certs) {
+      this.certs = certs;
+    }
 
+    @Override
+    public void validate() throws InvalidConfException {
+      notNull(validationModel, "validationModel");
+      notNull(trustAnchors, "trustAnchors");
+      validate(trustAnchors);
+      validate(certs);
     }
 
   }

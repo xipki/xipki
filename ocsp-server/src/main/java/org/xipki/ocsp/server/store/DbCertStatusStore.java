@@ -168,8 +168,7 @@ public class DbCertStatusStore extends OcspStore {
 
           // no change in the issuerStore
           Set<Integer> newIds = newIssuers.keySet();
-          Set<Integer> ids = (issuerStore != null) ? issuerStore.getIds()
-              : Collections.emptySet();
+          Set<Integer> ids = (issuerStore != null) ? issuerStore.getIds() : Collections.emptySet();
 
           boolean issuersUnchanged = (ids.size() == newIds.size())
               && ids.containsAll(newIds) && newIds.containsAll(ids);
@@ -218,8 +217,7 @@ public class DbCertStatusStore extends OcspStore {
               caInfoEntry.getEncodedHash(HashAlgo.SHA1));
           for (IssuerEntry existingIssuer : caInfos) {
             if (existingIssuer.matchHash(reqIssuer)) {
-              throw new Exception(
-                "found at least two issuers with the same subject and key");
+              throw new Exception("found at least two issuers with the same subject and key");
             }
           }
 

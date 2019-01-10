@@ -589,10 +589,10 @@ class ResponseCacher implements Closeable {
   }
 
   private static byte[] int2Bytes(int value) {
-    if (value < 65535) {
+    if (value > -1 && value < 65535) {
       return new byte[]{(byte) (value >> 8), (byte) value};
     } else {
-      throw new IllegalArgumentException("value is too large");
+      throw new IllegalArgumentException("value is out of the range [0, 65535]: " + value);
     }
   }
 

@@ -256,8 +256,7 @@ public class ImportCrl {
     return false;
   }
 
-  private int importCa(Connection conn)
-      throws DataAccessException, ImportCrlException {
+  private int importCa(Connection conn) throws DataAccessException, ImportCrlException {
     byte[] encodedCaCert;
     try {
       encodedCaCert = caCert.getEncoded();
@@ -376,7 +375,6 @@ public class ImportCrl {
 
   private void importEntries(Connection conn, int caId)
       throws DataAccessException, ImportCrlException {
-
     AtomicLong maxId = new AtomicLong(datasource.getMax(conn, "CERT", "ID"));
 
     // import the revoked information
@@ -568,8 +566,7 @@ public class ImportCrl {
     return ASN1OctetString.getInstance(encodedExtensionValue).getOctets();
   }
 
-  private Long getId(int caId, BigInteger serialNumber)
-      throws DataAccessException {
+  private Long getId(int caId, BigInteger serialNumber) throws DataAccessException {
     ResultSet rs = null;
     try {
       psSelectIdCert.setInt(1, caId);

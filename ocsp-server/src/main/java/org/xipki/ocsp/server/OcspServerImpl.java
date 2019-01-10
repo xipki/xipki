@@ -249,8 +249,7 @@ public class OcspServerImpl implements OcspServer {
     init(true);
   }
 
-  public void init(boolean force)
-      throws InvalidConfException, DataAccessException, PasswordResolverException {
+  public void init(boolean force) throws InvalidConfException, PasswordResolverException {
     LOG.info("starting OCSPResponder server ...");
     if (initialized.get()) {
       if (!force) {

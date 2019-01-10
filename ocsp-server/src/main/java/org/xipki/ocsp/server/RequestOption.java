@@ -26,7 +26,6 @@ import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
@@ -34,7 +33,6 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.xipki.ocsp.server.OcspServerConf.CertCollection.Keystore;
 import org.xipki.security.CertpathValidationModel;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.util.KeyUtil;
@@ -101,47 +99,27 @@ public class RequestOption {
 
     // Request nonce
     OcspServerConf.Nonce nonceConf = conf.getNonce();
-    int minLen = 4;
-    int maxLen = 32;
-    String str = nonceConf.getOccurrence().toLowerCase();
-    if ("forbidden".equals(str)) {
-      nonceOccurrence = TripleState.forbidden;
-    } else if ("optional".equals(str)) {
-      nonceOccurrence = TripleState.optional;
-    } else if ("required".equals(str)) {
-      nonceOccurrence = TripleState.required;
-    } else {
-      throw new InvalidConfException("invalid nonce.occurrence '" + str
-          + "', only forbidded, optional, and required are allowed");
-    }
+    nonceOccurrence = conf.getNonce().getOccurrence();
 
-    if (nonceConf.getMinLen() != null) {
-      minLen = nonceConf.getMinLen();
-    }
+    nonceMinLen = nonceConf.getMinLen() != null ? nonceConf.getMinLen() : 4;
+    nonceMaxLen = nonceConf.getMaxLen() != null ? nonceConf.getMaxLen() : 32;
 
-    if (nonceConf.getMaxLen() != null) {
-      maxLen = nonceConf.getMaxLen();
-    }
-
-    this.maxRequestListCount = conf.getMaxRequestListCount();
-    if (this.maxRequestListCount < 1) {
+    maxRequestListCount = conf.getMaxRequestListCount();
+    if (maxRequestListCount < 1) {
       throw new InvalidConfException("invalid maxRequestListCount " + maxRequestListCount);
     }
 
-    this.maxRequestSize = conf.getMaxRequestSize();
-    if (this.maxRequestSize < 100) {
+    maxRequestSize = conf.getMaxRequestSize();
+    if (maxRequestSize < 100) {
       throw new InvalidConfException("invalid maxRequestSize " + maxRequestSize);
     }
 
-    this.nonceMinLen = minLen;
-    this.nonceMaxLen = maxLen;
-
     // Request versions
 
-    this.versions = new HashSet<>();
+    versions = new HashSet<>();
     for (String m : conf.getVersions()) {
       if ("v1".equalsIgnoreCase(m)) {
-        this.versions.add(0);
+        versions.add(0);
       } else {
         throw new InvalidConfException("invalid OCSP request version '" + m + "'");
       }
@@ -149,7 +127,6 @@ public class RequestOption {
 
     // Request hash algorithms
     hashAlgos = new HashSet<>();
-
     if (conf.getHashAlgorithms().isEmpty()) {
       hashAlgos.addAll(SUPPORTED_HASH_ALGORITHMS);
     } else {
@@ -164,7 +141,7 @@ public class RequestOption {
     }
 
     // certpath validation
-    OcspServerConf.RequestOption.CertpathValidation certpathConf = conf.getCertpathValidation();
+    OcspServerConf.CertpathValidation certpathConf = conf.getCertpathValidation();
     if (certpathConf == null) {
       if (validateSignature) {
         throw new InvalidConfException("certpathValidation is not specified");
@@ -175,17 +152,7 @@ public class RequestOption {
       return;
     }
 
-    switch (certpathConf.getValidationModel()) {
-      case CHAIN:
-        certpathValidationModel = CertpathValidationModel.CHAIN;
-        break;
-      case PKIX:
-        certpathValidationModel = CertpathValidationModel.PKIX;
-        break;
-      default:
-        throw new IllegalStateException("should not reach here, unknown ValidationModel "
-            + certpathConf.getValidationModel());
-    } // end switch
+    certpathValidationModel = certpathConf.getValidationModel();
 
     try {
       Set<X509Certificate> tmpCerts = getCerts(certpathConf.getTrustAnchors());
@@ -200,7 +167,7 @@ public class RequestOption {
 
     OcspServerConf.CertCollection certsType = certpathConf.getCerts();
     try {
-      this.certs = (certsType == null) ? null : getCerts(certsType);
+      certs = (certsType == null) ? null : getCerts(certsType);
     } catch (Exception ex) {
       throw new InvalidConfException("could not initialize the certs: " + ex.getMessage(), ex);
     }
@@ -263,13 +230,12 @@ public class RequestOption {
   }
 
   private static Set<X509Certificate> getCerts(OcspServerConf.CertCollection conf)
-      throws KeyStoreException, NoSuchAlgorithmException, NoSuchProviderException,
-        CertificateException, IOException {
+      throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
     Args.notNull(conf, "conf");
     Set<X509Certificate> tmpCerts = new HashSet<>();
 
     if (conf.getKeystore() != null) {
-      Keystore ksConf = conf.getKeystore();
+      OcspServerConf.Keystore ksConf = conf.getKeystore();
       KeyStore trustStore = KeyUtil.getKeyStore(ksConf.getType());
 
       String fileName = ksConf.getKeystore().getFile();
