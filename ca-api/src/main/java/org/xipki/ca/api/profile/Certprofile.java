@@ -104,9 +104,7 @@ public abstract class Certprofile implements Closeable {
 
     } // enum Unit
 
-    private static final long SECOND = 1000L;
-
-    private static final long MINUTE = 60L * SECOND;
+    private static final long MINUTE = 60L * 1000;
 
     private static final long HOUR = 60L * MINUTE;
 
@@ -181,12 +179,11 @@ public abstract class Certprofile implements Closeable {
     public Date add(Date referenceDate) {
       switch (unit) {
         case DAY:
-          return new Date(referenceDate.getTime() + DAY - SECOND);
+          return new Date(referenceDate.getTime() + DAY);
         case YEAR:
           Calendar cal = Calendar.getInstance(TIMEZONE_UTC);
           cal.setTime(referenceDate);
           cal.add(Calendar.YEAR, validity);
-          cal.add(Calendar.SECOND, -1);
 
           int month = cal.get(Calendar.MONTH);
           // February
@@ -200,9 +197,9 @@ public abstract class Certprofile implements Closeable {
 
           return cal.getTime();
         case HOUR:
-          return new Date(referenceDate.getTime() + HOUR - SECOND);
+          return new Date(referenceDate.getTime() + HOUR);
         case MINUTE:
-          return new Date(referenceDate.getTime() + MINUTE - SECOND);
+          return new Date(referenceDate.getTime() + MINUTE);
         default:
           throw new IllegalStateException(String.format(
               "should not reach here, unknown CertValidity.Unit %s", unit));
