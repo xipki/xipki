@@ -1,0 +1,731 @@
+
+
+
+
+
+
+Network Working Group                                          J. Schaad
+Request for Comments: 5274                       Soaring Hawk Consulting
+Category: Standards Track                                       M. Myers
+                                               TraceRoute Security, Inc.
+                                                               June 2008
+
+
+Certificate Management Messages over CMS (CMC): Compliance Requirements
+
+Status of This Memo
+
+   This document specifies an Internet standards track protocol for the
+   Internet community, and requests discussion and suggestions for
+   improvements.  Please refer to the current edition of the "Internet
+   Official Protocol Standards" (STD 1) for the standardization state
+   and status of this protocol.  Distribution of this memo is unlimited.
+
+Abstract
+
+   This document provides a set of compliance statements about the CMC
+   (Certificate Management over CMS) enrollment protocol.  The ASN.1
+   structures and the transport mechanisms for the CMC enrollment
+   protocol are covered in other documents.  This document provides the
+   information needed to make a compliant version of CMC.
+
+Table of Contents
+
+   1.  Overview . . . . . . . . . . . . . . . . . . . . . . . . . . .  2
+   2.  Terminology  . . . . . . . . . . . . . . . . . . . . . . . . .  2
+   3.  Requirements Terminology . . . . . . . . . . . . . . . . . . .  3
+   4.  Requirements for All Entities  . . . . . . . . . . . . . . . .  3
+     4.1.  Cryptographic Algorithm Requirements . . . . . . . . . . .  4
+     4.2.  Controls . . . . . . . . . . . . . . . . . . . . . . . . .  6
+     4.3.  CRMF Feature Requirements  . . . . . . . . . . . . . . . .  8
+     4.4.  Requirements for Clients . . . . . . . . . . . . . . . . .  8
+   5.  Requirements for Servers . . . . . . . . . . . . . . . . . . .  8
+   6.  Requirements for EEs . . . . . . . . . . . . . . . . . . . . .  8
+   7.  Requirements for RAs . . . . . . . . . . . . . . . . . . . . .  8
+   8.  Requirements for CAs . . . . . . . . . . . . . . . . . . . . .  9
+   9.  Security Considerations  . . . . . . . . . . . . . . . . . . .  9
+   10. Acknowledgements . . . . . . . . . . . . . . . . . . . . . . .  9
+   11. References . . . . . . . . . . . . . . . . . . . . . . . . . . 10
+     11.1. Normative References . . . . . . . . . . . . . . . . . . . 10
+     11.2. Informative References . . . . . . . . . . . . . . . . . . 11
+
+
+
+
+
+
+
+Schaad & Myers              Standards Track                     [Page 1]
+
+RFC 5274                    CMC: Compliance                    June 2008
+
+
+1.  Overview
+
+   The CMC (Certificate Management over CMS) protocol is designed in
+   terms of a client/server relationship.  In the simplest case, the
+   client is the requestor of the certificate (i.e., the End Entity
+   (EE)) and the server is the issuer of the certificate (i.e., the
+   Certification Authority (CA)).  The introduction of a Registration
+   Authority (RA) into the set of agents complicates the picture only
+   slightly.  The RA becomes the server with respect to the certificate
+   requestor, and it becomes the client with respect to the certificate
+   issuer.  Any number of RAs can be inserted into the picture in this
+   manner.
+
+   The RAs may serve specialized purposes that are not currently covered
+   by this document.  One such purpose would be a Key Escrow agent.  As
+   such, all certificate requests for encryption keys would be directed
+   through this RA and it would take appropriate action to do the key
+   archival.  Key recovery requests could be defined in the CMC
+   methodology allowing for the Key Escrow agent to perform that
+   operation acting as the final server in the chain of agents.
+
+   If there are multiple RAs in the system, it is considered normal that
+   not all RAs will see all certificate requests.  The routing between
+   the RAs may be dependent on the content of the certificate requests
+   involved.
+
+   This document is divided into six sections, each section specifying
+   the requirements that are specific to a class of agents in the CMC
+   model.  These are 1) All agents, 2) all servers, 3) all clients, 4)
+   all End-Entities, 5) all Registration Entities, 6) all Certificate
+   Authorities.
+
+2.  Terminology
+
+   There are several different terms, abbreviations, and acronyms used
+   in this document that we define here for convenience and consistency
+   of usage:
+
+   End-Entity  (EE) refers to the entity that owns a key pair and for
+      whom a certificate is issued.
+
+   Registration Authority (RA)  or Local RA (LRA) refers to an entity
+      that acts as an intermediary between the EE and the CA.  Multiple
+      RAs can exist between the End-Entity and the Certification
+      Authority.  RAs may perform additional services such as key
+      generation or key archival.  This document uses the term RA for
+      both RA and LRA.
+
+
+
+
+Schaad & Myers              Standards Track                     [Page 2]
+
+RFC 5274                    CMC: Compliance                    June 2008
+
+
+   Certification Authority (CA)  refers to the entity that issues
+      certificates.
+
+   Client  refers to an entity that creates a PKI Request.  In this
+      document, both RAs and EEs can be clients.
+
+   Server  refers to the entities that process PKI Requests and create
+      PKI Responses.  In this document both CAs and RAs can be servers.
+
+   PKCS #10  refers to the Public Key Cryptography Standard #10
+      [PKCS10], which defines a certification request syntax.
+
+   CRMF  refers to the Certificate Request Message Format RFC [CRMF].
+      CMC uses this certification request syntax defined in this
+      document as part of the protocol.
+
+   CMS  refers to the Cryptographic Message Syntax RFC [CMS].  This
+      document provides for basic cryptographic services including
+      encryption and signing with and without key management.
+
+   PKI Request/Response  refers to the requests/responses described in
+      this document.  PKI Requests include certification requests,
+      revocation requests, etc.  PKI Responses include certs-only
+      messages, failure messages, etc.
+
+   Proof-of-Identity  refers to the client proving they are who they say
+      that they are to the server.
+
+   Proof-of-Possession (POP)  refers to a value that can be used to
+      prove that the private key corresponding to a public key is in the
+      possession and can be used by an end-entity.
+
+   Transport wrapper  refers to the outermost CMS wrapping layer.
+
+3.  Requirements Terminology
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted as described in [MUST].
+
+4.  Requirements for All Entities
+
+   All [CMC-STRUCT] and [CMC-TRANS] compliance statements MUST be
+   adhered to unless specifically stated otherwise in this document.
+
+   All entities MUST support Full PKI Requests, Simple PKI Responses,
+   and Full PKI Responses.  Servers SHOULD support Simple PKI Requests.
+
+
+
+
+Schaad & Myers              Standards Track                     [Page 3]
+
+RFC 5274                    CMC: Compliance                    June 2008
+
+
+   All entities MUST support the use of the CRMF syntax for
+   certification requests.  Support for the PKCS #10 syntax for
+   certification requests SHOULD be implemented by servers.
+
+   The extendedFailInfo field SHOULD NOT be populated in the
+   CMCStatusInfoV2 object; the failInfo field SHOULD be used to relay
+   this information.  If the extendedFailInfo field is used, it is
+   suggested that an additional CMCStatusInfoV2 item exist for the same
+   body part with a failInfo field.
+
+   All entities MUST implement the HTTP transport mechanism as defined
+   in [CMC-TRANS].  Other transport mechanisms MAY be implemented.
+
+4.1.  Cryptographic Algorithm Requirements
+
+   All entities MUST verify DSA-SHA1 and RSA-SHA1 signatures in
+   SignedData (see [CMS-ALG]).  Entities MAY verify other signature
+   algorithms.  It is strongly suggested that RSA-PSS with SHA-1 be
+   verified (see [CMS-RSA-PSS]).  It is strongly suggested that SHA-256
+   using RSA and RSA-PSS be verified (see [RSA-256]).
+
+   All entities MUST generate either DSA-SHA1 or RSA-SHA1 signatures for
+   SignedData (see [CMS-ALG]).  Other signatures algorithms MAY be used
+   for generation.
+
+   All entities MUST support Advanced Encryption Standard (AES) as the
+   content encryption algorithm for EnvelopedData (see [CMS-AES]).
+   Other content encryption algorithms MAY be implemented.
+
+   All entities MUST support RSA as a key transport algorithm for
+   EnvelopedData (see [CMS-ALG]).  All entities SHOULD support RSA-OAEP
+   (see [CMS-RSA-OAEP]) as a key transport algorithm.  Other key
+   transport algorithms MAY be implemented.
+
+   If an entity supports key agreement for EnvelopedData, it MUST
+   support Diffie-Hellman (see [CMS-DH]).
+
+   If an entity supports PasswordRecipientInfo for EnvelopedData or
+   AuthenticatedData, it MUST support PBKDF2 [PBKDF2] for key derivation
+   algorithms.  It MUST support AES key wrap (see [AES-WRAP] as the key
+   encryption algorithm.
+
+   If AuthenticatedData is supported, PasswordRecipientInfo MUST be
+   supported.
+
+
+
+
+
+
+
+Schaad & Myers              Standards Track                     [Page 4]
+
+RFC 5274                    CMC: Compliance                    June 2008
+
+
+   Algorithm requirements for the Identity Proof Version 2 control
+   (Section 6.2.1 of [CMC-STRUCT]) are: SHA-1 MUST be implemented for
+   hashAlgId.  SHA-256 SHOULD be implemented for hashAlgId.  HMAC-SHA1
+   MUST be implemented for macAlgId.  HMAC-SHA256 SHOULD be implemented
+   for macAlgId.
+
+   Algorithm requirements for the Pop Link Witness Version 2 control
+   (Section 6.3.1 of [CMC-STRUCT]) are: SHA-1 MUST be implemented for
+   keyGenAlgorithm.  SHA-256 SHOULD be implemented for keyGenAlgorithm.
+   PBKDF2 [PBKDF2] MAY be implemented for keyGenAlgorithm.  HMAC-SHA1
+   MUST be implemented for macAlgorithm.  HMAC-SHA256 SHOULD be
+   implemented for macAlgorithm.
+
+   Algorithm requirements for the Encrypted POP and Decrypted POP
+   controls (Section 6.7 of [CMC-STRUCT]) are: SHA-1 MUST be implemented
+   for witnessAlgID.  SHA-256 SHOULD be implemented for witnessAlgID.
+   HMAC-SHA1 MUST be implemented for thePOPAlgID.  HMAC-SHA256 SHOULD be
+   implemented for thePOPAlgID.
+
+   Algorithm requirements for Publish Trust Anchors control (Section
+   6.15 of [CMC-STRUCT]) are: SHA-1 MUST be implemented for
+   hashAlgorithm.  SHA-256 SHOULD be implemented for hashAlgorithm.
+
+   If an EE generates DH keys for certification, it MUST support section
+   4 of [DH-POP].  EEs MAY support Section 3 of [DH-POP].  CAs and RAs
+   that do POP verification MUST support Section 4 of [DH-POP] and
+   SHOULD support Section 3 of [DH-POP].
+
+   EEs that need to use a signature algorithm for keys that cannot
+   produce a signature MUST support Appendix C of [CMC-STRUCT] and MUST
+   support the Encrypted/Decrypted POP controls.  CAs and RAs that do
+   POP verification MUST support this signature algorithm and MUST
+   support the Encrypted/Decrypted POP controls.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Schaad & Myers              Standards Track                     [Page 5]
+
+RFC 5274                    CMC: Compliance                    June 2008
+
+
+4.2.  Controls
+
+   The following table lists the name and level of support required for
+   each control.
+
+      +----------------------------+----------+----------+----------+
+      | Control                    | EE       | RA       | CA       |
+      +----------------------------+----------+----------+----------+
+      | Extended CMC Status Info   | MUST     | MUST     | MUST     |
+      |                            |          |          |          |
+      | CMC Status Info            | SHOULD   | SHOULD   | SHOULD   |
+      |                            |          |          |          |
+      | Identity Proof Version 2   | MUST     | MUST     | MUST     |
+      |                            |          |          |          |
+      | Identity Proof             | SHOULD   | SHOULD   | SHOULD   |
+      |                            |          |          |          |
+      | Identification             | MUST     | MUST     | MUST     |
+      |                            |          |          |          |
+      | POP Link Random            | MUST     | MUST     | MUST     |
+      |                            |          |          |          |
+      | POP Link Witness Version 2 | MUST     | MUST     | MUST     |
+      |                            |          |          |          |
+      | POP Link Witness           | SHOULD   | MUST     | MUST     |
+      |                            |          |          |          |
+      | Data Return                | MUST     | MUST     | MUST     |
+      |                            |          |          |          |
+      | Modify Cert Request        | N/A      | MUST     | (2)      |
+      |                            |          |          |          |
+      | Add Extensions             | N/A      | MAY      | (1)      |
+      |                            |          |          |          |
+      | Transaction ID             | MUST     | MUST     | MUST     |
+      |                            |          |          |          |
+      | Sender Nonce               | MUST     | MUST     | MUST     |
+      |                            |          |          |          |
+      | Recipient Nonce            | MUST     | MUST     | MUST     |
+      |                            |          |          |          |
+      | Encrypted POP              | (4)      | (5)      | SHOULD   |
+      |                            |          |          |          |
+      | Decrypted POP              | (4)      | (5)      | SHOULD   |
+      |                            |          |          |          |
+      | RA POP Witness             | N/A      | SHOULD   | (1)      |
+      |                            |          |          |          |
+      | Get Certificate            | optional | optional | optional |
+      |                            |          |          |          |
+      | Get CRL                    | optional | optional | optional |
+      |                            |          |          |          |
+      | Revocation Request         | SHOULD   | SHOULD   | MUST     |
+      |                            |          |          |          |
+
+
+
+Schaad & Myers              Standards Track                     [Page 6]
+
+RFC 5274                    CMC: Compliance                    June 2008
+
+
+      | Registration Info          | SHOULD   | SHOULD   | SHOULD   |
+      |                            |          |          |          |
+      | Response Information       | SHOULD   | SHOULD   | SHOULD   |
+      |                            |          |          |          |
+      | Query Pending              | MUST     | MUST     | MUST     |
+      |                            |          |          |          |
+      | Confirm Cert.  Acceptance  | MUST     | MUST     | MUST     |
+      |                            |          |          |          |
+      | Publish Trust Anchors      | (3)      | (3)      | (3)      |
+      |                            |          |          |          |
+      | Authenticate Data          | (3)      | (3)      | (3)      |
+      |                            |          |          |          |
+      | Batch Request              | N/A      | MUST     | (2)      |
+      |                            |          |          |          |
+      | Batch Responses            | N/A      | MUST     | (2)      |
+      |                            |          |          |          |
+      | Publication Information    | optional | optional | optional |
+      |                            |          |          |          |
+      | Control Processed          | N/A      | MUST     | (2)      |
+      +----------------------------+----------+----------+----------+
+
+                      Table 1: CMC Control Attributes
+
+   Notes:
+
+   1.  CAs SHOULD implement this control if designed to work with RAs.
+
+   2.  CAs MUST implement this control if designed to work with RAs.
+
+   3.  Implementation is optional for these controls.  We strongly
+       suggest that they be implemented in order to populate client
+       trust anchors.
+
+   4.  EEs only need to implement this if (a) they support key agreement
+       algorithms or (b) they need to operate in environments where the
+       hardware keys cannot provide POP.
+
+   5.  RAs SHOULD implement this if they implement RA POP Witness.
+
+   Strong consideration should be given to implementing the Authenticate
+   Data and Publish Trust Anchors controls as this gives a simple method
+   for distributing trust anchors into clients without user
+   intervention.
+
+
+
+
+
+
+
+
+Schaad & Myers              Standards Track                     [Page 7]
+
+RFC 5274                    CMC: Compliance                    June 2008
+
+
+4.3.  CRMF Feature Requirements
+
+   The following additional restrictions are placed on CRMF features:
+
+   The registration control tokens id-regCtrl-regToken and id-regCtrl-
+   authToken MUST NOT be used.  No specific CMC feature is used to
+   replace these items, but generally the CMC controls identification
+   and identityProof will perform the same service and are more
+   specifically defined.
+
+   The control token id-regCtrl-pkiArchiveOptions SHOULD NOT be
+   supported.  An alternative method is under development to provide
+   this functionality.
+
+   The behavior of id-regCtrl-oldCertID is not presently used.  It is
+   replaced by issuing the new certificate and using the id-cmc-
+   publishCert to remove the old certificate from publication.  This
+   operation would not normally be accompanied by an immediate
+   revocation of the old certificate; however, that can be accomplished
+   by the id-cmc-revokeRequest control.
+
+   The id-regCtrl-protocolEncrKey is not used.
+
+4.4.  Requirements for Clients
+
+   There are no additional requirements.
+
+5.  Requirements for Servers
+
+   There are no additional requirements.
+
+6.  Requirements for EEs
+
+   If an entity implements Diffie-Hellman, it MUST implement either the
+   DH-POP Proof-of-Possession as defined in [DH-POP], Section 4, or the
+   challenge-response POP controls id-cmc-encryptedPOP and id-cmc-
+   decryptedPOP.
+
+7.  Requirements for RAs
+
+   RAs SHOULD be able to do delegated POP.  RAs implementing this
+   feature MUST implement the id-cmc-lraPOPWitness control.
+
+   All RAs MUST implement the promotion of the id-aa-cmc-unsignedData as
+   covered in Section 3.2.3 of [CMC-STRUCT].
+
+
+
+
+
+
+Schaad & Myers              Standards Track                     [Page 8]
+
+RFC 5274                    CMC: Compliance                    June 2008
+
+
+8.  Requirements for CAs
+
+   Providing for CAs to work in an environment with RAs is strongly
+   suggested.  Implementation of such support is strongly suggested as
+   this permits the delegation of substantial administrative interaction
+   onto an RA rather than at the CA.
+
+   CAs MUST perform at least minimal checks on all public keys before
+   issuing a certificate.  At a minimum, a check for syntax would occur
+   with the POP operation.  Additionally, CAs SHOULD perform simple
+   checks for known bad keys such as small subgroups for DSA-SHA1 and DH
+   keys [SMALL-SUB-GROUP] or known bad exponents for RSA keys.
+
+   CAs MUST enforce POP checking before issuing any certificate.  CAs
+   MAY delegate the POP operation to an RA for those cases where 1) a
+   challenge/response message pair must be used, 2) an RA performs
+   escrow of a key and checks for POP in that manner, or 3) an unusual
+   algorithm is used and that validation is done at the RA.
+
+   CAs SHOULD implement both the DH-POP Proof-of-Possession as defined
+   in [DH-POP], Section 4, and the challenge-response POP controls id-
+   cmc-encryptedPOP and id-cmc-decryptedPOP.
+
+9.  Security Considerations
+
+   This document uses [CMC-STRUCT] and [CMC-TRANS] as building blocks to
+   this document.  The security sections of those two documents are
+   included by reference.
+
+   Knowledge of how an entity is expected to operate is vital in
+   determining which sections of requirements are applicable to that
+   entity.  Care needs to be taken in determining which sections apply
+   and fully implementing the necessary code.
+
+   Cryptographic algorithms have and will be broken or weakened.
+   Implementers and users need to check that the cryptographic
+   algorithms listed in this document make sense from a security level.
+   The IETF from time to time may issue documents dealing with the
+   current state of the art.  Two examples of such documents are
+   [SMALL-SUB-GROUP] and [HASH-ATTACKS].
+
+10.  Acknowledgements
+
+   The authors and the PKIX Working Group are grateful for the
+   participation of Xiaoyi Liu and Jeff Weinstein in helping to author
+   the original versions of this document.
+
+
+
+
+
+Schaad & Myers              Standards Track                     [Page 9]
+
+RFC 5274                    CMC: Compliance                    June 2008
+
+
+   The authors would like to thank Brian LaMacchia for his work in
+   developing and writing up many of the concepts presented in this
+   document.  The authors would also like to thank Alex Deacon and Barb
+   Fox for their contributions.
+
+11.  References
+
+11.1.  Normative References
+
+   [CMC-STRUCT]       Schaad, J. and M. Myers, "Certificate Management
+                      over CMS (CMC)", RFC 5272, June 2008.
+
+   [CMC-TRANS]        Schaad, J. and M. Myers, "Certificate Management
+                      over CMS (CMC): Transport Protocols", RFC 5273,
+                      June 2008.
+
+   [CMS]              Housley, R., "Cryptographic Message Syntax (CMS)",
+                      RFC 3852, July 2004.
+
+   [CMS-AES]          Schaad, J., "Use of the Advanced Encryption
+                      Standard (AES) Encryption Algorithm in
+                      Cryptographic Message Syntax (CMS)", RFC 3565,
+                      July 2003.
+
+   [CMS-ALG]          Housley, R., "Cryptographic Message Syntax (CMS)
+                      Algorithms", RFC 3370, August 2002.
+
+   [CMS-DH]           Rescorla, E., "Diffie-Hellman Key Agreement
+                      Method", RFC 2631, June 1999.
+
+   [CRMF]             Schaad, J., "Internet X.509 Public Key
+                      Infrastructure Certificate Request Message Format
+                      (CRMF)", RFC 4211, September 2005.
+
+   [CMS-RSA-OAEP]     Housley, R., "Use of the RSAES-OAEP Key Transport
+                      Algorithm in the Cryptographic Message Syntax
+                      (CMS)", RFC 3560, July 2003.
+
+   [CMS-RSA-PSS]      Schaad, J., "Use of the RSASSA-PSS Signature
+                      Algorithm in Cryptographic Message Syntax (CMS)",
+                      RFC 4056, June 2005.
+
+   [DH-POP]           Prafullchandra, H. and J. Schaad, "Diffie-Hellman
+                      Proof-of-Possession Algorithms", RFC 2875,
+                      June 2000.
+
+
+
+
+
+
+Schaad & Myers              Standards Track                    [Page 10]
+
+RFC 5274                    CMC: Compliance                    June 2008
+
+
+   [MUST]             Bradner, S., "Key words for use in RFCs to
+                      Indicate Requirement Levels", RFC 2119, BCP 14,
+                      March 1997.
+
+   [RSA-256]          Schaad, J., Kaliski, B., and R. Housley,
+                      "Additional Algorithms and Identifiers for RSA
+                      Cryptography for use in the Internet X.509 Public
+                      Key Infrastructure Certificate and Certificate
+                      Revocation List (CRL) Profile", RFC 4055,
+                      June 2005.
+
+   [PBKDF2]           Kaliski, B., "PKCS #5: Password-Based Cryptography
+                      Specification Version 2.0", RFC 2898,
+                      September 2000.
+
+   [AES-WRAP]         Schaad, J. and R. Housley, "Advanced Encryption
+                      Standard (AES) Key Wrap Algorithm", RFC 3394,
+                      September 2002.
+
+11.2.  Informative References
+
+   [PKCS10]           Nystrom, M. and B. Kaliski, "PKCS #10:
+                      Certification Request Syntax Specification v1.7",
+                      RFC 2986, November 2000.
+
+   [SMALL-SUB-GROUP]  Zuccherato, R., "Methods for Avoiding the "Small-
+                      Subgroup" Attacks on the Diffie-Hellman Key
+                      Agreement Method for S/MIME", RFC 2785,
+                      March 2000.
+
+   [HASH-ATTACKS]     Hoffman, P. and B. Schneier, "Attacks on
+                      Cryptographic Hashes in Internet Protocols",
+                      RFC 4270, November 2005.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Schaad & Myers              Standards Track                    [Page 11]
+
+RFC 5274                    CMC: Compliance                    June 2008
+
+
+Authors' Addresses
+
+   Jim Schaad
+   Soaring Hawk Consulting
+   PO Box 675
+   Gold Bar, WA  98251
+
+   Phone: (425) 785-1031
+   EMail: jimsch@nwlink.com
+
+
+   Michael Myers
+   TraceRoute Security, Inc.
+
+   EMail: mmyers@fastq.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Schaad & Myers              Standards Track                    [Page 12]
+
+RFC 5274                    CMC: Compliance                    June 2008
+
+
+Full Copyright Statement
+
+   Copyright (C) The IETF Trust (2008).
+
+   This document is subject to the rights, licenses and restrictions
+   contained in BCP 78, and except as set forth therein, the authors
+   retain all their rights.
+
+   This document and the information contained herein are provided on an
+   "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS
+   OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY, THE IETF TRUST AND
+   THE INTERNET ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS
+   OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF
+   THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+   WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+Intellectual Property
+
+   The IETF takes no position regarding the validity or scope of any
+   Intellectual Property Rights or other rights that might be claimed to
+   pertain to the implementation or use of the technology described in
+   this document or the extent to which any license under such rights
+   might or might not be available; nor does it represent that it has
+   made any independent effort to identify any such rights.  Information
+   on the procedures with respect to rights in RFC documents can be
+   found in BCP 78 and BCP 79.
+
+   Copies of IPR disclosures made to the IETF Secretariat and any
+   assurances of licenses to be made available, or the result of an
+   attempt made to obtain a general license or permission for the use of
+   such proprietary rights by implementers or users of this
+   specification can be obtained from the IETF on-line IPR repository at
+   http://www.ietf.org/ipr.
+
+   The IETF invites any interested party to bring to its attention any
+   copyrights, patents or patent applications, or other proprietary
+   rights that may cover technology that may be required to implement
+   this standard.  Please address the information to the IETF at
+   ietf-ipr@ietf.org.
+
+
+
+
+
+
+
+
+
+
+
+
+Schaad & Myers              Standards Track                    [Page 13]
+
