@@ -144,17 +144,15 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
       return;
     }
 
-    crlUpdateInProcess.set(true);
-
-    Boolean updateCrlSuccessful = null;
     File updateMeFile = new File(crlFilename + ".UPDATEME");
     if (!updateMeFile.exists()) {
       LOG.info("The CRL will not be updated. Create new file {} to force the update",
           updateMeFile.getAbsolutePath());
-      crlUpdated = true;
-      crlUpdateFailed = false;
       return;
     }
+
+    Boolean updateCrlSuccessful = null;
+    crlUpdateInProcess.set(true);
 
     try {
       File fullCrlFile = new File(crlFilename);
