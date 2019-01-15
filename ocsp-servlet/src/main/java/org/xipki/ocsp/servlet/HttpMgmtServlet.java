@@ -30,7 +30,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.datasource.DataAccessException;
 import org.xipki.ocsp.api.mgmt.MgmtMessage.MgmtAction;
 import org.xipki.ocsp.api.mgmt.MgmtRequest;
 import org.xipki.ocsp.api.mgmt.OcspMgmtException;
@@ -117,7 +116,7 @@ public class HttpMgmtServlet extends HttpServlet {
         case restartServer: {
           try {
             ocspServer.init(true);
-          } catch (InvalidConfException | DataAccessException | PasswordResolverException ex) {
+          } catch (InvalidConfException | PasswordResolverException ex) {
             LOG.warn(action + ": could not restart OCSP server", ex);
             throw new MyException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                 "could not build the CaEntry: " + ex.getMessage());
