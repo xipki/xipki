@@ -179,7 +179,7 @@ public abstract class Certprofile implements Closeable {
     public Date add(Date referenceDate) {
       switch (unit) {
         case DAY:
-          return new Date(referenceDate.getTime() + vslidity * DAY);
+          return new Date(referenceDate.getTime() + validity * DAY);
         case YEAR:
           Calendar cal = Calendar.getInstance(TIMEZONE_UTC);
           cal.setTime(referenceDate);
@@ -197,9 +197,9 @@ public abstract class Certprofile implements Closeable {
 
           return cal.getTime();
         case HOUR:
-          return new Date(referenceDate.getTime() + vslidity * HOUR);
+          return new Date(referenceDate.getTime() + validity * HOUR);
         case MINUTE:
-          return new Date(referenceDate.getTime() + vslidity * MINUTE);
+          return new Date(referenceDate.getTime() + validity * MINUTE);
         default:
           throw new IllegalStateException(String.format(
               "should not reach here, unknown CertValidity.Unit %s", unit));
