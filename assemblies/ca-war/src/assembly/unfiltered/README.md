@@ -1,9 +1,7 @@
 Deployment in Tomcat
 ----
 1. Copy the sub-folders `webapps`, `xipki` and `lib ` to the tomcat root folder
-2. Add the line `org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true`
-   to the file `conf/catalina.properties` if OCSP over HTTP supported is activated. 
-3. Configure the TLS listener in the file `conf/server.xml`
+2. Configure the TLS listener in the file `conf/server.xml`
     - Use NIO connector
 
 ```sh
