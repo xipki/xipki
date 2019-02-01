@@ -177,7 +177,7 @@ public class DbCertStatusStore extends OcspStore {
             for (Integer id : newIds) {
               IssuerEntry entry = issuerStore.getIssuerForId(id);
               SimpleIssuerEntry newEntry = newIssuers.get(id);
-              if (newEntry.match(entry)) {
+              if (!newEntry.match(entry)) {
                 issuersUnchanged = false;
                 break;
               }
@@ -239,11 +239,12 @@ public class DbCertStatusStore extends OcspStore {
         releaseDbResources(ps, rs);
       }
     } catch (Throwable th) {
-      storeUpdateInProcess.set(false);
       LogUtil.error(LOG, th, "could not executing initIssuerStore()");
       initializationFailed = true;
       initialized = true;
-    }
+    } Finally {
+      storeUpdateInProcess.set(false);
+    } 
   } // method initIssuerStore
 
   @Override
