@@ -242,7 +242,7 @@ public class DbCertStatusStore extends OcspStore {
       LogUtil.error(LOG, th, "could not executing initIssuerStore()");
       initializationFailed = true;
       initialized = true;
-    } Finally {
+    } finally {
       storeUpdateInProcess.set(false);
     } 
   } // method initIssuerStore
