@@ -44,7 +44,7 @@ Deployment in Tomcat
         </SSLHostConfig>
     </Connector>
 ```
-3. Start tomcat
+5. Start tomcat
   In the tomcat root folder
 
 ```sh
@@ -53,7 +53,7 @@ Deployment in Tomcat
 
   Note that the start script of tomcat does not set the working directory to the tomcat root directory, you have to start tomcat as above so that the XiPKI can retrieve files correctly.
 
-4. Shutdown tomcat
+6. Shutdown tomcat
    Shutdown tomcat from any folder
 ```sh
   /path/to/tomcat/bin/shutdown.sh
