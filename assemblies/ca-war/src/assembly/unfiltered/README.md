@@ -40,6 +40,20 @@ Deployment in Tomcat
         </SSLHostConfig>
     </Connector>
 ```
+3. Start tomcat
+  In the tomcat root folder
+
+```sh
+  bin/start.sh
+```
+
+  Note that the start script of tomcat does not set the working directory to the tomcat root directory, you have to start tomcat as above so that the XiPKI can retrieve files correctly.
+
+4. Shutdown tomcat
+   Shutdown tomcat from any folder
+```sh
+  /path/to/tomcat/bin/shutdown.sh
+```
 
 Deployment in Jetty 9
 ----
@@ -58,3 +72,15 @@ jetty.sslContext.trustStoreType=PKCS12
 jetty.sslContext.needClientAuth=false
 jetty.sslContext.wantClientAuth=true
 ```
+3. Start jetty
+   Start jetty from any folder
+```sh
+  /path/to/jetty/bin/jetty.sh start
+```
+
+4. Shutdown jetty
+   Shutdown jetty from any folder
+```sh
+  /path/to/jetty/bin/jetty.sh stop
+```
+
