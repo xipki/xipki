@@ -786,7 +786,7 @@ public class ProfileConfCreatorDemo {
   } // method certprofileMultipleValuedRdn
 
   private static X509ProfileType certprofileQc() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile qc", CertLevel.EndEntity, "5y", false);
+    X509ProfileType profile = getBaseProfile("certprofile qc", CertLevel.EndEntity, "1000d", false);
 
     // Subject
     Subject subject = profile.getSubject();
