@@ -245,7 +245,7 @@ public class CertActions {
 
   }
 
-  @Command(scope = "ca", name = "getCrl", description = "download CRL")
+  @Command(scope = "ca", name = "get-crl", description = "download CRL")
   @Service
   public static class GetCrl extends CrlAction {
 

@@ -50,7 +50,7 @@ xi:scep-certpoll --url $SCEP_URL \
 
 SERIAL = $(xi:cert-info --serial --hex --in output/scep-ocsp1-certpoll.crt)
 
-xi:scep-getcert \
+xi:scep-get-cert \
   --url $SCEP_URL \
   --ca-cert output/subcawithcrl1.crt \
   --p12 output/scep-ocsp1.p12 \
