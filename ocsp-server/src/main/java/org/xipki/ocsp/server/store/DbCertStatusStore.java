@@ -244,7 +244,7 @@ public class DbCertStatusStore extends OcspStore {
       initialized = true;
     } finally {
       storeUpdateInProcess.set(false);
-    } 
+    }
   } // method initIssuerStore
 
   @Override
