@@ -3,6 +3,13 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
+## 5.0.1
+ - Release date: Feb 17, 2019
+ - Validity other than {num}'y' will not be handled correctly. This has been fixed.
+ - Increase the iteration count of PBKDF2 from 1000 to 10,000.
+ - The flag 'crlUpdateInProcess' is not set correctly. This has been fixed.
+ - OCSP-server DbCertStatusStore logic to detect issuer changes is wrong. This has been fixed.  
+
 ## 5.0.0
  - Release date: Dec 28, 2018
  - Optimized the file operations
