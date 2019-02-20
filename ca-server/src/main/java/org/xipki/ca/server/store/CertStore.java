@@ -120,7 +120,7 @@ public class CertStore {
   private static final String SQL_MAX_CRLNO = "SELECT MAX(CRL_NO) FROM CRL WHERE CA_ID=?";
 
   private static final String SQL_MAX_THISUPDAATE_CRL =
-      "SELECT MAX(THISUPDATE) FROM CRL WHERE CA_ID=?";
+      "SELECT MAX(THISUPDATE) FROM CRL WHERE CA_ID=? AND DELTACRL=?";
 
   private static final String SQL_ADD_CRL =
       "INSERT INTO CRL (ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE,DELTACRL,BASECRL_NO,CRL)"
@@ -448,7 +448,8 @@ public class CertStore {
     }
   }
 
-  public Long getThisUpdateOfCurrentCrl(NameId ca) throws OperationException {
+  public long getThisUpdateOfCurrentCrl(NameId ca, boolean deltaCrl)
+      throws OperationException {
     Args.notNull(ca, "ca");
 
     final String sql = SQL_MAX_THISUPDAATE_CRL;
@@ -456,6 +457,7 @@ public class CertStore {
     PreparedStatement ps = borrowPreparedStatement(sql);
     try {
       ps.setInt(1, ca.getId());
+      setBoolean(ps, 2, deltaCrl);
       rs = ps.executeQuery();
       if (!rs.next()) {
         return 0L;

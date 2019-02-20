@@ -24,7 +24,6 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -405,7 +404,7 @@ public abstract class MgmtEntry {
               (keepExpiredCertInDays < 0 ? "forever" : keepExpiredCertInDays + " days"),
           "\nextra control: ", extraCtrlText,
           "\nserial number bit length: ", serialNoBitLen,
-          "\nnext CRl number: ", nextCrlNumber,
+          "\nnext CRL number: ", nextCrlNumber,
           "\n", caUris, "\ncert: \n", InternUtil.formatCert(cert, verbose),
           "\nrevocation: ", (revocationInfo == null ? "not revoked" : "revoked"), revInfoText);
     } // method toString
@@ -532,10 +531,6 @@ public abstract class MgmtEntry {
 
     public void setRevocationInfo(CertRevocationInfo revocationInfo) {
       this.revocationInfo = revocationInfo;
-    }
-
-    public Date getCrlBaseTime() {
-      return (cert == null) ? null : cert.getNotBefore();
     }
 
     public String getSubject() {

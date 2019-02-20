@@ -126,11 +126,10 @@ import org.xipki.ca.api.mgmt.CertListOrderBy;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.api.mgmt.CmpControl;
 import org.xipki.ca.api.mgmt.CrlControl;
+import org.xipki.ca.api.mgmt.CrlControl.HourMinute;
 import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.mgmt.ValidityMode;
-import org.xipki.ca.api.mgmt.CrlControl.HourMinute;
-import org.xipki.ca.api.mgmt.CrlControl.UpdateMode;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
@@ -225,7 +224,7 @@ public class X509Ca implements Closeable {
       }
 
       inProcess = true;
-      final Date expiredAt = new Date(System.currentTimeMillis() - DAY_IN_MS * (keepDays + 1));
+      final Date expiredAt = new Date(System.currentTimeMillis() - MS_PER_DAY * (keepDays + 1));
 
       try {
         int num = removeExpirtedCerts(expiredAt, CaAuditConstants.MSGID_ca_routine);
@@ -244,7 +243,7 @@ public class X509Ca implements Closeable {
     @Override
     public void run() {
       CrlControl crlControl = caInfo.getCrlControl();
-      if (crlControl == null || crlControl.getUpdateMode() != UpdateMode.INTERVAL) {
+      if (crlControl == null) {
         return;
       }
 
@@ -264,112 +263,59 @@ public class X509Ca implements Closeable {
     } // method run
 
     private void run0() throws OperationException {
-      final long signWindowMin = 20;
-
-      Date thisUpdate = new Date();
-      long minSinceCrlBaseTime = (thisUpdate.getTime() - caInfo.getCrlBaseTime().getTime())
-          / MS_PER_MINUTE;
-
       CrlControl control = caInfo.getCrlControl();
-      int interval;
+      // In seconds
+      long lastIssueTimeOfFullCrl = certstore.getThisUpdateOfCurrentCrl(caIdent, false);
+      Date now = new Date();
 
-      if (control.getIntervalMinutes() != null && control.getIntervalMinutes() > 0) {
-        long intervalMin = control.getIntervalMinutes();
-        interval = (int) (minSinceCrlBaseTime / intervalMin);
-
-        long baseTimeInMin = interval * intervalMin;
-        if (minSinceCrlBaseTime - baseTimeInMin > signWindowMin) {
-          // only generate CRL within the time window
-          return;
-        }
-      } else if (control.getIntervalDayTime() != null) {
-        HourMinute hm = control.getIntervalDayTime();
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        cal.setTime(thisUpdate);
-        int minute = cal.get(Calendar.HOUR_OF_DAY) * 60 + cal.get(Calendar.MINUTE);
-        int scheduledMinute = hm.getHour() * 60 + hm.getMinute();
-        if (minute < scheduledMinute || minute - scheduledMinute > signWindowMin) {
-          return;
-        }
-        interval = (int) (minSinceCrlBaseTime % MINUTE_PER_DAY);
+      boolean createFullCrlNow = false;
+      if (lastIssueTimeOfFullCrl == 0L) {
+        // still no CRL available. Create a new FullCRL
+        createFullCrlNow = true;
       } else {
-        throw new IllegalStateException("should not reach here, neither interval minutes"
-            + " nor dateTime is specified");
+        Date nearestScheduledCrlIssueTime = getScheduledCrlGenTimeNotAfter(
+            new Date(lastIssueTimeOfFullCrl * 1000));
+        Date nextScheduledCrlIssueTime = new Date(
+            nearestScheduledCrlIssueTime.getTime() + control.getFullCrlIntervals() * MS_PER_DAY);
+        if (!nextScheduledCrlIssueTime.after(now)) {
+          // at least one interval was skipped
+          createFullCrlNow = true;
+        }
       }
 
-      boolean deltaCrl;
-      if (interval % control.getFullCrlIntervals() == 0) {
-        deltaCrl = false;
-      } else if (control.getDeltaCrlIntervals() > 0
-          && interval % control.getDeltaCrlIntervals() == 0) {
-        deltaCrl = true;
-      } else {
+      boolean createDeltaCrlNow = false;
+      if (control.getDeltaCrlIntervals() > 0 && !createFullCrlNow) {
+        // if no CRL will be issued, check whether it is time to generate DeltaCRL
+        // In seconds
+        long lastIssueTimeOfDeltaCrl = certstore.getThisUpdateOfCurrentCrl(caIdent, true);
+        long lastIssueTime = Math.max(lastIssueTimeOfDeltaCrl, lastIssueTimeOfFullCrl);
+
+        Date nearestScheduledCrlIssueTime = getScheduledCrlGenTimeNotAfter(
+            new Date(lastIssueTime * 1000));
+        Date nextScheduledCrlIssueTime = new Date(
+            nearestScheduledCrlIssueTime.getTime() + control.getDeltaCrlIntervals() * MS_PER_DAY);
+        if (!nextScheduledCrlIssueTime.after(now)) {
+          // at least one interval was skipped
+          createDeltaCrlNow = true;
+        }
+      }
+
+      if (!(createFullCrlNow || createDeltaCrlNow)) {
+        LOG.info("No CRL is needed to be created");
         return;
       }
 
-      if (deltaCrl && !certstore.hasCrl(caIdent)) {
-        // DeltaCRL will be generated only if fullCRL exists
-        return;
-      }
-
-      long nowInSecond = thisUpdate.getTime() / MS_PER_SECOND;
-      long thisUpdateOfCurrentCrl = certstore.getThisUpdateOfCurrentCrl(caIdent);
-      if (nowInSecond - thisUpdateOfCurrentCrl <= (signWindowMin + 5) * 60) {
-        // CRL was just generated within SIGN_WINDOW_MIN + 5 minutes
-        return;
-      }
-
-      // find out the next interval for fullCRL and deltaCRL
-      int nextFullCrlInterval = 0;
-      int nextDeltaCrlInterval = 0;
-
-      for (int i = interval + 1;; i++) {
-        if (i % control.getFullCrlIntervals() == 0) {
-          nextFullCrlInterval = i;
-          break;
-        }
-
-        if (nextDeltaCrlInterval != 0 && control.getDeltaCrlIntervals() != 0
-            && i % control.getDeltaCrlIntervals() == 0) {
-          nextDeltaCrlInterval = i;
-        }
-      }
-
-      int intervalOfNextUpdate;
-      if (deltaCrl) {
-        intervalOfNextUpdate = nextDeltaCrlInterval == 0 ? nextFullCrlInterval
-            : Math.min(nextFullCrlInterval, nextDeltaCrlInterval);
-      } else {
-        if (nextDeltaCrlInterval == 0) {
-          intervalOfNextUpdate = nextFullCrlInterval;
-        } else {
-          intervalOfNextUpdate = control.isExtendedNextUpdate() ? nextFullCrlInterval
-              : Math.min(nextFullCrlInterval, nextDeltaCrlInterval);
-        }
-      }
-
-      Date nextUpdate;
-      if (control.getIntervalMinutes() != null) {
-        int minutesTillNextUpdate = (intervalOfNextUpdate - interval)
-            * control.getIntervalMinutes() + control.getOverlapMinutes();
-        nextUpdate = new Date(MS_PER_SECOND * (nowInSecond + minutesTillNextUpdate * 60));
-      } else {
-        HourMinute hm = control.getIntervalDayTime();
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        cal.setTime(new Date(nowInSecond * MS_PER_SECOND));
-        cal.add(Calendar.DAY_OF_YEAR, (intervalOfNextUpdate - interval));
-        cal.set(Calendar.HOUR_OF_DAY, hm.getHour());
-        cal.set(Calendar.MINUTE, hm.getMinute());
-        cal.add(Calendar.MINUTE, control.getOverlapMinutes());
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        nextUpdate = cal.getTime();
-      }
+      int intervals = createDeltaCrlNow
+          ? control.getDeltaCrlIntervals() : control.getFullCrlIntervals();
+      Date nextUpdate =
+          new Date(getScheduledCrlGenTimeNotAfter(now).getTime()
+              + intervals * MS_PER_DAY
+              + control.getOverlapMinutes() * MS_PER_MINUTE);
 
       long maxIdOfDeltaCrlCache;
       try {
         maxIdOfDeltaCrlCache = certstore.getMaxIdOfDeltaCrlCache(caIdent);
-        generateCrl(deltaCrl, thisUpdate, nextUpdate, CaAuditConstants.MSGID_ca_routine);
+        generateCrl(createDeltaCrlNow, now, nextUpdate, CaAuditConstants.MSGID_ca_routine);
       } catch (Throwable th) {
         LogUtil.error(LOG, th);
         return;
@@ -416,6 +362,8 @@ public class X509Ca implements Closeable {
 
   } // class SuspendedCertsRevoker
 
+  private static final TimeZone TIMEZONE_UTC = TimeZone.getTimeZone("UTC");
+
   private static final long MS_PER_SECOND = 1000L;
 
   private static final long MS_PER_MINUTE = 60000L;
@@ -424,7 +372,7 @@ public class X509Ca implements Closeable {
 
   private static final int MINUTE_PER_DAY = 24 * 60;
 
-  private static final long DAY_IN_MS = MS_PER_MINUTE * MINUTE_PER_DAY;
+  private static final long MS_PER_DAY = MS_PER_MINUTE * MINUTE_PER_DAY;
 
   private static final long MAX_CERT_TIME_MS = 253402300799982L; //9999-12-31-23-59-59
 
@@ -722,10 +670,9 @@ public class X509Ca implements Closeable {
     crlGenInProcess.set(true);
     try {
       Date thisUpdate = new Date();
-      Date nextUpdate = getCrlNextUpdate(thisUpdate);
-      if (nextUpdate != null && !nextUpdate.after(thisUpdate)) {
-        nextUpdate = null;
-      }
+      Date nearestScheduledIssueTime = getScheduledCrlGenTimeNotAfter(thisUpdate);
+      Date nextUpdate = new Date(nearestScheduledIssueTime.getTime()
+          + caInfo.getCrlControl().getFullCrlIntervals() * MS_PER_DAY);
 
       long maxIdOfDeltaCrlCache = certstore.getMaxIdOfDeltaCrlCache(caIdent);
       X509CRL crl = generateCrl(false, thisUpdate, nextUpdate, msgId);
@@ -1582,10 +1529,6 @@ public class X509Ca implements Closeable {
       return false;
     }
 
-    if (control.getUpdateMode() == UpdateMode.ONDEMAND) {
-      return false;
-    }
-
     int deltaCrlInterval = control.getDeltaCrlIntervals();
     return deltaCrlInterval != 0 && deltaCrlInterval < control.getFullCrlIntervals();
   } // method shouldPublishToDeltaCrlCache
@@ -2372,46 +2315,24 @@ public class X509Ca implements Closeable {
     return caManager;
   }
 
-  private Date getCrlNextUpdate(Date thisUpdate) {
-    Args.notNull(thisUpdate, "thisUpdate");
-    CrlControl control = caInfo.getCrlControl();
-    if (control.getUpdateMode() != UpdateMode.INTERVAL) {
-      return null;
-    }
+  /**
+   * Gets the nearest scheduled CRL generation time which is not after the given {@code time}.
+   * @param time the reference time
+   * @return the nearest scheduled time
+   */
+  private Date getScheduledCrlGenTimeNotAfter(Date time) {
+    Calendar cal = Calendar.getInstance(TIMEZONE_UTC);
+    cal.setTime(time);
+    HourMinute hm =  caInfo.getCrlControl().getIntervalDayTime();
+    cal.set(Calendar.HOUR, hm.getHour());
+    cal.set(Calendar.MINUTE, hm.getMinute());
+    cal.set(Calendar.SECOND, 0);
+    cal.set(Calendar.MILLISECOND, 0);
 
-    int intervalsTillNextCrl = 0;
-    for (int i = 1;; i++) {
-      if (i % control.getFullCrlIntervals() == 0) {
-        intervalsTillNextCrl = i;
-        break;
-      } else if (!control.isExtendedNextUpdate() && control.getDeltaCrlIntervals() > 0) {
-        if (i % control.getDeltaCrlIntervals() == 0) {
-          intervalsTillNextCrl = i;
-          break;
-        }
-      }
-    }
-
-    Date nextUpdate;
-    if (control.getIntervalMinutes() != null) {
-      int minutesTillNextUpdate = intervalsTillNextCrl * control.getIntervalMinutes()
-          + control.getOverlapMinutes();
-      nextUpdate = new Date(MS_PER_SECOND * (thisUpdate.getTime() / MS_PER_SECOND / 60
-          + minutesTillNextUpdate) * 60);
-    } else {
-      Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-      cal.setTime(thisUpdate);
-      cal.add(Calendar.DAY_OF_YEAR, intervalsTillNextCrl);
-      cal.set(Calendar.HOUR_OF_DAY, control.getIntervalDayTime().getHour());
-      cal.set(Calendar.MINUTE, control.getIntervalDayTime().getMinute());
-      cal.add(Calendar.MINUTE, control.getOverlapMinutes());
-      cal.set(Calendar.SECOND, 0);
-      cal.set(Calendar.MILLISECOND, 0);
-      nextUpdate = cal.getTime();
-    }
-
-    return nextUpdate;
-  } // method getCrlNextUpdate
+    long t1 = time.getTime() / 1000;
+    long tcal = cal.getTimeInMillis() / 1000;
+    return (t1 >= tcal) ? cal.getTime() : new Date(cal.getTimeInMillis() - MS_PER_DAY);
+  }
 
   private int removeExpirtedCerts(Date expiredAtTime, String msgId) throws OperationException {
     LOG.debug("revoking suspended certificates");
@@ -2492,13 +2413,13 @@ public class X509Ca implements Closeable {
     long ms;
     switch (val.getUnit()) {
       case DAY:
-        ms = val.getValidity() * DAY_IN_MS;
+        ms = val.getValidity() * MS_PER_DAY;
         break;
       case HOUR:
-        ms = val.getValidity() * DAY_IN_MS / 24;
+        ms = val.getValidity() * MS_PER_DAY / 24;
         break;
       case YEAR:
-        ms = val.getValidity() * 365 * DAY_IN_MS;
+        ms = val.getValidity() * 365 * MS_PER_DAY;
         break;
       default:
         throw new IllegalStateException(

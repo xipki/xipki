@@ -32,9 +32,6 @@ import org.xipki.util.TripleState;
 /**
  *<pre>
  * Example configuration
- * update.mode=&lt;'interval'|'ondemand'&gt;
- *
- * # For all updateMode
  *
  * # Whether expired certificates are considered. Default is false
  * expiredcerts.included=&lt;'true'|'false'&gt;
@@ -55,28 +52,23 @@ import org.xipki.util.TripleState;
  *
  * # The following settings are only for updateMode 'interval'
  *
- * # Number of intervals to generate a full CRL. Default is 1
+ * # Days between two full CRLs. Default is 1.
  * # Should be greater than 0
  * fullcrl.intervals=&lt;integer&gt;
  *
- * # should be 0 or not greater than baseCRL.intervals. Default is 0.
+ * # Elapsed days before a deltaCRL is generated since the last CRL or deltaCRL.
+ * # Should be 0 or a positive integer less than fullcrl.intervals. Default is 0.
  * # 0 indicates that no deltaCRL will be generated
  * deltacrl.intervals=&lt;integer&gt;
  *
+ * # Overlap minutes. At least 60 minutes
  * overlap.minutes=&lt;minutes of overlap&gt;
  *
- * # should be less than fullCRL.intervals.
- * # If activated, a deltaCRL will be generated only between two full CRLs
- * deltacrl.intervals=&lt;integer&gt;
+ * # UTC time of generation of CRL, one interval covers 1 day. Default is 01:00
+ * interval.time=&lt;update time (hh:mm of UTC time)&gt;
  *
- * # Exactly one of interval.minutes and interval.days should be specified
- * # Number of minutes of one interval. At least 60 minutes
- * interval.minutes=&lt;minutes of one interval&gt;
- *
- * # UTC time of generation of CRL, one interval covers 1 day.
- * interval.time=&lt;updatet time (hh:mm of UTC time)&gt;
- *
- * # Whether the nextUpdate of a fullCRL is the update time of the fullCRL
+ * # If set to true, the nextUpdate of a fullCRL is set to the update time of the next fullCRL.
+ * # otherwise set to that of the next CRL (fullCRL or deltaCRL)
  * # Default is false
  * fullcrl.extended.nextupdate=&lt;'true'|'false'&gt;
  *
@@ -102,30 +94,6 @@ import org.xipki.util.TripleState;
  */
 
 public class CrlControl {
-
-  public enum UpdateMode {
-
-    INTERVAL("interval"),
-    ONDEMAND("ondemand");
-
-    private String mode;
-
-    private UpdateMode(String mode) {
-      this.mode = mode;
-    }
-
-    public static UpdateMode forName(String mode) {
-      Args.notNull(mode, "mode");
-      for (UpdateMode v : values()) {
-        if (v.mode.equalsIgnoreCase(mode)) {
-          return v;
-        }
-      }
-
-      throw new IllegalArgumentException("invalid UpdateMode '" + mode + "'");
-    }
-
-  } // enum UpdateMode
 
   public static class HourMinute {
 
@@ -171,8 +139,6 @@ public class CrlControl {
 
   } // class HourMinute
 
-  public static final String KEY_UPDATE_MODE = "update.mode";
-
   public static final String KEY_EYTENSIONS = "extensions";
 
   public static final String KEY_EXPIRED_CERTS_INCLUDED = "expiredcerts.included";
@@ -187,8 +153,6 @@ public class CrlControl {
 
   public static final String KEY_OVERLAP_MINUTES = "overlap.minutes";
 
-  public static final String KEY_INTERVAL_MINUTES = "interval.minutes";
-
   public static final String KEY_INTERVAL_TIME = "interval.time";
 
   public static final String KEY_FULLCRL_EXTENDED_NEXTUPDATE = "fullcrl.extended.nextupdate";
@@ -201,8 +165,6 @@ public class CrlControl {
 
   public static final String KEY_INVALIDITY_DATE = "invalidity.date";
 
-  private UpdateMode updateMode = UpdateMode.INTERVAL;
-
   private boolean xipkiCertsetIncluded;
 
   private boolean xipkiCertsetCertIncluded = true;
@@ -213,11 +175,9 @@ public class CrlControl {
 
   private int deltaCrlIntervals;
 
-  private int overlapMinutes = 10;
+  private int overlapMinutes = 60;
 
   private boolean extendedNextUpdate;
-
-  private Integer intervalMinutes;
 
   private HourMinute intervalDayTime;
 
@@ -239,10 +199,7 @@ public class CrlControl {
       throw new InvalidConfException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
     }
 
-    String str = props.value(KEY_UPDATE_MODE);
-    this.updateMode = (str == null) ? UpdateMode.INTERVAL : UpdateMode.forName(str);
-
-    str = props.value(KEY_INVALIDITY_DATE);
+    String str = props.value(KEY_INVALIDITY_DATE);
     if (str != null) {
       this.invalidityDateMode = TripleState.valueOf(str);
     }
@@ -273,33 +230,30 @@ public class CrlControl {
     this.onlyContainsUserCerts = getBoolean(props, KEY_ONLY_CONTAINS_USERCERTS, false);
     this.excludeReason = getBoolean(props, KEY_EXCLUDE_REASON, false);
 
-    if (this.updateMode != UpdateMode.ONDEMAND) {
-      this.fullCrlIntervals = getInteger(props, KEY_FULLCRL_INTERVALS, 1);
-      this.deltaCrlIntervals = getInteger(props, KEY_DELTACRL_INTERVALS, 0);
-      this.extendedNextUpdate = getBoolean(props, KEY_FULLCRL_EXTENDED_NEXTUPDATE, false);
-      this.overlapMinutes = getInteger(props, KEY_OVERLAP_MINUTES, 60);
-      str = props.value(KEY_INTERVAL_TIME);
-      if (str != null) {
-        List<String> tokens = StringUtil.split(str.trim(), ":");
-        if (tokens.size() != 2) {
-          throw new InvalidConfException(
-              "invalid " + KEY_INTERVAL_TIME + ": '" + str + "'");
-        }
+    this.fullCrlIntervals = getInteger(props, KEY_FULLCRL_INTERVALS, 1);
+    this.deltaCrlIntervals = getInteger(props, KEY_DELTACRL_INTERVALS, 0);
+    this.extendedNextUpdate = getBoolean(props, KEY_FULLCRL_EXTENDED_NEXTUPDATE, false);
+    this.overlapMinutes = getInteger(props, KEY_OVERLAP_MINUTES, 60);
+    if (this.overlapMinutes < 60) {
+      // corrected to the minimal value 60 minutes
+      this.overlapMinutes = 60;
+    }
+    str = props.value(KEY_INTERVAL_TIME);
+    if (str == null) {
+      this.intervalDayTime = new HourMinute(1, 0);
+    } else {
+      List<String> tokens = StringUtil.split(str.trim(), ":");
+      if (tokens.size() != 2) {
+        throw new InvalidConfException(
+            "invalid " + KEY_INTERVAL_TIME + ": '" + str + "'");
+      }
 
-        try {
-          int hour = Integer.parseInt(tokens.get(0));
-          int minute = Integer.parseInt(tokens.get(1));
-          this.intervalDayTime = new HourMinute(hour, minute);
-        } catch (IllegalArgumentException ex) {
-          throw new InvalidConfException("invalid " + KEY_INTERVAL_TIME + ": '" + str + "'");
-        }
-      } else {
-        int minutes = getInteger(props, KEY_INTERVAL_MINUTES, 0);
-        if (minutes < this.overlapMinutes + 30) {
-          throw new InvalidConfException("invalid " + KEY_INTERVAL_MINUTES + ": '"
-              + minutes + " is less than than 30 + " + this.overlapMinutes);
-        }
-        this.intervalMinutes = minutes;
+      try {
+        int hour = Integer.parseInt(tokens.get(0));
+        int minute = Integer.parseInt(tokens.get(1));
+        this.intervalDayTime = new HourMinute(hour, minute);
+      } catch (IllegalArgumentException ex) {
+        throw new InvalidConfException("invalid " + KEY_INTERVAL_TIME + ": '" + str + "'");
       }
     }
 
@@ -308,7 +262,6 @@ public class CrlControl {
 
   public String getConf() {
     ConfPairs pairs = new ConfPairs();
-    pairs.putPair(KEY_UPDATE_MODE, updateMode.name());
     pairs.putPair(KEY_EXPIRED_CERTS_INCLUDED, Boolean.toString(includeExpiredCerts));
     pairs.putPair(KEY_XIPKI_CERTSET, Boolean.toString(xipkiCertsetIncluded));
     pairs.putPair(KEY_XIPKI_CERTSET_CERTS, Boolean.toString(xipkiCertsetCertIncluded));
@@ -317,19 +270,10 @@ public class CrlControl {
     pairs.putPair(KEY_ONLY_CONTAINS_USERCERTS, Boolean.toString(onlyContainsUserCerts));
     pairs.putPair(KEY_EXCLUDE_REASON, Boolean.toString(excludeReason));
     pairs.putPair(KEY_INVALIDITY_DATE, invalidityDateMode.name());
-    if (updateMode != UpdateMode.ONDEMAND) {
-      pairs.putPair(KEY_FULLCRL_INTERVALS, Integer.toString(fullCrlIntervals));
-      pairs.putPair(KEY_FULLCRL_EXTENDED_NEXTUPDATE, Boolean.toString(extendedNextUpdate));
-      pairs.putPair(KEY_DELTACRL_INTERVALS, Integer.toString(deltaCrlIntervals));
-
-      if (intervalDayTime != null) {
-        pairs.putPair(KEY_INTERVAL_TIME, intervalDayTime.toString());
-      }
-
-      if (intervalMinutes != null) {
-        pairs.putPair(KEY_INTERVAL_MINUTES, intervalMinutes.toString());
-      }
-    }
+    pairs.putPair(KEY_FULLCRL_INTERVALS, Integer.toString(fullCrlIntervals));
+    pairs.putPair(KEY_FULLCRL_EXTENDED_NEXTUPDATE, Boolean.toString(extendedNextUpdate));
+    pairs.putPair(KEY_DELTACRL_INTERVALS, Integer.toString(deltaCrlIntervals));
+    pairs.putPair(KEY_INTERVAL_TIME, intervalDayTime.toString());
 
     if (CollectionUtil.isNonEmpty(extensionOids)) {
       StringBuilder extensionsSb = new StringBuilder(200);
@@ -356,15 +300,10 @@ public class CrlControl {
     }
     String xipkiCertSetStr = sb.toString();
 
-    sb = new StringBuilder("generate CRL ");
-    if (intervalDayTime != null) {
-      sb.append("at ").append(intervalDayTime);
-    } else {
-      sb.append("every ").append(intervalMinutes).append(" minutes");
-    }
+    sb = new StringBuilder("generate CRL at ").append(intervalDayTime);
     String intervalStr = sb.toString();
 
-    return StringUtil.concatObjects("  update mode: ", updateMode,
+    return StringUtil.concatObjects(
         "\n  include expired certificates: ", includeExpiredCerts,
         "\n  full CRL intervals: ", fullCrlIntervals,
         "\n  delta CRL intervals: ", deltaCrlIntervals,
@@ -377,10 +316,6 @@ public class CrlControl {
         "\n  interval: ", intervalStr,
         "\n  XiPKI CertSet: ", xipkiCertSetStr,
         (verbose ? "\n  encoded: " : ""), (verbose ? getConf() : ""));
-  }
-
-  public UpdateMode getUpdateMode() {
-    return updateMode;
   }
 
   public boolean isXipkiCertsetIncluded() {
@@ -405,10 +340,6 @@ public class CrlControl {
 
   public int getOverlapMinutes() {
     return overlapMinutes;
-  }
-
-  public Integer getIntervalMinutes() {
-    return intervalMinutes;
   }
 
   public HourMinute getIntervalDayTime() {
@@ -443,10 +374,6 @@ public class CrlControl {
     if (onlyContainsCaCerts && onlyContainsUserCerts) {
       throw new InvalidConfException(
           "onlyContainsCACerts and onlyContainsUserCerts can not be both true");
-    }
-
-    if (updateMode == UpdateMode.ONDEMAND) {
-      return;
     }
 
     if (fullCrlIntervals < deltaCrlIntervals) {
@@ -499,27 +426,7 @@ public class CrlControl {
       return false;
     }
 
-    if (intervalMinutes == null) {
-      if (obj2.intervalMinutes != null) {
-        return false;
-      }
-    } else if (!intervalMinutes.equals(obj2.intervalMinutes)) {
-      return false;
-    }
-
-    if (intervalDayTime == null) {
-      if (obj2.intervalDayTime != null) {
-        return false;
-      }
-    } else if (!intervalDayTime.equals(obj2.intervalDayTime)) {
-      return false;
-    }
-
-    if (updateMode == null) {
-      if (obj2.updateMode != null) {
-        return false;
-      }
-    } else if (!updateMode.equals(obj2.updateMode)) {
+    if (!intervalDayTime.equals(obj2.intervalDayTime)) {
       return false;
     }
 

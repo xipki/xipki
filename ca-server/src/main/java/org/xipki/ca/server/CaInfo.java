@@ -330,10 +330,6 @@ public class CaInfo {
     return caEntry.getKeepExpiredCertInDays();
   }
 
-  public Date getCrlBaseTime() {
-    return caEntry.getCrlBaseTime();
-  }
-
   public BigInteger nextSerial() throws OperationException {
     return randomSnGenerator.nextSerialNumber(caEntry.getSerialNoBitLen());
   }
