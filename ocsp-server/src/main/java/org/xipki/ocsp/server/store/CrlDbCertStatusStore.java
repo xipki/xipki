@@ -83,8 +83,6 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
 
   private String certsDirName;
 
-  private boolean useUpdateDatesFromCrl;
-
   private boolean crlUpdated;
 
   private boolean crlUpdateFailed;
@@ -109,7 +107,6 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     this.caCert = parseCert(conf0.getCaCertFile());
     this.issuerCert = (conf0.getIssuerCertFile() == null) ? null
         : parseCert(conf0.getIssuerCertFile());
-    this.useUpdateDatesFromCrl = conf0.isUseUpdateDatesFromCrl();
 
     initializeStore(datasource);
     super.init(conf, datasource);
@@ -191,7 +188,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
         }
       }
 
-      ImportCrl importCrl = new ImportCrl(datasource, useUpdateDatesFromCrl, crl, crlUrl,
+      ImportCrl importCrl = new ImportCrl(datasource, crl, crlUrl,
           caCert, issuerCert, caRevInfo, certsDirName);
       updateCrlSuccessful = importCrl.importCrlToOcspDb();
       crlUpdated = true;

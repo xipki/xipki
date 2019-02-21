@@ -282,7 +282,7 @@ public class DbCertStatusStore extends OcspStore {
       Date thisUpdate;
       Date nextUpdate = null;
 
-      if (crlInfo != null && crlInfo.isUseCrlUpdates()) {
+      if (crlInfo != null) {
         thisUpdate = crlInfo.getThisUpdate();
 
         // this.nextUpdate is still in the future (10 seconds buffer)

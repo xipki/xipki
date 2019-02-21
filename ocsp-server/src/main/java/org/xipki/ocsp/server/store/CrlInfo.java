@@ -46,8 +46,6 @@ public class CrlInfo {
 
   public static final String THIS_UPDATE = "this-update";
 
-  public static final String USE_CRL_UPDATES = "use-crl-updates";
-
   private BigInteger crlNumber;
 
   private BigInteger baseCrlNumber;
@@ -55,8 +53,6 @@ public class CrlInfo {
   private Date thisUpdate;
 
   private Date nextUpdate;
-
-  private boolean useCrlUpdates;
 
   private CrlID crlId;
 
@@ -78,9 +74,6 @@ public class CrlInfo {
 
     str = getNotBlankValue(pairs, CRL_ID);
     this.crlId = CrlID.getInstance(Base64.decodeFast(str));
-
-    str = getNotBlankValue(pairs, USE_CRL_UPDATES);
-    this.useCrlUpdates = Boolean.parseBoolean(str);
   }
 
   private static final String getNotBlankValue(ConfPairs pairs, String name) {
@@ -91,11 +84,10 @@ public class CrlInfo {
     return str;
   }
 
-  public CrlInfo(BigInteger crlNumber, BigInteger baseCrlNumber, boolean useCrlUpdate,
+  public CrlInfo(BigInteger crlNumber, BigInteger baseCrlNumber,
       Date thisUpdate, Date nextUpdate, CrlID crlId) {
     this.crlNumber = Args.notNull(crlNumber, "crlNumber");
     this.baseCrlNumber = baseCrlNumber;
-    this.useCrlUpdates = useCrlUpdate;
     this.thisUpdate = Args.notNull(thisUpdate, "thisUpdate");
     this.nextUpdate = Args.notNull(nextUpdate, "nextUpdate");
     this.crlId = Args.notNull(crlId, "crlId");
@@ -107,7 +99,6 @@ public class CrlInfo {
     if (baseCrlNumber != null) {
       pairs.putPair(BASE_CRL_NUMBER, baseCrlNumber.toString(16));
     }
-    pairs.putPair(USE_CRL_UPDATES, Boolean.toString(useCrlUpdates));
     pairs.putPair(THIS_UPDATE, DateUtil.toUtcTimeyyyyMMddhhmmss(thisUpdate));
     pairs.putPair(NEXT_UPDATE, DateUtil.toUtcTimeyyyyMMddhhmmss(nextUpdate));
     pairs.putPair(CRL_ID, Base64.encodeToString(crlId.getEncoded()));
@@ -144,14 +135,6 @@ public class CrlInfo {
 
   public void setNextUpdate(Date nextUpdate) {
     this.nextUpdate = Args.notNull(nextUpdate, "nextUpdate");
-  }
-
-  public boolean isUseCrlUpdates() {
-    return useCrlUpdates;
-  }
-
-  public void setUseCrlUpdates(boolean useCrlUpdates) {
-    this.useCrlUpdates = useCrlUpdates;
   }
 
   public CrlID getCrlId() {

@@ -116,8 +116,6 @@ public class ImportCrl {
 
   private final DataSourceWrapper datasource;
 
-  private final boolean useCrlUpdates;
-
   // The CRL number of a DeltaCRL.
   private final BigInteger baseCrlNumber;
 
@@ -144,12 +142,11 @@ public class ImportCrl {
   private PreparedStatement psUpdateCert;
   private PreparedStatement psUpdateCertRev;
 
-  public ImportCrl(DataSourceWrapper datasource, boolean useCrlUpdates, X509CRL crl, String crlUrl,
+  public ImportCrl(DataSourceWrapper datasource, X509CRL crl, String crlUrl,
       X509Certificate caCert, X509Certificate issuerCert, CertRevocationInfo caRevInfo,
       String certsDirName) throws ImportCrlException, DataAccessException {
     this.datasource = Args.notNull(datasource, "datasource");
     this.certhashAlgo = DbCertStatusStore.getCertHashAlgo(datasource);
-    this.useCrlUpdates = useCrlUpdates;
     this.crl = Args.notNull(crl, "crl");
     this.caCert = Args.notNull(caCert, "caCert");
     this.x500PrincipalCaSubject = caCert.getSubjectX500Principal();
@@ -297,8 +294,7 @@ public class ImportCrl {
         throw new ImportCrlException("Given CRL is a deltaCRL for the full CRL with number "
             + baseCrlNumber + ", please import this full CRL first.");
       } else {
-        crlInfo = new CrlInfo(crlNumber, null, useCrlUpdates, crl.getThisUpdate(),
-            crl.getNextUpdate(), crlId);
+        crlInfo = new CrlInfo(crlNumber, null, crl.getThisUpdate(), crl.getNextUpdate(), crlId);
       }
     } else {
       if (crlNumber.compareTo(crlInfo.getCrlNumber()) < 0) {

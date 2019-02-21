@@ -906,13 +906,6 @@ public class OcspServerConf extends ValidatableConf {
     private String crlUrl;
 
     /**
-     * Where use thisUpdate and nextUpdate of CRL in the corresponding fields
-     * of OCSP response. The default value is true.
-     * optional. Default is true
-     */
-    private boolean useUpdateDatesFromCrl = true;
-
-    /**
      * CA cert file.
      */
     private String caCertFile;
@@ -943,14 +936,6 @@ public class OcspServerConf extends ValidatableConf {
 
     public void setCrlUrl(String crlUrl) {
       this.crlUrl = crlUrl;
-    }
-
-    public boolean isUseUpdateDatesFromCrl() {
-      return useUpdateDatesFromCrl;
-    }
-
-    public void setUseUpdateDatesFromCrl(boolean useUpdateDatesFromCrl) {
-      this.useUpdateDatesFromCrl = useUpdateDatesFromCrl;
     }
 
     public String getCaCertFile() {
