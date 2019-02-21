@@ -305,8 +305,17 @@ public class X509Ca implements Closeable {
         return;
       }
 
-      int intervals = createDeltaCrlNow
-          ? control.getDeltaCrlIntervals() : control.getFullCrlIntervals();
+      int intervals;
+      if (createDeltaCrlNow) {
+        intervals = control.getDeltaCrlIntervals();
+      } else {
+        if (!control.isExtendedNextUpdate() && control.getDeltaCrlIntervals() > 0) {
+          intervals = control.getDeltaCrlIntervals();
+        } else {
+          intervals = control.getFullCrlIntervals();
+        }
+      }
+
       Date nextUpdate =
           new Date(getScheduledCrlGenTimeNotAfter(now).getTime()
               + intervals * MS_PER_DAY
@@ -659,7 +668,8 @@ public class X509Ca implements Closeable {
   } // method cleanupCrls
 
   public X509CRL generateCrlOnDemand(String msgId) throws OperationException {
-    if (caInfo.getCrlControl() == null) {
+    CrlControl control = caInfo.getCrlControl();
+    if (control == null) {
       throw new OperationException(NOT_PERMITTED, "CA could not generate CRL");
     }
 
@@ -671,8 +681,16 @@ public class X509Ca implements Closeable {
     try {
       Date thisUpdate = new Date();
       Date nearestScheduledIssueTime = getScheduledCrlGenTimeNotAfter(thisUpdate);
+
+      int intervals;
+      if (!control.isExtendedNextUpdate() && control.getDeltaCrlIntervals() > 0) {
+        intervals = control.getDeltaCrlIntervals();
+      } else {
+        intervals = control.getFullCrlIntervals();
+      }
+
       Date nextUpdate = new Date(nearestScheduledIssueTime.getTime()
-          + caInfo.getCrlControl().getFullCrlIntervals() * MS_PER_DAY);
+          + intervals * MS_PER_DAY);
 
       long maxIdOfDeltaCrlCache = certstore.getMaxIdOfDeltaCrlCache(caIdent);
       X509CRL crl = generateCrl(false, thisUpdate, nextUpdate, msgId);
