@@ -47,7 +47,6 @@ import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.ca.api.mgmt.ProtocolSupport;
 import org.xipki.ca.api.mgmt.ScepControl;
 import org.xipki.ca.api.mgmt.ValidityMode;
-import org.xipki.ca.api.profile.Certprofile.CertValidity;
 import org.xipki.ca.server.SqlColumn.ColumnType;
 import org.xipki.ca.server.store.CertStore;
 import org.xipki.datasource.DataAccessException;
@@ -65,6 +64,7 @@ import org.xipki.util.ConfPairs;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ObjectCreationException;
 import org.xipki.util.StringUtil;
+import org.xipki.util.Validity;
 
 /**
  * TODO.
@@ -407,7 +407,7 @@ class CaManagerQueryExecutor {
       entry.setCert(generateCert(rs.getString("CERT")));
 
       entry.setStatus(CaStatus.forName(rs.getString("STATUS")));
-      entry.setMaxValidity(CertValidity.getInstance(rs.getString("MAX_VALIDITY")));
+      entry.setMaxValidity(Validity.getInstance(rs.getString("MAX_VALIDITY")));
       entry.setKeepExpiredCertInDays(rs.getInt("KEEP_EXPIRED_CERT_DAYS"));
 
       String crlsignerName = rs.getString("CRL_SIGNER_NAME");

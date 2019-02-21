@@ -19,7 +19,6 @@ package org.xipki.ca.api.profile;
 
 import java.io.Closeable;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,7 +26,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -47,6 +45,7 @@ import org.xipki.security.KeyUsage;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.StringUtil;
+import org.xipki.util.Validity;
 
 /**
  * TODO.
@@ -81,207 +80,6 @@ public abstract class Certprofile implements Closeable {
     RootCA,
     SubCA,
     EndEntity
-  }
-
-  public static class CertValidity implements Comparable<CertValidity> {
-
-    public enum Unit {
-
-      YEAR("y"),
-      DAY("d"),
-      HOUR("h"),
-      MINUTE("m");
-
-      private String suffix;
-
-      private Unit(String suffix) {
-        this.suffix = suffix;
-      }
-
-      public String getSuffix() {
-        return suffix;
-      }
-
-    } // enum Unit
-
-    private static final long MINUTE = 60L * 1000;
-
-    private static final long HOUR = 60L * MINUTE;
-
-    private static final long DAY = 24L * HOUR;
-
-    private static final TimeZone TIMEZONE_UTC = TimeZone.getTimeZone("UTC");
-
-    private int validity;
-    private Unit unit;
-
-    // For the deserialization only
-    @SuppressWarnings("unused")
-    private CertValidity() {
-    }
-
-    public CertValidity(int validity, Unit unit) {
-      this.validity = Args.positive(validity, "validity");
-      this.unit = Args.notNull(unit, "unit");
-    }
-
-    public static CertValidity getInstance(String validityS) {
-      Args.notBlank(validityS, "validityS");
-
-      final int len = validityS.length();
-      final char suffix = validityS.charAt(len - 1);
-      Unit unit;
-      String numValdityS;
-      if (suffix == 'y' || suffix == 'Y') {
-        unit = Unit.YEAR;
-        numValdityS = validityS.substring(0, len - 1);
-      } else if (suffix == 'd' || suffix == 'D') {
-        unit = Unit.DAY;
-        numValdityS = validityS.substring(0, len - 1);
-      } else if (suffix == 'h' || suffix == 'H') {
-        unit = Unit.HOUR;
-        numValdityS = validityS.substring(0, len - 1);
-      } else if (suffix == 'm' || suffix == 'M') {
-        unit = Unit.MINUTE;
-        numValdityS = validityS.substring(0, len - 1);
-      } else if (suffix >= '0' && suffix <= '9') {
-        unit = Unit.DAY;
-        numValdityS = validityS;
-      } else {
-        throw new IllegalArgumentException(String.format("invalid validityS: %s", validityS));
-      }
-
-      int validity;
-      try {
-        validity = Integer.parseInt(numValdityS);
-      } catch (NumberFormatException ex) {
-        throw new IllegalArgumentException(String.format("invalid validityS: %s", validityS));
-      }
-      return new CertValidity(validity, unit);
-    } // method getInstance
-
-    public void setValidity(int validity) {
-      this.validity = Args.positive(validity, "validity");
-    }
-
-    public int getValidity() {
-      return validity;
-    }
-
-    public void setUnit(Unit unit) {
-      this.unit = Args.notNull(unit, "unit");
-    }
-
-    public Unit getUnit() {
-      return unit;
-    }
-
-    public Date add(Date referenceDate) {
-      switch (unit) {
-        case DAY:
-          return new Date(referenceDate.getTime() + validity * DAY);
-        case YEAR:
-          Calendar cal = Calendar.getInstance(TIMEZONE_UTC);
-          cal.setTime(referenceDate);
-          cal.add(Calendar.YEAR, validity);
-
-          int month = cal.get(Calendar.MONTH);
-          // February
-          if (month == 1) {
-            int day = cal.get(Calendar.DAY_OF_MONTH);
-            if (day > 28) {
-              int year = cal.get(Calendar.YEAR);
-              day = isLeapYear(year) ? 29 : 28;
-            }
-          }
-
-          return cal.getTime();
-        case HOUR:
-          return new Date(referenceDate.getTime() + validity * HOUR);
-        case MINUTE:
-          return new Date(referenceDate.getTime() + validity * MINUTE);
-        default:
-          throw new IllegalStateException(String.format(
-              "should not reach here, unknown CertValidity.Unit %s", unit));
-      }
-    } // method add
-
-    private int approxMinutes() {
-      switch (unit) {
-        case HOUR:
-          return 60 * validity;
-        case DAY:
-          return 24 * 60 * validity;
-        case YEAR:
-          return (365 * 24 * validity + 6 * validity) * 60;
-        default:
-          throw new IllegalStateException(String.format(
-              "should not reach here, unknown CertValidity.Unit %s", unit));
-      }
-    }
-
-    @Override
-    public int hashCode() {
-      return toString().hashCode();
-    }
-
-    @Override
-    public int compareTo(CertValidity obj) {
-      Args.notNull(obj, "obj");
-      if (unit == obj.unit) {
-        if (validity == obj.validity) {
-          return 0;
-        }
-
-        return (validity < obj.validity) ? -1 : 1;
-      } else {
-        int thisMinutes = approxMinutes();
-        int thatMinutes = obj.approxMinutes();
-        if (thisMinutes == thatMinutes) {
-          return 0;
-        } else {
-          return (thisMinutes < thatMinutes) ? -1 : 1;
-        }
-      }
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (this == obj) {
-        return true;
-      } else if (!(obj instanceof CertValidity)) {
-        return false;
-      }
-
-      CertValidity other = (CertValidity) obj;
-      return unit == other.unit && validity == other.validity;
-    }
-
-    @Override
-    public String toString() {
-      switch (unit) {
-        case HOUR:
-          return validity + "h";
-        case DAY:
-          return validity + "d";
-        case YEAR:
-          return validity + "y";
-        default:
-          throw new IllegalStateException(String.format(
-              "should not reach here, unknown CertValidity.Unit %s", unit));
-      }
-    }
-
-    private static boolean isLeapYear(int year) {
-      if (year % 4 != 0) {
-        return false;
-      } else if (year % 100 != 0) {
-        return true;
-      } else {
-        return year % 400 == 0;
-      }
-    }
-
   }
 
   public static class ExtensionControl {
@@ -792,7 +590,7 @@ public abstract class Certprofile implements Closeable {
    */
   public abstract Date getNotBefore(Date notBefore);
 
-  public abstract CertValidity getValidity();
+  public abstract Validity getValidity();
 
   /**
    * Checks the public key. If the check passes, returns the canonicalized public key.

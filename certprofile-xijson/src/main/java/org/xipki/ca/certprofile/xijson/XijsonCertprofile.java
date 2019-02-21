@@ -128,6 +128,7 @@ import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
+import org.xipki.util.Validity;
 
 /**
  * TODO.
@@ -187,7 +188,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   private ExtensionValue policyMappings;
 
-  private CertValidity privateKeyUsagePeriod;
+  private Validity privateKeyUsagePeriod;
 
   private ExtensionValue qcStatments;
 
@@ -209,7 +210,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   private ExtensionValue tlsFeature;
 
-  private CertValidity validity;
+  private Validity validity;
 
   private X509CertVersion version;
 
@@ -325,7 +326,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     this.raOnly = conf.getRaOnly() == null ? false : conf.getRaOnly();
     this.maxSize = conf.getMaxSize();
 
-    this.validity = CertValidity.getInstance(conf.getValidity());
+    this.validity = Validity.getInstance(conf.getValidity());
     this.certLevel = conf.getCertLevel();
     if (this.certLevel == null) {
       throw new CertprofileException("invalid CertLevel");
@@ -790,7 +791,7 @@ public class XijsonCertprofile extends BaseCertprofile {
       extnIds.remove(type);
       PrivateKeyUsagePeriod extConf = getExtension(type, extensions).getPrivateKeyUsagePeriod();
       if (extConf != null) {
-        privateKeyUsagePeriod = CertValidity.getInstance(extConf.getValidity());
+        privateKeyUsagePeriod = Validity.getInstance(extConf.getValidity());
       }
     }
   }
@@ -1085,7 +1086,7 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method toOidList
 
   @Override
-  public CertValidity getValidity() {
+  public Validity getValidity() {
     return validity;
   }
 
@@ -1822,7 +1823,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     return policyMappings;
   }
 
-  public CertValidity getPrivateKeyUsagePeriod() {
+  public Validity getPrivateKeyUsagePeriod() {
     return privateKeyUsagePeriod;
   }
 

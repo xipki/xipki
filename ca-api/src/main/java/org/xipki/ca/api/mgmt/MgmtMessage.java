@@ -22,12 +22,12 @@ import java.security.cert.CertificateException;
 
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.InvalidConfException;
+import org.xipki.util.Validity;
 
 /**
  * TODO.
@@ -208,7 +208,7 @@ public abstract class MgmtMessage {
 
     private CaStatus status;
 
-    private Certprofile.CertValidity maxValidity;
+    private Validity maxValidity;
 
     private String signerType;
 
@@ -330,11 +330,11 @@ public abstract class MgmtMessage {
       this.status = status;
     }
 
-    public Certprofile.CertValidity getMaxValidity() {
+    public Validity getMaxValidity() {
       return maxValidity;
     }
 
-    public void setMaxValidity(Certprofile.CertValidity maxValidity) {
+    public void setMaxValidity(Validity maxValidity) {
       this.maxValidity = maxValidity;
     }
 

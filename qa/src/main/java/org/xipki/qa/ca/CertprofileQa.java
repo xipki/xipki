@@ -47,7 +47,6 @@ import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.bouncycastle.asn1.x509.Time;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.profile.Certprofile.CertValidity;
 import org.xipki.ca.api.profile.Certprofile.X509CertVersion;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
@@ -60,6 +59,7 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
+import org.xipki.util.Validity;
 
 /**
  * TODO.
@@ -239,7 +239,7 @@ public class CertprofileQa {
     } else if (cert.getNotBefore().before(issuerInfo.getCaNotBefore())) {
       issue.setFailureMessage("notBefore may not be before CA's notBefore");
     } else {
-      CertValidity validity = certprofile.getValidity();
+      Validity validity = certprofile.getValidity();
       Date expectedNotAfter = validity.add(cert.getNotBefore());
       if (expectedNotAfter.getTime() > MAX_CERT_TIME_MS) {
         expectedNotAfter = new Date(MAX_CERT_TIME_MS);

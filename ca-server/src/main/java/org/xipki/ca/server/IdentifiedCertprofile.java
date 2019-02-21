@@ -60,7 +60,6 @@ import org.xipki.ca.api.profile.BaseCertprofile;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.Certprofile.AuthorityInfoAccessControl;
 import org.xipki.ca.api.profile.Certprofile.CertLevel;
-import org.xipki.ca.api.profile.Certprofile.CertValidity;
 import org.xipki.ca.api.profile.Certprofile.ExtKeyUsageControl;
 import org.xipki.ca.api.profile.Certprofile.ExtensionControl;
 import org.xipki.ca.api.profile.Certprofile.GeneralNameMode;
@@ -79,6 +78,7 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
+import org.xipki.util.Validity;
 
 /**
  * TODO.
@@ -179,7 +179,7 @@ class IdentifiedCertprofile implements Closeable {
     return certprofile.getNotBefore(notBefore);
   }
 
-  public CertValidity getValidity() {
+  public Validity getValidity() {
     return certprofile.getValidity();
   }
 

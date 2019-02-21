@@ -157,6 +157,7 @@ import org.xipki.util.DateUtil;
 import org.xipki.util.HealthCheckResult;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
+import org.xipki.util.Validity;
 
 /**
  * TODO.
@@ -2191,7 +2192,7 @@ public class X509Ca implements Closeable {
       msgBuilder.append(", ").append(subjectInfo.getWarning());
     }
 
-    Certprofile.CertValidity validity = certprofile.getValidity();
+    Validity validity = certprofile.getValidity();
 
     if (validity == null) {
       validity = caInfo.getMaxValidity();
@@ -2427,7 +2428,7 @@ public class X509Ca implements Closeable {
 
     final int numEntries = 100;
 
-    Certprofile.CertValidity val = caInfo.revokeSuspendedCertsControl().getUnchangedSince();
+    Validity val = caInfo.revokeSuspendedCertsControl().getUnchangedSince();
     long ms;
     switch (val.getUnit()) {
       case DAY:

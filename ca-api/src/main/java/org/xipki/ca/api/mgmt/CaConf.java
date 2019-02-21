@@ -39,7 +39,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
@@ -54,6 +53,7 @@ import org.xipki.util.FileOrValue;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.ObjectCreationException;
+import org.xipki.util.Validity;
 
 import com.alibaba.fastjson.JSON;
 
@@ -384,7 +384,7 @@ public class CaConf {
               : ci.getKeepExpiredCertDays().intValue();
           caEntry.setKeepExpiredCertInDays(keepExpiredCertDays);
 
-          caEntry.setMaxValidity(Certprofile.CertValidity.getInstance(ci.getMaxValidity()));
+          caEntry.setMaxValidity(Validity.getInstance(ci.getMaxValidity()));
           caEntry.setPermission(getIntPermission(ci.getPermissions()));
 
           if (ci.getProtocolSupport() != null) {

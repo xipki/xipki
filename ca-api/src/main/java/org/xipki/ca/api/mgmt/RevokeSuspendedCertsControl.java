@@ -17,9 +17,9 @@
 
 package org.xipki.ca.api.mgmt;
 
-import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.security.CrlReason;
 import org.xipki.util.ConfPairs;
+import org.xipki.util.Validity;
 import org.xipki.util.Args;
 
 /**
@@ -45,15 +45,14 @@ public class RevokeSuspendedCertsControl {
 
   private CrlReason targetReason;
 
-  private Certprofile.CertValidity unchangedSince;
+  private Validity unchangedSince;
 
   // For the deserialization only
   @SuppressWarnings("unused")
   private RevokeSuspendedCertsControl() {
   }
 
-  public RevokeSuspendedCertsControl(CrlReason targetReason,
-      Certprofile.CertValidity unchangedSince) {
+  public RevokeSuspendedCertsControl(CrlReason targetReason, Validity unchangedSince) {
     this.targetReason = Args.notNull(targetReason, "targetReason");
     this.unchangedSince = Args.notNull(unchangedSince, "unchangedSince");
 
@@ -70,7 +69,7 @@ public class RevokeSuspendedCertsControl {
     }
   } // constructor
 
-  public void setUnchangedSince(Certprofile.CertValidity unchangedSince) {
+  public void setUnchangedSince(Validity unchangedSince) {
     this.unchangedSince = unchangedSince;
   }
 
@@ -82,7 +81,7 @@ public class RevokeSuspendedCertsControl {
     return targetReason;
   }
 
-  public Certprofile.CertValidity getUnchangedSince() {
+  public Validity getUnchangedSince() {
     return unchangedSince;
   }
 

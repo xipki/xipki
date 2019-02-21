@@ -72,8 +72,10 @@ import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
+import org.xipki.ca.api.RequestType;
 import org.xipki.ca.api.mgmt.CaConf;
 import org.xipki.ca.api.mgmt.CaConfType;
+import org.xipki.ca.api.mgmt.CaConfType.NameTypeConf;
 import org.xipki.ca.api.mgmt.CaManager;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaStatus;
@@ -86,10 +88,7 @@ import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.ca.api.mgmt.PermissionConstants;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.mgmt.RevokeSuspendedCertsControl;
-import org.xipki.ca.api.mgmt.CaConfType.NameTypeConf;
-import org.xipki.ca.api.RequestType;
 import org.xipki.ca.api.profile.Certprofile;
-import org.xipki.ca.api.profile.Certprofile.CertValidity;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.CertprofileFactoryRegister;
 import org.xipki.ca.api.publisher.CertPublisher;
@@ -124,6 +123,7 @@ import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
 import org.xipki.util.StringUtil;
+import org.xipki.util.Validity;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -727,8 +727,8 @@ public class CaManagerImpl implements CaManager, Closeable {
             : CrlReason.forNameOrText(str);
 
         str = extraControl.value(RevokeSuspendedCertsControl.KEY_UNCHANGED_SINCE);
-        CertValidity unchangedSince = (str == null) ? new CertValidity(15, CertValidity.Unit.DAY)
-            : CertValidity.getInstance(str);
+        Validity unchangedSince = (str == null) ? new Validity(15, Validity.Unit.DAY)
+            : Validity.getInstance(str);
         RevokeSuspendedCertsControl control = new RevokeSuspendedCertsControl(reason,
             unchangedSince);
         caEntry.setRevokeSuspendedCertsControl(control);

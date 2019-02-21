@@ -35,6 +35,7 @@ import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
+import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.CmpControl;
 import org.xipki.ca.api.mgmt.CrlControl;
@@ -44,8 +45,6 @@ import org.xipki.ca.api.mgmt.ProtocolSupport;
 import org.xipki.ca.api.mgmt.RevokeSuspendedCertsControl;
 import org.xipki.ca.api.mgmt.ScepControl;
 import org.xipki.ca.api.mgmt.ValidityMode;
-import org.xipki.ca.api.profile.Certprofile;
-import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.server.store.CertStore;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.ConcurrentContentSigner;
@@ -56,6 +55,7 @@ import org.xipki.security.XiSecurityException;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
+import org.xipki.util.Validity;
 
 /**
  * TODO.
@@ -165,11 +165,11 @@ public class CaInfo {
     return caEntry.getCaUris();
   }
 
-  public Certprofile.CertValidity getMaxValidity() {
+  public Validity getMaxValidity() {
     return caEntry.getMaxValidity();
   }
 
-  public void setMaxValidity(Certprofile.CertValidity maxValidity) {
+  public void setMaxValidity(Validity maxValidity) {
     caEntry.setMaxValidity(maxValidity);
   }
 

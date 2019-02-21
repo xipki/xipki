@@ -29,7 +29,6 @@ import java.util.Set;
 
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.profile.Certprofile.CertValidity;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
@@ -43,6 +42,7 @@ import org.xipki.util.CompareUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
+import org.xipki.util.Validity;
 
 /**
  * TODO.
@@ -108,7 +108,7 @@ public abstract class MgmtEntry {
 
     private CaStatus status;
 
-    private org.xipki.ca.api.profile.Certprofile.CertValidity maxValidity;
+    private Validity maxValidity;
 
     private String signerType;
 
@@ -209,11 +209,11 @@ public abstract class MgmtEntry {
       return ident;
     }
 
-    public CertValidity getMaxValidity() {
+    public Validity getMaxValidity() {
       return maxValidity;
     }
 
-    public void setMaxValidity(CertValidity maxValidity) {
+    public void setMaxValidity(Validity maxValidity) {
       this.maxValidity = maxValidity;
     }
 
@@ -826,7 +826,7 @@ public abstract class MgmtEntry {
 
     private CaStatus status;
 
-    private CertValidity maxValidity;
+    private Validity maxValidity;
 
     private String signerType;
 
@@ -899,11 +899,11 @@ public abstract class MgmtEntry {
       this.status = status;
     }
 
-    public CertValidity getMaxValidity() {
+    public Validity getMaxValidity() {
       return maxValidity;
     }
 
-    public void setMaxValidity(CertValidity maxValidity) {
+    public void setMaxValidity(Validity maxValidity) {
       this.maxValidity = maxValidity;
     }
 

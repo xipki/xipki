@@ -51,8 +51,8 @@ import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
-import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.ca.api.PublicCaInfo;
+import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
@@ -70,6 +70,7 @@ import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ObjectCreationException;
+import org.xipki.util.Validity;
 
 /**
  * TODO.
@@ -240,7 +241,7 @@ class SelfSignedCertBuilder {
       notBefore = new Date();
     }
 
-    Certprofile.CertValidity validity = certprofile.getValidity();
+    Validity validity = certprofile.getValidity();
     if (validity == null) {
       throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
           "no validity specified in the profile " + certprofile.getIdent());

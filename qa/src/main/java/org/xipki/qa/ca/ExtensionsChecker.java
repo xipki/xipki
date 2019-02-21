@@ -92,7 +92,6 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.profile.Certprofile.AuthorityInfoAccessControl;
 import org.xipki.ca.api.profile.Certprofile.CertLevel;
-import org.xipki.ca.api.profile.Certprofile.CertValidity;
 import org.xipki.ca.api.profile.Certprofile.ExtKeyUsageControl;
 import org.xipki.ca.api.profile.Certprofile.ExtensionControl;
 import org.xipki.ca.api.profile.Certprofile.GeneralNameMode;
@@ -142,6 +141,7 @@ import org.xipki.util.CompareUtil;
 import org.xipki.util.Hex;
 import org.xipki.util.LogUtil;
 import org.xipki.util.TripleState;
+import org.xipki.util.Validity;
 
 /**
  * TODO.
@@ -1877,7 +1877,7 @@ public class ExtensionsChecker {
       byte[] extensionValue, Date certNotBefore, Date certNotAfter) {
     ASN1GeneralizedTime notBefore = new ASN1GeneralizedTime(certNotBefore);
     Date dateNotAfter;
-    CertValidity privateKeyUsagePeriod = certprofile.getPrivateKeyUsagePeriod();
+    Validity privateKeyUsagePeriod = certprofile.getPrivateKeyUsagePeriod();
     if (privateKeyUsagePeriod == null) {
       dateNotAfter = certNotAfter;
     } else {
