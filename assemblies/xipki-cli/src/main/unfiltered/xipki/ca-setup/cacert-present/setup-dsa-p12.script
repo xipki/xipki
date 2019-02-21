@@ -35,7 +35,4 @@ xi:replace --old "REPLACEME-CA_SIGNERCONF" \
 
 ca:load-conf --conf-file xipki/setup/cacert-present/ca-conf.json
 
-echo "create initial CRL"
-ca:gen-crl --ca myca1
-
 source xipki/ca-setup/configure-ocsp.script

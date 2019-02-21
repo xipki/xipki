@@ -124,7 +124,7 @@
 				"crlSource":{
 					"crlFile":"xipki/etc/ocsp/crls/subcawithcrl1/crl.crl",
 					"crlUrl":"http://example.org/crl",
-					"useUpdateDatesFromCrl":false,
+					"useUpdateDatesFromCrl":true,
 					"caCertFile":"xipki/etc/ocsp/crls/subcawithcrl1/ca.crt",
 					"certsDir":"xipki/etc/ocsp/crls/subcawithcrl1/certs/"
 				}

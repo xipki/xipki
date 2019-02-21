@@ -67,7 +67,4 @@ xi:move-file ${KEYCERTS_DIR}/ca-myca1.der ${KEYCERTS_DIR}/myca1.der
 
 source xipki/ca-setup/cacert-none/configure-ca.script
 
-echo "create initial CRL"
-ca:gen-crl --ca myca1
-
 source xipki/ca-setup/configure-ocsp.script

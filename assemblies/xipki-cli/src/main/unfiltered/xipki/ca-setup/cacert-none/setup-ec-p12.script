@@ -1,5 +1,3 @@
-################################################################################
-#
 # Copyright (c) 2013 - 2018 Lijun Liao
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -60,8 +58,5 @@ xi:update-cert-p12 --p12 ${KEYCERTS_DIR}/myca1.p12 --password 1234 \
   --cert ${KEYCERTS_DIR}/myca1.der
 
 source xipki/ca-setup/cacert-none/configure-ca.script
-
-echo "create initial CRL"
-ca:gen-crl --ca myca1
 
 source xipki/ca-setup/configure-ocsp.script
