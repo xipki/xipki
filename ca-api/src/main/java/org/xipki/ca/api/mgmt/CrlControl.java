@@ -304,7 +304,7 @@ public class CrlControl {
     String intervalStr = sb.toString();
 
     return StringUtil.concatObjects(
-        "\n  include expired certificates: ", includeExpiredCerts,
+        "  include expired certificates: ", includeExpiredCerts,
         "\n  full CRL intervals: ", fullCrlIntervals,
         "\n  delta CRL intervals: ", deltaCrlIntervals,
         "\n  overlap: ", overlapMinutes, " minutes",

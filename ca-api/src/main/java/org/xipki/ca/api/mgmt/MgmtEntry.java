@@ -613,8 +613,8 @@ public abstract class MgmtEntry {
     @Override
     public String toString() {
       return StringUtil.concatObjectsCap(200, "requestor: ", requestorIdent,
-          ", ra: ", ra, ", profiles: ", profiles,
-          ", permission: ", PermissionConstants.permissionToString(permission));
+          "\nra: ", ra, "\nprofiles: ", profiles,
+          "\npermission: ", PermissionConstants.permissionToString(permission));
     }
 
     @Override

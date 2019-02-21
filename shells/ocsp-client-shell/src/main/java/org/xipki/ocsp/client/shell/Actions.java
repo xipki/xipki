@@ -572,6 +572,8 @@ public class Actions {
         }
       } // end if
 
+      println("producedAt " + basicResp.getProducedAt());
+
       for (int i = 0; i < n; i++) {
         if (n > 1) {
           println("---------------------------- " + i + "----------------------------");

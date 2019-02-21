@@ -51,6 +51,7 @@ import org.xipki.ca.api.mgmt.CaSystemStatus;
 import org.xipki.ca.api.mgmt.CmpControl;
 import org.xipki.ca.api.mgmt.CrlControl;
 import org.xipki.ca.api.mgmt.MgmtEntry;
+import org.xipki.ca.api.mgmt.PermissionConstants;
 import org.xipki.ca.api.mgmt.ProtocolSupport;
 import org.xipki.ca.api.mgmt.ScepControl;
 import org.xipki.ca.api.mgmt.ValidityMode;
@@ -833,10 +834,10 @@ public class CaActions {
       if (isNotEmpty(entries)) {
         sb.append("requestors trusted by CA " + caName).append("\n");
         for (MgmtEntry.CaHasRequestor entry : entries) {
-          sb.append("\t").append(entry).append("\n");
+          sb.append("----------\n").append(entry).append("\n");
         }
       } else {
-        sb.append("\tno requestor for CA " + caName + " is configured");
+        sb.append("no requestor for CA " + caName + " is configured");
       }
       println(sb.toString());
       return null;
@@ -2332,7 +2333,8 @@ public class CaActions {
         MgmtEntry.CaHasUser entry = caHasUsers.get(ca);
         sb.append("\n----- CA ").append(ca).append("-----");
         sb.append("\nprofiles: ").append(entry.getProfiles());
-        sb.append("\npermission: ").append(entry.getPermission());
+        sb.append("\npermission: ").append(
+            PermissionConstants.permissionToString(entry.getPermission()));
       }
       println(sb.toString());
       return null;
