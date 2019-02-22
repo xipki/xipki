@@ -24,6 +24,7 @@ import java.util.Date;
 
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.util.Args;
+import org.xipki.util.Validity;
 
 /**
  * TODO.
@@ -51,6 +52,8 @@ public abstract class OcspStore implements Closeable {
   protected boolean ignoreExpiredCert;
 
   protected boolean ignoreNotYetValidCert;
+
+  protected Validity minNextUpdatePeriod;
 
   public OcspStore() {
   }
@@ -87,7 +90,44 @@ public abstract class OcspStore implements Closeable {
    *          Whether to inherit CA revocation
    * @return the certificate status.
    */
-  public abstract CertStatusInfo getCertStatus(Date time, RequestIssuer reqIssuer,
+  public final CertStatusInfo getCertStatus(Date time, RequestIssuer reqIssuer,
+      BigInteger serialNumber, boolean includeCertHash, boolean includeRit,
+      boolean inheritCaRevocation) throws OcspStoreException {
+    CertStatusInfo info = getCertStatus0(time, reqIssuer, serialNumber,
+        includeCertHash, includeRit, inheritCaRevocation);
+    if (info != null && minNextUpdatePeriod != null) {
+      Date nextUpdate = info.getNextUpdate();
+      Date minNextUpdate = minNextUpdatePeriod.add(time);
+
+      if (nextUpdate != null) {
+        if (minNextUpdate.after(nextUpdate)) {
+          info.setNextUpdate(minNextUpdate);
+        }
+      } else {
+        info.setNextUpdate(minNextUpdate);
+      }
+    }
+
+    return info;
+  }
+
+  /**
+   * TODO.
+   * @param time
+   *          Time of the certificate status. Must not be {@code null}.
+   * @param reqIssuer
+   *          Requested issuer
+   * @param serialNumber
+   *          Serial number of the target certificate. Must not be {@code null}.
+   * @param includeCertHash
+   *          Whether to include the hash of target certificate in the response.
+   * @param includeRit
+   *          Whether to include the revocation invalidity time in the response.
+   * @param inheritCaRevocation
+   *          Whether to inherit CA revocation
+   * @return the certificate status.
+   */
+  protected abstract CertStatusInfo getCertStatus0(Date time, RequestIssuer reqIssuer,
       BigInteger serialNumber, boolean includeCertHash, boolean includeRit,
       boolean inheritCaRevocation) throws OcspStoreException;
 
@@ -157,6 +197,14 @@ public abstract class OcspStore implements Closeable {
 
   public void setIgnoreNotYetValidCert(boolean ignoreNotYetValidCert) {
     this.ignoreNotYetValidCert = ignoreNotYetValidCert;
+  }
+
+  public Validity getMinNextUpdatePeriod() {
+    return minNextUpdatePeriod;
+  }
+
+  public void setMinNextUpdatePeriod(Validity minNextUpdatePeriod) {
+    this.minNextUpdatePeriod = minNextUpdatePeriod;
   }
 
 }

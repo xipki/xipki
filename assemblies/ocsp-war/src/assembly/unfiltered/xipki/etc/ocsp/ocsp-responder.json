@@ -75,6 +75,7 @@
 		"includeArchiveCutoff":true,
 		"includeCrlId":false,
 		"retentionInterval":-1,
+		"minNextUpdatePeriod":"1d",
 		"source":{
 			"datasource":"datasource1",
 			"type":"xipki-db",

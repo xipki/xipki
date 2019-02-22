@@ -97,6 +97,7 @@
 		"includeArchiveCutoff":true,
 		"includeCrlId":false,
 		"retentionInterval":-1,
+		"minNextUpdatePeriod":"1d",
 		"source":{
 			"datasource":"datasource1",
 			"type":"xipki-db",
@@ -117,6 +118,7 @@
 		"includeArchiveCutoff":false,
 		"includeCrlId":true,
 		"retentionInterval":0,
+		"minNextUpdatePeriod":"1d",
 		"source":{
 			"datasource":"datasource-crl",
 			"type":"crl",

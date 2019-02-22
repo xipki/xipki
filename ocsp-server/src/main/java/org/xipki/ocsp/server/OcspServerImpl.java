@@ -826,7 +826,9 @@ public class OcspServerImpl implements OcspServer {
       if (exceptionOccurs) {
         return unsuccesfulOCSPRespMap.get(OcspResponseStatus.tryLater);
       } else {
-        certStatusInfo = CertStatusInfo.getIssuerUnknownCertStatusInfo(new Date(), null);
+        final long msPerDay = 86400000L; // 24 * 60 * 60 * 1000L;
+        Date nextUpdate = new Date(now.getTime() + msPerDay);
+        certStatusInfo = CertStatusInfo.getIssuerUnknownCertStatusInfo(now, nextUpdate);
       }
     } // end if
 
@@ -1028,6 +1030,7 @@ public class OcspServerImpl implements OcspServer {
 
     store.setIgnoreExpiredCert(getBoolean(conf.getIgnoreExpiredCert(), true));
     store.setIgnoreNotYetValidCert(getBoolean(conf.getIgnoreNotYetValidCert(), true));
+    store.setMinNextUpdatePeriod(conf.getMinNextUpdatePeriod());
 
     String datasourceName = conf.getSource().getDatasource();
     DataSourceWrapper datasource = null;

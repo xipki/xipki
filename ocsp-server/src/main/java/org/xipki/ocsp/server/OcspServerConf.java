@@ -27,6 +27,9 @@ import org.xipki.util.FileOrValue;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.TripleState;
 import org.xipki.util.ValidatableConf;
+import org.xipki.util.Validity;
+
+import com.alibaba.fastjson.annotation.JSONField;
 
 /**
  * TODO.
@@ -666,6 +669,8 @@ public class OcspServerConf extends ValidatableConf {
 
     private Boolean includeCrlId;
 
+    private Validity minNextUpdatePeriod;
+
     private String name;
 
     public Source getSource() {
@@ -730,6 +735,20 @@ public class OcspServerConf extends ValidatableConf {
 
     public void setName(String name) {
       this.name = name;
+    }
+
+    public Validity getMinNextUpdatePeriod() {
+      return minNextUpdatePeriod;
+    }
+
+    @JSONField(name = "minNextUpdatePeriod")
+    public String getMinNextUpdateText() {
+      return minNextUpdatePeriod == null ? "" : minNextUpdatePeriod.toString();
+    }
+
+    @JSONField(name = "minNextUpdatePeriod")
+    public void setMinNextUpdateText(String period) {
+      this.minNextUpdatePeriod = period == null ? null : Validity.getInstance(period);
     }
 
     @Override

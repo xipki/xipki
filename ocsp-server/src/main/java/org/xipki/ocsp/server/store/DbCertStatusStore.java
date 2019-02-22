@@ -248,9 +248,9 @@ public class DbCertStatusStore extends OcspStore {
   } // method initIssuerStore
 
   @Override
-  public CertStatusInfo getCertStatus(Date time, RequestIssuer reqIssuer, BigInteger serialNumber,
-      boolean includeCertHash, boolean includeRit, boolean inheritCaRevocation)
-      throws OcspStoreException {
+  protected CertStatusInfo getCertStatus0(Date time, RequestIssuer reqIssuer,
+      BigInteger serialNumber, boolean includeCertHash, boolean includeRit,
+      boolean inheritCaRevocation) throws OcspStoreException {
     if (serialNumber.signum() != 1) { // non-positive serial number
       return CertStatusInfo.getUnknownCertStatusInfo(new Date(), null);
     }
