@@ -73,6 +73,7 @@ import org.xipki.util.ConfPairs;
 import org.xipki.util.DateUtil;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
+import org.xipki.util.Validity;
 
 /**
  * TODO.
@@ -341,7 +342,7 @@ public class CaActions {
         entry.setCrlSignerName(crlSignerName);
       }
 
-      Certprofile.CertValidity tmpMaxValidity = Certprofile.CertValidity.getInstance(maxValidity);
+      Validity tmpMaxValidity = Validity.getInstance(maxValidity);
       entry.setMaxValidity(tmpMaxValidity);
 
       entry.setKeepExpiredCertInDays(keepExpiredCertInDays);
@@ -1159,7 +1160,7 @@ public class CaActions {
       }
 
       if (maxValidity != null) {
-        entry.setMaxValidity(Certprofile.CertValidity.getInstance(maxValidity));
+        entry.setMaxValidity(Validity.getInstance(maxValidity));
       }
 
       if (cmpControl != null) {
