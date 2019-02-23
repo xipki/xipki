@@ -19,7 +19,10 @@ package org.xipki.ocsp.servlet;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.Arrays;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -35,6 +38,8 @@ import org.xipki.ocsp.api.ResponderAndPath;
 import org.xipki.security.HashAlgo;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
+import org.xipki.util.Base64Url;
+import org.xipki.util.Hex;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
@@ -148,22 +153,24 @@ public class OcspServlet extends HttpServlet {
     }
 
     try {
-      // RFC2560 A.1.1 specifies that request longer than 255 bytes SHOULD be sent by
-      // POST, we support GET for longer requests anyway.
+      // 1. RFC 2560/6960 A.1.1 specifies that request longer than 255 bytes SHOULD be sent by
+      //    POST, we support GET for longer requests anyway.
+      // 2. If OCSP request is sent via HTTP GET, it should be Base64-then-URL encoded, we relax
+      //    this limitation by accepting also OCSP requests:
+      //      - Which are Base64Url encoded, and/or
+      //      - Which do not containing the Base64 padding char '='.
       if (b64OcspReq.length() > responder.getMaxRequestSize()) {
         sendError(resp, HttpServletResponse.SC_REQUEST_URI_TOO_LONG);
         return;
       }
 
-      // URL decode
-      b64OcspReq = URLDecoder.decode(b64OcspReq, "US-ASCII");
-      byte[] ocspReq = Base64.decode(b64OcspReq);
-      if (ocspReq == null) {
+      byte[] ocsReqBytes = base64Decode(b64OcspReq.getBytes("UTF-8"));
+      if (ocsReqBytes == null) {
         sendError(resp, HttpServletResponse.SC_BAD_REQUEST);
         return;
       }
 
-      OcspRespWithCacheInfo ocspRespWithCacheInfo = server.answer(responder, ocspReq, true);
+      OcspRespWithCacheInfo ocspRespWithCacheInfo = server.answer(responder, ocsReqBytes, true);
       if (ocspRespWithCacheInfo == null || ocspRespWithCacheInfo.getResponse() == null) {
         sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         return;
@@ -231,6 +238,53 @@ public class OcspServlet extends HttpServlet {
   private static void sendError(HttpServletResponse resp, int status) {
     resp.setStatus(status);
     resp.setContentLength(0);
+  }
+
+  private static byte[] base64Decode(byte[] b64OcspReqBytes) throws UnsupportedEncodingException {
+    // final byte[] b64OcspReqBytes = ocspReqInUrl.getBytes("UTF-8");
+    final int len = b64OcspReqBytes.length;
+    if (Base64.containsOnlyBase64Chars(b64OcspReqBytes, 0, len)) {
+      // Base64 encoded, no URL decoding is required
+      return Base64.decodeFast(b64OcspReqBytes);
+    } else if (Base64Url.containsOnlyBase64UrlChars(b64OcspReqBytes, 0, len)) {
+      // Base64Url encoded, no URL decode is required
+      return Base64Url.decodeFast(b64OcspReqBytes);
+    } else {
+      // Base64-then-URL encoded, URL decode required
+      // count the number of encoded chars
+      int cnt = 0;
+      for (int i = 0; i < len - 2; i++) {
+        if (b64OcspReqBytes[i] == '%') {
+          cnt++;
+          i += 2;
+        }
+      }
+
+      if (cnt == 0) {
+        return null;
+      }
+
+      byte[] realB64Bytes = new byte[len - cnt * 2];
+      for (int i = 0, j = 0; j < realB64Bytes.length; i++, j++) {
+        if (b64OcspReqBytes[i] == '%') {
+          realB64Bytes[j] = Hex.decodeSingle(b64OcspReqBytes, i + 1);
+          i += 2;
+        } else {
+          realB64Bytes[j] = b64OcspReqBytes[i];
+        }
+      }
+
+      if (Base64.containsOnlyBase64Chars(realB64Bytes, 0, len)) {
+        // Base64 encoded
+        return Base64.decodeFast(realB64Bytes);
+      } else if (Base64Url.containsOnlyBase64UrlChars(realB64Bytes, 0, len)) {
+        // Base64Url encoded
+        return Base64Url.decodeFast(realB64Bytes);
+      } else {
+        return null;
+      }
+    }
+
   }
 
 }

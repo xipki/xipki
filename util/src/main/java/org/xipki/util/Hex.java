@@ -122,4 +122,8 @@ public class Hex {
     return out;
   }
 
+  public static byte decodeSingle(byte[] array, int offset) {
+    return (byte) (HINTS[0xff & array[offset]] | LINTS[0xff & array[offset + 1]]);
+  }
+
 }
