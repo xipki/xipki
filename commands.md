@@ -2,7 +2,7 @@ XiPKI CLI Commands
 =====
 
 For the usage of CLI commands, just use the option `--help`. Most XiPKI commands can
-auto-completing the options and arguments by the `TAB` key.
+auto-complete the options and arguments by the `TAB` key.
 
 Basic Commands
 --
