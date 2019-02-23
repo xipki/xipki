@@ -59,6 +59,7 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
+import org.xipki.util.StringUtil;
 import org.xipki.util.Validity;
 
 /**
@@ -88,7 +89,9 @@ public class CertprofileQa {
   private final XijsonCertprofile certprofile;
 
   public CertprofileQa(String data) throws CertprofileException {
-    this(Args.notNull(data, "data").getBytes());
+    this(
+        StringUtil.toUtf8Bytes(
+            Args.notNull(data, "data")));
   }
 
   public CertprofileQa(byte[] dataBytes) throws CertprofileException {

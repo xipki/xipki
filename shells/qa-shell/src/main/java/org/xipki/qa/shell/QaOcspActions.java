@@ -207,8 +207,8 @@ public class QaOcspActions {
 
       if (shellFilePath != null) {
         File linuxShellFile = new File(shellFilePath + ".sh");
-        IoUtil.save(linuxShellFile, ("#!/bin/sh\n" + linuxMsg).getBytes());
-        IoUtil.save(shellFilePath + ".bat", ("@echo off\r\n" + winMsg).getBytes());
+        IoUtil.save(linuxShellFile, StringUtil.toUtf8Bytes("#!/bin/sh\n" + linuxMsg));
+        IoUtil.save(shellFilePath + ".bat", StringUtil.toUtf8Bytes("@echo off\r\n" + winMsg));
         linuxShellFile.setExecutable(true);
       }
 
@@ -218,7 +218,7 @@ public class QaOcspActions {
       if (respIssuerFile != null) {
         respIssuer = X509Util.parseCert(new File(respIssuerFile));
         IoUtil.save(new File(outDir, "responder-issuer.pem"),
-            X509Util.toPemCert(respIssuer).getBytes());
+            StringUtil.toUtf8Bytes(X509Util.toPemCert(respIssuer)));
       }
 
       RequestOptions requestOptions = getRequestOptions();
@@ -251,7 +251,7 @@ public class QaOcspActions {
           line = line.trim();
 
           if (line.startsWith("#") || line.isEmpty()) {
-            resultOut.write(line.getBytes());
+            resultOut.write(StringUtil.toUtf8Bytes(line));
             resultOut.write('\n');
             continue;
           }
@@ -460,12 +460,13 @@ public class QaOcspActions {
         OcspQaStatusAction.format(issue, "    ", sb);
       }
 
-      IoUtil.save(new File(detailsDir, hexSerial + "." + validity), sb.toString().getBytes());
+      IoUtil.save(new File(detailsDir, hexSerial + "." + validity),
+          StringUtil.toUtf8Bytes(sb.toString()));
       return ret;
     }
 
     private void println(String message, OutputStream out) throws IOException {
-      out.write(message.getBytes());
+      out.write(StringUtil.toUtf8Bytes(message));
       out.write('\n');
     }
 

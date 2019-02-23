@@ -271,7 +271,8 @@ class RefDigestReader implements Closeable {
         throw new IllegalArgumentException("no CA with id '" + caId + "' is available");
       }
 
-      caCert = X509Util.parseCert(rs.getString("CERT").getBytes());
+      caCert = X509Util.parseCert(
+          StringUtil.toUtf8Bytes(rs.getString("CERT")));
       rs.close();
 
       sql = "SELECT COUNT(*) FROM CERT WHERE " + colCaId + "=" + caId;

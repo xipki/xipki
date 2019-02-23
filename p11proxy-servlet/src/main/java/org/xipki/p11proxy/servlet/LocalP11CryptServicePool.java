@@ -30,6 +30,7 @@ import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.P11CryptService;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.security.pkcs11.P11TokenException;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.
@@ -96,12 +97,7 @@ public class LocalP11CryptServicePool {
 
   /* ID = SHA1(moduleName.getBytes("UTF-8")[1..15] */
   private static short deriveModuleId(String moduleName) throws XiSecurityException {
-    byte[] hash;
-    try {
-      hash = HashAlgo.SHA1.hash(moduleName.getBytes("UTF-8"));
-    } catch (UnsupportedEncodingException ex) {
-      throw new XiSecurityException("Unsupported charset UTF-8");
-    }
+    byte[] hash = HashAlgo.SHA1.hash(StringUtil.toUtf8Bytes(moduleName));
     int intCode = 0x7FFF & ((0xFF & hash[0]) << 8) | (0xFF & hash[1]);
     return (short) intCode;
   }

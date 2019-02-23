@@ -87,7 +87,7 @@ public class Base64 {
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
   private static final char[] CA = CA_TEXT.toCharArray();
 
-  private static final byte[] BASE64_BYTES = (CA_TEXT + "=\r\n").getBytes();
+  private static final byte[] BASE64_BYTES = StringUtil.toUtf8Bytes(CA_TEXT + "=\r\n");
 
   private static final int[] IA = new int[256];
 

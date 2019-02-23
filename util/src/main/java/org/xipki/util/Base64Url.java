@@ -14,7 +14,7 @@ public class Base64Url {
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
   private static final char[] CA = CA_TEXT.toCharArray();
 
-  private static final byte[] BASE64URL_BYTES = (CA_TEXT + "=").getBytes();
+  private static final byte[] BASE64URL_BYTES = StringUtil.toUtf8Bytes(CA_TEXT + "=");
 
   private static final int[] IA = new int[256];
 

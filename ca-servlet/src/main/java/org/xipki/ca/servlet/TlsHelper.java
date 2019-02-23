@@ -98,7 +98,7 @@ public class TlsHelper {
       }
 
       try {
-        clientCert = X509Util.parseCert(pemClientCert.getBytes());
+        clientCert = X509Util.parseCert(StringUtil.toUtf8Bytes(pemClientCert));
       } catch (CertificateException ex) {
         throw new IOException("could not parse Certificate", ex);
       }

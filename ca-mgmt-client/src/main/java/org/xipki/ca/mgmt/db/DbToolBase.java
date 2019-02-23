@@ -259,7 +259,7 @@ public class DbToolBase implements Closeable {
   }
 
   protected static void writeLine(OutputStream os, String text) throws IOException {
-    os.write(text.getBytes());
+    os.write(StringUtil.toUtf8Bytes(text));
     os.write('\n');
   }
 

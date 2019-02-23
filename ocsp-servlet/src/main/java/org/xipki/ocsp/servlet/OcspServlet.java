@@ -20,9 +20,6 @@ package org.xipki.ocsp.servlet;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.util.Arrays;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -164,7 +161,7 @@ public class OcspServlet extends HttpServlet {
         return;
       }
 
-      byte[] ocsReqBytes = base64Decode(b64OcspReq.getBytes("UTF-8"));
+      byte[] ocsReqBytes = base64Decode(StringUtil.toUtf8Bytes(b64OcspReq));
       if (ocsReqBytes == null) {
         sendError(resp, HttpServletResponse.SC_BAD_REQUEST);
         return;
@@ -241,7 +238,6 @@ public class OcspServlet extends HttpServlet {
   }
 
   private static byte[] base64Decode(byte[] b64OcspReqBytes) throws UnsupportedEncodingException {
-    // final byte[] b64OcspReqBytes = ocspReqInUrl.getBytes("UTF-8");
     final int len = b64OcspReqBytes.length;
     if (Base64.containsOnlyBase64Chars(b64OcspReqBytes, 0, len)) {
       // Base64 encoded, no URL decoding is required

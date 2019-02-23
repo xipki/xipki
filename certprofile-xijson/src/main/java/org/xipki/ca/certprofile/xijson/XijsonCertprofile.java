@@ -270,13 +270,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
     X509ProfileType conf;
     try {
-      byte[] bytes;
-      try {
-        bytes = data.getBytes("UTF-8");
-      } catch (UnsupportedEncodingException ex) {
-        bytes = data.getBytes();
-      }
-
+      byte[] bytes = StringUtil.toUtf8Bytes(data);
       conf = X509ProfileType.parse(new ByteArrayInputStream(bytes));
     } catch (RuntimeException ex) {
       LogUtil.error(LOG, ex);

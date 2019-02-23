@@ -453,9 +453,9 @@ public class Actions {
         while ((line = reader.readLine()) != null) {
           if (line.contains(oldText)) {
             changed = true;
-            writer.write(line.replace(oldText, newText).getBytes());
+            writer.write(StringUtil.toUtf8Bytes(line.replace(oldText, newText)));
           } else {
-            writer.write(line.getBytes());
+            writer.write(StringUtil.toUtf8Bytes(line));
           }
           writer.write('\n');
         }

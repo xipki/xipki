@@ -220,7 +220,7 @@ public class DbPorter extends DbToolBase {
 
     File file = new File(baseDir, fileName);
     IoUtil.mkdirsParent(file.toPath());
-    IoUtil.save(file, content.getBytes("UTF-8"));
+    IoUtil.save(file, StringUtil.toUtf8Bytes(content));
 
     ret.setFile(fileName);
     return ret;
@@ -283,7 +283,7 @@ public class DbPorter extends DbToolBase {
 
   public static void echoToFile(String content, File file) throws IOException {
     Files.write(Args.notNull(file, "file").toPath(),
-        Args.notNull(content, "content").getBytes());
+        StringUtil.toUtf8Bytes(Args.notNull(content, "content")));
   }
 
 }

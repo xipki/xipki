@@ -512,7 +512,7 @@ public class P11Actions {
       Signature sig = Signature.getInstance(sigAlgo, XiSecurityConstants.PROVIDER_NAME_XIPKI);
 
       if (StringUtil.isNotBlank(ida)) {
-        sig.setParameter(new XiSM2ParameterSpec(ida.getBytes()));
+        sig.setParameter(new XiSM2ParameterSpec(StringUtil.toUtf8Bytes(ida)));
       }
 
       sig.initSign(key);
@@ -524,7 +524,7 @@ public class P11Actions {
 
       Signature ver = Signature.getInstance(sigAlgo, "BC");
       if (StringUtil.isNotBlank(ida)) {
-        ver.setParameter(new SM2ParameterSpec(ida.getBytes()));
+        ver.setParameter(new SM2ParameterSpec(StringUtil.toUtf8Bytes(ida)));
       }
 
       ver.initVerify(cert.getPublicKey());

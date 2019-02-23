@@ -1188,7 +1188,7 @@ public class OcspServerImpl implements OcspServer {
   private static InputStream getInputStream(FileOrValue conf) throws IOException {
     return (conf.getFile() != null)
         ? Files.newInputStream(Paths.get(IoUtil.expandFilepath(conf.getFile())))
-        : new ByteArrayInputStream(conf.getValue().getBytes());
+        : new ByteArrayInputStream(StringUtil.toUtf8Bytes(conf.getValue()));
   }
 
   private static void closeStream(InputStream stream) {

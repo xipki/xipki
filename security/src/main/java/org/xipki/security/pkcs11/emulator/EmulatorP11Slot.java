@@ -724,7 +724,8 @@ class EmulatorP11Slot extends P11Slot {
     }
 
     try {
-      IoUtil.save(new File(pubKeyDir, hexId + INFO_FILE_SUFFIX), sb.toString().getBytes());
+      IoUtil.save(new File(pubKeyDir, hexId + INFO_FILE_SUFFIX),
+          StringUtil.toUtf8Bytes(sb.toString()));
     } catch (IOException ex) {
       throw new P11TokenException(ex.getMessage(), ex);
     }
@@ -766,7 +767,7 @@ class EmulatorP11Slot extends P11Slot {
         PROP_SHA1SUM, "=", HashAlgo.SHA1.hexHash(value), "\n");
 
     try {
-      IoUtil.save(new File(dir, hexId + INFO_FILE_SUFFIX), str.getBytes());
+      IoUtil.save(new File(dir, hexId + INFO_FILE_SUFFIX), StringUtil.toUtf8Bytes(str));
       IoUtil.save(new File(dir, hexId + VALUE_FILE_SUFFIX), value);
     } catch (IOException ex) {
       throw new P11TokenException("could not save certificate");

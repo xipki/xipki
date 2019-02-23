@@ -25,6 +25,7 @@ import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.xipki.util.Args;
+import org.xipki.util.StringUtil;
 
 /**
  * PBKDF2 salted password hashing.
@@ -62,7 +63,7 @@ public class PasswordHash {
    */
   public static String createHash(String password) {
     Args.notBlank(password, "password");
-    return createHash(password.getBytes());
+    return createHash(StringUtil.toUtf8Bytes(password));
   }
 
   /**
@@ -106,7 +107,7 @@ public class PasswordHash {
    */
   public static boolean validatePassword(String password, String correctHash) {
     Args.notBlank(password, "password");
-    return validatePassword(password.getBytes(), correctHash);
+    return validatePassword(StringUtil.toUtf8Bytes(password), correctHash);
   }
 
   /**
@@ -158,14 +159,8 @@ public class PasswordHash {
    * @return the PBDKF2 hash of the password
    */
   public static byte[] pbkdf2(byte[] password, byte[] salt, int iterations, int bytes) {
-    byte[] pwdBytes;
-    try {
-      pwdBytes = new String(password).getBytes("UTF-8");
-    } catch (UnsupportedEncodingException ex) {
-      throw new IllegalStateException("no charset UTF-8");
-    }
     synchronized (GEN) {
-      GEN.init(pwdBytes, salt, iterations);
+      GEN.init(password, salt, iterations);
       byte[] dk = ((KeyParameter) GEN.generateDerivedParameters(bytes * 8)).getKey();
       return dk;
     }

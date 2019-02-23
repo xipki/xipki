@@ -100,8 +100,8 @@ public class PBEPasswordService {
     random.nextBytes(salt);
     byte[] encrypted;
     try {
-      encrypted = PasswordBasedEncryption.encrypt(algo, new String(password).getBytes(),
-          masterPassword, iterationCount, salt);
+      encrypted = PasswordBasedEncryption.encrypt(algo,
+          StringUtil.toUtf8Bytes(new String(password)), masterPassword, iterationCount, salt);
     } catch (GeneralSecurityException ex) {
       throw new PasswordResolverException("could not encrypt the password: " + ex.getMessage());
     }

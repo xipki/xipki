@@ -258,7 +258,7 @@ public class CaConfs {
     ZipEntry certZipEntry = new ZipEntry(fileName);
     zipStream.putNextEntry(certZipEntry);
     try {
-      zipStream.write(content.getBytes("UTF-8"));
+      zipStream.write(StringUtil.toUtf8Bytes(content));
     } finally {
       zipStream.closeEntry();
     }

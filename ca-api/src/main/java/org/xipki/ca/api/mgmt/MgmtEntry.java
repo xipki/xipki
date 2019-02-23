@@ -1319,7 +1319,7 @@ public abstract class MgmtEntry {
 
       if (!faulty && TYPE_CERT.equalsIgnoreCase(type)) {
         try {
-          X509Certificate cert = X509Util.parseCert(conf.getBytes());
+          X509Certificate cert = X509Util.parseCert(StringUtil.toUtf8Bytes(conf));
           sb.append("cert:");
           sb.append("\n\tissuer: ").append(X509Util.getRfc4519Name(cert.getIssuerX500Principal()));
           sb.append("\n\tserialNumber: ").append(LogUtil.formatCsn(cert.getSerialNumber()));
@@ -1385,7 +1385,7 @@ public abstract class MgmtEntry {
       }
 
       try {
-        this.certificate = X509Util.parseCert(base64Cert.getBytes());
+        this.certificate = X509Util.parseCert(StringUtil.toUtf8Bytes(base64Cert));
       } catch (Throwable th) {
         this.certFaulty = true;
       }

@@ -51,6 +51,7 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.LogUtil;
+import org.xipki.util.StringUtil;
 import org.xipki.util.Args;
 import org.xipki.util.concurrent.ConcurrentBag;
 import org.xipki.util.concurrent.ConcurrentBagEntry;
@@ -459,7 +460,7 @@ class ResponseCacher implements Closeable {
           ps.setInt(1, id);
           rs = ps.executeQuery();
           rs.next();
-          X509Certificate cert = X509Util.parseCert(rs.getString("CERT").getBytes());
+          X509Certificate cert = X509Util.parseCert(StringUtil.toUtf8Bytes(rs.getString("CERT")));
           IssuerEntry caInfoEntry = new IssuerEntry(id, cert);
           issuerStore.addIssuer(caInfoEntry);
           LOG.info("added issuer {}", id);
@@ -502,7 +503,7 @@ class ResponseCacher implements Closeable {
 
       while (rs.next()) {
         int id = rs.getInt("ID");
-        X509Certificate cert = X509Util.parseCert(rs.getString("CERT").getBytes());
+        X509Certificate cert = X509Util.parseCert(StringUtil.toUtf8Bytes(rs.getString("CERT")));
         IssuerEntry caInfoEntry = new IssuerEntry(id, cert);
         RequestIssuer reqIssuer = new RequestIssuer(HashAlgo.SHA1,
             caInfoEntry.getEncodedHash(HashAlgo.SHA1));

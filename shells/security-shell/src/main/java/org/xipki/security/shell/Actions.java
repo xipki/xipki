@@ -755,7 +755,7 @@ public class Actions {
 
       String password = OBFPasswordService.deobfuscate(passwordHint);
       if (outFile != null) {
-        saveVerbose("saved the password to file", outFile, new String(password).getBytes());
+        saveVerbose("saved the password to file", outFile, StringUtil.toUtf8Bytes(password));
       } else {
         println("the password is: '" + new String(password) + "'");
       }
@@ -1065,7 +1065,8 @@ public class Actions {
 
       String passwordHint = OBFPasswordService.obfuscate(new String(password));
       if (outFile != null) {
-        saveVerbose("saved the obfuscated password to file", outFile, passwordHint.getBytes());
+        saveVerbose("saved the obfuscated password to file", outFile,
+            StringUtil.toUtf8Bytes(passwordHint));
       } else {
         println("the obfuscated password is: '" + passwordHint + "'");
       }
@@ -1137,7 +1138,8 @@ public class Actions {
       char[] password = PBEPasswordService.decryptPassword(masterPassword, passwordHint);
 
       if (outFile != null) {
-        saveVerbose("saved the password to file", outFile, new String(password).getBytes());
+        saveVerbose("saved the password to file", outFile,
+            StringUtil.toUtf8Bytes(new String(password)));
       } else {
         println("the password is: '" + new String(password) + "'");
       }
@@ -1208,7 +1210,8 @@ public class Actions {
       String passwordHint = PBEPasswordService.encryptPassword(PBEAlgo.PBEWithHmacSHA256AndAES_256,
           iterationCount, masterPassword, password);
       if (outFile != null) {
-        saveVerbose("saved the encrypted password to file", outFile, passwordHint.getBytes());
+        saveVerbose("saved the encrypted password to file", outFile,
+            StringUtil.toUtf8Bytes(passwordHint));
       } else {
         println("the encrypted password is: '" + passwordHint + "'");
       }

@@ -224,7 +224,7 @@ public class EmulatorP11Module extends P11Module {
       slotDir.mkdirs();
 
       File slotInfoFile = new File(slotDir, "slot.info");
-      IoUtil.save(slotInfoFile, "namedCurveSupported=true\n".getBytes());
+      IoUtil.save(slotInfoFile, StringUtil.toUtf8Bytes("namedCurveSupported=true\n"));
     }
   }
 

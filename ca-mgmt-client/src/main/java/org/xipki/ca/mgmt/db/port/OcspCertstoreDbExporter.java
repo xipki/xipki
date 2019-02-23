@@ -42,6 +42,7 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.util.Args;
 import org.xipki.util.IoUtil;
 import org.xipki.util.ProcessLog;
+import org.xipki.util.StringUtil;
 
 import com.alibaba.fastjson.JSON;
 
@@ -145,7 +146,7 @@ class OcspCertstoreDbExporter extends DbPorter {
         issuer.setId(id);
 
         String certFileName = "issuer-conf/cert-issuer-" + id;
-        IoUtil.save(new File(baseDir, certFileName), rs.getString("CERT").getBytes("UTF-8"));
+        IoUtil.save(new File(baseDir, certFileName), StringUtil.toUtf8Bytes(rs.getString("CERT")));
         issuer.setCertFile(certFileName);
         issuer.setRevInfo(rs.getString("REV_INFO"));
 

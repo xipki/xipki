@@ -24,6 +24,7 @@ import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.operator.RuntimeOperatorException;
 import org.xipki.util.Args;
+import org.xipki.util.StringUtil;
 import org.xipki.util.concurrent.ConcurrentBag;
 import org.xipki.util.concurrent.ConcurrentBagEntry;
 
@@ -58,12 +59,7 @@ public class FpIdCalculator {
    */
   public static long hash(String data) {
     Args.notNull(data, "data");
-    byte[] encoded;
-    try {
-      encoded = data.getBytes("UTF-8");
-    } catch (UnsupportedEncodingException ex) {
-      encoded = data.getBytes();
-    }
+    byte[] encoded = StringUtil.toUtf8Bytes(data);
     return hash(encoded);
   }
 

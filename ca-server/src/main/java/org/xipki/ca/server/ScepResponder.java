@@ -86,6 +86,7 @@ import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.Hex;
 import org.xipki.util.LogUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.
@@ -447,7 +448,7 @@ public class ScepResponder {
 
             String user = strs[0];
             String password = strs[1];
-            userIdent = ca.authenticateUser(user, password.getBytes());
+            userIdent = ca.authenticateUser(user, StringUtil.toUtf8Bytes(password));
             if (userIdent == null) {
               LOG.warn("tid={}: could not authenticate user {}", tid, user);
               throw FailInfoException.BAD_REQUEST;
@@ -708,7 +709,7 @@ public class ScepResponder {
     byte[] bytes = null;
     final int n = tid.length();
     if (n % 2 != 0) { // neither hex nor base64 encoded
-      bytes = tid.getBytes();
+      bytes = StringUtil.toUtf8Bytes(tid);
     } else {
       try {
         bytes = Hex.decode(tid);
@@ -724,7 +725,7 @@ public class ScepResponder {
     }
 
     if (bytes == null) {
-      bytes = tid.getBytes();
+      bytes = StringUtil.toUtf8Bytes(tid);
     }
 
     if (bytes.length > 20) {

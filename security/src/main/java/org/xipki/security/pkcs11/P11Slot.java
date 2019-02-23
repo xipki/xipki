@@ -1226,7 +1226,7 @@ public abstract class P11Slot implements Closeable {
     }
 
     if (sb.length() > 0) {
-      stream.write(sb.toString().getBytes());
+      stream.write(StringUtil.toUtf8Bytes(sb.toString()));
     }
   }
 

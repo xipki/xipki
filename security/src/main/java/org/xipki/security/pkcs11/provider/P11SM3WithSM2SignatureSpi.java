@@ -40,6 +40,7 @@ import org.xipki.security.pkcs11.P11PrivateKey;
 import org.xipki.security.pkcs11.P11TokenException;
 import org.xipki.security.util.GMUtil;
 import org.xipki.security.util.SignerUtil;
+import org.xipki.util.StringUtil;
 
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
@@ -93,7 +94,8 @@ public class P11SM3WithSM2SignatureSpi extends SignatureSpi {
       throw new InvalidKeyException("privateKey is not an EC private key: " + algo);
     }
 
-    byte[] userId = (paramSpec == null) ? "1234567812345678".getBytes() : paramSpec.getId();
+    byte[] userId = (paramSpec == null)
+        ? StringUtil.toUtf8Bytes("1234567812345678") : paramSpec.getId();
 
     if (signingKey.supportsMechanism(PKCS11Constants.CKM_VENDOR_SM2)) {
       mechanism = PKCS11Constants.CKM_VENDOR_SM2;

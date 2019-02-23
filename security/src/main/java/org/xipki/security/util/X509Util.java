@@ -99,11 +99,11 @@ import org.xipki.util.StringUtil;
 public class X509Util {
   private static final Logger LOG = LoggerFactory.getLogger(X509Util.class);
 
-  private static final byte[] BEGIN_PEM = "-----BEGIN".getBytes();
+  private static final byte[] BEGIN_PEM = StringUtil.toUtf8Bytes("-----BEGIN");
 
-  private static final byte[] END_PEM = "-----END".getBytes();
+  private static final byte[] END_PEM = StringUtil.toUtf8Bytes("-----END");
 
-  private static final byte[] PEM_SEP = "-----".getBytes();
+  private static final byte[] PEM_SEP = StringUtil.toUtf8Bytes("-----");
 
   private static CertificateFactory certFact;
 
@@ -354,12 +354,7 @@ public class X509Util {
   public static long fpCanonicalizedName(X500Name name) {
     Args.notNull(name, "name");
     String canonicalizedName = canonicalizName(name);
-    byte[] encoded;
-    try {
-      encoded = canonicalizedName.getBytes("UTF-8");
-    } catch (UnsupportedEncodingException ex) {
-      encoded = canonicalizedName.getBytes();
-    }
+    byte[] encoded = StringUtil.toUtf8Bytes(canonicalizedName);
     return FpIdCalculator.hash(encoded);
   }
 

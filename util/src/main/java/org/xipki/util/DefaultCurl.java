@@ -127,7 +127,7 @@ public class DefaultCurl implements Curl {
 
       if (userPassword != null) {
         httpConn.setRequestProperty("Authorization",
-            "Basic " + Base64.encodeToString(userPassword.getBytes()));
+            "Basic " + Base64.encodeToString(StringUtil.toUtf8Bytes(userPassword)));
       }
 
       Map<String, List<String>> properties;

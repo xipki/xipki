@@ -19,6 +19,8 @@ package org.xipki.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -269,6 +271,10 @@ public class StringUtil {
       sb.append(obj);
     }
     return sb.toString();
+  }
+
+  public static byte[] toUtf8Bytes(String str) {
+    return (str == null) ? null : str.getBytes(StandardCharsets.UTF_8);
   }
 
 }

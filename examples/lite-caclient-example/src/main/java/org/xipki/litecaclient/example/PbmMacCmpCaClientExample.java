@@ -97,7 +97,7 @@ public class PbmMacCmpCaClientExample extends CaClientExample {
       PbmMacCmpCaClient client = new PbmMacCmpCaClient(CMP_URL, caCert, requestorSubject,
           responderSubject, HASH_ALGO);
 
-      // SHA1("requestor-mac1".getBytes())
+      // SHA1("requestor-mac1".getBytes("UTF-8"))
       client.setKid(Hex.decode("466827c7757a70af71ca0338c01361aab2019dcf"));
       client.setPassword("123456".toCharArray());
       client.setRequestInterationCount(10240);

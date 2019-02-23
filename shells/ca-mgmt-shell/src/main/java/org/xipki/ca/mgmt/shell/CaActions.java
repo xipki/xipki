@@ -1500,7 +1500,7 @@ public class CaActions {
         println("cert profile does not have conf");
       } else {
         saveVerbose("saved cert profile configuration to", confFile,
-            entry.getConf().getBytes("UTF-8"));
+            StringUtil.toUtf8Bytes(entry.getConf());
       }
       return null;
     }
@@ -1685,7 +1685,7 @@ public class CaActions {
         println("publisher does not have conf");
       } else {
         saveVerbose("saved publisher configuration to", confFile,
-            entry.getConf().getBytes("UTF-8"));
+            StringUtil.toUtf8Bytes(entry.getConf()));
       }
       return null;
     }
@@ -1898,7 +1898,7 @@ public class CaActions {
       } else {
         entry = new MgmtEntry.Requestor(
                   new NameId(null, name), MgmtEntry.Requestor.TYPE_PBM, password);
-        String keyId = HashAlgo.SHA1.hexHash(entry.getIdent().getName().getBytes("UTF-8"));
+        String keyId = HashAlgo.SHA1.hexHash(StringUtil.toUtf8Bytes(entry.getIdent().getName()));
         println("The key ID is " + keyId);
       }
 

@@ -942,7 +942,7 @@ class CaManagerQueryExecutor {
 
         X509Certificate cert;
         try {
-          cert = X509Util.parseCert(rs.getString("CERT").getBytes());
+          cert = X509Util.parseCert(StringUtil.toUtf8Bytes(rs.getString("CERT")));
         } catch (CertificateException ex) {
           throw new CaMgmtException("could not parse the stored certificate for CA '"
               + changeCaEntry.getIdent() + "'" + ex.getMessage(), ex);

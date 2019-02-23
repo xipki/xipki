@@ -62,7 +62,7 @@ public class CanonicalizeCode {
       BufferedReader reader = Files.newBufferedReader(Paths.get("src/test/resources/HEADER.txt"));
       String line;
       while ((line = reader.readLine()) != null) {
-        headerLines.add(line.getBytes("utf-8"));
+        headerLines.add(StringUtil.toUtf8Bytes(line));
       }
       reader.close();
     } catch (Throwable th) {
@@ -402,7 +402,7 @@ public class CanonicalizeCode {
 
   private static void writeLine(OutputStream out, byte[] newLine, String line) throws IOException {
     if (StringUtil.isNotBlank(line)) {
-      out.write(line.getBytes());
+      out.write(StringUtil.toUtf8Bytes(line));
     }
     out.write(newLine);
   }

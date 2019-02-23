@@ -336,7 +336,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     if (calockId == null) {
       calockId = UUID.randomUUID().toString();
       try {
-        IoUtil.save(caLockFile, calockId.getBytes());
+        IoUtil.save(caLockFile, StringUtil.toUtf8Bytes(calockId));
       } catch (IOException ex) {
         LOG.error("could not save {}: {}", caLockFile.getName(), ex.getMessage());
       }
@@ -3232,7 +3232,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       ZipEntry certZipEntry = new ZipEntry(fileName);
       zipStream.putNextEntry(certZipEntry);
       try {
-        zipStream.write(content.getBytes("UTF-8"));
+        zipStream.write(StringUtil.toUtf8Bytes(content));
       } finally {
         zipStream.closeEntry();
       }

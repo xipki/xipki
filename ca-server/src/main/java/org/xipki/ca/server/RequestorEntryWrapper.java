@@ -32,6 +32,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.
@@ -61,7 +62,7 @@ public class RequestorEntryWrapper {
     dbEntry.setFaulty(true);
     if (MgmtEntry.Requestor.TYPE_CERT.equalsIgnoreCase(type)) {
       try {
-        X509Certificate x509Cert = X509Util.parseCert(conf.getBytes());
+        X509Certificate x509Cert = X509Util.parseCert(StringUtil.toUtf8Bytes(conf));
         dbEntry.setFaulty(false);
         this.cert = new CertWithDbId(x509Cert);
       } catch (CertificateException ex) {
@@ -69,10 +70,10 @@ public class RequestorEntryWrapper {
       }
     } else if (MgmtEntry.Requestor.TYPE_PBM.equalsIgnoreCase(type)) {
       try {
-        this.keyId = HashAlgo.SHA1.hash(dbEntry.getIdent().getName().getBytes("UTF-8"));
+        this.keyId = HashAlgo.SHA1.hash(StringUtil.toUtf8Bytes(dbEntry.getIdent().getName()));
         this.password = passwordResolver.resolvePassword(conf);
         dbEntry.setFaulty(false);
-      } catch (PasswordResolverException | UnsupportedEncodingException ex) {
+      } catch (PasswordResolverException ex) {
         LogUtil.error(LOG, ex, "error while resolve password of requestor" + dbEntry.getIdent());
       }
     }

@@ -21,6 +21,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.xipki.password.PBEAlgo;
 import org.xipki.password.PasswordBasedEncryption;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.
@@ -38,7 +39,7 @@ public class PBEWithHmacSHA256AndAES256Test {
   @Test
   public void encrypThenDecrypt() throws Exception {
     char[] password = "qwert".toCharArray();
-    byte[] plainText = "123456".getBytes();
+    byte[] plainText = StringUtil.toUtf8Bytes("123456");
     int iterationCount = 1000;
     byte[] encrypted = PasswordBasedEncryption.encrypt(algo, plainText, password,
         iterationCount, salt);
@@ -57,7 +58,7 @@ public class PBEWithHmacSHA256AndAES256Test {
     byte[] decrypted = PasswordBasedEncryption.decrypt(algo, encrypted, password,
         iterationCount, salt);
 
-    byte[] plainText = "123456".getBytes();
+    byte[] plainText = StringUtil.toUtf8Bytes("123456");
     Assert.assertArrayEquals(plainText, decrypted);
   }
 

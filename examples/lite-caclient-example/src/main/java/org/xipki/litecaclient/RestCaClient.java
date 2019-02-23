@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
@@ -57,7 +58,8 @@ public class RestCaClient implements Closeable {
 
   public RestCaClient(String caUrl, String user, String password) throws Exception {
     this.caUrl = new URL(SdkUtil.requireNonBlank("caUrl", caUrl)).toString();
-    this.authorization = Base64.getEncoder().encodeToString((user + ":" + password).getBytes());
+    this.authorization = Base64.getEncoder().encodeToString(
+                            (user + ":" + password).getBytes(StandardCharsets.UTF_8));
   }
 
   public void init() throws Exception {

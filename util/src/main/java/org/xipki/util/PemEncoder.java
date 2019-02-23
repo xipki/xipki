@@ -76,8 +76,8 @@ public class PemEncoder {
     private final byte[] postfix;
 
     private PemLabel(String label) {
-      this.prefix = ("-----BEGIN " + label + "-----\r\n").getBytes();
-      this.postfix = ("\r\n-----END " + label + "-----").getBytes();
+      this.prefix = StringUtil.toUtf8Bytes("-----BEGIN " + label + "-----\r\n");
+      this.postfix = StringUtil.toUtf8Bytes("\r\n-----END " + label + "-----");
     }
 
   }

@@ -170,7 +170,7 @@ class DigestDiffReporter implements Closeable {
         "\n     speed: ", speedStr, "\n");
 
     try {
-      IoUtil.save(reportDirname + File.separator + "overview.txt", str.getBytes());
+      IoUtil.save(reportDirname + File.separator + "overview.txt", StringUtil.toUtf8Bytes(str));
     } catch (IOException ex) {
       System.out.println("Could not write overview.txt with following content\n" + str);
     }
