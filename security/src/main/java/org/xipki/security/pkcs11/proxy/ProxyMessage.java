@@ -1112,7 +1112,7 @@ public abstract class ProxyMessage extends ASN1Object {
           int tag = tagAsn1.getTagNo();
           if (tag == 1) {
             publicKeyLabel = DERUTF8String.getInstance(tagAsn1.getObject()).getString();
-          } else if (tag == 1) {
+          } else if (tag == 2) {
             certLabel = DERUTF8String.getInstance(tagAsn1.getObject()).getString();
           }
         }

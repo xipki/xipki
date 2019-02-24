@@ -354,18 +354,20 @@ public final class CmpClientImpl implements CmpClient {
           return false;
         }
 
-        SslConf sslConf = null;
+        SSLSocketFactory sslSocketFactory = null;
+        HostnameVerifier hostnameVerifier = null;
         if (caType.getSsl() != null) {
-          sslConf = sslConfs.get(caType.getSsl());
+          SslConf sslConf = sslConfs.get(caType.getSsl());
           if (sslConf == null) {
             LOG.error("no ssl named {} is configured", caType.getSsl());
-            return false;
+          } else {
+              sslSocketFactory = sslConf.getSslSocketFactory();
+              hostnameVerifier = sslConf.getHostnameVerifier();
           }
         }
 
         CaConf ca = new CaConf(caName, caType.getUrl(), caType.getHealthUrl(),
-            caType.getRequestor(), responder,
-            sslConf.getSslSocketFactory(), sslConf.getHostnameVerifier());
+            caType.getRequestor(), responder, sslSocketFactory, hostnameVerifier);
 
         // CA cert
         if (caType.getCaCert().isAutoconf()) {

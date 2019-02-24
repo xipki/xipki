@@ -187,7 +187,8 @@ public class BenchmarkHttpClient {
       // protocols
       builder.protocols("TLSv1.1", "TLSv1.2");
 
-      return builder.build();
+      sslContext = builder.build();
+      return sslContext;
     }
 
     private static KeyStore loadKeyStore(String storeType, String store, char[] password)
