@@ -55,7 +55,6 @@ import org.xipki.ca.api.mgmt.PermissionConstants;
 import org.xipki.ca.api.mgmt.ProtocolSupport;
 import org.xipki.ca.api.mgmt.ScepControl;
 import org.xipki.ca.api.mgmt.ValidityMode;
-import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
@@ -1500,7 +1499,7 @@ public class CaActions {
         println("cert profile does not have conf");
       } else {
         saveVerbose("saved cert profile configuration to", confFile,
-            StringUtil.toUtf8Bytes(entry.getConf());
+            StringUtil.toUtf8Bytes(entry.getConf()));
       }
       return null;
     }

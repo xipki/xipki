@@ -17,7 +17,6 @@
 
 package org.xipki.security;
 
-import java.io.UnsupportedEncodingException;
 import java.util.concurrent.TimeUnit;
 
 import org.bouncycastle.crypto.Digest;

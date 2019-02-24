@@ -17,7 +17,6 @@
 
 package org.xipki.p11proxy.servlet;
 
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
