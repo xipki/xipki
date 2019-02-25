@@ -1023,14 +1023,14 @@ public class OcspServerImpl implements OcspServer {
         store = new DbCertStatusStore();
       } else if (STORE_TYPE_CRL.equalsIgnoreCase(type)) {
         store = new CrlDbCertStatusStore();
-      } else if (type.startsWith("java:")){
+      } else if (type.startsWith("java:")) {
         String className = type.substring("java:".length()).trim();
         try {
           Class<?> clazz = Class.forName(className, false, getClass().getClassLoader());
           store = (OcspStore) clazz.newInstance();
         } catch (ClassNotFoundException | ClassCastException | InstantiationException
                 | IllegalAccessException ex) {
-              throw new InvalidConfException("ObjectCreationException of store " + conf.getName()
+          throw new InvalidConfException("ObjectCreationException of store " + conf.getName()
               + ":" + ex.getMessage(), ex);
         }
       } else {

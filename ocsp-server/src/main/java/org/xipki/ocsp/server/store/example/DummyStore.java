@@ -52,8 +52,8 @@ import com.alibaba.fastjson.JSON;
  *           }
  *       },
  * </pre>
- * Where the CA-certificate-file is either the CA certificate in DER or PEM format.<p/>
- *
+ * Where the CA-certificate-file is either the CA certificate in DER or PEM format.
+ * <p/>
  * This dummy store returns the following certificate status
  * <ul>
  * <li>GOOD if serial-number % 3 == 0</li>
@@ -88,7 +88,10 @@ public class DummyStore extends OcspStore {
   private X509Certificate issuerCert;
 
   public DummyStore() {
-    LOG.error("This DummyStore is only for demo, do NOT use it production environment");
+    LOG.error("\n"
+        + "--------------------------------------------------------\n"
+        + " ONLY FOR DEMO, DO NOT USE IT IN PRODUCTION ENVIRONMENT\n"
+        + "--------------------------------------------------------");
   }
 
   @Override
@@ -97,12 +100,12 @@ public class DummyStore extends OcspStore {
 
   @Override
   public boolean knowsIssuer(RequestIssuer reqIssuer) {
-      return issuserEntry.matchHash(reqIssuer);
+    return issuserEntry.matchHash(reqIssuer);
   }
 
   @Override
   public X509Certificate getIssuerCert(RequestIssuer reqIssuer) {
-      return issuserEntry.matchHash(reqIssuer) ? issuerCert : null;
+    return issuserEntry.matchHash(reqIssuer) ? issuerCert : null;
   }
 
   @Override
@@ -118,12 +121,12 @@ public class DummyStore extends OcspStore {
     Date nextUpdate = new Date(thisUpdate.getTime() + 12 * 60 * 60 * 1000L); // 12 hours
 
     if (rest == 0) {
-        return CertStatusInfo.getGoodCertStatusInfo(new Date(), nextUpdate);
+      return CertStatusInfo.getGoodCertStatusInfo(new Date(), nextUpdate);
     } else if (rest == 1) {
-        CertRevocationInfo revInfo = new CertRevocationInfo(CrlReason.KEY_COMPROMISE);
-        return CertStatusInfo.getRevokedCertStatusInfo(revInfo, thisUpdate, nextUpdate);
+      CertRevocationInfo revInfo = new CertRevocationInfo(CrlReason.KEY_COMPROMISE);
+      return CertStatusInfo.getRevokedCertStatusInfo(revInfo, thisUpdate, nextUpdate);
     } else {
-        return CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, nextUpdate);
+      return CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, nextUpdate);
     }
   }
 
@@ -156,7 +159,7 @@ public class DummyStore extends OcspStore {
 
   @Override
   public boolean isHealthy() {
-      return true;
+    return true;
   }
 
 }
