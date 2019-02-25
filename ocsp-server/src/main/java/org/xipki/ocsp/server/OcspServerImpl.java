@@ -63,11 +63,13 @@ import org.xipki.ocsp.api.OcspServer;
 import org.xipki.ocsp.api.OcspStore;
 import org.xipki.ocsp.api.OcspStore.SourceConf;
 import org.xipki.ocsp.api.OcspStoreException;
-import org.xipki.ocsp.api.OcspStoreFactoryRegister;
+import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.ocsp.api.Responder;
 import org.xipki.ocsp.api.ResponderAndPath;
 import org.xipki.ocsp.server.OcspServerConf.EmbedCertsMode;
 import org.xipki.ocsp.server.ResponderOption.OcspMode;
+import org.xipki.ocsp.server.store.CrlDbCertStatusStore;
+import org.xipki.ocsp.server.store.DbCertStatusStore;
 import org.xipki.ocsp.server.type.CertID;
 import org.xipki.ocsp.server.type.EncodingException;
 import org.xipki.ocsp.server.type.ExtendedExtension;
@@ -146,6 +148,10 @@ public class OcspServerImpl implements OcspServer {
 
   public static final long DFLT_CACHE_MAX_AGE = 60; // 1 minute
 
+  private static final String STORE_TYPE_XIPKI_DB = "xipki-db";
+
+  private static final String STORE_TYPE_CRL = "crl";
+
   private static final byte[] DERNullBytes = new byte[]{0x05, 0x00};
 
   private static final byte[] bytes_certstatus_good = new byte[]{(byte) 0x80, 0x00};
@@ -170,8 +176,6 @@ public class OcspServerImpl implements OcspServer {
   private boolean master;
 
   private ResponseCacher responseCacher;
-
-  private OcspStoreFactoryRegister ocspStoreFactoryRegister;
 
   private Map<String, ResponderImpl> responders = new HashMap<>();
 
@@ -807,8 +811,13 @@ public class OcspServerImpl implements OcspServer {
 
     BigInteger serial = certId.getSerialNumber();
 
+    RequestIssuer reqIssuer = certId.getIssuer();
     Date now = new Date();
     for (OcspStore store : responder.getStores()) {
+      if (!store.knowsIssuer(reqIssuer)) {
+        continue;
+      }
+
       try {
         certStatusInfo = store.getCertStatus(now, certId.getIssuer(), serial,
             repOpt.isIncludeCerthash(), repOpt.isIncludeInvalidityDate(),
@@ -957,10 +966,6 @@ public class OcspServerImpl implements OcspServer {
     return result;
   } // method healthCheck
 
-  public void setOcspStoreFactoryRegister(OcspStoreFactoryRegister ocspStoreFactoryRegister) {
-    this.ocspStoreFactoryRegister = ocspStoreFactoryRegister;
-  }
-
   public void refreshTokenForSignerType(String signerType) throws XiSecurityException {
     securityFactory.refreshTokenForSignerType(signerType);
   }
@@ -1013,7 +1018,14 @@ public class OcspServerImpl implements OcspServer {
       throws InvalidConfException {
     OcspStore store;
     try {
-      store = ocspStoreFactoryRegister.newOcspStore(conf.getSource().getType());
+      String type = conf.getSource().getType();
+      if (STORE_TYPE_XIPKI_DB.equalsIgnoreCase(type)) {
+        store = new DbCertStatusStore();
+      } else if (STORE_TYPE_CRL.equalsIgnoreCase(type)) {
+        store = new CrlDbCertStatusStore();
+      } else {
+        throw new ObjectCreationException("unknown type OCSP store type " + type);
+      }
     } catch (ObjectCreationException ex) {
       throw new InvalidConfException("ObjectCreationException of store " + conf.getName()
           + ":" + ex.getMessage(), ex);

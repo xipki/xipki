@@ -40,9 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException;
-import org.xipki.ocsp.api.OcspStoreFactoryRegister;
 import org.xipki.ocsp.server.OcspServerImpl;
-import org.xipki.ocsp.server.store.OcspStoreFactoryImpl;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.Securities;
 import org.xipki.security.util.X509Util;
@@ -63,6 +61,12 @@ public class OcspServletFilter implements Filter {
   private static final String DFLT_OCSP_SERVER_CFG = "xipki/etc/org.xipki.ocsp.server.cfg";
 
   private static final String DFLT_CONF_FILE = "xipki/etc/ocsp/ocsp-responder.json";
+
+  private static final String PROP_REMOTE_MGMT_ENABLED = "remote.mgmt.enabled";
+
+  private static final String PROP_REMOTE_MGMT_CERTS = "remote.mgmt.certs";
+
+  private static final String PROP_CONFFILE = "confFile";
 
   private Securities securities;
 
@@ -101,12 +105,7 @@ public class OcspServletFilter implements Filter {
     OcspServerImpl ocspServer = new OcspServerImpl();
     ocspServer.setSecurityFactory(securities.getSecurityFactory());
 
-    OcspStoreFactoryRegister ocspStoreFactoryRegister = new OcspStoreFactoryRegister();
-    ocspStoreFactoryRegister.registFactory(new OcspStoreFactoryImpl());
-
-    ocspServer.setOcspStoreFactoryRegister(ocspStoreFactoryRegister);
-
-    String confFile = props.getProperty("confFile", DFLT_CONF_FILE);
+    String confFile = props.getProperty(PROP_CONFFILE, DFLT_CONF_FILE);
     ocspServer.setConfFile(confFile);
 
     try {
@@ -123,11 +122,11 @@ public class OcspServletFilter implements Filter {
     this.ocspServlet.setServer(this.server);
 
     this.remoteMgmtEnabled =
-        Boolean.parseBoolean(props.getProperty("remote.mgmt.enabled", "false"));
+        Boolean.parseBoolean(props.getProperty(PROP_REMOTE_MGMT_ENABLED, "false"));
     LOG.info("remote management is {}", remoteMgmtEnabled ? "enabled" : "disabled");
 
     if (remoteMgmtEnabled) {
-      String certFiles = props.getProperty("remote.mgmt.certs");
+      String certFiles = props.getProperty(PROP_REMOTE_MGMT_CERTS);
       if (certFiles == null) {
         LOG.error("no client certificate is configured, disable the remote managent");
       } else {
@@ -141,7 +140,6 @@ public class OcspServletFilter implements Filter {
           } catch (CertificateException | IOException ex) {
             LogUtil.error(LOG, ex, "could not parse the client certificate " + fileName);
           }
-
         }
 
         if (certs.isEmpty()) {
