@@ -65,6 +65,8 @@ import org.xipki.util.concurrent.ConcurrentBagEntry;
 class ResponseCacher implements Closeable {
   private static final Logger LOG = LoggerFactory.getLogger(ResponseCacher.class);
 
+  private static final long SEC_PER_WEEK = 7L * 24 * 60 * 60;
+
   private static final String SQL_ADD_ISSUER = "INSERT INTO ISSUER (ID,S1C,CERT) VALUES (?,?,?)";
 
   private static final String SQL_SELECT_ISSUER_ID = "SELECT ID FROM ISSUER";
@@ -308,6 +310,15 @@ class ResponseCacher implements Closeable {
 
   void storeOcspResponse(int issuerId, BigInteger serialNumber, long thisUpdate, Long nextUpdate,
       AlgorithmCode sigAlgCode, byte[] response) {
+    long nowInSec = System.currentTimeMillis() / 1000;
+    if (nextUpdate == null) {
+      nextUpdate = nowInSec + SEC_PER_WEEK;
+    }
+
+    if (nextUpdate - nowInSec < validity) {
+      return;
+    }
+
     byte[] identBytes = buildIdent(serialNumber, sigAlgCode);
     String ident = Base64.encodeToString(identBytes);
     try {
@@ -326,11 +337,7 @@ class ResponseCacher implements Closeable {
           ps.setInt(idx++, issuerId);
           ps.setString(idx++, ident);
           ps.setLong(idx++, thisUpdate);
-          if (nextUpdate != null && nextUpdate > 0) {
-            ps.setLong(idx++, nextUpdate);
-          } else {
-            ps.setNull(idx++, java.sql.Types.BIGINT);
-          }
+          ps.setLong(idx++, nextUpdate);
           ps.setString(idx++, b64Response);
           ps.execute();
         } catch (SQLException ex) {
@@ -354,11 +361,7 @@ class ResponseCacher implements Closeable {
         try {
           int idx = 1;
           ps.setLong(idx++, thisUpdate);
-          if (nextUpdate != null && nextUpdate > 0) {
-            ps.setLong(idx++, nextUpdate);
-          } else {
-            ps.setNull(idx++, java.sql.Types.BIGINT);
-          }
+          ps.setLong(idx++, nextUpdate);
           ps.setString(idx++, b64Response);
           ps.setLong(idx++, id);
           ps.executeUpdate();

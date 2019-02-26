@@ -57,6 +57,7 @@
       </column>
       <column name="NEXT_UPDATE" type="BIGINT"
           remarks="next update, seconds since January 1, 1970, 00:00:00 GMT">
+        <constraints nullable="false"/>
       </column>
       <column name="RESP" type="VARCHAR(4000)"
           remarks="Base64 DER-encoded OCSP response">
