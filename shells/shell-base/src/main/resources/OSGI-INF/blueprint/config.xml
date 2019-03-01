@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
     xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0">
-  <cm:property-placeholder persistent-id="org.xipki.util.curl">
+  <cm:property-placeholder persistent-id="org.xipki.shell.curl">
     <cm:default-properties>
       <cm:property name="useSslConf" value="false" />
       <cm:property name="ssl.storeType" value="" />
