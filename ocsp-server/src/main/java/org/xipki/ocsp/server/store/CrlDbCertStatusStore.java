@@ -27,6 +27,7 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -34,7 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.ocsp.api.OcspStoreException;
-import org.xipki.ocsp.server.OcspServerConf;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.util.X509Util;
@@ -87,29 +87,68 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
 
   private boolean crlUpdateFailed;
 
-  public void init(SourceConf conf, DataSourceWrapper datasource) throws OcspStoreException {
-    Args.notNull(conf, "conf");
-    if (!(conf instanceof OcspServerConf.SourceConfImpl)) {
-      throw new OcspStoreException("unknown conf " + conf.getClass().getName());
-    }
+  /**
+   * Initialize the store.
+   *
+   * @param sourceConf
+   * the store source configuration. It contains following key-value pairs:
+   * <ul>
+   * <li>crlFile: required
+   *   <p/>
+   *   CRL file.The optional file ${crlFile}.revocation contains the revocation information
+   *   of the CA itself.<p/>
+   *   Just create the file ${crlFile}.UPDATEME to tell responder to update the CRL.</li>
+   * <li>crlUrl: optional
+   *   <p/>
+   *   CRL url</li>
+   * <li>caCertFile: optional
+   *   <p/>
+   *   CA cert file.</li>
+   * <li>issuerCertFile
+   *   <p/>certificate used to verify the CRL signature.<br/>
+   *   required for indirect CRL, otherwise optional</li>
+   * <li>certsDir: optional
+   *   <p/>
+   *   Folder containing the DER-encoded certificates suffixed with ".der" and ".crt"</li>
+   *  </ul>
+   * @param datasource DataSource.
+   */
+  public void init(Map<String, ? extends Object> sourceConf, DataSourceWrapper datasource)
+      throws OcspStoreException {
+    Args.notNull(sourceConf, "sourceConf");
 
-    OcspServerConf.CrlSourceConf conf0 = ((OcspServerConf.SourceConfImpl) conf).getCrlSource();
-    if (conf0 == null) {
-      throw new OcspStoreException("conf.getCrlSource() may not be null");
-    }
+    this.crlFilename = IoUtil.expandFilepath(getStrValue(sourceConf, "crlFile", true));
+    this.crlUrl = getStrValue(sourceConf, "crlUrl", false);
+    this.caCert = parseCert(getStrValue(sourceConf, "caCertFile", true));
 
-    this.datasource = Args.notNull(datasource, "datasource");
+    String str = getStrValue(sourceConf, "certsDir", false);
+    this.certsDirName = (str == null) ? null : IoUtil.expandFilepath(str);
 
-    this.crlFilename = IoUtil.expandFilepath(conf0.getCrlFile());
-    this.crlUrl = conf0.getCrlUrl();
-    this.certsDirName = (conf0.getCertsDir() == null) ? null
-        : IoUtil.expandFilepath(conf0.getCertsDir());
-    this.caCert = parseCert(conf0.getCaCertFile());
-    this.issuerCert = (conf0.getIssuerCertFile() == null) ? null
-        : parseCert(conf0.getIssuerCertFile());
+    str = getStrValue(sourceConf, "issuerCertFile", false);
+    this.issuerCert = (str == null) ? null : parseCert(str);
 
     initializeStore(datasource);
-    super.init(conf, datasource);
+    super.init(sourceConf, datasource);
+  }
+
+  private static String getStrValue(Map<String, ? extends Object> sourceConf,
+      String confName, boolean mandatory) {
+    Object objVal = sourceConf.get(confName);
+    if (objVal == null) {
+      if (mandatory) {
+        throw new IllegalArgumentException(
+            "mandatory " + confName + " is not specified in sourceConf");
+      } else {
+        return null;
+      }
+    }
+
+    if (objVal instanceof String) {
+      return (String) objVal;
+    } else {
+      throw new IllegalArgumentException(
+          "content of " + confName + " is not String, but " + objVal.getClass().getName());
+    }
   }
 
   @Override

@@ -85,7 +85,6 @@ public class IssuerEntry {
       nameAndKeyHash[offset++] = 0x04;
       nameAndKeyHash[offset++] = (byte) hlen;
       System.arraycopy(ha.hash(encodedKey), 0, nameAndKeyHash, offset, hlen);
-      offset += hlen;
 
       hashes.put(ha, nameAndKeyHash);
     }

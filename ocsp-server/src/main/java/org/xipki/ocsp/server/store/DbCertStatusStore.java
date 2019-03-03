@@ -60,6 +60,8 @@ import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 
+import com.alibaba.fastjson.JSON;
+
 /**
  * TODO.
  * @author Lijun Liao
@@ -474,18 +476,26 @@ public class DbCertStatusStore extends OcspStore {
     datasource.releaseResources(ps, rs);
   }
 
+  /**
+   * Initialize the store.
+   *
+   * @param sourceConf
+   * the store source configuration. It contains following key-value pairs:
+   * <ul>
+   * <li>caCerts: optional
+   *   <p/>
+   *   CA certificate files to be included / excluded.</li>
+   *  </ul>
+   * @param datasource DataSource.
+   */
   @Override
-  public void init(SourceConf conf, DataSourceWrapper datasource)
+  public void init(Map<String, ? extends Object> sourceConf, DataSourceWrapper datasource)
       throws OcspStoreException {
-    if (conf != null && !(conf instanceof OcspServerConf.SourceConfImpl)) {
-      throw new OcspStoreException("unknown conf " + conf.getClass().getName());
-    }
-
     OcspServerConf.CaCerts caCerts = null;
-    if (conf != null) {
-      OcspServerConf.DbSourceConf conf0 = ((OcspServerConf.SourceConfImpl) conf).getDbSource();
-      if (conf0 != null) {
-        caCerts = conf0.getCaCerts();
+    if (sourceConf != null) {
+      Object objValue = sourceConf.get("caCerts");
+      if (objValue != null) {
+        caCerts = JSON.parseObject(JSON.toJSONBytes(objValue), OcspServerConf.CaCerts.class);
       }
     }
 

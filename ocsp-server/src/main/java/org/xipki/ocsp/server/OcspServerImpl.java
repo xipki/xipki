@@ -61,7 +61,6 @@ import org.xipki.ocsp.api.OcspRespWithCacheInfo;
 import org.xipki.ocsp.api.OcspRespWithCacheInfo.ResponseCacheInfo;
 import org.xipki.ocsp.api.OcspServer;
 import org.xipki.ocsp.api.OcspStore;
-import org.xipki.ocsp.api.OcspStore.SourceConf;
 import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.ocsp.api.Responder;
@@ -1063,7 +1062,7 @@ public class OcspServerImpl implements OcspServer {
       }
     }
     try {
-      SourceConf sourceConf = conf.getSource().getConf();
+      Map<String, ? extends Object> sourceConf = conf.getSource().getConf();
       store.init(sourceConf, datasource);
     } catch (OcspStoreException ex) {
       throw new InvalidConfException("CertStatusStoreException of store " + conf.getName()

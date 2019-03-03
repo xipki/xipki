@@ -80,12 +80,10 @@
 			"datasource":"datasource1",
 			"type":"xipki-db",
 			"conf":{
-				"dbSource":{
-//					"caCerts": {
-//						"includes":[],
-//						"excludes":[],
-//					}
-				}
+//				"caCerts": {
+//					"includes":[],
+//					"excludes":[],
+//				}
 			}
 		},
 		"unknownSerialAsGood":false

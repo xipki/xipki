@@ -21,6 +21,7 @@ import java.io.Closeable;
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.Map;
 
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.util.Args;
@@ -33,9 +34,6 @@ import org.xipki.util.Validity;
  */
 
 public abstract class OcspStore implements Closeable {
-
-  public static interface SourceConf {
-  }
 
   protected static final long DAY = 24L * 60 * 60 * 1000;
 
@@ -138,7 +136,7 @@ public abstract class OcspStore implements Closeable {
    * @param datasource
    *          Datasource. Could be {@code null}.
    */
-  public abstract void init(SourceConf sourceConf, DataSourceWrapper datasource)
+  public abstract void init(Map<String, ? extends Object> sourceConf, DataSourceWrapper datasource)
       throws OcspStoreException;
 
   public abstract boolean isHealthy();

@@ -19,8 +19,8 @@ package org.xipki.ocsp.server;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
-import org.xipki.ocsp.api.OcspStore.SourceConf;
 import org.xipki.security.CertpathValidationModel;
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.FileOrValue;
@@ -765,7 +765,7 @@ public class OcspServerConf extends ValidatableConf {
 
     private String datasource;
 
-    private SourceConfImpl conf;
+    private Map<String, ? extends Object> conf;
 
     public String getType() {
       return type;
@@ -783,72 +783,17 @@ public class OcspServerConf extends ValidatableConf {
       this.datasource = value;
     }
 
-    public SourceConfImpl getConf() {
+    public Map<String, ? extends Object> getConf() {
       return conf;
     }
 
-    public void setConf(SourceConfImpl value) {
+    public void setConf(Map<String, ? extends Object> value) {
       this.conf = value;
     }
 
     @Override
     public void validate() throws InvalidConfException {
       notEmpty(type, "type");
-    }
-
-  }
-
-  public static class SourceConfImpl extends ValidatableConf implements SourceConf {
-
-    private DbSourceConf dbSource;
-
-    private CrlSourceConf crlSource;
-
-    private Object custom;
-
-    public DbSourceConf getDbSource() {
-      return dbSource;
-    }
-
-    public void setDbSource(DbSourceConf dbSource) {
-      this.dbSource = dbSource;
-    }
-
-    public CrlSourceConf getCrlSource() {
-      return crlSource;
-    }
-
-    public void setCrlSource(CrlSourceConf crlSource) {
-      this.crlSource = crlSource;
-    }
-
-    public Object getCustom() {
-      return custom;
-    }
-
-    public void setCustom(Object custom) {
-      this.custom = custom;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      int occurrences = 0;
-      if (dbSource != null) {
-        occurrences++;
-      }
-
-      if (crlSource == null) {
-        occurrences++;
-      }
-
-      if (custom != null) {
-        occurrences++;
-      }
-
-      if (occurrences > 1) {
-        throw new InvalidConfException(
-            "maximal one of dbSource, crlSource and custom may be set");
-      }
     }
 
   }
@@ -885,106 +830,6 @@ public class OcspServerConf extends ValidatableConf {
 
     @Override
     public void validate() throws InvalidConfException {
-    }
-
-  }
-
-  public static class DbSourceConf extends ValidatableConf {
-
-    private CaCerts caCerts;
-
-    public CaCerts getCaCerts() {
-      return caCerts;
-    }
-
-    public void setCaCerts(CaCerts caCerts) {
-      this.caCerts = caCerts;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-    }
-
-  }
-
-  public static class CrlSourceConf extends ValidatableConf {
-
-    /**
-     * CRL file.<br/>
-     * The optional file ${crlFile}.revocation contains the revocation information
-     * of the CA itself.<br/>
-     * Just create the file ${crlFile}.UPDATEME to tell responder to update the CRL.<br/>
-     * required
-     */
-    private String crlFile;
-
-    /**
-     * CRL url<br/>
-     * optional, default is none.
-     */
-    private String crlUrl;
-
-    /**
-     * CA cert file.
-     */
-    private String caCertFile;
-
-    /**
-     * certificate used to verify the CRL signature.
-     * Required for indirect CRL, otherwise optional
-     */
-    private String issuerCertFile;
-
-    /**
-     * Folder containing the DER-encoded certificates suffixed with ".der" and ".crt"
-     * optional.
-     */
-    private String certsDir;
-
-    public String getCrlFile() {
-      return crlFile;
-    }
-
-    public void setCrlFile(String crlFile) {
-      this.crlFile = crlFile;
-    }
-
-    public String getCrlUrl() {
-      return crlUrl;
-    }
-
-    public void setCrlUrl(String crlUrl) {
-      this.crlUrl = crlUrl;
-    }
-
-    public String getCaCertFile() {
-      return caCertFile;
-    }
-
-    public void setCaCertFile(String caCertFile) {
-      this.caCertFile = caCertFile;
-    }
-
-    public String getIssuerCertFile() {
-      return issuerCertFile;
-    }
-
-    public void setIssuerCertFile(String issuerCertFile) {
-      this.issuerCertFile = issuerCertFile;
-    }
-
-    public String getCertsDir() {
-      return certsDir;
-    }
-
-    public void setCertsDir(String certsDir) {
-      this.certsDir = certsDir;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      notEmpty(crlFile, "crlFile");
-      notEmpty(caCertFile, "caCertFile");
     }
 
   }
