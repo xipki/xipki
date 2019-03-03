@@ -33,6 +33,12 @@
       <version>${logback.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xipki</groupId>
+      <artifactId>p11proxy-servlet</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
   </dependencies>
   <build>
     <resources>
