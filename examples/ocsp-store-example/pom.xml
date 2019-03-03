@@ -19,17 +19,18 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xipki</groupId>
-    <artifactId>xipki-parent</artifactId>
+    <groupId>org.xipki.example</groupId>
+    <artifactId>examples</artifactId>
     <version>5.0.2-SNAPSHOT</version>
   </parent>
-  <groupId>org.xipki.example</groupId>
-  <artifactId>examples</artifactId>
-  <name>XiPKI :: ${project.artifactId}</name>
-  <packaging>pom</packaging>
-  <modules>
-    <module>certprofile-example</module>
-    <module>lite-caclient-example</module>
-    <module>ocsp-store-example</module>
-  </modules>
+  <artifactId>ocsp-store-example</artifactId>
+  <packaging>bundle</packaging>
+  <name>XiPKI :: example :: ${project.artifactId}</name>
+  <dependencies>
+    <dependency>
+      <groupId>org.xipki</groupId>
+      <artifactId>ocsp-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>
