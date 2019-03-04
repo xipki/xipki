@@ -3,6 +3,13 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
+## 5.0.2
+  - Release date: -
+  - Relax the limitation of OCSP response in HTTP GET
+  - New feature to add NextUpdate to OCSP Response, even if no NextUpdate is available. This is configurable.
+  - Optimize the mechanism to generate CRL
+  - Add example modules to demonstrate how to extend XiPKI OCSP server to use customized certificate status source.
+
 ## 5.0.1
  - Release date: Feb 17, 2019
  - Validity other than {num}'y' will not be handled correctly. This has been fixed.
