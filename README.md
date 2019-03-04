@@ -297,3 +297,9 @@ Features
   - Support of PBE (password based encryption) password resolver
      - All passwords can be encrypted by the master password
   - Support of OBF (as in jetty) password resolver
+
+Use OCSP with customized Certificate Status Source (OcspStore)
+-----
+  - See the example modules
+    - `ocsp-store-example`: implementation of a customized OcspStore.
+    - `ocsp-store-example-assembly`: assembly the binaries.
