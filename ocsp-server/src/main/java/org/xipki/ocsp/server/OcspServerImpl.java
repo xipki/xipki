@@ -1018,7 +1018,9 @@ public class OcspServerImpl implements OcspServer {
     OcspStore store;
     try {
       String type = conf.getSource().getType();
-      if (STORE_TYPE_XIPKI_DB.equalsIgnoreCase(type)) {
+      if (StringUtil.isBlank(type)) {
+        throw new ObjectCreationException("OCSP store type is not specified");
+      } else if (STORE_TYPE_XIPKI_DB.equalsIgnoreCase(type)) {
         store = new DbCertStatusStore();
       } else if (STORE_TYPE_CRL.equalsIgnoreCase(type)) {
         store = new CrlDbCertStatusStore();
@@ -1033,7 +1035,7 @@ public class OcspServerImpl implements OcspServer {
               + ":" + ex.getMessage(), ex);
         }
       } else {
-        throw new ObjectCreationException("unknown type OCSP store type " + type);
+        throw new ObjectCreationException("unknown OCSP store type " + type);
       }
     } catch (ObjectCreationException ex) {
       throw new InvalidConfException("ObjectCreationException of store " + conf.getName()

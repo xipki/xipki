@@ -19,7 +19,6 @@ package org.xipki.ocsp.servlet;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.cert.CertificateException;
@@ -90,16 +89,16 @@ public class OcspServletFilter implements Filter {
       return;
     }
 
-    Properties props = new Properties();
-    InputStream is = null;
-    try {
-      is = Files.newInputStream(Paths.get(DFLT_OCSP_SERVER_CFG));
-      props.load(is);
-    } catch (IOException ex) {
-      LogUtil.error(LOG, ex, "could not load properties from file " + DFLT_OCSP_SERVER_CFG);
-      return;
-    } finally {
-      IoUtil.closeQuietly(is);
+    Properties props;
+    if (Files.exists(Paths.get(DFLT_OCSP_SERVER_CFG))) {
+      try {
+        props = IoUtil.loadProperties(DFLT_OCSP_SERVER_CFG);
+      } catch (IOException ex) {
+        LogUtil.error(LOG, ex, "could not load properties from file " + DFLT_OCSP_SERVER_CFG);
+        return;
+      }
+    } else {
+      props = new Properties();
     }
 
     OcspServerImpl ocspServer = new OcspServerImpl();
