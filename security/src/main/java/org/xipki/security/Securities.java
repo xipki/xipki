@@ -19,9 +19,7 @@ package org.xipki.security;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Security;
 import java.util.Properties;
@@ -40,6 +38,8 @@ import org.xipki.security.pkcs11.iaik.IaikP11ModuleFactory;
 import org.xipki.security.pkcs11.proxy.ProxyP11ModuleFactory;
 import org.xipki.security.pkcs12.P12SignerFactory;
 import org.xipki.util.InvalidConfException;
+import org.xipki.util.IoUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.
@@ -114,9 +114,20 @@ public class Securities implements Closeable {
 
   private void initPassword() throws IOException, InvalidConfException {
     passwordResolver = new PasswordResolverImpl();
-    Properties props = loadProperties(passwordCfg, DFLT_PASSWORD_CFG);
-    String masterPasswordCallback = getString(props, "masterPassword.callback",
-                        "FILE file=xipki/security/masterpassword.secret");
+
+    Properties props;
+    if (StringUtil.isBlank(passwordCfg)) {
+      if (Files.exists(Paths.get(DFLT_PASSWORD_CFG))) {
+        props = IoUtil.loadProperties(DFLT_PASSWORD_CFG);
+      } else {
+        props = new Properties();
+      }
+    } else {
+      props = IoUtil.loadProperties(passwordCfg);
+    }
+
+    String masterPasswordCallback =
+        getString(props, "masterPassword.callback", "PBE-GUI quorum=1,tries=3");
     passwordResolver.setMasterPasswordCallback(masterPasswordCallback);
     passwordResolver.init();
 
@@ -140,7 +151,18 @@ public class Securities implements Closeable {
 
   private void initSecurityFactory() throws IOException, InvalidConfException {
     securityFactory = new SecurityFactoryImpl();
-    Properties props = loadProperties(securityCfg, DFLT_SECURITY_CFG);
+
+    Properties props;
+    if (StringUtil.isBlank(securityCfg)) {
+      if (Files.exists(Paths.get(DFLT_SECURITY_CFG))) {
+        props = IoUtil.loadProperties(DFLT_SECURITY_CFG);
+      } else {
+        props = new Properties();
+      }
+    } else {
+      props = IoUtil.loadProperties(securityCfg);
+    }
+
     securityFactory.setStrongRandom4SignEnabled(
         getBoolean(props, "sign.strongrandom.enabled", false));
     securityFactory.setStrongRandom4KeyEnabled(
@@ -156,8 +178,10 @@ public class Securities implements Closeable {
     initSecurityPkcs12(signerFactoryRegister);
 
     // PKCS#11
-    String pkcs11ConfFile = getString(props, "pkcs11.confFile", "xipki/security/pkcs11.json");
-    initSecurityPkcs11(pkcs11ConfFile, signerFactoryRegister);
+    String pkcs11ConfFile = getString(props, "pkcs11.confFile", null);
+    if (StringUtil.isNotBlank(pkcs11ConfFile)) {
+      initSecurityPkcs11(pkcs11ConfFile, signerFactoryRegister);
+    }
 
     // register additional SignerFactories
     String list = getString(props, "additional.signerFactories", null);
@@ -207,24 +231,7 @@ public class Securities implements Closeable {
   }
 
   public static Properties loadProperties(String path, String dfltPath) throws IOException {
-    return loadProperties(path == null ? dfltPath : path);
-  }
-
-  public static Properties loadProperties(String path) throws IOException {
-    Path realPath = Paths.get(path);
-    if (!Files.exists(realPath)) {
-      throw new IOException("File " + path + " does not exist");
-    }
-
-    if (!Files.isReadable(realPath)) {
-      throw new IOException("File " + path + " is not readable");
-    }
-
-    Properties props = new Properties();
-    try (InputStream is = Files.newInputStream(realPath)) {
-      props.load(is);
-    }
-    return props;
+    return IoUtil.loadProperties(path == null ? dfltPath : path);
   }
 
   public static String getString(Properties props, String key, String dfltValue) {

@@ -4,7 +4,7 @@
 
   <cm:property-placeholder persistent-id="org.xipki.password">
     <cm:default-properties>
-      <cm:property name="masterPassword.callback" value="PBE-GUI"/>
+      <cm:property name="masterPassword.callback" value="PBE-GUI quorum=1,tries=3"/>
     </cm:default-properties>
   </cm:property-placeholder>
 

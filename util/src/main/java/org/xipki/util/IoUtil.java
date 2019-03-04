@@ -39,6 +39,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -253,6 +254,23 @@ public class IoUtil {
       System.out.println(prompt);
     }
     return console.readLine();
+  }
+
+  public static Properties loadProperties(String path) throws IOException {
+    Path realPath = Paths.get(path);
+    if (!Files.exists(realPath)) {
+      throw new IOException("File " + path + " does not exist");
+    }
+
+    if (!Files.isReadable(realPath)) {
+      throw new IOException("File " + path + " is not readable");
+    }
+
+    Properties props = new Properties();
+    try (InputStream is = Files.newInputStream(realPath)) {
+      props.load(is);
+    }
+    return props;
   }
 
 }
