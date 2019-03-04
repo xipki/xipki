@@ -31,5 +31,6 @@
     <module>certprofile-example</module>
     <module>lite-caclient-example</module>
     <module>ocsp-store-example</module>
+    <module>ocsp-store-example-assembly</module>
   </modules>
 </project>
