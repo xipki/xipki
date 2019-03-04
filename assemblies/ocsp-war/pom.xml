@@ -32,6 +32,7 @@
       <artifactId>dbtool</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- required by the dbtool -->
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
@@ -98,13 +99,14 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
-            <id>copy-dependencies</id>
+            <id>copy-dbtool-dependencies</id>
             <phase>package</phase>
             <goals>
               <goal>copy-dependencies</goal>
             </goals>
             <configuration>
               <outputDirectory>${project.build.directory}/dbtool/lib</outputDirectory>
+              <includeTypes>jar</includeTypes>
             </configuration>
           </execution>
           <execution>

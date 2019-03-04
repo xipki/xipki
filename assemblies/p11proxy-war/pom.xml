@@ -28,12 +28,6 @@
   <name>XiPKI :: assembly :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>${logback.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
       <groupId>org.xipki</groupId>
       <artifactId>p11proxy-servlet</artifactId>
       <version>${project.version}</version>
