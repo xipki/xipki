@@ -288,8 +288,6 @@ public class XijsonCertprofile extends BaseCertprofile {
     try {
       initialize0(conf);
     } catch (RuntimeException ex) {
-      // TODO:
-      ex.printStackTrace();
       LogUtil.error(LOG, ex);
       throw new CertprofileException(
           "caught RuntimeException while initializing certprofile: " + ex.getMessage());
@@ -444,7 +442,7 @@ public class XijsonCertprofile extends BaseCertprofile {
       rdnControl.setPrefix(rdn.getPrefix());
       rdnControl.setSuffix(rdn.getSuffix());
       rdnControl.setGroup(rdn.getGroup());
-      SubjectDnSpec.fixRdnControl(rdnControl);
+      fixRdnControl(rdnControl);
     }
 
     this.subjectControl = new SubjectControl(subjectDnControls, subject.isKeepRdnOrder());
@@ -536,6 +534,38 @@ public class XijsonCertprofile extends BaseCertprofile {
     }
 
     // validate the configuration
+
+    /*
+     * RFC 5280, Section 4.1.2.7 Subject
+     *    Conforming implementations generating new certificates with
+     *    electronic mail addresses MUST use the rfc822Name in the subject
+     *    alternative name extension (Section 4.2.1.6) to describe such
+     *    identities.  Simultaneous inclusion of the emailAddress attribute in
+     *    the subject distinguished name to support legacy implementations is
+     *    deprecated but permitted.
+     *
+     * Make sure that if email address is contained in subject, it must be duplicated
+     * in the SubjectAltName extension as rfc822Name.
+     */
+    if (subjectControl.getControl(ObjectIdentifiers.DN_EmailAddress) != null) {
+      ASN1ObjectIdentifier type = ObjectIdentifiers.DN_EmailAddress;
+
+      if (subjectToSubjectAltNameModes == null
+          || subjectToSubjectAltNameModes.get(type) == null) {
+        throw new CertprofileException("subjectToSubjectAltNames for "
+            + ObjectIdentifiers.oidToDisplayName(type)
+            + " must be configured if subject RDN emailAddress is permitted");
+      }
+
+      GeneralNameTag nameTag = subjectToSubjectAltNameModes.get(type);
+      if (nameTag != GeneralNameTag.rfc822Name) {
+        throw new CertprofileException("For the RDN "
+            + ObjectIdentifiers.DN_EmailAddress.getId()
+            + ", only target SubjectAltName type rfc822Name is permitted, but not "
+            + nameTag);
+      }
+    }
+
     if (subjectToSubjectAltNameModes != null) {
       ASN1ObjectIdentifier type = Extension.subjectAlternativeName;
       if (!extensionControls.containsKey(type)) {
@@ -546,6 +576,7 @@ public class XijsonCertprofile extends BaseCertprofile {
       if (subjectAltNameModes != null) {
         for (ASN1ObjectIdentifier attrType : subjectToSubjectAltNameModes.keySet()) {
           GeneralNameTag nameTag = subjectToSubjectAltNameModes.get(attrType);
+
           boolean allowed = false;
           for (GeneralNameMode m : subjectAltNameModes) {
             if (m.getTag() == nameTag) {
@@ -1084,6 +1115,55 @@ public class XijsonCertprofile extends BaseCertprofile {
   }
 
   @Override
+  protected void verifySubjectDnOccurence(X500Name requestedSubject)
+      throws BadCertTemplateException {
+    Args.notNull(requestedSubject, "requestedSubject");
+
+    ASN1ObjectIdentifier[] types = requestedSubject.getAttributeTypes();
+    for (ASN1ObjectIdentifier type : types) {
+      RdnControl occu = subjectControl.getControl(type);
+      if (occu == null) {
+        if (subjectToSubjectAltNameModes != null
+            && subjectToSubjectAltNameModes.containsKey(type)) {
+          continue;
+        } else {
+          throw new BadCertTemplateException(String.format(
+              "subject DN of type %s is not allowed", ObjectIdentifiers.oidToDisplayName(type)));
+        }
+      }
+
+      RDN[] rdns = requestedSubject.getRDNs(type);
+      if (rdns.length > occu.getMaxOccurs() || rdns.length < occu.getMinOccurs()) {
+        throw new BadCertTemplateException(String.format(
+            "occurrence of subject DN of type %s not within the allowed range. "
+            + "%d is not within [%d, %d]", ObjectIdentifiers.oidToDisplayName(type), rdns.length,
+            occu.getMinOccurs(), occu.getMaxOccurs()));
+      }
+    }
+
+    for (ASN1ObjectIdentifier m : subjectControl.getTypes()) {
+      RdnControl occurence = subjectControl.getControl(m);
+      if (occurence.getMinOccurs() == 0) {
+        continue;
+      }
+
+      boolean present = false;
+      for (ASN1ObjectIdentifier type : types) {
+        if (occurence.getType().equals(type)) {
+          present = true;
+          break;
+        }
+      }
+
+      if (!present) {
+        throw new BadCertTemplateException(String.format(
+            "required subject DN of type %s is not present",
+            ObjectIdentifiers.oidToDisplayName(occurence.getType())));
+      }
+    }
+  } // method verifySubjectDnOccurence
+
+  @Override
   public ExtensionValues getExtensions(
       Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurences,
       X500Name requestedSubject, X500Name grantedSubject,
@@ -1611,11 +1691,11 @@ public class XijsonCertprofile extends BaseCertprofile {
         GeneralNameTag tag = subjectToSubjectAltNameModes.get(attrType);
 
         RDN[] rdns = grantedSubject.getRDNs(attrType);
-        if (rdns == null) {
+        if (rdns == null || rdns.length == 0) {
           rdns = requestedSubject.getRDNs(attrType);
         }
 
-        if (rdns == null) {
+        if (rdns == null || rdns.length == 0) {
           continue;
         }
 
@@ -1623,6 +1703,8 @@ public class XijsonCertprofile extends BaseCertprofile {
           String rdnValue = X509Util.rdnValueToString(rdn.getFirst().getValue());
           switch (tag) {
             case rfc822Name:
+              grantedNames.add(new GeneralName(tag.getTag(), rdnValue.toLowerCase()));
+              break;
             case DNSName:
             case uniformResourceIdentifier:
             case IPAddress:

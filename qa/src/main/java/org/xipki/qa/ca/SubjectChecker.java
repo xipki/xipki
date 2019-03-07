@@ -171,6 +171,10 @@ public class SubjectChecker {
       stringType = rdnControl.getStringType();
     }
 
+    if (stringType == null) {
+      stringType = StringType.utf8String;
+    }
+
     List<String> requestedCoreAtvTextValues = new LinkedList<>();
     if (requestedRdns != null) {
       for (RDN requestedRdn : requestedRdns) {
@@ -296,41 +300,44 @@ public class SubjectChecker {
   private void checkAttributeTypeAndValue(String name, ASN1ObjectIdentifier type,
       String atvTextValue, RdnControl rdnControl, List<String> requestedCoreAtvTextValues,
       int index, StringBuilder failureMsg) throws BadCertTemplateException {
-    String tmpAtvTextValue = atvTextValue;
+    if (atvTextValue != null && ObjectIdentifiers.DN_EmailAddress.equals(type)) {
+      atvTextValue = atvTextValue.toLowerCase();
+    }
+
     if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type)) {
-      if (!SubjectDnSpec.PATTERN_DATE_OF_BIRTH.matcher(tmpAtvTextValue).matches()) {
+      if (!SubjectDnSpec.PATTERN_DATE_OF_BIRTH.matcher(atvTextValue).matches()) {
         throw new BadCertTemplateException(
             "Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
       }
     } else if (rdnControl != null) {
       String prefix = rdnControl.getPrefix();
       if (prefix != null) {
-        if (!tmpAtvTextValue.startsWith(prefix)) {
-          failureMsg.append(name).append(" '").append(tmpAtvTextValue)
+        if (!atvTextValue.startsWith(prefix)) {
+          failureMsg.append(name).append(" '").append(atvTextValue)
             .append("' does not start with prefix '").append(prefix).append("'; ");
           return;
         } else {
-          tmpAtvTextValue = tmpAtvTextValue.substring(prefix.length());
+          atvTextValue = atvTextValue.substring(prefix.length());
         }
       }
 
       String suffix = rdnControl.getSuffix();
       if (suffix != null) {
-        if (!tmpAtvTextValue.endsWith(suffix)) {
-          failureMsg.append(name).append(" '").append(tmpAtvTextValue)
+        if (!atvTextValue.endsWith(suffix)) {
+          failureMsg.append(name).append(" '").append(atvTextValue)
             .append("' does not end with suffix '").append(suffix).append("'; ");
           return;
         } else {
-          tmpAtvTextValue = tmpAtvTextValue.substring(0,
-              tmpAtvTextValue.length() - suffix.length());
+          atvTextValue = atvTextValue.substring(0,
+              atvTextValue.length() - suffix.length());
         }
       }
 
       Pattern pattern = rdnControl.getPattern();
       if (pattern != null) {
-        boolean matches = pattern.matcher(tmpAtvTextValue).matches();
+        boolean matches = pattern.matcher(atvTextValue).matches();
         if (!matches) {
-          failureMsg.append(name).append(" '").append(tmpAtvTextValue)
+          failureMsg.append(name).append(" '").append(atvTextValue)
             .append("' is not valid against regex '").append(pattern.pattern()).append("'; ");
           return;
         }
@@ -344,8 +351,12 @@ public class SubjectChecker {
     } else {
       String requestedCoreAtvTextValue = requestedCoreAtvTextValues.get(index);
       if (!type.equals(ObjectIdentifiers.DN_SERIALNUMBER)) {
-        if (!tmpAtvTextValue.equals(requestedCoreAtvTextValue)) {
-          failureMsg.append("content '").append(tmpAtvTextValue)
+        if (requestedCoreAtvTextValue != null && type.equals(ObjectIdentifiers.DN_EmailAddress)) {
+          requestedCoreAtvTextValue = requestedCoreAtvTextValue.toLowerCase();
+        }
+
+        if (!atvTextValue.equals(requestedCoreAtvTextValue)) {
+          failureMsg.append("content '").append(atvTextValue)
             .append("' but expected '").append(requestedCoreAtvTextValue).append("'; ");
         }
       }

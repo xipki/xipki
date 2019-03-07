@@ -62,6 +62,8 @@ public class SubjectDnSpec {
 
   private static final Range RANGE_128 = new Range(1, 128);
 
+  private static final Range RANGE_255 = new Range(1, 255);
+
   private static final Range RANGE_POSTAL_CODE = new Range(1, 40);
 
   private static final Range RANGE_COUNTRY_NAME = new Range(2, 2);
@@ -223,6 +225,13 @@ public class SubjectDnSpec {
     RANGES.put(id, RANGE_64);
     STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
     DFLT_STRING_TYPES.put(id, StringType.utf8String);
+
+    // emailAddress
+    id = ObjectIdentifiers.DN_EmailAddress;
+    ids.add(id);
+    RANGES.put(id, RANGE_255);
+    STRING_TYPE_SET.put(id, IA5_STRING_ONLY);
+    DFLT_STRING_TYPES.put(id, StringType.ia5String);
 
     // countryOfCitizenship
     id = ObjectIdentifiers.DN_COUNTRY_OF_CITIZENSHIP;

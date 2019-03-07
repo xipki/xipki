@@ -1494,11 +1494,11 @@ public class ExtensionsChecker {
         GeneralNameTag tag = subjectToSubjectAltNameModes.get(attrType);
 
         RDN[] rdns = grantedSubject.getRDNs(attrType);
-        if (rdns == null) {
+        if (rdns == null || rdns.length == 0) {
           rdns = requestedSubject.getRDNs(attrType);
         }
 
-        if (rdns == null) {
+        if (rdns == null || rdns.length == 0) {
           continue;
         }
 
@@ -1506,6 +1506,8 @@ public class ExtensionsChecker {
           String rdnValue = X509Util.rdnValueToString(rdn.getFirst().getValue());
           switch (tag) {
             case rfc822Name:
+              grantedNames.add(new GeneralName(tag.getTag(), rdnValue.toLowerCase()));
+              break;
             case DNSName:
             case uniformResourceIdentifier:
             case IPAddress:

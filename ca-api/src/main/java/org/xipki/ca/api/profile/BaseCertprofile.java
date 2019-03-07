@@ -112,17 +112,11 @@ public abstract class BaseCertprofile extends Certprofile {
       }
 
       RDN[] thisRdns = getRdns(requstedRdns, type);
-      if (thisRdns == null) {
-        continue;
-      }
-      int len = thisRdns.length;
-      if (len == 0) {
+      if (thisRdns == null || thisRdns.length == 0) {
         continue;
       }
 
-      if (ObjectIdentifiers.DN_EmailAddress.equals(type)) {
-        throw new BadCertTemplateException("emailAddress is not allowed");
-      }
+      int len = thisRdns.length;
 
       if (len == 1) {
         ASN1Encodable rdnValue = thisRdns[0].getFirst().getValue();
@@ -315,58 +309,21 @@ public abstract class BaseCertprofile extends Certprofile {
     throw new BadCertTemplateException("the given publicKey is not permitted");
   } // method checkPublicKey
 
-  protected void verifySubjectDnOccurence(X500Name requestedSubject)
-      throws BadCertTemplateException {
-    Args.notNull(requestedSubject, "requestedSubject");
-
-    SubjectControl occurences = getSubjectControl();
-    if (occurences == null) {
-      return;
-    }
-
-    ASN1ObjectIdentifier[] types = requestedSubject.getAttributeTypes();
-    for (ASN1ObjectIdentifier type : types) {
-      RdnControl occu = occurences.getControl(type);
-      if (occu == null) {
-        throw new BadCertTemplateException(String.format(
-            "subject DN of type %s is not allowed", oidToDisplayName(type)));
-      }
-
-      RDN[] rdns = requestedSubject.getRDNs(type);
-      if (rdns.length > occu.getMaxOccurs() || rdns.length < occu.getMinOccurs()) {
-        throw new BadCertTemplateException(String.format(
-            "occurrence of subject DN of type %s not within the allowed range. "
-            + "%d is not within [%d, %d]", oidToDisplayName(type),  rdns.length,
-            occu.getMinOccurs(), occu.getMaxOccurs()));
-      }
-    }
-
-    for (ASN1ObjectIdentifier m : occurences.getTypes()) {
-      RdnControl occurence = occurences.getControl(m);
-      if (occurence.getMinOccurs() == 0) {
-        continue;
-      }
-
-      boolean present = false;
-      for (ASN1ObjectIdentifier type : types) {
-        if (occurence.getType().equals(type)) {
-          present = true;
-          break;
-        }
-      }
-
-      if (!present) {
-        throw new BadCertTemplateException(String.format(
-            "required subject DN of type %s is not present",
-            oidToDisplayName(occurence.getType())));
-      }
-    }
-  } // method verifySubjectDnOccurence
+  protected abstract void verifySubjectDnOccurence(X500Name requestedSubject)
+      throws BadCertTemplateException;
 
   protected RDN createSubjectRdn(String text, ASN1ObjectIdentifier type, RdnControl option,
       int index) throws BadCertTemplateException {
+    if (text != null && ObjectIdentifiers.DN_EmailAddress.equals(type)) {
+      text = text.toLowerCase();
+    }
+
     ASN1Encodable rdnValue = createRdnValue(text, type, option, index);
     return (rdnValue == null) ? null : new RDN(type, rdnValue);
+  }
+
+  protected void fixRdnControl(RdnControl rdnControl) throws CertprofileException {
+    SubjectDnSpec.fixRdnControl(rdnControl);
   }
 
   /**
@@ -594,10 +551,6 @@ public abstract class BaseCertprofile extends Certprofile {
 
     return stringType.createString(tmpText.trim());
   } // method createRdnValue
-
-  private static String oidToDisplayName(ASN1ObjectIdentifier type) {
-    return ObjectIdentifiers.oidToDisplayName(type);
-  }
 
   private static void checkEcSubjectPublicKeyInfo(ASN1ObjectIdentifier curveOid, byte[] encoded)
       throws BadCertTemplateException {
