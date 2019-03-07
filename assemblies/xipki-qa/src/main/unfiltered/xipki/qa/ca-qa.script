@@ -47,6 +47,12 @@ caqa:check-cert --issuer subcawithcrl --profile max-time \
 
 ## subca
 
+caqa:check-cert --issuer subca --profile smime \
+  --csr output/smime1.csr --cert output/smime1.crt
+
+caqa:check-cert --issuer subca --profile smime-legacy \
+  --csr output/smime-legacy1.csr --cert output/smime-legacy1.crt
+
 caqa:check-cert --issuer subca --profile tls \
   --csr output/tls1.csr --cert output/tls1.crt
 

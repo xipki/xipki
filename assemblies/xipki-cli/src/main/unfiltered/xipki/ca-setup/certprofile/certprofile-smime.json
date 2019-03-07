@@ -1,13 +1,13 @@
 {
 	"metadata":{
-		"details":"certprofile tls",
+		"details":"certprofile s/mime",
 		"category":"A"
 	},
 	"version":"v3",
 	"certLevel":"EndEntity",
 	"maxSize":5000,
 	"validity":"5y",
-	"notBeforeTime":"current",
+	"notBeforeTime":"midnight",
 	"serialNumberInReq":false,
 	"keypairGeneration":{
 		"inheritCA":true,
@@ -123,17 +123,16 @@
 				"oid":"2.5.4.3",
 				"description":"cn"
 			},
-			"regex":"(?=^.{1,254}$)(^(?:(?!\\d+\\.|-)[a-zA-Z0-9_\\-]{1,63}(?<!-)\\.?)+(?:[a-zA-Z]{2,})$)",
 			"minOccurs":1,
 			"maxOccurs":1
 		}]
 	},
 	"subjectToSubjectAltNames":[{
 		"source":{
-			"oid":"2.5.4.3",
-			"description":"cn"
+			"oid":"1.2.840.113549.1.9.1",
+			"description":"emailAddress"
 		},
-		"target":"DNSName"
+		"target":"rfc822Name"
 	}],
 	"extensions":[{
 		"type":{
@@ -168,7 +167,7 @@
 		"required":true,
 		"permittedInRequest":true,
 		"subjectAltName":{
-			"modes":["DNSName","IPAddress"]
+			"modes":["rfc822Name"]
 		}
 	},{
 		"type":{
@@ -232,29 +231,43 @@
 		"extendedKeyUsage":{
 			"usages":[{
 				"required":true,
-				"oid":"1.3.6.1.5.5.7.3.1",
-				"description":"kp-serverAuth"
-			},{
-				"required":false,
-				"oid":"1.3.6.1.5.5.7.3.2",
-				"description":"kp-clientAuth"
+				"oid":"1.3.6.1.5.5.7.3.4",
+				"description":"kp-emailProtection"
 			}]
 		}
 	},{
 		"type":{
-			"oid":"1.3.6.1.5.5.7.1.24",
-			"description":"tlsFeature"
+			"oid":"1.2.840.113549.1.9.15",
+			"description":"SMIMECapatibilities"
 		},
-		"critical":true,
+		"critical":false,
 		"required":true,
 		"permittedInRequest":false,
-		"tlsFeature":{
-			"features":[{
-				"value":2,
-				"description":"client_certificate_url"
+		"smimeCapabilities":{
+			"capabilities":[{
+				"capabilityId":{
+					"oid":"1.2.840.113549.3.7",
+					"description":"DES-EDE3-CBC"
+				}
 			},{
-				"value":5,
-				"description":"status_request"
+				"capabilityId":{
+					"oid":"1.2.840.113549.3.2",
+					"description":"RC2-CBC"
+				},
+				"parameter":{
+					"integer":128
+				}
+			},{
+				"capabilityId":{
+					"oid":"1.2.840.113549.3.2",
+					"description":"RC2-CBC"
+				},
+				"parameter":{
+					"binary":{
+						"value":"AgFA",
+						"description":"INTEGER 64"
+					}
+				}
 			}]
 		}
 	}]

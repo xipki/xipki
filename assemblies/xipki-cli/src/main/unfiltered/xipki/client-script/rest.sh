@@ -29,18 +29,6 @@ echo "output directory: ${OUT_DIR}"
 
 mkdir -p ${OUT_DIR}
 
-CN=tls-${CUR_TIME} 
-
-echo "generate RSA keypair"
-
-openssl genrsa -out ${OUT_DIR}/${CN}-key.pem 2048
-
-echo "generate CSR"
-
-openssl req -new -sha256 -key ${OUT_DIR}/${CN}-key.pem -outform der \
-    -out ${OUT_DIR}/${CN}.csr \
-    -subj "/CN=${CN}.xipki.org/O=xipki/C=DE"
-
 echo "get CA certificate"
 
 curl ${OPTS} \
@@ -51,6 +39,40 @@ CA_SHA1FP=`openssl sha1 ${OUT_DIR}/cacert.der | cut -d '=' -f 2 | cut -d ' ' -f 
 
 # The PEM file will be used by "openssl ocsp"
 openssl x509 -inform der -in ${OUT_DIR}/cacert.der -out ${OUT_DIR}/cacert.pem
+
+# enroll certificate smime
+CN=smime-${CUR_TIME}
+
+echo "generate RSA keypair"
+
+openssl genrsa -out ${OUT_DIR}/${CN}-key.pem 2048
+
+echo "generate CSR"
+
+openssl req -new -sha256 -key ${OUT_DIR}/${CN}-key.pem -outform der \
+    -out ${OUT_DIR}/${CN}.csr \
+    -subj "/CN=${CN}/emailAddress=info@example.com/O=xipki/C=DE"
+
+echo "enroll certificate"
+
+curl ${OPTS} \
+    --header "Content-Type: application/pkcs10" \
+    --data-binary "@${OUT_DIR}/${CN}.csr" \
+    --output ${OUT_DIR}/${CN}.der \
+    "${CA_URL}/enroll-cert?profile=smime"
+
+# enroll certificate tls
+CN=tls-${CUR_TIME}
+
+echo "generate RSA keypair"
+
+openssl genrsa -out ${OUT_DIR}/${CN}-key.pem 2048
+
+echo "generate CSR"
+
+openssl req -new -sha256 -key ${OUT_DIR}/${CN}-key.pem -outform der \
+    -out ${OUT_DIR}/${CN}.csr \
+    -subj "/CN=${CN}.xipki.org/O=xipki/C=DE"
 
 echo "enroll certificate"
 

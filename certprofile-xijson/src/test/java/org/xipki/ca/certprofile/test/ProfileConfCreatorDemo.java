@@ -180,6 +180,9 @@ public class ProfileConfCreatorDemo {
       profile = certprofileQc();
       marshall(profile, "certprofile-qc.json");
 
+      profile = certprofileSmime();
+      marshall(profile, "certprofile-smime.json");
+
       profile = certprofileTls();
       marshall(profile, "certprofile-tls.json");
 
@@ -199,13 +202,18 @@ public class ProfileConfCreatorDemo {
       marshall(profile, "certprofile-max-time.json");
 
       profile = certprofileExtended();
-      marshall(profile, "certprofile-extended.json");
+      // cannot validate due to some additional customized extensions.
+      marshall(profile, "certprofile-extended.json", false);
     } catch (Exception ex) {
       ex.printStackTrace();
     }
   } // method main
 
   private static void marshall(X509ProfileType profile, String filename) {
+    marshall(profile, filename, true);
+  }
+
+  private static void marshall(X509ProfileType profile, String filename, boolean validate) {
     try {
       Path path = Paths.get("tmp", filename);
       IoUtil.mkdirsParent(path);
@@ -214,15 +222,17 @@ public class ProfileConfCreatorDemo {
             SerializerFeature.PrettyFormat, SerializerFeature.SortField);
       }
 
-      X509ProfileType profileConf;
-      // Test by deserializing
-      try (InputStream is = Files.newInputStream(path)) {
-        profileConf = X509ProfileType.parse(is);
+      if (validate) {
+        X509ProfileType profileConf;
+        // Test by deserializing
+        try (InputStream is = Files.newInputStream(path)) {
+          profileConf = X509ProfileType.parse(is);
+        }
+        XijsonCertprofile profileObj = new XijsonCertprofile();
+        profileObj.initialize(profileConf);
+        profileObj.close();
+        System.out.println("Generated certprofile in " + filename);
       }
-      XijsonCertprofile profileObj = new XijsonCertprofile();
-      profileObj.initialize(profileConf);
-      profileObj.close();
-      System.out.println("Generated certprofile in " + filename);
     } catch (Exception ex) {
       System.err.println("Error while generating certprofile in " + filename);
       ex.printStackTrace();
@@ -529,6 +539,71 @@ public class ProfileConfCreatorDemo {
     return profile;
   } // method certprofileScep
 
+  private static X509ProfileType certprofileSmime() throws Exception {
+    X509ProfileType profile = getBaseProfile("certprofile s/mime", CertLevel.EndEntity, "5y", true);
+
+    // Subject
+    Subject subject = profile.getSubject();
+    subject.setIncSerialNumber(false);
+
+    List<RdnType> rdnControls = subject.getRdns();
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_EmailAddress, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
+
+    // SubjectToSubjectAltName
+    SubjectToSubjectAltNameType s2sType = new SubjectToSubjectAltNameType();
+    profile.getSubjectToSubjectAltNames().add(s2sType);
+    s2sType.setSource(createOidType(ObjectIdentifiers.DN_EmailAddress));
+    s2sType.setTarget(GeneralNameTag.rfc822Name);
+
+    // Extensions
+    // Extensions - controls
+    List<ExtensionType> list = profile.getExtensions();
+    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
+    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
+    list.add(createExtension(Extension.freshestCRL, false, false, null));
+
+    // Extensions - SubjectAltNames
+    list.add(createExtension(Extension.subjectAlternativeName, true, false));
+    GeneralNameType san = new GeneralNameType();
+    last(list).setSubjectAltName(san);
+    san.addTags(GeneralNameTag.rfc822Name);
+
+    // Extensions - basicConstraints
+    list.add(createExtension(Extension.basicConstraints, true, true));
+
+    // Extensions - AuthorityInfoAccess
+    list.add(createExtension(Extension.authorityInfoAccess, true, false));
+    last(list).setAuthorityInfoAccess(createAuthorityInfoAccess());
+
+    // Extensions - AuthorityKeyIdentifier
+    list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
+    last(list).setAuthorityKeyIdentifier(createAuthorityKeyIdentifier(true));
+
+    // Extensions - keyUsage
+    list.add(createExtension(Extension.keyUsage, true, true));
+    last(list).setKeyUsage(createKeyUsage(
+        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
+            KeyUsage.keyEncipherment},
+        null));
+
+    // Extensions - extenedKeyUsage
+    list.add(createExtension(Extension.extendedKeyUsage, true, false));
+    last(list).setExtendedKeyUsage(createExtendedKeyUsage(
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_emailProtection},
+        null));
+
+    // Extensions - SMIMECapabilities
+    list.add(createExtension(ObjectIdentifiers.id_smimeCapabilities, true, false));
+    last(list).setSmimeCapabilities(createSmimeCapabilities());
+
+    return profile;
+  } // method certprofileTls
+
   private static X509ProfileType certprofileTls() throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile tls", CertLevel.EndEntity, "5y", true);
 
@@ -590,10 +665,6 @@ public class ProfileConfCreatorDemo {
     list.add(createExtension(ObjectIdentifiers.id_pe_tlsfeature, true, true));
     last(list).setTlsFeature(createTlsFeature(
         TlsExtensionType.STATUS_REQUEST, TlsExtensionType.CLIENT_CERTIFICATE_URL));
-
-    // Extensions - SMIMECapabilities
-    list.add(createExtension(ObjectIdentifiers.id_smimeCapabilities, true, false));
-    last(list).setSmimeCapabilities(createSmimeCapabilities());
 
     return profile;
   } // method certprofileTls

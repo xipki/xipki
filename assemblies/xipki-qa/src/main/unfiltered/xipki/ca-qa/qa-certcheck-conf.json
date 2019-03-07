@@ -6,7 +6,7 @@
 		},
 		"validityMode":"cutoff",
 		"caIssuerUrls":["http://example.org/rootca1.der"],
-		"ocspUrls":["http://localhost:8080/ocsp/responder1"],
+		"ocspUrls":["http://localhost:8080/ocsp/responder1"]
 	},{
 		"name":"subca",
 		"cert":{
@@ -14,7 +14,7 @@
 		},
 		"validityMode":"cutoff",
 		"caIssuerUrls":["http://example.org/subca1.der"],
-		"ocspUrls":["http://localhost:8080/ocsp/responder1"],
+		"ocspUrls":["http://localhost:8080/ocsp/responder1"]
 	},{
 		"name":"subcawithcrl",
 		"cert":{
@@ -47,6 +47,12 @@
 	},{
 		"name":"multi-valued-rdn",
 		"file":"xipki/qa/certprofile/certprofile-multi-valued-rdn.json"
+	},{
+		"name":"smime",
+		"file":"xipki/qa/certprofile/certprofile-smime.json"
+	},{
+		"name":"smime-legacy",
+		"file":"xipki/qa/certprofile/certprofile-smime-legacy.json"
 	},{
 		"name":"tls",
 		"file":"xipki/qa/certprofile/certprofile-tls.json"

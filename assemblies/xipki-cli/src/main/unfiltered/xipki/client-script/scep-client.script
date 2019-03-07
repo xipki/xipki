@@ -1,6 +1,7 @@
 HASH = SHA256
 
 URL = http://localhost:8080/ca/scep/myca/tls/pkiclient.exe
+SMIME_URL = http://localhost:8080/ca/scep/myca/smime/pkiclient.exe
 
 echo "#################################################################"
 echo "#               Enroll Certificate via SCEP                     #"
@@ -15,6 +16,31 @@ CACERT = ${OUT_DIR}/cacert.der
 echo "# Get CA certificate"
 
 xi:scep-cacert --url ${URL} --out ${CACERT}
+
+# Enroll certificate of profile smime
+
+echo "=====SCEP: Enroll (self-signed identity cert) ====="
+
+CN = scep-smime-${CUR_TIME}
+
+# Must use the same CN as in the CSR
+xi:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}.p12" \
+  --subject "CN=${CN},E=info@example.com,O=xipki,C=DE"
+
+xi:csr-p12  --hash ${HASH} --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+  --challenge-password user1:password1 \
+  --subject "CN=${CN},E=info@example.com,O=xipki,C=DE" --out ${OUT_DIR}/${CN}.csr
+
+echo "# Enroll certificate via PKCSReq"
+xi:scep-enroll --method pkcs --url ${SMIME_URL} --ca-cert ${CACERT} \
+  --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+  --csr ${OUT_DIR}/${CN}.csr --out ${OUT_DIR}/${CN}.der
+
+echo "# Update the certificate in PKCS#12 file"
+xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+  --cert ${OUT_DIR}/${CN}.der --ca-cert ${CACERT}
+
+# Enroll certificate of profile tls
 
 echo "=====SCEP: Enroll (self-signed identity cert) ====="
 

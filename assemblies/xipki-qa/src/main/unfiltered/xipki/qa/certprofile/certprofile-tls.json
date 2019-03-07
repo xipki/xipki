@@ -257,40 +257,5 @@
 				"description":"status_request"
 			}]
 		}
-	},{
-		"type":{
-			"oid":"1.2.840.113549.1.9.15",
-			"description":"SMIMECapatibilities"
-		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false,
-		"smimeCapabilities":{
-			"capabilities":[{
-				"capabilityId":{
-					"oid":"1.2.840.113549.3.7",
-					"description":"DES-EDE3-CBC"
-				}
-			},{
-				"capabilityId":{
-					"oid":"1.2.840.113549.3.2",
-					"description":"RC2-CBC"
-				},
-				"parameter":{
-					"integer":128
-				}
-			},{
-				"capabilityId":{
-					"oid":"1.2.840.113549.3.2",
-					"description":"RC2-CBC"
-				},
-				"parameter":{
-					"binary":{
-						"value":"AgFA",
-						"description":"INTEGER 64"
-					}
-				}
-			}]
-		}
 	}]
 }

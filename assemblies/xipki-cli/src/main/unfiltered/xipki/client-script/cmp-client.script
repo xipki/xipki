@@ -22,8 +22,48 @@ echo "# Get CA certificate"
 xi:cmp-cacert \
   --out ${CACERT}
 
-## Enroll certificates
-# Certificate OCSP1
+## Enroll certificates (profile smime)
+
+echo "=====CMP: Enroll via CRMF====="
+
+CN = cmp-crmf-smime
+
+xi:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}.p12" \
+  --subject "CN=${CN}-${CUR_TIME}"
+
+xi:cmp-enroll-p12 --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+  --out ${OUT_DIR}/${CN}.der --profile smime \
+  --subject "CN=${CN}-${CUR_TIME},E=info@example.com,O=xipki,C=DE"
+
+xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+  --cert ${OUT_DIR}/${CN}.der
+
+echo "=====CMP: Enroll (CA generate key pair) via CRMF====="
+
+CN = cmp-crmf-ca-genkey-smime
+
+xi:cmp-enroll-cagenkey \
+  --p12-out ${OUT_DIR}/${CN}.p12 --password 1234 \
+  --cert-out ${OUT_DIR}/${CN}.der --profile smime \
+  --subject "CN=${CN}-${CUR_TIME},E=info@example.com,O=xipki,C=DE"
+
+echo "=====CMP: Enroll via CSR====="
+
+CN = cmp-csr-smime
+
+xi:rsa-p12 --password 1234 --out ${OUT_DIR}/${CN}.p12 \
+  --subject "CN=${CN}-${CUR_TIME}"
+
+xi:csr-p12 --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+  --out ${OUT_DIR}/${CN}.csr \
+  --subject "CN=${CN}-${CUR_TIME},E=info@example.com,O=xipki,C=DE"
+
+xi:cmp-csr-enroll --csr ${OUT_DIR}/${CN}.csr --out ${OUT_DIR}/${CN}.der --profile smime
+
+xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+  --cert ${OUT_DIR}/${CN}.der
+
+## Enroll certificates (profile tls)
 
 echo "=====CMP: Enroll via CRMF====="
 

@@ -216,6 +216,40 @@ xi:update-cert-p12 --p12 output/ee-complex2.p12 --password 1234 \
   --ca-cert output/subca1.crt \
   --ca-cert output/rootca1.crt
 
+# Certificate smime1
+
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/smime1.p12 --password 1234 \
+  --subject "CN=smime1,E=InFo@example.com,O=xipki,C=DE" \
+  --outform $OUTFORM \
+  --out output/smime1.csr \
+
+xi:cmp-csr-enroll --csr output/smime1.csr \
+  --outform $OUTFORM \
+  --out output/smime1.crt --profile smime
+
+xi:update-cert-p12 --p12 output/smime1.p12 --password 1234 \
+  --cert output/smime1.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate smime-legacy1
+
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/smime-legacy1.p12 --password 1234 \
+  --subject "CN=smime-legacy1,E=InFo@example.com,O=xipki,C=DE" \
+  --outform $OUTFORM \
+  --out output/smime-legacy1.csr \
+
+xi:cmp-csr-enroll --csr output/smime-legacy1.csr \
+  --outform $OUTFORM \
+  --out output/smime-legacy1.crt --profile smime-legacy
+
+xi:update-cert-p12 --p12 output/smime-legacy1.p12 --password 1234 \
+  --cert output/smime-legacy1.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
 # Certificate tls1
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \

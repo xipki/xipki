@@ -100,6 +100,18 @@
 			"file":"${profiles.dir}/certprofile-ee-complex.json"
 		}
 	},{
+		"name":"smime",
+		"type":"xijson",
+		"conf":{
+			"file":"${profiles.dir}/certprofile-smime.json"
+		}
+	},{
+		"name":"smime-legacy",
+		"type":"xijson",
+		"conf":{
+			"file":"${profiles.dir}/certprofile-smime-legacy.json"
+		}
+	},{
 		"name":"tls",
 		"type":"xijson",
 		"conf":{
@@ -116,7 +128,7 @@
 		"type":"xijson",
 		"conf":{
 			"file":"${profiles.dir}/certprofile-tls-c.json"
-		},
+		}
 	},{
 		"name":"tls-inc-sn",
 		"type":"xijson",

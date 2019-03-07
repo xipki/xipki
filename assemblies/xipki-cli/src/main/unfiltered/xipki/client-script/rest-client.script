@@ -17,6 +17,24 @@ xi:curl --out ${CACERT} $BASE_URL/cacert
 
 CA_SHA1FP = $(xi:cert-info --fingerprint --hash SHA1 --in ${CACERT})
 
+## Enroll certificate (profile smime)
+
+echo "=====REST: Enroll====="
+
+CN = rest-smime-${CUR_TIME}
+
+xi:rsa-p12 --password 1234 --out ${OUT_DIR}/${CN}.p12 --subject "CN=${CN}"
+
+xi:csr-p12 --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+  --subject "CN=${CN},E=info@example.com,O=xipki,C=DE" \
+  --out ${OUT_DIR}/${CN}.csr
+
+xi:curl --out ${OUT_DIR}/${CN}.der --data-file ${OUT_DIR}/${CN}.csr \
+  --header "Content-Type: application/pkcs10" \
+  "$BASE_URL/enroll-cert?profile=smime"
+
+## Enroll certificate (profile tls)
+
 echo "=====REST: Enroll====="
 
 CN = rest-tls-${CUR_TIME}

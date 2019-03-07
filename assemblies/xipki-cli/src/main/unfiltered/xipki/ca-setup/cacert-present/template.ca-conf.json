@@ -56,6 +56,12 @@
 			"file":"${profiles.dir}/certprofile-ocsp.json"
 		}
 	},{
+		"name":"smime",
+		"type":"xijson",
+		"conf":{
+			"file":"${profiles.dir}/certprofile-smime.json"
+		}
+	},{
 		"name":"tls",
 		"type":"xijson",
 		"conf":{
@@ -126,6 +132,7 @@
 		"profiles":[
 			"ocsp",
 			"scep",
+			"smime",
 			"tls",
 			"tls-c"
 		],

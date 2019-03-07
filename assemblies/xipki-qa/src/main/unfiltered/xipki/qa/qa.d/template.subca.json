@@ -52,6 +52,8 @@
 		"profiles":[
 			"qc",
 			"ee-complex",
+			"smime",
+			"smime-legacy",
 			"tls",
 			"tls-c",
 			"tls-inc-sn"
