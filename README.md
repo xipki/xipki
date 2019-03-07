@@ -203,7 +203,7 @@ Features
   - Customized extension to embed certificates in CRL
   - CMP (RFC 4210 and RFC 4211)
   - API to specify customized certificate profiles
-  - Support of XML-based certificate profile
+  - Support of JSON-based certificate profile
   - API to specify customized publisher, e.g. for LDAP and OCSP responder
   - Support of publisher for OCSP responder
   - Signature algorithms of certificates
