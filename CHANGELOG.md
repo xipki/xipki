@@ -9,6 +9,7 @@ See also <https://github.com/xipki/xipki/releases>
   - New feature to add NextUpdate to OCSP Response, even if no NextUpdate is available. This is configurable.
   - Optimize the mechanism to generate CRL
   - Add example modules to demonstrate how to extend XiPKI OCSP server to use customized certificate status source.
+  - Better mechansim to handle emailAddress in Subject / SubjectAltName
 
 ## 5.0.1
  - Release date: Feb 17, 2019
