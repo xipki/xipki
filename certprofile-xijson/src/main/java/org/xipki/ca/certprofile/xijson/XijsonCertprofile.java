@@ -1701,21 +1701,26 @@ public class XijsonCertprofile extends BaseCertprofile {
 
         for (RDN rdn : rdns) {
           String rdnValue = X509Util.rdnValueToString(rdn.getFirst().getValue());
+          GeneralName gn;
           switch (tag) {
             case rfc822Name:
-              grantedNames.add(new GeneralName(tag.getTag(), rdnValue.toLowerCase()));
+              gn = new GeneralName(tag.getTag(), rdnValue.toLowerCase());
               break;
             case DNSName:
             case uniformResourceIdentifier:
             case IPAddress:
             case directoryName:
             case registeredID:
-              grantedNames.add(new GeneralName(tag.getTag(), rdnValue));
+              gn = new GeneralName(tag.getTag(), rdnValue);
               break;
             default:
               throw new IllegalStateException(
                   "should not reach here, unknown GeneralName tag " + tag);
           } // end switch (tag)
+
+          if (!grantedNames.contains(gn)) {
+            grantedNames.add(gn);
+          }
         }
       }
     }
@@ -1724,7 +1729,10 @@ public class XijsonCertprofile extends BaseCertprofile {
     if (reqNames != null) {
       GeneralName[] reqL = reqNames.getNames();
       for (int i = 0; i < reqL.length; i++) {
-        grantedNames.add(createGeneralName(reqL[i], subjectAltNameModes));
+        GeneralName gn = createGeneralName(reqL[i], subjectAltNameModes);
+        if (!grantedNames.contains(gn)) {
+          grantedNames.add(gn);
+        }
       }
     }
 
