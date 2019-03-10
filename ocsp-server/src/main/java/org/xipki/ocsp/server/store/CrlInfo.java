@@ -34,7 +34,7 @@ import org.xipki.util.StringUtil;
  * @since 2.2.0
  */
 
-public class CrlInfo {
+class CrlInfo {
 
   public static final String BASE_CRL_NUMBER = "base-crl-number";
 

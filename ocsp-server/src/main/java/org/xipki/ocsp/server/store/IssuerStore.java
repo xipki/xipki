@@ -31,7 +31,7 @@ import org.xipki.ocsp.api.RequestIssuer;
  * @since 2.0.0
  */
 
-public class IssuerStore {
+class IssuerStore {
 
   private final List<IssuerEntry> entries;
 

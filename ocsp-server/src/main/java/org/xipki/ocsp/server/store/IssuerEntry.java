@@ -39,7 +39,7 @@ import org.xipki.util.Args;
  * @since 2.0.0
  */
 
-public class IssuerEntry {
+class IssuerEntry {
 
   private final int id;
 

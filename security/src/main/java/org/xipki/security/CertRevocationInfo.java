@@ -20,6 +20,7 @@ package org.xipki.security;
 import java.util.Date;
 
 import org.xipki.util.Args;
+import org.xipki.util.CompareUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.StringUtil;
 
@@ -132,6 +133,22 @@ public class CertRevocationInfo {
       pairs.putPair("invalidityTime", Long.toString(invalidityTime.getTime() / 1000));
     }
     return pairs.getEncoded();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+
+    if (!(obj instanceof CertRevocationInfo)) {
+      return false;
+    }
+
+    CertRevocationInfo other = (CertRevocationInfo) obj;
+    return reason == other.reason
+        && CompareUtil.equalsObject(revocationTime, other.revocationTime)
+        && CompareUtil.equalsObject(invalidityTime, other.invalidityTime);
   }
 
 }

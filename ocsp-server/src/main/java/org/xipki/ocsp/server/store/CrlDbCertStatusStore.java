@@ -61,7 +61,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     @Override
     public void run() {
       try {
-        initializeStore(datasource);
+        updateStore(datasource);
       } catch (Throwable th) {
         LogUtil.error(LOG, th, "error while calling initializeStore() for store " + name);
       }
@@ -127,7 +127,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     str = getStrValue(sourceConf, "issuerCertFile", false);
     this.issuerCert = (str == null) ? null : parseCert(str);
 
-    initializeStore(datasource);
+    updateStore(datasource);
     super.init(sourceConf, datasource);
   }
 
@@ -175,7 +175,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     }
   }
 
-  private synchronized void initializeStore(DataSourceWrapper datasource) {
+  private synchronized void updateStore(DataSourceWrapper datasource) {
     if (crlUpdateInProcess.get()) {
       return;
     }
@@ -239,7 +239,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
         LOG.error("updating CertStore {} failed", name);
       }
     } catch (Throwable th) {
-      LogUtil.error(LOG, th, "could not execute initializeStore()");
+      LogUtil.error(LOG, th, "error while executing updateStore()");
       crlUpdateFailed = true;
       crlUpdated = true;
     } finally {

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ocsp.server;
+package org.xipki.ocsp.server.store;
 
 import java.io.Closeable;
 import java.math.BigInteger;
@@ -42,8 +42,6 @@ import org.xipki.datasource.DataAccessException.Reason;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.ocsp.api.OcspRespWithCacheInfo;
 import org.xipki.ocsp.api.OcspRespWithCacheInfo.ResponseCacheInfo;
-import org.xipki.ocsp.server.store.IssuerEntry;
-import org.xipki.ocsp.server.store.IssuerStore;
 import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.security.AlgorithmCode;
 import org.xipki.security.HashAlgo;
@@ -62,7 +60,8 @@ import org.xipki.util.concurrent.ConcurrentBagEntry;
  * @since 2.2.0
  */
 
-class ResponseCacher implements Closeable {
+public class ResponseCacher implements Closeable {
+
   private static final Logger LOG = LoggerFactory.getLogger(ResponseCacher.class);
 
   private static final long SEC_PER_WEEK = 7L * 24 * 60 * 60;
@@ -142,7 +141,7 @@ class ResponseCacher implements Closeable {
 
   private ScheduledFuture<?> issuerUpdater;
 
-  ResponseCacher(DataSourceWrapper datasource, boolean master, int validity) {
+  public ResponseCacher(DataSourceWrapper datasource, boolean master, int validity) {
     this.datasource = Args.notNull(datasource, "datasource");
     this.master = master;
     this.validity = Args.positive(validity, "validity");
@@ -158,11 +157,11 @@ class ResponseCacher implements Closeable {
     }
   }
 
-  boolean isOnService() {
+  public boolean isOnService() {
     return onService.get() && issuerStore != null;
   }
 
-  void init() {
+  public void init() {
     updateCacheStore();
 
     scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
@@ -207,12 +206,12 @@ class ResponseCacher implements Closeable {
     }
   }
 
-  Integer getIssuerId(RequestIssuer reqIssuer) {
+  public Integer getIssuerId(RequestIssuer reqIssuer) {
     IssuerEntry issuer = issuerStore.getIssuerForFp(reqIssuer);
     return (issuer == null) ? null : issuer.getId();
   }
 
-  synchronized Integer storeIssuer(X509Certificate issuerCert)
+  public synchronized Integer storeIssuer(X509Certificate issuerCert)
       throws CertificateException, InvalidConfException, DataAccessException {
     if (!master) {
       throw new IllegalStateException("storeIssuer is not permitted in slave mode");
@@ -257,7 +256,7 @@ class ResponseCacher implements Closeable {
     }
   }
 
-  OcspRespWithCacheInfo getOcspResponse(int issuerId, BigInteger serialNumber,
+  public OcspRespWithCacheInfo getOcspResponse(int issuerId, BigInteger serialNumber,
       AlgorithmCode sigAlg) throws DataAccessException {
     final String sql = sqlSelectOcsp;
     byte[] identBytes = buildIdent(serialNumber, sigAlg);
@@ -308,8 +307,8 @@ class ResponseCacher implements Closeable {
     }
   }
 
-  void storeOcspResponse(int issuerId, BigInteger serialNumber, long thisUpdate, Long nextUpdate,
-      AlgorithmCode sigAlgCode, byte[] response) {
+  public void storeOcspResponse(int issuerId, BigInteger serialNumber, long thisUpdate,
+      Long nextUpdate, AlgorithmCode sigAlgCode, byte[] response) {
     long nowInSec = System.currentTimeMillis() / 1000;
     if (nextUpdate == null) {
       nextUpdate = nowInSec + SEC_PER_WEEK;

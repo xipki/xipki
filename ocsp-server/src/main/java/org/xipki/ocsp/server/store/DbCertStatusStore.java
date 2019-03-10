@@ -49,6 +49,7 @@ import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.OcspStore;
 import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.ocsp.api.RequestIssuer;
+import org.xipki.ocsp.server.IssuerFilter;
 import org.xipki.ocsp.server.OcspServerConf;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
@@ -100,7 +101,7 @@ public class DbCertStatusStore extends OcspStore {
 
     @Override
     public void run() {
-      initIssuerStore();
+      updateIssuerStore();
     }
 
   } // class StoreUpdateService
@@ -135,7 +136,7 @@ public class DbCertStatusStore extends OcspStore {
     return Collections.emptyList();
   }
 
-  private synchronized void initIssuerStore() {
+  private synchronized void updateIssuerStore() {
     if (storeUpdateInProcess.get()) {
       return;
     }
@@ -241,7 +242,7 @@ public class DbCertStatusStore extends OcspStore {
         releaseDbResources(ps, rs);
       }
     } catch (Throwable th) {
-      LogUtil.error(LOG, th, "could not executing initIssuerStore()");
+      LogUtil.error(LOG, th, "error while executing updateIssuerStore()");
       initializationFailed = true;
       initialized = true;
     } finally {
@@ -537,7 +538,7 @@ public class DbCertStatusStore extends OcspStore {
       throw new OcspStoreException(ex.getMessage(), ex);
     } // end try
 
-    initIssuerStore();
+    updateIssuerStore();
 
     if (this.scheduledThreadPoolExecutor != null) {
       this.scheduledThreadPoolExecutor.shutdownNow();

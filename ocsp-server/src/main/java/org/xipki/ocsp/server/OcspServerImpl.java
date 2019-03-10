@@ -69,6 +69,7 @@ import org.xipki.ocsp.server.OcspServerConf.EmbedCertsMode;
 import org.xipki.ocsp.server.ResponderOption.OcspMode;
 import org.xipki.ocsp.server.store.CrlDbCertStatusStore;
 import org.xipki.ocsp.server.store.DbCertStatusStore;
+import org.xipki.ocsp.server.store.ResponseCacher;
 import org.xipki.ocsp.server.type.CertID;
 import org.xipki.ocsp.server.type.EncodingException;
 import org.xipki.ocsp.server.type.ExtendedExtension;

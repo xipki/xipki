@@ -85,7 +85,7 @@ import org.xipki.util.StringUtil;
  * @since 2.2.0
  */
 
-public class ImportCrl {
+class ImportCrl {
 
   private static final Logger LOG = LoggerFactory.getLogger(ImportCrl.class);
 
