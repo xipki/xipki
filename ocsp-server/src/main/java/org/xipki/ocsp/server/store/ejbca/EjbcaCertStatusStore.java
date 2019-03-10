@@ -123,6 +123,13 @@ public class EjbcaCertStatusStore extends OcspStore {
         rs = ps.executeQuery();
         while (rs.next()) {
           String caData = rs.getString("data");
+
+          String str = extractTextFromCaData(caData, "catype", "int");
+          if (!"1".contentEquals(str)) {
+            // not X.509CA
+            continue;
+          }
+
           String b64Cert = extractTextFromCaData(caData, "certificatechain", "string");
           if (b64Cert == null) {
             // not an X.509CA
@@ -146,18 +153,13 @@ public class EjbcaCertStatusStore extends OcspStore {
           }
 
           // extract the revocation time of CA
-          String str = extractTextFromCaData(caData, "revokationreason", "int");
+          str = extractTextFromCaData(caData, "revokationreason", "int");
           if (str != null && !"-1".contentEquals(str)) {
             // CA is revoked
             str = extractTextFromCaData(caData, "revokationdate", "long");
 
-            Date revTime;
-            if (str != null && !"-1".contentEquals(str)) {
-              revTime = new Date(Long.parseLong(str));
-            } else {
-              revTime = new Date();
-            }
-
+            Date revTime = (str == null || "-1".contentEquals(str))
+                ? new Date() : new Date(Long.parseLong(str));
             issuerEntry.setRevocationInfo(revTime);
           }
 
@@ -223,19 +225,13 @@ public class EjbcaCertStatusStore extends OcspStore {
       throw new OcspStoreException("initialization of CertStore failed");
     }
 
-    String sql;
-
     try {
       EjbcaIssuerEntry issuer = issuerStore.getIssuerForFp(reqIssuer);
       if (issuer == null) {
         return null;
       }
 
-      if (includeCertHash) {
-        sql = sqlCsWithCertHash;
-      } else {
-        sql = sqlCs;
-      }
+      String sql = includeCertHash ? sqlCsWithCertHash : sqlCs;
 
       Date thisUpdate = new Date();
       Date nextUpdate = null;
