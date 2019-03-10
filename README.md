@@ -263,6 +263,7 @@ Features
   - Management of multiple certificate status sources
   - Support of certificate status source published by XiPKI CA
   - Support of certificate status source CRL and DeltaCRL
+  - Support of certificate status source published by EJBCA
   - API to support proprietary certificate sources
   - Support of both unsigned and signed OCSP requests
   - Multiple software instances (all can be in active mode) for the same OCSP
