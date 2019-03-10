@@ -70,6 +70,7 @@ import org.xipki.ocsp.server.ResponderOption.OcspMode;
 import org.xipki.ocsp.server.store.CrlDbCertStatusStore;
 import org.xipki.ocsp.server.store.DbCertStatusStore;
 import org.xipki.ocsp.server.store.ResponseCacher;
+import org.xipki.ocsp.server.store.ejbca.EjbcaCertStatusStore;
 import org.xipki.ocsp.server.type.CertID;
 import org.xipki.ocsp.server.type.EncodingException;
 import org.xipki.ocsp.server.type.ExtendedExtension;
@@ -151,6 +152,8 @@ public class OcspServerImpl implements OcspServer {
   private static final String STORE_TYPE_XIPKI_DB = "xipki-db";
 
   private static final String STORE_TYPE_CRL = "crl";
+
+  private static final String STORE_TYPE_EJBCA_DB = "ejbca-db";
 
   private static final byte[] DERNullBytes = new byte[]{0x05, 0x00};
 
@@ -1025,6 +1028,8 @@ public class OcspServerImpl implements OcspServer {
         store = new DbCertStatusStore();
       } else if (STORE_TYPE_CRL.equalsIgnoreCase(type)) {
         store = new CrlDbCertStatusStore();
+      } else if (STORE_TYPE_EJBCA_DB.equalsIgnoreCase(type)) {
+        store = new EjbcaCertStatusStore();
       } else if (type.startsWith("java:")) {
         String className = type.substring("java:".length()).trim();
         try {
