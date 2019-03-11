@@ -38,340 +38,358 @@ import org.xipki.util.StringUtil;
 public class ObjectIdentifiers {
 
   /**
-   * registered PEN for xipki.org: 45522
-   */
-  private static final ASN1ObjectIdentifier id_pen = new ASN1ObjectIdentifier("1.3.6.2.4.1");
-
-  private static final ASN1ObjectIdentifier id_xipki = id_pen.branch("45522");
-
-  private static final ASN1ObjectIdentifier id_xipki_ext = id_xipki.branch("1");
-
-  public static final ASN1ObjectIdentifier id_xipki_ext_crlCertset = id_xipki_ext.branch("1");
-
-  public static final ASN1ObjectIdentifier id_xipki_ext_cmpRequestExtensions
-      = id_xipki_ext.branch("2");
-
-  public static final ASN1ObjectIdentifier id_xipki_ext_authorizationTemplate
-      = id_xipki_ext.branch("3");
-
-  private static final ASN1ObjectIdentifier id_xipki_cmp = id_xipki.branch("2");
-
-  public static final ASN1ObjectIdentifier id_xipki_cmp_cmpGenmsg = id_xipki_cmp.branch("1");
-
-  public static final ASN1ObjectIdentifier id_xipki_cmp_cacerts = id_xipki_cmp.branch("2");
-
-  /**
-   * country code - StringType(SIZE(2)).
-   */
-  public static final ASN1ObjectIdentifier DN_C = new ASN1ObjectIdentifier("2.5.4.6");
-
-  /**
-   * organization - StringType(SIZE(1..64))
-   */
-  public static final ASN1ObjectIdentifier DN_O = new ASN1ObjectIdentifier("2.5.4.10");
-
-  /**
-   * organizationIdentifier - StringType(SIZE(1..64))
-   */
-  public static final ASN1ObjectIdentifier DN_organizationIdentifier
-      = new ASN1ObjectIdentifier("2.5.4.97");
-
-  /**
-   * organizational unit name - StringType(SIZE(1..64))
-   */
-  public static final ASN1ObjectIdentifier DN_OU = new ASN1ObjectIdentifier("2.5.4.11");
-
-  /**
-   * Title.
-   */
-  public static final ASN1ObjectIdentifier DN_T = new ASN1ObjectIdentifier("2.5.4.12");
-
-  /**
-   * common name - StringType(SIZE(1..64))
-   */
-  public static final ASN1ObjectIdentifier DN_CN = new ASN1ObjectIdentifier("2.5.4.3");
-
-  /**
-   * device serial number name - StringType(SIZE(1..64))
-   */
-  public static final ASN1ObjectIdentifier DN_SN = new ASN1ObjectIdentifier("2.5.4.5");
-
-  /**
-   * street - StringType(SIZE(1..64))
-   */
-  public static final ASN1ObjectIdentifier DN_STREET = new ASN1ObjectIdentifier("2.5.4.9");
-
-  /**
-   * device serial number name - StringType(SIZE(1..64))
-   */
-  public static final ASN1ObjectIdentifier DN_SERIALNUMBER = DN_SN;
-
-  /**
-   * locality name - StringType(SIZE(1..64))
-   */
-  public static final ASN1ObjectIdentifier DN_L = new ASN1ObjectIdentifier("2.5.4.7");
-
-  public static final ASN1ObjectIdentifier DN_LOCALITYNAME = DN_L;
-
-  /**
-   * state, or province name - StringType(SIZE(1..64))
-   */
-  public static final ASN1ObjectIdentifier DN_ST = new ASN1ObjectIdentifier("2.5.4.8");
-
-  /**
-   * Naming attributes of type X520name.
-   */
-  public static final ASN1ObjectIdentifier DN_SURNAME = new ASN1ObjectIdentifier("2.5.4.4");
-
-  public static final ASN1ObjectIdentifier DN_GIVENNAME = new ASN1ObjectIdentifier("2.5.4.42");
-
-  public static final ASN1ObjectIdentifier DN_INITIALS = new ASN1ObjectIdentifier("2.5.4.43");
-
-  public static final ASN1ObjectIdentifier DN_GENERATION = new ASN1ObjectIdentifier("2.5.4.44");
-
-  public static final ASN1ObjectIdentifier DN_GENERATION_QUALIFIER = DN_GENERATION;
-
-  public static final ASN1ObjectIdentifier DN_UNIQUE_IDENTIFIER
-      = new ASN1ObjectIdentifier("2.5.4.45");
-
-  /**
-   * businessCategory - DirectoryString(SIZE(1..128)
-   */
-  public static final ASN1ObjectIdentifier DN_BUSINESS_CATEGORY =
-      new ASN1ObjectIdentifier("2.5.4.15");
-
-  /**
-   * postalCode - DirectoryString(SIZE(1..40)
-   */
-  public static final ASN1ObjectIdentifier DN_POSTAL_CODE = new ASN1ObjectIdentifier("2.5.4.17");
-
-  /**
-   * dnQualifier - DirectoryString(SIZE(1..64)
-   */
-  public static final ASN1ObjectIdentifier DN_QUALIFIER = new ASN1ObjectIdentifier("2.5.4.46");
-
-  /**
-   * RFC 3039 Pseudonym - DirectoryString(SIZE(1..64)
-   */
-  public static final ASN1ObjectIdentifier DN_PSEUDONYM = new ASN1ObjectIdentifier("2.5.4.65");
-
-  /**
-   * RFC 3039 DateOfBirth - GeneralizedTime - YYYYMMDD000000Z.
-   */
-  public static final ASN1ObjectIdentifier DN_DATE_OF_BIRTH =
-      new ASN1ObjectIdentifier("1.3.6.1.5.5.7.9.1");
-
-  /**
-   * RFC 3039 PlaceOfBirth - DirectoryString(SIZE(1..128)
-   */
-  public static final ASN1ObjectIdentifier DN_PLACE_OF_BIRTH =
-      new ASN1ObjectIdentifier("1.3.6.1.5.5.7.9.2");
-
-  /**
-   * RFC 3039 Gender - PrintableString (SIZE(1))-- "M", "F", "m" or "f".
-   */
-  public static final ASN1ObjectIdentifier DN_GENDER =
-      new ASN1ObjectIdentifier("1.3.6.1.5.5.7.9.3");
-
-  /**
-   * RFC 3039 CountryOfCitizenship - PrintableString (SIZE (2))-- ISO 3166 codes only.
-   */
-  public static final ASN1ObjectIdentifier DN_COUNTRY_OF_CITIZENSHIP
-      = new ASN1ObjectIdentifier("1.3.6.1.5.5.7.9.4");
-
-  /**
-   * RFC 3039 CountryOfResidence - PrintableString (SIZE (2))-- ISO 3166 codes only.
-   */
-  public static final ASN1ObjectIdentifier DN_COUNTRY_OF_RESIDENCE =
-      new ASN1ObjectIdentifier("1.3.6.1.5.5.7.9.5");
-
-  /**
-   * ISIS-MTT NameAtBirth - DirectoryString(SIZE(1..64)
-   */
-  public static final ASN1ObjectIdentifier DN_NAME_AT_BIRTH =
-      new ASN1ObjectIdentifier("1.3.36.8.3.14");
-
-  /**
-   * RFC 3039 PostalAddress - SEQUENCE SIZE (1..6) OF
-   * DirectoryString(SIZE(1..30))
-   */
-  public static final ASN1ObjectIdentifier DN_POSTAL_ADDRESS = new ASN1ObjectIdentifier("2.5.4.16");
-
-  /**
-   * RFC 2256 dmdName.
-   */
-  public static final ASN1ObjectIdentifier DN_DMD_NAME = new ASN1ObjectIdentifier("2.5.4.54");
-
-  /**
-   * id-at-telephoneNumber.
-   */
-  public static final ASN1ObjectIdentifier DN_TELEPHONE_NUMBER
-      = X509ObjectIdentifiers.id_at_telephoneNumber;
-
-  /**
-   * id-at-name.
-   */
-  public static final ASN1ObjectIdentifier DN_NAME = X509ObjectIdentifiers.id_at_name;
-
-  /**
-   * Email address (RSA PKCS#9 extension) - IA5String.
-   * <p/>
-   * Note: if you're trying to be ultra orthodox, don't use this! It shouldn't be in here.
-   */
-  public static final ASN1ObjectIdentifier DN_EmailAddress =
-      PKCSObjectIdentifiers.pkcs_9_at_emailAddress;
-
-  /**
-   * more from PKCS#9.
-   */
-  public static final ASN1ObjectIdentifier DN_UnstructuredName =
-      PKCSObjectIdentifiers.pkcs_9_at_unstructuredName;
-
-  public static final ASN1ObjectIdentifier DN_UnstructuredAddress =
-      PKCSObjectIdentifiers.pkcs_9_at_unstructuredAddress;
-
-  /**
-   * email address in certificates.
-   */
-  public static final ASN1ObjectIdentifier DN_E = DN_EmailAddress;
-
-  /*
-  * others...
-  */
-  public static final ASN1ObjectIdentifier DN_DC =
-      new ASN1ObjectIdentifier("0.9.2342.19200300.100.1.25");
-
-  /**
-   * LDAP User id.
-   */
-  public static final ASN1ObjectIdentifier DN_LDAP_UID =
-      new ASN1ObjectIdentifier("0.9.2342.19200300.100.1.1");
-
-  /**
    * Extended key usages.
    */
   private static final ASN1ObjectIdentifier id_pkix = new ASN1ObjectIdentifier("1.3.6.1.5.5.7");
 
-  private static final ASN1ObjectIdentifier id_kp = id_pkix.branch("3");
+  public static final class Xipki {
 
-  public static final ASN1ObjectIdentifier id_anyExtendedKeyUsage =
-      Extension.extendedKeyUsage.branch("0");
+    /**
+     * registered PEN for xipki.org: 45522
+     */
+    private static final ASN1ObjectIdentifier id_pen = new ASN1ObjectIdentifier("1.3.6.2.4.1");
 
-  /**
-   * TLS WWW server authentication
-   * Key usage bits that may be consistent: digitalSignature, keyEncipherment or keyAgreement.
-   */
-  public static final ASN1ObjectIdentifier id_kp_serverAuth = id_kp.branch("1");
+    private static final ASN1ObjectIdentifier id_xipki = id_pen.branch("45522");
 
-  /**
-   * TLS WWW client authentication
-   * Key usage bits that may be consistent: digitalSignature and/or keyAgreement.
-   */
-  public static final ASN1ObjectIdentifier id_kp_clientAuth = id_kp.branch("2");
+    private static final ASN1ObjectIdentifier id_xipki_ext = id_xipki.branch("1");
 
-  /**
-   * Signing of downloadable executable code
-   * Key usage bits that may be consistent: digitalSignature.
-   */
-  public static final ASN1ObjectIdentifier id_kp_codeSigning = id_kp.branch("3");
+    public static final ASN1ObjectIdentifier id_xipki_ext_crlCertset = id_xipki_ext.branch("1");
 
-  /**
-   * Email protection
-   * Key usage bits that may be consistent: digitalSignature, nonRepudiation, and/or
-   * (keyEncipherment or keyAgreement).
-   */
-  public static final ASN1ObjectIdentifier id_kp_emailProtection = id_kp.branch("4");
+    public static final ASN1ObjectIdentifier id_xipki_ext_cmpRequestExtensions
+        = id_xipki_ext.branch("2");
 
-  /**
-   * Binding the hash of an object to a time
-   * Key usage bits that may be consistent: digitalSignature and/or nonRepudiation.
-   */
-  public static final ASN1ObjectIdentifier id_kp_timeStamping = id_kp.branch("8");
+    public static final ASN1ObjectIdentifier id_xipki_ext_authorizationTemplate
+        = id_xipki_ext.branch("3");
 
-  /**
-   * Signing OCSP responses
-   * Key usage bits that may be consistent: digitalSignature and/or nonRepudiation.
-   */
-  public static final ASN1ObjectIdentifier id_kp_OCSPSigning = id_kp.branch("9");
+    private static final ASN1ObjectIdentifier id_xipki_cmp = id_xipki.branch("2");
+
+    public static final ASN1ObjectIdentifier id_xipki_cmp_cmpGenmsg = id_xipki_cmp.branch("1");
+
+    public static final ASN1ObjectIdentifier id_xipki_cmp_cacerts = id_xipki_cmp.branch("2");
+
+  }
+
+  public static class DN {
+    /**
+     * country code - StringType(SIZE(2)).
+     */
+    public static final ASN1ObjectIdentifier C = new ASN1ObjectIdentifier("2.5.4.6");
+
+    /**
+     * organization - StringType(SIZE(1..64))
+     */
+    public static final ASN1ObjectIdentifier O = new ASN1ObjectIdentifier("2.5.4.10");
+
+    /**
+     * organizationIdentifier - StringType(SIZE(1..64))
+     */
+    public static final ASN1ObjectIdentifier organizationIdentifier
+        = new ASN1ObjectIdentifier("2.5.4.97");
+
+    /**
+     * organizational unit name - StringType(SIZE(1..64))
+     */
+    public static final ASN1ObjectIdentifier OU = new ASN1ObjectIdentifier("2.5.4.11");
+
+    /**
+     * Title.
+     */
+    public static final ASN1ObjectIdentifier T = new ASN1ObjectIdentifier("2.5.4.12");
+
+    /**
+     * common name - StringType(SIZE(1..64))
+     */
+    public static final ASN1ObjectIdentifier CN = new ASN1ObjectIdentifier("2.5.4.3");
+
+    /**
+     * device serial number name - StringType(SIZE(1..64))
+     */
+    public static final ASN1ObjectIdentifier SN = new ASN1ObjectIdentifier("2.5.4.5");
+
+    /**
+     * street - StringType(SIZE(1..64))
+     */
+    public static final ASN1ObjectIdentifier street = new ASN1ObjectIdentifier("2.5.4.9");
+
+    /**
+     * device serial number name - StringType(SIZE(1..64))
+     */
+    public static final ASN1ObjectIdentifier serialNumber = SN;
+
+    /**
+     * locality name - StringType(SIZE(1..64))
+     */
+    public static final ASN1ObjectIdentifier L = new ASN1ObjectIdentifier("2.5.4.7");
+
+    public static final ASN1ObjectIdentifier localityName = L;
+
+    /**
+     * state, or province name - StringType(SIZE(1..64))
+     */
+    public static final ASN1ObjectIdentifier ST = new ASN1ObjectIdentifier("2.5.4.8");
+
+    /**
+     * Naming attributes of type X520name.
+     */
+    public static final ASN1ObjectIdentifier surname = new ASN1ObjectIdentifier("2.5.4.4");
+
+    public static final ASN1ObjectIdentifier givenName = new ASN1ObjectIdentifier("2.5.4.42");
+
+    public static final ASN1ObjectIdentifier initials = new ASN1ObjectIdentifier("2.5.4.43");
+
+    public static final ASN1ObjectIdentifier generation = new ASN1ObjectIdentifier("2.5.4.44");
+
+    public static final ASN1ObjectIdentifier generationQualifier = generation;
+
+    public static final ASN1ObjectIdentifier uniqueIdentifier
+        = new ASN1ObjectIdentifier("2.5.4.45");
+
+    /**
+     * businessCategory - DirectoryString(SIZE(1..128)
+     */
+    public static final ASN1ObjectIdentifier businessCategory =
+        new ASN1ObjectIdentifier("2.5.4.15");
+
+    /**
+     * postalCode - DirectoryString(SIZE(1..40)
+     */
+    public static final ASN1ObjectIdentifier postalCode = new ASN1ObjectIdentifier("2.5.4.17");
+
+    /**
+     * dnQualifier - DirectoryString(SIZE(1..64)
+     */
+    public static final ASN1ObjectIdentifier dnQualifier = new ASN1ObjectIdentifier("2.5.4.46");
+
+    /**
+     * RFC 3039 Pseudonym - DirectoryString(SIZE(1..64)
+     */
+    public static final ASN1ObjectIdentifier pseudonym = new ASN1ObjectIdentifier("2.5.4.65");
+
+    /**
+     * RFC 3039 DateOfBirth - GeneralizedTime - YYYYMMDD000000Z.
+     */
+    public static final ASN1ObjectIdentifier dateOfBirth =
+        new ASN1ObjectIdentifier("1.3.6.1.5.5.7.9.1");
+
+    /**
+     * RFC 3039 PlaceOfBirth - DirectoryString(SIZE(1..128)
+     */
+    public static final ASN1ObjectIdentifier placeOfBirth =
+        new ASN1ObjectIdentifier("1.3.6.1.5.5.7.9.2");
+
+    /**
+     * RFC 3039 Gender - PrintableString (SIZE(1))-- "M", "F", "m" or "f".
+     */
+    public static final ASN1ObjectIdentifier gender =
+        new ASN1ObjectIdentifier("1.3.6.1.5.5.7.9.3");
+
+    /**
+     * RFC 3039 CountryOfCitizenship - PrintableString (SIZE (2))-- ISO 3166 codes only.
+     */
+    public static final ASN1ObjectIdentifier countryOfCitizenship
+        = new ASN1ObjectIdentifier("1.3.6.1.5.5.7.9.4");
+
+    /**
+     * RFC 3039 CountryOfResidence - PrintableString (SIZE (2))-- ISO 3166 codes only.
+     */
+    public static final ASN1ObjectIdentifier countryOfResidence =
+        new ASN1ObjectIdentifier("1.3.6.1.5.5.7.9.5");
+
+    /**
+     * ISIS-MTT NameAtBirth - DirectoryString(SIZE(1..64)
+     */
+    public static final ASN1ObjectIdentifier nameAtBirth =
+        new ASN1ObjectIdentifier("1.3.36.8.3.14");
+
+    /**
+     * RFC 3039 PostalAddress - SEQUENCE SIZE (1..6) OF
+     * DirectoryString(SIZE(1..30))
+     */
+    public static final ASN1ObjectIdentifier postalAddress = new ASN1ObjectIdentifier("2.5.4.16");
+
+    /**
+     * RFC 2256 dmdName.
+     */
+    public static final ASN1ObjectIdentifier dmdName = new ASN1ObjectIdentifier("2.5.4.54");
+
+    /**
+     * id-at-telephoneNumber.
+     */
+    public static final ASN1ObjectIdentifier telephoneNumber
+        = X509ObjectIdentifiers.id_at_telephoneNumber;
+
+    /**
+     * id-at-name.
+     */
+    public static final ASN1ObjectIdentifier name = X509ObjectIdentifiers.id_at_name;
+
+    /**
+     * Email address (RSA PKCS#9 extension) - IA5String.
+     * <p/>
+     * Note: if you're trying to be ultra orthodox, don't use this! It shouldn't be in here.
+     */
+    public static final ASN1ObjectIdentifier emailAddress =
+        PKCSObjectIdentifiers.pkcs_9_at_emailAddress;
+
+    /**
+     * more from PKCS#9.
+     */
+    public static final ASN1ObjectIdentifier unstructuredName =
+        PKCSObjectIdentifiers.pkcs_9_at_unstructuredName;
+
+    public static final ASN1ObjectIdentifier unstructuredAddress =
+        PKCSObjectIdentifiers.pkcs_9_at_unstructuredAddress;
+
+    /**
+     * email address in certificates.
+     */
+    public static final ASN1ObjectIdentifier E = emailAddress;
+
+    /*
+    * others...
+    */
+    public static final ASN1ObjectIdentifier DC =
+        new ASN1ObjectIdentifier("0.9.2342.19200300.100.1.25");
+
+    /**
+     * LDAP User id.
+     */
+    public static final ASN1ObjectIdentifier ldapUid =
+        new ASN1ObjectIdentifier("0.9.2342.19200300.100.1.1");
+  }
+
+  // extended key usage
+  public static final class ExtendedKU {
+
+    private static final ASN1ObjectIdentifier id_kp = id_pkix.branch("3");
+
+    /**
+     * TLS WWW server authentication
+     * Key usage bits that may be consistent: digitalSignature, keyEncipherment or keyAgreement.
+     */
+    public static final ASN1ObjectIdentifier id_kp_serverAuth = id_kp.branch("1");
+
+    /**
+     * TLS WWW client authentication
+     * Key usage bits that may be consistent: digitalSignature and/or keyAgreement.
+     */
+    public static final ASN1ObjectIdentifier id_kp_clientAuth = id_kp.branch("2");
+
+    /**
+     * Signing of downloadable executable code
+     * Key usage bits that may be consistent: digitalSignature.
+     */
+    public static final ASN1ObjectIdentifier id_kp_codeSigning = id_kp.branch("3");
+
+    /**
+     * Email protection
+     * Key usage bits that may be consistent: digitalSignature, nonRepudiation, and/or
+     * (keyEncipherment or keyAgreement).
+     */
+    public static final ASN1ObjectIdentifier id_kp_emailProtection = id_kp.branch("4");
+
+    /**
+     * Binding the hash of an object to a time
+     * Key usage bits that may be consistent: digitalSignature and/or nonRepudiation.
+     */
+    public static final ASN1ObjectIdentifier id_kp_timeStamping = id_kp.branch("8");
+
+    /**
+     * Signing OCSP responses
+     * Key usage bits that may be consistent: digitalSignature and/or nonRepudiation.
+     */
+    public static final ASN1ObjectIdentifier id_kp_OCSPSigning = id_kp.branch("9");
+
+    /*
+     * The following purposes have been included in a predecessor draft of RFC 3280
+     * and therefore continue to be listed by this implementation:
+     */
+
+    /**
+     * IP security end system.
+     */
+    public static final ASN1ObjectIdentifier id_kp_ipsecEndSystem = id_kp.branch("5");
+
+    /**
+     * IP security tunnel termination.
+     */
+    public static final ASN1ObjectIdentifier id_kp_ipsecTunnel = id_kp.branch("6");
+
+    /**
+     * IP security user.
+     */
+    public static final ASN1ObjectIdentifier id_kp_ipsecUser = id_kp.branch("7");
+
+    public static final ASN1ObjectIdentifier id_kp_ocsp = id_pkix.branch("1.48.1");
+
+  }
+
+  public static final class Extn {
+    public static final ASN1ObjectIdentifier id_anyExtendedKeyUsage =
+        Extension.extendedKeyUsage.branch("0");
+
+    // OCSP
+    public static final ASN1ObjectIdentifier id_pkix_ocsp_prefSigAlgs =
+        OCSPObjectIdentifiers.id_pkix_ocsp.branch("8");
+
+    public static final ASN1ObjectIdentifier id_pkix_ocsp_extendedRevoke =
+        OCSPObjectIdentifiers.id_pkix_ocsp.branch("9");
+
+    public static final ASN1ObjectIdentifier id_tsl_kp_tslSigning =
+        new ASN1ObjectIdentifier("0.4.0.2231.3.0");
+
+    public static final ASN1ObjectIdentifier id_extension_pkix_ocsp_nocheck =
+        id_pkix.branch("48.1.5");
+
+    public static final ASN1ObjectIdentifier id_extension_restriction =
+        new ASN1ObjectIdentifier("1.3.36.8.3.8");
+
+    public static final ASN1ObjectIdentifier id_extension_additionalInformation =
+        new ASN1ObjectIdentifier("1.3.36.8.3.15");
+
+    public static final ASN1ObjectIdentifier id_extension_validityModel =
+        new ASN1ObjectIdentifier("1.3.6.1.4.1.8301.3.5");
+
+    public static final ASN1ObjectIdentifier id_extension_admission =
+        new ASN1ObjectIdentifier("1.3.36.8.3.3");
+
+    private static final ASN1ObjectIdentifier id_ad = id_pkix.branch("48");
+
+    public static final ASN1ObjectIdentifier id_ad_timeStamping = id_ad.branch("3");
+
+    public static final ASN1ObjectIdentifier id_ad_caRepository = id_ad.branch("5");
+
+    private static final ASN1ObjectIdentifier id_qcs = id_pkix.branch("11");
+
+    public static final ASN1ObjectIdentifier id_qcs_pkixQCSyntax_v1 = id_qcs.branch("1");
+
+    public static final ASN1ObjectIdentifier id_qcs_pkixQCSyntax_v2 = id_qcs.branch("2");
+
+    private static final ASN1ObjectIdentifier id_etsi_qcs =
+        new ASN1ObjectIdentifier("0.4.0.1862.1");
+
+    public static final ASN1ObjectIdentifier id_etsi_qcs_QcCompliance = id_etsi_qcs.branch("1");
+
+    public static final ASN1ObjectIdentifier id_etsi_qcs_QcLimitValue = id_etsi_qcs.branch("2");
+
+    public static final ASN1ObjectIdentifier id_etsi_qcs_QcRetentionPeriod =
+        id_etsi_qcs.branch("3");
+
+    public static final ASN1ObjectIdentifier id_etsi_qcs_QcSSCD = id_etsi_qcs.branch("4");
+
+    public static final ASN1ObjectIdentifier id_etsi_qcs_QcPDS = id_etsi_qcs.branch("5");
+
+    // RFC 7633: X.509v3 Transport Layer Security (TLS) Feature Extension
+    private static final ASN1ObjectIdentifier id_pe = new ASN1ObjectIdentifier("1.3.6.1.5.5.7.1");
+
+    public static final ASN1ObjectIdentifier id_pe_tlsfeature = id_pe.branch("24");
+
+    // RFC 4262: SMIMECapatibilities
+    public static final ASN1ObjectIdentifier id_smimeCapabilities = new ASN1ObjectIdentifier(
+        "1.2.840.113549.1.9.15");
+  }
 
   /*
-   * The following purposes have been included in a predecessor draft of RFC 3280
-   * and therefore continue to be registrated by this implementation:
-   */
-
-  /**
-   * IP security end system.
-   */
-  public static final ASN1ObjectIdentifier id_kp_ipsecEndSystem = id_kp.branch("5");
-
-  /**
-   * IP security tunnel termination.
-   */
-  public static final ASN1ObjectIdentifier id_kp_ipsecTunnel = id_kp.branch("6");
-
-  /**
-   * IP security user.
-   */
-  public static final ASN1ObjectIdentifier id_kp_ipsecUser = id_kp.branch("7");
-
-  // OCSP
-  public static final ASN1ObjectIdentifier id_pkix_ocsp_prefSigAlgs =
-      OCSPObjectIdentifiers.id_pkix_ocsp.branch("8");
-
-  public static final ASN1ObjectIdentifier id_pkix_ocsp_extendedRevoke =
-      OCSPObjectIdentifiers.id_pkix_ocsp.branch("9");
-
-  public static final ASN1ObjectIdentifier id_tsl_kp_tslSigning =
-      new ASN1ObjectIdentifier("0.4.0.2231.3.0");
-
-  public static final ASN1ObjectIdentifier id_kp_ocsp = id_pkix.branch("1.48.1");
-
-  public static final ASN1ObjectIdentifier id_extension_pkix_ocsp_nocheck =
-      id_pkix.branch("48.1.5");
-
-  public static final ASN1ObjectIdentifier id_extension_restriction =
-      new ASN1ObjectIdentifier("1.3.36.8.3.8");
-
-  public static final ASN1ObjectIdentifier id_extension_additionalInformation =
-      new ASN1ObjectIdentifier("1.3.36.8.3.15");
-
-  public static final ASN1ObjectIdentifier id_extension_validityModel =
-      new ASN1ObjectIdentifier("1.3.6.1.4.1.8301.3.5");
-
-  public static final ASN1ObjectIdentifier id_extension_admission =
-      new ASN1ObjectIdentifier("1.3.36.8.3.3");
-
-  private static final ASN1ObjectIdentifier id_ad = id_pkix.branch("48");
-
-  public static final ASN1ObjectIdentifier id_ad_timeStamping = id_ad.branch("3");
-
-  public static final ASN1ObjectIdentifier id_ad_caRepository = id_ad.branch("5");
-
-  private static final ASN1ObjectIdentifier id_qcs = id_pkix.branch("11");
-
-  public static final ASN1ObjectIdentifier id_qcs_pkixQCSyntax_v1 = id_qcs.branch("1");
-
-  public static final ASN1ObjectIdentifier id_qcs_pkixQCSyntax_v2 = id_qcs.branch("2");
-
-  private static final ASN1ObjectIdentifier id_etsi_qcs = new ASN1ObjectIdentifier("0.4.0.1862.1");
-
-  public static final ASN1ObjectIdentifier id_etsi_qcs_QcCompliance = id_etsi_qcs.branch("1");
-
-  public static final ASN1ObjectIdentifier id_etsi_qcs_QcLimitValue = id_etsi_qcs.branch("2");
-
-  public static final ASN1ObjectIdentifier id_etsi_qcs_QcRetentionPeriod = id_etsi_qcs.branch("3");
-
-  public static final ASN1ObjectIdentifier id_etsi_qcs_QcSSCD = id_etsi_qcs.branch("4");
-
-  public static final ASN1ObjectIdentifier id_etsi_qcs_QcPDS = id_etsi_qcs.branch("5");
-
-  // RFC 7633: X.509v3 Transport Layer Security (TLS) Feature Extension
-  private static final ASN1ObjectIdentifier id_pe = new ASN1ObjectIdentifier("1.3.6.1.5.5.7.1");
-
-  public static final ASN1ObjectIdentifier id_pe_tlsfeature = id_pe.branch("24");
-
-  private static final ASN1ObjectIdentifier id_secg_scheme = new ASN1ObjectIdentifier("1.3.132.1");
-
   public static final ASN1ObjectIdentifier id_aes128_cbc_in_ecies = id_secg_scheme.branch("20.0");
 
   public static final ASN1ObjectIdentifier id_ecies_specifiedParameters =
@@ -381,55 +399,78 @@ public class ObjectIdentifiers {
 
   public static final ASN1ObjectIdentifier id_iso18033_kdf2 =
       new ASN1ObjectIdentifier("1.0.18033.2.5.2");
+   */
+  public static final class Secg {
+    private static final ASN1ObjectIdentifier id_secg_scheme =
+        new ASN1ObjectIdentifier("1.3.132.1");
+
+    public static final ASN1ObjectIdentifier id_aes128_cbc_in_ecies = id_secg_scheme.branch("20.0");
+
+    public static final ASN1ObjectIdentifier id_ecies_specifiedParameters =
+        id_secg_scheme.branch("8");
+
+    public static final ASN1ObjectIdentifier id_hmac_full_ecies = id_secg_scheme.branch("22");
+  }
+
+  public static final class Misc {
+    public static final ASN1ObjectIdentifier id_iso18033_kdf2 =
+        new ASN1ObjectIdentifier("1.0.18033.2.5.2");
+  }
 
   private static final Map<ASN1ObjectIdentifier, String> oidNameMap;
-
-  // RFC 4262: SMIMECapatibilities
-  public static final ASN1ObjectIdentifier id_smimeCapabilities = new ASN1ObjectIdentifier(
-      "1.2.840.113549.1.9.15");
 
   static {
     oidNameMap = new HashMap<>();
 
-    oidNameMap.put(DN_DATE_OF_BIRTH, "dateOfBirth");
-    oidNameMap.put(DN_PLACE_OF_BIRTH, "placeOfBirth");
-    oidNameMap.put(DN_GENDER, "gender");
-    oidNameMap.put(DN_COUNTRY_OF_CITIZENSHIP, "countryOfCitizenship");
-    oidNameMap.put(DN_COUNTRY_OF_RESIDENCE, "countryOfResidence");
-    oidNameMap.put(DN_NAME_AT_BIRTH, "nameAtBirth");
-    oidNameMap.put(DN_PSEUDONYM, "pseudonym");
-    oidNameMap.put(DN_DMD_NAME, "dmdName");
-    oidNameMap.put(DN_EmailAddress, "emailAddress");
-    oidNameMap.put(DN_UnstructuredName, "unstructuredName");
-    oidNameMap.put(DN_UnstructuredAddress, "unstructuredAddress");
-    oidNameMap.put(DN_organizationIdentifier, "organizationIdentifier");
+    oidNameMap.put(DN.countryOfCitizenship, "countryOfCitizenship");
+    oidNameMap.put(DN.countryOfResidence, "countryOfResidence");
+    oidNameMap.put(DN.dateOfBirth, "dateOfBirth");
+    oidNameMap.put(DN.dmdName, "dmdName");
+    oidNameMap.put(DN.emailAddress, "emailAddress");
+    oidNameMap.put(DN.gender, "gender");
+    oidNameMap.put(DN.nameAtBirth, "nameAtBirth");
+    oidNameMap.put(DN.organizationIdentifier, "organizationIdentifier");
+    oidNameMap.put(DN.placeOfBirth, "placeOfBirth");
+    oidNameMap.put(DN.pseudonym, "pseudonym");
+    oidNameMap.put(DN.unstructuredName, "unstructuredName");
+    oidNameMap.put(DN.unstructuredAddress, "unstructuredAddress");
 
-    oidNameMap.put(id_xipki_ext_crlCertset, "xipki-crlCertset");
-    oidNameMap.put(id_xipki_ext_cmpRequestExtensions, "xipki-cmpRequestExtensions");
-    oidNameMap.put(id_xipki_ext_authorizationTemplate, "xipki-authorizationTemplate");
+    oidNameMap.put(Xipki.id_xipki_ext_crlCertset, "xipki-crlCertset");
+    oidNameMap.put(Xipki.id_xipki_ext_cmpRequestExtensions, "xipki-cmpRequestExtensions");
+    oidNameMap.put(Xipki.id_xipki_ext_authorizationTemplate, "xipki-authorizationTemplate");
 
-    oidNameMap.put(id_kp_clientAuth, "kp-clientAuth");
-    oidNameMap.put(id_kp_codeSigning, "kp-codeSigning");
-    oidNameMap.put(id_kp_emailProtection, "kp-emailProtection");
-    oidNameMap.put(id_kp_ipsecEndSystem, "kp-ipsecEndSystem");
-    oidNameMap.put(id_kp_ipsecTunnel, "kp-ipsecTunnel");
-    oidNameMap.put(id_kp_ipsecUser, "kp-ipsecUser");
-    oidNameMap.put(id_kp_ocsp, "kp-ocsp");
-    oidNameMap.put(id_kp_OCSPSigning, "kp-OCSPSigning");
-    oidNameMap.put(id_kp_serverAuth, "kp-serverAuth");
-    oidNameMap.put(id_kp_timeStamping, "kp-timeStamping");
-    oidNameMap.put(id_pkix_ocsp_extendedRevoke, "pkix-ocsp-extendedRevoke");
-    oidNameMap.put(id_pkix_ocsp_prefSigAlgs, "pkix-ocsp-prefSigAlgs");
-    oidNameMap.put(id_tsl_kp_tslSigning, "tsl-kp-tslSigning");
-    oidNameMap.put(id_extension_pkix_ocsp_nocheck, "pkix-ocsp-nocheck");
-    oidNameMap.put(id_extension_restriction, "restriction");
-    oidNameMap.put(id_extension_additionalInformation, "additionalInformation");
-    oidNameMap.put(id_extension_admission, "admission");
-    oidNameMap.put(id_extension_validityModel, "validityModel");
+    oidNameMap.put(ExtendedKU.id_kp_clientAuth, "kp-clientAuth");
+    oidNameMap.put(ExtendedKU.id_kp_codeSigning, "kp-codeSigning");
+    oidNameMap.put(ExtendedKU.id_kp_emailProtection, "kp-emailProtection");
+    oidNameMap.put(ExtendedKU.id_kp_ipsecEndSystem, "kp-ipsecEndSystem");
+    oidNameMap.put(ExtendedKU.id_kp_ipsecTunnel, "kp-ipsecTunnel");
+    oidNameMap.put(ExtendedKU.id_kp_ipsecUser, "kp-ipsecUser");
+    oidNameMap.put(ExtendedKU.id_kp_ocsp, "kp-ocsp");
+    oidNameMap.put(ExtendedKU.id_kp_OCSPSigning, "kp-OCSPSigning");
+    oidNameMap.put(ExtendedKU.id_kp_serverAuth, "kp-serverAuth");
+    oidNameMap.put(ExtendedKU.id_kp_timeStamping, "kp-timeStamping");
 
-    oidNameMap.put(id_anyExtendedKeyUsage, "anyExtendedKeyUsage");
-    oidNameMap.put(id_ad_caRepository, "ad-caRepository");
-    oidNameMap.put(id_ad_timeStamping, "ad-timeStamping");
+    oidNameMap.put(Extn.id_pkix_ocsp_extendedRevoke, "pkix-ocsp-extendedRevoke");
+    oidNameMap.put(Extn.id_pkix_ocsp_prefSigAlgs, "pkix-ocsp-prefSigAlgs");
+    oidNameMap.put(Extn.id_tsl_kp_tslSigning, "tsl-kp-tslSigning");
+    oidNameMap.put(Extn.id_extension_pkix_ocsp_nocheck, "pkix-ocsp-nocheck");
+    oidNameMap.put(Extn.id_extension_restriction, "restriction");
+    oidNameMap.put(Extn.id_extension_additionalInformation, "additionalInformation");
+    oidNameMap.put(Extn.id_extension_admission, "admission");
+    oidNameMap.put(Extn.id_extension_validityModel, "validityModel");
+    oidNameMap.put(Extn.id_anyExtendedKeyUsage, "anyExtendedKeyUsage");
+    oidNameMap.put(Extn.id_ad_caRepository, "ad-caRepository");
+    oidNameMap.put(Extn.id_ad_timeStamping, "ad-timeStamping");
+
+    oidNameMap.put(Extn.id_qcs_pkixQCSyntax_v1, "qcs-pkixQCSyntax-v2");
+    oidNameMap.put(Extn.id_qcs_pkixQCSyntax_v2, "qcs-pkixQCSyntax-v2");
+    oidNameMap.put(Extn.id_etsi_qcs_QcCompliance, "etsi-qcs-QcCompliance");
+    oidNameMap.put(Extn.id_etsi_qcs_QcLimitValue, "etsi-qcs-QcLimitValue");
+    oidNameMap.put(Extn.id_etsi_qcs_QcRetentionPeriod, "etsi-qcs-QcRetentionPeriod");
+    oidNameMap.put(Extn.id_etsi_qcs_QcSSCD, "etsi-qcs-QcSSCD");
+    oidNameMap.put(Extn.id_pe_tlsfeature, "tlsFeature");
+    oidNameMap.put(Extn.id_smimeCapabilities, "SMIMECapatibilities");
+
     oidNameMap.put(Extension.auditIdentity, "auditIdentity");
     oidNameMap.put(Extension.authorityInfoAccess, "authorityInfoAccess");
     oidNameMap.put(Extension.authorityKeyIdentifier, "authorityKeyIdentifier");
@@ -462,31 +503,11 @@ public class ObjectIdentifiers {
     oidNameMap.put(Extension.subjectKeyIdentifier, "subjectKeyIdentifier");
     oidNameMap.put(Extension.targetInformation, "targetInformation");
 
-    oidNameMap.put(id_qcs_pkixQCSyntax_v1, "qcs-pkixQCSyntax-v2");
-    oidNameMap.put(id_qcs_pkixQCSyntax_v2, "qcs-pkixQCSyntax-v2");
-    oidNameMap.put(id_etsi_qcs_QcCompliance, "etsi-qcs-QcCompliance");
-    oidNameMap.put(id_etsi_qcs_QcLimitValue, "etsi-qcs-QcLimitValue");
-    oidNameMap.put(id_etsi_qcs_QcRetentionPeriod, "etsi-qcs-QcRetentionPeriod");
-    oidNameMap.put(id_etsi_qcs_QcSSCD, "etsi-qcs-QcSSCD");
+    oidNameMap.put(Secg.id_aes128_cbc_in_ecies, "aes128-cbc-in-ecies");
+    oidNameMap.put(Secg.id_ecies_specifiedParameters, "ecies-specifiedParameters");
+    oidNameMap.put(Secg.id_hmac_full_ecies, "hmac-full-ecies");
 
-    oidNameMap.put(id_pe_tlsfeature, "tlsFeature");
-    oidNameMap.put(id_smimeCapabilities, "SMIMECapatibilities");
-
-    /*
-    public static final ASN1ObjectIdentifier id_aes128_cbc_in_ecies = id_secg_scheme.branch("20.0");
-
-    public static final ASN1ObjectIdentifier id_ecies_specifiedParameters =
-        id_secg_scheme.branch("8");
-
-    public static final ASN1ObjectIdentifier id_hmac_full_ecies = id_secg_scheme.branch("22");
-
-    public static final ASN1ObjectIdentifier id_iso18033_kdf2 =
-        new ASN1ObjectIdentifier("1.0.18033.2.5.2");
-     */
-    oidNameMap.put(id_aes128_cbc_in_ecies, "aes128-cbc-in-ecies");
-    oidNameMap.put(id_ecies_specifiedParameters, "ecies-specifiedParameters");
-    oidNameMap.put(id_hmac_full_ecies, "hmac-full-ecies");
-    oidNameMap.put(id_iso18033_kdf2, "kdf2");
+    oidNameMap.put(Misc.id_iso18033_kdf2, "kdf2");
   }
 
   private ObjectIdentifiers() {

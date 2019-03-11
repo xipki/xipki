@@ -293,7 +293,7 @@ public class OcspQa {
     resultIssues.add(checkOccurrence("OCSP.NONCE", nonceExtn, responseOption.getNonceOccurrence()));
 
     boolean extendedRevoke = basicResp.getExtension(
-        ObjectIdentifiers.id_pkix_ocsp_extendedRevoke) != null;
+        ObjectIdentifiers.Extn.id_pkix_ocsp_extendedRevoke) != null;
 
     for (int i = 0; i < singleResponses.length; i++) {
       SingleResp singleResp = singleResponses[i];

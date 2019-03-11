@@ -110,7 +110,7 @@ public class Foo {
         new DEROctetString(newBytes(20, (byte) 0x22)),
         new ASN1Integer(BigInteger.valueOf(0x1235)));
     Request request2 = new Request(certId2,
-        new Extensions(new Extension(ObjectIdentifiers.id_ad_timeStamping,
+        new Extensions(new Extension(ObjectIdentifiers.Extn.id_ad_timeStamping,
             false, newBytes(30, (byte) 0x33))));
     // CHECKSTYLE:SKIP
     ASN1Sequence requestList = new DERSequence(new ASN1Encodable[]{request1, request2});

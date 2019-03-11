@@ -121,9 +121,9 @@ public abstract class BaseCertprofile extends Certprofile {
       if (len == 1) {
         ASN1Encodable rdnValue = thisRdns[0].getFirst().getValue();
         RDN rdn;
-        if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type)) {
+        if (ObjectIdentifiers.DN.dateOfBirth.equals(type)) {
           rdn = createDateOfBirthRdn(type, rdnValue);
-        } else if (ObjectIdentifiers.DN_POSTAL_ADDRESS.equals(type)) {
+        } else if (ObjectIdentifiers.DN.postalAddress.equals(type)) {
           rdn = createPostalAddressRdn(type, rdnValue, control, 0);
         } else {
           String value = X509Util.rdnValueToString(rdnValue);
@@ -134,12 +134,12 @@ public abstract class BaseCertprofile extends Certprofile {
           rdns.add(rdn);
         }
       } else {
-        if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type)) {
+        if (ObjectIdentifiers.DN.dateOfBirth.equals(type)) {
           for (int i = 0; i < len; i++) {
             RDN rdn = createDateOfBirthRdn(type, thisRdns[i].getFirst().getValue());
             rdns.add(rdn);
           }
-        } else if (ObjectIdentifiers.DN_POSTAL_ADDRESS.equals(type)) {
+        } else if (ObjectIdentifiers.DN.postalAddress.equals(type)) {
           for (int i = 0; i < len; i++) {
             RDN rdn = createPostalAddressRdn(type, thisRdns[i].getFirst().getValue(),
                 control, i);
@@ -314,7 +314,7 @@ public abstract class BaseCertprofile extends Certprofile {
 
   protected RDN createSubjectRdn(String text, ASN1ObjectIdentifier type, RdnControl option,
       int index) throws BadCertTemplateException {
-    if (text != null && ObjectIdentifiers.DN_EmailAddress.equals(type)) {
+    if (text != null && ObjectIdentifiers.DN.emailAddress.equals(type)) {
       text = text.toLowerCase();
     }
 

@@ -70,25 +70,25 @@ public class CaEnrollBenchEntry {
 
       switch (randomDn) {
         case GIVENNAME:
-          this.subjectRdnForIncrement = ObjectIdentifiers.DN_GIVENNAME;
+          this.subjectRdnForIncrement = ObjectIdentifiers.DN.givenName;
           break;
         case SURNAME:
-          this.subjectRdnForIncrement = ObjectIdentifiers.DN_SURNAME;
+          this.subjectRdnForIncrement = ObjectIdentifiers.DN.surname;
           break;
         case STREET:
-          this.subjectRdnForIncrement = ObjectIdentifiers.DN_STREET;
+          this.subjectRdnForIncrement = ObjectIdentifiers.DN.street;
           break;
         case POSTALCODE:
-          this.subjectRdnForIncrement = ObjectIdentifiers.DN_POSTAL_CODE;
+          this.subjectRdnForIncrement = ObjectIdentifiers.DN.postalCode;
           break;
         case O:
-          this.subjectRdnForIncrement = ObjectIdentifiers.DN_O;
+          this.subjectRdnForIncrement = ObjectIdentifiers.DN.O;
           break;
         case OU:
-          this.subjectRdnForIncrement = ObjectIdentifiers.DN_OU;
+          this.subjectRdnForIncrement = ObjectIdentifiers.DN.OU;
           break;
         case CN:
-          this.subjectRdnForIncrement = ObjectIdentifiers.DN_CN;
+          this.subjectRdnForIncrement = ObjectIdentifiers.DN.CN;
           break;
         default:
           throw new IllegalStateException("should not reach here, unknown randomDn " + randomDn);

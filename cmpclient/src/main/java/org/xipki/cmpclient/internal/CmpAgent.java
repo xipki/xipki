@@ -453,7 +453,7 @@ class CmpAgent {
   private ASN1Encodable extractXipkiActionRepContent(PkiResponse response, int action)
       throws CmpClientException, PkiErrorException {
     ASN1Encodable itvValue = extractGeneralRepContent(Args.notNull(response, "response"),
-        ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId(), true);
+        ObjectIdentifiers.Xipki.id_xipki_cmp_cmpGenmsg.getId(), true);
     return extractXiActionContent(itvValue, action);
   }
 
@@ -649,7 +649,7 @@ class CmpAgent {
       vec.add(value);
     }
 
-    InfoTypeAndValue itv = new InfoTypeAndValue(ObjectIdentifiers.id_xipki_cmp_cmpGenmsg,
+    InfoTypeAndValue itv = new InfoTypeAndValue(ObjectIdentifiers.Xipki.id_xipki_cmp_cmpGenmsg,
         new DERSequence(vec));
     GenMsgContent genMsgContent = new GenMsgContent(itv);
     PKIBody body = new PKIBody(PKIBody.TYPE_GEN_MSG, genMsgContent);
@@ -783,7 +783,7 @@ class CmpAgent {
         ASN1Sequence params = ASN1Sequence.getInstance(keyAlg.getParameters());
         final int n = params.size();
         for (int i = 0; i < n; i++) {
-          if (!keyOid.equals(ObjectIdentifiers.id_ecies_specifiedParameters)) {
+          if (!keyOid.equals(ObjectIdentifiers.Secg.id_ecies_specifiedParameters)) {
             throw new XiSecurityException("unsupported keyAlg " + keyOid.getId());
           }
 
@@ -791,7 +791,7 @@ class CmpAgent {
           int tag = to.getTagNo();
           if (tag == 0) { // KDF
             AlgorithmIdentifier algId = AlgorithmIdentifier.getInstance(to.getObject());
-            if (ObjectIdentifiers.id_iso18033_kdf2.equals(algId.getAlgorithm())) {
+            if (ObjectIdentifiers.Misc.id_iso18033_kdf2.equals(algId.getAlgorithm())) {
               AlgorithmIdentifier hashAlgorithm =
                   AlgorithmIdentifier.getInstance(algId.getParameters());
               if (!hashAlgorithm.getAlgorithm().equals(HashAlgo.SHA1.getOid())) {
@@ -804,13 +804,13 @@ class CmpAgent {
             }
           } else if (tag == 1) { // SymmetricEncryption
             AlgorithmIdentifier algId = AlgorithmIdentifier.getInstance(to.getObject());
-            if (!ObjectIdentifiers.id_aes128_cbc_in_ecies.equals(algId.getAlgorithm())) {
+            if (!ObjectIdentifiers.Secg.id_aes128_cbc_in_ecies.equals(algId.getAlgorithm())) {
               throw new XiSecurityException("unsupported SymmetricEncryption "
                   + algId.getAlgorithm().getId());
             }
           } else if (tag == 2) { // MessageAuthenticationCode
             AlgorithmIdentifier algId = AlgorithmIdentifier.getInstance(to.getObject());
-            if (ObjectIdentifiers.id_hmac_full_ecies.equals(algId.getAlgorithm())) {
+            if (ObjectIdentifiers.Secg.id_hmac_full_ecies.equals(algId.getAlgorithm())) {
               AlgorithmIdentifier hashAlgorithm =
                   AlgorithmIdentifier.getInstance(algId.getParameters());
               if (!hashAlgorithm.getAlgorithm().equals(HashAlgo.SHA1.getOid())) {
@@ -935,7 +935,7 @@ class CmpAgent {
     }
 
     ASN1ObjectIdentifier expectedType = (xipkiAction == null)
-        ? CMPObjectIdentifiers.it_currentCRL : ObjectIdentifiers.id_xipki_cmp_cmpGenmsg;
+        ? CMPObjectIdentifiers.it_currentCRL : ObjectIdentifiers.Xipki.id_xipki_cmp_cmpGenmsg;
 
     GenRepContent genRep = GenRepContent.getInstance(respBody.getContent());
 

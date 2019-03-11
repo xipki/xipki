@@ -109,7 +109,7 @@ class IdentifiedCertprofile implements Closeable {
     CRITICAL_ONLY_EXTENSION_TYPES.add(Extension.nameConstraints);
     CRITICAL_ONLY_EXTENSION_TYPES.add(Extension.policyConstraints);
     CRITICAL_ONLY_EXTENSION_TYPES.add(Extension.inhibitAnyPolicy);
-    CRITICAL_ONLY_EXTENSION_TYPES.add(ObjectIdentifiers.id_pe_tlsfeature);
+    CRITICAL_ONLY_EXTENSION_TYPES.add(ObjectIdentifiers.Extn.id_pe_tlsfeature);
 
     CA_CRITICAL_ONLY_EXTENSION_TYPES = new HashSet<>();
     CA_CRITICAL_ONLY_EXTENSION_TYPES.add(Extension.basicConstraints);
@@ -186,7 +186,7 @@ class IdentifiedCertprofile implements Closeable {
   public SubjectInfo getSubject(X500Name requestedSubject)
       throws CertprofileException, BadCertTemplateException {
     SubjectInfo subjectInfo = certprofile.getSubject(requestedSubject);
-    RDN[] countryRdns = subjectInfo.getGrantedSubject().getRDNs(ObjectIdentifiers.DN_C);
+    RDN[] countryRdns = subjectInfo.getGrantedSubject().getRDNs(ObjectIdentifiers.DN.C);
     if (countryRdns != null) {
       for (RDN rdn : countryRdns) {
         String textValue = IETFUtils.valueToString(rdn.getFirst().getValue());
@@ -234,7 +234,7 @@ class IdentifiedCertprofile implements Closeable {
     Set<ASN1ObjectIdentifier> wantedExtTypes = new HashSet<>(2);
     if (requestedExtensions != null) {
       Extension reqExtension = requestedExtensions.getExtension(
-          ObjectIdentifiers.id_xipki_ext_cmpRequestExtensions);
+          ObjectIdentifiers.Xipki.id_xipki_ext_cmpRequestExtensions);
       if (reqExtension != null) {
         ExtensionExistence ee = ExtensionExistence.getInstance(reqExtension.getParsedValue());
         neededExtTypes.addAll(ee.getNeedExtensions());
@@ -395,7 +395,7 @@ class IdentifiedCertprofile implements Closeable {
       }
 
       if (extControl.isCritical()
-          && usages.contains(ObjectIdentifiers.id_anyExtendedKeyUsage)) {
+          && usages.contains(ObjectIdentifiers.Extn.id_anyExtendedKeyUsage)) {
         extControl = new ExtensionControl(false, extControl.isRequired(),
             extControl.isRequest());
       }
@@ -405,7 +405,7 @@ class IdentifiedCertprofile implements Closeable {
     }
 
     // ocsp-nocheck
-    extType = ObjectIdentifiers.id_extension_pkix_ocsp_nocheck;
+    extType = ObjectIdentifiers.Extn.id_extension_pkix_ocsp_nocheck;
     extControl = controls.remove(extType);
     if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
       // the extension ocsp-nocheck will only be set if requested explicitly

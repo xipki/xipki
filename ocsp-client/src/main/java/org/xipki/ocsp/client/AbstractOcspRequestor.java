@@ -330,7 +330,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
       ASN1Sequence extnValue = new DERSequence(vec);
       Extension extn;
       try {
-        extn = new Extension(ObjectIdentifiers.id_pkix_ocsp_prefSigAlgs, false,
+        extn = new Extension(ObjectIdentifiers.Extn.id_pkix_ocsp_prefSigAlgs, false,
             new DEROctetString(extnValue));
       } catch (IOException ex) {
         throw new OcspRequestorException(ex.getMessage(), ex);

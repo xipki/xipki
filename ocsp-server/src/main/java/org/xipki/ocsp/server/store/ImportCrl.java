@@ -460,7 +460,8 @@ class ImportCrl {
     // import the certificates
 
     // extract the certificate
-    byte[] extnValue = crl.getExtensionValue(ObjectIdentifiers.id_xipki_ext_crlCertset.getId());
+    byte[] extnValue =
+        crl.getExtensionValue(ObjectIdentifiers.Xipki.id_xipki_ext_crlCertset.getId());
     if (extnValue != null) {
       extnValue = extractCoreValue(extnValue);
       ASN1Set asn1Set = DERSet.getInstance(extnValue);

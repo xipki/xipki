@@ -238,19 +238,19 @@ public class ExtensionsChecker {
     }
 
     // restriction
-    type = ObjectIdentifiers.id_extension_restriction;
+    type = ObjectIdentifiers.Extn.id_extension_restriction;
     if (extensionControls.containsKey(type)) {
       this.restriction = extensions.get(type.getId()).getRestriction();
     }
 
     // additionalInformation
-    type = ObjectIdentifiers.id_extension_additionalInformation;
+    type = ObjectIdentifiers.Extn.id_extension_additionalInformation;
     if (extensionControls.containsKey(type)) {
       this.additionalInformation = extensions.get(type.getId()).getAdditionalInformation();
     }
 
     // validityModel
-    type = ObjectIdentifiers.id_extension_validityModel;
+    type = ObjectIdentifiers.Extn.id_extension_validityModel;
     if (extensionControls.containsKey(type)) {
       this.validityModelId = extensions.get(type.getId()).getValidityModel().getModelId().toXiOid();
     }
@@ -262,19 +262,19 @@ public class ExtensionsChecker {
     }
 
     // tlsFeature
-    type = ObjectIdentifiers.id_pe_tlsfeature;
+    type = ObjectIdentifiers.Extn.id_pe_tlsfeature;
     if (extensionControls.containsKey(type)) {
       this.tlsFeature = extensions.get(type.getId()).getTlsFeature();
     }
 
     // AuthorizationTemplate
-    type = ObjectIdentifiers.id_xipki_ext_authorizationTemplate;
+    type = ObjectIdentifiers.Xipki.id_xipki_ext_authorizationTemplate;
     if (extensionControls.containsKey(type)) {
       this.authorizationTemplate = extensions.get(type.getId()).getAuthorizationTemplate();
     }
 
     // SMIMECapabilities
-    type = ObjectIdentifiers.id_smimeCapabilities;
+    type = ObjectIdentifiers.Extn.id_smimeCapabilities;
     if (extensionControls.containsKey(type)) {
       List<SmimeCapability> list =
           extensions.get(type.getId()).getSmimeCapabilities().getCapabilities();
@@ -420,19 +420,19 @@ public class ExtensionsChecker {
         } else if (Extension.subjectInfoAccess.equals(oid)) {
           // SubjectInfoAccess
           checkExtnSubjectInfoAccess(failureMsg, extnValue, requestedExtns, extnControl);
-        } else if (ObjectIdentifiers.id_extension_admission.equals(oid)) {
+        } else if (ObjectIdentifiers.Extn.id_extension_admission.equals(oid)) {
           // Admission
           checkExtnAdmission(failureMsg, extnValue, requestedExtns, extnControl);
-        } else if (ObjectIdentifiers.id_extension_pkix_ocsp_nocheck.equals(oid)) {
+        } else if (ObjectIdentifiers.Extn.id_extension_pkix_ocsp_nocheck.equals(oid)) {
           // ocsp-nocheck
           checkExtnOcspNocheck(failureMsg, extnValue);
-        } else if (ObjectIdentifiers.id_extension_restriction.equals(oid)) {
+        } else if (ObjectIdentifiers.Extn.id_extension_restriction.equals(oid)) {
           // restriction
           checkExtnRestriction(failureMsg, extnValue, requestedExtns, extnControl);
-        } else if (ObjectIdentifiers.id_extension_additionalInformation.equals(oid)) {
+        } else if (ObjectIdentifiers.Extn.id_extension_additionalInformation.equals(oid)) {
           // additionalInformation
           checkExtnAdditionalInformation(failureMsg, extnValue, requestedExtns, extnControl);
-        } else if (ObjectIdentifiers.id_extension_validityModel.equals(oid)) {
+        } else if (ObjectIdentifiers.Extn.id_extension_validityModel.equals(oid)) {
           // validityModel
           checkExtnValidityModel(failureMsg, extnValue, requestedExtns, extnControl);
         } else if (Extension.privateKeyUsagePeriod.equals(oid)) {
@@ -445,15 +445,15 @@ public class ExtensionsChecker {
         } else if (Extension.biometricInfo.equals(oid)) {
           // biometricInfo
           checkExtnBiometricInfo(failureMsg, extnValue, requestedExtns, extnControl);
-        } else if (ObjectIdentifiers.id_pe_tlsfeature.equals(oid)) {
+        } else if (ObjectIdentifiers.Extn.id_pe_tlsfeature.equals(oid)) {
           // tlsFeature
           checkExtnTlsFeature(failureMsg, extnValue, requestedExtns, extnControl);
-        } else if (ObjectIdentifiers.id_xipki_ext_authorizationTemplate.equals(oid)) {
+        } else if (ObjectIdentifiers.Xipki.id_xipki_ext_authorizationTemplate.equals(oid)) {
           // authorizationTemplate
           checkExtnAuthorizationTemplate(failureMsg, extnValue, requestedExtns, extnControl);
         } else {
           byte[] expected;
-          if (ObjectIdentifiers.id_smimeCapabilities.equals(oid)) {
+          if (ObjectIdentifiers.Extn.id_smimeCapabilities.equals(oid)) {
             // SMIMECapabilities
             expected = smimeCapabilities.getValue();
           } else {
@@ -509,7 +509,7 @@ public class ExtensionsChecker {
 
     if (requestedExtns != null) {
       Extension reqExtension = requestedExtns.getExtension(
-          ObjectIdentifiers.id_xipki_ext_cmpRequestExtensions);
+          ObjectIdentifiers.Xipki.id_xipki_ext_cmpRequestExtensions);
       if (reqExtension != null) {
         ExtensionExistence ee = ExtensionExistence.getInstance(reqExtension.getParsedValue());
         types.addAll(ee.getNeedExtensions());
@@ -670,7 +670,7 @@ public class ExtensionsChecker {
     }
 
     // Admission
-    type = ObjectIdentifiers.id_extension_admission;
+    type = ObjectIdentifiers.Extn.id_extension_admission;
     if (wantedExtensionTypes.contains(type)) {
       if (certprofile.getAdmission() != null) {
         types.add(type);
@@ -678,7 +678,7 @@ public class ExtensionsChecker {
     }
 
     // ocsp-nocheck
-    type = ObjectIdentifiers.id_extension_pkix_ocsp_nocheck;
+    type = ObjectIdentifiers.Extn.id_extension_pkix_ocsp_nocheck;
     if (wantedExtensionTypes.contains(type)) {
       types.add(type);
     }
@@ -1047,7 +1047,7 @@ public class ExtensionsChecker {
       Extensions requestedExtns, ExtensionControl extControl) {
     TlsFeature conf = tlsFeature;
     if (tlsFeature == null) {
-      checkConstantExtnValue(ObjectIdentifiers.id_pe_tlsfeature, failureMsg, extensionValue,
+      checkConstantExtnValue(ObjectIdentifiers.Extn.id_pe_tlsfeature, failureMsg, extensionValue,
           requestedExtns, extControl);
       return;
     }
@@ -1245,16 +1245,16 @@ public class ExtensionsChecker {
       ASN1ObjectIdentifier attrType = attr.getAttrType();
       ASN1Encodable attrVal = attr.getAttributeValues()[0];
 
-      if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(attrType)) {
+      if (ObjectIdentifiers.DN.dateOfBirth.equals(attrType)) {
         expDateOfBirth = ASN1GeneralizedTime.getInstance(attrVal);
-      } else if (ObjectIdentifiers.DN_PLACE_OF_BIRTH.equals(attrType)) {
+      } else if (ObjectIdentifiers.DN.placeOfBirth.equals(attrType)) {
         expPlaceOfBirth = DirectoryString.getInstance(attrVal).getString();
-      } else if (ObjectIdentifiers.DN_GENDER.equals(attrType)) {
+      } else if (ObjectIdentifiers.DN.gender.equals(attrType)) {
         expGender = DERPrintableString.getInstance(attrVal).getString();
-      } else if (ObjectIdentifiers.DN_COUNTRY_OF_CITIZENSHIP.equals(attrType)) {
+      } else if (ObjectIdentifiers.DN.countryOfCitizenship.equals(attrType)) {
         String country = DERPrintableString.getInstance(attrVal).getString();
         expCountryOfCitizenshipList.add(country);
-      } else if (ObjectIdentifiers.DN_COUNTRY_OF_RESIDENCE.equals(attrType)) {
+      } else if (ObjectIdentifiers.DN.countryOfResidence.equals(attrType)) {
         String country = DERPrintableString.getInstance(attrVal).getString();
         expCountryOfResidenceList.add(country);
       } else {
@@ -1296,16 +1296,16 @@ public class ExtensionsChecker {
 
       ASN1Encodable attrVal = attrs[0];
 
-      if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(attrType)) {
+      if (ObjectIdentifiers.DN.dateOfBirth.equals(attrType)) {
         dateOfBirth = ASN1GeneralizedTime.getInstance(attrVal);
-      } else if (ObjectIdentifiers.DN_PLACE_OF_BIRTH.equals(attrType)) {
+      } else if (ObjectIdentifiers.DN.placeOfBirth.equals(attrType)) {
         placeOfBirth = DirectoryString.getInstance(attrVal).getString();
-      } else if (ObjectIdentifiers.DN_GENDER.equals(attrType)) {
+      } else if (ObjectIdentifiers.DN.gender.equals(attrType)) {
         gender = DERPrintableString.getInstance(attrVal).getString();
-      } else if (ObjectIdentifiers.DN_COUNTRY_OF_CITIZENSHIP.equals(attrType)) {
+      } else if (ObjectIdentifiers.DN.countryOfCitizenship.equals(attrType)) {
         String country = DERPrintableString.getInstance(attrVal).getString();
         countryOfCitizenshipList.add(country);
-      } else if (ObjectIdentifiers.DN_COUNTRY_OF_RESIDENCE.equals(attrType)) {
+      } else if (ObjectIdentifiers.DN.countryOfResidence.equals(attrType)) {
         String country = DERPrintableString.getInstance(attrVal).getString();
         countryOfResidenceList.add(country);
       } else {
@@ -1319,23 +1319,23 @@ public class ExtensionsChecker {
     }
 
     if (dateOfBirth != null) {
-      attrTypes.remove(ObjectIdentifiers.DN_DATE_OF_BIRTH);
+      attrTypes.remove(ObjectIdentifiers.DN.dateOfBirth);
     }
 
     if (placeOfBirth != null) {
-      attrTypes.remove(ObjectIdentifiers.DN_PLACE_OF_BIRTH);
+      attrTypes.remove(ObjectIdentifiers.DN.placeOfBirth);
     }
 
     if (gender != null) {
-      attrTypes.remove(ObjectIdentifiers.DN_GENDER);
+      attrTypes.remove(ObjectIdentifiers.DN.gender);
     }
 
     if (!countryOfCitizenshipList.isEmpty()) {
-      attrTypes.remove(ObjectIdentifiers.DN_COUNTRY_OF_CITIZENSHIP);
+      attrTypes.remove(ObjectIdentifiers.DN.countryOfCitizenship);
     }
 
     if (!countryOfResidenceList.isEmpty()) {
-      attrTypes.remove(ObjectIdentifiers.DN_COUNTRY_OF_RESIDENCE);
+      attrTypes.remove(ObjectIdentifiers.DN.countryOfResidence);
     }
 
     attrTypes.removeAll(otherAttrs.keySet());
@@ -1725,7 +1725,7 @@ public class ExtensionsChecker {
   private void checkExtnAdmission(StringBuilder failureMsg, byte[] extensionValue,
       Extensions requestedExtns, ExtensionControl extControl) {
     AdmissionSyntaxOption conf = certprofile.getAdmission();
-    ASN1ObjectIdentifier type = ObjectIdentifiers.id_extension_admission;
+    ASN1ObjectIdentifier type = ObjectIdentifiers.Extn.id_extension_admission;
     if (conf == null) {
       checkConstantExtnValue(type, failureMsg, extensionValue, requestedExtns, extControl);
       return;
@@ -1799,14 +1799,14 @@ public class ExtensionsChecker {
 
   private void checkExtnRestriction(StringBuilder failureMsg, byte[] extensionValue,
       Extensions requestedExtns, ExtensionControl extControl) {
-    checkDirectoryString(ObjectIdentifiers.id_extension_restriction,
+    checkDirectoryString(ObjectIdentifiers.Extn.id_extension_restriction,
         restriction.getType(), restriction.getText(),
         failureMsg, extensionValue, requestedExtns, extControl);
   }
 
   private void checkExtnAdditionalInformation(StringBuilder failureMsg,
       byte[] extensionValue, Extensions requestedExtns, ExtensionControl extControl) {
-    checkDirectoryString(ObjectIdentifiers.id_extension_additionalInformation,
+    checkDirectoryString(ObjectIdentifiers.Extn.id_extension_additionalInformation,
         additionalInformation.getType(), additionalInformation.getText(),
         failureMsg, extensionValue, requestedExtns, extControl);
   }
@@ -1864,7 +1864,7 @@ public class ExtensionsChecker {
       Extensions requestedExtns, ExtensionControl extControl) {
     ASN1ObjectIdentifier conf = validityModelId;
     if (conf == null) {
-      checkConstantExtnValue(ObjectIdentifiers.id_extension_validityModel,
+      checkConstantExtnValue(ObjectIdentifiers.Extn.id_extension_validityModel,
           failureMsg, extensionValue, requestedExtns, extControl);
     } else {
       ASN1Sequence seq = ASN1Sequence.getInstance(extensionValue);
@@ -1935,7 +1935,7 @@ public class ExtensionsChecker {
       final int n = seq.size();
       for (int j = 0; j < n; j++) {
         QCStatement stmt = QCStatement.getInstance(seq.getObjectAt(j));
-        if (ObjectIdentifiers.id_etsi_qcs_QcLimitValue.equals(stmt.getStatementId())) {
+        if (ObjectIdentifiers.Extn.id_etsi_qcs_QcLimitValue.equals(stmt.getStatementId())) {
           MonetaryValue monetaryValue = MonetaryValue.getInstance(stmt.getStatementInfo());
           int amount = monetaryValue.getAmount().intValue();
           int exponent = monetaryValue.getExponent().intValue();
@@ -2176,11 +2176,11 @@ public class ExtensionsChecker {
       byte[] extensionValue, Extensions requestedExtns, ExtensionControl extControl) {
     AuthorizationTemplate conf = authorizationTemplate;
     if (conf == null) {
-      checkConstantExtnValue(ObjectIdentifiers.id_xipki_ext_authorizationTemplate,
+      checkConstantExtnValue(ObjectIdentifiers.Xipki.id_xipki_ext_authorizationTemplate,
           failureMsg, extensionValue, requestedExtns, extControl);
 
       byte[] expected = getExpectedExtValue(
-          ObjectIdentifiers.id_xipki_ext_authorizationTemplate, requestedExtns, extControl);
+          ObjectIdentifiers.Xipki.id_xipki_ext_authorizationTemplate, requestedExtns, extControl);
       if (!Arrays.equals(expected, extensionValue)) {
         addViolation(failureMsg, "extension values", hex(extensionValue),
             (expected == null) ? "not present" : hex(expected));

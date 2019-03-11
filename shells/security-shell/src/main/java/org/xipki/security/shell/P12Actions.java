@@ -293,7 +293,7 @@ public class P12Actions {
 
       // dateOfBirth
       if (complexSubject.booleanValue()) {
-        id = ObjectIdentifiers.DN_DATE_OF_BIRTH;
+        id = ObjectIdentifiers.DN.dateOfBirth;
         RDN[] rdns = name.getRDNs(id);
 
         if (rdns == null || rdns.length == 0) {
@@ -305,7 +305,7 @@ public class P12Actions {
 
       // postalAddress
       if (complexSubject.booleanValue()) {
-        id = ObjectIdentifiers.DN_POSTAL_ADDRESS;
+        id = ObjectIdentifiers.DN.postalAddress;
         RDN[] rdns = name.getRDNs(id);
 
         if (rdns == null || rdns.length == 0) {
@@ -319,8 +319,8 @@ public class P12Actions {
         }
       }
 
-      // DN_UNIQUE_IDENTIFIER
-      id = ObjectIdentifiers.DN_UNIQUE_IDENTIFIER;
+      // DN.UNIQUE_IDENTIFIER
+      id = ObjectIdentifiers.DN.uniqueIdentifier;
       RDN[] rdns = name.getRDNs(id);
 
       if (rdns == null || rdns.length == 0) {
@@ -355,7 +355,7 @@ public class P12Actions {
       GeneralName[] names = createComplexGeneralNames("SIA-").getNames();
 
       ASN1EncodableVector vec2 = new ASN1EncodableVector();
-      vec2.add(ObjectIdentifiers.id_ad_caRepository);
+      vec2.add(ObjectIdentifiers.Extn.id_ad_caRepository);
       vec2.add(names[0]);
       vec.add(new DERSequence(vec2));
 
@@ -429,7 +429,7 @@ public class P12Actions {
       AdmissionSyntax adSyn = new AdmissionSyntax(null, new DERSequence(vec));
 
       try {
-        extensions.add(new Extension(ObjectIdentifiers.id_extension_admission, false,
+        extensions.add(new Extension(ObjectIdentifiers.Extn.id_extension_admission, false,
             adSyn.getEncoded()));
       } catch (IOException ex) {
         throw new BadInputException(ex.getMessage(), ex);
@@ -438,25 +438,25 @@ public class P12Actions {
       // extension subjectDirectoryAttributes (RFC 3739)
       Vector<Attribute> attrs = new Vector<>();
       ASN1GeneralizedTime dateOfBirth = new ASN1GeneralizedTime("19800122120000Z");
-      attrs.add(new Attribute(ObjectIdentifiers.DN_DATE_OF_BIRTH, new DERSet(dateOfBirth)));
+      attrs.add(new Attribute(ObjectIdentifiers.DN.dateOfBirth, new DERSet(dateOfBirth)));
 
       DERPrintableString gender = new DERPrintableString("M");
-      attrs.add(new Attribute(ObjectIdentifiers.DN_GENDER, new DERSet(gender)));
+      attrs.add(new Attribute(ObjectIdentifiers.DN.gender, new DERSet(gender)));
 
       DERUTF8String placeOfBirth = new DERUTF8String("Berlin");
-      attrs.add(new Attribute(ObjectIdentifiers.DN_PLACE_OF_BIRTH, new DERSet(placeOfBirth)));
+      attrs.add(new Attribute(ObjectIdentifiers.DN.placeOfBirth, new DERSet(placeOfBirth)));
 
       String[] countryOfCitizenshipList = {"DE", "FR"};
       for (String country : countryOfCitizenshipList) {
         DERPrintableString val = new DERPrintableString(country);
-        attrs.add(new Attribute(ObjectIdentifiers.DN_COUNTRY_OF_CITIZENSHIP,
+        attrs.add(new Attribute(ObjectIdentifiers.DN.countryOfCitizenship,
             new DERSet(val)));
       }
 
       String[] countryOfResidenceList = {"DE"};
       for (String country : countryOfResidenceList) {
         DERPrintableString val = new DERPrintableString(country);
-        attrs.add(new Attribute(ObjectIdentifiers.DN_COUNTRY_OF_RESIDENCE,
+        attrs.add(new Attribute(ObjectIdentifiers.DN.countryOfResidence,
             new DERSet(val)));
       }
 

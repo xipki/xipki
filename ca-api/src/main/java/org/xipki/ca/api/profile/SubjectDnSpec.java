@@ -206,35 +206,35 @@ public class SubjectDnSpec {
     Set<ASN1ObjectIdentifier> ids = new HashSet<>();
 
     // businessCategory
-    id = ObjectIdentifiers.DN_BUSINESS_CATEGORY;
+    id = ObjectIdentifiers.DN.businessCategory;
     ids.add(id);
     RANGES.put(id, RANGE_128);
     STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
     DFLT_STRING_TYPES.put(id, StringType.utf8String);
 
     // countryName
-    id = ObjectIdentifiers.DN_C;
+    id = ObjectIdentifiers.DN.C;
     ids.add(id);
     RANGES.put(id, RANGE_COUNTRY_NAME);
     STRING_TYPE_SET.put(id, PRINTABLE_STRING_ONLY);
     DFLT_STRING_TYPES.put(id, StringType.printableString);
 
     // commonName
-    id = ObjectIdentifiers.DN_CN;
+    id = ObjectIdentifiers.DN.CN;
     ids.add(id);
     RANGES.put(id, RANGE_64);
     STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
     DFLT_STRING_TYPES.put(id, StringType.utf8String);
 
     // emailAddress
-    id = ObjectIdentifiers.DN_EmailAddress;
+    id = ObjectIdentifiers.DN.emailAddress;
     ids.add(id);
     RANGES.put(id, RANGE_255);
     STRING_TYPE_SET.put(id, IA5_STRING_ONLY);
     DFLT_STRING_TYPES.put(id, StringType.ia5String);
 
     // countryOfCitizenship
-    id = ObjectIdentifiers.DN_COUNTRY_OF_CITIZENSHIP;
+    id = ObjectIdentifiers.DN.countryOfCitizenship;
     ids.add(id);
     RANGES.put(id, RANGE_COUNTRY_NAME);
     PATTERNS.put(id, PATTERN_COUNTRY);
@@ -242,7 +242,7 @@ public class SubjectDnSpec {
     DFLT_STRING_TYPES.put(id, StringType.printableString);
 
     // countryOfResidence
-    id = ObjectIdentifiers.DN_COUNTRY_OF_RESIDENCE;
+    id = ObjectIdentifiers.DN.countryOfResidence;
     ids.add(id);
     RANGES.put(id, RANGE_COUNTRY_NAME);
     PATTERNS.put(id, PATTERN_COUNTRY);
@@ -250,25 +250,25 @@ public class SubjectDnSpec {
     DFLT_STRING_TYPES.put(id, StringType.printableString);
 
     // DATE_OF_BIRTH
-    id = ObjectIdentifiers.DN_DATE_OF_BIRTH;
+    id = ObjectIdentifiers.DN.dateOfBirth;
     ids.add(id);
     RANGES.put(id, RANGE_DATE_OF_BIRTH);
     PATTERNS.put(id, PATTERN_DATE_OF_BIRTH);
 
     // domainComponent
-    id = ObjectIdentifiers.DN_DC;
+    id = ObjectIdentifiers.DN.DC;
     ids.add(id);
     STRING_TYPE_SET.put(id, IA5_STRING_ONLY);
     DFLT_STRING_TYPES.put(id, StringType.ia5String);
 
     // RFC 2256 dmdName
-    id = ObjectIdentifiers.DN_DMD_NAME;
+    id = ObjectIdentifiers.DN.dmdName;
     ids.add(id);
     STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
     DFLT_STRING_TYPES.put(id, StringType.utf8String);
 
     // gender
-    id = ObjectIdentifiers.DN_GENDER;
+    id = ObjectIdentifiers.DN.gender;
     ids.add(id);
     PATTERNS.put(id, PATTERN_GENDER);
     RANGES.put(id, RANGE_GENDER);
@@ -276,164 +276,164 @@ public class SubjectDnSpec {
     DFLT_STRING_TYPES.put(id, StringType.printableString);
 
     // generation qualifier
-    id = ObjectIdentifiers.DN_GENERATION_QUALIFIER;
+    id = ObjectIdentifiers.DN.generationQualifier;
     ids.add(id);
     RANGES.put(id, RANGE_64);
     STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
     DFLT_STRING_TYPES.put(id, StringType.utf8String);
 
     // givenName
-    id = ObjectIdentifiers.DN_GIVENNAME;
+    id = ObjectIdentifiers.DN.givenName;
     ids.add(id);
     RANGES.put(id, RANGE_64);
     STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
     DFLT_STRING_TYPES.put(id, StringType.utf8String);
 
     // initials
-    id = ObjectIdentifiers.DN_INITIALS;
+    id = ObjectIdentifiers.DN.initials;
     ids.add(id);
     RANGES.put(id, RANGE_64);
     STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
     DFLT_STRING_TYPES.put(id, StringType.utf8String);
 
     // LDAP user ID
-    id = ObjectIdentifiers.DN_LDAP_UID;
+    id = ObjectIdentifiers.DN.ldapUid;
     ids.add(id);
     STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
     DFLT_STRING_TYPES.put(id, StringType.utf8String);
 
     // localityName
-    id = ObjectIdentifiers.DN_LOCALITYNAME;
+    id = ObjectIdentifiers.DN.localityName;
     ids.add(id);
     RANGES.put(id, RANGE_128);
     STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
     DFLT_STRING_TYPES.put(id, StringType.utf8String);
 
     // name
-    id = ObjectIdentifiers.DN_NAME;
+    id = ObjectIdentifiers.DN.name;
     ids.add(id);
     RANGES.put(id, RANGE_NAME);
     STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
     DFLT_STRING_TYPES.put(id, StringType.utf8String);
 
     // nameOfBirth
-    id = ObjectIdentifiers.DN_NAME_AT_BIRTH;
+    id = ObjectIdentifiers.DN.nameAtBirth;
     ids.add(id);
     RANGES.put(id, RANGE_64);
     STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
     DFLT_STRING_TYPES.put(id, StringType.utf8String);
 
     // organizationName
-    id = ObjectIdentifiers.DN_O;
+    id = ObjectIdentifiers.DN.O;
     ids.add(id);
     RANGES.put(id, RANGE_64);
     STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
     DFLT_STRING_TYPES.put(id, StringType.utf8String);
 
     // organizationIdentifier
-    id = ObjectIdentifiers.DN_organizationIdentifier;
+    id = ObjectIdentifiers.DN.organizationIdentifier;
     ids.add(id);
     RANGES.put(id, RANGE_64);
     STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
     DFLT_STRING_TYPES.put(id, StringType.utf8String);
 
     // organizationalUnitName
-    id = ObjectIdentifiers.DN_OU;
+    id = ObjectIdentifiers.DN.OU;
     ids.add(id);
     RANGES.put(id, RANGE_64);
     STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
     DFLT_STRING_TYPES.put(id, StringType.utf8String);
 
     // placeOfBirth
-    id = ObjectIdentifiers.DN_PLACE_OF_BIRTH;
+    id = ObjectIdentifiers.DN.placeOfBirth;
     ids.add(id);
     RANGES.put(id, RANGE_128);
     STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
     DFLT_STRING_TYPES.put(id, StringType.utf8String);
 
     // postalAddress
-    id = ObjectIdentifiers.DN_POSTAL_ADDRESS;
+    id = ObjectIdentifiers.DN.postalAddress;
     ids.add(id);
     RANGES.put(id, RANGE_POSTAL_ADDRESS);
     STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
     DFLT_STRING_TYPES.put(id, StringType.utf8String);
 
     // postalCode
-    id = ObjectIdentifiers.DN_POSTAL_CODE;
+    id = ObjectIdentifiers.DN.postalCode;
     ids.add(id);
     RANGES.put(id, RANGE_POSTAL_CODE);
     STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
     DFLT_STRING_TYPES.put(id, StringType.utf8String);
 
     // pseudonym
-    id = ObjectIdentifiers.DN_PSEUDONYM;
+    id = ObjectIdentifiers.DN.pseudonym;
     ids.add(id);
     RANGES.put(id, RANGE_64);
     STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
     DFLT_STRING_TYPES.put(id, StringType.utf8String);
 
     // distinguishedNameQualifier
-    id = ObjectIdentifiers.DN_QUALIFIER;
+    id = ObjectIdentifiers.DN.dnQualifier;
     ids.add(id);
     RANGES.put(id, RANGE_64);
     STRING_TYPE_SET.put(id, PRINTABLE_STRING_ONLY);
     DFLT_STRING_TYPES.put(id, StringType.printableString);
 
     // serialNumber
-    id = ObjectIdentifiers.DN_SERIALNUMBER;
+    id = ObjectIdentifiers.DN.serialNumber;
     ids.add(id);
     RANGES.put(id, RANGE_64);
     STRING_TYPE_SET.put(id, PRINTABLE_STRING_ONLY);
     DFLT_STRING_TYPES.put(id, StringType.printableString);
 
     // stateOrProvinceName
-    id = ObjectIdentifiers.DN_ST;
+    id = ObjectIdentifiers.DN.ST;
     ids.add(id);
     RANGES.put(id, RANGE_128);
     STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
     DFLT_STRING_TYPES.put(id, StringType.utf8String);
 
     // streetAddress
-    id = ObjectIdentifiers.DN_STREET;
+    id = ObjectIdentifiers.DN.street;
     ids.add(id);
     RANGES.put(id, RANGE_128);
     STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
     DFLT_STRING_TYPES.put(id, StringType.utf8String);
 
     // surName
-    id = ObjectIdentifiers.DN_SURNAME;
+    id = ObjectIdentifiers.DN.surname;
     ids.add(id);
     RANGES.put(id, RANGE_64);
     STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
     DFLT_STRING_TYPES.put(id, StringType.utf8String);
 
     // title
-    id = ObjectIdentifiers.DN_T;
+    id = ObjectIdentifiers.DN.T;
     ids.add(id);
     RANGES.put(id, RANGE_64);
     STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
     DFLT_STRING_TYPES.put(id, StringType.utf8String);
 
     // telefonNumber
-    id = ObjectIdentifiers.DN_TELEPHONE_NUMBER;
+    id = ObjectIdentifiers.DN.telephoneNumber;
     ids.add(id);
     STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
     DFLT_STRING_TYPES.put(id, StringType.utf8String);
 
     // unique Identifier
-    id = ObjectIdentifiers.DN_UNIQUE_IDENTIFIER;
+    id = ObjectIdentifiers.DN.uniqueIdentifier;
     ids.add(id);
     STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
     DFLT_STRING_TYPES.put(id, StringType.utf8String);
 
     // unstructedAddress
-    id = ObjectIdentifiers.DN_UnstructuredAddress;
+    id = ObjectIdentifiers.DN.unstructuredAddress;
     ids.add(id);
     STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
     DFLT_STRING_TYPES.put(id, StringType.utf8String);
 
     // unstructedName
-    id = ObjectIdentifiers.DN_UnstructuredName;
+    id = ObjectIdentifiers.DN.unstructuredName;
     ids.add(id);
     STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
     DFLT_STRING_TYPES.put(id, StringType.utf8String);

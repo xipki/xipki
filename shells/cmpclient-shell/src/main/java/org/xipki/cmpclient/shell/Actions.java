@@ -536,7 +536,7 @@ public class Actions {
 
             MonetaryValue monterayValue = new MonetaryValue(currency, amount, exponent);
             QCStatement statment = new QCStatement(
-                ObjectIdentifiers.id_etsi_qcs_QcLimitValue, monterayValue);
+                ObjectIdentifiers.Extn.id_etsi_qcs_QcLimitValue, monterayValue);
             vec.add(statment);
           } catch (Exception ex) {
             throw new Exception("invalid qc-eu-limit '" + m + "'");
@@ -587,8 +587,8 @@ public class Actions {
         ExtensionExistence ee = new ExtensionExistence(
             textToAsn1ObjectIdentifers(needExtensionTypes),
             textToAsn1ObjectIdentifers(wantExtensionTypes));
-        extensions.add(new Extension(ObjectIdentifiers.id_xipki_ext_cmpRequestExtensions, false,
-                          ee.toASN1Primitive().getEncoded()));
+        extensions.add(new Extension(ObjectIdentifiers.Xipki.id_xipki_ext_cmpRequestExtensions,
+                          false, ee.toASN1Primitive().getEncoded()));
       }
 
       if (isNotEmpty(extensions)) {
@@ -1575,8 +1575,8 @@ public class Actions {
         ExtensionExistence ee = new ExtensionExistence(
             EnrollAction.textToAsn1ObjectIdentifers(needExtensionTypes),
             EnrollAction.textToAsn1ObjectIdentifers(wantExtensionTypes));
-        extensions.add(new Extension(ObjectIdentifiers.id_xipki_ext_cmpRequestExtensions, false,
-                          ee.toASN1Primitive().getEncoded()));
+        extensions.add(new Extension(ObjectIdentifiers.Xipki.id_xipki_ext_cmpRequestExtensions,
+                          false, ee.toASN1Primitive().getEncoded()));
       }
 
       if (isNotEmpty(extensions)) {

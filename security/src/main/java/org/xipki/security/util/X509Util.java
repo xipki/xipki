@@ -118,13 +118,13 @@ public class X509Util {
 
   public static String getCommonName(X500Name name) {
     Args.notNull(name, "name");
-    RDN[] rdns = name.getRDNs(ObjectIdentifiers.DN_CN);
+    RDN[] rdns = name.getRDNs(ObjectIdentifiers.DN.CN);
     if (rdns != null && rdns.length > 0) {
       RDN rdn = rdns[0];
       AttributeTypeAndValue atv = null;
       if (rdn.isMultiValued()) {
         for (AttributeTypeAndValue m : rdn.getTypesAndValues()) {
-          if (m.getType().equals(ObjectIdentifiers.DN_CN)) {
+          if (m.getType().equals(ObjectIdentifiers.DN.CN)) {
             atv = m;
             break;
           }

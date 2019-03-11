@@ -1011,7 +1011,8 @@ public class X509Ca implements Closeable {
     // end do
 
     try {
-      crlBuilder.addExtension(ObjectIdentifiers.id_xipki_ext_crlCertset, false, new DERSet(vector));
+      crlBuilder.addExtension(ObjectIdentifiers.Xipki.id_xipki_ext_crlCertset,
+          false, new DERSet(vector));
     } catch (CertIOException ex) {
       throw new OperationException(INVALID_EXTENSION, "CertIOException: " + ex.getMessage());
     }
@@ -1967,7 +1968,7 @@ public class X509Ca implements Closeable {
     X500Name requestedSubject = removeEmptyRdns(certTemplate.getSubject());
 
     if (!certprofile.isSerialNumberInReqPermitted()) {
-      RDN[] rdns = requestedSubject.getRDNs(ObjectIdentifiers.DN_SN);
+      RDN[] rdns = requestedSubject.getRDNs(ObjectIdentifiers.DN.SN);
       if (rdns != null && rdns.length > 0) {
         throw new OperationException(BAD_CERT_TEMPLATE,
             "subjectDN SerialNumber in request is not permitted");
@@ -2653,15 +2654,15 @@ public class X509Ca implements Closeable {
     for (int i = 0; i < rdns.length; i++) {
       RDN rdn = rdns[i];
       ASN1ObjectIdentifier type = rdn.getFirst().getType();
-      if (ObjectIdentifiers.DN_CN.equals(type)) {
+      if (ObjectIdentifiers.DN.CN.equals(type)) {
         commonNameIndex = i;
-      } else if (ObjectIdentifiers.DN_SERIALNUMBER.equals(type)) {
+      } else if (ObjectIdentifiers.DN.serialNumber.equals(type)) {
         serialNumberIndex = i;
       }
     }
 
     String newSerialNumber = profile.incSerialNumber(latestSn);
-    RDN serialNumberRdn = new RDN(ObjectIdentifiers.DN_SERIALNUMBER,
+    RDN serialNumberRdn = new RDN(ObjectIdentifiers.DN.serialNumber,
         new DERPrintableString(newSerialNumber));
 
     X500Name newName;

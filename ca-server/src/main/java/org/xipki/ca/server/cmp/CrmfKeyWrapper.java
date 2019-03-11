@@ -103,7 +103,7 @@ abstract class CrmfKeyWrapper {
     public ECIESAsymmetricKeyWrapper(PublicKey publicKey) {
       this.publicKey = publicKey;
       this.algorithmIdentifier = new AlgorithmIdentifier(
-          ObjectIdentifiers.id_ecies_specifiedParameters, buildECIESParameters());
+          ObjectIdentifiers.Secg.id_ecies_specifiedParameters, buildECIESParameters());
     }
 
     @Override
@@ -220,16 +220,16 @@ abstract class CrmfKeyWrapper {
       ASN1EncodableVector vec = new ASN1EncodableVector();
       // KeyDerivationFunction
       AlgorithmIdentifier keyDerivationFunction = new AlgorithmIdentifier(
-          ObjectIdentifiers.id_iso18033_kdf2, new AlgorithmIdentifier(HashAlgo.SHA1.getOid()));
+          ObjectIdentifiers.Misc.id_iso18033_kdf2, new AlgorithmIdentifier(HashAlgo.SHA1.getOid()));
       vec.add(new DERTaggedObject(true, 0, keyDerivationFunction));
 
       // SymmetricEncryption
       AlgorithmIdentifier symmetricEncryption = new AlgorithmIdentifier(
-          ObjectIdentifiers.id_aes128_cbc_in_ecies);
+          ObjectIdentifiers.Secg.id_aes128_cbc_in_ecies);
       vec.add(new DERTaggedObject(true, 1, symmetricEncryption));
 
       // MessageAuthenticationCode
-      AlgorithmIdentifier mac = new AlgorithmIdentifier(ObjectIdentifiers.id_hmac_full_ecies,
+      AlgorithmIdentifier mac = new AlgorithmIdentifier(ObjectIdentifiers.Secg.id_hmac_full_ecies,
           new AlgorithmIdentifier(HashAlgo.SHA1.getOid()));
       vec.add(new DERTaggedObject(true, 2, mac));
       return new DERSequence(vec);

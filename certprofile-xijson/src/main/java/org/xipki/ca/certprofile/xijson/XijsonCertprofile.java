@@ -547,8 +547,8 @@ public class XijsonCertprofile extends BaseCertprofile {
      * Make sure that if email address is contained in subject, it must be duplicated
      * in the SubjectAltName extension as rfc822Name.
      */
-    if (subjectControl.getControl(ObjectIdentifiers.DN_EmailAddress) != null) {
-      ASN1ObjectIdentifier type = ObjectIdentifiers.DN_EmailAddress;
+    if (subjectControl.getControl(ObjectIdentifiers.DN.emailAddress) != null) {
+      ASN1ObjectIdentifier type = ObjectIdentifiers.DN.emailAddress;
 
       if (subjectToSubjectAltNameModes == null
           || subjectToSubjectAltNameModes.get(type) == null) {
@@ -560,7 +560,7 @@ public class XijsonCertprofile extends BaseCertprofile {
       GeneralNameTag nameTag = subjectToSubjectAltNameModes.get(type);
       if (nameTag != GeneralNameTag.rfc822Name) {
         throw new CertprofileException("For the RDN "
-            + ObjectIdentifiers.DN_EmailAddress.getId()
+            + ObjectIdentifiers.DN.emailAddress.getId()
             + ", only target SubjectAltName type rfc822Name is permitted, but not "
             + nameTag);
       }
@@ -600,7 +600,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     extnIds.remove(Extension.freshestCRL);
     extnIds.remove(Extension.subjectKeyIdentifier);
     extnIds.remove(Extension.subjectInfoAccess);
-    extnIds.remove(ObjectIdentifiers.id_extension_pkix_ocsp_nocheck);
+    extnIds.remove(ObjectIdentifiers.Extn.id_extension_pkix_ocsp_nocheck);
 
     // to avoid race conflict.
     Set<ASN1ObjectIdentifier> copyOfExtnIds = new HashSet<>(extnIds);
@@ -645,7 +645,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   private void initAdditionalInformation(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
-    ASN1ObjectIdentifier type = ObjectIdentifiers.id_extension_additionalInformation;
+    ASN1ObjectIdentifier type = ObjectIdentifiers.Extn.id_extension_additionalInformation;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
       AdditionalInformation extConf = getExtension(type, extensions).getAdditionalInformation();
@@ -659,7 +659,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   private void initAdmission(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
-    ASN1ObjectIdentifier type = ObjectIdentifiers.id_extension_admission;
+    ASN1ObjectIdentifier type = ObjectIdentifiers.Extn.id_extension_admission;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
       AdmissionSyntax extConf = getExtension(type, extensions).getAdmissionSyntax();
@@ -696,7 +696,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   private void initAuthorizationTemplate(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
-    ASN1ObjectIdentifier type = ObjectIdentifiers.id_xipki_ext_authorizationTemplate;
+    ASN1ObjectIdentifier type = ObjectIdentifiers.Xipki.id_xipki_ext_authorizationTemplate;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
       AuthorizationTemplate extConf = getExtension(type, extensions).getAuthorizationTemplate();
@@ -952,7 +952,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   private void initRestriction(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
-    ASN1ObjectIdentifier type = ObjectIdentifiers.id_extension_restriction;
+    ASN1ObjectIdentifier type = ObjectIdentifiers.Extn.id_extension_restriction;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
       Restriction extConf = getExtension(type, extensions).getRestriction();
@@ -965,7 +965,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   private void initSmimeCapabilities(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
-    ASN1ObjectIdentifier type = ObjectIdentifiers.id_smimeCapabilities;
+    ASN1ObjectIdentifier type = ObjectIdentifiers.Extn.id_smimeCapabilities;
     if (!extensionControls.containsKey(type)) {
       return;
     }
@@ -1031,7 +1031,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   private void initTlsFeature(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
-    ASN1ObjectIdentifier type = ObjectIdentifiers.id_pe_tlsfeature;
+    ASN1ObjectIdentifier type = ObjectIdentifiers.Extn.id_pe_tlsfeature;
     if (!extensionControls.containsKey(type)) {
       return;
     }
@@ -1071,7 +1071,7 @@ public class XijsonCertprofile extends BaseCertprofile {
    */
   private void initValidityModel(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
-    ASN1ObjectIdentifier type = ObjectIdentifiers.id_extension_validityModel;
+    ASN1ObjectIdentifier type = ObjectIdentifiers.Extn.id_extension_validityModel;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
       ValidityModel extConf = getExtension(type, extensions).getValidityModel();
@@ -1246,16 +1246,16 @@ public class XijsonCertprofile extends BaseCertprofile {
         ASN1ObjectIdentifier attrType = attr.getAttrType();
         ASN1Encodable attrVal = attr.getAttributeValues()[0];
 
-        if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(attrType)) {
+        if (ObjectIdentifiers.DN.dateOfBirth.equals(attrType)) {
           dateOfBirth = ASN1GeneralizedTime.getInstance(attrVal);
-        } else if (ObjectIdentifiers.DN_PLACE_OF_BIRTH.equals(attrType)) {
+        } else if (ObjectIdentifiers.DN.placeOfBirth.equals(attrType)) {
           placeOfBirth = DirectoryString.getInstance(attrVal).getString();
-        } else if (ObjectIdentifiers.DN_GENDER.equals(attrType)) {
+        } else if (ObjectIdentifiers.DN.gender.equals(attrType)) {
           gender = DERPrintableString.getInstance(attrVal).getString();
-        } else if (ObjectIdentifiers.DN_COUNTRY_OF_CITIZENSHIP.equals(attrType)) {
+        } else if (ObjectIdentifiers.DN.countryOfCitizenship.equals(attrType)) {
           String country = DERPrintableString.getInstance(attrVal).getString();
           countryOfCitizenshipList.add(country);
-        } else if (ObjectIdentifiers.DN_COUNTRY_OF_RESIDENCE.equals(attrType)) {
+        } else if (ObjectIdentifiers.DN.countryOfResidence.equals(attrType)) {
           String country = DERPrintableString.getInstance(attrVal).getString();
           countryOfResidenceList.add(country);
         } else {
@@ -1270,7 +1270,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
       Vector<Attribute> attrs = new Vector<>();
       for (ASN1ObjectIdentifier attrType : subjectDirAttrsControl.getTypes()) {
-        if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(attrType)) {
+        if (ObjectIdentifiers.DN.dateOfBirth.equals(attrType)) {
           if (dateOfBirth != null) {
             String timeStirng = dateOfBirth.getTimeString();
             if (!SubjectDnSpec.PATTERN_DATE_OF_BIRTH.matcher(timeStirng).matches()) {
@@ -1279,13 +1279,13 @@ public class XijsonCertprofile extends BaseCertprofile {
             attrs.add(new Attribute(attrType, new DERSet(dateOfBirth)));
             continue;
           }
-        } else if (ObjectIdentifiers.DN_PLACE_OF_BIRTH.equals(attrType)) {
+        } else if (ObjectIdentifiers.DN.placeOfBirth.equals(attrType)) {
           if (placeOfBirth != null) {
             ASN1Encodable attrVal = new DERUTF8String(placeOfBirth);
             attrs.add(new Attribute(attrType, new DERSet(attrVal)));
             continue;
           }
-        } else if (ObjectIdentifiers.DN_GENDER.equals(attrType)) {
+        } else if (ObjectIdentifiers.DN.gender.equals(attrType)) {
           if (gender != null && !gender.isEmpty()) {
             char ch = gender.charAt(0);
             if (!(gender.length() == 1
@@ -1296,7 +1296,7 @@ public class XijsonCertprofile extends BaseCertprofile {
             attrs.add(new Attribute(attrType, new DERSet(attrVal)));
             continue;
           }
-        } else if (ObjectIdentifiers.DN_COUNTRY_OF_CITIZENSHIP.equals(attrType)) {
+        } else if (ObjectIdentifiers.DN.countryOfCitizenship.equals(attrType)) {
           if (!countryOfCitizenshipList.isEmpty()) {
             for (String country : countryOfCitizenshipList) {
               if (!SubjectDnSpec.isValidCountryAreaCode(country)) {
@@ -1307,7 +1307,7 @@ public class XijsonCertprofile extends BaseCertprofile {
             }
             continue;
           }
-        } else if (ObjectIdentifiers.DN_COUNTRY_OF_RESIDENCE.equals(attrType)) {
+        } else if (ObjectIdentifiers.DN.countryOfResidence.equals(attrType)) {
           if (!countryOfResidenceList.isEmpty()) {
             for (String country : countryOfResidenceList) {
               if (!SubjectDnSpec.isValidCountryAreaCode(country)) {
@@ -1380,7 +1380,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     // processed by the CA
 
     // Admission
-    type = ObjectIdentifiers.id_extension_admission;
+    type = ObjectIdentifiers.Extn.id_extension_admission;
     if (occurences.contains(type) && admission != null) {
       if (admission.isInputFromRequestRequired()) {
         Extension extension = (requestedExtensions == null) ? null
@@ -1417,7 +1417,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     // processed by the CA
 
     // restriction
-    type = ObjectIdentifiers.id_extension_restriction;
+    type = ObjectIdentifiers.Extn.id_extension_restriction;
     if (restriction != null) {
       if (occurences.remove(type)) {
         values.addExtension(type, restriction);
@@ -1425,7 +1425,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     }
 
     // AdditionalInformation
-    type = ObjectIdentifiers.id_extension_additionalInformation;
+    type = ObjectIdentifiers.Extn.id_extension_additionalInformation;
     if (additionalInformation != null) {
       if (occurences.remove(type)) {
         values.addExtension(type, additionalInformation);
@@ -1433,7 +1433,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     }
 
     // ValidityModel
-    type = ObjectIdentifiers.id_extension_validityModel;
+    type = ObjectIdentifiers.Extn.id_extension_validityModel;
     if (validityModel != null) {
       if (occurences.remove(type)) {
         values.addExtension(type, validityModel);
@@ -1481,7 +1481,7 @@ public class XijsonCertprofile extends BaseCertprofile {
         final int n = seq.size();
         for (int i = 0; i < n; i++) {
           QCStatement stmt = QCStatement.getInstance(seq.getObjectAt(i));
-          if (!ObjectIdentifiers.id_etsi_qcs_QcLimitValue.equals(stmt.getStatementId())) {
+          if (!ObjectIdentifiers.Extn.id_etsi_qcs_QcLimitValue.equals(stmt.getStatementId())) {
             continue;
           }
 
@@ -1614,7 +1614,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     }
 
     // TlsFeature
-    type = ObjectIdentifiers.id_pe_tlsfeature;
+    type = ObjectIdentifiers.Extn.id_pe_tlsfeature;
     if (tlsFeature != null) {
       if (occurences.remove(type)) {
         values.addExtension(type, tlsFeature);
@@ -1622,7 +1622,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     }
 
     // AuthorizationTemplate
-    type = ObjectIdentifiers.id_xipki_ext_authorizationTemplate;
+    type = ObjectIdentifiers.Xipki.id_xipki_ext_authorizationTemplate;
     if (authorizationTemplate != null) {
       if (occurences.remove(type)) {
         values.addExtension(type, authorizationTemplate);
@@ -1630,7 +1630,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     }
 
     // SMIME
-    type = ObjectIdentifiers.id_smimeCapabilities;
+    type = ObjectIdentifiers.Extn.id_smimeCapabilities;
     if (smimeCapabilities != null) {
       if (occurences.remove(type)) {
         values.addExtension(type, smimeCapabilities);

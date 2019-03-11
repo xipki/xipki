@@ -248,11 +248,11 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -280,11 +280,11 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -318,11 +318,11 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -361,11 +361,11 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1, null, "PREFIX ", " SUFFIX"));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1, null, "PREFIX ", " SUFFIX"));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -426,7 +426,7 @@ public class ProfileConfCreatorDemo {
     gn.addTags(GeneralNameTag.rfc822Name, GeneralNameTag.DNSName, GeneralNameTag.directoryName,
         GeneralNameTag.ediPartyName, GeneralNameTag.uniformResourceIdentifier,
         GeneralNameTag.IPAddress, GeneralNameTag.registeredID);
-    gn.addOtherNames(createOidType(ObjectIdentifiers.DN_O));
+    gn.addOtherNames(createOidType(ObjectIdentifiers.DN.O));
 
     // SubjectInfoAccess
     list.add(createExtension(Extension.subjectInfoAccess, true, false));
@@ -435,7 +435,7 @@ public class ProfileConfCreatorDemo {
     SubjectInfoAccess.Access access = new SubjectInfoAccess.Access();
     subjectInfoAccess.getAccesses().add(access);
 
-    access.setAccessMethod(createOidType(ObjectIdentifiers.id_ad_caRepository));
+    access.setAccessMethod(createOidType(ObjectIdentifiers.Extn.id_ad_caRepository));
 
     GeneralNameType accessLocation = new GeneralNameType();
     access.setAccessLocation(accessLocation);
@@ -458,12 +458,12 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(true);
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_organizationIdentifier, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.organizationIdentifier, 0, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -471,7 +471,8 @@ public class ProfileConfCreatorDemo {
     list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
     list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
     list.add(createExtension(Extension.freshestCRL, false, false, null));
-    list.add(createExtension(ObjectIdentifiers.id_extension_pkix_ocsp_nocheck, false, false, null));
+    list.add(createExtension(
+              ObjectIdentifiers.Extn.id_extension_pkix_ocsp_nocheck, false, false, null));
 
     // Extensions - basicConstraints
     list.add(createExtension(Extension.basicConstraints, true, true));
@@ -492,7 +493,7 @@ public class ProfileConfCreatorDemo {
     // Extensions - extenedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_OCSPSigning}, null));
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.ExtendedKU.id_kp_OCSPSigning}, null));
 
     return profile;
   } // method certprofileOcsp
@@ -507,11 +508,11 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -547,17 +548,17 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_EmailAddress, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.emailAddress, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
 
     // SubjectToSubjectAltName
     SubjectToSubjectAltNameType s2sType = new SubjectToSubjectAltNameType();
     profile.getSubjectToSubjectAltNames().add(s2sType);
-    s2sType.setSource(createOidType(ObjectIdentifiers.DN_EmailAddress));
+    s2sType.setSource(createOidType(ObjectIdentifiers.DN.emailAddress));
     s2sType.setTarget(GeneralNameTag.rfc822Name);
 
     // Extensions
@@ -594,11 +595,11 @@ public class ProfileConfCreatorDemo {
     // Extensions - extenedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_emailProtection},
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.ExtendedKU.id_kp_emailProtection},
         null));
 
     // Extensions - SMIMECapabilities
-    list.add(createExtension(ObjectIdentifiers.id_smimeCapabilities, true, false));
+    list.add(createExtension(ObjectIdentifiers.Extn.id_smimeCapabilities, true, false));
     last(list).setSmimeCapabilities(createSmimeCapabilities());
 
     return profile;
@@ -612,16 +613,16 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1, REGEX_FQDN, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1, REGEX_FQDN, null, null));
 
     // SubjectToSubjectAltName
     SubjectToSubjectAltNameType s2sType = new SubjectToSubjectAltNameType();
     profile.getSubjectToSubjectAltNames().add(s2sType);
-    s2sType.setSource(createOidType(ObjectIdentifiers.DN_CN));
+    s2sType.setSource(createOidType(ObjectIdentifiers.DN.CN));
     s2sType.setTarget(GeneralNameTag.DNSName);
 
     // Extensions
@@ -658,11 +659,11 @@ public class ProfileConfCreatorDemo {
     // Extensions - extenedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_serverAuth},
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_clientAuth}));
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.ExtendedKU.id_kp_serverAuth},
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.ExtendedKU.id_kp_clientAuth}));
 
     // Extensions - tlsFeature
-    list.add(createExtension(ObjectIdentifiers.id_pe_tlsfeature, true, true));
+    list.add(createExtension(ObjectIdentifiers.Extn.id_pe_tlsfeature, true, true));
     last(list).setTlsFeature(createTlsFeature(
         TlsExtensionType.STATUS_REQUEST, TlsExtensionType.CLIENT_CERTIFICATE_URL));
 
@@ -677,11 +678,11 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -711,7 +712,7 @@ public class ProfileConfCreatorDemo {
     // Extensions - extenedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_clientAuth},
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.ExtendedKU.id_kp_clientAuth},
         null));
 
     return profile;
@@ -726,11 +727,11 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(true);
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1, REGEX_FQDN, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1, REGEX_FQDN, null, null));
 
     // Extensions
     // Extensions - controls
@@ -760,8 +761,8 @@ public class ProfileConfCreatorDemo {
     // Extensions - extenedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_serverAuth},
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_clientAuth}));
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.ExtendedKU.id_kp_serverAuth},
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.ExtendedKU.id_kp_clientAuth}));
 
     return profile;
   } // method certprofileTlsWithIncSerial
@@ -775,12 +776,12 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
 
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 2, 2));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 2, 2));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
 
     // Extensions
     // Extensions - general
@@ -822,11 +823,11 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1, null, null, null, "group1"));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 1, 1, null, null, null, "group1"));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1, null, null, null, "group1"));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 1, 1, null, null, null, "group1"));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
 
     // Extensions
     // Extensions - general
@@ -864,12 +865,12 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_organizationIdentifier, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.organizationIdentifier, 0, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
 
     // Extensions
     // Extensions - general
@@ -901,7 +902,7 @@ public class ProfileConfCreatorDemo {
     // Extensions - extenedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, true));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_timeStamping}, null));
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.ExtendedKU.id_kp_timeStamping}, null));
 
     // privateKeyUsagePeriod
     list.add(createExtension(Extension.privateKeyUsagePeriod, true, false));
@@ -923,14 +924,14 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(false);
     subject.setKeepRdnOrder(true);
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_DATE_OF_BIRTH, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_POSTAL_ADDRESS, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_UNIQUE_IDENTIFIER, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.dateOfBirth, 0, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.postalAddress, 0, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.uniqueIdentifier, 1, 1));
 
     // Extensions
     // Extensions - general
@@ -962,8 +963,8 @@ public class ProfileConfCreatorDemo {
     // Extensions - extenedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_serverAuth},
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_clientAuth}));
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.ExtendedKU.id_kp_serverAuth},
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.ExtendedKU.id_kp_clientAuth}));
 
     // Extension - subjectDirectoryAttributes
     list.add(createExtension(Extension.subjectDirectoryAttributes, true, false));
@@ -971,14 +972,14 @@ public class ProfileConfCreatorDemo {
     last(list).setSubjectDirectoryAttributs(subjectDirAttrType);
 
     List<DescribableOid> attrTypes = subjectDirAttrType.getTypes();
-    attrTypes.add(createOidType(ObjectIdentifiers.DN_COUNTRY_OF_CITIZENSHIP));
-    attrTypes.add(createOidType(ObjectIdentifiers.DN_COUNTRY_OF_RESIDENCE));
-    attrTypes.add(createOidType(ObjectIdentifiers.DN_GENDER));
-    attrTypes.add(createOidType(ObjectIdentifiers.DN_DATE_OF_BIRTH));
-    attrTypes.add(createOidType(ObjectIdentifiers.DN_PLACE_OF_BIRTH));
+    attrTypes.add(createOidType(ObjectIdentifiers.DN.countryOfCitizenship));
+    attrTypes.add(createOidType(ObjectIdentifiers.DN.countryOfResidence));
+    attrTypes.add(createOidType(ObjectIdentifiers.DN.gender));
+    attrTypes.add(createOidType(ObjectIdentifiers.DN.dateOfBirth));
+    attrTypes.add(createOidType(ObjectIdentifiers.DN.placeOfBirth));
 
     // Extension - Admission
-    list.add(createExtension(ObjectIdentifiers.id_extension_admission, true, false));
+    list.add(createExtension(ObjectIdentifiers.Extn.id_extension_admission, true, false));
     AdmissionSyntax admissionSyntax = new AdmissionSyntax();
     last(list).setAdmissionSyntax(admissionSyntax);
 
@@ -1014,17 +1015,18 @@ public class ProfileConfCreatorDemo {
     regNum.setRegex("a*b");
 
     // restriction
-    list.add(createExtension(ObjectIdentifiers.id_extension_restriction, true, false));
+    list.add(createExtension(ObjectIdentifiers.Extn.id_extension_restriction, true, false));
     last(list).setRestriction(
         createRestriction(DirectoryStringType.utf8String, "demo restriction"));
 
     // additionalInformation
-    list.add(createExtension(ObjectIdentifiers.id_extension_additionalInformation, true, false));
+    list.add(createExtension(
+              ObjectIdentifiers.Extn.id_extension_additionalInformation, true, false));
     last(list).setAdditionalInformation(createAdditionalInformation(DirectoryStringType.utf8String,
         "demo additional information"));
 
     // validationModel
-    list.add(createExtension(ObjectIdentifiers.id_extension_validityModel, true, false));
+    list.add(createExtension(ObjectIdentifiers.Extn.id_extension_validityModel, true, false));
     last(list).setValidityModel(
         createValidityModel(
             createOidType(new ASN1ObjectIdentifier("1.3.6.1.4.1.8301.3.5.1"), "chain")));
@@ -1042,7 +1044,8 @@ public class ProfileConfCreatorDemo {
     last(list).setBiometricInfo(createBiometricInfo());
 
     // authorizationTemplate
-    list.add(createExtension(ObjectIdentifiers.id_xipki_ext_authorizationTemplate, true, false));
+    list.add(createExtension(
+              ObjectIdentifiers.Xipki.id_xipki_ext_authorizationTemplate, true, false));
     last(list).setAuthorizationTemplate(createAuthorizationTemplate());
 
     // SubjectAltName
@@ -1062,7 +1065,7 @@ public class ProfileConfCreatorDemo {
     last(list).setSubjectInfoAccess(subjectInfoAccess);
 
     List<ASN1ObjectIdentifier> accessMethods = new LinkedList<>();
-    accessMethods.add(ObjectIdentifiers.id_ad_caRepository);
+    accessMethods.add(ObjectIdentifiers.Extn.id_ad_caRepository);
     for (int i = 0; i < 10; i++) {
       accessMethods.add(new ASN1ObjectIdentifier("2.3.4." + (i + 1)));
     }
@@ -1096,11 +1099,11 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1, REGEX_FQDN, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1, REGEX_FQDN, null, null));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -1139,11 +1142,11 @@ public class ProfileConfCreatorDemo {
     subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1, REGEX_FQDN, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1, REGEX_FQDN, null, null));
 
     // SubjectToSubjectAltName
     List<SubjectToSubjectAltNameType> subjectToSubjectAltNames = new LinkedList<>();
@@ -1151,7 +1154,7 @@ public class ProfileConfCreatorDemo {
 
     SubjectToSubjectAltNameType s2sType = new SubjectToSubjectAltNameType();
     subjectToSubjectAltNames.add(s2sType);
-    s2sType.setSource(createOidType(ObjectIdentifiers.DN_CN));
+    s2sType.setSource(createOidType(ObjectIdentifiers.DN.CN));
     s2sType.setTarget(GeneralNameTag.DNSName);
 
     // Extensions
@@ -1190,18 +1193,18 @@ public class ProfileConfCreatorDemo {
     // Extensions - extenedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_serverAuth},
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_clientAuth}));
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.ExtendedKU.id_kp_serverAuth},
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.ExtendedKU.id_kp_clientAuth}));
 
     // Extensions - tlsFeature
-    list.add(createExtension(ObjectIdentifiers.id_pe_tlsfeature, true, true));
+    list.add(createExtension(ObjectIdentifiers.Extn.id_pe_tlsfeature, true, true));
     last(list).setTlsFeature(
         createTlsFeature(
             new TlsExtensionType[]{TlsExtensionType.STATUS_REQUEST,
                 TlsExtensionType.CLIENT_CERTIFICATE_URL}));
 
     // Extensions - SMIMECapabilities
-    list.add(createExtension(ObjectIdentifiers.id_smimeCapabilities, true, false));
+    list.add(createExtension(ObjectIdentifiers.Extn.id_smimeCapabilities, true, false));
     last(list).setSmimeCapabilities(createSmimeCapabilities());
 
     // Extensions - 1.2.3.4.1 (demo_without_conf)
@@ -1374,17 +1377,17 @@ public class ProfileConfCreatorDemo {
     QcStatementType statement = new QcStatementType();
 
     // QcCompliance
-    statement.setStatementId(createOidType(ObjectIdentifiers.id_etsi_qcs_QcCompliance));
+    statement.setStatementId(createOidType(ObjectIdentifiers.Extn.id_etsi_qcs_QcCompliance));
     extValue.getQcStatements().add(statement);
 
     // QC SCD
     statement = new QcStatementType();
-    statement.setStatementId(createOidType(ObjectIdentifiers.id_etsi_qcs_QcSSCD));
+    statement.setStatementId(createOidType(ObjectIdentifiers.Extn.id_etsi_qcs_QcSSCD));
     extValue.getQcStatements().add(statement);
 
     // QC RetentionPeriod
     statement = new QcStatementType();
-    statement.setStatementId(createOidType(ObjectIdentifiers.id_etsi_qcs_QcRetentionPeriod));
+    statement.setStatementId(createOidType(ObjectIdentifiers.Extn.id_etsi_qcs_QcRetentionPeriod));
     QcStatementValueType statementValue = new QcStatementValueType();
     statementValue.setQcRetentionPeriod(10);
     statement.setStatementValue(statementValue);
@@ -1392,7 +1395,7 @@ public class ProfileConfCreatorDemo {
 
     // QC LimitValue
     statement = new QcStatementType();
-    statement.setStatementId(createOidType(ObjectIdentifiers.id_etsi_qcs_QcLimitValue));
+    statement.setStatementId(createOidType(ObjectIdentifiers.Extn.id_etsi_qcs_QcLimitValue));
     statementValue = new QcStatementValueType();
 
     QcEuLimitValueType euLimit = new QcEuLimitValueType();
@@ -1415,7 +1418,7 @@ public class ProfileConfCreatorDemo {
 
     // QC PDS
     statement = new QcStatementType();
-    statement.setStatementId(createOidType(ObjectIdentifiers.id_etsi_qcs_QcPDS));
+    statement.setStatementId(createOidType(ObjectIdentifiers.Extn.id_etsi_qcs_QcPDS));
     extValue.getQcStatements().add(statement);
     statementValue = new QcStatementValueType();
     statement.setStatementValue(statementValue);

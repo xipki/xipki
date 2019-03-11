@@ -300,11 +300,11 @@ public class SubjectChecker {
   private void checkAttributeTypeAndValue(String name, ASN1ObjectIdentifier type,
       String atvTextValue, RdnControl rdnControl, List<String> requestedCoreAtvTextValues,
       int index, StringBuilder failureMsg) throws BadCertTemplateException {
-    if (atvTextValue != null && ObjectIdentifiers.DN_EmailAddress.equals(type)) {
+    if (atvTextValue != null && ObjectIdentifiers.DN.emailAddress.equals(type)) {
       atvTextValue = atvTextValue.toLowerCase();
     }
 
-    if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type)) {
+    if (ObjectIdentifiers.DN.dateOfBirth.equals(type)) {
       if (!SubjectDnSpec.PATTERN_DATE_OF_BIRTH.matcher(atvTextValue).matches()) {
         throw new BadCertTemplateException(
             "Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
@@ -345,13 +345,13 @@ public class SubjectChecker {
     }
 
     if (CollectionUtil.isEmpty(requestedCoreAtvTextValues)) {
-      if (!type.equals(ObjectIdentifiers.DN_SERIALNUMBER)) {
+      if (!type.equals(ObjectIdentifiers.DN.serialNumber)) {
         failureMsg.append("is present but not contained in the request; ");
       }
     } else {
       String requestedCoreAtvTextValue = requestedCoreAtvTextValues.get(index);
-      if (!type.equals(ObjectIdentifiers.DN_SERIALNUMBER)) {
-        if (requestedCoreAtvTextValue != null && type.equals(ObjectIdentifiers.DN_EmailAddress)) {
+      if (!type.equals(ObjectIdentifiers.DN.serialNumber)) {
+        if (requestedCoreAtvTextValue != null && type.equals(ObjectIdentifiers.DN.emailAddress)) {
           requestedCoreAtvTextValue = requestedCoreAtvTextValue.toLowerCase();
         }
 
@@ -391,12 +391,12 @@ public class SubjectChecker {
       throws BadCertTemplateException {
     ASN1ObjectIdentifier type = requestedRdn.getFirst().getType();
     ASN1Encodable vec = requestedRdn.getFirst().getValue();
-    if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type)) {
+    if (ObjectIdentifiers.DN.dateOfBirth.equals(type)) {
       if (!(vec instanceof ASN1GeneralizedTime)) {
         throw new BadCertTemplateException("requested RDN is not of GeneralizedTime");
       }
       return ((ASN1GeneralizedTime) vec).getTimeString();
-    } else if (ObjectIdentifiers.DN_POSTAL_ADDRESS.equals(type)) {
+    } else if (ObjectIdentifiers.DN.postalAddress.equals(type)) {
       if (!(vec instanceof ASN1Sequence)) {
         throw new BadCertTemplateException("requested RDN is not of Sequence");
       }
@@ -436,13 +436,13 @@ public class SubjectChecker {
     ASN1ObjectIdentifier type = atv.getType();
     ASN1Encodable atvValue = atv.getValue();
 
-    if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type)) {
+    if (ObjectIdentifiers.DN.dateOfBirth.equals(type)) {
       if (!(atvValue instanceof ASN1GeneralizedTime)) {
         failureMsg.append(name).append(" is not of type GeneralizedTime; ");
         return null;
       }
       return ((ASN1GeneralizedTime) atvValue).getTimeString();
-    } else if (ObjectIdentifiers.DN_POSTAL_ADDRESS.equals(type)) {
+    } else if (ObjectIdentifiers.DN.postalAddress.equals(type)) {
       if (!(atvValue instanceof ASN1Sequence)) {
         failureMsg.append(name).append(" is not of type Sequence; ");
         return null;

@@ -167,7 +167,8 @@ public class Actions {
       EXTENSION_OIDNAME_MAP.put(OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff, "ArchiveCutoff");
       EXTENSION_OIDNAME_MAP.put(OCSPObjectIdentifiers.id_pkix_ocsp_crl, "CrlID");
       EXTENSION_OIDNAME_MAP.put(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, "Nonce");
-      EXTENSION_OIDNAME_MAP.put(ObjectIdentifiers.id_pkix_ocsp_extendedRevoke, "ExtendedRevoke");
+      EXTENSION_OIDNAME_MAP.put(ObjectIdentifiers.Extn.id_pkix_ocsp_extendedRevoke,
+          "ExtendedRevoke");
     }
 
     /**
@@ -473,7 +474,7 @@ public class Actions {
       }
 
       boolean extendedRevoke = basicResp.getExtension(
-          ObjectIdentifiers.id_pkix_ocsp_extendedRevoke) != null;
+          ObjectIdentifiers.Extn.id_pkix_ocsp_extendedRevoke) != null;
 
       SingleResp[] singleResponses = basicResp.getResponses();
 

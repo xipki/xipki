@@ -1764,8 +1764,8 @@ public class CertStore {
     RDN[] rdns2 = new RDN[rdns1.length];
     for (int i = 0; i < rdns1.length; i++) {
       RDN rdn = rdns1[i];
-      rdns2[i] =  rdn.getFirst().getType().equals(ObjectIdentifiers.DN_SERIALNUMBER)
-          ? new RDN(ObjectIdentifiers.DN_SERIALNUMBER, new DERPrintableString("%")) : rdn;
+      rdns2[i] =  rdn.getFirst().getType().equals(ObjectIdentifiers.DN.serialNumber)
+          ? new RDN(ObjectIdentifiers.DN.serialNumber, new DERPrintableString("%")) : rdn;
     }
 
     String namePattern = X509Util.getRfc4519Name(new X500Name(rdns2));
@@ -1791,7 +1791,7 @@ public class CertStore {
     }
 
     X500Name lastName = new X500Name(subjectStr);
-    RDN[] rdns = lastName.getRDNs(ObjectIdentifiers.DN_SERIALNUMBER);
+    RDN[] rdns = lastName.getRDNs(ObjectIdentifiers.DN.serialNumber);
     if (rdns == null || rdns.length == 0) {
       return null;
     }
