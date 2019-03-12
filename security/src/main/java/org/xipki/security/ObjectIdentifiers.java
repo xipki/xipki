@@ -42,12 +42,12 @@ public class ObjectIdentifiers {
    */
   private static final ASN1ObjectIdentifier id_pkix = new ASN1ObjectIdentifier("1.3.6.1.5.5.7");
 
-  public static final class Xipki {
+  /**
+   * registered PEN for xipki.org: 45522
+   */
+  private static final ASN1ObjectIdentifier id_pen = new ASN1ObjectIdentifier("1.3.6.2.4.1");
 
-    /**
-     * registered PEN for xipki.org: 45522
-     */
-    private static final ASN1ObjectIdentifier id_pen = new ASN1ObjectIdentifier("1.3.6.2.4.1");
+  public static final class Xipki {
 
     private static final ASN1ObjectIdentifier id_xipki = id_pen.branch("45522");
 
@@ -259,15 +259,12 @@ public class ObjectIdentifiers {
   }
 
   // extended key usage
-  public static final class ExtendedKU {
+  public static final class XKU {
+
+    public static final ASN1ObjectIdentifier id_kp_anyExtendedKeyUsage =
+        Extension.extendedKeyUsage.branch("0");
 
     private static final ASN1ObjectIdentifier id_kp = id_pkix.branch("3");
-
-    /**
-     * TLS WWW server authentication
-     * Key usage bits that may be consistent: digitalSignature, keyEncipherment or keyAgreement.
-     */
-    public static final ASN1ObjectIdentifier id_kp_serverAuth = id_kp.branch("1");
 
     /**
      * TLS WWW client authentication
@@ -282,6 +279,28 @@ public class ObjectIdentifiers {
     public static final ASN1ObjectIdentifier id_kp_codeSigning = id_kp.branch("3");
 
     /**
+     * CSN 369791 TLS client
+     */
+    public static final ASN1ObjectIdentifier id_kp_csn369791TlsClient =
+        new ASN1ObjectIdentifier("1.2.203.7064.1.1.369791.1");
+
+    /**
+     * CSN 369791 TLS server
+     */
+    public static final ASN1ObjectIdentifier id_kp_csn369791TlsServer =
+        new ASN1ObjectIdentifier("1.2.203.7064.1.1.369791.2");
+
+    /**
+     * EAP over LAN (EAPOL)
+     */
+    public static final ASN1ObjectIdentifier id_kp_eapOverLan = id_kp.branch("14");
+
+    /**
+     * EAP over PPP
+     */
+    public static final ASN1ObjectIdentifier id_kp_eapOverPpp = id_kp.branch("13");
+
+    /**
      * Email protection
      * Key usage bits that may be consistent: digitalSignature, nonRepudiation, and/or
      * (keyEncipherment or keyAgreement).
@@ -289,44 +308,160 @@ public class ObjectIdentifiers {
     public static final ASN1ObjectIdentifier id_kp_emailProtection = id_kp.branch("4");
 
     /**
-     * Binding the hash of an object to a time
-     * Key usage bits that may be consistent: digitalSignature and/or nonRepudiation.
+     * ETSI TSL Signing
      */
-    public static final ASN1ObjectIdentifier id_kp_timeStamping = id_kp.branch("8");
+    public static final ASN1ObjectIdentifier id_kp_etsiTslSigning =
+        new ASN1ObjectIdentifier("0.4.0.2231.3.0");
 
     /**
-     * Signing OCSP responses
-     * Key usage bits that may be consistent: digitalSignature and/or nonRepudiation.
+     * ICAO Master List Signing
      */
-    public static final ASN1ObjectIdentifier id_kp_OCSPSigning = id_kp.branch("9");
-
-    /*
-     * The following purposes have been included in a predecessor draft of RFC 3280
-     * and therefore continue to be listed by this implementation:
-     */
+    public static final ASN1ObjectIdentifier id_kp_icaoMasterListSigning =
+        new ASN1ObjectIdentifier("2.23.136.1.1.3");
 
     /**
+     * Internet Key Exchange for IPsec
+     */
+    public static final ASN1ObjectIdentifier id_kp_ikeForIpsec = id_kp.branch("17");
+
+    /**
+     * Intel AMT management
+     */
+    public static final ASN1ObjectIdentifier id_kp_intelAmtManagement =
+        new ASN1ObjectIdentifier("2.16.840.1.113741.1.2.3");
+
+    /**
+     * This purpose has been included in a predecessor draft of RFC 3280
+     * and therefore continue to be listed by this implementation.
+     * <p/>
      * IP security end system.
      */
     public static final ASN1ObjectIdentifier id_kp_ipsecEndSystem = id_kp.branch("5");
 
     /**
+     * This purpose has been included in a predecessor draft of RFC 3280
+     * and therefore continue to be listed by this implementation.
+     * <p/>
      * IP security tunnel termination.
      */
     public static final ASN1ObjectIdentifier id_kp_ipsecTunnel = id_kp.branch("6");
 
     /**
+     * This purpose has been included in a predecessor draft of RFC 3280
+     * and therefore continue to be listed by this implementation.
+     * <p/>
      * IP security user.
      */
     public static final ASN1ObjectIdentifier id_kp_ipsecUser = id_kp.branch("7");
 
-    public static final ASN1ObjectIdentifier id_kp_ocsp = id_pkix.branch("1.48.1");
+    /**
+     * Kerberos Client Authentication
+     */
+    public static final ASN1ObjectIdentifier id_kp_kerberosClientAuthentication =
+        new ASN1ObjectIdentifier("1.3.6.1.5.2.3.4");
+
+    /**
+     * Kerberos Key Distribution Center
+     */
+    public static final ASN1ObjectIdentifier id_kp_kerberosKdc =
+        new ASN1ObjectIdentifier("1.3.6.1.5.2.3.5");
+
+    private static final ASN1ObjectIdentifier id_microsoft = id_pen.branch("311");
+
+    /**
+     * Microsoft Commercial Code Signing
+     */
+    public static final ASN1ObjectIdentifier id_kp_microsoftCommercialCodeSigning =
+        id_microsoft.branch("2.1.22");
+
+    /**
+     * Microsoft Document Signing
+     */
+    public static final ASN1ObjectIdentifier id_kp_microsoftDocumentSigning =
+        id_microsoft.branch("10.3.12");
+
+    /**
+     * Microsoft Encrypted File System (EFS)
+     */
+    public static final ASN1ObjectIdentifier id_kp_microsoftEfs =
+        id_microsoft.branch("10.3.4");
+
+    /**
+     * Microsoft EFS Recovery
+     */
+    public static final ASN1ObjectIdentifier id_kp_microsoftEfsRecovery =
+        id_microsoft.branch("10.3.4.1");
+
+    /**
+     * Microsoft Individual Code Signing
+     */
+    public static final ASN1ObjectIdentifier id_kp_microsoftIndividualCodeSigning =
+        id_microsoft.branch("2.1.21");
+
+    /**
+     * Microsoft Smart Card Logon
+     */
+    public static final ASN1ObjectIdentifier id_kp_microsoftSmartCardLogon =
+        new ASN1ObjectIdentifier("20.2.2");
+
+    /**
+     * Signing OCSP responses
+     * Key usage bits that may be consistent: digitalSignature and/or nonRepudiation.
+     */
+    public static final ASN1ObjectIdentifier id_kp_ocspSigning = id_kp.branch("9");
+
+    /**
+     * PIV Card Authentication
+     */
+    public static final ASN1ObjectIdentifier id_kp_pivCardAuthentication =
+        new ASN1ObjectIdentifier("2.16.840.1.101.3.6.8");
+
+    /**
+     * PDF Signing
+     */
+    public static final ASN1ObjectIdentifier id_kp_pdfSigning =
+        new ASN1ObjectIdentifier("1.2.840.113583.1.1.5");
+
+    /**
+     * SCVP Client
+     */
+    public static final ASN1ObjectIdentifier id_kp_scvpClient = id_kp.branch("16");
+
+    /**
+     * SCVP Server
+     */
+    public static final ASN1ObjectIdentifier id_kp_scvpServer = id_kp.branch("15");
+
+    /**
+     * TLS WWW server authentication
+     * Key usage bits that may be consistent: digitalSignature, keyEncipherment or keyAgreement.
+     */
+    public static final ASN1ObjectIdentifier id_kp_serverAuth = id_kp.branch("1");
+
+    /**
+     * SIP Domain
+     */
+    public static final ASN1ObjectIdentifier id_kp_sipDomain = id_kp.branch("20");
+
+    /**
+     * SSH Client
+     */
+    public static final ASN1ObjectIdentifier id_kp_sshClient = id_kp.branch("21");
+
+    /**
+     * SSH Server
+     */
+    public static final ASN1ObjectIdentifier id_kp_sshServer = id_kp.branch("22");
+
+    /**
+     * Binding the hash of an object to a time
+     * Key usage bits that may be consistent: digitalSignature and/or nonRepudiation.
+     */
+    public static final ASN1ObjectIdentifier id_kp_timeStamping = id_kp.branch("8");
 
   }
 
   public static final class Extn {
-    public static final ASN1ObjectIdentifier id_anyExtendedKeyUsage =
-        Extension.extendedKeyUsage.branch("0");
 
     // OCSP
     public static final ASN1ObjectIdentifier id_pkix_ocsp_prefSigAlgs =
@@ -334,9 +469,6 @@ public class ObjectIdentifiers {
 
     public static final ASN1ObjectIdentifier id_pkix_ocsp_extendedRevoke =
         OCSPObjectIdentifiers.id_pkix_ocsp.branch("9");
-
-    public static final ASN1ObjectIdentifier id_tsl_kp_tslSigning =
-        new ASN1ObjectIdentifier("0.4.0.2231.3.0");
 
     public static final ASN1ObjectIdentifier id_extension_pkix_ocsp_nocheck =
         id_pkix.branch("48.1.5");
@@ -439,26 +571,13 @@ public class ObjectIdentifiers {
     oidNameMap.put(Xipki.id_xipki_ext_cmpRequestExtensions, "xipki-cmpRequestExtensions");
     oidNameMap.put(Xipki.id_xipki_ext_authorizationTemplate, "xipki-authorizationTemplate");
 
-    oidNameMap.put(ExtendedKU.id_kp_clientAuth, "kp-clientAuth");
-    oidNameMap.put(ExtendedKU.id_kp_codeSigning, "kp-codeSigning");
-    oidNameMap.put(ExtendedKU.id_kp_emailProtection, "kp-emailProtection");
-    oidNameMap.put(ExtendedKU.id_kp_ipsecEndSystem, "kp-ipsecEndSystem");
-    oidNameMap.put(ExtendedKU.id_kp_ipsecTunnel, "kp-ipsecTunnel");
-    oidNameMap.put(ExtendedKU.id_kp_ipsecUser, "kp-ipsecUser");
-    oidNameMap.put(ExtendedKU.id_kp_ocsp, "kp-ocsp");
-    oidNameMap.put(ExtendedKU.id_kp_OCSPSigning, "kp-OCSPSigning");
-    oidNameMap.put(ExtendedKU.id_kp_serverAuth, "kp-serverAuth");
-    oidNameMap.put(ExtendedKU.id_kp_timeStamping, "kp-timeStamping");
-
     oidNameMap.put(Extn.id_pkix_ocsp_extendedRevoke, "pkix-ocsp-extendedRevoke");
     oidNameMap.put(Extn.id_pkix_ocsp_prefSigAlgs, "pkix-ocsp-prefSigAlgs");
-    oidNameMap.put(Extn.id_tsl_kp_tslSigning, "tsl-kp-tslSigning");
     oidNameMap.put(Extn.id_extension_pkix_ocsp_nocheck, "pkix-ocsp-nocheck");
     oidNameMap.put(Extn.id_extension_restriction, "restriction");
     oidNameMap.put(Extn.id_extension_additionalInformation, "additionalInformation");
     oidNameMap.put(Extn.id_extension_admission, "admission");
     oidNameMap.put(Extn.id_extension_validityModel, "validityModel");
-    oidNameMap.put(Extn.id_anyExtendedKeyUsage, "anyExtendedKeyUsage");
     oidNameMap.put(Extn.id_ad_caRepository, "ad-caRepository");
     oidNameMap.put(Extn.id_ad_timeStamping, "ad-timeStamping");
 
@@ -508,6 +627,44 @@ public class ObjectIdentifiers {
     oidNameMap.put(Secg.id_hmac_full_ecies, "hmac-full-ecies");
 
     oidNameMap.put(Misc.id_iso18033_kdf2, "kdf2");
+
+    // Extended Key Usage
+    oidNameMap.put(XKU.id_kp_anyExtendedKeyUsage, "Any ExtendedKeyUsage");
+    oidNameMap.put(XKU.id_kp_clientAuth, "TLS WWW client authentication");
+    oidNameMap.put(XKU.id_kp_codeSigning, "Code signing");
+    oidNameMap.put(XKU.id_kp_csn369791TlsClient, "CSN 369791 TLS client");
+    oidNameMap.put(XKU.id_kp_csn369791TlsServer, "CSN 369791 TLS server");
+    oidNameMap.put(XKU.id_kp_eapOverLan, "EAP over LAN (EAPOL)");
+    oidNameMap.put(XKU.id_kp_eapOverPpp, "EAP over PPP");
+    oidNameMap.put(XKU.id_kp_emailProtection, "Email protection");
+    oidNameMap.put(XKU.id_kp_etsiTslSigning, "ETSI TSL Signing");
+    oidNameMap.put(XKU.id_kp_icaoMasterListSigning, "ICAO Master List Signing");
+    oidNameMap.put(XKU.id_kp_ikeForIpsec, "Internet Key Exchange for IPsec");
+    oidNameMap.put(XKU.id_kp_intelAmtManagement, "Intel AMT management");
+    oidNameMap.put(XKU.id_kp_ipsecEndSystem, "IP security end system");
+    oidNameMap.put(XKU.id_kp_ipsecTunnel, "IP security tunnel termination");
+    oidNameMap.put(XKU.id_kp_ipsecUser, "IP security user");
+    oidNameMap.put(XKU.id_kp_kerberosClientAuthentication, "Kerberos Client Authentication");
+    oidNameMap.put(XKU.id_kp_kerberosKdc, "Kerberos Key Distribution Center");
+    oidNameMap.put(XKU.id_kp_microsoftCommercialCodeSigning,
+        "Microsoft Commercial Code Signing");
+    oidNameMap.put(XKU.id_kp_microsoftDocumentSigning, "Microsoft Document Signing");
+    oidNameMap.put(XKU.id_kp_microsoftEfs, "Microsoft Encrypted File System");
+    oidNameMap.put(XKU.id_kp_microsoftEfsRecovery, "Microsoft EFS Recovery");
+    oidNameMap.put(XKU.id_kp_microsoftIndividualCodeSigning,
+        "Microsoft Individual Code Signing");
+    oidNameMap.put(XKU.id_kp_microsoftSmartCardLogon, "Microsoft Smart Card Logon");
+    oidNameMap.put(XKU.id_kp_ocspSigning, "Signing OCSP responses");
+    oidNameMap.put(XKU.id_kp_pivCardAuthentication, "PIV Card Authentication");
+    oidNameMap.put(XKU.id_kp_pdfSigning, "PDF Signing");
+    oidNameMap.put(XKU.id_kp_scvpClient, "SCVP Client");
+    oidNameMap.put(XKU.id_kp_scvpServer, "SCVP Server");
+    oidNameMap.put(XKU.id_kp_serverAuth, "TLS WWW server authentication");
+    oidNameMap.put(XKU.id_kp_sipDomain, "SIP Domain");
+    oidNameMap.put(XKU.id_kp_sshClient, "SSH Client");
+    oidNameMap.put(XKU.id_kp_sshServer, "SSH Server");
+    oidNameMap.put(XKU.id_kp_timeStamping, "TimeStamping");
+
   }
 
   private ObjectIdentifiers() {

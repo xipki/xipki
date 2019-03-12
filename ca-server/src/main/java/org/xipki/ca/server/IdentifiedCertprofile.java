@@ -395,7 +395,7 @@ class IdentifiedCertprofile implements Closeable {
       }
 
       if (extControl.isCritical()
-          && usages.contains(ObjectIdentifiers.Extn.id_anyExtendedKeyUsage)) {
+          && usages.contains(ObjectIdentifiers.XKU.id_kp_anyExtendedKeyUsage)) {
         extControl = new ExtensionControl(false, extControl.isRequired(),
             extControl.isRequest());
       }

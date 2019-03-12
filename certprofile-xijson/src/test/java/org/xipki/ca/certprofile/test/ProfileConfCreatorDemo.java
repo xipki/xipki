@@ -493,7 +493,7 @@ public class ProfileConfCreatorDemo {
     // Extensions - extenedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.ExtendedKU.id_kp_OCSPSigning}, null));
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_ocspSigning}, null));
 
     return profile;
   } // method certprofileOcsp
@@ -595,7 +595,7 @@ public class ProfileConfCreatorDemo {
     // Extensions - extenedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.ExtendedKU.id_kp_emailProtection},
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_emailProtection},
         null));
 
     // Extensions - SMIMECapabilities
@@ -659,8 +659,8 @@ public class ProfileConfCreatorDemo {
     // Extensions - extenedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.ExtendedKU.id_kp_serverAuth},
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.ExtendedKU.id_kp_clientAuth}));
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_serverAuth},
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth}));
 
     // Extensions - tlsFeature
     list.add(createExtension(ObjectIdentifiers.Extn.id_pe_tlsfeature, true, true));
@@ -712,7 +712,7 @@ public class ProfileConfCreatorDemo {
     // Extensions - extenedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.ExtendedKU.id_kp_clientAuth},
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth},
         null));
 
     return profile;
@@ -761,8 +761,8 @@ public class ProfileConfCreatorDemo {
     // Extensions - extenedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.ExtendedKU.id_kp_serverAuth},
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.ExtendedKU.id_kp_clientAuth}));
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_serverAuth},
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth}));
 
     return profile;
   } // method certprofileTlsWithIncSerial
@@ -902,7 +902,7 @@ public class ProfileConfCreatorDemo {
     // Extensions - extenedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, true));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.ExtendedKU.id_kp_timeStamping}, null));
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_timeStamping}, null));
 
     // privateKeyUsagePeriod
     list.add(createExtension(Extension.privateKeyUsagePeriod, true, false));
@@ -963,8 +963,8 @@ public class ProfileConfCreatorDemo {
     // Extensions - extenedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.ExtendedKU.id_kp_serverAuth},
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.ExtendedKU.id_kp_clientAuth}));
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_serverAuth},
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth}));
 
     // Extension - subjectDirectoryAttributes
     list.add(createExtension(Extension.subjectDirectoryAttributes, true, false));
@@ -1193,8 +1193,8 @@ public class ProfileConfCreatorDemo {
     // Extensions - extenedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.ExtendedKU.id_kp_serverAuth},
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.ExtendedKU.id_kp_clientAuth}));
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_serverAuth},
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth}));
 
     // Extensions - tlsFeature
     list.add(createExtension(ObjectIdentifiers.Extn.id_pe_tlsfeature, true, true));
