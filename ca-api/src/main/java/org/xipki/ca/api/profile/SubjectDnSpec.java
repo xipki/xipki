@@ -337,6 +337,20 @@ public class SubjectDnSpec {
     STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
     DFLT_STRING_TYPES.put(id, StringType.utf8String);
 
+    // NIF
+    id = ObjectIdentifiers.DN.NIF;
+    ids.add(id);
+    RANGES.put(id, RANGE_64);
+    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
+    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+
+    // CIF
+    id = ObjectIdentifiers.DN.CIF;
+    ids.add(id);
+    RANGES.put(id, RANGE_64);
+    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
+    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+
     // organizationalUnitName
     id = ObjectIdentifiers.DN.OU;
     ids.add(id);

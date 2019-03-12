@@ -256,6 +256,17 @@ public class ObjectIdentifiers {
      */
     public static final ASN1ObjectIdentifier ldapUid =
         new ASN1ObjectIdentifier("0.9.2342.19200300.100.1.1");
+
+    /**
+     * NIF, Tax ID number, for individuals (Spain)
+     */
+    public static final ASN1ObjectIdentifier NIF = id_pen.branch("18838.1.1");
+
+    /**
+     * CIF, Tax ID code, for companies (Spain)
+     */
+    public static final ASN1ObjectIdentifier CIF = id_pen.branch("4710.1.3.2");
+
   }
 
   // extended key usage
@@ -566,6 +577,8 @@ public class ObjectIdentifiers {
     oidNameMap.put(DN.pseudonym, "pseudonym");
     oidNameMap.put(DN.unstructuredName, "unstructuredName");
     oidNameMap.put(DN.unstructuredAddress, "unstructuredAddress");
+    oidNameMap.put(DN.NIF, "NIF, Tax ID number, for individuals (Spain)");
+    oidNameMap.put(DN.CIF, "CIF, Tax ID code, for companies (Spain)");
 
     oidNameMap.put(Xipki.id_xipki_ext_crlCertset, "xipki-crlCertset");
     oidNameMap.put(Xipki.id_xipki_ext_cmpRequestExtensions, "xipki-cmpRequestExtensions");
