@@ -168,6 +168,7 @@ import com.alibaba.fastjson.JSONObject;
  * @since 2.0.0
  */
 
+@SuppressWarnings("deprecation")
 public class CmpResponder extends BaseCmpResponder {
 
   private class PendingPoolCleaner implements Runnable {
