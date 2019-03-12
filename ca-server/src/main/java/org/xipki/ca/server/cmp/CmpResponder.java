@@ -227,6 +227,8 @@ public class CmpResponder extends BaseCmpResponder {
     KNOWN_GENMSG_IDS.add(CMPObjectIdentifiers.it_currentCRL.getId());
     KNOWN_GENMSG_IDS.add(ObjectIdentifiers.Xipki.id_xipki_cmp_cmpGenmsg.getId());
     KNOWN_GENMSG_IDS.add(ObjectIdentifiers.Xipki.id_xipki_cmp_cacerts.getId());
+    KNOWN_GENMSG_IDS.add(ObjectIdentifiers.HistoricXipki.id_xipki_cmp_cmpGenmsg.getId());
+    KNOWN_GENMSG_IDS.add(ObjectIdentifiers.HistoricXipki.id_xipki_cmp_cacerts.getId());
 
     String oid = NISTObjectIdentifiers.id_aes128_GCM.getId();
     aesGcm_ciphers = new ConcurrentBag<>();
@@ -1874,7 +1876,8 @@ public class CmpResponder extends BaseCmpResponder {
         }
 
         itvResp = new InfoTypeAndValue(infoType, crl);
-      } else if (ObjectIdentifiers.Xipki.id_xipki_cmp_cmpGenmsg.equals(infoType)) {
+      } else if (ObjectIdentifiers.Xipki.id_xipki_cmp_cmpGenmsg.equals(infoType)
+          || ObjectIdentifiers.HistoricXipki.id_xipki_cmp_cmpGenmsg.equals(infoType)) {
         ASN1Encodable asn1 = itv.getInfoValue();
         ASN1Integer asn1Code = null;
         ASN1Encodable reqValue = null;
@@ -1887,8 +1890,7 @@ public class CmpResponder extends BaseCmpResponder {
           }
         } catch (IllegalArgumentException ex) {
           return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
-              "invalid value of the InfoTypeAndValue for "
-              + ObjectIdentifiers.Xipki.id_xipki_cmp_cmpGenmsg.getId());
+              "invalid value of the InfoTypeAndValue for " + infoType.getId());
         }
 
         ASN1Encodable respValue;
@@ -1949,7 +1951,8 @@ public class CmpResponder extends BaseCmpResponder {
           vec.add(respValue);
         }
         itvResp = new InfoTypeAndValue(infoType, new DERSequence(vec));
-      } else if (ObjectIdentifiers.Xipki.id_xipki_cmp_cacerts.equals(infoType)) {
+      } else if (ObjectIdentifiers.Xipki.id_xipki_cmp_cacerts.equals(infoType)
+          || ObjectIdentifiers.HistoricXipki.id_xipki_cmp_cacerts.equals(infoType)) {
         event.addEventType(CaAuditConstants.TYPE_CMP_genm_cacerts);
         CMPCertificate caCert = ca.getCaInfo().getCertInCmpFormat();
         itvResp = new InfoTypeAndValue(infoType, new DERSequence(caCert));

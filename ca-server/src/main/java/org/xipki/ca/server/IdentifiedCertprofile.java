@@ -235,6 +235,11 @@ class IdentifiedCertprofile implements Closeable {
     if (requestedExtensions != null) {
       Extension reqExtension = requestedExtensions.getExtension(
           ObjectIdentifiers.Xipki.id_xipki_ext_cmpRequestExtensions);
+      if (reqExtension == null) {
+        reqExtension = requestedExtensions.getExtension(
+            ObjectIdentifiers.HistoricXipki.id_xipki_ext_cmpRequestExtensions);
+      }
+
       if (reqExtension != null) {
         ExtensionExistence ee = ExtensionExistence.getInstance(reqExtension.getParsedValue());
         neededExtTypes.addAll(ee.getNeedExtensions());

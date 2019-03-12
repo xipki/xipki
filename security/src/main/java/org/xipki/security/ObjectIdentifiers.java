@@ -45,7 +45,7 @@ public class ObjectIdentifiers {
   /**
    * registered PEN for xipki.org: 45522
    */
-  private static final ASN1ObjectIdentifier id_pen = new ASN1ObjectIdentifier("1.3.6.2.4.1");
+  private static final ASN1ObjectIdentifier id_pen = new ASN1ObjectIdentifier("1.3.6.1.4.1");
 
   public static final class Xipki {
 
@@ -65,6 +65,40 @@ public class ObjectIdentifiers {
 
     public static final ASN1ObjectIdentifier id_xipki_cmp_cmpGenmsg = id_xipki_cmp.branch("1");
 
+    public static final ASN1ObjectIdentifier id_xipki_cmp_cacerts = id_xipki_cmp.branch("2");
+
+  }
+
+  /**
+   * This class is only for legacy application. In version up to 5.0.1 (inclusive) the OID
+   * of xipki.org (id_xipki) was coded incorrectly as 1.3.6.2.4.1.45522 instead of the
+   * correct one 1.3.6.1.4.1.45522.
+   */
+  @Deprecated
+  public static final class HistoricXipki {
+
+    private static final ASN1ObjectIdentifier id_xipki =
+        new ASN1ObjectIdentifier("1.3.6.2.4.1.45522");
+
+    private static final ASN1ObjectIdentifier id_xipki_ext = id_xipki.branch("1");
+
+    @Deprecated
+    public static final ASN1ObjectIdentifier id_xipki_ext_crlCertset = id_xipki_ext.branch("1");
+
+    @Deprecated
+    public static final ASN1ObjectIdentifier id_xipki_ext_cmpRequestExtensions
+        = id_xipki_ext.branch("2");
+
+    @Deprecated
+    public static final ASN1ObjectIdentifier id_xipki_ext_authorizationTemplate
+        = id_xipki_ext.branch("3");
+
+    private static final ASN1ObjectIdentifier id_xipki_cmp = id_xipki.branch("2");
+
+    @Deprecated
+    public static final ASN1ObjectIdentifier id_xipki_cmp_cmpGenmsg = id_xipki_cmp.branch("1");
+
+    @Deprecated
     public static final ASN1ObjectIdentifier id_xipki_cmp_cacerts = id_xipki_cmp.branch("2");
 
   }
