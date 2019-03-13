@@ -14,7 +14,7 @@ cache:
     - $HOME/.m2/repository
 
 script:
-  - mvn clean install -Passemblies
+  - mvn clean install
 
 notifications:
   email: false
