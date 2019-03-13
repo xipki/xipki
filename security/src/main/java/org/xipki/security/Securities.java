@@ -84,7 +84,10 @@ public class Securities implements Closeable {
 
   public void init() throws IOException, InvalidConfException {
     if (Security.getProvider("BC") == null) {
+      LOG.info("add BouncyCastleProvider");
       Security.addProvider(new BouncyCastleProvider());
+    } else {
+      LOG.info("BouncyCastleProvider already added");
     }
 
     initPassword();

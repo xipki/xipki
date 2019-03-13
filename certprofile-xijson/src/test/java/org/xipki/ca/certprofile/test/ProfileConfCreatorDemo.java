@@ -158,64 +158,27 @@ public class ProfileConfCreatorDemo {
 
   public static void main(String[] args) {
     try {
-      X509ProfileType profile;
-
-      profile = certprofileRootCa();
-      marshall(profile, "certprofile-rootca.json");
-
-      profile = certprofileCross();
-      marshall(profile, "certprofile-cross.json");
-
-      profile = certprofileSubCa();
-      marshall(profile, "certprofile-subca.json");
-
-      profile = certprofileSubCaComplex();
-      marshall(profile, "certprofile-subca-complex.json");
-
-      profile = certprofileOcsp();
-      marshall(profile, "certprofile-ocsp.json");
-
-      profile = certprofileScep();
-      marshall(profile, "certprofile-scep.json");
-
-      profile = certprofileEeComplex();
-      marshall(profile, "certprofile-ee-complex.json");
-
-      profile = certprofileQc();
-      marshall(profile, "certprofile-qc.json");
-
-      profile = certprofileSmime();
-      marshall(profile, "certprofile-smime.json");
-
-      profile = certprofileTls();
-      marshall(profile, "certprofile-tls.json");
-
-      profile = certprofileTlsC();
-      marshall(profile, "certprofile-tls-c.json");
-
-      profile = certprofileTlsWithIncSerial();
-      marshall(profile, "certprofile-tls-inc-sn.json");
-
-      profile = certprofileMultipleOus();
-      marshall(profile, "certprofile-multiple-ous.json");
-
-      profile = certprofileMultipleValuedRdn();
-      marshall(profile, "certprofile-multi-valued-rdn.json");
-
-      profile = certprofileMaxTime();
-      marshall(profile, "certprofile-max-time.json");
-
-      profile = certprofileExtended();
-      // cannot validate due to some additional customized extensions.
-      marshall(profile, "certprofile-extended.json", false);
+      certprofileRootCa("certprofile-rootca.json");
+      certprofileCross("certprofile-cross.json");
+      certprofileSubCa("certprofile-subca.json");
+      certprofileSubCaComplex("certprofile-subca-complex.json");
+      certprofileOcsp("certprofile-ocsp.json");
+      certprofileScep("certprofile-scep.json");
+      certprofileEeComplex("certprofile-ee-complex.json");
+      certprofileQc("certprofile-qc.json");
+      certprofileSmime("certprofile-smime.json", false);
+      certprofileSmime("certprofile-smime-legacy.json", true);
+      certprofileTls("certprofile-tls.json", false);
+      certprofileTls("certprofile-tls-inc-sn.json", true);
+      certprofileTlsC("certprofile-tls-c.json");
+      certprofileMultipleOus("certprofile-multiple-ous.json");
+      certprofileMultipleValuedRdn("certprofile-multi-valued-rdn.json");
+      certprofileMaxTime("certprofile-max-time.json");
+      certprofileExtended("certprofile-extended.json");
     } catch (Exception ex) {
       ex.printStackTrace();
     }
   } // method main
-
-  private static void marshall(X509ProfileType profile, String filename) {
-    marshall(profile, filename, true);
-  }
 
   private static void marshall(X509ProfileType profile, String filename, boolean validate) {
     try {
@@ -244,12 +207,11 @@ public class ProfileConfCreatorDemo {
 
   } // method marshal
 
-  private static X509ProfileType certprofileRootCa() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile rootca", CertLevel.RootCA, "10y", false);
+  private static void certprofileRootCa(String destFilename) throws Exception {
+    X509ProfileType profile = getBaseProfile("certprofile rootca", CertLevel.RootCA, "10y");
 
     // Subject
     Subject subject = profile.getSubject();
-    subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdns();
     rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
@@ -273,15 +235,14 @@ public class ProfileConfCreatorDemo {
     last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign},
         new KeyUsage[]{KeyUsage.cRLSign}));
 
-    return profile;
+    marshall(profile, destFilename, true);
   } // method certprofileRootCa
 
-  private static X509ProfileType certprofileCross() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile cross", CertLevel.SubCA, "10y", false);
+  private static void certprofileCross(String destFilename) throws Exception {
+    X509ProfileType profile = getBaseProfile("certprofile cross", CertLevel.SubCA, "10y");
 
     // Subject
     Subject subject = profile.getSubject();
-    subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdns();
     rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
@@ -311,15 +272,14 @@ public class ProfileConfCreatorDemo {
     list.add(createExtension(Extension.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign}, null));
 
-    return profile;
+    marshall(profile, destFilename, true);
   } // method certprofileCross
 
-  private static X509ProfileType certprofileSubCa() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile subca", CertLevel.SubCA, "8y", false);
+  private static void certprofileSubCa(String destFilename) throws Exception {
+    X509ProfileType profile = getBaseProfile("certprofile subca", CertLevel.SubCA, "8y");
 
     // Subject
     Subject subject = profile.getSubject();
-    subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdns();
     rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
@@ -353,16 +313,15 @@ public class ProfileConfCreatorDemo {
     last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign},
         new KeyUsage[]{KeyUsage.cRLSign}));
 
-    return profile;
+    marshall(profile, destFilename, true);
   } // method certprofileSubCa
 
-  private static X509ProfileType certprofileSubCaComplex() throws Exception {
+  private static void certprofileSubCaComplex(String destFilename) throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile subca-complex (with most extensions)",
-        CertLevel.SubCA, "8y", false);
+        CertLevel.SubCA, "8y");
 
     // Subject
     Subject subject = profile.getSubject();
-    subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdns();
     rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
@@ -446,20 +405,6 @@ public class ProfileConfCreatorDemo {
     accessLocation.addTags(GeneralNameTag.directoryName,
         GeneralNameTag.uniformResourceIdentifier);
 
-    /**
-     *     public static final String TeletexString = "TeletexString";
-    public static final String PrintableString = "PrintableString";
-    public static final String UTF8String = "UTF8String";
-    public static final String BMPString = "BMPString";
-    public static final String IA5String = "IA5String";
-    public static final String NULL = "NULL";
-    public static final String INTEGER = "INTEGER";
-    public static final String BOOLEAN = "BOOLEAN";
-    public static final String BIT_STRING = "BIT STRING";
-    public static final String OCTET_STRING = "OCTET STRING";
-    public static final String OID = "OID";
-    public static final String raw = "raw";
-     */
     // Custom Extension
     list.add(createExtension(
         new ASN1ObjectIdentifier("1.2.3.4.1"), true, false, "custom extension BIT STRING"));
@@ -521,15 +466,15 @@ public class ProfileConfCreatorDemo {
     last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.UTF8String,
         "A UTF8 string", null));
 
-    return profile;
+    marshall(profile, destFilename, true);
   } // method certprofileSubCaComplex
 
-  private static X509ProfileType certprofileOcsp() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile ocsp", CertLevel.EndEntity, "5y", false);
+  private static void certprofileOcsp(String destFilename) throws Exception {
+    X509ProfileType profile = getBaseProfile("certprofile ocsp", CertLevel.EndEntity, "5y",
+        false, true);
 
     // Subject
     Subject subject = profile.getSubject();
-    subject.setIncSerialNumber(true);
 
     List<RdnType> rdnControls = subject.getRdns();
     rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
@@ -569,17 +514,16 @@ public class ProfileConfCreatorDemo {
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
         new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_ocspSigning}, null));
 
-    return profile;
+    marshall(profile, destFilename, true);
   } // method certprofileOcsp
 
-  private static X509ProfileType certprofileScep() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile scep", CertLevel.EndEntity, "5y", false);
+  private static void certprofileScep(String destFilename) throws Exception {
+    X509ProfileType profile = getBaseProfile("certprofile scep", CertLevel.EndEntity, "5y");
 
     profile.setKeyAlgorithms(createRSAKeyAlgorithms());
 
     // Subject
     Subject subject = profile.getSubject();
-    subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdns();
     rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
@@ -611,21 +555,23 @@ public class ProfileConfCreatorDemo {
     last(list).setKeyUsage(createKeyUsage(
         new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.keyEncipherment}, null));
 
-    return profile;
+    marshall(profile, destFilename, true);
   } // method certprofileScep
 
-  private static X509ProfileType certprofileSmime() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile s/mime", CertLevel.EndEntity, "5y", true);
+  private static void certprofileSmime(String destFilename, boolean legacy) throws Exception {
+    String desc = legacy ? "certprofile s/mime legacy" : "certprofile s/mime";
+    X509ProfileType profile = getBaseProfile(desc, CertLevel.EndEntity, "5y", true, false);
 
     // Subject
     Subject subject = profile.getSubject();
-    subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdns();
     rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.emailAddress, 1, 1));
+    if (legacy) {
+      rdnControls.add(createRdn(ObjectIdentifiers.DN.emailAddress, 1, 1));
+    }
     rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
 
@@ -676,15 +622,16 @@ public class ProfileConfCreatorDemo {
     list.add(createExtension(ObjectIdentifiers.Extn.id_smimeCapabilities, true, false));
     last(list).setSmimeCapabilities(createSmimeCapabilities());
 
-    return profile;
+    marshall(profile, destFilename, true);
   } // method certprofileTls
 
-  private static X509ProfileType certprofileTls() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile tls", CertLevel.EndEntity, "5y", true);
+  private static void certprofileTls(String destFilename, boolean incSerial) throws Exception {
+    String desc = incSerial ? "certprofile tls-inc-sn (serial number will be added automatically)"
+        : "certprofile tls";
+    X509ProfileType profile = getBaseProfile(desc, CertLevel.EndEntity, "5y", true, incSerial);
 
     // Subject
     Subject subject = profile.getSubject();
-    subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdns();
     rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
@@ -741,15 +688,14 @@ public class ProfileConfCreatorDemo {
     last(list).setTlsFeature(createTlsFeature(
         TlsExtensionType.STATUS_REQUEST, TlsExtensionType.CLIENT_CERTIFICATE_URL));
 
-    return profile;
+    marshall(profile, destFilename, true);
   } // method certprofileTls
 
-  private static X509ProfileType certprofileTlsC() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile tls-c", CertLevel.EndEntity, "5y", false);
+  private static void certprofileTlsC(String destFilename) throws Exception {
+    X509ProfileType profile = getBaseProfile("certprofile tls-c", CertLevel.EndEntity, "5y");
 
     // Subject
     Subject subject = profile.getSubject();
-    subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdns();
     rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
@@ -789,65 +735,14 @@ public class ProfileConfCreatorDemo {
         new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth},
         null));
 
-    return profile;
+    marshall(profile, destFilename, true);
   } // method certprofileTlsC
 
-  private static X509ProfileType certprofileTlsWithIncSerial() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile tls-inc-sn "
-        + "(serial number will be added automatically)", CertLevel.EndEntity, "5y", false);
+  private static void certprofileMultipleOus(String destFilename) throws Exception {
+    X509ProfileType profile = getBaseProfile("certprofile multiple-ous", CertLevel.EndEntity, "5y");
 
     // Subject
     Subject subject = profile.getSubject();
-    subject.setIncSerialNumber(true);
-
-    List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1, REGEX_FQDN, null, null));
-
-    // Extensions
-    // Extensions - controls
-    List<ExtensionType> list = profile.getExtensions();
-    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
-    list.add(createExtension(Extension.freshestCRL, false, false, null));
-
-    // Extensions - basicConstraints
-    list.add(createExtension(Extension.basicConstraints, true, true));
-
-    // Extensions - AuthorityInfoAccess
-    list.add(createExtension(Extension.authorityInfoAccess, true, false));
-    last(list).setAuthorityInfoAccess(createAuthorityInfoAccess());
-
-    // Extensions - AuthorityKeyIdentifier
-    list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-    last(list).setAuthorityKeyIdentifier(createAuthorityKeyIdentifier(true));
-
-    // Extensions - keyUsage
-    list.add(createExtension(Extension.keyUsage, true, true));
-    last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
-            KeyUsage.keyEncipherment},
-        null));
-
-    // Extensions - extenedKeyUsage
-    list.add(createExtension(Extension.extendedKeyUsage, true, false));
-    last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_serverAuth},
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth}));
-
-    return profile;
-  } // method certprofileTlsWithIncSerial
-
-  private static X509ProfileType certprofileMultipleOus() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile multiple-ous",
-        CertLevel.EndEntity, "5y", false);
-
-    // Subject
-    Subject subject = profile.getSubject();
-    subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdns();
     rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
@@ -882,19 +777,18 @@ public class ProfileConfCreatorDemo {
         new KeyUsage[]{KeyUsage.contentCommitment},
         null));
 
-    return profile;
+    marshall(profile, destFilename, true);
   } // method certprofileMultipleOus
 
   /*
    * O and OU in one RDN
    */
-  private static X509ProfileType certprofileMultipleValuedRdn() throws Exception {
+  private static void certprofileMultipleValuedRdn(String destFilename) throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile multiple-valued-rdn",
-        CertLevel.EndEntity, "5y", false);
+        CertLevel.EndEntity, "5y");
 
     // Subject
     Subject subject = profile.getSubject();
-    subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdns();
     rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
@@ -928,15 +822,14 @@ public class ProfileConfCreatorDemo {
         new KeyUsage[]{KeyUsage.contentCommitment},
         null));
 
-    return profile;
+    marshall(profile, destFilename, true);
   } // method certprofileMultipleValuedRdn
 
-  private static X509ProfileType certprofileQc() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile qc", CertLevel.EndEntity, "1000d", false);
+  private static void certprofileQc(String destFilename) throws Exception {
+    X509ProfileType profile = getBaseProfile("certprofile qc", CertLevel.EndEntity, "1000d");
 
     // Subject
     Subject subject = profile.getSubject();
-    subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdns();
     rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
@@ -986,16 +879,15 @@ public class ProfileConfCreatorDemo {
     list.add(createExtension(Extension.qCStatements, true, false));
     last(list).setQcStatements(createQcStatements(false));
 
-    return profile;
+    marshall(profile, destFilename, true);
   } // method certprofileEeComplex
 
-  private static X509ProfileType certprofileEeComplex() throws Exception {
+  private static void certprofileEeComplex(String destFilename) throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile ee-complex", CertLevel.EndEntity,
-        "5y", true);
+        "5y", true, false);
 
     // Subject
     Subject subject = profile.getSubject();
-    subject.setIncSerialNumber(false);
     subject.setKeepRdnOrder(true);
     List<RdnType> rdnControls = subject.getRdns();
     rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
@@ -1161,16 +1053,15 @@ public class ProfileConfCreatorDemo {
           createOidType(new ASN1ObjectIdentifier("1.2.3.2")));
     }
 
-    return profile;
+    marshall(profile, destFilename, true);
   } // method certprofileEeComplex
 
-  private static X509ProfileType certprofileMaxTime() throws Exception {
+  private static void certprofileMaxTime(String destFilename) throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile max-time", CertLevel.EndEntity,
-        "9999y", false);
+        "9999y");
 
     // Subject
     Subject subject = profile.getSubject();
-    subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdns();
     rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
@@ -1204,16 +1095,14 @@ public class ProfileConfCreatorDemo {
             KeyUsage.keyEncipherment},
         null));
 
-    return profile;
+    marshall(profile, destFilename, true);
   } // method certprofileMaxTime
 
-  private static X509ProfileType certprofileExtended() throws Exception {
-    X509ProfileType profile = getBaseProfile("certprofile extended", CertLevel.EndEntity,
-        "5y", false);
+  private static void certprofileExtended(String destFilename) throws Exception {
+    X509ProfileType profile = getBaseProfile("certprofile extended", CertLevel.EndEntity, "5y");
 
     // Subject
     Subject subject = profile.getSubject();
-    subject.setIncSerialNumber(false);
 
     List<RdnType> rdnControls = subject.getRdns();
     rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
@@ -1292,7 +1181,8 @@ public class ProfileConfCreatorDemo {
     demoWithConf.setTexts(Arrays.asList("text1", "text2"));
     last(list).setCustom(demoWithConf);
 
-    return profile;
+    // cannot validate due to some additional customized extensions.
+    marshall(profile, destFilename, false);
   } // method certprofileExtended
 
   private static RdnType createRdn(ASN1ObjectIdentifier type, int min, int max) {
@@ -1674,7 +1564,12 @@ public class ProfileConfCreatorDemo {
   }
 
   private static X509ProfileType getBaseProfile(String description, CertLevel certLevel,
-      String validity, boolean useMidnightNotBefore) {
+      String validity) {
+    return getBaseProfile(description, certLevel, validity, false, false);
+  }
+
+  private static X509ProfileType getBaseProfile(String description, CertLevel certLevel,
+      String validity, boolean useMidnightNotBefore, boolean incSerialNumber) {
     X509ProfileType profile = new X509ProfileType();
 
     profile.setMetadata(createDescription(description));
@@ -1719,6 +1614,7 @@ public class ProfileConfCreatorDemo {
     Subject subject = new Subject();
     profile.setSubject(subject);
     subject.setKeepRdnOrder(false);
+    subject.setIncSerialNumber(incSerialNumber);
 
     ASN1ObjectIdentifier[] curveIds = (CertLevel.EndEntity != certLevel) ? null :
       new ASN1ObjectIdentifier[] {SECObjectIdentifiers.secp256r1,
