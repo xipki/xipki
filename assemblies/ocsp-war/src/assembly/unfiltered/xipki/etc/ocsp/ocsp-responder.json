@@ -1,13 +1,4 @@
 {
-//	"responseCache":{
-//		"datasource":{
-//			"conf":{
-//				"file":"xipki/etc/ocsp/database/ocsp-cache-db.properties"
-//			},
-//			"name":"datasource-cache"
-//		},
-//		"validity":86400
-//	},
 	"master":true,
 	"datasources":[{
 		"name":"datasource1",
@@ -17,18 +8,6 @@
 	}],
 	"requestOptions":[{
 		"name":"request1",
-		"certpathValidation":{
-			"trustAnchors":{
-				"keystore":{
-					"keystore":{
-						"file":"xipki/keycerts/tlskeys/ca/tls-ca-cert.p12"
-					},
-					"password":"1234",
-					"type":"pkcs12"
-				}
-			},
-			"validationModel":"PKIX"
-		},
 		"hashAlgorithms":["SHA1","SHA256","SHA384","SHA512"
 		],
 		"maxRequestListCount":10,
@@ -40,7 +19,6 @@
 		},
 		"signatureRequired":false,
 		"supportsHttpGet":false,
-		"validateSignature":true,
 		"versions":["v1"]
 	}],
 	"responders":[{
@@ -55,7 +33,7 @@
 	}],
 	"responseOptions":[{
 		"name":"response1",
-		"embedCertsMode":"SIGNER_AND_CA",
+		"embedCertsMode":"SIGNER",
 		"includeCerthash":false,
 		"includeInvalidityDate":false,
 		"includeRevReason":true,
@@ -80,10 +58,6 @@
 			"datasource":"datasource1",
 			"type":"xipki-db",
 			"conf":{
-//				"caCerts": {
-//					"includes":[],
-//					"excludes":[],
-//				}
 			}
 		},
 		"unknownSerialAsGood":false

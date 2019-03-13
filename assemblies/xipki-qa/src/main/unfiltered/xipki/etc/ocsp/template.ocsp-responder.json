@@ -22,18 +22,18 @@
 	}],
 	"requestOptions":[{
 		"name":"request1",
-		"certpathValidation":{
-			"trustAnchors":{
-				"keystore":{
-					"keystore":{
-						"file":"xipki/keycerts/tlskeys/ca/tls-ca-cert.p12"
-					},
-					"password":"1234",
-					"type":"pkcs12"
-				}
-			},
-			"validationModel":"PKIX"
-		},
+//		"certpathValidation":{
+//			"trustAnchors":{
+//				"keystore":{
+//					"keystore":{
+//						"file":"xipki/keycerts/tlskeys/ca/tls-ca-cert.p12"
+//					},
+//					"password":"1234",
+//					"type":"pkcs12"
+//				}
+//			},
+//			"validationModel":"PKIX"
+//		},
 		"hashAlgorithms":["SHA1","SHA256","SHA384","SHA512"],
 		"maxRequestListCount":10,
 		"maxRequestSize":4096,
@@ -44,7 +44,7 @@
 		},
 		"signatureRequired":false,
 		"supportsHttpGet":true,
-		"validateSignature":true,
+		"validateSignature":false,
 		"versions":["v1"]
 	}],
 	"responders":[{
@@ -68,7 +68,7 @@
 	}],
 	"responseOptions":[{
 		"name":"response1",
-		"embedCertsMode":"SIGNER_AND_CA",
+		"embedCertsMode":"SIGNER",
 		"includeCerthash":true,
 		"includeInvalidityDate":false,
 		"includeRevReason":true,
