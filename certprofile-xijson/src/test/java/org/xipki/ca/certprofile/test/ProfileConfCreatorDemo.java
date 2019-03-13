@@ -67,6 +67,7 @@ import org.xipki.ca.certprofile.xijson.conf.ExtensionType.BasicConstraints;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.BiometricInfo;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.BiometricTypeType;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.CertificatePolicies;
+import org.xipki.ca.certprofile.xijson.conf.ExtensionType.ConstantExtnValue;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.ExtendedKeyUsage;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.InhibitAnyPolicy;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.NameConstraints;
@@ -108,6 +109,7 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.TlsExtensionType;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.Args;
+import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 import org.xipki.util.TripleState;
@@ -156,7 +158,9 @@ public class ProfileConfCreatorDemo {
 
   public static void main(String[] args) {
     try {
-      X509ProfileType profile = certprofileRootCa();
+      X509ProfileType profile;
+
+      profile = certprofileRootCa();
       marshall(profile, "certprofile-rootca.json");
 
       profile = certprofileCross();
@@ -442,10 +446,80 @@ public class ProfileConfCreatorDemo {
     accessLocation.addTags(GeneralNameTag.directoryName,
         GeneralNameTag.uniformResourceIdentifier);
 
+    /**
+     *     public static final String TeletexString = "TeletexString";
+    public static final String PrintableString = "PrintableString";
+    public static final String UTF8String = "UTF8String";
+    public static final String BMPString = "BMPString";
+    public static final String IA5String = "IA5String";
+    public static final String NULL = "NULL";
+    public static final String INTEGER = "INTEGER";
+    public static final String BOOLEAN = "BOOLEAN";
+    public static final String BIT_STRING = "BIT STRING";
+    public static final String OCTET_STRING = "OCTET STRING";
+    public static final String OID = "OID";
+    public static final String raw = "raw";
+     */
     // Custom Extension
     list.add(createExtension(
-        new ASN1ObjectIdentifier("1.2.3.4"), true, false, "custom extension 1"));
-    last(list).setConstant(createConstantExtValue(DERNull.INSTANCE.getEncoded(), "DER Null"));
+        new ASN1ObjectIdentifier("1.2.3.4.1"), true, false, "custom extension BIT STRING"));
+    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.BIT_STRING,
+        Base64.encodeToString(new byte[] {1, 2}), null));
+
+    list.add(createExtension(
+        new ASN1ObjectIdentifier("1.2.3.4.2"), true, false, "custom extension BMPSTRING"));
+    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.BMPString,
+        "A BMP string", null));
+
+    list.add(createExtension(
+        new ASN1ObjectIdentifier("1.2.3.4.3"), true, false, "custom extension BOOLEAN"));
+    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.BOOLEAN,
+        Boolean.TRUE.toString(), null));
+
+    list.add(createExtension(
+        new ASN1ObjectIdentifier("1.2.3.4.4"), true, false, "custom extension IA5String"));
+    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.IA5String,
+        "An IA5 string", null));
+
+    list.add(createExtension(
+        new ASN1ObjectIdentifier("1.2.3.4.5"), true, false, "custom extension INTEGER"));
+    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.INTEGER,
+        "10", null));
+
+    list.add(createExtension(
+        new ASN1ObjectIdentifier("1.2.3.4.6"), true, false, "custom extension NULL"));
+    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.NULL,
+        null, null));
+
+    list.add(createExtension(
+        new ASN1ObjectIdentifier("1.2.3.4.7"), true, false, "custom extension OCTET STRING"));
+    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.OCTET_STRING,
+        Base64.encodeToString(new byte[] {3, 4}), null));
+
+    list.add(createExtension(
+        new ASN1ObjectIdentifier("1.2.3.4.8"), true, false, "custom extension OID"));
+    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.OID,
+        "2.3.4.5", null));
+
+    list.add(createExtension(
+        new ASN1ObjectIdentifier("1.2.3.4.9"), true, false, "custom extension PrintableString"));
+    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.PrintableString,
+        "A printable string", null));
+
+    list.add(createExtension(
+        new ASN1ObjectIdentifier("1.2.3.4.10"), true, false, "custom extension raw"));
+    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.raw,
+        Base64.encodeToString(DERNull.INSTANCE.getEncoded()), "DER NULL"));
+
+    list.add(createExtension(
+        new ASN1ObjectIdentifier("1.2.3.4.11"), true, false, "custom extension TeletexString"));
+    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.TeletexString,
+        "A teletax string", null));
+
+    list.add(createExtension(
+        new ASN1ObjectIdentifier("1.2.3.4.12"), true, false, "custom extension UTF8String"));
+    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.UTF8String,
+        "A UTF8 string", null));
 
     return profile;
   } // method certprofileSubCaComplex
@@ -1590,9 +1664,9 @@ public class ProfileConfCreatorDemo {
     return ret;
   }
 
-  private static DescribableBinary createConstantExtValue(byte[] bytes, String desc) {
-    DescribableBinary extValue = new DescribableBinary();
-    extValue.setValue(bytes);
+  private static ConstantExtnValue createConstantExtValue(ConstantExtnValue.Type type,
+      String value, String desc) {
+    ConstantExtnValue extValue = new ConstantExtnValue(type, value);
     if (StringUtil.isNotBlank(desc)) {
       extValue.setDescription(desc);
     }

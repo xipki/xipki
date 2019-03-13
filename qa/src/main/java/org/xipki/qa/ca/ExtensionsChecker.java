@@ -2255,13 +2255,14 @@ public class ExtensionsChecker {
         continue;
       }
 
-      byte[] encodedValue = extn.getConstant().getValue();
-      ASN1StreamParser parser = new ASN1StreamParser(encodedValue);
+      byte[] encodedValue;
       try {
-        parser.readObject();
+        encodedValue = extn.getConstant().toASN1Encodable().toASN1Primitive().getEncoded();
       } catch (IOException ex) {
-        throw new CertprofileException("could not parse the constant extension value", ex);
+        throw new CertprofileException(
+            "could not parse the constant extension value of type" + type, ex);
       }
+
       QaExtensionValue extension = new QaExtensionValue(extn.isCritical(), encodedValue);
       map.put(oid, extension);
     }

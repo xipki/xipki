@@ -30,7 +30,6 @@ import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1StreamParser;
 import org.bouncycastle.asn1.x509.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -359,14 +358,7 @@ public class X509ProfileType extends ValidatableConf {
         continue;
       }
 
-      byte[] encodedValue = m.getConstant().getValue();
-      ASN1StreamParser parser = new ASN1StreamParser(encodedValue);
-      ASN1Encodable value;
-      try {
-        value = parser.readObject();
-      } catch (IOException ex) {
-        throw new CertprofileException("could not parse the constant extension value", ex);
-      }
+      ASN1Encodable value = m.getConstant().toASN1Encodable();
       ExtensionValue extension = new ExtensionValue(m.isCritical(), value);
       map.put(oid, extension);
     }

@@ -11,6 +11,7 @@ See also <https://github.com/xipki/xipki/releases>
   - Add example modules to demonstrate how to extend XiPKI OCSP server to use customized certificate status source.
   - Better mechansim to handle emailAddress in Subject / SubjectAltName
   - Add OCSP certificate status source published by EJBCA
+  - Simplify the specification of customized extension in certificate profile.
 
 ## 5.0.1
  - Release date: Feb 17, 2019

@@ -447,7 +447,7 @@ public class ObjectIdentifiers {
      * Microsoft Smart Card Logon
      */
     public static final ASN1ObjectIdentifier id_kp_microsoftSmartCardLogon =
-        new ASN1ObjectIdentifier("20.2.2");
+        id_microsoft.branch("20.2.2");
 
     /**
      * Signing OCSP responses

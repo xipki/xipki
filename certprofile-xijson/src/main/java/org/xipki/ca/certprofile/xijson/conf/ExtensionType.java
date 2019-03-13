@@ -26,13 +26,24 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.bouncycastle.asn1.ASN1Boolean;
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1StreamParser;
+import org.bouncycastle.asn1.DERBMPString;
+import org.bouncycastle.asn1.DERBitString;
+import org.bouncycastle.asn1.DERIA5String;
+import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DERT61String;
 import org.bouncycastle.asn1.DERTaggedObject;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.isismtt.x509.NamingAuthority;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.DirectoryString;
@@ -60,6 +71,7 @@ import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableInt;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
+import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.StringUtil;
@@ -120,7 +132,7 @@ public class ExtensionType extends ValidatableConf {
    * For constant encoded Extension.
    */
   @JSONField(ordinal = 5)
-  private DescribableBinary constant;
+  private ConstantExtnValue constant;
 
   @JSONField(ordinal = 5)
   private ExtendedKeyUsage extendedKeyUsage;
@@ -272,11 +284,11 @@ public class ExtensionType extends ValidatableConf {
     this.certificatePolicies = certificatePolicies;
   }
 
-  public DescribableBinary getConstant() {
+  public ConstantExtnValue getConstant() {
     return constant;
   }
 
-  public void setConstant(DescribableBinary constant) {
+  public void setConstant(ConstantExtnValue constant) {
     this.constant = constant;
   }
 
@@ -899,6 +911,148 @@ public class ExtensionType extends ValidatableConf {
     }
 
   } // class CertificatePolicies
+
+  public static class ConstantExtnValue extends Describable {
+
+    public static enum Type {
+      TeletexString("TeletexString"),
+      PrintableString("PrintableString"),
+      UTF8String("UTF8String"),
+      BMPString("BMPString"),
+      IA5String("IA5String"),
+      NULL("NULL"),
+      INTEGER("INTEGER"),
+      BOOLEAN("BOOLEAN"),
+      BIT_STRING("BIT STRING"),
+      OCTET_STRING("OCTET STRING"),
+      OID("OID"),
+      raw("raw");
+
+      private final String text;
+
+      private Type(String text) {
+        this.text = text;
+      }
+
+      public String getText() {
+        return text;
+      }
+    }
+
+    @JSONField(ordinal = 1)
+    private Type type;
+
+    @JSONField(ordinal = 2)
+    private String value;
+
+    @JSONField(name = "type")
+    public String getTypeText() {
+      return type.getText();
+    }
+
+    // for the JSON deserializer
+    @SuppressWarnings("unused")
+    private ConstantExtnValue() {
+    }
+
+    public ConstantExtnValue(Type type, String value) {
+      this.type = Args.notNull(type, "type");
+      this.value = value;
+    }
+
+    @JSONField(name = "type")
+    public void setTypeText(String text) {
+      if (text == null) {
+        this.type = null;
+      } else {
+        this.type = null;
+        for (Type m : Type.values()) {
+          if (m.name().equalsIgnoreCase(text) || m.text.equalsIgnoreCase(text)) {
+            this.type = m;
+          }
+        }
+
+        if (type == null) {
+          throw new IllegalArgumentException("invalid type " + type);
+        }
+      }
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    public void setValue(String value) {
+      this.value = value;
+    }
+
+    public ASN1Encodable toASN1Encodable() throws CertprofileException {
+      ASN1Encodable rv;
+
+      switch (type) {
+        case BIT_STRING:
+          rv = new DERBitString(Base64.decode(value));
+          break;
+        case BOOLEAN:
+          rv = ASN1Boolean.getInstance(Boolean.parseBoolean(value));
+          break;
+        case BMPString:
+          rv = new DERBMPString(value);
+          break;
+        case IA5String:
+          rv = new DERIA5String(value);
+          break;
+        case INTEGER:
+          BigInteger bi = StringUtil.startsWithIgnoreCase(value, "0x")
+              ? new BigInteger(value.substring(2), 16) : new BigInteger(value);
+          rv  = new ASN1Integer(bi);
+          break;
+        case NULL:
+          rv = DERNull.INSTANCE;
+          break;
+        case OCTET_STRING:
+          rv = new DEROctetString(Base64.decode(value));
+          break;
+        case OID:
+          rv = new ASN1ObjectIdentifier(value);
+          break;
+        case PrintableString:
+          rv = new DERPrintableString(value);
+          break;
+        case raw:
+          ASN1StreamParser parser = new ASN1StreamParser(Base64.decode(value));
+          try {
+            rv = parser.readObject();
+          } catch (IOException ex) {
+            throw new CertprofileException("could not parse the constant extension value", ex);
+          }
+          break;
+        case TeletexString:
+          rv = new DERT61String(value);
+          break;
+        case UTF8String:
+          rv = new DERUTF8String(value);
+          break;
+        default:
+          throw new RuntimeException("should not reach here, unknown type " + type);
+      }
+
+      return rv;
+    }
+
+    @Override
+    public void validate() throws InvalidConfException {
+      notNull(type, "type");
+      if (Type.NULL == type) {
+        if (value != null) {
+          throw new InvalidConfException("value may not be non-null");
+        }
+      } else {
+        notNull(value, "value");
+      }
+    }
+
+  }
 
   public static class ExtendedKeyUsage extends ValidatableConf {
 
