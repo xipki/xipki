@@ -12,6 +12,7 @@ See also <https://github.com/xipki/xipki/releases>
   - Better mechansim to handle emailAddress in Subject / SubjectAltName
   - Add OCSP certificate status source published by EJBCA
   - Simplify the specification of customized extension in certificate profile.
+  - If ca.war and ocsp.war are both in one tomcat instance, and one war cannot be started, the other too. This has been fixed.
 
 ## 5.0.1
  - Release date: Feb 17, 2019
