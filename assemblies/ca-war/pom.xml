@@ -129,7 +129,7 @@
             </configuration>
           </execution>
           <execution>
-            <!-- Copy the JDBC jars -->
+            <!-- Copy the JDBC and BouncyCastle jars -->
             <id>jdbc</id>
             <phase>generate-resources</phase>
             <goals>

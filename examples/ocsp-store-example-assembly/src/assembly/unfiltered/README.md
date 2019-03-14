@@ -1,6 +1,6 @@
 Deployment in Tomcat
 ----
-1. Copy the sub-folders `webapps` and `xipki` to the tomcat root folder
+1. Copy the sub-folders `webapps`, `xipki` and `lib ` to the tomcat root folder
 2. Add the line `org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true`
    to the file `conf/catalina.properties` if OCSP over HTTP supported is activated.
 3. Start tomcat
@@ -20,7 +20,7 @@ Deployment in Tomcat
 
 Deployment in Jetty 9
 ----
-1. Copy the sub-folders `webapps` and `xipki` to the jetty root folder.
+1. Copy the sub-folders `webapps` and `xipki` to the jetty root folder, and the files in sub-folder `lib` to the sub-folder `lib/ext` of jetty.
 2. Start jetty
    Start jetty from any folder
 ```sh

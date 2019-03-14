@@ -64,6 +64,24 @@
             </configuration>
           </execution>
           <execution>
+            <!-- Copy the JDBC and BouncyCastle jars -->
+            <id>jdbc</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <stripVersion>false</stripVersion>
+              <outputDirectory>${project.build.directory}/lib</outputDirectory>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.bouncycastle</groupId>
+                  <artifactId>bcprov-jdk15on</artifactId>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+          <execution>
             <id>copy-dependencies</id>
             <phase>generate-resources</phase>
             <goals>

@@ -12,8 +12,12 @@
       <outputDirectory>.</outputDirectory>
     </fileSet>
     <fileSet>
-      <directory>${project.build.directory}/webapps</directory>
-      <outputDirectory>webapps</outputDirectory>
+      <directory>${project.build.directory}</directory>
+      <outputDirectory>.</outputDirectory>
+      <includes>
+        <include>lib/**</include>
+        <include>webapps/**</include>
+      </includes>
     </fileSet>
   </fileSets>
 </assembly>
