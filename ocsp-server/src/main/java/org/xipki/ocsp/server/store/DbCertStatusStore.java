@@ -128,8 +128,6 @@ public class DbCertStatusStore extends OcspStore {
 
   private boolean initialized;
 
-  private boolean initializationFailed;
-
   private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
   protected List<Runnable> getScheduledServices() {
@@ -233,19 +231,15 @@ public class DbCertStatusStore extends OcspStore {
           caInfos.add(caInfoEntry);
         } // end while (rs.next())
 
-        initialized = false;
         this.issuerStore = new IssuerStore(caInfos);
         LOG.info("Updated issuers: {}", name);
-        initializationFailed = false;
-        initialized = true;
       } finally {
         releaseDbResources(ps, rs);
       }
     } catch (Throwable th) {
       LogUtil.error(LOG, th, "error while executing updateIssuerStore()");
-      initializationFailed = true;
-      initialized = true;
     } finally {
+      initialized = true;
       storeUpdateInProcess.set(false);
     }
   } // method initIssuerStore
@@ -260,10 +254,6 @@ public class DbCertStatusStore extends OcspStore {
 
     if (!initialized) {
       throw new OcspStoreException("initialization of CertStore is still in process");
-    }
-
-    if (initializationFailed) {
-      throw new OcspStoreException("initialization of CertStore failed");
     }
 
     String sql;
@@ -452,10 +442,6 @@ public class DbCertStatusStore extends OcspStore {
       return false;
     }
 
-    if (isInitializationFailed()) {
-      return false;
-    }
-
     final String sql = "SELECT ID FROM ISSUER";
 
     try {
@@ -587,10 +573,6 @@ public class DbCertStatusStore extends OcspStore {
 
   protected boolean isInitialized() {
     return initialized;
-  }
-
-  protected boolean isInitializationFailed() {
-    return initializationFailed;
   }
 
   private static Set<X509Certificate> parseCerts(Collection<String> certFiles)

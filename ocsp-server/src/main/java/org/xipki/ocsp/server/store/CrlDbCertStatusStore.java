@@ -85,8 +85,6 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
 
   private boolean crlUpdated;
 
-  private boolean crlUpdateFailed;
-
   /**
    * Initialize the store.
    *
@@ -161,11 +159,6 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     return crlUpdated && super.isInitialized();
   }
 
-  @Override
-  protected boolean isInitializationFailed() {
-    return crlUpdateFailed || super.isInitializationFailed();
-  }
-
   private static X509Certificate parseCert(String certFile) throws OcspStoreException {
     try {
       return X509Util.parseCert(new File(certFile));
@@ -230,28 +223,17 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
       ImportCrl importCrl = new ImportCrl(datasource, crl, crlUrl,
           caCert, issuerCert, caRevInfo, certsDirName);
       updateCrlSuccessful = importCrl.importCrlToOcspDb();
-      crlUpdated = true;
       if (updateCrlSuccessful) {
-        crlUpdateFailed = false;
+        updateMeFile.delete();
         LOG.info("updated CertStore {} successfully", name);
       } else {
-        crlUpdateFailed = true;
         LOG.error("updating CertStore {} failed", name);
       }
     } catch (Throwable th) {
       LogUtil.error(LOG, th, "error while executing updateStore()");
-      crlUpdateFailed = true;
-      crlUpdated = true;
     } finally {
-      updateMeFile.delete();
+      crlUpdated = true;
       crlUpdateInProcess.set(false);
-      if (updateCrlSuccessful != null) {
-        if (updateCrlSuccessful.booleanValue()) {
-          LOG.info("UPDATE_CRL: successful");
-        } else {
-          LOG.warn("UPDATE_CRL: failed");
-        }
-      }
     }
   } // method initializeStore
 
