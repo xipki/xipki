@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
@@ -465,6 +466,21 @@ public class ProfileConfCreatorDemo {
         new ASN1ObjectIdentifier("1.2.3.4.12"), true, false, "custom extension UTF8String"));
     last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.UTF8String,
         "A UTF8 string", null));
+
+    list.add(createExtension(
+        new ASN1ObjectIdentifier("1.2.3.4.13"), true, false, "custom extension ENUMERATED"));
+    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.ENUMERATED,
+        "2", null));
+
+    list.add(createExtension(
+        new ASN1ObjectIdentifier("1.2.3.4.14"), true, false, "custom extension GeneralizedTime"));
+    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.GeneralizedTime,
+        new ASN1GeneralizedTime("20180314130102Z").getTimeString(), null));
+
+    list.add(createExtension(
+        new ASN1ObjectIdentifier("1.2.3.4.15"), true, false, "custom extension UTCTIME"));
+    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.UTCTime,
+        "190314130102Z", null));
 
     marshall(profile, destFilename, true);
   } // method certprofileSubCaComplex

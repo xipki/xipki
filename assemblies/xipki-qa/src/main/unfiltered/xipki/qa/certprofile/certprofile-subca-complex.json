@@ -454,5 +454,41 @@
 			"type":"UTF8String",
 			"value":"A UTF8 string"
 		}
+	},{
+		"type":{
+			"oid":"1.2.3.4.13",
+			"description":"custom extension ENUMERATED"
+		},
+		"critical":false,
+		"required":true,
+		"permittedInRequest":false,
+		"constant":{
+			"type":"ENUMERATED",
+			"value":"2"
+		}
+	},{
+		"type":{
+			"oid":"1.2.3.4.14",
+			"description":"custom extension GeneralizedTime"
+		},
+		"critical":false,
+		"required":true,
+		"permittedInRequest":false,
+		"constant":{
+			"type":"GeneralizedTime",
+			"value":"20180314130102Z"
+		}
+	},{
+		"type":{
+			"oid":"1.2.3.4.15",
+			"description":"custom extension UTCTime"
+		},
+		"critical":false,
+		"required":true,
+		"permittedInRequest":false,
+		"constant":{
+			"type":"UTCTime",
+			"value":"190314130102Z"
+		}
 	}]
 }

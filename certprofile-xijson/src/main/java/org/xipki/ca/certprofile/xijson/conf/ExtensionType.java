@@ -29,11 +29,14 @@ import java.util.Set;
 import org.bouncycastle.asn1.ASN1Boolean;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Enumerated;
+import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1StreamParser;
+import org.bouncycastle.asn1.ASN1UTCTime;
 import org.bouncycastle.asn1.DERBMPString;
 import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DERIA5String;
@@ -922,6 +925,9 @@ public class ExtensionType extends ValidatableConf {
       IA5String("IA5String"),
       NULL("NULL"),
       INTEGER("INTEGER"),
+      ENUMERATED("ENUMERATED"),
+      GeneralizedTime("GeneralizedTime"),
+      UTCTime("UTCTime"),
       BOOLEAN("BOOLEAN"),
       BIT_STRING("BIT STRING"),
       OCTET_STRING("OCTET STRING"),
@@ -1003,9 +1009,16 @@ public class ExtensionType extends ValidatableConf {
           rv = new DERIA5String(value);
           break;
         case INTEGER:
+        case ENUMERATED:
           BigInteger bi = StringUtil.startsWithIgnoreCase(value, "0x")
               ? new BigInteger(value.substring(2), 16) : new BigInteger(value);
-          rv  = new ASN1Integer(bi);
+          rv  = type == Type.INTEGER ? new ASN1Integer(bi) : new ASN1Enumerated(bi);
+          break;
+        case GeneralizedTime:
+          rv = new ASN1GeneralizedTime(value);
+          break;
+        case UTCTime:
+          rv = new ASN1UTCTime(value);
           break;
         case NULL:
           rv = DERNull.INSTANCE;
