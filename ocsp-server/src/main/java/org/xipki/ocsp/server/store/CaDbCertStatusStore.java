@@ -17,8 +17,6 @@
 
 package org.xipki.ocsp.server.store;
 
-import java.io.File;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -26,11 +24,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +55,6 @@ import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.StringUtil;
 
 import com.alibaba.fastjson.JSON;
 
@@ -69,7 +64,7 @@ import com.alibaba.fastjson.JSON;
  * @since 2.0.0
  */
 
-public class DbCertStatusStore extends OcspStore {
+public class CaDbCertStatusStore extends OcspStore {
 
   private class StoreUpdateService implements Runnable {
 
@@ -80,9 +75,9 @@ public class DbCertStatusStore extends OcspStore {
 
   } // class StoreUpdateService
 
-  protected DataSourceWrapper datasource;
+  private DataSourceWrapper datasource;
 
-  private static final Logger LOG = LoggerFactory.getLogger(DbCertStatusStore.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CaDbCertStatusStore.class);
 
   private final AtomicBoolean storeUpdateInProcess = new AtomicBoolean(false);
 
@@ -116,7 +111,7 @@ public class DbCertStatusStore extends OcspStore {
     storeUpdateInProcess.set(true);
     try {
       if (initialized) {
-        final String sql = "SELECT ID,REV_INFO,S1C FROM ISSUER";
+        final String sql = "SELECT ID,REV_INFO,CERT FROM CA";
         PreparedStatement ps = preparedStatement(sql);
         ResultSet rs = null;
 
@@ -125,7 +120,8 @@ public class DbCertStatusStore extends OcspStore {
 
           rs = ps.executeQuery();
           while (rs.next()) {
-            String sha1Fp = rs.getString("S1C");
+            byte[] certBytes = Base64.decode(rs.getString("CERT"));
+            String sha1Fp = HashAlgo.SHA1.base64Hash(certBytes);
             if (!issuerFilter.includeIssuerWithSha1Fp(sha1Fp)) {
               continue;
             }
@@ -167,7 +163,7 @@ public class DbCertStatusStore extends OcspStore {
         }
       } // end if(initialized)
 
-      final String sql = "SELECT ID,NBEFORE,REV_INFO,S1C,CERT,CRL_INFO FROM ISSUER";
+      final String sql = "SELECT ID,REV_INFO,CERT FROM CA";
       PreparedStatement ps = preparedStatement(sql);
 
       ResultSet rs = null;
@@ -175,19 +171,15 @@ public class DbCertStatusStore extends OcspStore {
         rs = ps.executeQuery();
         List<IssuerEntry> caInfos = new LinkedList<>();
         while (rs.next()) {
-          String sha1Fp = rs.getString("S1C");
+          byte[] certBytes = Base64.decode(rs.getString("CERT"));
+          String sha1Fp = HashAlgo.SHA1.base64Hash(certBytes);
           if (!issuerFilter.includeIssuerWithSha1Fp(sha1Fp)) {
             continue;
           }
 
-          X509Certificate cert = X509Util.parseCert(StringUtil.toUtf8Bytes(rs.getString("CERT")));
+          X509Certificate cert = X509Util.parseCert(certBytes);
 
           IssuerEntry caInfoEntry = new IssuerEntry(rs.getInt("ID"), cert);
-          String crlInfoStr = rs.getString("CRL_INFO");
-          if (StringUtil.isNotBlank(crlInfoStr)) {
-            CrlInfo crlInfo = new CrlInfo(crlInfoStr);
-            caInfoEntry.setCrlInfo(crlInfo);
-          }
           RequestIssuer reqIssuer = new RequestIssuer(HashAlgo.SHA1,
               caInfoEntry.getEncodedHash(HashAlgo.SHA1));
           for (IssuerEntry existingIssuer : caInfos) {
@@ -244,21 +236,8 @@ public class DbCertStatusStore extends OcspStore {
         sql = includeRit ? sqlCs : sqlCsNoRit;
       }
 
-      CrlInfo crlInfo = issuer.getCrlInfo();
-
-      Date thisUpdate;
+      Date thisUpdate = new Date();
       Date nextUpdate = null;
-
-      if (crlInfo != null) {
-        thisUpdate = crlInfo.getThisUpdate();
-
-        // this.nextUpdate is still in the future (10 seconds buffer)
-        if (crlInfo.getNextUpdate().getTime() - System.currentTimeMillis() > 10 * 1000) {
-          nextUpdate = crlInfo.getNextUpdate();
-        }
-      } else {
-        thisUpdate = new Date();
-      }
 
       ResultSet rs = null;
       CertStatusInfo certStatusInfo = null;
@@ -299,7 +278,7 @@ public class DbCertStatusStore extends OcspStore {
 
           if (!ignore) {
             if (includeCertHash) {
-              b64CertHash = rs.getString("HASH");
+              b64CertHash = rs.getString("SHA1");
             }
 
             revoked = rs.getBoolean("REV");
@@ -342,10 +321,6 @@ public class DbCertStatusStore extends OcspStore {
                 certHash, thisUpdate, nextUpdate, certprofile);
           }
         }
-      }
-
-      if (includeCrlId && crlInfo != null) {
-        certStatusInfo.setCrlId(crlInfo.getCrlId());
       }
 
       if (includeArchiveCutoff) {
@@ -416,7 +391,7 @@ public class DbCertStatusStore extends OcspStore {
       return false;
     }
 
-    final String sql = "SELECT ID FROM ISSUER";
+    final String sql = "SELECT ID FROM CA";
 
     try {
       PreparedStatement ps = preparedStatement(sql);
@@ -463,21 +438,16 @@ public class DbCertStatusStore extends OcspStore {
     this.datasource = Args.notNull(datasource, "datasource");
 
     sqlCs = datasource.buildSelectFirstSql(1,
-        "NBEFORE,NAFTER,REV,RR,RT,RIT FROM CERT WHERE IID=? AND SN=?");
+        "NBEFORE,NAFTER,REV,RR,RT,RIT FROM CERT WHERE CA_ID=? AND SN=?");
     sqlCsNoRit = datasource.buildSelectFirstSql(1,
-        "NBEFORE,NAFTER,REV,RR,RT FROM CERT WHERE IID=? AND SN=?");
+        "NBEFORE,NAFTER,REV,RR,RT FROM CERT WHERE CA_ID=? AND SN=?");
 
     sqlCsWithCertHash = datasource.buildSelectFirstSql(1,
-        "NBEFORE,NAFTER,REV,RR,RT,RIT,HASH FROM CERT WHERE IID=? AND SN=?");
+        "NBEFORE,NAFTER,REV,RR,RT,RIT,SHA1 FROM CERT WHERE CA_ID=? AND SN=?");
     sqlCsNoRitWithCertHash = datasource.buildSelectFirstSql(1,
-        "NBEFORE,NAFTER,REV,RR,RT,HASH FROM CERT WHERE IID=? AND SN=?");
+        "NBEFORE,NAFTER,REV,RR,RT,SHA1 FROM CERT WHERE CA_ID=? AND SN=?");
 
-    try {
-      this.certHashAlgo = getCertHashAlgo(datasource);
-    } catch (DataAccessException ex) {
-      throw new OcspStoreException(
-          "Could not retrieve the certhash's algorithm from the database", ex);
-    }
+    this.certHashAlgo = HashAlgo.SHA1;
 
     try {
       Set<X509Certificate> includeIssuers = null;
@@ -485,11 +455,11 @@ public class DbCertStatusStore extends OcspStore {
 
       if (caCerts != null) {
         if (CollectionUtil.isNonEmpty(caCerts.getIncludes())) {
-          includeIssuers = parseCerts(caCerts.getIncludes());
+          includeIssuers = DbCertStatusStore.parseCerts(caCerts.getIncludes());
         }
 
         if (CollectionUtil.isNonEmpty(caCerts.getExcludes())) {
-          excludeIssuers = parseCerts(caCerts.getExcludes());
+          excludeIssuers = DbCertStatusStore.parseCerts(caCerts.getExcludes());
         }
       }
 
@@ -550,33 +520,6 @@ public class DbCertStatusStore extends OcspStore {
 
   protected boolean isInitialized() {
     return initialized;
-  }
-
-  static Set<X509Certificate> parseCerts(Collection<String> certFiles)
-      throws OcspStoreException {
-    Set<X509Certificate> certs = new HashSet<>(certFiles.size());
-    for (String certFile : certFiles) {
-      try {
-        certs.add(X509Util.parseCert(new File(certFile)));
-      } catch (CertificateException | IOException ex) {
-        throw new OcspStoreException("could not parse X.509 certificate from file "
-            + certFile + ": " + ex.getMessage(), ex);
-      }
-    }
-    return certs;
-  }
-
-  static HashAlgo getCertHashAlgo(DataSourceWrapper datasource) throws DataAccessException {
-    // analyze the database
-    String certHashAlgoStr = datasource.getFirstValue(null, "DBSCHEMA", "VALUE2",
-        "NAME='CERTHASH_ALGO'", String.class);
-
-    if (certHashAlgoStr == null) {
-      throw new DataAccessException(
-          "Column with NAME='CERTHASH_ALGO' is not defined in table DBSCHEMA");
-    }
-
-    return HashAlgo.getNonNullInstance(certHashAlgoStr);
   }
 
 }

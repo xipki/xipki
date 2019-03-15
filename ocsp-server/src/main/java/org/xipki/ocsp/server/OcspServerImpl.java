@@ -67,6 +67,7 @@ import org.xipki.ocsp.api.Responder;
 import org.xipki.ocsp.api.ResponderAndPath;
 import org.xipki.ocsp.server.OcspServerConf.EmbedCertsMode;
 import org.xipki.ocsp.server.ResponderOption.OcspMode;
+import org.xipki.ocsp.server.store.CaDbCertStatusStore;
 import org.xipki.ocsp.server.store.CrlDbCertStatusStore;
 import org.xipki.ocsp.server.store.DbCertStatusStore;
 import org.xipki.ocsp.server.store.ResponseCacher;
@@ -151,6 +152,8 @@ public class OcspServerImpl implements OcspServer {
 
   private static final String STORE_TYPE_XIPKI_DB = "xipki-db";
 
+  private static final String STORE_TYPE_XIPKI_CA_DB = "xipki-ca-db";
+
   private static final String STORE_TYPE_CRL = "crl";
 
   private static final String STORE_TYPE_EJBCA_DB = "ejbca-db";
@@ -166,7 +169,7 @@ public class OcspServerImpl implements OcspServer {
 
   private static final WritableOnlyExtension extension_pkix_ocsp_extendedRevoke;
 
-  private static final Logger LOG = LoggerFactory.getLogger(OcspServer.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OcspServerImpl.class);
 
   private static final Map<OcspResponseStatus, OcspRespWithCacheInfo> unsuccesfulOCSPRespMap;
 
@@ -1028,6 +1031,8 @@ public class OcspServerImpl implements OcspServer {
         store = new DbCertStatusStore();
       } else if (STORE_TYPE_CRL.equalsIgnoreCase(type)) {
         store = new CrlDbCertStatusStore();
+      } else if (STORE_TYPE_XIPKI_CA_DB.equalsIgnoreCase(type)) {
+        store = new CaDbCertStatusStore();
       } else if (STORE_TYPE_EJBCA_DB.equalsIgnoreCase(type)) {
         store = new EjbcaCertStatusStore();
       } else if (type.startsWith("java:")) {

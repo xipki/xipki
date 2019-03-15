@@ -31,12 +31,6 @@
       </excludes>
       <outputDirectory>.</outputDirectory>
     </fileSet>
-    <fileSet>
-      <directory>${project.build.directory}/xipki/etc/ocsp/database/mariadb</directory>
-      <outputDirectory>xipki/etc/ocsp/database</outputDirectory>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
   </fileSets>
   <files>
     <file>
@@ -49,6 +43,11 @@
       <source>${project.build.directory}/xipki/security/example/pkcs11-emulator.json</source>
       <outputDirectory>xipki/security</outputDirectory>
       <destName>pkcs11.json</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>${project.build.directory}/xipki/etc/ocsp/database/mariadb/ca-db.properties</source>
+      <outputDirectory>xipki/etc/ocsp/database</outputDirectory>
       <fileMode>0644</fileMode>
     </file>
   </files>

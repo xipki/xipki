@@ -3,7 +3,7 @@
 	"datasources":[{
 		"name":"datasource1",
 		"conf":{
-			"file":"xipki/etc/ocsp/database/ocsp-db.properties"
+			"file":"xipki/etc/ocsp/database/ca-db.properties"
 		}
 	}],
 	"requestOptions":[{
@@ -29,7 +29,7 @@
 		"response":"response1",
 		"servletPaths":["/responder1"],
 		"signer":"signer1",
-		"stores":["dbstore1"]
+		"stores":["store1"]
 	}],
 	"responseOptions":[{
 		"name":"response1",
@@ -47,7 +47,7 @@
 		"key":"password=1234,keystore=file:xipki/keycerts/ocsp1.p12"
 	}],
 	"stores":[{
-		"name":"dbstore1",
+		"name":"store1",
 		"ignoreExpiredCert":true,
 		"ignoreNotYetValidCert":true,
 		"includeArchiveCutoff":true,
@@ -56,7 +56,7 @@
 		"minNextUpdatePeriod":"1d",
 		"source":{
 			"datasource":"datasource1",
-			"type":"xipki-db",
+			"type":"xipki-ca-db",
 			"conf":{
 			}
 		},
