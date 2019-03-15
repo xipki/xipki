@@ -248,7 +248,7 @@ if { $printUsage equals "true" } then {
     ${XIPKI_DIR}/etc/ocsp/crls/subcawithcrl1/ca.crt
 
   # Force the OCSP responder to import the CRL to database
-  xi:copy-file -f ${XIPKI_DIR}/etc/ocsp/foo.crl.UPDATEME \
+  xi:copy-file -f ${XIPKI_DIR}/etc/ocsp/crls/foo.crl.UPDATEME \
     ${XIPKI_DIR}/etc/ocsp/crls/subcawithcrl1/crl.crl.UPDATEME
 
   if { $TOKEN_TYPE equals "pkcs11" } then {
