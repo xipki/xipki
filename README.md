@@ -63,7 +63,7 @@ follows.
 1. Unpack the binary `ca-war-<version>.zip` and install CA as described in the
    unpacked README file.
 
-2. Adapt the database configurations ${CONTAINER_ROOT}/xipki/etc/ca/database/{ca|ocsp}-db.properties.
+2. Adapt the database configurations ${CONTAINER_ROOT}/xipki/etc/ca/database/ca-db.properties.
    - If you use database other than MariaDB and MySQL, you need to overwrite the configuration templates
    from the sub folder.
    - If you use database other than MariaDB, MySQL and PostgreSQL, you need to get the JDBC driver and copy
@@ -75,8 +75,8 @@ follows.
 
 ```
  ca-war-<version>/dbtool/bin/initdb.sh \
-   --db-conf xipki/etc/ca/database/{ca|ocsp}-db.properties \
-   --db-schema xipki/sql/{ca|ocsp}-init.xml
+   --db-conf xipki/etc/ca/database/ca-db.properties \
+   --db-schema xipki/sql/ca-init.xml
 ```
 
 ## Install OCSP Responder
@@ -86,7 +86,7 @@ Note that CA and OCSP can be installed in the same servlet container.
 1. Unpack the binary `ocsp-war-<version>.zip` and install OCSP responder as described in the
    unpacked README file.
 
-2. Adapt the database configuration ${CONTAINER_ROOT}/xipki/etc/ocsp/database/ocsp-db.properties.
+2. Adapt the database configuration ${CONTAINER_ROOT}/xipki/etc/ocsp/database/ca-db.properties.
    - If you use database other than MariaDB and MySQL, you need to overwrite the configuration templates
    from the sub folder.
    - If you use database other than MariaDB, MySQL and PostgreSQL, you need to get the JDBC drivers and copy

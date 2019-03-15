@@ -30,13 +30,7 @@
 		"active":true,
 		"password":"password1"
 	}],
-	"publishers":[{
-		"name":"ocsp-publisher",
-		"type":"ocsp",
-		"conf":{
-			"value":"datasource=ocsp,publish.goodcerts=true"
-		}
-	}],
+	"publishers":[],
 	"profiles":[{
 		"name":"rootca",
 		"type":"xijson",
@@ -140,9 +134,7 @@
 			"tls",
 			"tls-c"
 		],
-		"publishers":[
-			"ocsp-publisher"
-		],
+		"publishers":[],
 		"requestors":[{
 			"ra":true,
 			"requestorName":"requestor1",
