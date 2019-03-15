@@ -244,7 +244,6 @@ public class CaDbCertStatusStore extends OcspStore {
 
       boolean unknown = true;
       boolean ignore = false;
-      String certprofile = null;
       String b64CertHash = null;
       boolean revoked = false;
       int reason = 0;
@@ -315,10 +314,10 @@ public class CaDbCertStatusStore extends OcspStore {
             CertRevocationInfo revInfo = new CertRevocationInfo(reason,
                 new Date(revTime * 1000), invTime);
             certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revInfo,
-                certHashAlgo, certHash, thisUpdate, nextUpdate, certprofile);
+                certHashAlgo, certHash, thisUpdate, nextUpdate, null);
           } else {
             certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo,
-                certHash, thisUpdate, nextUpdate, certprofile);
+                certHash, thisUpdate, nextUpdate, null);
           }
         }
       }
