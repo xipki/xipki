@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.xipki.shell</groupId>
     <artifactId>shells</artifactId>
-    <version>5.0.2-SNAPSHOT</version>
+    <version>5.1.0-SNAPSHOT</version>
   </parent>
   <artifactId>shell-base</artifactId>
   <packaging>bundle</packaging>

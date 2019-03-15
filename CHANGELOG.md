@@ -2,7 +2,7 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
-## 5.0.2
+## 5.1.0
   - Release date: -
   - Relax the limitation of OCSP response in HTTP GET
   - New feature to add NextUpdate to OCSP Response, even if no NextUpdate is available. This is configurable.
