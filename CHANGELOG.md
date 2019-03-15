@@ -1,4 +1,3 @@
-
 # Change Log
 
 See also <https://github.com/xipki/xipki/releases>
@@ -9,10 +8,11 @@ See also <https://github.com/xipki/xipki/releases>
   - New feature to add NextUpdate to OCSP Response, even if no NextUpdate is available. This is configurable.
   - Optimize the mechanism to generate CRL
   - Add example modules to demonstrate how to extend XiPKI OCSP server to use customized certificate status source.
-  - Better mechansim to handle emailAddress in Subject / SubjectAltName
-  - Add OCSP certificate status source published by EJBCA
+  - Better mechanism to handle emailAddress in Subject / SubjectAltName
+  - Add support of OCSP certificate status source published by EJBCA
   - Simplify the specification of customized extension in certificate profile.
   - If ca.war and ocsp.war are both in one tomcat instance, and one war cannot be started, the other too. This has been fixed.
+  - Add support of certificate status source based on the database of XiPKI CA.
 
 ## 5.0.1
  - Release date: Feb 17, 2019

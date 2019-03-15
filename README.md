@@ -261,7 +261,8 @@ Features
   - OCSP Responder (RFC 2560 and RFC 6960)
   - Support of Common PKI 2.0
   - Management of multiple certificate status sources
-  - Support of certificate status source published by XiPKI CA
+  - Support of certificate status source based on the database of XiPKI CA
+  - Support of certificate status source based on the OCSP database published by XiPKI CA
   - Support of certificate status source CRL and DeltaCRL
   - Support of certificate status source published by EJBCA
   - API to support proprietary certificate sources
