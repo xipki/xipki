@@ -1,13 +1,18 @@
 echo "#################################################################"
 echo "#                              OCSP                             #"
 echo "#################################################################"
-URL = http://localhost:8080/ocsp/responder1
 URL_CRL = http://localhost:8080/ocsp/responder2
 
 echo "Sleeping 1 second"
 sleep 1
 
 VERBOSE = "--verbose"
+
+list = [http://localhost:8080/ocsp/responder1 http://localhost:8080/ocsp/responder3]; each ($list) {
+
+URL = $it
+
+echo "URL: $URL"
 
 ## POST
 echo "QA: Good (POST, DB)"
@@ -17,6 +22,7 @@ xiqa:qa-ocsp-status $VERBOSE \
   --exp-status good \
   --exp-certhash required \
   --exp-sig-alg $SIGALGO \
+  --url $URL \
   --nonce \
   --resp-issuer output/rootca1.crt
 
@@ -26,6 +32,7 @@ xiqa:qa-ocsp-status $VERBOSE \
   --cert output/ee-complex1.crt \
   --exp-status unknown \
   --exp-sig-alg $SIGALGO \
+  --url $URL \
   --nonce \
   --resp-issuer output/rootca1.crt
 
@@ -36,6 +43,7 @@ xiqa:qa-ocsp-status $VERBOSE \
   --exp-status good \
   --exp-certhash required \
   --exp-sig-alg $SIGALGO \
+  --url $URL \
   --nonce \
   --resp-issuer output/rootca1.crt
 
@@ -46,37 +54,7 @@ xiqa:qa-ocsp-status $VERBOSE \
   --exp-status affiliationChanged \
   --exp-certhash required \
   --exp-sig-alg $SIGALGO \
-  --nonce \
-  --resp-issuer output/rootca1.crt
-
-echo "QA: Good (POST, CRL)"
-xiqa:qa-ocsp-status $VERBOSE \
-  --issuer output/subcawithcrl1.crt \
-  --cert output/ocsp1.crt \
-  --exp-status good \
-  --exp-certhash forbidden \
-  --exp-sig-alg $SIGALGO \
-  --nonce \
-  --resp-issuer output/rootca1.crt
-
-echo "QA: Revoked, reason = keyCompromise (POST, CRL)"
-xiqa:qa-ocsp-status $VERBOSE \
-  --issuer output/subcawithcrl1.crt \
-  --cert output/ocsp2.crt \
-  --exp-status keyCompromise \
-  --exp-certhash forbidden \
-  --exp-sig-alg $SIGALGO \
-  --nonce \
-  --resp-issuer output/rootca1.crt
-
-echo "QA: Good (POST, CRL)"
-xiqa:qa-ocsp-status $VERBOSE \
-  --issuer output/subcawithcrl1.crt \
-  --serial 99999 \
-  --exp-status good \
-  --exp-certhash forbidden \
-  --exp-sig-alg $SIGALGO \
-  --url $URL_CRL \
+  --url $URL \
   --nonce \
   --resp-issuer output/rootca1.crt
 
@@ -109,6 +87,7 @@ xiqa:qa-ocsp-status $VERBOSE \
   --exp-status good \
   --exp-certhash required \
   --exp-sig-alg $SIGALGO \
+  --url $URL \
   --nonce \
   --resp-issuer output/rootca1.crt
 
@@ -119,6 +98,7 @@ xiqa:qa-ocsp-status $VERBOSE \
   --http-get \
   --exp-status unknown \
   --exp-sig-alg $SIGALGO \
+  --url $URL \
   --nonce \
   --resp-issuer output/rootca1.crt
 
@@ -130,6 +110,7 @@ xiqa:qa-ocsp-status $VERBOSE \
   --exp-status good \
   --exp-certhash required \
   --exp-sig-alg $SIGALGO \
+  --url $URL \
   --nonce \
   --resp-issuer output/rootca1.crt
 
@@ -141,40 +122,7 @@ xiqa:qa-ocsp-status $VERBOSE \
   --exp-status affiliationChanged \
   --exp-certhash required \
   --exp-sig-alg $SIGALGO \
-  --nonce \
-  --resp-issuer output/rootca1.crt
-
-echo "QA: Good (GET, CRL)"
-xiqa:qa-ocsp-status \
-  --issuer output/subcawithcrl1.crt \
-  --cert output/ocsp1.crt \
-  --http-get \
-  --exp-status good \
-  --exp-certhash forbidden \
-  --exp-sig-alg $SIGALGO \
-  --nonce \
-  --resp-issuer output/rootca1.crt
-
-echo "QA: Revoked, reason = keyCompromise (GET, CRL)"
-xiqa:qa-ocsp-status $VERBOSE \
-  --issuer output/subcawithcrl1.crt \
-  --cert output/ocsp2.crt \
-  --http-get \
-  --exp-status keyCompromise \
-  --exp-certhash forbidden \
-  --exp-sig-alg $SIGALGO \
-  --nonce \
-  --resp-issuer output/rootca1.crt
-
-echo "QA: Good (GET, CRL)"
-xiqa:qa-ocsp-status $VERBOSE \
-  --issuer output/subcawithcrl1.crt \
-  --serial 99999 \
-  --http-get \
-  --exp-status good \
-  --exp-certhash forbidden \
-  --exp-sig-alg $SIGALGO \
-  --url $URL_CRL \
+  --url $URL \
   --nonce \
   --resp-issuer output/rootca1.crt
 
@@ -209,6 +157,7 @@ xiqa:qa-ocsp-status $VERBOSE \
   --exp-status good \
   --exp-certhash required \
   --exp-sig-alg $SIGALGO \
+  --url $URL \
   --nonce \
   --resp-issuer output/rootca1.crt
 
@@ -219,6 +168,7 @@ xiqa:qa-ocsp-status $VERBOSE \
   --sign \
   --exp-status unknown \
   --exp-sig-alg $SIGALGO \
+  --url $URL \
   --nonce \
   --resp-issuer output/rootca1.crt
 
@@ -230,6 +180,7 @@ xiqa:qa-ocsp-status $VERBOSE \
   --exp-status good \
   --exp-certhash required \
   --exp-sig-alg $SIGALGO \
+  --url $URL \
   --nonce \
   --resp-issuer output/rootca1.crt
 
@@ -241,39 +192,7 @@ xiqa:qa-ocsp-status $VERBOSE \
   --exp-status affiliationChanged \
   --exp-certhash required \
   --exp-sig-alg $SIGALGO \
-  --nonce \
-  --resp-issuer output/rootca1.crt
-
-echo "QA: Good (POST, SIGNED, CRL)"
-xiqa:qa-ocsp-status $VERBOSE \
-  --issuer output/subcawithcrl1.crt \
-  --cert output/ocsp1.crt \
-  --sign \
-  --exp-status good \
-  --exp-certhash forbidden \
-  --exp-sig-alg $SIGALGO \
-  --nonce \
-  --resp-issuer output/rootca1.crt
-
-echo "QA: Revoked, reason = keyCompromise (POST, SIGNED, CRL)"
-xiqa:qa-ocsp-status $VERBOSE \
-  --issuer output/subcawithcrl1.crt \
-  --cert output/ocsp2.crt --sign \
-  --exp-status keyCompromise \
-  --exp-certhash forbidden \
-  --exp-sig-alg $SIGALGO \
-  --nonce \
-  --resp-issuer output/rootca1.crt
-
-echo "QA: Good (POST, SIGNED, CRL)"
-xiqa:qa-ocsp-status $VERBOSE \
-  --issuer output/subcawithcrl1.crt \
-  --serial 99999 \
-  --sign \
-  --exp-status good \
-  --exp-certhash forbidden \
-  --exp-sig-alg $SIGALGO \
-  --url $URL_CRL \
+  --url $URL \
   --nonce \
   --resp-issuer output/rootca1.crt
 
@@ -299,3 +218,112 @@ xiqa:qa-ocsp-status $VERBOSE \
   --nonce \
   --resp-issuer output/rootca1.crt
 
+}
+
+echo "=====QA : OCSP responder====="
+echo "URL: $URL_CRL"
+
+echo "QA: Good (POST, CRL)"
+xiqa:qa-ocsp-status $VERBOSE \
+  --issuer output/subcawithcrl1.crt \
+  --serial 99999 \
+  --exp-status good \
+  --exp-certhash forbidden \
+  --exp-sig-alg $SIGALGO \
+  --url $URL_CRL \
+  --nonce \
+  --resp-issuer output/rootca1.crt
+
+echo "QA: Good (GET, CRL)"
+xiqa:qa-ocsp-status $VERBOSE \
+  --issuer output/subcawithcrl1.crt \
+  --serial 99999 \
+  --http-get \
+  --exp-status good \
+  --exp-certhash forbidden \
+  --exp-sig-alg $SIGALGO \
+  --url $URL_CRL \
+  --nonce \
+  --resp-issuer output/rootca1.crt
+
+echo "QA: Good (POST, SIGNED, CRL)"
+xiqa:qa-ocsp-status $VERBOSE \
+  --issuer output/subcawithcrl1.crt \
+  --serial 99999 \
+  --sign \
+  --exp-status good \
+  --exp-certhash forbidden \
+  --exp-sig-alg $SIGALGO \
+  --url $URL_CRL \
+  --nonce \
+  --resp-issuer output/rootca1.crt
+
+echo "QA: Revoked, reason = keyCompromise (POST, CRL)"
+xiqa:qa-ocsp-status $VERBOSE \
+  --issuer output/subcawithcrl1.crt \
+  --cert output/ocsp2.crt \
+  --exp-status keyCompromise \
+  --exp-certhash forbidden \
+  --exp-sig-alg $SIGALGO \
+  --url $URL_CRL \
+  --nonce \
+  --resp-issuer output/rootca1.crt
+
+echo "QA: Good (GET, CRL)"
+xiqa:qa-ocsp-status \
+  --issuer output/subcawithcrl1.crt \
+  --cert output/ocsp1.crt \
+  --http-get \
+  --exp-status good \
+  --exp-certhash forbidden \
+  --exp-sig-alg $SIGALGO \
+  --url $URL_CRL \
+  --nonce \
+  --resp-issuer output/rootca1.crt
+
+echo "QA: Revoked, reason = keyCompromise (GET, CRL)"
+xiqa:qa-ocsp-status $VERBOSE \
+  --issuer output/subcawithcrl1.crt \
+  --cert output/ocsp2.crt \
+  --http-get \
+  --exp-status keyCompromise \
+  --exp-certhash forbidden \
+  --exp-sig-alg $SIGALGO \
+  --url $URL_CRL \
+  --nonce \
+  --resp-issuer output/rootca1.crt
+
+
+echo "QA: Good (POST, CRL)"
+xiqa:qa-ocsp-status $VERBOSE \
+  --issuer output/subcawithcrl1.crt \
+  --cert output/ocsp1.crt \
+  --exp-status good \
+  --exp-certhash forbidden \
+  --exp-sig-alg $SIGALGO \
+  --url $URL_CRL \
+  --nonce \
+  --resp-issuer output/rootca1.crt
+
+echo "QA: Good (POST, SIGNED, CRL)"
+xiqa:qa-ocsp-status $VERBOSE \
+  --issuer output/subcawithcrl1.crt \
+  --cert output/ocsp1.crt \
+  --sign \
+  --exp-status good \
+  --exp-certhash forbidden \
+  --exp-sig-alg $SIGALGO \
+  --url $URL_CRL \
+  --nonce \
+  --resp-issuer output/rootca1.crt
+
+echo "QA: Revoked, reason = keyCompromise (POST, SIGNED, CRL)"
+xiqa:qa-ocsp-status $VERBOSE \
+  --issuer output/subcawithcrl1.crt \
+  --cert output/ocsp2.crt --sign \
+  --exp-status keyCompromise \
+  --exp-certhash forbidden \
+  --exp-sig-alg $SIGALGO \
+  --url $URL_CRL \
+  --nonce \
+  --resp-issuer output/rootca1.crt
