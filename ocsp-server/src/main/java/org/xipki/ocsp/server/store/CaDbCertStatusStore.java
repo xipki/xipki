@@ -121,9 +121,11 @@ public class CaDbCertStatusStore extends OcspStore {
           rs = ps.executeQuery();
           while (rs.next()) {
             byte[] certBytes = Base64.decode(rs.getString("CERT"));
-            String sha1Fp = HashAlgo.SHA1.base64Hash(certBytes);
-            if (!issuerFilter.includeIssuerWithSha1Fp(sha1Fp)) {
-              continue;
+            if (!issuerFilter.includeAll()) {
+              String sha1Fp = HashAlgo.SHA1.base64Hash(certBytes);
+              if (!issuerFilter.includeIssuerWithSha1Fp(sha1Fp)) {
+                continue;
+              }
             }
 
             int id = rs.getInt("ID");

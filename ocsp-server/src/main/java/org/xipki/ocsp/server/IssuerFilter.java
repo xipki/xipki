@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.xipki.security.HashAlgo;
 import org.xipki.util.Args;
+import org.xipki.util.CollectionUtil;
 
 /**
  * TODO.
@@ -39,7 +40,7 @@ public class IssuerFilter {
 
   public IssuerFilter(Set<X509Certificate> includes, Set<X509Certificate> excludes)
       throws CertificateEncodingException {
-    if (includes == null) {
+    if (CollectionUtil.isEmpty(includes)) {
       includeSha1Fps = null;
     } else {
       includeSha1Fps = new HashSet<>(includes.size());
@@ -49,7 +50,7 @@ public class IssuerFilter {
       }
     }
 
-    if (excludes == null) {
+    if (CollectionUtil.isEmpty(excludes)) {
       excludeSha1Fps = null;
     } else {
       excludeSha1Fps = new HashSet<>(excludes.size());
@@ -58,6 +59,10 @@ public class IssuerFilter {
         excludeSha1Fps.add(sha1Fp);
       }
     }
+  }
+
+  public boolean includeAll() {
+    return includeSha1Fps == null && excludeSha1Fps == null;
   }
 
   public boolean includeIssuerWithSha1Fp(String sha1Fp) {

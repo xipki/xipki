@@ -125,9 +125,11 @@ public class DbCertStatusStore extends OcspStore {
 
           rs = ps.executeQuery();
           while (rs.next()) {
-            String sha1Fp = rs.getString("S1C");
-            if (!issuerFilter.includeIssuerWithSha1Fp(sha1Fp)) {
-              continue;
+            if (!issuerFilter.includeAll()) {
+              String sha1Fp = rs.getString("S1C");
+              if (!issuerFilter.includeIssuerWithSha1Fp(sha1Fp)) {
+                continue;
+              }
             }
 
             int id = rs.getInt("ID");
