@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.xipki</groupId>
     <artifactId>xipki-parent</artifactId>
-    <version>5.1.0</version>
+    <version>5.1.1-SNAPSHOT</version>
   </parent>
   <packaging>bundle</packaging>
   <artifactId>datasource</artifactId>

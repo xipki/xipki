@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.xipki.shell</groupId>
     <artifactId>shells</artifactId>
-    <version>5.1.0</version>
+    <version>5.1.1-SNAPSHOT</version>
   </parent>
   <artifactId>ocsp-client-shell</artifactId>
   <packaging>bundle</packaging>
