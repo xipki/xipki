@@ -3,7 +3,7 @@
 See also <https://github.com/xipki/xipki/releases>
 
 ## 5.1.0
-  - Release date: -
+  - Release date: Mar 17, 2019
   - Relax the limitation of OCSP response in HTTP GET
   - New feature to add NextUpdate to OCSP Response, even if no NextUpdate is available. This is configurable.
   - Optimize the mechanism to generate CRL
