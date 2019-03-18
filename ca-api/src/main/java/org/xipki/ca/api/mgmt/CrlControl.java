@@ -175,7 +175,7 @@ public class CrlControl {
 
   private int deltaCrlIntervals;
 
-  private int overlapMinutes = 60;
+  private int overlapMinutes = 360;
 
   private boolean extendedNextUpdate;
 
