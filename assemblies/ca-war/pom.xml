@@ -31,13 +31,24 @@
       <groupId>org.xipki</groupId>
       <artifactId>dbtool</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <!-- required by the dbtool -->
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>${logback.version}</version>
-      <scope>runtime</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.xipki</groupId>
+          <artifactId>util</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xipki</groupId>
+          <artifactId>password</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xipki</groupId>
+          <artifactId>util</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xipki</groupId>
@@ -152,6 +163,10 @@
                 <artifactItem>
                   <groupId>org.bouncycastle</groupId>
                   <artifactId>bcprov-jdk15on</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.bouncycastle</groupId>
+                  <artifactId>bcpkix-jdk15on</artifactId>
                 </artifactItem>
               </artifactItems>
             </configuration>
