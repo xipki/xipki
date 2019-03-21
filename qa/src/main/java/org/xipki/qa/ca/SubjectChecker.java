@@ -153,11 +153,26 @@ public class SubjectChecker {
       return issue;
     }
 
+    List<String> requestedCoreAtvTextValues = new LinkedList<>();
+
     RDN[] requestedRdns = requestedSubject.getRDNs(type);
+    if (rdnControl == null || rdnControl.isValueOverridable()) {
+      if (requestedRdns != null && requestedRdns.length > 0) {
+        for (RDN requestedRdn : requestedRdns) {
+          String textValue = getRdnTextValueOfRequest(requestedRdn);
+          requestedCoreAtvTextValues.add(textValue);
+        }
+      } else if (rdnControl != null && rdnControl.getValue() != null) {
+        requestedCoreAtvTextValues.add(rdnControl.getValue());
+      }
+    } else {
+      // rdnControl.getValue() could not be non-null here.
+      requestedCoreAtvTextValues.add(rdnControl.getValue());
+    }
 
     if (rdnsSize == 0) {
       // check optional attribute but is present in requestedSubject
-      if (maxOccurs > 0 && requestedRdns != null && requestedRdns.length > 0) {
+      if (maxOccurs > 0 && !requestedCoreAtvTextValues.isEmpty()) {
         issue.setFailureMessage("is absent but expected present");
       }
       return issue;
@@ -173,18 +188,6 @@ public class SubjectChecker {
 
     if (stringType == null) {
       stringType = StringType.utf8String;
-    }
-
-    List<String> requestedCoreAtvTextValues = new LinkedList<>();
-    if (requestedRdns != null) {
-      for (RDN requestedRdn : requestedRdns) {
-        String textValue = getRdnTextValueOfRequest(requestedRdn);
-        requestedCoreAtvTextValues.add(textValue);
-      }
-    }
-
-    if (rdns == null) { // return always false, only to make the null checker happy
-      return issue;
     }
 
     for (int i = 0; i < rdns.length; i++) {

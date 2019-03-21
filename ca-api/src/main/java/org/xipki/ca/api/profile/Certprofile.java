@@ -222,10 +222,27 @@ public abstract class Certprofile implements Closeable {
 
     private String suffix;
 
+    private String value;
+
+    private boolean valueOverridable;
+
     private String group;
 
     public RdnControl(ASN1ObjectIdentifier type) {
       this(type, 1, 1);
+    }
+
+    public RdnControl(ASN1ObjectIdentifier type, String value, boolean valueOverridable) {
+      this.type = Args.notNull(type, "type");
+      this.minOccurs = 1;
+      this.maxOccurs = 1;
+      if (StringUtil.isBlank(value)) {
+        this.value = null;
+        this.valueOverridable = true;
+      } else {
+        this.value = value;
+        this.valueOverridable = valueOverridable;
+      }
     }
 
     public RdnControl(ASN1ObjectIdentifier type, int minOccurs, int maxOccurs) {
@@ -237,6 +254,7 @@ public abstract class Certprofile implements Closeable {
       this.type = Args.notNull(type, "type");
       this.minOccurs = minOccurs;
       this.maxOccurs = maxOccurs;
+      this.valueOverridable = true;
     }
 
     public int getMinOccurs() {
@@ -297,6 +315,14 @@ public abstract class Certprofile implements Closeable {
 
     public void setGroup(String group) {
       this.group = group;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    public boolean isValueOverridable() {
+      return valueOverridable;
     }
 
   }

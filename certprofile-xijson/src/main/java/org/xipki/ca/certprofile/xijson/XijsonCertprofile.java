@@ -118,6 +118,7 @@ import org.xipki.ca.certprofile.xijson.conf.QcStatementType.QcStatementValueType
 import org.xipki.ca.certprofile.xijson.conf.QcStatementType.Range2Type;
 import org.xipki.ca.certprofile.xijson.conf.Subject;
 import org.xipki.ca.certprofile.xijson.conf.Subject.RdnType;
+import org.xipki.ca.certprofile.xijson.conf.Subject.ValueType;
 import org.xipki.ca.certprofile.xijson.conf.SubjectToSubjectAltNameType;
 import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
 import org.xipki.security.ObjectIdentifiers;
@@ -431,7 +432,14 @@ public class XijsonCertprofile extends BaseCertprofile {
       Range range = (rdn.getMinLen() != null || rdn.getMaxLen() != null)
           ? new Range(rdn.getMinLen(), rdn.getMaxLen()) :  null;
 
-      RdnControl rdnControl = new RdnControl(type, rdn.getMinOccurs(), rdn.getMaxOccurs());
+      ValueType value = rdn.getValue();
+      RdnControl rdnControl;
+      if (value == null) {
+        rdnControl = new RdnControl(type, rdn.getMinOccurs(), rdn.getMaxOccurs());
+      } else {
+        rdnControl = new RdnControl(type, value.getText(), value.isOverridable());
+      }
+
       subjectDnControls.add(rdnControl);
 
       rdnControl.setStringType(rdn.getStringType());
@@ -1130,6 +1138,13 @@ public class XijsonCertprofile extends BaseCertprofile {
           throw new BadCertTemplateException(String.format(
               "subject DN of type %s is not allowed", ObjectIdentifiers.oidToDisplayName(type)));
         }
+      } else {
+        if (!occu.isValueOverridable()) {
+          throw new BadCertTemplateException(String.format(
+              "subject DN of type %s is not allowed in the request",
+              ObjectIdentifiers.oidToDisplayName(type)));
+
+        }
       }
 
       RDN[] rdns = requestedSubject.getRDNs(type);
@@ -1143,6 +1158,10 @@ public class XijsonCertprofile extends BaseCertprofile {
 
     for (ASN1ObjectIdentifier m : subjectControl.getTypes()) {
       RdnControl occurence = subjectControl.getControl(m);
+      if (occurence.getValue() != null) {
+        continue;
+      }
+
       if (occurence.getMinOccurs() == 0) {
         continue;
       }

@@ -57,10 +57,10 @@ import org.xipki.ca.api.profile.KeyParametersOption.RSAParametersOption;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.LruCache;
-import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -111,29 +111,49 @@ public abstract class BaseCertprofile extends Certprofile {
         continue;
       }
 
-      RDN[] thisRdns = getRdns(requstedRdns, type);
-      if (thisRdns == null || thisRdns.length == 0) {
-        continue;
+      String cvalue = control.getValue();
+      RDN[] thisRdns = null;
+      if (control.isValueOverridable()) {
+        thisRdns = getRdns(requstedRdns, type);
       }
 
-      int len = thisRdns.length;
-
-      if (len == 1) {
-        ASN1Encodable rdnValue = thisRdns[0].getFirst().getValue();
-        RDN rdn;
-        if (ObjectIdentifiers.DN.dateOfBirth.equals(type)) {
-          rdn = createDateOfBirthRdn(type, rdnValue);
-        } else if (ObjectIdentifiers.DN.postalAddress.equals(type)) {
-          rdn = createPostalAddressRdn(type, rdnValue, control, 0);
-        } else {
-          String value = X509Util.rdnValueToString(rdnValue);
-          rdn = createSubjectRdn(value, type, control, 0);
-        }
-
-        if (rdn != null) {
-          rdns.add(rdn);
+      int len = thisRdns == null ? 0 : thisRdns.length;
+      if (cvalue == null) {
+        if (len == 0) {
+          // not requested and no set in the control
+          continue;
         }
       } else {
+        if (len == 0) {
+          len = 1;
+        } else if (len == 1) {
+          // use the requested RDN instead of configured one
+          cvalue = null;
+        } else {
+          throw new BadCertTemplateException(len + " RDNs of type "
+              + ObjectIdentifiers.getName(type) + " are requested, but max 1 is allowed.");
+        }
+      }
+
+      if (len == 1) {
+        RDN rdn;
+        if (cvalue != null) {
+          rdn = createSubjectRdn(cvalue, type, control, 0);
+        } else {
+          ASN1Encodable rdnValue = thisRdns[0].getFirst().getValue();
+          if (ObjectIdentifiers.DN.dateOfBirth.equals(type)) {
+            rdn = createDateOfBirthRdn(type, rdnValue);
+          } else if (ObjectIdentifiers.DN.postalAddress.equals(type)) {
+            rdn = createPostalAddressRdn(type, rdnValue, control, 0);
+          } else {
+            String value = X509Util.rdnValueToString(rdnValue);
+            rdn = createSubjectRdn(value, type, control, 0);
+          }
+        }
+
+        rdns.add(rdn);
+      } else {
+        // cvalue must be null here.
         if (ObjectIdentifiers.DN.dateOfBirth.equals(type)) {
           for (int i = 0; i < len; i++) {
             RDN rdn = createDateOfBirthRdn(type, thisRdns[i].getFirst().getValue());

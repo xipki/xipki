@@ -80,6 +80,38 @@ public class Subject extends ValidatableConf {
     validate(rdns);
   }
 
+  public static class ValueType extends ValidatableConf {
+
+    private String text;
+
+    /**
+     * Whether the value can be overridden by the request.
+     */
+    private boolean overridable;
+
+    public String getText() {
+      return text;
+    }
+
+    public void setText(String text) {
+      this.text = text;
+    }
+
+    public boolean isOverridable() {
+      return overridable;
+    }
+
+    public void setOverridable(boolean overridable) {
+      this.overridable = overridable;
+    }
+
+    @Override
+    public void validate() throws InvalidConfException {
+      notEmpty(text, "text");
+    }
+
+  }
+
   public static class RdnType extends ValidatableConf {
 
     @JSONField(ordinal = 1)
@@ -111,6 +143,9 @@ public class Subject extends ValidatableConf {
 
     @JSONField(ordinal = 10)
     private String group;
+
+    @JSONField(ordinal = 11)
+    private ValueType value;
 
     public DescribableOid getType() {
       return type;
@@ -192,6 +227,14 @@ public class Subject extends ValidatableConf {
       this.group = group;
     }
 
+    public ValueType getValue() {
+      return value;
+    }
+
+    public void setValue(ValueType value) {
+      this.value = value;
+    }
+
     @Override
     public void validate() throws InvalidConfException {
       notNull(type, "type");
@@ -199,6 +242,15 @@ public class Subject extends ValidatableConf {
       if (minOccurs > maxOccurs) {
         throw new InvalidConfException(
             "minOccurs (" + minOccurs + ") may not be greater than maxOccurs (" + maxOccurs + ")");
+      }
+
+      if (value != null) {
+        if (minOccurs != 1 || maxOccurs != 1) {
+          throw new InvalidConfException(
+              "(minOccurs, maxOccurs) is not (1,1), but (" + minOccurs + "," + maxOccurs + ")");
+        }
+
+        value.validate();
       }
     }
 

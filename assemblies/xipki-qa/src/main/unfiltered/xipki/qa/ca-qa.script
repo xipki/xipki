@@ -83,3 +83,8 @@ caqa:check-cert --issuer subca --profile ee-complex \
 caqa:check-cert --issuer subca --profile ee-complex \
   --csr output/ee-complex2.csr --cert output/ee-complex2.crt
 
+caqa:check-cert --issuer subca --profile fixed-partial-subject \
+  --csr output/fixed-partial-subject1.csr --cert output/fixed-partial-subject1.crt
+
+caqa:check-cert --issuer subca --profile fixed-partial-subject \
+  --csr output/fixed-partial-subject2.csr --cert output/fixed-partial-subject2.crt

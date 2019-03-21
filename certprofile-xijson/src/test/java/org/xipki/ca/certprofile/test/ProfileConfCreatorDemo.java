@@ -102,6 +102,7 @@ import org.xipki.ca.certprofile.xijson.conf.QcStatementType.QcStatementValueType
 import org.xipki.ca.certprofile.xijson.conf.QcStatementType.Range2Type;
 import org.xipki.ca.certprofile.xijson.conf.Subject;
 import org.xipki.ca.certprofile.xijson.conf.Subject.RdnType;
+import org.xipki.ca.certprofile.xijson.conf.Subject.ValueType;
 import org.xipki.ca.certprofile.xijson.conf.SubjectToSubjectAltNameType;
 import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
 import org.xipki.security.HashAlgo;
@@ -175,6 +176,7 @@ public class ProfileConfCreatorDemo {
       certprofileMultipleOus("certprofile-multiple-ous.json");
       certprofileMultipleValuedRdn("certprofile-multi-valued-rdn.json");
       certprofileMaxTime("certprofile-max-time.json");
+      certprofileFixedPartialSubject("certprofile-fixed-partial-subject.json");
       certprofileExtended("certprofile-extended.json");
     } catch (Exception ex) {
       ex.printStackTrace();
@@ -1114,6 +1116,57 @@ public class ProfileConfCreatorDemo {
     marshall(profile, destFilename, true);
   } // method certprofileMaxTime
 
+  private static void certprofileFixedPartialSubject(String destFilename) throws Exception {
+    X509ProfileType profile = getBaseProfile("certprofile fixed subject O and C",
+        CertLevel.EndEntity, "365d");
+
+    // Subject
+    Subject subject = profile.getSubject();
+
+    List<RdnType> rdnControls = subject.getRdns();
+
+    ValueType value = new ValueType();
+    value.setText("DE");
+    value.setOverridable(true);
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, null, null, value));
+
+    value = new ValueType();
+    value.setText("fixed xipki.org");
+    value.setOverridable(false);
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, null, null, value));
+
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
+
+    // Extensions
+    List<ExtensionType> list = profile.getExtensions();
+
+    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
+    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
+    list.add(createExtension(Extension.freshestCRL, false, false, null));
+
+    // Extensions - basicConstraints
+    list.add(createExtension(Extension.basicConstraints, true, true));
+
+    // Extensions - AuthorityInfoAccess
+    list.add(createExtension(Extension.authorityInfoAccess, true, false));
+    last(list).setAuthorityInfoAccess(createAuthorityInfoAccess());
+
+    // Extensions - AuthorityKeyIdentifier
+    list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
+    last(list).setAuthorityKeyIdentifier(createAuthorityKeyIdentifier(true));
+
+    // Extensions - keyUsage
+    list.add(createExtension(Extension.keyUsage, true, true));
+    last(list).setKeyUsage(createKeyUsage(
+        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
+            KeyUsage.keyEncipherment},
+        null));
+
+    marshall(profile, destFilename, true);
+  } // method certprofileMaxTime
+
   private static void certprofileExtended(String destFilename) throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile extended", CertLevel.EndEntity, "5y");
 
@@ -1227,6 +1280,25 @@ public class ProfileConfCreatorDemo {
 
     if (StringUtil.isNotBlank(suffix)) {
       ret.setSuffix(suffix);
+    }
+
+    if (StringUtil.isNotBlank(group)) {
+      ret.setGroup(group);
+    }
+
+    return ret;
+  } // method createRdn
+
+  private static RdnType createRdn(ASN1ObjectIdentifier type,
+      String regex, String group, ValueType value) {
+    RdnType ret = new RdnType();
+    ret.setType(createOidType(type));
+    ret.setMinOccurs(1);
+    ret.setMaxOccurs(1);
+    ret.setValue(value);
+
+    if (regex != null) {
+      ret.setRegex(regex);
     }
 
     if (StringUtil.isNotBlank(group)) {

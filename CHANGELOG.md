@@ -2,6 +2,10 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
+## 5.1.1
+  - Release date: -
+  - New feature to configure fixed value of subject RDN in the certificate profile
+
 ## 5.1.0
   - Release date: Mar 17, 2019
   - Relax the limitation of OCSP response in HTTP GET

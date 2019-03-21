@@ -169,6 +169,42 @@ xi:update-cert-p12 --p12 output/qc1.p12 --password 1234 \
   --ca-cert output/subcawithcrl1.crt \
   --ca-cert output/rootca1.crt
 
+# Certificate fixed-partial-subject1
+
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/fixed-partial-subject1.p12 --password 1234 \
+  --out output/fixed-partial-subject1.csr \
+  --subject "CN=fixed-partial-subject1"
+
+xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/fixed-partial-subject1.p12 --password 1234 \
+  --outform $OUTFORM \
+  --out output/fixed-partial-subject1.crt --profile fixed-partial-subject \
+  --subject "CN=fixed-partial-subject1"
+
+xi:update-cert-p12 --p12 output/fixed-partial-subject1.p12 --password 1234 \
+  --cert output/fixed-partial-subject1.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate fixed-partial-subject2
+
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/fixed-partial-subject2.p12 --password 1234 \
+  --out output/fixed-partial-subject2.csr \
+  --subject "CN=fixed-partial-subject2,C=FR"
+
+xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/fixed-partial-subject2.p12 --password 1234 \
+  --outform $OUTFORM \
+  --out output/fixed-partial-subject2.crt --profile fixed-partial-subject \
+  --subject "CN=fixed-partial-subject2,C=FR"
+
+xi:update-cert-p12 --p12 output/fixed-partial-subject2.p12 --password 1234 \
+  --cert output/fixed-partial-subject2.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
 # Certificate ee-complex1 with complex subject (parsable in openssl)
 
 xi:csr-p12-complex --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \

@@ -12,7 +12,7 @@ echo "#################################################################"
 ## Certificate Profiles
 
 list = [ cross subca subca-complex ocsp scep multiple-ous \
-  multi-valued-rdn qc ee-complex smime smime-legacy tls tls-c tls-inc-sn max-time ]
+  multi-valued-rdn qc ee-complex smime smime-legacy tls tls-c tls-inc-sn max-time fixed-partial-subject]
 
 each ($list) {
   ca:profile-add --type xijson --name ${it} \
@@ -341,7 +341,8 @@ ca:caprofile-add \
   --profile smime-legacy \
   --profile tls \
   --profile tls-c \
-  --profile tls-inc-sn
+  --profile tls-inc-sn \
+  --profile fixed-partial-subject
 
 ## Add publisher
 ca:capub-add \

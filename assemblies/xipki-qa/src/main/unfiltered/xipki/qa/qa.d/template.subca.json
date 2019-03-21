@@ -56,7 +56,8 @@
 			"smime-legacy",
 			"tls",
 			"tls-c",
-			"tls-inc-sn"
+			"tls-inc-sn",
+			"fixed-partial-subject"
 		],
 		"publishers":[
 			"ocsp-publisher"

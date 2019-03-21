@@ -141,6 +141,12 @@
 		"conf":{
 			"file":"${profiles.dir}/certprofile-max-time.json"
 		}
+	},{
+		"name":"fixed-partial-subject",
+		"type":"xijson",
+		"conf":{
+			"file":"${profiles.dir}/certprofile-fixed-partial-subject.json"
+		}
 	}],
 	"cas":[{
 		"name":"rootca1",
