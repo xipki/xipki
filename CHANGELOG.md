@@ -5,6 +5,8 @@ See also <https://github.com/xipki/xipki/releases>
 ## 5.1.1
   - Release date: -
   - New feature to configure fixed value of subject RDN in the certificate profile
+  - Make sure that the certificate serial number is randomly generated with at least 64 bit entropy
+    and not weak by checking the NAF weight.
 
 ## 5.1.0
   - Release date: Mar 17, 2019

@@ -45,7 +45,7 @@
 			"signerConf":{
 				"value":"${ca.signerConf}"
 			},
-			"snSize":63,
+			"snSize":127,
 			"status":"active",
 			"validityMode":"strict"
 		},

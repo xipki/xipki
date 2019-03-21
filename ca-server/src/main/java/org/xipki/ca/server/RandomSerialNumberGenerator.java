@@ -20,6 +20,8 @@ package org.xipki.ca.server;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
+import org.xipki.util.Args;
+
 /**
  * TODO.
  * @author Lijun Liao
@@ -28,7 +30,9 @@ import java.security.SecureRandom;
 
 class RandomSerialNumberGenerator {
 
-  private static int[] MASKS = new int[] {-1, 1, 3, 7, 15, 31, 63, 127};
+  private static int[] AND_MASKS = new int[] {-1,  0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3F, 0x7F};
+
+  private static int[] OR_MASKS = new int[] {0x80, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40};
 
   private static RandomSerialNumberGenerator instance;
 
@@ -38,15 +42,38 @@ class RandomSerialNumberGenerator {
     this.random = new SecureRandom();
   }
 
+  /**
+   * Generate the next serial number.
+   * @param bitLen bit length of the serial number. The highest bit is always set to 1, so
+   *        the effective bit length is bitLen - 1. To ensure that at least 64 bit entropy,
+   *        bitLen must be at least 65. And since serial number should be maximal 20 bytes,
+   *        the maximal value of bitLen is 159.
+   * @return the serial number.
+   */
   public BigInteger nextSerialNumber(int bitLen) {
-    byte[] rdnBytes = new byte[(bitLen + 7) / 8];
-    random.nextBytes(rdnBytes);
-    int ci = bitLen % 8;
-    if (ci != 0) {
-      rdnBytes[0] = (byte) (rdnBytes[0] & MASKS[ci]);
+    Args.range(bitLen, "bitlen", 65, 159);
+    final byte[] rdnBytes = new byte[(bitLen + 7) / 8];
+    final int ci = bitLen % 8;
+    final int minWeight = bitLen >>> 2;
+
+    while (true) {
+      random.nextBytes(rdnBytes);
+      if (ci != 0) {
+        rdnBytes[0] = (byte) (rdnBytes[0] & AND_MASKS[ci]);
+      }
+      rdnBytes[0] = (byte) (rdnBytes[0] | OR_MASKS[ci]);
+
+      // check NAF weight
+      BigInteger bi = new BigInteger(1, rdnBytes);
+
+      BigInteger _3bi = bi.shiftLeft(1).add(bi);
+      BigInteger diff = _3bi.xor(bi);
+      int nafWeight = diff.bitCount();
+      if (nafWeight >= minWeight) {
+        return bi;
+      }
     }
 
-    return new BigInteger(1, rdnBytes);
   }
 
   public static synchronized RandomSerialNumberGenerator getInstance() {

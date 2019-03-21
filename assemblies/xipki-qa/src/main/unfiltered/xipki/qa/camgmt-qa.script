@@ -279,7 +279,7 @@ if { $printUsage equals "true" } then {
   caqa:ca-check --name subca1 \
     --permission all \
     --max-validity 5y \
-    --sn-bitlen 63  \
+    --sn-bitlen 127  \
     --signer-type $TOKEN_TYPE \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://example.org/subca1.der \
@@ -291,7 +291,7 @@ if { $printUsage equals "true" } then {
   caqa:ca-check --name rootca1 \
     --permission all \
     --max-validity 10y \
-    --sn-bitlen 63  \
+    --sn-bitlen 127  \
     --signer-type $TOKEN_TYPE \
     --cert output/rootca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
@@ -318,7 +318,7 @@ if { $printUsage equals "true" } then {
     --permission enroll_cert \
     --permission revoke_cert \
     --max-validity 8y \
-    --sn-bitlen 63  \
+    --sn-bitlen 127  \
     --signer-type $TOKEN_TYPE \
     --cert output/rootca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder2 \
@@ -349,7 +349,7 @@ if { $printUsage equals "true" } then {
     --outform $OUTFORM \
     --out output/rootca1-2.crt \
     --permission all \
-    --sn-bitlen 63  \
+    --sn-bitlen 127  \
     --next-crl-no 2 \
     --max-validity 10y \
     --signer-type $TOKEN_TYPE \
@@ -369,7 +369,7 @@ if { $printUsage equals "true" } then {
   caqa:neg-ca-add \
     --name rootca2 \
     --permission all \
-    --sn-bitlen 63  \
+    --sn-bitlen 127  \
     --next-crl-no 2 \
     --max-validity 10y \
     --signer-type $TOKEN_TYPE \
@@ -383,12 +383,30 @@ if { $printUsage equals "true" } then {
     --duplicate-key yes \
     --validity-mode cutoff
 
+  echo "neg-ca-add: sn-bitlen not in [64, 159]"
+
+  caqa:neg-ca-add \
+    --name rootca2 \
+    --permission all \
+    --sn-bitlen 127  \
+    --next-crl-no 2 \
+    --max-validity 10y \
+    --signer-type $TOKEN_TYPE \
+    --signer-conf $CA_SIGNER_CONF_RCA \
+    --cert output/rootca1.crt \
+    --ocsp-uri http://localhost:8080/ocsp/responder1 \
+    --ca-cert-uri http://example.org/rootca1.der \
+    --cmp-responder responder1 \
+    --duplicate-subject  yes \
+    --duplicate-key yes \
+    --validity-mode cutoff
+
   echo "neg-ca-add: CMP control name does not exist"
 
   caqa:neg-ca-add \
     --name rootca2 \
     --permission all \
-    --sn-bitlen 63  \
+    --sn-bitlen 127  \
     --next-crl-no 2 \
     --max-validity 10y \
     --signer-type $TOKEN_TYPE \
@@ -406,7 +424,7 @@ if { $printUsage equals "true" } then {
   caqa:neg-ca-add \
     --name rootca2 \
     --permission all \
-    --sn-bitlen 63  \
+    --sn-bitlen 127  \
     --next-crl-no 2 \
     --max-validity 10y \
     --signer-type $TOKEN_TYPE \
@@ -426,7 +444,7 @@ if { $printUsage equals "true" } then {
   caqa:neg-ca-add \
     --name rootca2 \
     --permission all \
-    --sn-bitlen 63  \
+    --sn-bitlen 127  \
     --next-crl-no 2 \
     --max-validity 10y \
     --signer-type $TOKEN_TYPE \
