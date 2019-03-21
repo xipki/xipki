@@ -504,6 +504,18 @@ public class ObjectIdentifiers {
      */
     public static final ASN1ObjectIdentifier id_kp_timeStamping = id_kp.branch("8");
 
+    private static final ASN1ObjectIdentifier id_appleExtendedKeyUsage =
+        new ASN1ObjectIdentifier("1.2.840.113635.100.4");
+
+    public static final ASN1ObjectIdentifier id_kp_appleSafariExtensionSigning =
+        id_appleExtendedKeyUsage.branch("8");
+
+    public static final ASN1ObjectIdentifier id_kp_macInstallerPackageSigning =
+        id_appleExtendedKeyUsage.branch("9");
+
+    public static final ASN1ObjectIdentifier id_kp_macAppStoreInstallerPackageSigning =
+        id_appleExtendedKeyUsage.branch("10");
+
   }
 
   public static final class Extn {
@@ -711,6 +723,11 @@ public class ObjectIdentifiers {
     oidNameMap.put(XKU.id_kp_sshClient, "SSH Client");
     oidNameMap.put(XKU.id_kp_sshServer, "SSH Server");
     oidNameMap.put(XKU.id_kp_timeStamping, "TimeStamping");
+
+    oidNameMap.put(XKU.id_kp_appleSafariExtensionSigning, "Apple Safari Extension Signing");
+    oidNameMap.put(XKU.id_kp_macInstallerPackageSigning, "Apple Mac Installer Package Signing");
+    oidNameMap.put(XKU.id_kp_macAppStoreInstallerPackageSigning,
+        "Apple Mac AppStore Installer Package Signing");
 
   }
 
