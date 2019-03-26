@@ -121,8 +121,6 @@ public class Validity implements Comparable<Validity> {
 
   public Date add(Date referenceDate) {
     switch (unit) {
-      case DAY:
-        return new Date(referenceDate.getTime() + validity * DAY);
       case YEAR:
         Calendar cal = Calendar.getInstance(TIMEZONE_UTC);
         cal.setTime(referenceDate);
@@ -139,6 +137,8 @@ public class Validity implements Comparable<Validity> {
         }
 
         return cal.getTime();
+      case DAY:
+        return new Date(referenceDate.getTime() + validity * DAY);
       case HOUR:
         return new Date(referenceDate.getTime() + validity * HOUR);
       case MINUTE:
@@ -151,12 +151,14 @@ public class Validity implements Comparable<Validity> {
 
   private int approxMinutes() {
     switch (unit) {
-      case HOUR:
-        return 60 * validity;
-      case DAY:
-        return 24 * 60 * validity;
       case YEAR:
         return (365 * 24 * validity + 6 * validity) * 60;
+      case DAY:
+        return 24 * 60 * validity;
+      case HOUR:
+        return 60 * validity;
+      case MINUTE:
+        return validity;
       default:
         throw new IllegalStateException(String.format(
             "should not reach here, unknown Validity.Unit %s", unit));
@@ -203,12 +205,14 @@ public class Validity implements Comparable<Validity> {
   @Override
   public String toString() {
     switch (unit) {
-      case HOUR:
-        return validity + "h";
-      case DAY:
-        return validity + "d";
       case YEAR:
         return validity + "y";
+      case DAY:
+        return validity + "d";
+      case HOUR:
+        return validity + "h";
+      case MINUTE:
+        return validity + "m";
       default:
         throw new IllegalStateException(String.format(
             "should not reach here, unknown Validity.Unit %s", unit));
