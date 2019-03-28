@@ -228,7 +228,7 @@ xi:update-cert-p12 --p12 output/ee-complex1.p12 --password 1234 \
   --ca-cert output/subca1.crt \
   --ca-cert output/rootca1.crt
 
-# Certificate ee-complex1 with complex subject (not parsable in openssl due to complex subject)
+# Certificate ee-complex2 with complex subject (not parsable in openssl due to complex subject)
 
 xi:csr-p12-complex --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --subject "CN=ee-complex2,O=xipki,C=DE" \
@@ -251,6 +251,55 @@ xi:update-cert-p12 --p12 output/ee-complex2.p12 --password 1234 \
   --cert output/ee-complex2.crt \
   --ca-cert output/subca1.crt \
   --ca-cert output/rootca1.crt
+
+# Certificates constant-ext1, constant-ext-implicit-tag1 and constant-ext-explicit-tag1
+
+list = [ constant-ext constant-ext-implicit-tag constant-ext-explicit-tag ]
+
+each ($list) {
+  certname = $it
+
+  xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+    --subject "CN=${certname}1,O=xipki,C=DE" \
+    --p12 output/${certname}1.p12 --password 1234 \
+    --outform $OUTFORM \
+    --out output/${certname}1.csr
+
+  xi:cmp-csr-enroll --csr output/${certname}1.csr \
+    --outform $OUTFORM \
+    --out output/${certname}1.crt \
+    --profile ${certname}
+
+  xi:update-cert-p12 --p12 output/${certname}1.p12 --password 1234 \
+    --cert output/${certname}1.crt \
+    --ca-cert output/subca1.crt \
+    --ca-cert output/rootca1.crt
+}
+
+# Certificates syntax-ext1, syntax-ext-implicit-tag1 and syntax-ext-explicit-tag1
+
+list = [ syntax-ext syntax-ext-implicit-tag syntax-ext-explicit-tag ]
+
+each ($list) {
+  certname = $it
+
+  xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+    --subject "CN=${certname}1,O=xipki,C=DE" \
+    --p12 output/${certname}1.p12 --password 1234 \
+    --outform $OUTFORM \
+    --out output/${certname}1.csr \
+    --extra-extensions-file xipki/qa/extensions/extensions-${certname}.json
+
+  xi:cmp-csr-enroll --csr output/${certname}1.csr \
+    --outform $OUTFORM \
+    --out output/${certname}1.crt \
+    --profile ${certname}
+
+  xi:update-cert-p12 --p12 output/${certname}1.p12 --password 1234 \
+    --cert output/${certname}1.crt \
+    --ca-cert output/subca1.crt \
+    --ca-cert output/rootca1.crt
+}
 
 # Certificate smime1
 

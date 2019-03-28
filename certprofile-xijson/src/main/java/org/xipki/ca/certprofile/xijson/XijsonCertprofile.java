@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.Vector;
-import java.util.regex.Pattern;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -78,10 +77,12 @@ import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.KeyParametersOption;
 import org.xipki.ca.api.profile.KeypairGenControl;
+import org.xipki.ca.api.profile.Patterns;
 import org.xipki.ca.api.profile.Range;
 import org.xipki.ca.api.profile.SubjectDnSpec;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableInt;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
+import org.xipki.ca.certprofile.xijson.conf.ExtensionSyntaxChecker;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.AdditionalInformation;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.AdmissionSyntax;
@@ -92,6 +93,7 @@ import org.xipki.ca.certprofile.xijson.conf.ExtensionType.BasicConstraints;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.BiometricInfo;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.CertificatePolicies;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.ExtendedKeyUsage;
+import org.xipki.ca.certprofile.xijson.conf.ExtensionType.ExtnSyntax;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.InhibitAnyPolicy;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.KeyUsage;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.NameConstraints;
@@ -162,6 +164,8 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   private ExtensionValue certificatePolicies;
 
+  private Map<ASN1ObjectIdentifier, ExtnSyntax> extensionsWithSyntax;
+
   private Map<ASN1ObjectIdentifier, ExtensionValue> constantExtensions;
 
   private Set<ExtKeyUsageControl> extendedKeyusages;
@@ -230,6 +234,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     certLevel = null;
     keypairGenControl = null;
     certificatePolicies = null;
+    extensionsWithSyntax = null;
     constantExtensions = null;
     extendedKeyusages = null;
     extensionControls = null;
@@ -282,6 +287,10 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   } // method initialize
 
+  public Map<ASN1ObjectIdentifier, ExtnSyntax> getExtensionsWithSyntax() {
+    return extensionsWithSyntax;
+  }
+
   public void initialize(X509ProfileType conf) throws CertprofileException {
     Args.notNull(conf, "conf");
 
@@ -289,6 +298,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     try {
       initialize0(conf);
     } catch (RuntimeException ex) {
+      ex.printStackTrace(); //TODO
       LogUtil.error(LOG, ex);
       throw new CertprofileException(
           "caught RuntimeException while initializing certprofile: " + ex.getMessage());
@@ -433,19 +443,16 @@ public class XijsonCertprofile extends BaseCertprofile {
           ? new Range(rdn.getMinLen(), rdn.getMaxLen()) :  null;
 
       ValueType value = rdn.getValue();
-      RdnControl rdnControl;
-      if (value == null) {
-        rdnControl = new RdnControl(type, rdn.getMinOccurs(), rdn.getMaxOccurs());
-      } else {
-        rdnControl = new RdnControl(type, value.getText(), value.isOverridable());
-      }
+      RdnControl rdnControl = (value == null)
+        ? new RdnControl(type, rdn.getMinOccurs(), rdn.getMaxOccurs())
+        : new RdnControl(type, value.getText(), value.isOverridable());
 
       subjectDnControls.add(rdnControl);
 
       rdnControl.setStringType(rdn.getStringType());
       rdnControl.setStringLengthRange(range);
       if (rdn.getRegex() != null) {
-        rdnControl.setPattern(Pattern.compile(rdn.getRegex()));
+        rdnControl.setPattern(Patterns.compile(rdn.getRegex()));
       }
       rdnControl.setPrefix(rdn.getPrefix());
       rdnControl.setSuffix(rdn.getSuffix());
@@ -539,6 +546,12 @@ public class XijsonCertprofile extends BaseCertprofile {
     this.constantExtensions = conf.buildConstantExtesions();
     if (this.constantExtensions != null) {
       extnIds.removeAll(this.constantExtensions.keySet());
+    }
+
+    // extensions with syntax
+    this.extensionsWithSyntax = conf.buildExtesionsWithSyntax();
+    if (this.extensionsWithSyntax != null) {
+      extnIds.removeAll(this.extensionsWithSyntax.keySet());
     }
 
     // validate the configuration
@@ -1292,7 +1305,7 @@ public class XijsonCertprofile extends BaseCertprofile {
         if (ObjectIdentifiers.DN.dateOfBirth.equals(attrType)) {
           if (dateOfBirth != null) {
             String timeStirng = dateOfBirth.getTimeString();
-            if (!SubjectDnSpec.PATTERN_DATE_OF_BIRTH.matcher(timeStirng).matches()) {
+            if (!Patterns.DATE_OF_BIRTH.matcher(timeStirng).matches()) {
               throw new BadCertTemplateException("invalid dateOfBirth " + timeStirng);
             }
             attrs.add(new Attribute(attrType, new DERSet(dateOfBirth)));
@@ -1667,6 +1680,25 @@ public class XijsonCertprofile extends BaseCertprofile {
         if (extensionValue != null) {
           values.addExtension(m, extensionValue);
         }
+      }
+    }
+
+    // extensions with syntax
+    if (extensionsWithSyntax != null) {
+      for (ASN1ObjectIdentifier m : extensionsWithSyntax.keySet()) {
+        if (!occurences.remove(m)) {
+          continue;
+        }
+
+        String extnName = "extension " + ObjectIdentifiers.oidToDisplayName(m);
+        Extension extension = (requestedExtensions == null) ? null
+            : requestedExtensions.getExtension(m);
+        if (extension == null) {
+          throw new BadCertTemplateException("no " + extnName + " is contained in the request");
+        }
+
+        ASN1Encodable reqExtValue = extension.getParsedValue();
+        ExtensionSyntaxChecker.checkExtension(extnName, reqExtValue, extensionsWithSyntax.get(m));
       }
     }
 

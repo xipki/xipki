@@ -5,7 +5,7 @@
 	},
 	"version":"v3",
 	"certLevel":"EndEntity",
-	"maxSize":5000,
+	"maxSize":3000,
 	"validity":"5y",
 	"notBeforeTime":"current",
 	"serialNumberInReq":false,
@@ -122,7 +122,7 @@
 				"oid":"2.5.4.5",
 				"description":"serialNumber"
 			},
-			"regex":"[\\d]{1,}",
+			"regex":":NUMBER",
 			"minOccurs":0,
 			"maxOccurs":1
 		},{

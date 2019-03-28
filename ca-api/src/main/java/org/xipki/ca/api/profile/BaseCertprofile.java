@@ -453,7 +453,7 @@ public abstract class BaseCertprofile extends Certprofile {
       throw new BadCertTemplateException("Value of RDN dateOfBirth has incorrect syntax");
     }
 
-    if (!SubjectDnSpec.PATTERN_DATE_OF_BIRTH.matcher(text).matches()) {
+    if (!Patterns.DATE_OF_BIRTH.matcher(text).matches()) {
       throw new BadCertTemplateException(
           "Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
     }

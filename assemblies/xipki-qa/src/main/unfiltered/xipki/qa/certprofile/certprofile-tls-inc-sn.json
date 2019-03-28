@@ -5,7 +5,7 @@
 	},
 	"version":"v3",
 	"certLevel":"EndEntity",
-	"maxSize":5000,
+	"maxSize":3000,
 	"validity":"5y",
 	"notBeforeTime":"current",
 	"serialNumberInReq":false,
@@ -115,7 +115,7 @@
 				"oid":"2.5.4.5",
 				"description":"serialNumber"
 			},
-			"regex":"[\\d]{1,}",
+			"regex":":NUMBER",
 			"minOccurs":0,
 			"maxOccurs":1
 		},{
@@ -123,12 +123,18 @@
 				"oid":"2.5.4.3",
 				"description":"cn"
 			},
-			"regex":"(?=^.{1,254}$)(^(?:(?!\\d+\\.|-)[a-zA-Z0-9_\\-]{1,63}(?<!-)\\.?)+(?:[a-zA-Z]{2,})$)",
+			"regex":":FQDN",
 			"minOccurs":1,
 			"maxOccurs":1
 		}]
 	},
-	"subjectToSubjectAltNames":[],
+	"subjectToSubjectAltNames":[{
+		"source":{
+			"oid":"2.5.4.3",
+			"description":"cn"
+		},
+		"target":"DNSName"
+	}],
 	"extensions":[{
 		"type":{
 			"oid":"2.5.29.14",
@@ -153,6 +159,17 @@
 		"critical":false,
 		"required":false,
 		"permittedInRequest":false
+	},{
+		"type":{
+			"oid":"2.5.29.17",
+			"description":"subjectAlternativeName"
+		},
+		"critical":false,
+		"required":true,
+		"permittedInRequest":true,
+		"subjectAltName":{
+			"modes":["DNSName","IPAddress"]
+		}
 	},{
 		"type":{
 			"oid":"2.5.29.19",
@@ -221,6 +238,23 @@
 				"required":false,
 				"oid":"1.3.6.1.5.5.7.3.2",
 				"description":"TLS WWW client authentication"
+			}]
+		}
+	},{
+		"type":{
+			"oid":"1.3.6.1.5.5.7.1.24",
+			"description":"tlsFeature"
+		},
+		"critical":true,
+		"required":true,
+		"permittedInRequest":false,
+		"tlsFeature":{
+			"features":[{
+				"value":2,
+				"description":"client_certificate_url"
+			},{
+				"value":5,
+				"description":"status_request"
 			}]
 		}
 	}]

@@ -40,6 +40,7 @@ import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.KeyParametersOption;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
+import org.xipki.ca.certprofile.xijson.conf.ExtensionType.ExtnSyntax;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
@@ -358,7 +359,12 @@ public class X509ProfileType extends ValidatableConf {
         continue;
       }
 
-      ASN1Encodable value = m.getConstant().toASN1Encodable();
+      ASN1Encodable value;
+      try {
+        value = m.getConstant().toASN1Encodable();
+      } catch (InvalidConfException ex) {
+        throw new CertprofileException(ex.getMessage(), ex);
+      }
       ExtensionValue extension = new ExtensionValue(m.isCritical(), value);
       map.put(oid, extension);
     }
@@ -370,6 +376,32 @@ public class X509ProfileType extends ValidatableConf {
     return Collections.unmodifiableMap(map);
   } // buildConstantExtesions
 
+  public Map<ASN1ObjectIdentifier, ExtnSyntax> buildExtesionsWithSyntax()
+      throws CertprofileException {
+    Map<ASN1ObjectIdentifier, ExtnSyntax> map = new HashMap<>();
+
+    for (ExtensionType m : getExtensions()) {
+      ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getType().getOid());
+      if (Extension.subjectAlternativeName.equals(oid)
+          || Extension.subjectInfoAccess.equals(oid)
+          || Extension.biometricInfo.equals(oid)) {
+        continue;
+      }
+
+      if (m.getSyntax() == null) {
+        continue;
+      }
+
+      map.put(oid, m.getSyntax());
+    }
+
+    if (CollectionUtil.isEmpty(map)) {
+      return null;
+    }
+
+    return Collections.unmodifiableMap(map);
+  } // buildExtesionsWithSyntax
+
   public Map<ASN1ObjectIdentifier, ExtensionControl> buildExtensionControls()
       throws CertprofileException {
     // Extension controls
@@ -380,8 +412,17 @@ public class X509ProfileType extends ValidatableConf {
         throw new CertprofileException("duplicated definition of extension " + oid.getId());
       }
 
+      boolean permittedInReq = extn.isPermittedInRequest();
+      if (permittedInReq && extn.getConstant() != null) {
+        throw new CertprofileException("constant Extension is not permitted in request");
+      }
+
+      if (!permittedInReq && extn.getSyntax() != null) {
+        throw new CertprofileException("Extension with syntax must be permitted in request");
+      }
+
       ExtensionControl ctrl = new ExtensionControl(extn.isCritical(), extn.isRequired(),
-          extn.isPermittedInRequest());
+          permittedInReq);
       controls.put(oid, ctrl);
     }
 

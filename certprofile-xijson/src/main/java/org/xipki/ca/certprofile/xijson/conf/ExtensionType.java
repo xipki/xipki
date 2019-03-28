@@ -25,28 +25,15 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
-import org.bouncycastle.asn1.ASN1Boolean;
-import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Enumerated;
-import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1StreamParser;
-import org.bouncycastle.asn1.ASN1UTCTime;
-import org.bouncycastle.asn1.DERBMPString;
-import org.bouncycastle.asn1.DERBitString;
-import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERT61String;
 import org.bouncycastle.asn1.DERTaggedObject;
-import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.isismtt.x509.NamingAuthority;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.DirectoryString;
@@ -60,6 +47,7 @@ import org.bouncycastle.asn1.x509.UserNotice;
 import org.xipki.ca.api.profile.Certprofile.ExtKeyUsageControl;
 import org.xipki.ca.api.profile.Certprofile.KeyUsageControl;
 import org.xipki.ca.api.profile.CertprofileException;
+import org.xipki.ca.api.profile.Patterns;
 import org.xipki.ca.certprofile.xijson.AdmissionSyntaxOption;
 import org.xipki.ca.certprofile.xijson.AdmissionsOption;
 import org.xipki.ca.certprofile.xijson.CertificatePolicyInformation;
@@ -72,9 +60,11 @@ import org.xipki.ca.certprofile.xijson.conf.CertificatePolicyInformationType.Pol
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableBinary;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableInt;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
+import org.xipki.security.X509ExtensionType.ConstantExtnValue;
+import org.xipki.security.X509ExtensionType.FieldType;
+import org.xipki.security.X509ExtensionType.Tag;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
-import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.StringUtil;
@@ -190,6 +180,12 @@ public class ExtensionType extends ValidatableConf {
 
   @JSONField(ordinal = 5)
   private Object custom;
+
+  /**
+   * For extension with syntax.
+   */
+  @JSONField(ordinal = 5)
+  private ExtnSyntax syntax;
 
   public DescribableOid getType() {
     return type;
@@ -423,6 +419,14 @@ public class ExtensionType extends ValidatableConf {
     this.custom = custom;
   }
 
+  public ExtnSyntax getSyntax() {
+    return syntax;
+  }
+
+  public void setSyntax(ExtnSyntax syntax) {
+    this.syntax = syntax;
+  }
+
   @Override
   public void validate() throws InvalidConfException {
     notNull(type, "type");
@@ -451,6 +455,7 @@ public class ExtensionType extends ValidatableConf {
     validate(subjectInfoAccess);
     validate(tlsFeature);
     validate(validityModel);
+    validate(syntax);
   }
 
   public static class AdditionalInformation extends ValidatableConf {
@@ -915,158 +920,6 @@ public class ExtensionType extends ValidatableConf {
 
   } // class CertificatePolicies
 
-  public static class ConstantExtnValue extends Describable {
-
-    public static enum Type {
-      TeletexString("TeletexString"),
-      PrintableString("PrintableString"),
-      UTF8String("UTF8String"),
-      BMPString("BMPString"),
-      IA5String("IA5String"),
-      NULL("NULL"),
-      INTEGER("INTEGER"),
-      ENUMERATED("ENUMERATED"),
-      GeneralizedTime("GeneralizedTime"),
-      UTCTime("UTCTime"),
-      BOOLEAN("BOOLEAN"),
-      BIT_STRING("BIT STRING"),
-      OCTET_STRING("OCTET STRING"),
-      OID("OID"),
-      raw("raw");
-
-      private final String text;
-
-      private Type(String text) {
-        this.text = text;
-      }
-
-      public String getText() {
-        return text;
-      }
-    }
-
-    @JSONField(ordinal = 1)
-    private Type type;
-
-    @JSONField(ordinal = 2)
-    private String value;
-
-    @JSONField(name = "type")
-    public String getTypeText() {
-      return type.getText();
-    }
-
-    // for the JSON deserializer
-    @SuppressWarnings("unused")
-    private ConstantExtnValue() {
-    }
-
-    public ConstantExtnValue(Type type, String value) {
-      this.type = Args.notNull(type, "type");
-      this.value = value;
-    }
-
-    @JSONField(name = "type")
-    public void setTypeText(String text) {
-      if (text == null) {
-        this.type = null;
-      } else {
-        this.type = null;
-        for (Type m : Type.values()) {
-          if (m.name().equalsIgnoreCase(text) || m.text.equalsIgnoreCase(text)) {
-            this.type = m;
-          }
-        }
-
-        if (type == null) {
-          throw new IllegalArgumentException("invalid type " + type);
-        }
-      }
-    }
-
-    public String getValue() {
-      return value;
-    }
-
-    public void setValue(String value) {
-      this.value = value;
-    }
-
-    public ASN1Encodable toASN1Encodable() throws CertprofileException {
-      ASN1Encodable rv;
-
-      switch (type) {
-        case BIT_STRING:
-          rv = new DERBitString(Base64.decode(value));
-          break;
-        case BOOLEAN:
-          rv = ASN1Boolean.getInstance(Boolean.parseBoolean(value));
-          break;
-        case BMPString:
-          rv = new DERBMPString(value);
-          break;
-        case IA5String:
-          rv = new DERIA5String(value);
-          break;
-        case INTEGER:
-        case ENUMERATED:
-          BigInteger bi = StringUtil.startsWithIgnoreCase(value, "0x")
-              ? new BigInteger(value.substring(2), 16) : new BigInteger(value);
-          rv  = type == Type.INTEGER ? new ASN1Integer(bi) : new ASN1Enumerated(bi);
-          break;
-        case GeneralizedTime:
-          rv = new ASN1GeneralizedTime(value);
-          break;
-        case UTCTime:
-          rv = new ASN1UTCTime(value);
-          break;
-        case NULL:
-          rv = DERNull.INSTANCE;
-          break;
-        case OCTET_STRING:
-          rv = new DEROctetString(Base64.decode(value));
-          break;
-        case OID:
-          rv = new ASN1ObjectIdentifier(value);
-          break;
-        case PrintableString:
-          rv = new DERPrintableString(value);
-          break;
-        case raw:
-          ASN1StreamParser parser = new ASN1StreamParser(Base64.decode(value));
-          try {
-            rv = parser.readObject();
-          } catch (IOException ex) {
-            throw new CertprofileException("could not parse the constant extension value", ex);
-          }
-          break;
-        case TeletexString:
-          rv = new DERT61String(value);
-          break;
-        case UTF8String:
-          rv = new DERUTF8String(value);
-          break;
-        default:
-          throw new RuntimeException("should not reach here, unknown type " + type);
-      }
-
-      return rv;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      notNull(type, "type");
-      if (Type.NULL == type) {
-        if (value != null) {
-          throw new InvalidConfException("value may not be non-null");
-        }
-      } else {
-        notNull(value, "value");
-      }
-    }
-
-  }
-
   public static class ExtendedKeyUsage extends ValidatableConf {
 
     private List<ExtendedKeyUsage.Usage> usages;
@@ -1089,10 +942,10 @@ public class ExtensionType extends ValidatableConf {
     }
 
     public Set<ExtKeyUsageControl> toXiExtKeyUsageOptions() {
-      List<ExtensionType.ExtendedKeyUsage.Usage> usages = getUsages();
+      List<ExtendedKeyUsage.Usage> usages = getUsages();
       Set<ExtKeyUsageControl> controls = new HashSet<>();
 
-      for (ExtensionType.ExtendedKeyUsage.Usage m : usages) {
+      for (ExtendedKeyUsage.Usage m : usages) {
         controls.add(new ExtKeyUsageControl(
                       new ASN1ObjectIdentifier(m.getOid()), m.isRequired()));
       }
@@ -1115,6 +968,156 @@ public class ExtensionType extends ValidatableConf {
     }
 
   } // class ExtendedKeyUsage
+
+  public static class ExtnSyntax extends ValidatableConf {
+
+    @JSONField(ordinal = 1)
+    private FieldType type;
+
+    /**
+     * Will be considered if the type is one of TeletexString, PrintableString, UTF8String and
+     * BMPString.
+     */
+    @JSONField(ordinal = 2)
+    private String stringRegex;
+
+    @JSONField(ordinal = 3)
+    private Tag tag;
+
+    @JSONField(ordinal = 4)
+    private List<SubFieldSyntax> subFields;
+
+    @JSONField(serialize=false, deserialize=false)
+    private Pattern stringPattern;
+
+    @JSONField(name = "type")
+    public String getTypeText() {
+      return type.getText();
+    }
+
+    // for the JSON deserializer
+    private ExtnSyntax() {
+    }
+
+    public ExtnSyntax(FieldType type) {
+      this.type = Args.notNull(type, "type");
+    }
+
+    @JSONField(name = "type")
+    public void setTypeText(String text) {
+      if (text == null) {
+        this.type = null;
+      } else {
+        this.type = null;
+        for (FieldType m : FieldType.values()) {
+          if (m.name().equalsIgnoreCase(text) || m.getText().equalsIgnoreCase(text)) {
+            this.type = m;
+          }
+        }
+
+        if (type == null) {
+          throw new IllegalArgumentException("invalid type " + type);
+        }
+      }
+    }
+
+    public FieldType type() {
+      return type;
+    }
+
+    public Tag getTag() {
+      return tag;
+    }
+
+    public void setTag(Tag tag) {
+      this.tag = tag;
+    }
+
+    public String getStringRegex() {
+      return stringRegex;
+    }
+
+    public void setStringRegex(String stringRegex) {
+      if (StringUtil.isNotBlank(stringRegex)) {
+        this.stringRegex = stringRegex;
+        this.stringPattern = Patterns.compile(stringRegex);
+      } else {
+        this.stringPattern = null;
+        this.stringRegex = null;
+      }
+    }
+
+    public Pattern getStringPattern() {
+      return stringPattern;
+    }
+
+    public List<SubFieldSyntax> getSubFields() {
+      return subFields;
+    }
+
+    public void setSubFields(List<SubFieldSyntax> subFields) {
+      this.subFields = subFields;
+    }
+
+    @Override
+    public void validate() throws InvalidConfException {
+      notNull(type, "type");
+      if (CollectionUtil.isNonEmpty(subFields)) {
+        if (type == FieldType.SEQUENCE || type == FieldType.SET) {
+          for (SubFieldSyntax m : subFields) {
+            m.validate();
+          }
+        } else if (type == FieldType.SEQUENCE_OF || type == FieldType.SET_OF) {
+          // the fields will be considered as the subfields of CHOICE, make sure that
+          // two subfields of same type have different tag
+          Set<String> set = new HashSet<>();
+          for (SubFieldSyntax m : subFields) {
+            int tag = (m.getTag() != null) ? m.getTag().getValue() : -1;
+            if (!set.add(m.type() + "-" + tag)) {
+              throw new InvalidConfException("multiple " + m.type()
+                  + " of the same tag (or no tag) within " + type + " defined");
+            }
+
+            m.validate();
+          }
+        } else {
+          throw new InvalidConfException("unsupported type " + type);
+        }
+      }
+    }
+
+    public static class SubFieldSyntax extends ExtnSyntax {
+
+      private boolean required;
+
+      // for the JSON deserializer
+      @SuppressWarnings("unused")
+      private SubFieldSyntax() {
+      }
+
+      public SubFieldSyntax(FieldType type) {
+        super(type);
+      }
+
+      public boolean isRequired() {
+        return required;
+      }
+
+      public void setRequired(boolean required) {
+        this.required = required;
+      }
+
+      @Override
+      public void validate() throws InvalidConfException {
+        super.validate();
+        if (FieldType.RAW == type()) {
+          throw new InvalidConfException("FieldType RAW is not allowed");
+        }
+      }
+
+    } // SubFieldSyntax
+
+  } // ExtnSyntax
 
   public static class InhibitAnyPolicy extends ValidatableConf {
 

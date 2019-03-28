@@ -68,8 +68,9 @@ import org.xipki.ca.certprofile.xijson.conf.ExtensionType.BasicConstraints;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.BiometricInfo;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.BiometricTypeType;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.CertificatePolicies;
-import org.xipki.ca.certprofile.xijson.conf.ExtensionType.ConstantExtnValue;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.ExtendedKeyUsage;
+import org.xipki.ca.certprofile.xijson.conf.ExtensionType.ExtnSyntax;
+import org.xipki.ca.certprofile.xijson.conf.ExtensionType.ExtnSyntax.SubFieldSyntax;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.InhibitAnyPolicy;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.NameConstraints;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.NamingAuthorityType;
@@ -109,6 +110,9 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.TlsExtensionType;
+import org.xipki.security.X509ExtensionType.ConstantExtnValue;
+import org.xipki.security.X509ExtensionType.FieldType;
+import org.xipki.security.X509ExtensionType.Tag;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
@@ -140,10 +144,9 @@ public class ProfileConfCreatorDemo {
 
   }
 
-  private static final String REGEX_FQDN =
-      "(?=^.{1,254}$)(^(?:(?!\\d+\\.|-)[a-zA-Z0-9_\\-]{1,63}(?<!-)\\.?)+(?:[a-zA-Z]{2,})$)";
+  private static final String REGEX_SN = ":NUMBER";
 
-  private static final String REGEX_SN = "[\\d]{1,}";
+  private static final String REGEX_FQDN = ":FQDN";
 
   private static final Set<ASN1ObjectIdentifier> REQUEST_EXTENSIONS;
 
@@ -177,6 +180,12 @@ public class ProfileConfCreatorDemo {
       certprofileMultipleValuedRdn("certprofile-multi-valued-rdn.json");
       certprofileMaxTime("certprofile-max-time.json");
       certprofileFixedPartialSubject("certprofile-fixed-partial-subject.json");
+      certprofileConstantExt("certprofile-constant-ext.json");
+      certprofileConstantExtImplicitTag("certprofile-constant-ext-implicit-tag.json");
+      certprofileConstantExtExplicitTag("certprofile-constant-ext-explicit-tag.json");
+      certprofileSyntaxExt("certprofile-syntax-ext.json");
+      certprofileSyntaxExtImplicitTag("certprofile-syntax-ext-implicit-tag.json");
+      certprofileSyntaxExtExplicitTag("certprofile-syntax-ext-explicit-tag.json");
       certprofileExtended("certprofile-extended.json");
     } catch (Exception ex) {
       ex.printStackTrace();
@@ -189,7 +198,8 @@ public class ProfileConfCreatorDemo {
       IoUtil.mkdirsParent(path);
       try (OutputStream out = Files.newOutputStream(path)) {
         JSON.writeJSONString(out, profile,
-            SerializerFeature.PrettyFormat, SerializerFeature.SortField);
+            SerializerFeature.PrettyFormat, SerializerFeature.SortField,
+            SerializerFeature.DisableCircularReferenceDetect);
       }
 
       if (validate) {
@@ -408,84 +418,214 @@ public class ProfileConfCreatorDemo {
     accessLocation.addTags(GeneralNameTag.directoryName,
         GeneralNameTag.uniformResourceIdentifier);
 
-    // Custom Extension
-    list.add(createExtension(
-        new ASN1ObjectIdentifier("1.2.3.4.1"), true, false, "custom extension BIT STRING"));
-    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.BIT_STRING,
-        Base64.encodeToString(new byte[] {1, 2}), null));
-
-    list.add(createExtension(
-        new ASN1ObjectIdentifier("1.2.3.4.2"), true, false, "custom extension BMPSTRING"));
-    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.BMPString,
-        "A BMP string", null));
-
-    list.add(createExtension(
-        new ASN1ObjectIdentifier("1.2.3.4.3"), true, false, "custom extension BOOLEAN"));
-    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.BOOLEAN,
-        Boolean.TRUE.toString(), null));
-
-    list.add(createExtension(
-        new ASN1ObjectIdentifier("1.2.3.4.4"), true, false, "custom extension IA5String"));
-    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.IA5String,
-        "An IA5 string", null));
-
-    list.add(createExtension(
-        new ASN1ObjectIdentifier("1.2.3.4.5"), true, false, "custom extension INTEGER"));
-    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.INTEGER,
-        "10", null));
-
-    list.add(createExtension(
-        new ASN1ObjectIdentifier("1.2.3.4.6"), true, false, "custom extension NULL"));
-    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.NULL,
-        null, null));
-
-    list.add(createExtension(
-        new ASN1ObjectIdentifier("1.2.3.4.7"), true, false, "custom extension OCTET STRING"));
-    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.OCTET_STRING,
-        Base64.encodeToString(new byte[] {3, 4}), null));
-
-    list.add(createExtension(
-        new ASN1ObjectIdentifier("1.2.3.4.8"), true, false, "custom extension OID"));
-    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.OID,
-        "2.3.4.5", null));
-
-    list.add(createExtension(
-        new ASN1ObjectIdentifier("1.2.3.4.9"), true, false, "custom extension PrintableString"));
-    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.PrintableString,
-        "A printable string", null));
-
-    list.add(createExtension(
-        new ASN1ObjectIdentifier("1.2.3.4.10"), true, false, "custom extension raw"));
-    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.raw,
-        Base64.encodeToString(DERNull.INSTANCE.getEncoded()), "DER NULL"));
-
-    list.add(createExtension(
-        new ASN1ObjectIdentifier("1.2.3.4.11"), true, false, "custom extension TeletexString"));
-    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.TeletexString,
-        "A teletax string", null));
-
-    list.add(createExtension(
-        new ASN1ObjectIdentifier("1.2.3.4.12"), true, false, "custom extension UTF8String"));
-    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.UTF8String,
-        "A UTF8 string", null));
-
-    list.add(createExtension(
-        new ASN1ObjectIdentifier("1.2.3.4.13"), true, false, "custom extension ENUMERATED"));
-    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.ENUMERATED,
-        "2", null));
-
-    list.add(createExtension(
-        new ASN1ObjectIdentifier("1.2.3.4.14"), true, false, "custom extension GeneralizedTime"));
-    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.GeneralizedTime,
-        new ASN1GeneralizedTime("20180314130102Z").getTimeString(), null));
-
-    list.add(createExtension(
-        new ASN1ObjectIdentifier("1.2.3.4.15"), true, false, "custom extension UTCTIME"));
-    last(list).setConstant(createConstantExtValue(ConstantExtnValue.Type.UTCTime,
-        "190314130102Z", null));
-
     marshall(profile, destFilename, true);
   } // method certprofileSubCaComplex
+
+  private static List<ConstantExtnValue> createConstantSequenceOrSet() {
+    /*
+     *  1. SEQUENCE or SET {
+     *  2.       UTF8String abc.def.myBlog EXPLICIT
+     *  3.       SEQUENCE
+     *  4.         UTF8String :app
+     *  5.   [0] UTF8String abc.def.myBlog.voip EXPLICIT
+     *  6.   [1] SEQUENCE EXPLICIT
+     *  7.         UTF8String :voip
+     *  8.   [2] UTF8String abc.def.myBlog.complication IMPLICIT
+     *  9.   [3] SEQUENCE IMPLICIT
+     * 10.         UTF8String :complication
+     * 11. }
+     */
+    List<ConstantExtnValue> subFields = new LinkedList<>();
+    // Line 2
+    ConstantExtnValue subField = new ConstantExtnValue(FieldType.UTF8String);
+    subFields.add(subField);
+    subField.setValue("abc.def.myBlog");
+
+    // Line 3-4
+    subField = new ConstantExtnValue(FieldType.SEQUENCE);
+    subFields.add(subField);
+    ConstantExtnValue subsubField = new ConstantExtnValue(FieldType.UTF8String);
+    subsubField.setValue(":app");
+    subField.setListValue(Arrays.asList(subsubField));
+
+    // Line 5
+    subField = new ConstantExtnValue(FieldType.UTF8String);
+    subFields.add(subField);
+    subField.setTag(new Tag(0, true));
+    subField.setValue("abc.def.myBlog.voip");
+
+    // Line 6-7
+    subField = new ConstantExtnValue(FieldType.SEQUENCE);
+    subFields.add(subField);
+    subField.setTag(new Tag(1, true));
+    subsubField = new ConstantExtnValue(FieldType.UTF8String);
+    subsubField.setValue(":void");
+    subField.setListValue(Arrays.asList(subsubField));
+
+    // Line 8
+    subField = new ConstantExtnValue(FieldType.UTF8String);
+    subFields.add(subField);
+    subField.setTag(new Tag(2, false));
+    subField.setValue("abc.def.myBlog.complication");
+
+    // Line 9-10
+    subField = new ConstantExtnValue(FieldType.SEQUENCE);
+    subFields.add(subField);
+    subField.setTag(new Tag(9, false));
+    subsubField = new ConstantExtnValue(FieldType.UTF8String);
+    subsubField.setValue(":complication");
+    subField.setListValue(Arrays.asList(subsubField));
+
+    return subFields;
+  }
+
+  private static List<SubFieldSyntax> createSyntaxSequenceOrSet() {
+    /*
+     *  1. SEQUENCE or SET {
+     *  2.       UTF8String # abc.def.myBlog EXPLICIT
+     *  3.       SEQUENCE
+     *  4.         UTF8String  # :app
+     *  5.   [0] UTF8String  # abc.def.myBlog.voip EXPLICIT
+     *  6.   [1] SEQUENCE EXPLICIT
+     *  7.         UTF8String  # :voip
+     *  8.   [2] UTF8String  # abc.def.myBlog.complication IMPLICIT
+     *  9.   [3] SEQUENCE IMPLICIT
+     * 10.         UTF8String  # :complication
+     * 11. }
+     */
+    List<SubFieldSyntax> subFields = new LinkedList<>();
+    // Line 2
+    SubFieldSyntax subField = new SubFieldSyntax(FieldType.UTF8String);
+    subFields.add(subField);
+
+    // Line 3-4
+    subField = new SubFieldSyntax(FieldType.SEQUENCE);
+    subFields.add(subField);
+    SubFieldSyntax subsubField = new SubFieldSyntax(FieldType.UTF8String);
+    subField.setSubFields(Arrays.asList(subsubField));
+
+    // Line 5
+    subField = new SubFieldSyntax(FieldType.UTF8String);
+    subFields.add(subField);
+    subField.setTag(new Tag(0, true));
+
+    // Line 6-7
+    subField = new SubFieldSyntax(FieldType.SEQUENCE);
+    subFields.add(subField);
+    subField.setTag(new Tag(1, true));
+    subsubField = new SubFieldSyntax(FieldType.UTF8String);
+    subField.setSubFields(Arrays.asList(subsubField));
+
+    // Line 8
+    subField = new SubFieldSyntax(FieldType.UTF8String);
+    subFields.add(subField);
+    subField.setTag(new Tag(2, false));
+
+    // Line 9-10
+    subField = new SubFieldSyntax(FieldType.SEQUENCE);
+    subFields.add(subField);
+    subField.setTag(new Tag(9, false));
+    subsubField = new SubFieldSyntax(FieldType.UTF8String);
+    subField.setSubFields(Arrays.asList(subsubField));
+
+    return subFields;
+  }
+
+  private static List<ConstantExtnValue> createConstantSequenceOfOrSetOf() {
+    /*
+     *  1. SEQUENCE or SET {
+     *  3.   SEQUENCE
+     *  3.     UTF8String abc.def.myBlog
+     *  4.     UTF8String :app
+     *  5.   SEQUENCE
+     *  6.       UTF8String abc.def.myBlog.voip
+     *  7.       UTF8String :voip
+     *  8.   SEQUENCE
+     *  9.     UTF8String abc.def.myBlog.complication
+     * 10.     UTF8String :complication
+     * 11. }
+     */
+    List<ConstantExtnValue> subFields = new LinkedList<>();
+
+    // Line 2-4
+    {
+      ConstantExtnValue subField = new ConstantExtnValue(FieldType.SEQUENCE);
+      subFields.add(subField);
+
+      List<ConstantExtnValue> subsubFields = new LinkedList<>();
+      subField.setListValue(subsubFields);
+
+      ConstantExtnValue subsubField = new ConstantExtnValue(FieldType.UTF8String);
+      subsubField.setValue("abc.def.myBlog");
+      subsubFields.add(subsubField);
+
+      subsubField = new ConstantExtnValue(FieldType.UTF8String);
+      subsubField.setValue(":app");
+      subsubFields.add(subsubField);
+    }
+
+    // Line 5-7
+    {
+      ConstantExtnValue subField = new ConstantExtnValue(FieldType.SEQUENCE);
+      subFields.add(subField);
+
+      List<ConstantExtnValue> subsubFields = new LinkedList<>();
+      subField.setListValue(subsubFields);
+
+      ConstantExtnValue subsubField = new ConstantExtnValue(FieldType.UTF8String);
+      subsubField.setValue("abc.def.myBlog.voip");
+      subsubFields.add(subsubField);
+
+      subsubField = new ConstantExtnValue(FieldType.UTF8String);
+      subsubField.setValue(":voip");
+      subsubFields.add(subsubField);
+    }
+
+    // Line 5-7
+    {
+      ConstantExtnValue subField = new ConstantExtnValue(FieldType.SEQUENCE);
+      subFields.add(subField);
+
+      List<ConstantExtnValue> subsubFields = new LinkedList<>();
+      subField.setListValue(subsubFields);
+
+      ConstantExtnValue subsubField = new ConstantExtnValue(FieldType.UTF8String);
+      subsubField.setValue("abc.def.myBlog.complication");
+      subsubFields.add(subsubField);
+
+      subsubField = new ConstantExtnValue(FieldType.UTF8String);
+      subsubField.setValue(":complication");
+      subsubFields.add(subsubField);
+    }
+
+    return subFields;
+  }
+
+  private static List<SubFieldSyntax> createSyntaxSequenceOfOrSetOf() {
+    /*
+     *  1. SEQUENCE OF or SET OF{
+     *  3.   SEQUENCE
+     *  3.     UTF8String
+     *  4.     UTF8String
+     *  5. }
+     */
+    List<SubFieldSyntax> subFields = new LinkedList<SubFieldSyntax>();
+
+    // Line 2-4
+    SubFieldSyntax subField = new SubFieldSyntax(FieldType.SEQUENCE);
+    subFields.add(subField);
+
+    List<SubFieldSyntax> subsubFields = new LinkedList<>();
+    subField.setSubFields(subsubFields);
+
+    SubFieldSyntax subsubField = new SubFieldSyntax(FieldType.UTF8String);
+    subsubFields.add(subsubField);
+
+    subsubField = new SubFieldSyntax(FieldType.UTF8String);
+    subsubFields.add(subsubField);
+
+    return subFields;
+  }
 
   private static void certprofileOcsp(String destFilename) throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile ocsp", CertLevel.EndEntity, "5y",
@@ -1074,6 +1214,251 @@ public class ProfileConfCreatorDemo {
     marshall(profile, destFilename, true);
   } // method certprofileEeComplex
 
+  private static void certprofileConstantExt(String destFilename) throws Exception {
+    certprofileConstantExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.1"), null);
+  }
+
+  private static void certprofileConstantExtImplicitTag(String destFilename) throws Exception {
+    certprofileConstantExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.2"), new Tag(1, false));
+  }
+
+  private static void certprofileConstantExtExplicitTag(String destFilename) throws Exception {
+    certprofileConstantExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.3"), new Tag(1, true));
+  }
+
+  private static void certprofileConstantExt(String destFilename, ASN1ObjectIdentifier oidPrefix,
+      Tag tag) throws Exception {
+    X509ProfileType profile = getBaseProfile("certprofile constant-extension", CertLevel.EndEntity,
+        "5y", true, false);
+
+    // Subject
+    Subject subject = profile.getSubject();
+    subject.setKeepRdnOrder(true);
+    List<RdnType> rdnControls = subject.getRdns();
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
+
+    // Extensions
+    // Extensions - general
+    List<ExtensionType> list = profile.getExtensions();
+
+    // Extensions - controls
+    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
+    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
+    list.add(createExtension(Extension.freshestCRL, false, false, null));
+
+    // Extensions - basicConstraints
+    list.add(createExtension(Extension.basicConstraints, true, false));
+
+    // Extensions - AuthorityInfoAccess
+    list.add(createExtension(Extension.authorityInfoAccess, true, false));
+    last(list).setAuthorityInfoAccess(createAuthorityInfoAccess());
+
+    // Extensions - AuthorityKeyIdentifier
+    list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
+    last(list).setAuthorityKeyIdentifier(createAuthorityKeyIdentifier(true));
+
+    // Extensions - keyUsage
+    list.add(createExtension(Extension.keyUsage, true, true));
+    last(list).setKeyUsage(createKeyUsage(
+        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
+            KeyUsage.keyEncipherment},
+        null));
+
+    // Extensions - extenedKeyUsage
+    list.add(createExtension(Extension.extendedKeyUsage, true, false));
+    last(list).setExtendedKeyUsage(createExtendedKeyUsage(
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_serverAuth},
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth}));
+
+    // Custom Constant Extension Value
+    list.addAll(createConstantExtensions(oidPrefix, tag));
+
+    marshall(profile, destFilename, true);
+  } // method certprofileConstantExt
+
+  private static void certprofileSyntaxExt(String destFilename) throws Exception {
+    certprofileSyntaxExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.1"), null);
+  }
+
+  private static void certprofileSyntaxExtImplicitTag(String destFilename) throws Exception {
+    certprofileSyntaxExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.2"), new Tag(1, false));
+  }
+
+  private static void certprofileSyntaxExtExplicitTag(String destFilename) throws Exception {
+    certprofileSyntaxExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.3"), new Tag(1, true));
+  }
+
+  private static void certprofileSyntaxExt(String destFilename,
+      ASN1ObjectIdentifier oidPrefix, Tag tag) throws Exception {
+    X509ProfileType profile = getBaseProfile("certprofile syntax-extension", CertLevel.EndEntity,
+        "5y", true, false);
+
+    // Subject
+    Subject subject = profile.getSubject();
+    subject.setKeepRdnOrder(true);
+    List<RdnType> rdnControls = subject.getRdns();
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
+
+    // Extensions
+    // Extensions - general
+    List<ExtensionType> list = profile.getExtensions();
+
+    // Extensions - controls
+    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
+    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
+    list.add(createExtension(Extension.freshestCRL, false, false, null));
+
+    // Extensions - basicConstraints
+    list.add(createExtension(Extension.basicConstraints, true, false));
+
+    // Extensions - AuthorityInfoAccess
+    list.add(createExtension(Extension.authorityInfoAccess, true, false));
+    last(list).setAuthorityInfoAccess(createAuthorityInfoAccess());
+
+    // Extensions - AuthorityKeyIdentifier
+    list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
+    last(list).setAuthorityKeyIdentifier(createAuthorityKeyIdentifier(true));
+
+    // Extensions - keyUsage
+    list.add(createExtension(Extension.keyUsage, true, true));
+    last(list).setKeyUsage(createKeyUsage(
+        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
+            KeyUsage.keyEncipherment},
+        null));
+
+    // Extensions - extenedKeyUsage
+    list.add(createExtension(Extension.extendedKeyUsage, true, false));
+    last(list).setExtendedKeyUsage(createExtendedKeyUsage(
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_serverAuth},
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth}));
+
+    // Custom extension with syntax
+    list.addAll(createSyntaxExtensions(oidPrefix, tag));
+
+    marshall(profile, destFilename, true);
+  } // method certprofileSyntaxExt
+
+  private static List<ExtensionType> createConstantExtensions(
+      ASN1ObjectIdentifier oidPrefix, Tag tag) throws IOException {
+    List<ExtensionType> list = new LinkedList<>();
+
+    // Custom Constant Extension Value
+    list.add(createConstantExtension(oidPrefix.branch("1"), true, false, tag,
+        FieldType.BIT_STRING, Base64.encodeToString(new byte[] {1, 2})));
+    list.add(createConstantExtension(oidPrefix.branch("2"), true, false, tag,
+        FieldType.BMPString, "A BMP string"));
+    list.add(createConstantExtension(oidPrefix.branch("3"), true, false, tag,
+        FieldType.BOOLEAN, Boolean.TRUE.toString()));
+    list.add(createConstantExtension(oidPrefix.branch("4"), true, false, tag,
+        FieldType.IA5String, "An IA5 string"));
+    list.add(createConstantExtension(oidPrefix.branch("5"), true, false, tag,
+        FieldType.INTEGER, "10"));
+    list.add(createConstantExtension(oidPrefix.branch("6"), true, false, tag,
+        FieldType.NULL, null));
+    list.add(createConstantExtension(oidPrefix.branch("7"), true, false, tag,
+        FieldType.OCTET_STRING, Base64.encodeToString(new byte[] {3, 4})));
+    list.add(createConstantExtension(oidPrefix.branch("8"), true, false, tag,
+        FieldType.OID, "2.3.4.5"));
+    list.add(createConstantExtension(oidPrefix.branch("9"), true, false, tag,
+        FieldType.PrintableString, "A printable string"));
+    list.add(createConstantExtension(oidPrefix.branch("10"), true, false, tag,
+        FieldType.RAW, Base64.encodeToString(DERNull.INSTANCE.getEncoded())));
+    last(list).getConstant().setDescription("DER NULL");
+
+    list.add(createConstantExtension(oidPrefix.branch("11"), true, false, tag,
+        FieldType.TeletexString, "A teletax string"));
+    list.add(createConstantExtension(oidPrefix.branch("12"), true, false, tag,
+        FieldType.UTF8String, "A UTF8 string"));
+    list.add(createConstantExtension(oidPrefix.branch("13"), true, false, tag,
+        FieldType.ENUMERATED, "2"));
+    list.add(createConstantExtension(oidPrefix.branch("14"), true, false, tag,
+        FieldType.GeneralizedTime, new ASN1GeneralizedTime("20180314130102Z").getTimeString()));
+    list.add(createConstantExtension(oidPrefix.branch("15"), true, false, tag,
+        FieldType.UTCTime, "190314130102Z"));
+    list.add(createConstantExtension(oidPrefix.branch("16"), true, false, tag,
+        FieldType.Name, "CN=abc,C=DE"));
+
+    list.add(createConstantExtension(oidPrefix.branch("17"), true, false, tag,
+        FieldType.SEQUENCE, null));
+    last(list).getConstant().setListValue(createConstantSequenceOrSet());
+
+    list.add(createConstantExtension(oidPrefix.branch("18"), true, false, tag,
+        FieldType.SEQUENCE_OF, null));
+    last(list).getConstant().setListValue(createConstantSequenceOfOrSetOf());
+
+    list.add(createConstantExtension(oidPrefix.branch("19"), true, false, tag,
+        FieldType.SET, null));
+    last(list).getConstant().setListValue(createConstantSequenceOrSet());
+
+    list.add(createConstantExtension(oidPrefix.branch("20"), true, false, tag,
+        FieldType.SET_OF, null));
+    last(list).getConstant().setListValue(createConstantSequenceOfOrSetOf());
+
+    return list;
+  }
+
+  private static List<ExtensionType> createSyntaxExtensions(ASN1ObjectIdentifier oidPrefix,
+      Tag tag) {
+    List<ExtensionType> list = new LinkedList<>();
+    // Custom extension with syntax
+    list.add(createSyntaxExtension(oidPrefix.branch("1"), true, false, tag,
+        FieldType.BIT_STRING));
+    list.add(createSyntaxExtension(oidPrefix.branch("2"), true, false, tag,
+        FieldType.BMPString));
+    list.add(createSyntaxExtension(oidPrefix.branch("3"), true, false, tag,
+        FieldType.BOOLEAN));
+    list.add(createSyntaxExtension(oidPrefix.branch("4"), true, false, tag,
+        FieldType.IA5String));
+    list.add(createSyntaxExtension(oidPrefix.branch("5"), true, false, tag,
+        FieldType.INTEGER));
+    list.add(createSyntaxExtension(oidPrefix.branch("6"), true, false, tag,
+        FieldType.NULL));
+    list.add(createSyntaxExtension(oidPrefix.branch("7"), true, false, tag,
+        FieldType.OCTET_STRING));
+    list.add(createSyntaxExtension(oidPrefix.branch("8"), true, false, tag,
+        FieldType.OID));
+    list.add(createSyntaxExtension(oidPrefix.branch("9"), true, false, tag,
+        FieldType.PrintableString));
+    list.add(createSyntaxExtension(oidPrefix.branch("10"), true, false, tag,
+        FieldType.RAW));
+    list.add(createSyntaxExtension(oidPrefix.branch("11"), true, false, tag,
+        FieldType.TeletexString));
+    list.add(createSyntaxExtension(oidPrefix.branch("12"), true, false, tag,
+        FieldType.UTF8String));
+    list.add(createSyntaxExtension(oidPrefix.branch("13"), true, false, tag,
+        FieldType.ENUMERATED));
+    list.add(createSyntaxExtension(oidPrefix.branch("14"), true, false, tag,
+        FieldType.GeneralizedTime));
+    list.add(createSyntaxExtension(oidPrefix.branch("15"), true, false, tag,
+        FieldType.UTCTime));
+    list.add(createSyntaxExtension(oidPrefix.branch("16"), true, false, tag,
+        FieldType.Name));
+
+    list.add(createSyntaxExtension(oidPrefix.branch("17"), true, false, tag,
+        FieldType.SEQUENCE));
+    last(list).getSyntax().setSubFields(createSyntaxSequenceOrSet());
+
+    list.add(createSyntaxExtension(oidPrefix.branch("18"), true, false, tag,
+        FieldType.SEQUENCE_OF));
+    last(list).getSyntax().setSubFields(createSyntaxSequenceOfOrSetOf());
+
+    list.add(createSyntaxExtension(oidPrefix.branch("19"), true, false, tag,
+        FieldType.SET));
+    last(list).getSyntax().setSubFields(createSyntaxSequenceOrSet());
+
+    list.add(createSyntaxExtension(oidPrefix.branch("20"), true, false, tag,
+        FieldType.SET_OF));
+    last(list).getSyntax().setSubFields(createSyntaxSequenceOfOrSetOf());
+
+    return list;
+  }
+
   private static void certprofileMaxTime(String destFilename) throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile max-time", CertLevel.EndEntity,
         "9999y");
@@ -1086,7 +1471,7 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1, REGEX_FQDN, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1, ":FQDN", null, null));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -1165,7 +1550,69 @@ public class ProfileConfCreatorDemo {
         null));
 
     marshall(profile, destFilename, true);
-  } // method certprofileMaxTime
+  } // method certprofileFixedPartialSubject
+
+  /*
+  private static void certprofileAppleWwdr(String destFilename) throws Exception {
+    X509ProfileType profile = getBaseProfile("certprofile apple WWDR",
+        CertLevel.EndEntity, "365d");
+
+    // Subject
+    Subject subject = profile.getSubject();
+
+    List<RdnType> rdnControls = subject.getRdns();
+
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.UID, 1, 1));
+
+    // Extensions
+    List<ExtensionType> list = profile.getExtensions();
+
+    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
+    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
+
+    // Extensions - basicConstraints
+    list.add(createExtension(Extension.basicConstraints, true, true));
+
+    // Extensions - AuthorityKeyIdentifier
+    list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
+    last(list).setAuthorityKeyIdentifier(createAuthorityKeyIdentifier(false));
+
+    // Extensions - keyUsage
+    list.add(createExtension(Extension.keyUsage, true, true));
+    last(list).setKeyUsage(createKeyUsage(
+        new KeyUsage[]{KeyUsage.digitalSignature},
+        null));
+
+    // Extensions - extenedKeyUsage
+    list.add(createExtension(Extension.extendedKeyUsage, true, false));
+    last(list).setExtendedKeyUsage(createExtendedKeyUsage(
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_serverAuth},
+        null));
+
+    // apple custom extension 1.2.840.113635.100.6.3.1
+    list.add(createExtension(new ASN1ObjectIdentifier("1.2.840.113635.100.6.3.1"), true, false));
+    last(list).setConstant(createConstantExtValue(FieldType.NULL, null, null));
+
+    // apple custom extension 1.2.840.113635.100.6.3.2
+    list.add(createExtension(new ASN1ObjectIdentifier("1.2.840.113635.100.6.3.2"), true, false));
+    last(list).setConstant(createConstantExtValue(FieldType.NULL, null, null));
+
+    // apple custom extension 1.2.840.113635.100.6.3.6
+    list.add(createExtension(new ASN1ObjectIdentifier("1.2.840.113635.100.6.3.6"), true, false));
+    ExtnSyntax syntax = new ExtnSyntax(FieldType.SEQUENCE);
+    last(list).setSyntax(syntax);
+    List<SubFieldSyntax> subFields = new LinkedList<SubFieldSyntax>();
+    SubFieldSyntax subFieldSyntax = new SubFieldSyntax(FieldType.UTF8String);
+    subFieldSyntax.setStringRegex(""); // TODO
+    subFields.add(subFieldSyntax);
+
+    marshall(profile, destFilename, true);
+  } // method certprofileAppleWwdr
+  */
 
   private static void certprofileExtended(String destFilename) throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile extended", CertLevel.EndEntity, "5y");
@@ -1178,7 +1625,7 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1, REGEX_FQDN, null, null));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1, ":FQDN", null, null));
 
     // SubjectToSubjectAltName
     List<SubjectToSubjectAltNameType> subjectToSubjectAltNames = new LinkedList<>();
@@ -1322,6 +1769,57 @@ public class ProfileConfCreatorDemo {
     // children
     ret.setType(createOidType(type, description));
     ret.setCritical(critical);
+    return ret;
+  }
+
+  private static ExtensionType createConstantExtension(ASN1ObjectIdentifier type, boolean required,
+      boolean critical, Tag tag, FieldType fieldType, String value) {
+    ExtensionType ret = new ExtensionType();
+    // attributes
+    ret.setRequired(required);
+    ret.setPermittedInRequest(false);
+    // children
+    String desc = "custom constant extension " + fieldType.getText();
+    if (tag != null) {
+      desc += " (" + tag.getValue() + ", " + (tag.isExplicit() ? "EXPLICIT)" : "IMPLICIT)");
+    }
+    ret.setType(createOidType(type, desc));
+    ret.setCritical(critical);
+
+    ConstantExtnValue constantExtn = new ConstantExtnValue(fieldType);
+    ret.setConstant(constantExtn);
+    if (value != null) {
+      constantExtn.setValue(value);
+    }
+
+    if (tag != null) {
+      constantExtn.setTag(tag);
+    }
+
+    return ret;
+  }
+
+  private static ExtensionType createSyntaxExtension(ASN1ObjectIdentifier type, boolean required,
+      boolean critical, Tag tag, FieldType fieldType) {
+    ExtensionType ret = new ExtensionType();
+    // attributes
+    ret.setRequired(required);
+    ret.setPermittedInRequest(true);
+    // children
+    String desc = "custom syntax extension " + fieldType.getText();
+    if (tag != null) {
+      desc += " (" + tag.getValue() + ", " + (tag.isExplicit() ? "EXPLICIT)" : "IMPLICIT)");
+    }
+    ret.setType(createOidType(type, desc));
+    ret.setCritical(critical);
+
+    ExtnSyntax extnSyntax = new ExtnSyntax(fieldType);
+    if (tag != null) {
+      extnSyntax.setTag(tag);
+    }
+
+    ret.setSyntax(extnSyntax);
+
     return ret;
   }
 
@@ -1642,15 +2140,6 @@ public class ProfileConfCreatorDemo {
     return ret;
   }
 
-  private static ConstantExtnValue createConstantExtValue(ConstantExtnValue.Type type,
-      String value, String desc) {
-    ConstantExtnValue extValue = new ConstantExtnValue(type, value);
-    if (StringUtil.isNotBlank(desc)) {
-      extValue.setDescription(desc);
-    }
-    return extValue;
-  }
-
   private static X509ProfileType getBaseProfile(String description, CertLevel certLevel,
       String validity) {
     return getBaseProfile(description, certLevel, validity, false, false);
@@ -1663,7 +2152,7 @@ public class ProfileConfCreatorDemo {
     profile.setMetadata(createDescription(description));
 
     profile.setCertLevel(certLevel);
-    profile.setMaxSize(5000);
+    profile.setMaxSize(3000);
     profile.setVersion(X509CertVersion.v3);
     profile.setValidity(validity);
     profile.setNotBeforeTime(useMidnightNotBefore ? "midnight" : "current");

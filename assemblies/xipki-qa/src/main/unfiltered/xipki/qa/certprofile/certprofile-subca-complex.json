@@ -5,7 +5,7 @@
 	},
 	"version":"v3",
 	"certLevel":"SubCA",
-	"maxSize":5000,
+	"maxSize":3000,
 	"validity":"8y",
 	"notBeforeTime":"current",
 	"serialNumberInReq":false,
@@ -101,7 +101,7 @@
 				"oid":"2.5.4.5",
 				"description":"serialNumber"
 			},
-			"regex":"[\\d]{1,}",
+			"regex":":NUMBER",
 			"minOccurs":0,
 			"maxOccurs":1
 		},{
@@ -309,186 +309,6 @@
 					"modes":["directoryName","uniformResourceIdentifier"]
 				}
 			}]
-		}
-	},{
-		"type":{
-			"oid":"1.2.3.4.1",
-			"description":"custom extension BIT STRING"
-		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false,
-		"constant":{
-			"type":"BIT STRING",
-			"value":"AQI="
-		}
-	},{
-		"type":{
-			"oid":"1.2.3.4.2",
-			"description":"custom extension BMPSTRING"
-		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false,
-		"constant":{
-			"type":"BMPString",
-			"value":"A BMP string"
-		}
-	},{
-		"type":{
-			"oid":"1.2.3.4.3",
-			"description":"custom extension BOOLEAN"
-		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false,
-		"constant":{
-			"type":"BOOLEAN",
-			"value":"true"
-		}
-	},{
-		"type":{
-			"oid":"1.2.3.4.4",
-			"description":"custom extension IA5String"
-		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false,
-		"constant":{
-			"type":"IA5String",
-			"value":"An IA5 string"
-		}
-	},{
-		"type":{
-			"oid":"1.2.3.4.5",
-			"description":"custom extension INTEGER"
-		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false,
-		"constant":{
-			"type":"INTEGER",
-			"value":"10"
-		}
-	},{
-		"type":{
-			"oid":"1.2.3.4.6",
-			"description":"custom extension NULL"
-		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false,
-		"constant":{
-			"type":"NULL"
-		}
-	},{
-		"type":{
-			"oid":"1.2.3.4.7",
-			"description":"custom extension OCTET STRING"
-		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false,
-		"constant":{
-			"type":"OCTET STRING",
-			"value":"AwQ="
-		}
-	},{
-		"type":{
-			"oid":"1.2.3.4.8",
-			"description":"custom extension OID"
-		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false,
-		"constant":{
-			"type":"OID",
-			"value":"2.3.4.5"
-		}
-	},{
-		"type":{
-			"oid":"1.2.3.4.9",
-			"description":"custom extension PrintableString"
-		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false,
-		"constant":{
-			"type":"PrintableString",
-			"value":"A printable string"
-		}
-	},{
-		"type":{
-			"oid":"1.2.3.4.10",
-			"description":"custom extension raw"
-		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false,
-		"constant":{
-			"type":"raw",
-			"description":"DER NULL",
-			"value":"BQA="
-		}
-	},{
-		"type":{
-			"oid":"1.2.3.4.11",
-			"description":"custom extension TeletexString"
-		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false,
-		"constant":{
-			"type":"TeletexString",
-			"value":"A teletax string"
-		}
-	},{
-		"type":{
-			"oid":"1.2.3.4.12",
-			"description":"custom extension UTF8String"
-		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false,
-		"constant":{
-			"type":"UTF8String",
-			"value":"A UTF8 string"
-		}
-	},{
-		"type":{
-			"oid":"1.2.3.4.13",
-			"description":"custom extension ENUMERATED"
-		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false,
-		"constant":{
-			"type":"ENUMERATED",
-			"value":"2"
-		}
-	},{
-		"type":{
-			"oid":"1.2.3.4.14",
-			"description":"custom extension GeneralizedTime"
-		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false,
-		"constant":{
-			"type":"GeneralizedTime",
-			"value":"20180314130102Z"
-		}
-	},{
-		"type":{
-			"oid":"1.2.3.4.15",
-			"description":"custom extension UTCTime"
-		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false,
-		"constant":{
-			"type":"UTCTime",
-			"value":"190314130102Z"
 		}
 	}]
 }

@@ -178,6 +178,8 @@ public class ObjectIdentifiers {
     public static final ASN1ObjectIdentifier uniqueIdentifier
         = new ASN1ObjectIdentifier("2.5.4.45");
 
+    public static final ASN1ObjectIdentifier UID = uniqueIdentifier;
+
     /**
      * businessCategory - DirectoryString(SIZE(1..128)
      */

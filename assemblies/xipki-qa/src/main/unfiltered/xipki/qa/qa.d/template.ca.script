@@ -11,8 +11,10 @@ echo "#################################################################"
 
 ## Certificate Profiles
 
-list = [ cross subca subca-complex ocsp scep multiple-ous \
-  multi-valued-rdn qc ee-complex smime smime-legacy tls tls-c tls-inc-sn max-time fixed-partial-subject]
+list = [ cross subca subca-complex ocsp scep multiple-ous multi-valued-rdn \
+  qc ee-complex smime smime-legacy tls tls-c tls-inc-sn max-time fixed-partial-subject \
+  constant-ext constant-ext-implicit-tag constant-ext-explicit-tag \
+  syntax-ext syntax-ext-implicit-tag syntax-ext-explicit-tag ]
 
 each ($list) {
   ca:profile-add --type xijson --name ${it} \
@@ -337,6 +339,12 @@ ca:caprofile-add \
   --ca subca1 \
   --profile qc \
   --profile ee-complex \
+  --profile constant-ext \
+  --profile constant-ext-implicit-tag \
+  --profile constant-ext-explicit-tag \
+  --profile syntax-ext \
+  --profile syntax-ext-implicit-tag \
+  --profile syntax-ext-explicit-tag \
   --profile smime \
   --profile smime-legacy \
   --profile tls \

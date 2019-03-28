@@ -52,6 +52,8 @@
 		"profiles":[
 			"qc",
 			"ee-complex",
+			"constant-ext", "constant-ext-implicit-tag", "constant-ext-explicit-tag",
+			"syntax-ext", "syntax-ext-implicit-tag", "syntax-ext-explicit-tag",
 			"smime",
 			"smime-legacy",
 			"tls",

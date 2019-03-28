@@ -39,7 +39,7 @@ import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.profile.Certprofile.RdnControl;
 import org.xipki.ca.api.profile.Certprofile.StringType;
 import org.xipki.ca.api.profile.Certprofile.SubjectControl;
-import org.xipki.ca.api.profile.SubjectDnSpec;
+import org.xipki.ca.api.profile.Patterns;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
@@ -308,7 +308,7 @@ public class SubjectChecker {
     }
 
     if (ObjectIdentifiers.DN.dateOfBirth.equals(type)) {
-      if (!SubjectDnSpec.PATTERN_DATE_OF_BIRTH.matcher(atvTextValue).matches()) {
+      if (!Patterns.DATE_OF_BIRTH.matcher(atvTextValue).matches()) {
         throw new BadCertTemplateException(
             "Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
       }

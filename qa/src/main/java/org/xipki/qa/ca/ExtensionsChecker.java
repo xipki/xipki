@@ -98,7 +98,7 @@ import org.xipki.ca.api.profile.Certprofile.GeneralNameMode;
 import org.xipki.ca.api.profile.Certprofile.GeneralNameTag;
 import org.xipki.ca.api.profile.Certprofile.KeyUsageControl;
 import org.xipki.ca.api.profile.CertprofileException;
-import org.xipki.ca.api.profile.SubjectDnSpec;
+import org.xipki.ca.api.profile.Patterns;
 import org.xipki.ca.certprofile.xijson.AdmissionSyntaxOption;
 import org.xipki.ca.certprofile.xijson.BiometricInfoOption;
 import org.xipki.ca.certprofile.xijson.DirectoryStringType;
@@ -107,10 +107,12 @@ import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
 import org.xipki.ca.certprofile.xijson.conf.CertificatePolicyInformationType;
 import org.xipki.ca.certprofile.xijson.conf.CertificatePolicyInformationType.PolicyQualifier;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableInt;
+import org.xipki.ca.certprofile.xijson.conf.ExtensionSyntaxChecker;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.AdditionalInformation;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.AuthorizationTemplate;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.CertificatePolicies;
+import org.xipki.ca.certprofile.xijson.conf.ExtensionType.ExtnSyntax;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.InhibitAnyPolicy;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.NameConstraints;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.PolicyConstraints;
@@ -139,6 +141,7 @@ import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.CompareUtil;
 import org.xipki.util.Hex;
+import org.xipki.util.InvalidConfException;
 import org.xipki.util.LogUtil;
 import org.xipki.util.TripleState;
 import org.xipki.util.Validity;
@@ -191,6 +194,8 @@ public class ExtensionsChecker {
   private QaExtensionValue smimeCapabilities;
 
   private Map<ASN1ObjectIdentifier, QaExtensionValue> constantExtensions;
+
+  private Map<ASN1ObjectIdentifier, ExtnSyntax> extensionSyntaxes;
 
   private XijsonCertprofile certprofile;
 
@@ -307,6 +312,9 @@ public class ExtensionsChecker {
 
     // constant extensions
     this.constantExtensions = buildConstantExtesions(extensions);
+
+    // extensions with syntax
+    this.extensionSyntaxes = buildExtesionSyntaxes(extensions);
   } // constructor
 
   public List<ValidationIssue> checkExtensions(Certificate cert, IssuerInfo issuerInfo,
@@ -367,7 +375,21 @@ public class ExtensionsChecker {
 
       byte[] extnValue = ext.getExtnValue().getOctets();
       try {
-        if (Extension.authorityKeyIdentifier.equals(oid)) {
+        if (extensionSyntaxes != null && extensionSyntaxes.containsKey(oid)) {
+          Extension requestedExtn = requestedExtns.getExtension(oid);
+          if (!Arrays.equals(requestedExtn.getExtnValue().getOctets(), extnValue)) {
+            failureMsg.append(
+                "extension in certificate does not equal the one contained in the request");
+          } else {
+            ExtnSyntax syntax = extensionSyntaxes.get(oid);
+            String extnName = "extension " + ObjectIdentifiers.oidToDisplayName(oid);
+            try {
+              ExtensionSyntaxChecker.checkExtension(extnName, ext.getParsedValue(), syntax);
+            } catch (BadCertTemplateException ex) {
+              failureMsg.append(ex.getMessage());
+            }
+          }
+        } else if (Extension.authorityKeyIdentifier.equals(oid)) {
           // AuthorityKeyIdentifier
           checkExtnIssuerKeyIdentifier(failureMsg, extnValue, issuerInfo);
         } else if (Extension.subjectKeyIdentifier.equals(oid)) {
@@ -501,6 +523,9 @@ public class ExtensionsChecker {
         certprofile.getExtensionControls();
     for (ASN1ObjectIdentifier oid : extensionControls.keySet()) {
       if (extensionControls.get(oid).isRequired()) {
+        types.add(oid);
+      } else if ((requestedExtns != null && requestedExtns.getExtension(oid) != null) &&
+          (extensionSyntaxes != null && extensionSyntaxes.containsKey(oid))) {
         types.add(oid);
       }
     }
@@ -1026,7 +1051,7 @@ public class ExtensionsChecker {
     }
 
     if (CollectionUtil.isEmpty(expectedUsages)) {
-      byte[] constantExtValue = getConstantExtensionValue(Extension.keyUsage);
+      byte[] constantExtValue = getConstantExtensionValue(Extension.extendedKeyUsage);
       if (constantExtValue != null) {
         expectedUsages = getExtKeyUsage(constantExtValue);
       }
@@ -1351,7 +1376,7 @@ public class ExtensionsChecker {
 
     if (dateOfBirth != null) {
       String timeStirng = dateOfBirth.getTimeString();
-      if (!SubjectDnSpec.PATTERN_DATE_OF_BIRTH.matcher(timeStirng).matches()) {
+      if (!Patterns.DATE_OF_BIRTH.matcher(timeStirng).matches()) {
         failureMsg.append("invalid dateOfBirth: " + timeStirng + "; ");
       }
 
@@ -2258,13 +2283,35 @@ public class ExtensionsChecker {
       byte[] encodedValue;
       try {
         encodedValue = extn.getConstant().toASN1Encodable().toASN1Primitive().getEncoded();
-      } catch (IOException ex) {
+      } catch (IOException | InvalidConfException ex) {
         throw new CertprofileException(
             "could not parse the constant extension value of type" + type, ex);
       }
 
       QaExtensionValue extension = new QaExtensionValue(extn.isCritical(), encodedValue);
       map.put(oid, extension);
+    }
+
+    if (CollectionUtil.isEmpty(map)) {
+      return null;
+    }
+
+    return Collections.unmodifiableMap(map);
+  } // method buildConstantExtesions
+
+  private static Map<ASN1ObjectIdentifier, ExtnSyntax> buildExtesionSyntaxes(
+      Map<String, ExtensionType> extensions) throws CertprofileException {
+    if (extensions == null) {
+      return null;
+    }
+
+    Map<ASN1ObjectIdentifier, ExtnSyntax> map = new HashMap<>();
+
+    for (String type : extensions.keySet()) {
+      ExtensionType extn = extensions.get(type);
+      if (extn.getSyntax() != null) {
+        map.put(extn.getType().toXiOid(), extn.getSyntax());
+      }
     }
 
     if (CollectionUtil.isEmpty(map)) {

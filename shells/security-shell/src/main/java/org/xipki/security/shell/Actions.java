@@ -50,6 +50,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
@@ -91,6 +92,7 @@ import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignatureAlgoControl;
+import org.xipki.security.X509ExtensionType;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
@@ -105,8 +107,12 @@ import org.xipki.util.CollectionUtil;
 import org.xipki.util.CompareUtil;
 import org.xipki.util.DateUtil;
 import org.xipki.util.Hex;
+import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
+import org.xipki.util.ValidatableConf;
+
+import com.alibaba.fastjson.JSON;
 
 /**
  * TODO.
@@ -401,6 +407,11 @@ public class Actions {
     @Completion(FileCompleter.class)
     private String biometricUri;
 
+    @Option(name = "--extra-extensions-file",
+        description = "Configuration file for extral extensions")
+    @Completion(FileCompleter.class)
+    private String extraExtensionsFile;
+
     @Option(name = "--need-extension", multiValued = true,
         description = "types (name or OID) of extension that must be contained in the certificate")
     @Completion(Completers.ExtensionNameCompleter.class)
@@ -563,6 +574,23 @@ public class Actions {
       } else {
         throw new Exception("either all of biometric triples (type, hash algo, file)"
             + " must be set or none of them should be set");
+      }
+
+      // extra extensions
+      if (extraExtensionsFile != null) {
+        byte[] bytes = IoUtil.read(extraExtensionsFile);
+        ExtensionsType extraExtensions = JSON.parseObject(bytes, ExtensionsType.class);
+        extraExtensions.validate();
+
+        List<X509ExtensionType> extnConfs = extraExtensions.getExtensions();
+        if (CollectionUtil.isNonEmpty(extnConfs)) {
+          for (X509ExtensionType m : extnConfs) {
+            byte[] encodedExtnValue =
+                m.getConstant().toASN1Encodable().toASN1Primitive().getEncoded(ASN1Encoding.DER);
+            extensions.add(new Extension(
+                new ASN1ObjectIdentifier(m.getType().getOid()), false, encodedExtnValue));
+          }
+        }
       }
 
       for (Extension addExt : getAdditionalExtensions()) {
@@ -1227,6 +1255,27 @@ public class Actions {
 
     protected String toUtcTimeyyyyMMddhhmmssZ(Date date) {
       return DateUtil.toUtcTimeyyyyMMddhhmmss(date) + "Z";
+    }
+
+  }
+
+  public static class ExtensionsType extends ValidatableConf {
+
+    private List<X509ExtensionType> extensions;
+
+    public List<X509ExtensionType> getExtensions() {
+      return extensions;
+    }
+
+    public void setExtensions(List<X509ExtensionType> extensions) {
+      this.extensions = extensions;
+    }
+
+    @Override
+    public void validate() throws InvalidConfException {
+      for (X509ExtensionType m : extensions) {
+        m.validate();
+      }
     }
 
   }

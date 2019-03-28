@@ -430,7 +430,7 @@ class IdentifiedCertprofile implements Closeable {
       addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
     }
 
-    // remove extensions that are not required from the list
+    // remove extensions that are not required from the list, and not contained in the request
     List<ASN1ObjectIdentifier> listToRm = null;
     for (ASN1ObjectIdentifier extnType : controls.keySet()) {
       ExtensionControl ctrl = controls.get(extnType);
@@ -439,6 +439,11 @@ class IdentifiedCertprofile implements Closeable {
       }
 
       if (neededExtTypes.contains(extnType) || wantedExtTypes.contains(extnType)) {
+        continue;
+      }
+
+      if (requestedExtensions.getExtension(extnType) != null) {
+        // contained in the request
         continue;
       }
 
@@ -455,8 +460,7 @@ class IdentifiedCertprofile implements Closeable {
     }
 
     ExtensionValues subvalues = certprofile.getExtensions(Collections.unmodifiableMap(controls),
-        requestedSubject, grantedSubject, requestedExtensions, notBefore, notAfter,
-        publicCaInfo);
+        requestedSubject, grantedSubject, requestedExtensions, notBefore, notAfter, publicCaInfo);
 
     Set<ASN1ObjectIdentifier> extTypes = new HashSet<>(controls.keySet());
     for (ASN1ObjectIdentifier type : extTypes) {
@@ -604,7 +608,6 @@ class IdentifiedCertprofile implements Closeable {
           set.add(type);
         }
       }
-
       if (ca && CA_CRITICAL_ONLY_EXTENSION_TYPES.contains(type)) {
         if (!control.isCritical()) {
           set.add(type);

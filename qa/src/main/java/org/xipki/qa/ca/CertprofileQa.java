@@ -57,6 +57,7 @@ import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
+import org.xipki.util.InvalidConfException;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 import org.xipki.util.Validity;
@@ -327,7 +328,7 @@ public class CertprofileQa {
       byte[] encodedValue;
       try {
         encodedValue = extn.getConstant().toASN1Encodable().toASN1Primitive().getEncoded();
-      } catch (IOException ex) {
+      } catch (IOException | InvalidConfException ex) {
         throw new CertprofileException(
             "could not parse the constant extension value of type" + type, ex);
       }

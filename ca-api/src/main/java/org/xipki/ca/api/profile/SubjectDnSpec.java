@@ -52,9 +52,6 @@ public class SubjectDnSpec {
 
   private static final Logger LOG = LoggerFactory.getLogger(SubjectDnSpec.class);
 
-  public static final Pattern PATTERN_DATE_OF_BIRTH =
-      Pattern.compile("^(19|20)\\d\\d(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])120000Z");
-
   /**
    * ranges.
    */
@@ -76,11 +73,6 @@ public class SubjectDnSpec {
 
   // according to specification should be 32768, 256 is specified by XiPKI.
   private static final Range RANGE_NAME = new Range(1, 256);
-
-  // patterns
-  private static final Pattern PATTERN_GENDER = Pattern.compile("M|m|F|f");
-
-  private static final Pattern PATTERN_COUNTRY = Pattern.compile("[A-Za-z]{2}");
 
   // stringTypes
   private static final Set<StringType> DIRECTORY_STRINGS = new HashSet<>(
@@ -237,7 +229,7 @@ public class SubjectDnSpec {
     id = ObjectIdentifiers.DN.countryOfCitizenship;
     ids.add(id);
     RANGES.put(id, RANGE_COUNTRY_NAME);
-    PATTERNS.put(id, PATTERN_COUNTRY);
+    PATTERNS.put(id, Patterns.COUNTRY);
     STRING_TYPE_SET.put(id, PRINTABLE_STRING_ONLY);
     DFLT_STRING_TYPES.put(id, StringType.printableString);
 
@@ -245,7 +237,7 @@ public class SubjectDnSpec {
     id = ObjectIdentifiers.DN.countryOfResidence;
     ids.add(id);
     RANGES.put(id, RANGE_COUNTRY_NAME);
-    PATTERNS.put(id, PATTERN_COUNTRY);
+    PATTERNS.put(id, Patterns.COUNTRY);
     STRING_TYPE_SET.put(id, PRINTABLE_STRING_ONLY);
     DFLT_STRING_TYPES.put(id, StringType.printableString);
 
@@ -253,7 +245,7 @@ public class SubjectDnSpec {
     id = ObjectIdentifiers.DN.dateOfBirth;
     ids.add(id);
     RANGES.put(id, RANGE_DATE_OF_BIRTH);
-    PATTERNS.put(id, PATTERN_DATE_OF_BIRTH);
+    PATTERNS.put(id, Patterns.DATE_OF_BIRTH);
 
     // domainComponent
     id = ObjectIdentifiers.DN.DC;
@@ -270,7 +262,7 @@ public class SubjectDnSpec {
     // gender
     id = ObjectIdentifiers.DN.gender;
     ids.add(id);
-    PATTERNS.put(id, PATTERN_GENDER);
+    PATTERNS.put(id, Patterns.GENDER);
     RANGES.put(id, RANGE_GENDER);
     STRING_TYPE_SET.put(id, PRINTABLE_STRING_ONLY);
     DFLT_STRING_TYPES.put(id, StringType.printableString);

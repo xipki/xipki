@@ -5,7 +5,7 @@
 	},
 	"version":"v3",
 	"certLevel":"EndEntity",
-	"maxSize":5000,
+	"maxSize":3000,
 	"validity":"9999y",
 	"notBeforeTime":"current",
 	"serialNumberInReq":false,
@@ -115,7 +115,7 @@
 				"oid":"2.5.4.5",
 				"description":"serialNumber"
 			},
-			"regex":"[\\d]{1,}",
+			"regex":":NUMBER",
 			"minOccurs":0,
 			"maxOccurs":1
 		},{
@@ -123,7 +123,7 @@
 				"oid":"2.5.4.3",
 				"description":"cn"
 			},
-			"regex":"(?=^.{1,254}$)(^(?:(?!\\d+\\.|-)[a-zA-Z0-9_\\-]{1,63}(?<!-)\\.?)+(?:[a-zA-Z]{2,})$)",
+			"regex":":FQDN",
 			"minOccurs":1,
 			"maxOccurs":1
 		}]

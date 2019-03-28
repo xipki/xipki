@@ -801,7 +801,7 @@ public class CmpResponder extends BaseCmpResponder {
       CmpRequestorInfo requestor, ASN1OctetString tid, PKIHeader reqHeader,
       CertificationRequest p10cr, CmpControl cmpControl, String msgId, AuditEvent event) {
     // verify the POP first
-    CertResponse certResp;
+    CertResponse certResp = null;
     ASN1Integer certReqId = new ASN1Integer(-1);
 
     boolean certGenerated = false;
@@ -812,49 +812,60 @@ public class CmpResponder extends BaseCmpResponder {
       certResp = buildErrorCertResponse(certReqId, PKIFailureInfo.badPOP, "invalid POP");
     } else {
       CertificationRequestInfo certTemp = p10cr.getCertificationRequestInfo();
-      Extensions extensions = CaUtil.getExtensions(certTemp);
 
-      X500Name subject = certTemp.getSubject();
-      SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
-
-      CmpUtf8Pairs keyvalues = CmpUtil.extract(reqHeader.getGeneralInfo());
-      Date notBefore = null;
-      Date notAfter = null;
-      String certprofileName = null;
-      if (keyvalues != null) {
-        certprofileName = keyvalues.value(CmpUtf8Pairs.KEY_CERTPROFILE);
-
-        String str = keyvalues.value(CmpUtf8Pairs.KEY_NOTBEFORE);
-        if (str != null) {
-          notBefore = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
-        }
-
-        str = keyvalues.value(CmpUtf8Pairs.KEY_NOTAFTER);
-        if (str != null) {
-          notAfter = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
-        }
-      }
-
-      if (certprofileName == null) {
-        certprofileName = dfltCertprofileName;
-      }
-
-      if (certprofileName == null) {
-        LOG.warn("no certprofile is specified");
+      Extensions extensions;
+      try {
+        extensions = CaUtil.getExtensions(certTemp);
+      } catch (IllegalArgumentException ex) {
+        extensions = null;
+        LOG.warn("could not parse extensions of the pkcs#10 requst");
         certResp = buildErrorCertResponse(certReqId, PKIFailureInfo.badCertTemplate,
-            "badCertTemplate");
-      } else {
-        certprofileName = certprofileName.toLowerCase();
-        if (!requestor.isCertprofilePermitted(certprofileName)) {
-          String msg = "certprofile " + certprofileName + " is not allowed";
-          certResp = buildErrorCertResponse(certReqId, PKIFailureInfo.notAuthorized, msg);
-        } else {
-          CertTemplateData certTemplateData = new CertTemplateData(subject, publicKeyInfo,
-              notBefore, notAfter, extensions, certprofileName, certReqId, false);
+                    "invalid extensions");
+      }
 
-          certResp = generateCertificates(Arrays.asList(certTemplateData),
-              requestor, tid, false, request, cmpControl, msgId, event).get(0);
-          certGenerated = true;
+      if (certResp == null) {
+        X500Name subject = certTemp.getSubject();
+        SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
+
+        CmpUtf8Pairs keyvalues = CmpUtil.extract(reqHeader.getGeneralInfo());
+        Date notBefore = null;
+        Date notAfter = null;
+        String certprofileName = null;
+        if (keyvalues != null) {
+          certprofileName = keyvalues.value(CmpUtf8Pairs.KEY_CERTPROFILE);
+
+          String str = keyvalues.value(CmpUtf8Pairs.KEY_NOTBEFORE);
+          if (str != null) {
+            notBefore = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
+          }
+
+          str = keyvalues.value(CmpUtf8Pairs.KEY_NOTAFTER);
+          if (str != null) {
+            notAfter = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
+          }
+        }
+
+        if (certprofileName == null) {
+          certprofileName = dfltCertprofileName;
+        }
+
+        if (certprofileName == null) {
+          LOG.warn("no certprofile is specified");
+          certResp = buildErrorCertResponse(certReqId, PKIFailureInfo.badCertTemplate,
+              "badCertTemplate");
+        } else {
+          certprofileName = certprofileName.toLowerCase();
+          if (!requestor.isCertprofilePermitted(certprofileName)) {
+            String msg = "certprofile " + certprofileName + " is not allowed";
+            certResp = buildErrorCertResponse(certReqId, PKIFailureInfo.notAuthorized, msg);
+          } else {
+            CertTemplateData certTemplateData = new CertTemplateData(subject, publicKeyInfo,
+                notBefore, notAfter, extensions, certprofileName, certReqId, false);
+
+            certResp = generateCertificates(Arrays.asList(certTemplateData),
+                requestor, tid, false, request, cmpControl, msgId, event).get(0);
+            certGenerated = true;
+          }
         }
       }
     }
