@@ -207,16 +207,35 @@ xi:update-cert-p12 --p12 output/fixed-partial-subject2.p12 --password 1234 \
 
 # Certificate ee-complex1 with complex subject (parsable in openssl)
 
-xi:csr-p12-complex --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
-  --subject "CN=ee-complex1,O=xipki,C=DE" \
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --p12 output/ee-complex1.p12 --password 1234 \
   --outform $OUTFORM \
   --out output/ee-complex1.csr \
+  --subject "UID=abc-def,CN=ee-complex2,O=xipki,C=DE" \
   --qc-eu-limit EUR:150:15 \
   --biometric-type 0 \
   --biometric-hash SHA256 \
   --biometric-file etc/jre.properties \
-  --biometric-uri https://example.org/?id=123
+  --biometric-uri https://example.org/?id=123 \
+  --san '[0]1.2.3.1=SAN-I am otherName 1.2.3.1' \
+  --san '[0]1.2.3.2=SAN-I am otherName 1.2.3.2' \
+  --san '[1]SNA-info@example.org' \
+  --san '[2]SAN-dns.example.org' \
+  --san '[4]CN=demo,C=DE' \
+  --san '[5]SAN-assigner1=SAN-party1' \
+  --san '[6]SAN-uri.example.org' \
+  --san '[7]69.1.2.190' \
+  --san '[8]2.3.4.5' \
+  --sia '1.3.6.1.5.5.7.48.5=[0]1.2.3.1\=SIA-I am otherName 1.2.3.1' \
+  --sia '2.3.4.1=[0]1.2.3.2\=SIA-I am otherName 1.2.3.2' \
+  --sia '2.3.4.2=[1]SNA-info@example.org' \
+  --sia '2.3.4.3=[2]SIA-dns.example.org' \
+  --sia '2.3.4.4=[4]CN\=demo\,C\=DE' \
+  --sia '2.3.4.5=[5]SIA-assigner1\=SIA-party1' \
+  --sia '2.3.4.6=[6]SIA-uri.example.org' \
+  --sia '2.3.4.7=[7]69.1.2.190' \
+  --sia '2.3.4.8=[8]2.3.4.5' \
+  --extra-extensions-file xipki/qa/extensions/extensions-ee-complex.json
 
 xi:cmp-csr-enroll --csr output/ee-complex1.csr \
   --outform $OUTFORM \
@@ -230,17 +249,38 @@ xi:update-cert-p12 --p12 output/ee-complex1.p12 --password 1234 \
 
 # Certificate ee-complex2 with complex subject (not parsable in openssl due to complex subject)
 
-xi:csr-p12-complex --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
-  --subject "CN=ee-complex2,O=xipki,C=DE" \
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --p12 output/ee-complex2.p12 --password 1234 \
   --outform $OUTFORM \
   --out output/ee-complex2.csr \
+  --subject "UID=abc-def,CN=ee-complex2,O=xipki,C=DE" \
+  --dateOfBirth 19810102 \
+  --postalAddress "street example 1" \
+  --postalAddress "D-69112 Heidelberg" \
   --qc-eu-limit EUR:150:15 \
   --biometric-type 0 \
   --biometric-hash SHA256 \
   --biometric-file etc/jre.properties \
   --biometric-uri https://example.org/?id=123 \
-  --complex-subject
+  --san '[0]1.2.3.1=SAN-I am otherName 1.2.3.1' \
+  --san '[0]1.2.3.2=SAN-I am otherName 1.2.3.2' \
+  --san '[1]SNA-info@example.org' \
+  --san '[2]SAN-dns.example.org' \
+  --san '[4]CN=demo,C=DE' \
+  --san '[5]SAN-assigner1=SAN-party1' \
+  --san '[6]SAN-uri.example.org' \
+  --san '[7]69.1.2.190' \
+  --san '[8]2.3.4.5' \
+  --sia '1.3.6.1.5.5.7.48.5=[0]1.2.3.1\=SIA-I am otherName 1.2.3.1' \
+  --sia '2.3.4.1=[0]1.2.3.2\=SIA-I am otherName 1.2.3.2' \
+  --sia '2.3.4.2=[1]SNA-info@example.org' \
+  --sia '2.3.4.3=[2]SIA-dns.example.org' \
+  --sia '2.3.4.4=[4]CN\=demo\,C\=DE' \
+  --sia '2.3.4.5=[5]SIA-assigner1\=SIA-party1' \
+  --sia '2.3.4.6=[6]SIA-uri.example.org' \
+  --sia '2.3.4.7=[7]69.1.2.190' \
+  --sia '2.3.4.8=[8]2.3.4.5' \
+  --extra-extensions-file xipki/qa/extensions/extensions-ee-complex.json
 
 xi:cmp-csr-enroll --csr output/ee-complex2.csr \
   --outform $OUTFORM \

@@ -141,8 +141,8 @@
 			"maxOccurs":1
 		},{
 			"type":{
-				"oid":"2.5.4.45",
-				"description":"x500UniqueIdentifier"
+				"oid":"0.9.2342.19200300.100.1.1",
+				"description":"uid"
 			},
 			"minOccurs":1,
 			"maxOccurs":1

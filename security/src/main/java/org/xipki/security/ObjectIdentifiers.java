@@ -178,8 +178,6 @@ public class ObjectIdentifiers {
     public static final ASN1ObjectIdentifier uniqueIdentifier
         = new ASN1ObjectIdentifier("2.5.4.45");
 
-    public static final ASN1ObjectIdentifier UID = uniqueIdentifier;
-
     /**
      * businessCategory - DirectoryString(SIZE(1..128)
      */
@@ -290,8 +288,13 @@ public class ObjectIdentifiers {
     /**
      * LDAP User id.
      */
-    public static final ASN1ObjectIdentifier ldapUid =
+    public static final ASN1ObjectIdentifier userid =
         new ASN1ObjectIdentifier("0.9.2342.19200300.100.1.1");
+
+    /**
+     * LDAP User id.
+     */
+    public static final ASN1ObjectIdentifier _UID = userid;
 
     /**
      * NIF, Tax ID number, for individuals (Spain)

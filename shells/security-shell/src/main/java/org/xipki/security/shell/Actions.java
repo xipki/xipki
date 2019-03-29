@@ -56,13 +56,16 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERSet;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Certificate;
@@ -342,18 +345,28 @@ public class Actions {
 
   public abstract static class CsrGenAction extends SecurityAction {
 
+    private static final long _12_HOURS_MS = 12L * 60 * 60 * 1000;
+
     @Option(name = "--hash", description = "hash algorithm name")
     @Completion(Completers.HashAlgCompleter.class)
     protected String hashAlgo = "SHA256";
 
-    @Option(name = "--subject-alt-name", multiValued = true, description = "subjectAltName")
+    @Option(name = "--subject-alt-name", aliases = "--san", multiValued = true,
+        description = "subjectAltName")
     protected List<String> subjectAltNames;
 
-    @Option(name = "--subject-info-access", multiValued = true, description = "subjectInfoAccess")
+    @Option(name = "--subject-info-access", aliases = "--sia", multiValued = true,
+        description = "subjectInfoAccess")
     protected List<String> subjectInfoAccesses;
 
     @Option(name = "--subject", aliases = "-s", required = true, description = "subject in the CSR")
     private String subject;
+
+    @Option(name = "--dateOfBirth", description = "Date of birth YYYYMMdd in subject")
+    private String dateOfBirth;
+
+    @Option(name = "--postalAddress", multiValued = true, description="postal address in subject")
+    private List<String> postalAddress;
 
     @Option(name = "--rsa-mgf1",
         description = "whether to use the RSAPSS MGF1 for the POPO computation\n"
@@ -470,7 +483,8 @@ public class Actions {
       // SubjectAltNames
       List<Extension> extensions = new LinkedList<>();
 
-      ASN1OctetString extnValue = createExtnValueSubjectAltName();
+      ASN1OctetString extnValue = isEmpty(subjectAltNames) ? null
+          : X509Util.createExtnSubjectAltName(subjectAltNames, false).getExtnValue();
       if (extnValue != null) {
         ASN1ObjectIdentifier oid = Extension.subjectAlternativeName;
         extensions.add(new Extension(oid, false, extnValue));
@@ -478,7 +492,9 @@ public class Actions {
       }
 
       // SubjectInfoAccess
-      extnValue = createExtnValueSubjectInfoAccess();
+      extnValue = isEmpty(subjectInfoAccesses) ? null
+          : X509Util.createExtnSubjectInfoAccess(subjectInfoAccesses, false).getExtnValue();
+
       if (extnValue != null) {
         ASN1ObjectIdentifier oid = Extension.subjectInfoAccess;
         extensions.add(new Extension(oid, false, extnValue));
@@ -630,6 +646,49 @@ public class Actions {
       }
 
       X500Name subjectDn = getSubject(subject);
+
+      List<RDN> list = new LinkedList<RDN>();
+
+      if (StringUtil.isNotBlank(dateOfBirth)) {
+        ASN1ObjectIdentifier id = ObjectIdentifiers.DN.dateOfBirth;
+        RDN[] rdns = subjectDn.getRDNs(id);
+
+        if (rdns == null || rdns.length == 0) {
+          Date date = DateUtil.parseUtcTimeyyyyMMdd(dateOfBirth);
+          date = new Date(date.getTime() + _12_HOURS_MS);
+          ASN1Encodable atvValue = new DERGeneralizedTime(
+              DateUtil.toUtcTimeyyyyMMddhhmmss(date) + "Z");
+          RDN rdn = new RDN(id, atvValue);
+          list.add(rdn);
+        }
+      }
+
+      if (CollectionUtil.isNonEmpty(postalAddress)) {
+        ASN1ObjectIdentifier id = ObjectIdentifiers.DN.postalAddress;
+        RDN[] rdns = subjectDn.getRDNs(id);
+
+        if (rdns == null || rdns.length == 0) {
+          ASN1EncodableVector vec = new ASN1EncodableVector();
+          for (String m : postalAddress) {
+            vec.add(new DERUTF8String(m));
+          }
+
+          if (vec.size() > 0) {
+            ASN1Sequence atvValue = new DERSequence(vec);
+            RDN rdn = new RDN(id, atvValue);
+            list.add(rdn);
+          }
+        }
+      }
+
+      if (!list.isEmpty()) {
+        for (RDN rdn : subjectDn.getRDNs()) {
+          list.add(rdn);
+        }
+
+        subjectDn = new X500Name(list.toArray(new RDN[0]));
+      }
+
       PKCS10CertificationRequest csr = generateRequest(signer, subjectPublicKeyInfo, subjectDn,
           attributes);
 
@@ -651,16 +710,6 @@ public class Actions {
 
     protected List<Extension> getAdditionalExtensions() throws BadInputException {
       return Collections.emptyList();
-    }
-
-    protected ASN1OctetString createExtnValueSubjectAltName() throws BadInputException {
-      return isEmpty(subjectAltNames) ? null
-          : X509Util.createExtnSubjectAltName(subjectAltNames, false).getExtnValue();
-    }
-
-    protected ASN1OctetString createExtnValueSubjectInfoAccess() throws BadInputException {
-      return isEmpty(subjectInfoAccesses) ? null
-          : X509Util.createExtnSubjectInfoAccess(subjectInfoAccesses, false).getExtnValue();
     }
 
     private static List<ASN1ObjectIdentifier> textToAsn1ObjectIdentifers(

@@ -1055,7 +1055,7 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
     rdnControls.add(createRdn(ObjectIdentifiers.DN.dateOfBirth, 0, 1));
     rdnControls.add(createRdn(ObjectIdentifiers.DN.postalAddress, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.uniqueIdentifier, 1, 1));
+    rdnControls.add(createRdn(ObjectIdentifiers.DN.userid, 1, 1));
 
     // Extensions
     // Extensions - general

@@ -25,8 +25,10 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.x509.Extension;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.X509ExtensionType;
 import org.xipki.security.X509ExtensionType.ConstantExtnValue;
@@ -35,6 +37,7 @@ import org.xipki.security.X509ExtensionType.FieldType;
 import org.xipki.security.X509ExtensionType.Tag;
 import org.xipki.security.shell.Actions.ExtensionsType;
 import org.xipki.util.Base64;
+import org.xipki.util.CollectionUtil;
 import org.xipki.util.IoUtil;
 
 import com.alibaba.fastjson.JSON;
@@ -66,11 +69,12 @@ public class ExtensionsConfCreatorDemo {
 
   public static void main(String[] args) {
     try {
-      extensionsEeComplex("extensions-syntax-ext.json",
+      extensionsEeCompelx("extensions-ee-complex.json");
+      extensionsSyntaxExt("extensions-syntax-ext.json",
           new ASN1ObjectIdentifier("1.2.3.6.1"), null);
-      extensionsEeComplex("extensions-syntax-ext-implicit-tag.json",
+      extensionsSyntaxExt("extensions-syntax-ext-implicit-tag.json",
           new ASN1ObjectIdentifier("1.2.3.6.2"), new Tag(1, false));
-      extensionsEeComplex("extensions-syntax-ext-explicit-tag.json",
+      extensionsSyntaxExt("extensions-syntax-ext-explicit-tag.json",
           new ASN1ObjectIdentifier("1.2.3.6.3"), new Tag(1, true));
     } catch (Exception ex) {
       ex.printStackTrace();
@@ -88,6 +92,8 @@ public class ExtensionsConfCreatorDemo {
             SerializerFeature.DisableCircularReferenceDetect);
       }
       System.out.println("marshalled " + path.toString());
+
+      check(path);
     } catch (Exception ex) {
       System.err.println("Error while generating extensions in " + filename);
       ex.printStackTrace();
@@ -95,7 +101,211 @@ public class ExtensionsConfCreatorDemo {
 
   } // method marshal
 
-  private static void extensionsEeComplex(String destFilename, ASN1ObjectIdentifier oidPrefix,
+  private static void check(Path path) throws Exception {
+    byte[] bytes = IoUtil.read(path.toFile());
+    ExtensionsType extraExtensions = JSON.parseObject(bytes, ExtensionsType.class);
+    extraExtensions.validate();
+
+    List<X509ExtensionType> extnConfs = extraExtensions.getExtensions();
+    if (CollectionUtil.isNonEmpty(extnConfs)) {
+      for (X509ExtensionType m : extnConfs) {
+        byte[] encodedExtnValue =
+            m.getConstant().toASN1Encodable().toASN1Primitive().getEncoded(ASN1Encoding.DER);
+        new Extension(new ASN1ObjectIdentifier(m.getType().getOid()), false, encodedExtnValue);
+      }
+    }
+  }
+
+  private static void extensionsEeCompelx(String destFilename) throws Exception {
+    ExtensionsType extensions = new ExtensionsType();
+    // Extensions
+    // Extensions - general
+    List<X509ExtensionType> list = new LinkedList<>();
+    extensions.setExtensions(list);
+
+    // extension admission (Germany standard commonpki)
+    /*
+    AdmissionSyntax ::= SEQUENCE
+    {
+      admissionAuthority GeneralName OPTIONAL,
+      contentsOfAdmissions SEQUENCE OF Admissions
+    }
+
+    Admissions ::= SEQUENCE
+    {
+      admissionAuthority [0] EXPLICIT GeneralName OPTIONAL
+      namingAuthority [1] EXPLICIT NamingAuthority OPTIONAL
+      professionInfos SEQUENCE OF ProfessionInfo
+    }
+
+    NamingAuthority ::= SEQUENCE
+    {
+      namingAuthorityId OBJECT IDENTIFIER OPTIONAL,
+      namingAuthorityUrl IA5String OPTIONAL,
+      namingAuthorityText DirectoryString(SIZE(1..128)) OPTIONAL
+    }
+
+    ProfessionInfo ::= SEQUENCE
+    {
+      namingAuthority [0] EXPLICIT NamingAuthority OPTIONAL,
+      professionItems SEQUENCE OF DirectoryString (SIZE(1..128)),
+      professionOIDs SEQUENCE OF OBJECT IDENTIFIER OPTIONAL,
+      registrationNumber PrintableString(SIZE(1..128)) OPTIONAL,
+      addProfessionInfo OCTET STRING OPTIONAL
+    }*/
+    X509ExtensionType admissionExtn = new X509ExtensionType();
+    list.add(admissionExtn);
+
+    admissionExtn.setType(
+        createOidType(ObjectIdentifiers.Extn.id_extension_admission, "commonpki admission"));
+
+    ConstantExtnValue admissionSyntax = new ConstantExtnValue(FieldType.SEQUENCE);
+    admissionExtn.setConstant(admissionSyntax);
+    admissionSyntax.setDescription("AdmissionSyntax");
+
+    List<ConstantExtnValue> admissionSyntax_values = new LinkedList<>();
+    admissionSyntax.setListValue(admissionSyntax_values);
+
+    ConstantExtnValue contentsOfAdmissions = new ConstantExtnValue(FieldType.SEQUENCE_OF);
+    admissionSyntax_values.add(contentsOfAdmissions);
+    contentsOfAdmissions.setDescription("contentsOfAdmissions");
+
+    List<ConstantExtnValue> contentsOfAdmissions_values = new LinkedList<>();
+    contentsOfAdmissions.setListValue(contentsOfAdmissions_values);
+
+    ConstantExtnValue admissions = new ConstantExtnValue(FieldType.SEQUENCE);
+    contentsOfAdmissions_values.add(admissions);
+    admissions.setDescription("admissions");
+
+    List<ConstantExtnValue> admissions_values = new LinkedList<>();
+    admissions.setListValue(admissions_values);
+
+    ConstantExtnValue professionInfos = new ConstantExtnValue(FieldType.SEQUENCE_OF);
+    admissions_values.add(professionInfos);
+    professionInfos.setDescription("professionInfos");
+
+    List<ConstantExtnValue> professionInfos_values = new LinkedList<>();
+    professionInfos.setListValue(professionInfos_values);
+
+    ConstantExtnValue professionInfo = new ConstantExtnValue(FieldType.SEQUENCE);
+    professionInfos_values.add(professionInfo);
+    professionInfo.setDescription("professionInfo");
+
+    List<ConstantExtnValue> professionInfo_values = new LinkedList<>();
+    professionInfo.setListValue(professionInfo_values);
+
+    // professionItems
+    ConstantExtnValue professionItems = new ConstantExtnValue(FieldType.SEQUENCE_OF);
+    professionInfo_values.add(professionItems);
+    professionItems.setDescription("professionItems");
+
+    List<ConstantExtnValue> professionItems_values = new LinkedList<>();
+    professionItems.setListValue(professionItems_values);
+
+    ConstantExtnValue professionItem = new ConstantExtnValue(FieldType.UTF8String);
+    professionItems_values.add(professionItem);
+    professionItem.setDescription("professionItem");
+    professionItem.setValue("dummy 1");
+
+    professionItem = new ConstantExtnValue(FieldType.UTF8String);
+    professionItems_values.add(professionItem);
+    professionItem.setDescription("professionItem");
+    professionItem.setValue("dummy 2");
+
+    // registrationNumber
+    ConstantExtnValue registrationNumber = new ConstantExtnValue(FieldType.PrintableString);
+    professionInfo_values.add(registrationNumber);
+    registrationNumber.setDescription("registrationNumber");
+    registrationNumber.setValue("aaaab");
+
+    // extension subjectDirectoryAttributes (RFC 3739)
+    /*
+         SubjectDirectoryAttributes ::= Attributes
+          Attributes ::= SEQUENCE SIZE (1..MAX) OF Attribute
+          Attribute ::= SEQUENCE
+          {
+            type AttributeType
+            values SET OF AttributeValue
+          }
+
+          AttributeType ::= OBJECT IDENTIFIER
+          AttributeValue ::= ANY DEFINED BY AttributeType
+    */
+    X509ExtensionType sdaExt = new X509ExtensionType();
+    list.add(sdaExt);
+
+    sdaExt.setType(
+        createOidType(Extension.subjectDirectoryAttributes, "subjectDirectoryAttributes"));
+
+    ConstantExtnValue sdaSyntax = new ConstantExtnValue(FieldType.SEQUENCE_OF);
+    sdaExt.setConstant(sdaSyntax);
+
+    List<ConstantExtnValue> sdaSyntax_values = new LinkedList<>();
+    sdaSyntax.setListValue(sdaSyntax_values);
+
+    List<ASN1ObjectIdentifier> types = new LinkedList<>();
+    List<FieldType> attrTypes = new LinkedList<>();
+    List<String> attrValues = new LinkedList<>();
+
+    // dateOfBirth
+    types.add(ObjectIdentifiers.DN.dateOfBirth);
+    attrTypes.add(FieldType.GeneralizedTime);
+    attrValues.add("19800122120000Z");
+
+    // Gender
+    types.add(ObjectIdentifiers.DN.gender);
+    attrTypes.add(FieldType.PrintableString);
+    attrValues.add("M");
+
+    // placeOfBirth
+    types.add(ObjectIdentifiers.DN.placeOfBirth);
+    attrTypes.add(FieldType.UTF8String);
+    attrValues.add("Berlin");
+
+    // placeOfBirth
+    types.add(ObjectIdentifiers.DN.countryOfCitizenship);
+    attrTypes.add(FieldType.PrintableString);
+    attrValues.add("DE");
+
+    types.add(ObjectIdentifiers.DN.countryOfCitizenship);
+    attrTypes.add(FieldType.PrintableString);
+    attrValues.add("FR");
+
+    // countryOfResidence
+    types.add(ObjectIdentifiers.DN.countryOfResidence);
+    attrTypes.add(FieldType.PrintableString);
+    attrValues.add("DE");
+
+    for (int i = 0; i < types.size(); i++) {
+      ConstantExtnValue attribute = new ConstantExtnValue(FieldType.SEQUENCE);
+      sdaSyntax_values.add(attribute);
+
+      List<ConstantExtnValue> attribute_values = new LinkedList<>();
+      attribute.setListValue(attribute_values);
+
+      ConstantExtnValue type = new ConstantExtnValue(FieldType.OID);
+      attribute_values.add(type);
+      type.setValue(types.get(i).getId());
+      String desc = ObjectIdentifiers.getName(types.get(i));
+      if (desc != null) {
+        type.setDescription(desc);
+      }
+
+      ConstantExtnValue values = new ConstantExtnValue(FieldType.SET);
+      attribute_values.add(values);
+
+      List<ConstantExtnValue> values_values = new LinkedList<>();
+      values.setListValue(values_values);
+
+      ConstantExtnValue value = new ConstantExtnValue(attrTypes.get(i));
+      values_values.add(value);
+      value.setValue(attrValues.get(i));
+    }
+
+    marshall(extensions, destFilename);
+  } // method certprofileEeComplex
+
+  private static void extensionsSyntaxExt(String destFilename, ASN1ObjectIdentifier oidPrefix,
       Tag tag) throws Exception {
     ExtensionsType extensions = new ExtensionsType();
     // Extensions

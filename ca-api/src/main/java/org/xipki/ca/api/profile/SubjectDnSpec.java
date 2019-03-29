@@ -289,7 +289,7 @@ public class SubjectDnSpec {
     DFLT_STRING_TYPES.put(id, StringType.utf8String);
 
     // LDAP user ID
-    id = ObjectIdentifiers.DN.ldapUid;
+    id = ObjectIdentifiers.DN.userid;
     ids.add(id);
     STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
     DFLT_STRING_TYPES.put(id, StringType.utf8String);

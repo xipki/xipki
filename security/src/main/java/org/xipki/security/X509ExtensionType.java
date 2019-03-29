@@ -124,16 +124,16 @@ public class X509ExtensionType extends ValidatableConf {
     private FieldType type;
 
     @JSONField(ordinal = 2)
+    private String description;
+
+    @JSONField(ordinal = 3)
     private Tag tag;
 
-    @JSONField(ordinal = 3)
+    @JSONField(ordinal = 4)
     private String value;
 
-    @JSONField(ordinal = 3)
+    @JSONField(ordinal = 5)
     private List<ConstantExtnValue> listValue;
-
-    @JSONField(ordinal = 4)
-    private String description;
 
     public String getDescription() {
       return description;

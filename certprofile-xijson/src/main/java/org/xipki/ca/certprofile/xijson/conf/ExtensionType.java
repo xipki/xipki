@@ -969,7 +969,7 @@ public class ExtensionType extends ValidatableConf {
 
   } // class ExtendedKeyUsage
 
-  public static class ExtnSyntax extends ValidatableConf {
+  public static class ExtnSyntax extends Describable {
 
     @JSONField(ordinal = 1)
     private FieldType type;
@@ -978,13 +978,13 @@ public class ExtensionType extends ValidatableConf {
      * Will be considered if the type is one of TeletexString, PrintableString, UTF8String and
      * BMPString.
      */
-    @JSONField(ordinal = 2)
+    @JSONField(ordinal = 3)
     private String stringRegex;
 
-    @JSONField(ordinal = 3)
+    @JSONField(ordinal = 4)
     private Tag tag;
 
-    @JSONField(ordinal = 4)
+    @JSONField(ordinal = 5)
     private List<SubFieldSyntax> subFields;
 
     @JSONField(serialize=false, deserialize=false)
