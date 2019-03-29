@@ -41,6 +41,18 @@ public interface CaManager {
 
   String NULL = "null";
 
+  /**
+   * The highest bit is always set to 1, so the effective bit length is bitLen - 1. To ensure that
+   * at least 64 bit entropy, bitLen must be at least 65. For better entropy, we increase it to 71.
+   */
+  int MIN_SERIALNUMBER_SIZE = 71;
+
+  /**
+   * Since serial number should be positive and maximal 20 bytes, the maximal value of bitLen is
+   * 159.
+   */
+  int MAX_SERIALNUMBER_SIZE = 159;
+
   CaSystemStatus getCaSystemStatus() throws CaMgmtException;
 
   void unlockCa() throws CaMgmtException;

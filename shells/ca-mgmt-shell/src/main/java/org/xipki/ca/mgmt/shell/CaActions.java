@@ -192,7 +192,8 @@ public class CaActions {
     private Set<String> permissions;
 
     @Option(name = "--sn-bitlen",
-        description = "number of bits of the serial number, between 65 and 159")
+        description = "number of bits of the serial number, between "
+            + CaManager.MIN_SERIALNUMBER_SIZE + " and " + CaManager.MAX_SERIALNUMBER_SIZE)
     private int snBitLen = 127;
 
     @Option(name = "--next-crl-no", required = true, description = "CRL number for the next CRL")
@@ -274,7 +275,8 @@ public class CaActions {
     private PasswordResolver passwordResolver;
 
     protected MgmtEntry.Ca getCaEntry() throws Exception {
-      Args.range(snBitLen, "sn-bitlen", 65, 159);
+      Args.range(snBitLen, "sn-bitlen",
+          CaManager.MIN_SERIALNUMBER_SIZE, CaManager.MAX_SERIALNUMBER_SIZE);
 
       if (nextCrlNumber < 1) {
         throw new IllegalCmdParamException("invalid CRL number: " + nextCrlNumber);
@@ -975,7 +977,8 @@ public class CaActions {
     private String caName;
 
     @Option(name = "--sn-bitlen",
-        description = "number of bits of the serial number, between 65 and 159")
+        description = "number of bits of the serial number, between "
+            + CaManager.MIN_SERIALNUMBER_SIZE + " and " + CaManager.MAX_SERIALNUMBER_SIZE)
     private Integer snBitLen;
 
     @Option(name = "--status", description = "CA status")
@@ -1083,7 +1086,8 @@ public class CaActions {
       MgmtEntry.ChangeCa entry = new MgmtEntry.ChangeCa(new NameId(null, caName));
 
       if (snBitLen != null) {
-        Args.range(snBitLen, "sn-bitlen", 65, 159);
+        Args.range(snBitLen, "sn-bitlen",
+            CaManager.MIN_SERIALNUMBER_SIZE, CaManager.MAX_SERIALNUMBER_SIZE);
         entry.setSerialNoBitLen(snBitLen);
       }
 

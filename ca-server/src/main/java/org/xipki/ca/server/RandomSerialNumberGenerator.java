@@ -20,6 +20,7 @@ package org.xipki.ca.server;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
+import org.xipki.ca.api.mgmt.CaManager;
 import org.xipki.util.Args;
 
 /**
@@ -44,14 +45,11 @@ class RandomSerialNumberGenerator {
 
   /**
    * Generate the next serial number.
-   * @param bitLen bit length of the serial number. The highest bit is always set to 1, so
-   *        the effective bit length is bitLen - 1. To ensure that at least 64 bit entropy,
-   *        bitLen must be at least 65. And since serial number should be maximal 20 bytes,
-   *        the maximal value of bitLen is 159.
+   * @param bitLen bit length of the serial number.
    * @return the serial number.
    */
   public BigInteger nextSerialNumber(int bitLen) {
-    Args.range(bitLen, "bitlen", 65, 159);
+    Args.range(bitLen, "bitlen", CaManager.MIN_SERIALNUMBER_SIZE, CaManager.MAX_SERIALNUMBER_SIZE);
     final byte[] rdnBytes = new byte[(bitLen + 7) / 8];
     final int ci = bitLen % 8;
     final int minWeight = bitLen >>> 2;

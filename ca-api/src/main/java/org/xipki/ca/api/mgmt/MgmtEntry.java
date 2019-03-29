@@ -173,7 +173,8 @@ public abstract class MgmtEntry {
       this.signerConf = Args.notBlank(signerConf, "signerConf");
 
       this.numCrls = Args.positive(numCrls, "numCrls");
-      this.serialNoBitLen = Args.range(serialNoBitLen, "serialNoBitLen", 65, 159);
+      this.serialNoBitLen = Args.range(serialNoBitLen, "serialNoBitLen",
+          CaManager.MIN_SERIALNUMBER_SIZE, CaManager.MAX_SERIALNUMBER_SIZE);
       this.nextCrlNumber = Args.positive(nextCrlNumber, "nextCrlNumber");
       this.caUris = (caUris == null) ? CaUris.EMPTY_INSTANCE : caUris;
     }
@@ -502,7 +503,8 @@ public abstract class MgmtEntry {
     }
 
     public void setSerialNoBitLen(int serialNoBitLen) {
-      this.serialNoBitLen = Args.range(serialNoBitLen, "serialNoBitLen", 65, 159);
+      this.serialNoBitLen = Args.range(serialNoBitLen, "serialNoBitLen",
+          CaManager.MIN_SERIALNUMBER_SIZE, CaManager.MAX_SERIALNUMBER_SIZE);
     }
 
     public long getNextCrlNumber() {
@@ -1065,7 +1067,8 @@ public abstract class MgmtEntry {
 
     public void setSerialNoBitLen(Integer serialNoBitLen) {
       if (serialNoBitLen != null) {
-        Args.range(serialNoBitLen, "serialNoBitLen", 65, 159);
+        Args.range(serialNoBitLen, "serialNoBitLen",
+            CaManager.MIN_SERIALNUMBER_SIZE, CaManager.MAX_SERIALNUMBER_SIZE);
       }
       this.serialNoBitLen = serialNoBitLen;
     }
