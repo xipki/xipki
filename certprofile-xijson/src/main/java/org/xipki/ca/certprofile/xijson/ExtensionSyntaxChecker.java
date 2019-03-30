@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.certprofile.xijson.conf;
+package org.xipki.ca.certprofile.xijson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +56,10 @@ import org.xipki.security.X509ExtensionType.Tag;
  */
 
 public class ExtensionSyntaxChecker {
+
+  private static class ASN1ObjectHolder {
+    private ASN1Encodable object;
+  }
 
   public static void checkExtension(String name, ASN1Encodable extnValue, ExtnSyntax syntax)
       throws BadCertTemplateException {
@@ -240,6 +244,15 @@ public class ExtensionSyntaxChecker {
 
       checkContentTextOrSubFields(name, syntax, obj);
     }
+
+    // make sure that all required fields are present
+    if (subFieldsIndex < subFieldsSize) {
+      for (; subFieldsIndex < subFieldsSize; subFieldsIndex++) {
+        if (subFields.get(subFieldsIndex).isRequired()) {
+          throw new BadCertTemplateException("invalid " + name);
+        }
+      }
+    }
   }
 
   private static void checkSetSyntax(String name, ASN1Set set, List<SubFieldSyntax> subFields)
@@ -249,15 +262,37 @@ public class ExtensionSyntaxChecker {
     final int size = set.size();
 
     for (int i = 0; i < size; i++) {
-      ASN1Encodable obj = set.getObjectAt(i);
-
+      ASN1ObjectHolder objHolder = new ASN1ObjectHolder();
+      objHolder.object = set.getObjectAt(i);
       // find the matched SubField
+      SubFieldSyntax syntax = getSyntax(name, objHolder, subFields0);
+
+      if (syntax == null) {
+        throw new BadCertTemplateException("invalid " + name);
+      }
+
+      subFields0.remove(syntax);
+      checkContentTextOrSubFields(name, syntax, objHolder.object);
+    }
+
+    for (SubFieldSyntax m : subFields0) {
+      if (m.isRequired()) {
+        throw new BadCertTemplateException("invalid " + name);
+      }
+    }
+  }
+
+  private static SubFieldSyntax getSyntax(String name, ASN1ObjectHolder objHolder,
+      List<SubFieldSyntax> subFields) throws BadCertTemplateException {
+      // find the matched SubField
+      ASN1Encodable obj = objHolder.object;
+
       SubFieldSyntax syntax = null;
       if (obj instanceof ASN1TaggedObject) {
         ASN1TaggedObject taggedObj = (ASN1TaggedObject) obj;
         Tag tag = new Tag(taggedObj.getTagNo(), taggedObj.isExplicit());
 
-        for (SubFieldSyntax m : subFields0) {
+        for (SubFieldSyntax m : subFields) {
           // found the syntax with given tag.
           if (m.getTag() != null && m.getTag().getValue() == tag.getValue()) {
             if (m.getTag().isExplicit() == tag.isExplicit()) {
@@ -301,7 +336,7 @@ public class ExtensionSyntaxChecker {
       } else {
         FieldType expectedType = getFieldType(obj);
 
-        for (SubFieldSyntax m : subFields0) {
+        for (SubFieldSyntax m : subFields) {
           FieldType syntaxType = m.type();
 
           if ((m.getTag() == null)
@@ -314,28 +349,22 @@ public class ExtensionSyntaxChecker {
         }
       }
 
-      if (syntax == null) {
-        throw new BadCertTemplateException("invalid " + name);
-      }
-
-      subFields0.remove(syntax);
-      checkContentTextOrSubFields(name, syntax, obj);
-    }
-
-    for (SubFieldSyntax m : subFields0) {
-      if (m.isRequired()) {
-        throw new BadCertTemplateException("invalid " + name);
-      }
-    }
+      objHolder.object = obj;
+      return syntax;
   }
 
   private static void checkSequenceOfOrSetOfSyntax(String name, ASN1Sequence seq,
-      ASN1Set set, SubFieldSyntax subField) throws BadCertTemplateException {
+      ASN1Set set, List<SubFieldSyntax> subFields) throws BadCertTemplateException {
     final int size = (seq != null) ? seq.size() : set.size();
 
     for (int i = 0; i < size; i++) {
-      ASN1Encodable obj = (seq != null) ? seq.getObjectAt(i) : set.getObjectAt(i);
-      checkField(name, obj, subField);
+      ASN1ObjectHolder objHolder = new ASN1ObjectHolder();
+      objHolder.object = (seq != null) ? seq.getObjectAt(i) : set.getObjectAt(i);
+      SubFieldSyntax subField = getSyntax(name, objHolder, subFields);
+      if (subField == null) {
+        throw new BadCertTemplateException("invalid " + name);
+      }
+      checkField(name, objHolder.object, subField);
     }
   }
 
@@ -453,8 +482,11 @@ public class ExtensionSyntaxChecker {
 
   private static void checkContentTextOrSubFields(String name, ExtnSyntax subField,
       ASN1Encodable obj) throws BadCertTemplateException {
-    if (subField.getStringPattern() != null && obj instanceof ASN1String) {
-      assertMatch(name, subField.getStringPattern(), ((ASN1String) obj).getString());
+    if (obj instanceof ASN1String) {
+      if (subField.getStringPattern() != null) {
+        assertMatch(name, subField.getStringPattern(), ((ASN1String) obj).getString());
+      }
+      return;
     }
 
     FieldType syntaxType = subField.type();
@@ -463,11 +495,9 @@ public class ExtensionSyntaxChecker {
     } else if (syntaxType == FieldType.SET) {
       checkSetSyntax(name, (ASN1Set) obj, subField.getSubFields());
     } else if (syntaxType == FieldType.SEQUENCE_OF) {
-      checkSequenceOfOrSetOfSyntax(name, (ASN1Sequence) obj, null,
-          subField.getSubFields().get(0));
-    } else if (syntaxType == FieldType.SET) {
-      checkSequenceOfOrSetOfSyntax(name, null, (ASN1Set) obj,
-          subField.getSubFields().get(0));
+      checkSequenceOfOrSetOfSyntax(name, (ASN1Sequence) obj, null, subField.getSubFields());
+    } else if (syntaxType == FieldType.SET_OF) {
+      checkSequenceOfOrSetOfSyntax(name, null, (ASN1Set) obj, subField.getSubFields());
     }
   }
 

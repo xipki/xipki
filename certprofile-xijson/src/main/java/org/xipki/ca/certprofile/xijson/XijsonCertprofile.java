@@ -82,7 +82,6 @@ import org.xipki.ca.api.profile.Range;
 import org.xipki.ca.api.profile.SubjectDnSpec;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableInt;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
-import org.xipki.ca.certprofile.xijson.conf.ExtensionSyntaxChecker;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.AdditionalInformation;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.AdmissionSyntax;

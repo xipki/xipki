@@ -102,12 +102,12 @@ import org.xipki.ca.api.profile.Patterns;
 import org.xipki.ca.certprofile.xijson.AdmissionSyntaxOption;
 import org.xipki.ca.certprofile.xijson.BiometricInfoOption;
 import org.xipki.ca.certprofile.xijson.DirectoryStringType;
+import org.xipki.ca.certprofile.xijson.ExtensionSyntaxChecker;
 import org.xipki.ca.certprofile.xijson.SubjectDirectoryAttributesControl;
 import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
 import org.xipki.ca.certprofile.xijson.conf.CertificatePolicyInformationType;
 import org.xipki.ca.certprofile.xijson.conf.CertificatePolicyInformationType.PolicyQualifier;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableInt;
-import org.xipki.ca.certprofile.xijson.conf.ExtensionSyntaxChecker;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.AdditionalInformation;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.AuthorizationTemplate;
@@ -1141,11 +1141,11 @@ public class ExtensionsChecker {
       int size = isPolicyQualifiers.size();
       for (int i = 0; i < size; i++) {
         PolicyQualifierInfo isPolicyQualifierInfo =
-            (PolicyQualifierInfo) isPolicyQualifiers.getObjectAt(i);
+            PolicyQualifierInfo.getInstance(isPolicyQualifiers.getObjectAt(i));
         ASN1ObjectIdentifier isPolicyQualifierId = isPolicyQualifierInfo.getPolicyQualifierId();
         ASN1Encodable isQualifier = isPolicyQualifierInfo.getQualifier();
         if (PolicyQualifierId.id_qt_cps.equals(isPolicyQualifierId)) {
-          String isCpsUri = ((DERIA5String) isQualifier).getString();
+          String isCpsUri = DERIA5String.getInstance(isQualifier).getString();
           isCpsUris.add(isCpsUri);
         } else if (PolicyQualifierId.id_qt_unotice.equals(isPolicyQualifierId)) {
           UserNotice isUserNotice = UserNotice.getInstance(isQualifier);

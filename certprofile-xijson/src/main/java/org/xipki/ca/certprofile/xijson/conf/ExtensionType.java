@@ -1072,6 +1072,11 @@ public class ExtensionType extends ValidatableConf {
           // two subfields of same type have different tag
           Set<String> set = new HashSet<>();
           for (SubFieldSyntax m : subFields) {
+            if (m.isRequired()) {
+              throw new InvalidConfException(
+                  "SubField within SEQUECE_OF or SET OF must not be required");
+            }
+
             int tag = (m.getTag() != null) ? m.getTag().getValue() : -1;
             if (!set.add(m.type() + "-" + tag)) {
               throw new InvalidConfException("multiple " + m.type()
