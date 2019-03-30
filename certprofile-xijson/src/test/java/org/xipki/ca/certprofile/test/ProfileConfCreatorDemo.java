@@ -54,6 +54,8 @@ import org.xipki.ca.certprofile.xijson.DirectoryStringType;
 import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
 import org.xipki.ca.certprofile.xijson.conf.AlgorithmType;
 import org.xipki.ca.certprofile.xijson.conf.CertificatePolicyInformationType;
+import org.xipki.ca.certprofile.xijson.conf.CertificatePolicyInformationType.PolicyQualfierType;
+import org.xipki.ca.certprofile.xijson.conf.CertificatePolicyInformationType.PolicyQualifier;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableBinary;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableInt;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
@@ -369,9 +371,11 @@ public class ProfileConfCreatorDemo {
 
     // Certificate Policies
     list.add(createExtension(Extension.certificatePolicies, true, false));
-    last(list).setCertificatePolicies(
-        createCertificatePolicies(new ASN1ObjectIdentifier("1.2.3.4.5"),
-            new ASN1ObjectIdentifier("2.4.3.2.1")));
+
+    Map<ASN1ObjectIdentifier, String> policies = new HashMap<>();
+    policies.put(new ASN1ObjectIdentifier("1.2.3.4.5"), "http://example.org/ca1-cps");
+    policies.put(new ASN1ObjectIdentifier("2.4.3.2.1"), null);
+    last(list).setCertificatePolicies(createCertificatePolicies(policies));
 
     // Policy Mappings
     list.add(createExtension(Extension.policyMappings, true, true));
@@ -2056,17 +2060,28 @@ public class ProfileConfCreatorDemo {
     return extValue;
   }
 
-  private static CertificatePolicies createCertificatePolicies(ASN1ObjectIdentifier... policyOids) {
-    if (policyOids == null || policyOids.length == 0) {
+  private static CertificatePolicies createCertificatePolicies(
+      Map<ASN1ObjectIdentifier, String> policies) {
+    if (policies == null || policies.isEmpty()) {
       return null;
     }
 
     CertificatePolicies extValue = new CertificatePolicies();
     List<CertificatePolicyInformationType> pis = extValue.getCertificatePolicyInformations();
-    for (ASN1ObjectIdentifier oid : policyOids) {
+    for (ASN1ObjectIdentifier oid : policies.keySet()) {
       CertificatePolicyInformationType single = new CertificatePolicyInformationType();
       pis.add(single);
       single.setPolicyIdentifier(createOidType(oid));
+
+      List<PolicyQualifier> qualifiers = new ArrayList<>(1);
+      String cpsUri = policies.get(oid);
+      if (cpsUri != null) {
+        PolicyQualifier qualifier = new PolicyQualifier();
+        qualifier.setType(PolicyQualfierType.cpsUri);
+        qualifier.setValue(cpsUri);
+        qualifiers.add(qualifier);
+      }
+      single.setPolicyQualifiers(qualifiers);
     }
 
     return extValue;

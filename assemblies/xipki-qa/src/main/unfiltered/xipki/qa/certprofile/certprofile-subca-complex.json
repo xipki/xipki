@@ -204,7 +204,12 @@
 				"policyIdentifier":{
 					"oid":"1.2.3.4.5"
 				},
-				"policyQualifiers":[]
+				"policyQualifiers":[
+					{
+						"type":"cpsUri",
+						"value":"http://example.org/ca1-cps"
+					}
+				]
 			},{
 				"policyIdentifier":{
 					"oid":"2.4.3.2.1"
