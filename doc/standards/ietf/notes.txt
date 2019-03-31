@@ -1,0 +1,1 @@
+Engineering deep dive: Encoding of SCTs in certificates: https://letsencrypt.org/2018/04/04/sct-encoding.html
