@@ -164,6 +164,7 @@ public class ExtensionsConfCreatorDemo {
     admissionExtn.setConstant(admissionSyntax);
     admissionSyntax.setDescription("AdmissionSyntax");
 
+    // CHECKSTYLE:SKIP
     List<ConstantExtnValue> admissionSyntax_values = new LinkedList<>();
     admissionSyntax.setListValue(admissionSyntax_values);
 
@@ -171,6 +172,7 @@ public class ExtensionsConfCreatorDemo {
     admissionSyntax_values.add(contentsOfAdmissions);
     contentsOfAdmissions.setDescription("contentsOfAdmissions");
 
+    // CHECKSTYLE:SKIP
     List<ConstantExtnValue> contentsOfAdmissions_values = new LinkedList<>();
     contentsOfAdmissions.setListValue(contentsOfAdmissions_values);
 
@@ -178,6 +180,7 @@ public class ExtensionsConfCreatorDemo {
     contentsOfAdmissions_values.add(admissions);
     admissions.setDescription("admissions");
 
+    // CHECKSTYLE:SKIP
     List<ConstantExtnValue> admissions_values = new LinkedList<>();
     admissions.setListValue(admissions_values);
 
@@ -185,6 +188,7 @@ public class ExtensionsConfCreatorDemo {
     admissions_values.add(professionInfos);
     professionInfos.setDescription("professionInfos");
 
+    // CHECKSTYLE:SKIP
     List<ConstantExtnValue> professionInfos_values = new LinkedList<>();
     professionInfos.setListValue(professionInfos_values);
 
@@ -192,6 +196,7 @@ public class ExtensionsConfCreatorDemo {
     professionInfos_values.add(professionInfo);
     professionInfo.setDescription("professionInfo");
 
+    // CHECKSTYLE:SKIP
     List<ConstantExtnValue> professionInfo_values = new LinkedList<>();
     professionInfo.setListValue(professionInfo_values);
 
@@ -200,6 +205,7 @@ public class ExtensionsConfCreatorDemo {
     professionInfo_values.add(professionItems);
     professionItems.setDescription("professionItems");
 
+    // CHECKSTYLE:SKIP
     List<ConstantExtnValue> professionItems_values = new LinkedList<>();
     professionItems.setListValue(professionItems_values);
 
@@ -241,6 +247,7 @@ public class ExtensionsConfCreatorDemo {
     ConstantExtnValue sdaSyntax = new ConstantExtnValue(FieldType.SEQUENCE_OF);
     sdaExt.setConstant(sdaSyntax);
 
+    // CHECKSTYLE:SKIP
     List<ConstantExtnValue> sdaSyntax_values = new LinkedList<>();
     sdaSyntax.setListValue(sdaSyntax_values);
 
@@ -281,6 +288,7 @@ public class ExtensionsConfCreatorDemo {
       ConstantExtnValue attribute = new ConstantExtnValue(FieldType.SEQUENCE);
       sdaSyntax_values.add(attribute);
 
+      // CHECKSTYLE:SKIP
       List<ConstantExtnValue> attribute_values = new LinkedList<>();
       attribute.setListValue(attribute_values);
 
@@ -295,6 +303,7 @@ public class ExtensionsConfCreatorDemo {
       ConstantExtnValue values = new ConstantExtnValue(FieldType.SET);
       attribute_values.add(values);
 
+      // CHECKSTYLE:SKIP
       List<ConstantExtnValue> values_values = new LinkedList<>();
       values.setListValue(values_values);
 

@@ -1219,16 +1219,16 @@ public class ProfileConfCreatorDemo {
     marshall(profile, destFilename, true);
   } // method certprofileEeComplex
 
-  private static void certprofileConstantExt(String destFilename) throws Exception {
-    certprofileConstantExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.1"), null);
-  }
-
   private static void certprofileConstantExtImplicitTag(String destFilename) throws Exception {
     certprofileConstantExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.2"), new Tag(1, false));
   }
 
   private static void certprofileConstantExtExplicitTag(String destFilename) throws Exception {
     certprofileConstantExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.3"), new Tag(1, true));
+  }
+
+  private static void certprofileConstantExt(String destFilename) throws Exception {
+    certprofileConstantExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.1"), null);
   }
 
   private static void certprofileConstantExt(String destFilename, ASN1ObjectIdentifier oidPrefix,
@@ -1284,16 +1284,16 @@ public class ProfileConfCreatorDemo {
     marshall(profile, destFilename, true);
   } // method certprofileConstantExt
 
-  private static void certprofileSyntaxExt(String destFilename) throws Exception {
-    certprofileSyntaxExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.1"), null);
-  }
-
   private static void certprofileSyntaxExtImplicitTag(String destFilename) throws Exception {
     certprofileSyntaxExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.2"), new Tag(1, false));
   }
 
   private static void certprofileSyntaxExtExplicitTag(String destFilename) throws Exception {
     certprofileSyntaxExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.3"), new Tag(1, true));
+  }
+
+  private static void certprofileSyntaxExt(String destFilename) throws Exception {
+    certprofileSyntaxExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.1"), null);
   }
 
   private static void certprofileSyntaxExt(String destFilename,

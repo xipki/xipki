@@ -268,6 +268,10 @@ public class XijsonCertprofile extends BaseCertprofile {
   protected void extraReset() {
   }
 
+  public Map<ASN1ObjectIdentifier, ExtnSyntax> getExtensionsWithSyntax() {
+    return extensionsWithSyntax;
+  }
+
   @Override
   public void initialize(String data) throws CertprofileException {
     Args.notBlank(data, "data");
@@ -285,10 +289,6 @@ public class XijsonCertprofile extends BaseCertprofile {
     initialize(conf);
 
   } // method initialize
-
-  public Map<ASN1ObjectIdentifier, ExtnSyntax> getExtensionsWithSyntax() {
-    return extensionsWithSyntax;
-  }
 
   public void initialize(X509ProfileType conf) throws CertprofileException {
     Args.notNull(conf, "conf");
@@ -443,8 +443,8 @@ public class XijsonCertprofile extends BaseCertprofile {
 
       ValueType value = rdn.getValue();
       RdnControl rdnControl = (value == null)
-        ? new RdnControl(type, rdn.getMinOccurs(), rdn.getMaxOccurs())
-        : new RdnControl(type, value.getText(), value.isOverridable());
+          ? new RdnControl(type, rdn.getMinOccurs(), rdn.getMaxOccurs())
+          : new RdnControl(type, value.getText(), value.isOverridable());
 
       subjectDnControls.add(rdnControl);
 

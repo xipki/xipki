@@ -524,8 +524,8 @@ public class ExtensionsChecker {
     for (ASN1ObjectIdentifier oid : extensionControls.keySet()) {
       if (extensionControls.get(oid).isRequired()) {
         types.add(oid);
-      } else if ((requestedExtns != null && requestedExtns.getExtension(oid) != null) &&
-          (extensionSyntaxes != null && extensionSyntaxes.containsKey(oid))) {
+      } else if ((requestedExtns != null && requestedExtns.getExtension(oid) != null)
+          && (extensionSyntaxes != null && extensionSyntaxes.containsKey(oid))) {
         types.add(oid);
       }
     }

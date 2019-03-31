@@ -986,7 +986,7 @@ public class ExtensionType extends ValidatableConf {
     @JSONField(ordinal = 5)
     private List<SubFieldSyntax> subFields;
 
-    @JSONField(serialize=false, deserialize=false)
+    @JSONField(serialize = false, deserialize = false)
     private Pattern stringPattern;
 
     @JSONField(name = "type")

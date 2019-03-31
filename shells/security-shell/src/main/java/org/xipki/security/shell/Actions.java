@@ -365,7 +365,7 @@ public class Actions {
     @Option(name = "--dateOfBirth", description = "Date of birth YYYYMMdd in subject")
     private String dateOfBirth;
 
-    @Option(name = "--postalAddress", multiValued = true, description="postal address in subject")
+    @Option(name = "--postalAddress", multiValued = true, description = "postal address in subject")
     private List<String> postalAddress;
 
     @Option(name = "--rsa-mgf1",

@@ -361,8 +361,8 @@ public final class CmpClientImpl implements CmpClient {
           if (sslConf == null) {
             LOG.error("no ssl named {} is configured", caType.getSsl());
           } else {
-              sslSocketFactory = sslConf.getSslSocketFactory();
-              hostnameVerifier = sslConf.getHostnameVerifier();
+            sslSocketFactory = sslConf.getSslSocketFactory();
+            hostnameVerifier = sslConf.getHostnameVerifier();
           }
         }
 

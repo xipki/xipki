@@ -57,6 +57,7 @@ import org.xipki.security.X509ExtensionType.Tag;
 
 public class ExtensionSyntaxChecker {
 
+  // CHECKSTYLE:SKIP
   private static class ASN1ObjectHolder {
     private ASN1Encodable object;
   }
@@ -189,7 +190,7 @@ public class ExtensionSyntaxChecker {
       // find the matched SubField
       int matchIndex = -1;
       for (int j = subFieldsIndex; j < subFieldsSize; j++) {
-        SubFieldSyntax subFieldSyntax= subFields.get(j);
+        SubFieldSyntax subFieldSyntax = subFields.get(j);
         FieldType syntaxType = subFieldSyntax.type();
         Tag syntaxTag = subFieldSyntax.getTag();
 
@@ -284,73 +285,73 @@ public class ExtensionSyntaxChecker {
 
   private static SubFieldSyntax getSyntax(String name, ASN1ObjectHolder objHolder,
       List<SubFieldSyntax> subFields) throws BadCertTemplateException {
-      // find the matched SubField
-      ASN1Encodable obj = objHolder.object;
+    // find the matched SubField
+    ASN1Encodable obj = objHolder.object;
 
-      SubFieldSyntax syntax = null;
-      if (obj instanceof ASN1TaggedObject) {
-        ASN1TaggedObject taggedObj = (ASN1TaggedObject) obj;
-        Tag tag = new Tag(taggedObj.getTagNo(), taggedObj.isExplicit());
+    SubFieldSyntax syntax = null;
+    if (obj instanceof ASN1TaggedObject) {
+      ASN1TaggedObject taggedObj = (ASN1TaggedObject) obj;
+      Tag tag = new Tag(taggedObj.getTagNo(), taggedObj.isExplicit());
 
-        for (SubFieldSyntax m : subFields) {
-          // found the syntax with given tag.
-          if (m.getTag() != null && m.getTag().getValue() == tag.getValue()) {
-            if (m.getTag().isExplicit() == tag.isExplicit()) {
+      for (SubFieldSyntax m : subFields) {
+        // found the syntax with given tag.
+        if (m.getTag() != null && m.getTag().getValue() == tag.getValue()) {
+          if (m.getTag().isExplicit() == tag.isExplicit()) {
+            syntax = m;
+          } else if (!m.getTag().isExplicit()) {
+            // 1. [t] IMPLICIT SEQUENCE { type } is wired the same as [t] EXPLICIT type
+            // 2. [t] IMPLICIT      SET { type } is wired the same as [t] EXPLICIT type
+            FieldType type = m.type();
+            if (type == FieldType.SEQUENCE || type == FieldType.SEQUENCE_OF) {
+              obj = new DERSequence(((ASN1TaggedObject) obj).getObject());
               syntax = m;
-            } else if (!m.getTag().isExplicit()) {
-              // 1. [t] IMPLICIT SEQUENCE { type } is wired the same as [t] EXPLICIT type
-              // 2. [t] IMPLICIT      SET { type } is wired the same as [t] EXPLICIT type
-              FieldType type = m.type();
-              if (type == FieldType.SEQUENCE || type == FieldType.SEQUENCE_OF) {
-                obj = new DERSequence(((ASN1TaggedObject) obj).getObject());
-                syntax = m;
-              } else if (type == FieldType.SET || type == FieldType.SET_OF) {
-                obj = new DERSet(((ASN1TaggedObject) obj).getObject());
-                syntax = m;
-              }
-            } else {
-              throw new BadCertTemplateException("invalid " + name);
-            }
-
-            if (syntax != null) {
-              break;
-            }
-          }
-        } // end for
-
-        if (syntax != null) {
-          if (syntax.getTag().isExplicit()) {
-            obj = taggedObj.getObject();
-            FieldType expectedType = getFieldType(obj);
-            FieldType syntaxType = syntax.type();
-
-            if (!((syntaxType == expectedType)
-                    || (syntaxType == FieldType.SEQUENCE_OF && expectedType == FieldType.SEQUENCE)
-                    || (syntaxType == FieldType.SET_OF && expectedType == FieldType.SET))) {
-              throw new BadCertTemplateException("invalid " + name);
+            } else if (type == FieldType.SET || type == FieldType.SET_OF) {
+              obj = new DERSet(((ASN1TaggedObject) obj).getObject());
+              syntax = m;
             }
           } else {
-            obj = getParsedImplicitValue(name, taggedObj, syntax.type());
+            throw new BadCertTemplateException("invalid " + name);
+          }
+
+          if (syntax != null) {
+            break;
           }
         }
-      } else {
-        FieldType expectedType = getFieldType(obj);
+      } // end for
 
-        for (SubFieldSyntax m : subFields) {
-          FieldType syntaxType = m.type();
+      if (syntax != null) {
+        if (syntax.getTag().isExplicit()) {
+          obj = taggedObj.getObject();
+          FieldType expectedType = getFieldType(obj);
+          FieldType syntaxType = syntax.type();
 
-          if ((m.getTag() == null)
-            && (syntaxType == expectedType
-                || (syntaxType == FieldType.SEQUENCE_OF && expectedType == FieldType.SEQUENCE)
-                || (syntaxType == FieldType.SET_OF && expectedType == FieldType.SET))) {
-              syntax = m;
-              break;
+          if (!((syntaxType == expectedType)
+                  || (syntaxType == FieldType.SEQUENCE_OF && expectedType == FieldType.SEQUENCE)
+                  || (syntaxType == FieldType.SET_OF && expectedType == FieldType.SET))) {
+            throw new BadCertTemplateException("invalid " + name);
           }
+        } else {
+          obj = getParsedImplicitValue(name, taggedObj, syntax.type());
         }
       }
+    } else {
+      FieldType expectedType = getFieldType(obj);
 
-      objHolder.object = obj;
-      return syntax;
+      for (SubFieldSyntax m : subFields) {
+        FieldType syntaxType = m.type();
+
+        if ((m.getTag() == null)
+            && (syntaxType == expectedType
+            || (syntaxType == FieldType.SEQUENCE_OF && expectedType == FieldType.SEQUENCE)
+            || (syntaxType == FieldType.SET_OF && expectedType == FieldType.SET))) {
+          syntax = m;
+          break;
+        }
+      }
+    }
+
+    objHolder.object = obj;
+    return syntax;
   }
 
   private static void checkSequenceOfOrSetOfSyntax(String name, ASN1Sequence seq,

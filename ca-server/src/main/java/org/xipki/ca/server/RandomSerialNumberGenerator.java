@@ -64,8 +64,8 @@ class RandomSerialNumberGenerator {
       // check NAF weight
       BigInteger bi = new BigInteger(1, rdnBytes);
 
-      BigInteger _3bi = bi.shiftLeft(1).add(bi);
-      BigInteger diff = _3bi.xor(bi);
+      BigInteger threeBi = bi.shiftLeft(1).add(bi);
+      BigInteger diff = threeBi.xor(bi);
       int nafWeight = diff.bitCount();
       if (nafWeight >= minWeight) {
         return bi;
