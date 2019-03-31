@@ -35,13 +35,13 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.isismtt.x509.NamingAuthority;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.CertPolicyId;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralSubtree;
 import org.bouncycastle.asn1.x509.PolicyInformation;
+import org.bouncycastle.asn1.x509.PolicyQualifierId;
 import org.bouncycastle.asn1.x509.PolicyQualifierInfo;
 import org.bouncycastle.asn1.x509.UserNotice;
 import org.xipki.ca.api.profile.Certprofile.ExtKeyUsageControl;
@@ -903,8 +903,7 @@ public class ExtensionType extends ValidatableConf {
           qualifierInfo = new PolicyQualifierInfo(qualifier.getCpsUri());
         } else if (qualifier.getUserNotice() != null) {
           UserNotice userNotice = new UserNotice(null, qualifier.getUserNotice());
-          qualifierInfo = new PolicyQualifierInfo(PKCSObjectIdentifiers.id_spq_ets_unotice,
-              userNotice);
+          qualifierInfo = new PolicyQualifierInfo(PolicyQualifierId.id_qt_unotice, userNotice);
         } else {
           qualifierInfo = null;
         }

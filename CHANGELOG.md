@@ -8,6 +8,7 @@ See also <https://github.com/xipki/xipki/releases>
   - Make sure that the certificate serial number is randomly generated with at least 70 bit entropy and not weak by checking the NAF weight.
   - Simplify and extend the configuration of custom extension
   - Extend the command csr-p11 and csr-p12 to generate CSR with complex subject and extensions
+  - In the extension CertificatePolicies, the OID for User Notice is not correct. This has been fixed.
 
 ## 5.1.0
   - Release date: Mar 17, 2019
