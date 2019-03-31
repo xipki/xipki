@@ -1,0 +1,45 @@
+{
+	"extensions":[{
+		"constant":{
+			"type":"SEQUENCE",
+			"listValue":[{
+				"type":"UTF8String",
+				"value":"abc.def.myBlog"
+			},{
+				"type":"SEQUENCE",
+				"listValue":[
+					{
+						"type":"UTF8String",
+						"value":"app"
+					}
+				]
+			},{
+				"type":"UTF8String",
+				"value":"abc.def.myBlog.voip"
+			},{
+				"type":"SEQUENCE",
+				"listValue":[
+					{
+						"type":"UTF8String",
+						"value":"void"
+					}
+				]
+			},{
+				"type":"UTF8String",
+				"value":"abc.def.myBlog.complication"
+			},{
+				"type":"SEQUENCE",
+				"listValue":[
+					{
+						"type":"UTF8String",
+						"value":"complication"
+					}
+				]
+			}]
+		},
+		"type":{
+			"oid":"1.2.840.113635.100.6.3.6",
+			"description":"custom apple extension"
+		}
+	}]
+}

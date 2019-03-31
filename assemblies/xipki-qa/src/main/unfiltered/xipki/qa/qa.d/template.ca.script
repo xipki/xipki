@@ -14,7 +14,7 @@ echo "#################################################################"
 list = [ cross subca subca-complex ocsp scep multiple-ous multi-valued-rdn \
   qc ee-complex smime smime-legacy tls tls-c tls-inc-sn max-time fixed-partial-subject \
   constant-ext constant-ext-implicit-tag constant-ext-explicit-tag \
-  syntax-ext syntax-ext-implicit-tag syntax-ext-explicit-tag ]
+  syntax-ext syntax-ext-implicit-tag syntax-ext-explicit-tag apple-wwdr ]
 
 each ($list) {
   ca:profile-add --type xijson --name ${it} \
@@ -420,7 +420,8 @@ ca:caprofile-add \
   --profile scep \
   --profile multiple-ous \
   --profile multi-valued-rdn \
-  --profile max-time
+  --profile max-time \
+  --profile apple-wwdr
 
 ## Add CMP requestor to CA
 ca:careq-add \

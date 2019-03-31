@@ -172,6 +172,12 @@
 			"file":"${profiles.dir}/certprofile-tls-inc-sn.json"
 		}
 	},{
+		"name":"apple-wwdr",
+		"type":"xijson",
+		"conf":{
+			"file":"${profiles.dir}/certprofile-apple-wwdr.json"
+		}
+	},{
 		"name":"max-time",
 		"type":"xijson",
 		"conf":{

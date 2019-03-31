@@ -229,7 +229,7 @@ public class ExtensionSyntaxChecker {
           }
         }
 
-        if (!subFieldSyntax.isRequired()) {
+        if (subFieldSyntax.isRequired()) {
           // cannot be skipped
           throw new BadCertTemplateException("invalid " + name);
         }

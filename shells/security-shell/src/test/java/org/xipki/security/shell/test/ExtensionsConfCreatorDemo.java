@@ -76,6 +76,7 @@ public class ExtensionsConfCreatorDemo {
           new ASN1ObjectIdentifier("1.2.3.6.2"), new Tag(1, false));
       extensionsSyntaxExt("extensions-syntax-ext-explicit-tag.json",
           new ASN1ObjectIdentifier("1.2.3.6.3"), new Tag(1, true));
+      extensionsAppleWwdr("extensions-apple-wwdr.json");
     } catch (Exception ex) {
       ex.printStackTrace();
     }
@@ -397,13 +398,13 @@ public class ExtensionsConfCreatorDemo {
      *  1. SEQUENCE or SET {
      *  2.       UTF8String abc.def.myBlog EXPLICIT
      *  3.       SEQUENCE
-     *  4.         UTF8String :app
+     *  4.         UTF8String app
      *  5.   [0] UTF8String abc.def.myBlog.voip EXPLICIT
      *  6.   [1] SEQUENCE EXPLICIT
-     *  7.         UTF8String :voip
+     *  7.         UTF8String voip
      *  8.   [2] UTF8String abc.def.myBlog.complication IMPLICIT
      *  9.   [3] SEQUENCE IMPLICIT
-     * 10.         UTF8String :complication
+     * 10.         UTF8String complication
      * 11. }
      */
     List<ConstantExtnValue> subFields = new LinkedList<>();
@@ -416,7 +417,7 @@ public class ExtensionsConfCreatorDemo {
     subField = new ConstantExtnValue(FieldType.SEQUENCE);
     subFields.add(subField);
     ConstantExtnValue subsubField = new ConstantExtnValue(FieldType.UTF8String);
-    subsubField.setValue(":app");
+    subsubField.setValue("app");
     subField.setListValue(Arrays.asList(subsubField));
 
     // Line 5
@@ -430,7 +431,7 @@ public class ExtensionsConfCreatorDemo {
     subFields.add(subField);
     subField.setTag(new Tag(1, true));
     subsubField = new ConstantExtnValue(FieldType.UTF8String);
-    subsubField.setValue(":void");
+    subsubField.setValue("void");
     subField.setListValue(Arrays.asList(subsubField));
 
     // Line 8
@@ -444,7 +445,7 @@ public class ExtensionsConfCreatorDemo {
     subFields.add(subField);
     subField.setTag(new Tag(9, false));
     subsubField = new ConstantExtnValue(FieldType.UTF8String);
-    subsubField.setValue(":complication");
+    subsubField.setValue("complication");
     subField.setListValue(Arrays.asList(subsubField));
 
     return subFields;
@@ -455,13 +456,13 @@ public class ExtensionsConfCreatorDemo {
      *  1. SEQUENCE or SET {
      *  3.   SEQUENCE
      *  3.     UTF8String abc.def.myBlog
-     *  4.     UTF8String :app
+     *  4.     UTF8String app
      *  5.   SEQUENCE
      *  6.       UTF8String abc.def.myBlog.voip
-     *  7.       UTF8String :voip
+     *  7.       UTF8String voip
      *  8.   SEQUENCE
      *  9.     UTF8String abc.def.myBlog.complication
-     * 10.     UTF8String :complication
+     * 10.     UTF8String complication
      * 11. }
      */
     List<ConstantExtnValue> subFields = new LinkedList<>();
@@ -479,7 +480,7 @@ public class ExtensionsConfCreatorDemo {
       subsubFields.add(subsubField);
 
       subsubField = new ConstantExtnValue(FieldType.UTF8String);
-      subsubField.setValue(":app");
+      subsubField.setValue("app");
       subsubFields.add(subsubField);
     }
 
@@ -496,7 +497,7 @@ public class ExtensionsConfCreatorDemo {
       subsubFields.add(subsubField);
 
       subsubField = new ConstantExtnValue(FieldType.UTF8String);
-      subsubField.setValue(":voip");
+      subsubField.setValue("voip");
       subsubFields.add(subsubField);
     }
 
@@ -513,12 +514,80 @@ public class ExtensionsConfCreatorDemo {
       subsubFields.add(subsubField);
 
       subsubField = new ConstantExtnValue(FieldType.UTF8String);
-      subsubField.setValue(":complication");
+      subsubField.setValue("complication");
       subsubFields.add(subsubField);
     }
 
     return subFields;
   }
+
+  private static void extensionsAppleWwdr(String destFilename) throws Exception {
+    ExtensionsType extensions = new ExtensionsType();
+    List<X509ExtensionType> list = new LinkedList<>();
+    extensions.setExtensions(list);
+
+    /*
+     *  1. SEQUENCE or SET {
+     *  2.   UTF8String abc.def.myBlog EXPLICIT
+     *  3.   SEQUENCE
+     *  4.     UTF8String app
+     *  5.   UTF8String abc.def.myBlog.voip EXPLICIT
+     *  6.   SEQUENCE EXPLICIT
+     *  7.     UTF8String voip
+     *  8.   UTF8String abc.def.myBlog.complication IMPLICIT
+     *  9.   SEQUENCE IMPLICIT
+     * 10.     UTF8String complication
+     * 11. }
+     */
+    List<ConstantExtnValue> subFields = new LinkedList<>();
+    // Line 2
+    ConstantExtnValue subField = new ConstantExtnValue(FieldType.UTF8String);
+    subFields.add(subField);
+    subField.setValue("abc.def.myBlog");
+
+    // Line 3-4
+    subField = new ConstantExtnValue(FieldType.SEQUENCE);
+    subFields.add(subField);
+    ConstantExtnValue subsubField = new ConstantExtnValue(FieldType.UTF8String);
+    subsubField.setValue("app");
+    subField.setListValue(Arrays.asList(subsubField));
+
+    // Line 5
+    subField = new ConstantExtnValue(FieldType.UTF8String);
+    subFields.add(subField);
+    subField.setValue("abc.def.myBlog.voip");
+
+    // Line 6-7
+    subField = new ConstantExtnValue(FieldType.SEQUENCE);
+    subFields.add(subField);
+    subsubField = new ConstantExtnValue(FieldType.UTF8String);
+    subsubField.setValue("void");
+    subField.setListValue(Arrays.asList(subsubField));
+
+    // Line 8
+    subField = new ConstantExtnValue(FieldType.UTF8String);
+    subFields.add(subField);
+    subField.setValue("abc.def.myBlog.complication");
+
+    // Line 9-10
+    subField = new ConstantExtnValue(FieldType.SEQUENCE);
+    subFields.add(subField);
+    subsubField = new ConstantExtnValue(FieldType.UTF8String);
+    subsubField.setValue("complication");
+    subField.setListValue(Arrays.asList(subsubField));
+
+    X509ExtensionType extn = new X509ExtensionType();
+    list.add(extn);
+
+    // children
+    extn.setType(createOidType(new ASN1ObjectIdentifier("1.2.840.113635.100.6.3.6"),
+        "custom apple extension"));
+    ConstantExtnValue extnValue = new ConstantExtnValue(FieldType.SEQUENCE);
+    extnValue.setListValue(subFields);
+    extn.setConstant(extnValue);
+
+    marshall(extensions, destFilename);
+  } // method certprofileEeComplex
 
   private static DescribableOid createOidType(ASN1ObjectIdentifier oid, String description) {
     DescribableOid ret = new DescribableOid();

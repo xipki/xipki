@@ -189,6 +189,7 @@ public class ProfileConfCreatorDemo {
       certprofileSyntaxExtImplicitTag("certprofile-syntax-ext-implicit-tag.json");
       certprofileSyntaxExtExplicitTag("certprofile-syntax-ext-explicit-tag.json");
       certprofileExtended("certprofile-extended.json");
+      certprofileAppleWwdr("certprofile-apple-wwdr.json");
     } catch (Exception ex) {
       ex.printStackTrace();
     }
@@ -430,13 +431,13 @@ public class ProfileConfCreatorDemo {
      *  1. SEQUENCE or SET {
      *  2.       UTF8String abc.def.myBlog EXPLICIT
      *  3.       SEQUENCE
-     *  4.         UTF8String :app
+     *  4.         UTF8String app
      *  5.   [0] UTF8String abc.def.myBlog.voip EXPLICIT
      *  6.   [1] SEQUENCE EXPLICIT
-     *  7.         UTF8String :voip
+     *  7.         UTF8String voip
      *  8.   [2] UTF8String abc.def.myBlog.complication IMPLICIT
      *  9.   [3] SEQUENCE IMPLICIT
-     * 10.         UTF8String :complication
+     * 10.         UTF8String complication
      * 11. }
      */
     List<ConstantExtnValue> subFields = new LinkedList<>();
@@ -449,7 +450,7 @@ public class ProfileConfCreatorDemo {
     subField = new ConstantExtnValue(FieldType.SEQUENCE);
     subFields.add(subField);
     ConstantExtnValue subsubField = new ConstantExtnValue(FieldType.UTF8String);
-    subsubField.setValue(":app");
+    subsubField.setValue("app");
     subField.setListValue(Arrays.asList(subsubField));
 
     // Line 5
@@ -463,7 +464,7 @@ public class ProfileConfCreatorDemo {
     subFields.add(subField);
     subField.setTag(new Tag(1, true));
     subsubField = new ConstantExtnValue(FieldType.UTF8String);
-    subsubField.setValue(":void");
+    subsubField.setValue("void");
     subField.setListValue(Arrays.asList(subsubField));
 
     // Line 8
@@ -477,7 +478,7 @@ public class ProfileConfCreatorDemo {
     subFields.add(subField);
     subField.setTag(new Tag(9, false));
     subsubField = new ConstantExtnValue(FieldType.UTF8String);
-    subsubField.setValue(":complication");
+    subsubField.setValue("complication");
     subField.setListValue(Arrays.asList(subsubField));
 
     return subFields;
@@ -488,13 +489,13 @@ public class ProfileConfCreatorDemo {
      *  1. SEQUENCE or SET {
      *  2.       UTF8String # abc.def.myBlog EXPLICIT
      *  3.       SEQUENCE
-     *  4.         UTF8String  # :app
+     *  4.         UTF8String  # app
      *  5.   [0] UTF8String  # abc.def.myBlog.voip EXPLICIT
      *  6.   [1] SEQUENCE EXPLICIT
-     *  7.         UTF8String  # :voip
+     *  7.         UTF8String  # voip
      *  8.   [2] UTF8String  # abc.def.myBlog.complication IMPLICIT
      *  9.   [3] SEQUENCE IMPLICIT
-     * 10.         UTF8String  # :complication
+     * 10.         UTF8String  # complication
      * 11. }
      */
     List<SubFieldSyntax> subFields = new LinkedList<>();
@@ -540,13 +541,13 @@ public class ProfileConfCreatorDemo {
      *  1. SEQUENCE or SET {
      *  3.   SEQUENCE
      *  3.     UTF8String abc.def.myBlog
-     *  4.     UTF8String :app
+     *  4.     UTF8String app
      *  5.   SEQUENCE
      *  6.       UTF8String abc.def.myBlog.voip
-     *  7.       UTF8String :voip
+     *  7.       UTF8String voip
      *  8.   SEQUENCE
      *  9.     UTF8String abc.def.myBlog.complication
-     * 10.     UTF8String :complication
+     * 10.     UTF8String complication
      * 11. }
      */
     List<ConstantExtnValue> subFields = new LinkedList<>();
@@ -564,7 +565,7 @@ public class ProfileConfCreatorDemo {
       subsubFields.add(subsubField);
 
       subsubField = new ConstantExtnValue(FieldType.UTF8String);
-      subsubField.setValue(":app");
+      subsubField.setValue("app");
       subsubFields.add(subsubField);
     }
 
@@ -581,7 +582,7 @@ public class ProfileConfCreatorDemo {
       subsubFields.add(subsubField);
 
       subsubField = new ConstantExtnValue(FieldType.UTF8String);
-      subsubField.setValue(":voip");
+      subsubField.setValue("voip");
       subsubFields.add(subsubField);
     }
 
@@ -598,7 +599,7 @@ public class ProfileConfCreatorDemo {
       subsubFields.add(subsubField);
 
       subsubField = new ConstantExtnValue(FieldType.UTF8String);
-      subsubField.setValue(":complication");
+      subsubField.setValue("complication");
       subsubFields.add(subsubField);
     }
 
@@ -1556,14 +1557,13 @@ public class ProfileConfCreatorDemo {
     marshall(profile, destFilename, true);
   } // method certprofileFixedPartialSubject
 
-  /*
   private static void certprofileAppleWwdr(String destFilename) throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile apple WWDR",
-        CertLevel.EndEntity, "365d");
+        CertLevel.EndEntity, "395d");
 
     // Subject
     Subject subject = profile.getSubject();
-
+    subject.setKeepRdnOrder(true);
     List<RdnType> rdnControls = subject.getRdns();
 
     rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
@@ -1576,14 +1576,39 @@ public class ProfileConfCreatorDemo {
     List<ExtensionType> list = profile.getExtensions();
 
     list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
-
     // Extensions - basicConstraints
     list.add(createExtension(Extension.basicConstraints, true, true));
-
     // Extensions - AuthorityKeyIdentifier
     list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
     last(list).setAuthorityKeyIdentifier(createAuthorityKeyIdentifier(false));
+
+    list.add(createExtension(Extension.cRLDistributionPoints, true, false, null));
+
+    // Extensions - CeritifcatePolicies
+    // Certificate Policies
+    list.add(createExtension(Extension.certificatePolicies, true, false));
+    CertificatePolicies extValue = new CertificatePolicies();
+    last(list).setCertificatePolicies(extValue);
+
+    List<CertificatePolicyInformationType> pis = extValue.getCertificatePolicyInformations();
+    CertificatePolicyInformationType single = new CertificatePolicyInformationType();
+    pis.add(single);
+    single.setPolicyIdentifier(createOidType(
+        new ASN1ObjectIdentifier("1.2.840.113635.100.5.1")));
+    List<PolicyQualifier> qualifiers = new ArrayList<>(1);
+    single.setPolicyQualifiers(qualifiers);
+
+    PolicyQualifier qualifier = new PolicyQualifier();
+    qualifiers.add(qualifier);
+    qualifier.setType(PolicyQualfierType.userNotice);
+    qualifier.setValue("Reliance on this certificate by any party assumes acceptance of the then "
+        + "applicable standard terms and conditions of use, certificate policy and certification "
+        + "practice statements.");
+
+    qualifier = new PolicyQualifier();
+    qualifiers.add(qualifier);
+    qualifier.setType(PolicyQualfierType.cpsUri);
+    qualifier.setValue("http://www.apple.com/certificateauthority");
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
@@ -1594,29 +1619,83 @@ public class ProfileConfCreatorDemo {
     // Extensions - extenedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_serverAuth},
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth},
         null));
 
     // apple custom extension 1.2.840.113635.100.6.3.1
-    list.add(createExtension(new ASN1ObjectIdentifier("1.2.840.113635.100.6.3.1"), true, false));
-    last(list).setConstant(createConstantExtValue(FieldType.NULL, null, null));
+    list.add(createConstantExtension(new ASN1ObjectIdentifier("1.2.840.113635.100.6.3.1"),
+            true, false, null, FieldType.NULL, null));
 
     // apple custom extension 1.2.840.113635.100.6.3.2
-    list.add(createExtension(new ASN1ObjectIdentifier("1.2.840.113635.100.6.3.2"), true, false));
-    last(list).setConstant(createConstantExtValue(FieldType.NULL, null, null));
+    list.add(createConstantExtension(new ASN1ObjectIdentifier("1.2.840.113635.100.6.3.2"),
+        true, false, null, FieldType.NULL, null));
 
     // apple custom extension 1.2.840.113635.100.6.3.6
     list.add(createExtension(new ASN1ObjectIdentifier("1.2.840.113635.100.6.3.6"), true, false));
     ExtnSyntax syntax = new ExtnSyntax(FieldType.SEQUENCE);
     last(list).setSyntax(syntax);
-    List<SubFieldSyntax> subFields = new LinkedList<SubFieldSyntax>();
-    SubFieldSyntax subFieldSyntax = new SubFieldSyntax(FieldType.UTF8String);
-    subFieldSyntax.setStringRegex(""); // TODO
-    subFields.add(subFieldSyntax);
+    last(list).setPermittedInRequest(true);
+
+    /*
+     *  1. SEQUENCE or SET {
+     *  2.    UTF8String # abc.def.myBlog EXPLICIT
+     *  3.    SEQUENCE
+     *  4.      UTF8String  # app
+     *  5.    UTF8String  # abc.def.myBlog.voip EXPLICIT
+     *  6.    SEQUENCE EXPLICIT
+     *  7.      UTF8String  # voip
+     *  8.    UTF8String  # abc.def.myBlog.complication IMPLICIT
+     *  9.    SEQUENCE IMPLICIT
+     * 10.      UTF8String  # complication
+     * 11. }
+     */
+    List<SubFieldSyntax> subFields = new LinkedList<>();
+    // Line 2
+    SubFieldSyntax subField = new SubFieldSyntax(FieldType.UTF8String);
+    subFields.add(subField);
+    subField.setRequired(true);
+
+    // Line 3-4
+    subField = new SubFieldSyntax(FieldType.SEQUENCE);
+    subFields.add(subField);
+    subField.setRequired(true);
+
+    SubFieldSyntax subsubField = new SubFieldSyntax(FieldType.UTF8String);
+    subsubField.setRequired(true);
+    subField.setSubFields(Arrays.asList(subsubField));
+
+    // Line 5
+    subField = new SubFieldSyntax(FieldType.UTF8String);
+    subField.setRequired(true);
+    subFields.add(subField);
+
+    // Line 6-7
+    subField = new SubFieldSyntax(FieldType.SEQUENCE);
+    subFields.add(subField);
+
+    subField.setRequired(true);
+    subsubField = new SubFieldSyntax(FieldType.UTF8String);
+    subsubField.setRequired(true);
+    subField.setSubFields(Arrays.asList(subsubField));
+
+    // Line 8
+    subField = new SubFieldSyntax(FieldType.UTF8String);
+    subFields.add(subField);
+    subField.setRequired(true);
+
+    // Line 9-10
+    subField = new SubFieldSyntax(FieldType.SEQUENCE);
+    subFields.add(subField);
+
+    subField.setRequired(true);
+    subsubField = new SubFieldSyntax(FieldType.UTF8String);
+    subsubField.setRequired(true);
+    subField.setSubFields(Arrays.asList(subsubField));
+
+    syntax.setSubFields(subFields);
 
     marshall(profile, destFilename, true);
   } // method certprofileAppleWwdr
-  */
 
   private static void certprofileExtended(String destFilename) throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile extended", CertLevel.EndEntity, "5y");

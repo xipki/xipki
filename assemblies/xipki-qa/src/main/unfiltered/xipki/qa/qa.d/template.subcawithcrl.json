@@ -68,7 +68,8 @@
 			"multiple-ous",
 			"multi-valued-rdn",
 			"max-time",
-			"tlsa"
+			"tlsa",
+			"apple-wwdr"
 		],
 		"requestors":[{
 			"ra":true,

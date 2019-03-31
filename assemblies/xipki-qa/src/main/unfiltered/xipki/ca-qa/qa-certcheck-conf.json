@@ -23,8 +23,8 @@
 		"validityMode":"lax",
 		"caIssuerUrls":["http://example.org/subcawithcrl1.der"],
 		"ocspUrls":["http://localhost:8080/ocsp/responder2"],
-		"crlUrls":["http://example.org/crl"],
-		"deltaCrlUrls":["http://example.org/deltacrl"]
+		"crlUrls":["http://subcawithcrl.example.org/crl"],
+		"deltaCrlUrls":["http://subcawithcrl.example.org/deltacrl"]
 	}],
 	"certprofiles":[{
 		"name":"rootca",
@@ -71,6 +71,9 @@
 	},{
 		"name":"max-time",
 		"file":"xipki/qa/certprofile/certprofile-max-time.json"
+	},{
+		"name":"apple-wwdr",
+		"file":"xipki/qa/certprofile/certprofile-apple-wwdr.json"
 	},{
 		"name":"fixed-partial-subject",
 		"file":"xipki/qa/certprofile/certprofile-fixed-partial-subject.json"
