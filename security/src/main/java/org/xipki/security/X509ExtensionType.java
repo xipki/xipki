@@ -393,7 +393,16 @@ public class X509ExtensionType extends ValidatableConf {
     }
 
     @Override
+    public int hashCode() {
+      return value + 31 * Boolean.valueOf(explicit).hashCode();
+    }
+
+    @Override
     public boolean equals(Object obj) {
+      if (obj == this) {
+        return true;
+      }
+
       if (!(obj instanceof Tag)) {
         return false;
       }

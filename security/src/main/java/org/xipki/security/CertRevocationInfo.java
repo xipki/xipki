@@ -136,6 +136,12 @@ public class CertRevocationInfo {
   }
 
   @Override
+  public int hashCode() {
+    return reason.hashCode() + 31 * revocationTime.hashCode() +
+            (invalidityTime == null ? 0 : 31 * 31 * invalidityTime.hashCode());
+  }
+
+  @Override
   public boolean equals(Object obj) {
     if (obj == this) {
       return true;

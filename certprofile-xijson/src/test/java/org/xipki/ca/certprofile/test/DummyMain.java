@@ -94,6 +94,10 @@ public class DummyMain {
         }
       }
 
+      if (extns == null) {
+        throw new Exception("no extension is present");
+      }
+
       XijsonCertprofile certprof = new XijsonCertprofile();
       String data = new String(IoUtil.read("tmp/certprofile-apple-wwdr.json"));
       certprof.initialize(data);

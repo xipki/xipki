@@ -334,7 +334,7 @@ public abstract class BaseCertprofile extends Certprofile {
 
   protected RDN createSubjectRdn(String text, ASN1ObjectIdentifier type, RdnControl option,
       int index) throws BadCertTemplateException {
-    if (text != null && ObjectIdentifiers.DN.emailAddress.equals(type)) {
+    if (ObjectIdentifiers.DN.emailAddress.equals(type)) {
       text = text.toLowerCase();
     }
 
