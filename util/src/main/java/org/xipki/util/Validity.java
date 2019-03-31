@@ -149,14 +149,14 @@ public class Validity implements Comparable<Validity> {
     }
   } // method add
 
-  private int approxMinutes() {
+  private long approxMinutes() {
     switch (unit) {
       case YEAR:
-        return (365 * 24 * validity + 6 * validity) * 60;
+        return (365L * 24 * validity + 6 * validity) * 60;
       case DAY:
-        return 24 * 60 * validity;
+        return 24L * 60 * validity;
       case HOUR:
-        return 60 * validity;
+        return 60L * validity;
       case MINUTE:
         return validity;
       default:
@@ -180,8 +180,8 @@ public class Validity implements Comparable<Validity> {
 
       return (validity < obj.validity) ? -1 : 1;
     } else {
-      int thisMinutes = approxMinutes();
-      int thatMinutes = obj.approxMinutes();
+      long thisMinutes = approxMinutes();
+      long thatMinutes = obj.approxMinutes();
       if (thisMinutes == thatMinutes) {
         return 0;
       } else {

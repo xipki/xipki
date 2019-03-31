@@ -294,7 +294,7 @@ public class ObjectIdentifiers {
     /**
      * LDAP User id.
      */
-    public static final ASN1ObjectIdentifier _UID = userid;
+    public static final ASN1ObjectIdentifier UID = userid;
 
     /**
      * NIF, Tax ID number, for individuals (Spain)
