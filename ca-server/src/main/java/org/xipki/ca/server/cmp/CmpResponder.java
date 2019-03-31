@@ -127,6 +127,7 @@ import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.InsuffientPermissionException;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
+import org.xipki.ca.api.RequestType;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
@@ -134,7 +135,6 @@ import org.xipki.ca.api.mgmt.CmpControl;
 import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.ca.api.mgmt.PermissionConstants;
 import org.xipki.ca.api.mgmt.RequestorInfo;
-import org.xipki.ca.api.RequestType;
 import org.xipki.ca.server.CaAuditConstants;
 import org.xipki.ca.server.CaInfo;
 import org.xipki.ca.server.CaManagerImpl;
@@ -168,7 +168,6 @@ import com.alibaba.fastjson.JSONObject;
  * @since 2.0.0
  */
 
-@SuppressWarnings("deprecation")
 public class CmpResponder extends BaseCmpResponder {
 
   private class PendingPoolCleaner implements Runnable {
@@ -228,8 +227,6 @@ public class CmpResponder extends BaseCmpResponder {
     KNOWN_GENMSG_IDS.add(CMPObjectIdentifiers.it_currentCRL.getId());
     KNOWN_GENMSG_IDS.add(ObjectIdentifiers.Xipki.id_xipki_cmp_cmpGenmsg.getId());
     KNOWN_GENMSG_IDS.add(ObjectIdentifiers.Xipki.id_xipki_cmp_cacerts.getId());
-    KNOWN_GENMSG_IDS.add(ObjectIdentifiers.HistoricXipki.id_xipki_cmp_cmpGenmsg.getId());
-    KNOWN_GENMSG_IDS.add(ObjectIdentifiers.HistoricXipki.id_xipki_cmp_cacerts.getId());
 
     String oid = NISTObjectIdentifiers.id_aes128_GCM.getId();
     aesGcm_ciphers = new ConcurrentBag<>();
@@ -1888,8 +1885,7 @@ public class CmpResponder extends BaseCmpResponder {
         }
 
         itvResp = new InfoTypeAndValue(infoType, crl);
-      } else if (ObjectIdentifiers.Xipki.id_xipki_cmp_cmpGenmsg.equals(infoType)
-          || ObjectIdentifiers.HistoricXipki.id_xipki_cmp_cmpGenmsg.equals(infoType)) {
+      } else if (ObjectIdentifiers.Xipki.id_xipki_cmp_cmpGenmsg.equals(infoType)) {
         ASN1Encodable asn1 = itv.getInfoValue();
         ASN1Integer asn1Code = null;
         ASN1Encodable reqValue = null;
@@ -1963,8 +1959,7 @@ public class CmpResponder extends BaseCmpResponder {
           vec.add(respValue);
         }
         itvResp = new InfoTypeAndValue(infoType, new DERSequence(vec));
-      } else if (ObjectIdentifiers.Xipki.id_xipki_cmp_cacerts.equals(infoType)
-          || ObjectIdentifiers.HistoricXipki.id_xipki_cmp_cacerts.equals(infoType)) {
+      } else if (ObjectIdentifiers.Xipki.id_xipki_cmp_cacerts.equals(infoType)) {
         event.addEventType(CaAuditConstants.TYPE_CMP_genm_cacerts);
         CMPCertificate caCert = ca.getCaInfo().getCertInCmpFormat();
         itvResp = new InfoTypeAndValue(infoType, new DERSequence(caCert));

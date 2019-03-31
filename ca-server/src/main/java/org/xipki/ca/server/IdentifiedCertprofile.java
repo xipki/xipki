@@ -220,7 +220,6 @@ class IdentifiedCertprofile implements Closeable {
    *          CA information.
    * @return the extensions of the certificate to be issued.
    */
-  @SuppressWarnings("deprecation")
   public ExtensionValues getExtensions(X500Name requestedSubject, X500Name grantedSubject,
       Extensions requestedExtensions, SubjectPublicKeyInfo publicKeyInfo, PublicCaInfo publicCaInfo,
       X509Certificate crlSignerCert, Date notBefore, Date notAfter)
@@ -236,10 +235,6 @@ class IdentifiedCertprofile implements Closeable {
     if (requestedExtensions != null) {
       Extension reqExtension = requestedExtensions.getExtension(
           ObjectIdentifiers.Xipki.id_xipki_ext_cmpRequestExtensions);
-      if (reqExtension == null) {
-        reqExtension = requestedExtensions.getExtension(
-            ObjectIdentifiers.HistoricXipki.id_xipki_ext_cmpRequestExtensions);
-      }
 
       if (reqExtension != null) {
         ExtensionExistence ee = ExtensionExistence.getInstance(reqExtension.getParsedValue());
