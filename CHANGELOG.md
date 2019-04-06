@@ -9,6 +9,7 @@ See also <https://github.com/xipki/xipki/releases>
   - Simplify and extend the configuration of custom extension
   - Extend the command csr-p11 and csr-p12 to generate CSR with complex subject and extensions
   - In the extension CertificatePolicies, the OID for User Notice is not correct. This has been fixed.
+  - Add the management of the certificate of parenet CAs for given CA
 
 ## 5.1.0
   - Release date: Mar 17, 2019

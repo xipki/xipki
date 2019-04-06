@@ -480,6 +480,10 @@ CMP Client Commands
 
      get CA certificate
 
+   * `xi:cmp-cacertchain`
+
+     get CA certificate chain
+
    * `xi:cmp-csr-enroll`
 
      enroll certificate via CSR

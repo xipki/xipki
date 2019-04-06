@@ -33,11 +33,13 @@ import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
+import java.security.cert.CertPathBuilderException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -86,6 +88,7 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.CompareUtil;
+import org.xipki.util.FileOrBinary;
 import org.xipki.util.HealthCheckResult;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
@@ -205,7 +208,7 @@ public final class CmpClientImpl implements CmpClient {
       try {
         CaConf.CaInfo caInfo = ca.getAgent().retrieveCaInfo(name, null);
         if (ca.isCertAutoconf()) {
-          ca.setCert(caInfo.getCert());
+          ca.setCertchain(caInfo.getCertchain());
         }
         if (ca.isCertprofilesAutoconf()) {
           ca.setCertprofiles(caInfo.getCertprofiles());
@@ -370,11 +373,30 @@ public final class CmpClientImpl implements CmpClient {
             caType.getRequestor(), responder, sslSocketFactory, hostnameVerifier);
 
         // CA cert
-        if (caType.getCaCert().isAutoconf()) {
+        if (caType.getCaCertchain().isAutoconf()) {
           ca.setCertAutoconf(true);
         } else {
           ca.setCertAutoconf(false);
-          ca.setCert(X509Util.parseCert(caType.getCaCert().getCert().getBinary()));
+          List<FileOrBinary> certchainConf = caType.getCaCertchain().getCertchain();
+
+          X509Certificate caCert = X509Util.parseCert(certchainConf.get(0).readContent());
+          Set<X509Certificate> issuers = new HashSet<>();
+          int size = certchainConf.size();
+          if (size > 1) {
+            for (int i = 1; i < size; i++) {
+              X509Certificate cert = X509Util.parseCert(certchainConf.get(i).readContent());
+              issuers.add(cert);
+            }
+
+            X509Certificate[] certchain = X509Util.buildCertPath(caCert, issuers);
+            if (certchain.length != size) {
+              LOG.error("cannot build certpath containing all configured issuers");
+            }
+
+            ca.setCertchain(Arrays.asList(certchain));
+          } else {
+            ca.setCertchain(Arrays.asList(caCert));
+          }
         }
 
         // CMPControl
@@ -412,7 +434,7 @@ public final class CmpClientImpl implements CmpClient {
         if (ca.isCertAutoconf() || ca.isCertprofilesAutoconf() || ca.isCmpControlAutoconf()) {
           autoConfCaNames.add(caName);
         }
-      } catch (IOException | CertificateException ex) {
+      } catch (IOException | CertificateException | CertPathBuilderException ex) {
         LogUtil.error(LOG, ex, "could not configure CA " + caName);
         return false;
       }
@@ -1262,11 +1284,20 @@ public final class CmpClientImpl implements CmpClient {
   }
 
   @Override
-  public java.security.cert.Certificate getCaCert(String caName) throws CmpClientException {
+  public X509Certificate getCaCert(String caName) throws CmpClientException {
     initIfNotInitialized();
 
     CaConf ca = casMap.get(caName.toLowerCase());
     return ca == null ? null : ca.getCert();
+  }
+
+  @Override
+  public List<X509Certificate> getCaCertchain(String caName)
+      throws CmpClientException {
+    initIfNotInitialized();
+
+    CaConf ca = casMap.get(caName.toLowerCase());
+    return ca == null ? null : ca.getCertchain();
   }
 
   @Override

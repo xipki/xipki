@@ -120,7 +120,11 @@ public abstract class MgmtEntry {
 
     private String crlSignerName;
 
+    private String precertSignerName;
+
     private CmpControl cmpControl;
+
+    private CtLogControl ctLogControl;
 
     private String cmpResponderName;
 
@@ -147,6 +151,12 @@ public abstract class MgmtEntry {
     private CaUris caUris;
 
     private X509Certificate cert;
+
+    /**
+     * certificate chain without the certificate specified in {@code #cert}. The first one issued
+     * {@code #cert}, the second one issues the first one, and so on.
+     */
+    private List<X509Certificate> certchain;
 
     private int serialNoBitLen;
 
@@ -270,6 +280,14 @@ public abstract class MgmtEntry {
       return scepControl;
     }
 
+    public CtLogControl getCtLogControl() {
+      return ctLogControl;
+    }
+
+    public void setCtLogControl(CtLogControl ctLogControl) {
+      this.ctLogControl = ctLogControl;
+    }
+
     public String getCmpResponderName() {
       return cmpResponderName;
     }
@@ -292,6 +310,14 @@ public abstract class MgmtEntry {
 
     public void setCrlSignerName(String crlSignerName) {
       this.crlSignerName = (crlSignerName == null) ? null : crlSignerName.toLowerCase();
+    }
+
+    public String getPrecertSignerName() {
+      return precertSignerName;
+    }
+
+    public void setPrecertSignerName(String precertSignerName) {
+      this.precertSignerName = (precertSignerName == null) ? null : precertSignerName.toLowerCase();
     }
 
     public boolean isDuplicateKeyPermitted() {
@@ -381,6 +407,18 @@ public abstract class MgmtEntry {
             "\n\trevoked at ", revocationInfo.getRevocationTime());
       }
 
+      int certchainSize = certchain == null ? 0 : certchain.size();
+      StringBuilder certchainStr = new StringBuilder(20 + certchainSize * 200);
+      certchainStr.append("\ncertchain: ");
+      if (certchainSize > 0) {
+        for (int i = 0; i < certchainSize; i++) {
+          certchainStr.append("\ncert[").append(i).append("]:\n");
+          certchainStr.append(InternUtil.formatCert(certchain.get(i), verbose));
+        }
+      } else {
+        certchainStr.append("null");
+      }
+
       return StringUtil.concatObjectsCap(1500,
           "id: ", ident.getId(), "\nname: ", ident.getName(),
           "\nstatus: ", (status == null ? "null" : status.getStatus()),
@@ -392,9 +430,11 @@ public abstract class MgmtEntry {
           "\nCMP control:\n", (cmpControl == null ? "  null" : cmpControl.toString(verbose)),
           "\nCRL control:\n", (crlControl == null ? "  null" : crlControl.toString(verbose)),
           "\nSCEP control: \n", (scepControl == null ? "  null" : scepControl.toString(verbose)),
+          "\nCTLog control: \n", (ctLogControl == null ? "  null" : ctLogControl.toString(verbose)),
           "\nCMP responder name: ", cmpResponderName,
           "\nSCEP responder name: ", scepResponderName,
           "\nCRL signer name: ", crlSignerName,
+          "\nPrecert signer name: ", precertSignerName,
           "\nduplicate key: ", duplicateKeyPermitted,
           "\nduplicate subject: ", duplicateSubjectPermitted,
           "\n", protocolSupport,
@@ -405,9 +445,10 @@ public abstract class MgmtEntry {
               (keepExpiredCertInDays < 0 ? "forever" : keepExpiredCertInDays + " days"),
           "\nextra control: ", extraCtrlText,
           "\nserial number bit length: ", serialNoBitLen,
-          "\nnext CRL number: ", nextCrlNumber,
-          "\n", caUris, "\ncert: \n", InternUtil.formatCert(cert, verbose),
-          "\nrevocation: ", (revocationInfo == null ? "not revoked" : "revoked"), revInfoText);
+          "\nnext CRL number: ", nextCrlNumber, "\n", caUris,
+          "\nrevocation: ", (revocationInfo == null ? "not revoked" : "revoked"), revInfoText,
+          "\ncert: \n", InternUtil.formatCert(cert, verbose),
+          certchainStr.toString());
     } // method toString
 
     protected static String urisToString(Collection<? extends Object> tokens) {
@@ -521,6 +562,14 @@ public abstract class MgmtEntry {
 
     public X509Certificate getCert() {
       return cert;
+    }
+
+    public List<X509Certificate> getCertchain() {
+      return certchain;
+    }
+
+    public void setCertchain(List<X509Certificate> certchain) {
+      this.certchain = certchain;
     }
 
     public int getNumCrls() {
@@ -840,11 +889,15 @@ public abstract class MgmtEntry {
 
     private String scepControl;
 
+    private String ctLogControl;
+
     private String cmpResponderName;
 
     private String scepResponderName;
 
     private String crlSignerName;
+
+    private String precertSignerName;
 
     private Boolean duplicateKeyPermitted;
 
@@ -871,6 +924,8 @@ public abstract class MgmtEntry {
     private CaUris caUris;
 
     private byte[] encodedCert;
+
+    private List<byte[]> encodedCertchain;
 
     private Integer numCrls;
 
@@ -949,6 +1004,14 @@ public abstract class MgmtEntry {
       this.scepControl = scepControl;
     }
 
+    public String getCtLogControl() {
+      return ctLogControl;
+    }
+
+    public void setCtLogControl(String ctLogControl) {
+      this.ctLogControl = ctLogControl;
+    }
+
     public String getCmpResponderName() {
       return cmpResponderName;
     }
@@ -971,6 +1034,14 @@ public abstract class MgmtEntry {
 
     public void setCrlSignerName(String crlSignerName) {
       this.crlSignerName = (crlSignerName == null) ? null : crlSignerName.toLowerCase();
+    }
+
+    public String getPrecertSignerName() {
+      return precertSignerName;
+    }
+
+    public void setPrecertSignerName(String precertSignerName) {
+      this.precertSignerName = (precertSignerName == null) ? null : precertSignerName.toLowerCase();
     }
 
     public Boolean getDuplicateKeyPermitted() {
@@ -1087,6 +1158,14 @@ public abstract class MgmtEntry {
 
     public void setEncodedCert(byte[] encodedCert) {
       this.encodedCert = encodedCert;
+    }
+
+    public List<byte[]> getEncodedCertchain() {
+      return encodedCertchain;
+    }
+
+    public void setEncodedCertchain(List<byte[]> encodedCertchain) {
+      this.encodedCertchain = encodedCertchain;
     }
 
     public Integer getNumCrls() {

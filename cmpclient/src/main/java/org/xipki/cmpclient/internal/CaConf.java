@@ -22,6 +22,7 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -58,20 +59,21 @@ class CaConf {
 
   static class CaInfo {
 
-    private final X509Certificate cert;
+    private final List<X509Certificate> certchain;
 
     private final Set<CertprofileInfo> certprofiles;
 
     private final CmpControl cmpControl;
 
-    CaInfo(X509Certificate cert, CmpControl cmpControl, Set<CertprofileInfo> certprofiles) {
-      this.cert = Args.notNull(cert, "cert");
+    CaInfo(List<X509Certificate> certchain, CmpControl cmpControl,
+        Set<CertprofileInfo> certprofiles) {
+      this.certchain = Args.notEmpty(certchain, "certchain");
       this.cmpControl = Args.notNull(cmpControl, "cmpControl");
       this.certprofiles = Args.notNull(certprofiles, "certprofiles");
     }
 
-    X509Certificate getCert() {
-      return cert;
+    List<X509Certificate> getCertchain() {
+      return certchain;
     }
 
     CmpControl getCmpControl() {
@@ -103,6 +105,8 @@ class CaConf {
   private boolean cmpControlAutoconf;
 
   private X509Certificate cert;
+
+  private List<X509Certificate> certchain;
 
   private X500Name subject;
 
@@ -140,10 +144,11 @@ class CaConf {
     return healthUrl;
   }
 
-  public void setCert(X509Certificate cert) throws CertificateEncodingException {
-    this.cert = cert;
-    this.subject = (cert == null) ? null
-        : X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
+  public void setCertchain(List<X509Certificate> certchain) throws CertificateEncodingException {
+    Args.notEmpty(certchain, "certchain");
+    this.certchain = certchain;
+    this.cert = certchain.get(0);
+    this.subject = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
     this.subjectKeyIdentifier = X509Util.extractSki(cert);
   }
 
@@ -162,8 +167,16 @@ class CaConf {
     return cert;
   }
 
+  public List<X509Certificate> getCertchain() {
+    return certchain;
+  }
+
   public X500Name getSubject() {
     return subject;
+  }
+
+  public boolean isCertAutoconf() {
+    return certAutoconf;
   }
 
   public Set<String> getProfileNames() {
@@ -184,10 +197,6 @@ class CaConf {
 
   public Responder getResponder() {
     return responder;
-  }
-
-  public boolean isCertAutoconf() {
-    return certAutoconf;
   }
 
   public void setCertAutoconf(boolean autoconf) {

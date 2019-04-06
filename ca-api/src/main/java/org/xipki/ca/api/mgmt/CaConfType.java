@@ -273,6 +273,11 @@ public class CaConfType {
      */
     private FileOrBinary cert;
 
+    /**
+     * Certificate chain without the certificate specified in {@code #cert}.
+     */
+    private List<FileOrBinary> certchain;
+
     private boolean duplicateKey = true;
 
     private boolean duplicateSubject = true;
@@ -298,11 +303,15 @@ public class CaConfType {
 
     private Map<String, Object> scepControl;
 
+    private Map<String, Object> ctLogControl;
+
     private String cmpResponderName;
 
     private String scepResponderName;
 
     private String crlSignerName;
+
+    private String precertSignerName;
 
     private Set<String> protocolSupport;
 
@@ -333,6 +342,14 @@ public class CaConfType {
 
     public void setCert(FileOrBinary cert) {
       this.cert = cert;
+    }
+
+    public List<FileOrBinary> getCertchain() {
+      return certchain;
+    }
+
+    public void setCertchain(List<FileOrBinary> certchain) {
+      this.certchain = certchain;
     }
 
     public boolean isDuplicateKey() {
@@ -426,6 +443,14 @@ public class CaConfType {
       this.scepControl = scepControl;
     }
 
+    public Map<String, Object> getCtLogControl() {
+      return ctLogControl;
+    }
+
+    public void setCtLogControl(Map<String, Object> ctLogControl) {
+      this.ctLogControl = ctLogControl;
+    }
+
     public String getCmpResponderName() {
       return cmpResponderName;
     }
@@ -448,6 +473,14 @@ public class CaConfType {
 
     public void setCrlSignerName(String crlSignerName) {
       this.crlSignerName = crlSignerName;
+    }
+
+    public String getPrecertSignerName() {
+      return precertSignerName;
+    }
+
+    public void setPrecertSignerName(String precertSignerName) {
+      this.precertSignerName = precertSignerName;
     }
 
     public Set<String> getProtocolSupport() {

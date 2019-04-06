@@ -136,6 +136,8 @@
       <column name="CRL_CONTROL" type="VARCHAR(1000)"/>
       <column name="CMP_CONTROL" type="VARCHAR(1000)"/>
       <column name="SCEP_CONTROL" type="VARCHAR(500)"/>
+      <column name="CTLOG_CONTROL" type="VARCHAR(5000)" remarks="Certificate Transparency Log Control"/>
+      <column name="PRECERT_SIGNER_NAME" type="VARCHAR(45)"/>
       <column name="CRL_SIGNER_NAME" type="VARCHAR(45)"/>
       <column name="CMP_RESPONDER_NAME" type="VARCHAR(45)"/>
       <column name="SCEP_RESPONDER_NAME" type="VARCHAR(45)"/>
@@ -169,10 +171,11 @@
       </column>
       <column name="KEEP_EXPIRED_CERT_DAYS" type="SMALLINT" defaultValueNumeric="-1"
           remarks="How long in days should certificates be kept after the expiration. Negative value for kept-for-ever"/>
-      <column name="EXTRA_CONTROL" type="VARCHAR(5000)"/>
       <column name="CERT" type="VARCHAR(4000)">
         <constraints nullable="false"/>
       </column>
+      <column name="EXTRA_CONTROL" type="CLOB" remarks="extra control"/>
+      <column name="CERTCHAIN" type="CLOB" remarks="Certificate chain without CA's certificate"/>
       <column name="SIGNER_CONF" type="CLOB">
         <constraints nullable="false"/>
       </column>
@@ -400,6 +403,11 @@
   </changeSet>
   <!-- CA Configuration :: foreign key -->
   <changeSet author="xipki" id="3">
+    <addForeignKeyConstraint constraintName="FK_CA_PRECERT_SIGNER1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="NO ACTION" onUpdate="NO ACTION"
+      baseColumnNames="PRECERT_SIGNER_NAME" baseTableName="CA"
+      referencedColumnNames="NAME" referencedTableName="SIGNER"/>
     <addForeignKeyConstraint constraintName="FK_CA_CRL_SIGNER1"
       deferrable="false" initiallyDeferred="false"
       onDelete="NO ACTION" onUpdate="NO ACTION"

@@ -25,11 +25,14 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Enumerated;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -37,6 +40,7 @@ import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.cmp.CMPObjectIdentifiers;
@@ -98,8 +102,10 @@ public abstract class CmpCaClient implements Closeable {
 
   private static final String CMP_RESPONSE_MIMETYPE = "application/pkixcmp";
 
-  private static final ASN1ObjectIdentifier id_xipki_cmp =
-      new ASN1ObjectIdentifier("1.3.6.2.4.1.45522.2.2");
+  private static final ASN1ObjectIdentifier id_xipki_cmp_cacertchain =
+      new ASN1ObjectIdentifier("1.3.6.1.4.1.45522.2.2");
+
+  private static final int CMP_ACTION_CACERTCHAIN = 4;
 
   private final URL caUrl;
 
@@ -114,6 +120,8 @@ public abstract class CmpCaClient implements Closeable {
   private final SecureRandom random;
 
   private X509Certificate caCert;
+
+  private List<X509Certificate> caCertchain;
 
   private byte[] caSubjectKeyIdentifier;
 
@@ -144,9 +152,15 @@ public abstract class CmpCaClient implements Closeable {
       return;
     }
 
-    Certificate tcert = cmpCaCerts()[0];
-    this.caSubject = tcert.getSubject();
-    this.caCert = SdkUtil.parseCert(tcert.getEncoded());
+    Certificate[] certchain = cmpCaCerts();
+    this.caCertchain = new ArrayList<>(certchain.length);
+    for (Certificate m : certchain) {
+      this.caCertchain.add(
+          SdkUtil.parseCert((m.getEncoded())));
+    }
+
+    this.caCert = this.caCertchain.get(0);
+    this.caSubject = certchain[0].getSubject();
     this.caSubjectKeyIdentifier = SdkUtil.extractSki(this.caCert);
   }
 
@@ -180,13 +194,16 @@ public abstract class CmpCaClient implements Closeable {
     builder.setTransactionID(randomTransactionId());
     builder.setSenderNonce(randomSenderNonce());
 
-    InfoTypeAndValue itv = new InfoTypeAndValue(id_xipki_cmp);
+    ASN1EncodableVector vec = new ASN1EncodableVector();
+    vec.add(new ASN1Integer(CMP_ACTION_CACERTCHAIN));
+
+    InfoTypeAndValue itv = new InfoTypeAndValue(id_xipki_cmp_cacertchain, new DERSequence(vec));
     PKIBody body = new PKIBody(PKIBody.TYPE_GEN_MSG, new GenMsgContent(itv));
     builder.setBody(body);
 
     ProtectedPKIMessage request = build(builder);
     PKIMessage response = transmit(request, null);
-    ASN1Encodable asn1Value = extractGeneralRepContent(response, id_xipki_cmp.getId());
+    ASN1Encodable asn1Value = extractGeneralRepContent(response, id_xipki_cmp_cacertchain.getId());
     ASN1Sequence seq = ASN1Sequence.getInstance(asn1Value);
 
     final int size = seq.size();

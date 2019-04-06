@@ -32,6 +32,8 @@ public class RestAPIConstants {
 
   public static final String CT_pkix_cert = "application/pkix-cert";
 
+  public static final String CT_pem_file = "application/x-pem-file";
+
   public static final String HEADER_PKISTATUS = "X-xipki-pkistatus";
 
   public static final String PKISTATUS_accepted = "accepted";
@@ -67,6 +69,8 @@ public class RestAPIConstants {
   public static final String FAILINFO_systemFailure = "systemFailure";
 
   public static final String CMD_cacert = "cacert";
+
+  public static final String CMD_cacertchain = "cacertchain";
 
   public static final String CMD_revoke_cert = "revoke-cert";
 

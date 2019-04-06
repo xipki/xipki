@@ -29,6 +29,7 @@ import java.security.SecureRandom;
 import java.security.Security;
 import java.security.Signature;
 import java.security.UnrecoverableKeyException;
+import java.security.cert.CertPathBuilderException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -263,7 +264,7 @@ public class P12ContentSignerBuilder {
       this.publicKey = cert.getPublicKey();
       this.certificateChain = X509Util.buildCertPath(cert, caCerts);
     } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException
-        | UnrecoverableKeyException | ClassCastException ex) {
+        | UnrecoverableKeyException | ClassCastException | CertPathBuilderException ex) {
       throw new XiSecurityException(ex.getMessage(), ex);
     }
   }

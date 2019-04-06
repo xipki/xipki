@@ -71,8 +71,6 @@ public class CaServletFilter implements Filter {
 
   private HealthCheckServlet healthServlet;
 
-  private HttpCaCertServlet caCertServlet;
-
   private HttpCmpServlet cmpServlet;
 
   private HttpRestServlet restServlet;
@@ -121,9 +119,6 @@ public class CaServletFilter implements Filter {
     caManager.setConfFile(confFile);
 
     caManager.startCaSystem();
-
-    this.caCertServlet = new HttpCaCertServlet();
-    this.caCertServlet.setResponderManager(caManager);
 
     this.cmpServlet = new HttpCmpServlet();
     this.cmpServlet.setResponderManager(caManager);
@@ -204,9 +199,6 @@ public class CaServletFilter implements Filter {
     } else if (path.startsWith("/health/")) {
       req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(7)); // 7 = "/health".length()
       healthServlet.service(req, res);
-    } else if (path.startsWith("/cacert/")) {
-      req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(7)); // 7 = "/cacert".length()
-      caCertServlet.service(req, res);
     } else if (path.startsWith("/mgmt/")) {
       if (remoteMgmtEnabled) {
         req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(5)); // 5 = "/mgmt".length()

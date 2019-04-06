@@ -108,7 +108,7 @@ public class CaAuditConstants {
 
   public static final String TYPE_CMP_error = "error";
 
-  public static final String TYPE_CMP_genm_cacerts = "genm_cacerts";
+  public static final String TYPE_CMP_genm_cacertchain = "genm_cacertchain";
 
   public static final String TYPE_CMP_genm_cainfo = "genm_cainfo";
 

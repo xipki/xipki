@@ -49,7 +49,7 @@ public class CmpClientConf extends ValidatableConf {
 
     private Cmpcontrol cmpcontrol;
 
-    private CaCert caCert;
+    private CaCertchain caCertchain;
 
     private Certprofiles certprofiles;
 
@@ -109,12 +109,12 @@ public class CmpClientConf extends ValidatableConf {
       this.cmpcontrol = cmpcontrol;
     }
 
-    public CaCert getCaCert() {
-      return caCert;
+    public CaCertchain getCaCertchain() {
+      return caCertchain;
     }
 
-    public void setCaCert(CaCert caCert) {
-      this.caCert = caCert;
+    public void setCaCertchain(CaCertchain caCertchain) {
+      this.caCertchain = caCertchain;
     }
 
     public Certprofiles getCertprofiles() {
@@ -133,19 +133,19 @@ public class CmpClientConf extends ValidatableConf {
       notEmpty(responder, "responder");
       notNull(cmpcontrol, "cmpcontrol");
       validate(cmpcontrol);
-      notNull(caCert, "caCert");
-      validate(caCert);
+      notNull(caCertchain, "caCertchain");
+      validate(caCertchain);
       notNull(certprofiles, "certprofiles");
       validate(certprofiles);
     }
 
   }
 
-  public static class CaCert extends ValidatableConf {
+  public static class CaCertchain extends ValidatableConf {
 
     private boolean autoconf;
 
-    private FileOrBinary cert;
+    private List<FileOrBinary> certchain;
 
     public boolean isAutoconf() {
       return autoconf;
@@ -155,19 +155,21 @@ public class CmpClientConf extends ValidatableConf {
       this.autoconf = autoconf;
     }
 
-    public FileOrBinary getCert() {
-      return autoconf ? null : cert;
+    public List<FileOrBinary> getCertchain() {
+      return autoconf ? null : certchain;
     }
 
-    public void setCert(FileOrBinary value) {
-      this.cert = value;
+    public void setCertchain(List<FileOrBinary> certchain) {
+      this.certchain = certchain;
     }
 
     @Override
     public void validate() throws InvalidConfException {
       if (!autoconf) {
-        notNull(cert, "cert");
-        validate(cert);
+        notEmpty(certchain, "certchain");
+        for (FileOrBinary m : certchain) {
+          m.validate();
+        }
       }
     }
 

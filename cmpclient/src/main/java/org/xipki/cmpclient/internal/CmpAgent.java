@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -1418,7 +1419,7 @@ class CmpAgent {
     Args.notBlank(caName, "caName");
 
     ASN1EncodableVector vec = new ASN1EncodableVector();
-    vec.add(new ASN1Integer(2));
+    vec.add(new ASN1Integer(3));
     ASN1Sequence acceptVersions = new DERSequence(vec);
 
     int action = XiSecurityConstants.CMP_ACTION_GET_CAINFO;
@@ -1439,14 +1440,19 @@ class CmpAgent {
 
     int version = root.getIntValue("version");
 
-    if (version == 2) {
-      // CACert
-      X509Certificate caCert;
-      byte[] certBytes = root.getBytes("caCert");
-      try {
-        caCert = X509Util.parseCert(certBytes);
-      } catch (CertificateException ex) {
-        throw new CmpClientException("could no parse the CA certificate", ex);
+    if (version == 3) {
+      // CACertchain
+      JSONArray array = root.getJSONArray("caCertchain");
+      List<X509Certificate> caCertchain = new LinkedList<>();
+      for (int i = 0; i < array.size(); i++) {
+        String base64Cert = array.getString(i);
+        X509Certificate caCert;
+        try {
+          caCert = X509Util.parseCert(base64Cert.getBytes());
+        } catch (CertificateException ex) {
+          throw new CmpClientException("could no parse the CA certificate chain", ex);
+        }
+        caCertchain.add(caCert);
       }
 
       // CmpControl
@@ -1478,7 +1484,7 @@ class CmpAgent {
       }
 
       LOG.info("CA {} supports profiles {}", caName, profileNames);
-      return new CaConf.CaInfo(caCert, cmpControl, profiles);
+      return new CaConf.CaInfo(caCertchain, cmpControl, profiles);
     } else {
       throw new CmpClientException("unknown CAInfo version " + version);
     }

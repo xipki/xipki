@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
+import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.FileOrValue;
@@ -205,6 +206,18 @@ public class CaConfs {
                 byte[] value = getBinary(ci.getCert().getFile(), properties, baseDir);
                 createFileOrBinary(zipStream, value, zipEntryName);
                 ci.getCert().setFile(zipEntryName);
+              }
+
+              if (CollectionUtil.isNonEmpty(ci.getCertchain())) {
+                for (int i = 0; i < ci.getCertchain().size(); i++) {
+                  FileOrBinary fi = ci.getCertchain().get(i);
+                  if (fi.getFile() != null) {
+                    String zipEntryName = "files/cacertchain-" + name + "-" + i + ".crt";
+                    byte[] value = getBinary(fi.getFile(), properties, baseDir);
+                    createFileOrBinary(zipStream, value, zipEntryName);
+                    fi.setFile(zipEntryName);
+                  }
+                }
               }
             } else {
               if (ci.getCert() != null) {

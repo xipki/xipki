@@ -24,6 +24,7 @@ import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -85,6 +86,8 @@ public class CaInfo {
 
   private PublicCaInfo publicCaInfo;
 
+  private List<X509Cert> certchain;
+
   private CertStore certStore;
 
   private RandomSerialNumberGenerator randomSnGenerator;
@@ -115,6 +118,13 @@ public class CaInfo {
     this.certInCmpFormat = new CMPCertificate(bcCert);
 
     this.publicCaInfo = new PublicCaInfo(cert, caEntry.getCaUris(), caEntry.getExtraControl());
+    List<X509Certificate> certs = caEntry.getCertchain();
+    this.certchain = new LinkedList<>();
+    if (CollectionUtil.isNonEmpty(certs)) {
+      for (X509Certificate m : certs) {
+        this.certchain.add(new X509Cert(m));
+      }
+    }
 
     this.noNewCertificateAfter = notAfter.getTime() - MS_PER_DAY * caEntry.getExpirationPeriod();
 
@@ -175,6 +185,10 @@ public class CaInfo {
 
   public X509Cert getCert() {
     return publicCaInfo.getCaCert();
+  }
+
+  public List<X509Cert> getCertchain() {
+    return certchain;
   }
 
   public String getSignerConf() {

@@ -35,6 +35,8 @@ public class XiSecurityConstants {
 
   public static final int CMP_ACTION_GET_CAINFO = 3;
 
+  public static final int CMP_ACTION_CACERTCHAIN = 4;
+
   private XiSecurityConstants() {
   }
 

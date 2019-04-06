@@ -19,12 +19,16 @@ package org.xipki.ca.api.mgmt;
 
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
+import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.Validity;
@@ -220,7 +224,11 @@ public abstract class MgmtMessage {
 
     private String crlSignerName;
 
+    private String precertSignerName;
+
     private String cmpControl;
+
+    private String ctLogControl;
 
     private String cmpResponderName;
 
@@ -248,6 +256,8 @@ public abstract class MgmtMessage {
 
     private byte[] certBytes;
 
+    private List<byte[]> certchainBytes;
+
     private int serialNoBitLen;
 
     private long nextCrlNumber;
@@ -274,9 +284,14 @@ public abstract class MgmtMessage {
       }
 
       crlSignerName = caEntry.getCrlSignerName();
+      precertSignerName = caEntry.getPrecertSignerName();
 
       if (caEntry.getCmpControl() != null) {
         cmpControl = caEntry.getCmpControl().getConf();
+      }
+
+      if (caEntry.getCtLogControl() != null) {
+        ctLogControl = caEntry.getCtLogControl().getConf();
       }
 
       cmpResponderName = caEntry.getCmpResponderName();
@@ -304,14 +319,21 @@ public abstract class MgmtMessage {
         }
       }
 
+      if (CollectionUtil.isNonEmpty(caEntry.getCertchain())) {
+        this.certchainBytes = new LinkedList<>();
+        for (X509Certificate m : caEntry.getCertchain()) {
+          try {
+            this.certchainBytes.add(m.getEncoded());
+          } catch (CertificateEncodingException ex) {
+            throw new IllegalStateException("could not encode certificate", ex);
+          }
+        }
+      }
+
       serialNoBitLen = caEntry.getSerialNoBitLen();
-
       nextCrlNumber = caEntry.getNextCrlNumber();
-
       numCrls = caEntry.getNumCrls();
-
       revocationInfo = caEntry.getRevocationInfo();
-
     }
 
     public NameId getIdent() {
@@ -384,6 +406,14 @@ public abstract class MgmtMessage {
 
     public void setCmpControl(String cmpControl) {
       this.cmpControl = cmpControl;
+    }
+
+    public String getCtLogControl() {
+      return ctLogControl;
+    }
+
+    public void setCtLogControl(String ctLogControl) {
+      this.ctLogControl = ctLogControl;
     }
 
     public String getCmpResponderName() {
@@ -490,6 +520,14 @@ public abstract class MgmtMessage {
       this.certBytes = certBytes;
     }
 
+    public List<byte[]> getCertchainBytes() {
+      return certchainBytes;
+    }
+
+    public void setCertchainBytes(List<byte[]> certchainBytes) {
+      this.certchainBytes = certchainBytes;
+    }
+
     public int getSerialNoBitLen() {
       return serialNoBitLen;
     }
@@ -522,12 +560,28 @@ public abstract class MgmtMessage {
       this.revocationInfo = revocationInfo;
     }
 
+    public String getPrecertSignerName() {
+      return precertSignerName;
+    }
+
+    public void setPrecertSignerName(String precertSignerName) {
+      this.precertSignerName = precertSignerName;
+    }
+
     public MgmtEntry.Ca toCaEntry()
         throws CertificateException, CaMgmtException, InvalidConfException {
       MgmtEntry.Ca rv = new MgmtEntry.Ca(ident, serialNoBitLen, nextCrlNumber,
                           signerType, signerConf, caUris, numCrls, expirationPeriod);
       if (certBytes != null) {
         rv.setCert(X509Util.parseCert(certBytes));
+      }
+
+      if (CollectionUtil.isNonEmpty(certchainBytes)) {
+        List<X509Certificate> certchain = new LinkedList<>();
+        for (byte[] m : certchainBytes) {
+          certchain.add(X509Util.parseCert(m));
+        }
+        rv.setCertchain(certchain);
       }
 
       if (cmpControl != null) {
@@ -540,7 +594,12 @@ public abstract class MgmtMessage {
         rv.setCrlControl(new CrlControl(crlControl));
       }
 
+      if (ctLogControl != null) {
+        rv.setCtLogControl(new CtLogControl(ctLogControl));
+      }
+
       rv.setCrlSignerName(crlSignerName);
+      rv.setPrecertSignerName(precertSignerName);
 
       rv.setDuplicateKeyPermitted(duplicateKeyPermitted);
       rv.setDuplicateSubjectPermitted(duplicateSubjectPermitted);

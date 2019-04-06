@@ -27,6 +27,7 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
@@ -52,6 +53,7 @@ import org.xipki.ca.api.RequestType;
 import org.xipki.ca.api.RestAPIConstants;
 import org.xipki.security.CrlReason;
 import org.xipki.security.X509Cert;
+import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.DateUtil;
@@ -246,6 +248,20 @@ public class RestResponder {
       if (RestAPIConstants.CMD_cacert.equalsIgnoreCase(command)) {
         respCt = RestAPIConstants.CT_pkix_cert;
         respBytes = ca.getCaInfo().getCert().getEncodedCert();
+      } else if (RestAPIConstants.CMD_cacertchain.equalsIgnoreCase(command)) {
+        respCt = RestAPIConstants.CT_pem_file;
+        List<X509Cert> certchain = ca.getCaInfo().getCertchain();
+        int size = 1 + (certchain == null ? 0 : certchain.size());
+        X509Cert[] certchainWithCaCert = new X509Cert[size];
+        certchainWithCaCert[0] = ca.getCaInfo().getCert();
+        if (size > 1) {
+          for (int i = 1; i < size; i++) {
+            certchainWithCaCert[i] = certchain.get(i - 1);
+          }
+        }
+
+        respBytes = StringUtil.toUtf8Bytes(
+                        X509Util.encodeCertificates(certchainWithCaCert));
       } else if (RestAPIConstants.CMD_enroll_cert.equalsIgnoreCase(command)) {
         String profile = httpRetriever.getParameter(RestAPIConstants.PARAM_profile);
         if (StringUtil.isBlank(profile)) {

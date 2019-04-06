@@ -20,7 +20,6 @@ package org.xipki.litecaclient.example;
 import java.io.File;
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.KeyStore;
@@ -39,7 +38,6 @@ import org.xipki.litecaclient.CmpCaClient;
 import org.xipki.litecaclient.KeyAndCert;
 import org.xipki.litecaclient.SdkUtil;
 import org.xipki.litecaclient.SignatureCmpCaClient;
-import org.xipki.litecaclient.TlsInit;
 
 /**
  * TODO.
@@ -53,8 +51,6 @@ public class SignatureCmpCaClientExample extends CaClientExample {
   private static final String URL_PREFIX = "https://localhost:8443/ca";
 
   private static final String CMP_URL = URL_PREFIX + "/cmp/myca";
-
-  private static final String CACERT_URL = URL_PREFIX + "/cacert/myca";
 
   private static final String KEYCERT_DIR =  "target/tlskeys";
 
@@ -104,20 +100,13 @@ public class SignatureCmpCaClientExample extends CaClientExample {
       PrivateKey requestorKey = (PrivateKey) ks.getKey(alias, password);
       X509Certificate requestorCert = (X509Certificate) ks.getCertificate(alias);
 
-      TlsInit.init();
-      byte[] encodedCaCert =
-          SdkUtil.send(new URL(CACERT_URL), "GET", null, null, "application/pkix-cert");
-      TlsInit.close();
-
-      X509Certificate caCert = SdkUtil.parseCert(encodedCaCert);
-      // CHECKSTYLE:SKIP
-      X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
-
       X509Certificate responderCert = SdkUtil.parseCert(new File(expandPath(RESPONDER_CERT_FILE)));
-      CmpCaClient client = new SignatureCmpCaClient(CMP_URL, caCert, requestorKey, requestorCert,
+      CmpCaClient client = new SignatureCmpCaClient(CMP_URL, null, requestorKey, requestorCert,
           responderCert, HASH_ALGO);
 
       client.init();
+      X509Certificate caCert = client.getCaCert();
+      X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
 
       // retrieve CA certificate
       printCert("===== CA Certificate =====", client.getCaCert());

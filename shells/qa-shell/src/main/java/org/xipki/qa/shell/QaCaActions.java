@@ -19,6 +19,7 @@ package org.xipki.qa.shell;
 
 import java.io.File;
 import java.rmi.UnexpectedException;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -68,6 +69,7 @@ import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.XiAction;
 import org.xipki.util.Base64;
+import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
@@ -341,6 +343,27 @@ public class QaCaActions {
       if (ey.getEncodedCert() != null) {
         if (!certEquals(ey.getEncodedCert(), ca.getCert().getEncoded())) {
           throw new CmdFailure("CA cert is not as expected");
+        }
+      }
+
+      // Certchain
+      if (ey.getEncodedCertchain() != null) {
+        List<byte[]> eyList = ey.getEncodedCertchain();
+        List<X509Certificate> isList = ca.getCertchain();
+        int eySize = eyList == null ? 0 : eyList.size();
+        int isSize = isList == null ? 0 : isList.size();
+
+        if (eySize != isSize) {
+          if (CollectionUtil.isNonEmpty(ca.getCertchain())) {
+            throw new CmdFailure("Length of CA certchain " + isSize
+                + " is not as expected " + eySize);
+          }
+        } else if (eySize != 0){
+          for (int i = 0; i < eySize; i++) {
+            if (!certEquals(eyList.get(i), isList.get(i).getEncoded())) {
+              throw new CmdFailure("CA cert chain[" + i + "] is not as expected");
+            }
+          }
         }
       }
 

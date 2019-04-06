@@ -17,9 +17,11 @@
 
 package org.xipki.litecaclient;
 
+import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
@@ -30,10 +32,14 @@ import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x509.CRLReason;
 import org.bouncycastle.util.encoders.Hex;
+import org.bouncycastle.util.io.pem.PemObject;
+import org.bouncycastle.util.io.pem.PemReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +50,7 @@ import org.slf4j.LoggerFactory;
 
 public class RestCaClient implements Closeable {
 
-  public static final String CT_pkix_cert = "application/pkix-cert";
+  public static final String CT_PEM_FILE = "application/x-pem-file";
 
   private static final Logger LOG = LoggerFactory.getLogger(RestCaClient.class);
 
@@ -53,6 +59,8 @@ public class RestCaClient implements Closeable {
   private final String authorization;
 
   private X509Certificate caCert;
+
+  private List<X509Certificate> caCertchain;
 
   private String caCertSha1Fp;
 
@@ -66,7 +74,8 @@ public class RestCaClient implements Closeable {
     TlsInit.init();
 
     // Get CA certificate
-    this.caCert = httpgetCaCert();
+    this.caCertchain = httpgetCaCertchain();
+    this.caCert = this.caCertchain.get(0);
     MessageDigest md = MessageDigest.getInstance("SHA1");
     byte[] digestBytes = md.digest(this.caCert.getEncoded());
     this.caCertSha1Fp = Hex.toHexString(digestBytes);
@@ -81,16 +90,30 @@ public class RestCaClient implements Closeable {
     TlsInit.close();
   }
 
-  private X509Certificate httpgetCaCert() throws Exception {
-    // Get CA certificate
-    byte[] bytes = httpGet(caUrl + "/cacert", CT_pkix_cert);
-    return SdkUtil.parseCert(bytes);
+  private List<X509Certificate> httpgetCaCertchain() throws Exception {
+    List<X509Certificate> certchain = new LinkedList<>();
+    // Get CA certificate chain
+    byte[] bytes = httpGet(caUrl + "/cacertchain", CT_PEM_FILE);
+    try (PemReader pemReader =
+        new PemReader(new InputStreamReader(new ByteArrayInputStream(bytes)))) {
+      PemObject pemObject;
+      while ((pemObject = pemReader.readPemObject()) != null) {
+        if ("CERTIFICATE".contentEquals(pemObject.getType())) {
+          certchain.add(SdkUtil.parseCert(pemObject.getContent()));
+        }
+      }
+    }
+
+    if (certchain.isEmpty()) {
+      throw new Exception("could not retrieve certificates");
+    }
+    return certchain;
   }
 
   public X509Certificate requestCert(String certprofile, CertificationRequest csr)
       throws Exception {
     String url = caUrl + "/enroll-cert?profile=" + certprofile;
-    byte[] response = httpPost(url, "application/pkcs10", csr.getEncoded(), CT_pkix_cert);
+    byte[] response = httpPost(url, "application/pkcs10", csr.getEncoded(), CT_PEM_FILE);
     X509Certificate cert = SdkUtil.parseCert(response);
     if (!verify(caCert, cert)) {
       throw new Exception("The returned certificate is not issued by the given CA");

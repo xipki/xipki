@@ -6,7 +6,7 @@
 		"responder":"responder1",
 		"ssl":"ssl1",
 		"url":"https://localhost:8443/ca/cmp/rootca",
-		"caCert":{
+		"caCertchain":{
 			"autoconf":true
 		},
 		"certprofiles":{
@@ -21,7 +21,7 @@
 		"responder":"responder1",
 		"ssl":"ssl1",
 		"url":"https://localhost:8443/ca/cmp/subca",
-		"caCert":{
+		"caCertchain":{
 			"autoconf":true
 		},
 		"certprofiles":{
@@ -36,7 +36,7 @@
 		"responder":"responder1",
 		"ssl":"ssl1",
 		"url":"https://localhost:8443/ca/cmp/subcawithcrl",
-		"caCert":{
+		"caCertchain":{
 			"autoconf":true
 		},
 		"certprofiles":{

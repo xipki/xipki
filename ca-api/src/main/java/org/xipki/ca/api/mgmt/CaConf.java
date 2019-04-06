@@ -370,9 +370,16 @@ public class CaConf {
                 new ConfPairs(ci.getScepControl()).getEncoded()));
           }
 
+          if (ci.getCtLogControl() != null) {
+            caEntry.setCtLogControl(new CtLogControl(
+                new ConfPairs(ci.getCtLogControl()).getEncoded()));
+          }
+
           caEntry.setCmpResponderName(ci.getCmpResponderName());
           caEntry.setScepResponderName(ci.getScepResponderName());
           caEntry.setCrlSignerName(ci.getCrlSignerName());
+          caEntry.setPrecertSignerName(ci.getPrecertSignerName());
+          caEntry.setPrecertSignerName(ci.getPrecertSignerName());
 
           caEntry.setDuplicateKeyPermitted(ci.isDuplicateKey());
           caEntry.setDuplicateSubjectPermitted(ci.isDuplicateSubject());
@@ -425,6 +432,21 @@ public class CaConf {
             }
 
             caEntry.setCert(caCert);
+
+            // certchain
+            if (CollectionUtil.isNonEmpty(ci.getCertchain())) {
+              List<X509Certificate> certchain = new LinkedList<>();
+              for (FileOrBinary cc : ci.getCertchain()) {
+                byte[] bytes = getBinary(cc, zipEntries);
+                try {
+                  certchain.add(X509Util.parseCert(bytes));
+                } catch (CertificateException ex) {
+                  throw new InvalidConfException("invalid certchain for CA " + name, ex);
+                }
+              }
+
+              caEntry.setCertchain(certchain);
+            }
           }
         }
 

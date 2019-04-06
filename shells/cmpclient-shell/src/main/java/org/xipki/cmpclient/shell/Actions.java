@@ -110,6 +110,7 @@ import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.XiAction;
 import org.xipki.util.Args;
+import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.DateUtil;
 import org.xipki.util.HealthCheckResult;
@@ -914,7 +915,7 @@ public class Actions {
         }
       }
 
-      Certificate caCert;
+      X509Certificate caCert;
       try {
         caCert = client.getCaCert(caName);
       } catch (Exception ex) {
@@ -927,6 +928,62 @@ public class Actions {
 
       saveVerbose(
           "saved CA certificate to file", outFile, encodeCert(caCert.getEncoded(), outform));
+      return null;
+    } // method execute0
+
+  }
+
+  @Command(scope = "xi", name = "cmp-cacertchain", description = "get CA certificate chain")
+  @Service
+  public static class CmpCacertchain extends ClientAction {
+
+    @Option(name = "--ca", description = "CA name\n(required if multiple CAs are configured)")
+    @Completion(CmpClientCompleters.CaNameCompleter.class)
+    private String caName;
+
+    @Option(name = "--out", aliases = "-o", required = true,
+        description = "where to save the CA certificate chain")
+    @Completion(FileCompleter.class)
+    private String outFile;
+
+    @Override
+    protected Object execute0() throws Exception {
+      if (caName != null) {
+        caName = caName.toLowerCase();
+      }
+
+      Set<String> caNames = client.getCaNames();
+      if (isEmpty(caNames)) {
+        throw new CmdFailure("no CA is configured");
+      }
+
+      if (caName != null && !caNames.contains(caName)) {
+        throw new IllegalCmdParamException("CA " + caName
+            + " is not within the configured CAs " + caNames);
+      }
+
+      if (caName == null) {
+        if (caNames.size() == 1) {
+          caName = caNames.iterator().next();
+        } else {
+          throw new IllegalCmdParamException("no CA is specified, one of " + caNames
+              + " is required");
+        }
+      }
+
+      List<X509Certificate> caCertChain;
+      try {
+        caCertChain = client.getCaCertchain(caName);
+      } catch (Exception ex) {
+        throw new CmdFailure("Error while retrieving CA certificate chain: " + ex.getMessage());
+      }
+
+      if (CollectionUtil.isEmpty(caCertChain)) {
+        throw new CmdFailure("received no CA certificate chain");
+      }
+
+      String encoded = X509Util.encodeCertificates(caCertChain.toArray(new X509Certificate[0]));
+      saveVerbose("saved CA certificate to file", outFile, StringUtil.toUtf8Bytes(encoded));
       return null;
     } // method execute0
 

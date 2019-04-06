@@ -36,6 +36,12 @@ curl ${OPTS} \
     --output cacert.der \
     "${BASE_URL}/cacert"
 
+echo "get CA certificate chain"
+
+curl ${OPTS} \
+    --output cacertchain.pem \
+    "${BASE_URL}/cacertchain"
+
 echo "enroll certificate"
 
 curl ${OPTS} \

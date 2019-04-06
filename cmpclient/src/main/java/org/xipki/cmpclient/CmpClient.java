@@ -19,10 +19,10 @@ package org.xipki.cmpclient;
 
 import java.io.Closeable;
 import java.math.BigInteger;
-import java.security.cert.Certificate;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -336,7 +336,17 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  Certificate getCaCert(String caName) throws CmpClientException;
+  X509Certificate getCaCert(String caName) throws CmpClientException;
+
+  /**
+   * Returns the CA certificate chain.
+   * @param caName
+   *          the CA name
+   * @return the CA certificate
+   * @throws CmpClientException
+   *          if client error occurs.
+   */
+  List<X509Certificate> getCaCertchain(String caName) throws CmpClientException;
 
   /**
    * Returns the subject of CA certificate.

@@ -145,6 +145,7 @@ import org.xipki.security.AlgorithmValidator;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.CrlReason;
 import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityConstants;
 import org.xipki.security.cmp.CmpUtf8Pairs;
 import org.xipki.security.cmp.CmpUtil;
@@ -226,7 +227,7 @@ public class CmpResponder extends BaseCmpResponder {
   static {
     KNOWN_GENMSG_IDS.add(CMPObjectIdentifiers.it_currentCRL.getId());
     KNOWN_GENMSG_IDS.add(ObjectIdentifiers.Xipki.id_xipki_cmp_cmpGenmsg.getId());
-    KNOWN_GENMSG_IDS.add(ObjectIdentifiers.Xipki.id_xipki_cmp_cacerts.getId());
+    KNOWN_GENMSG_IDS.add(ObjectIdentifiers.Xipki.id_xipki_cmp_cacertchain.getId());
 
     String oid = NISTObjectIdentifiers.id_aes128_GCM.getId();
     aesGcm_ciphers = new ConcurrentBag<>();
@@ -1606,27 +1607,22 @@ public class CmpResponder extends BaseCmpResponder {
   private String getSystemInfo(CmpRequestorInfo requestor, Set<Integer> acceptVersions)
       throws OperationException {
     X509Ca ca = getCa();
-    // current maximal support version is 2
-    int version = 2;
-    if (CollectionUtil.isNonEmpty(acceptVersions) && !acceptVersions.contains(version)) {
-      Integer ver = null;
-      for (Integer m : acceptVersions) {
-        if (m < version) {
-          ver = m;
-        }
-      }
-
-      if (ver == null) {
-        throw new OperationException(ErrorCode.BAD_REQUEST,
+    // current only version 3 is supported
+    int version = 3;
+    if (acceptVersions != null && !acceptVersions.contains(version)) {
+      throw new OperationException(ErrorCode.BAD_REQUEST,
           "none of versions " + acceptVersions + " is supported");
-      } else {
-        version = ver;
-      }
     }
 
     JSONObject root = new JSONObject(false);
     root.put("version", version);
-    root.put("caCert", ca.getCaInfo().getCert().getEncodedCert());
+    List<byte[]> certchain = new LinkedList<byte[]>();
+
+    certchain.add(ca.getCaInfo().getCert().getEncodedCert());
+    for (X509Cert m : ca.getCaInfo().getCertchain()) {
+      certchain.add(m.getEncodedCert());
+    }
+    root.put("caCertchain", certchain);
 
     JSONObject jsonCmpControl = new JSONObject(false);
     jsonCmpControl.put("rrAkiRequired", getCmpControl().isRrAkiRequired());
@@ -1942,7 +1938,7 @@ public class CmpResponder extends BaseCmpResponder {
             }
 
             if (CollectionUtil.isEmpty(acceptVersions)) {
-              acceptVersions.add(1);
+              acceptVersions.add(3);
             }
 
             String systemInfo = getSystemInfo(requestor, acceptVersions);
@@ -1959,10 +1955,18 @@ public class CmpResponder extends BaseCmpResponder {
           vec.add(respValue);
         }
         itvResp = new InfoTypeAndValue(infoType, new DERSequence(vec));
-      } else if (ObjectIdentifiers.Xipki.id_xipki_cmp_cacerts.equals(infoType)) {
-        event.addEventType(CaAuditConstants.TYPE_CMP_genm_cacerts);
-        CMPCertificate caCert = ca.getCaInfo().getCertInCmpFormat();
-        itvResp = new InfoTypeAndValue(infoType, new DERSequence(caCert));
+      } else if (ObjectIdentifiers.Xipki.id_xipki_cmp_cacertchain.equals(infoType)) {
+        event.addEventType(CaAuditConstants.TYPE_CMP_genm_cacertchain);
+        ASN1EncodableVector vec = new ASN1EncodableVector();
+        vec.add(ca.getCaInfo().getCertInCmpFormat());
+        List<X509Cert> certchain = ca.getCaInfo().getCertchain();
+        if (CollectionUtil.isNonEmpty(certchain)) {
+          for (X509Cert m : certchain) {
+            vec.add(m.getCertHolder().toASN1Structure());
+          }
+        }
+
+        itvResp = new InfoTypeAndValue(infoType, new DERSequence(vec));
       }
 
       GenRepContent genRepContent = new GenRepContent(itvResp);

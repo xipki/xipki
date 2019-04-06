@@ -50,6 +50,7 @@ import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.CaSystemStatus;
 import org.xipki.ca.api.mgmt.CmpControl;
 import org.xipki.ca.api.mgmt.CrlControl;
+import org.xipki.ca.api.mgmt.CtLogControl;
 import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.ca.api.mgmt.PermissionConstants;
 import org.xipki.ca.api.mgmt.ProtocolSupport;
@@ -138,9 +139,14 @@ public class CaActions {
   @Service
   public static class CaAdd extends CaAddOrGenAction {
 
-    @Option(name = "--cert", description = "DER encded CA certificate file")
+    @Option(name = "--cert", description = "CA certificate file")
     @Completion(FileCompleter.class)
     private String certFile;
+
+    @Option(name = "--certchain", multiValued = true,
+        description = "certificate chain of CA certificate")
+    @Completion(FileCompleter.class)
+    private List<String> issuerCertFiles;
 
     @Override
     protected Object execute0() throws Exception {
@@ -148,6 +154,14 @@ public class CaActions {
       if (certFile != null) {
         X509Certificate caCert = X509Util.parseCert(new File(certFile));
         caEntry.setCert(caCert);
+      }
+
+      if (CollectionUtil.isNonEmpty(issuerCertFiles)) {
+        List<X509Certificate> list = new ArrayList<>(issuerCertFiles.size());
+        for (String m : issuerCertFiles) {
+          list.add(X509Util.parseCert(Paths.get(m).toFile()));
+        }
+        caEntry.setCertchain(list);
       }
 
       String msg = "CA " + caEntry.getIdent().getName();
@@ -209,6 +223,10 @@ public class CaActions {
     @Completion(CaCompleters.SignerNameCompleter.class)
     private String crlSignerName;
 
+    @Option(name = "--precert-signer", description = "Precert (for CT Log) signer name or 'null'")
+    @Completion(CaCompleters.SignerNamePlusNullCompleter.class)
+    private String precertSignerName;
+
     @Option(name = "--cmp-responder", description = "CMP responder name")
     @Completion(CaCompleters.SignerNameCompleter.class)
     private String cmpResponderName;
@@ -225,6 +243,9 @@ public class CaActions {
 
     @Option(name = "--scep-control", description = "SCEP control")
     private String scepControl;
+
+    @Option(name = "--ctlog-control", description = "CT log control")
+    private String ctLogControl;
 
     @Option(name = "--num-crls", description = "number of CRLs to be kept in database")
     private Integer numCrls = 30;
@@ -331,6 +352,10 @@ public class CaActions {
         entry.setScepControl(new ScepControl(scepControl));
       }
 
+      if (ctLogControl != null) {
+        entry.setCtLogControl(new CtLogControl(ctLogControl));
+      }
+
       if (cmpResponderName != null) {
         entry.setCmpResponderName(cmpResponderName);
       }
@@ -341,6 +366,10 @@ public class CaActions {
 
       if (crlSignerName != null) {
         entry.setCrlSignerName(crlSignerName);
+      }
+
+      if (precertSignerName != null) {
+        entry.setPrecertSignerName(precertSignerName);
       }
 
       Validity tmpMaxValidity = Validity.getInstance(maxValidity);
@@ -1017,6 +1046,10 @@ public class CaActions {
     @Completion(CaCompleters.SignerNamePlusNullCompleter.class)
     private String crlSignerName;
 
+    @Option(name = "--precert-signer", description = "Precert (for CT Log) signer name or 'null'")
+    @Completion(CaCompleters.SignerNamePlusNullCompleter.class)
+    private String precertSignerName;
+
     @Option(name = "--cmp-responder", description = "CMP responder name or 'null'")
     @Completion(CaCompleters.SignerNamePlusNullCompleter.class)
     private String cmpResponderName;
@@ -1034,12 +1067,20 @@ public class CaActions {
     @Option(name = "--scep-control", description = "SCEP control or 'null'")
     private String scepControl;
 
+    @Option(name = "--ctlog-control", description = "CT log control")
+    private String ctLogControl;
+
     @Option(name = "--num-crls", description = "number of CRLs to be kept in database")
     private Integer numCrls;
 
     @Option(name = "--cert", description = "CA certificate file")
     @Completion(FileCompleter.class)
     private String certFile;
+
+    @Option(name = "--certchain", multiValued = true,
+        description = "certificate chain of CA certificate")
+    @Completion(FileCompleter.class)
+    private List<String> issuerCertFiles;
 
     @Option(name = "--signer-type", description = "CA signer type")
     @Completion(CaCompleters.SignerTypeCompleter.class)
@@ -1107,6 +1148,19 @@ public class CaActions {
 
       if (certFile != null) {
         entry.setEncodedCert(IoUtil.read(certFile));
+      }
+
+      if (CollectionUtil.isNonEmpty(issuerCertFiles)) {
+        List<byte[]> list = new ArrayList<>(issuerCertFiles.size());
+        for (String m : issuerCertFiles) {
+          if (CaManager.NULL.equalsIgnoreCase(m)) {
+            list.clear();
+            break;
+          }
+
+          list.add(X509Util.parseCert(Paths.get(m).toFile()).getEncoded());
+        }
+        entry.setEncodedCertchain(list);
       }
 
       if (signerConf != null) {
@@ -1178,6 +1232,10 @@ public class CaActions {
         entry.setScepControl(scepControl);
       }
 
+      if (ctLogControl != null) {
+        entry.setCtLogControl(ctLogControl);
+      }
+
       if (cmpResponderName != null) {
         entry.setCmpResponderName(cmpResponderName);
       }
@@ -1188,6 +1246,10 @@ public class CaActions {
 
       if (crlSignerName != null) {
         entry.setCrlSignerName(crlSignerName);
+      }
+
+      if (precertSignerName != null) {
+        entry.setPrecertSignerName(precertSignerName);
       }
 
       if (extraControl != null) {

@@ -21,6 +21,7 @@ import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.CertPathBuilderException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPublicKey;
@@ -104,7 +105,11 @@ public class P11ContentSignerBuilder {
         }
       }
 
-      this.certificateChain = X509Util.buildCertPath(cert, caCerts);
+      try {
+        this.certificateChain = X509Util.buildCertPath(cert, caCerts);
+      } catch (CertPathBuilderException ex) {
+        throw new XiSecurityException(ex);
+      }
     } else {
       this.certificateChain = null;
     }

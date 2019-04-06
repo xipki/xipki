@@ -231,11 +231,11 @@ class CaconfDbImporter extends DbPorter {
       throws DataAccessException, CertificateException, IOException {
     System.out.println("importing table CA");
     String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CA_URIS,MAX_VALIDITY,"
-        + "CERT,SIGNER_TYPE,CRL_SIGNER_NAME,CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,"
-        + "CRL_CONTROL,CMP_CONTROL,SCEP_CONTROL,"
+        + "CERT,CERTCHAIN,SIGNER_TYPE,CRL_SIGNER_NAME,PRECERT_SIGNER_NAME,CMP_RESPONDER_NAME,"
+        + "SCEP_RESPONDER_NAME,CRL_CONTROL,CMP_CONTROL,SCEP_CONTROL,CTLOG_CONTROL,"
         + "DUPLICATE_KEY,DUPLICATE_SUBJECT,PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION,NUM_CRLS,"
         + "EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,REV_INFO,VALIDITY_MODE,EXTRA_CONTROL,"
-        + "SIGNER_CONF) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        + "SIGNER_CONF) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     PreparedStatement ps = null;
     try {
@@ -256,13 +256,16 @@ class CaconfDbImporter extends DbPorter {
           ps.setString(idx++, ca.getCaUris());
           ps.setString(idx++, ca.getMaxValidity());
           ps.setString(idx++, Base64.encodeToString(certBytes));
+          // TODO certchain
           ps.setString(idx++, ca.getSignerType());
           ps.setString(idx++, ca.getCrlSignerName());
+          ps.setString(idx++, ca.getPrecertSignerName());
           ps.setString(idx++, ca.getCmpResponderName());
           ps.setString(idx++, ca.getScepResponderName());
           ps.setString(idx++, ca.getCrlControl());
           ps.setString(idx++, ca.getCmpControl());
           ps.setString(idx++, ca.getScepControl());
+          // TODO ctlog control
           ps.setInt(idx++, ca.getDuplicateKey());
           ps.setInt(idx++, ca.getDuplicateSubject());
           ps.setString(idx++, ca.getProtocolSupport());

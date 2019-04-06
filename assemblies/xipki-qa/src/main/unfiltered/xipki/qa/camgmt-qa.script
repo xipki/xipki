@@ -286,12 +286,13 @@ if { $printUsage equals "true" } then {
     --cmp-control $CMP_CONTROL \
     --cmp-responder responder1 \
     --duplicate-subject yes \
-    --duplicate-key yes
+    --duplicate-key yes \
+    --certchain output/rootca1.crt
 
   caqa:ca-check --name rootca1 \
     --permission all \
-    --max-validity 10y \
     --sn-bitlen 127  \
+    --max-validity 10y \
     --signer-type $TOKEN_TYPE \
     --cert output/rootca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
@@ -300,9 +301,31 @@ if { $printUsage equals "true" } then {
     --cmp-responder responder1 \
     --duplicate-subject yes \
     --duplicate-key yes \
-    --validity-mode cutoff
+    --validity-mode cutoff \
+    --certchain NULL
 
   # change the CA configuration
+
+  ca:ca-up --name subca1 \
+    --certchain NULL
+
+  caqa:ca-check --name subca1 \
+    --permission all \
+    --sn-bitlen 127 \
+    --max-validity 5y \
+    --signer-type $TOKEN_TYPE \
+    --cert output/subca1.crt \
+    --ocsp-uri http://localhost:8080/ocsp/responder1 \
+    --ca-cert-uri http://example.org/subca1.der \
+    --cmp-control $CMP_CONTROL \
+    --cmp-responder responder1 \
+    --duplicate-subject yes \
+    --duplicate-key yes \
+    --support-cmp yes --support-rest yes \
+    --save-req no \
+    --extra-control revokeSuspendedCerts.enabled=true,revokeSuspendedCerts.targetReason=cessationOfOperation,revokeSuspendedCerts.unchangedSince=15d \
+    --certchain output/rootca1.crt \
+    --certchain NULL
 
   ca:ca-up --name rootca1 \
     --permission enroll_cert \
@@ -382,6 +405,26 @@ if { $printUsage equals "true" } then {
     --duplicate-subject  yes \
     --duplicate-key yes \
     --validity-mode cutoff
+
+  echo "neg-ca-add: certchain does not match"
+
+  caqa:neg-ca-add \
+    --name rootca2 \
+    --permission all \
+    --sn-bitlen 127  \
+    --next-crl-no 2 \
+    --max-validity 10y \
+    --signer-type $TOKEN_TYPE \
+    --signer-conf $CA_SIGNER_CONF_RCA \
+    --cert output/subca1.crt \
+    --ocsp-uri http://localhost:8080/ocsp/responder1 \
+    --ca-cert-uri http://example.org/rootca1.der \
+    --cmp-control $CMP_CONTROL \
+    --cmp-responder responder1 \
+    --duplicate-subject  yes \
+    --duplicate-key yes \
+    --validity-mode cutoff \
+    --certchain output/subcawithcrl1.crt
 
   echo "neg-ca-add: sn-bitlen not in [64, 159]"
 

@@ -277,11 +277,11 @@ class CaconfDbExporter extends DbPorter {
       throws DataAccessException, IOException, InvalidConfException {
     System.out.println("exporting table CA");
     List<CaCertstore.Ca> cas = new LinkedList<>();
-    String sql = "SELECT ID,NAME,SN_SIZE,STATUS,CA_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE,SIGNER_CONF,"
-        + "PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,REV_INFO,DUPLICATE_KEY,"
-        + "DUPLICATE_SUBJECT,PROTOCOL_SUPPORT,SAVE_REQ,VALIDITY_MODE,NEXT_CRLNO,CMP_RESPONDER_NAME,"
-        + "SCEP_RESPONDER_NAME,CRL_SIGNER_NAME,CMP_CONTROL,SCEP_CONTROL,CRL_CONTROL,EXTRA_CONTROL "
-        + "FROM CA";
+    String sql = "SELECT ID,NAME,SN_SIZE,STATUS,CA_URIS,MAX_VALIDITY,CERT,CERTCHAIN,SIGNER_TYPE,"
+        + "SIGNER_CONF,PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,REV_INFO,"
+        + "DUPLICATE_KEY,DUPLICATE_SUBJECT,PROTOCOL_SUPPORT,SAVE_REQ,VALIDITY_MODE,NEXT_CRLNO,"
+        + "CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,CRL_SIGNER_NAME,PRECERT_SIGNER_NAME,CMP_CONTROL,"
+        + "SCEP_CONTROL,CRL_CONTROL,CTLOG_CONTROL,EXTRA_CONTROL FROM CA";
 
     Statement stmt = null;
     ResultSet rs = null;
@@ -302,15 +302,18 @@ class CaconfDbExporter extends DbPorter {
         ca.setMaxValidity(rs.getString("MAX_VALIDITY"));
         ca.setCert(buildFileOrBase64Binary(
             rs.getString("CERT"), "ca-conf/cert-ca-" + name + ".der"));
+        // TODO certchain
         ca.setSignerType(rs.getString("SIGNER_TYPE"));
         ca.setSignerConf(buildFileOrValue(
             rs.getString("SIGNER_CONF"), "ca-conf/signerconf-ca-" + name));
         ca.setCmpResponderName(rs.getString("CMP_RESPONDER_NAME"));
         ca.setScepResponderName(rs.getString("SCEP_RESPONDER_NAME"));
         ca.setCrlSignerName(rs.getString("CRL_SIGNER_NAME"));
+        ca.setPrecertSignerName(rs.getString("PRECERT_SIGNER_NAME"));
         ca.setCmpControl(rs.getString("CMP_CONTROL"));
         ca.setScepControl(rs.getString("SCEP_CONTROL"));
         ca.setCrlControl(rs.getString("CRL_CONTROL"));
+        // TODO ctlog control
         ca.setDuplicateKey(rs.getInt("DUPLICATE_KEY"));
         ca.setDuplicateSubject(rs.getInt("DUPLICATE_SUBJECT"));
         ca.setProtocolSupport(rs.getString("PROTOCOL_SUPPORT"));

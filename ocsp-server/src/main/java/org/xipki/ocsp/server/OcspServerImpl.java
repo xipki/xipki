@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.cert.CertPathBuilderException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateParsingException;
@@ -994,7 +995,11 @@ public class OcspServerImpl implements OcspServer {
         }
       }
 
-      explicitCertificateChain = X509Util.buildCertPath(explicitResponderCert, caCerts);
+      try {
+        explicitCertificateChain = X509Util.buildCertPath(explicitResponderCert, caCerts);
+      } catch (CertPathBuilderException ex) {
+        throw new InvalidConfException(ex);
+      }
     }
 
     String responderSignerType = signerType.getType();
@@ -1181,7 +1186,14 @@ public class OcspServerImpl implements OcspServer {
       certstore.addAll(requestOption.getCerts());
     }
 
-    X509Certificate[] certpath = X509Util.buildCertPath(target, certstore);
+    X509Certificate[] certpath;
+    try {
+      certpath = X509Util.buildCertPath(target, certstore);
+    } catch (CertPathBuilderException ex) {
+      LogUtil.warn(LOG, ex);
+      return false;
+    }
+
     CertpathValidationModel model = requestOption.getCertpathValidationModel();
 
     Date now = new Date();

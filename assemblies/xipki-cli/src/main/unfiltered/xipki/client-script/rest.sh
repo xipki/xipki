@@ -35,6 +35,10 @@ curl ${OPTS} \
     --output ${OUT_DIR}/cacert.der \
     "${CA_URL}/cacert"
 
+curl ${OPTS} \
+    --output ${OUT_DIR}/cacertchain.pem \
+    "${CA_URL}/cacertchain"
+
 CA_SHA1FP=`openssl sha1 ${OUT_DIR}/cacert.der | cut -d '=' -f 2 | cut -d ' ' -f 2`
 
 # The PEM file will be used by "openssl ocsp"

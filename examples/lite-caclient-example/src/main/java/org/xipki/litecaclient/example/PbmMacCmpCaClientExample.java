@@ -19,7 +19,6 @@ package org.xipki.litecaclient.example;
 
 import java.io.File;
 import java.math.BigInteger;
-import java.net.URL;
 import java.security.PrivateKey;
 import java.security.Security;
 import java.security.cert.X509Certificate;
@@ -40,7 +39,6 @@ import org.bouncycastle.util.encoders.Hex;
 import org.xipki.litecaclient.KeyAndCert;
 import org.xipki.litecaclient.PbmMacCmpCaClient;
 import org.xipki.litecaclient.SdkUtil;
-import org.xipki.litecaclient.TlsInit;
 
 /**
  * TODO.
@@ -54,8 +52,6 @@ public class PbmMacCmpCaClientExample extends CaClientExample {
   private static final String URL_PREFIX = "https://localhost:8443/ca";
 
   private static final String CMP_URL = URL_PREFIX + "/cmp/myca";
-
-  private static final String CACERT_URL = URL_PREFIX + "/cacert/myca";
 
   private static final String KEYCERT_DIR =  "target/tlskeys";
 
@@ -80,21 +76,14 @@ public class PbmMacCmpCaClientExample extends CaClientExample {
     Security.addProvider(new BouncyCastleProvider());
 
     try {
-      TlsInit.init();
-      byte[] encodedCaCert =
-          SdkUtil.send(new URL(CACERT_URL), "GET", null, null, "application/pkix-cert");
-      TlsInit.close();
-
-      X509Certificate caCert = SdkUtil.parseCert(encodedCaCert);
       // CHECKSTYLE:SKIP
-      X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
       X509Certificate responderCert = SdkUtil.parseCert(new File(expandPath(RESPONDER_CERT_FILE)));
 
       X500Name requestorSubject = new X500Name("CN=PBMMAC");
       X500Name responderSubject = X500Name.getInstance(
           responderCert.getSubjectX500Principal().getEncoded());
 
-      PbmMacCmpCaClient client = new PbmMacCmpCaClient(CMP_URL, caCert, requestorSubject,
+      PbmMacCmpCaClient client = new PbmMacCmpCaClient(CMP_URL, null, requestorSubject,
           responderSubject, HASH_ALGO);
 
       // SHA1("requestor-mac1".getBytes("UTF-8"))
@@ -115,6 +104,8 @@ public class PbmMacCmpCaClientExample extends CaClientExample {
       client.setTrustedMacOids(macOids);
 
       client.init();
+      X509Certificate caCert = client.getCaCert();
+      X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
 
       // retrieve CA certificate
       printCert("===== CA Certificate =====", client.getCaCert());

@@ -15,6 +15,10 @@ echo "REST cacert"
 
 xi:curl --out output/rest/cacert-subcawithcrl1.der $BASE_URL/cacert
 
+echo "REST cacertchain"
+
+xi:curl --out output/rest/cacertchain-subcawithcrl1.pem $BASE_URL/cacertchain
+
 echo "REST enroll"
 
 xi:curl --out output/rest/rest-tls1.der \

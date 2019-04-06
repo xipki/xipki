@@ -22,6 +22,9 @@ echo "# Get CA certificate"
 xi:cmp-cacert \
   --out ${CACERT}
 
+xi:cmp-cacertchain \
+  --out ${OUT_DIR}/cacertchain.pem
+
 ## Enroll certificates (profile smime)
 
 echo "=====CMP: Enroll via CRMF====="

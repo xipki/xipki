@@ -17,13 +17,17 @@
 
 package org.xipki.security.util;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.nio.file.Files;
 import java.security.NoSuchProviderException;
 import java.security.cert.CRLException;
+import java.security.cert.CertPathBuilderException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -80,6 +84,7 @@ import org.xipki.security.BadInputException;
 import org.xipki.security.FpIdCalculator;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
@@ -87,6 +92,8 @@ import org.xipki.util.CompareUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.Hex;
 import org.xipki.util.IoUtil;
+import org.xipki.util.PemEncoder;
+import org.xipki.util.PemEncoder.PemLabel;
 import org.xipki.util.StringUtil;
 
 /**
@@ -281,9 +288,7 @@ public class X509Util {
 
   public static String toPemCert(X509Certificate cert) throws CertificateException {
     Args.notNull(cert, "cert");
-    return StringUtil.concat("-----BEGIN CERTIFICATE-----\n",
-        Base64.encodeToString(cert.getEncoded(), true),
-        "\n-----END CERTIFICATE-----");
+    return new String(PemEncoder.encode(cert.getEncoded(), PemLabel.CERTIFICATE));
   }
 
   public static X509Certificate toX509Cert(org.bouncycastle.asn1.x509.Certificate asn1Cert)
@@ -568,17 +573,30 @@ public class X509Util {
 
   /**
    * Build the certificate path. Cross certificate will not be considered.
-   * @param cert certificate for which the certificate path will be built
+   * @param targetCert certificate for which the certificate path will be built
    * @param certs collection of certificates.
    * @return the certificate path
    */
-  public static X509Certificate[] buildCertPath(X509Certificate cert,
-      Set<? extends Certificate> certs) {
-    Args.notNull(cert, "cert");
+  public static X509Certificate[] buildCertPath(X509Certificate targetCert,
+      Collection<? extends Certificate> certs) throws CertPathBuilderException {
+    return buildCertPath(targetCert, certs, true);
+  }
+
+  /**
+   * Build the certificate path. Cross certificate will not be considered.
+   * @param targetCert certificate for which the certificate path will be built
+   * @param certs collection of certificates.
+   * @param includeTargetCert whether to include {@code targetCert} in the result.
+   * @return the certificate path
+   */
+  public static X509Certificate[] buildCertPath(X509Certificate targetCert,
+      Collection<? extends Certificate> certs, boolean includeTargetCert)
+          throws CertPathBuilderException {
+    Args.notNull(targetCert, "cert");
     List<X509Certificate> certChain = new LinkedList<>();
-    certChain.add(cert);
+    certChain.add(targetCert);
     try {
-      if (certs != null && !isSelfSigned(cert)) {
+      if (certs != null && !isSelfSigned(targetCert)) {
         while (true) {
           X509Certificate caCert = getCaCertOf(certChain.get(certChain.size() - 1), certs);
           if (caCert == null) {
@@ -596,30 +614,103 @@ public class X509Util {
     }
 
     final int n = certChain.size();
-    int len = n;
-    if (n > 1) {
-      for (int i = 1; i < n; i++) {
-        int pathLen = certChain.get(i).getBasicConstraints();
-        if (pathLen < 0 || pathLen < i) {
-          len = i;
-          break;
-        }
-      }
-    } // end for
-
-    if (len == n) {
-      return certChain.toArray(new X509Certificate[0]);
-    } else {
-      X509Certificate[] ret = new X509Certificate[len];
-      for (int i = 0; i < len; i++) {
-        ret[i] = certChain.get(i);
-      }
-      return ret;
+    if (n == 1) {
+      return includeTargetCert ? certChain.toArray(new X509Certificate[0]) : null;
     }
+
+    // check the basicConstrains
+    int minPathLen;
+    int targetPathLen = targetCert.getBasicConstraints();
+    if (targetPathLen != -1) {
+      // targetCert is non-CA
+      minPathLen = 0;
+    } else {
+      if (targetPathLen == Integer.MAX_VALUE) {
+        minPathLen = 1;
+      } else {
+        minPathLen = targetPathLen + 1;
+      }
+    }
+
+    for (int i = 1; i < n; i++) {
+      int pathLen = certChain.get(i).getBasicConstraints();
+      if (pathLen < minPathLen) {
+        throw new CertPathBuilderException("PathLen too small of certificate "
+            + certChain.get(i).getSubjectX500Principal().getName());
+      } else {
+        minPathLen = 1 + (pathLen == Integer.MAX_VALUE ? minPathLen : pathLen);
+      }
+    }
+
+    if (!includeTargetCert) {
+      certChain.remove(0);
+    }
+
+    return certChain.toArray(new X509Certificate[0]);
   } // method buildCertPath
 
+  public static String encodeCertificates(X509Certificate[] certchain)
+      throws CertificateException, IOException {
+    if (CollectionUtil.isEmpty(certchain)) {
+      return null;
+    }
+
+    StringBuilder sb = new StringBuilder();
+    boolean first = true;
+    for (X509Certificate m : certchain) {
+      if (!first) {
+        sb.append("\r\n");
+        first = false;
+      }
+      sb.append(toPemCert(m));
+    }
+    return sb.toString();
+  }
+
+  public static String encodeCertificates(X509Cert[] certchain)
+      throws CertificateException, IOException {
+    if (CollectionUtil.isEmpty(certchain)) {
+      return null;
+    }
+
+    StringBuilder sb = new StringBuilder();
+    boolean first = true;
+    for (X509Cert m : certchain) {
+      if (!first) {
+        sb.append("\r\n");
+        first = false;
+      }
+      sb.append(PemEncoder.encode(m.getEncodedCert(), PemLabel.CERTIFICATE));
+    }
+    return sb.toString();
+  }
+
+  public static List<X509Certificate> listCertificates(String encodedCerts)
+      throws CertificateException, IOException {
+    final String START_LINE = "-----BEGIN CERTIFICATE-----";
+    final String END_LINE = "-----END CERTIFICATE-----";
+
+    List<X509Certificate> certs = new LinkedList<>();
+    try (BufferedReader reader = new BufferedReader(new StringReader(encodedCerts))) {
+      String line;
+
+      ByteArrayOutputStream bout = new ByteArrayOutputStream();
+      while ((line = reader.readLine()) != null) {
+        if (START_LINE.equals(line)) {
+          bout.reset();
+        } else if (END_LINE.equals(line)) {
+          certs.add(parseCert(bout.toByteArray()));
+          bout.reset();
+        } else {
+          bout.write(StringUtil.toUtf8Bytes(line));
+        }
+      }
+    }
+    return certs;
+  }
+
   private static X509Certificate getCaCertOf(X509Certificate cert,
-      Set<? extends Certificate> caCerts) throws CertificateEncodingException {
+      Collection<? extends Certificate> caCerts) throws CertificateEncodingException {
     Args.notNull(cert, "cert");
     if (isSelfSigned(cert)) {
       return null;

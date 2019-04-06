@@ -65,7 +65,7 @@ public class ObjectIdentifiers {
 
     public static final ASN1ObjectIdentifier id_xipki_cmp_cmpGenmsg = id_xipki_cmp.branch("1");
 
-    public static final ASN1ObjectIdentifier id_xipki_cmp_cacerts = id_xipki_cmp.branch("2");
+    public static final ASN1ObjectIdentifier id_xipki_cmp_cacertchain = id_xipki_cmp.branch("2");
 
   }
 

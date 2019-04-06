@@ -1869,6 +1869,12 @@ public class CaManagerImpl implements CaManager, Closeable {
     return (ca == null) ? null : ca.getCaInfo().getCert();
   }
 
+  public List<X509Cert> getCaCertchain(String caName) {
+    caName = Args.toNonBlankLower(caName, "caName");
+    X509Ca ca = x509cas.get(caName);
+    return (ca == null) ? null : ca.getCaInfo().getCertchain();
+  }
+
   @Override
   public void removeCa(String name) throws CaMgmtException {
     name = Args.toNonBlankLower(name, "name");

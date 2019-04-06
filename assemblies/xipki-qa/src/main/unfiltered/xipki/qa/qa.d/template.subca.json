@@ -18,6 +18,9 @@
 					"http://localhost:8080/ocsp/responder1"
 				]
 			},
+			"certchain":[{
+				"file":"output/rootca1.crt"
+			}],
 			"cmpControl":{
 				"send.ca":true,
 				"messagetime.bias":300,
