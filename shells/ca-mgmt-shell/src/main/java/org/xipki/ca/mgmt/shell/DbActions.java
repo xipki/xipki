@@ -38,7 +38,6 @@ import org.xipki.password.PasswordResolver;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.Completers;
 import org.xipki.shell.XiAction;
-import org.xipki.util.StringUtil;
 
 /**
  * TODO.
@@ -79,15 +78,10 @@ public class DbActions {
 
       Exception ex = myRun.exception();
       if (ex != null) {
-        String errMsg = ex.getMessage();
-        if (StringUtil.isBlank(errMsg)) {
-          errMsg = "ERROR";
-        }
-
-        System.err.println(errMsg);
+        throw ex;
+      } else {
+        return null;
       }
-
-      return null;
     }
 
   }

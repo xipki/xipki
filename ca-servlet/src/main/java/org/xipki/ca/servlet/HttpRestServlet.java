@@ -83,8 +83,8 @@ public class HttpRestServlet extends HttpServlet {
       RestResponse response = rest.service(path, event, requestBytes, httpRetriever);
 
       resp.setStatus(response.getStatusCode());
-      if (resp.getContentType() != null) {
-        resp.setContentType(resp.getContentType());
+      if (response.getContentType() != null) {
+        resp.setContentType(response.getContentType());
       }
 
       Map<String, String> headers = response.getHeaders();

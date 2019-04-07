@@ -50,6 +50,8 @@ public class CaCertstore extends ValidatableConf {
 
     private FileOrBinary cert;
 
+    private FileOrValue certchain;
+
     private String signerType;
 
     private FileOrValue signerConf;
@@ -67,6 +69,8 @@ public class CaCertstore extends ValidatableConf {
     private String scepControl;
 
     private String crlControl;
+
+    private String ctLogControl;
 
     private int duplicateKey;
 
@@ -154,6 +158,14 @@ public class CaCertstore extends ValidatableConf {
       this.cert = cert;
     }
 
+    public FileOrValue getCertchain() {
+      return certchain;
+    }
+
+    public void setCertchain(FileOrValue certchain) {
+      this.certchain = certchain;
+    }
+
     public String getSignerType() {
       return signerType;
     }
@@ -224,6 +236,14 @@ public class CaCertstore extends ValidatableConf {
 
     public void setCrlControl(String crlControl) {
       this.crlControl = crlControl;
+    }
+
+    public String getCtLogControl() {
+      return ctLogControl;
+    }
+
+    public void setCtLogControl(String ctLogControl) {
+      this.ctLogControl = ctLogControl;
     }
 
     public int getDuplicateKey() {

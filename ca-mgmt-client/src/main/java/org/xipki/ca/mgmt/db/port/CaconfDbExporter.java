@@ -277,11 +277,13 @@ class CaconfDbExporter extends DbPorter {
       throws DataAccessException, IOException, InvalidConfException {
     System.out.println("exporting table CA");
     List<CaCertstore.Ca> cas = new LinkedList<>();
-    String sql = "SELECT ID,NAME,SN_SIZE,STATUS,CA_URIS,MAX_VALIDITY,CERT,CERTCHAIN,SIGNER_TYPE,"
-        + "SIGNER_CONF,PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,REV_INFO,"
-        + "DUPLICATE_KEY,DUPLICATE_SUBJECT,PROTOCOL_SUPPORT,SAVE_REQ,VALIDITY_MODE,NEXT_CRLNO,"
-        + "CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,CRL_SIGNER_NAME,PRECERT_SIGNER_NAME,CMP_CONTROL,"
-        + "SCEP_CONTROL,CRL_CONTROL,CTLOG_CONTROL,EXTRA_CONTROL FROM CA";
+
+    final String sql = "SELECT ID,NAME,SN_SIZE,NEXT_CRLNO,STATUS,CA_URIS," // 6
+        + "MAX_VALIDITY,CERT,CERTCHAIN,SIGNER_TYPE,CRL_SIGNER_NAME,PRECERT_SIGNER_NAME," // 6
+        + "CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,CRL_CONTROL,CMP_CONTROL,SCEP_CONTROL," // 5
+        + "CTLOG_CONTROL,DUPLICATE_KEY,DUPLICATE_SUBJECT,PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION," // 6
+        + "NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL," // 5
+        + "SIGNER_CONF,REV_INFO FROM CA"; // 2
 
     Statement stmt = null;
     ResultSet rs = null;
@@ -290,10 +292,9 @@ class CaconfDbExporter extends DbPorter {
       rs = stmt.executeQuery(sql);
 
       while (rs.next()) {
-        String name = rs.getString("NAME");
-
         CaCertstore.Ca ca = new CaCertstore.Ca();
         ca.setId(rs.getInt("ID"));
+        String name = rs.getString("NAME");
         ca.setName(name);
         ca.setSnSize(rs.getInt("SN_SIZE"));
         ca.setNextCrlNo(rs.getLong("NEXT_CRLNO"));
@@ -302,7 +303,8 @@ class CaconfDbExporter extends DbPorter {
         ca.setMaxValidity(rs.getString("MAX_VALIDITY"));
         ca.setCert(buildFileOrBase64Binary(
             rs.getString("CERT"), "ca-conf/cert-ca-" + name + ".der"));
-        // TODO certchain
+        ca.setCertchain(buildFileOrValue(
+            rs.getString("CERTCHAIN"), "ca-conf/certchain-ca-" + name + ".pem"));
         ca.setSignerType(rs.getString("SIGNER_TYPE"));
         ca.setSignerConf(buildFileOrValue(
             rs.getString("SIGNER_CONF"), "ca-conf/signerconf-ca-" + name));
@@ -313,7 +315,7 @@ class CaconfDbExporter extends DbPorter {
         ca.setCmpControl(rs.getString("CMP_CONTROL"));
         ca.setScepControl(rs.getString("SCEP_CONTROL"));
         ca.setCrlControl(rs.getString("CRL_CONTROL"));
-        // TODO ctlog control
+        ca.setCtLogControl(rs.getString("CTLOG_CONTROL"));
         ca.setDuplicateKey(rs.getInt("DUPLICATE_KEY"));
         ca.setDuplicateSubject(rs.getInt("DUPLICATE_SUBJECT"));
         ca.setProtocolSupport(rs.getString("PROTOCOL_SUPPORT"));

@@ -230,12 +230,14 @@ class CaconfDbImporter extends DbPorter {
   private void importCa(List<CaCertstore.Ca> cas)
       throws DataAccessException, CertificateException, IOException {
     System.out.println("importing table CA");
-    String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CA_URIS,MAX_VALIDITY,"
-        + "CERT,CERTCHAIN,SIGNER_TYPE,CRL_SIGNER_NAME,PRECERT_SIGNER_NAME,CMP_RESPONDER_NAME,"
-        + "SCEP_RESPONDER_NAME,CRL_CONTROL,CMP_CONTROL,SCEP_CONTROL,CTLOG_CONTROL,"
-        + "DUPLICATE_KEY,DUPLICATE_SUBJECT,PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION,NUM_CRLS,"
-        + "EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,REV_INFO,VALIDITY_MODE,EXTRA_CONTROL,"
-        + "SIGNER_CONF) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+    final String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CA_URIS," // 7
+        + "MAX_VALIDITY,CERT,CERTCHAIN,SIGNER_TYPE,CRL_SIGNER_NAME,PRECERT_SIGNER_NAME," // 6
+        + "CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,CRL_CONTROL,CMP_CONTROL,SCEP_CONTROL," // 5
+        + "CTLOG_CONTROL,DUPLICATE_KEY,DUPLICATE_SUBJECT,PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION," // 6
+        + "NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL," // 5
+        + "SIGNER_CONF,REV_INFO) " // 2
+        + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     PreparedStatement ps = null;
     try {
@@ -256,7 +258,8 @@ class CaconfDbImporter extends DbPorter {
           ps.setString(idx++, ca.getCaUris());
           ps.setString(idx++, ca.getMaxValidity());
           ps.setString(idx++, Base64.encodeToString(certBytes));
-          // TODO certchain
+
+          ps.setString(idx++, readContent(ca.getCertchain()));
           ps.setString(idx++, ca.getSignerType());
           ps.setString(idx++, ca.getCrlSignerName());
           ps.setString(idx++, ca.getPrecertSignerName());
@@ -265,7 +268,7 @@ class CaconfDbImporter extends DbPorter {
           ps.setString(idx++, ca.getCrlControl());
           ps.setString(idx++, ca.getCmpControl());
           ps.setString(idx++, ca.getScepControl());
-          // TODO ctlog control
+          ps.setString(idx++, ca.getCtLogControl());
           ps.setInt(idx++, ca.getDuplicateKey());
           ps.setInt(idx++, ca.getDuplicateSubject());
           ps.setString(idx++, ca.getProtocolSupport());
@@ -276,10 +279,10 @@ class CaconfDbImporter extends DbPorter {
           ps.setInt(idx++, tmpNumCrls);
           ps.setInt(idx++, ca.getExpirationPeriod());
           ps.setInt(idx++, ca.getKeepExpiredCertDays());
-          ps.setString(idx++, ca.getRevInfo());
           ps.setString(idx++, ca.getValidityMode());
           ps.setString(idx++, ca.getExtraControl());
           ps.setString(idx++, readContent(ca.getSignerConf()));
+          ps.setString(idx++, ca.getRevInfo());
 
           ps.executeUpdate();
         } catch (SQLException ex) {

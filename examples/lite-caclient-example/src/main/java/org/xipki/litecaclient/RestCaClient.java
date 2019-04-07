@@ -52,6 +52,8 @@ public class RestCaClient implements Closeable {
 
   public static final String CT_PEM_FILE = "application/x-pem-file";
 
+  public static final String CT_PKIX_CERT = "application/pkix-cert";
+
   private static final Logger LOG = LoggerFactory.getLogger(RestCaClient.class);
 
   private final String caUrl;
@@ -113,7 +115,7 @@ public class RestCaClient implements Closeable {
   public X509Certificate requestCert(String certprofile, CertificationRequest csr)
       throws Exception {
     String url = caUrl + "/enroll-cert?profile=" + certprofile;
-    byte[] response = httpPost(url, "application/pkcs10", csr.getEncoded(), CT_PEM_FILE);
+    byte[] response = httpPost(url, "application/pkcs10", csr.getEncoded(), CT_PKIX_CERT);
     X509Certificate cert = SdkUtil.parseCert(response);
     if (!verify(caCert, cert)) {
       throw new Exception("The returned certificate is not issued by the given CA");

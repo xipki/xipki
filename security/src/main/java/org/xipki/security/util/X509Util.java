@@ -680,7 +680,7 @@ public class X509Util {
         sb.append("\r\n");
         first = false;
       }
-      sb.append(PemEncoder.encode(m.getEncodedCert(), PemLabel.CERTIFICATE));
+      sb.append(new String(PemEncoder.encode(m.getEncodedCert(), PemLabel.CERTIFICATE)));
     }
     return sb.toString();
   }

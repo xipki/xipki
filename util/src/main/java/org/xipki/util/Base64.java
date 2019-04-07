@@ -200,8 +200,10 @@ public class Base64 {
    * Decodes a BASE64 encoded char array. All illegal characters will be ignored and can handle
    * both arrays with and without line separators.
    * @param sArr The source array. <code>null</code> or length 0 will return an empty array.
-   * @return The decoded array of bytes. May be of length 0. Will be <code>null</code> if the
-   *   legal characters (including '=') isn't divideable by 4.  (I.e. definitely corrupted).
+   * @return The decoded array of bytes. May be of length 0.
+   * @throws IllegalArgumentException
+   *         If the legal characters (including '=') isn't divideable by 4.
+   *         (I.e. definitely corrupted).
    */
   public final static byte[] decode(char[] sArr) {
     // Check special case
@@ -224,7 +226,7 @@ public class Base64 {
     // Check so that legal chars (including '=') are evenly divideable by 4 as specified in RFC
     // 2045.
     if ((sLen - sepCnt) % 4 != 0) {
-      return null;
+      throw new IllegalArgumentException("legal characters (including '=') isn't divideable by 4");
     }
 
     int pad = 0;
@@ -417,8 +419,10 @@ public class Base64 {
    * @param sArr
    *          The source array. Length 0 will return an empty array. <code>null</code> will throw
    *          an exception.
-   * @return The decoded array of bytes. May be of length 0. Will be <code>null</code> if the
-   *         legal characters (including '=') isn't divideable by 4. (I.e. definitely corrupted).
+   * @return The decoded array of bytes. May be of length 0.
+   * @throws IllegalArgumentException
+   *         If the legal characters (including '=') isn't divideable by 4.
+   *         (I.e. definitely corrupted).
    */
   public final static byte[] decode(byte[] sArr) {
     // Check special case
@@ -437,7 +441,7 @@ public class Base64 {
     // Check so that legal chars (including '=') are evenly divideable by 4 as specified in
     // RFC 2045.
     if ((sLen - sepCnt) % 4 != 0) {
-      return null;
+      throw new IllegalArgumentException("legal characters (including '=') isn't divideable by 4");
     }
 
     int pad = 0;
@@ -593,8 +597,10 @@ public class Base64 {
    * This version will use <code>str.charAt(i)</code> to iterate the string.
    * @param str
    *          The source string. <code>null</code> or length 0 will return an empty array.
-   * @return The decoded array of bytes. May be of length 0. Will be <code>null</code> if the
-   *         legal characters (including '=') isn't divideable by 4.  (I.e. definitely corrupted).
+   * @return The decoded array of bytes. May be of length 0.
+   * @throws IllegalArgumentException
+   *         If the legal characters (including '=') isn't divideable by 4.
+   *         (I.e. definitely corrupted).
    */
   public final static byte[] decode(String str) {    // Check special case
     int sLen = str != null ? str.length() : 0;
@@ -617,7 +623,7 @@ public class Base64 {
     // Check so that legal chars (including '=') are evenly divideable by 4 as specified in
     // RFC 2045.
     if ((sLen - sepCnt) % 4 != 0) {
-      return null;
+      throw new IllegalArgumentException("legal characters (including '=') isn't divideable by 4");
     }
 
     // Count '=' at end
