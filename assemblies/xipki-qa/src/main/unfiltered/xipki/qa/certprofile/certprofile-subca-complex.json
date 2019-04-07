@@ -170,10 +170,7 @@
 		},
 		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
-		"authorityKeyIdentifier":{
-			"includeIssuerAndSerial":false
-		}
+		"permittedInRequest":false
 	},{
 		"type":{
 			"oid":"2.5.29.15",

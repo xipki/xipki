@@ -267,15 +267,15 @@ class IdentifiedCertprofile implements Closeable {
     extType = Extension.authorityKeyIdentifier;
     extControl = controls.remove(extType);
     if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
-      byte[] ikiValue = publicCaInfo.getSubjectKeyIdentifer();
       AuthorityKeyIdentifier value = null;
-      if (ikiValue != null) {
-        if (certprofile.includesIssuerAndSerialInAki()) {
-          GeneralNames x509CaSubject = new GeneralNames(
-              new GeneralName(publicCaInfo.getX500Subject()));
-          value = new AuthorityKeyIdentifier(ikiValue, x509CaSubject,
-              publicCaInfo.getSerialNumber());
-        } else {
+      if (certprofile.useIssuerAndSerialInAki()) {
+        GeneralNames x509CaSubject = new GeneralNames(
+            new GeneralName(publicCaInfo.getX500Subject()));
+        value = new AuthorityKeyIdentifier(x509CaSubject,
+            publicCaInfo.getSerialNumber());
+      } else {
+        byte[] ikiValue = publicCaInfo.getSubjectKeyIdentifer();
+        if (ikiValue != null) {
           value = new AuthorityKeyIdentifier(ikiValue);
         }
       }
@@ -526,8 +526,8 @@ class IdentifiedCertprofile implements Closeable {
     }
   }
 
-  public boolean includeIssuerAndSerialInAki() {
-    return certprofile.includesIssuerAndSerialInAki();
+  public boolean useIssuerAndSerialInAki() {
+    return certprofile.useIssuerAndSerialInAki();
   }
 
   public String incSerialNumber(String currentSerialNumber) throws BadFormatException {

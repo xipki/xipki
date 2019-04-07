@@ -775,30 +775,14 @@ public class ExtensionsChecker {
       byte[] extensionValue, IssuerInfo issuerInfo) {
     AuthorityKeyIdentifier asn1 = AuthorityKeyIdentifier.getInstance(extensionValue);
     byte[] keyIdentifier = asn1.getKeyIdentifier();
-    if (keyIdentifier == null) {
-      failureMsg.append("keyIdentifier is 'absent' but expected 'present'; ");
-    } else if (!Arrays.equals(issuerInfo.getSubjectKeyIdentifier(), keyIdentifier)) {
-      addViolation(failureMsg, "keyIdentifier", hex(keyIdentifier),
-          hex(issuerInfo.getSubjectKeyIdentifier()));
-    }
+    BigInteger authorityCertSerialNumber = asn1.getAuthorityCertSerialNumber();
+    GeneralNames authorityCertIssuer = asn1.getAuthorityCertIssuer();
 
-    BigInteger serialNumber = asn1.getAuthorityCertSerialNumber();
-    GeneralNames names = asn1.getAuthorityCertIssuer();
-
-    if (certprofile.isIncludeIssuerAndSerialInAki()) {
-      if (serialNumber == null) {
-        failureMsg.append("authorityCertSerialNumber is 'absent' but expected 'present'; ");
+    if (certprofile.useIssuerAndSerialInAki()) {
+      if (authorityCertIssuer == null) {
+        failureMsg.append("authorityCertIssuer is 'absent', but expected 'present'; ");
       } else {
-        if (!issuerInfo.getCert().getSerialNumber().equals(serialNumber)) {
-          addViolation(failureMsg, "authorityCertSerialNumber", LogUtil.formatCsn(serialNumber),
-              LogUtil.formatCsn(issuerInfo.getCert().getSerialNumber()));
-        }
-      }
-
-      if (names == null) {
-        failureMsg.append("authorityCertIssuer is 'absent' but expected 'present'; ");
-      } else {
-        GeneralName[] genNames = names.getNames();
+        GeneralName[] genNames = authorityCertIssuer.getNames();
         X500Name x500GenName = null;
         for (GeneralName genName : genNames) {
           if (genName.getTagNo() != GeneralName.directoryName) {
@@ -824,15 +808,40 @@ public class ExtensionsChecker {
           }
         }
       }
-    } else {
-      if (serialNumber != null) {
-        failureMsg.append("authorityCertSerialNumber is 'absent' but expected 'present'; ");
+
+      if (authorityCertSerialNumber == null) {
+        failureMsg.append("authorityCertSerialNumber is 'absent', but expected 'present'; ");
+      } else {
+        BigInteger issuerSn = issuerInfo.getCert().getSerialNumber();
+        if (!issuerSn.equals(authorityCertSerialNumber)) {
+          addViolation(failureMsg, "authorityCertSerialNumber",
+              authorityCertSerialNumber, issuerSn);
+        }
       }
 
-      if (names != null) {
-        failureMsg.append("authorityCertIssuer is 'absent' but expected 'present'; ");
+      if (keyIdentifier != null) {
+        failureMsg.append("keyIdentifier is 'present', but expected 'absent'; ");
+      }
+
+    } else {
+      if (keyIdentifier == null) {
+        failureMsg.append("keyIdentifier is 'absent', but expected 'present'; ");
+      } else {
+        if (!Arrays.equals(issuerInfo.getSubjectKeyIdentifier(), keyIdentifier)) {
+          addViolation(failureMsg, "keyIdentifier", hex(keyIdentifier),
+              hex(issuerInfo.getSubjectKeyIdentifier()));
+        }
+      }
+
+      if (authorityCertIssuer != null) {
+        failureMsg.append("authorityCertIssuer is 'present', but expected 'absent'; ");
+      }
+
+      if (authorityCertSerialNumber != null) {
+        failureMsg.append("authorityCertSerialNumber is 'present', but expected 'absent'; ");
       }
     }
+
   } // method checkExtnIssuerKeyIdentifier
 
   private void checkExtnNameConstraints(StringBuilder failureMsg, byte[] extensionValue,

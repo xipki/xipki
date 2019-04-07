@@ -202,7 +202,7 @@
 		"required":true,
 		"permittedInRequest":false,
 		"authorityKeyIdentifier":{
-			"includeIssuerAndSerial":true
+			"useIssuerAndSerial":true
 		}
 	},{
 		"type":{

@@ -676,14 +676,14 @@ public class ExtensionType extends ValidatableConf {
 
   public static class AuthorityKeyIdentifier extends ValidatableConf {
 
-    private boolean includeIssuerAndSerial;
+    private boolean useIssuerAndSerial;
 
-    public boolean isIncludeIssuerAndSerial() {
-      return includeIssuerAndSerial;
+    public boolean isUseIssuerAndSerial() {
+      return useIssuerAndSerial;
     }
 
-    public void setIncludeIssuerAndSerial(boolean includeIssuerAndSerial) {
-      this.includeIssuerAndSerial = includeIssuerAndSerial;
+    public void setUseIssuerAndSerial(boolean useIssuerAndSerial) {
+      this.useIssuerAndSerial = useIssuerAndSerial;
     }
 
     @Override

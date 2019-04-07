@@ -7,7 +7,7 @@
 	"certLevel":"EndEntity",
 	"maxSize":3000,
 	"validity":"5y",
-	"notBeforeTime":"current",
+	"notBeforeTime":"midnight",
 	"serialNumberInReq":false,
 	"keypairGeneration":{
 		"inheritCA":true,
@@ -197,10 +197,7 @@
 		},
 		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
-		"authorityKeyIdentifier":{
-			"includeIssuerAndSerial":true
-		}
+		"permittedInRequest":false
 	},{
 		"type":{
 			"oid":"2.5.29.15",

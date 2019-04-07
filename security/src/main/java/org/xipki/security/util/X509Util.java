@@ -760,7 +760,7 @@ public class X509Util {
     if (issues) {
       byte[] ski = extractSki(issuerCert);
       byte[] aki = extractAki(cert);
-      if (ski != null) {
+      if (ski != null && aki != null) {
         issues = Arrays.equals(ski, aki);
       }
     }
@@ -784,7 +784,7 @@ public class X509Util {
     if (issues) {
       byte[] ski = extractSki(issuerCert);
       byte[] aki = extractAki(cert);
-      if (ski != null) {
+      if (ski != null && aki != null) {
         issues = Arrays.equals(ski, aki);
       }
     }

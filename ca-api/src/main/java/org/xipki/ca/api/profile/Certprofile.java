@@ -526,13 +526,13 @@ public abstract class Certprofile implements Closeable {
   }
 
   /**
-   * Returns whether include subject and serial number of the issuer certificate in the
+   * Returns whether use subject and serial number of the issuer certificate in the
    * AuthorityKeyIdentifier extension.
    *
    * @return whether include subject and serial number of the issuer certificate in the
    *         AuthorityKeyIdentifier extension.
    */
-  public boolean includesIssuerAndSerialInAki() {
+  public boolean useIssuerAndSerialInAki() {
     return false;
   }
 

@@ -171,7 +171,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   private Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls;
 
-  private boolean includeIssuerAndSerialInAki;
+  private boolean useIssuerAndSerialInAki;
 
   private boolean incSerialNoIfSubjectExists;
 
@@ -237,7 +237,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     constantExtensions = null;
     extendedKeyusages = null;
     extensionControls = null;
-    includeIssuerAndSerialInAki = false;
+    useIssuerAndSerialInAki = false;
     incSerialNoIfSubjectExists = false;
     inhibitAnyPolicy = null;
     keyAlgorithms = null;
@@ -708,9 +708,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
       AuthorityKeyIdentifier extConf = getExtension(type, extensions).getAuthorityKeyIdentifier();
-      if (extConf != null) {
-        this.includeIssuerAndSerialInAki = extConf.isIncludeIssuerAndSerial();
-      }
+      this.useIssuerAndSerialInAki = (extConf == null) ? false : extConf.isUseIssuerAndSerial();
     }
   }
 
@@ -1836,8 +1834,8 @@ public class XijsonCertprofile extends BaseCertprofile {
   }
 
   @Override
-  public boolean includesIssuerAndSerialInAki() {
-    return includeIssuerAndSerialInAki;
+  public boolean useIssuerAndSerialInAki() {
+    return useIssuerAndSerialInAki;
   }
 
   @Override
@@ -1918,10 +1916,6 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   public Set<ExtKeyUsageControl> getExtendedKeyusages() {
     return extendedKeyusages;
-  }
-
-  public boolean isIncludeIssuerAndSerialInAki() {
-    return includeIssuerAndSerialInAki;
   }
 
   public boolean isIncSerialNoIfSubjectExists() {

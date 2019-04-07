@@ -282,7 +282,6 @@ public class ProfileConfCreatorDemo {
 
     // Extensions - AuthorityKeyIdentifier
     list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-    last(list).setAuthorityKeyIdentifier(createAuthorityKeyIdentifier(false));
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
@@ -322,7 +321,6 @@ public class ProfileConfCreatorDemo {
 
     // Extensions - AuthorityKeyIdentifier
     list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-    last(list).setAuthorityKeyIdentifier(createAuthorityKeyIdentifier(false));
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
@@ -363,7 +361,6 @@ public class ProfileConfCreatorDemo {
 
     // Extensions - AuthorityKeyIdentifier
     list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-    last(list).setAuthorityKeyIdentifier(createAuthorityKeyIdentifier(false));
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
@@ -665,7 +662,6 @@ public class ProfileConfCreatorDemo {
 
     // Extensions - AuthorityKeyIdentifier
     list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-    last(list).setAuthorityKeyIdentifier(createAuthorityKeyIdentifier(true));
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
@@ -711,7 +707,6 @@ public class ProfileConfCreatorDemo {
 
     // Extensions - AuthorityKeyIdentifier
     list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-    last(list).setAuthorityKeyIdentifier(createAuthorityKeyIdentifier(true));
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
@@ -766,7 +761,6 @@ public class ProfileConfCreatorDemo {
 
     // Extensions - AuthorityKeyIdentifier
     list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-    last(list).setAuthorityKeyIdentifier(createAuthorityKeyIdentifier(true));
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
@@ -831,7 +825,6 @@ public class ProfileConfCreatorDemo {
 
     // Extensions - AuthorityKeyIdentifier
     list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-    last(list).setAuthorityKeyIdentifier(createAuthorityKeyIdentifier(true));
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
@@ -883,7 +876,6 @@ public class ProfileConfCreatorDemo {
 
     // Extensions - AuthorityKeyIdentifier
     list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-    last(list).setAuthorityKeyIdentifier(createAuthorityKeyIdentifier(true));
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
@@ -932,7 +924,6 @@ public class ProfileConfCreatorDemo {
 
     // Extensions - AuthorityKeyIdentifier
     list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-    last(list).setAuthorityKeyIdentifier(createAuthorityKeyIdentifier(true));
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
@@ -977,7 +968,6 @@ public class ProfileConfCreatorDemo {
 
     // Extensions - AuthorityKeyIdentifier
     list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-    last(list).setAuthorityKeyIdentifier(createAuthorityKeyIdentifier(true));
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
@@ -1021,7 +1011,6 @@ public class ProfileConfCreatorDemo {
 
     // Extensions - AuthorityKeyIdentifier
     list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-    last(list).setAuthorityKeyIdentifier(createAuthorityKeyIdentifier(true));
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
@@ -1080,7 +1069,7 @@ public class ProfileConfCreatorDemo {
 
     // Extensions - AuthorityKeyIdentifier
     list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-    last(list).setAuthorityKeyIdentifier(createAuthorityKeyIdentifier(true));
+    last(list).setAuthorityKeyIdentifier(createAKIwithSerialAndSerial());
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
@@ -1263,7 +1252,6 @@ public class ProfileConfCreatorDemo {
 
     // Extensions - AuthorityKeyIdentifier
     list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-    last(list).setAuthorityKeyIdentifier(createAuthorityKeyIdentifier(true));
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
@@ -1328,7 +1316,6 @@ public class ProfileConfCreatorDemo {
 
     // Extensions - AuthorityKeyIdentifier
     list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-    last(list).setAuthorityKeyIdentifier(createAuthorityKeyIdentifier(true));
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
@@ -1494,7 +1481,6 @@ public class ProfileConfCreatorDemo {
 
     // Extensions - AuthorityKeyIdentifier
     list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-    last(list).setAuthorityKeyIdentifier(createAuthorityKeyIdentifier(true));
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
@@ -1545,7 +1531,6 @@ public class ProfileConfCreatorDemo {
 
     // Extensions - AuthorityKeyIdentifier
     list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-    last(list).setAuthorityKeyIdentifier(createAuthorityKeyIdentifier(true));
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
@@ -1580,7 +1565,6 @@ public class ProfileConfCreatorDemo {
     list.add(createExtension(Extension.basicConstraints, true, true));
     // Extensions - AuthorityKeyIdentifier
     list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-    last(list).setAuthorityKeyIdentifier(createAuthorityKeyIdentifier(false));
 
     list.add(createExtension(Extension.cRLDistributionPoints, true, false, null));
 
@@ -1743,7 +1727,6 @@ public class ProfileConfCreatorDemo {
 
     // Extensions - AuthorityKeyIdentifier
     list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-    last(list).setAuthorityKeyIdentifier(createAuthorityKeyIdentifier(true));
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
@@ -1929,10 +1912,9 @@ public class ProfileConfCreatorDemo {
     return extValue;
   }
 
-  private static AuthorityKeyIdentifier createAuthorityKeyIdentifier(
-      boolean includeSerialAndSerial) {
+  private static AuthorityKeyIdentifier createAKIwithSerialAndSerial() {
     AuthorityKeyIdentifier akiType = new AuthorityKeyIdentifier();
-    akiType.setIncludeIssuerAndSerial(includeSerialAndSerial);
+    akiType.setUseIssuerAndSerial(true);
     return akiType;
 
   }
