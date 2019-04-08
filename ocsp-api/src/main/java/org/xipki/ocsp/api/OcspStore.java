@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.Map;
 
 import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
 import org.xipki.util.Args;
 import org.xipki.util.Validity;
 
@@ -39,7 +40,7 @@ public abstract class OcspStore implements Closeable {
 
   protected String name;
 
-  protected boolean unknownSerialAsGood;
+  protected UnknownCertBehaviour unknownCertBehaviour = UnknownCertBehaviour.unknown;
 
   protected int retentionInterval;
 
@@ -94,15 +95,18 @@ public abstract class OcspStore implements Closeable {
     CertStatusInfo info = getCertStatus0(time, reqIssuer, serialNumber,
         includeCertHash, includeRit, inheritCaRevocation);
     if (info != null && minNextUpdatePeriod != null) {
-      Date nextUpdate = info.getNextUpdate();
-      Date minNextUpdate = minNextUpdatePeriod.add(time);
+      if (unknownCertBehaviour == UnknownCertBehaviour.good ||
+          unknownCertBehaviour == UnknownCertBehaviour.unknown) {
+        Date nextUpdate = info.getNextUpdate();
+        Date minNextUpdate = minNextUpdatePeriod.add(time);
 
-      if (nextUpdate != null) {
-        if (minNextUpdate.after(nextUpdate)) {
+        if (nextUpdate != null) {
+          if (minNextUpdate.after(nextUpdate)) {
+            info.setNextUpdate(minNextUpdate);
+          }
+        } else {
           info.setNextUpdate(minNextUpdate);
         }
-      } else {
-        info.setNextUpdate(minNextUpdate);
       }
     }
 
@@ -149,12 +153,12 @@ public abstract class OcspStore implements Closeable {
     return name;
   }
 
-  public boolean isUnknownSerialAsGood() {
-    return unknownSerialAsGood;
+  public UnknownCertBehaviour getUnknownCertBehaviour() {
+    return unknownCertBehaviour;
   }
 
-  public void setUnknownSerialAsGood(boolean unknownSerialAsGood) {
-    this.unknownSerialAsGood = unknownSerialAsGood;
+  public void setUnknownCertBehaviour(UnknownCertBehaviour unknownCertBehaviour) {
+    this.unknownCertBehaviour = unknownCertBehaviour;
   }
 
   public boolean isIncludeArchiveCutoff() {

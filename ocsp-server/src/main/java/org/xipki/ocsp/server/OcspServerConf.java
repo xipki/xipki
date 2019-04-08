@@ -21,15 +21,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
+import org.xipki.ocsp.api.CertStatusInfo.UnknownIssuerBehaviour;
 import org.xipki.security.CertpathValidationModel;
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.FileOrValue;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.TripleState;
 import org.xipki.util.ValidatableConf;
-import org.xipki.util.Validity;
-
-import com.alibaba.fastjson.annotation.JSONField;
 
 /**
  * TODO.
@@ -663,13 +662,13 @@ public class OcspServerConf extends ValidatableConf {
 
     private Integer retentionInterval;
 
-    private Boolean unknownSerialAsGood;
+    private UnknownCertBehaviour unknownCertBehaviour;
 
     private Boolean includeArchiveCutoff;
 
     private Boolean includeCrlId;
 
-    private Validity minNextUpdatePeriod;
+    private String minNextUpdatePeriod;
 
     private String name;
 
@@ -705,12 +704,20 @@ public class OcspServerConf extends ValidatableConf {
       this.retentionInterval = retentionInterval;
     }
 
-    public Boolean getUnknownSerialAsGood() {
-      return unknownSerialAsGood;
+    public UnknownCertBehaviour getUnknownCertBehaviour() {
+      return unknownCertBehaviour;
     }
 
-    public void setUnknownSerialAsGood(Boolean unknownSerialAsGood) {
-      this.unknownSerialAsGood = unknownSerialAsGood;
+    public void setUnknownCertBehaviour(UnknownCertBehaviour unknownCertBehaviour) {
+      this.unknownCertBehaviour = unknownCertBehaviour;
+    }
+
+    public void setMinNextUpdatePeriod(String minNextUpdatePeriod) {
+      this.minNextUpdatePeriod = minNextUpdatePeriod;
+    }
+
+    public String getMinNextUpdatePeriod() {
+      return minNextUpdatePeriod;
     }
 
     public Boolean getIncludeArchiveCutoff() {
@@ -735,20 +742,6 @@ public class OcspServerConf extends ValidatableConf {
 
     public void setName(String name) {
       this.name = name;
-    }
-
-    public Validity getMinNextUpdatePeriod() {
-      return minNextUpdatePeriod;
-    }
-
-    @JSONField(name = "minNextUpdatePeriod")
-    public String getMinNextUpdateText() {
-      return minNextUpdatePeriod == null ? "" : minNextUpdatePeriod.toString();
-    }
-
-    @JSONField(name = "minNextUpdatePeriod")
-    public void setMinNextUpdateText(String period) {
-      this.minNextUpdatePeriod = period == null ? null : Validity.getInstance(period);
     }
 
     @Override
@@ -850,6 +843,8 @@ public class OcspServerConf extends ValidatableConf {
 
   private boolean master = true;
 
+  private UnknownIssuerBehaviour unknownIssuerBehaviour = UnknownIssuerBehaviour.unknown;
+
   public ResponseCache getResponseCache() {
     return responseCache;
   }
@@ -930,6 +925,14 @@ public class OcspServerConf extends ValidatableConf {
 
   public void setMaster(boolean master) {
     this.master = master;
+  }
+
+  public UnknownIssuerBehaviour getUnknownIssuerBehaviour() {
+    return unknownIssuerBehaviour;
+  }
+
+  public void setUnknownIssuerBehaviour(UnknownIssuerBehaviour unknownIssuerBehaviour) {
+    this.unknownIssuerBehaviour = unknownIssuerBehaviour;
   }
 
   @Override

@@ -58,6 +58,8 @@ import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.ocsp.api.CertStatusInfo;
+import org.xipki.ocsp.api.CertStatusInfo.CertStatus;
+import org.xipki.ocsp.api.CertStatusInfo.UnknownIssuerBehaviour;
 import org.xipki.ocsp.api.OcspRespWithCacheInfo;
 import org.xipki.ocsp.api.OcspRespWithCacheInfo.ResponseCacheInfo;
 import org.xipki.ocsp.api.OcspServer;
@@ -106,6 +108,7 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
 import org.xipki.util.StringUtil;
 import org.xipki.util.TripleState;
+import org.xipki.util.Validity;
 
 import com.alibaba.fastjson.JSON;
 
@@ -181,6 +184,8 @@ public class OcspServerImpl implements OcspServer {
   private String confFile;
 
   private boolean master;
+
+  private UnknownIssuerBehaviour unknownIssuerBehaviour = UnknownIssuerBehaviour.unknown;
 
   private ResponseCacher responseCacher;
 
@@ -408,6 +413,10 @@ public class OcspServerImpl implements OcspServer {
     }
 
     this.master = conf.isMaster();
+    this.unknownIssuerBehaviour = conf.getUnknownIssuerBehaviour();
+    if (this.unknownIssuerBehaviour == null) {
+      this.unknownIssuerBehaviour = UnknownIssuerBehaviour.unknown;
+    }
 
     // Response Cache
     OcspServerConf.ResponseCache cacheType = conf.getResponseCache();
@@ -830,6 +839,27 @@ public class OcspServerImpl implements OcspServer {
             repOpt.isIncludeCerthash(), repOpt.isIncludeInvalidityDate(),
             responder.getResponderOption().isInheritCaRevocation());
         if (certStatusInfo != null) {
+          CertStatus status = certStatusInfo.getCertStatus();
+          if (status == CertStatus.UNKNOWN || status == CertStatus.IGNORE) {
+            switch (store.getUnknownCertBehaviour()) {
+              case unknown:
+                break;
+              case good:
+                if (status == CertStatus.UNKNOWN) {
+                  certStatusInfo.setCertStatus(CertStatus.GOOD);
+                }
+                break;
+              case malformedRequest:
+                return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
+              case internalError:
+                return unsuccesfulOCSPRespMap.get(OcspResponseStatus.internalError);
+              case tryLater:
+                return unsuccesfulOCSPRespMap.get(OcspResponseStatus.tryLater);
+              default:
+                break;
+            }
+          }
+
           break;
         }
       } catch (OcspStoreException ex) {
@@ -838,21 +868,34 @@ public class OcspServerImpl implements OcspServer {
       }
     }
 
+    if (exceptionOccurs) {
+      return unsuccesfulOCSPRespMap.get(OcspResponseStatus.tryLater);
+    }
+
     if (certStatusInfo == null) {
-      if (exceptionOccurs) {
-        return unsuccesfulOCSPRespMap.get(OcspResponseStatus.tryLater);
-      } else {
-        final long msPerDay = 86400000L; // 24 * 60 * 60 * 1000L;
-        Date nextUpdate = new Date(now.getTime() + msPerDay);
-        certStatusInfo = CertStatusInfo.getIssuerUnknownCertStatusInfo(now, nextUpdate);
+      switch (unknownIssuerBehaviour) {
+        case unknown:
+          final long msPerDay = 86400000L; // 24 * 60 * 60 * 1000L;
+          Date nextUpdate = new Date(now.getTime() + msPerDay);
+          certStatusInfo = CertStatusInfo.getIssuerUnknownCertStatusInfo(now, nextUpdate);
+          break;
+        case malformedRequest:
+          return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
+        case internalError:
+          return unsuccesfulOCSPRespMap.get(OcspResponseStatus.internalError);
+        case tryLater:
+          return unsuccesfulOCSPRespMap.get(OcspResponseStatus.tryLater);
+        default:
+          break;
       }
-    } // end if
+    }
 
     // certStatusInfo may not be null in any case, since at least one store is configured
     Date thisUpdate = certStatusInfo.getThisUpdate();
     if (thisUpdate == null) {
       thisUpdate = new Date();
     }
+
     Date nextUpdate = certStatusInfo.getNextUpdate();
 
     List<Extension> extensions = new LinkedList<>();
@@ -1062,14 +1105,18 @@ public class OcspServerImpl implements OcspServer {
     Integer interval = conf.getRetentionInterval();
     int retentionInterva = (interval == null) ? -1 : interval.intValue();
     store.setRetentionInterval(retentionInterva);
-    store.setUnknownSerialAsGood(getBoolean(conf.getUnknownSerialAsGood(), false));
+    store.setUnknownCertBehaviour(conf.getUnknownCertBehaviour());
 
     store.setIncludeArchiveCutoff(getBoolean(conf.getIncludeArchiveCutoff(), true));
     store.setIncludeCrlId(getBoolean(conf.getIncludeCrlId(), true));
 
     store.setIgnoreExpiredCert(getBoolean(conf.getIgnoreExpiredCert(), true));
     store.setIgnoreNotYetValidCert(getBoolean(conf.getIgnoreNotYetValidCert(), true));
-    store.setMinNextUpdatePeriod(conf.getMinNextUpdatePeriod());
+    if (conf.getMinNextUpdatePeriod() != null) {
+      store.setMinNextUpdatePeriod(Validity.getInstance(conf.getMinNextUpdatePeriod()));
+    } else {
+      store.setMinNextUpdatePeriod(null);
+    }
 
     String datasourceName = conf.getSource().getDatasource();
     DataSourceWrapper datasource = null;

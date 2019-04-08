@@ -113,6 +113,7 @@ public abstract class OcspResponseException extends Exception {
     private int status;
 
     static {
+      codeStatusMap.put(0, "successful");
       codeStatusMap.put(1, "malformedRequest");
       codeStatusMap.put(2, "internalError");
       codeStatusMap.put(3, "tryLater");
@@ -121,7 +122,7 @@ public abstract class OcspResponseException extends Exception {
     }
 
     public Unsuccessful(int status) {
-      super(getOcspResponseStatus(status));
+      super(getStatusText(status));
       this.status = status;
     }
 
@@ -130,12 +131,12 @@ public abstract class OcspResponseException extends Exception {
     }
 
     public String statusText() {
-      return getOcspResponseStatus(status);
+      return getStatusText(status);
     }
 
-    private static String getOcspResponseStatus(int statusCode) {
+    public static String getStatusText(int statusCode) {
       String status = codeStatusMap.get(statusCode);
-      return (status == null) ? "undefined" : status;
+      return (status == null) ? Integer.toString(statusCode) : status;
     }
 
   }

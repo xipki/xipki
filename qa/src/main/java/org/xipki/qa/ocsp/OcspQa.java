@@ -49,6 +49,7 @@ import org.bouncycastle.cert.ocsp.RevokedStatus;
 import org.bouncycastle.cert.ocsp.SingleResp;
 import org.bouncycastle.cert.ocsp.UnknownStatus;
 import org.bouncycastle.operator.ContentVerifierProvider;
+import org.xipki.ocsp.client.OcspResponseException.Unsuccessful;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.qa.ValidationResult;
 import org.xipki.security.CrlReason;
@@ -125,12 +126,13 @@ public class OcspQa {
     resultIssues.add(issue);
     if (expectedOcspError != null) {
       if (status != expectedOcspError.getStatus()) {
-        issue.setFailureMessage("is '" + status + "', but expected '"
-            + expectedOcspError.getStatus() + "'");
+        issue.setFailureMessage("is '" + Unsuccessful.getStatusText(status) + "', but expected '"
+            + Unsuccessful.getStatusText(expectedOcspError.getStatus()) + "'");
       }
     } else {
       if (status != 0) {
-        issue.setFailureMessage("is '" + status + "', but expected '0'");
+        issue.setFailureMessage("is '" + Unsuccessful.getStatusText(status)
+          + "', but expected 'successful'");
       }
     }
 

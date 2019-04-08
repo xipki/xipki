@@ -1,5 +1,6 @@
 {
 	"master":true,
+	"unknownIssuerBehaviour":"unknown",
 	"datasources":[{
 		"name":"datasource1",
 		"conf":{
@@ -54,13 +55,13 @@
 		"includeCrlId":false,
 		"retentionInterval":-1,
 		"minNextUpdatePeriod":"1d",
+		"unknownCertBehaviour":"unknown",
 		"source":{
 			"datasource":"datasource1",
 			"type":"xipki-ca-db",
 			"conf":{
 			}
-		},
-		"unknownSerialAsGood":false
+		}
 	}]
 }
 

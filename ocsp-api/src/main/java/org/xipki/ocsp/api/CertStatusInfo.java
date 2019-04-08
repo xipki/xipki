@@ -32,7 +32,30 @@ import org.xipki.util.Args;
 
 public class CertStatusInfo {
 
-  private final CertStatus certStatus;
+  public static enum CertStatus {
+    GOOD,
+    REVOKED,
+    UNKNOWN,
+    IGNORE,
+    ISSUER_UNKNOWN
+  }
+
+  public enum UnknownCertBehaviour {
+    unknown,
+    good,
+    malformedRequest,
+    internalError,
+    tryLater;
+  }
+
+  public enum UnknownIssuerBehaviour {
+    unknown,
+    malformedRequest,
+    internalError,
+    tryLater;
+  }
+
+  private CertStatus certStatus;
 
   private CertRevocationInfo revocationInfo;
 
@@ -76,6 +99,10 @@ public class CertStatusInfo {
 
   public CertStatus getCertStatus() {
     return certStatus;
+  }
+
+  public void setCertStatus(CertStatus certStatus) {
+    this.certStatus = Args.notNull(certStatus, "certStatus");
   }
 
   public CertRevocationInfo getRevocationInfo() {

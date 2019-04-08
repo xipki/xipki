@@ -40,8 +40,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.ocsp.api.CertStatus;
 import org.xipki.ocsp.api.CertStatusInfo;
+import org.xipki.ocsp.api.CertStatusInfo.CertStatus;
+import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
 import org.xipki.ocsp.api.OcspStore;
 import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.ocsp.api.RequestIssuer;
@@ -299,28 +300,21 @@ public class CaDbCertStatusStore extends OcspStore {
       }
 
       if (unknown) {
-        if (unknownSerialAsGood) {
-          certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, null,
-              thisUpdate, nextUpdate, null);
-        } else {
-          certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, nextUpdate);
-        }
+        certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, nextUpdate);
+      } else if (ignore) {
+        certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(thisUpdate, nextUpdate);
       } else {
-        if (ignore) {
-          certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(thisUpdate, nextUpdate);
+        byte[] certHash = (b64CertHash == null) ? null : Base64.decodeFast(b64CertHash);
+        if (revoked) {
+          Date invTime = (invalTime == 0 || invalTime == revTime)
+              ? null : new Date(invalTime * 1000);
+          CertRevocationInfo revInfo = new CertRevocationInfo(reason,
+              new Date(revTime * 1000), invTime);
+          certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revInfo,
+              certHashAlgo, certHash, thisUpdate, nextUpdate, null);
         } else {
-          byte[] certHash = (b64CertHash == null) ? null : Base64.decodeFast(b64CertHash);
-          if (revoked) {
-            Date invTime = (invalTime == 0 || invalTime == revTime)
-                ? null : new Date(invalTime * 1000);
-            CertRevocationInfo revInfo = new CertRevocationInfo(reason,
-                new Date(revTime * 1000), invTime);
-            certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revInfo,
-                certHashAlgo, certHash, thisUpdate, nextUpdate, null);
-          } else {
-            certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo,
-                certHash, thisUpdate, nextUpdate, null);
-          }
+          certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo,
+              certHash, thisUpdate, nextUpdate, null);
         }
       }
 
@@ -348,8 +342,12 @@ public class CaDbCertStatusStore extends OcspStore {
       CertRevocationInfo caRevInfo = issuer.getRevocationInfo();
       CertStatus certStatus = certStatusInfo.getCertStatus();
       boolean replaced = false;
-      if (certStatus == CertStatus.GOOD || certStatus == CertStatus.UNKNOWN) {
+      if (certStatus == CertStatus.GOOD) {
         replaced = true;
+      } else if (certStatus == CertStatus.UNKNOWN || certStatus == CertStatus.IGNORE) {
+        if (unknownCertBehaviour == UnknownCertBehaviour.good) {
+          replaced = true;
+        }
       } else if (certStatus == CertStatus.REVOKED) {
         if (certStatusInfo.getRevocationInfo().getRevocationTime().after(
               caRevInfo.getRevocationTime())) {

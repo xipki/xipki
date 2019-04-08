@@ -12,6 +12,7 @@ See also <https://github.com/xipki/xipki/releases>
   - Add the management of the certificate of parenet CAs for given CA
   - Extension AuthorityKeyIdentifier embeds both KeyIdentifier and (authorityCertIssuer, authorityCertSerialNumber) in case of incorrect configuration. However exactly one of them is allowed. This has been fixed.
   - Add the native support of jurisdictionOfIncorporationCountryName, jurisdictionOfIncorporationLocalityName and jurisdictionOfIncorporationStateOrProvinceName
+  - Add the configuration of OCSP response behaviour for unknown certificate
 
 ## 5.1.0
   - Release date: Mar 17, 2019

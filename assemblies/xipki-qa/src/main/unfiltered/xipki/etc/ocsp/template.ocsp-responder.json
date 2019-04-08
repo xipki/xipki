@@ -9,6 +9,7 @@
 //		"validity":86400
 //	},
 	"master":true,
+	"unknownIssuerBehaviour":"unknown",
 	"datasources":[{
 		"name":"datasource1",
 		"conf":{
@@ -122,7 +123,7 @@
 //				}
 			}
 		},
-		"unknownSerialAsGood":false
+		"unknownCertBehaviour":"unknown"
 	},{
 		"name":"crlstore1",
 		"ignoreExpiredCert":true,
@@ -141,7 +142,7 @@
 				"certsDir":"xipki/etc/ocsp/crls/subcawithcrl1/certs/"
 			}
 		},
-		"unknownSerialAsGood":true
+		"unknownCertBehaviour":"good"
 	},{
 		"name":"dbstore3",
 		"ignoreExpiredCert":true,
@@ -160,7 +161,7 @@
 //				}
 			}
 		},
-		"unknownSerialAsGood":false
+		"unknownCertBehaviour":"unknown"
 	}]
 }
 
