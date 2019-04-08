@@ -2,7 +2,7 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
-## 5.1.1
+## 5.2.0
   - Release date: -
   - New feature to configure fixed value of subject RDN in the certificate profile
   - Make sure that the certificate serial number is randomly generated with at least 70 bit entropy and not weak by checking the NAF weight.
@@ -11,6 +11,7 @@ See also <https://github.com/xipki/xipki/releases>
   - In the extension CertificatePolicies, the OID for User Notice is not correct. This has been fixed.
   - Add the management of the certificate of parenet CAs for given CA
   - Extension AuthorityKeyIdentifier embeds both KeyIdentifier and (authorityCertIssuer, authorityCertSerialNumber) in case of incorrect configuration. However exactly one of them is allowed. This has been fixed.
+  - Add the native support of jurisdictionOfIncorporationCountryName, jurisdictionOfIncorporationLocalityName and jurisdictionOfIncorporationStateOrProvinceName
 
 ## 5.1.0
   - Release date: Mar 17, 2019
