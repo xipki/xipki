@@ -47,9 +47,11 @@ public class ObjectIdentifiers {
    */
   private static final ASN1ObjectIdentifier id_pen = new ASN1ObjectIdentifier("1.3.6.1.4.1");
 
-  public static final class Xipki {
+  private static final ASN1ObjectIdentifier id_xipki = id_pen.branch("45522");
 
-    private static final ASN1ObjectIdentifier id_xipki = id_pen.branch("45522");
+  private static final ASN1ObjectIdentifier id_microsoft = id_pen.branch("311");
+
+  public static final class Xipki {
 
     private static final ASN1ObjectIdentifier id_xipki_ext = id_xipki.branch("1");
 
@@ -272,6 +274,23 @@ public class ObjectIdentifiers {
      */
     public static final ASN1ObjectIdentifier CIF = id_pen.branch("4710.1.3.2");
 
+    /**
+     * jurisdictionOfIncorporationLocalityName
+     */
+    public static final ASN1ObjectIdentifier jurisdictionOfIncorporationLocalityName =
+        id_microsoft.branch("2.1.1");
+
+    /**
+     * jurisdictionOfIncorporationStateOrProvinceName
+     */
+    public static final ASN1ObjectIdentifier jurisdictionOfIncorporationStateOrProvinceName =
+        id_microsoft.branch("2.1.2");
+
+    /**
+     * jurisdictionOfIncorporationCountryName
+     */
+    public static final ASN1ObjectIdentifier jurisdictionOfIncorporationCountryName =
+        id_microsoft.branch("2.1.3");
   }
 
   // extended key usage
@@ -381,8 +400,6 @@ public class ObjectIdentifiers {
      */
     public static final ASN1ObjectIdentifier id_kp_kerberosKdc =
         new ASN1ObjectIdentifier("1.3.6.1.5.2.3.5");
-
-    private static final ASN1ObjectIdentifier id_microsoft = id_pen.branch("311");
 
     /**
      * Microsoft Commercial Code Signing
@@ -577,129 +594,137 @@ public class ObjectIdentifiers {
         new ASN1ObjectIdentifier("1.0.18033.2.5.2");
   }
 
-  private static final Map<ASN1ObjectIdentifier, String> oidNameMap;
+  private static class OidNameMap {
+    private static final Map<ASN1ObjectIdentifier, String> oidNameMap;
 
-  static {
-    oidNameMap = new HashMap<>();
+    static {
+      oidNameMap = new HashMap<>();
 
-    oidNameMap.put(DN.countryOfCitizenship, "countryOfCitizenship");
-    oidNameMap.put(DN.countryOfResidence, "countryOfResidence");
-    oidNameMap.put(DN.dateOfBirth, "dateOfBirth");
-    oidNameMap.put(DN.dmdName, "dmdName");
-    oidNameMap.put(DN.emailAddress, "emailAddress");
-    oidNameMap.put(DN.gender, "gender");
-    oidNameMap.put(DN.nameAtBirth, "nameAtBirth");
-    oidNameMap.put(DN.organizationIdentifier, "organizationIdentifier");
-    oidNameMap.put(DN.placeOfBirth, "placeOfBirth");
-    oidNameMap.put(DN.pseudonym, "pseudonym");
-    oidNameMap.put(DN.unstructuredName, "unstructuredName");
-    oidNameMap.put(DN.unstructuredAddress, "unstructuredAddress");
-    oidNameMap.put(DN.NIF, "NIF, Tax ID number, for individuals (Spain)");
-    oidNameMap.put(DN.CIF, "CIF, Tax ID code, for companies (Spain)");
+      oidNameMap.put(DN.countryOfCitizenship, "countryOfCitizenship");
+      oidNameMap.put(DN.countryOfResidence, "countryOfResidence");
+      oidNameMap.put(DN.dateOfBirth, "dateOfBirth");
+      oidNameMap.put(DN.dmdName, "dmdName");
+      oidNameMap.put(DN.emailAddress, "emailAddress");
+      oidNameMap.put(DN.gender, "gender");
+      oidNameMap.put(DN.nameAtBirth, "nameAtBirth");
+      oidNameMap.put(DN.organizationIdentifier, "organizationIdentifier");
+      oidNameMap.put(DN.placeOfBirth, "placeOfBirth");
+      oidNameMap.put(DN.pseudonym, "pseudonym");
+      oidNameMap.put(DN.unstructuredName, "unstructuredName");
+      oidNameMap.put(DN.unstructuredAddress, "unstructuredAddress");
+      oidNameMap.put(DN.NIF, "NIF, Tax ID number, for individuals (Spain)");
+      oidNameMap.put(DN.CIF, "CIF, Tax ID code, for companies (Spain)");
+      oidNameMap.put(DN.jurisdictionOfIncorporationCountryName,
+          "jurisdictionOfIncorporationCountryName");
+      oidNameMap.put(DN.jurisdictionOfIncorporationStateOrProvinceName,
+          "jurisdictionOfIncorporationStateOrProvinceName");
+      oidNameMap.put(DN.jurisdictionOfIncorporationLocalityName,
+          "jurisdictionOfIncorporationLocalityName");
 
-    oidNameMap.put(Xipki.id_xipki_ext_crlCertset, "xipki-crlCertset");
-    oidNameMap.put(Xipki.id_xipki_ext_cmpRequestExtensions, "xipki-cmpRequestExtensions");
-    oidNameMap.put(Xipki.id_xipki_ext_authorizationTemplate, "xipki-authorizationTemplate");
+      oidNameMap.put(Xipki.id_xipki_ext_crlCertset, "xipki-crlCertset");
+      oidNameMap.put(Xipki.id_xipki_ext_cmpRequestExtensions, "xipki-cmpRequestExtensions");
+      oidNameMap.put(Xipki.id_xipki_ext_authorizationTemplate, "xipki-authorizationTemplate");
 
-    oidNameMap.put(Extn.id_pkix_ocsp_extendedRevoke, "pkix-ocsp-extendedRevoke");
-    oidNameMap.put(Extn.id_pkix_ocsp_prefSigAlgs, "pkix-ocsp-prefSigAlgs");
-    oidNameMap.put(Extn.id_extension_pkix_ocsp_nocheck, "pkix-ocsp-nocheck");
-    oidNameMap.put(Extn.id_extension_restriction, "restriction");
-    oidNameMap.put(Extn.id_extension_additionalInformation, "additionalInformation");
-    oidNameMap.put(Extn.id_extension_admission, "admission");
-    oidNameMap.put(Extn.id_extension_validityModel, "validityModel");
-    oidNameMap.put(Extn.id_ad_caRepository, "ad-caRepository");
-    oidNameMap.put(Extn.id_ad_timeStamping, "ad-timeStamping");
+      oidNameMap.put(Extn.id_pkix_ocsp_extendedRevoke, "pkix-ocsp-extendedRevoke");
+      oidNameMap.put(Extn.id_pkix_ocsp_prefSigAlgs, "pkix-ocsp-prefSigAlgs");
+      oidNameMap.put(Extn.id_extension_pkix_ocsp_nocheck, "pkix-ocsp-nocheck");
+      oidNameMap.put(Extn.id_extension_restriction, "restriction");
+      oidNameMap.put(Extn.id_extension_additionalInformation, "additionalInformation");
+      oidNameMap.put(Extn.id_extension_admission, "admission");
+      oidNameMap.put(Extn.id_extension_validityModel, "validityModel");
+      oidNameMap.put(Extn.id_ad_caRepository, "ad-caRepository");
+      oidNameMap.put(Extn.id_ad_timeStamping, "ad-timeStamping");
 
-    oidNameMap.put(Extn.id_qcs_pkixQCSyntax_v1, "qcs-pkixQCSyntax-v2");
-    oidNameMap.put(Extn.id_qcs_pkixQCSyntax_v2, "qcs-pkixQCSyntax-v2");
-    oidNameMap.put(Extn.id_etsi_qcs_QcCompliance, "etsi-qcs-QcCompliance");
-    oidNameMap.put(Extn.id_etsi_qcs_QcLimitValue, "etsi-qcs-QcLimitValue");
-    oidNameMap.put(Extn.id_etsi_qcs_QcRetentionPeriod, "etsi-qcs-QcRetentionPeriod");
-    oidNameMap.put(Extn.id_etsi_qcs_QcSSCD, "etsi-qcs-QcSSCD");
-    oidNameMap.put(Extn.id_pe_tlsfeature, "tlsFeature");
-    oidNameMap.put(Extn.id_smimeCapabilities, "SMIMECapatibilities");
+      oidNameMap.put(Extn.id_qcs_pkixQCSyntax_v1, "qcs-pkixQCSyntax-v2");
+      oidNameMap.put(Extn.id_qcs_pkixQCSyntax_v2, "qcs-pkixQCSyntax-v2");
+      oidNameMap.put(Extn.id_etsi_qcs_QcCompliance, "etsi-qcs-QcCompliance");
+      oidNameMap.put(Extn.id_etsi_qcs_QcLimitValue, "etsi-qcs-QcLimitValue");
+      oidNameMap.put(Extn.id_etsi_qcs_QcRetentionPeriod, "etsi-qcs-QcRetentionPeriod");
+      oidNameMap.put(Extn.id_etsi_qcs_QcSSCD, "etsi-qcs-QcSSCD");
+      oidNameMap.put(Extn.id_pe_tlsfeature, "tlsFeature");
+      oidNameMap.put(Extn.id_smimeCapabilities, "SMIMECapatibilities");
 
-    oidNameMap.put(Extension.auditIdentity, "auditIdentity");
-    oidNameMap.put(Extension.authorityInfoAccess, "authorityInfoAccess");
-    oidNameMap.put(Extension.authorityKeyIdentifier, "authorityKeyIdentifier");
-    oidNameMap.put(Extension.basicConstraints, "basicConstraints");
-    oidNameMap.put(Extension.biometricInfo, "biometricInfo");
-    oidNameMap.put(Extension.certificateIssuer, "certificateIssuer");
-    oidNameMap.put(Extension.certificatePolicies, "certificatePolicies");
-    oidNameMap.put(Extension.cRLDistributionPoints, "cRLDistributionPoints");
-    oidNameMap.put(Extension.cRLNumber, "cRLNumber");
-    oidNameMap.put(Extension.deltaCRLIndicator, "deltaCRLIndicator");
-    oidNameMap.put(Extension.extendedKeyUsage, "extendedKeyUsage");
-    oidNameMap.put(Extension.freshestCRL, "freshestCRL");
-    oidNameMap.put(Extension.inhibitAnyPolicy, "inhibitAnyPolicy");
-    oidNameMap.put(Extension.instructionCode, "instructionCode");
-    oidNameMap.put(Extension.invalidityDate, "invalidityDate");
-    oidNameMap.put(Extension.issuerAlternativeName, "issuerAlternativeName");
-    oidNameMap.put(Extension.issuingDistributionPoint, "issuingDistributionPoint");
-    oidNameMap.put(Extension.keyUsage, "keyUsage");
-    oidNameMap.put(Extension.logoType, "logoType");
-    oidNameMap.put(Extension.nameConstraints, "nameConstraints");
-    oidNameMap.put(Extension.noRevAvail, "noRevAvail");
-    oidNameMap.put(Extension.policyConstraints, "policyConstraints");
-    oidNameMap.put(Extension.policyMappings, "policyMappings");
-    oidNameMap.put(Extension.privateKeyUsagePeriod, "privateKeyUsagePeriod");
-    oidNameMap.put(Extension.qCStatements, "qCStatements");
-    oidNameMap.put(Extension.reasonCode, "reasonCode");
-    oidNameMap.put(Extension.subjectAlternativeName, "subjectAlternativeName");
-    oidNameMap.put(Extension.subjectDirectoryAttributes, "subjectDirectoryAttributes");
-    oidNameMap.put(Extension.subjectInfoAccess, "subjectInfoAccess");
-    oidNameMap.put(Extension.subjectKeyIdentifier, "subjectKeyIdentifier");
-    oidNameMap.put(Extension.targetInformation, "targetInformation");
+      oidNameMap.put(Extension.auditIdentity, "auditIdentity");
+      oidNameMap.put(Extension.authorityInfoAccess, "authorityInfoAccess");
+      oidNameMap.put(Extension.authorityKeyIdentifier, "authorityKeyIdentifier");
+      oidNameMap.put(Extension.basicConstraints, "basicConstraints");
+      oidNameMap.put(Extension.biometricInfo, "biometricInfo");
+      oidNameMap.put(Extension.certificateIssuer, "certificateIssuer");
+      oidNameMap.put(Extension.certificatePolicies, "certificatePolicies");
+      oidNameMap.put(Extension.cRLDistributionPoints, "cRLDistributionPoints");
+      oidNameMap.put(Extension.cRLNumber, "cRLNumber");
+      oidNameMap.put(Extension.deltaCRLIndicator, "deltaCRLIndicator");
+      oidNameMap.put(Extension.extendedKeyUsage, "extendedKeyUsage");
+      oidNameMap.put(Extension.freshestCRL, "freshestCRL");
+      oidNameMap.put(Extension.inhibitAnyPolicy, "inhibitAnyPolicy");
+      oidNameMap.put(Extension.instructionCode, "instructionCode");
+      oidNameMap.put(Extension.invalidityDate, "invalidityDate");
+      oidNameMap.put(Extension.issuerAlternativeName, "issuerAlternativeName");
+      oidNameMap.put(Extension.issuingDistributionPoint, "issuingDistributionPoint");
+      oidNameMap.put(Extension.keyUsage, "keyUsage");
+      oidNameMap.put(Extension.logoType, "logoType");
+      oidNameMap.put(Extension.nameConstraints, "nameConstraints");
+      oidNameMap.put(Extension.noRevAvail, "noRevAvail");
+      oidNameMap.put(Extension.policyConstraints, "policyConstraints");
+      oidNameMap.put(Extension.policyMappings, "policyMappings");
+      oidNameMap.put(Extension.privateKeyUsagePeriod, "privateKeyUsagePeriod");
+      oidNameMap.put(Extension.qCStatements, "qCStatements");
+      oidNameMap.put(Extension.reasonCode, "reasonCode");
+      oidNameMap.put(Extension.subjectAlternativeName, "subjectAlternativeName");
+      oidNameMap.put(Extension.subjectDirectoryAttributes, "subjectDirectoryAttributes");
+      oidNameMap.put(Extension.subjectInfoAccess, "subjectInfoAccess");
+      oidNameMap.put(Extension.subjectKeyIdentifier, "subjectKeyIdentifier");
+      oidNameMap.put(Extension.targetInformation, "targetInformation");
 
-    oidNameMap.put(Secg.id_aes128_cbc_in_ecies, "aes128-cbc-in-ecies");
-    oidNameMap.put(Secg.id_ecies_specifiedParameters, "ecies-specifiedParameters");
-    oidNameMap.put(Secg.id_hmac_full_ecies, "hmac-full-ecies");
+      oidNameMap.put(Secg.id_aes128_cbc_in_ecies, "aes128-cbc-in-ecies");
+      oidNameMap.put(Secg.id_ecies_specifiedParameters, "ecies-specifiedParameters");
+      oidNameMap.put(Secg.id_hmac_full_ecies, "hmac-full-ecies");
 
-    oidNameMap.put(Misc.id_iso18033_kdf2, "kdf2");
+      oidNameMap.put(Misc.id_iso18033_kdf2, "kdf2");
 
-    // Extended Key Usage
-    oidNameMap.put(XKU.id_kp_anyExtendedKeyUsage, "Any ExtendedKeyUsage");
-    oidNameMap.put(XKU.id_kp_clientAuth, "TLS WWW client authentication");
-    oidNameMap.put(XKU.id_kp_codeSigning, "Code signing");
-    oidNameMap.put(XKU.id_kp_csn369791TlsClient, "CSN 369791 TLS client");
-    oidNameMap.put(XKU.id_kp_csn369791TlsServer, "CSN 369791 TLS server");
-    oidNameMap.put(XKU.id_kp_eapOverLan, "EAP over LAN (EAPOL)");
-    oidNameMap.put(XKU.id_kp_eapOverPpp, "EAP over PPP");
-    oidNameMap.put(XKU.id_kp_emailProtection, "Email protection");
-    oidNameMap.put(XKU.id_kp_etsiTslSigning, "ETSI TSL Signing");
-    oidNameMap.put(XKU.id_kp_icaoMasterListSigning, "ICAO Master List Signing");
-    oidNameMap.put(XKU.id_kp_ikeForIpsec, "Internet Key Exchange for IPsec");
-    oidNameMap.put(XKU.id_kp_intelAmtManagement, "Intel AMT management");
-    oidNameMap.put(XKU.id_kp_ipsecEndSystem, "IP security end system");
-    oidNameMap.put(XKU.id_kp_ipsecTunnel, "IP security tunnel termination");
-    oidNameMap.put(XKU.id_kp_ipsecUser, "IP security user");
-    oidNameMap.put(XKU.id_kp_kerberosClientAuthentication, "Kerberos Client Authentication");
-    oidNameMap.put(XKU.id_kp_kerberosKdc, "Kerberos Key Distribution Center");
-    oidNameMap.put(XKU.id_kp_microsoftCommercialCodeSigning,
-        "Microsoft Commercial Code Signing");
-    oidNameMap.put(XKU.id_kp_microsoftDocumentSigning, "Microsoft Document Signing");
-    oidNameMap.put(XKU.id_kp_microsoftEfs, "Microsoft Encrypted File System");
-    oidNameMap.put(XKU.id_kp_microsoftEfsRecovery, "Microsoft EFS Recovery");
-    oidNameMap.put(XKU.id_kp_microsoftIndividualCodeSigning,
-        "Microsoft Individual Code Signing");
-    oidNameMap.put(XKU.id_kp_microsoftSmartCardLogon, "Microsoft Smart Card Logon");
-    oidNameMap.put(XKU.id_kp_ocspSigning, "Signing OCSP responses");
-    oidNameMap.put(XKU.id_kp_pivCardAuthentication, "PIV Card Authentication");
-    oidNameMap.put(XKU.id_kp_pdfSigning, "PDF Signing");
-    oidNameMap.put(XKU.id_kp_scvpClient, "SCVP Client");
-    oidNameMap.put(XKU.id_kp_scvpServer, "SCVP Server");
-    oidNameMap.put(XKU.id_kp_serverAuth, "TLS WWW server authentication");
-    oidNameMap.put(XKU.id_kp_sipDomain, "SIP Domain");
-    oidNameMap.put(XKU.id_kp_sshClient, "SSH Client");
-    oidNameMap.put(XKU.id_kp_sshServer, "SSH Server");
-    oidNameMap.put(XKU.id_kp_timeStamping, "TimeStamping");
+      // Extended Key Usage
+      oidNameMap.put(XKU.id_kp_anyExtendedKeyUsage, "Any ExtendedKeyUsage");
+      oidNameMap.put(XKU.id_kp_clientAuth, "TLS WWW client authentication");
+      oidNameMap.put(XKU.id_kp_codeSigning, "Code signing");
+      oidNameMap.put(XKU.id_kp_csn369791TlsClient, "CSN 369791 TLS client");
+      oidNameMap.put(XKU.id_kp_csn369791TlsServer, "CSN 369791 TLS server");
+      oidNameMap.put(XKU.id_kp_eapOverLan, "EAP over LAN (EAPOL)");
+      oidNameMap.put(XKU.id_kp_eapOverPpp, "EAP over PPP");
+      oidNameMap.put(XKU.id_kp_emailProtection, "Email protection");
+      oidNameMap.put(XKU.id_kp_etsiTslSigning, "ETSI TSL Signing");
+      oidNameMap.put(XKU.id_kp_icaoMasterListSigning, "ICAO Master List Signing");
+      oidNameMap.put(XKU.id_kp_ikeForIpsec, "Internet Key Exchange for IPsec");
+      oidNameMap.put(XKU.id_kp_intelAmtManagement, "Intel AMT management");
+      oidNameMap.put(XKU.id_kp_ipsecEndSystem, "IP security end system");
+      oidNameMap.put(XKU.id_kp_ipsecTunnel, "IP security tunnel termination");
+      oidNameMap.put(XKU.id_kp_ipsecUser, "IP security user");
+      oidNameMap.put(XKU.id_kp_kerberosClientAuthentication, "Kerberos Client Authentication");
+      oidNameMap.put(XKU.id_kp_kerberosKdc, "Kerberos Key Distribution Center");
+      oidNameMap.put(XKU.id_kp_microsoftCommercialCodeSigning,
+          "Microsoft Commercial Code Signing");
+      oidNameMap.put(XKU.id_kp_microsoftDocumentSigning, "Microsoft Document Signing");
+      oidNameMap.put(XKU.id_kp_microsoftEfs, "Microsoft Encrypted File System");
+      oidNameMap.put(XKU.id_kp_microsoftEfsRecovery, "Microsoft EFS Recovery");
+      oidNameMap.put(XKU.id_kp_microsoftIndividualCodeSigning,
+          "Microsoft Individual Code Signing");
+      oidNameMap.put(XKU.id_kp_microsoftSmartCardLogon, "Microsoft Smart Card Logon");
+      oidNameMap.put(XKU.id_kp_ocspSigning, "Signing OCSP responses");
+      oidNameMap.put(XKU.id_kp_pivCardAuthentication, "PIV Card Authentication");
+      oidNameMap.put(XKU.id_kp_pdfSigning, "PDF Signing");
+      oidNameMap.put(XKU.id_kp_scvpClient, "SCVP Client");
+      oidNameMap.put(XKU.id_kp_scvpServer, "SCVP Server");
+      oidNameMap.put(XKU.id_kp_serverAuth, "TLS WWW server authentication");
+      oidNameMap.put(XKU.id_kp_sipDomain, "SIP Domain");
+      oidNameMap.put(XKU.id_kp_sshClient, "SSH Client");
+      oidNameMap.put(XKU.id_kp_sshServer, "SSH Server");
+      oidNameMap.put(XKU.id_kp_timeStamping, "TimeStamping");
 
-    oidNameMap.put(XKU.id_kp_appleSafariExtensionSigning, "Apple Safari Extension Signing");
-    oidNameMap.put(XKU.id_kp_macInstallerPackageSigning, "Apple Mac Installer Package Signing");
-    oidNameMap.put(XKU.id_kp_macAppStoreInstallerPackageSigning,
-        "Apple Mac AppStore Installer Package Signing");
+      oidNameMap.put(XKU.id_kp_appleSafariExtensionSigning, "Apple Safari Extension Signing");
+      oidNameMap.put(XKU.id_kp_macInstallerPackageSigning, "Apple Mac Installer Package Signing");
+      oidNameMap.put(XKU.id_kp_macAppStoreInstallerPackageSigning,
+          "Apple Mac AppStore Installer Package Signing");
 
+    }
   }
 
   private ObjectIdentifiers() {
@@ -713,7 +738,7 @@ public class ObjectIdentifiers {
 
   public static String getName(ASN1ObjectIdentifier type) {
     Args.notNull(type, "type");
-    String name = oidNameMap.get(type);
+    String name = OidNameMap.oidNameMap.get(type);
 
     if (StringUtil.isBlank(name)) {
       try {
@@ -726,8 +751,8 @@ public class ObjectIdentifiers {
 
   public static ASN1ObjectIdentifier nameToOid(String name) {
     Args.notNull(name, "name");
-    for (ASN1ObjectIdentifier oid : oidNameMap.keySet()) {
-      if (oidNameMap.get(oid).equalsIgnoreCase(name)) {
+    for (ASN1ObjectIdentifier oid : OidNameMap.oidNameMap.keySet()) {
+      if (OidNameMap.oidNameMap.get(oid).equalsIgnoreCase(name)) {
         return oid;
       }
     }

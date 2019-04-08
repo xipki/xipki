@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.profile.Certprofile.RdnControl;
 import org.xipki.ca.api.profile.Certprofile.StringType;
 import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.ObjectIdentifiers.DN;
 import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
@@ -193,256 +194,124 @@ public class SubjectDnSpec {
     }
 
     // ----- Type, Length -----
-    ASN1ObjectIdentifier id;
-
     Set<ASN1ObjectIdentifier> ids = new HashSet<>();
 
     // businessCategory
-    id = ObjectIdentifiers.DN.businessCategory;
-    ids.add(id);
-    RANGES.put(id, RANGE_128);
-    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
-    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+    conf(ids, DN.businessCategory, RANGE_128, DIRECTORY_STRINGS, StringType.utf8String);
 
-    // countryName
-    id = ObjectIdentifiers.DN.C;
-    ids.add(id);
-    RANGES.put(id, RANGE_COUNTRY_NAME);
-    STRING_TYPE_SET.put(id, PRINTABLE_STRING_ONLY);
-    DFLT_STRING_TYPES.put(id, StringType.printableString);
+    // countryName, countryOfCitizenship, countryOfResidence, jurisdictionOfIncorporationCountryName
+    ASN1ObjectIdentifier[] idList = new ASN1ObjectIdentifier[] {DN.C, DN.countryOfCitizenship,
+        DN.countryOfResidence, DN.jurisdictionOfIncorporationCountryName};
+    for (ASN1ObjectIdentifier m : idList) {
+      conf(ids, m, RANGE_COUNTRY_NAME, PRINTABLE_STRING_ONLY, StringType.printableString);
+    }
 
     // commonName
-    id = ObjectIdentifiers.DN.CN;
-    ids.add(id);
-    RANGES.put(id, RANGE_64);
-    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
-    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+    conf(ids, DN.CN, RANGE_64, DIRECTORY_STRINGS, StringType.utf8String);
 
     // emailAddress
-    id = ObjectIdentifiers.DN.emailAddress;
-    ids.add(id);
-    RANGES.put(id, RANGE_255);
-    STRING_TYPE_SET.put(id, IA5_STRING_ONLY);
-    DFLT_STRING_TYPES.put(id, StringType.ia5String);
-
-    // countryOfCitizenship
-    id = ObjectIdentifiers.DN.countryOfCitizenship;
-    ids.add(id);
-    RANGES.put(id, RANGE_COUNTRY_NAME);
-    PATTERNS.put(id, Patterns.COUNTRY);
-    STRING_TYPE_SET.put(id, PRINTABLE_STRING_ONLY);
-    DFLT_STRING_TYPES.put(id, StringType.printableString);
-
-    // countryOfResidence
-    id = ObjectIdentifiers.DN.countryOfResidence;
-    ids.add(id);
-    RANGES.put(id, RANGE_COUNTRY_NAME);
-    PATTERNS.put(id, Patterns.COUNTRY);
-    STRING_TYPE_SET.put(id, PRINTABLE_STRING_ONLY);
-    DFLT_STRING_TYPES.put(id, StringType.printableString);
+    conf(ids, DN.emailAddress, RANGE_255, IA5_STRING_ONLY, StringType.ia5String);
 
     // DATE_OF_BIRTH
-    id = ObjectIdentifiers.DN.dateOfBirth;
-    ids.add(id);
-    RANGES.put(id, RANGE_DATE_OF_BIRTH);
-    PATTERNS.put(id, Patterns.DATE_OF_BIRTH);
+    conf(ids, DN.dateOfBirth, RANGE_DATE_OF_BIRTH, null, null);
+    PATTERNS.put(DN.dateOfBirth, Patterns.DATE_OF_BIRTH);
 
     // domainComponent
-    id = ObjectIdentifiers.DN.DC;
-    ids.add(id);
-    STRING_TYPE_SET.put(id, IA5_STRING_ONLY);
-    DFLT_STRING_TYPES.put(id, StringType.ia5String);
+    conf(ids, DN.DC, null, IA5_STRING_ONLY, StringType.ia5String);
 
     // RFC 2256 dmdName
-    id = ObjectIdentifiers.DN.dmdName;
-    ids.add(id);
-    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
-    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+    conf(ids, DN.dmdName, null, DIRECTORY_STRINGS, StringType.utf8String);
 
     // gender
-    id = ObjectIdentifiers.DN.gender;
-    ids.add(id);
-    PATTERNS.put(id, Patterns.GENDER);
-    RANGES.put(id, RANGE_GENDER);
-    STRING_TYPE_SET.put(id, PRINTABLE_STRING_ONLY);
-    DFLT_STRING_TYPES.put(id, StringType.printableString);
+    conf(ids, DN.gender, RANGE_GENDER, PRINTABLE_STRING_ONLY, StringType.printableString);
+    PATTERNS.put(DN.gender, Patterns.GENDER);
 
     // generation qualifier
-    id = ObjectIdentifiers.DN.generationQualifier;
-    ids.add(id);
-    RANGES.put(id, RANGE_64);
-    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
-    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+    conf(ids, DN.generationQualifier, RANGE_64, DIRECTORY_STRINGS, StringType.utf8String);
 
     // givenName
-    id = ObjectIdentifiers.DN.givenName;
-    ids.add(id);
-    RANGES.put(id, RANGE_64);
-    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
-    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+    conf(ids, DN.givenName, RANGE_64, DIRECTORY_STRINGS, StringType.utf8String);
 
     // initials
-    id = ObjectIdentifiers.DN.initials;
-    ids.add(id);
-    RANGES.put(id, RANGE_64);
-    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
-    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+    conf(ids, DN.initials, RANGE_64, DIRECTORY_STRINGS, StringType.utf8String);
 
     // LDAP user ID
-    id = ObjectIdentifiers.DN.userid;
-    ids.add(id);
-    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
-    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+    conf(ids, DN.userid, null, DIRECTORY_STRINGS, StringType.utf8String);
 
-    // localityName
-    id = ObjectIdentifiers.DN.localityName;
-    ids.add(id);
-    RANGES.put(id, RANGE_128);
-    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
-    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+    // localityName, jurisdictionOfIncorporationLocalityName
+    idList = new ASN1ObjectIdentifier[] {
+        DN.localityName,
+        DN.jurisdictionOfIncorporationLocalityName};
+    for (ASN1ObjectIdentifier m : idList) {
+      conf(ids, m, RANGE_128, DIRECTORY_STRINGS, StringType.utf8String);
+    }
 
     // name
-    id = ObjectIdentifiers.DN.name;
-    ids.add(id);
-    RANGES.put(id, RANGE_NAME);
-    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
-    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+    conf(ids, DN.name, RANGE_NAME, DIRECTORY_STRINGS, StringType.utf8String);
 
     // nameOfBirth
-    id = ObjectIdentifiers.DN.nameAtBirth;
-    ids.add(id);
-    RANGES.put(id, RANGE_64);
-    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
-    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+    conf(ids, DN.nameAtBirth, RANGE_64, DIRECTORY_STRINGS, StringType.utf8String);
 
     // organizationName
-    id = ObjectIdentifiers.DN.O;
-    ids.add(id);
-    RANGES.put(id, RANGE_64);
-    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
-    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+    conf(ids, DN.O, RANGE_64, DIRECTORY_STRINGS, StringType.utf8String);
 
     // organizationIdentifier
-    id = ObjectIdentifiers.DN.organizationIdentifier;
-    ids.add(id);
-    RANGES.put(id, RANGE_64);
-    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
-    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+    conf(ids, DN.organizationIdentifier, RANGE_64, DIRECTORY_STRINGS, StringType.utf8String);
 
     // NIF
-    id = ObjectIdentifiers.DN.NIF;
-    ids.add(id);
-    RANGES.put(id, RANGE_64);
-    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
-    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+    conf(ids, DN.NIF, RANGE_64, DIRECTORY_STRINGS, StringType.utf8String);
 
     // CIF
-    id = ObjectIdentifiers.DN.CIF;
-    ids.add(id);
-    RANGES.put(id, RANGE_64);
-    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
-    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+    conf(ids, DN.CIF, RANGE_64, DIRECTORY_STRINGS, StringType.utf8String);
 
     // organizationalUnitName
-    id = ObjectIdentifiers.DN.OU;
-    ids.add(id);
-    RANGES.put(id, RANGE_64);
-    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
-    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+    conf(ids, DN.OU, RANGE_64, DIRECTORY_STRINGS, StringType.utf8String);
 
     // placeOfBirth
-    id = ObjectIdentifiers.DN.placeOfBirth;
-    ids.add(id);
-    RANGES.put(id, RANGE_128);
-    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
-    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+    conf(ids, DN.placeOfBirth, RANGE_128, DIRECTORY_STRINGS, StringType.utf8String);
 
     // postalAddress
-    id = ObjectIdentifiers.DN.postalAddress;
-    ids.add(id);
-    RANGES.put(id, RANGE_POSTAL_ADDRESS);
-    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
-    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+    conf(ids, DN.postalAddress, RANGE_POSTAL_ADDRESS, DIRECTORY_STRINGS, StringType.utf8String);
 
     // postalCode
-    id = ObjectIdentifiers.DN.postalCode;
-    ids.add(id);
-    RANGES.put(id, RANGE_POSTAL_CODE);
-    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
-    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+    conf(ids, DN.postalCode, RANGE_POSTAL_CODE, DIRECTORY_STRINGS, StringType.utf8String);
 
     // pseudonym
-    id = ObjectIdentifiers.DN.pseudonym;
-    ids.add(id);
-    RANGES.put(id, RANGE_64);
-    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
-    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+    conf(ids, DN.pseudonym, RANGE_64, DIRECTORY_STRINGS, StringType.utf8String);
 
     // distinguishedNameQualifier
-    id = ObjectIdentifiers.DN.dnQualifier;
-    ids.add(id);
-    RANGES.put(id, RANGE_64);
-    STRING_TYPE_SET.put(id, PRINTABLE_STRING_ONLY);
-    DFLT_STRING_TYPES.put(id, StringType.printableString);
+    conf(ids, DN.dnQualifier, RANGE_64, PRINTABLE_STRING_ONLY, StringType.printableString);
 
     // serialNumber
-    id = ObjectIdentifiers.DN.serialNumber;
-    ids.add(id);
-    RANGES.put(id, RANGE_64);
-    STRING_TYPE_SET.put(id, PRINTABLE_STRING_ONLY);
-    DFLT_STRING_TYPES.put(id, StringType.printableString);
+    conf(ids, DN.serialNumber, RANGE_64, PRINTABLE_STRING_ONLY, StringType.printableString);
 
-    // stateOrProvinceName
-    id = ObjectIdentifiers.DN.ST;
-    ids.add(id);
-    RANGES.put(id, RANGE_128);
-    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
-    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+    // stateOrProvinceName, jurisdictionOfIncorporationStateOrProvinceName
+    idList = new ASN1ObjectIdentifier[] {
+        DN.ST, DN.jurisdictionOfIncorporationStateOrProvinceName};
+    for (ASN1ObjectIdentifier m : idList) {
+      conf(ids, m, RANGE_128, DIRECTORY_STRINGS, StringType.utf8String);
+    }
 
     // streetAddress
-    id = ObjectIdentifiers.DN.street;
-    ids.add(id);
-    RANGES.put(id, RANGE_128);
-    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
-    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+    conf(ids, DN.street, RANGE_128, DIRECTORY_STRINGS, StringType.utf8String);
 
     // surName
-    id = ObjectIdentifiers.DN.surname;
-    ids.add(id);
-    RANGES.put(id, RANGE_64);
-    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
-    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+    conf(ids, DN.surname, RANGE_64, DIRECTORY_STRINGS, StringType.utf8String);
 
     // title
-    id = ObjectIdentifiers.DN.T;
-    ids.add(id);
-    RANGES.put(id, RANGE_64);
-    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
-    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+    conf(ids, DN.T, RANGE_64,DIRECTORY_STRINGS, StringType.utf8String);
 
     // telefonNumber
-    id = ObjectIdentifiers.DN.telephoneNumber;
-    ids.add(id);
-    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
-    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+    conf(ids, DN.telephoneNumber, null, DIRECTORY_STRINGS, StringType.utf8String);
 
     // unique Identifier
-    id = ObjectIdentifiers.DN.uniqueIdentifier;
-    ids.add(id);
-    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
-    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+    conf(ids, DN.uniqueIdentifier, null, DIRECTORY_STRINGS, StringType.utf8String);
 
     // unstructedAddress
-    id = ObjectIdentifiers.DN.unstructuredAddress;
-    ids.add(id);
-    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
-    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+    conf(ids, DN.unstructuredAddress, null, DIRECTORY_STRINGS, StringType.utf8String);
 
     // unstructedName
-    id = ObjectIdentifiers.DN.unstructuredName;
-    ids.add(id);
-    STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
-    DFLT_STRING_TYPES.put(id, StringType.utf8String);
+    conf(ids, DN.unstructuredName, null, DIRECTORY_STRINGS, StringType.utf8String);
 
     for (ASN1ObjectIdentifier type : ids) {
       StringType stringType = DFLT_STRING_TYPES.get(type);
@@ -464,6 +333,23 @@ public class SubjectDnSpec {
   }
 
   private SubjectDnSpec() {
+  }
+
+  private static void conf(Set<ASN1ObjectIdentifier> types, ASN1ObjectIdentifier type,
+      Range range, Set<StringType> stringTypes, StringType dfltStringType) {
+    types.add(type);
+    if (range != null) {
+      RANGES.put(type, range);
+    }
+    if (stringTypes != null) {
+      STRING_TYPE_SET.put(type, stringTypes);
+    }
+    if (dfltStringType != null) {
+      if (stringTypes != null && !stringTypes.contains(dfltStringType)) {
+        throw new IllegalArgumentException("stringTypes does not contain dfltStringType");
+      }
+      DFLT_STRING_TYPES.put(type, dfltStringType);
+    }
   }
 
   public static Range getStringLengthRange(ASN1ObjectIdentifier rdnType) {

@@ -46,6 +46,8 @@ public class DummyMain {
 
   public static void main(String[] args) {
     try {
+      String name0 = ObjectIdentifiers.getName(ObjectIdentifiers.DN.NIF);
+      System.out.println(name0);
       Validity validity = Validity.getInstance("395d");
       Date date = validity.add(new Date());
       System.out.println(date);

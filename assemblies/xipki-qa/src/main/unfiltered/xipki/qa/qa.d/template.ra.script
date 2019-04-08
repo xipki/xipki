@@ -211,7 +211,7 @@ xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --p12 output/ee-complex1.p12 --password 1234 \
   --outform $OUTFORM \
   --out output/ee-complex1.csr \
-  --subject "UID=abc-def,CN=ee-complex2,O=xipki,C=DE" \
+  --subject "UID=abc-def,CN=ee-complex1,O=xipki,C=DE,1.3.6.1.4.1.311.2.1.3=CN,1.3.6.1.4.1.311.2.1.2=Guandong,1.3.6.1.4.1.311.2.1.1=Shenzhen" \
   --qc-eu-limit EUR:150:15 \
   --biometric-type 0 \
   --biometric-hash SHA256 \
@@ -253,7 +253,7 @@ xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --p12 output/ee-complex2.p12 --password 1234 \
   --outform $OUTFORM \
   --out output/ee-complex2.csr \
-  --subject "UID=abc-def,CN=ee-complex2,O=xipki,C=DE" \
+  --subject "UID=abc-def,CN=ee-complex2,O=xipki,C=DE,1.3.6.1.4.1.311.2.1.3=CN,1.3.6.1.4.1.311.2.1.2=Guandong,1.3.6.1.4.1.311.2.1.1=Shenzhen" \
   --dateOfBirth 19810102 \
   --postalAddress "street example 1" \
   --postalAddress "D-69112 Heidelberg" \

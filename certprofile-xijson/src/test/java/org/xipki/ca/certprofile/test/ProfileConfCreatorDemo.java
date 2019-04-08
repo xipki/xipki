@@ -111,6 +111,7 @@ import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.ObjectIdentifiers.DN;
 import org.xipki.security.TlsExtensionType;
 import org.xipki.security.X509ExtensionType.ConstantExtnValue;
 import org.xipki.security.X509ExtensionType.FieldType;
@@ -230,11 +231,11 @@ public class ProfileConfCreatorDemo {
     Subject subject = profile.getSubject();
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
+    rdnControls.add(createRdn(DN.C, 1, 1));
+    rdnControls.add(createRdn(DN.O, 1, 1));
+    rdnControls.add(createRdn(DN.OU, 0, 1));
+    rdnControls.add(createRdn(DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(DN.CN, 1, 1));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -261,11 +262,11 @@ public class ProfileConfCreatorDemo {
     Subject subject = profile.getSubject();
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
+    rdnControls.add(createRdn(DN.C, 1, 1));
+    rdnControls.add(createRdn(DN.O, 1, 1));
+    rdnControls.add(createRdn(DN.OU, 0, 1));
+    rdnControls.add(createRdn(DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(DN.CN, 1, 1));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -297,11 +298,11 @@ public class ProfileConfCreatorDemo {
     Subject subject = profile.getSubject();
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
+    rdnControls.add(createRdn(DN.C, 1, 1));
+    rdnControls.add(createRdn(DN.O, 1, 1));
+    rdnControls.add(createRdn(DN.OU, 0, 1));
+    rdnControls.add(createRdn(DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(DN.CN, 1, 1));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -338,11 +339,11 @@ public class ProfileConfCreatorDemo {
     Subject subject = profile.getSubject();
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1, null, "PREFIX ", " SUFFIX"));
+    rdnControls.add(createRdn(DN.C, 1, 1));
+    rdnControls.add(createRdn(DN.O, 1, 1));
+    rdnControls.add(createRdn(DN.OU, 0, 1));
+    rdnControls.add(createRdn(DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(DN.CN, 1, 1, null, "PREFIX ", " SUFFIX"));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -404,7 +405,7 @@ public class ProfileConfCreatorDemo {
     gn.addTags(GeneralNameTag.rfc822Name, GeneralNameTag.DNSName, GeneralNameTag.directoryName,
         GeneralNameTag.ediPartyName, GeneralNameTag.uniformResourceIdentifier,
         GeneralNameTag.IPAddress, GeneralNameTag.registeredID);
-    gn.addOtherNames(createOidType(ObjectIdentifiers.DN.O));
+    gn.addOtherNames(createOidType(DN.O));
 
     // SubjectInfoAccess
     list.add(createExtension(Extension.subjectInfoAccess, true, false));
@@ -637,12 +638,12 @@ public class ProfileConfCreatorDemo {
     Subject subject = profile.getSubject();
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.organizationIdentifier, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
+    rdnControls.add(createRdn(DN.C, 1, 1));
+    rdnControls.add(createRdn(DN.O, 1, 1));
+    rdnControls.add(createRdn(DN.organizationIdentifier, 0, 1));
+    rdnControls.add(createRdn(DN.OU, 0, 1));
+    rdnControls.add(createRdn(DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(DN.CN, 1, 1));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -685,11 +686,11 @@ public class ProfileConfCreatorDemo {
     Subject subject = profile.getSubject();
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
+    rdnControls.add(createRdn(DN.C, 1, 1));
+    rdnControls.add(createRdn(DN.O, 1, 1));
+    rdnControls.add(createRdn(DN.OU, 0, 1));
+    rdnControls.add(createRdn(DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(DN.CN, 1, 1));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -724,19 +725,19 @@ public class ProfileConfCreatorDemo {
     Subject subject = profile.getSubject();
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
+    rdnControls.add(createRdn(DN.C, 1, 1));
+    rdnControls.add(createRdn(DN.O, 1, 1));
+    rdnControls.add(createRdn(DN.OU, 0, 1));
     if (legacy) {
-      rdnControls.add(createRdn(ObjectIdentifiers.DN.emailAddress, 1, 1));
+      rdnControls.add(createRdn(DN.emailAddress, 1, 1));
     }
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
+    rdnControls.add(createRdn(DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(DN.CN, 1, 1));
 
     // SubjectToSubjectAltName
     SubjectToSubjectAltNameType s2sType = new SubjectToSubjectAltNameType();
     profile.getSubjectToSubjectAltNames().add(s2sType);
-    s2sType.setSource(createOidType(ObjectIdentifiers.DN.emailAddress));
+    s2sType.setSource(createOidType(DN.emailAddress));
     s2sType.setTarget(GeneralNameTag.rfc822Name);
 
     // Extensions
@@ -791,16 +792,16 @@ public class ProfileConfCreatorDemo {
     Subject subject = profile.getSubject();
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1, REGEX_FQDN, null, null));
+    rdnControls.add(createRdn(DN.C, 1, 1));
+    rdnControls.add(createRdn(DN.O, 1, 1));
+    rdnControls.add(createRdn(DN.OU, 0, 1));
+    rdnControls.add(createRdn(DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(DN.CN, 1, 1, REGEX_FQDN, null, null));
 
     // SubjectToSubjectAltName
     SubjectToSubjectAltNameType s2sType = new SubjectToSubjectAltNameType();
     profile.getSubjectToSubjectAltNames().add(s2sType);
-    s2sType.setSource(createOidType(ObjectIdentifiers.DN.CN));
+    s2sType.setSource(createOidType(DN.CN));
     s2sType.setTarget(GeneralNameTag.DNSName);
 
     // Extensions
@@ -854,11 +855,11 @@ public class ProfileConfCreatorDemo {
     Subject subject = profile.getSubject();
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
+    rdnControls.add(createRdn(DN.C, 1, 1));
+    rdnControls.add(createRdn(DN.O, 1, 1));
+    rdnControls.add(createRdn(DN.OU, 0, 1));
+    rdnControls.add(createRdn(DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(DN.CN, 1, 1));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -900,12 +901,12 @@ public class ProfileConfCreatorDemo {
     Subject subject = profile.getSubject();
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
+    rdnControls.add(createRdn(DN.C, 1, 1));
+    rdnControls.add(createRdn(DN.O, 1, 1));
 
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 2, 2));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
+    rdnControls.add(createRdn(DN.OU, 2, 2));
+    rdnControls.add(createRdn(DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(DN.CN, 1, 1));
 
     // Extensions
     // Extensions - general
@@ -945,11 +946,11 @@ public class ProfileConfCreatorDemo {
     Subject subject = profile.getSubject();
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1, null, null, null, "group1"));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 1, 1, null, null, null, "group1"));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
+    rdnControls.add(createRdn(DN.C, 1, 1));
+    rdnControls.add(createRdn(DN.O, 1, 1, null, null, null, "group1"));
+    rdnControls.add(createRdn(DN.OU, 1, 1, null, null, null, "group1"));
+    rdnControls.add(createRdn(DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(DN.CN, 1, 1));
 
     // Extensions
     // Extensions - general
@@ -985,12 +986,12 @@ public class ProfileConfCreatorDemo {
     Subject subject = profile.getSubject();
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.organizationIdentifier, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
+    rdnControls.add(createRdn(DN.C, 1, 1));
+    rdnControls.add(createRdn(DN.O, 1, 1));
+    rdnControls.add(createRdn(DN.organizationIdentifier, 0, 1));
+    rdnControls.add(createRdn(DN.OU, 0, 1));
+    rdnControls.add(createRdn(DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(DN.CN, 1, 1));
 
     // Extensions
     // Extensions - general
@@ -1040,16 +1041,19 @@ public class ProfileConfCreatorDemo {
 
     // Subject
     Subject subject = profile.getSubject();
-    subject.setKeepRdnOrder(true);
+    subject.setKeepRdnOrder(false);
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.dateOfBirth, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.postalAddress, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.userid, 1, 1));
+    rdnControls.add(createRdn(DN.CN, 1, 1));
+    rdnControls.add(createRdn(DN.C, 1, 1));
+    rdnControls.add(createRdn(DN.O, 1, 1));
+    rdnControls.add(createRdn(DN.OU, 0, 1));
+    rdnControls.add(createRdn(DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(DN.dateOfBirth, 0, 1));
+    rdnControls.add(createRdn(DN.postalAddress, 0, 1));
+    rdnControls.add(createRdn(DN.userid, 1, 1));
+    rdnControls.add(createRdn(DN.jurisdictionOfIncorporationCountryName, 1, 1));
+    rdnControls.add(createRdn(DN.jurisdictionOfIncorporationLocalityName, 1, 1));
+    rdnControls.add(createRdn(DN.jurisdictionOfIncorporationStateOrProvinceName, 1, 1));
 
     // Extensions
     // Extensions - general
@@ -1090,11 +1094,11 @@ public class ProfileConfCreatorDemo {
     last(list).setSubjectDirectoryAttributs(subjectDirAttrType);
 
     List<DescribableOid> attrTypes = subjectDirAttrType.getTypes();
-    attrTypes.add(createOidType(ObjectIdentifiers.DN.countryOfCitizenship));
-    attrTypes.add(createOidType(ObjectIdentifiers.DN.countryOfResidence));
-    attrTypes.add(createOidType(ObjectIdentifiers.DN.gender));
-    attrTypes.add(createOidType(ObjectIdentifiers.DN.dateOfBirth));
-    attrTypes.add(createOidType(ObjectIdentifiers.DN.placeOfBirth));
+    attrTypes.add(createOidType(DN.countryOfCitizenship));
+    attrTypes.add(createOidType(DN.countryOfResidence));
+    attrTypes.add(createOidType(DN.gender));
+    attrTypes.add(createOidType(DN.dateOfBirth));
+    attrTypes.add(createOidType(DN.placeOfBirth));
 
     // Extension - Admission
     list.add(createExtension(ObjectIdentifiers.Extn.id_extension_admission, true, false));
@@ -1229,10 +1233,10 @@ public class ProfileConfCreatorDemo {
     Subject subject = profile.getSubject();
     subject.setKeepRdnOrder(true);
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
+    rdnControls.add(createRdn(DN.CN, 1, 1));
+    rdnControls.add(createRdn(DN.C, 1, 1));
+    rdnControls.add(createRdn(DN.O, 1, 1));
+    rdnControls.add(createRdn(DN.OU, 0, 1));
 
     // Extensions
     // Extensions - general
@@ -1293,10 +1297,10 @@ public class ProfileConfCreatorDemo {
     Subject subject = profile.getSubject();
     subject.setKeepRdnOrder(true);
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
+    rdnControls.add(createRdn(DN.CN, 1, 1));
+    rdnControls.add(createRdn(DN.C, 1, 1));
+    rdnControls.add(createRdn(DN.O, 1, 1));
+    rdnControls.add(createRdn(DN.OU, 0, 1));
 
     // Extensions
     // Extensions - general
@@ -1459,11 +1463,11 @@ public class ProfileConfCreatorDemo {
     Subject subject = profile.getSubject();
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1, ":FQDN", null, null));
+    rdnControls.add(createRdn(DN.C, 1, 1));
+    rdnControls.add(createRdn(DN.O, 1, 1));
+    rdnControls.add(createRdn(DN.OU, 0, 1));
+    rdnControls.add(createRdn(DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(DN.CN, 1, 1, ":FQDN", null, null));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -1504,16 +1508,16 @@ public class ProfileConfCreatorDemo {
     ValueType value = new ValueType();
     value.setText("DE");
     value.setOverridable(true);
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, null, null, value));
+    rdnControls.add(createRdn(DN.C, null, null, value));
 
     value = new ValueType();
     value.setText("fixed xipki.org");
     value.setOverridable(false);
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, null, null, value));
+    rdnControls.add(createRdn(DN.O, null, null, value));
 
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
+    rdnControls.add(createRdn(DN.OU, 0, 1));
+    rdnControls.add(createRdn(DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(DN.CN, 1, 1));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -1551,11 +1555,11 @@ public class ProfileConfCreatorDemo {
     subject.setKeepRdnOrder(true);
     List<RdnType> rdnControls = subject.getRdns();
 
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.UID, 1, 1));
+    rdnControls.add(createRdn(DN.C, 1, 1));
+    rdnControls.add(createRdn(DN.O, 1, 1));
+    rdnControls.add(createRdn(DN.OU, 1, 1));
+    rdnControls.add(createRdn(DN.CN, 1, 1));
+    rdnControls.add(createRdn(DN.UID, 1, 1));
 
     // Extensions
     List<ExtensionType> list = profile.getExtensions();
@@ -1688,11 +1692,11 @@ public class ProfileConfCreatorDemo {
     Subject subject = profile.getSubject();
 
     List<RdnType> rdnControls = subject.getRdns();
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.C, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.O, 1, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.OU, 0, 1));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.SN, 0, 1, REGEX_SN, null, null));
-    rdnControls.add(createRdn(ObjectIdentifiers.DN.CN, 1, 1, ":FQDN", null, null));
+    rdnControls.add(createRdn(DN.C, 1, 1));
+    rdnControls.add(createRdn(DN.O, 1, 1));
+    rdnControls.add(createRdn(DN.OU, 0, 1));
+    rdnControls.add(createRdn(DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(DN.CN, 1, 1, ":FQDN", null, null));
 
     // SubjectToSubjectAltName
     List<SubjectToSubjectAltNameType> subjectToSubjectAltNames = new LinkedList<>();
@@ -1700,7 +1704,7 @@ public class ProfileConfCreatorDemo {
 
     SubjectToSubjectAltNameType s2sType = new SubjectToSubjectAltNameType();
     subjectToSubjectAltNames.add(s2sType);
-    s2sType.setSource(createOidType(ObjectIdentifiers.DN.CN));
+    s2sType.setSource(createOidType(DN.CN));
     s2sType.setTarget(GeneralNameTag.DNSName);
 
     // Extensions

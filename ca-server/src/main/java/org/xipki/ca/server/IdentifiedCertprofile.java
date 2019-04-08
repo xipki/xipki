@@ -186,12 +186,27 @@ class IdentifiedCertprofile implements Closeable {
   public SubjectInfo getSubject(X500Name requestedSubject)
       throws CertprofileException, BadCertTemplateException {
     SubjectInfo subjectInfo = certprofile.getSubject(requestedSubject);
-    RDN[] countryRdns = subjectInfo.getGrantedSubject().getRDNs(ObjectIdentifiers.DN.C);
-    if (countryRdns != null) {
-      for (RDN rdn : countryRdns) {
-        String textValue = IETFUtils.valueToString(rdn.getFirst().getValue());
-        if (!SubjectDnSpec.isValidCountryAreaCode(textValue)) {
-          throw new BadCertTemplateException("invalid country/area code '" + textValue + "'");
+    // check the country
+    ASN1ObjectIdentifier[] countryOids = new ASN1ObjectIdentifier[] {
+        ObjectIdentifiers.DN.C,
+        ObjectIdentifiers.DN.countryOfCitizenship,
+        ObjectIdentifiers.DN.countryOfResidence,
+        ObjectIdentifiers.DN.jurisdictionOfIncorporationCountryName};
+
+    for (ASN1ObjectIdentifier oid : countryOids) {
+      RDN[] countryRdns = subjectInfo.getGrantedSubject().getRDNs(oid);
+      if (countryRdns != null) {
+        for (RDN rdn : countryRdns) {
+          String textValue = IETFUtils.valueToString(rdn.getFirst().getValue());
+          if (!SubjectDnSpec.isValidCountryAreaCode(textValue)) {
+            String name = ObjectIdentifiers.getName(oid);
+            if (name == null) {
+              name = oid.getId();
+            }
+
+            throw new BadCertTemplateException("invalid country/area code '" + textValue
+                + "' in subject attribute " + name);
+          }
         }
       }
     }
