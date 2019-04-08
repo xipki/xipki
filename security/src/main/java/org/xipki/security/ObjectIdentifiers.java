@@ -278,19 +278,19 @@ public class ObjectIdentifiers {
      * jurisdictionOfIncorporationLocalityName
      */
     public static final ASN1ObjectIdentifier jurisdictionOfIncorporationLocalityName =
-        id_microsoft.branch("2.1.1");
+        id_microsoft.branch("60.2.1.1");
 
     /**
      * jurisdictionOfIncorporationStateOrProvinceName
      */
     public static final ASN1ObjectIdentifier jurisdictionOfIncorporationStateOrProvinceName =
-        id_microsoft.branch("2.1.2");
+        id_microsoft.branch("60.2.1.2");
 
     /**
      * jurisdictionOfIncorporationCountryName
      */
     public static final ASN1ObjectIdentifier jurisdictionOfIncorporationCountryName =
-        id_microsoft.branch("2.1.3");
+        id_microsoft.branch("60.2.1.3");
   }
 
   // extended key usage

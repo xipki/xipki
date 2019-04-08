@@ -148,21 +148,21 @@
 			"maxOccurs":1
 		},{
 			"type":{
-				"oid":"1.3.6.1.4.1.311.2.1.3",
+				"oid":"1.3.6.1.4.1.311.60.2.1.3",
 				"description":"jurisdictionOfIncorporationCountryName"
 			},
 			"minOccurs":1,
 			"maxOccurs":1
 		},{
 			"type":{
-				"oid":"1.3.6.1.4.1.311.2.1.1",
+				"oid":"1.3.6.1.4.1.311.60.2.1.1",
 				"description":"jurisdictionOfIncorporationLocalityName"
 			},
 			"minOccurs":1,
 			"maxOccurs":1
 		},{
 			"type":{
-				"oid":"1.3.6.1.4.1.311.2.1.2",
+				"oid":"1.3.6.1.4.1.311.60.2.1.2",
 				"description":"jurisdictionOfIncorporationStateOrProvinceName"
 			},
 			"minOccurs":1,
