@@ -36,7 +36,7 @@ import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERT61String;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.BadFormatException;
@@ -228,6 +228,11 @@ public abstract class Certprofile implements Closeable {
 
     private String group;
 
+    /**
+     * This RDN is for other purpose, will not contained in the Subject field of certificate
+     */
+    private boolean notInSubject;
+
     public RdnControl(ASN1ObjectIdentifier type) {
       this(type, 1, 1);
     }
@@ -323,6 +328,14 @@ public abstract class Certprofile implements Closeable {
 
     public boolean isValueOverridable() {
       return valueOverridable;
+    }
+
+    public boolean isNotInSubject() {
+      return notInSubject;
+    }
+
+    public void setNotInSubject(boolean notInSubject) {
+      this.notInSubject = notInSubject;
     }
 
   }
@@ -647,8 +660,6 @@ public abstract class Certprofile implements Closeable {
   /**
    * Checks the requested extensions and returns the canonicalized ones.
    *
-   * @param extensionControls
-   *          Extension controls. Must not be {@code null}.
    * @param requestedSubject
    *          Requested subject. Must not be {@code null}.
    * @param grantedSubject
@@ -669,8 +680,9 @@ public abstract class Certprofile implements Closeable {
    */
   public abstract ExtensionValues getExtensions(
       Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls, X500Name requestedSubject,
-      X500Name grantedSubject, Extensions requestedExtensions, Date notBefore, Date notAfter,
-      PublicCaInfo caInfo) throws CertprofileException, BadCertTemplateException;
+      X500Name grantedSubject, Map<ASN1ObjectIdentifier, Extension> requestedExtensions,
+      Date notBefore, Date notAfter, PublicCaInfo caInfo)
+          throws CertprofileException, BadCertTemplateException;
 
   public abstract boolean incSerialNumberIfSubjectExists();
 

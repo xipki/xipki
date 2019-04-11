@@ -564,6 +564,27 @@ public class ObjectIdentifiers {
     // RFC 4262: SMIMECapatibilities
     public static final ASN1ObjectIdentifier id_smimeCapabilities = new ASN1ObjectIdentifier(
         "1.2.840.113549.1.9.15");
+
+    // GMT 0015-2012 SM2-Based Certificate
+    public static final ASN1ObjectIdentifier id_GMT_0015_IdentityCode = new ASN1ObjectIdentifier(
+        "1.2.156.10260.4.1.1");
+
+    // GMT 0015-2012 SM2-Based Certificate
+    public static final ASN1ObjectIdentifier id_GMT_0015_InsuranceNumber = new ASN1ObjectIdentifier(
+        "1.2.156.10260.4.1.2");
+
+    // GMT 0015-2012 SM2-Based Certificate
+    public static final ASN1ObjectIdentifier id_GMT_0015_ICRegistrationNumber =
+        new ASN1ObjectIdentifier("1.2.156.10260.4.1.3");
+
+    // GMT 0015-2012 SM2-Based Certificate
+    public static final ASN1ObjectIdentifier id_GMT_0015_OrganizationCode =
+        new ASN1ObjectIdentifier("1.2.156.10260.4.1.4");
+
+    // GMT 0015-2012 SM2-Based Certificate
+    public static final ASN1ObjectIdentifier id_GMT_0015_TaxationNumber = new ASN1ObjectIdentifier(
+        "1.2.156.10260.4.1.5");
+
   }
 
   /*
@@ -643,6 +664,11 @@ public class ObjectIdentifiers {
       oidNameMap.put(Extn.id_etsi_qcs_QcSSCD, "etsi-qcs-QcSSCD");
       oidNameMap.put(Extn.id_pe_tlsfeature, "tlsFeature");
       oidNameMap.put(Extn.id_smimeCapabilities, "SMIMECapatibilities");
+      oidNameMap.put(Extn.id_GMT_0015_ICRegistrationNumber, "GMT 0015 ICRegistrationNumber");
+      oidNameMap.put(Extn.id_GMT_0015_IdentityCode, "GMT 0015 IdentityCode");
+      oidNameMap.put(Extn.id_GMT_0015_InsuranceNumber, "GMT 0015 InsuranceNumber");
+      oidNameMap.put(Extn.id_GMT_0015_OrganizationCode, "GMT 0015 OrganizationCode");
+      oidNameMap.put(Extn.id_GMT_0015_TaxationNumber, "GMT 0015 TaxationNumber");
 
       oidNameMap.put(Extension.auditIdentity, "auditIdentity");
       oidNameMap.put(Extension.authorityInfoAccess, "authorityInfoAccess");

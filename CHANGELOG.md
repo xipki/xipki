@@ -13,6 +13,8 @@ See also <https://github.com/xipki/xipki/releases>
   - Extension AuthorityKeyIdentifier embeds both KeyIdentifier and (authorityCertIssuer, authorityCertSerialNumber) in case of incorrect configuration. However exactly one of them is allowed. This has been fixed.
   - Add the native support of jurisdictionOfIncorporationCountryName, jurisdictionOfIncorporationLocalityName and jurisdictionOfIncorporationStateOrProvinceName
   - Add the configuration of OCSP response behaviour for unknown certificate
+  - Add the native support of extensions IdentityCode, InsuranceNumber, ICRegistrationNumber, OrganizationCode and TaxationNumber defined in the chinese standard GM/T 0015
+  - Add support of specification of extension admission in subject
 
 ## 5.1.0
   - Release date: Mar 17, 2019

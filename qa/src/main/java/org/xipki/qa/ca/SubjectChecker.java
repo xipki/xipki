@@ -68,7 +68,9 @@ public class SubjectChecker {
     Set<ASN1ObjectIdentifier> oids = new HashSet<>();
 
     for (ASN1ObjectIdentifier oid : subjectControl.getTypes()) {
-      oids.add(oid);
+      if (!subjectControl.getControl(oid).isNotInSubject()) {
+        oids.add(oid);
+      }
     }
 
     for (ASN1ObjectIdentifier oid : subject.getAttributeTypes()) {

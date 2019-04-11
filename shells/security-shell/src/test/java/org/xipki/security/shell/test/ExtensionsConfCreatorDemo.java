@@ -22,20 +22,23 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
 import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.X509ExtensionType;
 import org.xipki.security.X509ExtensionType.ConstantExtnValue;
 import org.xipki.security.X509ExtensionType.DescribableOid;
+import org.xipki.security.X509ExtensionType.ExtensionsType;
 import org.xipki.security.X509ExtensionType.FieldType;
 import org.xipki.security.X509ExtensionType.Tag;
-import org.xipki.security.shell.Actions.ExtensionsType;
 import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.IoUtil;
@@ -77,6 +80,7 @@ public class ExtensionsConfCreatorDemo {
       extensionsSyntaxExt("extensions-syntax-ext-explicit-tag.json",
           new ASN1ObjectIdentifier("1.2.3.6.3"), new Tag(1, true));
       extensionsAppleWwdr("extensions-apple-wwdr.json");
+      extensionsGmt0015("extensions-gmt0015.json");
     } catch (Exception ex) {
       ex.printStackTrace();
     }
@@ -123,107 +127,6 @@ public class ExtensionsConfCreatorDemo {
     // Extensions - general
     List<X509ExtensionType> list = new LinkedList<>();
     extensions.setExtensions(list);
-
-    // extension admission (Germany standard commonpki)
-    /*
-    AdmissionSyntax ::= SEQUENCE
-    {
-      admissionAuthority GeneralName OPTIONAL,
-      contentsOfAdmissions SEQUENCE OF Admissions
-    }
-
-    Admissions ::= SEQUENCE
-    {
-      admissionAuthority [0] EXPLICIT GeneralName OPTIONAL
-      namingAuthority [1] EXPLICIT NamingAuthority OPTIONAL
-      professionInfos SEQUENCE OF ProfessionInfo
-    }
-
-    NamingAuthority ::= SEQUENCE
-    {
-      namingAuthorityId OBJECT IDENTIFIER OPTIONAL,
-      namingAuthorityUrl IA5String OPTIONAL,
-      namingAuthorityText DirectoryString(SIZE(1..128)) OPTIONAL
-    }
-
-    ProfessionInfo ::= SEQUENCE
-    {
-      namingAuthority [0] EXPLICIT NamingAuthority OPTIONAL,
-      professionItems SEQUENCE OF DirectoryString (SIZE(1..128)),
-      professionOIDs SEQUENCE OF OBJECT IDENTIFIER OPTIONAL,
-      registrationNumber PrintableString(SIZE(1..128)) OPTIONAL,
-      addProfessionInfo OCTET STRING OPTIONAL
-    }*/
-    X509ExtensionType admissionExtn = new X509ExtensionType();
-    list.add(admissionExtn);
-
-    admissionExtn.setType(
-        createOidType(ObjectIdentifiers.Extn.id_extension_admission, "commonpki admission"));
-
-    ConstantExtnValue admissionSyntax = new ConstantExtnValue(FieldType.SEQUENCE);
-    admissionExtn.setConstant(admissionSyntax);
-    admissionSyntax.setDescription("AdmissionSyntax");
-
-    // CHECKSTYLE:SKIP
-    List<ConstantExtnValue> admissionSyntax_values = new LinkedList<>();
-    admissionSyntax.setListValue(admissionSyntax_values);
-
-    ConstantExtnValue contentsOfAdmissions = new ConstantExtnValue(FieldType.SEQUENCE_OF);
-    admissionSyntax_values.add(contentsOfAdmissions);
-    contentsOfAdmissions.setDescription("contentsOfAdmissions");
-
-    // CHECKSTYLE:SKIP
-    List<ConstantExtnValue> contentsOfAdmissions_values = new LinkedList<>();
-    contentsOfAdmissions.setListValue(contentsOfAdmissions_values);
-
-    ConstantExtnValue admissions = new ConstantExtnValue(FieldType.SEQUENCE);
-    contentsOfAdmissions_values.add(admissions);
-    admissions.setDescription("admissions");
-
-    // CHECKSTYLE:SKIP
-    List<ConstantExtnValue> admissions_values = new LinkedList<>();
-    admissions.setListValue(admissions_values);
-
-    ConstantExtnValue professionInfos = new ConstantExtnValue(FieldType.SEQUENCE_OF);
-    admissions_values.add(professionInfos);
-    professionInfos.setDescription("professionInfos");
-
-    // CHECKSTYLE:SKIP
-    List<ConstantExtnValue> professionInfos_values = new LinkedList<>();
-    professionInfos.setListValue(professionInfos_values);
-
-    ConstantExtnValue professionInfo = new ConstantExtnValue(FieldType.SEQUENCE);
-    professionInfos_values.add(professionInfo);
-    professionInfo.setDescription("professionInfo");
-
-    // CHECKSTYLE:SKIP
-    List<ConstantExtnValue> professionInfo_values = new LinkedList<>();
-    professionInfo.setListValue(professionInfo_values);
-
-    // professionItems
-    ConstantExtnValue professionItems = new ConstantExtnValue(FieldType.SEQUENCE_OF);
-    professionInfo_values.add(professionItems);
-    professionItems.setDescription("professionItems");
-
-    // CHECKSTYLE:SKIP
-    List<ConstantExtnValue> professionItems_values = new LinkedList<>();
-    professionItems.setListValue(professionItems_values);
-
-    ConstantExtnValue professionItem = new ConstantExtnValue(FieldType.UTF8String);
-    professionItems_values.add(professionItem);
-    professionItem.setDescription("professionItem");
-    professionItem.setValue("dummy 1");
-
-    professionItem = new ConstantExtnValue(FieldType.UTF8String);
-    professionItems_values.add(professionItem);
-    professionItem.setDescription("professionItem");
-    professionItem.setValue("dummy 2");
-
-    // registrationNumber
-    ConstantExtnValue registrationNumber = new ConstantExtnValue(FieldType.PrintableString);
-    professionInfo_values.add(registrationNumber);
-    registrationNumber.setDescription("registrationNumber");
-    registrationNumber.setValue("aaaab");
 
     // extension subjectDirectoryAttributes (RFC 3739)
     /*
@@ -597,6 +500,42 @@ public class ExtensionsConfCreatorDemo {
 
     marshall(extensions, destFilename);
   } // method certprofileEeComplex
+
+  private static void extensionsGmt0015(String destFilename) throws Exception {
+    ExtensionsType extensions = new ExtensionsType();
+    List<X509ExtensionType> list = new LinkedList<>();
+    extensions.setExtensions(list);
+
+    /*
+     * Extension IdentityCode
+     *   [0] 362323880212651 IMPLICIT
+     */
+    ConstantExtnValue subField = new ConstantExtnValue(FieldType.PrintableString);
+    subField.setValue("362323880212651");
+    subField.setTag(new Tag(0, false));
+
+    X509ExtensionType extn = new X509ExtensionType();
+    list.add(extn);
+    extn.setType(createOidType(Extn.id_GMT_0015_IdentityCode, null));
+    extn.setConstant(subField);
+
+    Map<ASN1ObjectIdentifier, String> extns = new HashMap<>();
+    extns.put(Extn.id_GMT_0015_InsuranceNumber, "insurance123");
+    extns.put(Extn.id_GMT_0015_ICRegistrationNumber, "cor1234");
+    extns.put(Extn.id_GMT_0015_OrganizationCode, "orgcode1234");
+    extns.put(Extn.id_GMT_0015_TaxationNumber, "taxcode1234");
+    for (ASN1ObjectIdentifier type : extns.keySet()) {
+      subField = new ConstantExtnValue(FieldType.PrintableString);
+      subField.setValue(extns.get(type));
+
+      extn = new X509ExtensionType();
+      list.add(extn);
+      extn.setType(createOidType(type, null));
+      extn.setConstant(subField);
+    }
+
+    marshall(extensions, destFilename);
+  } // method certprofileGmt0015
 
   private static DescribableOid createOidType(ASN1ObjectIdentifier oid, String description) {
     DescribableOid ret = new DescribableOid();

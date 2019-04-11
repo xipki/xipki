@@ -112,6 +112,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.DN;
+import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.TlsExtensionType;
 import org.xipki.security.X509ExtensionType.ConstantExtnValue;
 import org.xipki.security.X509ExtensionType.FieldType;
@@ -153,12 +154,32 @@ public class ProfileConfCreatorDemo {
 
   private static final Set<ASN1ObjectIdentifier> REQUEST_EXTENSIONS;
 
+  private static final Set<ASN1ObjectIdentifier> NOT_IN_SUBJECT_RDNS;
+
   static {
     REQUEST_EXTENSIONS = new HashSet<>();
     REQUEST_EXTENSIONS.add(Extension.keyUsage);
     REQUEST_EXTENSIONS.add(Extension.extendedKeyUsage);
     REQUEST_EXTENSIONS.add(Extension.subjectAlternativeName);
+    REQUEST_EXTENSIONS.add(Extension.subjectDirectoryAttributes);
     REQUEST_EXTENSIONS.add(Extension.subjectInfoAccess);
+    REQUEST_EXTENSIONS.add(Extension.qCStatements);
+    REQUEST_EXTENSIONS.add(Extension.biometricInfo);
+    REQUEST_EXTENSIONS.add(Extn.id_extension_admission);
+    REQUEST_EXTENSIONS.add(Extn.id_extension_additionalInformation);
+    REQUEST_EXTENSIONS.add(Extn.id_GMT_0015_ICRegistrationNumber);
+    REQUEST_EXTENSIONS.add(Extn.id_GMT_0015_IdentityCode);
+    REQUEST_EXTENSIONS.add(Extn.id_GMT_0015_InsuranceNumber);
+    REQUEST_EXTENSIONS.add(Extn.id_GMT_0015_OrganizationCode);
+    REQUEST_EXTENSIONS.add(Extn.id_GMT_0015_TaxationNumber);
+
+    NOT_IN_SUBJECT_RDNS = new HashSet<>();
+    NOT_IN_SUBJECT_RDNS.add(Extn.id_GMT_0015_ICRegistrationNumber);
+    NOT_IN_SUBJECT_RDNS.add(Extn.id_GMT_0015_IdentityCode);
+    NOT_IN_SUBJECT_RDNS.add(Extn.id_GMT_0015_InsuranceNumber);
+    NOT_IN_SUBJECT_RDNS.add(Extn.id_GMT_0015_OrganizationCode);
+    NOT_IN_SUBJECT_RDNS.add(Extn.id_GMT_0015_TaxationNumber);
+    NOT_IN_SUBJECT_RDNS.add(Extn.id_extension_admission);
   }
 
   private ProfileConfCreatorDemo() {
@@ -191,6 +212,7 @@ public class ProfileConfCreatorDemo {
       certprofileSyntaxExtExplicitTag("certprofile-syntax-ext-explicit-tag.json");
       certprofileExtended("certprofile-extended.json");
       certprofileAppleWwdr("certprofile-apple-wwdr.json");
+      certprofileGmt0015("certprofile-gmt0015.json");
     } catch (Exception ex) {
       ex.printStackTrace();
     }
@@ -414,7 +436,7 @@ public class ProfileConfCreatorDemo {
     SubjectInfoAccess.Access access = new SubjectInfoAccess.Access();
     subjectInfoAccess.getAccesses().add(access);
 
-    access.setAccessMethod(createOidType(ObjectIdentifiers.Extn.id_ad_caRepository));
+    access.setAccessMethod(createOidType(Extn.id_ad_caRepository));
 
     GeneralNameType accessLocation = new GeneralNameType();
     access.setAccessLocation(accessLocation);
@@ -652,7 +674,7 @@ public class ProfileConfCreatorDemo {
     list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
     list.add(createExtension(Extension.freshestCRL, false, false, null));
     list.add(createExtension(
-              ObjectIdentifiers.Extn.id_extension_pkix_ocsp_nocheck, false, false, null));
+              Extn.id_extension_pkix_ocsp_nocheck, false, false, null));
 
     // Extensions - basicConstraints
     list.add(createExtension(Extension.basicConstraints, true, true));
@@ -777,7 +799,7 @@ public class ProfileConfCreatorDemo {
         null));
 
     // Extensions - SMIMECapabilities
-    list.add(createExtension(ObjectIdentifiers.Extn.id_smimeCapabilities, true, false));
+    list.add(createExtension(Extn.id_smimeCapabilities, true, false));
     last(list).setSmimeCapabilities(createSmimeCapabilities());
 
     marshall(profile, destFilename, true);
@@ -841,7 +863,7 @@ public class ProfileConfCreatorDemo {
         new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth}));
 
     // Extensions - tlsFeature
-    list.add(createExtension(ObjectIdentifiers.Extn.id_pe_tlsfeature, true, true));
+    list.add(createExtension(Extn.id_pe_tlsfeature, true, true));
     last(list).setTlsFeature(createTlsFeature(
         TlsExtensionType.STATUS_REQUEST, TlsExtensionType.CLIENT_CERTIFICATE_URL));
 
@@ -1054,6 +1076,7 @@ public class ProfileConfCreatorDemo {
     rdnControls.add(createRdn(DN.jurisdictionOfIncorporationCountryName, 1, 1));
     rdnControls.add(createRdn(DN.jurisdictionOfIncorporationLocalityName, 1, 1));
     rdnControls.add(createRdn(DN.jurisdictionOfIncorporationStateOrProvinceName, 1, 1));
+    rdnControls.add(createRdn(Extn.id_extension_admission, 0, 99));
 
     // Extensions
     // Extensions - general
@@ -1101,7 +1124,7 @@ public class ProfileConfCreatorDemo {
     attrTypes.add(createOidType(DN.placeOfBirth));
 
     // Extension - Admission
-    list.add(createExtension(ObjectIdentifiers.Extn.id_extension_admission, true, false));
+    list.add(createExtension(Extn.id_extension_admission, true, false));
     AdmissionSyntax admissionSyntax = new AdmissionSyntax();
     last(list).setAdmissionSyntax(admissionSyntax);
 
@@ -1137,18 +1160,18 @@ public class ProfileConfCreatorDemo {
     regNum.setRegex("a*b");
 
     // restriction
-    list.add(createExtension(ObjectIdentifiers.Extn.id_extension_restriction, true, false));
+    list.add(createExtension(Extn.id_extension_restriction, true, false));
     last(list).setRestriction(
         createRestriction(DirectoryStringType.utf8String, "demo restriction"));
 
     // additionalInformation
     list.add(createExtension(
-              ObjectIdentifiers.Extn.id_extension_additionalInformation, true, false));
+              Extn.id_extension_additionalInformation, true, false));
     last(list).setAdditionalInformation(createAdditionalInformation(DirectoryStringType.utf8String,
         "demo additional information"));
 
     // validationModel
-    list.add(createExtension(ObjectIdentifiers.Extn.id_extension_validityModel, true, false));
+    list.add(createExtension(Extn.id_extension_validityModel, true, false));
     last(list).setValidityModel(
         createValidityModel(
             createOidType(new ASN1ObjectIdentifier("1.3.6.1.4.1.8301.3.5.1"), "chain")));
@@ -1187,7 +1210,7 @@ public class ProfileConfCreatorDemo {
     last(list).setSubjectInfoAccess(subjectInfoAccess);
 
     List<ASN1ObjectIdentifier> accessMethods = new LinkedList<>();
-    accessMethods.add(ObjectIdentifiers.Extn.id_ad_caRepository);
+    accessMethods.add(Extn.id_ad_caRepository);
     for (int i = 0; i < 10; i++) {
       accessMethods.add(new ASN1ObjectIdentifier("2.3.4." + (i + 1)));
     }
@@ -1685,6 +1708,69 @@ public class ProfileConfCreatorDemo {
     marshall(profile, destFilename, true);
   } // method certprofileAppleWwdr
 
+  private static void certprofileGmt0015(String destFilename) throws Exception {
+    String desc = "certprofile GMT 0015";
+    X509ProfileType profile = getBaseProfile(desc, CertLevel.EndEntity, "5y");
+
+    // Subject
+    Subject subject = profile.getSubject();
+
+    List<RdnType> rdnControls = subject.getRdns();
+    rdnControls.add(createRdn(DN.C, 1, 1));
+    rdnControls.add(createRdn(DN.O, 1, 1));
+    rdnControls.add(createRdn(DN.OU, 0, 1));
+    rdnControls.add(createRdn(DN.CN, 1, 1));
+    rdnControls.add(createRdn(Extn.id_GMT_0015_ICRegistrationNumber, 0, 1));
+    rdnControls.add(createRdn(Extn.id_GMT_0015_IdentityCode, 0, 1));
+    rdnControls.add(createRdn(Extn.id_GMT_0015_InsuranceNumber, 0, 1));
+    rdnControls.add(createRdn(Extn.id_GMT_0015_OrganizationCode, 0, 1));
+    rdnControls.add(createRdn(Extn.id_GMT_0015_TaxationNumber, 0, 1));
+
+    // Extensions
+    // Extensions - controls
+    List<ExtensionType> list = profile.getExtensions();
+    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
+    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
+    list.add(createExtension(Extension.freshestCRL, false, false, null));
+
+    // Extensions - basicConstraints
+    list.add(createExtension(Extension.basicConstraints, true, true));
+
+    // Extensions - AuthorityInfoAccess
+    list.add(createExtension(Extension.authorityInfoAccess, true, false));
+    last(list).setAuthorityInfoAccess(createAuthorityInfoAccess());
+
+    // Extensions - AuthorityKeyIdentifier
+    list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
+
+    // Extensions - keyUsage
+    list.add(createExtension(Extension.keyUsage, true, true));
+    last(list).setKeyUsage(createKeyUsage(
+        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
+            KeyUsage.keyEncipherment},
+        null));
+
+    // Extensions - extenedKeyUsage
+    list.add(createExtension(Extension.extendedKeyUsage, true, false));
+    last(list).setExtendedKeyUsage(createExtendedKeyUsage(
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth},
+        null));
+
+    // Extension id_GMT_0015_ICRegistrationNumber
+    ASN1ObjectIdentifier[] gmtOids = new ASN1ObjectIdentifier[] {
+        Extn.id_GMT_0015_ICRegistrationNumber,
+        Extn.id_GMT_0015_IdentityCode,
+        Extn.id_GMT_0015_InsuranceNumber,
+        Extn.id_GMT_0015_OrganizationCode,
+        Extn.id_GMT_0015_TaxationNumber};
+    for (ASN1ObjectIdentifier m : gmtOids) {
+      list.add(createExtension(m, true, false));
+      last(list).setPermittedInRequest(true);
+    }
+
+    marshall(profile, destFilename, true);
+  } // method certprofileGmt0012
+
   private static void certprofileExtended(String destFilename) throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile extended", CertLevel.EndEntity, "5y");
 
@@ -1746,14 +1832,14 @@ public class ProfileConfCreatorDemo {
         new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth}));
 
     // Extensions - tlsFeature
-    list.add(createExtension(ObjectIdentifiers.Extn.id_pe_tlsfeature, true, true));
+    list.add(createExtension(Extn.id_pe_tlsfeature, true, true));
     last(list).setTlsFeature(
         createTlsFeature(
             new TlsExtensionType[]{TlsExtensionType.STATUS_REQUEST,
                 TlsExtensionType.CLIENT_CERTIFICATE_URL}));
 
     // Extensions - SMIMECapabilities
-    list.add(createExtension(ObjectIdentifiers.Extn.id_smimeCapabilities, true, false));
+    list.add(createExtension(Extn.id_smimeCapabilities, true, false));
     last(list).setSmimeCapabilities(createSmimeCapabilities());
 
     // Extensions - 1.2.3.4.1 (demo_without_conf)
@@ -1801,6 +1887,10 @@ public class ProfileConfCreatorDemo {
 
     if (StringUtil.isNotBlank(group)) {
       ret.setGroup(group);
+    }
+
+    if (NOT_IN_SUBJECT_RDNS.contains(type)) {
+      ret.setNotInSubject(Boolean.TRUE);
     }
 
     return ret;
@@ -1996,17 +2086,17 @@ public class ProfileConfCreatorDemo {
     QcStatementType statement = new QcStatementType();
 
     // QcCompliance
-    statement.setStatementId(createOidType(ObjectIdentifiers.Extn.id_etsi_qcs_QcCompliance));
+    statement.setStatementId(createOidType(Extn.id_etsi_qcs_QcCompliance));
     extValue.getQcStatements().add(statement);
 
     // QC SCD
     statement = new QcStatementType();
-    statement.setStatementId(createOidType(ObjectIdentifiers.Extn.id_etsi_qcs_QcSSCD));
+    statement.setStatementId(createOidType(Extn.id_etsi_qcs_QcSSCD));
     extValue.getQcStatements().add(statement);
 
     // QC RetentionPeriod
     statement = new QcStatementType();
-    statement.setStatementId(createOidType(ObjectIdentifiers.Extn.id_etsi_qcs_QcRetentionPeriod));
+    statement.setStatementId(createOidType(Extn.id_etsi_qcs_QcRetentionPeriod));
     QcStatementValueType statementValue = new QcStatementValueType();
     statementValue.setQcRetentionPeriod(10);
     statement.setStatementValue(statementValue);
@@ -2014,7 +2104,7 @@ public class ProfileConfCreatorDemo {
 
     // QC LimitValue
     statement = new QcStatementType();
-    statement.setStatementId(createOidType(ObjectIdentifiers.Extn.id_etsi_qcs_QcLimitValue));
+    statement.setStatementId(createOidType(Extn.id_etsi_qcs_QcLimitValue));
     statementValue = new QcStatementValueType();
 
     QcEuLimitValueType euLimit = new QcEuLimitValueType();
@@ -2037,7 +2127,7 @@ public class ProfileConfCreatorDemo {
 
     // QC PDS
     statement = new QcStatementType();
-    statement.setStatementId(createOidType(ObjectIdentifiers.Extn.id_etsi_qcs_QcPDS));
+    statement.setStatementId(createOidType(Extn.id_etsi_qcs_QcPDS));
     extValue.getQcStatements().add(statement);
     statementValue = new QcStatementValueType();
     statement.setStatementValue(statementValue);

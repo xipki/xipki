@@ -246,6 +246,12 @@ Features
     - SubjectKeyIdentifier (RFC 5280)
     - TLSFeature (RFC 7633)
     - ValidityModel (German national standard CommonPKI)
+    - GM/T 0015 IdentityCode (个人身份标识码, Chinese Standard GM/T 0015-2012 基于SM2密码算法的数字证书格式)
+    - GM/T 0015 InsuranceNumber (个人社会保险号, Chinese Standard GM/T 0015-2012 基于SM2密码算法的数字证书格式)
+    - GM/T 0015 ICRegistrationNumber (企业工商注册号, Chinese Standard GM/T 0015-2012 基于SM2密码算法的数字证书格式)
+    - GM/T 0015 OrganizationCode (企业组织机构代码, Chinese Standard GM/T 0015-2012 基于SM2密码算法的数字证书格式)
+    - GM/T 0015 TaxationNumber (企业税号, Chinese Standard GM/T 0015-2012 基于SM2密码算法的数字证书格式)
+
  - Management of multiple CAs in one software instance
  - Support of database cluster
  - Multiple software instances (all can be in active mode) for the same CA

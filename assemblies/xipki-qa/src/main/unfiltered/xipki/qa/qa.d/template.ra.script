@@ -211,7 +211,7 @@ xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --p12 output/ee-complex1.p12 --password 1234 \
   --outform $OUTFORM \
   --out output/ee-complex1.csr \
-  --subject "UID=abc-def,CN=ee-complex1,O=xipki,C=DE,1.3.6.1.4.1.311.60.2.1.3=CN,1.3.6.1.4.1.311.60.2.1.2=Guandong,1.3.6.1.4.1.311.60.2.1.1=Shenzhen" \
+  --subject "UID=abc-def,CN=ee-complex1,O=xipki,C=DE,1.3.6.1.4.1.311.60.2.1.3=CN,1.3.6.1.4.1.311.60.2.1.2=Guandong,1.3.6.1.4.1.311.60.2.1.1=Shenzhen,1.3.36.8.3.3=registrationNumber\=aaab" \
   --qc-eu-limit EUR:150:15 \
   --biometric-type 0 \
   --biometric-hash SHA256 \
@@ -253,7 +253,7 @@ xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --p12 output/ee-complex2.p12 --password 1234 \
   --outform $OUTFORM \
   --out output/ee-complex2.csr \
-  --subject "UID=abc-def,CN=ee-complex2,O=xipki,C=DE,1.3.6.1.4.1.311.60.2.1.3=CN,1.3.6.1.4.1.311.60.2.1.2=Guandong,1.3.6.1.4.1.311.60.2.1.1=Shenzhen" \
+  --subject "UID=abc-def,CN=ee-complex2,O=xipki,C=DE,1.3.6.1.4.1.311.60.2.1.3=CN,1.3.6.1.4.1.311.60.2.1.2=Guandong,1.3.6.1.4.1.311.60.2.1.1=Shenzhen,1.3.36.8.3.3=registrationNumber\=aaab" \
   --dateOfBirth 19810102 \
   --postalAddress "street example 1" \
   --postalAddress "D-69112 Heidelberg" \
@@ -526,6 +526,41 @@ xi:cmp-csr-enroll --csr output/apple-wwdr1.csr \
 
 xi:update-cert-p12 --p12 output/apple-wwdr1.p12 --password 1234 \
   --cert output/apple-wwdr1.crt \
+  --ca-cert output/subcawithcrl1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate gmt0015_1
+
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/gmt0015_1.p12 --password 1234 \
+  --subject "CN=gmt0015_1,OU=my OU,O=my O,C=CN" \
+  --outform $OUTFORM \
+  --out output/gmt0015_1.csr \
+  --extra-extensions-file xipki/qa/extensions/extensions-gmt0015.json
+
+xi:cmp-csr-enroll --csr output/gmt0015_1.csr \
+  --outform $OUTFORM \
+  --out output/gmt0015_1.crt --profile gmt0015
+
+xi:update-cert-p12 --p12 output/gmt0015_1.p12 --password 1234 \
+  --cert output/gmt0015_1.crt \
+  --ca-cert output/subcawithcrl1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate gmt0015_2
+
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/gmt0015_2.p12 --password 1234 \
+  --subject "CN=gmt0015_2,OU=my OU,O=my O,C=CN,1.2.156.10260.4.1.1=[0]362323880212651,1.2.156.10260.4.1.2=insurance123,1.2.156.10260.4.1.3=cor1234,1.2.156.10260.4.1.4=orgcode1234,1.2.156.10260.4.1.5=taxcode1234" \
+  --outform $OUTFORM \
+  --out output/gmt0015_2.csr
+
+xi:cmp-csr-enroll --csr output/gmt0015_2.csr \
+  --outform $OUTFORM \
+  --out output/gmt0015_2.crt --profile gmt0015
+
+xi:update-cert-p12 --p12 output/gmt0015_2.p12 --password 1234 \
+  --cert output/gmt0015_2.crt \
   --ca-cert output/subcawithcrl1.crt \
   --ca-cert output/rootca1.crt
 

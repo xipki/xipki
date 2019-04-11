@@ -67,6 +67,7 @@ import org.xipki.ca.api.profile.Certprofile.KeyUsageControl;
 import org.xipki.ca.api.profile.Certprofile.SubjectInfo;
 import org.xipki.ca.api.profile.Certprofile.X509CertVersion;
 import org.xipki.ca.api.profile.CertprofileException;
+import org.xipki.ca.api.profile.ExtensionSpec;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.KeypairGenControl;
@@ -87,66 +88,6 @@ import org.xipki.util.Validity;
  */
 
 class IdentifiedCertprofile implements Closeable {
-
-  private static final Set<ASN1ObjectIdentifier> CRITICAL_ONLY_EXTENSION_TYPES;
-
-  private static final Set<ASN1ObjectIdentifier> CA_CRITICAL_ONLY_EXTENSION_TYPES;
-
-  private static final Set<ASN1ObjectIdentifier> NONCRITICAL_ONLY_EXTENSION_TYPES;
-
-  private static final Set<ASN1ObjectIdentifier> CA_ONLY_EXTENSION_TYPES;
-
-  private static final Set<ASN1ObjectIdentifier> NONE_REQUEST_EXTENSION_TYPES;
-
-  private static final Set<ASN1ObjectIdentifier> REQUIRED_CA_EXTENSION_TYPES;
-
-  private static final Set<ASN1ObjectIdentifier> REQUIRED_EE_EXTENSION_TYPES;
-
-  static {
-    CRITICAL_ONLY_EXTENSION_TYPES = new HashSet<>();
-    CRITICAL_ONLY_EXTENSION_TYPES.add(Extension.keyUsage);
-    CRITICAL_ONLY_EXTENSION_TYPES.add(Extension.policyMappings);
-    CRITICAL_ONLY_EXTENSION_TYPES.add(Extension.nameConstraints);
-    CRITICAL_ONLY_EXTENSION_TYPES.add(Extension.policyConstraints);
-    CRITICAL_ONLY_EXTENSION_TYPES.add(Extension.inhibitAnyPolicy);
-    CRITICAL_ONLY_EXTENSION_TYPES.add(ObjectIdentifiers.Extn.id_pe_tlsfeature);
-
-    CA_CRITICAL_ONLY_EXTENSION_TYPES = new HashSet<>();
-    CA_CRITICAL_ONLY_EXTENSION_TYPES.add(Extension.basicConstraints);
-
-    NONCRITICAL_ONLY_EXTENSION_TYPES = new HashSet<>();
-    NONCRITICAL_ONLY_EXTENSION_TYPES.add(Extension.authorityKeyIdentifier);
-    NONCRITICAL_ONLY_EXTENSION_TYPES.add(Extension.subjectKeyIdentifier);
-    NONCRITICAL_ONLY_EXTENSION_TYPES.add(Extension.issuerAlternativeName);
-    NONCRITICAL_ONLY_EXTENSION_TYPES.add(Extension.subjectDirectoryAttributes);
-    NONCRITICAL_ONLY_EXTENSION_TYPES.add(Extension.freshestCRL);
-    NONCRITICAL_ONLY_EXTENSION_TYPES.add(Extension.authorityInfoAccess);
-    NONCRITICAL_ONLY_EXTENSION_TYPES.add(Extension.subjectInfoAccess);
-
-    CA_ONLY_EXTENSION_TYPES = new HashSet<>();
-    CA_ONLY_EXTENSION_TYPES.add(Extension.policyMappings);
-    CA_ONLY_EXTENSION_TYPES.add(Extension.nameConstraints);
-    CA_ONLY_EXTENSION_TYPES.add(Extension.policyConstraints);
-    CA_ONLY_EXTENSION_TYPES.add(Extension.inhibitAnyPolicy);
-
-    NONE_REQUEST_EXTENSION_TYPES = new HashSet<ASN1ObjectIdentifier>();
-    NONE_REQUEST_EXTENSION_TYPES.add(Extension.subjectKeyIdentifier);
-    NONE_REQUEST_EXTENSION_TYPES.add(Extension.authorityKeyIdentifier);
-    NONE_REQUEST_EXTENSION_TYPES.add(Extension.issuerAlternativeName);
-    NONE_REQUEST_EXTENSION_TYPES.add(Extension.cRLDistributionPoints);
-    NONE_REQUEST_EXTENSION_TYPES.add(Extension.freshestCRL);
-    NONE_REQUEST_EXTENSION_TYPES.add(Extension.basicConstraints);
-    NONE_REQUEST_EXTENSION_TYPES.add(Extension.inhibitAnyPolicy);
-
-    REQUIRED_CA_EXTENSION_TYPES = new HashSet<>();
-    REQUIRED_CA_EXTENSION_TYPES.add(Extension.basicConstraints);
-    REQUIRED_CA_EXTENSION_TYPES.add(Extension.subjectKeyIdentifier);
-    REQUIRED_CA_EXTENSION_TYPES.add(Extension.keyUsage);
-
-    REQUIRED_EE_EXTENSION_TYPES = new HashSet<>();
-    REQUIRED_EE_EXTENSION_TYPES.add(Extension.authorityKeyIdentifier);
-    REQUIRED_EE_EXTENSION_TYPES.add(Extension.subjectKeyIdentifier);
-  } // end static
 
   private final MgmtEntry.Certprofile dbEntry;
   private final Certprofile certprofile;
@@ -268,6 +209,18 @@ class IdentifiedCertprofile implements Closeable {
       }
     }
 
+    Map<ASN1ObjectIdentifier, Extension> requestedExtns = new HashMap<>();
+    // remove the request extensions which are not permitted in the request
+    if (requestedExtensions != null) {
+      ASN1ObjectIdentifier[] oids = requestedExtensions.getExtensionOIDs();
+      for (ASN1ObjectIdentifier m : oids) {
+        ExtensionControl control = controls.get(m);
+        if (control == null || control.isRequest()) {
+          requestedExtns.put(m, requestedExtensions.getExtension(m));
+        }
+      }
+    }
+
     // SubjectKeyIdentifier
     ASN1ObjectIdentifier extType = Extension.subjectKeyIdentifier;
     ExtensionControl extControl = controls.remove(extType);
@@ -385,9 +338,7 @@ class IdentifiedCertprofile implements Closeable {
       }
 
       // the optional KeyUsage will only be set if requested explicitly
-      if (requestedExtensions != null && extControl.isRequest()) {
-        addRequestedKeyusage(usages, requestedExtensions, usageOccs);
-      }
+      addRequestedKeyusage(usages, requestedExtns, usageOccs);
 
       org.bouncycastle.asn1.x509.KeyUsage value = X509Util.createKeyUsage(usages);
       addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
@@ -406,9 +357,7 @@ class IdentifiedCertprofile implements Closeable {
       }
 
       // the optional ExtKeyUsage will only be set if requested explicitly
-      if (requestedExtensions != null && extControl.isRequest()) {
-        addRequestedExtKeyusage(usages, requestedExtensions, usageOccs);
-      }
+      addRequestedExtKeyusage(usages, requestedExtns, usageOccs);
 
       if (extControl.isCritical()
           && usages.contains(ObjectIdentifiers.XKU.id_kp_anyExtendedKeyUsage)) {
@@ -432,11 +381,8 @@ class IdentifiedCertprofile implements Closeable {
     extType = Extension.subjectInfoAccess;
     extControl = controls.remove(extType);
     if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
-      ASN1Sequence value = null;
-      if (requestedExtensions != null && extControl.isRequest()) {
-        value = createSubjectInfoAccess(requestedExtensions,
+      ASN1Sequence value = createSubjectInfoAccess(requestedExtns,
             certprofile.getSubjectInfoAccessModes());
-      }
       addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
     }
 
@@ -452,7 +398,7 @@ class IdentifiedCertprofile implements Closeable {
         continue;
       }
 
-      if (requestedExtensions.getExtension(extnType) != null) {
+      if (requestedExtns.get(extnType) != null) {
         // contained in the request
         continue;
       }
@@ -470,26 +416,27 @@ class IdentifiedCertprofile implements Closeable {
     }
 
     ExtensionValues subvalues = certprofile.getExtensions(Collections.unmodifiableMap(controls),
-        requestedSubject, grantedSubject, requestedExtensions, notBefore, notAfter, publicCaInfo);
+        requestedSubject, grantedSubject, requestedExtns, notBefore, notAfter, publicCaInfo);
 
     Set<ASN1ObjectIdentifier> extTypes = new HashSet<>(controls.keySet());
     for (ASN1ObjectIdentifier type : extTypes) {
-      extControl = controls.remove(type);
+      extControl = controls.get(type);
       boolean addMe = addMe(type, extControl, neededExtTypes, wantedExtTypes);
       if (addMe) {
-        ExtensionValue value = null;
-        if (requestedExtensions != null && extControl.isRequest()) {
-          Extension reqExt = requestedExtensions.getExtension(type);
+        ExtensionValue value = subvalues.getExtensionValue(type);
+        if (value == null && requestedExtns != null && extControl.isRequest()) {
+          Extension reqExt = requestedExtns.get(type);
           if (reqExt != null) {
             value = new ExtensionValue(extControl.isCritical(), reqExt.getParsedValue());
           }
         }
 
-        if (value == null) {
-          value = subvalues.getExtensionValue(type);
+        if (value != null) {
+          addExtension(values, type, value, extControl, neededExtTypes, wantedExtTypes);
+          controls.remove(type);
         }
-
-        addExtension(values, type, value, extControl, neededExtTypes, wantedExtTypes);
+      } else {
+        controls.remove(type);
       }
     }
 
@@ -580,7 +527,7 @@ class IdentifiedCertprofile implements Closeable {
 
     // make sure that non-request extensions are not permitted in requests
     Set<ASN1ObjectIdentifier> set = new HashSet<>();
-    for (ASN1ObjectIdentifier type : NONE_REQUEST_EXTENSION_TYPES) {
+    for (ASN1ObjectIdentifier type : ExtensionSpec.getNonRequestExtensionTypes()) {
       ExtensionControl control = controls.get(type);
       if (control != null && control.isRequest()) {
         set.add(type);
@@ -598,7 +545,7 @@ class IdentifiedCertprofile implements Closeable {
     set.clear();
     if (!ca) {
       set.clear();
-      for (ASN1ObjectIdentifier type : CA_ONLY_EXTENSION_TYPES) {
+      for (ASN1ObjectIdentifier type : ExtensionSpec.getCaOnlyExtensionTypes()) {
         if (controls.containsKey(type)) {
           set.add(type);
         }
@@ -613,12 +560,12 @@ class IdentifiedCertprofile implements Closeable {
     set.clear();
     for (ASN1ObjectIdentifier type : controls.keySet()) {
       ExtensionControl control = controls.get(type);
-      if (CRITICAL_ONLY_EXTENSION_TYPES.contains(type)) {
+      if (ExtensionSpec.getCriticalOnlyExtensionTypes().contains(type)) {
         if (!control.isCritical()) {
           set.add(type);
         }
       }
-      if (ca && CA_CRITICAL_ONLY_EXTENSION_TYPES.contains(type)) {
+      if (ca && ExtensionSpec.getCaCriticalOnlyExtensionTypes().contains(type)) {
         if (!control.isCritical()) {
           set.add(type);
         }
@@ -634,7 +581,7 @@ class IdentifiedCertprofile implements Closeable {
     set.clear();
     for (ASN1ObjectIdentifier type : controls.keySet()) {
       ExtensionControl control = controls.get(type);
-      if (NONCRITICAL_ONLY_EXTENSION_TYPES.contains(type)) {
+      if (ExtensionSpec.getNonCriticalOnlyExtensionTypes().contains(type)) {
         if (control.isCritical()) {
           set.add(type);
         }
@@ -648,8 +595,8 @@ class IdentifiedCertprofile implements Closeable {
 
     // make sure that required extensions are present
     set.clear();
-    Set<ASN1ObjectIdentifier> requiredTypes = ca ? REQUIRED_CA_EXTENSION_TYPES
-        : REQUIRED_EE_EXTENSION_TYPES;
+    Set<ASN1ObjectIdentifier> requiredTypes = ca ? ExtensionSpec.getRequiredCaExtensionTypes()
+        : ExtensionSpec.getRequiredEeExtensionTypes();
 
     for (ASN1ObjectIdentifier type : requiredTypes) {
       ExtensionControl extCtrl = controls.get(type);
@@ -750,9 +697,10 @@ class IdentifiedCertprofile implements Closeable {
     return neededExtTypes.contains(extType) || wantedExtTypes.contains(extType);
   } // method addMe
 
-  private static void addRequestedKeyusage(Set<KeyUsage> usages, Extensions requestedExtensions,
+  private static void addRequestedKeyusage(Set<KeyUsage> usages,
+      Map<ASN1ObjectIdentifier, Extension> requestedExtensions,
       Set<KeyUsageControl> usageOccs) {
-    Extension extension = requestedExtensions.getExtension(Extension.keyUsage);
+    Extension extension = requestedExtensions.get(Extension.keyUsage);
     if (extension == null) {
       return;
     }
@@ -771,8 +719,8 @@ class IdentifiedCertprofile implements Closeable {
   } // method addRequestedKeyusage
 
   private static void addRequestedExtKeyusage(List<ASN1ObjectIdentifier> usages,
-      Extensions requestedExtensions, Set<ExtKeyUsageControl> usageOccs) {
-    Extension extension = requestedExtensions.getExtension(Extension.extendedKeyUsage);
+      Map<ASN1ObjectIdentifier, Extension> requestedExtensions, Set<ExtKeyUsageControl> usageOccs) {
+    Extension extension = requestedExtensions.get(Extension.extendedKeyUsage);
     if (extension == null) {
       return;
     }
@@ -789,14 +737,19 @@ class IdentifiedCertprofile implements Closeable {
     }
   } // method addRequestedExtKeyusage
 
-  private static ASN1Sequence createSubjectInfoAccess(Extensions requestedExtensions,
+  private static ASN1Sequence createSubjectInfoAccess(
+      Map<ASN1ObjectIdentifier, Extension> requestedExtensions,
       Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> modes) throws BadCertTemplateException {
     if (modes == null) {
       return null;
     }
 
-    ASN1Encodable extValue = requestedExtensions.getExtensionParsedValue(
-        Extension.subjectInfoAccess);
+    Extension extn = requestedExtensions.get(Extension.subjectInfoAccess);
+    if (extn == null) {
+      return null;
+    }
+
+    ASN1Encodable extValue = extn.getParsedValue();
     if (extValue == null) {
       return null;
     }

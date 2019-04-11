@@ -107,7 +107,7 @@ public abstract class BaseCertprofile extends Certprofile {
 
     for (ASN1ObjectIdentifier type : scontrol.getTypes()) {
       RdnControl control = scontrol.getControl(type);
-      if (control == null) {
+      if (control == null || control.isNotInSubject()) {
         continue;
       }
 

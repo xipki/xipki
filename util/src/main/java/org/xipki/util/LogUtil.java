@@ -46,6 +46,12 @@ public class LogUtil {
     } else {
       log.error("{}: {}", th.getClass().getName(), th.getMessage());
     }
+    if (th instanceof RuntimeException) {
+      log.error("Exception", th);
+    } else {
+      log.debug("Exception", th);
+    }
+
     log.debug("Exception", th);
   }
 
@@ -63,7 +69,12 @@ public class LogUtil {
     } else {
       log.error("{}, {}: {}", msg, th.getClass().getName(), th.getMessage());
     }
-    log.debug(msg, th);
+
+    if (th instanceof RuntimeException) {
+      log.error(msg, th);
+    } else {
+      log.debug(msg, th);
+    }
   }
 
   public static void warn(Logger log, Throwable th) {
@@ -80,7 +91,12 @@ public class LogUtil {
     } else {
       log.warn("{}: {}", th.getClass().getName(), th.getMessage());
     }
-    log.debug("Exception", th);
+
+    if (th instanceof RuntimeException) {
+      log.warn("Exception", th);
+    } else {
+      log.debug("Exception", th);
+    }
   }
 
   public static void warn(Logger log, Throwable th, String msg) {
@@ -97,7 +113,11 @@ public class LogUtil {
     } else {
       log.warn("{}, {}: {}", msg, th.getClass().getName(), th.getMessage());
     }
-    log.debug(msg, th);
+    if (th instanceof RuntimeException) {
+      log.warn(msg, th);
+    } else {
+      log.debug(msg, th);
+    }
   }
 
   /**

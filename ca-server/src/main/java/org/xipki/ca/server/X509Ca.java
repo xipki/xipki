@@ -1690,7 +1690,7 @@ public class X509Ca implements Closeable {
         exception = new OperationExceptionWithIndex(i, new OperationException(SYSTEM_FAILURE, th));
       } finally {
         if (!successful) {
-          LOG.warn("    FAILED generateCertificate: CA={}, profile={}, subject='{}'",
+          LOG.error("    FAILED generateCertificate: CA={}, profile={}, subject='{}'",
               caIdent.getName(), certprofilIdent.getName(), subjectText);
         }
       }

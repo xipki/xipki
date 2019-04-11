@@ -16,7 +16,7 @@ list = [ cross1 ocsp1 ocsp2 multiple-ous1 multiple-ous2 multi-valued-rdn1 qc1 \
   ee-complex1 ee-complex2 smime1 smime-legacy1 tls1 tls-neg tls-inc-sn1 tls-inc-sn1-1 tls-inc-sn1-2 \
   tls2 rest-tls1 tls-c1 tls-c2 max-time1 fixed-partial-subject1 fixed-partial-subject2 \
   constant-ext1 constant-ext-implicit-tag1 constant-ext-explicit-tag1 \
-  syntax-ext1 syntax-ext-implicit-tag1 syntax-ext-explicit-tag1 apple-wwdr1 ]
+  syntax-ext1 syntax-ext-implicit-tag1 syntax-ext-explicit-tag1 apple-wwdr1 gmt0015_1 gmt0015_2 ]
 
 each ($list) {
   filename = $it

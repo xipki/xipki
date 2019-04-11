@@ -60,6 +60,27 @@ import com.alibaba.fastjson.annotation.JSONField;
 
 public class X509ExtensionType extends ValidatableConf {
 
+  public static class ExtensionsType extends ValidatableConf {
+
+    private List<X509ExtensionType> extensions;
+
+    public List<X509ExtensionType> getExtensions() {
+      return extensions;
+    }
+
+    public void setExtensions(List<X509ExtensionType> extensions) {
+      this.extensions = extensions;
+    }
+
+    @Override
+    public void validate() throws InvalidConfException {
+      for (X509ExtensionType m : extensions) {
+        m.validate();
+      }
+    }
+
+  }
+
   private DescribableOid type;
 
   private ConstantExtnValue constant;

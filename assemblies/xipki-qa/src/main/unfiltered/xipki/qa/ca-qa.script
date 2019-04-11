@@ -48,6 +48,12 @@ caqa:check-cert --issuer subcawithcrl --profile max-time \
 caqa:check-cert --issuer subcawithcrl --profile apple-wwdr \
   --csr output/apple-wwdr1.csr --cert output/apple-wwdr1.crt
 
+caqa:check-cert --issuer subcawithcrl --profile gmt0015 \
+  --csr output/gmt0015_1.csr --cert output/gmt0015_1.crt
+
+caqa:check-cert --issuer subcawithcrl --profile gmt0015 \
+  --csr output/gmt0015_2.csr --cert output/gmt0015_2.crt
+
 ## subca
 
 caqa:check-cert --issuer subca --profile smime \

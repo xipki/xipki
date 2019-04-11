@@ -1,48 +1,6 @@
 {
 	"extensions":[{
 		"constant":{
-			"type":"SEQUENCE",
-			"description":"AdmissionSyntax",
-			"listValue":[{
-				"type":"SEQUENCE OF",
-				"description":"contentsOfAdmissions",
-				"listValue":[{
-					"type":"SEQUENCE",
-					"description":"admissions",
-					"listValue":[{
-						"type":"SEQUENCE OF",
-						"description":"professionInfos",
-						"listValue":[{
-							"type":"SEQUENCE",
-							"description":"professionInfo",
-							"listValue":[{
-								"type":"SEQUENCE OF",
-								"description":"professionItems",
-								"listValue":[{
-									"type":"UTF8String",
-									"description":"professionItem",
-									"value":"dummy 1"
-								},{
-									"type":"UTF8String",
-									"description":"professionItem",
-									"value":"dummy 2"
-								}]
-							},{
-								"type":"PrintableString",
-								"description":"registrationNumber",
-								"value":"aaaab"
-							}]
-						}]
-					}]
-				}]
-			}]
-		},
-		"type":{
-			"oid":"1.3.36.8.3.3",
-			"description":"commonpki admission"
-		}
-	},{
-		"constant":{
 			"type":"SEQUENCE OF",
 			"listValue":[{
 				"type":"SEQUENCE",

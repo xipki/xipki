@@ -72,7 +72,8 @@
 			"multi-valued-rdn",
 			"max-time",
 			"tlsa",
-			"apple-wwdr"
+			"apple-wwdr",
+			"gmt0015"
 		],
 		"requestors":[{
 			"ra":true,

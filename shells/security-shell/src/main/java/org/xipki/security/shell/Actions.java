@@ -96,6 +96,7 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.X509ExtensionType;
+import org.xipki.security.X509ExtensionType.ExtensionsType;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
@@ -110,10 +111,8 @@ import org.xipki.util.CollectionUtil;
 import org.xipki.util.CompareUtil;
 import org.xipki.util.DateUtil;
 import org.xipki.util.Hex;
-import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
-import org.xipki.util.ValidatableConf;
 
 import com.alibaba.fastjson.JSON;
 
@@ -1304,27 +1303,6 @@ public class Actions {
 
     protected String toUtcTimeyyyyMMddhhmmssZ(Date date) {
       return DateUtil.toUtcTimeyyyyMMddhhmmss(date) + "Z";
-    }
-
-  }
-
-  public static class ExtensionsType extends ValidatableConf {
-
-    private List<X509ExtensionType> extensions;
-
-    public List<X509ExtensionType> getExtensions() {
-      return extensions;
-    }
-
-    public void setExtensions(List<X509ExtensionType> extensions) {
-      this.extensions = extensions;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      for (X509ExtensionType m : extensions) {
-        m.validate();
-      }
     }
 
   }

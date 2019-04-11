@@ -144,6 +144,12 @@ public class Subject extends ValidatableConf {
     @JSONField(ordinal = 10)
     private String group;
 
+    /**
+     * This RDN is for other purpose, will not contained in the Subject field of certificate
+     */
+    @JSONField(ordinal = 11)
+    private Boolean notInSubject;
+
     @JSONField(ordinal = 11)
     private ValueType value;
 
@@ -233,6 +239,14 @@ public class Subject extends ValidatableConf {
 
     public void setValue(ValueType value) {
       this.value = value;
+    }
+
+    public Boolean getNotInSubject() {
+      return notInSubject;
+    }
+
+    public void setNotInSubject(Boolean notInSubject) {
+      this.notInSubject = notInSubject;
     }
 
     @Override

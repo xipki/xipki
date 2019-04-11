@@ -1,12 +1,12 @@
 {
 	"metadata":{
-		"details":"certprofile qc",
+		"details":"certprofile GMT 0015",
 		"category":"A"
 	},
 	"version":"v3",
 	"certLevel":"EndEntity",
 	"maxSize":3000,
-	"validity":"1000d",
+	"validity":"5y",
 	"notBeforeTime":"current",
 	"serialNumberInReq":false,
 	"keypairGeneration":{
@@ -105,24 +105,9 @@
 			"maxOccurs":1
 		},{
 			"type":{
-				"oid":"2.5.4.97",
-				"description":"organizationIdentifier"
-			},
-			"minOccurs":0,
-			"maxOccurs":1
-		},{
-			"type":{
 				"oid":"2.5.4.11",
 				"description":"ou"
 			},
-			"minOccurs":0,
-			"maxOccurs":1
-		},{
-			"type":{
-				"oid":"2.5.4.5",
-				"description":"serialNumber"
-			},
-			"regex":":NUMBER",
 			"minOccurs":0,
 			"maxOccurs":1
 		},{
@@ -132,6 +117,46 @@
 			},
 			"minOccurs":1,
 			"maxOccurs":1
+		},{
+			"type":{
+				"oid":"1.2.156.10260.4.1.3",
+				"description":"GMT 0015 ICRegistrationNumber"
+			},
+			"minOccurs":0,
+			"maxOccurs":1,
+			"notInSubject":true
+		},{
+			"type":{
+				"oid":"1.2.156.10260.4.1.1",
+				"description":"GMT 0015 IdentityCode"
+			},
+			"minOccurs":0,
+			"maxOccurs":1,
+			"notInSubject":true
+		},{
+			"type":{
+				"oid":"1.2.156.10260.4.1.2",
+				"description":"GMT 0015 InsuranceNumber"
+			},
+			"minOccurs":0,
+			"maxOccurs":1,
+			"notInSubject":true
+		},{
+			"type":{
+				"oid":"1.2.156.10260.4.1.4",
+				"description":"GMT 0015 OrganizationCode"
+			},
+			"minOccurs":0,
+			"maxOccurs":1,
+			"notInSubject":true
+		},{
+			"type":{
+				"oid":"1.2.156.10260.4.1.5",
+				"description":"GMT 0015 TaxationNumber"
+			},
+			"minOccurs":0,
+			"maxOccurs":1,
+			"notInSubject":true
 		}]
 	},
 	"subjectToSubjectAltNames":[],
@@ -164,12 +189,9 @@
 			"oid":"2.5.29.19",
 			"description":"basicConstraints"
 		},
-		"critical":false,
+		"critical":true,
 		"required":true,
-		"permittedInRequest":false,
-		"basicConstrains":{
-			"pathLen":1
-		}
+		"permittedInRequest":false
 	},{
 		"type":{
 			"oid":"1.3.6.1.5.5.7.1.1",
@@ -201,7 +223,13 @@
 		"keyUsage":{
 			"usages":[{
 				"required":true,
-				"value":"contentCommitment"
+				"value":"digitalSignature"
+			},{
+				"required":true,
+				"value":"dataEncipherment"
+			},{
+				"required":true,
+				"value":"keyEncipherment"
 			}]
 		}
 	},{
@@ -209,97 +237,55 @@
 			"oid":"2.5.29.37",
 			"description":"extendedKeyUsage"
 		},
-		"critical":true,
+		"critical":false,
 		"required":true,
 		"permittedInRequest":true,
 		"extendedKeyUsage":{
 			"usages":[{
 				"required":true,
-				"oid":"1.3.6.1.5.5.7.3.8",
-				"description":"TimeStamping"
+				"oid":"1.3.6.1.5.5.7.3.2",
+				"description":"TLS WWW client authentication"
 			}]
 		}
 	},{
 		"type":{
-			"oid":"2.5.29.16",
-			"description":"privateKeyUsagePeriod"
+			"oid":"1.2.156.10260.4.1.3",
+			"description":"GMT 0015 ICRegistrationNumber"
 		},
 		"critical":false,
 		"required":true,
-		"permittedInRequest":false,
-		"privateKeyUsagePeriod":{
-			"validity":"3y"
-		}
+		"permittedInRequest":true
 	},{
 		"type":{
-			"oid":"1.3.6.1.5.5.7.1.3",
-			"description":"qCStatements"
+			"oid":"1.2.156.10260.4.1.1",
+			"description":"GMT 0015 IdentityCode"
 		},
 		"critical":false,
 		"required":true,
-		"permittedInRequest":true,
-		"qcStatements":{
-			"qcStatements":[{
-				"statementId":{
-					"oid":"0.4.0.1862.1.1",
-					"description":"etsi-qcs-QcCompliance"
-				}
-			},{
-				"statementId":{
-					"oid":"0.4.0.1862.1.4",
-					"description":"etsi-qcs-QcSSCD"
-				}
-			},{
-				"statementId":{
-					"oid":"0.4.0.1862.1.3",
-					"description":"etsi-qcs-QcRetentionPeriod"
-				},
-				"statementValue":{
-					"qcRetentionPeriod":10
-				}
-			},{
-				"statementId":{
-					"oid":"0.4.0.1862.1.2",
-					"description":"etsi-qcs-QcLimitValue"
-				},
-				"statementValue":{
-					"qcEuLimitValue":{
-						"currency":"EUR",
-						"amount":{
-							"min":100,
-							"max":100
-						},
-						"exponent":{
-							"min":10,
-							"max":10
-						}
-					}
-				}
-			},{
-				"statementId":{
-					"oid":"0.4.0.1862.1.5"
-				},
-				"statementValue":{
-					"pdsLocations":[{
-						"url":"http://pki.example.org/pds/en",
-						"language":"en"
-					},{
-						"url":"http://pki.example.org/pds/de",
-						"language":"de"
-					}]
-				}
-			},{
-				"statementId":{
-					"oid":"1.2.3.4.5",
-					"description":"dummy"
-				},
-				"statementValue":{
-					"constant":{
-						"value":"BQA=",
-						"description":"DER NULL"
-					}
-				}
-			}]
-		}
+		"permittedInRequest":true
+	},{
+		"type":{
+			"oid":"1.2.156.10260.4.1.2",
+			"description":"GMT 0015 InsuranceNumber"
+		},
+		"critical":false,
+		"required":true,
+		"permittedInRequest":true
+	},{
+		"type":{
+			"oid":"1.2.156.10260.4.1.4",
+			"description":"GMT 0015 OrganizationCode"
+		},
+		"critical":false,
+		"required":true,
+		"permittedInRequest":true
+	},{
+		"type":{
+			"oid":"1.2.156.10260.4.1.5",
+			"description":"GMT 0015 TaxationNumber"
+		},
+		"critical":false,
+		"required":true,
+		"permittedInRequest":true
 	}]
 }

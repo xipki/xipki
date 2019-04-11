@@ -26,7 +26,7 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.asn1.x509.Extension;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.profile.CertprofileException;
@@ -116,7 +116,8 @@ public class DemoCertprofile extends XijsonCertprofile {
   @Override
   public ExtensionValues getExtraExtensions(
       Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurences,
-      X500Name requestedSubject, X500Name grantedSubject, Extensions requestedExtensions,
+      X500Name requestedSubject, X500Name grantedSubject,
+      Map<ASN1ObjectIdentifier, Extension> requestedExtensions,
       Date notBefore, Date notAfter, PublicCaInfo caInfo)
       throws CertprofileException, BadCertTemplateException {
     ExtensionValues extnValues = new ExtensionValues();

@@ -49,13 +49,17 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.apache.karaf.shell.support.completers.StringsCompleter;
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.cmp.CMPObjectIdentifiers;
 import org.bouncycastle.asn1.crmf.AttributeTypeAndValue;
 import org.bouncycastle.asn1.crmf.CertId;
@@ -67,6 +71,7 @@ import org.bouncycastle.asn1.crmf.POPOSigningKey;
 import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
@@ -102,6 +107,8 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.SignerConf;
+import org.xipki.security.X509ExtensionType;
+import org.xipki.security.X509ExtensionType.ExtensionsType;
 import org.xipki.security.cmp.PkiStatusInfo;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
@@ -352,6 +359,8 @@ public class Actions {
 
   public abstract static class EnrollAction extends ClientAction {
 
+    private static final long _12_HOURS_MS = 12L * 60 * 60 * 1000;
+
     @Reference
     protected SecurityFactory securityFactory;
 
@@ -418,6 +427,17 @@ public class Actions {
     @Completion(Completers.ExtensionNameCompleter.class)
     private List<String> wantExtensionTypes;
 
+    @Option(name = "--dateOfBirth", description = "Date of birth YYYYMMdd in subject")
+    private String dateOfBirth;
+
+    @Option(name = "--postalAddress", multiValued = true, description = "postal address in subject")
+    private List<String> postalAddress;
+
+    @Option(name = "--extra-extensions-file",
+        description = "Configuration file for extral extensions")
+    @Completion(FileCompleter.class)
+    private String extraExtensionsFile;
+
     protected abstract SubjectPublicKeyInfo getPublicKey() throws Exception;
 
     protected abstract EnrollCertRequest.Entry buildEnrollCertRequestEntry(
@@ -463,8 +483,50 @@ public class Actions {
 
       CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
 
-      X500Name x500Subject = new X500Name(subject);
-      certTemplateBuilder.setSubject(x500Subject);
+      X500Name subjectDn = new X500Name(subject);
+      List<RDN> list = new LinkedList<RDN>();
+
+      if (StringUtil.isNotBlank(dateOfBirth)) {
+        ASN1ObjectIdentifier id = ObjectIdentifiers.DN.dateOfBirth;
+        RDN[] rdns = subjectDn.getRDNs(id);
+
+        if (rdns == null || rdns.length == 0) {
+          Date date = DateUtil.parseUtcTimeyyyyMMdd(dateOfBirth);
+          date = new Date(date.getTime() + _12_HOURS_MS);
+          ASN1Encodable atvValue = new DERGeneralizedTime(
+              DateUtil.toUtcTimeyyyyMMddhhmmss(date) + "Z");
+          RDN rdn = new RDN(id, atvValue);
+          list.add(rdn);
+        }
+      }
+
+      if (CollectionUtil.isNonEmpty(postalAddress)) {
+        ASN1ObjectIdentifier id = ObjectIdentifiers.DN.postalAddress;
+        RDN[] rdns = subjectDn.getRDNs(id);
+
+        if (rdns == null || rdns.length == 0) {
+          ASN1EncodableVector vec = new ASN1EncodableVector();
+          for (String m : postalAddress) {
+            vec.add(new DERUTF8String(m));
+          }
+
+          if (vec.size() > 0) {
+            ASN1Sequence atvValue = new DERSequence(vec);
+            RDN rdn = new RDN(id, atvValue);
+            list.add(rdn);
+          }
+        }
+      }
+
+      if (!list.isEmpty()) {
+        for (RDN rdn : subjectDn.getRDNs()) {
+          list.add(rdn);
+        }
+
+        subjectDn = new X500Name(list.toArray(new RDN[0]));
+      }
+
+      certTemplateBuilder.setSubject(subjectDn);
 
       SubjectPublicKeyInfo publicKey = getPublicKey();
       if (publicKey != null) {
@@ -582,6 +644,24 @@ public class Actions {
       } else {
         throw new Exception("either all of biometric triples (type, hash algo, file)"
             + " must be set or none of them should be set");
+      }
+
+      // extra extensions
+      if (extraExtensionsFile != null) {
+        byte[] bytes = IoUtil.read(extraExtensionsFile);
+        ExtensionsType extraExtensions = JSON.parseObject(bytes, ExtensionsType.class);
+        extraExtensions.validate();
+
+        List<X509ExtensionType> extnConfs = extraExtensions.getExtensions();
+        if (CollectionUtil.isNonEmpty(extnConfs)) {
+          for (X509ExtensionType m : extnConfs) {
+            String id = m.getType().getOid();
+            byte[] encodedExtnValue =
+                m.getConstant().toASN1Encodable().toASN1Primitive().getEncoded(ASN1Encoding.DER);
+            extensions.add(new Extension(new ASN1ObjectIdentifier(id), false, encodedExtnValue));
+            needExtensionTypes.add(id);
+          }
+        }
       }
 
       if (isNotEmpty(needExtensionTypes) || isNotEmpty(wantExtensionTypes)) {
