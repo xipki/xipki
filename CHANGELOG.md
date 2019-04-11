@@ -4,18 +4,22 @@ See also <https://github.com/xipki/xipki/releases>
 
 ## 5.2.0
   - Release date: -
-  - New feature to configure fixed value of subject RDN in the certificate profile
-  - Make sure that the certificate serial number is randomly generated with at least 70 bit entropy and not weak by checking the NAF weight.
-  - Simplify and extend the configuration of custom extension
-  - Extend the command csr-p11 and csr-p12 to generate CSR with complex subject and extensions
-  - In the extension CertificatePolicies, the OID for User Notice is not correct. This has been fixed.
-  - Add the management of the certificate of parenet CAs for given CA
-  - Extension AuthorityKeyIdentifier embeds both KeyIdentifier and (authorityCertIssuer, authorityCertSerialNumber) in case of incorrect configuration. However exactly one of them is allowed. This has been fixed.
-  - Add the native support of jurisdictionOfIncorporationCountryName, jurisdictionOfIncorporationLocalityName and jurisdictionOfIncorporationStateOrProvinceName
-  - Add the configuration of OCSP response behaviour for unknown certificate
-  - Add the native support of extensions IdentityCode, InsuranceNumber, ICRegistrationNumber, OrganizationCode and TaxationNumber defined in the chinese standard GM/T 0015
-  - Add support of specification of extension admission in subject
-
+  - CA
+    - New feature to configure fixed value of subject RDN in the certificate profile
+    - Make sure that the certificate serial number is randomly generated with at least 70 bit entropy and not weak by checking the NAF weight.
+    - In the extension CertificatePolicies, the OID for User Notice is not correct. This has been fixed.
+    - Add the management of the certificate of parenet CAs for given CA
+    - Extension AuthorityKeyIdentifier embeds both KeyIdentifier and (authorityCertIssuer, authorityCertSerialNumber) in case of incorrect configuration. However exactly one of them is allowed. This has been fixed.
+    - Add the native support of jurisdictionOfIncorporationCountryName, jurisdictionOfIncorporationLocalityName and jurisdictionOfIncorporationStateOrProvinceName
+    - Add the native support of extensions IdentityCode, InsuranceNumber, ICRegistrationNumber, OrganizationCode and TaxationNumber defined in the chinese standard GM/T 0015
+    - Add support of specification of extension admission in subject
+  - OCSP
+    - Add the configuration of OCSP response behaviour for unknown certificate
+    - The OCSP cacher exhausts the database connections. This has been fixed.
+  - CLI
+    - Extend the command csr-p11 and csr-p12 to generate CSR with complex subject and extensions
+    - Simplify and extend the configuration of custom extension
+  - 
 ## 5.1.0
   - Release date: Mar 17, 2019
   - Relax the limitation of OCSP response in HTTP GET

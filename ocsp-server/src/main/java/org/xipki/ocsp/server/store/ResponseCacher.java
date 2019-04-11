@@ -440,46 +440,44 @@ public class ResponseCacher implements Closeable {
         LogUtil.error(LOG, ex, "could not executing updateCacheStore()");
         return false;
       } finally {
-        datasource.releaseResources(ps, rs, false);
+        datasource.releaseResources(ps, rs, true);
       }
 
       // add the new issuers
       ps = null;
       rs = null;
 
-      Set<Integer> currentIds = issuerStore.getIds();
-
-      for (Integer id : ids) {
-        if (currentIds.contains(id)) {
-          continue;
-        }
-
-        try {
-          if (ps == null) {
-            ps = datasource.prepareStatement(sqlSelectIssuerCert);
-          }
-
-          ps.setInt(1, id);
-          rs = ps.executeQuery();
-          rs.next();
-          X509Certificate cert = X509Util.parseCert(StringUtil.toUtf8Bytes(rs.getString("CERT")));
-          IssuerEntry caInfoEntry = new IssuerEntry(id, cert);
-          issuerStore.addIssuer(caInfoEntry);
-          LOG.info("added issuer {}", id);
-        } catch (SQLException ex) {
-          LogUtil.error(LOG, datasource.translate(sqlSelectIssuerCert, ex),
-              "could not executing updateCacheStore()");
-          return false;
-        } catch (Exception ex) {
-          LogUtil.error(LOG, ex, "could not executing updateCacheStore()");
-          return false;
-        } finally {
-          datasource.releaseResources(null, rs, false);
-        }
+      ids.removeAll(issuerStore.getIds());
+      if (ids.isEmpty()) {
+        // no new issuer
+        return true;
       }
 
-      if (ps != null) {
-        datasource.releaseResources(ps, null, false);
+      ps = datasource.prepareStatement(sqlSelectIssuerCert);
+      try {
+        for (Integer id : ids) {
+          try {
+            ps.setInt(1, id);
+            rs = ps.executeQuery();
+            rs.next();
+            X509Certificate cert = X509Util.parseCert(StringUtil.toUtf8Bytes(rs.getString("CERT")));
+            IssuerEntry caInfoEntry = new IssuerEntry(id, cert);
+            issuerStore.addIssuer(caInfoEntry);
+            LOG.info("added issuer {}", id);
+          } catch (SQLException ex) {
+            LogUtil.error(LOG, datasource.translate(sqlSelectIssuerCert, ex),
+                "could not executing updateCacheStore()");
+            return false;
+          } catch (Exception ex) {
+            LogUtil.error(LOG, ex, "could not executing updateCacheStore()");
+            return false;
+          } finally {
+            // only release ResultSet rs here
+            datasource.releaseResources(null, rs, false);
+          }
+        }
+      } finally {
+        datasource.releaseResources(ps, null, true);
       }
     } catch (DataAccessException ex) {
       LogUtil.error(LOG, ex, "could not executing updateCacheStore()");

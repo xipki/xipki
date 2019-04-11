@@ -4,7 +4,7 @@
 //			"name":"datasource-cache",
 //			"conf":{
 //				"file":"xipki/etc/ocsp/database/ocsp-cache-db.properties"
-//			},
+//			}
 //		},
 //		"validity":86400
 //	},
