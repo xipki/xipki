@@ -52,6 +52,7 @@ public class CertStatusInfo {
     unknown,
     malformedRequest,
     internalError,
+    unauthorized,
     tryLater;
   }
 

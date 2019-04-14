@@ -881,6 +881,8 @@ public class OcspServerImpl implements OcspServer {
           break;
         case malformedRequest:
           return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
+        case unauthorized:
+          return unsuccesfulOCSPRespMap.get(OcspResponseStatus.unauthorized);
         case internalError:
           return unsuccesfulOCSPRespMap.get(OcspResponseStatus.internalError);
         case tryLater:
