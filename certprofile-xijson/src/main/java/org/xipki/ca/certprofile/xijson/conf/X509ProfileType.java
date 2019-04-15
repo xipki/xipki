@@ -33,6 +33,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.api.profile.Certprofile.CertDomain;
 import org.xipki.ca.api.profile.Certprofile.CertLevel;
 import org.xipki.ca.api.profile.Certprofile.ExtensionControl;
 import org.xipki.ca.api.profile.Certprofile.X509CertVersion;
@@ -68,6 +69,9 @@ public class X509ProfileType extends ValidatableConf {
 
   @JSONField(ordinal = 3)
   private CertLevel certLevel;
+
+  @JSONField(ordinal = 3)
+  private CertDomain certDomain = CertDomain.RFC5280;
 
   @JSONField(ordinal = 4)
   private Boolean raOnly;
@@ -184,6 +188,14 @@ public class X509ProfileType extends ValidatableConf {
 
   public void setCertLevel(CertLevel certLevel) {
     this.certLevel = certLevel;
+  }
+
+  public CertDomain getCertDomain() {
+    return certDomain;
+  }
+
+  public void setCertDomain(CertDomain certDomain) {
+    this.certDomain = certDomain;
   }
 
   public Map<String, String> getMetadata() {

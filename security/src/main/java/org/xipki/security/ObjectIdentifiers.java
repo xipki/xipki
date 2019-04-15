@@ -71,6 +71,15 @@ public class ObjectIdentifiers {
 
   }
 
+  public static class BaseRequirements { // base requirements
+    public static final ASN1ObjectIdentifier id_domain_validated =
+        new ASN1ObjectIdentifier("2.23.140.1.2.1");
+    public static final ASN1ObjectIdentifier id_organization_validated =
+        new ASN1ObjectIdentifier("2.23.140.1.2.2");
+    public static final ASN1ObjectIdentifier id_individual_validated =
+        new ASN1ObjectIdentifier("2.23.140.1.2.3");
+  }
+
   public static class DN {
     /**
      * country code - StringType(SIZE(2)).

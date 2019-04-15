@@ -80,5 +80,20 @@
 	},{
 		"name":"fixed-partial-subject",
 		"file":"xipki/qa/certprofile/certprofile-fixed-partial-subject.json"
+	},{
+		"name":"cab-rootca",
+		"file":"xipki/qa/certprofile/certprofile-cab-rootca.json"
+	},{
+		"name":"cab-subca",
+		"file":"xipki/qa/certprofile/certprofile-cab-subca.json"
+	},{
+		"name":"cab-domain-validated",
+		"file":"xipki/qa/certprofile/certprofile-cab-domain-validated.json"
+	},{
+		"name":"cab-org-validated",
+		"file":"xipki/qa/certprofile/certprofile-cab-org-validated.json"
+	},{
+		"name":"cab-individual-validated",
+		"file":"xipki/qa/certprofile/certprofile-cab-individual-validated.json"
 	}]
 }

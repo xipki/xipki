@@ -178,12 +178,16 @@ public class KeyParametersOption {
       this.curveOids = curveOids;
     }
 
-    public Set<Byte> pointEncodings() {
-      return pointEncodings;
+    public Set<ASN1ObjectIdentifier> getCurveOids() {
+      return curveOids;
     }
 
     public void setPointEncodings(Set<Byte> pointEncodings) {
       this.pointEncodings = pointEncodings;
+    }
+
+    public Set<Byte> getPointEncodings() {
+      return pointEncodings;
     }
 
     public boolean allowsCurve(ASN1ObjectIdentifier curveOid) {

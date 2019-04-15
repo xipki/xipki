@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.regex.Pattern;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
@@ -90,7 +89,7 @@ public class SubjectDnSpec {
 
   private static final Map<ASN1ObjectIdentifier, Range> RANGES = new HashMap<>();
 
-  private static final Map<ASN1ObjectIdentifier, Pattern> PATTERNS = new HashMap<>();
+  private static final Map<ASN1ObjectIdentifier, TextVadidator> PATTERNS = new HashMap<>();
 
   private static final Map<ASN1ObjectIdentifier, RdnControl> CONTROLS = new HashMap<>();
 
@@ -214,7 +213,7 @@ public class SubjectDnSpec {
 
     // DATE_OF_BIRTH
     conf(ids, DN.dateOfBirth, RANGE_DATE_OF_BIRTH, null, null);
-    PATTERNS.put(DN.dateOfBirth, Patterns.DATE_OF_BIRTH);
+    PATTERNS.put(DN.dateOfBirth, TextVadidator.DATE_OF_BIRTH);
 
     // domainComponent
     conf(ids, DN.DC, null, IA5_STRING_ONLY, StringType.ia5String);
@@ -224,7 +223,7 @@ public class SubjectDnSpec {
 
     // gender
     conf(ids, DN.gender, RANGE_GENDER, PRINTABLE_STRING_ONLY, StringType.printableString);
-    PATTERNS.put(DN.gender, Patterns.GENDER);
+    PATTERNS.put(DN.gender, TextVadidator.GENDER);
 
     // generation qualifier
     conf(ids, DN.generationQualifier, RANGE_64, DIRECTORY_STRINGS, StringType.utf8String);
@@ -324,7 +323,7 @@ public class SubjectDnSpec {
           );
       control.setStringType(stringType);
       control.setStringLengthRange(RANGES.get(type));
-      Pattern pattern = PATTERNS.get(type);
+      TextVadidator pattern = PATTERNS.get(type);
       if (pattern != null) {
         control.setPattern(pattern);
       }
@@ -356,7 +355,7 @@ public class SubjectDnSpec {
     return RANGES.get(Args.notNull(rdnType, "rdnType"));
   }
 
-  public static Pattern getPattern(ASN1ObjectIdentifier rdnType) {
+  public static TextVadidator getPattern(ASN1ObjectIdentifier rdnType) {
     return PATTERNS.get(Args.notNull(rdnType, "rdnType"));
   }
 

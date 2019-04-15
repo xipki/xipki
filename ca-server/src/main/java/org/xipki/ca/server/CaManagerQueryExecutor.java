@@ -1039,11 +1039,15 @@ class CaManagerQueryExecutor {
       }
     }
 
+    // CHECKSTYLE:SKIP
     String status = (changeCaEntry.getStatus() == null) ? null : changeCaEntry.getStatus().name();
+    // CHECKSTYLE:SKIP
     String maxValidity = (changeCaEntry.getMaxValidity() == null) ? null
         : changeCaEntry.getMaxValidity().toString();
+    // CHECKSTYLE:SKIP
     String extraControl = (changeCaEntry.getExtraControl() == null) ? null
         : changeCaEntry.getExtraControl().getEncoded();
+    // CHECKSTYLE:SKIP
     String validityMode = (changeCaEntry.getValidityMode() == null) ? null
         : changeCaEntry.getValidityMode().name();
 

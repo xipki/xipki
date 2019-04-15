@@ -76,9 +76,9 @@ import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.KeyParametersOption;
 import org.xipki.ca.api.profile.KeypairGenControl;
-import org.xipki.ca.api.profile.Patterns;
 import org.xipki.ca.api.profile.Range;
 import org.xipki.ca.api.profile.SubjectDnSpec;
+import org.xipki.ca.api.profile.TextVadidator;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableInt;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
@@ -90,6 +90,7 @@ import org.xipki.ca.certprofile.xijson.conf.ExtensionType.AuthorizationTemplate;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.BasicConstraints;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.BiometricInfo;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.CertificatePolicies;
+import org.xipki.ca.certprofile.xijson.conf.ExtensionType.CrlDistributionPoints;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.ExtendedKeyUsage;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.ExtnSyntax;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.InhibitAnyPolicy;
@@ -148,6 +149,10 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   private AuthorityInfoAccessControl aiaControl;
 
+  private CrlDistributionPointsControl crlDpControl;
+
+  private CrlDistributionPointsControl freshestCrlControl;
+
   private Map<ASN1ObjectIdentifier, GeneralNameTag> subjectToSubjectAltNameModes;
 
   private Set<GeneralNameMode> subjectAltNameModes;
@@ -158,11 +163,13 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   private BiometricInfoOption biometricInfo;
 
+  private CertDomain certDomain;
+
   private CertLevel certLevel;
 
   private KeypairGenControl keypairGenControl;
 
-  private ExtensionValue certificatePolicies;
+  private org.bouncycastle.asn1.x509.CertificatePolicies certificatePolicies;
 
   private Map<ASN1ObjectIdentifier, ExtnSyntax> extensionsWithSyntax;
 
@@ -226,11 +233,14 @@ public class XijsonCertprofile extends BaseCertprofile {
     additionalInformation = null;
     admission = null;
     aiaControl = null;
+    crlDpControl = null;
+    freshestCrlControl = null;
     subjectToSubjectAltNameModes = null;
     subjectAltNameModes = null;
     subjectInfoAccessModes = null;
     authorizationTemplate = null;
     biometricInfo = null;
+    certDomain = null;
     certLevel = null;
     keypairGenControl = null;
     certificatePolicies = null;
@@ -298,7 +308,6 @@ public class XijsonCertprofile extends BaseCertprofile {
     try {
       initialize0(conf);
     } catch (RuntimeException ex) {
-      ex.printStackTrace(); //TODO
       LogUtil.error(LOG, ex);
       throw new CertprofileException(
           "caught RuntimeException while initializing certprofile: " + ex.getMessage());
@@ -333,6 +342,8 @@ public class XijsonCertprofile extends BaseCertprofile {
     if (this.certLevel == null) {
       throw new CertprofileException("invalid CertLevel");
     }
+
+    this.certDomain = conf.getCertDomain() == null ? CertDomain.RFC5280 : conf.getCertDomain();
 
     // KeypairGenControl
     KeypairGenerationType kg = conf.getKeypairGeneration();
@@ -452,7 +463,7 @@ public class XijsonCertprofile extends BaseCertprofile {
       rdnControl.setStringType(rdn.getStringType());
       rdnControl.setStringLengthRange(range);
       if (rdn.getRegex() != null) {
-        rdnControl.setPattern(Patterns.compile(rdn.getRegex()));
+        rdnControl.setPattern(TextVadidator.compile(rdn.getRegex()));
       }
       rdnControl.setPrefix(rdn.getPrefix());
       rdnControl.setSuffix(rdn.getSuffix());
@@ -500,8 +511,14 @@ public class XijsonCertprofile extends BaseCertprofile {
     // Certificate Policies
     initCertificatePolicies(extnIds, extensions);
 
+    // CRLDistributionPoints
+    initCrlDistributionPoints(extnIds, extensions);
+
     // ExtendedKeyUsage
     initExtendedKeyUsage(extnIds, extensions);
+
+    // CRLDistributionPoints
+    initFreshestCrl(extnIds, extensions);
 
     // Inhibit anyPolicy
     initInhibitAnyPolicy(extnIds, extensions);
@@ -723,7 +740,7 @@ public class XijsonCertprofile extends BaseCertprofile {
       AuthorityInfoAccess extConf = getExtension(type, extensions).getAuthorityInfoAccess();
       if (extConf != null) {
         this.aiaControl = new AuthorityInfoAccessControl(extConf.isIncludeCaIssuers(),
-            extConf.isIncludeOcsp());
+            extConf.isIncludeOcsp(), extConf.getCaIssuersProtocols(), extConf.getOcspProtocols());
       }
     }
   }
@@ -790,9 +807,19 @@ public class XijsonCertprofile extends BaseCertprofile {
       extnIds.remove(type);
       CertificatePolicies extConf = getExtension(type, extensions).getCertificatePolicies();
       if (extConf != null) {
-        org.bouncycastle.asn1.x509.CertificatePolicies value = extConf.toXiCertificatePolicies();
-        this.certificatePolicies =
-            new ExtensionValue(extensionControls.get(type).isCritical(), value);
+        certificatePolicies = extConf.toXiCertificatePolicies();
+      }
+    }
+  }
+
+  private void initCrlDistributionPoints(Set<ASN1ObjectIdentifier> extnIds,
+      Map<String, ExtensionType> extensions) throws CertprofileException {
+    ASN1ObjectIdentifier type = Extension.cRLDistributionPoints;
+    if (extensionControls.containsKey(type)) {
+      extnIds.remove(type);
+      CrlDistributionPoints extConf = getExtension(type, extensions).getCrlDistributionPoints();
+      if (extConf != null) {
+        crlDpControl = new CrlDistributionPointsControl(extConf.getProtocols());
       }
     }
   }
@@ -805,6 +832,18 @@ public class XijsonCertprofile extends BaseCertprofile {
       ExtendedKeyUsage extConf = getExtension(type, extensions).getExtendedKeyUsage();
       if (extConf != null) {
         this.extendedKeyusages = extConf.toXiExtKeyUsageOptions();
+      }
+    }
+  }
+
+  private void initFreshestCrl(Set<ASN1ObjectIdentifier> extnIds,
+      Map<String, ExtensionType> extensions) throws CertprofileException {
+    ASN1ObjectIdentifier type = Extension.freshestCRL;
+    if (extensionControls.containsKey(type)) {
+      extnIds.remove(type);
+      CrlDistributionPoints extConf = getExtension(type, extensions).getFreshestCrl();
+      if (extConf != null) {
+        freshestCrlControl = new CrlDistributionPointsControl(extConf.getProtocols());
       }
     }
   }
@@ -1254,15 +1293,10 @@ public class XijsonCertprofile extends BaseCertprofile {
     // processed by the CA
 
     // CertificatePolicies
-    ASN1ObjectIdentifier type = Extension.certificatePolicies;
-    if (certificatePolicies != null) {
-      if (occurences.remove(type)) {
-        values.addExtension(type, certificatePolicies);
-      }
-    }
+    // processed by the CA
 
     // Policy Mappings
-    type = Extension.policyMappings;
+    ASN1ObjectIdentifier type = Extension.policyMappings;
     if (policyMappings != null) {
       if (occurences.remove(type)) {
         values.addExtension(type, policyMappings);
@@ -1332,7 +1366,7 @@ public class XijsonCertprofile extends BaseCertprofile {
         if (ObjectIdentifiers.DN.dateOfBirth.equals(attrType)) {
           if (dateOfBirth != null) {
             String timeStirng = dateOfBirth.getTimeString();
-            if (!Patterns.DATE_OF_BIRTH.matcher(timeStirng).matches()) {
+            if (!TextVadidator.DATE_OF_BIRTH.isValid(timeStirng)) {
               throw new BadCertTemplateException("invalid dateOfBirth " + timeStirng);
             }
             attrs.add(new Attribute(attrType, new DERSet(dateOfBirth)));
@@ -1447,7 +1481,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
     if (occurences.contains(type) && admission != null
         && (((admission.isInputFromRequestRequired()) && admissionRdns != null)
-            || !admission.isInputFromRequestRequired())){
+            || !admission.isInputFromRequestRequired())) {
       if (admission.isInputFromRequestRequired()) {
         List<List<String>> reqRegNumsList = new LinkedList<>();
         for (RDN m : admissionRdns) {
@@ -1738,7 +1772,7 @@ public class XijsonCertprofile extends BaseCertprofile {
         ASN1Encodable extnValue = null;
         if (tag == 0 || tag == 2) {
           extnValue = new DERTaggedObject(false, tag, new DERPrintableString(extnStr));
-        } else if (tag == 1){
+        } else if (tag == 1) {
           extnValue = new DERTaggedObject(false, tag, new DERUTF8String(extnStr));
         }
 
@@ -1876,9 +1910,13 @@ public class XijsonCertprofile extends BaseCertprofile {
             case rfc822Name:
               gn = new GeneralName(tag.getTag(), rdnValue.toLowerCase());
               break;
-            case DNSName:
-            case uniformResourceIdentifier:
             case IPAddress:
+              gn = new GeneralName(tag.getTag(), rdnValue);
+              break;
+            case uniformResourceIdentifier:
+              gn = new GeneralName(tag.getTag(), rdnValue);
+              break;
+            case DNSName:
             case directoryName:
             case registeredID:
               gn = new GeneralName(tag.getTag(), rdnValue);
@@ -1926,6 +1964,11 @@ public class XijsonCertprofile extends BaseCertprofile {
   }
 
   @Override
+  public CertDomain getCertDomain() {
+    return certDomain;
+  }
+
+  @Override
   public KeypairGenControl getKeypairGenControl() {
     return keypairGenControl;
   }
@@ -1938,6 +1981,16 @@ public class XijsonCertprofile extends BaseCertprofile {
   @Override
   public AuthorityInfoAccessControl getAiaControl() {
     return aiaControl;
+  }
+
+  @Override
+  public CrlDistributionPointsControl getCrlDpControl() {
+    return crlDpControl;
+  }
+
+  @Override
+  public CrlDistributionPointsControl getFreshestCrlControl() {
+    return freshestCrlControl;
   }
 
   @Override
@@ -2016,6 +2069,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     return subjectToSubjectAltNameModes;
   }
 
+  @Override
   public Set<GeneralNameMode> getSubjectAltNameModes() {
     return subjectAltNameModes;
   }
@@ -2028,7 +2082,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     return biometricInfo;
   }
 
-  public ExtensionValue getCertificatePolicies() {
+  public org.bouncycastle.asn1.x509.CertificatePolicies getCertificatePolicies() {
     return certificatePolicies;
   }
 

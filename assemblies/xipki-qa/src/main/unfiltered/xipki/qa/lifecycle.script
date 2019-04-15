@@ -16,7 +16,7 @@ if { "$1" equals "" } then {
     SIG_TYPE = $5
     KEYSPEC = $6
   } else {
-    OUTFORM = $2
+    OUTFORM = $1
     HASH = $2
     TOKEN_TYPE = $3
     SIG_TYPE = $4

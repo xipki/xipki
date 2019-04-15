@@ -1,0 +1,152 @@
+printUsage = "false"
+argsValid = "false"
+errMsg = ""
+
+if { "$1" equals "" } then {
+  printUsage = "true"
+  argsValid = "true"
+} elif { "$1" equals "help" } then {
+  printUsage = "true"
+  argsValid = "true"
+} else {
+  OUTFORM = $1
+  HASH = $2
+  TOKEN_TYPE = $3
+  SIG_TYPE = $4
+  KEYSPEC = $5
+
+  list = [pkcs11 pkcs12]; each ($list) {
+    if { "$TOKEN_TYPE" equals $it } then {
+      argsValid = "true"
+      break
+    }
+  }
+
+  if { "$argsValid" equals "false" } then {
+    errMsg = "invalid TOKEN_TYPE $TOKEN_TYPE"
+  } else {
+    argsValid = "false"
+
+    list = [rsa rsapss ec dsa]; each ($list) {
+      if { "$SIG_TYPE" equals $it } then {
+        argsValid = "true"
+        break
+      }
+    }
+  }
+
+  if { "$argsValid" equals "false" } then {
+    errMsg = "invalid SIG_TYPE $SIG_TYPE"
+  } else {
+    argsValid = "false"
+
+    list = [sha256 sha384 sha512]; each ($list) {
+      if { "$HASH" equals $it } then {
+        argsValid = "true"
+        break
+      }
+    }
+
+    if { "$argsValid" equals "false" } then {
+      if { "$errMsg" equals ""} then {
+        errMsg = "invalid HASH $HASH"
+      }
+    }
+
+  }
+}
+
+if { $argsValid equals "false" } then {
+  echo "$errMsg"
+  echo ""
+  printUsage = "true"
+}
+
+if { $printUsage equals "true" } then {
+  echo "Usage: "
+  echo ""
+  echo "source file:./xipki/qa/cab/lifecycle.script <outform> <hash algo> <token type> <signature type> [<keyspec>]"
+  echo "    outform:         Output format of the certificates, CRLs and CSRs"
+  echo "    hash algo:       sha256, sha384, sha512"
+  echo "    token type:      pkcs11, pkcs12"
+  echo "    signature type:  rsa, rsapss, ec, dsa"
+  echo "    keyspec:         keysize for signature types rsa, rsaPSS and DSA,"
+  echo "                     curve name for signature types ec"
+} else {
+  STDHASH = $HASH
+  source file:./xipki/qa/qa.d/prepare-keys.script
+
+  ## CA client configuration
+  xi:copy-file -f xipki/qa/cab/template.cmpclient.json \
+    xipki/cmpclient/cmpclient.json
+
+  xi:replace --old "REPLACEME-CMP_SIGALGO" --new "$CMP_SIGALGO" \
+    xipki/cmpclient/cmpclient.json
+
+  xi:copy-file -f xipki/qa/cab/template.ca-load.script \
+    xipki/qa/cab/ca-load.script
+
+  xi:copy-file -f xipki/qa/cab/template.ra.script \
+    xipki/qa/cab/ra.script
+
+  rsaMgf1 = ""
+  if { "$SIG_TYPE" equals "rsapss" } then {
+    rsaMgf1 = "--rsa-mgf1"
+  }
+
+  xi:replace --old "REPLACEME-RSAMGF1" --new "${rsaMgf1}" \
+    xipki/qa/cab/ca-load.script
+
+  xi:replace --old "REPLACEME-RSAMGF1" --new "${rsaMgf1}" \
+    xipki/qa/cab/ra.script
+
+  source file:./xipki/qa/cab/ca-load.script
+
+  echo "#################################################################"
+  echo "#                  CA certificate commands                      #"
+  echo "#################################################################"
+
+  #### list certs ####
+
+  ca:list-cert --ca rootca1 --subject "CN=*ca*,O=xipki" --order subject -n 100
+
+  # get the serial number
+  SERIAL = $(xi:cert-info --serial --hex --in output/subca1.crt)
+
+  # save the certificate request
+  ca:get-request --ca rootca1 --serial $SERIAL --out output/subca1.request
+
+  source file:./xipki/qa/cab/ra.script
+
+  echo "Sleeping 1 second"
+  sleep 1
+
+  echo "#################################################################"
+  echo "#                     CAQA:Check certificate                    #"
+  echo "#################################################################"
+
+  caqa:init
+
+  ## rootca
+
+  caqa:check-cert --issuer rootca --profile cab-rootca \
+    --csr output/rootca1.csr --cert output/rootca1.crt
+
+  caqa:check-cert --issuer rootca --profile cab-subca \
+    --csr output/subca1.csr --cert output/subca1.crt
+
+  list = [ cab-domain-validated cab-domain-validated cab-org-validated ]
+
+  each ($list) {
+    name = $it
+    caqa:check-cert --issuer subca --profile ${name} \
+    --csr output/${name}1.csr --cert output/${name}1.crt
+  }
+
+  each ($list) {
+    name = $it
+    caqa:check-cert --issuer subca --profile ${name} \
+    --csr output/${name}2.csr --cert output/${name}2.crt
+  }
+
+}

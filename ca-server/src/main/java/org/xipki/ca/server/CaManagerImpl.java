@@ -2329,9 +2329,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
     try {
       Certprofile profile = certprofileFactoryRegister.newCertprofile(type);
-      IdentifiedCertprofile ret = new IdentifiedCertprofile(entry, profile);
-      ret.validate();
-      return ret;
+      return new IdentifiedCertprofile(entry, profile);
     } catch (ObjectCreationException | CertprofileException ex) {
       String msg = "could not initialize Certprofile " + entry.getIdent();
       LogUtil.error(LOG, ex, msg);

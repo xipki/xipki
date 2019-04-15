@@ -1,0 +1,116 @@
+echo "#################################################################"
+echo "#              Manage certificate with RA Client                #"
+echo "#################################################################"
+
+xi:cmp-init
+
+echo "Sleeping 1 second"
+sleep 1
+
+## Check the healthy status
+
+xi:cmp-health --ca rootca1
+
+xi:cmp-health --ca subca1
+
+# Certificate cab-domain-validated1
+
+xi:csr-p12 --hash $HASH REPLACEME-RSAMGF1 \
+  --p12 output/cab-domain-validated1.p12 --password 1234 \
+  --subject "CN=abc.domain-validated.xipki.org,C=DE" \
+  --outform $OUTFORM \
+  --out output/cab-domain-validated1.csr \
+
+xi:cmp-csr-enroll --csr output/cab-domain-validated1.csr \
+  --outform $OUTFORM \
+  --out output/cab-domain-validated1.crt --profile cab-domain-validated
+
+xi:update-cert-p12 --p12 output/cab-domain-validated1.p12 --password 1234 \
+  --cert output/cab-domain-validated1.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate cab-domain-validated2 (wildcard domain)
+
+xi:csr-p12 --hash $HASH REPLACEME-RSAMGF1 \
+  --p12 output/cab-domain-validated2.p12 --password 1234 \
+  --subject "CN=*.domain-validated.xipki.org,C=DE" \
+  --outform $OUTFORM \
+  --out output/cab-domain-validated2.csr \
+
+xi:cmp-csr-enroll --csr output/cab-domain-validated2.csr \
+  --outform $OUTFORM \
+  --out output/cab-domain-validated2.crt --profile cab-domain-validated
+
+xi:update-cert-p12 --p12 output/cab-domain-validated2.p12 --password 1234 \
+  --cert output/cab-domain-validated2.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate cab-org-validated1
+
+xi:csr-p12 --hash $HASH REPLACEME-RSAMGF1 \
+  --p12 output/cab-org-validated1.p12 --password 1234 \
+  --subject "CN=abc.org-validated.xipki.org,O=xipki.org,L=Frankfurt,C=DE" \
+  --outform $OUTFORM \
+  --out output/cab-org-validated1.csr \
+
+xi:cmp-csr-enroll --csr output/cab-org-validated1.csr \
+  --outform $OUTFORM \
+  --out output/cab-org-validated1.crt --profile cab-org-validated
+
+xi:update-cert-p12 --p12 output/cab-org-validated1.p12 --password 1234 \
+  --cert output/cab-org-validated1.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate cab-org-validated2 (wildcard domain)
+
+xi:csr-p12 --hash $HASH REPLACEME-RSAMGF1 \
+  --p12 output/cab-org-validated2.p12 --password 1234 \
+  --subject "CN=*.org-validated.xipki.org,O=xipki.org,L=Frankfurt,C=DE" \
+  --outform $OUTFORM \
+  --out output/cab-org-validated2.csr \
+
+xi:cmp-csr-enroll --csr output/cab-org-validated2.csr \
+  --outform $OUTFORM \
+  --out output/cab-org-validated2.crt --profile cab-org-validated
+
+xi:update-cert-p12 --p12 output/cab-org-validated2.p12 --password 1234 \
+  --cert output/cab-org-validated2.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate cab-individual-validated1
+
+xi:csr-p12 --hash $HASH REPLACEME-RSAMGF1 \
+  --p12 output/cab-individual-validated1.p12 --password 1234 \
+  --subject "CN=abc.individual-validated.xipki.org,givenName=alice,surName=mysurname,L=Frankfurt,C=DE" \
+  --outform $OUTFORM \
+  --out output/cab-individual-validated1.csr \
+
+xi:cmp-csr-enroll --csr output/cab-individual-validated1.csr \
+  --outform $OUTFORM \
+  --out output/cab-individual-validated1.crt --profile cab-individual-validated
+
+xi:update-cert-p12 --p12 output/cab-individual-validated1.p12 --password 1234 \
+  --cert output/cab-individual-validated1.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate cab-individual-validated2 (wildcard domain)
+
+xi:csr-p12 --hash $HASH REPLACEME-RSAMGF1 \
+  --p12 output/cab-individual-validated2.p12 --password 1234 \
+  --subject "CN=*.individual-validated.xipki.org,givenName=alice,surName=mysurname,L=Frankfurt,C=DE" \
+  --outform $OUTFORM \
+  --out output/cab-individual-validated2.csr \
+
+xi:cmp-csr-enroll --csr output/cab-individual-validated2.csr \
+  --outform $OUTFORM \
+  --out output/cab-individual-validated2.crt --profile cab-individual-validated
+
+xi:update-cert-p12 --p12 output/cab-individual-validated2.p12 --password 1234 \
+  --cert output/cab-individual-validated2.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt

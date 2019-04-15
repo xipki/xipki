@@ -24,7 +24,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -80,12 +79,30 @@ public abstract class BaseCertprofile extends Certprofile {
 
   public abstract Map<ASN1ObjectIdentifier, KeyParametersOption> getKeyAlgorithms();
 
-  /**
-   * Get the SubjectControl.
-   *
-   * @return the SubjectControl, may not be <code>null</code>.
-   */
-  protected abstract SubjectControl getSubjectControl();
+  @Override
+  public CertDomain getCertDomain() {
+    return CertDomain.RFC5280;
+  }
+
+  @Override
+  public Integer getPathLenBasicConstraint() {
+    return null;
+  }
+
+  @Override
+  public AuthorityInfoAccessControl getAiaControl() {
+    return null;
+  }
+
+  @Override
+  public CrlDistributionPointsControl getCrlDpControl() {
+    return null;
+  }
+
+  @Override
+  public CrlDistributionPointsControl getFreshestCrlControl() {
+    return null;
+  }
 
   @Override
   public Date getNotBefore(Date requestedNotBefore) {
@@ -255,13 +272,13 @@ public abstract class BaseCertprofile extends Certprofile {
       }
 
       // point encoding
-      if (ecOption.pointEncodings() != null) {
+      if (ecOption.getPointEncodings() != null) {
         byte[] keyData = publicKey.getPublicKeyData().getBytes();
         if (keyData.length < 1) {
           throw new BadCertTemplateException("invalid publicKeyData");
         }
         byte pointEncoding = keyData[0];
-        if (!ecOption.pointEncodings().contains(pointEncoding)) {
+        if (!ecOption.getPointEncodings().contains(pointEncoding)) {
           throw new BadCertTemplateException(String.format(
               "not accepted EC point encoding '%s'", pointEncoding));
         }
@@ -453,7 +470,7 @@ public abstract class BaseCertprofile extends Certprofile {
       throw new BadCertTemplateException("Value of RDN dateOfBirth has incorrect syntax");
     }
 
-    if (!Patterns.DATE_OF_BIRTH.matcher(text).matches()) {
+    if (!TextVadidator.DATE_OF_BIRTH.isValid(text)) {
       throw new BadCertTemplateException(
           "Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
     }
@@ -536,8 +553,8 @@ public abstract class BaseCertprofile extends Certprofile {
         }
       }
 
-      Pattern pattern = option.getPattern();
-      if (pattern != null && !pattern.matcher(tmpText).matches()) {
+      TextVadidator pattern = option.getPattern();
+      if (pattern != null && !pattern.isValid(tmpText)) {
         throw new BadCertTemplateException(
           String.format("invalid subject %s '%s' against regex '%s'",
               ObjectIdentifiers.oidToDisplayName(type), tmpText, pattern.pattern()));

@@ -1654,6 +1654,8 @@ public class X509Ca implements Closeable {
         GrantedCertTemplate gct = createGrantedCertTemplate(certTemplate, requestor, update);
         gcts.add(gct);
       } catch (OperationException ex) {
+        LOG.error("     FAILED createGrantedCertTemplate: CA={}, profile={}, subject='{}'",
+            caIdent.getName(), certTemplate.getCertprofileName(), certTemplate.getSubject());
         throw new OperationExceptionWithIndex(i, ex);
       }
     }

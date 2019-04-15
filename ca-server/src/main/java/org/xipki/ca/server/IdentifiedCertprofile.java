@@ -18,7 +18,9 @@
 package org.xipki.ca.server;
 
 import java.io.Closeable;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,24 +34,32 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.sec.SECObjectIdentifiers;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x509.AccessDescription;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.CRLDistPoint;
+import org.bouncycastle.asn1.x509.CertificatePolicies;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
+import org.bouncycastle.asn1.x509.PolicyInformation;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.BadFormatException;
 import org.xipki.ca.api.CaUris;
@@ -59,27 +69,41 @@ import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.ca.api.profile.BaseCertprofile;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.Certprofile.AuthorityInfoAccessControl;
+import org.xipki.ca.api.profile.Certprofile.CertDomain;
 import org.xipki.ca.api.profile.Certprofile.CertLevel;
+import org.xipki.ca.api.profile.Certprofile.CrlDistributionPointsControl;
 import org.xipki.ca.api.profile.Certprofile.ExtKeyUsageControl;
 import org.xipki.ca.api.profile.Certprofile.ExtensionControl;
 import org.xipki.ca.api.profile.Certprofile.GeneralNameMode;
+import org.xipki.ca.api.profile.Certprofile.GeneralNameTag;
 import org.xipki.ca.api.profile.Certprofile.KeyUsageControl;
+import org.xipki.ca.api.profile.Certprofile.RdnControl;
+import org.xipki.ca.api.profile.Certprofile.SubjectControl;
 import org.xipki.ca.api.profile.Certprofile.SubjectInfo;
 import org.xipki.ca.api.profile.Certprofile.X509CertVersion;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionSpec;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
+import org.xipki.ca.api.profile.KeyParametersOption;
+import org.xipki.ca.api.profile.KeyParametersOption.DSAParametersOption;
+import org.xipki.ca.api.profile.KeyParametersOption.ECParamatersOption;
+import org.xipki.ca.api.profile.KeyParametersOption.RSAParametersOption;
 import org.xipki.ca.api.profile.KeypairGenControl;
 import org.xipki.ca.api.profile.SubjectDnSpec;
 import org.xipki.security.ExtensionExistence;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.ObjectIdentifiers.BaseRequirements;
+import org.xipki.security.ObjectIdentifiers.DN;
+import org.xipki.security.ObjectIdentifiers.XKU;
+import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.Validity;
+import org.xipki.util.Validity.Unit;
 
 /**
  * TODO.
@@ -88,6 +112,8 @@ import org.xipki.util.Validity;
  */
 
 class IdentifiedCertprofile implements Closeable {
+
+  private static Validity maxCabEeValidity = new Validity(825, Unit.DAY);
 
   private final MgmtEntry.Certprofile dbEntry;
   private final Certprofile certprofile;
@@ -127,6 +153,156 @@ class IdentifiedCertprofile implements Closeable {
   public SubjectInfo getSubject(X500Name requestedSubject)
       throws CertprofileException, BadCertTemplateException {
     SubjectInfo subjectInfo = certprofile.getSubject(requestedSubject);
+
+    if (certprofile.getCertDomain() == CertDomain.CABForumBR) {
+      X500Name subject = subjectInfo.getGrantedSubject();
+
+      if (getCertLevel() == CertLevel.EndEntity) {
+        // extract the policyIdentifier
+        CertificatePolicies policies = certprofile.getCertificatePolicies();
+        ASN1ObjectIdentifier policyId = null;
+        if (policies != null) {
+          for (PolicyInformation m : policies.getPolicyInformation()) {
+            ASN1ObjectIdentifier pid = m.getPolicyIdentifier();
+            if (BaseRequirements.id_domain_validated.equals(pid)
+                || BaseRequirements.id_organization_validated.equals(pid)
+                || BaseRequirements.id_individual_validated.equals(pid)) {
+              policyId = pid;
+              break;
+            }
+          }
+        }
+
+        // subject:street
+        if (containsRdn(subject, DN.street)) {
+          if (!containsRdn(subject, DN.O)
+              && !containsRdn(subject, DN.givenName)
+              && !containsRdn(subject, DN.surname)) {
+            throw new BadCertTemplateException("subject:street is prohibited if the "
+                + "subject:organizationName field, subject:givenName, and subject:surname field "
+                + "are absent.");
+          }
+        }
+
+        // subject:localityName
+        if (containsRdn(subject, DN.localityName)) {
+          if (!containsRdn(subject, DN.O)
+              && !containsRdn(subject, DN.givenName)
+              && !containsRdn(subject, DN.surname)) {
+            throw new BadCertTemplateException("subject:localityName is prohibited if the "
+                + "subject:organizationName field, subject:givenName, and subject:surname field "
+                + "are absent.");
+          }
+        } else {
+          if (!containsRdn(subject, DN.ST)
+              && (containsRdn(subject, DN.O)
+                  || containsRdn(subject, DN.givenName)
+                  || containsRdn(subject, DN.surname))) {
+            throw new BadCertTemplateException("subject:localityName is required if the "
+                + "subject:organizationName field, subject:givenName field, or subject:surname "
+                + "field are present and the subject:stateOrProvinceName field is absent.");
+          }
+        }
+
+        // subject:stateOrProvinceName
+        if (containsRdn(subject, DN.ST)) {
+          if (!containsRdn(subject, DN.O)
+              && !containsRdn(subject, DN.givenName)
+              && !containsRdn(subject, DN.surname)) {
+            throw new BadCertTemplateException("subject:stateOrProvinceName is prohibited if the "
+                + "subject:organizationName field, subject:givenName, and subject:surname field "
+                + "are absent.");
+          }
+        } else {
+          if (!containsRdn(subject, DN.localityName)
+              && (containsRdn(subject, DN.O)
+                  || containsRdn(subject, DN.givenName)
+                  || containsRdn(subject, DN.surname))) {
+            throw new BadCertTemplateException("subject:stateOrProvinceName is required if the "
+                + "subject:organizationName field, subject:givenName field, or subject:surname "
+                +  "field are present and the subject:localityName field is absent.");
+          }
+        }
+
+        // subject:postalCode
+        if (containsRdn(subject, DN.postalCode)) {
+          if (!containsRdn(subject, DN.O)
+              && !containsRdn(subject, DN.givenName)
+              && !containsRdn(subject, DN.surname)) {
+            throw new BadCertTemplateException("subject:postalCode is prohibited if the "
+                + "subject:organizationName field, subject:givenName, and subject:surname field "
+                + "are absent.");
+          }
+        }
+
+        // subject:countryCode
+        if (!containsRdn(subject, DN.C)) {
+          if (containsRdn(subject, DN.O)
+              || containsRdn(subject, DN.givenName)
+              || containsRdn(subject, DN.surname)) {
+            throw new BadCertTemplateException("subject:countryCode is required if the "
+                + "subject:organizationName field, subject:givenName, and subject:surname field "
+                + "are present");
+          }
+        }
+
+        if (BaseRequirements.id_domain_validated.equals(policyId)) {
+          ASN1ObjectIdentifier[] excludeSubjectFields = new ASN1ObjectIdentifier[] {
+              DN.O, DN.givenName, DN.surname, DN.street, DN.localityName, DN.ST, DN.postalCode};
+          for (ASN1ObjectIdentifier m : excludeSubjectFields) {
+            if (containsRdn(subject, m)) {
+              throw new BadCertTemplateException("subject " + ObjectIdentifiers.getName(m)
+                + " is prohibited in domain validated certificate");
+            }
+          }
+        } else if (BaseRequirements.id_organization_validated.equals(policyId)) {
+          ASN1ObjectIdentifier[] includeSubjectFields = new ASN1ObjectIdentifier[] {
+              DN.O, DN.C};
+          for (ASN1ObjectIdentifier m : includeSubjectFields) {
+            if (!containsRdn(subject, m)) {
+              throw new BadCertTemplateException("subject " + ObjectIdentifiers.getName(m)
+                + " is required in organization validated certificate");
+            }
+          }
+
+          if (!(containsRdn(subject, DN.localityName) || containsRdn(subject, DN.ST))) {
+            throw new BadCertTemplateException("at least one of subject:localityName and "
+                + "subject:stateOrProvinceName is required in organization validated certificate");
+          }
+        } else if (BaseRequirements.id_individual_validated.equals(policyId)) {
+          ASN1ObjectIdentifier[] includeSubjectFields = new ASN1ObjectIdentifier[] {
+              DN.C};
+          for (ASN1ObjectIdentifier m : includeSubjectFields) {
+            if (!containsRdn(subject, m)) {
+              throw new BadCertTemplateException("subject " + ObjectIdentifiers.getName(m)
+                + " is required in individual validated certificate");
+            }
+          }
+
+          if (!(containsRdn(subject, DN.O)
+              || (containsRdn(subject, DN.givenName) && containsRdn(subject, DN.surname)))) {
+            throw new BadCertTemplateException("at least one of subject:organizationName and "
+                + "(subject:givenName, subject:surName) is required in individual validated "
+                + "certificate");
+          }
+
+          if (!(containsRdn(subject, DN.localityName) || containsRdn(subject, DN.ST))) {
+            throw new BadCertTemplateException("at least one of subject:localityName and "
+                + "subject:stateOrProvinceName is required in individual validated certificate");
+          }
+        }
+      } else {
+        ASN1ObjectIdentifier[] requiredTypes = new ASN1ObjectIdentifier[] {
+            DN.CN, DN.O, DN.C};
+        for (ASN1ObjectIdentifier m : requiredTypes) {
+          if (!containsRdn(subject, DN.CN)) {
+            throw new BadCertTemplateException("missing " + ObjectIdentifiers.getName(m)
+              + " in subject");
+          }
+        }
+      }
+    }
+
     // check the country
     ASN1ObjectIdentifier[] countryOids = new ASN1ObjectIdentifier[] {
         ObjectIdentifiers.DN.C,
@@ -386,6 +562,14 @@ class IdentifiedCertprofile implements Closeable {
       addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
     }
 
+    // CertificatePolicies
+    extType = Extension.certificatePolicies;
+    extControl = controls.remove(extType);
+    if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
+      ASN1Encodable value = certprofile.getCertificatePolicies();
+      addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
+    }
+
     // remove extensions that are not required from the list, and not contained in the request
     List<ASN1ObjectIdentifier> listToRm = null;
     for (ASN1ObjectIdentifier extnType : controls.keySet()) {
@@ -457,6 +641,55 @@ class IdentifiedCertprofile implements Closeable {
           "could not add requested extensions " + toString(neededExtTypes));
     }
 
+    // Check the SubjectAltNames
+    if (certprofile.getCertDomain() == CertDomain.CABForumBR
+        && getCertLevel() == CertLevel.EndEntity) {
+      // Make sure that the commonName included in SubjectAltName
+      String commonName = X509Util.getCommonName(grantedSubject);
+      boolean commonNameInSan = commonName == null ? true : false;
+
+      // No private IP address is permitted
+      GeneralName[] genNames = GeneralNames.getInstance(
+              values.getExtensionValue(Extension.subjectAlternativeName).getValue()).getNames();
+      for (GeneralName m : genNames) {
+        if (GeneralName.dNSName == m.getTagNo()) {
+          String domain = DERIA5String.getInstance(m.getName()).getString();
+          if (!commonNameInSan && domain.equals(commonName)) {
+            commonNameInSan = true;
+          }
+
+          if (domain.indexOf('_') != -1) {
+            throw new BadCertTemplateException("invalid DNSName " + domain);
+          }
+
+          if (!ExtensionSpec.isValidPublicDomain(domain)) {
+            throw new BadCertTemplateException("invalid DNSName " + domain);
+          }
+        } else if (GeneralName.iPAddress == m.getTagNo()) {
+          byte[] octets = DEROctetString.getInstance(m.getName()).getOctets();
+          if (octets.length == 4) { // IPv4Address
+            String ipAddressText = (0xFF & octets[0]) + "." + (0xFF & octets[1]) + "."
+                + (0xFF & octets[2]) + "." + (0xFF & octets[3]);
+            if (!commonNameInSan && ipAddressText.equals(commonName)) {
+              commonNameInSan = true;
+            }
+
+            if (!ExtensionSpec.isValidPublicIPv4Address(octets)) {
+              throw new BadCertTemplateException(
+                  "invalid IPv4Address " + ipAddressText);
+            }
+          } else {
+            // TODO: implement me
+          }
+        }
+      }
+
+      if (!commonNameInSan) {
+        throw new BadCertTemplateException(
+            "content of subject:commonName is not included in extension:SubjectAlternativeNames");
+      }
+    }
+
     return values;
   } // method getExtensions
 
@@ -524,51 +757,44 @@ class IdentifiedCertprofile implements Closeable {
     StringBuilder msg = new StringBuilder();
 
     Map<ASN1ObjectIdentifier, ExtensionControl> controls = getExtensionControls();
+    Set<ASN1ObjectIdentifier> types = new HashSet<>(controls.keySet());
+
+    CertLevel certLevel = getCertLevel();
+    CertDomain certDomain = certprofile.getCertDomain();
+
+    ExtensionSpec spec = ExtensionSpec.getExtensionSpec(certDomain, certLevel);
 
     // make sure that non-request extensions are not permitted in requests
     Set<ASN1ObjectIdentifier> set = new HashSet<>();
-    for (ASN1ObjectIdentifier type : ExtensionSpec.getNonRequestExtensionTypes()) {
+    for (ASN1ObjectIdentifier type : types) {
       ExtensionControl control = controls.get(type);
-      if (control != null && control.isRequest()) {
+      if (control.isRequest() && spec.isNonRequest(type)) {
         set.add(type);
       }
     }
 
     if (CollectionUtil.isNonEmpty(set)) {
-      msg.append("extensions ").append(toString(set)).append(" may not be contained in request, ");
+      msg.append("extensions ").append(toString(set)).append(" must not be contained in request, ");
     }
 
-    CertLevel level = getCertLevel();
-    boolean ca = (level == CertLevel.RootCA) || (level == CertLevel.SubCA);
-
-    // make sure that CA-only extensions are not permitted in EE certificate
+    // make sure that non-permitted extensions are not configured
     set.clear();
-    if (!ca) {
-      set.clear();
-      for (ASN1ObjectIdentifier type : ExtensionSpec.getCaOnlyExtensionTypes()) {
-        if (controls.containsKey(type)) {
-          set.add(type);
-        }
+    for (ASN1ObjectIdentifier type : types) {
+      if (spec.isNotPermitted(type)) {
+        set.add(type);
       }
+    }
 
-      if (CollectionUtil.isNonEmpty(set)) {
-        msg.append("EE profile contains CA-only extensions ").append(toString(set)).append(", ");
-      }
+    if (CollectionUtil.isNonEmpty(set)) {
+      msg.append("extensions ").append(toString(set)).append(" must not be contained, ");
     }
 
     // make sure that critical only extensions are not marked as non-critical.
     set.clear();
-    for (ASN1ObjectIdentifier type : controls.keySet()) {
+    for (ASN1ObjectIdentifier type : types) {
       ExtensionControl control = controls.get(type);
-      if (ExtensionSpec.getCriticalOnlyExtensionTypes().contains(type)) {
-        if (!control.isCritical()) {
-          set.add(type);
-        }
-      }
-      if (ca && ExtensionSpec.getCaCriticalOnlyExtensionTypes().contains(type)) {
-        if (!control.isCritical()) {
-          set.add(type);
-        }
+      if (control.isCritical() && spec.isNonCriticalOnly(type)) {
+        set.add(type);
       }
     }
 
@@ -579,24 +805,21 @@ class IdentifiedCertprofile implements Closeable {
 
     // make sure that non-critical only extensions are not marked as critical.
     set.clear();
-    for (ASN1ObjectIdentifier type : controls.keySet()) {
+    for (ASN1ObjectIdentifier type : types) {
       ExtensionControl control = controls.get(type);
-      if (ExtensionSpec.getNonCriticalOnlyExtensionTypes().contains(type)) {
-        if (control.isCritical()) {
-          set.add(type);
-        }
+      if (!control.isCritical() && spec.isCriticalOnly(type)) {
+        set.add(type);
       }
     }
 
     if (CollectionUtil.isNonEmpty(set)) {
-      msg.append("non-critical extensions are marked as critical ").append(toString(set))
-        .append(", ");
+      msg.append("non-critical only extensions are marked as critical ")
+        .append(toString(set)).append(", ");
     }
 
     // make sure that required extensions are present
     set.clear();
-    Set<ASN1ObjectIdentifier> requiredTypes = ca ? ExtensionSpec.getRequiredCaExtensionTypes()
-        : ExtensionSpec.getRequiredEeExtensionTypes();
+    Set<ASN1ObjectIdentifier> requiredTypes = spec.getRequiredExtensions();
 
     for (ASN1ObjectIdentifier type : requiredTypes) {
       ExtensionControl extCtrl = controls.get(type);
@@ -605,42 +828,51 @@ class IdentifiedCertprofile implements Closeable {
       }
     }
 
-    if (level == CertLevel.SubCA) {
-      ASN1ObjectIdentifier type = Extension.authorityKeyIdentifier;
-      ExtensionControl extCtrl = controls.get(type);
-      if (extCtrl == null || !extCtrl.isRequired()) {
-        set.add(type);
-      }
-    }
-
     if (!set.isEmpty()) {
-      msg.append("required extensions are not marked as required ")
+      msg.append("required extensions are not configured or not marked as required ")
         .append(toString(set)).append(", ");
     }
 
     // KeyUsage
     Set<KeyUsageControl> usages = getKeyUsage();
 
-    if (ca) {
-      // make sure the CA certificate contains usage keyCertSign
-      if (!containsKeyusage(usages, KeyUsage.keyCertSign)) {
-        msg.append("CA profile does not contain keyUsage ")
-          .append(KeyUsage.keyCertSign).append(", ");
+    if (certLevel == CertLevel.SubCA || certLevel == CertLevel.RootCA) {
+      // make sure the CA certificate contains usage keyCertSign and cRLSign
+      org.xipki.security.KeyUsage[] requiredUsages = new org.xipki.security.KeyUsage[] {
+          org.xipki.security.KeyUsage.keyCertSign,
+          org.xipki.security.KeyUsage.cRLSign};
+      for (org.xipki.security.KeyUsage usage : requiredUsages) {
+        if (!containsKeyusage(usages, usage)) {
+          msg.append("CA profile does not contain keyUsage ").append(usage).append(", ");
+        }
       }
     } else {
       // make sure the EE certificate does not contain CA-only usages
-      KeyUsage[] caOnlyUsages = {KeyUsage.keyCertSign, KeyUsage.cRLSign};
+      org.xipki.security.KeyUsage[] caOnlyUsages = {org.xipki.security.KeyUsage.keyCertSign};
 
-      Set<KeyUsage> setUsages = new HashSet<>();
-      for (KeyUsage caOnlyUsage : caOnlyUsages) {
+      Set<org.xipki.security.KeyUsage> setUsages = new HashSet<>();
+      for (org.xipki.security.KeyUsage caOnlyUsage : caOnlyUsages) {
         if (containsKeyusage(usages, caOnlyUsage)) {
           setUsages.add(caOnlyUsage);
         }
       }
 
       if (CollectionUtil.isNonEmpty(set)) {
-        msg.append("EE profile contains CA-only keyUsage ").append(setUsages).append(", ");
+        msg.append("EndEntity profile must not contain CA-only keyUsage ").append(setUsages)
+          .append(", ");
       }
+    }
+
+    // BasicConstraints
+    if (certLevel == CertLevel.RootCA) {
+      Integer pathLen = getPathLenBasicConstraint();
+      if (pathLen != null) {
+        msg.append("Root CA must not set PathLen, ");
+      }
+    }
+
+    if (certDomain == CertDomain.CABForumBR) {
+      validateCABForumBR(msg);
     }
 
     final int len = msg.length();
@@ -648,7 +880,232 @@ class IdentifiedCertprofile implements Closeable {
       msg.delete(len - 2, len);
       throw new CertprofileException(msg.toString());
     }
+
   } // method validate
+
+  // CHECKSTYLE:SKIP
+  private void validateCABForumBR(StringBuilder msg) {
+    // Subject only one entries in a RDN is allowed
+    SubjectControl subjectCtl = certprofile.getSubjectControl();
+    if (CollectionUtil.isNonEmpty(subjectCtl.getGroups())) {
+      msg.append("multiple AttributeAndTypes in one RDN is not permitted, ");
+    }
+
+    for (ASN1ObjectIdentifier m : subjectCtl.getTypes()) {
+      RdnControl ctl = subjectCtl.getControl(m);
+      if (ctl.getMaxOccurs() > 1) {
+        msg.append("multiple RDNs of the same type are not permitted, ");
+      }
+    }
+
+    CertLevel certLevel = getCertLevel();
+
+    // validity
+    if (certLevel == CertLevel.EndEntity) {
+      Validity validity = certprofile.getValidity();
+      if (validity.compareTo(maxCabEeValidity) == 1) {
+        msg.append("validity exceeds the maximal validity of subscriber certificate, ");
+      }
+    }
+
+    // Signature/hash algorithm
+    List<String> sigAlgos = getSignatureAlgorithms();
+    if (sigAlgos == null) {
+      msg.append("signature algorithms not defined, ");
+    } else {
+      List<HashAlgo> allowedHashAlgos =
+          Arrays.asList(HashAlgo.SHA256, HashAlgo.SHA384, HashAlgo.SHA512);
+      for (String m : sigAlgos) {
+        try {
+          AlgorithmIdentifier sigAlgId = AlgorithmUtil.getSigAlgId(m);
+          AlgorithmIdentifier digestAlgId = AlgorithmUtil.extractDigesetAlgFromSigAlg(sigAlgId);
+          HashAlgo hashAlgo = HashAlgo.getNonNullInstance(digestAlgId.getAlgorithm());
+          if (!allowedHashAlgos.contains(hashAlgo)) {
+            msg.append("unpermitted hash algorithm ").append(hashAlgo).append(", ");
+          }
+        } catch (IllegalArgumentException | NoSuchAlgorithmException ex) {
+          msg.append("unknown signature algorithm ").append(m).append(", ");
+        }
+      }
+    }
+
+    // Public Key
+    Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = certprofile.getKeyAlgorithms();
+    if (CollectionUtil.isEmpty(keyAlgorithms)) {
+      msg.append("keyAlgorithms is not configured, ");
+    } else {
+      for (ASN1ObjectIdentifier m : keyAlgorithms.keySet()) {
+        KeyParametersOption opt = keyAlgorithms.get(m);
+        if (m.equals(PKCSObjectIdentifiers.rsaEncryption)) {
+          if (opt instanceof RSAParametersOption) {
+            if (((RSAParametersOption) opt).allowsModulusLength(2048 - 1)) {
+              msg.append("minimum RSA modulus size 2048 bit not satisfied, ");
+            }
+          } else {
+            msg.append("unpermitted RSA modulus are configured, ");
+          }
+        } else if (m.equals(X9ObjectIdentifiers.id_ecPublicKey)) {
+          if (opt instanceof ECParamatersOption) {
+            Set<ASN1ObjectIdentifier> curveOids =
+                new HashSet<>(((ECParamatersOption) opt).getCurveOids());
+            curveOids.remove(SECObjectIdentifiers.secp256r1);
+            curveOids.remove(SECObjectIdentifiers.secp384r1);
+            curveOids.remove(SECObjectIdentifiers.secp521r1);
+
+            if (!curveOids.isEmpty()) {
+              msg.append("EC curves ").append(curveOids).append(" are not permitted, ");
+            }
+          } else {
+            msg.append("unpermitted EC curves are configured, ");
+          }
+        } else if (m.equals(X9ObjectIdentifiers.id_dsa)) {
+          if (opt instanceof DSAParametersOption) {
+            DSAParametersOption dsaOpt = (DSAParametersOption) opt;
+            if (dsaOpt.allowsPlength(2048 - 1)) {
+              msg.append("minimum L (2048) not satisfied, ");
+            }
+            if (dsaOpt.allowsQlength(224 - 1)) {
+              msg.append("minimum N (224) not satisfied, ");
+            }
+          } else {
+            msg.append("unpermitted DSA (p,q) are configured, ");
+          }
+        } else {
+          msg.append("keyAlgorithm ").append(m.getId() + " is not permitted, ");
+        }
+      }
+    }
+
+    // CRLDistributionPoints
+    CrlDistributionPointsControl crlDpControl = certprofile.getCrlDpControl();
+    if (crlDpControl == null) {
+      msg.append("restriction of CRLDistributionPoints is not configured, ");
+    } else {
+      Set<String> protocols = crlDpControl.getProtocols();
+      if (protocols == null || protocols.size() != 1 || !protocols.contains("http")) {
+        msg.append("CRLDistributionPoints allows protocol other than http, ");
+      }
+    }
+
+    // FreshestCRLDistributionPoints
+    CrlDistributionPointsControl freshestCrlControl = certprofile.getFreshestCrlControl();
+    if (freshestCrlControl == null) {
+      msg.append("restriction of FreshestCRL is not configured, ");
+    } else {
+      Set<String> protocols = freshestCrlControl.getProtocols();
+      if (protocols == null || protocols.size() != 1 || !protocols.contains("http")) {
+        msg.append("FreshestCRL allows protocol other than http, ");
+      }
+    }
+
+    // AuthorityInfoAccess
+    AuthorityInfoAccessControl aiaControl = certprofile.getAiaControl();
+    if (aiaControl == null) {
+      msg.append("restriction of AuthorityInfoAccess is not configured, ");
+    } else {
+      if (!aiaControl.isIncludesOcsp()) {
+        msg.append("access method id-ad-ocsp is not configured, ");
+      } else {
+        Set<String> protocols = aiaControl.getOcspProtocols();
+        if (protocols == null || protocols.size() != 1 || !protocols.contains("http")) {
+          msg.append("AIA OCSP allows protocol other than http, ");
+        }
+      }
+
+      if (!aiaControl.isIncludesCaIssuers()) {
+        msg.append("access method id-ad-caIssuers is not configured, ");
+      } else {
+        Set<String> protocols = aiaControl.getCaIssuersProtocols();
+        if (protocols == null || protocols.size() != 1 || !protocols.contains("http")) {
+          msg.append("AIA CAIssuers allows protocol other than http, ");
+        }
+      }
+    }
+
+    // Certificate Policies
+    if (certLevel == CertLevel.SubCA || certLevel == CertLevel.EndEntity) {
+      CertificatePolicies certPolicyValue = certprofile.getCertificatePolicies();
+      if (certPolicyValue == null) {
+        msg.append("CertificatePolicies is not configured, ");
+      }
+    }
+
+    // SubjectAltNames
+    if (certLevel == CertLevel.EndEntity) {
+      Set<GeneralNameMode> sanModes = certprofile.getSubjectAltNameModes();
+      if (sanModes == null) {
+        msg.append("Restriction of SubjectAltNames is not configured, ");
+      } else {
+        Set<GeneralNameMode> tmp = new HashSet<>(sanModes);
+        for (GeneralNameMode m : sanModes) {
+          if (m.getTag() != GeneralNameTag.uniformResourceIdentifier
+              && m.getTag() == GeneralNameTag.IPAddress) {
+            tmp.add(m);
+          }
+        }
+
+        if (!tmp.isEmpty()) {
+          msg.append("SubjectAltNames ").append(tmp).append(" is not configured, ");
+        }
+      }
+    }
+
+    // KeyUsage
+    Set<KeyUsageControl> usages = getKeyUsage();
+    if (certLevel == CertLevel.RootCA || certLevel == CertLevel.SubCA) {
+      if (!containsKeyusage(usages, org.xipki.security.KeyUsage.cRLSign)) {
+        msg.append("RootCA profile does contain keyUsage ")
+          .append(org.xipki.security.KeyUsage.cRLSign).append(", ");
+      }
+    } else if (certLevel == CertLevel.EndEntity) {
+      if (containsKeyusage(usages, org.xipki.security.KeyUsage.cRLSign)) {
+        msg.append("EndEntity profile must not contain keyUsage ")
+          .append(org.xipki.security.KeyUsage.cRLSign).append(", ");
+      }
+    }
+
+    // ExtendedKeyUsage
+    Set<ExtKeyUsageControl> ekuControls = getExtendedKeyUsages();
+    if (certLevel == CertLevel.EndEntity) {
+      // ekuControls could not be null here.
+      boolean xkuTlsServerRequired = false;
+      boolean xkuTlsClientRequired = false;
+      for (ExtKeyUsageControl m : ekuControls) {
+        ASN1ObjectIdentifier oid = m.getExtKeyUsage();
+        if (m.isRequired()) {
+          if (XKU.id_kp_serverAuth.equals(oid)) {
+            xkuTlsServerRequired = true;
+          } else if (XKU.id_kp_clientAuth.equals(oid)) {
+            xkuTlsClientRequired = true;
+          }
+        }
+
+        if (!(XKU.id_kp_serverAuth.equals(oid) || XKU.id_kp_clientAuth.equals(oid)
+            || XKU.id_kp_emailProtection.equals(oid))) {
+          msg.append("extendedKeyUsage ").append(oid.getId() + " is not permitted, ");
+        }
+      }
+
+      if (!(xkuTlsClientRequired | xkuTlsServerRequired)) {
+        msg.append("none of ").append(XKU.id_kp_clientAuth).append(" and ")
+          .append(XKU.id_kp_serverAuth).append(" is not configured, ");
+      }
+    } else {
+      if (ekuControls != null) {
+        for (ExtKeyUsageControl m : ekuControls) {
+          if (m.getExtKeyUsage().equals(XKU.id_kp_anyExtendedKeyUsage)) {
+            msg.append(XKU.id_kp_clientAuth).append(" is not allowed, ");
+          }
+        }
+      }
+    }
+
+  }
+
+  private static boolean containsRdn(X500Name name, ASN1ObjectIdentifier rdnType) {
+    RDN[] rdns = name.getRDNs(rdnType);
+    return rdns != null && rdns.length > 0;
+  }
 
   private static String toString(Set<ASN1ObjectIdentifier> oids) {
     if (oids == null) {
@@ -689,8 +1146,7 @@ class IdentifiedCertprofile implements Closeable {
 
   private static boolean addMe(ASN1ObjectIdentifier extType, ExtensionControl extControl,
       Set<ASN1ObjectIdentifier> neededExtTypes, Set<ASN1ObjectIdentifier> wantedExtTypes) {
-    boolean addMe = extControl.isRequired();
-    if (addMe) {
+    if (extControl.isRequired()) {
       return true;
     }
 

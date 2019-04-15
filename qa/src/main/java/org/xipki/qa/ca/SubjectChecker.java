@@ -21,7 +21,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
@@ -39,7 +38,7 @@ import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.profile.Certprofile.RdnControl;
 import org.xipki.ca.api.profile.Certprofile.StringType;
 import org.xipki.ca.api.profile.Certprofile.SubjectControl;
-import org.xipki.ca.api.profile.Patterns;
+import org.xipki.ca.api.profile.TextVadidator;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
@@ -310,7 +309,7 @@ public class SubjectChecker {
     }
 
     if (ObjectIdentifiers.DN.dateOfBirth.equals(type)) {
-      if (!Patterns.DATE_OF_BIRTH.matcher(atvTextValue).matches()) {
+      if (!TextVadidator.DATE_OF_BIRTH.isValid(atvTextValue)) {
         throw new BadCertTemplateException(
             "Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
       }
@@ -338,9 +337,9 @@ public class SubjectChecker {
         }
       }
 
-      Pattern pattern = rdnControl.getPattern();
+      TextVadidator pattern = rdnControl.getPattern();
       if (pattern != null) {
-        boolean matches = pattern.matcher(atvTextValue).matches();
+        boolean matches = pattern.isValid(atvTextValue);
         if (!matches) {
           failureMsg.append(name).append(" '").append(atvTextValue)
             .append("' is not valid against regex '").append(pattern.pattern()).append("'; ");

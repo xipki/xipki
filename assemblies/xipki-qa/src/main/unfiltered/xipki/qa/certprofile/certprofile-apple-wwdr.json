@@ -4,6 +4,7 @@
 		"category":"A"
 	},
 	"version":"v3",
+	"certDomain":"RFC5280",
 	"certLevel":"EndEntity",
 	"maxSize":3000,
 	"validity":"395d",

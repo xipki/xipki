@@ -19,7 +19,6 @@ package org.xipki.ca.certprofile.xijson;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.bouncycastle.asn1.ASN1Boolean;
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -45,6 +44,7 @@ import org.bouncycastle.asn1.DERUTCTime;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.api.BadCertTemplateException;
+import org.xipki.ca.api.profile.TextVadidator;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.ExtnSyntax;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.ExtnSyntax.SubFieldSyntax;
 import org.xipki.security.X509ExtensionType.FieldType;
@@ -417,13 +417,11 @@ public class ExtensionSyntaxChecker {
     return expectedType;
   }
 
-  private static void assertMatch(String name, Pattern pattern, String text)
+  private static void assertMatch(String name, String pattern, String text)
       throws BadCertTemplateException {
-    boolean match = pattern.matcher(text).matches();
-    if (!match) {
+    if (!TextVadidator.compile(pattern).isValid(text)) {
       throw new BadCertTemplateException(
-          String.format("invalid %s '%s' against regex '%s'",
-              name, text, pattern.pattern()));
+          String.format("invalid %s '%s' against regex '%s'", name, text, pattern));
     }
   }
 
@@ -484,8 +482,8 @@ public class ExtensionSyntaxChecker {
   private static void checkContentTextOrSubFields(String name, ExtnSyntax subField,
       ASN1Encodable obj) throws BadCertTemplateException {
     if (obj instanceof ASN1String) {
-      if (subField.getStringPattern() != null) {
-        assertMatch(name, subField.getStringPattern(), ((ASN1String) obj).getString());
+      if (subField.getStringRegex() != null) {
+        assertMatch(name, subField.getStringRegex(), ((ASN1String) obj).getString());
       }
       return;
     }

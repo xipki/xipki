@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -36,6 +35,7 @@ import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERT61String;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.CertificatePolicies;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.ca.api.BadCertTemplateException;
@@ -61,9 +61,18 @@ public abstract class Certprofile implements Closeable {
 
     private final boolean includesOcsp;
 
-    public AuthorityInfoAccessControl(boolean includesCaIssuers, boolean includesOcsp) {
+    private final Set<String> ocspProtocols;
+
+    private final Set<String> caIssuersProtocols;
+
+    public AuthorityInfoAccessControl(boolean includesCaIssuers, boolean includesOcsp,
+        Set<String> caIssuersProtocols, Set<String> ocspProtocols) {
       this.includesCaIssuers = includesCaIssuers;
       this.includesOcsp = includesOcsp;
+      this.ocspProtocols = ocspProtocols == null
+          ? null : Collections.unmodifiableSet(new HashSet<>(ocspProtocols));
+      this.caIssuersProtocols = caIssuersProtocols == null
+          ? null : Collections.unmodifiableSet(new HashSet<>(caIssuersProtocols));
     }
 
     public boolean isIncludesCaIssuers() {
@@ -74,6 +83,34 @@ public abstract class Certprofile implements Closeable {
       return includesOcsp;
     }
 
+    public Set<String> getOcspProtocols() {
+      return ocspProtocols;
+    }
+
+    public Set<String> getCaIssuersProtocols() {
+      return caIssuersProtocols;
+    }
+
+  }
+
+  public static class CrlDistributionPointsControl {
+
+    private final Set<String> protocols;
+
+    public CrlDistributionPointsControl(Set<String> protocols) {
+      this.protocols = protocols == null
+         ? null : Collections.unmodifiableSet(new HashSet<>(protocols));
+    }
+
+    public Set<String> getProtocols() {
+      return protocols;
+    }
+
+  }
+
+  public static enum CertDomain {
+    RFC5280,
+    CABForumBR
   }
 
   public enum CertLevel {
@@ -212,7 +249,7 @@ public abstract class Certprofile implements Closeable {
 
     private final ASN1ObjectIdentifier type;
 
-    private Pattern pattern;
+    private TextVadidator pattern;
 
     private StringType stringType;
 
@@ -229,7 +266,7 @@ public abstract class Certprofile implements Closeable {
     private String group;
 
     /**
-     * This RDN is for other purpose, will not contained in the Subject field of certificate
+     * This RDN is for other purpose, will not contained in the Subject field of certificate.
      */
     private boolean notInSubject;
 
@@ -278,7 +315,7 @@ public abstract class Certprofile implements Closeable {
       return stringType;
     }
 
-    public Pattern getPattern() {
+    public TextVadidator getPattern() {
       return pattern;
     }
 
@@ -294,7 +331,7 @@ public abstract class Certprofile implements Closeable {
       this.stringLengthRange = stringLengthRange;
     }
 
-    public void setPattern(Pattern pattern) {
+    public void setPattern(TextVadidator pattern) {
       this.pattern = pattern;
     }
 
@@ -549,9 +586,22 @@ public abstract class Certprofile implements Closeable {
     return false;
   }
 
-  public AuthorityInfoAccessControl getAiaControl() {
-    return null;
-  }
+  /**
+   * Get the SubjectControl.
+   *
+   * @return the SubjectControl, may not be <code>null</code>.
+   */
+  public abstract SubjectControl getSubjectControl();
+
+  public abstract AuthorityInfoAccessControl getAiaControl();
+
+  public abstract CrlDistributionPointsControl getCrlDpControl();
+
+  public abstract CrlDistributionPointsControl getFreshestCrlControl();
+
+  public abstract CertificatePolicies getCertificatePolicies();
+
+  public abstract Set<GeneralNameMode> getSubjectAltNameModes();
 
   /**
    * Increments the SerialNumber attribute in the subject.
@@ -612,9 +662,13 @@ public abstract class Certprofile implements Closeable {
 
   public abstract CertLevel getCertLevel();
 
+  public abstract CertDomain getCertDomain();
+
   public KeypairGenControl getKeypairGenControl() {
     return KeypairGenControl.ForbiddenKeypairGenControl.INSTANCE;
   }
+
+  public abstract Map<ASN1ObjectIdentifier, KeyParametersOption> getKeyAlgorithms();
 
   public abstract Set<KeyUsageControl> getKeyUsage();
 

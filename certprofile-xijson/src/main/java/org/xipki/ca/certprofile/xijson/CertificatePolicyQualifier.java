@@ -46,6 +46,7 @@ public class CertificatePolicyQualifier {
 
   public static CertificatePolicyQualifier getInstanceForUserNotice(String userNotice) {
     Args.notNull(userNotice, "userNotice");
+    Args.range(userNotice.length(), "userNotice.length", 1, 200);
     return new CertificatePolicyQualifier(null, userNotice);
   }
 

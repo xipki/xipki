@@ -95,7 +95,7 @@ import org.xipki.ca.api.profile.Certprofile.GeneralNameMode;
 import org.xipki.ca.api.profile.Certprofile.GeneralNameTag;
 import org.xipki.ca.api.profile.Certprofile.KeyUsageControl;
 import org.xipki.ca.api.profile.CertprofileException;
-import org.xipki.ca.api.profile.Patterns;
+import org.xipki.ca.api.profile.TextVadidator;
 import org.xipki.ca.certprofile.xijson.AdmissionSyntaxOption;
 import org.xipki.ca.certprofile.xijson.BiometricInfoOption;
 import org.xipki.ca.certprofile.xijson.DirectoryStringType;
@@ -547,7 +547,7 @@ public class ExtensionsChecker {
             if (tag == 0 || tag == 2) {
               expected =
                   new DERTaggedObject(false, tag, new DERPrintableString(extnStr)).getEncoded();
-            } else if (tag == 1){
+            } else if (tag == 1) {
               expected = new DERTaggedObject(false, tag, new DERUTF8String(extnStr)).getEncoded();
             }
           }
@@ -1462,7 +1462,7 @@ public class ExtensionsChecker {
 
     if (dateOfBirth != null) {
       String timeStirng = dateOfBirth.getTimeString();
-      if (!Patterns.DATE_OF_BIRTH.matcher(timeStirng).matches()) {
+      if (!TextVadidator.DATE_OF_BIRTH.isValid(timeStirng)) {
         failureMsg.append("invalid dateOfBirth: " + timeStirng + "; ");
       }
 

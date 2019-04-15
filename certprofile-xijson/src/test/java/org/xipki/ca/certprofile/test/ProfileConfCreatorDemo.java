@@ -46,6 +46,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
+import org.xipki.ca.api.profile.Certprofile.CertDomain;
 import org.xipki.ca.api.profile.Certprofile.CertLevel;
 import org.xipki.ca.api.profile.Certprofile.GeneralNameTag;
 import org.xipki.ca.api.profile.Certprofile.X509CertVersion;
@@ -70,6 +71,7 @@ import org.xipki.ca.certprofile.xijson.conf.ExtensionType.BasicConstraints;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.BiometricInfo;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.BiometricTypeType;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.CertificatePolicies;
+import org.xipki.ca.certprofile.xijson.conf.ExtensionType.CrlDistributionPoints;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.ExtendedKeyUsage;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.ExtnSyntax;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.ExtnSyntax.SubFieldSyntax;
@@ -111,6 +113,7 @@ import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.ObjectIdentifiers.BaseRequirements;
 import org.xipki.security.ObjectIdentifiers.DN;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.TlsExtensionType;
@@ -187,6 +190,13 @@ public class ProfileConfCreatorDemo {
 
   public static void main(String[] args) {
     try {
+      // CA/Browser Forum
+      certprofileCabRootCa("certprofile-cab-rootca.json");
+      certprofileCabSubCa("certprofile-cab-subca.json");
+      certprofileCabDomainValidatedTls("certprofile-cab-domain-validated.json");
+      certprofileCabOrganizationValidatedTls("certprofile-cab-org-validated.json");
+      certprofileCabIndividualValidatedTls("certprofile-cab-individual-validated.json");
+
       certprofileRootCa("certprofile-rootca.json");
       certprofileCross("certprofile-cross.json");
       certprofileSubCa("certprofile-subca.json");
@@ -245,6 +255,206 @@ public class ProfileConfCreatorDemo {
     }
 
   } // method marshal
+
+  private static void certprofileCabRootCa(String destFilename) throws Exception {
+    X509ProfileType profile = getBaseCabProfile("certprofile RootCA (CA/Browser Forum BR)",
+        CertLevel.RootCA, "10y");
+
+    // Subject
+    Subject subject = profile.getSubject();
+
+    List<RdnType> rdnControls = subject.getRdns();
+    rdnControls.add(createRdn(DN.C, 1, 1));
+    rdnControls.add(createRdn(DN.O, 1, 1));
+    rdnControls.add(createRdn(DN.OU, 0, 1));
+    rdnControls.add(createRdn(DN.SN, 0, 1));
+    rdnControls.add(createRdn(DN.CN, 1, 1));
+
+    // Extensions
+    List<ExtensionType> list = profile.getExtensions();
+
+    list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+
+    // Extensions - basicConstraints
+    list.add(createExtension(Extension.basicConstraints, true, true));
+
+    // Extensions - keyUsage
+    list.add(createExtension(Extension.keyUsage, true, true));
+    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign},
+        new KeyUsage[]{KeyUsage.cRLSign}));
+
+    marshall(profile, destFilename, true);
+  } // method certprofileCabRootCa
+
+  private static void certprofileCabSubCa(String destFilename) throws Exception {
+    X509ProfileType profile = getBaseCabProfile("certprofile SubCA (CA/Browser Forum BR)",
+        CertLevel.SubCA, "8y");
+
+    // Subject
+    Subject subject = profile.getSubject();
+
+    List<RdnType> rdnControls = subject.getRdns();
+    rdnControls.add(createRdn(DN.C, 1, 1));
+    rdnControls.add(createRdn(DN.O, 1, 1));
+    rdnControls.add(createRdn(DN.OU, 0, 1));
+    rdnControls.add(createRdn(DN.SN, 0, 1));
+    rdnControls.add(createRdn(DN.CN, 1, 1));
+
+    // Extensions
+    List<ExtensionType> list = profile.getExtensions();
+
+    // Extensions - controls
+    list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+    list.add(createExtension(Extension.cRLDistributionPoints, false, false));
+    last(list).setCrlDistributionPoints(createCrlDistibutoionPoints());
+
+    // Extensions - basicConstraints
+    list.add(createExtension(Extension.basicConstraints, true, true));
+    last(list).setBasicConstrains(createBasicConstraints(1));
+
+    // Extensions - AuthorityInfoAccess
+    list.add(createExtension(Extension.authorityInfoAccess, true, false));
+    last(list).setAuthorityInfoAccess(createAuthorityInfoAccess());
+
+    // Extensions - AuthorityKeyIdentifier
+    list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
+
+    // Extensions - keyUsage
+    list.add(createExtension(Extension.keyUsage, true, true));
+    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign},
+        new KeyUsage[]{KeyUsage.cRLSign}));
+
+    // Extensions - CertificatePolicies
+    list.add(createExtension(Extension.certificatePolicies, true, false));
+    Map<ASN1ObjectIdentifier, String> policiesIdAndCpsMap = new HashMap<>();
+    policiesIdAndCpsMap.put(new ASN1ObjectIdentifier("1.2.3.4"), "http://abc.def.de/cfp");
+    last(list).setCertificatePolicies(createCertificatePolicies(policiesIdAndCpsMap));
+
+    marshall(profile, destFilename, true);
+  } // method certprofileCabSubCa
+
+  private static void certprofileCabDomainValidatedTls(String destFilename) throws Exception {
+    X509ProfileType profile = getBaseCabSubscriberProfile(
+        "certprofile TLS (CA/Browser Forum BR, Domain Validated)");
+
+    // Subject
+    Subject subject = profile.getSubject();
+
+    List<RdnType> rdnControls = subject.getRdns();
+    rdnControls.add(createRdn(DN.C, 1, 1));
+    rdnControls.add(createRdn(DN.OU, 0, 1));
+    rdnControls.add(createRdn(DN.SN, 0, 1));
+    rdnControls.add(createRdn(DN.CN, 1, 1, REGEX_FQDN, null, null));
+
+    List<ExtensionType> list = profile.getExtensions();
+    // Extensions - CertificatePolicies
+    list.add(createExtension(Extension.certificatePolicies, true, false));
+    Map<ASN1ObjectIdentifier, String> policiesIdAndCpsMap = new HashMap<>();
+    policiesIdAndCpsMap.put(BaseRequirements.id_domain_validated, null);
+    last(list).setCertificatePolicies(createCertificatePolicies(policiesIdAndCpsMap));
+
+    marshall(profile, destFilename, true);
+  } // method certprofileCabDomainValidatedTls
+
+  private static void certprofileCabOrganizationValidatedTls(String destFilename) throws Exception {
+    X509ProfileType profile = getBaseCabSubscriberProfile(
+        "certprofile TLS (CA/Browser Forum BR, Organization Validiated)");
+
+    // Subject
+    Subject subject = profile.getSubject();
+
+    List<RdnType> rdnControls = subject.getRdns();
+    rdnControls.add(createRdn(DN.C, 1, 1));
+    rdnControls.add(createRdn(DN.ST, 0, 1));
+    rdnControls.add(createRdn(DN.localityName, 0, 1));
+    rdnControls.add(createRdn(DN.O, 1, 1));
+    rdnControls.add(createRdn(DN.OU, 0, 1));
+    rdnControls.add(createRdn(DN.SN, 0, 1));
+    rdnControls.add(createRdn(DN.CN, 1, 1, REGEX_FQDN, null, null));
+
+    List<ExtensionType> list = profile.getExtensions();
+    // Extensions - CertificatePolicies
+    list.add(createExtension(Extension.certificatePolicies, true, false));
+    Map<ASN1ObjectIdentifier, String> policiesIdAndCpsMap = new HashMap<>();
+    policiesIdAndCpsMap.put(BaseRequirements.id_organization_validated, null);
+    last(list).setCertificatePolicies(createCertificatePolicies(policiesIdAndCpsMap));
+
+    marshall(profile, destFilename, true);
+  } // method certprofileCabOrganizationValidatedTls
+
+  private static void certprofileCabIndividualValidatedTls(String destFilename) throws Exception {
+    X509ProfileType profile = getBaseCabSubscriberProfile(
+        "certprofile TLS (CA/Browser Forum BR, Individual Validiated)");
+
+    // Subject
+    Subject subject = profile.getSubject();
+
+    List<RdnType> rdnControls = subject.getRdns();
+    rdnControls.add(createRdn(DN.C, 1, 1));
+    rdnControls.add(createRdn(DN.ST, 0, 1));
+    rdnControls.add(createRdn(DN.localityName, 0, 1));
+    rdnControls.add(createRdn(DN.givenName, 1, 1));
+    rdnControls.add(createRdn(DN.surname, 1, 1));
+    rdnControls.add(createRdn(DN.SN, 0, 1));
+    rdnControls.add(createRdn(DN.CN, 1, 1, REGEX_FQDN, null, null));
+
+    List<ExtensionType> list = profile.getExtensions();
+    // Extensions - CertificatePolicies
+    list.add(createExtension(Extension.certificatePolicies, true, false));
+    Map<ASN1ObjectIdentifier, String> policiesIdAndCpsMap = new HashMap<>();
+    policiesIdAndCpsMap.put(BaseRequirements.id_individual_validated, null);
+    last(list).setCertificatePolicies(createCertificatePolicies(policiesIdAndCpsMap));
+
+    marshall(profile, destFilename, true);
+  } // method certprofileCabOrganizationValidatedTls
+
+  private static X509ProfileType getBaseCabSubscriberProfile(String desc) throws Exception {
+    X509ProfileType profile = getBaseCabProfile(desc, CertLevel.EndEntity, "2y");
+
+    // SubjectToSubjectAltName
+    SubjectToSubjectAltNameType s2sType = new SubjectToSubjectAltNameType();
+    profile.getSubjectToSubjectAltNames().add(s2sType);
+    s2sType.setSource(createOidType(DN.CN));
+    s2sType.setTarget(GeneralNameTag.DNSName);
+
+    // Extensions
+    // Extensions - controls
+    List<ExtensionType> list = profile.getExtensions();
+    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
+    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
+    last(list).setCrlDistributionPoints(createCrlDistibutoionPoints());
+
+    // Extensions - SubjectAltNames
+    list.add(createExtension(Extension.subjectAlternativeName, true, false));
+    GeneralNameType san = new GeneralNameType();
+    last(list).setSubjectAltName(san);
+    san.addTags(GeneralNameTag.DNSName, GeneralNameTag.IPAddress);
+
+    // Extensions - basicConstraints
+    list.add(createExtension(Extension.basicConstraints, true, true));
+
+    // Extensions - AuthorityInfoAccess
+    list.add(createExtension(Extension.authorityInfoAccess, true, false));
+    last(list).setAuthorityInfoAccess(createAuthorityInfoAccess());
+
+    // Extensions - AuthorityKeyIdentifier
+    list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
+
+    // Extensions - keyUsage
+    list.add(createExtension(Extension.keyUsage, true, true));
+    last(list).setKeyUsage(createKeyUsage(
+        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
+            KeyUsage.keyEncipherment},
+        null));
+
+    // Extensions - extenedKeyUsage
+    list.add(createExtension(Extension.extendedKeyUsage, true, false));
+    last(list).setExtendedKeyUsage(createExtendedKeyUsage(
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_serverAuth},
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth}));
+
+    return profile;
+  } // method certprofileCabTls
 
   private static void certprofileRootCa(String destFilename) throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile rootca", CertLevel.RootCA, "10y");
@@ -2006,6 +2216,7 @@ public class ProfileConfCreatorDemo {
     return extValue;
   }
 
+  // CHECKSTYLE:SKIP
   private static AuthorityKeyIdentifier createAKIwithSerialAndSerial() {
     AuthorityKeyIdentifier akiType = new AuthorityKeyIdentifier();
     akiType.setUseIssuerAndSerial(true);
@@ -2017,6 +2228,14 @@ public class ProfileConfCreatorDemo {
     AuthorityInfoAccess extnValue = new AuthorityInfoAccess();
     extnValue.setIncludeCaIssuers(true);
     extnValue.setIncludeOcsp(true);
+    extnValue.setCaIssuersProtocols(new HashSet<>(Arrays.asList("http")));
+    extnValue.setOcspProtocols(new HashSet<>(Arrays.asList("http")));
+    return extnValue;
+  }
+
+  private static CrlDistributionPoints createCrlDistibutoionPoints() {
+    CrlDistributionPoints extnValue = new CrlDistributionPoints();
+    extnValue.setProtocols(new HashSet<>(Arrays.asList("http")));
     return extnValue;
   }
 
@@ -2310,6 +2529,56 @@ public class ProfileConfCreatorDemo {
     return ret;
   }
 
+  private static X509ProfileType getBaseCabProfile(String description, CertLevel certLevel,
+      String validity) {
+    return getBaseCabProfile(description, certLevel, validity, false, false);
+  }
+
+  private static X509ProfileType getBaseCabProfile(String description, CertLevel certLevel,
+      String validity, boolean useMidnightNotBefore, boolean incSerialNumber) {
+    X509ProfileType profile = new X509ProfileType();
+
+    profile.setMetadata(createDescription(description));
+
+    profile.setCertDomain(CertDomain.CABForumBR);
+    profile.setCertLevel(certLevel);
+    profile.setMaxSize(3000);
+    profile.setVersion(X509CertVersion.v3);
+    profile.setValidity(validity);
+    profile.setNotBeforeTime(useMidnightNotBefore ? "midnight" : "current");
+
+    profile.setSerialNumberInReq(false);
+
+    if (certLevel == CertLevel.EndEntity) {
+      profile.setKeypairGeneration(new KeypairGenerationType());
+      profile.getKeypairGeneration().setInheritCA(true);
+    }
+
+    // SignatureAlgorithms
+    List<String> algos = new LinkedList<>();
+    profile.setSignatureAlgorithms(algos);
+
+    String[] sigHashAlgos = new String[]{"SHA512", "SHA384", "SHA256"};
+
+    String[] algoPart2s = new String[]{"withRSA", "withDSA", "withECDSA", "withRSAandMGF1"};
+    for (String part2 : algoPart2s) {
+      for (String hashAlgo : sigHashAlgos) {
+        algos.add(hashAlgo + part2);
+      }
+    }
+
+    // Subject
+    Subject subject = new Subject();
+    profile.setSubject(subject);
+    subject.setKeepRdnOrder(false);
+    subject.setIncSerialNumber(incSerialNumber);
+
+    // Key
+    profile.setKeyAlgorithms(createCabKeyAlgorithms());
+
+    return profile;
+  } // method getBaseProfile
+
   private static X509ProfileType getBaseProfile(String description, CertLevel certLevel,
       String validity) {
     return getBaseProfile(description, certLevel, validity, false, false);
@@ -2372,6 +2641,55 @@ public class ProfileConfCreatorDemo {
 
     return profile;
   } // method getBaseProfile
+
+  private static List<AlgorithmType> createCabKeyAlgorithms() {
+    List<AlgorithmType> list = new LinkedList<>();
+
+    // RSA
+    list.addAll(createRSAKeyAlgorithms());
+
+    // DSA
+    list.add(new AlgorithmType());
+    last(list).getAlgorithms().add(createOidType(X9ObjectIdentifiers.id_dsa, "DSA"));
+    last(list).setParameters(new KeyParametersType());
+
+    DsaParametersType dsaParams = new DsaParametersType();
+    last(list).getParameters().setDsa(dsaParams);
+
+    List<Range> plengths = new LinkedList<>();
+    dsaParams.setPlengths(plengths);
+
+    plengths.add(createRange(2048));
+    plengths.add(createRange(3072));
+
+    List<Range> qlengths = new LinkedList<>();
+    dsaParams.setQlengths(qlengths);
+    qlengths.add(createRange(224));
+    qlengths.add(createRange(256));
+
+    // EC
+    list.add(new AlgorithmType());
+
+    last(list).getAlgorithms().add(createOidType(X9ObjectIdentifiers.id_ecPublicKey, "EC"));
+    last(list).setParameters(new KeyParametersType());
+
+    EcParametersType ecParams = new EcParametersType();
+    last(list).getParameters().setEc(ecParams);
+
+    ASN1ObjectIdentifier[] curveIds = new ASN1ObjectIdentifier[] {SECObjectIdentifiers.secp256r1,
+        SECObjectIdentifiers.secp384r1, SECObjectIdentifiers.secp521r1};
+    List<DescribableOid> curves = new LinkedList<>();
+    ecParams.setCurves(curves);
+
+    for (ASN1ObjectIdentifier curveId : curveIds) {
+      String name = AlgorithmUtil.getCurveName(curveId);
+      curves.add(createOidType(curveId, name));
+    }
+
+    ecParams.setPointEncodings(Arrays.asList(((byte) 4)));
+
+    return list;
+  } // method createCabKeyAlgorithms
 
   private static List<AlgorithmType> createKeyAlgorithms(ASN1ObjectIdentifier[] curveIds) {
     List<AlgorithmType> list = new LinkedList<>();

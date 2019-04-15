@@ -145,7 +145,7 @@ public class Subject extends ValidatableConf {
     private String group;
 
     /**
-     * This RDN is for other purpose, will not contained in the Subject field of certificate
+     * This RDN is for other purpose, will not contained in the Subject field of certificate.
      */
     @JSONField(ordinal = 11)
     private Boolean notInSubject;

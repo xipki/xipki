@@ -1,0 +1,134 @@
+source file:./xipki/qa/qa.d/initdb.script
+
+echo "Sleeping 1 second"
+sleep 1
+
+ca:restart
+
+## Create the CSR for the command caqa:check-cert in QA
+if { $TOKEN_TYPE equals "pkcs11" } then {
+  xi:csr-p11 \
+    --hash $HASH REPLACEME-RSAMGF1 \
+    --slot $SLOT --label rootca1 --out output/rootca1.csr \
+    --subject "CN=rootca1,O=xipki,C=DE"
+} else {
+  xi:csr-p12 \
+    --hash $HASH REPLACEME-RSAMGF1 \
+    --p12 output/rootca1.p12 --password 1234 \
+    --out output/rootca1.csr \
+    --subject "CN=rootca1,O=xipki,C=DE"
+}
+
+echo "#################################################################"
+echo "#                        Load rootca.json                       #"
+echo "#################################################################"
+
+if { $TOKEN_TYPE equals "pkcs11" } then {
+  CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=rootca1"
+} else {
+  CA_SIGNER_CONF = "password=1234,keystore=file:output/rootca1.p12,algo=$SIGALGO"
+}
+
+xi:copy-file -f xipki/qa/cab/template.rootca.json xipki/qa/cab/rootca.json
+
+xi:replace --old "REPLACEME-CMP_SIGALGO" --new "$CMP_SIGALGO" \
+  xipki/qa/cab/rootca.json
+
+xi:replace --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
+  xipki/qa/cab/rootca.json
+
+xi:replace --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
+  xipki/qa/cab/rootca.json
+
+xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
+  xipki/qa/cab/rootca.json
+
+xi:replace --old "REPLACEME-HASH" --new "$STDHASH" \
+  xipki/qa/cab/rootca.json
+
+xi:replace --old "REPLACEME-OUTFORM" --new "$OUTFORM" \
+  xipki/qa/cab/rootca.json
+
+if { $TOKEN_TYPE equals "pkcs11" } then {
+  ca:refresh-token --type pkcs11
+}
+
+ca:load-conf --conf-file xipki/qa/cab/rootca.json \
+  --out-dir output
+
+xi:move-file output/ca-rootca1.der output/rootca1.crt
+
+## Update the certificate in the device
+if { $TOKEN_TYPE equals "pkcs11" } then {
+  xi:update-cert-p11 --slot $SLOT --label rootca1 --cert output/rootca1.crt
+} else {
+  xi:update-cert-p12 --p12 output/rootca1.p12 --password 1234 --cert output/rootca1.crt
+}
+
+## Generate keys and CSR for subca1
+if { $TOKEN_TYPE equals "pkcs11" } then {
+  xi:csr-p11 --hash $HASH REPLACEME-RSAMGF1 \
+    --slot $SLOT --label subca1 \
+    --outform $OUTFORM \
+    --out output/subca1.csr \
+    --subject "CN=subca1,O=xipki,C=DE"
+} else {
+  xi:csr-p12 --hash $HASH REPLACEME-RSAMGF1 \
+    --p12 output/subca1.p12 --password 1234 \
+    --outform $OUTFORM \
+    --out output/subca1.csr \
+    --subject "CN=subca1,O=xipki,C=DE"
+}
+
+ca:enroll-cert --ca rootca1 --csr output/subca1.csr \
+  --outform $OUTFORM \
+  --out output/subca1.crt --profile cab-subca
+
+if { $TOKEN_TYPE equals "pkcs11" } then {
+  xi:update-cert-p11 --slot $SLOT --label subca1 \
+    --cert output/subca1.crt \
+} else {
+  xi:update-cert-p12 --p12 output/subca1.p12 --password 1234 \
+    --cert output/subca1.crt --ca-cert output/rootca1.crt
+}
+
+if { $TOKEN_TYPE equals "pkcs11" } then {
+  ca:refresh-token --type pkcs11
+}
+
+echo "#################################################################"
+echo "#                             Add subca                         #"
+echo "#################################################################"
+## Add CA
+
+if { $TOKEN_TYPE equals "pkcs11" } then {
+  CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=subca1"
+} else {
+  CA_SIGNER_CONF = "password=1234,keystore=file:output/subca1.p12,algo=$SIGALGO"
+}
+
+xi:copy-file -f xipki/qa/cab/template.subca.json xipki/qa/cab/subca.json
+
+xi:replace --old "REPLACEME-CMP_SIGALGO" --new "$CMP_SIGALGO" \
+  xipki/qa/cab/subca.json
+
+xi:replace --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
+  xipki/qa/cab/subca.json
+
+xi:replace --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
+  xipki/qa/cab/subca.json
+
+xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
+  xipki/qa/cab/subca.json
+
+xi:replace --old "REPLACEME-HASH" --new "$STDHASH" \
+  xipki/qa/cab/subca.json
+
+ca:load-conf --conf-file xipki/qa/cab/subca.json
+
+# Remove CertProfile cab-rootca
+
+ca:profile-rm -f cab-rootca
+
+## Restart the CA
+#ca:restart

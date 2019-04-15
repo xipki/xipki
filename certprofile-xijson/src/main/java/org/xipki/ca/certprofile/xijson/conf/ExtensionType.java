@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
@@ -47,7 +46,6 @@ import org.bouncycastle.asn1.x509.UserNotice;
 import org.xipki.ca.api.profile.Certprofile.ExtKeyUsageControl;
 import org.xipki.ca.api.profile.Certprofile.KeyUsageControl;
 import org.xipki.ca.api.profile.CertprofileException;
-import org.xipki.ca.api.profile.Patterns;
 import org.xipki.ca.certprofile.xijson.AdmissionSyntaxOption;
 import org.xipki.ca.certprofile.xijson.AdmissionsOption;
 import org.xipki.ca.certprofile.xijson.CertificatePolicyInformation;
@@ -121,6 +119,9 @@ public class ExtensionType extends ValidatableConf {
   @JSONField(ordinal = 5)
   private CertificatePolicies certificatePolicies;
 
+  @JSONField(ordinal = 5)
+  private CrlDistributionPoints crlDistributionPoints;
+
   /**
    * For constant encoded Extension.
    */
@@ -129,6 +130,9 @@ public class ExtensionType extends ValidatableConf {
 
   @JSONField(ordinal = 5)
   private ExtendedKeyUsage extendedKeyUsage;
+
+  @JSONField(ordinal = 5)
+  private CrlDistributionPoints freshestCrl;
 
   @JSONField(ordinal = 5)
   private InhibitAnyPolicy inhibitAnyPolicy;
@@ -291,12 +295,28 @@ public class ExtensionType extends ValidatableConf {
     this.constant = constant;
   }
 
+  public CrlDistributionPoints getCrlDistributionPoints() {
+    return crlDistributionPoints;
+  }
+
+  public void setCrlDistributionPoints(CrlDistributionPoints crlDistributionPoints) {
+    this.crlDistributionPoints = crlDistributionPoints;
+  }
+
   public ExtendedKeyUsage getExtendedKeyUsage() {
     return extendedKeyUsage;
   }
 
   public void setExtendedKeyUsage(ExtendedKeyUsage extendedKeyUsage) {
     this.extendedKeyUsage = extendedKeyUsage;
+  }
+
+  public CrlDistributionPoints getFreshestCrl() {
+    return freshestCrl;
+  }
+
+  public void setFreshestCrl(CrlDistributionPoints freshestCrl) {
+    this.freshestCrl = freshestCrl;
   }
 
   public InhibitAnyPolicy getInhibitAnyPolicy() {
@@ -652,6 +672,12 @@ public class ExtensionType extends ValidatableConf {
     @JSONField(ordinal = 2)
     private boolean includeOcsp;
 
+    @JSONField(ordinal = 3)
+    private Set<String> ocspProtocols;
+
+    @JSONField(ordinal = 3)
+    private Set<String> caIssuersProtocols;
+
     public boolean isIncludeCaIssuers() {
       return includeCaIssuers;
     }
@@ -666,6 +692,22 @@ public class ExtensionType extends ValidatableConf {
 
     public void setIncludeOcsp(boolean includeOcsp) {
       this.includeOcsp = includeOcsp;
+    }
+
+    public Set<String> getOcspProtocols() {
+      return ocspProtocols;
+    }
+
+    public void setOcspProtocols(Set<String> ocspProtocols) {
+      this.ocspProtocols = ocspProtocols;
+    }
+
+    public Set<String> getCaIssuersProtocols() {
+      return caIssuersProtocols;
+    }
+
+    public void setCaIssuersProtocols(Set<String> caIssuersProtocols) {
+      this.caIssuersProtocols = caIssuersProtocols;
     }
 
     @Override
@@ -986,9 +1028,6 @@ public class ExtensionType extends ValidatableConf {
     @JSONField(ordinal = 5)
     private List<SubFieldSyntax> subFields;
 
-    @JSONField(serialize = false, deserialize = false)
-    private Pattern stringPattern;
-
     @JSONField(name = "type")
     public String getTypeText() {
       return type.getText();
@@ -1039,15 +1078,9 @@ public class ExtensionType extends ValidatableConf {
     public void setStringRegex(String stringRegex) {
       if (StringUtil.isNotBlank(stringRegex)) {
         this.stringRegex = stringRegex;
-        this.stringPattern = Patterns.compile(stringRegex);
       } else {
-        this.stringPattern = null;
         this.stringRegex = null;
       }
-    }
-
-    public Pattern getStringPattern() {
-      return stringPattern;
     }
 
     public List<SubFieldSyntax> getSubFields() {
@@ -1588,6 +1621,24 @@ public class ExtensionType extends ValidatableConf {
     }
 
   } // class ProfessionInfoType
+
+  public static class CrlDistributionPoints extends ValidatableConf {
+
+    private Set<String> protocols;
+
+    public Set<String> getProtocols() {
+      return protocols;
+    }
+
+    public void setProtocols(Set<String> protocols) {
+      this.protocols = protocols;
+    }
+
+    @Override
+    public void validate() throws InvalidConfException {
+    }
+
+  }
 
   public static class QcStatements extends ValidatableConf {
 

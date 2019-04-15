@@ -132,7 +132,7 @@ public class OcspQa {
     } else {
       if (status != 0) {
         issue.setFailureMessage("is '" + Unsuccessful.getStatusText(status)
-          + "', but expected 'successful'");
+            + "', but expected 'successful'");
       }
     }
 
