@@ -294,7 +294,7 @@ public class EjbcaCertStatusStore extends OcspStore {
 
       if (unknown) {
         certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, nextUpdate);
-      } if (ignore) {
+      } else if (ignore) {
         certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(thisUpdate, nextUpdate);
       } else {
         byte[] certHash = (hexCertHash == null) ? null : Hex.decode(hexCertHash);

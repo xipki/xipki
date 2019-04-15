@@ -106,6 +106,7 @@ public class SignatureCmpCaClientExample extends CaClientExample {
 
       client.init();
       X509Certificate caCert = client.getCaCert();
+      // CHECKSTYLE:SKIP
       X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
 
       // retrieve CA certificate

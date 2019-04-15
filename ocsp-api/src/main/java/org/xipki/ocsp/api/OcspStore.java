@@ -95,8 +95,8 @@ public abstract class OcspStore implements Closeable {
     CertStatusInfo info = getCertStatus0(time, reqIssuer, serialNumber,
         includeCertHash, includeRit, inheritCaRevocation);
     if (info != null && minNextUpdatePeriod != null) {
-      if (unknownCertBehaviour == UnknownCertBehaviour.good ||
-          unknownCertBehaviour == UnknownCertBehaviour.unknown) {
+      if (unknownCertBehaviour == UnknownCertBehaviour.good
+          || unknownCertBehaviour == UnknownCertBehaviour.unknown) {
         Date nextUpdate = info.getNextUpdate();
         Date minNextUpdate = minNextUpdatePeriod.add(time);
 

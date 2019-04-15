@@ -358,7 +358,7 @@ public class QaCaActions {
             throw new CmdFailure("Length of CA certchain " + isSize
                 + " is not as expected " + eySize);
           }
-        } else if (eySize != 0){
+        } else if (eySize != 0) {
           for (int i = 0; i < eySize; i++) {
             if (!certEquals(eyList.get(i), isList.get(i).getEncoded())) {
               throw new CmdFailure("CA cert chain[" + i + "] is not as expected");

@@ -481,8 +481,6 @@ public class Actions {
         extkeyusages = list;
       }
 
-      CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
-
       X500Name subjectDn = new X500Name(subject);
       List<RDN> list = new LinkedList<RDN>();
 
@@ -526,6 +524,7 @@ public class Actions {
         subjectDn = new X500Name(list.toArray(new RDN[0]));
       }
 
+      CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
       certTemplateBuilder.setSubject(subjectDn);
 
       SubjectPublicKeyInfo publicKey = getPublicKey();
