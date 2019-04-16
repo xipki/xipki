@@ -111,7 +111,7 @@ class CaManagerQueryExecutor {
     this.sqlSelectCaId = buildSelectFirstSql("ID FROM CA WHERE NAME=?");
     this.sqlSelectCa = buildSelectFirstSql("ID,SN_SIZE,NEXT_CRLNO,STATUS,MAX_VALIDITY,CERT,"
         + "CERTCHAIN,SIGNER_TYPE,CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,CRL_SIGNER_NAME,"
-        + "PRECERT_SIGNER_NAME,CMP_CONTROL,CRL_CONTROL,SCEP_CONTROL,CTLOG_CONTROL,DUPLICATE_KEY,"
+        + "CMP_CONTROL,CRL_CONTROL,SCEP_CONTROL,CTLOG_CONTROL,DUPLICATE_KEY,"
         + "DUPLICATE_SUBJECT,PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION,NUM_CRLS,KEEP_EXPIRED_CERT_DAYS,"
         + "EXPIRATION_PERIOD,REV_INFO,VALIDITY_MODE,CA_URIS,EXTRA_CONTROL,SIGNER_CONF "
         + "FROM CA WHERE NAME=?");
@@ -435,11 +435,6 @@ class CaManagerQueryExecutor {
         entry.setCrlSignerName(crlsignerName);
       }
 
-      String precertSignerName = rs.getString("PRECERT_SIGNER_NAME");
-      if (StringUtil.isNotBlank(precertSignerName)) {
-        entry.setPrecertSignerName(precertSignerName);
-      }
-
       String cmpResponderName = rs.getString("CMP_RESPONDER_NAME");
       if (StringUtil.isNotBlank(cmpResponderName)) {
         entry.setCmpResponderName(cmpResponderName);
@@ -625,11 +620,11 @@ class CaManagerQueryExecutor {
     }
 
     final String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CA_URIS,"//7
-        + "MAX_VALIDITY,CERT,CERTCHAIN,SIGNER_TYPE,CRL_SIGNER_NAME,PRECERT_SIGNER_NAME,"//6
+        + "MAX_VALIDITY,CERT,CERTCHAIN,SIGNER_TYPE,CRL_SIGNER_NAME,"//5
         + "CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,CRL_CONTROL,CMP_CONTROL,SCEP_CONTROL,"//5
         + "CTLOG_CONTROL,DUPLICATE_KEY,DUPLICATE_SUBJECT,PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION,"//6
         + "NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL,"//5
-        + "SIGNER_CONF) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        + "SIGNER_CONF) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     // insert to table ca
     PreparedStatement ps = null;
@@ -659,7 +654,6 @@ class CaManagerQueryExecutor {
 
       ps.setString(idx++, caEntry.getSignerType());
       ps.setString(idx++, caEntry.getCrlSignerName());
-      ps.setString(idx++, caEntry.getPrecertSignerName());
       ps.setString(idx++, caEntry.getCmpResponderName());
       ps.setString(idx++, caEntry.getScepResponderName());
 
@@ -1126,7 +1120,6 @@ class CaManagerQueryExecutor {
         col(STRING, "CA_URIS", caUrisStr),
         col(STRING, "MAX_VALIDITY", maxValidity), col(STRING, "SIGNER_TYPE", signerType),
         col(STRING, "CRL_SIGNER_NAME", changeCaEntry.getCrlSignerName()),
-        col(STRING, "PRECERT_SIGNER_NAME", changeCaEntry.getPrecertSignerName()),
         col(STRING, "CMP_RESPONDER_NAME", changeCaEntry.getCmpResponderName()),
         col(STRING, "SCEP_RESPONDER_NAME", changeCaEntry.getScepResponderName()),
         col(STRING, "CMP_CONTROL", changeCaEntry.getCmpControl()),

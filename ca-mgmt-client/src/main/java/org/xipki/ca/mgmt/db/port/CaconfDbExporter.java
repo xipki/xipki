@@ -279,7 +279,7 @@ class CaconfDbExporter extends DbPorter {
     List<CaCertstore.Ca> cas = new LinkedList<>();
 
     final String sql = "SELECT ID,NAME,SN_SIZE,NEXT_CRLNO,STATUS,CA_URIS," // 6
-        + "MAX_VALIDITY,CERT,CERTCHAIN,SIGNER_TYPE,CRL_SIGNER_NAME,PRECERT_SIGNER_NAME," // 6
+        + "MAX_VALIDITY,CERT,CERTCHAIN,SIGNER_TYPE,CRL_SIGNER_NAME," // 5
         + "CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,CRL_CONTROL,CMP_CONTROL,SCEP_CONTROL," // 5
         + "CTLOG_CONTROL,DUPLICATE_KEY,DUPLICATE_SUBJECT,PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION," // 6
         + "NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL," // 5
@@ -311,7 +311,6 @@ class CaconfDbExporter extends DbPorter {
         ca.setCmpResponderName(rs.getString("CMP_RESPONDER_NAME"));
         ca.setScepResponderName(rs.getString("SCEP_RESPONDER_NAME"));
         ca.setCrlSignerName(rs.getString("CRL_SIGNER_NAME"));
-        ca.setPrecertSignerName(rs.getString("PRECERT_SIGNER_NAME"));
         ca.setCmpControl(rs.getString("CMP_CONTROL"));
         ca.setScepControl(rs.getString("SCEP_CONTROL"));
         ca.setCrlControl(rs.getString("CRL_CONTROL"));

@@ -120,8 +120,6 @@ public abstract class MgmtEntry {
 
     private String crlSignerName;
 
-    private String precertSignerName;
-
     private CmpControl cmpControl;
 
     private CtLogControl ctLogControl;
@@ -312,14 +310,6 @@ public abstract class MgmtEntry {
       this.crlSignerName = (crlSignerName == null) ? null : crlSignerName.toLowerCase();
     }
 
-    public String getPrecertSignerName() {
-      return precertSignerName;
-    }
-
-    public void setPrecertSignerName(String precertSignerName) {
-      this.precertSignerName = (precertSignerName == null) ? null : precertSignerName.toLowerCase();
-    }
-
     public boolean isDuplicateKeyPermitted() {
       return duplicateKeyPermitted;
     }
@@ -434,7 +424,6 @@ public abstract class MgmtEntry {
           "\nCMP responder name: ", cmpResponderName,
           "\nSCEP responder name: ", scepResponderName,
           "\nCRL signer name: ", crlSignerName,
-          "\nPrecert signer name: ", precertSignerName,
           "\nduplicate key: ", duplicateKeyPermitted,
           "\nduplicate subject: ", duplicateSubjectPermitted,
           "\n", protocolSupport,
@@ -897,8 +886,6 @@ public abstract class MgmtEntry {
 
     private String crlSignerName;
 
-    private String precertSignerName;
-
     private Boolean duplicateKeyPermitted;
 
     private Boolean duplicateSubjectPermitted;
@@ -1034,14 +1021,6 @@ public abstract class MgmtEntry {
 
     public void setCrlSignerName(String crlSignerName) {
       this.crlSignerName = (crlSignerName == null) ? null : crlSignerName.toLowerCase();
-    }
-
-    public String getPrecertSignerName() {
-      return precertSignerName;
-    }
-
-    public void setPrecertSignerName(String precertSignerName) {
-      this.precertSignerName = (precertSignerName == null) ? null : precertSignerName.toLowerCase();
     }
 
     public Boolean getDuplicateKeyPermitted() {

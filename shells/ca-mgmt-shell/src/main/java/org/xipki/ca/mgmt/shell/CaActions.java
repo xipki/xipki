@@ -223,10 +223,6 @@ public class CaActions {
     @Completion(CaCompleters.SignerNameCompleter.class)
     private String crlSignerName;
 
-    @Option(name = "--precert-signer", description = "Precert (for CT Log) signer name or 'null'")
-    @Completion(CaCompleters.SignerNamePlusNullCompleter.class)
-    private String precertSignerName;
-
     @Option(name = "--cmp-responder", description = "CMP responder name")
     @Completion(CaCompleters.SignerNameCompleter.class)
     private String cmpResponderName;
@@ -366,10 +362,6 @@ public class CaActions {
 
       if (crlSignerName != null) {
         entry.setCrlSignerName(crlSignerName);
-      }
-
-      if (precertSignerName != null) {
-        entry.setPrecertSignerName(precertSignerName);
       }
 
       Validity tmpMaxValidity = Validity.getInstance(maxValidity);
@@ -1046,10 +1038,6 @@ public class CaActions {
     @Completion(CaCompleters.SignerNamePlusNullCompleter.class)
     private String crlSignerName;
 
-    @Option(name = "--precert-signer", description = "Precert (for CT Log) signer name or 'null'")
-    @Completion(CaCompleters.SignerNamePlusNullCompleter.class)
-    private String precertSignerName;
-
     @Option(name = "--cmp-responder", description = "CMP responder name or 'null'")
     @Completion(CaCompleters.SignerNamePlusNullCompleter.class)
     private String cmpResponderName;
@@ -1246,10 +1234,6 @@ public class CaActions {
 
       if (crlSignerName != null) {
         entry.setCrlSignerName(crlSignerName);
-      }
-
-      if (precertSignerName != null) {
-        entry.setPrecertSignerName(precertSignerName);
       }
 
       if (extraControl != null) {

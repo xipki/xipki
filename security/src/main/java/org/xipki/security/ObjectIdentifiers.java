@@ -513,6 +513,10 @@ public class ObjectIdentifiers {
     public static final ASN1ObjectIdentifier id_kp_macAppStoreInstallerPackageSigning =
         id_appleExtendedKeyUsage.branch("10");
 
+    // Certificate Transparency (RFC 6962)
+    public static final ASN1ObjectIdentifier id_kp_certificateTransparency =
+        new ASN1ObjectIdentifier("1.3.6.1.4.1.11129.2.4.4");
+
   }
 
   public static final class Extn {
@@ -593,6 +597,14 @@ public class ObjectIdentifiers {
     // GMT 0015-2012 SM2-Based Certificate
     public static final ASN1ObjectIdentifier id_GMT_0015_TaxationNumber = new ASN1ObjectIdentifier(
         "1.2.156.10260.4.1.5");
+
+    // Certificate Transparency (RFC 6962)
+    public static final ASN1ObjectIdentifier id_precertificate = new ASN1ObjectIdentifier(
+        "1.3.6.1.4.1.11129.2.4.3");
+
+    // Certificate Transparency (RFC 6962)
+    public static final ASN1ObjectIdentifier id_SCTs = new ASN1ObjectIdentifier(
+        "1.3.6.1.4.1.11129.2.4.2");
 
   }
 

@@ -232,12 +232,12 @@ class CaconfDbImporter extends DbPorter {
     System.out.println("importing table CA");
 
     final String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CA_URIS," // 7
-        + "MAX_VALIDITY,CERT,CERTCHAIN,SIGNER_TYPE,CRL_SIGNER_NAME,PRECERT_SIGNER_NAME," // 6
+        + "MAX_VALIDITY,CERT,CERTCHAIN,SIGNER_TYPE,CRL_SIGNER_NAME," // 5
         + "CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,CRL_CONTROL,CMP_CONTROL,SCEP_CONTROL," // 5
         + "CTLOG_CONTROL,DUPLICATE_KEY,DUPLICATE_SUBJECT,PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION," // 6
         + "NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL," // 5
         + "SIGNER_CONF,REV_INFO) " // 2
-        + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     PreparedStatement ps = null;
     try {
@@ -262,7 +262,6 @@ class CaconfDbImporter extends DbPorter {
           ps.setString(idx++, readContent(ca.getCertchain()));
           ps.setString(idx++, ca.getSignerType());
           ps.setString(idx++, ca.getCrlSignerName());
-          ps.setString(idx++, ca.getPrecertSignerName());
           ps.setString(idx++, ca.getCmpResponderName());
           ps.setString(idx++, ca.getScepResponderName());
           ps.setString(idx++, ca.getCrlControl());

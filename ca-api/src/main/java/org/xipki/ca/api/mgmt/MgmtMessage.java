@@ -224,8 +224,6 @@ public abstract class MgmtMessage {
 
     private String crlSignerName;
 
-    private String precertSignerName;
-
     private String cmpControl;
 
     private String ctLogControl;
@@ -284,7 +282,6 @@ public abstract class MgmtMessage {
       }
 
       crlSignerName = caEntry.getCrlSignerName();
-      precertSignerName = caEntry.getPrecertSignerName();
 
       if (caEntry.getCmpControl() != null) {
         cmpControl = caEntry.getCmpControl().getConf();
@@ -560,14 +557,6 @@ public abstract class MgmtMessage {
       this.revocationInfo = revocationInfo;
     }
 
-    public String getPrecertSignerName() {
-      return precertSignerName;
-    }
-
-    public void setPrecertSignerName(String precertSignerName) {
-      this.precertSignerName = precertSignerName;
-    }
-
     public MgmtEntry.Ca toCaEntry()
         throws CertificateException, CaMgmtException, InvalidConfException {
       MgmtEntry.Ca rv = new MgmtEntry.Ca(ident, serialNoBitLen, nextCrlNumber,
@@ -599,7 +588,6 @@ public abstract class MgmtMessage {
       }
 
       rv.setCrlSignerName(crlSignerName);
-      rv.setPrecertSignerName(precertSignerName);
 
       rv.setDuplicateKeyPermitted(duplicateKeyPermitted);
       rv.setDuplicateSubjectPermitted(duplicateSubjectPermitted);

@@ -378,8 +378,6 @@ public class CaConf {
           caEntry.setCmpResponderName(ci.getCmpResponderName());
           caEntry.setScepResponderName(ci.getScepResponderName());
           caEntry.setCrlSignerName(ci.getCrlSignerName());
-          caEntry.setPrecertSignerName(ci.getPrecertSignerName());
-          caEntry.setPrecertSignerName(ci.getPrecertSignerName());
 
           caEntry.setDuplicateKeyPermitted(ci.isDuplicateKey());
           caEntry.setDuplicateSubjectPermitted(ci.isDuplicateSubject());

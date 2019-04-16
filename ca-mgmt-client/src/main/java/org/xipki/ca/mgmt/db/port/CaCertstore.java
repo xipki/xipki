@@ -58,8 +58,6 @@ public class CaCertstore extends ValidatableConf {
 
     private String crlSignerName;
 
-    private String precertSignerName;
-
     private String cmpResponderName;
 
     private String scepResponderName;
@@ -188,14 +186,6 @@ public class CaCertstore extends ValidatableConf {
 
     public void setCrlSignerName(String crlSignerName) {
       this.crlSignerName = crlSignerName;
-    }
-
-    public String getPrecertSignerName() {
-      return precertSignerName;
-    }
-
-    public void setPrecertSignerName(String precertSignerName) {
-      this.precertSignerName = precertSignerName;
     }
 
     public String getCmpResponderName() {
