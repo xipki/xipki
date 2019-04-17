@@ -29,6 +29,11 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.util.Pack;
 import org.xipki.util.Args;
 
+/**
+ * RFC 6962 implementation of the required classes for the extension SCT in certificate.
+ *
+ * @author Lijun Liao
+ */
 public class CtLog {
 
   /**
@@ -111,6 +116,7 @@ public class CtLog {
    * opaque SerializedSCT<1..2^16-1>;
    *
    */
+  // CHECKSTYLE:SKIP
   public static class SerializedSCT {
 
     private final List<SignedCertificateTimestamp> scts;
@@ -163,7 +169,7 @@ public class CtLog {
       int totalLen = 0;
       for (SignedCertificateTimestamp sct : scts) {
         byte[] encodedSct = sct.getEncoded();
-        // the serialized SCT will be included. Although he maximal length is
+        // the serialized SCT will be included. Although the maximal length is
         // not defined in RFC 6962, the log servers use 2 bytes to represent
         // the length.
         byte[] encodedSctWithLen = new byte[2 + encodedSct.length];
@@ -287,8 +293,6 @@ public class CtLog {
    *     DigitallySigned signature
    *  } SignedCertificateTimestamp
    *
-   * @author lliao
-   *
    */
   public static class SignedCertificateTimestamp {
 
@@ -303,7 +307,7 @@ public class CtLog {
      *     opaque key_id[32];
      * } LogID;
      */
-    private final byte[] logID;
+    private final byte[] logId;
 
     /**
      * uint64 timestamp;
@@ -352,12 +356,12 @@ public class CtLog {
       return new SignedCertificateTimestamp(version, logID, timestamp, extensions, digitallySigned);
     }
 
-    public SignedCertificateTimestamp(byte version, byte[] logID, long timestamp, byte[] extensions,
+    public SignedCertificateTimestamp(byte version, byte[] logId, long timestamp, byte[] extensions,
         DigitallySigned digitallySigned) {
       this.version = Args.equals(version, "version", (byte) 0);
-      Args.notNull(logID, "logID");
-      Args.equals(logID.length, "logID.length", 32);
-      this.logID = logID;
+      Args.notNull(logId, "logId");
+      Args.equals(logId.length, "logID.length", 32);
+      this.logId = logId;
       this.timestamp = timestamp;
       this.extensions = extensions == null ? new byte[0] : extensions;
       this.digitallySigned = Args.notNull(digitallySigned, "digitallySigned");
@@ -367,8 +371,8 @@ public class CtLog {
       return version;
     }
 
-    public byte[] getLogID() {
-      return Arrays.copyOf(logID, logID.length);
+    public byte[] getLogId() {
+      return Arrays.copyOf(logId, logId.length);
     }
 
     public long getTimestamp() {
@@ -396,8 +400,8 @@ public class CtLog {
       res[offset++] = version;
 
       // logID: 32 bytes
-      System.arraycopy(logID, 0, res, 1, logID.length);
-      offset += logID.length;
+      System.arraycopy(logId, 0, res, 1, logId.length);
+      offset += logId.length;
 
       // timestamp: 8 bytes
       byte[] tsBytes = Pack.longToBigEndian(timestamp);
@@ -425,23 +429,23 @@ public class CtLog {
    */
   public static class SignedCertificateTimestampList {
 
-    private final SerializedSCT sct_list;
+    private final SerializedSCT sctList;
 
     public static SignedCertificateTimestampList getInstance(byte[] encoded) {
-      SerializedSCT sct_list = SerializedSCT.getInstance(encoded);
-      return new SignedCertificateTimestampList(sct_list);
+      SerializedSCT sctList = SerializedSCT.getInstance(encoded);
+      return new SignedCertificateTimestampList(sctList);
     }
 
-    public SignedCertificateTimestampList(SerializedSCT sct_list) {
-      this.sct_list = Args.notNull(sct_list, "sct_list");
+    public SignedCertificateTimestampList(SerializedSCT sctList) {
+      this.sctList = Args.notNull(sctList, "sctList");
     }
 
-    public SerializedSCT getSct_list() {
-      return sct_list;
+    public SerializedSCT getSctList() {
+      return sctList;
     }
 
     public byte[] getEncoded() {
-      return sct_list.getEncoded();
+      return sctList.getEncoded();
     }
 
   }
