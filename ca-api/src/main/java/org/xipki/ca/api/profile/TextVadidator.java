@@ -19,6 +19,8 @@ package org.xipki.ca.api.profile;
 
 import java.util.regex.Pattern;
 
+import org.xipki.util.LruCache;
+
 /**
  * TODO.
  * @author Lijun Liao
@@ -79,6 +81,8 @@ public abstract class TextVadidator {
 
   public static final TextVadidator FQDN = new FQDNValidator();
 
+  private static final LruCache<String, TextVadidator> cache = new LruCache<>(200);
+
   public static TextVadidator compile(String regex) {
     if (":COUNTRY".equalsIgnoreCase(regex) || "COUNTRY".equalsIgnoreCase(regex)) {
       return COUNTRY;
@@ -92,7 +96,12 @@ public abstract class TextVadidator {
     } else if (":NUMBER".equalsIgnoreCase(regex) || "NUMBER".equalsIgnoreCase(regex)) {
       return NUMBER;
     } else {
-      return new RegexValidator(regex);
+      TextVadidator validator = cache.get(regex);
+      if (validator == null) {
+        validator = new RegexValidator(regex);
+        cache.put(regex, validator);
+      }
+      return validator;
     }
   }
 

@@ -443,8 +443,8 @@ class DomainValidator implements Serializable {
     "sg",                 // Singapore
     "sh",                 // Saint Helena
     "si",                 // Slovenia
-    // CHECKSTYLE:SKIP
-    "sj",                 // Svalbard and Jan Mayen Islands Not in use (Norwegian dependencies; see .no)
+    // Svalbard and Jan Mayen Islands Not in use (Norwegian dependencies; see .no)
+    "sj",
     "sk",                 // Slovakia
     "sl",                 // Sierra Leone
     "sm",                 // San Marino
