@@ -402,11 +402,6 @@
   </changeSet>
   <!-- CA Configuration :: foreign key -->
   <changeSet author="xipki" id="3">
-    <addForeignKeyConstraint constraintName="FK_CA_PRECERT_SIGNER1"
-      deferrable="false" initiallyDeferred="false"
-      onDelete="NO ACTION" onUpdate="NO ACTION"
-      baseColumnNames="PRECERT_SIGNER_NAME" baseTableName="CA"
-      referencedColumnNames="NAME" referencedTableName="SIGNER"/>
     <addForeignKeyConstraint constraintName="FK_CA_CRL_SIGNER1"
       deferrable="false" initiallyDeferred="false"
       onDelete="NO ACTION" onUpdate="NO ACTION"
