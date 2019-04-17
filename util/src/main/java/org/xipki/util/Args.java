@@ -67,6 +67,30 @@ public class Args {
     return argument;
   }
 
+  public static byte equals(byte argument, String name, byte value) {
+    if (argument != value) {
+      throw new IllegalArgumentException(String.format(
+          "%s may not be other than %d: %d", name, value, argument));
+    }
+    return argument;
+  }
+
+  public static int equals(int argument, String name, int value) {
+    if (argument != value) {
+      throw new IllegalArgumentException(String.format(
+          "%s may not be other than %d: %d", name, value, argument));
+    }
+    return argument;
+  }
+
+  public static long equals(long argument, String name, long value) {
+    if (argument != value) {
+      throw new IllegalArgumentException(String.format(
+          "%s may not be other than %d: %d", name, value, argument));
+    }
+    return argument;
+  }
+
   public static int min(int argument, String name, int min) {
     if (argument < min) {
       throw new IllegalArgumentException(String.format(
