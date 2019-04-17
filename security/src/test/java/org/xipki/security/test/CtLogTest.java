@@ -56,7 +56,7 @@ public class CtLogTest {
     byte[] encodedScts = DEROctetString.getInstance(extn.getParsedValue()).getOctets();
     SignedCertificateTimestampList sctList2 =
         SignedCertificateTimestampList.getInstance(encodedScts);
-    sctList2.getSct_list().get(0).getDigitallySigned().getSignatureObject();
+    sctList2.getSctList().get(0).getDigitallySigned().getSignatureObject();
     byte[] encoded2 = sctList2.getEncoded();
     Assert.assertArrayEquals(encodedScts, encoded2);
   }
