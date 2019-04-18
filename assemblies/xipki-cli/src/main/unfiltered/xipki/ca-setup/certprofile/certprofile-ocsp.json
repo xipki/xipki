@@ -4,6 +4,7 @@
 		"category":"A"
 	},
 	"version":"v3",
+	"certDomain":"RFC5280",
 	"certLevel":"EndEntity",
 	"maxSize":3000,
 	"validity":"5y",
@@ -185,7 +186,9 @@
 		"permittedInRequest":false,
 		"authorityInfoAccess":{
 			"includeCaIssuers":true,
-			"includeOcsp":true
+			"includeOcsp":true,
+			"caIssuersProtocols":["http"],
+			"ocspProtocols":["http"]
 		}
 	},{
 		"type":{
@@ -208,7 +211,7 @@
 				"required":true,
 				"value":"contentCommitment"
 			},{
-				"required":false,
+				"required":true,
 				"value":"cRLSign"
 			}]
 		}
