@@ -358,7 +358,7 @@ public class CtLog {
 
     public SignedCertificateTimestamp(byte version, byte[] logId, long timestamp, byte[] extensions,
         DigitallySigned digitallySigned) {
-      this.version = Args.equals(version, "version", (byte) 0);
+      this.version = version;
       Args.notNull(logId, "logId");
       Args.equals(logId.length, "logID.length", 32);
       this.logId = logId;

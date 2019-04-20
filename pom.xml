@@ -80,6 +80,7 @@
     <!-- PKI -->
     <module>ca-api</module>
     <module>ca-server</module>
+    <module>dummy-ctlog-server</module>
     <module>ca-servlet</module>
     <module>ca-mgmt-client</module>
     <module>certprofile-xijson</module>

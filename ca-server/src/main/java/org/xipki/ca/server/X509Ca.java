@@ -31,6 +31,7 @@ import static org.xipki.ca.api.OperationException.ErrorCode.UNKNOWN_CERT_PROFILE
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -67,11 +68,16 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.DERBitString;
+import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERSet;
@@ -100,7 +106,6 @@ import org.bouncycastle.asn1.x509.Time;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509CRLHolder;
-import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v2CRLBuilder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.crypto.RuntimeCryptoException;
@@ -117,6 +122,7 @@ import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
+import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.RequestType;
 import org.xipki.ca.api.mgmt.CaMgmtException;
@@ -131,6 +137,7 @@ import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.mgmt.ValidityMode;
 import org.xipki.ca.api.profile.Certprofile;
+import org.xipki.ca.api.profile.Certprofile.ExtensionControl;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
@@ -141,11 +148,14 @@ import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.CrlReason;
+import org.xipki.security.CtLog.SignedCertificateTimestampList;
 import org.xipki.security.FpIdCalculator;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.X509Cert;
+import org.xipki.security.XiContentSigner;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.RSABrokenKey;
@@ -394,6 +404,8 @@ public class X509Ca implements Closeable {
 
   private final X509Cert caCert;
 
+  private final CtLogClient ctLog;
+
   // CHECKSTYLE:SKIP
   private final KeypairGenControl keypairGenControlByImplictCA;
 
@@ -419,12 +431,13 @@ public class X509Ca implements Closeable {
 
   private final ConcurrentSkipListSet<Long> subjectCertsInProcess = new ConcurrentSkipListSet<>();
 
-  public X509Ca(CaManagerImpl caManager, CaInfo caInfo, CertStore certstore)
+  public X509Ca(CaManagerImpl caManager, CaInfo caInfo, CertStore certstore, CtLogClient ctLog)
       throws OperationException {
     this.caManager = Args.notNull(caManager, "caManager");
     this.masterMode = caManager.isMasterMode();
     this.caIdNameMap = caManager.idNameMap();
     this.caInfo = Args.notNull(caInfo, "caInfo");
+    this.ctLog = ctLog;
     this.caIdent = caInfo.getIdent();
     this.caCert = caInfo.getCert();
     this.certstore = Args.notNull(certstore, "certstore");
@@ -1776,6 +1789,17 @@ public class X509Ca implements Closeable {
       }
     }
 
+    ExtensionControl extnSctCtrl = certprofile.getExtensionControls().get(Extn.id_SCTs);
+    boolean ctLogEnabled = caInfo.getCtLogControl() != null && caInfo.getCtLogControl().isEnabled();
+
+    if (!ctLogEnabled) {
+      if (extnSctCtrl != null && extnSctCtrl.isRequired()) {
+        throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+            "extension " + ObjectIdentifiers.getName(Extn.id_SCTs)
+            + " is required but CTLog of the CA is not activated");
+      }
+    }
+
     try {
       X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
           caInfo.getPublicCaInfo().getX500Subject(), caInfo.nextSerial(), gct.grantedNotBefore,
@@ -1798,21 +1822,26 @@ public class X509Ca implements Closeable {
           }
         }
 
-        ConcurrentBagEntrySigner signer0;
-        try {
-          signer0 = gct.signer.borrowSigner();
-        } catch (NoIdleSignerException ex) {
-          throw new OperationException(SYSTEM_FAILURE, ex);
+        boolean addCtLog = ctLogEnabled && extnSctCtrl != null;
+
+        Certificate bcCert;
+        if (addCtLog) {
+          bcCert = buildCtLoggedCert(certBuilder, gct, extnSctCtrl.isCritical());
+        } else {
+          ConcurrentBagEntrySigner signer0;
+          try {
+            signer0 = gct.signer.borrowSigner();
+          } catch (NoIdleSignerException ex) {
+            throw new OperationException(SYSTEM_FAILURE, ex);
+          }
+
+          try {
+            bcCert = certBuilder.build(signer0.value()).toASN1Structure();
+          } finally {
+            gct.signer.requiteSigner(signer0);
+          }
         }
 
-        X509CertificateHolder certHolder;
-        try {
-          certHolder = certBuilder.build(signer0.value());
-        } finally {
-          gct.signer.requiteSigner(signer0);
-        }
-
-        Certificate bcCert = certHolder.toASN1Structure();
         byte[] encodedCert = bcCert.getEncoded();
         int maxCertSize = gct.certprofile.getMaxCertSize();
         if (maxCertSize > 0) {
@@ -1874,6 +1903,135 @@ public class X509Ca implements Closeable {
       }
     }
   } // method generateCertificate0
+
+  private Certificate buildCtLoggedCert(X509v3CertificateBuilder certBuilder,
+      GrantedCertTemplate gct, boolean critical) throws CertIOException, OperationException {
+    // build precertificate
+    certBuilder.addExtension(Extn.id_precertificate, true, DERNull.INSTANCE);
+
+    ConcurrentBagEntrySigner signer0;
+    try {
+      signer0 = gct.signer.borrowSigner();
+    } catch (NoIdleSignerException ex) {
+      throw new OperationException(SYSTEM_FAILURE, ex);
+    }
+
+    Certificate precert;
+    try {
+      precert = certBuilder.build(signer0.value()).toASN1Structure();
+    } finally {
+      // returns the signer after the signing so that it can be used by others
+      gct.signer.requiteSigner(signer0);
+    }
+
+    byte[] encodedPreCert;
+    try {
+      encodedPreCert = precert.getEncoded();
+    } catch (IOException ex) {
+      throw new CertIOException("could not encode PreCert", ex);
+    }
+    SignedCertificateTimestampList scts = getCtLogScts(encodedPreCert);
+
+    ASN1Sequence preTbsCert =
+        ASN1Sequence.getInstance(precert.getTBSCertificate().toASN1Primitive());
+    /*
+     * we rebuild the tbsCert so that we get exact structure except the poison
+     * extension precert
+     *
+     * The TBSCertificate object.
+     * TBSCertificate ::= SEQUENCE {
+     *      version          [ 0 ]  Version DEFAULT v1(0),
+     *      serialNumber            CertificateSerialNumber,
+     *      signature               AlgorithmIdentifier,
+     *      issuer                  Name,
+     *      validity                Validity,
+     *      subject                 Name,
+     *      subjectPublicKeyInfo    SubjectPublicKeyInfo,
+     *      issuerUniqueID    [ 1 ] IMPLICIT UniqueIdentifier OPTIONAL,
+     *      subjectUniqueID   [ 2 ] IMPLICIT UniqueIdentifier OPTIONAL,
+     *      extensions        [ 3 ] Extensions OPTIONAL
+     *      }
+     */
+
+    ASN1EncodableVector tbsVec = new ASN1EncodableVector();
+    // 0: version is always set in v3(2)
+    tbsVec.add(preTbsCert.getObjectAt(0));
+    // 1: serialNumber
+    tbsVec.add(preTbsCert.getObjectAt(1));
+    // 2: signature
+    tbsVec.add(preTbsCert.getObjectAt(2));
+    // 3: issuer
+    tbsVec.add(preTbsCert.getObjectAt(3));
+    // 4: validity
+    tbsVec.add(preTbsCert.getObjectAt(4));
+    // 5: subject
+    tbsVec.add(preTbsCert.getObjectAt(5));
+    // 6: subjectPublicKeyInfo
+    tbsVec.add(preTbsCert.getObjectAt(6));
+    // issuerUniqueID and subjectUniqueID could not be set
+    // extensions must exist
+    ASN1TaggedObject taggedExtensions = ASN1TaggedObject.getInstance(preTbsCert.getObjectAt(7));
+    ASN1Sequence extnSeq = ASN1Sequence.getInstance(taggedExtensions.getObject());
+
+    ASN1EncodableVector extnVec = new ASN1EncodableVector();
+    final int size = extnSeq.size();
+    for (int i = 0; i < size; i++) {
+      ASN1Encodable asn1Extn = extnSeq.getObjectAt(i);
+      Extension extn = Extension.getInstance(asn1Extn);
+      // remove the pre-certificate extension
+      if (!extn.getExtnId().equals(Extn.id_precertificate)) {
+        extnVec.add(asn1Extn);
+      }
+    }
+
+    // add the SCTs extension
+    DEROctetString extnValue;
+    try {
+      extnValue = new DEROctetString(
+          new DEROctetString(scts.getEncoded()).getEncoded());
+    } catch (IOException ex) {
+      throw new CertIOException("could not encode SCT extension", ex);
+    }
+
+    extnVec.add(new Extension(Extn.id_SCTs, critical, extnValue));
+    tbsVec.add(new DERTaggedObject(taggedExtensions.isExplicit(), taggedExtensions.getTagNo(),
+        new DERSequence(extnVec)));
+
+    ASN1Sequence tbsCert = new DERSequence(tbsVec);
+    /*
+     * Certificate  ::=  SEQUENCE  {
+     *
+     *   tbsCertificate       TBSCertificate,
+     *   signatureAlgorithm   AlgorithmIdentifier,
+     *   signature            BIT STRING  }
+     */
+
+    try {
+      signer0 = gct.signer.borrowSigner();
+    } catch (NoIdleSignerException ex) {
+      throw new OperationException(SYSTEM_FAILURE, ex);
+    }
+
+    ASN1EncodableVector certVec = new ASN1EncodableVector();
+    certVec.add(tbsCert);
+
+    try {
+      XiContentSigner xiSigner = signer0.value();
+      certVec.add(xiSigner.getAlgorithmIdentifier());
+      OutputStream os = xiSigner.getOutputStream();
+      os.write(tbsCert.getEncoded());
+      byte[] signature = xiSigner.getSignature();
+      certVec.add(new DERBitString(signature));
+    } catch (IOException ex) {
+      throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
+    } finally {
+      // returns the signer after the signing so that it can be used by others
+      gct.signer.requiteSigner(signer0);
+    }
+
+    return Certificate.getInstance(new DERSequence(certVec));
+
+  }
 
   private void adaptGrantedSubejct(GrantedCertTemplate gct) throws OperationException {
     if (caInfo.isDuplicateSubjectPermitted()) {
@@ -2696,6 +2854,11 @@ public class X509Ca implements Closeable {
     event.setLevel(successful ? AuditLevel.INFO : AuditLevel.ERROR);
     event.setStatus(successful ? AuditStatus.SUCCESSFUL : AuditStatus.FAILED);
     auditService().logEvent(event);
+  }
+
+  private SignedCertificateTimestampList getCtLogScts(byte[] encodedPrecert)
+      throws OperationException {
+    return ctLog.getCtLogScts(encodedPrecert, caCert, caInfo.getCertchain());
   }
 
 }

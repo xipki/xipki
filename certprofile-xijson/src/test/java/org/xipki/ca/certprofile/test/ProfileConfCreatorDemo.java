@@ -453,6 +453,9 @@ public class ProfileConfCreatorDemo {
         new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_serverAuth},
         new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth}));
 
+    // Extensions - CTLog
+    list.add(createExtension(Extn.id_SCTs, true, false));
+
     return profile;
   } // method certprofileCabTls
 

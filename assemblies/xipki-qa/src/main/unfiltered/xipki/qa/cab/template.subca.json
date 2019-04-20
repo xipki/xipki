@@ -33,6 +33,11 @@
 				"popo.sigalgo":"REPLACEME-SIGALGO:REPLACEME-HASHwithRSA:REPLACEME-HASHwithECDSA:REPLACEME-HASHwithDSA:SM3withSM2"
 			},
 			"cmpResponderName":"responder1",
+			"ctLogControl":{
+				"enabled":true,
+				"servers":"https://localhost:8443/ctlog/ctlog1;https://localhost:8443/ctlog/ctlog2",
+				"sslcontext.name":"localhost"
+			},
 			"duplicateKey":true,
 			"duplicateSubject":true,
 			"expirationPeriod":365,

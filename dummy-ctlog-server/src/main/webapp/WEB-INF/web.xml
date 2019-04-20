@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+    version="2.4">
+
+    <display-name>ctlog-dummy-sserver</display-name>
+    <description>
+        CtLog Dummy Server
+    </description>
+
+    <servlet>
+        <servlet-name>ctlog1</servlet-name>
+        <servlet-class>org.xipki.ctlog.dummyserver.CtLogServlet.CtLogServlet1</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>ctlog2</servlet-name>
+        <servlet-class>org.xipki.ctlog.dummyserver.CtLogServlet.CtLogServlet2</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>ctlog1</servlet-name>
+        <url-pattern>/ctlog1/ct/v1/add-pre-chain/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>ctlog2</servlet-name>
+        <url-pattern>/ctlog2/ct/v1/add-pre-chain/*</url-pattern>
+    </servlet-mapping>
+
+</web-app>

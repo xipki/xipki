@@ -690,6 +690,8 @@ public class ObjectIdentifiers {
       oidNameMap.put(Extn.id_GMT_0015_InsuranceNumber, "GMT 0015 InsuranceNumber");
       oidNameMap.put(Extn.id_GMT_0015_OrganizationCode, "GMT 0015 OrganizationCode");
       oidNameMap.put(Extn.id_GMT_0015_TaxationNumber, "GMT 0015 TaxationNumber");
+      oidNameMap.put(Extn.id_precertificate, "CT Precertificate Indication");
+      oidNameMap.put(Extn.id_SCTs, "CT Precertificate SCTs");
 
       oidNameMap.put(Extension.auditIdentity, "auditIdentity");
       oidNameMap.put(Extension.authorityInfoAccess, "authorityInfoAccess");

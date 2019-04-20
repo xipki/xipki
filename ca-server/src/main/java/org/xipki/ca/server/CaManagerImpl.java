@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.SocketException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
@@ -42,7 +40,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -84,6 +81,7 @@ import org.xipki.ca.api.mgmt.CertListInfo;
 import org.xipki.ca.api.mgmt.CertListOrderBy;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.api.mgmt.CmpControl;
+import org.xipki.ca.api.mgmt.CtLogControl;
 import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.ca.api.mgmt.PermissionConstants;
 import org.xipki.ca.api.mgmt.RequestorInfo;
@@ -94,6 +92,7 @@ import org.xipki.ca.api.profile.CertprofileFactoryRegister;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertPublisherFactoryRegister;
+import org.xipki.ca.server.CaServerConf.Datasource;
 import org.xipki.ca.server.SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.ca.server.cmp.CmpResponder;
 import org.xipki.ca.server.store.CertStore;
@@ -124,6 +123,7 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
 import org.xipki.util.StringUtil;
 import org.xipki.util.Validity;
+import org.xipki.util.http.SslContextConf;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -289,7 +289,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   private final RestResponder restResponder;
 
-  private Properties confProperties;
+  private CaServerConf caServerConf;
 
   private boolean caSystemSetuped;
 
@@ -397,51 +397,22 @@ public class CaManagerImpl implements CaManager, Closeable {
     if (certPublisherFactoryRegister == null) {
       throw new IllegalStateException("certPublisherFactoryRegister is not set");
     }
-    if (confProperties == null) {
-      throw new IllegalStateException("confProperties is not set");
+    if (caServerConf == null) {
+      throw new IllegalStateException("caServerConf is not set");
     }
 
-    String caModeStr = confProperties.getProperty("ca.mode");
-    if (caModeStr != null) {
-      if ("slave".equalsIgnoreCase(caModeStr)) {
-        masterMode = false;
-      } else if ("master".equalsIgnoreCase(caModeStr)) {
-        masterMode = true;
-      } else {
-        throw new CaMgmtException(concat("invalid ca.mode '", caModeStr, "'"));
-      }
-    } else {
-      masterMode = true;
-    }
-    LOG.info("ca.mode: {}", caModeStr);
+    masterMode = caServerConf.isMaster();
+    LOG.info("ca.masterMode: {}", masterMode);
 
-    int shardId;
-    String shardIdStr = confProperties.getProperty("ca.shardId");
-    if (StringUtil.isBlank(shardIdStr)) {
-      throw new CaMgmtException("ca.shardId is not set");
-    }
-    LOG.info("ca.shardId: {}", shardIdStr);
-
-    try {
-      shardId = Integer.parseInt(shardIdStr);
-    } catch (NumberFormatException ex) {
-      throw new CaMgmtException(concat("invalid ca.shardId '", shardIdStr, "'"));
-    }
-
-    if (shardId < 0 || shardId > 127) {
-      throw new CaMgmtException("ca.shardId is not in [0, 127]");
-    }
+    int shardId = caServerConf.getShardId();
+    LOG.info("ca.shardId: {}", shardId);
 
     if (this.datasourceNameConfFileMap == null) {
       this.datasourceNameConfFileMap = new ConcurrentHashMap<>();
-      for (Object objKey : confProperties.keySet()) {
-        String key = (String) objKey;
-        if (!StringUtil.startsWithIgnoreCase(key, "datasource.")) {
-          continue;
-        }
-
-        String datasourceName = key.substring("datasource.".length());
-        String datasourceFile = confProperties.getProperty(key);
+      List<Datasource> datasourceList = caServerConf.getDatasources();
+      for (Datasource datasource : datasourceList) {
+        String datasourceName = datasource.getName();
+        String datasourceFile = datasource.getConfFile();
         this.datasourceNameConfFileMap.put(datasourceName, datasourceFile);
       }
 
@@ -660,7 +631,9 @@ public class CaManagerImpl implements CaManager, Closeable {
         for (String aliasName : caAliasNames) {
           String name = getCaNameForAlias(aliasName);
           names.remove(name);
-          sb.append(name).append(" (alias ").append(aliasName).append("), ");
+          if (name != null) {
+            sb.append(name).append(" (alias ").append(aliasName).append("), ");
+          }
         }
 
         for (String name : names) {
@@ -735,9 +708,21 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
     }
 
+    CtLogControl ctLogControl = caEntry.getCaEntry().getCtLogControl();
+    CtLogClient ctLogClient = null;
+    if (ctLogControl != null && ctLogControl.isEnabled()) {
+      String name = ctLogControl.getSslContextName();
+      SslContextConf ctxConf = caServerConf.getSslContextConf(name);
+      if (ctxConf == null) {
+        LOG.error(concat("X509CA.<init> (ca=", caName, "): found no SslContext named " + name));
+        return false;
+      }
+      ctLogClient = new CtLogClient(ctLogControl.getServers(), ctxConf);
+    }
+
     X509Ca ca;
     try {
-      ca = new X509Ca(this, caEntry, certstore);
+      ca = new X509Ca(this, caEntry, certstore, ctLogClient);
     } catch (OperationException ex) {
       LogUtil.error(LOG, ex, concat("X509CA.<init> (ca=", caName, ")"));
       return false;
@@ -1777,24 +1762,22 @@ public class CaManagerImpl implements CaManager, Closeable {
     publishers.put(name, publisher);
   } // method changePublisher
 
-  public Properties getConfProperties() {
-    return confProperties;
+  public CaServerConf getCaServerConf() {
+    return caServerConf;
   }
 
-  public void setConfProperties(Properties confProperties) {
-    this.confProperties = Args.notNull(confProperties, "confProperties");
+  public void setCaServerConf(CaServerConf caServerConf) {
+    this.caServerConf = Args.notNull(caServerConf, "caServerConf");
   }
 
   public void setConfFile(String confFile) {
     Args.notBlank(confFile, "confFile");
 
-    Properties confProps = new Properties();
     try {
-      confProps.load(Files.newInputStream(Paths.get(IoUtil.expandFilepath(confFile))));
-    } catch (IOException ex) {
+      this.caServerConf = CaServerConf.readConfFromFile(IoUtil.expandFilepath(confFile));
+    } catch (IOException | InvalidConfException ex) {
       throw new IllegalArgumentException("could not parse CA configuration file " + confFile, ex);
     }
-    this.confProperties = confProps;
   }
 
   @Override

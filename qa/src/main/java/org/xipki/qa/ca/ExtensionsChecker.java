@@ -133,6 +133,7 @@ import org.xipki.security.ExtensionExistence;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.CtLog.SignedCertificateTimestampList;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
@@ -479,6 +480,8 @@ public class ExtensionsChecker {
             addViolation(failureMsg, "extension valus", hex(extnValue),
                 (expected == null) ? "not present" : hex(expected));
           }
+        } else if (Extn.id_SCTs.equals(oid)) {
+          checkScts(failureMsg, extnValue, extnControl);
         } else if (Extn.id_GMT_0015_ICRegistrationNumber.equals(oid)
             || Extn.id_GMT_0015_InsuranceNumber.equals(oid)
             || Extn.id_GMT_0015_OrganizationCode.equals(oid)
@@ -2306,6 +2309,21 @@ public class ExtensionsChecker {
     if (!Arrays.equals(conf.getAccessRights().getValue(), isRights)) {
       addViolation(failureMsg, "accessRights",
           hex(isRights), hex(conf.getAccessRights().getValue()));
+    }
+  } // method checkExtnAuthorizationTemplate
+
+  private void checkScts(StringBuilder failureMsg,
+      byte[] extensionValue, ExtensionControl extControl) {
+    // just check the syntax
+    try {
+      SignedCertificateTimestampList sctList =
+          SignedCertificateTimestampList.getInstance(extensionValue);
+      int size = sctList.getSctList().size();
+      for (int i = 0; i < size; i++) {
+        sctList.getSctList().get(i).getDigitallySigned().getSignatureObject();
+      }
+    } catch (Exception ex) {
+      failureMsg.append("invalid syntax: ").append(ex.getMessage()).append("; ");
     }
   } // method checkExtnAuthorizationTemplate
 

@@ -22,6 +22,7 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
 import org.junit.Assert;
 import org.junit.Test;
+import org.xipki.security.CtLog.SignedCertificateTimestamp;
 import org.xipki.security.CtLog.SignedCertificateTimestampList;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
@@ -36,14 +37,15 @@ public class CtLogTest {
   @Test
   public void parseCtLogInCerts() throws Exception {
     String[] certFiles = new String[]{
-        "/ctlog-certs/githubcom.pem"
+        "/ctlog-certs/githubcom.pem",
+        "/ctlog-certs/cab-domain-validated1.crt"
     };
 
     for (String m : certFiles) {
       try {
         parseCtLogInCert(m);
       } catch (Exception ex) {
-        throw new Exception("exception throw while parsing CT Log in file " + m);
+        throw new Exception("exception throw while parsing CT Log in file " + m, ex);
       }
     }
   }
@@ -56,6 +58,9 @@ public class CtLogTest {
     byte[] encodedScts = DEROctetString.getInstance(extn.getParsedValue()).getOctets();
     SignedCertificateTimestampList sctList2 =
         SignedCertificateTimestampList.getInstance(encodedScts);
+    SignedCertificateTimestamp sct = sctList2.getSctList().get(0);
+    byte[] encoded = sct.getDigitallySigned().getEncoded();
+
     sctList2.getSctList().get(0).getDigitallySigned().getSignatureObject();
     byte[] encoded2 = sctList2.getEncoded();
     Assert.assertArrayEquals(encodedScts, encoded2);

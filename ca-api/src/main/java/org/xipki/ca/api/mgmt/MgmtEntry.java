@@ -420,7 +420,7 @@ public abstract class MgmtEntry {
           "\nCMP control:\n", (cmpControl == null ? "  null" : cmpControl.toString(verbose)),
           "\nCRL control:\n", (crlControl == null ? "  null" : crlControl.toString(verbose)),
           "\nSCEP control: \n", (scepControl == null ? "  null" : scepControl.toString(verbose)),
-          "\nCTLog control: \n", (ctLogControl == null ? "  null" : ctLogControl.toString(verbose)),
+          "\nCTLog control: \n", (ctLogControl == null ? "  null" : ctLogControl.toString()),
           "\nCMP responder name: ", cmpResponderName,
           "\nSCEP responder name: ", scepResponderName,
           "\nCRL signer name: ", crlSignerName,

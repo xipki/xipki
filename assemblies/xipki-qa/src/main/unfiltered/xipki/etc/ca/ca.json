@@ -1,0 +1,21 @@
+{
+	"datasources":[{
+		"confFile":"xipki/etc/ca/database/ca-db.properties",
+		"name":"ca"
+	},{
+		"confFile":"xipki/etc/ca/database/ocsp-db.properties",
+		"name":"ocsp"
+	}],
+	"master":true,
+	"shardId":0,
+	"sslContexts":[
+		{
+			"name":"localhost",
+			"truststore":{
+				"file":"xipki/keycerts/tlskeys/ca/tls-ca-cert.pem",
+				"password":"1234",
+				"type":"PKCS12"
+			}
+		}
+	]
+}

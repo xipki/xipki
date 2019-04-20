@@ -1,7 +1,10 @@
 # Prepare
 
+## In QA Folder
 - Set the XIPKI_DIR in `xipki/qa/setenv.script`.
-- Uncomment the line `#datasource.ocsp` in `xipki/etc/ca/ca.properties`
+- Copy the file `xipki/etc/ca/ca.json` to `<tomcat/jetty_root>/xipki/etc/ca/`
+
+## In Tomcat/Jetty Folder
 - Copy the database files `xipki/etc/ca/database/<db-type>/*.properties` to `xipki/etc/ca/database/`
 - Copy the database files `xipki/etc/ocsp/database/<db-type>/*.properties` to `xipki/etc/ocsp/database/`
 - Deploy both ocsp.war and ca.war to the same servlet container.

@@ -97,6 +97,7 @@ import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.BaseRequirements;
 import org.xipki.security.ObjectIdentifiers.DN;
+import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.ObjectIdentifiers.XKU;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
@@ -361,6 +362,9 @@ class IdentifiedCertprofile implements Closeable {
 
     Map<ASN1ObjectIdentifier, ExtensionControl> controls
         = new HashMap<>(certprofile.getExtensionControls());
+
+    // CTLog extension will be processed by the CA
+    controls.remove(Extn.id_SCTs);
 
     Set<ASN1ObjectIdentifier> neededExtTypes = new HashSet<>(2);
     Set<ASN1ObjectIdentifier> wantedExtTypes = new HashSet<>(2);

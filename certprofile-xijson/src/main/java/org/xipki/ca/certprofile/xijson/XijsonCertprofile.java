@@ -644,7 +644,8 @@ public class XijsonCertprofile extends BaseCertprofile {
     extnIds.remove(Extension.freshestCRL);
     extnIds.remove(Extension.subjectKeyIdentifier);
     extnIds.remove(Extension.subjectInfoAccess);
-    extnIds.remove(ObjectIdentifiers.Extn.id_extension_pkix_ocsp_nocheck);
+    extnIds.remove(Extn.id_extension_pkix_ocsp_nocheck);
+    extnIds.remove(Extn.id_SCTs);
 
     // to avoid race conflict.
     Set<ASN1ObjectIdentifier> copyOfExtnIds = new HashSet<>(extnIds);
@@ -702,7 +703,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   private void initAdditionalInformation(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
-    ASN1ObjectIdentifier type = ObjectIdentifiers.Extn.id_extension_additionalInformation;
+    ASN1ObjectIdentifier type = Extn.id_extension_additionalInformation;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
       AdditionalInformation extConf = getExtension(type, extensions).getAdditionalInformation();
@@ -716,7 +717,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   private void initAdmission(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
-    ASN1ObjectIdentifier type = ObjectIdentifiers.Extn.id_extension_admission;
+    ASN1ObjectIdentifier type = Extn.id_extension_admission;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
 
@@ -1035,7 +1036,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   private void initRestriction(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
-    ASN1ObjectIdentifier type = ObjectIdentifiers.Extn.id_extension_restriction;
+    ASN1ObjectIdentifier type = Extn.id_extension_restriction;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
       Restriction extConf = getExtension(type, extensions).getRestriction();
@@ -1048,7 +1049,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   private void initSmimeCapabilities(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
-    ASN1ObjectIdentifier type = ObjectIdentifiers.Extn.id_smimeCapabilities;
+    ASN1ObjectIdentifier type = Extn.id_smimeCapabilities;
     if (!extensionControls.containsKey(type)) {
       return;
     }
@@ -1114,7 +1115,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   private void initTlsFeature(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
-    ASN1ObjectIdentifier type = ObjectIdentifiers.Extn.id_pe_tlsfeature;
+    ASN1ObjectIdentifier type = Extn.id_pe_tlsfeature;
     if (!extensionControls.containsKey(type)) {
       return;
     }
@@ -1154,7 +1155,7 @@ public class XijsonCertprofile extends BaseCertprofile {
    */
   private void initValidityModel(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
-    ASN1ObjectIdentifier type = ObjectIdentifiers.Extn.id_extension_validityModel;
+    ASN1ObjectIdentifier type = Extn.id_extension_validityModel;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
       ValidityModel extConf = getExtension(type, extensions).getValidityModel();
@@ -1473,7 +1474,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     // processed by the CA
 
     // Admission
-    type = ObjectIdentifiers.Extn.id_extension_admission;
+    type = Extn.id_extension_admission;
     RDN[] admissionRdns = requestedSubject.getRDNs(type);
     if (admissionRdns != null && admissionRdns.length == 0) {
       admissionRdns = null;
@@ -1505,7 +1506,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     // processed by the CA
 
     // restriction
-    type = ObjectIdentifiers.Extn.id_extension_restriction;
+    type = Extn.id_extension_restriction;
     if (restriction != null) {
       if (occurences.remove(type)) {
         values.addExtension(type, restriction);
@@ -1513,7 +1514,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     }
 
     // AdditionalInformation
-    type = ObjectIdentifiers.Extn.id_extension_additionalInformation;
+    type = Extn.id_extension_additionalInformation;
     if (additionalInformation != null) {
       if (occurences.remove(type)) {
         values.addExtension(type, additionalInformation);
@@ -1521,7 +1522,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     }
 
     // ValidityModel
-    type = ObjectIdentifiers.Extn.id_extension_validityModel;
+    type = Extn.id_extension_validityModel;
     if (validityModel != null) {
       if (occurences.remove(type)) {
         values.addExtension(type, validityModel);
@@ -1569,7 +1570,7 @@ public class XijsonCertprofile extends BaseCertprofile {
         final int n = seq.size();
         for (int i = 0; i < n; i++) {
           QCStatement stmt = QCStatement.getInstance(seq.getObjectAt(i));
-          if (!ObjectIdentifiers.Extn.id_etsi_qcs_QcLimitValue.equals(stmt.getStatementId())) {
+          if (!Extn.id_etsi_qcs_QcLimitValue.equals(stmt.getStatementId())) {
             continue;
           }
 
@@ -1695,7 +1696,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     }
 
     // TlsFeature
-    type = ObjectIdentifiers.Extn.id_pe_tlsfeature;
+    type = Extn.id_pe_tlsfeature;
     if (tlsFeature != null) {
       if (occurences.remove(type)) {
         values.addExtension(type, tlsFeature);
@@ -1711,7 +1712,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     }
 
     // SMIME
-    type = ObjectIdentifiers.Extn.id_smimeCapabilities;
+    type = Extn.id_smimeCapabilities;
     if (smimeCapabilities != null) {
       if (occurences.remove(type)) {
         values.addExtension(type, smimeCapabilities);
@@ -1729,7 +1730,7 @@ public class XijsonCertprofile extends BaseCertprofile {
      *     militaryofficerCardNumber [1] UTF8String OPTIONAL
      *     passportNumber            [2] PrintableString OPTIONAL
      */
-    type = ObjectIdentifiers.Extn.id_GMT_0015_IdentityCode;
+    type = Extn.id_GMT_0015_IdentityCode;
     if (occurences.contains(type)) {
       int tag = -1;
       String extnStr = null;
@@ -1790,10 +1791,10 @@ public class XijsonCertprofile extends BaseCertprofile {
     // OrganizationCode ::= PrintableString
     // TaxationNumber ::= PrintableString
     ASN1ObjectIdentifier[] gmtOids = new ASN1ObjectIdentifier[] {
-        ObjectIdentifiers.Extn.id_GMT_0015_InsuranceNumber,
-        ObjectIdentifiers.Extn.id_GMT_0015_ICRegistrationNumber,
-        ObjectIdentifiers.Extn.id_GMT_0015_OrganizationCode,
-        ObjectIdentifiers.Extn.id_GMT_0015_TaxationNumber};
+        Extn.id_GMT_0015_InsuranceNumber,
+        Extn.id_GMT_0015_ICRegistrationNumber,
+        Extn.id_GMT_0015_OrganizationCode,
+        Extn.id_GMT_0015_TaxationNumber};
     for (ASN1ObjectIdentifier m : gmtOids) {
       if (occurences.contains(m)) {
         String extnStr = null;

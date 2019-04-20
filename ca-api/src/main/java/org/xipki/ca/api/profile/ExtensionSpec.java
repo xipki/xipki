@@ -141,6 +141,7 @@ public abstract class ExtensionSpec {
             Extension.freshestCRL,
             Extension.authorityInfoAccess,
             Extension.subjectInfoAccess,
+            Extn.id_SCTs,
             Extn.id_GMT_0015_ICRegistrationNumber,
             Extn.id_GMT_0015_IdentityCode,
             Extn.id_GMT_0015_InsuranceNumber,
@@ -155,6 +156,7 @@ public abstract class ExtensionSpec {
             Extension.cRLDistributionPoints,
             Extension.freshestCRL,
             Extension.basicConstraints,
+            Extn.id_SCTs,
             Extension.inhibitAnyPolicy)));
 
     public Set<ASN1ObjectIdentifier> getRequiredExtensions() {

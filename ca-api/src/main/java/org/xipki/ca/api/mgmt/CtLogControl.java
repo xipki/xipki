@@ -17,6 +17,9 @@
 
 package org.xipki.ca.api.mgmt;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.xipki.util.Args;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.InvalidConfException;
@@ -30,24 +33,61 @@ import org.xipki.util.StringUtil;
 
 public class CtLogControl {
 
+  /**
+   * Whether CTLog is enabled: true or false
+   */
   public static final String KEY_ENABLED = "enabled";
 
-  private final boolean enabled;
+  /**
+   * ';'-separated URL of the CT Log servers.
+   */
+  public static final String KEY_SERVERS = "servers";
 
-  private final String conf;
+  /**
+   * The name of SSL context
+   */
+  public static final String KEY_SSLCONTEXT_NAME = "sslcontext.name";
+
+  private boolean enabled;
+
+  private String sslContextName;
+
+  private List<String> servers;
+
+  private String conf;
 
   public CtLogControl(String conf) throws InvalidConfException {
     ConfPairs pairs = new ConfPairs(Args.notNull(conf, "conf"));
-    this.enabled = getBoolean(pairs, KEY_ENABLED, false);
+    enabled = getBoolean(pairs, KEY_ENABLED, false);
+    // normalize the pairs
+    pairs.putPair(KEY_ENABLED, Boolean.toString(enabled));
+
+    sslContextName = pairs.value(KEY_SSLCONTEXT_NAME);
+
+    String serverList = pairs.value(KEY_SERVERS);
+    servers = serverList == null ? null : Arrays.asList(serverList.split(";"));
+    if (servers == null || servers.isEmpty()) {
+      throw new InvalidConfException(KEY_SERVERS + " is not specified");
+    }
+
     this.conf = pairs.getEncoded();
   } // constructor
 
-  public CtLogControl(Boolean enabled)
+  public CtLogControl(Boolean enabled, List<String> servers, String sslContextName)
       throws InvalidConfException {
-    ConfPairs pairs = new ConfPairs();
+    Args.notEmpty(servers, "servers");
 
+    ConfPairs pairs = new ConfPairs();
     this.enabled = (enabled == null) ? false : enabled;
     pairs.putPair(KEY_ENABLED, Boolean.toString(this.enabled));
+
+    pairs.putPair(KEY_SERVERS, StringUtil.collectionAsString(servers, ";"));
+    this.servers = servers;
+
+    this.sslContextName = sslContextName;
+    if (sslContextName != null) {
+      pairs.putPair(KEY_SSLCONTEXT_NAME, sslContextName);
+    }
 
     this.conf = pairs.getEncoded();
   } // constructor
@@ -60,6 +100,30 @@ public class CtLogControl {
     return conf;
   }
 
+  public String getSslContextName() {
+    return sslContextName;
+  }
+
+  public void setSslContextName(String sslContextName) {
+    this.sslContextName = sslContextName;
+  }
+
+  public List<String> getServers() {
+    return servers;
+  }
+
+  public void setServers(List<String> servers) {
+    this.servers = servers;
+  }
+
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+  }
+
+  public void setConf(String conf) {
+    this.conf = conf;
+  }
+
   @Override
   public int hashCode() {
     return conf.hashCode();
@@ -67,12 +131,7 @@ public class CtLogControl {
 
   @Override
   public String toString() {
-    return toString(false);
-  }
-
-  public String toString(boolean verbose) {
-    return StringUtil.concatObjects(
-        "  enalbed: ", enabled);
+    return conf;
   }
 
   @Override

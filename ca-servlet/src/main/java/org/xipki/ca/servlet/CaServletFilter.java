@@ -63,7 +63,10 @@ public class CaServletFilter implements Filter {
 
   private static final String DFLT_CA_SERVER_CFG = "xipki/etc/org.xipki.ca.server.cfg";
 
-  private static final String DFLT_CONF_FILE = "xipki/etc/ca/ca.properties";
+  private static final String DFLT_CONF_FILE = "xipki/etc/ca/ca.json";
+
+  @Deprecated
+  private static final String DEPRECATED_DFLT_CONF_FILE = "xipki/etc/ca/ca.properties";
 
   private Securities securities;
 
@@ -115,7 +118,15 @@ public class CaServletFilter implements Filter {
     publiserFactoryRegister.registFactory(new OcspCertPublisherFactory());
     caManager.setCertPublisherFactoryRegister(publiserFactoryRegister);
 
-    String confFile = props.getProperty("confFile", DFLT_CONF_FILE);
+    String confFile = props.getProperty("confFile");
+    if (confFile == null) {
+      if (!Files.exists(Paths.get(DFLT_CONF_FILE))
+          && Files.exists(Paths.get(DEPRECATED_DFLT_CONF_FILE))) {
+        confFile = DEPRECATED_DFLT_CONF_FILE;
+      } else {
+        confFile = DFLT_CONF_FILE;
+      }
+    }
     caManager.setConfFile(confFile);
 
     caManager.startCaSystem();
