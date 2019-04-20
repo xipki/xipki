@@ -227,6 +227,7 @@ Features
     - BiometricInfo (RFC 3739)
     - CertificatePolicies (RFC 5280)
     - CRLDistributionPoints (RFC 5280)
+    - CT Precertificate SCTs (RFC 6962 Certificate Transparency)
     - ExtendedKeyUsage (RFC 5280)
     - FreshestCRL (RFC 5280)
     - InhibitAnyPolicy (RFC 5280)

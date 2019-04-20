@@ -14,6 +14,7 @@ See also <https://github.com/xipki/xipki/releases>
     - Add the native support of extensions IdentityCode, InsuranceNumber, ICRegistrationNumber, OrganizationCode and TaxationNumber defined in the chinese standard GM/T 0015
     - Add support of specification of extension admission in subject
     - Add CA/Browser certificate profiles.
+    - Add support of Certificate Transparency (RFC 6962)
   - OCSP
     - Add the configuration of OCSP response behaviour for unknown certificate
     - The OCSP cacher exhausts the database connections. This has been fixed.
