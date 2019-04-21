@@ -226,8 +226,6 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   } // class ScheduledCaRestarter
 
-  public static final String ENV_EPOCH = "EPOCH";
-
   private static final Logger LOG = LoggerFactory.getLogger(CaManagerImpl.class);
 
   private static final String EVENT_LOCK = "LOCK";
@@ -712,10 +710,15 @@ public class CaManagerImpl implements CaManager, Closeable {
     CtLogClient ctLogClient = null;
     if (ctLogControl != null && ctLogControl.isEnabled()) {
       String name = ctLogControl.getSslContextName();
-      SslContextConf ctxConf = caServerConf.getSslContextConf(name);
-      if (ctxConf == null) {
-        LOG.error(concat("X509CA.<init> (ca=", caName, "): found no SslContext named " + name));
-        return false;
+      SslContextConf ctxConf;
+      if (name == null) {
+        ctxConf = null;
+      } else {
+        ctxConf = caServerConf.getSslContextConf(name);
+        if (ctxConf == null) {
+          LOG.error(concat("X509CA.<init> (ca=", caName, "): found no SslContext named " + name));
+          return false;
+        }
       }
       ctLogClient = new CtLogClient(ctLogControl.getServers(), ctxConf);
     }
