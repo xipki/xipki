@@ -19,16 +19,15 @@ package org.xipki.security;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.Security;
-import java.util.Properties;
+import java.util.List;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.password.PasswordResolverImpl;
-import org.xipki.password.SinglePasswordResolver;
+import org.xipki.password.PasswordResolver;
+import org.xipki.password.Passwords;
+import org.xipki.password.Passwords.PasswordConf;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.security.pkcs11.P11CryptServiceFactoryImpl;
 import org.xipki.security.pkcs11.P11ModuleFactoryRegisterImpl;
@@ -37,9 +36,10 @@ import org.xipki.security.pkcs11.emulator.EmulatorP11ModuleFactory;
 import org.xipki.security.pkcs11.iaik.IaikP11ModuleFactory;
 import org.xipki.security.pkcs11.proxy.ProxyP11ModuleFactory;
 import org.xipki.security.pkcs12.P12SignerFactory;
+import org.xipki.util.CollectionUtil;
 import org.xipki.util.InvalidConfException;
-import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
+import org.xipki.util.ValidatableConf;
 
 /**
  * TODO.
@@ -48,31 +48,91 @@ import org.xipki.util.StringUtil;
 
 public class Securities implements Closeable {
 
+  public static class SecurityConf extends ValidatableConf {
+
+    private boolean keyStrongrandomEnabled;
+
+    private boolean signStrongrandomEnabled;
+
+    private int defaultSignerParallelism = 32;
+
+    private String pkcs11ConfFile;
+
+    private PasswordConf password;
+
+    public static final SecurityConf DEFAULT;
+
+    static {
+      DEFAULT = new SecurityConf();
+    }
+
+    /**
+     * list of classes that implement org.xipki.security.SignerFactory
+     */
+    private List<String> signerFactories;
+
+    public boolean isKeyStrongrandomEnabled() {
+      return keyStrongrandomEnabled;
+    }
+
+    public void setKeyStrongrandomEnabled(boolean keyStrongrandomEnabled) {
+      this.keyStrongrandomEnabled = keyStrongrandomEnabled;
+    }
+
+    public boolean isSignStrongrandomEnabled() {
+      return signStrongrandomEnabled;
+    }
+
+    public void setSignStrongrandomEnabled(boolean signStrongrandomEnabled) {
+      this.signStrongrandomEnabled = signStrongrandomEnabled;
+    }
+
+    public int getDefaultSignerParallelism() {
+      return defaultSignerParallelism;
+    }
+
+    public void setDefaultSignerParallelism(int defaultSignerParallelism) {
+      this.defaultSignerParallelism = defaultSignerParallelism;
+    }
+
+    public String getPkcs11ConfFile() {
+      return pkcs11ConfFile;
+    }
+
+    public void setPkcs11ConfFile(String pkcs11ConfFile) {
+      this.pkcs11ConfFile = pkcs11ConfFile;
+    }
+
+    public PasswordConf getPassword() {
+      return password == null ? PasswordConf.DEFAULT : password;
+    }
+
+    public void setPassword(PasswordConf password) {
+      this.password = password;
+    }
+
+    public List<String> getSignerFactories() {
+      return signerFactories;
+    }
+
+    public void setSignerFactories(List<String> signerFactories) {
+      this.signerFactories = signerFactories;
+    }
+
+    @Override
+    public void validate() throws InvalidConfException {
+      validate(password);
+    }
+
+  }
+
   private static final Logger LOG = LoggerFactory.getLogger(Securities.class);
-
-  private static final String DFLT_PASSWORD_CFG = "xipki/etc/org.xipki.password.cfg";
-
-  private static final String DFLT_SECURITY_CFG = "xipki/etc/org.xipki.security.cfg";
-
-  private String passwordCfg;
-
-  private String securityCfg;
-
-  private PasswordResolverImpl passwordResolver;
 
   private P11ModuleFactoryRegisterImpl p11ModuleFactoryRegister;
 
   private P11CryptServiceFactoryImpl p11CryptServiceFactory;
 
   private SecurityFactoryImpl securityFactory;
-
-  public void setPasswordCfg(String file) {
-    this.passwordCfg = file;
-  }
-
-  public void setSecuirtyCfg(String file) {
-    this.securityCfg = file;
-  }
 
   public SecurityFactory getSecurityFactory() {
     return securityFactory;
@@ -83,6 +143,10 @@ public class Securities implements Closeable {
   }
 
   public void init() throws IOException, InvalidConfException {
+    init(null);
+  }
+
+  public void init(SecurityConf conf) throws IOException, InvalidConfException {
     if (Security.getProvider("BC") == null) {
       LOG.info("add BouncyCastleProvider");
       Security.addProvider(new BouncyCastleProvider());
@@ -90,8 +154,11 @@ public class Securities implements Closeable {
       LOG.info("BouncyCastleProvider already added");
     }
 
-    initPassword();
-    initSecurityFactory();
+    if (conf == null) {
+      conf = SecurityConf.DEFAULT;
+    }
+
+    initSecurityFactory(conf);
   }
 
   @Override
@@ -115,82 +182,32 @@ public class Securities implements Closeable {
     }
   }
 
-  private void initPassword() throws IOException, InvalidConfException {
-    passwordResolver = new PasswordResolverImpl();
+  private void initSecurityFactory(SecurityConf conf) throws IOException, InvalidConfException {
+    Passwords passwords = new Passwords();
+    passwords.init(conf.getPassword());
 
-    Properties props;
-    if (StringUtil.isBlank(passwordCfg)) {
-      if (Files.exists(Paths.get(DFLT_PASSWORD_CFG))) {
-        props = IoUtil.loadProperties(DFLT_PASSWORD_CFG);
-      } else {
-        props = new Properties();
-      }
-    } else {
-      props = IoUtil.loadProperties(passwordCfg);
-    }
-
-    String masterPasswordCallback =
-        getString(props, "masterPassword.callback", "PBE-GUI quorum=1,tries=3");
-    passwordResolver.setMasterPasswordCallback(masterPasswordCallback);
-    passwordResolver.init();
-
-    // register additional SinglePasswordResolvers
-    String list = getString(props, "additional.singlePasswordResolvers", null);
-    String[] classNames = list == null ? null : list.split(", ");
-    if (classNames != null) {
-      for (String className : classNames) {
-        try {
-          Class<?> clazz = Class.forName(className);
-          SinglePasswordResolver resolver = (SinglePasswordResolver) clazz.newInstance();
-          passwordResolver.registResolver(resolver);
-        } catch (ClassCastException | ClassNotFoundException | IllegalAccessException
-            | InstantiationException ex) {
-          throw new InvalidConfException("error caught while initializing SinglePasswordResolver "
-              + className + ": " + ex.getClass().getName() + ": " + ex.getMessage(), ex);
-        }
-      }
-    }
-  }
-
-  private void initSecurityFactory() throws IOException, InvalidConfException {
     securityFactory = new SecurityFactoryImpl();
 
-    Properties props;
-    if (StringUtil.isBlank(securityCfg)) {
-      if (Files.exists(Paths.get(DFLT_SECURITY_CFG))) {
-        props = IoUtil.loadProperties(DFLT_SECURITY_CFG);
-      } else {
-        props = new Properties();
-      }
-    } else {
-      props = IoUtil.loadProperties(securityCfg);
-    }
-
-    securityFactory.setStrongRandom4SignEnabled(
-        getBoolean(props, "sign.strongrandom.enabled", false));
-    securityFactory.setStrongRandom4KeyEnabled(
-        getBoolean(props, "key.strongrandom.enabled", false));
-    securityFactory.setDefaultSignerParallelism(
-        getInt(props, "defaultSignerParallelism", 32));
+    securityFactory.setStrongRandom4SignEnabled(conf.isSignStrongrandomEnabled());
+    securityFactory.setStrongRandom4KeyEnabled(conf.isKeyStrongrandomEnabled());
+    securityFactory.setDefaultSignerParallelism(conf.getDefaultSignerParallelism());
 
     SignerFactoryRegisterImpl signerFactoryRegister = new SignerFactoryRegisterImpl();
     securityFactory.setSignerFactoryRegister(signerFactoryRegister);
-    securityFactory.setPasswordResolver(passwordResolver);
+    securityFactory.setPasswordResolver(passwords.getPasswordResolver());
 
     // PKCS#12
     initSecurityPkcs12(signerFactoryRegister);
 
     // PKCS#11
-    String pkcs11ConfFile = getString(props, "pkcs11.confFile", null);
-    if (StringUtil.isNotBlank(pkcs11ConfFile)) {
-      initSecurityPkcs11(pkcs11ConfFile, signerFactoryRegister);
+    if (StringUtil.isNotBlank(conf.getPkcs11ConfFile())) {
+      initSecurityPkcs11(conf.getPkcs11ConfFile(), signerFactoryRegister,
+          passwords.getPasswordResolver());
     }
 
     // register additional SignerFactories
-    String list = getString(props, "additional.signerFactories", null);
-    String[] classNames = list == null ? null : list.split(", ");
-    if (classNames != null) {
-      for (String className : classNames) {
+    if (CollectionUtil.isNonEmpty(conf.getSignerFactories())) {
+      for (String className : conf.getSignerFactories()) {
         try {
           Class<?> clazz = Class.forName(className);
           SignerFactory factory = (SignerFactory) clazz.newInstance();
@@ -213,7 +230,8 @@ public class Securities implements Closeable {
   }
 
   private void initSecurityPkcs11(String pkcs11ConfFile,
-      SignerFactoryRegisterImpl signerFactoryRegister) throws InvalidConfException {
+      SignerFactoryRegisterImpl signerFactoryRegister, PasswordResolver passwordResolver)
+          throws InvalidConfException {
     p11ModuleFactoryRegister = new P11ModuleFactoryRegisterImpl();
     p11ModuleFactoryRegister.registFactory(new EmulatorP11ModuleFactory());
     p11ModuleFactoryRegister.registFactory(new IaikP11ModuleFactory());
@@ -231,25 +249,6 @@ public class Securities implements Closeable {
     p11SignerFactory.setP11CryptServiceFactory(p11CryptServiceFactory);
 
     signerFactoryRegister.registFactory(p11SignerFactory);
-  }
-
-  public static Properties loadProperties(String path, String dfltPath) throws IOException {
-    return IoUtil.loadProperties(path == null ? dfltPath : path);
-  }
-
-  public static String getString(Properties props, String key, String dfltValue) {
-    String value = props.getProperty(key);
-    return value == null ? dfltValue : value;
-  }
-
-  public static int getInt(Properties props, String key, int dfltValue) {
-    String value = props.getProperty(key);
-    return value == null ? dfltValue : Integer.parseInt(value);
-  }
-
-  public static boolean getBoolean(Properties props, String key, boolean dfltValue) {
-    String value = props.getProperty(key);
-    return value == null ? dfltValue : Boolean.parseBoolean(value);
   }
 
 }

@@ -22,14 +22,13 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
+import org.xipki.audit.Audits.AuditConf;
+import org.xipki.security.Securities.SecurityConf;
 import org.xipki.util.Args;
 import org.xipki.util.InvalidConfException;
-import org.xipki.util.StringUtil;
 import org.xipki.util.ValidatableConf;
 import org.xipki.util.http.SslContextConf;
 
@@ -151,6 +150,36 @@ public class CaServerConf extends ValidatableConf {
 
   }
 
+  public static class RemoteMgmt {
+
+    private boolean enabled;
+
+    private List<String> certs;
+
+    public boolean isEnabled() {
+      return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+      this.enabled = enabled;
+    }
+
+    public List<String> getCerts() {
+      return certs;
+    }
+
+    public void setCerts(List<String> certs) {
+      this.certs = certs;
+    }
+
+  }
+
+  private AuditConf audit;
+
+  private SecurityConf security;
+
+  private RemoteMgmt remoteMgmt;
+
   /**
    * master or slave, the default is master
    */
@@ -166,6 +195,11 @@ public class CaServerConf extends ValidatableConf {
 
   private List<SslContext> sslContexts;
 
+  /**
+   * list of classes that implement org.xipki.ca.api.profile.CertprofileFactory
+   */
+  private List<String> certprofileFactories;
+
   @JSONField(serialize = false, deserialize = false)
   private Map<String, SslContextConf> sslContextConfMap = new HashMap<>();
 
@@ -173,62 +207,8 @@ public class CaServerConf extends ValidatableConf {
       throws IOException, InvalidConfException {
     Args.notBlank(fileName, "fileName");
     try (InputStream is = Files.newInputStream(Paths.get(fileName))) {
-      CaServerConf conf;
-
-      if (fileName.endsWith(".properties")) {
-        conf = new CaServerConf();
-        Properties props = new Properties();
-        props.load(is);
-        String caModeStr = props.getProperty("ca.mode");
-
-        boolean masterMode;
-        if (caModeStr != null) {
-          if ("slave".equalsIgnoreCase(caModeStr)) {
-            masterMode = false;
-          } else if ("master".equalsIgnoreCase(caModeStr)) {
-            masterMode = true;
-          } else {
-            throw new InvalidConfException("invalid ca.mode '" + caModeStr + "'");
-          }
-        } else {
-          masterMode = true;
-        }
-        conf.setMaster(masterMode);
-
-        String shardIdStr = props.getProperty("ca.shardId");
-        if (StringUtil.isBlank(shardIdStr)) {
-          throw new InvalidConfException("ca.shardId is not set");
-        }
-
-        int shardId;
-        try {
-          shardId = Integer.parseInt(shardIdStr);
-        } catch (NumberFormatException ex) {
-          throw new InvalidConfException("invalid ca.shardId '" + shardIdStr + "'");
-        }
-        conf.setShardId(shardId);
-
-        List<Datasource> datasources = new LinkedList<>();
-        conf.setDatasources(datasources);
-
-        for (Object objKey : props.keySet()) {
-          String key = (String) objKey;
-          if (!StringUtil.startsWithIgnoreCase(key, "datasource.")) {
-            continue;
-          }
-
-          String datasourceName = key.substring("datasource.".length());
-          String datasourceFile = props.getProperty(key);
-
-          Datasource ds = new Datasource();
-          ds.setName(datasourceName);
-          ds.setConfFile(datasourceFile);
-          datasources.add(ds);
-        }
-      } else {
-        conf = JSON.parseObject(Files.newInputStream(Paths.get(fileName)), CaServerConf.class);
-      }
-
+      CaServerConf conf =
+          JSON.parseObject(Files.newInputStream(Paths.get(fileName)), CaServerConf.class);
       conf.validate();
 
       return conf;
@@ -279,6 +259,38 @@ public class CaServerConf extends ValidatableConf {
     }
 
     return null;
+  }
+
+  public AuditConf getAudit() {
+    return audit == null ? AuditConf.DEFAULT : audit;
+  }
+
+  public void setAudit(AuditConf audit) {
+    this.audit = audit;
+  }
+
+  public SecurityConf getSecurity() {
+    return security == null ? SecurityConf.DEFAULT : security;
+  }
+
+  public void setSecurity(SecurityConf security) {
+    this.security = security;
+  }
+
+  public RemoteMgmt getRemoteMgmt() {
+    return remoteMgmt;
+  }
+
+  public void setRemoteMgmt(RemoteMgmt remoteMgmt) {
+    this.remoteMgmt = remoteMgmt;
+  }
+
+  public List<String> getCertprofileFactories() {
+    return certprofileFactories;
+  }
+
+  public void setCertprofileFactories(List<String> certprofileFactories) {
+    this.certprofileFactories = certprofileFactories;
   }
 
   public synchronized SslContextConf getSslContextConf(String name) {

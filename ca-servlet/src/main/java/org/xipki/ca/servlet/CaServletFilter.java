@@ -19,13 +19,10 @@ package org.xipki.ca.servlet;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashSet;
-import java.util.Properties;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.Filter;
@@ -40,18 +37,23 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.Audits;
+import org.xipki.audit.Audits.AuditConf;
 import org.xipki.ca.api.profile.CertprofileFactory;
 import org.xipki.ca.api.profile.CertprofileFactoryRegister;
 import org.xipki.ca.api.publisher.CertPublisherFactoryRegister;
 import org.xipki.ca.certprofile.xijson.CertprofileFactoryImpl;
 import org.xipki.ca.server.CaManagerImpl;
+import org.xipki.ca.server.CaServerConf;
+import org.xipki.ca.server.CaServerConf.RemoteMgmt;
 import org.xipki.ca.server.publisher.OcspCertPublisherFactory;
 import org.xipki.security.Securities;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.CollectionUtil;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.
@@ -61,12 +63,9 @@ public class CaServletFilter implements Filter {
 
   private static final Logger LOG = LoggerFactory.getLogger(CaServletFilter.class);
 
-  private static final String DFLT_CA_SERVER_CFG = "xipki/etc/org.xipki.ca.server.cfg";
+  private static final String DFLT_CA_SERVER_CFG = "xipki/etc/ca/ca.json";
 
-  private static final String DFLT_CONF_FILE = "xipki/etc/ca/ca.json";
-
-  @Deprecated
-  private static final String DEPRECATED_DFLT_CONF_FILE = "xipki/etc/ca/ca.properties";
+  private static final String DFLT_SYSLOG_AUDIT_CFG = "xipki/etc/ca/org.xipki.audit.syslog.cfg";
 
   private Securities securities;
 
@@ -86,11 +85,30 @@ public class CaServletFilter implements Filter {
 
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
-    Audits.init(null);
+    CaServerConf conf;
+    try {
+      conf = CaServerConf.readConfFromFile(IoUtil.expandFilepath(DFLT_CA_SERVER_CFG));
+    } catch (IOException | InvalidConfException ex) {
+      throw new IllegalArgumentException(
+          "could not parse CA configuration file " + DFLT_CA_SERVER_CFG, ex);
+    }
+
+    AuditConf audit = conf.getAudit();
+    String auditType = audit.getType();
+    if (StringUtil.isBlank(auditType)) {
+      auditType = "embed";
+    }
+
+    String auditConf = audit.getConf();
+    if ("syslog".equalsIgnoreCase(auditType) && auditConf == null) {
+      auditConf = DFLT_SYSLOG_AUDIT_CFG;
+    }
+
+    Audits.init(auditType, auditConf);
 
     securities = new Securities();
     try {
-      securities.init();
+      securities.init(conf.getSecurity());
     } catch (IOException | InvalidConfException ex) {
       throw new ServletException("Exception while initializing Securites", ex);
     }
@@ -98,36 +116,15 @@ public class CaServletFilter implements Filter {
     caManager = new CaManagerImpl();
     caManager.setSecurityFactory(securities.getSecurityFactory());
 
-    Properties props = new Properties();
-    InputStream is = null;
-    try {
-      is = Files.newInputStream(Paths.get(DFLT_CA_SERVER_CFG));
-      props.load(is);
-    } catch (IOException ex) {
-      throw new ServletException("could not load properties from file " + DFLT_CA_SERVER_CFG);
-    } finally {
-      IoUtil.closeQuietly(is);
-    }
-
     // Certprofiles
     caManager.setCertprofileFactoryRegister(
-        initCertprofileFactoryRegister(props));
+        initCertprofileFactoryRegister(conf.getCertprofileFactories()));
 
     // Publisher
     CertPublisherFactoryRegister publiserFactoryRegister = new CertPublisherFactoryRegister();
     publiserFactoryRegister.registFactory(new OcspCertPublisherFactory());
     caManager.setCertPublisherFactoryRegister(publiserFactoryRegister);
-
-    String confFile = props.getProperty("confFile");
-    if (confFile == null) {
-      if (!Files.exists(Paths.get(DFLT_CONF_FILE))
-          && Files.exists(Paths.get(DEPRECATED_DFLT_CONF_FILE))) {
-        confFile = DEPRECATED_DFLT_CONF_FILE;
-      } else {
-        confFile = DFLT_CONF_FILE;
-      }
-    }
-    caManager.setConfFile(confFile);
+    caManager.setCaServerConf(conf);
 
     caManager.startCaSystem();
 
@@ -143,19 +140,17 @@ public class CaServletFilter implements Filter {
     this.scepServlet = new HttpScepServlet();
     this.scepServlet.setResponderManager(caManager);
 
-    this.remoteMgmtEnabled =
-        Boolean.parseBoolean(props.getProperty("remote.mgmt.enabled", "false"));
+    RemoteMgmt remoteMgmt = conf.getRemoteMgmt();
+    this.remoteMgmtEnabled = remoteMgmt == null ? false : remoteMgmt.isEnabled();
     LOG.info("remote management is {}", remoteMgmtEnabled ? "enabled" : "disabled");
 
     if (this.remoteMgmtEnabled) {
-      String certFiles = props.getProperty("remote.mgmt.certs");
-      if (certFiles == null) {
+      List<String> certFiles = remoteMgmt.getCerts();
+      if (CollectionUtil.isEmpty(certFiles)) {
         LOG.error("no client certificate is configured, disable the remote managent");
       } else {
         Set<X509Certificate> certs = new HashSet<>();
-
-        String[] fileNames = certFiles.split(":; ");
-        for (String fileName : fileNames) {
+        for (String fileName : certFiles) {
           try {
             X509Certificate cert = X509Util.parseCert(new File(fileName));
             certs.add(cert);
@@ -227,19 +222,14 @@ public class CaServletFilter implements Filter {
     res.setContentLength(0);
   }
 
-  private CertprofileFactoryRegister initCertprofileFactoryRegister(Properties props)
+  private CertprofileFactoryRegister initCertprofileFactoryRegister(List<String> factories)
       throws ServletException {
     CertprofileFactoryRegister certprofileFactoryRegister = new CertprofileFactoryRegister();
     certprofileFactoryRegister.registFactory(new CertprofileFactoryImpl());
 
-    // register additional SignerFactories
-    String list = props.getProperty("additional.certprofileFactories");
-    if (list == null) {
-      list = props.getProperty("additional.certprofileFactories");
-    }
-    String[] classNames = list == null ? null : list.split(", ");
-    if (classNames != null) {
-      for (String className : classNames) {
+    // register additional CertprofileFactories
+    if (factories != null) {
+      for (String className : factories) {
         try {
           Class<?> clazz = Class.forName(className);
           CertprofileFactory factory = (CertprofileFactory) clazz.newInstance();

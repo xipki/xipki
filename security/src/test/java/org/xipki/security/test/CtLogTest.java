@@ -59,8 +59,7 @@ public class CtLogTest {
     SignedCertificateTimestampList sctList2 =
         SignedCertificateTimestampList.getInstance(encodedScts);
     SignedCertificateTimestamp sct = sctList2.getSctList().get(0);
-    byte[] encoded = sct.getDigitallySigned().getEncoded();
-
+    sct.getDigitallySigned().getEncoded();
     sctList2.getSctList().get(0).getDigitallySigned().getSignatureObject();
     byte[] encoded2 = sctList2.getEncoded();
     Assert.assertArrayEquals(encodedScts, encoded2);

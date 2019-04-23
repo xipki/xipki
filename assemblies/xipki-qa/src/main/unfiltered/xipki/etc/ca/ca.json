@@ -1,4 +1,8 @@
 {
+	"master":true,
+	// shard id, between 0 and 127. CA systems using same database must have
+	// different shard ids.
+	"shardId":0,
 	"datasources":[{
 		"confFile":"xipki/etc/ca/database/ca-db.properties",
 		"name":"ca"
@@ -6,13 +10,35 @@
 		"confFile":"xipki/etc/ca/database/ocsp-db.properties",
 		"name":"ocsp"
 	}],
-	"master":true,
-	"shardId":0,
+	"remoteMgmt":{
+		"enabled":true,
+		"certs":[
+			"xipki/keycerts/tlskeys/client2/tls-client2-cert.der"
+		]
+	},
+	"certprofileFactories":[
+	],
+	"security":{
+		"keyStrongrandomEnabled":false,
+		"signStrongrandomEnabled":false,
+		"defaultSignerParallelism":32,
+		"pkcs11ConfFile":"xipki/security/pkcs11.json",
+		"password":{
+			"masterPasswordCallback":"FILE file=xipki/security/masterpassword.secret"
+		}
+	},
+	"audit":{
+		// embed: use the embedded slf4j logging
+		// syslog: use the syslog
+		// java:<name of class that implements org.xipki.audit.AuditService>
+		"type":"embed"
+		//,"conf":"..."
+	},
 	"sslContexts":[
 		{
 			"name":"localhost",
 			"truststore":{
-				"file":"xipki/keycerts/tlskeys/ca/tls-ca-cert.pem",
+				"file":"xipki/keycerts/tlskeys/ca/tls-ca-cert.p12",
 				"password":"1234",
 				"type":"PKCS12"
 			}

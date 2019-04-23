@@ -17,13 +17,6 @@
 
 package org.xipki.audit;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Properties;
-
 import org.xipki.audit.services.EmbedAuditService;
 import org.xipki.audit.services.SyslogAuditService;
 
@@ -34,9 +27,37 @@ import org.xipki.audit.services.SyslogAuditService;
 
 public class Audits {
 
-  private static final String DFLT_AUDIT_CFG = "xipki/etc/org.xipki.audit.cfg";
+  public static class AuditConf {
 
-  private static final String DFLT_AUDIT_SYSLOG_CFG = "xipki/etc/org.xipki.audit.syslog.cfg";
+    /**
+     * valid values are:
+     *   embed: use the embedded slf4j logging
+     *   syslog: use the syslog
+     *   java:<name of class that implements org.xipki.audit.AuditService>
+     */
+    private String type;
+
+    private String conf;
+
+    public static AuditConf DEFAULT = new AuditConf();
+
+    public String getType() {
+      return type == null || type.isEmpty() ? "embed" : type;
+    }
+
+    public void setType(String type) {
+      this.type = type;
+    }
+
+    public String getConf() {
+      return conf;
+    }
+
+    public void setConf(String conf) {
+      this.conf = conf;
+    }
+
+  }
 
   private static AuditService auditService;
 
@@ -57,12 +78,8 @@ public class Audits {
     }
   }
 
-  public static void init(String auditCfg)  {
+  public static void init(String auditType, String auditConf)  {
     try {
-      Properties auditProps = loadProperties(auditCfg == null ? DFLT_AUDIT_CFG : auditCfg);
-      String auditType = getString(auditProps, "audit.type", "embed");
-      String auditConf = getString(auditProps, "audit.conf", DFLT_AUDIT_SYSLOG_CFG);
-
       AuditService service;
       if ("embed".equalsIgnoreCase(auditType)) {
         service = new EmbedAuditService();
@@ -94,29 +111,4 @@ public class Audits {
     }
   }
 
-  private static Properties loadProperties(String path) throws AuditServiceRuntimeException {
-    Path realPath = Paths.get(path);
-    if (Files.exists(realPath)) {
-      Properties props = new Properties();
-      try {
-        try (InputStream is = Files.newInputStream(realPath)) {
-          props.load(is);
-        }
-      } catch (IOException ex) {
-        throw new AuditServiceRuntimeException("could not load properties from file " + path, ex);
-      }
-      return props;
-    } else {
-      throw new AuditServiceRuntimeException("the file " + path + " does not exist");
-    }
-  }
-
-  private static String getString(Properties props, String key, String dfltValue) {
-    if (props == null) {
-      return dfltValue;
-    } else {
-      String value = props.getProperty(key);
-      return value == null ? dfltValue : value;
-    }
-  }
 }

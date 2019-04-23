@@ -718,6 +718,14 @@ public class CaManagerImpl implements CaManager, Closeable {
         if (ctxConf == null) {
           LOG.error(concat("X509CA.<init> (ca=", caName, "): found no SslContext named " + name));
           return false;
+        } else {
+          try {
+            ctxConf.getSslContext();
+          } catch (ObjectCreationException ex) {
+            LOG.error(concat("X509CA.<init> (ca=", caName,
+                        "): could not initialize SslContext named " + name));
+            return false;
+          }
         }
       }
       ctLogClient = new CtLogClient(ctLogControl.getServers(), ctxConf);
@@ -1771,16 +1779,6 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   public void setCaServerConf(CaServerConf caServerConf) {
     this.caServerConf = Args.notNull(caServerConf, "caServerConf");
-  }
-
-  public void setConfFile(String confFile) {
-    Args.notBlank(confFile, "confFile");
-
-    try {
-      this.caServerConf = CaServerConf.readConfFromFile(IoUtil.expandFilepath(confFile));
-    } catch (IOException | InvalidConfException ex) {
-      throw new IllegalArgumentException("could not parse CA configuration file " + confFile, ex);
-    }
   }
 
   @Override
