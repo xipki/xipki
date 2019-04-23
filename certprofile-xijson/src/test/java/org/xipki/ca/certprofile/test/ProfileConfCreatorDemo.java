@@ -902,7 +902,7 @@ public class ProfileConfCreatorDemo {
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.contentCommitment},
-        new KeyUsage[]{KeyUsage.cRLSign}));
+        null));
 
     // Extensions - extenedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
@@ -1074,11 +1074,6 @@ public class ProfileConfCreatorDemo {
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
         new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_serverAuth},
         new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth}));
-
-    // Extensions - tlsFeature
-    list.add(createExtension(Extn.id_pe_tlsfeature, true, true));
-    last(list).setTlsFeature(createTlsFeature(
-        TlsExtensionType.STATUS_REQUEST, TlsExtensionType.CLIENT_CERTIFICATE_URL));
 
     marshall(profile, destFilename, true);
   } // method certprofileTls
@@ -1335,6 +1330,11 @@ public class ProfileConfCreatorDemo {
     attrTypes.add(createOidType(DN.gender));
     attrTypes.add(createOidType(DN.dateOfBirth));
     attrTypes.add(createOidType(DN.placeOfBirth));
+
+    // Extensions - tlsFeature
+    list.add(createExtension(Extn.id_pe_tlsfeature, true, true));
+    last(list).setTlsFeature(createTlsFeature(
+        TlsExtensionType.STATUS_REQUEST, TlsExtensionType.CLIENT_CERTIFICATE_URL));
 
     // Extension - Admission
     list.add(createExtension(Extn.id_extension_admission, true, false));

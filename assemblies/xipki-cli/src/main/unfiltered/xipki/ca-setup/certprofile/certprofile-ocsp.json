@@ -210,9 +210,6 @@
 			"usages":[{
 				"required":true,
 				"value":"contentCommitment"
-			},{
-				"required":true,
-				"value":"cRLSign"
 			}]
 		}
 	},{
