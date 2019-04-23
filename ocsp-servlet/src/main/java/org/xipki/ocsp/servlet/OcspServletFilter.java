@@ -19,12 +19,9 @@ package org.xipki.ocsp.servlet;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashSet;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.servlet.Filter;
@@ -40,12 +37,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.ocsp.server.OcspServerImpl;
+import org.xipki.ocsp.servlet.OcspConf.RemoteMgmt;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.Securities;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.CollectionUtil;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.InvalidConfException;
-import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 
 /**
@@ -57,15 +55,7 @@ public class OcspServletFilter implements Filter {
 
   private static final Logger LOG = LoggerFactory.getLogger(OcspServletFilter.class);
 
-  private static final String DFLT_OCSP_SERVER_CFG = "xipki/etc/org.xipki.ocsp.server.cfg";
-
-  private static final String DFLT_CONF_FILE = "xipki/etc/ocsp/ocsp-responder.json";
-
-  private static final String PROP_REMOTE_MGMT_ENABLED = "remote.mgmt.enabled";
-
-  private static final String PROP_REMOTE_MGMT_CERTS = "remote.mgmt.certs";
-
-  private static final String PROP_CONFFILE = "confFile";
+  private static final String DFLT_CONF_FILE = "xipki/etc/ocsp/ocsp.json";
 
   private Securities securities;
 
@@ -81,31 +71,26 @@ public class OcspServletFilter implements Filter {
 
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
+    String confFile = DFLT_CONF_FILE;
+
+    OcspConf conf;
+    try {
+      conf = OcspConf.readConfFromFile(confFile);
+    } catch (IOException | InvalidConfException ex) {
+      throw new IllegalArgumentException("could not parse CA configuration file " + confFile, ex);
+    }
+
     securities = new Securities();
     try {
-      securities.init();
+      securities.init(conf.getSecurity());
     } catch (IOException | InvalidConfException ex) {
       LogUtil.error(LOG, ex, "could not initializing Securities");
       return;
     }
 
-    Properties props;
-    if (Files.exists(Paths.get(DFLT_OCSP_SERVER_CFG))) {
-      try {
-        props = IoUtil.loadProperties(DFLT_OCSP_SERVER_CFG);
-      } catch (IOException ex) {
-        LogUtil.error(LOG, ex, "could not load properties from file " + DFLT_OCSP_SERVER_CFG);
-        return;
-      }
-    } else {
-      props = new Properties();
-    }
-
     OcspServerImpl ocspServer = new OcspServerImpl();
     ocspServer.setSecurityFactory(securities.getSecurityFactory());
-
-    String confFile = props.getProperty(PROP_CONFFILE, DFLT_CONF_FILE);
-    ocspServer.setConfFile(confFile);
+    ocspServer.setConfFile(conf.getServerConf());
 
     try {
       ocspServer.init();
@@ -120,19 +105,15 @@ public class OcspServletFilter implements Filter {
     this.ocspServlet = new OcspServlet();
     this.ocspServlet.setServer(this.server);
 
-    this.remoteMgmtEnabled =
-        Boolean.parseBoolean(props.getProperty(PROP_REMOTE_MGMT_ENABLED, "false"));
+    RemoteMgmt remoteMgmt = conf.getRemoteMgmt();
+    this.remoteMgmtEnabled = remoteMgmt == null ? false : remoteMgmt.isEnabled();
     LOG.info("remote management is {}", remoteMgmtEnabled ? "enabled" : "disabled");
 
     if (remoteMgmtEnabled) {
-      String certFiles = props.getProperty(PROP_REMOTE_MGMT_CERTS);
-      if (certFiles == null) {
-        LOG.error("no client certificate is configured, disable the remote managent");
-      } else {
+      if (CollectionUtil.isNonEmpty(remoteMgmt.getCerts())) {
         Set<X509Certificate> certs = new HashSet<>();
 
-        String[] fileNames = certFiles.split(":; ");
-        for (String fileName : fileNames) {
+        for (String fileName : remoteMgmt.getCerts()) {
           try {
             X509Certificate cert = X509Util.parseCert(new File(fileName));
             certs.add(cert);

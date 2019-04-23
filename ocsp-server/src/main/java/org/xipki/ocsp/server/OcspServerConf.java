@@ -17,6 +17,10 @@
 
 package org.xipki.ocsp.server;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -24,11 +28,14 @@ import java.util.Map;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownIssuerBehaviour;
 import org.xipki.security.CertpathValidationModel;
+import org.xipki.util.Args;
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.FileOrValue;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.TripleState;
 import org.xipki.util.ValidatableConf;
+
+import com.alibaba.fastjson.JSON;
 
 /**
  * TODO.
@@ -844,6 +851,18 @@ public class OcspServerConf extends ValidatableConf {
   private boolean master = true;
 
   private UnknownIssuerBehaviour unknownIssuerBehaviour = UnknownIssuerBehaviour.unknown;
+
+  public static OcspServerConf readConfFromFile(String fileName)
+      throws IOException, InvalidConfException {
+    Args.notBlank(fileName, "fileName");
+    try (InputStream is = Files.newInputStream(Paths.get(fileName))) {
+      OcspServerConf conf =
+          JSON.parseObject(Files.newInputStream(Paths.get(fileName)), OcspServerConf.class);
+      conf.validate();
+
+      return conf;
+    }
+  }
 
   public ResponseCache getResponseCache() {
     return responseCache;
