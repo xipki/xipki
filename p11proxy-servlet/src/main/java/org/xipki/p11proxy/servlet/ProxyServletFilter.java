@@ -34,6 +34,7 @@ import org.xipki.security.Securities;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.P11TokenException;
 import org.xipki.util.InvalidConfException;
+import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 
 /**
@@ -45,17 +46,27 @@ public class ProxyServletFilter implements Filter {
 
   private static final Logger LOG = LoggerFactory.getLogger(ProxyServletFilter.class);
 
+  private static final String DFLT_SERVER_CFG = "xipki/etc/p11proxy/p11proxy.json";
+
   private Securities securities;
 
   private HttpProxyServlet servlet;
 
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
+    P11ProxyConf conf;
+    try {
+      conf = P11ProxyConf.readConfFromFile(IoUtil.expandFilepath(DFLT_SERVER_CFG));
+    } catch (IOException | InvalidConfException ex) {
+      throw new IllegalArgumentException(
+          "could not parse PKCS#11 Proxy configuration file " + DFLT_SERVER_CFG, ex);
+    }
+
     securities = new Securities();
     try {
-      securities.init();
+      securities.init(conf.getSecurity());
     } catch (IOException | InvalidConfException ex) {
-      LogUtil.error(LOG, ex, "could not initializing Securities");
+      LogUtil.error(LOG, ex, "could not initialize Securities");
       return;
     }
 

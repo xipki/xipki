@@ -1,0 +1,11 @@
+{
+	"security":{
+		"keyStrongrandomEnabled":false,
+		"signStrongrandomEnabled":false,
+		"defaultSignerParallelism":32,
+		"pkcs11ConfFile":"xipki/security/pkcs11.json",
+		"password":{
+			"masterPasswordCallback":"FILE file=xipki/security/masterpassword.secret"
+		}
+	}
+}
