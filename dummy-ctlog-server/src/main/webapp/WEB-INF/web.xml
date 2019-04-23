@@ -12,12 +12,12 @@
 
     <servlet>
         <servlet-name>ctlog1</servlet-name>
-        <servlet-class>org.xipki.ctlog.dummyserver.CtLogServlet.CtLogServlet1</servlet-class>
+        <servlet-class>org.xipki.ctlog.dummyserver.CtLogServlet1</servlet-class>
     </servlet>
 
     <servlet>
         <servlet-name>ctlog2</servlet-name>
-        <servlet-class>org.xipki.ctlog.dummyserver.CtLogServlet.CtLogServlet2</servlet-class>
+        <servlet-class>org.xipki.ctlog.dummyserver.CtLogServlet2</servlet-class>
     </servlet>
 
     <servlet-mapping>

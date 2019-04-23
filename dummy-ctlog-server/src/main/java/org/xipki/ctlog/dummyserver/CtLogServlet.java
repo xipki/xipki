@@ -20,7 +20,6 @@ package org.xipki.ctlog.dummyserver;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.SecureRandom;
-import java.util.Arrays;
 import java.util.Base64;
 
 import javax.servlet.ServletException;
@@ -34,40 +33,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 @SuppressWarnings("serial")
 public abstract class CtLogServlet extends HttpServlet {
-
-  public static class CtLogServlet1 extends CtLogServlet {
-
-    private String id;
-
-    public CtLogServlet1() {
-      byte[] tmpId = new byte[32];
-      Arrays.fill(tmpId, (byte) 0x11);
-      id = Base64.getEncoder().encodeToString(tmpId);
-    }
-
-    @Override
-    protected String getLogId() {
-      return id;
-    }
-
-  }
-
-  public static class CtLogServlet2 extends CtLogServlet {
-
-    private String id;
-
-    public CtLogServlet2() {
-      byte[] tmpId = new byte[32];
-      Arrays.fill(tmpId, (byte) 0x22);
-      id = Base64.getEncoder().encodeToString(tmpId);
-    }
-
-    @Override
-    protected String getLogId() {
-      return id;
-    }
-
-  }
 
   private final SecureRandom random = new SecureRandom();
 
