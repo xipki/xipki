@@ -110,7 +110,7 @@ public class CaServletFilter implements Filter {
     try {
       securities.init(conf.getSecurity());
     } catch (IOException | InvalidConfException ex) {
-      throw new ServletException("Exception while initializing Securites", ex);
+      throw new ServletException("could not initialize Securites", ex);
     }
 
     caManager = new CaManagerImpl();

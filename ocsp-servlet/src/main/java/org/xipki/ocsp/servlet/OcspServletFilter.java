@@ -77,14 +77,14 @@ public class OcspServletFilter implements Filter {
     try {
       conf = OcspConf.readConfFromFile(confFile);
     } catch (IOException | InvalidConfException ex) {
-      throw new IllegalArgumentException("could not parse CA configuration file " + confFile, ex);
+      throw new IllegalArgumentException("could not parse OCSP configuration file " + confFile, ex);
     }
 
     securities = new Securities();
     try {
       securities.init(conf.getSecurity());
     } catch (IOException | InvalidConfException ex) {
-      LogUtil.error(LOG, ex, "could not initializing Securities");
+      LogUtil.error(LOG, ex, "could not initialize Securities");
       return;
     }
 

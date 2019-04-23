@@ -150,7 +150,7 @@ public class CaServerConf extends ValidatableConf {
 
   }
 
-  public static class RemoteMgmt {
+  public static class RemoteMgmt extends ValidatableConf {
 
     private boolean enabled;
 
@@ -170,6 +170,10 @@ public class CaServerConf extends ValidatableConf {
 
     public void setCerts(List<String> certs) {
       this.certs = certs;
+    }
+
+    @Override
+    public void validate() throws InvalidConfException {
     }
 
   }
@@ -321,6 +325,8 @@ public class CaServerConf extends ValidatableConf {
     }
 
     notEmpty(datasources, "datasources");
+    validate(remoteMgmt);
+    validate(security);
   }
 
 }
