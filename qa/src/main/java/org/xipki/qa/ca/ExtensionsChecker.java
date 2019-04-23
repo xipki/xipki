@@ -2316,8 +2316,9 @@ public class ExtensionsChecker {
       byte[] extensionValue, ExtensionControl extControl) {
     // just check the syntax
     try {
+      ASN1OctetString octet = DEROctetString.getInstance(extensionValue);
       SignedCertificateTimestampList sctList =
-          SignedCertificateTimestampList.getInstance(extensionValue);
+          SignedCertificateTimestampList.getInstance(octet.getOctets());
       int size = sctList.getSctList().size();
       for (int i = 0; i < size; i++) {
         sctList.getSctList().get(i).getDigitallySigned().getSignatureObject();
