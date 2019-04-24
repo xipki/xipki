@@ -99,9 +99,7 @@
 	"signers":[{
 		"name":"signer1",
 		"type":"REPLACEME-TOKENTYPE",
-		"algorithms":[
-			"REPLACEME-SIGALGO"
-		],
+		"algorithms":["REPLACEME-SIGALGO"],
 		"caCerts":[],
 		"key":"REPLACEME-TOKENKEY"
 	}],

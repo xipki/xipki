@@ -4,7 +4,9 @@
 		"keyStrongrandomEnabled":false,
 		"signStrongrandomEnabled":false,
 		"defaultSignerParallelism":32,
-		"pkcs11ConfFile":"xipki/security/pkcs11.json",
+		"pkcs11Conf":{
+			"file":"xipki/security/pkcs11.json"
+		},
 		"password":{
 			"masterPasswordCallback":"FILE file=xipki/security/masterpassword.secret"
 		}
@@ -12,9 +14,9 @@
 	//,
 	//"remoteMgmt":{
 	//	"enabled":true,
-	//	"certs":[
-	//		"xipki/keycerts/tlskeys/client2/tls-client2-cert.der"
-	//	]
-	}
+	//	"certs":[{
+	//		"file":"xipki/keycerts/tlskeys/client2/tls-client2-cert.der"
+	//	}]
+	//}
 }
 

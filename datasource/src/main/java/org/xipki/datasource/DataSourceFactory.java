@@ -19,6 +19,8 @@ package org.xipki.datasource;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashSet;
@@ -31,6 +33,7 @@ import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.Args;
+import org.xipki.util.FileOrValue;
 
 /**
  * TODO.
@@ -41,6 +44,18 @@ import org.xipki.util.Args;
 public class DataSourceFactory {
 
   private static final Logger LOG = LoggerFactory.getLogger(DataSourceFactory.class);
+
+  public DataSourceWrapper createDataSource(String name, FileOrValue conf,
+      PasswordResolver passwordResolver) throws PasswordResolverException, IOException {
+    Args.notNull(conf, "conf");
+
+    Properties props = new Properties();
+    try (Reader reader = new StringReader(conf.readContent())) {
+      props.load(reader);
+    }
+
+    return createDataSource(name, props, passwordResolver);
+  }
 
   public DataSourceWrapper createDataSourceForFile(String name, String confFile,
       PasswordResolver passwordResolver) throws PasswordResolverException, IOException {

@@ -92,11 +92,11 @@ import org.xipki.ca.api.profile.CertprofileFactoryRegister;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertPublisherFactoryRegister;
-import org.xipki.ca.server.CaServerConf.Datasource;
 import org.xipki.ca.server.SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.ca.server.cmp.CmpResponder;
 import org.xipki.ca.server.store.CertStore;
 import org.xipki.datasource.DataAccessException;
+import org.xipki.datasource.DataSourceConf;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
@@ -244,7 +244,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   private boolean masterMode;
 
-  private Map<String, String> datasourceNameConfFileMap;
+  private Map<String, FileOrValue> datasourceNameConfFileMap;
 
   private final Map<String, CaInfo> caInfos = new ConcurrentHashMap<>();
 
@@ -407,19 +407,17 @@ public class CaManagerImpl implements CaManager, Closeable {
 
     if (this.datasourceNameConfFileMap == null) {
       this.datasourceNameConfFileMap = new ConcurrentHashMap<>();
-      List<Datasource> datasourceList = caServerConf.getDatasources();
-      for (Datasource datasource : datasourceList) {
-        String datasourceName = datasource.getName();
-        String datasourceFile = datasource.getConfFile();
-        this.datasourceNameConfFileMap.put(datasourceName, datasourceFile);
+      List<DataSourceConf> datasourceList = caServerConf.getDatasources();
+      for (DataSourceConf datasource : datasourceList) {
+        this.datasourceNameConfFileMap.put(datasource.getName(), datasource.getConf());
       }
 
-      String caDatasourceFile = datasourceNameConfFileMap.remove("ca");
-      if (caDatasourceFile == null) {
+      FileOrValue caDatasourceConf = datasourceNameConfFileMap.remove("ca");
+      if (caDatasourceConf == null) {
         throw new CaMgmtException("no datasource named 'ca' configured");
       }
 
-      this.datasource = loadDatasource("ca", caDatasourceFile);
+      this.datasource = loadDatasource("ca", caDatasourceConf);
     }
 
     this.queryExecutor = new CaManagerQueryExecutor(this.datasource);
@@ -448,22 +446,22 @@ public class CaManagerImpl implements CaManager, Closeable {
     initCas();
   } // method init
 
-  private DataSourceWrapper loadDatasource(String datasourceName, String datasourceFile)
+  private DataSourceWrapper loadDatasource(String datasourceName, FileOrValue datasourceConf)
       throws CaMgmtException {
     try {
-      DataSourceWrapper datasource = datasourceFactory.createDataSourceForFile(
-          datasourceName, datasourceFile, securityFactory.getPasswordResolver());
+      DataSourceWrapper datasource = datasourceFactory.createDataSource(
+          datasourceName, datasourceConf, securityFactory.getPasswordResolver());
 
       // test the datasource
       Connection conn = datasource.getConnection();
       datasource.returnConnection(conn);
 
-      LOG.info("datasource.{}: {}", datasourceName, datasourceFile);
+      LOG.info("loaded datasource.{}", datasourceName);
       return datasource;
     } catch (DataAccessException | PasswordResolverException | IOException
         | RuntimeException ex) {
       throw new CaMgmtException(concat(ex.getClass().getName(),
-        " while parsing datasource ", datasourceFile, ": ", ex.getMessage()), ex);
+        " while parsing datasource ", datasourceName, ": ", ex.getMessage()), ex);
     }
   }
 

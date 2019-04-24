@@ -43,6 +43,7 @@ import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.ConfPairs;
+import org.xipki.util.FileOrValue;
 import org.xipki.util.LogUtil;
 import org.xipki.util.Args;
 
@@ -69,7 +70,7 @@ public class OcspCertPublisher extends CertPublisher {
 
   @Override
   public void initialize(String conf, PasswordResolver passwordResolver,
-      Map<String, String> datasourceConfFiles) throws CertPublisherException {
+      Map<String, FileOrValue> datasourceConfs) throws CertPublisherException {
     Args.notNull(conf, "conf");
 
     ConfPairs pairs = new ConfPairs(conf);
@@ -82,16 +83,16 @@ public class OcspCertPublisher extends CertPublisher {
     ConfPairs confPairs = new ConfPairs(conf);
     String datasourceName = confPairs.value("datasource");
 
-    String datasourceConfFile = null;
+    FileOrValue datasourceConf = null;
     if (datasourceName != null) {
-      datasourceConfFile = datasourceConfFiles.get(datasourceName);
+      datasourceConf = datasourceConfs.get(datasourceName);
     }
 
-    if (datasourceConfFile == null) {
+    if (datasourceConf == null) {
       throw new CertPublisherException("no datasource named '" + datasourceName + "' is specified");
     }
 
-    datasource = loadDatasource(datasourceName, datasourceConfFile, passwordResolver);
+    datasource = loadDatasource(datasourceName, datasourceConf, passwordResolver);
 
     try {
       queryExecutor = new OcspStoreQueryExecutor(datasource, this.publishsGoodCert);
@@ -100,22 +101,22 @@ public class OcspCertPublisher extends CertPublisher {
     }
   } // method initialize
 
-  private DataSourceWrapper loadDatasource(String datasourceName, String datasourceFile,
+  private DataSourceWrapper loadDatasource(String datasourceName, FileOrValue datasourceConf,
       PasswordResolver passwordResolver) throws CertPublisherException {
     try {
-      DataSourceWrapper datasource = new DataSourceFactory().createDataSourceForFile(
-          datasourceName, datasourceFile, passwordResolver);
+      DataSourceWrapper datasource = new DataSourceFactory().createDataSource(
+          datasourceName, datasourceConf, passwordResolver);
 
       // test the datasource
       Connection conn = datasource.getConnection();
       datasource.returnConnection(conn);
 
-      LOG.info("datasource.{}: {}", datasourceName, datasourceFile);
+      LOG.info("loaded datasource.{}", datasourceName);
       return datasource;
     } catch (DataAccessException | PasswordResolverException | IOException
         | RuntimeException ex) {
       throw new CertPublisherException(
-          ex.getClass().getName() + " while parsing datasource " + datasourceFile + ": "
+          ex.getClass().getName() + " while parsing datasource " + datasourceName + ": "
               + ex.getMessage(),
           ex);
     }

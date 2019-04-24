@@ -4,16 +4,22 @@
 	// different shard ids.
 	"shardId":0,
 	"datasources":[{
-		"confFile":"xipki/etc/ca/database/ca-db.properties",
-		"name":"ca"
+		"name":"ca",
+		"conf":{
+			"file":"xipki/etc/ca/database/ca-db.properties"
+		}
 	},{
-		"confFile":"xipki/etc/ca/database/ocsp-db.properties",
-		"name":"ocsp"
+		"name":"ocsp",
+		"conf":{
+			"file":"xipki/etc/ca/database/ocsp-db.properties"
+		}
 	}],
 	"remoteMgmt":{
 		"enabled":true,
 		"certs":[
-			"xipki/keycerts/tlskeys/client2/tls-client2-cert.der"
+			{
+				"file":"xipki/keycerts/tlskeys/client2/tls-client2-cert.der"
+			}
 		]
 	},
 	"certprofileFactories":[
@@ -22,7 +28,9 @@
 		"keyStrongrandomEnabled":false,
 		"signStrongrandomEnabled":false,
 		"defaultSignerParallelism":32,
-		"pkcs11ConfFile":"xipki/security/pkcs11.json",
+		"pkcs11Conf":{
+			"file":"xipki/security/pkcs11.json"
+		},
 		"password":{
 			"masterPasswordCallback":"FILE file=xipki/security/masterpassword.secret"
 		}
@@ -38,7 +46,9 @@
 		{
 			"name":"localhost",
 			"truststore":{
-				"file":"xipki/keycerts/tlskeys/ca/tls-ca-cert.p12",
+				"keystore":{
+					"file":"xipki/keycerts/tlskeys/ca/tls-ca-cert.p12"
+				},
 				"password":"1234",
 				"type":"PKCS12"
 			}

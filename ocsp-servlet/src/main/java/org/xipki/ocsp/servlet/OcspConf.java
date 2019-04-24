@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.xipki.security.Securities.SecurityConf;
 import org.xipki.util.Args;
+import org.xipki.util.FileOrBinary;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 
@@ -40,7 +41,7 @@ public class OcspConf extends ValidatableConf {
 
     private boolean enabled;
 
-    private List<String> certs;
+    private List<FileOrBinary> certs;
 
     public boolean isEnabled() {
       return enabled;
@@ -50,11 +51,11 @@ public class OcspConf extends ValidatableConf {
       this.enabled = enabled;
     }
 
-    public List<String> getCerts() {
+    public List<FileOrBinary> getCerts() {
       return certs;
     }
 
-    public void setCerts(List<String> certs) {
+    public void setCerts(List<FileOrBinary> certs) {
       this.certs = certs;
     }
 

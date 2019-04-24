@@ -33,6 +33,7 @@ package org.xipki.util.http;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -212,8 +213,14 @@ public class SSLContextBuilder {
       final File file,
       final char[] storePassword) throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
     Args.notNull(file, "Truststore file");
+    return loadTrustMaterial(new FileInputStream(file), storePassword);
+  }
+
+  public SSLContextBuilder loadTrustMaterial(
+      final InputStream instream,
+      final char[] storePassword) throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
+    Args.notNull(instream, "Truststore instream");
     final KeyStore trustStore = KeyStore.getInstance(keyStoreType);
-    final FileInputStream instream = new FileInputStream(file);
     try {
       trustStore.load(instream, storePassword);
     } finally {
@@ -244,8 +251,15 @@ public class SSLContextBuilder {
       final char[] storePassword,
       final char[] keyPassword) throws NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException, CertificateException, IOException {
     Args.notNull(file, "Keystore file");
+    return loadKeyMaterial(new FileInputStream(file), storePassword, keyPassword);
+  }
+
+  public SSLContextBuilder loadKeyMaterial(
+      final InputStream instream,
+      final char[] storePassword,
+      final char[] keyPassword) throws NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException, CertificateException, IOException {
+    Args.notNull(instream, "Keystore instream");
     final KeyStore identityStore = KeyStore.getInstance(keyStoreType);
-    final FileInputStream instream = new FileInputStream(file);
     try {
       identityStore.load(instream, storePassword);
     } finally {

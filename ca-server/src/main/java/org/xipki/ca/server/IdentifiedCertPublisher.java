@@ -31,6 +31,7 @@ import org.xipki.password.PasswordResolver;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
+import org.xipki.util.FileOrValue;
 
 /**
  * TODO.
@@ -49,9 +50,10 @@ class IdentifiedCertPublisher implements Closeable {
     this.certPublisher = Args.notNull(certPublisher, "certPublisher");
   }
 
-  public void initialize(PasswordResolver passwordResolver, Map<String, String> datasourceConfFiles)
+  public void initialize(PasswordResolver passwordResolver,
+      Map<String, FileOrValue> datasourceConfs)
       throws CertPublisherException {
-    certPublisher.initialize(entry.getConf(), passwordResolver, datasourceConfFiles);
+    certPublisher.initialize(entry.getConf(), passwordResolver, datasourceConfs);
   }
 
   public boolean caAdded(X509Cert caCert) {

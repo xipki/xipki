@@ -562,11 +562,11 @@ public class CmpClientConf extends ValidatableConf {
 
     private String storeType;
 
-    private String keystoreFile;
+    private FileOrBinary keystore;
 
     private String keystorePassword;
 
-    private String truststoreFile;
+    private FileOrBinary truststore;
 
     private String truststorePassword;
 
@@ -592,12 +592,12 @@ public class CmpClientConf extends ValidatableConf {
       this.storeType = storeType;
     }
 
-    public String getKeystoreFile() {
-      return keystoreFile;
+    public FileOrBinary getKeystore() {
+      return keystore;
     }
 
-    public void setKeystoreFile(String keystoreFile) {
-      this.keystoreFile = keystoreFile;
+    public void setKeystore(FileOrBinary keystore) {
+      this.keystore = keystore;
     }
 
     public String getKeystorePassword() {
@@ -608,12 +608,12 @@ public class CmpClientConf extends ValidatableConf {
       this.keystorePassword = keystorePassword;
     }
 
-    public String getTruststoreFile() {
-      return truststoreFile;
+    public FileOrBinary getTruststore() {
+      return truststore;
     }
 
-    public void setTruststoreFile(String truststoreFile) {
-      this.truststoreFile = truststoreFile;
+    public void setTruststore(FileOrBinary truststore) {
+      this.truststore = truststore;
     }
 
     public String getTruststorePassword() {

@@ -55,6 +55,7 @@ import org.bouncycastle.operator.ContentVerifierProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException;
+import org.xipki.datasource.DataSourceConf;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.ocsp.api.CertStatusInfo;
@@ -402,7 +403,7 @@ public class OcspServerImpl implements OcspServer {
     // Duplication name check: datasource
     set.clear();
     if (conf.getDatasources() != null) {
-      for (OcspServerConf.Datasource m : conf.getDatasources()) {
+      for (DataSourceConf m : conf.getDatasources()) {
         String name = m.getName();
         if (set.contains(name)) {
           throw new InvalidConfException(
@@ -421,7 +422,7 @@ public class OcspServerImpl implements OcspServer {
     // Response Cache
     OcspServerConf.ResponseCache cacheType = conf.getResponseCache();
     if (cacheType != null) {
-      OcspServerConf.Datasource cacheSourceConf = cacheType.getDatasource();
+      DataSourceConf cacheSourceConf = cacheType.getDatasource();
       DataSourceWrapper datasource;
       InputStream dsStream = null;
       try {
@@ -458,7 +459,7 @@ public class OcspServerImpl implements OcspServer {
     // datasources
     Map<String, DataSourceWrapper> datasources = new HashMap<>();
     if (conf.getDatasources() != null) {
-      for (OcspServerConf.Datasource m : conf.getDatasources()) {
+      for (DataSourceConf m : conf.getDatasources()) {
         String name = m.getName();
         DataSourceWrapper datasource;
         InputStream dsStream = null;

@@ -73,10 +73,14 @@
 	"ssls":[{
 		"name":"ssl1",
 		"hostnameVerifier":"default",
-		"keystoreFile":"xipki/keycerts/tlskeys/client/tls-client.p12",
-		"keystorePassword":"1234",
 		"storeType":"PKCS12",
-		"truststoreFile":"xipki/keycerts/tlskeys/ca/tls-ca-cert.p12",
+		"keystore":{
+			"file":"xipki/keycerts/tlskeys/client/tls-client.p12"
+		},
+		"keystorePassword":"1234",
+		"truststore":{
+			"file":"xipki/keycerts/tlskeys/ca/tls-ca-cert.p12"
+		},
 		"truststorePassword":"1234"
 	}]
 }

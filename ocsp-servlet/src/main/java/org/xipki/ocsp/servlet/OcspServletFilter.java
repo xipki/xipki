@@ -17,7 +17,6 @@
 
 package org.xipki.ocsp.servlet;
 
-import java.io.File;
 import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -42,6 +41,7 @@ import org.xipki.password.PasswordResolverException;
 import org.xipki.security.Securities;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
+import org.xipki.util.FileOrBinary;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.LogUtil;
@@ -113,12 +113,16 @@ public class OcspServletFilter implements Filter {
       if (CollectionUtil.isNonEmpty(remoteMgmt.getCerts())) {
         Set<X509Certificate> certs = new HashSet<>();
 
-        for (String fileName : remoteMgmt.getCerts()) {
+        for (FileOrBinary m : remoteMgmt.getCerts()) {
           try {
-            X509Certificate cert = X509Util.parseCert(new File(fileName));
+            X509Certificate cert = X509Util.parseCert(m.readContent());
             certs.add(cert);
           } catch (CertificateException | IOException ex) {
-            LogUtil.error(LOG, ex, "could not parse the client certificate " + fileName);
+            String msg = "could not parse the client certificate";
+            if (m.getFile() != null) {
+              msg += " " + m.getFile();
+            }
+            LogUtil.error(LOG, ex, msg);
           }
         }
 

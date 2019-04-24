@@ -17,7 +17,6 @@
 
 package org.xipki.ca.servlet;
 
-import java.io.File;
 import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -49,6 +48,7 @@ import org.xipki.ca.server.publisher.OcspCertPublisherFactory;
 import org.xipki.security.Securities;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
+import org.xipki.util.FileOrBinary;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
@@ -145,17 +145,21 @@ public class CaServletFilter implements Filter {
     LOG.info("remote management is {}", remoteMgmtEnabled ? "enabled" : "disabled");
 
     if (this.remoteMgmtEnabled) {
-      List<String> certFiles = remoteMgmt.getCerts();
+      List<FileOrBinary> certFiles = remoteMgmt.getCerts();
       if (CollectionUtil.isEmpty(certFiles)) {
         LOG.error("no client certificate is configured, disable the remote managent");
       } else {
         Set<X509Certificate> certs = new HashSet<>();
-        for (String fileName : certFiles) {
+        for (FileOrBinary m : certFiles) {
           try {
-            X509Certificate cert = X509Util.parseCert(new File(fileName));
+            X509Certificate cert = X509Util.parseCert(m.readContent());
             certs.add(cert);
           } catch (CertificateException | IOException ex) {
-            LogUtil.error(LOG, ex, "could not parse the client certificate " + fileName);
+            String msg = "could not parse the client certificate";
+            if (m.getFile() != null) {
+              msg += " " + m.getFile();
+            }
+            LogUtil.error(LOG, ex, msg);
           }
 
         }

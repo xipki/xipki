@@ -26,6 +26,7 @@ import org.xipki.ca.api.CertificateInfo;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
+import org.xipki.util.FileOrValue;
 
 /**
  * TODO.
@@ -45,13 +46,13 @@ public abstract class CertPublisher implements Closeable {
    *          Configuration. Could be {@code null}.
    * @param passwordResolver
    *          Password resolver. Could be {@code null}.
-   * @param datasourceConfFiles
-   *          Datasource name to configuration file map. Must not be {@code null}.
+   * @param datasourceConfs
+   *          Datasource name to configuration map. Must not be {@code null}.
    * @throws CertPublisherException
    *         If error during the initialization occurs.
    */
   public abstract void initialize(String conf, PasswordResolver passwordResolver,
-      Map<String, String> datasourceConfFiles) throws CertPublisherException;
+      Map<String, FileOrValue> datasourceConfs) throws CertPublisherException;
 
   @Override
   public void close() {

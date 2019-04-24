@@ -17,6 +17,7 @@
 
 package org.xipki.cmpclient.internal;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -284,16 +285,18 @@ public final class CmpClientImpl implements CmpClient {
         }
 
         try {
-          if (ssl.getKeystoreFile() != null) {
+          if (ssl.getKeystore() != null) {
             char[] pwd = ssl.getKeystorePassword() == null
                 ? null : ssl.getKeystorePassword().toCharArray();
-            builder.loadKeyMaterial(new File(ssl.getKeystoreFile()), pwd, pwd);
+            builder.loadKeyMaterial(
+                new ByteArrayInputStream(ssl.getKeystore().readContent()), pwd, pwd);
           }
 
-          if (ssl.getTruststoreFile() != null) {
+          if (ssl.getTruststore() != null) {
             char[] pwd = ssl.getTruststorePassword() == null
                 ? null : ssl.getTruststorePassword().toCharArray();
-            builder.loadTrustMaterial(new File(ssl.getTruststoreFile()), pwd);
+            builder.loadTrustMaterial(
+                new ByteArrayInputStream(ssl.getTruststore().readContent()), pwd);
           }
 
           SSLSocketFactory socketFactory = builder.build().getSocketFactory();

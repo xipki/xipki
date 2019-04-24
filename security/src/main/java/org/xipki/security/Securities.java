@@ -32,14 +32,18 @@ import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.security.pkcs11.P11CryptServiceFactoryImpl;
 import org.xipki.security.pkcs11.P11ModuleFactoryRegisterImpl;
 import org.xipki.security.pkcs11.P11SignerFactory;
+import org.xipki.security.pkcs11.Pkcs11conf;
 import org.xipki.security.pkcs11.emulator.EmulatorP11ModuleFactory;
 import org.xipki.security.pkcs11.iaik.IaikP11ModuleFactory;
 import org.xipki.security.pkcs11.proxy.ProxyP11ModuleFactory;
 import org.xipki.security.pkcs12.P12SignerFactory;
 import org.xipki.util.CollectionUtil;
+import org.xipki.util.FileOrBinary;
+import org.xipki.util.FileOrValue;
 import org.xipki.util.InvalidConfException;
-import org.xipki.util.StringUtil;
 import org.xipki.util.ValidatableConf;
+
+import com.alibaba.fastjson.JSON;
 
 /**
  * TODO.
@@ -47,6 +51,46 @@ import org.xipki.util.ValidatableConf;
  */
 
 public class Securities implements Closeable {
+
+  public static class KeystoreConf extends ValidatableConf {
+
+    private String type;
+
+    private FileOrBinary keystore;
+
+    private String password;
+
+    public String getType() {
+      return type;
+    }
+
+    public void setType(String value) {
+      this.type = value;
+    }
+
+    public FileOrBinary getKeystore() {
+      return keystore;
+    }
+
+    public void setKeystore(FileOrBinary value) {
+      this.keystore = value;
+    }
+
+    public String getPassword() {
+      return password;
+    }
+
+    public void setPassword(String value) {
+      this.password = value;
+    }
+
+    @Override
+    public void validate() throws InvalidConfException {
+      notEmpty(type, "type");
+      validate(keystore);
+    }
+
+  }
 
   public static class SecurityConf extends ValidatableConf {
 
@@ -56,7 +100,7 @@ public class Securities implements Closeable {
 
     private int defaultSignerParallelism = 32;
 
-    private String pkcs11ConfFile;
+    private FileOrValue pkcs11Conf;
 
     private PasswordConf password;
 
@@ -95,12 +139,12 @@ public class Securities implements Closeable {
       this.defaultSignerParallelism = defaultSignerParallelism;
     }
 
-    public String getPkcs11ConfFile() {
-      return pkcs11ConfFile;
+    public FileOrValue getPkcs11Conf() {
+      return pkcs11Conf;
     }
 
-    public void setPkcs11ConfFile(String pkcs11ConfFile) {
-      this.pkcs11ConfFile = pkcs11ConfFile;
+    public void setPkcs11Conf(FileOrValue pkcs11Conf) {
+      this.pkcs11Conf = pkcs11Conf;
     }
 
     public PasswordConf getPassword() {
@@ -200,8 +244,8 @@ public class Securities implements Closeable {
     initSecurityPkcs12(signerFactoryRegister);
 
     // PKCS#11
-    if (StringUtil.isNotBlank(conf.getPkcs11ConfFile())) {
-      initSecurityPkcs11(conf.getPkcs11ConfFile(), signerFactoryRegister,
+    if (conf.getPkcs11Conf() != null) {
+      initSecurityPkcs11(conf.getPkcs11Conf(), signerFactoryRegister,
           passwords.getPasswordResolver());
     }
 
@@ -229,7 +273,7 @@ public class Securities implements Closeable {
     signerFactoryRegister.registFactory(p12SignerFactory);
   }
 
-  private void initSecurityPkcs11(String pkcs11ConfFile,
+  private void initSecurityPkcs11(FileOrValue pkcs11Conf,
       SignerFactoryRegisterImpl signerFactoryRegister, PasswordResolver passwordResolver)
           throws InvalidConfException {
     p11ModuleFactoryRegister = new P11ModuleFactoryRegisterImpl();
@@ -240,7 +284,14 @@ public class Securities implements Closeable {
     p11CryptServiceFactory = new P11CryptServiceFactoryImpl();
     p11CryptServiceFactory.setP11ModuleFactoryRegister(p11ModuleFactoryRegister);
     p11CryptServiceFactory.setPasswordResolver(passwordResolver);
-    p11CryptServiceFactory.setPkcs11ConfFile(pkcs11ConfFile);
+
+    Pkcs11conf pkcs11ConfObj;
+    try {
+      pkcs11ConfObj = JSON.parseObject(pkcs11Conf.readContent(), Pkcs11conf.class);
+    } catch (IOException ex) {
+      throw new InvalidConfException("could not create P11Conf: " + ex.getMessage(), ex);
+    }
+    p11CryptServiceFactory.setPkcs11Conf(pkcs11ConfObj);
 
     p11CryptServiceFactory.init();
 

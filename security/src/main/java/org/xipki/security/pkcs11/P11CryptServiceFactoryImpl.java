@@ -58,21 +58,30 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
 
   private String pkcs11ConfFile;
 
+  private Pkcs11conf pkcs11Conf;
+
   private P11ModuleFactoryRegister p11ModuleFactoryRegister;
 
   public synchronized void init() throws InvalidConfException {
     if (moduleConfs != null) {
       return;
     }
-    if (StringUtil.isBlank(pkcs11ConfFile)) {
-      LOG.error("no pkcs11ConfFile is configured, could not initialize");
+
+    if (pkcs11Conf == null && StringUtil.isBlank(pkcs11ConfFile)) {
+      LOG.error("neither pkcs11Conf nor pkcs11ConfFile is configured, could not initialize");
       return;
     }
 
-    try (InputStream confStream = Files.newInputStream(Paths.get(pkcs11ConfFile))) {
-      Pkcs11conf pkcs11Conf = JSON.parseObject(confStream, Pkcs11conf.class);
-      pkcs11Conf.validate();
+    if (pkcs11Conf == null) {
+      try (InputStream confStream = Files.newInputStream(Paths.get(pkcs11ConfFile))) {
+        pkcs11Conf = JSON.parseObject(confStream, Pkcs11conf.class);
+        pkcs11Conf.validate();
+      } catch (IOException ex) {
+        throw new InvalidConfException("could not create P11Conf: " + ex.getMessage(), ex);
+      }
+    }
 
+    try {
       List<Pkcs11conf.Module> moduleTypes = pkcs11Conf.getModules();
       List<Pkcs11conf.MechanismSet> mechanismSets = pkcs11Conf.getMechanismSets();
 
@@ -88,7 +97,7 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
       }
       this.moduleConfs = Collections.unmodifiableMap(confs);
       this.moduleNames = Collections.unmodifiableSet(new HashSet<>(confs.keySet()));
-    } catch (IOException | RuntimeException ex) {
+    } catch (RuntimeException ex) {
       throw new InvalidConfException("could not create P11Conf: " + ex.getMessage(), ex);
     }
   }
@@ -137,6 +146,15 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
     } else {
       this.pkcs11ConfFile = IoUtil.expandFilepath(confFile);
     }
+    this.pkcs11Conf = null;
+  }
+
+  public void setPkcs11Conf(Pkcs11conf conf) throws InvalidConfException {
+    if (conf != null) {
+      conf.validate();
+    }
+    this.pkcs11Conf = conf;
+    this.pkcs11ConfFile = null;
   }
 
   public void setPasswordResolver(PasswordResolver passwordResolver) {

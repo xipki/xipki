@@ -51,7 +51,7 @@
 		"signRequest":true,
 		"pbmMac":{
 			"iterationCount":10240,
-            // SHA1("requestor-mac1")
+			// SHA1("requestor-mac1")
 			"kid":"Rmgnx3V6cK9xygM4wBNhqrIBnc8=",
 			"mac":"HMAC-SHA256",
 			"owf":"SHA256",
@@ -76,10 +76,14 @@
 	"ssls":[{
 		"name":"ssl1",
 		"hostnameVerifier":"default",
-		"keystoreFile":"xipki/keycerts/tlskeys/client/tls-client.p12",
-		"keystorePassword":"1234",
 		"storeType":"PKCS12",
-		"truststoreFile":"xipki/keycerts/tlskeys/ca/tls-ca-cert.p12",
+		"keystore":{
+			"file":"xipki/keycerts/tlskeys/client/tls-client.p12"
+		},
+		"keystorePassword":"1234",
+		"truststore":{
+			"file":"xipki/keycerts/tlskeys/ca/tls-ca-cert.p12"
+		},
 		"truststorePassword":"1234"
 	}]
 }

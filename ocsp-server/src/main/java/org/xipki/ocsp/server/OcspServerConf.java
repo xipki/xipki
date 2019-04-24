@@ -25,12 +25,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.xipki.datasource.DataSourceConf;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownIssuerBehaviour;
 import org.xipki.security.CertpathValidationModel;
+import org.xipki.security.Securities.KeystoreConf;
 import org.xipki.util.Args;
 import org.xipki.util.FileOrBinary;
-import org.xipki.util.FileOrValue;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.TripleState;
 import org.xipki.util.ValidatableConf;
@@ -53,7 +54,7 @@ public class OcspServerConf extends ValidatableConf {
 
     private String dir;
 
-    private Keystore keystore;
+    private KeystoreConf keystore;
 
     public String getDir() {
       return dir;
@@ -63,11 +64,11 @@ public class OcspServerConf extends ValidatableConf {
       this.dir = value;
     }
 
-    public Keystore getKeystore() {
+    public KeystoreConf getKeystore() {
       return keystore;
     }
 
-    public void setKeystore(Keystore value) {
+    public void setKeystore(KeystoreConf value) {
       this.keystore = value;
     }
 
@@ -75,77 +76,6 @@ public class OcspServerConf extends ValidatableConf {
     public void validate() throws InvalidConfException {
       exactOne(keystore, "keystore", dir, "dir");
       validate(keystore);
-    }
-
-  }
-
-  public static class Keystore extends ValidatableConf {
-
-    private String type;
-
-    private FileOrBinary keystore;
-
-    private String password;
-
-    public String getType() {
-      return type;
-    }
-
-    public void setType(String value) {
-      this.type = value;
-    }
-
-    public FileOrBinary getKeystore() {
-      return keystore;
-    }
-
-    public void setKeystore(FileOrBinary value) {
-      this.keystore = value;
-    }
-
-    public String getPassword() {
-      return password;
-    }
-
-    public void setPassword(String value) {
-      this.password = value;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      notEmpty(type, "type");
-      validate(keystore);
-    }
-
-  }
-
-  public static class Datasource extends ValidatableConf {
-
-    private FileOrValue conf;
-
-    private String name;
-
-    public FileOrValue getConf() {
-      return conf;
-    }
-
-    public void setConf(FileOrValue value) {
-      this.conf = value;
-    }
-
-    public String getName() {
-      return name;
-    }
-
-    public void setName(String value) {
-      this.name = value;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      notEmpty(name, "name");
-      notNull(conf, "conf");
-      validate(conf);
     }
 
   }
@@ -475,15 +405,15 @@ public class OcspServerConf extends ValidatableConf {
 
   public static class ResponseCache extends ValidatableConf {
 
-    private Datasource datasource;
+    private DataSourceConf datasource;
 
     private int validity = 86400;
 
-    public Datasource getDatasource() {
+    public DataSourceConf getDatasource() {
       return datasource;
     }
 
-    public void setDatasource(Datasource datasource) {
+    public void setDatasource(DataSourceConf datasource) {
       this.datasource = datasource;
     }
 
@@ -842,7 +772,7 @@ public class OcspServerConf extends ValidatableConf {
 
   private List<Store> stores;
 
-  private List<Datasource> datasources;
+  private List<DataSourceConf> datasources;
 
   private List<RequestOption> requestOptions;
 
@@ -905,14 +835,14 @@ public class OcspServerConf extends ValidatableConf {
     this.stores = stores;
   }
 
-  public List<Datasource> getDatasources() {
+  public List<DataSourceConf> getDatasources() {
     if (datasources == null) {
       datasources = new LinkedList<>();
     }
     return datasources;
   }
 
-  public void setDatasources(List<Datasource> datasources) {
+  public void setDatasources(List<DataSourceConf> datasources) {
     this.datasources = datasources;
   }
 

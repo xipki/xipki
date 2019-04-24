@@ -35,6 +35,7 @@ import java.util.Set;
 
 import org.xipki.security.CertpathValidationModel;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.Securities.KeystoreConf;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
@@ -235,7 +236,7 @@ public class RequestOption {
     Set<X509Certificate> tmpCerts = new HashSet<>();
 
     if (conf.getKeystore() != null) {
-      OcspServerConf.Keystore ksConf = conf.getKeystore();
+      KeystoreConf ksConf = conf.getKeystore();
       KeyStore trustStore = KeyUtil.getKeyStore(ksConf.getType());
 
       String fileName = ksConf.getKeystore().getFile();

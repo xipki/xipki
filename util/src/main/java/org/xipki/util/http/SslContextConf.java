@@ -17,7 +17,7 @@
 
 package org.xipki.util.http;
 
-import java.io.File;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -29,6 +29,7 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 
+import org.xipki.util.FileOrBinary;
 import org.xipki.util.ObjectCreationException;
 
 /**
@@ -42,11 +43,11 @@ public class SslContextConf {
 
   private String sslStoreType;
 
-  private String sslKeystore;
+  private FileOrBinary sslKeystore;
 
   private String sslKeystorePassword;
 
-  private String sslTruststore;
+  private FileOrBinary sslTruststore;
 
   private String sslTruststorePassword;
 
@@ -72,12 +73,21 @@ public class SslContextConf {
     this.sslStoreType = emptyAsNull(sslStoreType);
   }
 
-  public String getSslKeystore() {
+  public FileOrBinary getSslKeystore() {
     return sslKeystore;
   }
 
   public void setSslKeystore(String sslKeystore) {
-    this.sslKeystore = emptyAsNull(sslKeystore);
+    String storeFile = emptyAsNull(sslKeystore);
+    if (storeFile == null) {
+      this.sslKeystore = null;
+    } else {
+      setSslKeystore(FileOrBinary.ofFile(storeFile));
+    }
+  }
+
+  public void setSslKeystore(FileOrBinary sslKeystore) {
+    this.sslKeystore = sslKeystore;
   }
 
   public String getSslKeystorePassword() {
@@ -88,12 +98,21 @@ public class SslContextConf {
     this.sslKeystorePassword = emptyAsNull(sslKeystorePassword);
   }
 
-  public String getSslTruststore() {
+  public FileOrBinary getSslTruststore() {
     return sslTruststore;
   }
 
   public void setSslTruststore(String sslTruststore) {
-    this.sslTruststore = emptyAsNull(sslTruststore);
+    String storeFile = emptyAsNull(sslTruststore);
+    if (storeFile == null) {
+      this.sslTruststore = null;
+    } else {
+      setSslTruststore(FileOrBinary.ofFile(storeFile));
+    }
+  }
+
+  public void setSslTruststore(FileOrBinary sslTruststore) {
+    this.sslTruststore = sslTruststore;
   }
 
   public String getSslTruststorePassword() {
@@ -126,13 +145,15 @@ public class SslContextConf {
       try {
         if (sslKeystore != null) {
           char[] password = sslKeystorePassword == null ? null : sslKeystorePassword.toCharArray();
-          builder.loadKeyMaterial(new File(sslKeystore), password, password);
+          builder.loadKeyMaterial(
+              new ByteArrayInputStream(sslKeystore.readContent()), password, password);
         }
 
         if (sslTruststorePassword != null) {
           char[] password = sslTruststorePassword == null
               ? null : sslTruststorePassword.toCharArray();
-          builder.loadTrustMaterial(new File(sslTruststore), password);
+          builder.loadTrustMaterial(
+              new ByteArrayInputStream(sslTruststore.readContent()), password);
         }
 
         sslContext = builder.build();

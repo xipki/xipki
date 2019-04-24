@@ -9,8 +9,7 @@
 	}],
 	"requestOptions":[{
 		"name":"request1",
-		"hashAlgorithms":["SHA1","SHA256","SHA384","SHA512"
-		],
+		"hashAlgorithms":["SHA1","SHA256","SHA384","SHA512"],
 		"maxRequestListCount":10,
 		"maxRequestSize":4096,
 		"nonce":{

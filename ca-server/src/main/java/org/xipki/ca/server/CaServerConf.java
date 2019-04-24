@@ -26,8 +26,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.xipki.audit.Audits.AuditConf;
+import org.xipki.datasource.DataSourceConf;
+import org.xipki.security.Securities.KeystoreConf;
 import org.xipki.security.Securities.SecurityConf;
 import org.xipki.util.Args;
+import org.xipki.util.FileOrBinary;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 import org.xipki.util.http.SslContextConf;
@@ -45,7 +48,7 @@ public class CaServerConf extends ValidatableConf {
 
     private String name;
 
-    private Keystore truststore;
+    private KeystoreConf truststore;
 
     private String hostverifier;
 
@@ -57,11 +60,11 @@ public class CaServerConf extends ValidatableConf {
       this.name = name;
     }
 
-    public Keystore getTruststore() {
+    public KeystoreConf getTruststore() {
       return truststore;
     }
 
-    public void setTruststore(Keystore truststore) {
+    public void setTruststore(KeystoreConf truststore) {
       this.truststore = truststore;
     }
 
@@ -80,81 +83,11 @@ public class CaServerConf extends ValidatableConf {
 
   }
 
-  public static class Keystore extends ValidatableConf {
-
-    private String type;
-
-    private String file;
-
-    private String password;
-
-    public String getType() {
-      return type;
-    }
-
-    public void setType(String value) {
-      this.type = value;
-    }
-
-    public String getFile() {
-      return file;
-    }
-
-    public void setFile(String file) {
-      this.file = file;
-    }
-
-    public String getPassword() {
-      return password;
-    }
-
-    public void setPassword(String value) {
-      this.password = value;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      notEmpty(type, "type");
-      notEmpty(file, "file");
-    }
-
-  }
-
-  public static class Datasource extends ValidatableConf {
-
-    private String confFile;
-
-    private String name;
-
-    public String getConfFile() {
-      return confFile;
-    }
-
-    public void setConfFile(String confFile) {
-      this.confFile = confFile;
-    }
-
-    public String getName() {
-      return name;
-    }
-
-    public void setName(String value) {
-      this.name = value;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      notEmpty(name, "name");
-      notEmpty(confFile, "confFile");
-    }
-
-  }
-
   public static class RemoteMgmt extends ValidatableConf {
 
     private boolean enabled;
 
-    private List<String> certs;
+    private List<FileOrBinary> certs;
 
     public boolean isEnabled() {
       return enabled;
@@ -164,11 +97,11 @@ public class CaServerConf extends ValidatableConf {
       this.enabled = enabled;
     }
 
-    public List<String> getCerts() {
+    public List<FileOrBinary> getCerts() {
       return certs;
     }
 
-    public void setCerts(List<String> certs) {
+    public void setCerts(List<FileOrBinary> certs) {
       this.certs = certs;
     }
 
@@ -195,7 +128,7 @@ public class CaServerConf extends ValidatableConf {
    */
   private int shardId = 0;
 
-  private List<Datasource> datasources;
+  private List<DataSourceConf> datasources;
 
   private List<SslContext> sslContexts;
 
@@ -235,11 +168,11 @@ public class CaServerConf extends ValidatableConf {
     this.shardId = shardId;
   }
 
-  public List<Datasource> getDatasources() {
+  public List<DataSourceConf> getDatasources() {
     return datasources;
   }
 
-  public void setDatasources(List<Datasource> datasources) {
+  public void setDatasources(List<DataSourceConf> datasources) {
     this.datasources = datasources;
   }
 
@@ -307,8 +240,8 @@ public class CaServerConf extends ValidatableConf {
         SslContextConf conf = new SslContextConf();
         conf.setSslHostnameVerifier(m.getHostverifier());
 
-        Keystore truststore = m.getTruststore();
-        conf.setSslTruststore(truststore.getFile());
+        KeystoreConf truststore = m.getTruststore();
+        conf.setSslTruststore(truststore.getKeystore());
         conf.setSslTruststorePassword(truststore.getPassword());
         conf.setSslStoreType(truststore.getType());
 
