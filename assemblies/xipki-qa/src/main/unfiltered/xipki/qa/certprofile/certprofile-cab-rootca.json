@@ -146,7 +146,7 @@
 				"required":true,
 				"value":"keyCertSign"
 			},{
-				"required":false,
+				"required":true,
 				"value":"cRLSign"
 			}]
 		}

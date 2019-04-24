@@ -280,8 +280,8 @@ public class ProfileConfCreatorDemo {
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
-    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign},
-        new KeyUsage[]{KeyUsage.cRLSign}));
+    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign},
+        null));
 
     marshall(profile, destFilename, true);
   } // method certprofileCabRootCa
@@ -321,8 +321,8 @@ public class ProfileConfCreatorDemo {
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
-    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign},
-        new KeyUsage[]{KeyUsage.cRLSign}));
+    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign},
+        null));
 
     // Extensions - CertificatePolicies
     list.add(createExtension(Extension.certificatePolicies, true, false));
@@ -484,8 +484,8 @@ public class ProfileConfCreatorDemo {
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
-    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign},
-        new KeyUsage[]{KeyUsage.cRLSign}));
+    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign},
+        null));
 
     marshall(profile, destFilename, true);
   } // method certprofileRootCa
@@ -560,8 +560,8 @@ public class ProfileConfCreatorDemo {
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
-    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign},
-        new KeyUsage[]{KeyUsage.cRLSign}));
+    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign},
+        null));
 
     marshall(profile, destFilename, true);
   } // method certprofileSubCa
@@ -600,8 +600,8 @@ public class ProfileConfCreatorDemo {
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
-    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign},
-        new KeyUsage[]{KeyUsage.cRLSign}));
+    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign},
+        null));
 
     // Certificate Policies
     list.add(createExtension(Extension.certificatePolicies, true, false));
