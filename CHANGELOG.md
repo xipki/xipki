@@ -15,13 +15,14 @@ See also <https://github.com/xipki/xipki/releases>
     - Add support of specification of extension admission in subject
     - Add CA/Browser certificate profiles.
     - Add support of Certificate Transparency (RFC 6962)
+    - Increase the max. size of a certificate from 3000 to 4500 bytes.
   - OCSP
     - Add the configuration of OCSP response behaviour for unknown certificate
     - The OCSP cacher exhausts the database connections. This has been fixed.
   - CLI
     - Extend the command csr-p11 and csr-p12 to generate CSR with complex subject and extensions
     - Simplify and extend the configuration of custom extension
-  - 
+ 
 ## 5.1.0
   - Release date: Mar 17, 2019
   - Relax the limitation of OCSP response in HTTP GET
