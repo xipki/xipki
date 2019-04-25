@@ -1,11 +1,11 @@
 Deployment in Tomcat
 ----
-1. Copy the sub-folders `webapps` and `xipki` to the tomcat root folder
-2. Add the line `org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true`
+- Copy the sub-folders `webapps` and `xipki` to the tomcat root folder
+- Add the line `org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true`
    to the file `conf/catalina.properties` if OCSP over HTTP supported is activated.
-3. (optiona) add `maxKeepAliveRequests="-1"` to the Connector listening on port 8080 in the file `conf/server`.
+- (optiona) add `maxKeepAliveRequests="-1"` to the Connector listening on port 8080 in the file `conf/server`.
    This step is only required for the benchmark test.
-4. Configure the TLS listener in the file `conf/server.xml`
+- Configure the TLS listener in the file `conf/server.xml`
     - Use NIO connector
 
 ```sh
@@ -45,10 +45,37 @@ Deployment in Tomcat
     </Connector>
 ```
 
+- (optional) To accelerate the start process, append the following block to the property
+`tomcat.util.scan.StandardJarScanFilter.jarsToSkip` in the file `conf/catalina.properties`.
+
+```
+audit-*.jar,\
+bcprov-jdk15on-*.jar,\
+bcpkix-jdk15on-*.jar,\
+ca-*.jar,\
+certprofile-xijson-*.jar,\
+datasource-*.jar,\
+fastjson-*.jar,\
+HikariCP-*.jar,\
+logback-core-*.jar,\
+logback-classic-*.jar,\
+mariadb-java-client-*.jar,\
+ocsp-api-*.jar,\
+ocsp-server-*.jar,\
+password-*.jar,\
+pkcs11-constants-*.jar,\
+postgresql-*.jar,\
+scep-common-*.jar,\
+security-*.jar,\
+sunpkcs11-wrapper-*.jar,\
+syslog-java-client-*.jar,\
+util-*.jar
+```
+
 Deployment in Jetty 9
 ----
-1. Copy the sub-folders `webapps` and `xipki` to the jetty root folder, and the files in sub-folder `lib` to the sub-folder `lib/ext` of jetty.
-2. Configure the TLS listener by adding the following block to the file `start.ini`
+- Copy the sub-folders `webapps` and `xipki` to the jetty root folder, and the files in sub-folder `lib` to the sub-folder `lib/ext` of jetty.
+- Configure the TLS listener by adding the following block to the file `start.ini`
 
 ```sh
 --module=https
