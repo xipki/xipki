@@ -149,7 +149,7 @@ public class SslContextConf {
               new ByteArrayInputStream(sslKeystore.readContent()), password, password);
         }
 
-        if (sslTruststorePassword != null) {
+        if (sslTruststore != null) {
           char[] password = sslTruststorePassword == null
               ? null : sslTruststorePassword.toCharArray();
           builder.loadTrustMaterial(

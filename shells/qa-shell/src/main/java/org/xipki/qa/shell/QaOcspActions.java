@@ -569,7 +569,7 @@ public class QaOcspActions {
         String description = StringUtil.concatObjects("issuer cert: ", issuerCertFile,
             "\nserver URL: ",serverUrl, "\nmaxRequest: ", maxRequests, "\nhash: ", hashAlgo);
 
-        Certificate issuerCert = Certificate.getInstance(IoUtil.read(issuerCertFile));
+        Certificate issuerCert = X509Util.parseBcCert(new File(issuerCertFile));
 
         RequestOptions options = getRequestOptions();
         OcspBenchmark loadTest = new OcspBenchmark(issuerCert, serverUrl, options,
