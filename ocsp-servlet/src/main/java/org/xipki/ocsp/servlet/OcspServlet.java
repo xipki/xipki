@@ -168,6 +168,7 @@ public class OcspServlet extends HttpServlet {
 
       OcspRespWithCacheInfo ocspRespWithCacheInfo = server.answer(responder, ocsReqBytes, true);
       if (ocspRespWithCacheInfo == null || ocspRespWithCacheInfo.getResponse() == null) {
+        LOG.error("processRequest returned null, this should not happen");
         sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         return;
       }

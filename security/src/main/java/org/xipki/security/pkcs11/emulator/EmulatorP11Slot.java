@@ -378,6 +378,9 @@ class EmulatorP11Slot extends P11Slot {
         try {
           Properties props = loadProperties(privKeyInfoFile);
           String label = props.getProperty(PROP_LABEL);
+          if (label == null) {
+            continue;
+          }
 
           P11ObjectIdentifier p11ObjId = new P11ObjectIdentifier(id, label);
           X509Cert cert = ret.getCertForId(id);
