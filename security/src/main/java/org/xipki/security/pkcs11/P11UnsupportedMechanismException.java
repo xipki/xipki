@@ -31,12 +31,12 @@ public class P11UnsupportedMechanismException extends P11TokenException {
 
   public P11UnsupportedMechanismException(long mechanism, P11SlotIdentifier slotId) {
     super("mechanism " + Functions.getMechanismDescription(mechanism)
-      + " is not supported by PKCS11 slot " + slotId);
+        + " is not supported by PKCS11 slot " + slotId);
   }
 
   public P11UnsupportedMechanismException(long mechanism, P11IdentityId identityId) {
     super("mechanism " + Functions.getMechanismDescription(mechanism)
-      + " is not supported by PKCS11 identity " + identityId);
+        + " is not supported by PKCS11 identity " + identityId);
   }
 
   public P11UnsupportedMechanismException(String message) {

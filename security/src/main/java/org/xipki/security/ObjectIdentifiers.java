@@ -80,6 +80,7 @@ public class ObjectIdentifiers {
         new ASN1ObjectIdentifier("2.23.140.1.2.3");
   }
 
+  // CHECKSTYLE:SKIP
   public static class DN {
     /**
      * country code - StringType(SIZE(2)).
@@ -274,35 +275,36 @@ public class ObjectIdentifiers {
     public static final ASN1ObjectIdentifier UID = userid;
 
     /**
-     * NIF, Tax ID number, for individuals (Spain)
+     * NIF, Tax ID number, for individuals (Spain).
      */
     public static final ASN1ObjectIdentifier NIF = id_pen.branch("18838.1.1");
 
     /**
-     * CIF, Tax ID code, for companies (Spain)
+     * CIF, Tax ID code, for companies (Spain).
      */
     public static final ASN1ObjectIdentifier CIF = id_pen.branch("4710.1.3.2");
 
     /**
-     * jurisdictionOfIncorporationLocalityName
+     * jurisdictionOfIncorporationLocalityName.
      */
     public static final ASN1ObjectIdentifier jurisdictionOfIncorporationLocalityName =
         id_microsoft.branch("60.2.1.1");
 
     /**
-     * jurisdictionOfIncorporationStateOrProvinceName
+     * jurisdictionOfIncorporationStateOrProvinceName.
      */
     public static final ASN1ObjectIdentifier jurisdictionOfIncorporationStateOrProvinceName =
         id_microsoft.branch("60.2.1.2");
 
     /**
-     * jurisdictionOfIncorporationCountryName
+     * jurisdictionOfIncorporationCountryName.
      */
     public static final ASN1ObjectIdentifier jurisdictionOfIncorporationCountryName =
         id_microsoft.branch("60.2.1.3");
   }
 
   // extended key usage
+  // CHECKSTYLE:SKIP
   public static final class XKU {
 
     public static final ASN1ObjectIdentifier id_kp_anyExtendedKeyUsage =
@@ -323,24 +325,24 @@ public class ObjectIdentifiers {
     public static final ASN1ObjectIdentifier id_kp_codeSigning = id_kp.branch("3");
 
     /**
-     * CSN 369791 TLS client
+     * CSN 369791 TLS client.
      */
     public static final ASN1ObjectIdentifier id_kp_csn369791TlsClient =
         new ASN1ObjectIdentifier("1.2.203.7064.1.1.369791.1");
 
     /**
-     * CSN 369791 TLS server
+     * CSN 369791 TLS server.
      */
     public static final ASN1ObjectIdentifier id_kp_csn369791TlsServer =
         new ASN1ObjectIdentifier("1.2.203.7064.1.1.369791.2");
 
     /**
-     * EAP over LAN (EAPOL)
+     * EAP over LAN (EAPOL).
      */
     public static final ASN1ObjectIdentifier id_kp_eapOverLan = id_kp.branch("14");
 
     /**
-     * EAP over PPP
+     * EAP over PPP.
      */
     public static final ASN1ObjectIdentifier id_kp_eapOverPpp = id_kp.branch("13");
 
@@ -352,24 +354,24 @@ public class ObjectIdentifiers {
     public static final ASN1ObjectIdentifier id_kp_emailProtection = id_kp.branch("4");
 
     /**
-     * ETSI TSL Signing
+     * ETSI TSL Signing.
      */
     public static final ASN1ObjectIdentifier id_kp_etsiTslSigning =
         new ASN1ObjectIdentifier("0.4.0.2231.3.0");
 
     /**
-     * ICAO Master List Signing
+     * ICAO Master List Signing.
      */
     public static final ASN1ObjectIdentifier id_kp_icaoMasterListSigning =
         new ASN1ObjectIdentifier("2.23.136.1.1.3");
 
     /**
-     * Internet Key Exchange for IPsec
+     * Internet Key Exchange for IPsec.
      */
     public static final ASN1ObjectIdentifier id_kp_ikeForIpsec = id_kp.branch("17");
 
     /**
-     * Intel AMT management
+     * Intel AMT management.
      */
     public static final ASN1ObjectIdentifier id_kp_intelAmtManagement =
         new ASN1ObjectIdentifier("2.16.840.1.113741.1.2.3");
@@ -399,49 +401,49 @@ public class ObjectIdentifiers {
     public static final ASN1ObjectIdentifier id_kp_ipsecUser = id_kp.branch("7");
 
     /**
-     * Kerberos Client Authentication
+     * Kerberos Client Authentication.
      */
     public static final ASN1ObjectIdentifier id_kp_kerberosClientAuthentication =
         new ASN1ObjectIdentifier("1.3.6.1.5.2.3.4");
 
     /**
-     * Kerberos Key Distribution Center
+     * Kerberos Key Distribution Center.
      */
     public static final ASN1ObjectIdentifier id_kp_kerberosKdc =
         new ASN1ObjectIdentifier("1.3.6.1.5.2.3.5");
 
     /**
-     * Microsoft Commercial Code Signing
+     * Microsoft Commercial Code Signing.
      */
     public static final ASN1ObjectIdentifier id_kp_microsoftCommercialCodeSigning =
         id_microsoft.branch("2.1.22");
 
     /**
-     * Microsoft Document Signing
+     * Microsoft Document Signing.
      */
     public static final ASN1ObjectIdentifier id_kp_microsoftDocumentSigning =
         id_microsoft.branch("10.3.12");
 
     /**
-     * Microsoft Encrypted File System (EFS)
+     * Microsoft Encrypted File System (EFS).
      */
     public static final ASN1ObjectIdentifier id_kp_microsoftEfs =
         id_microsoft.branch("10.3.4");
 
     /**
-     * Microsoft EFS Recovery
+     * Microsoft EFS Recovery.
      */
     public static final ASN1ObjectIdentifier id_kp_microsoftEfsRecovery =
         id_microsoft.branch("10.3.4.1");
 
     /**
-     * Microsoft Individual Code Signing
+     * Microsoft Individual Code Signing.
      */
     public static final ASN1ObjectIdentifier id_kp_microsoftIndividualCodeSigning =
         id_microsoft.branch("2.1.21");
 
     /**
-     * Microsoft Smart Card Logon
+     * Microsoft Smart Card Logon.
      */
     public static final ASN1ObjectIdentifier id_kp_microsoftSmartCardLogon =
         id_microsoft.branch("20.2.2");
@@ -453,24 +455,24 @@ public class ObjectIdentifiers {
     public static final ASN1ObjectIdentifier id_kp_ocspSigning = id_kp.branch("9");
 
     /**
-     * PIV Card Authentication
+     * PIV Card Authentication.
      */
     public static final ASN1ObjectIdentifier id_kp_pivCardAuthentication =
         new ASN1ObjectIdentifier("2.16.840.1.101.3.6.8");
 
     /**
-     * PDF Signing
+     * PDF Signing.
      */
     public static final ASN1ObjectIdentifier id_kp_pdfSigning =
         new ASN1ObjectIdentifier("1.2.840.113583.1.1.5");
 
     /**
-     * SCVP Client
+     * SCVP Client.
      */
     public static final ASN1ObjectIdentifier id_kp_scvpClient = id_kp.branch("16");
 
     /**
-     * SCVP Server
+     * SCVP Server.
      */
     public static final ASN1ObjectIdentifier id_kp_scvpServer = id_kp.branch("15");
 
@@ -481,17 +483,17 @@ public class ObjectIdentifiers {
     public static final ASN1ObjectIdentifier id_kp_serverAuth = id_kp.branch("1");
 
     /**
-     * SIP Domain
+     * SIP Domain.
      */
     public static final ASN1ObjectIdentifier id_kp_sipDomain = id_kp.branch("20");
 
     /**
-     * SSH Client
+     * SSH Client.
      */
     public static final ASN1ObjectIdentifier id_kp_sshClient = id_kp.branch("21");
 
     /**
-     * SSH Server
+     * SSH Server.
      */
     public static final ASN1ObjectIdentifier id_kp_sshServer = id_kp.branch("22");
 

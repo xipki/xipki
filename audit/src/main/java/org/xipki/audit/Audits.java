@@ -33,7 +33,7 @@ public class Audits {
      * valid values are:
      *   embed: use the embedded slf4j logging
      *   syslog: use the syslog
-     *   java:<name of class that implements org.xipki.audit.AuditService>
+     *   java:&lt;name of class that implements org.xipki.audit.AuditService&gt;
      */
     private String type;
 

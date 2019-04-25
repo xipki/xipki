@@ -118,7 +118,7 @@ public class CaServerConf extends ValidatableConf {
   private RemoteMgmt remoteMgmt;
 
   /**
-   * master or slave, the default is master
+   * master or slave, the default is master.
    */
   private boolean master = true;
 

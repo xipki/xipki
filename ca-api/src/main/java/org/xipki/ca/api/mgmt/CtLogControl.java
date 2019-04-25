@@ -34,7 +34,7 @@ import org.xipki.util.StringUtil;
 public class CtLogControl {
 
   /**
-   * Whether CTLog is enabled: true or false
+   * Whether CTLog is enabled: true or false.
    */
   public static final String KEY_ENABLED = "enabled";
 
@@ -44,7 +44,7 @@ public class CtLogControl {
   public static final String KEY_SERVERS = "servers";
 
   /**
-   * The name of SSL context
+   * The name of SSL context.
    */
   public static final String KEY_SSLCONTEXT_NAME = "sslcontext.name";
 

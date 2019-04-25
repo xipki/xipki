@@ -111,6 +111,10 @@ public class X509Util {
 
   private static final byte[] PEM_SEP = StringUtil.toUtf8Bytes("-----");
 
+  private static final String BEGIN_CERTIFICATE = "-----BEGIN CERTIFICATE-----";
+
+  private static final String END_CERTIFICATE = "-----END CERTIFICATE-----";
+
   private static CertificateFactory certFact;
 
   private static Object certFactLock = new Object();
@@ -687,18 +691,15 @@ public class X509Util {
 
   public static List<X509Certificate> listCertificates(String encodedCerts)
       throws CertificateException, IOException {
-    final String START_LINE = "-----BEGIN CERTIFICATE-----";
-    final String END_LINE = "-----END CERTIFICATE-----";
-
     List<X509Certificate> certs = new LinkedList<>();
     try (BufferedReader reader = new BufferedReader(new StringReader(encodedCerts))) {
       String line;
 
       ByteArrayOutputStream bout = new ByteArrayOutputStream();
       while ((line = reader.readLine()) != null) {
-        if (START_LINE.equals(line)) {
+        if (BEGIN_CERTIFICATE.equals(line)) {
           bout.reset();
-        } else if (END_LINE.equals(line)) {
+        } else if (END_CERTIFICATE.equals(line)) {
           certs.add(parseCert(bout.toByteArray()));
           bout.reset();
         } else {

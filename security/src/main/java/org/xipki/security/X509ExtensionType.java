@@ -224,6 +224,7 @@ public class X509ExtensionType extends ValidatableConf {
       this.listValue = listValue;
     }
 
+    // CHECKSTYLE:SKIP
     public ASN1Encodable toASN1Encodable() throws InvalidConfException {
       ASN1Encodable rv;
 

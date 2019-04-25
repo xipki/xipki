@@ -57,13 +57,6 @@ public class DataSourceFactory {
     return createDataSource(name, props, passwordResolver);
   }
 
-  public DataSourceWrapper createDataSourceForFile(String name, String confFile,
-      PasswordResolver passwordResolver) throws PasswordResolverException, IOException {
-    Args.notBlank(confFile, "confFile");
-    InputStream fileIn = Files.newInputStream(Paths.get(IoUtil.expandFilepath(confFile)));
-    return createDataSource(name, fileIn, passwordResolver);
-  }
-
   public DataSourceWrapper createDataSource(String name, InputStream conf,
       PasswordResolver passwordResolver) throws PasswordResolverException, IOException {
     Args.notNull(conf, "conf");
@@ -148,5 +141,12 @@ public class DataSourceFactory {
 
     return DataSourceWrapper.createDataSource(name, conf, databaseType);
   } // method createDataSource
+
+  public DataSourceWrapper createDataSourceForFile(String name, String confFile,
+      PasswordResolver passwordResolver) throws PasswordResolverException, IOException {
+    Args.notBlank(confFile, "confFile");
+    InputStream fileIn = Files.newInputStream(Paths.get(IoUtil.expandFilepath(confFile)));
+    return createDataSource(name, fileIn, passwordResolver);
+  }
 
 }

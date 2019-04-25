@@ -60,6 +60,7 @@ public class CtLogClient {
 
   public static class AddPreChainResponse {
 
+    // CHECKSTYLE:SKIP
     private byte sct_version;
 
     private byte[] id;
@@ -74,6 +75,7 @@ public class CtLogClient {
       return sct_version;
     }
 
+    // CHECKSTYLE:SKIP
     public void setSct_version(byte sct_version) {
       this.sct_version = sct_version;
     }
@@ -126,7 +128,7 @@ public class CtLogClient {
     for (String m : serverUrls) {
       String addPreChainUrl = m.endsWith("/")
           ? m + "ct/v1/add-pre-chain" : m + "/ct/v1/add-pre-chain";
-     this.addPreChainUrls.add(addPreChainUrl);
+      this.addPreChainUrls.add(addPreChainUrl);
     }
   }
 
@@ -171,8 +173,7 @@ public class CtLogClient {
       scts.add(sct);
     }
 
-    SerializedSCT serializedSCT = new SerializedSCT(scts);
-    return new SignedCertificateTimestampList(serializedSCT);
+    return new SignedCertificateTimestampList(new SerializedSCT(scts));
   }
 
 }

@@ -52,6 +52,7 @@ public class CtLog {
     public static DigitallySigned getInstance(byte[] encoded, AtomicInteger offsetObj) {
       int offset = offsetObj.get();
 
+      // CHECKSTYLE:SKIP
       SignatureAndHashAlgorithm algorithm =
           SignatureAndHashAlgorithm.getInstance(copyOf(encoded, offset, 2));
       offset += 2;
@@ -247,6 +248,8 @@ public class CtLog {
   }
 
   /**
+   * ASN.1 definition:
+   * <p/>
    * struct {
    *     HashAlgorithm hash;
    *     SignatureAlgorithm signature;
@@ -285,6 +288,8 @@ public class CtLog {
   }
 
   /**
+   * ASN1. definition:
+   * <p/>
    * struct {
    *     Version sct_version;
    *     LogID id;
@@ -297,12 +302,16 @@ public class CtLog {
   public static class SignedCertificateTimestamp {
 
     /**
+     * ASN.1 definition:
+     * <p/>
      * enum { v1(0), (255) }
      *   Version;
      */
     private final byte version;
 
     /**
+     * ASN.1 definition:
+     * <p/>
      * struct {
      *     opaque key_id[32];
      * } LogID;
@@ -310,14 +319,18 @@ public class CtLog {
     private final byte[] logId;
 
     /**
+     * ASN.1 definition:
+     * <p/>
      * uint64 timestamp;
      */
     private final long timestamp;
 
     /**
+     * ASN.1 definition:
+     * <p/>
      * opaque CtExtensions<0..2^16-1>;
      * CtExtensions extensions.
-     *
+     * <p/>
      * Does not contain the encoded length.
      */
     private final byte[] extensions;
@@ -328,10 +341,13 @@ public class CtLog {
         int len) {
       int startOffset = offsetObj.get();
       int offset = startOffset;
+      // CHECKSTYLE:SKIP
       byte version = encoded[offset++];
+      // CHECKSTYLE:SKIP
       byte[] logID = copyOf(encoded, offset, 32);
       offset += 32;
 
+      // CHECKSTYLE:SKIP
       long timestamp = Pack.bigEndianToLong(encoded, offset);
       offset += 8;
 
@@ -487,16 +503,16 @@ public class CtLog {
    */
   private static int readInt(byte[] buffer, int offset, int bytesLenOfValue) {
     if (bytesLenOfValue == 4) {
-      return (0xFF & buffer[offset]   ) << 24
+      return (0xFF & buffer[offset])    << 24
           | (0xFF & buffer[offset + 1]) << 16
           | (0xFF & buffer[offset + 2]) << 8
           | (0xFF & buffer[offset + 3]);
     } else if (bytesLenOfValue == 3) {
-      return  (0xFF & buffer[offset]  ) << 16
+      return  (0xFF & buffer[offset])   << 16
           | (0xFF & buffer[offset + 1]) << 8
           | (0xFF & buffer[offset + 2]);
     } else if (bytesLenOfValue == 2) {
-      return  (0xFF & buffer[offset]  ) << 8
+      return  (0xFF & buffer[offset])   << 8
           | (0xFF & buffer[offset + 1]);
     } else {
       return 0xFF & buffer[offset];
