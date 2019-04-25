@@ -276,4 +276,8 @@ public class StringUtil {
     return (str == null) ? null : str.getBytes(StandardCharsets.UTF_8);
   }
 
+  public static String toUtf8String(byte[] bytes) {
+    return new String(bytes, StandardCharsets.UTF_8);
+  }
+
 }

@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.security.CtLog.DigitallySigned;
@@ -33,8 +35,9 @@ import org.xipki.security.CtLog.SignedCertificateTimestampList;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.Curl;
-import org.xipki.util.DefaultCurl;
 import org.xipki.util.Curl.CurlResult;
+import org.xipki.util.DefaultCurl;
+import org.xipki.util.StringUtil;
 import org.xipki.util.http.SslContextConf;
 
 import com.alibaba.fastjson.JSON;
@@ -44,6 +47,8 @@ import com.alibaba.fastjson.JSON;
  * @author Lijun Liao
  */
 public class CtLogClient {
+
+  private static Logger LOG = LoggerFactory.getLogger(CtLogClient.class);
 
   public static class AddPreChainRequest {
     private List<byte[]> chain;
@@ -147,6 +152,9 @@ public class CtLogClient {
     }
 
     byte[] content = JSON.toJSONBytes(request);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("CTLog Request: {}", StringUtil.toUtf8String(content));
+    }
 
     List<SignedCertificateTimestamp> scts = new ArrayList<>(addPreChainUrls.size());
     Map<String, String> headers = new HashMap<>();
@@ -160,12 +168,17 @@ public class CtLogClient {
             "error while calling " + url + ": " + ex.getMessage());
       }
 
-      if (res.getContent() == null) {
+      byte[] respContent = res.getContent();
+      if (respContent == null) {
         throw new OperationException(ErrorCode.SYSTEM_FAILURE,
             "server does not return any content while responding " + url);
       }
 
-      AddPreChainResponse resp = JSON.parseObject(res.getContent(), AddPreChainResponse.class);
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("CTLog Response: {}", StringUtil.toUtf8String(respContent));
+      }
+
+      AddPreChainResponse resp = JSON.parseObject(respContent, AddPreChainResponse.class);
 
       DigitallySigned ds = DigitallySigned.getInstance(resp.getSignature(), new AtomicInteger(0));
       SignedCertificateTimestamp sct = new SignedCertificateTimestamp(resp.getSct_version(),
