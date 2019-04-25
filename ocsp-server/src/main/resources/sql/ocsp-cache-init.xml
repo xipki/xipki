@@ -17,7 +17,7 @@
           remarks="base64 enoded SHA1 sum of the certificate">
         <constraints nullable="false"/>
       </column>
-      <column name="CERT" type="VARCHAR(4000)">
+      <column name="CERT" type="VARCHAR(6000)">
         <constraints nullable="false"/>
       </column>
     </createTable>

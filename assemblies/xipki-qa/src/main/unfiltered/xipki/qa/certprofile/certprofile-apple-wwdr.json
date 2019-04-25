@@ -6,7 +6,7 @@
 	"version":"v3",
 	"certDomain":"RFC5280",
 	"certLevel":"EndEntity",
-	"maxSize":3000,
+	"maxSize":4500,
 	"validity":"395d",
 	"notBeforeTime":"current",
 	"serialNumberInReq":false,

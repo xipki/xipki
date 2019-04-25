@@ -2545,7 +2545,7 @@ public class ProfileConfCreatorDemo {
 
     profile.setCertDomain(CertDomain.CABForumBR);
     profile.setCertLevel(certLevel);
-    profile.setMaxSize(3000);
+    profile.setMaxSize(6000 * 3 / 4);
     profile.setVersion(X509CertVersion.v3);
     profile.setValidity(validity);
     profile.setNotBeforeTime(useMidnightNotBefore ? "midnight" : "current");

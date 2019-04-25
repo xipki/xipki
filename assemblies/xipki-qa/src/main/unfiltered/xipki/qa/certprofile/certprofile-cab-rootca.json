@@ -6,7 +6,7 @@
 	"version":"v3",
 	"certDomain":"CABForumBR",
 	"certLevel":"RootCA",
-	"maxSize":3000,
+	"maxSize":4500,
 	"validity":"10y",
 	"notBeforeTime":"current",
 	"serialNumberInReq":false,

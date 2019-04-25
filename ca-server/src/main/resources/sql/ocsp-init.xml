@@ -52,7 +52,7 @@
         <constraints nullable="false"/>
       </column>
       <column name="REV_INFO" type="varchar(200)" remarks="CA revocation information"/>
-      <column name="CERT" type="VARCHAR(4000)">
+      <column name="CERT" type="VARCHAR(6000)">
         <constraints nullable="false"/>
       </column>
       <column name="CRL_INFO" type="VARCHAR(1000)"
