@@ -48,7 +48,7 @@
     <xipki.tools.version>1.0.5</xipki.tools.version>
     <xipki.scep.version>3.1.0</xipki.scep.version>
     <servlet.version>3.1.0</servlet.version>
-    <karaf.version>4.2.4</karaf.version>
+    <karaf.version>4.2.5</karaf.version>
     <karaf.plugin.version>4.2.3</karaf.plugin.version>
     <bc.version>1.61</bc.version>
     <slf4j.version>1.7.7</slf4j.version>
@@ -57,10 +57,10 @@
     <snakeyaml.version>1.18</snakeyaml.version>
     <hikaricp.version>3.3.1</hikaricp.version>
     <syslog-java-client.version>1.1.7</syslog-java-client.version>
-    <fastjson.version>1.2.56</fastjson.version>
+    <fastjson.version>1.2.57</fastjson.version>
     <!-- only for runtime -->
     <logback.version>1.2.3</logback.version>
-    <jdbc.mariadb.version>2.3.0</jdbc.mariadb.version>
+    <jdbc.mariadb.version>2.4.1</jdbc.mariadb.version>
     <jdbc.postgresql.version>42.2.5</jdbc.postgresql.version>
     <!-- Only for test purpose -->
     <junit.version>4.8.2</junit.version>
