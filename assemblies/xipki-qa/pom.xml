@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.xipki.assembly</groupId>
     <artifactId>assemblies</artifactId>
-    <version>5.2.0</version>
+    <version>5.2.1-SNAPSHOT</version>
   </parent>
   <artifactId>xipki-qa</artifactId>
   <packaging>pom</packaging>

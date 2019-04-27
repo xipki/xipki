@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.xipki.shell</groupId>
     <artifactId>shells</artifactId>
-    <version>5.2.0</version>
+    <version>5.2.1-SNAPSHOT</version>
   </parent>
   <artifactId>dbtool-shell</artifactId>
   <packaging>bundle</packaging>
