@@ -134,6 +134,11 @@
   </fileSets>
   <files>
     <file>
+      <source>README.md</source>
+      <outputDirectory>.</outputDirectory>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
       <source>src/main/unfiltered/xipki/cmpclient/template.cmpclient-signature.json</source>
       <outputDirectory>xipki/cmpclient</outputDirectory>
       <destName>template.cmpclient.json</destName>

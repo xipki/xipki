@@ -36,6 +36,11 @@
   </fileSets>
   <files>
     <file>
+      <source>README.md</source>
+      <outputDirectory>.</outputDirectory>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
       <source>${project.build.directory}/webapps/ca-servlet.war</source>
       <outputDirectory>webapps</outputDirectory>
       <destName>ca.war</destName>

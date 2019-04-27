@@ -19,6 +19,11 @@
   </fileSets>
   <files>
     <file>
+      <source>README.md</source>
+      <outputDirectory>.</outputDirectory>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
       <source>${project.build.directory}/webapps/p11proxy-servlet.war</source>
       <outputDirectory>webapps</outputDirectory>
       <destName>p11proxy.war</destName>
