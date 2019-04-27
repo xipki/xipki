@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.ocsp.api.RequestIssuer;
+import org.xipki.ocsp.server.store.crl.CrlInfo;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;

@@ -15,18 +15,23 @@
  * limitations under the License.
  */
 
-package org.xipki.ocsp.server.store;
+package org.xipki.ocsp.server.store.crl;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
+import java.nio.file.Files;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
@@ -39,6 +44,7 @@ import java.sql.Types;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -68,15 +74,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.ocsp.server.store.DbCertStatusStore;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.Base64;
+import org.xipki.util.DateUtil;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -111,6 +119,10 @@ class ImportCrl {
 
   private static final Logger LOG = LoggerFactory.getLogger(ImportCrl.class);
 
+  private static final String KEY_CA_REVOCATION_TIME = "ca.revocation.time";
+
+  private static final String KEY_CA_INVALIDITY_TIME = "ca.invalidity.time";
+
   private static final String SQL_UPDATE_CERT_REV
       = "UPDATE CERT SET REV=?,RR=?,RT=?,RIT=?,LUPDATE=? WHERE ID=?";
 
@@ -127,6 +139,8 @@ class ImportCrl {
         + "VALUES(?,?,?,?,?,?,?,?,?,?,?)";
 
   private static final String CORE_SQL_SELECT_ID_CERT = "ID FROM CERT WHERE IID=? AND SN=?";
+
+  private final String basedir;
 
   private final String sqlSelectIdCert;
 
@@ -151,8 +165,6 @@ class ImportCrl {
 
   private final byte[] caSpki;
 
-  private final String certsDirName;
-
   private final CertRevocationInfo caRevInfo;
 
   private final HashAlgo certhashAlgo;
@@ -164,13 +176,26 @@ class ImportCrl {
   private PreparedStatement psUpdateCert;
   private PreparedStatement psUpdateCertRev;
 
-  public ImportCrl(DataSourceWrapper datasource, X509CRL crl, String crlUrl,
-      X509Certificate caCert, X509Certificate issuerCert, CertRevocationInfo caRevInfo,
-      String certsDirName) throws ImportCrlException, DataAccessException {
+  public ImportCrl(DataSourceWrapper datasource, String basedir)
+      throws ImportCrlException, DataAccessException, IOException {
     this.datasource = Args.notNull(datasource, "datasource");
+    this.basedir = Args.notNull(basedir, "basedir");
     this.certhashAlgo = DbCertStatusStore.getCertHashAlgo(datasource);
-    this.crl = Args.notNull(crl, "crl");
-    this.caCert = Args.notNull(caCert, "caCert");
+
+    File caCertFile = new File(basedir, "ca.crt");
+    if (!caCertFile.exists()) {
+      throw new ImportCrlException(
+          "CA certificate file " + caCertFile.getPath() + " does not exist");
+    }
+
+    File crlFile = new File(basedir, "ca.crl");
+    if (!crlFile.exists()) {
+      throw new ImportCrlException("CRL file " + caCertFile.getPath() + " does not exist");
+    }
+
+    LOG.info("UPDATE_CERTSTORE: a newer CRL is available");
+
+    this.caCert = parseCert(caCertFile);
     this.x500PrincipalCaSubject = caCert.getSubjectX500Principal();
     this.caSubject = X500Name.getInstance(x500PrincipalCaSubject.getEncoded());
     try {
@@ -179,14 +204,51 @@ class ImportCrl {
       throw new ImportCrlException("could not extract AKI of CA certificate", ex);
     }
 
-    this.certsDirName = certsDirName;
+    X509Certificate issuerCert = null;
+    File issuerCertFile = new File(basedir, "issuer.crt");
+    if (issuerCertFile.exists()) {
+      issuerCert = parseCert(issuerCertFile);
+    }
+
+    try {
+      this.crl = X509Util.parseCrl(crlFile);
+    } catch (CertificateException | CRLException ex) {
+      throw new ImportCrlException("could not parse X.509 CRL from file "
+          + crlFile + ": " + ex.getMessage(), ex);
+    }
+
+    File revFile = new File(basedir, "REVOCATION");
+    CertRevocationInfo caRevInfo = null;
+    if (revFile.exists()) {
+      Properties props = new Properties();
+      InputStream is = Files.newInputStream(revFile.toPath());
+      try {
+        props.load(is);
+      } finally {
+        is.close();
+      }
+
+      String str = props.getProperty(KEY_CA_REVOCATION_TIME);
+      if (StringUtil.isNotBlank(str)) {
+        Date revocationTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
+        Date invalidityTime = null;
+
+        str = props.getProperty(KEY_CA_INVALIDITY_TIME);
+        if (StringUtil.isNotBlank(str)) {
+          invalidityTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
+        }
+        caRevInfo = new CertRevocationInfo(CrlReason.UNSPECIFIED, revocationTime, invalidityTime);
+      }
+    }
+
     this.caRevInfo = caRevInfo;
 
     X500Principal issuer = crl.getIssuerX500Principal();
 
-    boolean caAsCrlIssuer = true;
-    if (!x500PrincipalCaSubject.equals(issuer)) {
-      caAsCrlIssuer = false;
+    X509Certificate crlSignerCert;
+    if (x500PrincipalCaSubject.equals(issuer)) {
+      crlSignerCert = caCert;
+    } else {
       if (issuerCert == null) {
         throw new IllegalArgumentException("issuerCert may not be null");
       }
@@ -194,10 +256,10 @@ class ImportCrl {
       if (!issuerCert.getSubjectX500Principal().equals(issuer)) {
         throw new IllegalArgumentException("issuerCert and CRL do not match");
       }
+      crlSignerCert = issuerCert;
     }
 
     // Verify the signature
-    X509Certificate crlSignerCert = caAsCrlIssuer ? caCert : issuerCert;
     try {
       crl.verify(crlSignerCert.getPublicKey());
     } catch (SignatureException | NoSuchProviderException | InvalidKeyException | CRLException
@@ -226,8 +288,12 @@ class ImportCrl {
 
     // Construct CrlID
     ASN1EncodableVector vec = new ASN1EncodableVector();
-    if (StringUtil.isNotBlank(crlUrl)) {
-      vec.add(new DERTaggedObject(true, 0, new DERIA5String(crlUrl, true)));
+    File urlFile = new File(basedir, "crl.url");
+    if (urlFile.exists()) {
+      String crlUrl = StringUtil.toUtf8String(IoUtil.read(urlFile)).trim();
+      if (StringUtil.isNotBlank(crlUrl)) {
+        vec.add(new DERTaggedObject(true, 0, new DERIA5String(crlUrl, true)));
+      }
     }
 
     vec.add(new DERTaggedObject(true, 1, asn1CrlNumber));
@@ -255,7 +321,9 @@ class ImportCrl {
       psUpdateCertRev = datasource.prepareStatement(conn, SQL_UPDATE_CERT_REV);
 
       importEntries(conn, caId);
-      deleteEntriesNotUpdatedSince(conn, startTime);
+      if (!isDeltaCrl) {
+        deleteEntriesNotUpdatedSince(conn, startTime);
+      }
 
       return true;
     } catch (Throwable th) {
@@ -319,7 +387,7 @@ class ImportCrl {
         crlInfo = new CrlInfo(crlNumber, null, crl.getThisUpdate(), crl.getNextUpdate(), crlId);
       }
     } else {
-      if (crlNumber.compareTo(crlInfo.getCrlNumber()) < 0) {
+      if (crlNumber.compareTo(crlInfo.getCrlNumber()) <= 0) {
         // It is permitted if the CRL number equals to the one in Database,
         // which enables the resume of importing process if error occurred.
         throw new ImportCrlException("Given CRL is not newer than existing CRL.");
@@ -430,15 +498,15 @@ class ImportCrl {
         String sql = null;
         try {
           if (reason == CrlReason.REMOVE_FROM_CRL) {
-            if (!isDeltaCrl) {
+            if (isDeltaCrl) {
+              // delete the entry
+              sql = SQL_DELETE_CERT;
+              psDeleteCert.setInt(1, caId);
+              psDeleteCert.setString(2, serial.toString(16));
+              psDeleteCert.executeUpdate();
+            } else {
               LOG.warn("ignore CRL entry with reason removeFromCRL in non-Delta CRL");
             }
-
-            // delete the entry
-            sql = SQL_DELETE_CERT;
-            psDeleteCert.setInt(1, caId);
-            psDeleteCert.setString(2, serial.toString(16));
-            psDeleteCert.executeUpdate();
             continue;
           }
 
@@ -535,47 +603,68 @@ class ImportCrl {
       }
     } else {
       // cert dirs
-      File certsDir = new File(certsDirName);
+      File certsDir = new File(basedir, "certs");
 
       if (!certsDir.exists()) {
-        LOG.warn("the folder {} does not exist, ignore it", certsDirName);
+        LOG.warn("the folder {} does not exist, ignore it", certsDir.getPath());
         return;
       }
 
       if (!certsDir.isDirectory()) {
-        LOG.warn("the path {} does not point to a folder, ignore it", certsDirName);
+        LOG.warn("the path {} does not point to a folder, ignore it", certsDir.getPath());
         return;
       }
 
       if (!certsDir.canRead()) {
-        LOG.warn("the folder {} may not be read, ignore it", certsDirName);
+        LOG.warn("the folder {} may not be read, ignore it", certsDir.getPath());
         return;
       }
 
+      // import certificates
       File[] certFiles = certsDir.listFiles(new FilenameFilter() {
         @Override
         public boolean accept(File dir, String name) {
-          return name.endsWith(".der") || name.endsWith(".crt");
+          return name.endsWith(".der") || name.endsWith(".crt") || name.endsWith(".pem");
         }
       });
 
-      if (certFiles == null || certFiles.length == 0) {
-        return;
+      if (certFiles != null && certFiles.length > 0) {
+        for (File certFile : certFiles) {
+          Certificate cert;
+          try {
+            cert = X509Util.parseBcCert(certFile);
+          } catch (IllegalArgumentException | IOException | CertificateException ex) {
+            LOG.warn("could not parse certificate {}, ignore it", certFile.getPath());
+            continue;
+          }
+
+          String certLogId = "(file " + certFile.getName() + ")";
+          addCertificate(maxId, caId, cert, null, certLogId);
+        }
       }
 
-      for (File certFile : certFiles) {
-        Certificate cert;
-
-        try {
-          byte[] encoded = IoUtil.read(certFile);
-          cert = Certificate.getInstance(encoded);
-        } catch (IllegalArgumentException | IOException ex) {
-          LOG.warn("could not parse certificate {}, ignore it", certFile.getPath());
-          continue;
+      // import certificate serial numbers
+      File[] serialNumbersFiles = certsDir.listFiles(new FilenameFilter() {
+        @Override
+        public boolean accept(File dir, String name) {
+          return name.endsWith(".serials");
         }
+      });
 
-        String certLogId = "(file " + certFile.getName() + ")";
-        addCertificate(maxId, caId, cert, null, certLogId);
+      if (serialNumbersFiles != null && serialNumbersFiles.length > 0) {
+        for (File serialNumbersFile : serialNumbersFiles) {
+          try (BufferedReader reader = new BufferedReader(new FileReader(serialNumbersFile))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+              BigInteger serialNumber = new BigInteger(line.trim(), 16);
+              addCertificateBySerialNumber(maxId, caId, serialNumber);
+            }
+          } catch (IOException ex) {
+            LOG.warn("could not import certificates by serial numbers from file {}, ignore it",
+                serialNumbersFile.getPath());
+            continue;
+          }
+        }
       }
     }
 
@@ -583,6 +672,15 @@ class ImportCrl {
 
   private static byte[] extractCoreValue(byte[] encodedExtensionValue) {
     return ASN1OctetString.getInstance(encodedExtensionValue).getOctets();
+  }
+
+  private static X509Certificate parseCert(File certFile) throws ImportCrlException {
+    try {
+      return X509Util.parseCert(certFile);
+    } catch (CertificateException | IOException ex) {
+      throw new ImportCrlException("could not parse X.509 certificate from file "
+          + certFile + ": " + ex.getMessage(), ex);
+    }
   }
 
   private Long getId(int caId, BigInteger serialNumber) throws DataAccessException {
@@ -690,8 +788,63 @@ class ImportCrl {
     LOG.info("Imported  certificate {}", certLogId);
   }
 
-  private void deleteEntriesNotUpdatedSince(Connection conn, Date time)
+  private void addCertificateBySerialNumber(AtomicLong maxId, int caId, BigInteger serialNumber)
       throws DataAccessException {
+    LOG.info("Importing certificate by serial number {}", serialNumber);
+    Long id = getId(caId, serialNumber);
+    boolean tblCertIdExists = (id != null);
+
+    PreparedStatement ps;
+    String sql;
+    // first update the table CERT
+    if (tblCertIdExists) {
+      sql = SQL_UPDATE_CERT;
+      ps = psUpdateCert;
+    } else {
+      sql = SQL_INSERT_CERT;
+      ps = psInsertCert;
+      id = maxId.incrementAndGet();
+    }
+
+    try {
+      int offset = 1;
+      if (sql == SQL_INSERT_CERT) {
+        ps.setLong(offset++, id);
+        // ISSUER ID IID
+        ps.setInt(offset++, caId);
+        // serial number SN
+        ps.setString(offset++, serialNumber.toString(16));
+        // whether revoked REV
+        ps.setInt(offset++, 0);
+        // revocation reason RR
+        ps.setNull(offset++, Types.SMALLINT);
+        // revocation time RT
+        ps.setNull(offset++, Types.BIGINT);
+        ps.setNull(offset++, Types.BIGINT);
+      }
+
+      // last update LUPDATE
+      ps.setLong(offset++, System.currentTimeMillis() / 1000);
+
+      // not before NBEFORE, we use the minimal time
+      ps.setLong(offset++, 0);
+      // not after NAFTER, use Long.MAX_VALUE
+      ps.setLong(offset++, Long.MAX_VALUE);
+      ps.setString(offset++, null);
+
+      if (sql == SQL_UPDATE_CERT) {
+        ps.setLong(offset++, id);
+      }
+
+      ps.executeUpdate();
+    } catch (SQLException ex) {
+      throw datasource.translate(sql, ex);
+    }
+
+    LOG.info(" Imported certificate by serial number {}", serialNumber);
+  }
+
+  private void deleteEntriesNotUpdatedSince(Connection conn, Date time) throws DataAccessException {
     // remove the unmodified entries
     String sql = "DELETE FROM CERT WHERE LUPDATE<" + time.getTime() / 1000;
     Statement stmt = datasource.createStatement(conn);

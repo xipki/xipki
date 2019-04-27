@@ -242,14 +242,18 @@ if { $printUsage equals "true" } then {
   }
 
   xi:copy-file -f output/subcawithcrl1.crl \
-    ${XIPKI_DIR}/etc/ocsp/crls/subcawithcrl1/crl.crl
+    ${XIPKI_DIR}/crls/example.ca/ca.crl
 
   xi:copy-file -f output/subcawithcrl1.crt \
-    ${XIPKI_DIR}/etc/ocsp/crls/subcawithcrl1/ca.crt
+    ${XIPKI_DIR}/crls/example.ca/ca.crt
 
   # Force the OCSP responder to import the CRL to database
-  xi:copy-file -f ${XIPKI_DIR}/etc/ocsp/crls/foo.crl.UPDATEME \
-    ${XIPKI_DIR}/etc/ocsp/crls/subcawithcrl1/crl.crl.UPDATEME
+  xi:copy-file -f ${XIPKI_DIR}/crls/example.ca/template/crl.url \
+    ${XIPKI_DIR}/crls/example.ca/crl.url
+
+  # Force the OCSP responder to import the CRL to database
+  xi:copy-file -f ${XIPKI_DIR}/crls/example.ca/template/UPDATEME \
+    ${XIPKI_DIR}/crls/example.ca/UPDATEME
 
   if { $TOKEN_TYPE equals "pkcs11" } then {
     ocsp:refresh-token --type pkcs11

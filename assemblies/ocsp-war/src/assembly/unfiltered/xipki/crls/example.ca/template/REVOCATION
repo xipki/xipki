@@ -1,4 +1,3 @@
-# Assume that the path of CRL is path/to/myca.crl, copy this file to path/to/myca.crl.revocation.
 #
 # When CA certificate is revoked. UTC DateTime yyyyMMddhhmmss, e.g. 20160418165058
 # optional, but required if CA is revoked.

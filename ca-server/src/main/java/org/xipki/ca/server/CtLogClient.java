@@ -50,6 +50,7 @@ public class CtLogClient {
 
   private static Logger LOG = LoggerFactory.getLogger(CtLogClient.class);
 
+  // Do not change the variable name, and the get- and set-methods.
   public static class AddPreChainRequest {
     private List<byte[]> chain;
 
@@ -63,6 +64,7 @@ public class CtLogClient {
 
   }
 
+  // Do not change the variable name, and the get- and set-methods.
   public static class AddPreChainResponse {
 
     // CHECKSTYLE:SKIP

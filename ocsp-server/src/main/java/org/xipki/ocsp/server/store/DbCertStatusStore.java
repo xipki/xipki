@@ -52,6 +52,7 @@ import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.ocsp.server.IssuerFilter;
 import org.xipki.ocsp.server.OcspServerConf;
+import org.xipki.ocsp.server.store.crl.CrlInfo;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
@@ -565,7 +566,7 @@ public class DbCertStatusStore extends OcspStore {
     return certs;
   }
 
-  static HashAlgo getCertHashAlgo(DataSourceWrapper datasource) throws DataAccessException {
+  public static HashAlgo getCertHashAlgo(DataSourceWrapper datasource) throws DataAccessException {
     // analyze the database
     String certHashAlgoStr = datasource.getFirstValue(null, "DBSCHEMA", "VALUE2",
         "NAME='CERTHASH_ALGO'", String.class);

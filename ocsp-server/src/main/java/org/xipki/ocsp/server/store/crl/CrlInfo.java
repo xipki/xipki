@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ocsp.server.store;
+package org.xipki.ocsp.server.store.crl;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -34,7 +34,7 @@ import org.xipki.util.StringUtil;
  * @since 2.2.0
  */
 
-class CrlInfo {
+public class CrlInfo {
 
   public static final String BASE_CRL_NUMBER = "base-crl-number";
 
