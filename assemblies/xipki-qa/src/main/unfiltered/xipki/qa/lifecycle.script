@@ -111,7 +111,7 @@ if { $printUsage equals "true" } then {
   echo "                     The sha3 algorithms are not for plainec."
   echo "    token type:      pkcs11, pkcs12"
   echo "    signature type:  rsa, rsapss, ec, plainec, dsa, sm2"
-  echo "    keyspec:         keysize for signature types rsa, rsaPSS and DSA,"
+  echo "    keyspec:         keysize for signature types rsa, rsapss and dsa,"
   echo "                     curve name for signature types ec and plainec"
   echo "options"
   echo "    -l               configure CAs using command 'load-conf'"

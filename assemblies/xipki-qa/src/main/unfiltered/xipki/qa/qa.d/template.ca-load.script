@@ -55,9 +55,10 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
 }
 
 ca:load-conf --conf-file xipki/qa/qa.d/rootca.json \
+  --outform $OUTFORM \
   --out-dir output
 
-xi:move-file output/ca-rootca1.der output/rootca1.crt
+xi:move-file output/ca-rootca1.crt output/rootca1.crt
 
 ## Update the certificate in the device
 if { $TOKEN_TYPE equals "pkcs11" } then {

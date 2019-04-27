@@ -1455,10 +1455,10 @@ public class CaActions {
         } else {
           println("loaded " + msg);
           for (String caname : rootCerts.keySet()) {
-            String filename = "ca-" + caname + "." + outform.toLowerCase();
+            String filename = "ca-" + caname + ".crt";
             saveVerbose("saved certificate of root CA " + caname + " to",
                 new File(outDir, filename),
-                encodeCrl(rootCerts.get(caname).getEncoded(), outform));
+                encodeCert(rootCerts.get(caname).getEncoded(), outform));
           }
         }
         return null;
