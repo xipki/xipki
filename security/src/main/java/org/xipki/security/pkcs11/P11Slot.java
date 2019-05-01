@@ -40,6 +40,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.pkcs11.P11ModuleConf.P11MechanismFilter;
@@ -354,6 +355,36 @@ public abstract class P11Slot implements Closeable {
    */
   // CHECKSTYLE:SKIP
   protected abstract P11Identity generateDSAKeypair0(BigInteger p, BigInteger q, BigInteger g,
+      P11NewKeyControl control) throws P11TokenException;
+
+  /**
+   * Generates an EC Edwards keypair.
+   *
+   * @param curveName
+   *         curveName of the curve. Must not be {@code null}.
+   * @param control
+   *          Control of the key generation process. Must not be {@code null}.
+   * @return the identifier of the key within the PKCS#P11 token.
+   * @throws P11TokenException
+   *         if PKCS#11 token exception occurs.
+   */
+  // CHECKSTYLE:SKIP
+  protected abstract P11Identity generateECEdwardsKeypair0(String curveName,
+      P11NewKeyControl control) throws P11TokenException;
+
+  /**
+   * Generates an EC Montgomery keypair.
+   *
+   * @param curveName
+   *         curveName of the curve. Must not be {@code null}.
+   * @param control
+   *          Control of the key generation process. Must not be {@code null}.
+   * @return the identifier of the key within the PKCS#P11 token.
+   * @throws P11TokenException
+   *         if PKCS#11 token exception occurs.
+   */
+  // CHECKSTYLE:SKIP
+  protected abstract P11Identity generateECMontgomeryKeypair0(String curveName,
       P11NewKeyControl control) throws P11TokenException;
 
   /**
@@ -1068,18 +1099,79 @@ public abstract class P11Slot implements Closeable {
   public P11IdentityId generateECKeypair(String curveNameOrOid, P11NewKeyControl control)
       throws P11TokenException {
     Args.notBlank(curveNameOrOid, "curveNameOrOid");
-    assertCanGenKeypair("generateECKeypair", PKCS11Constants.CKM_EC_KEY_PAIR_GEN, control);
 
-    ASN1ObjectIdentifier curveId = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
-    if (curveId == null) {
-      throw new IllegalArgumentException("unknown curve " + curveNameOrOid);
+    P11Identity identity;
+    if (EdECConstants.isEdwardsCurve(curveNameOrOid)) {
+      assertCanGenKeypair("generateECKeypair", PKCS11Constants.CKM_EC_EDWARDS_KEY_PAIR_GEN,
+          control);
+      identity = generateECEdwardsKeypair0(curveNameOrOid, control);
+    } else if (EdECConstants.isMontgemoryCurve(curveNameOrOid)) {
+      assertCanGenKeypair("generateECKeypair", PKCS11Constants.CKM_EC_MONTGOMERY_KEY_PAIR_GEN,
+          control);
+      identity = generateECMontgomeryKeypair0(curveNameOrOid, control);
+    } else {
+      assertCanGenKeypair("generateECKeypair", PKCS11Constants.CKM_EC_KEY_PAIR_GEN, control);
+      ASN1ObjectIdentifier curveId = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
+      if (curveId == null) {
+        throw new IllegalArgumentException("unknown curve " + curveNameOrOid);
+      }
+      identity = generateECKeypair0(curveId, control);
     }
-    P11Identity identity = generateECKeypair0(curveId, control);
+
     addIdentity(identity);
     P11IdentityId id = identity.getId();
     LOG.info("generated EC keypair {}", id);
     return id;
+  }
 
+  /**
+   * Generates an EC Edwards keypair.
+   *
+   * @param curveName
+   *         Name of the EC curve. Must not be {@code null}.
+   * @param control
+   *          Control of the key generation process. Must not be {@code null}.
+   * @return the identifier of the identity within the PKCS#P11 token.
+   * @throws P11TokenException
+   *         if PKCS#11 token exception occurs.
+   */
+  // CHECKSTYLE:SKIP
+  public P11IdentityId generateECEdwardsKeypair(String curveName, P11NewKeyControl control)
+      throws P11TokenException {
+    Args.notBlank(curveName, "curveName");
+
+    assertCanGenKeypair("generateECEdwardsKeypair0",
+        PKCS11Constants.CKM_EC_EDWARDS_KEY_PAIR_GEN, control);
+    P11Identity identity = generateECEdwardsKeypair0(curveName, control);
+    addIdentity(identity);
+    P11IdentityId id = identity.getId();
+    LOG.info("generated EC Edwards keypair {}", id);
+    return id;
+  }
+
+  /**
+   * Generates an EC Montgomery keypair.
+   *
+   * @param curveName
+   *         Name of the EC curve. Must not be {@code null}.
+   * @param control
+   *          Control of the key generation process. Must not be {@code null}.
+   * @return the identifier of the identity within the PKCS#P11 token.
+   * @throws P11TokenException
+   *         if PKCS#11 token exception occurs.
+   */
+  // CHECKSTYLE:SKIP
+  public P11IdentityId generateECMontgomeryKeypair(String curveName, P11NewKeyControl control)
+      throws P11TokenException {
+    Args.notBlank(curveName, "curveName");
+
+    assertCanGenKeypair("generateECMontgomeryKeypair",
+        PKCS11Constants.CKM_EC_MONTGOMERY_KEY_PAIR_GEN, control);
+    P11Identity identity = generateECMontgomeryKeypair0(curveName, control);
+    addIdentity(identity);
+    P11IdentityId id = identity.getId();
+    LOG.info("generated EC Montgomery keypair {}", id);
+    return id;
   }
 
   /**

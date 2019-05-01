@@ -36,15 +36,19 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.bsi.BSIObjectIdentifiers;
+import org.bouncycastle.asn1.edec.EdECObjectIdentifiers;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
+import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.xipki.security.AlgorithmCode;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.ObjectIdentifiers.Xipki;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.SignerConf;
 import org.xipki.util.Args;
@@ -93,11 +97,9 @@ public class AlgorithmUtil {
   private static final Map<String, HashAlgo> mgf1SigNameToDigestOidMap;
 
   static {
-    //----- initialize the static fields curveNames, curveNameOidMap, curveOidNameMap
     {
-      List<String> nameList = new LinkedList<>();
+      //----- initialize the static fields curveNames, curveNameOidMap, curveOidNameMap
       Map<String, ASN1ObjectIdentifier> nameOidMap = new HashMap<>();
-      Map<ASN1ObjectIdentifier, String> oidNameMap = new HashMap<>();
 
       Enumeration<?> names = ECNamedCurveTable.getNames();
       while (names.hasMoreElements()) {
@@ -106,6 +108,15 @@ public class AlgorithmUtil {
         if (oid == null) {
           continue;
         }
+
+        nameOidMap.put(name, oid);
+      }
+
+      List<String> nameList = new LinkedList<>();
+      Map<ASN1ObjectIdentifier, String> oidNameMap = new HashMap<>();
+
+      for (String name : nameOidMap.keySet()) {
+        ASN1ObjectIdentifier oid = nameOidMap.get(name);
 
         nameList.add(name);
         nameOidMap.put(name, oid);
@@ -133,6 +144,8 @@ public class AlgorithmUtil {
       map.put(NISTObjectIdentifiers.id_hmacWithSHA3_256, AlgorithmCode.HMAC_SHA256);
       map.put(NISTObjectIdentifiers.id_hmacWithSHA3_384, AlgorithmCode.HMAC_SHA384);
       map.put(NISTObjectIdentifiers.id_hmacWithSHA3_512, AlgorithmCode.HMAC_SHA512);
+      map.put(Xipki.id_alg_dhPop_x25519_sha256, AlgorithmCode.DHPOP_X25519_SHA256);
+      map.put(Xipki.id_alg_dhPop_x448_sha512, AlgorithmCode.DHPOP_X448_SHA512);
 
       // GMAC
       map.put(NISTObjectIdentifiers.id_aes128_GCM, AlgorithmCode.AES128_GMAC);
@@ -182,6 +195,10 @@ public class AlgorithmUtil {
 
       // SM2
       map.put(GMObjectIdentifiers.sm2sign_with_sm3, AlgorithmCode.SM2WITHSM3);
+
+      // EDDSA
+      map.put(EdECObjectIdentifiers.id_Ed25519, AlgorithmCode.ED25519);
+      map.put(EdECObjectIdentifiers.id_Ed448, AlgorithmCode.ED448);
 
       // Hash
       for (HashAlgo hashAlgo : HashAlgo.values()) {
@@ -328,6 +345,10 @@ public class AlgorithmUtil {
       addOidNameMap(m1, m2, NISTObjectIdentifiers.id_hmacWithSHA3_256, "HMACSHA3-256");
       addOidNameMap(m1, m2, NISTObjectIdentifiers.id_hmacWithSHA3_384, "HMACSHA3-384");
       addOidNameMap(m1, m2, NISTObjectIdentifiers.id_hmacWithSHA3_512, "HMACSHA3-512");
+      // DH-Poc
+      addOidNameMap(m1, m2, Xipki.id_alg_dhPop_x25519_sha256, "DHPOP-X25519-SHA256");
+      addOidNameMap(m1, m2, Xipki.id_alg_dhPop_x448_sha512, "DHPOP-X512-SHA512");
+
       macAlgOidToNameMap = Collections.unmodifiableMap(m1);
       macAlgNameToOidMap = Collections.unmodifiableMap(m2);
     }
@@ -402,6 +423,8 @@ public class AlgorithmUtil {
       addOidNameMap(m1, m2, NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512,
           "SHA3-512WITHRSA", "RSAWITHSHA3-512");
       addOidNameMap(m1, m2, GMObjectIdentifiers.sm2sign_with_sm3, "SM3WITHSM2", "SM2WITHSM3");
+      addOidNameMap(m1, m2, EdECObjectIdentifiers.id_Ed25519, EdECConstants.ALG_Ed25519);
+      addOidNameMap(m1, m2, EdECObjectIdentifiers.id_Ed448, EdECConstants.ALG_Ed448);
       sigAlgOidToNameMap = Collections.unmodifiableMap(m1);
       sigAlgNameToOidMap = Collections.unmodifiableMap(m2);
 
@@ -574,8 +597,17 @@ public class AlgorithmUtil {
         return getECSigAlgId(hashAlgo, dsaPlain, gm);
       } else if (pubKey instanceof DSAPublicKey) {
         return getDSASigAlgId(hashAlgo);
+      } else if (pubKey instanceof EdDSAKey) {
+        String keyAlgo = pubKey.getAlgorithm();
+        if (keyAlgo.equalsIgnoreCase(EdECConstants.ALG_Ed25519)) {
+          return new AlgorithmIdentifier(EdECObjectIdentifiers.id_Ed25519);
+        } else if (keyAlgo.equalsIgnoreCase(EdECConstants.ALG_Ed448)) {
+          return new AlgorithmIdentifier(EdECObjectIdentifiers.id_Ed448);
+        } else {
+          throw new NoSuchAlgorithmException("Unknown Edwards public key " + keyAlgo);
+        }
       } else {
-        throw new NoSuchAlgorithmException("Unknown public key '" + pubKey.getClass().getName());
+        throw new NoSuchAlgorithmException("Unknown public key " + pubKey.getClass().getName());
       }
     }
   }

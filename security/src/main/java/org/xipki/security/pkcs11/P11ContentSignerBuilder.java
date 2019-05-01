@@ -36,6 +36,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.DfltConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
@@ -165,6 +166,8 @@ public class P11ContentSignerBuilder {
               + signatureAlgId.getAlgorithm().getId() + "'");
         }
         signer = createDSAContentSigner(signatureAlgId);
+      } else if (publicKey instanceof EdDSAKey) {
+        signer = createEdDSAContentSigner(signatureAlgId);
       } else {
         throw new XiSecurityException("unsupported key " + publicKey.getClass().getName());
       }
@@ -220,6 +223,12 @@ public class P11ContentSignerBuilder {
       throws XiSecurityException, P11TokenException {
     return new P11ContentSigner.DSA(cryptService, identityId, signatureAlgId,
         AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId));
+  }
+
+  // CHECKSTYLE:SKIP
+  private XiContentSigner createEdDSAContentSigner(AlgorithmIdentifier signatureAlgId)
+      throws XiSecurityException, P11TokenException {
+    return new P11ContentSigner.EdDSA(cryptService, identityId, signatureAlgId);
   }
 
 }

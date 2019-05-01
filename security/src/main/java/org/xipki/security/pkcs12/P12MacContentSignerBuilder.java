@@ -52,8 +52,7 @@ public class P12MacContentSignerBuilder {
 
   private final SecretKey key;
 
-  public P12MacContentSignerBuilder(SecretKey key)
-      throws XiSecurityException {
+  public P12MacContentSignerBuilder(SecretKey key) throws XiSecurityException {
     this.key = Args.notNull(key, "key");
   }
 

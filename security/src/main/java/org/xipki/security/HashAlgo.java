@@ -201,24 +201,24 @@ public enum HashAlgo {
     }
   }
 
-  public String hexHash(byte[] data) {
-    return HashCalculator.hexHash(this, data);
+  public String hexHash(byte[]... datas) {
+    return HashCalculator.hexHash(this, datas);
   }
 
   public String hexHash(byte[] data, int offset, int len) {
     return HashCalculator.hexHash(this, data, offset, len);
   }
 
-  public String base64Hash(byte[] data) {
-    return HashCalculator.base64Hash(this, data);
+  public String base64Hash(byte[]... datas) {
+    return HashCalculator.base64Hash(this, datas);
   }
 
   public String base64Hash(byte[] data, int offset, int len) {
     return HashCalculator.base64Hash(this, data, offset, len);
   }
 
-  public byte[] hash(byte[] data) {
-    return HashCalculator.hash(this, data);
+  public byte[] hash(byte[]... datas) {
+    return HashCalculator.hash(this, datas);
   }
 
   public byte[] hash(byte[] data, int offset, int len) {

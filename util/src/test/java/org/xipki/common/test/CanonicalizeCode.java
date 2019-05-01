@@ -126,7 +126,12 @@ public class CanonicalizeCode {
         if ("java".equals(extension)) {
           canonicalizeFile(file);
         } else if (textFileExtensions.contains(extension) && !excludeTextFiles.contains(filename)) {
-          canonicalizeTextFile(file);
+          try {
+            canonicalizeTextFile(file);
+          } catch (Exception ex) {
+            System.err.println("could not canonicalize file " + file);
+            ex.printStackTrace();
+          }
         }
       }
     }

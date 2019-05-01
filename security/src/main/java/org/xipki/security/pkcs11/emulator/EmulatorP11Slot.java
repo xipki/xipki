@@ -59,6 +59,8 @@ import javax.crypto.spec.SecretKeySpec;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERPrintableString;
+import org.bouncycastle.asn1.edec.EdECObjectIdentifiers;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -70,6 +72,8 @@ import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.crypto.params.DSAParameters;
+import org.bouncycastle.jcajce.interfaces.EdDSAKey;
+import org.bouncycastle.jcajce.interfaces.XDHKey;
 import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.operator.ContentSigner;
@@ -80,6 +84,7 @@ import org.bouncycastle.operator.bc.BcRSAContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.pkcs11.P11Identity;
@@ -157,6 +162,8 @@ class EmulatorP11Slot extends P11Slot {
     PKCS11Constants.CKM_DSA_KEY_PAIR_GEN,
     PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN,
     PKCS11Constants.CKM_EC_KEY_PAIR_GEN,
+    PKCS11Constants.CKM_EC_EDWARDS_KEY_PAIR_GEN,
+    PKCS11Constants.CKM_EC_MONTGOMERY_KEY_PAIR_GEN,
     PKCS11Constants.CKM_GENERIC_SECRET_KEY_GEN,
 
     // Digest
@@ -226,6 +233,8 @@ class EmulatorP11Slot extends P11Slot {
     PKCS11Constants.CKM_ECDSA_SHA3_256,
     PKCS11Constants.CKM_ECDSA_SHA3_384,
     PKCS11Constants.CKM_ECDSA_SHA3_512,
+
+    PKCS11Constants.CKM_EDDSA,
 
     // SM2
     PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN,
@@ -458,6 +467,18 @@ class EmulatorP11Slot extends P11Slot {
         return KeyUtil.createECPublicKey(ecdsaParams, ecPoint);
       } catch (InvalidKeySpecException ex) {
         throw new P11TokenException(ex.getMessage(), ex);
+      }
+    } else if (EdECObjectIdentifiers.id_X25519.getId().equals(algorithm)
+        || EdECObjectIdentifiers.id_Ed25519.getId().equals(algorithm)
+        || EdECObjectIdentifiers.id_X448.getId().equals(algorithm)
+        || EdECObjectIdentifiers.id_Ed448.getId().equals(algorithm)) {
+      byte[] encodedPoint = decodeHex(props.getProperty(PROP_EC_EC_POINT));
+      SubjectPublicKeyInfo pkInfo = new SubjectPublicKeyInfo(
+          new AlgorithmIdentifier(new ASN1ObjectIdentifier(algorithm)), encodedPoint);
+      try {
+        return KeyUtil.generatePublicKey(pkInfo);
+      } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
+        throw new P11TokenException("error  key algorithm " + algorithm);
       }
     } else {
       throw new P11TokenException("unknown key algorithm " + algorithm);
@@ -721,6 +742,44 @@ class EmulatorP11Slot extends P11Slot {
         throw new P11TokenException("could not ASN.1 encode the ECPoint");
       }
       sb.append(PROP_EC_EC_POINT).append('=').append(hex(encodedEcPoint)).append('\n');
+    } else if (publicKey instanceof EdDSAKey || publicKey instanceof XDHKey) {
+      String algorithm = publicKey.getAlgorithm();
+
+      String curveName;
+      if (publicKey instanceof EdDSAKey) {
+        if (EdECConstants.ALG_Ed25519.equalsIgnoreCase(algorithm)) {
+          curveName = EdECConstants.edwards25519;
+        } else if (EdECConstants.ALG_Ed448.equalsIgnoreCase(algorithm)) {
+          curveName = EdECConstants.edwards448;
+        } else {
+          throw new P11TokenException("unknown algorithm " + algorithm);
+        }
+      } else {
+        if (EdECConstants.ALG_X25519.equalsIgnoreCase(algorithm)) {
+          curveName = EdECConstants.curve25519;
+        } else if (EdECConstants.ALG_X448.equalsIgnoreCase(algorithm)) {
+          curveName = EdECConstants.curve448;
+        } else {
+          throw new P11TokenException("unknown algorithm " + algorithm);
+        }
+      }
+      // ecdsaParams
+
+      sb.append(PROP_ALGORITHM).append('=')
+        .append(EdECConstants.getKeyAlgIdForKeyAlgName(algorithm).getId()).append('\n');
+
+      byte[] encodedParams;
+      try {
+        encodedParams = new DERPrintableString(curveName).getEncoded();
+      } catch (IOException ex) {
+        throw new P11TokenException("error encoding PrintableString");
+      }
+      sb.append(PROP_EC_ECDSA_PARAMS).append('=').append(hex(encodedParams)).append('\n');
+
+      // EC point
+      SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.getInstance(publicKey.getEncoded());
+      byte[] encodedEcPoint = spki.getPublicKeyData().getOctets();
+      sb.append(PROP_EC_EC_POINT).append('=').append(hex(encodedEcPoint)).append('\n');
     } else {
       throw new IllegalArgumentException(
           "unsupported public key " + publicKey.getClass().getName());
@@ -941,10 +1000,47 @@ class EmulatorP11Slot extends P11Slot {
   }
 
   @Override
+  protected P11Identity generateECEdwardsKeypair0(String curveName,
+      P11NewKeyControl control) throws P11TokenException {
+    assertMechanismSupported(PKCS11Constants.CKM_EC_EDWARDS_KEY_PAIR_GEN);
+
+    KeyPair keypair;
+    try {
+      if (!EdECConstants.isEdwardsCurve(curveName)) {
+        throw new P11TokenException("unknown curveName " + curveName);
+      }
+
+      keypair = KeyUtil.generateEdECKeypair(curveName, random);
+    } catch (NoSuchAlgorithmException | NoSuchProviderException
+        | InvalidAlgorithmParameterException ex) {
+      throw new P11TokenException(ex.getMessage(), ex);
+    }
+    return saveP11Entity(keypair, control);
+  }
+
+  @Override
+  protected P11Identity generateECMontgomeryKeypair0(String curveName,
+      P11NewKeyControl control) throws P11TokenException {
+    assertMechanismSupported(PKCS11Constants.CKM_EC_MONTGOMERY_KEY_PAIR_GEN);
+
+    KeyPair keypair;
+    try {
+      if (!EdECConstants.isMontgemoryCurve(curveName)) {
+        throw new P11TokenException("unknown curveName " + curveName);
+      }
+
+      keypair = KeyUtil.generateEdECKeypair(curveName, random);
+    } catch (NoSuchAlgorithmException | NoSuchProviderException
+        | InvalidAlgorithmParameterException ex) {
+      throw new P11TokenException(ex.getMessage(), ex);
+    }
+    return saveP11Entity(keypair, control);
+  }
+
+  @Override
   protected P11Identity generateECKeypair0(ASN1ObjectIdentifier curveId,
       P11NewKeyControl control) throws P11TokenException {
     assertMechanismSupported(PKCS11Constants.CKM_EC_KEY_PAIR_GEN);
-
     KeyPair keypair;
     try {
       keypair = KeyUtil.generateECKeypairForCurveNameOrOid(curveId.getId(), random);

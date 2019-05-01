@@ -42,6 +42,7 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.DERUTF8String;
@@ -390,6 +391,81 @@ public abstract class ProxyMessage extends ASN1Object {
 
     public ASN1ObjectIdentifier getCurveId() {
       return curveId;
+    }
+
+  }
+
+  /**
+   * TODO.
+   * <pre>
+   * GenECKeypairParams ::= SEQUENCE {
+   *     slotId               P11SlotIdentifier,
+   *     control              NewKeyControl,
+   *     String               CurveName }
+   * </pre>
+   */
+  // CHECKSTYLE:SKIP
+  public static class GenECEdwardsOrMontgomeryKeypairParams extends ProxyMessage {
+
+    private final P11SlotIdentifier slotId;
+
+    private final P11NewKeyControl control;
+
+    private final String curveName;
+
+    public GenECEdwardsOrMontgomeryKeypairParams(P11SlotIdentifier slotId,
+        P11NewKeyControl control, String curveName) {
+      this.slotId = Args.notNull(slotId, "slotId");
+      this.control = Args.notNull(control, "control");
+      this.curveName = Args.notBlank(curveName, "curveName");
+    }
+
+    private GenECEdwardsOrMontgomeryKeypairParams(ASN1Sequence seq) throws BadAsn1ObjectException {
+      requireRange(seq, 3, 3);
+      int idx = 0;
+      slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getValue();
+      control = NewKeyControl.getInstance(seq.getObjectAt(idx++)).getControl();
+      curveName = DERPrintableString.getInstance(seq.getObjectAt(idx++)).getString();
+    }
+
+    public static GenECEdwardsOrMontgomeryKeypairParams getInstance(Object obj)
+        throws BadAsn1ObjectException {
+      if (obj == null || obj instanceof GenECEdwardsOrMontgomeryKeypairParams) {
+        return (GenECEdwardsOrMontgomeryKeypairParams) obj;
+      }
+
+      try {
+        if (obj instanceof ASN1Sequence) {
+          return new GenECEdwardsOrMontgomeryKeypairParams((ASN1Sequence) obj);
+        } else if (obj instanceof byte[]) {
+          return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
+        } else {
+          throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
+        }
+      } catch (IOException | IllegalArgumentException ex) {
+        throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(), ex);
+      }
+    }
+
+    @Override
+    public ASN1Primitive toASN1Primitive() {
+      ASN1EncodableVector vector = new ASN1EncodableVector();
+      vector.add(new SlotIdentifier(slotId));
+      vector.add(new NewKeyControl(control));
+      vector.add(new DERPrintableString(curveName));
+      return new DERSequence(vector);
+    }
+
+    public P11SlotIdentifier getSlotId() {
+      return slotId;
+    }
+
+    public P11NewKeyControl getControl() {
+      return control;
+    }
+
+    public String getCurveName() {
+      return curveName;
     }
 
   }

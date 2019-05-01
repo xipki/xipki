@@ -69,6 +69,12 @@ public class ObjectIdentifiers {
 
     public static final ASN1ObjectIdentifier id_xipki_cmp_cacertchain = id_xipki_cmp.branch("2");
 
+    private static final ASN1ObjectIdentifier id_xipki_alg = id_xipki.branch("3");
+
+    public static final ASN1ObjectIdentifier id_alg_dhPop_x25519_sha256 = id_xipki_alg.branch("1");
+
+    public static final ASN1ObjectIdentifier id_alg_dhPop_x448_sha512 = id_xipki_alg.branch("2");
+
   }
 
   public static class BaseRequirements { // base requirements

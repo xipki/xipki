@@ -24,8 +24,11 @@ import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 
+import org.bouncycastle.jcajce.interfaces.EdDSAKey;
+import org.bouncycastle.jcajce.interfaces.XDHKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.XiSecurityException;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
@@ -82,15 +85,30 @@ public abstract class P11Identity implements Comparable<P11Identity> {
           .bitLength();
     } else if (this.publicKey instanceof DSAPublicKey) {
       signatureKeyBitLength = ((DSAPublicKey) this.publicKey).getParams().getQ().bitLength();
+    } else if (this.publicKey instanceof EdDSAKey) {
+      String algorithm = this.publicKey.getAlgorithm();
+      if (EdECConstants.ALG_Ed25519.equalsIgnoreCase(algorithm)) {
+        signatureKeyBitLength = 64;
+      } else {
+        throw new IllegalArgumentException("currently only " + EdECConstants.ALG_Ed25519
+            + " curve is supported, but not " + algorithm);
+      }
+    } else if (this.publicKey instanceof XDHKey) {
+      // no signature is supported
+      signatureKeyBitLength = 0;
     } else {
-      throw new IllegalArgumentException("currently only RSA, DSA and EC public key are supported, "
-          + "but not " + this.publicKey.getAlgorithm() + " (class: "
+      throw new IllegalArgumentException("currently only RSA, DSA, EC and Edwards public key are "
+          + "supported, but not " + this.publicKey.getAlgorithm() + " (class: "
           + this.publicKey.getClass().getName() + ")");
     }
   } // constructor
 
   public byte[] sign(long mechanism, P11Params parameters, byte[] content)
       throws P11TokenException {
+    if (publicKey instanceof XDHKey) {
+      throw new P11TokenException("this identity is not suitable for sign");
+    }
+
     Args.notNull(content, "content");
     slot.assertMechanismSupported(mechanism);
     if (!supportsMechanism(mechanism, parameters)) {
@@ -231,6 +249,10 @@ public abstract class P11Identity implements Comparable<P11Identity> {
         return parameters == null;
       } else if (PKCS11Constants.CKM_VENDOR_SM2_SM3 == mechanism) {
         return parameters instanceof P11Params.P11ByteArrayParams;
+      }
+    } else if (publicKey instanceof EdDSAKey) {
+      if (PKCS11Constants.CKM_EDDSA == mechanism) {
+        return true;
       }
     }
 

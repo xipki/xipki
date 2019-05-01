@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,6 +42,7 @@ import org.xipki.security.SignerConf;
 import org.xipki.security.SignerFactory;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
 import org.xipki.util.ObjectCreationException;
@@ -117,23 +119,21 @@ public class P12SignerFactory implements SignerFactory {
       }
     }
 
+    X509Certificate peerCert = null;
+    str = conf.getConfValue("peer-cert");
+    if (StringUtil.isNotBlank(str)) {
+      InputStream peerCertStream = getInputStream(str);
+      try {
+        peerCert = X509Util.parseCert(peerCertStream);
+      } catch (CertificateException | IOException ex) {
+        throw new ObjectCreationException("could not parse peer-cert", ex);
+      }
+    }
+
     str = conf.getConfValue("keystore");
     String keyLabel = conf.getConfValue("key-label");
 
-    InputStream keystoreStream;
-    if (StringUtil.startsWithIgnoreCase(str, "base64:")) {
-      keystoreStream = new ByteArrayInputStream(
-          Base64.decode(str.substring("base64:".length())));
-    } else if (StringUtil.startsWithIgnoreCase(str, "file:")) {
-      String fn = str.substring("file:".length());
-      try {
-        keystoreStream = Files.newInputStream(Paths.get(IoUtil.expandFilepath(fn)));
-      } catch (IOException ex) {
-        throw new ObjectCreationException("file not found: " + fn);
-      }
-    } else {
-      throw new ObjectCreationException("unknown keystore content format");
-    }
+    InputStream keystoreStream = getInputStream(str);
 
     try {
       AlgorithmIdentifier macAlgId = null;
@@ -151,6 +151,10 @@ public class P12SignerFactory implements SignerFactory {
             type, keystoreStream, password, keyLabel, password);
 
         return signerBuilder.createSigner(macAlgId, parallelism, securityFactory.getRandom4Sign());
+      } else if (peerCert != null) {
+        P12XdhMacContentSignerBuilder signerBuilder = new P12XdhMacContentSignerBuilder(peerCert,
+            type, keystoreStream, password, keyLabel, password, certificateChain);
+        return signerBuilder.createSigner(parallelism);
       } else {
         P12ContentSignerBuilder signerBuilder = new P12ContentSignerBuilder(
             type, keystoreStream, password, keyLabel, password, certificateChain);
@@ -175,5 +179,20 @@ public class P12SignerFactory implements SignerFactory {
   @Override
   public void refreshToken(String type) throws XiSecurityException {
     // Nothing to do.
+  }
+
+  private static InputStream getInputStream(String str) throws ObjectCreationException {
+    if (StringUtil.startsWithIgnoreCase(str, "base64:")) {
+      return new ByteArrayInputStream(Base64.decode(str.substring("base64:".length())));
+    } else if (StringUtil.startsWithIgnoreCase(str, "file:")) {
+      String fn = str.substring("file:".length());
+      try {
+        return Files.newInputStream(Paths.get(IoUtil.expandFilepath(fn)));
+      } catch (IOException ex) {
+        throw new ObjectCreationException("file not found: " + fn);
+      }
+    } else {
+      throw new ObjectCreationException("unknown content format");
+    }
   }
 }

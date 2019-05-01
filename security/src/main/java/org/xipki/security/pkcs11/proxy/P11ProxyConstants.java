@@ -99,6 +99,10 @@ public class P11ProxyConstants {
 
   public static final short ACTION_GEN_KEYPAIR_SM2   = 0x0145;
 
+  public static final short ACTION_GEN_KEYPAIR_EC_EDWARDS    = 0x0146;
+
+  public static final short ACTION_GEN_KEYPAIR_EC_MONTGOMERY = 0x0147;
+
   private static final Map<Short, String> rcMap;
 
   private static final Map<Short, String> actionMap;

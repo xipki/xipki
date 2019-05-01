@@ -47,6 +47,7 @@ import org.bouncycastle.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.SignerConf;
@@ -336,7 +337,17 @@ public class P11Actions {
     @Override
     protected Object execute0() throws Exception {
       P11Slot slot = getSlot();
-      P11IdentityId identityId = slot.generateECKeypair(curveName, getControl());
+      P11NewKeyControl control = getControl();
+
+      P11IdentityId identityId;
+      if (EdECConstants.isEdwardsCurve(curveName)) {
+        identityId = slot.generateECEdwardsKeypair(curveName, control);
+      } else if (EdECConstants.isMontgemoryCurve(curveName)) {
+        identityId = slot.generateECMontgomeryKeypair(curveName, control);
+      } else {
+        identityId = slot.generateECKeypair(curveName, control);
+      }
+
       finalize("EC", identityId);
       return null;
     }

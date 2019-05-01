@@ -19,10 +19,12 @@ package org.xipki.security.pkcs12;
 
 import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
+import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
+import java.security.Signature;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -48,12 +50,16 @@ import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.jcajce.interfaces.EdDSAKey;
+import org.bouncycastle.jcajce.interfaces.XDHKey;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.bc.BcContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcDSAContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcECContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcRSAContentSignerBuilder;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.SignatureSigner;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
@@ -141,8 +147,36 @@ public class P12KeyGenerator {
   // CHECKSTYLE:SKIP
   public P12KeyGenerationResult generateECKeypair(String curveNameOrOid,
       KeystoreGenerationParameters params, String selfSignedCertSubject) throws Exception {
-    KeyPairWithSubjectPublicKeyInfo kp = genECKeypair(curveNameOrOid, params.getRandom());
-    return generateIdentity(kp, params, selfSignedCertSubject);
+    ASN1ObjectIdentifier curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
+    if (curveOid == null) {
+      throw new IllegalArgumentException("invalid curveNameOrOid '" + curveNameOrOid + "'");
+    }
+
+    KeyPair keypair = KeyUtil.generateECKeypair(curveOid, params.getRandom());
+    AlgorithmIdentifier algId = new AlgorithmIdentifier(
+        X9ObjectIdentifiers.id_ecPublicKey, curveOid);
+
+    ECPublicKey pub = (ECPublicKey) keypair.getPublic();
+    int orderBitLength = pub.getParams().getOrder().bitLength();
+    byte[] keyData = KeyUtil.getUncompressedEncodedECPoint(pub.getW(), orderBitLength);
+    SubjectPublicKeyInfo subjectPublicKeyInfo = new SubjectPublicKeyInfo(algId, keyData);
+
+    return generateIdentity(new KeyPairWithSubjectPublicKeyInfo(keypair, subjectPublicKeyInfo),
+        params, selfSignedCertSubject);
+  }
+
+  // CHECKSTYLE:SKIP
+  public P12KeyGenerationResult generateEdECKeypair(String curveName,
+      KeystoreGenerationParameters params, String selfSignedCertSubject) throws Exception {
+    if (!EdECConstants.isEdwardsOrMontgemoryCurve(curveName)) {
+      throw new IllegalArgumentException("invalid curveName " + curveName);
+    }
+    KeyPair keypair = KeyUtil.generateEdECKeypair(curveName, params.getRandom());
+    SubjectPublicKeyInfo subjectPublicKeyInfo =
+        KeyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
+
+    return generateIdentity(new KeyPairWithSubjectPublicKeyInfo(keypair, subjectPublicKeyInfo),
+        params, selfSignedCertSubject);
   }
 
   public P12KeyGenerationResult generateSecretKey(String algorithm, int keyBitLen,
@@ -175,26 +209,6 @@ public class P12KeyGenerator {
     P12KeyGenerationResult result = new P12KeyGenerationResult(ksStream.toByteArray());
     result.setKeystoreObject(ks);
     return result;
-  }
-
-  // CHECKSTYLE:SKIP
-  private KeyPairWithSubjectPublicKeyInfo genECKeypair(String curveNameOrOid, SecureRandom random)
-      throws Exception {
-    ASN1ObjectIdentifier curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
-    if (curveOid == null) {
-      throw new IllegalArgumentException("invalid curveNameOrOid '" + curveNameOrOid + "'");
-    }
-
-    KeyPair kp = KeyUtil.generateECKeypair(curveOid, random);
-    AlgorithmIdentifier algId = new AlgorithmIdentifier(
-        X9ObjectIdentifiers.id_ecPublicKey, curveOid);
-
-    ECPublicKey pub = (ECPublicKey) kp.getPublic();
-    int orderBitLength = pub.getParams().getOrder().bitLength();
-    byte[] keyData = KeyUtil.getUncompressedEncodedECPoint(pub.getW(), orderBitLength);
-    SubjectPublicKeyInfo subjectPublicKeyInfo = new SubjectPublicKeyInfo(algId, keyData);
-
-    return new KeyPairWithSubjectPublicKeyInfo(kp, subjectPublicKeyInfo);
   }
 
   // CHECKSTYLE:SKIP
@@ -292,6 +306,26 @@ public class P12KeyGenerator {
 
       builder = new BcECContentSignerBuilder(new AlgorithmIdentifier(sigOid),
           buildAlgId(hashAlgo.getOid()));
+    } else if (key instanceof EdDSAKey) {
+      String algorithm = key.getAlgorithm();
+      ASN1ObjectIdentifier keyId = EdECConstants.getKeyAlgIdForKeyAlgName(algorithm);
+      if (keyId == null) {
+        throw new InvalidKeyException("unknown EdDSA key algorithm " + algorithm);
+      }
+      Signature signer = Signature.getInstance("EdDSA", "BC");
+
+      return new SignatureSigner(new AlgorithmIdentifier(keyId), signer, key);
+    } else if (key instanceof XDHKey) {
+      String algorithm = key.getAlgorithm();
+      ASN1ObjectIdentifier curveId = EdECConstants.getKeyAlgIdForKeyAlgName(algorithm);
+      if (curveId == null) {
+        throw new InvalidKeyException("unknown EdDSA key algorithm " + algorithm);
+      }
+      Signature signer = Signature.getInstance("EdDSA", "BC");
+
+      // Just dummy: signature created by the signKey cannot be verified by the public key.
+      PrivateKey signKey = KeyUtil.convertXDHToDummyEdDSAPrivateKey(key);
+      return new SignatureSigner(new AlgorithmIdentifier(curveId), signer, signKey);
     } else {
       throw new IllegalArgumentException("unknown type of key " + key.getClass().getName());
     }

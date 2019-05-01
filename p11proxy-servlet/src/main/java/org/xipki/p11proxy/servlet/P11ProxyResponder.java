@@ -83,6 +83,9 @@ public class P11ProxyResponder {
     actions.add(P11ProxyConstants.ACTION_ADD_CERT);
     actions.add(P11ProxyConstants.ACTION_GEN_KEYPAIR_DSA);
     actions.add(P11ProxyConstants.ACTION_GEN_KEYPAIR_EC);
+    actions.add(P11ProxyConstants.ACTION_GEN_KEYPAIR_EC_EDWARDS);
+    actions.add(P11ProxyConstants.ACTION_GEN_KEYPAIR_EC_MONTGOMERY);
+    actions.add(P11ProxyConstants.ACTION_GEN_KEYPAIR_SM2);
     actions.add(P11ProxyConstants.ACTION_GEN_KEYPAIR_RSA);
     actions.add(P11ProxyConstants.ACTION_GEN_SECRET_KEY);
     actions.add(P11ProxyConstants.ACTION_IMPORT_SECRET_KEY);
@@ -219,6 +222,24 @@ public class P11ProxyResponder {
           P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());
           P11IdentityId identityId = slot.generateECKeypair(
               asn1.getCurveId().getId(), asn1.getControl());
+          ASN1Object obj = new ProxyMessage.IdentityId(identityId);
+          return getSuccessResp(version, transactionId, action, obj);
+        }
+        case P11ProxyConstants.ACTION_GEN_KEYPAIR_EC_EDWARDS: {
+          ProxyMessage.GenECEdwardsOrMontgomeryKeypairParams asn1 =
+              ProxyMessage.GenECEdwardsOrMontgomeryKeypairParams.getInstance(content);
+          P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());
+          P11IdentityId identityId = slot.generateECEdwardsKeypair(
+              asn1.getCurveName(), asn1.getControl());
+          ASN1Object obj = new ProxyMessage.IdentityId(identityId);
+          return getSuccessResp(version, transactionId, action, obj);
+        }
+        case P11ProxyConstants.ACTION_GEN_KEYPAIR_EC_MONTGOMERY: {
+          ProxyMessage.GenECEdwardsOrMontgomeryKeypairParams asn1 =
+              ProxyMessage.GenECEdwardsOrMontgomeryKeypairParams.getInstance(content);
+          P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());
+          P11IdentityId identityId = slot.generateECMontgomeryKeypair(
+              asn1.getCurveName(), asn1.getControl());
           ASN1Object obj = new ProxyMessage.IdentityId(identityId);
           return getSuccessResp(version, transactionId, action, obj);
         }

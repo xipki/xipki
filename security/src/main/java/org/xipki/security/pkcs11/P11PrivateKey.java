@@ -23,6 +23,8 @@ import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
+import org.bouncycastle.jcajce.interfaces.EdDSAKey;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.XiSecurityException;
 import org.xipki.util.Args;
 
@@ -53,15 +55,18 @@ public class P11PrivateKey implements PrivateKey {
 
     this.publicKey = p11CryptService.getIdentity(identityId).getPublicKey();
 
-    if (this.publicKey instanceof RSAPublicKey) {
+    if (publicKey instanceof RSAPublicKey) {
       algorithm = "RSA";
       keysize = ((RSAPublicKey) publicKey).getModulus().bitLength();
-    } else if (this.publicKey instanceof DSAPublicKey) {
+    } else if (publicKey instanceof DSAPublicKey) {
       algorithm = "DSA";
       keysize = ((DSAPublicKey) publicKey).getParams().getP().bitLength();
-    } else if (this.publicKey instanceof ECPublicKey) {
+    } else if (publicKey instanceof ECPublicKey) {
       algorithm = "EC";
       keysize = ((ECPublicKey) publicKey).getParams().getCurve().getField().getFieldSize();
+    } else if (publicKey instanceof EdDSAKey) {
+      algorithm = publicKey.getAlgorithm();
+      keysize = EdECConstants.getKeyBitSizeForKeyAlgName(algorithm);
     } else {
       throw new P11TokenException("unknown public key: " + publicKey);
     }

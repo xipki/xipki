@@ -262,6 +262,24 @@ public class ProxyP11Slot extends P11Slot {
   }
 
   @Override
+  protected P11Identity generateECEdwardsKeypair0(String curveName, P11NewKeyControl control)
+      throws P11TokenException {
+    ProxyMessage.GenECEdwardsOrMontgomeryKeypairParams asn1 =
+        new ProxyMessage.GenECEdwardsOrMontgomeryKeypairParams(slotId, control, curveName);
+    byte[] resp = module.send(P11ProxyConstants.ACTION_GEN_KEYPAIR_EC_EDWARDS, asn1);
+    return parseGenerateKeypairResult(resp);
+  }
+
+  @Override
+  protected P11Identity generateECMontgomeryKeypair0(String curveName, P11NewKeyControl control)
+      throws P11TokenException {
+    ProxyMessage.GenECEdwardsOrMontgomeryKeypairParams asn1 =
+        new ProxyMessage.GenECEdwardsOrMontgomeryKeypairParams(slotId, control, curveName);
+    byte[] resp = module.send(P11ProxyConstants.ACTION_GEN_KEYPAIR_EC, asn1);
+    return parseGenerateKeypairResult(resp);
+  }
+
+  @Override
   protected P11Identity generateSM2Keypair0(P11NewKeyControl control) throws P11TokenException {
     ProxyMessage.GenSM2KeypairParams asn1 =
         new ProxyMessage.GenSM2KeypairParams(slotId, control);

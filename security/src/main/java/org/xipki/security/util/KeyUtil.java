@@ -45,9 +45,11 @@ import java.security.spec.ECGenParameterSpec;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPoint;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,23 +57,37 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.edec.EdECObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X962Parameters;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.params.DSAParameters;
+import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
+import org.bouncycastle.crypto.params.Ed448PublicKeyParameters;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
+import org.bouncycastle.crypto.params.X25519PublicKeyParameters;
+import org.bouncycastle.crypto.params.X448PublicKeyParameters;
+import org.bouncycastle.crypto.util.PrivateKeyFactory;
+import org.bouncycastle.jcajce.interfaces.EdDSAKey;
+import org.bouncycastle.jcajce.interfaces.XDHKey;
 import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSAUtil;
 import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.util.BigIntegers;
+import org.bouncycastle.util.encoders.Hex;
+import org.xipki.security.EdECConstants;
 import org.xipki.util.Args;
+import org.xipki.util.CompareUtil;
 
 /**
  * TODO.
@@ -80,6 +96,11 @@ import org.xipki.util.Args;
  */
 
 public class KeyUtil {
+
+  private static final byte[]  x25519Prefix = Hex.decode("302a300506032b656e032100");
+  private static final byte[] Ed25519Prefix = Hex.decode("302a300506032b6570032100");
+  private static final byte[]    x448Prefix = Hex.decode("3042300506032b656f033900");
+  private static final byte[]   Ed448Prefix = Hex.decode("3043300506032b6571033a00");
 
   private static final Map<String, KeyFactory> KEY_FACTORIES = new HashMap<>();
 
@@ -173,6 +194,21 @@ public class KeyUtil {
   }
 
   // CHECKSTYLE:SKIP
+  public static KeyPair generateEdECKeypair(String curveName, SecureRandom random)
+      throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
+    Args.notBlank(curveName, "curveName");
+
+    String algorithm = EdECConstants.getKeyAlgNameForCurve(curveName);
+    KeyPairGenerator kpGen = getKeyPairGenerator(algorithm);
+    synchronized (kpGen) {
+      if (random != null) {
+        kpGen.initialize(EdECConstants.getKeyBitSizeForCurve(curveName), random);
+      }
+      return kpGen.generateKeyPair();
+    }
+  }
+
+  // CHECKSTYLE:SKIP
   public static KeyPair generateECKeypair(ASN1ObjectIdentifier curveId, SecureRandom random)
       throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
     Args.notNull(curveId, "curveId");
@@ -186,6 +222,45 @@ public class KeyUtil {
         kpGen.initialize(spec, random);
       }
       return kpGen.generateKeyPair();
+    }
+  }
+
+  /**
+   * Convert XDH edwards private key to EdDSA private key. As the name indicates,
+   * the converted key is dummy, you cannot verify the signature signed with
+   * the converted private key against the correspond public key.
+   */
+  // CHECKSTYLE:SKIP
+  public static PrivateKey convertXDHToDummyEdDSAPrivateKey(PrivateKey key)
+      throws InvalidKeySpecException {
+    if (key instanceof XDHKey && key instanceof PrivateKey) {
+      PrivateKeyInfo xdhPki = PrivateKeyInfo.getInstance(key.getEncoded());
+      String xdhAlgo = key.getAlgorithm();
+
+      try {
+        PrivateKeyInfo edPki;
+        if (xdhAlgo.equalsIgnoreCase(EdECConstants.ALG_X25519)) {
+          edPki = new PrivateKeyInfo(
+              new AlgorithmIdentifier(EdECObjectIdentifiers.id_Ed25519), xdhPki.parsePrivateKey());
+        } else if (xdhAlgo.equalsIgnoreCase(EdECConstants.ALG_X448)) {
+          byte[] x448Octets = ASN1OctetString.getInstance(xdhPki.parsePrivateKey()).getOctets();
+          byte[] ed448Octets = new byte[57];
+          System.arraycopy(x448Octets, 0, ed448Octets, 0, 56);
+
+          edPki = new PrivateKeyInfo(
+              new AlgorithmIdentifier(EdECObjectIdentifiers.id_Ed448),
+              new DEROctetString(ed448Octets));
+        } else {
+          throw new IllegalArgumentException("unknown key algorithm " + xdhAlgo);
+        }
+
+        byte[] encoded = edPki.getEncoded();
+        return getKeyFactory("EDDSA").generatePrivate(new PKCS8EncodedKeySpec(encoded));
+      } catch (IOException ex) {
+        throw new InvalidKeySpecException("could not convert XDH to EdDSA private key", ex);
+      }
+    } else {
+      throw new IllegalArgumentException("key is not an XDH private key");
     }
   }
 
@@ -249,6 +324,10 @@ public class KeyUtil {
     } else if (X9ObjectIdentifiers.id_ecPublicKey.equals(aid)) {
       algorithm = "EC";
     } else {
+      algorithm = EdECConstants.getKeyAlgNameForKeyAlg(pkInfo.getAlgorithm());
+    }
+
+    if (algorithm == null) {
       throw new InvalidKeySpecException("unsupported key algorithm: " + aid);
     }
 
@@ -285,6 +364,12 @@ public class KeyUtil {
       return ECUtil.generatePrivateKeyParameter(key);
     } else if (key instanceof DSAPrivateKey) {
       return DSAUtil.generatePrivateKeyParameter(key);
+    } else if (key instanceof XDHKey || key instanceof EdDSAKey) {
+      try {
+        return PrivateKeyFactory.createKey(key.getEncoded());
+      } catch (IOException ex) {
+        throw new InvalidKeyException("exception creating key: " + ex.getMessage(), ex);
+      }
     } else {
       throw new InvalidKeyException("unknown key " + key.getClass().getName());
     }
@@ -301,6 +386,20 @@ public class KeyUtil {
       return ECUtil.generatePublicKeyParameter(key);
     } else if (key instanceof DSAPublicKey) {
       return DSAUtil.generatePublicKeyParameter(key);
+    } else if (key instanceof XDHKey || key instanceof EdDSAKey) {
+      byte[] encoded = key.getEncoded();
+      String algorithm = key.getAlgorithm();
+      if (EdECConstants.ALG_X25519.equalsIgnoreCase(algorithm)) {
+        return new X25519PublicKeyParameters(encoded, encoded.length - 32);
+      } else if (EdECConstants.ALG_Ed25519.equalsIgnoreCase(algorithm)) {
+        return new Ed25519PublicKeyParameters(encoded, encoded.length - 32);
+      } else if (EdECConstants.ALG_X448.equalsIgnoreCase(algorithm)) {
+        return new X448PublicKeyParameters(encoded, encoded.length - 56);
+      } else if (EdECConstants.ALG_Ed448.equalsIgnoreCase(algorithm)) {
+        return new Ed448PublicKeyParameters(encoded, encoded.length - 57);
+      } else {
+        throw new InvalidKeyException("unknown Edwards key " + algorithm);
+      }
     } else {
       throw new InvalidKeyException("unknown key " + key.getClass().getName());
     }
@@ -366,6 +465,44 @@ public class KeyUtil {
       AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey,
           curveOid);
       return new SubjectPublicKeyInfo(algId, pubKey);
+    } else if (publicKey instanceof XDHKey || publicKey instanceof EdDSAKey) {
+      String algorithm = publicKey.getAlgorithm();
+      byte[] encoded = publicKey.getEncoded();
+
+      int keysize;
+      byte[] prefix;
+      ASN1ObjectIdentifier algOid;
+      if (EdECConstants.ALG_Ed25519.equalsIgnoreCase(algorithm)) {
+        algOid = EdECObjectIdentifiers.id_Ed25519;
+        keysize = 32;
+        prefix = Ed25519Prefix;
+      } else if (EdECConstants.ALG_X25519.equalsIgnoreCase(algorithm)) {
+        algOid = EdECObjectIdentifiers.id_X25519;
+        keysize = 32;
+        prefix = x25519Prefix;
+      } else if (EdECConstants.ALG_Ed448.equalsIgnoreCase(algorithm)) {
+        algOid = EdECObjectIdentifiers.id_Ed448;
+        keysize = 57;
+        prefix = Ed448Prefix;
+      } else if (EdECConstants.ALG_X448.equalsIgnoreCase(algorithm)) {
+        algOid = EdECObjectIdentifiers.id_X448;
+        keysize = 56;
+        prefix = x448Prefix;
+      } else {
+        throw new IllegalArgumentException("invalid algorithm " + algorithm);
+      }
+
+      if (encoded.length != prefix.length + keysize) {
+        throw new IllegalArgumentException("invalid encoded PublicKey");
+      }
+
+      if (!CompareUtil.areEqual(encoded, 0, prefix, 0, prefix.length)) {
+        throw new IllegalArgumentException("invalid encoded PublicKey");
+      }
+
+      byte[] keyData = Arrays.copyOfRange(encoded, prefix.length, prefix.length + keysize);
+      AlgorithmIdentifier algId = new AlgorithmIdentifier(algOid);
+      return new SubjectPublicKeyInfo(algId, keyData);
     } else {
       throw new InvalidKeyException("unknown publicKey class " + publicKey.getClass().getName());
     }

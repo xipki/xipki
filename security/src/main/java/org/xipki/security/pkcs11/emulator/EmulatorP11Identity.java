@@ -45,6 +45,8 @@ import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.modes.GCMBlockCipher;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
+import org.bouncycastle.jcajce.interfaces.EdDSAKey;
+import org.bouncycastle.jcajce.interfaces.XDHKey;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,6 +81,9 @@ public class EmulatorP11Identity extends P11Identity {
   private final ConcurrentBag<ConcurrentBagEntry<Cipher>> rsaCiphers = new ConcurrentBag<>();
 
   private final ConcurrentBag<ConcurrentBagEntry<Signature>> dsaSignatures =
+      new ConcurrentBag<>();
+
+  private final ConcurrentBag<ConcurrentBagEntry<Signature>> eddsaSignatures =
       new ConcurrentBag<>();
 
   private final ConcurrentBag<ConcurrentBagEntry<SM2Signer>> sm2Signers = new ConcurrentBag<>();
@@ -132,9 +137,13 @@ public class EmulatorP11Identity extends P11Identity {
         algorithm = sm2curve ? null : "NONEwithECDSA";
       } else if (this.publicKey instanceof DSAPublicKey) {
         algorithm = "NONEwithDSA";
+      } else if (this.publicKey instanceof EdDSAKey) {
+        algorithm = null;
+      } else if (this.publicKey instanceof XDHKey) {
+        algorithm = null;
       } else {
-        throw new IllegalArgumentException("Currently only RSA, DSA and EC public key are "
-            + "supported, but not " + this.publicKey.getAlgorithm()
+        throw new IllegalArgumentException("Currently only RSA, DSA, EC, EC Edwards and EC "
+            + "Montgomery public key are supported, but not " + this.publicKey.getAlgorithm()
             + " (class: " + this.publicKey.getClass().getName() + ")");
       }
 
@@ -144,6 +153,15 @@ public class EmulatorP11Identity extends P11Identity {
           dsaSignature.initSign(privateKey, random);
           dsaSignatures.add(new ConcurrentBagEntry<>(dsaSignature));
         }
+      } else if (this.publicKey instanceof EdDSAKey) {
+        algorithm = this.publicKey.getAlgorithm();
+        for (int i = 0; i < maxSessions; i++) {
+          Signature signature = Signature.getInstance(algorithm, "BC");
+          signature.initSign(privateKey);
+          eddsaSignatures.add(new ConcurrentBagEntry<>(signature));
+        }
+      } else if (this.publicKey instanceof XDHKey) {
+        // do nothing. not suitable for sign.
       } else {
         for (int i = 0; i < maxSessions; i++) {
           SM2Signer sm2signer = new SM2Signer(ECUtil.generatePrivateKeyParameter(privateKey));
@@ -190,6 +208,8 @@ public class EmulatorP11Identity extends P11Identity {
       return dsaAndEcdsaSign(content, HashAlgo.SHA3_384);
     } else if (PKCS11Constants.CKM_ECDSA_SHA3_512 == mechanism) {
       return dsaAndEcdsaSign(content, HashAlgo.SHA3_512);
+    } else if (PKCS11Constants.CKM_EDDSA == mechanism) {
+      return eddsaSign(content);
     } else if (PKCS11Constants.CKM_VENDOR_SM2 == mechanism) {
       return sm2SignHash(content);
     } else if (PKCS11Constants.CKM_VENDOR_SM2_SM3 == mechanism) {
@@ -413,6 +433,33 @@ public class EmulatorP11Identity extends P11Identity {
       throw new P11TokenException("XiSecurityException: " + ex.getMessage(), ex);
     } finally {
       dsaSignatures.requite(sig0);
+    }
+  }
+
+  private byte[] eddsaSign(byte[] dataToSign) throws P11TokenException {
+    if (!(signingKey instanceof EdDSAKey)) {
+      throw new P11TokenException("given signing key is not suitable for EdDSA sign");
+    }
+
+    ConcurrentBagEntry<Signature> sig0;
+    try {
+      sig0 = eddsaSignatures.borrow(5000, TimeUnit.MILLISECONDS);
+    } catch (InterruptedException ex) {
+      throw new P11TokenException("InterruptedException occurs while retrieving idle signature");
+    }
+
+    if (sig0 == null) {
+      throw new P11TokenException("no idle DSA Signature available");
+    }
+
+    try {
+      Signature sig = sig0.value();
+      sig.update(dataToSign);
+      return sig.sign();
+    } catch (SignatureException ex) {
+      throw new P11TokenException("SignatureException: " + ex.getMessage(), ex);
+    } finally {
+      eddsaSignatures.requite(sig0);
     }
   }
 

@@ -39,6 +39,7 @@ import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfoBuilder;
 import org.bouncycastle.pkcs.PKCSException;
 import org.bouncycastle.pkcs.jcajce.JcePKCSPBEInputDecryptorProviderBuilder;
 import org.bouncycastle.pkcs.jcajce.JcePKCSPBEOutputEncryptorBuilder;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.pkcs11.P11TokenException;
 import org.xipki.util.Args;
 
@@ -94,6 +95,10 @@ class PrivateKeyCryptor {
     } else if (X9ObjectIdentifiers.id_ecPublicKey.equals(keyAlgOid)) {
       algoName = "EC";
     } else {
+      algoName = EdECConstants.getKeyAlgNameForKeyAlg(keyAlg);
+    }
+
+    if (algoName == null) {
       throw new P11TokenException("unknown private key algorithm " + keyAlgOid.getId());
     }
 

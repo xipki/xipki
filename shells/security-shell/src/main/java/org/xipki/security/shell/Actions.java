@@ -346,7 +346,13 @@ public class Actions {
 
     private static final long _12_HOURS_MS = 12L * 60 * 60 * 1000;
 
-    @Option(name = "--hash", description = "hash algorithm name")
+    @Option(name = "--peer-cert",
+        description = "Peer certificate, only for the Diffie-Hellman keys")
+    @Completion(FileCompleter.class)
+    protected String peerCertFile;
+
+    @Option(name = "--hash", description = "hash algorithm name (will be ignored in some keys, "
+        + "e.g. edwards curve based keys)")
     @Completion(Completers.HashAlgCompleter.class)
     protected String hashAlgo = "SHA256";
 

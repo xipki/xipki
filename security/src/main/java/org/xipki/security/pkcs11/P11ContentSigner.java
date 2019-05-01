@@ -30,6 +30,7 @@ import java.util.Map;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.bsi.BSIObjectIdentifiers;
+import org.bouncycastle.asn1.edec.EdECObjectIdentifiers;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -302,6 +303,44 @@ abstract class P11ContentSigner implements XiContentSigner {
 
       return cryptService.getIdentity(identityId).sign(mechanism, null, dataToSign);
     }
+  }
+
+  // CHECKSTYLE:SKIP
+  static class EdDSA extends P11ContentSigner {
+
+    private final ByteArrayOutputStream outputStream;
+
+    EdDSA(P11CryptService cryptService, P11IdentityId identityId,
+        AlgorithmIdentifier signatureAlgId)
+        throws XiSecurityException, P11TokenException {
+      super(cryptService, identityId, signatureAlgId);
+
+      ASN1ObjectIdentifier algOid = signatureAlgId.getAlgorithm();
+      if (!EdECObjectIdentifiers.id_Ed25519.equals(algOid)) {
+        throw new XiSecurityException("unsupproted signature algorithm " + algOid.getId());
+      }
+
+      this.outputStream = new ByteArrayOutputStream();
+    }
+
+    @Override
+    public OutputStream getOutputStream() {
+      outputStream.reset();
+      return outputStream;
+    }
+
+    @Override
+    public byte[] getSignature() {
+      byte[] content = outputStream.toByteArray();
+      outputStream.reset();
+      try {
+        return cryptService.getIdentity(identityId).sign(PKCS11Constants.CKM_EDDSA, null, content);
+      } catch (Throwable th) {
+        LogUtil.warn(LOG, th);
+        throw new RuntimeCryptoException(th.getClass().getName() + ": " + th.getMessage());
+      }
+    }
+
   }
 
   static class Mac extends P11ContentSigner {

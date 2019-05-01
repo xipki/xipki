@@ -42,6 +42,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.SignerConf;
@@ -59,6 +60,7 @@ import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.Args;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.ObjectCreationException;
+import org.xipki.util.StringUtil;
 
 /**
  * TODO.
@@ -242,15 +244,18 @@ public class P12Actions {
         throw new ObjectCreationException("could not read password: " + ex.getMessage(), ex);
       }
       SignerConf conf = getKeystoreSignerConf(p12File, new String(pwd),
-          HashAlgo.getNonNullInstance(hashAlgo), signatureAlgoControl);
+          HashAlgo.getNonNullInstance(hashAlgo), signatureAlgoControl, peerCertFile);
       return securityFactory.createSigner("PKCS12", conf, (X509Certificate[]) null);
     }
 
     static SignerConf getKeystoreSignerConf(String keystoreFile, String password,
-        HashAlgo hashAlgo, SignatureAlgoControl signatureAlgoControl) {
+        HashAlgo hashAlgo, SignatureAlgoControl signatureAlgoControl, String peerCertFile) {
       ConfPairs conf = new ConfPairs("password", password);
       conf.putPair("parallelism", Integer.toString(1));
       conf.putPair("keystore", "file:" + keystoreFile);
+      if (StringUtil.isNotBlank(peerCertFile)) {
+        conf.putPair("peer-cert", "file:" + peerCertFile);
+      }
       return new SignerConf(conf.getEncoded(), hashAlgo, signatureAlgoControl);
     }
 
@@ -309,8 +314,14 @@ public class P12Actions {
 
     @Override
     protected Object execute0() throws Exception {
-      P12KeyGenerationResult keypair = new P12KeyGenerator().generateECKeypair(curveName,
-          getKeyGenParameters(), subject);
+      P12KeyGenerator keyGen = new P12KeyGenerator();
+      KeystoreGenerationParameters keyGenParams = getKeyGenParameters();
+      P12KeyGenerationResult keypair;
+      if (EdECConstants.isEdwardsOrMontgemoryCurve(curveName)) {
+        keypair = keyGen.generateEdECKeypair(curveName, keyGenParams, subject);
+      } else {
+        keypair = new P12KeyGenerator().generateECKeypair(curveName, keyGenParams, subject);
+      }
       saveKey(keypair);
 
       return null;

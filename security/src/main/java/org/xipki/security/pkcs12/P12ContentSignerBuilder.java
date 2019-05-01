@@ -45,6 +45,8 @@ import java.util.Set;
 
 import javax.crypto.NoSuchPaddingException;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.edec.EdECObjectIdentifiers;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -56,6 +58,7 @@ import org.bouncycastle.crypto.signers.DSASigner;
 import org.bouncycastle.crypto.signers.ECDSASigner;
 import org.bouncycastle.crypto.signers.RSADigestSigner;
 import org.bouncycastle.crypto.signers.SM2Signer;
+import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSAUtil;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.operator.ContentSigner;
@@ -170,6 +173,7 @@ public class P12ContentSignerBuilder {
 
   } // class ECDSAContentSignerBuilder
 
+  // CHECKSTYLE:SKIP
   private static class SM2ContentSignerBuilder extends BcContentSignerBuilder {
 
     private SM2ContentSignerBuilder() throws NoSuchAlgorithmException {
@@ -235,7 +239,8 @@ public class P12ContentSignerBuilder {
       this.key = (PrivateKey) ks.getKey(tmpKeyname, keyPassword);
 
       if (!(key instanceof RSAPrivateKey || key instanceof DSAPrivateKey
-          || key instanceof ECPrivateKey)) {
+          || key instanceof ECPrivateKey
+          || key instanceof EdDSAKey)) {
         throw new XiSecurityException("unsupported key " + key.getClass().getName());
       }
 
@@ -284,6 +289,12 @@ public class P12ContentSignerBuilder {
       provName = null;
     } else if (AlgorithmUtil.isDSASigAlg(signatureAlgId)) {
       provName = "SUN";
+    } else {
+      ASN1ObjectIdentifier oid = signatureAlgId.getAlgorithm();
+      if (EdECObjectIdentifiers.id_Ed25519.equals(oid)
+          || EdECObjectIdentifiers.id_Ed448.equals(oid)) {
+        provName = "BC";
+      }
     }
 
     if (provName != null && Security.getProvider(provName) != null) {

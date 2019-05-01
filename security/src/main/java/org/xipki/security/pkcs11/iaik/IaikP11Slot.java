@@ -19,6 +19,7 @@ package org.xipki.security.pkcs11.iaik;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -37,10 +38,15 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERPrintableString;
+import org.bouncycastle.asn1.edec.EdECObjectIdentifiers;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.ECNamedCurveTable;
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.P11Identity;
@@ -78,14 +84,13 @@ import iaik.pkcs.pkcs11.objects.DSAPublicKey;
 import iaik.pkcs.pkcs11.objects.ECPrivateKey;
 import iaik.pkcs.pkcs11.objects.ECPublicKey;
 import iaik.pkcs.pkcs11.objects.Key;
+import iaik.pkcs.pkcs11.objects.Key.KeyType;
 import iaik.pkcs.pkcs11.objects.KeyPair;
 import iaik.pkcs.pkcs11.objects.PKCS11Object;
 import iaik.pkcs.pkcs11.objects.PrivateKey;
 import iaik.pkcs.pkcs11.objects.PublicKey;
 import iaik.pkcs.pkcs11.objects.RSAPrivateKey;
 import iaik.pkcs.pkcs11.objects.RSAPublicKey;
-import iaik.pkcs.pkcs11.objects.SM2PrivateKey;
-import iaik.pkcs.pkcs11.objects.SM2PublicKey;
 import iaik.pkcs.pkcs11.objects.SecretKey;
 import iaik.pkcs.pkcs11.objects.Storage;
 import iaik.pkcs.pkcs11.objects.ValuedSecretKey;
@@ -855,13 +860,46 @@ class IaikP11Slot extends P11Slot {
       }
     } else if (p11Key instanceof ECPublicKey) {
       ECPublicKey ecP11Key = (ECPublicKey) p11Key;
-      byte[] encodedAlgorithmIdParameters = ecP11Key.getEcdsaParams().getByteArrayValue();
+      long keyType = ecP11Key.getKeyType().getLongValue().longValue();
+      byte[] ecParameters = ecP11Key.getEcdsaParams().getByteArrayValue();
       byte[] encodedPoint = DEROctetString.getInstance(
           ecP11Key.getEcPoint().getByteArrayValue()).getOctets();
-      try {
-        return KeyUtil.createECPublicKey(encodedAlgorithmIdParameters, encodedPoint);
-      } catch (InvalidKeySpecException ex) {
-        throw new XiSecurityException(ex.getMessage(), ex);
+
+      if (keyType == KeyType.EC_EDWARDS || keyType == KeyType.EC_MONTGOMERY) {
+        String curveName = DERPrintableString.getInstance(ecParameters).getString();
+
+        ASN1ObjectIdentifier algOid;
+        if (keyType == KeyType.EC_EDWARDS) {
+          if (EdECConstants.edwards25519.equalsIgnoreCase(curveName)) {
+            algOid = EdECObjectIdentifiers.id_Ed25519;
+          } else if (EdECConstants.edwards448.equalsIgnoreCase(curveName)) {
+            algOid = EdECObjectIdentifiers.id_Ed448;
+          } else {
+            throw new XiSecurityException("unknown edwards curveName " + curveName);
+          }
+        } else {
+          if (EdECConstants.curve25519.equalsIgnoreCase(curveName)) {
+            algOid = EdECObjectIdentifiers.id_X25519;
+          } else if (EdECConstants.edwards448.equalsIgnoreCase(curveName)) {
+            algOid = EdECObjectIdentifiers.id_X448;
+          } else {
+            throw new XiSecurityException("unknown montgmoery curveName " + curveName);
+          }
+        }
+
+        SubjectPublicKeyInfo pkInfo = new SubjectPublicKeyInfo(new AlgorithmIdentifier(algOid),
+            encodedPoint);
+        try {
+          return KeyUtil.generatePublicKey(pkInfo);
+        } catch (InvalidKeySpecException | NoSuchAlgorithmException ex) {
+          throw new XiSecurityException(ex.getMessage(), ex);
+        }
+      } else {
+        try {
+          return KeyUtil.createECPublicKey(ecParameters, encodedPoint);
+        } catch (InvalidKeySpecException ex) {
+          throw new XiSecurityException(ex.getMessage(), ex);
+        }
       }
     } else {
       throw new XiSecurityException("unknown publicKey class " + p11Key.getClass().getName());
@@ -1223,6 +1261,46 @@ class IaikP11Slot extends P11Slot {
   }
 
   @Override
+  protected P11Identity generateECEdwardsKeypair0(String curveName, P11NewKeyControl control)
+      throws P11TokenException {
+    long mech = PKCS11Constants.CKM_EC_EDWARDS_KEY_PAIR_GEN;
+    assertMechanismSupported(mech);
+
+    ECPrivateKey privateKey = new ECPrivateKey(KeyType.EC_EDWARDS);
+    ECPublicKey publicKey = new ECPublicKey(KeyType.EC_EDWARDS);
+    setKeyAttributes(control, publicKey, privateKey);
+    byte[] encodedCurveName;
+    try {
+      encodedCurveName = new DERPrintableString(curveName).getEncoded();
+    } catch (IOException ex) {
+      throw new P11TokenException(ex.getMessage(), ex);
+    }
+
+    publicKey.getEcdsaParams().setByteArrayValue(encodedCurveName);
+    return generateKeyPair(mech, control.getId(), privateKey, publicKey);
+  }
+
+  @Override
+  protected P11Identity generateECMontgomeryKeypair0(String curveName, P11NewKeyControl control)
+      throws P11TokenException {
+    long mech = PKCS11Constants.CKM_EC_MONTGOMERY_KEY_PAIR_GEN;
+    assertMechanismSupported(mech);
+
+    ECPrivateKey privateKey = new ECPrivateKey(KeyType.EC_MONTGOMERY);
+    ECPublicKey publicKey = new ECPublicKey(KeyType.EC_MONTGOMERY);
+    setKeyAttributes(control, publicKey, privateKey);
+    byte[] encodedCurveName;
+    try {
+      encodedCurveName = new DERPrintableString(curveName).getEncoded();
+    } catch (IOException ex) {
+      throw new P11TokenException(ex.getMessage(), ex);
+    }
+
+    publicKey.getEcdsaParams().setByteArrayValue(encodedCurveName);
+    return generateKeyPair(mech, control.getId(), privateKey, publicKey);
+  }
+
+  @Override
   protected P11Identity generateECKeypair0(ASN1ObjectIdentifier curveId, P11NewKeyControl control)
       throws P11TokenException {
     long mech = PKCS11Constants.CKM_EC_KEY_PAIR_GEN;
@@ -1261,8 +1339,8 @@ class IaikP11Slot extends P11Slot {
     long mech = PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN;
     assertMechanismSupported(mech);
 
-    SM2PrivateKey privateKey = new SM2PrivateKey();
-    SM2PublicKey publicKey = new SM2PublicKey();
+    ECPrivateKey privateKey = new ECPrivateKey(KeyType.VENDOR_SM2);
+    ECPublicKey publicKey = new ECPublicKey(KeyType.VENDOR_SM2);
     setKeyAttributes(control, publicKey, privateKey);
     return generateKeyPair(mech, control.getId(), privateKey, publicKey);
   }

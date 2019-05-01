@@ -76,6 +76,10 @@ public enum AlgorithmCode {
   SHA384WITHPLAIN_ECDSA((byte) 0x44),
   SHA512WITHPLAIN_ECDSA((byte) 0x45),
 
+  // EdDSA
+  ED25519((byte) 0x46),
+  ED448((byte) 0x47),
+
   // HMAC
   HMAC_SHA1((byte) 0x51),
   HMAC_SHA224((byte) 0x52),
@@ -86,6 +90,10 @@ public enum AlgorithmCode {
   HMAC_SHA3_256((byte) 0x57),
   HMAC_SHA3_384((byte) 0x58),
   HMAC_SHA3_512((byte) 0x59),
+
+  // DHPOC-MAC
+  DHPOP_X25519_SHA256((byte) 0x5a),
+  DHPOP_X448_SHA512((byte) 0x5b),
 
   // AES-GMAC
   AES128_GMAC((byte) 0x61),
