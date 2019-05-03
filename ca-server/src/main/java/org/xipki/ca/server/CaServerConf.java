@@ -231,7 +231,7 @@ public class CaServerConf extends ValidatableConf {
   }
 
   public synchronized SslContextConf getSslContextConf(String name) {
-    if (sslContexts.isEmpty()) {
+    if (sslContexts == null || sslContexts.isEmpty()) {
       return null;
     }
 
