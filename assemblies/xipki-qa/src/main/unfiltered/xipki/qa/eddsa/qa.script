@@ -1,0 +1,97 @@
+echo "#################################################################"
+echo "#                     CAQA:Check certificate                    #"
+echo "#################################################################"
+
+caqa:init
+
+echo "Generate missing CSR files"
+
+xi:csr-p12 \
+  --p12 output/ed25519_2.p12 --password 1234 \
+  --subject "CN=ed25519-2.xipki.org,C=DE" \
+  --out output/ed25519_2.csr
+
+xi:csr-p12 \
+  --p12 output/ed25519_3.p12 --password 1234 \
+  --subject "CN=ed25519-3.xipki.org,C=DE" \
+  --out output/ed25519_3.csr
+
+xi:csr-p12 \
+  --p12 output/ed448_2.p12 --password 1234 \
+  --subject "CN=ed448-2.xipki.org,C=DE" \
+  --out output/ed448_2.csr
+
+xi:csr-p12 \
+  --p12 output/ed448_3.p12 --password 1234 \
+  --subject "CN=ed448-3.xipki.org,C=DE" \
+  --out output/ed448_3.csr
+
+## only dummy signature
+xi:csr-p12 \
+  --p12 output/x25519_3.p12 --password 1234 \
+  --subject "CN=x25519-3.xipki.org,C=DE" \
+  --peer-cert output/x25519_3.crt \
+  --out output/x25519_3.csr
+
+## only dummy signature
+xi:csr-p12 \
+  --p12 output/x448_3.p12 --password 1234 \
+  --subject "CN=x448-3.xipki.org,C=DE" \
+  --peer-cert output/x448_3.crt \
+  --out output/x448_3.csr
+
+## rootca
+
+caqa:check-cert --issuer rootca --profile rootca \
+  --csr output/rootca1.csr --cert output/rootca1.crt
+
+caqa:check-cert --issuer rootca --profile subca \
+  --csr output/subca1.csr --cert output/subca1.crt
+
+#####
+
+list = [ ed25519_1 ed25519_2 ed25519_3 ]
+
+each ($list) {
+
+ NAME = $it
+
+ caqa:check-cert --issuer subca --profile ed25519 \
+    --csr output/${NAME}.csr --cert output/${NAME}.crt
+}
+
+#####
+
+list = [ x25519_3 ]
+
+each ($list) {
+
+ NAME = $it
+
+ caqa:check-cert --issuer subca --profile x25519 \
+    --csr output/${NAME}.csr --cert output/${NAME}.crt
+}
+
+#####
+
+list = [ ed448_1 ed448_2 ed448_3 ]
+
+each ($list) {
+
+ NAME = $it
+
+ caqa:check-cert --issuer subca --profile ed448 \
+    --csr output/${NAME}.csr --cert output/${NAME}.crt
+}
+
+#####
+
+list = [ x448_3 ]
+
+each ($list) {
+
+ NAME = $it
+
+ caqa:check-cert --issuer subca --profile x448 \
+    --csr output/${NAME}.csr --cert output/${NAME}.crt
+}

@@ -1,0 +1,116 @@
+echo "#################################################################"
+echo "#              Manage certificate with RA Client                #"
+echo "#################################################################"
+
+xi:cmp-init
+
+echo "Sleeping 1 second"
+sleep 1
+
+## Check the healthy status
+
+xi:cmp-health --ca rootca1
+
+xi:cmp-health --ca subca1
+
+# Certificate ed25519 (via CSR)
+
+xi:csr-p12 \
+  --p12 output/ed25519_1.p12 --password 1234 \
+  --subject "CN=ed25519-1.xipki.org,C=DE" \
+  --out output/ed25519_1.csr
+
+xi:cmp-csr-enroll --csr output/ed25519_1.csr \
+  --out output/ed25519_1.crt --profile ed25519
+
+xi:update-cert-p12 --p12 output/ed25519_1.p12 --password 1234 \
+  --cert output/ed25519_1.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate ed25519 (via CMP)
+
+xi:cmp-enroll-p12 \
+  --p12 output/ed25519_2.p12 --password 1234 \
+  --out output/ed25519_2.crt --profile ed25519 \
+  --subject "CN=ed25519-2.xipki.org,C=DE"
+
+xi:update-cert-p12 --p12 output/ed25519_2.p12 --password 1234 \
+  --cert output/ed25519_2.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate ed25519 (CA generate keypair)
+
+xi:cmp-enroll-cagenkey \
+  --p12-out output/ed25519_3.p12 --password 1234 \
+  --cert-out output/ed25519_3.crt --profile ed25519 \
+  --subject "CN=ed25519-3.xipki.org,C=DE"
+
+xi:update-cert-p12 --p12 output/ed25519_3.p12 --password 1234 \
+  --cert output/ed25519_3.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate x25519 (CA generate keypair)
+
+xi:cmp-enroll-cagenkey \
+  --p12-out output/x25519_3.p12 --password 1234 \
+  --cert-out output/x25519_3.crt --profile x25519 \
+  --subject "CN=x25519-3.xipki.org,C=DE"
+
+xi:update-cert-p12 --p12 output/ed25519_3.p12 --password 1234 \
+  --cert output/ed25519_3.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate ed448 (via CSR)
+
+xi:csr-p12 \
+  --p12 output/ed448_1.p12 --password 1234 \
+  --subject "CN=ed448-1.xipki.org,C=DE" \
+  --out output/ed448_1.csr \
+
+xi:cmp-csr-enroll --csr output/ed448_1.csr \
+  --out output/ed448_1.crt --profile ed448
+
+xi:update-cert-p12 --p12 output/ed448_1.p12 --password 1234 \
+  --cert output/ed448_1.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate ed448 (via CMP)
+
+xi:cmp-enroll-p12 \
+  --p12 output/ed448_2.p12 --password 1234 \
+  --out output/ed448_2.crt --profile ed448 \
+  --subject "CN=ed448-2.xipki.org,C=DE"
+
+xi:update-cert-p12 --p12 output/ed448_2.p12 --password 1234 \
+  --cert output/ed448_2.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
+  # Certificate ed448 (CA generate keypair)
+
+xi:cmp-enroll-cagenkey \
+  --p12-out output/ed448_3.p12 --password 1234 \
+  --cert-out output/ed448_3.crt --profile ed448 \
+  --subject "CN=ed448-3.xipki.org,C=DE"
+
+xi:update-cert-p12 --p12 output/ed448_3.p12 --password 1234 \
+  --cert output/ed448_3.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate x448 (CA generate keypair)
+
+xi:cmp-enroll-cagenkey \
+  --p12-out output/x448_3.p12 --password 1234 \
+  --cert-out output/x448_3.crt --profile x448 \
+  --subject "CN=x448-3.xipki.org,C=DE"
+
+xi:update-cert-p12 --p12 output/ed448_3.p12 --password 1234 \
+  --cert output/ed448_3.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt

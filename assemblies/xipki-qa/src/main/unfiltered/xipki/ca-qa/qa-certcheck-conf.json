@@ -81,6 +81,18 @@
 		"name":"fixed-partial-subject",
 		"file":"xipki/qa/certprofile/certprofile-fixed-partial-subject.json"
 	},{
+		"name":"ed25519",
+		"file":"xipki/qa/certprofile/certprofile-ed25519.json"
+	},{
+		"name":"ed448",
+		"file":"xipki/qa/certprofile/certprofile-ed448.json"
+	},{
+		"name":"x25519",
+		"file":"xipki/qa/certprofile/certprofile-x25519.json"
+	},{
+		"name":"x448",
+		"file":"xipki/qa/certprofile/certprofile-x448.json"
+	},{
 		"name":"cab-rootca",
 		"file":"xipki/qa/certprofile/certprofile-cab-rootca.json"
 	},{

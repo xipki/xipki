@@ -1,0 +1,30 @@
+xi:rm -r -f output
+
+xi:mkdir output
+
+xi:rm -r -f error-output
+
+xi:mkdir error-output
+
+xi:copy-dir xipki/qa/p12/shared output
+
+xi:copy-dir xipki/qa/p12/eddsa output
+
+list = [ rootca1 subca1 ]
+
+if { $TOKEN_TYPE equals "pkcs11" } then {
+  SLOT = "0"
+
+  each ($list) {
+    xi:delete-key-p11 --force --slot $SLOT --label ${it}
+
+    xi:ec-p11 --curve edwards${KEYSPEC} --slot $SLOT --label ${it}
+  }
+
+} elif { $TOKEN_TYPE equals "pkcs12" } then {
+
+  each ($list) {
+    xi:ec-p12 --curve edwards${KEYSPEC} --password 1234 --out output/${it}.p12
+  }
+
+}
