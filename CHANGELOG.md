@@ -2,8 +2,14 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
-## 5.2.1
+## 5.3.0
   - Release date: -
+  - CA
+    - Add support of RFC8410 (Edwards and Montgomery Curves).
+  - OCSP
+    - Add support of Ed25519 and Ed448 as signature algorithm.
+  - CLI
+    - Add support to generate keypair, generate CSR, and enrol certificates of edwards and montgomery curves.
 
 ## 5.2.0
   - Release date: Apr 27, 2019
