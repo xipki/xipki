@@ -100,6 +100,7 @@ import org.xipki.ca.certprofile.xijson.conf.KeyParametersType.DsaParametersType;
 import org.xipki.ca.certprofile.xijson.conf.KeyParametersType.EcParametersType;
 import org.xipki.ca.certprofile.xijson.conf.KeyParametersType.RsaParametersType;
 import org.xipki.ca.certprofile.xijson.conf.KeypairGenerationType;
+import org.xipki.ca.certprofile.xijson.conf.KeypairGenerationType.KeyType;
 import org.xipki.ca.certprofile.xijson.conf.QcStatementType;
 import org.xipki.ca.certprofile.xijson.conf.QcStatementType.PdsLocationType;
 import org.xipki.ca.certprofile.xijson.conf.QcStatementType.QcEuLimitValueType;
@@ -110,6 +111,7 @@ import org.xipki.ca.certprofile.xijson.conf.Subject.RdnType;
 import org.xipki.ca.certprofile.xijson.conf.Subject.ValueType;
 import org.xipki.ca.certprofile.xijson.conf.SubjectToSubjectAltNameType;
 import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
@@ -223,6 +225,11 @@ public class ProfileConfCreatorDemo {
       certprofileExtended("certprofile-extended.json");
       certprofileAppleWwdr("certprofile-apple-wwdr.json");
       certprofileGmt0015("certprofile-gmt0015.json");
+
+      certprofileTlsEdwardsOrMontgomery("certprofile-ed25519.json", true,  true);
+      certprofileTlsEdwardsOrMontgomery("certprofile-ed448.json",   true,  false);
+      certprofileTlsEdwardsOrMontgomery("certprofile-x25519.json",  false, true);
+      certprofileTlsEdwardsOrMontgomery("certprofile-x448.json",    false, false);
     } catch (Exception ex) {
       ex.printStackTrace();
     }
@@ -1014,6 +1021,64 @@ public class ProfileConfCreatorDemo {
     // Extensions - SMIMECapabilities
     list.add(createExtension(Extn.id_smimeCapabilities, true, false));
     last(list).setSmimeCapabilities(createSmimeCapabilities());
+
+    marshall(profile, destFilename, true);
+  } // method certprofileTls
+
+  private static void certprofileTlsEdwardsOrMontgomery(String destFilename, boolean edwards,
+      boolean curve25519) throws Exception {
+    String desc = "certprofile tls with "
+                    + (edwards ? "edwards " : "montmomery ")
+                    + (curve25519 ? "25519" : "448")
+                    + " curves";
+
+    X509ProfileType profile = getEeBaseProfileForEdwardsOrMontgomeryCurves(
+        desc, "2y", edwards, curve25519);
+
+    // Subject
+    Subject subject = profile.getSubject();
+
+    List<RdnType> rdnControls = subject.getRdns();
+    rdnControls.add(createRdn(DN.C, 1, 1));
+    rdnControls.add(createRdn(DN.O, 0, 1));
+    rdnControls.add(createRdn(DN.OU, 0, 1));
+    rdnControls.add(createRdn(DN.SN, 0, 1, REGEX_SN, null, null));
+    rdnControls.add(createRdn(DN.CN, 1, 1, REGEX_FQDN, null, null));
+
+    // SubjectToSubjectAltName
+    SubjectToSubjectAltNameType s2sType = new SubjectToSubjectAltNameType();
+    profile.getSubjectToSubjectAltNames().add(s2sType);
+    s2sType.setSource(createOidType(DN.CN));
+    s2sType.setTarget(GeneralNameTag.DNSName);
+
+    // Extensions
+    // Extensions - controls
+    List<ExtensionType> list = profile.getExtensions();
+    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
+    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
+    list.add(createExtension(Extension.freshestCRL, false, false, null));
+
+    // Extensions - SubjectAltNames
+    list.add(createExtension(Extension.subjectAlternativeName, true, false));
+    GeneralNameType san = new GeneralNameType();
+    last(list).setSubjectAltName(san);
+    san.addTags(GeneralNameTag.DNSName, GeneralNameTag.IPAddress);
+
+    // Extensions - basicConstraints
+    list.add(createExtension(Extension.basicConstraints, true, true));
+
+    // Extensions - AuthorityInfoAccess
+    list.add(createExtension(Extension.authorityInfoAccess, true, false));
+    last(list).setAuthorityInfoAccess(createAuthorityInfoAccess());
+
+    // Extensions - AuthorityKeyIdentifier
+    list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
+
+    // Extensions - extenedKeyUsage
+    list.add(createExtension(Extension.extendedKeyUsage, true, false));
+    last(list).setExtendedKeyUsage(createExtendedKeyUsage(
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_serverAuth},
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth}));
 
     marshall(profile, destFilename, true);
   } // method certprofileTls
@@ -2594,7 +2659,7 @@ public class ProfileConfCreatorDemo {
     profile.setMetadata(createDescription(description));
 
     profile.setCertLevel(certLevel);
-    profile.setMaxSize(3000);
+    profile.setMaxSize(4500);
     profile.setVersion(X509CertVersion.v3);
     profile.setValidity(validity);
     profile.setNotBeforeTime(useMidnightNotBefore ? "midnight" : "current");
@@ -2628,6 +2693,8 @@ public class ProfileConfCreatorDemo {
     }
 
     algos.add("SM3withSM2");
+    algos.add("Ed25519");
+    algos.add("Ed448");
 
     // Subject
     Subject subject = new Subject();
@@ -2640,10 +2707,67 @@ public class ProfileConfCreatorDemo {
         TeleTrusTObjectIdentifiers.brainpoolP256r1, GMObjectIdentifiers.sm2p256v1};
 
     // Key
-    profile.setKeyAlgorithms(createKeyAlgorithms(curveIds));
+    profile.setKeyAlgorithms(createKeyAlgorithms(curveIds, certLevel));
 
     return profile;
   } // method getBaseProfile
+
+  private static X509ProfileType getEeBaseProfileForEdwardsOrMontgomeryCurves(String description,
+      String validity, boolean edwards, boolean curve25519) {
+    X509ProfileType profile = new X509ProfileType();
+
+    profile.setMetadata(createDescription(description));
+
+    profile.setCertLevel(CertLevel.EndEntity);
+    profile.setMaxSize(4500);
+    profile.setVersion(X509CertVersion.v3);
+    profile.setValidity(validity);
+    profile.setNotBeforeTime("current");
+
+    profile.setSerialNumberInReq(false);
+
+    KeypairGenerationType kpGen = new KeypairGenerationType();
+    profile.setKeypairGeneration(kpGen);
+    KeyType keyType;
+    ASN1ObjectIdentifier algorithm;
+    if (edwards) {
+      keyType = curve25519 ? KeyType.ed25519 : KeyType.ed448;
+      algorithm = curve25519 ? EdECConstants.id_Ed25519 : EdECConstants.id_Ed448;
+    } else {
+      keyType = curve25519 ? KeyType.x25519 : KeyType.x448;
+      algorithm = curve25519 ? EdECConstants.id_X25519 : EdECConstants.id_X448;
+    }
+    kpGen.setAlgorithm(createOidType(algorithm));
+    kpGen.setKeyType(keyType);
+
+    // SignatureAlgorithm
+    List<String> algos = new LinkedList<>();
+    profile.setSignatureAlgorithms(algos);
+    algos.add("Ed25519");
+    algos.add("Ed448");
+
+    // Subject
+    Subject subject = new Subject();
+    profile.setSubject(subject);
+    subject.setKeepRdnOrder(false);
+    subject.setIncSerialNumber(false);
+
+    // KeyUsage
+
+    KeyUsage[] usages = edwards
+      ? new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.contentCommitment}
+      : new KeyUsage[]{KeyUsage.keyAgreement};
+
+    List<AlgorithmType> keyAlgorithms = createEdwardsOrMontgomeryKeyAlgorithms(
+        edwards, !edwards, curve25519, !curve25519);
+
+    profile.setKeyAlgorithms(keyAlgorithms);
+    List<ExtensionType> extensions = profile.getExtensions();
+    extensions.add(createExtension(Extension.keyUsage, true, true));
+    last(extensions).setKeyUsage(createKeyUsage(usages, null));
+
+    return profile;
+  } // method getEeBaseProfileForEdwardsOrMontgomeryCurves
 
   private static List<AlgorithmType> createCabKeyAlgorithms() {
     List<AlgorithmType> list = new LinkedList<>();
@@ -2694,7 +2818,8 @@ public class ProfileConfCreatorDemo {
     return list;
   } // method createCabKeyAlgorithms
 
-  private static List<AlgorithmType> createKeyAlgorithms(ASN1ObjectIdentifier[] curveIds) {
+  private static List<AlgorithmType> createKeyAlgorithms(
+      ASN1ObjectIdentifier[] curveIds, CertLevel certLevel) {
     List<AlgorithmType> list = new LinkedList<>();
 
     // RSA
@@ -2742,8 +2867,44 @@ public class ProfileConfCreatorDemo {
 
     ecParams.setPointEncodings(Arrays.asList(((byte) 4)));
 
+    // EdDSA
+    if (certLevel == CertLevel.RootCA || certLevel == CertLevel.SubCA) {
+      list.addAll(createEdwardsOrMontgomeryKeyAlgorithms(true, false, true, true));
+    }
+
     return list;
   } // method createKeyAlgorithms
+
+  private static List<AlgorithmType> createEdwardsOrMontgomeryKeyAlgorithms(
+      boolean edwards, boolean montgomery, boolean curve25519, boolean curve448) {
+    List<AlgorithmType> list = new LinkedList<>();
+
+    List<ASN1ObjectIdentifier> oids = new LinkedList<>();
+    if (edwards) {
+      if (curve25519) {
+        oids.add(EdECConstants.id_Ed25519);
+      }
+
+      if (curve448) {
+        oids.add(EdECConstants.id_Ed448);
+      }
+    } else {
+      if (curve25519) {
+        oids.add(EdECConstants.id_X25519);
+      }
+
+      if (curve448) {
+        oids.add(EdECConstants.id_X448);
+      }
+    }
+
+    for (ASN1ObjectIdentifier oid : oids) {
+      list.add(new AlgorithmType());
+      last(list).getAlgorithms().add(createOidType(oid));
+    }
+
+    return list;
+  } // method createEdwardsOrMontgomeryKeyAlgorithms
 
   // CHECKSTYLE:SKIP
   private static List<AlgorithmType> createRSAKeyAlgorithms() {

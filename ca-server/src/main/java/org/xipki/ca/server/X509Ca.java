@@ -149,6 +149,7 @@ import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.CrlReason;
 import org.xipki.security.CtLog.SignedCertificateTimestampList;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.FpIdCalculator;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.NoIdleSignerException;
@@ -461,6 +462,9 @@ public class X509Ca implements Closeable {
       BigInteger g = ASN1Integer.getInstance(seq.getObjectAt(2)).getValue();
       this.keypairGenControlByImplictCA = new KeypairGenControl.DSAKeypairGenControl(
           p, q, g, caSpkiAlgId);
+    } else if (caSpkiAlgId.equals(EdECConstants.id_Ed25519)
+        || caSpkiAlgId.equals(EdECConstants.id_Ed448)) {
+      this.keypairGenControlByImplictCA = new KeypairGenControl.EDDSAKeypairGenControl(caSpkiAlgId);
     } else {
       this.keypairGenControlByImplictCA = null;
     }
@@ -2278,11 +2282,21 @@ public class X509Ca implements Closeable {
           DSAPrivateKey priv = (DSAPrivateKey) kp.getPrivate();
           privateKey = new PrivateKeyInfo(grantedPublicKeyInfo.getAlgorithm(),
               new ASN1Integer(priv.getX()));
+        } else if (kg instanceof KeypairGenControl.EDDSAKeypairGenControl) {
+          KeypairGenControl.EDDSAKeypairGenControl tkg =
+              (KeypairGenControl.EDDSAKeypairGenControl) kg;
+          KeyPair kp = KeyUtil.generateEdECKeypair(tkg.getCurveName(), random);
+          grantedPublicKeyInfo = KeyUtil.createSubjectPublicKeyInfo(kp.getPublic());
+          // make sure that the algorithm match
+          if (!grantedPublicKeyInfo.getAlgorithm().equals(tkg.getKeyAlgorithm())) {
+            throw new OperationException(SYSTEM_FAILURE, "invalid SubjectPublicKeyInfo.algorithm");
+          }
+          privateKey = PrivateKeyInfo.getInstance(kp.getPrivate().getEncoded());
         } else {
           throw new RuntimeCryptoException("unknown KeyPairGenControl " + kg);
         }
       } catch (InvalidAlgorithmParameterException | NoSuchAlgorithmException
-          | NoSuchProviderException | IOException ex) {
+          | NoSuchProviderException | InvalidKeyException | IOException ex) {
         throw new OperationException(SYSTEM_FAILURE, ex);
       }
     } else {

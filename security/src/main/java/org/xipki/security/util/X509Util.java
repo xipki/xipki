@@ -81,6 +81,7 @@ import org.bouncycastle.cert.X509AttributeCertificateHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.BadInputException;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.FpIdCalculator;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
@@ -837,6 +838,13 @@ public class X509Util {
         throw new InvalidKeySpecException("keyParameters is not an OBJECT IDENTIFIER");
       }
       return publicKeyInfo;
+    } else if (EdECConstants.isEdwardsOrMontgemoryCurveKeyAlgId(algOid)) {
+      if (keyParameters == null) {
+        return publicKeyInfo;
+      } else {
+        return new SubjectPublicKeyInfo(new AlgorithmIdentifier(algOid),
+            publicKeyInfo.getPublicKeyData().getBytes());
+      }
     } else {
       return publicKeyInfo;
     }

@@ -36,7 +36,6 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.bsi.BSIObjectIdentifiers;
-import org.bouncycastle.asn1.edec.EdECObjectIdentifiers;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -102,6 +101,7 @@ public class AlgorithmUtil {
       Map<String, ASN1ObjectIdentifier> nameOidMap = new HashMap<>();
 
       Enumeration<?> names = ECNamedCurveTable.getNames();
+      List<String> nameList = new LinkedList<>();
       while (names.hasMoreElements()) {
         String name = ((String) names.nextElement()).toLowerCase();
         ASN1ObjectIdentifier oid = org.bouncycastle.asn1.x9.ECNamedCurveTable.getOID(name);
@@ -109,16 +109,15 @@ public class AlgorithmUtil {
           continue;
         }
 
+        nameList.add(name);
         nameOidMap.put(name, oid);
       }
 
-      List<String> nameList = new LinkedList<>();
       Map<ASN1ObjectIdentifier, String> oidNameMap = new HashMap<>();
 
-      for (String name : nameOidMap.keySet()) {
+      for (String name : nameList) {
         ASN1ObjectIdentifier oid = nameOidMap.get(name);
 
-        nameList.add(name);
         nameOidMap.put(name, oid);
         if (!oidNameMap.containsKey(oid)) {
           oidNameMap.put(oid, name);
@@ -197,8 +196,8 @@ public class AlgorithmUtil {
       map.put(GMObjectIdentifiers.sm2sign_with_sm3, AlgorithmCode.SM2WITHSM3);
 
       // EDDSA
-      map.put(EdECObjectIdentifiers.id_Ed25519, AlgorithmCode.ED25519);
-      map.put(EdECObjectIdentifiers.id_Ed448, AlgorithmCode.ED448);
+      map.put(EdECConstants.id_Ed25519, AlgorithmCode.ED25519);
+      map.put(EdECConstants.id_Ed448, AlgorithmCode.ED448);
 
       // Hash
       for (HashAlgo hashAlgo : HashAlgo.values()) {
@@ -423,8 +422,8 @@ public class AlgorithmUtil {
       addOidNameMap(m1, m2, NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512,
           "SHA3-512WITHRSA", "RSAWITHSHA3-512");
       addOidNameMap(m1, m2, GMObjectIdentifiers.sm2sign_with_sm3, "SM3WITHSM2", "SM2WITHSM3");
-      addOidNameMap(m1, m2, EdECObjectIdentifiers.id_Ed25519, EdECConstants.ALG_Ed25519);
-      addOidNameMap(m1, m2, EdECObjectIdentifiers.id_Ed448, EdECConstants.ALG_Ed448);
+      addOidNameMap(m1, m2, EdECConstants.id_Ed25519, EdECConstants.ALG_Ed25519);
+      addOidNameMap(m1, m2, EdECConstants.id_Ed448, EdECConstants.ALG_Ed448);
       sigAlgOidToNameMap = Collections.unmodifiableMap(m1);
       sigAlgNameToOidMap = Collections.unmodifiableMap(m2);
 
@@ -600,9 +599,9 @@ public class AlgorithmUtil {
       } else if (pubKey instanceof EdDSAKey) {
         String keyAlgo = pubKey.getAlgorithm();
         if (keyAlgo.equalsIgnoreCase(EdECConstants.ALG_Ed25519)) {
-          return new AlgorithmIdentifier(EdECObjectIdentifiers.id_Ed25519);
+          return new AlgorithmIdentifier(EdECConstants.id_Ed25519);
         } else if (keyAlgo.equalsIgnoreCase(EdECConstants.ALG_Ed448)) {
-          return new AlgorithmIdentifier(EdECObjectIdentifiers.id_Ed448);
+          return new AlgorithmIdentifier(EdECConstants.id_Ed448);
         } else {
           throw new NoSuchAlgorithmException("Unknown Edwards public key " + keyAlgo);
         }

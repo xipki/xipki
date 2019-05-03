@@ -30,7 +30,6 @@ import java.util.Map;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.bsi.BSIObjectIdentifiers;
-import org.bouncycastle.asn1.edec.EdECObjectIdentifiers;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -46,6 +45,7 @@ import org.bouncycastle.crypto.params.ParametersWithRandom;
 import org.bouncycastle.crypto.signers.PSSSigner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.XiSecurityException;
@@ -316,7 +316,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       super(cryptService, identityId, signatureAlgId);
 
       ASN1ObjectIdentifier algOid = signatureAlgId.getAlgorithm();
-      if (!EdECObjectIdentifiers.id_Ed25519.equals(algOid)) {
+      if (!EdECConstants.id_Ed25519.equals(algOid)) {
         throw new XiSecurityException("unsupproted signature algorithm " + algOid.getId());
       }
 

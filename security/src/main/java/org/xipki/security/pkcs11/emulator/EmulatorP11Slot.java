@@ -60,7 +60,6 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
-import org.bouncycastle.asn1.edec.EdECObjectIdentifiers;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -468,10 +467,10 @@ class EmulatorP11Slot extends P11Slot {
       } catch (InvalidKeySpecException ex) {
         throw new P11TokenException(ex.getMessage(), ex);
       }
-    } else if (EdECObjectIdentifiers.id_X25519.getId().equals(algorithm)
-        || EdECObjectIdentifiers.id_Ed25519.getId().equals(algorithm)
-        || EdECObjectIdentifiers.id_X448.getId().equals(algorithm)
-        || EdECObjectIdentifiers.id_Ed448.getId().equals(algorithm)) {
+    } else if (EdECConstants.id_X25519.getId().equals(algorithm)
+        || EdECConstants.id_Ed25519.getId().equals(algorithm)
+        || EdECConstants.id_X448.getId().equals(algorithm)
+        || EdECConstants.id_Ed448.getId().equals(algorithm)) {
       byte[] encodedPoint = decodeHex(props.getProperty(PROP_EC_EC_POINT));
       SubjectPublicKeyInfo pkInfo = new SubjectPublicKeyInfo(
           new AlgorithmIdentifier(new ASN1ObjectIdentifier(algorithm)), encodedPoint);

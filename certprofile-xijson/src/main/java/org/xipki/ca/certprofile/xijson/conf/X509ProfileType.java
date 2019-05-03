@@ -322,7 +322,8 @@ public class X509ProfileType extends ValidatableConf {
         oids.add(oid);
       }
 
-      KeyParametersOption keyParamsOption = type.getParameters().toXiKeyParametersOption();
+      KeyParametersOption keyParamsOption = (type.getParameters() == null)
+          ? KeyParametersOption.ALLOW_ALL : type.getParameters().toXiKeyParametersOption();
       for (ASN1ObjectIdentifier oid : oids) {
         keyAlgorithms.put(oid, keyParamsOption);
       }

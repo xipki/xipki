@@ -62,7 +62,6 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.edec.EdECObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -241,14 +240,14 @@ public class KeyUtil {
         PrivateKeyInfo edPki;
         if (xdhAlgo.equalsIgnoreCase(EdECConstants.ALG_X25519)) {
           edPki = new PrivateKeyInfo(
-              new AlgorithmIdentifier(EdECObjectIdentifiers.id_Ed25519), xdhPki.parsePrivateKey());
+              new AlgorithmIdentifier(EdECConstants.id_Ed25519), xdhPki.parsePrivateKey());
         } else if (xdhAlgo.equalsIgnoreCase(EdECConstants.ALG_X448)) {
           byte[] x448Octets = ASN1OctetString.getInstance(xdhPki.parsePrivateKey()).getOctets();
           byte[] ed448Octets = new byte[57];
           System.arraycopy(x448Octets, 0, ed448Octets, 0, 56);
 
           edPki = new PrivateKeyInfo(
-              new AlgorithmIdentifier(EdECObjectIdentifiers.id_Ed448),
+              new AlgorithmIdentifier(EdECConstants.id_Ed448),
               new DEROctetString(ed448Octets));
         } else {
           throw new IllegalArgumentException("unknown key algorithm " + xdhAlgo);
@@ -473,19 +472,19 @@ public class KeyUtil {
       byte[] prefix;
       ASN1ObjectIdentifier algOid;
       if (EdECConstants.ALG_Ed25519.equalsIgnoreCase(algorithm)) {
-        algOid = EdECObjectIdentifiers.id_Ed25519;
+        algOid = EdECConstants.id_Ed25519;
         keysize = 32;
         prefix = Ed25519Prefix;
       } else if (EdECConstants.ALG_X25519.equalsIgnoreCase(algorithm)) {
-        algOid = EdECObjectIdentifiers.id_X25519;
+        algOid = EdECConstants.id_X25519;
         keysize = 32;
         prefix = x25519Prefix;
       } else if (EdECConstants.ALG_Ed448.equalsIgnoreCase(algorithm)) {
-        algOid = EdECObjectIdentifiers.id_Ed448;
+        algOid = EdECConstants.id_Ed448;
         keysize = 57;
         prefix = Ed448Prefix;
       } else if (EdECConstants.ALG_X448.equalsIgnoreCase(algorithm)) {
-        algOid = EdECObjectIdentifiers.id_X448;
+        algOid = EdECConstants.id_X448;
         keysize = 56;
         prefix = x448Prefix;
       } else {

@@ -377,6 +377,9 @@ public class XijsonCertprofile extends BaseCertprofile {
         String tmp = params.get(KeypairGenerationType.PARAM_qlength);
         int qlen = tmp == null ? 0 : Integer.parseInt(tmp);
         this.keypairGenControl = new KeypairGenControl.DSAKeypairGenControl(plen, qlen, keyAlgOid);
+      } else if (keyType == KeyType.ed25519 || keyType == KeyType.ed448
+          || keyType == KeyType.x25519 || keyType == KeyType.x448) {
+        this.keypairGenControl = new KeypairGenControl.EDDSAKeypairGenControl(keyAlgOid);
       } else {
         throw new CertprofileException("unknown KeypairGeneration type " + keyType);
       }

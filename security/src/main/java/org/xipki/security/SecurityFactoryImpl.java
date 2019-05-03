@@ -54,6 +54,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.bc.XiECContentVerifierProviderBuilder;
+import org.xipki.security.bc.XiEdDSAContentVerifierProvider;
 import org.xipki.security.bc.XiRSAContentVerifierProviderBuilder;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
@@ -130,6 +131,10 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     Args.notNull(publicKey, "publicKey");
 
     String keyAlg = publicKey.getAlgorithm().toUpperCase();
+    if ("ED25519".equals(keyAlg) || "ED448".equals(keyAlg)) {
+      return new XiEdDSAContentVerifierProvider(publicKey);
+    }
+
     BcContentVerifierProviderBuilder builder = VERIFIER_PROVIDER_BUILDER.get(keyAlg);
 
     if (builder == null) {

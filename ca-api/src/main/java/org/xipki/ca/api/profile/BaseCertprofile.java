@@ -53,6 +53,7 @@ import org.xipki.ca.api.profile.KeyParametersOption.AllowAllParametersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.DSAParametersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.ECParamatersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.RSAParametersOption;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
@@ -250,6 +251,20 @@ public abstract class BaseCertprofile extends Certprofile {
     ASN1ObjectIdentifier keyType = publicKey.getAlgorithm().getAlgorithm();
     if (!keyAlgorithms.containsKey(keyType)) {
       throw new BadCertTemplateException("key type " + keyType.getId() + " is not permitted");
+    }
+
+    // Edwards and Montgomery public keys
+    String curveName = EdECConstants.getCurveForKeyAlgId(keyType);
+    if (curveName != null) {
+      int expectedKeyBitSize = EdECConstants.getPublicKeyByteSizeForCurve(curveName);
+      if (expectedKeyBitSize > 0) {
+        int keyBitSize = publicKey.getPublicKeyData().getOctets().length;
+        if (keyBitSize != expectedKeyBitSize) {
+          throw new BadCertTemplateException("invalid length of key.");
+        }
+      }
+
+      return publicKey;
     }
 
     KeyParametersOption keyParamsOption = keyAlgorithms.get(keyType);

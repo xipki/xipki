@@ -39,7 +39,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
-import org.bouncycastle.asn1.edec.EdECObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.ECNamedCurveTable;
@@ -871,17 +870,17 @@ class IaikP11Slot extends P11Slot {
         ASN1ObjectIdentifier algOid;
         if (keyType == KeyType.EC_EDWARDS) {
           if (EdECConstants.edwards25519.equalsIgnoreCase(curveName)) {
-            algOid = EdECObjectIdentifiers.id_Ed25519;
+            algOid = EdECConstants.id_Ed25519;
           } else if (EdECConstants.edwards448.equalsIgnoreCase(curveName)) {
-            algOid = EdECObjectIdentifiers.id_Ed448;
+            algOid = EdECConstants.id_Ed448;
           } else {
             throw new XiSecurityException("unknown edwards curveName " + curveName);
           }
         } else {
           if (EdECConstants.curve25519.equalsIgnoreCase(curveName)) {
-            algOid = EdECObjectIdentifiers.id_X25519;
+            algOid = EdECConstants.id_X25519;
           } else if (EdECConstants.edwards448.equalsIgnoreCase(curveName)) {
-            algOid = EdECObjectIdentifiers.id_X448;
+            algOid = EdECConstants.id_X448;
           } else {
             throw new XiSecurityException("unknown montgmoery curveName " + curveName);
           }

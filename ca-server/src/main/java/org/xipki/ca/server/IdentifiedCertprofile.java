@@ -91,6 +91,7 @@ import org.xipki.ca.api.profile.KeyParametersOption.ECParamatersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.RSAParametersOption;
 import org.xipki.ca.api.profile.KeypairGenControl;
 import org.xipki.ca.api.profile.SubjectDnSpec;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.ExtensionExistence;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
@@ -877,6 +878,67 @@ class IdentifiedCertprofile implements Closeable {
 
     if (certDomain == CertDomain.CABForumBR) {
       validateCABForumBR(msg);
+    }
+
+    // Edwards or Montgomery Curves (RFC8410)
+    Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = certprofile.getKeyAlgorithms();
+    boolean withEdwardsCurves = keyAlgorithms.containsKey(EdECConstants.id_Ed25519)
+        || keyAlgorithms.containsKey(EdECConstants.id_Ed448);
+    boolean withMontgomeryCurves = keyAlgorithms.containsKey(EdECConstants.id_X25519)
+        || keyAlgorithms.containsKey(EdECConstants.id_X448);
+
+    if (withEdwardsCurves || withMontgomeryCurves) {
+      Set<KeyUsage> requiredUsages = new HashSet<>();
+      Set<KeyUsage> optionalUsages = new HashSet<>();
+      if (usages != null) {
+        for (KeyUsageControl m : usages) {
+          if (m.isRequired()) {
+            requiredUsages.add(m.getKeyUsage());
+          } else {
+            optionalUsages.add(m.getKeyUsage());
+          }
+        }
+      }
+
+      List<KeyUsage> allowedUsages;
+      if (withMontgomeryCurves) {
+        if (certLevel != CertLevel.EndEntity) {
+          msg.append("montgomery curves are not permitted in CA certificates, ");
+        }
+
+        if (!requiredUsages.contains(KeyUsage.keyAgreement)) {
+          msg.append("required KeyUsage KeyAgreement is not marked as 'required', ");
+        }
+
+        allowedUsages = Arrays.asList(KeyUsage.keyAgreement, KeyUsage.encipherOnly,
+                          KeyUsage.decipherOnly);
+      } else {
+        if (certLevel == CertLevel.EndEntity) {
+          if (! (requiredUsages.contains(KeyUsage.digitalSignature)
+                || requiredUsages.contains(KeyUsage.contentCommitment))) {
+            msg.append("required KeyUsage digitalSignature or contentCommitment is not marked "
+                + "as 'required', ");
+          }
+
+          allowedUsages = Arrays.asList(KeyUsage.digitalSignature, KeyUsage.contentCommitment);
+        } else {
+          allowedUsages = Arrays.asList(KeyUsage.digitalSignature, KeyUsage.contentCommitment,
+              KeyUsage.keyCertSign, KeyUsage.cRLSign);
+        }
+      }
+
+      requiredUsages.removeAll(allowedUsages);
+      optionalUsages.removeAll(allowedUsages);
+
+      if (!requiredUsages.isEmpty()) {
+        msg.append("Required KeyUsage items ").append(requiredUsages)
+          .append(" are not permitted, ");
+      }
+
+      if (!optionalUsages.isEmpty()) {
+        msg.append("Optional KeyUsage items ").append(requiredUsages)
+        .append(" are not permitted, ");
+      }
     }
 
     final int len = msg.length();

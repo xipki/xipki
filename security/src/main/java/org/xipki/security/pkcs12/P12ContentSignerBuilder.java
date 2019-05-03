@@ -46,7 +46,6 @@ import java.util.Set;
 import javax.crypto.NoSuchPaddingException;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.edec.EdECObjectIdentifiers;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -67,6 +66,7 @@ import org.bouncycastle.operator.bc.BcContentSignerBuilder;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.DSAPlainDigestSigner;
 import org.xipki.security.DfltConcurrentContentSigner;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.SignatureSigner;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.XiSecurityException;
@@ -291,8 +291,8 @@ public class P12ContentSignerBuilder {
       provName = "SUN";
     } else {
       ASN1ObjectIdentifier oid = signatureAlgId.getAlgorithm();
-      if (EdECObjectIdentifiers.id_Ed25519.equals(oid)
-          || EdECObjectIdentifiers.id_Ed448.equals(oid)) {
+      if (EdECConstants.id_Ed25519.equals(oid)
+          || EdECConstants.id_Ed448.equals(oid)) {
         provName = "BC";
       }
     }

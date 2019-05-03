@@ -17,10 +17,10 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
+import org.xipki.security.EdECConstants;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 
@@ -78,6 +78,11 @@ public class KeypairGenerationType extends ValidatableConf {
    *       <li>qlength (optional)</li>
    *     </ul>
    *   </li>
+   *   <li>For Edwards and Montgomery key
+   *     <ul>
+   *       <li>no parameter</li>
+   *     </ul>
+   *   </li>
    * </ul>
    */
   @JSONField(ordinal = 5)
@@ -118,14 +123,11 @@ public class KeypairGenerationType extends ValidatableConf {
   }
 
   public Map<String, String> getParameters() {
-    if (parameters == null) {
-      parameters = new HashMap<>();
-    }
     return parameters;
   }
 
   public void setParameters(Map<String, String> parameters) {
-    this.parameters = parameters;
+    this.parameters = parameters == null || parameters.isEmpty() ? null : parameters;
   }
 
   @Override
@@ -137,21 +139,44 @@ public class KeypairGenerationType extends ValidatableConf {
     notNull(algorithm, "algorithm");
     validate(algorithm);
     notNull(keyType, "keyType");
-    notNull(parameters, "parameters");
+
     switch (keyType) {
       case rsa:
+        notNull(parameters, "parameters");
         if (!parameters.containsKey(PARAM_keysize)) {
           throw new InvalidConfException("parameters " + PARAM_keysize + " may not be null");
         }
         break;
       case dsa:
+        notNull(parameters, "parameters");
         if (!parameters.containsKey(PARAM_plength)) {
           throw new InvalidConfException("parameters " + PARAM_plength + " may not be null");
         }
         break;
       case ec:
+        notNull(parameters, "parameters");
         if (!parameters.containsKey(PARAM_curve)) {
           throw new InvalidConfException("parameters " + PARAM_curve + " may not be null");
+        }
+        break;
+      case ed25519:
+        if (!EdECConstants.id_Ed25519.getId().equalsIgnoreCase(algorithm.getOid())) {
+          throw new InvalidConfException("keyType and algorithm not match");
+        }
+        break;
+      case ed448:
+        if (!EdECConstants.id_Ed448.getId().equalsIgnoreCase(algorithm.getOid())) {
+          throw new InvalidConfException("keyType and algorithm not match");
+        }
+        break;
+      case x25519:
+        if (!EdECConstants.id_X25519.getId().equalsIgnoreCase(algorithm.getOid())) {
+          throw new InvalidConfException("keyType and algorithm not match");
+        }
+        break;
+      case x448:
+        if (!EdECConstants.id_X448.getId().equalsIgnoreCase(algorithm.getOid())) {
+          throw new InvalidConfException("keyType and algorithm not match");
         }
         break;
       default:
@@ -162,7 +187,11 @@ public class KeypairGenerationType extends ValidatableConf {
   public static enum KeyType {
     rsa,
     ec,
-    dsa
+    dsa,
+    ed25519,
+    ed448,
+    x25519,
+    x448
   }
 
 }
