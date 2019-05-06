@@ -228,6 +228,8 @@ public abstract class MgmtMessage {
 
     private String ctLogControl;
 
+    private String dhpocControl;
+
     private String cmpResponderName;
 
     private String scepResponderName;
@@ -291,6 +293,7 @@ public abstract class MgmtMessage {
         ctLogControl = caEntry.getCtLogControl().getConf();
       }
 
+      dhpocControl = caEntry.getDhpocControl();
       cmpResponderName = caEntry.getCmpResponderName();
       scepResponderName = caEntry.getScepResponderName();
       duplicateKeyPermitted = caEntry.isDuplicateKeyPermitted();
@@ -411,6 +414,14 @@ public abstract class MgmtMessage {
 
     public void setCtLogControl(String ctLogControl) {
       this.ctLogControl = ctLogControl;
+    }
+
+    public String getDhpocControl() {
+      return dhpocControl;
+    }
+
+    public void setDhpocControl(String dhpocControl) {
+      this.dhpocControl = dhpocControl;
     }
 
     public String getCmpResponderName() {
@@ -614,6 +625,8 @@ public abstract class MgmtMessage {
       rv.setSignerConf(signerConf);
       rv.setStatus(status);
       rv.setValidityMode(validityMode);
+
+      rv.setDhpocControl(dhpocControl);
 
       return rv;
     }

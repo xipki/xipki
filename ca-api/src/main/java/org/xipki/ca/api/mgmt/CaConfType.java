@@ -305,6 +305,8 @@ public class CaConfType {
 
     private Map<String, Object> ctLogControl;
 
+    private FileOrValue dhpocControl;
+
     private String cmpResponderName;
 
     private String scepResponderName;
@@ -449,6 +451,14 @@ public class CaConfType {
 
     public void setCtLogControl(Map<String, Object> ctLogControl) {
       this.ctLogControl = ctLogControl;
+    }
+
+    public FileOrValue getDhpocControl() {
+      return dhpocControl;
+    }
+
+    public void setDhpocControl(FileOrValue dhpocControl) {
+      this.dhpocControl = dhpocControl;
     }
 
     public String getCmpResponderName() {

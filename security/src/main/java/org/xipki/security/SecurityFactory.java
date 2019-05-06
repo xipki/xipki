@@ -111,6 +111,21 @@ public interface SecurityFactory {
       throws InvalidKeyException;
 
   /**
+   * Gets the ContentVerifierProvider from the public key.
+   *
+   * @param publicKey
+   *          Signature verification key. Must not be {@code null}.
+   * @param ownerKeyAndCert
+   *          The owner's key and certificate for the CSR with Diffie-Hellman PoC.
+   *          May be {@code null}.
+   * @return the ContentVerifierProvider
+   * @throws InvalidKeyException
+   *         If the publicKey is invalid or unsupported.
+   */
+  ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey,
+      DHSigStaticKeyCertPair ownerKeyAndCert) throws InvalidKeyException;
+
+  /**
    * Gets the ContentVerifierProvider from the certificate.
    *
    * @param cert
@@ -152,10 +167,42 @@ public interface SecurityFactory {
    *          CSR to be verified. Must not be {@code null}.
    * @param algoValidator
    *          Signature algorithms validator. <code>null</code> to accept all algorithms
+   * @param ownerKeyAndCert
+   *          The owner's key and certificate for the CSR with Diffie-Hellman PoC.
+   *          May be {@code null}.
+   * @return <code>true</code> if the signature is valid and the signature algorithm is accepted,
+   *         <code>false</code> otherwise.
+   */
+  boolean verifyPopo(PKCS10CertificationRequest csr, AlgorithmValidator algoValidator,
+      DHSigStaticKeyCertPair ownerKeyAndCert);
+
+  /**
+   * Verifies the signature of CSR.
+   *
+   * @param csr
+   *          CSR to be verified. Must not be {@code null}.
+   * @param algoValidator
+   *          Signature algorithms validator. <code>null</code> to accept all algorithms
    * @return <code>true</code> if the signature is valid and the signature algorithm is accepted,
    *         <code>false</code> otherwise.
    */
   boolean verifyPopo(CertificationRequest csr, AlgorithmValidator algoValidator);
+
+  /**
+   * Verifies the signature of CSR.
+   *
+   * @param csr
+   *          CSR to be verified. Must not be {@code null}.
+   * @param algoValidator
+   *          Signature algorithms validator. <code>null</code> to accept all algorithms
+   * @param ownerKeyAndCert
+   *          The owner's key and certificate for the CSR with Diffie-Hellman PoC.
+   *          May be {@code null}.
+   * @return <code>true</code> if the signature is valid and the signature algorithm is accepted,
+   *         <code>false</code> otherwise.
+   */
+  boolean verifyPopo(CertificationRequest csr, AlgorithmValidator algoValidator,
+      DHSigStaticKeyCertPair ownerKeyAndCert);
 
   /**
    * Create PublicKey from the {@code subjectPublicKeyInfo}.

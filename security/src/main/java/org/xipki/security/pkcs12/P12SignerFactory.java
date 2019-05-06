@@ -24,11 +24,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.crypto.NoSuchPaddingException;
@@ -37,12 +37,12 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.SignerFactory;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
-import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
 import org.xipki.util.ObjectCreationException;
@@ -119,17 +119,6 @@ public class P12SignerFactory implements SignerFactory {
       }
     }
 
-    X509Certificate peerCert = null;
-    str = conf.getConfValue("peer-cert");
-    if (StringUtil.isNotBlank(str)) {
-      InputStream peerCertStream = getInputStream(str);
-      try {
-        peerCert = X509Util.parseCert(peerCertStream);
-      } catch (CertificateException | IOException ex) {
-        throw new ObjectCreationException("could not parse peer-cert", ex);
-      }
-    }
-
     str = conf.getConfValue("keystore");
     String keyLabel = conf.getConfValue("key-label");
 
@@ -151,24 +140,45 @@ public class P12SignerFactory implements SignerFactory {
             type, keystoreStream, password, keyLabel, password);
 
         return signerBuilder.createSigner(macAlgId, parallelism, securityFactory.getRandom4Sign());
-      } else if (peerCert != null) {
-        P12XdhMacContentSignerBuilder signerBuilder = new P12XdhMacContentSignerBuilder(peerCert,
-            type, keystoreStream, password, keyLabel, password, certificateChain);
-        return signerBuilder.createSigner(parallelism);
       } else {
-        P12ContentSignerBuilder signerBuilder = new P12ContentSignerBuilder(
+        KeypairWithCert keypairWithCert = KeypairWithCert.fromKeystore(
             type, keystoreStream, password, keyLabel, password, certificateChain);
+        String publicKeyAlg = keypairWithCert.getPublicKey().getAlgorithm();
+        if (EdECConstants.isMontgemoryCurveKeyAlgName(publicKeyAlg)) {
+          X509Certificate peerCert = null;
+          // peer certificate is needed
+          List<X509Certificate> peerCerts = conf.getPeerCertificates();
+          if (peerCerts != null) {
+            for (X509Certificate m : conf.getPeerCertificates()) {
+              if (publicKeyAlg.equalsIgnoreCase(m.getPublicKey().getAlgorithm())) {
+                peerCert = m;
+                break;
+              }
+            }
+          }
 
-        AlgorithmIdentifier signatureAlgId;
-        if (conf.getHashAlgo() == null) {
-          signatureAlgId = AlgorithmUtil.getSigAlgId(null, conf);
+          if (peerCert == null) {
+            throw new ObjectCreationException(
+                "could not find peer certificate for algorithm " + publicKeyAlg);
+          }
+
+          P12XdhMacContentSignerBuilder signerBuilder =
+              new P12XdhMacContentSignerBuilder(keypairWithCert, peerCert);
+          return signerBuilder.createSigner(parallelism);
         } else {
-          PublicKey pubKey = signerBuilder.getCertificate().getPublicKey();
-          signatureAlgId = AlgorithmUtil.getSigAlgId(pubKey, conf);
-        }
+          P12ContentSignerBuilder signerBuilder = new P12ContentSignerBuilder(keypairWithCert);
 
-        return signerBuilder.createSigner(signatureAlgId, parallelism,
-            securityFactory.getRandom4Sign());
+          AlgorithmIdentifier signatureAlgId;
+          if (conf.getHashAlgo() == null) {
+            signatureAlgId = AlgorithmUtil.getSigAlgId(null, conf);
+          } else {
+            PublicKey pubKey = signerBuilder.getCertificate().getPublicKey();
+            signatureAlgId = AlgorithmUtil.getSigAlgId(pubKey, conf);
+          }
+
+          return signerBuilder.createSigner(signatureAlgId, parallelism,
+              securityFactory.getRandom4Sign());
+        }
       }
     } catch (NoSuchAlgorithmException | NoSuchPaddingException | XiSecurityException ex) {
       throw new ObjectCreationException(String.format("%s: %s", ex.getClass().getName(),

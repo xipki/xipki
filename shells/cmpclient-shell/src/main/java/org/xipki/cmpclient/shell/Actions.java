@@ -445,13 +445,17 @@ public class Actions {
 
     protected abstract EnrollCertRequest.EnrollType getCmpReqType() throws Exception;
 
+    protected String getCaName() throws CmpClientException {
+      if (StringUtil.isBlank(caName)) {
+        caName = client.getCaNameForProfile(profile);
+      }
+
+      return caName;
+    }
+
     protected EnrollCertResult enroll() throws Exception {
       // CHECKSTYLE:SKIP
       EnrollCertRequest.EnrollType type = getCmpReqType();
-
-      if (caName != null) {
-        caName = caName.toLowerCase();
-      }
 
       if (needExtensionTypes != null) {
         needExtensionTypes = resolveExtensionTypes(needExtensionTypes);
@@ -685,7 +689,7 @@ public class Actions {
       ReqRespDebug debug = getReqRespDebug();
       EnrollCertResult result;
       try {
-        result = client.enrollCerts(caName, request, debug);
+        result = client.enrollCerts(getCaName(), request, debug);
       } finally {
         saveRequestResponse(debug);
       }
@@ -769,12 +773,8 @@ public class Actions {
       return new SignatureAlgoControl(rsaMgf1, dsaPlain, gm);
     }
 
-    /**
-     * TODO.
-     * @param signatureAlgoControl
-     *          Signature algorithm control. Must not be {@code null}.
-     */
-    protected abstract ConcurrentContentSigner getSigner() throws ObjectCreationException;
+    protected abstract ConcurrentContentSigner getSigner()
+        throws ObjectCreationException, CmpClientException;
 
     @Override
     protected SubjectPublicKeyInfo getPublicKey() throws Exception {
@@ -1371,7 +1371,8 @@ public class Actions {
     private ConcurrentContentSigner signer;
 
     @Override
-    protected ConcurrentContentSigner getSigner() throws ObjectCreationException {
+    protected ConcurrentContentSigner getSigner()
+        throws ObjectCreationException, CmpClientException {
       if (signer == null) {
         if (password == null) {
           try {
@@ -1386,6 +1387,13 @@ public class Actions {
         conf.putPair("keystore", "file:" + p12File);
         SignerConf signerConf = new SignerConf(conf.getEncoded(),
             HashAlgo.getNonNullInstance(hashAlgo), getSignatureAlgoControl());
+
+        String caName = getCaName().toLowerCase();
+        List<X509Certificate> peerCerts = client.getDhPocPeerCertificates(caName);
+        if (CollectionUtil.isNonEmpty(peerCerts)) {
+          signerConf.setPeerCertificates(peerCerts);
+        }
+
         signer = securityFactory.createSigner("PKCS12", signerConf, (X509Certificate[]) null);
       }
       return signer;

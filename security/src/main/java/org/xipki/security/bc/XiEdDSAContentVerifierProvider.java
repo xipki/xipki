@@ -89,7 +89,7 @@ public class XiEdDSAContentVerifierProvider implements ContentVerifierProvider {
 
   }
 
-  private PublicKey verifyKey;
+  private final PublicKey verifyKey;
 
   public XiEdDSAContentVerifierProvider(PublicKey verifyKey) {
     this.verifyKey = Args.notNull(verifyKey, "verifyKey");

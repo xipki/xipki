@@ -93,6 +93,7 @@ import org.xipki.util.CompareUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.Hex;
 import org.xipki.util.IoUtil;
+import org.xipki.util.LogUtil;
 import org.xipki.util.PemEncoder;
 import org.xipki.util.PemEncoder.PemLabel;
 import org.xipki.util.StringUtil;
@@ -1019,5 +1020,31 @@ public class X509Util {
         throw new IllegalStateException("unsupported tag " + tag);
     } // end switch (tag)
   } // method createGeneralName
+
+  public static String formatCert(X509Certificate cert, boolean verbose) {
+    if (cert == null) {
+      return "  null";
+    }
+
+    StringBuilder sb = new StringBuilder(verbose ? 1000 : 100);
+    sb.append("  issuer:  ")
+      .append(X509Util.getRfc4519Name(cert.getIssuerX500Principal())).append('\n');
+    sb.append("  serialNumber: ").append(LogUtil.formatCsn(cert.getSerialNumber())).append('\n');
+    sb.append("  subject: ")
+      .append(X509Util.getRfc4519Name(cert.getSubjectX500Principal())).append('\n');
+    sb.append("  notBefore: ").append(cert.getNotBefore()).append("\n");
+    sb.append("  notAfter:  ").append(cert.getNotAfter());
+
+    if (verbose) {
+      sb.append("\n  encoded: ");
+      try {
+        sb.append(Base64.encodeToString(cert.getEncoded()));
+      } catch (CertificateEncodingException ex) {
+        sb.append("ERROR");
+      }
+    }
+
+    return sb.toString();
+  }
 
 }

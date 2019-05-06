@@ -95,30 +95,15 @@ public class P12KeyGenerator {
 
   } // class KeyPairWithSubjectPublicKeyInfo
 
-  static class KeyAndCertPair {
-
-    private final X509CertificateHolder cert;
+  private static class KeyAndCertPair {
 
     private final X509Certificate jceCert;
 
     private final PrivateKey key;
 
     KeyAndCertPair(X509CertificateHolder cert, PrivateKey key) throws CertificateException {
-      this.cert = cert;
       this.key = key;
       this.jceCert = X509Util.toX509Cert(cert.toASN1Structure());
-    }
-
-    public X509CertificateHolder getCert() {
-      return cert;
-    }
-
-    public Certificate getJceCert() {
-      return jceCert;
-    }
-
-    public PrivateKey getKey() {
-      return key;
     }
 
   } // class KeyAndCertPair
@@ -253,8 +238,8 @@ public class P12KeyGenerator {
     KeyStore ks = KeyUtil.getKeyStore("PKCS12");
     ks.load(null, params.getPassword());
 
-    ks.setKeyEntry("main", identity.getKey(), params.getPassword(),
-        new Certificate[]{identity.getJceCert()});
+    ks.setKeyEntry("main", identity.key, params.getPassword(),
+        new Certificate[]{identity.jceCert});
 
     ByteArrayOutputStream ksStream = new ByteArrayOutputStream();
     try {

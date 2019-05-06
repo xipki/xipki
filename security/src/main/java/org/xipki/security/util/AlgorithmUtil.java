@@ -344,9 +344,6 @@ public class AlgorithmUtil {
       addOidNameMap(m1, m2, NISTObjectIdentifiers.id_hmacWithSHA3_256, "HMACSHA3-256");
       addOidNameMap(m1, m2, NISTObjectIdentifiers.id_hmacWithSHA3_384, "HMACSHA3-384");
       addOidNameMap(m1, m2, NISTObjectIdentifiers.id_hmacWithSHA3_512, "HMACSHA3-512");
-      // DH-Poc
-      addOidNameMap(m1, m2, Xipki.id_alg_dhPop_x25519_sha256, "DHPOP-X25519-SHA256");
-      addOidNameMap(m1, m2, Xipki.id_alg_dhPop_x448_sha512, "DHPOP-X512-SHA512");
 
       macAlgOidToNameMap = Collections.unmodifiableMap(m1);
       macAlgNameToOidMap = Collections.unmodifiableMap(m2);
@@ -424,6 +421,11 @@ public class AlgorithmUtil {
       addOidNameMap(m1, m2, GMObjectIdentifiers.sm2sign_with_sm3, "SM3WITHSM2", "SM2WITHSM3");
       addOidNameMap(m1, m2, EdECConstants.id_Ed25519, EdECConstants.ALG_Ed25519);
       addOidNameMap(m1, m2, EdECConstants.id_Ed448, EdECConstants.ALG_Ed448);
+
+      // DH-Poc
+      addOidNameMap(m1, m2, Xipki.id_alg_dhPop_x25519_sha256, "DHPOP-X25519-SHA256");
+      addOidNameMap(m1, m2, Xipki.id_alg_dhPop_x448_sha512, "DHPOP-X448-SHA512");
+
       sigAlgOidToNameMap = Collections.unmodifiableMap(m1);
       sigAlgNameToOidMap = Collections.unmodifiableMap(m2);
 
@@ -909,20 +911,15 @@ public class AlgorithmUtil {
       return algoText;
     }
 
-    StringBuilder sb = new StringBuilder(algoText.length());
-    for (int i = 0; i < algoText.length(); i++) {
-      char cc = algoText.charAt(i);
-      if (cc == '-') {
-        if (i > 3 && !(algoText.charAt(i - 4) == 'S' && algoText.charAt(i - 3) == 'H'
-            && algoText.charAt(i - 2) == 'A' && algoText.charAt(i - 1) == '3')) {
-          continue;
-        }
-      }
-
-      sb.append(cc);
+    boolean bo = algoText.contains("SHA-") || algoText.contains("AES-")
+                    || algoText.contains("RIPEMD-");
+    if (bo) {
+      algoText = algoText.replaceAll("SHA-", "SHA");
+      algoText = algoText.replaceAll("RIPEMD-", "RIPEMD");
+      algoText = algoText.replaceAll("AES-", "AES");
     }
 
-    return sb.toString();
+    return algoText;
   }
 
 }

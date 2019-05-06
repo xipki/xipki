@@ -33,7 +33,9 @@ import org.apache.karaf.shell.api.console.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.SecurePasswordInputPanel;
+import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
+import org.xipki.util.ConfPairs;
 import org.xipki.util.Hex;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
@@ -63,6 +65,35 @@ public abstract class XiAction implements Action {
 
   protected boolean isTrue(Boolean bo) {
     return bo != null && bo.booleanValue();
+  }
+
+  protected ConfPairs embedFileContent(ConfPairs confPairs) throws IOException {
+    boolean changed = false;
+    for (String name : confPairs.names()) {
+      String value = confPairs.value(name);
+      if (value.startsWith("file:")) {
+        changed = true;
+        break;
+      }
+    }
+
+    if (!changed) {
+      return confPairs;
+    }
+
+    ConfPairs newPairs = new ConfPairs();
+    for (String name : confPairs.names()) {
+      String value = confPairs.value(name);
+      if (value.startsWith("file:")) {
+        String fileName = value.substring("file:".length());
+        byte[] binValue = IoUtil.read(fileName);
+        confPairs.putPair(name, "base64:" + Base64.encodeToString(binValue));
+      } else {
+        newPairs.putPair(name, value);
+      }
+    }
+
+    return newPairs;
   }
 
   protected void saveVerbose(String promptPrefix, String file, byte[] encoded) throws IOException {

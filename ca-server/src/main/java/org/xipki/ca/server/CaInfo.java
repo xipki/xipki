@@ -73,25 +73,27 @@ public class CaInfo {
 
   private final MgmtEntry.Ca caEntry;
 
-  private long noNewCertificateAfter;
+  private final long noNewCertificateAfter;
 
-  private BigInteger serialNumber;
+  private final BigInteger serialNumber;
 
-  private Date notBefore;
+  private final Date notBefore;
 
-  private Date notAfter;
+  private final Date notAfter;
 
-  private boolean selfSigned;
+  private final boolean selfSigned;
 
-  private CMPCertificate certInCmpFormat;
+  private final CMPCertificate certInCmpFormat;
 
-  private PublicCaInfo publicCaInfo;
+  private final PublicCaInfo publicCaInfo;
 
-  private List<X509Cert> certchain;
+  private final List<X509Cert> certchain;
 
-  private CertStore certStore;
+  private final CertStore certStore;
 
-  private RandomSerialNumberGenerator randomSnGenerator;
+  private final RandomSerialNumberGenerator randomSnGenerator;
+
+  private DhpocControl dhpocControl;
 
   private Map<String, ConcurrentContentSigner> signers;
 
@@ -224,12 +226,16 @@ public class CaInfo {
     return caEntry.getCmpControl();
   }
 
+  public void setCmpControl(CmpControl cmpControl) {
+    caEntry.setCmpControl(cmpControl);
+  }
+
   public CtLogControl getCtLogControl() {
     return caEntry.getCtLogControl();
   }
 
-  public void setCmpControl(CmpControl cmpControl) {
-    caEntry.setCmpControl(cmpControl);
+  public DhpocControl getDhpocControl() {
+    return dhpocControl;
   }
 
   public String getScepResponderName() {
@@ -413,6 +419,19 @@ public class CaInfo {
     this.signers = Collections.unmodifiableMap(tmpSigners);
     return true;
   } // method initSigner
+
+  public boolean initDhpocControl(SecurityFactory securityFactory) throws XiSecurityException {
+    if (dhpocControl != null) {
+      return true;
+    }
+
+    if (caEntry.getDhpocControl() != null) {
+      this.dhpocControl = new DhpocControl(caEntry.getDhpocControl(), securityFactory);
+    } else {
+      this.dhpocControl = null;
+    }
+    return true;
+  }
 
   public boolean isSignerRequired() {
     int permission = caEntry.getPermission();

@@ -48,6 +48,7 @@ public class CollectionAlgorithmValidator implements AlgorithmValidator {
     Set<String> canonicalizedNames = new HashSet<>();
     if (algoNames != null) {
       for (String m : algoNames) {
+        //
         canonicalizedNames.add(AlgorithmUtil.canonicalizeSignatureAlgo(m));
       }
     }
@@ -68,7 +69,7 @@ public class CollectionAlgorithmValidator implements AlgorithmValidator {
 
     String name;
     try {
-      name = AlgorithmUtil.getSignatureAlgoName(algId);
+      name = AlgorithmUtil.getSigOrMacAlgoName(algId);
     } catch (NoSuchAlgorithmException ex) {
       return false;
     }

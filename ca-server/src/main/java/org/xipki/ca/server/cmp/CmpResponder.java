@@ -84,12 +84,14 @@ import org.bouncycastle.asn1.cmp.RevDetails;
 import org.bouncycastle.asn1.cmp.RevRepContentBuilder;
 import org.bouncycastle.asn1.cmp.RevReqContent;
 import org.bouncycastle.asn1.cms.GCMParameters;
+import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
 import org.bouncycastle.asn1.crmf.AttributeTypeAndValue;
 import org.bouncycastle.asn1.crmf.CertId;
 import org.bouncycastle.asn1.crmf.CertReqMessages;
 import org.bouncycastle.asn1.crmf.CertReqMsg;
 import org.bouncycastle.asn1.crmf.CertTemplate;
 import org.bouncycastle.asn1.crmf.Controls;
+import org.bouncycastle.asn1.crmf.DhSigStatic;
 import org.bouncycastle.asn1.crmf.EncryptedValue;
 import org.bouncycastle.asn1.crmf.OptionalValidity;
 import org.bouncycastle.asn1.crmf.POPOSigningKey;
@@ -140,13 +142,17 @@ import org.xipki.ca.server.CaInfo;
 import org.xipki.ca.server.CaManagerImpl;
 import org.xipki.ca.server.CaUtil;
 import org.xipki.ca.server.CertTemplateData;
+import org.xipki.ca.server.DhpocControl;
 import org.xipki.ca.server.X509Ca;
 import org.xipki.security.AlgorithmValidator;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.CrlReason;
+import org.xipki.security.DHSigStaticKeyCertPair;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityConstants;
+import org.xipki.security.ObjectIdentifiers.Xipki;
 import org.xipki.security.cmp.CmpUtf8Pairs;
 import org.xipki.security.cmp.CmpUtil;
 import org.xipki.security.util.AlgorithmUtil;
@@ -805,7 +811,7 @@ public class CmpResponder extends BaseCmpResponder {
     boolean certGenerated = false;
     X509Ca ca = getCa();
 
-    if (!securityFactory.verifyPopo(p10cr, getCmpControl().getPopoAlgoValidator())) {
+    if (!ca.verifyCsr(p10cr)) {
       LOG.warn("could not validate POP for the pkcs#10 requst");
       certResp = buildErrorCertResponse(certReqId, PKIFailureInfo.badPOP, "invalid POP");
     } else {
@@ -1579,7 +1585,29 @@ public class CmpResponder extends BaseCmpResponder {
 
     try {
       PublicKey publicKey = securityFactory.generatePublicKey(spki);
-      ContentVerifierProvider cvp = securityFactory.getContentVerifierProvider(publicKey);
+      ASN1ObjectIdentifier algOid = popoAlgId.getAlgorithm();
+
+      DhpocControl dhpocControl = getCa().getCaInfo().getDhpocControl();
+
+      DHSigStaticKeyCertPair kaKeyAndCert = null;
+      if (Xipki.id_alg_dhPop_x25519_sha256.equals(algOid)
+          || Xipki.id_alg_dhPop_x448_sha512.equals(algOid)) {
+        if (dhpocControl != null) {
+          DhSigStatic dhSigStatic = DhSigStatic.getInstance(popoSign.getSignature().getBytes());
+          IssuerAndSerialNumber isn = dhSigStatic.getIssuerAndSerial();
+
+          ASN1ObjectIdentifier keyAlgOid = spki.getAlgorithm().getAlgorithm();
+          kaKeyAndCert = dhpocControl.getKeyCertPair(isn.getName(),
+              isn.getSerialNumber().getValue(), EdECConstants.getKeyAlgNameForKeyAlg(keyAlgOid));
+        }
+
+        if (kaKeyAndCert == null) {
+          return false;
+        }
+      }
+
+      ContentVerifierProvider cvp = securityFactory.getContentVerifierProvider(
+          publicKey, kaKeyAndCert);
       return certRequest.isValidSigningKeyPOP(cvp);
     } catch (InvalidKeyException | IllegalStateException | CRMFException ex) {
       LogUtil.error(LOG, ex);
@@ -1607,6 +1635,8 @@ public class CmpResponder extends BaseCmpResponder {
   private String getSystemInfo(CmpRequestorInfo requestor, Set<Integer> acceptVersions)
       throws OperationException {
     X509Ca ca = getCa();
+    CaInfo caInfo = ca.getCaInfo();
+
     // current only version 3 is supported
     int version = 3;
     if (acceptVersions != null && !acceptVersions.contains(version)) {
@@ -1618,8 +1648,8 @@ public class CmpResponder extends BaseCmpResponder {
     root.put("version", version);
     List<byte[]> certchain = new LinkedList<byte[]>();
 
-    certchain.add(ca.getCaInfo().getCert().getEncodedCert());
-    for (X509Cert m : ca.getCaInfo().getCertchain()) {
+    certchain.add(caInfo.getCert().getEncodedCert());
+    for (X509Cert m : caInfo.getCertchain()) {
       certchain.add(m.getEncodedCert());
     }
     root.put("caCertchain", certchain);
@@ -1632,7 +1662,7 @@ public class CmpResponder extends BaseCmpResponder {
     Set<String> requestorProfiles = requestor.getCaHasRequestor().getProfiles();
     Set<String> supportedProfileNames = new HashSet<>();
     Set<String> caProfileNames =
-        ca.getCaManager().getCertprofilesForCa(ca.getCaInfo().getIdent().getName());
+        ca.getCaManager().getCertprofilesForCa(caInfo.getIdent().getName());
     for (String caProfileName : caProfileNames) {
       if (requestorProfiles.contains("all") || requestorProfiles.contains(caProfileName)) {
         supportedProfileNames.add(caProfileName);
@@ -1654,6 +1684,17 @@ public class CmpResponder extends BaseCmpResponder {
         jsonCertprofile.put("conf", entry.getConf());
         jsonCertprofiles.add(jsonCertprofile);
       }
+    }
+
+    // DHPocs
+    DhpocControl dhpocControl = ca.getCaInfo().getDhpocControl();
+    if (dhpocControl != null) {
+      X509Cert[] certs = dhpocControl.getCertificates();
+      List<byte[]> dhpocCerts = new LinkedList<>();
+      for (X509Cert m : certs) {
+        dhpocCerts.add(m.getEncodedCert());
+      }
+      root.put("dhpocs", dhpocCerts);
     }
 
     return JSON.toJSONString(root, false);

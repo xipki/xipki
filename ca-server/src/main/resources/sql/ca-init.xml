@@ -173,6 +173,7 @@
       <column name="CERT" type="VARCHAR(6000)">
         <constraints nullable="false"/>
       </column>
+      <column name="DHPOC_CONTROL" type="CLOB" remarks="Diffie-Hellman Key Agreement PoC Control"/>
       <column name="EXTRA_CONTROL" type="CLOB" remarks="extra control"/>
       <column name="CERTCHAIN" type="CLOB" remarks="Certificate chain without CA's certificate"/>
       <column name="SIGNER_CONF" type="CLOB">

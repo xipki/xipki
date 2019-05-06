@@ -25,7 +25,10 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
+import org.bouncycastle.asn1.crmf.DhSigStatic;
 import org.bouncycastle.asn1.pkcs.Attribute;
+import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.RDN;
@@ -42,6 +45,11 @@ import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.xipki.ca.api.profile.Certprofile.CertLevel;
 import org.xipki.ca.api.profile.SubjectDnSpec;
+import org.xipki.security.AlgorithmValidator;
+import org.xipki.security.DHSigStaticKeyCertPair;
+import org.xipki.security.EdECConstants;
+import org.xipki.security.ObjectIdentifiers.Xipki;
+import org.xipki.security.SecurityFactory;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 
@@ -170,6 +178,33 @@ public class CaUtil {
     }
 
     return new X500Name(rdns.toArray(new RDN[0]));
+  }
+
+  public static boolean verifyCsr(CertificationRequest csr, SecurityFactory securityFactory,
+      AlgorithmValidator algorithmValidator, DhpocControl dhpocControl) {
+    Args.notNull(csr, "csr");
+
+    ASN1ObjectIdentifier algOid = csr.getSignatureAlgorithm().getAlgorithm();
+
+    DHSigStaticKeyCertPair kaKeyAndCert = null;
+    if (Xipki.id_alg_dhPop_x25519_sha256.equals(algOid)
+        || Xipki.id_alg_dhPop_x448_sha512.equals(algOid)) {
+      if (dhpocControl != null) {
+        DhSigStatic dhSigStatic = DhSigStatic.getInstance(csr.getSignature().getBytes());
+        IssuerAndSerialNumber isn = dhSigStatic.getIssuerAndSerial();
+
+        ASN1ObjectIdentifier keyOid = csr.getCertificationRequestInfo().getSubjectPublicKeyInfo()
+                                        .getAlgorithm().getAlgorithm();
+        kaKeyAndCert = dhpocControl.getKeyCertPair(isn.getName(), isn.getSerialNumber().getValue(),
+            EdECConstants.getKeyAlgNameForKeyAlg(keyOid));
+      }
+
+      if (kaKeyAndCert == null) {
+        return false;
+      }
+    }
+
+    return securityFactory.verifyPopo(csr, algorithmValidator, kaKeyAndCert);
   }
 
   private static RDN[] getRdns(RDN[] rdns, ASN1ObjectIdentifier type) {

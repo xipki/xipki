@@ -411,10 +411,8 @@ public class ScepResponder {
             LOG.info("tid={}, subject={}", tid, X509Util.getRfc4519Name(reqSubject));
           }
 
-          try {
-            ca.checkCsr(csr);
-          } catch (OperationException ex) {
-            LogUtil.warn(LOG, ex, "tid=" + tid + " POPO verification failed");
+          if (ca.verifyCsr(csr)) {
+            LOG.warn("tid={} POPO verification failed",tid);
             throw FailInfoException.BAD_MESSAGE_CHECK;
           }
 

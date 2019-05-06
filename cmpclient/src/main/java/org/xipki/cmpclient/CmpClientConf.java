@@ -49,7 +49,9 @@ public class CmpClientConf extends ValidatableConf {
 
     private Cmpcontrol cmpcontrol;
 
-    private CaCertchain caCertchain;
+    private Certs caCertchain;
+
+    private Certs dhpocCerts;
 
     private Certprofiles certprofiles;
 
@@ -109,12 +111,20 @@ public class CmpClientConf extends ValidatableConf {
       this.cmpcontrol = cmpcontrol;
     }
 
-    public CaCertchain getCaCertchain() {
+    public Certs getCaCertchain() {
       return caCertchain;
     }
 
-    public void setCaCertchain(CaCertchain caCertchain) {
+    public void setCaCertchain(Certs caCertchain) {
       this.caCertchain = caCertchain;
+    }
+
+    public Certs getDhpocCerts() {
+      return dhpocCerts;
+    }
+
+    public void setDhpocCerts(Certs dhpocCerts) {
+      this.dhpocCerts = dhpocCerts;
     }
 
     public Certprofiles getCertprofiles() {
@@ -131,21 +141,19 @@ public class CmpClientConf extends ValidatableConf {
       notEmpty(url, "url");
       notEmpty(requestor, "requestor");
       notEmpty(responder, "responder");
-      notNull(cmpcontrol, "cmpcontrol");
       validate(cmpcontrol);
-      notNull(caCertchain, "caCertchain");
       validate(caCertchain);
-      notNull(certprofiles, "certprofiles");
       validate(certprofiles);
+      validate(dhpocCerts);
     }
 
   }
 
-  public static class CaCertchain extends ValidatableConf {
+  public static class Certs extends ValidatableConf {
 
     private boolean autoconf;
 
-    private List<FileOrBinary> certchain;
+    private List<FileOrBinary> certificates;
 
     public boolean isAutoconf() {
       return autoconf;
@@ -155,19 +163,19 @@ public class CmpClientConf extends ValidatableConf {
       this.autoconf = autoconf;
     }
 
-    public List<FileOrBinary> getCertchain() {
-      return autoconf ? null : certchain;
+    public List<FileOrBinary> getCertificates() {
+      return autoconf ? null : certificates;
     }
 
-    public void setCertchain(List<FileOrBinary> certchain) {
-      this.certchain = certchain;
+    public void setCertificates(List<FileOrBinary> certificates) {
+      this.certificates = certificates;
     }
 
     @Override
     public void validate() throws InvalidConfException {
       if (!autoconf) {
-        notEmpty(certchain, "certchain");
-        for (FileOrBinary m : certchain) {
+        notEmpty(certificates, "certificates");
+        for (FileOrBinary m : certificates) {
           m.validate();
         }
       }

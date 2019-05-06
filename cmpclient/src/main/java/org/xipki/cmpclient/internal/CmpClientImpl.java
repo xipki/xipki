@@ -46,6 +46,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -70,6 +71,7 @@ import org.xipki.cmpclient.CertIdOrError;
 import org.xipki.cmpclient.CertprofileInfo;
 import org.xipki.cmpclient.CmpClient;
 import org.xipki.cmpclient.CmpClientConf;
+import org.xipki.cmpclient.CmpClientConf.Certs;
 import org.xipki.cmpclient.CmpClientException;
 import org.xipki.cmpclient.EnrollCertRequest;
 import org.xipki.cmpclient.EnrollCertResult;
@@ -216,6 +218,9 @@ public final class CmpClientImpl implements CmpClient {
         }
         if (ca.isCmpControlAutoconf()) {
           ca.setCmpControl(caInfo.getCmpControl());
+        }
+        if (ca.isDhpocAutoconf()) {
+          ca.setDhpocs(caInfo.getDhpocs());
         }
         LOG.info("retrieved CAInfo for CA " + name);
       } catch (CmpClientException | PkiErrorException | CertificateEncodingException
@@ -375,12 +380,13 @@ public final class CmpClientImpl implements CmpClient {
         CaConf ca = new CaConf(caName, caType.getUrl(), caType.getHealthUrl(),
             caType.getRequestor(), responder, sslSocketFactory, hostnameVerifier);
 
-        // CA cert
-        if (caType.getCaCertchain().isAutoconf()) {
+        // CA certchain
+        Certs caCertchain = caType.getCaCertchain();
+        if (caCertchain == null || caCertchain.isAutoconf()) {
           ca.setCertAutoconf(true);
         } else {
           ca.setCertAutoconf(false);
-          List<FileOrBinary> certchainConf = caType.getCaCertchain().getCertchain();
+          List<FileOrBinary> certchainConf = caType.getCaCertchain().getCertificates();
 
           X509Certificate caCert = X509Util.parseCert(certchainConf.get(0).readContent());
           Set<X509Certificate> issuers = new HashSet<>();
@@ -402,10 +408,30 @@ public final class CmpClientImpl implements CmpClient {
           }
         }
 
+        // DHPoc
+        Certs dhpocCerts = caType.getDhpocCerts();
+        if (dhpocCerts == null || dhpocCerts.isAutoconf()) {
+          ca.setDhpocAutoconf(true);
+        } else {
+          ca.setDhpocAutoconf(false);
+          List<X509Certificate> dhpocs = new LinkedList<>();
+
+          List<FileOrBinary> list = dhpocCerts.getCertificates();
+          if (list != null) {
+            for (FileOrBinary m : list) {
+              X509Certificate cert = X509Util.parseCert(m.readContent());
+              dhpocs.add(cert);
+            }
+          }
+          ca.setDhpocs(dhpocs);
+        }
+
         // CMPControl
         CmpClientConf.Cmpcontrol cmpCtrlType = caType.getCmpcontrol();
-        ca.setCmpControlAutoconf(cmpCtrlType.isAutoconf());
-        if (!ca.isCmpControlAutoconf()) {
+        if (cmpCtrlType == null || cmpCtrlType.isAutoconf()) {
+          ca.setCmpControlAutoconf(true);
+        } else {
+          ca.setCmpControlAutoconf(false);
           Boolean tmpBo = cmpCtrlType.getRrAkiRequired();
           CaConf.CmpControl control = new CaConf.CmpControl(
               (tmpBo == null) ? false : tmpBo.booleanValue());
@@ -414,8 +440,10 @@ public final class CmpClientImpl implements CmpClient {
 
         // Certprofiles
         CmpClientConf.Certprofiles certprofilesType = caType.getCertprofiles();
-        ca.setCertprofilesAutoconf(certprofilesType.isAutoconf());
-        if (!ca.isCertprofilesAutoconf()) {
+        if (certprofilesType == null || certprofilesType.isAutoconf()) {
+          ca.setCertprofilesAutoconf(true);
+        } else {
+          ca.setCertprofilesAutoconf(false);
           List<CmpClientConf.Certprofile> types = certprofilesType.getProfiles();
           Set<CertprofileInfo> profiles = new HashSet<>(types.size());
           for (CmpClientConf.Certprofile m : types) {
@@ -434,7 +462,8 @@ public final class CmpClientImpl implements CmpClient {
         }
 
         cas.add(ca);
-        if (ca.isCertAutoconf() || ca.isCertprofilesAutoconf() || ca.isCmpControlAutoconf()) {
+        if (ca.isCertAutoconf() || ca.isCertprofilesAutoconf() || ca.isCmpControlAutoconf()
+            || ca.isDhpocAutoconf()) {
           autoConfCaNames.add(caName);
         }
       } catch (IOException | CertificateException | CertPathBuilderException ex) {
@@ -835,7 +864,8 @@ public final class CmpClientImpl implements CmpClient {
     throw new CmpClientException("unknown CA for issuer: " + issuer);
   }
 
-  private String getCaNameForProfile(String certprofile) throws CmpClientException {
+  @Override
+  public String getCaNameForProfile(String certprofile) throws CmpClientException {
     String caName = null;
     for (CaConf ca : casMap.values()) {
       if (!ca.isCaInfoConfigured()) {
@@ -1308,6 +1338,13 @@ public final class CmpClientImpl implements CmpClient {
     initIfNotInitialized();
     CaConf ca = casMap.get(caName.toLowerCase());
     return ca == null ? null : ca.getSubject();
+  }
+
+  @Override
+  public List<X509Certificate> getDhPocPeerCertificates(String caName) throws CmpClientException {
+    initIfNotInitialized();
+    CaConf ca = casMap.get(caName.toLowerCase());
+    return ca == null ? null : ca.getDhpocs();
   }
 
 }

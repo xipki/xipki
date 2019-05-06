@@ -19,7 +19,6 @@ package org.xipki.ca.server;
 
 import static org.xipki.ca.api.OperationException.ErrorCode.ALREADY_ISSUED;
 import static org.xipki.ca.api.OperationException.ErrorCode.BAD_CERT_TEMPLATE;
-import static org.xipki.ca.api.OperationException.ErrorCode.BAD_POP;
 import static org.xipki.ca.api.OperationException.ErrorCode.CERT_REVOKED;
 import static org.xipki.ca.api.OperationException.ErrorCode.CRL_FAILURE;
 import static org.xipki.ca.api.OperationException.ErrorCode.INVALID_EXTENSION;
@@ -469,6 +468,13 @@ public class X509Ca implements Closeable {
       this.keypairGenControlByImplictCA = null;
     }
 
+    try {
+      caInfo.initDhpocControl(caManager.getSecurityFactory());
+    } catch (XiSecurityException ex) {
+      LogUtil.error(LOG, ex, "initDhpocControl for CA " + caIdent);
+      throw new OperationException(SYSTEM_FAILURE, ex);
+    }
+
     if (caInfo.isSignerRequired()) {
       try {
         caInfo.initSigner(caManager.getSecurityFactory());
@@ -562,12 +568,10 @@ public class X509Ca implements Closeable {
     return certstore.getCertRequest(caIdent, serialNumber);
   }
 
-  public void checkCsr(CertificationRequest csr) throws OperationException {
+  public boolean verifyCsr(CertificationRequest csr) {
     Args.notNull(csr, "csr");
-    if (!caManager.getSecurityFactory().verifyPopo(csr, getCmpControl().getPopoAlgoValidator())) {
-      LOG.warn("could not validate POP for the pkcs#10 requst");
-      throw new OperationException(BAD_POP);
-    }
+    return CaUtil.verifyCsr(csr, caManager.getSecurityFactory(),
+        getCmpControl().getPopoAlgoValidator(), caInfo.getDhpocControl());
   }
 
   public List<CertListInfo> listCerts(X500Name subjectPattern, Date validFrom,

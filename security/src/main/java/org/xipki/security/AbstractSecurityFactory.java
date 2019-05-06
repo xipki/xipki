@@ -21,8 +21,10 @@ import java.security.InvalidKeyException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
+import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.operator.ContentVerifierProvider;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.xipki.util.Args;
 import org.xipki.util.ObjectCreationException;
 
@@ -54,6 +56,28 @@ public abstract class AbstractSecurityFactory implements SecurityFactory {
     Args.notNull(cert, "cert");
     PublicKey publicKey = generatePublicKey(cert.getSubjectPublicKeyInfo());
     return getContentVerifierProvider(publicKey);
+  }
+
+  @Override
+  public ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey)
+      throws InvalidKeyException {
+    return getContentVerifierProvider(publicKey, null);
+  }
+
+  @Override
+  public boolean verifyPopo(CertificationRequest csr, AlgorithmValidator algoValidator) {
+    return verifyPopo(new PKCS10CertificationRequest(csr), algoValidator, null);
+  }
+
+  @Override
+  public boolean verifyPopo(CertificationRequest csr, AlgorithmValidator algoValidator,
+      DHSigStaticKeyCertPair ownerKeyAndCert) {
+    return verifyPopo(new PKCS10CertificationRequest(csr), algoValidator, ownerKeyAndCert);
+  }
+
+  @Override
+  public boolean verifyPopo(PKCS10CertificationRequest csr, AlgorithmValidator algoValidator) {
+    return verifyPopo(csr, algoValidator, null);
   }
 
 }

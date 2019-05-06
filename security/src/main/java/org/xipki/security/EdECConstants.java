@@ -71,16 +71,28 @@ public class EdECConstants {
     return isEdwardsCurve(curveName) || isMontgemoryCurve(curveName);
   }
 
+  public static boolean isEdwardsCurveKeyAlgName(String algName) {
+    return ALG_Ed25519.equalsIgnoreCase(algName) || ALG_Ed448.equalsIgnoreCase(algName);
+  }
+
+  public static boolean isMontgemoryCurveKeyAlgName(String algName) {
+    return ALG_X25519.equalsIgnoreCase(algName) || ALG_X448.equalsIgnoreCase(algName);
+  }
+
   public static boolean isEdwardsOrMontgemoryCurveKeyAlgName(String algName) {
-    return ALG_Ed25519.equalsIgnoreCase(algName)
-        || ALG_Ed448.equalsIgnoreCase(algName)
-        || ALG_X25519.equalsIgnoreCase(algName)
-        || ALG_X448.equalsIgnoreCase(algName);
+    return isEdwardsCurveKeyAlgName(algName) || isMontgemoryCurveKeyAlgName(algName);
+  }
+
+  public static boolean isEdwardsCurveKeyAlgId(ASN1ObjectIdentifier algId) {
+    return id_Ed25519.equals(algId) || id_Ed448.equals(algId);
+  }
+
+  public static boolean isMontgemoryCurveKeyAlgId(ASN1ObjectIdentifier algId) {
+    return id_X25519.equals(algId) || id_X448.equals(algId);
   }
 
   public static boolean isEdwardsOrMontgemoryCurveKeyAlgId(ASN1ObjectIdentifier algId) {
-    return id_Ed25519.equals(algId) || id_Ed448.equals(algId)
-        || id_X25519.equals(algId) || id_X448.equals(algId);
+    return isEdwardsCurveKeyAlgId(algId) || isMontgemoryCurveKeyAlgId(algId);
   }
 
   public static int getKeyBitSizeForCurve(String curveName) {

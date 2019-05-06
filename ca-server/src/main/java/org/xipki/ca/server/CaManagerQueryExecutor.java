@@ -113,7 +113,8 @@ class CaManagerQueryExecutor {
         + "CERTCHAIN,SIGNER_TYPE,CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,CRL_SIGNER_NAME,"
         + "CMP_CONTROL,CRL_CONTROL,SCEP_CONTROL,CTLOG_CONTROL,DUPLICATE_KEY,"
         + "DUPLICATE_SUBJECT,PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION,NUM_CRLS,KEEP_EXPIRED_CERT_DAYS,"
-        + "EXPIRATION_PERIOD,REV_INFO,VALIDITY_MODE,CA_URIS,EXTRA_CONTROL,SIGNER_CONF "
+        + "EXPIRATION_PERIOD,REV_INFO,VALIDITY_MODE,CA_URIS,EXTRA_CONTROL,SIGNER_CONF,"
+        + "DHPOC_CONTROL "
         + "FROM CA WHERE NAME=?");
     this.sqlNextSelectCrlNo = buildSelectFirstSql("NEXT_CRLNO FROM CA WHERE ID=?");
     this.sqlSelectSystemEvent = buildSelectFirstSql(
@@ -418,6 +419,7 @@ class CaManagerQueryExecutor {
           rs.getLong("NEXT_CRLNO"), rs.getString("SIGNER_TYPE"), rs.getString("SIGNER_CONF"),
           caUris, rs.getInt("NUM_CRLS"), rs.getInt("EXPIRATION_PERIOD"));
       entry.setCert(generateCert(rs.getString("CERT")));
+      entry.setDhpocControl(rs.getString("DHPOC_CONTROL"));
 
       List<X509Certificate> certchain = generateCertchain(rs.getString("CERTCHAIN"));
       // validate certchain
@@ -624,7 +626,8 @@ class CaManagerQueryExecutor {
         + "CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,CRL_CONTROL,CMP_CONTROL,SCEP_CONTROL,"//5
         + "CTLOG_CONTROL,DUPLICATE_KEY,DUPLICATE_SUBJECT,PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION,"//6
         + "NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL,"//5
-        + "SIGNER_CONF) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        + "SIGNER_CONF,DHPOC_CONTROL) "
+        + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     // insert to table ca
     PreparedStatement ps = null;
@@ -685,6 +688,8 @@ class CaManagerQueryExecutor {
       String encodedExtraCtrl = (extraControl == null) ? null : extraControl.getEncoded();
       ps.setString(idx++, StringUtil.isBlank(encodedExtraCtrl) ? null : encodedExtraCtrl);
       ps.setString(idx++, caEntry.getSignerConf());
+      ps.setString(idx++, caEntry.getDhpocControl());
+
       if (ps.executeUpdate() == 0) {
         throw new CaMgmtException("could not add CA " + caEntry.getIdent());
       }
@@ -1136,7 +1141,8 @@ class CaManagerQueryExecutor {
         col(INT, "KEEP_EXPIRED_CERT_DAYS", changeCaEntry.getKeepExpiredCertInDays()),
         col(STRING, "VALIDITY_MODE", validityMode),
         col(STRING, "EXTRA_CONTROL", extraControl),
-        col(STRING, "SIGNER_CONF", signerConf, false, true));
+        col(STRING, "SIGNER_CONF", signerConf, false, true),
+        col(STRING, "DHPOC_CONTROL", changeCaEntry.getDhpocControl(), false, true));
   } // method changeCa
 
   void commitNextCrlNoIfLess(NameId ca, long nextCrlNo) throws CaMgmtException {

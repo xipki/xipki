@@ -61,19 +61,26 @@ class CaConf {
 
     private final List<X509Certificate> certchain;
 
+    private final List<X509Certificate> dhpocs;
+
     private final Set<CertprofileInfo> certprofiles;
 
     private final CmpControl cmpControl;
 
     CaInfo(List<X509Certificate> certchain, CmpControl cmpControl,
-        Set<CertprofileInfo> certprofiles) {
-      this.certchain = Args.notEmpty(certchain, "certchain");
-      this.cmpControl = Args.notNull(cmpControl, "cmpControl");
-      this.certprofiles = Args.notNull(certprofiles, "certprofiles");
+        Set<CertprofileInfo> certprofiles, List<X509Certificate> dhpocs) {
+      this.certchain = certchain;
+      this.cmpControl = cmpControl;
+      this.certprofiles = certprofiles;
+      this.dhpocs = dhpocs;
     }
 
     List<X509Certificate> getCertchain() {
       return certchain;
+    }
+
+    List<X509Certificate> getDhpocs() {
+      return dhpocs;
     }
 
     CmpControl getCmpControl() {
@@ -104,6 +111,8 @@ class CaConf {
 
   private boolean cmpControlAutoconf;
 
+  private boolean dhpocAutoconf;
+
   private X509Certificate cert;
 
   private List<X509Certificate> certchain;
@@ -120,8 +129,9 @@ class CaConf {
 
   private Map<String, CertprofileInfo> profiles = Collections.emptyMap();
 
-  CaConf(String name, String url, String healthUrl, String requestorName,
-      Responder responder,
+  private List<X509Certificate> dhpocs;
+
+  CaConf(String name, String url, String healthUrl, String requestorName, Responder responder,
       SSLSocketFactory sslSocketFactory, HostnameVerifier hostnameVerifier) {
     this.name = Args.toNonBlankLower(name, "name");
     this.url = Args.notBlank(url, "url");
@@ -169,6 +179,22 @@ class CaConf {
 
   public List<X509Certificate> getCertchain() {
     return certchain;
+  }
+
+  public boolean isDhpocAutoconf() {
+    return dhpocAutoconf;
+  }
+
+  public void setDhpocAutoconf(boolean dhpocAutoconf) {
+    this.dhpocAutoconf = dhpocAutoconf;
+  }
+
+  public List<X509Certificate> getDhpocs() {
+    return dhpocs;
+  }
+
+  public void setDhpocs(List<X509Certificate> dhpocs) {
+    this.dhpocs = dhpocs;
   }
 
   public X500Name getSubject() {

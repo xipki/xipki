@@ -32,6 +32,7 @@ import org.xipki.ca.api.NameId;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
+import org.xipki.security.SignerConf;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
@@ -113,6 +114,8 @@ public abstract class MgmtEntry {
     private String signerType;
 
     private String signerConf;
+
+    private String dhpocControl;
 
     private ScepControl scepControl;
 
@@ -270,6 +273,14 @@ public abstract class MgmtEntry {
       return crlControl;
     }
 
+    public String getDhpocControl() {
+      return dhpocControl;
+    }
+
+    public void setDhpocControl(String dhpocControl) {
+      this.dhpocControl = dhpocControl;
+    }
+
     public void setScepControl(ScepControl scepControl) {
       this.scepControl = scepControl;
     }
@@ -403,7 +414,7 @@ public abstract class MgmtEntry {
       if (certchainSize > 0) {
         for (int i = 0; i < certchainSize; i++) {
           certchainStr.append("\ncert[").append(i).append("]:\n");
-          certchainStr.append(InternUtil.formatCert(certchain.get(i), verbose));
+          certchainStr.append(X509Util.formatCert(certchain.get(i), verbose));
         }
       } else {
         certchainStr.append("null");
@@ -415,8 +426,10 @@ public abstract class MgmtEntry {
           "\nmax. validity: ", maxValidity,
           "\nexpiration period: ", expirationPeriod, " days",
           "\nsigner type: ", signerType,
-          "\nsigner conf: ", (signerConf == null ? "null" :
-            InternUtil.signerConfToString(signerConf, verbose, ignoreSensitiveInfo)),
+          "\nsigner conf: ", (signerConf == null
+                ? "null" : signerConfToString(signerConf, verbose, ignoreSensitiveInfo)),
+          "\nDHPoc control: ", (dhpocControl == null
+                ? "null" : signerConfToString(dhpocControl, verbose, ignoreSensitiveInfo)),
           "\nCMP control:\n", (cmpControl == null ? "  null" : cmpControl.toString(verbose)),
           "\nCRL control:\n", (crlControl == null ? "  null" : crlControl.toString(verbose)),
           "\nSCEP control: \n", (scepControl == null ? "  null" : scepControl.toString(verbose)),
@@ -436,7 +449,7 @@ public abstract class MgmtEntry {
           "\nserial number bit length: ", serialNoBitLen,
           "\nnext CRL number: ", nextCrlNumber, "\n", caUris,
           "\nrevocation: ", (revocationInfo == null ? "not revoked" : "revoked"), revInfoText,
-          "\ncert: \n", InternUtil.formatCert(cert, verbose),
+          "\ncert: \n", X509Util.formatCert(cert, verbose),
           certchainStr.toString());
     } // method toString
 
@@ -880,6 +893,8 @@ public abstract class MgmtEntry {
 
     private String ctLogControl;
 
+    private String dhpocControl;
+
     private String cmpResponderName;
 
     private String scepResponderName;
@@ -997,6 +1012,14 @@ public abstract class MgmtEntry {
 
     public void setCtLogControl(String ctLogControl) {
       this.ctLogControl = ctLogControl;
+    }
+
+    public String getDhpocControl() {
+      return dhpocControl;
+    }
+
+    public void setDhpocControl(String dhpocControl) {
+      this.dhpocControl = dhpocControl;
     }
 
     public String getCmpResponderName() {
@@ -1509,7 +1532,7 @@ public abstract class MgmtEntry {
       if (conf == null) {
         sb.append("null");
       } else {
-        sb.append(InternUtil.signerConfToString(conf, verbose, ignoreSensitiveInfo));
+        sb.append(signerConfToString(conf, verbose, ignoreSensitiveInfo));
       }
       sb.append('\n');
       sb.append("certificate: ").append("\n");
@@ -1631,6 +1654,20 @@ public abstract class MgmtEntry {
           "\nactive: ", active, "\npassword: *****\n");
     }
 
+  }
+
+  private static String signerConfToString(String signerConf, boolean verbose,
+      boolean ignoreSensitiveInfo) {
+    Args.notBlank(signerConf, "signerConf");
+    if (ignoreSensitiveInfo) {
+      signerConf = SignerConf.eraseSensitiveData(signerConf);
+    }
+
+    if (verbose || signerConf.length() < 101) {
+      return signerConf;
+    } else {
+      return StringUtil.concat(signerConf.substring(0, 97), "...");
+    }
   }
 
 }

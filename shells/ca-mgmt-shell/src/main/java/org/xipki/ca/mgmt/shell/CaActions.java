@@ -17,7 +17,6 @@
 
 package org.xipki.ca.mgmt.shell;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.math.BigInteger;
@@ -243,6 +242,9 @@ public class CaActions {
     @Option(name = "--ctlog-control", description = "CT log control")
     private String ctLogControl;
 
+    @Option(name = "--dhpoc-control", description = "DHPoc control")
+    private String dhpocControl;
+
     @Option(name = "--num-crls", description = "number of CRLs to be kept in database")
     private Integer numCrls = 30;
 
@@ -350,6 +352,16 @@ public class CaActions {
 
       if (ctLogControl != null) {
         entry.setCtLogControl(new CtLogControl(ctLogControl));
+      }
+
+      if (dhpocControl != null) {
+        String conf = dhpocControl;
+        if (conf.contains("file:")) {
+          ConfPairs confPairs = new ConfPairs(conf);
+          entry.setDhpocControl(embedFileContent(confPairs).getEncoded());
+        } else {
+          entry.setDhpocControl(dhpocControl);
+        }
       }
 
       if (cmpResponderName != null) {
@@ -1058,6 +1070,9 @@ public class CaActions {
     @Option(name = "--ctlog-control", description = "CT log control")
     private String ctLogControl;
 
+    @Option(name = "--dhpoc-control", description = "DHPoc control")
+    private String dhpocControl;
+
     @Option(name = "--num-crls", description = "number of CRLs to be kept in database")
     private Integer numCrls;
 
@@ -1222,6 +1237,12 @@ public class CaActions {
 
       if (ctLogControl != null) {
         entry.setCtLogControl(ctLogControl);
+      }
+
+      if (dhpocControl != null) {
+        String tmp = ShellUtil.canonicalizeSignerConf("PKCS12", dhpocControl,
+            passwordResolver, securityFactory);
+        entry.setDhpocControl(tmp);
       }
 
       if (cmpResponderName != null) {
@@ -1925,7 +1946,7 @@ public class CaActions {
     @Option(name = "--name", aliases = "-n", required = true, description = "requestor name")
     private String name;
 
-    @Option(name = "--cert", description = "requestor certificate file\n"
+    @Option(name = "--cert", description = "requestor certificate file"
         + "(exactly one of cert and password must be specified).")
     @Completion(FileCompleter.class)
     private String certFile;
@@ -2058,8 +2079,6 @@ public class CaActions {
     @Override
     protected Object execute0() throws Exception {
       // check if the certificate is valid
-      byte[] certBytes = IoUtil.read(certFile);
-      X509Util.parseCert(new ByteArrayInputStream(certBytes));
       String msg = "CMP requestor " + name;
 
       String type;

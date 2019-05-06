@@ -31,6 +31,7 @@ import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
@@ -47,6 +48,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.SignerConf;
 import org.xipki.security.XiSecurityException;
+import org.xipki.security.pkcs12.KeypairWithCert;
 import org.xipki.security.pkcs12.KeystoreGenerationParameters;
 import org.xipki.security.pkcs12.P12KeyGenerationResult;
 import org.xipki.security.pkcs12.P12KeyGenerator;
@@ -158,7 +160,7 @@ public class P12Actions {
       char[] pwd = getPassword();
       X509Certificate newCert = X509Util.parseCert(new File(certFile));
 
-      assertMatch(newCert, new String(pwd));
+      assertMatch(ks, newCert, new String(pwd));
 
       String keyname = null;
       Enumeration<String> aliases = ks.aliases();
@@ -191,15 +193,28 @@ public class P12Actions {
       }
     }
 
-    private void assertMatch(X509Certificate cert, String password)
-        throws ObjectCreationException {
-      ConfPairs pairs = new ConfPairs("keystore", "file:" + p12File);
-      if (password != null) {
-        pairs.putPair("password", new String(password));
-      }
+    private void assertMatch(KeyStore ks, X509Certificate cert, String password)
+        throws Exception {
+      String keyAlgName = cert.getPublicKey().getAlgorithm();
+      if (EdECConstants.ALG_X25519.equalsIgnoreCase(keyAlgName)
+          || EdECConstants.ALG_X448.equalsIgnoreCase(keyAlgName)) {
+        // cannot be checked via creating dummy signature, just compare the public keys
+        char[] pwd = password.toCharArray();
+        KeypairWithCert kp = KeypairWithCert.fromKeystore(ks, null, pwd, (X509Certificate[]) null);
+        byte[] expectedEncoded = kp.getPublicKey().getEncoded();
+        byte[] encoded = cert.getPublicKey().getEncoded();
+        if (!Arrays.equals(expectedEncoded, encoded)) {
+          throw new XiSecurityException("the certificate and private do not match");
+        }
+      } else {
+        ConfPairs pairs = new ConfPairs("keystore", "file:" + p12File);
+        if (password != null) {
+          pairs.putPair("password", new String(password));
+        }
 
-      SignerConf conf = new SignerConf(pairs.getEncoded(), HashAlgo.SHA256, null);
-      securityFactory.createSigner("PKCS12", conf, cert);
+        SignerConf conf = new SignerConf(pairs.getEncoded(), HashAlgo.SHA256, null);
+        securityFactory.createSigner("PKCS12", conf, cert);
+      }
     }
 
   }
@@ -249,14 +264,22 @@ public class P12Actions {
     }
 
     static SignerConf getKeystoreSignerConf(String keystoreFile, String password,
-        HashAlgo hashAlgo, SignatureAlgoControl signatureAlgoControl, String peerCertFile) {
+        HashAlgo hashAlgo, SignatureAlgoControl signatureAlgoControl, String peerCertFile)
+            throws ObjectCreationException {
       ConfPairs conf = new ConfPairs("password", password);
       conf.putPair("parallelism", Integer.toString(1));
       conf.putPair("keystore", "file:" + keystoreFile);
+      SignerConf signerConf = new SignerConf(conf.getEncoded(), hashAlgo, signatureAlgoControl);
       if (StringUtil.isNotBlank(peerCertFile)) {
-        conf.putPair("peer-cert", "file:" + peerCertFile);
+        X509Certificate cert;
+        try {
+          cert = X509Util.parseCert(Paths.get(peerCertFile).toFile());
+        } catch (CertificateException | IOException ex) {
+          throw new ObjectCreationException(ex.getMessage(), ex);
+        }
+        signerConf.setPeerCertificates(Arrays.asList(cert));
       }
-      return new SignerConf(conf.getEncoded(), hashAlgo, signatureAlgoControl);
+      return signerConf;
     }
 
   }

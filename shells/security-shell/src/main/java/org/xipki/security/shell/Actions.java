@@ -19,6 +19,7 @@ package org.xipki.security.shell;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -26,6 +27,7 @@ import java.nio.file.Paths;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.MessageDigest;
+import java.security.PrivateKey;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -87,12 +89,15 @@ import org.xipki.password.PBEPasswordService;
 import org.xipki.security.BadInputException;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.DHSigStaticKeyCertPair;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.ExtensionExistence;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.InvalidOidOrNameException;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.ObjectIdentifiers.Xipki;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.X509ExtensionType;
@@ -790,11 +795,70 @@ public class Actions {
     @Completion(FileCompleter.class)
     private String csrFile;
 
+    @Option(name = "--keystore", required = true, description = "peer's keystore file")
+    @Completion(FileCompleter.class)
+    private String peerKeystoreFile;
+
+    @Option(name = "--keystore-type", description = "type of the keystore")
+    @Completion(SecurityCompleters.KeystoreTypeCompleter.class)
+    private String keystoreType = "PKCS12";
+
+    @Option(name = "--keystore-password", description = "password of the keystore")
+    private String keystorePassword;
+
     @Override
     protected Object execute0() throws Exception {
       CertificationRequest csr = X509Util.parseCsr(IoUtil.read(csrFile));
+
+      ASN1ObjectIdentifier algOid = csr.getSignatureAlgorithm().getAlgorithm();
+
+      DHSigStaticKeyCertPair peerKeyAndCert = null;
+      if (Xipki.id_alg_dhPop_x25519_sha256.equals(algOid)
+          || Xipki.id_alg_dhPop_x448_sha512.equals(algOid)) {
+        if (peerKeystoreFile == null || keystorePassword == null) {
+          System.err.println("could not verify CSR, please specify the peer's keystore");
+          return null;
+        }
+
+        String requiredKeyAlg;
+        if (Xipki.id_alg_dhPop_x25519_sha256.equals(algOid)) {
+          requiredKeyAlg = EdECConstants.ALG_X25519;
+        } else {
+          requiredKeyAlg = EdECConstants.ALG_X448;
+        }
+
+        char[] password = keystorePassword.toCharArray();
+        KeyStore ks = KeyUtil.getKeyStore(keystoreType);
+
+        File file = IoUtil.expandFilepath(new File(peerKeystoreFile));
+        try (InputStream is = new FileInputStream(file)) {
+          ks.load(is, password);
+
+          Enumeration<String> aliases = ks.aliases();
+          while (aliases.hasMoreElements()) {
+            String alias = aliases.nextElement();
+            if (!ks.isKeyEntry(alias)) {
+              continue;
+            }
+
+            PrivateKey key = (PrivateKey) ks.getKey(alias, password);
+            if (key.getAlgorithm().equalsIgnoreCase(requiredKeyAlg)) {
+              X509Certificate cert = (X509Certificate) ks.getCertificate(alias);
+              peerKeyAndCert = new DHSigStaticKeyCertPair(key, cert);
+              break;
+            }
+          }
+        }
+
+        if (peerKeyAndCert == null) {
+          System.err.println("could not find peer key entry to verify the CSR");
+          return null;
+        }
+
+      }
+
       String sigAlgo = AlgorithmUtil.getSignatureAlgoName(csr.getSignatureAlgorithm());
-      boolean bo = securityFactory.verifyPopo(csr, null);
+      boolean bo = securityFactory.verifyPopo(csr, null, peerKeyAndCert);
       String txt = bo ? "valid" : "invalid";
       println("The POP is " + txt + " (signature algorithm " + sigAlgo + ").");
       return null;

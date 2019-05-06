@@ -17,7 +17,12 @@
 
 package org.xipki.security;
 
+import java.security.cert.X509Certificate;
+import java.util.List;
+
+import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
+import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.StringUtil;
 
@@ -34,6 +39,8 @@ public class SignerConf {
   private final HashAlgo hashAlgo;
 
   private final SignatureAlgoControl signatureAlgoControl;
+
+  private List<X509Certificate> peerCertificates;
 
   public SignerConf(String conf) {
     this.hashAlgo = null;
@@ -78,6 +85,18 @@ public class SignerConf {
     return confPairs.getEncoded();
   }
 
+  public List<X509Certificate> getPeerCertificates() {
+    return peerCertificates;
+  }
+
+  public void setPeerCertificates(List<X509Certificate> peerCertificates) {
+    this.peerCertificates = peerCertificates;
+  }
+
+  public ConfPairs getConfPairs() {
+    return confPairs;
+  }
+
   @Override
   public String toString() {
     return toString(true, true);
@@ -98,6 +117,16 @@ public class SignerConf {
 
     if (signatureAlgoControl != null) {
       sb.append("\nsiganture algo control: ").append(signatureAlgoControl);
+    }
+
+    sb.append("\npeerCertificates: ");
+    if (CollectionUtil.isEmpty(peerCertificates)) {
+      sb.append("null");
+    } else {
+      for (int i = 0; i < peerCertificates.size(); i++) {
+        sb.append("\ncert[").append(i).append("]:\n");
+        sb.append(X509Util.formatCert(peerCertificates.get(i), verbose));
+      }
     }
 
     return sb.toString();

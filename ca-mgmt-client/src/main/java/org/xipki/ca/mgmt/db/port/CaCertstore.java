@@ -70,6 +70,8 @@ public class CaCertstore extends ValidatableConf {
 
     private String ctLogControl;
 
+    private String dhpocControl;
+
     private int duplicateKey;
 
     private int duplicateSubject;
@@ -234,6 +236,14 @@ public class CaCertstore extends ValidatableConf {
 
     public void setCtLogControl(String ctLogControl) {
       this.ctLogControl = ctLogControl;
+    }
+
+    public String getDhpocControl() {
+      return dhpocControl;
+    }
+
+    public void setDhpocControl(String dhpocControl) {
+      this.dhpocControl = dhpocControl;
     }
 
     public int getDuplicateKey() {

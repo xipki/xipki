@@ -358,4 +358,24 @@ public interface CmpClient extends Closeable {
    */
   X500Name getCaCertSubject(String caName) throws CmpClientException;
 
+  /**
+   * Returns the certificates held by CA for the DH KeyAgreement.
+   * @param caName
+   *          the CA name
+   * @return the certificates held by CA for the DH KeyAgreement,
+   * @throws CmpClientException
+   *          if client error occurs.
+   */
+  List<X509Certificate> getDhPocPeerCertificates(String caName) throws CmpClientException;
+
+  /**
+   * Returns name of CA that supports give {@code certprofile}.
+   * @param certprofile
+   *        The name of certprofile
+   * @return name of CA that supports give {@code certprofile}.
+   * @throws CmpClientException
+   *         If more than one CA supports the certificate.
+   */
+  public String getCaNameForProfile(String certprofile) throws CmpClientException;
+
 }

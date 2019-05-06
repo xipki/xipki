@@ -80,7 +80,6 @@ import org.xipki.ca.api.mgmt.CaSystemStatus;
 import org.xipki.ca.api.mgmt.CertListInfo;
 import org.xipki.ca.api.mgmt.CertListOrderBy;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
-import org.xipki.ca.api.mgmt.CmpControl;
 import org.xipki.ca.api.mgmt.CtLogControl;
 import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.ca.api.mgmt.PermissionConstants;
@@ -2091,8 +2090,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       throw new CaMgmtException(concat("invalid CSR request. ERROR: ", ex.getMessage()));
     }
 
-    CmpControl cmpControl = ca.getCaInfo().getCmpControl();
-    if (!securityFactory.verifyPopo(csr, cmpControl.getPopoAlgoValidator())) {
+    if (!ca.verifyCsr(csr)) {
       throw new CaMgmtException("could not validate POP for the CSR");
     }
 

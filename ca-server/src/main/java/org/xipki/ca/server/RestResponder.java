@@ -46,11 +46,11 @@ import org.xipki.ca.api.InsuffientPermissionException;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
+import org.xipki.ca.api.RequestType;
+import org.xipki.ca.api.RestAPIConstants;
 import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.PermissionConstants;
 import org.xipki.ca.api.mgmt.RequestorInfo;
-import org.xipki.ca.api.RequestType;
-import org.xipki.ca.api.RestAPIConstants;
 import org.xipki.security.CrlReason;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
@@ -248,6 +248,15 @@ public class RestResponder {
       if (RestAPIConstants.CMD_cacert.equalsIgnoreCase(command)) {
         respCt = RestAPIConstants.CT_pkix_cert;
         respBytes = ca.getCaInfo().getCert().getEncodedCert();
+      } else if (RestAPIConstants.CMD_dhpoc_certs.equalsIgnoreCase(command)) {
+        DhpocControl control = responderManager.getX509Ca(caName).getCaInfo().getDhpocControl();
+        if (control == null) {
+          respBytes = new byte[0];
+        } else {
+          respCt = RestAPIConstants.CT_pem_file;
+          respBytes = StringUtil.toUtf8Bytes(
+                        X509Util.encodeCertificates(control.getCertificates()));
+        }
       } else if (RestAPIConstants.CMD_cacertchain.equalsIgnoreCase(command)) {
         respCt = RestAPIConstants.CT_pem_file;
         List<X509Cert> certchain = ca.getCaInfo().getCertchain();
@@ -260,8 +269,7 @@ public class RestResponder {
           }
         }
 
-        respBytes = StringUtil.toUtf8Bytes(
-                        X509Util.encodeCertificates(certchainWithCaCert));
+        respBytes = StringUtil.toUtf8Bytes(X509Util.encodeCertificates(certchainWithCaCert));
       } else if (RestAPIConstants.CMD_enroll_cert.equalsIgnoreCase(command)) {
         String profile = httpRetriever.getParameter(RestAPIConstants.PARAM_profile);
         if (StringUtil.isBlank(profile)) {
@@ -299,7 +307,9 @@ public class RestResponder {
         byte[] encodedCsr = request;
 
         CertificationRequest csr = CertificationRequest.getInstance(encodedCsr);
-        ca.checkCsr(csr);
+        if (!ca.verifyCsr(csr)) {
+          throw new OperationException(ErrorCode.BAD_POP);
+        }
 
         CertificationRequestInfo certTemp = csr.getCertificationRequestInfo();
 

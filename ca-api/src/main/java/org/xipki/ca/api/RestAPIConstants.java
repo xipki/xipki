@@ -72,6 +72,8 @@ public class RestAPIConstants {
 
   public static final String CMD_cacertchain = "cacertchain";
 
+  public static final String CMD_dhpoc_certs = "dhpoc-certs";
+
   public static final String CMD_revoke_cert = "revoke-cert";
 
   public static final String CMD_delete_cert = "delete-cert";

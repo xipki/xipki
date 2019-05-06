@@ -37,7 +37,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.RuntimeCryptoException;
@@ -56,6 +55,7 @@ import org.xipki.password.PasswordResolver;
 import org.xipki.security.bc.XiECContentVerifierProviderBuilder;
 import org.xipki.security.bc.XiEdDSAContentVerifierProvider;
 import org.xipki.security.bc.XiRSAContentVerifierProviderBuilder;
+import org.xipki.security.bc.XiXDHContentVerifierProvider;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
@@ -126,13 +126,18 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
   }
 
   @Override
-  public ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey)
-      throws InvalidKeyException {
+  public ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey,
+      DHSigStaticKeyCertPair ownerKeyAndCert) throws InvalidKeyException {
     Args.notNull(publicKey, "publicKey");
 
     String keyAlg = publicKey.getAlgorithm().toUpperCase();
     if ("ED25519".equals(keyAlg) || "ED448".equals(keyAlg)) {
       return new XiEdDSAContentVerifierProvider(publicKey);
+    } else if ("X25519".equals(keyAlg) || "X448".equals(keyAlg)) {
+      if (ownerKeyAndCert == null) {
+        throw new InvalidKeyException("ownerKeyAndCert is required but absent");
+      }
+      return new XiXDHContentVerifierProvider(publicKey, ownerKeyAndCert);
     }
 
     BcContentVerifierProviderBuilder builder = VERIFIER_PROVIDER_BUILDER.get(keyAlg);
@@ -170,12 +175,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
   }
 
   @Override
-  public boolean verifyPopo(CertificationRequest csr, AlgorithmValidator algoValidator) {
-    return verifyPopo(new PKCS10CertificationRequest(csr), algoValidator);
-  }
-
-  @Override
-  public boolean verifyPopo(PKCS10CertificationRequest csr, AlgorithmValidator algoValidator) {
+  public boolean verifyPopo(PKCS10CertificationRequest csr, AlgorithmValidator algoValidator,
+      DHSigStaticKeyCertPair ownerKeyAndCert) {
     if (algoValidator != null) {
       AlgorithmIdentifier algId = csr.getSignatureAlgorithm();
 
@@ -192,10 +193,11 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
       }
     }
 
+    SubjectPublicKeyInfo pkInfo = csr.getSubjectPublicKeyInfo();
+
     try {
-      SubjectPublicKeyInfo pkInfo = csr.getSubjectPublicKeyInfo();
       PublicKey pk = KeyUtil.generatePublicKey(pkInfo);
-      ContentVerifierProvider cvp = getContentVerifierProvider(pk);
+      ContentVerifierProvider cvp = getContentVerifierProvider(pk, ownerKeyAndCert);
       return csr.isSignatureValid(cvp);
     } catch (InvalidKeyException | PKCSException | NoSuchAlgorithmException
         | InvalidKeySpecException ex) {

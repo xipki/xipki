@@ -154,9 +154,8 @@ public class CaConfs {
       // Publishers
       if (root.getPublishers() != null) {
         for (CaConfType.NameTypeConf m : root.getPublishers()) {
-          String name = m.getName();
-
           if (m.getConf() != null && m.getConf().getFile() != null) {
+            String name = m.getName();
             String zipEntryName = "files/publisher-" + name + ".conf";
             String value = getValue(m.getConf().getFile(), properties, baseDir);
             createFileOrValue(zipStream, value, zipEntryName);
@@ -168,9 +167,8 @@ public class CaConfs {
       // Profiles
       if (root.getProfiles() != null) {
         for (CaConfType.NameTypeConf m : root.getProfiles()) {
-          String name = m.getName();
-
           if (m.getConf() != null && m.getConf().getFile() != null) {
+            String name = m.getName();
             String zipEntryName = "files/certprofile-" + name + ".conf";
             String value = getValue(m.getConf().getFile(), properties, baseDir);
             createFileOrValue(zipStream, value, zipEntryName);
@@ -182,24 +180,41 @@ public class CaConfs {
       // CAs
       if (root.getCas() != null) {
         for (CaConfType.Ca m : root.getCas()) {
-          String name = m.getName();
-
           if (m.getCaInfo() != null) {
+            String name = m.getName();
             CaConfType.CaInfo ci = m.getCaInfo();
 
+            // SignerInfo
             if (ci.getSignerConf() != null) {
-              String conf = convertSignerConf(ci.getSignerConf(), properties, baseDir);
+              FileOrValue fv = ci.getSignerConf();
+              String conf = convertSignerConf(fv, properties, baseDir);
               if (conf.length() > 200) {
                 String zipEntryName = "files/ca-" + name + "-signer.conf";
                 createFileOrValue(zipStream, conf, zipEntryName);
-                ci.getSignerConf().setFile(zipEntryName);
-                ci.getSignerConf().setValue(null);
+                fv.setFile(zipEntryName);
+                fv.setValue(null);
               } else {
-                ci.getSignerConf().setFile(null);
-                ci.getSignerConf().setValue(conf);
+                fv.setFile(null);
+                fv.setValue(conf);
               }
             }
 
+            // DHPoc Control
+            if (ci.getDhpocControl() != null) {
+              FileOrValue fv = ci.getDhpocControl();
+              String conf = convertSignerConf(fv, properties, baseDir);
+              if (conf.length() > 200) {
+                String zipEntryName = "files/ca-" + name + "-dhpoc.conf";
+                createFileOrValue(zipStream, conf, zipEntryName);
+                fv.setFile(zipEntryName);
+                fv.setValue(null);
+              } else {
+                fv.setFile(null);
+                fv.setValue(conf);
+              }
+            }
+
+            // Cert and Certchain
             if (ci.getGenSelfIssued() == null) {
               if (ci.getCert() != null && ci.getCert().getFile() != null) {
                 String zipEntryName = "files/ca-" + name + ".crt";

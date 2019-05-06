@@ -17,31 +17,20 @@
 
 package org.xipki.security.pkcs12;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.security.InvalidKeyException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.security.Signature;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertPathBuilderException;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPrivateKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.EllipticCurve;
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.crypto.NoSuchPaddingException;
 
@@ -57,7 +46,6 @@ import org.bouncycastle.crypto.signers.DSASigner;
 import org.bouncycastle.crypto.signers.ECDSASigner;
 import org.bouncycastle.crypto.signers.RSADigestSigner;
 import org.bouncycastle.crypto.signers.SM2Signer;
-import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSAUtil;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.operator.ContentSigner;
@@ -73,9 +61,7 @@ import org.xipki.security.XiSecurityException;
 import org.xipki.security.XiWrappedContentSigner;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.GMUtil;
-import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.SignerUtil;
-import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 
@@ -205,73 +191,11 @@ public class P12ContentSignerBuilder {
     this.certificateChain = null;
   }
 
-  public P12ContentSignerBuilder(String keystoreType, InputStream keystoreStream,
-      char[] keystorePassword, String keyname, char[] keyPassword,
-      X509Certificate[] certificateChain) throws XiSecurityException {
-    if (!("PKCS12".equalsIgnoreCase(keystoreType) || "JKS".equalsIgnoreCase(keystoreType))) {
-      throw new IllegalArgumentException("unsupported keystore type: " + keystoreType);
-    }
-
-    Args.notNull(keystoreStream, "keystoreStream");
-    Args.notNull(keystorePassword, "keystorePassword");
-    Args.notNull(keyPassword, "keyPassword");
-
-    try {
-      KeyStore ks = KeyUtil.getKeyStore(keystoreType);
-      ks.load(keystoreStream, keystorePassword);
-
-      String tmpKeyname = keyname;
-      if (tmpKeyname == null) {
-        Enumeration<String> aliases = ks.aliases();
-        while (aliases.hasMoreElements()) {
-          String alias = aliases.nextElement();
-          if (ks.isKeyEntry(alias)) {
-            tmpKeyname = alias;
-            break;
-          }
-        }
-      } else {
-        if (!ks.isKeyEntry(tmpKeyname)) {
-          throw new XiSecurityException("unknown key named " + tmpKeyname);
-        }
-      }
-
-      this.key = (PrivateKey) ks.getKey(tmpKeyname, keyPassword);
-
-      if (!(key instanceof RSAPrivateKey || key instanceof DSAPrivateKey
-          || key instanceof ECPrivateKey
-          || key instanceof EdDSAKey)) {
-        throw new XiSecurityException("unsupported key " + key.getClass().getName());
-      }
-
-      Set<Certificate> caCerts = new HashSet<>();
-
-      X509Certificate cert;
-      if (certificateChain != null && certificateChain.length > 0) {
-        cert = certificateChain[0];
-        final int n = certificateChain.length;
-        if (n > 1) {
-          for (int i = 1; i < n; i++) {
-            caCerts.add(certificateChain[i]);
-          }
-        }
-      } else {
-        cert = (X509Certificate) ks.getCertificate(tmpKeyname);
-      }
-
-      Certificate[] certsInKeystore = ks.getCertificateChain(tmpKeyname);
-      if (certsInKeystore.length > 1) {
-        for (int i = 1; i < certsInKeystore.length; i++) {
-          caCerts.add(certsInKeystore[i]);
-        }
-      }
-
-      this.publicKey = cert.getPublicKey();
-      this.certificateChain = X509Util.buildCertPath(cert, caCerts);
-    } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException
-        | UnrecoverableKeyException | ClassCastException | CertPathBuilderException ex) {
-      throw new XiSecurityException(ex.getMessage(), ex);
-    }
+  public P12ContentSignerBuilder(KeypairWithCert keypairWithCert) throws XiSecurityException {
+    Args.notNull(keypairWithCert, "keypairWithCert");
+    this.key = keypairWithCert.getKey();
+    this.publicKey = keypairWithCert.getPublicKey();
+    this.certificateChain = keypairWithCert.getCertificateChain();
   }
 
   public ConcurrentContentSigner createSigner(AlgorithmIdentifier signatureAlgId, int parallelism,

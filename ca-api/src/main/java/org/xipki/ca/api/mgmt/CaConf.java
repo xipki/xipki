@@ -396,6 +396,10 @@ public class CaConf {
             caEntry.setProtocolSupport(new ProtocolSupport(ci.getProtocolSupport()));
           }
 
+          if (ci.getDhpocControl() != null) {
+            caEntry.setDhpocControl(getValue(ci.getDhpocControl(), zipEntries));
+          }
+
           caEntry.setSaveRequest(ci.isSaveReq());
           caEntry.setStatus(CaStatus.forName(ci.getStatus()));
 
