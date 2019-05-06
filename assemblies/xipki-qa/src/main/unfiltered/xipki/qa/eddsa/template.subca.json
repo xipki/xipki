@@ -30,7 +30,7 @@
 				"rr.aki.required":true,
 				"group.enroll":true,
 				"protection.sigalgo":"SHA256withRSA",
-				"popo.sigalgo":"Ed25519:Ed448"
+				"popo.sigalgo":"Ed25519:Ed448:DHPOP-X25519-SHA256:DHPOP-X448-SHA512"
 			},
 			"cmpResponderName":"responder1",
 			"duplicateKey":true,
@@ -40,6 +40,9 @@
 				"revokeSuspendedCerts.enabled":true,
 				"revokeSuspendedCerts.targetReason":"cessationOfOperation",
 				"revokeSuspendedCerts.unchangedSince":"15d"
+			},
+			"dhpocControl":{
+				"value":"type=pkcs12,password=1234,keystore=file:xipki/qa/keys/dhpoc.p12"
 			},
 			"keepExpiredCertDays":-1,
 			"maxValidity":"5y",

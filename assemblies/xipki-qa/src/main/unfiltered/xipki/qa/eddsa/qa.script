@@ -17,6 +17,18 @@ xi:csr-p12 \
   --out output/ed25519_3.csr
 
 xi:csr-p12 \
+  --p12 output/x25519_2.p12 --password 1234 \
+  --subject "CN=x25519-2.xipki.org,C=DE" \
+  --peer-cert xipki/qa/keys/dhpoc_x25519.crt \
+  --out output/x25519_2.csr
+
+xi:csr-p12 \
+  --p12 output/x25519_3.p12 --password 1234 \
+  --subject "CN=x25519-3.xipki.org,C=DE" \
+  --peer-cert xipki/qa/keys/dhpoc_x25519.crt \
+  --out output/x25519_3.csr
+
+xi:csr-p12 \
   --p12 output/ed448_2.p12 --password 1234 \
   --subject "CN=ed448-2.xipki.org,C=DE" \
   --out output/ed448_2.csr
@@ -26,18 +38,16 @@ xi:csr-p12 \
   --subject "CN=ed448-3.xipki.org,C=DE" \
   --out output/ed448_3.csr
 
-## only dummy signature
 xi:csr-p12 \
-  --p12 output/x25519_3.p12 --password 1234 \
-  --subject "CN=x25519-3.xipki.org,C=DE" \
-  --peer-cert output/x25519_3.crt \
-  --out output/x25519_3.csr
+  --p12 output/x448_2.p12 --password 1234 \
+  --subject "CN=x448-2.xipki.org,C=DE" \
+  --peer-cert xipki/qa/keys/dhpoc_x448.crt \
+  --out output/x448_2.csr
 
-## only dummy signature
 xi:csr-p12 \
   --p12 output/x448_3.p12 --password 1234 \
   --subject "CN=x448-3.xipki.org,C=DE" \
-  --peer-cert output/x448_3.crt \
+  --peer-cert xipki/qa/keys/dhpoc_x448.crt \
   --out output/x448_3.csr
 
 ## rootca
@@ -62,7 +72,7 @@ each ($list) {
 
 #####
 
-list = [ x25519_3 ]
+list = [ x25519_1 x25519_2 x25519_3 ]
 
 each ($list) {
 
@@ -86,7 +96,7 @@ each ($list) {
 
 #####
 
-list = [ x448_3 ]
+list = [ x448_1 x448_2 x448_3 ]
 
 each ($list) {
 

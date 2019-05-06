@@ -52,6 +52,34 @@ xi:update-cert-p12 --p12 output/ed25519_3.p12 --password 1234 \
   --ca-cert output/subca1.crt \
   --ca-cert output/rootca1.crt
 
+# Certificate x25519 (via CSR)
+
+xi:csr-p12 \
+  --p12 output/x25519_1.p12 --password 1234 \
+  --subject "CN=x25519-1.xipki.org,C=DE" \
+  --peer-cert xipki/qa/keys/dhpoc_x25519.crt \
+  --out output/x25519_1.csr
+
+xi:cmp-csr-enroll --csr output/x25519_1.csr \
+  --out output/x25519_1.crt --profile x25519
+
+xi:update-cert-p12 --p12 output/x25519_1.p12 --password 1234 \
+  --cert output/x25519_1.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate x25519 (via CMP)
+
+xi:cmp-enroll-p12 \
+  --p12 output/x25519_2.p12 --password 1234 \
+  --out output/x25519_2.crt --profile x25519 \
+  --subject "CN=x25519-2.xipki.org,C=DE"
+
+xi:update-cert-p12 --p12 output/x25519_2.p12 --password 1234 \
+  --cert output/x25519_2.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
 # Certificate x25519 (CA generate keypair)
 
 xi:cmp-enroll-cagenkey \
@@ -100,6 +128,34 @@ xi:cmp-enroll-cagenkey \
 
 xi:update-cert-p12 --p12 output/ed448_3.p12 --password 1234 \
   --cert output/ed448_3.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate x448 (via CSR)
+
+xi:csr-p12 \
+  --p12 output/x448_1.p12 --password 1234 \
+  --subject "CN=x448-1.xipki.org,C=DE" \
+  --peer-cert xipki/qa/keys/dhpoc_x448.crt \
+  --out output/x448_1.csr
+
+xi:cmp-csr-enroll --csr output/x448_1.csr \
+  --out output/x448_1.crt --profile x448
+
+xi:update-cert-p12 --p12 output/x448_1.p12 --password 1234 \
+  --cert output/x448_1.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate x448 (via CMP)
+
+xi:cmp-enroll-p12 \
+  --p12 output/x448_2.p12 --password 1234 \
+  --out output/x448_2.crt --profile x448 \
+  --subject "CN=x448-2.xipki.org,C=DE"
+
+xi:update-cert-p12 --p12 output/x448_2.p12 --password 1234 \
+  --cert output/x448_2.crt \
   --ca-cert output/subca1.crt \
   --ca-cert output/rootca1.crt
 

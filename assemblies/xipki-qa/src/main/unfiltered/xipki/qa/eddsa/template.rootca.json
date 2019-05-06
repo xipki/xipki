@@ -99,7 +99,7 @@
 				"rr.aki.required":true,
 				"group.enroll":true,
 				"protection.sigalgo":"SHA256withRSA",
-				"popo.sigalgo":"Ed25519:Ed448"
+				"popo.sigalgo":"Ed25519:Ed448:DHPOP-X25519-SHA256:DHPOP-X448-SHA512"
 			},
 			"cmpResponderName":"responder1",
 			"duplicateKey":true,
