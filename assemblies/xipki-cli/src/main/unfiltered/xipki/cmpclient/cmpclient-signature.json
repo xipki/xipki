@@ -5,17 +5,7 @@
 		"requestor":"requestor1",
 		"responder":"responder1",
 		"ssl":"ssl1",
-		"url":"https://localhost:8443/ca/cmp/myca",
-		"caCertchain":{
-			"autoconf":true
-		},
-		"certprofiles":{
-			"autoconf":true,
-			"profiles":[]
-		},
-		"cmpcontrol":{
-			"autoconf":true
-		}
+		"url":"https://localhost:8443/ca/cmp/myca"
 	}],
 	"requestors":[{
 		"name":"requestor1",

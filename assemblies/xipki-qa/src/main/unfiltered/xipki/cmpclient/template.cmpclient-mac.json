@@ -5,46 +5,19 @@
 		"requestor":"requestor1",
 		"responder":"responder1",
 		"ssl":"ssl1",
-		"url":"https://localhost:8443/ca/cmp/rootca",
-		"caCertchain":{
-			"autoconf":true
-		},
-		"certprofiles":{
-			"autoconf":true
-		},
-		"cmpcontrol":{
-			"autoconf":true
-		}
+		"url":"https://localhost:8443/ca/cmp/rootca"
 	},{
 		"name":"subca1",
 		"requestor":"requestor1",
 		"responder":"responder1",
 		"ssl":"ssl1",
-		"url":"https://localhost:8443/ca/cmp/subca",
-		"caCertchain":{
-			"autoconf":true
-		},
-		"certprofiles":{
-			"autoconf":true
-		},
-		"cmpcontrol":{
-			"autoconf":true
-		}
+		"url":"https://localhost:8443/ca/cmp/subca"
 	},{
 		"name":"subcawithcrl1",
 		"requestor":"requestor1",
 		"responder":"responder1",
 		"ssl":"ssl1",
-		"url":"https://localhost:8443/ca/cmp/subcawithcrl",
-		"caCertchain":{
-			"autoconf":true
-		},
-		"certprofiles":{
-			"autoconf":true
-		},
-		"cmpcontrol":{
-			"autoconf":true
-		}
+		"url":"https://localhost:8443/ca/cmp/subcawithcrl"
 	}],
 	"requestors":[{
 		"name":"requestor1",
