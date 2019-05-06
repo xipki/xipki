@@ -69,7 +69,7 @@ public class CollectionAlgorithmValidator implements AlgorithmValidator {
 
     String name;
     try {
-      name = AlgorithmUtil.getSigOrMacAlgoName(algId);
+      name = AlgorithmUtil.getSignatureAlgoName(algId);
     } catch (NoSuchAlgorithmException ex) {
       return false;
     }
