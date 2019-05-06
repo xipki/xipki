@@ -212,6 +212,7 @@ Features
     - EC
     - DSA
     - Ed25519, Ed448
+    - X25519, X448
     - SM2
   - Signature algorithms of certificates
     - Ed25519, Ed448
