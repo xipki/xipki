@@ -191,9 +191,10 @@ Please refer to [commands.md](commands.md) for more details.
 Features
 -----
 - CA (Certification Authority)
-
   - X.509 Certificate v3 (RFC 5280)
   - X.509 CRL v2 (RFC 5280)
+  - EdDSA Certificates (RFC 8410, RFC 8032)
+  - Diffie-Hellman Proof-of-Possession Algorithms (RFC 6955)
   - SCEP (draft-gutmann-scep-00, draft-nourse-scep-23)
   - EN 319 411 (eIDAS)
   - EN 319 412 (eIDAS)
@@ -206,7 +207,14 @@ Features
   - Support of JSON-based certificate profile
   - API to specify customized publisher, e.g. for LDAP and OCSP responder
   - Support of publisher for OCSP responder
+  - Public key types of certificates
+    - RSA
+    - EC
+    - DSA
+    - Ed25519, Ed448
+    - SM2
   - Signature algorithms of certificates
+    - Ed25519, Ed448
     - SM3withSM2
     - SHA3-*withRSA: where * is 224, 256, 384 and 512
     - SHA3-*withRSAandMGF1: where * is 224, 256, 384 and 512
