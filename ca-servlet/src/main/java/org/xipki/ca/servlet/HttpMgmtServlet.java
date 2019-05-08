@@ -290,6 +290,9 @@ public class HttpMgmtServlet extends HttpServlet {
         case getCa: {
           String name = getNameFromRequest(in);
           MgmtEntry.Ca caEntry = caManager.getCa(name);
+          if (caEntry == null) {
+            throw new CaMgmtException("Unknown CA " + name);
+          }
           resp = new MgmtResponse.GetCa(new CaEntryWrapper(caEntry));
           break;
         }
@@ -301,6 +304,9 @@ public class HttpMgmtServlet extends HttpServlet {
         case getCaHasUsersForUser: {
           String userName = getNameFromRequest(in);
           Map<String, MgmtEntry.CaHasUser> result = caManager.getCaHasUsersForUser(userName);
+          if (result == null) {
+            throw new CaMgmtException("Unknown user " + userName);
+          }
           resp = new MgmtResponse.GetCaHasUsersForUser(result);
           break;
         }
@@ -336,6 +342,9 @@ public class HttpMgmtServlet extends HttpServlet {
         case getCertprofile: {
           String name = getNameFromRequest(in);
           MgmtEntry.Certprofile result = caManager.getCertprofile(name);
+          if (result == null) {
+            throw new CaMgmtException("Unknown Certprofile " + name);
+          }
           resp = new MgmtResponse.GetCertprofile(result);
           break;
         }
@@ -353,18 +362,29 @@ public class HttpMgmtServlet extends HttpServlet {
         case getCertRequest: {
           MgmtRequest.GetCertRequest req = parse(in, MgmtRequest.GetCertRequest.class);
           byte[] result = caManager.getCertRequest(req.getCaName(), req.getSerialNumber());
+          if (result == null) {
+            throw new CaMgmtException("Found no CertRequest for CA " + req.getCaName()
+                        + " and serialNumber " + req.getSerialNumber());
+          }
           resp = new MgmtResponse.ByteArray(result);
           break;
         }
         case getCrl: {
           MgmtRequest.GetCrl req = parse(in, MgmtRequest.GetCrl.class);
           X509CRL crl = caManager.getCrl(req.getCaName(), req.getCrlNumber());
+          if (crl == null) {
+            throw new CaMgmtException("Found no CRL for CA " + req.getCaName()
+                        + " with CRL number " + req.getCrlNumber());
+          }
           resp = toByteArray(action, crl);
           break;
         }
         case getCurrentCrl: {
           String caName = getNameFromRequest(in);
           X509CRL crl = caManager.getCurrentCrl(caName);
+          if (crl == null) {
+            throw new CaMgmtException("No current CRL for CA " + caName);
+          }
           resp = toByteArray(action, crl);
           break;
         }
@@ -381,6 +401,9 @@ public class HttpMgmtServlet extends HttpServlet {
         case getPublisher: {
           String name = getNameFromRequest(in);
           MgmtEntry.Publisher result = caManager.getPublisher(name);
+          if (result == null) {
+            throw new CaMgmtException("Unknown publisher " + name);
+          }
           resp = new MgmtResponse.GetPublisher(result);
           break;
         }
@@ -398,6 +421,9 @@ public class HttpMgmtServlet extends HttpServlet {
         case getRequestor: {
           String name = getNameFromRequest(in);
           MgmtEntry.Requestor result = caManager.getRequestor(name);
+          if (result == null) {
+            throw new CaMgmtException("Unknown requestor " + name);
+          }
           resp = new MgmtResponse.GetRequestor(result);
           break;
         }
@@ -415,6 +441,9 @@ public class HttpMgmtServlet extends HttpServlet {
         case getSigner: {
           String name = getNameFromRequest(in);
           MgmtEntry.Signer result = caManager.getSigner(name);
+          if (result == null) {
+            throw new CaMgmtException("Unknown signer " + name);
+          }
           resp = new MgmtResponse.GetSigner(new SignerEntryWrapper(result));
           break;
         }
@@ -446,6 +475,9 @@ public class HttpMgmtServlet extends HttpServlet {
         case getUser: {
           String name = getNameFromRequest(in);
           MgmtEntry.User result = caManager.getUser(name);
+          if (result == null) {
+            throw new CaMgmtException("Unknown user " + name);
+          }
           resp = new MgmtResponse.GetUser(result);
           break;
         }
