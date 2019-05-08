@@ -49,7 +49,7 @@ import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.CaSystemStatus;
 import org.xipki.ca.api.mgmt.CmpControl;
 import org.xipki.ca.api.mgmt.CrlControl;
-import org.xipki.ca.api.mgmt.CtLogControl;
+import org.xipki.ca.api.mgmt.CtlogControl;
 import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.ca.api.mgmt.PermissionConstants;
 import org.xipki.ca.api.mgmt.ProtocolSupport;
@@ -241,7 +241,7 @@ public class CaActions {
     private String scepControl;
 
     @Option(name = "--ctlog-control", description = "CT log control")
-    private String ctLogControl;
+    private String ctlogControl;
 
     @Option(name = "--dhpoc-control", description = "DHPoc control")
     private String dhpocControl;
@@ -355,8 +355,8 @@ public class CaActions {
         entry.setScepControl(new ScepControl(scepControl));
       }
 
-      if (ctLogControl != null) {
-        entry.setCtLogControl(new CtLogControl(ctLogControl));
+      if (ctlogControl != null) {
+        entry.setCtlogControl(new CtlogControl(ctlogControl));
       }
 
       if (dhpocControl != null) {
@@ -1078,7 +1078,7 @@ public class CaActions {
     private String scepControl;
 
     @Option(name = "--ctlog-control", description = "CT log control")
-    private String ctLogControl;
+    private String ctlogControl;
 
     @Option(name = "--dhpoc-control", description = "DHPoc control")
     private String dhpocControl;
@@ -1249,8 +1249,8 @@ public class CaActions {
         entry.setScepControl(scepControl);
       }
 
-      if (ctLogControl != null) {
-        entry.setCtLogControl(ctLogControl);
+      if (ctlogControl != null) {
+        entry.setCtlogControl(ctlogControl);
       }
 
       if (dhpocControl != null) {

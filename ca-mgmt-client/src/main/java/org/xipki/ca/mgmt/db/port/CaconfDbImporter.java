@@ -267,7 +267,7 @@ class CaconfDbImporter extends DbPorter {
           ps.setString(idx++, ca.getCrlControl());
           ps.setString(idx++, ca.getCmpControl());
           ps.setString(idx++, ca.getScepControl());
-          ps.setString(idx++, ca.getCtLogControl());
+          ps.setString(idx++, ca.getCtlogControl());
           ps.setInt(idx++, ca.getDuplicateKey());
           ps.setInt(idx++, ca.getDuplicateSubject());
           ps.setString(idx++, ca.getProtocolSupport());

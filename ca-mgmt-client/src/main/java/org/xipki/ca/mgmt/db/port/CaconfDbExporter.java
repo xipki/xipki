@@ -314,7 +314,7 @@ class CaconfDbExporter extends DbPorter {
         ca.setCmpControl(rs.getString("CMP_CONTROL"));
         ca.setScepControl(rs.getString("SCEP_CONTROL"));
         ca.setCrlControl(rs.getString("CRL_CONTROL"));
-        ca.setCtLogControl(rs.getString("CTLOG_CONTROL"));
+        ca.setCtlogControl(rs.getString("CTLOG_CONTROL"));
         ca.setDuplicateKey(rs.getInt("DUPLICATE_KEY"));
         ca.setDuplicateSubject(rs.getInt("DUPLICATE_SUBJECT"));
         ca.setProtocolSupport(rs.getString("PROTOCOL_SUPPORT"));

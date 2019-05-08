@@ -31,7 +31,7 @@ import org.xipki.util.StringUtil;
  * @author Lijun Liao
  */
 
-public class CtLogControl {
+public class CtlogControl {
 
   /**
    * Whether CTLog is enabled: true or false.
@@ -56,7 +56,7 @@ public class CtLogControl {
 
   private String conf;
 
-  public CtLogControl(String conf) throws InvalidConfException {
+  public CtlogControl(String conf) throws InvalidConfException {
     ConfPairs pairs = new ConfPairs(Args.notNull(conf, "conf"));
     enabled = getBoolean(pairs, KEY_ENABLED, false);
     // normalize the pairs
@@ -73,7 +73,7 @@ public class CtLogControl {
     this.conf = pairs.getEncoded();
   } // constructor
 
-  public CtLogControl(Boolean enabled, List<String> servers, String sslContextName)
+  public CtlogControl(Boolean enabled, List<String> servers, String sslContextName)
       throws InvalidConfException {
     Args.notEmpty(servers, "servers");
 
@@ -141,11 +141,11 @@ public class CtLogControl {
   public boolean equals(Object obj) {
     if (this == obj) {
       return true;
-    } else if (!(obj instanceof CtLogControl)) {
+    } else if (!(obj instanceof CtlogControl)) {
       return false;
     }
 
-    return conf.equals(((CtLogControl) obj).conf);
+    return conf.equals(((CtlogControl) obj).conf);
   }
 
   private static boolean getBoolean(ConfPairs pairs, String key, boolean defaultValue) {

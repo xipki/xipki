@@ -40,7 +40,7 @@ import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.CmpControl;
 import org.xipki.ca.api.mgmt.CrlControl;
-import org.xipki.ca.api.mgmt.CtLogControl;
+import org.xipki.ca.api.mgmt.CtlogControl;
 import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.ca.api.mgmt.PermissionConstants;
 import org.xipki.ca.api.mgmt.ProtocolSupport;
@@ -230,8 +230,8 @@ public class CaInfo {
     caEntry.setCmpControl(cmpControl);
   }
 
-  public CtLogControl getCtLogControl() {
-    return caEntry.getCtLogControl();
+  public CtlogControl getCtlogControl() {
+    return caEntry.getCtlogControl();
   }
 
   public DhpocControl getDhpocControl() {

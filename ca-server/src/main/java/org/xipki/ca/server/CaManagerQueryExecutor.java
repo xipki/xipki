@@ -45,7 +45,7 @@ import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.CmpControl;
 import org.xipki.ca.api.mgmt.CrlControl;
-import org.xipki.ca.api.mgmt.CtLogControl;
+import org.xipki.ca.api.mgmt.CtlogControl;
 import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.ca.api.mgmt.ProtocolSupport;
 import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
@@ -485,7 +485,7 @@ class CaManagerQueryExecutor {
       String ctlogControl = rs.getString("CTLOG_CONTROL");
       if (StringUtil.isNotBlank(ctlogControl)) {
         try {
-          entry.setCtLogControl(new CtLogControl(ctlogControl));
+          entry.setCtlogControl(new CtlogControl(ctlogControl));
         } catch (InvalidConfException ex) {
           throw new CaMgmtException("invalid CTLOG_CONTROL: " + scepcontrol, ex);
         }
@@ -674,7 +674,7 @@ class CaManagerQueryExecutor {
       ScepControl scepControl = caEntry.getScepControl();
       ps.setString(idx++, (scepControl == null ? null : scepControl.getConf()));
 
-      CtLogControl ctlogControl = caEntry.getCtLogControl();
+      CtlogControl ctlogControl = caEntry.getCtlogControl();
       ps.setString(idx++, (ctlogControl == null ? null : ctlogControl.getConf()));
 
       setBoolean(ps, idx++, caEntry.isDuplicateKeyPermitted());
@@ -1137,7 +1137,7 @@ class CaManagerQueryExecutor {
         col(STRING, "CMP_CONTROL", changeCaEntry.getCmpControl()),
         col(STRING, "CRL_CONTROL", changeCaEntry.getCrlControl()),
         col(STRING, "SCEP_CONTROL", changeCaEntry.getScepControl()),
-        col(STRING, "CTLOG_CONTROL", changeCaEntry.getCtLogControl()),
+        col(STRING, "CTLOG_CONTROL", changeCaEntry.getCtlogControl()),
         col(BOOL, "DUPLICATE_KEY", changeCaEntry.getDuplicateKeyPermitted()),
         col(BOOL, "DUPLICATE_SUBJECT", changeCaEntry.getDuplicateSubjectPermitted()),
         col(STRING, "PROTOCOL_SUPPORT", protocolSupportStr),

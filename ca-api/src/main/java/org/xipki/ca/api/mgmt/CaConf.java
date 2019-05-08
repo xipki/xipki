@@ -370,9 +370,9 @@ public class CaConf {
                 new ConfPairs(ci.getScepControl()).getEncoded()));
           }
 
-          if (ci.getCtLogControl() != null) {
-            caEntry.setCtLogControl(new CtLogControl(
-                new ConfPairs(ci.getCtLogControl()).getEncoded()));
+          if (ci.getCtlogControl() != null) {
+            caEntry.setCtlogControl(new CtlogControl(
+                new ConfPairs(ci.getCtlogControl()).getEncoded()));
           }
 
           caEntry.setCmpResponderName(ci.getCmpResponderName());

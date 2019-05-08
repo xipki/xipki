@@ -80,7 +80,7 @@ import org.xipki.ca.api.mgmt.CaSystemStatus;
 import org.xipki.ca.api.mgmt.CertListInfo;
 import org.xipki.ca.api.mgmt.CertListOrderBy;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
-import org.xipki.ca.api.mgmt.CtLogControl;
+import org.xipki.ca.api.mgmt.CtlogControl;
 import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.ca.api.mgmt.PermissionConstants;
 import org.xipki.ca.api.mgmt.RequestorInfo;
@@ -679,10 +679,10 @@ public class CaManagerImpl implements CaManager, Closeable {
   private boolean startCa(String caName) {
     CaInfo caEntry = caInfos.get(caName);
 
-    CtLogControl ctLogControl = caEntry.getCaEntry().getCtLogControl();
-    CtLogClient ctLogClient = null;
-    if (ctLogControl != null && ctLogControl.isEnabled()) {
-      String name = ctLogControl.getSslContextName();
+    CtlogControl ctlogControl = caEntry.getCaEntry().getCtlogControl();
+    CtLogClient ctlogClient = null;
+    if (ctlogControl != null && ctlogControl.isEnabled()) {
+      String name = ctlogControl.getSslContextName();
       SslContextConf ctxConf;
       if (name == null) {
         ctxConf = null;
@@ -701,12 +701,12 @@ public class CaManagerImpl implements CaManager, Closeable {
           }
         }
       }
-      ctLogClient = new CtLogClient(ctLogControl.getServers(), ctxConf);
+      ctlogClient = new CtLogClient(ctlogControl.getServers(), ctxConf);
     }
 
     X509Ca ca;
     try {
-      ca = new X509Ca(this, caEntry, certstore, ctLogClient);
+      ca = new X509Ca(this, caEntry, certstore, ctlogClient);
     } catch (OperationException ex) {
       LogUtil.error(LOG, ex, concat("X509CA.<init> (ca=", caName, ")"));
       return false;
@@ -3028,9 +3028,9 @@ public class CaManagerImpl implements CaManager, Closeable {
             caInfoType.setCrlSignerName(entry.getCrlSignerName());
           }
 
-          if (entry.getCtLogControl() != null) {
-            caInfoType.setCtLogControl(
-                new HashMap<>(new ConfPairs(entry.getCtLogControl().getConf()).asMap()));
+          if (entry.getCtlogControl() != null) {
+            caInfoType.setCtlogControl(
+                new HashMap<>(new ConfPairs(entry.getCtlogControl().getConf()).asMap()));
           }
 
           if (entry.getDhpocControl() != null) {

@@ -125,7 +125,7 @@ public abstract class MgmtEntry {
 
     private CmpControl cmpControl;
 
-    private CtLogControl ctLogControl;
+    private CtlogControl ctlogControl;
 
     private RevokeSuspendedControl revokeSuspendedControl;
 
@@ -291,12 +291,12 @@ public abstract class MgmtEntry {
       return scepControl;
     }
 
-    public CtLogControl getCtLogControl() {
-      return ctLogControl;
+    public CtlogControl getCtlogControl() {
+      return ctlogControl;
     }
 
-    public void setCtLogControl(CtLogControl ctLogControl) {
-      this.ctLogControl = ctLogControl;
+    public void setCtlogControl(CtlogControl ctlogControl) {
+      this.ctlogControl = ctlogControl;
     }
 
     public RevokeSuspendedControl getRevokeSuspendedControl() {
@@ -448,7 +448,7 @@ public abstract class MgmtEntry {
           "\nSCEP control: \n", (scepControl == null ? "  null" : scepControl.toString(verbose)),
           "\nRevoke suspended certificates control: \n",
               (revokeSuspendedControl == null ? "  null" : revokeSuspendedControl.toString()),
-          "\nCTLog control: ", (ctLogControl == null ? "  null" : ctLogControl.toString()),
+          "\nCTLog control: \n", (ctlogControl == null ? "  null" : ctlogControl.toString()),
           "\nCMP responder name: ", cmpResponderName,
           "\nSCEP responder name: ", scepResponderName,
           "\nCRL signer name: ", crlSignerName,
@@ -511,7 +511,7 @@ public abstract class MgmtEntry {
           && CompareUtil.equalsObject(cmpResponderName, obj.cmpResponderName)
           && CompareUtil.equalsObject(crlControl, obj.crlControl)
           && CompareUtil.equalsObject(crlSignerName, obj.crlSignerName)
-          && CompareUtil.equalsObject(ctLogControl, obj.ctLogControl)
+          && CompareUtil.equalsObject(ctlogControl, obj.ctlogControl)
           && CompareUtil.equalsObject(dhpocControl, obj.dhpocControl)
           && (duplicateKeyPermitted == obj.duplicateKeyPermitted)
           && (duplicateSubjectPermitted == obj.duplicateSubjectPermitted)
@@ -912,7 +912,7 @@ public abstract class MgmtEntry {
 
     private String scepControl;
 
-    private String ctLogControl;
+    private String ctlogControl;
 
     private String dhpocControl;
 
@@ -1029,12 +1029,12 @@ public abstract class MgmtEntry {
       this.scepControl = scepControl;
     }
 
-    public String getCtLogControl() {
-      return ctLogControl;
+    public String getCtlogControl() {
+      return ctlogControl;
     }
 
-    public void setCtLogControl(String ctLogControl) {
-      this.ctLogControl = ctLogControl;
+    public void setCtlogControl(String ctlogControl) {
+      this.ctlogControl = ctlogControl;
     }
 
     public String getRevokeSuspendedControl() {

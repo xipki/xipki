@@ -303,7 +303,7 @@ public class CaConfType {
 
     private Map<String, Object> scepControl;
 
-    private Map<String, Object> ctLogControl;
+    private Map<String, Object> ctlogControl;
 
     private Map<String, Object> revokeSuspendedControl;
 
@@ -445,12 +445,12 @@ public class CaConfType {
       this.scepControl = scepControl;
     }
 
-    public Map<String, Object> getCtLogControl() {
-      return ctLogControl;
+    public Map<String, Object> getCtlogControl() {
+      return ctlogControl;
     }
 
-    public void setCtLogControl(Map<String, Object> ctLogControl) {
-      this.ctLogControl = ctLogControl;
+    public void setCtlogControl(Map<String, Object> ctlogControl) {
+      this.ctlogControl = ctlogControl;
     }
 
     public Map<String, Object> getRevokeSuspendedControl() {

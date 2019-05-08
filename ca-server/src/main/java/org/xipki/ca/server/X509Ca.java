@@ -404,7 +404,7 @@ public class X509Ca implements Closeable {
 
   private final X509Cert caCert;
 
-  private final CtLogClient ctLog;
+  private final CtLogClient ctlogClient;
 
   // CHECKSTYLE:SKIP
   private final KeypairGenControl keypairGenControlByImplictCA;
@@ -431,13 +431,14 @@ public class X509Ca implements Closeable {
 
   private final ConcurrentSkipListSet<Long> subjectCertsInProcess = new ConcurrentSkipListSet<>();
 
-  public X509Ca(CaManagerImpl caManager, CaInfo caInfo, CertStore certstore, CtLogClient ctLog)
+  public X509Ca(CaManagerImpl caManager, CaInfo caInfo, CertStore certstore,
+      CtLogClient ctlogClient)
       throws OperationException {
     this.caManager = Args.notNull(caManager, "caManager");
     this.masterMode = caManager.isMasterMode();
     this.caIdNameMap = caManager.idNameMap();
     this.caInfo = Args.notNull(caInfo, "caInfo");
-    this.ctLog = ctLog;
+    this.ctlogClient = ctlogClient;
     this.caIdent = caInfo.getIdent();
     this.caCert = caInfo.getCert();
     this.certstore = Args.notNull(certstore, "certstore");
@@ -1798,9 +1799,9 @@ public class X509Ca implements Closeable {
     }
 
     ExtensionControl extnSctCtrl = certprofile.getExtensionControls().get(Extn.id_SCTs);
-    boolean ctLogEnabled = caInfo.getCtLogControl() != null && caInfo.getCtLogControl().isEnabled();
+    boolean ctlogEnabled = caInfo.getCtlogControl() != null && caInfo.getCtlogControl().isEnabled();
 
-    if (!ctLogEnabled) {
+    if (!ctlogEnabled) {
       if (extnSctCtrl != null && extnSctCtrl.isRequired()) {
         throw new OperationException(ErrorCode.SYSTEM_FAILURE,
             "extension " + ObjectIdentifiers.getName(Extn.id_SCTs)
@@ -1830,11 +1831,11 @@ public class X509Ca implements Closeable {
           }
         }
 
-        boolean addCtLog = ctLogEnabled && extnSctCtrl != null;
+        boolean addCtlog = ctlogEnabled && extnSctCtrl != null;
 
         Certificate bcCert;
-        if (addCtLog) {
-          bcCert = buildCtLoggedCert(certBuilder, gct, extnSctCtrl.isCritical());
+        if (addCtlog) {
+          bcCert = buildCtloggedCert(certBuilder, gct, extnSctCtrl.isCritical());
         } else {
           ConcurrentBagEntrySigner signer0;
           try {
@@ -1912,7 +1913,7 @@ public class X509Ca implements Closeable {
     }
   } // method generateCertificate0
 
-  private Certificate buildCtLoggedCert(X509v3CertificateBuilder certBuilder,
+  private Certificate buildCtloggedCert(X509v3CertificateBuilder certBuilder,
       GrantedCertTemplate gct, boolean critical) throws CertIOException, OperationException {
     // build precertificate
     certBuilder.addExtension(Extn.id_precertificate, true, DERNull.INSTANCE);
@@ -1938,7 +1939,7 @@ public class X509Ca implements Closeable {
     } catch (IOException ex) {
       throw new CertIOException("could not encode PreCert", ex);
     }
-    SignedCertificateTimestampList scts = getCtLogScts(encodedPreCert);
+    SignedCertificateTimestampList scts = getCtlogScts(encodedPreCert);
 
     ASN1Sequence preTbsCert =
         ASN1Sequence.getInstance(precert.getTBSCertificate().toASN1Primitive());
@@ -2874,9 +2875,9 @@ public class X509Ca implements Closeable {
     auditService().logEvent(event);
   }
 
-  private SignedCertificateTimestampList getCtLogScts(byte[] encodedPrecert)
+  private SignedCertificateTimestampList getCtlogScts(byte[] encodedPrecert)
       throws OperationException {
-    return ctLog.getCtLogScts(encodedPrecert, caCert, caInfo.getCertchain());
+    return ctlogClient.getCtLogScts(encodedPrecert, caCert, caInfo.getCertchain());
   }
 
 }

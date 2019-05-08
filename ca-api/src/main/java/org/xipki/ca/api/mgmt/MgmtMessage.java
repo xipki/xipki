@@ -226,7 +226,7 @@ public abstract class MgmtMessage {
 
     private String cmpControl;
 
-    private String ctLogControl;
+    private String ctlogControl;
 
     private String dhpocControl;
 
@@ -305,8 +305,8 @@ public abstract class MgmtMessage {
 
       crlSignerName = caEntry.getCrlSignerName();
 
-      if (caEntry.getCtLogControl() != null) {
-        ctLogControl = caEntry.getCtLogControl().getConf();
+      if (caEntry.getCtlogControl() != null) {
+        ctlogControl = caEntry.getCtlogControl().getConf();
       }
 
       dhpocControl = caEntry.getDhpocControl();
@@ -423,12 +423,12 @@ public abstract class MgmtMessage {
       this.cmpControl = cmpControl;
     }
 
-    public String getCtLogControl() {
-      return ctLogControl;
+    public String getCtlogControl() {
+      return ctlogControl;
     }
 
-    public void setCtLogControl(String ctLogControl) {
-      this.ctLogControl = ctLogControl;
+    public void setCtlogControl(String ctlogControl) {
+      this.ctlogControl = ctlogControl;
     }
 
     public String getDhpocControl() {
@@ -609,8 +609,8 @@ public abstract class MgmtMessage {
         rv.setCrlControl(new CrlControl(crlControl));
       }
 
-      if (ctLogControl != null) {
-        rv.setCtLogControl(new CtLogControl(ctLogControl));
+      if (ctlogControl != null) {
+        rv.setCtlogControl(new CtlogControl(ctlogControl));
       }
 
       rv.setCrlSignerName(crlSignerName);

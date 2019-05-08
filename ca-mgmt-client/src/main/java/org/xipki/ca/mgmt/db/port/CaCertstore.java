@@ -68,7 +68,7 @@ public class CaCertstore extends ValidatableConf {
 
     private String crlControl;
 
-    private String ctLogControl;
+    private String ctlogControl;
 
     private String dhpocControl;
 
@@ -232,12 +232,12 @@ public class CaCertstore extends ValidatableConf {
       this.crlControl = crlControl;
     }
 
-    public String getCtLogControl() {
-      return ctLogControl;
+    public String getCtlogControl() {
+      return ctlogControl;
     }
 
-    public void setCtLogControl(String ctLogControl) {
-      this.ctLogControl = ctLogControl;
+    public void setCtlogControl(String ctlogControl) {
+      this.ctlogControl = ctlogControl;
     }
 
     public String getRevokeSuspendedControl() {
