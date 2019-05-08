@@ -127,6 +127,8 @@ public abstract class MgmtEntry {
 
     private CtLogControl ctLogControl;
 
+    private RevokeSuspendedControl revokeSuspendedControl;
+
     private String cmpResponderName;
 
     private String scepResponderName;
@@ -297,6 +299,17 @@ public abstract class MgmtEntry {
       this.ctLogControl = ctLogControl;
     }
 
+    public RevokeSuspendedControl getRevokeSuspendedControl() {
+      return revokeSuspendedControl;
+    }
+
+    public void setRevokeSuspendedControl(RevokeSuspendedControl revokeSuspendedControl) {
+      if (revokeSuspendedControl == null) {
+        new Exception("LIAO").printStackTrace(); // FIXME
+      }
+      this.revokeSuspendedControl = revokeSuspendedControl;
+    }
+
     public String getCmpResponderName() {
       return cmpResponderName;
     }
@@ -433,6 +446,8 @@ public abstract class MgmtEntry {
           "\nCMP control:\n", (cmpControl == null ? "  null" : cmpControl.toString(verbose)),
           "\nCRL control:\n", (crlControl == null ? "  null" : crlControl.toString(verbose)),
           "\nSCEP control: \n", (scepControl == null ? "  null" : scepControl.toString(verbose)),
+          "\nRevoke suspended certificates control: \n",
+              (revokeSuspendedControl == null ? "  null" : revokeSuspendedControl.toString()),
           "\nCTLog control: ", (ctLogControl == null ? "  null" : ctLogControl.toString()),
           "\nCMP responder name: ", cmpResponderName,
           "\nSCEP responder name: ", scepResponderName,
@@ -489,30 +504,36 @@ public abstract class MgmtEntry {
         }
       }
 
-      return ident.equals(obj.ident, ignoreId)
-        && signerType.equals(obj.signerType)
-        && CompareUtil.equalsObject(status, obj.status)
-        && CompareUtil.equalsObject(protocolSupport, obj.protocolSupport)
-        && CompareUtil.equalsObject(maxValidity, obj.maxValidity)
-        && CompareUtil.equalsObject(cmpControl, obj.cmpControl)
-        && CompareUtil.equalsObject(crlControl, obj.crlControl)
-        && CompareUtil.equalsObject(scepControl, obj.scepControl)
-        && CompareUtil.equalsObject(cmpResponderName, obj.cmpResponderName)
-        && CompareUtil.equalsObject(scepResponderName, obj.scepResponderName)
-        && CompareUtil.equalsObject(crlSignerName, obj.crlSignerName)
-        && (duplicateKeyPermitted == obj.duplicateKeyPermitted)
-        && (duplicateSubjectPermitted == obj.duplicateSubjectPermitted)
-        && (saveRequest == obj.saveRequest)
-        && CompareUtil.equalsObject(validityMode, obj.validityMode)
-        && (permission == obj.permission)
-        && (expirationPeriod == obj.expirationPeriod)
-        && (keepExpiredCertInDays == obj.keepExpiredCertInDays)
-        && CompareUtil.equalsObject(extraControl, obj.extraControl)
-        && CompareUtil.equalsObject(caUris, obj.caUris)
-        && CompareUtil.equalsObject(cert, obj.cert)
-        && (serialNoBitLen == obj.serialNoBitLen)
-        && (numCrls == obj.numCrls)
-        && CompareUtil.equalsObject(revocationInfo, obj.revocationInfo);
+      return CompareUtil.equalsObject(caUris, obj.caUris)
+          && CompareUtil.equalsObject(cert, obj.cert)
+          && CompareUtil.equalsObject(certchain, obj.certchain)
+          && CompareUtil.equalsObject(cmpControl, obj.cmpControl)
+          && CompareUtil.equalsObject(cmpResponderName, obj.cmpResponderName)
+          && CompareUtil.equalsObject(crlControl, obj.crlControl)
+          && CompareUtil.equalsObject(crlSignerName, obj.crlSignerName)
+          && CompareUtil.equalsObject(ctLogControl, obj.ctLogControl)
+          && CompareUtil.equalsObject(dhpocControl, obj.dhpocControl)
+          && (duplicateKeyPermitted == obj.duplicateKeyPermitted)
+          && (duplicateSubjectPermitted == obj.duplicateSubjectPermitted)
+          && (expirationPeriod == obj.expirationPeriod)
+          && CompareUtil.equalsObject(extraControl, obj.extraControl)
+          && ident.equals(obj.ident, ignoreId)
+          && (keepExpiredCertInDays == obj.keepExpiredCertInDays)
+          && CompareUtil.equalsObject(maxValidity, obj.maxValidity)
+          // ignore dynamic field nextCrlNumber
+          && (numCrls == obj.numCrls)
+          && (permission == obj.permission)
+          && CompareUtil.equalsObject(protocolSupport, obj.protocolSupport)
+          && CompareUtil.equalsObject(revocationInfo, obj.revocationInfo)
+          && CompareUtil.equalsObject(revokeSuspendedControl, obj.revokeSuspendedControl)
+          && (saveRequest == obj.saveRequest)
+          && CompareUtil.equalsObject(scepControl, obj.scepControl)
+          && CompareUtil.equalsObject(scepResponderName, obj.scepResponderName)
+          && (serialNoBitLen == obj.serialNoBitLen)
+          && signerType.equals(obj.signerType)
+          && CompareUtil.equalsObject(signerConf, obj.signerConf)
+          && CompareUtil.equalsObject(status, obj.status)
+          && CompareUtil.equalsObject(validityMode, obj.validityMode);
     }
 
     @Override
@@ -895,6 +916,8 @@ public abstract class MgmtEntry {
 
     private String dhpocControl;
 
+    private String revokeSuspendedControl;
+
     private String cmpResponderName;
 
     private String scepResponderName;
@@ -1012,6 +1035,14 @@ public abstract class MgmtEntry {
 
     public void setCtLogControl(String ctLogControl) {
       this.ctLogControl = ctLogControl;
+    }
+
+    public String getRevokeSuspendedControl() {
+      return revokeSuspendedControl;
+    }
+
+    public void setRevokeSuspendedControl(String revokeSuspendedControl) {
+      this.revokeSuspendedControl = revokeSuspendedControl;
     }
 
     public String getDhpocControl() {

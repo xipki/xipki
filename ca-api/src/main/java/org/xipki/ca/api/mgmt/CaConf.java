@@ -400,6 +400,12 @@ public class CaConf {
             caEntry.setDhpocControl(getValue(ci.getDhpocControl(), zipEntries));
           }
 
+          if (ci.getRevokeSuspendedControl() != null) {
+            caEntry.setRevokeSuspendedControl(
+                new RevokeSuspendedControl(
+                    new ConfPairs(ci.getRevokeSuspendedControl())));
+          }
+
           caEntry.setSaveRequest(ci.isSaveReq());
           caEntry.setStatus(CaStatus.forName(ci.getStatus()));
 

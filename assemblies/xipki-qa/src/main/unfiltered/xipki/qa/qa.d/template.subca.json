@@ -29,20 +29,25 @@
 				"protection.sigalgo":"REPLACEME-CMP_SIGALGO",
 				"popo.sigalgo":"REPLACEME-SIGALGO:REPLACEME-HASHwithRSA:REPLACEME-HASHwithECDSA:REPLACEME-HASHwithDSA:SM3withSM2"
 			},
+			"ctlog-control":{
+				"enabled":true,
+				"sslcontext.name":"localhost",
+				"servers":"https://localhost/ctlog/"
+			},
 			"cmpResponderName":"responder1",
 			"duplicateKey":true,
 			"duplicateSubject":true,
 			"expirationPeriod":365,
-			"extraControl":{
-				"revokeSuspendedCerts.enabled":true,
-				"revokeSuspendedCerts.targetReason":"cessationOfOperation",
-				"revokeSuspendedCerts.unchangedSince":"15d"
-			},
 			"keepExpiredCertDays":-1,
 			"maxValidity":"5y",
 			"nextCrlNo":2,
 			"permissions":["all"],
 			"protocolSupport":["cmp","rest"],
+			"revokeSuspendedControl":{
+				"enabled":true,
+				"targetReason":"cessationOfOperation",
+				"unchangedSince":"15d"
+			},
 			"saveReq":false,
 			"signerType":"${token.type}",
 			"signerConf":{

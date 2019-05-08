@@ -48,6 +48,7 @@ import org.xipki.ca.api.mgmt.CrlControl;
 import org.xipki.ca.api.mgmt.CtLogControl;
 import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.ca.api.mgmt.ProtocolSupport;
+import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
 import org.xipki.ca.api.mgmt.ScepControl;
 import org.xipki.ca.api.mgmt.ValidityMode;
 import org.xipki.ca.server.SqlColumn.ColumnType;
@@ -114,7 +115,7 @@ class CaManagerQueryExecutor {
         + "CMP_CONTROL,CRL_CONTROL,SCEP_CONTROL,CTLOG_CONTROL,DUPLICATE_KEY,"
         + "DUPLICATE_SUBJECT,PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION,NUM_CRLS,KEEP_EXPIRED_CERT_DAYS,"
         + "EXPIRATION_PERIOD,REV_INFO,VALIDITY_MODE,CA_URIS,EXTRA_CONTROL,SIGNER_CONF,"
-        + "DHPOC_CONTROL "
+        + "DHPOC_CONTROL,REVOKE_SUSPENDED_CONTROL "
         + "FROM CA WHERE NAME=?");
     this.sqlNextSelectCrlNo = buildSelectFirstSql("NEXT_CRLNO FROM CA WHERE ID=?");
     this.sqlSelectSystemEvent = buildSelectFirstSql(
@@ -420,6 +421,10 @@ class CaManagerQueryExecutor {
           caUris, rs.getInt("NUM_CRLS"), rs.getInt("EXPIRATION_PERIOD"));
       entry.setCert(generateCert(rs.getString("CERT")));
       entry.setDhpocControl(rs.getString("DHPOC_CONTROL"));
+      String str = rs.getString("REVOKE_SUSPENDED_CONTROL");
+      RevokeSuspendedControl revokeSuspended = str == null
+          ? new RevokeSuspendedControl(false) : new RevokeSuspendedControl(str);
+      entry.setRevokeSuspendedControl(revokeSuspended);
 
       List<X509Certificate> certchain = generateCertchain(rs.getString("CERTCHAIN"));
       // validate certchain
@@ -626,8 +631,8 @@ class CaManagerQueryExecutor {
         + "CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,CRL_CONTROL,CMP_CONTROL,SCEP_CONTROL,"//5
         + "CTLOG_CONTROL,DUPLICATE_KEY,DUPLICATE_SUBJECT,PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION,"//6
         + "NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL,"//5
-        + "SIGNER_CONF,DHPOC_CONTROL) "
-        + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        + "SIGNER_CONF,DHPOC_CONTROL,REVOKE_SUSPENDED_CONTROL) "
+        + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     // insert to table ca
     PreparedStatement ps = null;
@@ -689,6 +694,8 @@ class CaManagerQueryExecutor {
       ps.setString(idx++, StringUtil.isBlank(encodedExtraCtrl) ? null : encodedExtraCtrl);
       ps.setString(idx++, caEntry.getSignerConf());
       ps.setString(idx++, caEntry.getDhpocControl());
+      RevokeSuspendedControl revokeSuspended = caEntry.getRevokeSuspendedControl();
+      ps.setString(idx++, revokeSuspended == null ? null : revokeSuspended.getConf());
 
       if (ps.executeUpdate() == 0) {
         throw new CaMgmtException("could not add CA " + caEntry.getIdent());
@@ -1142,7 +1149,8 @@ class CaManagerQueryExecutor {
         col(STRING, "VALIDITY_MODE", validityMode),
         col(STRING, "EXTRA_CONTROL", extraControl),
         col(STRING, "SIGNER_CONF", signerConf, false, true),
-        col(STRING, "DHPOC_CONTROL", changeCaEntry.getDhpocControl(), false, true));
+        col(STRING, "DHPOC_CONTROL", changeCaEntry.getDhpocControl(), false, true),
+        col(STRING, "REVOKE_SUSPENDED_CONTROL", changeCaEntry.getRevokeSuspendedControl()));
   } // method changeCa
 
   void commitNextCrlNoIfLess(NameId ca, long nextCrlNo) throws CaMgmtException {

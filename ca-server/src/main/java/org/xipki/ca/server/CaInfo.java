@@ -44,7 +44,7 @@ import org.xipki.ca.api.mgmt.CtLogControl;
 import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.ca.api.mgmt.PermissionConstants;
 import org.xipki.ca.api.mgmt.ProtocolSupport;
-import org.xipki.ca.api.mgmt.RevokeSuspendedCertsControl;
+import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
 import org.xipki.ca.api.mgmt.ScepControl;
 import org.xipki.ca.api.mgmt.ValidityMode;
 import org.xipki.ca.server.store.CertStore;
@@ -99,7 +99,7 @@ public class CaInfo {
 
   private ConcurrentContentSigner dfltSigner;
 
-  private RevokeSuspendedCertsControl revokeSuspendedCertsControl;
+  private RevokeSuspendedControl revokeSuspendedCertsControl;
 
   public CaInfo(MgmtEntry.Ca caEntry, CertStore certStore) throws OperationException {
     this.caEntry = Args.notNull(caEntry, "caEntry");
@@ -441,12 +441,12 @@ public class CaInfo {
         || PermissionConstants.contains(permission, PermissionConstants.KEY_UPDATE);
   } // method isSignerRequired
 
-  public RevokeSuspendedCertsControl revokeSuspendedCertsControl() {
+  public RevokeSuspendedControl revokeSuspendedCertsControl() {
     return revokeSuspendedCertsControl;
   }
 
   public void setRevokeSuspendedCertsControl(
-      RevokeSuspendedCertsControl revokeSuspendedCertsControl) {
+      RevokeSuspendedControl revokeSuspendedCertsControl) {
     this.revokeSuspendedCertsControl = revokeSuspendedCertsControl;
   }
 

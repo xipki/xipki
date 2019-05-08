@@ -283,7 +283,7 @@ class CaconfDbExporter extends DbPorter {
         + "CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,CRL_CONTROL,CMP_CONTROL,SCEP_CONTROL," // 5
         + "CTLOG_CONTROL,DUPLICATE_KEY,DUPLICATE_SUBJECT,PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION," // 6
         + "NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL," // 5
-        + "SIGNER_CONF,REV_INFO,DHPOC_CONTROL FROM CA"; // 3
+        + "SIGNER_CONF,REV_INFO,DHPOC_CONTROL,REVOKE_SUSPENDED_CONTROL FROM CA"; // 4
 
     Statement stmt = null;
     ResultSet rs = null;
@@ -327,6 +327,7 @@ class CaconfDbExporter extends DbPorter {
         ca.setNumCrls(rs.getInt("NUM_CRLS"));
         ca.setRevInfo(rs.getString("REV_INFO"));
         ca.setDhpocControl(rs.getString("DHPOC_CONTROL"));
+        ca.setRevokeSuspendedControl(rs.getString("REVOKE_SUSPENDED_CONTROL"));
 
         ca.validate();
         cas.add(ca);

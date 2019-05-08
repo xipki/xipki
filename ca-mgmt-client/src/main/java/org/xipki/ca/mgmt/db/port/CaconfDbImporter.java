@@ -236,8 +236,8 @@ class CaconfDbImporter extends DbPorter {
         + "CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,CRL_CONTROL,CMP_CONTROL,SCEP_CONTROL," // 5
         + "CTLOG_CONTROL,DUPLICATE_KEY,DUPLICATE_SUBJECT,PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION," // 6
         + "NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL," // 5
-        + "SIGNER_CONF,REV_INFO,DHPOC_CONTROL) " // 3
-        + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        + "SIGNER_CONF,REV_INFO,DHPOC_CONTROL,REVOKE_SUSPENDED_CONTROL) " // 4
+        + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     PreparedStatement ps = null;
     try {
@@ -283,6 +283,7 @@ class CaconfDbImporter extends DbPorter {
           ps.setString(idx++, readContent(ca.getSignerConf()));
           ps.setString(idx++, ca.getRevInfo());
           ps.setString(idx++, ca.getDhpocControl());
+          ps.setString(idx++, ca.getRevokeSuspendedControl());
 
           ps.executeUpdate();
         } catch (SQLException ex) {

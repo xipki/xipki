@@ -131,7 +131,10 @@ public class CtLogControl {
 
   @Override
   public String toString() {
-    return conf;
+    return StringUtil.concatObjects(
+        "  enabled: ", enabled,
+        "\n  SSL context name: ", sslContextName,
+        "\n  Servers: ", servers);
   }
 
   @Override

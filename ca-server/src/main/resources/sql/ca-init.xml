@@ -137,6 +137,7 @@
       <column name="CMP_CONTROL" type="VARCHAR(1000)"/>
       <column name="SCEP_CONTROL" type="VARCHAR(500)"/>
       <column name="CTLOG_CONTROL" type="VARCHAR(5000)" remarks="Certificate Transparency Log Control"/>
+      <column name="REVOKE_SUSPENDED_CONTROL" type="VARCHAR(500)"/>
       <column name="CRL_SIGNER_NAME" type="VARCHAR(45)"/>
       <column name="CMP_RESPONDER_NAME" type="VARCHAR(45)"/>
       <column name="SCEP_RESPONDER_NAME" type="VARCHAR(45)"/>

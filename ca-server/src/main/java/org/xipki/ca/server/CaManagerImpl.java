@@ -84,7 +84,6 @@ import org.xipki.ca.api.mgmt.CtLogControl;
 import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.ca.api.mgmt.PermissionConstants;
 import org.xipki.ca.api.mgmt.RequestorInfo;
-import org.xipki.ca.api.mgmt.RevokeSuspendedCertsControl;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.CertprofileFactoryRegister;
@@ -121,7 +120,6 @@ import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
 import org.xipki.util.StringUtil;
-import org.xipki.util.Validity;
 import org.xipki.util.http.SslContextConf;
 
 import com.alibaba.fastjson.JSON;
@@ -680,28 +678,6 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   private boolean startCa(String caName) {
     CaInfo caEntry = caInfos.get(caName);
-
-    ConfPairs extraControl = caEntry.getCaEntry().getExtraControl();
-    if (extraControl != null) {
-      String str = extraControl.value(RevokeSuspendedCertsControl.KEY_REVOCATION_ENABLED);
-      boolean enabled = false;
-      if (str != null) {
-        enabled = Boolean.parseBoolean(str);
-      }
-
-      if (enabled) {
-        str = extraControl.value(RevokeSuspendedCertsControl.KEY_REVOCATION_REASON);
-        CrlReason reason = (str == null) ? CrlReason.CESSATION_OF_OPERATION
-            : CrlReason.forNameOrText(str);
-
-        str = extraControl.value(RevokeSuspendedCertsControl.KEY_UNCHANGED_SINCE);
-        Validity unchangedSince = (str == null) ? new Validity(15, Validity.Unit.DAY)
-            : Validity.getInstance(str);
-        RevokeSuspendedCertsControl control = new RevokeSuspendedCertsControl(reason,
-            unchangedSince);
-        caEntry.setRevokeSuspendedCertsControl(control);
-      }
-    }
 
     CtLogControl ctLogControl = caEntry.getCaEntry().getCtLogControl();
     CtLogClient ctLogClient = null;
@@ -2926,18 +2902,6 @@ public class CaManagerImpl implements CaManager, Closeable {
             ca.setAliases(new ArrayList<>(strs));
           }
 
-          strs = caHasProfiles.get(name);
-          if (CollectionUtil.isNonEmpty(strs)) {
-            includeProfileNames.addAll(strs);
-            ca.setProfiles(new ArrayList<>(strs));
-          }
-
-          strs = caHasPublishers.get(name);
-          if (CollectionUtil.isNonEmpty(strs)) {
-            includePublisherNames.addAll(strs);
-            ca.setPublishers(new ArrayList<>(strs));
-          }
-
           // CaHasRequestors
           Set<MgmtEntry.CaHasRequestor> requestors = caHasRequestors.get(name);
           if (CollectionUtil.isNonEmpty(requestors)) {
@@ -2988,47 +2952,23 @@ public class CaManagerImpl implements CaManager, Closeable {
             }
           }
 
+          strs = caHasProfiles.get(name);
+          if (CollectionUtil.isNonEmpty(strs)) {
+            includeProfileNames.addAll(strs);
+            ca.setProfiles(new ArrayList<>(strs));
+          }
+
+          strs = caHasPublishers.get(name);
+          if (CollectionUtil.isNonEmpty(strs)) {
+            includePublisherNames.addAll(strs);
+            ca.setPublishers(new ArrayList<>(strs));
+          }
+
+          CaConfType.CaInfo caInfoType = new CaConfType.CaInfo();
+          ca.setCaInfo(caInfoType);
+
           MgmtEntry.Ca entry = x509cas.get(name).getCaInfo().getCaEntry();
-          CaConfType.CaInfo ciJaxb = new CaConfType.CaInfo();
-          byte[] certBytes;
-          try {
-            certBytes = entry.getCert().getEncoded();
-          } catch (CertificateEncodingException ex) {
-            throw new CaMgmtException(concat("could not encode CA certificate ", name));
-          }
-          ciJaxb.setCert(createFileOrBinary(zipStream, certBytes,
-              concat("files/ca-", name, "-cert.der")));
-
-          if (entry.getCrlSignerName() != null) {
-            includeCrlSignerNames.add(entry.getCrlSignerName());
-            ciJaxb.setCrlSignerName(entry.getCrlSignerName());
-          }
-
-          if (entry.getCmpResponderName() != null) {
-            includeSignerNames.add(entry.getCmpResponderName());
-            ciJaxb.setCmpResponderName(entry.getCmpResponderName());
-          }
-
-          if (entry.getScepResponderName() != null) {
-            includeSignerNames.add(entry.getScepResponderName());
-            ciJaxb.setScepResponderName(entry.getScepResponderName());
-          }
-
-          if (entry.getCmpControl() != null) {
-            ciJaxb.setCmpControl(
-                new HashMap<>(new ConfPairs(entry.getCmpControl().getConf()).asMap()));
-          }
-
-          if (entry.getCrlControl() != null) {
-            ciJaxb.setCrlControl(
-                new HashMap<>(new ConfPairs(entry.getCrlControl().getConf()).asMap()));
-          }
-
-          if (entry.getScepControl() != null) {
-            ciJaxb.setScepControl(
-                new HashMap<>(new ConfPairs(entry.getScepControl().getConf()).asMap()));
-          }
-
+          // CA URIs
           CaUris caUris = entry.getCaUris();
           if (caUris != null) {
             CaConfType.CaUris caUrisType = new CaConfType.CaUris();
@@ -3036,31 +2976,108 @@ public class CaManagerImpl implements CaManager, Closeable {
             caUrisType.setOcspUris(caUris.getOcspUris());
             caUrisType.setCrlUris(caUris.getCrlUris());
             caUrisType.setDeltacrlUris(caUris.getDeltaCrlUris());
-            ciJaxb.setCaUris(caUrisType);
+            caInfoType.setCaUris(caUrisType);
           }
 
-          ciJaxb.setDuplicateKey(entry.isDuplicateKeyPermitted());
-          ciJaxb.setDuplicateSubject(entry.isDuplicateSubjectPermitted());
-          ciJaxb.setExpirationPeriod(entry.getExpirationPeriod());
-          if (entry.getExtraControl() != null) {
-            ciJaxb.setExtraControl(entry.getExtraControl().asMap());
+          // Certificate
+          byte[] certBytes;
+          try {
+            certBytes = entry.getCert().getEncoded();
+          } catch (CertificateEncodingException ex) {
+            throw new CaMgmtException(concat("could not encode CA certificate ", name));
           }
-          ciJaxb.setKeepExpiredCertDays(entry.getKeepExpiredCertInDays());
-          ciJaxb.setMaxValidity(entry.getMaxValidity().toString());
-          ciJaxb.setNextCrlNo(entry.getNextCrlNumber());
-          ciJaxb.setNumCrls(entry.getNumCrls());
-          ciJaxb.setPermissions(getPermissions(entry.getPermission()));
-          ciJaxb.setSaveReq(entry.isSaveRequest());
-          ciJaxb.setSignerConf(createFileOrValue(zipStream, entry.getSignerConf(),
-              concat("files/ca-", name, "-signerconf.conf")));
-          ciJaxb.setSignerType(entry.getSignerType());
-          ciJaxb.setSnSize(entry.getSerialNoBitLen());
-          ciJaxb.setStatus(entry.getStatus().getStatus());
-          ciJaxb.setValidityMode(entry.getValidityMode().name());
-          ciJaxb.setProtocolSupport(
+          caInfoType.setCert(createFileOrBinary(zipStream, certBytes,
+              concat("files/ca-", name, "-cert.der")));
+
+          // certchain
+          List<X509Certificate> certchain = entry.getCertchain();
+          if (CollectionUtil.isNonEmpty(certchain)) {
+            List<FileOrBinary> ccList = new LinkedList<>();
+
+            for (int i = 0; i < certchain.size(); i++) {
+              X509Certificate m = certchain.get(i);
+              try {
+                certBytes = m.getEncoded();
+              } catch (CertificateEncodingException ex) {
+                throw new CaMgmtException(concat(
+                    "could not encode CA certchain [", Integer.toString(i), "] of CA", name));
+              }
+              ccList.add(createFileOrBinary(zipStream, certBytes,
+                  concat("files/ca-", name, "-certchain-" + i + ".der")));
+            }
+            caInfoType.setCertchain(ccList);
+          }
+
+          if (entry.getCmpControl() != null) {
+            caInfoType.setCmpControl(
+                new HashMap<>(new ConfPairs(entry.getCmpControl().getConf()).asMap()));
+          }
+
+          if (entry.getCmpResponderName() != null) {
+            includeSignerNames.add(entry.getCmpResponderName());
+            caInfoType.setCmpResponderName(entry.getCmpResponderName());
+          }
+
+          if (entry.getCrlControl() != null) {
+            caInfoType.setCrlControl(
+                new HashMap<>(new ConfPairs(entry.getCrlControl().getConf()).asMap()));
+          }
+
+          if (entry.getCrlSignerName() != null) {
+            includeCrlSignerNames.add(entry.getCrlSignerName());
+            caInfoType.setCrlSignerName(entry.getCrlSignerName());
+          }
+
+          if (entry.getCtLogControl() != null) {
+            caInfoType.setCtLogControl(
+                new HashMap<>(new ConfPairs(entry.getCtLogControl().getConf()).asMap()));
+          }
+
+          if (entry.getDhpocControl() != null) {
+            FileOrValue fv = createFileOrValue(
+                zipStream, entry.getDhpocControl(), concat("files/ca-", name, "-dhpoc.conf"));
+            caInfoType.setDhpocControl(fv);
+          }
+
+          caInfoType.setDuplicateKey(entry.isDuplicateKeyPermitted());
+          caInfoType.setDuplicateSubject(entry.isDuplicateSubjectPermitted());
+          caInfoType.setExpirationPeriod(entry.getExpirationPeriod());
+          if (entry.getExtraControl() != null) {
+            caInfoType.setExtraControl(entry.getExtraControl().asMap());
+          }
+
+          caInfoType.setKeepExpiredCertDays(entry.getKeepExpiredCertInDays());
+          caInfoType.setMaxValidity(entry.getMaxValidity().toString());
+          caInfoType.setNextCrlNo(entry.getNextCrlNumber());
+          caInfoType.setNumCrls(entry.getNumCrls());
+          caInfoType.setPermissions(getPermissions(entry.getPermission()));
+
+          caInfoType.setProtocolSupport(
               StringUtil.splitAsSet(entry.getProtocoSupport().getEncoded(), ","));
 
-          ca.setCaInfo(ciJaxb);
+          if (entry.getRevokeSuspendedControl() != null) {
+            caInfoType.setRevokeSuspendedControl(
+                new HashMap<>(new ConfPairs(entry.getRevokeSuspendedControl().getConf()).asMap()));
+          }
+
+          caInfoType.setSaveReq(entry.isSaveRequest());
+          if (entry.getScepControl() != null) {
+            caInfoType.setScepControl(
+                new HashMap<>(new ConfPairs(entry.getScepControl().getConf()).asMap()));
+          }
+
+          if (entry.getScepResponderName() != null) {
+            includeSignerNames.add(entry.getScepResponderName());
+            caInfoType.setScepResponderName(entry.getScepResponderName());
+          }
+
+          caInfoType.setSignerConf(createFileOrValue(zipStream, entry.getSignerConf(),
+              concat("files/ca-", name, "-signerconf.conf")));
+          caInfoType.setSignerType(entry.getSignerType());
+          caInfoType.setSnSize(entry.getSerialNoBitLen());
+
+          caInfoType.setStatus(entry.getStatus().getStatus());
+          caInfoType.setValidityMode(entry.getValidityMode().name());
 
           list.add(ca);
         }

@@ -305,6 +305,8 @@ public class CaConfType {
 
     private Map<String, Object> ctLogControl;
 
+    private Map<String, Object> revokeSuspendedControl;
+
     private FileOrValue dhpocControl;
 
     private String cmpResponderName;
@@ -312,8 +314,6 @@ public class CaConfType {
     private String scepResponderName;
 
     private String crlSignerName;
-
-    private String precertSignerName;
 
     private Set<String> protocolSupport;
 
@@ -453,6 +453,14 @@ public class CaConfType {
       this.ctLogControl = ctLogControl;
     }
 
+    public Map<String, Object> getRevokeSuspendedControl() {
+      return revokeSuspendedControl;
+    }
+
+    public void setRevokeSuspendedControl(Map<String, Object> revokeSuspendedControl) {
+      this.revokeSuspendedControl = revokeSuspendedControl;
+    }
+
     public FileOrValue getDhpocControl() {
       return dhpocControl;
     }
@@ -483,14 +491,6 @@ public class CaConfType {
 
     public void setCrlSignerName(String crlSignerName) {
       this.crlSignerName = crlSignerName;
-    }
-
-    public String getPrecertSignerName() {
-      return precertSignerName;
-    }
-
-    public void setPrecertSignerName(String precertSignerName) {
-      this.precertSignerName = precertSignerName;
     }
 
     public Set<String> getProtocolSupport() {

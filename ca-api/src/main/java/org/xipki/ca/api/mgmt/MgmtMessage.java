@@ -230,6 +230,8 @@ public abstract class MgmtMessage {
 
     private String dhpocControl;
 
+    private String revokeSuspended;
+
     private String cmpResponderName;
 
     private String scepResponderName;
@@ -270,45 +272,6 @@ public abstract class MgmtMessage {
     }
 
     public CaEntryWrapper(MgmtEntry.Ca caEntry) {
-      ident = caEntry.getIdent();
-      status = caEntry.getStatus();
-      maxValidity = caEntry.getMaxValidity();
-      signerType = caEntry.getSignerType();
-      signerConf = caEntry.getSignerConf();
-      if (caEntry.getScepControl() != null) {
-        scepControl = caEntry.getScepControl().getConf();
-      }
-
-      if (caEntry.getCrlControl() != null) {
-        crlControl = caEntry.getCrlControl().getConf();
-      }
-
-      crlSignerName = caEntry.getCrlSignerName();
-
-      if (caEntry.getCmpControl() != null) {
-        cmpControl = caEntry.getCmpControl().getConf();
-      }
-
-      if (caEntry.getCtLogControl() != null) {
-        ctLogControl = caEntry.getCtLogControl().getConf();
-      }
-
-      dhpocControl = caEntry.getDhpocControl();
-      cmpResponderName = caEntry.getCmpResponderName();
-      scepResponderName = caEntry.getScepResponderName();
-      duplicateKeyPermitted = caEntry.isDuplicateKeyPermitted();
-      duplicateSubjectPermitted = caEntry.isDuplicateSubjectPermitted();
-      protocolSupport = caEntry.getProtocoSupport();
-      saveRequest = caEntry.isSaveRequest();
-      validityMode = caEntry.getValidityMode();
-      permission = caEntry.getPermission();
-      expirationPeriod = caEntry.getExpirationPeriod();
-      keepExpiredCertInDays = caEntry.getKeepExpiredCertInDays();
-
-      if (caEntry.getExtraControl() != null) {
-        extraControl = caEntry.getExtraControl().getEncoded();
-      }
-
       caUris = caEntry.getCaUris();
 
       if (caEntry.getCert() != null) {
@@ -330,10 +293,54 @@ public abstract class MgmtMessage {
         }
       }
 
-      serialNoBitLen = caEntry.getSerialNoBitLen();
+      if (caEntry.getCmpControl() != null) {
+        cmpControl = caEntry.getCmpControl().getConf();
+      }
+
+      cmpResponderName = caEntry.getCmpResponderName();
+
+      if (caEntry.getCrlControl() != null) {
+        crlControl = caEntry.getCrlControl().getConf();
+      }
+
+      crlSignerName = caEntry.getCrlSignerName();
+
+      if (caEntry.getCtLogControl() != null) {
+        ctLogControl = caEntry.getCtLogControl().getConf();
+      }
+
+      dhpocControl = caEntry.getDhpocControl();
+      duplicateKeyPermitted = caEntry.isDuplicateKeyPermitted();
+      duplicateSubjectPermitted = caEntry.isDuplicateSubjectPermitted();
+      expirationPeriod = caEntry.getExpirationPeriod();
+      if (caEntry.getExtraControl() != null) {
+        extraControl = caEntry.getExtraControl().getEncoded();
+      }
+
+      ident = caEntry.getIdent();
+      keepExpiredCertInDays = caEntry.getKeepExpiredCertInDays();
+      maxValidity = caEntry.getMaxValidity();
       nextCrlNumber = caEntry.getNextCrlNumber();
       numCrls = caEntry.getNumCrls();
+      permission = caEntry.getPermission();
+      protocolSupport = caEntry.getProtocoSupport();
       revocationInfo = caEntry.getRevocationInfo();
+      if (caEntry.getRevokeSuspendedControl() != null) {
+        revokeSuspended = caEntry.getRevokeSuspendedControl().getConf();
+      }
+      saveRequest = caEntry.isSaveRequest();
+      if (caEntry.getScepControl() != null) {
+        scepControl = caEntry.getScepControl().getConf();
+      }
+      scepResponderName = caEntry.getScepResponderName();
+
+      serialNoBitLen = caEntry.getSerialNoBitLen();
+      signerConf = caEntry.getSignerConf();
+      signerType = caEntry.getSignerType();
+
+      status = caEntry.getStatus();
+
+      validityMode = caEntry.getValidityMode();
     }
 
     public NameId getIdent() {
@@ -390,6 +397,14 @@ public abstract class MgmtMessage {
 
     public void setCrlControl(String crlControl) {
       this.crlControl = crlControl;
+    }
+
+    public String getRevokeSuspended() {
+      return revokeSuspended;
+    }
+
+    public void setRevokeSuspended(String revokeSuspended) {
+      this.revokeSuspended = revokeSuspended;
     }
 
     public String getCrlSignerName() {
@@ -618,6 +633,10 @@ public abstract class MgmtMessage {
       rv.setSaveRequest(saveRequest);
       if (scepControl != null) {
         rv.setScepControl(new ScepControl(scepControl));
+      }
+
+      if (revokeSuspended != null) {
+        rv.setRevokeSuspendedControl(new RevokeSuspendedControl(revokeSuspended));
       }
 
       rv.setScepResponderName(scepResponderName);

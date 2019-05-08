@@ -53,6 +53,7 @@ import org.xipki.ca.api.mgmt.CtLogControl;
 import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.ca.api.mgmt.PermissionConstants;
 import org.xipki.ca.api.mgmt.ProtocolSupport;
+import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
 import org.xipki.ca.api.mgmt.ScepControl;
 import org.xipki.ca.api.mgmt.ValidityMode;
 import org.xipki.password.PasswordResolver;
@@ -245,6 +246,10 @@ public class CaActions {
     @Option(name = "--dhpoc-control", description = "DHPoc control")
     private String dhpocControl;
 
+    @Option(name = "--revoke-suspended-control",
+        description = "Revoke suspended certificates control")
+    private String revokeSuspendedControl;
+
     @Option(name = "--num-crls", description = "number of CRLs to be kept in database")
     private Integer numCrls = 30;
 
@@ -362,6 +367,11 @@ public class CaActions {
         } else {
           entry.setDhpocControl(dhpocControl);
         }
+      }
+
+      if (revokeSuspendedControl != null) {
+        entry.setRevokeSuspendedControl(
+            new RevokeSuspendedControl(new ConfPairs(revokeSuspendedControl)));
       }
 
       if (cmpResponderName != null) {
@@ -1073,6 +1083,10 @@ public class CaActions {
     @Option(name = "--dhpoc-control", description = "DHPoc control")
     private String dhpocControl;
 
+    @Option(name = "--revoke-suspended-control",
+        description = "Revoke suspended certificates control")
+    private String revokeSuspendedControl;
+
     @Option(name = "--num-crls", description = "number of CRLs to be kept in database")
     private Integer numCrls;
 
@@ -1243,6 +1257,10 @@ public class CaActions {
         String tmp = ShellUtil.canonicalizeSignerConf("PKCS12", dhpocControl,
             passwordResolver, securityFactory);
         entry.setDhpocControl(tmp);
+      }
+
+      if (revokeSuspendedControl != null) {
+        entry.setRevokeSuspendedControl(revokeSuspendedControl);
       }
 
       if (cmpResponderName != null) {
