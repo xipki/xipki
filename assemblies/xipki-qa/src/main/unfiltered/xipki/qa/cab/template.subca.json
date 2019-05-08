@@ -41,10 +41,10 @@
 			"duplicateKey":true,
 			"duplicateSubject":true,
 			"expirationPeriod":365,
-			"extraControl":{
-				"revokeSuspendedCerts.enabled":true,
-				"revokeSuspendedCerts.targetReason":"cessationOfOperation",
-				"revokeSuspendedCerts.unchangedSince":"15d"
+			"revokeSuspendedControl":{
+				"enabled":true,
+				"targetReason":"cessationOfOperation",
+				"unchangedSince":"15d"
 			},
 			"keepExpiredCertDays":-1,
 			"maxValidity":"5y",
