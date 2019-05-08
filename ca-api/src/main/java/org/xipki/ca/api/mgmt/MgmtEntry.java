@@ -433,6 +433,13 @@ public abstract class MgmtEntry {
         certchainStr.append("null");
       }
 
+      Set<String> permissionSet = PermissionConstants.permissionToStringSet(permission);
+      StringBuilder buffer = new StringBuilder();
+      for (String m : permissionSet) {
+        buffer.append("\n  ").append(m);
+      }
+      String permissionText = buffer.toString();
+
       return StringUtil.concatObjectsCap(1500,
           "id: ", ident.getId(), "\nname: ", ident.getName(),
           "\nstatus: ", (status == null ? "null" : status.getStatus()),
@@ -446,9 +453,9 @@ public abstract class MgmtEntry {
           "\nCMP control:\n", (cmpControl == null ? "  null" : cmpControl.toString(verbose)),
           "\nCRL control:\n", (crlControl == null ? "  null" : crlControl.toString(verbose)),
           "\nSCEP control: \n", (scepControl == null ? "  null" : scepControl.toString(verbose)),
-          "\nRevoke suspended certificates control: \n",
-              (revokeSuspendedControl == null ? "  null" : revokeSuspendedControl.toString()),
           "\nCTLog control: \n", (ctlogControl == null ? "  null" : ctlogControl.toString()),
+          "\nrevoke suspended certificates control: \n",
+              (revokeSuspendedControl == null ? "  null" : revokeSuspendedControl.toString()),
           "\nCMP responder name: ", cmpResponderName,
           "\nSCEP responder name: ", scepResponderName,
           "\nCRL signer name: ", crlSignerName,
@@ -457,7 +464,7 @@ public abstract class MgmtEntry {
           "\n", protocolSupport,
           "\nsave request: ", saveRequest,
           "\nvalidity mode: ", validityMode,
-          "\npermission: ", PermissionConstants.permissionToString(permission),
+          "\npermission:", permissionText,
           "\nkeep expired certs: ",
               (keepExpiredCertInDays < 0 ? "forever" : keepExpiredCertInDays + " days"),
           "\nextra control: ", extraCtrlText,

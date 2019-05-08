@@ -20,8 +20,10 @@ package org.xipki.ca.api.mgmt;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.xipki.util.StringUtil;
 
@@ -111,5 +113,15 @@ public class PermissionConstants {
     }
 
     return sb.toString();
+  }
+
+  public static Set<String> permissionToStringSet(int permission) {
+    Set<String> set = new HashSet<>();
+    for (Integer code : codeTextMap.keySet()) {
+      if ((permission & code) != 0) {
+        set.add(codeTextMap.get(code));
+      }
+    }
+    return set;
   }
 }

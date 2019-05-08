@@ -132,7 +132,7 @@ public class ProtocolSupport {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("Supported protocols:");
+    sb.append("supported protocols:");
     sb.append("\n  CMP:").append(cmp);
     sb.append("\n  REST:").append(rest);
     sb.append("\n  SCEP:").append(scep);
