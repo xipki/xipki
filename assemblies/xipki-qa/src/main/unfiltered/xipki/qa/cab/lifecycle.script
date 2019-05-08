@@ -9,11 +9,10 @@ if { "$1" equals "" } then {
   printUsage = "true"
   argsValid = "true"
 } else {
-  OUTFORM = $1
-  HASH = $2
-  TOKEN_TYPE = $3
-  SIG_TYPE = $4
-  KEYSPEC = $5
+  HASH = $1
+  TOKEN_TYPE = $2
+  SIG_TYPE = $3
+  KEYSPEC = $4
 
   list = [pkcs11 pkcs12]; each ($list) {
     if { "$TOKEN_TYPE" equals $it } then {
@@ -65,8 +64,7 @@ if { $argsValid equals "false" } then {
 if { $printUsage equals "true" } then {
   echo "Usage: "
   echo ""
-  echo "source file:./xipki/qa/cab/lifecycle.script <outform> <hash algo> <token type> <signature type> [<keyspec>]"
-  echo "    outform:         Output format of the certificates, CRLs and CSRs"
+  echo "source file:./xipki/qa/cab/lifecycle.script <hash algo> <token type> <signature type> [<keyspec>]"
   echo "    hash algo:       sha256, sha384, sha512"
   echo "    token type:      pkcs11, pkcs12"
   echo "    signature type:  rsa, rsapss, ec, dsa"

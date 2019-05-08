@@ -100,7 +100,6 @@
 			"duplicateSubject":true,
 			"expirationPeriod":365,
 			"genSelfIssued":{
-				"certOutform":"REPLACEME-OUTFORM",
 				"csr":{
 					"file":"${output.dir}/rootca1.csr"
 				},

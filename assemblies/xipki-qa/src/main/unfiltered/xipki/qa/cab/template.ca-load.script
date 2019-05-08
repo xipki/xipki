@@ -46,15 +46,11 @@ xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
 xi:replace --old "REPLACEME-HASH" --new "$STDHASH" \
   xipki/qa/cab/rootca.json
 
-xi:replace --old "REPLACEME-OUTFORM" --new "$OUTFORM" \
-  xipki/qa/cab/rootca.json
-
 if { $TOKEN_TYPE equals "pkcs11" } then {
   ca:refresh-token --type pkcs11
 }
 
 ca:load-conf --conf-file xipki/qa/cab/rootca.json \
-  --outform $OUTFORM \
   --out-dir output
 
 xi:move-file output/ca-rootca1.crt output/rootca1.crt
@@ -70,19 +66,16 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
 if { $TOKEN_TYPE equals "pkcs11" } then {
   xi:csr-p11 --hash $HASH REPLACEME-RSAMGF1 \
     --slot $SLOT --label subca1 \
-    --outform $OUTFORM \
     --out output/subca1.csr \
     --subject "CN=subca1,O=xipki,C=DE"
 } else {
   xi:csr-p12 --hash $HASH REPLACEME-RSAMGF1 \
     --p12 output/subca1.p12 --password 1234 \
-    --outform $OUTFORM \
     --out output/subca1.csr \
     --subject "CN=subca1,O=xipki,C=DE"
 }
 
 ca:enroll-cert --ca rootca1 --csr output/subca1.csr \
-  --outform $OUTFORM \
   --out output/subca1.crt --profile cab-subca
 
 if { $TOKEN_TYPE equals "pkcs11" } then {

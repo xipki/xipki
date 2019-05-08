@@ -36,10 +36,10 @@
 			"duplicateKey":true,
 			"duplicateSubject":true,
 			"expirationPeriod":365,
-			"extraControl":{
-				"revokeSuspendedCerts.enabled":true,
-				"revokeSuspendedCerts.targetReason":"cessationOfOperation",
-				"revokeSuspendedCerts.unchangedSince":"15d"
+			"revokeSuspendedControl":{
+				"enabled":true,
+				"targetReason":"cessationOfOperation",
+				"unchangedSince":"15d"
 			},
 			"dhpocControl":{
 				"value":"type=pkcs12,password=1234,keystore=file:xipki/qa/keys/dhpoc.p12"
