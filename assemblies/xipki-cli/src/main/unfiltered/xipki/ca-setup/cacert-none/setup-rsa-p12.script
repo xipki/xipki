@@ -35,7 +35,7 @@ xi:replace --old "REPLACEME-CA_SIGNERCONF" \
 ca:load-conf --conf-file xipki/ca-setup/cacert-none/ca-conf.json \
   --out-dir ${KEYCERTS_DIR}
 
-xi:move-file ${KEYCERTS_DIR}/ca-myca1.der ${KEYCERTS_DIR}/myca1.der
+xi:move-file ${KEYCERTS_DIR}/ca-myca1.crt ${KEYCERTS_DIR}/myca1.der
 
 echo "# Update the certificate in the device"
 xi:update-cert-p12 --p12 ${KEYCERTS_DIR}/myca1.p12 --password 1234 \
