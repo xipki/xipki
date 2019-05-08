@@ -49,7 +49,6 @@
     <xipki.scep.version>3.1.0</xipki.scep.version>
     <servlet.version>3.1.0</servlet.version>
     <karaf.version>4.2.5</karaf.version>
-    <karaf.plugin.version>4.2.3</karaf.plugin.version>
     <bc.version>1.61</bc.version>
     <slf4j.version>1.7.7</slf4j.version>
     <pkcs11-wrapper.version>1.4.4-SNAPSHOT</pkcs11-wrapper.version>
@@ -218,7 +217,7 @@
         <plugin>
           <groupId>org.apache.karaf.tooling</groupId>
           <artifactId>karaf-maven-plugin</artifactId>
-          <version>${karaf.plugin.version}</version>
+          <version>${karaf.version}</version>
         </plugin>
         <plugin>
           <artifactId>maven-antrun-plugin</artifactId>
