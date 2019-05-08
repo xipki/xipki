@@ -433,9 +433,9 @@ public abstract class MgmtEntry {
         certchainStr.append("null");
       }
 
-      Set<String> permissionSet = PermissionConstants.permissionToStringSet(permission);
+      List<String> permissionList = PermissionConstants.permissionToStringSet(permission);
       StringBuilder buffer = new StringBuilder();
-      for (String m : permissionSet) {
+      for (String m : permissionList) {
         buffer.append("\n  ").append(m);
       }
       String permissionText = buffer.toString();
