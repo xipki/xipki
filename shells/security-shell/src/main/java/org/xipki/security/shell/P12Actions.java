@@ -62,7 +62,6 @@ import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.Args;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.ObjectCreationException;
-import org.xipki.util.StringUtil;
 
 /**
  * TODO.
@@ -258,28 +257,18 @@ public class P12Actions {
       } catch (IOException ex) {
         throw new ObjectCreationException("could not read password: " + ex.getMessage(), ex);
       }
-      SignerConf conf = getKeystoreSignerConf(p12File, new String(pwd),
-          HashAlgo.getNonNullInstance(hashAlgo), signatureAlgoControl, peerCertFile);
-      return securityFactory.createSigner("PKCS12", conf, (X509Certificate[]) null);
-    }
 
-    static SignerConf getKeystoreSignerConf(String keystoreFile, String password,
-        HashAlgo hashAlgo, SignatureAlgoControl signatureAlgoControl, String peerCertFile)
-            throws ObjectCreationException {
-      ConfPairs conf = new ConfPairs("password", password);
+      ConfPairs conf = new ConfPairs("password", new String(pwd));
       conf.putPair("parallelism", Integer.toString(1));
-      conf.putPair("keystore", "file:" + keystoreFile);
-      SignerConf signerConf = new SignerConf(conf.getEncoded(), hashAlgo, signatureAlgoControl);
-      if (StringUtil.isNotBlank(peerCertFile)) {
-        X509Certificate cert;
-        try {
-          cert = X509Util.parseCert(Paths.get(peerCertFile).toFile());
-        } catch (CertificateException | IOException ex) {
-          throw new ObjectCreationException(ex.getMessage(), ex);
-        }
-        signerConf.setPeerCertificates(Arrays.asList(cert));
+      conf.putPair("keystore", "file:" + p12File);
+      SignerConf signerConf = new SignerConf(conf.getEncoded(),
+                                  HashAlgo.getNonNullInstance(hashAlgo), signatureAlgoControl);
+      try {
+        signerConf.setPeerCertificates(getPeerCertificates());
+      } catch (CertificateException | IOException ex) {
+        throw new ObjectCreationException("error getting peer certificates", ex);
       }
-      return signerConf;
+      return securityFactory.createSigner("PKCS12", signerConf, (X509Certificate[]) null);
     }
 
   }

@@ -20,6 +20,8 @@ package org.xipki.security.shell;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -28,9 +30,11 @@ import java.security.Key;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
+import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
@@ -83,6 +87,8 @@ import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
+import org.bouncycastle.util.io.pem.PemObject;
+import org.bouncycastle.util.io.pem.PemReader;
 import org.xipki.password.OBFPasswordService;
 import org.xipki.password.PBEAlgo;
 import org.xipki.password.PBEPasswordService;
@@ -351,11 +357,6 @@ public class Actions {
 
     private static final long _12_HOURS_MS = 12L * 60 * 60 * 1000;
 
-    @Option(name = "--peer-cert",
-        description = "Peer certificate, only for the Diffie-Hellman keys")
-    @Completion(FileCompleter.class)
-    protected String peerCertFile;
-
     @Option(name = "--hash", description = "hash algorithm name (will be ignored in some keys, "
         + "e.g. edwards curve based keys)")
     @Completion(Completers.HashAlgCompleter.class)
@@ -368,6 +369,16 @@ public class Actions {
     @Option(name = "--subject-info-access", aliases = "--sia", multiValued = true,
         description = "subjectInfoAccess")
     protected List<String> subjectInfoAccesses;
+
+    @Option(name = "--peer-cert",
+        description = "Peer certificate file, only for the Diffie-Hellman keys")
+    @Completion(FileCompleter.class)
+    private String peerCertFile;
+
+    @Option(name = "--peer-certs", description = "Peer certificates file "
+        + "(A PEM file containing certificates, only for the Diffie-Hellman keys")
+    @Completion(FileCompleter.class)
+    private String peerCertsFile;
 
     @Option(name = "--subject", aliases = "-s", required = true, description = "subject in the CSR")
     private String subject;
@@ -454,6 +465,29 @@ public class Actions {
      */
     protected abstract ConcurrentContentSigner getSigner(
          SignatureAlgoControl signatureAlgoControl) throws Exception;
+
+    protected List<X509Certificate> getPeerCertificates()
+        throws CertificateException, IOException {
+      if (StringUtil.isNotBlank(peerCertsFile)) {
+        try (PemReader pemReader = new PemReader(new FileReader(peerCertsFile))) {
+          List<X509Certificate> certs = new LinkedList<>();
+          PemObject pemObj;
+          while ((pemObj = pemReader.readPemObject()) != null) {
+            if (!"CERTIFICATE".equals(pemObj.getType())) {
+              continue;
+            }
+
+            certs.add(X509Util.parseCert(pemObj.getContent()));
+          }
+          return certs.isEmpty() ? null : certs;
+        }
+      } else if (StringUtil.isNotBlank(peerCertFile)) {
+        X509Certificate cert = X509Util.parseCert(Paths.get(peerCertFile).toFile());
+        return Arrays.asList(cert);
+      } else {
+        return null;
+      }
+    }
 
     @Override
     protected Object execute0() throws Exception {
