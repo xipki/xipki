@@ -1077,8 +1077,9 @@ public class ProfileConfCreatorDemo {
     // Extensions - extenedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_serverAuth},
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth}));
+        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_serverAuth,
+            ObjectIdentifiers.XKU.id_kp_clientAuth},
+        null));
 
     marshall(profile, destFilename, true);
   } // method certprofileTls
