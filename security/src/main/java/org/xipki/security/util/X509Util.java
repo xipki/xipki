@@ -662,11 +662,10 @@ public class X509Util {
     }
 
     StringBuilder sb = new StringBuilder();
-    boolean first = true;
-    for (X509Certificate m : certchain) {
-      if (!first) {
+    for (int i = 0; i < certchain.length; i++) {
+      X509Certificate m = certchain[i];
+      if (i != 0) {
         sb.append("\r\n");
-        first = false;
       }
       sb.append(toPemCert(m));
     }
@@ -680,11 +679,10 @@ public class X509Util {
     }
 
     StringBuilder sb = new StringBuilder();
-    boolean first = true;
-    for (X509Cert m : certchain) {
-      if (!first) {
+    for (int i = 0; i < certchain.length; i++) {
+      X509Cert m = certchain[i];
+      if (i != 0) {
         sb.append("\r\n");
-        first = false;
       }
       sb.append(new String(PemEncoder.encode(m.getEncodedCert(), PemLabel.CERTIFICATE)));
     }
