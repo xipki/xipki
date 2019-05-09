@@ -6,49 +6,37 @@ caqa:init
 
 echo "Generate missing CSR files"
 
-xi:csr-p12 \
-  --p12 output/ed25519_2.p12 --password 1234 \
-  --subject "CN=ed25519-2.xipki.org,C=DE" \
-  --out output/ed25519_2.csr
+list = [ ed25519 ed448 ]
+each ($list) {
+  type = $it
 
-xi:csr-p12 \
-  --p12 output/ed25519_3.p12 --password 1234 \
-  --subject "CN=ed25519-3.xipki.org,C=DE" \
-  --out output/ed25519_3.csr
+  xi:csr-p12 \
+    --p12 output/${type}-1.p12 --password 1234 \
+    --subject "CN=${type}-1.xipki.org,C=DE" \
+    --out output/${type}-1.csr
 
-xi:csr-p12 \
-  --p12 output/x25519_2.p12 --password 1234 \
-  --subject "CN=x25519-2.xipki.org,C=DE" \
-  --peer-cert xipki/qa/keys/dhpoc_x25519.crt \
-  --out output/x25519_2.csr
+  xi:csr-p12 \
+    --p12 output/${type}-2.p12 --password 1234 \
+    --subject "CN=${type}-2.xipki.org,C=DE" \
+    --out output/${type}-2.csr
+ }
 
-xi:csr-p12 \
-  --p12 output/x25519_3.p12 --password 1234 \
-  --subject "CN=x25519-3.xipki.org,C=DE" \
-  --peer-cert xipki/qa/keys/dhpoc_x25519.crt \
-  --out output/x25519_3.csr
+list = [ x25519 x448 ]
+each ($list) {
+  type = $it
 
-xi:csr-p12 \
-  --p12 output/ed448_2.p12 --password 1234 \
-  --subject "CN=ed448-2.xipki.org,C=DE" \
-  --out output/ed448_2.csr
+  xi:csr-p12 \
+    --p12 output/${type}-1.p12 --password 1234 \
+    --subject "CN=${type}-1.xipki.org,C=DE" \
+    --peer-certs output/dhpoc-certs.pem \
+    --out output/${type}-1.csr
 
-xi:csr-p12 \
-  --p12 output/ed448_3.p12 --password 1234 \
-  --subject "CN=ed448-3.xipki.org,C=DE" \
-  --out output/ed448_3.csr
-
-xi:csr-p12 \
-  --p12 output/x448_2.p12 --password 1234 \
-  --subject "CN=x448-2.xipki.org,C=DE" \
-  --peer-cert xipki/qa/keys/dhpoc_x448.crt \
-  --out output/x448_2.csr
-
-xi:csr-p12 \
-  --p12 output/x448_3.p12 --password 1234 \
-  --subject "CN=x448-3.xipki.org,C=DE" \
-  --peer-cert xipki/qa/keys/dhpoc_x448.crt \
-  --out output/x448_3.csr
+  xi:csr-p12 \
+    --p12 output/${type}-2.p12 --password 1234 \
+    --subject "CN=${type}-2.xipki.org,C=DE" \
+    --peer-certs output/dhpoc-certs.pem \
+    --out output/${type}-2.csr
+}
 
 ## rootca
 
@@ -59,49 +47,19 @@ caqa:check-cert --issuer rootca --profile subca \
   --csr output/subca1.csr --cert output/subca1.crt
 
 #####
-
-list = [ ed25519_1 ed25519_2 ed25519_3 ]
-
+list = [ ed25519 ed448 x25519 x448 ]
 each ($list) {
+ type = $it
 
- NAME = $it
+ caqa:check-cert --issuer subca --profile ${type} \
+    --csr output/${type}-1.csr --cert output/${type}-1.crt
 
- caqa:check-cert --issuer subca --profile ed25519 \
-    --csr output/${NAME}.csr --cert output/${NAME}.crt
-}
+ caqa:check-cert --issuer subca --profile ${type} \
+    --csr output/${type}-2.csr --cert output/${type}-2.crt
 
-#####
+ caqa:check-cert --issuer subca --profile ${type} \
+    --csr output/${type}-3.csr --cert output/${type}-3.crt
 
-list = [ x25519_1 x25519_2 x25519_3 ]
-
-each ($list) {
-
- NAME = $it
-
- caqa:check-cert --issuer subca --profile x25519 \
-    --csr output/${NAME}.csr --cert output/${NAME}.crt
-}
-
-#####
-
-list = [ ed448_1 ed448_2 ed448_3 ]
-
-each ($list) {
-
- NAME = $it
-
- caqa:check-cert --issuer subca --profile ed448 \
-    --csr output/${NAME}.csr --cert output/${NAME}.crt
-}
-
-#####
-
-list = [ x448_1 x448_2 x448_3 ]
-
-each ($list) {
-
- NAME = $it
-
- caqa:check-cert --issuer subca --profile x448 \
-    --csr output/${NAME}.csr --cert output/${NAME}.crt
+ caqa:check-cert --issuer subca --profile ${type} \
+    --csr output/${type}-4.csr --cert output/${type}-4.crt
 }

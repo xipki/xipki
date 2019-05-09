@@ -1,5 +1,5 @@
 echo "#################################################################"
-echo "#              Manage certificate with RA Client                #"
+echo "#              Manage certificate with CMP Client               #"
 echo "#################################################################"
 
 xi:cmp-init
@@ -13,160 +13,129 @@ xi:cmp-health --ca rootca1
 
 xi:cmp-health --ca subca1
 
-# Certificate ed25519 (via CSR)
+list = [ "2" "3" "4" ]
+each ($list) {
+  xi:ec-p12 --curve edwards25519 --password 1234 --out output/ed25519-${it}.p12
+  xi:ec-p12 --curve curve25519   --password 1234 --out output/x25519-${it}.p12
+  xi:ec-p12 --curve edwards448   --password 1234 --out output/ed448-${it}.p12
+  xi:ec-p12 --curve curve448     --password 1234 --out output/x448-${it}.p12
+}
 
-xi:csr-p12 \
-  --p12 output/ed25519_1.p12 --password 1234 \
-  --subject "CN=ed25519-1.xipki.org,C=DE" \
-  --out output/ed25519_1.csr
+# Enroll Certificate (CA generate keypair)
 
-xi:cmp-csr-enroll --csr output/ed25519_1.csr \
-  --out output/ed25519_1.crt --profile ed25519
+list = [ ed25519 ed448 x25519 x448 ]
+each ($list) {
+  type = $it
 
-xi:update-cert-p12 --p12 output/ed25519_1.p12 --password 1234 \
-  --cert output/ed25519_1.crt \
-  --ca-cert output/subca1.crt \
-  --ca-cert output/rootca1.crt
+  xi:cmp-enroll-cagenkey \
+    --p12-out output/${type}-1.p12 --password 1234 \
+    --cert-out output/${type}-1.crt --profile ${type} \
+    --subject "CN=${type}-1.xipki.org,C=DE"
 
-# Certificate ed25519 (via CMP)
+  xi:update-cert-p12 --p12 output/${type}-1.p12 --password 1234 \
+    --cert output/${type}-1.crt \
+    --ca-cert output/subca1.crt \
+    --ca-cert output/rootca1.crt
+}
 
-xi:cmp-enroll-p12 \
-  --p12 output/ed25519_2.p12 --password 1234 \
-  --out output/ed25519_2.crt --profile ed25519 \
-  --subject "CN=ed25519-2.xipki.org,C=DE"
+# Certificate (via CMP)
 
-xi:update-cert-p12 --p12 output/ed25519_2.p12 --password 1234 \
-  --cert output/ed25519_2.crt \
-  --ca-cert output/subca1.crt \
-  --ca-cert output/rootca1.crt
+list = [ ed25519 ed448 x25519 x448 ]
+each ($list) {
+  type = $it
 
-# Certificate ed25519 (CA generate keypair)
+  xi:cmp-enroll-p12 \
+    --p12 output/${type}-2.p12 --password 1234 \
+    --out output/${type}-2.crt --profile ${type} \
+    --subject "CN=${type}-2.xipki.org,C=DE"
 
-xi:cmp-enroll-cagenkey \
-  --p12-out output/ed25519_3.p12 --password 1234 \
-  --cert-out output/ed25519_3.crt --profile ed25519 \
-  --subject "CN=ed25519-3.xipki.org,C=DE"
+  xi:update-cert-p12 --p12 output/${type}-2.p12 --password 1234 \
+    --cert output/${type}-2.crt \
+    --ca-cert output/subca1.crt \
+    --ca-cert output/rootca1.crt
+}
 
-xi:update-cert-p12 --p12 output/ed25519_3.p12 --password 1234 \
-  --cert output/ed25519_3.crt \
-  --ca-cert output/subca1.crt \
-  --ca-cert output/rootca1.crt
+# Certificate (via CSR)
 
-# Certificate x25519 (via CSR)
+list = [ ed25519 ed448 ]
+each ($list) {
+  type = $it
 
-xi:csr-p12 \
-  --p12 output/x25519_1.p12 --password 1234 \
-  --subject "CN=x25519-1.xipki.org,C=DE" \
-  --peer-cert xipki/qa/keys/dhpoc_x25519.crt \
-  --out output/x25519_1.csr
+  xi:csr-p12 \
+    --p12 output/${type}-3.p12 --password 1234 \
+    --subject "CN=${type}-3.xipki.org,C=DE" \
+    --out output/${type}-3.csr
+}
 
-xi:cmp-csr-enroll --csr output/x25519_1.csr \
-  --out output/x25519_1.crt --profile x25519
+list = [ x25519 x448 ]
+each ($list) {
+  type = $it
 
-xi:update-cert-p12 --p12 output/x25519_1.p12 --password 1234 \
-  --cert output/x25519_1.crt \
-  --ca-cert output/subca1.crt \
-  --ca-cert output/rootca1.crt
+  xi:csr-p12 \
+    --p12 output/${type}-3.p12 --password 1234 \
+    --subject "CN=${type}-3.xipki.org,C=DE" \
+    --peer-certs xipki/qa/keys/dhpoc_certs.pem \
+    --out output/${type}-3.csr
+}
 
-# Certificate x25519 (via CMP)
+list = [ ed25519 ed448 x25519 x448 ]
+each ($list) {
+  type = $it
 
-xi:cmp-enroll-p12 \
-  --p12 output/x25519_2.p12 --password 1234 \
-  --out output/x25519_2.crt --profile x25519 \
-  --subject "CN=x25519-2.xipki.org,C=DE"
+  xi:cmp-csr-enroll --csr output/${type}-3.csr \
+    --out output/${type}-3.crt --profile ${type}
 
-xi:update-cert-p12 --p12 output/x25519_2.p12 --password 1234 \
-  --cert output/x25519_2.crt \
-  --ca-cert output/subca1.crt \
-  --ca-cert output/rootca1.crt
+  xi:update-cert-p12 --p12 output/${type}-3.p12 --password 1234 \
+    --cert output/${type}-3.crt \
+    --ca-cert output/subca1.crt \
+    --ca-cert output/rootca1.crt
+}
 
-# Certificate x25519 (CA generate keypair)
+echo "#################################################################"
+echo "#             Manage certificate with REST Client               #"
+echo "#################################################################"
 
-xi:cmp-enroll-cagenkey \
-  --p12-out output/x25519_3.p12 --password 1234 \
-  --cert-out output/x25519_3.crt --profile x25519 \
-  --subject "CN=x25519-3.xipki.org,C=DE"
+BASE_URL = https://localhost:8443/ca/rest/subca
 
-xi:update-cert-p12 --p12 output/ed25519_3.p12 --password 1234 \
-  --cert output/ed25519_3.crt \
-  --ca-cert output/subca1.crt \
-  --ca-cert output/rootca1.crt
+echo "Sleeping 1 second"
+sleep 1
 
-# Certificate ed448 (via CSR)
+echo "REST DH POC certificates"
 
-xi:csr-p12 \
-  --p12 output/ed448_1.p12 --password 1234 \
-  --subject "CN=ed448-1.xipki.org,C=DE" \
-  --out output/ed448_1.csr \
+xi:curl --out output/dhpoc-certs.pem $BASE_URL/dhpoc-certs
 
-xi:cmp-csr-enroll --csr output/ed448_1.csr \
-  --out output/ed448_1.crt --profile ed448
+list = [ ed25519 ed448 ]
+each ($list) {
+  type = $it
 
-xi:update-cert-p12 --p12 output/ed448_1.p12 --password 1234 \
-  --cert output/ed448_1.crt \
-  --ca-cert output/subca1.crt \
-  --ca-cert output/rootca1.crt
+  xi:csr-p12 \
+    --p12 output/${type}-4.p12 --password 1234 \
+    --subject "CN=${type}-4.xipki.org,C=DE" \
+    --out output/${type}-4.csr
+}
 
-# Certificate ed448 (via CMP)
+list = [ x25519 x448 ]
+each ($list) {
+  type = $it
 
-xi:cmp-enroll-p12 \
-  --p12 output/ed448_2.p12 --password 1234 \
-  --out output/ed448_2.crt --profile ed448 \
-  --subject "CN=ed448-2.xipki.org,C=DE"
+  xi:csr-p12 \
+    --p12 output/${type}-4.p12 --password 1234 \
+    --subject "CN=${type}-4.xipki.org,C=DE" \
+    --peer-certs output/dhpoc-certs.pem \
+    --out output/${type}-4.csr
+}
 
-xi:update-cert-p12 --p12 output/ed448_2.p12 --password 1234 \
-  --cert output/ed448_2.crt \
-  --ca-cert output/subca1.crt \
-  --ca-cert output/rootca1.crt
+list = [ ed25519 ed448 x25519 x448 ]
+each ($list) {
+  type = $it
 
-  # Certificate ed448 (CA generate keypair)
+  xi:curl --out output/${type}-4.crt \
+    --data-file output/${type}-4.csr \
+    --header "Content-Type: application/pkcs10" \
+    "$BASE_URL/enroll-cert?profile=${type}"
 
-xi:cmp-enroll-cagenkey \
-  --p12-out output/ed448_3.p12 --password 1234 \
-  --cert-out output/ed448_3.crt --profile ed448 \
-  --subject "CN=ed448-3.xipki.org,C=DE"
-
-xi:update-cert-p12 --p12 output/ed448_3.p12 --password 1234 \
-  --cert output/ed448_3.crt \
-  --ca-cert output/subca1.crt \
-  --ca-cert output/rootca1.crt
-
-# Certificate x448 (via CSR)
-
-xi:csr-p12 \
-  --p12 output/x448_1.p12 --password 1234 \
-  --subject "CN=x448-1.xipki.org,C=DE" \
-  --peer-cert xipki/qa/keys/dhpoc_x448.crt \
-  --out output/x448_1.csr
-
-xi:cmp-csr-enroll --csr output/x448_1.csr \
-  --out output/x448_1.crt --profile x448
-
-xi:update-cert-p12 --p12 output/x448_1.p12 --password 1234 \
-  --cert output/x448_1.crt \
-  --ca-cert output/subca1.crt \
-  --ca-cert output/rootca1.crt
-
-# Certificate x448 (via CMP)
-
-xi:cmp-enroll-p12 \
-  --p12 output/x448_2.p12 --password 1234 \
-  --out output/x448_2.crt --profile x448 \
-  --subject "CN=x448-2.xipki.org,C=DE"
-
-xi:update-cert-p12 --p12 output/x448_2.p12 --password 1234 \
-  --cert output/x448_2.crt \
-  --ca-cert output/subca1.crt \
-  --ca-cert output/rootca1.crt
-
-# Certificate x448 (CA generate keypair)
-
-xi:cmp-enroll-cagenkey \
-  --p12-out output/x448_3.p12 --password 1234 \
-  --cert-out output/x448_3.crt --profile x448 \
-  --subject "CN=x448-3.xipki.org,C=DE"
-
-xi:update-cert-p12 --p12 output/ed448_3.p12 --password 1234 \
-  --cert output/ed448_3.crt \
-  --ca-cert output/subca1.crt \
-  --ca-cert output/rootca1.crt
+  xi:update-cert-p12 --p12 output/${type}-4.p12 --password 1234 \
+    --cert output/${type}-4.crt \
+    --ca-cert output/subca1.crt \
+    --ca-cert output/rootca1.crt
+}

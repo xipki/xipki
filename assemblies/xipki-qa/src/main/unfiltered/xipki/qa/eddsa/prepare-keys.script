@@ -6,10 +6,6 @@ xi:rm -r -f error-output
 
 xi:mkdir error-output
 
-xi:copy-dir xipki/qa/p12/shared output
-
-xi:copy-dir xipki/qa/p12/eddsa output
-
 list = [ rootca1 subca1 ]
 
 if { $TOKEN_TYPE equals "pkcs11" } then {
