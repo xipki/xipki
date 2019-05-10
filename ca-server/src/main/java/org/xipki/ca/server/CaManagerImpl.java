@@ -530,6 +530,32 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method reset
 
   @Override
+  public void restartCa(String name) throws CaMgmtException {
+    name = Args.toNonBlankLower(name, "name");
+    asssertMasterMode();
+
+    NameId ident = idNameMap.getCa(name);
+    if (ident == null) {
+      throw new CaMgmtException("Unknown CA " + name);
+    }
+
+    if (createCa(name)) {
+      CaInfo caInfo = caInfos.get(name);
+      if (CaStatus.ACTIVE != caInfo.getCaEntry().getStatus()) {
+        return;
+      }
+
+      if (startCa(name)) {
+        LOG.info("started CA {}", name);
+      } else {
+        LOG.error("could not start CA {}", name);
+      }
+    } else {
+      LOG.error("could not create CA {}", name);
+    }
+  } // method restartCa
+
+  @Override
   public void restartCaSystem() throws CaMgmtException {
     reset();
     boolean caSystemStarted = startCaSystem0();
@@ -2692,7 +2718,7 @@ public class CaManagerImpl implements CaManager, Closeable {
           }
 
           if (caEntry.equals(entryB, true, true)) {
-            LOG.info("ignore existed CA {}", caName);
+            LOG.info("ignore existing CA {}", caName);
           } else {
             throw logAndCreateException(concat("CA ", caName, " existed, could not re-added it"));
           }

@@ -171,6 +171,12 @@ public class CaMgmtClient implements CaManager {
   }
 
   @Override
+  public void restartCa(String caName) throws CaMgmtException {
+    MgmtRequest.Name req = new MgmtRequest.Name(caName);
+    voidTransmit(MgmtAction.restartCa, req);
+  }
+
+  @Override
   public void restartCaSystem() throws CaMgmtException {
     voidTransmit(MgmtAction.restartCaSystem, null);
   }

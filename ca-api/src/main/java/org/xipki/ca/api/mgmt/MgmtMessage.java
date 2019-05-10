@@ -110,6 +110,7 @@ public abstract class MgmtMessage {
     removeUser,
     removeUserFromCa,
     republishCertificates,
+    restartCa,
     restartCaSystem,
     revokeCa,
     revokeCertficate,

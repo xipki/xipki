@@ -2121,6 +2121,27 @@ public class CaActions {
 
   }
 
+  @Command(scope = "ca", name = "restart-ca", description = "restart CA")
+  @Service
+  public static class RestartCa extends CaAction {
+
+    @Argument(index = 0, name = "name", required = true, description = "CA name")
+    @Completion(CaCompleters.CaNameCompleter.class)
+    private String name;
+
+    @Override
+    protected Object execute0() throws Exception {
+      try {
+        caManager.restartCa(name);
+        System.out.println("restarted CA " + name);
+      } catch (CaMgmtException ex) {
+        throw new CmdFailure("could not restart CA " + name + ", error: " + ex.getMessage(), ex);
+      }
+      return null;
+    }
+
+  }
+
   @Command(scope = "ca", name = "restart", description = "restart CA system")
   @Service
   public static class Restart extends CaAction {

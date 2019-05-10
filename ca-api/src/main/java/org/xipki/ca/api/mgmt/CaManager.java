@@ -99,6 +99,20 @@ public interface CaManager {
    */
   void removeCa(String caName) throws CaMgmtException;
 
+  /**
+   * Restart the given CA.
+   * @param caName
+   *          CA name. Must not be {@code null}.
+   * @throws CaMgmtException
+   *           if error occurs.
+   */
+  void restartCa(String caName) throws CaMgmtException;
+
+  /**
+   * Restart the whole CA system.
+   * @throws CaMgmtException
+   *           if error occurs.
+   */
   void restartCaSystem() throws CaMgmtException;
 
   /**

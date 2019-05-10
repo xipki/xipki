@@ -606,6 +606,12 @@ public class HttpMgmtServlet extends HttpServlet {
           resp = null;
           break;
         }
+        case restartCa: {
+          String name = getNameFromRequest(in);
+          caManager.restartCa(name);
+          resp = null;
+          break;
+        }
         case restartCaSystem: {
           caManager.restartCaSystem();
           resp = null;
