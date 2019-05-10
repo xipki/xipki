@@ -18,6 +18,7 @@
 package org.xipki.security.shell;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -61,7 +62,10 @@ import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.Args;
 import org.xipki.util.ConfPairs;
+import org.xipki.util.IoUtil;
 import org.xipki.util.ObjectCreationException;
+import org.xipki.util.PemEncoder;
+import org.xipki.util.PemEncoder.PemLabel;
 
 /**
  * TODO.
@@ -450,6 +454,36 @@ public class P12Actions {
           GMObjectIdentifiers.sm2p256v1.getId(), getKeyGenParameters(), subject);
       saveKey(keypair);
 
+      return null;
+    }
+
+  }
+
+  @Command(scope = "xi", name = "pkcs12",
+      description = "export PKCS#12 key store, like the 'openssl pkcs12' command")
+  @Service
+  public static class Pkcs12 extends P12SecurityAction {
+
+    @Option(name = "--key-out", required = true, description = "where to save the key")
+    @Completion(FileCompleter.class)
+    private String keyOutFile;
+
+    @Option(name = "--cert-out", required = true, description = "where to save the certificate")
+    @Completion(FileCompleter.class)
+    private String certOutFile;
+
+    @Override
+    protected Object execute0() throws Exception {
+      char[] password = getPassword();
+      try (InputStream keystoreStream = new FileInputStream(p12File)) {
+        KeypairWithCert kp = KeypairWithCert.fromKeystore("PKCS12",
+                              keystoreStream, password, null, password, (X509Certificate) null);
+        byte[] encodedKey = PemEncoder.encode(kp.getKey().getEncoded(), PemLabel.PRIVATE_KEY);
+        byte[] encodedCert = PemEncoder.encode(kp.getCertificateChain()[0].getEncoded(),
+                              PemLabel.CERTIFICATE);
+        IoUtil.save(keyOutFile, encodedKey);
+        IoUtil.save(certOutFile, encodedCert);
+      }
       return null;
     }
 
