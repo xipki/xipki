@@ -19,14 +19,10 @@ package org.xipki.ca.server;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.security.interfaces.DSAPublicKey;
-import java.security.interfaces.ECPublicKey;
-import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
 import java.util.List;
@@ -42,10 +38,6 @@ import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
-import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
-import org.bouncycastle.crypto.params.RSAKeyParameters;
-import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSAUtil;
-import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.BadCertTemplateException;
@@ -299,20 +291,5 @@ class SelfSignedCertBuilder {
       certBuilder.addExtension(extType, extValue.isCritical(), extValue.getValue());
     }
   } // method addExtensions
-
-  public static AsymmetricKeyParameter generatePublicKeyParameter(PublicKey key)
-      throws InvalidKeyException {
-    Args.notNull(key, "key");
-    if (key instanceof RSAPublicKey) {
-      RSAPublicKey rsakey = (RSAPublicKey) key;
-      return new RSAKeyParameters(false, rsakey.getModulus(), rsakey.getPublicExponent());
-    } else if (key instanceof ECPublicKey) {
-      return ECUtil.generatePublicKeyParameter(key);
-    } else if (key instanceof DSAPublicKey) {
-      return DSAUtil.generatePublicKeyParameter(key);
-    } else {
-      throw new InvalidKeyException("unknown key " + key.getClass().getName());
-    }
-  } // method generatePublicKeyParameter
 
 }
