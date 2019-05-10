@@ -22,6 +22,8 @@ echo "#                        Load rootca.json                       #"
 echo "#################################################################"
 
 if { $TOKEN_TYPE equals "pkcs11" } then {
+  ca:refresh-token --type pkcs11
+
   CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=rootca1"
 } else {
   CA_SIGNER_CONF = "algo=$SIGALGO,password=1234,keystore=file:output/rootca1.p12"

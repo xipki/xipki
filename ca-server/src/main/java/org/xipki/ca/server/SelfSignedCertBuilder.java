@@ -20,6 +20,7 @@ package org.xipki.ca.server;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -173,43 +174,38 @@ class SelfSignedCertBuilder {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
     }
 
-    SubjectPublicKeyInfo publicKeyInfo;
-    if (signer.getCertificate() != null) {
-      // this cert is the dummy one which can be considered only as public key container
-      Certificate bcCert;
-      try {
-        bcCert = Certificate.getInstance(signer.getCertificate().getEncoded());
-      } catch (Exception ex) {
-        throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-            "could not reparse certificate: " + ex.getMessage());
-      }
-      publicKeyInfo = bcCert.getSubjectPublicKeyInfo();
-    } else {
-      PublicKey signerPublicKey = signer.getPublicKey();
-      try {
-        publicKeyInfo = KeyUtil.createSubjectPublicKeyInfo(signerPublicKey);
-      } catch (InvalidKeyException ex) {
-        throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-            "cannot generate SubjectPublicKeyInfo from publicKey: " + ex.getMessage());
-      }
-    }
-
     X509Certificate newCert = generateCertificate(signer, certprofile, csr, serialNumber,
-        publicKeyInfo, caUris, extraControl);
+        caUris, extraControl);
 
     return new GenerateSelfSignedResult(signerConf, newCert);
   } // method generateSelfSigned
 
   private static X509Certificate generateCertificate(ConcurrentContentSigner signer,
       IdentifiedCertprofile certprofile, CertificationRequest csr, BigInteger serialNumber,
-      SubjectPublicKeyInfo publicKeyInfo, CaUris caUris, ConfPairs extraControl)
+      CaUris caUris, ConfPairs extraControl)
       throws OperationException {
 
+    SubjectPublicKeyInfo publicKeyInfo;
     try {
-      publicKeyInfo = X509Util.toRfc3279Style(publicKeyInfo);
+      publicKeyInfo = X509Util.toRfc3279Style(
+          csr.getCertificationRequestInfo().getSubjectPublicKeyInfo());
     } catch (InvalidKeySpecException ex) {
       LOG.warn("SecurityUtil.toRfc3279Style", ex);
       throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);
+    }
+
+    PublicKey signerPublicKey = signer.getPublicKey();
+    // make sure that the signer's public key is the same the requested one
+    PublicKey csrPublicKey;
+    try {
+      csrPublicKey = KeyUtil.generatePublicKey(publicKeyInfo);
+    } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
+      throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
+    }
+
+    if (!signerPublicKey.equals(csrPublicKey)) {
+      throw new OperationException(ErrorCode.BAD_REQUEST,
+          "Public keys of the signer's token and of CSR are different");
     }
 
     try {
