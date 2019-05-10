@@ -1,0 +1,125 @@
+source xipki/qa/setenv.script
+
+xi:rm -r -f output
+
+xi:copy-file -f xipki/qa/tools/cmpclient.json xipki/cmpclient/cmpclient.json
+
+echo "#################################################################"
+CA_TYPE=DSA
+echo "#                             ${CA_TYPE}"
+echo "#################################################################"
+
+TLS_PROFILE=certprofile-tls-dsa-ec.json
+
+OUT_DIR=output/dsa
+
+SIGNER_CONF="algo=SHA256withDSA,password=1234,keystore=file:${OUT_DIR}/ca/tls-ca.p12"
+
+xi:dsa-p12 --password 1234 --out ${OUT_DIR}/ca/tls-ca.p12 --plen 2048
+
+source xipki/qa/tools/gencerts.script
+
+echo "#################################################################"
+CA_TYPE=EC
+echo "#                             ${CA_TYPE}"
+echo "#################################################################"
+
+TLS_PROFILE=certprofile-tls-dsa-ec.json
+
+OUT_DIR=output/ec
+
+SIGNER_CONF="algo=SHA256withECDSA,password=1234,keystore=file:${OUT_DIR}/ca/tls-ca.p12"
+
+xi:ec-p12 --password 1234 --out ${OUT_DIR}/ca/tls-ca.p12 --curve secp256r1
+
+source xipki/qa/tools/gencerts.script
+
+echo "#################################################################"
+CA_TYPE=RSA
+echo "#                             ${CA_TYPE}"
+echo "#################################################################"
+
+TLS_PROFILE=certprofile-tls-rsa.json
+
+OUT_DIR=output/rsa
+
+SIGNER_CONF="algo=SHA256withRSA,password=1234,keystore=file:${OUT_DIR}/ca/tls-ca.p12"
+
+xi:rsa-p12 --password 1234 --out ${OUT_DIR}/ca/tls-ca.p12 --key-size 2048
+
+source xipki/qa/tools/gencerts.script
+
+echo "#################################################################"
+CA_TYPE=SM2
+echo "#                             ${CA_TYPE}"
+echo "#################################################################"
+
+TLS_PROFILE=certprofile-tls-dsa-ec.json
+
+OUT_DIR=output/sm2
+
+SIGNER_CONF="algo=SM3withSM2,password=1234,keystore=file:${OUT_DIR}/ca/tls-ca.p12"
+
+xi:sm2-p12 --password 1234 --out ${OUT_DIR}/ca/tls-ca.p12
+
+source xipki/qa/tools/gencerts.script
+
+echo "#################################################################"
+CA_TYPE=X25519
+echo "#                             ${CA_TYPE}"
+echo "#################################################################"
+
+TLS_PROFILE=certprofile-tls-x25519.json
+
+OUT_DIR=output/x25519
+
+SIGNER_CONF="algo=Ed25519,password=1234,keystore=file:${OUT_DIR}/ca/tls-ca.p12"
+
+xi:ec-p12 --password 1234 --out ${OUT_DIR}/ca/tls-ca.p12 --curve edwards25519
+
+source xipki/qa/tools/gencerts.script
+
+echo "#################################################################"
+CA_TYPE=Ed25519
+echo "#                             ${CA_TYPE}"
+echo "#################################################################"
+
+TLS_PROFILE=certprofile-tls-ed25519.json
+
+OUT_DIR=output/ed25519
+
+SIGNER_CONF="algo=Ed25519,password=1234,keystore=file:${OUT_DIR}/ca/tls-ca.p12"
+
+xi:ec-p12 --password 1234 --out ${OUT_DIR}/ca/tls-ca.p12 --curve edwards25519
+
+source xipki/qa/tools/gencerts.script
+
+echo "#################################################################"
+CA_TYPE=X448
+echo "#                             ${CA_TYPE}"
+echo "#################################################################"
+
+TLS_PROFILE=certprofile-tls-x448.json
+
+OUT_DIR=output/x448
+
+SIGNER_CONF="algo=Ed448,password=1234,keystore=file:${OUT_DIR}/ca/tls-ca.p12"
+
+xi:ec-p12 --password 1234 --out ${OUT_DIR}/ca/tls-ca.p12 --curve edwards448
+
+source xipki/qa/tools/gencerts.script
+
+echo "#################################################################"
+CA_TYPE=Ed448
+echo "#                             ${CA_TYPE}"
+echo "#################################################################"
+
+TLS_PROFILE=certprofile-tls-ed448.json
+
+OUT_DIR=output/ed448
+
+SIGNER_CONF="algo=Ed448,password=1234,keystore=file:${OUT_DIR}/ca/tls-ca.p12"
+
+xi:ec-p12 --password 1234 --out ${OUT_DIR}/ca/tls-ca.p12 --curve edwards448
+
+source xipki/qa/tools/gencerts.script
