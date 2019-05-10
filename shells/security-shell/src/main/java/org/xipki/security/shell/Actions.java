@@ -829,7 +829,7 @@ public class Actions {
     @Completion(FileCompleter.class)
     private String csrFile;
 
-    @Option(name = "--keystore", required = true, description = "peer's keystore file")
+    @Option(name = "--keystore", description = "peer's keystore file")
     @Completion(FileCompleter.class)
     private String peerKeystoreFile;
 
