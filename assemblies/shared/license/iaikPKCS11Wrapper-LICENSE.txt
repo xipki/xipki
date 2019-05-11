@@ -1,6 +1,10 @@
 License
 
-We provide IAIK PKCS#11 Wrapper under an Apache-style license. In short, this means that you can use the IAIK PKCS#11 Wrapper for free for noncommercial and commercial developments provided you meet the conditions of the license text. The complete license text is as follows.
+We provide IAIK PKCS#11 Wrapper under an Apache-style license. In short, this
+means that you can use the IAIK PKCS#11 Wrapper for free for noncommercial and
+commercial developments provided you meet the conditions of the license text.
+The complete license text is as follows.
+
 IAIK PKCS#11 Wrapper License
 
 Copyright (c) 2002 Graz University of Technology. All rights reserved.
