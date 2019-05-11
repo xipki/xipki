@@ -69,6 +69,59 @@ import org.xipki.util.StringUtil;
 
 public class RestResponder {
 
+  public static class RestResponse {
+
+    private int statusCode;
+
+    private String contentType;
+
+    private Map<String, String> headers = new HashMap<>();
+
+    private byte[] body;
+
+    public RestResponse(int statusCode, String contentType, Map<String, String> headers,
+        byte[] body) {
+      this.statusCode = statusCode;
+      this.contentType = contentType;
+      this.headers = headers;
+      this.body = body;
+    }
+
+    public int getStatusCode() {
+      return statusCode;
+    }
+
+    public void setStatusCode(int statusCode) {
+      this.statusCode = statusCode;
+    }
+
+    public String getContentType() {
+      return contentType;
+    }
+
+    public void setContentType(String contentType) {
+      this.contentType = contentType;
+    }
+
+    public Map<String, String> getHeaders() {
+      return headers;
+    }
+
+    public void setHeaders(Map<String, String> headers) {
+      this.headers = headers;
+    }
+
+    public byte[] getBody() {
+      return body;
+
+    }
+
+    public void setBody(byte[] body) {
+      this.body = body;
+    }
+
+  }
+
   private static class HttpRespAuditException extends Exception {
 
     private static final long serialVersionUID = 1L;
@@ -166,12 +219,12 @@ public class RestResponder {
         }
 
         // skip also the first char ('/')
-        String caAlias = coreUri.substring(1, sepIndex);
+        String caAlias = coreUri.substring(1, sepIndex).toLowerCase();
         command = coreUri.substring(sepIndex + 1);
 
         caName = responderManager.getCaNameForAlias(caAlias);
         if (caName == null) {
-          caName = caAlias.toLowerCase();
+          caName = caAlias;
         }
         ca = responderManager.getX509CaResponder(caName).getCa();
       }

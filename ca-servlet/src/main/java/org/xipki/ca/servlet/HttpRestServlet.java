@@ -36,7 +36,7 @@ import org.xipki.audit.Audits;
 import org.xipki.ca.server.CaManagerImpl;
 import org.xipki.ca.server.HttpRequestMetadataRetriever;
 import org.xipki.ca.server.RestResponder;
-import org.xipki.ca.server.RestResponse;
+import org.xipki.ca.server.RestResponder.RestResponse;
 import org.xipki.util.Args;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;

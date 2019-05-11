@@ -25,6 +25,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -95,6 +96,32 @@ import org.xipki.util.StringUtil;
  *
  */
 public class ScepResponder {
+
+  public static class ScepCaCertRespBytes {
+
+    private final byte[] bytes;
+
+    public ScepCaCertRespBytes(X509Certificate caCert, X509Certificate responderCert)
+        throws CMSException, CertificateException {
+      Args.notNull(caCert, "caCert");
+      Args.notNull(responderCert, "responderCert");
+
+      CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
+      try {
+        cmsSignedDataGen.addCertificate(new X509CertificateHolder(caCert.getEncoded()));
+        cmsSignedDataGen.addCertificate(new X509CertificateHolder(responderCert.getEncoded()));
+        CMSSignedData degenerateSignedData = cmsSignedDataGen.generate(new CMSAbsentContent());
+        bytes = degenerateSignedData.getEncoded();
+      } catch (IOException ex) {
+        throw new CMSException("could not build CMS SignedDta");
+      }
+    }
+
+    public byte[] getBytes() {
+      return Arrays.copyOf(bytes, bytes.length);
+    }
+
+  }
 
   private static class FailInfoException extends Exception {
 
@@ -255,12 +282,12 @@ public class ScepResponder {
     DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent, envelopedDataDecryptor, null);
 
     PkiMessage rep = servicePkiOperation0(requestContent, req, certprofileName, msgId, event);
-    audit(event, CaAuditConstants.NAME_SCEP_pki_status, rep.getPkiStatus().toString());
+    audit(event, CaAuditConstants.Scep.NAME_pki_status, rep.getPkiStatus().toString());
     if (rep.getPkiStatus() == PkiStatus.FAILURE) {
       event.setStatus(AuditStatus.FAILED);
     }
     if (rep.getFailInfo() != null) {
-      audit(event, CaAuditConstants.NAME_SCEP_fail_info, rep.getFailInfo().toString());
+      audit(event, CaAuditConstants.Scep.NAME_fail_info, rep.getFailInfo().toString());
     }
     return encodeResponse(rep, req);
   } // method servicePkiOperation
@@ -274,15 +301,15 @@ public class ScepResponder {
     // verify and decrypt the request
     audit(event, CaAuditConstants.NAME_tid, tid);
     if (req.getFailureMessage() != null) {
-      audit(event, CaAuditConstants.NAME_SCEP_failure_message, req.getFailureMessage());
+      audit(event, CaAuditConstants.Scep.NAME_failure_message, req.getFailureMessage());
     }
     Boolean bo = req.isSignatureValid();
     if (bo != null && !bo.booleanValue()) {
-      audit(event, CaAuditConstants.NAME_SCEP_signature, "invalid");
+      audit(event, CaAuditConstants.Scep.NAME_signature, "invalid");
     }
     bo = req.isDecryptionSuccessful();
     if (bo != null && !bo.booleanValue()) {
-      audit(event, CaAuditConstants.NAME_SCEP_decryption, "failed");
+      audit(event, CaAuditConstants.Scep.NAME_decryption, "failed");
     }
 
     PkiMessage rep =
@@ -399,7 +426,7 @@ public class ScepResponder {
       SignedData signedData;
 
       MessageType mt = req.getMessageType();
-      audit(event, CaAuditConstants.NAME_SCEP_message_type, mt.toString());
+      audit(event, CaAuditConstants.Scep.NAME_message_type, mt.toString());
 
       switch (mt) {
         case PKCSReq:

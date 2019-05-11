@@ -381,15 +381,15 @@ public class CmpResponder extends BaseCmpResponder {
         case PKIBody.TYPE_CROSS_CERT_REQ:
           String eventType = null;
           if (PKIBody.TYPE_CERT_REQ == type) {
-            eventType = CaAuditConstants.TYPE_CMP_cr;
+            eventType = CaAuditConstants.Cmp.TYPE_cr;
           } else if (PKIBody.TYPE_INIT_REQ == type) {
-            eventType = CaAuditConstants.TYPE_CMP_ir;
+            eventType = CaAuditConstants.Cmp.TYPE_ir;
           } else if (PKIBody.TYPE_KEY_UPDATE_REQ == type) {
-            eventType = CaAuditConstants.TYPE_CMP_kur;
+            eventType = CaAuditConstants.Cmp.TYPE_kur;
           } else if (PKIBody.TYPE_P10_CERT_REQ == type) {
-            eventType = CaAuditConstants.TYPE_CMP_p10cr;
+            eventType = CaAuditConstants.Cmp.TYPE_p10cr;
           } else if (PKIBody.TYPE_CROSS_CERT_REQ == type) {
-            eventType = CaAuditConstants.TYPE_CMP_ccr;
+            eventType = CaAuditConstants.Cmp.TYPE_ccr;
           }
 
           if (eventType != null) {
@@ -410,7 +410,7 @@ public class CmpResponder extends BaseCmpResponder {
               cmpControl, reqHeader, reqBody, cmpRequestor, tid, msgId, event);
           break;
         case PKIBody.TYPE_CERT_CONFIRM:
-          event.addEventType(CaAuditConstants.TYPE_CMP_certConf);
+          event.addEventType(CaAuditConstants.Cmp.TYPE_certConf);
           CertConfirmContent certConf = (CertConfirmContent) reqBody.getContent();
           respBody = confirmCertificates(tid, certConf, msgId);
           break;
@@ -419,7 +419,7 @@ public class CmpResponder extends BaseCmpResponder {
               reqBody, cmpRequestor, msgId, event);
           break;
         case PKIBody.TYPE_CONFIRM:
-          event.addEventType(CaAuditConstants.TYPE_CMP_pkiconf);
+          event.addEventType(CaAuditConstants.Cmp.TYPE_pkiconf);
           respBody = new PKIBody(PKIBody.TYPE_CONFIRM, DERNull.INSTANCE);
           break;
         case PKIBody.TYPE_GEN_MSG:
@@ -427,7 +427,7 @@ public class CmpResponder extends BaseCmpResponder {
               tid, msgId, event);
           break;
         case PKIBody.TYPE_ERROR:
-          event.addEventType(CaAuditConstants.TYPE_CMP_error);
+          event.addEventType(CaAuditConstants.Cmp.TYPE_error);
           revokePendingCertificates(tid, msgId);
           respBody = new PKIBody(PKIBody.TYPE_CONFIRM, DERNull.INSTANCE);
           break;
@@ -1829,7 +1829,7 @@ public class CmpResponder extends BaseCmpResponder {
 
       if (reasonCode == XiSecurityConstants.CMP_CRL_REASON_REMOVE) {
         if (requiredPermission == null) {
-          event.addEventType(CaAuditConstants.TYPE_CMP_rr_remove);
+          event.addEventType(CaAuditConstants.Cmp.TYPE_rr_remove);
           requiredPermission = PermissionConstants.REMOVE_CERT;
         } else if (requiredPermission != PermissionConstants.REMOVE_CERT) {
           allRevdetailsOfSameType = false;
@@ -1837,7 +1837,7 @@ public class CmpResponder extends BaseCmpResponder {
         }
       } else if (reasonCode == CrlReason.REMOVE_FROM_CRL.getCode()) {
         if (requiredPermission == null) {
-          event.addEventType(CaAuditConstants.TYPE_CMP_rr_unrevoke);
+          event.addEventType(CaAuditConstants.Cmp.TYPE_rr_unrevoke);
           requiredPermission = PermissionConstants.UNREVOKE_CERT;
         } else if (requiredPermission != PermissionConstants.UNREVOKE_CERT) {
           allRevdetailsOfSameType = false;
@@ -1845,7 +1845,7 @@ public class CmpResponder extends BaseCmpResponder {
         }
       } else {
         if (requiredPermission == null) {
-          event.addEventType(CaAuditConstants.TYPE_CMP_rr_revoke);
+          event.addEventType(CaAuditConstants.Cmp.TYPE_rr_revoke);
           requiredPermission = PermissionConstants.REVOKE_CERT;
         } else if (requiredPermission != PermissionConstants.REVOKE_CERT) {
           allRevdetailsOfSameType = false;
@@ -1904,7 +1904,7 @@ public class CmpResponder extends BaseCmpResponder {
     try {
       X509Ca ca = getCa();
       if (CMPObjectIdentifiers.it_currentCRL.equals(infoType)) {
-        event.addEventType(CaAuditConstants.TYPE_CMP_genm_current_crl);
+        event.addEventType(CaAuditConstants.Cmp.TYPE_genm_current_crl);
         checkPermission(requestor, PermissionConstants.GET_CRL);
         CertificateList crl = ca.getBcCurrentCrl();
 
@@ -1943,7 +1943,7 @@ public class CmpResponder extends BaseCmpResponder {
         int action = asn1Code.getPositiveValue().intValue();
         switch (action) {
           case XiSecurityConstants.CMP_ACTION_GEN_CRL:
-            event.addEventType(CaAuditConstants.TYPE_CMP_genm_gen_crl);
+            event.addEventType(CaAuditConstants.Cmp.TYPE_genm_gen_crl);
             checkPermission(requestor, PermissionConstants.GEN_CRL);
             X509CRL tmpCrl = ca.generateCrlOnDemand(msgId);
             if (tmpCrl == null) {
@@ -1955,7 +1955,7 @@ public class CmpResponder extends BaseCmpResponder {
             }
             break;
           case XiSecurityConstants.CMP_ACTION_GET_CRL_WITH_SN:
-            event.addEventType(CaAuditConstants.TYPE_CMP_genm_crl4number);
+            event.addEventType(CaAuditConstants.Cmp.TYPE_genm_crl4number);
             checkPermission(requestor, PermissionConstants.GET_CRL);
 
             ASN1Integer crlNumber = ASN1Integer.getInstance(reqValue);
@@ -1967,7 +1967,7 @@ public class CmpResponder extends BaseCmpResponder {
             }
             break;
           case XiSecurityConstants.CMP_ACTION_GET_CAINFO:
-            event.addEventType(CaAuditConstants.TYPE_CMP_genm_cainfo);
+            event.addEventType(CaAuditConstants.Cmp.TYPE_genm_cainfo);
             Set<Integer> acceptVersions = new HashSet<>();
             if (reqValue != null) {
               ASN1Sequence seq = DERSequence.getInstance(reqValue);
@@ -1997,7 +1997,7 @@ public class CmpResponder extends BaseCmpResponder {
         }
         itvResp = new InfoTypeAndValue(infoType, new DERSequence(vec));
       } else if (ObjectIdentifiers.Xipki.id_xipki_cmp_cacertchain.equals(infoType)) {
-        event.addEventType(CaAuditConstants.TYPE_CMP_genm_cacertchain);
+        event.addEventType(CaAuditConstants.Cmp.TYPE_genm_cacertchain);
         ASN1EncodableVector vec = new ASN1EncodableVector();
         vec.add(ca.getCaInfo().getCertInCmpFormat());
         List<X509Cert> certchain = ca.getCaInfo().getCertchain();

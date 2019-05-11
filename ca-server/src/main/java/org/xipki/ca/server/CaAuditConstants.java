@@ -25,6 +25,60 @@ package org.xipki.ca.server;
 
 public class CaAuditConstants {
 
+  public static final class Scep {
+    public static final String NAME_decryption = "decryption";
+
+    public static final String NAME_fail_info = "fail_info";
+
+    public static final String NAME_failure_message = "failure_message";
+
+    public static final String NAME_message_type = "message_type";
+
+    public static final String NAME_name = "name";
+
+    public static final String NAME_pki_status = "pki_status";
+
+    public static final String NAME_operation = "operation";
+
+    public static final String NAME_signature = "signature";
+  }
+
+  public static final class Cmp {
+
+    public static final String TYPE_ccr = "ccr";
+
+    public static final String TYPE_certConf = "cert_conf";
+
+    public static final String TYPE_ir = "ir";
+
+    public static final String TYPE_cr = "cr";
+
+    public static final String TYPE_error = "error";
+
+    public static final String TYPE_genm_cacertchain = "genm_cacertchain";
+
+    public static final String TYPE_genm_cainfo = "genm_cainfo";
+
+    public static final String TYPE_genm_crl4number = "genm_crl4number";
+
+    public static final String TYPE_genm_current_crl = "genm_current_crl";
+
+    public static final String TYPE_genm_gen_crl = "genm_gen_crl";
+
+    public static final String TYPE_kur = "kur";
+
+    public static final String TYPE_p10cr = "p10cr";
+
+    public static final String TYPE_pkiconf = "pkiconf";
+
+    public static final String TYPE_rr_remove = "rr_remove";
+
+    public static final String TYPE_rr_revoke = "rr_revoke";
+
+    public static final String TYPE_rr_unrevoke = "rr_unrevoke";
+
+  }
+
   public static final String APPNAME = "ca";
 
   public static final String MSGID_ca_routine = "ca_routine";
@@ -69,22 +123,6 @@ public class CaAuditConstants {
 
   public static final String NAME_requestor = "requestor";
 
-  public static final String NAME_SCEP_decryption = "decryption";
-
-  public static final String NAME_SCEP_fail_info = "fail_info";
-
-  public static final String NAME_SCEP_failure_message = "failure_message";
-
-  public static final String NAME_SCEP_message_type = "message_type";
-
-  public static final String NAME_SCEP_name = "name";
-
-  public static final String NAME_SCEP_pki_status = "pki_status";
-
-  public static final String NAME_SCEP_operation = "operation";
-
-  public static final String NAME_SCEP_signature = "signature";
-
   public static final String NAME_serial = "serial";
 
   public static final String NAME_this_update = "this_update";
@@ -97,38 +135,6 @@ public class CaAuditConstants {
 
   // eventType
   public static final String TYPE_cleanup_crl = "cleanup_crl";
-
-  public static final String TYPE_CMP_ccr = "ccr";
-
-  public static final String TYPE_CMP_certConf = "cert_conf";
-
-  public static final String TYPE_CMP_ir = "ir";
-
-  public static final String TYPE_CMP_cr = "cr";
-
-  public static final String TYPE_CMP_error = "error";
-
-  public static final String TYPE_CMP_genm_cacertchain = "genm_cacertchain";
-
-  public static final String TYPE_CMP_genm_cainfo = "genm_cainfo";
-
-  public static final String TYPE_CMP_genm_crl4number = "genm_crl4number";
-
-  public static final String TYPE_CMP_genm_current_crl = "genm_current_crl";
-
-  public static final String TYPE_CMP_genm_gen_crl = "genm_gen_crl";
-
-  public static final String TYPE_CMP_kur = "kur";
-
-  public static final String TYPE_CMP_p10cr = "p10cr";
-
-  public static final String TYPE_CMP_pkiconf = "pkiconf";
-
-  public static final String TYPE_CMP_rr_remove = "rr_remove";
-
-  public static final String TYPE_CMP_rr_revoke = "rr_revoke";
-
-  public static final String TYPE_CMP_rr_unrevoke = "rr_unrevoke";
 
   public static final String TYPE_downlaod_crl4number = "download_crl4number";
 

@@ -117,7 +117,7 @@ public class HttpScepServlet extends HttpServlet {
     AuditEvent event = new AuditEvent(new Date());
     event.setApplicationName("SCEP");
     event.setName(CaAuditConstants.NAME_perf);
-    event.addEventData(CaAuditConstants.NAME_SCEP_name, caAlias + "/" + certprofileName);
+    event.addEventData(CaAuditConstants.Scep.NAME_name, caAlias + "/" + certprofileName);
     event.addEventData(CaAuditConstants.NAME_req_type, RequestType.SCEP.name());
 
     String msgId = RandomUtil.nextHexLong();
@@ -144,7 +144,7 @@ public class HttpScepServlet extends HttpServlet {
       }
 
       String operation = req.getParameter("operation");
-      event.addEventData(CaAuditConstants.NAME_SCEP_operation, operation);
+      event.addEventData(CaAuditConstants.Scep.NAME_operation, operation);
 
       if ("PKIOperation".equalsIgnoreCase(operation)) {
         CMSSignedData reqMessage;
