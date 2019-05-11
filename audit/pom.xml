@@ -35,8 +35,9 @@
       <artifactId>syslog-java-client</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>util</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 </project>

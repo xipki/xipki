@@ -17,11 +17,11 @@
 
 package org.xipki.password;
 
-import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -90,7 +90,7 @@ public class PasswordResolverImpl implements PasswordResolver {
 
   @Override
   public char[] resolvePassword(String passwordHint) throws PasswordResolverException {
-    Objects.requireNonNull(passwordHint, "passwordHint may not be null");
+    Args.notNull(passwordHint, "passwordHint");
     int index = passwordHint.indexOf(':');
     if (index == -1) {
       return passwordHint.toCharArray();
@@ -110,8 +110,8 @@ public class PasswordResolverImpl implements PasswordResolver {
 
   @Override
   public String protectPassword(String protocol, char[] password) throws PasswordResolverException {
-    Objects.requireNonNull(protocol, "protocol may not be null");
-    Objects.requireNonNull(password, "password may not be null");
+    Args.notNull(protocol, "protocol");
+    Args.notNull(password, "password");
 
     for (SinglePasswordResolver resolver : resolvers) {
       if (resolver.canResolveProtocol(protocol)) {

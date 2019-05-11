@@ -21,7 +21,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
+
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -90,8 +91,7 @@ public class AuditEvent {
   }
 
   public void setApplicationName(String applicationName) {
-    this.applicationName = Objects.requireNonNull(applicationName,
-        "applicationName may not be null");
+    this.applicationName = Args.notNull(applicationName, "applicationName");
   }
 
   public Date getTimestamp() {
@@ -111,7 +111,7 @@ public class AuditEvent {
   }
 
   public AuditEventData addEventData(AuditEventData eventData) {
-    Objects.requireNonNull(eventData, "eventData may not be null");
+    Args.notNull(eventData, "eventData");
 
     int idx = -1;
     for (int i = 0; i < eventDatas.size(); i++) {
@@ -133,7 +133,7 @@ public class AuditEvent {
   }
 
   public boolean removeEventData(String eventDataName) {
-    Objects.requireNonNull(eventDataName, "eventDataName may not be null");
+    Args.notNull(eventDataName, "eventDataName");
 
     boolean removed = false;
     for (final AuditEventData ed : eventDatas) {
@@ -152,7 +152,7 @@ public class AuditEvent {
   }
 
   public void setStatus(AuditStatus status) {
-    this.status = Objects.requireNonNull(status, "status may not be null");
+    this.status = Args.notNull(status, "status");
   }
 
   public void finish() {

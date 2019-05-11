@@ -26,7 +26,6 @@ import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -38,6 +37,7 @@ import org.xipki.audit.AuditService;
 import org.xipki.audit.AuditServiceRuntimeException;
 import org.xipki.audit.AuditStatus;
 import org.xipki.audit.PciAuditEvent;
+import org.xipki.util.Args;
 
 import com.cloudbees.syslog.Facility;
 import com.cloudbees.syslog.MessageFormat;
@@ -312,7 +312,7 @@ public class SyslogAuditService implements AuditService {
   }
 
   public void setHost(String host) {
-    this.host = Objects.requireNonNull(host, "host may not be null");
+    this.host = Args.notNull(host, "host");
   }
 
   public void setPort(int port) {
@@ -320,7 +320,7 @@ public class SyslogAuditService implements AuditService {
   }
 
   public void setProtocol(String protocol) {
-    this.protocol = Objects.requireNonNull(protocol, "protocol may not be null");
+    this.protocol = Args.notNull(protocol, "protocol");
   }
 
   public void setLocalname(String localname) {
@@ -328,7 +328,7 @@ public class SyslogAuditService implements AuditService {
   }
 
   public void setMessageFormat(String messageFormat) {
-    this.messageFormat = Objects.requireNonNull(messageFormat, "messageFormat may not be null");
+    this.messageFormat = Args.notNull(messageFormat, "messageFormat");
   }
 
   public void setWriteRetries(int writeRetries) {

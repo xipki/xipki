@@ -17,7 +17,7 @@
 
 package org.xipki.audit;
 
-import java.util.Objects;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -46,7 +46,7 @@ public enum AuditLevel {
   }
 
   public static AuditLevel forName(String name) {
-    Objects.requireNonNull("name", "name may not be null");
+    Args.notNull(name, "name");
     for (AuditLevel value : values()) {
       if (value.name().equals(name)) {
         return value;

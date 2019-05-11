@@ -30,7 +30,8 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
+
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -94,7 +95,7 @@ public class PciAuditEvent {
   private AuditLevel level;
 
   public PciAuditEvent(Date date) {
-    Objects.requireNonNull(date, "date may not be null");
+    Args.notNull(date, "date");
     LocalDateTime localDate = LocalDateTime.ofInstant(date.toInstant(), ZONE_UTC);
     this.date = DATE_FORMATTER.format(localDate);
     this.time = TIME_FORMATTER.format(localDate);
@@ -106,7 +107,7 @@ public class PciAuditEvent {
   }
 
   public void setLevel(AuditLevel level) {
-    this.level = Objects.requireNonNull(level, "level may not be null");
+    this.level = Args.notNull(level, "level");
   }
 
   public String getUserId() {

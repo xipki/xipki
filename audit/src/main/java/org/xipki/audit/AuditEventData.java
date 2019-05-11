@@ -17,7 +17,7 @@
 
 package org.xipki.audit;
 
-import java.util.Objects;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -32,11 +32,8 @@ public class AuditEventData {
   private String value;
 
   public AuditEventData(String name, Object value) {
-    Objects.requireNonNull(name, "name may not be null");
-    if (name.isEmpty()) {
-      throw new IllegalArgumentException("name may not be empty");
-    }
-    Objects.requireNonNull(value, "value may not be null");
+    Args.notBlank(name, "name");
+    Args.notNull(value, "value");
     this.name = name;
     if (value instanceof String) {
       this.value = (String) value;

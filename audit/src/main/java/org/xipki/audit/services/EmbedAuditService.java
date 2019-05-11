@@ -19,7 +19,6 @@ package org.xipki.audit.services;
 
 import java.io.CharArrayWriter;
 import java.util.List;
-import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +28,7 @@ import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditService;
 import org.xipki.audit.AuditStatus;
 import org.xipki.audit.PciAuditEvent;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -82,7 +82,7 @@ public class EmbedAuditService implements AuditService {
   }
 
   protected static String createMessage(AuditEvent event) {
-    Objects.requireNonNull(event, "event may not be null");
+    Args.notNull(event, "event");
     String applicationName = event.getApplicationName();
     if (applicationName == null) {
       applicationName = "undefined";

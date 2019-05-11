@@ -21,16 +21,15 @@ import java.io.Closeable;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Objects;
 import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.util.IoUtil;
-import org.xipki.util.StringUtil;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.util.Args;
+import org.xipki.util.IoUtil;
+import org.xipki.util.StringUtil;
 
 import liquibase.CatalogAndSchema;
 import liquibase.Liquibase;
@@ -70,9 +69,9 @@ public class LiquibaseMain implements Closeable {
     public DatabaseConf(String driver, String username, String password,
         String url, String schema) {
       this.driver = driver;
-      this.username = Objects.requireNonNull(username, "username may not be null");
+      this.username = Args.notNull(username, "username");
       this.password = password;
-      this.url = Objects.requireNonNull(url, "url may not be null");
+      this.url = Args.notNull(url, "url");
       this.schema = schema;
     }
 

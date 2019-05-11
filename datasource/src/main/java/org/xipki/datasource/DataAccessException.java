@@ -18,7 +18,7 @@
 
 package org.xipki.datasource;
 
-import java.util.Objects;
+import org.xipki.util.Args;
 
 /**
  * Root of the hierarchy of data access exceptions discussed in.
@@ -214,7 +214,7 @@ public class DataAccessException extends Exception {
    */
   public DataAccessException(Reason reason, String msg) {
     super(reason + " - " + msg);
-    this.reason = Objects.requireNonNull(reason, "reason may not be null");
+    this.reason = Args.notNull(reason, "reason");
   }
 
   /**
@@ -234,7 +234,7 @@ public class DataAccessException extends Exception {
    */
   public DataAccessException(Reason reason, String msg, Throwable cause) {
     super(reason + " - " + msg, cause);
-    this.reason = Objects.requireNonNull(reason, "reason may not be null");
+    this.reason = Args.notNull(reason, "reason");
   }
 
   public Reason getReason() {

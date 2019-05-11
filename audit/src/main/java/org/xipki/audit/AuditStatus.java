@@ -17,7 +17,7 @@
 
 package org.xipki.audit;
 
-import java.util.Objects;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -35,7 +35,7 @@ public enum AuditStatus {
   }
 
   public static AuditStatus forName(final String name) {
-    Objects.requireNonNull(name, "name may not be null");
+    Args.notNull(name, "name");
     for (final AuditStatus v : values()) {
       if (v.name().equals(name)) {
         return v;
