@@ -242,8 +242,7 @@ public class CaServerConf extends ValidatableConf {
 
         KeystoreConf truststore = m.getTruststore();
         conf.setSslTruststore(truststore.getKeystore());
-        String pwd = truststore.getPassword();
-        conf.setSslTruststorePassword(pwd == null ? new char[0] : pwd.toCharArray());
+        conf.setSslTruststorePassword(truststore.getPassword());
         conf.setSslStoreType(truststore.getType());
 
         sslContextConfMap.put(m.getName(), conf);

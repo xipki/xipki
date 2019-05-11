@@ -180,12 +180,12 @@ public class SyslogAuditService implements AuditService {
 
           if (sslKeystore != null) {
             sslConf.setSslKeystore(FileOrBinary.ofFile(sslKeystore));
-            sslConf.setSslKeystorePassword(sslKeystorePassword.toCharArray());
+            sslConf.setSslKeystorePassword(sslKeystorePassword);
           }
 
           if (sslTruststore != null) {
             sslConf.setSslTruststore(FileOrBinary.ofFile(sslStoreType));
-            sslConf.setSslTruststorePassword(sslTruststorePassword.toCharArray());
+            sslConf.setSslTruststorePassword(sslTruststorePassword);
           }
 
           SSLContext sslContext;
