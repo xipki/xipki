@@ -45,11 +45,11 @@ public class SslContextConf {
 
   private FileOrBinary sslKeystore;
 
-  private String sslKeystorePassword;
+  private char[] sslKeystorePassword;
 
   private FileOrBinary sslTruststore;
 
-  private String sslTruststorePassword;
+  private char[] sslTruststorePassword;
 
   private String sslHostnameVerifier;
 
@@ -90,12 +90,12 @@ public class SslContextConf {
     this.sslKeystore = sslKeystore;
   }
 
-  public String getSslKeystorePassword() {
+  public char[] getSslKeystorePassword() {
     return sslKeystorePassword;
   }
 
-  public void setSslKeystorePassword(String sslKeystorePassword) {
-    this.sslKeystorePassword = emptyAsNull(sslKeystorePassword);
+  public void setSslKeystorePassword(char[] sslKeystorePassword) {
+    this.sslKeystorePassword = sslKeystorePassword;
   }
 
   public FileOrBinary getSslTruststore() {
@@ -115,12 +115,12 @@ public class SslContextConf {
     this.sslTruststore = sslTruststore;
   }
 
-  public String getSslTruststorePassword() {
+  public char[] getSslTruststorePassword() {
     return sslTruststorePassword;
   }
 
-  public void setSslTruststorePassword(String sslTruststorePassword) {
-    this.sslTruststorePassword = emptyAsNull(sslTruststorePassword);
+  public void setSslTruststorePassword(char[] sslTruststorePassword) {
+    this.sslTruststorePassword = sslTruststorePassword;
   }
 
   public String getSslHostnameVerifier() {
@@ -144,16 +144,14 @@ public class SslContextConf {
 
       try {
         if (sslKeystore != null) {
-          char[] password = sslKeystorePassword == null ? null : sslKeystorePassword.toCharArray();
           builder.loadKeyMaterial(
-              new ByteArrayInputStream(sslKeystore.readContent()), password, password);
+              new ByteArrayInputStream(sslKeystore.readContent()),
+                sslKeystorePassword, sslKeystorePassword);
         }
 
         if (sslTruststore != null) {
-          char[] password = sslTruststorePassword == null
-              ? null : sslTruststorePassword.toCharArray();
           builder.loadTrustMaterial(
-              new ByteArrayInputStream(sslTruststore.readContent()), password);
+              new ByteArrayInputStream(sslTruststore.readContent()), sslTruststorePassword);
         }
 
         sslContext = builder.build();

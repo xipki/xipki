@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
+import javax.net.ssl.SSLContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
@@ -37,7 +39,9 @@ import org.xipki.audit.AuditService;
 import org.xipki.audit.AuditServiceRuntimeException;
 import org.xipki.audit.AuditStatus;
 import org.xipki.audit.PciAuditEvent;
-import org.xipki.util.Args;
+import org.xipki.util.FileOrBinary;
+import org.xipki.util.ObjectCreationException;
+import org.xipki.util.http.SslContextConf;
 
 import com.cloudbees.syslog.Facility;
 import com.cloudbees.syslog.MessageFormat;
@@ -88,36 +92,11 @@ public class SyslogAuditService implements AuditService {
   protected AbstractSyslogMessageSender syslog;
 
   /**
-   * The syslog host.
-   */
-  private String host = DFLT_SYSLOG_HOST;
-
-  /**
-   * The default port for the syslog host.
-   */
-  private int port = DFLT_SYSLOG_PORT;
-
-  /**
-   * The protocol for the syslog host.
-   */
-  private String protocol = DFLT_SYSLOG_PROTOCOL;
-
-  /**
-   * The facility for syslog message.
-   */
-  private String facility = DFLT_SYSLOG_FACILITY;
-
-  /**
    * Message format, rfc_3164 or rfc_5424.
    */
   private String messageFormat = DFLT_MESSAGE_FORMAT;
 
   private int maxMessageLength = 1024;
-
-  /**
-   * If a write to syslog host fails, how many retries should be done, not applied to UDP.
-   */
-  private int writeRetries;
 
   /**
    * Set this if the default hostname of the sending side should be avoided.
@@ -129,11 +108,6 @@ public class SyslogAuditService implements AuditService {
    */
   private String prefix;
 
-  /**
-   * Whether uses SSL to secure the communication, not applied to UDP.
-   */
-  private boolean ssl;
-
   private boolean initialized;
 
   public SyslogAuditService() {
@@ -143,22 +117,26 @@ public class SyslogAuditService implements AuditService {
   public void init(String conf) {
     LOG.info("initializing: {}", SyslogAuditService.class);
     Properties props = loadProperties(conf.trim());
-    setFacility(getString(props, "facility", DFLT_SYSLOG_FACILITY));
-    setHost(getString(props, "host", DFLT_SYSLOG_HOST));
-    setPrefix(getString(props, "prefix", ""));
-
-    String localname = props.getProperty("localname");
-    if (localname != null) {
-      setLocalname(localname);
+    // host
+    String host = getString(props, "host", DFLT_SYSLOG_HOST);
+    // prefix
+    String ts = props.getProperty("prefix");
+    if (notEmpty(ts)) {
+      this.prefix = (ts.charAt(ts.length() - 1) != ' ') ? ts + " " : ts;
+    } else {
+      this.prefix = null;
     }
-
-    setMaxMessageLength(getInt(props, "maxMessageLength", 1024));
-    setPort(getInt(props, "port", DFLT_SYSLOG_PORT));
-    setProtocol(getString(props, "protocol", DFLT_SYSLOG_PROTOCOL));
-    setWriteRetries(getInt(props, "writeRetries", 2));
-    setSsl(getBoolean(props, "ssl", false));
-    setMessageFormat(getString(props, "messageFormat", DFLT_MESSAGE_FORMAT));
-
+    // localname
+    this.localname = props.getProperty("localname");
+    // maxMessageLength
+    int ti = getInt(props, "maxMessageLength", 1024);
+    this.maxMessageLength = (ti <= 0) ? 1023 : ti;
+    // port
+    int port = getInt(props, "port", DFLT_SYSLOG_PORT);
+    // protocol
+    String protocol = getString(props, "protocol", DFLT_SYSLOG_PROTOCOL);
+    // messageFormat
+    this.messageFormat = getString(props, "messageFormat", DFLT_MESSAGE_FORMAT);
     MessageFormat msgFormat;
     if ("rfc3164".equalsIgnoreCase(messageFormat) || "rfc_3164".equalsIgnoreCase(messageFormat)) {
       msgFormat = MessageFormat.RFC_3164;
@@ -176,13 +154,52 @@ public class SyslogAuditService implements AuditService {
       syslog = lcSyslog;
       lcSyslog.setSyslogServerHostname(host);
       lcSyslog.setSyslogServerPort(port);
-      lcSyslog.setSsl(ssl);
+
+      // writeRetries
+      int writeRetries = getInt(props, "writeRetries", 2);
       if (writeRetries > 0) {
         lcSyslog.setMaxRetryCount(writeRetries);
       }
+
+      // ssl
+      boolean ssl = getBoolean(props, "ssl", false);
+      lcSyslog.setSsl(ssl);
+
+      if (ssl) {
+        String sslKeystore = props.getProperty("sslKeystore");
+        String sslTruststore = props.getProperty("sslTruststore");
+        if (sslKeystore != null || sslTruststore != null) {
+          String sslStoreType = getString(props, "sslStoreType", "PKCS12");
+          String sslKeystorePassword = getString(props, "sslKeystorePassword", "");
+          String sslTruststorePassword = getString(props, "sslTruststorePassword", "");
+
+          SslContextConf sslConf = new SslContextConf();
+          if (sslStoreType != null) {
+            sslConf.setSslStoreType(sslStoreType);
+          }
+
+          if (sslKeystore != null) {
+            sslConf.setSslKeystore(FileOrBinary.ofFile(sslKeystore));
+            sslConf.setSslKeystorePassword(sslKeystorePassword.toCharArray());
+          }
+
+          if (sslTruststore != null) {
+            sslConf.setSslTruststore(FileOrBinary.ofFile(sslStoreType));
+            sslConf.setSslTruststorePassword(sslTruststorePassword.toCharArray());
+          }
+
+          SSLContext sslContext;
+          try {
+            sslContext = sslConf.getSslContext();
+          } catch (ObjectCreationException ex) {
+            throw new IllegalStateException("error getting SSLContext", ex);
+          }
+          lcSyslog.setSSLContext(sslContext);
+        }
+      }
     } else {
       if (!"udp".equalsIgnoreCase(protocol)) {
-        LOG.warn("unknown protocol '{}', use the default one 'udp'", this.protocol);
+        LOG.warn("unknown protocol '{}', use the default one 'udp'", protocol);
       }
 
       final UdpSyslogMessageSender lcSyslog = new UdpSyslogMessageSender();
@@ -194,18 +211,16 @@ public class SyslogAuditService implements AuditService {
     // syslog.setDefaultMessageHostname(host);
     syslog.setMessageFormat(msgFormat);
 
-    Facility sysFacility = notEmpty(facility)
-        ? Facility.fromLabel(facility.toUpperCase(Locale.ENGLISH)) : null;
-
+    // facility
+    String facility = getString(props, "facility", DFLT_SYSLOG_FACILITY);
+    Facility sysFacility = Facility.fromLabel(facility.toUpperCase(Locale.ENGLISH));
     if (sysFacility == null) {
       LOG.warn("unknown facility, use the default one '{}'", DFLT_SYSLOG_FACILITY);
       sysFacility = Facility.fromLabel(DFLT_SYSLOG_FACILITY.toUpperCase(Locale.ENGLISH));
     }
-
     if (sysFacility == null) {
       throw new IllegalStateException("should not reach here, sysFacility is null");
     }
-
     syslog.setDefaultFacility(sysFacility);
 
     // after we're finished set initialized to true
@@ -306,52 +321,6 @@ public class SyslogAuditService implements AuditService {
       LOG.debug("could not send syslog message", th);
     }
   } // method logEvent(PCIAuditEvent)
-
-  public void setFacility(String facility) {
-    this.facility = facility;
-  }
-
-  public void setHost(String host) {
-    this.host = Args.notNull(host, "host");
-  }
-
-  public void setPort(int port) {
-    this.port = port;
-  }
-
-  public void setProtocol(String protocol) {
-    this.protocol = Args.notNull(protocol, "protocol");
-  }
-
-  public void setLocalname(String localname) {
-    this.localname = localname;
-  }
-
-  public void setMessageFormat(String messageFormat) {
-    this.messageFormat = Args.notNull(messageFormat, "messageFormat");
-  }
-
-  public void setWriteRetries(int writeRetries) {
-    this.writeRetries = writeRetries;
-  }
-
-  public void setPrefix(String prefix) {
-    if (notEmpty(prefix)) {
-      if (prefix.charAt(prefix.length() - 1) != ' ') {
-        this.prefix = prefix + " ";
-      }
-    } else {
-      this.prefix = null;
-    }
-  }
-
-  public void setMaxMessageLength(int maxMessageLength) {
-    this.maxMessageLength = (maxMessageLength <= 0) ? 1023 : maxMessageLength;
-  }
-
-  public void setSsl(boolean ssl) {
-    this.ssl = ssl;
-  }
 
   private static boolean notEmpty(String text) {
     return text != null && !text.isEmpty();

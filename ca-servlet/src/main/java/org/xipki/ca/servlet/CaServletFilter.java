@@ -65,7 +65,7 @@ public class CaServletFilter implements Filter {
 
   private static final String DFLT_CA_SERVER_CFG = "xipki/etc/ca/ca.json";
 
-  private static final String DFLT_SYSLOG_AUDIT_CFG = "xipki/etc/ca/org.xipki.audit.syslog.cfg";
+  private static final String DFLT_SYSLOG_AUDIT_CFG = "xipki/etc/ca/audit.syslog.cfg";
 
   private Securities securities;
 
