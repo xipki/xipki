@@ -251,6 +251,9 @@
       <column name="CA_ID" type="SMALLINT">
         <constraints nullable="false"/>
       </column>
+      <column name="CRL_SCOPE" type="SMALLINT" remarks="CRL scope, reserved for future use">
+        <constraints nullable="false"/>
+      </column>
       <column name="CRL_NO" type="BIGINT">
         <constraints nullable="false"/>
       </column>
@@ -332,6 +335,9 @@
       </column>
       <column name="TID" type="VARCHAR(43)"
           remarks="base64 encoded transactionId, maximal 256 bit"/>
+      <column name="CRL_SCOPE" type="SMALLINT" remarks="CRL scope, reserved for future use">
+        <constraints nullable="false"/>
+      </column>
       <column name="SHA1" type="CHAR(28)"
           remarks="base64 encoded SHA1 fingerprint of the certificate">
         <constraints nullable="false"/>

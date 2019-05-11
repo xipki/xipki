@@ -68,12 +68,12 @@ class CaCertstoreDbImporter extends DbPorter {
 
   private static final String SQL_ADD_CERT =
       "INSERT INTO CERT (ID,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,RR,RT,RIT,"
-      + "PID,CA_ID,RID,UID,FP_K,EE,RTYPE,TID,SHA1,REQ_SUBJECT,CERT)"
-      + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+      + "PID,CA_ID,RID,UID,FP_K,EE,RTYPE,TID,SHA1,REQ_SUBJECT,CRL_SCOPE,CERT)"
+      + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
   private static final String SQL_ADD_CRL =
-      "INSERT INTO CRL (ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE,DELTACRL,BASECRL_NO,CRL)"
-      + " VALUES (?,?,?,?,?,?,?,?)";
+      "INSERT INTO CRL (ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE,DELTACRL,BASECRL_NO,CRL_SCOPE,CRL)"
+      + " VALUES (?,?,?,?,?,?,?,?,?)";
 
   private static final String SQL_ADD_REQUEST =
       "INSERT INTO REQUEST (ID,LUPDATE,DATA) VALUES (?,?,?)";
@@ -496,6 +496,7 @@ class CaCertstoreDbImporter extends DbPorter {
           stmt.setString(idx++, tidS);
           stmt.setString(idx++, b64Sha1FpCert);
           stmt.setString(idx++, cert.getRs());
+          stmt.setInt(idx++, cert.getCrlScope());
           stmt.setString(idx++, Base64.encodeToString(encodedCert));
           stmt.addBatch();
         } catch (SQLException ex) {
@@ -637,8 +638,8 @@ class CaCertstoreDbImporter extends DbPorter {
             stmt.setLong(idx++, baseCrlNumber.longValue());
           }
 
-          String str = Base64.encodeToString(encodedCrl);
-          stmt.setString(idx++, str);
+          stmt.setInt(idx++, crl.getCrlScope());
+          stmt.setString(idx++, Base64.encodeToString(encodedCrl));
 
           stmt.addBatch();
         } catch (SQLException ex) {

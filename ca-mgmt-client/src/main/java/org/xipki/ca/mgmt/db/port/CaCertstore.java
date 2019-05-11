@@ -451,6 +451,8 @@ public class CaCertstore extends ValidatableConf {
      */
     private Long fpRs;
 
+    private Integer crlScope;
+
     /**
      * requested subject, if differs from the one in certificate.
      */
@@ -472,7 +474,7 @@ public class CaCertstore extends ValidatableConf {
       this.sn = sn;
     }
 
-    public Boolean isEe() {
+    public Boolean getEe() {
       return ee;
     }
 
@@ -584,6 +586,14 @@ public class CaCertstore extends ValidatableConf {
       this.uid = uid;
     }
 
+    public Integer getCrlScope() {
+      return crlScope;
+    }
+
+    public void setCrlScope(Integer crlScope) {
+      this.crlScope = crlScope;
+    }
+
     @Override
     public void validate() throws InvalidConfException {
       super.validate();
@@ -597,6 +607,7 @@ public class CaCertstore extends ValidatableConf {
       notNull(rid, "rid");
       notEmpty(sn, "sn");
       notNull(update, "update");
+      notNull(crlScope, "crlScope");
       if (rev != null && rev.intValue() == 1) {
         notNull(rr, "rr");
         notNull(rt, "rt");
@@ -824,6 +835,8 @@ public class CaCertstore extends ValidatableConf {
 
     private String file;
 
+    private Integer crlScope;
+
     public Integer getCaId() {
       return caId;
     }
@@ -840,6 +853,14 @@ public class CaCertstore extends ValidatableConf {
       this.crlNo = crlNo;
     }
 
+    public Integer getCrlScope() {
+      return crlScope;
+    }
+
+    public void setCrlScope(Integer crlScope) {
+      this.crlScope = crlScope;
+    }
+
     public String getFile() {
       return file;
     }
@@ -854,6 +875,7 @@ public class CaCertstore extends ValidatableConf {
       notNull(caId, "caId");
       notEmpty(crlNo, "crlNo");
       notEmpty(file, "file");
+      notNull(crlScope, "crlScope");
     }
 
   }

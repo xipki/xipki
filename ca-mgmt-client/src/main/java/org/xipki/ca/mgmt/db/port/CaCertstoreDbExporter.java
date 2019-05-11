@@ -197,11 +197,11 @@ class CaCertstoreDbExporter extends DbPorter {
       case CERT:
         numProcessedBefore = certstore.getCountCerts();
         coreSql = "ID,SN,CA_ID,PID,RID,RTYPE,TID,UID,EE,LUPDATE,REV,RR,RT,RIT,FP_RS,"
-            + "REQ_SUBJECT,CERT FROM CERT WHERE ID>=?";
+            + "REQ_SUBJECT,CRL_SCOPE,CERT FROM CERT WHERE ID>=?";
         break;
       case CRL:
         numProcessedBefore = certstore.getCountCrls();
-        coreSql = "ID,CA_ID,CRL FROM CRL WHERE ID>=?";
+        coreSql = "ID,CA_ID,CRL_SCOPE,CRL FROM CRL WHERE ID>=?";
         break;
       case REQUEST:
         numProcessedBefore = certstore.getCountRequests();
@@ -336,6 +336,8 @@ class CaCertstoreDbExporter extends DbPorter {
               }
             }
 
+            cert.setCrlScope(rs.getInt("CRL_SCOPE"));
+
             cert.validate();
             ((CaCertstore.Certs) entriesInCurrentFile).add(cert);
           } else if (CaDbEntryType.CRL == type) {
@@ -376,6 +378,7 @@ class CaCertstoreDbExporter extends DbPorter {
             byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
             BigInteger crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
             crl.setCrlNo(crlNumber.toString());
+            crl.setCrlScope(rs.getInt("CRL_SCOPE"));
             crl.setFile(crlFilename);
 
             crl.validate();

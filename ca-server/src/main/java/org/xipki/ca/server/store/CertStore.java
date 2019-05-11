@@ -96,8 +96,8 @@ public class CertStore {
 
   private static final String SQL_ADD_CERT =
       "INSERT INTO CERT (ID,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,PID,"
-      + "CA_ID,RID,UID,FP_K,EE,RTYPE,TID,SHA1,REQ_SUBJECT,CERT)"
-      + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+      + "CA_ID,RID,UID,FP_K,EE,RTYPE,TID,SHA1,REQ_SUBJECT,CRL_SCOPE,CERT)"
+      + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
   private static final String SQL_REVOKE_CERT =
       "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
@@ -123,8 +123,8 @@ public class CertStore {
       "SELECT MAX(THISUPDATE) FROM CRL WHERE CA_ID=? AND DELTACRL=?";
 
   private static final String SQL_ADD_CRL =
-      "INSERT INTO CRL (ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE,DELTACRL,BASECRL_NO,CRL)"
-      + " VALUES (?,?,?,?,?,?,?,?)";
+      "INSERT INTO CRL (ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE,DELTACRL,BASECRL_NO,CRL_SCOPE,CRL)"
+      + " VALUES (?,?,?,?,?,?,?,?,?)";
 
   private static final String SQL_ADD_DELTACRL_CACHE =
       "INSERT INTO DELTACRL_CACHE (ID,CA_ID,SN) VALUES (?,?,?)";
@@ -315,6 +315,8 @@ public class CertStore {
 
       ps.setString(idx++, b64FpCert);
       ps.setString(idx++, reqSubjectText);
+      // in this version we set CRL_SCOPE to fixed value 0
+      ps.setInt(idx++, 0);
       ps.setString(idx++, b64Cert);
 
       ps.executeUpdate();
@@ -531,6 +533,8 @@ public class CertStore {
       setDateSeconds(ps, idx++, crl.getNextUpdate());
       setBoolean(ps, idx++, (baseCrlNumber != null));
       setLong(ps, idx++, baseCrlNumber);
+      // in this version we set CRL_SCOPE to fixed value 0
+      ps.setInt(idx++, 0);
       ps.setString(idx++, b64Crl);
 
       ps.executeUpdate();
