@@ -42,6 +42,14 @@ curl ${OPTS} \
     --output cacertchain.pem \
     "${BASE_URL}/cacertchain"
 
+echo "enroll certificate (CA generate keypair)"
+
+curl ${OPTS} \
+    --header "Content-Type: text/plain; charset=utf-8" \
+    --data-ascii "subject=CN=${filename}-cagenkeypair.xipki.org,O=xipki,C=DE" \
+    --output ${filename}-cagenkeypair.pem -v \
+    "${BASE_URL}/enroll-cert-cagenkeypair?profile=tlsa"
+
 echo "enroll certificate"
 
 curl ${OPTS} \

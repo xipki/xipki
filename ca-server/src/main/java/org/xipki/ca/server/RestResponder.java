@@ -21,6 +21,7 @@ import static org.xipki.audit.AuditLevel.ERROR;
 import static org.xipki.audit.AuditLevel.INFO;
 import static org.xipki.audit.AuditStatus.FAILED;
 
+import java.io.ByteArrayInputStream;
 import java.io.EOFException;
 import java.math.BigInteger;
 import java.security.cert.X509CRL;
@@ -29,6 +30,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
@@ -58,6 +60,8 @@ import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.DateUtil;
 import org.xipki.util.LogUtil;
+import org.xipki.util.PemEncoder;
+import org.xipki.util.PemEncoder.PemLabel;
 import org.xipki.util.RandomUtil;
 import org.xipki.util.StringUtil;
 
@@ -323,7 +327,8 @@ public class RestResponder {
         }
 
         respBytes = StringUtil.toUtf8Bytes(X509Util.encodeCertificates(certchainWithCaCert));
-      } else if (RestAPIConstants.CMD_enroll_cert.equalsIgnoreCase(command)) {
+      } else if (RestAPIConstants.CMD_enroll_cert.equalsIgnoreCase(command)
+          || RestAPIConstants.CMD_enroll_cert_cagenkeypair.equalsIgnoreCase(command)) {
         String profile = httpRetriever.getParameter(RestAPIConstants.PARAM_profile);
         if (StringUtil.isBlank(profile)) {
           throw new HttpRespAuditException(BAD_REQUEST,
@@ -343,12 +348,6 @@ public class RestResponder {
               "certprofile " + profile + " is not allowed");
         }
 
-        String ct = httpRetriever.getHeader("Content-Type");
-        if (!RestAPIConstants.CT_pkcs10.equalsIgnoreCase(ct)) {
-          String message = "unsupported media type " + ct;
-          throw new HttpRespAuditException(UNSUPPORTED_MEDIA_TYPE, message, INFO, FAILED);
-        }
-
         String strNotBefore = httpRetriever.getParameter(RestAPIConstants.PARAM_not_before);
         Date notBefore = (strNotBefore == null) ? null
             : DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotBefore);
@@ -357,38 +356,96 @@ public class RestResponder {
         Date notAfter = (strNotAfter == null) ? null
             : DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotAfter);
 
-        byte[] encodedCsr = request;
+        if (RestAPIConstants.CMD_enroll_cert_cagenkeypair.equalsIgnoreCase(command)) {
+          String ct = httpRetriever.getHeader("Content-Type");
 
-        CertificationRequest csr = CertificationRequest.getInstance(encodedCsr);
-        if (!ca.verifyCsr(csr)) {
-          throw new OperationException(ErrorCode.BAD_POP);
+          X500Name subject;
+          Extensions extensions;
+
+          if (ct.startsWith("text/plain")) {
+            Properties props = new Properties();
+            props.load(new ByteArrayInputStream(request));
+            String strSubject = props.getProperty("subject");
+            if (strSubject == null) {
+              throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, "subject is not specified");
+            }
+
+            try {
+              subject = new X500Name(strSubject);
+            } catch (Exception ex) {
+              throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, "invalid subject");
+            }
+            extensions = null;
+          } else if (RestAPIConstants.CT_pkcs10.equalsIgnoreCase(ct)) {
+            // The PKCS#10 will only be used for transport of subject and extensions.
+            // The associated key will not be used, so the verification of POPO is skipped.
+            CertificationRequestInfo certTemp =
+                CertificationRequest.getInstance(request).getCertificationRequestInfo();
+            subject = certTemp.getSubject();
+            extensions = CaUtil.getExtensions(certTemp);
+          } else {
+            String message = "unsupported media type " + ct;
+            throw new HttpRespAuditException(UNSUPPORTED_MEDIA_TYPE, message, INFO, FAILED);
+          }
+
+          CertTemplateData certTemplate = new CertTemplateData(subject, null,
+              notBefore, notAfter, extensions, profile, null, true);
+          CertificateInfo certInfo = ca.generateCert(certTemplate, requestor, RequestType.REST,
+              null, msgId);
+
+          if (ca.getCaInfo().isSaveRequest()) {
+            long dbId = ca.addRequest(request);
+            ca.addRequestCert(dbId, certInfo.getCert().getCertId());
+          }
+
+          respCt = RestAPIConstants.CT_pem_file;
+          byte[] keyBytes =
+              PemEncoder.encode(certInfo.getPrivateKey().getEncoded(), PemLabel.PRIVATE_KEY);
+          byte[] certBytes =
+              PemEncoder.encode(certInfo.getCert().getEncodedCert(), PemLabel.CERTIFICATE);
+
+          respBytes = new byte[keyBytes.length + 2 + certBytes.length];
+          System.arraycopy(keyBytes, 0, respBytes, 0, keyBytes.length);
+          respBytes[keyBytes.length] = '\r';
+          respBytes[keyBytes.length + 1] = '\n';
+          System.arraycopy(certBytes, 0, respBytes, keyBytes.length + 2, certBytes.length);
+        } else {
+          String ct = httpRetriever.getHeader("Content-Type");
+          if (!RestAPIConstants.CT_pkcs10.equalsIgnoreCase(ct)) {
+            String message = "unsupported media type " + ct;
+            throw new HttpRespAuditException(UNSUPPORTED_MEDIA_TYPE, message, INFO, FAILED);
+          }
+
+          CertificationRequest csr = CertificationRequest.getInstance(request);
+          if (!ca.verifyCsr(csr)) {
+            throw new OperationException(ErrorCode.BAD_POP);
+          }
+
+          CertificationRequestInfo certTemp = csr.getCertificationRequestInfo();
+
+          X500Name subject = certTemp.getSubject();
+          SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
+
+          Extensions extensions = CaUtil.getExtensions(certTemp);
+          CertTemplateData certTemplate = new CertTemplateData(subject, publicKeyInfo,
+              notBefore, notAfter, extensions, profile);
+          CertificateInfo certInfo = ca.generateCert(certTemplate, requestor, RequestType.REST,
+              null, msgId);
+
+          if (ca.getCaInfo().isSaveRequest()) {
+            long dbId = ca.addRequest(request);
+            ca.addRequestCert(dbId, certInfo.getCert().getCertId());
+          }
+
+          X509Cert cert = certInfo.getCert();
+          if (cert == null) {
+            String message = "could not generate certificate";
+            LOG.warn(message);
+            throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, message, INFO, FAILED);
+          }
+          respCt = RestAPIConstants.CT_pkix_cert;
+          respBytes = cert.getEncodedCert();
         }
-
-        CertificationRequestInfo certTemp = csr.getCertificationRequestInfo();
-
-        X500Name subject = certTemp.getSubject();
-        SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
-
-        Extensions extensions = CaUtil.getExtensions(certTemp);
-        CertTemplateData certTemplate = new CertTemplateData(subject, publicKeyInfo,
-            notBefore, notAfter, extensions, profile);
-
-        CertificateInfo certInfo = ca.generateCert(certTemplate, requestor, RequestType.REST,
-            null, msgId);
-
-        if (ca.getCaInfo().isSaveRequest()) {
-          long dbId = ca.addRequest(encodedCsr);
-          ca.addRequestCert(dbId, certInfo.getCert().getCertId());
-        }
-
-        X509Cert cert = certInfo.getCert();
-        if (cert == null) {
-          String message = "could not generate certificate";
-          LOG.warn(message);
-          throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, message, INFO, FAILED);
-        }
-        respCt = RestAPIConstants.CT_pkix_cert;
-        respBytes = cert.getEncodedCert();
       } else if (RestAPIConstants.CMD_revoke_cert.equalsIgnoreCase(command)
           || RestAPIConstants.CMD_delete_cert.equalsIgnoreCase(command)) {
         int permission;

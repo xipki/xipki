@@ -19,6 +19,13 @@ echo "REST cacertchain"
 
 xi:curl --out output/rest/cacertchain-subcawithcrl1.pem $BASE_URL/cacertchain
 
+echo "REST enroll (CA generate keypair)"
+
+xi:curl --out output/rest/rest-tls-cagenkeypair1.pem \
+  --data "subject=CN=rest-tls-cagenkeypair1.example.org,O=xipki,C=DE" \
+  --header "Content-Type: text/plain; charset=utf-8" \
+  "$BASE_URL/enroll-cert-cagenkeypair?profile=tlsa"
+
 echo "REST enroll"
 
 xi:curl --out output/rest/rest-tls1.der \

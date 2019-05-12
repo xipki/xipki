@@ -80,6 +80,8 @@ public class RestAPIConstants {
 
   public static final String CMD_enroll_cert = "enroll-cert";
 
+  public static final String CMD_enroll_cert_cagenkeypair = "enroll-cert-cagenkeypair";
+
   public static final String CMD_crl = "crl";
 
   public static final String CMD_new_crl = "new-crl";
