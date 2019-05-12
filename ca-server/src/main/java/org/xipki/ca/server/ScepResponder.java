@@ -645,6 +645,7 @@ public class ScepResponder {
 
     CertificateList crl = ca.getBcCurrentCrl();
     if (crl == null) {
+      LOG.error("found no CRL");
       throw FailInfoException.BAD_REQUEST;
     }
     CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();

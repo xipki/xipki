@@ -37,6 +37,15 @@ xi:curl --out ${OUT_DIR}/${CN}.der --data-file ${OUT_DIR}/${CN}.csr \
 
 ## Enroll certificate (profile tls)
 
+echo "=====REST: Enroll (CA generate keypair)====="
+
+CN = rest-tls-cagenkey-${CUR_TIME}
+
+xi:curl --out ${OUT_DIR}/${CN}.pem \
+  --data "subject=CN=${CN}.xipki.org,O=xipki,C=DE" \
+  --header "Content-Type: text/plain; encoding=utf-8" \
+  "$BASE_URL/enroll-cert-cagenkeypair?profile=tls"
+
 echo "=====REST: Enroll====="
 
 CN = rest-tls-${CUR_TIME}

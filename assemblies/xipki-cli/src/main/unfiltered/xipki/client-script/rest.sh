@@ -65,6 +65,17 @@ curl ${OPTS} \
     --output ${OUT_DIR}/${CN}.der \
     "${CA_URL}/enroll-cert?profile=smime"
 
+# enroll certificate tls (CA generate keypair)
+CN=tls-cagenkeypair-${CUR_TIME}
+
+echo "enroll certificate (CA generate keypair)"
+
+curl ${OPTS} \
+    --header "Content-Type: text/plain; encoding=utf-8" \
+    --data-ascii "subject=CN=${CN}.xipki.org,O=xipki,C=DE" \
+    --output ${OUT_DIR}/${CN}.pem \
+    "${CA_URL}/enroll-cert-cagenkeypair?profile=tls"
+
 # enroll certificate tls
 CN=tls-${CUR_TIME}
 
