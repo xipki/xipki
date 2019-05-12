@@ -2,7 +2,7 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
-## 5.4.0
+## 5.3.1
   - Release date: -
 
 ## 5.3.0
