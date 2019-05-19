@@ -20,11 +20,10 @@ package org.xipki.qa.security;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.SecurityFactory;
-import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.Args;
 import org.xipki.util.BenchmarkExecutor;
@@ -60,22 +59,20 @@ public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
   // CHECKSTYLE:SKIP
   public static class EC extends P12KeyGenSpeed {
 
-    private final ASN1ObjectIdentifier curveOid;
+    private final String curveOidOrName;
 
     public EC(String curveNameOrOid, SecurityFactory securityFactory) throws Exception {
       super("PKCS#12 EC key generation\ncurve: " + curveNameOrOid, securityFactory);
-
-      ASN1ObjectIdentifier oid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
-      if (oid == null) {
-        throw new IllegalArgumentException("invalid curve name or OID " + curveNameOrOid);
-      }
-
-      this.curveOid = oid;
+      this.curveOidOrName = curveNameOrOid;
     }
 
     @Override
     protected void generateKeypair(SecureRandom random) throws Exception {
-      KeyUtil.generateECKeypair(curveOid, random);
+      if (EdECConstants.isEdwardsOrMontgemoryCurve(curveOidOrName)) {
+        KeyUtil.generateEdECKeypair(curveOidOrName, random);
+      } else {
+        KeyUtil.generateECKeypairForCurveNameOrOid(curveOidOrName, random);
+      }
     }
 
   }

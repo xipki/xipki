@@ -27,6 +27,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.qa.ca.CaQaSystemManager;
 import org.xipki.qa.ocsp.OcspCertStatus;
 import org.xipki.qa.ocsp.OcspError;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.shell.DynamicEnumCompleter;
 import org.xipki.shell.EnumCompleter;
@@ -97,6 +98,17 @@ public class QaCompleters {
         enums.add(hashAlg + "withPlainECDSA");
       }
       setTokens(enums);
+    }
+
+  }
+
+  @Service
+  //CHECKSTYLE:SKIP
+  public static class EDDSASigAlgCompleter extends EnumCompleter {
+
+    public EDDSASigAlgCompleter() {
+      String[] hashAlgs = new String[]{EdECConstants.ALG_Ed25519, EdECConstants.ALG_Ed448};
+      setTokens(hashAlgs);
     }
 
   }

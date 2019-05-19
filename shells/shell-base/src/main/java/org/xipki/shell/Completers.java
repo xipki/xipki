@@ -91,6 +91,15 @@ public class Completers {
   }
 
   @Service
+  //CHECKSTYLE:SKIP
+  public static class EdCurveNameCompleter extends EnumCompleter {
+
+    public EdCurveNameCompleter() {
+      setTokens("curve25519", "curve448", "edwards25519", "edwards448");
+    }
+  }
+
+  @Service
   public static class ExtensionNameCompleter extends EnumCompleter {
 
     private static final Map<String, String> nameToIdMap = new HashMap<>();

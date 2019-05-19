@@ -32,6 +32,7 @@ import org.xipki.qa.security.P11KeyGenSpeed;
 import org.xipki.qa.security.P11SignSpeed;
 import org.xipki.qa.security.P12KeyGenSpeed;
 import org.xipki.qa.security.P12SignSpeed;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.P11CryptService;
@@ -542,6 +543,53 @@ public class QaSecurityActions {
 
   }
 
+  @Command(scope = "xi", name = "speed-ed-gen-p11",
+      description = "performance test of PKCS#11 Edwards and montgomery EC key generation")
+  @Service
+  public static class SpeedEdGenP11 extends SpeedP11Action {
+
+    @Option(name = "--curve", required = true, description = "curve name")
+    @Completion(Completers.EdCurveNameCompleter.class)
+    private String curveName;
+
+    @Override
+    protected BenchmarkExecutor getTester() throws Exception {
+      return new P11KeyGenSpeed.EC(getSlot(), getKeyId(), curveName);
+    }
+
+    @Override
+    protected int getNumThreads() {
+      return (getKeyId() == null) ? super.getNumThreads() : 1;
+    }
+
+  }
+
+  @Command(scope = "xi", name = "speed-ed-sign-p11",
+      description = "performance test of PKCS#11 EdDSA signature creation")
+  @Service
+  public static class SpeedEdSignP11 extends SpeedP11SignAction {
+
+    @Option(name = "--sig-algo", required = true, description = "signature algorithm")
+    @Completion(QaCompleters.EDDSASigAlgCompleter.class)
+    private String sigAlgo;
+
+    @Override
+    protected BenchmarkExecutor getTester() throws Exception {
+      String curveName;
+      if (EdECConstants.ALG_Ed25519.equalsIgnoreCase(sigAlgo)) {
+        curveName = EdECConstants.edwards25519;
+      } else if (EdECConstants.ALG_Ed448.equalsIgnoreCase(sigAlgo)) {
+        curveName = EdECConstants.edwards448;
+      } else {
+        throw new IllegalCmdParamException("invalid sigAlgo " + sigAlgo);
+      }
+
+      return new P11SignSpeed.EC(keyPresent, securityFactory, getSlot(), getKeyId(), keyLabel,
+          sigAlgo, getNumThreads(), curveName);
+    }
+
+  }
+
   @Command(scope = "xi", name = "speed-hmac-sign-p11",
       description = "performance test of PKCS#11 HMAC signature creation")
   @Service
@@ -896,6 +944,47 @@ public class QaSecurityActions {
 
   }
 
+  @Command(scope = "xi", name = "speed-ed-gen-p12",
+      description = "performance test of PKCS#12 Edwards and montgomery EC key generation")
+  @Service
+  public static class SpeedEdGenP12 extends SingleSpeedAction {
+
+    @Option(name = "--curve", required = true, description = "curve name")
+    @Completion(Completers.EdCurveNameCompleter.class)
+    private String curveName;
+
+    @Override
+    protected BenchmarkExecutor getTester() throws Exception {
+      return new P12KeyGenSpeed.EC(curveName, securityFactory);
+    }
+
+  }
+
+  @Command(scope = "xi", name = "speed-ed-sign-p12",
+      description = "performance test of PKCS#12 EdDSA signature creation")
+  @Service
+  public static class SpeedEdSignP12 extends SpeedP12SignAction {
+
+    @Option(name = "--sig-algo", required = true, description = "signature algorithm")
+    @Completion(QaCompleters.EDDSASigAlgCompleter.class)
+    private String sigAlgo;
+
+    @Override
+    protected BenchmarkExecutor getTester() throws Exception {
+      String curveName;
+      if (EdECConstants.ALG_Ed25519.equalsIgnoreCase(sigAlgo)) {
+        curveName = EdECConstants.edwards25519;
+      } else if (EdECConstants.ALG_Ed448.equalsIgnoreCase(sigAlgo)) {
+        curveName = EdECConstants.edwards448;
+      } else {
+        throw new IllegalCmdParamException("invalid sigAlgo " + sigAlgo);
+      }
+
+      return new P12SignSpeed.EC(securityFactory, sigAlgo, getNumThreads(), curveName);
+    }
+
+  }
+
   @Command(scope = "xi", name = "speed-hmac-sign-p12",
       description = "performance test of PKCS#12 HMAC signature creation")
   @Service
@@ -969,10 +1058,10 @@ public class QaSecurityActions {
 
   }
 
-  @Command(scope = "xi", name = "speed-sm3-sign-p12",
+  @Command(scope = "xi", name = "speed-sm2-sign-p12",
       description = "performance test of PKCS#12 SM2 signature creation")
   @Service
-  public static class SpeedSm3SignP12 extends SpeedP12SignAction {
+  public static class SpeedSm2SignP12 extends SpeedP12SignAction {
 
     @Override
     protected BenchmarkExecutor getTester() throws Exception {

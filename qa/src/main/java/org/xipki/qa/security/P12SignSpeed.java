@@ -28,6 +28,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.pkcs12.KeystoreGenerationParameters;
@@ -121,8 +122,12 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
         KeystoreGenerationParameters params = new KeystoreGenerationParameters(
             PASSWORD.toCharArray());
         params.setRandom(new SecureRandom());
-        P12KeyGenerationResult identity = new P12KeyGenerator().generateECKeypair(
-            curveNameOrOid, params, null);
+        P12KeyGenerationResult identity;
+        if (EdECConstants.isEdwardsOrMontgemoryCurve(curveNameOrOid)) {
+          identity = new P12KeyGenerator().generateEdECKeypair(curveNameOrOid, params, null);
+        } else {
+          identity = new P12KeyGenerator().generateECKeypair(curveNameOrOid, params, null);
+        }
         keystoreBytes = identity.keystore();
       }
       return keystoreBytes;
