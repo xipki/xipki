@@ -22,7 +22,8 @@ import java.security.cert.X509Certificate;
 import org.xipki.security.X509Cert;
 
 /**
- * TODO.
+ * Certificate with id of this certificate in the database.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

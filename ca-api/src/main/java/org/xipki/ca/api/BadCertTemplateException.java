@@ -18,7 +18,8 @@
 package org.xipki.ca.api;
 
 /**
- * TODO.
+ * Exception indicates bad certificate template.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

@@ -48,7 +48,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 
 /**
- * TODO.
+ * Helper class to convert the CA configuration.
+ *
  * @author Lijun Liao
  * @since 2.1.0
  */

@@ -21,7 +21,8 @@ import org.xipki.audit.services.EmbedAuditService;
 import org.xipki.audit.services.SyslogAuditService;
 
 /**
- * TODO.
+ * Helper class to configure and initialize the Audit.
+ *
  * @author Lijun Liao
  */
 

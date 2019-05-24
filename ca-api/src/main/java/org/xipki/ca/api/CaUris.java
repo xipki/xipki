@@ -26,7 +26,8 @@ import org.xipki.util.ConfPairs;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * CA URIs.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

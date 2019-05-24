@@ -22,7 +22,8 @@ import java.util.Set;
 import org.xipki.util.ObjectCreationException;
 
 /**
- * TODO.
+ * CertPublisher factory interface.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

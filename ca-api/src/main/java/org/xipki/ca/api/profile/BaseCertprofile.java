@@ -64,7 +64,8 @@ import org.xipki.util.LruCache;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Base Certprofile.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

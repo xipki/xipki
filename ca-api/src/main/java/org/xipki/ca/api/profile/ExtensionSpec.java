@@ -32,7 +32,8 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
 
 /**
- * TODO.
+ * Extension specification.
+ *
  * @author Lijun Liao
  */
 public abstract class ExtensionSpec {

@@ -18,7 +18,8 @@
 package org.xipki.audit;
 
 /**
- * TODO.
+ * Audit service interface.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

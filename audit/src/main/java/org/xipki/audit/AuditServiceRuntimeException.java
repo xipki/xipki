@@ -18,7 +18,8 @@
 package org.xipki.audit;
 
 /**
- * TODO.
+ * Audit Service runtime exception.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

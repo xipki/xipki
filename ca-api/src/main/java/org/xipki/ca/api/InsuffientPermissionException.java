@@ -18,7 +18,8 @@
 package org.xipki.ca.api;
 
 /**
- * TODO.
+ * Exception indicates insufficient permission.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

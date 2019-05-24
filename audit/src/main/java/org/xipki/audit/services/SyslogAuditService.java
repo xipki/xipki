@@ -52,7 +52,8 @@ import com.cloudbees.syslog.sender.TcpSyslogMessageSender;
 import com.cloudbees.syslog.sender.UdpSyslogMessageSender;
 
 /**
- * TODO.
+ * Syslog audit service.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

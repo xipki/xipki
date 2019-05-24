@@ -22,7 +22,8 @@ import java.util.Set;
 import org.xipki.util.ObjectCreationException;
 
 /**
- * TODO.
+ * Certprofile factory.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

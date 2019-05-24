@@ -34,7 +34,8 @@ import org.xipki.util.InvalidConfException;
 import org.xipki.util.Validity;
 
 /**
- * TODO.
+ * CA Management message via the REST API.
+ *
  * @author Lijun Liao
  */
 

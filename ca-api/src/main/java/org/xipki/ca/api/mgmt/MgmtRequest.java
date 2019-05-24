@@ -25,7 +25,8 @@ import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 
 /**
- * TODO.
+ * CA Management request via the REST API.
+ *
  * @author Lijun Liao
  */
 

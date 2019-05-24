@@ -26,7 +26,8 @@ import java.util.Map;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * CA permission constants.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

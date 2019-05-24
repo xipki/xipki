@@ -22,6 +22,8 @@ import org.xipki.util.InvalidConfException;
 import org.xipki.util.StringUtil;
 
 /**
+ * SCEP control.
+ * <p/>
  * Example configuration.
  *
  * <pre>

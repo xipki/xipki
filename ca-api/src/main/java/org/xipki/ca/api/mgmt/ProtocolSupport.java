@@ -23,7 +23,8 @@ import java.util.StringTokenizer;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Protocol support control (e.g. CMP, REST and SCEP).
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

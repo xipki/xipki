@@ -18,7 +18,8 @@
 package org.xipki.ca.api.mgmt;
 
 /**
- * TODO.
+ * The mode to sort the certificates.
+ *
  * @author Lijun Liao
  * @since 2.1.0
  */

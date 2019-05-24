@@ -21,7 +21,8 @@ import org.xipki.ca.api.InsuffientPermissionException;
 import org.xipki.ca.api.NameId;
 
 /**
- * TODO.
+ * Requestor info interface.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

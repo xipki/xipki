@@ -21,7 +21,8 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Extension value control.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

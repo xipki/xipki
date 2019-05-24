@@ -25,7 +25,8 @@ import org.xipki.util.CollectionUtil;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Control the permitted public key in the certificate.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

@@ -23,7 +23,8 @@ import java.util.Date;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Certificate list container.
+ *
  * @author Lijun Liao
  * @since 2.1.0
  */

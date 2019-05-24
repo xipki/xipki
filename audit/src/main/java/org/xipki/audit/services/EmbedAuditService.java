@@ -31,7 +31,8 @@ import org.xipki.audit.PciAuditEvent;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * The embedded audit service. It uses Log4j logger xipki.audit.sl4fj.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

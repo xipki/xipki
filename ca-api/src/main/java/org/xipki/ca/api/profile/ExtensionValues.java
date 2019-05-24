@@ -27,7 +27,8 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Container of extension value control.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

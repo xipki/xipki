@@ -24,7 +24,8 @@ import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Certificate Information.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

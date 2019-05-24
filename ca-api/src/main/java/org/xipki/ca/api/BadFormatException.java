@@ -18,7 +18,8 @@
 package org.xipki.ca.api;
 
 /**
- * TODO.
+ * Exception indicates bad format.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

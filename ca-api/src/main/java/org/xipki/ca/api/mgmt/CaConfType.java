@@ -29,7 +29,8 @@ import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 
 /**
- * TODO.
+ * CA configuration types.
+ *
  * @author Lijun Liao
  *
  */

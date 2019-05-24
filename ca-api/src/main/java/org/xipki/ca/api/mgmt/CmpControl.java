@@ -37,7 +37,8 @@ import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * CMP control.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

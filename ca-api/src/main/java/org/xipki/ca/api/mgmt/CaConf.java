@@ -58,7 +58,8 @@ import org.xipki.util.Validity;
 import com.alibaba.fastjson.JSON;
 
 /**
- * TODO.
+ * CA configuration.
+ *
  * @author Lijun Liao
  * @since 2.1.0
  */

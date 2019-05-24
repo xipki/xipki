@@ -22,7 +22,8 @@ import java.security.cert.Certificate;
 import org.xipki.security.CertRevocationInfo;
 
 /**
- * TODO.
+ * Certificate with status info.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

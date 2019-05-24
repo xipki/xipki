@@ -22,7 +22,8 @@ import java.util.regex.Pattern;
 import org.xipki.util.LruCache;
 
 /**
- * TODO.
+ * Text validator.
+ *
  * @author Lijun Liao
  */
 

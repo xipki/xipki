@@ -20,7 +20,8 @@ package org.xipki.audit;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Audit level.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

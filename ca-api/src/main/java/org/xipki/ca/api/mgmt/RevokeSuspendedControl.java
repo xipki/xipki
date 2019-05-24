@@ -25,6 +25,8 @@ import org.xipki.util.Validity;
 import org.xipki.util.Validity.Unit;
 
 /**
+ * Revoke suspended certificate control.
+ * <p/>
  * Example configuration
  *<pre>
  * enabled=&lt;true|false&gt;, \

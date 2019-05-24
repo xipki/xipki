@@ -48,7 +48,8 @@ import org.xipki.util.StringUtil;
 import org.xipki.util.Validity;
 
 /**
- * TODO.
+ * Defines how the certificate looks like. All Certprofile classes must extend this class.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

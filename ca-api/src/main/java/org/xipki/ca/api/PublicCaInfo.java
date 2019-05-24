@@ -36,7 +36,8 @@ import org.xipki.util.ConfPairs;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Public CA information.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

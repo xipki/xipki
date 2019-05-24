@@ -22,7 +22,8 @@ import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Name and Identifier.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

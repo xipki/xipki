@@ -29,7 +29,9 @@ import org.xipki.security.X509Cert;
 import org.xipki.util.FileOrValue;
 
 /**
- * TODO.
+ * Defines how to publish the certificates and CRLs. All CertPublisher classes must extend this
+ * class.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

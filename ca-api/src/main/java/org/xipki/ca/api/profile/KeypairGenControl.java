@@ -31,7 +31,8 @@ import org.xipki.security.util.DSAParameterCache;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Control of how the CA generate keypair for the new certificate.
+ *
  * @author Lijun Liao
  *
  */

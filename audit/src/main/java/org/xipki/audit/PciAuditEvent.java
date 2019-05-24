@@ -34,7 +34,8 @@ import java.util.List;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * PCI audit event.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

@@ -21,7 +21,8 @@ import org.xipki.ca.api.CertWithDbId;
 import org.xipki.security.CertRevocationInfo;
 
 /**
- * TODO.
+ * Certificate with revocation information.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

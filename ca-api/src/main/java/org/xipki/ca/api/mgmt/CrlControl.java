@@ -30,6 +30,7 @@ import org.xipki.util.StringUtil;
 import org.xipki.util.TripleState;
 
 /**
+ * CRL control.
  *<pre>
  * Example configuration
  *

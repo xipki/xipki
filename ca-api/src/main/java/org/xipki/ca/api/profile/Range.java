@@ -20,7 +20,7 @@ package org.xipki.ca.api.profile;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Range with optional min and max values.
  * @author Lijun Liao
  * @since 2.0.0
  */

@@ -28,7 +28,8 @@ import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.util.X509Util;
 
 /**
- * TODO.
+ * CA Management response via the REST API.
+ *
  * @author Lijun Liao
  */
 

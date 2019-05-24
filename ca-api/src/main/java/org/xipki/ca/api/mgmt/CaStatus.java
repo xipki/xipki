@@ -20,7 +20,8 @@ package org.xipki.ca.api.mgmt;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * CA status enum.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

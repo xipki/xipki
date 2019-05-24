@@ -18,7 +18,8 @@
 package org.xipki.ca.api;
 
 /**
- * TODO.
+ * REST API constants.
+ *
  * @author Lijun Liao
  * @since 2.1.0
  */

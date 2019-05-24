@@ -32,7 +32,8 @@ import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 
 /**
- * TODO.
+ * Interface to manage the CA system.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

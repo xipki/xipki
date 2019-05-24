@@ -18,7 +18,8 @@
 package org.xipki.ca.api;
 
 /**
- * TODO.
+ * Operation exception.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

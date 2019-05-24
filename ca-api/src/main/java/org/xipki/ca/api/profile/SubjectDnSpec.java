@@ -44,7 +44,8 @@ import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Subject DN specification.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

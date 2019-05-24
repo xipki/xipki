@@ -18,7 +18,8 @@
 package org.xipki.ca.api.mgmt;
 
 /**
- * TODO.
+ * Exception related to CA management.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
