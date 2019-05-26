@@ -29,7 +29,8 @@ import org.xipki.util.ObjectCreationException;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Wrapper of signer database entry.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

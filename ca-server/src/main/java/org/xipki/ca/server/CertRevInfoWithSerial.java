@@ -25,7 +25,8 @@ import org.xipki.security.CrlReason;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Certificate revocation information with serial number and database table id.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

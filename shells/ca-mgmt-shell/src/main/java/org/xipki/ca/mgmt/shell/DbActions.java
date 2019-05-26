@@ -40,7 +40,8 @@ import org.xipki.shell.Completers;
 import org.xipki.shell.XiAction;
 
 /**
- * TODO.
+ * Actions to operate on databases directly.
+ *
  * @author Lijun Liao
  *
  */

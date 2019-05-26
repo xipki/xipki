@@ -55,6 +55,8 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.RandomUtil;
 
 /**
+ * SCEP servlet.
+ * <p/>
  * URL http://host:port/scep/&lt;name&gt;/&lt;profile-alias&gt;/pkiclient.exe
  *
  * @author Lijun Liao

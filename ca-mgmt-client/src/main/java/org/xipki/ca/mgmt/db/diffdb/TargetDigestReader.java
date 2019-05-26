@@ -44,12 +44,13 @@ import org.xipki.util.ProcessLog;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Reader of certificate information for the comparison from the target database.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-class TargetDigestRetriever implements Closeable {
+class TargetDigestReader implements Closeable {
 
   private class Retriever implements Runnable {
 
@@ -144,7 +145,7 @@ class TargetDigestRetriever implements Closeable {
 
   } // class Retriever
 
-  private final DbControl dbControl;
+  private final DbType dbType;
 
   private final HashAlgo certhashAlgo;
 
@@ -170,20 +171,20 @@ class TargetDigestRetriever implements Closeable {
 
   private final List<Retriever> retrievers;
 
-  public TargetDigestRetriever(boolean revokedOnly, ProcessLog processLog, RefDigestReader reader,
-      DigestDiffReporter reporter, DataSourceWrapper datasource, DbControl dbControl,
+  public TargetDigestReader(boolean revokedOnly, ProcessLog processLog, RefDigestReader reader,
+      DigestDiffReporter reporter, DataSourceWrapper datasource, DbType dbType,
       HashAlgo certHashAlgo, int caId, int numPerSelect, int numThreads, AtomicBoolean stopMe)
       throws DataAccessException {
     this.processLog = Args.notNull(processLog, "processLog");
     this.numPerSelect = numPerSelect;
-    this.dbControl = Args.notNull(dbControl, "dbControl");
+    this.dbType = Args.notNull(dbType, "dbControl");
     this.reader = Args.notNull(reader, "reader");
     this.reporter = Args.notNull(reporter, "reporter");
     this.stopMe = Args.notNull(stopMe, "stopMe");
     this.datasource = Args.notNull(datasource, "datasource");
     this.certhashAlgo = Args.notNull(certHashAlgo, "certhashAlgo");
 
-    if (dbControl == DbControl.XIPKI_OCSP_v4) {
+    if (dbType == DbType.XIPKI_OCSP_v4) {
       String certHashAlgoInDb = datasource.getFirstValue(
           null, "DBSCHEMA", "VALUE2", "NAME='CERTHASH_ALGO'", String.class);
       if (certHashAlgo != HashAlgo.getInstance(certHashAlgoInDb)) {
@@ -195,7 +196,7 @@ class TargetDigestRetriever implements Closeable {
     String singleSql;
     StringBuilder arrayBuffer = new StringBuilder(200);
 
-    if (dbControl == DbControl.XIPKI_OCSP_v4) {
+    if (dbType == DbType.XIPKI_OCSP_v4) {
       singleSql = StringUtil.concat("REV,RR,RT,RIT,HASH FROM CERT WHERE IID=",
           Integer.toString(caId), " AND SN=?");
 
@@ -205,7 +206,7 @@ class TargetDigestRetriever implements Closeable {
         arrayBuffer.append(",?");
       }
       arrayBuffer.append(")");
-    } else if (dbControl == DbControl.XIPKI_CA_v4) {
+    } else if (dbType == DbType.XIPKI_CA_v4) {
       String hashOrCertColumn;
       if (certHashAlgo == HashAlgo.SHA1) {
         hashOrCertColumn = "SHA1";
@@ -224,7 +225,7 @@ class TargetDigestRetriever implements Closeable {
       }
       arrayBuffer.append(")");
     } else {
-      throw new IllegalArgumentException("unknown dbControl " + dbControl);
+      throw new IllegalArgumentException("unknown dbControl " + dbType);
     }
 
     singleCertSql = datasource.buildSelectFirstSql(1, singleSql);
@@ -375,7 +376,7 @@ class TargetDigestRetriever implements Closeable {
   }
 
   private String getBase64HashValue(ResultSet rs) throws SQLException {
-    if (dbControl == DbControl.XIPKI_OCSP_v4) {
+    if (dbType == DbType.XIPKI_OCSP_v4) {
       return rs.getString("HASH");
     } else { // if (dbControl == DbControl.XIPKI_CA_v4) {
       if (certhashAlgo == HashAlgo.SHA1) {

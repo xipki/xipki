@@ -76,7 +76,8 @@ import org.xipki.util.StringUtil;
 import org.xipki.util.Validity;
 
 /**
- * TODO.
+ * Actions to manage CA.
+ *
  * @author Lijun Liao
  *
  */

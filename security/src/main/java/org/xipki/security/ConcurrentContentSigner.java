@@ -68,7 +68,8 @@ public interface ConcurrentContentSigner extends Closeable {
   X509CertificateHolder getBcCertificate();
 
   /**
-   * TODO.
+   * Set the CertificateChain.
+   *
    * @param certchain
    *          Certificate chain of this signer. Could be {@code null}.
    */

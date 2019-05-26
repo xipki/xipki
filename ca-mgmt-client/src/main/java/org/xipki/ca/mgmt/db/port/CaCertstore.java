@@ -26,7 +26,8 @@ import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 
 /**
- * TODO.
+ * CA CertStore configuration.
+ *
  * @author Lijun Liao
  */
 

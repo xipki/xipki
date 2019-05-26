@@ -26,7 +26,8 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Certificate template data.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

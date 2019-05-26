@@ -34,7 +34,8 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Wrapper of requestor database entry.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

@@ -21,7 +21,8 @@ import java.io.IOException;
 import java.security.cert.X509Certificate;
 
 /**
- * TODO.
+ * Interface to retrieve the meta data of HTTP request.
+ *
  * @author Lijun Liao
  * @since 3.0.1
  */

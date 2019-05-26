@@ -51,8 +51,6 @@ import org.xipki.ca.api.mgmt.ProtocolSupport;
 import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
 import org.xipki.ca.api.mgmt.ScepControl;
 import org.xipki.ca.api.mgmt.ValidityMode;
-import org.xipki.ca.server.SqlColumn.ColumnType;
-import org.xipki.ca.server.store.CertStore;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
@@ -72,11 +70,89 @@ import org.xipki.util.StringUtil;
 import org.xipki.util.Validity;
 
 /**
- * TODO.
+ * Execute the database queries to manage CA system.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
 class CaManagerQueryExecutor {
+
+  private static enum ColumnType {
+    INT,
+    STRING,
+    BOOL
+  }
+
+  private static class SqlColumn {
+
+    private ColumnType type;
+    private String name;
+    private Object value;
+    private boolean sensitive;
+    private boolean signerConf;
+
+    public SqlColumn(ColumnType type, String name, Object value) {
+      this(type, name, value, false, false);
+    }
+
+    public SqlColumn(ColumnType type, String name, Object value, boolean sensitive,
+        boolean signerConf) {
+      this.type = Args.notNull(type, "type");
+      this.name = Args.notNull(name, "name");
+      this.value = value;
+      this.sensitive = sensitive;
+      this.signerConf = signerConf;
+    }
+
+    public ColumnType getType() {
+      return type;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public Object getValue() {
+      return value;
+    }
+
+    public boolean isSensitive() {
+      return sensitive;
+    }
+
+    public boolean isSignerConf() {
+      return signerConf;
+    }
+
+  }
+
+  static class SystemEvent {
+
+    private final String name;
+
+    private final String owner;
+
+    private final long eventTime;
+
+    SystemEvent(String name, String owner, long eventTime) {
+      this.name = Args.notBlank(name, "name");
+      this.owner = Args.notBlank(owner, "owner");
+      this.eventTime = eventTime;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public String getOwner() {
+      return owner;
+    }
+
+    public long getEventTime() {
+      return eventTime;
+    }
+
+  }
 
   private static final Logger LOG = LoggerFactory.getLogger(CaManagerQueryExecutor.class);
 

@@ -66,7 +66,8 @@ import org.xipki.util.ObjectCreationException;
 import org.xipki.util.Validity;
 
 /**
- * TODO.
+ * Self-signed certificate builder.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

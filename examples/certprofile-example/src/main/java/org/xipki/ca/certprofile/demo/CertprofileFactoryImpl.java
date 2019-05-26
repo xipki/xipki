@@ -27,7 +27,8 @@ import org.xipki.ca.api.profile.CertprofileFactory;
 import org.xipki.util.ObjectCreationException;
 
 /**
- * TODO.
+ * Factory to create certprofile of type demo-profiletype.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

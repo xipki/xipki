@@ -24,7 +24,8 @@ import java.util.Map;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Container of the map of serial number to digest value of certificates.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

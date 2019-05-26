@@ -21,7 +21,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * TODO.
+ * Entry of a queue.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

@@ -29,14 +29,15 @@ public interface AuditService {
   void init(String conf);
 
   /**
-   * TODO.
+   * Log audit event.
    * @param event
    *          Audit event. Must not be {@code null}-
    */
   void logEvent(AuditEvent event);
 
   /**
-   * TODO.
+   * Log PCI audit event.
+   *
    * @param event
    *          Audit event. Must not be {@code null}-
    */

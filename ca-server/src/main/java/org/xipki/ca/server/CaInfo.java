@@ -47,7 +47,6 @@ import org.xipki.ca.api.mgmt.ProtocolSupport;
 import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
 import org.xipki.ca.api.mgmt.ScepControl;
 import org.xipki.ca.api.mgmt.ValidityMode;
-import org.xipki.ca.server.store.CertStore;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
@@ -60,7 +59,8 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.Validity;
 
 /**
- * TODO.
+ * CA information.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

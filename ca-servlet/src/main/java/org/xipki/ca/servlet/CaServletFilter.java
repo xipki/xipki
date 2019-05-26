@@ -56,7 +56,8 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * CA ServletFilter.
+ *
  * @author Lijun Liao
  */
 public class CaServletFilter implements Filter {

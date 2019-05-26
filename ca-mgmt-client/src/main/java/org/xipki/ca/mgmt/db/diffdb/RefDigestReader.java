@@ -48,7 +48,8 @@ import org.xipki.util.Base64;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Reader of certificate information for the comparison from the reference database.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -83,7 +84,7 @@ class RefDigestReader implements Closeable {
 
   private String selectCertSql;
 
-  private DbControl dbControl;
+  private DbType dbType;
 
   private HashAlgo certhashAlgo;
 
@@ -134,7 +135,7 @@ class RefDigestReader implements Closeable {
           }
 
           String hash;
-          if (dbControl == DbControl.XIPKI_OCSP_v4) {
+          if (dbType == DbType.XIPKI_OCSP_v4) {
             hash = rs.getString("HASH");
           } else { //if (dbControl == DbControl.XIPKI_CA_v4) {
             if (certhashAlgo == HashAlgo.SHA1) {
@@ -193,15 +194,15 @@ class RefDigestReader implements Closeable {
     this.outQueue = new ArrayBlockingQueue<>(numBlocksToRead);
   } // constructor
 
-  private void init(DbControl dbControl, HashAlgo certhashAlgo, int caId, int numPerSelect)
+  private void init(DbType dbType, HashAlgo certhashAlgo, int caId, int numPerSelect)
       throws Exception {
     this.caId = caId;
     this.conn = datasource.getConnection();
-    this.dbControl = dbControl;
+    this.dbType = dbType;
     this.certhashAlgo = certhashAlgo;
 
     String coreSql;
-    if (dbControl == DbControl.XIPKI_OCSP_v4) {
+    if (dbType == DbType.XIPKI_OCSP_v4) {
       String certHashAlgoInDb = datasource.getFirstValue(
           null, "DBSCHEMA", "VALUE2", "NAME='CERTHASH_ALGO'", String.class);
       if (certhashAlgo != HashAlgo.getInstance(certHashAlgoInDb)) {
@@ -211,12 +212,12 @@ class RefDigestReader implements Closeable {
 
       coreSql = StringUtil.concat("ID,SN,REV,RR,RT,RIT,HASH FROM CERT WHERE IID=",
           Integer.toString(caId), " AND ID>=?");
-    } else if (dbControl == DbControl.XIPKI_CA_v4) {
+    } else if (dbType == DbType.XIPKI_CA_v4) {
       coreSql = StringUtil.concat("ID,SN,REV,RR,RT,RIT,",
           (certhashAlgo == HashAlgo.SHA1 ? "SHA1" : "CERT"),
           " FROM CERT WHERE CA_ID=", Integer.toString(caId), " AND ID>=?");
     } else {
-      throw new IllegalArgumentException("unknown dbControl " + dbControl);
+      throw new IllegalArgumentException("unknown dbControl " + dbType);
     }
     this.selectCertSql = datasource.buildSelectFirstSql(numPerSelect, "ID ASC", coreSql);
 
@@ -237,7 +238,7 @@ class RefDigestReader implements Closeable {
     return caId;
   }
 
-  public static RefDigestReader getInstance(DataSourceWrapper datasource, DbControl dbControl,
+  public static RefDigestReader getInstance(DataSourceWrapper datasource, DbType dbType,
       HashAlgo certhashAlgo, int caId, int numBlocksToRead, int numPerSelect, AtomicBoolean stopMe)
       throws Exception {
     Args.notNull(datasource, "datasource");
@@ -255,14 +256,14 @@ class RefDigestReader implements Closeable {
 
       String tblCa;
       String colCaId;
-      if (dbControl == DbControl.XIPKI_OCSP_v4) {
+      if (dbType == DbType.XIPKI_OCSP_v4) {
         tblCa = "ISSUER";
         colCaId = "IID";
-      } else if (dbControl == DbControl.XIPKI_CA_v4) {
+      } else if (dbType == DbType.XIPKI_CA_v4) {
         tblCa = "CA";
         colCaId = "CA_ID";
       } else {
-        throw new IllegalArgumentException("unknown dbControl " + dbControl);
+        throw new IllegalArgumentException("unknown dbControl " + dbType);
       }
 
       sql = "SELECT CERT FROM " + tblCa + " WHERE ID=" + caId;
@@ -287,7 +288,7 @@ class RefDigestReader implements Closeable {
 
       RefDigestReader reader = new RefDigestReader(datasource, caCert,
           totalAccount, minId, numBlocksToRead, stopMe);
-      reader.init(dbControl, certhashAlgo, caId, numPerSelect);
+      reader.init(dbType, certhashAlgo, caId, numPerSelect);
       return reader;
     } catch (SQLException ex) {
       throw datasource.translate(sql, ex);

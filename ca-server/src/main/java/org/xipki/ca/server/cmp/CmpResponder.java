@@ -137,6 +137,7 @@ import org.xipki.ca.api.mgmt.CmpControl;
 import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.ca.api.mgmt.PermissionConstants;
 import org.xipki.ca.api.mgmt.RequestorInfo;
+import org.xipki.ca.api.mgmt.RequestorInfo.CmpRequestorInfo;
 import org.xipki.ca.server.CaAuditConstants;
 import org.xipki.ca.server.CaInfo;
 import org.xipki.ca.server.CaManagerImpl;
@@ -149,10 +150,11 @@ import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.CrlReason;
 import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.EdECConstants;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.ObjectIdentifiers.Xipki;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityConstants;
-import org.xipki.security.ObjectIdentifiers.Xipki;
 import org.xipki.security.cmp.CmpUtf8Pairs;
 import org.xipki.security.cmp.CmpUtil;
 import org.xipki.security.util.AlgorithmUtil;
@@ -170,12 +172,155 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 /**
- * TODO.
+ * CMP responder.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class CmpResponder extends BaseCmpResponder {
+
+  private static class PendingCertificatePool {
+
+    private static class MyEntry {
+
+      private final BigInteger certReqId;
+
+      private final long waitForConfirmTill;
+
+      private final CertificateInfo certInfo;
+
+      private final byte[] certHash;
+
+      MyEntry(BigInteger certReqId, long waitForConfirmTill, CertificateInfo certInfo) {
+        this.certReqId = Args.notNull(certReqId, "certReqId");
+        this.certInfo = Args.notNull(certInfo, "certInfo");
+        this.waitForConfirmTill = waitForConfirmTill;
+        this.certHash = HashAlgo.SHA1.hash(certInfo.getCert().getEncodedCert());
+      }
+
+      @Override
+      public int hashCode() {
+        return certReqId.hashCode() + 961 * (int) waitForConfirmTill + 31 * certInfo.hashCode();
+      }
+
+      @Override
+      public boolean equals(Object obj) {
+        if (this == obj) {
+          return true;
+        } else if (!(obj instanceof MyEntry)) {
+          return false;
+        }
+
+        MyEntry another = (MyEntry) obj;
+        return certReqId.equals(another.certReqId) && certInfo.equals(another.certInfo);
+      }
+
+    } // class MyEntry
+
+    private final Map<String, Set<MyEntry>> map = new HashMap<>();
+
+    PendingCertificatePool() {
+    }
+
+    void addCertificate(byte[] transactionId, BigInteger certReqId, CertificateInfo certInfo,
+        long waitForConfirmTill) {
+      Args.notNull(transactionId, "transactionId");
+      Args.notNull(certInfo, "certInfo");
+      if (certInfo.isAlreadyIssued()) {
+        return;
+      }
+
+      String hexTid = Hex.encode(transactionId);
+      MyEntry myEntry = new MyEntry(certReqId, waitForConfirmTill, certInfo);
+      synchronized (map) {
+        Set<MyEntry> entries = map.get(hexTid);
+        if (entries == null) {
+          entries = new HashSet<>();
+          map.put(hexTid, entries);
+        }
+        entries.add(myEntry);
+      }
+    }
+
+    CertificateInfo removeCertificate(byte[] transactionId, BigInteger certReqId, byte[] certHash) {
+      Args.notNull(transactionId, "transactionId");
+      Args.notNull(certReqId, "certReqId");
+      Args.notNull(certHash, "certHash");
+
+      String hexTid = Hex.encode(transactionId);
+      MyEntry retEntry = null;
+
+      synchronized (map) {
+        Set<MyEntry> entries = map.get(hexTid);
+        if (entries == null) {
+          return null;
+        }
+
+        for (MyEntry entry : entries) {
+          if (certReqId.equals(entry.certReqId)) {
+            retEntry = entry;
+            break;
+          }
+        }
+
+        if (retEntry != null) {
+          if (Arrays.equals(certHash, retEntry.certHash)) {
+            entries.remove(retEntry);
+
+            if (CollectionUtil.isEmpty(entries)) {
+              map.remove(hexTid);
+            }
+          }
+        }
+      }
+
+      return (retEntry == null) ? null : retEntry.certInfo;
+    }
+
+    Set<CertificateInfo> removeCertificates(byte[] transactionId) {
+      Args.notNull(transactionId, "transactionId");
+
+      String hexId = Hex.encode(transactionId);
+      Set<MyEntry> entries;
+      synchronized  (map) {
+        entries = map.remove(hexId);
+      }
+
+      if (entries == null) {
+        return null;
+      }
+
+      Set<CertificateInfo> ret = new HashSet<>();
+      for (MyEntry myEntry :entries) {
+        ret.add(myEntry.certInfo);
+      }
+      return ret;
+    }
+
+    Set<CertificateInfo> removeConfirmTimeoutedCertificates() {
+      synchronized (map) {
+        if (CollectionUtil.isEmpty(map)) {
+          return null;
+        }
+
+        long now = System.currentTimeMillis();
+
+        Set<CertificateInfo> ret = new HashSet<>();
+
+        for (String tid : map.keySet()) {
+          Set<MyEntry> entries = map.get(tid);
+          for (MyEntry entry : entries) {
+            if (entry.waitForConfirmTill < now) {
+              ret.add(entry.certInfo);
+            }
+          }
+        }
+        return ret;
+      }
+    }
+
+  }
 
   private class PendingPoolCleaner implements Runnable {
 

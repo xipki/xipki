@@ -47,7 +47,8 @@ import org.xipki.util.StringUtil;
 import com.alibaba.fastjson.JSON;
 
 /**
- * TODO.
+ * Database exporter of OCSP CertStore.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

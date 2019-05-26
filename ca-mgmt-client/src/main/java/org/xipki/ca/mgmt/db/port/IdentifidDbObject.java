@@ -21,7 +21,8 @@ import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 
 /**
- * TODO.
+ * CA configuration entry with database table id.
+ *
  * @author Lijun Liao
  */
 

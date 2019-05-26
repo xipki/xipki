@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server.impl.test;
+package org.xipki.ca.server;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
@@ -30,7 +30,8 @@ import org.junit.Test;
 import org.xipki.ca.server.PasswordHash;
 
 /**
- * TODO.
+ * PasswordHash test.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

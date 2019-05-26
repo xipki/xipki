@@ -36,7 +36,8 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Report of the comparison result of two databases.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

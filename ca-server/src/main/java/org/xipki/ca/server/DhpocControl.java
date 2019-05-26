@@ -47,6 +47,7 @@ import org.xipki.util.StringUtil;
 
 /**
  * DHPoc control.
+ *
  * @author Lijun Liao
  */
 public class DhpocControl {

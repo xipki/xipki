@@ -30,7 +30,8 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Database Schema Information. It contains the content of the table DBSCHEMA.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

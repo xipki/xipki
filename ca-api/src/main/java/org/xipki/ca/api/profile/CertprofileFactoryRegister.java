@@ -53,7 +53,8 @@ public class CertprofileFactoryRegister {
   }
 
   /**
-   * TODO.
+   * Whether Certprofile of given type can be created.
+   *
    * @param type
    *          Type of the certificate profile. Must not be {@code null}.
    * @return whether certificate profile of this type can be created.
@@ -68,7 +69,8 @@ public class CertprofileFactoryRegister {
   }
 
   /**
-   * TODO.
+   * Create new Certprofile of given type.
+   *
    * @param type
    *          Type of the certificate. Must not be {@code null}.
    * @return new certificate profile.

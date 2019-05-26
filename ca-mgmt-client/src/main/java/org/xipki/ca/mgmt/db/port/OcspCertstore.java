@@ -24,7 +24,8 @@ import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 
 /**
- * TODO.
+ * OCSP CertStore.
+ *
  * @author Lijun Liao
  */
 

@@ -22,7 +22,8 @@ import org.xipki.audit.AuditStatus;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Response Audit Exception.
+ *
  * @author Lijun Liao
  * @since 3.0.1
  */

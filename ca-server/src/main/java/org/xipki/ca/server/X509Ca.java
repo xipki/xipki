@@ -141,8 +141,6 @@ import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.KeypairGenControl;
-import org.xipki.ca.server.cmp.CmpRequestorInfo;
-import org.xipki.ca.server.store.CertStore;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
@@ -170,7 +168,8 @@ import org.xipki.util.StringUtil;
 import org.xipki.util.Validity;
 
 /**
- * TODO.
+ * X509CA.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -382,6 +381,23 @@ public class X509Ca implements Closeable {
 
   } // class SuspendedCertsRevoker
 
+  private static class OperationExceptionWithIndex extends OperationException {
+
+    private static final long serialVersionUID = 1L;
+
+    private final int index;
+
+    public OperationExceptionWithIndex(int index, OperationException underlying) {
+      super(underlying.getErrorCode(), underlying.getMessage());
+      this.index = index;
+    }
+
+    public int getIndex() {
+      return index;
+    }
+
+  }
+
   private static final TimeZone TIMEZONE_UTC = TimeZone.getTimeZone("UTC");
 
   private static final long MS_PER_SECOND = 1000L;
@@ -551,10 +567,10 @@ public class X509Ca implements Closeable {
     return certstore.getCert(subjectName, transactionId);
   }
 
-  public KnowCertResult knowsCert(X509Certificate cert) throws OperationException {
+  public CertStore.KnowCertResult knowsCert(X509Certificate cert) throws OperationException {
     Args.notNull(cert, "cert");
     if (!caInfo.getSubject().equals(X509Util.getRfc4519Name(cert.getIssuerX500Principal()))) {
-      return KnowCertResult.UNKNOWN;
+      return CertStore.KnowCertResult.UNKNOWN;
     }
 
     return certstore.knowsCertForSerial(caIdent, cert.getSerialNumber());
@@ -589,7 +605,8 @@ public class X509Ca implements Closeable {
     return (name == null) ? null : new NameId(userId, name);
   }
 
-  public ByUserRequestorInfo getByUserRequestor(NameId userIdent) throws OperationException {
+  public RequestorInfo.ByUserRequestorInfo getByUserRequestor(NameId userIdent)
+      throws OperationException {
     MgmtEntry.CaHasUser caHasUser = certstore.getCaHasUser(caIdent, userIdent);
     return (caHasUser == null) ? null : caManager.createByUserRequestor(caHasUser);
   }
@@ -998,13 +1015,13 @@ public class X509Ca implements Closeable {
     final int numEntries = 100;
     long startId = 1;
 
-    List<SerialWithId> serials;
+    List<CertStore.SerialWithId> serials;
     do {
       serials = certstore.getSerialNumbers(caIdent, notExpireAt, startId, numEntries, false,
           onlyCaCerts, onlyUserCerts);
 
       long maxId = 1;
-      for (SerialWithId sid : serials) {
+      for (CertStore.SerialWithId sid : serials) {
         if (sid.getId() > maxId) {
           maxId = sid.getId();
         }
@@ -1058,7 +1075,8 @@ public class X509Ca implements Closeable {
   }
 
   /**
-   * TODO.
+   * Publish certificate.
+   *
    * @param certInfo certificate to be published.
    * @return 0 for published successfully, 1 if could not be published to CA certstore and
    *     any publishers, 2 if could be published to CA certstore but not to all publishers.
@@ -1879,8 +1897,8 @@ public class X509Ca implements Closeable {
         CertWithDbId certWithMeta = new CertWithDbId(cert, encodedCert);
         ret = new CertificateInfo(certWithMeta, gct.privateKey, caIdent, caCert,
             gct.grantedPublicKeyData, gct.certprofile.getIdent(), requestor.getIdent());
-        if (requestor instanceof ByUserRequestorInfo) {
-          ret.setUser((((ByUserRequestorInfo) requestor).getUserId()));
+        if (requestor instanceof RequestorInfo.ByUserRequestorInfo) {
+          ret.setUser((((RequestorInfo.ByUserRequestorInfo) requestor).getUserId()));
         }
         ret.setReqType(reqType);
         ret.setTransactionId(transactionId);
@@ -2350,10 +2368,10 @@ public class X509Ca implements Closeable {
     long fpPublicKey = FpIdCalculator.hash(subjectPublicKeyData);
 
     if (update) {
-      CertStatus certStatus = certstore.getCertStatusForSubject(caIdent, grantedSubject);
-      if (certStatus == CertStatus.REVOKED) {
+      CertStore.CertStatus certStatus = certstore.getCertStatusForSubject(caIdent, grantedSubject);
+      if (certStatus == CertStore.CertStatus.REVOKED) {
         throw new OperationException(CERT_REVOKED);
-      } else if (certStatus == CertStatus.UNKNOWN) {
+      } else if (certStatus == CertStore.CertStatus.UNKNOWN) {
         throw new OperationException(UNKNOWN_CERT);
       }
     } else {
@@ -2438,7 +2456,7 @@ public class X509Ca implements Closeable {
     return profileNames.contains(certprofileName.toLowerCase());
   }
 
-  public CmpRequestorInfo getRequestor(X500Name requestorSender) {
+  public RequestorInfo.CmpRequestorInfo getRequestor(X500Name requestorSender) {
     Set<MgmtEntry.CaHasRequestor> requestorEntries =
         caManager.getRequestorsForCa(caIdent.getName());
     if (CollectionUtil.isEmpty(requestorEntries)) {
@@ -2458,14 +2476,14 @@ public class X509Ca implements Closeable {
       }
 
       if (entry.getCert().getSubjectAsX500Name().equals(requestorSender)) {
-        return new CmpRequestorInfo(m, entry.getCert());
+        return new RequestorInfo.CmpRequestorInfo(m, entry.getCert());
       }
     }
 
     return null;
   } // method getRequestor
 
-  public CmpRequestorInfo getRequestor(X509Certificate requestorCert) {
+  public RequestorInfo.CmpRequestorInfo getRequestor(X509Certificate requestorCert) {
     Set<MgmtEntry.CaHasRequestor> requestorEntries =
         caManager.getRequestorsForCa(caIdent.getName());
     if (CollectionUtil.isEmpty(requestorEntries)) {
@@ -2480,7 +2498,7 @@ public class X509Ca implements Closeable {
       }
 
       if (entry.getCert().getCert().equals(requestorCert)) {
-        return new CmpRequestorInfo(m, entry.getCert());
+        return new RequestorInfo.CmpRequestorInfo(m, entry.getCert());
       }
     }
 
@@ -2488,7 +2506,7 @@ public class X509Ca implements Closeable {
   }
 
   // CHECKSTYLE:SKIP
-  public CmpRequestorInfo getMacRequestor(X500Name sender, byte[] senderKID) {
+  public RequestorInfo.CmpRequestorInfo getMacRequestor(X500Name sender, byte[] senderKID) {
     Set<MgmtEntry.CaHasRequestor> requestorEntries =
         caManager.getRequestorsForCa(caIdent.getName());
     if (CollectionUtil.isEmpty(requestorEntries)) {
@@ -2503,7 +2521,7 @@ public class X509Ca implements Closeable {
       }
 
       if (entry.matchKeyId(senderKID)) {
-        return new CmpRequestorInfo(m, entry.getPassword(), senderKID);
+        return new RequestorInfo.CmpRequestorInfo(m, entry.getPassword(), senderKID);
       }
     }
 

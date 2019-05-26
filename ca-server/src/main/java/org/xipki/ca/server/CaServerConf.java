@@ -39,7 +39,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
 
 /**
- * TODO.
+ * CA server configuration.
+ *
  * @author Lijun Liao
  */
 public class CaServerConf extends ValidatableConf {

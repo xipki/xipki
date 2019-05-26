@@ -43,7 +43,8 @@ import org.xipki.util.http.SslContextConf;
 import com.alibaba.fastjson.JSON;
 
 /**
- * TODO.
+ * Certificate transparency (CT) log client.
+ *
  * @author Lijun Liao
  */
 public class CtLogClient {

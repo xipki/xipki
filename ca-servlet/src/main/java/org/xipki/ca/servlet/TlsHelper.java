@@ -30,6 +30,8 @@ import org.xipki.util.LruCache;
 import org.xipki.util.StringUtil;
 
 /**
+ * TLS helper.
+ * <p/>
  * For more details please refer to
  * http://httpd.apache.org/docs/2.2/mod/mod_ssl.html
  * http://www.zeitoun.net/articles/client-certificate-x509-authentication-behind-reverse-proxy/start

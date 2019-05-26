@@ -37,7 +37,8 @@ import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Worker for DigestDiff.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

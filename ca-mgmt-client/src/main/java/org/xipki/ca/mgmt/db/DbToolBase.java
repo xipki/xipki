@@ -46,7 +46,8 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Database tool base.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

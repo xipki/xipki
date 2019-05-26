@@ -27,7 +27,8 @@ import org.xipki.ca.api.publisher.CertPublisherFactory;
 import org.xipki.util.ObjectCreationException;
 
 /**
- * TODO.
+ * Factory of {@link OcspCertPublisher}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

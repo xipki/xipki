@@ -108,7 +108,8 @@ import org.xipki.util.Validity;
 import org.xipki.util.Validity.Unit;
 
 /**
- * TODO.
+ * CertProfiel with identifier.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -333,7 +334,8 @@ class IdentifiedCertprofile implements Closeable {
   }
 
   /**
-   * TODO.
+   * Get the extensions.
+   *
    * @param requestedSubject
    *          Subject requested subject. Must not be {@code null}.
    * @param grantedSubject

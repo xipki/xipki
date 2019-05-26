@@ -30,7 +30,7 @@ import org.xipki.util.StringUtil;
  * PBKDF2 salted password hashing.
  * @author: havoc AT defuse.ca, www: http://crackstation.net/hashing-security.htm
  */
-public class PasswordHash {
+class PasswordHash {
 
   // see 'http://stackoverflow.com/questions/22580853/reliable-implementation-of-pbkdf2-hmac-sha256-for-java'
   // public static final String PBKDF2_ALGORITHM = "PBKDF2WithHmacSHA1";

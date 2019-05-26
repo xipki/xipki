@@ -41,7 +41,8 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Database porter.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

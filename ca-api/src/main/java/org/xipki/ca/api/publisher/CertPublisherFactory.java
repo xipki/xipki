@@ -37,7 +37,7 @@ public interface CertPublisherFactory {
   Set<String> getSupportedTypes();
 
   /**
-   * TODO.
+   * Whether Publisher of given type can be created.
    * @param type
    *          Type of the publisher. Must not be {@code null}.
    * @return whether publisher of this type can be created.
@@ -45,7 +45,7 @@ public interface CertPublisherFactory {
   boolean canCreatePublisher(String type);
 
   /**
-   * TODO.
+   * Create new publisher of given type.
    * @param type
    *          Type of the publisher. Must not be {@code null}.
    * @return the new created publisher

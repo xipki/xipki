@@ -47,7 +47,8 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 
 /**
- * TODO.
+ * CRMF key wrapper.
+ *
  * @author Lijun Liao
  */
 

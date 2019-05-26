@@ -34,7 +34,8 @@ import org.xipki.util.Args;
 import org.xipki.util.FileOrValue;
 
 /**
- * TODO.
+ * CertPublisher with identifier.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

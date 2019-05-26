@@ -52,7 +52,8 @@ import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Actions to management certificates and CRLs.
+ *
  * @author Lijun Liao
  *
  */
@@ -373,10 +374,6 @@ public class CertActions {
     @Completion(CaCompleters.CertListSortByCompleter.class)
     private String orderByS;
 
-    /**
-     * TODO.
-     * @return comma-separated serial numbers (in hex).
-     */
     @Override
     protected Object execute0() throws Exception {
       Date validFrom = getDate(validFromS);

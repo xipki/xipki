@@ -56,7 +56,8 @@ import iaik.pkcs.pkcs11.constants.Functions;
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
 /**
- * TODO.
+ * PKCS#11 slot.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -440,7 +441,8 @@ public abstract class P11Slot implements Closeable {
   public abstract void close();
 
   /**
-   * TODO.
+   * Remove objects.
+   *
    * @param id
    *         Id of the objects to be deleted. At least one of id and label may not be {@code null}.
    * @param label
@@ -782,7 +784,8 @@ public abstract class P11Slot implements Closeable {
   }
 
   /**
-   * TODO.
+   * Remove certificates.
+   *
    * @param objectId
    *          Object identifier. Must not be {@code null}.
    * @throws P11TokenException

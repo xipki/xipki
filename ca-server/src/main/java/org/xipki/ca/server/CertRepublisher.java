@@ -32,14 +32,14 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
-import org.xipki.ca.server.store.CertStore;
 import org.xipki.security.X509Cert;
 import org.xipki.util.LogUtil;
 import org.xipki.util.Args;
 import org.xipki.util.ProcessLog;
 
 /**
- * TODO.
+ * Publish certificates.
+ *
  * @author Lijun Liao
  * @since 2.1.0
  */
@@ -61,13 +61,13 @@ class CertRepublisher {
 
   private class SerialWithIdQueueEntry implements QueueEntry {
 
-    private final SerialWithId serialWithId;
+    private final CertStore.SerialWithId serialWithId;
 
-    public SerialWithIdQueueEntry(SerialWithId serialWithId) {
+    public SerialWithIdQueueEntry(CertStore.SerialWithId serialWithId) {
       this.serialWithId = Args.notNull(serialWithId, "serialWithId");
     }
 
-    public SerialWithId serialWithId() {
+    public CertStore.SerialWithId serialWithId() {
       return serialWithId;
     }
 
@@ -86,11 +86,11 @@ class CertRepublisher {
       long startId = 1;
 
       try {
-        List<SerialWithId> serials;
+        List<CertStore.SerialWithId> serials;
         do {
           serials = certstore.getSerialNumbers(ca, startId, numEntries, onlyRevokedCerts);
           long maxId = 1;
-          for (SerialWithId sid : serials) {
+          for (CertStore.SerialWithId sid : serials) {
             if (sid.getId() > maxId) {
               maxId = sid.getId();
             }
@@ -149,7 +149,7 @@ class CertRepublisher {
           break;
         }
 
-        SerialWithId sid = ((SerialWithIdQueueEntry) entry).serialWithId();
+        CertStore.SerialWithId sid = ((SerialWithIdQueueEntry) entry).serialWithId();
 
         CertificateInfo certInfo;
 

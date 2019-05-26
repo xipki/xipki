@@ -54,7 +54,8 @@ import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 
 /**
- * TODO.
+ * Util class of CA.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

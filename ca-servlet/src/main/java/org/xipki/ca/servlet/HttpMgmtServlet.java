@@ -58,7 +58,8 @@ import org.xipki.util.IoUtil;
 import com.alibaba.fastjson.JSON;
 
 /**
- * TODO.
+ * CA management servlet.
+ *
  * @author Lijun Liao
  * @since 3.0.1
  */

@@ -36,7 +36,8 @@ import org.xipki.util.Base64;
 import com.alibaba.fastjson.JSON;
 
 /**
- * TODO.
+ * Database importer of CA configuration.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

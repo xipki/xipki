@@ -23,7 +23,8 @@ import java.util.Map;
 import org.xipki.ca.api.NameId;
 
 /**
- * TODO.
+ * Container of NameId of CA management entries.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

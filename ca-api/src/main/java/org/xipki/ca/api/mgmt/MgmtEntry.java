@@ -305,9 +305,6 @@ public abstract class MgmtEntry {
     }
 
     public void setRevokeSuspendedControl(RevokeSuspendedControl revokeSuspendedControl) {
-      if (revokeSuspendedControl == null) {
-        new Exception("LIAO").printStackTrace(); // FIXME
-      }
       this.revokeSuspendedControl = revokeSuspendedControl;
     }
 

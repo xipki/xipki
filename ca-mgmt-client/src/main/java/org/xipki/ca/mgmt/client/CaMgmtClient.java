@@ -66,7 +66,8 @@ import org.xipki.util.http.SslContextConf;
 import com.alibaba.fastjson.JSON;
 
 /**
- * TODO.
+ * CA management client via REST API.
+ *
  * @author Lijun Liao
  */
 

@@ -18,7 +18,8 @@
 package org.xipki.ca.server;
 
 /**
- * TODO.
+ * Constants used to identify the audit event.
+ *
  * @author Lijun Liao
  * @since 3.0.1
  */

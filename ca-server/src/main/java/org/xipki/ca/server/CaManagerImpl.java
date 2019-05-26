@@ -90,9 +90,9 @@ import org.xipki.ca.api.profile.CertprofileFactoryRegister;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertPublisherFactoryRegister;
+import org.xipki.ca.server.CaManagerQueryExecutor.SystemEvent;
 import org.xipki.ca.server.SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.ca.server.cmp.CmpResponder;
-import org.xipki.ca.server.store.CertStore;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceConf;
 import org.xipki.datasource.DataSourceFactory;
@@ -126,8 +126,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 
 /**
- * TODO: unify the LOG, make sure that all events are audited even exception is thrown.
- * TODO.
+ * Manages the CA system.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -233,7 +233,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   private final CaIdNameMap idNameMap = new CaIdNameMap();
 
-  private ByCaRequestorInfo byCaRequestor;
+  private RequestorInfo byCaRequestor;
 
   private NameId byUserRequestorId;
 
@@ -904,7 +904,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       if (RequestorInfo.NAME_BY_CA.equals(name)) {
         Integer id = queryExecutor.getRequestorId(name);
         NameId ident = new NameId(id, name);
-        byCaRequestor = new ByCaRequestorInfo(ident);
+        byCaRequestor = new RequestorInfo.ByCaRequestorInfo(ident);
         idNameMap.addRequestor(ident);
       } else if (RequestorInfo.NAME_BY_USER.equals(name)) {
         Integer id = queryExecutor.getRequestorId(name);
@@ -1127,8 +1127,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
   }
 
-  public ByUserRequestorInfo createByUserRequestor(MgmtEntry.CaHasUser caHasUser) {
-    return new ByUserRequestorInfo(byUserRequestorId, caHasUser);
+  public RequestorInfo.ByUserRequestorInfo createByUserRequestor(MgmtEntry.CaHasUser caHasUser) {
+    return new RequestorInfo.ByUserRequestorInfo(byUserRequestorId, caHasUser);
   }
 
   @Override

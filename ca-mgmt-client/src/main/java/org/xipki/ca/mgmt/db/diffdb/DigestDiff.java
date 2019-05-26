@@ -45,7 +45,8 @@ import org.xipki.util.ProcessLog;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Compare content of two databases.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -60,9 +61,9 @@ class DigestDiff {
 
   private final DataSourceWrapper targetDatasource;
 
-  private final DbControl refDbControl;
+  private final DbType refDbType;
 
-  private final DbControl targetDbControl;
+  private final DbType targetDbType;
 
   private final HashAlgo certhashAlgo;
 
@@ -86,10 +87,10 @@ class DigestDiff {
     this.stopMe = Args.notNull(stopMe, "stopMe");
     this.numPerSelect = Args.positive(numPerSelect, "numPerSelect");
 
-    this.refDbControl = detectDbControl(refDatasource);
-    this.targetDbControl = detectDbControl(targetDatasource);
+    this.refDbType = detectDbControl(refDatasource);
+    this.targetDbType = detectDbControl(targetDatasource);
 
-    if (refDbControl == DbControl.XIPKI_OCSP_v4) {
+    if (refDbType == DbType.XIPKI_OCSP_v4) {
       HashAlgo refAlgo = detectOcspDbCerthashAlgo(refDatasource);
       HashAlgo targetAlgo = detectOcspDbCerthashAlgo(targetDatasource);
       if (refAlgo != targetAlgo) {
@@ -98,10 +99,10 @@ class DigestDiff {
             refAlgo, ") and targetDataSource (", targetAlgo, ")"));
       }
       this.certhashAlgo = refAlgo;
-    } else if (refDbControl == DbControl.XIPKI_CA_v4) {
+    } else if (refDbType == DbType.XIPKI_CA_v4) {
       this.certhashAlgo = HashAlgo.SHA1;
     } else {
-      throw new IllegalStateException("should not reach here, unknown dbContro " + refDbControl);
+      throw new IllegalStateException("should not reach here, unknown dbContro " + refDbType);
     }
 
     // number of threads
@@ -122,17 +123,17 @@ class DigestDiff {
   }
 
   public void diff() throws Exception {
-    Map<Integer, byte[]> caIdCertMap = getCas(targetDatasource, targetDbControl);
+    Map<Integer, byte[]> caIdCertMap = getCas(targetDatasource, targetDbType);
 
     List<Integer> refCaIds = new LinkedList<>();
 
     String refSql;
-    if (refDbControl == DbControl.XIPKI_OCSP_v4) {
+    if (refDbType == DbType.XIPKI_OCSP_v4) {
       refSql = "SELECT ID FROM ISSUER";
-    } else if (refDbControl == DbControl.XIPKI_CA_v4) {
+    } else if (refDbType == DbType.XIPKI_CA_v4) {
       refSql = "SELECT ID FROM CA";
     } else {
-      throw new IllegalStateException("invalid refDbControl " + refDbControl);
+      throw new IllegalStateException("invalid refDbControl " + refDbType);
     }
 
     Statement refStmt = null;
@@ -156,7 +157,7 @@ class DigestDiff {
 
     final int numBlocksToRead = numTargetThreads * 3 / 2;
     for (Integer refCaId : refCaIds) {
-      RefDigestReader refReader = RefDigestReader.getInstance(refDatasource, refDbControl,
+      RefDigestReader refReader = RefDigestReader.getInstance(refDatasource, refDbType,
           certhashAlgo, refCaId, numBlocksToRead, numPerSelect, stopMe);
       diffSingleCa(refReader, caIdCertMap);
     }
@@ -204,7 +205,7 @@ class DigestDiff {
       return;
     }
 
-    TargetDigestRetriever target = null;
+    TargetDigestReader target = null;
 
     try {
       reporter.start();
@@ -213,8 +214,8 @@ class DigestDiff {
           "Processing certificates of CA \n\t'" + refReader.getCaSubjectName() + "'");
       processLog.printHeader();
 
-      target = new TargetDigestRetriever(revokedOnly, processLog, refReader, reporter,
-          targetDatasource, targetDbControl, certhashAlgo, caId, numPerSelect,
+      target = new TargetDigestReader(revokedOnly, processLog, refReader, reporter,
+          targetDatasource, targetDbType, certhashAlgo, caId, numPerSelect,
           numTargetThreads, stopMe);
 
       target.awaitTerminiation();
@@ -233,16 +234,16 @@ class DigestDiff {
     }
   } // method diffSingleCa
 
-  private static Map<Integer, byte[]> getCas(DataSourceWrapper datasource, DbControl dbControl)
+  private static Map<Integer, byte[]> getCas(DataSourceWrapper datasource, DbType dbType)
       throws DataAccessException {
     // get a list of available CAs in the target database
     String sql = "SELECT ID,CERT FROM ";
-    if (dbControl == DbControl.XIPKI_CA_v4) {
+    if (dbType == DbType.XIPKI_CA_v4) {
       sql += "CA";
-    } else if (dbControl == DbControl.XIPKI_OCSP_v4) {
+    } else if (dbType == DbType.XIPKI_OCSP_v4) {
       sql += "ISSUER";
     } else {
-      throw new IllegalArgumentException("unknown dbControl " + dbControl);
+      throw new IllegalArgumentException("unknown dbType " + dbType);
     }
 
     Statement stmt = datasource.createStatement();
@@ -262,13 +263,13 @@ class DigestDiff {
     return caIdCertMap;
   }
 
-  public static DbControl detectDbControl(DataSourceWrapper datasource) throws DataAccessException {
+  public static DbType detectDbControl(DataSourceWrapper datasource) throws DataAccessException {
     Connection conn = datasource.getConnection();
     try {
       if (datasource.tableExists(conn, "CA")) {
-        return DbControl.XIPKI_CA_v4;
+        return DbType.XIPKI_CA_v4;
       } else if (datasource.tableExists(conn, "ISSUER")) {
-        return DbControl.XIPKI_OCSP_v4;
+        return DbType.XIPKI_OCSP_v4;
       } else {
         throw new IllegalArgumentException("unknown database schema");
       }

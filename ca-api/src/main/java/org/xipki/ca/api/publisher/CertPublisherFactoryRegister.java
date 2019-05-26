@@ -30,7 +30,8 @@ import org.xipki.util.ObjectCreationException;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Register of CertPublisherFacotries.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -42,7 +43,8 @@ public class CertPublisherFactoryRegister {
   private ConcurrentLinkedDeque<CertPublisherFactory> factories = new ConcurrentLinkedDeque<>();
 
   /**
-   * TODO.
+   * Whether publisher of given type can be created.
+   *
    * @param type
    *          Type of the publisher. Must not be {@code null}.
    * @return whether publisher of this type can be created.
@@ -57,7 +59,8 @@ public class CertPublisherFactoryRegister {
   }
 
   /**
-   * TODO.
+   * Create new publisher of given type.
+   *
    * @param type
    *          Type of the publisher. Must not be {@code null}.
    * @return new publisher.

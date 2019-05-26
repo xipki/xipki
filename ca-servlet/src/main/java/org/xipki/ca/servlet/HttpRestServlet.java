@@ -42,7 +42,8 @@ import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
 
 /**
- * TODO.
+ * REST API exception.
+ *
  * @author Lijun Liao
  * @since 3.0.1
  */

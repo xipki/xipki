@@ -20,7 +20,8 @@ package org.xipki.ca.mgmt.db.diffdb;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * DigestEntry with the id and caId in database.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

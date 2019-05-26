@@ -48,7 +48,8 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Publish certificates to XiPKI OCSP database.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

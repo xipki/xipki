@@ -66,7 +66,8 @@ import org.xipki.util.RandomUtil;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * REST API responder.
+ *
  * @author Lijun Liao
  * @since 3.0.1
  */

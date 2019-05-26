@@ -15,33 +15,16 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server;
+package org.xipki.ca.mgmt.db.diffdb;
 
 /**
- * TODO.
+ * Database type.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class KnowCertResult {
-
-  public static final KnowCertResult UNKNOWN = new KnowCertResult(false, null);
-
-  private final boolean known;
-
-  private final Integer userId;
-
-  public KnowCertResult(boolean known, Integer userId) {
-    this.known = known;
-    this.userId = userId;
-  }
-
-  public boolean isKnown() {
-    return known;
-  }
-
-  public Integer getUserId() {
-    return userId;
-  }
-
+enum DbType {
+  XIPKI_CA_v4,
+  XIPKI_OCSP_v4;
 }

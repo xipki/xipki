@@ -24,7 +24,8 @@ import org.xipki.ca.api.mgmt.CaManager;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Random serial number generator.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

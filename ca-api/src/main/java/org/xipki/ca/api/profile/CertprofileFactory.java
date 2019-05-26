@@ -37,7 +37,8 @@ public interface CertprofileFactory {
   Set<String> getSupportedTypes();
 
   /**
-   * TODO.
+   * Whether Certprofile of given type can be created.
+   *
    * @param type
    *          Type of the certificate profile. Must not be {@code null}.
    * @return whether certificate profile of this type can be created.
@@ -45,7 +46,8 @@ public interface CertprofileFactory {
   boolean canCreateProfile(String type);
 
   /**
-   * TODO.
+   * Create new Certprofile of given type.
+   *
    * @param type
    *          Type of the certificate profile. Must not be {@code null}.
    * @return the new created certificate profile.

@@ -25,7 +25,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.xipki.ca.server.HttpRequestMetadataRetriever;
 
 /**
- * TODO.
+ * HTTP request metadata retriever.
+ *
  * @author Lijun Liao
  * @since 3.0.1
  */

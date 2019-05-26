@@ -40,7 +40,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 /**
- * TODO.
+ * Example Certprofile.
+ *
  * @author Lijun Liao
  */
 

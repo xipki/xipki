@@ -37,7 +37,8 @@ import org.xipki.util.LogUtil;
 import com.alibaba.fastjson.JSON;
 
 /**
- * TODO.
+ * Health check servlet.
+ *
  * @author Lijun Liao
  * @since 3.0.1
  */

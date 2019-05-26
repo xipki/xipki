@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server.store;
+package org.xipki.ca.server;
 
 import static org.xipki.ca.api.OperationException.ErrorCode.BAD_REQUEST;
 import static org.xipki.ca.api.OperationException.ErrorCode.CERT_REVOKED;
@@ -33,13 +33,16 @@ import java.security.cert.X509Certificate;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1Integer;
@@ -60,15 +63,6 @@ import org.xipki.ca.api.mgmt.CertListInfo;
 import org.xipki.ca.api.mgmt.CertListOrderBy;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.api.mgmt.MgmtEntry;
-import org.xipki.ca.server.CaIdNameMap;
-import org.xipki.ca.server.CaUtil;
-import org.xipki.ca.server.CertRevInfoWithSerial;
-import org.xipki.ca.server.CertStatus;
-import org.xipki.ca.server.DbSchemaInfo;
-import org.xipki.ca.server.KnowCertResult;
-import org.xipki.ca.server.PasswordHash;
-import org.xipki.ca.server.SerialWithId;
-import org.xipki.ca.server.UniqueIdGenerator;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.CertRevocationInfo;
@@ -85,12 +79,100 @@ import org.xipki.util.LruCache;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * CA database store.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class CertStore {
+
+  static enum CertStatus {
+
+    UNKNOWN,
+    REVOKED,
+    GOOD
+
+  }
+
+  private class DbSchemaInfo {
+    private final Map<String, String> variables = new HashMap<>();
+
+    public DbSchemaInfo(DataSourceWrapper datasource) throws DataAccessException {
+      Args.notNull(datasource, "datasource");
+      final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
+
+      Statement stmt = null;
+      ResultSet rs = null;
+
+      try {
+        stmt = datasource.createStatement();
+        if (stmt == null) {
+          throw new DataAccessException("could not create statement");
+        }
+
+        rs = stmt.executeQuery(sql);
+        while (rs.next()) {
+          String name = rs.getString("NAME");
+          String value = rs.getString("VALUE2");
+          variables.put(name, value);
+        }
+      } catch (SQLException ex) {
+        throw datasource.translate(sql, ex);
+      } finally {
+        datasource.releaseResources(stmt, rs);
+      }
+    } // constructor
+
+    public String variableValue(String variableName) {
+      return variables.get(Args.notNull(variableName, "variableName"));
+    }
+
+  }
+
+  static class KnowCertResult {
+
+    public static final KnowCertResult UNKNOWN = new KnowCertResult(false, null);
+
+    private final boolean known;
+
+    private final Integer userId;
+
+    public KnowCertResult(boolean known, Integer userId) {
+      this.known = known;
+      this.userId = userId;
+    }
+
+    public boolean isKnown() {
+      return known;
+    }
+
+    public Integer getUserId() {
+      return userId;
+    }
+
+  }
+
+  static class SerialWithId {
+
+    private long id;
+
+    private BigInteger serial;
+
+    public SerialWithId(long id, BigInteger serial) {
+      this.id = id;
+      this.serial = serial;
+    }
+
+    public BigInteger getSerial() {
+      return serial;
+    }
+
+    public long getId() {
+      return id;
+    }
+
+  }
 
   private static final Logger LOG = LoggerFactory.getLogger(CertStore.class);
 
@@ -1242,7 +1324,8 @@ public class CertStore {
   } // method getCertprofileForId
 
   /**
-   * TODO.
+   * Get certificate for given subject and transactionId.
+   *
    * @param subjectName Subject of Certificate or requested Subject.
    * @param transactionId will only be considered if there are more than one certificate
    *     matches the subject.

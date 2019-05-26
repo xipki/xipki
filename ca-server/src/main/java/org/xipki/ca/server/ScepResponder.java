@@ -62,6 +62,7 @@ import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.ca.api.mgmt.PermissionConstants;
+import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.mgmt.ScepControl;
 import org.xipki.ca.api.RequestType;
 import org.xipki.scep.crypto.ScepHashAlgo;
@@ -90,7 +91,8 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * SCEP responder.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  *
@@ -232,7 +234,7 @@ public class ScepResponder {
   }
 
   /**
-   * TODO.
+   * Set the maximal signing time bias in milliseconds.
    * @param ms signing time bias in milliseconds. non-positive value deactivate the check of
    *     signing time.
    */
@@ -497,7 +499,7 @@ public class ScepResponder {
             if (userIdent == null) {
               // up to draft-nourse-scep-23 the client sends all messages to enroll
               // certificate via MessageType PKCSReq
-              KnowCertResult knowCertRes = ca.knowsCert(reqSignatureCert);
+              CertStore.KnowCertResult knowCertRes = ca.knowsCert(reqSignatureCert);
               if (!knowCertRes.isKnown()) {
                 LOG.warn("tid={}: signature certificate is not trusted by the CA", tid);
                 throw FailInfoException.BAD_REQUEST;
@@ -513,7 +515,7 @@ public class ScepResponder {
             } // end if
           } // end if
 
-          ByUserRequestorInfo requestor = ca.getByUserRequestor(userIdent);
+          RequestorInfo.ByUserRequestorInfo requestor = ca.getByUserRequestor(userIdent);
           checkUserPermission(requestor, certprofileName);
 
           byte[] tidBytes = getTransactionIdBytes(tid);
@@ -681,7 +683,8 @@ public class ScepResponder {
     return ci;
   } // method encodeResponse
 
-  private static void checkUserPermission(ByUserRequestorInfo requestor, String certprofile)
+  private static void checkUserPermission(
+      RequestorInfo.ByUserRequestorInfo requestor, String certprofile)
       throws OperationException {
     int permission = PermissionConstants.ENROLL_CERT;
     if (!requestor.isPermitted(permission)) {

@@ -55,6 +55,7 @@ import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditStatus;
 import org.xipki.ca.api.mgmt.CmpControl;
 import org.xipki.ca.api.mgmt.RequestorInfo;
+import org.xipki.ca.api.mgmt.RequestorInfo.CmpRequestorInfo;
 import org.xipki.ca.server.CaAuditConstants;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
@@ -68,7 +69,8 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.RandomUtil;
 
 /**
- * TODO.
+ * Base CMP responder.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -103,7 +105,8 @@ abstract class BaseCmpResponder {
   }
 
   /**
-   * TODO.
+   * Get the CMP control.
+   *
    * @return never returns {@code null}.
    */
   protected abstract CmpControl getCmpControl();

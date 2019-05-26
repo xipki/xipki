@@ -48,7 +48,8 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * XiPKI OCSP database query executor.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

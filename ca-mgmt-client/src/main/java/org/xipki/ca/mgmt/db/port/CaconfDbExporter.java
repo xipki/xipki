@@ -36,7 +36,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 
 /**
- * TODO.
+ * Database exporter of CA configuration.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

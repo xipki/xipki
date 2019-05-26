@@ -37,7 +37,8 @@ import org.xipki.shell.DynamicEnumCompleter;
 import org.xipki.shell.EnumCompleter;
 
 /**
- * TODO.
+ * Completers for the CA actions.
+ *
  * @author Lijun Liao
  */
 public class CaCompleters {

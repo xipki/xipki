@@ -26,7 +26,8 @@ import org.xipki.security.HashAlgo;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Base class for the OCSP CertStore database importer.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

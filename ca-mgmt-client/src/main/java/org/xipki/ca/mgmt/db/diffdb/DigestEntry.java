@@ -25,7 +25,9 @@ import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Certificate entry containing the serial number, revocation information and hash value of
+ * certificates.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
