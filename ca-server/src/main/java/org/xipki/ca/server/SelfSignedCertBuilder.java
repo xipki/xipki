@@ -19,7 +19,6 @@ package org.xipki.ca.server;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -192,7 +191,7 @@ class SelfSignedCertBuilder {
     PublicKey csrPublicKey;
     try {
       csrPublicKey = KeyUtil.generatePublicKey(publicKeyInfo);
-    } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
+    } catch (InvalidKeySpecException ex) {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
     }
 

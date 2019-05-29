@@ -18,7 +18,6 @@
 package org.xipki.security.pkcs11.proxy;
 
 import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -147,7 +146,7 @@ public class ProxyP11Slot extends P11Slot {
     SubjectPublicKeyInfo pkInfo = SubjectPublicKeyInfo.getInstance(resp);
     try {
       return KeyUtil.generatePublicKey(pkInfo);
-    } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
+    } catch (InvalidKeySpecException ex) {
       throw new P11TokenException("could not generate Public Key from SubjectPublicKeyInfo:"
           + ex.getMessage(), ex);
     }

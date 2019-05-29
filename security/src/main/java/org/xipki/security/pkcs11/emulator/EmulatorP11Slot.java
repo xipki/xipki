@@ -476,7 +476,7 @@ class EmulatorP11Slot extends P11Slot {
           new AlgorithmIdentifier(new ASN1ObjectIdentifier(algorithm)), encodedPoint);
       try {
         return KeyUtil.generatePublicKey(pkInfo);
-      } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
+      } catch (InvalidKeySpecException ex) {
         throw new P11TokenException("error  key algorithm " + algorithm);
       }
     } else {

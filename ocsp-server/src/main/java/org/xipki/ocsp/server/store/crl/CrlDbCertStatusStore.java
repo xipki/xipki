@@ -122,19 +122,18 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
       return;
     }
 
-    File updateMeFile = new File(dir, "UPDATEME");
-    if (!updateMeFile.exists()) {
-      LOG.info("The CRL will not be updated. Create new file {} to force the update",
-          updateMeFile.getAbsolutePath());
-      return;
-    }
-
     crlUpdateInProcess.set(true);
-
+    File updateMeFile = null;
     try {
+      updateMeFile = new File(dir, "UPDATEME");
+      if (!updateMeFile.exists()) {
+        LOG.info("The CRL will not be updated. Create new file {} to force the update",
+            updateMeFile.getAbsolutePath());
+        return;
+      }
+
       ImportCrl importCrl = new ImportCrl(datasource, dir);
       if (importCrl.importCrlToOcspDb()) {
-        updateMeFile.delete();
         LOG.info("updated CertStore {} successfully", name);
       } else {
         LOG.error("updating CertStore {} failed", name);
@@ -144,6 +143,9 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     } finally {
       crlUpdated = true;
       crlUpdateInProcess.set(false);
+      if (updateMeFile != null) {
+        updateMeFile.delete();
+      }
     }
   } // method initializeStore
 

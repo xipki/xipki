@@ -304,7 +304,7 @@ public class KeyUtil {
   }
 
   public static PublicKey generatePublicKey(SubjectPublicKeyInfo pkInfo)
-      throws NoSuchAlgorithmException, InvalidKeySpecException {
+      throws InvalidKeySpecException {
     Args.notNull(pkInfo, "pkInfo");
 
     X509EncodedKeySpec keyspec;

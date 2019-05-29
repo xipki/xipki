@@ -25,42 +25,27 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
-import java.security.cert.CRLException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509CRL;
-import java.security.cert.X509CRLEntry;
-import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
-import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
-
-import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.DERTaggedObject;
@@ -68,7 +53,6 @@ import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.ocsp.CrlID;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,6 +61,9 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.ocsp.server.store.DbCertStatusStore;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
+import org.xipki.security.CrlStreamParser;
+import org.xipki.security.CrlStreamParser.RevokedCert;
+import org.xipki.security.CrlStreamParser.RevokedCertsIterator;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
@@ -144,24 +131,15 @@ class ImportCrl {
 
   private final String sqlSelectIdCert;
 
-  private final X509CRL crl;
-
-  private final X509Certificate caCert;
-
-  private final BigInteger crlNumber;
+  private final Certificate caCert;
 
   private final DataSourceWrapper datasource;
 
-  // The CRL number of a DeltaCRL.
-  private final BigInteger baseCrlNumber;
-
-  private final boolean isDeltaCrl;
+  private final CrlStreamParser crl;
 
   private final CrlID crlId;
 
   private final X500Name caSubject;
-
-  private final X500Principal x500PrincipalCaSubject;
 
   private final byte[] caSpki;
 
@@ -170,10 +148,15 @@ class ImportCrl {
   private final HashAlgo certhashAlgo;
 
   private PreparedStatement psDeleteCert;
+
   private PreparedStatement psInsertCert;
+
   private PreparedStatement psInsertCertRev;
+
   private PreparedStatement psSelectIdCert;
+
   private PreparedStatement psUpdateCert;
+
   private PreparedStatement psUpdateCertRev;
 
   public ImportCrl(DataSourceWrapper datasource, String basedir)
@@ -196,25 +179,17 @@ class ImportCrl {
     LOG.info("UPDATE_CERTSTORE: a newer CRL is available");
 
     this.caCert = parseCert(caCertFile);
-    this.x500PrincipalCaSubject = caCert.getSubjectX500Principal();
-    this.caSubject = X500Name.getInstance(x500PrincipalCaSubject.getEncoded());
+    this.caSubject = caCert.getSubject();
     try {
       this.caSpki = X509Util.extractSki(caCert);
     } catch (CertificateEncodingException ex) {
       throw new ImportCrlException("could not extract AKI of CA certificate", ex);
     }
 
-    X509Certificate issuerCert = null;
+    Certificate issuerCert = null;
     File issuerCertFile = new File(basedir, "issuer.crt");
     if (issuerCertFile.exists()) {
       issuerCert = parseCert(issuerCertFile);
-    }
-
-    try {
-      this.crl = X509Util.parseCrl(crlFile);
-    } catch (CertificateException | CRLException ex) {
-      throw new ImportCrlException("could not parse X.509 CRL from file "
-          + crlFile + ": " + ex.getMessage(), ex);
     }
 
     File revFile = new File(basedir, "REVOCATION");
@@ -243,48 +218,33 @@ class ImportCrl {
 
     this.caRevInfo = caRevInfo;
 
-    X500Principal issuer = crl.getIssuerX500Principal();
+    this.crl = new CrlStreamParser(crlFile);
+    X500Name issuer = crl.getIssuer();
 
-    X509Certificate crlSignerCert;
-    if (x500PrincipalCaSubject.equals(issuer)) {
+    Certificate crlSignerCert;
+    if (caSubject.equals(issuer)) {
       crlSignerCert = caCert;
     } else {
       if (issuerCert == null) {
         throw new IllegalArgumentException("issuerCert may not be null");
       }
 
-      if (!issuerCert.getSubjectX500Principal().equals(issuer)) {
+      if (!issuerCert.getSubject().equals(issuer)) {
         throw new IllegalArgumentException("issuerCert and CRL do not match");
       }
       crlSignerCert = issuerCert;
     }
 
     // Verify the signature
-    try {
-      crl.verify(crlSignerCert.getPublicKey());
-    } catch (SignatureException | NoSuchProviderException | InvalidKeyException | CRLException
-        | NoSuchAlgorithmException ex) {
-      throw new ImportCrlException("could not verify signature of CRL", ex);
+    if (!crl.verifySignature(crlSignerCert.getSubjectPublicKeyInfo())) {
+      throw new ImportCrlException("signature of CRL is invalid");
     }
 
-    byte[] octetString = crl.getExtensionValue(Extension.cRLNumber.getId());
-    if (octetString == null) {
-      throw new IllegalArgumentException("CRL without CRLNumber is not supported");
+    if (crl.getCrlNumber() == null) {
+      throw new ImportCrlException("crlNumber is not specified");
     }
-    ASN1Integer asn1CrlNumber
-        = ASN1Integer.getInstance(DEROctetString.getInstance(octetString).getOctets());
-    this.crlNumber = asn1CrlNumber.getPositiveValue();
 
-    octetString = crl.getExtensionValue(Extension.deltaCRLIndicator.getId());
-    this.isDeltaCrl = (octetString != null);
-    if (this.isDeltaCrl) {
-      LOG.info("The CRL is a DeltaCRL");
-      byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
-      this.baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
-    } else {
-      LOG.info("The CRL is a full CRL");
-      this.baseCrlNumber = null;
-    }
+    LOG.info("The CRL is a {}", crl.isDeltaCrl() ? "DeltaCRL" : "FullCRL");
 
     // Construct CrlID
     ASN1EncodableVector vec = new ASN1EncodableVector();
@@ -296,8 +256,9 @@ class ImportCrl {
       }
     }
 
-    vec.add(new DERTaggedObject(true, 1, asn1CrlNumber));
-    vec.add(new DERTaggedObject(true, 2, new DERGeneralizedTime(crl.getThisUpdate())));
+    vec.add(new DERTaggedObject(true, 1, new ASN1Integer(crl.getCrlNumber())));
+    vec.add(new DERTaggedObject(true, 2,
+                new ASN1GeneralizedTime(crl.getThisUpdate())));
     this.crlId = CrlID.getInstance(new DERSequence(vec));
 
     this.sqlSelectIdCert = datasource.buildSelectFirstSql(1, CORE_SQL_SELECT_ID_CERT);
@@ -321,7 +282,7 @@ class ImportCrl {
       psUpdateCertRev = datasource.prepareStatement(conn, SQL_UPDATE_CERT_REV);
 
       importEntries(conn, caId);
-      if (!isDeltaCrl) {
+      if (!crl.isDeltaCrl()) {
         deleteEntriesNotUpdatedSince(conn, startTime);
       }
 
@@ -343,11 +304,12 @@ class ImportCrl {
     return false;
   }
 
-  private int importCa(Connection conn) throws DataAccessException, ImportCrlException {
+  private int importCa(Connection conn)
+      throws DataAccessException, ImportCrlException {
     byte[] encodedCaCert;
     try {
       encodedCaCert = caCert.getEncoded();
-    } catch (CertificateEncodingException ex) {
+    } catch (IOException ex) {
       throw new ImportCrlException("could not encode CA certificate");
     }
     String fpCaCert = HashAlgo.SHA1.base64Hash(encodedCaCert);
@@ -379,9 +341,11 @@ class ImportCrl {
     }
 
     boolean addNew = (issuerId == null);
+    BigInteger crlNumber = crl.getCrlNumber();
+    BigInteger baseCrlNumber = crl.getBaseCrlNumber();
     if (addNew) {
-      if (isDeltaCrl) {
-        throw new ImportCrlException("Given CRL is a deltaCRL for the full CRL with number "
+      if (crl.isDeltaCrl()) {
+        throw new ImportCrlException("Given CRL is a DeltaCRL for the full CRL with number "
             + baseCrlNumber + ", please import this full CRL first.");
       } else {
         crlInfo = new CrlInfo(crlNumber, null, crl.getThisUpdate(), crl.getNextUpdate(), crlId);
@@ -393,7 +357,7 @@ class ImportCrl {
         throw new ImportCrlException("Given CRL is not newer than existing CRL.");
       }
 
-      if (isDeltaCrl) {
+      if (crl.isDeltaCrl()) {
         BigInteger lastFullCrlNumber = crlInfo.getBaseCrlNumber();
         if (lastFullCrlNumber == null) {
           lastFullCrlNumber = crlInfo.getCrlNumber();
@@ -406,7 +370,7 @@ class ImportCrl {
       }
 
       crlInfo.setCrlNumber(crlNumber);
-      crlInfo.setBaseCrlNumber(isDeltaCrl ? baseCrlNumber : null);
+      crlInfo.setBaseCrlNumber(crl.isDeltaCrl() ? baseCrlNumber : null);
       crlInfo.setThisUpdate(crl.getThisUpdate());
       crlInfo.setNextUpdate(crl.getNextUpdate());
     }
@@ -424,12 +388,12 @@ class ImportCrl {
         sql = "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1C,CERT,REV_INFO,CRL_INFO)"
             + " VALUES(?,?,?,?,?,?,?,?)";
         ps = datasource.prepareStatement(conn, sql);
-        String subject = X509Util.getRfc4519Name(caCert.getSubjectX500Principal());
+        String subject = X509Util.getRfc4519Name(caCert.getSubject());
 
         ps.setInt(offset++, issuerId);
         ps.setString(offset++, subject);
-        ps.setLong(offset++, caCert.getNotBefore().getTime() / 1000);
-        ps.setLong(offset++, caCert.getNotAfter().getTime() / 1000);
+        ps.setLong(offset++, caCert.getStartDate().getDate().getTime() / 1000);
+        ps.setLong(offset++, caCert.getEndDate().getDate().getTime() / 1000);
         ps.setString(offset++, fpCaCert);
         ps.setString(offset++, Base64.encodeToString(encodedCaCert));
       } else {
@@ -460,40 +424,22 @@ class ImportCrl {
   }
 
   private void importEntries(Connection conn, int caId)
-      throws DataAccessException, ImportCrlException {
+      throws DataAccessException, ImportCrlException, IOException {
     AtomicLong maxId = new AtomicLong(datasource.getMax(conn, "CERT", "ID"));
 
+    boolean isDeltaCrl = crl.isDeltaCrl();
     // import the revoked information
-    Set<? extends X509CRLEntry> revokedCertList = crl.getRevokedCertificates();
-    if (revokedCertList != null) {
-      for (X509CRLEntry c : revokedCertList) {
-        X500Principal issuer = c.getCertificateIssuer();
-        BigInteger serial = c.getSerialNumber();
-
-        if (issuer != null) {
-          if (!x500PrincipalCaSubject.equals(issuer)) {
-            throw new ImportCrlException("invalid CRLEntry for certificate number " + serial);
-          }
+    try (RevokedCertsIterator revokedCertList = crl.revokedCertificates()) {
+      while (revokedCertList.hasNext()) {
+        RevokedCert revCert = revokedCertList.next();
+        BigInteger serial = revCert.getSerialNumber();
+        Date rt = revCert.getRevocationDate();
+        Date rit = revCert.getInvalidityDate();
+        CrlReason reason = revCert.getReason();
+        X500Name issuer = revCert.getCertificateIssuer();
+        if (issuer != null && !issuer.equals(caSubject)) {
+          throw new ImportCrlException("invalid CRLEntry for certificate number " + serial);
         }
-
-        Date rt = c.getRevocationDate();
-        Date rit = null;
-        byte[] extnValue = c.getExtensionValue(Extension.invalidityDate.getId());
-        if (extnValue != null) {
-          extnValue = extractCoreValue(extnValue);
-          ASN1GeneralizedTime genTime = DERGeneralizedTime.getInstance(extnValue);
-          try {
-            rit = genTime.getDate();
-          } catch (ParseException ex) {
-            throw new ImportCrlException(ex.getMessage(), ex);
-          }
-
-          if (rt.equals(rit)) {
-            rit = null;
-          }
-        }
-
-        CrlReason reason = CrlReason.fromReason(c.getRevocationReason());
 
         String sql = null;
         try {
@@ -550,10 +496,9 @@ class ImportCrl {
     // import the certificates
 
     // extract the certificate
-    byte[] extnValue =
-        crl.getExtensionValue(ObjectIdentifiers.Xipki.id_xipki_ext_crlCertset.getId());
+    byte[] extnValue = X509Util.getCoreExtValue(
+                          crl.getCrlExtensions(), ObjectIdentifiers.Xipki.id_xipki_ext_crlCertset);
     if (extnValue != null) {
-      extnValue = extractCoreValue(extnValue);
       ASN1Set asn1Set = DERSet.getInstance(extnValue);
       final int n = asn1Set.size();
 
@@ -667,16 +612,11 @@ class ImportCrl {
         }
       }
     }
-
   }
 
-  private static byte[] extractCoreValue(byte[] encodedExtensionValue) {
-    return ASN1OctetString.getInstance(encodedExtensionValue).getOctets();
-  }
-
-  private static X509Certificate parseCert(File certFile) throws ImportCrlException {
+  private static Certificate parseCert(File certFile) throws ImportCrlException {
     try {
-      return X509Util.parseCert(certFile);
+      return X509Util.parseBcCert(certFile);
     } catch (CertificateException | IOException ex) {
       throw new ImportCrlException("could not parse X.509 certificate from file "
           + certFile + ": " + ex.getMessage(), ex);

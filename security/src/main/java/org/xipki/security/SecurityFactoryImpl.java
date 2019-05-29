@@ -33,31 +33,20 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.RuntimeCryptoException;
-import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.operator.ContentVerifierProvider;
-import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
-import org.bouncycastle.operator.DigestAlgorithmIdentifierFinder;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
-import org.bouncycastle.operator.bc.BcDSAContentVerifierProviderBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCSException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolver;
-import org.xipki.security.bc.XiECContentVerifierProviderBuilder;
-import org.xipki.security.bc.XiEdDSAContentVerifierProvider;
-import org.xipki.security.bc.XiRSAContentVerifierProviderBuilder;
-import org.xipki.security.bc.XiXDHContentVerifierProvider;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
+import org.xipki.security.util.SignerUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
@@ -72,12 +61,6 @@ import org.xipki.util.ObjectCreationException;
 public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
   private static final Logger LOG = LoggerFactory.getLogger(SecurityFactoryImpl.class);
-
-  private static final DigestAlgorithmIdentifierFinder DIGESTALG_IDENTIFIER_FINDER =
-      new DefaultDigestAlgorithmIdentifierFinder();
-
-  private static final Map<String, BcContentVerifierProviderBuilder> VERIFIER_PROVIDER_BUILDER =
-      new HashMap<>();
 
   private int defaultSignerParallelism = 32;
 
@@ -128,40 +111,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
   @Override
   public ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey,
       DHSigStaticKeyCertPair ownerKeyAndCert) throws InvalidKeyException {
-    Args.notNull(publicKey, "publicKey");
-
-    String keyAlg = publicKey.getAlgorithm().toUpperCase();
-    if ("ED25519".equals(keyAlg) || "ED448".equals(keyAlg)) {
-      return new XiEdDSAContentVerifierProvider(publicKey);
-    } else if ("X25519".equals(keyAlg) || "X448".equals(keyAlg)) {
-      if (ownerKeyAndCert == null) {
-        throw new InvalidKeyException("ownerKeyAndCert is required but absent");
-      }
-      return new XiXDHContentVerifierProvider(publicKey, ownerKeyAndCert);
-    }
-
-    BcContentVerifierProviderBuilder builder = VERIFIER_PROVIDER_BUILDER.get(keyAlg);
-
-    if (builder == null) {
-      if ("RSA".equals(keyAlg)) {
-        builder = new XiRSAContentVerifierProviderBuilder(DIGESTALG_IDENTIFIER_FINDER);
-      } else if ("DSA".equals(keyAlg)) {
-        builder = new BcDSAContentVerifierProviderBuilder(DIGESTALG_IDENTIFIER_FINDER);
-      } else if ("EC".equals(keyAlg) || "ECDSA".equals(keyAlg)) {
-        builder = new XiECContentVerifierProviderBuilder(DIGESTALG_IDENTIFIER_FINDER);
-      } else {
-        throw new InvalidKeyException("unknown key algorithm of the public key " + keyAlg);
-      }
-      VERIFIER_PROVIDER_BUILDER.put(keyAlg, builder);
-    }
-
-    AsymmetricKeyParameter keyParam = KeyUtil.generatePublicKeyParameter(publicKey);
-    try {
-      return builder.build(keyParam);
-    } catch (OperatorCreationException ex) {
-      throw new InvalidKeyException("could not build ContentVerifierProvider: "
-          + ex.getMessage(), ex);
-    }
+    return SignerUtil.getContentVerifierProvider(publicKey, ownerKeyAndCert);
   }
 
   @Override
@@ -169,7 +119,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
       throws InvalidKeyException {
     try {
       return KeyUtil.generatePublicKey(subjectPublicKeyInfo);
-    } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
+    } catch (InvalidKeySpecException ex) {
       throw new InvalidKeyException(ex.getMessage(), ex);
     }
   }
@@ -199,8 +149,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
       PublicKey pk = KeyUtil.generatePublicKey(pkInfo);
       ContentVerifierProvider cvp = getContentVerifierProvider(pk, ownerKeyAndCert);
       return csr.isSignatureValid(cvp);
-    } catch (InvalidKeyException | PKCSException | NoSuchAlgorithmException
-        | InvalidKeySpecException ex) {
+    } catch (InvalidKeyException | PKCSException | InvalidKeySpecException ex) {
       LogUtil.error(LOG, ex, "could not validate POPO of CSR");
       return false;
     }

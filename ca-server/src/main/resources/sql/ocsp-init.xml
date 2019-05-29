@@ -99,6 +99,8 @@
       <column name="SUBJECT" type="${x500name.type}"
           remarks="subject of the certificate">
       </column>
+      <column name="NEXT_UPDATE" type="BIGINT"
+          remarks="next update, seconds since January 1, 1970, 00:00:00 GMT"/>
     </createTable>
     <addUniqueConstraint tableName="CERT" columnNames="IID, SN" constraintName="CONST_ISSUER_SN"/>
   </changeSet>

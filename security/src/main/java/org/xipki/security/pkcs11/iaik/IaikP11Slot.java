@@ -19,7 +19,6 @@ package org.xipki.security.pkcs11.iaik;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -890,7 +889,7 @@ class IaikP11Slot extends P11Slot {
             encodedPoint);
         try {
           return KeyUtil.generatePublicKey(pkInfo);
-        } catch (InvalidKeySpecException | NoSuchAlgorithmException ex) {
+        } catch (InvalidKeySpecException ex) {
           throw new XiSecurityException(ex.getMessage(), ex);
         }
       } else {

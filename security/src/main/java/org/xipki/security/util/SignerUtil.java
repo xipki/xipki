@@ -19,7 +19,9 @@ package org.xipki.security.util;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
@@ -37,11 +39,23 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.AsymmetricBlockCipher;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.engines.RSABlindedEngine;
+import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
 import org.bouncycastle.crypto.signers.PSSSigner;
+import org.bouncycastle.operator.ContentVerifierProvider;
+import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
+import org.bouncycastle.operator.DigestAlgorithmIdentifierFinder;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
+import org.bouncycastle.operator.bc.BcDSAContentVerifierProviderBuilder;
+import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.XiSecurityException;
+import org.xipki.security.bc.XiECContentVerifierProviderBuilder;
+import org.xipki.security.bc.XiEdDSAContentVerifierProvider;
+import org.xipki.security.bc.XiRSAContentVerifierProviderBuilder;
+import org.xipki.security.bc.XiXDHContentVerifierProvider;
 import org.xipki.util.Args;
 import org.xipki.util.Hex;
 
@@ -56,6 +70,12 @@ import org.xipki.util.Hex;
 public class SignerUtil {
 
   private static final Map<HashAlgo, byte[]> digestPkcsPrefix = new HashMap<>();
+
+  private static final DigestAlgorithmIdentifierFinder DIGESTALG_IDENTIFIER_FINDER =
+      new DefaultDigestAlgorithmIdentifierFinder();
+
+  private static final Map<String, BcContentVerifierProviderBuilder> VERIFIER_PROVIDER_BUILDER =
+      new HashMap<>();
 
   static {
     addDigestPkcsPrefix(HashAlgo.SHA1,     "3021300906052b0e03021a05000414");
@@ -359,6 +379,44 @@ public class SignerUtil {
   public static byte[] getDigestPkcsPrefix(HashAlgo hashAlgo) {
     byte[] bytes = digestPkcsPrefix.get(hashAlgo);
     return (bytes == null) ? null : Arrays.copyOf(bytes, bytes.length);
+  }
+
+  public static ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey,
+      DHSigStaticKeyCertPair ownerKeyAndCert) throws InvalidKeyException {
+    Args.notNull(publicKey, "publicKey");
+
+    String keyAlg = publicKey.getAlgorithm().toUpperCase();
+    if ("ED25519".equals(keyAlg) || "ED448".equals(keyAlg)) {
+      return new XiEdDSAContentVerifierProvider(publicKey);
+    } else if ("X25519".equals(keyAlg) || "X448".equals(keyAlg)) {
+      if (ownerKeyAndCert == null) {
+        throw new InvalidKeyException("ownerKeyAndCert is required but absent");
+      }
+      return new XiXDHContentVerifierProvider(publicKey, ownerKeyAndCert);
+    }
+
+    BcContentVerifierProviderBuilder builder = VERIFIER_PROVIDER_BUILDER.get(keyAlg);
+
+    if (builder == null) {
+      if ("RSA".equals(keyAlg)) {
+        builder = new XiRSAContentVerifierProviderBuilder(DIGESTALG_IDENTIFIER_FINDER);
+      } else if ("DSA".equals(keyAlg)) {
+        builder = new BcDSAContentVerifierProviderBuilder(DIGESTALG_IDENTIFIER_FINDER);
+      } else if ("EC".equals(keyAlg) || "ECDSA".equals(keyAlg)) {
+        builder = new XiECContentVerifierProviderBuilder(DIGESTALG_IDENTIFIER_FINDER);
+      } else {
+        throw new InvalidKeyException("unknown key algorithm of the public key " + keyAlg);
+      }
+      VERIFIER_PROVIDER_BUILDER.put(keyAlg, builder);
+    }
+
+    AsymmetricKeyParameter keyParam = KeyUtil.generatePublicKeyParameter(publicKey);
+    try {
+      return builder.build(keyParam);
+    } catch (OperatorCreationException ex) {
+      throw new InvalidKeyException("could not build ContentVerifierProvider: "
+          + ex.getMessage(), ex);
+    }
   }
 
 }

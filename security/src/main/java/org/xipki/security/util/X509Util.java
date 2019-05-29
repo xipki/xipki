@@ -72,6 +72,7 @@ import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.DSAParameter;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
@@ -434,18 +435,8 @@ public class X509Util {
   public static byte[] extractSki(org.bouncycastle.asn1.x509.Certificate cert)
       throws CertificateEncodingException {
     Args.notNull(cert, "cert");
-    Extension encodedSkiValue = cert.getTBSCertificate().getExtensions().getExtension(
+    return getCoreExtValue(cert.getTBSCertificate().getExtensions(),
         Extension.subjectKeyIdentifier);
-    if (encodedSkiValue == null) {
-      return null;
-    }
-
-    try {
-      return ASN1OctetString.getInstance(encodedSkiValue.getParsedValue()).getOctets();
-    } catch (IllegalArgumentException ex) {
-      throw new CertificateEncodingException("invalid extension SubjectKeyIdentifier: "
-          + ex.getMessage());
-    }
   }
 
   public static byte[] extractAki(X509Certificate cert) throws CertificateEncodingException {
@@ -563,6 +554,17 @@ public class X509Util {
       throw new CertificateEncodingException("invalid extension " + type.getId() + ": "
           + ex.getMessage());
     }
+  }
+
+  public static byte[] getCoreExtValue(Extensions extensions, ASN1ObjectIdentifier extnType) {
+    Args.notNull(extensions, "extensions");
+    Args.notNull(extnType, "extnType");
+    Extension extn = extensions.getExtension(extnType);
+    if (extn == null) {
+      return null;
+    }
+
+    return extn.getExtnValue().getOctets();
   }
 
   public static byte[] getCoreExtValue(X509AttributeCertificateHolder cert,
