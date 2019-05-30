@@ -47,10 +47,34 @@ public class CrlStreamParserTest {
   }
 
   @Test
-  public void parseCa1() throws Exception {
-    File crlFile = new File("src/test/resources/crls/ca1-crl.crl");
+  public void parseCrl1() throws Exception {
+    File crlFile = new File("src/test/resources/crls/crl-1/subcawithcrl1.crl");
     Certificate issuerSigner = X509Util.parseBcCert(
-        new File("src/test/resources/crls/ca1-cert.crt"));
+        new File("src/test/resources/crls/crl-1/ca.crt"));
+
+    CrlStreamParser parser = new CrlStreamParser(crlFile);
+    Assert.assertEquals("version", 1, parser.getVersion());
+    Assert.assertEquals("CRL number", BigInteger.valueOf(3), parser.getCrlNumber());
+
+    Assert.assertTrue("signature", parser.verifySignature(issuerSigner.getSubjectPublicKeyInfo()));
+
+    int numRevokedCerts = 0;
+
+    try (RevokedCertsIterator iterator = parser.revokedCertificates()) {
+      while (iterator.hasNext()) {
+        iterator.next();
+        numRevokedCerts++;
+      }
+    }
+
+    Assert.assertEquals("#revokedCertificates", 1, numRevokedCerts);
+  }
+
+  @Test
+  public void parseCrl2() throws Exception {
+    File crlFile = new File("src/test/resources/crls/crl-2/ca1-crl.crl");
+    Certificate issuerSigner = X509Util.parseBcCert(
+        new File("src/test/resources/crls/crl-2/ca1-cert.crt"));
 
     CrlStreamParser parser = new CrlStreamParser(crlFile);
     Assert.assertEquals("version", 1, parser.getVersion());
