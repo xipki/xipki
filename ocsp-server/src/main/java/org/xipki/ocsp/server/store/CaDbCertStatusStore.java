@@ -92,7 +92,7 @@ public class CaDbCertStatusStore extends OcspStore {
 
   private IssuerFilter issuerFilter;
 
-  private IssuerStore issuerStore;
+  private IssuerStore issuerStore = new IssuerStore();
 
   private HashAlgo certHashAlgo;
 
@@ -200,7 +200,7 @@ public class CaDbCertStatusStore extends OcspStore {
           caInfos.add(caInfoEntry);
         } // end while (rs.next())
 
-        this.issuerStore = new IssuerStore(caInfos);
+        this.issuerStore.setIssuers(caInfos);
         LOG.info("Updated issuers: {}", name);
       } finally {
         releaseDbResources(ps, rs);
@@ -251,7 +251,6 @@ public class CaDbCertStatusStore extends OcspStore {
       int reason = 0;
       long revTime = 0;
       long invalTime = 0;
-      long nextUpdateSec = 0;
 
       PreparedStatement ps = datasource.prepareStatement(sql);
 
@@ -291,8 +290,6 @@ public class CaDbCertStatusStore extends OcspStore {
                 invalTime = rs.getLong("RIT");
               }
             }
-
-            nextUpdateSec = rs.getLong("NEXT_UPDATE");
           }
         } // end if (rs.next())
       } catch (SQLException ex) {
@@ -302,10 +299,6 @@ public class CaDbCertStatusStore extends OcspStore {
       }
 
       Date nextUpdate = null;
-      if ((nextUpdateSec - System.currentTimeMillis() / 1000) > 120) {
-        // at least 2 minutes validity
-        nextUpdate = new Date(nextUpdateSec * 1000);
-      }
 
       if (unknown) {
         certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, nextUpdate);
@@ -445,14 +438,14 @@ public class CaDbCertStatusStore extends OcspStore {
     this.datasource = Args.notNull(datasource, "datasource");
 
     sqlCs = datasource.buildSelectFirstSql(1,
-        "NBEFORE,NAFTER,REV,RR,RT,RIT,NEXT_UPDATE FROM CERT WHERE CA_ID=? AND SN=?");
+        "NBEFORE,NAFTER,REV,RR,RT,RIT FROM CERT WHERE CA_ID=? AND SN=?");
     sqlCsNoRit = datasource.buildSelectFirstSql(1,
-        "NBEFORE,NAFTER,REV,RR,RT,NEXT_UPDATE FROM CERT WHERE CA_ID=? AND SN=?");
+        "NBEFORE,NAFTER,REV,RR,RT FROM CERT WHERE CA_ID=? AND SN=?");
 
     sqlCsWithCertHash = datasource.buildSelectFirstSql(1,
-        "NBEFORE,NAFTER,REV,RR,RT,RIT,SHA1,NEXT_UPDATE FROM CERT WHERE CA_ID=? AND SN=?");
+        "NBEFORE,NAFTER,REV,RR,RT,RIT,SHA1 FROM CERT WHERE CA_ID=? AND SN=?");
     sqlCsNoRitWithCertHash = datasource.buildSelectFirstSql(1,
-        "NBEFORE,NAFTER,REV,RR,RT,SHA1,NEXT_UPDATE FROM CERT WHERE CA_ID=? AND SN=?");
+        "NBEFORE,NAFTER,REV,RR,RT,SHA1 FROM CERT WHERE CA_ID=? AND SN=?");
 
     this.certHashAlgo = HashAlgo.SHA1;
 

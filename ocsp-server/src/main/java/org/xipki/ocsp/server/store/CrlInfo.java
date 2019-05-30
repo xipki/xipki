@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ocsp.server.store.crl;
+package org.xipki.ocsp.server.store;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -56,6 +56,8 @@ public class CrlInfo {
 
   private CrlID crlId;
 
+  private String encoded;
+
   public CrlInfo(String conf) {
     ConfPairs pairs = new ConfPairs(conf);
     String str = getNotBlankValue(pairs, CRL_NUMBER);
@@ -74,6 +76,7 @@ public class CrlInfo {
 
     str = getNotBlankValue(pairs, CRL_ID);
     this.crlId = CrlID.getInstance(Base64.decodeFast(str));
+    initEncoded();
   }
 
   private static final String getNotBlankValue(ConfPairs pairs, String name) {
@@ -91,9 +94,10 @@ public class CrlInfo {
     this.thisUpdate = Args.notNull(thisUpdate, "thisUpdate");
     this.nextUpdate = Args.notNull(nextUpdate, "nextUpdate");
     this.crlId = Args.notNull(crlId, "crlId");
+    initEncoded();
   }
 
-  public String getEncoded() throws IOException {
+  private void initEncoded() {
     ConfPairs pairs = new ConfPairs();
     pairs.putPair(CRL_NUMBER, crlNumber.toString(16));
     if (baseCrlNumber != null) {
@@ -101,48 +105,46 @@ public class CrlInfo {
     }
     pairs.putPair(THIS_UPDATE, DateUtil.toUtcTimeyyyyMMddhhmmss(thisUpdate));
     pairs.putPair(NEXT_UPDATE, DateUtil.toUtcTimeyyyyMMddhhmmss(nextUpdate));
-    pairs.putPair(CRL_ID, Base64.encodeToString(crlId.getEncoded()));
-    return pairs.getEncoded();
+    byte[] encodedCrlId;
+    try {
+      encodedCrlId = crlId.getEncoded();
+    } catch (IOException ex) {
+      throw new IllegalArgumentException("error encoding CrlID");
+    }
+    pairs.putPair(CRL_ID, Base64.encodeToString(encodedCrlId));
+    this.encoded = pairs.getEncoded();
+  }
+
+  public String getEncoded() {
+    return encoded;
   }
 
   public BigInteger getCrlNumber() {
     return crlNumber;
   }
 
-  public void setCrlNumber(BigInteger crlNumber) {
-    this.crlNumber = Args.notNull(crlNumber, "crlNumber");
-  }
-
   public BigInteger getBaseCrlNumber() {
     return baseCrlNumber;
-  }
-
-  public void setBaseCrlNumber(BigInteger baseCrlNumber) {
-    this.baseCrlNumber = baseCrlNumber;
   }
 
   public Date getThisUpdate() {
     return thisUpdate;
   }
 
-  public void setThisUpdate(Date thisUpdate) {
-    this.thisUpdate = Args.notNull(thisUpdate, "thisUpdate");
-  }
-
   public Date getNextUpdate() {
     return nextUpdate;
-  }
-
-  public void setNextUpdate(Date nextUpdate) {
-    this.nextUpdate = Args.notNull(nextUpdate, "nextUpdate");
   }
 
   public CrlID getCrlId() {
     return crlId;
   }
 
-  public void setCrlId(CrlID crlId) {
-    this.crlId = crlId;
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof CrlInfo)) {
+      return false;
+    }
+    return ((CrlInfo) obj).encoded.equals(encoded);
   }
 
 }

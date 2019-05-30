@@ -33,7 +33,7 @@
     </insert>
     <!-- table ISSUER -->
     <createTable tableName="ISSUER">
-      <column name="ID" type="INT">
+      <column name="ID" type="SMALLINT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="SUBJECT" type="${x500name.type}">
@@ -58,13 +58,21 @@
       <column name="CRL_INFO" type="VARCHAR(1000)"
           remarks="CRL information if this issuer is imported from a CRL"/>
     </createTable>
+    <createTable tableName="CRL_INFO">
+      <column name="ID" type="SMALLINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="INFO" type="VARCHAR(1000)" remarks="CRL information">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
     <!-- table CERT -->
     <createTable tableName="CERT"
         remarks="certificate information">
       <column name="ID" type="BIGINT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="IID" type="INT"
+      <column name="IID" type="SMALLINT"
           remarks="issuer id">
         <constraints nullable="false"/>
       </column>
@@ -72,6 +80,8 @@
           remarks="serial number">
         <constraints nullable="false"/>
       </column>
+      <column name="CRL_ID" type="SMALLINT"
+          remarks="CRL ID, only present for entry imported from CRL"/>
       <column name="LUPDATE" type="BIGINT"
           remarks="last update of the this database entry, seconds since January 1, 1970, 00:00:00 GMT">
         <constraints nullable="false"/>
@@ -99,8 +109,6 @@
       <column name="SUBJECT" type="${x500name.type}"
           remarks="subject of the certificate">
       </column>
-      <column name="NEXT_UPDATE" type="BIGINT"
-          remarks="next update, seconds since January 1, 1970, 00:00:00 GMT"/>
     </createTable>
     <addUniqueConstraint tableName="CERT" columnNames="IID, SN" constraintName="CONST_ISSUER_SN"/>
   </changeSet>
@@ -111,5 +119,10 @@
       onDelete="NO ACTION" onUpdate="NO ACTION"
       baseColumnNames="IID" baseTableName="CERT"
       referencedColumnNames="ID" referencedTableName="ISSUER"/>
+    <addForeignKeyConstraint constraintName="FK_CERT_CRL1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="NO ACTION" onUpdate="NO ACTION"
+      baseColumnNames="CRL_ID" baseTableName="CERT"
+      referencedColumnNames="ID" referencedTableName="CRL_INFO"/>
   </changeSet>
 </databaseChangeLog>

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ocsp.server.store.crl;
+package org.xipki.ocsp.server.store;
 
 import java.io.File;
 import java.util.Arrays;
@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.ocsp.api.OcspStoreException;
-import org.xipki.ocsp.server.store.DbCertStatusStore;
 import org.xipki.util.Args;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
@@ -45,7 +44,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     @Override
     public void run() {
       try {
-        updateStore(datasource);
+        updateStore(false);
       } catch (Throwable th) {
         LogUtil.error(LOG, th, "error while calling initializeStore() for store " + name);
       }
@@ -56,10 +55,6 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
   private static final Logger LOG = LoggerFactory.getLogger(CrlDbCertStatusStore.class);
 
   private final AtomicBoolean crlUpdateInProcess = new AtomicBoolean(false);
-
-  //private X509Certificate caCert;
-
-  //private X509Certificate issuerCert;
 
   private String dir;
 
@@ -82,8 +77,8 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     Args.notNull(sourceConf, "sourceConf");
 
     this.dir = IoUtil.expandFilepath(getStrValue(sourceConf, "dir", true));
-
-    updateStore(datasource);
+    super.datasource = datasource;
+    updateStore(true);
     super.init(sourceConf, datasource);
   }
 
@@ -117,35 +112,52 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     return crlUpdated && super.isInitialized();
   }
 
-  private synchronized void updateStore(DataSourceWrapper datasource) {
+  private synchronized void updateStore(boolean firstTime) {
     if (crlUpdateInProcess.get()) {
       return;
     }
 
     crlUpdateInProcess.set(true);
-    File updateMeFile = null;
     try {
-      updateMeFile = new File(dir, "UPDATEME");
-      if (!updateMeFile.exists()) {
-        LOG.info("The CRL will not be updated. Create new file {} to force the update",
-            updateMeFile.getAbsolutePath());
+      File[] subDirs = new File(dir).listFiles();
+      boolean updateMe = false;
+      if (subDirs != null) {
+        for (File subDir : subDirs) {
+          if (!subDir.isDirectory()) {
+            continue;
+          }
+
+          String dirName = subDir.getName();
+          if (dirName.startsWith("crl-")) {
+            if (new File(subDir, "UPDATEME").exists()) {
+              updateMe = true;
+              break;
+            }
+          }
+        }
+      }
+
+      if (!updateMe) {
+        LOG.info("CertStore {} not changed", name);
         return;
       }
 
       ImportCrl importCrl = new ImportCrl(datasource, dir);
+
       if (importCrl.importCrlToOcspDb()) {
         LOG.info("updated CertStore {} successfully", name);
       } else {
         LOG.error("updating CertStore {} failed", name);
+      }
+
+      if (!firstTime) {
+        super.updateIssuerStore(true);
       }
     } catch (Throwable th) {
       LogUtil.error(LOG, th, "error while executing updateStore()");
     } finally {
       crlUpdated = true;
       crlUpdateInProcess.set(false);
-      if (updateMeFile != null) {
-        updateMeFile.delete();
-      }
     }
   } // method initializeStore
 

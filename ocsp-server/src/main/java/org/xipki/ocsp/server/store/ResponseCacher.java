@@ -133,7 +133,7 @@ public class ResponseCacher implements Closeable {
 
   private DataSourceWrapper datasource;
 
-  private IssuerStore issuerStore;
+  private IssuerStore issuerStore = new IssuerStore();
 
   private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
@@ -532,7 +532,7 @@ public class ResponseCacher implements Closeable {
         }
       } // end while (rs.next())
 
-      this.issuerStore = new IssuerStore(caInfos);
+      this.issuerStore.setIssuers(caInfos);
       LOG.info("Updated issuers");
     } catch (SQLException ex) {
       throw datasource.translate(SQL_SELECT_ISSUER, ex);

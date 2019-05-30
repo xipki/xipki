@@ -26,6 +26,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -52,7 +53,6 @@ import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.ocsp.server.IssuerFilter;
 import org.xipki.ocsp.server.OcspServerConf;
-import org.xipki.ocsp.server.store.crl.CrlInfo;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
@@ -98,7 +98,7 @@ public class DbCertStatusStore extends OcspStore {
 
   private IssuerFilter issuerFilter;
 
-  private IssuerStore issuerStore;
+  private IssuerStore issuerStore = new IssuerStore();
 
   private HashAlgo certHashAlgo;
 
@@ -107,15 +107,43 @@ public class DbCertStatusStore extends OcspStore {
   private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
   protected List<Runnable> getScheduledServices() {
-    return Collections.emptyList();
+    return Arrays.asList(new StoreUpdateService());
+  }
+
+  protected IssuerStore getIssuerStore() {
+    return issuerStore;
   }
 
   private synchronized void updateIssuerStore() {
-    if (storeUpdateInProcess.get()) {
-      return;
+    updateIssuerStore(false);
+  }
+
+  protected synchronized void updateIssuerStore(boolean force) {
+    if (force) {
+      while (storeUpdateInProcess.get()) {
+        try {
+          Thread.sleep(1000);
+        } catch (InterruptedException ex) {
+          LOG.warn("interrputed, continue waiting");
+        }
+      }
+    } else {
+      if (storeUpdateInProcess.get()) {
+        return;
+      }
     }
 
     storeUpdateInProcess.set(true);
+    try {
+      updateIssuers();
+      updateCrls();
+    } finally {
+      initialized = true;
+      storeUpdateInProcess.set(false);
+    }
+  }
+
+  private void updateIssuers() {
     try {
       if (initialized) {
         final String sql = "SELECT ID,REV_INFO,S1C FROM ISSUER";
@@ -171,7 +199,7 @@ public class DbCertStatusStore extends OcspStore {
         }
       } // end if(initialized)
 
-      final String sql = "SELECT ID,NBEFORE,REV_INFO,S1C,CERT,CRL_INFO FROM ISSUER";
+      final String sql = "SELECT ID,NBEFORE,REV_INFO,S1C,CERT FROM ISSUER";
       PreparedStatement ps = preparedStatement(sql);
 
       ResultSet rs = null;
@@ -187,11 +215,6 @@ public class DbCertStatusStore extends OcspStore {
           X509Certificate cert = X509Util.parseCert(StringUtil.toUtf8Bytes(rs.getString("CERT")));
 
           IssuerEntry caInfoEntry = new IssuerEntry(rs.getInt("ID"), cert);
-          String crlInfoStr = rs.getString("CRL_INFO");
-          if (StringUtil.isNotBlank(crlInfoStr)) {
-            CrlInfo crlInfo = new CrlInfo(crlInfoStr);
-            caInfoEntry.setCrlInfo(crlInfo);
-          }
           RequestIssuer reqIssuer = new RequestIssuer(HashAlgo.SHA1,
               caInfoEntry.getEncodedHash(HashAlgo.SHA1));
           for (IssuerEntry existingIssuer : caInfos) {
@@ -209,18 +232,43 @@ public class DbCertStatusStore extends OcspStore {
           caInfos.add(caInfoEntry);
         } // end while (rs.next())
 
-        this.issuerStore = new IssuerStore(caInfos);
+        this.issuerStore.setIssuers(caInfos);
         LOG.info("Updated issuers: {}", name);
       } finally {
         releaseDbResources(ps, rs);
       }
     } catch (Throwable th) {
-      LogUtil.error(LOG, th, "error while executing updateIssuerStore()");
-    } finally {
-      initialized = true;
-      storeUpdateInProcess.set(false);
+      LogUtil.error(LOG, th, "error while executing updateIssuers()");
     }
-  } // method initIssuerStore
+  } // method updateIssuers
+
+  private void updateCrls() {
+    try {
+      final String sql = "SELECT ID,INFO FROM CRL_INFO";
+      PreparedStatement ps = preparedStatement(sql);
+      ResultSet rs = null;
+
+      try {
+        Map<Integer, CrlInfo> crlInfos = new HashMap<>();
+
+        rs = ps.executeQuery();
+        while (rs.next()) {
+          int id = rs.getInt("ID");
+          String str = rs.getString("INFO");
+          CrlInfo crlInfo = new CrlInfo(str);
+          crlInfos.put(id, crlInfo);
+        }
+
+        issuerStore.setCrlInfos(crlInfos);
+
+        LOG.info("Updated issuers: {}", name);
+      } finally {
+        releaseDbResources(ps, rs);
+      }
+    } catch (Throwable th) {
+      LogUtil.error(LOG, th, "error while executing updateCrls()");
+    }
+  } // method updateCrls
 
   @Override
   protected CertStatusInfo getCertStatus0(Date time, RequestIssuer reqIssuer,
@@ -248,22 +296,6 @@ public class DbCertStatusStore extends OcspStore {
         sql = includeRit ? sqlCs : sqlCsNoRit;
       }
 
-      CrlInfo crlInfo = issuer.getCrlInfo();
-
-      Date thisUpdate;
-      Date nextUpdate = null;
-
-      if (crlInfo != null) {
-        thisUpdate = crlInfo.getThisUpdate();
-
-        // this.nextUpdate is still in the future (10 seconds buffer)
-        if (crlInfo.getNextUpdate().getTime() - System.currentTimeMillis() > 10 * 1000) {
-          nextUpdate = crlInfo.getNextUpdate();
-        }
-      } else {
-        thisUpdate = new Date();
-      }
-
       ResultSet rs = null;
       CertStatusInfo certStatusInfo = null;
 
@@ -274,6 +306,7 @@ public class DbCertStatusStore extends OcspStore {
       int reason = 0;
       long revTime = 0;
       long invalTime = 0;
+      int crlId = 0;
 
       PreparedStatement ps = datasource.prepareStatement(sql);
 
@@ -301,6 +334,7 @@ public class DbCertStatusStore extends OcspStore {
           }
 
           if (!ignore) {
+            crlId = rs.getInt("CRL_ID");
             if (includeCertHash) {
               b64CertHash = rs.getString("HASH");
             }
@@ -319,6 +353,17 @@ public class DbCertStatusStore extends OcspStore {
         throw datasource.translate(sql, ex);
       } finally {
         releaseDbResources(ps, rs);
+      }
+
+      CrlInfo crlInfo = (crlId != 0) ? null : issuerStore.getCrlInfo(crlId);
+      Date thisUpdate;
+      Date nextUpdate;
+      if (crlInfo == null) {
+        thisUpdate = new Date();
+        nextUpdate = null;
+      } else {
+        thisUpdate = crlInfo.getThisUpdate();
+        nextUpdate = crlInfo.getNextUpdate();
       }
 
       if (unknown) {
@@ -463,14 +508,14 @@ public class DbCertStatusStore extends OcspStore {
     this.datasource = Args.notNull(datasource, "datasource");
 
     sqlCs = datasource.buildSelectFirstSql(1,
-        "NBEFORE,NAFTER,REV,RR,RT,RIT FROM CERT WHERE IID=? AND SN=?");
+        "NBEFORE,NAFTER,REV,RR,RT,RIT,CRL_ID FROM CERT WHERE IID=? AND SN=?");
     sqlCsNoRit = datasource.buildSelectFirstSql(1,
-        "NBEFORE,NAFTER,REV,RR,RT FROM CERT WHERE IID=? AND SN=?");
+        "NBEFORE,NAFTER,REV,RR,RT,CRL_ID FROM CERT WHERE IID=? AND SN=?");
 
     sqlCsWithCertHash = datasource.buildSelectFirstSql(1,
-        "NBEFORE,NAFTER,REV,RR,RT,RIT,HASH FROM CERT WHERE IID=? AND SN=?");
+        "NBEFORE,NAFTER,REV,RR,RT,RIT,HASH,CRL_ID FROM CERT WHERE IID=? AND SN=?");
     sqlCsNoRitWithCertHash = datasource.buildSelectFirstSql(1,
-        "NBEFORE,NAFTER,REV,RR,RT,HASH FROM CERT WHERE IID=? AND SN=?");
+        "NBEFORE,NAFTER,REV,RR,RT,HASH,CRL_ID FROM CERT WHERE IID=? AND SN=?");
 
     try {
       this.certHashAlgo = getCertHashAlgo(datasource);
@@ -503,21 +548,17 @@ public class DbCertStatusStore extends OcspStore {
     if (this.scheduledThreadPoolExecutor != null) {
       this.scheduledThreadPoolExecutor.shutdownNow();
     }
-    StoreUpdateService storeUpdateService = new StoreUpdateService();
     List<Runnable> scheduledServices = getScheduledServices();
-    int size = 1;
-    if (scheduledServices != null) {
-      size += scheduledServices.size();
-    }
-    this.scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(size);
 
-    Random random = new Random();
-    this.scheduledThreadPoolExecutor.scheduleAtFixedRate(storeUpdateService,
-        60 + random.nextInt(60), 60, TimeUnit.SECONDS);
-    if (scheduledServices != null) {
-      for (Runnable service : scheduledServices) {
-        this.scheduledThreadPoolExecutor.scheduleAtFixedRate(service,
-            60 + random.nextInt(60), 60, TimeUnit.SECONDS);
+    int size = scheduledServices == null ? 0 : scheduledServices.size();
+    if (size > 0) {
+      this.scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(size);
+      Random random = new Random();
+      if (scheduledServices != null) {
+        for (Runnable service : scheduledServices) {
+          this.scheduledThreadPoolExecutor.scheduleAtFixedRate(service,
+              60 + random.nextInt(60), 60, TimeUnit.SECONDS);
+        }
       }
     }
   }

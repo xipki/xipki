@@ -27,12 +27,11 @@ import java.util.Map;
 
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.ocsp.api.RequestIssuer;
-import org.xipki.ocsp.server.store.crl.CrlInfo;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
-import org.xipki.util.CompareUtil;
 import org.xipki.util.Args;
+import org.xipki.util.CompareUtil;
 
 /**
  * TODO.
@@ -51,8 +50,6 @@ class IssuerEntry {
   private final X509Certificate cert;
 
   private CertRevocationInfo revocationInfo;
-
-  private CrlInfo crlInfo;
 
   public IssuerEntry(int id, X509Certificate cert) throws CertificateEncodingException {
     this.id = id;
@@ -115,14 +112,6 @@ class IssuerEntry {
     Args.notNull(revocationTime, "revocationTime");
     this.revocationInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE,
         revocationTime, null);
-  }
-
-  public void setCrlInfo(CrlInfo crlInfo) {
-    this.crlInfo = crlInfo;
-  }
-
-  public CrlInfo getCrlInfo() {
-    return crlInfo;
   }
 
   public CertRevocationInfo getRevocationInfo() {
