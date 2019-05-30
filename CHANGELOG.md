@@ -6,6 +6,8 @@ See also <https://github.com/xipki/xipki/releases>
   - Release date: -
   - OCSP
     - Use stream parser to parse the CRL to get small memory usage even for very large CRLs.
+    - Extend the OCSP store type "crl" to support multiple CRLs, even for the same CA.
+
 ## 5.3.0
   - Release date: May 12, 2019
   - CA
