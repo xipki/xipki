@@ -369,31 +369,29 @@ public class CrlStreamParser {
       }
       offset += revokedCertificatesLength;
 
-      if (offset < tbsCertListEndIndex) {
+      int crlExtensionsTag = BERTags.TAGGED | BERTags.CONSTRUCTED | 0; // [0] EXPLICIT
+
+      Extensions extns = null;
+      while (offset < tbsCertListEndIndex) {
         tag = markAndReadTag(instream);
         offset++;
 
-        if ((tag & (BERTags.TAGGED | BERTags.CONSTRUCTED)) == 0) {
-          throw new IllegalArgumentException(
-              "only tagged object is allowed after revokedCertificates");
+        int length = readLength(bytesLen, instream);
+        offset += bytesLen.get();
+
+        if (tag != crlExtensionsTag) {
+          instream.skip(length);
+          offset += length;
+        } else {
+          instream.mark(1);
+          //       crlExtensions           [0]  EXPLICIT Extensions OPTIONAL
+          bytes = readBlock(TAG_CONSTRUCTED_SEQUENCE, instream, "crlExtensions");
+          offset += bytes.length;
+          extns = Extensions.getInstance(bytes);
         }
-
-        // tagged
-        int tagNo = tag & 0x1F;
-        if (tagNo != 0) {
-          throw new IllegalArgumentException("tagNo != 0");
-        }
-
-        readLength(lenBytesSize, instream);
-        offset += lenBytesSize.get();
-
-        //       crlExtensions           [0]  EXPLICIT Extensions OPTIONAL
-        bytes = readBlock(TAG_CONSTRUCTED_SEQUENCE, instream, "crlExtensions");
-        offset += bytes.length;
-        this.crlExtensions = Extensions.getInstance(bytes);
-      } else {
-        this.crlExtensions = null;
       }
+
+      this.crlExtensions = extns;
 
       if (this.crlExtensions != null) {
         bytes = X509Util.getCoreExtValue(this.crlExtensions, Extension.cRLNumber);
@@ -564,7 +562,7 @@ public class CrlStreamParser {
 
       instream.read(lengthBytes);
 
-      int length = lengthBytes[0];
+      int length = 0xFF & lengthBytes[0];
       for (int i = 1; i < lengthBytes.length; i++) {
         length = (length << 8) + (0xFF & lengthBytes[i]);
       }
