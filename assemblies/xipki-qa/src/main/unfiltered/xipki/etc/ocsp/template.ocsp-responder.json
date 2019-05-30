@@ -134,7 +134,7 @@
 			"datasource":"datasource-crl",
 			"type":"crl",
 			"conf":{
-				"dir":"xipki/crls/example.ca"
+				"dir":"xipki/crls/example-crls"
 			}
 		},
 		"unknownCertBehaviour":"good"

@@ -570,8 +570,9 @@ xi:cmp-get-crl --ca subcawithcrl1 \
   --out output/subcawithcrl1-1-get.crl
 
 ## Generate CRL
+## DER format is required by the OCSP service.
 xi:cmp-gen-crl --ca subcawithcrl1 \
-  --outform $OUTFORM \
+  --outform der \
   --out output/subcawithcrl1.crl
 
 ## Get CRL
