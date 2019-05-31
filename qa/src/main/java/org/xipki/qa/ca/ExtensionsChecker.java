@@ -96,7 +96,7 @@ import org.xipki.ca.api.profile.Certprofile.GeneralNameTag;
 import org.xipki.ca.api.profile.Certprofile.KeyUsageControl;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.TextVadidator;
-import org.xipki.ca.certprofile.xijson.AdmissionSyntaxOption;
+import org.xipki.ca.certprofile.xijson.AdmissionExtension;
 import org.xipki.ca.certprofile.xijson.BiometricInfoOption;
 import org.xipki.ca.certprofile.xijson.DirectoryStringType;
 import org.xipki.ca.certprofile.xijson.ExtensionSyntaxChecker;
@@ -1838,7 +1838,7 @@ public class ExtensionsChecker {
 
   private void checkExtnAdmission(StringBuilder failureMsg, byte[] extensionValue,
       Extensions requestedExtns, X500Name requestedSubject, ExtensionControl extControl) {
-    AdmissionSyntaxOption conf = certprofile.getAdmission();
+    AdmissionExtension.AdmissionSyntaxOption conf = certprofile.getAdmission();
     ASN1ObjectIdentifier type = Extn.id_extension_admission;
     if (conf == null) {
       checkConstantExtnValue(type, failureMsg, extensionValue, requestedExtns, extControl);
