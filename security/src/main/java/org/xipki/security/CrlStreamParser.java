@@ -143,10 +143,7 @@ public class CrlStreamParser {
 
     private RevokedCertsIterator() throws IOException {
       this.instream = new BufferedInputStream(new FileInputStream(crlFile));
-      if (firstRevokedCertificateOffset != this.instream.skip(firstRevokedCertificateOffset)) {
-        throw new IllegalArgumentException("error skipping " + firstRevokedCertificateOffset);
-      }
-
+      skip(this.instream, firstRevokedCertificateOffset);
       this.offset = firstRevokedCertificateOffset;
       next0();
     }
@@ -364,9 +361,7 @@ public class CrlStreamParser {
       this.firstRevokedCertificateOffset = offset;
 
       // skip the revokedCertificates
-      if (revokedCertificatesLength != instream.skip(revokedCertificatesLength)) {
-        throw new IOException("error skipping");
-      }
+      skip(instream, revokedCertificatesLength);
       offset += revokedCertificatesLength;
 
       int crlExtensionsTag = BERTags.TAGGED | BERTags.CONSTRUCTED | 0; // [0] EXPLICIT
@@ -380,7 +375,7 @@ public class CrlStreamParser {
         offset += bytesLen.get();
 
         if (tag != crlExtensionsTag) {
-          instream.skip(length);
+          skip(instream, length);
           offset += length;
         } else {
           instream.mark(1);
@@ -476,9 +471,7 @@ public class CrlStreamParser {
       ContentVerifier verifier = cvp.get(algorithmIdentifier);
       OutputStream sigOut = verifier.getOutputStream();
       try (InputStream crlStream = new FileInputStream(crlFile)) {
-        if (tbsCertListOffset != crlStream.skip(tbsCertListOffset)) {
-          throw new IOException("error skipping " + tbsCertListOffset);
-        }
+        skip(crlStream, tbsCertListOffset);
 
         int remainingLength = tbsCertListEndIndex - tbsCertListOffset;
         byte[] buffer = new byte[1024];
@@ -592,6 +585,13 @@ public class CrlStreamParser {
       }
     } catch (ParseException ex) {
       throw new IllegalArgumentException("error parsing time", ex);
+    }
+  }
+
+  private static void skip(InputStream instream, long count) throws IOException {
+    long remaining = count;
+    while (remaining > 0) {
+      remaining -= instream.skip(remaining);
     }
   }
 }
