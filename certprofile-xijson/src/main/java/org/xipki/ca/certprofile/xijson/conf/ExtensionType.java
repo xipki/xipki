@@ -46,13 +46,10 @@ import org.bouncycastle.asn1.x509.UserNotice;
 import org.xipki.ca.api.profile.Certprofile.ExtKeyUsageControl;
 import org.xipki.ca.api.profile.Certprofile.KeyUsageControl;
 import org.xipki.ca.api.profile.CertprofileException;
-import org.xipki.ca.certprofile.xijson.AdmissionSyntaxOption;
-import org.xipki.ca.certprofile.xijson.AdmissionsOption;
+import org.xipki.ca.certprofile.xijson.AdmissionExtension;
 import org.xipki.ca.certprofile.xijson.CertificatePolicyInformation;
 import org.xipki.ca.certprofile.xijson.CertificatePolicyQualifier;
 import org.xipki.ca.certprofile.xijson.DirectoryStringType;
-import org.xipki.ca.certprofile.xijson.ProfessionInfoOption;
-import org.xipki.ca.certprofile.xijson.RegistrationNumberOption;
 import org.xipki.ca.certprofile.xijson.conf.CertificatePolicyInformationType.PolicyQualfierType;
 import org.xipki.ca.certprofile.xijson.conf.CertificatePolicyInformationType.PolicyQualifier;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableBinary;
@@ -591,11 +588,11 @@ public class ExtensionType extends ValidatableConf {
       validate(contentsOfAdmissions);
     }
 
-    public AdmissionSyntaxOption toXiAdmissionSyntax(boolean critical)
+    public AdmissionExtension.AdmissionSyntaxOption toXiAdmissionSyntax(boolean critical)
         throws CertprofileException {
-      List<AdmissionsOption> admissionsList = new LinkedList<>();
+      List<AdmissionExtension.AdmissionsOption> admissionsList = new LinkedList<>();
       for (AdmissionsType at : getContentsOfAdmissions()) {
-        List<ProfessionInfoOption> professionInfos = new LinkedList<>();
+        List<AdmissionExtension.ProfessionInfoOption> professionInfos = new LinkedList<>();
         for (ProfessionInfoType pi : at.getProfessionInfos()) {
           NamingAuthority namingAuthorityL3 = null;
           if (pi.getNamingAuthority() != null) {
@@ -612,11 +609,13 @@ public class ExtensionType extends ValidatableConf {
           }
 
           RegistrationNumber rnType = pi.getRegistrationNumber();
-          RegistrationNumberOption rno = (rnType == null) ? null
-              : new RegistrationNumberOption(rnType.getRegex(), rnType.getConstant());
+          AdmissionExtension.RegistrationNumberOption rno = (rnType == null) ? null
+              : new AdmissionExtension.RegistrationNumberOption(
+                      rnType.getRegex(), rnType.getConstant());
 
-          ProfessionInfoOption pio = new ProfessionInfoOption(namingAuthorityL3,
-              pi.getProfessionItems(), oids, rno, pi.getAddProfessionInfo());
+          AdmissionExtension.ProfessionInfoOption pio =
+              new AdmissionExtension.ProfessionInfoOption(namingAuthorityL3,
+                  pi.getProfessionItems(), oids, rno, pi.getAddProfessionInfo());
 
           professionInfos.add(pio);
         }
@@ -632,8 +631,9 @@ public class ExtensionType extends ValidatableConf {
           namingAuthority = buildNamingAuthority(at.getNamingAuthority());
         }
 
-        AdmissionsOption admissionsOption = new AdmissionsOption(admissionAuthority,
-            namingAuthority, professionInfos);
+        AdmissionExtension.AdmissionsOption admissionsOption =
+            new AdmissionExtension.AdmissionsOption(
+                admissionAuthority, namingAuthority, professionInfos);
         admissionsList.add(admissionsOption);
       }
 
@@ -642,7 +642,8 @@ public class ExtensionType extends ValidatableConf {
         tmpAdmissionAuthority = GeneralName.getInstance(admissionAuthority);
       }
 
-      return new AdmissionSyntaxOption(critical, tmpAdmissionAuthority, admissionsList);
+      return new AdmissionExtension.AdmissionSyntaxOption(
+                  critical, tmpAdmissionAuthority, admissionsList);
     }
 
     private static ASN1Primitive asn1PrimitivefromByteArray(byte[] encoded)

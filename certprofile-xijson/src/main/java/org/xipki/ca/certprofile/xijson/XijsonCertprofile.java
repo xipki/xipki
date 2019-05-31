@@ -146,7 +146,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   private ExtensionValue additionalInformation;
 
-  private AdmissionSyntaxOption admission;
+  private AdmissionExtension.AdmissionSyntaxOption admission;
 
   private AuthorityInfoAccessControl aiaControl;
 
@@ -2066,7 +2066,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     return additionalInformation;
   }
 
-  public AdmissionSyntaxOption getAdmission() {
+  public AdmissionExtension.AdmissionSyntaxOption getAdmission() {
     return admission;
   }
 
