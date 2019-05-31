@@ -24,7 +24,8 @@ import java.util.TimeZone;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Control of the certificate's NotBefore field.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

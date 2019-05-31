@@ -31,7 +31,8 @@ import org.xipki.util.Args;
 import org.xipki.util.TripleState;
 
 /**
- * TODO.
+ * Control of the extension BiometricInfo.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

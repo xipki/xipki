@@ -20,7 +20,8 @@ package org.xipki.ca.certprofile.xijson;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Control of the CertificatePolicyQualifier (in the extension CertificatePolicies).
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

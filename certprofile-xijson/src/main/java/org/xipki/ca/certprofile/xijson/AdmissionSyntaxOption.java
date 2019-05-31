@@ -37,7 +37,8 @@ import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 
 /**
- * TODO.
+ * Control of the extension Admission.
+ *
  * @author Lijun Liao
  * @since 2.0.1
  */

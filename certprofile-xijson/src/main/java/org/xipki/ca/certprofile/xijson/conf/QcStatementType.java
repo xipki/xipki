@@ -28,7 +28,8 @@ import org.xipki.util.ValidatableConf;
 import com.alibaba.fastjson.annotation.JSONField;
 
 /**
- * TODO.
+ * Configuration of the extension QCStatements.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

@@ -25,7 +25,8 @@ import org.bouncycastle.asn1.DERUTF8String;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Type of the DirectoryString.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

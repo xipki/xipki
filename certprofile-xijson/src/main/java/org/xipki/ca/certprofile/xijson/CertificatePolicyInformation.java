@@ -23,7 +23,8 @@ import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 
 /**
- * TODO.
+ * Control of the CertificatePolicyInformation (in the extension CertificatePolicies).
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

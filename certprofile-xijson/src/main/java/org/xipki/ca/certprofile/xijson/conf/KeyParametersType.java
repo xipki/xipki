@@ -34,7 +34,8 @@ import org.xipki.util.ValidatableConf;
 import com.alibaba.fastjson.annotation.JSONField;
 
 /**
- * TODO.
+ * KeyPrameters.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

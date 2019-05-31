@@ -32,7 +32,8 @@ import org.xipki.util.StringUtil;
 import org.xipki.util.ValidatableConf;
 
 /**
- * TODO.
+ * Configuration of GeneralName.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

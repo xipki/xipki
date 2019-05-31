@@ -134,7 +134,8 @@ import org.xipki.util.StringUtil;
 import org.xipki.util.Validity;
 
 /**
- * TODO.
+ * Certprofile configured by JSON.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

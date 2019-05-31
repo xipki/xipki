@@ -52,7 +52,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
 
 /**
- * TODO.
+ * Root configuration of the xijson Certprofile.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

@@ -51,7 +51,8 @@ import org.xipki.security.X509ExtensionType.FieldType;
 import org.xipki.security.X509ExtensionType.Tag;
 
 /**
- * TODO.
+ * The extension syntax checker.
+ *
  * @author Lijun Liao
  */
 

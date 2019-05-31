@@ -20,7 +20,8 @@ package org.xipki.ca.certprofile.xijson;
 import java.util.regex.Pattern;
 
 /**
- * TODO.
+ * Control of the RegistrationNumber (in the extension Admission).
+ *
  * @author Lijun Liao
  * @since 2.0.1
  */

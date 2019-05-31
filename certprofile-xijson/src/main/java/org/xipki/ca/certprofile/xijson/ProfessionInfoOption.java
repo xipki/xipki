@@ -24,7 +24,8 @@ import org.bouncycastle.asn1.isismtt.x509.NamingAuthority;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Control of the ProfessionInfo (in the extension Admission).
+ *
  * @author Lijun Liao
  * @since 2.0.1
  */

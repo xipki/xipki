@@ -24,7 +24,8 @@ import org.bouncycastle.asn1.x509.GeneralName;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Control of the Admission (in the extension Admission).
+ *
  * @author Lijun Liao
  * @since 2.0.1
  */

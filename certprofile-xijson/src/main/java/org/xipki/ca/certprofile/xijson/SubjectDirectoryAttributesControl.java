@@ -24,7 +24,8 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Control of SubjectDirectoryAttributes.
+ *
  * @author Lijun Liao
  * @since 2.0.1
  */

@@ -28,7 +28,8 @@ import org.xipki.util.ValidatableConf;
 import com.alibaba.fastjson.annotation.JSONField;
 
 /**
- * TODO.
+ * Control which RDNs and how they are converted to the SubjectAltNames extension.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

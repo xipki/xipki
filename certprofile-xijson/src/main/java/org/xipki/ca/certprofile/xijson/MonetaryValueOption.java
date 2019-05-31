@@ -22,7 +22,8 @@ import org.xipki.ca.certprofile.xijson.conf.QcStatementType.Range2Type;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Control of the MonetaryValue (in the extension QCStatements).
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

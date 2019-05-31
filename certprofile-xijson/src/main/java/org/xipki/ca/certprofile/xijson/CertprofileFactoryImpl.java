@@ -27,7 +27,8 @@ import org.xipki.ca.api.profile.CertprofileFactory;
 import org.xipki.util.ObjectCreationException;
 
 /**
- * TODO.
+ * CertprofileFactory for the Certprofile of type 'xijson'.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

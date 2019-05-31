@@ -133,7 +133,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 
 /**
- * TODO.
+ * Demo the creation of xijson configuration.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
