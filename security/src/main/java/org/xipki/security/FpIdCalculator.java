@@ -17,38 +17,19 @@
 
 package org.xipki.security;
 
-import java.util.concurrent.TimeUnit;
-
-import org.bouncycastle.crypto.Digest;
-import org.bouncycastle.crypto.digests.SHA1Digest;
-import org.bouncycastle.operator.RuntimeOperatorException;
 import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
-import org.xipki.util.concurrent.ConcurrentBag;
-import org.xipki.util.concurrent.ConcurrentBagEntry;
 
 /**
- * TODO.
+ * MD'5 Fingerprint calculator.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class FpIdCalculator {
 
-  private static final int PARALLELISM = 50;
-
-  private static final ConcurrentBag<ConcurrentBagEntry<Digest>> MDS = getMD5MessageDigests();
-
   private FpIdCalculator() {
-  }
-
-  private static ConcurrentBag<ConcurrentBagEntry<Digest>> getMD5MessageDigests() {
-    ConcurrentBag<ConcurrentBagEntry<Digest>> mds = new ConcurrentBag<>();
-    for (int i = 0; i < PARALLELISM; i++) {
-      Digest md = new SHA1Digest();
-      mds.add(new ConcurrentBagEntry<>(md));
-    }
-    return mds;
   }
 
   /**
@@ -59,7 +40,8 @@ public class FpIdCalculator {
   public static long hash(String data) {
     Args.notNull(data, "data");
     byte[] encoded = StringUtil.toUtf8Bytes(data);
-    return hash(encoded);
+    byte[] bytes = HashAlgo.SHA1.hash(encoded);
+    return bytesToLong(bytes);
   }
 
   /**
@@ -69,31 +51,8 @@ public class FpIdCalculator {
    */
   public static long hash(byte[] data) {
     Args.notNull(data, "data");
-
-    ConcurrentBagEntry<Digest> md0 = null;
-    for (int i = 0; i < 3; i++) {
-      try {
-        md0 = MDS.borrow(10, TimeUnit.SECONDS);
-        break;
-      } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
-      }
-    }
-
-    if (md0 == null) {
-      throw new RuntimeOperatorException("could not get idle MessageDigest");
-    }
-
-    try {
-      Digest md = md0.value();
-      md.reset();
-      md.update(data, 0, data.length);
-      byte[] bytes = new byte[md.getDigestSize()];
-      md.doFinal(bytes, 0);
-
-      return bytesToLong(bytes);
-    } finally {
-      MDS.requite(md0);
-    }
+    byte[] bytes = HashAlgo.SHA1.hash(data);
+    return bytesToLong(bytes);
   }
 
   private static long bytesToLong(byte[] bs) {
