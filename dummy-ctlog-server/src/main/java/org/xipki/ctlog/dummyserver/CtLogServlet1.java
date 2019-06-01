@@ -21,7 +21,8 @@ import java.util.Arrays;
 import java.util.Base64;
 
 /**
- * TODO.
+ * The CT Log servlet 1.
+ *
  * @author Lijun Liao
  */
 @SuppressWarnings("serial")

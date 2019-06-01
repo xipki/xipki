@@ -55,7 +55,8 @@ import org.xipki.util.concurrent.ConcurrentBag;
 import org.xipki.util.concurrent.ConcurrentBagEntry;
 
 /**
- * TODO.
+ * Response cacher.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

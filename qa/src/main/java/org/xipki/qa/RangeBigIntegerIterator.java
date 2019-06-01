@@ -24,7 +24,9 @@ import java.util.List;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Iterator which iterates the {@link BigInteger} as specified by a list of
+ * {@link BigIntegerRange}s.
+ *
  * @author Lijun Liao
  * @since 2.1.0
  */

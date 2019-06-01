@@ -20,7 +20,8 @@ package org.xipki.security.cmp;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Protection verification result with the requestor.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

@@ -25,7 +25,8 @@ import org.xipki.util.Args;
 import org.xipki.util.InvalidConfException;
 
 /**
- * TODO.
+ * Responder option.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

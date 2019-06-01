@@ -37,7 +37,8 @@ import org.xipki.security.util.SignerUtil;
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
 /**
- * TODO.
+ * PKCS#11 ECDSA/Plain-ECDSA {@link SignatureSpi}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -55,7 +56,8 @@ abstract class AbstractP11ECDSASignatureSpi extends SignatureSpi {
   private P11PrivateKey signingKey;
 
   /**
-   * TODO.
+   * Constructor.
+   *
    * @param hashAlgo
    *          hash algorithm. Could be {@code null}.
    */

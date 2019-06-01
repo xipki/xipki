@@ -23,7 +23,8 @@ import java.util.Set;
 import org.xipki.util.ObjectCreationException;
 
 /**
- * TODO.
+ * Factory to create {@link ConcurrentContentSigner}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

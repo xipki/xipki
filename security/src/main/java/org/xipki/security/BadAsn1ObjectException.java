@@ -18,7 +18,8 @@
 package org.xipki.security;
 
 /**
- * TODO.
+ * Exception indicates ASN.1 encoding / decoding error.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

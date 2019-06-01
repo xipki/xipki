@@ -22,7 +22,8 @@ import java.security.SecureRandom;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Parameters for the keystore generation.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

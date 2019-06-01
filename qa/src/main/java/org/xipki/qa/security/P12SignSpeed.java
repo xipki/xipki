@@ -42,7 +42,8 @@ import org.xipki.util.ConfPairs;
 import org.xipki.util.IoUtil;
 
 /**
- * TODO.
+ * Speed test of PKCS#12 signature creation.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

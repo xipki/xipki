@@ -37,7 +37,8 @@ import org.xipki.security.util.SignerUtil;
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
 /**
- * TODO.
+ * PKCS#11 DSA {@link SignatureSpi}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

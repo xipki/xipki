@@ -20,7 +20,8 @@ package org.xipki.qa;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Single validation issue.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

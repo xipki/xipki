@@ -32,7 +32,8 @@ import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.CollectionUtil;
 
 /**
- * TODO.
+ * Completers for security shells.
+ *
  * @author Lijun Liao
  */
 public class SecurityCompleters {

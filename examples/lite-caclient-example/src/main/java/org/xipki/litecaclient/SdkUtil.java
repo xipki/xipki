@@ -38,7 +38,8 @@ import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.x509.Extension;
 
 /**
- * TODO.
+ * Utility class.
+ *
  * @author Lijun Liao
  */
 

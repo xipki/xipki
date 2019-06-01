@@ -29,7 +29,8 @@ import org.xipki.util.Args;
 import org.xipki.util.Validity;
 
 /**
- * TODO.
+ * Store of certificate status.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -58,7 +59,7 @@ public abstract class OcspStore implements Closeable {
   }
 
   /**
-   * TODO.
+   * Whether the store knows the reqIssuer.
    * @param reqIssuer
    *          Requested issuer
    * @return whether this OCSP store knows the given issuer.
@@ -66,7 +67,8 @@ public abstract class OcspStore implements Closeable {
   public abstract boolean knowsIssuer(RequestIssuer reqIssuer);
 
   /**
-   * TODO.
+   * Returns the certificate for the given {@link RequestIssuer}.
+   *
    * @param reqIssuer
    *          Requested issuer
    * @return the certificate of the given issuer.
@@ -74,7 +76,8 @@ public abstract class OcspStore implements Closeable {
   public abstract X509Certificate getIssuerCert(RequestIssuer reqIssuer);
 
   /**
-   * TODO.
+   * Return the certificate status.
+   *
    * @param time
    *          Time of the certificate status. Must not be {@code null}.
    * @param reqIssuer
@@ -114,7 +117,8 @@ public abstract class OcspStore implements Closeable {
   }
 
   /**
-   * TODO.
+   * Return the certificate status.
+   *
    * @param time
    *          Time of the certificate status. Must not be {@code null}.
    * @param reqIssuer
@@ -134,7 +138,8 @@ public abstract class OcspStore implements Closeable {
       boolean inheritCaRevocation) throws OcspStoreException;
 
   /**
-   * TODO.
+   * Initialize the OCSP store.
+   *
    * @param sourceConf
    *          Source configuration. Could be {@code null}.
    * @param datasource

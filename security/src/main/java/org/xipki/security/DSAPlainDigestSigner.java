@@ -34,7 +34,9 @@ import org.xipki.security.util.SignerUtil;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Plain-DSA signer. The signature is not encoded as ASN.1 structure, but just the
+ * concatenation of two integer (r and s) in format of byte array.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

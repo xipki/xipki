@@ -40,7 +40,8 @@ import iaik.pkcs.pkcs11.constants.Functions;
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
 /**
- * TODO.
+ * Configuration of a PKCS#11 module.
+ *
  * @author Lijun Liao
  *
  */

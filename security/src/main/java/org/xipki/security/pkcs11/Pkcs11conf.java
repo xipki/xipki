@@ -26,7 +26,8 @@ import org.xipki.util.ValidatableConf;
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
 /**
- * TODO.
+ * Configuration of PKCS#11.
+ *
  * @author Lijun Liao
  */
 

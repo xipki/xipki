@@ -32,7 +32,8 @@ import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * CMP responder.
+ *
  * @author Lijun Liao
  * @since 2.1.0
  */

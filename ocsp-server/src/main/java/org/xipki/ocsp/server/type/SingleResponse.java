@@ -20,7 +20,8 @@ package org.xipki.ocsp.server.type;
 import java.util.Date;
 
 /**
- * TODO.
+ * ASN.1 SingleResponse.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

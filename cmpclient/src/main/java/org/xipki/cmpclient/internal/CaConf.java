@@ -36,7 +36,8 @@ import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Configuration of the remote CA.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

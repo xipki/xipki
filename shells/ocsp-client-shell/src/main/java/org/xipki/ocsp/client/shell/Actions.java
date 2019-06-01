@@ -94,7 +94,8 @@ import org.xipki.util.StringUtil;
 import org.xipki.util.ReqRespDebug.ReqRespPair;
 
 /**
- * TODO.
+ * OCSP client actions.
+ *
  * @author Lijun Liao
  */
 public class Actions {
@@ -172,7 +173,8 @@ public class Actions {
     }
 
     /**
-     * TODO.
+     * Check whether the parameters are valid.
+     *
      * @param respIssuer
      *          Expected responder issuer. Could be {@code null}.
      * @param serialNumbers
@@ -184,7 +186,9 @@ public class Actions {
         List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts) throws Exception;
 
     /**
-     * TODO.
+     * Check whether the response has the expected issuer, certificate serial numbers and
+     * for the given encoded certificates.
+     *
      * @param response
      *          OCSP response. Must not be {@code null}.
      * @param respIssuer
@@ -196,7 +200,7 @@ public class Actions {
      * @param encodedCerts
      *          Map of serial number and the corresponding certificate. Could be {@code null}.
      */
-    protected abstract Object processResponse(OCSPResp response, X509Certificate respIssuer,
+    protected abstract void processResponse(OCSPResp response, X509Certificate respIssuer,
         IssuerHash issuerHash, List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
         throws Exception;
 
@@ -344,7 +348,8 @@ public class Actions {
         } // end if
       } // end finally
 
-      return processResponse(response, respIssuer, issuerHash, sns, encodedCerts);
+      processResponse(response, respIssuer, issuerHash, sns, encodedCerts);
+      return null;
     } // method execute0
 
     public static List<String> extractOcspUrls(X509Certificate cert)
@@ -454,7 +459,7 @@ public class Actions {
     }
 
     @Override
-    protected Object processResponse(OCSPResp response, X509Certificate respIssuer,
+    protected void processResponse(OCSPResp response, X509Certificate respIssuer,
         IssuerHash issuerHash, List<BigInteger> serialNumbers,
         Map<BigInteger, byte[]> encodedCerts) throws Exception {
       Args.notNull(response, "response");
@@ -700,8 +705,6 @@ public class Actions {
         println(msg.toString());
       } // end for
       println("");
-
-      return null;
     } // method processResponse
 
   }

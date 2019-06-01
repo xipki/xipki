@@ -33,7 +33,8 @@ import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * HMAC signer.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

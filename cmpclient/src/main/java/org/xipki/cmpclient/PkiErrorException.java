@@ -21,7 +21,8 @@ import org.bouncycastle.asn1.cmp.PKIStatusInfo;
 import org.xipki.security.util.CmpFailureUtil;
 
 /**
- * TODO.
+ * Exception that wraps the PKIStatusInfo.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

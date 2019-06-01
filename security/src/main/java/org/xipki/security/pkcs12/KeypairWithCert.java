@@ -44,7 +44,8 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Keypair with certificate.
+ *
  * @author Lijun Liao
  *
  */

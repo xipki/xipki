@@ -44,7 +44,8 @@ import org.xipki.util.IoUtil;
 import org.xipki.util.TripleState;
 
 /**
- * TODO.
+ * OCSP request option.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

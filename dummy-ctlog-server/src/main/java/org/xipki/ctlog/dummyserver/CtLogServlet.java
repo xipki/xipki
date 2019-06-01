@@ -28,7 +28,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * TODO.
+ * HTTP servlet of CT Log server.
+ *
  * @author Lijun Liao
  */
 @SuppressWarnings("serial")

@@ -18,7 +18,8 @@
 package org.xipki.security.pkcs11;
 
 /**
- * TODO.
+ * PKCS#11 token exception.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

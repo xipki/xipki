@@ -37,6 +37,7 @@ import org.xipki.util.StringUtil;
 
 /**
  * Canonicalize the text files.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

@@ -28,7 +28,8 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
 
 /**
- * TODO.
+ * CTLog test.
+ *
  * @author Lijun Liao
  *
  */

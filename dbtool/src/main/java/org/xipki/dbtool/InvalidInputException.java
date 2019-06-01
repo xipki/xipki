@@ -18,7 +18,8 @@
 package org.xipki.dbtool;
 
 /**
- * TODO.
+ * Exception for invalid input.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

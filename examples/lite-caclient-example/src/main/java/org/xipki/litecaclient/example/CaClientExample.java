@@ -51,7 +51,8 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.xipki.litecaclient.KeyAndCert;
 
 /**
- * TODO.
+ * CA client exception.
+ *
  * @author Lijun Liao
  */
 

@@ -24,7 +24,8 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Contains issuerNameHash and issuerKeyHash as specified in the OCSP standard RFC 6960.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

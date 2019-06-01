@@ -29,7 +29,8 @@ import javax.crypto.spec.PBEParameterSpec;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Password based encryption utility class.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

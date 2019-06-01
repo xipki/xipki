@@ -33,7 +33,8 @@ import org.xipki.util.FileOrBinary;
 import org.xipki.util.ObjectCreationException;
 
 /**
- * TODO.
+ * Configuration of SSL context.
+ *
  * @author Lijun Liao
  */
 

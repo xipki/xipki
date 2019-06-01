@@ -18,7 +18,8 @@
 package org.xipki.cmpclient.internal;
 
 /**
- * TODO.
+ * Response of removing expired certificates.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

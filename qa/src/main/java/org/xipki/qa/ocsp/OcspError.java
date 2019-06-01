@@ -20,7 +20,8 @@ package org.xipki.qa.ocsp;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * OCSP error enum.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

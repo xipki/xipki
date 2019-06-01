@@ -44,7 +44,8 @@ import org.xipki.util.Args;
 import org.xipki.util.Base64;
 
 /**
- * TODO.
+ * SubjectPublicKeyInfo entry for benchmark enrollment test.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

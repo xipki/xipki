@@ -37,7 +37,8 @@ import iaik.pkcs.pkcs11.constants.Functions;
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
 /**
- * TODO.
+ * PKCS#11 identity (private key and the corresponding public key and certificates).
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

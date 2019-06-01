@@ -26,7 +26,8 @@ import org.xipki.util.StringUtil;
 import org.xipki.util.TripleState;
 
 /**
- * TODO.
+ * OCSP response option.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

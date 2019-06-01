@@ -18,7 +18,8 @@
 package org.xipki.security;
 
 /**
- * TODO.
+ * Certpath validation model.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

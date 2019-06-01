@@ -22,7 +22,8 @@ import java.math.BigInteger;
 import org.xipki.ocsp.api.RequestIssuer;
 
 /**
- * TODO.
+ * ASN.1 CertID.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

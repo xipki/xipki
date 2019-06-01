@@ -24,7 +24,8 @@ import org.xipki.util.Args;
 import org.xipki.util.Hex;
 
 /**
- * TODO.
+ * Identifier of a PKCS#11 Object.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -38,7 +39,8 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
   private final String label;
 
   /**
-   * TODO.
+   * Constructor.
+   *
    * @param id
    *          Identifier. Must not be {@code null}.
    * @param label

@@ -40,7 +40,8 @@ import org.xipki.security.pkcs11.P11PrivateKey;
 import org.xipki.security.pkcs11.P11RSAKeyParameter;
 
 /**
- * TODO.
+ * PKCS#11 RSAPSS {@link SignatureSpi}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

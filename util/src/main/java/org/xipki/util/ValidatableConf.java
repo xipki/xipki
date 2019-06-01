@@ -20,7 +20,8 @@ package org.xipki.util;
 import java.util.Collection;
 
 /**
- * TODO.
+ * Configuration that can be validated.
+ *
  * @author Lijun Liao
  */
 

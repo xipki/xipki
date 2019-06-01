@@ -44,7 +44,8 @@ import org.xipki.util.PemEncoder.PemLabel;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Anchor class for all actions. All actions should derive from this one.
+ *
  * @author Lijun Liao
  * @since 3.0.1
  */

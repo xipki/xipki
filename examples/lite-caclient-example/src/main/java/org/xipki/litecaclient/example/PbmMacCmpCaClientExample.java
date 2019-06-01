@@ -41,7 +41,8 @@ import org.xipki.litecaclient.PbmMacCmpCaClient;
 import org.xipki.litecaclient.SdkUtil;
 
 /**
- * TODO.
+ * Example to use {@link PbmMacCmpCaClient}.
+ *
  * @author Lijun Liao
  */
 

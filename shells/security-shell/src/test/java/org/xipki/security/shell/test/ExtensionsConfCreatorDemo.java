@@ -47,7 +47,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 
 /**
- * TODO.
+ * Demonstrate how to create constant extension configuration that can be used
+ * in the actions xi:csr-p12 and xi:csr-p11.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -227,7 +229,7 @@ public class ExtensionsConfCreatorDemo {
     extensions.setExtensions(list);
     list.addAll(createConstantExtensions(oidPrefix, tag));
     marshall(extensions, destFilename);
-  } // method certprofileEeComplex
+  } // method extensionsSyntaxExt
 
   private static List<X509ExtensionType> createConstantExtensions(ASN1ObjectIdentifier oidPrefix,
       Tag tag) {
@@ -499,7 +501,7 @@ public class ExtensionsConfCreatorDemo {
     extn.setConstant(extnValue);
 
     marshall(extensions, destFilename);
-  } // method certprofileEeComplex
+  } // method extensionsAppleWwdr
 
   private static void extensionsGmt0015(String destFilename) throws Exception {
     ExtensionsType extensions = new ExtensionsType();

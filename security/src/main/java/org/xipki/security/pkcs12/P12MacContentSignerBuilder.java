@@ -43,7 +43,8 @@ import org.xipki.security.util.KeyUtil;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Builder of PKCS#12 MAC signers.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

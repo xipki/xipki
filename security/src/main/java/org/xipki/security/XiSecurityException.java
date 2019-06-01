@@ -18,7 +18,8 @@
 package org.xipki.security;
 
 /**
- * TODO.
+ * General security exception.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

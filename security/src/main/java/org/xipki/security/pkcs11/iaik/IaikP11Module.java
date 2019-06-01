@@ -44,7 +44,8 @@ import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
 
 /**
- * TODO.
+ * {@link P11Module} based on the IAIK PKCS#11 wrapper.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

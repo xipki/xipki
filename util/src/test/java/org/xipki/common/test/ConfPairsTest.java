@@ -27,7 +27,8 @@ import org.xipki.util.ConfPairs;
 import junit.framework.Assert;
 
 /**
- * TODO.
+ * Test for {@link ConfPairs}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

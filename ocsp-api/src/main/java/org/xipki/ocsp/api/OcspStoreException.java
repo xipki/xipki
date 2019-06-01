@@ -18,7 +18,8 @@
 package org.xipki.ocsp.api;
 
 /**
- * TODO.
+ * OCSP store exception.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

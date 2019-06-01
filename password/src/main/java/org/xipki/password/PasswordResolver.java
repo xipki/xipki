@@ -18,7 +18,8 @@
 package org.xipki.password;
 
 /**
- * TODO.
+ * Password resolver interface.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

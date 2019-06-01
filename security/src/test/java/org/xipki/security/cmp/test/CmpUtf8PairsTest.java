@@ -27,7 +27,8 @@ import org.xipki.security.cmp.CmpUtf8Pairs;
 import junit.framework.Assert;
 
 /**
- * TODO.
+ * Test the {@link CmpUtf8Pairs}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

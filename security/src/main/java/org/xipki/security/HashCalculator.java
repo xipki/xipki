@@ -29,7 +29,8 @@ import org.xipki.util.concurrent.ConcurrentBag;
 import org.xipki.util.concurrent.ConcurrentBagEntry;
 
 /**
- * TODO.
+ * Utility class to calculate hash values.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

@@ -25,7 +25,8 @@ import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 
 /**
- * TODO.
+ * Validation result consisting of failed validation issues and successful issues.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

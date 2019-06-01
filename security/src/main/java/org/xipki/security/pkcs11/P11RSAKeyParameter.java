@@ -25,7 +25,8 @@ import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * {@link RSAKeyParameters} for PKCS#11 token.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

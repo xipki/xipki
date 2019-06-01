@@ -64,7 +64,8 @@ import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 
 /**
- * TODO.
+ * Benchmark HTTP client.
+ *
  * @author Lijun Liao
  */
 

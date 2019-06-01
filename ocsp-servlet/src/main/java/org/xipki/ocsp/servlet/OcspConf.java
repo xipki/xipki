@@ -32,7 +32,8 @@ import org.xipki.util.ValidatableConf;
 import com.alibaba.fastjson.JSON;
 
 /**
- * TODO.
+ * Configuration of the OCSP server.
+ *
  * @author Lijun Liao
  */
 public class OcspConf extends ValidatableConf {

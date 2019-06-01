@@ -25,7 +25,8 @@ import org.bouncycastle.operator.ContentSigner;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * An implementation of {@link XiContentSigner}.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

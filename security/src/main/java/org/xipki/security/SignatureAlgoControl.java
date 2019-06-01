@@ -18,7 +18,8 @@
 package org.xipki.security;
 
 /**
- * TODO.
+ * Control the signature algorithm.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

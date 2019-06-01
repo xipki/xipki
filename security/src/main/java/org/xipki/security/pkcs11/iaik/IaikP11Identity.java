@@ -34,7 +34,8 @@ import iaik.pkcs.pkcs11.objects.PrivateKey;
 import iaik.pkcs.pkcs11.objects.SecretKey;
 
 /**
- * TODO.
+ * {@link P11Identity} based on the IAIK PKCS#11 wrapper.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

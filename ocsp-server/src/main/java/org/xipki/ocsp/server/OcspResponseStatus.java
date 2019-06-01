@@ -18,7 +18,8 @@
 package org.xipki.ocsp.server;
 
 /**
- * TODO.
+ * OCSP response status.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

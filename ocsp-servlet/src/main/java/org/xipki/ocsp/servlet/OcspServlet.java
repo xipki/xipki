@@ -43,7 +43,8 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * HTTP servlet of the OCSP responder.
+ *
  * @author Lijun Liao
  * @since 3.0.1
  */

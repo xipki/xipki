@@ -34,7 +34,8 @@ import org.bouncycastle.asn1.ocsp.TBSRequest;
 import org.xipki.ocsp.api.RequestIssuer;
 
 /**
- * TODO.
+ * OCSP request.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

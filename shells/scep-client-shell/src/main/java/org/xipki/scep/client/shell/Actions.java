@@ -52,7 +52,8 @@ import org.xipki.shell.XiAction;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Actions for CA client via SCEP.
+ *
  * @author Lijun Liao
  */
 

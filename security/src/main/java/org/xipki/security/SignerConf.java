@@ -27,7 +27,8 @@ import org.xipki.util.ConfPairs;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Configuration of {@link ConcurrentContentSigner}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

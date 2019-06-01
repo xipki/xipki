@@ -23,7 +23,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * TODO.
+ * Process Logger.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

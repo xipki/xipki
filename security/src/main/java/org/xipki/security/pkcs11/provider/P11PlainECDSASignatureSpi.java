@@ -17,10 +17,13 @@
 
 package org.xipki.security.pkcs11.provider;
 
+import java.security.SignatureSpi;
+
 import org.xipki.security.HashAlgo;
 
 /**
- * TODO.
+ * PKCS#11 ECDSA {@link SignatureSpi}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

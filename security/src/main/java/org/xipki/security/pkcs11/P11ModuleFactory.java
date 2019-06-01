@@ -18,7 +18,8 @@
 package org.xipki.security.pkcs11;
 
 /**
- * TODO.
+ * Factory to create {@link P11Module}.
+ *
  * @author Lijun Liao
  * @since 3.0.1
  */

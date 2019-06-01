@@ -22,7 +22,8 @@ import java.util.Date;
 import java.util.TimeZone;
 
 /**
- * TODO.
+ * Validity like the certificate validity, e.g. 3 years.
+ *
  * @author Lijun Liao
  */
 

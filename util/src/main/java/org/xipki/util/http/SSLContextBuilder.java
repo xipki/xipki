@@ -65,7 +65,7 @@ import org.xipki.util.Args;
  * SSLContext.html#init
  * </a>
  * <p>
- * TODO Specify which Oracle JSSE versions the above has been verified.
+ *
  *  </p>
  * @since 4.4
  */

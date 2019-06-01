@@ -24,7 +24,8 @@ import java.util.Arrays;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Certificate wrapper with encoded content.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

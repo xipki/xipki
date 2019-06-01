@@ -67,7 +67,8 @@ import org.xipki.util.ReqRespDebug.ReqRespPair;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Abstract class of OCSP requestor.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

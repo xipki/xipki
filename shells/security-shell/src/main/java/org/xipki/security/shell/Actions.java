@@ -99,7 +99,6 @@ import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.ExtensionExistence;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.InvalidOidOrNameException;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.ObjectIdentifiers;
@@ -128,7 +127,8 @@ import org.xipki.util.StringUtil;
 import com.alibaba.fastjson.JSON;
 
 /**
- * TODO.
+ * Security actions.
+ *
  * @author Lijun Liao
  */
 
@@ -756,8 +756,7 @@ public class Actions {
       return Collections.emptyList();
     }
 
-    private static List<ASN1ObjectIdentifier> textToAsn1ObjectIdentifers(
-        List<String> oidTexts) throws InvalidOidOrNameException {
+    private static List<ASN1ObjectIdentifier> textToAsn1ObjectIdentifers(List<String> oidTexts) {
       if (oidTexts == null) {
         return null;
       }

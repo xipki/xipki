@@ -29,7 +29,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
- * TODO.
+ * Utility class for String.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

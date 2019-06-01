@@ -31,7 +31,8 @@ import org.xipki.security.pkcs11.P11Params.P11RSAPkcsPssParams;
 import org.xipki.security.pkcs11.P11TokenException;
 
 /**
- * TODO.
+ * {@link P11Identity} for PKCS#11 proxy.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

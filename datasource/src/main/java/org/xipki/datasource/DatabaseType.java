@@ -20,7 +20,8 @@ package org.xipki.datasource;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Database type.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

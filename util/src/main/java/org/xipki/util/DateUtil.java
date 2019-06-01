@@ -25,7 +25,8 @@ import java.time.format.DateTimeParseException;
 import java.util.Date;
 
 /**
- * TODO.
+ * Utility class for the date conversion.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

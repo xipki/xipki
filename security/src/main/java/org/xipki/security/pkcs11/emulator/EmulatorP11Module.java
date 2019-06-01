@@ -39,7 +39,8 @@ import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * {@link P11Module} for PKCS#11 emulator.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

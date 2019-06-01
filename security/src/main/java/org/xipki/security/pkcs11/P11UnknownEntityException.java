@@ -18,7 +18,8 @@
 package org.xipki.security.pkcs11;
 
 /**
- * TODO.
+ * Exception inidcates unknown PKCS#11 entity.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

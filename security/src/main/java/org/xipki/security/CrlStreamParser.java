@@ -59,6 +59,13 @@ import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
 
 /**
+ * Both BouncyCastle and JDK read the whole CRL during the initialization. The
+ * size of the consumed memory is linear to the size of CRL. This may cause
+ * that OutOfMemory error for large CRLs.
+ * <p/>
+ * This class implements a real stream based parser of CRL with constant memory
+ * consumption.
+ * <p/>
  * Definition of CertificateList.
  *
  * <pre>

@@ -18,7 +18,8 @@
 package org.xipki.util;
 
 /**
- * TODO.
+ * Exception for object creation.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

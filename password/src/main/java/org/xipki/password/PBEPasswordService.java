@@ -27,7 +27,8 @@ import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * PBE (Password Based Encrytion) password service.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

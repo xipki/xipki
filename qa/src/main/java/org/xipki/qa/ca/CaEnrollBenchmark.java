@@ -83,7 +83,8 @@ import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.ssl.SslContext;
 
 /**
- * TODO.
+ * CA enrollment benchmark.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

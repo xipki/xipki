@@ -45,9 +45,10 @@ import org.xipki.security.ObjectIdentifiers.Xipki;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * {@link ContentVerifierProvider} for the algorithm X25519/X448 static HMAC (XiPKI own
+ * algorithm, based on RFC 6955).
+ *
  * @author Lijun Liao
- * @since 2.1.0
  */
 
 // CHECKSTYLE:SKIP

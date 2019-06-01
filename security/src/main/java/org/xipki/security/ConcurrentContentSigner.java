@@ -24,10 +24,12 @@ import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.operator.ContentSigner;
 import org.xipki.password.PasswordResolver;
 
 /**
- * TODO.
+ * Concurrent {@link ContentSigner}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

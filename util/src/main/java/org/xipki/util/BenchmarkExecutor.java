@@ -27,7 +27,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * TODO.
+ * Benchmark executor.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

@@ -22,7 +22,8 @@ import java.security.Security;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
 
 /**
- * TODO.
+ * Helper class to register the {@link XiProvider}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

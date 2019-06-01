@@ -18,7 +18,8 @@
 package org.xipki.security.pkcs11;
 
 /**
- * TODO.
+ * Exception indicates duplicated entities.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

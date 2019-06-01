@@ -18,7 +18,8 @@
 package org.xipki.security;
 
 /**
- * TODO.
+ * TLS feature extension type. See RFC 7633 for details.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

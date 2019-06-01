@@ -89,7 +89,8 @@ import org.xipki.util.Args;
 import org.xipki.util.CompareUtil;
 
 /**
- * TODO.
+ * Key utility class.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

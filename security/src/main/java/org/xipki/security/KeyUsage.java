@@ -20,7 +20,8 @@ package org.xipki.security;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Certificate key usage enum.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

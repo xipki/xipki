@@ -27,7 +27,8 @@ import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
 
 /**
- * TODO.
+ * PKCS#11 cryptographic service.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

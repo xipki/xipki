@@ -18,7 +18,8 @@
 package org.xipki.security;
 
 /**
- * TODO.
+ * Algorithm code. Defined intern in XiPKI.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

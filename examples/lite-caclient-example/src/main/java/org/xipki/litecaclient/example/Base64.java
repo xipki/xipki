@@ -20,7 +20,8 @@ package org.xipki.litecaclient.example;
 import java.util.Arrays;
 
 /**
- * TODO.
+ * Base64 encoder / decoder.
+ *
  * @author Lijun Liao
  */
 

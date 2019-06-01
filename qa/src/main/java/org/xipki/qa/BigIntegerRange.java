@@ -20,7 +20,8 @@ package org.xipki.qa;
 import java.math.BigInteger;
 
 /**
- * TODO.
+ * Range with [from, to].
+ *
  * @author Lijun Liao
  * @since 2.1.0
  */

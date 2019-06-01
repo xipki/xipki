@@ -46,7 +46,8 @@ import org.xipki.ocsp.server.type.OcspRequest;
 import org.xipki.security.ObjectIdentifiers;
 
 /**
- * TODO.
+ * Dummy class to do some tests.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

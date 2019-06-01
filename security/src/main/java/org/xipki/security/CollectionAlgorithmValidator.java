@@ -28,7 +28,9 @@ import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * An implementation of {@link AlgorithmValidator} where the permitted algorithms
+ * are contained in a static collection.
+ *
  * @author Lijun Liao
  * @since 2.1.0
  */

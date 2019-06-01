@@ -22,7 +22,8 @@ import org.xipki.cmpclient.IdentifiedObject;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * CMP request to enroll certificate for given CSR.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

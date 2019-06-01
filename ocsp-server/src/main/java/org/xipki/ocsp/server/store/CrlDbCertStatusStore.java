@@ -32,7 +32,8 @@ import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 
 /**
- * TODO.
+ * OcspStore for CRLs. Note that the CRLs will be imported to XiPKI OCSP database.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

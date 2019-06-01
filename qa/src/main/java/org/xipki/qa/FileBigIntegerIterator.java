@@ -31,7 +31,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Iterator which iterates the {@link BigInteger} specified in the file.
+ *
  * @author Lijun Liao
  * @since 2.1.0
  */

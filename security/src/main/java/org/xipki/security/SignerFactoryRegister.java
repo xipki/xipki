@@ -23,7 +23,9 @@ import java.util.Set;
 import org.xipki.util.ObjectCreationException;
 
 /**
- * TODO.
+ * Interface to register {@link SignerFactory} and to create new
+ * {@link ConcurrentContentSigner}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -37,7 +39,8 @@ public interface SignerFactoryRegister {
   Set<String> getSupportedSignerTypes();
 
   /**
-   * TODO.
+   * Creates a new {@link ConcurrentContentSigner}.
+   *
    * @param securityFactory
    *          Security factory. Must not be {@code null}.
    * @param type

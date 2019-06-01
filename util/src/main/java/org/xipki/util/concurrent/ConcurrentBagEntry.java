@@ -22,7 +22,8 @@ import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import org.xipki.util.concurrent.ConcurrentBag.IConcurrentBagEntry;
 
 /**
- * TODO.
+ * ConcurrentBagEntry.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

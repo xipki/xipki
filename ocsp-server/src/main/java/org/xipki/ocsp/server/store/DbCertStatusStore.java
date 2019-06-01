@@ -66,7 +66,8 @@ import org.xipki.util.StringUtil;
 import com.alibaba.fastjson.JSON;
 
 /**
- * TODO.
+ * OcspStore for XiPKI OCSP database.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

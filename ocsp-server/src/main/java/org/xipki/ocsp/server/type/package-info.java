@@ -16,3 +16,8 @@
  */
 
 package org.xipki.ocsp.server.type;
+
+/**
+ * This package contains classes to create of OCSP response with minimal CPU and
+ * minimal memory consumption.
+ */

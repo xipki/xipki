@@ -23,7 +23,8 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x500.X500Name;
 
 /**
- * TODO.
+ * ASN.1 ResponderID.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

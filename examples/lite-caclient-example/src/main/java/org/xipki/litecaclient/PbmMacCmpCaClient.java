@@ -52,7 +52,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * TODO.
+ * CMP CA Client using PBM MAC to protect the integrity of requests.
+ *
  * @author Lijun Liao
  */
 

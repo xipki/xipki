@@ -35,7 +35,8 @@ import org.xipki.util.CollectionUtil;
 import org.xipki.util.TripleState;
 
 /**
- * TODO.
+ * Completers for QA shells.
+ *
  * @author Lijun Liao
  */
 

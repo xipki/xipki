@@ -62,7 +62,8 @@ import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;
 
 /**
- * TODO.
+ * OCSP benchmark requestor.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

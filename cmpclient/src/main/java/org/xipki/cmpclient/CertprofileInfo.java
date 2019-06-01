@@ -21,7 +21,8 @@ import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Certprofile information.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

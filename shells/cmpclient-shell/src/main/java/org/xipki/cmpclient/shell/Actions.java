@@ -101,7 +101,6 @@ import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.CrlReason;
 import org.xipki.security.ExtensionExistence;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.InvalidOidOrNameException;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
@@ -131,7 +130,8 @@ import org.xipki.util.StringUtil;
 import com.alibaba.fastjson.JSON;
 
 /**
- * TODO.
+ * CMP client actions.
+ *
  * @author Lijun Liao
  *
  */
@@ -697,8 +697,7 @@ public class Actions {
       return result;
     } // method enroll
 
-    static List<ASN1ObjectIdentifier> textToAsn1ObjectIdentifers(List<String> oidTexts)
-        throws InvalidOidOrNameException {
+    static List<ASN1ObjectIdentifier> textToAsn1ObjectIdentifers(List<String> oidTexts) {
       if (oidTexts == null) {
         return null;
       }
@@ -1803,9 +1802,7 @@ public class Actions {
     }
 
     /**
-     * TODO.
-     * @param signatureAlgoControl
-     *          Signature algorithm control. Must not be {@code null}.
+     * Gets the signer.
      */
     protected abstract ConcurrentContentSigner getSigner() throws ObjectCreationException;
 

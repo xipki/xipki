@@ -27,7 +27,8 @@ import java.util.Set;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Specifies utf8Pairs defined in RFC4211.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

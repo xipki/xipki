@@ -46,7 +46,8 @@ import org.xipki.util.ValidatableConf;
 import com.alibaba.fastjson.JSON;
 
 /**
- * TODO.
+ * Utility class to initialize {@link SecurityFactory} and {@link P11CryptServiceFactory}.
+ *
  * @author Lijun Liao
  */
 

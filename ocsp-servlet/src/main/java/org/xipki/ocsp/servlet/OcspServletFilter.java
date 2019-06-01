@@ -47,7 +47,8 @@ import org.xipki.util.InvalidConfException;
 import org.xipki.util.LogUtil;
 
 /**
- * TODO.
+ * The Servlet Filter of OCSP servlets.
+ *
  * @author Lijun Liao
  */
 

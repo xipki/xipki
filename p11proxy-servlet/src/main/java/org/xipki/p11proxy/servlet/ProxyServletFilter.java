@@ -38,7 +38,8 @@ import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 
 /**
- * TODO.
+ * The Servlet Filter of P11Proxy servlets.
+ *
  * @author Lijun Liao
  */
 

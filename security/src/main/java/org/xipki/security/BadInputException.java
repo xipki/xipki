@@ -18,7 +18,8 @@
 package org.xipki.security;
 
 /**
- * TODO.
+ * Exception that indicates bad input.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

@@ -39,7 +39,8 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 /**
- * TODO.
+ * OCSP benchmark.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

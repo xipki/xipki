@@ -39,7 +39,8 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
 
 /**
- * TODO.
+ * {@link SignerFactory} for PKCS#11 token.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

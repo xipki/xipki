@@ -27,7 +27,8 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * CMP request to unrevoke or remove certificates.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

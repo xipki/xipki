@@ -18,7 +18,8 @@
 package org.xipki.shell;
 
 /**
- * TODO.
+ * Action failure.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

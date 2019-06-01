@@ -36,7 +36,8 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 /**
- * TODO.
+ * Secure panel to enter password.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

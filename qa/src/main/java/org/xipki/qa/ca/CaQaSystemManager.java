@@ -21,7 +21,8 @@ import java.io.Closeable;
 import java.util.Set;
 
 /**
- * TODO.
+ * QA system manager for CA.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -43,7 +44,7 @@ public interface CaQaSystemManager extends Closeable {
   Set<String> getCertprofileNames();
 
   /**
-   * TODO.
+   * Returns the Certprofile for the given name.
    * @param certprofileName
    *          Name of the cert profile.
    * @return the cert profile.

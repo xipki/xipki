@@ -23,7 +23,8 @@ import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * {@link AsymmetricKeyParameter} for PKCS#11 private key.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

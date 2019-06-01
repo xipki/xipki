@@ -22,7 +22,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.AbstractQueuedSynchronizer;
 
 /**
- * TODO.
+ * Count latch.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

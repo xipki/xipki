@@ -26,7 +26,8 @@ import org.bouncycastle.asn1.x509.CRLReason;
 import org.xipki.litecaclient.RestCaClient;
 
 /**
- * TODO.
+ * Example to use {@link RestCaClient}.
+ *
  * @author Lijun Liao
  */
 

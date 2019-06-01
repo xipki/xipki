@@ -18,7 +18,8 @@
 package org.xipki.util;
 
 /**
- * TODO.
+ * HEX encoder and decoder.
+ *
  * @author Lijun Liao
  * @since 3.0.1
  */

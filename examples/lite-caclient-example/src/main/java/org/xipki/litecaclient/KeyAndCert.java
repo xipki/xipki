@@ -22,7 +22,8 @@ import java.security.cert.X509Certificate;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 
 /**
- * TODO.
+ * Private key and certificate.
+ *
  * @author Lijun Liao
  */
 

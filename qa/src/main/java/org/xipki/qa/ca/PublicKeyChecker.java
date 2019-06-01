@@ -47,7 +47,8 @@ import org.xipki.util.CollectionUtil;
 import org.xipki.util.LruCache;
 
 /**
- * TODO.
+ * Public key checker.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

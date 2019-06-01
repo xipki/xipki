@@ -40,7 +40,7 @@ import org.xipki.litecaclient.SdkUtil;
 import org.xipki.litecaclient.SignatureCmpCaClient;
 
 /**
- * TODO.
+ * Example to use {@link CmpCaClient}.
  * @author Lijun Liao
  */
 

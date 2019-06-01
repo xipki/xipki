@@ -22,7 +22,9 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 
 /**
- * TODO.
+ * JUnit tests to test the signature creation and verification of PKCS#12 token
+ * for the signature algorithm SHA256withRSA.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

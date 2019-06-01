@@ -29,7 +29,8 @@ import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * CRL information.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

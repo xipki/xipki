@@ -52,7 +52,8 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Actions of QA for security.
+ *
  * @author Lijun Liao
  */
 

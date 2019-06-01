@@ -45,7 +45,8 @@ import org.xipki.security.NoIdleSignerException;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * CMP utility class.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

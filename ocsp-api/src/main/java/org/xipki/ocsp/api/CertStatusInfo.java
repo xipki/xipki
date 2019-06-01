@@ -25,7 +25,8 @@ import org.xipki.security.HashAlgo;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * CertStatus information.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

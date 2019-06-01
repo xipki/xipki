@@ -43,7 +43,7 @@ import org.xipki.util.Args;
 import org.xipki.util.IoUtil;
 
 /**
- * TODO.
+ * AES GMAC signer.
  * @author Lijun Liao
  * @since 2.2.0
  */

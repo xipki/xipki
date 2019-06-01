@@ -18,7 +18,8 @@
 package org.xipki.ocsp.server.type;
 
 /**
- * TODO.
+ * ASN.1 tagged Sequence of certificates.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

@@ -39,7 +39,8 @@ import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Basic actions.
+ *
  * @author Lijun Liao
  *
  */

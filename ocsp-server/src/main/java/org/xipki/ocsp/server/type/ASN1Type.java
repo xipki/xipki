@@ -22,7 +22,8 @@ import java.time.ZoneOffset;
 import java.util.Date;
 
 /**
- * TODO.
+ * The anchor class of ASN.1 types defined in this package.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

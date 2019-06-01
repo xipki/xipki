@@ -18,7 +18,8 @@
 package org.xipki.ocsp.api.mgmt;
 
 /**
- * TODO.
+ * OCSP manager interface.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

@@ -43,7 +43,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.util.GMUtil;
 
 /**
- * The RAW SM2 Digital Signature algorithm. The message is the hash value over the real message
+ * The RAW SM2 Digital Signature algorithm. The message is the hash value over the real message.
  *
  * @author Lijun Liao
  *

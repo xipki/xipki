@@ -18,7 +18,8 @@
 package org.xipki.security;
 
 /**
- * TODO.
+ * Abstract class of the result of Keypair generation.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

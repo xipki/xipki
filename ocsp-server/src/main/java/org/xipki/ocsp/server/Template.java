@@ -36,7 +36,8 @@ import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 
 /**
- * TODO.
+ * OCSP response template.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

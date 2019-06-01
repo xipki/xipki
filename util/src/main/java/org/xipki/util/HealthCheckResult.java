@@ -23,7 +23,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * TODO.
+ * Result of the health check.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

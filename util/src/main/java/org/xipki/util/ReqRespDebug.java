@@ -21,7 +21,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * TODO.
+ * Helper class for debug.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

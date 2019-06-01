@@ -30,7 +30,8 @@ import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Callback to get password.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

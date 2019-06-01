@@ -65,7 +65,8 @@ import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 
 /**
- * TODO.
+ * PKCS#12 key generator.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

@@ -22,7 +22,8 @@ import java.util.Arrays;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * QA extension value.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

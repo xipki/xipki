@@ -34,7 +34,10 @@ import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 
 /**
- * TODO.
+ * Defines XiPKI own extension ExtensionExistence. It is used to tell
+ * the CA which extensions are needed (required) and which ones are wanted
+ * (optional).
+ *
  * <pre>
  * ExtensionExistence ::= SEQUENCE
  * {

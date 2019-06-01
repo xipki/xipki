@@ -20,7 +20,8 @@ package org.xipki.security;
 import org.xipki.util.concurrent.ConcurrentBagEntry;
 
 /**
- * TODO.
+ * A {@link ConcurrentBagEntry} for {@link XiContentSigner}.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

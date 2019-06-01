@@ -18,7 +18,8 @@
 package org.xipki.ocsp.api;
 
 /**
- * TODO.
+ * Responder and ServletPath.
+ *
  * @author Lijun Liao
  * @since 3.0.1
  */

@@ -59,7 +59,8 @@ import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 
 /**
- * TODO.
+ * The responder of P11Proxy.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

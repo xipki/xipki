@@ -24,7 +24,8 @@ import org.xipki.password.PasswordBasedEncryption;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Test for the algorithm PBEWithHmacSHA256AndAES256.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

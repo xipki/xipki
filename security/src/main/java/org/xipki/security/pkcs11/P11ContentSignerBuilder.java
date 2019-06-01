@@ -48,7 +48,8 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Builder of {@link ConcurrentContentSigner} for PKCS#11 token.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

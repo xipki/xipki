@@ -75,7 +75,8 @@ import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Actions of QA for CA.
+ *
  * @author Lijun Liao
  */
 

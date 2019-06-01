@@ -18,7 +18,8 @@
 package org.xipki.ocsp.client;
 
 /**
- * TODO.
+ * Exception related to the OCSP requestor.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

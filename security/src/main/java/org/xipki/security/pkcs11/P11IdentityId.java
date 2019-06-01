@@ -21,7 +21,8 @@ import org.xipki.util.Args;
 import org.xipki.util.CompareUtil;
 
 /**
- * TODO.
+ * Identifier of {@link P11Identity}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -37,7 +38,8 @@ public class P11IdentityId implements Comparable<P11IdentityId> {
   private P11ObjectIdentifier certId;
 
   /**
-   * TODO.
+   * Constructor.
+   *
    * @param slotId
    *          Slot identifier. Must not be {@code null}.
    * @param keyId

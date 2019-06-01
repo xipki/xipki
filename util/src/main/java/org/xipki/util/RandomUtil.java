@@ -20,7 +20,8 @@ package org.xipki.util;
 import java.util.Random;
 
 /**
- * TODO.
+ * Random utility class.
+ *
  * @author Lijun Liao
  * @since 2.1.0
  *

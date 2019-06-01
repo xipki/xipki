@@ -59,7 +59,8 @@ import org.xipki.util.http.HostnameVerifiers;
 import org.xipki.util.http.SSLContextBuilder;
 
 /**
- * TODO.
+ * {@link P11Module} for PKCS#11 proxy.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

@@ -36,7 +36,8 @@ import org.xipki.util.Args;
 import org.xipki.util.FileOrValue;
 
 /**
- * TODO.
+ * Factory to create {@link DataSourceWrapper}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

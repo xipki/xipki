@@ -34,7 +34,8 @@ import org.xipki.util.LogUtil;
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
 /**
- * TODO.
+ * Builder to create {@link ConcurrentContentSigner} for PKCS#11 token.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

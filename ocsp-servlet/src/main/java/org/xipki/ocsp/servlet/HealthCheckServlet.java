@@ -37,7 +37,8 @@ import org.xipki.util.LogUtil;
 import com.alibaba.fastjson.JSON;
 
 /**
- * TODO.
+ * HTTP health check servlet of the OCSP server.
+ *
  * @author Lijun Liao
  * @since 3.0.1
  */

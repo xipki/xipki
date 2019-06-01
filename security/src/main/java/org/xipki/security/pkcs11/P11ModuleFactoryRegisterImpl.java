@@ -26,7 +26,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.util.LogUtil;
 
 /**
- * TODO.
+ * An implementation of {@link P11ModuleFactoryRegister}s.
+ *
  * @author Lijun Liao
  * @since 3.0.1
  */

@@ -31,7 +31,8 @@ import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 
 /**
- * TODO.
+ * HTTP proxy servlet.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

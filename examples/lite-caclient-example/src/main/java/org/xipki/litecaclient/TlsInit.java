@@ -33,7 +33,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * TODO.
+ * TLS utility class.
+ *
  * @author Lijun Liao
  */
 
@@ -46,13 +47,13 @@ public class TlsInit {
   private static final class InternX509TrustManager implements X509TrustManager {
 
     @Override
-    public void checkClientTrusted(X509Certificate[] arg0, String arg1)
+    public void checkClientTrusted(X509Certificate[] chain, String authType)
         throws CertificateException {
       // TODO: implement me
     }
 
     @Override
-    public void checkServerTrusted(X509Certificate[] arg0, String arg1)
+    public void checkServerTrusted(X509Certificate[] chain, String authType)
             throws CertificateException {
       // TODO: implement me
     }
@@ -78,7 +79,7 @@ public class TlsInit {
      */
     @Override
     public boolean verify(String hostname, SSLSession session) {
-      // TODO: implement the verification
+      // TODO: implement me
       return true;
     }
 

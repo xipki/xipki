@@ -53,7 +53,8 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
 
 /**
- * TODO.
+ * An implementation of {@link SecurityFactory}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

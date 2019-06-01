@@ -28,7 +28,8 @@ import java.util.Set;
 import org.xipki.ocsp.api.RequestIssuer;
 
 /**
- * TODO.
+ * Issuer store.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

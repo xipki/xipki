@@ -20,7 +20,8 @@ package org.xipki.util;
 import java.util.Map;
 
 /**
- * TODO.
+ * This interface specifies similar operations like the Linux command curl.
+ *
  * @author Lijun Liao
  */
 

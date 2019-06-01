@@ -42,7 +42,8 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.concurrent.ConcurrentBag;
 
 /**
- * TODO.
+ * An implementation of {@link ConcurrentContentSigner}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -149,7 +150,8 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
   }
 
   /**
-   * TODO.
+   * Borrows a signer.
+   *
    * @param soTimeout timeout in milliseconds, 0 for infinitely.
    */
   @Override

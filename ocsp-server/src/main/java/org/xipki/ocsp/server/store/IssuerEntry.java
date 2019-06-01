@@ -34,7 +34,8 @@ import org.xipki.util.Args;
 import org.xipki.util.CompareUtil;
 
 /**
- * TODO.
+ * Issuer entry.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

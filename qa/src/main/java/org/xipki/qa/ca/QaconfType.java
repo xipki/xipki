@@ -26,7 +26,8 @@ import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 
 /**
- * TODO.
+ * Configuration the QA system.
+ *
  * @author Lijun Liao
  */
 public class QaconfType extends ValidatableConf {

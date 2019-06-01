@@ -63,7 +63,8 @@ import org.xipki.util.StringUtil;
 import org.xipki.util.Validity;
 
 /**
- * TODO.
+ * QA for Certprofile.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

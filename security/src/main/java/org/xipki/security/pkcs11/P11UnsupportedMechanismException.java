@@ -20,7 +20,8 @@ package org.xipki.security.pkcs11;
 import iaik.pkcs.pkcs11.constants.Functions;
 
 /**
- * TODO.
+ * Exception indicates unsupported PKCS#11 mechanism.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

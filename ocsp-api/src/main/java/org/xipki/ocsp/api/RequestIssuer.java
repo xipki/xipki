@@ -25,7 +25,8 @@ import org.xipki.util.CompareUtil;
 import org.xipki.util.Hex;
 
 /**
- * TODO.
+ * Issuer in the OCSP request.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

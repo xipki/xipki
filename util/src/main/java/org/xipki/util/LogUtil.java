@@ -22,7 +22,8 @@ import java.math.BigInteger;
 import org.slf4j.Logger;
 
 /**
- * TODO.
+ * LOG utility class.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

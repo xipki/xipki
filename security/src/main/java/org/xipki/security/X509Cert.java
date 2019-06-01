@@ -30,7 +30,8 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Wrapper to an {@link X509Certificate}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

@@ -30,7 +30,8 @@ import org.bouncycastle.operator.RuntimeOperatorException;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * {@link XiContentSigner} based on {@link Signature}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

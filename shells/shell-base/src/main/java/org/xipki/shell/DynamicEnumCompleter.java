@@ -26,7 +26,8 @@ import org.apache.karaf.shell.api.console.Session;
 import org.apache.karaf.shell.support.completers.StringsCompleter;
 
 /**
- * TODO.
+ * Completer with dynamic enums.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

@@ -18,7 +18,8 @@
 package org.xipki.password;
 
 /**
- * TODO.
+ * Password based encryption algorithm enum.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

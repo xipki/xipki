@@ -24,7 +24,8 @@ import org.xipki.util.ObjectCreationException;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Utility class to create {@link HostnameVerifier}.
+ *
  * @author Lijun Liao
  */
 public class HostnameVerifiers {

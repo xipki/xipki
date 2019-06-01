@@ -18,7 +18,8 @@
 package org.xipki.security.cmp;
 
 /**
- * TODO.
+ * Protection verification result enum.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

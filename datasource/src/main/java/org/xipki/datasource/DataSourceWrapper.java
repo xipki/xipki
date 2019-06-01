@@ -40,7 +40,8 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 /**
- * TODO.
+ * A wrapper of {@link HikariDataSource}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

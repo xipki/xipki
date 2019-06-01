@@ -25,7 +25,8 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * TODO.
+ * Utility class to validate the parameters.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

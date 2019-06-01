@@ -45,7 +45,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * TODO.
+ * IO utility class.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

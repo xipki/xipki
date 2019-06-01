@@ -66,7 +66,8 @@ import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 
 /**
- * TODO.
+ * Builder of signer based PKCS#12 keystore.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

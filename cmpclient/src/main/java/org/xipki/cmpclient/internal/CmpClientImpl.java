@@ -104,7 +104,8 @@ import org.xipki.util.http.SSLContextBuilder;
 import com.alibaba.fastjson.JSON;
 
 /**
- * TODO.
+ * Implementation of the interface {@link CmpClient}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -194,7 +195,8 @@ public final class CmpClientImpl implements CmpClient {
   }
 
   /**
-   * TODO.
+   * Configure the CAs automatically.
+   *
    * @return names of CAs which may not been configured.
    */
   private Set<String> autoConfCas(Set<String> caNames) {

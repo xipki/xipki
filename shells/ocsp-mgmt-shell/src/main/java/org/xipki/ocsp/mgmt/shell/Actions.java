@@ -29,7 +29,8 @@ import org.xipki.shell.Completers;
 import org.xipki.shell.XiAction;
 
 /**
- * TODO.
+ * OCSP server management actions.
+ *
  * @author Lijun Liao
  */
 

@@ -27,7 +27,8 @@ import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * CMP request to enroll certificates.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

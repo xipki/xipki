@@ -18,7 +18,8 @@
 package org.xipki.ocsp.api;
 
 /**
- * TODO.
+ * OCSP response with {@link ResponseCacheInfo}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

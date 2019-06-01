@@ -20,7 +20,8 @@ package org.xipki.security;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 
 /**
- * TODO.
+ * Interface to check whether given algorithm is permitted.
+ *
  * @author Lijun Liao
  * @since 2.1.0
  */

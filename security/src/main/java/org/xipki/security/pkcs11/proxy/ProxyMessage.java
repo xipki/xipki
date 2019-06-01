@@ -61,14 +61,16 @@ import org.xipki.util.CollectionUtil;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * ASN.1 Messages communicated between the PKCS#11 proxy client and server.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
 public abstract class ProxyMessage extends ASN1Object {
 
   /**
-   * TODO.
+   * Parameters to add certificate.
+   *
    * <pre>
    * AddCertParams ::= SEQUENCE {
    *     slotId               P11SlotIdentifier,
@@ -155,7 +157,8 @@ public abstract class ProxyMessage extends ASN1Object {
   }
 
   /**
-   * TODO.
+   * Definition of DigestSecretKeyTemplate.
+   *
    * <pre>
    * DigestSecretKeyTemplate ::= SEQUENCE {
    *     slotId         SlotIdentifier,
@@ -228,7 +231,8 @@ public abstract class ProxyMessage extends ASN1Object {
   }
 
   /**
-   * TODO.
+   * Parameters to generate RSA keypair.
+   *
    * <pre>
    * GenRSAKeypairParams ::= SEQUENCE {
    *     slotId               P11SlotIdentifier,
@@ -322,7 +326,8 @@ public abstract class ProxyMessage extends ASN1Object {
   }
 
   /**
-   * TODO.
+   * Parameters to generate EC keypair.
+   *
    * <pre>
    * GenECKeypairParams ::= SEQUENCE {
    *     slotId               P11SlotIdentifier,
@@ -396,7 +401,8 @@ public abstract class ProxyMessage extends ASN1Object {
   }
 
   /**
-   * TODO.
+   * Paramters to generate EC keypair.
+   *
    * <pre>
    * GenECKeypairParams ::= SEQUENCE {
    *     slotId               P11SlotIdentifier,
@@ -471,7 +477,8 @@ public abstract class ProxyMessage extends ASN1Object {
   }
 
   /**
-   * TODO.
+   * Parameters to generate RSA keypair.
+   *
    * <pre>
    * GenRSAKeypairParams ::= SEQUENCE {
    *     slotId               P11SlotIdentifier,
@@ -561,7 +568,8 @@ public abstract class ProxyMessage extends ASN1Object {
   }
 
   /**
-   * TODO.
+   * Parameters to generate secret key.
+   *
    * <pre>
    * GenSecretKeyParams ::= SEQUENCE {
    *     slotId               P11SlotIdentifier,
@@ -645,7 +653,8 @@ public abstract class ProxyMessage extends ASN1Object {
   }
 
   /**
-   * TODO.
+   * Parameters to generate SM2 keypair.
+   *
    * <pre>
    * GenSM2KeypairParams ::= SEQUENCE {
    *     slotId               P11SlotIdentifier,
@@ -708,7 +717,8 @@ public abstract class ProxyMessage extends ASN1Object {
   }
 
   /**
-   * TODO.
+   * Parameters to import secret key.
+   *
    * <pre>
    * ImportSecretKeyParams ::= SEQUENCE {
    *     slotId               P11SlotIdentifier,
@@ -791,7 +801,8 @@ public abstract class ProxyMessage extends ASN1Object {
   }
 
   /**
-   * TODO.
+   * Definition of Mechanism.
+   *
    * <pre>
    * Mechanism ::= SEQUENCE {
    *     mechanism     INTEGER,
@@ -856,7 +867,8 @@ public abstract class ProxyMessage extends ASN1Object {
   }
 
   /**
-   * TODO.
+   * Control how to create new PKCS#11 keypair / secret key.
+   *
    * <pre>
    * NewKeyControl ::= SEQUENCE {
    *     label                  UTF8 STRING,
@@ -992,7 +1004,8 @@ public abstract class ProxyMessage extends ASN1Object {
   }
 
   /**
-   * TODO.
+   * Control how to create new PKCS#11 object.
+   *
    * <pre>
    * NewKeyControl ::= SEQUENCE {
    *     label                  UTF8 STRING,
@@ -1067,9 +1080,10 @@ public abstract class ProxyMessage extends ASN1Object {
   }
 
   /**
-   * TODO.
+   * Definition of ObjectIdAndCert.
+   *
    * <pre>
-   * EntityIdAndCert ::= SEQUENCE {
+   * ObjectIdAndCert ::= SEQUENCE {
    *     slotId         SlotIdentifier,
    *     objectId       ObjectIdentifier,
    *     certificate    Certificate }
@@ -1154,7 +1168,8 @@ public abstract class ProxyMessage extends ASN1Object {
   }
 
   /**
-   * TODO.
+   * Identifier of the PKCS#11 identity.
+   *
    * <pre>
    * IdentityIdentifer ::= SEQUENCE {
    *     slotId              SlotIdentifier,
@@ -1242,7 +1257,8 @@ public abstract class ProxyMessage extends ASN1Object {
   }
 
   /**
-   * TODO.
+   * Identifier of PKCS#11 object.
+   *
    * <pre>
    * P11ObjectIdentifier ::= SEQUENCE {
    *     id        OCTET STRING,
@@ -1298,7 +1314,8 @@ public abstract class ProxyMessage extends ASN1Object {
   }
 
   /**
-   * TODO.
+   * List of {@link ObjectIdentifier}s.
+   *
    * <pre>
    * P11ObjectIdentifiers ::= SEQUENCE OF P11ObjectIdentifier
    * </pre>
@@ -1353,7 +1370,8 @@ public abstract class ProxyMessage extends ASN1Object {
   }
 
   /**
-   * TODO.
+   * ASN.1 PKCS#11 params.
+   *
    * <pre>
    * P11Params ::= CHOICE {
    *     rsaPkcsPssParams   [0]  RSA-PKCS-PSS-Parameters,
@@ -1416,7 +1434,8 @@ public abstract class ProxyMessage extends ASN1Object {
   }
 
   /**
-   * TODO.
+   * Slot identifier and Object identifier.
+   *
    * <pre>
    * SlotIdAndObjectId ::= SEQUENCE {
    *     slotId     SlotIdentifier,
@@ -1484,7 +1503,8 @@ public abstract class ProxyMessage extends ASN1Object {
   }
 
   /**
-   * TODO.
+   * Slot identifier.
+   *
    * <pre>
    * SlotIdentifier ::= SEQUENCE {
    *     id         INTEGER,
@@ -1540,7 +1560,8 @@ public abstract class ProxyMessage extends ASN1Object {
   }
 
   /**
-   * TODO.
+   * Parameters to remove objects.
+   *
    * <pre>
    * RemoveObjectsParams ::= SEQUENCE {
    *     slotId     SlotIdentifier,
@@ -1637,7 +1658,8 @@ public abstract class ProxyMessage extends ASN1Object {
   }
 
   /**
-   * TODO.
+   * Parameters to create RSAPkcsPss signature.
+   *
    * <pre>
    * RSAPkcsPssParams ::= SEQUENCE {
    *     contentHash       INTEGER,
@@ -1697,7 +1719,8 @@ public abstract class ProxyMessage extends ASN1Object {
   }
 
   /**
-   * TODO.
+   * Server capability.
+   *
    * <pre>
    * ServerCaps ::= SEQUENCE {
    *     readOnly      BOOLEAN,
@@ -1788,7 +1811,8 @@ public abstract class ProxyMessage extends ASN1Object {
   }
 
   /**
-   * TODO.
+   * Definition of SignTemplate.
+   *
    * <pre>
    * SignTemplate ::= SEQUENCE {
    *     slotId         SlotIdentifier,

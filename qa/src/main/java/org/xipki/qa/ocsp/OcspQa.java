@@ -65,7 +65,8 @@ import org.xipki.util.DateUtil;
 import org.xipki.util.TripleState;
 
 /**
- * TODO.
+ * OCSP QA.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

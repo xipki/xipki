@@ -18,7 +18,8 @@
 package org.xipki.util;
 
 /**
- * TODO.
+ * XiPKIÄ's HTTP constants.
+ *
  * @author Lijun Liao
  */
 

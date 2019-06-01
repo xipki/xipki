@@ -21,7 +21,8 @@ import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Single password resolver.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

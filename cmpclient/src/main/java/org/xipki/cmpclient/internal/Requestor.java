@@ -29,7 +29,8 @@ import org.xipki.security.SecurityFactory;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * CMP requestor.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

@@ -40,7 +40,8 @@ import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Actions of database tool.
+ *
  * @author Lijun Liao
  */
 public class Actions {

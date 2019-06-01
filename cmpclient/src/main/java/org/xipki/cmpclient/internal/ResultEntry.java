@@ -30,7 +30,8 @@ import org.xipki.security.cmp.PkiStatusInfo;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Result entry.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

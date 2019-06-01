@@ -29,7 +29,8 @@ import org.xipki.util.Args;
 import org.xipki.util.BenchmarkExecutor;
 
 /**
- * TODO.
+ * Speed test of PKCS#12 keypair generation.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

@@ -23,7 +23,8 @@ import org.xipki.security.KeypairGenerationResult;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Result of the KeyStore generation.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

@@ -36,7 +36,8 @@ import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * OCSP request options.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

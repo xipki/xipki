@@ -18,7 +18,8 @@
 package org.xipki.ocsp.server;
 
 /**
- * TODO.
+ * OCSP responder exception.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

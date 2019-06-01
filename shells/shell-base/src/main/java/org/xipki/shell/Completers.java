@@ -29,7 +29,8 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 
 /**
- * TODO.
+ * Completers for actions.
+ *
  * @author Lijun Liao
  */
 public class Completers {

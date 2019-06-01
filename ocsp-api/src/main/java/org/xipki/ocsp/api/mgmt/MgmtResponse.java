@@ -18,7 +18,8 @@
 package org.xipki.ocsp.api.mgmt;
 
 /**
- * TODO.
+ * OCSP server management response.
+ *
  * @author Lijun Liao
  */
 

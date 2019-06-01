@@ -27,7 +27,8 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Entry for benchmark enrollment test.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

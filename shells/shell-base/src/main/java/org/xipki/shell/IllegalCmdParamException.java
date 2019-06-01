@@ -18,7 +18,8 @@
 package org.xipki.shell;
 
 /**
- * TODO.
+ * Exception for illegagl action parameters / options.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

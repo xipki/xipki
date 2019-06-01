@@ -25,7 +25,8 @@ import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.xipki.util.ReqRespDebug;
 
 /**
- * TODO.
+ * OCSP requestor interface.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

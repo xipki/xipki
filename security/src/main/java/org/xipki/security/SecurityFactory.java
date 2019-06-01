@@ -33,7 +33,10 @@ import org.xipki.password.PasswordResolver;
 import org.xipki.util.ObjectCreationException;
 
 /**
- * TODO.
+ * This is the core interface. It specifies the method to create
+ * {@link ConcurrentContentSigner}, {@link ContentVerifierProvider},
+ * to verify POPO, to the random, etc.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

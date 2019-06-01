@@ -25,7 +25,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * TODO.
+ * Container of name-value pairs.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

@@ -18,7 +18,8 @@
 package org.xipki.security;
 
 /**
- * TODO.
+ * Exception that indicates cryptographic error.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

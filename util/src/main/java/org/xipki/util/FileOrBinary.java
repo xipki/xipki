@@ -20,7 +20,8 @@ package org.xipki.util;
 import java.io.IOException;
 
 /**
- * TODO.
+ * Configuration consisting either file path or the binary content.
+ *
  * @author Lijun Liao
  */
 

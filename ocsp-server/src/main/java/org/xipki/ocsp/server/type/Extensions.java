@@ -20,7 +20,8 @@ package org.xipki.ocsp.server.type;
 import java.util.List;
 
 /**
- * TODO.
+ * ASN.1 Extensions.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

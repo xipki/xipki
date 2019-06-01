@@ -25,7 +25,8 @@ import org.bouncycastle.crypto.RuntimeCryptoException;
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
 /**
- * TODO.
+ * Plain-RSA signer for PKCS#11 token.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

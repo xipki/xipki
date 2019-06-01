@@ -148,7 +148,8 @@ import org.xipki.util.TripleState;
 import org.xipki.util.Validity;
 
 /**
- * TODO.
+ * Extensions checker.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

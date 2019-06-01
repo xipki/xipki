@@ -18,7 +18,8 @@
 package org.xipki.security;
 
 /**
- * TODO.
+ * Exception that indicates no idle signer is available.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

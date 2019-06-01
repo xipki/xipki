@@ -23,7 +23,8 @@ import java.io.UnsupportedEncodingException;
 import org.xipki.util.HealthCheckResult;
 
 /**
- * TODO.
+ * OCSP server interface.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

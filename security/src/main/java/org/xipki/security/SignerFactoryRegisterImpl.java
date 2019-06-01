@@ -29,7 +29,8 @@ import org.xipki.util.Args;
 import org.xipki.util.ObjectCreationException;
 
 /**
- * TODO.
+ * An implementation of {@link SignerFactoryRegister}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

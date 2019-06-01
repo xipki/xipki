@@ -30,7 +30,9 @@ import org.xipki.security.DSAPlainDigestSigner;
 import org.xipki.security.util.AlgorithmUtil;
 
 /**
- * TODO.
+ * Extends {@link BcECContentVerifierProviderBuilder} to support the signature algorithms
+ * Plain-ECDSA and SM3.
+ *
  * @author Lijun Liao
  * @since 2.1.0
  */

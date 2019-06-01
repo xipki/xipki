@@ -27,7 +27,8 @@ import org.xipki.cmpclient.CmpClientException;
 import org.xipki.shell.DynamicEnumCompleter;
 
 /**
- * TODO.
+ * Shell completers.
+ *
  * @author Lijun Liao
  */
 

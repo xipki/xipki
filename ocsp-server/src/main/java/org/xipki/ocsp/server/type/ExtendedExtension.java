@@ -27,7 +27,8 @@ import org.xipki.ocsp.server.type.OcspRequest.Header;
 import org.xipki.util.Hex;
 
 /**
- * TODO.
+ * ASN.1 extension that can be read and written.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

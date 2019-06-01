@@ -45,7 +45,8 @@ import org.xipki.util.http.SslContextConf;
 import com.alibaba.fastjson.JSON;
 
 /**
- * TODO.
+ * OCSP Management client. It communicates with the server via REST API.
+ *
  * @author Lijun Liao
  */
 

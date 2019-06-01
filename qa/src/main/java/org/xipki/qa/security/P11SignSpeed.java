@@ -42,7 +42,8 @@ import org.xipki.util.StringUtil;
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
 /**
- * TODO.
+ * Speed test of PKCS#11 signature creation.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

@@ -35,7 +35,8 @@ import org.bouncycastle.crypto.digests.SM3Digest;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Hash algorithm enum.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

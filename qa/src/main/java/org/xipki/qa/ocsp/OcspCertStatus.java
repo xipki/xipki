@@ -18,7 +18,8 @@
 package org.xipki.qa.ocsp;
 
 /**
- * TODO.
+ * OCSP Certstatus enum.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

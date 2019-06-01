@@ -22,7 +22,8 @@ import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 
 /**
- * TODO.
+ * Configuration of DataSource.
+ *
  * @author Lijun Liao
  */
 public class DataSourceConf extends ValidatableConf {

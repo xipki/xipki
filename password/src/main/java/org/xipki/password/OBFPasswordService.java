@@ -23,7 +23,8 @@ import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * OBF (jetty's Obfuscate) password service.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

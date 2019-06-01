@@ -23,7 +23,8 @@ import java.util.Set;
 import org.xipki.security.XiSecurityException;
 
 /**
- * TODO.
+ * Factory to create {@link P11CryptService}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

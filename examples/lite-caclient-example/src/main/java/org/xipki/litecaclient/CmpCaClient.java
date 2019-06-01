@@ -90,7 +90,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * TODO.
+ * CA client which communicates with CA via CMP.
+ *
  * @author Lijun Liao
  */
 

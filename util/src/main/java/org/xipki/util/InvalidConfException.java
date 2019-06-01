@@ -18,7 +18,8 @@
 package org.xipki.util;
 
 /**
- * TODO.
+ * Invalid configuration exception.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

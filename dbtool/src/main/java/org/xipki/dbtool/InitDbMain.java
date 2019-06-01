@@ -38,7 +38,8 @@ import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Class with main method to initialize the database.
+ *
  * @author Lijun Liao
  */
 

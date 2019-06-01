@@ -25,7 +25,8 @@ import org.xipki.util.ConfPairs;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Certificate revocation information.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

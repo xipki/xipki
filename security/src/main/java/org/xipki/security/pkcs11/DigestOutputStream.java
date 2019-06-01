@@ -23,7 +23,8 @@ import java.io.OutputStream;
 import org.bouncycastle.crypto.Digest;
 
 /**
- * TODO.
+ * {@link OutputStream} with a {@link Digest} as the backend.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

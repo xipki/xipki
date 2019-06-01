@@ -27,7 +27,8 @@ import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 
 /**
- * TODO.
+ * Configuration of CMP client.
+ *
  * @author Lijun Liao
  */
 

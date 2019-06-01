@@ -25,7 +25,8 @@ import org.xipki.util.DateUtil;
 import junit.framework.Assert;
 
 /**
- * TODO.
+ * Test for {@link DateUtil}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

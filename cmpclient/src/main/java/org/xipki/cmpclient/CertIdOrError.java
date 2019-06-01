@@ -22,7 +22,8 @@ import org.xipki.security.cmp.PkiStatusInfo;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * CertId or PKI error.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

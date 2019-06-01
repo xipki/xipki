@@ -49,7 +49,8 @@ import org.xipki.util.ObjectCreationException;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * {@link SignerFactory} for the types pkcs12, jks and jceks.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

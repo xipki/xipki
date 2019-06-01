@@ -24,7 +24,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * An implementation of {@link PasswordResolver}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

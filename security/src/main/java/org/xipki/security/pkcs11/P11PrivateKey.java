@@ -29,7 +29,8 @@ import org.xipki.security.XiSecurityException;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * {@link PrivateKey} for PKCS#11 token.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

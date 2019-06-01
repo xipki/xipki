@@ -26,7 +26,8 @@ import org.xipki.util.StringUtil;
 import org.xipki.util.ValidatableConf;
 
 /**
- * TODO.
+ * Utility class to initialize {@link PasswordResolver}.
+ *
  * @author Lijun Liao
  */
 

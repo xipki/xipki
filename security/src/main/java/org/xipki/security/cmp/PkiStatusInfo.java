@@ -22,7 +22,8 @@ import org.xipki.security.util.CmpFailureUtil;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * PKIStatus.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

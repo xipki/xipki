@@ -28,7 +28,8 @@ import org.xipki.security.HashAlgo;
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
 /**
- * TODO.
+ * PKCS#11 params.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

@@ -18,7 +18,8 @@
 package org.xipki.security;
 
 /**
- * TODO.
+ * Exception that indicates signer related errors.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

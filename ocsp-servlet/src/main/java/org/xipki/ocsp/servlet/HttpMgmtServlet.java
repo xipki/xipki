@@ -43,7 +43,8 @@ import org.xipki.util.InvalidConfException;
 import com.alibaba.fastjson.JSON;
 
 /**
- * TODO.
+ * REST management servlet of OCSP server.
+ *
  * @author Lijun Liao
  * @since 3.0.1
  */

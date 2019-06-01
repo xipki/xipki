@@ -20,7 +20,8 @@ package org.xipki.security.pkcs11;
 import java.io.Closeable;
 
 /**
- * TODO.
+ * Register of {@link P11ModuleFactory}s.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

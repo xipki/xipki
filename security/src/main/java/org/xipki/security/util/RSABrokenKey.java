@@ -28,7 +28,8 @@ package org.xipki.security.util;
 import java.math.BigInteger;
 
 /**
- * TODO.
+ * RSA broken key checker.
+ *
  * @author Lijun Liao
  * @since 2.1.0
  */

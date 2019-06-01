@@ -64,7 +64,8 @@ import org.xipki.util.StringUtil;
 import com.alibaba.fastjson.JSON;
 
 /**
- * TODO.
+ * OcspStore for the EJBCA database.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

@@ -27,7 +27,8 @@ import java.util.Set;
 import org.xipki.ocsp.api.RequestIssuer;
 
 /**
- * TODO.
+ * IssuerStore for the EJBCA database.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

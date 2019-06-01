@@ -49,7 +49,8 @@ import org.xipki.security.XiSecurityException;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Builder of PKCS#12 XDH (e.g. X25519, X448) MAC signer.
+ *s
  * @author Lijun Liao
  */
 

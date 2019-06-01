@@ -82,7 +82,8 @@ import org.xipki.util.StringUtil;
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
 /**
- * TODO.
+ * Actions for PKCS#11 security.
+ *
  * @author Lijun Liao
  */
 

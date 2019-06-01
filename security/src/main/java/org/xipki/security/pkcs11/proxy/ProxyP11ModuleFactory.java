@@ -23,7 +23,8 @@ import org.xipki.security.pkcs11.P11ModuleFactory;
 import org.xipki.security.pkcs11.P11TokenException;
 
 /**
- * TODO.
+ * {@link P11ModuleFactory} to create {@link P11Module} of type "proxy".
+ *
  * @author Lijun Liao
  *
  */

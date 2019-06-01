@@ -24,7 +24,8 @@ import org.xipki.util.Hex;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Exception related to the OCSP response.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

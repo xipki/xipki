@@ -32,7 +32,8 @@ import org.xipki.util.HealthCheckResult;
 import org.xipki.util.ReqRespDebug;
 
 /**
- * TODO.
+ * CMP client interface.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -44,7 +45,8 @@ public interface CmpClient extends Closeable {
   Set<String> getCaNames() throws CmpClientException;
 
   /**
-   * TODO.
+   * Return set given Certprofiles supported by the CA caName.
+   *
    * @param caName
    *          CA name. Must not be {@code null}
    * @return the certificate profiles supported by the given CA.
@@ -54,8 +56,7 @@ public interface CmpClient extends Closeable {
   Set<CertprofileInfo> getCertprofiles(String caName) throws CmpClientException;
 
   /**
-   * TODO.
-   * Enrolls a certificate
+   * Enrolls a certificate.
    *
    * @param caName
    *          CA name. Could be {@code null}.
@@ -119,8 +120,7 @@ public interface CmpClient extends Closeable {
       ReqRespDebug debug) throws CmpClientException, PkiErrorException;
 
   /**
-   * TODO.
-   * Revokes a certificate
+   * Revokes a certificate.
    *
    * @param caName
    *          CA name. Could be {@code null}.

@@ -79,7 +79,8 @@ import org.xipki.util.StringUtil;
 import org.xipki.util.TripleState;
 
 /**
- * TODO.
+ * Actions of QA for OCSP.
+ *
  * @author Lijun Liao
  */
 
@@ -702,7 +703,7 @@ public class QaOcspActions {
     } // method checkParameters
 
     @Override
-    protected Object processResponse(OCSPResp response, X509Certificate respIssuer,
+    protected void processResponse(OCSPResp response, X509Certificate respIssuer,
         IssuerHash issuerHash, List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
         throws Exception {
       OcspResponseOption responseOption = new OcspResponseOption();
@@ -737,7 +738,6 @@ public class QaOcspActions {
       if (!result.isAllSuccessful()) {
         throw new CmdFailure("OCSP response is invalid");
       }
-      return null;
     } // method processResponse
 
     static void format(ValidationIssue issue, String prefix, StringBuilder sb) {

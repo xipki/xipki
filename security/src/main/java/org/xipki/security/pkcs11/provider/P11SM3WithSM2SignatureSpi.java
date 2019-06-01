@@ -45,7 +45,8 @@ import org.xipki.util.StringUtil;
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
 /**
- * TODO.
+ * PKCS#11 SM3withSM2 {@link SignatureSpi}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

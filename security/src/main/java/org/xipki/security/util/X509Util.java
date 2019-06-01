@@ -100,7 +100,8 @@ import org.xipki.util.PemEncoder.PemLabel;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * X.509 certificate utility class.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

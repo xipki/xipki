@@ -27,7 +27,8 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.util.CompareUtil;
 
 /**
- * TODO.
+ * OID enums.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

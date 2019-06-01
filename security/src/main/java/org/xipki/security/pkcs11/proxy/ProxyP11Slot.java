@@ -45,7 +45,8 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * {@link P11Slot} for PKCS#11 proxy.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

@@ -20,9 +20,9 @@ package org.xipki.litecaclient;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 
 /**
- * TODO.
+ * Collection of Object Identifiers.
+ *
  * @author Lijun Liao
- * @since 2.0.0
  */
 
 public class ObjectIdentifiers {

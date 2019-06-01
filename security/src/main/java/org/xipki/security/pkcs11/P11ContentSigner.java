@@ -57,7 +57,8 @@ import org.xipki.util.LogUtil;
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
 /**
- * TODO.
+ * PKCS#11 {@link XiContentSigner}.
+ *
  * @author Lijun Liao
  *
  */

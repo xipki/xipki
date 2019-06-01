@@ -32,7 +32,8 @@ import javax.net.ssl.SSLSocketFactory;
 import org.xipki.util.http.SslContextConf;
 
 /**
- * TODO.
+ * An implementation of {@link Curl}.
+ *
  * @author Lijun Liao
  */
 

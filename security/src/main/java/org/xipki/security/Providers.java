@@ -25,7 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * TODO.
+ * Helper class to register providers {@link BouncyCastleProvider}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

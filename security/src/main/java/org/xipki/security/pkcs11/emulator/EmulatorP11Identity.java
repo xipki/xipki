@@ -67,7 +67,8 @@ import iaik.pkcs.pkcs11.constants.Functions;
 import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 
 /**
- * TODO.
+ * {@link P11Identity} for PKCS#11 emulator.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

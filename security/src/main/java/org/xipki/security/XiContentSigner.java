@@ -20,7 +20,8 @@ package org.xipki.security;
 import org.bouncycastle.operator.ContentSigner;
 
 /**
- * TODO.
+ * Extends {@link ContentSigner} by a new method {@link #getEncodedAlgorithmIdentifier()}.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

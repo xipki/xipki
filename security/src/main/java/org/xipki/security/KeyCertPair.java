@@ -23,7 +23,8 @@ import java.security.cert.X509Certificate;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Private key and certificate.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

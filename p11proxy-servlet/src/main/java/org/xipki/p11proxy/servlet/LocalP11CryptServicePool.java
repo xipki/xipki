@@ -32,7 +32,7 @@ import org.xipki.security.pkcs11.P11TokenException;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Pool of local {@link P11CryptService}s.
  * @author Lijun Liao
  * @since 2.0.0
  */

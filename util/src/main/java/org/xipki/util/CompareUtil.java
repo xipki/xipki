@@ -18,7 +18,8 @@
 package org.xipki.util;
 
 /**
- * TODO.
+ * Utility class for the comparison.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

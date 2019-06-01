@@ -21,7 +21,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * TODO.
+ * ASN.1 ResponseData.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

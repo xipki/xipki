@@ -21,7 +21,7 @@ import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
- * TODO.
+ * Identifier of a {@link P11Slot}.
  * @author Lijun Liao
  * @since 2.0.0
  */

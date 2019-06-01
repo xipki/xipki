@@ -21,7 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * TODO.
+ * PKCS#11 proxy constants.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

@@ -18,7 +18,8 @@
 package org.xipki.cmpclient;
 
 /**
- * TODO.
+ * CMP client exception.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

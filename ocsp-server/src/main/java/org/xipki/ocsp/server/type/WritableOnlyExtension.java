@@ -18,7 +18,8 @@
 package org.xipki.ocsp.server.type;
 
 /**
- * TODO.
+ * Write only extension.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

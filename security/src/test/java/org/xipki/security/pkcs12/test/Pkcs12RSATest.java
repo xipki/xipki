@@ -36,7 +36,9 @@ import org.xipki.security.pkcs12.P12ContentSignerBuilder;
 import org.xipki.security.util.X509Util;
 
 /**
- * TODO.
+ * Abstract class of JUnit tests to test the signature creation and verification
+ * of PKCS#12 token.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

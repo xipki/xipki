@@ -20,7 +20,8 @@ package org.xipki.cmpclient;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Object with id.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

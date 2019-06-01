@@ -44,7 +44,8 @@ import org.xipki.security.pkcs11.P11TokenException;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Encrypts and decrypts private key in the emulator.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

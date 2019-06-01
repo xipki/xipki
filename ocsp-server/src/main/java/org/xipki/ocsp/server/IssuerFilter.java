@@ -27,7 +27,8 @@ import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 
 /**
- * TODO.
+ * Certificate issuer filter.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

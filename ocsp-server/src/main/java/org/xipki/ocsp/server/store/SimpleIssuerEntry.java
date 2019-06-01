@@ -18,7 +18,8 @@
 package org.xipki.ocsp.server.store;
 
 /**
- * TODO.
+ * Simple IssuerEntry containing only the id and RevocationTime.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

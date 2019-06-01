@@ -68,7 +68,8 @@ import org.xipki.util.PemEncoder;
 import org.xipki.util.PemEncoder.PemLabel;
 
 /**
- * TODO.
+ * Actions for PKCS#12 security.
+ *
  * @author Lijun Liao
  */
 

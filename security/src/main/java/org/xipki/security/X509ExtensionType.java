@@ -54,7 +54,8 @@ import org.xipki.util.ValidatableConf;
 import com.alibaba.fastjson.annotation.JSONField;
 
 /**
- * TODO.
+ * Configuration of an X.509 extension.
+ *
  * @author Lijun Liao
  */
 

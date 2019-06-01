@@ -18,7 +18,8 @@
 package org.xipki.security;
 
 /**
- * TODO.
+ * Constants.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

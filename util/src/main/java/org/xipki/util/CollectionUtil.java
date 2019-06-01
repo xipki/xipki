@@ -26,7 +26,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * TODO.
+ * Utility class for operations on {@link Collection}, {@link Set}, {@link List}, {@link Map},
+ * and arrays.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

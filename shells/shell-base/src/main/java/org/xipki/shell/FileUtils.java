@@ -28,7 +28,8 @@ import java.util.List;
 import javax.security.auth.login.Configuration;
 
 /**
- * TODO.
+ * File utility class.
+ *
  * @author Lijun Liao
  * @since 2.2.0
  */

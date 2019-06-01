@@ -30,7 +30,8 @@ import org.xipki.util.ValidatableConf;
 import com.alibaba.fastjson.JSON;
 
 /**
- * TODO.
+ * Configuration of the P11Proxy.
+ *
  * @author Lijun Liao
  */
 public class P11ProxyConf extends ValidatableConf {

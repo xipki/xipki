@@ -23,6 +23,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * LRU cache.
+ *
+ */
 public class LruCache<K, V> {
 
   private final LinkedHashMap<K, V> map;
@@ -43,7 +47,8 @@ public class LruCache<K, V> {
   private int missCount;
 
   /**
-   * TODO.
+   * Constructor with the maximal size.
+   *
    * @param maxSize for caches that do not override {@link #sizeOf}, this is
    *     the maximum number of entries in the cache. For all other caches,
    *     this is the maximum sum of the sizes of the entries in this cache.
@@ -347,7 +352,8 @@ public class LruCache<K, V> {
   }
 
   /**
-   * TODO.
+   * Returns a snapshot the cache.
+   *
    * @return a copy of the current contents of the cache, ordered from least
    *      recently accessed to most recently accessed.
    */
@@ -356,7 +362,7 @@ public class LruCache<K, V> {
   }
 
   /**
-   * TODO.
+   * Returns a snapshot of the keys of current cache.
    * @return a copy of the keys of the current contents of the cache.
    */
   public final synchronized Set<K> keySnapshot() {

@@ -18,7 +18,7 @@
 package org.xipki.util;
 
 /**
- * For details please refer to RFC 7468.
+ * PEM encoder. For details please refer to RFC 7468.
  *
  * @author Lijun Liao
  *

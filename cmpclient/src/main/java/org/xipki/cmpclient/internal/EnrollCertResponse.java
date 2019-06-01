@@ -24,7 +24,8 @@ import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Response of certificate enrollment.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
