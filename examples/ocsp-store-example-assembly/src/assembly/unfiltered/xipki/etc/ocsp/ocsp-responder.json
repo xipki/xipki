@@ -50,6 +50,7 @@
 		"retentionInterval":-1,
 		"minNextUpdatePeriod":"1d",
 		"unknownSerialAsGood":false,
+		"updateInterval":"10m",
 		"source":{
 			"type":"java:org.xipki.ocsp.server.store.example.DummyStore",
 			"conf":{

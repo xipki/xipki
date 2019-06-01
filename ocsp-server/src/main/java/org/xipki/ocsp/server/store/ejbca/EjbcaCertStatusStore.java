@@ -26,6 +26,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -104,7 +105,7 @@ public class EjbcaCertStatusStore extends OcspStore {
   private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
   protected List<Runnable> getScheduledServices() {
-    return Collections.emptyList();
+    return Arrays.asList(new StoreUpdateService());
   }
 
   private synchronized void updateIssuerStore() {
@@ -466,21 +467,19 @@ public class EjbcaCertStatusStore extends OcspStore {
     if (this.scheduledThreadPoolExecutor != null) {
       this.scheduledThreadPoolExecutor.shutdownNow();
     }
-    StoreUpdateService storeUpdateService = new StoreUpdateService();
-    List<Runnable> scheduledServices = getScheduledServices();
-    int size = 1;
-    if (scheduledServices != null) {
-      size += scheduledServices.size();
-    }
-    this.scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(size);
 
-    Random random = new Random();
-    this.scheduledThreadPoolExecutor.scheduleAtFixedRate(storeUpdateService,
-        60 + random.nextInt(60), 60, TimeUnit.SECONDS);
-    if (scheduledServices != null) {
-      for (Runnable service : scheduledServices) {
-        this.scheduledThreadPoolExecutor.scheduleAtFixedRate(service,
-            60 + random.nextInt(60), 60, TimeUnit.SECONDS);
+    if (updateInterval != null) {
+      List<Runnable> scheduledServices = getScheduledServices();
+      int size = scheduledServices == null ? 0 : scheduledServices.size();
+      if (size > 0) {
+        this.scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(size);
+        Random random = new Random();
+        long intervalSeconds = updateInterval.approxMinutes() * 60;
+        for (Runnable service : scheduledServices) {
+          this.scheduledThreadPoolExecutor.scheduleAtFixedRate(service,
+              intervalSeconds + random.nextInt(60), intervalSeconds,
+              TimeUnit.SECONDS);
+        }
       }
     }
   }

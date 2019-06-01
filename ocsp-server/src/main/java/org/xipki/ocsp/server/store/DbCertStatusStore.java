@@ -549,16 +549,18 @@ public class DbCertStatusStore extends OcspStore {
     if (this.scheduledThreadPoolExecutor != null) {
       this.scheduledThreadPoolExecutor.shutdownNow();
     }
-    List<Runnable> scheduledServices = getScheduledServices();
 
-    int size = scheduledServices == null ? 0 : scheduledServices.size();
-    if (size > 0) {
-      this.scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(size);
-      Random random = new Random();
-      if (scheduledServices != null) {
+    if (updateInterval != null) {
+      List<Runnable> scheduledServices = getScheduledServices();
+      int size = scheduledServices == null ? 0 : scheduledServices.size();
+      if (size > 0) {
+        this.scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(size);
+        Random random = new Random();
+        long intervalSeconds = updateInterval.approxMinutes() * 60;
         for (Runnable service : scheduledServices) {
           this.scheduledThreadPoolExecutor.scheduleAtFixedRate(service,
-              60 + random.nextInt(60), 60, TimeUnit.SECONDS);
+              intervalSeconds + random.nextInt(60), intervalSeconds,
+              TimeUnit.SECONDS);
         }
       }
     }

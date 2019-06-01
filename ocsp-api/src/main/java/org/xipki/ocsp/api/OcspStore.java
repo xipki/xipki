@@ -55,6 +55,8 @@ public abstract class OcspStore implements Closeable {
 
   protected Validity minNextUpdatePeriod;
 
+  protected Validity updateInterval;
+
   public OcspStore() {
   }
 
@@ -212,6 +214,14 @@ public abstract class OcspStore implements Closeable {
 
   public void setMinNextUpdatePeriod(Validity minNextUpdatePeriod) {
     this.minNextUpdatePeriod = minNextUpdatePeriod;
+  }
+
+  public Validity getUpdateInterval() {
+    return updateInterval;
+  }
+
+  public void setUpdateInterval(Validity updateInterval) {
+    this.updateInterval = updateInterval;
   }
 
 }

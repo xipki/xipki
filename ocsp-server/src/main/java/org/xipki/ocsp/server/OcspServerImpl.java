@@ -1122,6 +1122,14 @@ public class OcspServerImpl implements OcspServer {
       store.setMinNextUpdatePeriod(null);
     }
 
+    if ("NEVER".equalsIgnoreCase(conf.getUpdateInterval())) {
+      store.setUpdateInterval(null);
+    } else {
+      String str = conf.getUpdateInterval();
+      Validity updateInterval = Validity.getInstance(StringUtil.isBlank(str) ? "5m" : str);
+      store.setUpdateInterval(updateInterval);
+    }
+
     String datasourceName = conf.getSource().getDatasource();
     DataSourceWrapper datasource = null;
     if (datasourceName != null) {

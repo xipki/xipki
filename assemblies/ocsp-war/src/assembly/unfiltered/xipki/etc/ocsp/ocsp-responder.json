@@ -55,6 +55,7 @@
 		"retentionInterval":-1,
 		"minNextUpdatePeriod":"1d",
 		"unknownCertBehaviour":"unknown",
+		"updateInterval":"10m",
 		"source":{
 			"datasource":"datasource1",
 			"type":"xipki-ca-db",

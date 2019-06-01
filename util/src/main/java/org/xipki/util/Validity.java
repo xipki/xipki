@@ -150,7 +150,7 @@ public class Validity implements Comparable<Validity> {
     }
   } // method add
 
-  private long approxMinutes() {
+  public long approxMinutes() {
     switch (unit) {
       case YEAR:
         return (365L * 24 * validity + 6 * validity) * 60;

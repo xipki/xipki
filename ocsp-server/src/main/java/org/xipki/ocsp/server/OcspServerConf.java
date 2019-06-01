@@ -35,6 +35,7 @@ import org.xipki.util.FileOrBinary;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.TripleState;
 import org.xipki.util.ValidatableConf;
+import org.xipki.util.Validity;
 
 import com.alibaba.fastjson.JSON;
 
@@ -594,6 +595,11 @@ public class OcspServerConf extends ValidatableConf {
 
     private Source source;
 
+    /**
+     * Update interval. Either "NEVER" or {@link Validity}.
+     */
+    private String updateInterval;
+
     private Boolean ignoreExpiredCert;
 
     private Boolean ignoreNotYetValidCert;
@@ -680,6 +686,14 @@ public class OcspServerConf extends ValidatableConf {
 
     public void setName(String name) {
       this.name = name;
+    }
+
+    public String getUpdateInterval() {
+      return updateInterval;
+    }
+
+    public void setUpdateInterval(String updateInterval) {
+      this.updateInterval = updateInterval;
     }
 
     @Override

@@ -111,6 +111,7 @@
 		"includeCrlId":false,
 		"retentionInterval":-1,
 		"minNextUpdatePeriod":"1d",
+		"updateInterval":"10m",
 		"source":{
 			"datasource":"datasource1",
 			"type":"xipki-db",
@@ -130,6 +131,7 @@
 		"includeCrlId":true,
 		"retentionInterval":0,
 		"minNextUpdatePeriod":"1d",
+		"updateInterval":"10m",
 		"source":{
 			"datasource":"datasource-crl",
 			"type":"crl",
@@ -146,6 +148,7 @@
 		"includeCrlId":false,
 		"retentionInterval":-1,
 		"minNextUpdatePeriod":"1d",
+		"updateInterval":"10m",
 		"source":{
 			"datasource":"datasource3",
 			"type":"xipki-ca-db",
