@@ -21,18 +21,19 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * PKI message with verification result.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class PkiResponse {
+public class VerifiedPkiMessage {
 
   private final GeneralPKIMessage pkiMessage;
 
   private ProtectionVerificationResult protectionVerificationResult;
 
-  public PkiResponse(GeneralPKIMessage pkiMessage) {
+  public VerifiedPkiMessage(GeneralPKIMessage pkiMessage) {
     this.pkiMessage = Args.notNull(pkiMessage,"pkiMessage");
   }
 

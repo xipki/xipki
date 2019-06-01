@@ -155,7 +155,7 @@ import org.xipki.security.XiSecurityConstants;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.cmp.CmpUtf8Pairs;
 import org.xipki.security.cmp.CmpUtil;
-import org.xipki.security.cmp.PkiResponse;
+import org.xipki.security.cmp.VerifiedPkiMessage;
 import org.xipki.security.cmp.ProtectionResult;
 import org.xipki.security.cmp.ProtectionVerificationResult;
 import org.xipki.security.util.AlgorithmUtil;
@@ -175,7 +175,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 /**
- * TODO.
+ * CMP agent to communicate with CA.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -324,7 +325,7 @@ class CmpAgent {
     }
   }
 
-  private PkiResponse signAndSend(PKIMessage request, ReqRespDebug debug)
+  private VerifiedPkiMessage signAndSend(PKIMessage request, ReqRespDebug debug)
       throws CmpClientException {
     Args.notNull(request, "request");
     PKIMessage tmpRequest = requestor.signRequest() ? sign(request) : request;
@@ -389,7 +390,7 @@ class CmpAgent {
       LOG.warn("tid={}: unknown CMP requestor '{}'", tid, rec);
     }
 
-    PkiResponse ret = new PkiResponse(response);
+    VerifiedPkiMessage ret = new VerifiedPkiMessage(response);
     if (response.hasProtection()) {
       try {
         ProtectionVerificationResult verifyProtection = verifyProtection(
@@ -409,7 +410,7 @@ class CmpAgent {
     return ret;
   } // method signAndSend
 
-  private ASN1Encodable extractGeneralRepContent(PkiResponse response, String expectedType,
+  private ASN1Encodable extractGeneralRepContent(VerifiedPkiMessage response, String expectedType,
       boolean requireProtectionCheck) throws CmpClientException, PkiErrorException {
     Args.notNull(response, "response");
     Args.notNull(expectedType, "expectedType");
@@ -451,7 +452,7 @@ class CmpAgent {
     return itv.getInfoValue();
   } // method extractGeneralRepContent
 
-  private ASN1Encodable extractXipkiActionRepContent(PkiResponse response, int action)
+  private ASN1Encodable extractXipkiActionRepContent(VerifiedPkiMessage response, int action)
       throws CmpClientException, PkiErrorException {
     ASN1Encodable itvValue = extractGeneralRepContent(Args.notNull(response, "response"),
         ObjectIdentifiers.Xipki.id_xipki_cmp_cmpGenmsg.getId(), true);
@@ -669,7 +670,7 @@ class CmpAgent {
     return new PKIMessage(header, body);
   }
 
-  private void checkProtection(PkiResponse response) throws PkiErrorException {
+  private void checkProtection(VerifiedPkiMessage response) throws PkiErrorException {
     Args.notNull(response, "response");
 
     if (!response.hasProtection()) {
@@ -894,7 +895,7 @@ class CmpAgent {
   public X509CRL generateCrl(ReqRespDebug debug) throws CmpClientException, PkiErrorException {
     int action = XiSecurityConstants.CMP_ACTION_GEN_CRL;
     PKIMessage request = buildMessageWithXipkAction(action, null);
-    PkiResponse response = signAndSend(request, debug);
+    VerifiedPkiMessage response = signAndSend(request, debug);
     return evaluateCrlResponse(response, action);
   }
 
@@ -915,11 +916,11 @@ class CmpAgent {
       request = buildMessageWithXipkAction(action, new ASN1Integer(crlNumber));
     }
 
-    PkiResponse response = signAndSend(request, debug);
+    VerifiedPkiMessage response = signAndSend(request, debug);
     return evaluateCrlResponse(response, action);
   }
 
-  private X509CRL evaluateCrlResponse(PkiResponse response, Integer xipkiAction)
+  private X509CRL evaluateCrlResponse(VerifiedPkiMessage response, Integer xipkiAction)
       throws CmpClientException, PkiErrorException {
     checkProtection(Args.notNull(response, "response"));
 
@@ -974,7 +975,7 @@ class CmpAgent {
   public RevokeCertResponse revokeCertificate(RevokeCertRequest request,
       ReqRespDebug debug) throws CmpClientException, PkiErrorException {
     PKIMessage reqMessage = buildRevokeCertRequest(Args.notNull(request, "request"));
-    PkiResponse response = signAndSend(reqMessage, debug);
+    VerifiedPkiMessage response = signAndSend(reqMessage, debug);
     return parse(response, request.getRequestEntries());
   }
 
@@ -982,7 +983,7 @@ class CmpAgent {
       ReqRespDebug debug) throws CmpClientException, PkiErrorException {
     PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(Args.notNull(request, "request"),
         CrlReason.REMOVE_FROM_CRL.getCode());
-    PkiResponse response = signAndSend(reqMessage, debug);
+    VerifiedPkiMessage response = signAndSend(reqMessage, debug);
     return parse(response, request.getRequestEntries());
   }
 
@@ -990,11 +991,11 @@ class CmpAgent {
       ReqRespDebug debug) throws CmpClientException, PkiErrorException {
     PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(Args.notNull(request, "request"),
             XiSecurityConstants.CMP_CRL_REASON_REMOVE);
-    PkiResponse response = signAndSend(reqMessage, debug);
+    VerifiedPkiMessage response = signAndSend(reqMessage, debug);
     return parse(response, request.getRequestEntries());
   }
 
-  private RevokeCertResponse parse(PkiResponse response,
+  private RevokeCertResponse parse(VerifiedPkiMessage response,
       List<? extends UnrevokeOrRemoveCertRequest.Entry> reqEntries)
           throws CmpClientException, PkiErrorException {
     checkProtection(Args.notNull(response, "response"));
@@ -1109,7 +1110,7 @@ class CmpAgent {
   private EnrollCertResponse requestCertificate0(PKIMessage reqMessage,
       Map<BigInteger, String> reqIdIdMap, int expectedBodyType, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
-    PkiResponse response = signAndSend(reqMessage, debug);
+    VerifiedPkiMessage response = signAndSend(reqMessage, debug);
     checkProtection(response);
 
     PKIBody respBody = response.getPkiMessage().getBody();
@@ -1424,7 +1425,7 @@ class CmpAgent {
 
     int action = XiSecurityConstants.CMP_ACTION_GET_CAINFO;
     PKIMessage request = buildMessageWithXipkAction(action, acceptVersions);
-    PkiResponse response = signAndSend(request, debug);
+    VerifiedPkiMessage response = signAndSend(request, debug);
     ASN1Encodable itvValue = extractXipkiActionRepContent(response, action);
     DERUTF8String utf8Str = DERUTF8String.getInstance(itvValue);
     String systemInfoStr = utf8Str.getString();
