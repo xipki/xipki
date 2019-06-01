@@ -55,12 +55,13 @@
       <column name="CERT" type="VARCHAR(6000)">
         <constraints nullable="false"/>
       </column>
-      <column name="CRL_INFO" type="VARCHAR(1000)"
-          remarks="CRL information if this issuer is imported from a CRL"/>
     </createTable>
     <createTable tableName="CRL_INFO">
       <column name="ID" type="SMALLINT">
         <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="NAME" type="VARCHAR(100)">
+        <constraints nullable="false"/>
       </column>
       <column name="INFO" type="VARCHAR(1000)" remarks="CRL information">
         <constraints nullable="false"/>
