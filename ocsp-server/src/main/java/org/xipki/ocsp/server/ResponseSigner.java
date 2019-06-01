@@ -37,12 +37,13 @@ import org.xipki.security.HashAlgo;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Response signer.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-class ResponderSigner {
+class ResponseSigner {
 
   private final Map<String, ConcurrentContentSigner> algoSignerMap;
 
@@ -62,7 +63,7 @@ class ResponderSigner {
 
   private final boolean macSigner;
 
-  ResponderSigner(List<ConcurrentContentSigner> signers) throws CertificateException, IOException {
+  ResponseSigner(List<ConcurrentContentSigner> signers) throws CertificateException, IOException {
     this.signers = Args.notEmpty(signers, "signers");
     ConcurrentContentSigner firstSigner = signers.get(0);
     this.macSigner = firstSigner.isMac();

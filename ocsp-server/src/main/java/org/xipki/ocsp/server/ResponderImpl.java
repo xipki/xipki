@@ -25,7 +25,8 @@ import org.xipki.ocsp.server.OcspServerConf.ResponseOption;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Implementation of {@link Responder}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -38,12 +39,12 @@ public class ResponderImpl implements Responder {
 
   private final ResponseOption responseOption;
 
-  private final ResponderSigner signer;
+  private final ResponseSigner signer;
 
   private final List<OcspStore> stores;
 
   ResponderImpl(ResponderOption responderOption, RequestOption requestOption,
-      ResponseOption responseOption, ResponderSigner signer, List<OcspStore> stores) {
+      ResponseOption responseOption, ResponseSigner signer, List<OcspStore> stores) {
     this.responderOption = Args.notNull(responderOption, "responderOption");
     this.requestOption = Args.notNull(requestOption, "requestOption");
     this.responseOption = Args.notNull(responseOption, "responseOption");
@@ -63,7 +64,7 @@ public class ResponderImpl implements Responder {
     return responseOption;
   }
 
-  public ResponderSigner getSigner() {
+  public ResponseSigner getSigner() {
     return signer;
   }
 

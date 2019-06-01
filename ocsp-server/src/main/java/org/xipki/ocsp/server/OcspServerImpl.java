@@ -114,7 +114,8 @@ import org.xipki.util.Validity;
 import com.alibaba.fastjson.JSON;
 
 /**
- * TODO.
+ * Implementation of {@link OcspServer}.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -192,7 +193,7 @@ public class OcspServerImpl implements OcspServer {
 
   private Map<String, ResponderImpl> responders = new HashMap<>();
 
-  private Map<String, ResponderSigner> signers = new HashMap<>();
+  private Map<String, ResponseSigner> signers = new HashMap<>();
 
   private Map<String, RequestOption> requestOptions = new HashMap<>();
 
@@ -441,7 +442,7 @@ public class OcspServerImpl implements OcspServer {
     //-- initializes the responders
     // signers
     for (OcspServerConf.Signer m : conf.getSigners()) {
-      ResponderSigner signer = initSigner(m);
+      ResponseSigner signer = initSigner(m);
       signers.put(m.getName(), signer);
     }
 
@@ -524,7 +525,7 @@ public class OcspServerImpl implements OcspServer {
 
       OcspServerConf.ResponseOption responseOption =
           responseOptions.get(option.getResponseOptionName());
-      ResponderSigner signer = signers.get(option.getSignerName());
+      ResponseSigner signer = signers.get(option.getSignerName());
       if (signer.isMacSigner()) {
         if (responseOption.isResponderIdByName()) {
           throw new InvalidConfException(
@@ -601,7 +602,7 @@ public class OcspServerImpl implements OcspServer {
       return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
     }
 
-    ResponderSigner signer = responder.getSigner();
+    ResponseSigner signer = responder.getSigner();
     OcspServerConf.ResponseOption repOpt = responder.getResponseOption();
 
     try {
@@ -1023,7 +1024,7 @@ public class OcspServerImpl implements OcspServer {
     securityFactory.refreshTokenForSignerType(signerType);
   }
 
-  private ResponderSigner initSigner(OcspServerConf.Signer signerType) throws InvalidConfException {
+  private ResponseSigner initSigner(OcspServerConf.Signer signerType) throws InvalidConfException {
     X509Certificate[] explicitCertificateChain = null;
 
     X509Certificate explicitResponderCert = null;
@@ -1065,7 +1066,7 @@ public class OcspServerImpl implements OcspServer {
     }
 
     try {
-      return new ResponderSigner(singleSigners);
+      return new ResponseSigner(singleSigners);
     } catch (CertificateException | IOException ex) {
       throw new InvalidConfException(ex.getMessage(), ex);
     }
