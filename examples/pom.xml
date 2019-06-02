@@ -32,5 +32,6 @@
     <module>lite-caclient-example</module>
     <module>ocsp-store-example</module>
     <module>ocsp-store-example-assembly</module>
+    <module>scep-example</module>
   </modules>
 </project>

@@ -32,8 +32,7 @@
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
-    <bundle>mvn:org.xipki.scep/scep-common/${xipki.scep.version}</bundle>
-    <bundle>mvn:org.xipki.scep/scep-client/${xipki.scep.version}</bundle>
+    <bundle>mvn:org.xipki/scep-client/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/scep-client-shell/${project.version}</bundle>
   </feature>

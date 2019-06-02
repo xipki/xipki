@@ -46,7 +46,6 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <xipki.tools.version>1.0.5</xipki.tools.version>
-    <xipki.scep.version>3.1.0</xipki.scep.version>
     <servlet.version>3.1.0</servlet.version>
     <karaf.version>4.2.5</karaf.version>
     <bc.version>1.61</bc.version>
@@ -75,6 +74,7 @@
     <module>p11proxy-servlet</module>
     <!-- PKI SDK/Client -->
     <module>cmpclient</module>
+    <module>scep-client</module>
     <module>ocsp-client</module>
     <!-- PKI -->
     <module>ca-api</module>
@@ -297,16 +297,6 @@
   </build>
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>org.xipki.scep</groupId>
-        <artifactId>scep-common</artifactId>
-        <version>${xipki.scep.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki.scep</groupId>
-        <artifactId>scep-client</artifactId>
-        <version>${xipki.scep.version}</version>
-      </dependency>
       <dependency>
         <groupId>org.bouncycastle</groupId>
         <artifactId>bcprov-jdk15on</artifactId>

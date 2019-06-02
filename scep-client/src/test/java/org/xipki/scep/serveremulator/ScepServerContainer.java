@@ -35,7 +35,7 @@ public class ScepServerContainer {
   private Server server;
 
   public ScepServerContainer(int port, ScepServer scepServer) throws Exception {
-      this(port, Arrays.asList(ScepUtil.requireNonNull("scepServer", scepServer)));
+    this(port, Arrays.asList(ScepUtil.requireNonNull("scepServer", scepServer)));
   }
 
   public ScepServerContainer(int port, List<ScepServer> scepServers) throws Exception {

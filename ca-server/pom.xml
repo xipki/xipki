@@ -38,8 +38,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.scep</groupId>
-      <artifactId>scep-common</artifactId>
+      <groupId>org.xipki</groupId>
+      <artifactId>scep-client</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
