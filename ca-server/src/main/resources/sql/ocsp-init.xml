@@ -57,7 +57,7 @@
       </column>
     </createTable>
     <createTable tableName="CRL_INFO">
-      <column name="ID" type="SMALLINT">
+      <column name="ID" type="INT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="NAME" type="VARCHAR(100)">
@@ -81,7 +81,7 @@
           remarks="serial number">
         <constraints nullable="false"/>
       </column>
-      <column name="CRL_ID" type="SMALLINT"
+      <column name="CRL_ID" type="INT"
           remarks="CRL ID, only present for entry imported from CRL"/>
       <column name="LUPDATE" type="BIGINT"
           remarks="last update of the this database entry, seconds since January 1, 1970, 00:00:00 GMT">

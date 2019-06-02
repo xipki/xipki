@@ -195,8 +195,7 @@ class ImportCrl {
 
   private PreparedStatement psUpdateCertRev;
 
-  public ImportCrl(DataSourceWrapper datasource, String basedir)
-      throws ImportCrlException, DataAccessException, IOException {
+  public ImportCrl(DataSourceWrapper datasource, String basedir) throws DataAccessException {
     this.datasource = Args.notNull(datasource, "datasource");
     this.basedir = Args.notNull(basedir, "basedir");
     this.certhashAlgo = DbCertStatusStore.getCertHashAlgo(datasource);
@@ -206,6 +205,24 @@ class ImportCrl {
   }
 
   public boolean importCrlToOcspDb() {
+    // check the dirs
+    Map<Integer, String> map = new HashMap<>();
+    File[] crlDirs = new File(basedir).listFiles();
+    for (File crlDir : crlDirs) {
+      String crlName = getCrlNameFromDir(crlDir);
+      if (StringUtil.isBlank(crlName)) {
+        continue;
+      }
+
+      int crlId = getCrlIdFromName(crlName);
+      if (map.containsKey(crlId)) {
+        LOG.error("Please rename one of the directories {} or {}", crlDir.getPath(),
+            new File(basedir, "crl-" + map.get(crlId)).getPath());
+        return false;
+      }
+      map.put(crlId, crlName);
+    }
+
     Connection conn = null;
     try {
       conn = datasource.getConnection();
@@ -222,14 +239,13 @@ class ImportCrl {
       psUpdateCert = datasource.prepareStatement(conn, SQL_UPDATE_CERT);
       psUpdateCertRev = datasource.prepareStatement(conn, SQL_UPDATE_CERT_REV);
 
-      File[] crlDirs = new File(basedir).listFiles();
       for (File crlDir : crlDirs) {
         String crlName = getCrlNameFromDir(crlDir);
         if (StringUtil.isBlank(crlName)) {
           continue;
         }
 
-        int id = crlName.hashCode();
+        int id = getCrlIdFromName(crlName);
 
         // CHECKSTYLE:SKIP
         File updatemeFile = new File(crlDir, "UPDATEME");
@@ -933,6 +949,14 @@ class ImportCrl {
 
   private void releaseResources(Statement ps, ResultSet rs) {
     datasource.releaseResources(ps, rs, false);
+  }
+
+  private static int getCrlIdFromName(String name) {
+    int intvalue = name.hashCode();
+    if (intvalue < 0) {
+      intvalue *= -1;
+    }
+    return intvalue;
   }
 
   private static String getCrlNameFromDir(File dir) {

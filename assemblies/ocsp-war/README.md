@@ -1,6 +1,25 @@
+Prepare
+-----
+- If you use CRL as OCSP store
+    - Initialize the database which will be used to import the CRLs.
+      `dbtool/bin/initdb.sh --db-schema xipki/sql/ocsp-init.xml --db-conf <xipki/etc/ocsp/database/ocsp-crl-db.properties`
+
+- If you cache the OCSP responses
+    - Initialize the database which will be used to store the cached OCSP responses.
+      `dbtool/bin/initdb.sh --db-schema xipki/sql/ocsp-cache-init.xml --db-conf <xipki/etc/ocsp/database/ocsp-cache-db.properties`
+
+- Adapt the configuration file `xipki/etc/ocsp-responder.json`.
+
 Deployment in Tomcat
 ----
 - Copy the sub-folders `webapps`, `xipki` and `lib ` to the tomcat root folder
+     - The OCSP responder is reachable under `http://<host>:<port>/ocsp/<path>`.
+     - Rename `webapps/ocsp.war` to `webapps/ROOT.war` to change the URL to
+       `http://<host>:<port>/<path>`.
+     - The path can be changed by the `"servletPaths":["/..."]` in the configuration
+       file `xipki/etc/ocsp-responder.json`.
+     - With `webapps/ROOT.war` and `"servletPaths":["/"]` the OCSP responder is reachable
+       under `http://<host>:<port>`.
 - Add the line `org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true`
    to the file `conf/catalina.properties` if OCSP over HTTP supported is activated.
 - (optiona) add `maxKeepAliveRequests="-1"` to the HTTP Connector in the file `conf/server`.
