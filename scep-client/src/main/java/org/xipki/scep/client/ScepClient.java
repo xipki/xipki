@@ -29,8 +29,7 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 
-import org.xipki.scep.client.exception.ScepClientException;
-import org.xipki.scep.util.ScepUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -58,7 +57,7 @@ public class ScepClient extends Client {
 
   @Override
   protected ScepHttpResponse httpGet(String url) throws ScepClientException {
-    ScepUtil.requireNonNull("url", url);
+    Args.notNull(url, "url");
     try {
       HttpURLConnection httpConn = openHttpConn(new URL(url));
       if (httpConn instanceof HttpsURLConnection) {
@@ -80,7 +79,7 @@ public class ScepClient extends Client {
   @Override
   protected ScepHttpResponse httpPost(String url, String requestContentType, byte[] request)
       throws ScepClientException {
-    ScepUtil.requireNonNull("url", url);
+    Args.notNull(url, "url");
     try {
       HttpURLConnection httpConn = openHttpConn(new URL(url));
       httpConn.setDoOutput(true);
@@ -105,7 +104,7 @@ public class ScepClient extends Client {
   }
 
   protected ScepHttpResponse parseResponse(HttpURLConnection conn) throws ScepClientException {
-    ScepUtil.requireNonNull("conn", conn);
+    Args.notNull(conn, "conn");
 
     try {
       InputStream inputstream = conn.getInputStream();
@@ -129,7 +128,7 @@ public class ScepClient extends Client {
   }
 
   private static HttpURLConnection openHttpConn(URL url) throws IOException {
-    ScepUtil.requireNonNull("url", url);
+    Args.notNull(url, "url");
     URLConnection conn = url.openConnection();
     if (conn instanceof HttpURLConnection) {
       return (HttpURLConnection) conn;

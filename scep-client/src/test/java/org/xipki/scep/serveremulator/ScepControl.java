@@ -17,7 +17,7 @@
 
 package org.xipki.scep.serveremulator;
 
-import org.xipki.scep.util.ScepUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -38,7 +38,7 @@ public class ScepControl {
 
   public ScepControl(boolean sendCaCert, boolean pendingCert, boolean sendSignerCert,
       boolean useInsecureAlg, String secret) {
-    this.secret = ScepUtil.requireNonBlank("secret", secret);
+    this.secret = Args.notBlank(secret, "secret");
     this.sendCaCert = sendCaCert;
     this.pendingCert = pendingCert;
     this.sendSignerCert = sendSignerCert;

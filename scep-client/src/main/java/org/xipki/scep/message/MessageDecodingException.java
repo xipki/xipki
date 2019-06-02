@@ -15,4 +15,27 @@
  * limitations under the License.
  */
 
-package org.xipki.scep.crypto;
+package org.xipki.scep.message;
+
+/**
+ * TODO.
+ * @author Lijun Liao
+ */
+
+public class MessageDecodingException extends Exception {
+
+  private static final long serialVersionUID = 1L;
+
+  public MessageDecodingException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
+  public MessageDecodingException(String message) {
+    super(message);
+  }
+
+  public MessageDecodingException(Throwable cause) {
+    super(cause.getMessage(), cause);
+  }
+
+}

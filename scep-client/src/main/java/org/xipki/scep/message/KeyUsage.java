@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package org.xipki.scep.crypto;
+package org.xipki.scep.message;
 
-import org.xipki.scep.util.ScepUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -62,7 +62,7 @@ public enum KeyUsage {
   }
 
   public static KeyUsage getKeyUsage(String usage) {
-    ScepUtil.requireNonBlank("usage", usage);
+    Args.notBlank(usage, "usage");
 
     for (KeyUsage ku : KeyUsage.values()) {
       for (String name : ku.names) {

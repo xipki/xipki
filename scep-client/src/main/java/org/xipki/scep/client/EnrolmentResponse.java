@@ -26,12 +26,12 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.SignedData;
-import org.xipki.scep.client.exception.ScepClientException;
 import org.xipki.scep.message.PkiMessage;
 import org.xipki.scep.transaction.FailInfo;
 import org.xipki.scep.transaction.MessageType;
 import org.xipki.scep.transaction.PkiStatus;
 import org.xipki.scep.util.ScepUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -45,7 +45,7 @@ public final class EnrolmentResponse {
   private List<X509Certificate> certificates;
 
   public EnrolmentResponse(PkiMessage pkcsRep) throws ScepClientException {
-    ScepUtil.requireNonNull("pkcsRep", pkcsRep);
+    Args.notNull(pkcsRep, "pkcsRep");
     MessageType messageType = pkcsRep.getMessageType();
     if (MessageType.CertRep != messageType) {
       throw new ScepClientException("messageType must not be other than CertRep: " + messageType);

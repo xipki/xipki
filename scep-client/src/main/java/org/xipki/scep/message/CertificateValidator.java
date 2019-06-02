@@ -17,7 +17,13 @@
 
 package org.xipki.scep.message;
 
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
+import java.util.HashSet;
+
+import org.xipki.scep.util.ScepHashAlgo;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -35,5 +41,61 @@ public interface CertificateValidator {
    * @return whether the target certificate is trusted.
    */
   boolean trustCertificate(X509Certificate target, X509Certificate[] otherCerts);
+
+  public static class CollectionCertificateValidator implements CertificateValidator {
+
+    private final Collection<String> certHashes;
+
+    public CollectionCertificateValidator(Collection<X509Certificate> certs) {
+      Args.notEmpty(certs, "certs");
+
+      certHashes = new HashSet<String>(certs.size());
+      for (X509Certificate cert : certs) {
+        String hash;
+        try {
+          hash = ScepHashAlgo.SHA256.hexDigest(cert.getEncoded());
+        } catch (CertificateEncodingException ex) {
+          throw new IllegalArgumentException(
+              "could not encode certificate: " + ex.getMessage(), ex);
+        }
+        certHashes.add(hash);
+      }
+    }
+
+    public CollectionCertificateValidator(X509Certificate cert) {
+      Args.notNull(cert, "cert");
+
+      certHashes = new HashSet<String>(2);
+      String hash;
+      try {
+        hash = ScepHashAlgo.SHA256.hexDigest(cert.getEncoded());
+      } catch (CertificateEncodingException ex) {
+        throw new IllegalArgumentException("could not encode certificate: " + ex.getMessage(), ex);
+      }
+      certHashes.add(hash);
+    }
+
+    @Override
+    public boolean trustCertificate(X509Certificate signerCert, X509Certificate[] otherCerts) {
+      Args.notNull(signerCert, "signerCert");
+
+      String hash;
+      try {
+        hash = ScepHashAlgo.SHA256.hexDigest(signerCert.getEncoded());
+      } catch (CertificateEncodingException ex) {
+        throw new IllegalArgumentException("could not encode certificate: " + ex.getMessage(), ex);
+      }
+      return certHashes.contains(hash);
+    }
+
+  } // class CollectionCertificateValidator
+
+  public static class TrustAllCertValidator implements CertificateValidator {
+
+    public boolean trustCertificate(X509Certificate target, X509Certificate[] otherCerts) {
+      return true;
+    }
+
+  } // class TrustAllCertValidator
 
 }

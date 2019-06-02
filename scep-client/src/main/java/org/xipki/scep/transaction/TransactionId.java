@@ -23,8 +23,8 @@ import java.security.spec.InvalidKeySpecException;
 
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.digests.SHA1Digest;
-import org.bouncycastle.util.encoders.Hex;
-import org.xipki.scep.util.ScepUtil;
+import org.xipki.util.Args;
+import org.xipki.util.Hex;
 
 /**
  * TODO.
@@ -38,14 +38,14 @@ public class TransactionId {
   private final String id;
 
   public TransactionId(String id) {
-    this.id = ScepUtil.requireNonBlank("id", id);
+    this.id = Args.notBlank(id, "id");
   }
 
   private TransactionId(byte[] bytes) {
     if (bytes == null || bytes.length == 0) {
       throw new IllegalArgumentException("bytes must not be empty");
     }
-    this.id = Hex.toHexString(bytes);
+    this.id = Hex.encode(bytes);
   }
 
   public String getId() {
@@ -60,7 +60,7 @@ public class TransactionId {
 
   public static TransactionId sha1TransactionId(SubjectPublicKeyInfo spki)
       throws InvalidKeySpecException {
-    ScepUtil.requireNonNull("spki", spki);
+    Args.notNull(spki, "spki");
 
     byte[] encoded;
     try {
@@ -73,7 +73,7 @@ public class TransactionId {
   }
 
   public static TransactionId sha1TransactionId(byte[] content) {
-    ScepUtil.requireNonNull("content", content);
+    Args.notNull(content, "content");
 
     SHA1Digest dgst = new SHA1Digest();
     dgst.update(content, 0, content.length);

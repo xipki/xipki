@@ -15,27 +15,37 @@
  * limitations under the License.
  */
 
-package org.xipki.scep.exception;
+package org.xipki.scep.client;
 
 /**
  * TODO.
  * @author Lijun Liao
  */
 
-public class MessageDecodingException extends Exception {
+public class ScepClientException extends Exception {
 
   private static final long serialVersionUID = 1L;
 
-  public MessageDecodingException(String message, Throwable cause) {
+  public ScepClientException(String message, Throwable cause) {
     super(message, cause);
   }
 
-  public MessageDecodingException(String message) {
+  public ScepClientException(String message) {
     super(message);
   }
 
-  public MessageDecodingException(Throwable cause) {
+  public ScepClientException(Throwable cause) {
     super(cause.getMessage(), cause);
+  }
+
+  public static class OperationNotSupportedException extends ScepClientException {
+
+    private static final long serialVersionUID = 1L;
+
+    public OperationNotSupportedException(String message) {
+      super(message);
+    }
+
   }
 
 }

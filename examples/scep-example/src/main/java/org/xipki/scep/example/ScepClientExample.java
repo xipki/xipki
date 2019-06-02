@@ -32,9 +32,9 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.xipki.scep.client.CaCertValidator;
 import org.xipki.scep.client.CaIdentifier;
 import org.xipki.scep.client.EnrolmentResponse;
-import org.xipki.scep.client.PreprovisionedCaCertValidator;
 import org.xipki.scep.client.ScepClient;
 import org.xipki.scep.util.ScepUtil;
+import org.xipki.util.IoUtil;
 
 /**
  * TODO.
@@ -57,9 +57,9 @@ public class ScepClientExample extends CaClientExample {
 
     try {
       X509Certificate caCert = ScepUtil.parseCert(
-          ScepUtil.read(new FileInputStream(expandPath(CA_CERT_FILE))));
+          IoUtil.read(new FileInputStream(expandPath(CA_CERT_FILE))));
       CaIdentifier tmpCaId = new CaIdentifier(CA_URL, null);
-      CaCertValidator caCertValidator = new PreprovisionedCaCertValidator(caCert);
+      CaCertValidator caCertValidator = new CaCertValidator.PreprovisionedCaCertValidator(caCert);
       ScepClient client = new ScepClient(tmpCaId, caCertValidator);
 
       client.init();

@@ -27,9 +27,9 @@ import java.util.StringTokenizer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.scep.crypto.ScepHashAlgo;
 import org.xipki.scep.transaction.CaCapability;
-import org.xipki.scep.util.ScepUtil;
+import org.xipki.scep.util.ScepHashAlgo;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -59,7 +59,7 @@ public class CaCaps {
   }
 
   public void addCapabilities(CaCapability... caps) {
-    ScepUtil.requireNonNull("caps", caps);
+    Args.notNull(caps, "caps");
     for (CaCapability m : caps) {
       capabilities.add(m);
     }
@@ -67,13 +67,13 @@ public class CaCaps {
   }
 
   public void removeCapabilities(CaCaps caCaps) {
-    ScepUtil.requireNonNull("caCaps", caCaps);
+    Args.notNull(caCaps, "caCaps");
     this.capabilities.retainAll(caCaps.capabilities);
     refresh();
   }
 
   public void removeCapabilities(CaCapability... caps) {
-    ScepUtil.requireNonNull("caps", caps);
+    Args.notNull(caps, "caps");
     for (CaCapability m : caps) {
       capabilities.remove(m);
     }
@@ -81,7 +81,7 @@ public class CaCaps {
   }
 
   public boolean containsCapability(CaCapability cap) {
-    ScepUtil.requireNonNull("cap", cap);
+    Args.notNull(cap, "cap");
     return capabilities.contains(cap);
   }
 
@@ -155,8 +155,7 @@ public class CaCaps {
     while (st.hasMoreTokens()) {
       String token = st.nextToken();
       try {
-        CaCapability cap = CaCapability.forValue(token);
-        caps.add(cap);
+        caps.add(CaCapability.forValue(token));
       } catch (IllegalArgumentException ex) {
         LOG.warn("ignore unknown CACap '{}'", token);
       }

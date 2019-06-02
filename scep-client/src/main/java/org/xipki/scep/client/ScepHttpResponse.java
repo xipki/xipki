@@ -18,14 +18,11 @@
 package org.xipki.scep.client;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xipki.scep.client.exception.ScepClientException;
-import org.xipki.scep.util.ScepUtil;
+import org.xipki.util.Args;
+import org.xipki.util.IoUtil;
 
 /**
  * TODO.
@@ -33,8 +30,6 @@ import org.xipki.scep.util.ScepUtil;
  */
 
 public class ScepHttpResponse {
-
-  private static final Logger LOG = LoggerFactory.getLogger(ScepHttpResponse.class);
 
   private final String contentType;
 
@@ -45,14 +40,14 @@ public class ScepHttpResponse {
   private String contentEncoding;
 
   public ScepHttpResponse(String contentType, int contentLength, InputStream content) {
-    this.contentType = ScepUtil.requireNonNull("contentType", contentType);
-    this.content = ScepUtil.requireNonNull("content", content);
+    this.contentType = Args.notNull(contentType, "contentType");
+    this.content = Args.notNull(content, "content");
     this.contentLength = contentLength;
   }
 
   public ScepHttpResponse(String contentType, int contentLength, byte[] contentBytes) {
     this(contentType, contentLength,
-        new ByteArrayInputStream(ScepUtil.requireNonNull("contentBytes", contentBytes)));
+        new ByteArrayInputStream(Args.notNull(contentBytes, "contentBytes")));
   }
 
   public String getContentType() {
@@ -81,24 +76,9 @@ public class ScepHttpResponse {
     }
 
     try {
-      ByteArrayOutputStream bout = new ByteArrayOutputStream();
-      int readed = 0;
-      byte[] buffer = new byte[2048];
-      while ((readed = content.read(buffer)) != -1) {
-        bout.write(buffer, 0, readed);
-      }
-
-      return bout.toByteArray();
+      return IoUtil.read(content);
     } catch (IOException ex) {
       throw new ScepClientException(ex);
-    } finally {
-      if (content != null) {
-        try {
-          content.close();
-        } catch (IOException ex) {
-          LOG.error("could not close stream: {}", ex.getMessage());
-        }
-      }
     }
   }
 

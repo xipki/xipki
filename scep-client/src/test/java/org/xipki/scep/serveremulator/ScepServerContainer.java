@@ -23,7 +23,7 @@ import java.util.List;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.xipki.scep.util.ScepUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -35,11 +35,11 @@ public class ScepServerContainer {
   private Server server;
 
   public ScepServerContainer(int port, ScepServer scepServer) throws Exception {
-    this(port, Arrays.asList(ScepUtil.requireNonNull("scepServer", scepServer)));
+    this(port, Arrays.asList(Args.notNull(scepServer, "scepServer")));
   }
 
   public ScepServerContainer(int port, List<ScepServer> scepServers) throws Exception {
-    ScepUtil.requireNonEmpty("scepServers", scepServers);
+    Args.notEmpty(scepServers, "scepServers");
     server = new Server(port);
     ServletHandler handler = new ServletHandler();
     server.setHandler(handler);

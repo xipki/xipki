@@ -20,7 +20,7 @@ package org.xipki.scep.transaction;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
-import org.xipki.scep.util.ScepUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -36,7 +36,7 @@ public class Nonce {
   private final byte[] bytes;
 
   private Nonce(byte[] bytes, boolean cloneBytes) {
-    ScepUtil.requireNonNull("bytes", bytes);
+    Args.notNull(bytes, "bytes");
     if (bytes.length != 16) {
       throw new IllegalArgumentException("bytes.length is not of 16");
     }

@@ -17,15 +17,20 @@
 
 package org.xipki.scep.message;
 
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.bouncycastle.cms.CMSEnvelopedData;
 import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.KeyTransRecipient;
+import org.bouncycastle.cms.RecipientId;
 import org.bouncycastle.cms.RecipientInformation;
 import org.bouncycastle.cms.RecipientInformationStore;
-import org.xipki.scep.exception.MessageDecodingException;
-import org.xipki.scep.util.ScepUtil;
+import org.bouncycastle.cms.jcajce.JceKeyTransEnvelopedRecipient;
+import org.bouncycastle.cms.jcajce.JceKeyTransRecipientId;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -34,21 +39,45 @@ import org.xipki.scep.util.ScepUtil;
 
 public final class EnvelopedDataDecryptor {
 
+  public static final class EnvelopedDataDecryptorInstance {
+
+    private final RecipientId recipientId;
+
+    private final KeyTransRecipient recipient;
+
+    public EnvelopedDataDecryptorInstance(X509Certificate recipientCert, PrivateKey privKey) {
+      Args.notNull(recipientCert, "recipientCert");
+      Args.notNull(privKey, "privKey");
+
+      this.recipientId = new JceKeyTransRecipientId(recipientCert);
+      this.recipient = new JceKeyTransEnvelopedRecipient(privKey);
+    }
+
+    public KeyTransRecipient getRecipient() {
+      return recipient;
+    }
+
+    public RecipientId getRecipientId() {
+      return recipientId;
+    }
+
+  }
+
   private final List<EnvelopedDataDecryptorInstance> decryptors;
 
   public EnvelopedDataDecryptor(List<EnvelopedDataDecryptorInstance> decryptors) {
-    ScepUtil.requireNonEmpty("decryptors", decryptors);
+    Args.notEmpty(decryptors, "decryptors");
     this.decryptors = new ArrayList<EnvelopedDataDecryptorInstance>(decryptors);
   }
 
   public EnvelopedDataDecryptor(EnvelopedDataDecryptorInstance decryptor) {
-    ScepUtil.requireNonNull("decryptor", decryptor);
+    Args.notNull(decryptor, "decryptor");
     this.decryptors = new ArrayList<EnvelopedDataDecryptorInstance>(1);
     this.decryptors.add(decryptor);
   }
 
   public byte[] decrypt(CMSEnvelopedData envData) throws MessageDecodingException {
-    ScepUtil.requireNonNull("envData", envData);
+    Args.notNull(envData, "envData");
     final RecipientInformationStore recipientInfos = envData.getRecipientInfos();
     RecipientInformation recipientInfo = null;
     EnvelopedDataDecryptorInstance decryptor = null;

@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-package org.xipki.scep.crypto;
+package org.xipki.scep.util;
 
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.MD5Digest;
 import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
-import org.bouncycastle.util.encoders.Hex;
-import org.xipki.scep.util.ScepUtil;
+import org.xipki.util.Args;
+import org.xipki.util.Hex;
 
 /**
  * TODO.
@@ -63,11 +63,11 @@ public enum ScepHashAlgo {
 
   public String hexDigest(byte[] content) {
     byte[] dgst = digest(content);
-    return (dgst == null) ? null : Hex.toHexString(dgst);
+    return (dgst == null) ? null : Hex.encode(dgst);
   }
 
   public byte[] digest(byte[] content) {
-    ScepUtil.requireNonNull("content", content);
+    Args.notNull(content, "content");
     Digest digest;
     if (this == SHA1) {
       digest = new SHA1Digest();

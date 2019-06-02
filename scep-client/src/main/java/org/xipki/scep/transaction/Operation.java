@@ -17,7 +17,7 @@
 
 package org.xipki.scep.transaction;
 
-import org.xipki.scep.util.ScepUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -42,7 +42,7 @@ public enum Operation {
   }
 
   public static Operation forValue(String code) {
-    ScepUtil.requireNonNull("code", code);
+    Args.notBlank(code, "code");
     for (Operation m : values()) {
       if (code.equalsIgnoreCase(m.code)) {
         return m;

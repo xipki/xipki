@@ -44,7 +44,7 @@ import org.xipki.ca.api.RequestType;
 import org.xipki.ca.server.CaAuditConstants;
 import org.xipki.ca.server.CaManagerImpl;
 import org.xipki.ca.server.ScepResponder;
-import org.xipki.scep.exception.MessageDecodingException;
+import org.xipki.scep.message.MessageDecodingException;
 import org.xipki.scep.transaction.Operation;
 import org.xipki.scep.util.ScepConstants;
 import org.xipki.util.Args;

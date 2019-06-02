@@ -23,7 +23,7 @@ import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.scep.util.ScepUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -37,14 +37,14 @@ public class IssuerAndSubject extends ASN1Object {
   private X500Name subject;
 
   private IssuerAndSubject(ASN1Sequence seq) {
-    ScepUtil.requireNonNull("seq", seq);
+    Args.notNull(seq, "seq");
     this.issuer = X500Name.getInstance(seq.getObjectAt(0));
     this.subject = X500Name.getInstance(seq.getObjectAt(1));
   }
 
   public IssuerAndSubject(X500Name issuer, X500Name subject) {
-    this.issuer = ScepUtil.requireNonNull("issuer", issuer);
-    this.subject = ScepUtil.requireNonNull("subject", subject);
+    this.issuer = Args.notNull(issuer, "issuer");
+    this.subject = Args.notNull(subject, "subject");
   }
 
   public X500Name getIssuer() {

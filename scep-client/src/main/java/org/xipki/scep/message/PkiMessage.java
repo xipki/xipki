@@ -57,13 +57,13 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.OutputEncryptor;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.xipki.scep.exception.MessageEncodingException;
 import org.xipki.scep.transaction.FailInfo;
 import org.xipki.scep.transaction.MessageType;
 import org.xipki.scep.transaction.Nonce;
 import org.xipki.scep.transaction.PkiStatus;
 import org.xipki.scep.transaction.TransactionId;
 import org.xipki.scep.util.ScepUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -110,9 +110,9 @@ public class PkiMessage {
   }
 
   public PkiMessage(TransactionId transactionId, MessageType messageType, Nonce senderNonce) {
-    this.transactionId = ScepUtil.requireNonNull("transactionId", transactionId);
-    this.messageType = ScepUtil.requireNonNull("messageType", messageType);
-    this.senderNonce = ScepUtil.requireNonNull("senderNonce", senderNonce);
+    this.transactionId = Args.notNull(transactionId, "transactionId");
+    this.messageType = Args.notNull(messageType, "messageType");
+    this.senderNonce = Args.notNull(senderNonce, "senderNonce");
   }
 
   public TransactionId getTransactionId() {
@@ -241,7 +241,7 @@ public class PkiMessage {
       X509Certificate signerCert, X509Certificate[] signerCertSet,
       X509Certificate recipientCert, ASN1ObjectIdentifier encAlgId)
       throws MessageEncodingException {
-    ScepUtil.requireNonNull("signerKey", signerKey);
+    Args.notNull(signerKey, "signerKey");
     ContentSigner signer;
     try {
       signer = new JcaContentSignerBuilder(signatureAlgorithm).build(signerKey);
@@ -254,11 +254,11 @@ public class PkiMessage {
   public ContentInfo encode(ContentSigner signer, X509Certificate signerCert,
       X509Certificate[] cmsCertSet, X509Certificate recipientCert,
       ASN1ObjectIdentifier encAlgId) throws MessageEncodingException {
-    ScepUtil.requireNonNull("signer", signer);
-    ScepUtil.requireNonNull("signerCert", signerCert);
+    Args.notNull(signer, "signer");
+    Args.notNull(signerCert, "signerCert");
     if (messageData != null) {
-      ScepUtil.requireNonNull("recipientCert", recipientCert);
-      ScepUtil.requireNonNull("encAlgId", encAlgId);
+      Args.notNull(recipientCert, "recipientCert");
+      Args.notNull(encAlgId, "encAlgId");
     }
 
     CMSTypedData content;
@@ -312,8 +312,8 @@ public class PkiMessage {
 
   private CMSEnvelopedData encrypt(X509Certificate recipient, ASN1ObjectIdentifier encAlgId)
       throws MessageEncodingException {
-    ScepUtil.requireNonNull("recipient", recipient);
-    ScepUtil.requireNonNull("encAlgId", encAlgId);
+    Args.notNull(recipient, "recipient");
+    Args.notNull(encAlgId, "encAlgId");
 
     byte[] messageDataBytes;
     try {

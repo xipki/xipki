@@ -17,7 +17,7 @@
 
 package org.xipki.scep.transaction;
 
-import org.xipki.scep.util.ScepUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -47,7 +47,7 @@ public enum CaCapability {
   }
 
   public static CaCapability forValue(String text) {
-    ScepUtil.requireNonNull("text", text);
+    Args.notNull(text, "text");
     for (CaCapability m : values()) {
       if (m.text.equalsIgnoreCase(text)) {
         return m;

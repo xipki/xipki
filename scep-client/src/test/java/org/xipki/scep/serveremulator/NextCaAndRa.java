@@ -18,7 +18,7 @@
 package org.xipki.scep.serveremulator;
 
 import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.scep.util.ScepUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -32,7 +32,7 @@ public class NextCaAndRa {
   private final Certificate raCert;
 
   public NextCaAndRa(Certificate caCert, Certificate raCert) {
-    this.caCert = ScepUtil.requireNonNull("caCert", caCert);
+    this.caCert = Args.notNull(caCert, "caCert");
     this.raCert = raCert;
   }
 

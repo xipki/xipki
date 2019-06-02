@@ -39,7 +39,6 @@ import org.junit.Test;
 import org.xipki.scep.client.CaCertValidator;
 import org.xipki.scep.client.CaIdentifier;
 import org.xipki.scep.client.EnrolmentResponse;
-import org.xipki.scep.client.PreprovisionedCaCertValidator;
 import org.xipki.scep.client.ScepClient;
 import org.xipki.scep.message.AuthorityCertStore;
 import org.xipki.scep.message.CaCaps;
@@ -132,7 +131,7 @@ public abstract class AbstractCaTest {
   @Test
   public void test() throws Exception {
     CaIdentifier caId = new CaIdentifier("http://localhost:" + port + "/scep/pkiclient.exe", null);
-    CaCertValidator caCertValidator = new PreprovisionedCaCertValidator(
+    CaCertValidator caCertValidator = new CaCertValidator.PreprovisionedCaCertValidator(
             ScepUtil.toX509Cert(scepServer.getCaCert()));
     ScepClient client = new ScepClient(caId, caCertValidator);
     client.setUseInsecureAlgorithms(useInsecureAlgorithms());
@@ -200,36 +199,36 @@ public abstract class AbstractCaTest {
       kpGen.initialize(2048);
       KeyPair keypair = kpGen.generateKeyPair();
       privKey = keypair.getPrivate();
-      SubjectPublicKeyInfo subjectPublicKeyInfo = ScepUtil.createSubjectPublicKeyInfo(
+      SubjectPublicKeyInfo subjectPublicKeyInfo = MyUtil.createSubjectPublicKeyInfo(
               keypair.getPublic());
       X500Name subject = new X500Name("CN=EE1, OU=emulator, O=xipki.org, C=DE");
 
       // first try without secret
-      PKCS10CertificationRequest p10Req = ScepUtil.generateRequest(privKey, subjectPublicKeyInfo,
+      PKCS10CertificationRequest p10Req = MyUtil.generateRequest(privKey, subjectPublicKeyInfo,
           subject, null, null);
       csr = p10Req.toASN1Structure();
 
-      selfSignedCert = ScepUtil.generateSelfsignedCert(p10Req.toASN1Structure(), privKey);
+      selfSignedCert = MyUtil.generateSelfsignedCert(p10Req.toASN1Structure(), privKey);
       EnrolmentResponse enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey,
           selfSignedCert);
       PkiStatus status = enrolResp.getPkcsRep().getPkiStatus();
       Assert.assertEquals("PkiStatus without secret", PkiStatus.FAILURE, status);
 
       // then try invalid secret
-      p10Req = ScepUtil.generateRequest(privKey, subjectPublicKeyInfo, subject,
+      p10Req = MyUtil.generateRequest(privKey, subjectPublicKeyInfo, subject,
           "invalid-" + secret, null);
       csr = p10Req.toASN1Structure();
 
-      selfSignedCert = ScepUtil.generateSelfsignedCert(p10Req.toASN1Structure(), privKey);
+      selfSignedCert = MyUtil.generateSelfsignedCert(p10Req.toASN1Structure(), privKey);
       enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey, selfSignedCert);
       status = enrolResp.getPkcsRep().getPkiStatus();
       Assert.assertEquals("PkiStatus with invalid secret", PkiStatus.FAILURE, status);
 
       // try with valid secret
-      p10Req = ScepUtil.generateRequest(privKey, subjectPublicKeyInfo, subject, secret, null);
+      p10Req = MyUtil.generateRequest(privKey, subjectPublicKeyInfo, subject, secret, null);
       csr = p10Req.toASN1Structure();
 
-      selfSignedCert = ScepUtil.generateSelfsignedCert(p10Req.toASN1Structure(), privKey);
+      selfSignedCert = MyUtil.generateSelfsignedCert(p10Req.toASN1Structure(), privKey);
       enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey, selfSignedCert);
 
       List<X509Certificate> certs = enrolResp.getCertificates();
@@ -239,10 +238,10 @@ public abstract class AbstractCaTest {
       enroledCert = cert;
 
       // try :: self-signed certificate's subject different from the one of CSR
-      p10Req = ScepUtil.generateRequest(privKey, subjectPublicKeyInfo, subject, secret, null);
+      p10Req = MyUtil.generateRequest(privKey, subjectPublicKeyInfo, subject, secret, null);
       csr = p10Req.toASN1Structure();
 
-      selfSignedCert = ScepUtil.generateSelfsignedCert(new X500Name("CN=dummy"),
+      selfSignedCert = MyUtil.generateSelfsignedCert(new X500Name("CN=dummy"),
           csr.getCertificationRequestInfo().getSubjectPublicKeyInfo(), privKey);
       enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey, selfSignedCert);
       status = enrolResp.getPkcsRep().getPkiStatus();

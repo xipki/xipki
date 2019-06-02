@@ -70,8 +70,9 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCSException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.scep.crypto.ScepHashAlgo;
+import org.xipki.scep.util.ScepHashAlgo;
 import org.xipki.scep.util.ScepUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -114,8 +115,8 @@ public class CaEmulator {
 
   public CaEmulator(PrivateKey caKey, Certificate caCert, boolean generateCrl)
       throws CertificateEncodingException {
-    this.caKey = ScepUtil.requireNonNull("caKey", caKey);
-    this.caCert = ScepUtil.requireNonNull("caCert", caCert);
+    this.caKey = Args.notNull(caKey, "caKey");
+    this.caCert = Args.notNull(caCert, "caCert");
     this.caSubject = caCert.getSubject();
     this.generateCrl = generateCrl;
     try {
@@ -157,9 +158,9 @@ public class CaEmulator {
 
   public Certificate generateCert(SubjectPublicKeyInfo pubKeyInfo, X500Name subjectDn,
       Date notBefore) throws Exception {
-    ScepUtil.requireNonNull("pubKeyInfo", pubKeyInfo);
-    ScepUtil.requireNonNull("subjectDn", subjectDn);
-    ScepUtil.requireNonNull("notBefore", notBefore);
+    Args.notNull(pubKeyInfo, "pubKeyInfo");
+    Args.notNull(subjectDn, "subjectDn");
+    Args.notNull(notBefore, "notBefore");
 
     Date notAfter = new Date(notBefore.getTime() + 730 * DAY_IN_MS);
     BigInteger tmpSerialNumber = BigInteger.valueOf(serialNumber.getAndAdd(1));
@@ -190,8 +191,8 @@ public class CaEmulator {
   }
 
   public Certificate pollCert(X500Name issuer, X500Name subject) {
-    ScepUtil.requireNonNull("issuer", issuer);
-    ScepUtil.requireNonNull("subject", subject);
+    Args.notNull(issuer, "issuer");
+    Args.notNull(subject, "subject");
     if (!caSubject.equals(issuer)) {
       return null;
     }
@@ -224,7 +225,7 @@ public class CaEmulator {
   }
 
   private boolean verifyPopo(CertificationRequest csr) {
-    ScepUtil.requireNonNull("csr", csr);
+    Args.notNull(csr, "csr");
     try {
       PKCS10CertificationRequest p10Req = new PKCS10CertificationRequest(csr);
       SubjectPublicKeyInfo pkInfo = p10Req.getSubjectPublicKeyInfo();
@@ -240,7 +241,7 @@ public class CaEmulator {
 
   public ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey)
       throws InvalidKeyException {
-    ScepUtil.requireNonNull("publicKey", publicKey);
+    Args.notNull(publicKey, "publicKey");
 
     String keyAlg = publicKey.getAlgorithm().toUpperCase();
     if ("EC".equals(keyAlg)) {
@@ -272,7 +273,7 @@ public class CaEmulator {
 
   private static PublicKey generatePublicKey(SubjectPublicKeyInfo pkInfo)
       throws InvalidKeySpecException {
-    ScepUtil.requireNonNull("pkInfo", pkInfo);
+    Args.notNull(pkInfo, "pkInfo");
 
     X509EncodedKeySpec keyspec;
     try {
@@ -306,7 +307,7 @@ public class CaEmulator {
 
   private static AsymmetricKeyParameter generatePublicKeyParameter(PublicKey key)
       throws InvalidKeyException {
-    ScepUtil.requireNonNull("key", key);
+    Args.notNull(key, "key");
 
     if (key instanceof RSAPublicKey) {
       RSAPublicKey rsaKey = (RSAPublicKey) key;

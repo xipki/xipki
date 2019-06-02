@@ -45,13 +45,12 @@ import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.scep.crypto.ScepHashAlgo;
-import org.xipki.scep.exception.MessageDecodingException;
 import org.xipki.scep.message.CaCaps;
 import org.xipki.scep.message.DecodedPkiMessage;
 import org.xipki.scep.message.EnvelopedDataDecryptor;
-import org.xipki.scep.message.EnvelopedDataDecryptorInstance;
+import org.xipki.scep.message.EnvelopedDataDecryptor.EnvelopedDataDecryptorInstance;
 import org.xipki.scep.message.IssuerAndSubject;
+import org.xipki.scep.message.MessageDecodingException;
 import org.xipki.scep.message.NextCaMessage;
 import org.xipki.scep.message.PkiMessage;
 import org.xipki.scep.serveremulator.AuditEvent.AuditLevel;
@@ -61,7 +60,9 @@ import org.xipki.scep.transaction.MessageType;
 import org.xipki.scep.transaction.Nonce;
 import org.xipki.scep.transaction.PkiStatus;
 import org.xipki.scep.transaction.TransactionId;
+import org.xipki.scep.util.ScepHashAlgo;
 import org.xipki.scep.util.ScepUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -103,9 +104,9 @@ public class ScepResponder {
 
   public ScepResponder(CaCaps caCaps, CaEmulator caEmulator, RaEmulator raEmulator,
       NextCaAndRa nextCaAndRa, ScepControl control) throws Exception {
-    this.caCaps = ScepUtil.requireNonNull("caCaps", caCaps);
-    this.caEmulator = ScepUtil.requireNonNull("caEmulator", caEmulator);
-    this.control = ScepUtil.requireNonNull("control", control);
+    this.caCaps = Args.notNull(caCaps, "caCaps");
+    this.caEmulator = Args.notNull(caEmulator, "caEmulator");
+    this.control = Args.notNull(control, "control");
 
     this.raEmulator = raEmulator;
     this.nextCaAndRa = nextCaAndRa;
@@ -128,7 +129,7 @@ public class ScepResponder {
 
   public ContentInfo servicePkiOperation(CMSSignedData requestContent, AuditEvent event)
       throws MessageDecodingException, CaException {
-    ScepUtil.requireNonNull("requestContent", requestContent);
+    Args.notNull(requestContent, "requestContent");
     PrivateKey recipientKey = (raEmulator != null) ? raEmulator.getRaKey() : caEmulator.getCaKey();
     Certificate recipientCert =
         (raEmulator != null) ? raEmulator.getRaCert() : caEmulator.getCaCert();
@@ -172,7 +173,7 @@ public class ScepResponder {
   } // method servicePkiOperation
 
   public ContentInfo encode(NextCaMessage nextCaMsg) throws CaException {
-    ScepUtil.requireNonNull("nextCAMsg", nextCaMsg);
+    Args.notNull(nextCaMsg, "nextCaMsg");
     try {
       X509Certificate jceSignerCert = ScepUtil.toX509Cert(getSigningCert());
       X509Certificate[] certs = control.isSendSignerCert()

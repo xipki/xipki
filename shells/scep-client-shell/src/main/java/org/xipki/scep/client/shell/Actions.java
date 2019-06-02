@@ -42,7 +42,6 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.scep.client.CaCertValidator;
 import org.xipki.scep.client.CaIdentifier;
 import org.xipki.scep.client.EnrolmentResponse;
-import org.xipki.scep.client.PreprovisionedCaCertValidator;
 import org.xipki.scep.client.ScepClient;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
@@ -131,7 +130,7 @@ public class Actions {
       if (scepClient == null) {
         X509Certificate caCert = X509Util.parseCert(new File(caCertFile));
         CaIdentifier tmpCaId = new CaIdentifier(url, caId);
-        CaCertValidator caCertValidator = new PreprovisionedCaCertValidator(caCert);
+        CaCertValidator caCertValidator = new CaCertValidator.PreprovisionedCaCertValidator(caCert);
         scepClient = new ScepClient(tmpCaId, caCertValidator);
       }
       return scepClient;

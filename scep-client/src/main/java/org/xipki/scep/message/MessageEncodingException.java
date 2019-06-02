@@ -15,4 +15,27 @@
  * limitations under the License.
  */
 
-package org.xipki.scep.exception;
+package org.xipki.scep.message;
+
+/**
+ * TODO.
+ * @author Lijun Liao
+ */
+
+public class MessageEncodingException extends Exception {
+
+  private static final long serialVersionUID = 1L;
+
+  public MessageEncodingException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
+  public MessageEncodingException(String message) {
+    super(message);
+  }
+
+  public MessageEncodingException(Throwable cause) {
+    super(cause.getMessage(), cause);
+  }
+
+}

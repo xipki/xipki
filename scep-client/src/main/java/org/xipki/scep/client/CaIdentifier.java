@@ -24,7 +24,7 @@ import java.net.URLEncoder;
 
 import org.xipki.scep.transaction.Operation;
 import org.xipki.scep.transaction.TransactionException;
-import org.xipki.scep.util.ScepUtil;
+import org.xipki.util.Args;
 
 /**
  * CA identifier.
@@ -38,7 +38,7 @@ public class CaIdentifier {
   private final String profile;
 
   public CaIdentifier(String serverUrl, String profile) throws MalformedURLException {
-    ScepUtil.requireNonBlank("serverUrl", serverUrl);
+    Args.notBlank(serverUrl, "serverUrl");
     URL tmpUrl = new URL(serverUrl);
     final String protocol = tmpUrl.getProtocol();
 
@@ -69,7 +69,7 @@ public class CaIdentifier {
 
   @SuppressWarnings("deprecation")
   public String buildGetUrl(Operation operation, String message) {
-    ScepUtil.requireNonNull("operation", operation);
+    Args.notNull(operation, "operation");
     StringBuilder ub = new StringBuilder(url);
     ub.append('?').append("operation=").append(operation.getCode());
 
@@ -86,7 +86,7 @@ public class CaIdentifier {
   }
 
   public String buildPostUrl(Operation operation) {
-    ScepUtil.requireNonNull("operation", operation);
+    Args.notNull(operation, "operation");
     StringBuilder ub = new StringBuilder(url);
     ub.append('?').append("operation=").append(operation.getCode());
     return ub.toString();

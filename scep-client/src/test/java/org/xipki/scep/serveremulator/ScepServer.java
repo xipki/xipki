@@ -24,19 +24,11 @@ import java.security.PrivateKey;
 import java.util.Date;
 
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.cert.CertIOException;
-import org.bouncycastle.cert.X509v3CertificateBuilder;
-import org.bouncycastle.jce.X509KeyUsage;
-import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.xipki.scep.crypto.ScepHashAlgo;
+import org.xipki.scep.client.test.MyUtil;
 import org.xipki.scep.message.CaCaps;
-import org.xipki.scep.util.ScepUtil;
+import org.xipki.util.Args;
 
 /**
  * TODO.
@@ -71,9 +63,9 @@ public class ScepServer {
 
   public ScepServer(String name, CaCaps caCaps, boolean withRa, boolean withNextCa,
       boolean generateCrl, ScepControl control) {
-    this.name = ScepUtil.requireNonBlank("name", name);
-    this.caCaps = ScepUtil.requireNonNull("caCaps", caCaps);
-    this.control = ScepUtil.requireNonNull("control", control);
+    this.name = Args.notBlank(name, "name");
+    this.caCaps = Args.notNull(caCaps, "caCaps");
+    this.control = Args.notNull(control, "control");
     this.withRa = withRa;
     this.withNextCa = withNextCa;
     this.generateCrl = generateCrl;
@@ -103,9 +95,9 @@ public class ScepServer {
     kpGen.initialize(2048);
     keypair = kpGen.generateKeyPair();
 
-    SubjectPublicKeyInfo pkInfo = ScepUtil.createSubjectPublicKeyInfo(keypair.getPublic());
+    SubjectPublicKeyInfo pkInfo = MyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
     X500Name subject = new X500Name("CN=CA1, OU=emulator, O=xipki.org, C=DE");
-    this.caCert = issueSubCaCert(rcaKey, rcaSubject, pkInfo, subject, BigInteger.valueOf(2),
+    this.caCert = MyUtil.issueSubCaCert(rcaKey, rcaSubject, pkInfo, subject, BigInteger.valueOf(2),
         new Date(System.currentTimeMillis() - 10 * CaEmulator.MIN_IN_MS));
     CaEmulator ca = new CaEmulator(keypair.getPrivate(), this.caCert, generateCrl);
 
@@ -113,7 +105,7 @@ public class ScepServer {
     if (withRa) {
       kpGen.initialize(2048);
       keypair = kpGen.generateKeyPair();
-      pkInfo = ScepUtil.createSubjectPublicKeyInfo(keypair.getPublic());
+      pkInfo = MyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
 
       subject = new X500Name("CN=RA1, OU=emulator, O=xipki.org, C=DE");
       this.raCert = ca.generateCert(pkInfo, subject);
@@ -125,18 +117,18 @@ public class ScepServer {
       kpGen.initialize(2048);
       keypair = kpGen.generateKeyPair();
 
-      pkInfo = ScepUtil.createSubjectPublicKeyInfo(keypair.getPublic());
+      pkInfo = MyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
       subject = new X500Name("CN=CA2, OU=emulator, O=xipki.org, C=DE");
 
       Date startTime = new Date(System.currentTimeMillis() + 365 * CaEmulator.DAY_IN_MS);
-      this.nextCaCert = issueSubCaCert(rcaKey, rcaSubject, pkInfo, subject,
+      this.nextCaCert = MyUtil.issueSubCaCert(rcaKey, rcaSubject, pkInfo, subject,
               BigInteger.valueOf(2), startTime);
       CaEmulator tmpCa = new CaEmulator(keypair.getPrivate(), this.nextCaCert, generateCrl);
 
       if (withRa) {
         kpGen.initialize(2048);
         keypair = kpGen.generateKeyPair();
-        pkInfo = ScepUtil.createSubjectPublicKeyInfo(keypair.getPublic());
+        pkInfo = MyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
 
         subject = new X500Name("CN=RA2, OU=emulator, O=xipki.org, C=DE");
         Date raStartTime = new Date(startTime.getTime() + 10 * CaEmulator.DAY_IN_MS);
@@ -181,22 +173,6 @@ public class ScepServer {
 
   public boolean isGenerateCrl() {
     return generateCrl;
-  }
-
-  private static Certificate issueSubCaCert(PrivateKey rcaKey, X500Name issuer,
-      SubjectPublicKeyInfo pubKeyInfo, X500Name subject, BigInteger serialNumber,
-      Date startTime) throws CertIOException, OperatorCreationException {
-    Date notAfter = new Date(startTime.getTime() + CaEmulator.DAY_IN_MS * 3650);
-    X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(issuer, serialNumber,
-        startTime, notAfter, subject, pubKeyInfo);
-    X509KeyUsage ku = new X509KeyUsage(X509KeyUsage.keyCertSign | X509KeyUsage.cRLSign);
-    certGenerator.addExtension(Extension.keyUsage, true, ku);
-    BasicConstraints bc = new BasicConstraints(0);
-    certGenerator.addExtension(Extension.basicConstraints, true, bc);
-
-    String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(rcaKey, ScepHashAlgo.SHA256);
-    ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(rcaKey);
-    return certGenerator.build(contentSigner).toASN1Structure();
   }
 
 }

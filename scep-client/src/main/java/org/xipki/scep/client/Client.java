@@ -43,17 +43,14 @@ import org.bouncycastle.cms.CMSAlgorithm;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.util.CollectionStore;
-import org.bouncycastle.util.encoders.Base64;
-import org.xipki.scep.client.exception.OperationNotSupportedException;
-import org.xipki.scep.client.exception.ScepClientException;
-import org.xipki.scep.crypto.ScepHashAlgo;
-import org.xipki.scep.exception.MessageDecodingException;
-import org.xipki.scep.exception.MessageEncodingException;
+import org.xipki.scep.client.ScepClientException.OperationNotSupportedException;
 import org.xipki.scep.message.AuthorityCertStore;
 import org.xipki.scep.message.CaCaps;
 import org.xipki.scep.message.DecodedNextCaMessage;
 import org.xipki.scep.message.DecodedPkiMessage;
 import org.xipki.scep.message.IssuerAndSubject;
+import org.xipki.scep.message.MessageDecodingException;
+import org.xipki.scep.message.MessageEncodingException;
 import org.xipki.scep.message.PkiMessage;
 import org.xipki.scep.transaction.CaCapability;
 import org.xipki.scep.transaction.MessageType;
@@ -61,7 +58,10 @@ import org.xipki.scep.transaction.Operation;
 import org.xipki.scep.transaction.PkiStatus;
 import org.xipki.scep.transaction.TransactionId;
 import org.xipki.scep.util.ScepConstants;
+import org.xipki.scep.util.ScepHashAlgo;
 import org.xipki.scep.util.ScepUtil;
+import org.xipki.util.Args;
+import org.xipki.util.Base64;
 
 /**
  * TODO.
@@ -92,8 +92,8 @@ public abstract class Client {
   private boolean useInsecureAlgorithms;
 
   public Client(CaIdentifier caId, CaCertValidator caCertValidator) throws MalformedURLException {
-    this.caId = ScepUtil.requireNonNull("caId", caId);
-    this.caCertValidator = ScepUtil.requireNonNull("caCertValidator", caCertValidator);
+    this.caId = Args.notNull(caId, "caId");
+    this.caCertValidator = Args.notNull(caCertValidator, "caCertValidator");
   }
 
   /**
@@ -167,7 +167,7 @@ public abstract class Client {
         return httpPost(url, REQ_CONTENT_TYPE, request);
       } else {
         String url = caId.buildGetUrl(operation,
-            (request == null) ? null : new String(Base64.encode(request)));
+            (request == null) ? null : Base64.encodeToString(request));
         return httpGet(url);
       }
     } // end if
@@ -229,10 +229,10 @@ public abstract class Client {
 
   public X509CRL scepGetCrl(PrivateKey identityKey, X509Certificate identityCert, X500Name issuer,
       BigInteger serialNumber) throws ScepClientException {
-    ScepUtil.requireNonNull("identityKey", identityKey);
-    ScepUtil.requireNonNull("identityCert", identityCert);
-    ScepUtil.requireNonNull("issuer", issuer);
-    ScepUtil.requireNonNull("serialNumber", serialNumber);
+    Args.notNull(identityKey, "identityKey");
+    Args.notNull(identityCert, "identityCert");
+    Args.notNull(issuer, "issuer");
+    Args.notNull(serialNumber, "serialNumber");
 
     initIfNotInited();
 
@@ -258,10 +258,10 @@ public abstract class Client {
 
   public List<X509Certificate> scepGetCert(PrivateKey identityKey, X509Certificate identityCert,
       X500Name issuer, BigInteger serialNumber) throws ScepClientException {
-    ScepUtil.requireNonNull("identityKey", identityKey);
-    ScepUtil.requireNonNull("identityCert", identityCert);
-    ScepUtil.requireNonNull("issuer", issuer);
-    ScepUtil.requireNonNull("serialNumber", serialNumber);
+    Args.notNull(identityKey, "identityKey");
+    Args.notNull(identityCert, "identityCert");
+    Args.notNull(issuer, "issuer");
+    Args.notNull(serialNumber, "serialNumber");
 
     initIfNotInited();
 
@@ -288,7 +288,7 @@ public abstract class Client {
 
   public EnrolmentResponse scepCertPoll(PrivateKey identityKey, X509Certificate identityCert,
       CertificationRequest csr, X500Name issuer) throws ScepClientException {
-    ScepUtil.requireNonNull("csr", csr);
+    Args.notNull(csr, "csr");
 
     TransactionId tid;
     try {
@@ -304,10 +304,10 @@ public abstract class Client {
 
   public EnrolmentResponse scepCertPoll(PrivateKey identityKey, X509Certificate identityCert,
       TransactionId transactionId, X500Name issuer, X500Name subject) throws ScepClientException {
-    ScepUtil.requireNonNull("identityKey", identityKey);
-    ScepUtil.requireNonNull("identityCert", identityCert);
-    ScepUtil.requireNonNull("issuer", issuer);
-    ScepUtil.requireNonNull("transactionId", transactionId);
+    Args.notNull(identityKey, "identityKey");
+    Args.notNull(identityCert, "identityCert");
+    Args.notNull(issuer, "issuer");
+    Args.notNull(transactionId, "transactionId");
 
     initIfNotInited();
 
@@ -325,9 +325,9 @@ public abstract class Client {
 
   public EnrolmentResponse scepEnrol(CertificationRequest csr, PrivateKey identityKey,
       X509Certificate identityCert) throws ScepClientException {
-    ScepUtil.requireNonNull("csr", csr);
-    ScepUtil.requireNonNull("identityKey", identityKey);
-    ScepUtil.requireNonNull("identityCert", identityCert);
+    Args.notNull(csr, "csr");
+    Args.notNull(identityKey, "identityKey");
+    Args.notNull(identityCert, "identityCert");
 
     initIfNotInited();
 
@@ -355,9 +355,9 @@ public abstract class Client {
 
   public EnrolmentResponse scepPkcsReq(CertificationRequest csr, PrivateKey identityKey,
       X509Certificate identityCert) throws ScepClientException {
-    ScepUtil.requireNonNull("csr", csr);
-    ScepUtil.requireNonNull("identityKey", identityKey);
-    ScepUtil.requireNonNull("identityCert", identityCert);
+    Args.notNull(csr, "csr");
+    Args.notNull(identityKey, "identityKey");
+    Args.notNull(identityCert, "identityCert");
 
     initIfNotInited();
 

@@ -36,17 +36,19 @@ import org.bouncycastle.cms.CMSAbsentContent;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.scep.exception.MessageDecodingException;
 import org.xipki.scep.message.CaCaps;
+import org.xipki.scep.message.MessageDecodingException;
 import org.xipki.scep.message.NextCaMessage;
 import org.xipki.scep.serveremulator.AuditEvent.AuditLevel;
 import org.xipki.scep.transaction.CaCapability;
 import org.xipki.scep.transaction.Operation;
 import org.xipki.scep.util.ScepConstants;
 import org.xipki.scep.util.ScepUtil;
+import org.xipki.util.Args;
+import org.xipki.util.Base64;
+import org.xipki.util.IoUtil;
 
 /**
  * URL http://host:port/scep/&lt;name&gt;/&lt;profile-alias&gt;/pkiclient.exe
@@ -65,7 +67,7 @@ public class ScepServlet extends HttpServlet {
   private ScepResponder responder;
 
   public ScepServlet(ScepResponder responder) {
-    this.responder = ScepUtil.requireNonNull("responder", responder);
+    this.responder = Args.notNull(responder, "responder");
   }
 
   @Override
@@ -106,7 +108,7 @@ public class ScepServlet extends HttpServlet {
         CMSSignedData reqMessage;
         // parse the request
         try {
-          byte[] content = post ? ScepUtil.read(req.getInputStream())
+          byte[] content = post ? IoUtil.read(req.getInputStream())
               : Base64.decode(req.getParameter("message"));
 
           reqMessage = new CMSSignedData(content);
@@ -223,7 +225,7 @@ public class ScepServlet extends HttpServlet {
   }
 
   protected PKIMessage generatePkiMessage(InputStream is) throws IOException {
-    ASN1InputStream asn1Stream = new ASN1InputStream(ScepUtil.requireNonNull("is", is));
+    ASN1InputStream asn1Stream = new ASN1InputStream(Args.notNull(is, "is"));
 
     try {
       return PKIMessage.getInstance(asn1Stream.readObject());
