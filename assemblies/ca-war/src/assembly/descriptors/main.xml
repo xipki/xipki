@@ -10,13 +10,23 @@
     <fileSet>
       <directory>${project.build.directory}</directory>
       <includes>
-        <include>xipki/**/*.sh</include>
-        <include>lib/**/*.sh</include>
         <include>dbtool/**/*.sh</include>
       </includes>
       <outputDirectory>.</outputDirectory>
       <fileMode>0755</fileMode>
       <directoryMode>0755</directoryMode>
+      <lineEnding>unix</lineEnding>
+    </fileSet>
+    <fileSet>
+      <directory>${project.build.directory}</directory>
+      <includes>
+        <include>dbtool/**/*.bat</include>
+        <include>dbtool/**/*.cmd</include>
+      </includes>
+      <outputDirectory>.</outputDirectory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+      <lineEnding>dos</lineEnding>
     </fileSet>
     <fileSet>
       <directory>${project.build.directory}</directory>
@@ -28,6 +38,8 @@
       </includes>
       <excludes>
         <exclude>**/*.sh</exclude>
+        <exclude>**/*.bat</exclude>
+        <exclude>**/*.cmd</exclude>
       </excludes>
       <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>
