@@ -37,7 +37,7 @@ if "%JAVA_HOME%" == "" (
     set JAVA_EXEC="%JAVA_HOME%"\bin\java
 )
 
-set CLASSPATH=%DIRNAME%\..\lib\*;%DIRNAME%\..\..\lib\*;%DIRNAME%\..\tmplib\WEB-INF\lib\*
+set CLASSPATH=%DIRNAME%\..\lib\;%DIRNAME%\..\lib\*;%DIRNAME%\..\..\lib\*;%DIRNAME%\..\tmplib\WEB-INF\lib\*
 
 %JAVA_EXEC% -cp %CLASSPATH% org.xipki.dbtool.InitDbMain %ARGS%
 

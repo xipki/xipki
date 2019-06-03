@@ -20,6 +20,6 @@ else
 	JAVA_EXEC=$JAVA_HOME/bin/java
 fi
 
-CLASSPATH="$DIRNAME/../lib/*:$DIRNAME/../../lib/*:$TMPLIB/WEB-INF/lib/*"
+CLASSPATH="$DIRNAME/../lib:$DIRNAME/../lib/*:$DIRNAME/../../lib/*:$TMPLIB/WEB-INF/lib/*"
 
 $JAVA_EXEC -cp "$CLASSPATH" org.xipki.dbtool.InitDbMain "$@"
