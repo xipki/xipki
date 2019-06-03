@@ -28,8 +28,11 @@ Deployment in Tomcat
 `tomcat.util.scan.StandardJarScanFilter.jarsToSkip` in the file `conf/catalina.properties`.
 
 ```
+audit-*.jar,\
 bcprov-jdk15on-*.jar,\
 bcpkix-jdk15on-*.jar,\
+ca-*.jar,\
+certprofile-xijson-*.jar,\
 datasource-*.jar,\
 fastjson-*.jar,\
 HikariCP-*.jar,\
@@ -42,8 +45,10 @@ ocsp-server-*.jar,\
 password-*.jar,\
 pkcs11-constants-*.jar,\
 postgresql-*.jar,\
+scep-client-*.jar,\
 security-*.jar,\
 sunpkcs11-wrapper-*.jar,\
+syslog-java-client-*.jar,\
 util-*.jar
 ```
 - Start tomcat
