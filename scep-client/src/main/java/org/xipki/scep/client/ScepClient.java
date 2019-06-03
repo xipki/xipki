@@ -30,6 +30,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 
 import org.xipki.util.Args;
+import org.xipki.util.StringUtil;
 
 /**
  * A concrete SCEP client.
@@ -39,13 +40,13 @@ import org.xipki.util.Args;
 
 public class ScepClient extends Client {
 
-  private SSLSocketFactory sslSocketFactory;
+  private final SSLSocketFactory sslSocketFactory;
 
-  private HostnameVerifier hostnameVerifier;
+  private final HostnameVerifier hostnameVerifier;
 
   public ScepClient(CaIdentifier caId, CaCertValidator caCertValidator)
       throws MalformedURLException {
-    super(caId, caCertValidator);
+    this(caId, caCertValidator, null, null);
   }
 
   public ScepClient(CaIdentifier caId, CaCertValidator caCertValidator,
@@ -119,7 +120,7 @@ public class ScepClient extends Client {
 
       ScepHttpResponse resp = new ScepHttpResponse(contentType, contentLength, inputstream);
       String contentEncoding = conn.getContentEncoding();
-      if (contentEncoding != null && !contentEncoding.isEmpty()) {
+      if (StringUtil.isNotBlank(contentEncoding)) {
         resp.setContentEncoding(contentEncoding);
       }
       return resp;

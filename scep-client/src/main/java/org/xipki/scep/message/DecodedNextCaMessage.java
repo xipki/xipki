@@ -48,6 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.scep.util.ScepUtil;
 import org.xipki.util.Args;
+import org.xipki.util.CollectionUtil;
 
 /**
  * Decoded {@link NextCaMessage}.
@@ -144,7 +145,7 @@ public class DecodedNextCaMessage {
       signedDataCerts = certStore.getMatches(sid);
     }
 
-    if (signedDataCerts == null || signedDataCerts.isEmpty()) {
+    if (CollectionUtil.isEmpty(signedDataCerts)) {
       signedDataCerts = pkiMessage.getCertificates().getMatches(signerInfo.getSID());
     }
 

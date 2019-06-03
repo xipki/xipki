@@ -54,6 +54,8 @@ import org.xipki.scep.serveremulator.CaEmulator;
 import org.xipki.scep.util.ScepHashAlgo;
 import org.xipki.scep.util.ScepUtil;
 import org.xipki.util.Args;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * Utility class.
@@ -97,12 +99,12 @@ public class MyUtil {
     Map<ASN1ObjectIdentifier, ASN1Encodable> attributes =
         new HashMap<ASN1ObjectIdentifier, ASN1Encodable>();
 
-    if (challengePassword != null && !challengePassword.isEmpty()) {
+    if (StringUtil.isNotBlank(challengePassword)) {
       DERPrintableString asn1Pwd = new DERPrintableString(challengePassword);
       attributes.put(PKCSObjectIdentifiers.pkcs_9_at_challengePassword, asn1Pwd);
     }
 
-    if (extensions != null && !extensions.isEmpty()) {
+    if (CollectionUtil.isNonEmpty(extensions)) {
       Extensions asn1Extensions = new Extensions(extensions.toArray(new Extension[0]));
       attributes.put(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest, asn1Extensions);
     }

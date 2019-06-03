@@ -43,6 +43,7 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.xipki.scep.util.ScepHashAlgo;
 import org.xipki.scep.util.ScepUtil;
 import org.xipki.util.Args;
+import org.xipki.util.CollectionUtil;
 
 /**
  * Get Next CA Response Message.
@@ -72,7 +73,7 @@ public class NextCaMessage {
   }
 
   public void setRaCerts(List<X509Certificate> raCerts) {
-    this.raCerts = (raCerts == null || raCerts.isEmpty()) ? null
+    this.raCerts = CollectionUtil.isEmpty(raCerts) ? null
         : Collections.unmodifiableList(new ArrayList<X509Certificate>(raCerts));
   }
 
@@ -86,7 +87,7 @@ public class NextCaMessage {
       try {
         CMSSignedDataGenerator degenerateSignedData = new CMSSignedDataGenerator();
         degenerateSignedData.addCertificate(new X509CertificateHolder(caCert.getEncoded()));
-        if (raCerts != null && !raCerts.isEmpty()) {
+        if (CollectionUtil.isNonEmpty(raCerts)) {
           for (X509Certificate m : raCerts) {
             degenerateSignedData.addCertificate(new X509CertificateHolder(m.getEncoded()));
           }

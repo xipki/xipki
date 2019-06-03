@@ -25,6 +25,7 @@ import java.net.URLEncoder;
 import org.xipki.scep.transaction.Operation;
 import org.xipki.scep.transaction.TransactionException;
 import org.xipki.util.Args;
+import org.xipki.util.StringUtil;
 
 /**
  * CA identifier.
@@ -73,7 +74,7 @@ public class CaIdentifier {
     StringBuilder ub = new StringBuilder(url);
     ub.append('?').append("operation=").append(operation.getCode());
 
-    if (message != null && !message.isEmpty()) {
+    if (StringUtil.isNotBlank(message)) {
       String urlMessage;
       try {
         urlMessage = URLEncoder.encode(message, "UTF-8");
@@ -96,7 +97,7 @@ public class CaIdentifier {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("URL: ").append(url);
-    if (profile != null && !profile.isEmpty()) {
+    if (StringUtil.isNotBlank(profile)) {
       sb.append(", CA-Ident: ").append(profile);
     }
     return sb.toString();

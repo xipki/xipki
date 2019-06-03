@@ -657,26 +657,26 @@ public abstract class Client {
 
     if (raCerts.isEmpty()) {
       return AuthorityCertStore.getInstance(caCert);
-    } else {
-      AuthorityCertStore cs = AuthorityCertStore.getInstance(caCert,
-          raCerts.toArray(new X509Certificate[0]));
-      X509Certificate raEncCert = cs.getEncryptionCert();
-      X509Certificate raSignCert = cs.getSignatureCert();
-      try {
-        if (!ScepUtil.issues(caCert, raEncCert)) {
-          throw new ScepClientException("RA certificate '"
-              + raEncCert.getSubjectX500Principal() + " is not issued by the CA");
-        }
-        if (raSignCert != raEncCert && ScepUtil.issues(caCert, raSignCert)) {
-          throw new ScepClientException("RA certificate '"
-              + raSignCert.getSubjectX500Principal() + " is not issued by the CA");
-        }
-      } catch (CertificateException ex) {
-        throw new ScepClientException("invalid certificate: " + ex.getMessage(), ex);
-      }
-
-      return cs;
     }
+
+    AuthorityCertStore cs = AuthorityCertStore.getInstance(caCert,
+        raCerts.toArray(new X509Certificate[0]));
+    X509Certificate raEncCert = cs.getEncryptionCert();
+    X509Certificate raSignCert = cs.getSignatureCert();
+    try {
+      if (!ScepUtil.issues(caCert, raEncCert)) {
+        throw new ScepClientException("RA certificate '"
+            + raEncCert.getSubjectX500Principal() + " is not issued by the CA");
+      }
+      if (raSignCert != raEncCert && ScepUtil.issues(caCert, raSignCert)) {
+        throw new ScepClientException("RA certificate '"
+            + raSignCert.getSubjectX500Principal() + " is not issued by the CA");
+      }
+    } catch (CertificateException ex) {
+      throw new ScepClientException("invalid certificate: " + ex.getMessage(), ex);
+    }
+
+    return cs;
   } // method retrieveCaCertStore
 
   private static void assertSameNonce(PkiMessage request, PkiMessage response)

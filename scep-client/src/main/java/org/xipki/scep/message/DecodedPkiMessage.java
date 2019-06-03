@@ -60,6 +60,8 @@ import org.xipki.scep.transaction.PkiStatus;
 import org.xipki.scep.transaction.TransactionId;
 import org.xipki.scep.util.ScepUtil;
 import org.xipki.util.Args;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * Decoded {@link PkiMessage}.
@@ -189,7 +191,7 @@ public class DecodedPkiMessage extends PkiMessage {
       signedDataCerts = certStore.getMatches(sid);
     }
 
-    if (signedDataCerts == null || signedDataCerts.isEmpty()) {
+    if (CollectionUtil.isEmpty(signedDataCerts)) {
       signedDataCerts = pkiMessage.getCertificates().getMatches(signerInfo.getSID());
     }
 
@@ -212,7 +214,7 @@ public class DecodedPkiMessage extends PkiMessage {
 
     // transactionId
     String str = getPrintableStringAttrValue(signedAttrs, ScepObjectIdentifiers.ID_TRANSACTION_ID);
-    if (str == null || str.isEmpty()) {
+    if (StringUtil.isBlank(str)) {
       throw new MessageDecodingException("missing required SCEP attribute transactionId");
     }
     TransactionId transactionId = new TransactionId(str);

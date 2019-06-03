@@ -30,6 +30,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.scep.transaction.CaCapability;
 import org.xipki.scep.util.ScepHashAlgo;
 import org.xipki.util.Args;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * CA caps.
@@ -50,7 +52,7 @@ public class CaCaps {
   }
 
   public CaCaps(Set<CaCapability> capabilities) {
-    this.capabilities = ((capabilities == null || capabilities.isEmpty()))
+    this.capabilities = CollectionUtil.isEmpty(capabilities)
         ? new HashSet<CaCapability>() : new HashSet<CaCapability>(capabilities);
     refresh();
   }
@@ -146,7 +148,7 @@ public class CaCaps {
 
   public static CaCaps getInstance(String scepMessage) {
     CaCaps ret = new CaCaps();
-    if (scepMessage == null || scepMessage.isEmpty()) {
+    if (StringUtil.isBlank(scepMessage)) {
       return ret;
     }
 
