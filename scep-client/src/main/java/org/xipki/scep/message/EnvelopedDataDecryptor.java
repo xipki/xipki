@@ -33,7 +33,8 @@ import org.bouncycastle.cms.jcajce.JceKeyTransRecipientId;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * EnvelopedData decryptor.
+ *
  * @author Lijun Liao
  */
 

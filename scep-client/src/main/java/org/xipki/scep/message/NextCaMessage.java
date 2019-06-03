@@ -45,7 +45,8 @@ import org.xipki.scep.util.ScepUtil;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Get Next CA Response Message.
+ *
  * @author Lijun Liao
  */
 

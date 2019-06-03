@@ -26,7 +26,8 @@ import org.xipki.util.Args;
 import org.xipki.util.Hex;
 
 /**
- * TODO.
+ * Hash algorithm enum.
+ *
  * @author Lijun Liao
  */
 

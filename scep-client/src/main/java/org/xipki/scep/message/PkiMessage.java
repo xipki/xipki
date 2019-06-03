@@ -66,7 +66,8 @@ import org.xipki.scep.util.ScepUtil;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * SCEP PKI-Message.
+ *
  * @author Lijun Liao
  */
 

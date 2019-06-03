@@ -64,7 +64,8 @@ import org.xipki.util.Args;
 import org.xipki.util.Base64;
 
 /**
- * TODO.
+ * SCEP client.
+ *
  * @author Lijun Liao
  */
 
@@ -97,7 +98,8 @@ public abstract class Client {
   }
 
   /**
-   * TODO.
+   * Send request via HTTP POST.
+   *
    * @param url
    *          SCEP server URL. Must not be {@code null}.
    * @param requestContentType
@@ -112,7 +114,8 @@ public abstract class Client {
       byte[] request) throws ScepClientException;
 
   /**
-   * TODO.
+   * Send request via HTTP GET.
+   *
    * @param url
    *          URL. Must not be {@code null}.
    */

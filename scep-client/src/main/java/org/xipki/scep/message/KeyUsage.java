@@ -20,7 +20,8 @@ package org.xipki.scep.message;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * X.509 KeyUsage.
+ *
  * @author Lijun Liao
  */
 

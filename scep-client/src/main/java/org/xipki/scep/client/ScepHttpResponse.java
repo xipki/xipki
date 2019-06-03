@@ -25,7 +25,8 @@ import org.xipki.util.Args;
 import org.xipki.util.IoUtil;
 
 /**
- * TODO.
+ * HTTP Response.
+ *
  * @author Lijun Liao
  */
 

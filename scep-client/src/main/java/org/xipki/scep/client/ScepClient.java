@@ -32,7 +32,8 @@ import javax.net.ssl.SSLSocketFactory;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * A concrete SCEP client.
+ *
  * @author Lijun Liao
  */
 

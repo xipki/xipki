@@ -20,7 +20,8 @@ package org.xipki.scep.client.test;
 import org.xipki.scep.transaction.CaCapability;
 
 /**
- * TODO.
+ * Test CA with only HTTP GET (no POST) support.
+ *
  * @author Lijun Liao
  */
 

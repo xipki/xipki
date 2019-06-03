@@ -18,7 +18,8 @@
 package org.xipki.scep.transaction;
 
 /**
- * TODO.
+ * FailInfo enum.
+ *
  * @author Lijun Liao
  */
 

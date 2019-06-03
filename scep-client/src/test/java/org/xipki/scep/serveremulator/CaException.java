@@ -18,7 +18,8 @@
 package org.xipki.scep.serveremulator;
 
 /**
- * TODO.
+ * Emulator CA exception.
+ *
  * @author Lijun Liao
  */
 

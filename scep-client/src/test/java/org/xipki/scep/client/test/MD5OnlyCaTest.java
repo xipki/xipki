@@ -20,7 +20,8 @@ package org.xipki.scep.client.test;
 import org.xipki.scep.transaction.CaCapability;
 
 /**
- * TODO.
+ * Test CA with only the MD5 hash support.
+ *
  * @author Lijun Liao
  */
 

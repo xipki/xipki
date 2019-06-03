@@ -21,7 +21,8 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Contains the next CA certificate and next RA certificate.
+ *
  * @author Lijun Liao
  */
 

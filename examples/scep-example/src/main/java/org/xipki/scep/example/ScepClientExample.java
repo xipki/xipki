@@ -37,7 +37,8 @@ import org.xipki.scep.util.ScepUtil;
 import org.xipki.util.IoUtil;
 
 /**
- * TODO.
+ * SCEP client example with concrete test data.
+ *
  * @author Lijun Liao
  */
 
@@ -45,8 +46,8 @@ public class ScepClientExample extends CaClientExample {
 
   private static final String CA_URL = "http://localhost:8080/scep/scep1/tls/pkiclient.exe";
 
-  private static final String CA_CERT_FILE = "~/source/xipki/dist/xipki-pki/target/"
-      + "xipki-pki-3.1.0-SNAPSHOT/xipki/setup/keycerts/myca1.der";
+  private static final String CA_CERT_FILE = "~/source/xipki/dist/xipki-cli/target/"
+      + "xipki-cli-3.1.0-SNAPSHOT/xipki/setup/keycerts/myca1.der";
 
   private static final String challengePassword = "user1:password1";
 

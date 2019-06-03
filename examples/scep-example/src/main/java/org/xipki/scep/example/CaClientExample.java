@@ -50,7 +50,8 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.util.encoders.Base64;
 
 /**
- * TODO.
+ * SCEP client example with the common static methods.
+ *
  * @author Lijun Liao
  */
 

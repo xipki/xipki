@@ -18,7 +18,8 @@
 package org.xipki.scep.util;
 
 /**
- * TODO.
+ * SCEP constants.
+ *
  * @author Lijun Liao
  */
 

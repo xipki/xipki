@@ -32,7 +32,8 @@ import org.xipki.scep.util.ScepHashAlgo;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * CA caps.
+ *
  * @author Lijun Liao
  */
 

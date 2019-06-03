@@ -31,7 +31,8 @@ import org.xipki.scep.message.CaCaps;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * SCEP server.
+ *
  * @author Lijun Liao
  */
 

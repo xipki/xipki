@@ -18,7 +18,8 @@
 package org.xipki.scep.transaction;
 
 /**
- * TODO.
+ * Exception during the transaction.
+ *
  * @author Lijun Liao
  */
 

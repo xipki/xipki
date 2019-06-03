@@ -62,7 +62,8 @@ import org.xipki.scep.util.ScepUtil;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Decoded {@link PkiMessage}.
+ *
  * @author Lijun Liao
  */
 

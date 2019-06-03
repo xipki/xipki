@@ -75,7 +75,8 @@ import org.xipki.scep.util.ScepUtil;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * CA emulator.
+ *
  * @author Lijun Liao
  */
 

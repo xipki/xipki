@@ -18,7 +18,8 @@
 package org.xipki.scep.transaction;
 
 /**
- * TODO.
+ * Message type enum.
+ *
  * @author Lijun Liao
  */
 

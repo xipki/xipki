@@ -24,11 +24,12 @@ import java.util.Map;
 import org.slf4j.Logger;
 
 /**
- * TODO.
+ * Audit event.
+ *
  * @author Lijun Liao
  */
 
-public class AuditEvent {
+class AuditEvent {
 
   public static enum AuditLevel {
 
@@ -36,6 +37,16 @@ public class AuditEvent {
     INFO;
 
   }
+
+  public static final String NAME_failInfo = "failInfo";
+
+  public static final String NAME_PERF = "PERF";
+
+  public static final String NAME_operation = "operation";
+
+  public static final String NAME_pkiStatus = "pkiStatus";
+
+  public static final String NAME_servletPath = "servletPath";
 
   /**
    * The name of the event type.

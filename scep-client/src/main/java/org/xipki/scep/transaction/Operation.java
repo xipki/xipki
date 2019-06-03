@@ -20,7 +20,8 @@ package org.xipki.scep.transaction;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Operation enum.
+ *
  * @author Lijun Liao
  */
 

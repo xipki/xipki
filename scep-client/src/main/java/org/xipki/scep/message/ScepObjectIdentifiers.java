@@ -20,7 +20,7 @@ package org.xipki.scep.message;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 
 /**
- * TODO.
+ * Collection of SCEP related OBJECT IDENTIFIERs.
  * @author Lijun Liao
  */
 

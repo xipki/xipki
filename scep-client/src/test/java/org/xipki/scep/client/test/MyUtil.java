@@ -56,7 +56,8 @@ import org.xipki.scep.util.ScepUtil;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Utility class.
+ *
  * @author Lijun Liao
  */
 

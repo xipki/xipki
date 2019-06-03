@@ -26,14 +26,16 @@ import org.xipki.scep.util.ScepHashAlgo;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Certificate validator.
+ *
  * @author Lijun Liao
  */
 
 public interface CertificateValidator {
 
   /**
-   * TODO.
+   * Whether the target certificate can be trusted.
+   *
    * @param target
    *          The certificate to be verified. Must not be {@code null}.
    * @param otherCerts

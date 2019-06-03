@@ -23,7 +23,8 @@ import java.util.Arrays;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Nonce.
+ *
  * @author Lijun Liao
  */
 

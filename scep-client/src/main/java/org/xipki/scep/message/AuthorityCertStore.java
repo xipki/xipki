@@ -22,7 +22,8 @@ import java.security.cert.X509Certificate;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Contains the CA certificate and the corresponding RA certificates, if exist.
+ *
  * @author Lijun Liao
  */
 

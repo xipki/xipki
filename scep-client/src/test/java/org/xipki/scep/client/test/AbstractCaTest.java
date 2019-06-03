@@ -50,7 +50,8 @@ import org.xipki.scep.transaction.PkiStatus;
 import org.xipki.scep.util.ScepUtil;
 
 /**
- * TODO.
+ * Anchor of all CA tests.
+ *
  * @author Lijun Liao
  */
 

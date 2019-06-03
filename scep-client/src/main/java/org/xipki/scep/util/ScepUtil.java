@@ -55,7 +55,8 @@ import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * SCEP utility class.
+ *
  * @author Lijun Liao
  */
 

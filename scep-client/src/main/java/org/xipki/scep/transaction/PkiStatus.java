@@ -18,7 +18,8 @@
 package org.xipki.scep.transaction;
 
 /**
- * TODO.
+ * PKI status enum.
+ *
  * @author Lijun Liao
  */
 

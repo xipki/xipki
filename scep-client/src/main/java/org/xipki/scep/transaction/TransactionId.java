@@ -27,7 +27,8 @@ import org.xipki.util.Args;
 import org.xipki.util.Hex;
 
 /**
- * TODO.
+ * Transaction Id.
+ *
  * @author Lijun Liao
  */
 

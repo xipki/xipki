@@ -65,7 +65,8 @@ import org.xipki.scep.util.ScepUtil;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * SCEP responder.
+ *
  * @author Lijun Liao
  */
 
@@ -119,7 +120,8 @@ public class ScepResponder {
   }
 
   /**
-   * TODO.
+   * Set the maximal allowed bias of signing time during the signature verification.
+   *
    * @param ms signing time bias in milliseconds. non-positive value deactivate
    *        the check of signing time.
    */
@@ -148,13 +150,13 @@ public class ScepResponder {
     DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent, recipient, null);
 
     PkiMessage rep = servicePkiOperation0(req, event);
-    event.putEventData(ScepAuditConstants.NAME_pkiStatus, rep.getPkiStatus());
+    event.putEventData(AuditEvent.NAME_pkiStatus, rep.getPkiStatus());
     if (rep.getPkiStatus() == PkiStatus.FAILURE) {
       event.setLevel(AuditLevel.ERROR);
     }
 
     if (rep.getFailInfo() != null) {
-      event.putEventData(ScepAuditConstants.NAME_failInfo, rep.getFailInfo());
+      event.putEventData(AuditEvent.NAME_failInfo, rep.getFailInfo());
     }
 
     String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(getSigningKey(),

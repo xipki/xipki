@@ -20,7 +20,8 @@ package org.xipki.scep.transaction;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * CA capability enum.
+ *
  * @author Lijun Liao
  */
 

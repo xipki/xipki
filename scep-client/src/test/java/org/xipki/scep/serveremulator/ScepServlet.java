@@ -86,8 +86,8 @@ public class ScepServlet extends HttpServlet {
     }
 
     AuditEvent event = new AuditEvent();
-    event.setName(ScepAuditConstants.NAME_PERF);
-    event.putEventData(ScepAuditConstants.NAME_servletPath, req.getServletPath());
+    event.setName(AuditEvent.NAME_PERF);
+    event.putEventData(AuditEvent.NAME_servletPath, req.getServletPath());
 
     AuditLevel auditLevel = AuditLevel.INFO;
     String auditMessage = null;
@@ -102,7 +102,7 @@ public class ScepServlet extends HttpServlet {
       }
 
       String operation = req.getParameter("operation");
-      event.putEventData(ScepAuditConstants.NAME_operation, operation);
+      event.putEventData(AuditEvent.NAME_operation, operation);
 
       if ("PKIOperation".equalsIgnoreCase(operation)) {
         CMSSignedData reqMessage;

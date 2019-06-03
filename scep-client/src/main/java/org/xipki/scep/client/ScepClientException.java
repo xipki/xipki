@@ -18,7 +18,8 @@
 package org.xipki.scep.client;
 
 /**
- * TODO.
+ * SCEP client exception.
+ *
  * @author Lijun Liao
  */
 

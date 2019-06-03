@@ -20,7 +20,8 @@ package org.xipki.scep.serveremulator;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * SCEP control.
+ *
  * @author Lijun Liao
  */
 

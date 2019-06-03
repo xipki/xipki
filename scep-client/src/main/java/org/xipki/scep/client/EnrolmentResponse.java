@@ -34,7 +34,8 @@ import org.xipki.scep.util.ScepUtil;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * Response of certificate enrolment.
+ *
  * @author Lijun Liao
  */
 

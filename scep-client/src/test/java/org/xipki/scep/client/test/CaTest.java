@@ -20,7 +20,8 @@ package org.xipki.scep.client.test;
 import org.xipki.scep.transaction.CaCapability;
 
 /**
- * TODO.
+ * Test the basic CA operation.
+ *
  * @author Lijun Liao
  */
 

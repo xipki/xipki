@@ -26,7 +26,8 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.xipki.util.Args;
 
 /**
- * TODO.
+ * This class starts and shutdowns he Jetty HTTP server.
+ *
  * @author Lijun Liao
  */
 

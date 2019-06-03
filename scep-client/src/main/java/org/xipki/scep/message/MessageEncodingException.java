@@ -18,7 +18,8 @@
 package org.xipki.scep.message;
 
 /**
- * TODO.
+ * Exception indicate error while encoding message.
+ *
  * @author Lijun Liao
  */
 
