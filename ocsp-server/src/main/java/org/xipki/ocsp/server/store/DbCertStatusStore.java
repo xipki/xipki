@@ -356,7 +356,7 @@ public class DbCertStatusStore extends OcspStore {
         releaseDbResources(ps, rs);
       }
 
-      CrlInfo crlInfo = (crlId != 0) ? null : issuerStore.getCrlInfo(crlId);
+      CrlInfo crlInfo = (crlId == 0) ? null : issuerStore.getCrlInfo(crlId);
       Date thisUpdate;
       Date nextUpdate;
       if (crlInfo == null) {
