@@ -461,7 +461,7 @@ class IdentifiedCertprofile implements Closeable {
       }
 
       AuthorityInformationAccess value = null;
-      if (CollectionUtil.isNonEmpty(caIssuers) || CollectionUtil.isNonEmpty(ocspUris)) {
+      if (CollectionUtil.isNotEmpty(caIssuers) || CollectionUtil.isNotEmpty(ocspUris)) {
         value = CaUtil.createAuthorityInformationAccess(
             caIssuers, ocspUris);
       }
@@ -479,7 +479,7 @@ class IdentifiedCertprofile implements Closeable {
       extControl = controls.remove(extType);
       if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
         CRLDistPoint value = null;
-        if (CollectionUtil.isNonEmpty(caUris.getCrlUris())) {
+        if (CollectionUtil.isNotEmpty(caUris.getCrlUris())) {
           value = CaUtil.createCrlDistributionPoints(caUris.getCrlUris(),
               x500CaPrincipal, crlSignerSubject);
         }
@@ -491,7 +491,7 @@ class IdentifiedCertprofile implements Closeable {
       extControl = controls.remove(extType);
       if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
         CRLDistPoint value = null;
-        if (CollectionUtil.isNonEmpty(caUris.getDeltaCrlUris())) {
+        if (CollectionUtil.isNotEmpty(caUris.getDeltaCrlUris())) {
           value = CaUtil.createCrlDistributionPoints(caUris.getDeltaCrlUris(),
               x500CaPrincipal, crlSignerSubject);
         }
@@ -638,12 +638,12 @@ class IdentifiedCertprofile implements Closeable {
       }
     }
 
-    if (CollectionUtil.isNonEmpty(unprocessedExtTypes)) {
+    if (CollectionUtil.isNotEmpty(unprocessedExtTypes)) {
       throw new CertprofileException(
           "could not add required extensions " + toString(unprocessedExtTypes));
     }
 
-    if (CollectionUtil.isNonEmpty(neededExtTypes)) {
+    if (CollectionUtil.isNotEmpty(neededExtTypes)) {
       throw new BadCertTemplateException(
           "could not add requested extensions " + toString(neededExtTypes));
     }
@@ -780,7 +780,7 @@ class IdentifiedCertprofile implements Closeable {
       }
     }
 
-    if (CollectionUtil.isNonEmpty(set)) {
+    if (CollectionUtil.isNotEmpty(set)) {
       msg.append("extensions ").append(toString(set)).append(" must not be contained in request, ");
     }
 
@@ -792,7 +792,7 @@ class IdentifiedCertprofile implements Closeable {
       }
     }
 
-    if (CollectionUtil.isNonEmpty(set)) {
+    if (CollectionUtil.isNotEmpty(set)) {
       msg.append("extensions ").append(toString(set)).append(" must not be contained, ");
     }
 
@@ -805,7 +805,7 @@ class IdentifiedCertprofile implements Closeable {
       }
     }
 
-    if (CollectionUtil.isNonEmpty(set)) {
+    if (CollectionUtil.isNotEmpty(set)) {
       msg.append("critical only extensions are marked as non-critical ")
         .append(toString(set)).append(", ");
     }
@@ -819,7 +819,7 @@ class IdentifiedCertprofile implements Closeable {
       }
     }
 
-    if (CollectionUtil.isNonEmpty(set)) {
+    if (CollectionUtil.isNotEmpty(set)) {
       msg.append("non-critical only extensions are marked as critical ")
         .append(toString(set)).append(", ");
     }
@@ -864,7 +864,7 @@ class IdentifiedCertprofile implements Closeable {
         }
       }
 
-      if (CollectionUtil.isNonEmpty(set)) {
+      if (CollectionUtil.isNotEmpty(set)) {
         msg.append("EndEntity profile must not contain CA-only keyUsage ").append(setUsages)
           .append(", ");
       }
@@ -955,7 +955,7 @@ class IdentifiedCertprofile implements Closeable {
   private void validateCABForumBR(StringBuilder msg) {
     // Subject only one entries in a RDN is allowed
     SubjectControl subjectCtl = certprofile.getSubjectControl();
-    if (CollectionUtil.isNonEmpty(subjectCtl.getGroups())) {
+    if (CollectionUtil.isNotEmpty(subjectCtl.getGroups())) {
       msg.append("multiple AttributeAndTypes in one RDN is not permitted, ");
     }
 
@@ -1194,7 +1194,7 @@ class IdentifiedCertprofile implements Closeable {
       sb.append(", ");
     }
 
-    if (CollectionUtil.isNonEmpty(oids)) {
+    if (CollectionUtil.isNotEmpty(oids)) {
       int len = sb.length();
       sb.delete(len - 2, len);
     }

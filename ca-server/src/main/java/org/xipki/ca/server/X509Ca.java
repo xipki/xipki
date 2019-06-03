@@ -938,7 +938,7 @@ public class X509Ca implements Closeable {
 
         // freshestCRL
         List<String> deltaCrlUris = pci.getCaUris().getDeltaCrlUris();
-        if (control.getDeltaCrlIntervals() > 0 && CollectionUtil.isNonEmpty(deltaCrlUris)) {
+        if (control.getDeltaCrlIntervals() > 0 && CollectionUtil.isNotEmpty(deltaCrlUris)) {
           CRLDistPoint cdp = CaUtil.createCrlDistributionPoints(deltaCrlUris, pci.getX500Subject(),
               crlIssuer);
           crlBuilder.addExtension(Extension.freshestCRL, false, cdp);

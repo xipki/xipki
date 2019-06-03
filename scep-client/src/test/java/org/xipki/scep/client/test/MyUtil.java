@@ -104,7 +104,7 @@ public class MyUtil {
       attributes.put(PKCSObjectIdentifiers.pkcs_9_at_challengePassword, asn1Pwd);
     }
 
-    if (CollectionUtil.isNonEmpty(extensions)) {
+    if (CollectionUtil.isNotEmpty(extensions)) {
       Extensions asn1Extensions = new Extensions(extensions.toArray(new Extension[0]));
       attributes.put(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest, asn1Extensions);
     }

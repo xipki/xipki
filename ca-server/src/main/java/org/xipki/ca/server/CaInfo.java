@@ -123,7 +123,7 @@ public class CaInfo {
     this.publicCaInfo = new PublicCaInfo(cert, caEntry.getCaUris(), caEntry.getExtraControl());
     List<X509Certificate> certs = caEntry.getCertchain();
     this.certchain = new LinkedList<>();
-    if (CollectionUtil.isNonEmpty(certs)) {
+    if (CollectionUtil.isNotEmpty(certs)) {
       for (X509Certificate m : certs) {
         this.certchain.add(new X509Cert(m));
       }

@@ -50,14 +50,29 @@ public class CollectionUtil {
     return map == null || map.isEmpty();
   }
 
+  public static boolean isNotEmpty(Collection<?> col) {
+    return col != null && !col.isEmpty();
+  }
+
+  public static boolean isNotEmpty(Object[] arrays) {
+    return arrays != null && arrays.length > 0;
+  }
+
+  public static boolean isNotEmpty(Map<?, ?> map) {
+    return map != null && !map.isEmpty();
+  }
+
+  @Deprecated
   public static boolean isNonEmpty(Collection<?> col) {
     return col != null && !col.isEmpty();
   }
 
+  @Deprecated
   public static boolean isNonEmpty(Object[] arrays) {
     return arrays != null && arrays.length > 0;
   }
 
+  @Deprecated
   public static boolean isNonEmpty(Map<?, ?> map) {
     return map != null && !map.isEmpty();
   }

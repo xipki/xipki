@@ -356,7 +356,7 @@ public class CaConf {
               expandConf(ci.getSignerType()), getValue(ci.getSignerConf(), zipEntries), caUris,
               numCrls, exprirationPeriod);
 
-          if (CollectionUtil.isNonEmpty(ci.getCmpControl())) {
+          if (CollectionUtil.isNotEmpty(ci.getCmpControl())) {
             caEntry.setCmpControl(new CmpControl(
                     new ConfPairs(ci.getCmpControl()).getEncoded()));
           }
@@ -443,7 +443,7 @@ public class CaConf {
             caEntry.setCert(caCert);
 
             // certchain
-            if (CollectionUtil.isNonEmpty(ci.getCertchain())) {
+            if (CollectionUtil.isNotEmpty(ci.getCertchain())) {
               List<X509Certificate> certchain = new LinkedList<>();
               for (FileOrBinary cc : ci.getCertchain()) {
                 byte[] bytes = getBinary(cc, zipEntries);

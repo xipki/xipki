@@ -650,7 +650,7 @@ public class ExtensionsChecker {
 
       if (!required) {
         Set<KeyUsageControl> requiredKeyusage = getKeyusage(true);
-        if (CollectionUtil.isNonEmpty(requiredKeyusage)) {
+        if (CollectionUtil.isNotEmpty(requiredKeyusage)) {
           required = true;
         }
       }
@@ -725,7 +725,7 @@ public class ExtensionsChecker {
 
       if (!required) {
         Set<ExtKeyUsageControl> requiredExtKeyusage = getExtKeyusage(true);
-        if (CollectionUtil.isNonEmpty(requiredExtKeyusage)) {
+        if (CollectionUtil.isNotEmpty(requiredExtKeyusage)) {
           required = true;
         }
       }
@@ -1074,7 +1074,7 @@ public class ExtensionsChecker {
 
     Set<KeyUsageControl> optionalKeyusage = getKeyusage(false);
     if (requestedExtns != null && extControl.isRequest()
-        && CollectionUtil.isNonEmpty(optionalKeyusage)) {
+        && CollectionUtil.isNotEmpty(optionalKeyusage)) {
       Extension extension = requestedExtns.getExtension(Extension.keyUsage);
       if (extension != null) {
         org.bouncycastle.asn1.x509.KeyUsage reqKeyUsage =
@@ -1095,12 +1095,12 @@ public class ExtensionsChecker {
     }
 
     Set<String> diffs = strInBnotInA(expectedUsages, isUsages);
-    if (CollectionUtil.isNonEmpty(diffs)) {
+    if (CollectionUtil.isNotEmpty(diffs)) {
       failureMsg.append("usages ").append(diffs).append(" are present but not expected; ");
     }
 
     diffs = strInBnotInA(isUsages, expectedUsages);
-    if (CollectionUtil.isNonEmpty(diffs)) {
+    if (CollectionUtil.isNotEmpty(diffs)) {
       failureMsg.append("usages ").append(diffs).append(" are absent but are required; ");
     }
   } // method checkExtnKeyUsage
@@ -1127,7 +1127,7 @@ public class ExtensionsChecker {
 
     Set<ExtKeyUsageControl> optionalExtKeyusage = getExtKeyusage(false);
     if (requestedExtns != null && extControl.isRequest()
-        && CollectionUtil.isNonEmpty(optionalExtKeyusage)) {
+        && CollectionUtil.isNotEmpty(optionalExtKeyusage)) {
       Extension extension = requestedExtns.getExtension(Extension.extendedKeyUsage);
       if (extension != null) {
         org.bouncycastle.asn1.x509.ExtendedKeyUsage reqKeyUsage =
@@ -1148,12 +1148,12 @@ public class ExtensionsChecker {
     }
 
     Set<String> diffs = strInBnotInA(expectedUsages, isUsages);
-    if (CollectionUtil.isNonEmpty(diffs)) {
+    if (CollectionUtil.isNotEmpty(diffs)) {
       failureMsg.append("usages ").append(diffs).append(" are present but not expected; ");
     }
 
     diffs = strInBnotInA(isUsages, expectedUsages);
-    if (CollectionUtil.isNonEmpty(diffs)) {
+    if (CollectionUtil.isNotEmpty(diffs)) {
       failureMsg.append("usages ").append(diffs).append(" are absent but are required; ");
     }
   } // method checkExtnExtendedKeyUsage
@@ -1181,12 +1181,12 @@ public class ExtensionsChecker {
     }
 
     Set<String> diffs = strInBnotInA(expFeatures, isFeatures);
-    if (CollectionUtil.isNonEmpty(diffs)) {
+    if (CollectionUtil.isNotEmpty(diffs)) {
       failureMsg.append("features ").append(diffs).append(" are present but not expected; ");
     }
 
     diffs = strInBnotInA(isFeatures, expFeatures);
-    if (CollectionUtil.isNonEmpty(diffs)) {
+    if (CollectionUtil.isNotEmpty(diffs)) {
       failureMsg.append("features ").append(diffs).append(" are absent but are required; ");
     }
   } // method checkExtnTlsFeature
@@ -1304,7 +1304,7 @@ public class ExtensionsChecker {
       }
     }
 
-    if (CollectionUtil.isNonEmpty(isMap)) {
+    if (CollectionUtil.isNotEmpty(isMap)) {
       failureMsg.append("issuerDomainPolicies '").append(isMap.keySet())
         .append("' are present but not expected; ");
     }
@@ -1493,13 +1493,13 @@ public class ExtensionsChecker {
 
     if (!countryOfCitizenshipList.isEmpty()) {
       Set<String> diffs = strInBnotInA(expCountryOfCitizenshipList, countryOfCitizenshipList);
-      if (CollectionUtil.isNonEmpty(diffs)) {
+      if (CollectionUtil.isNotEmpty(diffs)) {
         failureMsg.append("countryOfCitizenship ").append(diffs)
           .append(" are present but not expected; ");
       }
 
       diffs = strInBnotInA(countryOfCitizenshipList, expCountryOfCitizenshipList);
-      if (CollectionUtil.isNonEmpty(diffs)) {
+      if (CollectionUtil.isNotEmpty(diffs)) {
         failureMsg.append("countryOfCitizenship ").append(diffs)
           .append(" are absent but are required; ");
       }
@@ -1507,13 +1507,13 @@ public class ExtensionsChecker {
 
     if (!countryOfResidenceList.isEmpty()) {
       Set<String> diffs = strInBnotInA(expCountryOfResidenceList, countryOfResidenceList);
-      if (CollectionUtil.isNonEmpty(diffs)) {
+      if (CollectionUtil.isNotEmpty(diffs)) {
         failureMsg.append("countryOfResidence ").append(diffs)
           .append(" are present but not expected; ");
       }
 
       diffs = strInBnotInA(countryOfResidenceList, expCountryOfResidenceList);
-      if (CollectionUtil.isNonEmpty(diffs)) {
+      if (CollectionUtil.isNotEmpty(diffs)) {
         failureMsg.append("countryOfResidence ").append(diffs)
           .append(" are absent but are required; ");
       }
@@ -1774,12 +1774,12 @@ public class ExtensionsChecker {
 
       Set<String> expCrlUrls = issuerInfo.getCrlUrls();
       Set<String> diffs = strInBnotInA(expCrlUrls, isCrlUrls);
-      if (CollectionUtil.isNonEmpty(diffs)) {
+      if (CollectionUtil.isNotEmpty(diffs)) {
         failureMsg.append("CRL URLs ").append(diffs).append(" are present but not expected; ");
       }
 
       diffs = strInBnotInA(isCrlUrls, expCrlUrls);
-      if (CollectionUtil.isNonEmpty(diffs)) {
+      if (CollectionUtil.isNotEmpty(diffs)) {
         failureMsg.append("CRL URLs ").append(diffs).append(" are absent but are required; ");
       }
     }
@@ -1826,12 +1826,12 @@ public class ExtensionsChecker {
 
       Set<String> expCrlUrls = issuerInfo.getCrlUrls();
       Set<String> diffs = strInBnotInA(expCrlUrls, isCrlUrls);
-      if (CollectionUtil.isNonEmpty(diffs)) {
+      if (CollectionUtil.isNotEmpty(diffs)) {
         failureMsg.append("deltaCRL URLs ").append(diffs).append(" are present but not expected; ");
       }
 
       diffs = strInBnotInA(isCrlUrls, expCrlUrls);
-      if (CollectionUtil.isNonEmpty(diffs)) {
+      if (CollectionUtil.isNotEmpty(diffs)) {
         failureMsg.append("deltaCRL URLs ").append(diffs).append(" are absent but are required; ");
       }
     }
@@ -2114,13 +2114,13 @@ public class ExtensionsChecker {
           }
 
           Set<String> diffs = strInBnotInA(expectedPdsLocations, pdsLocations);
-          if (CollectionUtil.isNonEmpty(diffs)) {
+          if (CollectionUtil.isNotEmpty(diffs)) {
             failureMsg.append("statementInfo[").append(i).append("]: ").append(diffs)
               .append(" are present but not expected; ");
           }
 
           diffs = strInBnotInA(pdsLocations, expectedPdsLocations);
-          if (CollectionUtil.isNonEmpty(diffs)) {
+          if (CollectionUtil.isNotEmpty(diffs)) {
             failureMsg.append("statementInfo[").append(i).append("]: ").append(diffs)
               .append(" are absent but are required; ");
           }
@@ -2583,13 +2583,13 @@ public class ExtensionsChecker {
     }
 
     Set<String> diffs = strInBnotInA(expectedUris, isUris);
-    if (CollectionUtil.isNonEmpty(diffs)) {
+    if (CollectionUtil.isNotEmpty(diffs)) {
       failureMsg.append(typeDesc).append(" URIs ").append(diffs);
       failureMsg.append(" are present but not expected; ");
     }
 
     diffs = strInBnotInA(isUris, expectedUris);
-    if (CollectionUtil.isNonEmpty(diffs)) {
+    if (CollectionUtil.isNotEmpty(diffs)) {
       failureMsg.append(typeDesc).append(" URIs ").append(diffs);
       failureMsg.append(" are absent but are required; ");
     }

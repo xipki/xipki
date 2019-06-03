@@ -276,7 +276,7 @@ public class CrlControl {
     pairs.putPair(KEY_DELTACRL_INTERVALS, Integer.toString(deltaCrlIntervals));
     pairs.putPair(KEY_INTERVAL_TIME, intervalDayTime.toString());
 
-    if (CollectionUtil.isNonEmpty(extensionOids)) {
+    if (CollectionUtil.isNotEmpty(extensionOids)) {
       StringBuilder extensionsSb = new StringBuilder(200);
       for (String oid : extensionOids) {
         extensionsSb.append(oid).append(",");

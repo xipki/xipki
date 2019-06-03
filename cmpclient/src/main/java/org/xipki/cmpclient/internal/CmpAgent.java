@@ -539,7 +539,7 @@ class CmpAgent {
       }
     }
 
-    if (CollectionUtil.isNonEmpty(itvs)) {
+    if (CollectionUtil.isNotEmpty(itvs)) {
       hdrBuilder.setGeneralInfo(itvs.toArray(new InfoTypeAndValue[0]));
     }
 
@@ -1234,7 +1234,7 @@ class CmpAgent {
       result.addResultEntry(resultEntry);
     }
 
-    if (CollectionUtil.isNonEmpty(reqIdIdMap)) {
+    if (CollectionUtil.isNotEmpty(reqIdIdMap)) {
       for (BigInteger reqId : reqIdIdMap.keySet()) {
         ResultEntry.Error ere = new ResultEntry.Error(reqIdIdMap.get(reqId), PKISTATUS_NO_ANSWER);
         result.addResultEntry(ere);

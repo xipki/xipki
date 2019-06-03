@@ -1985,7 +1985,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     publisherNames = CollectionUtil.toLowerCaseList(publisherNames);
 
     if (caName == null) {
-      if (CollectionUtil.isNonEmpty(publisherNames)) {
+      if (CollectionUtil.isNotEmpty(publisherNames)) {
         throw new IllegalArgumentException("non-empty publisherNames is not allowed");
       }
 
@@ -2912,7 +2912,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       root.setUsers(users);
 
       // cas
-      if (CollectionUtil.isNonEmpty(caNames)) {
+      if (CollectionUtil.isNotEmpty(caNames)) {
         List<CaConfType.Ca> list = new LinkedList<>();
 
         for (String name : x509cas.keySet()) {
@@ -2924,13 +2924,13 @@ public class CaManagerImpl implements CaManager, Closeable {
           ca.setName(name);
 
           Set<String> strs = getAliasesForCa(name);
-          if (CollectionUtil.isNonEmpty(strs)) {
+          if (CollectionUtil.isNotEmpty(strs)) {
             ca.setAliases(new ArrayList<>(strs));
           }
 
           // CaHasRequestors
           Set<MgmtEntry.CaHasRequestor> requestors = caHasRequestors.get(name);
-          if (CollectionUtil.isNonEmpty(requestors)) {
+          if (CollectionUtil.isNotEmpty(requestors)) {
             ca.setRequestors(new ArrayList<>());
 
             for (MgmtEntry.CaHasRequestor m : requestors) {
@@ -2949,7 +2949,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
           // CaHasUsers
           List<MgmtEntry.CaHasUser> caHasUsers = queryExecutor.getCaHasUsersForCa(name, idNameMap);
-          if (CollectionUtil.isNonEmpty(caHasUsers)) {
+          if (CollectionUtil.isNotEmpty(caHasUsers)) {
             ca.setUsers(new ArrayList<>());
 
             for (MgmtEntry.CaHasUser m : caHasUsers) {
@@ -2979,13 +2979,13 @@ public class CaManagerImpl implements CaManager, Closeable {
           }
 
           strs = caHasProfiles.get(name);
-          if (CollectionUtil.isNonEmpty(strs)) {
+          if (CollectionUtil.isNotEmpty(strs)) {
             includeProfileNames.addAll(strs);
             ca.setProfiles(new ArrayList<>(strs));
           }
 
           strs = caHasPublishers.get(name);
-          if (CollectionUtil.isNonEmpty(strs)) {
+          if (CollectionUtil.isNotEmpty(strs)) {
             includePublisherNames.addAll(strs);
             ca.setPublishers(new ArrayList<>(strs));
           }
@@ -3017,7 +3017,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
           // certchain
           List<X509Certificate> certchain = entry.getCertchain();
-          if (CollectionUtil.isNonEmpty(certchain)) {
+          if (CollectionUtil.isNotEmpty(certchain)) {
             List<FileOrBinary> ccList = new LinkedList<>();
 
             for (int i = 0; i < certchain.size(); i++) {
@@ -3119,7 +3119,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
 
       // requestors
-      if (CollectionUtil.isNonEmpty(requestorDbEntries)) {
+      if (CollectionUtil.isNotEmpty(requestorDbEntries)) {
         List<CaConfType.Requestor> list = new LinkedList<>();
 
         for (String name : requestorDbEntries.keySet()) {
@@ -3151,7 +3151,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
 
       // publishers
-      if (CollectionUtil.isNonEmpty(publisherDbEntries)) {
+      if (CollectionUtil.isNotEmpty(publisherDbEntries)) {
         List<NameTypeConf> list = new LinkedList<>();
 
         for (String name : publisherDbEntries.keySet()) {
@@ -3173,7 +3173,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
 
       // profiles
-      if (CollectionUtil.isNonEmpty(certprofileDbEntries)) {
+      if (CollectionUtil.isNotEmpty(certprofileDbEntries)) {
         List<NameTypeConf> list = new LinkedList<>();
         for (String name : certprofileDbEntries.keySet()) {
           if (!includeProfileNames.contains(name)) {
@@ -3194,7 +3194,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
 
       // signers
-      if (CollectionUtil.isNonEmpty(signerDbEntries)) {
+      if (CollectionUtil.isNotEmpty(signerDbEntries)) {
         List<CaConfType.Signer> list = new LinkedList<>();
 
         for (String name : signerDbEntries.keySet()) {

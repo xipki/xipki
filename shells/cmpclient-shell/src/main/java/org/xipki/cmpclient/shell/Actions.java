@@ -502,7 +502,7 @@ public class Actions {
         }
       }
 
-      if (CollectionUtil.isNonEmpty(postalAddress)) {
+      if (CollectionUtil.isNotEmpty(postalAddress)) {
         ASN1ObjectIdentifier id = ObjectIdentifiers.DN.postalAddress;
         RDN[] rdns = subjectDn.getRDNs(id);
 
@@ -656,7 +656,7 @@ public class Actions {
         extraExtensions.validate();
 
         List<X509ExtensionType> extnConfs = extraExtensions.getExtensions();
-        if (CollectionUtil.isNonEmpty(extnConfs)) {
+        if (CollectionUtil.isNotEmpty(extnConfs)) {
           for (X509ExtensionType m : extnConfs) {
             String id = m.getType().getOid();
             byte[] encodedExtnValue =
@@ -1389,7 +1389,7 @@ public class Actions {
 
         String caName = getCaName().toLowerCase();
         List<X509Certificate> peerCerts = client.getDhPocPeerCertificates(caName);
-        if (CollectionUtil.isNonEmpty(peerCerts)) {
+        if (CollectionUtil.isNotEmpty(peerCerts)) {
           signerConf.setPeerCertificates(peerCerts);
         }
 

@@ -1086,7 +1086,7 @@ class IaikP11Slot extends P11Slot {
     Set<P11KeyUsage> usages = control.getUsages();
     // CHECKSTYLE:SKIP
     final Boolean TRUE = Boolean.TRUE;
-    if (CollectionUtil.isNonEmpty(usages)) {
+    if (CollectionUtil.isNotEmpty(usages)) {
       for (P11KeyUsage usage : usages) {
         switch (usage) {
           case DECRYPT:
@@ -1168,7 +1168,7 @@ class IaikP11Slot extends P11Slot {
     Set<P11KeyUsage> usages = control.getUsages();
     // CHECKSTYLE:SKIP
     final Boolean TRUE = Boolean.TRUE;
-    if (CollectionUtil.isNonEmpty(usages)) {
+    if (CollectionUtil.isNotEmpty(usages)) {
       for (P11KeyUsage usage : usages) {
         switch (usage) {
           case DECRYPT:
@@ -1493,7 +1493,7 @@ class IaikP11Slot extends P11Slot {
       Set<P11KeyUsage> usages = control.getUsages();
       // CHECKSTYLE:SKIP
       final Boolean TRUE = Boolean.TRUE;
-      if (CollectionUtil.isNonEmpty(usages)) {
+      if (CollectionUtil.isNotEmpty(usages)) {
         for (P11KeyUsage usage : usages) {
           switch (usage) {
             case DECRYPT:

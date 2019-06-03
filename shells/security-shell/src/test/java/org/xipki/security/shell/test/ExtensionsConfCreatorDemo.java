@@ -114,7 +114,7 @@ public class ExtensionsConfCreatorDemo {
     extraExtensions.validate();
 
     List<X509ExtensionType> extnConfs = extraExtensions.getExtensions();
-    if (CollectionUtil.isNonEmpty(extnConfs)) {
+    if (CollectionUtil.isNotEmpty(extnConfs)) {
       for (X509ExtensionType m : extnConfs) {
         byte[] encodedExtnValue =
             m.getConstant().toASN1Encodable().toASN1Primitive().getEncoded(ASN1Encoding.DER);

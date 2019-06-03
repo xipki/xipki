@@ -504,7 +504,7 @@ class CaManagerQueryExecutor {
 
       List<X509Certificate> certchain = generateCertchain(rs.getString("CERTCHAIN"));
       // validate certchain
-      if (CollectionUtil.isNonEmpty(certchain)) {
+      if (CollectionUtil.isNotEmpty(certchain)) {
         buildCertChain(entry.getCert(), certchain);
         entry.setCertchain(certchain);
       }
@@ -1042,7 +1042,7 @@ class CaManagerQueryExecutor {
     X509Certificate caCert = null;
 
     if (signerType != null || signerConf != null || encodedCert != null
-        || CollectionUtil.isNonEmpty(changeCaEntry.getEncodedCertchain())) {
+        || CollectionUtil.isNotEmpty(changeCaEntry.getEncodedCertchain())) {
       // need CA certificate
       if (encodedCert != null) {
         caCert = parseCert(encodedCert);

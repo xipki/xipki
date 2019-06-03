@@ -426,7 +426,7 @@ public class P11Actions {
       if (StringUtil.isNotBlank(sensitive)) {
         control.setSensitive(isEnabled(sensitive, false, "sensitive"));
       }
-      if (CollectionUtil.isNonEmpty(keyusages)) {
+      if (CollectionUtil.isNotEmpty(keyusages)) {
         control.setUsages(SecurityCompleters.P11KeyUsageCompleter.parseUsages(keyusages));
       }
 

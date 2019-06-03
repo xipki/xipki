@@ -140,7 +140,7 @@ public final class CmpClientImpl implements CmpClient {
         LOG.info("scheduled configuring CAs {}", autoConfCaNames);
         Set<String> failedCaNames = autoConfCas(autoConfCaNames);
 
-        if (CollectionUtil.isNonEmpty(failedCaNames)) {
+        if (CollectionUtil.isNotEmpty(failedCaNames)) {
           LOG.warn("could not configure following CAs {}", failedCaNames);
         }
 
@@ -571,7 +571,7 @@ public final class CmpClientImpl implements CmpClient {
       LOG.info("configuring CAs {}", autoConfCaNames);
       Set<String> failedCaNames = autoConfCas(autoConfCaNames);
 
-      if (CollectionUtil.isNonEmpty(failedCaNames)) {
+      if (CollectionUtil.isNotEmpty(failedCaNames)) {
         LOG.error("could not configure following CAs {}", failedCaNames);
         return false;
       }

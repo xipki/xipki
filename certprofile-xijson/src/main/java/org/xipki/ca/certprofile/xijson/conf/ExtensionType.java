@@ -601,7 +601,7 @@ public class ExtensionType extends ValidatableConf {
 
           List<DescribableOid> oidTypes = pi.getProfessionOids();
           List<ASN1ObjectIdentifier> oids = null;
-          if (CollectionUtil.isNonEmpty(oidTypes)) {
+          if (CollectionUtil.isNotEmpty(oidTypes)) {
             oids = new LinkedList<>();
             for (DescribableOid k : oidTypes) {
               oids.add(new ASN1ObjectIdentifier(k.getOid()));
@@ -925,7 +925,7 @@ public class ExtensionType extends ValidatableConf {
         List<CertificatePolicyQualifier> qualifiers = policyInfo.getQualifiers();
 
         ASN1Sequence policyQualifiers = null;
-        if (CollectionUtil.isNonEmpty(qualifiers)) {
+        if (CollectionUtil.isNotEmpty(qualifiers)) {
           policyQualifiers = createPolicyQualifiers(qualifiers);
         }
 
@@ -1096,7 +1096,7 @@ public class ExtensionType extends ValidatableConf {
     @Override
     public void validate() throws InvalidConfException {
       notNull(type, "type");
-      if (CollectionUtil.isNonEmpty(subFields)) {
+      if (CollectionUtil.isNotEmpty(subFields)) {
         if (type == FieldType.SEQUENCE || type == FieldType.SET) {
           for (SubFieldSyntax m : subFields) {
             m.validate();

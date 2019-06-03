@@ -355,7 +355,7 @@ public class QaCaActions {
         int isSize = isList == null ? 0 : isList.size();
 
         if (eySize != isSize) {
-          if (CollectionUtil.isNonEmpty(ca.getCertchain())) {
+          if (CollectionUtil.isNotEmpty(ca.getCertchain())) {
             throw new CmdFailure("Length of CA certchain " + isSize
                 + " is not as expected " + eySize);
           }

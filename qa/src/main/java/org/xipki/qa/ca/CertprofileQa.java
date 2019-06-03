@@ -180,7 +180,7 @@ public class CertprofileQa {
 
     // signatureAlgorithm
     List<String> signatureAlgorithms = certprofile.getSignatureAlgorithms();
-    if (CollectionUtil.isNonEmpty(signatureAlgorithms)) {
+    if (CollectionUtil.isNotEmpty(signatureAlgorithms)) {
       issue = new ValidationIssue("X509.SIGALG", "signature algorithm");
       resultIssues.add(issue);
 

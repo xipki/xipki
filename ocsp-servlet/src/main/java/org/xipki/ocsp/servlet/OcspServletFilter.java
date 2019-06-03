@@ -111,7 +111,7 @@ public class OcspServletFilter implements Filter {
     LOG.info("remote management is {}", remoteMgmtEnabled ? "enabled" : "disabled");
 
     if (remoteMgmtEnabled) {
-      if (CollectionUtil.isNonEmpty(remoteMgmt.getCerts())) {
+      if (CollectionUtil.isNotEmpty(remoteMgmt.getCerts())) {
         Set<X509Certificate> certs = new HashSet<>();
 
         for (FileOrBinary m : remoteMgmt.getCerts()) {

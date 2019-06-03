@@ -199,7 +199,7 @@ public abstract class BaseCertprofile extends Certprofile {
     } // for
 
     Set<String> subjectDnGroups = scontrol.getGroups();
-    if (CollectionUtil.isNonEmpty(subjectDnGroups)) {
+    if (CollectionUtil.isNotEmpty(subjectDnGroups)) {
       Set<String> consideredGroups = new HashSet<>();
       final int n = rdns.size();
 

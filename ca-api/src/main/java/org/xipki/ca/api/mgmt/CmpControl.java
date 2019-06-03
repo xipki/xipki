@@ -221,7 +221,7 @@ public class CmpControl {
       throw new InvalidConfException("invalid sigAlgos", ex);
     }
 
-    if (CollectionUtil.isNonEmpty(sigAlgos)) {
+    if (CollectionUtil.isNotEmpty(sigAlgos)) {
       pairs.putPair(KEY_PROTECTION_SIGALGO, algosAsString(this.sigAlgoValidator.getAlgoNames()));
     }
 
@@ -231,18 +231,18 @@ public class CmpControl {
       throw new InvalidConfException("invalid popoAlgos", ex);
     }
 
-    if (CollectionUtil.isNonEmpty(popoAlgos)) {
+    if (CollectionUtil.isNotEmpty(popoAlgos)) {
       pairs.putPair(KEY_POPO_SIGALGO, algosAsString(this.popoAlgoValidator.getAlgoNames()));
     }
 
     // PasswordBasedMac
     initPbm(pairs, pbmOwfs, pbmMacs, pbmIterationCount);
 
-    if (CollectionUtil.isNonEmpty(pbmOwfs)) {
+    if (CollectionUtil.isNotEmpty(pbmOwfs)) {
       pairs.putPair(KEY_PROTECTION_PBM_OWF, algosAsString(pbmOwfs));
     }
 
-    if (CollectionUtil.isNonEmpty(pbmMacs)) {
+    if (CollectionUtil.isNotEmpty(pbmMacs)) {
       pairs.putPair(KEY_PROTECTION_PBM_MAC, algosAsString(pbmMacs));
     }
 

@@ -520,7 +520,7 @@ public class QaOcspActions {
         ii++;
       }
 
-      if (CollectionUtil.isNonEmpty(certFiles)) {
+      if (CollectionUtil.isNotEmpty(certFiles)) {
         ii++;
       }
 

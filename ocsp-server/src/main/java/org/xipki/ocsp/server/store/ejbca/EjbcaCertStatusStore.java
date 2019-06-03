@@ -448,11 +448,11 @@ public class EjbcaCertStatusStore extends OcspStore {
       Set<X509Certificate> excludeIssuers = null;
 
       if (caCerts != null) {
-        if (CollectionUtil.isNonEmpty(caCerts.getIncludes())) {
+        if (CollectionUtil.isNotEmpty(caCerts.getIncludes())) {
           includeIssuers = parseCerts(caCerts.getIncludes());
         }
 
-        if (CollectionUtil.isNonEmpty(caCerts.getExcludes())) {
+        if (CollectionUtil.isNotEmpty(caCerts.getExcludes())) {
           excludeIssuers = parseCerts(caCerts.getExcludes());
         }
       }

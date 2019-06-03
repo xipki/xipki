@@ -284,7 +284,7 @@ public abstract class MgmtMessage {
         }
       }
 
-      if (CollectionUtil.isNonEmpty(caEntry.getCertchain())) {
+      if (CollectionUtil.isNotEmpty(caEntry.getCertchain())) {
         this.certchainBytes = new LinkedList<>();
         for (X509Certificate m : caEntry.getCertchain()) {
           try {
@@ -593,7 +593,7 @@ public abstract class MgmtMessage {
         rv.setCert(X509Util.parseCert(certBytes));
       }
 
-      if (CollectionUtil.isNonEmpty(certchainBytes)) {
+      if (CollectionUtil.isNotEmpty(certchainBytes)) {
         List<X509Certificate> certchain = new LinkedList<>();
         for (byte[] m : certchainBytes) {
           certchain.add(X509Util.parseCert(m));

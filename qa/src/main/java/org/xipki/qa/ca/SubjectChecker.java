@@ -81,7 +81,7 @@ public class SubjectChecker {
 
     ValidationIssue issue = new ValidationIssue("X509.SUBJECT.group", "X509 subject RDN group");
     result.add(issue);
-    if (CollectionUtil.isNonEmpty(subjectControl.getGroups())) {
+    if (CollectionUtil.isNotEmpty(subjectControl.getGroups())) {
       Set<String> groups = new HashSet<>(subjectControl.getGroups());
       for (String g : groups) {
         boolean toBreak = false;

@@ -339,7 +339,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
       extensions.add(extn);
     }
 
-    if (CollectionUtil.isNonEmpty(extensions)) {
+    if (CollectionUtil.isNotEmpty(extensions)) {
       reqBuilder.setRequestExtensions(new Extensions(extensions.toArray(new Extension[0])));
     }
 

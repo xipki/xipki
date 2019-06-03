@@ -87,7 +87,7 @@ public class NextCaMessage {
       try {
         CMSSignedDataGenerator degenerateSignedData = new CMSSignedDataGenerator();
         degenerateSignedData.addCertificate(new X509CertificateHolder(caCert.getEncoded()));
-        if (CollectionUtil.isNonEmpty(raCerts)) {
+        if (CollectionUtil.isNotEmpty(raCerts)) {
           for (X509Certificate m : raCerts) {
             degenerateSignedData.addCertificate(new X509CertificateHolder(m.getEncoded()));
           }

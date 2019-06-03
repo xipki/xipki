@@ -157,7 +157,7 @@ public class CaActions {
         caEntry.setCert(caCert);
       }
 
-      if (CollectionUtil.isNonEmpty(issuerCertFiles)) {
+      if (CollectionUtil.isNotEmpty(issuerCertFiles)) {
         List<X509Certificate> list = new ArrayList<>(issuerCertFiles.size());
         for (String m : issuerCertFiles) {
           list.add(X509Util.parseCert(Paths.get(m).toFile()));
@@ -637,7 +637,7 @@ public class CaActions {
 
       StringBuilder sb = new StringBuilder();
       Set<String> entries = caManager.getCertprofilesForCa(caName);
-      if (CollectionUtil.isNonEmpty(entries)) {
+      if (CollectionUtil.isNotEmpty(entries)) {
         sb.append("certificate Profiles supported by CA " + caName).append("\n");
 
         for (String name: entries) {
@@ -1168,7 +1168,7 @@ public class CaActions {
         entry.setEncodedCert(IoUtil.read(certFile));
       }
 
-      if (CollectionUtil.isNonEmpty(issuerCertFiles)) {
+      if (CollectionUtil.isNotEmpty(issuerCertFiles)) {
         List<byte[]> list = new ArrayList<>(issuerCertFiles.size());
         for (String m : issuerCertFiles) {
           if (CaManager.NULL.equalsIgnoreCase(m)) {
@@ -1220,7 +1220,7 @@ public class CaActions {
         entry.setSaveRequest(isEnabled(saveReqS, true, "save-req"));
       }
 
-      if (CollectionUtil.isNonEmpty(permissions)) {
+      if (CollectionUtil.isNotEmpty(permissions)) {
         int intPermission = ShellUtil.getPermission(permissions);
         entry.setPermission(intPermission);
       }

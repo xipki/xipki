@@ -299,7 +299,7 @@ public abstract class XiAction implements Action {
   }
 
   protected static boolean isNotEmpty(Collection<?> col) {
-    return CollectionUtil.isNonEmpty(col);
+    return CollectionUtil.isNotEmpty(col);
   }
 
   protected static List<String> split(String str, String delim) {

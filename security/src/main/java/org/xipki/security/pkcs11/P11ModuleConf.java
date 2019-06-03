@@ -393,7 +393,7 @@ public class P11ModuleConf {
     mechanismFilter = new P11MechanismFilter();
 
     List<Pkcs11conf.MechanimFilter> mechFilters = moduleType.getMechanismFilters();
-    if (mechFilters != null && CollectionUtil.isNonEmpty(mechFilters)) {
+    if (mechFilters != null && CollectionUtil.isNotEmpty(mechFilters)) {
       for (Pkcs11conf.MechanimFilter filterType : mechFilters) {
         Set<P11SlotIdFilter> slots = getSlotIdFilters(filterType.getSlots());
         String mechanismSetName = filterType.getMechanismSet();
@@ -415,7 +415,7 @@ public class P11ModuleConf {
     // Password retriever
     passwordRetriever = new P11PasswordsRetriever();
     List<Pkcs11conf.PasswordSet> passwordsList = moduleType.getPasswordSets();
-    if (passwordsList != null && CollectionUtil.isNonEmpty(passwordsList)) {
+    if (passwordsList != null && CollectionUtil.isNotEmpty(passwordsList)) {
       passwordRetriever.setPasswordResolver(passwordResolver);
       for (Pkcs11conf.PasswordSet passwordType : passwordsList) {
         Set<P11SlotIdFilter> slots = getSlotIdFilters(passwordType.getSlots());

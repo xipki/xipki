@@ -111,7 +111,7 @@ public class CaUtil {
 
     List<AccessDescription> accessDescriptions = new ArrayList<>(ocspUris.size());
 
-    if (CollectionUtil.isNonEmpty(caIssuerUris)) {
+    if (CollectionUtil.isNotEmpty(caIssuerUris)) {
       for (String uri : caIssuerUris) {
         GeneralName gn = new GeneralName(GeneralName.uniformResourceIdentifier, uri);
         accessDescriptions.add(
@@ -119,7 +119,7 @@ public class CaUtil {
       }
     }
 
-    if (CollectionUtil.isNonEmpty(ocspUris)) {
+    if (CollectionUtil.isNotEmpty(ocspUris)) {
       for (String uri : ocspUris) {
         GeneralName gn = new GeneralName(GeneralName.uniformResourceIdentifier, uri);
         accessDescriptions.add(new AccessDescription(X509ObjectIdentifiers.id_ad_ocsp, gn));

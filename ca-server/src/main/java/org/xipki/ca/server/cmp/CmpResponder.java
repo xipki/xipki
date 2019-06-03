@@ -1814,7 +1814,7 @@ public class CmpResponder extends BaseCmpResponder {
       }
     }
 
-    if (CollectionUtil.isNonEmpty(supportedProfileNames)) {
+    if (CollectionUtil.isNotEmpty(supportedProfileNames)) {
       List<JSONObject> jsonCertprofiles = new LinkedList<>();
       root.put("certprofiles", jsonCertprofiles);
       for (String name : supportedProfileNames) {
@@ -2146,7 +2146,7 @@ public class CmpResponder extends BaseCmpResponder {
         ASN1EncodableVector vec = new ASN1EncodableVector();
         vec.add(ca.getCaInfo().getCertInCmpFormat());
         List<X509Cert> certchain = ca.getCaInfo().getCertchain();
-        if (CollectionUtil.isNonEmpty(certchain)) {
+        if (CollectionUtil.isNotEmpty(certchain)) {
           for (X509Cert m : certchain) {
             vec.add(m.getCertHolder().toASN1Structure());
           }

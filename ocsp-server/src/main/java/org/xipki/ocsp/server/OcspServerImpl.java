@@ -1241,7 +1241,7 @@ public class OcspServerImpl implements OcspServer {
     }
 
     Set<X509Certificate> configuredCerts = requestOption.getCerts();
-    if (CollectionUtil.isNonEmpty(configuredCerts)) {
+    if (CollectionUtil.isNotEmpty(configuredCerts)) {
       certstore.addAll(requestOption.getCerts());
     }
 

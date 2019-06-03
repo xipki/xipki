@@ -234,7 +234,7 @@ public class QcStatementType extends ValidatableConf {
         num++;
       }
 
-      if (CollectionUtil.isNonEmpty(pdsLocations)) {
+      if (CollectionUtil.isNotEmpty(pdsLocations)) {
         num++;
       }
 

@@ -643,7 +643,7 @@ public class Actions {
         extraExtensions.validate();
 
         List<X509ExtensionType> extnConfs = extraExtensions.getExtensions();
-        if (CollectionUtil.isNonEmpty(extnConfs)) {
+        if (CollectionUtil.isNotEmpty(extnConfs)) {
           for (X509ExtensionType m : extnConfs) {
             byte[] encodedExtnValue =
                 m.getConstant().toASN1Encodable().toASN1Primitive().getEncoded(ASN1Encoding.DER);
@@ -671,7 +671,7 @@ public class Actions {
       ConcurrentContentSigner signer = getSigner(new SignatureAlgoControl(rsaMgf1, dsaPlain, gm));
 
       Map<ASN1ObjectIdentifier, ASN1Encodable> attributes = new HashMap<>();
-      if (CollectionUtil.isNonEmpty(extensions)) {
+      if (CollectionUtil.isNotEmpty(extensions)) {
         attributes.put(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest,
             new Extensions(extensions.toArray(new Extension[0])));
       }
@@ -707,7 +707,7 @@ public class Actions {
         }
       }
 
-      if (CollectionUtil.isNonEmpty(postalAddress)) {
+      if (CollectionUtil.isNotEmpty(postalAddress)) {
         ASN1ObjectIdentifier id = ObjectIdentifiers.DN.postalAddress;
         RDN[] rdns = subjectDn.getRDNs(id);
 
@@ -783,7 +783,7 @@ public class Actions {
       Args.notNull(subjectDn, "subjectDn");
       PKCS10CertificationRequestBuilder csrBuilder =
           new PKCS10CertificationRequestBuilder(subjectDn, subjectPublicKeyInfo);
-      if (CollectionUtil.isNonEmpty(attributes)) {
+      if (CollectionUtil.isNotEmpty(attributes)) {
         for (ASN1ObjectIdentifier attrType : attributes.keySet()) {
           csrBuilder.addAttribute(attrType, attributes.get(attrType));
         }

@@ -251,7 +251,7 @@ public class Securities implements Closeable {
     }
 
     // register additional SignerFactories
-    if (CollectionUtil.isNonEmpty(conf.getSignerFactories())) {
+    if (CollectionUtil.isNotEmpty(conf.getSignerFactories())) {
       for (String className : conf.getSignerFactories()) {
         try {
           Class<?> clazz = Class.forName(className);

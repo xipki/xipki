@@ -172,7 +172,7 @@ public class InitDbMain {
       prompt = "Please enter";
     }
 
-    if (CollectionUtil.isNonEmpty(tmpValidValues)) {
+    if (CollectionUtil.isNotEmpty(tmpValidValues)) {
       StringBuilder promptBuilder = new StringBuilder(prompt);
       promptBuilder.append(" [");
 

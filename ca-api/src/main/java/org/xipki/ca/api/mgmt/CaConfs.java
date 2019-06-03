@@ -224,7 +224,7 @@ public class CaConfs {
                 ci.getCert().setFile(zipEntryName);
               }
 
-              if (CollectionUtil.isNonEmpty(ci.getCertchain())) {
+              if (CollectionUtil.isNotEmpty(ci.getCertchain())) {
                 for (int i = 0; i < ci.getCertchain().size(); i++) {
                   FileOrBinary fi = ci.getCertchain().get(i);
                   if (fi.getFile() != null) {

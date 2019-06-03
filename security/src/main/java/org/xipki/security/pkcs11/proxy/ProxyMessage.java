@@ -981,7 +981,7 @@ public abstract class ProxyMessage extends ASN1Object {
       }
 
       Set<P11KeyUsage> usages = control.getUsages();
-      if (CollectionUtil.isNonEmpty(usages)) {
+      if (CollectionUtil.isNotEmpty(usages)) {
         ASN1EncodableVector asn1Usages = new ASN1EncodableVector();
         for (P11KeyUsage usage : usages) {
           int value = usageToValueMap.get(usage);

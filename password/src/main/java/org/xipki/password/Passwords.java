@@ -90,7 +90,7 @@ public class Passwords {
 
     List<String> singlePasswordResolvers = conf.getSinglePasswordResolvers();
     // register additional SinglePasswordResolvers
-    if (CollectionUtil.isNonEmpty(singlePasswordResolvers)) {
+    if (CollectionUtil.isNotEmpty(singlePasswordResolvers)) {
       for (String className : singlePasswordResolvers) {
         try {
           Class<?> clazz = Class.forName(className);
