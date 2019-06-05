@@ -147,7 +147,7 @@
 		"includeArchiveCutoff":true,
 		"includeCrlId":false,
 		"retentionInterval":-1,
-		"minNextUpdatePeriod":"1d",
+		"minNextUpdatePeriod":"12h",
 		"updateInterval":"10m",
 		"source":{
 			"datasource":"datasource3",

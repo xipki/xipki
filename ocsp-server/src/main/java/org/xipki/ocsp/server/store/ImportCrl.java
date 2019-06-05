@@ -92,21 +92,24 @@ class ImportCrl {
 
     private final File crlDir;
 
-    private final CertWrapper caCert;
-
     private final boolean updateMe;
+
+    private CertWrapper caCert;
+
+    private String base64Sha1Fp;
+
+    private CertRevocationInfo revocationinfo;
 
     private boolean shareCaWithOtherCrl = false;
 
-    CrlDirInfo(int crlId, String crlName, File crlDir, CertWrapper caCert, boolean updateMe) {
+    CrlDirInfo(int crlId, String crlName, File crlDir, boolean updateMe) {
       this.crlId = crlId;
       this.crlName = crlName;
       this.crlDir = crlDir;
-      this.caCert = caCert;
       this.updateMe = updateMe;
     }
 
-  }
+  } // class CrlDirInfo
 
   private static class CertWrapper {
 
@@ -119,8 +122,6 @@ class ImportCrl {
     private final String base64Encoded;
 
     private final byte[] subjectKeyIdentifier;
-
-    private CertRevocationInfo revocationinfo;
 
     private Integer databaseId;
 
@@ -142,19 +143,7 @@ class ImportCrl {
       }
     }
 
-    public CertRevocationInfo getRevocationinfo() {
-      return revocationinfo;
-    }
-
-    public void setRevocationinfo(CertRevocationInfo revocationinfo) {
-      this.revocationinfo = revocationinfo;
-    }
-
-    public void setDatabaseId(Integer databaseId) {
-      this.databaseId = databaseId;
-    }
-
-  }
+  } // class CertWrapper
 
   private static class ImportCrlException extends Exception {
 
@@ -168,7 +157,7 @@ class ImportCrl {
       super(message);
     }
 
-  }
+  } // class ImportCrlException
 
   private static final Logger LOG = LoggerFactory.getLogger(ImportCrl.class);
 
@@ -275,16 +264,7 @@ class ImportCrl {
         return false;
       }
 
-      Certificate caCertObj;
-      try {
-        caCertObj = parseCert(caCertFile);
-      } catch (ImportCrlException ex) {
-        LOG.error("error parsing CA certificate " + caCertFile.getPath(), ex);
-        return false;
-      }
-
-      CertWrapper caCert = new CertWrapper(caCertObj);
-
+      CertRevocationInfo caRevInfo = null;
       File revFile = new File(crlDir, "REVOCATION");
       if (revFile.exists()) {
         Properties props = new Properties();
@@ -307,33 +287,46 @@ class ImportCrl {
             invalidityTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
           }
 
-          CertRevocationInfo caRevInfo = new CertRevocationInfo(
+          caRevInfo = new CertRevocationInfo(
                           CrlReason.UNSPECIFIED, revocationTime, invalidityTime);
-          caCert.setRevocationinfo(caRevInfo);
         }
       }
 
+      String base64Sha1Fp;
+      try {
+        byte[] derCertBytes = X509Util.toDerEncoded(IoUtil.read(caCertFile));
+        base64Sha1Fp = HashAlgo.SHA1.base64Hash(derCertBytes);
+      } catch (IOException ex) {
+        LOG.error("error reading " + caCertFile.getPath(), ex);
+        return false;
+      }
+
       boolean updateMe = new File(crlDir, "UPDATEME").exists();
-      crlDirInfos.add(new CrlDirInfo(crlId, crlName, crlDir, caCert, updateMe));
+      CrlDirInfo crlDirInfo = new CrlDirInfo(crlId, crlName, crlDir, updateMe);
+      crlDirInfo.base64Sha1Fp = base64Sha1Fp;
+      crlDirInfo.revocationinfo = caRevInfo;
+
+      crlDirInfos.add(new CrlDirInfo(crlId, crlName, crlDir, updateMe));
     }
 
     // pre processing
     for (CrlDirInfo m : crlDirInfos) {
-      if (m.caCert.getRevocationinfo() != null) {
+      File crlDir = m.crlDir;
+      if (m.revocationinfo != null) {
         // make sure that revoked CA is not specified in two different folders
         for (CrlDirInfo n : crlDirInfos) {
-          if (m != n && m.caCert.base64Sha1Fp.equals(n.caCert.base64Sha1Fp)) {
+          if (m != n && m.base64Sha1Fp.equals(n.base64Sha1Fp)) {
             LOG.error("{} and {} specify duplicatedly a revoked CA certificate.",
-                m.crlDir.getPath(), n.crlDir.getPath());
+                crlDir.getPath(), n.crlDir.getPath());
             return false;
           }
         }
       } else {
         // make sure that unrevoked CA to be updated has the file ca.crl.
         if (m.updateMe) {
-          File crlFile = new File(m.crlDir, "ca.crl");
+          File crlFile = new File(crlDir, "ca.crl");
           if (!(crlFile.exists() && crlFile.isFile())) {
-            LOG.error("{} has UPDATEME but no ca.crl", m.crlDir.getPath());
+            LOG.error("{} has UPDATEME but no ca.crl", crlDir.getPath());
             return false;
           }
         }
@@ -341,7 +334,7 @@ class ImportCrl {
 
       boolean shareCaWithOtherCrl = false;
       for (CrlDirInfo n : crlDirInfos) {
-        if (m != n && m.caCert.base64Sha1Fp.equals(n.caCert.base64Sha1Fp)) {
+        if (m != n && m.base64Sha1Fp.equals(n.base64Sha1Fp)) {
           shareCaWithOtherCrl = true;
           break;
         }
@@ -374,7 +367,7 @@ class ImportCrl {
         boolean updateSucc = false;
 
         try {
-          if (caCert.getRevocationinfo() != null) {
+          if (crlDirInfo.revocationinfo != null) {
             LOG.info("Ignored CRL (name={}) in the folder {}: CA is revoked",
                 crlName, crlDir.getPath());
             continue;
@@ -529,7 +522,18 @@ class ImportCrl {
         continue;
       }
 
-      CertWrapper caCert = crlDirInfo.caCert;
+      CertRevocationInfo revInfo = crlDirInfo.revocationinfo;
+
+      CertWrapper caCert;
+      File caCertFile = new File(crlDirInfo.crlDir, "ca.crt");
+      try {
+        Certificate cert = X509Util.parseBcCert(caCertFile);
+        caCert = new CertWrapper(cert);
+        crlDirInfo.caCert = caCert;
+      } catch (CertificateException ex) {
+        throw new ImportCrlException("could not parse CA certificate " + caCertFile.getPath(), ex);
+      }
+
       Integer issuerId = datasource.getFirstValue(conn, "ISSUER", "ID",
                             "S1C='" + caCert.base64Sha1Fp + "'", Integer.class);
 
@@ -555,20 +559,18 @@ class ImportCrl {
           ps.setLong(offset++, caCert.cert.getEndDate().getDate().getTime() / 1000);
           ps.setString(offset++, caCert.base64Sha1Fp);
           ps.setString(offset++, caCert.base64Encoded);
-          ps.setString(offset++,
-              (caCert.revocationinfo == null) ? null : caCert.revocationinfo.getEncoded());
+          ps.setString(offset++, revInfo == null ? null : revInfo.getEncoded());
         } else {
           // issuer exists
           sql = "UPDATE ISSUER SET REV_INFO=? WHERE ID=?";
           ps = datasource.prepareStatement(conn, sql);
-          ps.setString(offset++,
-              (caCert.revocationinfo == null) ? null : caCert.revocationinfo.getEncoded());
+          ps.setString(offset++, revInfo == null ? null : revInfo.getEncoded());
           ps.setInt(offset++, issuerId.intValue());
         }
 
         ps.executeUpdate();
 
-        caCert.setDatabaseId(issuerId);
+        caCert.databaseId = issuerId;
         updatedCrlDirInfos.add(crlDirInfo);
       } catch (SQLException ex) {
         throw datasource.translate(sql, ex);
@@ -759,7 +761,7 @@ class ImportCrl {
       File certsDir = new File(basedir, "certs");
 
       if (!certsDir.exists()) {
-        LOG.warn("the folder {} does not exist, ignore it", certsDir.getPath());
+        LOG.info("the folder {} does not exist, ignore it", certsDir.getPath());
         return;
       }
 
