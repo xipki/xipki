@@ -200,7 +200,7 @@ public class DbCertStatusStore extends OcspStore {
         }
       } // end if(initialized)
 
-      final String sql = "SELECT ID,NBEFORE,REV_INFO,S1C,CERT FROM ISSUER";
+      final String sql = "SELECT ID,NBEFORE,REV_INFO,S1C,CERT,CRL_ID FROM ISSUER";
       PreparedStatement ps = preparedStatement(sql);
 
       ResultSet rs = null;
@@ -229,6 +229,8 @@ public class DbCertStatusStore extends OcspStore {
             CertRevocationInfo revInfo = CertRevocationInfo.fromEncoded(str);
             caInfoEntry.setRevocationInfo(revInfo.getRevocationTime());
           }
+
+          caInfoEntry.setCrlId(rs.getInt("CRL_ID"));
 
           caInfos.add(caInfoEntry);
         } // end while (rs.next())
@@ -318,6 +320,7 @@ public class DbCertStatusStore extends OcspStore {
 
         if (rs.next()) {
           unknown = false;
+          crlId = rs.getInt("CRL_ID");
 
           long timeInSec = time.getTime() / 1000;
           if (!ignore && ignoreNotYetValidCert) {
@@ -335,7 +338,6 @@ public class DbCertStatusStore extends OcspStore {
           }
 
           if (!ignore) {
-            crlId = rs.getInt("CRL_ID");
             if (includeCertHash) {
               b64CertHash = rs.getString("HASH");
             }
@@ -354,6 +356,10 @@ public class DbCertStatusStore extends OcspStore {
         throw datasource.translate(sql, ex);
       } finally {
         releaseDbResources(ps, rs);
+      }
+
+      if (crlId == 0) {
+        crlId = issuer.getCrlId();
       }
 
       CrlInfo crlInfo = (crlId == 0) ? null : issuerStore.getCrlInfo(crlId);

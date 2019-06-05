@@ -50,6 +50,8 @@ class IssuerEntry {
 
   private final X509Certificate cert;
 
+  private int crlId;
+
   private CertRevocationInfo revocationInfo;
 
   public IssuerEntry(int id, X509Certificate cert) throws CertificateEncodingException {
@@ -117,6 +119,14 @@ class IssuerEntry {
 
   public CertRevocationInfo getRevocationInfo() {
     return revocationInfo;
+  }
+
+  public int getCrlId() {
+    return crlId;
+  }
+
+  public void setCrlId(int crlId) {
+    this.crlId = crlId;
   }
 
   public Date getNotBefore() {
