@@ -55,6 +55,8 @@ public class OcspCertstore extends ValidatableConf {
 
     private Long update;
 
+    private Integer crlId;
+
     public String getHash() {
       return hash;
     }
@@ -143,6 +145,14 @@ public class OcspCertstore extends ValidatableConf {
       this.update = update;
     }
 
+    public Integer getCrlId() {
+      return crlId;
+    }
+
+    public void setCrlId(Integer crlId) {
+      this.crlId = crlId;
+    }
+
     @Override
     public void validate() throws InvalidConfException {
       super.validate();
@@ -190,6 +200,8 @@ public class OcspCertstore extends ValidatableConf {
 
     private int id;
 
+    private Integer crlId;
+
     private String certFile;
 
     private String revInfo;
@@ -223,6 +235,54 @@ public class OcspCertstore extends ValidatableConf {
       this.revInfo = revInfo;
     }
 
+    public Integer getCrlId() {
+      return crlId;
+    }
+
+    public void setCrlId(Integer crlId) {
+      this.crlId = crlId;
+    }
+
+  }
+
+  public static class CrlInfo extends ValidatableConf {
+
+    private int id;
+
+    private String name;
+
+    private String info;
+
+    @Override
+    public void validate() throws InvalidConfException {
+      notEmpty(name, "name");
+      notEmpty(info, "info");
+    }
+
+    public int getId() {
+      return id;
+    }
+
+    public void setId(int id) {
+      this.id = id;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public void setName(String name) {
+      this.name = name;
+    }
+
+    public String getInfo() {
+      return info;
+    }
+
+    public void setInfo(String info) {
+      this.info = info;
+    }
+
   }
 
   private int version;
@@ -232,6 +292,8 @@ public class OcspCertstore extends ValidatableConf {
   private String certhashAlgo;
 
   private List<Issuer> issuers;
+
+  private List<CrlInfo> crlInfos;
 
   public int getVersion() {
     return version;
@@ -268,10 +330,19 @@ public class OcspCertstore extends ValidatableConf {
     this.issuers = issuers;
   }
 
+  public List<CrlInfo> getCrlInfos() {
+    return crlInfos;
+  }
+
+  public void setCrlInfos(List<CrlInfo> crlInfos) {
+    this.crlInfos = crlInfos;
+  }
+
   @Override
   public void validate() throws InvalidConfException {
     notEmpty(certhashAlgo, "certhashAlgo");
     validate(issuers);
+    validate(crlInfos);
   }
 
 }

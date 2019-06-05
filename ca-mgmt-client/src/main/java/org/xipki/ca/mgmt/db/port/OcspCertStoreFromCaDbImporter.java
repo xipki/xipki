@@ -26,6 +26,7 @@ import java.nio.file.Paths;
 import java.security.cert.CertificateException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -243,6 +244,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
       ps.setString(idx++, HashAlgo.SHA1.base64Hash(encodedCert));
       ps.setString(idx++, issuer.getRevInfo());
       ps.setString(idx++, Base64.encodeToString(encodedCert));
+      ps.setNull(idx++, Types.INTEGER); // CRL_ID
 
       ps.execute();
     } catch (SQLException ex) {
@@ -419,6 +421,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
 
               psCert.setString(idx++, certhash);
               psCert.setString(idx++, subject);
+              psCert.setNull(idx++, Types.INTEGER);
 
               psCert.addBatch();
             } catch (SQLException ex) {

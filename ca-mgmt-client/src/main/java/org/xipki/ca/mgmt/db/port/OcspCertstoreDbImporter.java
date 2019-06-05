@@ -26,6 +26,7 @@ import java.nio.file.Paths;
 import java.security.cert.CertificateException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -40,6 +41,7 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
+import org.xipki.util.CollectionUtil;
 import org.xipki.util.IoUtil;
 import org.xipki.util.ProcessLog;
 
@@ -97,6 +99,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
       if (!resume) {
         dropIndexes();
         importCertHashAlgo(certstore.getCerthashAlgo());
+        importCrlInfo(certstore.getCrlInfos());
         importIssuer(certstore.getIssuers());
       }
       importCert(certstore, processLogFile);
@@ -126,6 +129,10 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
 
   private void importIssuer(List<OcspCertstore.Issuer> issuers)
       throws DataAccessException, CertificateException, IOException {
+    if (CollectionUtil.isEmpty(issuers)) {
+      return;
+    }
+
     System.out.println("importing table ISSUER");
     PreparedStatement ps = prepareStatement(SQL_ADD_ISSUER);
 
@@ -153,6 +160,11 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
           ps.setString(idx++, sha1(encodedCert));
           ps.setString(idx++, issuer.getRevInfo());
           ps.setString(idx++, b64Cert);
+          if (issuer.getCrlId() == null) {
+            ps.setNull(idx++, Types.INTEGER);
+          } else {
+            ps.setInt(idx++, issuer.getCrlId());
+          }
 
           ps.execute();
         } catch (SQLException ex) {
@@ -167,6 +179,34 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
       releaseResources(ps, null);
     }
     System.out.println(" imported table ISSUER");
+  }
+
+  private void importCrlInfo(List<OcspCertstore.CrlInfo> crlInfos)
+      throws DataAccessException, CertificateException, IOException {
+    if (CollectionUtil.isEmpty(crlInfos)) {
+      return;
+    }
+
+    System.out.println("importing table CRL_INFO");
+    PreparedStatement ps = prepareStatement(SQL_ADD_CRLINFO);
+
+    try {
+      for (OcspCertstore.CrlInfo crlInfo : crlInfos) {
+        try {
+          int idx = 1;
+          ps.setInt(idx++, crlInfo.getId());
+          ps.setString(idx++, crlInfo.getName());
+          ps.setString(idx++, crlInfo.getInfo());
+          ps.execute();
+        } catch (SQLException ex) {
+          System.err.println("could not import CRL_INFO with id=" + crlInfo.getId());
+          throw translate(SQL_ADD_CRLINFO, ex);
+        }
+      }
+    } finally {
+      releaseResources(ps, null);
+    }
+    System.out.println(" imported table CRL_INFO");
   }
 
   private void importCert(OcspCertstore certstore, File processLogFile) throws Exception {
@@ -302,6 +342,11 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
           setLong(psCert, idx++, cert.getRit());
           psCert.setString(idx++, cert.getHash());
           psCert.setString(idx++, cert.getSubject());
+          if (cert.getCrlId() == null) {
+            psCert.setNull(idx++, Types.INTEGER);
+          } else {
+            psCert.setInt(idx++, cert.getCrlId().intValue());
+          }
           psCert.addBatch();
         } catch (SQLException ex) {
           throw translate(SQL_ADD_CERT, ex);

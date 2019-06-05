@@ -102,6 +102,7 @@ class OcspCertstoreDbExporter extends DbPorter {
     if (!resume) {
       exportHashAlgo(certstore);
       exportIssuer(certstore);
+      exportCrlInfo(certstore);
     }
 
     File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
@@ -131,7 +132,7 @@ class OcspCertstoreDbExporter extends DbPorter {
     System.out.println("exporting table ISSUER");
     List<OcspCertstore.Issuer> issuers = new LinkedList<>();
     certstore.setIssuers(issuers);
-    final String sql = "SELECT ID,CERT,REV_INFO FROM ISSUER";
+    final String sql = "SELECT ID,CERT,REV_INFO,CRL_ID FROM ISSUER";
 
     Statement stmt = null;
     ResultSet rs = null;
@@ -151,6 +152,11 @@ class OcspCertstoreDbExporter extends DbPorter {
         issuer.setCertFile(certFileName);
         issuer.setRevInfo(rs.getString("REV_INFO"));
 
+        int crlId = rs.getInt("CRL_ID");
+        if (crlId != 0) {
+          issuer.setCrlId(crlId);
+        }
+
         issuers.add(issuer);
       }
     } catch (SQLException ex) {
@@ -161,6 +167,36 @@ class OcspCertstoreDbExporter extends DbPorter {
 
     System.out.println(" exported table ISSUER");
   } // method exportIssuer
+
+  private void exportCrlInfo(OcspCertstore certstore) throws DataAccessException, IOException {
+    System.out.println("exporting table CRL_INFO");
+    List<OcspCertstore.CrlInfo> crlInfos = new LinkedList<>();
+    certstore.setCrlInfos(crlInfos);
+    final String sql = "SELECT ID,NAME,INFO FROM CRL_INFO";
+
+    Statement stmt = null;
+    ResultSet rs = null;
+
+    try {
+      stmt = createStatement();
+      rs = stmt.executeQuery(sql);
+
+      while (rs.next()) {
+        OcspCertstore.CrlInfo crlInfo = new OcspCertstore.CrlInfo();
+        crlInfo.setId(rs.getInt("ID"));
+        crlInfo.setName(rs.getString("NAME"));
+        crlInfo.setInfo(rs.getString("INFO"));
+
+        crlInfos.add(crlInfo);
+      }
+    } catch (SQLException ex) {
+      throw translate(sql, ex);
+    } finally {
+      releaseResources(stmt, rs);
+    }
+
+    System.out.println(" exported table CRL_INFO");
+  } // method exportCrlInfo
 
   private Exception exportCert(OcspCertstore certstore, File processLogFile) {
     new File(baseDir, OcspDbEntryType.CERT.getDirName()).mkdirs();
@@ -203,7 +239,7 @@ class OcspCertstoreDbExporter extends DbPorter {
 
     System.out.println("exporting table CERT from ID " + minId);
 
-    final String coreSql = "ID,SN,IID,LUPDATE,REV,RR,RT,RIT,NAFTER,NBEFORE,HASH,SUBJECT "
+    final String coreSql = "ID,SN,IID,LUPDATE,REV,RR,RT,RIT,NAFTER,NBEFORE,HASH,SUBJECT,CRL_ID "
         + "FROM CERT WHERE ID>=?";
     final String certSql = datasource.buildSelectFirstSql(numCertsPerSelect, "ID ASC", coreSql);
 
@@ -308,6 +344,11 @@ class OcspCertstoreDbExporter extends DbPorter {
           long nbefore = rs.getLong("NBEFORE");
           if (nbefore != 0) {
             cert.setNbefore(nbefore);
+          }
+
+          int crlId = rs.getInt("CRL_ID");
+          if (crlId != 0) {
+            cert.setCrlId(crlId);
           }
 
           certsInCurrentFile.add(cert);

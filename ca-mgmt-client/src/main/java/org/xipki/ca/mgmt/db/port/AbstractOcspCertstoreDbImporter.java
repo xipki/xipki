@@ -36,12 +36,16 @@ abstract class AbstractOcspCertstoreDbImporter extends DbPorter {
 
   protected static final String MSG_CERTS_FINISHED = "certs.finished";
 
+  protected static final String SQL_ADD_CRLINFO =
+      "INSERT INTO CRL_INFO (ID,NAME,INFO) VALUES (?,?,?)";
+
   protected static final String SQL_ADD_ISSUER =
-      "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1C,REV_INFO,CERT) VALUES (?,?,?,?,?,?,?)";
+      "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1C,REV_INFO,CERT,CRL_ID) "
+      + "VALUES (?,?,?,?,?,?,?,?)";
 
   protected static final String SQL_ADD_CERT =
-      "INSERT INTO CERT (ID,IID,SN,LUPDATE,NBEFORE,NAFTER,REV,RR,RT,RIT,HASH,SUBJECT)"
-      + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+      "INSERT INTO CERT (ID,IID,SN,LUPDATE,NBEFORE,NAFTER,REV,RR,RT,RIT,HASH,SUBJECT,CRL_ID)"
+      + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
   protected static final String SQL_DEL_CERT = "DELETE FROM CERT WHERE ID>?";
 
