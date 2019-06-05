@@ -4,9 +4,12 @@ See also <https://github.com/xipki/xipki/releases>
 
 ## 5.3.1
   - Release date: -
+  - CA
+    - Replace the logging backend logback by log4j2.
   - OCSP
     - Use stream parser to parse the CRL to get small memory usage even for very large CRLs.
     - Extend the OCSP store type "crl" to support multiple CRLs, even for the same CA.
+    - Replace the logging backend logback by log4j2.
 
 ## 5.3.0
   - Release date: May 12, 2019
