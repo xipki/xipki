@@ -403,6 +403,14 @@ class ImportCrl {
 
       if (crlDirInfo.revocationinfo == null) {
         crl = new CrlStreamParser(new File(crlDir, "ca.crl"));
+        Date now = new Date();
+        if (crl.getNextUpdate() != null && crl.getNextUpdate().before(now)) {
+          LOG.error("CRL is expired");
+          return;
+        } else if (crl.getThisUpdate().after(now)) {
+          LOG.error("CRL is not valid yet");
+          return;
+        }
 
         X500Name issuer = crl.getIssuer();
 
@@ -521,11 +529,7 @@ class ImportCrl {
     } finally {
       File updatemeFile = new File(crlDirInfo.crlDir, "UPDATEME");
       updatemeFile.setLastModified(System.currentTimeMillis());
-      if (updateSucc) {
-        updatemeFile.renameTo(new File(updatemeFile.getPath() + ".SUCC"));
-      } else {
-        updatemeFile.renameTo(new File(updatemeFile.getPath() + ".FAIL"));
-      }
+      updatemeFile.renameTo(new File(updatemeFile.getPath() + (updateSucc ? ".SUCC" : ".FAIL")));
     }
   }
 
