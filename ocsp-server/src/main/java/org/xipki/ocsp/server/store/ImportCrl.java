@@ -305,8 +305,7 @@ class ImportCrl {
       CrlDirInfo crlDirInfo = new CrlDirInfo(crlId, crlName, crlDir, updateMe);
       crlDirInfo.base64Sha1Fp = base64Sha1Fp;
       crlDirInfo.revocationinfo = caRevInfo;
-
-      crlDirInfos.add(new CrlDirInfo(crlId, crlName, crlDir, updateMe));
+      crlDirInfos.add(crlDirInfo);
     }
 
     // pre processing
