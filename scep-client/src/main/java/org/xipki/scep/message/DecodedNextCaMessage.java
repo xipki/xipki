@@ -31,7 +31,6 @@ import org.bouncycastle.asn1.cms.CMSAttributes;
 import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.SignedData;
-import org.bouncycastle.asn1.cms.Time;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cms.CMSException;
@@ -163,7 +162,7 @@ public class DecodedNextCaMessage {
     // signingTime
     ASN1Encodable attrValue = ScepUtil.getFirstAttrValue(signedAttrs, CMSAttributes.signingTime);
     if (attrValue != null) {
-      signingTime = Time.getInstance(attrValue).getDate();
+      signingTime = ScepUtil.getTime(attrValue);
     }
 
     DecodedNextCaMessage ret = new DecodedNextCaMessage();

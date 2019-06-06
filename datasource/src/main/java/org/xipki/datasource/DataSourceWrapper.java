@@ -658,7 +658,7 @@ public abstract class DataSourceWrapper implements Closeable {
       stmt.execute(sql);
     } catch (Throwable th) {
       if (LOG.isWarnEnabled()) {
-        LOG.warn("datasource {} could not deletefrom table {}: {}", name, table, th.getMessage());
+        LOG.warn("datasource {} could not delete from table {}: {}", name, table, th.getMessage());
       }
       return false;
     } finally {

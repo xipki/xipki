@@ -35,10 +35,12 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -52,9 +54,12 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1String;
+import org.bouncycastle.asn1.BERTags;
+import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
+import org.bouncycastle.asn1.DERUTCTime;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.DERUniversalString;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
@@ -77,6 +82,7 @@ import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x509.Time;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.X509AttributeCertificateHolder;
 import org.slf4j.Logger;
@@ -1046,6 +1052,30 @@ public class X509Util {
     }
 
     return sb.toString();
+  }
+
+  public static Date getTime(Object obj) {
+    if (obj instanceof byte[]) {
+      byte[] encoded = (byte[]) obj;
+      int tag = encoded[0] & 0xFF;;
+      try {
+        if (tag == BERTags.UTC_TIME) {
+          return DERUTCTime.getInstance(encoded).getDate();
+        } else if (tag == BERTags.GENERALIZED_TIME) {
+          return DERGeneralizedTime.getInstance(encoded).getDate();
+        } else {
+          throw new IllegalArgumentException("invalid tag " + tag);
+        }
+      } catch (ParseException ex) {
+        throw new IllegalArgumentException("error parsing time", ex);
+      }
+    } else if (obj instanceof Time) {
+      return ((Time) obj).getDate();
+    } else if (obj instanceof org.bouncycastle.asn1.cms.Time) {
+      return ((org.bouncycastle.asn1.cms.Time) obj).getDate();
+    } else {
+      return Time.getInstance(obj).getDate();
+    }
   }
 
 }

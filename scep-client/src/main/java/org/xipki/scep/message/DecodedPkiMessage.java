@@ -35,7 +35,6 @@ import org.bouncycastle.asn1.cms.CMSAttributes;
 import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
-import org.bouncycastle.asn1.cms.Time;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.cert.X509CertificateHolder;
@@ -209,7 +208,7 @@ public class DecodedPkiMessage extends PkiMessage {
     // signingTime
     ASN1Encodable attrValue = ScepUtil.getFirstAttrValue(signedAttrs, CMSAttributes.signingTime);
     if (attrValue != null) {
-      signingTime = Time.getInstance(attrValue).getDate();
+      signingTime = ScepUtil.getTime(attrValue);
     }
 
     // transactionId

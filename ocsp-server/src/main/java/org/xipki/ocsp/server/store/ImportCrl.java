@@ -186,9 +186,6 @@ class ImportCrl {
 
   private static final String CORE_SQL_SELECT_ID_CERT = "ID FROM CERT WHERE IID=? AND SN=?";
 
-  private static final String SQL_UPDATE_ISSUER_CRL_ID
-      = "UPDATE ISSUER SET CRL_ID=? WHERE S1C=?";
-
   private final String basedir;
 
   private final String sqlSelectIdCert;
@@ -383,12 +380,12 @@ class ImportCrl {
     File crlDir = crlDirInfo.crlDir;
 
     boolean updateSucc = false;
+    CertWrapper caCert = null;
 
     try {
       LOG.info("Importing CRL (id={}, name={}) in the folder {}",
           id, crlName, crlDir.getPath());
 
-      CertWrapper caCert;
       File caCertFile = new File(crlDirInfo.crlDir, "ca.crt");
       try {
         Certificate cert = X509Util.parseBcCert(caCertFile);
@@ -530,6 +527,12 @@ class ImportCrl {
       File updatemeFile = new File(crlDirInfo.crlDir, "UPDATEME");
       updatemeFile.setLastModified(System.currentTimeMillis());
       updatemeFile.renameTo(new File(updatemeFile.getPath() + (updateSucc ? ".SUCC" : ".FAIL")));
+      if (!updateSucc && caCert != null) {
+        if (!crlDirInfo.shareCaWithOtherCrl) {
+          // try to delete the issuer if there is not certificate associated with it
+          datasource.deleteFromTable(conn, "ISSUER", "ID", caCert.databaseId);
+        }
+      }
     }
   }
 
@@ -624,7 +627,7 @@ class ImportCrl {
     }
 
     try {
-      sql = SQL_UPDATE_ISSUER_CRL_ID;
+      sql = "UPDATE ISSUER SET CRL_ID=? WHERE S1C=?";
       ps = datasource.prepareStatement(conn, sql);
       if (shareCaWithOtherCrl) {
         // clear the CRL_ID
