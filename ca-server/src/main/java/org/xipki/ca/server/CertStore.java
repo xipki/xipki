@@ -2007,7 +2007,7 @@ public class CertStore {
 
   private String getSqlSerials(int numEntries, Date notExpiredAt, boolean onlyRevoked,
       boolean withEe) {
-    String sql = StringUtil.concat("ID,SN FROM CERT WHERE ID>? AND CS=?",
+    String sql = StringUtil.concat("ID,SN FROM CERT WHERE ID>? AND CA_ID=?",
         (notExpiredAt != null ? " AND NAFTER>?" : ""),
         (onlyRevoked ? " AND REV=1" : ""), (withEe ? " AND EE=?" : ""));
     return datasource.buildSelectFirstSql(numEntries, "ID ASC", sql);
