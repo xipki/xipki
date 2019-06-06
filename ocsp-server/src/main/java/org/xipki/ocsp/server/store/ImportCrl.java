@@ -351,10 +351,9 @@ class ImportCrl {
       psUpdateCertRev = datasource.prepareStatement(conn, SQL_UPDATE_CERT_REV);
 
       for (CrlDirInfo crlDirInfo : crlDirInfos) {
-        if (!crlDirInfo.updateMe) {
-          continue;
+        if (crlDirInfo.updateMe) {
+          importCrl(conn, crlDirInfo);
         }
-        importCrl(conn, crlDirInfo);
       }
 
       return true;
@@ -395,8 +394,8 @@ class ImportCrl {
         Certificate cert = X509Util.parseBcCert(caCertFile);
         caCert = new CertWrapper(cert);
       } catch (CertificateException ex) {
-        throw new ImportCrlException(
-            "could not parse CA certificate " + caCertFile.getPath(), ex);
+        LOG.error("could not parse CA certificate " + caCertFile.getPath(), ex);
+        return;
       }
 
       CrlStreamParser crl = null;
@@ -404,6 +403,7 @@ class ImportCrl {
 
       if (crlDirInfo.revocationinfo == null) {
         crl = new CrlStreamParser(new File(crlDir, "ca.crl"));
+
         X500Name issuer = crl.getIssuer();
 
         Certificate crlSignerCert;
@@ -417,18 +417,21 @@ class ImportCrl {
           }
 
           if (crlIssuerCert == null) {
-            throw new IllegalStateException("issuerCert may not be null");
+            LOG.error("issuerCert may not be null");
+            return;
           }
 
           if (!crlIssuerCert.getSubject().equals(issuer)) {
-            throw new IllegalArgumentException("issuerCert and CRL do not match");
+            LOG.error("issuerCert and CRL do not match");
+            return;
           }
 
           crlSignerCert = crlIssuerCert;
         }
 
         if (crl.getCrlNumber() == null) {
-          throw new ImportCrlException("crlNumber is not specified");
+          LOG.error("crlNumber is not specified");
+          return;
         }
 
         LOG.info("The CRL is a {}", crl.isDeltaCrl() ? "DeltaCRL" : "FullCRL");
@@ -457,15 +460,17 @@ class ImportCrl {
 
         if (addNew) {
           if (crl.isDeltaCrl()) {
-            throw new ImportCrlException("Given CRL is a DeltaCRL for the full CRL with number "
-                + baseCrlNumber + ", please import this full CRL first.");
+            LOG.error("Given CRL is a DeltaCRL for the full CRL with number {}, "
+                + "please import this full CRL first.", baseCrlNumber);
+            return;
           }
         } else {
           CrlInfo oldCrlInfo = new CrlInfo(str);
           if (crlNumber.compareTo(oldCrlInfo.getCrlNumber()) <= 0) {
             // It is permitted if the CRL number equals to the one in Database,
             // which enables the resume of importing process if error occurred.
-            throw new ImportCrlException("Given CRL is not newer than existing CRL.");
+            LOG.error("Given CRL is not newer than existing CRL.");
+            return;
           }
 
           if (crl.isDeltaCrl()) {
@@ -475,16 +480,18 @@ class ImportCrl {
             }
 
             if (!baseCrlNumber.equals(lastFullCrlNumber)) {
-              throw new ImportCrlException(
-                  "Given CRL is a deltaCRL for the full CRL with number "
-                  + crlNumber + ", please import this full CRL first.");
+              LOG.error(
+                  "Given CRL is a deltaCRL for the full CRL with number {}, "
+                  + "please import this full CRL first.", crlNumber);
+              return;
             }
           }
         }
 
         // Verify the signature
         if (!crl.verifySignature(crlSignerCert.getSubjectPublicKeyInfo())) {
-          throw new ImportCrlException("signature of CRL is invalid");
+          LOG.error("signature of CRL is invalid");
+          return;
         }
 
         crlInfo = new CrlInfo(crlNumber, baseCrlNumber,
@@ -496,15 +503,14 @@ class ImportCrl {
       if (crl == null) {
         LOG.info("Ignored CRL (name={}) in the folder {}: CA is revoked",
             crlName, crlDir.getPath());
-        return;
-      }
+      } else {
+        importCrlInfo(conn, id, crlName, crlInfo,
+            crlDirInfo.shareCaWithOtherCrl, caCert.base64Sha1Fp);
 
-      importCrlInfo(conn, id, crlName, crlInfo,
-          crlDirInfo.shareCaWithOtherCrl, caCert.base64Sha1Fp);
-
-      importCrlRevokedCertificates(conn, id, caCert, crl);
-      if (!crl.isDeltaCrl()) {
-        deleteEntriesNotUpdatedSince(conn, id, startTime);
+        importCrlRevokedCertificates(conn, id, caCert, crl);
+        if (!crl.isDeltaCrl()) {
+          deleteEntriesNotUpdatedSince(conn, id, startTime);
+        }
       }
 
       updateSucc = true;
