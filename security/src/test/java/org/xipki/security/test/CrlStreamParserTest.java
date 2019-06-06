@@ -22,11 +22,13 @@ import java.math.BigInteger;
 import java.security.Security;
 
 import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.xipki.security.CrlStreamParser;
 import org.xipki.security.CrlStreamParser.RevokedCertsIterator;
+import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
 
 import junit.framework.Assert;
@@ -92,6 +94,35 @@ public class CrlStreamParserTest {
     }
 
     Assert.assertEquals("#revokedCertificates", 6, numRevokedCerts);
+  }
+
+  @Test
+  public void parseCrlWithInvalidityDateAndXipkiSet() throws Exception {
+    File crlFile = new File("src/test/resources/crls/crl-3/subcawithcrl1.crl");
+    Certificate issuerSigner = X509Util.parseBcCert(
+        new File("src/test/resources/crls/crl-3/ca.crt"));
+
+    CrlStreamParser parser = new CrlStreamParser(crlFile);
+    Assert.assertEquals("version", 1, parser.getVersion());
+    Assert.assertEquals("CRL number", BigInteger.valueOf(5), parser.getCrlNumber());
+
+    Assert.assertTrue("signature", parser.verifySignature(issuerSigner.getSubjectPublicKeyInfo()));
+
+    int numRevokedCerts = 0;
+
+    try (RevokedCertsIterator iterator = parser.revokedCertificates()) {
+      while (iterator.hasNext()) {
+        iterator.next();
+        numRevokedCerts++;
+      }
+    }
+
+    Assert.assertEquals("#revokedCertificates", 3, numRevokedCerts);
+
+    Extension extn = parser.getCrlExtensions().getExtension(
+                      ObjectIdentifiers.Xipki.id_xipki_ext_crlCertset);
+    Assert.assertNotNull("extension", extn);
+    // TODO: parse the extension
   }
 
 }
