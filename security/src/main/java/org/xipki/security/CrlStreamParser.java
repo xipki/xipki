@@ -288,7 +288,11 @@ public class CrlStreamParser {
       int offset = 0;
       // Tag SEQUENCE of CertificateList
       int tag = markAndReadTag(instream);
+      if (tag == '-') {
+        throw new IllegalArgumentException("The CRL is not DER encoded.");
+      }
       assertTag(TAG_CONSTRUCTED_SEQUENCE, tag, "CertificateList");
+
       offset++;
 
       MyInt lenBytesSize = new MyInt();

@@ -94,8 +94,6 @@ class ImportCrl {
 
     private final boolean updateMe;
 
-    private CertWrapper caCert;
-
     private String base64Sha1Fp;
 
     private CertRevocationInfo revocationinfo;
@@ -345,11 +343,6 @@ class ImportCrl {
     try {
       conn = datasource.getConnection();
 
-      // CHECKSTYLE:SKIP
-      Date startTime = new Date();
-      // CHECKSTYLE:SKIP
-      Set<CrlDirInfo> updatedCrlDirInfos = importCa(conn, crlDirInfos);
-
       psDeleteCert = datasource.prepareStatement(conn, SQL_DELETE_CERT);
       psInsertCert = datasource.prepareStatement(conn, SQL_INSERT_CERT);
       psInsertCertRev = datasource.prepareStatement(conn, SQL_INSERT_CERT_REV);
@@ -357,133 +350,17 @@ class ImportCrl {
       psUpdateCert = datasource.prepareStatement(conn, SQL_UPDATE_CERT);
       psUpdateCertRev = datasource.prepareStatement(conn, SQL_UPDATE_CERT_REV);
 
-      for (CrlDirInfo crlDirInfo : updatedCrlDirInfos) {
-        int id = crlDirInfo.crlId;
-        String crlName = crlDirInfo.crlName;
-        File crlDir = crlDirInfo.crlDir;
-        CertWrapper caCert = crlDirInfo.caCert;
-
-        boolean updateSucc = false;
-
-        try {
-          if (crlDirInfo.revocationinfo != null) {
-            LOG.info("Ignored CRL (name={}) in the folder {}: CA is revoked",
-                crlName, crlDir.getPath());
-            continue;
-          }
-
-          LOG.info("Importing CRL (id={}, name={}) in the folder {}", id,
-              crlName, crlDir.getPath());
-          CrlStreamParser crl = new CrlStreamParser(new File(crlDir, "ca.crl"));
-          X500Name issuer = crl.getIssuer();
-
-          Certificate crlSignerCert;
-          if (caCert.subject.equals(issuer)) {
-            crlSignerCert = caCert.cert;
-          } else {
-            Certificate crlIssuerCert = null;
-            File issuerCertFile = new File(crlDir, "issuer.crt");
-            if (issuerCertFile.exists()) {
-              crlIssuerCert = parseCert(issuerCertFile);
-            }
-
-            if (crlIssuerCert == null) {
-              throw new IllegalStateException("issuerCert may not be null");
-            }
-
-            if (!crlIssuerCert.getSubject().equals(issuer)) {
-              throw new IllegalArgumentException("issuerCert and CRL do not match");
-            }
-
-            crlSignerCert = crlIssuerCert;
-          }
-
-          if (crl.getCrlNumber() == null) {
-            throw new ImportCrlException("crlNumber is not specified");
-          }
-
-          LOG.info("The CRL is a {}", crl.isDeltaCrl() ? "DeltaCRL" : "FullCRL");
-
-          // Construct CrlID
-          ASN1EncodableVector vec = new ASN1EncodableVector();
-          File urlFile = new File(basedir, "crl.url");
-          if (urlFile.exists()) {
-            String crlUrl = StringUtil.toUtf8String(IoUtil.read(urlFile)).trim();
-            if (StringUtil.isNotBlank(crlUrl)) {
-              vec.add(new DERTaggedObject(true, 0, new DERIA5String(crlUrl, true)));
-            }
-          }
-
-          vec.add(new DERTaggedObject(true, 1, new ASN1Integer(crl.getCrlNumber())));
-          vec.add(new DERTaggedObject(true, 2,
-                      new ASN1GeneralizedTime(crl.getThisUpdate())));
-          CrlID crlId = CrlID.getInstance(new DERSequence(vec));
-
-          BigInteger crlNumber = crl.getCrlNumber();
-          BigInteger baseCrlNumber = crl.getBaseCrlNumber();
-
-          String str = datasource.getFirstValue(
-                        conn, "CRL_INFO", "INFO", "ID='" + id + "'", String.class);
-          boolean addNew = str == null;
-
-          if (addNew) {
-            if (crl.isDeltaCrl()) {
-              throw new ImportCrlException("Given CRL is a DeltaCRL for the full CRL with number "
-                  + baseCrlNumber + ", please import this full CRL first.");
-            }
-          } else {
-            CrlInfo crlInfo = new CrlInfo(str);
-            if (crlNumber.compareTo(crlInfo.getCrlNumber()) <= 0) {
-              // It is permitted if the CRL number equals to the one in Database,
-              // which enables the resume of importing process if error occurred.
-              throw new ImportCrlException("Given CRL is not newer than existing CRL.");
-            }
-
-            if (crl.isDeltaCrl()) {
-              BigInteger lastFullCrlNumber = crlInfo.getBaseCrlNumber();
-              if (lastFullCrlNumber == null) {
-                lastFullCrlNumber = crlInfo.getCrlNumber();
-              }
-
-              if (!baseCrlNumber.equals(lastFullCrlNumber)) {
-                throw new ImportCrlException("Given CRL is a deltaCRL for the full CRL with number "
-                    + crlNumber + ", please import this full CRL first.");
-              }
-            }
-          }
-
-          // Verify the signature
-          if (!crl.verifySignature(crlSignerCert.getSubjectPublicKeyInfo())) {
-            throw new ImportCrlException("signature of CRL is invalid");
-          }
-
-          CrlInfo crlInfo = new CrlInfo(crlNumber, baseCrlNumber,
-              crl.getThisUpdate(), crl.getNextUpdate(), crlId);
-          importCrlInfo(conn, id, crlName, crlInfo,
-              crlDirInfo.shareCaWithOtherCrl, caCert.base64Sha1Fp);
-
-          importEntries(conn, id, caCert, crl);
-          if (!crl.isDeltaCrl()) {
-            deleteEntriesNotUpdatedSince(conn, id, startTime);
-          }
-
-          updateSucc = true;
-        } finally {
-          File updatemeFile = new File(crlDirInfo.crlDir, "UPDATEME");
-          updatemeFile.setLastModified(System.currentTimeMillis());
-          if (updateSucc) {
-            LOG.info("Imported CRL (id={}) in the folder {}", id, crlDir.getPath());
-            updatemeFile.renameTo(new File(updatemeFile.getPath() + ".SUCC"));
-          } else {
-            LOG.info("Importing CRL (id={}) in the folder {} FAILED", id, crlDir.getPath());
-            updatemeFile.renameTo(new File(updatemeFile.getPath() + ".FAILED"));
-          }
+      for (CrlDirInfo crlDirInfo : crlDirInfos) {
+        if (!crlDirInfo.updateMe) {
+          continue;
         }
+        importCrl(conn, crlDirInfo);
       }
 
       return true;
     } catch (Throwable th) {
       LogUtil.error(LOG, th, "could not import CRL to OCSP database");
+    } finally {
       releaseResources(psDeleteCert, null);
       releaseResources(psInsertCert, null);
       releaseResources(psInsertCertRev, null);
@@ -499,12 +376,158 @@ class ImportCrl {
     return false;
   }
 
+  private void importCrl(Connection conn, CrlDirInfo crlDirInfo) {
+    Date startTime = new Date();
+
+    int id = crlDirInfo.crlId;
+    String crlName = crlDirInfo.crlName;
+    File crlDir = crlDirInfo.crlDir;
+
+    boolean updateSucc = false;
+
+    try {
+      LOG.info("Importing CRL (id={}, name={}) in the folder {}",
+          id, crlName, crlDir.getPath());
+
+      CertWrapper caCert;
+      File caCertFile = new File(crlDirInfo.crlDir, "ca.crt");
+      try {
+        Certificate cert = X509Util.parseBcCert(caCertFile);
+        caCert = new CertWrapper(cert);
+      } catch (CertificateException ex) {
+        throw new ImportCrlException(
+            "could not parse CA certificate " + caCertFile.getPath(), ex);
+      }
+
+      CrlStreamParser crl = null;
+      CrlInfo crlInfo = null;
+
+      if (crlDirInfo.revocationinfo == null) {
+        crl = new CrlStreamParser(new File(crlDir, "ca.crl"));
+        X500Name issuer = crl.getIssuer();
+
+        Certificate crlSignerCert;
+        if (caCert.subject.equals(issuer)) {
+          crlSignerCert = caCert.cert;
+        } else {
+          Certificate crlIssuerCert = null;
+          File issuerCertFile = new File(crlDir, "issuer.crt");
+          if (issuerCertFile.exists()) {
+            crlIssuerCert = parseCert(issuerCertFile);
+          }
+
+          if (crlIssuerCert == null) {
+            throw new IllegalStateException("issuerCert may not be null");
+          }
+
+          if (!crlIssuerCert.getSubject().equals(issuer)) {
+            throw new IllegalArgumentException("issuerCert and CRL do not match");
+          }
+
+          crlSignerCert = crlIssuerCert;
+        }
+
+        if (crl.getCrlNumber() == null) {
+          throw new ImportCrlException("crlNumber is not specified");
+        }
+
+        LOG.info("The CRL is a {}", crl.isDeltaCrl() ? "DeltaCRL" : "FullCRL");
+
+        // Construct CrlID
+        ASN1EncodableVector vec = new ASN1EncodableVector();
+        File urlFile = new File(basedir, "crl.url");
+        if (urlFile.exists()) {
+          String crlUrl = StringUtil.toUtf8String(IoUtil.read(urlFile)).trim();
+          if (StringUtil.isNotBlank(crlUrl)) {
+            vec.add(new DERTaggedObject(true, 0, new DERIA5String(crlUrl, true)));
+          }
+        }
+
+        vec.add(new DERTaggedObject(true, 1, new ASN1Integer(crl.getCrlNumber())));
+        vec.add(new DERTaggedObject(true, 2,
+                    new ASN1GeneralizedTime(crl.getThisUpdate())));
+        CrlID crlId = CrlID.getInstance(new DERSequence(vec));
+
+        BigInteger crlNumber = crl.getCrlNumber();
+        BigInteger baseCrlNumber = crl.getBaseCrlNumber();
+
+        String str = datasource.getFirstValue(
+                      conn, "CRL_INFO", "INFO", "ID='" + id + "'", String.class);
+        boolean addNew = str == null;
+
+        if (addNew) {
+          if (crl.isDeltaCrl()) {
+            throw new ImportCrlException("Given CRL is a DeltaCRL for the full CRL with number "
+                + baseCrlNumber + ", please import this full CRL first.");
+          }
+        } else {
+          CrlInfo oldCrlInfo = new CrlInfo(str);
+          if (crlNumber.compareTo(oldCrlInfo.getCrlNumber()) <= 0) {
+            // It is permitted if the CRL number equals to the one in Database,
+            // which enables the resume of importing process if error occurred.
+            throw new ImportCrlException("Given CRL is not newer than existing CRL.");
+          }
+
+          if (crl.isDeltaCrl()) {
+            BigInteger lastFullCrlNumber = oldCrlInfo.getBaseCrlNumber();
+            if (lastFullCrlNumber == null) {
+              lastFullCrlNumber = oldCrlInfo.getCrlNumber();
+            }
+
+            if (!baseCrlNumber.equals(lastFullCrlNumber)) {
+              throw new ImportCrlException(
+                  "Given CRL is a deltaCRL for the full CRL with number "
+                  + crlNumber + ", please import this full CRL first.");
+            }
+          }
+        }
+
+        // Verify the signature
+        if (!crl.verifySignature(crlSignerCert.getSubjectPublicKeyInfo())) {
+          throw new ImportCrlException("signature of CRL is invalid");
+        }
+
+        crlInfo = new CrlInfo(crlNumber, baseCrlNumber,
+            crl.getThisUpdate(), crl.getNextUpdate(), crlId);
+      }
+
+      importCa(conn, crlDirInfo, caCert);
+
+      if (crl == null) {
+        LOG.info("Ignored CRL (name={}) in the folder {}: CA is revoked",
+            crlName, crlDir.getPath());
+        return;
+      }
+
+      importCrlInfo(conn, id, crlName, crlInfo,
+          crlDirInfo.shareCaWithOtherCrl, caCert.base64Sha1Fp);
+
+      importCrlRevokedCertificates(conn, id, caCert, crl);
+      if (!crl.isDeltaCrl()) {
+        deleteEntriesNotUpdatedSince(conn, id, startTime);
+      }
+
+      updateSucc = true;
+      LOG.info("Imported CRL (id={}) in the folder {}", id, crlDir.getPath());
+    } catch (Throwable th) {
+      LOG.error(String.format(
+          "Importing CRL (id=%s) in the folder %s FAILED", id, crlDir.getPath()), th);
+    } finally {
+      File updatemeFile = new File(crlDirInfo.crlDir, "UPDATEME");
+      updatemeFile.setLastModified(System.currentTimeMillis());
+      if (updateSucc) {
+        updatemeFile.renameTo(new File(updatemeFile.getPath() + ".SUCC"));
+      } else {
+        updatemeFile.renameTo(new File(updatemeFile.getPath() + ".FAIL"));
+      }
+    }
+  }
+
   /**
    * Import the CA certificate with revocation information.
    *
    * @param conn The database connection.
    * @param crlDirInfo CRL directory information.
-   * @return CRL-Id to CA Certificate Map
    * @throws DataAccessException
    *         If database exception occurs.
    * @throws DataAccessException
@@ -512,73 +535,52 @@ class ImportCrl {
    * @throws ImportCrlException
    *         If other exception occurs.
    */
-  private Set<CrlDirInfo> importCa(Connection conn, Set<CrlDirInfo> crlDirInfos)
+  private void importCa(Connection conn, CrlDirInfo crlDirInfo, CertWrapper caCert)
       throws DataAccessException, ImportCrlException, IOException {
-    Set<CrlDirInfo> updatedCrlDirInfos = new HashSet<>();
+    CertRevocationInfo revInfo = crlDirInfo.revocationinfo;
 
-    for (CrlDirInfo crlDirInfo : crlDirInfos) {
-      if (!crlDirInfo.updateMe) {
-        continue;
+    Integer issuerId = datasource.getFirstValue(conn, "ISSUER", "ID",
+        "S1C='" + caCert.base64Sha1Fp + "'", Integer.class);
+
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+    String sql = null;
+
+    try {
+      int offset = 1;
+      if (issuerId == null) {
+        // issuer not exists
+        int maxId = (int) datasource.getMax(conn, "ISSUER", "ID");
+        issuerId = maxId + 1;
+
+        sql = "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1C,CERT,REV_INFO)"
+            + " VALUES(?,?,?,?,?,?,?)";
+        ps = datasource.prepareStatement(conn, sql);
+        String subject = X509Util.getRfc4519Name(caCert.subject);
+
+        ps.setInt(offset++, issuerId);
+        ps.setString(offset++, subject);
+        ps.setLong(offset++, caCert.cert.getStartDate().getDate().getTime() / 1000);
+        ps.setLong(offset++, caCert.cert.getEndDate().getDate().getTime() / 1000);
+        ps.setString(offset++, caCert.base64Sha1Fp);
+        ps.setString(offset++, caCert.base64Encoded);
+        ps.setString(offset++, revInfo == null ? null : revInfo.getEncoded());
+      } else {
+        // issuer exists
+        sql = "UPDATE ISSUER SET REV_INFO=? WHERE ID=?";
+        ps = datasource.prepareStatement(conn, sql);
+        ps.setString(offset++, revInfo == null ? null : revInfo.getEncoded());
+        ps.setInt(offset++, issuerId.intValue());
       }
 
-      CertRevocationInfo revInfo = crlDirInfo.revocationinfo;
+      ps.executeUpdate();
 
-      CertWrapper caCert;
-      File caCertFile = new File(crlDirInfo.crlDir, "ca.crt");
-      try {
-        Certificate cert = X509Util.parseBcCert(caCertFile);
-        caCert = new CertWrapper(cert);
-        crlDirInfo.caCert = caCert;
-      } catch (CertificateException ex) {
-        throw new ImportCrlException("could not parse CA certificate " + caCertFile.getPath(), ex);
-      }
-
-      Integer issuerId = datasource.getFirstValue(conn, "ISSUER", "ID",
-                            "S1C='" + caCert.base64Sha1Fp + "'", Integer.class);
-
-      PreparedStatement ps = null;
-      ResultSet rs = null;
-      String sql = null;
-
-      try {
-        int offset = 1;
-        if (issuerId == null) {
-          // issuer not exists
-          int maxId = (int) datasource.getMax(conn, "ISSUER", "ID");
-          issuerId = maxId + 1;
-
-          sql = "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1C,CERT,REV_INFO)"
-              + " VALUES(?,?,?,?,?,?,?)";
-          ps = datasource.prepareStatement(conn, sql);
-          String subject = X509Util.getRfc4519Name(caCert.subject);
-
-          ps.setInt(offset++, issuerId);
-          ps.setString(offset++, subject);
-          ps.setLong(offset++, caCert.cert.getStartDate().getDate().getTime() / 1000);
-          ps.setLong(offset++, caCert.cert.getEndDate().getDate().getTime() / 1000);
-          ps.setString(offset++, caCert.base64Sha1Fp);
-          ps.setString(offset++, caCert.base64Encoded);
-          ps.setString(offset++, revInfo == null ? null : revInfo.getEncoded());
-        } else {
-          // issuer exists
-          sql = "UPDATE ISSUER SET REV_INFO=? WHERE ID=?";
-          ps = datasource.prepareStatement(conn, sql);
-          ps.setString(offset++, revInfo == null ? null : revInfo.getEncoded());
-          ps.setInt(offset++, issuerId.intValue());
-        }
-
-        ps.executeUpdate();
-
-        caCert.databaseId = issuerId;
-        updatedCrlDirInfos.add(crlDirInfo);
-      } catch (SQLException ex) {
-        throw datasource.translate(sql, ex);
-      } finally {
-        releaseResources(ps, rs);
-      }
+      caCert.databaseId = issuerId;
+    } catch (SQLException ex) {
+      throw datasource.translate(sql, ex);
+    } finally {
+      releaseResources(ps, rs);
     }
-
-    return updatedCrlDirInfos;
   }
 
   private void importCrlInfo(Connection conn, int id, String name, CrlInfo crlInfo,
@@ -630,7 +632,7 @@ class ImportCrl {
     }
   }
 
-  private void importEntries(Connection conn, int crlInfoId, CertWrapper caCert,
+  private void importCrlRevokedCertificates(Connection conn, int crlInfoId, CertWrapper caCert,
       CrlStreamParser crl) throws DataAccessException, ImportCrlException, IOException {
     int caId = caCert.databaseId.intValue();
     AtomicLong maxId = new AtomicLong(datasource.getMax(conn, "CERT", "ID"));
@@ -705,6 +707,7 @@ class ImportCrl {
     // import the certificates
 
     // extract the certificate
+    // this extension will be generated only be XiPKI CA.
     byte[] extnValue = X509Util.getCoreExtValue(
                           crl.getCrlExtensions(), ObjectIdentifiers.Xipki.id_xipki_ext_crlCertset);
     if (extnValue != null) {
