@@ -211,8 +211,12 @@ public class CrlStreamParser extends Asn1StreamParser {
         }
 
         coreExtValue = X509Util.getCoreExtValue(extns, Extension.reasonCode);
-        CRLReason bcReason = CRLReason.getInstance(coreExtValue);
-        reason = CrlReason.forReasonCode(bcReason.getValue().intValue());
+        if (coreExtValue == null) {
+          reason = CrlReason.UNSPECIFIED;
+        } else {
+          CRLReason bcReason = CRLReason.getInstance(coreExtValue);
+          reason = CrlReason.forReasonCode(bcReason.getValue().intValue());
+        }
       }
 
       next = new RevokedCert(serialNumber, revocationDate, reason, invalidityDate,
