@@ -18,6 +18,7 @@
 package org.xipki.ocsp.server.store;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FilenameFilter;
@@ -40,18 +41,12 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.DERTaggedObject;
-import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.ocsp.CrlID;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
@@ -64,6 +59,9 @@ import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.asn1.CrlCertSetStreamParser;
+import org.xipki.security.asn1.CrlCertSetStreamParser.CrlCert;
+import org.xipki.security.asn1.CrlCertSetStreamParser.CrlCertsIterator;
 import org.xipki.security.asn1.CrlStreamParser;
 import org.xipki.security.asn1.CrlStreamParser.RevokedCert;
 import org.xipki.security.asn1.CrlStreamParser.RevokedCertsIterator;
@@ -724,52 +722,34 @@ class ImportCrl {
     byte[] extnValue = X509Util.getCoreExtValue(
                           crl.getCrlExtensions(), ObjectIdentifiers.Xipki.id_xipki_ext_crlCertset);
     if (extnValue != null) {
-      ASN1Set asn1Set = DERSet.getInstance(extnValue);
-      final int n = asn1Set.size();
+      CrlCertSetStreamParser crlCertParser =
+          new CrlCertSetStreamParser(new ByteArrayInputStream(extnValue));
+      CrlCertsIterator crlCerts = crlCertParser.crlCerts();
 
-      for (int i = 0; i < n; i++) {
-        ASN1Encodable asn1 = asn1Set.getObjectAt(i);
-        ASN1Sequence seq = ASN1Sequence.getInstance(asn1);
-        BigInteger serialNumber = ASN1Integer.getInstance(seq.getObjectAt(0)).getValue();
-
-        Certificate cert = null;
-        String profileName = null;
-
-        final int size = seq.size();
-        for (int j = 1; j < size; j++) {
-          ASN1TaggedObject taggedObj = DERTaggedObject.getInstance(seq.getObjectAt(j));
-          int tagNo = taggedObj.getTagNo();
-          switch (tagNo) {
-            case 0:
-              cert = Certificate.getInstance(taggedObj.getObject());
-              break;
-            case 1:
-              profileName = DERUTF8String.getInstance(taggedObj.getObject()).getString();
-              break;
-            default:
-              break;
-          }
-        }
+      while (crlCerts.hasNext()) {
+        CrlCert crlCert = crlCerts.next();
+        BigInteger serialNumber = crlCert.getSerial();
+        Certificate cert = crlCert.getCert();
 
         if (cert == null) {
-          continue;
-        }
+          addCertificateBySerialNumber(maxId, caId, crlInfoId, serialNumber);
+        } else {
+          if (!caCert.subject.equals(cert.getIssuer())) {
+            LOG.warn("issuer not match (serial={}) in CRL Extension Xipki-CertSet, ignore it",
+                LogUtil.formatCsn(serialNumber));
+            continue;
+          }
+  
+          if (!serialNumber.equals(cert.getSerialNumber().getValue())) {
+            LOG.warn("serialNumber not match (serial={}) in CRL Extension Xipki-CertSet, ignore it",
+                LogUtil.formatCsn(serialNumber));
+            continue;
+          }
 
-        if (!caCert.subject.equals(cert.getIssuer())) {
-          LOG.warn("issuer not match (serial={}) in CRL Extension Xipki-CertSet, ignore it",
-              LogUtil.formatCsn(serialNumber));
-          continue;
+          String certLogId = "(issuer='" + cert.getIssuer()
+              + "', serialNumber=" + cert.getSerialNumber() + ")";
+          addCertificate(maxId, crlInfoId, caCert, cert, null, certLogId);
         }
-
-        if (!serialNumber.equals(cert.getSerialNumber().getValue())) {
-          LOG.warn("serialNumber not match (serial={}) in CRL Extension Xipki-CertSet, ignore it",
-              LogUtil.formatCsn(serialNumber));
-          continue;
-        }
-
-        String certLogId = "(issuer='" + cert.getIssuer()
-            + "', serialNumber=" + cert.getSerialNumber() + ")";
-        addCertificate(maxId, crlInfoId, caCert, cert, profileName, certLogId);
       }
     } else {
       // cert dirs

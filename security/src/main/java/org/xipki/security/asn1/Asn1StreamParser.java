@@ -52,6 +52,8 @@ public class Asn1StreamParser {
 
   protected static final int TAG_CONSTRUCTED_SEQUENCE = BERTags.CONSTRUCTED | BERTags.SEQUENCE;
 
+  protected static final int TAG_CONSTRUCTED_SET = BERTags.CONSTRUCTED | BERTags.SET;
+
   protected static byte[] readBlock(int expectedTag, BufferedInputStream instream, String name)
       throws IOException {
     instream.mark(10);
