@@ -159,6 +159,18 @@ public class IoUtil {
     }
   }
 
+  public static boolean deleteFile(String path) {
+    return deleteFile(new File(expandFilepath(path)));
+  }
+
+  public static boolean deleteFile(File file) {
+    file = expandFilepath(file);
+    if (file.exists()) {
+      return file.delete();
+    }
+    return true;
+  }
+
   public static String expandFilepath(String path) {
     Args.notBlank(path, "path");
     return path.startsWith("~") ? USER_HOME + path.substring(1) : path;

@@ -30,6 +30,7 @@ import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.util.Args;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * OcspStore for CRLs. Note that the CRLs will be imported to XiPKI OCSP database.
@@ -59,6 +60,10 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
 
   private String dir;
 
+  private int sqlBatchCommit;
+
+  private boolean ignoreExpiredCrls;
+
   private boolean crlUpdated;
 
   /**
@@ -70,6 +75,12 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
    * <li>dir: required
    *   <p/>
    *   Directory of the CRL resources.</li>
+   * <li>sqlBatchCommit:
+   *   <p/>
+   *   Number of SQL queries before next commit, default to be 1000.</li>
+   * <li>ignoreExpiredCrls:
+   *   <p/>
+   *   Whether expired CRLs are ignored, default to true.</li>
    * </ul>
    * @param datasource DataSource.
    */
@@ -78,6 +89,12 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     Args.notNull(sourceConf, "sourceConf");
 
     this.dir = IoUtil.expandFilepath(getStrValue(sourceConf, "dir", true));
+    String value = getStrValue(sourceConf, "sqlBatchCommit", false);
+    this.sqlBatchCommit = StringUtil.isBlank(value) ? 1000 : Integer.parseInt(value);
+
+    value = getStrValue(sourceConf, "ignoreExpiredCrls", false);
+    this.ignoreExpiredCrls = StringUtil.isBlank(value) ? true : Boolean.parseBoolean(value);
+
     super.datasource = datasource;
     updateStore(true);
     super.init(sourceConf, datasource);
@@ -98,8 +115,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     if (objVal instanceof String) {
       return (String) objVal;
     } else {
-      throw new IllegalArgumentException(
-          "content of " + confName + " is not String, but " + objVal.getClass().getName());
+      return objVal.toString();
     }
   }
 
@@ -143,7 +159,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
         return;
       }
 
-      ImportCrl importCrl = new ImportCrl(datasource, dir);
+      ImportCrl importCrl = new ImportCrl(datasource, dir, sqlBatchCommit, ignoreExpiredCrls);
 
       if (importCrl.importCrlToOcspDb()) {
         LOG.info("updated CertStore {} successfully", name);

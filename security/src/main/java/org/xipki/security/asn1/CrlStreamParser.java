@@ -96,22 +96,37 @@ public class CrlStreamParser extends Asn1StreamParser {
 
   public static class RevokedCert {
 
-    private BigInteger serialNumber;
+    private final BigInteger serialNumber;
 
-    private Date revocationDate;
+    /**
+     * EPOCH seconds of revocationDate.
+     */
+    private final long revocationDate;
 
-    private CrlReason reason;
+    /**
+     * CRLReason code.
+     */
+    private final int reason;
 
-    private Date invalidityDate;
+    /**
+     * EPOCH seconds of revocationDate. Or 0 if not set.
+     */
+    private final long invalidityDate;
 
-    private X500Name certificateIssuer;
+    private final X500Name certificateIssuer;
 
-    private RevokedCert(BigInteger serialNumber, Date revocationDate, CrlReason reason,
+    private RevokedCert(BigInteger serialNumber, Date revocationDate, int reason,
         Date invalidityDate, X500Name certificateIssuer) {
       this.serialNumber = serialNumber;
-      this.revocationDate = revocationDate;
-      this.reason = reason == null ? CrlReason.UNSPECIFIED : reason;
-      this.invalidityDate = invalidityDate;
+      this.revocationDate = revocationDate.getTime() / 1000;
+      this.reason = reason;
+      if (invalidityDate == null) {
+        this.invalidityDate = 0;
+      } else {
+        this.invalidityDate =
+            revocationDate.equals(invalidityDate) ? 0 : invalidityDate.getTime() / 1000;
+      }
+
       this.certificateIssuer = certificateIssuer;
     }
 
@@ -119,15 +134,15 @@ public class CrlStreamParser extends Asn1StreamParser {
       return serialNumber;
     }
 
-    public Date getRevocationDate() {
+    public long getRevocationDate() {
       return revocationDate;
     }
 
-    public CrlReason getReason() {
+    public int getReason() {
       return reason;
     }
 
-    public Date getInvalidityDate() {
+    public long getInvalidityDate() {
       return invalidityDate;
     }
 
@@ -194,7 +209,7 @@ public class CrlStreamParser extends Asn1StreamParser {
       BigInteger serialNumber = ASN1Integer.getInstance(revCert.getObjectAt(0)).getValue();
       Date revocationDate = readTime(revCert.getObjectAt(1));
       Date invalidityDate = null;
-      CrlReason reason = null;
+      int reason = 0;
       X500Name certificateIssuer = null;
 
       if (revCert.size() > 2) {
@@ -212,10 +227,9 @@ public class CrlStreamParser extends Asn1StreamParser {
 
         coreExtValue = X509Util.getCoreExtValue(extns, Extension.reasonCode);
         if (coreExtValue == null) {
-          reason = CrlReason.UNSPECIFIED;
+          reason = CrlReason.UNSPECIFIED.getCode();
         } else {
-          CRLReason bcReason = CRLReason.getInstance(coreExtValue);
-          reason = CrlReason.forReasonCode(bcReason.getValue().intValue());
+          reason = CRLReason.getInstance(coreExtValue).getValue().intValue();
         }
       }
 

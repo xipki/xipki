@@ -136,7 +136,9 @@
 			"datasource":"datasource-crl",
 			"type":"crl",
 			"conf":{
-				"dir":"xipki/crls/example-crls"
+				"dir":"xipki/crls/example-crls",
+				"sqlBatchCommit":1000,
+				"ignoreExpiredCrls":true
 			}
 		},
 		"unknownCertBehaviour":"good"

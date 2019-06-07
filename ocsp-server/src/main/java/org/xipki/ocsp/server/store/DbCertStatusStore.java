@@ -236,7 +236,7 @@ public class DbCertStatusStore extends OcspStore {
         } // end while (rs.next())
 
         this.issuerStore.setIssuers(caInfos);
-        LOG.info("Updated issuers: {}", name);
+        LOG.info("Updated issuers of store {}", name);
       } finally {
         releaseDbResources(ps, rs);
       }
@@ -264,7 +264,7 @@ public class DbCertStatusStore extends OcspStore {
 
         issuerStore.setCrlInfos(crlInfos);
 
-        LOG.info("Updated issuers: {}", name);
+        LOG.info("Updated CRL_INFOs of store {}", name);
       } finally {
         releaseDbResources(ps, rs);
       }

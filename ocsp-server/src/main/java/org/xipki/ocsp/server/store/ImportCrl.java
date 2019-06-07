@@ -82,6 +82,41 @@ import org.xipki.util.StringUtil;
 
 class ImportCrl {
 
+  private static class CertInfo {
+    private long id;
+
+    private int crlId;
+
+    private boolean revoked;
+
+    private int revocationReason;
+
+    private long revocationTime;
+
+    private long invalidityTime;
+
+    boolean isDifferent(RevokedCert revokedCert, int crlId) {
+      if (this.crlId != crlId) {
+        return true;
+      }
+
+      if (revoked) {
+        if (revocationReason != revokedCert.getReason()) {
+          return true;
+        }
+
+        if (revocationTime != revokedCert.getRevocationDate()) {
+          return true;
+        }
+
+        return invalidityTime != revokedCert.getInvalidityDate();
+      } else {
+        return true;
+      }
+    }
+
+  }
+
   private static class CrlDirInfo {
 
     private final int crlId;
@@ -175,6 +210,8 @@ class ImportCrl {
 
   private static final String SQL_DELETE_CERT = "DELETE FROM CERT WHERE IID=? AND SN=?";
 
+  private static final String SQL_UPDATE_CERT_LUPDATE = "UPDATE CERT SET LUPDATE=? WHERE ID=?";
+
   private static final String SQL_UPDATE_CERT
       = "UPDATE CERT SET LUPDATE=?,NBEFORE=?,NAFTER=?,CRL_ID=?,HASH=? WHERE ID=?";
 
@@ -182,7 +219,8 @@ class ImportCrl {
       = "INSERT INTO CERT (ID,IID,SN,REV,RR,RT,RIT,LUPDATE,NBEFORE,NAFTER,CRL_ID,HASH) "
         + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
 
-  private static final String CORE_SQL_SELECT_ID_CERT = "ID FROM CERT WHERE IID=? AND SN=?";
+  private static final String CORE_SQL_SELECT_ID_CERT
+      = "ID,REV,RR,RT,RIT,CRL_ID FROM CERT WHERE IID=? AND SN=?";
 
   private final String basedir;
 
@@ -191,6 +229,10 @@ class ImportCrl {
   private final DataSourceWrapper datasource;
 
   private final HashAlgo certhashAlgo;
+
+  private final int sqlBatchCommit;
+
+  private final boolean ignoreExpiredCrls;
 
   private PreparedStatement psDeleteCert;
 
@@ -204,7 +246,12 @@ class ImportCrl {
 
   private PreparedStatement psUpdateCertRev;
 
-  public ImportCrl(DataSourceWrapper datasource, String basedir) throws DataAccessException {
+  private PreparedStatement psUpdateCertLastupdate;
+
+  public ImportCrl(DataSourceWrapper datasource, String basedir, int sqlBatchCommit,
+      boolean ignoreExpiredCrls) throws DataAccessException {
+    this.sqlBatchCommit = Args.min(sqlBatchCommit, "sqlBatchCommit", 1);
+    this.ignoreExpiredCrls = ignoreExpiredCrls;
     this.datasource = Args.notNull(datasource, "datasource");
     this.basedir = Args.notNull(basedir, "basedir");
     this.certhashAlgo = DbCertStatusStore.getCertHashAlgo(datasource);
@@ -335,8 +382,16 @@ class ImportCrl {
     }
 
     Connection conn = null;
+    boolean autoCommitChanged = false;
     try {
       conn = datasource.getConnection();
+
+      // disable the autoCommit for better performance
+      boolean origAutocommit = conn.getAutoCommit();
+      if (origAutocommit) {
+        conn.setAutoCommit(false);
+        autoCommitChanged = true;
+      }
 
       psDeleteCert = datasource.prepareStatement(conn, SQL_DELETE_CERT);
       psInsertCert = datasource.prepareStatement(conn, SQL_INSERT_CERT);
@@ -344,6 +399,7 @@ class ImportCrl {
       psSelectIdCert = datasource.prepareStatement(conn, sqlSelectIdCert);
       psUpdateCert = datasource.prepareStatement(conn, SQL_UPDATE_CERT);
       psUpdateCertRev = datasource.prepareStatement(conn, SQL_UPDATE_CERT_REV);
+      psUpdateCertLastupdate = datasource.prepareStatement(conn, SQL_UPDATE_CERT_LUPDATE);
 
       for (CrlDirInfo crlDirInfo : crlDirInfos) {
         if (crlDirInfo.updateMe) {
@@ -355,12 +411,28 @@ class ImportCrl {
     } catch (Throwable th) {
       LogUtil.error(LOG, th, "could not import CRL to OCSP database");
     } finally {
+      try {
+        commit(conn);
+      } catch (Throwable th) {
+        LOG.error("could not import CRL to OCSP database (Connection.commit)");
+      }
+
+      if (autoCommitChanged) {
+        // change the autoCommit back to original value.
+        try {
+          conn.setAutoCommit(true);
+        } catch (SQLException ex) {
+          LOG.error("could not import CRL to OCSP database (Connection.setAutoCommit)");
+        }
+      }
+
       releaseResources(psDeleteCert, null);
       releaseResources(psInsertCert, null);
       releaseResources(psInsertCertRev, null);
       releaseResources(psSelectIdCert, null);
       releaseResources(psUpdateCert, null);
       releaseResources(psUpdateCertRev, null);
+      releaseResources(psUpdateCertLastupdate, null);
 
       if (conn != null) {
         datasource.returnConnection(conn);
@@ -371,6 +443,10 @@ class ImportCrl {
   }
 
   private void importCrl(Connection conn, CrlDirInfo crlDirInfo) {
+    // Delete the files UPDATE.SUCC and UPDATE.FAIL
+    IoUtil.deleteFile(new File(crlDirInfo.crlDir, "UPDATEME.SUCC"));
+    IoUtil.deleteFile(new File(crlDirInfo.crlDir, "UPDATEME.FAIL"));
+
     Date startTime = new Date();
 
     int id = crlDirInfo.crlId;
@@ -400,8 +476,10 @@ class ImportCrl {
         crl = new CrlStreamParser(new File(crlDir, "ca.crl"));
         Date now = new Date();
         if (crl.getNextUpdate() != null && crl.getNextUpdate().before(now)) {
-          LOG.error("CRL is expired");
-          return;
+          if (ignoreExpiredCrls) {
+            LOG.error("CRL is expired");
+            return;
+          }
         } else if (crl.getThisUpdate().after(now)) {
           LOG.error("CRL is not valid yet");
           return;
@@ -469,10 +547,10 @@ class ImportCrl {
           }
         } else {
           CrlInfo oldCrlInfo = new CrlInfo(str);
-          if (crlNumber.compareTo(oldCrlInfo.getCrlNumber()) <= 0) {
+          if (crlNumber.compareTo(oldCrlInfo.getCrlNumber()) < 0) {
             // It is permitted if the CRL number equals to the one in Database,
             // which enables the resume of importing process if error occurred.
-            LOG.error("Given CRL is not newer than existing CRL.");
+            LOG.error("Given CRL is older than existing CRL.");
             return;
           }
 
@@ -502,6 +580,7 @@ class ImportCrl {
       }
 
       importCa(conn, crlDirInfo, caCert);
+      commit(conn);
 
       if (crl == null) {
         LOG.info("Ignored CRL (name={}) in the folder {}: CA is revoked",
@@ -509,10 +588,14 @@ class ImportCrl {
       } else {
         importCrlInfo(conn, id, crlName, crlInfo,
             crlDirInfo.shareCaWithOtherCrl, caCert.base64Sha1Fp);
+        commit(conn);
 
         importCrlRevokedCertificates(conn, id, caCert, crl);
+        commit(conn);
+
         if (!crl.isDeltaCrl()) {
           deleteEntriesNotUpdatedSince(conn, id, startTime);
+          commit(conn);
         }
       }
 
@@ -522,6 +605,14 @@ class ImportCrl {
       LOG.error(String.format(
           "Importing CRL (id=%s) in the folder %s FAILED", id, crlDir.getPath()), th);
     } finally {
+      try {
+        commit(conn);
+      } catch (Throwable th) {
+        LOG.error(String.format(
+            "Importing CRL (id=%s) in the folder %s FAILED (Connect.commit)",
+            id, crlDir.getPath()), th);
+      }
+
       File updatemeFile = new File(crlDirInfo.crlDir, "UPDATEME");
       updatemeFile.setLastModified(System.currentTimeMillis());
       updatemeFile.renameTo(new File(updatemeFile.getPath() + (updateSucc ? ".SUCC" : ".FAIL")));
@@ -653,14 +744,18 @@ class ImportCrl {
     AtomicLong maxId = new AtomicLong(datasource.getMax(conn, "CERT", "ID"));
 
     boolean isDeltaCrl = crl.isDeltaCrl();
+
     // import the revoked information
     try (RevokedCertsIterator revokedCertList = crl.revokedCertificates()) {
+      int num = 0;
       while (revokedCertList.hasNext()) {
+        num++;
+
         RevokedCert revCert = revokedCertList.next();
         BigInteger serial = revCert.getSerialNumber();
-        Date rt = revCert.getRevocationDate();
-        Date rit = revCert.getInvalidityDate();
-        CrlReason reason = revCert.getReason();
+        long rt = revCert.getRevocationDate();
+        long rit = revCert.getInvalidityDate();
+        int reason = revCert.getReason();
         X500Name issuer = revCert.getCertificateIssuer();
         if (issuer != null && !issuer.equals(caCert.subject)) {
           throw new ImportCrlException("invalid CRLEntry for certificate number " + serial);
@@ -668,7 +763,7 @@ class ImportCrl {
 
         String sql = null;
         try {
-          if (reason == CrlReason.REMOVE_FROM_CRL) {
+          if (reason == CrlReason.REMOVE_FROM_CRL.getCode()) {
             if (isDeltaCrl) {
               // delete the entry
               sql = SQL_DELETE_CERT;
@@ -681,43 +776,67 @@ class ImportCrl {
             continue;
           }
 
-          Long id = getId(caId, serial);
+          CertInfo existingCertInfo = getCertInfo(caId, serial);
           PreparedStatement ps;
-          int offset = 1;
 
-          if (id == null) {
+          if (existingCertInfo == null) {
             sql = SQL_INSERT_CERT_REV;
-            id = maxId.incrementAndGet();
+            long id = maxId.incrementAndGet();
             ps = psInsertCertRev;
+            int offset = 1;
+
             ps.setLong(offset++, id);
             ps.setInt(offset++, caId);
             ps.setString(offset++, serial.toString(16));
+            ps.setInt(offset++, 1);
+            ps.setInt(offset++, reason);
+            ps.setLong(offset++, rt);
+            if (rit != 0) {
+              ps.setLong(offset++, rit);
+            } else {
+              ps.setNull(offset++, Types.BIGINT);
+            }
+            ps.setLong(offset++, System.currentTimeMillis() / 1000);
+            ps.setInt(offset++, crlInfoId);
           } else {
-            sql = SQL_UPDATE_CERT_REV;
-            ps = psUpdateCertRev;
-          }
+            if (existingCertInfo.isDifferent(revCert, crlInfoId)) {
+              sql = SQL_UPDATE_CERT_REV;
+              ps = psUpdateCertRev;
+              int offset = 1;
 
-          ps.setInt(offset++, 1);
-          ps.setInt(offset++, reason.getCode());
-          ps.setLong(offset++, rt.getTime() / 1000);
-          if (rit != null) {
-            ps.setLong(offset++, rit.getTime() / 1000);
-          } else {
-            ps.setNull(offset++, Types.BIGINT);
-          }
-          ps.setLong(offset++, System.currentTimeMillis() / 1000);
-          ps.setInt(offset++, crlInfoId);
-
-          if (ps == psUpdateCertRev) {
-            ps.setLong(offset++, id);
+              ps.setInt(offset++, 1);
+              ps.setInt(offset++, reason);
+              ps.setLong(offset++, rt);
+              if (rit != 0) {
+                ps.setLong(offset++, rit);
+              } else {
+                ps.setNull(offset++, Types.BIGINT);
+              }
+              ps.setLong(offset++, System.currentTimeMillis() / 1000);
+              ps.setInt(offset++, crlInfoId);
+              ps.setLong(offset++, existingCertInfo.id);
+            } else {
+              sql = SQL_UPDATE_CERT_LUPDATE;
+              ps = psUpdateCertLastupdate;
+              ps.setLong(1, System.currentTimeMillis() / 1000);
+              ps.setLong(2, existingCertInfo.id);
+            }
           }
 
           ps.executeUpdate();
+
+          if (num % sqlBatchCommit == 0) {
+            commit(conn);
+          }
         } catch (SQLException ex) {
           throw datasource.translate(sql, ex);
         }
       }
+
+      LOG.info("imported {} revoked certificates", num);
     }
+
+    commit(conn);
 
     // import the certificates
 
@@ -730,7 +849,9 @@ class ImportCrl {
           new CrlCertSetStreamParser(new ByteArrayInputStream(extnValue));
       CrlCertsIterator crlCerts = crlCertParser.crlCerts();
 
+      int num = 0;
       while (crlCerts.hasNext()) {
+        num++;
         CrlCert crlCert = crlCerts.next();
         BigInteger serialNumber = crlCert.getSerial();
         Certificate cert = crlCert.getCert();
@@ -754,7 +875,14 @@ class ImportCrl {
               + "', serialNumber=" + cert.getSerialNumber() + ")";
           addCertificate(maxId, crlInfoId, caCert, cert, null, certLogId);
         }
+
+        if (num >= sqlBatchCommit) {
+          num = 0;
+          commit(conn);
+        }
       }
+
+      commit(conn);
     } else {
       // cert dirs
       File certsDir = new File(basedir, "certs");
@@ -783,7 +911,9 @@ class ImportCrl {
       });
 
       if (certFiles != null && certFiles.length > 0) {
+        int num = 0;
         for (File certFile : certFiles) {
+          num++;
           Certificate cert;
           try {
             cert = X509Util.parseBcCert(certFile);
@@ -794,7 +924,14 @@ class ImportCrl {
 
           String certLogId = "(file " + certFile.getName() + ")";
           addCertificate(maxId, crlInfoId, caCert, cert, null, certLogId);
+
+          if (num >= sqlBatchCommit) {
+            num = 0;
+            commit(conn);
+          }
         }
+
+        commit(conn);
       }
 
       // import certificate serial numbers
@@ -806,7 +943,9 @@ class ImportCrl {
       });
 
       if (serialNumbersFiles != null && serialNumbersFiles.length > 0) {
+        int num = 0;
         for (File serialNumbersFile : serialNumbersFiles) {
+          num++;
           try (BufferedReader reader = new BufferedReader(new FileReader(serialNumbersFile))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -818,7 +957,14 @@ class ImportCrl {
                 serialNumbersFile.getPath());
             continue;
           }
+
+          if (num >= sqlBatchCommit) {
+            num = 0;
+            commit(conn);
+          }
         }
+
+        commit(conn);
       }
     }
   }
@@ -832,7 +978,7 @@ class ImportCrl {
     }
   }
 
-  private Long getId(int caId, BigInteger serialNumber) throws DataAccessException {
+  private CertInfo getCertInfo(int caId, BigInteger serialNumber) throws DataAccessException {
     ResultSet rs = null;
     try {
       psSelectIdCert.setInt(1, caId);
@@ -841,7 +987,16 @@ class ImportCrl {
       if (!rs.next()) {
         return null;
       }
-      return rs.getLong("ID");
+
+      CertInfo ci = new CertInfo();
+      ci.crlId = rs.getInt("CRL_ID");
+      ci.id = rs.getLong("ID");
+      ci.invalidityTime = rs.getLong("RIT");
+      ci.revocationReason = rs.getInt("RR");
+      ci.revocationTime = rs.getLong("RT");
+      ci.revoked = rs.getBoolean("REV");
+
+      return ci;
     } catch (SQLException ex) {
       throw datasource.translate(sqlSelectIdCert, ex);
     } finally {
@@ -886,24 +1041,18 @@ class ImportCrl {
     } // end if
 
     LOG.info("Importing certificate {}", certLogId);
-    Long id = getId(caId, cert.getSerialNumber().getPositiveValue());
-    boolean tblCertIdExists = (id != null);
+    CertInfo existingCertInfo = getCertInfo(caId, cert.getSerialNumber().getPositiveValue());
 
-    PreparedStatement ps;
-    String sql;
-    // first update the table CERT
-    if (tblCertIdExists) {
-      sql = SQL_UPDATE_CERT;
-      ps = psUpdateCert;
-    } else {
-      sql = SQL_INSERT_CERT;
-      ps = psInsertCert;
-      id = maxId.incrementAndGet();
-    }
+    PreparedStatement ps = null;
+    String sql = null;
 
     try {
-      int offset = 1;
-      if (sql == SQL_INSERT_CERT) {
+      if (existingCertInfo == null) {
+        sql = SQL_INSERT_CERT;
+        ps = psInsertCert;
+
+        long id = maxId.incrementAndGet();
+        int offset = 1;
         ps.setLong(offset++, id);
         // ISSUER ID IID
         ps.setInt(offset++, caId);
@@ -916,22 +1065,44 @@ class ImportCrl {
         // revocation time RT
         ps.setNull(offset++, Types.BIGINT);
         ps.setNull(offset++, Types.BIGINT);
-      }
 
-      // last update LUPDATE
-      ps.setLong(offset++, System.currentTimeMillis() / 1000);
+        // last update LUPDATE
+        ps.setLong(offset++, System.currentTimeMillis() / 1000);
 
-      TBSCertificate tbsCert = cert.getTBSCertificate();
-      // not before NBEFORE
-      ps.setLong(offset++, tbsCert.getStartDate().getDate().getTime() / 1000);
-      // not after NAFTER
-      ps.setLong(offset++, tbsCert.getEndDate().getDate().getTime() / 1000);
-      ps.setInt(offset++, crlInfoId);
+        TBSCertificate tbsCert = cert.getTBSCertificate();
+        // not before NBEFORE
+        ps.setLong(offset++, tbsCert.getStartDate().getDate().getTime() / 1000);
+        // not after NAFTER
+        ps.setLong(offset++, tbsCert.getEndDate().getDate().getTime() / 1000);
+        ps.setInt(offset++, crlInfoId);
 
-      ps.setString(offset++, b64CertHash);
+        ps.setString(offset++, b64CertHash);
+      } else {
+        if (existingCertInfo.revoked || existingCertInfo.crlId != crlInfoId) {
+          sql = SQL_UPDATE_CERT;
+          ps = psUpdateCert;
 
-      if (sql == SQL_UPDATE_CERT) {
-        ps.setLong(offset++, id);
+          int offset = 1;
+          // last update LUPDATE
+          ps.setLong(offset++, System.currentTimeMillis() / 1000);
+
+          TBSCertificate tbsCert = cert.getTBSCertificate();
+          // not before NBEFORE
+          ps.setLong(offset++, tbsCert.getStartDate().getDate().getTime() / 1000);
+          // not after NAFTER
+          ps.setLong(offset++, tbsCert.getEndDate().getDate().getTime() / 1000);
+          ps.setInt(offset++, crlInfoId);
+
+          ps.setString(offset++, b64CertHash);
+          ps.setLong(offset++, existingCertInfo.id);
+        } else {
+          sql = SQL_UPDATE_CERT_LUPDATE;
+          ps = psUpdateCertLastupdate;
+
+          // last update LUPDATE
+          ps.setLong(1, System.currentTimeMillis() / 1000);
+          ps.setLong(2, existingCertInfo.id);
+        }
       }
 
       ps.executeUpdate();
@@ -945,24 +1116,18 @@ class ImportCrl {
   private void addCertificateBySerialNumber(AtomicLong maxId, int caId, int crlInfoId,
       BigInteger serialNumber) throws DataAccessException {
     LOG.info("Importing certificate by serial number {}", serialNumber);
-    Long id = getId(caId, serialNumber);
-    boolean tblCertIdExists = (id != null);
+    CertInfo existingCertInfo = getCertInfo(caId, serialNumber);
 
-    PreparedStatement ps;
-    String sql;
-    // first update the table CERT
-    if (tblCertIdExists) {
-      sql = SQL_UPDATE_CERT;
-      ps = psUpdateCert;
-    } else {
-      sql = SQL_INSERT_CERT;
-      ps = psInsertCert;
-      id = maxId.incrementAndGet();
-    }
+    PreparedStatement ps = null;
+    String sql = null;
 
     try {
-      int offset = 1;
-      if (sql == SQL_INSERT_CERT) {
+      if (existingCertInfo == null) {
+        sql = SQL_INSERT_CERT;
+        ps = psInsertCert;
+        long id = maxId.incrementAndGet();
+        int offset = 1;
+
         ps.setLong(offset++, id);
         // ISSUER ID IID
         ps.setInt(offset++, caId);
@@ -975,20 +1140,39 @@ class ImportCrl {
         // revocation time RT
         ps.setNull(offset++, Types.BIGINT);
         ps.setNull(offset++, Types.BIGINT);
-      }
+        // last update LUPDATE
+        ps.setLong(offset++, System.currentTimeMillis() / 1000);
 
-      // last update LUPDATE
-      ps.setLong(offset++, System.currentTimeMillis() / 1000);
+        // not before NBEFORE, we use the minimal time
+        ps.setLong(offset++, 0);
+        // not after NAFTER, use Long.MAX_VALUE
+        ps.setLong(offset++, Long.MAX_VALUE);
+        ps.setInt(offset++, crlInfoId);
+        ps.setString(offset++, null);
+      } else {
+        if (existingCertInfo.revoked | existingCertInfo.crlId != crlInfoId) {
+          sql = SQL_UPDATE_CERT;
+          ps = psUpdateCert;
 
-      // not before NBEFORE, we use the minimal time
-      ps.setLong(offset++, 0);
-      // not after NAFTER, use Long.MAX_VALUE
-      ps.setLong(offset++, Long.MAX_VALUE);
-      ps.setInt(offset++, crlInfoId);
-      ps.setString(offset++, null);
+          int offset = 1;
+          // last update LUPDATE
+          ps.setLong(offset++, System.currentTimeMillis() / 1000);
 
-      if (sql == SQL_UPDATE_CERT) {
-        ps.setLong(offset++, id);
+          // not before NBEFORE, we use the minimal time
+          ps.setLong(offset++, 0);
+          // not after NAFTER, use Long.MAX_VALUE
+          ps.setLong(offset++, Long.MAX_VALUE);
+          ps.setInt(offset++, crlInfoId);
+          ps.setString(offset++, null);
+          ps.setLong(offset++, existingCertInfo.id);
+        } else {
+          sql = SQL_UPDATE_CERT_LUPDATE;
+          ps = psUpdateCertLastupdate;
+
+          // last update LUPDATE
+          ps.setLong(1, System.currentTimeMillis() / 1000);
+          ps.setLong(2, existingCertInfo.id);
+        }
       }
 
       ps.executeUpdate();
@@ -1024,6 +1208,14 @@ class ImportCrl {
       intvalue *= -1;
     }
     return intvalue;
+  }
+
+  private void commit(Connection conn) throws DataAccessException {
+    try {
+      conn.commit();
+    } catch (SQLException ex) {
+      throw datasource.translate("commit", ex);
+    }
   }
 
   private static String getCrlNameFromDir(File dir) {
