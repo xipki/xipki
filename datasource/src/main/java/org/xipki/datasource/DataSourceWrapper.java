@@ -647,6 +647,19 @@ public abstract class DataSourceWrapper implements Closeable {
   }
 
   public boolean deleteFromTable(Connection conn, String table, String idColumn, long id) {
+    try {
+      deleteFromTableWithException(conn, table, idColumn, id);
+      return true;
+    } catch (Throwable th) {
+      if (LOG.isWarnEnabled()) {
+        LOG.warn("datasource {} could not delete from table {}: {}", name, table, th.getMessage());
+      }
+      return false;
+    }
+  }
+
+  public void deleteFromTableWithException(Connection conn, String table, String idColumn,
+      long id) throws SQLException, DataAccessException {
     Args.notBlank(table, "table");
     Args.notBlank(idColumn, "idColumn");
     final String sql = StringUtil.concat("DELETE FROM ", table, " WHERE ", idColumn,
@@ -656,16 +669,9 @@ public abstract class DataSourceWrapper implements Closeable {
     try {
       stmt = conn == null ? createStatement() : createStatement(conn);
       stmt.execute(sql);
-    } catch (Throwable th) {
-      if (LOG.isWarnEnabled()) {
-        LOG.warn("datasource {} could not delete from table {}: {}", name, table, th.getMessage());
-      }
-      return false;
     } finally {
       releaseResources(stmt, null, conn == null);
     }
-
-    return true;
   }
 
   public boolean columnExists(Connection conn, String table, String column, Object value)

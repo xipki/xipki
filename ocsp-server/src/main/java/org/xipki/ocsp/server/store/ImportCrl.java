@@ -528,7 +528,11 @@ class ImportCrl {
       if (!updateSucc && caCert != null) {
         if (!crlDirInfo.shareCaWithOtherCrl) {
           // try to delete the issuer if there is not certificate associated with it
-          datasource.deleteFromTable(conn, "ISSUER", "ID", caCert.databaseId);
+          try {
+            datasource.deleteFromTableWithException(conn, "ISSUER", "ID", caCert.databaseId);
+          } catch (Throwable th) {
+            LOG.warn("error deleting from table ISSUER for ID {}", caCert.databaseId);
+          }
         }
       }
     }
