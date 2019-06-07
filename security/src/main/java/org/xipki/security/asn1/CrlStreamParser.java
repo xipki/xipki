@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.security;
+package org.xipki.security.asn1;
 
 import java.io.BufferedInputStream;
 import java.io.Closeable;
@@ -48,6 +48,7 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.security.CrlReason;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.SignerUtil;
 import org.xipki.security.util.X509Util;

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.security;
+package org.xipki.security.asn1;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
