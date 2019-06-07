@@ -442,8 +442,9 @@ public class X509Util {
   public static byte[] extractSki(org.bouncycastle.asn1.x509.Certificate cert)
       throws CertificateEncodingException {
     Args.notNull(cert, "cert");
-    return getCoreExtValue(cert.getTBSCertificate().getExtensions(),
+    byte[] coreExtValue = getCoreExtValue(cert.getTBSCertificate().getExtensions(),
         Extension.subjectKeyIdentifier);
+    return ASN1OctetString.getInstance(coreExtValue).getOctets();
   }
 
   public static byte[] extractAki(X509Certificate cert) throws CertificateEncodingException {
