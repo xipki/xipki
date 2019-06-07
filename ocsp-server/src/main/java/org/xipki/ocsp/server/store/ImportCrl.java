@@ -447,7 +447,7 @@ class ImportCrl {
     IoUtil.deleteFile(new File(crlDirInfo.crlDir, "UPDATEME.SUCC"));
     IoUtil.deleteFile(new File(crlDirInfo.crlDir, "UPDATEME.FAIL"));
 
-    Date startTime = new Date();
+    long startTimeSec = System.currentTimeMillis() / 1000;;
 
     int id = crlDirInfo.crlId;
     String crlName = crlDirInfo.crlName;
@@ -590,11 +590,11 @@ class ImportCrl {
             crlDirInfo.shareCaWithOtherCrl, caCert.base64Sha1Fp);
         commit(conn);
 
-        importCrlRevokedCertificates(conn, id, caCert, crl);
+        importCrlRevokedCertificates(conn, id, caCert, crl, startTimeSec);
         commit(conn);
 
         if (!crl.isDeltaCrl()) {
-          deleteEntriesNotUpdatedSince(conn, id, startTime);
+          deleteEntriesNotUpdatedSince(conn, id, startTimeSec);
           commit(conn);
         }
       }
@@ -739,7 +739,8 @@ class ImportCrl {
   }
 
   private void importCrlRevokedCertificates(Connection conn, int crlInfoId, CertWrapper caCert,
-      CrlStreamParser crl) throws DataAccessException, ImportCrlException, IOException {
+      CrlStreamParser crl, long startTimeSec)
+          throws DataAccessException, ImportCrlException, IOException {
     int caId = caCert.databaseId.intValue();
     AtomicLong maxId = new AtomicLong(datasource.getMax(conn, "CERT", "ID"));
 
@@ -750,6 +751,13 @@ class ImportCrl {
       int num = 0;
       while (revokedCertList.hasNext()) {
         num++;
+
+        // If the system time is adjusted to a previous time point during the
+        // import process, System.currentTime...() may be before startTime.
+        // Since all entries in the database whose Last-Update is before
+        // startTime will be deleted, we must ensure that the Last-Update is
+        // not before startTime.
+        long updateTimeSec = Math.max(System.currentTimeMillis() / 1000, startTimeSec);
 
         RevokedCert revCert = revokedCertList.next();
         BigInteger serial = revCert.getSerialNumber();
@@ -796,7 +804,7 @@ class ImportCrl {
             } else {
               ps.setNull(offset++, Types.BIGINT);
             }
-            ps.setLong(offset++, System.currentTimeMillis() / 1000);
+            ps.setLong(offset++, updateTimeSec);
             ps.setInt(offset++, crlInfoId);
           } else {
             if (existingCertInfo.isDifferent(revCert, crlInfoId)) {
@@ -812,13 +820,13 @@ class ImportCrl {
               } else {
                 ps.setNull(offset++, Types.BIGINT);
               }
-              ps.setLong(offset++, System.currentTimeMillis() / 1000);
+              ps.setLong(offset++, updateTimeSec);
               ps.setInt(offset++, crlInfoId);
               ps.setLong(offset++, existingCertInfo.id);
             } else {
               sql = SQL_UPDATE_CERT_LUPDATE;
               ps = psUpdateCertLastupdate;
-              ps.setLong(1, System.currentTimeMillis() / 1000);
+              ps.setLong(1, updateTimeSec);
               ps.setLong(2, existingCertInfo.id);
             }
           }
@@ -1183,11 +1191,10 @@ class ImportCrl {
     LOG.info(" Imported certificate by serial number {}", serialNumber);
   }
 
-  private void deleteEntriesNotUpdatedSince(Connection conn, int crlInfoId, Date time)
+  private void deleteEntriesNotUpdatedSince(Connection conn, int crlInfoId, long timeSec)
       throws DataAccessException {
     // remove the unmodified entries
-    String sql = "DELETE FROM CERT WHERE CRL_ID=" + crlInfoId
-                    + " AND LUPDATE<" + time.getTime() / 1000;
+    String sql = "DELETE FROM CERT WHERE CRL_ID=" + crlInfoId + " AND LUPDATE<" + timeSec;
     Statement stmt = datasource.createStatement(conn);
     try {
       stmt.executeUpdate(sql);
