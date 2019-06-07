@@ -81,6 +81,7 @@ import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.DERTaggedObject;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -161,6 +162,7 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.CompareUtil;
+import org.xipki.util.ConfPairs;
 import org.xipki.util.DateUtil;
 import org.xipki.util.HealthCheckResult;
 import org.xipki.util.LogUtil;
@@ -1000,9 +1002,10 @@ public class X509Ca implements Closeable {
    * Xipki-CrlCertSet ::= SET OF Xipki-CrlCert
    *
    * Xipki-CrlCert ::= SEQUENCE {
-   *         serial          INTEGER
-   *         cert        [0] EXPLICIT    Certificate OPTIONAL
-   *         }
+   *   serial          INTEGER,
+   *   cert        [0] EXPLICIT    Certificate OPTIONAL,
+   *   info        [1] EXPLICIT    UTF8String  OPTIONAL
+   * }
    * </pre>
    */
   private void addXipkiCertset(X509v2CRLBuilder crlBuilder, boolean deltaCrl, CrlControl control,
@@ -1039,6 +1042,15 @@ public class X509Ca implements Closeable {
           }
 
           Certificate cert = Certificate.getInstance(certInfo.getCert().getEncodedCert());
+
+          NameId profileId = certInfo.getProfile();
+          if (profileId != null) {
+            String profileName = profileId.getName();
+            ConfPairs info = new ConfPairs();
+            info.putPair("profile", profileName);
+            vec.add(new DERTaggedObject(1, new DERUTF8String(info.getEncoded())));
+          }
+
           vec.add(new DERTaggedObject(true, 0, cert));
         }
 

@@ -739,7 +739,7 @@ class ImportCrl {
                 LogUtil.formatCsn(serialNumber));
             continue;
           }
-  
+
           if (!serialNumber.equals(cert.getSerialNumber().getValue())) {
             LOG.warn("serialNumber not match (serial={}) in CRL Extension Xipki-CertSet, ignore it",
                 LogUtil.formatCsn(serialNumber));

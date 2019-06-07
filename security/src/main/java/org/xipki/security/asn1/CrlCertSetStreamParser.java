@@ -41,8 +41,9 @@ import org.xipki.util.Args;
  * Xipki-CrlCertSet ::= SET OF Xipki-CrlCert
  *
  * Xipki-CrlCert ::= SEQUENCE {
- *   serial          INTEGER
- *   cert        [0] EXPLICIT    Certificate OPTIONAL
+ *   serial          INTEGER,
+ *   cert        [0] EXPLICIT    Certificate OPTIONAL,
+ *   info        [1] EXPLICIT    UTF8String  OPTIONAL
  * }
  * </pre>
  *
@@ -141,7 +142,7 @@ public class CrlCertSetStreamParser extends Asn1StreamParser {
             break;
         }
       }
-      
+
       next = new CrlCert(serialNumber, cert);
     }
 
@@ -156,9 +157,9 @@ public class CrlCertSetStreamParser extends Asn1StreamParser {
   } // class RevokedCertsIterator
 
   private BufferedInputStream instream;
-  
+
   private int endIndex;
-  
+
   private int offset;
 
   public CrlCertSetStreamParser(InputStream instream) throws IOException {

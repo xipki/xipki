@@ -129,13 +129,13 @@ public class CrlStreamParserTest {
     CrlCertSetStreamParser crlCertParser =
         new CrlCertSetStreamParser(new ByteArrayInputStream(coreExtValue));
     CrlCertsIterator crlCerts = crlCertParser.crlCerts();
-    
+
     int numCrlCerts = 0;
     while (crlCerts.hasNext()) {
       crlCerts.next();
       numCrlCerts++;
     }
-    
+
     Assert.assertEquals("#numCrlCerts", 15, numCrlCerts);
   }
 
