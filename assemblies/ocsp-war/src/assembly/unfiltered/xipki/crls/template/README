@@ -14,6 +14,9 @@
        +-- crl.url (file, optional)
        |     If present, contains a line of the URL to download the CRL.
        |
+       +-- REMOVEME (file, optional)
+       |     Indicates that the CA shall be removed from the database.
+       |
        +-- REVOCATION (file, optional)
        |     If present, it specifies the revocation information of the CA.
        |     An example file is the folder template.

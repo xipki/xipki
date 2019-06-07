@@ -133,11 +133,14 @@ class ImportCrl {
 
     private boolean shareCaWithOtherCrl = false;
 
-    CrlDirInfo(int crlId, String crlName, File crlDir, boolean updateMe) {
+    private boolean deleteMe;
+
+    CrlDirInfo(int crlId, String crlName, File crlDir, boolean updateMe, boolean deleteMe) {
       this.crlId = crlId;
       this.crlName = crlName;
       this.crlDir = crlDir;
       this.updateMe = updateMe;
+      this.deleteMe = deleteMe;
     }
 
   } // class CrlDirInfo
@@ -342,7 +345,8 @@ class ImportCrl {
       }
 
       boolean updateMe = new File(crlDir, "UPDATEME").exists();
-      CrlDirInfo crlDirInfo = new CrlDirInfo(crlId, crlName, crlDir, updateMe);
+      boolean deleteMe = new File(crlDir, "DELETEME").exists();
+      CrlDirInfo crlDirInfo = new CrlDirInfo(crlId, crlName, crlDir, updateMe, deleteMe);
       crlDirInfo.base64Sha1Fp = base64Sha1Fp;
       crlDirInfo.revocationinfo = caRevInfo;
       crlDirInfos.add(crlDirInfo);
@@ -351,8 +355,8 @@ class ImportCrl {
     // pre processing
     for (CrlDirInfo m : crlDirInfos) {
       File crlDir = m.crlDir;
-      if (m.revocationinfo != null) {
-        // make sure that revoked CA is not specified in two different folders
+      if (m.deleteMe || m.revocationinfo != null) {
+        // make sure that CA to be deleted or revoked CA is not specified in two different folders
         for (CrlDirInfo n : crlDirInfos) {
           if (m != n && m.base64Sha1Fp.equals(n.base64Sha1Fp)) {
             LOG.error("{} and {} specify duplicatedly a revoked CA certificate.",
@@ -472,7 +476,7 @@ class ImportCrl {
       CrlStreamParser crl = null;
       CrlInfo crlInfo = null;
 
-      if (crlDirInfo.revocationinfo == null) {
+      if (!crlDirInfo.deleteMe & crlDirInfo.revocationinfo == null) {
         crl = new CrlStreamParser(new File(crlDir, "ca.crl"));
         Date now = new Date();
         if (crl.getNextUpdate() != null && crl.getNextUpdate().before(now)) {
@@ -579,7 +583,12 @@ class ImportCrl {
             crl.getThisUpdate(), crl.getNextUpdate(), crlId);
       }
 
-      importCa(conn, crlDirInfo, caCert);
+      if (crlDirInfo.deleteMe) {
+        deleteCa(conn, crlDirInfo, caCert);
+      } else {
+        importCa(conn, crlDirInfo, caCert);
+      }
+
       commit(conn);
 
       if (crl == null) {
@@ -630,13 +639,42 @@ class ImportCrl {
   }
 
   /**
+   * Delete CA.
+   *
+   * @param conn The database connection.
+   * @param crlDirInfo CRL directory information.
+   * @throws IOException
+   *         If IO error occurs.
+   * @throws DataAccessException
+   *         If database exception occurs.
+   * @throws ImportCrlException
+   *         If other exception occurs.
+   */
+  private void deleteCa(Connection conn, CrlDirInfo crlDirInfo, CertWrapper caCert)
+      throws DataAccessException, ImportCrlException, IOException {
+    Integer issuerId = datasource.getFirstValue(conn, "ISSUER", "ID",
+        "S1C='" + caCert.base64Sha1Fp + "'", Integer.class);
+    if (issuerId == null) {
+      LOG.info("No issuer for CRL {} in the folder {} found in database",
+          crlDirInfo.crlId, crlDirInfo.crlDir.getPath());
+      return;
+    }
+
+    // Delete the table CERT first
+    datasource.deleteFromTable(conn, "CERT", "IID", issuerId.intValue());
+
+    // Delete the table ISSUER
+    datasource.deleteFromTable(conn, "ISSUER", "ID", issuerId.intValue());
+  }
+
+  /**
    * Import the CA certificate with revocation information.
    *
    * @param conn The database connection.
    * @param crlDirInfo CRL directory information.
    * @throws DataAccessException
    *         If database exception occurs.
-   * @throws DataAccessException
+   * @throws IOException
    *         If IO error occurs.
    * @throws ImportCrlException
    *         If other exception occurs.
