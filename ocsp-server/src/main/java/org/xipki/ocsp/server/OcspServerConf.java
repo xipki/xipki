@@ -35,6 +35,7 @@ import org.xipki.util.FileOrBinary;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 import org.xipki.util.Validity;
+import org.xipki.util.Validity.Unit;
 
 import com.alibaba.fastjson.JSON;
 
@@ -408,7 +409,7 @@ public class OcspServerConf extends ValidatableConf {
 
     private DataSourceConf datasource;
 
-    private int validity = 86400;
+    private String validity;
 
     public DataSourceConf getDatasource() {
       return datasource;
@@ -418,12 +419,16 @@ public class OcspServerConf extends ValidatableConf {
       this.datasource = datasource;
     }
 
-    public int getValidity() {
+    public String getValidity() {
       return validity;
     }
 
-    public void setValidity(int validity) {
+    public void setValidity(String validity) {
       this.validity = validity;
+    }
+
+    public Validity validity() {
+      return validity == null ? new Validity(1, Unit.DAY) : Validity.getInstance(validity);
     }
 
     @Override

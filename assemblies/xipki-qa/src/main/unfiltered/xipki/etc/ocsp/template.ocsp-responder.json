@@ -6,7 +6,7 @@
 //				"file":"xipki/etc/ocsp/database/ocsp-cache-db.properties"
 //			}
 //		},
-//		"validity":86400
+//		"validity":"1d"
 //	},
 	"master":true,
 	"unknownIssuerBehaviour":"malformedRequest",

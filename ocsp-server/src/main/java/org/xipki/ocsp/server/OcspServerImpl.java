@@ -434,7 +434,7 @@ public class OcspServerImpl implements OcspServer {
       } finally {
         closeStream(dsStream);
       }
-      responseCacher = new ResponseCacher(datasource, master, cacheType.getValidity());
+      responseCacher = new ResponseCacher(datasource, master, cacheType.validity());
       responseCacher.init();
     }
 

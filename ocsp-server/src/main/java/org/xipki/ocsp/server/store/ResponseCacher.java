@@ -50,6 +50,7 @@ import org.xipki.util.Base64;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
+import org.xipki.util.Validity;
 import org.xipki.util.Args;
 import org.xipki.util.concurrent.ConcurrentBag;
 import org.xipki.util.concurrent.ConcurrentBagEntry;
@@ -128,6 +129,7 @@ public class ResponseCacher implements Closeable {
 
   private final boolean master;
 
+  // validity in seconds
   private final int validity;
 
   private final AtomicBoolean onService;
@@ -142,10 +144,10 @@ public class ResponseCacher implements Closeable {
 
   private ScheduledFuture<?> issuerUpdater;
 
-  public ResponseCacher(DataSourceWrapper datasource, boolean master, int validity) {
+  public ResponseCacher(DataSourceWrapper datasource, boolean master, Validity validity) {
     this.datasource = Args.notNull(datasource, "datasource");
     this.master = master;
-    this.validity = Args.positive(validity, "validity");
+    this.validity = (int) (Args.notNull(validity, "validity").approxMinutes() * 60);
     this.sqlSelectIssuerCert = datasource.buildSelectFirstSql(1, "CERT FROM ISSUER WHERE ID=?");
     this.sqlSelectOcsp = datasource.buildSelectFirstSql(1,
         "IID,IDENT,THIS_UPDATE,NEXT_UPDATE,RESP FROM OCSP WHERE ID=?");
