@@ -80,7 +80,7 @@ public class OcspQa {
   }
 
   public ValidationResult checkOcsp(OCSPResp response, IssuerHash issuerHash,
-      BigInteger serialNumber, byte[] encodedCert, OcspError expectedOcspError,
+      BigInteger serialNumber, byte[] encodedCert,
       OcspCertStatus expectedOcspStatus, OcspResponseOption responseOption,
       Date exptectedRevTime, boolean noSigVerify) {
     List<BigInteger> serialNumbers = new ArrayList<>(1);
@@ -104,13 +104,32 @@ public class OcspQa {
       exptectedRevTimes.put(serialNumber, exptectedRevTime);
     }
 
-    return checkOcsp(response, issuerHash, serialNumbers, encodedCerts, expectedOcspError,
+    return checkOcsp(response, issuerHash, serialNumbers, encodedCerts,
         expectedOcspStatuses, exptectedRevTimes, responseOption, noSigVerify);
+  }
+
+  public ValidationResult checkOcsp(OCSPResp response, OcspError expectedOcspError) {
+    Args.notNull(response, "response");
+    Args.notNull(expectedOcspError, "expectedOcspError");
+
+    List<ValidationIssue> resultIssues = new LinkedList<ValidationIssue>();
+
+    int status = response.getStatus();
+
+    // Response status
+    ValidationIssue issue = new ValidationIssue("OCSP.STATUS", "response.status");
+    resultIssues.add(issue);
+    if (status != expectedOcspError.getStatus()) {
+      issue.setFailureMessage("is '" + Unsuccessful.getStatusText(status) + "', but expected '"
+          + Unsuccessful.getStatusText(expectedOcspError.getStatus()) + "'");
+    }
+
+    return new ValidationResult(resultIssues);
   }
 
   public ValidationResult checkOcsp(OCSPResp response, IssuerHash issuerHash,
       List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts,
-      OcspError expectedOcspError, Map<BigInteger, OcspCertStatus> expectedOcspStatuses,
+      Map<BigInteger, OcspCertStatus> expectedOcspStatuses,
       Map<BigInteger, Date> expectedRevTimes, OcspResponseOption responseOption,
       boolean noSigVerify) {
     Args.notNull(response, "response");
@@ -125,19 +144,9 @@ public class OcspQa {
     // Response status
     ValidationIssue issue = new ValidationIssue("OCSP.STATUS", "response.status");
     resultIssues.add(issue);
-    if (expectedOcspError != null) {
-      if (status != expectedOcspError.getStatus()) {
-        issue.setFailureMessage("is '" + Unsuccessful.getStatusText(status) + "', but expected '"
-            + Unsuccessful.getStatusText(expectedOcspError.getStatus()) + "'");
-      }
-    } else {
-      if (status != 0) {
-        issue.setFailureMessage("is '" + Unsuccessful.getStatusText(status)
-            + "', but expected 'successful'");
-      }
-    }
-
     if (status != 0) {
+      issue.setFailureMessage("is '" + Unsuccessful.getStatusText(status)
+          + "', but expected 'successful'");
       return new ValidationResult(resultIssues);
     }
 

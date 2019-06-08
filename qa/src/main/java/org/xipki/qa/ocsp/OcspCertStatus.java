@@ -39,12 +39,7 @@ public enum OcspCertStatus {
   certificateHold,
   removeFromCRL,
   privilegeWithdrawn,
-  aACompromise,
-  malformedRequest,
-  internalError,
-  tryLater,
-  sigRequired,
-  unauthorized;
+  aACompromise;
 
   public static OcspCertStatus forName(String name) {
     for (OcspCertStatus entry : values()) {

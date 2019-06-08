@@ -447,7 +447,7 @@ public class QaOcspActions {
         responseOption.setCerthashAlgId(AlgorithmUtil.getHashAlg(certhashAlg));
       }
 
-      ValidationResult ret = ocspQa.checkOcsp(response, issuerHash, serialNumber, null, null,
+      ValidationResult ret = ocspQa.checkOcsp(response, issuerHash, serialNumber, null,
           status, responseOption, revTime, noSigVerify.booleanValue());
 
       String validity = ret.isAllSuccessful() ? "valid" : "invalid";
@@ -720,8 +720,14 @@ public class QaOcspActions {
         ocspQa = new OcspQa(securityFactory);
       }
 
-      ValidationResult result = ocspQa.checkOcsp(response, issuerHash, serialNumbers, encodedCerts,
-          expectedOcspError, expectedStatuses, expecteRevTimes, responseOption, noSigVerify);
+      ValidationResult result;
+
+      if (expectedOcspError != null) {
+        result = ocspQa.checkOcsp(response, expectedOcspError);
+      } else {
+        result = ocspQa.checkOcsp(response, issuerHash, serialNumbers, encodedCerts,
+                    expectedStatuses, expecteRevTimes, responseOption, noSigVerify);
+      }
 
       StringBuilder sb = new StringBuilder(50);
       sb.append("OCSP response is ");
