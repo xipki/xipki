@@ -38,6 +38,7 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.Args;
@@ -272,29 +273,34 @@ public static final class ECKeyEntry extends CaEnrollBenchKeyEntry {
 
     public ECKeyEntry(final String curveNameOrOid) throws Exception {
       Args.notNull(curveNameOrOid, "curveNameOrOid");
+      KeyPair keypair;
+      if (EdECConstants.isEdwardsOrMontgemoryCurve(curveNameOrOid)) {
+        keypair = KeyUtil.generateEdECKeypair(curveNameOrOid, null);
+        this.spki = KeyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
+      } else {
+        ASN1ObjectIdentifier curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
+        if (curveOid == null) {
+          throw new IllegalArgumentException("unknown curveNameOrOid '" + curveNameOrOid + "'");
+        }
 
-      ASN1ObjectIdentifier curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
-      if (curveOid == null) {
-        throw new IllegalArgumentException("unknown curveNameOrOid '" + curveNameOrOid + "'");
+        String curveName = AlgorithmUtil.getCurveName(curveOid);
+        if (curveName == null) {
+          curveName = curveOid.getId();
+        }
+
+        AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey,
+            curveOid);
+
+        KeyPairGenerator kpgen = KeyPairGenerator.getInstance("ECDSA", "BC");
+        ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveName);
+        kpgen.initialize(spec);
+        KeyPair kp = kpgen.generateKeyPair();
+
+        ECPublicKey pub = (ECPublicKey) kp.getPublic();
+        int orderBitLength = pub.getParams().getOrder().bitLength();
+        byte[] keyData = KeyUtil.getUncompressedEncodedECPoint(pub.getW(), orderBitLength);
+        spki = new SubjectPublicKeyInfo(algId, keyData);
       }
-
-      String curveName = AlgorithmUtil.getCurveName(curveOid);
-      if (curveName == null) {
-        curveName = curveOid.getId();
-      }
-
-      AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey,
-          curveOid);
-
-      KeyPairGenerator kpgen = KeyPairGenerator.getInstance("ECDSA", "BC");
-      ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveName);
-      kpgen.initialize(spec);
-      KeyPair kp = kpgen.generateKeyPair();
-
-      ECPublicKey pub = (ECPublicKey) kp.getPublic();
-      int orderBitLength = pub.getParams().getOrder().bitLength();
-      byte[] keyData = KeyUtil.getUncompressedEncodedECPoint(pub.getW(), orderBitLength);
-      spki = new SubjectPublicKeyInfo(algId, keyData);
     }
 
     @Override

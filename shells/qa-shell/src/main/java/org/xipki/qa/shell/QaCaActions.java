@@ -252,6 +252,7 @@ public class QaCaActions {
     @Option(name = "--thread", description = "number of threads")
     private Integer numThreads = 5;
 
+    @Completion(value = StringsCompleter.class, values = {"RSA", "EC", "DSA"})
     @Option(name = "--key-type", description = "key type to be requested")
     private String keyType = "RSA";
 
