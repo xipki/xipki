@@ -645,7 +645,7 @@ public class QaCaActions {
 
   @Command(scope = "caqa", name = "neg-caalias-add", description = "add CA alias (negative, QA)")
   @Service
-  public static class NegCaaliasAddA extends CaActions.CaaliasAdd {
+  public static class NegCaaliasAdd extends CaActions.CaaliasAdd {
 
     @Override
     protected Object execute0() throws Exception {
