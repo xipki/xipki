@@ -408,9 +408,13 @@ public class X509Ca implements Closeable {
 
   private static final long MS_PER_10MINUTES = 300000L;
 
+  private static final long MS_PER_HOUR = 60 * MS_PER_MINUTE;
+
   private static final int MINUTE_PER_DAY = 24 * 60;
 
-  private static final long MS_PER_DAY = MS_PER_MINUTE * MINUTE_PER_DAY;
+  private static final long MS_PER_DAY = MINUTE_PER_DAY * MS_PER_MINUTE;
+
+  private static final long MS_PER_WEEK = 7 * MS_PER_DAY;
 
   private static final long MAX_CERT_TIME_MS = 253402300799982L; //9999-12-31-23-59-59
 
@@ -2641,11 +2645,17 @@ public class X509Ca implements Closeable {
     Validity val = caInfo.revokeSuspendedCertsControl().getUnchangedSince();
     long ms;
     switch (val.getUnit()) {
+      case MINUTE:
+        ms = val.getValidity() * MS_PER_MINUTE;
+        break;
+      case HOUR:
+        ms = val.getValidity() * MS_PER_HOUR;
+        break;
       case DAY:
         ms = val.getValidity() * MS_PER_DAY;
         break;
-      case HOUR:
-        ms = val.getValidity() * MS_PER_DAY / 24;
+      case WEEK:
+        ms = val.getValidity() * MS_PER_WEEK;
         break;
       case YEAR:
         ms = val.getValidity() * 365 * MS_PER_DAY;

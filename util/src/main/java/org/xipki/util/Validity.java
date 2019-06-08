@@ -32,6 +32,7 @@ public class Validity implements Comparable<Validity> {
   public enum Unit {
 
     YEAR("y"),
+    WEEK("w"),
     DAY("d"),
     HOUR("h"),
     MINUTE("m");
@@ -53,6 +54,8 @@ public class Validity implements Comparable<Validity> {
   private static final long HOUR = 60L * MINUTE;
 
   private static final long DAY = 24L * HOUR;
+
+  private static final long WEEK = 7L * DAY;
 
   private static final TimeZone TIMEZONE_UTC = TimeZone.getTimeZone("UTC");
 
@@ -78,6 +81,9 @@ public class Validity implements Comparable<Validity> {
     String numValdityS;
     if (suffix == 'y' || suffix == 'Y') {
       unit = Unit.YEAR;
+      numValdityS = validityS.substring(0, len - 1);
+    } else if (suffix == 'w' || suffix == 'W') {
+      unit = Unit.WEEK;
       numValdityS = validityS.substring(0, len - 1);
     } else if (suffix == 'd' || suffix == 'D') {
       unit = Unit.DAY;
@@ -138,6 +144,8 @@ public class Validity implements Comparable<Validity> {
         }
 
         return cal.getTime();
+      case WEEK:
+        return new Date(referenceDate.getTime() + validity * WEEK);
       case DAY:
         return new Date(referenceDate.getTime() + validity * DAY);
       case HOUR:
@@ -154,6 +162,8 @@ public class Validity implements Comparable<Validity> {
     switch (unit) {
       case YEAR:
         return (365L * 24 * validity + 6 * validity) * 60;
+      case WEEK:
+        return 7L * 24 * 60 * validity;
       case DAY:
         return 24L * 60 * validity;
       case HOUR:
@@ -208,6 +218,8 @@ public class Validity implements Comparable<Validity> {
     switch (unit) {
       case YEAR:
         return validity + "y";
+      case WEEK:
+        return validity + "w";
       case DAY:
         return validity + "d";
       case HOUR:
