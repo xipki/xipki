@@ -20,7 +20,7 @@ Just create [issues](https://github.com/xipki/xipki/issues).
 ## Prerequisite
 * OS: Linux, Windows, MacOS
 * JRE / JDK 8 (build 162+), 9, 10, 11
-* Database: DB2, MariaDB, MySQL, Oracle, PostgreSQL
+* Database: DB2, MariaDB, MySQL, Oracle, PostgreSQL, H2, HSQLDB
 
 ## Tested PKCS#11 Devices
 * [Softhsm v1 & v2](https://www.opendnssec.org/download/packages/),
