@@ -41,7 +41,6 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
-import org.xipki.util.TripleState;
 
 /**
  * OCSP request option.
@@ -78,7 +77,7 @@ public class RequestOption {
 
   private final Collection<Integer> versions;
 
-  private final TripleState nonceOccurrence;
+  private final QuadrupleState nonceOccurrence;
 
   private final int nonceMinLen;
 
@@ -191,7 +190,7 @@ public class RequestOption {
     return supportsHttpGet;
   }
 
-  public TripleState getNonceOccurrence() {
+  public QuadrupleState getNonceOccurrence() {
     return nonceOccurrence;
   }
 

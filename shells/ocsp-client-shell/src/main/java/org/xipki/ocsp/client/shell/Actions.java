@@ -411,6 +411,10 @@ public class Actions {
     @Option(name = "--nonce-len", description = "nonce length in octects")
     protected Integer nonceLen;
 
+    @Option(name = "--allow-no-nonce-in-resp",
+        description = "allow response without nonce, only applied if request has nonce.")
+    protected Boolean allowNoNonceInResponse = Boolean.FALSE;
+
     @Option(name = "--hash", description = "hash algorithm name")
     @Completion(Completers.HashAlgCompleter.class)
     protected String hashAlgo = "SHA256";
@@ -427,13 +431,13 @@ public class Actions {
     protected Boolean signRequest = Boolean.FALSE;
 
     protected RequestOptions getRequestOptions() throws Exception {
-      ASN1ObjectIdentifier hashAlgOid = AlgorithmUtil.getHashAlg(hashAlgo);
       RequestOptions options = new RequestOptions();
       options.setUseNonce(usenonce.booleanValue());
       if (nonceLen != null) {
         options.setNonceLen(nonceLen);
       }
-      options.setHashAlgorithmId(hashAlgOid);
+      options.setAllowNoNonceInResponse(allowNoNonceInResponse.booleanValue());
+      options.setHashAlgorithmId(AlgorithmUtil.getHashAlg(hashAlgo));
       options.setSignRequest(signRequest.booleanValue());
       options.setUseHttpGetForRequest(useHttpGetForSmallRequest.booleanValue());
 

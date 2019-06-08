@@ -33,7 +33,6 @@ import org.xipki.security.Securities.KeystoreConf;
 import org.xipki.util.Args;
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.InvalidConfException;
-import org.xipki.util.TripleState;
 import org.xipki.util.ValidatableConf;
 import org.xipki.util.Validity;
 
@@ -85,19 +84,19 @@ public class OcspServerConf extends ValidatableConf {
   public static class Nonce extends ValidatableConf {
 
     /**
-     * valid values are forbidden, optional and required.
+     * valid values are ignore, forbidden, optional and required.
      */
-    private TripleState occurrence;
+    private QuadrupleState occurrence;
 
     private Integer minLen;
 
     private Integer maxLen;
 
-    public TripleState getOccurrence() {
+    public QuadrupleState getOccurrence() {
       return occurrence;
     }
 
-    public void setOccurrence(TripleState occurrence) {
+    public void setOccurrence(QuadrupleState occurrence) {
       this.occurrence = occurrence;
     }
 

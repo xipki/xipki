@@ -226,12 +226,14 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     if (nonce != null) {
       Extension nonceExtn = basicOcspResp.getExtension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
       if (nonceExtn == null) {
-        throw new OcspResponseException.OcspNonceUnmatched(nonce, null);
-      }
-
-      byte[] receivedNonce = nonceExtn.getExtnValue().getOctets();
-      if (!Arrays.equals(nonce, receivedNonce)) {
-        throw new OcspResponseException.OcspNonceUnmatched(nonce, receivedNonce);
+        if (!requestOptions.isAllowNoNonceInResponse()) {
+          throw new OcspResponseException.OcspNonceUnmatched(nonce, null);
+        }
+      } else {
+        byte[] receivedNonce = nonceExtn.getExtnValue().getOctets();
+        if (!Arrays.equals(nonce, receivedNonce)) {
+          throw new OcspResponseException.OcspNonceUnmatched(nonce, receivedNonce);
+        }
       }
     }
 

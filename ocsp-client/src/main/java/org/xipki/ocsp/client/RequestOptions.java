@@ -62,6 +62,8 @@ public class RequestOptions {
 
   private int nonceLen = 8;
 
+  private boolean allowNoNonceInResponse;
+
   private boolean useHttpGetForRequest;
 
   private ASN1ObjectIdentifier hashAlgorithmId = NISTObjectIdentifiers.id_sha256;
@@ -138,6 +140,14 @@ public class RequestOptions {
 
   public void setSignRequest(boolean signRequest) {
     this.signRequest = signRequest;
+  }
+
+  public boolean isAllowNoNonceInResponse() {
+    return allowNoNonceInResponse;
+  }
+
+  public void setAllowNoNonceInResponse(boolean allowNoNonceInResponse) {
+    this.allowNoNonceInResponse = allowNoNonceInResponse;
   }
 
   private static AlgorithmIdentifier createAlgId(String algoName) {

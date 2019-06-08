@@ -108,7 +108,6 @@ import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
 import org.xipki.util.StringUtil;
-import org.xipki.util.TripleState;
 import org.xipki.util.Validity;
 
 import com.alibaba.fastjson.JSON;
@@ -630,24 +629,28 @@ public class OcspServerImpl implements OcspServer {
 
       ExtendedExtension nonceExtn = removeExtension(reqExtensions, OID.ID_PKIX_OCSP_NONCE);
       if (nonceExtn != null) {
-        if (reqOpt.getNonceOccurrence() == TripleState.forbidden) {
+        if (reqOpt.getNonceOccurrence() == QuadrupleState.forbidden) {
           LOG.warn("nonce forbidden, but is present in the request");
           return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
         }
 
-        int len = nonceExtn.getExtnValueLength();
-        int min = reqOpt.getNonceMinLen();
-        int max = reqOpt.getNonceMaxLen();
+        if (reqOpt.getNonceOccurrence() == QuadrupleState.ignore) {
+          nonceExtn = null;
+        } else {
+          int len = nonceExtn.getExtnValueLength();
+          int min = reqOpt.getNonceMinLen();
+          int max = reqOpt.getNonceMaxLen();
 
-        if (len < min || len > max) {
-          LOG.warn("length of nonce {} not within [{},{}]", len, min, max);
-          return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
+          if (len < min || len > max) {
+            LOG.warn("length of nonce {} not within [{},{}]", len, min, max);
+            return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
+          }
+
+          repControl.canCacheInfo = false;
+          respExtensions.add(nonceExtn);
         }
-
-        repControl.canCacheInfo = false;
-        respExtensions.add(nonceExtn);
       } else {
-        if (reqOpt.getNonceOccurrence() == TripleState.required) {
+        if (reqOpt.getNonceOccurrence() == QuadrupleState.required) {
           LOG.warn("nonce required, but is not present in the request");
           return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
         }
