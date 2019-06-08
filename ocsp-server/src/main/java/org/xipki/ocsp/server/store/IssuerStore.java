@@ -36,11 +36,11 @@ import org.xipki.ocsp.api.RequestIssuer;
 
 class IssuerStore {
 
-  private List<IssuerEntry> issuers;
+  private List<IssuerEntry> issuers = new ArrayList<>();
 
-  private Set<Integer> ids;
+  private Set<Integer> ids = Collections.emptySet();
 
-  private Map<Integer, CrlInfo> crlInfos;
+  private Map<Integer, CrlInfo> crlInfos = new HashMap<>();
 
   public IssuerStore() {
   }
@@ -97,6 +97,7 @@ class IssuerStore {
 
   public void addIssuer(IssuerEntry issuer) {
     this.issuers.add(issuer);
+
     Set<Integer> newIds = new HashSet<>(this.ids);
     newIds.add(issuer.getId());
     this.ids = Collections.unmodifiableSet(newIds);

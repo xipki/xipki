@@ -424,12 +424,6 @@ public class ResponseCacher implements Closeable {
         ps = datasource.prepareStatement(SQL_SELECT_ISSUER_ID);
         rs = ps.executeQuery();
 
-        if (master) {
-          // If in master mode, the issuers are always up-to-date. Here just to check
-          // whether the database is accessible
-          return true;
-        }
-
         while (rs.next()) {
           ids.add(rs.getInt("ID"));
         }
