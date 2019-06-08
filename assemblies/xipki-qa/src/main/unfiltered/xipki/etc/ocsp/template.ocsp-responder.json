@@ -9,7 +9,7 @@
 //		"validity":86400
 //	},
 	"master":true,
-	"unknownIssuerBehaviour":"unknown",
+	"unknownIssuerBehaviour":"malformedRequest",
 	"datasources":[{
 		"name":"datasource1",
 		"conf":{
@@ -161,7 +161,7 @@
 //				}
 			}
 		},
-		"unknownCertBehaviour":"unknown"
+		"unknownCertBehaviour":"malformedRequest"
 	}]
 }
 
