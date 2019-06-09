@@ -89,6 +89,8 @@ public class DbCertStatusStore extends OcspStore {
 
   private final AtomicBoolean storeUpdateInProcess = new AtomicBoolean(false);
 
+  private final StoreUpdateService storeUpdateService = new StoreUpdateService();
+
   private String sqlCsNoRit;
 
   private String sqlCs;
@@ -108,7 +110,7 @@ public class DbCertStatusStore extends OcspStore {
   private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
   protected List<Runnable> getScheduledServices() {
-    return Arrays.asList(new StoreUpdateService());
+    return Arrays.asList(storeUpdateService);
   }
 
   protected IssuerStore getIssuerStore() {

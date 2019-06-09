@@ -56,6 +56,8 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
 
   private static final Logger LOG = LoggerFactory.getLogger(CrlDbCertStatusStore.class);
 
+  private final CrlUpdateService storeUpdateService = new CrlUpdateService();
+
   private final AtomicBoolean crlUpdateInProcess = new AtomicBoolean(false);
 
   private String dir;
@@ -121,7 +123,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
 
   @Override
   protected List<Runnable> getScheduledServices() {
-    return Arrays.asList(new CrlUpdateService());
+    return Arrays.asList(storeUpdateService);
   }
 
   @Override

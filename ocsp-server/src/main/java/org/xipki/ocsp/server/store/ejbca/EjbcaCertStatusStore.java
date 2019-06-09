@@ -86,6 +86,8 @@ public class EjbcaCertStatusStore extends OcspStore {
 
   private final HashAlgo certHashAlgo = HashAlgo.SHA1;
 
+  private final StoreUpdateService storeUpdateService = new StoreUpdateService();
+
   private final AtomicBoolean storeUpdateInProcess = new AtomicBoolean(false);
 
   private DataSourceWrapper datasource;
@@ -105,7 +107,7 @@ public class EjbcaCertStatusStore extends OcspStore {
   private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
   protected List<Runnable> getScheduledServices() {
-    return Arrays.asList(new StoreUpdateService());
+    return Arrays.asList(storeUpdateService);
   }
 
   private synchronized void updateIssuerStore() {
