@@ -3,7 +3,7 @@
 See also <https://github.com/xipki/xipki/releases>
 
 ## 5.3.2
-  - Release data: -
+  - Release date: -
 
 ## 5.3.1
   - Release date: June 10, 2019
