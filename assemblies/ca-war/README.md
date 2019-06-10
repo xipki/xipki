@@ -1,4 +1,4 @@
-Deployment in Tomcat
+Deployment in Tomcat 8 and 9
 ----
 - Copy the sub-folders `webapps`, `xipki` and `lib ` to the tomcat root folder
 - Configure the TLS listener in the file `conf/server.xml`
@@ -101,6 +101,19 @@ jetty.sslContext.trustStoreType=PKCS12
 jetty.sslContext.needClientAuth=false
 jetty.sslContext.wantClientAuth=true
 ```
+- For jetty 9.4.15 - 9.4.18
+  There is a bug in these versions, you need to remove the `default="HTTPS"` block from the 
+  line `EndpointIdentificationAlgorithm` in the file `etc/jetty-ssl-context.xml`, namely from
+
+```
+ <Set name="EndpointIdentificationAlgorithm"><Property name="jetty.sslContext.endpointIdentificationAlgorithm" default="HTTPS"/></Set>
+```
+to
+
+```
+ <Set name="EndpointIdentificationAlgorithm"><Property name="jetty.sslContext.endpointIdentificationAlgorithm"/></Set>
+```
+
 - Start jetty
    Start jetty from any folder
 
