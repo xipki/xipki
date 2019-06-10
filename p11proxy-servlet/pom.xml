@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.xipki</groupId>
     <artifactId>xipki-parent</artifactId>
-    <version>5.3.1</version>
+    <version>5.3.2-SNAPSHOT</version>
   </parent>
   <artifactId>p11proxy-servlet</artifactId>
   <packaging>war</packaging>

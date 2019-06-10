@@ -2,8 +2,11 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
+## 5.3.2
+  - Release data: -
+
 ## 5.3.1
-  - Release date: -
+  - Release date: June 10, 2019
   - CA
     - Replace the logging backend logback by log4j2.
     - Reintroduced the support of databases H2 and HSQLDB.
