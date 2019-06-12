@@ -4,6 +4,8 @@ See also <https://github.com/xipki/xipki/releases>
 
 ## 5.3.2
   - Release date: -
+  - CA
+    - Use EXPLICIT tag for the GMT 0015 IdentityCode
 
 ## 5.3.1
   - Release date: June 10, 2019

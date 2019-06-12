@@ -520,10 +520,11 @@ public class ExtensionsChecker {
             if (reqExtnValue instanceof ASN1TaggedObject) {
               ASN1TaggedObject tagged = (ASN1TaggedObject) reqExtnValue;
               tag = tagged.getTagNo();
-              // we also allow the EXPLICIT in request
+              // we allow the EXPLICIT in request
               if (tagged.isExplicit()) {
                 extnStr = ((ASN1String) tagged.getObject()).getString();
               } else {
+                // we also allow the IMPLICIT in request
                 if (tag == 0 || tag == 2) {
                   extnStr = DERPrintableString.getInstance(tagged, false).getString();
                 } else if (tag == 1) {
@@ -548,11 +549,13 @@ public class ExtensionsChecker {
 
           byte[] expected = null;
           if (StringUtil.isNotBlank(extnStr)) {
+            final boolean explicit = true;
             if (tag == 0 || tag == 2) {
               expected =
-                  new DERTaggedObject(false, tag, new DERPrintableString(extnStr)).getEncoded();
+                  new DERTaggedObject(explicit, tag, new DERPrintableString(extnStr)).getEncoded();
             } else if (tag == 1) {
-              expected = new DERTaggedObject(false, tag, new DERUTF8String(extnStr)).getEncoded();
+              expected =
+                  new DERTaggedObject(explicit, tag, new DERUTF8String(extnStr)).getEncoded();
             }
           }
 

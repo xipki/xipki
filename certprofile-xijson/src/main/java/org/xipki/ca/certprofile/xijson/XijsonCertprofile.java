@@ -1726,8 +1726,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     // GMT 0015
     /*
      * In the standard it is not specified whether IMPLICIT or EXPLICIT should
-     * be applied. Compared to tagged definitions in RFC 5280, the IMPLICIT
-     * should be applied.
+     * be applied. The EXPLICIT is used here first.
      *
      * IdentityCode ::= CHOICE {
      *     residenterCardNumber      [0] PrintableString OPTIONAL
@@ -1746,10 +1745,11 @@ public class XijsonCertprofile extends BaseCertprofile {
         if (reqExtnValue instanceof ASN1TaggedObject) {
           ASN1TaggedObject tagged = (ASN1TaggedObject) reqExtnValue;
           tag = tagged.getTagNo();
-          // we also allow the EXPLICIT in request
+          // we allow the EXPLICIT in request
           if (tagged.isExplicit()) {
             extnStr = ((ASN1String) tagged.getObject()).getString();
           } else {
+            // we also allow the IMPLICIT in request
             if (tag == 0 || tag == 2) {
               extnStr = DERPrintableString.getInstance(tagged, false).getString();
             } else if (tag == 1) {
@@ -1774,11 +1774,12 @@ public class XijsonCertprofile extends BaseCertprofile {
 
       // TODO: add the validity check of extnStr
       if (StringUtil.isNotBlank(extnStr)) {
+        final boolean explicit = true;
         ASN1Encodable extnValue = null;
         if (tag == 0 || tag == 2) {
-          extnValue = new DERTaggedObject(false, tag, new DERPrintableString(extnStr));
+          extnValue = new DERTaggedObject(explicit, tag, new DERPrintableString(extnStr));
         } else if (tag == 1) {
-          extnValue = new DERTaggedObject(false, tag, new DERUTF8String(extnStr));
+          extnValue = new DERTaggedObject(explicit, tag, new DERUTF8String(extnStr));
         }
 
         if (extnValue != null) {
