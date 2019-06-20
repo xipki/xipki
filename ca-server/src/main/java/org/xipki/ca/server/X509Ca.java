@@ -30,7 +30,6 @@ import static org.xipki.ca.api.OperationException.ErrorCode.UNKNOWN_CERT_PROFILE
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -67,14 +66,11 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
@@ -154,7 +150,6 @@ import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.X509Cert;
-import org.xipki.security.XiContentSigner;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.RSABrokenKey;
@@ -1975,26 +1970,53 @@ public class X509Ca implements Closeable {
     }
     SignedCertificateTimestampList scts = getCtlogScts(encodedPreCert);
 
+    // remove the precertificate extension
+    certBuilder.removeExtension(Extn.id_precertificate);
+
+    // add the SCTs extension
+    DEROctetString extnValue;
+    try {
+      extnValue = new DEROctetString(
+          new DEROctetString(scts.getEncoded()).getEncoded());
+    } catch (IOException ex) {
+      throw new CertIOException("could not encode SCT extension", ex);
+    }
+    certBuilder.addExtension(new Extension(Extn.id_SCTs, critical, extnValue));
+
+    try {
+      signer0 = gct.signer.borrowSigner();
+    } catch (NoIdleSignerException ex) {
+      throw new OperationException(SYSTEM_FAILURE, ex);
+    }
+
+    try {
+      return certBuilder.build(signer0.value()).toASN1Structure();
+    } finally {
+      // returns the signer after the signing so that it can be used by others
+      gct.signer.requiteSigner(signer0);
+    }
+
+    /* The following is the code block to generate certificate for BouncyCastle <= 1.61.
     ASN1Sequence preTbsCert =
         ASN1Sequence.getInstance(precert.getTBSCertificate().toASN1Primitive());
-    /*
-     * we rebuild the tbsCert so that we get exact structure except the poison
-     * extension precert
-     *
-     * The TBSCertificate object.
-     * TBSCertificate ::= SEQUENCE {
-     *      version          [ 0 ]  Version DEFAULT v1(0),
-     *      serialNumber            CertificateSerialNumber,
-     *      signature               AlgorithmIdentifier,
-     *      issuer                  Name,
-     *      validity                Validity,
-     *      subject                 Name,
-     *      subjectPublicKeyInfo    SubjectPublicKeyInfo,
-     *      issuerUniqueID    [ 1 ] IMPLICIT UniqueIdentifier OPTIONAL,
-     *      subjectUniqueID   [ 2 ] IMPLICIT UniqueIdentifier OPTIONAL,
-     *      extensions        [ 3 ] Extensions OPTIONAL
-     *      }
-     */
+    //
+    // we rebuild the tbsCert so that we get exact structure except the poison
+    // extension precert
+    //
+    // The TBSCertificate object.
+    // TBSCertificate ::= SEQUENCE {
+    //      version          [ 0 ]  Version DEFAULT v1(0),
+    //      serialNumber            CertificateSerialNumber,
+    //      signature               AlgorithmIdentifier,
+    //      issuer                  Name,
+    //      validity                Validity,
+    //      subject                 Name,
+    //      subjectPublicKeyInfo    SubjectPublicKeyInfo,
+    //      issuerUniqueID    [ 1 ] IMPLICIT UniqueIdentifier OPTIONAL,
+    //      subjectUniqueID   [ 2 ] IMPLICIT UniqueIdentifier OPTIONAL,
+    //      extensions        [ 3 ] Extensions OPTIONAL
+    //      }
+    //
 
     ASN1EncodableVector tbsVec = new ASN1EncodableVector();
     // 0: version is always set in v3(2)
@@ -2041,13 +2063,13 @@ public class X509Ca implements Closeable {
         new DERSequence(extnVec)));
 
     ASN1Sequence tbsCert = new DERSequence(tbsVec);
-    /*
-     * Certificate  ::=  SEQUENCE  {
-     *
-     *   tbsCertificate       TBSCertificate,
-     *   signatureAlgorithm   AlgorithmIdentifier,
-     *   signature            BIT STRING  }
-     */
+    //
+    // Certificate  ::=  SEQUENCE  {
+    //
+    //   tbsCertificate       TBSCertificate,
+    //   signatureAlgorithm   AlgorithmIdentifier,
+    //   signature            BIT STRING  }
+    //
 
     try {
       signer0 = gct.signer.borrowSigner();
@@ -2073,7 +2095,7 @@ public class X509Ca implements Closeable {
     }
 
     return Certificate.getInstance(new DERSequence(certVec));
-
+    */
   }
 
   private void adaptGrantedSubejct(GrantedCertTemplate gct) throws OperationException {
