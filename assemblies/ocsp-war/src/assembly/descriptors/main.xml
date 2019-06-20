@@ -67,5 +67,10 @@
       <outputDirectory>xipki/etc/ocsp/database</outputDirectory>
       <fileMode>0644</fileMode>
     </file>
+    <file>
+      <source>${project.build.directory}/xipki/etc/ocsp/example/xipki-ca-db-store/ocsp-responder.json</source>
+      <outputDirectory>xipki/etc/ocsp</outputDirectory>
+      <fileMode>0644</fileMode>
+    </file>
   </files>
 </assembly>

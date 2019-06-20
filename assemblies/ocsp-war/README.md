@@ -1,5 +1,7 @@
 Prepare
 -----
+- The `xipki/etc/ocsp/ocsp-responder.json` is for the OCSP store type `xipki-ca-db`. If you use
+  other type (namely `xipki-db`, `ejbca`, and `crl`), please copy the `ocsp-responder.json` from the sub-folder `xipki/etc/ocsp/example` to replace it. 
 - If you use CRL as OCSP store
     - Initialize the database which will be used to import the CRLs.
       `dbtool/bin/initdb.sh --db-schema xipki/sql/ocsp-init.xml --db-conf <xipki/etc/ocsp/database/ocsp-crl-db.properties`
@@ -43,7 +45,6 @@ mariadb-java-client-*.jar,\
 ocsp-api-*.jar,\
 ocsp-server-*.jar,\
 password-*.jar,\
-pkcs11-constants-*.jar,\
 postgresql-*.jar,\
 scep-client-*.jar,\
 security-*.jar,\
@@ -94,3 +95,10 @@ to
   /path/to/jetty/bin/jetty.sh stop
 ```
 
+After the deployment
+-----
+You can use the openssl command to check whether the OCSP server answers as expected:  
+  `openssl ocsp -VAfile <PEM encoded OCSP signer certificate> -issuer <PEM encoded CA certificate> -url <URL> --serial <hex serial number>`
+  
+e.g.
+  `openssl ocsp -VAfile ocsp-signer.pem -issuer ca.pem -url http://localhost:8080/responder1 -serial 0x123456789abc`
