@@ -19,6 +19,7 @@ package org.xipki.ctlog.dummyserver;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.Base64;
 
@@ -58,23 +59,31 @@ public abstract class CtLogServlet extends HttpServlet {
   }
 
   private String buildEncodedDigitallySigned() throws IOException {
-    ByteArrayOutputStream os = new ByteArrayOutputStream();
-    os.write(4); // Hash Algorithm
-    os.write(3); // Signature Algorithm
-    os.write(new byte[] {0x00, 0x46});
-    os.write(new byte[] {0x30, 0x44});
-    os.write(new byte[] {0x02, 0x20});
     // ECDSA r of 32 bytes
     byte[] r = new byte[32];
     random.nextBytes(r);
-    r[0] = (byte) (0x7F & r[0]);
-    os.write(r);
+    r = new BigInteger(1, r).toByteArray();
 
     // ECDSA s of 32 bytes
-    os.write(new byte[] {0x02, 0x20});
     byte[] s = new byte[32];
     random.nextBytes(s);
-    s[0] = (byte) (0x7F & s[0]);
+    s = new BigInteger(1, s).toByteArray();
+
+    ByteArrayOutputStream os = new ByteArrayOutputStream();
+    os.write(4); // Hash Algorithm
+    os.write(3); // Signature Algorithm
+
+    os.write(0x00);
+    os.write(6 + r.length + s.length);
+    os.write(0x30);
+    os.write(4 + r.length + s.length);
+
+    os.write(0x02);
+    os.write(r.length);
+    os.write(r);
+
+    os.write(0x02);
+    os.write(s.length);
     os.write(s);
 
     byte[] encoded = os.toByteArray();
