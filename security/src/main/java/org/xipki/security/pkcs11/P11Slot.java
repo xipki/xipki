@@ -52,8 +52,8 @@ import org.xipki.util.Hex;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 
-import iaik.pkcs.pkcs11.constants.Functions;
-import iaik.pkcs.pkcs11.constants.PKCS11Constants;
+import iaik.pkcs.pkcs11.wrapper.Functions;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 
 /**
  * PKCS#11 slot.

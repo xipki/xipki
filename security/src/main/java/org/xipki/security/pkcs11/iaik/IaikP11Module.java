@@ -40,7 +40,7 @@ import iaik.pkcs.pkcs11.Module;
 import iaik.pkcs.pkcs11.Slot;
 import iaik.pkcs.pkcs11.SlotInfo;
 import iaik.pkcs.pkcs11.TokenException;
-import iaik.pkcs.pkcs11.constants.PKCS11Constants;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
 
 /**

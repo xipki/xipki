@@ -23,7 +23,7 @@ import java.util.List;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 
-import iaik.pkcs.pkcs11.constants.PKCS11Constants;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 
 /**
  * Configuration of PKCS#11.

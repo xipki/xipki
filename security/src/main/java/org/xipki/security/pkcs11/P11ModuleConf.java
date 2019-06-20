@@ -36,8 +36,8 @@ import org.xipki.util.CollectionUtil;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.StringUtil;
 
-import iaik.pkcs.pkcs11.constants.Functions;
-import iaik.pkcs.pkcs11.constants.PKCS11Constants;
+import iaik.pkcs.pkcs11.wrapper.Functions;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 
 /**
  * Configuration of a PKCS#11 module.

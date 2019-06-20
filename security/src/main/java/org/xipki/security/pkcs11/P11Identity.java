@@ -33,8 +33,8 @@ import org.xipki.security.XiSecurityException;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 
-import iaik.pkcs.pkcs11.constants.Functions;
-import iaik.pkcs.pkcs11.constants.PKCS11Constants;
+import iaik.pkcs.pkcs11.wrapper.Functions;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 
 /**
  * PKCS#11 identity (private key and the corresponding public key and certificates).

@@ -103,8 +103,8 @@ import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 
-import iaik.pkcs.pkcs11.constants.Functions;
-import iaik.pkcs.pkcs11.constants.PKCS11Constants;
+import iaik.pkcs.pkcs11.wrapper.Functions;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
 
 /**

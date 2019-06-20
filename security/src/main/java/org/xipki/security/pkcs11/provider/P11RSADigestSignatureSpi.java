@@ -34,7 +34,7 @@ import org.bouncycastle.crypto.digests.NullDigest;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.pkcs11.P11PrivateKey;
 
-import iaik.pkcs.pkcs11.constants.PKCS11Constants;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 
 /**
  * PKCS#11 RSA {@link SignatureSpi}.

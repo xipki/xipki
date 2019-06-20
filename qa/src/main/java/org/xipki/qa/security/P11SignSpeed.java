@@ -39,7 +39,7 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
 import org.xipki.util.StringUtil;
 
-import iaik.pkcs.pkcs11.constants.PKCS11Constants;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 
 /**
  * Speed test of PKCS#11 signature creation.

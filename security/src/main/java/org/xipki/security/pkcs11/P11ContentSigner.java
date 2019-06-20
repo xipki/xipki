@@ -54,7 +54,7 @@ import org.xipki.security.util.SignerUtil;
 import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
 
-import iaik.pkcs.pkcs11.constants.PKCS11Constants;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 
 /**
  * PKCS#11 {@link XiContentSigner}.

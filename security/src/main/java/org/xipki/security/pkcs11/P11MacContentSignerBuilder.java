@@ -31,7 +31,7 @@ import org.xipki.security.XiSecurityException;
 import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
 
-import iaik.pkcs.pkcs11.constants.PKCS11Constants;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 
 /**
  * Builder to create {@link ConcurrentContentSigner} for PKCS#11 token.

@@ -73,8 +73,6 @@ import iaik.pkcs.pkcs11.Slot;
 import iaik.pkcs.pkcs11.State;
 import iaik.pkcs.pkcs11.Token;
 import iaik.pkcs.pkcs11.TokenException;
-import iaik.pkcs.pkcs11.constants.Functions;
-import iaik.pkcs.pkcs11.constants.PKCS11Constants;
 import iaik.pkcs.pkcs11.objects.Attribute;
 import iaik.pkcs.pkcs11.objects.Certificate.CertificateType;
 import iaik.pkcs.pkcs11.objects.DSAPrivateKey;
@@ -93,10 +91,12 @@ import iaik.pkcs.pkcs11.objects.SecretKey;
 import iaik.pkcs.pkcs11.objects.Storage;
 import iaik.pkcs.pkcs11.objects.ValuedSecretKey;
 import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
-import iaik.pkcs.pkcs11.params.IVParams;
-import iaik.pkcs.pkcs11.params.OpaqueParams;
-import iaik.pkcs.pkcs11.params.Params;
-import iaik.pkcs.pkcs11.params.RSAPkcsPssParams;
+import iaik.pkcs.pkcs11.parameters.InitializationVectorParameters;
+import iaik.pkcs.pkcs11.parameters.OpaqueParameters;
+import iaik.pkcs.pkcs11.parameters.Parameters;
+import iaik.pkcs.pkcs11.parameters.RSAPkcsPssParameters;
+import iaik.pkcs.pkcs11.wrapper.Functions;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
 
 /**
@@ -511,21 +511,21 @@ class IaikP11Slot extends P11Slot {
       return ret;
     }
 
-    Params paramObj;
+    Parameters paramObj;
     if (parameters instanceof P11Params.P11RSAPkcsPssParams) {
       P11Params.P11RSAPkcsPssParams param = (P11Params.P11RSAPkcsPssParams) parameters;
-      paramObj = new RSAPkcsPssParams(Mechanism.get(param.getHashAlgorithm()),
+      paramObj = new RSAPkcsPssParameters(Mechanism.get(param.getHashAlgorithm()),
           param.getMaskGenerationFunction(), param.getSaltLength());
     } else if (parameters instanceof P11Params.P11ByteArrayParams) {
-      paramObj = new OpaqueParams(((P11Params.P11ByteArrayParams) parameters).getBytes());
+      paramObj = new OpaqueParameters(((P11Params.P11ByteArrayParams) parameters).getBytes());
     } else if (parameters instanceof P11Params.P11IVParams) {
-      paramObj = new IVParams(((P11Params.P11IVParams) parameters).getIV());
+      paramObj = new InitializationVectorParameters(((P11Params.P11IVParams) parameters).getIV());
     } else {
       throw new P11TokenException("unknown P11Parameters " + parameters.getClass().getName());
     }
 
     if (paramObj != null) {
-      ret.setParams(paramObj);
+      ret.setParameters(paramObj);
     }
 
     return ret;

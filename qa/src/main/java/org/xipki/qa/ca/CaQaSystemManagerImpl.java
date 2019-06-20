@@ -76,7 +76,6 @@ public class CaQaSystemManagerImpl implements CaQaSystemManager {
     LOG.info("initializing ...");
     initialized.set(false);
     x509IssuerInfoMap.clear();
-    x509IssuerInfoMap.clear();
 
     QaconfType qaConf;
     try {

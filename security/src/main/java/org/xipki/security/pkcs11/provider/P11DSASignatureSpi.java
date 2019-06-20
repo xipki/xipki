@@ -34,7 +34,7 @@ import org.xipki.security.pkcs11.P11PrivateKey;
 import org.xipki.security.pkcs11.P11TokenException;
 import org.xipki.security.util.SignerUtil;
 
-import iaik.pkcs.pkcs11.constants.PKCS11Constants;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 
 /**
  * PKCS#11 DSA {@link SignatureSpi}.
