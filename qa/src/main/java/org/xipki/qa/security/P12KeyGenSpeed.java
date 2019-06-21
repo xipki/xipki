@@ -20,6 +20,7 @@ package org.xipki.qa.security;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.EdECConstants;
@@ -60,19 +61,19 @@ public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
   // CHECKSTYLE:SKIP
   public static class EC extends P12KeyGenSpeed {
 
-    private final String curveOidOrName;
+    private final ASN1ObjectIdentifier curveOid;
 
-    public EC(String curveNameOrOid, SecurityFactory securityFactory) throws Exception {
-      super("PKCS#12 EC key generation\ncurve: " + curveNameOrOid, securityFactory);
-      this.curveOidOrName = curveNameOrOid;
+    public EC(ASN1ObjectIdentifier curveOid, SecurityFactory securityFactory) throws Exception {
+      super("PKCS#12 EC key generation\ncurve: " + curveOid.getId(), securityFactory);
+      this.curveOid = curveOid;
     }
 
     @Override
     protected void generateKeypair(SecureRandom random) throws Exception {
-      if (EdECConstants.isEdwardsOrMontgemoryCurve(curveOidOrName)) {
-        KeyUtil.generateEdECKeypair(curveOidOrName, random);
+      if (EdECConstants.isEdwardsOrMontgomeryCurve(curveOid)) {
+        KeyUtil.generateEdECKeypair(curveOid, random);
       } else {
-        KeyUtil.generateECKeypairForCurveNameOrOid(curveOidOrName, random);
+        KeyUtil.generateECKeypair(curveOid, random);
       }
     }
 

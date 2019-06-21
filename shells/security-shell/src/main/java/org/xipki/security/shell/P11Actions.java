@@ -41,6 +41,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.jcajce.spec.SM2ParameterSpec;
 import org.bouncycastle.util.Arrays;
@@ -341,12 +342,18 @@ public class P11Actions {
       P11NewKeyControl control = getControl();
 
       P11IdentityId identityId;
-      if (EdECConstants.isEdwardsCurve(curveName)) {
-        identityId = slot.generateECEdwardsKeypair(curveName, control);
-      } else if (EdECConstants.isMontgemoryCurve(curveName)) {
-        identityId = slot.generateECMontgomeryKeypair(curveName, control);
+
+      ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(curveName);
+      if (curveOid != null) {
+        if (EdECConstants.isEdwardsCurve(curveOid)) {
+          identityId = slot.generateECEdwardsKeypair(curveOid, control);
+        } else {
+          // Montegomery Curve
+          identityId = slot.generateECMontgomeryKeypair(curveOid, control);
+        }
       } else {
-        identityId = slot.generateECKeypair(curveName, control);
+        curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName);
+        identityId = slot.generateECKeypair(curveOid, control);
       }
 
       finalize("EC", identityId);

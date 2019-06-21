@@ -25,6 +25,7 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.ConcurrentContentSigner;
@@ -34,7 +35,6 @@ import org.xipki.security.SignerConf;
 import org.xipki.security.pkcs12.KeystoreGenerationParameters;
 import org.xipki.security.pkcs12.P12KeyGenerationResult;
 import org.xipki.security.pkcs12.P12KeyGenerator;
-import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.BenchmarkExecutor;
@@ -112,22 +112,22 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
   public static class EC extends P12SignSpeed {
 
     public EC(SecurityFactory securityFactory, String signatureAlgorithm, int threads,
-        String curveNameOrOid) throws Exception {
-      super(securityFactory, signatureAlgorithm, generateKeystore(curveNameOrOid),
-          "PKCS#12 EC signature creation\ncurve: " + curveNameOrOid, threads);
+        ASN1ObjectIdentifier curveOid) throws Exception {
+      super(securityFactory, signatureAlgorithm, generateKeystore(curveOid),
+          "PKCS#12 EC signature creation\ncurve: " + curveOid.getId(), threads);
     }
 
-    private static byte[] generateKeystore(String curveNameOrOid) throws Exception {
-      byte[] keystoreBytes = getPrecomputedECKeystore(curveNameOrOid);
+    private static byte[] generateKeystore(ASN1ObjectIdentifier curveOid) throws Exception {
+      byte[] keystoreBytes = getPrecomputedECKeystore(curveOid);
       if (keystoreBytes == null) {
         KeystoreGenerationParameters params = new KeystoreGenerationParameters(
             PASSWORD.toCharArray());
         params.setRandom(new SecureRandom());
         P12KeyGenerationResult identity;
-        if (EdECConstants.isEdwardsOrMontgemoryCurve(curveNameOrOid)) {
-          identity = new P12KeyGenerator().generateEdECKeypair(curveNameOrOid, params, null);
+        if (EdECConstants.isEdwardsOrMontgomeryCurve(curveOid)) {
+          identity = new P12KeyGenerator().generateEdECKeypair(curveOid, params, null);
         } else {
-          identity = new P12KeyGenerator().generateECKeypair(curveNameOrOid, params, null);
+          identity = new P12KeyGenerator().generateECKeypair(curveOid, params, null);
         }
         keystoreBytes = identity.keystore();
       }
@@ -203,18 +203,18 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
   public static class SM2 extends P12SignSpeed {
 
     public SM2(SecurityFactory securityFactory, int threads) throws Exception {
-      super(securityFactory, "SM3WITHSM2", generateKeystore("sm2p256v1"),
+      super(securityFactory, "SM3WITHSM2", generateKeystore(GMObjectIdentifiers.sm2p256v1),
           "PKCS#12 SM2 signature creation", threads);
     }
 
-    private static byte[] generateKeystore(String curveNameOrOid) throws Exception {
-      byte[] keystoreBytes = getPrecomputedECKeystore(curveNameOrOid);
+    private static byte[] generateKeystore(ASN1ObjectIdentifier curveNOid) throws Exception {
+      byte[] keystoreBytes = getPrecomputedECKeystore(curveNOid);
       if (keystoreBytes == null) {
         KeystoreGenerationParameters params = new KeystoreGenerationParameters(
             PASSWORD.toCharArray());
         params.setRandom(new SecureRandom());
         P12KeyGenerationResult identity = new P12KeyGenerator().generateECKeypair(
-            curveNameOrOid, params, null);
+            curveNOid, params, null);
         keystoreBytes = identity.keystore();
       }
       return keystoreBytes;
@@ -292,13 +292,9 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
   }
 
   // CHECKSTYLE:SKIP
-  protected static byte[] getPrecomputedECKeystore(String curveNamOrOid) throws IOException {
-    ASN1ObjectIdentifier oid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNamOrOid);
-    if (oid == null) {
-      return null;
-    }
-
-    return getPrecomputedKeystore("ec-" + oid.getId() + ".p12");
+  protected static byte[] getPrecomputedECKeystore(ASN1ObjectIdentifier curveOid)
+      throws IOException {
+    return getPrecomputedKeystore("ec-" + curveOid.getId() + ".p12");
   }
 
   private static byte[] getPrecomputedKeystore(String filename) throws IOException {

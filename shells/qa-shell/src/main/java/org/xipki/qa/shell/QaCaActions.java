@@ -33,6 +33,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.apache.karaf.shell.support.completers.StringsCompleter;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
@@ -63,6 +64,8 @@ import org.xipki.qa.ca.CaEnrollBenchmark;
 import org.xipki.qa.ca.CaQaSystemManager;
 import org.xipki.qa.ca.CertprofileQa;
 import org.xipki.qa.ca.IssuerInfo;
+import org.xipki.security.EdECConstants;
+import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
@@ -297,7 +300,11 @@ public class QaCaActions {
 
       CaEnrollBenchKeyEntry keyEntry;
       if ("EC".equalsIgnoreCase(keyType)) {
-        keyEntry = new ECKeyEntry(curveName);
+        ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(curveName);
+        if (curveOid == null) {
+          curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName);
+        }
+        keyEntry = new ECKeyEntry(curveOid);
       } else if ("RSA".equalsIgnoreCase(keyType)) {
         keyEntry = new RSAKeyEntry(keysize.intValue());
       } else if ("DSA".equalsIgnoreCase(keyType)) {

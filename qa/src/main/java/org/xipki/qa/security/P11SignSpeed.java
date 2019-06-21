@@ -21,6 +21,7 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.ConcurrentContentSigner;
@@ -83,25 +84,25 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
   public static class EC extends P11SignSpeed {
 
     public EC(SecurityFactory securityFactory, P11Slot slot, byte[] keyId,
-        String signatureAlgorithm, int threads, String curveNameOrOid) throws Exception {
-      this(false, securityFactory, slot, keyId, null, signatureAlgorithm, threads, curveNameOrOid);
+        String signatureAlgorithm, int threads, ASN1ObjectIdentifier curveOid) throws Exception {
+      this(false, securityFactory, slot, keyId, null, signatureAlgorithm, threads, curveOid);
     }
 
     public EC(boolean keyPresent, SecurityFactory securityFactory, P11Slot slot,
         byte[] keyId, String keyLabel, String signatureAlgorithm, int threads,
-        String curveNameOrOid) throws Exception {
+        ASN1ObjectIdentifier curveOid) throws Exception {
       super(securityFactory, slot, signatureAlgorithm, !keyPresent,
-          generateKey(keyPresent, slot, keyId, keyLabel, curveNameOrOid),
-          "PKCS#11 EC signature creation\ncurve: " + curveNameOrOid, threads);
+          generateKey(keyPresent, slot, keyId, keyLabel, curveOid),
+          "PKCS#11 EC signature creation\ncurve: " + curveOid, threads);
     }
 
     private static P11ObjectIdentifier generateKey(boolean keyPresent, P11Slot slot, byte[] keyId,
-        String keyLabel, String curveNameOrOid) throws Exception {
+        String keyLabel, ASN1ObjectIdentifier curveOid) throws Exception {
       if (keyPresent) {
         return getNonNullKeyId(slot, keyId, keyLabel);
       }
 
-      return slot.generateECKeypair(curveNameOrOid, getNewKeyControl(keyId, keyLabel)).getKeyId();
+      return slot.generateECKeypair(curveOid, getNewKeyControl(keyId, keyLabel)).getKeyId();
     }
 
   }

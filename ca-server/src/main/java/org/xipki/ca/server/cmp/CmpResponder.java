@@ -1743,7 +1743,7 @@ public class CmpResponder extends BaseCmpResponder {
 
           ASN1ObjectIdentifier keyAlgOid = spki.getAlgorithm().getAlgorithm();
           kaKeyAndCert = dhpocControl.getKeyCertPair(isn.getName(),
-              isn.getSerialNumber().getValue(), EdECConstants.getKeyAlgNameForKeyAlg(keyAlgOid));
+              isn.getSerialNumber().getValue(), EdECConstants.getName(keyAlgOid));
         }
 
         if (kaKeyAndCert == null) {

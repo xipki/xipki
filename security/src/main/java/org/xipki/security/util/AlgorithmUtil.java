@@ -420,8 +420,8 @@ public class AlgorithmUtil {
       addOidNameMap(m1, m2, NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512,
           "SHA3-512WITHRSA", "RSAWITHSHA3-512");
       addOidNameMap(m1, m2, GMObjectIdentifiers.sm2sign_with_sm3, "SM3WITHSM2", "SM2WITHSM3");
-      addOidNameMap(m1, m2, EdECConstants.id_Ed25519, EdECConstants.ALG_Ed25519);
-      addOidNameMap(m1, m2, EdECConstants.id_Ed448, EdECConstants.ALG_Ed448);
+      addOidNameMap(m1, m2, EdECConstants.id_Ed25519, EdECConstants.Ed25519);
+      addOidNameMap(m1, m2, EdECConstants.id_Ed448, EdECConstants.Ed448);
 
       // DH-Poc
       addOidNameMap(m1, m2, Xipki.id_alg_dhPop_x25519_sha256, "DHPOP-X25519-SHA256");
@@ -601,9 +601,9 @@ public class AlgorithmUtil {
         return getDSASigAlgId(hashAlgo);
       } else if (pubKey instanceof EdDSAKey) {
         String keyAlgo = pubKey.getAlgorithm();
-        if (keyAlgo.equalsIgnoreCase(EdECConstants.ALG_Ed25519)) {
+        if (keyAlgo.equalsIgnoreCase(EdECConstants.Ed25519)) {
           return new AlgorithmIdentifier(EdECConstants.id_Ed25519);
-        } else if (keyAlgo.equalsIgnoreCase(EdECConstants.ALG_Ed448)) {
+        } else if (keyAlgo.equalsIgnoreCase(EdECConstants.Ed448)) {
           return new AlgorithmIdentifier(EdECConstants.id_Ed448);
         } else {
           throw new NoSuchAlgorithmException("Unknown Edwards public key " + keyAlgo);

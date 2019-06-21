@@ -60,9 +60,9 @@ import org.bouncycastle.operator.bc.BcRSAContentSignerBuilder;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignatureSigner;
-import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 
 /**
  * PKCS#12 key generator.
@@ -131,13 +131,9 @@ public class P12KeyGenerator {
   }
 
   // CHECKSTYLE:SKIP
-  public P12KeyGenerationResult generateECKeypair(String curveNameOrOid,
+  public P12KeyGenerationResult generateECKeypair(ASN1ObjectIdentifier curveOid,
       KeystoreGenerationParameters params, String selfSignedCertSubject) throws Exception {
-    ASN1ObjectIdentifier curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
-    if (curveOid == null) {
-      throw new IllegalArgumentException("invalid curveNameOrOid '" + curveNameOrOid + "'");
-    }
-
+    Args.notNull(curveOid, "curveOid");
     KeyPair keypair = KeyUtil.generateECKeypair(curveOid, params.getRandom());
     AlgorithmIdentifier algId = new AlgorithmIdentifier(
         X9ObjectIdentifiers.id_ecPublicKey, curveOid);
@@ -152,12 +148,13 @@ public class P12KeyGenerator {
   }
 
   // CHECKSTYLE:SKIP
-  public P12KeyGenerationResult generateEdECKeypair(String curveName,
+  public P12KeyGenerationResult generateEdECKeypair(ASN1ObjectIdentifier curveOid,
       KeystoreGenerationParameters params, String selfSignedCertSubject) throws Exception {
-    if (!EdECConstants.isEdwardsOrMontgemoryCurve(curveName)) {
-      throw new IllegalArgumentException("invalid curveName " + curveName);
+    Args.notNull(curveOid, "curveOid");
+    if (!EdECConstants.isEdwardsOrMontgomeryCurve(curveOid)) {
+      throw new IllegalArgumentException("invalid EdDSA curve  " + curveOid.getId());
     }
-    KeyPair keypair = KeyUtil.generateEdECKeypair(curveName, params.getRandom());
+    KeyPair keypair = KeyUtil.generateEdECKeypair(curveOid, params.getRandom());
     SubjectPublicKeyInfo subjectPublicKeyInfo =
         KeyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
 
@@ -294,24 +291,24 @@ public class P12KeyGenerator {
           buildAlgId(hashAlgo.getOid()));
     } else if (key instanceof EdDSAKey) {
       String algorithm = key.getAlgorithm();
-      ASN1ObjectIdentifier keyId = EdECConstants.getKeyAlgIdForKeyAlgName(algorithm);
-      if (keyId == null) {
+      ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(algorithm);
+      if (curveOid == null || !EdECConstants.isEdwardsCurve(curveOid)) {
         throw new InvalidKeyException("unknown EdDSA key algorithm " + algorithm);
       }
       Signature signer = Signature.getInstance("EdDSA", "BC");
 
-      return new SignatureSigner(new AlgorithmIdentifier(keyId), signer, key);
+      return new SignatureSigner(new AlgorithmIdentifier(curveOid), signer, key);
     } else if (key instanceof XDHKey) {
       String algorithm = key.getAlgorithm();
-      ASN1ObjectIdentifier curveId = EdECConstants.getKeyAlgIdForKeyAlgName(algorithm);
-      if (curveId == null) {
-        throw new InvalidKeyException("unknown EdDSA key algorithm " + algorithm);
+      ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(algorithm);
+      if (curveOid == null || !EdECConstants.isMontgomeryCurve(curveOid)) {
+        throw new InvalidKeyException("unknown XDH key algorithm " + algorithm);
       }
       Signature signer = Signature.getInstance("EdDSA", "BC");
 
       // Just dummy: signature created by the signKey cannot be verified by the public key.
       PrivateKey signKey = KeyUtil.convertXDHToDummyEdDSAPrivateKey(key);
-      return new SignatureSigner(new AlgorithmIdentifier(curveId), signer, signKey);
+      return new SignatureSigner(new AlgorithmIdentifier(curveOid), signer, signKey);
     } else {
       throw new IllegalArgumentException("unknown type of key " + key.getClass().getName());
     }

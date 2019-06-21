@@ -782,10 +782,10 @@ public class ObjectIdentifiers {
       oidNameMap.put(XKU.id_kp_macAppStoreInstallerPackageSigning,
           "Apple Mac AppStore Installer Package Signing");
 
-      oidNameMap.put(EdECConstants.id_Ed25519, EdECConstants.ALG_Ed25519);
-      oidNameMap.put(EdECConstants.id_Ed448, EdECConstants.ALG_Ed448);
-      oidNameMap.put(EdECConstants.id_X25519, EdECConstants.ALG_X25519);
-      oidNameMap.put(EdECConstants.id_X448, EdECConstants.ALG_X448);
+      oidNameMap.put(EdECConstants.id_Ed25519, EdECConstants.Ed25519);
+      oidNameMap.put(EdECConstants.id_Ed448, EdECConstants.Ed448);
+      oidNameMap.put(EdECConstants.id_X25519, EdECConstants.X25519);
+      oidNameMap.put(EdECConstants.id_X448, EdECConstants.X448);
     }
   }
 

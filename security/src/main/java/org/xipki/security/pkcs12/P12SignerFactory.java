@@ -33,6 +33,7 @@ import java.util.Set;
 
 import javax.crypto.NoSuchPaddingException;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
@@ -145,7 +146,9 @@ public class P12SignerFactory implements SignerFactory {
         KeypairWithCert keypairWithCert = KeypairWithCert.fromKeystore(
             type, keystoreStream, password, keyLabel, password, certificateChain);
         String publicKeyAlg = keypairWithCert.getPublicKey().getAlgorithm();
-        if (EdECConstants.isMontgemoryCurveKeyAlgName(publicKeyAlg)) {
+
+        ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(publicKeyAlg);
+        if (curveOid != null && EdECConstants.isMontgomeryCurve(curveOid)) {
           X509Certificate peerCert = null;
           // peer certificate is needed
           List<X509Certificate> peerCerts = conf.getPeerCertificates();

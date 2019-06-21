@@ -255,9 +255,8 @@ public abstract class BaseCertprofile extends Certprofile {
     }
 
     // Edwards and Montgomery public keys
-    String curveName = EdECConstants.getCurveForKeyAlgId(keyType);
-    if (curveName != null) {
-      int expectedKeyBitSize = EdECConstants.getPublicKeyByteSizeForCurve(curveName);
+    if (EdECConstants.isEdwardsOrMontgomeryCurve(keyType)) {
+      int expectedKeyBitSize = EdECConstants.getPublicKeyByteSize(keyType);
       if (expectedKeyBitSize > 0) {
         int keyBitSize = publicKey.getPublicKeyData().getOctets().length;
         if (keyBitSize != expectedKeyBitSize) {

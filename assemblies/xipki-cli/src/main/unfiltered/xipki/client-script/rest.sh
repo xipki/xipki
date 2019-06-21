@@ -4,7 +4,7 @@
 CA_URL="https://localhost:8443/ca/rest/myca"
 echo "CA URL: ${CA_URL}"
 
-OCSP_URL="http://localhost:8080/ocsp/responder1"
+OCSP_URL="http://localhost:8080/ocsp/"
 
 echo "OCSP URL: ${OCSP_URL}"
 

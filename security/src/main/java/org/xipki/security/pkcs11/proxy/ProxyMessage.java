@@ -42,20 +42,19 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.Arrays;
 import org.xipki.security.BadAsn1ObjectException;
+import org.xipki.security.pkcs11.P11IdentityId;
+import org.xipki.security.pkcs11.P11ObjectIdentifier;
+import org.xipki.security.pkcs11.P11Params.P11RSAPkcsPssParams;
 import org.xipki.security.pkcs11.P11Slot.P11KeyUsage;
 import org.xipki.security.pkcs11.P11Slot.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11Slot.P11NewObjectControl;
-import org.xipki.security.pkcs11.P11IdentityId;
-import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
-import org.xipki.security.pkcs11.P11Params.P11RSAPkcsPssParams;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.StringUtil;
@@ -407,7 +406,7 @@ public abstract class ProxyMessage extends ASN1Object {
    * GenECKeypairParams ::= SEQUENCE {
    *     slotId               P11SlotIdentifier,
    *     control              NewKeyControl,
-   *     String               CurveName }
+   *     ASN1ObjectIdentifier CurveOid }
    * </pre>
    */
   // CHECKSTYLE:SKIP
@@ -417,13 +416,13 @@ public abstract class ProxyMessage extends ASN1Object {
 
     private final P11NewKeyControl control;
 
-    private final String curveName;
+    private final ASN1ObjectIdentifier curveOid;
 
     public GenECEdwardsOrMontgomeryKeypairParams(P11SlotIdentifier slotId,
-        P11NewKeyControl control, String curveName) {
+        P11NewKeyControl control, ASN1ObjectIdentifier curveOid) {
       this.slotId = Args.notNull(slotId, "slotId");
       this.control = Args.notNull(control, "control");
-      this.curveName = Args.notBlank(curveName, "curveName");
+      this.curveOid = Args.notNull(curveOid, "curveOid");
     }
 
     private GenECEdwardsOrMontgomeryKeypairParams(ASN1Sequence seq) throws BadAsn1ObjectException {
@@ -431,7 +430,7 @@ public abstract class ProxyMessage extends ASN1Object {
       int idx = 0;
       slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getValue();
       control = NewKeyControl.getInstance(seq.getObjectAt(idx++)).getControl();
-      curveName = DERPrintableString.getInstance(seq.getObjectAt(idx++)).getString();
+      curveOid = ASN1ObjectIdentifier.getInstance(seq.getObjectAt(idx++));
     }
 
     public static GenECEdwardsOrMontgomeryKeypairParams getInstance(Object obj)
@@ -458,7 +457,7 @@ public abstract class ProxyMessage extends ASN1Object {
       ASN1EncodableVector vector = new ASN1EncodableVector();
       vector.add(new SlotIdentifier(slotId));
       vector.add(new NewKeyControl(control));
-      vector.add(new DERPrintableString(curveName));
+      vector.add(curveOid);
       return new DERSequence(vector);
     }
 
@@ -470,8 +469,8 @@ public abstract class ProxyMessage extends ASN1Object {
       return control;
     }
 
-    public String getCurveName() {
-      return curveName;
+    public ASN1ObjectIdentifier getCurveOid() {
+      return curveOid;
     }
 
   }

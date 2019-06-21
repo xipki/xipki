@@ -96,7 +96,7 @@ class PrivateKeyCryptor {
     } else if (X9ObjectIdentifiers.id_ecPublicKey.equals(keyAlgOid)) {
       algoName = "EC";
     } else {
-      algoName = EdECConstants.getKeyAlgNameForKeyAlg(keyAlg);
+      algoName = EdECConstants.getName(keyAlg.getAlgorithm());
     }
 
     if (algoName == null) {

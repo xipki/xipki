@@ -144,10 +144,10 @@ public class P12XdhMacContentSignerBuilder {
 
   private void init(PrivateKey privateKey, X509Certificate peerCert) throws XiSecurityException {
     String algorithm = privateKey.getAlgorithm();
-    if (EdECConstants.ALG_X25519.equalsIgnoreCase(algorithm)) {
+    if (EdECConstants.X25519.equalsIgnoreCase(algorithm)) {
       this.algId = new AlgorithmIdentifier(Xipki.id_alg_dhPop_x25519_sha256);
       this.hash = HashAlgo.SHA256;
-    } else if (EdECConstants.ALG_X448.equalsIgnoreCase(algorithm)) {
+    } else if (EdECConstants.X448.equalsIgnoreCase(algorithm)) {
       this.algId = new AlgorithmIdentifier(Xipki.id_alg_dhPop_x448_sha512);
       this.hash = HashAlgo.SHA512;
     } else {

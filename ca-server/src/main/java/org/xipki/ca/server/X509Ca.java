@@ -2346,7 +2346,7 @@ public class X509Ca implements Closeable {
         } else if (kg instanceof KeypairGenControl.EDDSAKeypairGenControl) {
           KeypairGenControl.EDDSAKeypairGenControl tkg =
               (KeypairGenControl.EDDSAKeypairGenControl) kg;
-          KeyPair kp = KeyUtil.generateEdECKeypair(tkg.getCurveName(), random);
+          KeyPair kp = KeyUtil.generateEdECKeypair(tkg.getKeyAlgorithm().getAlgorithm(), random);
           grantedPublicKeyInfo = KeyUtil.createSubjectPublicKeyInfo(kp.getPublic());
           // make sure that the algorithm match
           if (!grantedPublicKeyInfo.getAlgorithm().equals(tkg.getKeyAlgorithm())) {

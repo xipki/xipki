@@ -132,11 +132,11 @@ public class XiXDHContentVerifierProvider implements ContentVerifierProvider {
     String keyAlgName = verifyKey.getAlgorithm();
 
     HashAlgo hash;
-    if (EdECConstants.ALG_X25519.equalsIgnoreCase(keyAlgName)) {
+    if (EdECConstants.X25519.equalsIgnoreCase(keyAlgName)) {
       this.sigAlgOid = Xipki.id_alg_dhPop_x25519_sha256;
       this.hmacAlgoithm = "HMAC-SHA256";
       hash = HashAlgo.SHA256;
-    } else if (EdECConstants.ALG_X448.equalsIgnoreCase(keyAlgName)) {
+    } else if (EdECConstants.X448.equalsIgnoreCase(keyAlgName)) {
       this.sigAlgOid = Xipki.id_alg_dhPop_x448_sha512;
       this.hmacAlgoithm = "HMAC-SHA512";
       hash = HashAlgo.SHA512;

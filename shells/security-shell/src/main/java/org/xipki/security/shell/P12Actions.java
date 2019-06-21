@@ -42,6 +42,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.EdECConstants;
@@ -55,6 +56,7 @@ import org.xipki.security.pkcs12.P12KeyGenerationResult;
 import org.xipki.security.pkcs12.P12KeyGenerator;
 import org.xipki.security.shell.Actions.CsrGenAction;
 import org.xipki.security.shell.Actions.SecurityAction;
+import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
@@ -200,8 +202,8 @@ public class P12Actions {
     private void assertMatch(KeyStore ks, X509Certificate cert, String password)
         throws Exception {
       String keyAlgName = cert.getPublicKey().getAlgorithm();
-      if (EdECConstants.ALG_X25519.equalsIgnoreCase(keyAlgName)
-          || EdECConstants.ALG_X448.equalsIgnoreCase(keyAlgName)) {
+      if (EdECConstants.X25519.equalsIgnoreCase(keyAlgName)
+          || EdECConstants.X448.equalsIgnoreCase(keyAlgName)) {
         // cannot be checked via creating dummy signature, just compare the public keys
         char[] pwd = password.toCharArray();
         KeypairWithCert kp = KeypairWithCert.fromKeystore(ks, null, pwd, (X509Certificate[]) null);
@@ -334,10 +336,13 @@ public class P12Actions {
       P12KeyGenerator keyGen = new P12KeyGenerator();
       KeystoreGenerationParameters keyGenParams = getKeyGenParameters();
       P12KeyGenerationResult keypair;
-      if (EdECConstants.isEdwardsOrMontgemoryCurve(curveName)) {
-        keypair = keyGen.generateEdECKeypair(curveName, keyGenParams, subject);
+
+      ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(curveName);
+      if (curveOid != null) {
+        keypair = keyGen.generateEdECKeypair(curveOid, keyGenParams, subject);
       } else {
-        keypair = new P12KeyGenerator().generateECKeypair(curveName, keyGenParams, subject);
+        curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName);
+        keypair = new P12KeyGenerator().generateECKeypair(curveOid, keyGenParams, subject);
       }
       saveKey(keypair);
 
@@ -452,7 +457,7 @@ public class P12Actions {
     @Override
     protected Object execute0() throws Exception {
       P12KeyGenerationResult keypair = new P12KeyGenerator().generateECKeypair(
-          GMObjectIdentifiers.sm2p256v1.getId(), getKeyGenParameters(), subject);
+          GMObjectIdentifiers.sm2p256v1, getKeyGenParameters(), subject);
       saveKey(keypair);
 
       return null;

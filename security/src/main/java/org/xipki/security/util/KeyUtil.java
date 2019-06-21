@@ -183,26 +183,14 @@ public class KeyUtil {
   }
 
   // CHECKSTYLE:SKIP
-  public static KeyPair generateECKeypairForCurveNameOrOid(String curveNameOrOid,
-      SecureRandom random) throws NoSuchAlgorithmException, NoSuchProviderException,
-        InvalidAlgorithmParameterException {
-    ASN1ObjectIdentifier oid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
-    if (oid == null) {
-      throw new IllegalArgumentException("invalid curveNameOrOid '" + curveNameOrOid + "'");
-    }
-    return generateECKeypair(oid, random);
-  }
-
-  // CHECKSTYLE:SKIP
-  public static KeyPair generateEdECKeypair(String curveName, SecureRandom random)
+  public static KeyPair generateEdECKeypair(ASN1ObjectIdentifier curveId, SecureRandom random)
       throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
-    Args.notBlank(curveName, "curveName");
-
-    String algorithm = EdECConstants.getKeyAlgNameForCurve(curveName);
+    Args.notNull(curveId, "curveId");
+    String algorithm = EdECConstants.getName(curveId);
     KeyPairGenerator kpGen = getKeyPairGenerator(algorithm);
     synchronized (kpGen) {
       if (random != null) {
-        kpGen.initialize(EdECConstants.getKeyBitSizeForCurve(curveName), random);
+        kpGen.initialize(EdECConstants.getKeyBitSize(curveId), random);
       }
       return kpGen.generateKeyPair();
     }
@@ -239,10 +227,10 @@ public class KeyUtil {
 
       try {
         PrivateKeyInfo edPki;
-        if (xdhAlgo.equalsIgnoreCase(EdECConstants.ALG_X25519)) {
+        if (xdhAlgo.equalsIgnoreCase(EdECConstants.X25519)) {
           edPki = new PrivateKeyInfo(
               new AlgorithmIdentifier(EdECConstants.id_Ed25519), xdhPki.parsePrivateKey());
-        } else if (xdhAlgo.equalsIgnoreCase(EdECConstants.ALG_X448)) {
+        } else if (xdhAlgo.equalsIgnoreCase(EdECConstants.X448)) {
           byte[] x448Octets = ASN1OctetString.getInstance(xdhPki.parsePrivateKey()).getOctets();
           byte[] ed448Octets = new byte[57];
           System.arraycopy(x448Octets, 0, ed448Octets, 0, 56);
@@ -324,7 +312,7 @@ public class KeyUtil {
     } else if (X9ObjectIdentifiers.id_ecPublicKey.equals(aid)) {
       algorithm = "EC";
     } else {
-      algorithm = EdECConstants.getKeyAlgNameForKeyAlg(pkInfo.getAlgorithm());
+      algorithm = EdECConstants.getName(pkInfo.getAlgorithm().getAlgorithm());
     }
 
     if (algorithm == null) {
@@ -389,13 +377,13 @@ public class KeyUtil {
     } else if (key instanceof XDHKey || key instanceof EdDSAKey) {
       byte[] encoded = key.getEncoded();
       String algorithm = key.getAlgorithm();
-      if (EdECConstants.ALG_X25519.equalsIgnoreCase(algorithm)) {
+      if (EdECConstants.X25519.equalsIgnoreCase(algorithm)) {
         return new X25519PublicKeyParameters(encoded, encoded.length - 32);
-      } else if (EdECConstants.ALG_Ed25519.equalsIgnoreCase(algorithm)) {
+      } else if (EdECConstants.Ed25519.equalsIgnoreCase(algorithm)) {
         return new Ed25519PublicKeyParameters(encoded, encoded.length - 32);
-      } else if (EdECConstants.ALG_X448.equalsIgnoreCase(algorithm)) {
+      } else if (EdECConstants.X448.equalsIgnoreCase(algorithm)) {
         return new X448PublicKeyParameters(encoded, encoded.length - 56);
-      } else if (EdECConstants.ALG_Ed448.equalsIgnoreCase(algorithm)) {
+      } else if (EdECConstants.Ed448.equalsIgnoreCase(algorithm)) {
         return new Ed448PublicKeyParameters(encoded, encoded.length - 57);
       } else {
         throw new InvalidKeyException("unknown Edwards key " + algorithm);
@@ -472,19 +460,19 @@ public class KeyUtil {
       int keysize;
       byte[] prefix;
       ASN1ObjectIdentifier algOid;
-      if (EdECConstants.ALG_Ed25519.equalsIgnoreCase(algorithm)) {
+      if (EdECConstants.Ed25519.equalsIgnoreCase(algorithm)) {
         algOid = EdECConstants.id_Ed25519;
         keysize = 32;
         prefix = Ed25519Prefix;
-      } else if (EdECConstants.ALG_X25519.equalsIgnoreCase(algorithm)) {
+      } else if (EdECConstants.X25519.equalsIgnoreCase(algorithm)) {
         algOid = EdECConstants.id_X25519;
         keysize = 32;
         prefix = x25519Prefix;
-      } else if (EdECConstants.ALG_Ed448.equalsIgnoreCase(algorithm)) {
+      } else if (EdECConstants.Ed448.equalsIgnoreCase(algorithm)) {
         algOid = EdECConstants.id_Ed448;
         keysize = 57;
         prefix = Ed448Prefix;
-      } else if (EdECConstants.ALG_X448.equalsIgnoreCase(algorithm)) {
+      } else if (EdECConstants.X448.equalsIgnoreCase(algorithm)) {
         algOid = EdECConstants.id_X448;
         keysize = 56;
         prefix = x448Prefix;

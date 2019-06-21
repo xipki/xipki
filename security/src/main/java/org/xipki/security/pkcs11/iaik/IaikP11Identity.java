@@ -23,6 +23,9 @@ import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
+import org.bouncycastle.jcajce.interfaces.EdDSAKey;
+import org.bouncycastle.jcajce.interfaces.XDHKey;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.pkcs11.P11Identity;
 import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11Params;
@@ -64,8 +67,21 @@ class IaikP11Identity extends P11Identity {
       expectedSignatureLen = (keyBitLen + 7) / 8 * 2;
     } else if (publicKey instanceof DSAPublicKey) {
       expectedSignatureLen = (keyBitLen + 7) / 8 * 2;
+    } else if (publicKey instanceof EdDSAKey) {
+      String algName = publicKey.getAlgorithm();
+      if (EdECConstants.Ed25519.equalsIgnoreCase(algName)) {
+        expectedSignatureLen = 64;
+      } else if (EdECConstants.Ed25519.equalsIgnoreCase(algName)) {
+        expectedSignatureLen = 114;
+      } else {
+        throw new IllegalArgumentException("unknown EdDSA algorithm " + algName);
+      }
+    } else if (publicKey instanceof XDHKey) {
+      // no signature is supported
+      expectedSignatureLen = 0;
     } else {
-      throw new IllegalArgumentException("currently only RSA, DSA and EC public key are supported,"
+      throw new IllegalArgumentException(
+          "currently only RSA, DSA, EC, EdDSA and XDH public key are supported,"
           + " but not " + this.publicKey.getAlgorithm()
           + " (class: " + publicKey.getClass().getName() + ")");
     }

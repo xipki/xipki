@@ -26,6 +26,8 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.qa.security.P11KeyGenSpeed;
@@ -315,7 +317,8 @@ public class QaSecurityActions {
         return null;
       }
 
-      return new P11KeyGenSpeed.EC(getSlot(), getKeyId(), control.curveName());
+      ASN1ObjectIdentifier curveOid = getCurveOid(control.curveName());
+      return new P11KeyGenSpeed.EC(getSlot(), getKeyId(), curveOid);
     }
 
     protected int getNumThreads(int numThreads) {
@@ -349,7 +352,7 @@ public class QaSecurityActions {
       }
 
       return new P11SignSpeed.EC(securityFactory, getSlot(), getKeyId(), sigAlgo, getNumThreads(),
-          control.curveName());
+          AlgorithmUtil.getCurveOidForCurveNameOrOid(control.curveName));
     }
 
   }
@@ -513,7 +516,8 @@ public class QaSecurityActions {
 
     @Override
     protected BenchmarkExecutor getTester() throws Exception {
-      return new P11KeyGenSpeed.EC(getSlot(), getKeyId(), curveName);
+      ASN1ObjectIdentifier curveOid = getCurveOid(curveName);
+      return new P11KeyGenSpeed.EC(getSlot(), getKeyId(), curveOid);
     }
 
     @Override
@@ -539,7 +543,7 @@ public class QaSecurityActions {
     @Override
     protected BenchmarkExecutor getTester() throws Exception {
       return new P11SignSpeed.EC(keyPresent, securityFactory, getSlot(), getKeyId(), keyLabel,
-          sigAlgo, getNumThreads(), curveName);
+          sigAlgo, getNumThreads(), AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName));
     }
 
   }
@@ -555,7 +559,8 @@ public class QaSecurityActions {
 
     @Override
     protected BenchmarkExecutor getTester() throws Exception {
-      return new P11KeyGenSpeed.EC(getSlot(), getKeyId(), curveName);
+      ASN1ObjectIdentifier curveOid = getCurveOid(curveName);
+      return new P11KeyGenSpeed.EC(getSlot(), getKeyId(), curveOid);
     }
 
     @Override
@@ -576,17 +581,13 @@ public class QaSecurityActions {
 
     @Override
     protected BenchmarkExecutor getTester() throws Exception {
-      String curveName;
-      if (EdECConstants.ALG_Ed25519.equalsIgnoreCase(sigAlgo)) {
-        curveName = EdECConstants.edwards25519;
-      } else if (EdECConstants.ALG_Ed448.equalsIgnoreCase(sigAlgo)) {
-        curveName = EdECConstants.edwards448;
-      } else {
+      ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(sigAlgo);
+      if (curveOid == null) {
         throw new IllegalCmdParamException("invalid sigAlgo " + sigAlgo);
       }
 
       return new P11SignSpeed.EC(keyPresent, securityFactory, getSlot(), getKeyId(), keyLabel,
-          sigAlgo, getNumThreads(), curveName);
+          sigAlgo, getNumThreads(), curveOid);
     }
 
   }
@@ -763,7 +764,8 @@ public class QaSecurityActions {
     @Override
     protected BenchmarkExecutor nextTester() throws Exception {
       KeyControl.EC control = queue.poll();
-      return (control == null) ? null : new P12KeyGenSpeed.EC(control.curveName(), securityFactory);
+      ASN1ObjectIdentifier curveOid = getCurveOid(control.curveName());
+      return (control == null) ? null : new P12KeyGenSpeed.EC(curveOid, securityFactory);
     }
 
   }
@@ -785,7 +787,8 @@ public class QaSecurityActions {
     protected BenchmarkExecutor nextTester() throws Exception {
       KeyControl.EC control = queue.poll();
       return (control == null) ? null
-          : new P12SignSpeed.EC(securityFactory, sigAlgo, getNumThreads(), control.curveName());
+          : new P12SignSpeed.EC(securityFactory, sigAlgo, getNumThreads(),
+                  getCurveOid(control.curveName()));
     }
 
   }
@@ -920,7 +923,7 @@ public class QaSecurityActions {
 
     @Override
     protected BenchmarkExecutor getTester() throws Exception {
-      return new P12KeyGenSpeed.EC(curveName, securityFactory);
+      return new P12KeyGenSpeed.EC(getCurveOid(curveName), securityFactory);
     }
 
   }
@@ -940,7 +943,8 @@ public class QaSecurityActions {
 
     @Override
     protected BenchmarkExecutor getTester() throws Exception {
-      return new P12SignSpeed.EC(securityFactory, sigAlgo, getNumThreads(), curveName);
+      return new P12SignSpeed.EC(securityFactory, sigAlgo, getNumThreads(),
+          getCurveOid(curveName));
     }
 
   }
@@ -956,7 +960,7 @@ public class QaSecurityActions {
 
     @Override
     protected BenchmarkExecutor getTester() throws Exception {
-      return new P12KeyGenSpeed.EC(curveName, securityFactory);
+      return new P12KeyGenSpeed.EC(getCurveOid(curveName), securityFactory);
     }
 
   }
@@ -972,16 +976,8 @@ public class QaSecurityActions {
 
     @Override
     protected BenchmarkExecutor getTester() throws Exception {
-      String curveName;
-      if (EdECConstants.ALG_Ed25519.equalsIgnoreCase(sigAlgo)) {
-        curveName = EdECConstants.edwards25519;
-      } else if (EdECConstants.ALG_Ed448.equalsIgnoreCase(sigAlgo)) {
-        curveName = EdECConstants.edwards448;
-      } else {
-        throw new IllegalCmdParamException("invalid sigAlgo " + sigAlgo);
-      }
-
-      return new P12SignSpeed.EC(securityFactory, sigAlgo, getNumThreads(), curveName);
+      ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(sigAlgo);
+      return new P12SignSpeed.EC(securityFactory, sigAlgo, getNumThreads(), curveOid);
     }
 
   }
@@ -1054,7 +1050,7 @@ public class QaSecurityActions {
 
     @Override
     protected BenchmarkExecutor getTester() throws Exception {
-      return new P12KeyGenSpeed.EC("sm2p256v1", securityFactory);
+      return new P12KeyGenSpeed.EC(GMObjectIdentifiers.sm2p256v1, securityFactory);
     }
 
   }
@@ -1069,6 +1065,18 @@ public class QaSecurityActions {
       return new P12SignSpeed.SM2(securityFactory, getNumThreads());
     }
 
+  }
+
+  private static ASN1ObjectIdentifier getCurveOid(String curveName) {
+    ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(curveName);
+    if (curveOid == null) {
+      curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName);
+    }
+
+    if (curveOid == null) {
+      throw new IllegalArgumentException("unknown curveName " + curveName);
+    }
+    return curveOid;
   }
 
 }

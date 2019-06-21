@@ -197,7 +197,7 @@ public class CaUtil {
         ASN1ObjectIdentifier keyOid = csr.getCertificationRequestInfo().getSubjectPublicKeyInfo()
                                         .getAlgorithm().getAlgorithm();
         kaKeyAndCert = dhpocControl.getKeyCertPair(isn.getName(), isn.getSerialNumber().getValue(),
-            EdECConstants.getKeyAlgNameForKeyAlg(keyOid));
+            EdECConstants.getName(keyOid));
       }
 
       if (kaKeyAndCert == null) {

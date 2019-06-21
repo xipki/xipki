@@ -37,7 +37,7 @@
 		"mode":"RFC6960",
 		"request":"request1",
 		"response":"response1",
-		"servletPaths":["/responder1"],
+		"servletPaths":["/"],
 		"signer":"signer1",
 		"stores":["store1"]
 	}],

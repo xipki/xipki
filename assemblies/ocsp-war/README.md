@@ -101,4 +101,4 @@ You can use the openssl command to check whether the OCSP server answers as expe
   `openssl ocsp -VAfile <PEM encoded OCSP signer certificate> -issuer <PEM encoded CA certificate> -url <URL> --serial <hex serial number>`
   
 e.g.
-  `openssl ocsp -VAfile ocsp-signer.pem -issuer ca.pem -url http://localhost:8080/responder1 -serial 0x123456789abc`
+  `openssl ocsp -VAfile ocsp-signer.pem -issuer ca.pem -url http://localhost:8080/ocsp/ -serial 0x123456789abc`

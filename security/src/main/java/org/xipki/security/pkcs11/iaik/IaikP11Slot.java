@@ -37,7 +37,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.ECNamedCurveTable;
@@ -865,27 +864,16 @@ class IaikP11Slot extends P11Slot {
           ecP11Key.getEcPoint().getByteArrayValue()).getOctets();
 
       if (keyType == KeyType.EC_EDWARDS || keyType == KeyType.EC_MONTGOMERY) {
-        String curveName = DERPrintableString.getInstance(ecParameters).getString();
-
-        ASN1ObjectIdentifier algOid;
+        ASN1ObjectIdentifier algOid = ASN1ObjectIdentifier.getInstance(ecParameters);
         if (keyType == KeyType.EC_EDWARDS) {
-          if (EdECConstants.edwards25519.equalsIgnoreCase(curveName)) {
-            algOid = EdECConstants.id_Ed25519;
-          } else if (EdECConstants.edwards448.equalsIgnoreCase(curveName)) {
-            algOid = EdECConstants.id_Ed448;
-          } else {
-            throw new XiSecurityException("unknown edwards curveName " + curveName);
+          if (!EdECConstants.isEdwardsCurve(algOid)) {
+            throw new XiSecurityException("unknown Edwards curve OID " + algOid);
           }
         } else {
-          if (EdECConstants.curve25519.equalsIgnoreCase(curveName)) {
-            algOid = EdECConstants.id_X25519;
-          } else if (EdECConstants.edwards448.equalsIgnoreCase(curveName)) {
-            algOid = EdECConstants.id_X448;
-          } else {
-            throw new XiSecurityException("unknown montgmoery curveName " + curveName);
+          if (!EdECConstants.isMontgomeryCurve(algOid)) {
+            throw new XiSecurityException("unknown Montgomery curve OID " + algOid);
           }
         }
-
         SubjectPublicKeyInfo pkInfo = new SubjectPublicKeyInfo(new AlgorithmIdentifier(algOid),
             encodedPoint);
         try {
@@ -1260,42 +1248,40 @@ class IaikP11Slot extends P11Slot {
   }
 
   @Override
-  protected P11Identity generateECEdwardsKeypair0(String curveName, P11NewKeyControl control)
-      throws P11TokenException {
+  protected P11Identity generateECEdwardsKeypair0(ASN1ObjectIdentifier curveId,
+      P11NewKeyControl control) throws P11TokenException {
     long mech = PKCS11Constants.CKM_EC_EDWARDS_KEY_PAIR_GEN;
     assertMechanismSupported(mech);
 
     ECPrivateKey privateKey = new ECPrivateKey(KeyType.EC_EDWARDS);
     ECPublicKey publicKey = new ECPublicKey(KeyType.EC_EDWARDS);
     setKeyAttributes(control, publicKey, privateKey);
-    byte[] encodedCurveName;
+    byte[] encodedCurveId;
     try {
-      encodedCurveName = new DERPrintableString(curveName).getEncoded();
+      encodedCurveId = curveId.getEncoded();
     } catch (IOException ex) {
       throw new P11TokenException(ex.getMessage(), ex);
     }
-
-    publicKey.getEcdsaParams().setByteArrayValue(encodedCurveName);
+    publicKey.getEcdsaParams().setByteArrayValue(encodedCurveId);
     return generateKeyPair(mech, control.getId(), privateKey, publicKey);
   }
 
   @Override
-  protected P11Identity generateECMontgomeryKeypair0(String curveName, P11NewKeyControl control)
-      throws P11TokenException {
+  protected P11Identity generateECMontgomeryKeypair0(ASN1ObjectIdentifier curveId,
+      P11NewKeyControl control) throws P11TokenException {
     long mech = PKCS11Constants.CKM_EC_MONTGOMERY_KEY_PAIR_GEN;
     assertMechanismSupported(mech);
 
     ECPrivateKey privateKey = new ECPrivateKey(KeyType.EC_MONTGOMERY);
     ECPublicKey publicKey = new ECPublicKey(KeyType.EC_MONTGOMERY);
     setKeyAttributes(control, publicKey, privateKey);
-    byte[] encodedCurveName;
+    byte[] encodedCurveId;
     try {
-      encodedCurveName = new DERPrintableString(curveName).getEncoded();
+      encodedCurveId = curveId.getEncoded();
     } catch (IOException ex) {
       throw new P11TokenException(ex.getMessage(), ex);
     }
-
-    publicKey.getEcdsaParams().setByteArrayValue(encodedCurveName);
+    publicKey.getEcdsaParams().setByteArrayValue(encodedCurveId);
     return generateKeyPair(mech, control.getId(), privateKey, publicKey);
   }
 

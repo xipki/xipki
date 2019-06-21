@@ -847,7 +847,7 @@ public class X509Util {
         throw new InvalidKeySpecException("keyParameters is not an OBJECT IDENTIFIER");
       }
       return publicKeyInfo;
-    } else if (EdECConstants.isEdwardsOrMontgemoryCurveKeyAlgId(algOid)) {
+    } else if (EdECConstants.isEdwardsOrMontgomeryCurve(algOid)) {
       if (keyParameters == null) {
         return publicKeyInfo;
       } else {

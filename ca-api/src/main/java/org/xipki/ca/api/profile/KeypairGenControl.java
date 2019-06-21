@@ -26,7 +26,6 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.DSAParameter;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
-import org.xipki.security.EdECConstants;
 import org.xipki.security.util.DSAParameterCache;
 import org.xipki.util.Args;
 
@@ -182,20 +181,12 @@ public class KeypairGenControl {
 
     private final AlgorithmIdentifier keyAlgorithm;
 
-    private final String curveName;
-
     public EDDSAKeypairGenControl(ASN1ObjectIdentifier keyAlgorithmOid) {
       this.keyAlgorithm = new AlgorithmIdentifier(Args.notNull(keyAlgorithmOid, "keyAlgorithmOid"));
-      this.curveName = EdECConstants.getCurveForKeyAlgId(keyAlgorithmOid);
-      Args.notNull(curveName, "curveName");
     }
 
     public AlgorithmIdentifier getKeyAlgorithm() {
       return keyAlgorithm;
-    }
-
-    public String getCurveName() {
-      return curveName;
     }
 
   }

@@ -58,7 +58,7 @@ public class XiEdDSAContentVerifierProvider implements ContentVerifierProvider {
 
     private EdDSAContentVerifier(AlgorithmIdentifier algId, PublicKey verifyKey) {
       this.algId = algId;
-      this.algorithm = EdECConstants.getKeyAlgNameForKeyAlg(algId);
+      this.algorithm = EdECConstants.getName(algId.getAlgorithm());
       this.outstream = new ByteArrayOutputStream();
       this.verifyKey = verifyKey;
     }

@@ -222,7 +222,7 @@ public class P11ProxyResponder {
               ProxyMessage.GenECKeypairParams.getInstance(content);
           P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());
           P11IdentityId identityId = slot.generateECKeypair(
-              asn1.getCurveId().getId(), asn1.getControl());
+              asn1.getCurveId(), asn1.getControl());
           ASN1Object obj = new ProxyMessage.IdentityId(identityId);
           return getSuccessResp(version, transactionId, action, obj);
         }
@@ -231,7 +231,7 @@ public class P11ProxyResponder {
               ProxyMessage.GenECEdwardsOrMontgomeryKeypairParams.getInstance(content);
           P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());
           P11IdentityId identityId = slot.generateECEdwardsKeypair(
-              asn1.getCurveName(), asn1.getControl());
+              asn1.getCurveOid(), asn1.getControl());
           ASN1Object obj = new ProxyMessage.IdentityId(identityId);
           return getSuccessResp(version, transactionId, action, obj);
         }
@@ -240,7 +240,7 @@ public class P11ProxyResponder {
               ProxyMessage.GenECEdwardsOrMontgomeryKeypairParams.getInstance(content);
           P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());
           P11IdentityId identityId = slot.generateECMontgomeryKeypair(
-              asn1.getCurveName(), asn1.getControl());
+              asn1.getCurveOid(), asn1.getControl());
           ASN1Object obj = new ProxyMessage.IdentityId(identityId);
           return getSuccessResp(version, transactionId, action, obj);
         }

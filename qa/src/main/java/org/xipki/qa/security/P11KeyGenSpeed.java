@@ -20,6 +20,7 @@ package org.xipki.qa.security;
 import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.pkcs11.P11IdentityId;
@@ -61,16 +62,16 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
   //CHECKSTYLE:SKIP
   public static class EC extends P11KeyGenSpeed {
 
-    private final String curveNameOrOid;
+    private final ASN1ObjectIdentifier curveOid;
 
-    public EC(P11Slot slot, byte[] id, String curveNameOrOid) throws Exception {
-      super(slot, id, "PKCS#11 EC key generation\ncurve: " + curveNameOrOid);
-      this.curveNameOrOid = Args.notNull(curveNameOrOid, "curveNameOrOid");
+    public EC(P11Slot slot, byte[] id, ASN1ObjectIdentifier curveOid) throws Exception {
+      super(slot, id, "PKCS#11 EC key generation\ncurve: " + curveOid.getId());
+      this.curveOid = Args.notNull(curveOid, "curveOid");
     }
 
     @Override
     protected void genKeypair() throws Exception {
-      P11IdentityId objId = slot.generateECKeypair(curveNameOrOid, getControl());
+      P11IdentityId objId = slot.generateECKeypair(curveOid, getControl());
       slot.removeIdentity(objId);
     }
 

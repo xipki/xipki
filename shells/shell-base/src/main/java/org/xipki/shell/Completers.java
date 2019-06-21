@@ -87,7 +87,7 @@ public class Completers {
           "sect283r1", "sect409k1", "sect409r1", "sect571k1", "sect571r1", "sm2p256v1",
           "wapip192v1",
           // Montgomery curves and Edwards curves
-          "curve25519", "curve448", "edwards25519", "edwards448");
+          "ed25519", "ed448", "x25519", "x448");
     }
   }
 
@@ -96,7 +96,7 @@ public class Completers {
   public static class EdCurveNameCompleter extends EnumCompleter {
 
     public EdCurveNameCompleter() {
-      setTokens("curve25519", "curve448", "edwards25519", "edwards448");
+      setTokens("ed25519", "ed448", "x25519", "x448");
     }
   }
 

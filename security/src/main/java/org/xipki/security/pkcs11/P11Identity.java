@@ -28,7 +28,6 @@ import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.jcajce.interfaces.XDHKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.EdECConstants;
 import org.xipki.security.XiSecurityException;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
@@ -87,13 +86,8 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     } else if (this.publicKey instanceof DSAPublicKey) {
       signatureKeyBitLength = ((DSAPublicKey) this.publicKey).getParams().getQ().bitLength();
     } else if (this.publicKey instanceof EdDSAKey) {
-      String algorithm = this.publicKey.getAlgorithm();
-      if (EdECConstants.ALG_Ed25519.equalsIgnoreCase(algorithm)) {
-        signatureKeyBitLength = 64;
-      } else {
-        throw new IllegalArgumentException("currently only " + EdECConstants.ALG_Ed25519
-            + " curve is supported, but not " + algorithm);
-      }
+      // will not be used
+      signatureKeyBitLength = 0;
     } else if (this.publicKey instanceof XDHKey) {
       // no signature is supported
       signatureKeyBitLength = 0;

@@ -67,8 +67,7 @@ public class P11PrivateKey implements PrivateKey {
       keysize = ((ECPublicKey) publicKey).getParams().getCurve().getField().getFieldSize();
     } else if (publicKey instanceof EdDSAKey) {
       algorithm = publicKey.getAlgorithm();
-      String curveName = EdECConstants.getCurveForKeyAlgName(algorithm);
-      keysize = EdECConstants.getKeyBitSizeForCurve(curveName);
+      keysize = EdECConstants.getKeyBitSize(EdECConstants.getCurveOid(algorithm));
     } else {
       throw new P11TokenException("unknown public key: " + publicKey);
     }

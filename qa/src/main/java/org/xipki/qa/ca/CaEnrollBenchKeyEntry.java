@@ -271,18 +271,14 @@ public static final class ECKeyEntry extends CaEnrollBenchKeyEntry {
 
     private final SubjectPublicKeyInfo spki;
 
-    public ECKeyEntry(final String curveNameOrOid) throws Exception {
-      Args.notNull(curveNameOrOid, "curveNameOrOid");
+    public ECKeyEntry(final ASN1ObjectIdentifier curveOid) throws Exception {
+      Args.notNull(curveOid, "curveOid");
       KeyPair keypair;
-      if (EdECConstants.isEdwardsOrMontgemoryCurve(curveNameOrOid)) {
-        keypair = KeyUtil.generateEdECKeypair(curveNameOrOid, null);
+
+      if (EdECConstants.isEdwardsOrMontgomeryCurve(curveOid)) {
+        keypair = KeyUtil.generateEdECKeypair(curveOid, null);
         this.spki = KeyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
       } else {
-        ASN1ObjectIdentifier curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
-        if (curveOid == null) {
-          throw new IllegalArgumentException("unknown curveNameOrOid '" + curveNameOrOid + "'");
-        }
-
         String curveName = AlgorithmUtil.getCurveName(curveOid);
         if (curveName == null) {
           curveName = curveOid.getId();

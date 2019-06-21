@@ -44,7 +44,6 @@ import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.pkcs11.P11ModuleConf.P11MechanismFilter;
-import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.DSAParameterCache;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
@@ -361,8 +360,8 @@ public abstract class P11Slot implements Closeable {
   /**
    * Generates an EC Edwards keypair.
    *
-   * @param curveName
-   *         curveName of the curve. Must not be {@code null}.
+   * @param curveId
+   *         Object Identifier of the curve. Must not be {@code null}.
    * @param control
    *          Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the key within the PKCS#P11 token.
@@ -370,14 +369,14 @@ public abstract class P11Slot implements Closeable {
    *         if PKCS#11 token exception occurs.
    */
   // CHECKSTYLE:SKIP
-  protected abstract P11Identity generateECEdwardsKeypair0(String curveName,
+  protected abstract P11Identity generateECEdwardsKeypair0(ASN1ObjectIdentifier curveId,
       P11NewKeyControl control) throws P11TokenException;
 
   /**
    * Generates an EC Montgomery keypair.
    *
-   * @param curveName
-   *         curveName of the curve. Must not be {@code null}.
+   * @param curveId
+   *         Object Identifier of the curve. Must not be {@code null}.
    * @param control
    *          Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the key within the PKCS#P11 token.
@@ -385,7 +384,7 @@ public abstract class P11Slot implements Closeable {
    *         if PKCS#11 token exception occurs.
    */
   // CHECKSTYLE:SKIP
-  protected abstract P11Identity generateECMontgomeryKeypair0(String curveName,
+  protected abstract P11Identity generateECMontgomeryKeypair0(ASN1ObjectIdentifier curveId,
       P11NewKeyControl control) throws P11TokenException;
 
   /**
@@ -1090,8 +1089,8 @@ public abstract class P11Slot implements Closeable {
   /**
    * Generates an EC keypair.
    *
-   * @param curveNameOrOid
-   *         Object identifier or name of the EC curve. Must not be {@code null}.
+   * @param curveOid
+   *         Object identifier of the EC curve. Must not be {@code null}.
    * @param control
    *          Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the identity within the PKCS#P11 token.
@@ -1099,26 +1098,22 @@ public abstract class P11Slot implements Closeable {
    *         if PKCS#11 token exception occurs.
    */
   // CHECKSTYLE:SKIP
-  public P11IdentityId generateECKeypair(String curveNameOrOid, P11NewKeyControl control)
+  public P11IdentityId generateECKeypair(ASN1ObjectIdentifier curveOid, P11NewKeyControl control)
       throws P11TokenException {
-    Args.notBlank(curveNameOrOid, "curveNameOrOid");
+    Args.notNull(curveOid, "curveOid");
 
     P11Identity identity;
-    if (EdECConstants.isEdwardsCurve(curveNameOrOid)) {
+    if (EdECConstants.isEdwardsCurve(curveOid)) {
       assertCanGenKeypair("generateECKeypair", PKCS11Constants.CKM_EC_EDWARDS_KEY_PAIR_GEN,
           control);
-      identity = generateECEdwardsKeypair0(curveNameOrOid, control);
-    } else if (EdECConstants.isMontgemoryCurve(curveNameOrOid)) {
+      identity = generateECEdwardsKeypair0(curveOid, control);
+    } else if (EdECConstants.isMontgomeryCurve(curveOid)) {
       assertCanGenKeypair("generateECKeypair", PKCS11Constants.CKM_EC_MONTGOMERY_KEY_PAIR_GEN,
           control);
-      identity = generateECMontgomeryKeypair0(curveNameOrOid, control);
+      identity = generateECMontgomeryKeypair0(curveOid, control);
     } else {
       assertCanGenKeypair("generateECKeypair", PKCS11Constants.CKM_EC_KEY_PAIR_GEN, control);
-      ASN1ObjectIdentifier curveId = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
-      if (curveId == null) {
-        throw new IllegalArgumentException("unknown curve " + curveNameOrOid);
-      }
-      identity = generateECKeypair0(curveId, control);
+      identity = generateECKeypair0(curveOid, control);
     }
 
     addIdentity(identity);
@@ -1130,8 +1125,8 @@ public abstract class P11Slot implements Closeable {
   /**
    * Generates an EC Edwards keypair.
    *
-   * @param curveName
-   *         Name of the EC curve. Must not be {@code null}.
+   * @param curveOid
+   *         Object Identifier of the EdEC curve as defined in RFC 8410. Must not be {@code null}.
    * @param control
    *          Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the identity within the PKCS#P11 token.
@@ -1139,13 +1134,13 @@ public abstract class P11Slot implements Closeable {
    *         if PKCS#11 token exception occurs.
    */
   // CHECKSTYLE:SKIP
-  public P11IdentityId generateECEdwardsKeypair(String curveName, P11NewKeyControl control)
-      throws P11TokenException {
-    Args.notBlank(curveName, "curveName");
+  public P11IdentityId generateECEdwardsKeypair(ASN1ObjectIdentifier curveOid,
+      P11NewKeyControl control) throws P11TokenException {
+    Args.notNull(curveOid, "curveOid");
 
     assertCanGenKeypair("generateECEdwardsKeypair0",
         PKCS11Constants.CKM_EC_EDWARDS_KEY_PAIR_GEN, control);
-    P11Identity identity = generateECEdwardsKeypair0(curveName, control);
+    P11Identity identity = generateECEdwardsKeypair0(curveOid, control);
     addIdentity(identity);
     P11IdentityId id = identity.getId();
     LOG.info("generated EC Edwards keypair {}", id);
@@ -1155,8 +1150,8 @@ public abstract class P11Slot implements Closeable {
   /**
    * Generates an EC Montgomery keypair.
    *
-   * @param curveName
-   *         Name of the EC curve. Must not be {@code null}.
+   * @param curveOid
+   *         Object Identifier of the EdEC curve as defined in RFC 8410. Must not be {@code null}.
    * @param control
    *          Control of the key generation process. Must not be {@code null}.
    * @return the identifier of the identity within the PKCS#P11 token.
@@ -1164,13 +1159,13 @@ public abstract class P11Slot implements Closeable {
    *         if PKCS#11 token exception occurs.
    */
   // CHECKSTYLE:SKIP
-  public P11IdentityId generateECMontgomeryKeypair(String curveName, P11NewKeyControl control)
-      throws P11TokenException {
-    Args.notBlank(curveName, "curveName");
+  public P11IdentityId generateECMontgomeryKeypair(ASN1ObjectIdentifier curveOid,
+      P11NewKeyControl control) throws P11TokenException {
+    Args.notNull(curveOid, "curveOid");
 
     assertCanGenKeypair("generateECMontgomeryKeypair",
         PKCS11Constants.CKM_EC_MONTGOMERY_KEY_PAIR_GEN, control);
-    P11Identity identity = generateECMontgomeryKeypair0(curveName, control);
+    P11Identity identity = generateECMontgomeryKeypair0(curveOid, control);
     addIdentity(identity);
     P11IdentityId id = identity.getId();
     LOG.info("generated EC Montgomery keypair {}", id);

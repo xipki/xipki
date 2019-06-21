@@ -855,9 +855,9 @@ public class Actions {
 
         String requiredKeyAlg;
         if (Xipki.id_alg_dhPop_x25519_sha256.equals(algOid)) {
-          requiredKeyAlg = EdECConstants.ALG_X25519;
+          requiredKeyAlg = EdECConstants.X25519;
         } else {
-          requiredKeyAlg = EdECConstants.ALG_X448;
+          requiredKeyAlg = EdECConstants.X448;
         }
 
         char[] password = keystorePassword.toCharArray();
