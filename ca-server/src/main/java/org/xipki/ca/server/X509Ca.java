@@ -1862,10 +1862,9 @@ public class X509Ca implements Closeable {
 
         boolean addCtlog = ctlogEnabled && extnSctCtrl != null;
 
-        Certificate bcCert;
         if (addCtlog) {
-          bcCert = buildCtloggedCert(certBuilder, gct, extnSctCtrl.isCritical());
-        } else {
+          certBuilder.addExtension(Extn.id_precertificate, true, DERNull.INSTANCE);
+
           ConcurrentBagEntrySigner signer0;
           try {
             signer0 = gct.signer.borrowSigner();
@@ -1873,11 +1872,48 @@ public class X509Ca implements Closeable {
             throw new OperationException(SYSTEM_FAILURE, ex);
           }
 
+          Certificate precert;
           try {
-            bcCert = certBuilder.build(signer0.value()).toASN1Structure();
+            precert = certBuilder.build(signer0.value()).toASN1Structure();
           } finally {
+            // returns the signer after the signing so that it can be used by others
             gct.signer.requiteSigner(signer0);
           }
+
+          byte[] encodedPreCert;
+          try {
+            encodedPreCert = precert.getEncoded();
+          } catch (IOException ex) {
+            throw new CertIOException("could not encode PreCert", ex);
+          }
+          SignedCertificateTimestampList scts = getCtlogScts(encodedPreCert);
+
+          // remove the precertificate extension
+          certBuilder.removeExtension(Extn.id_precertificate);
+
+          // add the SCTs extension
+          DEROctetString extnValue;
+          try {
+            extnValue = new DEROctetString(new DEROctetString(scts.getEncoded()).getEncoded());
+          } catch (IOException ex) {
+            throw new CertIOException("could not encode SCT extension", ex);
+          }
+          certBuilder.addExtension(
+              new Extension(Extn.id_SCTs, extnSctCtrl.isCritical(), extnValue));
+        }
+
+        ConcurrentBagEntrySigner signer0;
+        try {
+          signer0 = gct.signer.borrowSigner();
+        } catch (NoIdleSignerException ex) {
+          throw new OperationException(SYSTEM_FAILURE, ex);
+        }
+
+        Certificate bcCert;
+        try {
+          bcCert = certBuilder.build(signer0.value()).toASN1Structure();
+        } finally {
+          gct.signer.requiteSigner(signer0);
         }
 
         byte[] encodedCert = bcCert.getEncoded();
@@ -1941,162 +1977,6 @@ public class X509Ca implements Closeable {
       }
     }
   } // method generateCertificate0
-
-  private Certificate buildCtloggedCert(X509v3CertificateBuilder certBuilder,
-      GrantedCertTemplate gct, boolean critical) throws CertIOException, OperationException {
-    // build precertificate
-    certBuilder.addExtension(Extn.id_precertificate, true, DERNull.INSTANCE);
-
-    ConcurrentBagEntrySigner signer0;
-    try {
-      signer0 = gct.signer.borrowSigner();
-    } catch (NoIdleSignerException ex) {
-      throw new OperationException(SYSTEM_FAILURE, ex);
-    }
-
-    Certificate precert;
-    try {
-      precert = certBuilder.build(signer0.value()).toASN1Structure();
-    } finally {
-      // returns the signer after the signing so that it can be used by others
-      gct.signer.requiteSigner(signer0);
-    }
-
-    byte[] encodedPreCert;
-    try {
-      encodedPreCert = precert.getEncoded();
-    } catch (IOException ex) {
-      throw new CertIOException("could not encode PreCert", ex);
-    }
-    SignedCertificateTimestampList scts = getCtlogScts(encodedPreCert);
-
-    // remove the precertificate extension
-    certBuilder.removeExtension(Extn.id_precertificate);
-
-    // add the SCTs extension
-    DEROctetString extnValue;
-    try {
-      extnValue = new DEROctetString(
-          new DEROctetString(scts.getEncoded()).getEncoded());
-    } catch (IOException ex) {
-      throw new CertIOException("could not encode SCT extension", ex);
-    }
-    certBuilder.addExtension(new Extension(Extn.id_SCTs, critical, extnValue));
-
-    try {
-      signer0 = gct.signer.borrowSigner();
-    } catch (NoIdleSignerException ex) {
-      throw new OperationException(SYSTEM_FAILURE, ex);
-    }
-
-    try {
-      return certBuilder.build(signer0.value()).toASN1Structure();
-    } finally {
-      // returns the signer after the signing so that it can be used by others
-      gct.signer.requiteSigner(signer0);
-    }
-
-    /* The following is the code block to generate certificate for BouncyCastle <= 1.61.
-    ASN1Sequence preTbsCert =
-        ASN1Sequence.getInstance(precert.getTBSCertificate().toASN1Primitive());
-    //
-    // we rebuild the tbsCert so that we get exact structure except the poison
-    // extension precert
-    //
-    // The TBSCertificate object.
-    // TBSCertificate ::= SEQUENCE {
-    //      version          [ 0 ]  Version DEFAULT v1(0),
-    //      serialNumber            CertificateSerialNumber,
-    //      signature               AlgorithmIdentifier,
-    //      issuer                  Name,
-    //      validity                Validity,
-    //      subject                 Name,
-    //      subjectPublicKeyInfo    SubjectPublicKeyInfo,
-    //      issuerUniqueID    [ 1 ] IMPLICIT UniqueIdentifier OPTIONAL,
-    //      subjectUniqueID   [ 2 ] IMPLICIT UniqueIdentifier OPTIONAL,
-    //      extensions        [ 3 ] Extensions OPTIONAL
-    //      }
-    //
-
-    ASN1EncodableVector tbsVec = new ASN1EncodableVector();
-    // 0: version is always set in v3(2)
-    tbsVec.add(preTbsCert.getObjectAt(0));
-    // 1: serialNumber
-    tbsVec.add(preTbsCert.getObjectAt(1));
-    // 2: signature
-    tbsVec.add(preTbsCert.getObjectAt(2));
-    // 3: issuer
-    tbsVec.add(preTbsCert.getObjectAt(3));
-    // 4: validity
-    tbsVec.add(preTbsCert.getObjectAt(4));
-    // 5: subject
-    tbsVec.add(preTbsCert.getObjectAt(5));
-    // 6: subjectPublicKeyInfo
-    tbsVec.add(preTbsCert.getObjectAt(6));
-    // issuerUniqueID and subjectUniqueID could not be set
-    // extensions must exist
-    ASN1TaggedObject taggedExtensions = ASN1TaggedObject.getInstance(preTbsCert.getObjectAt(7));
-    ASN1Sequence extnSeq = ASN1Sequence.getInstance(taggedExtensions.getObject());
-
-    ASN1EncodableVector extnVec = new ASN1EncodableVector();
-    final int size = extnSeq.size();
-    for (int i = 0; i < size; i++) {
-      ASN1Encodable asn1Extn = extnSeq.getObjectAt(i);
-      Extension extn = Extension.getInstance(asn1Extn);
-      // remove the pre-certificate extension
-      if (!extn.getExtnId().equals(Extn.id_precertificate)) {
-        extnVec.add(asn1Extn);
-      }
-    }
-
-    // add the SCTs extension
-    DEROctetString extnValue;
-    try {
-      extnValue = new DEROctetString(
-          new DEROctetString(scts.getEncoded()).getEncoded());
-    } catch (IOException ex) {
-      throw new CertIOException("could not encode SCT extension", ex);
-    }
-
-    extnVec.add(new Extension(Extn.id_SCTs, critical, extnValue));
-    tbsVec.add(new DERTaggedObject(taggedExtensions.isExplicit(), taggedExtensions.getTagNo(),
-        new DERSequence(extnVec)));
-
-    ASN1Sequence tbsCert = new DERSequence(tbsVec);
-    //
-    // Certificate  ::=  SEQUENCE  {
-    //
-    //   tbsCertificate       TBSCertificate,
-    //   signatureAlgorithm   AlgorithmIdentifier,
-    //   signature            BIT STRING  }
-    //
-
-    try {
-      signer0 = gct.signer.borrowSigner();
-    } catch (NoIdleSignerException ex) {
-      throw new OperationException(SYSTEM_FAILURE, ex);
-    }
-
-    ASN1EncodableVector certVec = new ASN1EncodableVector();
-    certVec.add(tbsCert);
-
-    try {
-      XiContentSigner xiSigner = signer0.value();
-      certVec.add(xiSigner.getAlgorithmIdentifier());
-      OutputStream os = xiSigner.getOutputStream();
-      os.write(tbsCert.getEncoded());
-      byte[] signature = xiSigner.getSignature();
-      certVec.add(new DERBitString(signature));
-    } catch (IOException ex) {
-      throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
-    } finally {
-      // returns the signer after the signing so that it can be used by others
-      gct.signer.requiteSigner(signer0);
-    }
-
-    return Certificate.getInstance(new DERSequence(certVec));
-    */
-  }
 
   private void adaptGrantedSubejct(GrantedCertTemplate gct) throws OperationException {
     if (caInfo.isDuplicateSubjectPermitted()) {
