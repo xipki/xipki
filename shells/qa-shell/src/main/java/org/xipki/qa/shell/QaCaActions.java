@@ -186,6 +186,13 @@ public class QaCaActions {
           sb.append("\n");
           format(issue, "    ", sb);
         }
+      } else {
+        for (ValidationIssue issue : result.getValidationIssues()) {
+          if (issue.isFailed()) {
+            sb.append("\n");
+            format(issue, "    ", sb);
+          }
+        }
       }
 
       println(sb.toString());
