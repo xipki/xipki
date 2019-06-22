@@ -49,6 +49,7 @@ bcprov-jdk15on-*.jar,\
 bcpkix-jdk15on-*.jar,\
 ca-*.jar,\
 certprofile-xijson-*.jar,\
+core-*.jar,\
 datasource-*.jar,\
 fastjson-*.jar,\
 HikariCP-*.jar,\
