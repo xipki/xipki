@@ -26,8 +26,8 @@ import java.util.Map;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.security.HashAlgo;
-import org.xipki.util.CompareUtil;
 import org.xipki.util.Args;
+import org.xipki.util.CompareUtil;
 
 /**
  * Issuer entry.

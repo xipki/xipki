@@ -24,9 +24,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
+import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
-import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**

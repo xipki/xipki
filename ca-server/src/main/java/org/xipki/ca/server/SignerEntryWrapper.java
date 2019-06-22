@@ -25,8 +25,8 @@ import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
-import org.xipki.util.ObjectCreationException;
 import org.xipki.util.Args;
+import org.xipki.util.ObjectCreationException;
 
 /**
  * Wrapper of signer database entry.

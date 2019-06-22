@@ -42,10 +42,10 @@ import org.xipki.password.PasswordResolverException;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.FileOrValue;
 import org.xipki.util.LogUtil;
-import org.xipki.util.Args;
 
 /**
  * Publish certificates to XiPKI OCSP database.

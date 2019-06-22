@@ -22,8 +22,8 @@ import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
-import org.xipki.util.Base64;
 import org.xipki.util.Args;
+import org.xipki.util.Base64;
 import org.xipki.util.StringUtil;
 
 /**

@@ -129,11 +129,11 @@ import org.xipki.ca.certprofile.xijson.conf.QcStatementType.QcStatementValueType
 import org.xipki.ca.certprofile.xijson.conf.QcStatementType.Range2Type;
 import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
 import org.xipki.qa.ValidationIssue;
+import org.xipki.security.CtLog.SignedCertificateTimestampList;
 import org.xipki.security.ExtensionExistence;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
-import org.xipki.security.CtLog.SignedCertificateTimestampList;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;

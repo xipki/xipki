@@ -17,8 +17,8 @@
 
 package org.xipki.ca.api;
 
-import org.xipki.util.CompareUtil;
 import org.xipki.util.Args;
+import org.xipki.util.CompareUtil;
 import org.xipki.util.StringUtil;
 
 /**

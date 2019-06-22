@@ -27,7 +27,6 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.xipki.ca.server.PasswordHash;
 
 /**
  * PasswordHash test.

@@ -32,8 +32,8 @@ import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.ConfPairs;
 import org.xipki.util.Args;
+import org.xipki.util.ConfPairs;
 
 /**
  * Public CA information.

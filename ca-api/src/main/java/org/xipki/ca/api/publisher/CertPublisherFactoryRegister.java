@@ -24,10 +24,8 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.publisher.CertPublisher;
-import org.xipki.ca.api.publisher.CertPublisherFactory;
-import org.xipki.util.ObjectCreationException;
 import org.xipki.util.Args;
+import org.xipki.util.ObjectCreationException;
 
 /**
  * Register of CertPublisherFacotries.

@@ -30,8 +30,8 @@ import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
-import org.xipki.util.CompareUtil;
 import org.xipki.util.Args;
+import org.xipki.util.CompareUtil;
 
 /**
  * IssuerEntry for the EJBCA database.

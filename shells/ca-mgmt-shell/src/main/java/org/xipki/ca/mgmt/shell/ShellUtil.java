@@ -23,10 +23,10 @@ import org.xipki.ca.api.mgmt.PermissionConstants;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.SecurityFactory;
 import org.xipki.shell.IllegalCmdParamException;
+import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.IoUtil;
-import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**

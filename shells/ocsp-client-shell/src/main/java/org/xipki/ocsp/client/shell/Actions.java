@@ -90,8 +90,8 @@ import org.xipki.util.Hex;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ReqRespDebug;
-import org.xipki.util.StringUtil;
 import org.xipki.util.ReqRespDebug.ReqRespPair;
+import org.xipki.util.StringUtil;
 
 /**
  * OCSP client actions.

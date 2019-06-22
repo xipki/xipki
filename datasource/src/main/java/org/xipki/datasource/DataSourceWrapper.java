@@ -31,9 +31,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException.Reason;
+import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
 import org.xipki.util.LruCache;
-import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 import com.zaxxer.hikari.HikariConfig;

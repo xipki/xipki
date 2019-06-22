@@ -43,9 +43,9 @@ import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.LogUtil;
-import org.xipki.util.Args;
 
 /**
  * XiPKI OCSP database query executor.

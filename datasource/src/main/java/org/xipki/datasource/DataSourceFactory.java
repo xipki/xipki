@@ -31,9 +31,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
-import org.xipki.util.IoUtil;
 import org.xipki.util.Args;
 import org.xipki.util.FileOrValue;
+import org.xipki.util.IoUtil;
 
 /**
  * Factory to create {@link DataSourceWrapper}.
