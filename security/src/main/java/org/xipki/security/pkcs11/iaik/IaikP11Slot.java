@@ -513,7 +513,7 @@ class IaikP11Slot extends P11Slot {
     Parameters paramObj;
     if (parameters instanceof P11Params.P11RSAPkcsPssParams) {
       P11Params.P11RSAPkcsPssParams param = (P11Params.P11RSAPkcsPssParams) parameters;
-      paramObj = new RSAPkcsPssParameters(Mechanism.get(param.getHashAlgorithm()),
+      paramObj = new RSAPkcsPssParameters(param.getHashAlgorithm(),
           param.getMaskGenerationFunction(), param.getSaltLength());
     } else if (parameters instanceof P11Params.P11ByteArrayParams) {
       paramObj = new OpaqueParameters(((P11Params.P11ByteArrayParams) parameters).getBytes());
