@@ -60,7 +60,6 @@ mariadb-java-client-*.jar,\
 ocsp-api-*.jar,\
 ocsp-server-*.jar,\
 password-*.jar,\
-pkcs11-constants-*.jar,\
 postgresql-*.jar,\
 scep-client-*.jar,\
 security-*.jar,\

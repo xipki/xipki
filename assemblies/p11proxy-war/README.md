@@ -59,7 +59,6 @@ log4j-api-*.jar,\
 log4j-slf4j-impl-*.jar,\
 mariadb-java-client-*.jar,\
 password-*.jar,\
-pkcs11-constants-*.jar,\
 postgresql-*.jar,\
 security-*.jar,\
 sunpkcs11-wrapper-*.jar,\
