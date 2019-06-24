@@ -7,7 +7,6 @@
     <bundle>mvn:org.xipki/password/${project.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
-    <bundle>mvn:org.xipki.iaik/pkcs11-constants/${pkcs11-wrapper.version}</bundle>
     <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
