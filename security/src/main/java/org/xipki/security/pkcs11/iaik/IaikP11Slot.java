@@ -72,6 +72,7 @@ import iaik.pkcs.pkcs11.Slot;
 import iaik.pkcs.pkcs11.State;
 import iaik.pkcs.pkcs11.Token;
 import iaik.pkcs.pkcs11.TokenException;
+import iaik.pkcs.pkcs11.Util;
 import iaik.pkcs.pkcs11.objects.Attribute;
 import iaik.pkcs.pkcs11.objects.Certificate.CertificateType;
 import iaik.pkcs.pkcs11.objects.DSAPrivateKey;
@@ -1241,9 +1242,9 @@ class IaikP11Slot extends P11Slot {
     DSAPublicKey publicKey = new DSAPublicKey();
     setKeyAttributes(control, publicKey, privateKey);
 
-    publicKey.getPrime().setByteArrayValue(p.toByteArray());
-    publicKey.getSubprime().setByteArrayValue(q.toByteArray());
-    publicKey.getBase().setByteArrayValue(g.toByteArray());
+    publicKey.getPrime().setByteArrayValue(Util.unsignedBigIntergerToByteArray(p));
+    publicKey.getSubprime().setByteArrayValue(Util.unsignedBigIntergerToByteArray(q));
+    publicKey.getBase().setByteArrayValue(Util.unsignedBigIntergerToByteArray(g));
     return generateKeyPair(mech, control.getId(), privateKey, publicKey);
   }
 
