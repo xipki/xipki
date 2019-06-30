@@ -186,7 +186,7 @@
                   <artifactId>ca-server</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
-                  <includes>sql/**</includes>
+                  <includes>sql/ocsp*</includes>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki</groupId>
