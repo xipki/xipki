@@ -30,7 +30,7 @@
     <app.name>cli</app.name>
     <shared.dir>${project.basedir}/../shared</shared.dir>
     <patchkaraf.repos>mvn:org.xipki.feature/cli/${project.version}/xml/features</patchkaraf.repos>
-    <patchkaraf.features>(-framework,-jaas,-ssh,-config,aries-blueprint/${karaf.version},wrap),xipki-security,xipki-caclient,xipki-scepclient,xipki-ocspclient,xipki-camgmt,xipki-ocspmgmt</patchkaraf.features>
+    <patchkaraf.features>(-jaas,-ssh,-config,aries-blueprint/${karaf.version},wrap),xipki-security,xipki-caclient,xipki-scepclient,xipki-ocspclient,xipki-camgmt,xipki-ocspmgmt</patchkaraf.features>
   </properties>
   <dependencies>
     <dependency>

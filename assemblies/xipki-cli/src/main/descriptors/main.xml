@@ -111,7 +111,6 @@
         <exclude>system/org/apache/karaf/jaas/org.apache.karaf.jaas.config/**</exclude>
         <exclude>system/org/apache/karaf/jaas/org.apache.karaf.jaas.modules/**</exclude>
         <exclude>system/org/apache/karaf/jaas/org.apache.karaf.jaas.command/**</exclude>
-        <exclude>system/org/apache/servicemix/**</exclude>
         <exclude>system/org/apache/sshd/**</exclude>
         <exclude>system/org/apache/servicemix/bundles/org.apache.servicemix.bundles.not-yet-commons-ssl/**</exclude>
         <exclude>system/org/apache/karaf/shell/org.apache.karaf.shell.ssh/**</exclude>
