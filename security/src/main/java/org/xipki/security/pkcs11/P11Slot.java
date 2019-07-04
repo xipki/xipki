@@ -245,8 +245,8 @@ public abstract class P11Slot implements Closeable {
   /**
    * Returns the hex representation of the bytes.
    *
-   * @param bytes
-   *          Data to be encoded. Must not be {@code null}.
+   * @param hex
+   *          Data to be decoded. Must not be {@code null}.
    * @return the hex representation of the bytes.
    */
   protected static byte[] decodeHex(String hex) {

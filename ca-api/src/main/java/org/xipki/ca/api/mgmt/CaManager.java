@@ -443,8 +443,8 @@ public interface CaManager {
    *          Type to be changed. {@code null} indicates no change.
    * @param conf
    *          Configuration to be changed. {@code null} indicates no change.
-   * @param encodedCert
-   *          Encoded certificate of the signer. {@code null} indicates no change.
+   * @param base64Cert
+   *          Base64 encoded certificate of the signer. {@code null} indicates no change.
    * @throws CaMgmtException
    *          if error occurs.
    */

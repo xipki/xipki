@@ -669,8 +669,6 @@ public class XijsonCertprofile extends BaseCertprofile {
   /**
    * Process the extension.
    *
-   * @param extnId
-   *          ID of the extensions to be processed
    * @param extn
    *          Configuration of the extension
    * @return whether the extension is processed
