@@ -24,7 +24,7 @@ Just create [issues](https://github.com/xipki/xipki/issues).
 
 ## Tested PKCS#11 Devices
 * [Softhsm v1 & v2](https://www.opendnssec.org/download/packages/),
-*  [Smartcard HSM EA+](http://www.smartcard-hsm.com/features.html#usbstick),
+* [Smartcard HSM EA+](http://www.smartcard-hsm.com/features.html#usbstick),
 * Thales nCipher Connect, Thales nCipher Solo, Utimaco Se
 
 ## Get Started
@@ -198,7 +198,7 @@ Features
   - SCEP (draft-gutmann-scep-00, draft-nourse-scep-23)
   - EN 319 411 (eIDAS)
   - EN 319 412 (eIDAS)
-  - Supported databases: DB2, MariaDB, MySQL, Oracle
+  - Supported databases: DB2, MariaDB, MySQL, Oracle, PostgreSQL, H2, HSQLDB
   - Direct and indirect CRL
   - FullCRL and DeltaCRL
   - Customized extension to embed certificates in CRL
@@ -236,7 +236,7 @@ Features
     - BiometricInfo (RFC 3739)
     - CertificatePolicies (RFC 5280)
     - CRLDistributionPoints (RFC 5280)
-    - CT Precertificate SCTs (RFC 6962 Certificate Transparency)
+    - CT Precertificate SCTs (RFC 6962)
     - ExtendedKeyUsage (RFC 5280)
     - FreshestCRL (RFC 5280)
     - InhibitAnyPolicy (RFC 5280)
@@ -285,7 +285,7 @@ Features
   - Support of both unsigned and signed OCSP requests
   - Multiple software instances (all can be in active mode) for the same OCSP
     signer and certificate status sources.
-  - Supported databases: DB2, MariaDB, MySQL, Oracle
+  - Supported databases: DB2, MariaDB, MySQL, Oracle, PostgreSQL, H2, HSQLDB
   - Database tool (export and import OCSP database) simplifies the switch of
     databases, upgrade of XiPKi and switch from other OCSP system to XiPKI OCSP.
   - Client to send OCSP request
