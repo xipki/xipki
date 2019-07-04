@@ -2,10 +2,20 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
-## 5.3.2
+## 5.3.3
   - Release date: -
+
+## 5.3.2
+  - Release date: July 4, 2019
   - CA
     - Use EXPLICIT tag for the GMT 0015 IdentityCode
+    - Reduce the table size to make it loadable if the database has charset utf8mb4 in MySQL/MariaDB.
+  - ALL
+    - Remove the leading zero of DSA's P, Q and G in CK_DSA_PARAMS.
+    - EC: use Object Identifer of a curve instead name if possible
+    - EdDSA: use curveId instead of curveName in PKCS#11 keypair generation.
+  - OCSP
+    - Added configuration of OCSP responder for the store types xipki-db, ejbca and crl.
 
 ## 5.3.1
   - Release date: June 10, 2019
