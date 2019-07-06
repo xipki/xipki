@@ -423,7 +423,7 @@ public class CaDbCertStatusStore extends OcspStore {
    * the store source configuration. It contains following key-value pairs:
    * <ul>
    * <li>caCerts: optional
-   *   <p/>
+   *   <p>
    *   CA certificate files to be included / excluded.</li>
    *  </ul>
    * @param datasource DataSource.

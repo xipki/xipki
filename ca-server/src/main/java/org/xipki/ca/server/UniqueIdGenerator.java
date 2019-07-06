@@ -24,16 +24,16 @@ import org.xipki.util.Args;
 
 /**
  * Unique Identifier Generator.
- * <p/>
- * An id consists of
+ *
+ * <p>An id consists of
  * <ol>
  *  <li>highest bit is set to 0 to assure positive long.
  *  <li>epoch in ms: 46 bits for 1312 years after the epoch</li>
  *  <li>offset: 10 bits
  *  <li>shard_id: 7 bits
  * </ol>
- * <p/>
- * Idea is borrowed from http://instagram-engineering.tumblr.com/post/10853187575/sharding-ids-at-instagram
+ *
+ * <p>Idea is borrowed from http://instagram-engineering.tumblr.com/post/10853187575/sharding-ids-at-instagram
  * @author Lijun Liao
  * @since 2.0.0
  *

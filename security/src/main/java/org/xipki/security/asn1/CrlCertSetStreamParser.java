@@ -34,8 +34,8 @@ import org.xipki.util.Args;
 /**
  * This class implements a real stream based parser of XiPKI CrlCertSet with
  * constant memory consumption.
- * <p/>
- * Definition of Xipki-CrlCertSet.
+ *
+ * <p>Definition of Xipki-CrlCertSet.
  *
  * <pre>
  * Xipki-CrlCertSet ::= SET OF Xipki-CrlCert

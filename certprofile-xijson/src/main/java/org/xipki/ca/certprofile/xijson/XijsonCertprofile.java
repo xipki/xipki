@@ -672,6 +672,8 @@ public class XijsonCertprofile extends BaseCertprofile {
    * @param extn
    *          Configuration of the extension
    * @return whether the extension is processed
+   * @throws CertprofileException
+   *           If initialization of the extra extension failed.
    */
   protected boolean initExtraExtension(ExtensionType extn) throws CertprofileException {
     return false;

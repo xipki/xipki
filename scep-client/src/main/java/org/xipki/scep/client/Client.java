@@ -118,6 +118,9 @@ public abstract class Client {
    *
    * @param url
    *          URL. Must not be {@code null}.
+   * @return the response.
+   * @throws ScepClientException
+   *           If error occurs.
    */
   protected abstract ScepHttpResponse httpGet(String url) throws ScepClientException;
 

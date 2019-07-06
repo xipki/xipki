@@ -169,6 +169,8 @@ public class XiOCSPReqBuilder {
    * Generate an unsigned request.
    *
    * @return the OCSPRequest
+   * @throws OCSPException
+   *           If OCSP request cannot be built.
    */
   public OCSPRequest build() throws OCSPException {
     return generateRequest(null, null);

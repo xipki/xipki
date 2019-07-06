@@ -75,13 +75,13 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
    * the store source configuration. It contains following key-value pairs:
    * <ul>
    * <li>dir: required
-   *   <p/>
+   *   <p>
    *   Directory of the CRL resources.</li>
    * <li>sqlBatchCommit:
-   *   <p/>
+   *   <p>
    *   Number of SQL queries before next commit, default to be 1000.</li>
    * <li>ignoreExpiredCrls:
-   *   <p/>
+   *   <p>
    *   Whether expired CRLs are ignored, default to true.</li>
    * </ul>
    * @param datasource DataSource.

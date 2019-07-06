@@ -1324,11 +1324,14 @@ public class CertStore {
   } // method getCertprofileForId
 
   /**
-   * Get certificate for given subject and transactionId.
+   * Get certificates for given subject and transactionId.
    *
    * @param subjectName Subject of Certificate or requested Subject.
    * @param transactionId will only be considered if there are more than one certificate
    *     matches the subject.
+   * @return certificates for given subject and transactionId.
+   * @throws OperationException
+   *           If error occurs.
    */
   public List<X509Certificate> getCert(X500Name subjectName, byte[] transactionId)
       throws OperationException {

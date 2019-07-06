@@ -41,8 +41,8 @@ class FileUtils {
 
   /**
    * Copied from the apache commons io project.
-   * <p/>
-   * Deletes a directory recursively.
+   *
+   * <p>Deletes a directory recursively.
    *
    * @param directory - directory to delete
    * @throws IOException in case deletion is unsuccessful
@@ -64,16 +64,16 @@ class FileUtils {
 
   /**
    * Copied from the apache commons io project
-   * <p/>
-   * Determines whether the specified file is a Symbolic Link rather than an actual file.
-   * <p/>
-   * Will not return true if there is a Symbolic Link anywhere in the path,
+   *
+   * <p>Determines whether the specified file is a Symbolic Link rather than an actual file.
+   *
+   * <p>Will not return true if there is a Symbolic Link anywhere in the path,
    * only if the specific file is.
-   * <p/>
-   * <b>Note:</b> the current implementation always returns {@code false} if the system
+   *
+   * <p><b>Note:</b> the current implementation always returns {@code false} if the system
    * is detected as Windows using {@link Configuration#isWindows()}
-   * <p/>
-   * For code that runs on Java 1.7 or later, use the following method instead:
+   *
+   * <p>For code that runs on Java 1.7 or later, use the following method instead:
    * <br>
    * {@code boolean java.nio.file.Files.isSymbolicLink(Path path)}
    * @param file - the file to check
@@ -98,8 +98,8 @@ class FileUtils {
 
   /**
    * Copied from the apache commons io project
-   * <p/>
-   * Cleans a directory without deleting it.
+   *
+   * <p>Cleans a directory without deleting it.
    *
    * @param directory - directory to clean
    * @throws IOException in case cleaning is unsuccessful
@@ -136,10 +136,10 @@ class FileUtils {
 
   /**
    * Copied from the apache commons io project
-   * <p/>
-   * Deletes a file. If file is a directory, delete it and all sub-directories.
-   * <p/>
-   * The difference between File.delete() and this method are:
+   *
+   * <p>Deletes a file. If file is a directory, delete it and all sub-directories.
+   *
+   * <p>The difference between File.delete() and this method are:
    * <ul>
    * <li>A directory to be deleted does not have to be empty.</li>
    * <li>You get exceptions when a file or directory may not be deleted.
@@ -168,8 +168,8 @@ class FileUtils {
 
   /**
    * Copied from the apache commons io project
-   * <p/>
-   * Internal copy file method.
+   *
+   * <p>Internal copy file method.
    * This caches the original file length, and an IOException will be thrown
    * if the output file length is different from the current input file length.
    * So it may fail if the file changes size.
@@ -204,8 +204,8 @@ class FileUtils {
 
   /**
    * Copied from the apache commons io project
-   * <p/>
-   * Internal copy directory method.
+   *
+   * <p>Internal copy directory method.
    *
    * @param srcDir - the validated source directory, may not be {@code null}
    * @param destDir - the validated destination directory, may not be {@code null}

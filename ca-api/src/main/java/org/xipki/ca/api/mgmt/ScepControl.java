@@ -23,8 +23,8 @@ import org.xipki.util.StringUtil;
 
 /**
  * SCEP control.
- * <p/>
- * Example configuration.
+ *
+ * <p>Example configuration.
  *
  * <pre>
  *

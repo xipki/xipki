@@ -79,7 +79,7 @@ public abstract class Describable extends ValidatableConf {
 
     /**
      * Gets the value of the value property.
-     *
+     * @return the value of the value property.
      */
     public int getValue() {
       return value;

@@ -37,11 +37,12 @@ import org.xipki.util.Args;
 public class CtLog {
 
   /**
+   * <pre>
    * struct {
    *     SignatureAndHashAlgorithm algorithm;
-   *     opaque signature<0..2^16-1>;
+   *     opaque signature&lt;0..2^16-1&gt;;
    * } DigitallySigned;
-   *
+   * </pre>
    */
   public static class DigitallySigned {
 
@@ -114,8 +115,9 @@ public class CtLog {
   }
 
   /**
-   * opaque SerializedSCT<1..2^16-1>;
-   *
+   * <pre>
+   * opaque SerializedSCT&lt;1..2^16-1&gt;;
+   * </pre>
    */
   // CHECKSTYLE:SKIP
   public static class SerializedSCT {
@@ -249,12 +251,12 @@ public class CtLog {
 
   /**
    * ASN.1 definition:
-   * <p/>
+   * <pre>
    * struct {
    *     HashAlgorithm hash;
    *     SignatureAlgorithm signature;
    * } SignatureAndHashAlgorithm;
-   *
+   * </pre>
    */
   public static class SignatureAndHashAlgorithm {
 
@@ -289,7 +291,7 @@ public class CtLog {
 
   /**
    * ASN1. definition:
-   * <p/>
+   * <pre>
    * struct {
    *     Version sct_version;
    *     LogID id;
@@ -297,40 +299,43 @@ public class CtLog {
    *     CtExtensions extensions;
    *     DigitallySigned signature
    *  } SignedCertificateTimestamp
-   *
+   * </pre>
    */
   public static class SignedCertificateTimestamp {
 
     /**
      * ASN.1 definition:
-     * <p/>
+     * <pre>
      * enum { v1(0), (255) }
      *   Version;
+     * </pre>
      */
     private final byte version;
 
     /**
      * ASN.1 definition:
-     * <p/>
+     * <pre>
      * struct {
      *     opaque key_id[32];
      * } LogID;
+     * </pre>
      */
     private final byte[] logId;
 
     /**
      * ASN.1 definition:
-     * <p/>
+     * <pre>
      * uint64 timestamp;
+     * </pre>
      */
     private final long timestamp;
 
     /**
      * ASN.1 definition:
-     * <p/>
+     * <pre>
      * opaque CtExtensions<0..2^16-1>;
      * CtExtensions extensions.
-     * <p/>
+     * </pre>
      * Does not contain the encoded length.
      */
     private final byte[] extensions;
@@ -438,10 +443,11 @@ public class CtLog {
   }
 
   /**
+   * <pre>
    * struct {
-   *     SerializedSCT sct_list <1..2^16-1>;
+   *     SerializedSCT sct_list &lt;1..2^16-1&gt;;
    * } SignedCertificateTimestampList;
-   *
+   * </pre>
    */
   public static class SignedCertificateTimestampList {
 

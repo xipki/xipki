@@ -73,7 +73,7 @@ public class ScepUtil {
   private ScepUtil() {
   }
 
-  /**
+  /*
    * The first one is a non-CA certificate if there exists one non-CA certificate.
    */
   public static List<X509Certificate> getCertsFromSignedData(SignedData signedData)

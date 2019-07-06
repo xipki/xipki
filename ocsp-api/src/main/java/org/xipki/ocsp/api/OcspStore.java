@@ -93,6 +93,8 @@ public abstract class OcspStore implements Closeable {
    * @param inheritCaRevocation
    *          Whether to inherit CA revocation
    * @return the certificate status.
+   * @throws OcspStoreException
+   *           If OCSP store failed to retrieve the status.
    */
   public final CertStatusInfo getCertStatus(Date time, RequestIssuer reqIssuer,
       BigInteger serialNumber, boolean includeCertHash, boolean includeRit,
@@ -134,6 +136,8 @@ public abstract class OcspStore implements Closeable {
    * @param inheritCaRevocation
    *          Whether to inherit CA revocation
    * @return the certificate status.
+   * @throws OcspStoreException
+   *           If OCSP store failed to retrieve the status.
    */
   protected abstract CertStatusInfo getCertStatus0(Date time, RequestIssuer reqIssuer,
       BigInteger serialNumber, boolean includeCertHash, boolean includeRit,
@@ -146,6 +150,8 @@ public abstract class OcspStore implements Closeable {
    *          Source configuration. Could be {@code null}.
    * @param datasource
    *          Datasource. Could be {@code null}.
+   * @throws OcspStoreException
+   *           If OCSP store cannot be initialized.
    */
   public abstract void init(Map<String, ? extends Object> sourceConf, DataSourceWrapper datasource)
       throws OcspStoreException;

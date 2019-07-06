@@ -23,9 +23,9 @@ import org.xipki.util.Args;
  * How CA assigns the notAfter field in the certificate if the requested notAfter is
  * after CA's validity.
  * <ul>
- *   STRICT: the enrollment request will be rejected.
- *   LAX: Use the requested notAfter.
- *   CUTOFF: Use CA's notAfter.
+ *  <li>STRICT: the enrollment request will be rejected.</li>
+ *  <li>LAX: Use the requested notAfter.</li>
+ *  <li>CUTOFF: Use CA's notAfter.</li>
  * </ul>
  * @author Lijun Liao
  * @since 2.0.0

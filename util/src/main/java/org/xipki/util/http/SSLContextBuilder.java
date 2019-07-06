@@ -64,9 +64,6 @@ import org.xipki.util.Args;
  * <a href="http://docs.oracle.com/javase/7/docs/api/javax/net/ssl/SSLContext.html#init%28javax.net.ssl.KeyManager[],%20javax.net.ssl.TrustManager[],%20java.security.SecureRandom%29">
  * SSLContext.html#init
  * </a>
- * <p>
- *
- *  </p>
  * @since 4.4
  */
 public class SSLContextBuilder {

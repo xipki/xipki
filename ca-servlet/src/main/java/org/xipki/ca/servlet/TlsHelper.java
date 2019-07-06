@@ -31,12 +31,12 @@ import org.xipki.util.StringUtil;
 
 /**
  * TLS helper.
- * <p/>
- * For more details please refer to
+ *
+ * <p>For more details please refer to
  * http://httpd.apache.org/docs/2.2/mod/mod_ssl.html
  * http://www.zeitoun.net/articles/client-certificate-x509-authentication-behind-reverse-proxy/start
- * <p/>
- * Please forward at least the following headers:
+ *
+ * <p>Please forward at least the following headers:
  * <ul>
  *   <li>SSL_CLIENT_VERIFY</li>
  *   <li>SSL_CLIENT_CERT</li>

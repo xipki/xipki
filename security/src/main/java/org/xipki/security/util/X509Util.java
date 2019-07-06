@@ -592,6 +592,8 @@ public class X509Util {
    * @param targetCert certificate for which the certificate path will be built
    * @param certs collection of certificates.
    * @return the certificate path
+   * @throws CertPathBuilderException
+   *           If cannot build a valid certificate path.
    */
   public static X509Certificate[] buildCertPath(X509Certificate targetCert,
       Collection<? extends Certificate> certs) throws CertPathBuilderException {
@@ -604,6 +606,8 @@ public class X509Util {
    * @param certs collection of certificates.
    * @param includeTargetCert whether to include {@code targetCert} in the result.
    * @return the certificate path
+   * @throws CertPathBuilderException
+   *           If cannot build a valid certificate path.
    */
   public static X509Certificate[] buildCertPath(X509Certificate targetCert,
       Collection<? extends Certificate> certs, boolean includeTargetCert)

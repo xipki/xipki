@@ -74,7 +74,7 @@ public class CertprofileFactoryRegister {
    * @param type
    *          Type of the certificate. Must not be {@code null}.
    * @return new certificate profile.
-   * @throws AuditServiceRuntimeException
+   * @throws ObjectCreationException
    *           If certificate profile could not be created.
    */
   public Certprofile newCertprofile(String type) throws ObjectCreationException {

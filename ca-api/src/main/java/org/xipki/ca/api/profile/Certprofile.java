@@ -693,7 +693,9 @@ public abstract class Certprofile implements Closeable {
    *          Requested public key. Must not be {@code null}.
    * @return the granted public key.
    * @throws BadCertTemplateException
-   *         If the publicKey does not have correct format or is not permitted.
+   *         if the publicKey does not have correct format or is not permitted.
+   * @throws CertprofileException
+   *         if error occurs.
    */
   public abstract SubjectPublicKeyInfo checkPublicKey(SubjectPublicKeyInfo publicKey)
       throws CertprofileException, BadCertTemplateException;
@@ -715,6 +717,8 @@ public abstract class Certprofile implements Closeable {
   /**
    * Checks the requested extensions and returns the canonicalized ones.
    *
+   * @param extensionControls
+   *          Extension controls.
    * @param requestedSubject
    *          Requested subject. Must not be {@code null}.
    * @param grantedSubject

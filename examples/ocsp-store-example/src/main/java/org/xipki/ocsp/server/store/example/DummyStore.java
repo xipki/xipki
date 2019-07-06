@@ -37,8 +37,9 @@ import org.xipki.security.CrlReason;
 import org.xipki.security.util.X509Util;
 
 /**
- * This is just an example that demonstrates how to use the custom OcspStore.<br/>
- * To use this store, configure the store in the <tt>ocsp-responder.json</tt> file as follows
+ * This is just an example that demonstrates how to use the custom OcspStore.
+ *
+ * <p>To use this store, configure the store in the <tt>ocsp-responder.json</tt> file as follows
  * <pre>
  *      "source":{
  *           "type":"java:org.xipki.ocsp.server.store.example.DummyStore",
@@ -48,8 +49,8 @@ import org.xipki.security.util.X509Util;
  *       },
  * </pre>
  * Where the CA-certificate-file is either the CA certificate in DER or PEM format.
- * <p/>
- * This dummy store returns the following certificate status
+ *
+ * <p>This dummy store returns the following certificate status
  * <ul>
  * <li>GOOD if serial-number % 3 == 0</li>
  * <li>REVOKED if serial-number % 3 == 1</li>
@@ -130,7 +131,7 @@ public class DummyStore extends OcspStore {
    * the store source configuration. It contains following key-value pairs:
    * <ul>
    * <li>caCert: optional
-   *   <p/>
+   *   <p>
    *   CA cert file.</li>
    * </ul>
    * @param datasource DataSource.

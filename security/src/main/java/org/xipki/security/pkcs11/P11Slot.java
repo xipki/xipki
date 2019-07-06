@@ -762,8 +762,6 @@ public abstract class P11Slot implements Closeable {
    * @param objectId
    *          Object identifier. Must not be {@code null}.
    * @return the exported certificate
-   * @throws CertificateException
-   *         if process with certificate fails.
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
@@ -876,6 +874,7 @@ public abstract class P11Slot implements Closeable {
    *          Certificate to be added. Must not be {@code null}.
    * @param control
    *          Control of the object creation process. Must not be {@code null}.
+   * @return the identifier of the newly added certificate.
    * @throws CertificateException
    *         if process with certificate fails.
    * @throws P11TokenException

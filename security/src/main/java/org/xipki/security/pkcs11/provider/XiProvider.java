@@ -26,13 +26,13 @@ import org.xipki.security.XiSecurityConstants;
 /**
  * The XIPKI Provider class.
  * Supported algorithms:
- * <p/>
- * Keystore
+ *
+ * <p>Keystore
  * <ul>
  *   <li><code>PKCS11</code></li>
  * </ul>
- * <p/>
- * Signature (RSA)
+ *
+ * <p>Signature (RSA)
  * <ul>
  *   <li><code>NONEwithRSA</code></li>
  *   <li><code>SHA1withRSA</code></li>
@@ -54,8 +54,8 @@ import org.xipki.security.XiSecurityConstants;
  *   <li><code>SHA3-384withRSAandMGF1</code></li>
  *   <li><code>SHA3-512withRSAandMGF1</code></li>
  * </ul>
- * <p/>
- * Signature (DSA)
+ *
+ * <p>Signature (DSA)
  * <ul>
  *   <li><code>NONEwithDSA</code></li>
  *   <li><code>SHA1withDSA</code></li>
@@ -68,8 +68,8 @@ import org.xipki.security.XiSecurityConstants;
  *   <li><code>SHA3-384withDSA</code></li>
  *   <li><code>SHA3-512withDSA</code></li>
  * </ul>
- * <p/>
- * Signature (ECDSA)
+ *
+ * <p>Signature (ECDSA)
  * <ul>
  *   <li><code>NONEwithECDSA</code></li>
  *   <li><code>SHA1withECDSA</code></li>

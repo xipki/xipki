@@ -702,8 +702,10 @@ public interface CaManager {
    * @param zippedConfStream
    *          Inputstream of the zipped Configuration the CA system. Must not be {@code null}.
    * @return map of generated root certificates, if newly generated. The key is the CA name.
+   * @throws IOException
+   *          If read the ZIP stream fails.
    * @throws CaMgmtException
-   *          if error occurs.
+   *          if other error occurs.
    */
   Map<String, X509Certificate> loadConf(InputStream zippedConfStream)
       throws CaMgmtException, IOException;

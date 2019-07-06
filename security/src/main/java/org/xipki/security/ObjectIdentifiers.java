@@ -244,8 +244,8 @@ public class ObjectIdentifiers {
 
     /**
      * Email address (RSA PKCS#9 extension) - IA5String.
-     * <p/>
-     * Note: if you're trying to be ultra orthodox, don't use this! It shouldn't be in here.
+     *
+     * <p>Note: if you're trying to be ultra orthodox, don't use this! It shouldn't be in here.
      */
     public static final ASN1ObjectIdentifier emailAddress =
         PKCSObjectIdentifiers.pkcs_9_at_emailAddress;
@@ -386,24 +386,24 @@ public class ObjectIdentifiers {
     /**
      * This purpose has been included in a predecessor draft of RFC 3280
      * and therefore continue to be listed by this implementation.
-     * <p/>
-     * IP security end system.
+     *
+     * <p>IP security end system.
      */
     public static final ASN1ObjectIdentifier id_kp_ipsecEndSystem = id_kp.branch("5");
 
     /**
      * This purpose has been included in a predecessor draft of RFC 3280
      * and therefore continue to be listed by this implementation.
-     * <p/>
-     * IP security tunnel termination.
+     *
+     * <p>IP security tunnel termination.
      */
     public static final ASN1ObjectIdentifier id_kp_ipsecTunnel = id_kp.branch("6");
 
     /**
      * This purpose has been included in a predecessor draft of RFC 3280
      * and therefore continue to be listed by this implementation.
-     * <p/>
-     * IP security user.
+     *
+     * <p>IP security user.
      */
     public static final ASN1ObjectIdentifier id_kp_ipsecUser = id_kp.branch("7");
 

@@ -181,6 +181,8 @@ public class Actions {
      *          Expected serial numbers. Must not be {@code null}.
      * @param encodedCerts
      *          Map of serial number and the corresponding certificate. Could be {@code null}.
+     * @throws Exception
+     *           if checking failed.
      */
     protected abstract void checkParameters(X509Certificate respIssuer,
         List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts) throws Exception;
@@ -199,6 +201,8 @@ public class Actions {
      *          Expected serial numbers. Must not be {@code null}.
      * @param encodedCerts
      *          Map of serial number and the corresponding certificate. Could be {@code null}.
+     * @throws Exception
+     *           if processing response failed.
      */
     protected abstract void processResponse(OCSPResp response, X509Certificate respIssuer,
         IssuerHash issuerHash, List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)

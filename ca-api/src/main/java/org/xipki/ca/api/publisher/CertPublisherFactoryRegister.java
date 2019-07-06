@@ -62,7 +62,7 @@ public class CertPublisherFactoryRegister {
    * @param type
    *          Type of the publisher. Must not be {@code null}.
    * @return new publisher.
-   * @throws AuditServiceRuntimeException
+   * @throws ObjectCreationException
    *           if publisher could not be created.
    */
   public CertPublisher newPublisher(String type) throws ObjectCreationException {

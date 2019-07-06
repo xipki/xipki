@@ -1803,6 +1803,9 @@ public class Actions {
 
     /**
      * Gets the signer.
+     * @return the signer.
+     * @throws ObjectCreationException
+     *           if no signer can be built.
      */
     protected abstract ConcurrentContentSigner getSigner() throws ObjectCreationException;
 

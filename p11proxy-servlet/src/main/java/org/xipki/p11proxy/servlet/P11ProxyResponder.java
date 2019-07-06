@@ -123,9 +123,15 @@ public class P11ProxyResponder {
    * 0 - - - 1 - - - 2 - - - 3 - - - 4 - - - 5 - - - 6 - - - 7 - - - 8
    * |    Version    |        Transaction ID         |   Body ...    |
    * |   ... Length  |     Action    |   Module ID   |   Content...  |
-   * |   .Content               | <-- 10 + Length (offset).
+   * |   .Content               | &lt;-- 10 + Length (offset).
    *
    * </pre>
+   *
+   * @param pool
+   *          The pool that holds the P11CryptService.
+   * @param request
+   *          The request.
+   * @return response.
    */
   public byte[] processRequest(LocalP11CryptServicePool pool, byte[] request) {
     int reqLen = request.length;

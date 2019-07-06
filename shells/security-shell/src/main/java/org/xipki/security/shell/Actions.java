@@ -462,6 +462,8 @@ public class Actions {
      * @param signatureAlgoControl
      *          The signature control. Must not be {@code null}.
      * @return the signer
+     * @throws Exception
+     *           If getting signer failed.
      */
     protected abstract ConcurrentContentSigner getSigner(
          SignatureAlgoControl signatureAlgoControl) throws Exception;

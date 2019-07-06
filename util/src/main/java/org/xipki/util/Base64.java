@@ -6,53 +6,53 @@ import java.util.Arrays;
 
 /** A very fast and memory efficient class to encode and decode to and from
  * BASE64 in full accordance with RFC 2045.
- * <p/>
- * On Windows XP sp1 with 1.4.2_04 and later ;), this encoder and decoder is
+ *
+ * <p>On Windows XP sp1 with 1.4.2_04 and later ;), this encoder and decoder is
  * about 10 times faster on small arrays (10 - 1000 bytes) and 2-3 times as
  * fast on larger arrays (10000 - 1000000 bytes) compared to
  * <code>sun.misc.Encoder()/Decoder()</code>.
- * <p/>
- * On byte arrays the encoder is about 20% faster than Jakarta Commons Base64
+ *
+ * <p>On byte arrays the encoder is about 20% faster than Jakarta Commons Base64
  * Codec for encode and about 50% faster for decoding large arrays. This
  * implementation is about twice as fast on very small arrays (less than 30
  * bytes).
  * If source/destination is a <code>String</code> this version is about three
  * times as fast due to the fact that the Commons Codec result has to be recoded
  * to a <code>String</code> from <code>byte[]</code>, which is very expensive.
- * <p/>
- * This encode/decode algorithm doesn't create any temporary arrays as many
+ *
+ * <p>This encode/decode algorithm doesn't create any temporary arrays as many
  * other codecs do, it only allocates the resulting array. This produces less
  * garbage and it is possible to handle arrays twice as large as algorithms that
  * create a temporary array. (E.g. Jakarta Commons Codec). It is unknown whether
  * Sun's <code>sun.misc.Encoder()/Decoder()</code> produce temporary arrays but
  * since performance is quite low it probably does.
- * <p/>
- * The encoder produces the same output as the Sun one except that the Sun's
+ *
+ * <p>The encoder produces the same output as the Sun one except that the Sun's
  * encoder appends a trailing line separator if the last character isn't a pad.
  * Unclear why but it only adds to the length and is probably a side effect.
  * Both are in conformance with RFC 2045 though.<br>
  * Commons codec seem to always att a trailing line separator.
- * <p/>
- * <b>Note!</b>
+ *
+ * <p><b>Note!</b>
  * The encode/decode method pairs (types) come in three versions with the
  * <b>exact</b> same algorithm and thus a lot of code redundancy. This is to
  * not create any temporary arrays for transcoding to/from different format
  * types. The methods not used can simply be commented out.
- * <p/>
- * There is also a "fast" version of all decode methods that works the same
+ *
+ * <p>There is also a "fast" version of all decode methods that works the same
  * way as the normal ones, but har a few demands on the decoded input. Normally
  * though, these fast verions should be used if the source if the input is
  * known and it hasn't bee tampered with.
- * <p/>
- * If you find the code useful or you find a bug, please send me a note at
+ *
+ * <p>If you find the code useful or you find a bug, please send me a note at
  * base64 @ miginfocom.com.
- * <p/>
- * Licence (BSD):
- * <p/>
- * Copyright (c) 2004, Mikael Grev, MiG InfoCom AB. (base64 @ miginfocom . com)
+ *
+ * <p>Licence (BSD):
+ *
+ * <p>Copyright (c) 2004, Mikael Grev, MiG InfoCom AB. (base64 @ miginfocom . com)
  * All rights reserved.
- * <p/>
- * Redistribution and use in source and binary forms, with or without
+ *
+ * <p>Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  * Redistributions of source code must retain the above copyright notice, this
  * list of conditions and the following disclaimer.
@@ -62,8 +62,8 @@ import java.util.Arrays;
  * Neither the name of the MiG InfoCom AB nor the names of its contributors
  * may be used to endorse or promote products derived from this software without
  * specific prior written permission.
- * <p/>
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ *
+ * <p>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
  * ARE DISCLAIMED.
