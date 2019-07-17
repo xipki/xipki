@@ -7,10 +7,14 @@
   <filter>
     <filter-name>proxy-filter</filter-name>
     <filter-class>org.xipki.p11proxy.servlet.ProxyServletFilter</filter-class>
-    <!--init-param>
-      <param-name></param-name>
-      <param-value></param-value>
-    </init-param-->
+    <init-param>
+      <param-name>logReqResp</param-name>
+      <!--
+        If set to true, please also set logger.xipki.level to DEBUG
+        in the file META-INF/classes/log4j2.properties.
+      -->
+      <param-value>false</param-value>
+    </init-param>
   </filter>
   <filter-mapping>
     <filter-name>proxy-filter</filter-name>

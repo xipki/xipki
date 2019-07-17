@@ -53,6 +53,8 @@ public class ProxyServletFilter implements Filter {
 
   private HttpProxyServlet servlet;
 
+  private boolean logReqResp;
+
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
     P11ProxyConf conf;
@@ -62,6 +64,10 @@ public class ProxyServletFilter implements Filter {
       throw new IllegalArgumentException(
           "could not parse PKCS#11 Proxy configuration file " + DFLT_SERVER_CFG, ex);
     }
+
+    String str = filterConfig.getInitParameter("logReqResp");
+    logReqResp = Boolean.parseBoolean(str);
+    LOG.info("logReqResp: {}", logReqResp);
 
     securities = new Securities();
     try {
@@ -81,6 +87,7 @@ public class ProxyServletFilter implements Filter {
     }
 
     servlet = new HttpProxyServlet();
+    servlet.setLogReqResp(logReqResp);
     servlet.setLocalP11CryptServicePool(pool);
   }
 

@@ -50,8 +50,14 @@ public class HttpProxyServlet extends HttpServlet {
 
   private LocalP11CryptServicePool localP11CryptServicePool;
 
+  private boolean logReqResp;
+
   public HttpProxyServlet() {
     responder = new P11ProxyResponder();
+  }
+
+  public void setLogReqResp(boolean logReqResp) {
+    this.logReqResp = logReqResp;
   }
 
   @Override
@@ -67,6 +73,12 @@ public class HttpProxyServlet extends HttpServlet {
 
       byte[] requestBytes = IoUtil.read(req.getInputStream());
       byte[] responseBytes = responder.processRequest(localP11CryptServicePool, requestBytes);
+
+      if (logReqResp && LOG.isDebugEnabled()) {
+        LOG.debug("HTTP POST OCSP path: {}\nRequest:\n{}\nResponse:\n{}", req.getRequestURI(),
+            LogUtil.base64Encode(requestBytes), LogUtil.base64Encode(responseBytes));
+      }
+
       resp.setStatus(HttpServletResponse.SC_OK);
       resp.setContentType(RESPONSE_MIMETYPE);
       resp.setContentLength(responseBytes.length);
