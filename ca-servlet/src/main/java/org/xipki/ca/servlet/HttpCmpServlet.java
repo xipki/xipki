@@ -42,6 +42,7 @@ import org.xipki.ca.server.CaAuditConstants;
 import org.xipki.ca.server.CaManagerImpl;
 import org.xipki.ca.server.cmp.CmpResponder;
 import org.xipki.util.Args;
+import org.xipki.util.Base64;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
@@ -62,7 +63,13 @@ public class HttpCmpServlet extends HttpServlet {
 
   private static final String CT_RESPONSE = "application/pkixcmp";
 
+  private boolean logReqResp;
+
   private CaManagerImpl responderManager;
+
+  public void setLogReqResp(boolean logReqResp) {
+    this.logReqResp = logReqResp;
+  }
 
   public void setResponderManager(CaManagerImpl responderManager) {
     this.responderManager = Args.notNull(responderManager, "responderManager");
@@ -133,6 +140,13 @@ public class HttpCmpServlet extends HttpServlet {
 
       PKIMessage pkiResp = responder.processPkiMessage(pkiReq, clientCert, parameters, event);
       byte[] encodedPkiResp = pkiResp.getEncoded();
+
+      if (logReqResp && LOG.isDebugEnabled()) {
+        LOG.debug("HTTP POST CA CMP path: {}\nRequest:\n{}\nResponse:\n{}",
+            req.getRequestURI(),
+            Base64.encodeToString(reqContent, true),
+            Base64.encodeToString(encodedPkiResp, true));
+      }
 
       resp.setContentType(CT_RESPONSE);
       resp.setContentLength(encodedPkiResp.length);

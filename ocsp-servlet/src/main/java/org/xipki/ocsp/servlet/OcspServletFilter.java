@@ -68,6 +68,8 @@ public class OcspServletFilter implements Filter {
 
   private boolean remoteMgmtEnabled;
 
+  private boolean logReqResp;
+
   private HttpMgmtServlet mgmtServlet;
 
   @Override
@@ -80,6 +82,10 @@ public class OcspServletFilter implements Filter {
     } catch (IOException | InvalidConfException ex) {
       throw new IllegalArgumentException("could not parse OCSP configuration file " + confFile, ex);
     }
+
+    String str = filterConfig.getInitParameter("logReqResp");
+    logReqResp = Boolean.parseBoolean(str);
+    LOG.info("logReqResp: {}", logReqResp);
 
     securities = new Securities();
     try {
@@ -105,6 +111,7 @@ public class OcspServletFilter implements Filter {
 
     this.ocspServlet = new OcspServlet();
     this.ocspServlet.setServer(this.server);
+    this.ocspServlet.setLogReqResp(logReqResp);
 
     RemoteMgmt remoteMgmt = conf.getRemoteMgmt();
     this.remoteMgmtEnabled = remoteMgmt == null ? false : remoteMgmt.isEnabled();

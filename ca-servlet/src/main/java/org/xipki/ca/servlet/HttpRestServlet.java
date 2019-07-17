@@ -40,6 +40,7 @@ import org.xipki.ca.server.RestResponder.RestResponse;
 import org.xipki.util.Args;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
+import org.xipki.util.LogUtil;
 
 /**
  * REST API exception.
@@ -53,7 +54,13 @@ public class HttpRestServlet extends HttpServlet {
 
   private static Logger LOG = LoggerFactory.getLogger(HttpRestServlet.class);
 
+  private boolean logReqResp;
+
   private CaManagerImpl responderManager;
+
+  public void setLogReqResp(boolean logReqResp) {
+    this.logReqResp = logReqResp;
+  }
 
   public void setResponderManager(CaManagerImpl responderManager) {
     this.responderManager = Args.notNull(responderManager, "responderManager");
@@ -96,6 +103,16 @@ public class HttpRestServlet extends HttpServlet {
       }
 
       byte[] respBody = response.getBody();
+      if (logReqResp && LOG.isDebugEnabled()) {
+        if (viaPost) {
+          LOG.debug("HTTP POST CA REST path: {}\nRequest:\n{}\nResponse:\n{}", req.getRequestURI(),
+              LogUtil.base64Encode(requestBytes), LogUtil.base64Encode(respBody));
+        } else {
+          LOG.debug("HTTP GET CA REST path: {}\nResponse:\n{}", req.getRequestURI(),
+              LogUtil.base64Encode(respBody));
+        }
+      }
+
       if (respBody == null) {
         resp.setContentLength(0);
       } else {

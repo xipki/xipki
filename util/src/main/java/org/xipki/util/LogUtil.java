@@ -130,4 +130,14 @@ public class LogUtil {
     return "0x" + Hex.encode(serialNumber.toByteArray());
   }
 
+  public static String base64Encode(byte[] bytes) {
+    if (bytes == null) {
+      return "NULL";
+    } else if (bytes.length == 0) {
+      return "EMPTY";
+    } else {
+      return Base64.encodeToString(bytes, true);
+    }
+  }
+
 }

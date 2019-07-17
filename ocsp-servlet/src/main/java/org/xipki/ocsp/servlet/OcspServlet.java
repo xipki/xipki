@@ -61,7 +61,13 @@ public class OcspServlet extends HttpServlet {
 
   private static final String CT_RESPONSE = "application/ocsp-response";
 
+  private boolean logReqResp;
+
   private OcspServer server;
+
+  public void setLogReqResp(boolean logReqResp) {
+    this.logReqResp = logReqResp;
+  }
 
   public void setServer(OcspServer server) {
     this.server = Args.notNull(server, "server");
@@ -100,6 +106,11 @@ public class OcspServlet extends HttpServlet {
       }
 
       byte[] encodedOcspResp = ocspRespWithCacheInfo.getResponse();
+      if (logReqResp && LOG.isDebugEnabled()) {
+        LOG.debug("HTTP POST OCSP path: {}\nRequest:\n{}\nResponse:\n{}", req.getRequestURI(),
+            LogUtil.base64Encode(reqContent), LogUtil.base64Encode(encodedOcspResp));
+      }
+
       resp.setStatus(HttpServletResponse.SC_OK);
       resp.setContentType(CT_RESPONSE);
       resp.setContentLength(encodedOcspResp.length);
@@ -175,6 +186,10 @@ public class OcspServlet extends HttpServlet {
       }
 
       byte[] encodedOcspResp = ocspRespWithCacheInfo.getResponse();
+      if (logReqResp && LOG.isDebugEnabled()) {
+        LOG.debug("HTTP GET OCSP path: {}\nResponse:\n{}", req.getRequestURI(),
+            LogUtil.base64Encode(encodedOcspResp));
+      }
 
       OcspRespWithCacheInfo.ResponseCacheInfo cacheInfo = ocspRespWithCacheInfo.getCacheInfo();
       if (cacheInfo != null) {

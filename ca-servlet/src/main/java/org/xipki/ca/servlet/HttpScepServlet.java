@@ -74,7 +74,13 @@ public class HttpScepServlet extends HttpServlet {
 
   private static final String CT_RESPONSE = ScepConstants.CT_PKI_MESSAGE;
 
+  private boolean logReqResp;
+
   private CaManagerImpl responderManager;
+
+  public void setLogReqResp(boolean logReqResp) {
+    this.logReqResp = logReqResp;
+  }
 
   public void setResponderManager(CaManagerImpl responderManager) {
     this.responderManager = Args.notNull(responderManager, "responderManager");
@@ -148,19 +154,22 @@ public class HttpScepServlet extends HttpServlet {
       String operation = req.getParameter("operation");
       event.addEventData(CaAuditConstants.Scep.NAME_operation, operation);
 
+      byte[] requestBytes;
+      byte[] respBody;
+      String contentType;
+
       if ("PKIOperation".equalsIgnoreCase(operation)) {
         CMSSignedData reqMessage;
         // parse the request
         try {
-          byte[] content;
           if (viaPost) {
-            content = IoUtil.read(req.getInputStream());
+            requestBytes = IoUtil.read(req.getInputStream());
           } else {
             String b64 = req.getParameter("message");
-            content = Base64.decode(b64);
+            requestBytes = Base64.decode(b64);
           }
 
-          reqMessage = new CMSSignedData(content);
+          reqMessage = new CMSSignedData(requestBytes);
         } catch (Exception ex) {
           final String msg = "invalid request";
           LogUtil.error(LOG, ex, msg);
@@ -221,17 +230,18 @@ public class HttpScepServlet extends HttpServlet {
           return;
         }
 
-        byte[] bodyBytes = ci.getEncoded();
-
-        sendOKResponse(resp, CT_RESPONSE, bodyBytes);
+        respBody = ci.getEncoded();
+        contentType = CT_RESPONSE;
       } else if (Operation.GetCACaps.getCode().equalsIgnoreCase(operation)) {
         // CA-Ident is ignored
-        byte[] caCapsBytes = responder.getCaCaps().getBytes();
-        sendOKResponse(resp, ScepConstants.CT_TEXT_PLAIN, caCapsBytes);
+        requestBytes = null;
+        contentType = ScepConstants.CT_TEXT_PLAIN;
+        respBody = responder.getCaCaps().getBytes();
       } else if (Operation.GetCACert.getCode().equalsIgnoreCase(operation)) {
         // CA-Ident is ignored
-        byte[] respBytes = responder.getCaCertResp().getBytes();
-        sendOKResponse(resp, ScepConstants.CT_X509_CA_RA_CERT, respBytes);
+        requestBytes = null;
+        contentType = ScepConstants.CT_X509_CA_RA_CERT;
+        respBody = responder.getCaCertResp().getBytes();
       } else if (Operation.GetNextCACert.getCode().equalsIgnoreCase(operation)) {
         auditMessage = "SCEP operation '" + operation + "' is not permitted";
         auditStatus = AuditStatus.FAILED;
@@ -243,6 +253,19 @@ public class HttpScepServlet extends HttpServlet {
         sendError(resp, HttpServletResponse.SC_BAD_REQUEST);
         return;
       }
+
+      if (logReqResp && LOG.isDebugEnabled()) {
+        if (viaPost) {
+          LOG.debug("HTTP POST CA SCEP path: {}\nRequest:\n{}\nResponse:\n{}",
+              req.getRequestURI(),
+              LogUtil.base64Encode(requestBytes), LogUtil.base64Encode(respBody));
+        } else {
+          LOG.debug("HTTP GET CA SCEP path: {}\nResponse:\n{}", req.getRequestURI(),
+              LogUtil.base64Encode(respBody));
+        }
+      }
+
+      sendOKResponse(resp, contentType, respBody);
     } catch (Throwable th) {
       if (th instanceof EOFException) {
         final String msg = "connection reset by peer";

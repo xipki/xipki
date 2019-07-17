@@ -82,6 +82,8 @@ public class CaServletFilter implements Filter {
 
   private boolean remoteMgmtEnabled;
 
+  private boolean logReqResp;
+
   private HttpMgmtServlet mgmtServlet;
 
   @Override
@@ -93,6 +95,10 @@ public class CaServletFilter implements Filter {
       throw new IllegalArgumentException(
           "could not parse CA configuration file " + DFLT_CA_SERVER_CFG, ex);
     }
+
+    String str = filterConfig.getInitParameter("logReqResp");
+    logReqResp = Boolean.parseBoolean(str);
+    LOG.info("logReqResp: {}", logReqResp);
 
     AuditConf audit = conf.getAudit();
     String auditType = audit.getType();
@@ -131,15 +137,18 @@ public class CaServletFilter implements Filter {
 
     this.cmpServlet = new HttpCmpServlet();
     this.cmpServlet.setResponderManager(caManager);
+    this.cmpServlet.setLogReqResp(logReqResp);
 
     this.healthServlet = new HealthCheckServlet();
     this.healthServlet.setResponderManager(caManager);
 
     this.restServlet = new HttpRestServlet();
     this.restServlet.setResponderManager(caManager);
+    this.restServlet.setLogReqResp(logReqResp);
 
     this.scepServlet = new HttpScepServlet();
     this.scepServlet.setResponderManager(caManager);
+    this.scepServlet.setLogReqResp(logReqResp);
 
     RemoteMgmt remoteMgmt = conf.getRemoteMgmt();
     this.remoteMgmtEnabled = remoteMgmt == null ? false : remoteMgmt.isEnabled();
