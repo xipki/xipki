@@ -311,7 +311,6 @@ public abstract class ExtensionSpec {
 
     private static final Set<ASN1ObjectIdentifier> REQUIRED_EXTENSIONS =
         Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-            Extension.authorityInfoAccess,
             Extension.subjectKeyIdentifier
             )));
 

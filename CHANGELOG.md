@@ -4,6 +4,11 @@ See also <https://github.com/xipki/xipki/releases>
 
 ## 5.3.3
   - Release date: -
+  - CA
+    - Add feature to log the the HTTP requests and responses
+    - Remove the extension authorityInfoAccess from the mandatory list
+  - OCSP
+    - Add feature to log the the HTTP requests and responses
 
 ## 5.3.2
   - Release date: July 4, 2019
