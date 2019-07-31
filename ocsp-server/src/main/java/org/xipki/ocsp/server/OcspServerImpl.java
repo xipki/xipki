@@ -18,6 +18,7 @@
 package org.xipki.ocsp.server;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -70,6 +71,7 @@ import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.ocsp.api.Responder;
 import org.xipki.ocsp.api.ResponderAndPath;
 import org.xipki.ocsp.server.OcspServerConf.EmbedCertsMode;
+import org.xipki.ocsp.server.OcspServerConf.Source;
 import org.xipki.ocsp.server.ResponderOption.OcspMode;
 import org.xipki.ocsp.server.store.CaDbCertStatusStore;
 import org.xipki.ocsp.server.store.CrlDbCertStatusStore;
@@ -410,6 +412,33 @@ public class OcspServerImpl implements OcspServer {
               "duplicated definition of datasource named '" + name + "'");
         }
         set.add(name);
+      }
+    }
+
+    // assert that one directory will not be used duplicated by the source of type 'crl'
+    Set<String> crlsDirs = new HashSet<>();
+    for (OcspServerConf.Store m : conf.getStores()) {
+      Source source = m.getSource();
+      if ("crl".equalsIgnoreCase(source.getType())) {
+        Object obj = source.getConf().get("dir");
+        if (!(obj instanceof String)) {
+          continue;
+        }
+
+        File file = new File((String) obj);
+        String canonicalPath;
+        try {
+          canonicalPath = file.getCanonicalPath();
+        } catch (IOException ex) {
+          throw new InvalidConfException("error getCanonicalPath:" + ex.getMessage());
+        }
+
+        if (crlsDirs.contains(canonicalPath)) {
+          throw new InvalidConfException(
+              "duplicated use of dir '" + canonicalPath + "' in store " + m.getName());
+        } else {
+          crlsDirs.add(canonicalPath);
+        }
       }
     }
 
