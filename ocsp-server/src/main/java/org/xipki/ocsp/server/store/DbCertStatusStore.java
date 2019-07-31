@@ -87,6 +87,8 @@ public class DbCertStatusStore extends OcspStore {
 
   private static final Logger LOG = LoggerFactory.getLogger(DbCertStatusStore.class);
 
+  private final Object lock = new Object();
+
   private final AtomicBoolean storeUpdateInProcess = new AtomicBoolean(false);
 
   private final StoreUpdateService storeUpdateService = new StoreUpdateService();
@@ -121,29 +123,33 @@ public class DbCertStatusStore extends OcspStore {
     updateIssuerStore(false);
   }
 
-  protected synchronized void updateIssuerStore(boolean force) {
-    if (force) {
-      while (storeUpdateInProcess.get()) {
-        try {
-          Thread.sleep(1000);
-        } catch (InterruptedException ex) {
-          LOG.warn("interrputed, continue waiting");
-        }
-      }
-    } else {
+  protected void updateIssuerStore(boolean force) {
+    if (!force) {
       if (storeUpdateInProcess.get()) {
         return;
       }
     }
 
-    storeUpdateInProcess.set(true);
-    try {
-      updateIssuers();
-      updateCrls();
-    } finally {
-      initialized = true;
-      storeUpdateInProcess.set(false);
-    }
+    synchronized (lock) {
+      if (force) {
+        while (storeUpdateInProcess.get()) {
+          try {
+            Thread.sleep(1000);
+          } catch (InterruptedException ex) {
+            LOG.warn("interrputed, continue waiting");
+          }
+        }
+      }
+
+      storeUpdateInProcess.set(true);
+      try {
+        updateIssuers();
+        updateCrls();
+      } finally {
+        initialized = true;
+        storeUpdateInProcess.set(false);
+      }
+    } // end lock
   }
 
   private void updateIssuers() {

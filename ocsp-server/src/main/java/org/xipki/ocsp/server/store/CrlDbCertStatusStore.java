@@ -58,6 +58,8 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
 
   private final CrlUpdateService storeUpdateService = new CrlUpdateService();
 
+  private final Object lock = new Object();
+
   private final AtomicBoolean crlUpdateInProcess = new AtomicBoolean(false);
 
   private String dir;
@@ -131,53 +133,55 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     return crlUpdated && super.isInitialized();
   }
 
-  private synchronized void updateStore(boolean firstTime) {
+  private void updateStore(boolean firstTime) {
     if (crlUpdateInProcess.get()) {
       return;
     }
 
-    crlUpdateInProcess.set(true);
-    try {
-      File[] subDirs = new File(dir).listFiles();
-      boolean updateMe = false;
-      if (subDirs != null) {
-        for (File subDir : subDirs) {
-          if (!subDir.isDirectory()) {
-            continue;
-          }
+    synchronized (lock) {
+      crlUpdateInProcess.set(true);
+      try {
+        File[] subDirs = new File(dir).listFiles();
+        boolean updateMe = false;
+        if (subDirs != null) {
+          for (File subDir : subDirs) {
+            if (!subDir.isDirectory()) {
+              continue;
+            }
 
-          String dirName = subDir.getName();
-          if (dirName.startsWith("crl-")) {
-            if (new File(subDir, "UPDATEME").exists()) {
-              updateMe = true;
-              break;
+            String dirName = subDir.getName();
+            if (dirName.startsWith("crl-")) {
+              if (new File(subDir, "UPDATEME").exists()) {
+                updateMe = true;
+                break;
+              }
             }
           }
         }
-      }
 
-      if (!updateMe) {
-        LOG.info("CertStore {} not changed", name);
-        return;
-      }
+        if (!updateMe) {
+          LOG.info("CertStore {} not changed", name);
+          return;
+        }
 
-      ImportCrl importCrl = new ImportCrl(datasource, dir, sqlBatchCommit, ignoreExpiredCrls);
+        ImportCrl importCrl = new ImportCrl(datasource, dir, sqlBatchCommit, ignoreExpiredCrls);
 
-      if (importCrl.importCrlToOcspDb()) {
-        LOG.info("updated CertStore {} successfully", name);
-      } else {
-        LOG.error("updating CertStore {} failed", name);
-      }
+        if (importCrl.importCrlToOcspDb()) {
+          LOG.info("updated CertStore {} successfully", name);
+        } else {
+          LOG.error("updating CertStore {} failed", name);
+        }
 
-      if (!firstTime) {
-        super.updateIssuerStore(true);
+        if (!firstTime) {
+          super.updateIssuerStore(true);
+        }
+      } catch (Throwable th) {
+        LogUtil.error(LOG, th, "error while executing updateStore()");
+      } finally {
+        crlUpdated = true;
+        crlUpdateInProcess.set(false);
       }
-    } catch (Throwable th) {
-      LogUtil.error(LOG, th, "error while executing updateStore()");
-    } finally {
-      crlUpdated = true;
-      crlUpdateInProcess.set(false);
-    }
+    } // end lock
   } // method initializeStore
 
 }

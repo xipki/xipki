@@ -101,24 +101,28 @@ public class ResponseCacher implements Closeable {
 
   private class ExpiredResponsesCleaner implements Runnable {
 
-    private boolean inProcess;
+    private final Object lock = new Object();
+
+    private final AtomicBoolean inProcess = new AtomicBoolean(false);
 
     @Override
     public void run() {
-      if (inProcess) {
+      if (inProcess.get()) {
         return;
       }
 
-      inProcess = true;
-      long maxThisUpdate = System.currentTimeMillis() / 1000 - validity;
-      try {
-        int num = removeExpiredResponses(maxThisUpdate);
-        LOG.info("removed {} response with thisUpdate < {}", num, maxThisUpdate);
-      } catch (Throwable th) {
-        LogUtil.error(LOG, th, "could not remove expired responses");
-      } finally {
-        inProcess = false;
-      }
+      synchronized (lock) {
+        inProcess.set(true);
+        long maxThisUpdate = System.currentTimeMillis() / 1000 - validity;
+        try {
+          int num = removeExpiredResponses(maxThisUpdate);
+          LOG.info("removed {} response with thisUpdate < {}", num, maxThisUpdate);
+        } catch (Throwable th) {
+          LogUtil.error(LOG, th, "could not remove expired responses");
+        } finally {
+          inProcess.set(false);
+        }
+      } // end lock
     } // method run
 
   } // class ExpiredResponsesCleaner

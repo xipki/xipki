@@ -90,6 +90,8 @@ public class EjbcaCertStatusStore extends OcspStore {
 
   private final AtomicBoolean storeUpdateInProcess = new AtomicBoolean(false);
 
+  private final Object lock = new Object();
+
   private DataSourceWrapper datasource;
 
   private String sqlCs;
@@ -110,104 +112,106 @@ public class EjbcaCertStatusStore extends OcspStore {
     return Arrays.asList(storeUpdateService);
   }
 
-  private synchronized void updateIssuerStore() {
+  private void updateIssuerStore() {
     if (storeUpdateInProcess.get()) {
       return;
     }
 
     final String sql = "SELECT data FROM CAData";
 
-    storeUpdateInProcess.set(true);
-    try {
-      PreparedStatement ps = preparedStatement(sql);
-      ResultSet rs = null;
-
+    synchronized (lock) {
+      storeUpdateInProcess.set(true);
       try {
-        Map<String, EjbcaIssuerEntry> newIssuers = new HashMap<>();
+        PreparedStatement ps = preparedStatement(sql);
+        ResultSet rs = null;
 
-        rs = ps.executeQuery();
-        while (rs.next()) {
-          String caData = rs.getString("data");
+        try {
+          Map<String, EjbcaIssuerEntry> newIssuers = new HashMap<>();
 
-          String str = extractTextFromCaData(caData, "catype", "int");
-          if (!"1".contentEquals(str)) {
-            // not X.509CA
-            continue;
+          rs = ps.executeQuery();
+          while (rs.next()) {
+            String caData = rs.getString("data");
+
+            String str = extractTextFromCaData(caData, "catype", "int");
+            if (!"1".contentEquals(str)) {
+              // not X.509CA
+              continue;
+            }
+
+            String b64Cert = extractTextFromCaData(caData, "certificatechain", "string");
+            if (b64Cert == null) {
+              // not an X.509CA
+              continue;
+            }
+
+            X509Certificate cert = X509Util.parseCert(StringUtil.toUtf8Bytes(b64Cert.trim()));
+            EjbcaIssuerEntry issuerEntry = new EjbcaIssuerEntry(cert);
+            String sha1Fp = issuerEntry.getId();
+
+            if (!issuerFilter.includeIssuerWithSha1Fp(sha1Fp)) {
+              continue;
+            }
+
+            RequestIssuer reqIssuer =
+                new RequestIssuer(HashAlgo.SHA1, issuerEntry.getEncodedHash(HashAlgo.SHA1));
+            for (EjbcaIssuerEntry m : newIssuers.values()) {
+              if (m.matchHash(reqIssuer)) {
+                throw new Exception("found at least two issuers with the same subject and key");
+              }
+            }
+
+            // extract the revocation time of CA
+            str = extractTextFromCaData(caData, "revokationreason", "int");
+            if (str != null && !"-1".contentEquals(str)) {
+              // CA is revoked
+              str = extractTextFromCaData(caData, "revokationdate", "long");
+
+              Date revTime = (str == null || "-1".contentEquals(str))
+                  ? new Date() : new Date(Long.parseLong(str));
+              issuerEntry.setRevocationInfo(revTime);
+            }
+
+            newIssuers.put(sha1Fp, issuerEntry);
           }
 
-          String b64Cert = extractTextFromCaData(caData, "certificatechain", "string");
-          if (b64Cert == null) {
-            // not an X.509CA
-            continue;
-          }
+          // no change in the issuerStore
+          Set<String> newIds = newIssuers.keySet();
+          Set<String> ids = (issuerStore != null) ? issuerStore.getIds() : Collections.emptySet();
 
-          X509Certificate cert = X509Util.parseCert(StringUtil.toUtf8Bytes(b64Cert.trim()));
-          EjbcaIssuerEntry issuerEntry = new EjbcaIssuerEntry(cert);
-          String sha1Fp = issuerEntry.getId();
+          boolean issuersUnchanged = (ids.size() == newIds.size())
+              && ids.containsAll(newIds) && newIds.containsAll(ids);
 
-          if (!issuerFilter.includeIssuerWithSha1Fp(sha1Fp)) {
-            continue;
-          }
-
-          RequestIssuer reqIssuer =
-              new RequestIssuer(HashAlgo.SHA1, issuerEntry.getEncodedHash(HashAlgo.SHA1));
-          for (EjbcaIssuerEntry m : newIssuers.values()) {
-            if (m.matchHash(reqIssuer)) {
-              throw new Exception("found at least two issuers with the same subject and key");
+          if (issuersUnchanged) {
+            for (String id : newIds) {
+              EjbcaIssuerEntry entry = issuerStore.getIssuerForId(id);
+              EjbcaIssuerEntry newEntry = newIssuers.get(id);
+              if (!newEntry.equals(entry)) {
+                issuersUnchanged = false;
+                break;
+              }
             }
           }
 
-          // extract the revocation time of CA
-          str = extractTextFromCaData(caData, "revokationreason", "int");
-          if (str != null && !"-1".contentEquals(str)) {
-            // CA is revoked
-            str = extractTextFromCaData(caData, "revokationdate", "long");
-
-            Date revTime = (str == null || "-1".contentEquals(str))
-                ? new Date() : new Date(Long.parseLong(str));
-            issuerEntry.setRevocationInfo(revTime);
+          if (issuersUnchanged) {
+            return;
           }
 
-          newIssuers.put(sha1Fp, issuerEntry);
+          initialized = false;
+          this.issuerStore = new EjbcaIssuerStore(newIssuers.values());
+          LOG.info("Updated issuers: {}", name);
+          initializationFailed = false;
+          initialized = true;
+        } finally {
+          releaseDbResources(ps, rs);
         }
-
-        // no change in the issuerStore
-        Set<String> newIds = newIssuers.keySet();
-        Set<String> ids = (issuerStore != null) ? issuerStore.getIds() : Collections.emptySet();
-
-        boolean issuersUnchanged = (ids.size() == newIds.size())
-            && ids.containsAll(newIds) && newIds.containsAll(ids);
-
-        if (issuersUnchanged) {
-          for (String id : newIds) {
-            EjbcaIssuerEntry entry = issuerStore.getIssuerForId(id);
-            EjbcaIssuerEntry newEntry = newIssuers.get(id);
-            if (!newEntry.equals(entry)) {
-              issuersUnchanged = false;
-              break;
-            }
-          }
-        }
-
-        if (issuersUnchanged) {
-          return;
-        }
-
-        initialized = false;
-        this.issuerStore = new EjbcaIssuerStore(newIssuers.values());
-        LOG.info("Updated issuers: {}", name);
-        initializationFailed = false;
+      } catch (Throwable th) {
+        LogUtil.error(LOG, th, "error while executing updateIssuerStore()");
+        initializationFailed = true;
         initialized = true;
       } finally {
-        releaseDbResources(ps, rs);
+        storeUpdateInProcess.set(false);
       }
-    } catch (Throwable th) {
-      LogUtil.error(LOG, th, "error while executing updateIssuerStore()");
-      initializationFailed = true;
-      initialized = true;
-    } finally {
-      storeUpdateInProcess.set(false);
-    }
+    } // end lock
   } // method initIssuerStore
 
   @Override

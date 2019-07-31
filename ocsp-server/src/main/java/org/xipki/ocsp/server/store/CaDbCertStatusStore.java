@@ -84,6 +84,8 @@ public class CaDbCertStatusStore extends OcspStore {
 
   private final StoreUpdateService storeUpdateService = new StoreUpdateService();
 
+  private final Object lock = new Object();
+
   private final AtomicBoolean storeUpdateInProcess = new AtomicBoolean(false);
 
   private String sqlCsNoRit;
@@ -108,113 +110,116 @@ public class CaDbCertStatusStore extends OcspStore {
     return Arrays.asList(storeUpdateService);
   }
 
-  private synchronized void updateIssuerStore() {
+  private void updateIssuerStore() {
     if (storeUpdateInProcess.get()) {
       return;
     }
 
-    storeUpdateInProcess.set(true);
-    try {
-      if (initialized) {
-        final String sql = "SELECT ID,REV_INFO,CERT FROM CA";
-        PreparedStatement ps = preparedStatement(sql);
-        ResultSet rs = null;
+    synchronized (lock) {
+      storeUpdateInProcess.set(true);
+      try {
+        if (initialized) {
+          final String sql = "SELECT ID,REV_INFO,CERT FROM CA";
+          PreparedStatement ps = preparedStatement(sql);
+          ResultSet rs = null;
 
-        try {
-          Map<Integer, SimpleIssuerEntry> newIssuers = new HashMap<>();
+          try {
+            Map<Integer, SimpleIssuerEntry> newIssuers = new HashMap<>();
 
-          rs = ps.executeQuery();
-          while (rs.next()) {
-            byte[] certBytes = Base64.decode(rs.getString("CERT"));
-            if (!issuerFilter.includeAll()) {
-              String sha1Fp = HashAlgo.SHA1.base64Hash(certBytes);
-              if (!issuerFilter.includeIssuerWithSha1Fp(sha1Fp)) {
-                continue;
+            rs = ps.executeQuery();
+            while (rs.next()) {
+              byte[] certBytes = Base64.decode(rs.getString("CERT"));
+              if (!issuerFilter.includeAll()) {
+                String sha1Fp = HashAlgo.SHA1.base64Hash(certBytes);
+                if (!issuerFilter.includeIssuerWithSha1Fp(sha1Fp)) {
+                  continue;
+                }
+              }
+
+              int id = rs.getInt("ID");
+              Long revTimeMs = null;
+              String str = rs.getString("REV_INFO");
+              if (str != null) {
+                CertRevocationInfo revInfo = CertRevocationInfo.fromEncoded(str);
+                revTimeMs = revInfo.getRevocationTime().getTime();
+              }
+              SimpleIssuerEntry issuerEntry = new SimpleIssuerEntry(id, revTimeMs);
+              newIssuers.put(id, issuerEntry);
+            }
+
+            // no change in the issuerStore
+            Set<Integer> newIds = newIssuers.keySet();
+            Set<Integer> ids = (issuerStore != null)
+                                  ? issuerStore.getIds() : Collections.emptySet();
+
+            boolean issuersUnchanged = (ids.size() == newIds.size())
+                && ids.containsAll(newIds) && newIds.containsAll(ids);
+
+            if (issuersUnchanged) {
+              for (Integer id : newIds) {
+                IssuerEntry entry = issuerStore.getIssuerForId(id);
+                SimpleIssuerEntry newEntry = newIssuers.get(id);
+                if (!newEntry.match(entry)) {
+                  issuersUnchanged = false;
+                  break;
+                }
               }
             }
 
-            int id = rs.getInt("ID");
-            Long revTimeMs = null;
+            if (issuersUnchanged) {
+              return;
+            }
+          } finally {
+            releaseDbResources(ps, rs);
+          }
+        } // end if(initialized)
+
+        final String sql = "SELECT ID,REV_INFO,CERT FROM CA";
+        PreparedStatement ps = preparedStatement(sql);
+
+        ResultSet rs = null;
+        try {
+          rs = ps.executeQuery();
+          List<IssuerEntry> caInfos = new LinkedList<>();
+          while (rs.next()) {
+            byte[] certBytes = Base64.decode(rs.getString("CERT"));
+            String sha1Fp = HashAlgo.SHA1.base64Hash(certBytes);
+            if (!issuerFilter.includeIssuerWithSha1Fp(sha1Fp)) {
+              continue;
+            }
+
+            X509Certificate cert = X509Util.parseCert(certBytes);
+
+            IssuerEntry caInfoEntry = new IssuerEntry(rs.getInt("ID"), cert);
+            RequestIssuer reqIssuer = new RequestIssuer(HashAlgo.SHA1,
+                caInfoEntry.getEncodedHash(HashAlgo.SHA1));
+            for (IssuerEntry existingIssuer : caInfos) {
+              if (existingIssuer.matchHash(reqIssuer)) {
+                throw new Exception("found at least two issuers with the same subject and key");
+              }
+            }
+
             String str = rs.getString("REV_INFO");
             if (str != null) {
               CertRevocationInfo revInfo = CertRevocationInfo.fromEncoded(str);
-              revTimeMs = revInfo.getRevocationTime().getTime();
+              caInfoEntry.setRevocationInfo(revInfo.getRevocationTime());
             }
-            SimpleIssuerEntry issuerEntry = new SimpleIssuerEntry(id, revTimeMs);
-            newIssuers.put(id, issuerEntry);
-          }
 
-          // no change in the issuerStore
-          Set<Integer> newIds = newIssuers.keySet();
-          Set<Integer> ids = (issuerStore != null) ? issuerStore.getIds() : Collections.emptySet();
+            caInfos.add(caInfoEntry);
+          } // end while (rs.next())
 
-          boolean issuersUnchanged = (ids.size() == newIds.size())
-              && ids.containsAll(newIds) && newIds.containsAll(ids);
-
-          if (issuersUnchanged) {
-            for (Integer id : newIds) {
-              IssuerEntry entry = issuerStore.getIssuerForId(id);
-              SimpleIssuerEntry newEntry = newIssuers.get(id);
-              if (!newEntry.match(entry)) {
-                issuersUnchanged = false;
-                break;
-              }
-            }
-          }
-
-          if (issuersUnchanged) {
-            return;
-          }
+          this.issuerStore.setIssuers(caInfos);
+          LOG.info("Updated issuers: {}", name);
         } finally {
           releaseDbResources(ps, rs);
         }
-      } // end if(initialized)
-
-      final String sql = "SELECT ID,REV_INFO,CERT FROM CA";
-      PreparedStatement ps = preparedStatement(sql);
-
-      ResultSet rs = null;
-      try {
-        rs = ps.executeQuery();
-        List<IssuerEntry> caInfos = new LinkedList<>();
-        while (rs.next()) {
-          byte[] certBytes = Base64.decode(rs.getString("CERT"));
-          String sha1Fp = HashAlgo.SHA1.base64Hash(certBytes);
-          if (!issuerFilter.includeIssuerWithSha1Fp(sha1Fp)) {
-            continue;
-          }
-
-          X509Certificate cert = X509Util.parseCert(certBytes);
-
-          IssuerEntry caInfoEntry = new IssuerEntry(rs.getInt("ID"), cert);
-          RequestIssuer reqIssuer = new RequestIssuer(HashAlgo.SHA1,
-              caInfoEntry.getEncodedHash(HashAlgo.SHA1));
-          for (IssuerEntry existingIssuer : caInfos) {
-            if (existingIssuer.matchHash(reqIssuer)) {
-              throw new Exception("found at least two issuers with the same subject and key");
-            }
-          }
-
-          String str = rs.getString("REV_INFO");
-          if (str != null) {
-            CertRevocationInfo revInfo = CertRevocationInfo.fromEncoded(str);
-            caInfoEntry.setRevocationInfo(revInfo.getRevocationTime());
-          }
-
-          caInfos.add(caInfoEntry);
-        } // end while (rs.next())
-
-        this.issuerStore.setIssuers(caInfos);
-        LOG.info("Updated issuers: {}", name);
+      } catch (Throwable th) {
+        LogUtil.error(LOG, th, "error while executing updateIssuerStore()");
       } finally {
-        releaseDbResources(ps, rs);
+        initialized = true;
+        storeUpdateInProcess.set(false);
       }
-    } catch (Throwable th) {
-      LogUtil.error(LOG, th, "error while executing updateIssuerStore()");
-    } finally {
-      initialized = true;
-      storeUpdateInProcess.set(false);
-    }
+    } // end lock
   } // method initIssuerStore
 
   @Override
