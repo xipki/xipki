@@ -962,7 +962,7 @@ public class OcspServerImpl implements OcspServer {
       } else if (Arrays.equals(certStatus, bytes_certstatus_unknown)) {
         certStatusText = "unknown";
       } else if (Arrays.equals(certStatus, bytes_certstatus_rfc6960_unknown)) {
-        certStatusText = "RFC6969_unknown";
+        certStatusText = "RFC6960_unknown";
       } else  {
         certStatusText = unknownAsRevoked ? "unknown_as_revoked" : "revoked";
       }
