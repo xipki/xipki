@@ -757,6 +757,8 @@ class ImportCrl {
       releaseResources(ps, rs);
     }
 
+    // If one issuer has more than one CRLs, the CRL_ID is set to 0,
+    // otherwise set it to the id
     try {
       sql = "UPDATE ISSUER SET CRL_ID=? WHERE S1C=?";
       ps = datasource.prepareStatement(conn, sql);

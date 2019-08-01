@@ -124,6 +124,11 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
   }
 
   @Override
+  protected boolean isIgnoreExpiredCrls() {
+    return ignoreExpiredCrls;
+  }
+
+  @Override
   protected List<Runnable> getScheduledServices() {
     return Arrays.asList(storeUpdateService);
   }

@@ -87,6 +87,8 @@ public class DbCertStatusStore extends OcspStore {
 
   private static final Logger LOG = LoggerFactory.getLogger(DbCertStatusStore.class);
 
+  private static final long MS_PER_5MIN = 300L * 1000;
+
   private final Object lock = new Object();
 
   private final AtomicBoolean storeUpdateInProcess = new AtomicBoolean(false);
@@ -301,6 +303,18 @@ public class DbCertStatusStore extends OcspStore {
         return null;
       }
 
+      CrlInfo crlInfo = null;
+      if (issuer.getCrlId() != 0) {
+        crlInfo = issuerStore.getCrlInfo(issuer.getCrlId());
+        // check whether CRL is expired
+        if (isIgnoreExpiredCrls()) {
+          // CRL will expire in 5 minutes
+          if (crlInfo.getNextUpdate().getTime() < time.getTime() + MS_PER_5MIN) {
+            return CertStatusInfo.getCrlExpiredStatusInfo();
+          }
+        }
+      }
+
       if (includeCertHash) {
         sql = includeRit ? sqlCsWithCertHash : sqlCsNoRitWithCertHash;
       } else {
@@ -370,7 +384,10 @@ public class DbCertStatusStore extends OcspStore {
         crlId = issuer.getCrlId();
       }
 
-      CrlInfo crlInfo = (crlId == 0) ? null : issuerStore.getCrlInfo(crlId);
+      if (crlInfo == null && crlId != 0) {
+        crlInfo = issuerStore.getCrlInfo(crlId);
+      }
+
       Date thisUpdate;
       Date nextUpdate;
       if (crlInfo == null) {
@@ -379,6 +396,13 @@ public class DbCertStatusStore extends OcspStore {
       } else {
         thisUpdate = crlInfo.getThisUpdate();
         nextUpdate = crlInfo.getNextUpdate();
+
+        if (isIgnoreExpiredCrls()) {
+          // CRL will expire in 5 minutes
+          if (crlInfo.getNextUpdate().getTime() < time.getTime() + MS_PER_5MIN) {
+            return CertStatusInfo.getCrlExpiredStatusInfo();
+          }
+        }
       }
 
       if (unknown) {

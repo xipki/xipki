@@ -38,7 +38,8 @@ public class CertStatusInfo {
     REVOKED,
     UNKNOWN,
     IGNORE,
-    ISSUER_UNKNOWN
+    ISSUER_UNKNOWN,
+    CRL_EXPIRED
   }
 
   public enum UnknownCertBehaviour {
@@ -56,6 +57,49 @@ public class CertStatusInfo {
     unauthorized,
     tryLater;
   }
+
+  @SuppressWarnings("unused")
+  private static class UnmodifiableCertStatusInfo extends CertStatusInfo {
+
+    private UnmodifiableCertStatusInfo(CertStatus certStatus, Date thisUpdate, Date nextUpdate,
+        String certprofile) {
+      super(certStatus, thisUpdate, nextUpdate, certprofile);
+    }
+
+    @Override
+    public void setThisUpdate(Date thisUpdate) {
+      throw new UnsupportedOperationException("setThisUpdate() unsupported");
+    }
+
+    @Override
+    public void setNextUpdate(Date nextUpdate) {
+      throw new UnsupportedOperationException("setNextUpdate() unsupported");
+    }
+
+    @Override
+    public void setCertStatus(CertStatus certStatus) {
+      throw new UnsupportedOperationException("setCertStatus() unsupported");
+    }
+
+    @Override
+    public void setCertprofile(String certprofile) {
+      throw new UnsupportedOperationException("setCertprofile() unsupported");
+    }
+
+    @Override
+    public void setCrlId(CrlID crlId) {
+      throw new UnsupportedOperationException("setCrlId() unsupported");
+    }
+
+    @Override
+    public void setArchiveCutOff(Date archiveCutOff) {
+      throw new UnsupportedOperationException("setArchiveCutOff() unsupported");
+    }
+
+  }
+
+  private static final CertStatusInfo crlExpiredStatus =
+      new UnmodifiableCertStatusInfo(CertStatus.CRL_EXPIRED, null, null, null);
 
   private CertStatus certStatus;
 
@@ -141,6 +185,10 @@ public class CertStatusInfo {
 
   public void setArchiveCutOff(Date archiveCutOff) {
     this.archiveCutOff = archiveCutOff;
+  }
+
+  public static CertStatusInfo getCrlExpiredStatusInfo() {
+    return crlExpiredStatus;
   }
 
   public static CertStatusInfo getUnknownCertStatusInfo(Date thisUpdate, Date nextUpdate) {

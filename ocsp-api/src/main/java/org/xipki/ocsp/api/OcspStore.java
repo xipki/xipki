@@ -78,6 +78,15 @@ public abstract class OcspStore implements Closeable {
   public abstract X509Certificate getIssuerCert(RequestIssuer reqIssuer);
 
   /**
+   * Ignores expired CRLs. Only applied to CRL-based datasource.
+   *
+   * @return whether expired CRLs will be ignored.
+   */
+  protected boolean isIgnoreExpiredCrls() {
+    return false;
+  }
+
+  /**
    * Return the certificate status.
    *
    * @param time
@@ -101,7 +110,8 @@ public abstract class OcspStore implements Closeable {
       boolean inheritCaRevocation) throws OcspStoreException {
     CertStatusInfo info = getCertStatus0(time, reqIssuer, serialNumber,
         includeCertHash, includeRit, inheritCaRevocation);
-    if (info != null && minNextUpdatePeriod != null) {
+
+    if (info != null && minNextUpdatePeriod != null && !isIgnoreExpiredCrls()) {
       if (unknownCertBehaviour == UnknownCertBehaviour.good
           || unknownCertBehaviour == UnknownCertBehaviour.unknown) {
         Date nextUpdate = info.getNextUpdate();

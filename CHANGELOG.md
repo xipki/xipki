@@ -9,6 +9,9 @@ See also <https://github.com/xipki/xipki/releases>
     - Remove the extension authorityInfoAccess from the mandatory list
   - OCSP
     - Add feature to log the the HTTP requests and responses
+    - Add option to configure how to handle expired CRLs:
+       - Default or ignoreExpiredCrls=false: consider the last imported CRLs as valid.
+       - ignoreExpiredCrls=true: return OCSP response tryLater.
 
 ## 5.3.2
   - Release date: July 4, 2019

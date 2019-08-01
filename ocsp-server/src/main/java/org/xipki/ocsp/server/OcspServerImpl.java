@@ -892,8 +892,11 @@ public class OcspServerImpl implements OcspServer {
               default:
                 break;
             }
+          } else if (status == CertStatus.CRL_EXPIRED) {
+            return unsuccesfulOCSPRespMap.get(OcspResponseStatus.tryLater);
           }
 
+          exceptionOccurs = false;
           break;
         }
       } catch (OcspStoreException ex) {
