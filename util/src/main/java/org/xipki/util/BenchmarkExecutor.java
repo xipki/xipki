@@ -161,7 +161,7 @@ public abstract class BenchmarkExecutor {
         this.duration = num * 60;
         break;
       case 'h':
-        this.duration = num * 1440; // 1440 = 60 * 24
+        this.duration = num * 3600; // 3600 = 60 * 60
         break;
       default:
         throw new IllegalStateException("invalid duration unit " + unit);
