@@ -65,6 +65,22 @@ sunpkcs11-wrapper-*.jar,\
 util-*.jar
 ```
 
+- Start tomcat
+  <span style="color:red">**In the tomcat root folder** (Otherwise the file path cannot be interpreted correctly.)</span>
+
+```sh
+  bin/start.sh
+```
+
+  Note that the start script of tomcat does not set the working directory to the tomcat root directory, you have to start tomcat as above so that the XiPKI can retrieve files correctly.
+
+- Shutdown tomcat
+   Shutdown tomcat from any folder
+
+```sh
+  /path/to/tomcat/bin/shutdown.sh
+```
+
 Deployment in Jetty 9
 ----
 - Copy the sub-folders `webapps` and `xipki` to the jetty root folder, and the files in sub-folder `lib` to the sub-folder `lib/ext` of jetty.

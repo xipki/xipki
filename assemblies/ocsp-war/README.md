@@ -54,7 +54,7 @@ syslog-java-client-*.jar,\
 util-*.jar
 ```
 - Start tomcat
-  In the tomcat root folder
+  <span style="color:red">**In the tomcat root folder** (Otherwise the file path cannot be interpreted correctly.)</span>
 
 ```sh
   bin/start.sh
