@@ -2,8 +2,11 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
-## 5.3.3
+## 6.0.0
   - Release date: -
+
+## 5.3.3
+  - Release date: August 8, 2019
   - CA
     - Add feature to log the the HTTP requests and responses
     - Remove the extension authorityInfoAccess from the mandatory list
