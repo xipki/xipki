@@ -51,8 +51,8 @@
     <bc.version>1.62</bc.version>
     <slf4j.version>1.7.7</slf4j.version>
     <pkcs11-wrapper.version>1.4.6</pkcs11-wrapper.version>
-    <liquibase.version>3.6.3</liquibase.version>
-    <snakeyaml.version>1.18</snakeyaml.version>
+    <liquibase.version>3.7.0</liquibase.version>
+    <snakeyaml.version>1.23</snakeyaml.version>
     <hikaricp.version>3.3.1</hikaricp.version>
     <syslog-java-client.version>1.1.7</syslog-java-client.version>
     <fastjson.version>1.2.57</fastjson.version>
