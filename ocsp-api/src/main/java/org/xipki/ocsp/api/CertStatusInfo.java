@@ -58,49 +58,6 @@ public class CertStatusInfo {
     tryLater;
   }
 
-  @SuppressWarnings("unused")
-  private static class UnmodifiableCertStatusInfo extends CertStatusInfo {
-
-    private UnmodifiableCertStatusInfo(CertStatus certStatus, Date thisUpdate, Date nextUpdate,
-        String certprofile) {
-      super(certStatus, thisUpdate, nextUpdate, certprofile);
-    }
-
-    @Override
-    public void setThisUpdate(Date thisUpdate) {
-      throw new UnsupportedOperationException("setThisUpdate() unsupported");
-    }
-
-    @Override
-    public void setNextUpdate(Date nextUpdate) {
-      throw new UnsupportedOperationException("setNextUpdate() unsupported");
-    }
-
-    @Override
-    public void setCertStatus(CertStatus certStatus) {
-      throw new UnsupportedOperationException("setCertStatus() unsupported");
-    }
-
-    @Override
-    public void setCertprofile(String certprofile) {
-      throw new UnsupportedOperationException("setCertprofile() unsupported");
-    }
-
-    @Override
-    public void setCrlId(CrlID crlId) {
-      throw new UnsupportedOperationException("setCrlId() unsupported");
-    }
-
-    @Override
-    public void setArchiveCutOff(Date archiveCutOff) {
-      throw new UnsupportedOperationException("setArchiveCutOff() unsupported");
-    }
-
-  }
-
-  private static final CertStatusInfo crlExpiredStatus =
-      new UnmodifiableCertStatusInfo(CertStatus.CRL_EXPIRED, null, null, null);
-
   private CertStatus certStatus;
 
   private CertRevocationInfo revocationInfo;
@@ -188,7 +145,7 @@ public class CertStatusInfo {
   }
 
   public static CertStatusInfo getCrlExpiredStatusInfo() {
-    return crlExpiredStatus;
+    return new CertStatusInfo(CertStatus.CRL_EXPIRED, new Date(), null, null);
   }
 
   public static CertStatusInfo getUnknownCertStatusInfo(Date thisUpdate, Date nextUpdate) {
