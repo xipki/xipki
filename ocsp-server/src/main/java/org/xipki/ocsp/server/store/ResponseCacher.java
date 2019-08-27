@@ -300,13 +300,12 @@ public class ResponseCacher implements Closeable {
       }
 
       long thisUpdate = rs.getLong("THIS_UPDATE");
-      String b64Resp = rs.getString("RESP");
-      byte[] encoded = Base64.decodeFast(b64Resp);
+      byte[] resp = rs.getBytes("RESP");
       ResponseCacheInfo cacheInfo = new ResponseCacheInfo(thisUpdate);
       if (nextUpdate != 0) {
         cacheInfo.setNextUpdate(nextUpdate);
       }
-      return new OcspRespWithCacheInfo(encoded, cacheInfo);
+      return new OcspRespWithCacheInfo(resp, cacheInfo);
     } catch (SQLException ex) {
       throw datasource.translate(sql, ex);
     } finally {
@@ -335,7 +334,6 @@ public class ResponseCacher implements Closeable {
         String sql = SQL_ADD_RESP;
         PreparedStatement ps = datasource.prepareStatement(conn, sql);
 
-        String b64Response = Base64.encodeToString(response);
         Boolean dataIntegrityViolationException = null;
         try {
           int idx = 1;
@@ -344,7 +342,7 @@ public class ResponseCacher implements Closeable {
           ps.setString(idx++, ident);
           ps.setLong(idx++, thisUpdate);
           ps.setLong(idx++, nextUpdate);
-          ps.setString(idx++, b64Response);
+          ps.setBytes(idx++, response);
           ps.execute();
         } catch (SQLException ex) {
           DataAccessException dex = datasource.translate(sql, ex);
@@ -368,7 +366,7 @@ public class ResponseCacher implements Closeable {
           int idx = 1;
           ps.setLong(idx++, thisUpdate);
           ps.setLong(idx++, nextUpdate);
-          ps.setString(idx++, b64Response);
+          ps.setBytes(idx++, response);
           ps.setLong(idx++, id);
           ps.executeUpdate();
         } catch (SQLException ex) {
