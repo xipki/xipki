@@ -285,7 +285,7 @@ class CaCertstoreDbExporter extends DbPorter {
           }
 
           if (CaDbEntryType.CERT == type) {
-            byte[] certBytes = Base64.decodeFast(rs.getString("CERT"));
+            byte[] certBytes = getVersionDependendBytes(rs, "CERT");
 
             String sha1 = HashAlgo.SHA1.hexHash(certBytes);
             String certFileName = sha1 + ".der";
@@ -342,7 +342,7 @@ class CaCertstoreDbExporter extends DbPorter {
             cert.validate();
             ((CaCertstore.Certs) entriesInCurrentFile).add(cert);
           } else if (CaDbEntryType.CRL == type) {
-            byte[] crlBytes = Base64.decodeFast(rs.getString("CRL"));
+            byte[] crlBytes = getVersionDependendBytes(rs, "CRL");
 
             X509CRL x509Crl = null;
             try {
@@ -385,7 +385,7 @@ class CaCertstoreDbExporter extends DbPorter {
             crl.validate();
             ((CaCertstore.Crls) entriesInCurrentFile).add(crl);
           } else if (CaDbEntryType.REQUEST == type) {
-            byte[] dataBytes = Base64.decodeFast(rs.getString("DATA"));
+            byte[] dataBytes = getVersionDependendBytes(rs, "DATA");
             String sha1 = HashAlgo.SHA1.hexHash(dataBytes);
             final String dataFilename = sha1 + ".req";
             ZipEntry certZipEntry = new ZipEntry(dataFilename);
@@ -604,4 +604,14 @@ class CaCertstoreDbExporter extends DbPorter {
         throw new IllegalStateException("unknown CaDbEntryType " + type);
     }
   }
+
+  private byte[] getVersionDependendBytes(ResultSet rs, String column)
+      throws SQLException {
+    if (dbSchemaVersion < 5) {
+      return Base64.decodeFast(rs.getString(column));
+    } else {
+      return rs.getBytes(column);
+    }
+  }
+
 }

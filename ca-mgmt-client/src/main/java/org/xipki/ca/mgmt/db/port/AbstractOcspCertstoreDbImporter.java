@@ -20,10 +20,8 @@ package org.xipki.ca.mgmt.db.port;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
-import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.HashAlgo;
-import org.xipki.util.StringUtil;
 
 /**
  * Base class for the OCSP CertStore database importer.
@@ -68,33 +66,6 @@ abstract class AbstractOcspCertstoreDbImporter extends DbPorter {
 
   protected void deleteCertGreatherThan(long id, Logger log) {
     deleteFromTableWithLargerId("CERT", "ID", id, log);
-  }
-
-  protected void dropIndexes() throws DataAccessException {
-    System.out.println("dropping indexes");
-    long start = System.currentTimeMillis();
-
-    datasource.dropForeignKeyConstraint(null, "FK_CERT_ISSUER1", "CERT");
-    datasource.dropUniqueConstrain(null, "CONST_ISSUER_SN", "CERT");
-
-    datasource.dropPrimaryKey(null, "PK_CERT", "CERT");
-
-    long duration = (System.currentTimeMillis() - start) / 1000;
-    System.out.println(" dropped indexes in " + StringUtil.formatTime(duration, false));
-  }
-
-  protected void recoverIndexes() throws DataAccessException {
-    System.out.println("recovering indexes");
-    long start = System.currentTimeMillis();
-
-    datasource.addPrimaryKey(null, "PK_CERT", "CERT", "ID");
-
-    datasource.addForeignKeyConstraint(null, "FK_CERT_ISSUER1", "CERT", "IID", "ISSUER", "ID",
-        "CASCADE", "NO ACTION");
-    datasource.addUniqueConstrain(null, "CONST_ISSUER_SN", "CERT", "IID", "SN");
-
-    long duration = (System.currentTimeMillis() - start) / 1000;
-    System.out.println(" recovered indexes in " + StringUtil.formatTime(duration, false));
   }
 
 }

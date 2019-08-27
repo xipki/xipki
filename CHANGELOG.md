@@ -2,8 +2,14 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
-## 6.0.0
+## 5.3.4
   - Release date: -
+  - CA
+    - Save the binary form of certificates, CRLs and requests instead the BASE64 encoded ones.
+  - OCSP
+    - Fixed bug "OCSP server cannot answer anymore" (this bug is introduced in 5.3.3)
+    - Cache the binary OCSP response instead of base64 encoded one.
+      Re-initialization of OCSP cache database is required if updated from previous version.
 
 ## 5.3.3
   - Release date: August 8, 2019

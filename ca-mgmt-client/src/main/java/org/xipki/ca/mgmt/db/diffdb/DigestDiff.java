@@ -90,19 +90,23 @@ class DigestDiff {
     this.refDbType = detectDbControl(refDatasource);
     this.targetDbType = detectDbControl(targetDatasource);
 
-    if (refDbType == DbType.XIPKI_OCSP_v4) {
-      HashAlgo refAlgo = detectOcspDbCerthashAlgo(refDatasource);
-      HashAlgo targetAlgo = detectOcspDbCerthashAlgo(targetDatasource);
-      if (refAlgo != targetAlgo) {
-        throw new IllegalArgumentException(StringUtil.concatObjects(
-            "Could not compare OCSP datasources with different CERTHASH_ALGO: refDataSource (",
-            refAlgo, ") and targetDataSource (", targetAlgo, ")"));
-      }
-      this.certhashAlgo = refAlgo;
-    } else if (refDbType == DbType.XIPKI_CA_v4) {
-      this.certhashAlgo = HashAlgo.SHA1;
-    } else {
-      throw new IllegalStateException("should not reach here, unknown dbContro " + refDbType);
+    switch (refDbType) {
+      case XIPKI_OCSP_v4:
+        HashAlgo refAlgo = detectOcspDbCerthashAlgo(refDatasource);
+        HashAlgo targetAlgo = detectOcspDbCerthashAlgo(targetDatasource);
+        if (refAlgo != targetAlgo) {
+          throw new IllegalArgumentException(StringUtil.concatObjects(
+              "Could not compare OCSP datasources with different CERTHASH_ALGO: refDataSource (",
+              refAlgo, ") and targetDataSource (", targetAlgo, ")"));
+        }
+        this.certhashAlgo = refAlgo;
+        break;
+      case XIPKI_CA_v4:
+      case XIPKI_CA_v5:
+        this.certhashAlgo = HashAlgo.SHA1;
+        break;
+      default:
+        throw new IllegalStateException("unknown refDbType " + refDbType);
     }
 
     // number of threads
@@ -112,7 +116,7 @@ class DigestDiff {
       LOG.info("reduce the numTargetThreads from {} to {}", numTargetThreads,
           this.numTargetThreads);
     }
-  } // constuctor
+  } // constructor
 
   public Set<byte[]> isIncludeCaCerts() {
     return includeCaCerts;
@@ -128,12 +132,16 @@ class DigestDiff {
     List<Integer> refCaIds = new LinkedList<>();
 
     String refSql;
-    if (refDbType == DbType.XIPKI_OCSP_v4) {
-      refSql = "SELECT ID FROM ISSUER";
-    } else if (refDbType == DbType.XIPKI_CA_v4) {
-      refSql = "SELECT ID FROM CA";
-    } else {
-      throw new IllegalStateException("invalid refDbControl " + refDbType);
+    switch (refDbType) {
+      case XIPKI_OCSP_v4:
+        refSql = "SELECT ID FROM ISSUER";
+        break;
+      case XIPKI_CA_v4:
+      case XIPKI_CA_v5:
+        refSql = "SELECT ID FROM CA";
+        break;
+      default:
+        throw new IllegalStateException("unknown refDbType " + refDbType);
     }
 
     Statement refStmt = null;
@@ -238,12 +246,16 @@ class DigestDiff {
       throws DataAccessException {
     // get a list of available CAs in the target database
     String sql = "SELECT ID,CERT FROM ";
-    if (dbType == DbType.XIPKI_CA_v4) {
-      sql += "CA";
-    } else if (dbType == DbType.XIPKI_OCSP_v4) {
-      sql += "ISSUER";
-    } else {
-      throw new IllegalArgumentException("unknown dbType " + dbType);
+    switch (dbType) {
+      case XIPKI_OCSP_v4:
+        sql += "ISSUER";
+        break;
+      case XIPKI_CA_v4:
+      case XIPKI_CA_v5:
+        sql += "CA";
+        break;
+      default:
+        throw new IllegalStateException("unknown dbType " + dbType);
     }
 
     Statement stmt = datasource.createStatement();
@@ -267,7 +279,13 @@ class DigestDiff {
     Connection conn = datasource.getConnection();
     try {
       if (datasource.tableExists(conn, "CA")) {
-        return DbType.XIPKI_CA_v4;
+        String dbSchemaVersion = datasource.getFirstValue(
+            null, "DBSCHEMA", "VALUE2", "WHERE NAME='VERSION'", String.class);
+        if ("5".equals(dbSchemaVersion)) {
+          return DbType.XIPKI_CA_v5;
+        } else {
+          return DbType.XIPKI_CA_v4;
+        }
       } else if (datasource.tableExists(conn, "ISSUER")) {
         return DbType.XIPKI_OCSP_v4;
       } else {

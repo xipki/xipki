@@ -49,10 +49,8 @@ import org.xipki.security.FpIdCalculator;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
-import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
 import org.xipki.util.ProcessLog;
-import org.xipki.util.StringUtil;
 
 import com.alibaba.fastjson.JSON;
 
@@ -81,8 +79,6 @@ class CaCertstoreDbImporter extends DbPorter {
 
   private static final String SQL_ADD_REQCERT = "INSERT INTO REQCERT (ID,RID,CID) VALUES (?,?,?)";
 
-  private final boolean resume;
-
   private final int numCertsPerCommit;
 
   CaCertstoreDbImporter(DataSourceWrapper datasource, String srcDir, int numCertsPerCommit,
@@ -90,7 +86,6 @@ class CaCertstoreDbImporter extends DbPorter {
     super(datasource, srcDir, stopMe);
 
     this.numCertsPerCommit = Args.positive(numCertsPerCommit, "numCertsPerCommit");
-    this.resume = resume;
 
     File processLogFile = new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
     if (resume) {
@@ -120,10 +115,6 @@ class CaCertstoreDbImporter extends DbPorter {
     File processLogFile = new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
     System.out.println("importing CA certstore to database");
     try {
-      if (!resume) {
-        dropIndexes();
-      }
-
       CaDbEntryType typeProcessedInLastProcess = null;
       Integer numProcessedInLastProcess = null;
       Long idProcessedInLastProcess = null;
@@ -194,7 +185,6 @@ class CaCertstoreDbImporter extends DbPorter {
       importPublishQueue(certstore.getPublishQueue());
       importDeltaCrlCache(certstore.getDeltaCrlCache());
 
-      recoverIndexes();
       processLogFile.delete();
     } catch (Exception ex) {
       System.err.println("could not import CA certstore to database");
@@ -498,7 +488,7 @@ class CaCertstoreDbImporter extends DbPorter {
           stmt.setString(idx++, b64Sha1FpCert);
           stmt.setString(idx++, cert.getRs());
           stmt.setInt(idx++, cert.getCrlScope());
-          stmt.setString(idx++, Base64.encodeToString(encodedCert));
+          stmt.setBytes(idx++, encodedCert);
           stmt.addBatch();
         } catch (SQLException ex) {
           throw translate(sql, ex);
@@ -640,7 +630,7 @@ class CaCertstoreDbImporter extends DbPorter {
           }
 
           stmt.setInt(idx++, crl.getCrlScope());
-          stmt.setString(idx++, Base64.encodeToString(encodedCrl));
+          stmt.setBytes(idx++, encodedCrl);
 
           stmt.addBatch();
         } catch (SQLException ex) {
@@ -740,7 +730,7 @@ class CaCertstoreDbImporter extends DbPorter {
           int idx = 1;
           stmt.setLong(idx++, request.getId());
           stmt.setLong(idx++, request.getUpdate());
-          stmt.setString(idx++, Base64.encodeToString(encodedRequest));
+          stmt.setBytes(idx++, encodedRequest);
           stmt.addBatch();
         } catch (SQLException ex) {
           System.err.println("could not import REQUEST with ID=" + request.getId()
@@ -875,61 +865,5 @@ class CaCertstoreDbImporter extends DbPorter {
       zipFile.close();
     }
   } // method importReqCerts
-
-  private void dropIndexes() throws DataAccessException {
-    long start = System.currentTimeMillis();
-
-    datasource.dropIndex(null, "CERT", "IDX_CA_FPK");
-    datasource.dropIndex(null, "CERT", "IDX_CA_FPS");
-    datasource.dropIndex(null, "CERT", "IDX_CA_FPRS");
-
-    datasource.dropForeignKeyConstraint(null, "FK_CERT_CA1", "CERT");
-    datasource.dropForeignKeyConstraint(null, "FK_CERT_USER1", "CERT");
-
-    datasource.dropUniqueConstrain(null, "CONST_CA_SN", "CERT");
-
-    datasource.dropForeignKeyConstraint(null, "FK_PUBLISHQUEUE_CERT1", "PUBLISHQUEUE");
-
-    datasource.dropForeignKeyConstraint(null, "FK_REQCERT_REQ1", "REQCERT");
-    datasource.dropForeignKeyConstraint(null, "FK_REQCERT_CERT1", "REQCERT");
-
-    datasource.dropPrimaryKey(null, "PK_CERT", "CERT");
-    datasource.dropPrimaryKey(null, "PK_REQUEST", "REQUEST");
-    datasource.dropPrimaryKey(null, "PK_REQCERT", "REQCERT");
-
-    long duration = (System.currentTimeMillis() - start) / 1000;
-    System.out.println(" dropped indexes in " + StringUtil.formatTime(duration, false));
-  }
-
-  private void recoverIndexes() throws DataAccessException {
-    long start = System.currentTimeMillis();
-    datasource.addPrimaryKey(null, "PK_CERT", "CERT", "ID");
-    datasource.addPrimaryKey(null, "PK_REQUEST", "REQUEST", "ID");
-    datasource.addPrimaryKey(null, "PK_REQCERT", "REQCERT", "ID");
-
-    datasource.addForeignKeyConstraint(null, "FK_PUBLISHQUEUE_CERT1", "PUBLISHQUEUE",
-        "CID", "CERT", "ID", "CASCADE", "NO ACTION");
-
-    datasource.addForeignKeyConstraint(null, "FK_CERT_CA1", "CERT",
-        "CA_ID", "CA", "ID", "CASCADE", "NO ACTION");
-
-    datasource.addForeignKeyConstraint(null, "FK_CERT_USER1", "CERT",
-        "UID", "TUSER", "ID", "CASCADE", "NO ACTION");
-
-    datasource.addForeignKeyConstraint(null, "FK_REQCERT_REQ1", "REQCERT",
-        "RID", "REQUEST", "ID", "CASCADE", "NO ACTION");
-
-    datasource.addForeignKeyConstraint(null, "FK_REQCERT_CERT1", "REQCERT",
-        "CID", "CERT", "ID", "CASCADE", "NO ACTION");
-
-    datasource.addUniqueConstrain(null, "CONST_CA_SN", "CERT", "CA_ID", "SN");
-
-    datasource.createIndex(null, "IDX_CA_FPK", "CERT", "CA_ID", "FP_K");
-    datasource.createIndex(null, "IDX_CA_FPS", "CERT", "CA_ID", "FP_S");
-    datasource.createIndex(null, "IDX_CA_FPRS", "CERT", "CA_ID", "FP_RS");
-
-    long duration = (System.currentTimeMillis() - start) / 1000;
-    System.out.println(" recovered indexes in " + StringUtil.formatTime(duration, false));
-  }
 
 }

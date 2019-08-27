@@ -117,10 +117,6 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
 
     System.out.println("importing CA certstore to OCSP database");
     try {
-      if (!resume) {
-        dropIndexes();
-      }
-
       CaCertstore.IdNameTypeConf publisherType = null;
       for (CaCertstore.IdNameTypeConf type : caconf.getPublishers()) {
         if (publisherName.equals(type.getName())) {
@@ -169,7 +165,6 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
 
       File processLogFile = new File(baseDir, DbPorter.IMPORT_TO_OCSP_PROCESS_LOG_FILENAME);
       importCert(certstore, revokedOnly, relatedCertStoreCaIds, processLogFile);
-      recoverIndexes();
       processLogFile.delete();
     } catch (Exception ex) {
       System.err.println("could not import OCSP certstore to database");
