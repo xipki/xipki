@@ -367,6 +367,7 @@ public class CertStore {
 
     byte[] encodedCert = certificate.getEncodedCert();
     String b64FpCert = base64Fp(encodedCert);
+    String b64Cert = Base64.encodeToString(encodedCert);
     String tid = (transactionId == null) ? null : Base64.encodeToString(transactionId);
 
     final String sql = SQL_ADD_CERT;
@@ -399,7 +400,7 @@ public class CertStore {
       ps.setString(idx++, reqSubjectText);
       // in this version we set CRL_SCOPE to fixed value 0
       ps.setInt(idx++, 0);
-      setVersionDependendBytes(ps, idx++, encodedCert);
+      ps.setString(idx++, b64Cert);
 
       ps.executeUpdate();
 
@@ -599,7 +600,7 @@ public class CertStore {
     }
     long crlId = currentMaxCrlId + 1;
 
-    byte[] encodedCrl = crl.getEncoded();
+    String b64Crl = Base64.encodeToString(crl.getEncoded());
 
     PreparedStatement ps = null;
 
@@ -617,7 +618,7 @@ public class CertStore {
       setLong(ps, idx++, baseCrlNumber);
       // in this version we set CRL_SCOPE to fixed value 0
       ps.setInt(idx++, 0);
-      setVersionDependendBytes(ps, idx++, encodedCrl);
+      ps.setString(idx++, b64Crl);
 
       ps.executeUpdate();
     } catch (SQLException ex) {
@@ -1031,7 +1032,7 @@ public class CertStore {
     ResultSet rs = null;
     PreparedStatement ps = borrowPreparedStatement(sql);
 
-    byte[] encodedCrl = null;
+    String b64Crl = null;
     try {
       int idx = 1;
       ps.setInt(idx++, ca.getId());
@@ -1044,7 +1045,7 @@ public class CertStore {
       while (rs.next()) {
         long thisUpdate = rs.getLong("THISUPDATE");
         if (thisUpdate >= currentThisUpdate) {
-          encodedCrl = getVersionDependendBytes(rs, "CRL");
+          b64Crl = rs.getString("CRL");
           currentThisUpdate = thisUpdate;
         }
       }
@@ -1054,7 +1055,7 @@ public class CertStore {
       datasource.releaseResources(ps, rs);
     }
 
-    return encodedCrl;
+    return (b64Crl == null) ? null : Base64.decodeFast(b64Crl);
   } // method getEncodedCrl
 
   public int cleanupCrls(NameId ca, int numCrls) throws OperationException {
@@ -1114,7 +1115,7 @@ public class CertStore {
 
     final String sql = sqlCertForId;
 
-    byte[] encodedCert;
+    String b64Cert;
     int certprofileId;
     int requestorId;
     boolean revoked;
@@ -1130,8 +1131,7 @@ public class CertStore {
       if (!rs.next()) {
         return null;
       }
-
-      encodedCert = getVersionDependendBytes(rs, "CERT");
+      b64Cert = rs.getString("CERT");
       certprofileId = rs.getInt("PID");
       requestorId = rs.getInt("RID");
       revoked = rs.getBoolean("REV");
@@ -1146,6 +1146,7 @@ public class CertStore {
       datasource.releaseResources(ps, rs);
     }
 
+    byte[] encodedCert = Base64.decodeFast(b64Cert);
     X509Certificate cert = X509Util.parseCert(encodedCert);
     CertWithDbId certWithMeta = new CertWithDbId(cert, encodedCert);
     certWithMeta.setCertId(certId);
@@ -1171,7 +1172,7 @@ public class CertStore {
     final String sql = sqlCertWithRevInfo;
 
     long certId;
-    byte[] encodedCert;
+    String b64Cert;
     boolean revoked;
     int revReason = 0;
     long revTime = 0;
@@ -1190,7 +1191,7 @@ public class CertStore {
         return null;
       }
       certId = rs.getLong("ID");
-      encodedCert = getVersionDependendBytes(rs, "CERT");
+      b64Cert = rs.getString("CERT");
       certprofileId = rs.getInt("PID");
 
       revoked = rs.getBoolean("REV");
@@ -1205,6 +1206,7 @@ public class CertStore {
       datasource.releaseResources(ps, null);
     }
 
+    byte[] encodedCert = Base64.decodeFast(b64Cert);
     X509Certificate cert;
     try {
       cert = X509Util.parseCert(encodedCert);
@@ -1238,7 +1240,7 @@ public class CertStore {
 
     final String sql = sqlCertInfo;
 
-    byte[] encodedCert;
+    String b64Cert;
     boolean revoked;
     int revReason = 0;
     long revTime = 0;
@@ -1257,7 +1259,7 @@ public class CertStore {
       if (!rs.next()) {
         return null;
       }
-      encodedCert = getVersionDependendBytes(rs, "CERT");
+      b64Cert = rs.getString("CERT");
       certprofileId = rs.getInt("PID");
       requestorId = rs.getInt("RID");
       revoked = rs.getBoolean("REV");
@@ -1273,6 +1275,7 @@ public class CertStore {
     }
 
     try {
+      byte[] encodedCert = Base64.decodeFast(b64Cert);
       X509Certificate cert = X509Util.parseCert(encodedCert);
 
       CertWithDbId certWithMeta = new CertWithDbId(cert, encodedCert);
@@ -1353,7 +1356,8 @@ public class CertStore {
       rs = ps.executeQuery();
 
       while (rs.next()) {
-        byte[] encodedCert = getVersionDependendBytes(rs, "CERT");
+        String b64Cert = rs.getString("CERT");
+        byte[] encodedCert = Base64.decodeFast(b64Cert);
 
         X509Certificate cert;
         try {
@@ -1399,14 +1403,14 @@ public class CertStore {
       return null;
     }
 
-    byte[] req = null;
+    String b64Req = null;
     sql = sqlReqForId;
     ps = borrowPreparedStatement(sql);
     try {
       ps.setLong(1, reqId);
       rs = ps.executeQuery();
       if (rs.next()) {
-        req = getVersionDependendBytes(rs, "DATA");
+        b64Req = rs.getString("DATA");
       }
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
@@ -1414,7 +1418,7 @@ public class CertStore {
       datasource.releaseResources(ps, rs);
     }
 
-    return req;
+    return (b64Req == null) ? null : Base64.decodeFast(b64Req);
   }
 
   public List<CertListInfo> listCerts(NameId ca, X500Name subjectPattern, Date validFrom,
@@ -1904,12 +1908,13 @@ public class CertStore {
 
     long id = idGenerator.nextId();
     long currentTimeSeconds = System.currentTimeMillis() / 1000;
+    String b64Request = Base64.encodeToString(request);
     final String sql = SQL_ADD_REQUEST;
     PreparedStatement ps = borrowPreparedStatement(sql);
     try {
       ps.setLong(1, id);
       ps.setLong(2, currentTimeSeconds);
-      setVersionDependendBytes(ps, 3, request);
+      ps.setString(3, b64Request);
       ps.executeUpdate();
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
@@ -2010,24 +2015,6 @@ public class CertStore {
         (notExpiredAt != null ? " AND NAFTER>?" : ""),
         (onlyRevoked ? " AND REV=1" : ""), (withEe ? " AND EE=?" : ""));
     return datasource.buildSelectFirstSql(numEntries, "ID ASC", sql);
-  }
-
-  private byte[] getVersionDependendBytes(ResultSet rs, String column)
-      throws SQLException {
-    if (dbSchemaVersion < 5) {
-      return Base64.decodeFast(rs.getString(column));
-    } else {
-      return rs.getBytes(column);
-    }
-  }
-
-  private void setVersionDependendBytes(PreparedStatement stmt, int index, byte[] bytes)
-      throws SQLException {
-    if (dbSchemaVersion < 5) {
-      stmt.setString(index, Base64.encodeToString(bytes));
-    } else {
-      stmt.setBytes(index, bytes);
-    }
   }
 
   private static void setBoolean(PreparedStatement ps, int index, boolean value)

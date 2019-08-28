@@ -49,6 +49,7 @@ import org.xipki.security.FpIdCalculator;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
+import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
 import org.xipki.util.ProcessLog;
 
@@ -488,7 +489,7 @@ class CaCertstoreDbImporter extends DbPorter {
           stmt.setString(idx++, b64Sha1FpCert);
           stmt.setString(idx++, cert.getRs());
           stmt.setInt(idx++, cert.getCrlScope());
-          stmt.setBytes(idx++, encodedCert);
+          stmt.setString(idx++, Base64.encodeToString(encodedCert));
           stmt.addBatch();
         } catch (SQLException ex) {
           throw translate(sql, ex);
@@ -630,7 +631,7 @@ class CaCertstoreDbImporter extends DbPorter {
           }
 
           stmt.setInt(idx++, crl.getCrlScope());
-          stmt.setBytes(idx++, encodedCrl);
+          stmt.setString(idx++, Base64.encodeToString(encodedCrl));
 
           stmt.addBatch();
         } catch (SQLException ex) {
@@ -730,7 +731,7 @@ class CaCertstoreDbImporter extends DbPorter {
           int idx = 1;
           stmt.setLong(idx++, request.getId());
           stmt.setLong(idx++, request.getUpdate());
-          stmt.setBytes(idx++, encodedRequest);
+          stmt.setString(idx++, Base64.encodeToString(encodedRequest));
           stmt.addBatch();
         } catch (SQLException ex) {
           System.err.println("could not import REQUEST with ID=" + request.getId()

@@ -8,6 +8,9 @@
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
   logicalFilePath="ca-init.xml">
   <property name="x500name.type" value="VARCHAR(350)"/>
+  <!-- 100 MB for DB2 -->
+  <property name="crl.data.type" value="CLOB(104857600)" dbms="db2"/>
+  <property name="crl.data.type" value="CLOB" dbms="oracle,postgresql,mysql,mariadb,h2,hsqldb"/>
   <!-- CA configuration :: create table -->
   <changeSet author="xipki" id="1">
     <!-- table DBSCHEMAINFO -->
@@ -22,7 +25,7 @@
     </createTable>
     <insert tableName="DBSCHEMA">
       <column name="NAME" value="VERSION"/>
-      <column name="VALUE2" value="5"/>
+      <column name="VALUE2" value="4"/>
     </insert>
     <insert tableName="DBSCHEMA">
       <column name="NAME" value="X500NAME_MAXLEN"/>
@@ -262,7 +265,7 @@
         <constraints nullable="false"/>
       </column>
       <column name="BASECRL_NO" type="BIGINT"/>
-      <column name="CRL" type="BLOB">
+      <column name="CRL" type="${crl.data.type}">
         <constraints nullable="false"/>
       </column>
     </createTable>
@@ -340,8 +343,8 @@
         <constraints nullable="false"/>
       </column>
       <column name="REQ_SUBJECT" type="${x500name.type}"/>
-      <column name="CERT" type="BLOB"
-          remarks="DER encoded certificate">
+      <column name="CERT" type="VARCHAR(6000)"
+          remarks="Base64 encoded certificate">
         <constraints nullable="false"/>
       </column>
     </createTable>
@@ -353,7 +356,7 @@
           remarks="time at which the request is added to database, seconds since January 1, 1970, 00:00:00 GMT">
         <constraints nullable="false"/>
       </column>
-      <column name="DATA" type="BLOB"/>
+      <column name="DATA" type="CLOB"/>
     </createTable>
     <!-- table REQCERT -->
     <createTable tableName="REQCERT">

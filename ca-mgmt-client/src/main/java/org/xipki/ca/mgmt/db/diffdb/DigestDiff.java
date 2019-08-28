@@ -102,7 +102,6 @@ class DigestDiff {
         this.certhashAlgo = refAlgo;
         break;
       case XIPKI_CA_v4:
-      case XIPKI_CA_v5:
         this.certhashAlgo = HashAlgo.SHA1;
         break;
       default:
@@ -137,7 +136,6 @@ class DigestDiff {
         refSql = "SELECT ID FROM ISSUER";
         break;
       case XIPKI_CA_v4:
-      case XIPKI_CA_v5:
         refSql = "SELECT ID FROM CA";
         break;
       default:
@@ -251,7 +249,6 @@ class DigestDiff {
         sql += "ISSUER";
         break;
       case XIPKI_CA_v4:
-      case XIPKI_CA_v5:
         sql += "CA";
         break;
       default:
@@ -278,16 +275,21 @@ class DigestDiff {
   public static DbType detectDbControl(DataSourceWrapper datasource) throws DataAccessException {
     Connection conn = datasource.getConnection();
     try {
+      String dbSchemaVersion = datasource.getFirstValue(
+          null, "DBSCHEMA", "VALUE2", "WHERE NAME='VERSION'", String.class);
+
       if (datasource.tableExists(conn, "CA")) {
-        String dbSchemaVersion = datasource.getFirstValue(
-            null, "DBSCHEMA", "VALUE2", "WHERE NAME='VERSION'", String.class);
-        if ("5".equals(dbSchemaVersion)) {
-          return DbType.XIPKI_CA_v5;
-        } else {
+        if ("4".equals(dbSchemaVersion)) {
           return DbType.XIPKI_CA_v4;
+        } else {
+          throw new IllegalArgumentException("unknown DBSCHEMA version " + dbSchemaVersion);
         }
       } else if (datasource.tableExists(conn, "ISSUER")) {
-        return DbType.XIPKI_OCSP_v4;
+        if ("4".equals(dbSchemaVersion)) {
+          return DbType.XIPKI_OCSP_v4;
+        } else {
+          throw new IllegalArgumentException("unknown DBSCHEMA version " + dbSchemaVersion);
+        }
       } else {
         throw new IllegalArgumentException("unknown database schema");
       }
