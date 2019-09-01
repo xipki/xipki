@@ -81,7 +81,7 @@ public class QaSecurityActions {
         return qlen;
       }
 
-    }
+    } // class KeyControl
 
     //CHECKSTYLE:SKIP
     public static class EC extends KeyControl {
@@ -95,7 +95,7 @@ public class QaSecurityActions {
         return curveName;
       }
 
-    }
+    } // class EC
 
     //CHECKSTYLE:SKIP
     public static class RSA extends KeyControl {
@@ -109,16 +109,16 @@ public class QaSecurityActions {
         return modulusLen;
       }
 
-    }
+    } // class RSA
 
-  }
+  } // class KeyControl
 
   public abstract static class SecurityAction extends XiAction {
 
     @Reference
     protected SecurityFactory securityFactory;
 
-  }
+  } // class SecurityAction
 
   public abstract static class SingleSpeedAction extends SecurityAction {
 
@@ -144,7 +144,7 @@ public class QaSecurityActions {
       return numThreads;
     }
 
-  }
+  } // class SingleSpeedAction
 
   public abstract static class BatchSpeedAction extends SecurityAction {
 
@@ -195,7 +195,7 @@ public class QaSecurityActions {
       return numThreads;
     }
 
-  }
+  } // class BatchSpeedAction
 
   public abstract static class BSpeedP11Action extends BatchSpeedAction {
 
@@ -227,7 +227,7 @@ public class QaSecurityActions {
       return StringUtil.isBlank(hexKeyId) ? null : Hex.decode(hexKeyId);
     }
 
-  }
+  } // class BSpeedP11Action
 
   @Command(scope = "xi", name = "bspeed-dsa-gen-p11",
       description = "performance test of PKCS#11 DSA key generation (batch)")
@@ -258,7 +258,7 @@ public class QaSecurityActions {
       return (getKeyId() == null) ? super.getNumThreads() : 1;
     }
 
-  }
+  } // class BspeedDsaGenP11
 
   @Command(scope = "xi", name = "bspeed-dsa-sign-p11",
       description = "performance test of PKCS#11 DSA signature creation (batch)")
@@ -295,7 +295,7 @@ public class QaSecurityActions {
           control.plen(), control.qlen());
     }
 
-  }
+  } // class BspeedDsaSignP11
 
   @Command(scope = "xi", name = "bspeed-ec-gen-p11",
       description = "performance test of PKCS#11 EC key generation (batch)")
@@ -325,7 +325,7 @@ public class QaSecurityActions {
       return (getKeyId() == null) ? numThreads : 1;
     }
 
-  }
+  } // class BspeedEcGenP11
 
   @Command(scope = "xi", name = "bspeed-ec-sign-p11",
       description = "performance test of PKCS#11 EC signature creation (batch)")
@@ -355,7 +355,7 @@ public class QaSecurityActions {
           AlgorithmUtil.getCurveOidForCurveNameOrOid(control.curveName));
     }
 
-  }
+  } // class BspeedEcSignP11
 
   @Command(scope = "xi", name = "bspeed-rsa-gen-p11",
       description = "performance test of PKCS#11 RSA key generation (batch)")
@@ -382,7 +382,7 @@ public class QaSecurityActions {
           toBigInt("0x10001"));
     }
 
-  }
+  } // class BspeedRsaGenP11
 
   @Command(scope = "xi", name = "bspeed-rsa-sign-p11",
       description = "performance test of PKCS#11 RSA signature creation (batch)")
@@ -413,7 +413,7 @@ public class QaSecurityActions {
           control.modulusLen(), toBigInt("0x10001"));
     }
 
-  }
+  } // class BspeedRsaGenP11
 
   public abstract static class SpeedP11Action extends SingleSpeedAction {
 
@@ -444,7 +444,7 @@ public class QaSecurityActions {
       return StringUtil.isBlank(hexKeyId) ? null : Hex.decode(hexKeyId);
     }
 
-  }
+  } // class SpeedP11Action
 
   @Command(scope = "xi", name = "speed-dsa-gen-p11",
       description = "performance test of PKCS#11 DSA key generation")
@@ -470,7 +470,7 @@ public class QaSecurityActions {
       return (getKeyId() == null) ? super.getNumThreads() : 1;
     }
 
-  }
+  } // class SpeedDsaGenP11
 
   @Command(scope = "xi", name = "speed-dsa-sign-p11",
       description = "performance test of PKCS#11 DSA signature creation")
@@ -503,7 +503,7 @@ public class QaSecurityActions {
           sigAlgo, getNumThreads(), plen, qlen);
     }
 
-  }
+  } // class SpeedDsaSignP11
 
   @Command(scope = "xi", name = "speed-ec-gen-p11",
       description = "performance test of PKCS#11 EC key generation")
@@ -525,7 +525,7 @@ public class QaSecurityActions {
       return (getKeyId() == null) ? super.getNumThreads() : 1;
     }
 
-  }
+  } // class SpeedEcGenP11
 
   @Command(scope = "xi", name = "speed-ec-sign-p11",
       description = "performance test of PKCS#11 EC signature creation")
@@ -546,7 +546,7 @@ public class QaSecurityActions {
           sigAlgo, getNumThreads(), AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName));
     }
 
-  }
+  } // class SpeedEcSignP11
 
   @Command(scope = "xi", name = "speed-ed-gen-p11",
       description = "performance test of PKCS#11 Edwards and montgomery EC key generation")
@@ -568,7 +568,7 @@ public class QaSecurityActions {
       return (getKeyId() == null) ? super.getNumThreads() : 1;
     }
 
-  }
+  } // class SpeedEdGenP11
 
   @Command(scope = "xi", name = "speed-ed-sign-p11",
       description = "performance test of PKCS#11 EdDSA signature creation")
@@ -590,7 +590,7 @@ public class QaSecurityActions {
           sigAlgo, getNumThreads(), curveOid);
     }
 
-  }
+  } // class SpeedEdSignP11
 
   @Command(scope = "xi", name = "speed-hmac-sign-p11",
       description = "performance test of PKCS#11 HMAC signature creation")
@@ -607,7 +607,7 @@ public class QaSecurityActions {
           sigAlgo, getNumThreads());
     }
 
-  }
+  } // class SpeedHmacSignP11
 
   @Command(scope = "xi", name = "speed-rsa-gen-p11",
       description = "performance test of PKCS#11 RSA key generation")
@@ -630,7 +630,7 @@ public class QaSecurityActions {
       return (getKeyId() == null) ? super.getNumThreads() : 1;
     }
 
-  }
+  } // class SpeedRsaGenP11
 
   @Command(scope = "xi", name = "speed-rsa-sign-p11",
       description = "performance test of PKCS#11 RSA signature creation")
@@ -653,7 +653,7 @@ public class QaSecurityActions {
           sigAlgo, getNumThreads(), keysize, toBigInt(publicExponent));
     }
 
-  }
+  } // class SpeedRsaSignP11
 
   public abstract static class SpeedP11SignAction extends SpeedP11Action {
 
@@ -663,7 +663,7 @@ public class QaSecurityActions {
     @Option(name = "--key-label", description = "label of the PKCS#11 key")
     protected String keyLabel;
 
-  }
+  } // class SpeedP11SignAction
 
   @Command(scope = "xi", name = "speed-sm2-gen-p11",
       description = "performance test of PKCS#11 SM2 key generation")
@@ -680,7 +680,7 @@ public class QaSecurityActions {
       return (getKeyId() == null) ? super.getNumThreads() : 1;
     }
 
-  }
+  } // class SpeedSm2GenP11
 
   @Command(scope = "xi", name = "speed-sm2-sign-p11",
       description = "performance test of PKCS#11 SM2 signature creation")
@@ -693,7 +693,7 @@ public class QaSecurityActions {
           getNumThreads());
     }
 
-  }
+  } // class SpeedSm2SignP11
 
   @Command(scope = "xi", name = "bspeed-dsa-gen-p12",
       description = "performance test of PKCS#12 DSA key generation (batch)")
@@ -716,7 +716,7 @@ public class QaSecurityActions {
           : new P12KeyGenSpeed.DSA(control.plen(), control.qlen(), securityFactory);
     }
 
-  }
+  } // class BspeedDsaGenP12
 
   @Command(scope = "xi", name = "bspeed-dsa-sign-p12",
       description = "performance test of PKCS#12 DSA signature creation")
@@ -746,7 +746,7 @@ public class QaSecurityActions {
           control.plen(), control.qlen());
     }
 
-  }
+  } // class BspeedDsaSignP12
 
   @Command(scope = "xi", name = "bspeed-ec-gen-p12",
       description = "performance test of PKCS#12 EC key generation (batch)")
@@ -768,7 +768,7 @@ public class QaSecurityActions {
       return (control == null) ? null : new P12KeyGenSpeed.EC(curveOid, securityFactory);
     }
 
-  }
+  } // class BspeedEcGenP12
 
   @Command(scope = "xi", name = "bspeed-ec-sign-p12",
       description = "performance test of PKCS#12 EC signature creation (batch)")
@@ -791,7 +791,7 @@ public class QaSecurityActions {
                   getCurveOid(control.curveName()));
     }
 
-  }
+  } // class BspeedEcSignP12
 
   @Command(scope = "xi", name = "bspeed-rsa-gen-p12",
       description = "performance test of PKCS#12 RSA key generation (batch)")
@@ -814,7 +814,7 @@ public class QaSecurityActions {
           : new P12KeyGenSpeed.RSA(control.modulusLen(), toBigInt("0x10001"), securityFactory);
     }
 
-  }
+  } // class BspeedRsaGenP12
 
   @Command(scope = "xi", name = "bspeed-rsa-sign-p12",
       description = "performance test of PKCS#12 RSA signature creation (batch)")
@@ -837,7 +837,7 @@ public class QaSecurityActions {
         : new P12SignSpeed.RSA(securityFactory, sigAlgo, getNumThreads(),
             control.modulusLen(), toBigInt("0x10001"));
     }
-  }
+  } // class BspeedRsaSignP12
 
   public abstract static class BSpeedP12SignAction extends BatchSpeedAction {
 
@@ -864,7 +864,7 @@ public class QaSecurityActions {
       return new P12SignSpeed.AESGmac(securityFactory, sigAlgo, getNumThreads());
     }
 
-  }
+  } // class BSpeedP12SignAction
 
   @Command(scope = "xi", name = "speed-dsa-gen-p12",
       description = "performance test of PKCS#12 DSA key generation")
@@ -885,7 +885,7 @@ public class QaSecurityActions {
       return new P12KeyGenSpeed.DSA(plen, qlen, securityFactory);
     }
 
-  }
+  } // class SpeedDsaGenP12
 
   @Command(scope = "xi", name = "speed-dsa-sign-p12",
       description = "performance test of PKCS#12 DSA signature creation")
@@ -910,7 +910,7 @@ public class QaSecurityActions {
       return new P12SignSpeed.DSA(securityFactory, sigAlgo, getNumThreads(), plen, qlen);
     }
 
-  }
+  } // class SpeedDsaSignP12
 
   @Command(scope = "xi", name = "speed-ec-gen-p12",
       description = "performance test of PKCS#12 EC key generation")
@@ -926,7 +926,7 @@ public class QaSecurityActions {
       return new P12KeyGenSpeed.EC(getCurveOid(curveName), securityFactory);
     }
 
-  }
+  } // class SpeedEcGenP12
 
   @Command(scope = "xi", name = "speed-ec-sign-p12",
       description = "performance test of PKCS#12 EC signature creation")
@@ -947,7 +947,7 @@ public class QaSecurityActions {
           getCurveOid(curveName));
     }
 
-  }
+  } // class SpeedEcSignP12
 
   @Command(scope = "xi", name = "speed-ed-gen-p12",
       description = "performance test of PKCS#12 Edwards and montgomery EC key generation")
@@ -963,7 +963,7 @@ public class QaSecurityActions {
       return new P12KeyGenSpeed.EC(getCurveOid(curveName), securityFactory);
     }
 
-  }
+  } // class SpeedEdGenP12
 
   @Command(scope = "xi", name = "speed-ed-sign-p12",
       description = "performance test of PKCS#12 EdDSA signature creation")
@@ -980,7 +980,7 @@ public class QaSecurityActions {
       return new P12SignSpeed.EC(securityFactory, sigAlgo, getNumThreads(), curveOid);
     }
 
-  }
+  } // class SpeedEdSignP12
 
   @Command(scope = "xi", name = "speed-hmac-sign-p12",
       description = "performance test of PKCS#12 HMAC signature creation")
@@ -996,7 +996,7 @@ public class QaSecurityActions {
       return new P12SignSpeed.HMAC(securityFactory, sigAlgo, getNumThreads());
     }
 
-  }
+  } // class SpeedHmacSignP12
 
   @Command(scope = "xi", name = "speed-rsa-gen-p12",
       description = "performance test of PKCS#12 RSA key generation")
@@ -1014,7 +1014,7 @@ public class QaSecurityActions {
       return new P12KeyGenSpeed.RSA(keysize, toBigInt(publicExponent), securityFactory);
     }
 
-  }
+  } // class SpeedRsaGenP12
 
   @Command(scope = "xi", name = "speed-rsa-sign-p12",
       description = "performance test of PKCS#12 RSA signature creation")
@@ -1037,11 +1037,11 @@ public class QaSecurityActions {
           toBigInt(publicExponent));
     }
 
-  }
+  } // class SpeedRsaSignP12
 
   public abstract static class SpeedP12SignAction extends SingleSpeedAction {
 
-  }
+  } // class SpeedP12SignAction
 
   @Command(scope = "xi", name = "speed-sm2-gen-p12",
       description = "performance test of PKCS#12 SM2 key generation")
@@ -1053,7 +1053,7 @@ public class QaSecurityActions {
       return new P12KeyGenSpeed.EC(GMObjectIdentifiers.sm2p256v1, securityFactory);
     }
 
-  }
+  } // class SpeedSm2GenP12
 
   @Command(scope = "xi", name = "speed-sm2-sign-p12",
       description = "performance test of PKCS#12 SM2 signature creation")
@@ -1065,7 +1065,7 @@ public class QaSecurityActions {
       return new P12SignSpeed.SM2(securityFactory, getNumThreads());
     }
 
-  }
+  } // class SpeedSm2SignP12
 
   private static ASN1ObjectIdentifier getCurveOid(String curveName) {
     ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(curveName);
@@ -1077,6 +1077,6 @@ public class QaSecurityActions {
       throw new IllegalArgumentException("unknown curveName " + curveName);
     }
     return curveOid;
-  }
+  } // method getCurveOid
 
 }

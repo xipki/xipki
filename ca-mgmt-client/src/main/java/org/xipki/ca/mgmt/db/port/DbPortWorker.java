@@ -75,7 +75,7 @@ public abstract class DbPortWorker implements Runnable {
       LOG.error("exception thrown", ex);
       exception = ex;
     }
-  }
+  } // method run
 
   protected abstract void run0() throws Exception;
 
@@ -275,7 +275,7 @@ public abstract class DbPortWorker implements Runnable {
       }
     }
 
-  } // ExportOcspDb
+  } // class ExportOcspDb
 
   public static class ImportOcspDb extends DbPortWorker {
 
@@ -314,7 +314,7 @@ public abstract class DbPortWorker implements Runnable {
       }
     }
 
-  } // ImportOcspDb
+  } // class ImportOcspDb
 
   public static class ImportOcspFromCaDb extends DbPortWorker {
 

@@ -77,7 +77,7 @@ public class ResponseData extends ASN1Type {
 
     this.bodyLength = len;
     this.encodedLength = getLen(bodyLength);
-  }
+  } // constructor
 
   @Override
   public int getEncodedLength() {
@@ -115,6 +115,6 @@ public class ResponseData extends ASN1Type {
     }
 
     return idx - offset;
-  }
+  } // method write
 
 }

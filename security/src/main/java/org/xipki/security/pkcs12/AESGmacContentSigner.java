@@ -69,7 +69,7 @@ public class AESGmacContentSigner implements XiContentSigner {
       cipher.updateAAD(bytes, off, len);
     }
 
-  }
+  } // class AESGmacOutputStream
 
   private static final int tagByteLen = 16;
 
@@ -142,7 +142,7 @@ public class AESGmacContentSigner implements XiContentSigner {
     } catch (InvalidKeyException | InvalidAlgorithmParameterException ex) {
       throw new XiSecurityException(ex);
     }
-  }
+  } // method AESGmacContentSigner
 
   @Override
   public AlgorithmIdentifier getAlgorithmIdentifier() {

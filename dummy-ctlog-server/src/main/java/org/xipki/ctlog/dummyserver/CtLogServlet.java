@@ -56,7 +56,7 @@ public abstract class CtLogServlet extends HttpServlet {
     resp.setContentLengthLong(respContent.length);
     resp.getOutputStream().write(respContent);
     resp.setStatus(HttpServletResponse.SC_OK);
-  }
+  } // method doPost
 
   private String buildEncodedDigitallySigned() throws IOException {
     // ECDSA r of 32 bytes
@@ -88,6 +88,6 @@ public abstract class CtLogServlet extends HttpServlet {
 
     byte[] encoded = os.toByteArray();
     return new String(Base64.getEncoder().encode(encoded));
-  }
+  } // method buildEncodedDigitallySigned
 
 }

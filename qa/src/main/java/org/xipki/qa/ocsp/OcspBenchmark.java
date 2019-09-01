@@ -207,6 +207,6 @@ public class OcspBenchmark extends BenchmarkExecutor implements ResponseHandler 
     }
 
     return true;
-  }
+  } // method onComplete0
 
 }

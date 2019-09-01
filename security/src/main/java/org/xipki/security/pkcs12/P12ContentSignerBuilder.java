@@ -304,7 +304,7 @@ public class P12ContentSignerBuilder {
       concurrentSigner.setPublicKey(publicKey);
     }
     return concurrentSigner;
-  } // createSigner
+  } // method createSigner
 
   public X509Certificate getCertificate() {
     return (certificateChain != null && certificateChain.length > 0) ? certificateChain[0] : null;

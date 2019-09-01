@@ -105,7 +105,7 @@ public class P11ProxyResponder {
     actions.add(P11ProxyConstants.ACTION_IMPORT_SECRET_KEY);
     actions.add(P11ProxyConstants.ACTION_GEN_KEYPAIR_SM2);
     actionsRequireNonNullRequest = Collections.unmodifiableSet(actions);
-  }
+  } // method static
 
   public P11ProxyResponder() {
     Set<Short> tmpVersions = new HashSet<>();
@@ -466,7 +466,7 @@ public class P11ProxyResponder {
       LogUtil.error(LOG, th, buildErrorMsg(action, transactionId));
       return getResp(version, transactionId, P11ProxyConstants.RC_INTERNAL_ERROR, action);
     }
-  } // method processPkiMessage
+  } // method processRequest
 
   private static String buildErrorMsg(short action, byte[] transactionId) {
     return "could not process action " + P11ProxyConstants.getActionName(action)
@@ -480,7 +480,7 @@ public class P11ProxyResponder {
       throw new P11UnknownEntityException(slotId);
     }
     return slot;
-  }
+  } // method getSlot
 
   private static byte[] getResp(short version, byte[] transactionId, short rc, short action) {
     byte[] resp = new byte[14];
@@ -490,7 +490,7 @@ public class P11ProxyResponder {
     IoUtil.writeShort(rc, resp, 10); // RC
     IoUtil.writeShort(action, resp, 12); // action
     return resp;
-  }
+  } // method getResp
 
   private static byte[] getSuccessResp(short version, byte[] transactionId, short action,
       ASN1Object respContent) {
@@ -502,7 +502,7 @@ public class P11ProxyResponder {
       return getResp(version, transactionId, P11ProxyConstants.RC_INTERNAL_ERROR, action);
     }
     return getSuccessResp(version, transactionId, action, encoded);
-  }
+  } // method getSuccessResp
 
   private static byte[] getSuccessResp(short version, byte[] transactionId, short action,
       byte[] respContent) {
@@ -520,6 +520,6 @@ public class P11ProxyResponder {
       System.arraycopy(respContent, 0, resp, 14, respContent.length);
     }
     return resp;
-  }
+  } // method getSuccessResp
 
 }

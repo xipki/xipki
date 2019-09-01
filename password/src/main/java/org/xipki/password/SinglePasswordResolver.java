@@ -56,7 +56,7 @@ public interface SinglePasswordResolver {
       return OBFPasswordService.obfuscate(new String(password));
     }
 
-  }
+  } // class OBF
 
   // CHECKSTYLE:SKIP
   public static class PBE implements SinglePasswordResolver {
@@ -129,7 +129,7 @@ public interface SinglePasswordResolver {
             + masterPasswordCallback + ", " + ex.getClass().getName() + ": " + ex.getMessage());
       }
       this.masterPwdCallback = pwdCallback;
-    }
+    } // method init
 
     public void clearMasterPassword() {
       masterPassword = null;
@@ -157,6 +157,6 @@ public interface SinglePasswordResolver {
       this.masterPasswordCallback = masterPasswordCallback.trim();
     }
 
-  }
+  } // class PBE
 
 }

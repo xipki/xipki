@@ -124,6 +124,6 @@ public class DummyMain {
     } catch (Exception ex) {
       ex.printStackTrace();
     }
-  }
+  } // method main
 
 }

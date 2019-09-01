@@ -92,7 +92,7 @@ public abstract class Certprofile implements Closeable {
       return caIssuersProtocols;
     }
 
-  }
+  } // class AuthorityInfoAccessControl
 
   public static class CrlDistributionPointsControl {
 
@@ -107,18 +107,18 @@ public abstract class Certprofile implements Closeable {
       return protocols;
     }
 
-  }
+  } // class CrlDistributionPointsControl
 
   public static enum CertDomain {
     RFC5280,
     CABForumBR
-  }
+  } // class CertDomain
 
   public enum CertLevel {
     RootCA,
     SubCA,
     EndEntity
-  }
+  } // class CertLevel
 
   public static class ExtensionControl {
 
@@ -146,7 +146,7 @@ public abstract class Certprofile implements Closeable {
       return request;
     }
 
-  }
+  } // class CertLevel
 
   public static class ExtKeyUsageControl {
 
@@ -167,7 +167,7 @@ public abstract class Certprofile implements Closeable {
       return required;
     }
 
-  }
+  } // class ExtKeyUsageControl
 
   public enum GeneralNameTag {
 
@@ -191,7 +191,7 @@ public abstract class Certprofile implements Closeable {
       return tag;
     }
 
-  }
+  } // class GeneralNameTag
 
   public static class GeneralNameMode {
 
@@ -219,7 +219,7 @@ public abstract class Certprofile implements Closeable {
       return allowedTypes;
     }
 
-  }
+  } // class GeneralNameMode
 
   public static class KeyUsageControl {
 
@@ -240,7 +240,7 @@ public abstract class Certprofile implements Closeable {
       return required;
     }
 
-  }
+  } // class KeyUsageControl
 
   public static class RdnControl {
 
@@ -376,7 +376,7 @@ public abstract class Certprofile implements Closeable {
       this.notInSubject = notInSubject;
     }
 
-  }
+  } // class RdnControl
 
   public enum StringType {
 
@@ -404,7 +404,7 @@ public abstract class Certprofile implements Closeable {
       }
     }
 
-  }
+  } // class StringType
 
   public static class SubjectControl {
 
@@ -496,7 +496,7 @@ public abstract class Certprofile implements Closeable {
       return types;
     }
 
-  }
+  } // class SubjectControl
 
   public static class SubjectInfo {
 
@@ -555,7 +555,7 @@ public abstract class Certprofile implements Closeable {
       throw new IllegalArgumentException("invalid X509CertVersion " + versionNumber);
     }
 
-  }
+  } // class SubjectInfo
 
   public boolean isOnlyForRa() {
     return false;

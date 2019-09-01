@@ -362,7 +362,7 @@ public class CaCertstore extends ValidatableConf {
       notEmpty(protocolSupport, "protocolSupport");
     }
 
-  }
+  } // class Ca
 
   public static class Caalias extends ValidatableConf {
 
@@ -391,7 +391,334 @@ public class CaCertstore extends ValidatableConf {
       notEmpty(name, "name");
     }
 
-  }
+  } // class Caalias
+
+  public static class Caconf extends ValidatableConf {
+
+    private int version;
+
+    private List<Signer> signers;
+
+    private List<IdNameTypeConf> requestors;
+
+    private List<IdNameTypeConf> publishers;
+
+    private List<IdNameTypeConf> profiles;
+
+    private List<Ca> cas;
+
+    private List<Caalias> caaliases;
+
+    private List<User> users;
+
+    private List<CaHasRequestor> caHasRequestors;
+
+    private List<CaHasPublisher> caHasPublishers;
+
+    private List<CaHasProfile> caHasProfiles;
+
+    private List<CaHasUser> caHasUsers;
+
+    public int getVersion() {
+      return version;
+    }
+
+    public void setVersion(int version) {
+      this.version = version;
+    }
+
+    public List<Signer> getSigners() {
+      if (signers == null) {
+        signers = new LinkedList<>();
+      }
+      return signers;
+    }
+
+    public void setSigners(List<Signer> signers) {
+      this.signers = signers;
+    }
+
+    public List<IdNameTypeConf> getRequestors() {
+      if (requestors == null) {
+        requestors = new LinkedList<>();
+      }
+      return requestors;
+    }
+
+    public void setRequestors(List<IdNameTypeConf> requestors) {
+      this.requestors = requestors;
+    }
+
+    public List<IdNameTypeConf> getPublishers() {
+      if (publishers == null) {
+        publishers = new LinkedList<>();
+      }
+      return publishers;
+    }
+
+    public void setPublishers(List<IdNameTypeConf> publishers) {
+      this.publishers = publishers;
+    }
+
+    public List<IdNameTypeConf> getProfiles() {
+      if (profiles == null) {
+        profiles = new LinkedList<>();
+      }
+      return profiles;
+    }
+
+    public void setProfiles(List<IdNameTypeConf> profiles) {
+      this.profiles = profiles;
+    }
+
+    public List<Ca> getCas() {
+      if (cas == null) {
+        cas = new LinkedList<>();
+      }
+      return cas;
+    }
+
+    public void setCas(List<Ca> cas) {
+      this.cas = cas;
+    }
+
+    public List<Caalias> getCaaliases() {
+      if (caaliases == null) {
+        caaliases = new LinkedList<>();
+      }
+      return caaliases;
+    }
+
+    public void setCaaliases(List<Caalias> caaliases) {
+      this.caaliases = caaliases;
+    }
+
+    public List<User> getUsers() {
+      if (users == null) {
+        users = new LinkedList<>();
+      }
+      return users;
+    }
+
+    public void setUsers(List<User> users) {
+      this.users = users;
+    }
+
+    public List<CaHasRequestor> getCaHasRequestors() {
+      if (caHasRequestors == null) {
+        caHasRequestors = new LinkedList<>();
+      }
+      return caHasRequestors;
+    }
+
+    public void setCaHasRequestors(List<CaHasRequestor> caHasRequestors) {
+      this.caHasRequestors = caHasRequestors;
+    }
+
+    public List<CaHasPublisher> getCaHasPublishers() {
+      if (caHasPublishers == null) {
+        caHasPublishers = new LinkedList<>();
+      }
+      return caHasPublishers;
+    }
+
+    public void setCaHasPublishers(List<CaHasPublisher> caHasPublishers) {
+      this.caHasPublishers = caHasPublishers;
+    }
+
+    public List<CaHasProfile> getCaHasProfiles() {
+      if (caHasProfiles == null) {
+        caHasProfiles = new LinkedList<>();
+      }
+      return caHasProfiles;
+    }
+
+    public void setCaHasProfiles(List<CaHasProfile> caHasProfiles) {
+      this.caHasProfiles = caHasProfiles;
+    }
+
+    public List<CaHasUser> getCaHasUsers() {
+      if (caHasUsers == null) {
+        caHasUsers = new LinkedList<>();
+      }
+      return caHasUsers;
+    }
+
+    public void setCaHasUsers(List<CaHasUser> caHasUsers) {
+      this.caHasUsers = caHasUsers;
+    }
+
+    @Override
+    public void validate() throws InvalidConfException {
+      validate(signers);
+      validate(requestors);
+      validate(publishers);
+      validate(profiles);
+      validate(cas);
+      validate(caaliases);
+      validate(users);
+      validate(caHasRequestors);
+      validate(caHasPublishers);
+      validate(caHasProfiles);
+    }
+
+  } // class Caconf
+
+  public abstract static class CaHasEntry extends ValidatableConf {
+
+    private int caId;
+
+    public int getCaId() {
+      return caId;
+    }
+
+    public void setCaId(int caId) {
+      this.caId = caId;
+    }
+
+  } // class CaHasEntry
+
+  public static class CaHasPublisher extends CaHasEntry {
+
+    private int publisherId;
+
+    public int getPublisherId() {
+      return publisherId;
+    }
+
+    public void setPublisherId(int publisherId) {
+      this.publisherId = publisherId;
+    }
+
+    @Override
+    public void validate() throws InvalidConfException {
+    }
+
+  } // class CaHasPublisher
+
+  public static class CaHasProfile extends CaHasEntry {
+
+    private int profileId;
+
+    public int getProfileId() {
+      return profileId;
+    }
+
+    public void setProfileId(int profileId) {
+      this.profileId = profileId;
+    }
+
+    @Override
+    public void validate() throws InvalidConfException {
+    }
+
+  } // class CaHasProfile
+
+  public static class CaHasRequestor extends CaHasEntry {
+
+    private int requestorId;
+
+    private int ra;
+
+    private int permission;
+
+    private String profiles;
+
+    public int getRequestorId() {
+      return requestorId;
+    }
+
+    public void setRequestorId(int requestorId) {
+      this.requestorId = requestorId;
+    }
+
+    public int getRa() {
+      return ra;
+    }
+
+    public void setRa(int ra) {
+      this.ra = ra;
+    }
+
+    public int getPermission() {
+      return permission;
+    }
+
+    public void setPermission(int permission) {
+      this.permission = permission;
+    }
+
+    public String getProfiles() {
+      return profiles;
+    }
+
+    public void setProfiles(String profiles) {
+      this.profiles = profiles;
+    }
+
+    @Override
+    public void validate() throws InvalidConfException {
+    }
+
+  } // class CaHasRequestor
+
+  public static class CaHasUser extends CaHasEntry {
+
+    private int id;
+
+    private int userId;
+
+    private int active;
+
+    private int permission;
+
+    private String profiles;
+
+    public int getId() {
+      return id;
+    }
+
+    public void setId(int id) {
+      this.id = id;
+    }
+
+    public int getUserId() {
+      return userId;
+    }
+
+    public void setUserId(int userId) {
+      this.userId = userId;
+    }
+
+    public int getActive() {
+      return active;
+    }
+
+    public void setActive(int active) {
+      this.active = active;
+    }
+
+    public int getPermission() {
+      return permission;
+    }
+
+    public void setPermission(int permission) {
+      this.permission = permission;
+    }
+
+    public String getProfiles() {
+      return profiles;
+    }
+
+    public void setProfiles(String profiles) {
+      this.profiles = profiles;
+    }
+
+    @Override
+    public void validate() throws InvalidConfException {
+    }
+
+  } // class CaHasUser
 
   public static class Cert extends IdentifidDbObject {
 
@@ -615,7 +942,7 @@ public class CaCertstore extends ValidatableConf {
       }
     }
 
-  }
+  } // method Cert
 
   public static class Certs extends ValidatableConf {
 
@@ -641,192 +968,7 @@ public class CaCertstore extends ValidatableConf {
       validate(certs);
     }
 
-  }
-
-  public static class Caconf extends ValidatableConf {
-
-    private int version;
-
-    private List<Signer> signers;
-
-    private List<IdNameTypeConf> requestors;
-
-    private List<IdNameTypeConf> publishers;
-
-    private List<IdNameTypeConf> profiles;
-
-    private List<Ca> cas;
-
-    private List<Caalias> caaliases;
-
-    private List<User> users;
-
-    private List<CaHasRequestor> caHasRequestors;
-
-    private List<CaHasPublisher> caHasPublishers;
-
-    private List<CaHasProfile> caHasProfiles;
-
-    private List<CaHasUser> caHasUsers;
-
-    public int getVersion() {
-      return version;
-    }
-
-    public void setVersion(int version) {
-      this.version = version;
-    }
-
-    public List<Signer> getSigners() {
-      if (signers == null) {
-        signers = new LinkedList<>();
-      }
-      return signers;
-    }
-
-    public void setSigners(List<Signer> signers) {
-      this.signers = signers;
-    }
-
-    public List<IdNameTypeConf> getRequestors() {
-      if (requestors == null) {
-        requestors = new LinkedList<>();
-      }
-      return requestors;
-    }
-
-    public void setRequestors(List<IdNameTypeConf> requestors) {
-      this.requestors = requestors;
-    }
-
-    public List<IdNameTypeConf> getPublishers() {
-      if (publishers == null) {
-        publishers = new LinkedList<>();
-      }
-      return publishers;
-    }
-
-    public void setPublishers(List<IdNameTypeConf> publishers) {
-      this.publishers = publishers;
-    }
-
-    public List<IdNameTypeConf> getProfiles() {
-      if (profiles == null) {
-        profiles = new LinkedList<>();
-      }
-      return profiles;
-    }
-
-    public void setProfiles(List<IdNameTypeConf> profiles) {
-      this.profiles = profiles;
-    }
-
-    public List<Ca> getCas() {
-      if (cas == null) {
-        cas = new LinkedList<>();
-      }
-      return cas;
-    }
-
-    public void setCas(List<Ca> cas) {
-      this.cas = cas;
-    }
-
-    public List<Caalias> getCaaliases() {
-      if (caaliases == null) {
-        caaliases = new LinkedList<>();
-      }
-      return caaliases;
-    }
-
-    public void setCaaliases(List<Caalias> caaliases) {
-      this.caaliases = caaliases;
-    }
-
-    public List<User> getUsers() {
-      if (users == null) {
-        users = new LinkedList<>();
-      }
-      return users;
-    }
-
-    public void setUsers(List<User> users) {
-      this.users = users;
-    }
-
-    public List<CaHasRequestor> getCaHasRequestors() {
-      if (caHasRequestors == null) {
-        caHasRequestors = new LinkedList<>();
-      }
-      return caHasRequestors;
-    }
-
-    public void setCaHasRequestors(List<CaHasRequestor> caHasRequestors) {
-      this.caHasRequestors = caHasRequestors;
-    }
-
-    public List<CaHasPublisher> getCaHasPublishers() {
-      if (caHasPublishers == null) {
-        caHasPublishers = new LinkedList<>();
-      }
-      return caHasPublishers;
-    }
-
-    public void setCaHasPublishers(List<CaHasPublisher> caHasPublishers) {
-      this.caHasPublishers = caHasPublishers;
-    }
-
-    public List<CaHasProfile> getCaHasProfiles() {
-      if (caHasProfiles == null) {
-        caHasProfiles = new LinkedList<>();
-      }
-      return caHasProfiles;
-    }
-
-    public void setCaHasProfiles(List<CaHasProfile> caHasProfiles) {
-      this.caHasProfiles = caHasProfiles;
-    }
-
-    public List<CaHasUser> getCaHasUsers() {
-      if (caHasUsers == null) {
-        caHasUsers = new LinkedList<>();
-      }
-      return caHasUsers;
-    }
-
-    public void setCaHasUsers(List<CaHasUser> caHasUsers) {
-      this.caHasUsers = caHasUsers;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      validate(signers);
-      validate(requestors);
-      validate(publishers);
-      validate(profiles);
-      validate(cas);
-      validate(caaliases);
-      validate(users);
-      validate(caHasRequestors);
-      validate(caHasPublishers);
-      validate(caHasProfiles);
-    }
-
-  }
-
-  public abstract static class CaHasEntry extends ValidatableConf {
-
-    private int caId;
-
-    public int getCaId() {
-      return caId;
-    }
-
-    public void setCaId(int caId) {
-      this.caId = caId;
-    }
-
-  }
+  } // class Certs
 
   public static class Crl extends IdentifidDbObject {
 
@@ -879,7 +1021,7 @@ public class CaCertstore extends ValidatableConf {
       notNull(crlScope, "crlScope");
     }
 
-  }
+  } // class CaHasEntry
 
   public static class Crls extends ValidatableConf {
 
@@ -905,7 +1047,7 @@ public class CaCertstore extends ValidatableConf {
       validate(crls);
     }
 
-  }
+  } // class Crls
 
   public static class DeltaCrlCacheEntry extends ValidatableConf {
 
@@ -934,7 +1076,7 @@ public class CaCertstore extends ValidatableConf {
       notEmpty(serial, "serial");
     }
 
-  }
+  } // class DeltaCrlCacheEntry
 
   public static class IdNameTypeConf extends ValidatableConf {
 
@@ -986,7 +1128,7 @@ public class CaCertstore extends ValidatableConf {
       conf.validate();
     }
 
-  }
+  } // class IdNameTypeConf
 
   public static class ReqCert extends IdentifidDbObject {
 
@@ -1017,149 +1159,7 @@ public class CaCertstore extends ValidatableConf {
       notNull(cid, "cid");
     }
 
-  }
-
-  public static class CaHasPublisher extends CaHasEntry {
-
-    private int publisherId;
-
-    public int getPublisherId() {
-      return publisherId;
-    }
-
-    public void setPublisherId(int publisherId) {
-      this.publisherId = publisherId;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-    }
-
-  }
-
-  public static class CaHasProfile extends CaHasEntry {
-
-    private int profileId;
-
-    public int getProfileId() {
-      return profileId;
-    }
-
-    public void setProfileId(int profileId) {
-      this.profileId = profileId;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-    }
-
-  }
-
-  public static class CaHasRequestor extends CaHasEntry {
-
-    private int requestorId;
-
-    private int ra;
-
-    private int permission;
-
-    private String profiles;
-
-    public int getRequestorId() {
-      return requestorId;
-    }
-
-    public void setRequestorId(int requestorId) {
-      this.requestorId = requestorId;
-    }
-
-    public int getRa() {
-      return ra;
-    }
-
-    public void setRa(int ra) {
-      this.ra = ra;
-    }
-
-    public int getPermission() {
-      return permission;
-    }
-
-    public void setPermission(int permission) {
-      this.permission = permission;
-    }
-
-    public String getProfiles() {
-      return profiles;
-    }
-
-    public void setProfiles(String profiles) {
-      this.profiles = profiles;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-    }
-
-  }
-
-  public static class CaHasUser extends CaHasEntry {
-
-    private int id;
-
-    private int userId;
-
-    private int active;
-
-    private int permission;
-
-    private String profiles;
-
-    public int getId() {
-      return id;
-    }
-
-    public void setId(int id) {
-      this.id = id;
-    }
-
-    public int getUserId() {
-      return userId;
-    }
-
-    public void setUserId(int userId) {
-      this.userId = userId;
-    }
-
-    public int getActive() {
-      return active;
-    }
-
-    public void setActive(int active) {
-      this.active = active;
-    }
-
-    public int getPermission() {
-      return permission;
-    }
-
-    public void setPermission(int permission) {
-      this.permission = permission;
-    }
-
-    public String getProfiles() {
-      return profiles;
-    }
-
-    public void setProfiles(String profiles) {
-      this.profiles = profiles;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-    }
-
-  }
+  } // class ReqCert
 
   public static class ReqCerts extends ValidatableConf {
 
@@ -1188,7 +1188,7 @@ public class CaCertstore extends ValidatableConf {
       validate(reqCerts);
     }
 
-  }
+  } // class ReqCerts
 
   public static class Request extends IdentifidDbObject {
 
@@ -1219,7 +1219,7 @@ public class CaCertstore extends ValidatableConf {
       notEmpty(file, "file");
     }
 
-  }
+  } // class Request
 
   public static class Requests extends ValidatableConf {
 
@@ -1248,7 +1248,7 @@ public class CaCertstore extends ValidatableConf {
       validate(requests);
     }
 
-  }
+  } // class Requests
 
   public static class Signer extends ValidatableConf {
 
@@ -1301,7 +1301,7 @@ public class CaCertstore extends ValidatableConf {
       validate(cert);
     }
 
-  }
+  } // class Signer
 
   public static class ToPublish extends ValidatableConf {
 
@@ -1339,7 +1339,7 @@ public class CaCertstore extends ValidatableConf {
     public void validate() throws InvalidConfException {
     }
 
-  }
+  } // class ToPublish
 
   public static class User extends ValidatableConf {
 
@@ -1389,7 +1389,7 @@ public class CaCertstore extends ValidatableConf {
       notEmpty(password, "password");
     }
 
-  }
+  } // class User
 
   private int version;
 

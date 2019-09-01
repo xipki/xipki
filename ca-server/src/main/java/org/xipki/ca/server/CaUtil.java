@@ -75,7 +75,7 @@ public class CaUtil {
       }
     }
     return null;
-  }
+  } // method getExtensions
 
   public static String getChallengePassword(CertificationRequestInfo csr) {
     Args.notNull(csr, "csr");
@@ -88,7 +88,7 @@ public class CaUtil {
       }
     }
     return null;
-  }
+  } // method getChallengePassword
 
   public static BasicConstraints createBasicConstraints(CertLevel level, Integer pathLen) {
     BasicConstraints basicConstraints;
@@ -101,7 +101,7 @@ public class CaUtil {
       throw new IllegalStateException("unknown CertLevel " + level);
     }
     return basicConstraints;
-  }
+  } // method createBasicConstraints
 
   public static AuthorityInformationAccess createAuthorityInformationAccess(
       List<String> caIssuerUris, List<String> ocspUris) {
@@ -128,7 +128,7 @@ public class CaUtil {
 
     DERSequence seq = new DERSequence(accessDescriptions.toArray(new AccessDescription[0]));
     return AuthorityInformationAccess.getInstance(seq);
-  }
+  } // method createAuthorityInformationAccess
 
   public static CRLDistPoint createCrlDistributionPoints(List<String> crlUris, X500Name caSubject,
       X500Name crlSignerSubject) {
@@ -153,7 +153,7 @@ public class CaUtil {
     points[0] = new DistributionPoint(pointName, null, crlIssuer);
 
     return new CRLDistPoint(points);
-  }
+  } // method createCrlDistributionPoints
 
   public static X500Name sortX509Name(X500Name name) {
     Args.notNull(name, "name");
@@ -179,7 +179,7 @@ public class CaUtil {
     }
 
     return new X500Name(rdns.toArray(new RDN[0]));
-  }
+  } // method sortX509Name
 
   public static boolean verifyCsr(CertificationRequest csr, SecurityFactory securityFactory,
       AlgorithmValidator algorithmValidator, DhpocControl dhpocControl) {
@@ -206,7 +206,7 @@ public class CaUtil {
     }
 
     return securityFactory.verifyPopo(csr, algorithmValidator, kaKeyAndCert);
-  }
+  } // method verifyCsr
 
   private static RDN[] getRdns(RDN[] rdns, ASN1ObjectIdentifier type) {
     Args.notNull(rdns, "rdns");
@@ -220,6 +220,6 @@ public class CaUtil {
     }
 
     return CollectionUtil.isEmpty(ret) ? null : ret.toArray(new RDN[0]);
-  }
+  } // method getRdns
 
 }

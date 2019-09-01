@@ -47,7 +47,7 @@ public class Validity implements Comparable<Validity> {
       return suffix;
     }
 
-  } // enum Unit
+  } // class Unit
 
   private static final long MINUTE = 60L * 1000;
 

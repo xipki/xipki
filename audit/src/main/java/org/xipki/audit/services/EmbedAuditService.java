@@ -62,7 +62,7 @@ public class EmbedAuditService implements AuditService {
         }
         break;
     } // end switch
-  }
+  } // method logEvent
 
   @Override
   public void logEvent(PciAuditEvent event) {
@@ -80,7 +80,7 @@ public class EmbedAuditService implements AuditService {
         }
         break;
     } // end switch
-  }
+  } // method logEvent
 
   protected static String createMessage(AuditEvent event) {
     Args.notNull(event, "event");
@@ -122,6 +122,6 @@ public class EmbedAuditService implements AuditService {
     }
 
     return sb.toString();
-  }
+  } // method createMessage
 
 }

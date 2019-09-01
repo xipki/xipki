@@ -94,7 +94,7 @@ public class HttpProxyServlet extends HttpServlet {
     } finally {
       resp.flushBuffer();
     }
-  } // method servicePost
+  } // method doPost
 
   public void setLocalP11CryptServicePool(LocalP11CryptServicePool localP11CryptServicePool) {
     this.localP11CryptServicePool = localP11CryptServicePool;

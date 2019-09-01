@@ -87,7 +87,7 @@ public class DSAPlainDigestSigner implements Signer {
 
     reset();
     dsaSigner.init(forSigning, parameters);
-  }
+  } // method init
 
   @Override
   public void update(byte input) {

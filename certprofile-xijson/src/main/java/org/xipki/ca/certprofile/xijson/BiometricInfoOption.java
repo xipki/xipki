@@ -68,7 +68,7 @@ public class BiometricInfoOption {
         throw new IllegalStateException("should not reach here, invalid biometricType");
       }
     }
-  }
+  } // constructor
 
   public boolean isTypePermitted(TypeOfBiometricData type) {
     Args.notNull(type, "type");

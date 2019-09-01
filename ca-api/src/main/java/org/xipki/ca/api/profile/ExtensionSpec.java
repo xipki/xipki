@@ -90,7 +90,7 @@ public abstract class ExtensionSpec {
     }
 
     return true;
-  }
+  } // method isValidPublicDomain
 
   public static boolean isValidPublicIPv4Address(byte[] ipv4Address) {
     if (ipv4Address == null || ipv4Address.length != 4) {
@@ -113,12 +113,12 @@ public abstract class ExtensionSpec {
     }
 
     return true;
-  }
+  } // method isValidPublicIPv4Address
 
   public static ExtensionSpec getExtensionSpec(CertDomain domain, CertLevel certLevel) {
     return domain == CertDomain.CABForumBR
         ? browserForumInstances.get(certLevel) : rfc5280Instances.get(certLevel);
-  }
+  } // method getExtensionSpec
 
   private static class Rfc5280 extends ExtensionSpec {
 
@@ -184,7 +184,7 @@ public abstract class ExtensionSpec {
       return false;
     }
 
-  }
+  } // class Rfc5280
 
   // CHECKSTYLE:SKIP
   private static class Rfc5280RootCA extends Rfc5280 {
@@ -245,7 +245,7 @@ public abstract class ExtensionSpec {
       return NON_CRITICAL_ONLY_EXTENSIONS.contains(type) ? true : super.isNonCriticalOnly(type);
     }
 
-  }
+  } // class Rfc5280RootCA
 
   // CHECKSTYLE:SKIP
   private static class Rfc5280SubCA extends Rfc5280 {
@@ -304,7 +304,7 @@ public abstract class ExtensionSpec {
       return NON_CRITICAL_ONLY_EXTENSIONS.contains(type) ? true : super.isNonCriticalOnly(type);
     }
 
-  }
+  } // class Rfc5280SubCA
 
   // CHECKSTYLE:SKIP
   private static class Rfc5280EndEntity extends Rfc5280 {
@@ -350,12 +350,12 @@ public abstract class ExtensionSpec {
       return NON_CRITICAL_ONLY_EXTENSIONS.contains(type) ? true : super.isNonCriticalOnly(type);
     }
 
-  }
+  } // class Rfc5280EndEntity
 
   // CHECKSTYLE:SKIP
   private static class BrowserForumBRRootCA extends Rfc5280RootCA {
 
-  }
+  } // class BrowserForumBRRootCA
 
   // CHECKSTYLE:SKIP
   private static class BrowserForumBRSubCA extends Rfc5280SubCA {
@@ -417,7 +417,7 @@ public abstract class ExtensionSpec {
       return NON_CRITICAL_ONLY_EXTENSIONS.contains(type) ? true : super.isNonCriticalOnly(type);
     }
 
-  }
+  } // class BrowserForumBRSubCA
 
   // CHECKSTYLE:SKIP
   private static class BrowserForumBREndEntity extends Rfc5280EndEntity {
@@ -474,6 +474,6 @@ public abstract class ExtensionSpec {
       return NON_CRITICAL_ONLY_EXTENSIONS.contains(type) ? true : super.isNonCriticalOnly(type);
     }
 
-  }
+  } // class BrowserForumBREndEntity
 
 }

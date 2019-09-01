@@ -90,7 +90,7 @@ public class PasswordBasedEncryption {
 
     System.arraycopy(cipherText, 0, ret, 1 + ivLen, cipherText.length);
     return ret;
-  }
+  } // method encrypt
 
   public static byte[] decrypt(PBEAlgo algo, byte[] cipherTextWithIv, char[] password,
       int iterationCount, byte[] salt) throws GeneralSecurityException {
@@ -125,6 +125,6 @@ public class PasswordBasedEncryption {
 
     cipher.init(Cipher.DECRYPT_MODE, pbeKey, pbeParameterSpec);
     return cipher.doFinal(cipherText);
-  }
+  } // method decrypt
 
 }

@@ -88,7 +88,7 @@ public class CmpUtil {
       signer.requiteSigner(signer0);
     }
     return signedMessage.toASN1Structure();
-  }
+  } // method addProtection
 
   public static PKIMessage addProtection(PKIMessage pkiMessage, char[] password,
       PBMParameter pbmParameter, GeneralName signerName, byte[] senderKid)
@@ -105,7 +105,7 @@ public class CmpUtil {
       throw new CMPException(ex.getMessage(), ex);
     }
     return signedMessage.toASN1Structure();
-  }
+  } // method addProtection
 
   // CHECKSTYLE:SKIP
   private static ProtectedPKIMessageBuilder newProtectedPKIMessageBuilder(PKIMessage pkiMessage,
@@ -155,7 +155,7 @@ public class CmpUtil {
     builder.setBody(pkiMessage.getBody());
 
     return builder;
-  }
+  } // method newProtectedPKIMessageBuilder
 
   public static boolean isImplictConfirm(PKIHeader header) {
     Args.notNull(header, "header");
@@ -170,7 +170,7 @@ public class CmpUtil {
     }
 
     return false;
-  }
+  } // method isImplictConfirm
 
   public static InfoTypeAndValue getImplictConfirmGeneralInfo() {
     return new InfoTypeAndValue(CMPObjectIdentifiers.it_implicitConfirm, DERNull.INSTANCE);

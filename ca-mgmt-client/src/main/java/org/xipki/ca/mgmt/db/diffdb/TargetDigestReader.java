@@ -75,7 +75,7 @@ class TargetDigestReader implements Closeable {
         datasource.returnConnection(conn);
         throw ex;
       }
-    }
+    } // constructor
 
     @Override
     public void run() {
@@ -271,7 +271,7 @@ class TargetDigestReader implements Closeable {
     }
 
     return ret;
-  }
+  } // method getCertsViaSingleSelect
 
   private Map<BigInteger, DigestEntry> getCertsViaInArraySelect(PreparedStatement batchSelectStmt,
       List<BigInteger> serialNumbers) throws DataAccessException {
@@ -296,7 +296,7 @@ class TargetDigestReader implements Closeable {
     } finally {
       releaseResources(null, rs);
     }
-  }
+  } // method getCertsViaInArraySelect
 
   private Map<BigInteger, DigestEntry> buildResult(ResultSet rs, List<BigInteger> serialNumbers)
       throws SQLException {
@@ -328,7 +328,7 @@ class TargetDigestReader implements Closeable {
     }
 
     return ret;
-  }
+  } // method buildResult
 
   private DigestEntry getSingleCert(PreparedStatement singleSelectStmt, BigInteger serialNumber)
       throws DataAccessException {
@@ -358,7 +358,7 @@ class TargetDigestReader implements Closeable {
     } finally {
       releaseResources(null, rs);
     }
-  }
+  } // method getSingleCert
 
   private void releaseResources(Statement ps, ResultSet rs) {
     datasource.releaseResources(ps, rs);
@@ -376,7 +376,7 @@ class TargetDigestReader implements Closeable {
     if (exception != null) {
       throw exception;
     }
-  }
+  } // method awaitTerminiation
 
   private String getBase64HashValue(ResultSet rs) throws SQLException {
     switch (dbType) {
@@ -392,5 +392,5 @@ class TargetDigestReader implements Closeable {
       default:
         throw new IllegalStateException("unknown dbType " + dbType);
     }
-  }
+  } // method getBase64HashValue
 }

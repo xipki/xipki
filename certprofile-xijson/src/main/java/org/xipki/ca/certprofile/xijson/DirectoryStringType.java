@@ -53,6 +53,6 @@ public enum DirectoryStringType {
       throw new IllegalStateException(
           "should not reach here, unknown DirectoryStringType " + this.name());
     }
-  }
+  } // method createDirectoryString
 
 }

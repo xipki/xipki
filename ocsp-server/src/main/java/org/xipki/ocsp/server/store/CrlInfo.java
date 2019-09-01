@@ -78,7 +78,7 @@ public class CrlInfo {
     str = getNotBlankValue(pairs, CRL_ID);
     this.crlId = CrlID.getInstance(Base64.decodeFast(str));
     initEncoded();
-  }
+  } // constructor
 
   private static final String getNotBlankValue(ConfPairs pairs, String name) {
     String str = pairs.value(name);
@@ -114,7 +114,7 @@ public class CrlInfo {
     }
     pairs.putPair(CRL_ID, Base64.encodeToString(encodedCrlId));
     this.encoded = pairs.getEncoded();
-  }
+  } // method initEncoded
 
   public String getEncoded() {
     return encoded;

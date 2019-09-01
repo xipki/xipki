@@ -161,7 +161,7 @@ public class OcspRequest {
     }
 
     return new OcspRequest(version, requestList, extensions);
-  }
+  } // method getInstance
 
   public static OcspRequest getInstance(OCSPRequest req) throws EncodingException {
     TBSRequest tbsReq0 = req.getTbsRequest();
@@ -212,7 +212,7 @@ public class OcspRequest {
     }
 
     return new OcspRequest(tbsReq0.getVersion().getValue().intValue(), requestList, extensions);
-  }
+  } // method getInstance
 
   public static int readRequestVersion(byte[] request) throws EncodingException {
     // OCSPRequest
@@ -232,7 +232,7 @@ public class OcspRequest {
         throw new EncodingException("version too large");
       }
     }
-  }
+  } // method readRequestVersion
 
   public static boolean containsSignature(byte[] request) throws EncodingException {
     // OCSPRequest
@@ -268,7 +268,7 @@ public class OcspRequest {
       }
     }
     return new Header(readerIndex, tag, len, off);
-  }
+  } // method readHeader
 
   private static byte[] readContent(byte[] encoded, Header header) {
     byte[] content = new byte[header.len];

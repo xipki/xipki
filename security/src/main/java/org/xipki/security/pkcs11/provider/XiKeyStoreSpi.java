@@ -145,7 +145,7 @@ public class XiKeyStoreSpi extends KeyStoreSpi {
     if (LOG.isErrorEnabled()) {
       LOG.info("loaded key entries {}", keyCerts.keySet());
     }
-  }
+  } // class engineLoad
 
   private void engineLoad(String moduleName) throws P11TokenException, XiSecurityException {
     P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);

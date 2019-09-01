@@ -93,7 +93,7 @@ public class QcStatementType extends ValidatableConf {
     public void validate() throws InvalidConfException {
     }
 
-  }
+  } // method Range2Type
 
   public static class QcEuLimitValueType extends ValidatableConf {
 
@@ -137,9 +137,9 @@ public class QcStatementType extends ValidatableConf {
       validate(amount);
       notNull(exponent, "exponent");
       validate(exponent);
-    }
+    } // method validate
 
-  }
+  } // class QcEuLimitValueType
 
   public static class PdsLocationType extends ValidatableConf {
 
@@ -171,7 +171,7 @@ public class QcStatementType extends ValidatableConf {
       notEmpty(language, "language");
     }
 
-  }
+  } // class QcEuLimitValueType
 
   public static class QcStatementValueType extends ValidatableConf {
 
@@ -246,8 +246,8 @@ public class QcStatementType extends ValidatableConf {
       validate(constant);
       validate(qcEuLimitValue);
       validate(pdsLocations);
-    }
+    } // method QcStatementValueType
 
-  }
+  } // class QcStatementValueType
 
 }

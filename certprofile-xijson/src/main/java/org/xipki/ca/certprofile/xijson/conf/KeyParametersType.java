@@ -42,6 +42,42 @@ import com.alibaba.fastjson.annotation.JSONField;
 
 public class KeyParametersType extends ValidatableConf {
 
+  public static class DsaParametersType extends ValidatableConf {
+
+    private List<Range> plengths;
+
+    private List<Range> qlengths;
+
+    public List<Range> getPlengths() {
+      if (plengths == null) {
+        plengths = new LinkedList<>();
+      }
+      return plengths;
+    }
+
+    public void setPlengths(List<Range> plengths) {
+      if (qlengths == null) {
+        qlengths = new LinkedList<>();
+      }
+      this.plengths = plengths;
+    }
+
+    public List<Range> getQlengths() {
+      return qlengths;
+    }
+
+    public void setQlengths(List<Range> qlengths) {
+      this.qlengths = qlengths;
+    }
+
+    @Override
+    public void validate() throws InvalidConfException {
+      validateRanges(plengths);
+      validateRanges(qlengths);
+    }
+
+  } // class DsaParametersType
+
   public static class EcParametersType extends ValidatableConf {
 
     private List<DescribableOid> curves;
@@ -75,7 +111,55 @@ public class KeyParametersType extends ValidatableConf {
       validate(curves);
     }
 
-  }
+  } // class EcParametersType
+
+  public static class GostParametersType extends ValidatableConf {
+
+    private List<DescribableOid> publicKeyParamSet;
+
+    private List<DescribableOid> digestParamSet;
+
+    private List<DescribableOid> encryptionParamSet;
+
+    public List<DescribableOid> getPublicKeyParamSet() {
+      if (publicKeyParamSet == null) {
+        publicKeyParamSet = new LinkedList<>();
+      }
+      return publicKeyParamSet;
+    }
+
+    public void setPublicKeyParamSet(List<DescribableOid> publicKeyParamSet) {
+      this.publicKeyParamSet = publicKeyParamSet;
+    }
+
+    public List<DescribableOid> getDigestParamSet() {
+      if (digestParamSet == null) {
+        digestParamSet = new LinkedList<>();
+      }
+      return digestParamSet;
+    }
+
+    public void setDigestParamSet(List<DescribableOid> digestParamSet) {
+      this.digestParamSet = digestParamSet;
+    }
+
+    public List<DescribableOid> getEncryptionParamSet() {
+      if (encryptionParamSet == null) {
+        encryptionParamSet = new LinkedList<>();
+      }
+      return encryptionParamSet;
+    }
+
+    public void setEncryptionParamSet(List<DescribableOid> encryptionParamSet) {
+      this.encryptionParamSet = encryptionParamSet;
+    }
+
+    @Override
+    public void validate() throws InvalidConfException {
+      // TODO implement me
+    }
+
+  } // class GostParametersType
 
   public static class RsaParametersType extends ValidatableConf {
 
@@ -98,7 +182,7 @@ public class KeyParametersType extends ValidatableConf {
       validateRanges(modulusLengths);
     }
 
-  }
+  } // class RsaParametersType
 
   public static class RsapssParametersType extends RsaParametersType {
 
@@ -164,91 +248,7 @@ public class KeyParametersType extends ValidatableConf {
       validate(maskGenAlgorithms);
     }
 
-  }
-
-  public static class DsaParametersType extends ValidatableConf {
-
-    private List<Range> plengths;
-
-    private List<Range> qlengths;
-
-    public List<Range> getPlengths() {
-      if (plengths == null) {
-        plengths = new LinkedList<>();
-      }
-      return plengths;
-    }
-
-    public void setPlengths(List<Range> plengths) {
-      if (qlengths == null) {
-        qlengths = new LinkedList<>();
-      }
-      this.plengths = plengths;
-    }
-
-    public List<Range> getQlengths() {
-      return qlengths;
-    }
-
-    public void setQlengths(List<Range> qlengths) {
-      this.qlengths = qlengths;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      validateRanges(plengths);
-      validateRanges(qlengths);
-    }
-
-  }
-
-  public static class GostParametersType extends ValidatableConf {
-
-    private List<DescribableOid> publicKeyParamSet;
-
-    private List<DescribableOid> digestParamSet;
-
-    private List<DescribableOid> encryptionParamSet;
-
-    public List<DescribableOid> getPublicKeyParamSet() {
-      if (publicKeyParamSet == null) {
-        publicKeyParamSet = new LinkedList<>();
-      }
-      return publicKeyParamSet;
-    }
-
-    public void setPublicKeyParamSet(List<DescribableOid> publicKeyParamSet) {
-      this.publicKeyParamSet = publicKeyParamSet;
-    }
-
-    public List<DescribableOid> getDigestParamSet() {
-      if (digestParamSet == null) {
-        digestParamSet = new LinkedList<>();
-      }
-      return digestParamSet;
-    }
-
-    public void setDigestParamSet(List<DescribableOid> digestParamSet) {
-      this.digestParamSet = digestParamSet;
-    }
-
-    public List<DescribableOid> getEncryptionParamSet() {
-      if (encryptionParamSet == null) {
-        encryptionParamSet = new LinkedList<>();
-      }
-      return encryptionParamSet;
-    }
-
-    public void setEncryptionParamSet(List<DescribableOid> encryptionParamSet) {
-      this.encryptionParamSet = encryptionParamSet;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      // TODO implement me
-    }
-
-  }
+  } // class RsapssParametersType
 
   private DsaParametersType dsa;
 
@@ -354,7 +354,7 @@ public class KeyParametersType extends ValidatableConf {
     } else {
       return KeyParametersOption.ALLOW_ALL;
     }
-  } // method convertKeyParametersOption
+  } // method toXiKeyParametersOption
 
   private static Set<Range> buildParametersMap(List<Range> ranges) {
     if (CollectionUtil.isEmpty(ranges)) {
@@ -369,7 +369,7 @@ public class KeyParametersType extends ValidatableConf {
     }
 
     return ret;
-  }
+  } // method buildParametersMap
 
   private static void validateRanges(List<Range> ranges) throws InvalidConfException {
     if (ranges != null) {
@@ -381,7 +381,7 @@ public class KeyParametersType extends ValidatableConf {
         }
       }
     }
-  }
+  } // method validateRanges
 
   @Override
   public void validate() throws InvalidConfException {
@@ -390,6 +390,6 @@ public class KeyParametersType extends ValidatableConf {
     validate(gost);
     validate(rsa);
     validate(rsapss);
-  }
+  } // method validate
 
 }

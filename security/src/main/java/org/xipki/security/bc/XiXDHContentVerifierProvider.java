@@ -74,7 +74,7 @@ public class XiXDHContentVerifierProvider implements ContentVerifierProvider {
         hmac.update(bytes, off, len);
       }
 
-    }
+    } // class HmacOutputStream
 
     private final AlgorithmIdentifier algId;
 
@@ -116,7 +116,7 @@ public class XiXDHContentVerifierProvider implements ContentVerifierProvider {
       return Arrays.equals(expectedHashValue, hashValue);
     }
 
-  }
+  } // class XDHContentVerifier
 
   private final SecretKey hmacKey;
 
@@ -168,8 +168,7 @@ public class XiXDHContentVerifierProvider implements ContentVerifierProvider {
     byte[] trailingInfo = ownerKeyAndCert.getEncodedIssuer();
     byte[] k = hash.hash(leadingInfo, zz, trailingInfo);
     this.hmacKey = new SecretKeySpec(k, hmacAlgoithm);
-
-  }
+  } // constructor
 
   @Override
   public boolean hasAssociatedCertificate() {
@@ -198,6 +197,6 @@ public class XiXDHContentVerifierProvider implements ContentVerifierProvider {
     }
 
     return new XDHContentVerifier(verifierAlgorithmIdentifier, hmac, hmacKey);
-  }
+  } // method get
 
 }

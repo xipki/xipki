@@ -153,7 +153,7 @@ public abstract class ProxyMessage extends ASN1Object {
       return certificate;
     }
 
-  }
+  } // class AddCertParams
 
   /**
    * Definition of DigestSecretKeyTemplate.
@@ -227,7 +227,7 @@ public abstract class ProxyMessage extends ASN1Object {
     public Mechanism getMechanism() {
       return mechanism;
     }
-  }
+  } // class DigestSecretKeyTemplate
 
   /**
    * Parameters to generate RSA keypair.
@@ -322,7 +322,7 @@ public abstract class ProxyMessage extends ASN1Object {
       return g;
     }
 
-  }
+  } // class GenDSAKeypairParams
 
   /**
    * Parameters to generate EC keypair.
@@ -397,7 +397,7 @@ public abstract class ProxyMessage extends ASN1Object {
       return curveId;
     }
 
-  }
+  } // class GenECKeypairParams
 
   /**
    * Paramters to generate EC keypair.
@@ -473,7 +473,7 @@ public abstract class ProxyMessage extends ASN1Object {
       return curveOid;
     }
 
-  }
+  } // class GenECEdwardsOrMontgomeryKeypairParams
 
   /**
    * Parameters to generate RSA keypair.
@@ -564,7 +564,7 @@ public abstract class ProxyMessage extends ASN1Object {
       return publicExponent;
     }
 
-  }
+  } // class GenRSAKeypairParams
 
   /**
    * Parameters to generate secret key.
@@ -649,7 +649,7 @@ public abstract class ProxyMessage extends ASN1Object {
       return keysize;
     }
 
-  }
+  } // class GenSecretKeyParams
 
   /**
    * Parameters to generate SM2 keypair.
@@ -713,7 +713,7 @@ public abstract class ProxyMessage extends ASN1Object {
       return control;
     }
 
-  }
+  } // method GenSM2KeypairParams
 
   /**
    * Parameters to import secret key.
@@ -797,7 +797,7 @@ public abstract class ProxyMessage extends ASN1Object {
       return Arrays.copyOf(keyValue, keyValue.length);
     }
 
-  }
+  } // method ImportSecretKeyParams
 
   /**
    * Definition of Mechanism.
@@ -863,7 +863,7 @@ public abstract class ProxyMessage extends ASN1Object {
       return params;
     }
 
-  }
+  } // method Mechanism
 
   /**
    * Control how to create new PKCS#11 keypair / secret key.
@@ -904,7 +904,7 @@ public abstract class ProxyMessage extends ASN1Object {
         P11KeyUsage usage = valueToUsageMap.get(value);
         usageToValueMap.put(usage, value);
       }
-    }
+    } // method static
 
     public NewKeyControl(P11NewKeyControl control) {
       this.control = Args.notNull(control, "control");
@@ -949,7 +949,7 @@ public abstract class ProxyMessage extends ASN1Object {
       this.control = new P11NewKeyControl(id, label);
       this.control.setUsages(usages);
       this.control.setExtractable(extractable);
-    }
+    } // constructor
 
     public static NewKeyControl getInstance(Object obj) throws BadAsn1ObjectException {
       if (obj == null || obj instanceof NewKeyControl) {
@@ -1000,7 +1000,7 @@ public abstract class ProxyMessage extends ASN1Object {
       return control;
     }
 
-  }
+  } // class NewKeyControl
 
   /**
    * Control how to create new PKCS#11 object.
@@ -1076,7 +1076,7 @@ public abstract class ProxyMessage extends ASN1Object {
       return control;
     }
 
-  }
+  } // class NewObjectControl
 
   /**
    * Definition of ObjectIdAndCert.
@@ -1164,7 +1164,7 @@ public abstract class ProxyMessage extends ASN1Object {
       return certificate;
     }
 
-  }
+  } // class ObjectIdAndCert
 
   /**
    * Identifier of the PKCS#11 identity.
@@ -1253,7 +1253,7 @@ public abstract class ProxyMessage extends ASN1Object {
       return value;
     }
 
-  }
+  } // class IdentityId
 
   /**
    * Identifier of PKCS#11 object.
@@ -1310,7 +1310,7 @@ public abstract class ProxyMessage extends ASN1Object {
       return value;
     }
 
-  }
+  } // class ObjectIdentifier
 
   /**
    * List of {@link ObjectIdentifier}s.
@@ -1366,7 +1366,7 @@ public abstract class ProxyMessage extends ASN1Object {
       return objectIds;
     }
 
-  }
+  } // class ObjectIdentifiers
 
   /**
    * ASN.1 PKCS#11 params.
@@ -1430,7 +1430,7 @@ public abstract class ProxyMessage extends ASN1Object {
       return p11Params;
     }
 
-  }
+  } // class P11Params
 
   /**
    * Slot identifier and Object identifier.
@@ -1499,7 +1499,7 @@ public abstract class ProxyMessage extends ASN1Object {
       return objectId;
     }
 
-  }
+  } // class SlotIdAndObjectId
 
   /**
    * Slot identifier.
@@ -1556,7 +1556,7 @@ public abstract class ProxyMessage extends ASN1Object {
       return value;
     }
 
-  }
+  } // class SlotIdentifier
 
   /**
    * Parameters to remove objects.
@@ -1654,7 +1654,7 @@ public abstract class ProxyMessage extends ASN1Object {
       return objectLabel;
     }
 
-  }
+  } // class RemoveObjectsParams
 
   /**
    * Parameters to create RSAPkcsPss signature.
@@ -1715,7 +1715,7 @@ public abstract class ProxyMessage extends ASN1Object {
       return pkcsPssParams;
     }
 
-  }
+  } // class RSAPkcsPssParams
 
   /**
    * Server capability.
@@ -1807,7 +1807,7 @@ public abstract class ProxyMessage extends ASN1Object {
       vec.add(new DERSequence(vecVersions));
       return new DERSequence(vec);
     }
-  }
+  } // class ServerCaps
 
   /**
    * Definition of SignTemplate.
@@ -1891,7 +1891,7 @@ public abstract class ProxyMessage extends ASN1Object {
     public Mechanism getMechanism() {
       return mechanism;
     }
-  }
+  } // class SignTemplate
 
   private static void requireRange(ASN1Sequence seq, int minSize, int maxSize)
       throws BadAsn1ObjectException {

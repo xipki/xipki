@@ -1128,7 +1128,7 @@ public class X509Ca implements Closeable {
     } // end for
 
     return 0;
-  } // method publishCertificate0
+  } // method publishCert0
 
   public boolean republishCerts(List<String> publisherNames, int numThreads) {
     List<IdentifiedCertPublisher> publishers;
@@ -1206,7 +1206,7 @@ public class X509Ca implements Closeable {
     } finally {
       caInfo.setStatus(status);
     }
-  } // method republishCertificates
+  } // method republishCerts
 
   public void clearPublishQueue(List<String> publisherNames) throws CaMgmtException {
     if (publisherNames == null) {

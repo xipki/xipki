@@ -124,7 +124,7 @@ public class SignatureCmpCaClient extends CmpCaClient {
     for (ASN1ObjectIdentifier oid : oids) {
       trustedProtectionAlgOids.add(oid.getId());
     }
-  }
+  } // constructor
 
   @Override
   protected boolean verifyProtection(GeneralPKIMessage pkiMessage)
@@ -195,7 +195,7 @@ public class SignatureCmpCaClient extends CmpCaClient {
       throw new InvalidKeyException("could not build ContentVerifierProvider: "
           + ex.getMessage(), ex);
     }
-  }
+  } // method getContentVerifierProvider
 
   @Override
   protected byte[] decrypt(EncryptedValue ev) throws Exception {
@@ -346,7 +346,7 @@ public class SignatureCmpCaClient extends CmpCaClient {
         | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
       throw new Exception("Error while decrypting the EncryptedValue", ex);
     }
-  }
+  } // method decrypt
 
   @Override
   protected ProtectedPKIMessage build(ProtectedPKIMessageBuilder builder) throws Exception {

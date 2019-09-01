@@ -188,7 +188,7 @@ public class P12SignerFactory implements SignerFactory {
       throw new ObjectCreationException(String.format("%s: %s", ex.getClass().getName(),
           ex.getMessage()));
     }
-  }
+  } // method newSigner
 
   @Override
   public void refreshToken(String type) throws XiSecurityException {
@@ -208,5 +208,5 @@ public class P12SignerFactory implements SignerFactory {
     } else {
       throw new ObjectCreationException("unknown content format");
     }
-  }
+  } // method getInputStream
 }

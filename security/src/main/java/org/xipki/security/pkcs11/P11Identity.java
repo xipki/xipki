@@ -252,6 +252,6 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     }
 
     return false;
-  }
+  } // method supportsMechanism
 
 }

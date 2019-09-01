@@ -397,7 +397,7 @@ public class QaOcspActions {
 
       return processOcspQuery(ocspQa, serialNumber, status, revTime, messageDir, detailsDir,
           serverUrl, respIssuer, issuerCert, issuerHash, requestOptions);
-    }
+    } // method processOcspQuery
 
     private ValidationResult processOcspQuery(OcspQa ocspQa, BigInteger serialNumber,
         OcspCertStatus status, Date revTime, File messageDir, File detailsDir,
@@ -464,14 +464,14 @@ public class QaOcspActions {
       IoUtil.save(new File(detailsDir, hexSerial + "." + validity),
           StringUtil.toUtf8Bytes(sb.toString()));
       return ret;
-    }
+    } // method processOcspQuery
 
     private void println(String message, OutputStream out) throws IOException {
       out.write(StringUtil.toUtf8Bytes(message));
       out.write('\n');
-    }
+    } // method println
 
-  }
+  } // class BatchOcspQaStatusAction
 
   @Command(scope = "xiqa", name = "benchmark-ocsp-status", description = "OCSP benchmark")
   @Service
@@ -587,7 +587,7 @@ public class QaOcspActions {
       return null;
     } // end execute0
 
-  }
+  } // class BenchmarkOcspStatusAction
 
   @Command(scope = "xiqa", name = "qa-ocsp-status", description = "request certificate status (QA)")
   @Service
@@ -759,8 +759,8 @@ public class QaOcspActions {
       if (issue.getFailureMessage() != null) {
         sb.append(", ").append(issue.getFailureMessage());
       }
-    }
+    } // method format
 
-  }
+  } // class OcspQaStatusAction
 
 }

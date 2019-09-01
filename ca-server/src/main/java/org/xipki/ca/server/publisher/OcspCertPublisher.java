@@ -121,7 +121,7 @@ public class OcspCertPublisher extends CertPublisher {
               + ex.getMessage(),
           ex);
     }
-  }
+  } // method loadDatasource
 
   @Override
   public boolean caAdded(X509Cert issuer) {
@@ -132,7 +132,7 @@ public class OcspCertPublisher extends CertPublisher {
       logAndAudit(issuer.getSubject(), issuer, ex, "could not publish issuer");
       return false;
     }
-  }
+  } // method caAdded
 
   @Override
   public boolean certificateAdded(CertificateInfo certInfo) {
@@ -146,7 +146,7 @@ public class OcspCertPublisher extends CertPublisher {
       logAndAudit(caCert.getSubject(), cert, ex, "could not save certificate");
       return false;
     }
-  }
+  } // method certificateAdded
 
   @Override
   public boolean certificateRevoked(X509Cert caCert, CertWithDbId cert,
@@ -158,7 +158,7 @@ public class OcspCertPublisher extends CertPublisher {
       logAndAudit(caCert.getSubject(), cert, ex, "could not publish revoked certificate");
       return false;
     }
-  }
+  } // method certificateRevoked
 
   @Override
   public boolean certificateUnrevoked(X509Cert caCert, CertWithDbId cert) {
@@ -169,7 +169,7 @@ public class OcspCertPublisher extends CertPublisher {
       logAndAudit(caCert.getSubject(), cert, ex, "could not publish unrevocation of certificate");
       return false;
     }
-  }
+  } // method certificateUnrevoked
 
   private void logAndAudit(String issuer, X509Cert cert, Exception ex, String messagePrefix) {
     String subjectText = cert.getSubject();
@@ -217,7 +217,7 @@ public class OcspCertPublisher extends CertPublisher {
       logAndAudit(issuerText, caCert, ex, "could not publish revocation of CA");
       return false;
     }
-  }
+  } // method caRevoked
 
   @Override
   public boolean caUnrevoked(X509Cert caCert) {
@@ -229,7 +229,7 @@ public class OcspCertPublisher extends CertPublisher {
       logAndAudit(issuerText, caCert, ex, "could not publish unrevocation of CA");
       return false;
     }
-  }
+  } // method caUnrevoked
 
   @Override
   public boolean certificateRemoved(X509Cert issuerCert, CertWithDbId cert) {
@@ -241,7 +241,7 @@ public class OcspCertPublisher extends CertPublisher {
       logAndAudit(issuerText, issuerCert, ex, "could not publish removal of certificate");
       return false;
     }
-  }
+  } // method certificateRemoved
 
   @Override
   public boolean isAsyn() {

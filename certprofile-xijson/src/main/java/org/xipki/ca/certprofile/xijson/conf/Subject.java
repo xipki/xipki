@@ -111,7 +111,7 @@ public class Subject extends ValidatableConf {
       notEmpty(text, "text");
     }
 
-  }
+  } // class ValueType
 
   public static class RdnType extends ValidatableConf {
 
@@ -267,9 +267,9 @@ public class Subject extends ValidatableConf {
 
         value.validate();
       }
-    }
+    } // method validate
 
-  }
+  } // class RdnType
 
 }
 

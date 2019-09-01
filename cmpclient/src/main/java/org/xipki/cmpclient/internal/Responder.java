@@ -110,7 +110,7 @@ abstract class Responder {
       return false;
     }
 
-  }
+  } // class PbmMacCmpResponder
 
   static class SignaturetCmpResponder extends Responder {
 
@@ -133,6 +133,6 @@ abstract class Responder {
       return sigAlgoValidator;
     }
 
-  }
+  } // class SignaturetCmpResponder
 
 }

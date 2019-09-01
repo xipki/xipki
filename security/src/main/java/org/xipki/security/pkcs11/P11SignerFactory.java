@@ -185,7 +185,7 @@ public class P11SignerFactory implements SignerFactory {
     } catch (P11TokenException | NoSuchAlgorithmException | XiSecurityException ex) {
       throw new ObjectCreationException(ex.getMessage(), ex);
     }
-  }
+  } // method newSigner
 
   @Override
   public void refreshToken(String type) throws XiSecurityException {
@@ -207,6 +207,6 @@ public class P11SignerFactory implements SignerFactory {
     if (!errorModules.isEmpty()) {
       throw new XiSecurityException("could not refreshed modules " + errorModules);
     }
-  }
+  } // method refreshToken
 
 }

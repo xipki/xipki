@@ -331,7 +331,7 @@ class IdentifiedCertprofile implements Closeable {
       }
     }
     return subjectInfo;
-  }
+  } // method getSubject
 
   /**
    * Get the extensions.
@@ -1168,12 +1168,12 @@ class IdentifiedCertprofile implements Closeable {
       }
     }
 
-  }
+  } // method validateCABForumBR
 
   private static boolean containsRdn(X500Name name, ASN1ObjectIdentifier rdnType) {
     RDN[] rdns = name.getRDNs(rdnType);
     return rdns != null && rdns.length > 0;
-  }
+  } // method containsRdn
 
   private static String toString(Set<ASN1ObjectIdentifier> oids) {
     if (oids == null) {

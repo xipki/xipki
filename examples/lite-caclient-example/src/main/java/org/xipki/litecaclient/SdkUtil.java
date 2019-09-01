@@ -59,7 +59,7 @@ public class SdkUtil {
     } finally {
       in.close();
     }
-  }
+  } // method parseCert
 
   public static X509Certificate parseCert(byte[] certBytes) throws CertificateException {
     requireNonNull("certBytes", certBytes);
@@ -73,7 +73,7 @@ public class SdkUtil {
       throw new CertificateEncodingException("the given one is not a valid X.509 certificate");
     }
     return cert;
-  }
+  } // method parseCert
 
   private static CertificateFactory getCertFactory() throws CertificateException {
     synchronized (certFactLock) {
@@ -82,7 +82,7 @@ public class SdkUtil {
       }
       return certFact;
     }
-  }
+  } // method getCertFactory
 
   public static byte[] extractSki(X509Certificate cert) throws CertificateEncodingException {
     byte[] fullExtValue = cert.getExtensionValue(Extension.subjectKeyIdentifier.getId());
@@ -115,7 +115,7 @@ public class SdkUtil {
         // CHECKSTYLE:SKIP
       }
     }
-  }
+  } // method read
 
   public static void save(File file, byte[] content) throws IOException {
     File parent = file.getParentFile();

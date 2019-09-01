@@ -88,7 +88,7 @@ public class CertprofileFactoryRegister {
 
     throw new ObjectCreationException(
         "could not find factory to create Certprofile of type '" + type + "'");
-  }
+  } // method newCertprofile
 
   public void registFactory(CertprofileFactory factory) {
     //might be null if dependency is optional
@@ -102,7 +102,7 @@ public class CertprofileFactoryRegister {
 
     String action = replaced ? "replaced" : "added";
     LOG.info("{} CertprofileFactory binding for {}", action, factory);
-  }
+  } // method registFactory
 
   public void unregistFactory(CertprofileFactory factory) {
     //might be null if dependency is optional
@@ -116,7 +116,7 @@ public class CertprofileFactoryRegister {
     } else {
       LOG.info("no CertprofileFactory binding found to remove for '{}'", factory);
     }
-  }
+  } // method unregistFactory
 
 }
 

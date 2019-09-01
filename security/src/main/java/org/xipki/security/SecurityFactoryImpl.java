@@ -154,7 +154,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
       LogUtil.error(LOG, ex, "could not validate POPO of CSR");
       return false;
     }
-  }
+  } // method verifyPopo
 
   @Override
   public int getDfltSignerParallelism() {
@@ -192,7 +192,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     ConcurrentContentSigner signer = signerFactoryRegister.newSigner(this, type, conf, certs);
     PrivateKey privateKey = (PrivateKey) signer.getSigningKey();
     return new KeyCertPair(privateKey, signer.getCertificate());
-  }
+  } // method createPrivateKeyAndCert
 
   @Override
   public SecureRandom getRandom4Key() {
@@ -281,7 +281,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
       throw new RuntimeCryptoException(
           "could not get strong SecureRandom: " + ex.getMessage());
     }
-  }
+  } // method getSecureRandom
 
   private static void validateSigner(ConcurrentContentSigner signer, String signerType,
       SignerConf signerConf) throws ObjectCreationException {

@@ -87,8 +87,8 @@ class DigestDiff {
     this.stopMe = Args.notNull(stopMe, "stopMe");
     this.numPerSelect = Args.positive(numPerSelect, "numPerSelect");
 
-    this.refDbType = detectDbControl(refDatasource);
-    this.targetDbType = detectDbControl(targetDatasource);
+    this.refDbType = detectDbType(refDatasource);
+    this.targetDbType = detectDbType(targetDatasource);
 
     switch (refDbType) {
       case XIPKI_OCSP_v4:
@@ -270,9 +270,9 @@ class DigestDiff {
     }
 
     return caIdCertMap;
-  }
+  } // method getCas
 
-  public static DbType detectDbControl(DataSourceWrapper datasource) throws DataAccessException {
+  public static DbType detectDbType(DataSourceWrapper datasource) throws DataAccessException {
     Connection conn = datasource.getConnection();
     try {
       String dbSchemaVersion = datasource.getFirstValue(
@@ -296,13 +296,13 @@ class DigestDiff {
     } finally {
       datasource.returnConnection(conn);
     }
-  }
+  } // method
 
   public static HashAlgo detectOcspDbCerthashAlgo(DataSourceWrapper datasource)
       throws DataAccessException {
     String str = datasource.getFirstValue(null, "DBSCHEMA", "VALUE2", "NAME='CERTHASH_ALGO'",
         String.class);
     return HashAlgo.getNonNullInstance(str);
-  }
+  } // method detectOcspDbCerthashAlgo
 
 }

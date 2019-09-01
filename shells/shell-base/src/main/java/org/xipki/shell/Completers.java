@@ -43,7 +43,7 @@ public class Completers {
           "cessationOfOperation", "certificateHold", "privilegeWithdrawn");
     }
 
-  }
+  } // class ClientCrlReasonCompleter
 
   @Service
   public static class DerPemCompleter extends EnumCompleter {
@@ -52,7 +52,7 @@ public class Completers {
       setTokens("pem", "der");
     }
 
-  }
+  } // class DerPemCompleter
 
   @Service
   public static class DirCompleter extends FileCompleter {
@@ -62,7 +62,7 @@ public class Completers {
       return path.toFile().isDirectory() && super.accept(path);
     }
 
-  }
+  } // class DirCompleter
 
   @Service
   //CHECKSTYLE:SKIP
@@ -89,7 +89,7 @@ public class Completers {
           // Montgomery curves and Edwards curves
           "ed25519", "ed448", "x25519", "x448");
     }
-  }
+  } // class ECCurveNameCompleter
 
   @Service
   //CHECKSTYLE:SKIP
@@ -98,7 +98,7 @@ public class Completers {
     public EdCurveNameCompleter() {
       setTokens("ed25519", "ed448", "x25519", "x448");
     }
-  }
+  } // class EdCurveNameCompleter
 
   @Service
   public static class ExtensionNameCompleter extends EnumCompleter {
@@ -158,7 +158,7 @@ public class Completers {
       return nameToIdMap.get(name.toLowerCase());
     }
 
-  }
+  } // class ExtensionNameCompleter
 
   @Service
   public static class ExtKeyusageCompleter extends EnumCompleter {
@@ -193,7 +193,7 @@ public class Completers {
       setTokens(tokens);
     }
 
-  }
+  } // class ExtKeyusageCompleter
 
   @Service
   public static class HashAlgCompleter extends EnumCompleter {
@@ -203,7 +203,7 @@ public class Completers {
           "SHA3-224", "SHA3-256", "SHA3-384", "SHA3-512", "SM3");
     }
 
-  }
+  } // class HashAlgCompleter
 
   @Service
   public static class KeyusageCompleter extends EnumCompleter {
@@ -213,7 +213,7 @@ public class Completers {
           "keyAgreement", "keyCertSign", "cRLSign", "encipherOnly", "decipherOnly");
     }
 
-  }
+  } // class KeyusageCompleter
 
   @Service
   public static class SigAlgCompleter extends EnumCompleter {
@@ -239,7 +239,7 @@ public class Completers {
       setTokens(enums);
     }
 
-  }
+  } // class SigAlgCompleter
 
   @Service
   public static class SignerTypeCompleter extends EnumCompleter {
@@ -248,7 +248,7 @@ public class Completers {
       setTokens("JKS", "PKCS11", "PKCS12");
     }
 
-  }
+  } // class SignerTypeCompleter
 
   @Service
   public static class YesNoCompleter extends EnumCompleter {
@@ -257,6 +257,6 @@ public class Completers {
       setTokens("yes", "no");
     }
 
-  }
+  } // class YesNoCompleter
 
 }

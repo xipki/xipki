@@ -152,7 +152,7 @@ public class DbCertStatusStore extends OcspStore {
         storeUpdateInProcess.set(false);
       }
     } // end lock
-  }
+  } // method updateIssuerStore
 
   private void updateIssuers() {
     try {
@@ -483,7 +483,7 @@ public class DbCertStatusStore extends OcspStore {
       throw new OcspStoreException(ex.getMessage(), ex);
     }
 
-  } // method getCertStatus
+  } // method getCertStatus0
 
   /**
    * Borrow Prepared Statement.
@@ -515,7 +515,7 @@ public class DbCertStatusStore extends OcspStore {
       LogUtil.error(LOG, ex);
       return false;
     }
-  }
+  } // method isHealthy
 
   private void releaseDbResources(Statement ps, ResultSet rs) {
     datasource.releaseResources(ps, rs);
@@ -602,7 +602,7 @@ public class DbCertStatusStore extends OcspStore {
         }
       }
     }
-  }
+  } // method init
 
   @Override
   public void close() {

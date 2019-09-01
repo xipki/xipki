@@ -80,7 +80,7 @@ public class ProtocolSupport {
         scep = true;
       }
     }
-  }
+  } // constructor
 
   public ProtocolSupport(boolean cmp, boolean rest, boolean scep) {
     this.cmp = cmp;

@@ -74,6 +74,6 @@ public class HostnameVerifiers {
     } else {
       throw new IllegalArgumentException("invalid hostnameVerifierType " + hostnameVerifierType);
     }
-  }
+  } // method createHostnameVerifier
 
 }

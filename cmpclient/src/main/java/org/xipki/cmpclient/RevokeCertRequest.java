@@ -77,7 +77,7 @@ public class RevokeCertRequest {
       this.authorityKeyIdentifier = authorityKeyIdentifier;
     }
 
-  }
+  } // class Entry
 
   private final List<Entry> requestEntries = new LinkedList<>();
 

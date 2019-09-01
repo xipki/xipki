@@ -90,7 +90,7 @@ class EjbcaIssuerEntry {
       hashes.put(ha, nameAndKeyHash);
     }
     return hashes;
-  }
+  } // method getIssuerHashAndKeys
 
   public String getId() {
     return id;
@@ -143,6 +143,6 @@ class EjbcaIssuerEntry {
     return id.equals(other.id)
         && CompareUtil.equalsObject(revocationInfo, other.revocationInfo);
     // The comparison of id implies the comparison of issuerHashMap, notBefore and cert.
-  }
+  } // method equals
 
 }

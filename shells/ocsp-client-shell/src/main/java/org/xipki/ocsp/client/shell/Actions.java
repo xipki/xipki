@@ -121,7 +121,7 @@ public class Actions {
         return num.compareTo(from) >= 0 && num.compareTo(to) <= 0;
       }
 
-    }
+    } // class BigIntegerRange
 
     protected static final Map<ASN1ObjectIdentifier, String> EXTENSION_OIDNAME_MAP
         = new HashMap<>();
@@ -365,7 +365,7 @@ public class Actions {
 
       AuthorityInformationAccess aia = AuthorityInformationAccess.getInstance(extnValue);
       return extractOcspUrls(aia);
-    }
+    } // method extractOcspUrls
 
     public static List<String> extractOcspUrls(X509AttributeCertificateHolder cert)
         throws CertificateEncodingException {
@@ -375,7 +375,7 @@ public class Actions {
       }
       AuthorityInformationAccess aia = AuthorityInformationAccess.getInstance(extValue);
       return extractOcspUrls(aia);
-    }
+    } // method extractOcspUrls
 
     public static List<String> extractOcspUrls(AuthorityInformationAccess aia)
         throws CertificateEncodingException {
@@ -398,9 +398,9 @@ public class Actions {
       }
 
       return ocspUris;
-    }
+    } // method extractOcspUrls
 
-  }
+  } // class BaseOcspStatusAction
 
   public abstract static class CommonOcspStatusAction extends XiAction {
 
@@ -449,9 +449,9 @@ public class Actions {
         options.setPreferredSignatureAlgorithms(prefSigAlgs.toArray(new String[0]));
       }
       return options;
-    }
+    } // method getRequestOptions
 
-  }
+  } // class CommonOcspStatusAction
 
   @Command(scope = "xi", name = "ocsp-status", description = "request certificate status")
   @Service
@@ -715,6 +715,6 @@ public class Actions {
       println("");
     } // method processResponse
 
-  }
+  } // class OcspStatus
 
 }

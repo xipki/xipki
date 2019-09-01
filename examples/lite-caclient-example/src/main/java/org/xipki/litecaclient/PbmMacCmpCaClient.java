@@ -163,7 +163,7 @@ public class PbmMacCmpCaClient extends CmpCaClient {
 
     PKMACBuilder pkMacBuilder = new PKMACBuilder(new JcePKMACValuesCalculator());
     return protectedMsg.verify(pkMacBuilder, password);
-  }
+  } // method verifyProtection
 
   @Override
   protected byte[] decrypt(EncryptedValue ev) throws Exception {
@@ -208,7 +208,7 @@ public class PbmMacCmpCaClient extends CmpCaClient {
     cipher.init(Cipher.DECRYPT_MODE, key, gcmParamSpec);
 
     return cipher.doFinal(ev.getEncValue().getOctets());
-  }
+  } // method decrypt
 
   @Override
   protected ProtectedPKIMessage build(ProtectedPKIMessageBuilder builder) throws Exception {
@@ -225,6 +225,6 @@ public class PbmMacCmpCaClient extends CmpCaClient {
     } catch (CRMFException ex) {
       throw new CMPException(ex.getMessage(), ex);
     }
-  }
+  } // method build
 
 }

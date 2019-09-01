@@ -60,7 +60,7 @@ public class CaUris {
     this.ocspUris = (ocspUris == null) ? null : Collections.unmodifiableList(ocspUris);
     this.crlUris = (crlUris == null) ? null : Collections.unmodifiableList(crlUris);
     this.deltaCrlUris = (deltaCrlUris == null) ? null : Collections.unmodifiableList(deltaCrlUris);
-  }
+  } // constructor
 
   public void setCacertUris(List<String> cacertUris) {
     this.cacertUris = (cacertUris == null) ? null : Collections.unmodifiableList(cacertUris);
@@ -106,7 +106,7 @@ public class CaUris {
         && CompareUtil.equalsObject(ocspUris, other.ocspUris)
         && CompareUtil.equalsObject(crlUris, other.crlUris)
         && CompareUtil.equalsObject(deltaCrlUris, other.deltaCrlUris);
-  }
+  } // method equals
 
   @Override
   public int hashCode() {
@@ -122,7 +122,7 @@ public class CaUris {
     sb.append("\n  CRL URIs:").append(formatUris(crlUris));
     sb.append("\n  DeltaCRL URIs:").append(formatUris(deltaCrlUris));
     return sb.toString();
-  }
+  } // method toString
 
   private static String formatUris(List<String> uris) {
     if (CollectionUtil.isEmpty(uris)) {
@@ -133,7 +133,7 @@ public class CaUris {
       sb.append("\n    ").append(uri);
     }
     return sb.toString();
-  }
+  } // method formatUris
 
   public static CaUris decode(String encoded) {
     ConfPairs pairs = new ConfPairs(encoded);
@@ -142,7 +142,7 @@ public class CaUris {
         StringUtil.split(pairs.value(NAME_OCSP_URIS), "|"),
         StringUtil.split(pairs.value(NAME_CRL_URIS), "|"),
         StringUtil.split(pairs.value(NAME_DELTACRL_URIS), "|"));
-  }
+  } // method decode
 
   public String getEncoded() {
     ConfPairs pairs = new ConfPairs();
@@ -167,6 +167,6 @@ public class CaUris {
     }
 
     return pairs.getEncoded();
-  }
+  } // method getEncoded
 
 }

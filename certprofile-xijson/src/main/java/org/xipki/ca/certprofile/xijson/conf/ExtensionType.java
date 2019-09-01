@@ -474,7 +474,7 @@ public class ExtensionType extends ValidatableConf {
     validate(tlsFeature);
     validate(validityModel);
     validate(syntax);
-  }
+  } // method validate
 
   public static class AdditionalInformation extends ValidatableConf {
 
@@ -644,7 +644,7 @@ public class ExtensionType extends ValidatableConf {
 
       return new AdmissionExtension.AdmissionSyntaxOption(
                   critical, tmpAdmissionAuthority, admissionsList);
-    }
+    } // method toXiAdmissionSyntax
 
     private static ASN1Primitive asn1PrimitivefromByteArray(byte[] encoded)
         throws CertprofileException {
@@ -662,7 +662,7 @@ public class ExtensionType extends ValidatableConf {
       DirectoryString text = StringUtil.isBlank(value.getText()) ? null
           : new DirectoryString(value.getText());
       return new NamingAuthority(oid, url, text);
-    }
+    } // method buildNamingAuthority
 
   } // class AdmissionSyntax
 
@@ -935,7 +935,7 @@ public class ExtensionType extends ValidatableConf {
       }
 
       return new org.bouncycastle.asn1.x509.CertificatePolicies(infos);
-    }
+    } // method toXiCertificatePolicies
 
     private  static ASN1Sequence createPolicyQualifiers(
         List<CertificatePolicyQualifier> qualifiers) {
@@ -959,9 +959,27 @@ public class ExtensionType extends ValidatableConf {
       }
 
       return new DERSequence(qualifierInfos.toArray(new PolicyQualifierInfo[0]));
-    }
+    } // method createPolicyQualifiers
 
   } // class CertificatePolicies
+
+  public static class CrlDistributionPoints extends ValidatableConf {
+
+    private Set<String> protocols;
+
+    public Set<String> getProtocols() {
+      return protocols;
+    }
+
+    public void setProtocols(Set<String> protocols) {
+      this.protocols = protocols;
+    }
+
+    @Override
+    public void validate() throws InvalidConfException {
+    }
+
+  } // class CrlDistributionPoints
 
   public static class ExtendedKeyUsage extends ValidatableConf {
 
@@ -1008,7 +1026,7 @@ public class ExtensionType extends ValidatableConf {
         this.required = required;
       }
 
-    }
+    } // class Usage
 
   } // class ExtendedKeyUsage
 
@@ -1059,7 +1077,7 @@ public class ExtensionType extends ValidatableConf {
           throw new IllegalArgumentException("invalid type " + type);
         }
       }
-    }
+    } // method setTypeText
 
     public FieldType type() {
       return type;
@@ -1083,7 +1101,7 @@ public class ExtensionType extends ValidatableConf {
       } else {
         this.stringRegex = null;
       }
-    }
+    } // method setStringRegex
 
     public List<SubFieldSyntax> getSubFields() {
       return subFields;
@@ -1123,7 +1141,7 @@ public class ExtensionType extends ValidatableConf {
           throw new InvalidConfException("unsupported type " + type);
         }
       }
-    }
+    } // method validate
 
     public static class SubFieldSyntax extends ExtnSyntax {
 
@@ -1154,9 +1172,9 @@ public class ExtensionType extends ValidatableConf {
         }
       }
 
-    } // SubFieldSyntax
+    } // class SubFieldSyntax
 
-  } // ExtnSyntax
+  } // class ExtnSyntax
 
   public static class InhibitAnyPolicy extends ValidatableConf {
 
@@ -1206,7 +1224,7 @@ public class ExtensionType extends ValidatableConf {
       }
 
       return Collections.unmodifiableSet(controls);
-    }
+    } // method toXiKeyUsageOptions
 
     public static class Usage extends ValidatableConf {
 
@@ -1234,7 +1252,7 @@ public class ExtensionType extends ValidatableConf {
       public void validate() throws InvalidConfException {
       }
 
-    }
+    } // class Usage
 
   } // class KeyUsage
 
@@ -1280,7 +1298,7 @@ public class ExtensionType extends ValidatableConf {
       }
       validate(permittedSubtrees);
       validate(excludedSubtrees);
-    }
+    } // method validate
 
     public org.bouncycastle.asn1.x509.NameConstraints toXiNameConstrains()
         throws CertprofileException {
@@ -1288,7 +1306,7 @@ public class ExtensionType extends ValidatableConf {
       GeneralSubtree[] excluded = buildGeneralSubtrees(getExcludedSubtrees());
       return (permitted == null && excluded == null) ? null
           : new org.bouncycastle.asn1.x509.NameConstraints(permitted, excluded);
-    } // method buildNameConstrains
+    } // method toXiNameConstrains
 
     private static GeneralSubtree[] buildGeneralSubtrees(List<GeneralSubtreeType> subtrees)
         throws CertprofileException {
@@ -1448,7 +1466,7 @@ public class ExtensionType extends ValidatableConf {
       }
 
       return new DERSequence(vec);
-    } //method buildPolicyConstrains
+    } //method toXiPolicyConstrains
 
   } // class PolicyConstraints
 
@@ -1484,7 +1502,7 @@ public class ExtensionType extends ValidatableConf {
       validate(subjectDomainPolicy);
     }
 
-  }
+  } // class PolicyIdMappingType
 
   /**
    * Only for CA.
@@ -1529,9 +1547,9 @@ public class ExtensionType extends ValidatableConf {
       }
 
       return new org.bouncycastle.asn1.x509.PolicyMappings(issuerDomainPolicy, subjectDomainPolicy);
-    } // method buildPolicyMappings
+    } // method toXiPolicyMappings
 
-  } // PolicyMappings
+  } // class PolicyMappings
 
   public static class PrivateKeyUsagePeriod extends ValidatableConf {
 
@@ -1623,24 +1641,6 @@ public class ExtensionType extends ValidatableConf {
     }
 
   } // class ProfessionInfoType
-
-  public static class CrlDistributionPoints extends ValidatableConf {
-
-    private Set<String> protocols;
-
-    public Set<String> getProtocols() {
-      return protocols;
-    }
-
-    public void setProtocols(Set<String> protocols) {
-      this.protocols = protocols;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-    }
-
-  }
 
   public static class QcStatements extends ValidatableConf {
 
@@ -1892,7 +1892,7 @@ public class ExtensionType extends ValidatableConf {
         validate(accessLocation);
       }
 
-    }
+    } // class Access
 
   } // class SubjectInfoAccess
 

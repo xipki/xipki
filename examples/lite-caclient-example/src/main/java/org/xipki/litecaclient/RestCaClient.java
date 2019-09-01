@@ -82,7 +82,7 @@ public class RestCaClient implements Closeable {
     MessageDigest md = MessageDigest.getInstance("SHA1");
     byte[] digestBytes = md.digest(this.caCert.getEncoded());
     this.caCertSha1Fp = Hex.toHexString(digestBytes);
-  }
+  } // method init
 
   public X509Certificate getCaCert() {
     return caCert;
@@ -111,7 +111,7 @@ public class RestCaClient implements Closeable {
       throw new Exception("could not retrieve certificates");
     }
     return certchain;
-  }
+  } // method httpgetCaCertchain
 
   public X509Certificate requestCert(String certprofile, CertificationRequest csr)
       throws Exception {
@@ -123,7 +123,7 @@ public class RestCaClient implements Closeable {
     }
 
     return cert;
-  }
+  } // method requestCert
 
   public boolean revokeCert(BigInteger serialNumber, CRLReason reason) throws Exception {
     StringBuilder sb = new StringBuilder(200);
@@ -132,7 +132,7 @@ public class RestCaClient implements Closeable {
     sb.append("&reason=").append(reason.getValue().intValue());
     String url = sb.toString();
     return simpleHttpGet(url);
-  }
+  } // method revokeCert
 
   public boolean unrevokeCert(BigInteger serialNumber) throws Exception {
     return revokeCert(serialNumber, CRLReason.lookup(CRLReason.removeFromCRL));
@@ -174,7 +174,7 @@ public class RestCaClient implements Closeable {
       LOG.warn("bad response: {}    {}", conn.getResponseCode(), conn.getResponseMessage());
     }
     return ok;
-  } // method send
+  } // method simpleHttpGet
 
   private byte[] httpGet(String url, String responseCt) throws IOException {
     HttpURLConnection conn = SdkUtil.openHttpConn(new URL(url));
@@ -205,7 +205,7 @@ public class RestCaClient implements Closeable {
     }
 
     return SdkUtil.read(inputStream);
-  } // method send
+  } // method httpGet
 
   private byte[] httpPost(String url, String contentType, byte[] request, String responseCt)
       throws IOException {
@@ -245,6 +245,6 @@ public class RestCaClient implements Closeable {
     }
 
     return SdkUtil.read(inputStream);
-  } // method send
+  } // method httpPost
 
 }

@@ -42,7 +42,7 @@ public class EnrollCertRequest {
     KEY_UPDATE,
     CROSS_CERT_REQ;
 
-  } // enum Type
+  } // class EnrollType
 
   public static class Entry extends IdentifiedObject {
 
@@ -93,7 +93,7 @@ public class EnrollCertRequest {
       return caGenerateKeypair;
     }
 
-  }
+  } // class Entry
 
   private final EnrollType type;
 
@@ -123,7 +123,7 @@ public class EnrollCertRequest {
 
     requestEntries.add(requestEntry);
     return true;
-  }
+  } // method addRequestEntry
 
   public List<Entry> getRequestEntries() {
     return Collections.unmodifiableList(requestEntries);

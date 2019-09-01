@@ -161,9 +161,9 @@ public class CaConfType {
       validate(profiles);
       validate(cas);
       validate(users);
-    }
+    } // methdo validate
 
-  }
+  } // class CaSystem
 
   public static class CaHasRequestor extends ValidatableConf {
 
@@ -219,7 +219,7 @@ public class CaConfType {
       notEmpty(permissions, "permissions");
     }
 
-  }
+  } // class CaHasRequestor
 
   public static class CaHasUser extends ValidatableConf {
 
@@ -265,7 +265,7 @@ public class CaConfType {
       notEmpty(permissions, "permissions");
     }
 
-  }
+  } // class CaHasUser
 
   public static class CaInfo extends ValidatableConf {
 
@@ -590,9 +590,9 @@ public class CaConfType {
       validate(signerConf);
       notEmpty(status, status);
       validate(caUris);
-    }
+    } // method validate
 
-  }
+  } // class CaInfo
 
   public static class Ca extends ValidatableConf {
 
@@ -689,7 +689,7 @@ public class CaConfType {
       validate(users);
     }
 
-  }
+  } // class Ca
 
   public static class CaUris extends ValidatableConf {
 
@@ -749,7 +749,7 @@ public class CaConfType {
     public void validate() throws InvalidConfException {
     }
 
-  }
+  } // class CaUris
 
   public static class GenSelfIssued extends ValidatableConf {
 
@@ -802,7 +802,7 @@ public class CaConfType {
       validate(csr);
     }
 
-  }
+  } // class GenSelfIssued
 
   public static class NameTypeConf extends ValidatableConf {
 
@@ -843,7 +843,7 @@ public class CaConfType {
       validate(conf);
     }
 
-  }
+  } // class NameTypeConf
 
   public static class Requestor extends ValidatableConf {
 
@@ -896,7 +896,7 @@ public class CaConfType {
       validate(binaryConf);
     }
 
-  }
+  } // class Requestor
 
   public static class Signer extends ValidatableConf {
 
@@ -949,7 +949,7 @@ public class CaConfType {
       validate(cert);
     }
 
-  }
+  } // class Signer
 
   public static class User extends ValidatableConf {
 
@@ -1000,6 +1000,6 @@ public class CaConfType {
       exactOne(password, "password", hashedPassword, "hashedPassword");
     }
 
-  }
+  } // class User
 
 }

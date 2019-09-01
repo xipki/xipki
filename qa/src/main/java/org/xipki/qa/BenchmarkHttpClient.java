@@ -190,7 +190,7 @@ public class BenchmarkHttpClient {
 
       sslContext = builder.build();
       return sslContext;
-    }
+    } // method buildSslContext
 
     private static KeyStore loadKeyStore(String storeType, String store, char[] password)
         throws GeneralSecurityException, IOException {
@@ -203,9 +203,9 @@ public class BenchmarkHttpClient {
         keystore.load(stream, password);
         return keystore;
       }
-    }
+    } // method loadKeyStore
 
-  }
+  } // class SslConf
 
   private static final Logger LOG = LoggerFactory.getLogger(BenchmarkHttpClient.class);
 
@@ -215,7 +215,7 @@ public class BenchmarkHttpClient {
 
     void onError();
 
-  }
+  } // class ResponseHandler
 
   public static class HttpClientException extends Exception {
 
@@ -229,7 +229,7 @@ public class BenchmarkHttpClient {
       super(message, cause);
     }
 
-  }
+  } // class HttpClientException
 
   private class HttpClientInitializer extends ChannelInitializer<SocketChannel> {
 
@@ -274,7 +274,7 @@ public class BenchmarkHttpClient {
       LOG.warn("error", cause);
       responseHandler.onError();
     }
-  }
+  } // method HttpClientHandler
 
   private static Boolean epollAvailable;
 
@@ -331,7 +331,7 @@ public class BenchmarkHttpClient {
         LogUtil.warn(LOG, th, "could not use KQueue transport");
       }
     }
-  }
+  } // method static
 
   public BenchmarkHttpClient(String host, int port, SslContext sslContext,
       ResponseHandler responseHandler, int queueSize) {
@@ -402,7 +402,7 @@ public class BenchmarkHttpClient {
 
     // Make the connection attempt.
     this.channel = bootstrap.connect(host, port).syncUninterruptibly().channel();
-  }
+  } // method start
 
   public void send(FullHttpRequest request) throws HttpClientException {
     request.headers().add(HttpHeaderNames.HOST, hostHeader);
@@ -452,6 +452,6 @@ public class BenchmarkHttpClient {
         }
       }
     }
-  }
+  } // method decrementPendingRequests
 
 }

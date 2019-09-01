@@ -308,9 +308,9 @@ public class CmpControl {
         responsePbmMac = algId;
       }
     }
-    pairs.putPair(KEY_PROTECTION_PBM_MAC, algosAsString(canonicalizedAlgos));
 
-  }
+    pairs.putPair(KEY_PROTECTION_PBM_MAC, algosAsString(canonicalizedAlgos));
+  } // method initPbm
 
   public boolean isMessageTimeRequired() {
     return messageTimeRequired;
@@ -376,7 +376,7 @@ public class CmpControl {
       }
     }
     return false;
-  }
+  } // method isRequestPbmOwfPermitted
 
   public boolean isRequestPbmMacPermitted(AlgorithmIdentifier pbmMac) {
     ASN1ObjectIdentifier macOid = pbmMac.getAlgorithm();
@@ -386,7 +386,7 @@ public class CmpControl {
       }
     }
     return false;
-  }
+  } // method isRequestPbmMacPermitted
 
   public String getConf() {
     return conf;
@@ -415,7 +415,7 @@ public class CmpControl {
         "\n  signature algorithms: ", sigAlgoValidator.getAlgoNames(),
         "\n  POPO algorithms: ", popoAlgoValidator.getAlgoNames(),
         (verbose ? "\n  encoded: " : ""), (verbose ? conf : ""));
-  }
+  } // method toString
 
   @Override
   public boolean equals(Object obj) {
@@ -426,21 +426,21 @@ public class CmpControl {
     }
 
     return conf.equals(((CmpControl) obj).conf);
-  }
+  } // method equals
 
   private static boolean getBoolean(ConfPairs pairs, String key, boolean defaultValue) {
     String str = pairs.value(key);
     boolean ret = StringUtil.isBlank(str) ? defaultValue : Boolean.parseBoolean(str);
     pairs.putPair(key, Boolean.toString(ret));
     return ret;
-  }
+  } // method getBoolean
 
   private static int getInt(ConfPairs pairs, String key, int defaultValue) {
     String str = pairs.value(key);
     int ret = StringUtil.isBlank(str) ? defaultValue : Integer.parseInt(str);
     pairs.putPair(key, Integer.toString(ret));
     return ret;
-  }
+  } // method getInt
 
   private static String algosAsString(Collection<String> algos) {
     return StringUtil.collectionAsString(algos, ALGO_DELIMITER);

@@ -90,7 +90,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
       }
     }
     this.resume = resume;
-  }
+  } // constructor
 
   public void importToDb() throws Exception {
     CaCertstore certstore;
@@ -194,7 +194,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
       relatedCaIds.add(issuer.getId());
     }
     return relatedCaIds;
-  }
+  } // method getIssuerIds
 
   private List<Integer> importIssuer(List<CaCertstore.Ca> cas)
       throws DataAccessException, CertificateException, IOException {
@@ -214,7 +214,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
 
     System.out.println(" imported table ISSUER");
     return relatedCaIds;
-  }
+  } // method importIssuer
 
   private void importIssuer0(CaCertstore.Ca issuer, String sql, PreparedStatement ps,
       List<Integer> relatedCaIds) throws IOException, DataAccessException, CertificateException {
@@ -484,6 +484,6 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
     }
 
     return HashAlgo.getNonNullInstance(certHashAlgoStr);
-  }
+  } // method getCertHashAlgo
 
 }

@@ -268,7 +268,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
     } else {
       pss.init(true, new ParametersWithRandom(p11KeyParam, random));
     }
-  }
+  } // method engineInitSign
 
   @Override
   protected void engineInitSign(PrivateKey privateKey) throws InvalidKeyException {
@@ -367,7 +367,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
     }
 
     return engineParams;
-  }
+  } // method engineGetParameters
 
   @Override
   protected Object engineGetParameter(String param) {

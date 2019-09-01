@@ -163,7 +163,7 @@ public class XiOCSPReqBuilder {
     }
 
     return new OCSPRequest(tbsReq, signature);
-  }
+  } // method generateRequest
 
   /**
    * Generate an unsigned request.

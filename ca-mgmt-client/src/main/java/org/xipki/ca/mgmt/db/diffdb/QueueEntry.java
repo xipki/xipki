@@ -36,7 +36,7 @@ interface QueueEntry {
     private EndOfQueue() {
     }
 
-  }
+  } // class EndOfQueue
 
   static class DigestEntrySet implements QueueEntry, Comparable<DigestEntrySet> {
 
@@ -79,7 +79,7 @@ interface QueueEntry {
       } else {
         return 1;
       }
-    }
+    } // method compareTo
 
-  }
+  } // class DigestEntrySet
 }

@@ -153,6 +153,6 @@ public class CtlogControl {
     boolean ret = StringUtil.isBlank(str) ? defaultValue : Boolean.parseBoolean(str);
     pairs.putPair(key, Boolean.toString(ret));
     return ret;
-  }
+  } // method getBoolean
 
 }

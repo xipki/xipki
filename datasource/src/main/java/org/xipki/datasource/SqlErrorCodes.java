@@ -182,7 +182,7 @@ class SqlErrorCodes {
       default:
         throw new IllegalStateException("should not reach here, unknown database type " + dbType);
     }
-  }
+  } // method newInstance
 
   private static Set<String> toSet(String... strs) {
     if (strs == null || strs.length == 0) {
@@ -194,7 +194,7 @@ class SqlErrorCodes {
       set.add(str);
     }
     return Collections.unmodifiableSet(set);
-  }
+  } // method toSet
 
   private static Set<String> toSet(int... ints) {
     if (ints == null || ints.length == 0) {
@@ -206,6 +206,6 @@ class SqlErrorCodes {
       set.add(Integer.toString(i));
     }
     return Collections.unmodifiableSet(set);
-  }
+  } // method toSet
 
 }

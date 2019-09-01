@@ -126,7 +126,7 @@ public class RestResponder {
       this.body = body;
     }
 
-  }
+  } // class RestResponse
 
   private static class HttpRespAuditException extends Exception {
 
@@ -164,7 +164,7 @@ public class RestResponder {
       return auditStatus;
     }
 
-  }
+  } // class HttpRespAuditException
 
   private static final int OK = 200;
 
@@ -680,6 +680,6 @@ public class RestResponder {
       }
     }
     return new BigInteger(tmpStr);
-  }
+  } // method toBigInt
 
 }

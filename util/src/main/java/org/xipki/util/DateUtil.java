@@ -62,7 +62,7 @@ public class DateUtil {
     } catch (DateTimeParseException ex) {
       throw new IllegalArgumentException("invalid utcTime '" + utcTime + "': " + ex.getMessage());
     }
-  }
+  } // method parseUtcTimeyyyyMMddhhmmss
 
   public static Date parseUtcTimeyyyyMMdd(String utcTime) {
     String coreUtcTime = utcTime;
@@ -84,7 +84,7 @@ public class DateUtil {
     } catch (DateTimeParseException ex) {
       throw new IllegalArgumentException("invalid utcTime '" + utcTime + "': " + ex.getMessage());
     }
-  }
+  } // method parseUtcTimeyyyyMMdd
 
   public static String toUtcTimeyyyyMMddhhmmss(Date utcTime) {
     return SDF1.format(utcTime.toInstant().atZone(ZONE_UTC));

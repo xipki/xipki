@@ -77,7 +77,7 @@ public class P11ModuleConf {
       return true;
     }
 
-  }
+  } // class P11SlotIdFilter
 
   private static final class P11SingleMechanismFilter {
 
@@ -111,7 +111,7 @@ public class P11ModuleConf {
       return mechanisms.contains(mechanism);
     }
 
-  } // class SingleFilter
+  } // class P11SingleMechanismFilter
 
   public static class P11MechanismFilter {
 
@@ -145,7 +145,7 @@ public class P11ModuleConf {
       return true;
     }
 
-  }
+  } // class P11MechanismFilter
 
   public static class P11PasswordsRetriever {
 
@@ -191,7 +191,7 @@ public class P11ModuleConf {
         return ret;
       }
 
-    } // class SingleRetriever
+    } // class P11PasswordsRetriever
 
     private final List<P11SinglePasswordRetriever> singleRetrievers;
     private PasswordResolver passwordResolver;
@@ -227,7 +227,7 @@ public class P11ModuleConf {
       this.passwordResolver = passwordResolver;
     }
 
-  }
+  } // P11PasswordsRetriever
 
   public static class P11NewObjectConf {
 
@@ -283,7 +283,7 @@ public class P11ModuleConf {
           Args.notNull(setCertObjectAttributes, "setCertObjectAttributes");
     }
 
-  }
+  } // class P11NewObjectConf
 
   private static final Logger LOG = LoggerFactory.getLogger(P11ModuleConf.class);
 
@@ -453,7 +453,7 @@ public class P11ModuleConf {
 
     this.newObjectConf = (moduleType.getNewObjectConf() == null) ? new P11NewObjectConf()
         : new P11NewObjectConf(moduleType.getNewObjectConf());
-  }
+  } // constructor
 
   public String getName() {
     return name;
@@ -513,7 +513,7 @@ public class P11ModuleConf {
     }
 
     return true;
-  }
+  } // method isSlotIncluded
 
   public P11MechanismFilter getP11MechanismFilter() {
     return mechanismFilter;
@@ -547,7 +547,7 @@ public class P11ModuleConf {
     }
 
     return filters;
-  }
+  } // method getSlotIdFilters
 
 }
 

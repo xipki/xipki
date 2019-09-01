@@ -372,7 +372,7 @@ public class SubjectDnSpec {
       control.setStringType(StringType.utf8String);
     }
     return control;
-  } // static
+  } // method getRdnControl
 
   public static void fixRdnControl(RdnControl control) throws CertprofileException {
     Args.notNull(control, "control");
@@ -460,6 +460,6 @@ public class SubjectDnSpec {
       LOG.info("read from resource " + fallbackResource);
       return new BufferedReader(new InputStreamReader(confStream));
     }
-  }
+  } // method getReader
 
 }

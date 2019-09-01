@@ -169,6 +169,6 @@ public class CaCaps {
     }
 
     return ret;
-  }
+  } // method getInstance
 
 }

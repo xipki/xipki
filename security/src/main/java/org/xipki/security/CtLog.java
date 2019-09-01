@@ -112,7 +112,7 @@ public class CtLog {
       return res;
     }
 
-  }
+  } // class DigitallySigned
 
   /**
    * <pre>
@@ -190,9 +190,9 @@ public class CtLog {
       }
 
       return res;
-    }
+    } // class getEncoded
 
-  }
+  } // class SerializedSCT
 
   public static enum HashAlgorithm {
     none((byte) 0),
@@ -221,7 +221,7 @@ public class CtLog {
       }
       return null;
     }
-  }
+  } // class HashAlgorithm
 
   public static enum SignatureAlgorithm {
     anonymous((byte) 0),
@@ -247,7 +247,7 @@ public class CtLog {
       }
       return null;
     }
-  }
+  } // class SignatureAlgorithm
 
   /**
    * ASN.1 definition:
@@ -287,7 +287,7 @@ public class CtLog {
       return new byte[] {hash.getCode(), signature.getCode()};
     }
 
-  }
+  } // class SignatureAndHashAlgorithm
 
   /**
    * ASN1. definition:
@@ -375,7 +375,7 @@ public class CtLog {
       }
 
       return new SignedCertificateTimestamp(version, logID, timestamp, extensions, digitallySigned);
-    }
+    } // constructor
 
     public SignedCertificateTimestamp(byte version, byte[] logId, long timestamp, byte[] extensions,
         DigitallySigned digitallySigned) {
@@ -438,9 +438,9 @@ public class CtLog {
 
       System.arraycopy(encodedDs, 0, res, offset, encodedDs.length);
       return res;
-    }
+    } // method getEncoded
 
-  }
+  } // class SignedCertificateTimestamp
 
   /**
    * <pre>
@@ -470,7 +470,7 @@ public class CtLog {
       return sctList.getEncoded();
     }
 
-  }
+  } // class SignedCertificateTimestampList
 
   /**
    * Write integer value to the buffer.
@@ -498,7 +498,7 @@ public class CtLog {
     }
 
     return bytesLenOfValue;
-  }
+  } // method writeInt
 
   /**
    * Read integer value from the buffer.
@@ -523,7 +523,7 @@ public class CtLog {
     } else {
       return 0xFF & buffer[offset];
     }
-  }
+  } // method readInt
 
   private static byte[] copyOf(byte[] original, int from, int len) {
     return Arrays.copyOfRange(original, from, from + len);

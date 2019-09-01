@@ -48,7 +48,7 @@ public class CaCompleters {
     @Reference
     protected CaManager caManager;
 
-  }
+  } // class CaMgmtCompleter
 
   @Service
   public static class CaAliasCompleter extends CaMgmtCompleter {
@@ -62,7 +62,7 @@ public class CaCompleters {
       }
     }
 
-  }
+  } // class CaAliasCompleter
 
   @Service
   public static class CaCrlReasonCompleter extends EnumCompleter {
@@ -75,7 +75,7 @@ public class CaCompleters {
       setTokens(enums);
     }
 
-  }
+  } // class CaCrlReasonCompleter
 
   @Service
   public static class CaNameCompleter extends CaMgmtCompleter {
@@ -89,7 +89,7 @@ public class CaCompleters {
       }
     }
 
-  }
+  } // class CaNameCompleter
 
   @Service
   public static class CaNamePlusAllCompleter extends CaMgmtCompleter {
@@ -106,7 +106,7 @@ public class CaCompleters {
       return ret;
     }
 
-  }
+  } // class CaNamePlusAllCompleter
 
   @Service
   public static class CaStatusCompleter extends EnumCompleter {
@@ -115,7 +115,7 @@ public class CaCompleters {
       setTokens("active", "inactive");
     }
 
-  }
+  } // class CaStatusCompleter
 
   @Service
   public static class CertListSortByCompleter extends EnumCompleter {
@@ -128,7 +128,7 @@ public class CaCompleters {
       setTokens(enums);
     }
 
-  }
+  } // class
 
   @Service
   public static class PermissionCompleter extends EnumCompleter {
@@ -137,7 +137,7 @@ public class CaCompleters {
       setTokens("enroll_cert", "revoke_cert", "unrevoke_cert", "remove_cert",
           "key_update", "gen_crl", "get_crl", "enroll_cross", "all");
     }
-  }
+  } // class PermissionCompleter
 
   @Service
   public static class ProfileNameAndAllCompleter extends CaMgmtCompleter {
@@ -154,7 +154,7 @@ public class CaCompleters {
       return ret;
     }
 
-  }
+  } // class ProfileNameAndAllCompleter
 
   @Service
   public static class ProfileNameCompleter extends CaMgmtCompleter {
@@ -168,7 +168,7 @@ public class CaCompleters {
       }
     }
 
-  }
+  } // class ProfileNameCompleter
 
   @Service
   public static class ProfileTypeCompleter extends CaMgmtCompleter {
@@ -182,7 +182,7 @@ public class CaCompleters {
       }
     }
 
-  }
+  } // class ProfileTypeCompleter
 
   @Service
   public static class PublisherNameCompleter extends CaMgmtCompleter {
@@ -196,7 +196,7 @@ public class CaCompleters {
       }
     }
 
-  }
+  } // class PublisherNameCompleter
 
   @Service
   public static class PublisherNamePlusAllCompleter extends CaMgmtCompleter {
@@ -213,7 +213,7 @@ public class CaCompleters {
       return ret;
     }
 
-  }
+  } // class PublisherNamePlusAllCompleter
 
   @Service
   public static class PublisherTypeCompleter extends CaMgmtCompleter {
@@ -227,7 +227,7 @@ public class CaCompleters {
       }
     }
 
-  }
+  } // class PublisherTypeCompleter
 
   @Service
   public static class RcaNameCompleter extends CaMgmtCompleter {
@@ -259,7 +259,7 @@ public class CaCompleters {
       return ret;
     }
 
-  }
+  } // class RcaNameCompleter
 
   @Service
   public static class RequestorNameCompleter extends CaMgmtCompleter {
@@ -277,7 +277,7 @@ public class CaCompleters {
       return names;
     }
 
-  }
+  } // class RequestorNameCompleter
 
   @Service
   public static class SignerNameCompleter extends CaMgmtCompleter {
@@ -290,7 +290,7 @@ public class CaCompleters {
         return Collections.emptySet();
       }
     }
-  }
+  } // class SignerNameCompleter
 
   @Service
   public static class SignerNamePlusNullCompleter extends CaMgmtCompleter {
@@ -307,7 +307,7 @@ public class CaCompleters {
       return ret;
     }
 
-  }
+  } // class SignerNamePlusNullCompleter
 
   @Service
   public static class SignerTypeCompleter extends CaMgmtCompleter {
@@ -321,7 +321,7 @@ public class CaCompleters {
       }
     }
 
-  }
+  } // class SignerTypeCompleter
 
   @Service
   public static class ValidityModeCompleter extends EnumCompleter {
@@ -334,6 +334,6 @@ public class CaCompleters {
       setTokens(enums);
     }
 
-  }
+  } // class ValidityModeCompleter
 
 }

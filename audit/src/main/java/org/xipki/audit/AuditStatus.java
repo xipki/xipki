@@ -43,6 +43,6 @@ public enum AuditStatus {
       }
     }
     throw new IllegalArgumentException("invalid AuditStatus " + name);
-  }
+  } // method forName
 
 }

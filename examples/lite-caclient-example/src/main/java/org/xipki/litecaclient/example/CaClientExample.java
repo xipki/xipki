@@ -116,7 +116,7 @@ public class CaClientExample {
         new org.bouncycastle.asn1.pkcs.RSAPublicKey(pubKey.getModulus(),
             pubKey.getPublicExponent()));
     return new MyKeypair(kp.getPrivate(), subjectPublicKeyInfo);
-  }
+  } // method generateRsaKeypair
 
   protected static MyKeypair generateEcKeypair() throws GeneralSecurityException {
     KeyPairGenerator kpGen = KeyPairGenerator.getInstance("EC");
@@ -134,7 +134,7 @@ public class CaClientExample {
         X9ObjectIdentifiers.id_ecPublicKey, SECObjectIdentifiers.secp256r1);
     SubjectPublicKeyInfo subjectPublicKeyInfo = new SubjectPublicKeyInfo(algId, keyData);
     return new MyKeypair(kp.getPrivate(), subjectPublicKeyInfo);
-  }
+  } // method generateEcKeypair
 
   protected static MyKeypair generateDsaKeypair() throws Exception {
     // plen: 2048, qlen: 256
@@ -155,7 +155,7 @@ public class CaClientExample {
         new ASN1Integer(dsaPubKey.getY()));
 
     return new MyKeypair(kp.getPrivate(), subjectPublicKeyInfo);
-  }
+  } // method generateDsaKeypair
 
   protected static CertificationRequest genCsr(MyKeypair keypair, String subject)
       throws GeneralSecurityException, OperatorCreationException {
@@ -176,7 +176,7 @@ public class CaClientExample {
 
     ContentSigner signer = buildSigner(keypair.privateKey, "SHA256");
     return csrBuilder.build(signer).toASN1Structure();
-  }
+  } // method genCsr
 
   protected static void printKeyAndCert(String prefix, KeyAndCert keyAndCert)
       throws CertificateEncodingException, IOException {
@@ -184,7 +184,7 @@ public class CaClientExample {
     System.out.println("-----BEGIN PRIVATE KEY-----");
     System.out.println(Base64.encodeToString(keyAndCert.getKey().getEncoded(), true));
     System.out.println("-----END PRIVATE KEY-----");
-  }
+  } // method printKeyAndCert
 
   protected static void printCert(String prefix, X509Certificate cert)
       throws CertificateEncodingException {
@@ -200,8 +200,7 @@ public class CaClientExample {
     System.out.println("-----BEGIN CERTIFICATE-----");
     System.out.println(Base64.encodeToString(cert.getEncoded(), true));
     System.out.println("-----END CERTIFICATE-----");
-
-  }
+  } // method printCert
 
   protected static ContentSigner buildSigner(PrivateKey signingKey, String hashAlgo)
       throws OperatorCreationException {
@@ -213,7 +212,7 @@ public class CaClientExample {
       sigAlgo = hashAlgo + "WITH" + keyAlgo;
     }
     return new JcaContentSignerBuilder(sigAlgo).build(signingKey);
-  }
+  } // method buildSigner
 
   private static void copyArray(byte[] source, byte[] dest, int destPos, int length) {
     int srcLen = source.length;
@@ -234,6 +233,6 @@ public class CaClientExample {
     } else {
       System.arraycopy(source, 0, dest, destPos + length - srcLen, srcLen);
     }
-  }
+  } // method copyArray
 
 }

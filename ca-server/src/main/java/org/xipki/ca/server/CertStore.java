@@ -93,7 +93,7 @@ public class CertStore {
     REVOKED,
     GOOD
 
-  }
+  } // class CertStatus
 
   private class DbSchemaInfo {
     private final Map<String, String> variables = new HashMap<>();
@@ -128,7 +128,7 @@ public class CertStore {
       return variables.get(Args.notNull(variableName, "variableName"));
     }
 
-  }
+  } // class DbSchemaInfo
 
   static class KnowCertResult {
 
@@ -151,7 +151,7 @@ public class CertStore {
       return userId;
     }
 
-  }
+  } // end class KnowCertResult
 
   static class SerialWithId {
 
@@ -172,7 +172,7 @@ public class CertStore {
       return id;
     }
 
-  }
+  } // class SerialWithId
 
   private static final Logger LOG = LoggerFactory.getLogger(CertStore.class);
 
@@ -338,7 +338,7 @@ public class CertStore {
     }
 
     return true;
-  }
+  } // method addCert
 
   private void addCert(NameId ca, CertWithDbId certificate, byte[] encodedSubjectPublicKey,
       NameId certprofile, NameId requestor, Integer userId, RequestType reqType,
@@ -428,7 +428,7 @@ public class CertStore {
     } finally {
       datasource.releaseResources(ps, null);
     }
-  }
+  } // method addToPublishQueue
 
   public void removeFromPublishQueue(NameId publisher, long certId) throws OperationException {
     final String sql = SQL_REMOVE_PUBLISHQUEUE;
@@ -442,7 +442,7 @@ public class CertStore {
     } finally {
       datasource.releaseResources(ps, null);
     }
-  }
+  } // method removeFromPublishQueue
 
   public long getMaxIdOfDeltaCrlCache(NameId ca) throws OperationException {
     Args.notNull(ca, "ca");
@@ -461,7 +461,7 @@ public class CertStore {
     } finally {
       datasource.releaseResources(ps, null);
     }
-  }
+  } // method getMaxIdOfDeltaCrlCache
 
   public void clearDeltaCrlCache(NameId ca, long maxId) throws OperationException {
     final String sql = SQL_CLEAR_DELTACRL_CACHE;
@@ -475,7 +475,7 @@ public class CertStore {
     } finally {
       datasource.releaseResources(ps, null);
     }
-  }
+  } // method clearDeltaCrlCache
 
   public void clearPublishQueue(NameId ca, NameId publisher) throws OperationException {
     StringBuilder sqlBuilder = new StringBuilder(80);
@@ -510,7 +510,7 @@ public class CertStore {
     } finally {
       datasource.releaseResources(ps, null);
     }
-  }
+  } // method clearPublishQueue
 
   public long getMaxCrlNumber(NameId ca) throws OperationException {
     Args.notNull(ca, "ca");
@@ -531,7 +531,7 @@ public class CertStore {
     } finally {
       datasource.releaseResources(ps, rs);
     }
-  }
+  } // method getMaxCrlNumber
 
   public long getThisUpdateOfCurrentCrl(NameId ca, boolean deltaCrl)
       throws OperationException {
@@ -553,7 +553,7 @@ public class CertStore {
     } finally {
       datasource.releaseResources(ps, rs);
     }
-  }
+  } // method getThisUpdateOfCurrentCrl
 
   public boolean hasCrl(NameId ca) throws OperationException {
     Args.notNull(ca, "ca");
@@ -571,7 +571,7 @@ public class CertStore {
     } finally {
       datasource.releaseResources(ps, rs);
     }
-  }
+  } // method hasCrl
 
   public void addCrl(NameId ca, X509CRL crl) throws OperationException, CRLException {
     Args.notNull(ca, "ca");
@@ -832,7 +832,7 @@ public class CertStore {
     } finally {
       datasource.releaseResources(ps, null);
     }
-  }
+  } // method publishToDeltaCrlCache
 
   public void removeCert(NameId ca, BigInteger serialNumber) throws OperationException {
     Args.notNull(ca, "ca");
@@ -901,7 +901,7 @@ public class CertStore {
     } finally {
       datasource.releaseResources(ps, rs);
     }
-  }
+  } // method getCountOfCerts
 
   public List<SerialWithId> getSerialNumbers(NameId ca,  long startId, int numEntries,
       boolean onlyRevoked) throws OperationException {
@@ -1299,7 +1299,7 @@ public class CertStore {
       LOG.warn("getCertificateInfo()", ex);
       throw new OperationException(SYSTEM_FAILURE, ex);
     }
-  } // method getCertificateInfo
+  } // method getCertInfo
 
   public Integer getCertprofileForCertId(NameId ca, long cid) throws OperationException {
     Args.notNull(ca, "ca");
@@ -1419,7 +1419,7 @@ public class CertStore {
     }
 
     return (b64Req == null) ? null : Base64.decodeFast(b64Req);
-  }
+  } // method getCertRequest
 
   public List<CertListInfo> listCerts(NameId ca, X500Name subjectPattern, Date validFrom,
       Date validTo, CertListOrderBy orderBy, int numEntries) throws OperationException {
@@ -1583,7 +1583,7 @@ public class CertStore {
     } finally {
       datasource.releaseResources(ps, rs);
     }
-  } // method authenticateUser
+  } // method getUsername
 
   public MgmtEntry.CaHasUser getCaHasUser(NameId ca, NameId user) throws OperationException {
     final String sql = sqlCaHasUser;
@@ -1611,7 +1611,7 @@ public class CertStore {
     } finally {
       datasource.releaseResources(ps, rs);
     }
-  }
+  } // method getCaHasUser
 
   public KnowCertResult knowsCertForSerial(NameId ca, BigInteger serial) throws OperationException {
     Args.notNull(serial, "serial");
@@ -1679,7 +1679,7 @@ public class CertStore {
     } finally {
       datasource.releaseResources(ps, rs);
     }
-  } // method getRevokedCertificates
+  } // method getRevokedCerts
 
   public List<CertRevInfoWithSerial> getCertsForDeltaCrl(NameId ca, long startId, int numEntries,
       boolean onlyCaCerts, boolean onlyUserCerts) throws OperationException {
@@ -1751,12 +1751,12 @@ public class CertStore {
     } // end for
 
     return ret;
-  } // method getCertificatesForDeltaCrl
+  } // method getCertsForDeltaCrl
 
   public CertStatus getCertStatusForSubject(NameId ca, X500Name subject) throws OperationException {
     long subjectFp = X509Util.fpCanonicalizedName(subject);
     return getCertStatusForSubjectFp(ca, subjectFp);
-  }
+  } // method getCertStatusForSubject
 
   private CertStatus getCertStatusForSubjectFp(NameId ca, long subjectFp)
       throws OperationException {
@@ -1815,11 +1815,11 @@ public class CertStore {
     } finally {
       datasource.releaseResources(ps, rs);
     }
-  }
+  } // method isCertForSubjectIssued
 
   private String base64Fp(byte[] data) {
     return HashAlgo.SHA1.base64Hash(data);
-  }
+  } // method base64Fp
 
   private PreparedStatement borrowPreparedStatement(String sqlQuery) throws OperationException {
     try {
@@ -1901,7 +1901,7 @@ public class CertStore {
     } finally {
       datasource.releaseResources(ps, rs);
     }
-  }
+  } // method deleteUnreferencedRequests
 
   public long addRequest(byte[] request) throws OperationException {
     Args.notNull(request, "request");
@@ -1923,7 +1923,7 @@ public class CertStore {
     }
 
     return id;
-  }
+  } // method addRequest
 
   public void addRequestCert(long requestId, long certId) throws OperationException {
     final String sql = SQL_ADD_REQCERT;
@@ -1939,7 +1939,7 @@ public class CertStore {
     } finally {
       datasource.releaseResources(ps, null);
     }
-  }
+  } // method addRequestCert
 
   private String getSqlCidFromPublishQueue(int numEntries) {
     String sql = cacheSqlCidFromPublishQueue.get(numEntries);
@@ -1949,7 +1949,7 @@ public class CertStore {
       cacheSqlCidFromPublishQueue.put(numEntries, sql);
     }
     return sql;
-  }
+  } // method getSqlCidFromPublishQueue
 
   private String getSqlExpiredSerials(int numEntries) {
     String sql = cacheSqlExpiredSerials.get(numEntries);
@@ -1958,7 +1958,7 @@ public class CertStore {
       cacheSqlExpiredSerials.put(numEntries, sql);
     }
     return sql;
-  }
+  } // method getSqlExpiredSerials
 
   private String getSqlSuspendedSerials(int numEntries) {
     String sql = cacheSqlSuspendedSerials.get(numEntries);
@@ -1968,7 +1968,7 @@ public class CertStore {
       cacheSqlSuspendedSerials.put(numEntries, sql);
     }
     return sql;
-  }
+  } // method getSqlSuspendedSerials
 
   private String getSqlDeltaCrlCacheIds(int numEntries) {
     String sql = cacheSqlDeltaCrlCacheIds.get(numEntries);
@@ -1978,7 +1978,7 @@ public class CertStore {
       cacheSqlDeltaCrlCacheIds.put(numEntries, sql);
     }
     return sql;
-  }
+  } // method getSqlDeltaCrlCacheIds
 
   private String getSqlRevokedCerts(int numEntries, boolean withEe) {
     LruCache<Integer, String> cache = withEe ? cacheSqlRevokedCertsWithEe : cacheSqlRevokedCerts;
@@ -1993,7 +1993,7 @@ public class CertStore {
       cache.put(numEntries, sql);
     }
     return sql;
-  }
+  } // method getSqlRevokedCerts
 
   private String getSqlSerials(int numEntries, boolean onlyRevoked) {
     LruCache<Integer, String> cache = onlyRevoked ? cacheSqlSerialsRevoked : cacheSqlSerials;
@@ -2007,7 +2007,7 @@ public class CertStore {
       cache.put(numEntries, sql);
     }
     return sql;
-  }
+  } // method getSqlSerials
 
   private String getSqlSerials(int numEntries, Date notExpiredAt, boolean onlyRevoked,
       boolean withEe) {
@@ -2015,12 +2015,12 @@ public class CertStore {
         (notExpiredAt != null ? " AND NAFTER>?" : ""),
         (onlyRevoked ? " AND REV=1" : ""), (withEe ? " AND EE=?" : ""));
     return datasource.buildSelectFirstSql(numEntries, "ID ASC", sql);
-  }
+  } // method getSqlSerials
 
   private static void setBoolean(PreparedStatement ps, int index, boolean value)
       throws SQLException {
     ps.setInt(index, value ? 1 : 0);
-  }
+  } // method setBoolean
 
   private static void setLong(PreparedStatement ps, int index, Long value) throws SQLException {
     if (value != null) {
@@ -2028,7 +2028,7 @@ public class CertStore {
     } else {
       ps.setNull(index, Types.BIGINT);
     }
-  }
+  } // method setLong
 
   private static void setInt(PreparedStatement ps, int index, Integer value) throws SQLException {
     if (value != null) {
@@ -2036,7 +2036,7 @@ public class CertStore {
     } else {
       ps.setNull(index, Types.INTEGER);
     }
-  }
+  } // method setInt
 
   private static void setDateSeconds(PreparedStatement ps, int index, Date date)
       throws SQLException {
@@ -2045,6 +2045,6 @@ public class CertStore {
     } else {
       ps.setNull(index, Types.BIGINT);
     }
-  }
+  } // method setDateSeconds
 
 }

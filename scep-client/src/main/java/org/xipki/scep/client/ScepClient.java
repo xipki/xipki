@@ -76,7 +76,7 @@ public class ScepClient extends Client {
     } catch (IOException ex) {
       throw new ScepClientException(ex);
     }
-  }
+  } // method httpGet
 
   @Override
   protected ScepHttpResponse httpPost(String url, String requestContentType, byte[] request)
@@ -103,7 +103,7 @@ public class ScepClient extends Client {
     } catch (IOException ex) {
       throw new ScepClientException(ex.getMessage(), ex);
     }
-  }
+  } // method httpPost
 
   protected ScepHttpResponse parseResponse(HttpURLConnection conn) throws ScepClientException {
     Args.notNull(conn, "conn");
@@ -127,7 +127,7 @@ public class ScepClient extends Client {
     } catch (IOException ex) {
       throw new ScepClientException(ex);
     }
-  }
+  } // method parseResponse
 
   private static HttpURLConnection openHttpConn(URL url) throws IOException {
     Args.notNull(url, "url");

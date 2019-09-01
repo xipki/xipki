@@ -81,7 +81,7 @@ class CaCertstoreDbExporter extends DbPorter {
     this.numCertsInBundle = Args.positive(numCertsInBundle, "numCertsInBundle");
     this.numCertsPerSelect = Args.positive(numCertsPerSelect, "numCertsPerSelect");
     this.resume = resume;
-  }
+  } // constructor
 
   public void export() throws Exception {
     CaCertstore certstore;
@@ -181,7 +181,7 @@ class CaCertstoreDbExporter extends DbPorter {
     } finally {
       IoUtil.closeQuietly(entriesFileOs);
     }
-  }
+  } // method exportEntries
 
   private void exportEntries(CaDbEntryType type, CaCertstore certstore, File processLogFile,
       OutputStream filenameListOs, Long idProcessedInLastProcess) throws Exception {
@@ -569,7 +569,7 @@ class CaCertstoreDbExporter extends DbPorter {
     }
 
     zipOutStream.close();
-  }
+  } // method finalizeZip
 
   private static Object createContainer(CaDbEntryType type) throws IOException {
     switch (type) {
@@ -584,7 +584,7 @@ class CaCertstoreDbExporter extends DbPorter {
       default:
         throw new IllegalStateException("unknown CaDbEntryType " + type);
     }
-  }
+  } // method createContainer
 
   private static void setCount(CaDbEntryType type, CaCertstore certstore, int num) {
     switch (type) {
@@ -603,5 +603,5 @@ class CaCertstoreDbExporter extends DbPorter {
       default:
         throw new IllegalStateException("unknown CaDbEntryType " + type);
     }
-  }
+  } // method setCount
 }

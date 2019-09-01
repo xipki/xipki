@@ -108,7 +108,7 @@ public class FileBigIntegerIterator implements Iterator<BigInteger>, Closeable {
     }
 
     return nextNumbers.poll();
-  }
+  } // method readNextNumber
 
   @Override
   public void close() {

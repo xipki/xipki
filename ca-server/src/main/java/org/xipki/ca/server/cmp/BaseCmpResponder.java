@@ -102,7 +102,7 @@ abstract class BaseCmpResponder {
       LogUtil.error(LOG, ex, "could not get responder signer");
       return false;
     }
-  }
+  } // method isOnService
 
   /**
    * Get the CMP control.
@@ -125,7 +125,7 @@ abstract class BaseCmpResponder {
     }
 
     return (X500Name) requestSender.getName();
-  }
+  } // method getX500Sender
 
   /**
    * Processes the request and returns the response.
@@ -332,7 +332,7 @@ abstract class BaseCmpResponder {
     byte[] bytes = new byte[len];
     random.nextBytes(bytes);
     return bytes;
-  }
+  } // method randomBytes
 
   private ProtectionVerificationResult verifyProtection(String tid, GeneralPKIMessage pkiMessage,
       CmpControl cmpControl) throws CMPException, InvalidKeyException, OperatorCreationException {

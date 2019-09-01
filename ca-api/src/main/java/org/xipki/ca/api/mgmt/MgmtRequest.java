@@ -44,7 +44,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.aliasName = aliasName;
     }
 
-  }
+  } // class AddCaAlias
 
   public static class AddCa extends MgmtRequest {
 
@@ -58,7 +58,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.caEntry = caEntry;
     }
 
-  }
+  } // class AddCa
 
   public static class AddCertprofile extends MgmtRequest {
 
@@ -72,7 +72,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.certprofileEntry = certprofileEntry;
     }
 
-  }
+  } // class AddCertprofile
 
   public static class AddCertprofileToCa extends CaNameRequest {
 
@@ -86,7 +86,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.profileName = profileName;
     }
 
-  }
+  } // class AddCertprofileToCa
 
   public static class AddPublisher extends MgmtRequest {
 
@@ -100,7 +100,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.publisherEntry = publisherEntry;
     }
 
-  }
+  } // class AddPublisher
 
   public static class AddPublisherToCa extends CaNameRequest {
 
@@ -114,7 +114,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.publisherName = publisherName;
     }
 
-  }
+  } // class AddPublisherToCa
 
   public static class AddRequestor extends MgmtRequest {
 
@@ -128,7 +128,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.requestorEntry = requestorEntry;
     }
 
-  }
+  } // class AddRequestor
 
   public static class AddRequestorToCa extends CaNameRequest {
 
@@ -142,7 +142,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.requestor = requestor;
     }
 
-  }
+  } // class AddRequestorToCa
 
   public static class AddSigner extends MgmtRequest {
 
@@ -156,7 +156,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.signerEntry = signerEntry;
     }
 
-  }
+  } // class AddSigner
 
   public static class AddUser extends MgmtRequest {
 
@@ -170,7 +170,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.addUserEntry = addUserEntry;
     }
 
-  }
+  } // class AddUser
 
   public static class AddUserToCa extends CaNameRequest {
 
@@ -184,7 +184,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.user = user;
     }
 
-  }
+  } // class AddUserToCa
 
   public abstract static class CaNameRequest extends MgmtRequest {
 
@@ -198,7 +198,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.caName = caName;
     }
 
-  }
+  } // class CaNameRequest
 
   public static class ChangeCa extends MgmtRequest {
 
@@ -212,7 +212,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.changeCaEntry = changeCaEntry;
     }
 
-  }
+  } // class ChangeCa
 
   public static class ChangeSigner extends MgmtRequest {
 
@@ -256,7 +256,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.base64Cert = base64Cert;
     }
 
-  }
+  } // class ChangeSigner
 
   public static class ChangeTypeConfEntity extends MgmtRequest {
 
@@ -299,7 +299,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.conf = conf;
     }
 
-  }
+  } // class ChangeTypeConfEntity
 
   public static class ChangeUser extends MgmtRequest {
 
@@ -313,7 +313,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.changeUserEntry = changeUserEntry;
     }
 
-  }
+  } // class ChangeUser
 
   public static class ClearPublishQueue extends CaNameRequest {
 
@@ -327,7 +327,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.publisherNames = publisherNames;
     }
 
-  }
+  } // class ClearPublishQueue
 
   public static class ExportConf extends MgmtRequest {
 
@@ -341,7 +341,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.caNames = caNames;
     }
 
-  }
+  } // class ExportConf
 
   public static class GenerateCertificate extends CaNameRequest {
 
@@ -385,7 +385,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.notAfter = notAfter;
     }
 
-  }
+  } // class GenerateCertificate
 
   public static class GenerateRootCa extends MgmtRequest {
 
@@ -429,7 +429,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.serialNumber = serialNumber;
     }
 
-  }
+  } // class GenerateRootCa
 
   public static class GetCert extends MgmtRequest {
 
@@ -469,7 +469,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.serialNumber = serialNumber;
     }
 
-  }
+  } // class GetCert
 
   public static class GetCertRequest extends MgmtRequest {
 
@@ -493,7 +493,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.serialNumber = serialNumber;
     }
 
-  }
+  } // class GetCertRequest
 
   public static class GetCrl extends CaNameRequest {
 
@@ -507,7 +507,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.crlNumber = crlNumber;
     }
 
-  }
+  } // class GetCrl
 
   public static class ListCertificates extends CaNameRequest {
 
@@ -561,7 +561,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.numEntries = numEntries;
     }
 
-  }
+  } // class ListCertificates
 
   public static class LoadConf extends MgmtRequest {
 
@@ -575,7 +575,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.confBytes = confBytes;
     }
 
-  }
+  } // class LoadConf
 
   public static class Name extends MgmtRequest {
 
@@ -596,7 +596,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.name = name;
     }
 
-  }
+  } // class Name
 
   public static class RemoveCertificate extends CaNameRequest {
 
@@ -610,7 +610,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.serialNumber = serialNumber;
     }
 
-  }
+  } // class RemoveCertificate
 
   public static class RemoveEntityFromCa extends CaNameRequest {
 
@@ -624,7 +624,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.entityName = entityName;
     }
 
-  }
+  } // class RemoveEntityFromCa
 
   public static class RepublishCertificates extends CaNameRequest {
 
@@ -648,7 +648,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.numThreads = numThreads;
     }
 
-  }
+  } // class RepublishCertificates
 
   public static class RevokeCa extends CaNameRequest {
 
@@ -662,7 +662,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.revocationInfo = revocationInfo;
     }
 
-  }
+  } // class RevokeCa
 
   public static class RevokeCertificate extends CaNameRequest {
 
@@ -696,7 +696,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.invalidityTime = invalidityTime;
     }
 
-  }
+  } // class RevokeCertificate
 
   public static class UnrevokeCertificate extends CaNameRequest {
 
@@ -710,6 +710,6 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.serialNumber = serialNumber;
     }
 
-  }
+  } // class UnrevokeCertificate
 
 }

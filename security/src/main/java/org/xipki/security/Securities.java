@@ -91,7 +91,7 @@ public class Securities implements Closeable {
       validate(keystore);
     }
 
-  }
+  } // class KeystoreConf
 
   public static class SecurityConf extends ValidatableConf {
 
@@ -169,7 +169,7 @@ public class Securities implements Closeable {
       validate(password);
     }
 
-  }
+  } // class SecurityConf
 
   private static final Logger LOG = LoggerFactory.getLogger(Securities.class);
 
@@ -225,7 +225,7 @@ public class Securities implements Closeable {
       }
       this.p11CryptServiceFactory = null;
     }
-  }
+  } // method close
 
   private void initSecurityFactory(SecurityConf conf) throws IOException, InvalidConfException {
     Passwords passwords = new Passwords();
@@ -265,14 +265,14 @@ public class Securities implements Closeable {
       }
     }
 
-  }
+  } // method initSecurityFactory
 
   private void initSecurityPkcs12(SignerFactoryRegisterImpl signerFactoryRegister)
       throws IOException {
     P12SignerFactory p12SignerFactory = new P12SignerFactory();
     p12SignerFactory.setSecurityFactory(securityFactory);
     signerFactoryRegister.registFactory(p12SignerFactory);
-  }
+  } // method initSecurityPkcs12
 
   private void initSecurityPkcs11(FileOrValue pkcs11Conf,
       SignerFactoryRegisterImpl signerFactoryRegister, PasswordResolver passwordResolver)
@@ -301,6 +301,6 @@ public class Securities implements Closeable {
     p11SignerFactory.setP11CryptServiceFactory(p11CryptServiceFactory);
 
     signerFactoryRegister.registFactory(p11SignerFactory);
-  }
+  } // method initSecurityPkcs11
 
 }

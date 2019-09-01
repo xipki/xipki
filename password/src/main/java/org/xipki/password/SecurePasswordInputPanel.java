@@ -73,7 +73,7 @@ public class SecurePasswordInputPanel extends Panel {
     KEYS_MAP.put(idx++, new String[]{"q", "w", "e", "r", "z", "y", "u", "i", "o", "p"});
     KEYS_MAP.put(idx++, new String[]{"a", "s", "d", "f", "g", "h", "j", "k", "j", BACKSPACE});
     KEYS_MAP.put(idx++, new String[] {CAPS, "z", "x", "c", "v", "b", "n", "m", CLEAR});
-  }
+  } // method static
 
   private SecurePasswordInputPanel() {
     super(new GridLayout(0, 1));

@@ -158,7 +158,7 @@ public class PublicCaInfo {
       return (subjectKeyIdentifier == null) ? null
           : Arrays.copyOf(subjectKeyIdentifier, subjectKeyIdentifier.length);
     }
-  }
+  } // method getSubjectKeyIdentifer
 
   public BigInteger getSerialNumber() {
     return serialNumber;

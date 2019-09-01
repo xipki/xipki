@@ -235,7 +235,7 @@ public class CrlStreamParser extends Asn1StreamParser {
 
       next = new RevokedCert(serialNumber, revocationDate, reason, invalidityDate,
                   certificateIssuer);
-    }
+    } // method next0
 
     @Override
     public void close() throws IOException {
@@ -423,7 +423,7 @@ public class CrlStreamParser extends Asn1StreamParser {
       bytes = readBlock(BERTags.BIT_STRING, instream, "signature");
       this.signature = DERBitString.getInstance(bytes).getBytes();
     }
-  }
+  } // constructor
 
   public int getVersion() {
     return version;
@@ -517,7 +517,7 @@ public class CrlStreamParser extends Asn1StreamParser {
       LogUtil.error(LOG, ex, "could not validate POPO of CSR");
       return false;
     }
-  }
+  } // method verifySignature
 
   public RevokedCertsIterator revokedCertificates() throws IOException {
     return new RevokedCertsIterator();

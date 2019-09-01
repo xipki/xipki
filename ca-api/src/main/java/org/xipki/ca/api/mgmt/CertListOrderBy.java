@@ -51,6 +51,6 @@ public enum CertListOrderBy {
     }
 
     return null;
-  }
+  } // method forValue
 
 }

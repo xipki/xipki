@@ -68,11 +68,11 @@ public class RevokeSuspendedControl {
     str = conf.value(KEY_UNCHANGED_SINCE);
     this.unchangedSince = (str == null)
         ? new Validity(15, Unit.DAY) : Validity.getInstance(str);
-  }
+  } // constructor
 
   public RevokeSuspendedControl(boolean enabled) {
     this(enabled, null, null);
-  }
+  } // constructor
 
   public RevokeSuspendedControl(boolean enabled, CrlReason targetReason, Validity unchangedSince) {
     this.enabled = enabled;
@@ -137,7 +137,7 @@ public class RevokeSuspendedControl {
     return enabled == obj2.enabled
         && (targetReason == obj2.targetReason)
         && (unchangedSince != obj2.unchangedSince);
-  }
+  } // method equals
 
   private static boolean getBoolean(ConfPairs pairs, String key, boolean defaultValue) {
     String str = pairs.value(key);

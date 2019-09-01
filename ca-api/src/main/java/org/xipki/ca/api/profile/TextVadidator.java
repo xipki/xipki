@@ -29,13 +29,6 @@ import org.xipki.util.LruCache;
 
 public abstract class TextVadidator {
 
-  private TextVadidator() {
-  }
-
-  public abstract boolean isValid(String value);
-
-  public abstract String pattern();
-
   private static class RegexValidator extends TextVadidator {
 
     private final Pattern pattern;
@@ -54,7 +47,7 @@ public abstract class TextVadidator {
       return pattern.pattern();
     }
 
-  }
+  } // class RegexValidator
 
   // CHECKSTYLE:SKIP
   private static class FQDNValidator extends TextVadidator {
@@ -69,7 +62,7 @@ public abstract class TextVadidator {
       return ":FQDN";
     }
 
-  }
+  } // class FQDNValidator
 
   public static final TextVadidator COUNTRY = new RegexValidator("[A-Za-z]{2}");
 
@@ -83,6 +76,13 @@ public abstract class TextVadidator {
   public static final TextVadidator FQDN = new FQDNValidator();
 
   private static final LruCache<String, TextVadidator> cache = new LruCache<>(200);
+
+  private TextVadidator() {
+  }
+
+  public abstract boolean isValid(String value);
+
+  public abstract String pattern();
 
   public static TextVadidator compile(String regex) {
     if (":COUNTRY".equalsIgnoreCase(regex) || "COUNTRY".equalsIgnoreCase(regex)) {
@@ -104,6 +104,6 @@ public abstract class TextVadidator {
       }
       return validator;
     }
-  }
+  } // method compile
 
 }

@@ -131,7 +131,7 @@ public class AuditEvent {
       existing.addValue(eventData.getValue());
       return existing;
     }
-  }
+  } // method addEventData
 
   public boolean removeEventData(String eventDataName) {
     Args.notNull(eventDataName, "eventDataName");
@@ -146,7 +146,7 @@ public class AuditEvent {
     }
 
     return removed;
-  }
+  } // method removeEventData
 
   public AuditStatus getStatus() {
     return status;

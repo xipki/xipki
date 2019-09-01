@@ -79,7 +79,7 @@ public class CrlCertSetStreamParser extends Asn1StreamParser {
       this.cert = cert;
     }
 
-  } // class RevokedCert
+  } // class CrlCert
 
   public class CrlCertsIterator implements Iterator<CrlCert>, Closeable {
 
@@ -144,7 +144,7 @@ public class CrlCertSetStreamParser extends Asn1StreamParser {
       }
 
       next = new CrlCert(serialNumber, cert);
-    }
+    } // method next0
 
     @Override
     public void close() throws IOException {
@@ -154,7 +154,7 @@ public class CrlCertSetStreamParser extends Asn1StreamParser {
       instream = null;
     }
 
-  } // class RevokedCertsIterator
+  } // class CrlCertsIterator
 
   private BufferedInputStream instream;
 

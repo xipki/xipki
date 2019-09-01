@@ -83,9 +83,9 @@ public class DbActions {
       } else {
         return null;
       }
-    }
+    } // method execute0
 
-  }
+  } // class DbPortAction
 
   @Command(scope = "ca", name = "diff-digest", description = "diff digest XiPKI database")
   @Service
@@ -132,9 +132,9 @@ public class DbActions {
 
       return new DigestDiffWorker(datasourceFactory, passwordResolver, revokedOnly,
           refDbConf, dbconfFile, reportDir, numCertsPerSelect, numTargetThreads, caCerts);
-    }
+    } // method getDbPortWorker
 
-  }
+  } // class DiffDigest
 
   @Command(scope = "ca", name = "export-ca", description = "export CA database")
   @Service
@@ -163,7 +163,7 @@ public class DbActions {
           resume, numCertsInBundle, numCertsPerCommit);
     }
 
-  }
+  } // class ExportCa
 
   @Command(scope = "ca", name = "export-ocsp", description = "export OCSP database")
   @Service
@@ -192,7 +192,7 @@ public class DbActions {
           resume, numCertsInBundle, numCertsPerSelect);
     }
 
-  }
+  } // class ExportOcsp
 
   @Command(scope = "ca", name = "import-ca", description = "import CA database")
   @Service
@@ -218,7 +218,7 @@ public class DbActions {
           indir, numCertsPerCommit.intValue());
     }
 
-  }
+  } // class ImportCa
 
   @Command(scope = "ca", name = "import-ocsp", description = "import OCSP database")
   @Service
@@ -244,7 +244,7 @@ public class DbActions {
           indir, numCertsPerCommit.intValue());
     }
 
-  }
+  } // class ImportOcsp
 
   @Command(scope = "ca", name = "import-ocspfromca",
       description = "import OCSP database from CA data")
@@ -279,6 +279,6 @@ public class DbActions {
           publisherName, resume, indir, numCertsPerCommit.intValue(), testOnly.booleanValue());
     }
 
-  }
+  } // class ImportOcspfromca
 
 }

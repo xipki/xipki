@@ -583,7 +583,7 @@ public class ExtensionsChecker {
     }
 
     return result;
-  } // method checkExtns
+  } // method checkExtensions
 
   private byte[] getExpectedExtValue(ASN1ObjectIdentifier type, Extensions requestedExtns,
       ExtensionControl extControl) {
@@ -1650,7 +1650,7 @@ public class ExtensionsChecker {
     }
 
     return grantedNames.isEmpty() ? null : grantedNames.toArray(new GeneralName[0]);
-  }
+  } // getRequestedSubjectAltNames
 
   private void checkExtnSubjectInfoAccess(StringBuilder failureMsg, byte[] extensionValue,
       Extensions requestedExtns, ExtensionControl extControl) {
@@ -2330,7 +2330,7 @@ public class ExtensionsChecker {
     } catch (Exception ex) {
       failureMsg.append("invalid syntax: ").append(ex.getMessage()).append("; ");
     }
-  } // method checkExtnAuthorizationTemplate
+  } // method checkScts
 
   private Set<KeyUsageControl> getKeyusage(boolean required) {
     Set<KeyUsageControl> ret = new HashSet<>();
@@ -2344,7 +2344,7 @@ public class ExtensionsChecker {
       }
     }
     return ret;
-  }
+  } // method getKeyusage
 
   private Set<ExtKeyUsageControl> getExtKeyusage(boolean required) {
     Set<ExtKeyUsageControl> ret = new HashSet<>();
@@ -2358,7 +2358,7 @@ public class ExtensionsChecker {
       }
     }
     return ret;
-  }
+  } // method getExtKeyusage
 
   private byte[] getConstantExtensionValue(ASN1ObjectIdentifier type) {
     return (constantExtensions == null) ? null : constantExtensions.get(type).getValue();
@@ -2424,7 +2424,7 @@ public class ExtensionsChecker {
     }
 
     return Collections.unmodifiableMap(map);
-  } // method buildConstantExtesions
+  } // method buildExtesionSyntaxes
 
   private static ASN1Encodable readAsn1Encodable(byte[] encoded) throws CertprofileException {
     ASN1StreamParser parser = new ASN1StreamParser(encoded);
@@ -2433,7 +2433,7 @@ public class ExtensionsChecker {
     } catch (IOException ex) {
       throw new CertprofileException("could not parse the constant extension value", ex);
     }
-  }
+  } // method readAsn1Encodable
 
   private static String hex(byte[] bytes) {
     return Hex.encode(bytes);
@@ -2452,7 +2452,7 @@ public class ExtensionsChecker {
       }
     }
     return result;
-  }
+  } // method strInBnotInA
 
   private static GeneralName createGeneralName(GeneralName reqName, Set<GeneralNameMode> modes)
       throws BadCertTemplateException {
@@ -2537,7 +2537,7 @@ public class ExtensionsChecker {
     }
 
     return usages;
-  }
+  } // method getKeyUsage
 
   private static Set<String> getExtKeyUsage(byte[] extensionValue) {
     Set<String> usages = new HashSet<>();
@@ -2547,7 +2547,7 @@ public class ExtensionsChecker {
       usages.add(usage.getId());
     }
     return usages;
-  }
+  } // method getExtKeyUsage
 
   private static void checkAia(StringBuilder failureMsg, AuthorityInformationAccess aia,
       ASN1ObjectIdentifier accessMethod, Set<String> expectedUris) {
@@ -2606,12 +2606,12 @@ public class ExtensionsChecker {
       addViolation(failureMsg, "extension values", hex(extensionValue),
           (expected == null) ? "not present" : hex(expected));
     }
-  }
+  } // method checkConstantExtnValue
 
   private static void addViolation(StringBuilder failureMsg, String field,
       Object is, Object expected) {
     failureMsg.append(field).append(" is '").append(is)
       .append("' but expected '").append(expected).append("';");
-  }
+  } // method addViolation
 
 }

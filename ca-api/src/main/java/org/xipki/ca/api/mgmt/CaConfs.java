@@ -68,7 +68,7 @@ public class CaConfs {
     Args.notNull(out, "out");
     root.validate();
     JSON.writeJSONString(out, Charset.forName("UTF8"), root, SerializerFeature.PrettyFormat);
-  }
+  } // method marshal
 
   public static InputStream convertFileConfToZip(String confFilename)
       throws IOException, InvalidConfException {
@@ -280,7 +280,7 @@ public class CaConfs {
     }
 
     return new ByteArrayInputStream(bytesStream.toByteArray());
-  }
+  } // method convertFileConfToZip
 
   private static void createFileOrValue(ZipOutputStream zipStream, String content, String fileName)
       throws IOException {
@@ -291,7 +291,7 @@ public class CaConfs {
     } finally {
       zipStream.closeEntry();
     }
-  }
+  } // method createFileOrValue
 
   private static void createFileOrBinary(ZipOutputStream zipStream, byte[] content, String fileName)
       throws IOException {
@@ -302,13 +302,13 @@ public class CaConfs {
     } finally {
       zipStream.closeEntry();
     }
-  }
+  } // method createFileOrBinary
 
   private static String getValue(String fileName, Map<String, String> properties, String baseDir)
       throws IOException {
     byte[] binary = getBinary(fileName, properties, baseDir);
     return new String(binary, "UTF-8");
-  }
+  } // method getValue
 
   private static byte[] getBinary(String fileName, Map<String, String> properties, String baseDir)
       throws IOException {
@@ -317,7 +317,7 @@ public class CaConfs {
     InputStream is = Files.newInputStream(Paths.get(resolveFilePath(fileName, baseDir)));
 
     return IoUtil.read(is);
-  }
+  } // method getBinary
 
   private static String expandConf(String confStr, Map<String, String> properties) {
     if (confStr == null || !confStr.contains("${") || confStr.indexOf('}') == -1) {
@@ -332,12 +332,12 @@ public class CaConfs {
     }
 
     return confStr;
-  }
+  } // method expandConf
 
   private static String resolveFilePath(String filePath, String baseDir) {
     File file = new File(filePath);
     return file.isAbsolute() ? filePath : new File(baseDir, filePath).getPath();
-  }
+  } // method resolveFilePath
 
   private static String convertSignerConf(FileOrValue confFv, Map<String, String> properties,
       String baseDir) throws IOException {
@@ -370,6 +370,6 @@ public class CaConfs {
     }
 
     return changed ? confPairs.getEncoded() : conf;
-  }
+  } // method convertSignerConf
 
 }

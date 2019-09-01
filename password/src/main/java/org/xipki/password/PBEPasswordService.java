@@ -84,7 +84,7 @@ public class PBEPasswordService {
     }
 
     return ret;
-  } // method resolvePassword
+  } // method decryptPassword
 
   public static String encryptPassword(PBEAlgo algo, int iterationCount, char[] masterPassword,
       char[] password) throws PasswordResolverException {
@@ -125,6 +125,6 @@ public class PBEPasswordService {
     // cipher text
     System.arraycopy(encrypted, 0, encryptedText, offset, encrypted.length);
     return StringUtil.concat("PBE:", Base64.encodeToString(encryptedText));
-  }
+  } // method encryptPassword
 
 }

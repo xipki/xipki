@@ -186,7 +186,7 @@ public class ProfileConfCreatorDemo {
     NOT_IN_SUBJECT_RDNS.add(Extn.id_GMT_0015_OrganizationCode);
     NOT_IN_SUBJECT_RDNS.add(Extn.id_GMT_0015_TaxationNumber);
     NOT_IN_SUBJECT_RDNS.add(Extn.id_extension_admission);
-  }
+  } // method static
 
   private ProfileConfCreatorDemo() {
   }
@@ -465,7 +465,7 @@ public class ProfileConfCreatorDemo {
     list.add(createExtension(Extn.id_SCTs, true, false));
 
     return profile;
-  } // method certprofileCabTls
+  } // method getBaseCabSubscriberProfile
 
   private static void certprofileRootCa(String destFilename) throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile rootca", CertLevel.RootCA, "10y");
@@ -723,7 +723,7 @@ public class ProfileConfCreatorDemo {
     subField.setListValue(Arrays.asList(subsubField));
 
     return subFields;
-  }
+  } // method createConstantSequenceOrSet
 
   private static List<SubFieldSyntax> createSyntaxSequenceOrSet() {
     /*
@@ -775,7 +775,7 @@ public class ProfileConfCreatorDemo {
     subField.setSubFields(Arrays.asList(subsubField));
 
     return subFields;
-  }
+  } // method createSyntaxSequenceOrSet
 
   private static List<ConstantExtnValue> createConstantSequenceOfOrSetOf() {
     /*
@@ -845,7 +845,7 @@ public class ProfileConfCreatorDemo {
     }
 
     return subFields;
-  }
+  } // method createConstantSequenceOfOrSetOf
 
   private static List<SubFieldSyntax> createSyntaxSequenceOfOrSetOf() {
     /*
@@ -871,7 +871,7 @@ public class ProfileConfCreatorDemo {
     subsubFields.add(subsubField);
 
     return subFields;
-  }
+  } // method createSyntaxSequenceOfOrSetOf
 
   private static void certprofileOcsp(String destFilename) throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile ocsp", CertLevel.EndEntity, "5y",
@@ -1024,7 +1024,7 @@ public class ProfileConfCreatorDemo {
     last(list).setSmimeCapabilities(createSmimeCapabilities());
 
     marshall(profile, destFilename, true);
-  } // method certprofileTls
+  } // method certprofileSmime
 
   private static void certprofileTlsEdwardsOrMontgomery(String destFilename, boolean edwards,
       boolean curve25519) throws Exception {
@@ -1083,7 +1083,7 @@ public class ProfileConfCreatorDemo {
         null));
 
     marshall(profile, destFilename, true);
-  } // method certprofileTls
+  } // method certprofileTlsEdwardsOrMontgomery
 
   private static void certprofileTls(String destFilename, boolean incSerial) throws Exception {
     String desc = incSerial ? "certprofile tls-inc-sn (serial number will be added automatically)"
@@ -1330,7 +1330,7 @@ public class ProfileConfCreatorDemo {
     last(list).setQcStatements(createQcStatements(false));
 
     marshall(profile, destFilename, true);
-  } // method certprofileEeComplex
+  } // method certprofileQc
 
   private static void certprofileEeComplex(String destFilename) throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile ee-complex", CertLevel.EndEntity,
@@ -1700,7 +1700,7 @@ public class ProfileConfCreatorDemo {
     last(list).getConstant().setListValue(createConstantSequenceOfOrSetOf());
 
     return list;
-  }
+  } // method createConstantExtensions
 
   private static List<ExtensionType> createSyntaxExtensions(ASN1ObjectIdentifier oidPrefix,
       Tag tag) {
@@ -1756,7 +1756,7 @@ public class ProfileConfCreatorDemo {
     last(list).getSyntax().setSubFields(createSyntaxSequenceOfOrSetOf());
 
     return list;
-  }
+  } // method createSyntaxExtensions
 
   private static void certprofileMaxTime(String destFilename) throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile max-time", CertLevel.EndEntity,
@@ -2049,7 +2049,7 @@ public class ProfileConfCreatorDemo {
     }
 
     marshall(profile, destFilename, true);
-  } // method certprofileGmt0012
+  } // method certprofileGmt0015
 
   private static void certprofileExtended(String destFilename) throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile extended", CertLevel.EndEntity, "5y");
@@ -2237,7 +2237,7 @@ public class ProfileConfCreatorDemo {
     }
 
     return ret;
-  }
+  } // method createConstantExtension
 
   private static ExtensionType createSyntaxExtension(ASN1ObjectIdentifier type, boolean required,
       boolean critical, Tag tag, FieldType fieldType) {
@@ -2261,7 +2261,7 @@ public class ProfileConfCreatorDemo {
     ret.setSyntax(extnSyntax);
 
     return ret;
-  }
+  } // method createSyntaxExtension
 
   private static ExtensionType.KeyUsage createKeyUsage(KeyUsage[] requiredUsages,
       KeyUsage[] optionalUsages) {
@@ -2284,15 +2284,14 @@ public class ProfileConfCreatorDemo {
     }
 
     return extValue;
-  }
+  } // method createKeyUsage
 
   // CHECKSTYLE:SKIP
   private static AuthorityKeyIdentifier createAKIwithSerialAndSerial() {
     AuthorityKeyIdentifier akiType = new AuthorityKeyIdentifier();
     akiType.setUseIssuerAndSerial(true);
     return akiType;
-
-  }
+  } // method createAKIwithSerialAndSerial
 
   private static AuthorityInfoAccess createAuthorityInfoAccess() {
     AuthorityInfoAccess extnValue = new AuthorityInfoAccess();
@@ -2301,7 +2300,7 @@ public class ProfileConfCreatorDemo {
     extnValue.setCaIssuersProtocols(new HashSet<>(Arrays.asList("http")));
     extnValue.setOcspProtocols(new HashSet<>(Arrays.asList("http")));
     return extnValue;
-  }
+  } // method createAuthorityInfoAccess
 
   private static CrlDistributionPoints createCrlDistibutoionPoints() {
     CrlDistributionPoints extnValue = new CrlDistributionPoints();
@@ -2335,7 +2334,7 @@ public class ProfileConfCreatorDemo {
     }
 
     return extValue;
-  }
+  } // method createExtendedKeyUsage
 
   private static ExtendedKeyUsage.Usage createSingleExtKeyUsage(
       ASN1ObjectIdentifier usage, boolean required) {
@@ -2347,14 +2346,14 @@ public class ProfileConfCreatorDemo {
       type.setDescription(desc);
     }
     return type;
-  }
+  } // method createSingleExtKeyUsage
 
   private static Restriction createRestriction(DirectoryStringType type, String text) {
     Restriction extValue = new Restriction();
     extValue.setType(type);
     extValue.setText(text);
     return extValue;
-  }
+  } // method createRestriction
 
   private static AdditionalInformation createAdditionalInformation(DirectoryStringType type,
       String text) {
@@ -2362,7 +2361,7 @@ public class ProfileConfCreatorDemo {
     extValue.setType(type);
     extValue.setText(text);
     return extValue;
-  }
+  } // method createAdditionalInformation
 
   private static PrivateKeyUsagePeriod createPrivateKeyUsagePeriod(String validity) {
     PrivateKeyUsagePeriod extValue = new PrivateKeyUsagePeriod();
@@ -2496,13 +2495,13 @@ public class ProfileConfCreatorDemo {
     extValue.setAccessRights(accessRights);
 
     return extValue;
-  }
+  } // method createAuthorizationTemplate
 
   private static ValidityModel createValidityModel(DescribableOid modelId) {
     ValidityModel extValue = new ValidityModel();
     extValue.setModelId(modelId);
     return extValue;
-  }
+  } // method createValidityModel
 
   private static CertificatePolicies createCertificatePolicies(
       Map<ASN1ObjectIdentifier, String> policies) {
@@ -2529,7 +2528,7 @@ public class ProfileConfCreatorDemo {
     }
 
     return extValue;
-  }
+  } // method createCertificatePolicies
 
   private static String getDescription(ASN1ObjectIdentifier oid) {
     return ObjectIdentifiers.getName(oid);
@@ -2542,7 +2541,7 @@ public class ProfileConfCreatorDemo {
     ret.setSubjectDomainPolicy(createOidType(subjectPolicyId));
 
     return ret;
-  }
+  } // method createPolicyIdMapping
 
   private static PolicyConstraints createPolicyConstraints(Integer inhibitPolicyMapping,
       Integer requireExplicitPolicy) {
@@ -2555,7 +2554,7 @@ public class ProfileConfCreatorDemo {
       ret.setRequireExplicitPolicy(requireExplicitPolicy);
     }
     return ret;
-  }
+  } // method createPolicyConstraints
 
   private static NameConstraints createNameConstraints() {
     NameConstraints ret = new NameConstraints();
@@ -2576,13 +2575,13 @@ public class ProfileConfCreatorDemo {
     ret.setExcludedSubtrees(excluded);
 
     return ret;
-  }
+  } // method createNameConstraints
 
   private static InhibitAnyPolicy createInhibitAnyPolicy(int skipCerts) {
     InhibitAnyPolicy ret = new InhibitAnyPolicy();
     ret.setSkipCerts(skipCerts);
     return ret;
-  }
+  } // method createInhibitAnyPolicy
 
   private static DescribableOid createOidType(ASN1ObjectIdentifier oid) {
     return createOidType(oid, null);
@@ -2597,7 +2596,7 @@ public class ProfileConfCreatorDemo {
       ret.setDescription(desc);
     }
     return ret;
-  }
+  } // method
 
   private static X509ProfileType getBaseCabProfile(String description, CertLevel certLevel,
       String validity) {
@@ -2647,7 +2646,7 @@ public class ProfileConfCreatorDemo {
     profile.setKeyAlgorithms(createCabKeyAlgorithms());
 
     return profile;
-  } // method getBaseProfile
+  } // method getBaseCabProfile
 
   private static X509ProfileType getBaseProfile(String description, CertLevel certLevel,
       String validity) {
@@ -2924,7 +2923,7 @@ public class ProfileConfCreatorDemo {
     rsaParams.getModulusLengths().add(createRange(4096));
 
     return list;
-  }
+  } // method createRSAKeyAlgorithms
 
   private static Range createRange(int size) {
     return createRange(size, size);
@@ -2935,14 +2934,14 @@ public class ProfileConfCreatorDemo {
     ret.setMin(min);
     ret.setMax(max);
     return ret;
-  }
+  } // method createRange
 
   private static Map<String, String> createDescription(String details) {
     Map<String, String> map = new HashMap<>();
     map.put("category", "A");
     map.put("details", details);
     return map;
-  }
+  } // method createDescription
 
   private static TlsFeature createTlsFeature(TlsExtensionType... features) {
     List<TlsExtensionType> exts = Arrays.asList(features);
@@ -2957,7 +2956,7 @@ public class ProfileConfCreatorDemo {
     }
 
     return tlsFeature;
-  }
+  } // method createTlsFeature
 
   private static SmimeCapabilities createSmimeCapabilities() {
     SmimeCapabilities caps = new SmimeCapabilities();
@@ -2991,7 +2990,7 @@ public class ProfileConfCreatorDemo {
     cap.getParameter().setBinary(binary);
 
     return caps;
-  }
+  } // method createSmimeCapabilities
 
   private static List<ASN1ObjectIdentifier> sortOidList(List<ASN1ObjectIdentifier> oids) {
     Args.notNull(oids, "oids");
@@ -3010,7 +3009,7 @@ public class ProfileConfCreatorDemo {
       }
     }
     return sorted;
-  }
+  } // method sortOidList
 
   private static <T> T last(List<T> list) {
     if (list == null || list.isEmpty()) {
@@ -3019,5 +3018,5 @@ public class ProfileConfCreatorDemo {
       return list.get(list.size() - 1);
     }
 
-  }
+  } // method last
 }

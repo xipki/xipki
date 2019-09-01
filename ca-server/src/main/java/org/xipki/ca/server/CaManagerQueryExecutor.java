@@ -81,7 +81,7 @@ class CaManagerQueryExecutor {
     INT,
     STRING,
     BOOL
-  }
+  } // class ColumnType
 
   private static class SqlColumn {
 
@@ -124,7 +124,7 @@ class CaManagerQueryExecutor {
       return signerConf;
     }
 
-  }
+  } // class SqlColumn
 
   static class SystemEvent {
 
@@ -152,7 +152,7 @@ class CaManagerQueryExecutor {
       return eventTime;
     }
 
-  }
+  } // class SystemEvent
 
   private static final Logger LOG = LoggerFactory.getLogger(CaManagerQueryExecutor.class);
 
@@ -198,7 +198,7 @@ class CaManagerQueryExecutor {
         "EVENT_TIME,EVENT_OWNER FROM SYSTEM_EVENT WHERE NAME=?");
     this.sqlSelectUserId = buildSelectFirstSql("ID FROM TUSER WHERE NAME=?");
     this.sqlSelectUser = buildSelectFirstSql("ID,ACTIVE,PASSWORD FROM TUSER WHERE NAME=?");
-  }
+  } // constructor
 
   private String buildSelectFirstSql(String coreSql) {
     return datasource.buildSelectFirstSql(1, coreSql);
@@ -223,7 +223,7 @@ class CaManagerQueryExecutor {
     } catch (CertificateException | IOException ex) {
       throw new CaMgmtException(ex);
     }
-  } // method generateCert
+  } // method generateCertchain
 
   private Statement createStatement() throws CaMgmtException {
     try {
@@ -312,7 +312,7 @@ class CaManagerQueryExecutor {
   void changeSystemEvent(SystemEvent systemEvent) throws CaMgmtException {
     deleteSystemEvent(systemEvent.getName());
     addSystemEvent(systemEvent);
-  }
+  } // method changeSystemEvent
 
   Map<String, Integer> createCaAliases() throws CaMgmtException {
     Map<String, Integer> map = new HashMap<>();
@@ -385,7 +385,7 @@ class CaManagerQueryExecutor {
     } finally {
       datasource.releaseResources(stmt, rs);
     }
-  } // method getNamesFromTable
+  } // method namesFromTable
 
   MgmtEntry.Publisher createPublisher(String name) throws CaMgmtException {
     final String sql = sqlSelectPublisher;
@@ -429,7 +429,7 @@ class CaManagerQueryExecutor {
     } finally {
       datasource.releaseResources(stmt, rs);
     }
-  }
+  } // method getRequestorId
 
   MgmtEntry.Requestor createRequestor(String name) throws CaMgmtException {
     final String sql = sqlSelectRequestor;
@@ -475,7 +475,7 @@ class CaManagerQueryExecutor {
     } finally {
       datasource.releaseResources(stmt, rs);
     }
-  } // method createResponder
+  } // method createSigner
 
   CaInfo createCaInfo(String name, boolean masterMode, CertStore certstore) throws CaMgmtException {
     final String sql = sqlSelectCa;
@@ -671,7 +671,7 @@ class CaManagerQueryExecutor {
     } finally {
       datasource.releaseResources(stmt, rs);
     }
-  } // method createCaHasNames
+  } // method createCaHasPublishers
 
   boolean deleteRowWithName(String name, String table) throws CaMgmtException {
     return deleteRowWithName(name, table, false);
@@ -929,7 +929,7 @@ class CaManagerQueryExecutor {
     } finally {
       datasource.releaseResources(stmt, rs);
     }
-  }
+  } // method addRequestorIfNeeded
 
   void addRequestorToCa(MgmtEntry.CaHasRequestor requestor, NameId ca) throws CaMgmtException {
     Args.notNull(requestor, "requestor");
@@ -1348,7 +1348,7 @@ class CaManagerQueryExecutor {
     } finally {
       datasource.releaseResources(ps, null);
     }
-  }
+  } // method changeIfNotNull
 
   private void setColumn(Map<String, String> changedColumns, PreparedStatement ps,
       int index, SqlColumn column) throws SQLException {
@@ -1396,7 +1396,7 @@ class CaManagerQueryExecutor {
     if (changedColumns != null) {
       changedColumns.put(name, sensitive ? "*****" : valText);
     }
-  }
+  } // method setColumn
 
   RequestorEntryWrapper changeRequestor(NameId nameId, String type, String conf,
       PasswordResolver passwordResolver) throws CaMgmtException {
@@ -1733,7 +1733,7 @@ class CaManagerQueryExecutor {
     } finally {
       datasource.releaseResources(ps, null);
     }
-  } // method removeRequestorFromCa
+  } // method removeUserFromCa
 
   void addUserToCa(MgmtEntry.CaHasUser user, NameId ca) throws CaMgmtException {
     Args.notNull(user, "user");
@@ -1901,7 +1901,7 @@ class CaManagerQueryExecutor {
     } catch (CertificateException | IOException ex) {
       throw new CaMgmtException(ex);
     }
-  }
+  } // method encodeCertchain
 
   private static List<X509Certificate> buildCertChain(X509Certificate targetCert,
       List<X509Certificate> certs) throws CaMgmtException {
@@ -1916,7 +1916,7 @@ class CaManagerQueryExecutor {
       throw new CaMgmtException("could not build certchain containing all specified certs");
     }
     return Arrays.asList(certchain);
-  }
+  } // method buildCertChain
 
   private static X509Certificate parseCert(byte[] encodedCert) throws CaMgmtException {
     try {
@@ -1924,7 +1924,7 @@ class CaManagerQueryExecutor {
     } catch (CertificateException ex) {
       throw new CaMgmtException("could not parse certificate", ex);
     }
-  }
+  } // method parseCert
 
   private int getNonNullIdForName(String sql, String name) throws CaMgmtException {
     Integer id = getIdForName(sql, name);
@@ -1933,7 +1933,7 @@ class CaManagerQueryExecutor {
     }
 
     throw new CaMgmtException(concat("Found no entry named ",name));
-  }
+  } // method getNonNullIdForName
 
   private Integer getIdForName(String sql, String name) throws CaMgmtException {
     PreparedStatement ps = null;
@@ -1952,7 +1952,7 @@ class CaManagerQueryExecutor {
     } finally {
       datasource.releaseResources(ps, rs);
     }
-  }
+  } // method getIdForName
 
   private Map<Integer, String> getIdNameMap(String tableName) throws CaMgmtException {
     final String sql = concat("SELECT ID,NAME FROM ", tableName);
@@ -1973,7 +1973,7 @@ class CaManagerQueryExecutor {
     }
 
     return ret;
-  }
+  } // method getIdNameMap
 
   private static String concat(String s1, String... strs) {
     return StringUtil.concat(s1, strs);

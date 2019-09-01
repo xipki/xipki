@@ -82,7 +82,7 @@ public class GeneralNameType extends ValidatableConf {
     }
 
     return ret;
-  }
+  } // method toGeneralNameModes
 
   public void addTags(GeneralNameTag... tags) {
     for (GeneralNameTag tag : tags) {
@@ -94,7 +94,7 @@ public class GeneralNameType extends ValidatableConf {
     for (GeneralNameTag tag : tags) {
       getModes().add(tag.name());
     }
-  }
+  } // method addTags
 
   public void addOtherNames(DescribableOid... oids) {
     StringBuilder sb = new StringBuilder("otherName:");
@@ -105,7 +105,7 @@ public class GeneralNameType extends ValidatableConf {
       sb.append(oids[i].getOid());
     }
     getModes().add(sb.toString());
-  }
+  } // method addOtherNames
 
   @Override
   public void validate() throws InvalidConfException {

@@ -103,7 +103,7 @@ public class QaCaActions {
       return null;
     } // method execute0
 
-  }
+  } // class Init
 
   @Command(scope = "caqa", name = "check-cert", description = "check the certificate")
   @Service
@@ -211,7 +211,7 @@ public class QaCaActions {
       }
     }
 
-  }
+  } // class CheckCert
 
   @Command(scope = "caqa", name = "caalias-check", description = "check CA aliases (QA)")
   @Service
@@ -237,7 +237,7 @@ public class QaCaActions {
       return null;
     }
 
-  }
+  } // class CaAliasCheck
 
   @Command(scope = "xiqa", name = "cmp-benchmark-enroll",
       description = "CA client enroll (benchmark)")
@@ -332,7 +332,7 @@ public class QaCaActions {
       return null;
     } // method execute0
 
-  }
+  } // class CmpBenchmarkEnroll
 
   @Command(scope = "caqa", name = "ca-check", description = "check information of CAs (QA)")
   @Service
@@ -486,7 +486,7 @@ public class QaCaActions {
       return null;
     } // method execute0
 
-  }
+  } // class CaCheck
 
   @Command(scope = "caqa", name = "caprofile-check",
       description = "check information of certificate profiles in given CA (QA)")
@@ -518,7 +518,7 @@ public class QaCaActions {
       return null;
     }
 
-  }
+  } // class CaprofileCheck
 
   @Command(scope = "caqa", name = "capub-check",
       description = "check information of publishers in given CA (QA)")
@@ -554,7 +554,7 @@ public class QaCaActions {
       throw new CmdFailure("CA is not associated with publisher '" + publisherName + "'");
     }
 
-  }
+  } // class CapubCheck
 
   @Command(scope = "caqa", name = "careq-check",
       description = "check information of requestors in CA (QA)")
@@ -636,7 +636,7 @@ public class QaCaActions {
       return null;
     } // method execute0
 
-  }
+  } // class CaReqCheck
 
   @Command(scope = "caqa", name = "neg-ca-add", description = "add CA (negative, QA)")
   @Service
@@ -655,7 +655,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegCaAdd
 
   @Command(scope = "caqa", name = "neg-caalias-add", description = "add CA alias (negative, QA)")
   @Service
@@ -674,7 +674,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegCaaliasAdd
 
   @Command(scope = "caqa", name = "neg-caalias-rm", description = "remove CA alias (negative, QA)")
   @Service
@@ -693,7 +693,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegCaaliasRm
 
   @Command(scope = "caqa", name = "neg-caprofile-add",
       description = "add certificate profiles to CA (negative, QA)")
@@ -713,7 +713,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegCaprofileAdd
 
   @Command(scope = "caqa", name = "neg-caprofile-rm",
       description = "remove certificate profile from CA (negative, QA)")
@@ -733,7 +733,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegCaprofileRm
 
   @Command(scope = "caqa", name = "neg-capub-add",
       description = "add publishers to CA (negative, QA)")
@@ -753,7 +753,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegCaPubAdd
 
   @Command(scope = "caqa", name = "neg-capub-rm",
       description = "remove publisher from CA (negative, QA)")
@@ -773,7 +773,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegCapubRm
 
   @Command(scope = "caqa", name = "neg-ca-rm", description = "remove CA (negative, QA)")
   @Service
@@ -792,7 +792,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegCaRm
 
   @Command(scope = "caqa", name = "neg-careq-add",
       description = "add requestor to CA (negative, QA)")
@@ -812,7 +812,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegCaReqAdd
 
   @Command(scope = "caqa", name = "neg-careq-rm",
       description = "remove requestor in CA (negative, QA)")
@@ -832,7 +832,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegCareqRm
 
   @Command(scope = "caqa", name = "neg-ca-revoke", description = "revoke CA (negative, QA)")
   @Service
@@ -851,7 +851,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegCaRevoke
 
   @Command(scope = "caqa", name = "neg-ca-unrevoke", description = "unrevoke CA (negative, QA)")
   @Service
@@ -870,7 +870,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegCaUnrevoke
 
   @Command(scope = "caqa", name = "neg-ca-up", description = "update CA (negative, QA)")
   @Service
@@ -889,7 +889,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegCaUp
 
   @Command(scope = "caqa", name = "neg-clear-publishqueue",
       description = "clear publish queue (negative, QA)")
@@ -909,7 +909,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegClearPublishQueue
 
   @Command(scope = "caqa", name = "neg-enroll-cert",
       description = "enroll certificate (negative, QA)")
@@ -929,7 +929,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegEnrollCert
 
   @Command(scope = "caqa", name = "neg-gen-rootca",
       description = "generate selfsigned CA (negative, QA)")
@@ -949,7 +949,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegGenRootCa
 
   @Command(scope = "caqa", name = "neg-profile-add",
       description = "add certificate profile (negative, QA)")
@@ -969,7 +969,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegProfileAdd
 
   @Command(scope = "caqa", name = "profile-check",
       description = "check information of profiles (QA)")
@@ -1004,7 +1004,7 @@ public class QaCaActions {
       return null;
     }
 
-  }
+  } // class ProfileCheck
 
   @Command(scope = "caqa", name = "neg-profile-rm", description = "remove Profile (negative, QA)")
   @Service
@@ -1023,7 +1023,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegProfileRm
 
   @Command(scope = "caqa", name = "neg-profile-up",
       description = "update certificate profile (negative, QA)")
@@ -1043,7 +1043,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegProfileUp
 
   @Command(scope = "caqa", name = "neg-publisher-add", description = "add publisher (negative, QA)")
   @Service
@@ -1062,7 +1062,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegPublisherAdd
 
   @Command(scope = "caqa", name = "publisher-check",
       description = "check information of publishers (QA)")
@@ -1090,7 +1090,7 @@ public class QaCaActions {
       return null;
     }
 
-  }
+  } // class PublisherCheck
 
   @Command(scope = "caqa", name = "neg-publisher-rm",
       description = "remove publisher (negative, QA)")
@@ -1110,7 +1110,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegPublisherRm
 
   @Command(scope = "caqa", name = "neg-publisher-up",
       description = "update publisher (negative, QA)")
@@ -1130,7 +1130,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegPublisherUp
 
   @Command(scope = "caqa", name = "neg-republish",
       description = "republish certificates (negative, QA)")
@@ -1150,7 +1150,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegRepublish
 
   @Command(scope = "caqa", name = "neg-requestor-add", description = "add requestor (negative, QA)")
   @Service
@@ -1169,7 +1169,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegRequestorAdd
 
   @Command(scope = "caqa", name = "requestor-check",
       description = "check information of requestors (QA)")
@@ -1215,9 +1215,9 @@ public class QaCaActions {
 
       println(" checked requestor " + name);
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class RequestorCheck
 
   @Command(scope = "caqa", name = "neg-requestor-rm",
       description = "remove requestor (negative, QA)")
@@ -1237,7 +1237,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegRequestorRm
 
   @Command(scope = "caqa", name = "neg-requestor-up",
       description = "update requestor (negative, QA)")
@@ -1257,7 +1257,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegRequestorUp
 
   @Command(scope = "caqa", name = "neg-rm-cert", description = "remove certificate (negative, QA)")
   @Service
@@ -1276,7 +1276,7 @@ public class QaCaActions {
       throw new CmdFailure("Exception expected, but received none");
     }
 
-  }
+  } // class NegRmCert
 
   @Command(scope = "caqa", name = "neg-revoke-cert",
       description = "revoke certificate (negative, QA)")
@@ -1296,7 +1296,7 @@ public class QaCaActions {
       throw new CmdFailure("Exception expected, but received none");
     }
 
-  }
+  } // class NegRevokeCert
 
   @Command(scope = "caqa", name = "neg-signer-add", description = "add signer (negative, QA)")
   @Service
@@ -1315,7 +1315,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegSignerAdd
 
   @Command(scope = "caqa", name = "signer-check", description = "check information of signer (QA)")
   @Service
@@ -1353,7 +1353,7 @@ public class QaCaActions {
       return null;
     }
 
-  }
+  } // class SignerCheck
 
   @Command(scope = "caqa", name = "neg-signer-rm", description = "remove signer (negative, QA)")
   @Service
@@ -1372,7 +1372,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegSignerRm
 
   @Command(scope = "caqa", name = "neg-signer-up", description = "update signer (negative, QA)")
   @Service
@@ -1391,7 +1391,7 @@ public class QaCaActions {
       throw new CmdFailure("exception expected, but received none");
     }
 
-  }
+  } // class NegSignerUp
 
   @Command(scope = "caqa", name = "neg-unrevoke-cert",
       description = "unrevoke certificate (negative, QA)")
@@ -1411,7 +1411,7 @@ public class QaCaActions {
       throw new CmdFailure("Exception expected, but received none");
     }
 
-  }
+  } // class NegUnrevokeCert
 
   public static void assertTypeEquals(String desc, String ex, String is) throws CmdFailure {
     String tmpEx = ex;
@@ -1423,7 +1423,7 @@ public class QaCaActions {
     if (!bo) {
       throw new CmdFailure(desc + ": is '" + is + "', but expected '" + tmpEx + "'");
     }
-  }
+  } // method assertTypeEquals
 
   public static void assertEquals(String desc, String ex, String is) throws CmdFailure {
     String tmpEx = ex;
@@ -1435,7 +1435,7 @@ public class QaCaActions {
     if (!bo) {
       throw new CmdFailure(desc + ": is '" + is + "', but expected '" + tmpEx + "'");
     }
-  }
+  } // method assertEquals
 
   public static void assertEquals(String desc, Collection<?> ex, Collection<?> is)
       throws CmdFailure {
@@ -1443,14 +1443,14 @@ public class QaCaActions {
     if (!bo) {
       throw new CmdFailure(desc + ": is '" + is + "', but expected '" + ex + "'");
     }
-  }
+  } // method assertEquals
 
   public static void assertObjEquals(String desc, Object ex, Object is) throws CmdFailure {
     boolean bo = (ex == null) ? (is == null) : ex.equals(is);
     if (!bo) {
       throw new CmdFailure(desc + ": is '" + is + "', but expected '" + ex + "'");
     }
-  }
+  } // method assertObjEquals
 
   public static boolean certEquals(byte[] certBytes1, byte[] certBytes2) {
     if (certBytes1 == null && certBytes2 == null) {
@@ -1466,6 +1466,6 @@ public class QaCaActions {
     } else {
       return false;
     }
-  }
+  } // method certEquals
 
 }

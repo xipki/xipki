@@ -90,7 +90,7 @@ class IssuerEntry {
       hashes.put(ha, nameAndKeyHash);
     }
     return hashes;
-  }
+  } // method getIssuerHashAndKeys
 
   public int getId() {
     return id;

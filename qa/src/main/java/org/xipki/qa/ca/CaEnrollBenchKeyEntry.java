@@ -127,7 +127,7 @@ public abstract class CaEnrollBenchKeyEntry {
             new org.bouncycastle.asn1.pkcs.RSAPublicKey(
                 publicKey.getModulus(), publicKey.getPublicExponent()));
       }
-    }
+    } // constructor
 
     private static BigInteger base64ToInt(String base64Str) {
       return new BigInteger(1, Base64.decode(base64Str));

@@ -181,7 +181,7 @@ public class CaEmulator {
     serialCertMap.put(tmpSerialNumber, asn1Cert);
     reqSubjectCertMap.put(subjectDn, asn1Cert);
     return asn1Cert;
-  }
+  } // method generateCert
 
   public Certificate getCert(X500Name issuer, BigInteger serialNumber) {
     if (!caSubject.equals(issuer)) {
@@ -223,7 +223,7 @@ public class CaEmulator {
     ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(caKey);
     X509CRLHolder crl = crlBuilder.build(contentSigner);
     return crl.toASN1Structure();
-  }
+  } // method getCrl
 
   private boolean verifyPopo(CertificationRequest csr) {
     Args.notNull(csr, "csr");
@@ -238,7 +238,7 @@ public class CaEmulator {
       LOG.error("could not validate POPO of CSR", ex);
       return false;
     }
-  }
+  } // method verifyPopo
 
   public ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey)
       throws InvalidKeyException {
@@ -270,7 +270,7 @@ public class CaEmulator {
       throw new InvalidKeyException("could not build ContentVerifierProvider: " + ex.getMessage(),
           ex);
     }
-  }
+  } // method getContentVerifierProvider
 
   private static PublicKey generatePublicKey(SubjectPublicKeyInfo pkInfo)
       throws InvalidKeySpecException {
@@ -304,7 +304,7 @@ public class CaEmulator {
     }
 
     return kf.generatePublic(keyspec);
-  }
+  } // method generatePublicKey
 
   private static AsymmetricKeyParameter generatePublicKeyParameter(PublicKey key)
       throws InvalidKeyException {
@@ -320,6 +320,6 @@ public class CaEmulator {
     } else {
       throw new InvalidKeyException("unknown key " + key.getClass().getName());
     }
-  }
+  } // method generatePublicKeyParameter
 
 }

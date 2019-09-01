@@ -81,7 +81,7 @@ public class GMUtil {
     byte[] result = new byte[digest.getDigestSize()];
     digest.doFinal(result, 0);
     return result;
-  }
+  } // method getSM2Z
 
   private static void addUserId(Digest digest, byte[] userId) {
     int len = userId.length * 8;

@@ -118,7 +118,7 @@ public class P11Actions {
       return null;
     }
 
-  }
+  } // class AddCertP11
 
   @Command(scope = "xi", name = "delete-cert-p11",
       description = "remove certificate from PKCS#11 device")
@@ -148,7 +148,7 @@ public class P11Actions {
       return null;
     }
 
-  }
+  } // class DeleteCertP11
 
   @Command(scope = "xi", name = "export-cert-p11",
       description = "export certificate from PKCS#11 device")
@@ -186,7 +186,7 @@ public class P11Actions {
       return null;
     }
 
-  }
+  } // class ExportCertP11
 
   @Command(scope = "xi", name = "update-cert-p11",
       description = "update certificate in PKCS#11 device")
@@ -217,7 +217,7 @@ public class P11Actions {
       return null;
     }
 
-  }
+  } // class UpdateCertP11
 
   @Command(scope = "xi", name = "csr-p11", description = "generate CSR request with PKCS#11 device")
   @Service
@@ -290,9 +290,9 @@ public class P11Actions {
       }
 
       return new SignerConf(conf.getEncoded(), hashAlgo, signatureAlgoControl);
-    }
+    } // method getPkcs11SignerConf
 
-  }
+  } // class CsrP11
 
   @Command(scope = "xi", name = "dsa-p11", description = "generate DSA keypair in PKCS#11 device")
   @Service
@@ -326,7 +326,7 @@ public class P11Actions {
       return null;
     }
 
-  }
+  } // method Dsa11
 
   @Command(scope = "xi", name = "ec-p11", description = "generate EC keypair in PKCS#11 device")
   @Service
@@ -360,7 +360,7 @@ public class P11Actions {
       return null;
     }
 
-  }
+  } // class EcP11
 
   @Command(scope = "xi", name = "delete-key-p11",
       description = "delete key and cert in PKCS#11 device")
@@ -396,7 +396,7 @@ public class P11Actions {
       return null;
     }
 
-  }
+  } // class DeleteKeyP11
 
   public abstract static class P11KeyGenAction extends P11SecurityAction {
 
@@ -440,7 +440,7 @@ public class P11Actions {
       return control;
     }
 
-  }
+  } // class P11KeyGenAction
 
   @Command(scope = "xi", name = "delete-objects-p11",
       description = "delete objects in PKCS#11 device")
@@ -475,7 +475,7 @@ public class P11Actions {
       return null;
     }
 
-  }
+  } // class DeleteObjectsP11
 
   @Command(scope = "xi", name = "p11prov-sm2-test",
       description = "test the SM2 implementation of Xipki PKCS#11 JCA/JCE provider")
@@ -551,7 +551,7 @@ public class P11Actions {
       boolean valid = ver.verify(signature);
       println("signature valid: " + valid);
       return null;
-    }
+    } // method execute0
 
     private String getAlias() {
       if (label != null) {
@@ -563,7 +563,7 @@ public class P11Actions {
       }
     }
 
-  }
+  } // class P11provSm2Test
 
   @Command(scope = "xi", name = "p11prov-test",
       description = "test the Xipki PKCS#11 JCA/JCE provider")
@@ -646,7 +646,7 @@ public class P11Actions {
       boolean valid = ver.verify(signature);
       println("signature valid: " + valid);
       return null;
-    }
+    } // method execute0
 
     private String getAlias() {
       if (label != null) {
@@ -665,7 +665,7 @@ public class P11Actions {
       return AlgorithmUtil.getSignatureAlgoName(sigAlgId);
     }
 
-  }
+  } // class P11provTest
 
   @Command(scope = "xi", name = "refresh-p11", description = "refresh PKCS#11 module")
   @Service
@@ -689,7 +689,7 @@ public class P11Actions {
       return null;
     }
 
-  }
+  } // class RefreshP11
 
   @Command(scope = "xi", name = "rsa-p11", description = "generate RSA keypair in PKCS#11 device")
   @Service
@@ -714,7 +714,7 @@ public class P11Actions {
       return null;
     }
 
-  }
+  } // class RsaP11
 
   @Command(scope = "xi", name = "secretkey-p11",
       description = "generate secret key in PKCS#11 device")
@@ -795,9 +795,9 @@ public class P11Actions {
       }
 
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class SecretkeyP11
 
   @Command(scope = "xi", name = "import-secretkey-p11",
       description = "import secret key with given value in PKCS#11 device")
@@ -863,7 +863,7 @@ public class P11Actions {
       P11ObjectIdentifier objId = slot.importSecretKey(p11KeyType, keyValue, getControl());
       println("imported " + keyType + " key " + objId);
       return null;
-    }
+    } // method execute0
 
     protected char[] getPassword() throws IOException {
       char[] pwdInChar = readPasswordIfNotSet(password);
@@ -873,7 +873,7 @@ public class P11Actions {
       return pwdInChar;
     }
 
-  }
+  } // class ImportSecretkeyP11
 
   public abstract static class P11SecurityAction extends SecurityAction {
 
@@ -921,7 +921,7 @@ public class P11Actions {
       return objIdentifier;
     }
 
-  }
+  } // class P11SecurityAction
 
   @Command(scope = "xi", name = "sm2-p11",
       description = "generate SM2 (curve sm2p256v1) keypair in PKCS#11 device")
@@ -936,7 +936,7 @@ public class P11Actions {
       return null;
     }
 
-  }
+  } // class Sm2P11
 
   @Command(scope = "xi", name = "token-info-p11", description = "list objects in PKCS#11 device")
   @Service
@@ -997,6 +997,6 @@ public class P11Actions {
       }
     }
 
-  }
+  } // class TokenInfoP11
 
 }

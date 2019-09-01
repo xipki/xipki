@@ -43,7 +43,7 @@ public class KeypairGenControl {
 
     private ForbiddenKeypairGenControl() {
     }
-  }
+  } // class class
 
   // CHECKSTYLE:SKIP
   public static class InheritCAKeypairGenControl extends KeypairGenControl {
@@ -51,7 +51,7 @@ public class KeypairGenControl {
 
     private InheritCAKeypairGenControl() {
     }
-  }
+  } // class InheritCAKeypairGenControl
 
   // CHECKSTYLE:SKIP
   public static class RSAKeypairGenControl extends KeypairGenControl {
@@ -78,7 +78,7 @@ public class KeypairGenControl {
       this.keyAlgorithm = new AlgorithmIdentifier(
           (keyAlgorithmOid != null) ? keyAlgorithmOid : PKCSObjectIdentifiers.rsaEncryption,
           DERNull.INSTANCE);
-    }
+    } // constructor
 
     public int getKeysize() {
       return keysize;
@@ -92,7 +92,7 @@ public class KeypairGenControl {
       return keyAlgorithm;
     }
 
-  }
+  } // class RSAKeypairGenControl
 
   // CHECKSTYLE:SKIP
   public static class ECKeypairGenControl extends KeypairGenControl {
@@ -121,7 +121,7 @@ public class KeypairGenControl {
       return keyAlgorithm;
     }
 
-  }
+  } // class ECKeypairGenControl
 
   // CHECKSTYLE:SKIP
   public static class DSAKeypairGenControl extends KeypairGenControl {
@@ -174,7 +174,7 @@ public class KeypairGenControl {
       return keyAlgorithm;
     }
 
-  }
+  } // class DSAKeypairGenControl
 
   // CHECKSTYLE:SKIP
   public static class EDDSAKeypairGenControl extends KeypairGenControl {
@@ -189,6 +189,6 @@ public class KeypairGenControl {
       return keyAlgorithm;
     }
 
-  }
+  } // class EDDSAKeypairGenControl
 
 }

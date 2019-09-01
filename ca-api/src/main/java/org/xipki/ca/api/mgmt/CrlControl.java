@@ -317,7 +317,7 @@ public class CrlControl {
         "\n  interval: ", intervalStr,
         "\n  XiPKI CertSet: ", xipkiCertSetStr,
         (verbose ? "\n  encoded: " : ""), (verbose ? getConf() : ""));
-  }
+  } // method toString(boolean)
 
   public boolean isXipkiCertsetIncluded() {
     return xipkiCertsetIncluded;
@@ -392,7 +392,7 @@ public class CrlControl {
       throw new InvalidConfException(
           "deltaCRLIntervals may not be less than 0: " + deltaCrlIntervals);
     }
-  }
+  } // method validate
 
   @Override
   public int hashCode() {
@@ -445,7 +445,7 @@ public class CrlControl {
       }
     }
     return dfltValue;
-  }
+  } // method getInteger
 
   private static boolean getBoolean(ConfPairs props, String propKey, boolean dfltValue)
       throws InvalidConfException {
@@ -461,6 +461,6 @@ public class CrlControl {
       }
     }
     return dfltValue;
-  }
+  } // method getBoolean
 
 }

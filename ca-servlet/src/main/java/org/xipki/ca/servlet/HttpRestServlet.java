@@ -131,6 +131,6 @@ public class HttpRestServlet extends HttpServlet {
       event.finish();
       auditService.logEvent(event);
     }
-  } // method service
+  } // method service0
 
 }

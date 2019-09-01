@@ -183,7 +183,7 @@ public class ProxyP11Module extends P11Module {
     }
 
     refresh();
-  }
+  } // constructor
 
   public static P11Module getInstance(P11ModuleConf moduleConf) throws P11TokenException {
     Args.notNull(moduleConf, "moduleConf");
@@ -246,7 +246,7 @@ public class ProxyP11Module extends P11Module {
       slots.add(slot);
     }
     setSlots(slots);
-  }
+  } // method refresh
 
   @Override
   public String getDescription() {

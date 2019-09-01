@@ -177,7 +177,7 @@ public class OCSPRespBuilder {
       offset += taggedCertSequence.write(out, offset);
     }
     return out;
-  }
+  } // method buildOCSPResponse
 
   private static int getLen(int bodyLen) {
     return ASN1Type.getHeaderLen(bodyLen) + bodyLen;

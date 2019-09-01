@@ -114,7 +114,7 @@ public class CaActions {
       }
       sb.append("}");
       return sb.toString();
-    }
+    } // method toString
 
     protected void printCaNames(StringBuilder sb, Set<String> caNames, String prefix)
         throws CaMgmtException {
@@ -132,9 +132,9 @@ public class CaActions {
         }
         sb.append("\n");
       }
-    }
+    } // method printCaNames
 
-  }
+  } // class CaAction
 
   @Command(scope = "ca", name = "ca-add", description = "add CA")
   @Service
@@ -173,9 +173,9 @@ public class CaActions {
       } catch (CaMgmtException ex) {
         throw new CmdFailure("could not add " + msg + ", error: " + ex.getMessage(), ex);
       }
-    }
+    } // method execute0
 
-  }
+  } // class CaAdd
 
   public abstract static class CaAddOrGenAction extends CaAction {
 
@@ -404,7 +404,7 @@ public class CaActions {
       return entry;
     } // method getCaEntry
 
-  }
+  } // class CaAddOrGenAction
 
   @Command(scope = "ca", name = "caalias-add", description = "add CA alias")
   @Service
@@ -427,9 +427,9 @@ public class CaActions {
       } catch (CaMgmtException ex) {
         throw new CmdFailure("could not add " + msg + ", error: " + ex.getMessage(), ex);
       }
-    }
+    } // method execute0
 
-  }
+  } // class CaaliasAdd
 
   @Command(scope = "ca", name = "caalias-info", description = "show information of CA alias")
   @Service
@@ -474,7 +474,7 @@ public class CaActions {
       return null;
     } // method execute0
 
-  }
+  } // class CaaliasInfo
 
   @Command(scope = "ca", name = "caalias-rm", description = "remove CA alias")
   @Service
@@ -499,9 +499,9 @@ public class CaActions {
         }
       }
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class CaaliasRm
 
   @Command(scope = "ca", name = "gen-rootca", description = "generate selfsigned CA")
   @Service
@@ -543,9 +543,9 @@ public class CaActions {
       }
       println("generated root CA " + caEntry.getIdent().getName());
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class GenRootca
 
   @Command(scope = "ca", name = "ca-info", description = "show information of CA")
   @Service
@@ -590,7 +590,7 @@ public class CaActions {
       return null;
     } // method execute0
 
-  }
+  } // class CaInfo
 
   @Command(scope = "ca", name = "caprofile-add", description = "add certificate profile to CA")
   @Service
@@ -616,9 +616,9 @@ public class CaActions {
         }
       }
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class CaprofileAdd
 
   @Command(scope = "ca", name = "caprofile-info",
       description = "show information of certificate profile in given CA")
@@ -649,9 +649,9 @@ public class CaActions {
 
       println(sb.toString());
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class CaprofileInfo
 
   @Command(scope = "ca", name = "caprofile-rm", description = "remove certificate profile from CA")
   @Service
@@ -684,9 +684,9 @@ public class CaActions {
       }
 
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class CaprofileRm
 
   @Command(scope = "ca", name = "capub-add", description = "add publisher to CA")
   @Service
@@ -714,9 +714,9 @@ public class CaActions {
       }
 
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class CapubAdd
 
   @Command(scope = "ca", name = "capub-info",
       description = "show information of publisher in given CA")
@@ -746,9 +746,9 @@ public class CaActions {
       }
 
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class CapubInfo
 
   @Command(scope = "ca", name = "capub-rm", description = "remove publisher from CA")
   @Service
@@ -781,9 +781,9 @@ public class CaActions {
       }
 
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class CapubRm
 
   @Command(scope = "ca", name = "ca-rm", description = "remove CA")
   @Service
@@ -808,9 +808,9 @@ public class CaActions {
         }
       }
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class CaRm
 
   @Command(scope = "ca", name = "careq-add", description = "add requestor to CA")
   @Service
@@ -856,9 +856,9 @@ public class CaActions {
       } catch (CaMgmtException ex) {
         throw new CmdFailure("could not add " + msg + ", error: " + ex.getMessage(), ex);
       }
-    }
+    } // method execute0
 
-  }
+  } // class CareqAdd
 
   @Command(scope = "ca", name = "careq-info", description = "show information of requestor in CA")
   @Service
@@ -887,9 +887,9 @@ public class CaActions {
       }
       println(sb.toString());
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class CareqInfo
 
   @Command(scope = "ca", name = "careq-rm", description = "remove requestor from CA")
   @Service
@@ -922,9 +922,9 @@ public class CaActions {
       }
 
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class CareqRm
 
   @Command(scope = "ca", name = "ca-revoke", description = "revoke CA")
   @Service
@@ -984,7 +984,7 @@ public class CaActions {
       }
     } // method execute0
 
-  }
+  } // class CaRevoke
 
   @Command(scope = "ca", name = "ca-unrevoke", description = "unrevoke CA")
   @Service
@@ -1008,9 +1008,9 @@ public class CaActions {
       } catch (CaMgmtException ex) {
         throw new CmdFailure("could not unrevoke " + msg + ", error: " + ex.getMessage(), ex);
       }
-    }
+    } // method execute0
 
-  }
+  } // class CaUnrevoke
 
   @Command(scope = "ca", name = "ca-up", description = "update CA")
   @Service
@@ -1297,7 +1297,7 @@ public class CaActions {
       } catch (CaMgmtException ex) {
         throw new CmdFailure("could not update " + msg + ", error: " + ex.getMessage(), ex);
       }
-    }
+    } // method execute0
 
     private static List<String> getUris(List<String> uris) {
       if (uris == null) {
@@ -1313,9 +1313,9 @@ public class CaActions {
       }
 
       return clearUris ? Collections.emptyList() : new ArrayList<>(uris);
-    }
+    } // method getUris
 
-  }
+  } // class CaUp
 
   @Command(scope = "ca", name = "causer-add", description = "add user to CA")
   @Service
@@ -1352,9 +1352,9 @@ public class CaActions {
       } catch (CaMgmtException ex) {
         throw new CmdFailure("could not add " + msg + ", error: " + ex.getMessage(), ex);
       }
-    }
+    } // method execute0
 
-  }
+  } // class CauserAdd
 
   @Command(scope = "ca", name = "causer-rm", description = "remove user from CA")
   @Service
@@ -1382,9 +1382,9 @@ public class CaActions {
         }
       }
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class CauserRm
 
   @Command(scope = "ca", name = "clear-publishqueue", description = "clear publish queue")
   @Service
@@ -1428,9 +1428,9 @@ public class CaActions {
       } catch (CaMgmtException ex) {
         throw new CmdFailure("could not clear " + msg + ", error: " + ex.getMessage(), ex);
       }
-    }
+    } // method execute0
 
-  }
+  } // class ClearPublishqueue
 
   @Command(scope = "ca", name = "export-conf", description = "export configuration to zip file")
   @Service
@@ -1457,9 +1457,9 @@ public class CaActions {
       } catch (CaMgmtException ex) {
         throw new CmdFailure("could not export " + msg + ", error: " + ex.getMessage(), ex);
       }
-    }
+    } // method execute0
 
-  }
+  } // class ExportConf
 
   @Command(scope = "ca", name = "load-conf", description = "load configuration")
   @Service
@@ -1505,9 +1505,9 @@ public class CaActions {
       } catch (CaMgmtException ex) {
         throw new CmdFailure("could not load " + msg + ", error: " + ex.getMessage(), ex);
       }
-    }
+    } // method execute0
 
-  }
+  } // class LoadConf
 
   @Command(scope = "ca", name = "notify-change", description = "notify the change of CA system")
   @Service
@@ -1523,9 +1523,9 @@ public class CaActions {
       } catch (CaMgmtException ex) {
         throw new CmdFailure("could not notify " + msg + ", error: " + ex.getMessage(), ex);
       }
-    }
+    } // method execute0
 
-  }
+  } // class NotifyChange
 
   @Command(scope = "ca", name = "profile-add", description = "add certificate profile")
   @Service
@@ -1560,9 +1560,9 @@ public class CaActions {
       } catch (CaMgmtException ex) {
         throw new CmdFailure("could not add " + msg + ", error: " + ex.getMessage(), ex);
       }
-    }
+    } // method execute0
 
-  }
+  } // class ProfileAdd
 
   @Command(scope = "ca", name = "profile-export",
       description = "export certificate profile configuration")
@@ -1592,9 +1592,9 @@ public class CaActions {
             StringUtil.toUtf8Bytes(entry.getConf()));
       }
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class ProfileExport
 
   @Command(scope = "ca", name = "profile-info",
       description = "show information of certificate profile")
@@ -1643,7 +1643,7 @@ public class CaActions {
       return null;
     } // method execute0
 
-  }
+  } // class ProfileInfo
 
   @Command(scope = "ca", name = "profile-rm", description = "remove certificate profile")
   @Service
@@ -1668,9 +1668,9 @@ public class CaActions {
         }
       }
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class ProfileRm
 
   @Command(scope = "ca", name = "profile-up", description = "update certificate profile")
   @Service
@@ -1709,9 +1709,9 @@ public class CaActions {
       } catch (CaMgmtException ex) {
         throw new CmdFailure("could not update " + msg + ", error: " + ex.getMessage(), ex);
       }
-    }
+    } // method execute0
 
-  }
+  } // class ProfileUp
 
   @Command(scope = "ca", name = "publisher-add", description = "add publisher")
   @Service
@@ -1746,9 +1746,9 @@ public class CaActions {
       } catch (CaMgmtException ex) {
         throw new CmdFailure("could not add " + msg + ", error: " + ex.getMessage(), ex);
       }
-    }
+    } // method execute0
 
-  }
+  } // class PublisherAdd
 
   @Command(scope = "ca", name = "publisher-export", description = "export publisher configuration")
   @Service
@@ -1777,9 +1777,9 @@ public class CaActions {
             StringUtil.toUtf8Bytes(entry.getConf()));
       }
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class PublisherExport
 
   @Command(scope = "ca", name = "publisher-info", description = "show information of publisher")
   @Service
@@ -1822,7 +1822,7 @@ public class CaActions {
       return null;
     } // method execute0
 
-  }
+  } // class PublisherInfo
 
   @Command(scope = "ca", name = "publisher-rm", description = "remove publisher")
   @Service
@@ -1847,9 +1847,9 @@ public class CaActions {
         }
       }
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class PublisherRm
 
   @Command(scope = "ca", name = "publisher-up", description = "update publisher")
   @Service
@@ -1888,9 +1888,9 @@ public class CaActions {
       } catch (CaMgmtException ex) {
         throw new CmdFailure("could not update " + msg + ", error: " + ex.getMessage(), ex);
       }
-    }
+    } // method execute0
 
-  }
+  } // class PublisherUp
 
   @Command(scope = "ca", name = "refresh-token", description = "refresh token for signers")
   @Service
@@ -1907,7 +1907,7 @@ public class CaActions {
       return null;
     } // method execute0
 
-  }
+  } // class RefreshToken
 
   @Command(scope = "ca", name = "republish", description = "republish certificates")
   @Service
@@ -1954,9 +1954,9 @@ public class CaActions {
       } catch (CaMgmtException ex) {
         throw new CmdFailure("could not republish " + msg + ", error: " + ex.getMessage(), ex);
       }
-    }
+    } // method execute0
 
-  }
+  } // class Republish
 
   @Command(scope = "ca", name = "requestor-add", description = "add requestor")
   @Service
@@ -2000,9 +2000,9 @@ public class CaActions {
       } catch (CaMgmtException ex) {
         throw new CmdFailure("could not add " + msg + ", error: " + ex.getMessage(), ex);
       }
-    }
+    } // method execute0
 
-  }
+  } // class RequestorAdd
 
   @Command(scope = "ca", name = "requestor-info", description = "show information of requestor")
   @Service
@@ -2050,7 +2050,7 @@ public class CaActions {
       return null;
     } // method execute0
 
-  }
+  } // class RequestorInfo
 
   @Command(scope = "ca", name = "requestor-rm", description = "remove requestor")
   @Service
@@ -2075,9 +2075,9 @@ public class CaActions {
         }
       }
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class RequestorRm
 
   @Command(scope = "ca", name = "requestor-up", description = "update requestor")
   @Service
@@ -2118,9 +2118,9 @@ public class CaActions {
       } catch (CaMgmtException ex) {
         throw new CmdFailure("could not update " + msg + ", error: " + ex.getMessage(), ex);
       }
-    }
+    } // method execute0
 
-  }
+  } // class RequestorUp
 
   @Command(scope = "ca", name = "restart-ca", description = "restart CA")
   @Service
@@ -2139,9 +2139,9 @@ public class CaActions {
         throw new CmdFailure("could not restart CA " + name + ", error: " + ex.getMessage(), ex);
       }
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class RestartCa
 
   @Command(scope = "ca", name = "restart", description = "restart CA system")
   @Service
@@ -2171,7 +2171,7 @@ public class CaActions {
       return null;
     } // method execute0
 
-  }
+  } // class Restart
 
   @Command(scope = "ca", name = "signer-add", description = "add signer")
   @Service
@@ -2216,9 +2216,9 @@ public class CaActions {
       } catch (CaMgmtException ex) {
         throw new CmdFailure("could not add " + msg + ", error: " + ex.getMessage(), ex);
       }
-    }
+    } // method execute0
 
-  }
+  } // class SignerAdd
 
   @Command(scope = "ca", name = "signer-info", description = "show information of signer")
   @Service
@@ -2264,7 +2264,7 @@ public class CaActions {
       return null;
     } // method execute0
 
-  }
+  } // class SignerInfo
 
   @Command(scope = "ca", name = "signer-rm", description = "remove signer")
   @Service
@@ -2289,9 +2289,9 @@ public class CaActions {
         }
       }
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class SignerRm
 
   @Command(scope = "ca", name = "signer-up", description = "update signer")
   @Service
@@ -2329,7 +2329,7 @@ public class CaActions {
       }
 
       return ShellUtil.canonicalizeSignerConf(tmpType, conf, passwordResolver, securityFactory);
-    }
+    } // method getSigenrConf
 
     @Override
     protected Object execute0() throws Exception {
@@ -2350,9 +2350,9 @@ public class CaActions {
       } catch (CaMgmtException ex) {
         throw new CmdFailure("could not update " + msg + ", error: " + ex.getMessage(), ex);
       }
-    }
+    } // method execute0
 
-  }
+  } // class SignerUp
 
   @Command(scope = "ca", name = "system-status", description = "show CA system status")
   @Service
@@ -2367,9 +2367,9 @@ public class CaActions {
         throw new CmdFailure("status is null");
       }
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class SystemStatus
 
   @Command(scope = "ca", name = "unlock", description = "unlock CA system")
   @Service
@@ -2384,9 +2384,9 @@ public class CaActions {
       } catch (CaMgmtException ex) {
         throw new CmdFailure("could not unlock CA system, error: " + ex.getMessage(), ex);
       }
-    }
+    } // method execute0
 
-  }
+  } // class Unlock
 
   @Command(scope = "ca", name = "user-add", description = "add user")
   @Service
@@ -2416,9 +2416,9 @@ public class CaActions {
       } catch (CaMgmtException ex) {
         throw new CmdFailure("could not add " + msg + ", error: " + ex.getMessage(), ex);
       }
-    }
+    } // method execute0
 
-  }
+  } // class UserAdd
 
   @Command(scope = "ca", name = "user-info", description = "show information of user")
   @Service
@@ -2447,9 +2447,9 @@ public class CaActions {
       }
       println(sb.toString());
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class UserInfo
 
   @Command(scope = "ca", name = "user-rm", description = "remove user")
   @Service
@@ -2473,9 +2473,9 @@ public class CaActions {
         }
       }
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class UserRm
 
   @Command(scope = "ca", name = "user-up", description = "update user")
   @Service
@@ -2528,8 +2528,8 @@ public class CaActions {
       } catch (CaMgmtException ex) {
         throw new CmdFailure("could not change " + msg + ", error: " + ex.getMessage(), ex);
       }
-    }
+    } // method execute0
 
-  }
+  } // class UserUp
 
 }

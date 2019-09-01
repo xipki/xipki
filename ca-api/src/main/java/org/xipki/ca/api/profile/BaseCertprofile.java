@@ -372,7 +372,7 @@ public abstract class BaseCertprofile extends Certprofile {
 
     ASN1Encodable rdnValue = createRdnValue(text, type, option, index);
     return (rdnValue == null) ? null : new RDN(type, rdnValue);
-  }
+  } // method createSubjectRdn
 
   protected void fixRdnControl(RdnControl rdnControl) throws CertprofileException {
     SubjectDnSpec.fixRdnControl(rdnControl);
@@ -495,7 +495,7 @@ public abstract class BaseCertprofile extends Certprofile {
     }
 
     return new RDN(type, newRdnValue);
-  }
+  } // method createDateOfBirthRdn
 
   private static RDN createPostalAddressRdn(ASN1ObjectIdentifier type, ASN1Encodable rdnValue,
       RdnControl control, int index) throws BadCertTemplateException {
@@ -528,7 +528,7 @@ public abstract class BaseCertprofile extends Certprofile {
     }
 
     return new RDN(type, new DERSequence(vec));
-  }
+  } // method createPostalAddressRdn
 
   private static RDN[] getRdns(RDN[] rdns, ASN1ObjectIdentifier type) {
     Args.notNull(rdns, "rdns");
@@ -543,7 +543,7 @@ public abstract class BaseCertprofile extends Certprofile {
     }
 
     return CollectionUtil.isEmpty(ret) ? null : ret.toArray(new RDN[0]);
-  }
+  } // method getRdns
 
   private static ASN1Encodable createRdnValue(String text, ASN1ObjectIdentifier type,
       RdnControl option, int index) throws BadCertTemplateException {

@@ -69,6 +69,6 @@ public class CertWithEncoded {
       }
       return Arrays.equals(encoded, encodedCert);
     }
-  }
+  } // method equalsCert
 
 }

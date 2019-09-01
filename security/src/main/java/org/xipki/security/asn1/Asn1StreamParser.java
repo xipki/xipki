@@ -74,7 +74,7 @@ public class Asn1StreamParser {
       throw new IOException("error reading " + name);
     }
     return bytes;
-  }
+  } // method readBlock
 
   protected static int markAndReadTag(InputStream instream) throws IOException {
     instream.mark(10);
@@ -102,7 +102,7 @@ public class Asn1StreamParser {
       }
       return length;
     }
-  }
+  } // method readLength
 
   protected static void assertTag(int expectedTag, int tag, String name) {
     if (expectedTag != tag) {
@@ -131,7 +131,7 @@ public class Asn1StreamParser {
     } catch (ParseException ex) {
       throw new IllegalArgumentException("error parsing time", ex);
     }
-  }
+  } // method readTime
 
   protected static void skip(InputStream instream, long count) throws IOException {
     long remaining = count;

@@ -381,7 +381,7 @@ public class CaInfo {
     }
 
     return null;
-  }
+  } // method getSigner
 
   public boolean initSigner(SecurityFactory securityFactory) throws XiSecurityException {
     if (signers != null) {
@@ -431,7 +431,7 @@ public class CaInfo {
       this.dhpocControl = null;
     }
     return true;
-  }
+  } // method initDhpocControl
 
   public boolean isSignerRequired() {
     int permission = caEntry.getPermission();

@@ -236,6 +236,6 @@ public class ScepServlet extends HttpServlet {
         LOG.error("could not close stream: {}", ex.getMessage());
       }
     }
-  }
+  } // method generatePkiMessage
 
 }

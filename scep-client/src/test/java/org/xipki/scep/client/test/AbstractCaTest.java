@@ -271,7 +271,7 @@ public abstract class AbstractCaTest {
     // getNextCA
     AuthorityCertStore nextCa = client.scepNextCaCert();
     Assert.assertNotNull("nextCa", nextCa);
-  }
+  } // method test
 
   private CaCaps getExpectedCaCaps() {
     CaCaps caCaps = getDefaultCaCaps();
@@ -288,7 +288,7 @@ public abstract class AbstractCaTest {
       caCaps.removeCapabilities(CaCapability.GetNextCACert);
     }
     return caCaps;
-  }
+  } // method getExpectedCaCaps
 
   private boolean equals(Certificate bcCert, X509Certificate cert)
       throws CertificateException, IOException {

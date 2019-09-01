@@ -194,7 +194,7 @@ public class OcspCertstore extends ValidatableConf {
       validate(certs);
     }
 
-  }
+  } // class Cert
 
   public static class Issuer extends ValidatableConf {
 
@@ -243,7 +243,7 @@ public class OcspCertstore extends ValidatableConf {
       this.crlId = crlId;
     }
 
-  }
+  } // class Issuer
 
   public static class CrlInfo extends ValidatableConf {
 
@@ -283,7 +283,7 @@ public class OcspCertstore extends ValidatableConf {
       this.info = info;
     }
 
-  }
+  } // class CrlInfo
 
   private int version;
 

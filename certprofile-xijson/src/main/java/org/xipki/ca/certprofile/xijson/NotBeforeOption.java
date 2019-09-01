@@ -68,7 +68,7 @@ public class NotBeforeOption {
         return new Date(System.currentTimeMillis() + offsetMillis);
       }
     }
-  }
+  } // method getNotBefore
 
   private Date setToMidnight(long date) {
     Calendar cal = Calendar.getInstance(midNightTimeZone);
@@ -80,7 +80,7 @@ public class NotBeforeOption {
     cal.set(Calendar.SECOND, 0);
     cal.set(Calendar.MILLISECOND, 0);
     return cal.getTime();
-  }
+  } // method setToMidnight
 
   public TimeZone getMidNightTimeZone() {
     return midNightTimeZone;

@@ -110,11 +110,11 @@ public class HealthCheckServlet extends HttpServlet {
     } finally {
       resp.flushBuffer();
     }
-  } // method service0
+  } // method doGet
 
   private static void sendError(HttpServletResponse resp, int status) {
     resp.setStatus(status);
     resp.setContentLength(0);
-  }
+  } // method sendError
 
 }

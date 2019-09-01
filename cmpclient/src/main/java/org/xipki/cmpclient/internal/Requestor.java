@@ -115,7 +115,7 @@ abstract class Requestor {
       random.nextBytes(bytes);
       return bytes;
     }
-  }
+  } // class PbmMacCmpRequestor
 
   static class SignatureCmpRequestor extends Requestor {
 
@@ -146,6 +146,6 @@ abstract class Requestor {
       return X500Name.getInstance(signer.getCertificate().getSubjectX500Principal().getEncoded());
     }
 
-  }
+  } // class SignatureCmpRequestor
 
 }

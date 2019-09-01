@@ -99,7 +99,7 @@ class CaCertstoreDbImporter extends DbPorter {
             + processLogFile.getPath() + " first");
       }
     }
-  }
+  } // constructor
 
   public void importToDb() throws Exception {
     CaCertstore certstore;
@@ -371,7 +371,7 @@ class CaCertstoreDbImporter extends DbPorter {
       LOG.error("Exception", ex);
       return ex;
     }
-  }
+  } // method importEntries
 
   private long importCerts(String entriesZipFile, long minId,
       File processLogFile, ProcessLog processLog, int numProcessedInLastProcess,

@@ -162,7 +162,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
       validate(ssl);
     }
 
-  }
+  } // classConf
 
   class Testor implements Runnable {
 
@@ -281,7 +281,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
       this.caPort = port;
     }
 
-  }
+  } // constructor
 
   @Override
   protected Runnable getTestor() throws Exception {
@@ -332,7 +332,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
 
     PKIBody body = new PKIBody(PKIBody.TYPE_CERT_REQ, new CertReqMessages(certReqMsgs));
     return new PKIMessage(builder.build(), body);
-  }
+  } // method nextCertRequest
 
   @Override
   public void onComplete(FullHttpResponse response) {
@@ -345,7 +345,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
     }
 
     account(1, success ? 0 : 1);
-  }
+  } // method onComplete
 
   private boolean onComplete0(FullHttpResponse response) {
     if (response == null) {
@@ -388,7 +388,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
       LOG.warn("exception while parsing response", th);
       return false;
     }
-  }
+  } // method onComplete0
 
   private void parseEnrollCertResult(PKIMessage response, int resonseBodyType, int numCerts)
       throws Exception {
@@ -455,6 +455,6 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
       default:
         return Integer.toString(status);
     }
-  }
+  } // method buildText
 
 }

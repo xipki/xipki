@@ -58,7 +58,7 @@ public class HmacContentSigner implements XiContentSigner {
       hmac.update(bytes, off, len);
     }
 
-  }
+  } // method HmacOutputStream
 
   private final AlgorithmIdentifier algorithmIdentifier;
 

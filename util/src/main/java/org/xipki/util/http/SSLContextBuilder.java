@@ -187,7 +187,8 @@ public class SSLContextBuilder {
   }
 
   public SSLContextBuilder loadTrustMaterial(
-      final KeyStore truststore) throws NoSuchAlgorithmException, KeyStoreException {
+      final KeyStore truststore)
+          throws NoSuchAlgorithmException, KeyStoreException {
     final TrustManagerFactory tmfactory = TrustManagerFactory
             .getInstance(trustManagerFactoryAlgorithm == null ? TrustManagerFactory.getDefaultAlgorithm()
                     : trustManagerFactoryAlgorithm);
@@ -208,14 +209,16 @@ public class SSLContextBuilder {
 
   public SSLContextBuilder loadTrustMaterial(
       final File file,
-      final char[] storePassword) throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
+      final char[] storePassword)
+          throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
     Args.notNull(file, "Truststore file");
     return loadTrustMaterial(new FileInputStream(file), storePassword);
   }
 
   public SSLContextBuilder loadTrustMaterial(
       final InputStream instream,
-      final char[] storePassword) throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
+      final char[] storePassword)
+          throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
     Args.notNull(instream, "Truststore instream");
     final KeyStore trustStore = KeyStore.getInstance(keyStoreType);
     try {
@@ -246,7 +249,9 @@ public class SSLContextBuilder {
   public SSLContextBuilder loadKeyMaterial(
       final File file,
       final char[] storePassword,
-      final char[] keyPassword) throws NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException, CertificateException, IOException {
+      final char[] keyPassword)
+          throws NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException,
+          CertificateException, IOException {
     Args.notNull(file, "Keystore file");
     return loadKeyMaterial(new FileInputStream(file), storePassword, keyPassword);
   }
@@ -254,7 +259,9 @@ public class SSLContextBuilder {
   public SSLContextBuilder loadKeyMaterial(
       final InputStream instream,
       final char[] storePassword,
-      final char[] keyPassword) throws NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException, CertificateException, IOException {
+      final char[] keyPassword)
+          throws NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException,
+          CertificateException, IOException {
     Args.notNull(instream, "Keystore instream");
     final KeyStore identityStore = KeyStore.getInstance(keyStoreType);
     try {
@@ -276,9 +283,10 @@ public class SSLContextBuilder {
         secureRandom);
   }
 
-  public SSLContext build() throws NoSuchAlgorithmException, KeyManagementException {
-    final SSLContext sslContext;
+  public SSLContext build()
+      throws NoSuchAlgorithmException, KeyManagementException {
     final String protocolStr = this.protocol != null ? this.protocol : TLS;
+    final SSLContext sslContext;
     if (this.provider != null) {
       sslContext = SSLContext.getInstance(protocolStr, this.provider);
     } else {

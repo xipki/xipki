@@ -53,8 +53,9 @@ public class QaCompleters {
       return qaSystemManager.getCertprofileNames();
     }
 
-  }
+  } // class CertprofileNameCompleter
 
+  @Service
   public static class CertStatusCompleter extends EnumCompleter {
 
     public CertStatusCompleter() {
@@ -65,7 +66,7 @@ public class QaCompleters {
       setTokens(enums);
     }
 
-  }
+  } // class CertStatusCompleter
 
   @Service
   //CHECKSTYLE:SKIP
@@ -81,7 +82,7 @@ public class QaCompleters {
       setTokens(enums);
     }
 
-  }
+  } // class DSASigAlgCompleter
 
   @Service
   //CHECKSTYLE:SKIP
@@ -101,7 +102,7 @@ public class QaCompleters {
       setTokens(enums);
     }
 
-  }
+  } // class ECDSASigAlgCompleter
 
   @Service
   //CHECKSTYLE:SKIP
@@ -112,7 +113,7 @@ public class QaCompleters {
       setTokens(hashAlgs);
     }
 
-  }
+  } // class EDDSASigAlgCompleter
 
   @Service
   //CHECKSTYLE:SKIP
@@ -122,7 +123,7 @@ public class QaCompleters {
       setTokens("AES128-GMAC", "AES192-GMAC", "AES256-GMAC");
     }
 
-  }
+  } // class GMACSigAlgCompleter
 
   @Service
   public static class IssuerNameCompleter extends DynamicEnumCompleter {
@@ -135,7 +136,7 @@ public class QaCompleters {
       return qaSystemManager.getIssuerNames();
     }
 
-  }
+  } // class IssuerNameCompleter
 
   @Service
   //CHECKSTYLE:SKIP
@@ -146,7 +147,7 @@ public class QaCompleters {
           "HMACSHA3-224", "HMACSHA3-256", "HMACSHA3-384", "HMACSHA3-512");
     }
 
-  }
+  } // class HMACSigAlgCompleter
 
   @Service
   public static class OccurrenceCompleter extends EnumCompleter {
@@ -159,7 +160,7 @@ public class QaCompleters {
       setTokens(enums);
     }
 
-  }
+  } // class OccurrenceCompleter
 
   @Service
   public static class OcspErrorCompleter extends EnumCompleter {
@@ -172,7 +173,7 @@ public class QaCompleters {
       setTokens(enums);
     }
 
-  }
+  } // class OcspErrorCompleter
 
   @Service
   public static class P11ModuleNameCompleter extends DynamicEnumCompleter {
@@ -189,7 +190,7 @@ public class QaCompleters {
       return names;
     }
 
-  }
+  } // class P11ModuleNameCompleter
 
   @Service
   //CHECKSTYLE:SKIP
@@ -206,5 +207,5 @@ public class QaCompleters {
       setTokens(enums);
     }
 
-  }
+  } // class RSASigAlgCompleter
 }

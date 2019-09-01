@@ -90,9 +90,9 @@ public class CertActions {
             encodeCert(certInfo.getCert().getEncodedCert(), outform));
       }
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class CertStatus
 
   public abstract static class CrlAction extends CaAction {
 
@@ -129,11 +129,11 @@ public class CertActions {
         saveVerbose("saved CRL to file", outFile, encodeCrl(crl.getEncoded(), outform));
       }
       return null;
-    }
+    } // method execute0
 
     protected abstract String getOutFile();
 
-  }
+  } // class CrlAction
 
   @Command(scope = "ca", name = "enroll-cert", description = "enroll certificate")
   @Service
@@ -186,9 +186,9 @@ public class CertActions {
       saveVerbose("saved certificate to file", outFile, encodeCert(cert.getEncoded(), outform));
 
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class EnrollCert
 
   @Command(scope = "ca", name = "gen-crl", description = "generate CRL")
   @Service
@@ -208,7 +208,7 @@ public class CertActions {
       return outFile;
     }
 
-  }
+  } // class GenCrl
 
   @Command(scope = "ca", name = "get-cert", description = "get certificate")
   @Service
@@ -242,9 +242,9 @@ public class CertActions {
       saveVerbose("certificate saved to file", outputFile,
           encodeCert(certInfo.getCert().getEncodedCert(), outform));
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class GetCert
 
   @Command(scope = "ca", name = "get-crl", description = "download CRL")
   @Service
@@ -320,7 +320,7 @@ public class CertActions {
       return outFile;
     }
 
-  }
+  } // class GetCrl
 
   @Command(scope = "ca", name = "get-request",
       description = "get the request to enroll certificate")
@@ -342,9 +342,9 @@ public class CertActions {
 
       saveVerbose("request saved to file", outputFile, request);
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class GetRequest
 
   @Command(scope = "ca", name = "list-cert", description = "show a list of certificates")
   @Service
@@ -407,14 +407,14 @@ public class CertActions {
       }
 
       return null;
-    }
+    } // method execute0
 
     private String format(int index, CertListInfo info) {
       return StringUtil.concat(StringUtil.formatAccount(index, 4), " | ",
           StringUtil.formatText(info.getSerialNumber().toString(16), 20), " | ",
           DateUtil.toUtcTimeyyyyMMddhhmmss(info.getNotBefore()), " | ",
           DateUtil.toUtcTimeyyyyMMddhhmmss(info.getNotAfter()), " | ", info.getSubject());
-    }
+    } // method format
 
     private Date getDate(String str) throws IllegalCmdParamException {
       if (str == null) {
@@ -433,9 +433,9 @@ public class CertActions {
       } catch (IllegalArgumentException ex) {
         throw new IllegalCmdParamException("invalid time " + str + ": " + ex.getMessage(), ex);
       }
-    }
+    } // method getDate
 
-  }
+  } // class ListCert
 
   @Command(scope = "ca", name = "rm-cert", description = "remove certificate")
   @Service
@@ -457,9 +457,9 @@ public class CertActions {
         }
       }
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class RmCert
 
   @Command(scope = "ca", name = "revoke-cert", description = "revoke certificate")
   @Service
@@ -494,9 +494,9 @@ public class CertActions {
       } catch (CaMgmtException ex) {
         throw new CmdFailure("could not revoke " + msg + ", error: " + ex.getMessage(), ex);
       }
-    }
+    } // method execute0
 
-  }
+  } // class RevokeCert
 
   @Command(scope = "ca", name = "unrevoke-cert", description = "unrevoke certificate")
   @Service
@@ -513,9 +513,9 @@ public class CertActions {
       } catch (CaMgmtException ex) {
         throw new CmdFailure("could not unrevoke " + msg + ", error: " + ex.getMessage(), ex);
       }
-    }
+    } // method execute0
 
-  }
+  } // class UnrevokeCert
 
   public abstract static class UnRevRmCertAction extends CaAction {
 
@@ -556,8 +556,8 @@ public class CertActions {
       }
 
       return serialNumber;
-    }
+    } // method getSerialNumber
 
-  }
+  } // class UnRevRmCertAction
 
 }

@@ -77,7 +77,7 @@ public class Audits {
     } else {
       throw new IllegalStateException("Please call Audits.init() first.");
     }
-  }
+  } // method getAuditService
 
   public static void init(String auditType, String auditConf)  {
     try {
@@ -110,6 +110,6 @@ public class Audits {
     } catch (RuntimeException ex) {
       initializationException = new AuditServiceRuntimeException(ex.getMessage(), ex);
     }
-  }
+  } // method init
 
 }

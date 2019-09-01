@@ -330,7 +330,7 @@ public class X509ProfileType extends ValidatableConf {
       }
     }
     return CollectionUtil.unmodifiableMap(keyAlgorithms);
-  } // method buildKeyAlgorithms
+  } // method toXiKeyAlgorithms
 
   @Override
   public void validate() throws InvalidConfException {
@@ -355,7 +355,7 @@ public class X509ProfileType extends ValidatableConf {
       }
     }
 
-  }
+  } // method validate
 
   public Map<ASN1ObjectIdentifier, ExtensionValue> buildConstantExtesions()
       throws CertprofileException {
@@ -453,6 +453,6 @@ public class X509ProfileType extends ValidatableConf {
       oids.add(type.toXiOid());
     }
     return Collections.unmodifiableSet(oids);
-  }
+  } // method toOidSet
 
 }

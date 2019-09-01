@@ -415,7 +415,7 @@ public class ScepResponder {
     }
 
     return cmsSigneddata.toASN1Structure();
-  }
+  } // method createSignedData
 
   private ContentInfo createSignedData(Certificate cert) throws CaException {
     CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
@@ -433,7 +433,7 @@ public class ScepResponder {
     }
 
     return cmsSigneddata.toASN1Structure();
-  }
+  } // method createSignedData
 
   public PrivateKey getSigningKey() {
     return (raEmulator != null) ? raEmulator.getRaKey() : caEmulator.getCaKey();
@@ -469,7 +469,7 @@ public class ScepResponder {
       }
     }
     return null;
-  }
+  } // method getChallengePassword
 
   private static PkiMessage buildPkiMessage(PkiMessage message, PkiStatus status,
       FailInfo failInfo) {

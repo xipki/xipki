@@ -101,7 +101,7 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
     } catch (RuntimeException ex) {
       throw new InvalidConfException("could not create P11Conf: " + ex.getMessage(), ex);
     }
-  }
+  } // method init
 
   public void setP11ModuleFactoryRegister(P11ModuleFactoryRegister p11ModuleFactoryRegister) {
     this.p11ModuleFactoryRegister = p11ModuleFactoryRegister;
@@ -135,7 +135,7 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
     }
 
     return instance;
-  }
+  } // method getP11CryptService
 
   private String getModuleName(String moduleName) {
     return (moduleName == null) ? DEFAULT_P11MODULE_NAME : moduleName;

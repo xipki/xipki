@@ -63,7 +63,7 @@ public class Actions {
       return null;
     }
 
-  }
+  } // class Confirm
 
   @Command(scope = "xi", name = "copy-dir",
       description = "copy content of the directory to destination")
@@ -108,7 +108,7 @@ public class Actions {
       return null;
     }
 
-  }
+  } // class CopyDir
 
   @Command(scope = "xi", name = "copy-file", description = "copy file")
   @Service
@@ -157,7 +157,7 @@ public class Actions {
       return null;
     }
 
-  }
+  } // class CopyFile
 
   @Command(scope = "xi", name = "curl", description = "transfer a URL")
   @Service
@@ -261,7 +261,7 @@ public class Actions {
       }
 
       return null;
-    }
+    } // method execute0
 
     private static String getCharset(String contentType) {
       if (StringUtil.isBlank(contentType) || contentType.indexOf(';') == -1) {
@@ -285,9 +285,9 @@ public class Actions {
       }
 
       return null;
-    }
+    } // method getCharset
 
-  }
+  } // class Curl
 
   @Command(scope = "xi", name = "mkdir", description = "make directories")
   @Service
@@ -313,7 +313,7 @@ public class Actions {
       return null;
     }
 
-  }
+  } // class Mkdir
 
   @Command(scope = "xi", name = "move-dir",
       description = "move content of the directory to destination")
@@ -359,7 +359,7 @@ public class Actions {
       return null;
     }
 
-  }
+  } // class MoveDir
 
   @Command(scope = "xi", name = "move-file", description = "move file")
   @Service
@@ -409,7 +409,7 @@ public class Actions {
       return null;
     }
 
-  }
+  } // class MoveFile
 
   @Command(scope = "xi", name = "replace", description = "replace text in file")
   @Service
@@ -473,7 +473,7 @@ public class Actions {
       }
     }
 
-  }
+  } // class Replace
 
   @Command(scope = "xi", name = "rm", description = "remove file or directory")
   @Service
@@ -520,6 +520,6 @@ public class Actions {
       return null;
     }
 
-  }
+  } // class Rm
 
 }

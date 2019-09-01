@@ -76,7 +76,7 @@ public class DbPorter extends DbToolBase {
       return sqlBatchFactor;
     }
 
-  }
+  } // class OcspDbEntryType
 
   public enum CaDbEntryType {
     CERT("certs", "CERT", 1),
@@ -108,7 +108,7 @@ public class DbPorter extends DbToolBase {
       return sqlBatchFactor;
     }
 
-  }
+  } // class CaDbEntryType
 
   public static class DbPortFileNameIterator implements Iterator<String>, Closeable {
 
@@ -169,7 +169,7 @@ public class DbPorter extends DbToolBase {
       return null;
     }
 
-  }
+  } // class DbPortFileNameIterator
 
   public static final String FILENAME_CA_CONFIGURATION = "ca-configuration.json";
 
@@ -225,7 +225,7 @@ public class DbPorter extends DbToolBase {
 
     ret.setFile(fileName);
     return ret;
-  }
+  } // method buildFileOrValue
 
   protected FileOrBinary buildFileOrBase64Binary(String base64Content, String fileName)
       throws IOException {
@@ -233,7 +233,7 @@ public class DbPorter extends DbToolBase {
       return null;
     }
     return buildFileOrBinary(Base64.decode(base64Content), fileName);
-  }
+  } // method buildFileOrBase64Binary
 
   protected FileOrBinary buildFileOrBinary(byte[] content, String fileName) throws IOException {
     if (content == null) {
@@ -254,7 +254,7 @@ public class DbPorter extends DbToolBase {
 
     ret.setFile(fileName);
     return ret;
-  }
+  } // method buildFileOrBinary
 
   protected byte[] readContent(FileOrBinary fileOrBinary) throws IOException {
     if (fileOrBinary == null) {
@@ -267,7 +267,7 @@ public class DbPorter extends DbToolBase {
 
     File file = new File(baseDir, fileOrBinary.getFile());
     return IoUtil.read(file);
-  }
+  } // method readContent
 
   protected String readContent(FileOrValue fileOrValue) throws IOException {
     if (fileOrValue == null) {
@@ -280,7 +280,7 @@ public class DbPorter extends DbToolBase {
 
     File file = new File(baseDir, fileOrValue.getFile());
     return new String(IoUtil.read(file), "UTF-8");
-  }
+  } // method readContent
 
   public static void echoToFile(String content, File file) throws IOException {
     Files.write(Args.notNull(file, "file").toPath(),

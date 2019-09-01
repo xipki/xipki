@@ -300,7 +300,7 @@ public class EmulatorP11Identity extends P11Identity {
     } else {
       throw new P11TokenException("unsupported mechanism " + mechanism);
     }
-  }
+  } // method sign0
 
   // TODO: check the correctness
   private byte[] hmac(byte[] contentToSign, HashAlgo hashAlgo) {
@@ -310,7 +310,7 @@ public class EmulatorP11Identity extends P11Identity {
     byte[] signature = new byte[hmac.getMacSize()];
     hmac.doFinal(signature, 0);
     return signature;
-  }
+  } // method hmac
 
   // TODO: check the correctness
   private byte[] aesGmac(P11Params params, byte[] contentToSign) throws P11TokenException {
@@ -333,7 +333,7 @@ public class EmulatorP11Identity extends P11Identity {
     byte[] signature = new byte[gmac.getMacSize()];
     gmac.doFinal(signature, 0);
     return signature;
-  }
+  } // method aesGmac
 
   private byte[] rsaPkcsPssSign(P11Params parameters, byte[] contentToSign,
       HashAlgo hashAlgo) throws P11TokenException {
@@ -366,7 +366,7 @@ public class EmulatorP11Identity extends P11Identity {
       throw new P11TokenException("XiSecurityException: " + ex.getMessage(), ex);
     }
     return rsaX509Sign(encodedHashValue);
-  }
+  } // method rsaPkcsPssSign
 
   private byte[] rsaPkcsSign(byte[] contentToSign, HashAlgo hashAlgo) throws P11TokenException {
     int modulusBitLen = getSignatureKeyBitLength();
@@ -383,7 +383,7 @@ public class EmulatorP11Identity extends P11Identity {
     }
 
     return rsaX509Sign(paddedHash);
-  }
+  } // method rsaPkcsSign
 
   private byte[] rsaX509Sign(byte[] dataToSign) throws P11TokenException {
     ConcurrentBagEntry<Cipher> cipher;
@@ -406,7 +406,7 @@ public class EmulatorP11Identity extends P11Identity {
     } finally {
       rsaCiphers.requite(cipher);
     }
-  }
+  } // method rsaX509Sign
 
   private byte[] dsaAndEcdsaSign(byte[] dataToSign, HashAlgo hashAlgo)
       throws P11TokenException {
@@ -435,7 +435,7 @@ public class EmulatorP11Identity extends P11Identity {
     } finally {
       dsaSignatures.requite(sig0);
     }
-  }
+  } // method dsaAndEcdsaSign
 
   private byte[] eddsaSign(byte[] dataToSign) throws P11TokenException {
     if (!(signingKey instanceof EdDSAKey)) {
@@ -462,7 +462,7 @@ public class EmulatorP11Identity extends P11Identity {
     } finally {
       eddsaSignatures.requite(sig0);
     }
-  }
+  } // method eddsaSign
 
   private byte[] sm2SignHash(byte[] hash) throws P11TokenException {
     ConcurrentBagEntry<SM2Signer> sig0;
@@ -487,7 +487,7 @@ public class EmulatorP11Identity extends P11Identity {
     } finally {
       sm2Signers.requite(sig0);
     }
-  }
+  } // method sm2SignHash
 
   private byte[] sm2Sign(P11Params params, byte[] dataToSign, HashAlgo hash)
       throws P11TokenException {
@@ -525,7 +525,7 @@ public class EmulatorP11Identity extends P11Identity {
     } finally {
       sm2Signers.requite(sig0);
     }
-  }
+  } // method sm2Sign
 
   Key getSigningKey() {
     return signingKey;
@@ -555,7 +555,7 @@ public class EmulatorP11Identity extends P11Identity {
     } else {
       return null;
     }
-  }
+  } // method getHashAlgoForPkcs11HashMech
 
   private static HashAlgo getHashAlgoForPkcs11MgfMech(long hashMech) {
     if (hashMech == PKCS11Constants.CKG_MGF1_SHA1) {
@@ -580,6 +580,6 @@ public class EmulatorP11Identity extends P11Identity {
       // SM3 does not apply to RSAPSS signature
       return null;
     }
-  }
+  } // method getHashAlgoForPkcs11MgfMech
 
 }

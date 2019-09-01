@@ -336,7 +336,7 @@ public class LiquibaseMain implements Closeable {
       database = null;
       liquibase = null;
     }
-  }
+  } // method close
 
   public static boolean loglevelIsSevereOrOff(String logLevel) {
     return "off".equalsIgnoreCase(logLevel) || "severe".equalsIgnoreCase(logLevel);

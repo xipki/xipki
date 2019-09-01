@@ -85,7 +85,7 @@ class IaikP11Identity extends P11Identity {
           + " but not " + this.publicKey.getAlgorithm()
           + " (class: " + publicKey.getClass().getName() + ")");
     }
-  }
+  } // constructor
 
   @Override
   protected byte[] digestSecretKey0(long mechanism) throws P11TokenException {
@@ -104,7 +104,7 @@ class IaikP11Identity extends P11Identity {
     }
 
     return ((IaikP11Slot) slot).digestKey(mechanism, this);
-  }
+  } // constructor
 
   @Override
   protected byte[] sign0(long mechanism, P11Params parameters, byte[] content)

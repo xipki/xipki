@@ -146,7 +146,7 @@ public class P11ProxyConstants {
     actionMap.put(ACTION_REMOVE_OBJECTS,    "ACTION_REMOVE_OBJECTS");
     actionMap.put(ACTION_GEN_KEYPAIR_SM2,   "ACTION_GEN_KEYPAIR_SM2");
 
-  }
+  } // method static
 
   private P11ProxyConstants() {
   }

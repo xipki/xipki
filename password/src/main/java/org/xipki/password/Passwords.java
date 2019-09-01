@@ -71,7 +71,7 @@ public class Passwords {
     public void validate() throws InvalidConfException {
     }
 
-  }
+  } // class PasswordConf
 
   private PasswordResolverImpl passwordResolver;
 
@@ -103,7 +103,7 @@ public class Passwords {
         }
       }
     }
-  }
+  } // method init
 
   public PasswordResolver getPasswordResolver() {
     return passwordResolver;

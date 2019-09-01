@@ -80,7 +80,7 @@ public class X509ExtensionType extends ValidatableConf {
       }
     }
 
-  }
+  } // class ExtensionsType
 
   private DescribableOid type;
 
@@ -138,7 +138,7 @@ public class X509ExtensionType extends ValidatableConf {
     public void validate() throws InvalidConfException {
       notNull(oid, "oid");
     }
-  }
+  } // class DescribableOid
 
   public static class ConstantExtnValue extends ValidatableConf {
 
@@ -300,7 +300,7 @@ public class X509ExtensionType extends ValidatableConf {
       }
 
       return tag == null ? rv : new DERTaggedObject(tag.isExplicit(), tag.getValue(), rv);
-    }
+    } // method toASN1Encodable
 
     @Override
     public void validate() throws InvalidConfException {
@@ -339,9 +339,9 @@ public class X509ExtensionType extends ValidatableConf {
         }
         notNull(value, "value");
       }
-    }
+    } // method validate
 
-  }
+  } // class ConstantExtnValue
 
   public static enum FieldType {
     TeletexString("TeletexString"),
@@ -374,7 +374,7 @@ public class X509ExtensionType extends ValidatableConf {
     public String getText() {
       return text;
     }
-  }
+  } // method FieldType
 
   public static class Tag extends ValidatableConf {
 
@@ -434,6 +434,6 @@ public class X509ExtensionType extends ValidatableConf {
       return value == other.value && explicit == other.explicit;
     }
 
-  }
+  } // method Tag
 
 }

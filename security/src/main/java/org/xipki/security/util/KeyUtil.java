@@ -254,7 +254,7 @@ public class KeyUtil {
     } else {
       throw new IllegalArgumentException("key is not an XDH private key");
     }
-  }
+  } // method convertXDHToDummyEdDSAPrivateKey
 
   private static KeyFactory getKeyFactory(String algorithm) throws InvalidKeySpecException {
     String alg = algorithm.toUpperCase();
@@ -276,7 +276,7 @@ public class KeyUtil {
       KEY_FACTORIES.put(algorithm, kf);
       return kf;
     }
-  }
+  } // method getKeyFactory
 
   private static KeyPairGenerator getKeyPairGenerator(String algorithm)
       throws NoSuchAlgorithmException, NoSuchProviderException {
@@ -294,7 +294,7 @@ public class KeyUtil {
       KEYPAIR_GENERATORS.put(algorithm, kg);
       return kg;
     }
-  }
+  } // method getKeyPairGenerator
 
   public static PublicKey generatePublicKey(SubjectPublicKeyInfo pkInfo)
       throws InvalidKeySpecException {
@@ -327,7 +327,7 @@ public class KeyUtil {
     synchronized (kf) {
       return kf.generatePublic(keyspec);
     }
-  }
+  } // method generatePublicKey
 
   // CHECKSTYLE:SKIP
   public static RSAPublicKey generateRSAPublicKey(RSAPublicKeySpec keySpec)
@@ -365,7 +365,7 @@ public class KeyUtil {
     } else {
       throw new InvalidKeyException("unknown key " + key.getClass().getName());
     }
-  }
+  } // method generatePrivateKeyParameter
 
   public static AsymmetricKeyParameter generatePublicKeyParameter(PublicKey key)
       throws InvalidKeyException {
@@ -395,7 +395,7 @@ public class KeyUtil {
     } else {
       throw new InvalidKeyException("unknown key " + key.getClass().getName());
     }
-  }
+  } // method generatePublicKeyParameter
 
   public static SubjectPublicKeyInfo createSubjectPublicKeyInfo(PublicKey publicKey)
       throws InvalidKeyException {
@@ -498,7 +498,7 @@ public class KeyUtil {
     } else {
       throw new InvalidKeyException("unknown publicKey class " + publicKey.getClass().getName());
     }
-  }
+  } // method createSubjectPublicKeyInfo
 
   // CHECKSTYLE:SKIP
   public static ECPublicKey createECPublicKey(byte[] encodedAlgorithmIdParameters,
@@ -530,7 +530,7 @@ public class KeyUtil {
       throw new InvalidKeySpecException(ex.getMessage(), ex);
     }
     return (ECPublicKey) kf.generatePublic(keySpec);
-  }
+  } // method createECPublicKey
 
   private static ASN1ObjectIdentifier detectCurveOid(ECParameterSpec paramSpec) {
     org.bouncycastle.jce.spec.ECParameterSpec bcParamSpec = EC5Util.convertSpec(paramSpec, false);
@@ -545,7 +545,7 @@ public class KeyUtil {
     unsignedByteArrayCopy(keyData, 1, orderByteLength, point.getAffineX());
     unsignedByteArrayCopy(keyData, 1 + orderByteLength, orderByteLength, point.getAffineY());
     return keyData;
-  }
+  } // method getUncompressedEncodedECPoint
 
   /**
    * Write the passed in value as an unsigned byte array to the {@code out} from offset
@@ -569,6 +569,6 @@ public class KeyUtil {
 
       System.arraycopy(bytes, start, dest, destPos + length - count, count);
     }
-  }
+  } // method unsignedByteArrayCopy
 
 }

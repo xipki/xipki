@@ -82,7 +82,7 @@ public class CaServerConf extends ValidatableConf {
       notEmpty(name, "name");
     }
 
-  }
+  } // class SslContext
 
   public static class RemoteMgmt extends ValidatableConf {
 
@@ -110,7 +110,7 @@ public class CaServerConf extends ValidatableConf {
     public void validate() throws InvalidConfException {
     }
 
-  }
+  } // class RemoteMgmt
 
   private AuditConf audit;
 
@@ -151,7 +151,7 @@ public class CaServerConf extends ValidatableConf {
 
       return conf;
     }
-  }
+  } // method readConfFromFile
 
   public boolean isMaster() {
     return master;
@@ -197,7 +197,7 @@ public class CaServerConf extends ValidatableConf {
     }
 
     return null;
-  }
+  } // method getSslContext
 
   public AuditConf getAudit() {
     return audit == null ? AuditConf.DEFAULT : audit;
@@ -250,7 +250,7 @@ public class CaServerConf extends ValidatableConf {
       }
     }
     return sslContextConfMap.get(name);
-  }
+  } // method getSslContextConf
 
   @Override
   public void validate() throws InvalidConfException {
@@ -261,6 +261,6 @@ public class CaServerConf extends ValidatableConf {
     notEmpty(datasources, "datasources");
     validate(remoteMgmt);
     validate(security);
-  }
+  } // method validate
 
 }

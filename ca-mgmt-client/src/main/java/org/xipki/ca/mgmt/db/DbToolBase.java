@@ -80,7 +80,7 @@ public class DbToolBase implements Closeable {
       throw datasource.translate(null, ex);
     }
     this.baseDir = IoUtil.expandFilepath(baseDir);
-  }
+  } // constructor
 
   protected Statement createStatement() throws DataAccessException {
     try {
@@ -241,7 +241,7 @@ public class DbToolBase implements Closeable {
     }
 
     return props;
-  }
+  } // method getDbConfProperties
 
   public static void deleteTmpFiles(String dirName, String prefix) {
     Args.notBlank(dirName, "dirName");
@@ -257,7 +257,7 @@ public class DbToolBase implements Closeable {
         }
       }
     }
-  }
+  } // method deleteTmpFiles
 
   protected static void writeLine(OutputStream os, String text) throws IOException {
     os.write(StringUtil.toUtf8Bytes(text));
@@ -296,7 +296,7 @@ public class DbToolBase implements Closeable {
     ZipOutputStream zipOutStream = new ZipOutputStream(out);
     zipOutStream.setLevel(Deflater.BEST_SPEED);
     return zipOutStream;
-  }
+  } // method getZipOutputStream
 
   public void releaseResources(Statement ps, ResultSet rs) {
     datasource.releaseResources(ps, rs, false);

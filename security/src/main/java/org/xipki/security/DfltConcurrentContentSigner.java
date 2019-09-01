@@ -90,7 +90,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
         defaultSignServiceTimeout = vi;
       }
     }
-  }
+  } // method static
 
   public DfltConcurrentContentSigner(boolean mac, List<XiContentSigner> signers)
       throws NoSuchAlgorithmException {
@@ -207,7 +207,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
                 ex.getClass().getName(), i, ex.getMessage()), ex);
       }
     }
-  }
+  } // method setCertificateChain
 
   @Override
   public PublicKey getPublicKey() {
@@ -282,7 +282,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
     } finally {
       requiteSigner(signer);
     }
-  }
+  } // method sign
 
   @Override
   public byte[][] sign(byte[][] data) throws NoIdleSignerException, SignatureException {
@@ -307,6 +307,6 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     return signatures;
-  }
+  } // method sign
 
 }

@@ -163,7 +163,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
     } // method run
 
-  } // class ScheduledPublishQueueCleaner
+  } // class CertsInQueuePublisher
 
   private class UnreferencedRequstCleaner implements Runnable {
 
@@ -188,7 +188,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
     } // method run
 
-  } // class ScheduledDeleteUnreferencedRequstervice
+  } // class UnreferencedRequstCleaner
 
   private class CaRestarter implements Runnable {
 
@@ -221,7 +221,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
     } // method run
 
-  } // class ScheduledCaRestarter
+  } // class CaRestarter
 
   private static final Logger LOG = LoggerFactory.getLogger(CaManagerImpl.class);
 
@@ -460,7 +460,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       throw new CaMgmtException(concat(ex.getClass().getName(),
         " while parsing datasource ", datasourceName, ": ", ex.getMessage()), ex);
     }
-  }
+  } // method loadDatasource
 
   @Override
   public CaSystemStatus getCaSystemStatus() {
@@ -473,7 +473,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     } else {
       return CaSystemStatus.ERROR;
     }
-  }
+  } // method getCaSystemStatus
 
   private void lockCa(boolean forceRelock) throws CaMgmtException {
     SystemEvent lockInfo = queryExecutor.getSystemEvent(EVENT_LOCK);
@@ -823,7 +823,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
     auditLogPciEvent(true, "SHUTDOWN");
     LOG.info("stopped CA system");
-  } // method shutdown
+  } // method close
 
   public CmpResponder getX509CaResponder(String name) {
     return cmpResponders.get(Args.toNonBlankLower(name, "name"));
@@ -867,7 +867,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
     }
     return ret;
-  }
+  } // method getSuccessfulCaNames
 
   @Override
   public Set<String> getFailedCaNames() {
@@ -878,7 +878,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
     }
     return ret;
-  }
+  } // method getFailedCaNames
 
   @Override
   public Set<String> getInactiveCaNames() {
@@ -889,7 +889,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
     }
     return ret;
-  }
+  } // method getInactiveCaNames
 
   private void initRequestors() throws CaMgmtException {
     if (requestorsInitialized) {
@@ -958,7 +958,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
     }
     signerInitialized = true;
-  } // method initResponders
+  } // method initSigners
 
   private void initCaAliases() throws CaMgmtException {
     if (caAliasesInitialized) {
@@ -1125,7 +1125,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     } catch (RuntimeException ex) {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
     }
-  }
+  } // method commitNextCrlNo
 
   public RequestorInfo.ByUserRequestorInfo createByUserRequestor(MgmtEntry.CaHasUser caHasUser) {
     return new RequestorInfo.ByUserRequestorInfo(byUserRequestorId, caHasUser);
@@ -1184,7 +1184,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   public MgmtEntry.Ca getCa(String name) {
     CaInfo caInfo = caInfos.get(Args.toNonBlankLower(name, "name"));
     return (caInfo == null) ? null : caInfo.getCaEntry();
-  }
+  } // method getCa
 
   @Override
   public void changeCa(MgmtEntry.ChangeCa entry) throws CaMgmtException {
@@ -1498,7 +1498,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     asssertMasterMode();
 
     queryExecutor.removeUserFromCa(userName, caName);
-  }
+  } // method removeUserFromCa
 
   @Override
   public void addUserToCa(MgmtEntry.CaHasUser user, String caName) throws CaMgmtException {
@@ -1511,7 +1511,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
 
     queryExecutor.addUserToCa(user, ca.getCaIdent());
-  }
+  } // method addUserToCa
 
   @Override
   public Map<String, MgmtEntry.CaHasUser> getCaHasUsersForUser(String user) throws CaMgmtException {
@@ -1619,7 +1619,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     queryExecutor.addSigner(signerEntry);
     signers.put(name, signer);
     signerDbEntries.put(name, signerEntry);
-  } // method addResponder
+  } // method addSigner
 
   @Override
   public void removeSigner(String name) throws CaMgmtException {
@@ -1805,7 +1805,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     asssertMasterMode();
     queryExecutor.removeCaAlias(name);
     caAliases.remove(name);
-  }
+  } // method removeCaAlias
 
   @Override
   public String getCaNameForAlias(String aliasName) {
@@ -1818,7 +1818,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
     }
     return null;
-  }
+  } // method getCaNameForAlias
 
   @Override
   public Set<String> getAliasesForCa(String caName) {
@@ -1850,13 +1850,13 @@ public class CaManagerImpl implements CaManager, Closeable {
     caName = Args.toNonBlankLower(caName, "caName");
     X509Ca ca = x509cas.get(caName);
     return (ca == null) ? null : ca.getCaInfo().getCert();
-  }
+  } // method getCaCert
 
   public List<X509Cert> getCaCertchain(String caName) {
     caName = Args.toNonBlankLower(caName, "caName");
     X509Ca ca = x509cas.get(caName);
     return (ca == null) ? null : ca.getCaInfo().getCertchain();
-  }
+  } // method getCaCertchain
 
   @Override
   public void removeCa(String name) throws CaMgmtException {
@@ -2139,7 +2139,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       throw new CaMgmtException("unknown CA " + name);
     }
     return ca;
-  }
+  } // method getX509Ca
 
   public X509Ca getX509Ca(NameId ident) throws CaMgmtException {
     Args.notNull(ident, "ident");
@@ -2148,7 +2148,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       throw new CaMgmtException("unknown CA " + ident);
     }
     return ca;
-  }
+  } // method getX509Ca
 
   public IdentifiedCertprofile getIdentifiedCertprofile(String profileName) {
     profileName = Args.toNonBlankLower(profileName, "profileName");
@@ -2361,7 +2361,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     if (!queryExecutor.deleteRowWithName(username, "TUSER")) {
       throw new CaMgmtException("unknown user " + username);
     }
-  }
+  } // method removeUser
 
   @Override
   public MgmtEntry.User getUser(String username) throws CaMgmtException {
@@ -2480,7 +2480,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     } catch (CertificateException | OperationException ex) {
       throw new CaMgmtException(ex.getMessage(), ex);
     }
-  }
+  } // method getCert
 
   @Override
   public CertWithRevocationInfo getCert(X500Name issuer, BigInteger serialNumber)
@@ -2506,7 +2506,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     } catch (OperationException ex) {
       throw new CaMgmtException(ex.getMessage(), ex);
     }
-  }
+  } // method getCert
 
   @Override
   public byte[] getCertRequest(String caName, BigInteger serialNumber) throws CaMgmtException {
@@ -2518,7 +2518,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     } catch (OperationException ex) {
       throw new CaMgmtException(ex.getMessage(), ex);
     }
-  }
+  } // method getCertRequest
 
   @Override
   public List<CertListInfo> listCertificates(String caName, X500Name subjectPattern, Date validFrom,
@@ -2531,7 +2531,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     } catch (OperationException ex) {
       throw new CaMgmtException(ex.getMessage(), ex);
     }
-  }
+  } // method listCertificates
 
   @Override
   public void refreshTokenForSignerType(String signerType) throws CaMgmtException {
@@ -2541,7 +2541,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       throw new CaMgmtException("could not refresh token for signer type " + signerType
           + ": " + ex.getMessage(), ex);
     }
-  }
+  } // method refreshTokenForSignerType
 
   @Override
   public Map<String, X509Certificate> loadConf(InputStream zippedConfStream)
@@ -2867,7 +2867,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     } // cas
 
     return generatedRootCerts.isEmpty() ? null : generatedRootCerts;
-  }
+  } // method loadConf
 
   @Override
   public InputStream exportConf(List<String> caNames)
@@ -3243,7 +3243,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
 
     return new ByteArrayInputStream(bytesStream.toByteArray());
-  }
+  } // method exportConf
 
   private static FileOrValue createFileOrValue(ZipOutputStream zipStream,
       String content, String fileName) throws IOException {
@@ -3265,7 +3265,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
     }
     return ret;
-  }
+  } // method createFileOrValue
 
   private static FileOrBinary createFileOrBase64Value(ZipOutputStream zipStream,
       String b64Content, String fileName) throws IOException {
@@ -3274,7 +3274,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
 
     return createFileOrBinary(zipStream, Base64.decode(b64Content), fileName);
-  }
+  } // method createFileOrBase64Value
 
   private static FileOrBinary createFileOrBinary(ZipOutputStream zipStream,
       byte[] content, String fileName) throws IOException {
@@ -3296,7 +3296,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
     }
     return ret;
-  }
+  } // method createFileOrBinary
 
   public RestResponder getRestResponder() {
     return restResponder;
@@ -3324,6 +3324,6 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
 
     return list;
-  }
+  } // method getPermissions
 
 }

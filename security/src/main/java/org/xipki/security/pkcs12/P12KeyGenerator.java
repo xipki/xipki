@@ -145,7 +145,7 @@ public class P12KeyGenerator {
 
     return generateIdentity(new KeyPairWithSubjectPublicKeyInfo(keypair, subjectPublicKeyInfo),
         params, selfSignedCertSubject);
-  }
+  } // method generateECKeypair
 
   // CHECKSTYLE:SKIP
   public P12KeyGenerationResult generateEdECKeypair(ASN1ObjectIdentifier curveOid,
@@ -160,7 +160,7 @@ public class P12KeyGenerator {
 
     return generateIdentity(new KeyPairWithSubjectPublicKeyInfo(keypair, subjectPublicKeyInfo),
         params, selfSignedCertSubject);
-  }
+  } // method generateEdECKeypair
 
   public P12KeyGenerationResult generateSecretKey(String algorithm, int keyBitLen,
       KeystoreGenerationParameters params) throws Exception {
@@ -192,7 +192,7 @@ public class P12KeyGenerator {
     P12KeyGenerationResult result = new P12KeyGenerationResult(ksStream.toByteArray());
     result.setKeystoreObject(ks);
     return result;
-  }
+  } // method generateSecretKey
 
   // CHECKSTYLE:SKIP
   private KeyPairWithSubjectPublicKeyInfo genRSAKeypair(int keysize,
@@ -205,7 +205,7 @@ public class P12KeyGenerator {
         new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE),
         new RSAPublicKey(rsaPubKey.getModulus(), rsaPubKey.getPublicExponent()));
     return new KeyPairWithSubjectPublicKeyInfo(kp, spki);
-  }
+  } // method genRSAKeypair
 
   // CHECKSTYLE:SKIP
   private KeyPairWithSubjectPublicKeyInfo genDSAKeypair(int plength, int qlength,

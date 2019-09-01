@@ -61,16 +61,11 @@ public class RequestIssuer {
     this.from = 0;
     this.length = offset;
     this.hashAlgo = hashAlgo;
-  }
-
-  public static int arraycopy(byte[] hashData, byte[] data, int offset) {
-    System.arraycopy(hashData, 0, data, offset, hashData.length);
-    return hashData.length;
-  }
+  } // constructor
 
   public RequestIssuer(byte[] data) {
     this(data, 0, data.length);
-  }
+  } // constructor
 
   public RequestIssuer(byte[] data, int from, int length) {
     this.data = data;
@@ -80,6 +75,11 @@ public class RequestIssuer {
 
     int hashAlgoFieldLen = 0xFF & data[from + 1];
     this.nameHashFrom = from + 2 + hashAlgoFieldLen;
+  } // constructor
+
+  public static int arraycopy(byte[] hashData, byte[] data, int offset) {
+    System.arraycopy(hashData, 0, data, offset, hashData.length);
+    return hashData.length;
   }
 
   public HashAlgo hashAlgorithm() {

@@ -76,7 +76,7 @@ public class ObjectIdentifiers {
 
     public static final ASN1ObjectIdentifier id_alg_dhPop_x448_sha512 = id_xipki_alg.branch("2");
 
-  }
+  } // class Xipki
 
   public static class BaseRequirements { // base requirements
     public static final ASN1ObjectIdentifier id_domain_validated =

@@ -224,7 +224,7 @@ public class PkiMessage {
       addAttribute(vec, type, signedAttributes.get(type));
     }
     return new AttributeTable(vec);
-  }
+  } // method getSignedAttributes
 
   private AttributeTable getUnsignedAttributes() {
     if (unsignedAttributes.isEmpty()) {
@@ -250,7 +250,7 @@ public class PkiMessage {
       throw new MessageEncodingException(ex);
     }
     return encode(signer, signerCert, signerCertSet, recipientCert, encAlgId);
-  }
+  } // method encode
 
   public ContentInfo encode(ContentSigner signer, X509Certificate signerCert,
       X509Certificate[] cmsCertSet, X509Certificate recipientCert,
@@ -340,7 +340,7 @@ public class PkiMessage {
     } catch (CMSException ex) {
       throw new MessageEncodingException(ex);
     }
-  }
+  } // method encrypt
 
   private static void addAttribute(ASN1EncodableVector vector,
       ASN1ObjectIdentifier attrType, ASN1Encodable attrValue) {

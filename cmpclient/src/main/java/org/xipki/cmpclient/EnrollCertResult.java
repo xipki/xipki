@@ -66,7 +66,7 @@ public class EnrollCertResult {
       return error;
     }
 
-  }
+  } // class CertifiedKeyPairOrError
 
   private final Certificate caCert;
 

@@ -84,9 +84,9 @@ abstract class CrmfKeyWrapper {
       } catch (Exception ex) {
         throw new OperatorException("error in generateWrappedKey", ex);
       }
-    }
+    } // method generateWrappedKey
 
-  }
+  } // class RSAOAEPAsymmetricKeyWrapper
 
   // CHECKSTYLE:SKIP
   static class ECIESAsymmetricKeyWrapper extends CrmfKeyWrapper {
@@ -105,7 +105,7 @@ abstract class CrmfKeyWrapper {
       this.publicKey = publicKey;
       this.algorithmIdentifier = new AlgorithmIdentifier(
           ObjectIdentifiers.Secg.id_ecies_specifiedParameters, buildECIESParameters());
-    }
+    } // constructor
 
     @Override
     public AlgorithmIdentifier getAlgorithmIdentifier() {
@@ -165,7 +165,7 @@ abstract class CrmfKeyWrapper {
       } catch (Exception ex) {
         throw new OperatorException("error while generateWrappedKey", ex);
       }
-    }
+    } // method generateWrappedKey
 
     /**
      * <pre>
@@ -234,8 +234,8 @@ abstract class CrmfKeyWrapper {
           new AlgorithmIdentifier(HashAlgo.SHA1.getOid()));
       vec.add(new DERTaggedObject(true, 2, mac));
       return new DERSequence(vec);
-    }
+    } // method buildECIESParameters
 
-  }
+  } // class ECIESAsymmetricKeyWrapper
 
 }

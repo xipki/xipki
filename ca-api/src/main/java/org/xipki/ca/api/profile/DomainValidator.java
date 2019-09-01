@@ -111,9 +111,9 @@ class DomainValidator implements Serializable {
       }
 
       return null;
-    }
+    } // method match
 
-  }
+  } // class RegexValidator
 
   // Regular expression strings for hostnames (derived from RFC2396 and RFC 1123)
   private static final String DOMAIN_LABEL_REGEX = "\\p{Alnum}(?>[\\p{Alnum}-]*\\p{Alnum})*";

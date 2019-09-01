@@ -77,7 +77,7 @@ public class RequestorEntryWrapper {
         LogUtil.error(LOG, ex, "error while resolve password of requestor" + dbEntry.getIdent());
       }
     }
-  }
+  } // method setDbEntry
 
   public CertWithDbId getCert() {
     return cert;

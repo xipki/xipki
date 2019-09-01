@@ -82,7 +82,7 @@ class Template {
     extension = new ExtendedExtension(OID.ID_PKIX_OCSP_ARCHIVE_CUTOFF, false, new byte[17]);
     extnArchiveCutof = new byte[extension.getEncodedLength()];
     extension.write(extnArchiveCutof, 0);
-  }
+  } // method static
 
   public static WritableOnlyExtension getCertHashExtension(HashAlgo hashAlgo, byte[] certHash) {
     if (hashAlgo.getLength() != certHash.length) {
@@ -95,7 +95,7 @@ class Template {
     System.arraycopy(certHash, 0, rv, encodedPrefix.length, certHash.length);
 
     return new WritableOnlyExtension(rv);
-  }
+  } // method getCertHashExtension
 
   public static WritableOnlyExtension getInvalidityDateExtension(Date invalidityDate) {
     int len = extnInvalidityDate.length;
@@ -103,7 +103,7 @@ class Template {
     System.arraycopy(extnInvalidityDate, 0, encoded, 0, len - 17);
     ASN1Type.writeGeneralizedTime(invalidityDate, encoded, len - 17);
     return new WritableOnlyExtension(encoded);
-  }
+  } // method getInvalidityDateExtension
 
   public static WritableOnlyExtension getArchiveOffExtension(Date archiveCutoff) {
     int len = extnArchiveCutof.length;
@@ -111,7 +111,7 @@ class Template {
     System.arraycopy(extnArchiveCutof, 0, encoded, 0, len - 17);
     ASN1Type.writeGeneralizedTime(archiveCutoff, encoded, len - 17);
     return new WritableOnlyExtension(encoded);
-  }
+  } // method getArchiveOffExtension
 
   public static byte[] getEncodeRevokedInfo(CrlReason reason, Date revocationTime) {
     if (reason == null) {
@@ -127,6 +127,6 @@ class Template {
       encoded[23] = (byte) reason.getCode();
       return encoded;
     }
-  }
+  } // method getEncodeRevokedInfo
 
 }

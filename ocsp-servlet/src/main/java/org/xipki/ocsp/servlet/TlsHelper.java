@@ -68,7 +68,7 @@ public class TlsHelper {
     }
 
     LOG.info("set reverseProxyMode to {}", reverseProxyMode);
-  }
+  } // method static
 
   public static X509Certificate getTlsClientCert(HttpServletRequest request) throws IOException {
     if (reverseProxyMode == null) {
@@ -109,6 +109,6 @@ public class TlsHelper {
       throw new IllegalStateException("unknown reverseProxyMode " + reverseProxyMode);
     }
 
-  }
+  } // method getTlsClientCert
 
 }

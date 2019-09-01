@@ -135,7 +135,7 @@ public class SubjectChecker {
     } else {
       return checkSubjectAttributeNotMultiValued(type, subject, requestedSubject);
     }
-  }
+  } // method checkSubjectAttribute
 
   private ValidationIssue checkSubjectAttributeNotMultiValued(ASN1ObjectIdentifier type,
       X500Name subject, X500Name requestedSubject) throws BadCertTemplateException {
@@ -366,7 +366,7 @@ public class SubjectChecker {
         }
       }
     }
-  } // mehtod checkAttributeTypeAndValue
+  } // method checkAttributeTypeAndValue
 
   private static boolean matchStringType(ASN1Encodable atvValue, StringType stringType) {
     boolean correctStringType = true;

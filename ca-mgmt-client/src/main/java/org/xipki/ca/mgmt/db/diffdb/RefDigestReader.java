@@ -101,7 +101,7 @@ class RefDigestReader implements Closeable {
         throw ex;
       }
 
-    }
+    } // constructor
 
     @Override
     public void run() {
@@ -116,7 +116,7 @@ class RefDigestReader implements Closeable {
       releaseResources(selectCertStmt, null);
       datasource.returnConnection(conn);
       selectCertStmt = null;
-    }
+    } // method run
 
     private void query() throws InterruptedException {
       long startId = lastProcessedId + 1;
@@ -192,7 +192,7 @@ class RefDigestReader implements Closeable {
       }
     } // method query
 
-  } // class XipkiDbRetriever
+  } // class Retriever
 
   private RefDigestReader(DataSourceWrapper datasource, X509Certificate caCert, int totalAccount,
       long minId, int numBlocksToRead, AtomicBoolean stopMe) throws Exception {
@@ -248,7 +248,7 @@ class RefDigestReader implements Closeable {
       throw new Exception("could not initialize me");
     }
 
-  }
+  } // method init
 
   public int getCaId() {
     return caId;
@@ -375,7 +375,7 @@ class RefDigestReader implements Closeable {
     if (conn != null) {
       datasource.returnConnection(conn);
     }
-  }
+  } // method close
 
   protected void releaseResources(Statement ps, ResultSet rs) {
     datasource.releaseResources(ps, rs);

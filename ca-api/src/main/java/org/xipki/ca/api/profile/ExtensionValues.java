@@ -46,7 +46,7 @@ public class ExtensionValues {
     }
     extensions.put(type, new ExtensionValue(critical, value));
     return true;
-  }
+  } // method addExtension
 
   public boolean addExtension(ASN1ObjectIdentifier type, ExtensionValue value) {
     Args.notNull(type, "type");
@@ -57,7 +57,7 @@ public class ExtensionValues {
     }
     extensions.put(type, value);
     return true;
-  }
+  } // method addExtension
 
   public Set<ASN1ObjectIdentifier> getExtensionTypes() {
     return Collections.unmodifiableSet(extensions.keySet());

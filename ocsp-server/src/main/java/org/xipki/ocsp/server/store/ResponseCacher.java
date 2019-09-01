@@ -181,7 +181,7 @@ public class ResponseCacher implements Closeable {
     // check every 600 seconds (10 minutes)
     this.issuerUpdater = scheduledThreadPoolExecutor.scheduleAtFixedRate(
         new IssuerUpdater(), 448, 600, TimeUnit.SECONDS);
-  }
+  } // method init
 
   @Override
   public void close() {
@@ -211,7 +211,7 @@ public class ResponseCacher implements Closeable {
       }
       scheduledThreadPoolExecutor = null;
     }
-  }
+  } // method close
 
   public Integer getIssuerId(RequestIssuer reqIssuer) {
     IssuerEntry issuer = issuerStore.getIssuerForFp(reqIssuer);
@@ -261,7 +261,7 @@ public class ResponseCacher implements Closeable {
       }
       throw ex;
     }
-  }
+  } // method storeIssuer
 
   public OcspRespWithCacheInfo getOcspResponse(int issuerId, BigInteger serialNumber,
       AlgorithmCode sigAlg) throws DataAccessException {
@@ -312,7 +312,7 @@ public class ResponseCacher implements Closeable {
     } finally {
       datasource.releaseResources(ps, rs);
     }
-  }
+  } // method getOcspResponse
 
   public void storeOcspResponse(int issuerId, BigInteger serialNumber, long thisUpdate,
       Long nextUpdate, AlgorithmCode sigAlgCode, byte[] response) {
@@ -385,7 +385,7 @@ public class ResponseCacher implements Closeable {
         LOG.debug("could not cache OCSP response iid=" + issuerId + ", ident=" + ident, ex);
       }
     }
-  }
+  } // method storeOcspResponse
 
   private int removeExpiredResponses(long maxThisUpdate) throws DataAccessException {
     final String sql = SQL_DELETE_EXPIRED_RESP;
@@ -399,7 +399,7 @@ public class ResponseCacher implements Closeable {
     } finally {
       datasource.releaseResources(ps, null);
     }
-  }
+  } // method removeExpiredResponses
 
   private void updateCacheStore() {
     boolean stillOnService = updateCacheStore0();
@@ -409,7 +409,7 @@ public class ResponseCacher implements Closeable {
     } else {
       LOG.info("OCSP response cacher is on service");
     }
-  }
+  } // method updateCacheStore
 
   /**
    * update the cache store.
@@ -542,7 +542,7 @@ public class ResponseCacher implements Closeable {
     }
 
     return true;
-  }
+  } // method initIssuerStore
 
   private static byte[] buildIdent(BigInteger serialNumber, AlgorithmCode sigAlg) {
     byte[] snBytes = serialNumber.toByteArray();
@@ -588,7 +588,7 @@ public class ResponseCacher implements Closeable {
         | (0xFFL & hash[5]) << 16
         | (0xFFL & hash[6]) << 8
         | (0xFFL & hash[7]);
-  }
+  } // method deriveId
 
   private static byte[] int2Bytes(int value) {
     if (value > -1 && value < 65535) {

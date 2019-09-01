@@ -167,7 +167,7 @@ public class IaikP11Module extends P11Module {
     }
 
     setSlots(slots);
-  }
+  } // constructor
 
   public static P11Module getInstance(P11ModuleConf moduleConf) throws P11TokenException {
     Args.notNull(moduleConf, "moduleConf");
@@ -205,7 +205,7 @@ public class IaikP11Module extends P11Module {
     }
 
     return new IaikP11Module(module, moduleConf);
-  }
+  } // method getInstance
 
   @Override
   public String getDescription() {

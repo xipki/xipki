@@ -65,7 +65,7 @@ public class HttpMgmtServlet extends HttpServlet {
       return status;
     }
 
-  }
+  } // class MyException
 
   private static final Logger LOG = LoggerFactory.getLogger(HttpMgmtServlet.class);
 
@@ -152,7 +152,7 @@ public class HttpMgmtServlet extends HttpServlet {
     } finally {
       response.flushBuffer();
     }
-  } // method service
+  } // method doPost
 
   private static String getNameFromRequest(InputStream in) throws OcspMgmtException {
     MgmtRequest.Name req = parse(in, MgmtRequest.Name.class);
@@ -166,6 +166,6 @@ public class HttpMgmtServlet extends HttpServlet {
     } catch (RuntimeException | IOException ex) {
       throw new OcspMgmtException("cannot parse request " + clazz + " from InputStream");
     }
-  }
+  } // method parse
 
 }

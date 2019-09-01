@@ -89,7 +89,7 @@ public class ProxyServletFilter implements Filter {
     servlet = new HttpProxyServlet();
     servlet.setLogReqResp(logReqResp);
     servlet.setLocalP11CryptServicePool(pool);
-  }
+  } // method init
 
   @Override
   public void destroy() {
@@ -108,6 +108,6 @@ public class ProxyServletFilter implements Filter {
     HttpServletRequest req = (HttpServletRequest) request;
     HttpServletResponse resp = (HttpServletResponse) response;
     servlet.doPost(req, resp);
-  }
+  } // method doFilter
 
 }

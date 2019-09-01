@@ -143,7 +143,7 @@ public class OcspServletFilter implements Filter {
         }
       }
     }
-  }
+  } // method init
 
   @Override
   public void destroy() {
@@ -196,6 +196,6 @@ public class OcspServletFilter implements Filter {
       req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path);
       ocspServlet.service(req, resp);
     }
-  }
+  } // method doFilter
 
 }

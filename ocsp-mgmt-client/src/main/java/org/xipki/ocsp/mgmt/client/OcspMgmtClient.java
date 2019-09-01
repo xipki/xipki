@@ -107,7 +107,7 @@ public class OcspMgmtClient implements OcspManager {
     }
 
     initialized = true;
-  }
+  } // method initIfNotDone
 
   @Override
   public void restartOcspServer() throws OcspMgmtException {
@@ -201,7 +201,7 @@ public class OcspMgmtClient implements OcspManager {
       throw new OcspMgmtException(
           "IOException while sending message to the server: " + ex.getMessage(), ex);
     }
-  }
+  } // method transmit
 
   @SuppressWarnings("unused")
   private static <T extends MgmtResponse> T parse(byte[] bytes, Class<?> clazz)

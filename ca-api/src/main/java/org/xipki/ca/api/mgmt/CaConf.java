@@ -99,7 +99,7 @@ public class CaConf {
     public String getCertOutputFormat() {
       return certOutputFormat;
     }
-  }
+  } // class GenSelfIssued
 
   public static class SingleCa {
 
@@ -144,7 +144,7 @@ public class CaConf {
       this.requestors = requestors;
       this.users = users;
       this.publisherNames = publisherNames;
-    }
+    } // constructor
 
     public String getName() {
       return name;
@@ -178,7 +178,7 @@ public class CaConf {
       return publisherNames;
     }
 
-  }
+  } // class SingleCa
 
   private static final Logger LOG = LoggerFactory.getLogger(CaConf.class);
 
@@ -241,7 +241,7 @@ public class CaConf {
         LOG.info("could not clonse zipStream", ex.getMessage());
       }
     }
-  }
+  } // method init
 
   private final void init0(CaConfType.CaSystem root, Map<String, byte[]> zipEntries,
       SecurityFactory securityFactory)
@@ -509,7 +509,7 @@ public class CaConf {
       }
     }
 
-  }
+  } // method init0
 
   public void addSigner(MgmtEntry.Signer signer) {
     Args.notNull(signer, "signer");
@@ -611,7 +611,7 @@ public class CaConf {
     }
 
     return expandConf(new String(binary, "UTF-8"));
-  }
+  } // method getValue
 
   private String getBase64Binary(FileOrBinary fileOrBinary, Map<String, byte[]> zipEntries)
       throws IOException {
@@ -628,7 +628,7 @@ public class CaConf {
     }
 
     return bout.toByteArray();
-  }
+  } // method read
 
   private byte[] getBinary(FileOrBinary fileOrBinary, Map<String, byte[]> zipEntries)
       throws IOException {
@@ -647,7 +647,7 @@ public class CaConf {
     }
 
     return binary;
-  }
+  } //method getBinary
 
   private String expandConf(String confStr) {
     if (confStr == null || !confStr.contains("${") || confStr.indexOf('}') == -1) {
@@ -662,7 +662,7 @@ public class CaConf {
     }
 
     return confStr;
-  }
+  } // method expandConf
 
   private static int getIntPermission(List<String> permissions) throws InvalidConfException {
     int ret = 0;
@@ -674,6 +674,6 @@ public class CaConf {
       ret |= ii;
     }
     return ret;
-  }
+  } // method getIntPermission
 
 }

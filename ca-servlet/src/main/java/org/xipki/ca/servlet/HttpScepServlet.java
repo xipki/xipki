@@ -284,7 +284,7 @@ public class HttpScepServlet extends HttpServlet {
     } finally {
       audit(auditService, event, auditLevel, auditStatus, auditMessage);
     }
-  } // method service
+  } // method service0
 
   protected PKIMessage generatePkiMessage(InputStream is) throws IOException {
     ASN1InputStream asn1Stream = new ASN1InputStream(is);
@@ -298,7 +298,7 @@ public class HttpScepServlet extends HttpServlet {
         LOG.error("could not close ASN1 stream: {}", asn1Stream);
       }
     }
-  } // method generatePKIMessage
+  } // method generatePkiMessage
 
   private static void audit(AuditService auditService, AuditEvent event,
       AuditLevel auditLevel, AuditStatus auditStatus, String auditMessage) {
@@ -324,7 +324,7 @@ public class HttpScepServlet extends HttpServlet {
   private static void sendError(HttpServletResponse resp, int status) {
     resp.setStatus(status);
     resp.setContentLength(0);
-  }
+  } // method sendError
 
   // CHECKSTYLE:SKIP
   private static void sendOKResponse(HttpServletResponse resp, String contentType, byte[] content)
@@ -333,6 +333,6 @@ public class HttpScepServlet extends HttpServlet {
     resp.setContentType(contentType);
     resp.setContentLength(content.length);
     resp.getOutputStream().write(content);
-  }
+  } // method sendOKResponse
 
 }

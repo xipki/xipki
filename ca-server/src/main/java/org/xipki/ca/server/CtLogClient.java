@@ -63,7 +63,7 @@ public class CtLogClient {
       this.chain = chain;
     }
 
-  }
+  } // class AddPreChainRequest
 
   // Do not change the variable name, and the get- and set-methods.
   public static class AddPreChainResponse {
@@ -120,7 +120,7 @@ public class CtLogClient {
       this.signature = signature;
     }
 
-  }
+  } // class AddPreChainResponse
 
   private final Curl curl;
 
@@ -138,7 +138,7 @@ public class CtLogClient {
           ? m + "ct/v1/add-pre-chain" : m + "/ct/v1/add-pre-chain";
       this.addPreChainUrls.add(addPreChainUrl);
     }
-  }
+  } // constructor
 
   public SignedCertificateTimestampList getCtLogScts(
       byte[] precert, X509Cert caCert, List<X509Cert> certchain) throws OperationException {
@@ -190,6 +190,6 @@ public class CtLogClient {
     }
 
     return new SignedCertificateTimestampList(new SerializedSCT(scts));
-  }
+  } // method getCtLogScts
 
 }

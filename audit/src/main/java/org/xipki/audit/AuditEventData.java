@@ -41,7 +41,7 @@ public class AuditEventData {
     } else {
       this.value = value.toString();
     }
-  }
+  } // constructor
 
   public void addValue(Object additionalValue) {
     this.value += ", " + additionalValue;

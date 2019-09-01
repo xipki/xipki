@@ -81,7 +81,7 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
       return keysize;
     }
 
-  }
+  } // class AESGmac
 
   // CHECKSTYLE:SKIP
   public static class DSA extends P12SignSpeed {
@@ -106,7 +106,7 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
       return keystoreBytes;
     }
 
-  }
+  } // class DSA
 
   // CHECKSTYLE:SKIP
   public static class EC extends P12SignSpeed {
@@ -134,7 +134,7 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
       return keystoreBytes;
     }
 
-  }
+  } // class EC
 
   // CHECKSTYLE:SKIP
   public static class HMAC extends P12SignSpeed {
@@ -171,7 +171,7 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
       return keysize;
     }
 
-  }
+  } // class HMAC
 
   // CHECKSTYLE:SKIP
   public static class RSA extends P12SignSpeed {
@@ -197,7 +197,7 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
       return keystoreBytes;
     }
 
-  }
+  } // class RSA
 
   // CHECKSTYLE:SKIP
   public static class SM2 extends P12SignSpeed {
@@ -220,7 +220,7 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
       return keystoreBytes;
     }
 
-  }
+  } // class SM2
 
   class Testor implements Runnable {
 

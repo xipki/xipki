@@ -156,7 +156,7 @@ public class X509Util {
       return (atv == null) ? null : rdnValueToString(atv.getValue());
     }
     return null;
-  }
+  } // method getCommonName
 
   public static X500Name reverse(X500Name name) {
     RDN[] orig = Args.notNull(name, "name").getRDNs();
@@ -285,7 +285,7 @@ public class X509Util {
     }
 
     return bytes;
-  }
+  } // method toDerEncoded
 
   private static CertificateFactory getCertFactory() throws CertificateException {
     synchronized (certFactLock) {
@@ -788,7 +788,7 @@ public class X509Util {
     }
 
     return issues;
-  }
+  } // method issues
 
   public static boolean issues(org.bouncycastle.asn1.x509.Certificate issuerCert,
       org.bouncycastle.asn1.x509.Certificate cert) throws CertificateEncodingException {
@@ -812,7 +812,7 @@ public class X509Util {
     }
 
     return issues;
-  }
+  } // method issues
 
   public static SubjectPublicKeyInfo toRfc3279Style(SubjectPublicKeyInfo publicKeyInfo)
       throws InvalidKeySpecException {
@@ -861,7 +861,7 @@ public class X509Util {
     } else {
       return publicKeyInfo;
     }
-  }
+  } // method toRfc3279Style
 
   public static String cutText(String text, int maxLen) {
     Args.notNull(text, "text");
@@ -893,7 +893,7 @@ public class X509Util {
     } catch (IOException ex) {
       throw new IllegalStateException(ex.getMessage(), ex);
     }
-  }
+  } // method createExtnSubjectAltName
 
   public static Extension createExtnSubjectInfoAccess(List<String> accessMethodAndLocations,
       boolean critical) throws BadInputException {
@@ -911,7 +911,7 @@ public class X509Util {
     } catch (IOException ex) {
       throw new IllegalStateException(ex.getMessage(), ex);
     }
-  }
+  } // method createExtnSubjectInfoAccess
 
   public static AccessDescription createAccessDescription(String accessMethodAndLocation)
       throws BadInputException {
@@ -934,7 +934,7 @@ public class X509Util {
 
     GeneralName location = createGeneralName(taggedValue);
     return new AccessDescription(accessMethod, location);
-  }
+  } // method createAccessDescription
 
   public static GeneralNames createGeneralNames(List<String> taggedValues)
       throws BadInputException {
@@ -948,7 +948,7 @@ public class X509Util {
       names[i] = createGeneralName(taggedValues.get(i));
     }
     return new GeneralNames(names);
-  }
+  } // method createGeneralNames
 
   /**
   * Creates {@link GeneralName} from the tagged value.
@@ -1057,7 +1057,7 @@ public class X509Util {
     }
 
     return sb.toString();
-  }
+  } // method formatCert
 
   public static Date getTime(Object obj) {
     if (obj instanceof byte[]) {
@@ -1081,6 +1081,6 @@ public class X509Util {
     } else {
       return Time.getInstance(obj).getDate();
     }
-  }
+  } // method getTime
 
 }

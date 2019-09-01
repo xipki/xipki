@@ -131,7 +131,7 @@ public abstract class P11Slot implements Closeable {
       return null;
     }
 
-  }
+  } // class P11SlotRefreshResult
 
   public static class P11NewObjectControl {
 
@@ -152,7 +152,7 @@ public abstract class P11Slot implements Closeable {
       return label;
     }
 
-  }
+  } // class P11NewObjectControl
 
   public static enum P11KeyUsage {
     DECRYPT,
@@ -160,7 +160,7 @@ public abstract class P11Slot implements Closeable {
     SIGN,
     SIGN_RECOVER,
     UNWRAP
-  }
+  } // class P11KeyUsage
 
   public static class P11NewKeyControl extends P11NewObjectControl {
 
@@ -201,7 +201,7 @@ public abstract class P11Slot implements Closeable {
       this.usages = usages;
     }
 
-  }
+  } // class P11NewKeyControl
 
   private static final Logger LOG = LoggerFactory.getLogger(P11Slot.class);
 
@@ -465,7 +465,7 @@ public abstract class P11Slot implements Closeable {
       }
     }
     return null;
-  }
+  } // method getCertForId
 
   /**
    * Gets certificate with the given identifier {@code id}.
@@ -497,7 +497,7 @@ public abstract class P11Slot implements Closeable {
         LOG.warn("could not set certificates for identity {}", identity.getId());
       }
     }
-  }
+  } // method updateCaCertsOfIdentity
 
   private X509Certificate[] buildCertPath(X509Certificate cert) {
     List<X509Certificate> certs = new LinkedList<>();
@@ -507,7 +507,7 @@ public abstract class P11Slot implements Closeable {
       cur = getIssuerForCert(cur);
     }
     return certs.toArray(new X509Certificate[0]);
-  }
+  } // method buildCertPath
 
   private X509Certificate getIssuerForCert(X509Certificate cert) {
     try {
@@ -528,7 +528,7 @@ public abstract class P11Slot implements Closeable {
       LOG.warn("invalid encoding of certificate {}", ex.getMessage());
     }
     return null;
-  }
+  } // method getIssuerForCert
 
   public void refresh() throws P11TokenException {
     P11SlotRefreshResult res = refresh0(); // CHECKSTYLE:SKIP
@@ -600,7 +600,7 @@ public abstract class P11Slot implements Closeable {
 
       LOG.info(sb.toString());
     }
-  }
+  } // method refresh
 
   protected void addIdentity(P11Identity identity) throws P11DuplicateEntityException {
     if (!slotId.equals(identity.getId().getSlotId())) {
@@ -614,7 +614,7 @@ public abstract class P11Slot implements Closeable {
 
     identities.put(keyId, identity);
     updateCaCertsOfIdentity(identity);
-  }
+  } // method addIdentity
 
   public boolean hasIdentity(P11ObjectIdentifier keyId) {
     return identities.containsKey(keyId);
@@ -693,7 +693,7 @@ public abstract class P11Slot implements Closeable {
         throw new P11DuplicateEntityException(sb.toString());
       }
     }
-  }
+  } // method assertNoIdentityAndCert
 
   public P11ObjectIdentifier getObjectId(byte[] id, String label) {
     if (id == null && label == null) {
@@ -731,7 +731,7 @@ public abstract class P11Slot implements Closeable {
     }
 
     return null;
-  }
+  } // method getObjectId
 
   public P11IdentityId getIdentityId(byte[] keyId, String keyLabel) {
     if (keyId == null && keyLabel == null) {
@@ -754,7 +754,7 @@ public abstract class P11Slot implements Closeable {
     }
 
     return null;
-  }
+  } // method getIdentityId
 
   /**
    * Exports the certificate of the given identifier {@code objectId}.
@@ -778,7 +778,7 @@ public abstract class P11Slot implements Closeable {
       throw new P11UnknownEntityException(slotId, objectId);
     }
     return cert.getCert();
-  }
+  } // method exportCert
 
   /**
    * Remove certificates.
@@ -812,7 +812,7 @@ public abstract class P11Slot implements Closeable {
 
     updateCaCertsOfIdentities();
     removeCerts0(objectId);
-  }
+  } // method removeCerts
 
   /**
    * Removes the key (private key, public key, secret key, and certificates) associated with
@@ -837,7 +837,7 @@ public abstract class P11Slot implements Closeable {
     }
 
     removeIdentity0(identityId);
-  }
+  } // method removeIdentity
 
   /**
    * Removes the key (private key, public key, secret key, and certificates) associated with
@@ -865,7 +865,7 @@ public abstract class P11Slot implements Closeable {
       removeIdentity0(entityId);
     }
 
-  }
+  } // method removeIdentityByKeyId
 
   /**
    * Adds the certificate to the PKCS#11 token under the given identifier {@code objectId}.
@@ -896,7 +896,7 @@ public abstract class P11Slot implements Closeable {
     updateCaCertsOfIdentities();
     LOG.info("added certificate {}", objectId);
     return objectId;
-  }
+  } // method addCert
 
   protected String generateLabel(String label) throws P11TokenException {
 
@@ -933,7 +933,7 @@ public abstract class P11Slot implements Closeable {
       idx++;
       tmpLabel = label + "-" + idx;
     }
-  }
+  } // method generateLabel
 
   /**
    * Generates a secret key in the PKCS#11 token.
@@ -960,7 +960,7 @@ public abstract class P11Slot implements Closeable {
     P11IdentityId id = identity.getId();
     LOG.info("generated secret key {}", id);
     return id;
-  }
+  } // method generateSecretKey
 
   /**
    * Imports secret key object in the PKCS#11 token. The key itself will not be generated
@@ -988,7 +988,7 @@ public abstract class P11Slot implements Closeable {
     P11ObjectIdentifier objId = identity.getId().getKeyId();
     LOG.info("created secret key {}", objId);
     return objId;
-  }
+  } // method importSecretKey
 
   /**
    * Generates an RSA keypair.
@@ -1022,7 +1022,7 @@ public abstract class P11Slot implements Closeable {
     P11IdentityId id = identity.getId();
     LOG.info("generated RSA keypair {}", id);
     return id;
-  }
+  } // method generateRSAKeypair
 
   /**
    * Generates a DSA keypair.
@@ -1053,7 +1053,7 @@ public abstract class P11Slot implements Closeable {
     P11IdentityId id = identity.getId();
     LOG.info("generated DSA keypair {}", id);
     return id;
-  }
+  } // method generateDSAKeypair
 
   /**
    * Generates a DSA keypair.
@@ -1083,7 +1083,7 @@ public abstract class P11Slot implements Closeable {
     P11IdentityId id = identity.getId();
     LOG.info("generated DSA keypair {}", id);
     return id;
-  }
+  } // method generateDSAKeypair
 
   /**
    * Generates an EC keypair.
@@ -1119,7 +1119,7 @@ public abstract class P11Slot implements Closeable {
     P11IdentityId id = identity.getId();
     LOG.info("generated EC keypair {}", id);
     return id;
-  }
+  } // method generateECKeypair
 
   /**
    * Generates an EC Edwards keypair.
@@ -1144,7 +1144,7 @@ public abstract class P11Slot implements Closeable {
     P11IdentityId id = identity.getId();
     LOG.info("generated EC Edwards keypair {}", id);
     return id;
-  }
+  } // method generateECEdwardsKeypair
 
   /**
    * Generates an EC Montgomery keypair.
@@ -1169,7 +1169,7 @@ public abstract class P11Slot implements Closeable {
     P11IdentityId id = identity.getId();
     LOG.info("generated EC Montgomery keypair {}", id);
     return id;
-  }
+  } // method generateECMontgomeryKeypair
 
   /**
    * Generates an SM2 keypair.
@@ -1189,7 +1189,7 @@ public abstract class P11Slot implements Closeable {
     P11IdentityId id = identity.getId();
     LOG.info("generated SM2 keypair {}", id);
     return id;
-  }
+  } // method generateSM2Keypair
 
   private void assertCanGenKeypair(String methodName, long mechanism, P11NewKeyControl control)
       throws P11UnsupportedMechanismException, P11PermissionException, P11DuplicateEntityException {
@@ -1197,7 +1197,7 @@ public abstract class P11Slot implements Closeable {
     assertWritable(methodName);
     assertMechanismSupported(mechanism);
     assertNoIdentityAndCert(control.getId(), control.getLabel());
-  }
+  } // method assertCanGenKeypair
 
   /**
    * Updates the certificate associated with the given ID {@code keyId} with the given certificate
@@ -1238,7 +1238,7 @@ public abstract class P11Slot implements Closeable {
     identity.setCertificates(new X509Certificate[]{newCert});
     updateCaCertsOfIdentities();
     LOG.info("updated certificate for key {}", keyId);
-  }
+  } // method updateCertificate
 
   /**
    * Writes the token details to the given {@code stream}.
@@ -1317,13 +1317,13 @@ public abstract class P11Slot implements Closeable {
     if (sb.length() > 0) {
       stream.write(StringUtil.toUtf8Bytes(sb.toString()));
     }
-  }
+  } // method showDetails
 
   protected void assertWritable(String operationName) throws P11PermissionException {
     if (readOnly) {
       throw new P11PermissionException("Writable operation " + operationName + " is not permitted");
     }
-  }
+  } // method assertWritable
 
   protected boolean existsIdentityForId(byte[] id) {
     for (P11ObjectIdentifier objectId : identities.keySet()) {
@@ -1333,7 +1333,7 @@ public abstract class P11Slot implements Closeable {
     }
 
     return false;
-  }
+  } // method existsIdentityForId
 
   protected boolean existsCertForId(byte[] id) {
     for (P11ObjectIdentifier objectId : certificates.keySet()) {
@@ -1343,7 +1343,7 @@ public abstract class P11Slot implements Closeable {
     }
 
     return false;
-  }
+  } // method existsCertForId
 
   private static void formatString(Integer index, boolean verbose, StringBuilder sb,
       X509Certificate cert) {
@@ -1373,12 +1373,12 @@ public abstract class P11Slot implements Closeable {
       sb.append("ERROR");
     }
     sb.append("\n");
-  }
+  } // method formatString
 
   private List<P11ObjectIdentifier> getSortedObjectIds(Set<P11ObjectIdentifier> sets) {
     List<P11ObjectIdentifier> ids = new ArrayList<>(sets);
     Collections.sort(ids);
     return ids;
-  }
+  } // method getSortedObjectIds
 
 }

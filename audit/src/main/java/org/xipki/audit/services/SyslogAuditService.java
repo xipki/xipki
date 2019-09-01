@@ -350,7 +350,7 @@ public class SyslogAuditService implements AuditService {
         throw new IllegalArgumentException(String.format("unknown auditLevel '%s'", auditLevel));
     }
     return res;
-  }
+  } // method getSeverity
 
   private static Properties loadProperties(String path) throws AuditServiceRuntimeException {
     if (path == null) {
@@ -371,7 +371,7 @@ public class SyslogAuditService implements AuditService {
     } else {
       throw new AuditServiceRuntimeException("the file " + path + " does not exist");
     }
-  }
+  } // method loadProperties
 
   private static String getString(Properties props, String key, String dfltValue) {
     if (props == null) {
@@ -380,7 +380,7 @@ public class SyslogAuditService implements AuditService {
       String value = props.getProperty(key);
       return value == null ? dfltValue : value;
     }
-  }
+  } // method getString
 
   private static int getInt(Properties props, String key, int dfltValue) {
     if (props == null) {
@@ -389,7 +389,7 @@ public class SyslogAuditService implements AuditService {
       String value = props.getProperty(key);
       return value == null ? dfltValue : Integer.parseInt(value);
     }
-  }
+  } // method getInt
 
   private static boolean getBoolean(Properties props, String key, boolean dfltValue) {
     if (props == null) {
@@ -398,6 +398,6 @@ public class SyslogAuditService implements AuditService {
       String value = props.getProperty(key);
       return value == null ? dfltValue : Boolean.parseBoolean(value);
     }
-  }
+  } // method getBoolean
 
 }

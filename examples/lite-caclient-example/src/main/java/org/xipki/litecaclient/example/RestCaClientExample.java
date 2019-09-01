@@ -101,7 +101,7 @@ public class RestCaClientExample extends CaClientExample {
       ex.printStackTrace();
       System.exit(-1);
     }
-  }
+  } // method main
 
   private static String getSubject() {
     return "CN=REST-" + index.incrementAndGet() + ".xipki.org,O=xipki,C=DE";

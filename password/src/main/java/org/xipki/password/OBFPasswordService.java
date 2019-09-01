@@ -58,7 +58,7 @@ public class OBFPasswordService {
       }
     } // end for
     return buf.toString();
-  }
+  } // method obfuscate
 
   public static String deobfuscate(String str) {
     Args.notNull(str, "str");
@@ -87,7 +87,7 @@ public class OBFPasswordService {
     } // end for
 
     return new String(bytes, 0, idx, StandardCharsets.UTF_8);
-  }
+  } // method deobfuscate
 
   private static boolean startsWithIgnoreCase(String str, String prefix) {
     return (str.length() < prefix.length()) ? false

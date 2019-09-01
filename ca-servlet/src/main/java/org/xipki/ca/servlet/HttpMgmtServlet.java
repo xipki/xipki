@@ -80,7 +80,7 @@ public class HttpMgmtServlet extends HttpServlet {
       return status;
     }
 
-  }
+  } // class class
 
   private static final Logger LOG = LoggerFactory.getLogger(HttpMgmtServlet.class);
 
@@ -676,7 +676,7 @@ public class HttpMgmtServlet extends HttpServlet {
     } finally {
       response.flushBuffer();
     }
-  } // method service
+  } // method doPost
 
   private static MgmtResponse.ByteArray toByteArray(MgmtAction action, X509Certificate cert)
       throws MyException {
@@ -694,7 +694,7 @@ public class HttpMgmtServlet extends HttpServlet {
     }
 
     return new MgmtResponse.ByteArray(encoded);
-  }
+  } // method toByteArray
 
   private static MgmtResponse.ByteArray toByteArray(MgmtAction action, X509CRL crl)
       throws MyException {
@@ -712,12 +712,12 @@ public class HttpMgmtServlet extends HttpServlet {
     }
 
     return new MgmtResponse.ByteArray(encoded);
-  }
+  } // method toByteArray
 
   private static String getNameFromRequest(InputStream in) throws CaMgmtException {
     MgmtRequest.Name req = parse(in, MgmtRequest.Name.class);
     return req.getName();
-  }
+  } // method getNameFromRequest
 
   private static <T extends MgmtRequest> T parse(InputStream in, Class<?> clazz)
       throws CaMgmtException {
@@ -726,6 +726,6 @@ public class HttpMgmtServlet extends HttpServlet {
     } catch (RuntimeException | IOException ex) {
       throw new CaMgmtException("cannot parse request " + clazz + " from InputStream");
     }
-  }
+  } // method parse
 
 }

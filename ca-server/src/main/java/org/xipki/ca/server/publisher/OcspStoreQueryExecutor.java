@@ -74,7 +74,7 @@ class OcspStoreQueryExecutor {
     boolean matchCert(byte[] encodedCert) {
       return Arrays.equals(this.cert, encodedCert);
     }
-  }
+  } // class IssuerEntry
 
   private static class IssuerStore {
 
@@ -87,7 +87,7 @@ class OcspStoreQueryExecutor {
       for (IssuerEntry entry : entries) {
         addIdentityEntry(entry);
       }
-    }
+    } // constructor
 
     final void addIdentityEntry(IssuerEntry entry) {
       Args.notNull(entry, "entry");
@@ -99,7 +99,7 @@ class OcspStoreQueryExecutor {
       }
 
       entries.add(entry);
-    }
+    } // method addIdentityEntry
 
     Integer getIdForCert(byte[] encodedCert) {
       Args.notNull(encodedCert, "encodedCert");
@@ -110,9 +110,9 @@ class OcspStoreQueryExecutor {
       }
 
       return null;
-    }
+    } // method getIdForCert
 
-  }
+  } // class IssuerStore
 
   private static final String SQL_ADD_REVOKED_CERT =
       "INSERT INTO CERT (ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,HASH,SUBJECT,RT,RIT,RR)"
@@ -321,7 +321,7 @@ class OcspStoreQueryExecutor {
     } finally {
       datasource.releaseResources(ps, null);
     }
-  }
+  } // method updateRegisteredCert
 
   void revokeCert(X509Cert caCert, CertWithDbId cert, CertRevocationInfo revInfo)
       throws DataAccessException, OperationException {
@@ -445,7 +445,7 @@ class OcspStoreQueryExecutor {
           + "please start XiPKI in master mode first the restart this XiPKI system");
     }
     return id.intValue();
-  }
+  } // method getIssuerId
 
   void addIssuer(X509Cert issuerCert) throws DataAccessException {
     if (issuerStore.getIdForCert(issuerCert.getEncodedCert()) != null) {

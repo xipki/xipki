@@ -70,7 +70,7 @@ public class CertificatePolicyInformationType extends ValidatableConf {
   public static enum PolicyQualfierType {
     cpsUri,
     userNotice
-  }
+  } // class PolicyQualfierType
 
   public static class PolicyQualifier extends ValidatableConf {
 
@@ -100,5 +100,5 @@ public class CertificatePolicyInformationType extends ValidatableConf {
       notEmpty(value, "value");
     }
 
-  }
+  } // class PolicyQualifier
 }

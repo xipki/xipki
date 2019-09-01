@@ -157,7 +157,7 @@ class OcspBenchRequestor {
     this.httpClient = new BenchmarkHttpClient(uri.getHost(), uri.getPort(), null,
         responseHandler, queueSize);
     this.httpClient.start();
-  }
+  } // method init
 
   public void shutdown() throws Exception {
     httpClient.shutdown();

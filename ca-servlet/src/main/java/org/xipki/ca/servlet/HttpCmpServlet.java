@@ -182,6 +182,6 @@ public class HttpCmpServlet extends HttpServlet {
       event.finish();
       auditService.logEvent(event);
     }
-  } // method service
+  } // method doPost
 
 }

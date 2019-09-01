@@ -137,7 +137,7 @@ public class CaIdNameMap {
   public void clearCa() {
     idCaMap.clear();
     nameCaMap.clear();
-  }
+  } // method clearCa
 
   public NameId removeCertprofile(int id) {
     NameId ident = idCertprofileMap.remove(id);
@@ -145,7 +145,7 @@ public class CaIdNameMap {
       nameCertprofileMap.remove(ident.getName());
     }
     return ident;
-  }
+  } // method removeCertprofile
 
   public NameId removeCertprofile(String name) {
     NameId ident = nameCertprofileMap.remove(name.toLowerCase());
@@ -153,7 +153,7 @@ public class CaIdNameMap {
       idCertprofileMap.remove(ident.getId());
     }
     return ident;
-  }
+  } // method removeCertprofile
 
   public NameId removePublisher(int id) {
     NameId ident = idPublisherMap.remove(id);
@@ -161,7 +161,7 @@ public class CaIdNameMap {
       namePublisherMap.remove(ident.getName());
     }
     return ident;
-  }
+  } // method removePublisher
 
   public NameId removePublisher(String name) {
     NameId ident = namePublisherMap.remove(name.toLowerCase());
@@ -169,7 +169,7 @@ public class CaIdNameMap {
       idPublisherMap.remove(ident.getId());
     }
     return ident;
-  }
+  } // method removePublisher
 
   public NameId removeRequestor(int id) {
     NameId ident = idRequestorMap.remove(id);
@@ -177,7 +177,7 @@ public class CaIdNameMap {
       nameRequestorMap.remove(ident.getName());
     }
     return ident;
-  }
+  } // method removeRequestor
 
   public NameId removeRequestor(String name) {
     NameId ident = nameRequestorMap.remove(name.toLowerCase());
@@ -185,7 +185,7 @@ public class CaIdNameMap {
       idRequestorMap.remove(ident.getId());
     }
     return ident;
-  }
+  } // method removeRequestor
 
   public NameId removeCa(int id) {
     NameId ident = idCaMap.remove(id);
@@ -193,7 +193,7 @@ public class CaIdNameMap {
       nameCaMap.remove(ident.getName());
     }
     return ident;
-  }
+  } // method removeCa
 
   public NameId removeCa(String name) {
     NameId ident = nameCaMap.remove(name.toLowerCase());
@@ -201,6 +201,6 @@ public class CaIdNameMap {
       idCaMap.remove(ident.getId());
     }
     return ident;
-  }
+  } // method removeCa
 
 }

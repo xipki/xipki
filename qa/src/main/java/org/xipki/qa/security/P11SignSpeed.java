@@ -78,7 +78,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
                 .getKeyId();
     }
 
-  }
+  } // class DSA
 
   //CHECKSTYLE:SKIP
   public static class EC extends P11SignSpeed {
@@ -105,7 +105,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
       return slot.generateECKeypair(curveOid, getNewKeyControl(keyId, keyLabel)).getKeyId();
     }
 
-  }
+  } // class EC
 
   //CHECKSTYLE:SKIP
   public static class HMAC extends P11SignSpeed {
@@ -157,7 +157,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
       return keysize;
     }
 
-  }
+  } // class HMAC
 
   // CHECKSTYLE:SKIP
   public static class RSA extends P11SignSpeed {
@@ -188,7 +188,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
               .getKeyId();
     }
 
-  }
+  } // class RSA
 
   //CHECKSTYLE:SKIP
   public static class SM2 extends P11SignSpeed {
@@ -214,7 +214,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
       return slot.generateSM2Keypair(getNewKeyControl(keyId, keyLabel)).getKeyId();
     }
 
-  }
+  } // class SM2
 
   class Testor implements Runnable {
 
@@ -275,7 +275,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
       close();
       throw ex;
     }
-  }
+  } // constructor
 
   @Override
   public final void close() {
@@ -328,6 +328,6 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
     }
 
     return new SignerConf(conf.getEncoded());
-  }
+  } // method getPkcs11SignerConf
 
 }

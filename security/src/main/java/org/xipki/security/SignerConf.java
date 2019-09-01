@@ -131,7 +131,7 @@ public class SignerConf {
     }
 
     return sb.toString();
-  }
+  } // method toString
 
   public static String eraseSensitiveData(String conf) {
     if (conf == null || !conf.toLowerCase().contains("password")) {
@@ -152,6 +152,6 @@ public class SignerConf {
     } catch (Exception ex) {
       return conf;
     }
-  }
+  } // method eraseSensitiveData
 
 }

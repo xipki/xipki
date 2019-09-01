@@ -88,7 +88,7 @@ public class LocalP11CryptServicePool {
 
     initialized.set(true);
     LOG.info("initialized");
-  }
+  } // method init
 
   public P11CryptService getP11CryptService(short moduleId) {
     return p11CryptServices.get(moduleId);

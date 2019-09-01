@@ -78,6 +78,6 @@ public class RangeBigIntegerIterator implements Iterator<BigInteger> {
     }
 
     return ret;
-  }
+  } // method next
 
 }

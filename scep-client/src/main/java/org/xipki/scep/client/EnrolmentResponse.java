@@ -76,7 +76,7 @@ public final class EnrolmentResponse {
       throw new ScepClientException(ex.getMessage(), ex);
     }
     this.certificates = Collections.unmodifiableList(certs);
-  }
+  } // constructor
 
   /**
    * Returns <tt>true</tt> for a pending response, <tt>false</tt> otherwise.

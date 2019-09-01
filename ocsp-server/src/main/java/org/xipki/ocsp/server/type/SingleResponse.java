@@ -64,7 +64,7 @@ public class SingleResponse extends ASN1Type {
 
     this.bodyLength = len;
     this.encodedLength = getLen(bodyLength);
-  }
+  } // constructor
 
   @Override
   public int getEncodedLength() {
@@ -88,6 +88,6 @@ public class SingleResponse extends ASN1Type {
       idx += extensions.write(out, idx);
     }
     return idx - offset;
-  }
+  } // method write
 
 }

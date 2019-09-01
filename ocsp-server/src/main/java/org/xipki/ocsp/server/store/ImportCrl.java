@@ -115,7 +115,7 @@ class ImportCrl {
       }
     }
 
-  }
+  } // class CertInfo
 
   private static class CrlDirInfo {
 
@@ -444,7 +444,7 @@ class ImportCrl {
     }
 
     return false;
-  }
+  } // method importCrlToOcspDb
 
   private void importCrl(Connection conn, CrlDirInfo crlDirInfo) {
     // Delete the files UPDATE.SUCC and UPDATE.FAIL
@@ -636,7 +636,7 @@ class ImportCrl {
         }
       }
     }
-  }
+  } // method importCrl
 
   /**
    * Delete CA.
@@ -665,7 +665,7 @@ class ImportCrl {
 
     // Delete the table ISSUER
     datasource.deleteFromTable(conn, "ISSUER", "ID", issuerId.intValue());
-  }
+  } // method deleteCa
 
   /**
    * Import the CA certificate with revocation information.
@@ -725,7 +725,7 @@ class ImportCrl {
     } finally {
       releaseResources(ps, rs);
     }
-  }
+  } // method importCa
 
   private void importCrlInfo(Connection conn, int id, String name, CrlInfo crlInfo,
       boolean shareCaWithOtherCrl, String sha1FpOfIssuerCert) throws DataAccessException {
@@ -776,7 +776,7 @@ class ImportCrl {
     } finally {
       releaseResources(ps, rs);
     }
-  }
+  } // method importCrlInfo
 
   private void importCrlRevokedCertificates(Connection conn, int crlInfoId, CertWrapper caCert,
       CrlStreamParser crl, long startTimeSec)
@@ -1015,7 +1015,7 @@ class ImportCrl {
         commit(conn);
       }
     }
-  }
+  } // method importCrlRevokedCertificates
 
   private static Certificate parseCert(File certFile) throws ImportCrlException {
     try {
@@ -1024,7 +1024,7 @@ class ImportCrl {
       throw new ImportCrlException("could not parse X.509 certificate from file "
           + certFile + ": " + ex.getMessage(), ex);
     }
-  }
+  } // method parseCert
 
   private CertInfo getCertInfo(int caId, BigInteger serialNumber) throws DataAccessException {
     ResultSet rs = null;
@@ -1050,7 +1050,7 @@ class ImportCrl {
     } finally {
       releaseResources(null, rs);
     }
-  }
+  } // method getCertInfo
 
   private void addCertificate(AtomicLong maxId, int crlInfoId, CertWrapper caCert, Certificate cert,
       String profileName, String certLogId) throws DataAccessException, ImportCrlException {
@@ -1159,7 +1159,7 @@ class ImportCrl {
     }
 
     LOG.info("Imported  certificate {}", certLogId);
-  }
+  } // method addCertificate
 
   private void addCertificateBySerialNumber(AtomicLong maxId, int caId, int crlInfoId,
       BigInteger serialNumber) throws DataAccessException {
@@ -1229,7 +1229,7 @@ class ImportCrl {
     }
 
     LOG.info(" Imported certificate by serial number {}", serialNumber);
-  }
+  } // method addCertificateBySerialNumber
 
   private void deleteEntriesNotUpdatedSince(Connection conn, int crlInfoId, long timeSec)
       throws DataAccessException {
@@ -1243,7 +1243,7 @@ class ImportCrl {
     } finally {
       releaseResources(stmt, null);
     }
-  }
+  } // method deleteEntriesNotUpdatedSince
 
   private void releaseResources(Statement ps, ResultSet rs) {
     datasource.releaseResources(ps, rs, false);
@@ -1278,6 +1278,6 @@ class ImportCrl {
     }
 
     return StringUtil.isBlank(dirName) ? null : crlName;
-  }
+  } // method getCrlNameFromDir
 
 }

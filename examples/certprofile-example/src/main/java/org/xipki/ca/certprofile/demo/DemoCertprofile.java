@@ -112,7 +112,7 @@ public class DemoCertprofile extends XijsonCertprofile {
     } else {
       return false;
     }
-  }
+  } // method initExtraExtension
 
   @Override
   public ExtensionValues getExtraExtensions(
@@ -158,6 +158,6 @@ public class DemoCertprofile extends XijsonCertprofile {
     }
 
     return extnValues.size() == 0 ? null : extnValues;
-  } // method getExtensions
+  } // method getExtraExtensions
 
 }

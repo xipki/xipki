@@ -164,7 +164,7 @@ public class KeypairWithCert {
         | UnrecoverableKeyException | ClassCastException | CertPathBuilderException ex) {
       throw new XiSecurityException(ex.getMessage(), ex);
     }
-  }
+  } // method fromKeystore
 
   public PrivateKey getKey() {
     return key;

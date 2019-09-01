@@ -148,7 +148,7 @@ public final class CmpClientImpl implements CmpClient {
         lastUpdate = System.currentTimeMillis();
         inProcess.set(false);
       }
-    }
+    } // method run
 
   } // class ClientConfigUpdater
 
@@ -171,7 +171,7 @@ public final class CmpClientImpl implements CmpClient {
       return hostnameVerifier;
     }
 
-  }
+  } // class SslConf
 
   private static final Logger LOG = LoggerFactory.getLogger(CmpClientImpl.class);
 
@@ -252,7 +252,7 @@ public final class CmpClientImpl implements CmpClient {
     if (!init()) {
       throw new CmpClientException("initialization of CA client failed");
     }
-  }
+  } // method initIfNotInitialized
 
   public synchronized boolean init() {
     // reset
@@ -601,7 +601,7 @@ public final class CmpClientImpl implements CmpClient {
       }
       scheduledThreadPoolExecutor = null;
     }
-  }
+  } // method close
 
   @Override
   public EnrollCertResult enrollCert(String caName, CertificationRequest csr, String profile,
@@ -632,7 +632,7 @@ public final class CmpClientImpl implements CmpClient {
         request, notBefore, notAfter, debug);
 
     return parseEnrollCertResult(result);
-  } // method requestCert
+  } // method enrollCert
 
   @Override
   public EnrollCertResult enrollCerts(String caName, EnrollCertRequest request,
@@ -674,7 +674,7 @@ public final class CmpClientImpl implements CmpClient {
 
     EnrollCertResponse result = ca.getAgent().requestCertificate(request, debug);
     return parseEnrollCertResult(result);
-  } // method requestCerts
+  } // method enrollCerts
 
   private void checkCertprofileSupportInCa(String certprofile, String caName)
       throws CmpClientException {
@@ -711,7 +711,7 @@ public final class CmpClientImpl implements CmpClient {
     if (caName == null) {
       throw new CmpClientException("unsupported certprofile " + certprofile);
     }
-  }
+  } // method checkCertprofileSupportInCa
 
   @Override
   public CertIdOrError revokeCert(String caName, X509Certificate cert, int reason,
@@ -721,7 +721,7 @@ public final class CmpClientImpl implements CmpClient {
     CaConf ca = getCa(caName);
     assertIssuedByCa(cert, ca);
     return revokeCert(ca, cert.getSerialNumber(), reason, invalidityDate, debug);
-  }
+  } // method revokeCert
 
   @Override
   public CertIdOrError revokeCert(String caName, BigInteger serial, int reason, Date invalidityDate,
@@ -729,7 +729,7 @@ public final class CmpClientImpl implements CmpClient {
     initIfNotInitialized();
     CaConf ca = getCa(caName);
     return revokeCert(ca, serial, reason, invalidityDate, debug);
-  }
+  } // method revokeCert
 
   private CertIdOrError revokeCert(CaConf ca, BigInteger serial, int reason,
       Date invalidityDate, ReqRespDebug debug) throws CmpClientException, PkiErrorException {
@@ -747,7 +747,7 @@ public final class CmpClientImpl implements CmpClient {
     request.addRequestEntry(entry);
     Map<String, CertIdOrError> result = revokeCerts(request, debug);
     return (result == null) ? null : result.get(id);
-  }
+  } // method revokeCert
 
   @Override
   public Map<String, CertIdOrError> revokeCerts(RevokeCertRequest request, ReqRespDebug debug)
@@ -782,7 +782,7 @@ public final class CmpClientImpl implements CmpClient {
 
     RevokeCertResponse result = caConf.getAgent().revokeCertificate(request, debug);
     return parseRevokeCertResult(result);
-  }
+  } // method revokeCerts
 
   private Map<String, CertIdOrError> parseRevokeCertResult(RevokeCertResponse result)
       throws CmpClientException {
@@ -804,14 +804,14 @@ public final class CmpClientImpl implements CmpClient {
     }
 
     return ret;
-  }
+  } // method parseRevokeCertResult
 
   @Override
   public X509CRL downloadCrl(String caName, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     caName = Args.toNonBlankLower(caName, "caName");
     return downloadCrl(caName, (BigInteger) null, debug);
-  }
+  } // method downloadCrl
 
   @Override
   public X509CRL downloadCrl(String caName, BigInteger crlNumber, ReqRespDebug debug)
@@ -829,7 +829,7 @@ public final class CmpClientImpl implements CmpClient {
           : agent.downloadCrl(crlNumber, debug);
 
     return result;
-  }
+  } // method downloadCrl
 
   @Override
   public X509CRL generateCrl(String caName, ReqRespDebug debug)
@@ -844,7 +844,7 @@ public final class CmpClientImpl implements CmpClient {
     }
 
     return ca.getAgent().generateCrl(debug);
-  }
+  } // method generateCrl
 
   @Override
   public String getCaNameByIssuer(X500Name issuer) throws CmpClientException {
@@ -864,7 +864,7 @@ public final class CmpClientImpl implements CmpClient {
     }
 
     throw new CmpClientException("unknown CA for issuer: " + issuer);
-  }
+  } // method getCaNameByIssuer
 
   @Override
   public String getCaNameForProfile(String certprofile) throws CmpClientException {
@@ -887,7 +887,7 @@ public final class CmpClientImpl implements CmpClient {
     }
 
     return caName;
-  }
+  } // method getCaNameForProfile
 
   private java.security.cert.Certificate getCertificate(CMPCertificate cmpCert)
       throws CertificateException {
@@ -951,7 +951,7 @@ public final class CmpClientImpl implements CmpClient {
     CaConf ca = getCa(caName);
     assertIssuedByCa(cert, ca);
     return unrevokeCert(ca, cert.getSerialNumber(), debug);
-  }
+  } // method unrevokeCert
 
   @Override
   public CertIdOrError unrevokeCert(String caName, BigInteger serial, ReqRespDebug debug)
@@ -979,7 +979,7 @@ public final class CmpClientImpl implements CmpClient {
     request.addRequestEntry(entry2);
     Map<String, CertIdOrError> result = unrevokeCerts(request, debug);
     return (result == null) ? null : result.get(id);
-  }
+  } // method unrevokeCert
 
   @Override
   public Map<String, CertIdOrError> unrevokeCerts(UnrevokeOrRemoveCertRequest request,
@@ -1014,7 +1014,7 @@ public final class CmpClientImpl implements CmpClient {
     CaConf ca = getCa(caName);
     assertIssuedByCa(cert, ca);
     return removeCert(ca, cert.getSerialNumber(), debug);
-  }
+  } // method removeCert
 
   @Override
   public CertIdOrError removeCert(String caName, BigInteger serial, ReqRespDebug debug)
@@ -1022,7 +1022,7 @@ public final class CmpClientImpl implements CmpClient {
     initIfNotInitialized();
     CaConf ca = getCa(caName);
     return removeCert(ca, serial, debug);
-  }
+  } // method removeCert
 
   private CertIdOrError removeCert(CaConf ca, BigInteger serial, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
@@ -1039,7 +1039,7 @@ public final class CmpClientImpl implements CmpClient {
     request.addRequestEntry(entry);
     Map<String, CertIdOrError> result = removeCerts(request, debug);
     return (result == null) ? null : result.get(id);
-  }
+  } // method removeCert
 
   @Override
   public Map<String, CertIdOrError> removeCerts(UnrevokeOrRemoveCertRequest request,
@@ -1064,7 +1064,7 @@ public final class CmpClientImpl implements CmpClient {
     CmpAgent agent = casMap.get(caName).getAgent();
     RevokeCertResponse result = agent.removeCertificate(request, debug);
     return parseRevokeCertResult(result);
-  }
+  } // method removeCerts
 
   @Override
   public Set<CertprofileInfo> getCertprofiles(String caName) throws CmpClientException {
@@ -1086,7 +1086,7 @@ public final class CmpClientImpl implements CmpClient {
       ret.add(ca.getProfile(m));
     }
     return ret;
-  }
+  } // method getCertprofiles
 
   @Override
   public HealthCheckResult getHealthCheckResult(String caName) throws CmpClientException {
@@ -1302,7 +1302,7 @@ public final class CmpClientImpl implements CmpClient {
       throw new CmpClientException("could not find CA named " + caName);
     }
     return ca;
-  }
+  } // method parse
 
   private static void assertIssuedByCa(X509Certificate cert, CaConf ca)
       throws CmpClientException {
@@ -1316,7 +1316,7 @@ public final class CmpClientImpl implements CmpClient {
     if (!issued) {
       throw new CmpClientException("the given certificate is not issued by the CA");
     }
-  }
+  } // method assertIssuedByCa
 
   @Override
   public X509Certificate getCaCert(String caName) throws CmpClientException {

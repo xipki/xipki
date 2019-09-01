@@ -88,7 +88,7 @@ public class XiEdDSAContentVerifierProvider implements ContentVerifierProvider {
       }
     }
 
-  }
+  } // class EdDSAContentVerifier
 
   private final PublicKey verifyKey;
 

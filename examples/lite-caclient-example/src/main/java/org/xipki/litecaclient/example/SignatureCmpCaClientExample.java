@@ -211,7 +211,7 @@ public class SignatureCmpCaClientExample extends CaClientExample {
       ex.printStackTrace();
       System.exit(-1);
     }
-  }
+  } // method main
 
   private static String getSubject() {
     return "CN=CMP-" + index.incrementAndGet() + ".xipki.org,O=xipki,C=DE";

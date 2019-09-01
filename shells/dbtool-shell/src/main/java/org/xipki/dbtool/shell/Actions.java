@@ -67,7 +67,7 @@ public class Actions {
       return null;
     }
 
-  }
+  } // class Initdb
 
   public abstract static class LiquibaseAction extends XiAction {
 
@@ -153,6 +153,6 @@ public class Actions {
       }
     } // method read
 
-  }
+  } // class LiquibaseAction
 
 }

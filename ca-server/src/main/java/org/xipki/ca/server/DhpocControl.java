@@ -111,7 +111,7 @@ public class DhpocControl {
       throw new XiSecurityException(ex.getMessage(), ex);
     }
 
-  }
+  } // constructor
 
   public X509Cert[] getCertificates() {
     if (certs == null || certs.length == 0) {
@@ -119,7 +119,7 @@ public class DhpocControl {
     } else {
       return Arrays.copyOf(certs, certs.length);
     }
-  }
+  } // method getCertificates
 
   public DHSigStaticKeyCertPair getKeyCertPair(X500Name issuer, BigInteger serial,
       String keyAlgorithm) {
@@ -132,6 +132,6 @@ public class DhpocControl {
     }
 
     return null;
-  }
+  } // method getKeyCertPair
 
 }

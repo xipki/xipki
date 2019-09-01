@@ -130,7 +130,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       hashMechMap.put(HashAlgo.SHA3_256, PKCS11Constants.CKM_DSA_SHA3_256);
       hashMechMap.put(HashAlgo.SHA3_384, PKCS11Constants.CKM_DSA_SHA3_384);
       hashMechMap.put(HashAlgo.SHA3_512, PKCS11Constants.CKM_DSA_SHA3_512);
-    }
+    } // method static
 
     DSA(P11CryptService cryptService, P11IdentityId identityId,
         AlgorithmIdentifier signatureAlgId, boolean plain)
@@ -159,7 +159,7 @@ abstract class P11ContentSigner implements XiContentSigner {
 
         this.outputStream = new ByteArrayOutputStream();
       }
-    }
+    } // constructor
 
     @Override
     public OutputStream getOutputStream() {
@@ -198,7 +198,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       return cryptService.getIdentity(identityId).sign(mechanism, null, dataToSign);
     }
 
-  }
+  } // class DSA
 
   // CHECKSTYLE:SKIP
   static class ECDSA extends P11ContentSigner {
@@ -239,7 +239,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       hashMechMap.put(HashAlgo.SHA3_256, PKCS11Constants.CKM_ECDSA_SHA3_256);
       hashMechMap.put(HashAlgo.SHA3_384, PKCS11Constants.CKM_ECDSA_SHA3_384);
       hashMechMap.put(HashAlgo.SHA3_512, PKCS11Constants.CKM_ECDSA_SHA3_512);
-    }
+    } // method static
 
     ECDSA(P11CryptService cryptService, P11IdentityId identityId,
         AlgorithmIdentifier signatureAlgId, boolean plain)
@@ -266,7 +266,7 @@ abstract class P11ContentSigner implements XiContentSigner {
         }
         this.outputStream = new ByteArrayOutputStream();
       }
-    }
+    } // method constructor
 
     @Override
     public OutputStream getOutputStream() {
@@ -304,7 +304,7 @@ abstract class P11ContentSigner implements XiContentSigner {
 
       return cryptService.getIdentity(identityId).sign(mechanism, null, dataToSign);
     }
-  }
+  } // method ECDSA
 
   // CHECKSTYLE:SKIP
   static class EdDSA extends P11ContentSigner {
@@ -342,7 +342,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       }
     }
 
-  }
+  } // class EdDSA
 
   static class Mac extends P11ContentSigner {
 
@@ -378,7 +378,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       }
 
       this.outputStream = new ByteArrayOutputStream();
-    }
+    } // constructor
 
     @Override
     public OutputStream getOutputStream() {
@@ -401,7 +401,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       }
     }
 
-  }
+  } // class Mac
 
   // CHECKSTYLE:SKIP
   static class RSA extends P11ContentSigner {
@@ -442,7 +442,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       hashAlgMecMap.put(HashAlgo.SHA3_256, PKCS11Constants.CKM_SHA3_256_RSA_PKCS);
       hashAlgMecMap.put(HashAlgo.SHA3_384, PKCS11Constants.CKM_SHA3_384_RSA_PKCS);
       hashAlgMecMap.put(HashAlgo.SHA3_512, PKCS11Constants.CKM_SHA3_512_RSA_PKCS);
-    }
+    } // method static
 
     RSA(P11CryptService cryptService, P11IdentityId identityId,
         AlgorithmIdentifier signatureAlgId) throws XiSecurityException, P11TokenException {
@@ -482,7 +482,7 @@ abstract class P11ContentSigner implements XiContentSigner {
 
       RSAPublicKey rsaPubKey = (RSAPublicKey) cryptService.getIdentity(identityId).getPublicKey();
       this.modulusBitLen = rsaPubKey.getModulus().bitLength();
-    }
+    } // constructor
 
     @Override
     public OutputStream getOutputStream() {
@@ -518,9 +518,9 @@ abstract class P11ContentSigner implements XiContentSigner {
         LogUtil.error(LOG, ex, "could not sign");
         throw new RuntimeCryptoException("SignerException: " + ex.getMessage());
       }
-    }
+    } // method getSignature
 
-  }
+  } // class RSA
 
   // CHECKSTYLE:SKIP
   static class RSAPSS extends P11ContentSigner {
@@ -537,7 +537,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       hashAlgMecMap.put(HashAlgo.SHA3_256, PKCS11Constants.CKM_SHA3_256_RSA_PKCS_PSS);
       hashAlgMecMap.put(HashAlgo.SHA3_384, PKCS11Constants.CKM_SHA3_384_RSA_PKCS_PSS);
       hashAlgMecMap.put(HashAlgo.SHA3_512, PKCS11Constants.CKM_SHA3_512_RSA_PKCS_PSS);
-    }
+    } // method static
 
     // CHECKSTYLE:SKIP
     private static class PSSSignerOutputStream extends OutputStream {
@@ -640,7 +640,7 @@ abstract class P11ContentSigner implements XiContentSigner {
         this.parameters = new P11Params.P11RSAPkcsPssParams(asn1Params);
         this.outputStream = new ByteArrayOutputStream();
       }
-    }
+    } // constructor
 
     @Override
     public OutputStream getOutputStream() {
@@ -680,9 +680,9 @@ abstract class P11ContentSigner implements XiContentSigner {
         throw new RuntimeCryptoException("SignerException: " + ex.getMessage());
       }
 
-    }
+    } // method getSignature
 
-  }
+  } // class RSAPSS
 
   static class SM2 extends P11ContentSigner {
 
@@ -785,6 +785,6 @@ abstract class P11ContentSigner implements XiContentSigner {
 
       return cryptService.getIdentity(identityId).sign(mechanism, params, dataToSign);
     }
-  }
+  } // class SM2
 
 }

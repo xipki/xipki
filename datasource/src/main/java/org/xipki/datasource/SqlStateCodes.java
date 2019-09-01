@@ -170,7 +170,7 @@ public class SqlStateCodes {
       default:
         throw new IllegalStateException("should not reach here, unknown database type " + dbType);
     }
-  }
+  } // method newInstance
 
   private static Set<String> toSet(String... strs) {
     if (strs == null || strs.length == 0) {
@@ -182,7 +182,7 @@ public class SqlStateCodes {
       set.add(str);
     }
     return Collections.unmodifiableSet(set);
-  }
+  } // method toSet
 
   private static Set<String> addToSet(Set<String> baseSet, String... strs) {
     if (strs == null || strs.length == 0) {
@@ -194,6 +194,6 @@ public class SqlStateCodes {
       newSet.add(str);
     }
     return Collections.unmodifiableSet(newSet);
-  }
+  } // method addToSet
 
 }

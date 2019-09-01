@@ -57,7 +57,7 @@ class CertRepublisher {
 
     }
 
-  }
+  } // class QueueEntry
 
   private class SerialWithIdQueueEntry implements QueueEntry {
 
@@ -71,7 +71,7 @@ class CertRepublisher {
       return serialWithId;
     }
 
-  }
+  } // class SerialWithIdQueueEntry
 
   private class CertRepublishProducer implements Runnable {
 
@@ -117,8 +117,8 @@ class CertRepublisher {
           failed = true;
         }
       }
-    }
-  }
+    } // method run
+  } // class CertRepublishProducer
 
   private class CertRepublishConsumer implements Runnable {
 
@@ -180,9 +180,9 @@ class CertRepublisher {
         }
         processLog.addNumProcessed(1);
       }
-    }
+    } // method run
 
-  }
+  } // class CertRepublishConsumer
 
   private static final Logger LOG = LoggerFactory.getLogger(CertRepublisher.class);
 
@@ -215,7 +215,7 @@ class CertRepublisher {
     this.publishers = Args.notEmpty(publishers, "publishers");
     this.onlyRevokedCerts = onlyRevokedCerts;
     this.numThreads = Args.positive(numThreads, "numThreads");
-  }
+  } // constructor
 
   boolean republish() {
     try {
@@ -226,7 +226,7 @@ class CertRepublisher {
         processLog.printTrailer();
       }
     }
-  }
+  } // method republish
 
   private boolean republish0() {
     long total;
@@ -311,6 +311,6 @@ class CertRepublisher {
     }
 
     return successful;
-  }
+  } // method republish0
 
 }

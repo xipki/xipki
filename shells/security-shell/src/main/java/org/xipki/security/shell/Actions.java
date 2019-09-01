@@ -211,7 +211,7 @@ public class Actions {
       }
     }
 
-  }
+  } // class CertInfo
 
   @Command(scope = "xi", name = "convert-keystore", description = "Convert keystore")
   @Service
@@ -280,7 +280,7 @@ public class Actions {
       return null;
     }
 
-  }
+  } // class ConvertKeystore
 
   @Command(scope = "xi", name = "crl-info", description = "print CRL information")
   @Service
@@ -351,7 +351,7 @@ public class Actions {
       }
     }
 
-  }
+  } // class CrlInfo
 
   public abstract static class CsrGenAction extends SecurityAction {
 
@@ -489,7 +489,7 @@ public class Actions {
       } else {
         return null;
       }
-    }
+    } // method getPeerCertificates
 
     @Override
     protected Object execute0() throws Exception {
@@ -775,7 +775,7 @@ public class Actions {
         }
       }
       return ret;
-    }
+    } // method textToAsn1ObjectIdentifers
 
     private PKCS10CertificationRequest generateRequest(ConcurrentContentSigner signer,
         SubjectPublicKeyInfo subjectPublicKeyInfo, X500Name subjectDn,
@@ -803,7 +803,7 @@ public class Actions {
       } finally {
         signer.requiteSigner(signer0);
       }
-    }
+    } // method generateRequest
 
     private List<String> resolveExtensionTypes(List<String> types) throws IllegalCmdParamException {
       List<String> list = new ArrayList<>(types.size());
@@ -818,9 +818,9 @@ public class Actions {
         }
       }
       return list;
-    }
+    } // method resolveExtensionTypes
 
-  }
+  } // class CsrGenAction
 
   @Command(scope = "xi", name = "validate-csr", description = "validate CSR")
   @Service
@@ -899,7 +899,7 @@ public class Actions {
       return null;
     }
 
-  }
+  } // method ValidateCsr
 
   @Command(scope = "xi", name = "deobfuscate", description = "deobfuscate password")
   @Service
@@ -943,7 +943,7 @@ public class Actions {
       return null;
     }
 
-  }
+  } // class Deobfuscate
 
   @Command(scope = "xi", name = "extract-cert", description = "extract certificates from CRL")
   @Service
@@ -1011,7 +1011,7 @@ public class Actions {
       return derOctet.getOctets();
     }
 
-  }
+  } // class ExtractCert
 
   @Command(scope = "xi", name = "import-cert", description = "import certificates to a keystore")
   @Service
@@ -1074,7 +1074,7 @@ public class Actions {
       return null;
     }
 
-  }
+  } // class ImportCert
 
   @Command(scope = "xi", name = "keystore-convert", description = "convert the keystore format")
   @Service
@@ -1214,9 +1214,9 @@ public class Actions {
 
       saveVerbose("converted keystore to", outFile, bout.toByteArray());
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class KeystoreConvert
 
   @Command(scope = "xi", name = "obfuscate", description = "obfuscate password")
   @Service
@@ -1254,7 +1254,7 @@ public class Actions {
       return null;
     }
 
-  }
+  } // class Obfuscate
 
   @Command(scope = "xi", name = "pbe-dec", description = "decrypt password with master password")
   @Service
@@ -1325,9 +1325,9 @@ public class Actions {
         println("the password is: '" + new String(password) + "'");
       }
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class PbeDec
 
   @Command(scope = "xi", name = "pbe-enc", description = "encrypt password with master password")
   @Service
@@ -1397,9 +1397,9 @@ public class Actions {
         println("the encrypted password is: '" + passwordHint + "'");
       }
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class PbeEnc
 
   public abstract static class SecurityAction extends XiAction {
 
@@ -1410,6 +1410,6 @@ public class Actions {
       return DateUtil.toUtcTimeyyyyMMddhhmmss(date) + "Z";
     }
 
-  }
+  } // class SecurityAction
 
 }

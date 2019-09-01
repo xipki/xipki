@@ -123,7 +123,7 @@ public class ScepResponder {
       return Arrays.copyOf(bytes, bytes.length);
     }
 
-  }
+  } // method ScepCaCertRespBytes
 
   private static class FailInfoException extends Exception {
 
@@ -147,7 +147,7 @@ public class ScepResponder {
       return failInfo;
     }
 
-  }
+  } // method FailInfoException
 
   private static final Logger LOG = LoggerFactory.getLogger(ScepResponder.class);
 
@@ -205,7 +205,7 @@ public class ScepResponder {
     this.caCaps = caps;
 
     setResponder(responder);
-  }
+  } // constructor
 
   public final void setResponder(SignerEntryWrapper responder) throws CaMgmtException {
     if (responder == null) {
@@ -231,7 +231,7 @@ public class ScepResponder {
     this.responderCert = signer.getCertificate();
     this.envelopedDataDecryptor =
         new EnvelopedDataDecryptor(new EnvelopedDataDecryptorInstance(responderCert, responderKey));
-  }
+  } // method setResponder
 
   /**
    * Set the maximal signing time bias in milliseconds.
@@ -272,7 +272,7 @@ public class ScepResponder {
       return false;
     }
     return ca.getCaInfo().getStatus() == CaStatus.ACTIVE;
-  }
+  } // method isOnService
 
   public ContentInfo servicePkiOperation(CMSSignedData requestContent, String certprofileName,
       String msgId, AuditEvent event) throws MessageDecodingException, OperationException {
@@ -698,7 +698,7 @@ public class ScepResponder {
           "Certificate profile " + certprofile + " is not permitted for user "
           + requestor.getCaHasUser().getUserIdent().getName());
     }
-  }
+  } // method checkUserPermission
 
   private static String getSignatureAlgorithm(PrivateKey key, ASN1ObjectIdentifier digestOid) {
     ScepHashAlgo hashAlgo = ScepHashAlgo.forNameOrOid(digestOid.getId());
@@ -719,7 +719,7 @@ public class ScepResponder {
     if (!thisCaX500Name.equals(caX500Name)) {
       throw FailInfoException.BAD_CERTID;
     }
-  }
+  } // method ensureIssuedByThisCa
 
   static CMSSignedData createDegeneratedSigendData(X509Certificate... certs)
       throws CMSException, CertificateException {
@@ -732,7 +732,7 @@ public class ScepResponder {
     } catch (IOException ex) {
       throw new CMSException("could not build CMS SignedDta");
     }
-  }
+  } // method createDegeneratedSigendData
 
   private static byte[] getTransactionIdBytes(String tid) throws OperationException {
     byte[] bytes = null;
@@ -781,6 +781,6 @@ public class ScepResponder {
     } catch (CaMgmtException | CertificateException | CMSException ex) {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
     }
-  }
+  } // method refreshCa
 
 }

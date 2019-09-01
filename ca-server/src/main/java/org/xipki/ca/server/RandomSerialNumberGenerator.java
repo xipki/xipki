@@ -73,13 +73,13 @@ class RandomSerialNumberGenerator {
       }
     }
 
-  }
+  } // method nextSerialNumber
 
   public static synchronized RandomSerialNumberGenerator getInstance() {
     if (instance == null) {
       instance = new RandomSerialNumberGenerator();
     }
     return instance;
-  }
+  } // method RandomSerialNumberGenerator
 
 }

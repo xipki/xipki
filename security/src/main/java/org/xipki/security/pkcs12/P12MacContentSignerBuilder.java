@@ -91,7 +91,7 @@ public class P12MacContentSignerBuilder {
         | CertificateException | IOException | UnrecoverableKeyException | ClassCastException ex) {
       throw new XiSecurityException(ex.getMessage(), ex);
     }
-  }
+  } // constructor
 
   public ConcurrentContentSigner createSigner(AlgorithmIdentifier signatureAlgId,
       int parallelism, SecureRandom random) throws XiSecurityException {
@@ -128,7 +128,7 @@ public class P12MacContentSignerBuilder {
     concurrentSigner.setSha1DigestOfMacKey(HashAlgo.SHA1.hash(key.getEncoded()));
 
     return concurrentSigner;
-  } // createSigner
+  } // method createSigner
 
   public SecretKey getKey() {
     return key;

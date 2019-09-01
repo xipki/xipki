@@ -49,5 +49,5 @@ public class CmpClientCompleters {
       }
     }
 
-  }
+  } // class CaNameCompleter
 }

@@ -109,7 +109,7 @@ public class P12XdhMacContentSignerBuilder {
       return sigValue;
     }
 
-  }
+  } // class XdhMacContentSigner
 
   private SecretKey key;
 
@@ -181,7 +181,7 @@ public class P12XdhMacContentSignerBuilder {
     this.key = new SecretKeySpec(k, "HMAC-" + this.hash.getName());
     this.peerIssuerAndSerial =
         new IssuerAndSerialNumber(X500Name.getInstance(trailingInfo), peerCert.getSerialNumber());
-  }
+  } // method init
 
   public ConcurrentContentSigner createSigner(int parallelism) throws XiSecurityException {
     Args.positive(parallelism, "parallelism");
@@ -210,6 +210,6 @@ public class P12XdhMacContentSignerBuilder {
     }
 
     return concurrentSigner;
-  } // createSigner
+  } // method createSigner
 
 }

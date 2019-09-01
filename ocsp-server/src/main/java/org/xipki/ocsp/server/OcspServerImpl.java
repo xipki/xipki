@@ -140,7 +140,7 @@ public class OcspServerImpl implements OcspServer {
       return (str.length() > obj.str.length()) ? 1 : -1;
     }
 
-  }
+  } // class SizeComparableString
 
   private static class OcspRespControl {
     boolean canCacheInfo;
@@ -153,7 +153,7 @@ public class OcspServerImpl implements OcspServer {
       cacheThisUpdate = 0;
       cacheNextUpdate = Long.MAX_VALUE;
     }
-  }
+  } // class OcspRespControl
 
   public static final long DFLT_CACHE_MAX_AGE = 60; // 1 minute
 
@@ -231,7 +231,7 @@ public class OcspServerImpl implements OcspServer {
     byte[] encoded = new byte[ext.getEncodedLength()];
     ext.write(encoded, 0);
     extension_pkix_ocsp_extendedRevoke = new WritableOnlyExtension(encoded);
-  }
+  } // method static
 
   public OcspServerImpl() {
     this.datasourceFactory = new DataSourceFactory();
@@ -294,7 +294,7 @@ public class OcspServerImpl implements OcspServer {
       LOG.error("could not start OCSP responder", th);
       throw new IllegalStateException(th);
     }
-  }
+  } // method init
 
   private void init0() throws OcspStoreException, InvalidConfException, PasswordResolverException {
     if (confFile == null) {
@@ -608,7 +608,7 @@ public class OcspServerImpl implements OcspServer {
         LogUtil.warn(LOG, ex, "shutdown store " + store.getName());
       }
     }
-  }
+  } // method close
 
   @Override
   public OcspRespWithCacheInfo answer(Responder responder2, byte[] request, boolean viaGet) {
@@ -1024,7 +1024,7 @@ public class OcspServerImpl implements OcspServer {
     }
 
     return null;
-  }
+  } // method processCertReq
 
   @Override
   public HealthCheckResult healthCheck(Responder responder2) {
@@ -1182,7 +1182,7 @@ public class OcspServerImpl implements OcspServer {
     }
 
     return store;
-  } // method initStore
+  } // method newStore
 
   private Object checkSignature(byte[] request, RequestOption requestOption)
       throws OCSPException, CertificateParsingException, InvalidAlgorithmParameterException {
@@ -1357,7 +1357,7 @@ public class OcspServerImpl implements OcspServer {
     } finally {
       closeStream(is);
     }
-  }
+  } // method parseCert
 
   private static OcspServerConf parseConf(String confFilename) throws InvalidConfException {
     try (InputStream is = Files.newInputStream(Paths.get(confFilename))) {
@@ -1367,7 +1367,7 @@ public class OcspServerImpl implements OcspServer {
     } catch (IOException | RuntimeException ex) {
       throw new InvalidConfException("parse profile failed, message: " + ex.getMessage(), ex);
     }
-  }
+  } // method parseConf
 
   private static ExtendedExtension removeExtension(List<ExtendedExtension> extensions,
       OID extnType) {
@@ -1384,6 +1384,6 @@ public class OcspServerImpl implements OcspServer {
     }
 
     return extn;
-  }
+  } // method removeExtension
 
 }

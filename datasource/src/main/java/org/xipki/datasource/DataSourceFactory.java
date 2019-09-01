@@ -56,7 +56,7 @@ public class DataSourceFactory {
     }
 
     return createDataSource(name, props, passwordResolver);
-  }
+  } // method createDataSource
 
   public DataSourceWrapper createDataSource(String name, InputStream conf,
       PasswordResolver passwordResolver) throws PasswordResolverException, IOException {

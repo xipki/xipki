@@ -49,7 +49,7 @@ class CsrEnrollCertRequest extends IdentifiedObject {
       return profile;
     }
 
-  }
+  } // class Entry
 
   private final String certprofile;
 

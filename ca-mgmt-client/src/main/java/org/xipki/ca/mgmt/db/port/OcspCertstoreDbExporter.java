@@ -126,7 +126,7 @@ class OcspCertstoreDbExporter extends DbPorter {
     }
 
     certstore.setCerthashAlgo(certHashAlgoStr);
-  }
+  } // method exportHashAlgo
 
   private void exportIssuer(OcspCertstore certstore) throws DataAccessException, IOException {
     System.out.println("exporting table ISSUER");
@@ -429,6 +429,6 @@ class OcspCertstoreDbExporter extends DbPorter {
     }
 
     zipOutStream.close();
-  }
+  } // method finalizeZip
 
 }

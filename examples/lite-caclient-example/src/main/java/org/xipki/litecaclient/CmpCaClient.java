@@ -144,7 +144,7 @@ public abstract class CmpCaClient implements Closeable {
       this.caSubject = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
       this.caSubjectKeyIdentifier = SdkUtil.extractSki(caCert);
     }
-  }
+  } // constructor
 
   public void init() throws Exception {
     TlsInit.init();
@@ -163,7 +163,7 @@ public abstract class CmpCaClient implements Closeable {
     this.caCert = this.caCertchain.get(0);
     this.caSubject = certchain[0].getSubject();
     this.caSubjectKeyIdentifier = SdkUtil.extractSki(this.caCert);
-  }
+  } // method init
 
   @Override
   public void close() {
@@ -213,7 +213,7 @@ public abstract class CmpCaClient implements Closeable {
       caCerts[i] = CMPCertificate.getInstance(seq.getObjectAt(i)).getX509v3PKCert();
     }
     return caCerts;
-  }
+  } // method cmpCaCerts
 
   private ASN1Encodable extractGeneralRepContent(PKIMessage response, String expectedType)
       throws Exception {
@@ -285,7 +285,7 @@ public abstract class CmpCaClient implements Closeable {
     }
 
     throw new Exception("invalid signature/MAC in PKI protection");
-  }
+  } // method transmit
 
   private Map<BigInteger, KeyAndCert> parseEnrollCertResult(PKIMessage response,
       int resonseBodyType, int numCerts) throws Exception {
@@ -368,7 +368,7 @@ public abstract class CmpCaClient implements Closeable {
     PKIMessage response = transmit(request, uri);
     return parseEnrollCertResult(response, PKIBody.TYPE_CERT_REP, 1)
             .values().iterator().next().getCert();
-  }
+  } // method enrollCertViaCsr
 
   private boolean parseRevocationResult(PKIMessage response, BigInteger serialNumber)
       throws Exception {
@@ -408,14 +408,14 @@ public abstract class CmpCaClient implements Closeable {
     CertId revCert = revCerts[0];
     return caSubject.equals(revCert.getIssuer().getName())
         && serialNumber.equals(revCert.getSerialNumber().getValue());
-  }
+  } // method parseRevocationResult
 
   public X509Certificate enrollCertViaCrmf(String certprofile, PrivateKey privateKey,
       SubjectPublicKeyInfo publicKeyInfo, String subject, boolean profileInUri)
           throws Exception {
     return enrollCertsViaCrmf(new String[]{certprofile}, new PrivateKey[]{privateKey},
         new SubjectPublicKeyInfo[] {publicKeyInfo}, new String[] {subject}, profileInUri)[0];
-  }
+  } // method enrollCertViaCrmf
 
   public X509Certificate[] enrollCertsViaCrmf(String[] certprofiles, PrivateKey[] privateKey,
       SubjectPublicKeyInfo[] publicKeyInfo, String[] subject, boolean profileInUri)
@@ -484,13 +484,13 @@ public abstract class CmpCaClient implements Closeable {
     }
 
     return ret;
-  }
+  } // method enrollCertsViaCrmf
 
   public KeyAndCert enrollCertViaCrmfCaGenKeypair(String certprofile, String subject,
       boolean profileAndMetaInUri) throws Exception {
     return enrollCertsViaCrmfCaGenKeypair(new String[]{certprofile},
         new String[] {subject}, profileAndMetaInUri)[0];
-  }
+  } // method enrollCertViaCrmfCaGenKeypair
 
   public KeyAndCert[] enrollCertsViaCrmfCaGenKeypair(String[] certprofiles,
       String[] subject, boolean profileAndMetaInUri) throws Exception {
@@ -556,7 +556,7 @@ public abstract class CmpCaClient implements Closeable {
     }
 
     return ret;
-  }
+  } // method enrollCertsViaCrmfCaGenKeypair
 
   public X509Certificate updateCertViaCrmf(PrivateKey privateKey, X500Name issuer,
       BigInteger oldCertSerialNumber) throws Exception {
@@ -613,7 +613,7 @@ public abstract class CmpCaClient implements Closeable {
     }
 
     return ret;
-  }
+  } // method updateCertsViaCrmf
 
   public KeyAndCert updateCertViaCrmfCaGenKeypair(X500Name issuer, BigInteger oldCertSerialNumber,
       boolean profileAndMetaInUri) throws Exception {
@@ -678,7 +678,7 @@ public abstract class CmpCaClient implements Closeable {
     }
 
     return ret;
-  }
+  } // updateCertsViaCrmfCaGenKeypair
 
   public boolean revokeCert(BigInteger serialNumber, CRLReason reason) throws Exception {
     ProtectedPKIMessageBuilder builder = new ProtectedPKIMessageBuilder(
@@ -709,7 +709,7 @@ public abstract class CmpCaClient implements Closeable {
 
     PKIMessage response = transmit(request, null);
     return parseRevocationResult(response, serialNumber);
-  }
+  } // method revokeCert
 
   private boolean verify(X509Certificate caCert, X509Certificate cert) {
     if (!cert.getIssuerX500Principal().equals(caCert.getSubjectX500Principal())) {
@@ -763,6 +763,6 @@ public abstract class CmpCaClient implements Closeable {
       default:
         return Integer.toString(status);
     }
-  }
+  } // method buildText
 
 }

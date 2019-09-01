@@ -71,7 +71,7 @@ public class P11PrivateKey implements PrivateKey {
     } else {
       throw new P11TokenException("unknown public key: " + publicKey);
     }
-  }
+  } // constructor
 
   public boolean supportsMechanism(long mechanism) {
     try {

@@ -70,7 +70,7 @@ public class IssuerEntry {
       hashes.put(ha, nameAndKeyHash);
     }
     return hashes;
-  }
+  } // method getIssuerHashAndKeys
 
   public boolean matchHash(RequestIssuer reqIssuer) {
     byte[] issuerHash = issuerHashMap.get(reqIssuer.hashAlgorithm());

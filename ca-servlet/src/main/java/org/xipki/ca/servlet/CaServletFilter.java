@@ -183,7 +183,7 @@ public class CaServletFilter implements Filter {
         }
       }
     }
-  }
+  } // method init
 
   @Override
   public void destroy() {
@@ -194,7 +194,7 @@ public class CaServletFilter implements Filter {
     if (caManager != null) {
       caManager.close();
     }
-  }
+  } // method destroy
 
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -229,12 +229,12 @@ public class CaServletFilter implements Filter {
     } else {
       sendError(res, HttpServletResponse.SC_NOT_FOUND);
     }
-  }
+  } // method doFilter
 
   private static void sendError(HttpServletResponse res, int status) {
     res.setStatus(status);
     res.setContentLength(0);
-  }
+  } // method sendError
 
   private CertprofileFactoryRegister initCertprofileFactoryRegister(List<String> factories)
       throws ServletException {
@@ -257,6 +257,6 @@ public class CaServletFilter implements Filter {
     }
 
     return certprofileFactoryRegister;
-  }
+  } // method initCertprofileFactoryRegister
 
 }

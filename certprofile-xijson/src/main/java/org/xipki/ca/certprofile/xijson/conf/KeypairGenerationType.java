@@ -183,7 +183,7 @@ public class KeypairGenerationType extends ValidatableConf {
       default:
         break;
     }
-  }
+  } // method validate
 
   public static enum KeyType {
     rsa,
@@ -193,6 +193,6 @@ public class KeypairGenerationType extends ValidatableConf {
     ed448,
     x25519,
     x448
-  }
+  } // class KeyType
 
 }

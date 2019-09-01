@@ -101,7 +101,7 @@ public class Actions {
       return null;
     }
 
-  }
+  } // class ScepCertpoll
 
   public abstract static class ClientAction extends XiAction {
 
@@ -175,7 +175,7 @@ public class Actions {
       this.identityCert = (X509Certificate) ks.getCertificate(keyname);
     }
 
-  }
+  } // class ClientAction
 
   @Command(scope = "xi", name = "scep-enroll", description = "enroll certificate")
   @Service
@@ -233,7 +233,7 @@ public class Actions {
       return null;
     }
 
-  }
+  } // class ScepEnroll
 
   @Command(scope = "xi", name = "scep-cacert", description = "get CA certificate")
   @Service
@@ -275,7 +275,7 @@ public class Actions {
       return null;
     }
 
-  }
+  } // class ScepCacert
 
   @Command(scope = "xi", name = "scep-get-cert", description = "download certificate")
   @Service
@@ -310,7 +310,7 @@ public class Actions {
       return null;
     }
 
-  }
+  } // class ScepGetCert
 
   @Command(scope = "xi", name = "scep-get-crl", description = "download CRL")
   @Service
@@ -343,6 +343,6 @@ public class Actions {
       return null;
     }
 
-  }
+  } // class ScepGetCrl
 
 }

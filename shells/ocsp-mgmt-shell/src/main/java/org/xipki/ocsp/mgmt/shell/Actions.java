@@ -41,7 +41,7 @@ public class Actions {
     @Reference
     protected OcspManager ocspManager;
 
-  }
+  } // class OcspAction
 
   @Command(scope = "ocsp", name = "restart-server", description = "restart OCSP server")
   @Service
@@ -60,7 +60,7 @@ public class Actions {
       return null;
     } // method execute0
 
-  }
+  } // class OcspSystemRestartAction
 
   @Command(scope = "ocsp", name = "refresh-token", description = "refresh token for signers")
   @Service
@@ -77,6 +77,6 @@ public class Actions {
       return null;
     } // method execute0
 
-  }
+  } // class RefreshTokenAction
 
 }

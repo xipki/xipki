@@ -65,7 +65,7 @@ class UniqueIdGenerator {
     this.epoch = Args.notNegative(epoch, "epoch");
     this.shardId = Args.range(shardId, "shardId", 0, 127);
     this.accumulatorFunction = new OffsetIncrement();
-  }
+  } // constructor
 
   public long nextId() {
     long now = System.currentTimeMillis();
@@ -77,6 +77,6 @@ class UniqueIdGenerator {
 
     ret += shardId;
     return ret;
-  }
+  } // method nextId
 
 }

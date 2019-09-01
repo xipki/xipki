@@ -129,7 +129,7 @@ public abstract class MgmtMessage {
       return null;
     }
 
-  }
+  } // class MgmtAction
 
   public static class SignerEntryWrapper {
 
@@ -206,7 +206,7 @@ public abstract class MgmtMessage {
       ret.setConfFaulty(faulty);
       return ret;
     }
-  }
+  } // class SignerEntryWrapper
 
   public static class CaEntryWrapper {
 
@@ -343,7 +343,7 @@ public abstract class MgmtMessage {
       status = caEntry.getStatus();
 
       validityMode = caEntry.getValidityMode();
-    }
+    } // method constructor
 
     public NameId getIdent() {
       return ident;
@@ -649,9 +649,9 @@ public abstract class MgmtMessage {
 
       rv.setDhpocControl(dhpocControl);
 
-      return rv;
+      return rv; // method toCaEntry
     }
 
-  }
+  } // class CaEntryWrapper
 
 }

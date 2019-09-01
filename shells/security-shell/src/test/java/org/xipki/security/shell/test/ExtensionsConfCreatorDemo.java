@@ -121,7 +121,7 @@ public class ExtensionsConfCreatorDemo {
         new Extension(new ASN1ObjectIdentifier(m.getType().getOid()), false, encodedExtnValue);
       }
     }
-  }
+  } // method check
 
   private static void extensionsEeCompelx(String destFilename) throws Exception {
     ExtensionsType extensions = new ExtensionsType();
@@ -218,7 +218,7 @@ public class ExtensionsConfCreatorDemo {
     }
 
     marshall(extensions, destFilename);
-  } // method certprofileEeComplex
+  } // method extensionsEeCompelx
 
   private static void extensionsSyntaxExt(String destFilename, ASN1ObjectIdentifier oidPrefix,
       Tag tag) throws Exception {
@@ -284,7 +284,7 @@ public class ExtensionsConfCreatorDemo {
     last(list).getConstant().setListValue(createConstantSequenceOfOrSetOf());
 
     return list;
-  }
+  } // method createConstantExtensions
 
   private static X509ExtensionType createConstantExtension(ASN1ObjectIdentifier type, Tag tag,
       FieldType fieldType, String value) {
@@ -305,7 +305,7 @@ public class ExtensionsConfCreatorDemo {
       ret.getConstant().setTag(tag);
     }
     return ret;
-  }
+  } // method createConstantExtension
 
   private static List<ConstantExtnValue> createConstantSequenceOrSet() {
     /*
@@ -363,7 +363,7 @@ public class ExtensionsConfCreatorDemo {
     subField.setListValue(Arrays.asList(subsubField));
 
     return subFields;
-  }
+  } // method createConstantSequenceOrSet
 
   private static List<ConstantExtnValue> createConstantSequenceOfOrSetOf() {
     /*
@@ -433,7 +433,7 @@ public class ExtensionsConfCreatorDemo {
     }
 
     return subFields;
-  }
+  } // method createConstantSequenceOfOrSetOf
 
   private static void extensionsAppleWwdr(String destFilename) throws Exception {
     ExtensionsType extensions = new ExtensionsType();
@@ -537,7 +537,7 @@ public class ExtensionsConfCreatorDemo {
     }
 
     marshall(extensions, destFilename);
-  } // method certprofileGmt0015
+  } // method extensionsGmt0015
 
   private static DescribableOid createOidType(ASN1ObjectIdentifier oid, String description) {
     DescribableOid ret = new DescribableOid();
@@ -548,7 +548,7 @@ public class ExtensionsConfCreatorDemo {
       ret.setDescription(desc);
     }
     return ret;
-  }
+  } // method createOidType
 
   private static <T> T last(List<T> list) {
     if (list == null || list.isEmpty()) {
@@ -556,6 +556,6 @@ public class ExtensionsConfCreatorDemo {
     } else {
       return list.get(list.size() - 1);
     }
+  } // method last
 
-  }
 }

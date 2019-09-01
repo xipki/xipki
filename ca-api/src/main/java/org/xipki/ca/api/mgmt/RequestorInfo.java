@@ -80,7 +80,7 @@ public interface RequestorInfo {
     public void assertPermitted(int requiredPermission) throws InsuffientPermissionException {
     }
 
-  }
+  } // class ByCaRequestorInfo
 
   /**
    * CMP requestor info.
@@ -163,7 +163,7 @@ public interface RequestorInfo {
       }
     }
 
-  }
+  } // method CmpRequestorInfo
 
   /**
    * Represent requestor that is authenticated via user/password.
@@ -230,7 +230,7 @@ public interface RequestorInfo {
       }
     }
 
-  }
+  } // class ByUserRequestorInfo
 
   NameId getIdent();
 

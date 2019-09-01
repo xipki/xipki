@@ -40,7 +40,7 @@ public class CertStatusInfo {
     IGNORE,
     ISSUER_UNKNOWN,
     CRL_EXPIRED
-  }
+  } // class CertStatus
 
   public enum UnknownCertBehaviour {
     unknown,
@@ -48,7 +48,7 @@ public class CertStatusInfo {
     malformedRequest,
     internalError,
     tryLater;
-  }
+  } // class UnknownCertBehaviour
 
   public enum UnknownIssuerBehaviour {
     unknown,
@@ -56,7 +56,7 @@ public class CertStatusInfo {
     internalError,
     unauthorized,
     tryLater;
-  }
+  } // class UnknownIssuerBehaviour
 
   private CertStatus certStatus;
 
@@ -166,7 +166,7 @@ public class CertStatusInfo {
     ret.certHashAlgo = certHashAlgo;
     ret.certHash = certHash;
     return ret;
-  }
+  } // method getGoodCertStatusInfo
 
   public static CertStatusInfo getGoodCertStatusInfo(Date thisUpdate, Date nextUpdate) {
     return new CertStatusInfo(CertStatus.GOOD, thisUpdate, nextUpdate, null);
@@ -184,7 +184,7 @@ public class CertStatusInfo {
     ret.certHashAlgo = certHashAlgo;
     ret.certHash = certHash;
     return ret;
-  }
+  } // method getRevokedCertStatusInfo
 
   public static CertStatusInfo getRevokedCertStatusInfo(CertRevocationInfo revocationInfo,
       Date thisUpdate, Date nextUpdate) {
@@ -194,6 +194,6 @@ public class CertStatusInfo {
     CertStatusInfo ret = new CertStatusInfo(CertStatus.REVOKED, thisUpdate, nextUpdate, null);
     ret.revocationInfo = revocationInfo;
     return ret;
-  }
+  } // method getRevokedCertStatusInfo
 
 }

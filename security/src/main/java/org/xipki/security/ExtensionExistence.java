@@ -128,7 +128,7 @@ public class ExtensionExistence extends ASN1Object {
     }
 
     return new DERSequence(vector);
-  }
+  } // method toASN1Primitive
 
   public List<ASN1ObjectIdentifier> getNeedExtensions() {
     return needExtensions;
@@ -157,6 +157,6 @@ public class ExtensionExistence extends ASN1Object {
 
     throw new IllegalArgumentException("unknown object in getInstance: "
         + obj.getClass().getName());
-  }
+  } // method getInstance
 
 }

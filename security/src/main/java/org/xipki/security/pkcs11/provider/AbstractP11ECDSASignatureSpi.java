@@ -125,7 +125,7 @@ abstract class AbstractP11ECDSASignatureSpi extends SignatureSpi {
     }
 
     this.signingKey = (P11PrivateKey) privateKey;
-  }
+  } // method engineInitSign
 
   @Override
   protected void engineUpdate(byte input) throws SignatureException {
@@ -162,7 +162,7 @@ abstract class AbstractP11ECDSASignatureSpi extends SignatureSpi {
     } catch (XiSecurityException | P11TokenException ex) {
       throw new SignatureException(ex.getMessage(), ex);
     }
-  }
+  } // method engineSign
 
   @Override
   protected void engineSetParameter(AlgorithmParameterSpec params) {

@@ -56,7 +56,7 @@ public class PasswordResolverImpl implements PasswordResolver {
     }
     resolvers.add(pbe);
     initialized = true;
-  }
+  } // method init
 
   public void registResolver(SinglePasswordResolver resolver) {
     //might be null if dependency is optional
@@ -69,7 +69,7 @@ public class PasswordResolverImpl implements PasswordResolver {
     resolvers.add(resolver);
     String txt = replaced ? "replaced" : "added";
     LOG.debug("{} SinglePasswordResolver binding for {}", txt, resolver);
-  }
+  } // method registResolver
 
   public void unregistResolver(SinglePasswordResolver resolver) {
     //might be null if dependency is optional
@@ -87,7 +87,7 @@ public class PasswordResolverImpl implements PasswordResolver {
     } catch (Exception ex) {
       LOG.debug("caught Exception({}). service is probably destroyed.", ex.getMessage());
     }
-  }
+  } // method unregistResolver
 
   @Override
   public char[] resolvePassword(String passwordHint) throws PasswordResolverException {
@@ -107,7 +107,7 @@ public class PasswordResolverImpl implements PasswordResolver {
 
     throw new PasswordResolverException("could not find password resolver to resolve password "
         + "of protocol '" + protocol + "'");
-  }
+  } // method resolvePassword
 
   @Override
   public String protectPassword(String protocol, char[] password) throws PasswordResolverException {
@@ -122,7 +122,7 @@ public class PasswordResolverImpl implements PasswordResolver {
 
     throw new PasswordResolverException("could not find password resolver to protect password "
         + "of protocol '" + protocol + "'");
-  }
+  } // method protectPassword
 
   public void setMasterPasswordCallback(String masterPasswordCallback) {
     this.masterPasswordCallback = masterPasswordCallback;

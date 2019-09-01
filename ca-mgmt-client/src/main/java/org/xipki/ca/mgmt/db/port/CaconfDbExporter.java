@@ -72,7 +72,7 @@ class CaconfDbExporter extends DbPorter {
       JSON.writeJSONString(os, caconf, SerializerFeature.PrettyFormat);
     }
     System.out.println(" exported CA configuration from database");
-  }
+  } // method export
 
   private void exportCaalias(CaCertstore.Caconf caconf)
       throws DataAccessException, InvalidConfException {

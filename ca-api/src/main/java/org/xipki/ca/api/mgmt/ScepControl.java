@@ -71,7 +71,7 @@ public class ScepControl {
     this.includeCaCert = getBoolean(props, KEY_CACERT_INCLUDED, true);
     this.includeSignerCert = getBoolean(props, KEY_SIGNERCERT_INCLUDED, true);
     this.supportGetCrl = getBoolean(props, KEY_SUPPORT_GETCRL, false);
-  }
+  } // constructor
 
   public String getConf() {
     ConfPairs pairs = new ConfPairs();
@@ -137,7 +137,7 @@ public class ScepControl {
     }
 
     return true;
-  }
+  } // method equals
 
   private static boolean getBoolean(ConfPairs props, String propKey, boolean dfltValue)
       throws InvalidConfException {
@@ -153,6 +153,6 @@ public class ScepControl {
       }
     }
     return dfltValue;
-  }
+  } // method getBoolean
 
 }

@@ -86,7 +86,7 @@ public class MyUtil {
     String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(rcaKey, ScepHashAlgo.SHA256);
     ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(rcaKey);
     return certGenerator.build(contentSigner).toASN1Structure();
-  }
+  } // method issueSubCaCert
 
   public static PKCS10CertificationRequest generateRequest(PrivateKey privatekey,
       SubjectPublicKeyInfo subjectPublicKeyInfo, X500Name subjectDn,
@@ -121,7 +121,7 @@ public class MyUtil {
     ContentSigner contentSigner = new JcaContentSignerBuilder(
         ScepUtil.getSignatureAlgorithm(privatekey, ScepHashAlgo.SHA1)).build(privatekey);
     return csrBuilder.build(contentSigner);
-  }
+  } // method generateRequest
 
   public static X509Certificate generateSelfsignedCert(CertificationRequest csr,
       PrivateKey identityKey) throws CertificateException {
@@ -174,6 +174,6 @@ public class MyUtil {
     } else {
       throw new IllegalArgumentException("unsupported public key " + publicKey);
     }
-  }
+  } // method createSubjectPublicKeyInfo
 
 }

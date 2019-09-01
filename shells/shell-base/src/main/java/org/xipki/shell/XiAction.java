@@ -95,7 +95,7 @@ public abstract class XiAction implements Action {
     }
 
     return newPairs;
-  }
+  } // method embedFileContent
 
   protected void saveVerbose(String promptPrefix, String file, byte[] encoded) throws IOException {
     saveVerbose(promptPrefix, new File(file), encoded);
@@ -196,7 +196,7 @@ public abstract class XiAction implements Action {
 
     Files.copy(
         new ByteArrayInputStream(encoded), tmpFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-  }
+  } // method save
 
   private static String randomHex(int numOfBytes) {
     SecureRandom random = new SecureRandom();
@@ -371,6 +371,6 @@ public abstract class XiAction implements Action {
     }
 
     return false;
-  }
+  } // method confirm
 
 }

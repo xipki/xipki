@@ -106,7 +106,7 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
       super(HashAlgo.SHA3_224);
     }
 
-  }
+  } // class SHA3_224
 
   // CHECKSTYLE:SKIP
   public static class SHA3_256 extends P11DSASignatureSpi {
@@ -115,7 +115,7 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
       super(HashAlgo.SHA3_256);
     }
 
-  }
+  } // class SHA3_256
 
   // CHECKSTYLE:SKIP
   public static class SHA3_384 extends P11DSASignatureSpi {
@@ -124,7 +124,7 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
       super(HashAlgo.SHA3_384);
     }
 
-  }
+  } // class SHA3_384
 
   // CHECKSTYLE:SKIP
   public static class SHA3_512 extends P11DSASignatureSpi {
@@ -133,7 +133,7 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
       super(HashAlgo.SHA3_512);
     }
 
-  }
+  } // class SHA3_512
 
   private final HashAlgo hashAlgo;
 
@@ -207,7 +207,7 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
     }
 
     this.signingKey = (P11PrivateKey) privateKey;
-  }
+  } // class engineInitSign
 
   @Override
   protected void engineUpdate(byte input) throws SignatureException {
@@ -244,7 +244,7 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
     } catch (P11TokenException | XiSecurityException ex) {
       throw new SignatureException(ex.getMessage(), ex);
     }
-  }
+  } // method engineSign
 
   @Override
   protected void engineSetParameter(AlgorithmParameterSpec params) {

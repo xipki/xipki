@@ -50,7 +50,7 @@ public class QaconfType extends ValidatableConf {
       notEmpty(name, "name");
     }
 
-  }
+  } // class class
 
   public static class Issuer extends ValidatableConf {
 
@@ -143,7 +143,7 @@ public class QaconfType extends ValidatableConf {
       notEmpty(name, "name");
     }
 
-  }
+  } // class Issuer
 
   private List<Issuer> issuers;
 

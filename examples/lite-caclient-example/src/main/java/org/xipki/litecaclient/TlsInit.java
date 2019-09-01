@@ -64,7 +64,7 @@ public class TlsInit {
       return new X509Certificate[0];
     }
 
-  }
+  } // class InternX509TrustManager
 
   private static class SdkHostnameVerifier implements HostnameVerifier {
 
@@ -83,7 +83,7 @@ public class TlsInit {
       return true;
     }
 
-  }
+  } // class SdkHostnameVerifier
 
   public static void init() throws GeneralSecurityException {
     System.err.println("***** ONLY FOR TEST, DO NOT USE IT IN PRODUCTION ENVIRONMENT ******");
@@ -96,7 +96,7 @@ public class TlsInit {
     LOG.info("Register me as DefaultHostnameVerifier, and backup the old one {}",
         oldHostnameVerifier);
     HttpsURLConnection.setDefaultHostnameVerifier(SdkHostnameVerifier.INSTANCE);
-  }
+  } // method init
 
   public static void close() {
     if (HttpsURLConnection.getDefaultHostnameVerifier() == SdkHostnameVerifier.INSTANCE) {
@@ -104,6 +104,6 @@ public class TlsInit {
           oldHostnameVerifier);
       HttpsURLConnection.setDefaultHostnameVerifier(oldHostnameVerifier);
     }
-  }
+  } // method close
 
 }

@@ -60,7 +60,7 @@ class DigestEntry {
     this.revReason = revReason;
     this.revTime = revTime;
     this.revInvTime = revInvTime;
-  }
+  } // constructor
 
   public BigInteger getSerialNumber() {
     return serialNumber;
@@ -184,7 +184,7 @@ class DigestEntry {
       }
     }
     return ret;
-  }
+  } // method getIndexes
 
   private static boolean equals(Object obj1, Object obj2) {
     return (obj1 == null) ? (obj2 == null) : obj1.equals(obj2);

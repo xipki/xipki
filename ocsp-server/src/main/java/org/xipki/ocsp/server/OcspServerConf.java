@@ -50,7 +50,7 @@ public class OcspServerConf extends ValidatableConf {
     NONE,
     SIGNER,
     SIGNER_AND_CA;
-  }
+  } // class EmbedCertsMode
 
   public static class CertCollection extends ValidatableConf {
 
@@ -80,7 +80,7 @@ public class OcspServerConf extends ValidatableConf {
       validate(keystore);
     }
 
-  }
+  } // class CertCollection
 
   public static class Nonce extends ValidatableConf {
 
@@ -122,7 +122,7 @@ public class OcspServerConf extends ValidatableConf {
       notNull(occurrence, "occurrence");
     }
 
-  }
+  } // class Nonce
 
   public static class RequestOption extends ValidatableConf {
 
@@ -250,7 +250,7 @@ public class OcspServerConf extends ValidatableConf {
       validate(certpathValidation);
     }
 
-  }
+  } // class RequestOption
 
   public static class CertpathValidation extends ValidatableConf {
 
@@ -292,7 +292,7 @@ public class OcspServerConf extends ValidatableConf {
       validate(certs);
     }
 
-  }
+  } // class CertpathValidation
 
   public static class Responder extends ValidatableConf {
 
@@ -403,7 +403,7 @@ public class OcspServerConf extends ValidatableConf {
       notEmpty(name, "name");
     }
 
-  }
+  } // class Responder
 
   public static class ResponseCache extends ValidatableConf {
 
@@ -436,7 +436,7 @@ public class OcspServerConf extends ValidatableConf {
       notNull(datasource, "datasource");
     }
 
-  }
+  } // class ResponseCache
 
   public static class ResponseOption extends ValidatableConf {
 
@@ -515,7 +515,7 @@ public class OcspServerConf extends ValidatableConf {
       notEmpty(name, "name");
     }
 
-  }
+  } // class ResponseOption
 
   public static class Signer extends ValidatableConf {
 
@@ -593,7 +593,7 @@ public class OcspServerConf extends ValidatableConf {
       notEmpty(algorithms, "algorithms");
     }
 
-  }
+  } // class Signer
 
   public static class Store extends ValidatableConf {
 
@@ -706,7 +706,7 @@ public class OcspServerConf extends ValidatableConf {
       notNull(source, "source");
     }
 
-  }
+  } // class Store
 
   public static class Source extends ValidatableConf {
 
@@ -745,7 +745,7 @@ public class OcspServerConf extends ValidatableConf {
       notEmpty(type, "type");
     }
 
-  }
+  } // class Source
 
   public static class CaCerts extends ValidatableConf {
 
@@ -781,7 +781,7 @@ public class OcspServerConf extends ValidatableConf {
     public void validate() throws InvalidConfException {
     }
 
-  }
+  } // class CaCerts
 
   private ResponseCache responseCache;
 
@@ -921,6 +921,6 @@ public class OcspServerConf extends ValidatableConf {
 
     notEmpty(responseOptions, "responseOptions");
     validate(responseOptions);
-  }
+  } // method validate
 
 }

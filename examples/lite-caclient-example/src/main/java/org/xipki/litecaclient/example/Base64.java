@@ -96,7 +96,7 @@ public class Base64 {
       darr[dlen - 1] = '=';
     }
     return darr;
-  }
+  } // method encodeToChar
 
   /**
    * Encodes a raw byte array into a BASE64 <code>String</code> representation i accordance with

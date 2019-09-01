@@ -79,7 +79,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
       }
     }
     this.resume = resume;
-  }
+  } // constructor
 
   public void importToDb() throws Exception {
     OcspCertstore certstore;

@@ -250,7 +250,7 @@ class CmpAgent {
     } catch (MalformedURLException ex) {
       throw new IllegalArgumentException("invalid URL: " + serverUrl);
     }
-  }
+  } // constructor
 
   private byte[] send(byte[] request) throws IOException {
     Args.notNull(request, "request");
@@ -323,7 +323,7 @@ class CmpAgent {
         throw new CmpClientException("could not sign the request", ex);
       }
     }
-  }
+  } // method sign
 
   private VerifiedPkiMessage signAndSend(PKIMessage request, ReqRespDebug debug)
       throws CmpClientException {
@@ -457,7 +457,7 @@ class CmpAgent {
     ASN1Encodable itvValue = extractGeneralRepContent(Args.notNull(response, "response"),
         ObjectIdentifiers.Xipki.id_xipki_cmp_cmpGenmsg.getId(), true);
     return extractXiActionContent(itvValue, action);
-  }
+  } // method extractXipkiActionRepContent
 
   private ASN1Encodable extractXiActionContent(ASN1Encodable itvValue, int action)
       throws CmpClientException {
@@ -486,7 +486,7 @@ class CmpAgent {
     }
 
     return (size == 1) ? null : seq.getObjectAt(1);
-  } // method extractXipkiActionContent
+  } // method extractXiActionContent
 
   private PKIHeader buildPkiHeader(ASN1OctetString tid) {
     return buildPkiHeader(false, tid, (CmpUtf8Pairs) null, (InfoTypeAndValue[]) null);
@@ -642,7 +642,7 @@ class CmpAgent {
     }
   } // method verifyProtection
 
-  private PKIMessage buildMessageWithXipkAction(int action, ASN1Encodable value) {
+  private PKIMessage buildMessageWithXipkiAction(int action, ASN1Encodable value) {
     PKIHeader header = buildPkiHeader(null);
 
     ASN1EncodableVector vec = new ASN1EncodableVector();
@@ -656,7 +656,7 @@ class CmpAgent {
     GenMsgContent genMsgContent = new GenMsgContent(itv);
     PKIBody body = new PKIBody(PKIBody.TYPE_GEN_MSG, genMsgContent);
     return new PKIMessage(header, body);
-  }
+  } // method buildMessageWithXipkiAction
 
   private PKIMessage buildMessageWithGeneralMsgContent(ASN1ObjectIdentifier type,
       ASN1Encodable value) {
@@ -668,7 +668,7 @@ class CmpAgent {
     GenMsgContent genMsgContent = new GenMsgContent(itv);
     PKIBody body = new PKIBody(PKIBody.TYPE_GEN_MSG, genMsgContent);
     return new PKIMessage(header, body);
-  }
+  } // method buildMessageWithGeneralMsgContent
 
   private void checkProtection(VerifiedPkiMessage response) throws PkiErrorException {
     Args.notNull(response, "response");
@@ -692,7 +692,7 @@ class CmpAgent {
       throw new PkiErrorException(PKISTATUS_RESPONSE_ERROR,
           PKIFailureInfo.badMessageCheck, "message check of the response failed");
     }
-  }
+  } // method checkProtection
 
   public boolean isSendRequestorCert() {
     return sendRequestorCert;
@@ -737,7 +737,7 @@ class CmpAgent {
         | InvalidAlgorithmParameterException ex) {
       throw new XiSecurityException("Error while decrypting the EncryptedValue", ex);
     }
-  }
+  } // method decrypt
 
   private static byte[] decrypt(EncryptedValue ev, PrivateKey decKey)
       throws XiSecurityException {
@@ -890,19 +890,19 @@ class CmpAgent {
         | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
       throw new XiSecurityException("Error while decrypting the EncryptedValue", ex);
     }
-  }
+  } // method decrypt
 
   public X509CRL generateCrl(ReqRespDebug debug) throws CmpClientException, PkiErrorException {
     int action = XiSecurityConstants.CMP_ACTION_GEN_CRL;
-    PKIMessage request = buildMessageWithXipkAction(action, null);
+    PKIMessage request = buildMessageWithXipkiAction(action, null);
     VerifiedPkiMessage response = signAndSend(request, debug);
     return evaluateCrlResponse(response, action);
-  }
+  } // method generateCrl
 
   public X509CRL downloadCurrentCrl(ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     return downloadCrl((BigInteger) null, debug);
-  }
+  } // method downloadCurrentCrl
 
   public X509CRL downloadCrl(BigInteger crlNumber, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
@@ -913,12 +913,12 @@ class CmpAgent {
       request = buildMessageWithGeneralMsgContent(type, null);
     } else {
       action = XiSecurityConstants.CMP_ACTION_GET_CRL_WITH_SN;
-      request = buildMessageWithXipkAction(action, new ASN1Integer(crlNumber));
+      request = buildMessageWithXipkiAction(action, new ASN1Integer(crlNumber));
     }
 
     VerifiedPkiMessage response = signAndSend(request, debug);
     return evaluateCrlResponse(response, action);
-  }
+  } // method downloadCrl
 
   private X509CRL evaluateCrlResponse(VerifiedPkiMessage response, Integer xipkiAction)
       throws CmpClientException, PkiErrorException {
@@ -977,7 +977,7 @@ class CmpAgent {
     PKIMessage reqMessage = buildRevokeCertRequest(Args.notNull(request, "request"));
     VerifiedPkiMessage response = signAndSend(reqMessage, debug);
     return parse(response, request.getRequestEntries());
-  }
+  } // method revokeCertificate
 
   public RevokeCertResponse unrevokeCertificate(UnrevokeOrRemoveCertRequest request,
       ReqRespDebug debug) throws CmpClientException, PkiErrorException {
@@ -985,7 +985,7 @@ class CmpAgent {
         CrlReason.REMOVE_FROM_CRL.getCode());
     VerifiedPkiMessage response = signAndSend(reqMessage, debug);
     return parse(response, request.getRequestEntries());
-  }
+  } // method unrevokeCertificate
 
   public RevokeCertResponse removeCertificate(UnrevokeOrRemoveCertRequest request,
       ReqRespDebug debug) throws CmpClientException, PkiErrorException {
@@ -993,7 +993,7 @@ class CmpAgent {
             XiSecurityConstants.CMP_CRL_REASON_REMOVE);
     VerifiedPkiMessage response = signAndSend(reqMessage, debug);
     return parse(response, request.getRequestEntries());
-  }
+  } // method removeCertificate
 
   private RevokeCertResponse parse(VerifiedPkiMessage response,
       List<? extends UnrevokeOrRemoveCertRequest.Entry> reqEntries)
@@ -1074,7 +1074,7 @@ class CmpAgent {
     Map<BigInteger, String> reqIdIdMap = new HashMap<>();
     reqIdIdMap.put(MINUS_ONE, csr.getId());
     return requestCertificate0(request, reqIdIdMap, PKIBody.TYPE_CERT_REP, debug);
-  }
+  } // method requestCertificate
 
   public EnrollCertResponse requestCertificate(EnrollCertRequest req, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
@@ -1105,7 +1105,7 @@ class CmpAgent {
     }
 
     return requestCertificate0(request, reqIdIdMap, exptectedBodyType, debug);
-  }
+  } // method requestCertificate
 
   private EnrollCertResponse requestCertificate0(PKIMessage reqMessage,
       Map<BigInteger, String> reqIdIdMap, int expectedBodyType, ReqRespDebug debug)
@@ -1265,7 +1265,7 @@ class CmpAgent {
     }
     PKIBody body = new PKIBody(PKIBody.TYPE_CERT_CONFIRM, certConfirm.toASN1Structure());
     return new PKIMessage(header, body);
-  }
+  } // method buildCertConfirmRequest
 
   private PKIMessage buildRevokeCertRequest(RevokeCertRequest request)
       throws CmpClientException {
@@ -1364,7 +1364,7 @@ class CmpAgent {
     PKIBody body = new PKIBody(PKIBody.TYPE_P10_CERT_REQ, csr.getCsr());
 
     return new PKIMessage(header, body);
-  }
+  } // method buildPkiMessage
 
   private PKIMessage buildPkiMessage(EnrollCertRequest req) {
     PKIHeader header = buildPkiHeader(implicitConfirm, null);
@@ -1424,7 +1424,7 @@ class CmpAgent {
     ASN1Sequence acceptVersions = new DERSequence(vec);
 
     int action = XiSecurityConstants.CMP_ACTION_GET_CAINFO;
-    PKIMessage request = buildMessageWithXipkAction(action, acceptVersions);
+    PKIMessage request = buildMessageWithXipkiAction(action, acceptVersions);
     VerifiedPkiMessage response = signAndSend(request, debug);
     ASN1Encodable itvValue = extractXipkiActionRepContent(response, action);
     DERUTF8String utf8Str = DERUTF8String.getInstance(itvValue);
@@ -1520,6 +1520,6 @@ class CmpAgent {
     Extension extAki = new Extension(Extension.authorityKeyIdentifier, false, encodedAki);
     Extensions certTempExts = new Extensions(extAki);
     return certTempExts;
-  }
+  } // method getCertTempExtensions
 
 }

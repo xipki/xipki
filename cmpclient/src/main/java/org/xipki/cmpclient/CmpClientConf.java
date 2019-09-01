@@ -148,7 +148,7 @@ public class CmpClientConf extends ValidatableConf {
       validate(dhpocCerts);
     }
 
-  }
+  } // class Ca
 
   public static class Certs extends ValidatableConf {
 
@@ -182,7 +182,7 @@ public class CmpClientConf extends ValidatableConf {
       }
     }
 
-  }
+  } // class Certs
 
   public static class Certprofile extends ValidatableConf {
 
@@ -222,7 +222,7 @@ public class CmpClientConf extends ValidatableConf {
       validate(conf);
     }
 
-  }
+  } // class Certprofile
 
   public static class Certprofiles extends ValidatableConf {
 
@@ -260,7 +260,7 @@ public class CmpClientConf extends ValidatableConf {
       }
     }
 
-  }
+  } // class Certprofiles
 
   public static class Cmpcontrol extends ValidatableConf {
 
@@ -288,7 +288,7 @@ public class CmpClientConf extends ValidatableConf {
     public void validate() throws InvalidConfException {
     }
 
-  }
+  } // class Cmpcontrol
 
   public static class Requestor extends ValidatableConf {
 
@@ -411,7 +411,7 @@ public class CmpClientConf extends ValidatableConf {
         notEmpty(mac, "mac");
       }
 
-    }
+    } // class PbmMac
 
     public static class Signature extends ValidatableConf {
 
@@ -450,9 +450,9 @@ public class CmpClientConf extends ValidatableConf {
         validate(cert);
       }
 
-    }
+    } // class Signature
 
-  }
+  } // class Requestor
 
   public static class Responder extends ValidatableConf {
 
@@ -539,7 +539,7 @@ public class CmpClientConf extends ValidatableConf {
         notEmpty(macAlgos, "macAlgos");
       }
 
-    }
+    } // class PbmMac
 
     public static class Signature extends ValidatableConf {
 
@@ -561,9 +561,9 @@ public class CmpClientConf extends ValidatableConf {
         notEmpty(signatureAlgos, "signatureAlgos");
       }
 
-    }
+    } // class Signature
 
-  }
+  } // class Responder
 
   public static class Ssl extends ValidatableConf {
 
@@ -646,7 +646,7 @@ public class CmpClientConf extends ValidatableConf {
       notEmpty(name, "name");
     }
 
-  }
+  } // class Ssl
 
   private List<Ssl> ssls;
 

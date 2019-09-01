@@ -56,7 +56,7 @@ public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
       KeyUtil.generateDSAKeypair(plength, qlength, random);
     }
 
-  }
+  } // class DSA
 
   // CHECKSTYLE:SKIP
   public static class EC extends P12KeyGenSpeed {
@@ -77,7 +77,7 @@ public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
       }
     }
 
-  }
+  } // class EC
 
   // CHECKSTYLE:SKIP
   public static class RSA extends P12KeyGenSpeed {

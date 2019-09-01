@@ -122,7 +122,7 @@ class EmulatorP11Slot extends P11Slot {
       return name.endsWith(INFO_FILE_SUFFIX);
     }
 
-  }
+  } // class InfoFilenameFilter
 
   private static final Logger LOG = LoggerFactory.getLogger(EmulatorP11Slot.class);
 
@@ -239,7 +239,7 @@ class EmulatorP11Slot extends P11Slot {
     // SM2
     PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN,
     PKCS11Constants.CKM_VENDOR_SM2_SM3,
-    PKCS11Constants.CKM_VENDOR_SM2};
+    PKCS11Constants.CKM_VENDOR_SM2}; // method static
 
   private static final FilenameFilter INFO_FILENAME_FILTER = new InfoFilenameFilter();
 
@@ -309,7 +309,7 @@ class EmulatorP11Slot extends P11Slot {
     }
 
     refresh();
-  }
+  } // constructor
 
   @Override
   protected P11SlotRefreshResult refresh0() throws P11TokenException {
@@ -425,7 +425,7 @@ class EmulatorP11Slot extends P11Slot {
     }
 
     return ret;
-  } // method refresh
+  } // method refresh0
 
   File slotDir() {
     return slotDir;
@@ -483,7 +483,7 @@ class EmulatorP11Slot extends P11Slot {
     } else {
       throw new P11TokenException("unknown key algorithm " + algorithm);
     }
-  }
+  } // method readPublicKey
 
   private X509Cert readCertificate(byte[] keyId) throws CertificateException, IOException {
     byte[] encoded = IoUtil.read(new File(certDir, hex(keyId) + VALUE_FILE_SUFFIX));
@@ -555,7 +555,7 @@ class EmulatorP11Slot extends P11Slot {
     }
 
     return deleted;
-  }
+  } // method removePkcs11Entry
 
   private static boolean deletePkcs11Entry(File dir, byte[] objectId) {
     String hextId = hex(objectId);
@@ -572,7 +572,7 @@ class EmulatorP11Slot extends P11Slot {
     }
 
     return b1 || b2;
-  }
+  } // method deletePkcs11Entry
 
   private int deletePkcs11Entry(File dir, byte[] id, String label) throws P11TokenException {
     if (StringUtil.isBlank(label)) {
@@ -616,7 +616,7 @@ class EmulatorP11Slot extends P11Slot {
       deletePkcs11Entry(dir, m);
     }
     return ids.size();
-  }
+  } // method deletePkcs11Entry
 
   private String savePkcs11SecretKey(byte[] id, String label, SecretKey secretKey)
       throws P11TokenException {
@@ -641,7 +641,7 @@ class EmulatorP11Slot extends P11Slot {
     savePkcs11Entry(secKeyDir, id, label, encrytedValue);
 
     return label;
-  }
+  } // method savePkcs11SecretKey
 
   private String savePkcs11PrivateKey(byte[] id, String label, PrivateKey privateKey)
       throws P11TokenException {
@@ -661,7 +661,7 @@ class EmulatorP11Slot extends P11Slot {
 
     savePkcs11Entry(privKeyDir, id, label, encoded);
     return label;
-  }
+  } // method savePkcs11PrivateKey
 
   private String savePkcs11PublicKey(byte[] id, String label, PublicKey publicKey)
       throws P11TokenException {
@@ -776,7 +776,7 @@ class EmulatorP11Slot extends P11Slot {
     }
 
     return label;
-  }
+  } // method savePkcs11PublicKey
 
   private static void bigIntToBytes(String numName, BigInteger num, byte[] dest, int destPos,
       int length) throws P11TokenException {
@@ -817,7 +817,7 @@ class EmulatorP11Slot extends P11Slot {
     } catch (IOException ex) {
       throw new P11TokenException("could not save certificate");
     }
-  }
+  } // method savePkcs11Entry
 
   @Override
   public int removeObjects(byte[] id, String label) throws P11TokenException {
@@ -830,7 +830,7 @@ class EmulatorP11Slot extends P11Slot {
     num += deletePkcs11Entry(certDir, id, label);
     num += deletePkcs11Entry(secKeyDir, id, label);
     return num;
-  }
+  } // method removeObjects
 
   @Override
   protected void removeIdentity0(P11IdentityId identityId) throws P11TokenException {
@@ -852,7 +852,7 @@ class EmulatorP11Slot extends P11Slot {
     if (! (b1 || b2 || b3 || b4)) {
       throw new P11UnknownEntityException(slotId, keyId);
     }
-  }
+  } // method removeIdentity0
 
   @Override
   protected void removeCerts0(P11ObjectIdentifier objectId) throws P11TokenException {
@@ -871,7 +871,7 @@ class EmulatorP11Slot extends P11Slot {
 
     savePkcs11Cert(id, label, cert);
     return new P11ObjectIdentifier(id, label);
-  }
+  } // method addCert0
 
   @Override
   protected P11Identity generateSecretKey0(long keyType, int keysize,
@@ -905,7 +905,7 @@ class EmulatorP11Slot extends P11Slot {
     random.nextBytes(keyBytes);
     SecretKey key = new SecretKeySpec(keyBytes, getSecretKeyAlgorithm(keyType));
     return saveP11Entity(key, control);
-  }
+  } // method generateSecretKey0
 
   @Override
   protected P11Identity importSecretKey0(long keyType, byte[] keyValue,
@@ -942,7 +942,7 @@ class EmulatorP11Slot extends P11Slot {
       throw new IllegalArgumentException("unsupported keyType " + keyType);
     }
     return algorithm;
-  }
+  } // method getSecretKeyAlgorithm
 
   @Override
   protected P11Identity generateRSAKeypair0(int keysize, BigInteger publicExponent,
@@ -957,7 +957,7 @@ class EmulatorP11Slot extends P11Slot {
       throw new P11TokenException(ex.getMessage(), ex);
     }
     return saveP11Entity(keypair, control);
-  }
+  } // method generateRSAKeypair0
 
   @Override
   // CHECKSTYLE:SKIP
@@ -973,7 +973,7 @@ class EmulatorP11Slot extends P11Slot {
       throw new P11TokenException(ex.getMessage(), ex);
     }
     return saveP11Entity(keypair, control);
-  }
+  } // method generateDSAKeypair0
 
   @Override
   protected P11Identity generateSM2Keypair0(P11NewKeyControl control)
@@ -999,7 +999,7 @@ class EmulatorP11Slot extends P11Slot {
       throw new P11TokenException(ex.getMessage(), ex);
     }
     return saveP11Entity(keypair, control);
-  }
+  } // method generateECEdwardsKeypair0
 
   @Override
   protected P11Identity generateECMontgomeryKeypair0(ASN1ObjectIdentifier curveOid,
@@ -1018,7 +1018,7 @@ class EmulatorP11Slot extends P11Slot {
       throw new P11TokenException(ex.getMessage(), ex);
     }
     return saveP11Entity(keypair, control);
-  }
+  } // method generateECMontgomeryKeypair0
 
   @Override
   protected P11Identity generateECKeypair0(ASN1ObjectIdentifier curveId,
@@ -1032,7 +1032,7 @@ class EmulatorP11Slot extends P11Slot {
       throw new P11TokenException(ex.getMessage(), ex);
     }
     return saveP11Entity(keypair, control);
-  }
+  } // method generateECKeypair0
 
   private P11Identity saveP11Entity(KeyPair keypair, P11NewObjectControl control)
       throws P11TokenException {
@@ -1084,7 +1084,7 @@ class EmulatorP11Slot extends P11Slot {
       throw new P11TokenException(
           "could not construct KeyStoreP11Identity: " + ex.getMessage(), ex);
     }
-  }
+  } // method saveP11Entity
 
   private P11Identity saveP11Entity(SecretKey key, P11NewObjectControl control)
       throws P11TokenException {
@@ -1100,14 +1100,14 @@ class EmulatorP11Slot extends P11Slot {
     P11IdentityId identityId = new P11IdentityId(slotId,
         new P11ObjectIdentifier(id, label), null, null);
     return new EmulatorP11Identity(this,identityId, key, maxSessions, random);
-  }
+  } // method saveP11Entity
 
   @Override
   protected void updateCertificate0(P11ObjectIdentifier keyId, X509Certificate newCert)
       throws P11TokenException, CertificateException {
     removePkcs11Cert(keyId);
     savePkcs11Cert(keyId.getId(), keyId.getLabel(), newCert);
-  }
+  } // method updateCertificate0
 
   private byte[] generateId() throws P11TokenException {
     while (true) {
@@ -1119,7 +1119,7 @@ class EmulatorP11Slot extends P11Slot {
         return id;
       }
     }
-  }
+  } // method generateId
 
   private void assertValidId(byte[] id) throws P11TokenException {
     if (vendor == Vendor.YUBIKEY) {
@@ -1127,7 +1127,7 @@ class EmulatorP11Slot extends P11Slot {
         throw buildP11TokenException(PKCS11Constants.CKR_ATTRIBUTE_VALUE_INVALID);
       }
     }
-  }
+  } // method assertValidId
 
   private static P11TokenException buildP11TokenException(long p11ErrorCode) {
     return new P11TokenException(new PKCS11Exception(p11ErrorCode));

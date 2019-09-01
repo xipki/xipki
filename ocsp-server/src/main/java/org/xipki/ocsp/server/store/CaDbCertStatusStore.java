@@ -220,7 +220,7 @@ public class CaDbCertStatusStore extends OcspStore {
         storeUpdateInProcess.set(false);
       }
     } // end lock
-  } // method initIssuerStore
+  } // method updateIssuerStore
 
   @Override
   protected CertStatusInfo getCertStatus0(Date time, RequestIssuer reqIssuer,
@@ -383,7 +383,7 @@ public class CaDbCertStatusStore extends OcspStore {
       throw new OcspStoreException(ex.getMessage(), ex);
     }
 
-  } // method getCertStatus
+  } // method getCertStatus0
 
   /**
    * Borrow Prepared Statement.
@@ -415,7 +415,7 @@ public class CaDbCertStatusStore extends OcspStore {
       LogUtil.error(LOG, ex);
       return false;
     }
-  }
+  } // method isHealthy
 
   private void releaseDbResources(Statement ps, ResultSet rs) {
     datasource.releaseResources(ps, rs);
@@ -497,7 +497,7 @@ public class CaDbCertStatusStore extends OcspStore {
         }
       }
     }
-  }
+  } // method init
 
   @Override
   public void close() {
@@ -509,7 +509,7 @@ public class CaDbCertStatusStore extends OcspStore {
     if (datasource != null) {
       datasource.close();
     }
-  }
+  } // method close
 
   @Override
   public boolean knowsIssuer(RequestIssuer reqIssuer) {
@@ -523,7 +523,7 @@ public class CaDbCertStatusStore extends OcspStore {
     }
     IssuerEntry issuer = issuerStore.getIssuerForFp(reqIssuer);
     return (issuer == null) ? null : issuer.getCert();
-  }
+  } // method getIssuerCert
 
   protected boolean isInitialized() {
     return initialized;

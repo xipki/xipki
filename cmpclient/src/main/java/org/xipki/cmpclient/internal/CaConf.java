@@ -56,7 +56,7 @@ class CaConf {
       return this.rrAkiRequired;
     }
 
-  }
+  } // class CmpControl
 
   static class CaInfo {
 
@@ -92,7 +92,7 @@ class CaConf {
       return certprofiles;
     }
 
-  }
+  } // class CaInfo
 
   private final String name;
 

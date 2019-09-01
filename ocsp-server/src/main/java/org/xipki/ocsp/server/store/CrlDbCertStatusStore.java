@@ -52,7 +52,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
       }
     }
 
-  } // StoreUpdateService
+  } // class CrlUpdateService
 
   private static final Logger LOG = LoggerFactory.getLogger(CrlDbCertStatusStore.class);
 
@@ -102,7 +102,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     super.datasource = datasource;
     updateStore(true);
     super.init(sourceConf, datasource);
-  }
+  } // method init
 
   private static String getStrValue(Map<String, ? extends Object> sourceConf,
       String confName, boolean mandatory) {
@@ -121,7 +121,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     } else {
       return objVal.toString();
     }
-  }
+  } // method getStrValue
 
   @Override
   protected boolean isIgnoreExpiredCrls() {
@@ -187,6 +187,6 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
         crlUpdateInProcess.set(false);
       }
     } // end lock
-  } // method initializeStore
+  } // method updateStore
 
 }

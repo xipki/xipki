@@ -128,7 +128,7 @@ public abstract class OcspStore implements Closeable {
     }
 
     return info;
-  }
+  } // method getCertStatus
 
   /**
    * Return the certificate status.

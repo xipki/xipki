@@ -65,7 +65,7 @@ abstract class ResultEntry extends IdentifiedObject {
       return statusInfo;
     }
 
-  }
+  } // class Error
 
   public static class EnrollCert extends ResultEntry {
 
@@ -98,7 +98,7 @@ abstract class ResultEntry extends IdentifiedObject {
       return status;
     }
 
-  }
+  } // class EnrollCert
 
   public static class RevokeCert extends ResultEntry {
 
@@ -113,7 +113,7 @@ abstract class ResultEntry extends IdentifiedObject {
       return certId;
     }
 
-  }
+  } // class RevokeCert
 
   public static class UnrevokeOrRemoveCert extends ResultEntry {
 
@@ -150,6 +150,6 @@ abstract class ResultEntry extends IdentifiedObject {
       this.authorityKeyIdentifier = authorityKeyIdentifier;
     }
 
-  }
+  } // class UnrevokeOrRemoveCert
 
 }

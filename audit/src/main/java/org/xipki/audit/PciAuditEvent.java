@@ -101,7 +101,7 @@ public class PciAuditEvent {
     this.date = DATE_FORMATTER.format(localDate);
     this.time = TIME_FORMATTER.format(localDate);
     this.level = AuditLevel.INFO;
-  }
+  } // constructor
 
   public AuditLevel getLevel() {
     return level;
@@ -149,7 +149,7 @@ public class PciAuditEvent {
     }
 
     return origination;
-  }
+  } // method getOrigination
 
   public void setOrigination(String origination) {
     this.origination = origination;
@@ -181,7 +181,7 @@ public class PciAuditEvent {
     buffer.append(replaceDelimiter(getAffectedResource()));
 
     return buffer;
-  }
+  } // method toCharArrayWriter
 
   private static boolean isBlank(CharSequence cs) {
     if (cs == null) {
@@ -199,7 +199,7 @@ public class PciAuditEvent {
       }
     }
     return true;
-  }
+  } // method isBlank
 
   private static String replaceDelimiter(String fieldValue) {
     if (fieldValue == null || fieldValue.isEmpty()) {
@@ -207,7 +207,7 @@ public class PciAuditEvent {
     }
 
     return fieldValue.replace(DEFAULT_DELIMITER, DEFAULT_REPLACE_DELIMITER);
-  }
+  } // method replaceDelimiter
 
   private static String getHostAddress() {
     List<String> addresses = new LinkedList<>();
@@ -251,6 +251,6 @@ public class PciAuditEvent {
         return "UNKNOWN";
       }
     }
-  }
+  } // method getHostAddress
 
 }

@@ -114,8 +114,8 @@ public class GeneralSubtreeType extends ValidatableConf {
         throw new InvalidConfException("exact one of directoryName, dnsName, ipAddress, rfc822Name,"
             + " and uri must be set");
       }
-    }
-  }
+    } // method validate
+  } // class Base
 
   @JSONField(ordinal = 1)
   private Base base;

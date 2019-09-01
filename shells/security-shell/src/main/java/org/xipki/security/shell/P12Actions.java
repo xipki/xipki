@@ -104,7 +104,7 @@ public class P12Actions {
       return null;
     }
 
-  }
+  } // class SecretkeyP12
 
   @Command(scope = "xi", name = "export-cert-p12",
       description = "export certificate from PKCS#12 keystore")
@@ -144,7 +144,7 @@ public class P12Actions {
       return null;
     }
 
-  }
+  } // class ExportCertP12
 
   @Command(scope = "xi", name = "update-cert-p12",
       description = "update certificate in PKCS#12 keystore")
@@ -197,7 +197,7 @@ public class P12Actions {
         println("updated certificate");
         return null;
       }
-    }
+    } // method execute0
 
     private void assertMatch(KeyStore ks, X509Certificate cert, String password)
         throws Exception {
@@ -221,9 +221,9 @@ public class P12Actions {
         SignerConf conf = new SignerConf(pairs.getEncoded(), HashAlgo.SHA256, null);
         securityFactory.createSigner("PKCS12", conf, cert);
       }
-    }
+    } // method assertMatch
 
-  }
+  } // class UpdateCertP12
 
   @Command(scope = "xi", name = "csr-p12", description = "generate CSR with PKCS#12 keystore")
   @Service
@@ -276,9 +276,9 @@ public class P12Actions {
         throw new ObjectCreationException("error getting peer certificates", ex);
       }
       return securityFactory.createSigner("PKCS12", signerConf, (X509Certificate[]) null);
-    }
+    } // method getSigner
 
-  }
+  } // class CsrP12
 
   @Command(scope = "xi", name = "dsa-p12", description = "generate RSA keypair in PKCS#12 keystore")
   @Service
@@ -315,9 +315,9 @@ public class P12Actions {
       saveKey(keypair);
 
       return null;
-    }
+    } // method execute0
 
-  }
+  } // class DsaP12
 
   @Command(scope = "xi", name = "ec-p12", description = "generate EC keypair in PKCS#12 keystore")
   @Service
@@ -349,7 +349,7 @@ public class P12Actions {
       return null;
     }
 
-  }
+  } // class EcP12
 
   public abstract static class P12KeyGenAction extends SecurityAction {
 
@@ -384,7 +384,7 @@ public class P12Actions {
       return pwdInChar;
     }
 
-  }
+  } // class P12KeyGenAction
 
   @Command(scope = "xi", name = "rsa-p12", description = "generate RSA keypair in PKCS#12 keystore")
   @Service
@@ -413,7 +413,7 @@ public class P12Actions {
       return null;
     }
 
-  }
+  } // class RsaP12
 
   public abstract static class P12SecurityAction extends SecurityAction {
 
@@ -443,7 +443,7 @@ public class P12Actions {
       return ks;
     }
 
-  }
+  } // class P12SecurityAction
 
   @Command(scope = "xi", name = "sm2-p12",
       description = "generate SM2 (curve sm2p256v1) keypair in PKCS#12 keystore")
@@ -463,7 +463,7 @@ public class P12Actions {
       return null;
     }
 
-  }
+  } // class Sm2P12
 
   @Command(scope = "xi", name = "pkcs12",
       description = "export PKCS#12 key store, like the 'openssl pkcs12' command")
@@ -493,6 +493,6 @@ public class P12Actions {
       return null;
     }
 
-  }
+  } // class Pkcs12
 
 }

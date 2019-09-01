@@ -49,6 +49,6 @@ public enum RequestType {
     }
 
     throw new IllegalArgumentException("invalid RequestType code " + code);
-  }
+  } // method getInstance
 
 }

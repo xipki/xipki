@@ -87,7 +87,7 @@ public class SignerUtil {
     addDigestPkcsPrefix(HashAlgo.SHA3_256, "3031300d060960864801650304020805000420");
     addDigestPkcsPrefix(HashAlgo.SHA3_384, "3041300d060960864801650304020905000430");
     addDigestPkcsPrefix(HashAlgo.SHA3_512, "3051300d060960864801650304020a05000440");
-  }
+  } // method static
 
   private static void addDigestPkcsPrefix(HashAlgo algo, String prefix) {
     digestPkcsPrefix.put(algo, Hex.decode(prefix));
@@ -145,7 +145,7 @@ public class SignerUtil {
     AsymmetricBlockCipher tmpCipher = (cipher == null) ? new RSABlindedEngine() : cipher;
 
     return new PSSSigner(tmpCipher, dig, mfgDig, saltSize, getTrailer(trailerField));
-  }
+  } // method createPSSRSASigner
 
   private static byte getTrailer(int trailerField) {
     if (trailerField == 1) {
@@ -189,7 +189,7 @@ public class SignerUtil {
     offset += prefix.length;
     System.arraycopy(hashValue, 0, block, offset, hashValue.length);
     return block;
-  }
+  } // method EMSA_PKCS1_v1_5_encoding
 
   // CHECKSTYLE:SKIP
   public static byte[] EMSA_PKCS1_v1_5_encoding(byte[] encodedDigestInfo, int modulusBigLength)
@@ -219,7 +219,7 @@ public class SignerUtil {
 
     System.arraycopy(encodedDigestInfo, 0, block, offset, encodedDigestInfo.length);
     return block;
-  }
+  } // method EMSA_PKCS1_v1_5_encoding
 
   // CHECKSTYLE:SKIP
   public static byte[] EMSA_PSS_ENCODE(HashAlgo contentDigest, byte[] hashValue, HashAlgo mgfDigest,
@@ -260,7 +260,7 @@ public class SignerUtil {
 
     block[block.length - 1] = trailer;
     return block;
-  }
+  } // method EMSA_PSS_ENCODE
 
   /**
    * int to octet string.
@@ -299,7 +299,7 @@ public class SignerUtil {
     }
 
     return mask;
-  }
+  } // method maskGeneratorFunction1
 
   // CHECKSTYLE:SKIP
   public static byte[] dsaSigPlainToX962(byte[] signature) throws XiSecurityException {
@@ -322,7 +322,7 @@ public class SignerUtil {
     } catch (IOException ex) {
       throw new XiSecurityException("IOException, message: " + ex.getMessage(), ex);
     }
-  }
+  } // method dsaSigPlainToX962
 
   // CHECKSTYLE:SKIP
   public static byte[] dsaSigX962ToPlain(byte[] x962Signature, int keyBitLen)
@@ -335,7 +335,7 @@ public class SignerUtil {
     BigInteger sigR = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue();
     BigInteger sigS = ASN1Integer.getInstance(seq.getObjectAt(1)).getPositiveValue();
     return dsaSigToPlain(sigR, sigS, keyBitLen);
-  }
+  } // method dsaSigX962ToPlain
 
   public static byte[] dsaSigToPlain(BigInteger sigR, BigInteger sigS, int keyBitLen)
       throws XiSecurityException {
@@ -354,7 +354,7 @@ public class SignerUtil {
     bigIntToBytes(sigR, plainSignature, 0, blockSize);
     bigIntToBytes(sigS, plainSignature, blockSize, blockSize);
     return plainSignature;
-  }
+  } // method dsaSigToPlain
 
   private static void bigIntToBytes(BigInteger num, byte[] dest, int destPos, int length) {
     byte[] bytes = num.toByteArray();
@@ -365,7 +365,7 @@ public class SignerUtil {
     } else {
       System.arraycopy(bytes, bytes.length - length, dest, destPos, length);
     }
-  }
+  } // method bigIntToBytes
 
   private static Digest getDigest(AlgorithmIdentifier hashAlgo) throws XiSecurityException {
     HashAlgo hat = HashAlgo.getInstance(hashAlgo.getAlgorithm());
@@ -417,6 +417,6 @@ public class SignerUtil {
       throw new InvalidKeyException("could not build ContentVerifierProvider: "
           + ex.getMessage(), ex);
     }
-  }
+  } // method getContentVerifierProvider
 
 }

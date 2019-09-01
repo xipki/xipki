@@ -106,7 +106,7 @@ public class OcspQa {
 
     return checkOcsp(response, issuerHash, serialNumbers, encodedCerts,
         expectedOcspStatuses, exptectedRevTimes, responseOption, noSigVerify);
-  }
+  } // method checkOcsp
 
   public ValidationResult checkOcsp(OCSPResp response, OcspError expectedOcspError) {
     Args.notNull(response, "response");
@@ -125,7 +125,7 @@ public class OcspQa {
     }
 
     return new ValidationResult(resultIssues);
-  }
+  } // method checkOcsp
 
   public ValidationResult checkOcsp(OCSPResp response, IssuerHash issuerHash,
       List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts,
@@ -501,7 +501,7 @@ public class OcspQa {
       }
     }
     return issue;
-  }
+  } // method checkOccurrence
 
   private static final String formatTime(Date date) {
     return DateUtil.toUtcTimeyyyyMMddhhmmss(date);

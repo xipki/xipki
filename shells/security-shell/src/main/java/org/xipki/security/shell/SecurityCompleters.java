@@ -44,7 +44,7 @@ public class SecurityCompleters {
     public KeystoreTypeCompleter() {
       setTokens("PKCS12", "JKS", "JCEKS");
     }
-  }
+  } // class KeystoreTypeCompleter
 
   @Service
   public static class P11KeyUsageCompleter extends EnumCompleter {
@@ -70,7 +70,7 @@ public class SecurityCompleters {
       return usages;
     }
 
-  }
+  } // class P11KeyUsageCompleter
 
   @Service
   public static class P11ModuleNameCompleter extends DynamicEnumCompleter {
@@ -87,7 +87,7 @@ public class SecurityCompleters {
       return names;
     }
 
-  }
+  } // class P11ModuleNameCompleter
 
   @Service
   public static class SecretKeyTypeCompleter extends EnumCompleter {
@@ -96,6 +96,6 @@ public class SecurityCompleters {
       setTokens("DES3", "AES", "GENERIC");
     }
 
-  }
+  } // class SecretKeyTypeCompleter
 
 }

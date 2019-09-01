@@ -85,7 +85,7 @@ class DigestDiffReporter implements Closeable {
     this.errorWriter = Files.newBufferedWriter(Paths.get(dirPath, "error"));
 
     start();
-  }
+  } // constructor
 
   public final void start() {
     startTime = new Date();
@@ -124,7 +124,7 @@ class DigestDiffReporter implements Closeable {
     synchronized (diffWriter) {
       diffWriter.write(msg);
     }
-  }
+  } // method addDiff
 
   public void addError(String errorMessage) throws IOException {
     Args.notNull(errorMessage, "errorMessage");
@@ -134,7 +134,7 @@ class DigestDiffReporter implements Closeable {
     synchronized (errorWriter) {
       errorWriter.write(msg);
     }
-  }
+  } // method addError
 
   public void addNoCaMatch() throws IOException {
     synchronized (errorWriter) {
@@ -183,7 +183,7 @@ class DigestDiffReporter implements Closeable {
     synchronized (writer) {
       writer.write(msg);
     }
-  }
+  } // method writeSerialNumberLine
 
   private static void closeWriter(Writer writer) {
     try {
@@ -191,6 +191,6 @@ class DigestDiffReporter implements Closeable {
     } catch (Exception ex) {
       LogUtil.warn(LOG, ex, "could not close writer");
     }
-  }
+  } // method closeWriter
 
 }

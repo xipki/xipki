@@ -73,7 +73,7 @@ public class DummyStore extends OcspStore {
       this.caCert = caCert;
     }
 
-  }
+  } // class DummySourceConf
 
   private static Logger LOG = LoggerFactory.getLogger(DummyStore.class);
 
@@ -122,7 +122,7 @@ public class DummyStore extends OcspStore {
     } else {
       return CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, nextUpdate);
     }
-  }
+  } // method getCertStatus0
 
   /**
    * Initialize the store.

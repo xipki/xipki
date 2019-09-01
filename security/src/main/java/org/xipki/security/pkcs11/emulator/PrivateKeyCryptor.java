@@ -71,7 +71,7 @@ class PrivateKeyCryptor {
 
     JcePKCSPBEInputDecryptorProviderBuilder db = new JcePKCSPBEInputDecryptorProviderBuilder();
     decryptorProvider = db.build(password);
-  }
+  } // constructor
 
   PrivateKey decrypt(PKCS8EncryptedPrivateKeyInfo encryptedPrivateKeyInfo)
       throws P11TokenException {
@@ -111,7 +111,7 @@ class PrivateKeyCryptor {
         | InvalidKeySpecException ex) {
       throw new P11TokenException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
     }
-  }
+  } // method decrypt
 
   PKCS8EncryptedPrivateKeyInfo encrypt(PrivateKey privateKey) {
     Args.notNull(privateKey, "privateKey");

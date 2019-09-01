@@ -80,7 +80,7 @@ public interface CaCertValidator {
       }
     }
 
-  }
+  } // class CachingCertificateValidator
 
   /**
    * {@link CaCertValidator} with pre-povisioned CA certificates.
@@ -133,7 +133,7 @@ public interface CaCertValidator {
       }
     }
 
-  }
+  } // class PreprovisionedCaCertValidator
 
   public static final class PreprovisionedHashCaCertValidator implements CaCertValidator {
 
@@ -178,6 +178,6 @@ public interface CaCertValidator {
       return false;
     }
 
-  }
+  } // class PreprovisionedHashCaCertValidator
 
 }

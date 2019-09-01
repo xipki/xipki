@@ -118,7 +118,7 @@ public class ScepClientExample extends CaClientExample {
       ex.printStackTrace();
       System.exit(-1);
     }
-  }
+  } // method main
 
   private static String getSubject() {
     return "CN=SCEP-" + index.incrementAndGet() + ".xipki.org,O=xipki,C=DE";

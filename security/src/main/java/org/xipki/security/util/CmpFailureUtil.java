@@ -65,7 +65,7 @@ public class CmpFailureUtil {
     STATUS_TEXT_MAP.put(PKIStatus.REVOCATION_WARNING, "revocationWarning");
     STATUS_TEXT_MAP.put(PKIStatus.REVOCATION_NOTIFICATION, "revocationNotification");
     STATUS_TEXT_MAP.put(PKIStatus.KEY_UPDATE_WARNING, "keyUpdateWarning");
-  }
+  } // method static
 
   private CmpFailureUtil() {
   }
@@ -76,13 +76,13 @@ public class CmpFailureUtil {
     PKIFreeText text = pkiStatusInfo.getStatusString();
     String statusMessage = (text == null) ? null : text.getStringAt(0).getString();
     return formatPkiStatusInfo(status, failureInfo, statusMessage);
-  }
+  } // method formatPkiStatusInfo
 
   public static String formatPkiStatusInfo(int status, int failureInfo, String statusMessage) {
     return StringUtil.concatObjectsCap(200, "PKIStatusInfo {status = ", status,
       " (", STATUS_TEXT_MAP.get(status), "), ", "failureInfo = ", failureInfo,
       " (", getFailureInfoText(failureInfo), "), ", "statusMessage = ", statusMessage, "}");
-  }
+  } // method formatPkiStatusInfo
 
   public static String getFailureInfoText(int failureInfo) {
     BigInteger bi = BigInteger.valueOf(failureInfo);
@@ -96,6 +96,6 @@ public class CmpFailureUtil {
     }
 
     return (sb.length() < 3) ? "" : sb.substring(2);
-  }
+  } // method getFailureInfoText
 
 }

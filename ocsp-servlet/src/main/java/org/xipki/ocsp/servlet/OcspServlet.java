@@ -126,7 +126,7 @@ public class OcspServlet extends HttpServlet {
     } finally {
       resp.flushBuffer();
     }
-  } // method servicePost
+  } // method doPost
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -246,7 +246,7 @@ public class OcspServlet extends HttpServlet {
     } finally {
       resp.flushBuffer();
     }
-  } // method serviceGet
+  } // method doGet
 
   private static void sendError(HttpServletResponse resp, int status) {
     resp.setStatus(status);
@@ -297,6 +297,6 @@ public class OcspServlet extends HttpServlet {
       }
     }
 
-  }
+  } // method base64Decode
 
 }

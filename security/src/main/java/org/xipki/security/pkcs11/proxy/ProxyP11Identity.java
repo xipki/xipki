@@ -85,7 +85,7 @@ class ProxyP11Identity extends P11Identity {
     }
 
     return (octetString == null) ? null : octetString.getOctets();
-  }
+  } // method sign0
 
   @Override
   protected byte[] digestSecretKey0(long mechanism) throws P11TokenException {
@@ -103,6 +103,6 @@ class ProxyP11Identity extends P11Identity {
     }
 
     return (octetString == null) ? null : octetString.getOctets();
-  }
+  } // method digestSecretKey0
 
 }

@@ -251,7 +251,7 @@ public class AdmissionExtension {
 
       return new ExtensionValue(critical,
           new AdmissionSyntax(admissionAuthority, new DERSequence(vec)));
-    }
+    } // method getExtensionValue
 
   } // class AdmissionSyntaxOption
 

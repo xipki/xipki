@@ -70,7 +70,7 @@ public abstract class Describable extends ValidatableConf {
       }
     }
 
-  }
+  } // class DescribableOid
 
   public static class DescribableInt extends Describable {
 
@@ -92,7 +92,7 @@ public abstract class Describable extends ValidatableConf {
     @Override
     public void validate() throws InvalidConfException {
     }
-  }
+  } // class DescribableInt
 
   public static class DescribableString extends Describable {
 
@@ -104,7 +104,7 @@ public abstract class Describable extends ValidatableConf {
       notNull(value, "value");
     }
 
-  }
+  } // class DescribableString
 
   public static class DescribableBinary extends Describable {
 
@@ -124,6 +124,6 @@ public abstract class Describable extends ValidatableConf {
       notNull(value, "value");
     }
 
-  }
+  } // class DescribableBinary
 
 }

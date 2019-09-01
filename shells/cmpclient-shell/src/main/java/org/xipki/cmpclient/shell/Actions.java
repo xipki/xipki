@@ -211,40 +211,24 @@ public class Actions {
       return sb.toString();
     }
 
-  }
+  } // class ClientAction
 
-  @Command(scope = "xi", name = "cmp-init", description = "initialize CMP client")
+  @Command(scope = "xi", name = "cmp-cacert", description = "get CA certificate")
   @Service
-  public static class CmpInit extends ClientAction {
-
-    @Override
-    protected Object execute0() throws Exception {
-      boolean succ = client.init();
-      if (succ) {
-        println("CA client initialized successfully");
-      } else {
-        println("CA client initialization failed");
-      }
-      return null;
-    }
-
-  }
-
-  public abstract static class CrlAction extends ClientAction {
+  public static class CmpCacert extends ClientAction {
 
     @Option(name = "--ca", description = "CA name\n(required if multiple CAs are configured)")
     @Completion(CmpClientCompleters.CaNameCompleter.class)
-    protected String caName;
+    private String caName;
 
-    @Option(name = "--outform", description = "output format of the CRL")
+    @Option(name = "--outform", description = "output format of the certificate")
     @Completion(Completers.DerPemCompleter.class)
-    protected String outform = "der";
+    private String outform = "der";
 
-    @Option(name = "--out", aliases = "-o", required = true, description = "where to save the CRL")
+    @Option(name = "--out", aliases = "-o", required = true,
+        description = "where to save the CA certificate")
     @Completion(FileCompleter.class)
-    protected String outFile;
-
-    protected abstract X509CRL retrieveCrl() throws CmpClientException, PkiErrorException;
+    private String outFile;
 
     @Override
     protected Object execute0() throws Exception {
@@ -271,22 +255,79 @@ public class Actions {
         }
       }
 
-      X509CRL crl = null;
+      X509Certificate caCert;
       try {
-        crl = retrieveCrl();
-      } catch (PkiErrorException ex) {
-        throw new CmdFailure("received no CRL from server: " + ex.getMessage());
+        caCert = client.getCaCert(caName);
+      } catch (Exception ex) {
+        throw new CmdFailure("Error while retrieving CA certificate: " + ex.getMessage());
       }
 
-      if (crl == null) {
-        throw new CmdFailure("received no CRL from server");
+      if (caCert == null) {
+        throw new CmdFailure("received no CA certificate");
       }
 
-      saveVerbose("saved CRL to file", outFile, encodeCrl(crl.getEncoded(), outform));
+      saveVerbose(
+          "saved CA certificate to file", outFile, encodeCert(caCert.getEncoded(), outform));
       return null;
     } // method execute0
 
-  }
+  } // class CmpCacert
+
+  @Command(scope = "xi", name = "cmp-cacertchain", description = "get CA certificate chain")
+  @Service
+  public static class CmpCacertchain extends ClientAction {
+
+    @Option(name = "--ca", description = "CA name\n(required if multiple CAs are configured)")
+    @Completion(CmpClientCompleters.CaNameCompleter.class)
+    private String caName;
+
+    @Option(name = "--out", aliases = "-o", required = true,
+        description = "where to save the CA certificate chain")
+    @Completion(FileCompleter.class)
+    private String outFile;
+
+    @Override
+    protected Object execute0() throws Exception {
+      if (caName != null) {
+        caName = caName.toLowerCase();
+      }
+
+      Set<String> caNames = client.getCaNames();
+      if (isEmpty(caNames)) {
+        throw new CmdFailure("no CA is configured");
+      }
+
+      if (caName != null && !caNames.contains(caName)) {
+        throw new IllegalCmdParamException("CA " + caName
+            + " is not within the configured CAs " + caNames);
+      }
+
+      if (caName == null) {
+        if (caNames.size() == 1) {
+          caName = caNames.iterator().next();
+        } else {
+          throw new IllegalCmdParamException("no CA is specified, one of " + caNames
+              + " is required");
+        }
+      }
+
+      List<X509Certificate> caCertChain;
+      try {
+        caCertChain = client.getCaCertchain(caName);
+      } catch (Exception ex) {
+        throw new CmdFailure("Error while retrieving CA certificate chain: " + ex.getMessage());
+      }
+
+      if (CollectionUtil.isEmpty(caCertChain)) {
+        throw new CmdFailure("received no CA certificate chain");
+      }
+
+      String encoded = X509Util.encodeCertificates(caCertChain.toArray(new X509Certificate[0]));
+      saveVerbose("saved CA certificate to file", outFile, StringUtil.toUtf8Bytes(encoded));
+      return null;
+    } // method execute0
+
+  } // class CmpCacertchain
 
   @Command(scope = "xi", name = "cmp-csr-enroll", description = "enroll certificate via CSR")
   @Service
@@ -353,9 +394,773 @@ public class Actions {
 
       saveVerbose("certificate saved to file", outputFile, encodeCert(cert.getEncoded(), outform));
       return null;
+    } // method execute0
+
+  } // class CmpCsrEnroll
+
+  @Command(scope = "xi", name = "cmp-enroll-cagenkey",
+      description = "enroll certificate (keypair will be generated by the CA)")
+  @Service
+  public static class CmpEnrollCagenkey extends EnrollAction {
+
+    @Option(name = "--cmpreq-type",
+        description = "CMP request type (ir for Initialization Request,\n"
+            + "and cr for Certification Request)")
+    @Completion(value = StringsCompleter.class, values = {"ir", "cr"})
+    private String cmpreqType = "cr";
+
+    @Option(name = "--cert-outform", description = "output format of the certificate")
+    @Completion(Completers.DerPemCompleter.class)
+    private String certOutform = "der";
+
+    @Option(name = "--cert-out", description = "where to save the certificate")
+    @Completion(FileCompleter.class)
+    private String certOutputFile;
+
+    @Option(name = "--p12-out", required = true, description = "where to save the PKCS#12 keystore")
+    @Completion(FileCompleter.class)
+    private String p12OutputFile;
+
+    @Option(name = "--password", description = "password of the PKCS#12 file")
+    private String password;
+
+    @Override
+    protected SubjectPublicKeyInfo getPublicKey() throws Exception {
+      return null;
+    }
+
+    @Override
+    protected EnrollCertRequest.Entry buildEnrollCertRequestEntry(String id, String profile,
+        CertRequest certRequest) throws Exception {
+      final boolean caGenKeypair = true;
+      final boolean kup = false;
+      return new EnrollCertRequest.Entry("id-1", profile, certRequest, null, caGenKeypair, kup);
+    }
+
+    @Override
+    protected Object execute0() throws Exception {
+      EnrollCertResult result = enroll();
+
+      X509Certificate cert = null;
+      PrivateKeyInfo privateKeyInfo = null;
+      if (result != null) {
+        String id = result.getAllIds().iterator().next();
+        CertifiedKeyPairOrError certOrError = result.getCertOrError(id);
+        cert = (X509Certificate) certOrError.getCertificate();
+        privateKeyInfo = certOrError.getPrivateKeyInfo();
+      }
+
+      if (cert == null) {
+        throw new CmdFailure("no certificate received from the server");
+      }
+
+      if (privateKeyInfo == null) {
+        throw new CmdFailure("no private key received from the server");
+      }
+
+      if (StringUtil.isNotBlank(certOutputFile)) {
+        saveVerbose("saved certificate to file", certOutputFile,
+            encodeCert(cert.getEncoded(), certOutform));
+      }
+
+      PrivateKey privateKey = BouncyCastleProvider.getPrivateKey(privateKeyInfo);
+
+      KeyStore ks = KeyStore.getInstance("PKCS12");
+      char[] pwd = getPassword();
+      ks.load(null, pwd);
+      ks.setKeyEntry("main", privateKey, pwd, new Certificate[] {cert});
+      ByteArrayOutputStream bout = new ByteArrayOutputStream();
+      ks.store(bout, pwd);
+      saveVerbose("saved key to file", p12OutputFile, bout.toByteArray());
+
+      return null;
+    } // method execute0
+
+    @Override
+    protected EnrollType getCmpReqType() throws Exception {
+      if ("cr".equalsIgnoreCase(cmpreqType)) {
+        return EnrollCertRequest.EnrollType.CERT_REQ;
+      } else if ("ir".equalsIgnoreCase(cmpreqType)) {
+        return EnrollCertRequest.EnrollType.INIT_REQ;
+      } else {
+        throw new IllegalCmdParamException("invalid cmpreq-type " + cmpreqType);
+      }
+    } // method getCmpReqType
+
+    private char[] getPassword() throws IOException {
+      char[] pwdInChar = readPasswordIfNotSet(password);
+      if (pwdInChar != null) {
+        password = new String(pwdInChar);
+      }
+      return pwdInChar;
+    } // method getPassword
+
+  } // class CmpEnrollCagenkey
+
+  @Command(scope = "xi", name = "cmp-enroll-p11",
+      description = "enroll certificate (PKCS#11 token)")
+  @Service
+  public static class CmpEnrollP11 extends EnrollCertAction {
+
+    @Option(name = "--slot", required = true, description = "slot index")
+    private Integer slotIndex;
+
+    @Option(name = "--key-id",
+        description = "id of the private key in the PKCS#11 device\n"
+            + "either keyId or keyLabel must be specified")
+    private String keyId;
+
+    @Option(name = "--key-label",
+        description = "label of the private key in the PKCS#11 device\n"
+            + "either keyId or keyLabel must be specified")
+    private String keyLabel;
+
+    @Option(name = "--module", description = "name of the PKCS#11 module")
+    private String moduleName = "default";
+
+    private ConcurrentContentSigner signer;
+
+    @Override
+    protected ConcurrentContentSigner getSigner() throws ObjectCreationException {
+      if (signer == null) {
+        byte[] keyIdBytes = null;
+        if (keyId != null) {
+          keyIdBytes = Hex.decode(keyId);
+        }
+
+        SignerConf signerConf = getPkcs11SignerConf(moduleName, slotIndex, keyLabel,
+            keyIdBytes, HashAlgo.getInstance(hashAlgo), getSignatureAlgoControl());
+        signer = securityFactory.createSigner("PKCS11", signerConf, (X509Certificate[]) null);
+      }
+      return signer;
+    } // method getSigner
+
+    public static SignerConf getPkcs11SignerConf(String pkcs11ModuleName, Integer slotIndex,
+        String keyLabel, byte[] keyId, HashAlgo hashAlgo,
+        SignatureAlgoControl signatureAlgoControl) {
+      Args.notNull(hashAlgo, "hashAlgo");
+      Args.notNull(slotIndex, "slotIndex");
+
+      if (keyId == null && keyLabel == null) {
+        throw new IllegalArgumentException("at least one of keyId and keyLabel may not be null");
+      }
+
+      ConfPairs conf = new ConfPairs();
+      conf.putPair("parallelism", Integer.toString(1));
+
+      if (pkcs11ModuleName != null && pkcs11ModuleName.length() > 0) {
+        conf.putPair("module", pkcs11ModuleName);
+      }
+
+      if (slotIndex != null) {
+        conf.putPair("slot", slotIndex.toString());
+      }
+
+      if (keyId != null) {
+        conf.putPair("key-id", Hex.encode(keyId));
+      }
+
+      if (keyLabel != null) {
+        conf.putPair("key-label", keyLabel);
+      }
+
+      return new SignerConf(conf.getEncoded(), hashAlgo, signatureAlgoControl);
+    } // method getPkcs11SignerConf
+
+  } // class CmpEnrollP11
+
+  @Command(scope = "xi", name = "cmp-enroll-p12",
+      description = "enroll certificate (PKCS#12 keystore)")
+  @Service
+  public static class CmpEnrollP12 extends EnrollCertAction {
+
+    @Option(name = "--p12", required = true, description = "PKCS#12 keystore file")
+    @Completion(FileCompleter.class)
+    private String p12File;
+
+    @Option(name = "--password", description = "password of the PKCS#12 keystore file")
+    private String password;
+
+    private ConcurrentContentSigner signer;
+
+    @Override
+    protected ConcurrentContentSigner getSigner()
+        throws ObjectCreationException, CmpClientException {
+      if (signer == null) {
+        if (password == null) {
+          try {
+            password = new String(readPassword());
+          } catch (IOException ex) {
+            throw new ObjectCreationException("could not read password: " + ex.getMessage(), ex);
+          }
+        }
+
+        ConfPairs conf = new ConfPairs("password", password);
+        conf.putPair("parallelism", Integer.toString(1));
+        conf.putPair("keystore", "file:" + p12File);
+        SignerConf signerConf = new SignerConf(conf.getEncoded(),
+            HashAlgo.getNonNullInstance(hashAlgo), getSignatureAlgoControl());
+
+        String caName = getCaName().toLowerCase();
+        List<X509Certificate> peerCerts = client.getDhPocPeerCertificates(caName);
+        if (CollectionUtil.isNotEmpty(peerCerts)) {
+          signerConf.setPeerCertificates(peerCerts);
+        }
+
+        signer = securityFactory.createSigner("PKCS12", signerConf, (X509Certificate[]) null);
+      }
+      return signer;
+    } // method getSigner
+
+  } // class CmpEnrollP12
+
+  @Command(scope = "xi", name = "cmp-gen-crl", description = "generate CRL")
+  @Service
+  public static class CmpGenCrl extends CrlAction {
+
+    @Override
+    protected X509CRL retrieveCrl() throws CmpClientException, PkiErrorException {
+      ReqRespDebug debug = getReqRespDebug();
+      try {
+        return client.generateCrl(caName, debug);
+      } finally {
+        saveRequestResponse(debug);
+      }
+    }
+
+  } // class CmpGenCrl
+
+  @Command(scope = "xi", name = "cmp-get-crl", description = "download CRL")
+  @Service
+  public static class CmpGetCrl extends CrlAction {
+
+    @Option(name = "--with-basecrl",
+        description = "whether to retrieve the baseCRL if the current CRL is a delta CRL")
+    private Boolean withBaseCrl = Boolean.FALSE;
+
+    @Option(name = "--basecrl-out",
+        description = "where to save the baseCRL\n(defaults to <out>-baseCRL)")
+    @Completion(FileCompleter.class)
+    private String baseCrlOut;
+
+    @Override
+    protected X509CRL retrieveCrl() throws CmpClientException, PkiErrorException {
+      ReqRespDebug debug = getReqRespDebug();
+      try {
+        return client.downloadCrl(caName, debug);
+      } finally {
+        saveRequestResponse(debug);
+      }
+    }
+
+    @Override
+    protected Object execute0() throws Exception {
+      if (caName != null) {
+        caName = caName.toLowerCase();
+      }
+
+      Set<String> caNames = client.getCaNames();
+      if (isEmpty(caNames)) {
+        throw new IllegalCmdParamException("no CA is configured");
+      }
+
+      if (caName != null && !caNames.contains(caName)) {
+        throw new IllegalCmdParamException("CA " + caName + " is not within the configured CAs "
+            + caNames);
+      }
+
+      if (caName == null) {
+        if (caNames.size() == 1) {
+          caName = caNames.iterator().next();
+        } else {
+          throw new IllegalCmdParamException("no CA is specified, one of " + caNames
+              + " is required");
+        }
+      }
+
+      X509CRL crl = null;
+      try {
+        crl = retrieveCrl();
+      } catch (PkiErrorException ex) {
+        throw new CmdFailure("received no CRL from server: " + ex.getMessage());
+      }
+
+      if (crl == null) {
+        throw new CmdFailure("received no CRL from server");
+      }
+
+      saveVerbose("saved CRL to file", outFile, encodeCrl(crl.getEncoded(), outform));
+
+      if (!withBaseCrl.booleanValue()) {
+        return null;
+      }
+
+      byte[] octetString = crl.getExtensionValue(Extension.deltaCRLIndicator.getId());
+      if (octetString == null) {
+        return null;
+      }
+
+      if (baseCrlOut == null) {
+        baseCrlOut = outFile + "-baseCRL";
+      }
+
+      byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
+      BigInteger baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
+
+      ReqRespDebug debug = getReqRespDebug();
+      try {
+        crl = client.downloadCrl(caName, baseCrlNumber, debug);
+      } catch (PkiErrorException ex) {
+        throw new CmdFailure("received no baseCRL from server: " + ex.getMessage());
+      } finally {
+        saveRequestResponse(debug);
+      }
+
+      if (crl == null) {
+        throw new CmdFailure("received no baseCRL from server");
+      }
+
+      saveVerbose("saved baseCRL to file", baseCrlOut, encodeCrl(crl.getEncoded(), outform));
+      return null;
+    } // method execute0
+
+  } // class CmpGetCrl
+
+  @Command(scope = "xi", name = "cmp-health", description = "check healty status of CA")
+  @Service
+  public static class CmpHealth extends ClientAction {
+
+    @Option(name = "--ca", description = "CA name\n(required if multiple CAs are configured)")
+    @Completion(CmpClientCompleters.CaNameCompleter.class)
+    private String caName;
+
+    @Option(name = "--verbose", aliases = "-v", description = "show status verbosely")
+    private Boolean verbose = Boolean.FALSE;
+
+    @Override
+    protected Object execute0() throws Exception {
+      if (caName != null) {
+        caName = caName.toLowerCase();
+      }
+
+      Set<String> caNames = client.getCaNames();
+      if (isEmpty(caNames)) {
+        throw new IllegalCmdParamException("no CA is configured");
+      }
+
+      if (caName != null && !caNames.contains(caName)) {
+        throw new IllegalCmdParamException("CA " + caName + " is not within the configured CAs "
+            + caNames);
+      }
+
+      if (caName == null) {
+        if (caNames.size() == 1) {
+          caName = caNames.iterator().next();
+        } else {
+          throw new IllegalCmdParamException("no CA is specified, one of " + caNames
+              + " is required");
+        }
+      }
+
+      HealthCheckResult healthResult = client.getHealthCheckResult(caName);
+      String str = StringUtil.concat("healthy status for CA ", caName, ": ",
+          (healthResult.isHealthy() ? "healthy" : "not healthy"));
+      if (verbose) {
+        str = StringUtil.concat(str, "\n", JSON.toJSONString(healthResult, true));
+      }
+      System.out.println(str);
+      return null;
+    } // method execute0
+
+  } // class CmpHealth
+
+  @Command(scope = "xi", name = "cmp-init", description = "initialize CMP client")
+  @Service
+  public static class CmpInit extends ClientAction {
+
+    @Override
+    protected Object execute0() throws Exception {
+      boolean succ = client.init();
+      if (succ) {
+        println("CA client initialized successfully");
+      } else {
+        println("CA client initialization failed");
+      }
+      return null;
+    }
+
+  } // class CmpInit
+
+  @Command(scope = "xi", name = "cmp-revoke", description = "revoke certificate")
+  @Service
+  public static class CmpRevoke extends UnRevRemoveCertAction {
+
+    @Option(name = "--reason", aliases = "-r", required = true, description = "CRL reason")
+    @Completion(Completers.ClientCrlReasonCompleter.class)
+    private String reason;
+
+    @Option(name = "--inv-date", description = "invalidity date, UTC time of format yyyyMMddHHmmss")
+    private String invalidityDateS;
+
+    @Override
+    protected Object execute0() throws Exception {
+      if (!(certFile == null ^ getSerialNumber() == null)) {
+        throw new IllegalCmdParamException("exactly one of cert and serial must be specified");
+      }
+
+      CrlReason crlReason = CrlReason.forNameOrText(reason);
+
+      if (!CrlReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason)) {
+        throw new IllegalCmdParamException("reason " + reason + " is not permitted");
+      }
+
+      CertIdOrError certIdOrError;
+
+      Date invalidityDate = null;
+      if (isNotBlank(invalidityDateS)) {
+        invalidityDate = DateUtil.parseUtcTimeyyyyMMddhhmmss(invalidityDateS);
+      }
+
+      ReqRespDebug debug = getReqRespDebug();
+      try {
+        if (certFile != null) {
+          X509Certificate cert = X509Util.parseCert(new File(certFile));
+          certIdOrError = client.revokeCert(caName, cert, crlReason.getCode(), invalidityDate,
+              debug);
+        } else {
+          certIdOrError = client.revokeCert(caName, getSerialNumber(), crlReason.getCode(),
+              invalidityDate, debug);
+        }
+      } finally {
+        saveRequestResponse(debug);
+      }
+
+      if (certIdOrError.getError() != null) {
+        PkiStatusInfo error = certIdOrError.getError();
+        throw new CmdFailure("revocation failed: " + error);
+      } else {
+        println("revoked certificate");
+      }
+      return null;
+    } // method execute0
+
+  } // class CmpRevoke
+
+  @Command(scope = "xi", name = "cmp-rm-cert", description = "remove certificate")
+  @Service
+  public static class CmpRmCert extends UnRevRemoveCertAction {
+
+    @Override
+    protected Object execute0() throws Exception {
+      if (!(certFile == null ^ getSerialNumber() == null)) {
+        throw new IllegalCmdParamException("exactly one of cert and serial must be specified");
+      }
+
+      ReqRespDebug debug = getReqRespDebug();
+      CertIdOrError certIdOrError;
+      try {
+        if (certFile != null) {
+          X509Certificate cert = X509Util.parseCert(new File(certFile));
+          certIdOrError = client.removeCert(caName, cert, debug);
+        } else {
+          certIdOrError = client.removeCert(caName, getSerialNumber(), debug);
+        }
+      } finally {
+        saveRequestResponse(debug);
+      }
+
+      if (certIdOrError.getError() != null) {
+        PkiStatusInfo error = certIdOrError.getError();
+        throw new CmdFailure("removing certificate failed: " + error);
+      } else {
+        println("removed certificate");
+      }
+      return null;
+    } // method execute0
+
+  } // class CmpRmCert
+
+  @Command(scope = "xi", name = "cmp-unrevoke", description = "unrevoke certificate")
+  @Service
+  public static class CmpUnrevoke extends UnRevRemoveCertAction {
+
+    @Override
+    protected Object execute0() throws Exception {
+      if (!(certFile == null ^ getSerialNumber() == null)) {
+        throw new IllegalCmdParamException("exactly one of cert and serial must be specified");
+      }
+
+      ReqRespDebug debug = getReqRespDebug();
+      CertIdOrError certIdOrError;
+      try {
+        if (certFile != null) {
+          X509Certificate cert = X509Util.parseCert(new File(certFile));
+          certIdOrError = client.unrevokeCert(caName, cert, debug);
+        } else {
+          certIdOrError = client.unrevokeCert(caName, getSerialNumber(), debug);
+        }
+      } finally {
+        saveRequestResponse(debug);
+      }
+
+      if (certIdOrError.getError() != null) {
+        PkiStatusInfo error = certIdOrError.getError();
+        throw new CmdFailure("releasing revocation failed: " + error);
+      } else {
+        println("unrevoked certificate");
+      }
+      return null;
+    } // method execute0
+
+  } // class CmpUnrevoke
+
+  @Command(scope = "xi", name = "cmp-update-cagenkey",
+      description = "update certificate (keypair will be generated by the CA)")
+  @Service
+  public static class CmpUpdateCagenkey extends UpdateAction {
+
+    @Option(name = "--cert-outform", description = "output format of the certificate")
+    @Completion(Completers.DerPemCompleter.class)
+    private String certOutform = "der";
+
+    @Option(name = "--cert-out", description = "where to save the certificate")
+    @Completion(FileCompleter.class)
+    private String certOutputFile;
+
+    @Option(name = "--p12-out", required = true, description = "where to save the PKCS#12 keystore")
+    @Completion(FileCompleter.class)
+    private String p12OutputFile;
+
+    @Option(name = "--password", description = "password of the PKCS#12 file")
+    private String password;
+
+    @Override
+    protected SubjectPublicKeyInfo getPublicKey() throws Exception {
+      return null;
+    }
+
+    @Override
+    protected EnrollCertRequest.Entry buildEnrollCertRequestEntry(String id, String profile,
+        CertRequest certRequest) throws Exception {
+      final boolean caGenKeypair = true;
+      final boolean kup = true;
+      return new EnrollCertRequest.Entry("id-1", profile, certRequest, null, caGenKeypair, kup);
+    }
+
+    @Override
+    protected Object execute0() throws Exception {
+      EnrollCertResult result = enroll();
+
+      X509Certificate cert = null;
+      PrivateKeyInfo privateKeyInfo = null;
+      if (result != null) {
+        String id = result.getAllIds().iterator().next();
+        CertifiedKeyPairOrError certOrError = result.getCertOrError(id);
+        cert = (X509Certificate) certOrError.getCertificate();
+        privateKeyInfo = certOrError.getPrivateKeyInfo();
+      }
+
+      if (cert == null) {
+        throw new CmdFailure("no certificate received from the server");
+      }
+
+      if (privateKeyInfo == null) {
+        throw new CmdFailure("no private key received from the server");
+      }
+
+      if (StringUtil.isNotBlank(certOutputFile)) {
+        saveVerbose("saved certificate to file", certOutputFile,
+            encodeCert(cert.getEncoded(), certOutform));
+      }
+
+      PrivateKey privateKey = BouncyCastleProvider.getPrivateKey(privateKeyInfo);
+
+      KeyStore ks = KeyStore.getInstance("PKCS12");
+      char[] pwd = getPassword();
+      ks.load(null, pwd);
+      ks.setKeyEntry("main", privateKey, pwd, new Certificate[] {cert});
+      ByteArrayOutputStream bout = new ByteArrayOutputStream();
+      ks.store(bout, pwd);
+      saveVerbose("saved key to file", p12OutputFile, bout.toByteArray());
+
+      return null;
+    } // method execute0
+
+    private char[] getPassword() throws IOException {
+      char[] pwdInChar = readPasswordIfNotSet(password);
+      if (pwdInChar != null) {
+        password = new String(pwdInChar);
+      }
+      return pwdInChar;
+    }
+  } // class CmpUpdateCagenkey
+
+  @Command(scope = "xi", name = "cmp-update-p11",
+      description = "update certificate (PKCS#11 token)")
+  @Service
+  public static class CmpUpdateP11 extends UpdateCertAction {
+
+    @Option(name = "--slot", required = true, description = "slot index")
+    private Integer slotIndex;
+
+    @Option(name = "--key-id",
+        description = "id of the private key in the PKCS#11 device\n"
+            + "either keyId or keyLabel must be specified")
+    private String keyId;
+
+    @Option(name = "--key-label",
+        description = "label of the private key in the PKCS#11 device\n"
+            + "either keyId or keyLabel must be specified")
+    private String keyLabel;
+
+    @Option(name = "--module", description = "name of the PKCS#11 module")
+    private String moduleName = "default";
+
+    private ConcurrentContentSigner signer;
+
+    @Override
+    protected ConcurrentContentSigner getSigner() throws ObjectCreationException {
+      if (signer == null) {
+        byte[] keyIdBytes = null;
+        if (keyId != null) {
+          keyIdBytes = Hex.decode(keyId);
+        }
+
+        SignerConf signerConf = getPkcs11SignerConf(moduleName, slotIndex, keyLabel,
+            keyIdBytes, HashAlgo.getInstance(hashAlgo), getSignatureAlgoControl());
+        signer = securityFactory.createSigner("PKCS11", signerConf, (X509Certificate[]) null);
+      }
+      return signer;
+    } // method getSigner
+
+    public static SignerConf getPkcs11SignerConf(String pkcs11ModuleName, Integer slotIndex,
+        String keyLabel, byte[] keyId, HashAlgo hashAlgo,
+        SignatureAlgoControl signatureAlgoControl) {
+      Args.notNull(hashAlgo, "hashAlgo");
+      Args.notNull(slotIndex, "slotIndex");
+
+      if (keyId == null && keyLabel == null) {
+        throw new IllegalArgumentException("at least one of keyId and keyLabel may not be null");
+      }
+
+      ConfPairs conf = new ConfPairs();
+      conf.putPair("parallelism", Integer.toString(1));
+
+      if (pkcs11ModuleName != null && pkcs11ModuleName.length() > 0) {
+        conf.putPair("module", pkcs11ModuleName);
+      }
+
+      if (slotIndex != null) {
+        conf.putPair("slot", slotIndex.toString());
+      }
+
+      if (keyId != null) {
+        conf.putPair("key-id", Hex.encode(keyId));
+      }
+
+      if (keyLabel != null) {
+        conf.putPair("key-label", keyLabel);
+      }
+
+      return new SignerConf(conf.getEncoded(), hashAlgo, signatureAlgoControl);
+    } // method getPkcs11SignerConf
+
+  } // class CmpUpdateP11
+
+  @Command(scope = "xi", name = "cmp-update-p12",
+      description = "update certificate (PKCS#12 keystore)")
+  @Service
+  public static class CmpUpdateP12 extends UpdateCertAction {
+
+    @Option(name = "--p12", required = true, description = "PKCS#12 keystore file")
+    @Completion(FileCompleter.class)
+    private String p12File;
+
+    @Option(name = "--password", description = "password of the PKCS#12 keystore file")
+    private String password;
+
+    private ConcurrentContentSigner signer;
+
+    @Override
+    protected ConcurrentContentSigner getSigner() throws ObjectCreationException {
+      if (signer == null) {
+        if (password == null) {
+          try {
+            password = new String(readPassword());
+          } catch (IOException ex) {
+            throw new ObjectCreationException("could not read password: " + ex.getMessage(), ex);
+          }
+        }
+
+        ConfPairs conf = new ConfPairs("password", password);
+        conf.putPair("parallelism", Integer.toString(1));
+        conf.putPair("keystore", "file:" + p12File);
+        SignerConf signerConf = new SignerConf(conf.getEncoded(),
+            HashAlgo.getNonNullInstance(hashAlgo), getSignatureAlgoControl());
+        signer = securityFactory.createSigner("PKCS12", signerConf, (X509Certificate[]) null);
+      }
+      return signer;
     }
 
   }
+
+  public abstract static class CrlAction extends ClientAction {
+
+    @Option(name = "--ca", description = "CA name\n(required if multiple CAs are configured)")
+    @Completion(CmpClientCompleters.CaNameCompleter.class)
+    protected String caName;
+
+    @Option(name = "--outform", description = "output format of the CRL")
+    @Completion(Completers.DerPemCompleter.class)
+    protected String outform = "der";
+
+    @Option(name = "--out", aliases = "-o", required = true, description = "where to save the CRL")
+    @Completion(FileCompleter.class)
+    protected String outFile;
+
+    protected abstract X509CRL retrieveCrl() throws CmpClientException, PkiErrorException;
+
+    @Override
+    protected Object execute0() throws Exception {
+      if (caName != null) {
+        caName = caName.toLowerCase();
+      }
+
+      Set<String> caNames = client.getCaNames();
+      if (isEmpty(caNames)) {
+        throw new CmdFailure("no CA is configured");
+      }
+
+      if (caName != null && !caNames.contains(caName)) {
+        throw new IllegalCmdParamException("CA " + caName
+            + " is not within the configured CAs " + caNames);
+      }
+
+      if (caName == null) {
+        if (caNames.size() == 1) {
+          caName = caNames.iterator().next();
+        } else {
+          throw new IllegalCmdParamException("no CA is specified, one of " + caNames
+              + " is required");
+        }
+      }
+
+      X509CRL crl = null;
+      try {
+        crl = retrieveCrl();
+      } catch (PkiErrorException ex) {
+        throw new CmdFailure("received no CRL from server: " + ex.getMessage());
+      }
+
+      if (crl == null) {
+        throw new CmdFailure("received no CRL from server");
+      }
+
+      saveVerbose("saved CRL to file", outFile, encodeCrl(crl.getEncoded(), outform));
+      return null;
+    } // method execute0
+
+  } // class CrlAction
 
   public abstract static class EnrollAction extends ClientAction {
 
@@ -714,7 +1519,7 @@ public class Actions {
         }
       }
       return ret;
-    }
+    } // method textToAsn1ObjectIdentifers
 
     static List<String> resolveExtensionTypes(List<String> types) throws IllegalCmdParamException {
       List<String> list = new ArrayList<>(types.size());
@@ -729,9 +1534,9 @@ public class Actions {
         }
       }
       return list;
-    }
+    } // method resolveExtensionTypes
 
-  }
+  } // class EnrollAction
 
   public abstract static class EnrollCertAction extends EnrollAction {
 
@@ -799,7 +1604,7 @@ public class Actions {
 
       ProofOfPossession popo = new ProofOfPossession(popoSk);
       return new EnrollCertRequest.Entry(id, profile, certRequest, popo);
-    }
+    } // method buildEnrollCertRequestEntry
 
     @Override
     protected Object execute0() throws Exception {
@@ -832,733 +1637,9 @@ public class Actions {
       } else {
         throw new IllegalCmdParamException("invalid cmpreq-type " + cmpreqType);
       }
-    }
+    } // method getCmpReqType
 
-  }
-
-  @Command(scope = "xi", name = "cmp-enroll-cagenkey",
-      description = "enroll certificate (keypair will be generated by the CA)")
-  @Service
-  public static class CmpEnrollCagenkey extends EnrollAction {
-
-    @Option(name = "--cmpreq-type",
-        description = "CMP request type (ir for Initialization Request,\n"
-            + "and cr for Certification Request)")
-    @Completion(value = StringsCompleter.class, values = {"ir", "cr"})
-    private String cmpreqType = "cr";
-
-    @Option(name = "--cert-outform", description = "output format of the certificate")
-    @Completion(Completers.DerPemCompleter.class)
-    private String certOutform = "der";
-
-    @Option(name = "--cert-out", description = "where to save the certificate")
-    @Completion(FileCompleter.class)
-    private String certOutputFile;
-
-    @Option(name = "--p12-out", required = true, description = "where to save the PKCS#12 keystore")
-    @Completion(FileCompleter.class)
-    private String p12OutputFile;
-
-    @Option(name = "--password", description = "password of the PKCS#12 file")
-    private String password;
-
-    @Override
-    protected SubjectPublicKeyInfo getPublicKey() throws Exception {
-      return null;
-    }
-
-    @Override
-    protected EnrollCertRequest.Entry buildEnrollCertRequestEntry(String id, String profile,
-        CertRequest certRequest) throws Exception {
-      final boolean caGenKeypair = true;
-      final boolean kup = false;
-      return new EnrollCertRequest.Entry("id-1", profile, certRequest, null, caGenKeypair, kup);
-    }
-
-    @Override
-    protected Object execute0() throws Exception {
-      EnrollCertResult result = enroll();
-
-      X509Certificate cert = null;
-      PrivateKeyInfo privateKeyInfo = null;
-      if (result != null) {
-        String id = result.getAllIds().iterator().next();
-        CertifiedKeyPairOrError certOrError = result.getCertOrError(id);
-        cert = (X509Certificate) certOrError.getCertificate();
-        privateKeyInfo = certOrError.getPrivateKeyInfo();
-      }
-
-      if (cert == null) {
-        throw new CmdFailure("no certificate received from the server");
-      }
-
-      if (privateKeyInfo == null) {
-        throw new CmdFailure("no private key received from the server");
-      }
-
-      if (StringUtil.isNotBlank(certOutputFile)) {
-        saveVerbose("saved certificate to file", certOutputFile,
-            encodeCert(cert.getEncoded(), certOutform));
-      }
-
-      PrivateKey privateKey = BouncyCastleProvider.getPrivateKey(privateKeyInfo);
-
-      KeyStore ks = KeyStore.getInstance("PKCS12");
-      char[] pwd = getPassword();
-      ks.load(null, pwd);
-      ks.setKeyEntry("main", privateKey, pwd, new Certificate[] {cert});
-      ByteArrayOutputStream bout = new ByteArrayOutputStream();
-      ks.store(bout, pwd);
-      saveVerbose("saved key to file", p12OutputFile, bout.toByteArray());
-
-      return null;
-    } // method execute0
-
-    @Override
-    protected EnrollType getCmpReqType() throws Exception {
-      if ("cr".equalsIgnoreCase(cmpreqType)) {
-        return EnrollCertRequest.EnrollType.CERT_REQ;
-      } else if ("ir".equalsIgnoreCase(cmpreqType)) {
-        return EnrollCertRequest.EnrollType.INIT_REQ;
-      } else {
-        throw new IllegalCmdParamException("invalid cmpreq-type " + cmpreqType);
-      }
-    }
-
-    private char[] getPassword() throws IOException {
-      char[] pwdInChar = readPasswordIfNotSet(password);
-      if (pwdInChar != null) {
-        password = new String(pwdInChar);
-      }
-      return pwdInChar;
-    }
-
-  }
-
-  @Command(scope = "xi", name = "cmp-gen-crl", description = "generate CRL")
-  @Service
-  public static class CmpGenCrl extends CrlAction {
-
-    @Override
-    protected X509CRL retrieveCrl() throws CmpClientException, PkiErrorException {
-      ReqRespDebug debug = getReqRespDebug();
-      try {
-        return client.generateCrl(caName, debug);
-      } finally {
-        saveRequestResponse(debug);
-      }
-    }
-
-  }
-
-  @Command(scope = "xi", name = "cmp-cacert", description = "get CA certificate")
-  @Service
-  public static class CmpCacert extends ClientAction {
-
-    @Option(name = "--ca", description = "CA name\n(required if multiple CAs are configured)")
-    @Completion(CmpClientCompleters.CaNameCompleter.class)
-    private String caName;
-
-    @Option(name = "--outform", description = "output format of the certificate")
-    @Completion(Completers.DerPemCompleter.class)
-    private String outform = "der";
-
-    @Option(name = "--out", aliases = "-o", required = true,
-        description = "where to save the CA certificate")
-    @Completion(FileCompleter.class)
-    private String outFile;
-
-    @Override
-    protected Object execute0() throws Exception {
-      if (caName != null) {
-        caName = caName.toLowerCase();
-      }
-
-      Set<String> caNames = client.getCaNames();
-      if (isEmpty(caNames)) {
-        throw new CmdFailure("no CA is configured");
-      }
-
-      if (caName != null && !caNames.contains(caName)) {
-        throw new IllegalCmdParamException("CA " + caName
-            + " is not within the configured CAs " + caNames);
-      }
-
-      if (caName == null) {
-        if (caNames.size() == 1) {
-          caName = caNames.iterator().next();
-        } else {
-          throw new IllegalCmdParamException("no CA is specified, one of " + caNames
-              + " is required");
-        }
-      }
-
-      X509Certificate caCert;
-      try {
-        caCert = client.getCaCert(caName);
-      } catch (Exception ex) {
-        throw new CmdFailure("Error while retrieving CA certificate: " + ex.getMessage());
-      }
-
-      if (caCert == null) {
-        throw new CmdFailure("received no CA certificate");
-      }
-
-      saveVerbose(
-          "saved CA certificate to file", outFile, encodeCert(caCert.getEncoded(), outform));
-      return null;
-    } // method execute0
-
-  }
-
-  @Command(scope = "xi", name = "cmp-cacertchain", description = "get CA certificate chain")
-  @Service
-  public static class CmpCacertchain extends ClientAction {
-
-    @Option(name = "--ca", description = "CA name\n(required if multiple CAs are configured)")
-    @Completion(CmpClientCompleters.CaNameCompleter.class)
-    private String caName;
-
-    @Option(name = "--out", aliases = "-o", required = true,
-        description = "where to save the CA certificate chain")
-    @Completion(FileCompleter.class)
-    private String outFile;
-
-    @Override
-    protected Object execute0() throws Exception {
-      if (caName != null) {
-        caName = caName.toLowerCase();
-      }
-
-      Set<String> caNames = client.getCaNames();
-      if (isEmpty(caNames)) {
-        throw new CmdFailure("no CA is configured");
-      }
-
-      if (caName != null && !caNames.contains(caName)) {
-        throw new IllegalCmdParamException("CA " + caName
-            + " is not within the configured CAs " + caNames);
-      }
-
-      if (caName == null) {
-        if (caNames.size() == 1) {
-          caName = caNames.iterator().next();
-        } else {
-          throw new IllegalCmdParamException("no CA is specified, one of " + caNames
-              + " is required");
-        }
-      }
-
-      List<X509Certificate> caCertChain;
-      try {
-        caCertChain = client.getCaCertchain(caName);
-      } catch (Exception ex) {
-        throw new CmdFailure("Error while retrieving CA certificate chain: " + ex.getMessage());
-      }
-
-      if (CollectionUtil.isEmpty(caCertChain)) {
-        throw new CmdFailure("received no CA certificate chain");
-      }
-
-      String encoded = X509Util.encodeCertificates(caCertChain.toArray(new X509Certificate[0]));
-      saveVerbose("saved CA certificate to file", outFile, StringUtil.toUtf8Bytes(encoded));
-      return null;
-    } // method execute0
-
-  }
-
-  @Command(scope = "xi", name = "cmp-get-crl", description = "download CRL")
-  @Service
-  public static class CmpGetCrl extends CrlAction {
-
-    @Option(name = "--with-basecrl",
-        description = "whether to retrieve the baseCRL if the current CRL is a delta CRL")
-    private Boolean withBaseCrl = Boolean.FALSE;
-
-    @Option(name = "--basecrl-out",
-        description = "where to save the baseCRL\n(defaults to <out>-baseCRL)")
-    @Completion(FileCompleter.class)
-    private String baseCrlOut;
-
-    @Override
-    protected X509CRL retrieveCrl() throws CmpClientException, PkiErrorException {
-      ReqRespDebug debug = getReqRespDebug();
-      try {
-        return client.downloadCrl(caName, debug);
-      } finally {
-        saveRequestResponse(debug);
-      }
-    }
-
-    @Override
-    protected Object execute0() throws Exception {
-      if (caName != null) {
-        caName = caName.toLowerCase();
-      }
-
-      Set<String> caNames = client.getCaNames();
-      if (isEmpty(caNames)) {
-        throw new IllegalCmdParamException("no CA is configured");
-      }
-
-      if (caName != null && !caNames.contains(caName)) {
-        throw new IllegalCmdParamException("CA " + caName + " is not within the configured CAs "
-            + caNames);
-      }
-
-      if (caName == null) {
-        if (caNames.size() == 1) {
-          caName = caNames.iterator().next();
-        } else {
-          throw new IllegalCmdParamException("no CA is specified, one of " + caNames
-              + " is required");
-        }
-      }
-
-      X509CRL crl = null;
-      try {
-        crl = retrieveCrl();
-      } catch (PkiErrorException ex) {
-        throw new CmdFailure("received no CRL from server: " + ex.getMessage());
-      }
-
-      if (crl == null) {
-        throw new CmdFailure("received no CRL from server");
-      }
-
-      saveVerbose("saved CRL to file", outFile, encodeCrl(crl.getEncoded(), outform));
-
-      if (!withBaseCrl.booleanValue()) {
-        return null;
-      }
-
-      byte[] octetString = crl.getExtensionValue(Extension.deltaCRLIndicator.getId());
-      if (octetString == null) {
-        return null;
-      }
-
-      if (baseCrlOut == null) {
-        baseCrlOut = outFile + "-baseCRL";
-      }
-
-      byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
-      BigInteger baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
-
-      ReqRespDebug debug = getReqRespDebug();
-      try {
-        crl = client.downloadCrl(caName, baseCrlNumber, debug);
-      } catch (PkiErrorException ex) {
-        throw new CmdFailure("received no baseCRL from server: " + ex.getMessage());
-      } finally {
-        saveRequestResponse(debug);
-      }
-
-      if (crl == null) {
-        throw new CmdFailure("received no baseCRL from server");
-      }
-
-      saveVerbose("saved baseCRL to file", baseCrlOut, encodeCrl(crl.getEncoded(), outform));
-      return null;
-    } // method execute0
-
-  }
-
-  @Command(scope = "xi", name = "cmp-health", description = "check healty status of CA")
-  @Service
-  public static class CmpHealth extends ClientAction {
-
-    @Option(name = "--ca", description = "CA name\n(required if multiple CAs are configured)")
-    @Completion(CmpClientCompleters.CaNameCompleter.class)
-    private String caName;
-
-    @Option(name = "--verbose", aliases = "-v", description = "show status verbosely")
-    private Boolean verbose = Boolean.FALSE;
-
-    @Override
-    protected Object execute0() throws Exception {
-      if (caName != null) {
-        caName = caName.toLowerCase();
-      }
-
-      Set<String> caNames = client.getCaNames();
-      if (isEmpty(caNames)) {
-        throw new IllegalCmdParamException("no CA is configured");
-      }
-
-      if (caName != null && !caNames.contains(caName)) {
-        throw new IllegalCmdParamException("CA " + caName + " is not within the configured CAs "
-            + caNames);
-      }
-
-      if (caName == null) {
-        if (caNames.size() == 1) {
-          caName = caNames.iterator().next();
-        } else {
-          throw new IllegalCmdParamException("no CA is specified, one of " + caNames
-              + " is required");
-        }
-      }
-
-      HealthCheckResult healthResult = client.getHealthCheckResult(caName);
-      String str = StringUtil.concat("healthy status for CA ", caName, ": ",
-          (healthResult.isHealthy() ? "healthy" : "not healthy"));
-      if (verbose) {
-        str = StringUtil.concat(str, "\n", JSON.toJSONString(healthResult, true));
-      }
-      System.out.println(str);
-      return null;
-    } // method execute0
-
-  }
-
-  @Command(scope = "xi", name = "cmp-enroll-p11",
-      description = "enroll certificate (PKCS#11 token)")
-  @Service
-  public static class CmpEnrollP11 extends EnrollCertAction {
-
-    @Option(name = "--slot", required = true, description = "slot index")
-    private Integer slotIndex;
-
-    @Option(name = "--key-id",
-        description = "id of the private key in the PKCS#11 device\n"
-            + "either keyId or keyLabel must be specified")
-    private String keyId;
-
-    @Option(name = "--key-label",
-        description = "label of the private key in the PKCS#11 device\n"
-            + "either keyId or keyLabel must be specified")
-    private String keyLabel;
-
-    @Option(name = "--module", description = "name of the PKCS#11 module")
-    private String moduleName = "default";
-
-    private ConcurrentContentSigner signer;
-
-    @Override
-    protected ConcurrentContentSigner getSigner() throws ObjectCreationException {
-      if (signer == null) {
-        byte[] keyIdBytes = null;
-        if (keyId != null) {
-          keyIdBytes = Hex.decode(keyId);
-        }
-
-        SignerConf signerConf = getPkcs11SignerConf(moduleName, slotIndex, keyLabel,
-            keyIdBytes, HashAlgo.getInstance(hashAlgo), getSignatureAlgoControl());
-        signer = securityFactory.createSigner("PKCS11", signerConf, (X509Certificate[]) null);
-      }
-      return signer;
-    }
-
-    public static SignerConf getPkcs11SignerConf(String pkcs11ModuleName, Integer slotIndex,
-        String keyLabel, byte[] keyId, HashAlgo hashAlgo,
-        SignatureAlgoControl signatureAlgoControl) {
-      Args.notNull(hashAlgo, "hashAlgo");
-      Args.notNull(slotIndex, "slotIndex");
-
-      if (keyId == null && keyLabel == null) {
-        throw new IllegalArgumentException("at least one of keyId and keyLabel may not be null");
-      }
-
-      ConfPairs conf = new ConfPairs();
-      conf.putPair("parallelism", Integer.toString(1));
-
-      if (pkcs11ModuleName != null && pkcs11ModuleName.length() > 0) {
-        conf.putPair("module", pkcs11ModuleName);
-      }
-
-      if (slotIndex != null) {
-        conf.putPair("slot", slotIndex.toString());
-      }
-
-      if (keyId != null) {
-        conf.putPair("key-id", Hex.encode(keyId));
-      }
-
-      if (keyLabel != null) {
-        conf.putPair("key-label", keyLabel);
-      }
-
-      return new SignerConf(conf.getEncoded(), hashAlgo, signatureAlgoControl);
-    }
-
-  }
-
-  @Command(scope = "xi", name = "cmp-update-p11",
-      description = "update certificate (PKCS#11 token)")
-  @Service
-  public static class CmpUpdateP11 extends UpdateCertAction {
-
-    @Option(name = "--slot", required = true, description = "slot index")
-    private Integer slotIndex;
-
-    @Option(name = "--key-id",
-        description = "id of the private key in the PKCS#11 device\n"
-            + "either keyId or keyLabel must be specified")
-    private String keyId;
-
-    @Option(name = "--key-label",
-        description = "label of the private key in the PKCS#11 device\n"
-            + "either keyId or keyLabel must be specified")
-    private String keyLabel;
-
-    @Option(name = "--module", description = "name of the PKCS#11 module")
-    private String moduleName = "default";
-
-    private ConcurrentContentSigner signer;
-
-    @Override
-    protected ConcurrentContentSigner getSigner() throws ObjectCreationException {
-      if (signer == null) {
-        byte[] keyIdBytes = null;
-        if (keyId != null) {
-          keyIdBytes = Hex.decode(keyId);
-        }
-
-        SignerConf signerConf = getPkcs11SignerConf(moduleName, slotIndex, keyLabel,
-            keyIdBytes, HashAlgo.getInstance(hashAlgo), getSignatureAlgoControl());
-        signer = securityFactory.createSigner("PKCS11", signerConf, (X509Certificate[]) null);
-      }
-      return signer;
-    }
-
-    public static SignerConf getPkcs11SignerConf(String pkcs11ModuleName, Integer slotIndex,
-        String keyLabel, byte[] keyId, HashAlgo hashAlgo,
-        SignatureAlgoControl signatureAlgoControl) {
-      Args.notNull(hashAlgo, "hashAlgo");
-      Args.notNull(slotIndex, "slotIndex");
-
-      if (keyId == null && keyLabel == null) {
-        throw new IllegalArgumentException("at least one of keyId and keyLabel may not be null");
-      }
-
-      ConfPairs conf = new ConfPairs();
-      conf.putPair("parallelism", Integer.toString(1));
-
-      if (pkcs11ModuleName != null && pkcs11ModuleName.length() > 0) {
-        conf.putPair("module", pkcs11ModuleName);
-      }
-
-      if (slotIndex != null) {
-        conf.putPair("slot", slotIndex.toString());
-      }
-
-      if (keyId != null) {
-        conf.putPair("key-id", Hex.encode(keyId));
-      }
-
-      if (keyLabel != null) {
-        conf.putPair("key-label", keyLabel);
-      }
-
-      return new SignerConf(conf.getEncoded(), hashAlgo, signatureAlgoControl);
-    }
-
-  }
-
-  @Command(scope = "xi", name = "cmp-enroll-p12",
-      description = "enroll certificate (PKCS#12 keystore)")
-  @Service
-  public static class CmpEnrollP12 extends EnrollCertAction {
-
-    @Option(name = "--p12", required = true, description = "PKCS#12 keystore file")
-    @Completion(FileCompleter.class)
-    private String p12File;
-
-    @Option(name = "--password", description = "password of the PKCS#12 keystore file")
-    private String password;
-
-    private ConcurrentContentSigner signer;
-
-    @Override
-    protected ConcurrentContentSigner getSigner()
-        throws ObjectCreationException, CmpClientException {
-      if (signer == null) {
-        if (password == null) {
-          try {
-            password = new String(readPassword());
-          } catch (IOException ex) {
-            throw new ObjectCreationException("could not read password: " + ex.getMessage(), ex);
-          }
-        }
-
-        ConfPairs conf = new ConfPairs("password", password);
-        conf.putPair("parallelism", Integer.toString(1));
-        conf.putPair("keystore", "file:" + p12File);
-        SignerConf signerConf = new SignerConf(conf.getEncoded(),
-            HashAlgo.getNonNullInstance(hashAlgo), getSignatureAlgoControl());
-
-        String caName = getCaName().toLowerCase();
-        List<X509Certificate> peerCerts = client.getDhPocPeerCertificates(caName);
-        if (CollectionUtil.isNotEmpty(peerCerts)) {
-          signerConf.setPeerCertificates(peerCerts);
-        }
-
-        signer = securityFactory.createSigner("PKCS12", signerConf, (X509Certificate[]) null);
-      }
-      return signer;
-    }
-
-  }
-
-  @Command(scope = "xi", name = "cmp-update-p12",
-      description = "update certificate (PKCS#12 keystore)")
-  @Service
-  public static class CmpUpdateP12 extends UpdateCertAction {
-
-    @Option(name = "--p12", required = true, description = "PKCS#12 keystore file")
-    @Completion(FileCompleter.class)
-    private String p12File;
-
-    @Option(name = "--password", description = "password of the PKCS#12 keystore file")
-    private String password;
-
-    private ConcurrentContentSigner signer;
-
-    @Override
-    protected ConcurrentContentSigner getSigner() throws ObjectCreationException {
-      if (signer == null) {
-        if (password == null) {
-          try {
-            password = new String(readPassword());
-          } catch (IOException ex) {
-            throw new ObjectCreationException("could not read password: " + ex.getMessage(), ex);
-          }
-        }
-
-        ConfPairs conf = new ConfPairs("password", password);
-        conf.putPair("parallelism", Integer.toString(1));
-        conf.putPair("keystore", "file:" + p12File);
-        SignerConf signerConf = new SignerConf(conf.getEncoded(),
-            HashAlgo.getNonNullInstance(hashAlgo), getSignatureAlgoControl());
-        signer = securityFactory.createSigner("PKCS12", signerConf, (X509Certificate[]) null);
-      }
-      return signer;
-    }
-
-  }
-
-  @Command(scope = "xi", name = "cmp-rm-cert", description = "remove certificate")
-  @Service
-  public static class CmpRmCert extends UnRevRemoveCertAction {
-
-    @Override
-    protected Object execute0() throws Exception {
-      if (!(certFile == null ^ getSerialNumber() == null)) {
-        throw new IllegalCmdParamException("exactly one of cert and serial must be specified");
-      }
-
-      ReqRespDebug debug = getReqRespDebug();
-      CertIdOrError certIdOrError;
-      try {
-        if (certFile != null) {
-          X509Certificate cert = X509Util.parseCert(new File(certFile));
-          certIdOrError = client.removeCert(caName, cert, debug);
-        } else {
-          certIdOrError = client.removeCert(caName, getSerialNumber(), debug);
-        }
-      } finally {
-        saveRequestResponse(debug);
-      }
-
-      if (certIdOrError.getError() != null) {
-        PkiStatusInfo error = certIdOrError.getError();
-        throw new CmdFailure("removing certificate failed: " + error);
-      } else {
-        println("removed certificate");
-      }
-      return null;
-    } // method execute0
-
-  }
-
-  @Command(scope = "xi", name = "cmp-revoke", description = "revoke certificate")
-  @Service
-  public static class CmpRevoke extends UnRevRemoveCertAction {
-
-    @Option(name = "--reason", aliases = "-r", required = true, description = "CRL reason")
-    @Completion(Completers.ClientCrlReasonCompleter.class)
-    private String reason;
-
-    @Option(name = "--inv-date", description = "invalidity date, UTC time of format yyyyMMddHHmmss")
-    private String invalidityDateS;
-
-    @Override
-    protected Object execute0() throws Exception {
-      if (!(certFile == null ^ getSerialNumber() == null)) {
-        throw new IllegalCmdParamException("exactly one of cert and serial must be specified");
-      }
-
-      CrlReason crlReason = CrlReason.forNameOrText(reason);
-
-      if (!CrlReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason)) {
-        throw new IllegalCmdParamException("reason " + reason + " is not permitted");
-      }
-
-      CertIdOrError certIdOrError;
-
-      Date invalidityDate = null;
-      if (isNotBlank(invalidityDateS)) {
-        invalidityDate = DateUtil.parseUtcTimeyyyyMMddhhmmss(invalidityDateS);
-      }
-
-      ReqRespDebug debug = getReqRespDebug();
-      try {
-        if (certFile != null) {
-          X509Certificate cert = X509Util.parseCert(new File(certFile));
-          certIdOrError = client.revokeCert(caName, cert, crlReason.getCode(), invalidityDate,
-              debug);
-        } else {
-          certIdOrError = client.revokeCert(caName, getSerialNumber(), crlReason.getCode(),
-              invalidityDate, debug);
-        }
-      } finally {
-        saveRequestResponse(debug);
-      }
-
-      if (certIdOrError.getError() != null) {
-        PkiStatusInfo error = certIdOrError.getError();
-        throw new CmdFailure("revocation failed: " + error);
-      } else {
-        println("revoked certificate");
-      }
-      return null;
-    } // method execute0
-
-  }
-
-  @Command(scope = "xi", name = "cmp-unrevoke", description = "unrevoke certificate")
-  @Service
-  public static class CmpUnrevoke extends UnRevRemoveCertAction {
-
-    @Override
-    protected Object execute0() throws Exception {
-      if (!(certFile == null ^ getSerialNumber() == null)) {
-        throw new IllegalCmdParamException("exactly one of cert and serial must be specified");
-      }
-
-      ReqRespDebug debug = getReqRespDebug();
-      CertIdOrError certIdOrError;
-      try {
-        if (certFile != null) {
-          X509Certificate cert = X509Util.parseCert(new File(certFile));
-          certIdOrError = client.unrevokeCert(caName, cert, debug);
-        } else {
-          certIdOrError = client.unrevokeCert(caName, getSerialNumber(), debug);
-        }
-      } finally {
-        saveRequestResponse(debug);
-      }
-
-      if (certIdOrError.getError() != null) {
-        PkiStatusInfo error = certIdOrError.getError();
-        throw new CmdFailure("releasing revocation failed: " + error);
-      } else {
-        println("unrevoked certificate");
-      }
-      return null;
-    } // method execute0
-
-  }
+  } // class EnrollCertAction
 
   public abstract static class UnRevRemoveCertAction extends ClientAction {
 
@@ -1618,9 +1699,9 @@ public class Actions {
       }
 
       return null;
-    }
+    } // method checkCertificate
 
-  }
+  } // class UnRevRemoveCertAction
 
   public abstract static class UpdateAction extends ClientAction {
 
@@ -1762,7 +1843,7 @@ public class Actions {
       return result;
     } // method enroll
 
-  }
+  } // class UpdateAction
 
   public abstract static class UpdateCertAction extends UpdateAction {
 
@@ -1817,7 +1898,7 @@ public class Actions {
         X509CertificateHolder ssCert = signer.getBcCertificate();
         return ssCert.getSubjectPublicKeyInfo();
       }
-    }
+    } // method getPublicKey
 
     @Override
     protected EnrollCertRequest.Entry buildEnrollCertRequestEntry(String id, String profile,
@@ -1839,7 +1920,7 @@ public class Actions {
       final boolean kup = true;
 
       return new EnrollCertRequest.Entry(id, profile, certRequest, popo, caGenKeypair, kup);
-    }
+    } // method buildEnrollCertRequestEntry
 
     @Override
     protected Object execute0() throws Exception {
@@ -1861,87 +1942,6 @@ public class Actions {
       return null;
     } // method execute0
 
-  }
-
-  @Command(scope = "xi", name = "cmp-update-cagenkey",
-      description = "update certificate (keypair will be generated by the CA)")
-  @Service
-  public static class CmpUpdateCagenkey extends UpdateAction {
-
-    @Option(name = "--cert-outform", description = "output format of the certificate")
-    @Completion(Completers.DerPemCompleter.class)
-    private String certOutform = "der";
-
-    @Option(name = "--cert-out", description = "where to save the certificate")
-    @Completion(FileCompleter.class)
-    private String certOutputFile;
-
-    @Option(name = "--p12-out", required = true, description = "where to save the PKCS#12 keystore")
-    @Completion(FileCompleter.class)
-    private String p12OutputFile;
-
-    @Option(name = "--password", description = "password of the PKCS#12 file")
-    private String password;
-
-    @Override
-    protected SubjectPublicKeyInfo getPublicKey() throws Exception {
-      return null;
-    }
-
-    @Override
-    protected EnrollCertRequest.Entry buildEnrollCertRequestEntry(String id, String profile,
-        CertRequest certRequest) throws Exception {
-      final boolean caGenKeypair = true;
-      final boolean kup = true;
-      return new EnrollCertRequest.Entry("id-1", profile, certRequest, null, caGenKeypair, kup);
-    }
-
-    @Override
-    protected Object execute0() throws Exception {
-      EnrollCertResult result = enroll();
-
-      X509Certificate cert = null;
-      PrivateKeyInfo privateKeyInfo = null;
-      if (result != null) {
-        String id = result.getAllIds().iterator().next();
-        CertifiedKeyPairOrError certOrError = result.getCertOrError(id);
-        cert = (X509Certificate) certOrError.getCertificate();
-        privateKeyInfo = certOrError.getPrivateKeyInfo();
-      }
-
-      if (cert == null) {
-        throw new CmdFailure("no certificate received from the server");
-      }
-
-      if (privateKeyInfo == null) {
-        throw new CmdFailure("no private key received from the server");
-      }
-
-      if (StringUtil.isNotBlank(certOutputFile)) {
-        saveVerbose("saved certificate to file", certOutputFile,
-            encodeCert(cert.getEncoded(), certOutform));
-      }
-
-      PrivateKey privateKey = BouncyCastleProvider.getPrivateKey(privateKeyInfo);
-
-      KeyStore ks = KeyStore.getInstance("PKCS12");
-      char[] pwd = getPassword();
-      ks.load(null, pwd);
-      ks.setKeyEntry("main", privateKey, pwd, new Certificate[] {cert});
-      ByteArrayOutputStream bout = new ByteArrayOutputStream();
-      ks.store(bout, pwd);
-      saveVerbose("saved key to file", p12OutputFile, bout.toByteArray());
-
-      return null;
-    } // method execute0
-
-    private char[] getPassword() throws IOException {
-      char[] pwdInChar = readPasswordIfNotSet(password);
-      if (pwdInChar != null) {
-        password = new String(pwdInChar);
-      }
-      return pwdInChar;
-    }
-  }
+  } // class UpdateCertAction
 
 }

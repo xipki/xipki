@@ -60,7 +60,7 @@ class IssuerStore {
     List<IssuerEntry> copy = new ArrayList<IssuerEntry>(issuers);
     this.ids = Collections.unmodifiableSet(newIds);
     this.issuers = copy;
-  }
+  } // method setIssuers
 
   public int size() {
     return ids.size();

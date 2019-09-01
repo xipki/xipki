@@ -83,7 +83,7 @@ public class ShellUtil {
 
     pairs.putPair("keystore", "base64:" + Base64.encodeToString(keystoreBytes));
     return pairs.getEncoded();
-  } // method execute0
+  } // method canonicalizeSignerConf
 
   public static int getPermission(Set<String> permissions) throws IllegalCmdParamException {
     int ret = 0;
@@ -95,6 +95,6 @@ public class ShellUtil {
       ret |= code;
     }
     return ret;
-  }
+  } // method getPermission
 
 }

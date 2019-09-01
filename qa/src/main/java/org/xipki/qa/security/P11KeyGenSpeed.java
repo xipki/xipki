@@ -57,7 +57,7 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
       slot.removeIdentity(objId);
     }
 
-  }
+  } // class DSA
 
   //CHECKSTYLE:SKIP
   public static class EC extends P11KeyGenSpeed {
@@ -75,7 +75,7 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
       slot.removeIdentity(objId);
     }
 
-  }
+  } // class EC
 
   //CHECKSTYLE:SKIP
   public static class RSA extends P11KeyGenSpeed {
@@ -98,7 +98,7 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
       slot.removeIdentity(objId);
     }
 
-  }
+  } // class RSA
 
   //CHECKSTYLE:SKIP
   public static class SM2 extends P11KeyGenSpeed {
@@ -112,7 +112,7 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
       slot.removeIdentity(objId);
     }
 
-  }
+  } // class SM2
 
   class Testor implements Runnable {
 

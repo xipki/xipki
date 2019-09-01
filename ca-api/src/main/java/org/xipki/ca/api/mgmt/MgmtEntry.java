@@ -102,7 +102,7 @@ public abstract class MgmtEntry {
           "\nactive: ", active, "\npassword: ****\n");
     }
 
-  }
+  } // class AddUser
 
   public static class Ca extends MgmtEntry {
 
@@ -191,7 +191,7 @@ public abstract class MgmtEntry {
           CaManager.MIN_SERIALNUMBER_SIZE, CaManager.MAX_SERIALNUMBER_SIZE);
       this.nextCrlNumber = Args.positive(nextCrlNumber, "nextCrlNumber");
       this.caUris = (caUris == null) ? CaUris.EMPTY_INSTANCE : caUris;
-    }
+    } // constructor Ca
 
     public static List<String[]> splitCaSignerConfs(String conf) throws XiSecurityException {
       ConfPairs pairs = new ConfPairs(conf);
@@ -218,7 +218,7 @@ public abstract class MgmtEntry {
       }
 
       return signerConfs;
-    }
+    } // method splitCaSignerConfs
 
     public NameId getIdent() {
       return ident;
@@ -471,7 +471,7 @@ public abstract class MgmtEntry {
           "\nrevocation: ", (revocationInfo == null ? "not revoked" : "revoked"), revInfoText,
           "\ncert: \n", X509Util.formatCert(cert, verbose),
           certchainStr.toString());
-    } // method toString
+    } // method toString(boolean, boolean)
 
     protected static String urisToString(Collection<? extends Object> tokens) {
       if (CollectionUtil.isEmpty(tokens)) {
@@ -489,7 +489,7 @@ public abstract class MgmtEntry {
         }
       }
       return sb.toString();
-    }
+    } // method urisToString
 
     @Override
     public boolean equals(Object obj) {
@@ -500,7 +500,7 @@ public abstract class MgmtEntry {
       }
 
       return equals((Ca) obj, false, false);
-    }
+    } // method equals(Object)
 
     public boolean equals(Ca obj, boolean ignoreDynamicFields, boolean ignoreId) {
       if (!ignoreDynamicFields) {
@@ -539,7 +539,7 @@ public abstract class MgmtEntry {
           && CompareUtil.equalsObject(signerConf, obj.signerConf)
           && CompareUtil.equalsObject(status, obj.status)
           && CompareUtil.equalsObject(validityMode, obj.validityMode);
-    }
+    } // method equals(Ca, boolean, boolean)
 
     @Override
     public int hashCode() {
@@ -565,7 +565,7 @@ public abstract class MgmtEntry {
         }
         this.hexSha1OfCert = HashAlgo.SHA1.hexHash(encodedCert);
       }
-    }
+    } // method setCert
 
     public int getSerialNoBitLen() {
       return serialNoBitLen;
@@ -620,7 +620,7 @@ public abstract class MgmtEntry {
       return hexSha1OfCert;
     }
 
-  }
+  } // class Ca
 
   public static class CaHasRequestor extends MgmtEntry {
 
@@ -720,7 +720,7 @@ public abstract class MgmtEntry {
       return requestorIdent.hashCode();
     }
 
-  }
+  } // class CaHasRequestor
 
   public static class CaHasUser extends MgmtEntry {
 
@@ -792,7 +792,7 @@ public abstract class MgmtEntry {
       return userIdent.hashCode();
     }
 
-  }
+  } // method CaHasUser
 
   public static class Certprofile extends MgmtEntry {
 
@@ -897,7 +897,7 @@ public abstract class MgmtEntry {
       return ident.hashCode();
     }
 
-  }
+  } // class Certprofile
 
   public static class ChangeCa extends MgmtEntry {
 
@@ -1214,7 +1214,7 @@ public abstract class MgmtEntry {
       this.numCrls = numCrls;
     }
 
-  }
+  } // class ChangeCa
 
   public static class ChangeUser extends MgmtEntry {
 
@@ -1257,7 +1257,7 @@ public abstract class MgmtEntry {
       this.password = password;
     }
 
-  }
+  } // class ChangeUser
 
   public static class Publisher extends MgmtEntry {
 
@@ -1341,7 +1341,7 @@ public abstract class MgmtEntry {
       return ident.hashCode();
     }
 
-  }
+  } // class Publisher
 
   public static class Requestor extends MgmtEntry {
 
@@ -1451,7 +1451,7 @@ public abstract class MgmtEntry {
       }
 
       return sb.toString();
-    }
+    } // method toString(boolean)
 
     @Override
     public boolean equals(Object obj) {
@@ -1476,7 +1476,7 @@ public abstract class MgmtEntry {
       return ident.hashCode();
     }
 
-  }
+  } // class Requestor
 
   public static class Signer extends MgmtEntry {
 
@@ -1593,7 +1593,7 @@ public abstract class MgmtEntry {
         sb.append("  null");
       }
       return sb.toString();
-    } // method toString
+    } // method toString(boolean, boolean)
 
     @Override
     public boolean equals(Object obj) {
@@ -1608,14 +1608,14 @@ public abstract class MgmtEntry {
           && type.equals(objB.type)
           && CompareUtil.equalsObject(conf, objB.conf)
           && CompareUtil.equalsObject(base64Cert, objB.base64Cert);
-    }
+    } // method equals
 
     @Override
     public int hashCode() {
       return name.hashCode();
     }
 
-  }
+  } // class Signer
 
   public static class User extends MgmtEntry {
 
@@ -1690,7 +1690,7 @@ public abstract class MgmtEntry {
           "\nactive: ", active, "\npassword: *****\n");
     }
 
-  }
+  } // class User
 
   private static String signerConfToString(String signerConf, boolean verbose,
       boolean ignoreSensitiveInfo) {
@@ -1704,6 +1704,6 @@ public abstract class MgmtEntry {
     } else {
       return StringUtil.concat(signerConf.substring(0, 97), "...");
     }
-  }
+  } // method signerConfToString
 
 }

@@ -71,7 +71,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       ret.setCertId(certId);
       return ret;
     }
-  }
+  } // class CertWithDbIdWrapper
 
   public static class CertWithRevocationInfoWrapper {
 
@@ -122,7 +122,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       return ret;
     }
 
-  }
+  } // class CertWithRevocationInfoWrapper
 
   public static class ByteArray extends MgmtResponse {
 
@@ -143,7 +143,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = result;
     }
 
-  }
+  } // class ByteArray
 
   public static class Error extends MgmtResponse {
 
@@ -164,7 +164,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.message = message;
     }
 
-  }
+  } // class Error
 
   public static class GetAliasesForCa extends MgmtResponse {
 
@@ -185,49 +185,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = result;
     }
 
-  }
-
-  public static class GetCaHasUserForUser extends MgmtResponse {
-
-    private Map<String, MgmtEntry.CaHasUser> result;
-
-    public GetCaHasUserForUser() {
-    }
-
-    public GetCaHasUserForUser(Map<String, MgmtEntry.CaHasUser> result) {
-      this.result = result;
-    }
-
-    public Map<String, MgmtEntry.CaHasUser> getResult() {
-      return result;
-    }
-
-    public void setResult(Map<String, MgmtEntry.CaHasUser> result) {
-      this.result = result;
-    }
-
-  }
-
-  public static class GetCaHasUsersForUser extends MgmtResponse {
-
-    private Map<String, MgmtEntry.CaHasUser> result;
-
-    public GetCaHasUsersForUser() {
-    }
-
-    public GetCaHasUsersForUser(Map<String, MgmtEntry.CaHasUser> result) {
-      this.result = result;
-    }
-
-    public Map<String, MgmtEntry.CaHasUser> getResult() {
-      return result;
-    }
-
-    public void setResult(Map<String, MgmtEntry.CaHasUser> result) {
-      this.result = result;
-    }
-
-  }
+  } // class GetAliasesForCa
 
   public static class GetCa extends MgmtResponse {
 
@@ -248,7 +206,49 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = result;
     }
 
-  }
+  } // class GetCa
+
+  public static class GetCaHasUserForUser extends MgmtResponse {
+
+    private Map<String, MgmtEntry.CaHasUser> result;
+
+    public GetCaHasUserForUser() {
+    }
+
+    public GetCaHasUserForUser(Map<String, MgmtEntry.CaHasUser> result) {
+      this.result = result;
+    }
+
+    public Map<String, MgmtEntry.CaHasUser> getResult() {
+      return result;
+    }
+
+    public void setResult(Map<String, MgmtEntry.CaHasUser> result) {
+      this.result = result;
+    }
+
+  } // class GetCaHasUserForUser
+
+  public static class GetCaHasUsersForUser extends MgmtResponse {
+
+    private Map<String, MgmtEntry.CaHasUser> result;
+
+    public GetCaHasUsersForUser() {
+    }
+
+    public GetCaHasUsersForUser(Map<String, MgmtEntry.CaHasUser> result) {
+      this.result = result;
+    }
+
+    public Map<String, MgmtEntry.CaHasUser> getResult() {
+      return result;
+    }
+
+    public void setResult(Map<String, MgmtEntry.CaHasUser> result) {
+      this.result = result;
+    }
+
+  } // class GetCaHasUsersForUser
 
   public static class GetCaSystemStatus extends MgmtResponse {
 
@@ -269,7 +269,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = result;
     }
 
-  }
+  } // class GetCaSystemStatus
 
   public static class GetCertprofile extends MgmtResponse {
 
@@ -290,7 +290,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = result;
     }
 
-  }
+  } // class GetCertprofile
 
   public static class GetCert extends MgmtResponse {
 
@@ -311,7 +311,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = result;
     }
 
-  }
+  } // class GetCert
 
   public static class GetPublischersForCa extends MgmtResponse {
 
@@ -332,7 +332,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = result;
     }
 
-  }
+  } // class GetPublischersForCa
 
   public static class GetPublisher extends MgmtResponse {
 
@@ -353,7 +353,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = result;
     }
 
-  }
+  } // class GetPublisher
 
   public static class GetRequestor extends MgmtResponse {
 
@@ -374,7 +374,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = result;
     }
 
-  }
+  } // class GetRequestor
 
   public static class GetRequestorsForCa extends MgmtResponse {
 
@@ -395,7 +395,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = result;
     }
 
-  }
+  } // class GetRequestorsForCa
 
   public static class GetSigner extends MgmtResponse {
 
@@ -416,7 +416,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = result;
     }
 
-  }
+  } // class GetSigner
 
   public static class GetUser extends MgmtResponse {
 
@@ -437,7 +437,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = result;
     }
 
-  }
+  } // class GetUser
 
   public static class ListCertificates extends MgmtResponse {
 
@@ -458,7 +458,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = result;
     }
 
-  }
+  } // class ListCertificates
 
   public static class LoadConf extends MgmtResponse {
 
@@ -479,7 +479,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = result;
     }
 
-  }
+  } // class LoadConf
 
   public static class StringResponse extends MgmtResponse {
 
@@ -500,7 +500,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = result;
     }
 
-  }
+  } // class StringResponse
 
   public static class StringSet extends MgmtResponse {
 
@@ -521,6 +521,6 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = result;
     }
 
-  }
+  } // class StringSet
 
 }

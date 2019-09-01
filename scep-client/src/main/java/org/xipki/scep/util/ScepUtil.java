@@ -139,7 +139,7 @@ public class ScepUtil {
     } catch (IllegalArgumentException | CertificateException | CRLException ex) {
       throw new CRLException(ex);
     }
-  }
+  } // method getCrlFromPkiMessage
 
   public static String getSignatureAlgorithm(PrivateKey key, ScepHashAlgo hashAlgo) {
     Args.notNull(key, "key");
@@ -258,7 +258,7 @@ public class ScepUtil {
     }
 
     return issues;
-  }
+  } // method issues
 
   public static ASN1ObjectIdentifier extractDigesetAlgorithmIdentifier(String sigOid,
       byte[] sigParams) throws NoSuchAlgorithmException {
@@ -287,7 +287,7 @@ public class ScepUtil {
     }
 
     return digestAlgOid;
-  }
+  } // method extractDigesetAlgorithmIdentifier
 
   public static ASN1Encodable getFirstAttrValue(AttributeTable attrs, ASN1ObjectIdentifier type) {
     Args.notNull(attrs, "attrs");
@@ -313,7 +313,7 @@ public class ScepUtil {
 
     JcaCertStore certStore = new JcaCertStore(certColl);
     generator.addCertificates(certStore);
-  }
+  } // method addCmsCertSet
 
   public static Date getTime(Object obj) {
     if (obj instanceof byte[]) {
@@ -337,7 +337,7 @@ public class ScepUtil {
     } else {
       return Time.getInstance(obj).getDate();
     }
-  }
+  } // method getTime
 
   private static CertificateFactory getCertFactory() throws CertificateException {
     synchronized (certFactLock) {

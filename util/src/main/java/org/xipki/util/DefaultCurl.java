@@ -201,7 +201,7 @@ public class DefaultCurl implements Curl {
     } finally {
       httpConn.disconnect();
     }
-  }
+  } // method curl
 
   private void checkUserPassword(String userPassword) {
     if (userPassword == null) {

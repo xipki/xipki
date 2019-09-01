@@ -71,7 +71,7 @@ public class Pkcs11conf extends ValidatableConf {
       validate(slots);
     }
 
-  }
+  } // class MechanimFilter
 
   public static class MechanismSet extends ValidatableConf {
 
@@ -107,7 +107,7 @@ public class Pkcs11conf extends ValidatableConf {
       notEmpty(mechanisms, "mechanisms");
     }
 
-  }
+  } // class MechanismSet
 
   public static class Module extends ValidatableConf {
 
@@ -268,7 +268,7 @@ public class Pkcs11conf extends ValidatableConf {
       validate(mechanismFilters);
     }
 
-  }
+  } // class Module
 
   public static class NativeLibrary extends ValidatableConf {
 
@@ -300,7 +300,7 @@ public class Pkcs11conf extends ValidatableConf {
       notNull(path, "path");
     }
 
-  }
+  } // class NativeLibrary
 
   public static class NewObjectConf extends ValidatableConf {
 
@@ -363,7 +363,7 @@ public class Pkcs11conf extends ValidatableConf {
     public void validate() throws InvalidConfException {
     }
 
-  }
+  } // class NewObjectConf
 
   public static class PasswordSet extends ValidatableConf {
 
@@ -398,7 +398,7 @@ public class Pkcs11conf extends ValidatableConf {
       notEmpty(passwords, "passwords");
     }
 
-  }
+  } // class PasswordSet
 
   public static class Slot extends ValidatableConf {
 
@@ -429,7 +429,7 @@ public class Pkcs11conf extends ValidatableConf {
       exactOne(index, "index", id, "id");
     }
 
-  }
+  } // class Slot
 
   /**
    * exactly one module must have the name 'default'.

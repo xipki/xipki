@@ -177,7 +177,7 @@ public abstract class Client {
         return httpGet(url);
       }
     } // end if
-  }
+  } // method httpSend
 
   private ScepHttpResponse httpSend(Operation operation) throws ScepClientException {
     return httpSend(operation, null);
@@ -207,7 +207,7 @@ public abstract class Client {
     }
     this.responseSignerCerts = new CollectionStore<X509CertificateHolder>(
         Arrays.asList(certHolder));
-  }
+  } // method refresh
 
   public CaCaps getCaCaps() throws ScepClientException {
     initIfNotInited();
@@ -260,7 +260,7 @@ public abstract class Client {
     } catch (CRLException ex) {
       throw new ScepClientException(ex.getMessage(), ex);
     }
-  }
+  } // method scepGetCrl
 
   public List<X509Certificate> scepGetCert(PrivateKey identityKey, X509Certificate identityCert,
       X500Name issuer, BigInteger serialNumber) throws ScepClientException {
@@ -290,7 +290,7 @@ public abstract class Client {
     } catch (CertificateException ex) {
       throw new ScepClientException(ex.getMessage(), ex);
     }
-  }
+  } // method scepGetCert
 
   public EnrolmentResponse scepCertPoll(PrivateKey identityKey, X509Certificate identityCert,
       CertificationRequest csr, X500Name issuer) throws ScepClientException {
@@ -306,7 +306,7 @@ public abstract class Client {
 
     return scepCertPoll(identityKey, identityCert, tid, issuer,
         csr.getCertificationRequestInfo().getSubject());
-  }
+  } // method scepCertPoll
 
   public EnrolmentResponse scepCertPoll(PrivateKey identityKey, X509Certificate identityCert,
       TransactionId transactionId, X500Name issuer, X500Name subject) throws ScepClientException {
@@ -327,7 +327,7 @@ public abstract class Client {
     DecodedPkiMessage response = decode(cmsSignedData, identityKey, identityCert);
     assertSameNonce(pkiMessage, response);
     return new EnrolmentResponse(response);
-  }
+  } // method scepCertPoll
 
   public EnrolmentResponse scepEnrol(CertificationRequest csr, PrivateKey identityKey,
       X509Certificate identityCert) throws ScepClientException {
@@ -357,7 +357,7 @@ public abstract class Client {
     } // end if
 
     return scepPkcsReq(csr, identityKey, identityCert);
-  }
+  } // method scepEnrol
 
   public EnrolmentResponse scepPkcsReq(CertificationRequest csr, PrivateKey identityKey,
       X509Certificate identityCert) throws ScepClientException {
@@ -372,7 +372,7 @@ public abstract class Client {
     }
 
     return enroll(MessageType.PKCSReq, csr, identityKey, identityCert);
-  }
+  } // method scepPkcsReq
 
   public EnrolmentResponse scepRenewalReq(CertificationRequest csr, PrivateKey identityKey,
       X509Certificate identityCert) throws ScepClientException {
@@ -389,7 +389,7 @@ public abstract class Client {
     }
 
     return enroll(MessageType.RenewalReq, csr, identityKey, identityCert);
-  }
+  } // method scepRenewalReq
 
   public EnrolmentResponse scepUpdateReq(CertificationRequest csr, PrivateKey identityKey,
       X509Certificate identityCert) throws ScepClientException {
@@ -406,7 +406,7 @@ public abstract class Client {
     }
 
     return enroll(MessageType.UpdateReq, csr, identityKey, identityCert);
-  }
+  } // method scepUpdateReq
 
   private EnrolmentResponse enroll(MessageType messageType, CertificationRequest csr,
       PrivateKey identityKey, X509Certificate identityCert) throws ScepClientException {
@@ -427,7 +427,7 @@ public abstract class Client {
     DecodedPkiMessage response = decode(cmsSignedData, identityKey, identityCert);
     assertSameNonce(pkiMessage, response);
     return new EnrolmentResponse(response);
-  }
+  } // method enroll
 
   public AuthorityCertStore scepNextCaCert() throws ScepClientException {
     initIfNotInited();
@@ -439,7 +439,7 @@ public abstract class Client {
 
     ScepHttpResponse resp = httpSend(Operation.GetNextCACert);
     return retrieveNextCaAuthorityCertStore(resp);
-  }
+  } // method scepNextCaCert
 
   private ContentInfo encryptThenSign(PkiMessage request, PrivateKey identityKey,
       X509Certificate identityCert) throws ScepClientException {
@@ -465,7 +465,7 @@ public abstract class Client {
     } catch (MessageEncodingException ex) {
       throw new ScepClientException(ex);
     }
-  }
+  } // method encryptThenSign
 
   public void destroy() {
   }

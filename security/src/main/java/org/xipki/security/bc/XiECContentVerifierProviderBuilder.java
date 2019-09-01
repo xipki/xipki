@@ -69,7 +69,6 @@ public class XiECContentVerifierProviderBuilder extends BcECContentVerifierProvi
     }
 
     return super.createSigner(sigAlgId);
-
-  }
+  } // method createSigner
 
 }

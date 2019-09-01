@@ -71,7 +71,7 @@ public class RSABrokenKey {
     for (int i = 0; i < markers.length; i++) {
       markers[i] = new BigInteger(strs[i], 16);
     }
-  }
+  } // method static
 
   public static boolean isAffected(BigInteger modulus) {
     for (int i = 0; i < primes.length; i++) {

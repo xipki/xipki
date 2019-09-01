@@ -43,7 +43,7 @@ public class OperationException extends Exception {
     UNKNOWN_CERT,
     UNKNOWN_CERT_PROFILE
 
-  } // enum ErrorCode
+  } // class ErrorCode
 
   private static final long serialVersionUID = 1L;
 
@@ -87,6 +87,6 @@ public class OperationException extends Exception {
       sb.append(": ").append(msg);
     }
     return sb.toString();
-  }
+  } // method getMessage
 
 }

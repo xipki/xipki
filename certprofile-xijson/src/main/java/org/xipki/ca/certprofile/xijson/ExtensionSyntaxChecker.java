@@ -170,7 +170,7 @@ public class ExtensionSyntaxChecker {
     }
 
     checkContentTextOrSubFields(name, syntax, extnValue);
-  }
+  } // method checkField
 
   private static void checkSequenceSyntax(String name, ASN1Sequence seq,
       List<SubFieldSyntax> subFields) throws BadCertTemplateException {
@@ -255,7 +255,7 @@ public class ExtensionSyntaxChecker {
         }
       }
     }
-  }
+  } // method checkSequenceSyntax
 
   private static void checkSetSyntax(String name, ASN1Set set, List<SubFieldSyntax> subFields)
       throws BadCertTemplateException {
@@ -282,7 +282,7 @@ public class ExtensionSyntaxChecker {
         throw new BadCertTemplateException("invalid " + name);
       }
     }
-  }
+  } // method checkSetSyntax
 
   private static SubFieldSyntax getSyntax(String name, ASN1ObjectHolder objHolder,
       List<SubFieldSyntax> subFields) throws BadCertTemplateException {
@@ -353,7 +353,7 @@ public class ExtensionSyntaxChecker {
 
     objHolder.object = obj;
     return syntax;
-  }
+  } // method getSyntax
 
   private static void checkSequenceOfOrSetOfSyntax(String name, ASN1Sequence seq,
       ASN1Set set, List<SubFieldSyntax> subFields) throws BadCertTemplateException {
@@ -368,7 +368,7 @@ public class ExtensionSyntaxChecker {
       }
       checkField(name, objHolder.object, subField);
     }
-  }
+  } // method checkSequenceOfOrSetOfSyntax
 
   private static FieldType getFieldType(ASN1Encodable obj) {
     FieldType expectedType;
@@ -416,7 +416,7 @@ public class ExtensionSyntaxChecker {
     }
 
     return expectedType;
-  }
+  } // method getFieldType
 
   private static void assertMatch(String name, String pattern, String text)
       throws BadCertTemplateException {
@@ -424,7 +424,7 @@ public class ExtensionSyntaxChecker {
       throw new BadCertTemplateException(
           String.format("invalid %s '%s' against regex '%s'", name, text, pattern));
     }
-  }
+  } // method assertMatch
 
   private static ASN1Encodable getParsedImplicitValue(String name, ASN1TaggedObject taggedObject,
       FieldType fieldType) throws BadCertTemplateException {
@@ -478,7 +478,7 @@ public class ExtensionSyntaxChecker {
     } catch (IllegalArgumentException ex) {
       throw new BadCertTemplateException("invalid " + name, ex);
     }
-  }
+  } // method getParsedImplicitValue
 
   private static void checkContentTextOrSubFields(String name, ExtnSyntax subField,
       ASN1Encodable obj) throws BadCertTemplateException {
@@ -499,6 +499,6 @@ public class ExtensionSyntaxChecker {
     } else if (syntaxType == FieldType.SET_OF) {
       checkSequenceOfOrSetOfSyntax(name, null, (ASN1Set) obj, subField.getSubFields());
     }
-  }
+  } // method checkContentTextOrSubFields
 
 }

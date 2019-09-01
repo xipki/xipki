@@ -75,7 +75,7 @@ public class CertPublisherFactoryRegister {
     }
 
     throw new ObjectCreationException("could not find factory to create Publisher of type " + type);
-  }
+  } // method newPublisher
 
   /**
    * Retrieves the types of supported publishers.
@@ -123,6 +123,6 @@ public class CertPublisherFactoryRegister {
     } else {
       LOG.info("no CertPublisherFactory binding found to remove for {}", factory);
     }
-  }
+  } // method unregistFactory
 
 }

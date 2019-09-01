@@ -445,7 +445,7 @@ public class AlgorithmUtil {
       mgf1SigNameToDigestOidMap = Collections.unmodifiableMap(m3);
     }
 
-  }
+  } // method static
 
   private static void addOidNameMap(Map<ASN1ObjectIdentifier, String> oidNameMap,
       Map<String, ASN1ObjectIdentifier> nameOidMap, ASN1ObjectIdentifier oid, String... names) {
@@ -454,7 +454,7 @@ public class AlgorithmUtil {
     for (String name : names) {
       nameOidMap.put(name.toUpperCase(), oid);
     }
-  }
+  } // method addOidNameMap
 
   private static void addHashAlgoNameMap(Map<ASN1ObjectIdentifier, String> oidNameMap,
       Map<String, HashAlgo> nameOidMap, HashAlgo hashAlgo, String... names) {
@@ -463,7 +463,7 @@ public class AlgorithmUtil {
     for (String name : names) {
       nameOidMap.put(name.toUpperCase(), hashAlgo);
     }
-  }
+  } // method addHashAlgoNameMap
 
   private AlgorithmUtil() {
   }
@@ -507,14 +507,14 @@ public class AlgorithmUtil {
     } else {
       throw new NoSuchAlgorithmException("unsupported signature algorithm " + oid.getId());
     }
-  } // method getSignatureAlgoName
+  } // method getSigOrMacAlgoCode
 
   public static String getSigOrMacAlgoName(AlgorithmIdentifier sigAlgId)
       throws NoSuchAlgorithmException {
     ASN1ObjectIdentifier algOid = Args.notNull(sigAlgId, "sigAlgId").getAlgorithm();
     String name = macAlgOidToNameMap.get(algOid);
     return (name != null) ? name : getSignatureAlgoName(sigAlgId);
-  }
+  } // method getSigOrMacAlgoName
 
   public static String getSignatureAlgoName(AlgorithmIdentifier sigAlgId)
       throws NoSuchAlgorithmException {
@@ -540,11 +540,11 @@ public class AlgorithmUtil {
   // CHECKSTYLE:SKIP
   public static boolean isDSAPlainSigAlg(AlgorithmIdentifier algId) {
     return isPlainECDSASigAlg(algId);
-  }
+  } // method isDSAPlainSigAlg
 
   public static String canonicalizeSignatureAlgo(String algoName) throws NoSuchAlgorithmException {
     return getSignatureAlgoName(getSigAlgId(algoName));
-  }
+  } // method canonicalizeSignatureAlgo
 
   public static AlgorithmIdentifier getMacAlgId(String macAlgName) throws NoSuchAlgorithmException {
     String algoS = Args.notNull(macAlgName, "macAlgName").toUpperCase();
@@ -612,7 +612,7 @@ public class AlgorithmUtil {
         throw new NoSuchAlgorithmException("Unknown public key " + pubKey.getClass().getName());
       }
     }
-  }
+  } // method getSigAlgId
 
   public static AlgorithmIdentifier getSigAlgId(PublicKey pubKey, HashAlgo hashAlgo,
       SignatureAlgoControl algoControl) throws NoSuchAlgorithmException {
@@ -630,7 +630,7 @@ public class AlgorithmUtil {
     } else {
       throw new NoSuchAlgorithmException("Unknown public key '" + pubKey.getClass().getName());
     }
-  }
+  } // method getSigAlgId
 
   // CHECKSTYLE:SKIP
   public static boolean isRSASigAlgId(AlgorithmIdentifier algId) {
@@ -649,12 +649,12 @@ public class AlgorithmUtil {
     }
 
     return false;
-  }
+  } // method isRSASigAlgId
 
   // CHECKSTYLE:SKIP
   public static boolean isECSigAlg(AlgorithmIdentifier algId) {
     return isECDSASigAlg(algId) || isPlainECDSASigAlg(algId);
-  }
+  } // method isECSigAlg
 
   // CHECKSTYLE:SKIP
   private static boolean isECDSASigAlg(AlgorithmIdentifier algId) {
@@ -672,7 +672,7 @@ public class AlgorithmUtil {
     }
 
     return false;
-  }
+  } // method isECDSASigAlg
 
   // CHECKSTYLE:SKIP
   public static boolean isPlainECDSASigAlg(AlgorithmIdentifier algId) {
@@ -686,7 +686,7 @@ public class AlgorithmUtil {
     }
 
     return false;
-  }
+  } // method isPlainECDSASigAlg
 
   // CHECKSTYLE:SKIP
   public static boolean isSM2SigAlg(AlgorithmIdentifier algId) {
@@ -696,9 +696,8 @@ public class AlgorithmUtil {
     }
 
     // other algorithms not supported yet.
-
     return false;
-  }
+  } // method isSM2SigAlg
 
   // CHECKSTYLE:SKIP
   public static boolean isDSASigAlg(AlgorithmIdentifier algId) {
@@ -716,7 +715,7 @@ public class AlgorithmUtil {
     }
 
     return false;
-  }
+  } // method isDSASigAlg
 
   // CHECKSTYLE:SKIP
   private static AlgorithmIdentifier getRSASigAlgId(HashAlgo hashAlgo, boolean mgf1)
@@ -787,7 +786,7 @@ public class AlgorithmUtil {
       throw new IllegalArgumentException("unknown algorithm identifier " + oid.getId());
     }
     return hashAlgo;
-  }
+  } // method extractHashAlgoFromMacAlg
 
   public static AlgorithmIdentifier extractDigesetAlgFromSigAlg(AlgorithmIdentifier sigAlgId)
       throws NoSuchAlgorithmException {
@@ -807,7 +806,7 @@ public class AlgorithmUtil {
     }
 
     return new AlgorithmIdentifier(digestAlgOid, DERNull.INSTANCE);
-  } // method extractDigesetAlgorithmIdentifier
+  } // method extractDigesetAlgFromSigAlg
 
   public static boolean equalsAlgoName(String algoNameA, String algoNameB) {
     Args.notBlank(algoNameA, "algoNameA");
@@ -831,7 +830,7 @@ public class AlgorithmUtil {
     }
 
     return splitAlgoNameTokens(tmpA).equals(splitAlgoNameTokens(tmpB));
-  }
+  } // method equalsAlgoName
 
   private static Set<String> splitAlgoNameTokens(String algoName) {
     Args.notBlank(algoName, "algoName");
@@ -863,14 +862,14 @@ public class AlgorithmUtil {
         endIndex = len;
       }
     }
-  }
+  } // method splitAlgoNameTokens
 
   // CHECKSTYLE:SKIP
   private static AlgorithmIdentifier buildRSAPSSAlgId(HashAlgo digestAlg)
       throws NoSuchAlgorithmException {
     RSASSAPSSparams params = createPSSRSAParams(digestAlg);
     return new AlgorithmIdentifier(PKCSObjectIdentifiers.id_RSASSA_PSS, params);
-  }
+  } // method buildRSAPSSAlgId
 
   // CHECKSTYLE:SKIP
   private static RSASSAPSSparams createPSSRSAParams(HashAlgo digestAlg)
@@ -884,7 +883,7 @@ public class AlgorithmUtil {
 
   private static ASN1ObjectIdentifier getCurveOidForName(String curveName) {
     return curveNameToOidMap.get(Args.toNonBlankLower(curveName, "curveName"));
-  }
+  } // method getCurveOidForName
 
   // CHECKSTYLE:SKIP
   public static List<String> getECCurveNames() {
@@ -905,7 +904,7 @@ public class AlgorithmUtil {
       oid = getCurveOidForName(curveNameOrOid);
     }
     return oid;
-  }
+  } // method getCurveOidForCurveNameOrOid
 
   private static String canonicalizeAlgoText(String algoText) {
     if (algoText.indexOf('-') == -1) {
@@ -921,6 +920,6 @@ public class AlgorithmUtil {
     }
 
     return algoText;
-  }
+  } // method canonicalizeAlgoText
 
 }

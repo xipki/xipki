@@ -81,7 +81,7 @@ class SM2Signer {
         ((ECPrivateKeyParameters)ecKey).getD()).normalize();
 
     this.digest = HashAlgo.SM3.createDigest();
-  }
+  } // constructor
 
   public byte[] generateSignatureForMessage(byte[] userId, byte[] message) throws CryptoException {
     // CHECKSTYLE:SKIP
@@ -102,7 +102,7 @@ class SM2Signer {
     byte[] hash = new byte[digest.getDigestSize()];
     digest.doFinal(hash, 0);
     return generateSignatureForHash(hash);
-  }
+  } // method generateSignatureForMessage
 
   // CHECKSTYLE:SKIP
   public byte[] generateSignatureForHash(byte[] eHash) throws CryptoException {
@@ -146,7 +146,7 @@ class SM2Signer {
     } catch (IOException ex) {
       throw new CryptoException("unable to encode signature: " + ex.getMessage(), ex);
     }
-  }
+  } // method generateSignatureForHash
   // CHECKSTYLE:ON
 
 }

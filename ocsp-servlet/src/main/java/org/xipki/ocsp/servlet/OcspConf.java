@@ -64,7 +64,7 @@ public class OcspConf extends ValidatableConf {
     public void validate() throws InvalidConfException {
     }
 
-  }
+  } // class RemoteMgmt
 
   public static final String DFLT_SERVER_CONF = "xipki/etc/ocsp/ocsp-responder.json";
 

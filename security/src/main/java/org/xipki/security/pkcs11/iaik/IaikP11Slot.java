@@ -282,7 +282,7 @@ class IaikP11Slot extends P11Slot {
     } finally {
       sessions.requite(bagEntry);
     }
-  } // method refresh
+  } // method refresh0
 
   @Override
   public final void close() {
@@ -303,7 +303,7 @@ class IaikP11Slot extends P11Slot {
     // clear the session pool
     sessions.close();
     countSessions.lazySet(0);
-  }
+  } // method close
 
   private void analyseSingleKey(SecretKey secretKey, P11SlotRefreshResult refreshResult) {
     byte[] id = secretKey.getId().getByteArrayValue();
@@ -317,7 +317,7 @@ class IaikP11Slot extends P11Slot {
     IaikP11Identity identity = new IaikP11Identity(this,
         new P11IdentityId(slotId, objectId, null, null), secretKey);
     refreshResult.addIdentity(identity);
-  }
+  } // method analyseSingleKey
 
   private void analyseSingleKey(Session session, PrivateKey privKey,
       P11SlotRefreshResult refreshResult) throws P11TokenException, XiSecurityException {
@@ -353,7 +353,7 @@ class IaikP11Slot extends P11Slot {
     IaikP11Identity identity = new IaikP11Identity(this,
         new P11IdentityId(slotId, objectId, pubKeyLabel, certLabel), privKey, pubKey, certs);
     refreshResult.addIdentity(identity);
-  }
+  } // method analyseSingleKey
 
   byte[] digestKey(long mechanism, IaikP11Identity identity) throws P11TokenException {
     Args.notNull(identity, "identity");
@@ -412,7 +412,7 @@ class IaikP11Slot extends P11Slot {
     } finally {
       sessions.requite(session0);
     }
-  }
+  } // method digestKey
 
   private byte[] digestKey0(Session session, int digestLen, Mechanism mechanism, SecretKey key)
       throws TokenException {
@@ -421,7 +421,7 @@ class IaikP11Slot extends P11Slot {
     byte[] digest = new byte[digestLen];
     session.digestFinal(digest, 0, digestLen);
     return digest;
-  }
+  } // method digestKey0
 
   byte[] sign(long mechanism, P11Params parameters, byte[] content, IaikP11Identity identity)
       throws P11TokenException {
@@ -474,7 +474,7 @@ class IaikP11Slot extends P11Slot {
     } catch (TokenException ex) {
       throw new P11TokenException(ex.getMessage(), ex);
     }
-  }
+  } // method sign
 
   private byte[] sign0(Session session, int expectedSignatureLen, Mechanism mechanism,
       byte[] content, Key signingKey) throws TokenException {
@@ -494,7 +494,7 @@ class IaikP11Slot extends P11Slot {
     }
 
     return session.signFinal(expectedSignatureLen);
-  }
+  } // method sign0
 
   private byte[] singleSign(Session session, Mechanism mechanism, byte[] content,
       Key signingKey) throws TokenException {
@@ -502,7 +502,7 @@ class IaikP11Slot extends P11Slot {
     session.signInit(mechanism, signingKey);
     byte[] signature = session.sign(content);
     return signature;
-  }
+  } // method singleSign
 
   private static Mechanism getMechanism(long mechanism, P11Params parameters)
       throws P11TokenException {
@@ -529,7 +529,7 @@ class IaikP11Slot extends P11Slot {
     }
 
     return ret;
-  }
+  } // method getMechanism
 
   private Session openSession() throws P11TokenException {
     Session session;
@@ -541,7 +541,7 @@ class IaikP11Slot extends P11Slot {
     }
     countSessions.incrementAndGet();
     return session;
-  }
+  } // method openSession
 
   private ConcurrentBagEntry<Session> borrowSession() throws P11TokenException {
     ConcurrentBagEntry<Session> session = null;
@@ -572,7 +572,7 @@ class IaikP11Slot extends P11Slot {
 
     login(session.value());
     return session;
-  }
+  } // method borrowSession
 
   private void firstLogin(Session session, List<char[]> password) throws P11TokenException {
     try {
@@ -597,7 +597,7 @@ class IaikP11Slot extends P11Slot {
     } catch (TokenException ex) {
       throw new P11TokenException(ex.getMessage(), ex);
     }
-  }
+  } // method firstLogin
 
   private void login(Session session) throws P11TokenException {
     boolean isSessionLoggedIn = checkSessionLoggedIn(session);
@@ -625,7 +625,7 @@ class IaikP11Slot extends P11Slot {
         singleLogin(session, singlePwd);
       }
     }
-  }
+  } // method login
 
   private void forceLogin(Session session) throws P11TokenException {
     if (CollectionUtil.isEmpty(password)) {
@@ -637,7 +637,7 @@ class IaikP11Slot extends P11Slot {
         singleLogin(session, singlePwd);
       }
     }
-  }
+  } // method forceLogin
 
   private void singleLogin(Session session, char[] pin) throws P11TokenException {
     char[] tmpPin = pin;
@@ -659,7 +659,7 @@ class IaikP11Slot extends P11Slot {
             "login failed as user " + userTypeText + ": " + ex.getMessage(), ex);
       }
     }
-  }
+  } // method singleLogin
 
   private List<PrivateKey> getAllPrivateObjects(Session session) throws P11TokenException {
     PrivateKey template = new PrivateKey();
@@ -677,7 +677,7 @@ class IaikP11Slot extends P11Slot {
     }
 
     return privateKeys;
-  }
+  } // method getAllPrivateObjects
 
   private List<SecretKey> getAllSecretKeyObjects(Session session) throws P11TokenException {
     SecretKey template = new SecretKey();
@@ -695,7 +695,7 @@ class IaikP11Slot extends P11Slot {
     }
 
     return keys;
-  }
+  } // method getAllSecretKeyObjects
 
   private SecretKey getSecretKeyObject(Session session, byte[] keyId, char[] keyLabel)
       throws P11TokenException {
@@ -732,7 +732,7 @@ class IaikP11Slot extends P11Slot {
     }
 
     return (Key) tmpObjects.get(0);
-  }
+  } // method getKeyObject
 
   private X509PublicKeyCertificate getCertificateObject(Session session, byte[] keyId,
       char[] keyLabel) throws P11TokenException {
@@ -758,7 +758,7 @@ class IaikP11Slot extends P11Slot {
     }
 
     return (X509PublicKeyCertificate) tmpObjects.get(0);
-  }
+  } // method getCertificateObject
 
   private boolean checkSessionLoggedIn(Session session) throws P11TokenException {
     SessionInfo info;
@@ -790,7 +790,7 @@ class IaikP11Slot extends P11Slot {
 
     LOG.debug("sessionLoggedIn: {}", sessionLoggedIn);
     return sessionLoggedIn;
-  }
+  } // method checkSessionLoggedIn
 
   private static List<Storage> getObjects(Session session, Storage template)
       throws P11TokenException {
@@ -901,7 +901,7 @@ class IaikP11Slot extends P11Slot {
     } catch (CertificateException ex) {
       throw new P11TokenException("could not parse certificate: " + ex.getMessage(), ex);
     }
-  }
+  } // method parseCert
 
   private List<X509PublicKeyCertificate> getAllCertificateObjects(Session session)
       throws P11TokenException {
@@ -914,7 +914,7 @@ class IaikP11Slot extends P11Slot {
       certs.add(cert);
     }
     return certs;
-  }
+  } // method getAllCertificateObjects
 
   @Override
   public int removeObjects(byte[] id, String label) throws P11TokenException {
@@ -948,7 +948,7 @@ class IaikP11Slot extends P11Slot {
 
     num += removeObjects(certTemplate, "certificates" + objIdDesc);
     return num;
-  }
+  } // method removeObjects
 
   private int removeObjects(Storage template, String desc) throws P11TokenException {
     ConcurrentBagEntry<Session> bagEntry = borrowSession();
@@ -975,7 +975,7 @@ class IaikP11Slot extends P11Slot {
     } finally {
       sessions.requite(bagEntry);
     }
-  }
+  } // method removeObjects
 
   @Override
   protected void removeCerts0(P11ObjectIdentifier objectId) throws P11TokenException {
@@ -1001,7 +1001,7 @@ class IaikP11Slot extends P11Slot {
     } finally {
       sessions.requite(bagEntry);
     }
-  }
+  } // method removeCerts0
 
   @Override
   protected P11ObjectIdentifier addCert0(X509Certificate cert, P11NewObjectControl control)
@@ -1021,7 +1021,7 @@ class IaikP11Slot extends P11Slot {
     } finally {
       sessions.requite(bagEntry);
     }
-  }
+  } // method addCert0
 
   @Override
   protected P11Identity generateSecretKey0(long keyType, int keysize, P11NewKeyControl control)
@@ -1130,7 +1130,7 @@ class IaikP11Slot extends P11Slot {
     } finally {
       sessions.requite(bagEntry);
     }
-  }
+  } // method generateSecretKey0
 
   @Override
   protected P11Identity importSecretKey0(long keyType, byte[] keyValue, P11NewKeyControl control)
@@ -1211,7 +1211,7 @@ class IaikP11Slot extends P11Slot {
     } finally {
       sessions.requite(bagEntry);
     }
-  }
+  } // method importSecretKey0
 
   @Override
   protected P11Identity generateRSAKeypair0(int keysize, BigInteger publicExponent,
@@ -1229,7 +1229,7 @@ class IaikP11Slot extends P11Slot {
     }
 
     return generateKeyPair(mech, control.getId(), privateKey, publicKey);
-  }
+  } // method generateRSAKeypair0
 
   @Override
   // CHECKSTYLE:SKIP
@@ -1246,7 +1246,7 @@ class IaikP11Slot extends P11Slot {
     publicKey.getSubprime().setByteArrayValue(Util.unsignedBigIntergerToByteArray(q));
     publicKey.getBase().setByteArrayValue(Util.unsignedBigIntergerToByteArray(g));
     return generateKeyPair(mech, control.getId(), privateKey, publicKey);
-  }
+  } // method generateDSAKeypair0
 
   @Override
   protected P11Identity generateECEdwardsKeypair0(ASN1ObjectIdentifier curveId,
@@ -1265,7 +1265,7 @@ class IaikP11Slot extends P11Slot {
     }
     publicKey.getEcdsaParams().setByteArrayValue(encodedCurveId);
     return generateKeyPair(mech, control.getId(), privateKey, publicKey);
-  }
+  } // method generateECEdwardsKeypair0
 
   @Override
   protected P11Identity generateECMontgomeryKeypair0(ASN1ObjectIdentifier curveId,
@@ -1284,7 +1284,7 @@ class IaikP11Slot extends P11Slot {
     }
     publicKey.getEcdsaParams().setByteArrayValue(encodedCurveId);
     return generateKeyPair(mech, control.getId(), privateKey, publicKey);
-  }
+  } // method generateECMontgomeryKeypair0
 
   @Override
   protected P11Identity generateECKeypair0(ASN1ObjectIdentifier curveId, P11NewKeyControl control)
@@ -1318,7 +1318,7 @@ class IaikP11Slot extends P11Slot {
       }
       return generateKeyPair(mech, control.getId(), privateKey, publicKey);
     }
-  }
+  } // method generateECKeypair0
 
   @Override
   protected P11Identity generateSM2Keypair0(P11NewKeyControl control) throws P11TokenException {
@@ -1329,7 +1329,7 @@ class IaikP11Slot extends P11Slot {
     ECPublicKey publicKey = new ECPublicKey(KeyType.VENDOR_SM2);
     setKeyAttributes(control, publicKey, privateKey);
     return generateKeyPair(mech, control.getId(), privateKey, publicKey);
-  }
+  } // method generateSM2Keypair0
 
   private P11Identity generateKeyPair(long mech, byte[] id, PrivateKey privateKeyTemplate,
       PublicKey publicKeyTemplate) throws P11TokenException {
@@ -1413,7 +1413,7 @@ class IaikP11Slot extends P11Slot {
         }
       }
     }
-  }
+  } // method generateKeyPair
 
   private X509PublicKeyCertificate createPkcs11Template(Session session, X509Cert cert,
       P11NewObjectControl control) throws P11TokenException {
@@ -1458,7 +1458,7 @@ class IaikP11Slot extends P11Slot {
 
     newCertTemp.getValue().setByteArrayValue(cert.getEncodedCert());
     return newCertTemp;
-  }
+  } // method createPkcs11Template
 
   private void setKeyAttributes(P11NewKeyControl control,
       PublicKey publicKey, PrivateKey privateKey) {
@@ -1526,7 +1526,7 @@ class IaikP11Slot extends P11Slot {
       }
       publicKey.getVerify().setBooleanValue(true);
     }
-  }
+  } // method setKeyAttributes
 
   @Override
   protected void updateCertificate0(P11ObjectIdentifier keyId, X509Certificate newCert)
@@ -1555,7 +1555,7 @@ class IaikP11Slot extends P11Slot {
     } finally {
       sessions.requite(bagEntry);
     }
-  }
+  } // method updateCertificate0
 
   private X509PublicKeyCertificate[] getCertificateObjects(Session session, byte[] keyId,
       char[] keyLabel) throws P11TokenException {
@@ -1580,7 +1580,7 @@ class IaikP11Slot extends P11Slot {
       certs[i] = (X509PublicKeyCertificate) tmpObjects.get(i);
     }
     return certs;
-  }
+  } // method getCertificateObjects
 
   @Override
   protected void removeIdentity0(P11IdentityId identityId) throws P11TokenException {
@@ -1649,7 +1649,7 @@ class IaikP11Slot extends P11Slot {
     } finally {
       sessions.requite(bagEntry);
     }
-  }
+  } // method removeIdentity0
 
   private byte[] generateId(Session session) throws P11TokenException {
     byte[] keyId = null;
@@ -1703,7 +1703,7 @@ class IaikP11Slot extends P11Slot {
     }
 
     return objects.length > 0;
-  }
+  } // method idExists
 
   private static boolean labelExists(Session session, char[] keyLabel) throws P11TokenException {
     Args.notNull(keyLabel, "keyLabel");
@@ -1744,7 +1744,7 @@ class IaikP11Slot extends P11Slot {
     }
 
     return objects.length > 0;
-  }
+  } // method labelExists
 
   private static void logPkcs11ObjectAttributes(String prefix, PKCS11Object p11Object) {
     if (!LOG.isDebugEnabled()) {
@@ -1764,6 +1764,6 @@ class IaikP11Slot extends P11Slot {
     }
 
     LOG.debug(sb.toString());
-  }
+  } // method logPkcs11ObjectAttributes
 
 }

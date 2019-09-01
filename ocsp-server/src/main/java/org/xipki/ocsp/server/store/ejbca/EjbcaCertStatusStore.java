@@ -212,7 +212,7 @@ public class EjbcaCertStatusStore extends OcspStore {
         storeUpdateInProcess.set(false);
       }
     } // end lock
-  } // method initIssuerStore
+  } // method updateIssuerStore
 
   @Override
   protected CertStatusInfo getCertStatus0(Date time, RequestIssuer reqIssuer,
@@ -372,7 +372,7 @@ public class EjbcaCertStatusStore extends OcspStore {
       throw new OcspStoreException(ex.getMessage(), ex);
     }
 
-  } // method getCertStatus
+  } // method getCertStatus0
 
   /**
    * Borrow Prepared Statement.
@@ -408,7 +408,7 @@ public class EjbcaCertStatusStore extends OcspStore {
       LogUtil.error(LOG, ex);
       return false;
     }
-  }
+  } // method isHealthy
 
   private void releaseDbResources(Statement ps, ResultSet rs) {
     datasource.releaseResources(ps, rs);
@@ -488,7 +488,7 @@ public class EjbcaCertStatusStore extends OcspStore {
         }
       }
     }
-  }
+  } // method init
 
   @Override
   public void close() {
@@ -533,7 +533,7 @@ public class EjbcaCertStatusStore extends OcspStore {
       }
     }
     return certs;
-  }
+  } // method parseCerts
 
   private static String extractTextFromCaData(String caData, String key, String valueType) {
     String keyTag = "<string>" + key + "</string>";
@@ -557,6 +557,6 @@ public class EjbcaCertStatusStore extends OcspStore {
     }
 
     return caData.substring(startIndex, index);
-  }
+  } // method extractTextFromCaData
 
 }

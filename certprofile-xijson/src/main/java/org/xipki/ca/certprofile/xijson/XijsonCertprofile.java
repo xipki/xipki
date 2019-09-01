@@ -703,7 +703,7 @@ public class XijsonCertprofile extends BaseCertprofile {
       subjectToSubjectAltNameModes.put(
           new ASN1ObjectIdentifier(m.getSource().getOid()), targetTag);
     }
-  }
+  } // method initSubjectToSubjectAltNames
 
   private void initAdditionalInformation(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
@@ -717,7 +717,7 @@ public class XijsonCertprofile extends BaseCertprofile {
             new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
       }
     }
-  }
+  } // method initAdditionalInformation
 
   private void initAdmission(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
@@ -735,7 +735,7 @@ public class XijsonCertprofile extends BaseCertprofile {
         }
       }
     }
-  }
+  } // method initAdmission
 
   private void initAuthorityInfoAccess(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
@@ -748,7 +748,7 @@ public class XijsonCertprofile extends BaseCertprofile {
             extConf.isIncludeOcsp(), extConf.getCaIssuersProtocols(), extConf.getOcspProtocols());
       }
     }
-  }
+  } // method initAuthorityInfoAccess
 
   private void initAuthorityKeyIdentifier(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
@@ -758,7 +758,7 @@ public class XijsonCertprofile extends BaseCertprofile {
       AuthorityKeyIdentifier extConf = getExtension(type, extensions).getAuthorityKeyIdentifier();
       this.useIssuerAndSerialInAki = (extConf == null) ? false : extConf.isUseIssuerAndSerial();
     }
-  }
+  } // method initAuthorityKeyIdentifier
 
   private void initAuthorizationTemplate(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
@@ -775,7 +775,7 @@ public class XijsonCertprofile extends BaseCertprofile {
             new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
       }
     }
-  }
+  } // method initAuthorizationTemplate
 
   private void initBasicConstraints(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
@@ -787,7 +787,7 @@ public class XijsonCertprofile extends BaseCertprofile {
         this.pathLen = extConf.getPathLen();
       }
     }
-  }
+  } // method initBasicConstraints
 
   private void initBiometricInfo(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
@@ -803,7 +803,7 @@ public class XijsonCertprofile extends BaseCertprofile {
         }
       }
     }
-  }
+  } // method initBiometricInfo
 
   private void initCertificatePolicies(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
@@ -815,7 +815,7 @@ public class XijsonCertprofile extends BaseCertprofile {
         certificatePolicies = extConf.toXiCertificatePolicies();
       }
     }
-  }
+  } // method initCertificatePolicies
 
   private void initCrlDistributionPoints(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
@@ -827,7 +827,7 @@ public class XijsonCertprofile extends BaseCertprofile {
         crlDpControl = new CrlDistributionPointsControl(extConf.getProtocols());
       }
     }
-  }
+  } // method initCrlDistributionPoints
 
   private void initExtendedKeyUsage(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
@@ -839,7 +839,7 @@ public class XijsonCertprofile extends BaseCertprofile {
         this.extendedKeyusages = extConf.toXiExtKeyUsageOptions();
       }
     }
-  }
+  } // method initExtendedKeyUsage
 
   private void initFreshestCrl(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
@@ -851,7 +851,7 @@ public class XijsonCertprofile extends BaseCertprofile {
         freshestCrlControl = new CrlDistributionPointsControl(extConf.getProtocols());
       }
     }
-  }
+  } // method initFreshestCrl
 
   private void initInhibitAnyPolicy(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
@@ -869,7 +869,7 @@ public class XijsonCertprofile extends BaseCertprofile {
         this.inhibitAnyPolicy = new ExtensionValue(extensionControls.get(type).isCritical(), value);
       }
     }
-  }
+  } // method initInhibitAnyPolicy
 
   private void initKeyUsage(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
@@ -881,7 +881,7 @@ public class XijsonCertprofile extends BaseCertprofile {
         this.keyusages = extConf.toXiKeyUsageOptions();
       }
     }
-  }
+  } // method initKeyUsage
 
   private void initNameConstraints(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
@@ -894,7 +894,7 @@ public class XijsonCertprofile extends BaseCertprofile {
         this.nameConstraints = new ExtensionValue(extensionControls.get(type).isCritical(), value);
       }
     }
-  }
+  } // method initNameConstraints
 
   private void initPrivateKeyUsagePeriod(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
@@ -906,7 +906,7 @@ public class XijsonCertprofile extends BaseCertprofile {
         privateKeyUsagePeriod = Validity.getInstance(extConf.getValidity());
       }
     }
-  }
+  } // method initPrivateKeyUsagePeriod
 
   private void initPolicyConstraints(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
@@ -920,7 +920,7 @@ public class XijsonCertprofile extends BaseCertprofile {
             new ExtensionValue(extensionControls.get(type).isCritical(), value);
       }
     }
-  }
+  } // method initPolicyConstraints
 
   private void initPolicyMappings(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
@@ -933,7 +933,7 @@ public class XijsonCertprofile extends BaseCertprofile {
         this.policyMappings = new ExtensionValue(extensionControls.get(type).isCritical(), value);
       }
     }
-  }
+  } // method initPolicyMappings
 
   private void initQcStatements(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
@@ -1036,7 +1036,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     ASN1Sequence seq = new DERSequence(vec);
     qcStatments = new ExtensionValue(extensionControls.get(type).isCritical(), seq);
     qcStatementsOption = null;
-  }
+  } // method initQcStatements
 
   private void initRestriction(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
@@ -1049,7 +1049,7 @@ public class XijsonCertprofile extends BaseCertprofile {
         restriction = new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
       }
     }
-  }
+  } // method initRestriction
 
   private void initSmimeCapabilities(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
@@ -1085,7 +1085,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
     ASN1Encodable extValue = new DERSequence(vec);
     smimeCapabilities = new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
-  }
+  } // method initSmimeCapabilities
 
   private void initSubjectAlternativeName(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
@@ -1097,7 +1097,7 @@ public class XijsonCertprofile extends BaseCertprofile {
         this.subjectAltNameModes = extConf.toGeneralNameModes();
       }
     }
-  }
+  } // method initSubjectAlternativeName
 
   private void initSubjectInfoAccess(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
@@ -1115,7 +1115,7 @@ public class XijsonCertprofile extends BaseCertprofile {
         }
       }
     }
-  }
+  } // method initSubjectInfoAccess
 
   private void initTlsFeature(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
@@ -1145,7 +1145,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     }
     ASN1Encodable extValue = new DERSequence(vec);
     tlsFeature = new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
-  }
+  } // method initTlsFeature
 
   /**
    * See <a href="https://www.hrz.tu-darmstadt.de/itsicherheit/object_identifier/oids_der_informatik__cdc/index.de.jsp#validity_models">Validity Model</a>
@@ -1169,7 +1169,7 @@ public class XijsonCertprofile extends BaseCertprofile {
         validityModel = new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
       }
     }
-  }
+  } // method initValidityModel
 
   private void initSubjectDirAttrs(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
@@ -1183,7 +1183,7 @@ public class XijsonCertprofile extends BaseCertprofile {
         subjectDirAttrsControl = new SubjectDirectoryAttributesControl(types);
       }
     }
-  }
+  } // method initSubjectDirAttrs
 
   private void initGmt0015Extensions(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) throws CertprofileException {
@@ -1192,7 +1192,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     extnIds.remove(Extn.id_GMT_0015_InsuranceNumber);
     extnIds.remove(Extn.id_GMT_0015_OrganizationCode);
     extnIds.remove(Extn.id_GMT_0015_TaxationNumber);
-  }
+  } // method initGmt0015Extensions
 
   private static List<ASN1ObjectIdentifier> toOidList(List<DescribableOid> oidWithDescTypes) {
     if (CollectionUtil.isEmpty(oidWithDescTypes)) {
@@ -1875,7 +1875,7 @@ public class XijsonCertprofile extends BaseCertprofile {
       Date notBefore, Date notAfter, PublicCaInfo caInfo)
           throws CertprofileException, BadCertTemplateException {
     return null;
-  }
+  } // method getExtraExtensions
 
   private GeneralNames createRequestedSubjectAltNames(X500Name requestedSubject,
       X500Name grantedSubject, Map<ASN1ObjectIdentifier, Extension> requestedExtensions)
@@ -1952,7 +1952,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
     return grantedNames.isEmpty() ? null :
       new GeneralNames(grantedNames.toArray(new GeneralName[0]));
-  }
+  } // method createRequestedSubjectAltNames
 
   @Override
   public Set<KeyUsageControl> getKeyUsage() {
@@ -2177,7 +2177,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     }
 
     return extension;
-  } // method getExtensionValue
+  } // method getExtension
 
   private static ASN1Encodable readAsn1Encodable(byte[] encoded) throws CertprofileException {
     ASN1StreamParser parser = new ASN1StreamParser(encoded);
@@ -2186,6 +2186,6 @@ public class XijsonCertprofile extends BaseCertprofile {
     } catch (IOException ex) {
       throw new CertprofileException("could not parse the constant extension value", ex);
     }
-  }
+  } // method readAsn1Encodable
 
 }

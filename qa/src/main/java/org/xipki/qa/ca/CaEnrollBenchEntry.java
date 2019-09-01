@@ -55,7 +55,7 @@ public class CaEnrollBenchEntry {
       return null;
     }
 
-  } // enum RandomDN
+  } // class RandomDN
 
   private static class IncreasableSubject {
 
@@ -100,7 +100,7 @@ public class CaEnrollBenchEntry {
         throw new IllegalArgumentException("subjectTemplate does not contain DN field "
             + ObjectIdentifiers.oidToDisplayName(this.subjectRdnForIncrement));
       }
-    }
+    } // constructor
 
     private X500Name getX500Name(long index) {
       RDN[] baseRdns = subjectTemplate.getRDNs();
@@ -122,7 +122,7 @@ public class CaEnrollBenchEntry {
         newRdns[i] = rdn;
       }
       return new X500Name(newRdns);
-    }
+    } // method getX500Name
 
   } // class IncreasableSubject
 
