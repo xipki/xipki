@@ -129,7 +129,7 @@ public class ProxyP11Slot extends P11Slot {
     }
 
     return refreshResult;
-  }
+  } // method refresh0
 
   @Override
   public void close() {

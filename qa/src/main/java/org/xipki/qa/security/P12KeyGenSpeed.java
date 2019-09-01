@@ -99,7 +99,7 @@ public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
       KeyUtil.generateRSAKeypair(keysize, publicExponent, random);
     }
 
-  }
+  } // class RSA
 
   class Testor implements Runnable {
 

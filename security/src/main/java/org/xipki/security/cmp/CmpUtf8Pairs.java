@@ -152,7 +152,7 @@ public class CmpUtf8Pairs {
     }
 
     return sb.toString();
-  } // method getEncoded
+  } // method encoded
 
   @Override
   public String toString() {

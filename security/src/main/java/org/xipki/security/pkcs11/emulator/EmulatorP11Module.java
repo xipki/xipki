@@ -52,7 +52,7 @@ public class EmulatorP11Module extends P11Module {
     YUBIKEY,
     GENERAL
 
-  }
+  } // class Vendor
 
   public static final String TYPE = "emulator";
 

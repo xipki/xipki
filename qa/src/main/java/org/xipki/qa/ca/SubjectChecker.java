@@ -390,7 +390,7 @@ public class SubjectChecker {
         throw new IllegalStateException("should not reach here, unknown StringType " + stringType);
     } // end switch
     return correctStringType;
-  }
+  } // method matchStringType
 
   private static String getRdnTextValueOfRequest(RDN requestedRdn)
       throws BadCertTemplateException {
@@ -420,7 +420,7 @@ public class SubjectChecker {
     } else {
       return X509Util.rdnValueToString(vec);
     }
-  }
+  } // method getRdnTextValueOfRequest
 
   private static ValidationIssue createSubjectIssue(ASN1ObjectIdentifier subjectAttrType) {
     ValidationIssue issue;
@@ -434,7 +434,7 @@ public class SubjectChecker {
           + " (" + subjectAttrType.getId() + ")");
     }
     return issue;
-  }
+  } // method createSubjectIssue
 
   private static String getAtvValueString(String name, AttributeTypeAndValue atv,
       StringType stringType, StringBuilder failureMsg) {
