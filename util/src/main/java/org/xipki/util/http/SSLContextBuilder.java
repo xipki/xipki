@@ -58,7 +58,8 @@ import org.xipki.util.Args;
 /**
  * Builder for {@link javax.net.ssl.SSLContext} instances.
  * <p>
- * Please note: the default Oracle JSSE implementation of {@link SSLContext#init(KeyManager[], TrustManager[], SecureRandom)}
+ * Please note: the default Oracle JSSE implementation of {@link SSLContext#init(KeyManager[],
+ *  TrustManager[], SecureRandom)}
  * accepts multiple key and trust managers, however only first matching type is ever used.
  * See for example:
  * <a href="http://docs.oracle.com/javase/7/docs/api/javax/net/ssl/SSLContext.html#init%28javax.net.ssl.KeyManager[],%20javax.net.ssl.TrustManager[],%20java.security.SecureRandom%29">
@@ -181,7 +182,8 @@ public class SSLContextBuilder {
    *      Cryptography Architecture Standard Algorithm Name Documentation</a>
    * @since 4.4.7
    */
-  public SSLContextBuilder setTrustManagerFactoryAlgorithm(final String trustManagerFactoryAlgorithm) {
+  public SSLContextBuilder setTrustManagerFactoryAlgorithm(
+      final String trustManagerFactoryAlgorithm) {
     this.trustManagerFactoryAlgorithm = trustManagerFactoryAlgorithm;
     return this;
   }
@@ -190,8 +192,9 @@ public class SSLContextBuilder {
       final KeyStore truststore)
           throws NoSuchAlgorithmException, KeyStoreException {
     final TrustManagerFactory tmfactory = TrustManagerFactory
-            .getInstance(trustManagerFactoryAlgorithm == null ? TrustManagerFactory.getDefaultAlgorithm()
-                    : trustManagerFactoryAlgorithm);
+            .getInstance(trustManagerFactoryAlgorithm == null
+                ? TrustManagerFactory.getDefaultAlgorithm()
+                : trustManagerFactoryAlgorithm);
     tmfactory.init(truststore);
     final TrustManager[] tms = tmfactory.getTrustManagers();
     if (tms != null) {
@@ -234,8 +237,9 @@ public class SSLContextBuilder {
       final char[] keyPassword)
       throws NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException {
     final KeyManagerFactory kmfactory = KeyManagerFactory
-            .getInstance(keyManagerFactoryAlgorithm == null ? KeyManagerFactory.getDefaultAlgorithm()
-                    : keyManagerFactoryAlgorithm);
+            .getInstance(keyManagerFactoryAlgorithm == null
+                ? KeyManagerFactory.getDefaultAlgorithm()
+                : keyManagerFactoryAlgorithm);
     kmfactory.init(keystore, keyPassword);
     final KeyManager[] kms = kmfactory.getKeyManagers();
     if (kms != null) {
@@ -279,7 +283,8 @@ public class SSLContextBuilder {
       final SecureRandom secureRandom) throws KeyManagementException {
     sslContext.init(
         !keyManagers.isEmpty() ? keyManagers.toArray(new KeyManager[keyManagers.size()]) : null,
-        !trustManagers.isEmpty() ? trustManagers.toArray(new TrustManager[trustManagers.size()]) : null,
+        !trustManagers.isEmpty()
+            ? trustManagers.toArray(new TrustManager[trustManagers.size()]) : null,
         secureRandom);
   }
 
@@ -300,9 +305,10 @@ public class SSLContextBuilder {
   @Override
   public String toString() {
     return "[provider=" + provider + ", protocol=" + protocol + ", keyStoreType=" + keyStoreType
-        + ", keyManagerFactoryAlgorithm=" + keyManagerFactoryAlgorithm + ", keyManagers=" + keyManagers
-        + ", trustManagerFactoryAlgorithm=" + trustManagerFactoryAlgorithm + ", trustManagers=" + trustManagers
-        + ", secureRandom=" + secureRandom + "]";
+        + ", keyManagerFactoryAlgorithm=" + keyManagerFactoryAlgorithm
+        + ", keyManagers=" + keyManagers
+        + ", trustManagerFactoryAlgorithm=" + trustManagerFactoryAlgorithm
+        + ", trustManagers=" + trustManagers + ", secureRandom=" + secureRandom + "]";
   }
 
 }
