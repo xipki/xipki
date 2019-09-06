@@ -2,8 +2,11 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
-## 5.3.4
+## 5.3.5
   - Release date: -
+
+## 5.3.4
+  - Release date: September 6, 2019
   - OCSP
     - Fixed bug "OCSP server cannot answer anymore" (this bug is introduced in 5.3.3)
 
