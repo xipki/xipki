@@ -1772,7 +1772,6 @@ public class XijsonCertprofile extends BaseCertprofile {
         }
       }
 
-      // TODO: add the validity check of extnStr
       if (StringUtil.isNotBlank(extnStr)) {
         final boolean explicit = true;
         ASN1Encodable extnValue = null;
@@ -1817,7 +1816,6 @@ public class XijsonCertprofile extends BaseCertprofile {
         }
 
         if (StringUtil.isNotBlank(extnStr)) {
-          // TODO: add the validity check of extnStr
           occurences.remove(m);
           ASN1Encodable extnValue = new DERPrintableString(extnStr);
           values.addExtension(m,
