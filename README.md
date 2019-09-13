@@ -142,11 +142,11 @@ preload <start script>
  
    * Setup CA
       * In case of using new keys and certificates, in CLI:  
-        `source xipki/setup/cacert-none/setup-*.script`
+        `source xipki/ca-setup/cacert-none/setup-*.script`
          where * is place holder.
 
       * In case of using existing keys and certificates, in CLI:  
-        `source xipki/setup/cacert-present/setup-*.script`
+        `source xipki/ca-setup/cacert-present/setup-*.script`
          where * is place holder.
 
    * Verify the installation, execute the command in CLI:  
