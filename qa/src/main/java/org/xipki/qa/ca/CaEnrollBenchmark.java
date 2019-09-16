@@ -289,7 +289,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
   }
 
   @Override
-  protected int getRealAccount(int account) {
+  protected long getRealAccount(long account) {
     return num * account;
   }
 
