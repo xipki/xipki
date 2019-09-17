@@ -17,6 +17,8 @@
 
 package org.xipki.audit;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.xipki.audit.services.EmbedAuditService;
 import org.xipki.audit.services.SyslogAuditService;
 
@@ -90,9 +92,9 @@ public class Audits {
         String className = auditType.substring("java:".length());
         try {
           Class<?> clazz = Class.forName(className);
-          service = (AuditService) clazz.newInstance();
-        } catch (ClassCastException | ClassNotFoundException | IllegalAccessException
-            | InstantiationException ex) {
+          service = (AuditService) clazz.getDeclaredConstructor().newInstance();
+        } catch (ClassCastException | ClassNotFoundException | NoSuchMethodException
+            | IllegalAccessException | InstantiationException | InvocationTargetException ex) {
           throw new AuditServiceRuntimeException(
               "error caught while initializing AuditService " + auditType
               + ": " + ex.getClass().getName() + ": " + ex.getMessage(), ex);
