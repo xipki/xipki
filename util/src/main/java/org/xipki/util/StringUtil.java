@@ -178,7 +178,7 @@ public class StringUtil {
     return formatTime(seconds, minLen);
   }
 
-  private static String formatTime(long seconds, int minLen) {
+  public static String formatTime(long seconds, int minLen) {
     long minutes = seconds / 60;
 
     StringBuilder sb = new StringBuilder();

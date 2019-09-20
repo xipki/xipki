@@ -48,6 +48,8 @@ public class ProcessLog {
 
   private static final long DAY_IN_SEC = 24L * 60 * 60;
 
+  private static final int MIN_LEN_LONGTEXT = 15;
+
   private static final int MIN_LEN = 12;
 
   private final long total;
@@ -80,14 +82,14 @@ public class ProcessLog {
     StringBuilder sb = new StringBuilder();
 
     // first header line
-    final int n = hasTotal ? 7 : 4;
-    for (int i = 0; i < n * MIN_LEN; i++) {
+    final int n = hasTotal ? 6 : 3;
+    for (int i = 0; i < MIN_LEN_LONGTEXT + n * MIN_LEN; i++) {
       sb.append('-');
     }
     sb.append('\n');
 
     // second header line
-    sb.append(formatText("total"));
+    sb.append(StringUtil.formatText("total", MIN_LEN_LONGTEXT));
     if (hasTotal) {
       sb.append(formatText("%"));
     }
@@ -98,7 +100,7 @@ public class ProcessLog {
     sb.append('\n');
 
     // third header line
-    sb.append(formatText(""));
+    sb.append(StringUtil.formatText("", MIN_LEN_LONGTEXT));
     if (hasTotal) {
       sb.append(formatText(""));
     }
@@ -129,8 +131,8 @@ public class ProcessLog {
     StringBuilder sb = new StringBuilder();
     sb.append('\n');
 
-    final int n = hasTotal ? 7 : 4;
-    for (int i = 0; i < n * MIN_LEN; i++) {
+    final int n = hasTotal ? 6 : 3;
+    for (int i = 0; i < MIN_LEN_LONGTEXT + n  * MIN_LEN; i++) {
       sb.append('-');
     }
 
@@ -189,7 +191,7 @@ public class ProcessLog {
     StringBuilder sb = new StringBuilder("\r");
 
     // processed number
-    sb.append(StringUtil.formatAccount(tmpNumProcessed, true));
+    sb.append(StringUtil.formatAccount(tmpNumProcessed, MIN_LEN_LONGTEXT));
 
     // processed percent
     if (hasTotal) {
