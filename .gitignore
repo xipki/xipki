@@ -48,6 +48,9 @@ bin/**
 tmp/**
 tmp/
 tmp/**/*
+temp/**
+temp/
+temp/**/*
 *.tmp
 *.bak
 *.swp
