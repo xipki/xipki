@@ -49,17 +49,17 @@
     <servlet.version>3.1.0</servlet.version>
     <karaf.version>4.2.6</karaf.version>
     <bc.version>1.63</bc.version>
-    <slf4j.version>1.7.7</slf4j.version>
+    <slf4j.version>1.7.25</slf4j.version>
     <pkcs11-wrapper.version>1.4.6</pkcs11-wrapper.version>
-    <liquibase.version>3.7.0</liquibase.version>
+    <liquibase.version>3.8.0</liquibase.version>
     <snakeyaml.version>1.23</snakeyaml.version>
-    <hikaricp.version>3.3.1</hikaricp.version>
+    <hikaricp.version>3.4.1</hikaricp.version>
     <syslog-java-client.version>1.1.7</syslog-java-client.version>
-    <fastjson.version>1.2.57</fastjson.version>
+    <fastjson.version>1.2.61</fastjson.version>
     <!-- only for runtime -->
-    <log4j.version>2.11.2</log4j.version>
-    <jdbc.mariadb.version>2.4.1</jdbc.mariadb.version>
-    <jdbc.postgresql.version>42.2.5</jdbc.postgresql.version>
+    <log4j.version>2.12.1</log4j.version>
+    <jdbc.mariadb.version>2.4.4</jdbc.mariadb.version>
+    <jdbc.postgresql.version>42.2.8</jdbc.postgresql.version>
     <!-- Only for test purpose -->
     <junit.version>4.8.2</junit.version>
   </properties>
