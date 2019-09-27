@@ -56,8 +56,12 @@ public abstract class BenchmarkExecutor {
   private String unit = "";
 
   public BenchmarkExecutor(String description) {
+    this(description, 0);
+  }
+
+  public BenchmarkExecutor(String description, int total) {
     this.description = Args.notNull(description, "description");
-    this.processLog = new ProcessLog(0);
+    this.processLog = new ProcessLog(total);
   }
 
   protected abstract Runnable getTestor() throws Exception;

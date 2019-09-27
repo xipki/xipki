@@ -48,13 +48,19 @@ public class ProcessLog {
 
   private static final long DAY_IN_SEC = 24L * 60 * 60;
 
-  private static final int MIN_LEN_LONGTEXT = 15;
+  private static final int DURATION_LEN = 10;
 
-  private static final int MIN_LEN = 12;
+  private static final int PERCENT_LEN = 6;
 
-  private final long total;
+  private static final int SPEED_LEN = 10;
 
-  private final boolean hasTotal;
+  private static final int TIME_LEN = 10;
+
+  private static final int TOTAL_LEN = 15;
+
+  private long total;
+
+  private boolean hasTotal;
 
   private long startTimeMs;
 
@@ -74,39 +80,45 @@ public class ProcessLog {
 
   public ProcessLog(long total) {
     this.total = total;
-    this.hasTotal = total > 0;
     reset();
   }
 
   public void printHeader() {
     StringBuilder sb = new StringBuilder();
 
+    final int lineLength = getLineLength();
+
     // first header line
-    final int n = hasTotal ? 6 : 3;
-    for (int i = 0; i < MIN_LEN_LONGTEXT + n * MIN_LEN; i++) {
+    for (int i = 0; i < lineLength; i++) {
       sb.append('-');
     }
     sb.append('\n');
 
     // second header line
-    sb.append(StringUtil.formatText("total", MIN_LEN_LONGTEXT));
+    sb.append(formatText("", TOTAL_LEN));
     if (hasTotal) {
-      sb.append(formatText("%"));
+      sb.append(formatText("", PERCENT_LEN));
     }
-    sb.append(formatText("average")).append(formatText("current")).append(formatText("time"));
+    sb.append(formatText("average", SPEED_LEN))
+        .append(formatText("current", SPEED_LEN))
+        .append(formatText("time", DURATION_LEN));
     if (hasTotal) {
-      sb.append(formatText("time")).append(formatText("finish"));
+      sb.append(formatText("time", DURATION_LEN))
+        .append(formatText("finish", TIME_LEN));
     }
     sb.append('\n');
 
     // third header line
-    sb.append(StringUtil.formatText("", MIN_LEN_LONGTEXT));
+    sb.append(StringUtil.formatText("total", TOTAL_LEN));
     if (hasTotal) {
-      sb.append(formatText(""));
+      sb.append(formatText("%", PERCENT_LEN));
     }
-    sb.append(formatText("speed")).append(formatText("speed")).append(formatText("spent"));
+    sb.append(formatText("speed", SPEED_LEN))
+      .append(formatText("speed", SPEED_LEN))
+      .append(formatText("spent", DURATION_LEN));
     if (hasTotal) {
-      sb.append(formatText("left")).append(formatText("at"));
+      sb.append(formatText("left", DURATION_LEN))
+        .append(formatText("at", TIME_LEN));
     }
     sb.append('\n');
 
@@ -131,8 +143,8 @@ public class ProcessLog {
     StringBuilder sb = new StringBuilder();
     sb.append('\n');
 
-    final int n = hasTotal ? 6 : 3;
-    for (int i = 0; i < MIN_LEN_LONGTEXT + n  * MIN_LEN; i++) {
+    final int lineLength = getLineLength();
+    for (int i = 0; i < lineLength; i++) {
       sb.append('-');
     }
 
@@ -148,12 +160,18 @@ public class ProcessLog {
     return total;
   }
 
+  public void total(long total) {
+    this.total = total;
+  }
+
   public final void reset() {
     startTimeMs = System.currentTimeMillis();
     numProcessed = new AtomicLong(0);
     lastPrintTimeMs = new AtomicLong(0);
     measureDeque.clear();
     measureDeque.add(new MeasurePoint(startTimeMs, 0));
+
+    hasTotal = total > 0;
   }
 
   public long startTimeMs() {
@@ -191,13 +209,13 @@ public class ProcessLog {
     StringBuilder sb = new StringBuilder("\r");
 
     // processed number
-    sb.append(StringUtil.formatAccount(tmpNumProcessed, MIN_LEN_LONGTEXT));
+    sb.append(StringUtil.formatAccount(tmpNumProcessed, TOTAL_LEN));
 
     // processed percent
     if (hasTotal) {
       int percent = (int) (tmpNumProcessed * 100 / total);
-      String percentS = Integer.toString(percent);
-      sb.append(formatText(percentS));
+      String percentS = Integer.toString(percent) + "%";
+      sb.append(formatText(percentS, PERCENT_LEN));
     }
 
     // average speed
@@ -206,7 +224,7 @@ public class ProcessLog {
     if (elapsedTimeMs > 0) {
       averageSpeed = tmpNumProcessed * 1000 / elapsedTimeMs;
     }
-    sb.append(StringUtil.formatAccount(averageSpeed, true));
+    sb.append(StringUtil.formatAccount(averageSpeed, SPEED_LEN));
 
     // current speed
     long currentSpeed = 0;
@@ -214,10 +232,10 @@ public class ProcessLog {
     if (t2inms > 0) {
       currentSpeed = (tmpNumProcessed - referenceMeasurePoint.measureAccount) * 1000 / t2inms;
     }
-    sb.append(StringUtil.formatAccount(currentSpeed, true));
+    sb.append(StringUtil.formatAccount(currentSpeed, SPEED_LEN));
 
     // elapsed time
-    sb.append(StringUtil.formatTime(elapsedTimeMs / 1000, true));
+    sb.append(StringUtil.formatTime(elapsedTimeMs / 1000, DURATION_LEN));
 
     // remaining time and finish at
     if (hasTotal) {
@@ -231,14 +249,14 @@ public class ProcessLog {
         finishAtMs = nowMs + remaingTimeMs;
       }
 
-      if (remaingTimeMs == -1) {
-        sb.append(formatText("--"));
+      if (remaingTimeMs < 1) {
+        sb.append(formatText("--", DURATION_LEN));
       } else {
-        sb.append(StringUtil.formatTime(remaingTimeMs / 1000, true));
+        sb.append(StringUtil.formatTime(remaingTimeMs / 1000, DURATION_LEN));
       }
 
-      if (finishAtMs == -1) {
-        sb.append(formatText("--"));
+      if (remaingTimeMs < 1) {
+        sb.append(formatText("--", TIME_LEN));
       } else {
         sb.append(buildDateTime(finishAtMs));
       }
@@ -269,8 +287,8 @@ public class ProcessLog {
     return averageSpeed;
   }
 
-  private static String formatText(String text) {
-    return StringUtil.formatText(text, MIN_LEN);
+  private static String formatText(String text, int minLen) {
+    return StringUtil.formatText(text, minLen);
   }
 
   private static String buildDateTime(long timeMs) {
@@ -309,10 +327,28 @@ public class ProcessLog {
     }
 
     int size = sb.length();
-    for (int i = 0; i < (MIN_LEN - size); i++) {
+    for (int i = 0; i < (TIME_LEN - size); i++) {
       sb.insert(0, ' ');
     }
 
     return sb.toString();
   } // method buildDateTime
+
+  private int getLineLength() {
+    int len = TOTAL_LEN;
+    if (hasTotal) {
+      len += PERCENT_LEN;
+    }
+
+    len += SPEED_LEN;
+    len += SPEED_LEN;
+    len += DURATION_LEN;
+
+    if (hasTotal) {
+      len += DURATION_LEN;
+      len += TIME_LEN;
+    }
+
+    return len;
+  }
 }
