@@ -114,7 +114,7 @@ public class CmpControl {
   private final CollectionAlgorithmValidator popoAlgoValidator;
 
   public CmpControl(String conf) throws InvalidConfException {
-    ConfPairs pairs = new ConfPairs(Args.notNull(conf, "conf"));
+    ConfPairs pairs = new ConfPairs(conf);
     this.confirmCert = getBoolean(pairs, KEY_CONFIRM_CERT, false);
     this.sendCaCert = getBoolean(pairs, KEY_SEND_CA, false);
     this.sendResponderCert = getBoolean(pairs, KEY_SEND_RESPONDER, true);
