@@ -532,7 +532,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void restartCa(String name) throws CaMgmtException {
     name = Args.toNonBlankLower(name, "name");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
 
     NameId ident = idNameMap.getCa(name);
     if (ident == null) {
@@ -608,6 +608,7 @@ public class CaManagerImpl implements CaManager, Closeable {
         init();
       } catch (Exception ex) {
         LogUtil.error(LOG, ex);
+        return false;
       }
 
       this.lastStartTime = new Date();
@@ -1134,7 +1135,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void addCa(MgmtEntry.Ca caEntry) throws CaMgmtException {
     Args.notNull(caEntry, "caEntry");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
     NameId ident = caEntry.getIdent();
     String name = ident.getName();
 
@@ -1189,7 +1190,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void changeCa(MgmtEntry.ChangeCa entry) throws CaMgmtException {
     Args.notNull(entry, "entry");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
     String name = entry.getIdent().getName();
     NameId ident = idNameMap.getCa(name);
     if (ident == null) {
@@ -1220,7 +1221,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   public void removeCertprofileFromCa(String profileName, String caName) throws CaMgmtException {
     profileName = Args.toNonBlankLower(profileName, "profileName");
     caName = Args.toNonBlankLower(caName, "caName");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
 
     queryExecutor.removeCertprofileFromCa(profileName, caName);
 
@@ -1236,7 +1237,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   public void addCertprofileToCa(String profileName, String caName) throws CaMgmtException {
     profileName = Args.toNonBlankLower(profileName, "profileName");
     caName = Args.toNonBlankLower(caName, "caName");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
 
     NameId ident = idNameMap.getCertprofile(profileName);
     if (ident == null) {
@@ -1271,7 +1272,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   public void removePublisherFromCa(String publisherName, String caName) throws CaMgmtException {
     publisherName = Args.toNonBlankLower(publisherName, "publisherName");
     caName = Args.toNonBlankLower(caName, "caName");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
 
     queryExecutor.removePublisherFromCa(publisherName, caName);
 
@@ -1285,7 +1286,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   public void addPublisherToCa(String publisherName, String caName) throws CaMgmtException {
     publisherName = Args.toNonBlankLower(publisherName, "publisherName");
     caName = Args.toNonBlankLower(caName, "caName");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
 
     NameId ident = idNameMap.getPublisher(publisherName);
     if (ident == null) {
@@ -1342,7 +1343,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void addRequestor(MgmtEntry.Requestor requestorEntry) throws CaMgmtException {
     Args.notNull(requestorEntry, "requestorEntry");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
     String name = requestorEntry.getIdent().getName();
     if (requestorDbEntries.containsKey(name)) {
       throw new CaMgmtException(concat("Requestor named ", name, " exists"));
@@ -1376,7 +1377,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void removeRequestor(String name) throws CaMgmtException {
     name = Args.toNonBlankLower(name, "name");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
 
     for (String caName : caHasRequestors.keySet()) {
       boolean removeMe = false;
@@ -1408,7 +1409,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     Args.notBlank(type, "type");
     Args.notBlank(conf, "conf");
 
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
 
     NameId ident = idNameMap.getRequestor(name);
     if (ident == null) {
@@ -1429,7 +1430,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   public void removeRequestorFromCa(String requestorName, String caName) throws CaMgmtException {
     requestorName = Args.toNonBlankLower(requestorName, "requestorName");
     caName = Args.toNonBlankLower(caName, "caName");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
 
     if (requestorName.equals(RequestorInfo.NAME_BY_CA)
         || requestorName.equals(RequestorInfo.NAME_BY_USER)) {
@@ -1454,7 +1455,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       throws CaMgmtException {
     Args.notNull(requestor, "requestor");
     caName = Args.toNonBlankLower(caName, "caName");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
 
     NameId requestorIdent = requestor.getRequestorIdent();
     NameId ident = idNameMap.getRequestor(requestorIdent.getName());
@@ -1495,7 +1496,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   public void removeUserFromCa(String userName, String caName) throws CaMgmtException {
     userName = Args.toNonBlankLower(userName, "userName");
     caName = Args.toNonBlankLower(caName, "caName");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
 
     queryExecutor.removeUserFromCa(userName, caName);
   } // method removeUserFromCa
@@ -1503,7 +1504,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void addUserToCa(MgmtEntry.CaHasUser user, String caName) throws CaMgmtException {
     caName = Args.toNonBlankLower(caName, "caName");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
 
     X509Ca ca = getX509Ca(caName);
     if (ca == null) {
@@ -1527,7 +1528,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void removeCertprofile(String name) throws CaMgmtException {
     name = Args.toNonBlankLower(name, "name");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
 
     for (String caName : caHasProfiles.keySet()) {
       if (caHasProfiles.get(caName).contains(name)) {
@@ -1562,7 +1563,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       type = type.toLowerCase();
     }
 
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
 
     IdentifiedCertprofile profile = queryExecutor.changeCertprofile(ident, type, conf, this);
 
@@ -1579,7 +1580,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void addCertprofile(MgmtEntry.Certprofile certprofileEntry) throws CaMgmtException {
     Args.notNull(certprofileEntry, "certprofileEntry");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
     String name = certprofileEntry.getIdent().getName();
     if (certprofileDbEntries.containsKey(name)) {
       throw new CaMgmtException(concat("Certprofile named ", name, " exists"));
@@ -1601,7 +1602,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void addSigner(MgmtEntry.Signer signerEntry) throws CaMgmtException {
     Args.notNull(signerEntry, "signerEntry");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
     String name = signerEntry.getName();
     if (signerDbEntries.containsKey(name)) {
       throw new CaMgmtException(concat("Signer named ", name, " exists"));
@@ -1624,7 +1625,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void removeSigner(String name) throws CaMgmtException {
     name = Args.toNonBlankLower(name, "name");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
     boolean bo = queryExecutor.deleteRowWithName(name, "SIGNER");
     if (!bo) {
       throw new CaMgmtException("unknown signer " + name);
@@ -1655,7 +1656,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   public void changeSigner(String name, String type, String conf, String base64Cert)
       throws CaMgmtException {
     name = Args.toNonBlankLower(name, "name");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
     if (type == null && conf == null && base64Cert == null) {
       throw new IllegalArgumentException("nothing to change");
     }
@@ -1692,7 +1693,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void addPublisher(MgmtEntry.Publisher entry) throws CaMgmtException {
     Args.notNull(entry, "entry");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
     String name = entry.getIdent().getName();
     if (publisherDbEntries.containsKey(name)) {
       throw new CaMgmtException(concat("Publisher named ", name, " exists"));
@@ -1734,7 +1735,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void removePublisher(String name) throws CaMgmtException {
     name = Args.toNonBlankLower(name, "name");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
     for (String caName : caHasPublishers.keySet()) {
       if (caHasPublishers.get(caName).contains(name)) {
         removePublisherFromCa(name, caName);
@@ -1755,7 +1756,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void changePublisher(String name, String type, String conf) throws CaMgmtException {
     name = Args.toNonBlankLower(name, "name");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
     if (type == null && conf == null) {
       throw new IllegalArgumentException("nothing to change");
     }
@@ -1784,7 +1785,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   public void addCaAlias(String aliasName, String caName) throws CaMgmtException {
     aliasName = Args.toNonBlankLower(aliasName, "aliasName");
     caName = Args.toNonBlankLower(caName, "caName");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
 
     X509Ca ca = x509cas.get(caName);
     if (ca == null) {
@@ -1802,7 +1803,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void removeCaAlias(String name) throws CaMgmtException {
     name = Args.toNonBlankLower(name, "name");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
     queryExecutor.removeCaAlias(name);
     caAliases.remove(name);
   } // method removeCaAlias
@@ -1861,7 +1862,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void removeCa(String name) throws CaMgmtException {
     name = Args.toNonBlankLower(name, "name");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
 
     queryExecutor.removeCa(name);
 
@@ -1885,7 +1886,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       throws CaMgmtException {
     caName = Args.toNonBlankLower(caName, "caName");
     Args.positive(numThreads, "numThreads");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
     X509Ca ca = x509cas.get(caName);
     if (ca == null) {
       throw new CaMgmtException(concat("could not find CA named ", caName));
@@ -1901,7 +1902,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   public void revokeCa(String caName, CertRevocationInfo revocationInfo) throws CaMgmtException {
     caName = Args.toNonBlankLower(caName, "caName");
     Args.notNull(revocationInfo, "revocationInfo");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
 
     if (!x509cas.containsKey(caName)) {
       throw new CaMgmtException(concat("unkown CA ", caName));
@@ -1933,7 +1934,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void unrevokeCa(String caName) throws CaMgmtException {
     caName = Args.toNonBlankLower(caName, "caName");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
 
     if (!x509cas.containsKey(caName)) {
       throw new CaMgmtException(concat("could not find CA named ", caName));
@@ -1980,7 +1981,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   @Override
   public void clearPublishQueue(String caName, List<String> publisherNames) throws CaMgmtException {
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
 
     publisherNames = CollectionUtil.toLowerCaseList(publisherNames);
 
@@ -2027,7 +2028,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       Date invalidityTime) throws CaMgmtException {
     caName = Args.toNonBlankLower(caName, "caName");
     Args.notNull(serialNumber, "serialNumber");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
     X509Ca ca = getX509Ca(caName);
     try {
       if (ca.revokeCert(serialNumber, reason, invalidityTime,
@@ -2043,6 +2044,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   public void unrevokeCertificate(String caName, BigInteger serialNumber) throws CaMgmtException {
     caName = Args.toNonBlankLower(caName, "caName");
     Args.notNull(serialNumber, "serialNumber");
+
     X509Ca ca = getX509Ca(caName);
     try {
       if (ca.unrevokeCert(serialNumber, CaAuditConstants.MSGID_ca_mgmt) == null) {
@@ -2057,7 +2059,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   public void removeCertificate(String caName, BigInteger serialNumber) throws CaMgmtException {
     caName = Args.toNonBlankLower(caName, "caName");
     Args.notNull(serialNumber, "serialNumber");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
     X509Ca ca = getX509Ca(caName);
     if (ca == null) {
       throw logAndCreateException(concat("unknown CA ", caName));
@@ -2075,6 +2077,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public X509Certificate generateCertificate(String caName, String profileName, byte[] encodedCsr,
       Date notBefore, Date notAfter) throws CaMgmtException {
+
     caName = Args.toNonBlankLower(caName, "caName");
     profileName = Args.toNonBlankLower(profileName, "profileName");
     Args.notNull(encodedCsr, "encodedCsr");
@@ -2180,7 +2183,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     int numCrls = caEntry.getNumCrls();
     String signerType = caEntry.getSignerType();
 
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
 
     if (numCrls < 0) {
       System.err.println("invalid numCrls: " + numCrls);
@@ -2257,9 +2260,13 @@ public class CaManagerImpl implements CaManager, Closeable {
     return caCert;
   } // method generateRootCa
 
-  private void asssertMasterMode() throws CaMgmtException {
+  private void assertMasterModeAndSetuped() throws CaMgmtException {
     if (!masterMode) {
       throw new CaMgmtException("operation not allowed in slave mode");
+    }
+
+    if (!caSystemSetuped) {
+      throw new CaMgmtException("CA system is not initialized yet.");
     }
   }
 
@@ -2344,20 +2351,20 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   @Override
   public void addUser(MgmtEntry.AddUser addUserEntry) throws CaMgmtException {
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
     queryExecutor.addUser(addUserEntry);
   }
 
   @Override
   public void changeUser(MgmtEntry.ChangeUser changeUserEntry) throws CaMgmtException {
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
     queryExecutor.changeUser(changeUserEntry);
   }
 
   @Override
   public void removeUser(String username) throws CaMgmtException {
     username = Args.toNonBlankLower(username, "username");
-    asssertMasterMode();
+    assertMasterModeAndSetuped();
     if (!queryExecutor.deleteRowWithName(username, "TUSER")) {
       throw new CaMgmtException("unknown user " + username);
     }
@@ -2547,10 +2554,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   public Map<String, X509Certificate> loadConf(InputStream zippedConfStream)
       throws CaMgmtException {
     Args.notNull(zippedConfStream, "zippedConfStream");
-
-    if (!caSystemSetuped) {
-      throw new CaMgmtException("CA system is not initialized yet.");
-    }
+    assertMasterModeAndSetuped();
 
     CaConf conf;
     try {
@@ -2872,9 +2876,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public InputStream exportConf(List<String> caNames)
       throws CaMgmtException, IOException {
-    if (!caSystemSetuped) {
-      throw new CaMgmtException("CA system is not initialized yet.");
-    }
+    assertMasterModeAndSetuped();
 
     if (caNames != null) {
       List<String> tmpCaNames = new ArrayList<>(caNames.size());
