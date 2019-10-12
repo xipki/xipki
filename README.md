@@ -15,7 +15,8 @@ a highly scalable and high-performance open source PKI (CA and OCSP responder).
 Lijun Liao, [LinkedIn](https://www.linkedin.com/in/lijun-liao-644696b8)
 
 ## Support
-Just create [issues](https://github.com/xipki/xipki/issues).
+Just create [issues](https://github.com/xipki/xipki/issues), 
+or via wechat (微信）`xipki9`.
 
 ## Prerequisite
 * OS: Linux, Windows, MacOS
