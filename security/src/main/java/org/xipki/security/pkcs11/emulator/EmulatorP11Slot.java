@@ -708,7 +708,7 @@ class EmulatorP11Slot extends P11Slot {
       ECParameterSpec paramSpec = ecKey.getParams();
 
       // ecdsaParams
-      org.bouncycastle.jce.spec.ECParameterSpec bcParamSpec = EC5Util.convertSpec(paramSpec, false);
+      org.bouncycastle.jce.spec.ECParameterSpec bcParamSpec = EC5Util.convertSpec(paramSpec);
       ASN1ObjectIdentifier curveOid = ECUtil.getNamedCurveOid(bcParamSpec);
       if (curveOid == null) {
         throw new P11TokenException("EC public key is not of namedCurve");

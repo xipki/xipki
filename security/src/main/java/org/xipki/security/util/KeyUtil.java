@@ -533,7 +533,7 @@ public class KeyUtil {
   } // method createECPublicKey
 
   private static ASN1ObjectIdentifier detectCurveOid(ECParameterSpec paramSpec) {
-    org.bouncycastle.jce.spec.ECParameterSpec bcParamSpec = EC5Util.convertSpec(paramSpec, false);
+    org.bouncycastle.jce.spec.ECParameterSpec bcParamSpec = EC5Util.convertSpec(paramSpec);
     return ECUtil.getNamedCurveOid(bcParamSpec);
   }
 
