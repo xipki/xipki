@@ -213,11 +213,10 @@ Features
     - EC
     - DSA
     - Ed25519, Ed448
-    - X25519, X448
     - SM2
+    - X25519, X448
   - Signature algorithms of certificates
     - Ed25519, Ed448
-    - SM3withSM2
     - SHA3-*withRSA: where * is 224, 256, 384 and 512
     - SHA3-*withRSAandMGF1: where * is 224, 256, 384 and 512
     - SHA3-*withECDSA: where * is 224, 256, 384 and 512
@@ -227,6 +226,7 @@ Features
     - SHA*withECDSA: where * is 1, 224, 256, 384 and 512
     - SHA*withPlainECDSA: where * is 1, 224, 256, 384 and 512
     - SHA*withDSA: where * is 1, 224, 256, 384 and 512
+    - SM3withSM2
  - Native support of X.509 extensions (other extensions can be supported by
    configuring it as blob)
     - AdditionalInformation (German national standard CommonPKI)
@@ -240,6 +240,11 @@ Features
     - CT Precertificate SCTs (RFC 6962)
     - ExtendedKeyUsage (RFC 5280)
     - FreshestCRL (RFC 5280)
+    - GM/T 0015 ICRegistrationNumber (企业工商注册号, Chinese Standard GM/T 0015-2012)
+    - GM/T 0015 IdentityCode (个人身份标识码, Chinese Standard GM/T 0015-2012)
+    - GM/T 0015 InsuranceNumber (个人社会保险号, Chinese Standard GM/T 0015-2012)
+    - GM/T 0015 OrganizationCode (企业组织机构代码, Chinese Standard GM/T 0015-2012)
+    - GM/T 0015 TaxationNumber (企业税号, Chinese Standard GM/T 0015-2012)
     - InhibitAnyPolicy (RFC 5280)
     - IssuerAltName (RFC 5280)
     - KeyUsage (RFC 5280)
@@ -257,11 +262,6 @@ Features
     - SubjectKeyIdentifier (RFC 5280)
     - TLSFeature (RFC 7633)
     - ValidityModel (German national standard CommonPKI)
-    - GM/T 0015 IdentityCode (个人身份标识码, Chinese Standard GM/T 0015-2012)
-    - GM/T 0015 InsuranceNumber (个人社会保险号, Chinese Standard GM/T 0015-2012)
-    - GM/T 0015 ICRegistrationNumber (企业工商注册号, Chinese Standard GM/T 0015-2012)
-    - GM/T 0015 OrganizationCode (企业组织机构代码, Chinese Standard GM/T 0015-2012)
-    - GM/T 0015 TaxationNumber (企业税号, Chinese Standard GM/T 0015-2012)
 
  - Management of multiple CAs in one software instance
  - Support of database cluster
