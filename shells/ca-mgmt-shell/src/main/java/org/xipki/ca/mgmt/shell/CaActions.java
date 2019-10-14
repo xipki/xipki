@@ -199,7 +199,8 @@ public class CaActions {
     @Option(name = "--crl-uri", multiValued = true, description = "CRL distribution point")
     private List<String> crlUris;
 
-    @Option(name = "--deltacrl-uri", multiValued = true, description = "CRL distribution point")
+    @Option(name = "--deltacrl-uri", multiValued = true,
+        description = "Delta CRL distribution point")
     private List<String> deltaCrlUris;
 
     @Option(name = "--permission", required = true, multiValued = true, description = "permission")
@@ -514,7 +515,7 @@ public class CaActions {
     @Option(name = "--profile", required = true, description = "profile of the Root CA")
     private String rootcaProfile;
 
-    @Option(name = "--serial", description = "profile of the Root CA")
+    @Option(name = "--serial", description = "serial number of the Root CA")
     private String serialS;
 
     @Option(name = "--outform", description = "output format of the certificate")
