@@ -54,7 +54,7 @@
     <snakeyaml.version>1.18</snakeyaml.version>
     <hikaricp.version>3.4.1</hikaricp.version>
     <syslog-java-client.version>1.1.7</syslog-java-client.version>
-    <fastjson.version>1.2.61</fastjson.version>
+    <fastjson.version>1.2.62</fastjson.version>
     <!-- only for runtime -->
     <log4j.version>2.12.1</log4j.version>
     <jdbc.mariadb.version>2.4.4</jdbc.mariadb.version>
