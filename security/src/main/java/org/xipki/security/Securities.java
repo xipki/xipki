@@ -20,6 +20,9 @@ package org.xipki.security;
 import java.io.Closeable;
 import java.io.IOException;
 import java.security.Security;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -30,6 +33,7 @@ import org.xipki.password.Passwords;
 import org.xipki.password.Passwords.PasswordConf;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.security.pkcs11.P11CryptServiceFactoryImpl;
+import org.xipki.security.pkcs11.P11ModuleFactory;
 import org.xipki.security.pkcs11.P11ModuleFactoryRegisterImpl;
 import org.xipki.security.pkcs11.P11SignerFactory;
 import org.xipki.security.pkcs11.Pkcs11conf;
@@ -179,6 +183,20 @@ public class Securities implements Closeable {
 
   private SecurityFactoryImpl securityFactory;
 
+  private List<P11ModuleFactory> p11ModuleFactories;
+
+  public Securities() {
+    this(Arrays.asList(
+        new EmulatorP11ModuleFactory(),
+        new IaikP11ModuleFactory(),
+        new ProxyP11ModuleFactory()));
+  }
+
+  public Securities(List<P11ModuleFactory> p11ModuleFactories) {
+    this.p11ModuleFactories = p11ModuleFactories != null
+        ? new ArrayList<>(p11ModuleFactories) : Collections.emptyList();
+  }
+
   public SecurityFactory getSecurityFactory() {
     return securityFactory;
   }
@@ -278,9 +296,9 @@ public class Securities implements Closeable {
       SignerFactoryRegisterImpl signerFactoryRegister, PasswordResolver passwordResolver)
           throws InvalidConfException {
     p11ModuleFactoryRegister = new P11ModuleFactoryRegisterImpl();
-    p11ModuleFactoryRegister.registFactory(new EmulatorP11ModuleFactory());
-    p11ModuleFactoryRegister.registFactory(new IaikP11ModuleFactory());
-    p11ModuleFactoryRegister.registFactory(new ProxyP11ModuleFactory());
+    for (P11ModuleFactory m : p11ModuleFactories) {
+      p11ModuleFactoryRegister.registFactory(m);
+    }
 
     p11CryptServiceFactory = new P11CryptServiceFactoryImpl();
     p11CryptServiceFactory.setP11ModuleFactoryRegister(p11ModuleFactoryRegister);
