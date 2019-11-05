@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.xipki.example</groupId>
     <artifactId>examples</artifactId>
-    <version>5.3.5-SNAPSHOT</version>
+    <version>5.3.5</version>
   </parent>
   <artifactId>ocsp-store-example-assembly</artifactId>
   <packaging>pom</packaging>
