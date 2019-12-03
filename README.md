@@ -117,10 +117,17 @@ Note that CA and OCSP can be installed in the same servlet container.
   * configure the proxy to forward the headers via mod_proxy with the following
     configuration
 
-    ```sh
+   ```sh
+   #initialize the special headers to a blank value to avoid http header forgeries 
+   RequestHeader set SSL_CLIENT_VERIFY  "" 
+   RequestHeader set SSL_CLIENT_CERT  "" 
+   
+   <Location / >
     RequestHeader set SSL_CLIENT_VERIFY "%{SSL_CLIENT_VERIFY}s"
     RequestHeader set SSL_CLIENT_CERT "%{SSL_CLIENT_CERT}s"
-    ```
+    ...
+   </Location>
+   ```
 
     For more details please refer to
 
