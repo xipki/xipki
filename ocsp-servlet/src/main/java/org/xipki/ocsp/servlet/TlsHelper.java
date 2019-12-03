@@ -79,16 +79,19 @@ public class TlsHelper {
       // check whether this application is behind a reverse proxy and the TLS client
       // certificate is forwarded.
       String clientVerify = request.getHeader("SSL_CLIENT_VERIFY");
+      LOG.info("SSL_CLIENT_VERIFY: '{}'", clientVerify);
+
       if (StringUtil.isBlank(clientVerify)) {
         return null;
       }
 
-      if ("SUCCESS".equalsIgnoreCase(clientVerify.trim())) {
+      if (!"SUCCESS".equalsIgnoreCase(clientVerify.trim())) {
         return null;
       }
 
       String pemClientCert = request.getHeader("SSL_CLIENT_CERT");
-      if (StringUtil.isBlank(pemClientCert)) {
+      if (pemClientCert == null || pemClientCert.length() < 100) {
+        // no certificate available
         return null;
       }
 
@@ -100,7 +103,7 @@ public class TlsHelper {
       try {
         clientCert = X509Util.parseCert(StringUtil.toUtf8Bytes(pemClientCert));
       } catch (CertificateException ex) {
-        LOG.error("could not parse Certificate '{}'", pemClientCert);
+        LOG.error("SSL_CLIENT_CERT: '{}'", pemClientCert);
         throw new IOException("could not parse Certificate", ex);
       }
 
