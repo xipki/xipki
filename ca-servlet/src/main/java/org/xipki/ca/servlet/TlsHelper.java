@@ -81,7 +81,7 @@ public class TlsHelper {
       // check whether this application is behind a reverse proxy and the TLS client
       // certificate is forwarded.
       String clientVerify = request.getHeader("SSL_CLIENT_VERIFY");
-      LOG.info("SSL_CLIENT_VERIFY: '{}'", clientVerify);
+      LOG.debug("SSL_CLIENT_VERIFY: '{}'", clientVerify);
 
       if (StringUtil.isBlank(clientVerify)) {
         return null;
@@ -93,6 +93,7 @@ public class TlsHelper {
 
       String pemClientCert = request.getHeader("SSL_CLIENT_CERT");
       if (pemClientCert == null || pemClientCert.length() < 100) {
+        LOG.error("SSL_CLIENT_CERT: '{}'", pemClientCert);
         // no certificate available
         return null;
       }
