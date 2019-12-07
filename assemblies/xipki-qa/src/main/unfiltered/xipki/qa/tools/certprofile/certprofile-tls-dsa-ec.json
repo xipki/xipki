@@ -70,10 +70,22 @@
 			"ec":{
 				"curves":[{
 					"oid":"1.2.840.10045.3.1.7",
-					"description":"prime256v1"
+					"description":"secp256r1"
+				},{
+					"oid":"1.3.132.0.34",
+					"description":"secp384r1"
+				},{
+					"oid":"1.3.132.0.35",
+					"description":"secp521r1"
 				},{
 					"oid":"1.3.36.3.3.2.8.1.1.7",
-					"description":"brainpoolp256r1"
+					"description":"brainpoolP256r1"
+				},{
+					"oid":"1.3.36.3.3.2.8.1.1.11",
+					"description":"brainpoolP384r1"
+				},{
+					"oid":"1.3.36.3.3.2.8.1.1.13",
+					"description":"brainpoolP512r1"
 				},{
 					"oid":"1.2.156.10197.1.301",
 					"description":"sm2p256v1"
