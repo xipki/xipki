@@ -624,9 +624,9 @@ class ImportCrl {
 
       File updatemeFile = new File(crlDirInfo.crlDir, "UPDATEME");
       updatemeFile.setLastModified(System.currentTimeMillis());
-      updatemeFile.renameTo(new File(updatemeFile.getPath() + (updateSucc ? ".Ich SUCC" : ".FAIL")));
+      updatemeFile.renameTo(new File(updatemeFile.getPath() + (updateSucc ? "SUCC" : ".FAIL")));
       if (!updateSucc && caCert != null) {
-        if (!crlDirInfo.shareCaWithOtherCrl && caCert.databaseId! = null) {
+        if (!crlDirInfo.shareCaWithOtherCrl && caCert.databaseId != null) {
           // try to delete the issuer if there is not certificate associated with it
           try {
             datasource.deleteFromTableWithException(conn, "ISSUER", "ID", caCert.databaseId);
