@@ -118,6 +118,9 @@ Note that CA and OCSP can be installed in the same servlet container.
     configuration
 
    ```sh
+   # Require SSL Client verification
+   SSLVerifyClient		require
+
    #initialize the special headers to a blank value to avoid http header forgeries 
    RequestHeader set SSL_CLIENT_VERIFY  "" 
    RequestHeader set SSL_CLIENT_CERT  "" 
