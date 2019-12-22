@@ -54,6 +54,8 @@ public class PublicCaInfo {
 
   private final GeneralNames subjectAltName;
 
+  private final X500Name x500Issuer;
+
   private final BigInteger serialNumber;
 
   private final X509Cert caCert;
@@ -70,6 +72,7 @@ public class PublicCaInfo {
     this.caUris = (caUris == null) ? CaUris.EMPTY_INSTANCE : caUris;
 
     this.caCert = new X509Cert(caCert);
+    this.x500Issuer = X500Name.getInstance(caCert.getIssuerX500Principal().getEncoded());
     this.serialNumber = caCert.getSerialNumber();
     this.subject = caCert.getSubjectX500Principal();
     this.x500Subject = X500Name.getInstance(subject.getEncoded());
@@ -96,10 +99,12 @@ public class PublicCaInfo {
     }
   } // constructor
 
-  public PublicCaInfo(X500Name subject, BigInteger serialNumber, GeneralNames subjectAltName,
-      byte[] subjectKeyIdentifier, CaUris caUris, ConfPairs extraControl)
+  public PublicCaInfo(X500Name subject, X500Name issuer, BigInteger serialNumber,
+      GeneralNames subjectAltName, byte[] subjectKeyIdentifier,
+      CaUris caUris, ConfPairs extraControl)
       throws OperationException {
     this.x500Subject = Args.notNull(subject, "subject");
+    this.x500Issuer = Args.notNull(subject, "issuer");
     this.serialNumber = Args.notNull(serialNumber, "serialNumber");
     this.caUris = (caUris == null) ? CaUris.EMPTY_INSTANCE : caUris;
 
@@ -141,6 +146,10 @@ public class PublicCaInfo {
 
   public X500Name getX500Subject() {
     return x500Subject;
+  }
+
+  public X500Name getX500Issuer() {
+    return x500Issuer;
   }
 
   public String getC14nSubject() {

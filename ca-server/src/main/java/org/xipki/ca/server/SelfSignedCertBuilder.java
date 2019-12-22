@@ -242,8 +242,8 @@ class SelfSignedCertBuilder {
     X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(grantedSubject,
         serialNumber, notBefore, notAfter, grantedSubject, publicKeyInfo);
 
-    PublicCaInfo publicCaInfo = new PublicCaInfo(grantedSubject, serialNumber, null, null,
-        caUris, extraControl);
+    PublicCaInfo publicCaInfo = new PublicCaInfo(grantedSubject, grantedSubject, serialNumber,
+        null, null, caUris, extraControl);
 
     Extensions extensions = null;
     ASN1Set attrs = csr.getCertificationRequestInfo().getAttributes();

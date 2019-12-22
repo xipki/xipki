@@ -420,10 +420,9 @@ class IdentifiedCertprofile implements Closeable {
     if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
       AuthorityKeyIdentifier value = null;
       if (certprofile.useIssuerAndSerialInAki()) {
-        GeneralNames x509CaSubject = new GeneralNames(
-            new GeneralName(publicCaInfo.getX500Subject()));
-        value = new AuthorityKeyIdentifier(x509CaSubject,
-            publicCaInfo.getSerialNumber());
+        GeneralNames x509CaIssuer = new GeneralNames(
+            new GeneralName(publicCaInfo.getX500Issuer()));
+        value = new AuthorityKeyIdentifier(x509CaIssuer, publicCaInfo.getSerialNumber());
       } else {
         byte[] ikiValue = publicCaInfo.getSubjectKeyIdentifer();
         if (ikiValue != null) {
