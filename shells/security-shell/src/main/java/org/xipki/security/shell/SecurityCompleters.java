@@ -42,7 +42,7 @@ public class SecurityCompleters {
   public static class KeystoreTypeCompleter extends EnumCompleter {
 
     public KeystoreTypeCompleter() {
-      setTokens("PKCS12", "JKS", "JCEKS");
+      setTokens("PKCS12", "JCEKS");
     }
   } // class KeystoreTypeCompleter
 

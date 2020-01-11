@@ -50,7 +50,7 @@ import org.xipki.util.ObjectCreationException;
 import org.xipki.util.StringUtil;
 
 /**
- * {@link SignerFactory} for the types pkcs12, jks and jceks.
+ * {@link SignerFactory} for the types pkcs12 and jceks.
  *
  * @author Lijun Liao
  * @since 2.0.0
@@ -60,11 +60,10 @@ import org.xipki.util.StringUtil;
 public class P12SignerFactory implements SignerFactory {
 
   private static final String TYPE_PKCS12 = "pkcs12";
-  private static final String TYPE_JKS = "jks";
   private static final String TYPE_JCEKS = "jceks";
 
   private static final Set<String> types = Collections.unmodifiableSet(
-      new HashSet<>(Arrays.asList(TYPE_PKCS12, TYPE_JKS, TYPE_JCEKS)));
+      new HashSet<>(Arrays.asList(TYPE_PKCS12, TYPE_JCEKS)));
 
   private SecurityFactory securityFactory;
 

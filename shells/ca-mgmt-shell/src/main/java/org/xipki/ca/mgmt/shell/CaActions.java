@@ -316,7 +316,7 @@ public class CaActions {
         throw new IllegalCmdParamException("invalid expirationPeriod: " + expirationPeriod);
       }
 
-      if ("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType)) {
+      if ("PKCS12".equalsIgnoreCase(signerType) || "JCEKS".equalsIgnoreCase(signerType)) {
         signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, passwordResolver,
             securityFactory);
       }
@@ -2204,7 +2204,7 @@ public class CaActions {
         base64Cert = IoUtil.base64Encode(signerCert.getEncoded(), false);
       }
 
-      if ("PKCS12".equalsIgnoreCase(type) || "JKS".equalsIgnoreCase(type)) {
+      if ("PKCS12".equalsIgnoreCase(type) || "JCEKS".equalsIgnoreCase(type)) {
         conf = ShellUtil.canonicalizeSignerConf(type, conf, passwordResolver, securityFactory);
       }
       MgmtEntry.Signer entry = new MgmtEntry.Signer(name, type, conf, base64Cert);

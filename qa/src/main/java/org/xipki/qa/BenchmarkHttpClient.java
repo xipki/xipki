@@ -195,7 +195,7 @@ public class BenchmarkHttpClient {
     private static KeyStore loadKeyStore(String storeType, String store, char[] password)
         throws GeneralSecurityException, IOException {
       if (storeType == null) {
-        storeType = "JKS";
+        storeType = "JCEKS";
       }
 
       try (InputStream stream = Files.newInputStream(Paths.get(store))) {

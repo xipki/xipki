@@ -2224,7 +2224,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     String signerConf = result.getSignerConf();
     X509Certificate caCert = result.getCert();
 
-    if ("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType)) {
+    if ("PKCS12".equalsIgnoreCase(signerType) || "JCEKS".equalsIgnoreCase(signerType)) {
       try {
         signerConf = canonicalizeSignerConf(signerType, signerConf,
             new X509Certificate[]{caCert}, securityFactory);

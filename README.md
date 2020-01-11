@@ -314,7 +314,7 @@ Features
   - Exporting certificate from token
 
 - For both CA and OCSP Responder
-  - Support of PKCS#12 and JKS keystore
+  - Support of PKCS#12 and JCEKS keystore
   - Support of PKCS#11 devices, e.g. HSM
   - API to use customized key types, e.g. smartcard
   - High performance

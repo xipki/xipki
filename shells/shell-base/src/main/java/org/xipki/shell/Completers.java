@@ -245,7 +245,7 @@ public class Completers {
   public static class SignerTypeCompleter extends EnumCompleter {
 
     public SignerTypeCompleter() {
-      setTokens("JKS", "PKCS11", "PKCS12");
+      setTokens("JCEKS", "PKCS11", "PKCS12");
     }
 
   } // class SignerTypeCompleter

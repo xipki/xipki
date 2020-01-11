@@ -123,12 +123,12 @@ class SelfSignedCertBuilder {
       throw new InvalidConfException("could not validate POP for the CSR");
     }
 
-    if ("pkcs12".equalsIgnoreCase(signerType) || "jks".equalsIgnoreCase(signerType)) {
+    if ("PKCS12".equalsIgnoreCase(signerType) || "JCEKS".equalsIgnoreCase(signerType)) {
       ConfPairs keyValues = new ConfPairs(signerConf);
       String keystoreConf = keyValues.value("keystore");
       if (keystoreConf == null) {
         throw new InvalidConfException(
-          "required parameter 'keystore' for types PKCS12 and JKS, is not specified");
+          "required parameter 'keystore' for types PKCS12 and JCEKS, is not specified");
       }
     }
 
