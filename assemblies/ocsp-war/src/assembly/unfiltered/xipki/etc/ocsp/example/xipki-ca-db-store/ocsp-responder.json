@@ -34,7 +34,7 @@
 	"responders":[{
 		"name":"responder1",
 		"inheritCaRevocation":true,
-		"mode":"RFC6960",
+		"mode":"RFC2560",
 		"request":"request1",
 		"response":"response1",
 		"servletPaths":["/"],
