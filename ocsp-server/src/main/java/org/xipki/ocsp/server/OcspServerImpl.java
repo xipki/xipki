@@ -227,7 +227,7 @@ public class OcspServerImpl implements OcspServer {
     }
 
     ExtendedExtension ext = new ExtendedExtension(OID.ID_PKIX_OCSP_EXTENDEDREVOKE,
-        true, DERNullBytes);
+        false, DERNullBytes);
     byte[] encoded = new byte[ext.getEncodedLength()];
     ext.write(encoded, 0);
     extension_pkix_ocsp_extendedRevoke = new WritableOnlyExtension(encoded);
@@ -676,7 +676,13 @@ public class OcspServerImpl implements OcspServer {
           }
 
           repControl.canCacheInfo = false;
-          respExtensions.add(nonceExtn);
+
+          if (nonceExtn.isCritical()) {
+            respExtensions.add(nonceExtn);
+          } else {
+            // nonce extension should be non-critical
+            nonceExtn = nonceExtn.toNonCriticalExtension();
+          }
         }
       } else {
         if (reqOpt.getNonceOccurrence() == QuadrupleState.required) {
