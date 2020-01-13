@@ -676,13 +676,7 @@ public class OcspServerImpl implements OcspServer {
           }
 
           repControl.canCacheInfo = false;
-
-          if (nonceExtn.isCritical()) {
-            respExtensions.add(nonceExtn);
-          } else {
-            // nonce extension should be non-critical
-            nonceExtn = nonceExtn.toNonCriticalExtension();
-          }
+          respExtensions.add(nonceExtn);
         }
       } else {
         if (reqOpt.getNonceOccurrence() == QuadrupleState.required) {
