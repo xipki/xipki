@@ -676,7 +676,11 @@ public class OcspServerImpl implements OcspServer {
           }
 
           repControl.canCacheInfo = false;
-          respExtensions.add(nonceExtn);
+          if (nonceExtn.isCritical()) {
+            respExtensions.add(nonceExtn.revertCritical());
+          } else {
+            respExtensions.add(nonceExtn);
+          }
         }
       } else {
         if (reqOpt.getNonceOccurrence() == QuadrupleState.required) {
@@ -798,8 +802,7 @@ public class OcspServerImpl implements OcspServer {
       }
 
       if (!respExtensions.isEmpty()) {
-        Extensions extns = new Extensions(respExtensions);
-        builder.setResponseExtensions(extns);
+        builder.setResponseExtensions(new Extensions(respExtensions));
       }
 
       TaggedCertSequence certsInResp;

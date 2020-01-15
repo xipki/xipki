@@ -19,6 +19,7 @@ package org.xipki.ocsp.server.type;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
@@ -164,6 +165,12 @@ public class ExtendedExtension extends Extension {
   public int writeExtnValue(byte[] out, int offset) {
     System.arraycopy(encoded, extnValueFrom, out, offset, extnValueLength);
     return extnValueLength;
+  }
+
+  public ExtendedExtension revertCritical() {
+    byte[] extnValue = Arrays.copyOfRange(encoded,
+                        extnValueFrom, extnValueFrom + extnValueLength);
+    return new ExtendedExtension(extnType, !critical, extnValue);
   }
 
 }
