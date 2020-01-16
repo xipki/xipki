@@ -788,16 +788,23 @@ public class OcspServerImpl implements OcspServer {
       ResponderID responderId = signer.getResponderId(repOpt.isResponderIdByName());
       OCSPRespBuilder builder = new OCSPRespBuilder(responderId);
 
+      boolean unknownAsRevoked = false;
+      AtomicBoolean unknownAsRevoked0 = new AtomicBoolean(false);
       for (int i = 0; i < requestsSize; i++) {
-        OcspRespWithCacheInfo failureOcspResp = processCertReq(requestList.get(i),
+        OcspRespWithCacheInfo failureOcspResp = processCertReq(
+            unknownAsRevoked0, requestList.get(i),
             builder, responder, reqOpt, repOpt, repControl);
 
         if (failureOcspResp != null) {
           return failureOcspResp;
         }
+
+        if (unknownAsRevoked0.get()) {
+          unknownAsRevoked = true;
+        }
       }
 
-      if (repControl.includeExtendedRevokeExtension) {
+      if (unknownAsRevoked && repControl.includeExtendedRevokeExtension) {
         respExtensions.add(extension_pkix_ocsp_extendedRevoke);
       }
 
@@ -850,7 +857,8 @@ public class OcspServerImpl implements OcspServer {
     }
   } // method ask
 
-  private OcspRespWithCacheInfo processCertReq(CertID certId, OCSPRespBuilder builder,
+  private OcspRespWithCacheInfo processCertReq(AtomicBoolean unknownAsRevoked,
+      CertID certId, OCSPRespBuilder builder,
       ResponderImpl responder, RequestOption reqOpt, OcspServerConf.ResponseOption repOpt,
       OcspRespControl repControl) throws IOException {
     HashAlgo reqHashAlgo = certId.getIssuer().hashAlgorithm();
@@ -941,7 +949,7 @@ public class OcspServerImpl implements OcspServer {
     Date nextUpdate = certStatusInfo.getNextUpdate();
 
     List<Extension> extensions = new LinkedList<>();
-    boolean unknownAsRevoked = false;
+    unknownAsRevoked.set(false);
     byte[] certStatus;
     switch (certStatusInfo.getCertStatus()) {
       case GOOD:
@@ -957,7 +965,7 @@ public class OcspServerImpl implements OcspServer {
         if (responder.getResponderOption().getMode() == OcspMode.RFC2560) {
           certStatus = bytes_certstatus_unknown;
         } else { // (ocspMode == OCSPMode.RFC6960)
-          unknownAsRevoked = true;
+          unknownAsRevoked.set(true);
           certStatus = bytes_certstatus_rfc6960_unknown;
         }
         break;
@@ -999,7 +1007,7 @@ public class OcspServerImpl implements OcspServer {
       } else if (Arrays.equals(certStatus, bytes_certstatus_rfc6960_unknown)) {
         certStatusText = "RFC6960_unknown";
       } else  {
-        certStatusText = unknownAsRevoked ? "unknown_as_revoked" : "revoked";
+        certStatusText = unknownAsRevoked.get() ? "unknown_as_revoked" : "revoked";
       }
 
       String msg = StringUtil.concatObjectsCap(250, "issuer: ", certId.getIssuer(),
