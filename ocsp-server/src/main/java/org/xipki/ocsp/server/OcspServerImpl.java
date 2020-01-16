@@ -1029,9 +1029,11 @@ public class OcspServerImpl implements OcspServer {
       builder.addResponse(certId, certStatus, thisUpdate, nextUpdate, new Extensions(extensions));
     }
 
-    repControl.cacheThisUpdate = Math.max(repControl.cacheThisUpdate, thisUpdate.getTime());
+    repControl.cacheThisUpdate =
+        Math.max(repControl.cacheThisUpdate, thisUpdate.getTime() / 1000);
     if (nextUpdate != null) {
-      repControl.cacheNextUpdate = Math.min(repControl.cacheNextUpdate, nextUpdate.getTime());
+      repControl.cacheNextUpdate =
+          Math.min(repControl.cacheNextUpdate, nextUpdate.getTime() / 1000);
     }
 
     return null;
