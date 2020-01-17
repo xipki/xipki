@@ -393,7 +393,7 @@ public class ExtensionsChecker {
           }
         } else if (Extension.authorityKeyIdentifier.equals(oid)) {
           // AuthorityKeyIdentifier
-          checkExtnIssuerKeyIdentifier(failureMsg, extnValue, issuerInfo);
+          checkExtnAuthorityKeyIdentifier(failureMsg, extnValue, issuerInfo);
         } else if (Extension.subjectKeyIdentifier.equals(oid)) {
           // SubjectKeyIdentifier
           checkExtnSubjectKeyIdentifier(failureMsg, extnValue, cert.getSubjectPublicKeyInfo());
@@ -855,7 +855,7 @@ public class ExtensionsChecker {
     }
   } // method checkExtnSubjectKeyIdentifier
 
-  private void checkExtnIssuerKeyIdentifier(StringBuilder failureMsg,
+  private void checkExtnAuthorityKeyIdentifier(StringBuilder failureMsg,
       byte[] extensionValue, IssuerInfo issuerInfo) {
     AuthorityKeyIdentifier asn1 = AuthorityKeyIdentifier.getInstance(extensionValue);
     byte[] keyIdentifier = asn1.getKeyIdentifier();
@@ -886,9 +886,9 @@ public class ExtensionsChecker {
           failureMsg.append(
               "authorityCertIssuer does not contain directoryName but expected one; ");
         } else {
-          X500Name caSubject = issuerInfo.getBcCert().getTBSCertificate().getSubject();
-          if (!caSubject.equals(x500GenName)) {
-            addViolation(failureMsg, "authorityCertIssuer", x500GenName, caSubject);
+          X500Name caIssuer = issuerInfo.getBcCert().getTBSCertificate().getIssuer();
+          if (!caIssuer.equals(x500GenName)) {
+            addViolation(failureMsg, "authorityCertIssuer", x500GenName, caIssuer);
           }
         }
       }
