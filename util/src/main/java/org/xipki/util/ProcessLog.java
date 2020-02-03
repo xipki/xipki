@@ -316,11 +316,11 @@ public class ProcessLog {
     }
     sb.append(second);
 
-    cal.setTimeInMillis(System.currentTimeMillis());
-    cal.set(Calendar.HOUR, 0);
-    cal.set(Calendar.MINUTE, 0);
-    cal.set(Calendar.SECOND, 0);
-    long midNightSec = cal.getTimeInMillis() / 1000;
+    Calendar midNight = Calendar.getInstance();
+    midNight.set(Calendar.HOUR, 0);
+    midNight.set(Calendar.MINUTE, 0);
+    midNight.set(Calendar.SECOND, 0);
+    long midNightSec = midNight.getTimeInMillis() / 1000;
     long days = (timeMs / 1000 - midNightSec) / DAY_IN_SEC;
     if (days > 0) {
       sb.append('+').append(days);
