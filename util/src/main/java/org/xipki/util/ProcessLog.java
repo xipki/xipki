@@ -323,7 +323,7 @@ public class ProcessLog {
     long midNightSec = midNight.getTimeInMillis() / 1000;
     long days = (timeMs / 1000 - midNightSec) / DAY_IN_SEC;
     if (days > 0) {
-      sb.append('+').append(days);
+      sb.append('+').append(days > 9 ? "x" : Long.toString(days));
     }
 
     int size = sb.length();
