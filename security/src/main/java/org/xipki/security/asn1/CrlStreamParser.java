@@ -361,22 +361,21 @@ public class CrlStreamParser extends Asn1StreamParser {
 
       offset++;
 
-      boolean tagConsumed = false;
       //       revokedCertificates     SEQUENCE OF SEQUENCE  { ... } OPTIONAL
       if (TAG_CONSTRUCTED_SEQUENCE == tag) {
-        tagConsumed = true;
         int revokedCertificatesOffset = offset;
         int revokedCertificatesLength = readLength(lenBytesSize, instream);
         offset += lenBytesSize.get();
-  
+
         this.revokedCertificatesEndIndex = revokedCertificatesOffset + revokedCertificatesLength;
         this.firstRevokedCertificateOffset = offset;
-  
+
         // skip the revokedCertificates
         skip(instream, revokedCertificatesLength);
         offset += revokedCertificatesLength;
         tag = -1;
       } else {
+        instream.reset();
         this.revokedCertificatesEndIndex = offset;
         this.firstRevokedCertificateOffset = offset;
       }
@@ -385,10 +384,7 @@ public class CrlStreamParser extends Asn1StreamParser {
 
       Extensions extns = null;
       while (offset < tbsCertListEndIndex) {
-        if (tagConsumed) {
-          tag = markAndReadTag(instream);
-          tagConsumed = true;
-        }
+        tag = markAndReadTag(instream);
 
         offset++;
 
