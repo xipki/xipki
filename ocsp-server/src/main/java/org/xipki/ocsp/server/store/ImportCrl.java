@@ -599,7 +599,7 @@ class ImportCrl {
             crlDirInfo.shareCaWithOtherCrl, caCert.base64Sha1Fp);
         commit(conn);
 
-        importCrlRevokedCertificates(conn, id, caCert, crl, startTimeSec);
+        importCrlRevokedCertificates(conn, id, caCert, crl, crlDir, startTimeSec);
         commit(conn);
 
         if (!crl.isDeltaCrl()) {
@@ -779,7 +779,7 @@ class ImportCrl {
   } // method importCrlInfo
 
   private void importCrlRevokedCertificates(Connection conn, int crlInfoId, CertWrapper caCert,
-      CrlStreamParser crl, long startTimeSec)
+      CrlStreamParser crl, File crlDir, long startTimeSec)
           throws DataAccessException, ImportCrlException, IOException {
     int caId = caCert.databaseId.intValue();
     AtomicLong maxId = new AtomicLong(datasource.getMax(conn, "CERT", "ID"));
@@ -933,7 +933,7 @@ class ImportCrl {
       commit(conn);
     } else {
       // cert dirs
-      File certsDir = new File(basedir, "certs");
+      File certsDir = new File(crlDir, "certs");
 
       if (!certsDir.exists()) {
         LOG.info("the folder {} does not exist, ignore it", certsDir.getPath());
