@@ -58,7 +58,7 @@
 		"updateInterval":"10m",
 		"source":{
 			"datasource":"datasource1",
-			"type":"ejbca",
+			"type":"ejbca-db",
 			"conf":{
 			}
 		}
