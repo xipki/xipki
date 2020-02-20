@@ -361,24 +361,35 @@ public class CrlStreamParser extends Asn1StreamParser {
 
       offset++;
 
-      //       revokedCertificates     SEQUENCE OF SEQUENCE  { ... }
-      assertTag(TAG_CONSTRUCTED_SEQUENCE, tag, "tbsCertList.revokedCertificates");
-      int revokedCertificatesOffset = offset;
-      int revokedCertificatesLength = readLength(lenBytesSize, instream);
-      offset += lenBytesSize.get();
-
-      this.revokedCertificatesEndIndex = revokedCertificatesOffset + revokedCertificatesLength;
-      this.firstRevokedCertificateOffset = offset;
-
-      // skip the revokedCertificates
-      skip(instream, revokedCertificatesLength);
-      offset += revokedCertificatesLength;
+      boolean tagConsumed = false;
+      //       revokedCertificates     SEQUENCE OF SEQUENCE  { ... } OPTIONAL
+      if (TAG_CONSTRUCTED_SEQUENCE == tag) {
+        tagConsumed = true;
+        int revokedCertificatesOffset = offset;
+        int revokedCertificatesLength = readLength(lenBytesSize, instream);
+        offset += lenBytesSize.get();
+  
+        this.revokedCertificatesEndIndex = revokedCertificatesOffset + revokedCertificatesLength;
+        this.firstRevokedCertificateOffset = offset;
+  
+        // skip the revokedCertificates
+        skip(instream, revokedCertificatesLength);
+        offset += revokedCertificatesLength;
+        tag = -1;
+      } else {
+        this.revokedCertificatesEndIndex = offset;
+        this.firstRevokedCertificateOffset = offset;
+      }
 
       int crlExtensionsTag = BERTags.TAGGED | BERTags.CONSTRUCTED | 0; // [0] EXPLICIT
 
       Extensions extns = null;
       while (offset < tbsCertListEndIndex) {
-        tag = markAndReadTag(instream);
+        if (tagConsumed) {
+          tag = markAndReadTag(instream);
+          tagConsumed = true;
+        }
+
         offset++;
 
         int length = readLength(bytesLen, instream);
