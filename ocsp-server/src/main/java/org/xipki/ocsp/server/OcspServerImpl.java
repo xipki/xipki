@@ -1125,6 +1125,10 @@ public class OcspServerImpl implements OcspServer {
     OcspStore store;
     try {
       String type = conf.getSource().getType();
+      if (type != null) {
+        type = type.trim();
+      }
+
       if (StringUtil.isBlank(type)) {
         throw new ObjectCreationException("OCSP store type is not specified");
       } else if (STORE_TYPE_XIPKI_DB.equalsIgnoreCase(type)) {
