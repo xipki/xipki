@@ -362,7 +362,7 @@ public class CrlStreamParser extends Asn1StreamParser {
       offset++;
 
       //       revokedCertificates     SEQUENCE OF SEQUENCE  { ... } OPTIONAL
-      if (TAG_CONSTRUCTED_SEQUENCE == tag) {
+      if (offset < tbsCertListLength && TAG_CONSTRUCTED_SEQUENCE == tag) {
         int revokedCertificatesOffset = offset;
         int revokedCertificatesLength = readLength(lenBytesSize, instream);
         offset += lenBytesSize.get();
@@ -376,30 +376,32 @@ public class CrlStreamParser extends Asn1StreamParser {
         tag = -1;
       } else {
         instream.reset();
-        this.revokedCertificatesEndIndex = offset;
-        this.firstRevokedCertificateOffset = offset;
+        this.revokedCertificatesEndIndex = -1;
+        this.firstRevokedCertificateOffset = -1;
       }
 
       int crlExtensionsTag = BERTags.TAGGED | BERTags.CONSTRUCTED | 0; // [0] EXPLICIT
 
       Extensions extns = null;
-      while (offset < tbsCertListEndIndex) {
-        tag = markAndReadTag(instream);
+      if (offset < tbsCertListEndIndex) {
+        while (offset < tbsCertListEndIndex) {
+          tag = markAndReadTag(instream);
 
-        offset++;
+          offset++;
 
-        int length = readLength(bytesLen, instream);
-        offset += bytesLen.get();
+          int length = readLength(bytesLen, instream);
+          offset += bytesLen.get();
 
-        if (tag != crlExtensionsTag) {
-          skip(instream, length);
-          offset += length;
-        } else {
-          instream.mark(1);
-          //       crlExtensions           [0]  EXPLICIT Extensions OPTIONAL
-          bytes = readBlock(TAG_CONSTRUCTED_SEQUENCE, instream, "crlExtensions");
-          offset += bytes.length;
-          extns = Extensions.getInstance(bytes);
+          if (tag != crlExtensionsTag) {
+            skip(instream, length);
+            offset += length;
+          } else {
+            instream.mark(1);
+            //       crlExtensions           [0]  EXPLICIT Extensions OPTIONAL
+            bytes = readBlock(TAG_CONSTRUCTED_SEQUENCE, instream, "crlExtensions");
+            offset += bytes.length;
+            extns = Extensions.getInstance(bytes);
+          }
         }
       }
 
@@ -407,7 +409,7 @@ public class CrlStreamParser extends Asn1StreamParser {
 
       if (this.crlExtensions != null) {
         bytes = X509Util.getCoreExtValue(this.crlExtensions, Extension.cRLNumber);
-        this.crlNumber = ASN1Integer.getInstance(bytes).getValue();
+        this.crlNumber = (bytes == null) ? null : ASN1Integer.getInstance(bytes).getValue();
 
         bytes = X509Util.getCoreExtValue(this.crlExtensions, Extension.deltaCRLIndicator);
         if (bytes == null) {
@@ -420,7 +422,7 @@ public class CrlStreamParser extends Asn1StreamParser {
         this.baseCrlNumber = null;
       }
 
-      // From now on, the offset will not be needed anymore, so do update it.
+      // From now on, the offset will not be needed anymore, so do not update it.
       bytes = readBlock(TAG_CONSTRUCTED_SEQUENCE, instream, "signatureAlgorithm");
       this.algorithmIdentifier = AlgorithmIdentifier.getInstance(bytes);
       if (!tbsSignature.equals(this.algorithmIdentifier)) {
