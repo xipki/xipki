@@ -43,8 +43,7 @@ public interface CaManager {
   String NULL = "null";
 
   /**
-   * The highest bit is always set to 1, so the effective bit length is bitLen - 1. To ensure that
-   * at least 64 bit entropy, bitLen must be at least 65. For better entropy, we increase it to 71.
+   * At least 64 bit entropy is required. For better entropy, we increase it to 71.
    */
   int MIN_SERIALNUMBER_SIZE = 71;
 

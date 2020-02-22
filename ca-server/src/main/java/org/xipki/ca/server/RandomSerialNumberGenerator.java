@@ -34,8 +34,6 @@ class RandomSerialNumberGenerator {
 
   private static int[] AND_MASKS = new int[] {0xFF, 0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3F, 0x7F};
 
-  private static int[]  OR_MASKS = new int[] {0x80, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40};
-
   private static RandomSerialNumberGenerator instance;
 
   private final SecureRandom random;
@@ -60,7 +58,6 @@ class RandomSerialNumberGenerator {
       if (ci != 0) {
         rdnBytes[0] = (byte) (rdnBytes[0] & AND_MASKS[ci]);
       }
-      rdnBytes[0] = (byte) (rdnBytes[0] | OR_MASKS[ci]);
 
       // check NAF weight
       BigInteger bi = new BigInteger(1, rdnBytes);

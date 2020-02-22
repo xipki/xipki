@@ -210,7 +210,7 @@ public class CaActions {
     @Option(name = "--sn-bitlen",
         description = "number of bits of the serial number, between "
             + CaManager.MIN_SERIALNUMBER_SIZE + " and " + CaManager.MAX_SERIALNUMBER_SIZE)
-    private int snBitLen = 127;
+    private int snBitLen = 159;
 
     @Option(name = "--next-crl-no", required = true, description = "CRL number for the next CRL")
     private Long nextCrlNumber;
