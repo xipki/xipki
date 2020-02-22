@@ -62,8 +62,8 @@ import org.xipki.util.TripleState;
  * # 0 indicates that no deltaCRL will be generated
  * deltacrl.intervals=&lt;integer&gt;
  *
- * # Overlap minutes. At least 60 minutes
- * overlap.minutes=&lt;minutes of overlap&gt;
+ * # Overlap days. At least 1 day
+ * overlap.days=&lt;days of overlap&gt;
  *
  * # UTC time of generation of CRL, one interval covers 1 day. Default is 01:00
  * interval.time=&lt;update time (hh:mm of UTC time)&gt;
@@ -152,7 +152,13 @@ public class CrlControl {
 
   public static final String KEY_DELTACRL_INTERVALS = "deltacrl.intervals";
 
+  /**
+   * Overlap in minutes.
+   * @deprecated use {@link #KEY_OVERLAP_DAYS} instead.
+   */
   public static final String KEY_OVERLAP_MINUTES = "overlap.minutes";
+
+  public static final String KEY_OVERLAP_DAYS = "overlap.days";
 
   public static final String KEY_INTERVAL_TIME = "interval.time";
 
@@ -176,7 +182,7 @@ public class CrlControl {
 
   private int deltaCrlIntervals;
 
-  private int overlapMinutes = 360;
+  private int overlapDays = 3;
 
   private boolean extendedNextUpdate;
 
@@ -231,14 +237,24 @@ public class CrlControl {
     this.onlyContainsUserCerts = getBoolean(props, KEY_ONLY_CONTAINS_USERCERTS, false);
     this.excludeReason = getBoolean(props, KEY_EXCLUDE_REASON, false);
 
-    this.fullCrlIntervals = getInteger(props, KEY_FULLCRL_INTERVALS, 1);
+    // Maximal interval allowed by CA/Browser Forum's Baseline Requirements
+    this.fullCrlIntervals = getInteger(props, KEY_FULLCRL_INTERVALS, 7);
     this.deltaCrlIntervals = getInteger(props, KEY_DELTACRL_INTERVALS, 0);
     this.extendedNextUpdate = getBoolean(props, KEY_FULLCRL_EXTENDED_NEXTUPDATE, false);
-    this.overlapMinutes = getInteger(props, KEY_OVERLAP_MINUTES, 60);
-    if (this.overlapMinutes < 60) {
-      // corrected to the minimal value 60 minutes
-      this.overlapMinutes = 60;
+
+    if (props.value(KEY_OVERLAP_DAYS) != null) {
+      this.overlapDays = getInteger(props, KEY_OVERLAP_DAYS, 1);
+    } else if (props.value(KEY_OVERLAP_MINUTES) != null) {
+      int minutes = getInteger(props, KEY_OVERLAP_MINUTES, 1);
+      // convert minutes to days.
+      this.overlapDays = (minutes + 24 * 60 - 1) / (24 * 60);
     }
+
+    if (this.overlapDays < 1) {
+      // Maximal overlap allowed by CA/Browser Forum's Baseline Requirements
+      this.overlapDays = 3;
+    }
+
     str = props.value(KEY_INTERVAL_TIME);
     if (str == null) {
       this.intervalDayTime = new HourMinute(1, 0);
@@ -263,18 +279,19 @@ public class CrlControl {
 
   public String getConf() {
     ConfPairs pairs = new ConfPairs();
+    pairs.putPair(KEY_DELTACRL_INTERVALS, Integer.toString(deltaCrlIntervals));
+    pairs.putPair(KEY_EXCLUDE_REASON, Boolean.toString(excludeReason));
     pairs.putPair(KEY_EXPIRED_CERTS_INCLUDED, Boolean.toString(includeExpiredCerts));
+    pairs.putPair(KEY_FULLCRL_EXTENDED_NEXTUPDATE, Boolean.toString(extendedNextUpdate));
+    pairs.putPair(KEY_FULLCRL_INTERVALS, Integer.toString(fullCrlIntervals));
+    pairs.putPair(KEY_INTERVAL_TIME, intervalDayTime.toString());
+    pairs.putPair(KEY_INVALIDITY_DATE, invalidityDateMode.name());
+    pairs.putPair(KEY_ONLY_CONTAINS_CACERTS, Boolean.toString(onlyContainsCaCerts));
+    pairs.putPair(KEY_ONLY_CONTAINS_USERCERTS, Boolean.toString(onlyContainsUserCerts));
+    pairs.putPair(KEY_OVERLAP_DAYS, Integer.toString(overlapDays));
     pairs.putPair(KEY_XIPKI_CERTSET, Boolean.toString(xipkiCertsetIncluded));
     pairs.putPair(KEY_XIPKI_CERTSET_CERTS, Boolean.toString(xipkiCertsetCertIncluded));
     pairs.putPair(KEY_XIPKI_CERTSET, Boolean.toString(xipkiCertsetIncluded));
-    pairs.putPair(KEY_ONLY_CONTAINS_CACERTS, Boolean.toString(onlyContainsCaCerts));
-    pairs.putPair(KEY_ONLY_CONTAINS_USERCERTS, Boolean.toString(onlyContainsUserCerts));
-    pairs.putPair(KEY_EXCLUDE_REASON, Boolean.toString(excludeReason));
-    pairs.putPair(KEY_INVALIDITY_DATE, invalidityDateMode.name());
-    pairs.putPair(KEY_FULLCRL_INTERVALS, Integer.toString(fullCrlIntervals));
-    pairs.putPair(KEY_FULLCRL_EXTENDED_NEXTUPDATE, Boolean.toString(extendedNextUpdate));
-    pairs.putPair(KEY_DELTACRL_INTERVALS, Integer.toString(deltaCrlIntervals));
-    pairs.putPair(KEY_INTERVAL_TIME, intervalDayTime.toString());
 
     if (CollectionUtil.isNotEmpty(extensionOids)) {
       StringBuilder extensionsSb = new StringBuilder(200);
@@ -308,7 +325,7 @@ public class CrlControl {
         "  include expired certificates: ", includeExpiredCerts,
         "\n  full CRL intervals: ", fullCrlIntervals,
         "\n  delta CRL intervals: ", deltaCrlIntervals,
-        "\n  overlap: ", overlapMinutes, " minutes",
+        "\n  overlap: ", overlapDays, " days",
         "\n  use extended nextUpdate: ", extendedNextUpdate,
         "\n  only user certificates: ", onlyContainsUserCerts,
         "\n  only CA certificates: ", onlyContainsCaCerts,
@@ -339,8 +356,8 @@ public class CrlControl {
     return deltaCrlIntervals;
   }
 
-  public int getOverlapMinutes() {
-    return overlapMinutes;
+  public int getOverlapDays() {
+    return overlapDays;
   }
 
   public HourMinute getIntervalDayTime() {

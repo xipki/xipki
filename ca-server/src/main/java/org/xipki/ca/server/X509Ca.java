@@ -325,8 +325,7 @@ public class X509Ca implements Closeable {
 
       Date nextUpdate =
           new Date(getScheduledCrlGenTimeNotAfter(now).getTime()
-              + intervals * MS_PER_DAY
-              + control.getOverlapMinutes() * MS_PER_MINUTE);
+              + (intervals + control.getOverlapDays()) * MS_PER_DAY);
 
       long maxIdOfDeltaCrlCache;
       try {
@@ -731,7 +730,7 @@ public class X509Ca implements Closeable {
       }
 
       Date nextUpdate = new Date(nearestScheduledIssueTime.getTime()
-          + intervals * MS_PER_DAY);
+          + (intervals + control.getOverlapDays()) * MS_PER_DAY);
 
       long maxIdOfDeltaCrlCache = certstore.getMaxIdOfDeltaCrlCache(caIdent);
       X509CRL crl = generateCrl(false, thisUpdate, nextUpdate, msgId);

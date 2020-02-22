@@ -58,7 +58,7 @@
 			"crlControl":{
 				"update.mode":"interval",
 				"fullcrl.intervals":1,
-				"overlap.minutes":90,
+				"overlap.days":3,
 				"interval.time":"02:00"
 			},
 			"duplicateKey":true,
