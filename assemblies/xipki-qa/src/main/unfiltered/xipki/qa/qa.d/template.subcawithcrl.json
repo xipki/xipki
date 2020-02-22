@@ -37,7 +37,7 @@
 			},
 			"crlControl":{
 				"update.mode":"interval",
-				"fullcrl.intervals":1,
+				"fullcrl.intervals":7,
 				"overlap.days":3,
 				"interval.time":"02:00",
 				"xipki.certset":false
