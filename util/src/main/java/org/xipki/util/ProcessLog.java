@@ -317,7 +317,7 @@ public class ProcessLog {
     sb.append(second);
 
     Calendar midNight = Calendar.getInstance();
-    midNight.set(Calendar.HOUR, 0);
+    midNight.set(Calendar.HOUR_OF_DAY, 0);
     midNight.set(Calendar.MINUTE, 0);
     midNight.set(Calendar.SECOND, 0);
     long midNightSec = midNight.getTimeInMillis() / 1000;

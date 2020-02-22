@@ -2458,7 +2458,7 @@ public class X509Ca implements Closeable {
     Calendar cal = Calendar.getInstance(TIMEZONE_UTC);
     cal.setTime(time);
     HourMinute hm =  caInfo.getCrlControl().getIntervalDayTime();
-    cal.set(Calendar.HOUR, hm.getHour());
+    cal.set(Calendar.HOUR_OF_DAY, hm.getHour());
     cal.set(Calendar.MINUTE, hm.getMinute());
     cal.set(Calendar.SECOND, 0);
     cal.set(Calendar.MILLISECOND, 0);
