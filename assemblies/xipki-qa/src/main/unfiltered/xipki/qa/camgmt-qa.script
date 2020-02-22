@@ -279,7 +279,7 @@ if { $printUsage equals "true" } then {
   caqa:ca-check --name subca1 \
     --permission all \
     --max-validity 5y \
-    --sn-bitlen 127  \
+    --sn-len 16  \
     --signer-type $TOKEN_TYPE \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://example.org/subca1.der \
@@ -291,7 +291,7 @@ if { $printUsage equals "true" } then {
 
   caqa:ca-check --name rootca1 \
     --permission all \
-    --sn-bitlen 127  \
+    --sn-len 16  \
     --max-validity 10y \
     --signer-type $TOKEN_TYPE \
     --cert output/rootca1.crt \
@@ -311,7 +311,7 @@ if { $printUsage equals "true" } then {
 
   caqa:ca-check --name subca1 \
     --permission all \
-    --sn-bitlen 127 \
+    --sn-len 16 \
     --max-validity 5y \
     --signer-type $TOKEN_TYPE \
     --cert output/subca1.crt \
@@ -341,7 +341,7 @@ if { $printUsage equals "true" } then {
     --permission enroll_cert \
     --permission revoke_cert \
     --max-validity 8y \
-    --sn-bitlen 127  \
+    --sn-len 16  \
     --signer-type $TOKEN_TYPE \
     --cert output/rootca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder2 \
@@ -372,7 +372,7 @@ if { $printUsage equals "true" } then {
     --outform $OUTFORM \
     --out output/rootca1-2.crt \
     --permission all \
-    --sn-bitlen 127  \
+    --sn-len 16  \
     --next-crl-no 2 \
     --max-validity 10y \
     --signer-type $TOKEN_TYPE \
@@ -392,7 +392,7 @@ if { $printUsage equals "true" } then {
   caqa:neg-ca-add \
     --name rootca2 \
     --permission all \
-    --sn-bitlen 127  \
+    --sn-len 16  \
     --next-crl-no 2 \
     --max-validity 10y \
     --signer-type $TOKEN_TYPE \
@@ -411,7 +411,7 @@ if { $printUsage equals "true" } then {
   caqa:neg-ca-add \
     --name rootca2 \
     --permission all \
-    --sn-bitlen 127  \
+    --sn-len 16  \
     --next-crl-no 2 \
     --max-validity 10y \
     --signer-type $TOKEN_TYPE \
@@ -426,12 +426,12 @@ if { $printUsage equals "true" } then {
     --validity-mode cutoff \
     --certchain output/subcawithcrl1.crt
 
-  echo "neg-ca-add: sn-bitlen not in [64, 159]"
+  echo "neg-ca-add: sn-len not in [8, 20]"
 
   caqa:neg-ca-add \
     --name rootca2 \
     --permission all \
-    --sn-bitlen 127  \
+    --sn-len 16  \
     --next-crl-no 2 \
     --max-validity 10y \
     --signer-type $TOKEN_TYPE \
@@ -449,7 +449,7 @@ if { $printUsage equals "true" } then {
   caqa:neg-ca-add \
     --name rootca2 \
     --permission all \
-    --sn-bitlen 127  \
+    --sn-len 16  \
     --next-crl-no 2 \
     --max-validity 10y \
     --signer-type $TOKEN_TYPE \
@@ -467,7 +467,7 @@ if { $printUsage equals "true" } then {
   caqa:neg-ca-add \
     --name rootca2 \
     --permission all \
-    --sn-bitlen 127  \
+    --sn-len 16  \
     --next-crl-no 2 \
     --max-validity 10y \
     --signer-type $TOKEN_TYPE \
@@ -487,7 +487,7 @@ if { $printUsage equals "true" } then {
   caqa:neg-ca-add \
     --name rootca2 \
     --permission all \
-    --sn-bitlen 127  \
+    --sn-len 16  \
     --next-crl-no 2 \
     --max-validity 10y \
     --signer-type $TOKEN_TYPE \

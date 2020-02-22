@@ -262,7 +262,7 @@ public abstract class MgmtMessage {
 
     private List<byte[]> certchainBytes;
 
-    private int serialNoBitLen;
+    private int serialNoLen;
 
     private long nextCrlNumber;
 
@@ -336,7 +336,7 @@ public abstract class MgmtMessage {
       }
       scepResponderName = caEntry.getScepResponderName();
 
-      serialNoBitLen = caEntry.getSerialNoBitLen();
+      serialNoLen = caEntry.getSerialNoLen();
       signerConf = caEntry.getSignerConf();
       signerType = caEntry.getSignerType();
 
@@ -553,12 +553,12 @@ public abstract class MgmtMessage {
       this.certchainBytes = certchainBytes;
     }
 
-    public int getSerialNoBitLen() {
-      return serialNoBitLen;
+    public int getSerialNoLen() {
+      return serialNoLen;
     }
 
-    public void setSerialNoBitLen(int serialNoBitLen) {
-      this.serialNoBitLen = serialNoBitLen;
+    public void setSerialNoLen(int serialNoLen) {
+      this.serialNoLen = serialNoLen;
     }
 
     public long getNextCrlNumber() {
@@ -587,7 +587,7 @@ public abstract class MgmtMessage {
 
     public MgmtEntry.Ca toCaEntry()
         throws CertificateException, CaMgmtException, InvalidConfException {
-      MgmtEntry.Ca rv = new MgmtEntry.Ca(ident, serialNoBitLen, nextCrlNumber,
+      MgmtEntry.Ca rv = new MgmtEntry.Ca(ident, serialNoLen, nextCrlNumber,
                           signerType, signerConf, caUris, numCrls, expirationPeriod);
       if (certBytes != null) {
         rv.setCert(X509Util.parseCert(certBytes));
@@ -642,7 +642,7 @@ public abstract class MgmtMessage {
       }
 
       rv.setScepResponderName(scepResponderName);
-      rv.setSerialNoBitLen(serialNoBitLen);
+      rv.setSerialNoLen(serialNoLen);
       rv.setSignerConf(signerConf);
       rv.setStatus(status);
       rv.setValidityMode(validityMode);

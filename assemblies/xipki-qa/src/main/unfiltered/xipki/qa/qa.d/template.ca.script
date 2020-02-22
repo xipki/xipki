@@ -96,7 +96,7 @@ ca:gen-rootca \
   --outform $OUTFORM \
   --out output/rootca1.crt \
   --permission all \
-  --sn-bitlen 127 \
+  --sn-len 16 \
   --next-crl-no 2 \
   --max-validity 10y \
   --signer-type $TOKEN_TYPE \
@@ -315,7 +315,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
 ca:ca-add \
   --name subca1 \
   --permission all \
-  --sn-bitlen 127 \
+  --sn-len 16 \
   --next-crl-no 2 \
   --max-validity 5y \
   --signer-type $TOKEN_TYPE \
@@ -391,7 +391,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
 ca:ca-add \
   --name subcawithcrl1 \
   --permission all \
-  --sn-bitlen 127 \
+  --sn-len 16 \
   --next-crl-no 2 \
   --max-validity 8000y \
   --signer-type $TOKEN_TYPE \

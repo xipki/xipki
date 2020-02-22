@@ -356,7 +356,7 @@ public class CaInfo {
   }
 
   public BigInteger nextSerial() throws OperationException {
-    return randomSnGenerator.nextSerialNumber(caEntry.getSerialNoBitLen());
+    return randomSnGenerator.nextSerialNumber(caEntry.getSerialNoLen());
   }
 
   public BigInteger nextCrlNumber() throws OperationException {

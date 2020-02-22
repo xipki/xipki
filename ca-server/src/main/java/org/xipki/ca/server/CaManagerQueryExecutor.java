@@ -492,7 +492,14 @@ class CaManagerQueryExecutor {
 
       String caUrisText = rs.getString("CA_URIS");
       CaUris caUris = (caUrisText == null) ? null : CaUris.decode(caUrisText);
-      MgmtEntry.Ca entry = new MgmtEntry.Ca(new NameId(rs.getInt("ID"), name), rs.getInt("SN_SIZE"),
+      int snSize = rs.getInt("SN_SIZE");
+      if (snSize > CaManager.MAX_SERIALNUMBER_SIZE) {
+        snSize = CaManager.MAX_SERIALNUMBER_SIZE;
+      } else if (snSize < CaManager.MIN_SERIALNUMBER_SIZE) {
+        snSize = CaManager.MIN_SERIALNUMBER_SIZE;
+      }
+
+      MgmtEntry.Ca entry = new MgmtEntry.Ca(new NameId(rs.getInt("ID"), name), snSize,
           rs.getLong("NEXT_CRLNO"), rs.getString("SIGNER_TYPE"), rs.getString("SIGNER_CONF"),
           caUris, rs.getInt("NUM_CRLS"), rs.getInt("EXPIRATION_PERIOD"));
       entry.setCert(generateCert(rs.getString("CERT")));
@@ -718,7 +725,7 @@ class CaManagerQueryExecutor {
       ps.setInt(idx++, caEntry.getIdent().getId());
       ps.setString(idx++, caEntry.getIdent().getName());
       ps.setString(idx++, caEntry.getSubject());
-      ps.setInt(idx++, caEntry.getSerialNoBitLen());
+      ps.setInt(idx++, caEntry.getSerialNoLen());
       ps.setLong(idx++, caEntry.getNextCrlNumber());
       ps.setString(idx++, caEntry.getStatus().getStatus());
 
@@ -1202,7 +1209,7 @@ class CaManagerQueryExecutor {
     }
 
     changeIfNotNull("CA", col(INT, "ID", changeCaEntry.getIdent().getId()),
-        col(INT, "SN_SIZE", changeCaEntry.getSerialNoBitLen()), col(STRING, "STATUS", status),
+        col(INT, "SN_SIZE", changeCaEntry.getSerialNoLen()), col(STRING, "STATUS", status),
         col(STRING, "SUBJECT", subject), col(STRING, "CERT", base64Cert),
         col(STRING, "CERTCHAIN", certchainStr),
         col(STRING, "CA_URIS", caUrisStr),

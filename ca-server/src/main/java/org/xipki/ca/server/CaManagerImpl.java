@@ -2210,7 +2210,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
 
     BigInteger serialOfThisCert = (serialNumber != null) ? serialNumber
-        : RandomSerialNumberGenerator.getInstance().nextSerialNumber(caEntry.getSerialNoBitLen());
+        : RandomSerialNumberGenerator.getInstance().nextSerialNumber(caEntry.getSerialNoLen());
 
     GenerateSelfSignedResult result;
     try {
@@ -2236,7 +2236,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     String name = caEntry.getIdent().getName();
     long nextCrlNumber = caEntry.getNextCrlNumber();
 
-    MgmtEntry.Ca entry = new MgmtEntry.Ca(new NameId(null, name), caEntry.getSerialNoBitLen(),
+    MgmtEntry.Ca entry = new MgmtEntry.Ca(new NameId(null, name), caEntry.getSerialNoLen(),
         nextCrlNumber, signerType, signerConf, caEntry.getCaUris(), numCrls, expirationPeriod);
     entry.setCert(caCert);
     entry.setCmpControl(caEntry.getCmpControl());
@@ -3102,7 +3102,7 @@ public class CaManagerImpl implements CaManager, Closeable {
           caInfoType.setSignerConf(createFileOrValue(zipStream, entry.getSignerConf(),
               concat("files/ca-", name, "-signerconf.conf")));
           caInfoType.setSignerType(entry.getSignerType());
-          caInfoType.setSnSize(entry.getSerialNoBitLen());
+          caInfoType.setSnSize(entry.getSerialNoLen());
 
           caInfoType.setStatus(entry.getStatus().getStatus());
           caInfoType.setValidityMode(entry.getValidityMode().name());

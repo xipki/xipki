@@ -207,10 +207,10 @@ public class CaActions {
     @Completion(CaCompleters.PermissionCompleter.class)
     private Set<String> permissions;
 
-    @Option(name = "--sn-bitlen",
-        description = "number of bits of the serial number, between "
+    @Option(name = "--sn-len",
+        description = "number of bytes of the serial number, between "
             + CaManager.MIN_SERIALNUMBER_SIZE + " and " + CaManager.MAX_SERIALNUMBER_SIZE)
-    private int snBitLen = 159;
+    private int snLen = CaManager.MAX_SERIALNUMBER_SIZE;
 
     @Option(name = "--next-crl-no", required = true, description = "CRL number for the next CRL")
     private Long nextCrlNumber;
@@ -301,7 +301,7 @@ public class CaActions {
     private PasswordResolver passwordResolver;
 
     protected MgmtEntry.Ca getCaEntry() throws Exception {
-      Args.range(snBitLen, "sn-bitlen",
+      Args.range(snLen, "snLen",
           CaManager.MIN_SERIALNUMBER_SIZE, CaManager.MAX_SERIALNUMBER_SIZE);
 
       if (nextCrlNumber < 1) {
@@ -322,7 +322,7 @@ public class CaActions {
       }
 
       CaUris caUris = new CaUris(caCertUris, ocspUris, crlUris, deltaCrlUris);
-      MgmtEntry.Ca entry = new MgmtEntry.Ca(new NameId(null, caName), snBitLen, nextCrlNumber,
+      MgmtEntry.Ca entry = new MgmtEntry.Ca(new NameId(null, caName), snLen, nextCrlNumber,
           signerType, signerConf, caUris, numCrls.intValue(), expirationPeriod.intValue());
 
       entry.setKeepExpiredCertInDays(keepExpiredCertInDays.intValue());
@@ -1021,10 +1021,10 @@ public class CaActions {
     @Completion(CaCompleters.CaNameCompleter.class)
     private String caName;
 
-    @Option(name = "--sn-bitlen",
-        description = "number of bits of the serial number, between "
+    @Option(name = "--sn-len",
+        description = "number of octets of the serial number, between "
             + CaManager.MIN_SERIALNUMBER_SIZE + " and " + CaManager.MAX_SERIALNUMBER_SIZE)
-    private Integer snBitLen;
+    private Integer snLen;
 
     @Option(name = "--status", description = "CA status")
     @Completion(CaCompleters.CaStatusCompleter.class)
@@ -1145,10 +1145,10 @@ public class CaActions {
     protected MgmtEntry.ChangeCa getChangeCaEntry() throws Exception {
       MgmtEntry.ChangeCa entry = new MgmtEntry.ChangeCa(new NameId(null, caName));
 
-      if (snBitLen != null) {
-        Args.range(snBitLen, "sn-bitlen",
+      if (snLen != null) {
+        Args.range(snLen, "sn-len",
             CaManager.MIN_SERIALNUMBER_SIZE, CaManager.MAX_SERIALNUMBER_SIZE);
-        entry.setSerialNoBitLen(snBitLen);
+        entry.setSerialNoLen(snLen);
       }
 
       if (caStatus != null) {

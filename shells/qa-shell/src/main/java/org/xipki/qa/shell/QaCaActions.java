@@ -384,8 +384,8 @@ public class QaCaActions {
       }
 
       // SN size
-      if (ey.getSerialNoBitLen() != null) {
-        assertObjEquals("serial number bit length", ey.getSerialNoBitLen(), ca.getSerialNoBitLen());
+      if (ey.getSerialNoLen() != null) {
+        assertObjEquals("serial number length", ey.getSerialNoLen(), ca.getSerialNoLen());
       }
 
       // CMP control name

@@ -43,15 +43,14 @@ public interface CaManager {
   String NULL = "null";
 
   /**
-   * At least 64 bit entropy is required. For better entropy, we increase it to 71.
+   * At least 64 bit entropy is required. Since the highest bit is set to 0, 9 bytes is required.
    */
-  int MIN_SERIALNUMBER_SIZE = 71;
+  int MIN_SERIALNUMBER_SIZE = 9;
 
   /**
-   * Since serial number should be positive and maximal 20 bytes, the maximal value of bitLen is
-   * 159.
+   * Since serial number should be positive and maximal 20 bytes.
    */
-  int MAX_SERIALNUMBER_SIZE = 159;
+  int MAX_SERIALNUMBER_SIZE = 20;
 
   CaSystemStatus getCaSystemStatus() throws CaMgmtException;
 

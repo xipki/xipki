@@ -162,7 +162,7 @@ public abstract class MgmtEntry {
      */
     private List<X509Certificate> certchain;
 
-    private int serialNoBitLen;
+    private int serialNoLen;
 
     private long nextCrlNumber;
 
@@ -179,7 +179,7 @@ public abstract class MgmtEntry {
     private Ca() {
     }
 
-    public Ca(NameId ident, int serialNoBitLen, long nextCrlNumber, String signerType,
+    public Ca(NameId ident, int serialNoLen, long nextCrlNumber, String signerType,
         String signerConf, CaUris caUris, int numCrls, int expirationPeriod) {
       this.ident = Args.notNull(ident, "ident");
       this.signerType = Args.toNonBlankLower(signerType, "signerType");
@@ -187,7 +187,7 @@ public abstract class MgmtEntry {
       this.signerConf = Args.notBlank(signerConf, "signerConf");
 
       this.numCrls = Args.positive(numCrls, "numCrls");
-      this.serialNoBitLen = Args.range(serialNoBitLen, "serialNoBitLen",
+      this.serialNoLen = Args.range(serialNoLen, "serialNoLen",
           CaManager.MIN_SERIALNUMBER_SIZE, CaManager.MAX_SERIALNUMBER_SIZE);
       this.nextCrlNumber = Args.positive(nextCrlNumber, "nextCrlNumber");
       this.caUris = (caUris == null) ? CaUris.EMPTY_INSTANCE : caUris;
@@ -466,7 +466,7 @@ public abstract class MgmtEntry {
           "\nkeep expired certs: ",
               (keepExpiredCertInDays < 0 ? "forever" : keepExpiredCertInDays + " days"),
           "\nextra control: ", extraCtrlText,
-          "\nserial number bit length: ", serialNoBitLen,
+          "\nserial number length: ", serialNoLen, " bytes",
           "\nnext CRL number: ", nextCrlNumber, "\n", caUris,
           "\nrevocation: ", (revocationInfo == null ? "not revoked" : "revoked"), revInfoText,
           "\ncert: \n", X509Util.formatCert(cert, verbose),
@@ -534,7 +534,7 @@ public abstract class MgmtEntry {
           && (saveRequest == obj.saveRequest)
           && CompareUtil.equalsObject(scepControl, obj.scepControl)
           && CompareUtil.equalsObject(scepResponderName, obj.scepResponderName)
-          && (serialNoBitLen == obj.serialNoBitLen)
+          && (serialNoLen == obj.serialNoLen)
           && signerType.equals(obj.signerType)
           && CompareUtil.equalsObject(signerConf, obj.signerConf)
           && CompareUtil.equalsObject(status, obj.status)
@@ -567,12 +567,12 @@ public abstract class MgmtEntry {
       }
     } // method setCert
 
-    public int getSerialNoBitLen() {
-      return serialNoBitLen;
+    public int getSerialNoLen() {
+      return serialNoLen;
     }
 
-    public void setSerialNoBitLen(int serialNoBitLen) {
-      this.serialNoBitLen = Args.range(serialNoBitLen, "serialNoBitLen",
+    public void setSerialNoLen(int serialNoLen) {
+      this.serialNoLen = Args.range(serialNoLen, "serialNoLen",
           CaManager.MIN_SERIALNUMBER_SIZE, CaManager.MAX_SERIALNUMBER_SIZE);
     }
 
@@ -959,7 +959,7 @@ public abstract class MgmtEntry {
 
     private Integer numCrls;
 
-    private Integer serialNoBitLen;
+    private Integer serialNoLen;
 
     // For the deserialization only
     @SuppressWarnings("unused")
@@ -1170,16 +1170,16 @@ public abstract class MgmtEntry {
       this.extraControl = extraControl;
     }
 
-    public Integer getSerialNoBitLen() {
-      return serialNoBitLen;
+    public Integer getSerialNoLen() {
+      return serialNoLen;
     }
 
-    public void setSerialNoBitLen(Integer serialNoBitLen) {
-      if (serialNoBitLen != null) {
-        Args.range(serialNoBitLen, "serialNoBitLen",
+    public void setSerialNoLen(Integer serialNoLen) {
+      if (serialNoLen != null) {
+        Args.range(serialNoLen, "serialNoLen",
             CaManager.MIN_SERIALNUMBER_SIZE, CaManager.MAX_SERIALNUMBER_SIZE);
       }
-      this.serialNoBitLen = serialNoBitLen;
+      this.serialNoLen = serialNoLen;
     }
 
     public CaUris getCaUris() {

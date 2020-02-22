@@ -563,7 +563,13 @@ public class CaConfType {
     }
 
     public void setSnSize(int snSize) {
-      this.snSize = snSize;
+      if (snSize > CaManager.MAX_SERIALNUMBER_SIZE) {
+        snSize = CaManager.MAX_SERIALNUMBER_SIZE;
+      } else if (snSize < CaManager.MIN_SERIALNUMBER_SIZE) {
+        snSize = CaManager.MIN_SERIALNUMBER_SIZE;
+      } else {
+        this.snSize = snSize;
+      }
     }
 
     public CaUris getCaUris() {

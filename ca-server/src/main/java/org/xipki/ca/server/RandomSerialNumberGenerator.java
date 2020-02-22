@@ -20,9 +20,6 @@ package org.xipki.ca.server;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
-import org.xipki.ca.api.mgmt.CaManager;
-import org.xipki.util.Args;
-
 /**
  * Random serial number generator.
  *
@@ -31,8 +28,6 @@ import org.xipki.util.Args;
  */
 
 class RandomSerialNumberGenerator {
-
-  private static int[] AND_MASKS = new int[] {0xFF, 0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3F, 0x7F};
 
   private static RandomSerialNumberGenerator instance;
 
@@ -44,23 +39,20 @@ class RandomSerialNumberGenerator {
 
   /**
    * Generate the next serial number.
-   * @param bitLen bit length of the serial number.
+   * @param byteLen byte length of the serial number.
    * @return the serial number.
    */
-  public BigInteger nextSerialNumber(int bitLen) {
-    Args.range(bitLen, "bitlen", CaManager.MIN_SERIALNUMBER_SIZE, CaManager.MAX_SERIALNUMBER_SIZE);
-    final byte[] rdnBytes = new byte[(bitLen + 7) / 8];
-    final int ci = bitLen % 8;
-    final int minWeight = bitLen >>> 2;
+  public BigInteger nextSerialNumber(int byteLen) {
+    final byte[] rndBytes = new byte[byteLen];
+    final int minWeight = byteLen * 2;
 
     while (true) {
-      random.nextBytes(rdnBytes);
-      if (ci != 0) {
-        rdnBytes[0] = (byte) (rdnBytes[0] & AND_MASKS[ci]);
-      }
+      random.nextBytes(rndBytes);
+      // set the first bit to 0.
+      rndBytes[0] &= 0x7F;
 
       // check NAF weight
-      BigInteger bi = new BigInteger(1, rdnBytes);
+      BigInteger bi = new BigInteger(rndBytes);
 
       BigInteger threeBi = bi.shiftLeft(1).add(bi);
       BigInteger diff = threeBi.xor(bi);
