@@ -5,14 +5,16 @@
    |
    +-- crl-<name> (e.g. crl-mycrl1, one for each CRL)
        |
-       +-- UPDATEME (file, optional)
+       +-- UPDATEME (file, required for first time and on every change)
        |     If present, it indicates that content of this folder is changed.
        |
        +-- ca.crt (file, required)
        |     CA certificate. Either DER or PEM encoded.
        |
        +-- crl.url (file, optional)
-       |     If present, contains a line of the URL to download the CRL.
+       |     If present, contains a line of the URL of the CRL.
+       |     Note that it will only be used to construct the CrlID in the OCSP
+       |     response, not to download the CRL.
        |
        +-- REMOVEME (file, optional)
        |     Indicates that the CA shall be removed from the database.
