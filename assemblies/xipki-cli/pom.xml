@@ -187,10 +187,6 @@
                     file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/bin/inc"
                     token="-Dcom.sun.management.jmxremote"
                     value=""/>
-                <replace
-                    file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/startup.properties"
-                    token="mvn\:org.apache.servicemix"
-                    value="#mvn\:org.apache.servicemix"/>
               </target>
             </configuration>
             <goals>

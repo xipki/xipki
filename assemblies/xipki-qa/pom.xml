@@ -250,10 +250,6 @@
                     file="${project.build.directory}/classes/system/org/xipki/feature/qa/${project.version}/qa-${project.version}-features.xml"
                     token="&lt;!--feature&gt;intern-xipki-jdbc&lt;/feature--&gt;"
                     value="&lt;feature&gt;intern-xipki-jdbc&lt;/feature&gt;"/>
-                <replace
-                    file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/startup.properties"
-                    token="mvn\:org.apache.servicemix"
-                    value="#mvn\:org.apache.servicemix"/>
               </target>
             </configuration>
             <goals>

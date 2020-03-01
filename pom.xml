@@ -46,15 +46,15 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <xipki.tools.version>1.0.5</xipki.tools.version>
     <servlet.version>3.1.0</servlet.version>
-    <karaf.version>4.2.7</karaf.version>
+    <karaf.version>4.2.8</karaf.version>
     <bc.version>1.64</bc.version>
     <slf4j.version>1.7.25</slf4j.version>
     <pkcs11-wrapper.version>1.4.6</pkcs11-wrapper.version>
     <liquibase.version>3.6.3</liquibase.version>
     <snakeyaml.version>1.18</snakeyaml.version>
-    <hikaricp.version>3.4.1</hikaricp.version>
+    <hikaricp.version>3.4.2</hikaricp.version>
     <syslog-java-client.version>1.1.7</syslog-java-client.version>
-    <fastjson.version>1.2.62</fastjson.version>
+    <fastjson.version>1.2.66</fastjson.version>
     <!-- only for runtime -->
     <log4j.version>2.12.1</log4j.version>
     <jdbc.mariadb.version>2.4.4</jdbc.mariadb.version>
