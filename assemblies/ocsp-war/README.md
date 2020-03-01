@@ -24,8 +24,6 @@ Deployment in Tomcat 8 and 9
        under `http://<host>:<port>`.
 - Add the line `org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true`
    to the file `conf/catalina.properties` if OCSP over HTTP supported is activated.
-- (optiona) add `maxKeepAliveRequests="-1"` to the HTTP Connector in the file `conf/server`.
-   This step is only required for the benchmark test.
 - (optional) To accelerate the start process, append the following block to the property
 `tomcat.util.scan.StandardJarScanFilter.jarsToSkip` in the file `conf/catalina.properties`.
 

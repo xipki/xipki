@@ -9,3 +9,6 @@
 - Comment-in the remoteMgmt block in `xipki/etc/ocsp/ocsp.json`.
 - Copy the database files `xipki/etc/ca/database/mariadb/*.properties` to `xipki/etc/ca/database/`.
 - Copy the database files `xipki/etc/ocsp/database/mariadb/*.properties` to `xipki/etc/ocsp/database/`.
+
+## In Tomcat conf/server.xml
+- Add `maxKeepAliveRequests="-1"` to the Connectors listening on port 8080 and 8443.

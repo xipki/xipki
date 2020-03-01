@@ -7,7 +7,7 @@ Deployment in Tomcat 8 and 9
 ```sh
     <Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"
                maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
-               connectionTimeout="4000" maxKeepAliveRequests="-1">
+               connectionTimeout="4000">
         <SSLHostConfig
                 certificateVerification="optional"
                 protocols="TLSv1.2"
@@ -28,7 +28,7 @@ Deployment in Tomcat 8 and 9
 ```sh
     <Connector port="8443" protocol="org.apache.coyote.http11.Http11AprProtocol"
                maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
-               connectionTimeout="4000" maxKeepAliveRequests="-1">
+               connectionTimeout="4000">
         <SSLHostConfig
                 certificateVerification="optional"
                 protocols="TLSv1.2"

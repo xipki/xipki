@@ -3,15 +3,13 @@ Deployment in Tomcat 8 and 9
 - Copy the sub-folders `webapps` and `xipki` to the tomcat root folder
 - Add the line `org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true`
    to the file `conf/catalina.properties` if OCSP over HTTP supported is activated.
-- (optiona) add `maxKeepAliveRequests="-1"` to the Connector listening on port 8080 in the file `conf/server`.
-   This step is only required for the benchmark test.
 - Configure the TLS listener in the file `conf/server.xml`
     - Use NIO connector
 
 ```sh
     <Connector port="9443" protocol="org.apache.coyote.http11.Http11NioProtocol"
                maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
-               connectionTimeout="4000" maxKeepAliveRequests="-1">
+               connectionTimeout="4000">
         <SSLHostConfig
                 certificateVerification="optional"
                 protocols="TLSv1.2"
@@ -32,7 +30,7 @@ Deployment in Tomcat 8 and 9
 ```sh
     <Connector port="9443" protocol="org.apache.coyote.http11.Http11AprProtocol"
                maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
-               connectionTimeout="4000" maxKeepAliveRequests="-1">
+               connectionTimeout="4000">
         <SSLHostConfig
                 certificateVerification="optional"
                 protocols="TLSv1.2"
