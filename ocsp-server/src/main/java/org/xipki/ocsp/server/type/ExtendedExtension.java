@@ -25,6 +25,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ocsp.server.type.OcspRequest.Header;
+import org.xipki.util.CompareUtil;
 import org.xipki.util.Hex;
 
 /**
@@ -98,7 +99,7 @@ public class ExtendedExtension extends Extension {
     Header hdrExtValue;
 
     boolean critical;
-    if (hdrNext.tag == 0x01) { // criticial
+    if (hdrNext.tag == 0x01) { // critical
       critical = encoded[hdrNext.readerIndex] == (byte) 0xFF;
       hdrExtValue = OcspRequest.readHeader(encoded, hdrNext.readerIndex + hdrNext.len);
     } else {
@@ -109,7 +110,7 @@ public class ExtendedExtension extends Extension {
     OID extnType = OID.getInstanceForEncoded(encoded, hdrOid.tagIndex);
     if (extnType == null) {
       byte[] bytes = new byte[hdrOid.readerIndex - hdrOid.tagIndex + hdrOid.len];
-      System.arraycopy(encoded, hdrOid.tag, bytes, 0, bytes.length);
+      System.arraycopy(encoded, hdrOid.tagIndex, bytes, 0, bytes.length);
       ASN1ObjectIdentifier oid = ASN1ObjectIdentifier.getInstance(bytes);
       LOG.warn("unknown extension {}", oid.getId());
       if (critical) {
@@ -160,6 +161,13 @@ public class ExtendedExtension extends Extension {
   public int write(byte[] out, int offset) {
     System.arraycopy(encoded, from, out, offset, encodedLength);
     return encodedLength;
+  }
+
+  public boolean equalsExtnValue(byte[] value) {
+    if (value.length != extnValueLength) {
+      return false;
+    }
+    return CompareUtil.areEqual(value, 0, encoded, extnValueFrom, extnValueLength);
   }
 
   public int writeExtnValue(byte[] out, int offset) {

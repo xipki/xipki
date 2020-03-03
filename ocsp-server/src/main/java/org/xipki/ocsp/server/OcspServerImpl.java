@@ -45,7 +45,9 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.ocsp.OCSPRequest;
 import org.bouncycastle.asn1.ocsp.OCSPResponse;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -180,6 +182,8 @@ public class OcspServerImpl implements OcspServer {
 
   private static final Map<OcspResponseStatus, OcspRespWithCacheInfo> unsuccesfulOCSPRespMap;
 
+  private static final byte[] encodedAcceptableResponses_Basic;
+
   private final DataSourceFactory datasourceFactory;
 
   private SecurityFactory securityFactory;
@@ -231,6 +235,8 @@ public class OcspServerImpl implements OcspServer {
     byte[] encoded = new byte[ext.getEncodedLength()];
     ext.write(encoded, 0);
     extension_pkix_ocsp_extendedRevoke = new WritableOnlyExtension(encoded);
+
+    encodedAcceptableResponses_Basic = Hex.decode("300B06092B0601050507300101");
   } // method static
 
   public OcspServerImpl() {
@@ -655,6 +661,30 @@ public class OcspServerImpl implements OcspServer {
 
       List<ExtendedExtension> reqExtensions = req.getExtensions();
       List<Extension> respExtensions = new LinkedList<>();
+
+      ExtendedExtension ocspRespExtn = removeExtension(reqExtensions, OID.ID_PKIX_OCSP_RESPONSE);
+      if (ocspRespExtn != null) {
+        boolean containsBasic = ocspRespExtn.equalsExtnValue(encodedAcceptableResponses_Basic);
+        if (!containsBasic) {
+          // we need to parse the extension
+          byte[] extnValue = new byte[ocspRespExtn.getExtnValueLength()];
+          ocspRespExtn.writeExtnValue(extnValue, 0);
+          ASN1Sequence seq = ASN1Sequence.getInstance(extnValue);
+          final int size = seq.size();
+          for (int i = 0; i < size; i++) {
+            ASN1ObjectIdentifier oid = ASN1ObjectIdentifier.getInstance(seq.getObjectAt(i));
+            if (OCSPObjectIdentifiers.id_pkix_ocsp_basic.equals(oid)) {
+              containsBasic = true;
+              break;
+            }
+          }
+        }
+
+        if (!containsBasic) {
+          LOG.warn("basic OCSP response is not accepted by the client");
+          return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
+        }
+      }
 
       ExtendedExtension nonceExtn = removeExtension(reqExtensions, OID.ID_PKIX_OCSP_NONCE);
       if (nonceExtn != null) {

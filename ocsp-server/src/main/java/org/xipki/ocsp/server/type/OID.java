@@ -40,7 +40,8 @@ public enum OID {
   ID_PKIX_OCSP_EXTENDEDREVOKE(ObjectIdentifiers.Extn.id_pkix_ocsp_extendedRevoke),
   ID_ISISMTT_AT_CERTHASH(ISISMTTObjectIdentifiers.id_isismtt_at_certHash),
   ID_INVALIDITY_DATE(Extension.invalidityDate),
-  ID_PKIX_OCSP_ARCHIVE_CUTOFF(OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff);
+  ID_PKIX_OCSP_ARCHIVE_CUTOFF(OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff),
+  ID_PKIX_OCSP_RESPONSE(OCSPObjectIdentifiers.id_pkix_ocsp_response);
 
   private String id;
 
