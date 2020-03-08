@@ -9,10 +9,6 @@ cache:
   directories:
     - $HOME/.m2/repository
 
-cache:
-  directories:
-    - $HOME/.m2/repository
-
 script:
   - mvn clean install
 
