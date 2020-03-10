@@ -145,8 +145,7 @@ public class CaServerConf extends ValidatableConf {
       throws IOException, InvalidConfException {
     Args.notBlank(fileName, "fileName");
     try (InputStream is = Files.newInputStream(Paths.get(fileName))) {
-      CaServerConf conf =
-          JSON.parseObject(Files.newInputStream(Paths.get(fileName)), CaServerConf.class);
+      CaServerConf conf = JSON.parseObject(is, CaServerConf.class);
       conf.validate();
 
       return conf;

@@ -805,8 +805,7 @@ public class OcspServerConf extends ValidatableConf {
       throws IOException, InvalidConfException {
     Args.notBlank(fileName, "fileName");
     try (InputStream is = Files.newInputStream(Paths.get(fileName))) {
-      OcspServerConf conf =
-          JSON.parseObject(Files.newInputStream(Paths.get(fileName)), OcspServerConf.class);
+      OcspServerConf conf = JSON.parseObject(is, OcspServerConf.class);
       conf.validate();
 
       return conf;
