@@ -121,12 +121,16 @@ public class DataSourceFactory {
     String dataSourceUrl = conf.getProperty("dataSource.url");
     if (dataSourceUrl != null) {
       String newUrl = null;
-      if (dataSourceUrl.startsWith("jdbc:h2:~")) {
-        newUrl = "jdbc:h2:" + IoUtil.expandFilepath(
-                    dataSourceUrl.substring("jdbc:h2:".length()));
-      } else if (dataSourceUrl.startsWith("jdbc:hsqldb:file:~")) {
-        newUrl = "jdbc:h2:" + IoUtil.expandFilepath(
-                    dataSourceUrl.substring("jdbc:hsqldb:file:".length()));
+
+      final String h2_prefix = "jdbc:h2:";
+      final String hsqldb_prefix = "jdbc:hsqldb:file:";
+
+      if (dataSourceUrl.startsWith(h2_prefix + "~")) {
+        newUrl = h2_prefix + IoUtil.expandFilepath(
+                    dataSourceUrl.substring(h2_prefix.length()));
+      } else if (dataSourceUrl.startsWith(hsqldb_prefix + "~")) {
+        newUrl = hsqldb_prefix + IoUtil.expandFilepath(
+                    dataSourceUrl.substring(hsqldb_prefix.length()));
       }
       if (newUrl != null) {
         conf.setProperty("dataSource.url", newUrl);
