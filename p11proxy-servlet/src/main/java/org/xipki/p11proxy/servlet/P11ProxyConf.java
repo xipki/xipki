@@ -42,8 +42,7 @@ public class P11ProxyConf extends ValidatableConf {
       throws IOException, InvalidConfException {
     Args.notBlank(fileName, "fileName");
     try (InputStream is = Files.newInputStream(Paths.get(fileName))) {
-      P11ProxyConf conf =
-          JSON.parseObject(Files.newInputStream(Paths.get(fileName)), P11ProxyConf.class);
+      P11ProxyConf conf = JSON.parseObject(is, P11ProxyConf.class);
       conf.validate();
 
       return conf;
