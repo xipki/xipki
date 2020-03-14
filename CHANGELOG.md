@@ -2,16 +2,82 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
-## 5.3.5
+## 5.3.7
   - Release date: -
+  - CA
+    - Do not set the highest bit, increase the dflt bit length from 127 to 159 of serial numbers
+    - Use overlap.days instead overlap.minutes to control the overlap in CRL
+    - Update hikaricp 3.4.1 to 3.4.2, fastjson 1.2.62 to 1.2.66.
+  - OCSP
+    - Fixed #447 OCSP-server cannot parse CRLs without revoked certificates.
+    - Corrected type from 'ejbca' to 'ejbca-db' in the configuration file.
+    - Fixed #148 Ocspd ignores the folder certs in case of CRL as source in ocspd.
+    - Use bytes instead of bits to specify the length of serial number.
+    - Change fullcrl.intervals from 1 to 7.
+    - Fixed #154 OCSP server cannot answer request with unknown extension.
+    - Update hikaricp 3.4.1 to 3.4.2, fastjson 1.2.62 to 1.2.66.
+  - CLI
+    - Better print of time in the benchmark test
+    - Update karaf 4.2.7 to 4.2.8, hikaricp 3.4.1 to 3.4.2, fastjson 1.2.62 to 1.2.66.
+
+## 5.3.6
+  - Release date: Jan 7, 2020
+  - CA
+    - BUG: Fixed #134 The issuerCertIssuer in the extension AKI is not set correctly
+    - Better handle of proxyed TLS connection
+    - Removed the support of insecure JKS keystore
+  - OCSP
+    - BUG: Fixed NPE
+    - BUG: Fixed #137: set OCSP extension extendedRevoke to not critical
+    - BUG Fixed #140: OCSP response cacher saves time in (incorrect) milliseconds instead of (correct) seconds.
+    - Better handle of proxyed TLS connection
+    - Removed the support of insecure JKS keystore
+    - Changed the mode in ocsp-responder.json from RFC6960 to RFC2560 (configurable)
+    - #138 Set the extension nonce in OCSP response as NOT critical
+    - Include extn extendedRevoke only if unknown marked as revoked
+  - CLI
+    - Removed the support of insecure JKS keystore
+
+## 5.3.6
+  - Release date: Jan 7, 2020
+  - CA
+    - BUG: Fixed #134 The issuerCertIssuer in the extension AKI is not set correctly
+    - Better handle of proxyed TLS connection
+    - Removed the support of insecure JKS keystore
+  - OCSP
+    - BUG: Fixed NPE
+    - BUG: Fixed #137: set OCSP extension extendedRevoke to not critical
+    - BUG Fixed #140: OCSP response cacher saves time in (incorrect) milliseconds instead of (correct) seconds.
+    - Better handle of proxyed TLS connection
+    - Removed the support of insecure JKS keystore
+    - Changed the mode in ocsp-responder.json from RFC6960 to RFC2560 (configurable)
+    - #138 Set the extension nonce in OCSP response as NOT critical
+    - Include extn extendedRevoke only if unknown marked as revoked
+  - CLI
+    - Removed the support of insecure JKS keystore
+
+## 5.3.5
+  - Release date: Nov 5, 2019
+  - CA
+    - Upgrade bcprov-jdk15on and bcpkix-jdk15on to 1.64
+    - Fixed bug #128 "CA cannot start with NULL CMP_CONTROL"
+    - Downgrade liquibase from 3.8.0 to 3.6.3 to support MariaDB 10.3+ 
+    - Securities accepts explicit P11ModuleFactories
+  - OCSP
+    - Upgrade bcprov-jdk15on and bcpkix-jdk15on to 1.64
+    - Downgrade liquibase from 3.8.0 to 3.6.3 to support MariaDB 10.3+ 
+    - Securities accepts explicit P11ModuleFactories
+  - CLI 
+    - Optimized the display of benchmark with number over 1,000,000,000
+    - Securities accepts explicit P11ModuleFactories
 
 ## 5.3.4
-  - Release date: September 6, 2019
+  - Release date: Sep 6, 2019
   - OCSP
     - Fixed bug "OCSP server cannot answer anymore" (this bug is introduced in 5.3.3)
 
 ## 5.3.3
-  - Release date: August 8, 2019
+  - Release date: Aug 8, 2019
   - CA
     - Add feature to log the the HTTP requests and responses
     - Remove the extension authorityInfoAccess from the mandatory list
@@ -22,7 +88,7 @@ See also <https://github.com/xipki/xipki/releases>
        - ignoreExpiredCrls=true: return OCSP response tryLater.
 
 ## 5.3.2
-  - Release date: July 4, 2019
+  - Release date: Jul 4, 2019
   - CA
     - Use EXPLICIT tag for the GMT 0015 IdentityCode
     - Reduce the table size to make it loadable if the database has charset utf8mb4 in MySQL/MariaDB.
@@ -34,7 +100,7 @@ See also <https://github.com/xipki/xipki/releases>
     - Added configuration of OCSP responder for the store types xipki-db, ejbca and crl.
 
 ## 5.3.1
-  - Release date: June 10, 2019
+  - Release date: Jun 10, 2019
   - CA
     - Replace the logging backend logback by log4j2.
     - Reintroduced the support of databases H2 and HSQLDB.
