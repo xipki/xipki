@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.xipki</groupId>
     <artifactId>xipki-parent</artifactId>
-    <version>5.3.7-SNAPSHOT</version>
+    <version>5.3.7</version>
   </parent>
   <packaging>bundle</packaging>
   <artifactId>audit</artifactId>
