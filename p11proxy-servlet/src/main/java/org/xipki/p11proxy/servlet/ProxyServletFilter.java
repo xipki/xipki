@@ -36,6 +36,7 @@ import org.xipki.security.pkcs11.P11TokenException;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
+import org.xipki.util.XipkiBaseDir;
 
 /**
  * The Servlet Filter of P11Proxy servlets.
@@ -47,7 +48,7 @@ public class ProxyServletFilter implements Filter {
 
   private static final Logger LOG = LoggerFactory.getLogger(ProxyServletFilter.class);
 
-  private static final String DFLT_SERVER_CFG = "xipki/etc/p11proxy/p11proxy.json";
+  private static final String DFLT_SERVER_CFG = "etc/p11proxy/p11proxy.json";
 
   private Securities securities;
 
@@ -57,6 +58,8 @@ public class ProxyServletFilter implements Filter {
 
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
+    XipkiBaseDir.init();
+
     P11ProxyConf conf;
     try {
       conf = P11ProxyConf.readConfFromFile(IoUtil.expandFilepath(DFLT_SERVER_CFG));

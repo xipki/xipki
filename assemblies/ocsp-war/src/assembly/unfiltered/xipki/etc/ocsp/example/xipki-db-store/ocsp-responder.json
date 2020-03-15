@@ -3,7 +3,7 @@
 //		"datasource":{
 //			"name":"datasource-cache",
 //			"conf":{
-//				"file":"xipki/etc/ocsp/database/ocsp-cache-db.properties"
+//				"file":"etc/ocsp/database/ocsp-cache-db.properties"
 //			}
 //		},
 //		"validity":"1d"
@@ -13,7 +13,7 @@
 	"datasources":[{
 		"name":"datasource1",
 		"conf":{
-			"file":"xipki/etc/ocsp/database/ocsp-db.properties"
+			"file":"etc/ocsp/database/ocsp-db.properties"
 		}
 	}],
 	"requestOptions":[{
@@ -54,7 +54,7 @@
 		"type":"pkcs12",
 		"algorithms":["SHA256withRSA"],
 		"caCerts":[],
-		"key":"password=1234,keystore=file:xipki/keycerts/ocsp1.p12"
+		"key":"password=1234,keystore=file:keycerts/ocsp1.p12"
 	}],
 	"stores":[{
 		"name":"store1",

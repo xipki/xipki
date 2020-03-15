@@ -53,9 +53,9 @@ import org.slf4j.LoggerFactory;
 
 public class IoUtil {
 
-  private static final Logger LOG = LoggerFactory.getLogger(IoUtil.class);
+  static final String USER_HOME = System.getProperty("user.home");
 
-  private static final String USER_HOME = System.getProperty("user.home");
+  private static final Logger LOG = LoggerFactory.getLogger(IoUtil.class);
 
   private IoUtil() {
   }
@@ -173,7 +173,16 @@ public class IoUtil {
 
   public static String expandFilepath(String path) {
     Args.notBlank(path, "path");
-    return path.startsWith("~") ? USER_HOME + path.substring(1) : path;
+    if (path.startsWith("~")) {
+      return USER_HOME + path.substring(1);
+    } else {
+      if (path.startsWith("/")) {
+        return path;
+      } else {
+        String basedir = XipkiBaseDir.basedir();
+        return basedir == null ? path : Paths.get(basedir, path).toString();
+      }
+    }
   }
 
   public static File expandFilepath(File file) {
@@ -270,7 +279,7 @@ public class IoUtil {
   }
 
   public static Properties loadProperties(String path) throws IOException {
-    Path realPath = Paths.get(path);
+    Path realPath = Paths.get(expandFilepath(path));
     if (!Files.exists(realPath)) {
       throw new IOException("File " + path + " does not exist");
     }

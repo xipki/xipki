@@ -137,9 +137,13 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
+      <source>${project.basedir}/../../CHANGELOG.md</source>
+      <outputDirectory>.</outputDirectory>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
       <source>${project.basedir}/../../README.md</source>
-      <outputDirectory>xipki</outputDirectory>
-      <destName>README.md</destName>
+      <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>
     </file>
     <file>

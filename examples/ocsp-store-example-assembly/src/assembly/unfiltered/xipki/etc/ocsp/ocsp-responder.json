@@ -39,7 +39,7 @@
 		"type":"pkcs12",
 		"algorithms":["SHA256withRSA"],
 		"caCerts":[],
-		"key":"password=1234,keystore=file:xipki/keycerts/ocsp1.p12"
+		"key":"password=1234,keystore=file:keycerts/ocsp1.p12"
 	}],
 	"stores":[{
 		"name":"dummystore1",
@@ -54,7 +54,7 @@
 		"source":{
 			"type":"java:org.xipki.ocsp.server.store.example.DummyStore",
 			"conf":{
-				"caCert":"xipki/keycerts/ca-cert.pem"
+				"caCert":"keycerts/ca-cert.pem"
 			}
 		}
 	}]

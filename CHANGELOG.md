@@ -5,10 +5,12 @@ See also <https://github.com/xipki/xipki/releases>
 ## 5.3.7
   - Release date: -
   - CA
+    - Make XIPKI_BASE configurable.
     - Do not set the highest bit, increase the dflt bit length from 127 to 159 of serial numbers
     - Use overlap.days instead overlap.minutes to control the overlap in CRL
     - Update hikaricp 3.4.1 to 3.4.2, fastjson 1.2.62 to 1.2.66.
   - OCSP
+    - Make XIPKI_BASE configurable.
     - Fixed #447 OCSP-server cannot parse CRLs without revoked certificates.
     - Corrected type from 'ejbca' to 'ejbca-db' in the configuration file.
     - Fixed #148 Ocspd ignores the folder certs in case of CRL as source in ocspd.

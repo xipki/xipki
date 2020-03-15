@@ -1,8 +1,18 @@
+Migration
+----
+- From v5.3.0 - v5.3.6 to v5.3.7+
+  - Remove the path prefix `xipki/` in all configuration files (`*.json`, `*.properties`, `*.cfg`) in the folder `xipki/`.
+- For v5.3.7+, the folder `xipki` may be placed anywhere, it must be pointed to by the java property `XIPKI_BASE`.
+  It can be configured as follows:
+  - Tomcat: in the file `bin\setevn.*`
+  - Jetty: in the file `start.ini`.
+
 Deployment in Tomcat 8 and 9
 ----
+- Copy the files `setenv.sh` and `setenv.bat` in the folder `tomcat/bin` to the folder `${CATALINA_HOME}/bin`.
 - Copy the sub-folders `webapps` and `xipki` to the tomcat root folder
-- Add the line `org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true`
-   to the file `conf/catalina.properties` if OCSP over HTTP supported is activated.
+  The folder `xipki` can be moved to other location, in this case the java property `XIPKI_BASE` in
+  `setenv.sh` and `setenv.bat` must be adapted to point to the new position.
 - Configure the TLS listener in the file `conf/server.xml`
     - Use NIO connector
 
@@ -14,11 +24,11 @@ Deployment in Tomcat 8 and 9
                 certificateVerification="optional"
                 protocols="TLSv1.2"
                 ciphers="TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256, TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256, TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
-                truststoreFile="xipki/keycerts/tlskeys/ca/tls-ca-cert.p12"
+                truststoreFile="${XIPKI_BASE}/keycerts/tlskeys/ca/tls-ca-cert.p12"
                 truststorePassword="1234"
                 truststoreType="PKCS12">
             <Certificate type="RSA"
-                         certificateKeystoreFile="xipki/keycerts/tlskeys/server/tls-server.p12"
+                         certificateKeystoreFile="${XIPKI_BASE}/keycerts/tlskeys/server/tls-server.p12"
                          certificateKeystorePassword="1234"
                          certificateKeystoreType="PKCS12"/>
         </SSLHostConfig>
@@ -47,24 +57,19 @@ Deployment in Tomcat 8 and 9
 `tomcat.util.scan.StandardJarScanFilter.jarsToSkip` in the file `conf/catalina.properties`.
 
 ```
-bcprov-jdk15on-*.jar,\
-bcpkix-jdk15on-*.jar,\
-datasource-*.jar,\
+bcprov-*.jar,\
+bcpkix-*.jar,\
 fastjson-*.jar,\
-HikariCP-*.jar,\
-log4j-core-*.jar,\
-log4j-api-*.jar,\
-log4j-slf4j-impl-*.jar,\
-mariadb-java-client-*.jar,\
+log4j-*.jar,\
 password-*.jar,\
-postgresql-*.jar,\
 security-*.jar,\
+slf4j-*.jar,\
 sunpkcs11-wrapper-*.jar,\
 util-*.jar
 ```
 
 - Start tomcat
-  <span style="color:red">**In the tomcat root folder** (Otherwise the file path cannot be interpreted correctly.)</span>
+  <span style="color:red">**In the tomcat root folder ${CATALINA_HOME}** (Otherwise the file path cannot be interpreted correctly.)</span>
 
 ```sh
   bin/start.sh
@@ -81,16 +86,19 @@ util-*.jar
 
 Deployment in Jetty 9
 ----
-- Copy the sub-folders `webapps` and `xipki` to the jetty root folder, and the files in sub-folder `lib` to the sub-folder `lib/ext` of jetty.
-- Configure the TLS listener by adding the following block to the file `start.ini`
+- Copy the sub-folder `webapps` to the jetty root folder, and the files in sub-folder `${JETTY_BASE}lib` to the sub-folder `${JETTY_BASE}lib/ext` of jetty.
+- Copy the sub-folder `xipki` to any position you wished.
+- Configure the TLS listener by adding the following block to the file `start.ini`. Please configure
+  XIPKI_BASE correctly.
 
 ```sh
 --module=https
-jetty.sslContext.keyStorePath=xipki/keycerts/tlskeys/server/tls-server.p12
+XIPKI_BASE=<path/to/folder/xipki>
+jetty.sslContext.keyStorePath=${XIPKI_BASE}/keycerts/tlskeys/server/tls-server.p12
 jetty.sslContext.keyStorePassword=1234
 jetty.sslContext.keyStoreType=PKCS12
 jetty.sslContext.keyManagerPassword=1234
-jetty.sslContext.trustStorePath=xipki/keycerts/tlskeys/ca/tls-ca-cert.p12
+jetty.sslContext.trustStorePath=${XIPKI_BASE}/keycerts/tlskeys/ca/tls-ca-cert.p12
 jetty.sslContext.trustStorePassword=1234
 jetty.sslContext.trustStoreType=PKCS12
 jetty.sslContext.needClientAuth=false

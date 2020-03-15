@@ -3,7 +3,7 @@
 //		"datasource":{
 //			"name":"datasource-cache",
 //			"conf":{
-//				"file":"xipki/etc/ocsp/database/ocsp-cache-db.properties"
+//				"file":"etc/ocsp/database/ocsp-cache-db.properties"
 //			}
 //		},
 //		"validity":"1d"
@@ -13,17 +13,17 @@
 	"datasources":[{
 		"name":"datasource1",
 		"conf":{
-			"file":"xipki/etc/ocsp/database/ocsp-db.properties"
+			"file":"etc/ocsp/database/ocsp-db.properties"
 		}
 	},{
 		"name":"datasource-crl",
 		"conf":{
-			"file":"xipki/etc/ocsp/database/ocsp-crl-db.properties"
+			"file":"etc/ocsp/database/ocsp-crl-db.properties"
 		}
 	},{
 		"name":"datasource3",
 		"conf":{
-			"file":"xipki/etc/ocsp/database/ca-db.properties"
+			"file":"etc/ocsp/database/ca-db.properties"
 		}
 	}],
 	"requestOptions":[{
@@ -32,7 +32,7 @@
 //			"trustAnchors":{
 //				"keystore":{
 //					"keystore":{
-//						"file":"xipki/keycerts/tlskeys/ca/tls-ca-cert.p12"
+//						"file":"keycerts/tlskeys/ca/tls-ca-cert.p12"
 //					},
 //					"password":"1234",
 //					"type":"pkcs12"
@@ -136,7 +136,7 @@
 			"datasource":"datasource-crl",
 			"type":"crl",
 			"conf":{
-				"dir":"xipki/crls/example-crls",
+				"dir":"crls/example-crls",
 				"sqlBatchCommit":1000,
 				"ignoreExpiredCrls":true
 			}

@@ -11,6 +11,7 @@
       <directory>${project.build.directory}</directory>
       <includes>
         <include>dbtool/**/*.sh</include>
+        <include>tomcat/**/*.sh</include>
       </includes>
       <outputDirectory>.</outputDirectory>
       <fileMode>0755</fileMode>
@@ -22,6 +23,8 @@
       <includes>
         <include>dbtool/**/*.bat</include>
         <include>dbtool/**/*.cmd</include>
+        <include>tomcat/**/*.bat</include>
+        <include>tomcat/**/*.cmd</include>
       </includes>
       <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>
@@ -33,6 +36,7 @@
       <includes>
         <include>README.md</include>
         <include>xipki/**</include>
+        <include>tomcat/**</include>
         <include>lib/**</include>
         <include>dbtool/**</include>
       </includes>
@@ -47,6 +51,11 @@
     </fileSet>
   </fileSets>
   <files>
+    <file>
+      <source>../../CHANGELOG.md</source>
+      <outputDirectory>.</outputDirectory>
+      <fileMode>0644</fileMode>
+    </file>
     <file>
       <source>README.md</source>
       <outputDirectory>.</outputDirectory>

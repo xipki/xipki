@@ -55,6 +55,7 @@
         <filtering>false</filtering>
         <includes>
           <include>xipki/**</include>
+          <include>tomcat/**</include>
         </includes>
       </resource>
     </resources>

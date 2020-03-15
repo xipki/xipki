@@ -152,6 +152,8 @@ public class ProxyP11Module extends P11Module {
     }
 
     if (sslKeystore != null) {
+      sslKeystore = IoUtil.expandFilepath(sslKeystore);
+
       char[] pwd = sslKeystorePassword == null ? null : sslKeystorePassword.toCharArray();
       try {
         builder.loadKeyMaterial(new File(sslKeystore), pwd, pwd);
@@ -162,6 +164,7 @@ public class ProxyP11Module extends P11Module {
     }
 
     if (sslTruststore != null) {
+      sslTruststore = IoUtil.expandFilepath(sslTruststore);
       char[] pwd = sslTruststorePassword == null ? null : sslTruststorePassword.toCharArray();
       try {
         builder.loadTrustMaterial(new File(sslTruststore), pwd);

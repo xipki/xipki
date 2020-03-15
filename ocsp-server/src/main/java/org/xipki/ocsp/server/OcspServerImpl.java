@@ -1407,7 +1407,8 @@ public class OcspServerImpl implements OcspServer {
   } // method parseCert
 
   private static OcspServerConf parseConf(String confFilename) throws InvalidConfException {
-    try (InputStream is = Files.newInputStream(Paths.get(confFilename))) {
+    try (InputStream is = Files.newInputStream(
+          Paths.get(IoUtil.expandFilepath(confFilename)))) {
       OcspServerConf root = JSON.parseObject(is, OcspServerConf.class);
       root.validate();
       return root;

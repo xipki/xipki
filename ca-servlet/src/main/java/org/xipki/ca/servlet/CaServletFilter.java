@@ -54,6 +54,7 @@ import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
+import org.xipki.util.XipkiBaseDir;
 
 /**
  * CA ServletFilter.
@@ -64,9 +65,9 @@ public class CaServletFilter implements Filter {
 
   private static final Logger LOG = LoggerFactory.getLogger(CaServletFilter.class);
 
-  private static final String DFLT_CA_SERVER_CFG = "xipki/etc/ca/ca.json";
+  private static final String DFLT_CA_SERVER_CFG = "etc/ca/ca.json";
 
-  private static final String DFLT_SYSLOG_AUDIT_CFG = "xipki/etc/ca/audit.syslog.cfg";
+  private static final String DFLT_SYSLOG_AUDIT_CFG = "etc/ca/audit.syslog.cfg";
 
   private Securities securities;
 
@@ -88,6 +89,8 @@ public class CaServletFilter implements Filter {
 
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
+    XipkiBaseDir.init();
+
     CaServerConf conf;
     try {
       conf = CaServerConf.readConfFromFile(IoUtil.expandFilepath(DFLT_CA_SERVER_CFG));

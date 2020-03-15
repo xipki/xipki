@@ -45,6 +45,7 @@ import org.xipki.util.FileOrBinary;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.LogUtil;
+import org.xipki.util.XipkiBaseDir;
 
 /**
  * The Servlet Filter of OCSP servlets.
@@ -56,7 +57,7 @@ public class OcspServletFilter implements Filter {
 
   private static final Logger LOG = LoggerFactory.getLogger(OcspServletFilter.class);
 
-  private static final String DFLT_CONF_FILE = "xipki/etc/ocsp/ocsp.json";
+  private static final String DFLT_CONF_FILE = "etc/ocsp/ocsp.json";
 
   private Securities securities;
 
@@ -74,6 +75,8 @@ public class OcspServletFilter implements Filter {
 
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
+    XipkiBaseDir.init();
+
     String confFile = DFLT_CONF_FILE;
 
     OcspConf conf;

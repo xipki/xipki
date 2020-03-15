@@ -27,6 +27,7 @@ import org.xipki.security.Securities.SecurityConf;
 import org.xipki.util.Args;
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.InvalidConfException;
+import org.xipki.util.IoUtil;
 import org.xipki.util.ValidatableConf;
 
 import com.alibaba.fastjson.JSON;
@@ -66,7 +67,7 @@ public class OcspConf extends ValidatableConf {
 
   } // class RemoteMgmt
 
-  public static final String DFLT_SERVER_CONF = "xipki/etc/ocsp/ocsp-responder.json";
+  public static final String DFLT_SERVER_CONF = "etc/ocsp/ocsp-responder.json";
 
   private String serverConf;
 
@@ -77,9 +78,9 @@ public class OcspConf extends ValidatableConf {
   public static OcspConf readConfFromFile(String fileName)
       throws IOException, InvalidConfException {
     Args.notBlank(fileName, "fileName");
-    try (InputStream is = Files.newInputStream(Paths.get(fileName))) {
-      OcspConf conf =
-          JSON.parseObject(Files.newInputStream(Paths.get(fileName)), OcspConf.class);
+    try (InputStream is = Files.newInputStream(
+                            Paths.get(IoUtil.expandFilepath(fileName)))) {
+      OcspConf conf = JSON.parseObject(is, OcspConf.class);
       conf.validate();
 
       return conf;

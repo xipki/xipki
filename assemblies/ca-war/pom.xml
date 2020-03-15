@@ -41,10 +41,6 @@
           <artifactId>password</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.xipki</groupId>
-          <artifactId>util</artifactId>
-        </exclusion>
-        <exclusion>
           <groupId>org.slf4j</groupId>
           <artifactId>slf4j-api</artifactId>
         </exclusion>
@@ -78,6 +74,7 @@
         <filtering>false</filtering>
         <includes>
           <include>xipki/**</include>
+          <include>tomcat/**</include>
         </includes>
       </resource>
       <resource>
