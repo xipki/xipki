@@ -30,6 +30,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
@@ -49,6 +50,7 @@ import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.SignerConf;
+import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs12.KeypairWithCert;
 import org.xipki.security.pkcs12.KeystoreGenerationParameters;
@@ -164,7 +166,7 @@ public class P12Actions {
       KeyStore ks = getKeyStore();
 
       char[] pwd = getPassword();
-      X509Certificate newCert = X509Util.parseCert(new File(certFile));
+      X509Cert newCert = X509Util.parseCert(new File(certFile));
 
       assertMatch(ks, newCert, new String(pwd));
 
@@ -183,14 +185,19 @@ public class P12Actions {
       }
 
       Key key = ks.getKey(keyname, pwd);
-      Set<X509Certificate> caCerts = new HashSet<>();
+      Set<X509Cert> caCerts = new HashSet<>();
       if (isNotEmpty(caCertFiles)) {
         for (String caCertFile : caCertFiles) {
           caCerts.add(X509Util.parseCert(new File(caCertFile)));
         }
       }
-      X509Certificate[] certChain = X509Util.buildCertPath(newCert, caCerts);
-      ks.setKeyEntry(keyname, key, pwd, certChain);
+      X509Cert[] certChain = X509Util.buildCertPath(newCert, caCerts);
+      Certificate[] jceCertChain = new Certificate[certChain.length];
+      for (int i = 0; i < certChain.length; i++) {
+        jceCertChain[i] = certChain[i].toJceCert();
+      }
+
+      ks.setKeyEntry(keyname, key, pwd, jceCertChain);
 
       try (OutputStream out = Files.newOutputStream(Paths.get(p12File))) {
         ks.store(out, pwd);
@@ -199,14 +206,14 @@ public class P12Actions {
       }
     } // method execute0
 
-    private void assertMatch(KeyStore ks, X509Certificate cert, String password)
+    private void assertMatch(KeyStore ks, X509Cert cert, String password)
         throws Exception {
       String keyAlgName = cert.getPublicKey().getAlgorithm();
       if (EdECConstants.X25519.equalsIgnoreCase(keyAlgName)
           || EdECConstants.X448.equalsIgnoreCase(keyAlgName)) {
         // cannot be checked via creating dummy signature, just compare the public keys
         char[] pwd = password.toCharArray();
-        KeypairWithCert kp = KeypairWithCert.fromKeystore(ks, null, pwd, (X509Certificate[]) null);
+        KeypairWithCert kp = KeypairWithCert.fromKeystore(ks, null, pwd, (X509Cert[]) null);
         byte[] expectedEncoded = kp.getPublicKey().getEncoded();
         byte[] encoded = cert.getPublicKey().getEncoded();
         if (!Arrays.equals(expectedEncoded, encoded)) {
@@ -275,7 +282,7 @@ public class P12Actions {
       } catch (CertificateException | IOException ex) {
         throw new ObjectCreationException("error getting peer certificates", ex);
       }
-      return securityFactory.createSigner("PKCS12", signerConf, (X509Certificate[]) null);
+      return securityFactory.createSigner("PKCS12", signerConf, (X509Cert[]) null);
     } // method getSigner
 
   } // class CsrP12
@@ -483,7 +490,7 @@ public class P12Actions {
       char[] password = getPassword();
       try (InputStream keystoreStream = new FileInputStream(p12File)) {
         KeypairWithCert kp = KeypairWithCert.fromKeystore("PKCS12",
-                              keystoreStream, password, null, password, (X509Certificate) null);
+                              keystoreStream, password, null, password, (X509Cert) null);
         byte[] encodedKey = PemEncoder.encode(kp.getKey().getEncoded(), PemLabel.PRIVATE_KEY);
         byte[] encodedCert = PemEncoder.encode(kp.getCertificateChain()[0].getEncoded(),
                               PemLabel.CERTIFICATE);

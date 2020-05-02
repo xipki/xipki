@@ -17,8 +17,6 @@
 
 package org.xipki.ca.api;
 
-import java.security.cert.X509Certificate;
-
 import org.xipki.security.X509Cert;
 
 /**
@@ -28,16 +26,18 @@ import org.xipki.security.X509Cert;
  * @since 2.0.0
  */
 
-public class CertWithDbId extends X509Cert {
+public class CertWithDbId {
+
+  private final X509Cert cert;
 
   private Long certId;
 
-  public CertWithDbId(X509Certificate cert) {
-    super(cert);
+  public CertWithDbId(X509Cert cert) {
+    this.cert = cert;
   }
 
-  public CertWithDbId(X509Certificate cert, byte[] encodedCert) {
-    super(cert, encodedCert);
+  public X509Cert getCert() {
+    return cert;
   }
 
   public Long getCertId() {

@@ -27,7 +27,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.security.cert.CRLException;
-import java.security.cert.X509CRL;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -38,8 +37,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.cert.X509CRLHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException;
@@ -344,7 +343,7 @@ class CaCertstoreDbExporter extends DbPorter {
           } else if (CaDbEntryType.CRL == type) {
             byte[] crlBytes = Base64.decodeFast(rs.getString("CRL"));
 
-            X509CRL x509Crl = null;
+            X509CRLHolder x509Crl = null;
             try {
               x509Crl = X509Util.parseCrl(crlBytes);
             } catch (CRLException ex) {
@@ -355,8 +354,9 @@ class CaCertstoreDbExporter extends DbPorter {
               throw new CRLException(ex.getMessage(), ex);
             }
 
-            byte[] octetString = x509Crl.getExtensionValue(Extension.cRLNumber.getId());
-            if (octetString == null) {
+            byte[] extnValue = X509Util.getCoreExtValue(x509Crl.getExtensions(),
+                                  Extension.cRLNumber);
+            if (extnValue == null) {
               LOG.warn("CRL without CRL number, ignore it");
               continue;
             }
@@ -376,7 +376,6 @@ class CaCertstoreDbExporter extends DbPorter {
 
             crl.setCaId(rs.getInt("CA_ID"));
 
-            byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
             BigInteger crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
             crl.setCrlNo(crlNumber.toString());
             crl.setCrlScope(rs.getInt("CRL_SCOPE"));

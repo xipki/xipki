@@ -18,11 +18,11 @@
 package org.xipki.ca.servlet;
 
 import java.io.IOException;
-import java.security.cert.X509Certificate;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.xipki.ca.server.HttpRequestMetadataRetriever;
+import org.xipki.security.X509Cert;
 
 /**
  * HTTP request metadata retriever.
@@ -50,7 +50,7 @@ class HttpRequestMetadataRetrieverImpl implements HttpRequestMetadataRetriever {
   }
 
   @Override
-  public X509Certificate getTlsClientCert() throws IOException {
+  public X509Cert getTlsClientCert() throws IOException {
     return TlsHelper.getTlsClientCert(req);
   }
 

@@ -19,7 +19,6 @@ package org.xipki.ca.server.cmp;
 
 import java.security.InvalidKeyException;
 import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Map;
@@ -59,10 +58,10 @@ import org.xipki.ca.api.mgmt.RequestorInfo.CmpRequestorInfo;
 import org.xipki.ca.server.CaAuditConstants;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.X509Cert;
 import org.xipki.security.cmp.CmpUtil;
 import org.xipki.security.cmp.ProtectionResult;
 import org.xipki.security.cmp.ProtectionVerificationResult;
-import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.LogUtil;
@@ -116,7 +115,7 @@ abstract class BaseCmpResponder {
 
   public abstract CmpRequestorInfo getRequestor(X500Name requestorSender);
 
-  public abstract CmpRequestorInfo getRequestor(X509Certificate requestorCert);
+  public abstract CmpRequestorInfo getRequestor(X509Cert requestorCert);
 
   private static X500Name getX500Sender(PKIHeader reqHeader) {
     GeneralName requestSender = reqHeader.getSender();
@@ -149,7 +148,7 @@ abstract class BaseCmpResponder {
       ASN1OctetString transactionId, GeneralPKIMessage pkiMessage, String msgId,
       Map<String, String> parameters, AuditEvent event);
 
-  public PKIMessage processPkiMessage(PKIMessage pkiMessage, X509Certificate tlsClientCert,
+  public PKIMessage processPkiMessage(PKIMessage pkiMessage, X509Cert tlsClientCert,
       Map<String, String> parameters, AuditEvent event) {
     Args.notNull(pkiMessage, "pkiMessage");
     Args.notNull(event, "event");
@@ -291,7 +290,7 @@ abstract class BaseCmpResponder {
         errorStatus = null;
       } else {
         LOG.warn("tid={}: not authorized requestor (TLS client '{}')", tid,
-            X509Util.getRfc4519Name(tlsClientCert.getSubjectX500Principal()));
+            tlsClientCert.getSubjectRfc4519Text());
         errorStatus = "requestor (TLS client certificate) is not authorized";
       }
     } else {
@@ -477,7 +476,7 @@ abstract class BaseCmpResponder {
     return (sender == null) ? null : (X500Name) sender.getName();
   }
 
-  public X509Certificate getResponderCert() {
+  public X509Cert getResponderCert() {
     ConcurrentContentSigner signer = getSigner();
     return (signer == null) ? null : signer.getCertificate();
   }

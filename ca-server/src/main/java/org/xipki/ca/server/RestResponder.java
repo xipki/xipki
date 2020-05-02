@@ -24,8 +24,6 @@ import static org.xipki.audit.AuditStatus.FAILED;
 import java.io.ByteArrayInputStream;
 import java.io.EOFException;
 import java.math.BigInteger;
-import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -37,12 +35,14 @@ import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditStatus;
+import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.InsuffientPermissionException;
 import org.xipki.ca.api.NameId;
@@ -292,7 +292,7 @@ public class RestResponder {
         }
         requestor = ca.getByUserRequestor(userIdent);
       } else {
-        X509Certificate clientCert = httpRetriever.getTlsClientCert();
+        X509Cert clientCert = httpRetriever.getTlsClientCert();
         if (clientCert == null) {
           throw new HttpRespAuditException(UNAUTHORIZED, "no client certificate", INFO, FAILED);
         }
@@ -310,7 +310,7 @@ public class RestResponder {
 
       if (RestAPIConstants.CMD_cacert.equalsIgnoreCase(command)) {
         respCt = RestAPIConstants.CT_pkix_cert;
-        respBytes = ca.getCaInfo().getCert().getEncodedCert();
+        respBytes = ca.getCaInfo().getCert().getEncoded();
       } else if (RestAPIConstants.CMD_dhpoc_certs.equalsIgnoreCase(command)) {
         DhpocControl control = responderManager.getX509Ca(caName).getCaInfo().getDhpocControl();
         if (control == null) {
@@ -408,7 +408,7 @@ public class RestResponder {
           byte[] keyBytes =
               PemEncoder.encode(certInfo.getPrivateKey().getEncoded(), PemLabel.PRIVATE_KEY);
           byte[] certBytes =
-              PemEncoder.encode(certInfo.getCert().getEncodedCert(), PemLabel.CERTIFICATE);
+              PemEncoder.encode(certInfo.getCert().getCert().getEncoded(), PemLabel.CERTIFICATE);
 
           respBytes = new byte[keyBytes.length + 2 + certBytes.length];
           System.arraycopy(keyBytes, 0, respBytes, 0, keyBytes.length);
@@ -443,14 +443,14 @@ public class RestResponder {
             ca.addRequestCert(dbId, certInfo.getCert().getCertId());
           }
 
-          X509Cert cert = certInfo.getCert();
+          CertWithDbId cert = certInfo.getCert();
           if (cert == null) {
             String message = "could not generate certificate";
             LOG.warn(message);
             throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, message, INFO, FAILED);
           }
           respCt = RestAPIConstants.CT_pkix_cert;
-          respBytes = cert.getEncodedCert();
+          respBytes = cert.getCert().getEncoded();
         }
       } else if (RestAPIConstants.CMD_revoke_cert.equalsIgnoreCase(command)
           || RestAPIConstants.CMD_delete_cert.equalsIgnoreCase(command)) {
@@ -527,7 +527,7 @@ public class RestResponder {
           }
         }
 
-        X509CRL crl = ca.getCrl(crlNumber);
+        X509CRLHolder crl = ca.getCrl(crlNumber);
         if (crl == null) {
           String message = "could not get CRL";
           LOG.warn(message);
@@ -543,7 +543,7 @@ public class RestResponder {
           throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
         }
 
-        X509CRL crl = ca.generateCrlOnDemand(msgId);
+        X509CRLHolder crl = ca.generateCrlOnDemand(msgId);
         if (crl == null) {
           String message = "could not generate CRL";
           LOG.warn(message);

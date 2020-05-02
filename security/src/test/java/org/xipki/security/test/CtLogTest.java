@@ -26,6 +26,7 @@ import org.xipki.security.CtLog.SignedCertificateTimestamp;
 import org.xipki.security.CtLog.SignedCertificateTimestampList;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.IoUtil;
 
 /**
  * CTLog test.
@@ -52,8 +53,9 @@ public class CtLogTest {
   }
 
   private void parseCtLogInCert(String certFile) throws Exception {
-    Certificate cert = X509Util.parseBcCert(
-        getClass().getResourceAsStream(certFile));
+    byte[] certBytes = IoUtil.read(getClass().getResourceAsStream(certFile));
+    certBytes = X509Util.toDerEncoded(certBytes);
+    Certificate cert = Certificate.getInstance(certBytes);
     Extension extn = cert.getTBSCertificate().getExtensions().getExtension(
                         ObjectIdentifiers.Extn.id_SCTs);
     byte[] encodedScts = DEROctetString.getInstance(extn.getParsedValue()).getOctets();

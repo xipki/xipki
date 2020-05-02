@@ -18,7 +18,6 @@
 package org.xipki.cmpclient;
 
 import java.math.BigInteger;
-import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
@@ -43,11 +42,6 @@ public class RevokeCertRequest {
     private Date invalidityDate;
 
     private byte[] authorityKeyIdentifier;
-
-    public Entry(String id, X509Certificate cert, int reason, Date invalidityDate) {
-      this(id, X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()),
-          cert.getSerialNumber(), reason, invalidityDate);
-    }
 
     public Entry(String id, X500Name issuer, BigInteger serialNumber, int reason,
         Date invalidityDate) {

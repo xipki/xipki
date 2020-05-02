@@ -18,13 +18,13 @@
 package org.xipki.ca.api.mgmt;
 
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.security.CertRevocationInfo;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 
 /**
@@ -45,7 +45,7 @@ public abstract class MgmtResponse extends MgmtMessage {
     }
 
     public CertWithDbIdWrapper(CertWithDbId certWithDbId) {
-      this.cert = certWithDbId.getEncodedCert();
+      this.cert = certWithDbId.getCert().getEncoded();
       this.certId = certWithDbId.getCertId();
     }
 
@@ -66,7 +66,7 @@ public abstract class MgmtResponse extends MgmtMessage {
     }
 
     public CertWithDbId toCertWithDbId() throws CertificateException {
-      X509Certificate certObj = X509Util.parseCert(cert);
+      X509Cert certObj = X509Util.parseCert(cert);
       CertWithDbId ret = new CertWithDbId(certObj);
       ret.setCertId(certId);
       return ret;

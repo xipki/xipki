@@ -19,8 +19,6 @@ package org.xipki.security.pkcs11.proxy;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,6 +46,7 @@ import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.Arrays;
 import org.xipki.security.BadAsn1ObjectException;
+import org.xipki.security.X509Cert;
 import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Params.P11RSAPkcsPssParams;
@@ -93,17 +92,11 @@ public abstract class ProxyMessage extends ASN1Object {
     }
 
     public AddCertParams(P11SlotIdentifier slotId, P11NewObjectControl control,
-        X509Certificate certificate) {
+        X509Cert certificate) {
       this.slotId = Args.notNull(slotId, "slotId");
       this.control = Args.notNull(control, "control");
       Args.notNull(certificate, "certificate");
-      byte[] encoded;
-      try {
-        encoded = certificate.getEncoded();
-      } catch (CertificateEncodingException ex) {
-        throw new IllegalArgumentException("could not encode certificate: " + ex.getMessage(), ex);
-      }
-      this.certificate = Certificate.getInstance(encoded);
+      this.certificate = certificate.toBcCert().toASN1Structure();
     }
 
     private AddCertParams(ASN1Sequence seq) throws BadAsn1ObjectException {
@@ -1104,17 +1097,11 @@ public abstract class ProxyMessage extends ASN1Object {
     }
 
     public ObjectIdAndCert(SlotIdentifier slotId, ObjectIdentifier objectId,
-        X509Certificate certificate) {
+        X509Cert certificate) {
       this.slotId = Args.notNull(slotId, "slotId");
       this.objectId = Args.notNull(objectId, "objectId");
       Args.notNull(certificate, "certificate");
-      byte[] encoded;
-      try {
-        encoded = certificate.getEncoded();
-      } catch (CertificateEncodingException ex) {
-        throw new IllegalArgumentException("could not encode certificate: " + ex.getMessage(), ex);
-      }
-      this.certificate = Certificate.getInstance(encoded);
+      this.certificate = certificate.toBcCert().toASN1Structure();
     }
 
     private ObjectIdAndCert(ASN1Sequence seq) throws BadAsn1ObjectException {

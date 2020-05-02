@@ -37,8 +37,6 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertPathBuilderException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -65,6 +63,7 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.cert.X509CRLHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.cmpclient.CertIdOrError;
@@ -86,6 +85,7 @@ import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
@@ -323,7 +323,7 @@ public final class CmpClientImpl implements CmpClient {
     // responders
     Map<String, Responder> responders = new HashMap<>();
     for (CmpClientConf.Responder m : conf.getResponders()) {
-      X509Certificate cert;
+      X509Cert cert;
       try {
         cert = X509Util.parseCert(m.getCert().readContent());
       } catch (CertificateException | IOException ex) {
@@ -348,7 +348,7 @@ public final class CmpClientImpl implements CmpClient {
         responder = new Responder.SignaturetCmpResponder(cert, sigAlgoValidator);
       } else { // if (m.getPbmMac() != null)
         CmpClientConf.Responder.PbmMac mac = m.getPbmMac();
-        X500Name subject = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
+        X500Name subject = cert.getSubject();
         responder = new Responder.PbmMacCmpResponder(subject, mac.getOwfAlgos(), mac.getMacAlgos());
       }
 
@@ -390,16 +390,16 @@ public final class CmpClientImpl implements CmpClient {
           ca.setCertAutoconf(false);
           List<FileOrBinary> certchainConf = caType.getCaCertchain().getCertificates();
 
-          X509Certificate caCert = X509Util.parseCert(certchainConf.get(0).readContent());
-          Set<X509Certificate> issuers = new HashSet<>();
+          X509Cert caCert = X509Util.parseCert(certchainConf.get(0).readContent());
+          Set<X509Cert> issuers = new HashSet<>();
           int size = certchainConf.size();
           if (size > 1) {
             for (int i = 1; i < size; i++) {
-              X509Certificate cert = X509Util.parseCert(certchainConf.get(i).readContent());
+              X509Cert cert = X509Util.parseCert(certchainConf.get(i).readContent());
               issuers.add(cert);
             }
 
-            X509Certificate[] certchain = X509Util.buildCertPath(caCert, issuers);
+            X509Cert[] certchain = X509Util.buildCertPath(caCert, issuers);
             if (certchain.length != size) {
               LOG.error("cannot build certpath containing all configured issuers");
             }
@@ -416,12 +416,12 @@ public final class CmpClientImpl implements CmpClient {
           ca.setDhpocAutoconf(true);
         } else {
           ca.setDhpocAutoconf(false);
-          List<X509Certificate> dhpocs = new LinkedList<>();
+          List<X509Cert> dhpocs = new LinkedList<>();
 
           List<FileOrBinary> list = dhpocCerts.getCertificates();
           if (list != null) {
             for (FileOrBinary m : list) {
-              X509Certificate cert = X509Util.parseCert(m.readContent());
+              X509Cert cert = X509Util.parseCert(m.readContent());
               dhpocs.add(cert);
             }
           }
@@ -486,7 +486,7 @@ public final class CmpClientImpl implements CmpClient {
         CmpClientConf.Requestor.Signature cf = requestorConf.getSignature();
         //requestorSignRequests.put(name, cf.isSignRequest());
 
-        X509Certificate requestorCert = null;
+        X509Cert requestorCert = null;
         if (cf.getCert() != null) {
           try {
             requestorCert = X509Util.parseCert(cf.getCert().getBinary());
@@ -714,7 +714,7 @@ public final class CmpClientImpl implements CmpClient {
   } // method checkCertprofileSupportInCa
 
   @Override
-  public CertIdOrError revokeCert(String caName, X509Certificate cert, int reason,
+  public CertIdOrError revokeCert(String caName, X509Cert cert, int reason,
       Date invalidityDate, ReqRespDebug debug) throws CmpClientException, PkiErrorException {
     Args.notNull(cert, "cert");
     initIfNotInitialized();
@@ -807,14 +807,14 @@ public final class CmpClientImpl implements CmpClient {
   } // method parseRevokeCertResult
 
   @Override
-  public X509CRL downloadCrl(String caName, ReqRespDebug debug)
+  public X509CRLHolder downloadCrl(String caName, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     caName = Args.toNonBlankLower(caName, "caName");
     return downloadCrl(caName, (BigInteger) null, debug);
   } // method downloadCrl
 
   @Override
-  public X509CRL downloadCrl(String caName, BigInteger crlNumber, ReqRespDebug debug)
+  public X509CRLHolder downloadCrl(String caName, BigInteger crlNumber, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     caName = Args.toNonBlankLower(caName, "caName");
     initIfNotInitialized();
@@ -825,14 +825,14 @@ public final class CmpClientImpl implements CmpClient {
     }
 
     CmpAgent agent = ca.getAgent();
-    X509CRL result = (crlNumber == null) ? agent.downloadCurrentCrl(debug)
+    X509CRLHolder result = (crlNumber == null) ? agent.downloadCurrentCrl(debug)
           : agent.downloadCrl(crlNumber, debug);
 
     return result;
   } // method downloadCrl
 
   @Override
-  public X509CRL generateCrl(String caName, ReqRespDebug debug)
+  public X509CRLHolder generateCrl(String caName, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     caName = Args.toNonBlankLower(caName, "caName");
 
@@ -889,10 +889,10 @@ public final class CmpClientImpl implements CmpClient {
     return caName;
   } // method getCaNameForProfile
 
-  private java.security.cert.Certificate getCertificate(CMPCertificate cmpCert)
+  private X509Cert getCertificate(CMPCertificate cmpCert)
       throws CertificateException {
     Certificate bcCert = cmpCert.getX509v3PKCert();
-    return (bcCert == null) ? null : X509Util.toX509Cert(bcCert);
+    return (bcCert == null) ? null : new X509Cert(bcCert);
   }
 
   public String getConfFile() {
@@ -909,20 +909,8 @@ public final class CmpClientImpl implements CmpClient {
     return casMap.keySet();
   }
 
-  private static boolean verify(java.security.cert.Certificate caCert,
-      java.security.cert.Certificate cert) {
-    if (!(caCert instanceof X509Certificate)) {
-      return false;
-    }
-
-    if (!(cert instanceof X509Certificate)) {
-      return false;
-    }
-
-    X509Certificate x509caCert = (X509Certificate) caCert;
-    X509Certificate x509cert = (X509Certificate) cert;
-
-    if (!x509cert.getIssuerX500Principal().equals(x509caCert.getSubjectX500Principal())) {
+  private static boolean verify(X509Cert caCert, X509Cert cert) {
+    if (!cert.getIssuer().equals(caCert.getSubject())) {
       return false;
     }
 
@@ -931,9 +919,9 @@ public final class CmpClientImpl implements CmpClient {
       return true;
     }
 
-    PublicKey caPublicKey = x509caCert.getPublicKey();
+    PublicKey caPublicKey = caCert.getPublicKey();
     try {
-      x509cert.verify(caPublicKey);
+      cert.verify(caPublicKey);
       return true;
     } catch (SignatureException | InvalidKeyException | CertificateException
         | NoSuchAlgorithmException | NoSuchProviderException ex) {
@@ -943,7 +931,7 @@ public final class CmpClientImpl implements CmpClient {
   } // method verify
 
   @Override
-  public CertIdOrError unrevokeCert(String caName, X509Certificate cert, ReqRespDebug debug)
+  public CertIdOrError unrevokeCert(String caName, X509Cert cert, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     Args.notNull(cert, "cert");
     initIfNotInitialized();
@@ -1007,7 +995,7 @@ public final class CmpClientImpl implements CmpClient {
   } // method unrevokeCerts
 
   @Override
-  public CertIdOrError removeCert(String caName, X509Certificate cert, ReqRespDebug debug)
+  public CertIdOrError removeCert(String caName, X509Cert cert, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     Args.notNull(cert, "cert");
     initIfNotInitialized();
@@ -1181,7 +1169,7 @@ public final class CmpClientImpl implements CmpClient {
       if (resultEntry instanceof ResultEntry.EnrollCert) {
         ResultEntry.EnrollCert entry = (ResultEntry.EnrollCert) resultEntry;
         try {
-          java.security.cert.Certificate cert = getCertificate(entry.getCert());
+          X509Cert cert = getCertificate(entry.getCert());
           certOrError =
               new EnrollCertResult.CertifiedKeyPairOrError(cert, entry.getPrivateKeyInfo());
         } catch (CertificateException ex) {
@@ -1206,7 +1194,7 @@ public final class CmpClientImpl implements CmpClient {
       return new EnrollCertResult(null, certOrErrors);
     }
 
-    List<java.security.cert.Certificate> caPubs = new ArrayList<>(cmpCaPubs.size());
+    List<X509Cert> caPubs = new ArrayList<>(cmpCaPubs.size());
     for (CMPCertificate cmpCaPub : cmpCaPubs) {
       try {
         caPubs.add(getCertificate(cmpCaPub));
@@ -1215,14 +1203,14 @@ public final class CmpClientImpl implements CmpClient {
       }
     }
 
-    java.security.cert.Certificate caCert = null;
+    X509Cert caCert = null;
     for (EnrollCertResult.CertifiedKeyPairOrError certOrError : certOrErrors.values()) {
-      java.security.cert.Certificate cert = certOrError.getCertificate();
+      X509Cert cert = certOrError.getCertificate();
       if (cert == null) {
         continue;
       }
 
-      for (java.security.cert.Certificate caPub : caPubs) {
+      for (X509Cert caPub : caPubs) {
         if (verify(caPub, cert)) {
           caCert = caPub;
           break;
@@ -1239,7 +1227,7 @@ public final class CmpClientImpl implements CmpClient {
     }
 
     for (EnrollCertResult.CertifiedKeyPairOrError certOrError : certOrErrors.values()) {
-      java.security.cert.Certificate cert = certOrError.getCertificate();
+      X509Cert cert = certOrError.getCertificate();
       if (cert == null) {
         continue;
       }
@@ -1304,7 +1292,7 @@ public final class CmpClientImpl implements CmpClient {
     return ca;
   } // method parse
 
-  private static void assertIssuedByCa(X509Certificate cert, CaConf ca)
+  private static void assertIssuedByCa(X509Cert cert, CaConf ca)
       throws CmpClientException {
     boolean issued;
     try {
@@ -1319,7 +1307,7 @@ public final class CmpClientImpl implements CmpClient {
   } // method assertIssuedByCa
 
   @Override
-  public X509Certificate getCaCert(String caName) throws CmpClientException {
+  public X509Cert getCaCert(String caName) throws CmpClientException {
     initIfNotInitialized();
 
     CaConf ca = casMap.get(caName.toLowerCase());
@@ -1327,7 +1315,7 @@ public final class CmpClientImpl implements CmpClient {
   }
 
   @Override
-  public List<X509Certificate> getCaCertchain(String caName)
+  public List<X509Cert> getCaCertchain(String caName)
       throws CmpClientException {
     initIfNotInitialized();
 
@@ -1343,7 +1331,7 @@ public final class CmpClientImpl implements CmpClient {
   }
 
   @Override
-  public List<X509Certificate> getDhPocPeerCertificates(String caName) throws CmpClientException {
+  public List<X509Cert> getDhPocPeerCertificates(String caName) throws CmpClientException {
     initIfNotInitialized();
     CaConf ca = casMap.get(caName.toLowerCase());
     return ca == null ? null : ca.getDhpocs();

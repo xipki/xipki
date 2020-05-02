@@ -23,10 +23,11 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.util.Date;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.BERTags;
 import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.DERUTCTime;
-import org.xipki.security.util.X509Util;
+import org.bouncycastle.asn1.x509.Time;
 
 /**
  * ASN.1 stream parser.
@@ -111,8 +112,14 @@ public class Asn1StreamParser {
     }
   }
 
-  protected static Date readTime(Object obj) {
-    return X509Util.getTime(obj);
+  protected static Date readTime(ASN1Encodable  obj) {
+    if (obj instanceof Time) {
+      return ((Time) obj).getDate();
+    } else if (obj instanceof org.bouncycastle.asn1.cms.Time) {
+      return ((org.bouncycastle.asn1.cms.Time) obj).getDate();
+    } else {
+      return Time.getInstance(obj).getDate();
+    }
   }
 
   protected static Date readTime(MyInt bytesLen, BufferedInputStream instream, String name)

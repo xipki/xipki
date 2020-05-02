@@ -28,7 +28,6 @@ import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
@@ -40,6 +39,7 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.P11CryptService;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
@@ -97,11 +97,15 @@ public class XiKeyStoreSpi extends KeyStoreSpi {
 
     private Certificate[] chain;
 
-    KeyCertEntry(PrivateKey key, Certificate[] chain) {
+    KeyCertEntry(PrivateKey key, X509Cert[] chain) {
       this.key = Args.notNull(key, "key");
-      this.chain = Args.notNull(chain, "chain");
+      Args.notNull(chain, "chain");
       if (chain.length < 1) {
         throw new IllegalArgumentException("chain does not contain any certificate");
+      }
+      this.chain = new Certificate[chain.length];
+      for (int i = 0; i < chain.length; i++) {
+        this.chain[i] = chain[i].toJceCert();
       }
     }
 
@@ -157,7 +161,7 @@ public class XiKeyStoreSpi extends KeyStoreSpi {
       Set<P11ObjectIdentifier> identityIds = slot.getIdentityKeyIds();
       for (P11ObjectIdentifier objId : identityIds) {
         P11Identity identity = slot.getIdentity(objId);
-        X509Certificate[] chain = identity.certificateChain();
+        X509Cert[] chain = identity.certificateChain();
         if (chain == null || chain.length == 0) {
           continue;
         }

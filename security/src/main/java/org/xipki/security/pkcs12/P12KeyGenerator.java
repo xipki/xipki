@@ -26,8 +26,6 @@ import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPrivateKey;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPrivateKey;
@@ -48,7 +46,6 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
-import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.jcajce.interfaces.XDHKey;
@@ -60,6 +57,7 @@ import org.bouncycastle.operator.bc.BcRSAContentSignerBuilder;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignatureSigner;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
@@ -98,13 +96,13 @@ public class P12KeyGenerator {
 
   private static class KeyAndCertPair {
 
-    private final X509Certificate jceCert;
+    private final X509Cert cert;
 
     private final PrivateKey key;
 
-    KeyAndCertPair(X509CertificateHolder cert, PrivateKey key) throws CertificateException {
+    KeyAndCertPair(X509Cert cert, PrivateKey key) {
       this.key = key;
-      this.jceCert = X509Util.toX509Cert(cert.toASN1Structure());
+      this.cert = cert;
     }
 
   } // class KeyAndCertPair
@@ -230,14 +228,15 @@ public class P12KeyGenerator {
     X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(subjectDn,
         BigInteger.ONE, notBefore, notAfter, subjectDn, subjectPublicKeyInfo);
 
-    KeyAndCertPair identity = new KeyAndCertPair(certGenerator.build(contentSigner),
+    KeyAndCertPair identity = new KeyAndCertPair(
+        new X509Cert(certGenerator.build(contentSigner)),
         kp.getKeypair().getPrivate());
 
     KeyStore ks = KeyUtil.getKeyStore("PKCS12");
     ks.load(null, params.getPassword());
 
     ks.setKeyEntry("main", identity.key, params.getPassword(),
-        new Certificate[]{identity.jceCert});
+        new Certificate[]{identity.cert.toJceCert()});
 
     ByteArrayOutputStream ksStream = new ByteArrayOutputStream();
     try {

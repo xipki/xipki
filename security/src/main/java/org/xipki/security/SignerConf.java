@@ -17,7 +17,6 @@
 
 package org.xipki.security;
 
-import java.security.cert.X509Certificate;
 import java.util.List;
 
 import org.xipki.security.util.X509Util;
@@ -41,7 +40,7 @@ public class SignerConf {
 
   private final SignatureAlgoControl signatureAlgoControl;
 
-  private List<X509Certificate> peerCertificates;
+  private List<X509Cert> peerCertificates;
 
   public SignerConf(String conf) {
     this.hashAlgo = null;
@@ -86,11 +85,11 @@ public class SignerConf {
     return confPairs.getEncoded();
   }
 
-  public List<X509Certificate> getPeerCertificates() {
+  public List<X509Cert> getPeerCertificates() {
     return peerCertificates;
   }
 
-  public void setPeerCertificates(List<X509Certificate> peerCertificates) {
+  public void setPeerCertificates(List<X509Cert> peerCertificates) {
     this.peerCertificates = peerCertificates;
   }
 

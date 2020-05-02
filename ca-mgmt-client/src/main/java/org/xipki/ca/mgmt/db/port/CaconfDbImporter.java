@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
@@ -30,6 +29,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 
@@ -247,12 +247,12 @@ class CaconfDbImporter extends DbPorter {
       for (CaCertstore.Ca ca : cas) {
         try {
           byte[] certBytes = readContent(ca.getCert());
-          X509Certificate cert = X509Util.parseCert(certBytes);
+          X509Cert cert = X509Util.parseCert(certBytes);
 
           int idx = 1;
           ps.setInt(idx++, ca.getId());
           ps.setString(idx++, ca.getName().toLowerCase());
-          ps.setString(idx++, X509Util.cutX500Name(cert.getSubjectX500Principal(), maxX500nameLen));
+          ps.setString(idx++, X509Util.cutX500Name(cert.getSubject(), maxX500nameLen));
           ps.setInt(idx++, ca.getSnSize());
           ps.setLong(idx++, ca.getNextCrlNo());
           ps.setString(idx++, ca.getStatus());

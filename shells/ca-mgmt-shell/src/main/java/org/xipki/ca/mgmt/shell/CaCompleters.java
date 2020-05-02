@@ -17,7 +17,6 @@
 
 package org.xipki.ca.mgmt.shell;
 
-import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -33,6 +32,7 @@ import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.mgmt.ValidityMode;
 import org.xipki.security.CrlReason;
+import org.xipki.security.X509Cert;
 import org.xipki.shell.DynamicEnumCompleter;
 import org.xipki.shell.EnumCompleter;
 
@@ -251,8 +251,8 @@ public class CaCompleters {
           continue;
         }
 
-        X509Certificate cert = caEntry.getCert();
-        if (cert.getIssuerX500Principal().equals(cert.getSubjectX500Principal())) {
+        X509Cert cert = caEntry.getCert();
+        if (cert.isSelfSigned()) {
           ret.add(name);
         }
       }

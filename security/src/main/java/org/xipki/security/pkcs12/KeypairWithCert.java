@@ -38,6 +38,7 @@ import java.util.Set;
 
 import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.jcajce.interfaces.XDHKey;
+import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
@@ -55,9 +56,9 @@ public class KeypairWithCert {
 
   private final PublicKey publicKey;
 
-  private final X509Certificate[] certificateChain;
+  private final X509Cert[] certificateChain;
 
-  public KeypairWithCert(PrivateKey key, X509Certificate[] certificateChain) {
+  public KeypairWithCert(PrivateKey key, X509Cert[] certificateChain) {
     this.key = Args.notNull(key, "key");
     this.certificateChain = Args.notNull(certificateChain, "certificateChain");
     Args.min(certificateChain.length, "certificateChain.length", 1);
@@ -65,15 +66,15 @@ public class KeypairWithCert {
   }
 
   public static KeypairWithCert fromKeystore(String keystoreType, InputStream keystoreStream,
-      char[] keystorePassword, String keyname, char[] keyPassword, X509Certificate cert)
+      char[] keystorePassword, String keyname, char[] keyPassword, X509Cert cert)
           throws XiSecurityException {
     return fromKeystore(keystoreType, keystoreStream, keystorePassword, keyname, keyPassword,
-        cert == null ? null : new X509Certificate[] {cert});
+        cert == null ? null : new X509Cert[] {cert});
   }
 
   public static KeypairWithCert fromKeystore(String keystoreType, InputStream keystoreStream,
-      char[] keystorePassword, String keyname, char[] keyPassword, X509Certificate[] certchain)
-          throws XiSecurityException {
+      char[] keystorePassword, String keyname, char[] keyPassword,
+      X509Cert[] certchain) throws XiSecurityException {
     if (!("PKCS12".equalsIgnoreCase(keystoreType) || "JCEKS".equalsIgnoreCase(keystoreType))) {
       throw new IllegalArgumentException("unsupported keystore type: " + keystoreType);
     }
@@ -105,7 +106,7 @@ public class KeypairWithCert {
   }
 
   public static KeypairWithCert fromKeystore(KeyStore keystore,
-      String keyname, char[] keyPassword, X509Certificate[] certchain)
+      String keyname, char[] keyPassword, X509Cert[] certchain)
           throws XiSecurityException {
     Args.notNull(keyPassword, "keyPassword");
 
@@ -135,9 +136,9 @@ public class KeypairWithCert {
         throw new XiSecurityException("unsupported key " + key.getClass().getName());
       }
 
-      Set<Certificate> caCerts = new HashSet<>();
+      Set<X509Cert> caCerts = new HashSet<>();
 
-      X509Certificate cert;
+      X509Cert cert;
       if (certchain != null && certchain.length > 0) {
         cert = certchain[0];
         final int n = certchain.length;
@@ -147,17 +148,17 @@ public class KeypairWithCert {
           }
         }
       } else {
-        cert = (X509Certificate) keystore.getCertificate(tmpKeyname);
+        cert = new X509Cert((X509Certificate) keystore.getCertificate(tmpKeyname));
       }
 
       Certificate[] certsInKeystore = keystore.getCertificateChain(tmpKeyname);
       if (certsInKeystore.length > 1) {
         for (int i = 1; i < certsInKeystore.length; i++) {
-          caCerts.add(certsInKeystore[i]);
+          caCerts.add(new X509Cert((X509Certificate) certsInKeystore[i]));
         }
       }
 
-      X509Certificate[] certificateChain = X509Util.buildCertPath(cert, caCerts);
+      X509Cert[] certificateChain = X509Util.buildCertPath(cert, caCerts);
 
       return new KeypairWithCert(key, certificateChain);
     } catch (KeyStoreException | NoSuchAlgorithmException
@@ -174,7 +175,7 @@ public class KeypairWithCert {
     return publicKey;
   }
 
-  public X509Certificate[] getCertificateChain() {
+  public X509Cert[] getCertificateChain() {
     return certificateChain;
   }
 

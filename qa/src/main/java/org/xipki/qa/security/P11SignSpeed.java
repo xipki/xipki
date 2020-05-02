@@ -19,7 +19,6 @@ package org.xipki.qa.security;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
@@ -27,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
+import org.xipki.security.X509Cert;
 import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
@@ -270,7 +270,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
         slotId.getId(), objectId.getId(), signatureAlgorithm,
         threads + Math.max(2, threads * 5 / 4));
     try {
-      this.signer = securityFactory.createSigner("PKCS11", signerConf, (X509Certificate) null);
+      this.signer = securityFactory.createSigner("PKCS11", signerConf, (X509Cert) null);
     } catch (ObjectCreationException ex) {
       close();
       throw ex;

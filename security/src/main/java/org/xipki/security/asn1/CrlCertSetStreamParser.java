@@ -29,6 +29,7 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.x509.Certificate;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 
 /**
@@ -56,9 +57,9 @@ public class CrlCertSetStreamParser extends Asn1StreamParser {
 
     private BigInteger serial;
 
-    private Certificate cert;
+    private X509Cert cert;
 
-    private CrlCert(BigInteger serial, Certificate cert) {
+    private CrlCert(BigInteger serial, X509Cert cert) {
       this.serial = serial;
       this.cert = cert;
     }
@@ -71,11 +72,11 @@ public class CrlCertSetStreamParser extends Asn1StreamParser {
       this.serial = serial;
     }
 
-    public Certificate getCert() {
+    public X509Cert getCert() {
       return cert;
     }
 
-    public void setCert(Certificate cert) {
+    public void setCert(X509Cert cert) {
       this.cert = cert;
     }
 
@@ -143,7 +144,7 @@ public class CrlCertSetStreamParser extends Asn1StreamParser {
         }
       }
 
-      next = new CrlCert(serialNumber, cert);
+      next = new CrlCert(serialNumber, new X509Cert(cert));
     } // method next0
 
     @Override

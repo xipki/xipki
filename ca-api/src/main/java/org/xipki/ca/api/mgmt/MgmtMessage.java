@@ -17,15 +17,14 @@
 
 package org.xipki.ca.api.mgmt;
 
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.security.CertRevocationInfo;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
@@ -277,21 +276,13 @@ public abstract class MgmtMessage {
       caUris = caEntry.getCaUris();
 
       if (caEntry.getCert() != null) {
-        try {
-          certBytes = caEntry.getCert().getEncoded();
-        } catch (CertificateEncodingException ex) {
-          throw new IllegalStateException("could not encode certificate", ex);
-        }
+        certBytes = caEntry.getCert().getEncoded();
       }
 
       if (CollectionUtil.isNotEmpty(caEntry.getCertchain())) {
         this.certchainBytes = new LinkedList<>();
-        for (X509Certificate m : caEntry.getCertchain()) {
-          try {
-            this.certchainBytes.add(m.getEncoded());
-          } catch (CertificateEncodingException ex) {
-            throw new IllegalStateException("could not encode certificate", ex);
-          }
+        for (X509Cert m : caEntry.getCertchain()) {
+          this.certchainBytes.add(m.getEncoded());
         }
       }
 
@@ -594,7 +585,7 @@ public abstract class MgmtMessage {
       }
 
       if (CollectionUtil.isNotEmpty(certchainBytes)) {
-        List<X509Certificate> certchain = new LinkedList<>();
+        List<X509Cert> certchain = new LinkedList<>();
         for (byte[] m : certchainBytes) {
           certchain.add(X509Util.parseCert(m));
         }

@@ -40,9 +40,7 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.SignatureException;
 import java.security.cert.CRLException;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPrivateKey;
 import java.security.interfaces.DSAPublicKey;
@@ -102,6 +100,7 @@ import org.bouncycastle.asn1.x509.Time;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509CRLHolder;
+import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v2CRLBuilder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.crypto.RuntimeCryptoException;
@@ -459,11 +458,11 @@ public class X509Ca implements Closeable {
     this.caCert = caInfo.getCert();
     this.certstore = Args.notNull(certstore, "certstore");
 
-    SubjectPublicKeyInfo caSpki = this.caCert.getCertHolder().getSubjectPublicKeyInfo();
+    SubjectPublicKeyInfo caSpki = this.caCert.getSubjectPublicKeyInfo();
     ASN1ObjectIdentifier caSpkiAlgId = caSpki.getAlgorithm().getAlgorithm();
     if (caSpkiAlgId.equals(PKCSObjectIdentifiers.rsaEncryption)) {
       java.security.interfaces.RSAPublicKey pubKey =
-          (java.security.interfaces.RSAPublicKey) caCert.getCert().getPublicKey();
+          (java.security.interfaces.RSAPublicKey) caCert.getPublicKey();
       this.keypairGenControlByImplictCA = new KeypairGenControl.RSAKeypairGenControl(
           pubKey.getModulus().bitLength(), pubKey.getPublicExponent(), caSpkiAlgId);
     } else if (caSpkiAlgId.equals(X9ObjectIdentifiers.id_ecPublicKey)) {
@@ -502,15 +501,15 @@ public class X509Ca implements Closeable {
     }
 
     if (caInfo.getCrlControl() != null) {
-      X509Certificate crlSignerCert;
+      X509Cert crlSignerCert;
       if (caInfo.getCrlSignerName() != null) {
         crlSignerCert = getCrlSigner().getDbEntry().getCertificate();
       } else {
         // CA signs the CRL
-        crlSignerCert = caCert.getCert();
+        crlSignerCert = caCert;
       }
 
-      if (!X509Util.hasKeyusage(crlSignerCert, KeyUsage.cRLSign)) {
+      if (!crlSignerCert.hasKeyusage(KeyUsage.cRLSign)) {
         final String msg = "CRL signer does not have keyusage cRLSign";
         LOG.error(msg);
         throw new OperationException(SYSTEM_FAILURE, msg);
@@ -548,7 +547,7 @@ public class X509Ca implements Closeable {
     return caInfo.getCmpControl();
   }
 
-  public X509Certificate getCert(BigInteger serialNumber)
+  public X509Cert getCert(BigInteger serialNumber)
       throws CertificateException, OperationException {
     CertificateInfo certInfo = certstore.getCertInfo(caIdent, caCert, serialNumber, caIdNameMap);
     return (certInfo == null) ? null : certInfo.getCert().getCert();
@@ -562,14 +561,16 @@ public class X509Ca implements Closeable {
    * @throws OperationException
    *         if error occurs.
    */
-  public List<X509Certificate> getCert(X500Name subjectName, byte[] transactionId)
+  public List<X509Cert> getCert(X500Name subjectName, byte[] transactionId)
       throws OperationException {
     return certstore.getCert(subjectName, transactionId);
   }
 
   public CertStore.KnowCertResult knowsCert(X509Certificate cert) throws OperationException {
     Args.notNull(cert, "cert");
-    if (!caInfo.getSubject().equals(X509Util.getRfc4519Name(cert.getIssuerX500Principal()))) {
+
+    X500Name issuerX500 = X500Name.getInstance(cert.getIssuerX500Principal().getEncoded());
+    if (!caInfo.getSubject().equals(X509Util.getRfc4519Name(issuerX500))) {
       return CertStore.KnowCertResult.UNKNOWN;
     }
 
@@ -611,11 +612,11 @@ public class X509Ca implements Closeable {
     return (caHasUser == null) ? null : caManager.createByUserRequestor(caHasUser);
   }
 
-  public X509CRL getCurrentCrl() throws OperationException {
+  public X509CRLHolder getCurrentCrl() throws OperationException {
     return getCrl(null);
   }
 
-  public X509CRL getCrl(BigInteger crlNumber) throws OperationException {
+  public X509CRLHolder getCrl(BigInteger crlNumber) throws OperationException {
     LOG.info("     START getCrl: ca={}, crlNumber={}", caIdent.getName(), crlNumber);
     boolean successful = false;
 
@@ -626,14 +627,14 @@ public class X509Ca implements Closeable {
       }
 
       try {
-        X509CRL crl = X509Util.parseCrl(encodedCrl);
+        X509CRLHolder crl = X509Util.parseCrl(encodedCrl);
         successful = true;
         if (LOG.isInfoEnabled()) {
           String timeStr = new Time(crl.getThisUpdate()).getTime();
           LOG.info("SUCCESSFUL getCrl: ca={}, thisUpdate={}", caIdent.getName(), timeStr);
         }
         return crl;
-      } catch (CRLException | CertificateException ex) {
+      } catch (CRLException ex) {
         throw new OperationException(SYSTEM_FAILURE, ex);
       } catch (RuntimeException ex) {
         throw new OperationException(SYSTEM_FAILURE, ex);
@@ -707,7 +708,7 @@ public class X509Ca implements Closeable {
     }
   } // method cleanupCrls
 
-  public X509CRL generateCrlOnDemand(String msgId) throws OperationException {
+  public X509CRLHolder generateCrlOnDemand(String msgId) throws OperationException {
     CrlControl control = caInfo.getCrlControl();
     if (control == null) {
       throw new OperationException(NOT_PERMITTED, "CA could not generate CRL");
@@ -733,7 +734,7 @@ public class X509Ca implements Closeable {
           + (intervals + control.getOverlapDays()) * MS_PER_DAY);
 
       long maxIdOfDeltaCrlCache = certstore.getMaxIdOfDeltaCrlCache(caIdent);
-      X509CRL crl = generateCrl(false, thisUpdate, nextUpdate, msgId);
+      X509CRLHolder crl = generateCrl(false, thisUpdate, nextUpdate, msgId);
       if (crl == null) {
         return null;
       }
@@ -749,12 +750,12 @@ public class X509Ca implements Closeable {
     }
   } // method generateCrlOnDemand
 
-  private X509CRL generateCrl(boolean deltaCrl, Date thisUpdate, Date nextUpdate, String msgId)
-      throws OperationException {
+  private X509CRLHolder generateCrl(boolean deltaCrl, Date thisUpdate, Date nextUpdate,
+      String msgId) throws OperationException {
     boolean successful = false;
     AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_gen_crl, msgId);
     try {
-      X509CRL crl = generateCrl0(deltaCrl, thisUpdate, nextUpdate, event, msgId);
+      X509CRLHolder crl = generateCrl0(deltaCrl, thisUpdate, nextUpdate, event, msgId);
       successful = true;
       return crl;
     } finally {
@@ -762,7 +763,7 @@ public class X509Ca implements Closeable {
     }
   }
 
-  private X509CRL generateCrl0(boolean deltaCrl, Date thisUpdate, Date nextUpdate,
+  private X509CRLHolder generateCrl0(boolean deltaCrl, Date thisUpdate, Date nextUpdate,
       AuditEvent event, String msgId) throws OperationException {
     CrlControl control = caInfo.getCrlControl();
     if (control == null) {
@@ -791,7 +792,7 @@ public class X509Ca implements Closeable {
       PublicCaInfo pci = caInfo.getPublicCaInfo();
 
       boolean indirectCrl = (crlSigner != null);
-      X500Name crlIssuer = indirectCrl ? crlSigner.getSubjectAsX500Name() : pci.getX500Subject();
+      X500Name crlIssuer = indirectCrl ? crlSigner.getSubjectAsX500Name() : pci.getSubject();
 
       X509v2CRLBuilder crlBuilder = new X509v2CRLBuilder(crlIssuer, thisUpdate);
       if (nextUpdate != null) {
@@ -892,7 +893,7 @@ public class X509Ca implements Closeable {
           extensions.add(ext);
         }
 
-        Extension ext = createCertificateIssuerExtension(pci.getX500Subject());
+        Extension ext = createCertificateIssuerExtension(pci.getSubject());
         extensions.add(ext);
 
         crlBuilder.addCRLEntry(serial, revocationTime,
@@ -915,7 +916,7 @@ public class X509Ca implements Closeable {
       try {
         // AuthorityKeyIdentifier
         byte[] akiValues = indirectCrl
-            ? X509Util.extractSki(crlSigner.getSigner().getCertificate())
+            ? crlSigner.getSigner().getCertificate().getSubjectKeyId()
             : pci.getSubjectKeyIdentifer();
         AuthorityKeyIdentifier aki = new AuthorityKeyIdentifier(akiValues);
         crlBuilder.addExtension(Extension.authorityKeyIdentifier, false, aki);
@@ -939,11 +940,11 @@ public class X509Ca implements Closeable {
         // freshestCRL
         List<String> deltaCrlUris = pci.getCaUris().getDeltaCrlUris();
         if (control.getDeltaCrlIntervals() > 0 && CollectionUtil.isNotEmpty(deltaCrlUris)) {
-          CRLDistPoint cdp = CaUtil.createCrlDistributionPoints(deltaCrlUris, pci.getX500Subject(),
+          CRLDistPoint cdp = CaUtil.createCrlDistributionPoints(deltaCrlUris, pci.getSubject(),
               crlIssuer);
           crlBuilder.addExtension(Extension.freshestCRL, false, cdp);
         }
-      } catch (CertIOException | CertificateEncodingException ex) {
+      } catch (CertIOException ex) {
         LogUtil.error(LOG, ex, "crlBuilder.addExtension");
         throw new OperationException(INVALID_EXTENSION, ex);
       }
@@ -961,31 +962,26 @@ public class X509Ca implements Closeable {
         throw new OperationException(SYSTEM_FAILURE, "NoIdleSignerException: " + ex.getMessage());
       }
 
-      X509CRLHolder crlHolder;
+      X509CRLHolder crl;
       try {
-        crlHolder = crlBuilder.build(signer0.value());
+        crl = crlBuilder.build(signer0.value());
       } finally {
         concurrentSigner.requiteSigner(signer0);
       }
 
-      try {
-        X509CRL crl = X509Util.toX509Crl(crlHolder.toASN1Structure());
-        caInfo.getCaEntry().setNextCrlNumber(crlNumber.longValue() + 1);
-        caManager.commitNextCrlNo(caIdent, caInfo.getCaEntry().getNextCrlNumber());
-        publishCrl(crl);
+      caInfo.getCaEntry().setNextCrlNumber(crlNumber.longValue() + 1);
+      caManager.commitNextCrlNo(caIdent, caInfo.getCaEntry().getNextCrlNumber());
+      publishCrl(crl);
 
-        successful = true;
-        LOG.info("SUCCESSFUL generateCrl: ca={}, crlNumber={}, thisUpdate={}", caIdent.getName(),
-            crlNumber, crl.getThisUpdate());
+      successful = true;
+      LOG.info("SUCCESSFUL generateCrl: ca={}, crlNumber={}, thisUpdate={}", caIdent.getName(),
+          crlNumber, crl.getThisUpdate());
 
-        if (!deltaCrl) {
-          // clean up the CRL
-          cleanupCrlsWithoutException(msgId);
-        }
-        return crl;
-      } catch (CRLException | CertificateException ex) {
-        throw new OperationException(CRL_FAILURE, ex);
+      if (!deltaCrl) {
+        // clean up the CRL
+        cleanupCrlsWithoutException(msgId);
       }
+      return crl;
     } finally {
       if (!successful) {
         LOG.info("    FAILED generateCrl: ca={}", caIdent.getName());
@@ -1039,7 +1035,7 @@ public class X509Ca implements Closeable {
                 "CertificateException: " + ex.getMessage());
           }
 
-          Certificate cert = Certificate.getInstance(certInfo.getCert().getEncodedCert());
+          Certificate cert = certInfo.getCert().getCert().toBcCert().toASN1Structure();
 
           NameId profileId = certInfo.getProfile();
           if (profileId != null) {
@@ -1288,7 +1284,7 @@ public class X509Ca implements Closeable {
     return true;
   } // method publishCertsInQueue
 
-  private boolean publishCrl(X509CRL crl) {
+  private boolean publishCrl(X509CRLHolder crl) {
     try {
       certstore.addCrl(caIdent, crl);
     } catch (Exception ex) {
@@ -1411,12 +1407,12 @@ public class X509Ca implements Closeable {
       }
 
       successful = false;
-      X509Certificate cert = certToRemove.getCert();
+      X509Cert cert = certToRemove.getCert();
       if (LOG.isErrorEnabled()) {
         LOG.error("removing certificate issuer='{}', serial={}, subject='{}' from publisher"
-            + " {} failed.", X509Util.getRfc4519Name(cert.getIssuerX500Principal()),
-            LogUtil.formatCsn(cert.getSerialNumber()),
-            X509Util.getRfc4519Name(cert.getSubjectX500Principal()), publisher.getIdent());
+            + " {} failed.", cert.getIssuerRfc4519Text(),
+            LogUtil.formatCsn(cert.getSerialNumber()), cert.getSubjectRfc4519Text(),
+            publisher.getIdent());
       }
     } // end for
 
@@ -1733,7 +1729,8 @@ public class X509Ca implements Closeable {
           String prefix = certInfo.isAlreadyIssued() ? "RETURN_OLD_CERT" : "SUCCESSFUL";
           CertWithDbId cert = certInfo.getCert();
           LOG.info("{} generateCertificate: CA={}, profile={}, subject='{}', serialNumber={}",
-              prefix, caIdent.getName(), certprofilIdent.getName(), cert.getSubject(),
+              prefix, caIdent.getName(), certprofilIdent.getName(),
+              cert.getCert().getSubjectRfc4519Text(),
               LogUtil.formatCsn(cert.getCert().getSerialNumber()));
         }
       } catch (OperationException ex) {
@@ -1839,14 +1836,14 @@ public class X509Ca implements Closeable {
 
     try {
       X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
-          caInfo.getPublicCaInfo().getX500Subject(), caInfo.nextSerial(), gct.grantedNotBefore,
+          caInfo.getPublicCaInfo().getSubject(), caInfo.nextSerial(), gct.grantedNotBefore,
           gct.grantedNotAfter, gct.grantedSubject, gct.grantedPublicKey);
 
       CertificateInfo ret;
 
       try {
         SignerEntryWrapper crlSigner = getCrlSigner();
-        X509Certificate crlSignerCert = (crlSigner == null)
+        X509Cert crlSignerCert = (crlSigner == null)
             ? null : crlSigner.getSigner().getCertificate();
 
         ExtensionValues extensionTuples = certprofile.getExtensions(gct.requestedSubject,
@@ -1908,9 +1905,9 @@ public class X509Ca implements Closeable {
           throw new OperationException(SYSTEM_FAILURE, ex);
         }
 
-        Certificate bcCert;
+        X509CertificateHolder bcCert;
         try {
-          bcCert = certBuilder.build(signer0.value()).toASN1Structure();
+          bcCert = certBuilder.build(signer0.value());
         } finally {
           gct.signer.requiteSigner(signer0);
         }
@@ -1926,21 +1923,13 @@ public class X509Ca implements Closeable {
           }
         }
 
-        X509Certificate cert;
-        try {
-          cert = X509Util.toX509Cert(bcCert);
-        } catch (CertificateException ex) {
-          String message = "should not happen, could not parse generated certificate";
-          LOG.error(message, ex);
-          throw new OperationException(SYSTEM_FAILURE, ex);
-        }
-
+        X509Cert cert = new X509Cert(bcCert, encodedCert);
         if (!verifySignature(cert)) {
           throw new OperationException(SYSTEM_FAILURE,
               "could not verify the signature of generated certificate");
         }
 
-        CertWithDbId certWithMeta = new CertWithDbId(cert, encodedCert);
+        CertWithDbId certWithMeta = new CertWithDbId(cert);
         ret = new CertificateInfo(certWithMeta, gct.privateKey, caIdent, caCert,
             gct.grantedPublicKeyData, gct.certprofile.getIdent(), requestor.getIdent());
         if (requestor instanceof RequestorInfo.ByUserRequestorInfo) {
@@ -2392,7 +2381,7 @@ public class X509Ca implements Closeable {
         continue;
       }
 
-      if (entry.getCert().getSubjectAsX500Name().equals(requestorSender)) {
+      if (entry.getCert().getCert().getSubject().equals(requestorSender)) {
         return new RequestorInfo.CmpRequestorInfo(m, entry.getCert());
       }
     }
@@ -2400,7 +2389,7 @@ public class X509Ca implements Closeable {
     return null;
   } // method getRequestor
 
-  public RequestorInfo.CmpRequestorInfo getRequestor(X509Certificate requestorCert) {
+  public RequestorInfo.CmpRequestorInfo getRequestor(X509Cert requestorCert) {
     Set<MgmtEntry.CaHasRequestor> requestorEntries =
         caManager.getRequestorsForCa(caIdent.getName());
     if (CollectionUtil.isEmpty(requestorEntries)) {
@@ -2664,9 +2653,9 @@ public class X509Ca implements Closeable {
     return event;
   }
 
-  private boolean verifySignature(X509Certificate cert) {
+  private boolean verifySignature(X509Cert cert) {
     Args.notNull(cert, "cert");
-    PublicKey caPublicKey = caCert.getCert().getPublicKey();
+    PublicKey caPublicKey = caCert.getPublicKey();
     try {
       cert.verify(caPublicKey);
       return true;

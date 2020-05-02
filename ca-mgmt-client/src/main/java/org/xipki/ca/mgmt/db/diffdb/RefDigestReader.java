@@ -19,7 +19,6 @@ package org.xipki.ca.mgmt.db.diffdb;
 
 import java.io.Closeable;
 import java.math.BigInteger;
-import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -42,6 +41,7 @@ import org.xipki.ca.mgmt.db.diffdb.QueueEntry.DigestEntrySet;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
@@ -62,7 +62,7 @@ class RefDigestReader implements Closeable {
 
   private final DataSourceWrapper datasource;
 
-  private final X509Certificate caCert;
+  private final X509Cert caCert;
 
   private final AtomicBoolean stopMe;
 
@@ -194,13 +194,13 @@ class RefDigestReader implements Closeable {
 
   } // class Retriever
 
-  private RefDigestReader(DataSourceWrapper datasource, X509Certificate caCert, int totalAccount,
-      long minId, int numBlocksToRead, AtomicBoolean stopMe) throws Exception {
+  private RefDigestReader(DataSourceWrapper datasource, X509Cert caCert,
+      int totalAccount, long minId, int numBlocksToRead, AtomicBoolean stopMe) throws Exception {
     this.datasource = Args.notNull(datasource, "datasource");
     this.caCert = Args.notNull(caCert, "caCert");
     this.stopMe = Args.notNull(stopMe, "stopMe");
     this.totalAccount = totalAccount;
-    this.caSubjectName = X509Util.getRfc4519Name(caCert.getSubjectX500Principal());
+    this.caSubjectName = caCert.getSubjectRfc4519Text();
     this.lastProcessedId = minId - 1;
     this.outQueue = new ArrayBlockingQueue<>(numBlocksToRead);
   } // constructor
@@ -263,7 +263,7 @@ class RefDigestReader implements Closeable {
     ResultSet rs = null;
     String sql = null;
 
-    X509Certificate caCert;
+    X509Cert caCert;
     int totalAccount;
     long minId;
 
@@ -316,7 +316,7 @@ class RefDigestReader implements Closeable {
     }
   } // method getInstance
 
-  public X509Certificate getCaCert() {
+  public X509Cert getCaCert() {
     return caCert;
   }
 

@@ -31,7 +31,6 @@ import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
-import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -85,6 +84,7 @@ import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
 import org.bouncycastle.asn1.x509.qualified.MonetaryValue;
 import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
+import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.util.io.pem.PemObject;
@@ -105,6 +105,7 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Xipki;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignatureAlgoControl;
+import org.xipki.security.X509Cert;
 import org.xipki.security.X509ExtensionType;
 import org.xipki.security.X509ExtensionType.ExtensionsType;
 import org.xipki.security.XiSecurityException;
@@ -169,18 +170,18 @@ public class Actions {
 
     @Override
     protected Object execute0() throws Exception {
-      Certificate cert = X509Util.parseBcCert(IoUtil.read(inFile));
+      X509Cert cert = X509Util.parseCert(IoUtil.read(inFile));
 
       if (serial != null && serial) {
-        return getNumber(cert.getSerialNumber().getPositiveValue());
+        return getNumber(cert.getSerialNumber());
       } else if (subject != null && subject) {
         return cert.getSubject().toString();
       } else if (issuer != null && issuer) {
         return cert.getIssuer().toString();
       } else if (notBefore != null && notBefore) {
-        return toUtcTimeyyyyMMddhhmmssZ(cert.getStartDate().getDate());
+        return toUtcTimeyyyyMMddhhmmssZ(cert.getNotBefore());
       } else if (notAfter != null && notAfter) {
-        return toUtcTimeyyyyMMddhhmmssZ(cert.getEndDate().getDate());
+        return toUtcTimeyyyyMMddhhmmssZ(cert.getNotAfter());
       } else if (fingerprint != null && fingerprint) {
         byte[] encoded = cert.getEncoded();
         return HashAlgo.getInstance(hashAlgo).hexHash(encoded);
@@ -468,11 +469,11 @@ public class Actions {
     protected abstract ConcurrentContentSigner getSigner(
          SignatureAlgoControl signatureAlgoControl) throws Exception;
 
-    protected List<X509Certificate> getPeerCertificates()
+    protected List<X509Cert> getPeerCertificates()
         throws CertificateException, IOException {
       if (StringUtil.isNotBlank(peerCertsFile)) {
         try (PemReader pemReader = new PemReader(new FileReader(peerCertsFile))) {
-          List<X509Certificate> certs = new LinkedList<>();
+          List<X509Cert> certs = new LinkedList<>();
           PemObject pemObj;
           while ((pemObj = pemReader.readPemObject()) != null) {
             if (!"CERTIFICATE".equals(pemObj.getType())) {
@@ -484,7 +485,7 @@ public class Actions {
           return certs.isEmpty() ? null : certs;
         }
       } else if (StringUtil.isNotBlank(peerCertFile)) {
-        X509Certificate cert = X509Util.parseCert(Paths.get(peerCertFile).toFile());
+        X509Cert cert = X509Util.parseCert(Paths.get(peerCertFile).toFile());
         return Arrays.asList(cert);
       } else {
         return null;
@@ -878,7 +879,7 @@ public class Actions {
 
             PrivateKey key = (PrivateKey) ks.getKey(alias, password);
             if (key.getAlgorithm().equalsIgnoreCase(requiredKeyAlg)) {
-              X509Certificate cert = (X509Certificate) ks.getCertificate(alias);
+              X509Cert cert = new X509Cert((X509Certificate) ks.getCertificate(alias));
               peerKeyAndCert = new DHSigStaticKeyCertPair(key, cert);
               break;
             }
@@ -960,14 +961,13 @@ public class Actions {
 
     @Override
     protected Object execute0() throws Exception {
-      X509CRL crl = X509Util.parseCrl(new File(crlFile));
-      String oidExtnCerts = ObjectIdentifiers.Xipki.id_xipki_ext_crlCertset.getId();
-      byte[] extnValue = crl.getExtensionValue(oidExtnCerts);
+      X509CRLHolder crl = X509Util.parseCrl(new File(crlFile));
+      byte[] extnValue = X509Util.getCoreExtValue(crl.getExtensions(),
+                            ObjectIdentifiers.Xipki.id_xipki_ext_crlCertset);
       if (extnValue == null) {
         throw new IllegalCmdParamException("no certificate is contained in " + crlFile);
       }
 
-      extnValue = removingTagAndLenFromExtensionValue(extnValue);
       ASN1Set asn1Set = DERSet.getInstance(extnValue);
       final int n = asn1Set.size();
       if (n == 0) {
@@ -1005,11 +1005,6 @@ public class Actions {
       saveVerbose("extracted " + n + " certificates to", outFile, out.toByteArray());
       return null;
     } // method execute0
-
-    private static byte[] removingTagAndLenFromExtensionValue(byte[] encodedExtensionValue) {
-      DEROctetString derOctet = (DEROctetString) DEROctetString.getInstance(encodedExtensionValue);
-      return derOctet.getOctets();
-    }
 
   } // class ExtractCert
 
@@ -1057,14 +1052,14 @@ public class Actions {
       }
 
       for (String certFile : certFiles) {
-        X509Certificate cert = X509Util.parseCert(new File(certFile));
-        String baseAlias = X509Util.getCommonName(cert.getSubjectX500Principal());
+        X509Cert cert = X509Util.parseCert(new File(certFile));
+        String baseAlias = X509Util.getCommonName(cert.getSubject());
         String alias = baseAlias;
         int idx = 2;
         while (aliases.contains(alias)) {
           alias = baseAlias + "-" + (idx++);
         }
-        ks.setCertificateEntry(alias, cert);
+        ks.setCertificateEntry(alias, cert.toJceCert());
         aliases.add(alias);
       }
 

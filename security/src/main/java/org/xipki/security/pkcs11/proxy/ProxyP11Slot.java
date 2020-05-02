@@ -20,7 +20,6 @@ package org.xipki.security.pkcs11.proxy;
 import java.math.BigInteger;
 import java.security.PublicKey;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
@@ -109,7 +108,7 @@ public class ProxyP11Slot extends P11Slot {
       java.security.PublicKey pubKey = null;
       X509Cert cert = refreshResult.getCertForId(id);
       if (cert != null) {
-        pubKey = cert.getCert().getPublicKey();
+        pubKey = cert.getPublicKey();
       } else {
         pubKey = getPublicKey(keyId);
       }
@@ -122,7 +121,7 @@ public class ProxyP11Slot extends P11Slot {
       if (pubKey == null) {
         identity = new ProxyP11Identity(this, entityId);
       } else {
-        X509Certificate[] certs = (cert == null) ? null : new X509Certificate[]{cert.getCert()};
+        X509Cert[] certs = (cert == null) ? null : new X509Cert[]{cert};
         identity = new ProxyP11Identity(this, entityId, pubKey, certs);
       }
       refreshResult.addIdentity(identity);
@@ -162,7 +161,7 @@ public class ProxyP11Slot extends P11Slot {
     }
 
     try {
-      return new X509Cert(X509Util.parseCert(resp), resp);
+      return X509Util.parseCert(resp);
     } catch (CertificateException ex) {
       throw new P11TokenException("could not parse certificate:" + ex.getMessage(), ex);
     }
@@ -192,7 +191,7 @@ public class ProxyP11Slot extends P11Slot {
   }
 
   @Override
-  protected P11ObjectIdentifier addCert0(X509Certificate cert, P11NewObjectControl control)
+  protected P11ObjectIdentifier addCert0(X509Cert cert, P11NewObjectControl control)
       throws P11TokenException, CertificateException {
     ProxyMessage.AddCertParams asn1 = new ProxyMessage.AddCertParams(slotId, control, cert);
     byte[] resp = module.send(P11ProxyConstants.ACTION_ADD_CERT, asn1);
@@ -323,7 +322,7 @@ public class ProxyP11Slot extends P11Slot {
   }
 
   @Override
-  protected void updateCertificate0(P11ObjectIdentifier objectId, X509Certificate newCert)
+  protected void updateCertificate0(P11ObjectIdentifier objectId, X509Cert newCert)
       throws P11TokenException, CertificateException {
     ProxyMessage.ObjectIdAndCert asn1 = new ProxyMessage.ObjectIdAndCert(asn1SlotId,
         new ProxyMessage.ObjectIdentifier(objectId), newCert);

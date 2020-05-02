@@ -68,15 +68,14 @@ public class CmpUtil {
       if (signer.getCertificate() == null) {
         throw new IllegalArgumentException("signer without certificate is not allowed");
       }
-      X500Name x500Name = X500Name.getInstance(
-          signer.getCertificate().getSubjectX500Principal().getEncoded());
+      X500Name x500Name = signer.getCertificate().getSubject();
       tmpSignerName = new GeneralName(x500Name);
     }
 
     ProtectedPKIMessageBuilder builder =
         newProtectedPKIMessageBuilder(pkiMessage, tmpSignerName, null);
     if (addSignerCert) {
-      X509CertificateHolder signerCert = signer.getBcCertificate();
+      X509CertificateHolder signerCert = signer.getCertificate().toBcCert();
       builder.addCMPCertificate(signerCert);
     }
 

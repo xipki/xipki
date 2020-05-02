@@ -20,7 +20,6 @@ package org.xipki.ca.mgmt.db.diffdb;
 import java.io.File;
 import java.io.IOException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -38,7 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.util.X509Util;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.ProcessLog;
@@ -171,7 +170,7 @@ class DigestDiff {
 
   private void diffSingleCa(RefDigestReader refReader, Map<Integer, byte[]> caIdCertBytesMap)
       throws CertificateException, IOException, InterruptedException {
-    X509Certificate caCert = refReader.getCaCert();
+    X509Cert caCert = refReader.getCaCert();
     byte[] caCertBytes = caCert.getEncoded();
 
     if (includeCaCerts != null && !includeCaCerts.isEmpty()) {
@@ -187,7 +186,7 @@ class DigestDiff {
       }
     }
 
-    String commonName = X509Util.getCommonName(caCert.getSubjectX500Principal());
+    String commonName = caCert.getCommonName();
     File caReportDir = new File(reportDirName, "ca-" + commonName);
 
     int idx = 2;

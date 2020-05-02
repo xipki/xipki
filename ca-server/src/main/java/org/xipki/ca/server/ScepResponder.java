@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.Key;
 import java.security.PrivateKey;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
@@ -103,15 +102,15 @@ public class ScepResponder {
 
     private final byte[] bytes;
 
-    public ScepCaCertRespBytes(X509Certificate caCert, X509Certificate responderCert)
+    public ScepCaCertRespBytes(X509Cert caCert, X509Cert responderCert)
         throws CMSException, CertificateException {
       Args.notNull(caCert, "caCert");
       Args.notNull(responderCert, "responderCert");
 
       CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
       try {
-        cmsSignedDataGen.addCertificate(new X509CertificateHolder(caCert.getEncoded()));
-        cmsSignedDataGen.addCertificate(new X509CertificateHolder(responderCert.getEncoded()));
+        cmsSignedDataGen.addCertificate(caCert.toBcCert());
+        cmsSignedDataGen.addCertificate(responderCert.toBcCert());
         CMSSignedData degenerateSignedData = cmsSignedDataGen.generate(new CMSAbsentContent());
         bytes = degenerateSignedData.getEncoded();
       } catch (IOException ex) {
@@ -165,7 +164,7 @@ public class ScepResponder {
 
   private PrivateKey responderKey;
 
-  private X509Certificate responderCert;
+  private X509Cert responderCert;
 
   private EnvelopedDataDecryptor envelopedDataDecryptor;
 
@@ -230,7 +229,8 @@ public class ScepResponder {
     this.responderKey = (PrivateKey) signingKey;
     this.responderCert = signer.getCertificate();
     this.envelopedDataDecryptor =
-        new EnvelopedDataDecryptor(new EnvelopedDataDecryptorInstance(responderCert, responderKey));
+        new EnvelopedDataDecryptor(
+            new EnvelopedDataDecryptorInstance(responderCert.toJceCert(), responderKey));
   } // method setResponder
 
   /**
@@ -422,7 +422,7 @@ public class ScepResponder {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
     }
 
-    X500Name caX500Name = ca.getCaInfo().getCert().getSubjectAsX500Name();
+    X500Name caX500Name = ca.getCaInfo().getCert().getSubject();
 
     try {
       SignedData signedData;
@@ -586,7 +586,7 @@ public class ScepResponder {
 
   private SignedData getCert(X509Ca ca, BigInteger serialNumber)
       throws FailInfoException, OperationException {
-    X509Certificate cert;
+    X509Cert cert;
     try {
       cert = ca.getCert(serialNumber);
     } catch (CertificateException ex) {
@@ -604,7 +604,7 @@ public class ScepResponder {
   private SignedData pollCert(X509Ca ca, X500Name subject, TransactionId tid)
       throws FailInfoException, OperationException {
     byte[] tidBytes = getTransactionIdBytes(tid.getId());
-    List<X509Certificate> certs = ca.getCert(subject, tidBytes);
+    List<X509Cert> certs = ca.getCert(subject, tidBytes);
     if (CollectionUtil.isEmpty(certs)) {
       certs = ca.getCert(subject, null);
     }
@@ -622,18 +622,18 @@ public class ScepResponder {
     return buildSignedData(certs.get(0));
   } // method pollCert
 
-  private SignedData buildSignedData(X509Certificate cert) throws OperationException {
+  private SignedData buildSignedData(X509Cert cert) throws OperationException {
     CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
     try {
       X509CertificateHolder certHolder = new X509CertificateHolder(cert.getEncoded());
       cmsSignedDataGen.addCertificate(certHolder);
       if (control.isIncludeCaCert()) {
         refreshCa();
-        cmsSignedDataGen.addCertificate(caCert.getCertHolder());
+        cmsSignedDataGen.addCertificate(caCert.toBcCert());
       }
       CMSSignedData signedData = cmsSignedDataGen.generate(new CMSAbsentContent());
       return SignedData.getInstance(signedData.toASN1Structure().getContent());
-    } catch (CMSException | IOException | CertificateEncodingException ex) {
+    } catch (CMSException | IOException ex) {
       LogUtil.error(LOG, ex);
       throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
     }
@@ -671,10 +671,11 @@ public class ScepResponder {
     String signatureAlgorithm = getSignatureAlgorithm(responderKey, request.getDigestAlgorithm());
     ContentInfo ci;
     try {
+      X509Certificate jceResponerCert = responderCert.toJceCert();
       X509Certificate[] cmsCertSet = control.isIncludeSignerCert()
-          ? new X509Certificate[]{responderCert} : null;
+          ? new X509Certificate[]{jceResponerCert} : null;
 
-      ci = response.encode(responderKey, signatureAlgorithm, responderCert, cmsCertSet,
+      ci = response.encode(responderKey, signatureAlgorithm, jceResponerCert, cmsCertSet,
           request.getSignatureCert(), request.getContentEncryptionAlgorithm());
     } catch (MessageEncodingException ex) {
       LogUtil.error(LOG, ex, "could not encode response");
@@ -777,7 +778,7 @@ public class ScepResponder {
       }
 
       caCert = currentCaCert;
-      caCertRespBytes = new ScepCaCertRespBytes(currentCaCert.getCert(), responderCert);
+      caCertRespBytes = new ScepCaCertRespBytes(currentCaCert, responderCert);
     } catch (CaMgmtException | CertificateException | CMSException ex) {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
     }

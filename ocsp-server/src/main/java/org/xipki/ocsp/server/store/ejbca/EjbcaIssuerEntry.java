@@ -19,7 +19,6 @@ package org.xipki.ocsp.server.store.ejbca;
 
 import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,6 +29,7 @@ import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.CompareUtil;
 
@@ -48,11 +48,11 @@ class EjbcaIssuerEntry {
 
   private final Date notBefore;
 
-  private final X509Certificate cert;
+  private final X509Cert cert;
 
   private CertRevocationInfo revocationInfo;
 
-  public EjbcaIssuerEntry(X509Certificate cert)
+  public EjbcaIssuerEntry(X509Cert cert)
       throws CertificateEncodingException {
     this.cert = Args.notNull(cert, "cert");
     this.notBefore = cert.getNotBefore();
@@ -125,7 +125,7 @@ class EjbcaIssuerEntry {
     return notBefore;
   }
 
-  public X509Certificate getCert() {
+  public X509Cert getCert() {
     return cert;
   }
 

@@ -19,13 +19,12 @@ package org.xipki.ocsp.server.store.example;
 
 import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.CompareUtil;
 
@@ -40,18 +39,12 @@ public class IssuerEntry {
 
   private final Map<HashAlgo, byte[]> issuerHashMap;
 
-  private final X509Certificate cert;
+  private final X509Cert cert;
 
-  public IssuerEntry(X509Certificate cert) throws IOException, CertificateEncodingException {
+  public IssuerEntry(X509Cert cert) throws IOException, CertificateEncodingException {
     this.cert = Args.notNull(cert, "cert");
-    this.issuerHashMap = getIssuerHashAndKeys(cert.getEncoded());
-  }
-
-  private static Map<HashAlgo, byte[]> getIssuerHashAndKeys(byte[] encodedCert)
-      throws IOException {
-    Certificate bcCert = Certificate.getInstance(encodedCert);
-    byte[] encodedName = bcCert.getSubject().getEncoded("DER");
-    byte[] encodedKey = bcCert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
+    byte[] encodedName = cert.getSubject().getEncoded("DER");
+    byte[] encodedKey = cert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
 
     Map<HashAlgo, byte[]> hashes = new HashMap<>();
     for (HashAlgo ha : HashAlgo.values()) {
@@ -69,7 +62,7 @@ public class IssuerEntry {
 
       hashes.put(ha, nameAndKeyHash);
     }
-    return hashes;
+    this.issuerHashMap = hashes;
   } // method getIssuerHashAndKeys
 
   public boolean matchHash(RequestIssuer reqIssuer) {
@@ -82,7 +75,7 @@ public class IssuerEntry {
         reqIssuer.getNameHashFrom(), issuerHash.length);
   }
 
-  public X509Certificate getCert() {
+  public X509Cert getCert() {
     return cert;
   }
 

@@ -17,7 +17,6 @@
 
 package org.xipki.security;
 
-import java.security.cert.X509Certificate;
 import java.util.Set;
 
 import org.xipki.util.ObjectCreationException;
@@ -59,8 +58,8 @@ public interface SignerFactory {
    * @throws ObjectCreationException
    *         if signer could not be created.
    */
-  ConcurrentContentSigner newSigner(String type, SignerConf conf,
-      X509Certificate[] certificateChain) throws ObjectCreationException;
+  ConcurrentContentSigner newSigner(String type, SignerConf conf, X509Cert[] certificateChain)
+      throws ObjectCreationException;
 
   void refreshToken(String type) throws XiSecurityException;
 

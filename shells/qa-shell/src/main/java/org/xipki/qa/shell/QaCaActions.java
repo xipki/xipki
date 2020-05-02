@@ -19,7 +19,6 @@ package org.xipki.qa.shell;
 
 import java.io.File;
 import java.rmi.UnexpectedException;
-import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -65,6 +64,7 @@ import org.xipki.qa.ca.CaQaSystemManager;
 import org.xipki.qa.ca.CertprofileQa;
 import org.xipki.qa.ca.IssuerInfo;
 import org.xipki.security.EdECConstants;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
@@ -365,7 +365,7 @@ public class QaCaActions {
       // Certchain
       if (ey.getEncodedCertchain() != null) {
         List<byte[]> eyList = ey.getEncodedCertchain();
-        List<X509Certificate> isList = ca.getCertchain();
+        List<X509Cert> isList = ca.getCertchain();
         int eySize = eyList == null ? 0 : eyList.size();
         int isSize = isList == null ? 0 : isList.size();
 
@@ -1457,8 +1457,8 @@ public class QaCaActions {
       return true;
     } else if (certBytes1 != null && certBytes2 != null) {
       try {
-        byte[] encoded1 = X509Util.parseBcCert(certBytes1).getEncoded();
-        byte[] encoded2 = X509Util.parseBcCert(certBytes2).getEncoded();
+        byte[] encoded1 = X509Util.parseCert(certBytes1).getEncoded();
+        byte[] encoded2 = X509Util.parseCert(certBytes2).getEncoded();
         return Arrays.equals(encoded1, encoded2);
       } catch (Exception ex) {
         return false;

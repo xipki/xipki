@@ -20,11 +20,7 @@ package org.xipki.ca.servlet;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.cert.CRLException;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -37,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.cert.X509CRLHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.mgmt.CaManager;
@@ -50,6 +47,7 @@ import org.xipki.ca.api.mgmt.MgmtMessage.MgmtAction;
 import org.xipki.ca.api.mgmt.MgmtMessage.SignerEntryWrapper;
 import org.xipki.ca.api.mgmt.MgmtRequest;
 import org.xipki.ca.api.mgmt.MgmtResponse;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.InvalidConfException;
@@ -86,11 +84,11 @@ public class HttpMgmtServlet extends HttpServlet {
 
   private static final String CT_RESPONSE = "application/json";
 
-  private Set<X509Certificate> mgmtCerts;
+  private Set<X509Cert> mgmtCerts;
 
   private CaManager caManager;
 
-  public void setMgmtCerts(Set<X509Certificate> mgmtCerts) {
+  public void setMgmtCerts(Set<X509Cert> mgmtCerts) {
     this.mgmtCerts = new HashSet<>(Args.notEmpty(mgmtCerts, "mgmtCerts"));
   }
 
@@ -102,7 +100,7 @@ public class HttpMgmtServlet extends HttpServlet {
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
     try {
-      X509Certificate clientCert = TlsHelper.getTlsClientCert(request);
+      X509Cert clientCert = TlsHelper.getTlsClientCert(request);
       if (clientCert == null) {
         throw new MyException(HttpServletResponse.SC_UNAUTHORIZED,
             "remote management is not permitted if TLS client certificate is not present");
@@ -254,14 +252,14 @@ public class HttpMgmtServlet extends HttpServlet {
         }
         case generateCertificate: {
           MgmtRequest.GenerateCertificate req = parse(in, MgmtRequest.GenerateCertificate.class);
-          X509Certificate cert = caManager.generateCertificate(req.getCaName(),
+          X509Cert cert = caManager.generateCertificate(req.getCaName(),
               req.getProfileName(), req.getEncodedCsr(), req.getNotBefore(), req.getNotAfter());
           resp = toByteArray(action, cert);
           break;
         }
         case generateCrlOnDemand: {
           String caName = getNameFromRequest(in);
-          X509CRL crl = caManager.generateCrlOnDemand(caName);
+          X509CRLHolder crl = caManager.generateCrlOnDemand(caName);
           resp = toByteArray(action, crl);
           break;
         }
@@ -277,7 +275,7 @@ public class HttpMgmtServlet extends HttpServlet {
                 "could not build the CaEntry: " + ex.getMessage());
           }
 
-          X509Certificate cert = caManager.generateRootCa(caEntry,
+          X509Cert cert = caManager.generateRootCa(caEntry,
               req.getCertprofileName(), req.getEncodedCsr(), req.getSerialNumber());
           resp = toByteArray(action, cert);
           break;
@@ -372,7 +370,7 @@ public class HttpMgmtServlet extends HttpServlet {
         }
         case getCrl: {
           MgmtRequest.GetCrl req = parse(in, MgmtRequest.GetCrl.class);
-          X509CRL crl = caManager.getCrl(req.getCaName(), req.getCrlNumber());
+          X509CRLHolder crl = caManager.getCrl(req.getCaName(), req.getCrlNumber());
           if (crl == null) {
             throw new CaMgmtException("Found no CRL for CA " + req.getCaName()
                         + " with CRL number " + req.getCrlNumber());
@@ -382,7 +380,7 @@ public class HttpMgmtServlet extends HttpServlet {
         }
         case getCurrentCrl: {
           String caName = getNameFromRequest(in);
-          X509CRL crl = caManager.getCurrentCrl(caName);
+          X509CRLHolder crl = caManager.getCurrentCrl(caName);
           if (crl == null) {
             throw new CaMgmtException("No current CRL for CA " + caName);
           }
@@ -492,7 +490,7 @@ public class HttpMgmtServlet extends HttpServlet {
         }
         case loadConf: {
           MgmtRequest.LoadConf req = parse(in, MgmtRequest.LoadConf.class);
-          Map<String, X509Certificate> rootcaNameCertMap =
+          Map<String, X509Cert> rootcaNameCertMap =
               caManager.loadConf(new ByteArrayInputStream(req.getConfBytes()));
 
           if (rootcaNameCertMap == null || rootcaNameCertMap.isEmpty()) {
@@ -500,15 +498,7 @@ public class HttpMgmtServlet extends HttpServlet {
           } else {
             Map<String, byte[]> result = new HashMap<>(rootcaNameCertMap.size());
             for (String name : rootcaNameCertMap.keySet()) {
-              byte[] encodedCert;
-              try {
-                encodedCert = rootcaNameCertMap.get(name).getEncoded();
-              } catch (CertificateEncodingException ex) {
-                final String errMsg =
-                    "could not encode newly generated certificate of root CA " + name;
-                LOG.error(action + ": " + errMsg, ex);
-                throw new MyException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errMsg);
-              }
+              byte[] encodedCert = rootcaNameCertMap.get(name).getEncoded();
               result.put(name, encodedCert);
             }
             resp = new MgmtResponse.LoadConf(result);
@@ -678,25 +668,17 @@ public class HttpMgmtServlet extends HttpServlet {
     }
   } // method doPost
 
-  private static MgmtResponse.ByteArray toByteArray(MgmtAction action, X509Certificate cert)
+  private static MgmtResponse.ByteArray toByteArray(MgmtAction action, X509Cert cert)
       throws MyException {
     if (cert == null) {
       return new MgmtResponse.ByteArray(null);
     }
 
-    byte[] encoded;
-    try {
-      encoded = cert.getEncoded();
-    } catch (CertificateEncodingException ex) {
-      LOG.error(action + ": could not encode the generated certificate", ex);
-      throw new MyException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-          "could not encode the generated certificate");
-    }
-
+    byte[] encoded = cert.getEncoded();
     return new MgmtResponse.ByteArray(encoded);
   } // method toByteArray
 
-  private static MgmtResponse.ByteArray toByteArray(MgmtAction action, X509CRL crl)
+  private static MgmtResponse.ByteArray toByteArray(MgmtAction action, X509CRLHolder crl)
       throws MyException {
     if (crl == null) {
       return new MgmtResponse.ByteArray(null);
@@ -705,7 +687,7 @@ public class HttpMgmtServlet extends HttpServlet {
     byte[] encoded;
     try {
       encoded = crl.getEncoded();
-    } catch (CRLException ex) {
+    } catch (IOException ex) {
       LOG.error(action + ": could not encode the generated CRL", ex);
       throw new MyException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
           "could not encode the generated CRL");

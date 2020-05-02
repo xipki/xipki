@@ -23,7 +23,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -44,6 +43,7 @@ import org.xipki.security.DfltConcurrentContentSigner;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers.Xipki;
+import org.xipki.security.X509Cert;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.XiSecurityException;
 import org.xipki.util.Args;
@@ -121,9 +121,9 @@ public class P12XdhMacContentSignerBuilder {
 
   private final PublicKey publicKey;
 
-  private final X509Certificate[] certificateChain;
+  private final X509Cert[] certificateChain;
 
-  public P12XdhMacContentSignerBuilder(X509Certificate peerCert,
+  public P12XdhMacContentSignerBuilder(X509Cert peerCert,
       PrivateKey privateKey, PublicKey publicKey) throws XiSecurityException {
     Args.notNull(privateKey, "privateKey");
     Args.notNull(peerCert, "peerCert");
@@ -132,7 +132,8 @@ public class P12XdhMacContentSignerBuilder {
     init(privateKey, peerCert);
   }
 
-  public P12XdhMacContentSignerBuilder(KeypairWithCert keypairWithCert, X509Certificate peerCert)
+  public P12XdhMacContentSignerBuilder(KeypairWithCert keypairWithCert,
+      X509Cert peerCert)
       throws XiSecurityException {
     Args.notNull(keypairWithCert, "keypairWithCert");
     Args.notNull(peerCert, "peerCert");
@@ -142,7 +143,8 @@ public class P12XdhMacContentSignerBuilder {
     init(keypairWithCert.getKey(), peerCert);
   }
 
-  private void init(PrivateKey privateKey, X509Certificate peerCert) throws XiSecurityException {
+  private void init(PrivateKey privateKey, X509Cert peerCert)
+      throws XiSecurityException {
     String algorithm = privateKey.getAlgorithm();
     if (EdECConstants.X25519.equalsIgnoreCase(algorithm)) {
       this.algId = new AlgorithmIdentifier(Xipki.id_alg_dhPop_x25519_sha256);
@@ -173,10 +175,18 @@ public class P12XdhMacContentSignerBuilder {
 
     // as defined in RFC 6955, raw hash algorithm is used as KDF
 
-    // LeadingInfo := Subject Distinguished Name from certificate
-    byte[] leadingInfo = peerCert.getSubjectX500Principal().getEncoded();
-    // TrailingInfo ::= Issuer Distinguished Name from certificate
-    byte[] trailingInfo = peerCert.getIssuerX500Principal().getEncoded();
+    byte[] leadingInfo;
+    byte[] trailingInfo;
+
+    try {
+      // LeadingInfo := Subject Distinguished Name from certificate
+      leadingInfo = peerCert.getSubject().getEncoded();
+      // TrailingInfo ::= Issuer Distinguished Name from certificate
+      trailingInfo = peerCert.getIssuer().getEncoded();
+    } catch (IOException ex) {
+      throw new XiSecurityException("error encoding certificate", ex);
+
+    }
     byte[] k = this.hash.hash(leadingInfo, zz, trailingInfo);
     this.key = new SecretKeySpec(k, "HMAC-" + this.hash.getName());
     this.peerIssuerAndSerial =

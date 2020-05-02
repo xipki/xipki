@@ -21,12 +21,10 @@ import java.security.InvalidKeyException;
 import java.security.KeyStoreException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 import java.util.Set;
 
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.xipki.password.PasswordResolver;
@@ -64,7 +62,7 @@ public interface SecurityFactory {
    * @throws ObjectCreationException
    *         if could not create the object
    */
-  KeyCertPair createPrivateKeyAndCert(String type, SignerConf conf, X509Certificate cert)
+  KeyCertPair createPrivateKeyAndCert(String type, SignerConf conf, X509Cert cert)
       throws ObjectCreationException;
 
   /**
@@ -81,7 +79,7 @@ public interface SecurityFactory {
    * @throws ObjectCreationException
    *         if could not create the signer
    */
-  ConcurrentContentSigner createSigner(String type, SignerConf conf, X509Certificate cert)
+  ConcurrentContentSigner createSigner(String type, SignerConf conf, X509Cert cert)
       throws ObjectCreationException;
 
   /**
@@ -98,7 +96,7 @@ public interface SecurityFactory {
    * @throws ObjectCreationException
    *         if could not create the signer
    */
-  ConcurrentContentSigner createSigner(String type, SignerConf conf, X509Certificate[] certs)
+  ConcurrentContentSigner createSigner(String type, SignerConf conf, X509Cert[] certs)
       throws ObjectCreationException;
 
   /**
@@ -137,19 +135,7 @@ public interface SecurityFactory {
    * @throws InvalidKeyException
    *         If the publicKey contained in the certificate is invalid or unsupported.
    */
-  ContentVerifierProvider getContentVerifierProvider(X509Certificate cert)
-      throws InvalidKeyException;
-
-  /**
-   * Gets the ContentVerifierProvider from the certificate.
-   *
-   * @param cert
-   *          Certificate that contains the signature verification key. Must not be {@code null}.
-   * @return the ContentVerifierProvider
-   * @throws InvalidKeyException
-   *         If the publicKey contained in the certificate is invalid or unsupported.
-   */
-  ContentVerifierProvider getContentVerifierProvider(X509CertificateHolder cert)
+  ContentVerifierProvider getContentVerifierProvider(X509Cert cert)
       throws InvalidKeyException;
 
   /**
@@ -243,7 +229,7 @@ public interface SecurityFactory {
    *          If case 3 occurs.
    */
   byte[] extractMinimalKeyStore(String keystoreType, byte[] keystoreBytes, String keyname,
-      char[] password, X509Certificate[] newCertChain) throws KeyStoreException;
+      char[] password, X509Cert[] newCertChain) throws KeyStoreException;
 
   SecureRandom getRandom4Sign();
 

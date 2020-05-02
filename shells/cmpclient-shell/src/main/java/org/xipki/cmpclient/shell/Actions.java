@@ -31,8 +31,6 @@ import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -85,7 +83,7 @@ import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
 import org.bouncycastle.asn1.x509.qualified.MonetaryValue;
 import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
-import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.xipki.cmpclient.CertIdOrError;
@@ -106,6 +104,7 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.SignerConf;
+import org.xipki.security.X509Cert;
 import org.xipki.security.X509ExtensionType;
 import org.xipki.security.X509ExtensionType.ExtensionsType;
 import org.xipki.security.cmp.PkiStatusInfo;
@@ -255,7 +254,7 @@ public class Actions {
         }
       }
 
-      X509Certificate caCert;
+      X509Cert caCert;
       try {
         caCert = client.getCaCert(caName);
       } catch (Exception ex) {
@@ -311,7 +310,7 @@ public class Actions {
         }
       }
 
-      List<X509Certificate> caCertChain;
+      List<X509Cert> caCertChain;
       try {
         caCertChain = client.getCaCertchain(caName);
       } catch (Exception ex) {
@@ -322,7 +321,7 @@ public class Actions {
         throw new CmdFailure("received no CA certificate chain");
       }
 
-      String encoded = X509Util.encodeCertificates(caCertChain.toArray(new X509Certificate[0]));
+      String encoded = X509Util.encodeCertificates(caCertChain.toArray(new X509Cert[0]));
       saveVerbose("saved CA certificate to file", outFile, StringUtil.toUtf8Bytes(encoded));
       return null;
     } // method execute0
@@ -381,11 +380,10 @@ public class Actions {
         saveRequestResponse(debug);
       }
 
-      X509Certificate cert = null;
+      X509Cert cert = null;
       if (result != null) {
         String id = result.getAllIds().iterator().next();
-        CertifiedKeyPairOrError certOrError = result.getCertOrError(id);
-        cert = (X509Certificate) certOrError.getCertificate();
+        cert = result.getCertOrError(id).getCertificate();
       }
 
       if (cert == null) {
@@ -441,12 +439,12 @@ public class Actions {
     protected Object execute0() throws Exception {
       EnrollCertResult result = enroll();
 
-      X509Certificate cert = null;
+      X509Cert cert = null;
       PrivateKeyInfo privateKeyInfo = null;
       if (result != null) {
         String id = result.getAllIds().iterator().next();
         CertifiedKeyPairOrError certOrError = result.getCertOrError(id);
-        cert = (X509Certificate) certOrError.getCertificate();
+        cert = certOrError.getCertificate();
         privateKeyInfo = certOrError.getPrivateKeyInfo();
       }
 
@@ -468,7 +466,7 @@ public class Actions {
       KeyStore ks = KeyStore.getInstance("PKCS12");
       char[] pwd = getPassword();
       ks.load(null, pwd);
-      ks.setKeyEntry("main", privateKey, pwd, new Certificate[] {cert});
+      ks.setKeyEntry("main", privateKey, pwd, new Certificate[] {cert.toJceCert()});
       ByteArrayOutputStream bout = new ByteArrayOutputStream();
       ks.store(bout, pwd);
       saveVerbose("saved key to file", p12OutputFile, bout.toByteArray());
@@ -530,7 +528,7 @@ public class Actions {
 
         SignerConf signerConf = getPkcs11SignerConf(moduleName, slotIndex, keyLabel,
             keyIdBytes, HashAlgo.getInstance(hashAlgo), getSignatureAlgoControl());
-        signer = securityFactory.createSigner("PKCS11", signerConf, (X509Certificate[]) null);
+        signer = securityFactory.createSigner("PKCS11", signerConf, (X509Cert[]) null);
       }
       return signer;
     } // method getSigner
@@ -602,12 +600,12 @@ public class Actions {
             HashAlgo.getNonNullInstance(hashAlgo), getSignatureAlgoControl());
 
         String caName = getCaName().toLowerCase();
-        List<X509Certificate> peerCerts = client.getDhPocPeerCertificates(caName);
+        List<X509Cert> peerCerts = client.getDhPocPeerCertificates(caName);
         if (CollectionUtil.isNotEmpty(peerCerts)) {
           signerConf.setPeerCertificates(peerCerts);
         }
 
-        signer = securityFactory.createSigner("PKCS12", signerConf, (X509Certificate[]) null);
+        signer = securityFactory.createSigner("PKCS12", signerConf, (X509Cert[]) null);
       }
       return signer;
     } // method getSigner
@@ -619,7 +617,7 @@ public class Actions {
   public static class CmpGenCrl extends CrlAction {
 
     @Override
-    protected X509CRL retrieveCrl() throws CmpClientException, PkiErrorException {
+    protected X509CRLHolder retrieveCrl() throws CmpClientException, PkiErrorException {
       ReqRespDebug debug = getReqRespDebug();
       try {
         return client.generateCrl(caName, debug);
@@ -644,7 +642,7 @@ public class Actions {
     private String baseCrlOut;
 
     @Override
-    protected X509CRL retrieveCrl() throws CmpClientException, PkiErrorException {
+    protected X509CRLHolder retrieveCrl() throws CmpClientException, PkiErrorException {
       ReqRespDebug debug = getReqRespDebug();
       try {
         return client.downloadCrl(caName, debug);
@@ -678,7 +676,7 @@ public class Actions {
         }
       }
 
-      X509CRL crl = null;
+      X509CRLHolder crl = null;
       try {
         crl = retrieveCrl();
       } catch (PkiErrorException ex) {
@@ -695,8 +693,8 @@ public class Actions {
         return null;
       }
 
-      byte[] octetString = crl.getExtensionValue(Extension.deltaCRLIndicator.getId());
-      if (octetString == null) {
+      byte[] extnValue = X509Util.getCoreExtValue(crl.getExtensions(), Extension.deltaCRLIndicator);
+      if (extnValue == null) {
         return null;
       }
 
@@ -704,7 +702,6 @@ public class Actions {
         baseCrlOut = outFile + "-baseCRL";
       }
 
-      byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
       BigInteger baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
 
       ReqRespDebug debug = getReqRespDebug();
@@ -824,7 +821,7 @@ public class Actions {
       ReqRespDebug debug = getReqRespDebug();
       try {
         if (certFile != null) {
-          X509Certificate cert = X509Util.parseCert(new File(certFile));
+          X509Cert cert = X509Util.parseCert(new File(certFile));
           certIdOrError = client.revokeCert(caName, cert, crlReason.getCode(), invalidityDate,
               debug);
         } else {
@@ -860,7 +857,7 @@ public class Actions {
       CertIdOrError certIdOrError;
       try {
         if (certFile != null) {
-          X509Certificate cert = X509Util.parseCert(new File(certFile));
+          X509Cert cert = X509Util.parseCert(new File(certFile));
           certIdOrError = client.removeCert(caName, cert, debug);
         } else {
           certIdOrError = client.removeCert(caName, getSerialNumber(), debug);
@@ -894,7 +891,7 @@ public class Actions {
       CertIdOrError certIdOrError;
       try {
         if (certFile != null) {
-          X509Certificate cert = X509Util.parseCert(new File(certFile));
+          X509Cert cert = X509Util.parseCert(new File(certFile));
           certIdOrError = client.unrevokeCert(caName, cert, debug);
         } else {
           certIdOrError = client.unrevokeCert(caName, getSerialNumber(), debug);
@@ -951,12 +948,12 @@ public class Actions {
     protected Object execute0() throws Exception {
       EnrollCertResult result = enroll();
 
-      X509Certificate cert = null;
+      X509Cert cert = null;
       PrivateKeyInfo privateKeyInfo = null;
       if (result != null) {
         String id = result.getAllIds().iterator().next();
         CertifiedKeyPairOrError certOrError = result.getCertOrError(id);
-        cert = (X509Certificate) certOrError.getCertificate();
+        cert = certOrError.getCertificate();
         privateKeyInfo = certOrError.getPrivateKeyInfo();
       }
 
@@ -978,7 +975,7 @@ public class Actions {
       KeyStore ks = KeyStore.getInstance("PKCS12");
       char[] pwd = getPassword();
       ks.load(null, pwd);
-      ks.setKeyEntry("main", privateKey, pwd, new Certificate[] {cert});
+      ks.setKeyEntry("main", privateKey, pwd, new Certificate[] {cert.toJceCert()});
       ByteArrayOutputStream bout = new ByteArrayOutputStream();
       ks.store(bout, pwd);
       saveVerbose("saved key to file", p12OutputFile, bout.toByteArray());
@@ -1028,7 +1025,7 @@ public class Actions {
 
         SignerConf signerConf = getPkcs11SignerConf(moduleName, slotIndex, keyLabel,
             keyIdBytes, HashAlgo.getInstance(hashAlgo), getSignatureAlgoControl());
-        signer = securityFactory.createSigner("PKCS11", signerConf, (X509Certificate[]) null);
+        signer = securityFactory.createSigner("PKCS11", signerConf, (X509Cert[]) null);
       }
       return signer;
     } // method getSigner
@@ -1097,7 +1094,7 @@ public class Actions {
         conf.putPair("keystore", "file:" + p12File);
         SignerConf signerConf = new SignerConf(conf.getEncoded(),
             HashAlgo.getNonNullInstance(hashAlgo), getSignatureAlgoControl());
-        signer = securityFactory.createSigner("PKCS12", signerConf, (X509Certificate[]) null);
+        signer = securityFactory.createSigner("PKCS12", signerConf, (X509Cert[]) null);
       }
       return signer;
     }
@@ -1118,7 +1115,7 @@ public class Actions {
     @Completion(FileCompleter.class)
     protected String outFile;
 
-    protected abstract X509CRL retrieveCrl() throws CmpClientException, PkiErrorException;
+    protected abstract X509CRLHolder retrieveCrl() throws CmpClientException, PkiErrorException;
 
     @Override
     protected Object execute0() throws Exception {
@@ -1145,7 +1142,7 @@ public class Actions {
         }
       }
 
-      X509CRL crl = null;
+      X509CRLHolder crl = null;
       try {
         crl = retrieveCrl();
       } catch (PkiErrorException ex) {
@@ -1582,9 +1579,7 @@ public class Actions {
 
     @Override
     protected SubjectPublicKeyInfo getPublicKey() throws Exception {
-      ConcurrentContentSigner signer = getSigner();
-      X509CertificateHolder ssCert = signer.getBcCertificate();
-      return ssCert.getSubjectPublicKeyInfo();
+      return getSigner().getCertificate().getSubjectPublicKeyInfo();
     }
 
     @Override
@@ -1610,11 +1605,10 @@ public class Actions {
     protected Object execute0() throws Exception {
       EnrollCertResult result = enroll();
 
-      X509Certificate cert = null;
+      X509Cert cert = null;
       if (result != null) {
         String id = result.getAllIds().iterator().next();
-        CertifiedKeyPairOrError certOrError = result.getCertOrError(id);
-        cert = (X509Certificate) certOrError.getCertificate();
+        cert = result.getCertOrError(id).getCertificate();
       }
 
       if (cert == null) {
@@ -1667,7 +1661,7 @@ public class Actions {
       return serialNumber;
     }
 
-    protected String checkCertificate(X509Certificate cert, X509Certificate caCert)
+    protected String checkCertificate(X509Cert cert, X509Cert caCert)
         throws CertificateEncodingException {
       if (caName != null) {
         caName = caName.toLowerCase();
@@ -1676,12 +1670,12 @@ public class Actions {
       Args.notNull(cert, "cert");
       Args.notNull(caCert, "caCert");
 
-      if (!cert.getIssuerX500Principal().equals(caCert.getSubjectX500Principal())) {
+      if (!cert.getIssuer().equals(caCert.getSubject())) {
         return "the given certificate is not issued by the given issuer";
       }
 
-      byte[] caSki = X509Util.extractSki(caCert);
-      byte[] aki = X509Util.extractAki(cert);
+      byte[] caSki = caCert.getSubjectKeyId();
+      byte[] aki = cert.getAuthorityKeyId();
       if (caSki != null && aki != null) {
         if (!Arrays.equals(aki, caSki)) {
           return "the given certificate is not issued by the given issuer";
@@ -1815,8 +1809,7 @@ public class Actions {
 
       CertId oldCertId;
       if (oldCertFile != null) {
-        org.bouncycastle.asn1.x509.Certificate oldCert =
-            X509Util.parseBcCert(new File(oldCertFile));
+        X509Cert oldCert = X509Util.parseCert(new File(oldCertFile));
         oldCertId = new CertId(new GeneralName(oldCert.getIssuer()), oldCert.getSerialNumber());
       } else {
         X500Name issuer = client.getCaCertSubject(caName);
@@ -1891,13 +1884,7 @@ public class Actions {
     protected abstract ConcurrentContentSigner getSigner() throws ObjectCreationException;
 
     protected SubjectPublicKeyInfo getPublicKey() throws Exception {
-      if (!embedsPulibcKey) {
-        return null;
-      } else {
-        ConcurrentContentSigner signer = getSigner();
-        X509CertificateHolder ssCert = signer.getBcCertificate();
-        return ssCert.getSubjectPublicKeyInfo();
-      }
+      return embedsPulibcKey ? getSigner().getCertificate().getSubjectPublicKeyInfo() : null;
     } // method getPublicKey
 
     @Override
@@ -1926,11 +1913,10 @@ public class Actions {
     protected Object execute0() throws Exception {
       EnrollCertResult result = enroll();
 
-      X509Certificate cert = null;
+      X509Cert cert = null;
       if (result != null) {
         String id = result.getAllIds().iterator().next();
-        CertifiedKeyPairOrError certOrError = result.getCertOrError(id);
-        cert = (X509Certificate) certOrError.getCertificate();
+        cert = result.getCertOrError(id).getCertificate();
       }
 
       if (cert == null) {

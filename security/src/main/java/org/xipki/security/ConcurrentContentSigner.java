@@ -21,9 +21,7 @@ import java.io.Closeable;
 import java.security.Key;
 import java.security.PublicKey;
 import java.security.SignatureException;
-import java.security.cert.X509Certificate;
 
-import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.operator.ContentSigner;
 import org.xipki.password.PasswordResolver;
 
@@ -65,9 +63,7 @@ public interface ConcurrentContentSigner extends Closeable {
 
   PublicKey getPublicKey();
 
-  X509Certificate getCertificate();
-
-  X509CertificateHolder getBcCertificate();
+  X509Cert getCertificate();
 
   /**
    * Set the CertificateChain.
@@ -75,11 +71,9 @@ public interface ConcurrentContentSigner extends Closeable {
    * @param certchain
    *          Certificate chain of this signer. Could be {@code null}.
    */
-  void setCertificateChain(X509Certificate[] certchain);
+  void setCertificateChain(X509Cert[] certchain);
 
-  X509Certificate[] getCertificateChain();
-
-  X509CertificateHolder[] getBcCertificateChain();
+  X509Cert[] getCertificateChain();
 
   /**
    * Initializes me.

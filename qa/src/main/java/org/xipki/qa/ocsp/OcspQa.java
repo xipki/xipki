@@ -21,7 +21,6 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -57,6 +56,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.IssuerHash;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
@@ -271,11 +271,11 @@ public class OcspQa {
           }
         } // end for
 
-        X509Certificate respIssuer = responseOption.getRespIssuer();
+        X509Cert respIssuer = responseOption.getRespIssuer();
         if (!issue.isFailed() && respIssuer != null) {
-          X509Certificate jceRespSigner;
+          X509Cert jceRespSigner;
           try {
-            jceRespSigner = X509Util.toX509Cert(respSigner.toASN1Structure());
+            jceRespSigner = new X509Cert(respSigner);
             if (X509Util.issues(respIssuer, jceRespSigner)) {
               jceRespSigner.verify(respIssuer.getPublicKey());
             } else {

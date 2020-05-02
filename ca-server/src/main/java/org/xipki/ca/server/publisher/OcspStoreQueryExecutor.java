@@ -19,7 +19,6 @@ package org.xipki.ca.server.publisher;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -231,13 +230,14 @@ class OcspStoreQueryExecutor {
     final String sql = revoked ? SQL_ADD_REVOKED_CERT : SQL_ADD_CERT;
 
     long certId = certificate.getCertId();
-    byte[] encodedCert = certificate.getEncodedCert();
+    byte[] encodedCert = certificate.getCert().getEncoded();
     String certHash = certhashAlgo.base64Hash(encodedCert);
 
-    X509Certificate cert = certificate.getCert();
+    X509Cert cert = certificate.getCert();
     long notBeforeSeconds = cert.getNotBefore().getTime() / 1000;
     long notAfterSeconds = cert.getNotAfter().getTime() / 1000;
-    String cuttedSubject = X509Util.cutText(certificate.getSubject(), maxX500nameLen);
+    String cuttedSubject = X509Util.cutText(certificate.getCert().getSubjectRfc4519Text(),
+                            maxX500nameLen);
 
     PreparedStatement ps = datasource.prepareStatement(sql);
 
@@ -332,7 +332,7 @@ class OcspStoreQueryExecutor {
     Args.notNull(issuer, "issuer");
     Args.notNull(cert, "cert");
 
-    Integer issuerId = issuerStore.getIdForCert(issuer.getEncodedCert());
+    Integer issuerId = issuerStore.getIdForCert(issuer.getEncoded());
     if (issuerId == null) {
       return;
     }
@@ -383,7 +383,7 @@ class OcspStoreQueryExecutor {
     Args.notNull(issuer, "issuer");
     Args.notNull(cert, "cert");
 
-    Integer issuerId = issuerStore.getIdForCert(issuer.getEncodedCert());
+    Integer issuerId = issuerStore.getIdForCert(issuer.getEncoded());
     if (issuerId == null) {
       return;
     }
@@ -439,7 +439,7 @@ class OcspStoreQueryExecutor {
 
   private int getIssuerId(X509Cert issuerCert) throws DataAccessException {
     Args.notNull(issuerCert, "issuerCert");
-    Integer id = issuerStore.getIdForCert(issuerCert.getEncodedCert());
+    Integer id = issuerStore.getIdForCert(issuerCert.getEncoded());
     if (id == null) {
       throw new IllegalStateException("could not find issuer, "
           + "please start XiPKI in master mode first the restart this XiPKI system");
@@ -448,17 +448,17 @@ class OcspStoreQueryExecutor {
   } // method getIssuerId
 
   void addIssuer(X509Cert issuerCert) throws DataAccessException {
-    if (issuerStore.getIdForCert(issuerCert.getEncodedCert()) != null) {
+    if (issuerStore.getIdForCert(issuerCert.getEncoded()) != null) {
       return;
     }
 
-    String sha1FpCert = HashAlgo.SHA1.base64Hash(issuerCert.getEncodedCert());
+    String sha1FpCert = HashAlgo.SHA1.base64Hash(issuerCert.getEncoded());
     long maxId = datasource.getMax(null, "ISSUER", "ID");
     int id = (int) maxId + 1;
 
-    byte[] encodedCert = issuerCert.getEncodedCert();
-    long notBeforeSeconds = issuerCert.getCert().getNotBefore().getTime() / 1000;
-    long notAfterSeconds = issuerCert.getCert().getNotAfter().getTime() / 1000;
+    byte[] encodedCert = issuerCert.getEncoded();
+    long notBeforeSeconds = issuerCert.getNotBefore().getTime() / 1000;
+    long notAfterSeconds = issuerCert.getNotAfter().getTime() / 1000;
 
     final String sql =
         "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1C,CERT) VALUES (?,?,?,?,?,?)";
@@ -467,7 +467,7 @@ class OcspStoreQueryExecutor {
 
     try {
       String b64Cert = Base64.encodeToString(encodedCert);
-      String subject = issuerCert.getSubject();
+      String subject = issuerCert.getSubjectRfc4519Text();
       int idx = 1;
       ps.setInt(idx++, id);
       ps.setString(idx++, subject);

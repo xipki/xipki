@@ -17,14 +17,13 @@
 
 package org.xipki.ca.server;
 
-import java.security.cert.X509Certificate;
-
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.ObjectCreationException;
 
@@ -52,8 +51,7 @@ public class SignerEntryWrapper {
     this.dbEntry = Args.notNull(dbEntry, "dbEntry");
     signer = null;
     if (dbEntry.getCertificate() != null) {
-      subjectAsX500Name = X500Name.getInstance(
-          dbEntry.getCertificate().getSubjectX500Principal().getEncoded());
+      subjectAsX500Name = dbEntry.getCertificate().getSubject();
       subjectAsGeneralName = new GeneralName(subjectAsX500Name);
     }
   }
@@ -72,7 +70,7 @@ public class SignerEntryWrapper {
       throw new ObjectCreationException("dbEntry is null");
     }
 
-    X509Certificate responderCert = dbEntry.getCertificate();
+    X509Cert responderCert = dbEntry.getCertificate();
     dbEntry.setConfFaulty(true);
     signer = securityFactory.createSigner(dbEntry.getType(), new SignerConf(dbEntry.getConf()),
         responderCert);
@@ -83,7 +81,7 @@ public class SignerEntryWrapper {
 
     if (dbEntry.getBase64Cert() == null) {
       dbEntry.setCertificate(signer.getCertificate());
-      subjectAsX500Name = X500Name.getInstance(signer.getBcCertificate().getSubject());
+      subjectAsX500Name = signer.getCertificate().getSubject();
       subjectAsGeneralName = new GeneralName(subjectAsX500Name);
     }
   } // method initSigner

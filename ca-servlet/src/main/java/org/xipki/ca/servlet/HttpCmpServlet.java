@@ -19,7 +19,6 @@ package org.xipki.ca.servlet;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,6 +40,7 @@ import org.xipki.ca.api.RequestType;
 import org.xipki.ca.server.CaAuditConstants;
 import org.xipki.ca.server.CaManagerImpl;
 import org.xipki.ca.server.cmp.CmpResponder;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.HttpConstants;
@@ -78,7 +78,7 @@ public class HttpCmpServlet extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
-    X509Certificate clientCert = TlsHelper.getTlsClientCert(req);
+    X509Cert clientCert = TlsHelper.getTlsClientCert(req);
     AuditService auditService = Audits.getAuditService();
     AuditEvent event = new AuditEvent(new Date());
     event.setApplicationName(CaAuditConstants.APPNAME);

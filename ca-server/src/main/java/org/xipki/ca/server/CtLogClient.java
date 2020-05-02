@@ -147,10 +147,10 @@ public class CtLogClient {
     request.setChain(chain);
 
     chain.add(precert);
-    chain.add(caCert.getEncodedCert());
+    chain.add(caCert.getEncoded());
     if (certchain != null) {
       for (X509Cert m : certchain) {
-        chain.add(m.getEncodedCert());
+        chain.add(m.getEncoded());
       }
     }
 

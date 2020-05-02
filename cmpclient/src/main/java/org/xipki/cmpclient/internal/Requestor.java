@@ -18,7 +18,6 @@
 package org.xipki.cmpclient.internal;
 
 import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.cmp.PBMParameter;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -26,6 +25,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 
 /**
@@ -121,9 +121,8 @@ abstract class Requestor {
 
     private final ConcurrentContentSigner signer;
 
-    SignatureCmpRequestor(X509Certificate cert) {
-      super(false,
-          X500Name.getInstance(Args.notNull(cert, "cert").getSubjectX500Principal().getEncoded()));
+    SignatureCmpRequestor(X509Cert cert) {
+      super(false, Args.notNull(cert, "cert").getSubject());
       this.signer = null;
     }
 
@@ -143,7 +142,7 @@ abstract class Requestor {
         throw new IllegalArgumentException("requestor without certificate is not allowed");
       }
 
-      return X500Name.getInstance(signer.getCertificate().getSubjectX500Principal().getEncoded());
+      return signer.getCertificate().getSubject();
     }
 
   } // class SignatureCmpRequestor

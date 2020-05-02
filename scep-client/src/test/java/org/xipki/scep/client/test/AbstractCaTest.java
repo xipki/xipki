@@ -22,7 +22,6 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
-import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.List;
@@ -31,6 +30,7 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.junit.After;
 import org.junit.Assert;
@@ -264,7 +264,7 @@ public abstract class AbstractCaTest {
     Assert.assertNotNull("received certificate", cert);
 
     // getCRL
-    X509CRL crl = client.scepGetCrl(privKey, enroledCert, issuerName,
+    X509CRLHolder crl = client.scepGetCrl(privKey, enroledCert, issuerName,
         enroledCert.getSerialNumber());
     Assert.assertNotNull("received CRL", crl);
 

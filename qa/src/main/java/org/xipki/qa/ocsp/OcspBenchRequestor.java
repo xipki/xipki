@@ -37,7 +37,6 @@ import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.ocsp.CertID;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.cert.ocsp.CertificateID;
@@ -50,6 +49,7 @@ import org.xipki.qa.BenchmarkHttpClient.HttpClientException;
 import org.xipki.qa.BenchmarkHttpClient.ResponseHandler;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.StringUtil;
@@ -94,7 +94,7 @@ class OcspBenchRequestor {
 
   private BenchmarkHttpClient httpClient;
 
-  public void init(ResponseHandler responseHandler, String responderUrl, Certificate issuerCert,
+  public void init(ResponseHandler responseHandler, String responderUrl, X509Cert issuerCert,
       RequestOptions requestOptions, int queueSize)
           throws OcspRequestorException, IOException, URISyntaxException {
     Args.notNull(issuerCert, "issuerCert");

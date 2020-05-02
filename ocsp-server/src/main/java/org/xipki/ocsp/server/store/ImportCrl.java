@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -49,7 +48,6 @@ import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.ocsp.CrlID;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +57,7 @@ import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.X509Cert;
 import org.xipki.security.asn1.CrlCertSetStreamParser;
 import org.xipki.security.asn1.CrlCertSetStreamParser.CrlCert;
 import org.xipki.security.asn1.CrlCertSetStreamParser.CrlCertsIterator;
@@ -147,7 +146,7 @@ class ImportCrl {
 
   private static class CertWrapper {
 
-    private final Certificate cert;
+    private final X509Cert cert;
 
     private final X500Name subject;
 
@@ -159,22 +158,13 @@ class ImportCrl {
 
     private Integer databaseId;
 
-    CertWrapper(Certificate cert) {
+    CertWrapper(X509Cert cert) {
       this.cert = cert;
       this.subject = cert.getSubject();
-      byte[] encoded;
-      try {
-        encoded = cert.getEncoded();
-      } catch (IOException ex) {
-        throw new IllegalArgumentException("error encoding certificate");
-      }
+      byte[] encoded = cert.getEncoded();
       this.base64Sha1Fp = HashAlgo.SHA1.base64Hash(encoded);
       this.base64Encoded = Base64.encodeToString(encoded);
-      try {
-        this.subjectKeyIdentifier = X509Util.extractSki(cert);
-      } catch (CertificateEncodingException ex) {
-        throw new IllegalArgumentException("error extracting SubjectKeyIdentifier");
-      }
+      this.subjectKeyIdentifier = cert.getSubjectKeyId();
     }
 
   } // class CertWrapper
@@ -466,7 +456,7 @@ class ImportCrl {
 
       File caCertFile = new File(crlDirInfo.crlDir, "ca.crt");
       try {
-        Certificate cert = X509Util.parseBcCert(caCertFile);
+        X509Cert cert = X509Util.parseCert(caCertFile);
         caCert = new CertWrapper(cert);
       } catch (CertificateException ex) {
         LOG.error("could not parse CA certificate " + caCertFile.getPath(), ex);
@@ -491,11 +481,11 @@ class ImportCrl {
 
         X500Name issuer = crl.getIssuer();
 
-        Certificate crlSignerCert;
+        X509Cert crlSignerCert;
         if (caCert.subject.equals(issuer)) {
           crlSignerCert = caCert.cert;
         } else {
-          Certificate crlIssuerCert = null;
+          X509Cert crlIssuerCert = null;
           File issuerCertFile = new File(crlDir, "issuer.crt");
           if (issuerCertFile.exists()) {
             crlIssuerCert = parseCert(issuerCertFile);
@@ -704,8 +694,8 @@ class ImportCrl {
 
         ps.setInt(offset++, issuerId);
         ps.setString(offset++, subject);
-        ps.setLong(offset++, caCert.cert.getStartDate().getDate().getTime() / 1000);
-        ps.setLong(offset++, caCert.cert.getEndDate().getDate().getTime() / 1000);
+        ps.setLong(offset++, caCert.cert.getNotBefore().getTime() / 1000);
+        ps.setLong(offset++, caCert.cert.getNotAfter().getTime() / 1000);
         ps.setString(offset++, caCert.base64Sha1Fp);
         ps.setString(offset++, caCert.base64Encoded);
         ps.setString(offset++, revInfo == null ? null : revInfo.getEncoded());
@@ -902,7 +892,7 @@ class ImportCrl {
         num++;
         CrlCert crlCert = crlCerts.next();
         BigInteger serialNumber = crlCert.getSerial();
-        Certificate cert = crlCert.getCert();
+        X509Cert cert = crlCert.getCert();
 
         if (cert == null) {
           addCertificateBySerialNumber(maxId, caId, crlInfoId, serialNumber);
@@ -913,7 +903,7 @@ class ImportCrl {
             continue;
           }
 
-          if (!serialNumber.equals(cert.getSerialNumber().getValue())) {
+          if (!serialNumber.equals(cert.getSerialNumber())) {
             LOG.warn("serialNumber not match (serial={}) in CRL Extension Xipki-CertSet, ignore it",
                 LogUtil.formatCsn(serialNumber));
             continue;
@@ -962,9 +952,9 @@ class ImportCrl {
         int num = 0;
         for (File certFile : certFiles) {
           num++;
-          Certificate cert;
+          X509Cert cert;
           try {
-            cert = X509Util.parseBcCert(certFile);
+            cert = X509Util.parseCert(certFile);
           } catch (IllegalArgumentException | IOException | CertificateException ex) {
             LOG.warn("could not parse certificate {}, ignore it", certFile.getPath());
             continue;
@@ -1017,9 +1007,9 @@ class ImportCrl {
     }
   } // method importCrlRevokedCertificates
 
-  private static Certificate parseCert(File certFile) throws ImportCrlException {
+  private static X509Cert parseCert(File certFile) throws ImportCrlException {
     try {
-      return X509Util.parseBcCert(certFile);
+      return X509Util.parseCert(certFile);
     } catch (CertificateException | IOException ex) {
       throw new ImportCrlException("could not parse X.509 certificate from file "
           + certFile + ": " + ex.getMessage(), ex);
@@ -1052,7 +1042,7 @@ class ImportCrl {
     }
   } // method getCertInfo
 
-  private void addCertificate(AtomicLong maxId, int crlInfoId, CertWrapper caCert, Certificate cert,
+  private void addCertificate(AtomicLong maxId, int crlInfoId, CertWrapper caCert, X509Cert cert,
       String profileName, String certLogId) throws DataAccessException, ImportCrlException {
     // CHECKSTYLE:SKIP
     int caId = caCert.databaseId.intValue();
@@ -1064,23 +1054,11 @@ class ImportCrl {
     }
 
     // we don't use the binary read from file, since it may contains redundant ending bytes.
-    byte[] encodedCert;
-    try {
-      encodedCert = cert.getEncoded();
-    } catch (IOException ex) {
-      throw new ImportCrlException("could not encode certificate {}" + certLogId, ex);
-    }
+    byte[] encodedCert = cert.getEncoded();
     String b64CertHash = certhashAlgo.base64Hash(encodedCert);
 
     if (caCert.subjectKeyIdentifier != null) {
-      byte[] aki = null;
-      try {
-        aki = X509Util.extractAki(cert);
-      } catch (CertificateEncodingException ex) {
-        LogUtil.error(LOG, ex,
-            "invalid AuthorityKeyIdentifier of certificate {}" + certLogId + ", ignore it");
-        return;
-      }
+      byte[] aki = cert.getAuthorityKeyId();
 
       if (aki == null || !Arrays.equals(caCert.subjectKeyIdentifier, aki)) {
         LOG.warn("certificate {} is not issued by the given CA, ignore it", certLogId);
@@ -1089,7 +1067,7 @@ class ImportCrl {
     } // end if
 
     LOG.info("Importing certificate {}", certLogId);
-    CertInfo existingCertInfo = getCertInfo(caId, cert.getSerialNumber().getPositiveValue());
+    CertInfo existingCertInfo = getCertInfo(caId, cert.getSerialNumber());
 
     PreparedStatement ps = null;
     String sql = null;
@@ -1105,7 +1083,7 @@ class ImportCrl {
         // ISSUER ID IID
         ps.setInt(offset++, caId);
         // serial number SN
-        ps.setString(offset++, cert.getSerialNumber().getPositiveValue().toString(16));
+        ps.setString(offset++, cert.getSerialNumber().toString(16));
         // whether revoked REV
         ps.setInt(offset++, 0);
         // revocation reason RR
@@ -1117,7 +1095,7 @@ class ImportCrl {
         // last update LUPDATE
         ps.setLong(offset++, System.currentTimeMillis() / 1000);
 
-        TBSCertificate tbsCert = cert.getTBSCertificate();
+        TBSCertificate tbsCert = cert.toBcCert().toASN1Structure().getTBSCertificate();
         // not before NBEFORE
         ps.setLong(offset++, tbsCert.getStartDate().getDate().getTime() / 1000);
         // not after NAFTER
@@ -1134,7 +1112,7 @@ class ImportCrl {
           // last update LUPDATE
           ps.setLong(offset++, System.currentTimeMillis() / 1000);
 
-          TBSCertificate tbsCert = cert.getTBSCertificate();
+          TBSCertificate tbsCert = cert.toBcCert().toASN1Structure().getTBSCertificate();
           // not before NBEFORE
           ps.setLong(offset++, tbsCert.getStartDate().getDate().getTime() / 1000);
           // not after NAFTER

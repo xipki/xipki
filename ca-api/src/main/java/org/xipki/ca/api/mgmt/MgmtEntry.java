@@ -18,9 +18,7 @@
 package org.xipki.ca.api.mgmt;
 
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,6 +31,7 @@ import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.SignerConf;
+import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
@@ -154,13 +153,13 @@ public abstract class MgmtEntry {
 
     private CaUris caUris;
 
-    private X509Certificate cert;
+    private X509Cert cert;
 
     /**
      * certificate chain without the certificate specified in {@code #cert}. The first one issued
      * {@code #cert}, the second one issues the first one, and so on.
      */
-    private List<X509Certificate> certchain;
+    private List<X509Cert> certchain;
 
     private int serialNoLen;
 
@@ -546,23 +545,18 @@ public abstract class MgmtEntry {
       return ident.hashCode();
     }
 
-    public void setCert(X509Certificate cert) throws CaMgmtException {
+    public void setCert(X509Cert cert) throws CaMgmtException {
       if (cert == null) {
         this.cert = null;
         this.subject = null;
         this.hexSha1OfCert = null;
       } else {
-        if (!X509Util.hasKeyusage(cert, KeyUsage.keyCertSign)) {
+        if (!cert.hasKeyusage(KeyUsage.keyCertSign)) {
           throw new CaMgmtException("CA certificate does not have keyusage keyCertSign");
         }
         this.cert = cert;
-        this.subject = X509Util.getRfc4519Name(cert.getSubjectX500Principal());
-        byte[] encodedCert;
-        try {
-          encodedCert = cert.getEncoded();
-        } catch (CertificateEncodingException ex) {
-          throw new CaMgmtException("could not encoded certificate", ex);
-        }
+        this.subject = cert.getSubjectRfc4519Text();
+        byte[] encodedCert = cert.getEncoded();
         this.hexSha1OfCert = HashAlgo.SHA1.hexHash(encodedCert);
       }
     } // method setCert
@@ -588,15 +582,15 @@ public abstract class MgmtEntry {
       return caUris;
     }
 
-    public X509Certificate getCert() {
+    public X509Cert getCert() {
       return cert;
     }
 
-    public List<X509Certificate> getCertchain() {
+    public List<X509Cert> getCertchain() {
       return certchain;
     }
 
-    public void setCertchain(List<X509Certificate> certchain) {
+    public void setCertchain(List<X509Cert> certchain) {
       this.certchain = certchain;
     }
 
@@ -1439,12 +1433,11 @@ public abstract class MgmtEntry {
 
       if (!faulty && TYPE_CERT.equalsIgnoreCase(type)) {
         try {
-          X509Certificate cert = X509Util.parseCert(StringUtil.toUtf8Bytes(conf));
+          X509Cert cert = X509Util.parseCert(StringUtil.toUtf8Bytes(conf));
           sb.append("cert:");
-          sb.append("\n\tissuer: ").append(X509Util.getRfc4519Name(cert.getIssuerX500Principal()));
+          sb.append("\n\tissuer: ").append(cert.getIssuerRfc4519Text());
           sb.append("\n\tserialNumber: ").append(LogUtil.formatCsn(cert.getSerialNumber()));
-          sb.append("\n\tsubject: ")
-            .append(X509Util.getRfc4519Name(cert.getSubjectX500Principal())).append('\n');
+          sb.append("\n\tsubject: ").append(cert.getSubjectRfc4519Text()).append('\n');
         } catch (CertificateException ex) {
           sb.append("cert: ERROR(").append(ex.getMessage()).append(")\n");
         }
@@ -1492,7 +1485,7 @@ public abstract class MgmtEntry {
 
     private final String base64Cert;
 
-    private X509Certificate certificate;
+    private X509Cert certificate;
 
     public Signer(String name, String type, String conf, String base64Cert) {
       this.name = Args.toNonBlankLower(name, "name");
@@ -1527,11 +1520,11 @@ public abstract class MgmtEntry {
       return conf;
     }
 
-    public X509Certificate getCertificate() {
+    public X509Cert getCertificate() {
       return certificate;
     }
 
-    public void setCertificate(X509Certificate certificate) {
+    public void setCertificate(X509Cert certificate) {
       if (base64Cert != null) {
         throw new IllegalStateException("certificate is already specified by base64Cert");
       }
@@ -1574,20 +1567,14 @@ public abstract class MgmtEntry {
       sb.append("certificate: ").append("\n");
       if (certificate != null || base64Cert != null) {
         if (certificate != null) {
-          sb.append("\tissuer: ").append(X509Util.getRfc4519Name(
-              certificate.getIssuerX500Principal())).append('\n');
+          sb.append("\tissuer: ").append(certificate.getIssuerRfc4519Text()).append('\n');
           sb.append("\tserialNumber: ")
               .append(LogUtil.formatCsn(certificate.getSerialNumber())).append('\n');
-          sb.append("\tsubject: ").append(X509Util.getRfc4519Name(
-              certificate.getSubjectX500Principal()));
+          sb.append("\tsubject: ").append(certificate.getSubjectRfc4519Text());
         }
         if (verbose) {
           sb.append("\n\tencoded: ");
-          try {
-            sb.append(Base64.encodeToString(certificate.getEncoded()));
-          } catch (CertificateEncodingException ex) {
-            sb.append("ERROR");
-          }
+          sb.append(Base64.encodeToString(certificate.getEncoded()));
         }
       } else {
         sb.append("  null");

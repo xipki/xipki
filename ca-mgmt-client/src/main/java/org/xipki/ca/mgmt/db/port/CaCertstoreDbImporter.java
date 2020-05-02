@@ -24,7 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509CRL;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -36,11 +35,12 @@ import java.util.zip.ZipFile;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.TBSCertificate;
+import org.bouncycastle.cert.X509CRLHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException;
@@ -581,7 +581,7 @@ class CaCertstoreDbImporter extends DbPorter {
         // rawcert
         byte[] encodedCrl = IoUtil.read(zipFile.getInputStream(zipEnty));
 
-        X509CRL x509crl = null;
+        X509CRLHolder x509crl = null;
         try {
           x509crl = X509Util.parseCrl(encodedCrl);
         } catch (Exception ex) {
@@ -595,19 +595,18 @@ class CaCertstoreDbImporter extends DbPorter {
         }
 
         try {
-          byte[] octetString = x509crl.getExtensionValue(Extension.cRLNumber.getId());
-          if (octetString == null) {
+          Extensions extns = x509crl.getExtensions();
+          byte[] extnValue = X509Util.getCoreExtValue(extns, Extension.cRLNumber);
+          if (extnValue == null) {
             LOG.warn("CRL without CRL number, ignore it");
             continue;
           }
-          byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
           // CHECKSTYLE:SKIP
           BigInteger crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
 
           BigInteger baseCrlNumber = null;
-          octetString = x509crl.getExtensionValue(Extension.deltaCRLIndicator.getId());
-          if (octetString != null) {
-            extnValue = DEROctetString.getInstance(octetString).getOctets();
+          extnValue = X509Util.getCoreExtValue(extns, Extension.deltaCRLIndicator);
+          if (extnValue != null) {
             baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
           }
 

@@ -19,7 +19,6 @@ package org.xipki.ocsp.server.store;
 
 import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,6 +29,7 @@ import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.CompareUtil;
 
@@ -48,13 +48,13 @@ class IssuerEntry {
 
   private final Date notBefore;
 
-  private final X509Certificate cert;
+  private final X509Cert cert;
 
   private int crlId;
 
   private CertRevocationInfo revocationInfo;
 
-  public IssuerEntry(int id, X509Certificate cert) throws CertificateEncodingException {
+  public IssuerEntry(int id, X509Cert cert) throws CertificateEncodingException {
     this.id = id;
     this.cert = Args.notNull(cert, "cert");
     this.notBefore = cert.getNotBefore();
@@ -133,7 +133,7 @@ class IssuerEntry {
     return notBefore;
   }
 
-  public X509Certificate getCert() {
+  public X509Cert getCert() {
     return cert;
   }
 

@@ -27,10 +27,7 @@ import java.math.BigInteger;
 import java.net.SocketException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,6 +54,7 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.cert.X509CRLHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
@@ -2075,8 +2073,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method removeCertificate
 
   @Override
-  public X509Certificate generateCertificate(String caName, String profileName, byte[] encodedCsr,
-      Date notBefore, Date notAfter) throws CaMgmtException {
+  public X509Cert generateCertificate(String caName, String profileName,
+      byte[] encodedCsr, Date notBefore, Date notAfter) throws CaMgmtException {
 
     caName = Args.toNonBlankLower(caName, "caName");
     profileName = Args.toNonBlankLower(profileName, "profileName");
@@ -2174,7 +2172,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method getIdentifiedPublishersForCa
 
   @Override
-  public X509Certificate generateRootCa(MgmtEntry.Ca caEntry, String profileName, byte[] encodedCsr,
+  public X509Cert generateRootCa(MgmtEntry.Ca caEntry, String profileName, byte[] encodedCsr,
       BigInteger serialNumber) throws CaMgmtException {
     Args.notNull(caEntry, "caEntry");
     profileName = Args.toNonBlankLower(profileName, "profileName");
@@ -2222,12 +2220,12 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
 
     String signerConf = result.getSignerConf();
-    X509Certificate caCert = result.getCert();
+    X509Cert caCert = result.getCert();
 
     if ("PKCS12".equalsIgnoreCase(signerType) || "JCEKS".equalsIgnoreCase(signerType)) {
       try {
         signerConf = canonicalizeSignerConf(signerType, signerConf,
-            new X509Certificate[]{caCert}, securityFactory);
+            new X509Cert[]{caCert}, securityFactory);
       } catch (Exception ex) {
         throw new CaMgmtException(concat(ex.getClass().getName(), ": ", ex.getMessage()), ex);
       }
@@ -2380,7 +2378,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public X509CRL generateCrlOnDemand(String caName) throws CaMgmtException {
+  public X509CRLHolder generateCrlOnDemand(String caName) throws CaMgmtException {
     caName = Args.toNonBlankLower(caName, "caName");
 
     X509Ca ca = getX509Ca(caName);
@@ -2392,12 +2390,12 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method generateCrlOnDemand
 
   @Override
-  public X509CRL getCrl(String caName, BigInteger crlNumber) throws CaMgmtException {
+  public X509CRLHolder getCrl(String caName, BigInteger crlNumber) throws CaMgmtException {
     caName = Args.toNonBlankLower(caName, "caName");
     Args.notNull(crlNumber, "crlNumber");
     X509Ca ca = getX509Ca(caName);
     try {
-      X509CRL crl = ca.getCrl(crlNumber);
+      X509CRLHolder crl = ca.getCrl(crlNumber);
       if (crl == null) {
         LOG.warn("found no CRL for CA {} and crlNumber {}", caName, crlNumber);
       }
@@ -2408,11 +2406,11 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method getCrl
 
   @Override
-  public X509CRL getCurrentCrl(String caName) throws CaMgmtException {
+  public X509CRLHolder getCurrentCrl(String caName) throws CaMgmtException {
     caName = Args.toNonBlankLower(caName, "caName");
     X509Ca ca = getX509Ca(caName);
     try {
-      X509CRL crl = ca.getCurrentCrl();
+      X509CRLHolder crl = ca.getCurrentCrl();
       if (crl == null) {
         LOG.warn("found no CRL for CA {}", caName);
       }
@@ -2428,7 +2426,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   static String canonicalizeSignerConf(String keystoreType, String signerConf,
-      X509Certificate[] certChain, SecurityFactory securityFactory) throws CaMgmtException {
+      X509Cert[] certChain, SecurityFactory securityFactory) throws CaMgmtException {
     if (!signerConf.contains("file:") && !signerConf.contains("base64:")) {
       return signerConf;
     }
@@ -2498,7 +2496,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     NameId caId = null;
     for (String name : caInfos.keySet()) {
       CaInfo ca = caInfos.get(name);
-      if (issuer.equals(caInfos.get(name).getCert().getSubjectAsX500Name())) {
+      if (issuer.equals(caInfos.get(name).getCert().getSubject())) {
         caId = ca.getIdent();
         break;
       }
@@ -2551,7 +2549,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method refreshTokenForSignerType
 
   @Override
-  public Map<String, X509Certificate> loadConf(InputStream zippedConfStream)
+  public Map<String, X509Cert> loadConf(InputStream zippedConfStream)
       throws CaMgmtException {
     Args.notNull(zippedConfStream, "zippedConfStream");
     assertMasterModeAndSetuped();
@@ -2565,7 +2563,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       throw new CaMgmtException("caught RuntimeException while parsing the CA configuration", ex);
     }
 
-    Map<String, X509Certificate> generatedRootCerts = new HashMap<>(2);
+    Map<String, X509Cert> generatedRootCerts = new HashMap<>(2);
 
     // Responder
     for (String name : conf.getSignerNames()) {
@@ -2714,7 +2712,7 @@ public class CaManagerImpl implements CaManager, Closeable {
             ConcurrentContentSigner signer;
             try {
               signer = securityFactory.createSigner(caEntry.getSignerType(), signerConf,
-                  (X509Certificate) null);
+                  (X509Cert) null);
             } catch (ObjectCreationException ex) {
               throw new CaMgmtException(concat("could not create signer for CA ", caName), ex);
             }
@@ -2728,7 +2726,7 @@ public class CaManagerImpl implements CaManager, Closeable {
           }
         } else {
           if (genSelfIssued != null) {
-            X509Certificate cert = generateRootCa(caEntry, genSelfIssued.getProfile(),
+            X509Cert cert = generateRootCa(caEntry, genSelfIssued.getProfile(),
                 genSelfIssued.getCsr(), genSelfIssued.getSerialNumber());
             LOG.info("generated root CA {}", caName);
             generatedRootCerts.put(caName, cert);
@@ -3008,28 +3006,17 @@ public class CaManagerImpl implements CaManager, Closeable {
           }
 
           // Certificate
-          byte[] certBytes;
-          try {
-            certBytes = entry.getCert().getEncoded();
-          } catch (CertificateEncodingException ex) {
-            throw new CaMgmtException(concat("could not encode CA certificate ", name));
-          }
+          byte[] certBytes = entry.getCert().getEncoded();
           caInfoType.setCert(createFileOrBinary(zipStream, certBytes,
               concat("files/ca-", name, "-cert.der")));
 
           // certchain
-          List<X509Certificate> certchain = entry.getCertchain();
+          List<X509Cert> certchain = entry.getCertchain();
           if (CollectionUtil.isNotEmpty(certchain)) {
             List<FileOrBinary> ccList = new LinkedList<>();
 
             for (int i = 0; i < certchain.size(); i++) {
-              X509Certificate m = certchain.get(i);
-              try {
-                certBytes = m.getEncoded();
-              } catch (CertificateEncodingException ex) {
-                throw new CaMgmtException(concat(
-                    "could not encode CA certchain [", Integer.toString(i), "] of CA", name));
-              }
+              certBytes = certchain.get(i).getEncoded();
               ccList.add(createFileOrBinary(zipStream, certBytes,
                   concat("files/ca-", name, "-certchain-" + i + ".der")));
             }

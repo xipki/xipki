@@ -24,7 +24,6 @@ import java.net.URL;
 import java.security.SecureRandom;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -45,7 +44,6 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.TBSCertificate;
-import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.ocsp.BasicOCSPResp;
 import org.bouncycastle.cert.ocsp.CertificateID;
 import org.bouncycastle.cert.ocsp.OCSPException;
@@ -58,6 +56,7 @@ import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
@@ -108,8 +107,8 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
       throws IOException;
 
   @Override
-  public OCSPResp ask(X509Certificate issuerCert, X509Certificate cert, URL responderUrl,
-      RequestOptions requestOptions, ReqRespDebug debug)
+  public OCSPResp ask(X509Cert issuerCert, X509Cert cert,
+      URL responderUrl, RequestOptions requestOptions, ReqRespDebug debug)
       throws OcspResponseException, OcspRequestorException {
     Args.notNull(issuerCert, "issuerCert");
     Args.notNull(cert, "cert");
@@ -127,8 +126,8 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
   }
 
   @Override
-  public OCSPResp ask(X509Certificate issuerCert, X509Certificate[] certs, URL responderUrl,
-      RequestOptions requestOptions, ReqRespDebug debug)
+  public OCSPResp ask(X509Cert issuerCert, X509Cert[] certs,
+      URL responderUrl, RequestOptions requestOptions, ReqRespDebug debug)
       throws OcspResponseException, OcspRequestorException {
     Args.notNull(issuerCert, "issuerCert");
     Args.notNull(certs, "certs");
@@ -136,7 +135,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
 
     BigInteger[] serialNumbers = new BigInteger[certs.length];
     for (int i = 0; i < certs.length; i++) {
-      X509Certificate cert = certs[i];
+      X509Cert cert = certs[i];
       try {
         if (!X509Util.issues(issuerCert, cert)) {
           throw new IllegalArgumentException(
@@ -152,15 +151,15 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
   }
 
   @Override
-  public OCSPResp ask(X509Certificate issuerCert, BigInteger serialNumber, URL responderUrl,
+  public OCSPResp ask(X509Cert issuerCert, BigInteger serialNumber, URL responderUrl,
       RequestOptions requestOptions, ReqRespDebug debug)
       throws OcspResponseException, OcspRequestorException {
     return ask(issuerCert, new BigInteger[]{serialNumber}, responderUrl, requestOptions, debug);
   }
 
   @Override
-  public OCSPResp ask(X509Certificate issuerCert, BigInteger[] serialNumbers, URL responderUrl,
-      RequestOptions requestOptions, ReqRespDebug debug)
+  public OCSPResp ask(X509Cert issuerCert, BigInteger[] serialNumbers,
+      URL responderUrl, RequestOptions requestOptions, ReqRespDebug debug)
       throws OcspResponseException, OcspRequestorException {
     Args.notNull(issuerCert, "issuerCert");
     Args.notNull(requestOptions, "requestOptions");
@@ -308,7 +307,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     return ocspResp;
   } // method ask
 
-  private OCSPRequest buildRequest(X509Certificate caCert, BigInteger[] serialNumbers,
+  private OCSPRequest buildRequest(X509Cert caCert, BigInteger[] serialNumbers,
       byte[] nonce, RequestOptions requestOptions) throws OcspRequestorException {
     HashAlgo hashAlgo = HashAlgo.getInstance(requestOptions.getHashAlgorithmId());
     if (hashAlgo == null) {
@@ -346,15 +345,10 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     }
 
     try {
-      DEROctetString issuerNameHash = new DEROctetString(hashAlgo.hash(
-          caCert.getSubjectX500Principal().getEncoded()));
+      DEROctetString issuerNameHash =
+          new DEROctetString(hashAlgo.hash(caCert.getSubject().getEncoded()));
 
-      TBSCertificate tbsCert;
-      try {
-        tbsCert = TBSCertificate.getInstance(caCert.getTBSCertificate());
-      } catch (CertificateEncodingException ex) {
-        throw new OcspRequestorException(ex);
-      }
+      TBSCertificate tbsCert = caCert.toBcCert().toASN1Structure().getTBSCertificate();
       DEROctetString issuerKeyHash = new DEROctetString(hashAlgo.hash(
           tbsCert.getSubjectPublicKeyInfo().getPublicKeyData().getOctets()));
 
@@ -376,7 +370,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
               throw new OcspRequestorException("signerConf is not configured");
             }
 
-            X509Certificate cert = null;
+            X509Cert cert = null;
             if (StringUtil.isNotBlank(signerCertFile)) {
               try {
                 cert = X509Util.parseCert(new File(signerCertFile));
@@ -396,11 +390,11 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
           } // end if
         } // end synchronized
 
-        reqBuilder.setRequestorName(signer.getBcCertificate().getSubject());
-        X509CertificateHolder[] certChain0 = signer.getBcCertificateChain();
+        reqBuilder.setRequestorName(signer.getCertificate().getSubject());
+        X509Cert[] certChain0 = signer.getCertificateChain();
         Certificate[] certChain = new Certificate[certChain0.length];
         for (int i = 0; i < certChain.length; i++) {
-          certChain[i] = certChain0[i].toASN1Structure();
+          certChain[i] = certChain0[i].toBcCert().toASN1Structure();
         }
 
         ConcurrentBagEntrySigner signer0;

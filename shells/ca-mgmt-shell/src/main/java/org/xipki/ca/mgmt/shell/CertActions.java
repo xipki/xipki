@@ -21,8 +21,6 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
-import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
 
@@ -32,9 +30,10 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.cert.X509CRLHolder;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CertListInfo;
 import org.xipki.ca.api.mgmt.CertListOrderBy;
@@ -42,6 +41,7 @@ import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.ca.mgmt.shell.CaActions.CaAction;
 import org.xipki.security.CrlReason;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
@@ -87,7 +87,7 @@ public class CertActions {
       println(msg);
       if (outputFile != null) {
         saveVerbose("saved certificate to file", outputFile,
-            encodeCert(certInfo.getCert().getEncodedCert(), outform));
+            encodeCert(certInfo.getCert().getCert().getEncoded(), outform));
       }
       return null;
     } // method execute0
@@ -104,7 +104,7 @@ public class CertActions {
     @Completion(Completers.DerPemCompleter.class)
     protected String outform = "der";
 
-    protected abstract X509CRL retrieveCrl() throws Exception;
+    protected abstract X509CRLHolder retrieveCrl() throws Exception;
 
     @Override
     protected Object execute0() throws Exception {
@@ -113,7 +113,7 @@ public class CertActions {
         throw new CmdFailure("CA " + caName + " not available");
       }
 
-      X509CRL crl = null;
+      X509CRLHolder crl = null;
       try {
         crl = retrieveCrl();
       } catch (Exception ex) {
@@ -181,7 +181,7 @@ public class CertActions {
 
       byte[] encodedCsr = IoUtil.read(csrFile);
 
-      X509Certificate cert = caManager.generateCertificate(caName, profileName, encodedCsr,
+      X509Cert cert = caManager.generateCertificate(caName, profileName, encodedCsr,
           notBefore, notAfter);
       saveVerbose("saved certificate to file", outFile, encodeCert(cert.getEncoded(), outform));
 
@@ -199,7 +199,7 @@ public class CertActions {
     protected String outFile;
 
     @Override
-    protected X509CRL retrieveCrl() throws Exception {
+    protected X509CRLHolder retrieveCrl() throws Exception {
       return caManager.generateCrlOnDemand(caName);
     }
 
@@ -240,7 +240,7 @@ public class CertActions {
       }
 
       saveVerbose("certificate saved to file", outputFile,
-          encodeCert(certInfo.getCert().getEncodedCert(), outform));
+          encodeCert(certInfo.getCert().getCert().getEncoded(), outform));
       return null;
     } // method execute0
 
@@ -264,7 +264,7 @@ public class CertActions {
     protected String outFile;
 
     @Override
-    protected X509CRL retrieveCrl() throws Exception {
+    protected X509CRLHolder retrieveCrl() throws Exception {
       return caManager.getCurrentCrl(caName);
     }
 
@@ -275,7 +275,7 @@ public class CertActions {
         throw new CmdFailure("CA " + caName + " not available");
       }
 
-      X509CRL crl = null;
+      X509CRLHolder crl = null;
       try {
         crl = retrieveCrl();
       } catch (Exception ex) {
@@ -289,13 +289,13 @@ public class CertActions {
       saveVerbose("saved CRL to file", outFile, encodeCrl(crl.getEncoded(), outform));
 
       if (withBaseCrl.booleanValue()) {
-        byte[] octetString = crl.getExtensionValue(Extension.deltaCRLIndicator.getId());
-        if (octetString != null) {
+        Extensions extns = crl.getExtensions();
+        byte[] extnValue = X509Util.getCoreExtValue(extns, Extension.deltaCRLIndicator);
+        if (extnValue != null) {
           if (baseCrlOut == null) {
             baseCrlOut = outFile + "-baseCRL";
           }
 
-          byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
           BigInteger baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
 
           try {
@@ -545,8 +545,8 @@ public class CertActions {
       if (serialNumberS != null) {
         serialNumber = toBigInt(serialNumberS);
       } else if (certFile != null) {
-        X509Certificate caCert = ca.getCert();
-        X509Certificate cert = X509Util.parseCert(new File(certFile));
+        X509Cert caCert = ca.getCert();
+        X509Cert cert = X509Util.parseCert(new File(certFile));
         if (!X509Util.issues(caCert, cert)) {
           throw new CmdFailure("certificate '" + certFile + "' is not issued by CA " + caName);
         }

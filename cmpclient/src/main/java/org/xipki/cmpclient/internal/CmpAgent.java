@@ -28,10 +28,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.AlgorithmParameterSpec;
@@ -111,6 +108,7 @@ import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.cmp.CMPException;
 import org.bouncycastle.cert.cmp.CertificateConfirmationContent;
@@ -151,6 +149,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityConstants;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.cmp.CmpUtf8Pairs;
@@ -629,7 +628,7 @@ class CmpAgent {
         return new ProtectionVerificationResult(null, ProtectionResult.SIGNATURE_INVALID);
       }
 
-      X509Certificate cert = sigResponder.getCert();
+      X509Cert cert = sigResponder.getCert();
       ContentVerifierProvider verifierProvider = securityFactory.getContentVerifierProvider(cert);
       if (verifierProvider == null) {
         LOG.warn("tid={}: not authorized responder '{}'", tid, header.getSender());
@@ -892,19 +891,20 @@ class CmpAgent {
     }
   } // method decrypt
 
-  public X509CRL generateCrl(ReqRespDebug debug) throws CmpClientException, PkiErrorException {
+  public X509CRLHolder generateCrl(ReqRespDebug debug)
+      throws CmpClientException, PkiErrorException {
     int action = XiSecurityConstants.CMP_ACTION_GEN_CRL;
     PKIMessage request = buildMessageWithXipkiAction(action, null);
     VerifiedPkiMessage response = signAndSend(request, debug);
     return evaluateCrlResponse(response, action);
   } // method generateCrl
 
-  public X509CRL downloadCurrentCrl(ReqRespDebug debug)
+  public X509CRLHolder downloadCurrentCrl(ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     return downloadCrl((BigInteger) null, debug);
   } // method downloadCurrentCrl
 
-  public X509CRL downloadCrl(BigInteger crlNumber, ReqRespDebug debug)
+  public X509CRLHolder downloadCrl(BigInteger crlNumber, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     Integer action = null;
     PKIMessage request;
@@ -920,7 +920,7 @@ class CmpAgent {
     return evaluateCrlResponse(response, action);
   } // method downloadCrl
 
-  private X509CRL evaluateCrlResponse(VerifiedPkiMessage response, Integer xipkiAction)
+  private X509CRLHolder evaluateCrlResponse(VerifiedPkiMessage response, Integer xipkiAction)
       throws CmpClientException, PkiErrorException {
     checkProtection(Args.notNull(response, "response"));
 
@@ -961,15 +961,7 @@ class CmpAgent {
         : extractXiActionContent(itv.getInfoValue(), xipkiAction);
 
     CertificateList certList = CertificateList.getInstance(certListAsn1Object);
-
-    X509CRL crl;
-    try {
-      crl = X509Util.toX509Crl(certList);
-    } catch (CRLException | CertificateException ex) {
-      throw new CmpClientException("returned CRL is invalid: " + ex.getMessage());
-    }
-
-    return crl;
+    return new X509CRLHolder(certList);
   } // method evaluateCrlResponse
 
   public RevokeCertResponse revokeCertificate(RevokeCertRequest request,
@@ -1444,10 +1436,10 @@ class CmpAgent {
     if (version == 3) {
       // CACertchain
       JSONArray array = root.getJSONArray("caCertchain");
-      List<X509Certificate> caCertchain = new LinkedList<>();
+      List<X509Cert> caCertchain = new LinkedList<>();
       for (int i = 0; i < array.size(); i++) {
         String base64Cert = array.getString(i);
-        X509Certificate caCert;
+        X509Cert caCert;
         try {
           caCert = X509Util.parseCert(base64Cert.getBytes());
         } catch (CertificateException ex) {
@@ -1458,12 +1450,12 @@ class CmpAgent {
 
       // DHPocs
       array = root.getJSONArray("dhpocs");
-      List<X509Certificate> dhpocs = null;
+      List<X509Cert> dhpocs = null;
       if (array != null) {
         dhpocs = new LinkedList<>();
         for (int i = 0; i < array.size(); i++) {
           String base64Cert = array.getString(i);
-          X509Certificate caCert;
+          X509Cert caCert;
           try {
             caCert = X509Util.parseCert(base64Cert.getBytes());
           } catch (CertificateException ex) {

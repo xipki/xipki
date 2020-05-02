@@ -19,12 +19,12 @@ package org.xipki.ocsp.api;
 
 import java.io.Closeable;
 import java.math.BigInteger;
-import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Map;
 
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.Validity;
 
@@ -75,7 +75,7 @@ public abstract class OcspStore implements Closeable {
    *          Requested issuer
    * @return the certificate of the given issuer.
    */
-  public abstract X509Certificate getIssuerCert(RequestIssuer reqIssuer);
+  public abstract X509Cert getIssuerCert(RequestIssuer reqIssuer);
 
   /**
    * Ignores expired CRLs. Only applied to CRL-based datasource.

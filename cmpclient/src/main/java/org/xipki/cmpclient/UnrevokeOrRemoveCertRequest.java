@@ -18,7 +18,6 @@
 package org.xipki.cmpclient;
 
 import java.math.BigInteger;
-import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,11 +41,6 @@ public class UnrevokeOrRemoveCertRequest {
     private final BigInteger serialNumber;
 
     private byte[] authorityKeyIdentifier;
-
-    public Entry(String id, X509Certificate cert) {
-      this(id, X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()),
-          cert.getSerialNumber());
-    }
 
     public Entry(String id, X500Name issuer, BigInteger serialNumber) {
       super(id);

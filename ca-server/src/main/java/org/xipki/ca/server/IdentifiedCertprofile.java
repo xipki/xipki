@@ -19,7 +19,6 @@ package org.xipki.ca.server;
 
 import java.io.Closeable;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -100,6 +99,7 @@ import org.xipki.security.ObjectIdentifiers.BaseRequirements;
 import org.xipki.security.ObjectIdentifiers.DN;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.ObjectIdentifiers.XKU;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
@@ -358,7 +358,7 @@ class IdentifiedCertprofile implements Closeable {
    */
   public ExtensionValues getExtensions(X500Name requestedSubject, X500Name grantedSubject,
       Extensions requestedExtensions, SubjectPublicKeyInfo publicKeyInfo, PublicCaInfo publicCaInfo,
-      X509Certificate crlSignerCert, Date notBefore, Date notAfter)
+      X509Cert crlSignerCert, Date notBefore, Date notAfter)
       throws CertprofileException, BadCertTemplateException {
     Args.notNull(publicKeyInfo, "publicKeyInfo");
     ExtensionValues values = new ExtensionValues();
@@ -421,7 +421,7 @@ class IdentifiedCertprofile implements Closeable {
       AuthorityKeyIdentifier value = null;
       if (certprofile.useIssuerAndSerialInAki()) {
         GeneralNames x509CaIssuer = new GeneralNames(
-            new GeneralName(publicCaInfo.getX500Issuer()));
+            new GeneralName(publicCaInfo.getIssuer()));
         value = new AuthorityKeyIdentifier(x509CaIssuer, publicCaInfo.getSerialNumber());
       } else {
         byte[] ikiValue = publicCaInfo.getSubjectKeyIdentifer();
@@ -469,9 +469,8 @@ class IdentifiedCertprofile implements Closeable {
 
     if (controls.containsKey(Extension.cRLDistributionPoints)
         || controls.containsKey(Extension.freshestCRL)) {
-      X500Name crlSignerSubject = (crlSignerCert == null) ? null
-          : X500Name.getInstance(crlSignerCert.getSubjectX500Principal().getEncoded());
-      X500Name x500CaPrincipal = publicCaInfo.getX500Subject();
+      X500Name crlSignerSubject = (crlSignerCert == null) ? null : crlSignerCert.getSubject();
+      X500Name x500CaPrincipal = publicCaInfo.getSubject();
 
       // CRLDistributionPoints
       extType = Extension.cRLDistributionPoints;

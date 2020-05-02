@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
@@ -339,7 +338,7 @@ class IaikP11Slot extends P11Slot {
 
     if (cert != null) {
       certLabel = refreshResult.getCertLabelForId(id);
-      pubKey = cert.getCert().getPublicKey();
+      pubKey = cert.getPublicKey();
     } else if (p11PublicKey != null) {
       pubKey = generatePublicKey(p11PublicKey);
     } else {
@@ -349,7 +348,7 @@ class IaikP11Slot extends P11Slot {
 
     P11ObjectIdentifier objectId = new P11ObjectIdentifier(id, new String(label));
 
-    X509Certificate[] certs = (cert == null) ? null : new X509Certificate[]{cert.getCert()};
+    X509Cert[] certs = (cert == null) ? null : new X509Cert[]{cert};
     IaikP11Identity identity = new IaikP11Identity(this,
         new P11IdentityId(slotId, objectId, pubKeyLabel, certLabel), privKey, pubKey, certs);
     refreshResult.addIdentity(identity);
@@ -897,7 +896,7 @@ class IaikP11Slot extends P11Slot {
   private static X509Cert parseCert(X509PublicKeyCertificate p11Cert) throws P11TokenException {
     try {
       byte[] encoded = p11Cert.getValue().getByteArrayValue();
-      return new X509Cert(X509Util.parseCert(encoded), encoded);
+      return X509Util.parseCert(encoded);
     } catch (CertificateException ex) {
       throw new P11TokenException("could not parse certificate: " + ex.getMessage(), ex);
     }
@@ -1004,13 +1003,12 @@ class IaikP11Slot extends P11Slot {
   } // method removeCerts0
 
   @Override
-  protected P11ObjectIdentifier addCert0(X509Certificate cert, P11NewObjectControl control)
+  protected P11ObjectIdentifier addCert0(X509Cert cert, P11NewObjectControl control)
       throws P11TokenException {
     ConcurrentBagEntry<Session> bagEntry = borrowSession();
     try {
       Session session = bagEntry.value();
-      X509PublicKeyCertificate newCertTemp =
-          createPkcs11Template(session, new X509Cert(cert), control);
+      X509PublicKeyCertificate newCertTemp = createPkcs11Template(session, cert, control);
       X509PublicKeyCertificate newCert =
           (X509PublicKeyCertificate) session.createObject(newCertTemp);
 
@@ -1386,10 +1384,10 @@ class IaikP11Slot extends P11Slot {
         // certificate: some vendors like yubico generate also certificate
         X509PublicKeyCertificate cert2 = getCertificateObject(session, id, null);
         String certLabel = null;
-        X509Certificate[] certs = null;
+        X509Cert[] certs = null;
         if (cert2 != null) {
           certLabel = new String(cert2.getLabel().getCharArrayValue());
-          certs = new X509Certificate[1];
+          certs = new X509Cert[1];
           try {
             certs[0] = X509Util.parseCert(cert2.getValue().getByteArrayValue());
           } catch (CertificateException ex) {
@@ -1433,30 +1431,32 @@ class IaikP11Slot extends P11Slot {
     newCertTemp.getCertificateType().setLongValue(CertificateType.X_509_PUBLIC_KEY);
 
     Set<Long> setCertAttributes = newObjectConf.getSetCertObjectAttributes();
-    if (setCertAttributes.contains(PKCS11Constants.CKA_SUBJECT)) {
-      newCertTemp.getSubject().setByteArrayValue(
-          cert.getCert().getSubjectX500Principal().getEncoded());
-    }
 
-    if (setCertAttributes.contains(PKCS11Constants.CKA_ISSUER)) {
-      newCertTemp.getIssuer().setByteArrayValue(
-          cert.getCert().getIssuerX500Principal().getEncoded());
+    try {
+      if (setCertAttributes.contains(PKCS11Constants.CKA_SUBJECT)) {
+        newCertTemp.getSubject().setByteArrayValue(cert.getSubject().getEncoded());
+      }
+
+      if (setCertAttributes.contains(PKCS11Constants.CKA_ISSUER)) {
+        newCertTemp.getIssuer().setByteArrayValue(cert.getIssuer().getEncoded());
+      }
+    } catch (IOException ex) {
+      throw new P11TokenException("error encoding certificate: " + ex.getMessage(), ex);
     }
 
     if (setCertAttributes.contains(PKCS11Constants.CKA_SERIAL_NUMBER)) {
-      newCertTemp.getSerialNumber().setByteArrayValue(
-          cert.getCert().getSerialNumber().toByteArray());
+      newCertTemp.getSerialNumber().setByteArrayValue(cert.getSerialNumber().toByteArray());
     }
 
     if (setCertAttributes.contains(PKCS11Constants.CKA_START_DATE)) {
-      newCertTemp.getStartDate().setDateValue(cert.getCert().getNotBefore());
+      newCertTemp.getStartDate().setDateValue(cert.getNotBefore());
     }
 
     if (setCertAttributes.contains(PKCS11Constants.CKA_END_DATE)) {
-      newCertTemp.getStartDate().setDateValue(cert.getCert().getNotAfter());
+      newCertTemp.getStartDate().setDateValue(cert.getNotAfter());
     }
 
-    newCertTemp.getValue().setByteArrayValue(cert.getEncodedCert());
+    newCertTemp.getValue().setByteArrayValue(cert.getEncoded());
     return newCertTemp;
   } // method createPkcs11Template
 
@@ -1529,7 +1529,7 @@ class IaikP11Slot extends P11Slot {
   } // method setKeyAttributes
 
   @Override
-  protected void updateCertificate0(P11ObjectIdentifier keyId, X509Certificate newCert)
+  protected void updateCertificate0(P11ObjectIdentifier keyId, X509Cert newCert)
       throws P11TokenException {
     try {
       removeCerts(keyId);
@@ -1547,8 +1547,7 @@ class IaikP11Slot extends P11Slot {
     ConcurrentBagEntry<Session> bagEntry = borrowSession();
     try {
       Session session = bagEntry.value();
-      X509PublicKeyCertificate newCertTemp =
-          createPkcs11Template(session, new X509Cert(newCert), control);
+      X509PublicKeyCertificate newCertTemp = createPkcs11Template(session, newCert, control);
       session.createObject(newCertTemp);
     } catch (TokenException ex) {
       throw new P11TokenException("could not createObject: " + ex.getMessage(), ex);

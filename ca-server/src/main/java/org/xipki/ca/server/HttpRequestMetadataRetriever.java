@@ -18,7 +18,8 @@
 package org.xipki.ca.server;
 
 import java.io.IOException;
-import java.security.cert.X509Certificate;
+
+import org.xipki.security.X509Cert;
 
 /**
  * Interface to retrieve the meta data of HTTP request.
@@ -33,6 +34,6 @@ public interface HttpRequestMetadataRetriever {
 
   String getParameter(String paramName);
 
-  X509Certificate getTlsClientCert() throws IOException;
+  X509Cert getTlsClientCert() throws IOException;
 
 }

@@ -18,15 +18,13 @@
 package org.xipki.qa.ca;
 
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.bouncycastle.asn1.x509.Certificate;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
@@ -48,17 +46,9 @@ public class IssuerInfo {
 
   private final Set<String> deltaCrlUrls;
 
-  private final X509Certificate cert;
-
-  private final Certificate bcCert;
+  private final X509Cert cert;
 
   private final boolean cutoffNotAfter;
-
-  private final Date caNotBefore;
-
-  private final Date caNotAfter;
-
-  private final byte[] ski;
 
   public IssuerInfo(List<String> caIssuerUrls, List<String> ocspUrls, List<String> crlUrls,
       List<String> deltaCrlUrls, byte[] certBytes, boolean cutoffNotAfter)
@@ -100,10 +90,6 @@ public class IssuerInfo {
     }
 
     this.cert = X509Util.parseCert(certBytes);
-    this.bcCert = X509Util.parseBcCert(certBytes);
-    this.ski = X509Util.extractSki(cert);
-    this.caNotBefore = this.cert.getNotBefore();
-    this.caNotAfter = this.cert.getNotAfter();
   } // constructor
 
   public Set<String> getCaIssuerUrls() {
@@ -122,16 +108,12 @@ public class IssuerInfo {
     return deltaCrlUrls;
   }
 
-  public X509Certificate getCert() {
+  public X509Cert getCert() {
     return cert;
   }
 
   public byte[] getSubjectKeyIdentifier() {
-    return Arrays.copyOf(ski, ski.length);
-  }
-
-  public Certificate getBcCert() {
-    return bcCert;
+    return cert.getSubjectKeyId();
   }
 
   public boolean isCutoffNotAfter() {
@@ -139,11 +121,11 @@ public class IssuerInfo {
   }
 
   public Date getCaNotBefore() {
-    return caNotBefore;
+    return cert.getNotBefore();
   }
 
   public Date getCaNotAfter() {
-    return caNotAfter;
+    return cert.getNotAfter();
   }
 
 }

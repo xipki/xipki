@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -55,6 +54,7 @@ import org.xipki.ocsp.server.OcspServerConf;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
@@ -144,7 +144,7 @@ public class EjbcaCertStatusStore extends OcspStore {
               continue;
             }
 
-            X509Certificate cert = X509Util.parseCert(StringUtil.toUtf8Bytes(b64Cert.trim()));
+            X509Cert cert = X509Util.parseCert(StringUtil.toUtf8Bytes(b64Cert.trim()));
             EjbcaIssuerEntry issuerEntry = new EjbcaIssuerEntry(cert);
             String sha1Fp = issuerEntry.getId();
 
@@ -450,8 +450,8 @@ public class EjbcaCertStatusStore extends OcspStore {
     sqlCsWithCertHash = datasource.buildSelectFirstSql(1, "fingerprint," + coreSql);
 
     try {
-      Set<X509Certificate> includeIssuers = null;
-      Set<X509Certificate> excludeIssuers = null;
+      Set<X509Cert> includeIssuers = null;
+      Set<X509Cert> excludeIssuers = null;
 
       if (caCerts != null) {
         if (CollectionUtil.isNotEmpty(caCerts.getIncludes())) {
@@ -508,7 +508,7 @@ public class EjbcaCertStatusStore extends OcspStore {
   }
 
   @Override
-  public X509Certificate getIssuerCert(RequestIssuer reqIssuer) {
+  public X509Cert getIssuerCert(RequestIssuer reqIssuer) {
     EjbcaIssuerEntry issuer = issuerStore.getIssuerForFp(reqIssuer);
     return (issuer == null) ? null : issuer.getCert();
   }
@@ -521,9 +521,9 @@ public class EjbcaCertStatusStore extends OcspStore {
     return initializationFailed;
   }
 
-  private static Set<X509Certificate> parseCerts(Collection<String> certFiles)
+  private static Set<X509Cert> parseCerts(Collection<String> certFiles)
       throws OcspStoreException {
-    Set<X509Certificate> certs = new HashSet<>(certFiles.size());
+    Set<X509Cert> certs = new HashSet<>(certFiles.size());
     for (String certFile : certFiles) {
       try {
         certs.add(X509Util.parseCert(new File(certFile)));

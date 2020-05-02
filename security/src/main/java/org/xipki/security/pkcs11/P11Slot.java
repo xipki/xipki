@@ -24,7 +24,6 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.security.spec.DSAParameterSpec;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -275,7 +274,7 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  protected abstract void updateCertificate0(P11ObjectIdentifier keyId, X509Certificate newCert)
+  protected abstract void updateCertificate0(P11ObjectIdentifier keyId, X509Cert newCert)
       throws P11TokenException, CertificateException;
 
   /**
@@ -302,7 +301,7 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  protected abstract P11ObjectIdentifier addCert0(X509Certificate cert, P11NewObjectControl control)
+  protected abstract P11ObjectIdentifier addCert0(X509Cert cert, P11NewObjectControl control)
       throws P11TokenException, CertificateException;
 
   /**
@@ -484,12 +483,12 @@ public abstract class P11Slot implements Closeable {
   }
 
   private void updateCaCertsOfIdentity(P11Identity identity) {
-    X509Certificate[] certchain = identity.certificateChain();
+    X509Cert[] certchain = identity.certificateChain();
     if (certchain == null || certchain.length == 0) {
       return;
     }
 
-    X509Certificate[] newCertchain = buildCertPath(certchain[0]);
+    X509Cert[] newCertchain = buildCertPath(certchain[0]);
     if (!Arrays.equals(certchain, newCertchain)) {
       try {
         identity.setCertificates(newCertchain);
@@ -499,29 +498,29 @@ public abstract class P11Slot implements Closeable {
     }
   } // method updateCaCertsOfIdentity
 
-  private X509Certificate[] buildCertPath(X509Certificate cert) {
-    List<X509Certificate> certs = new LinkedList<>();
-    X509Certificate cur = cert;
+  private X509Cert[] buildCertPath(X509Cert cert) {
+    List<X509Cert> certs = new LinkedList<>();
+    X509Cert cur = cert;
     while (cur != null) {
       certs.add(cur);
       cur = getIssuerForCert(cur);
     }
-    return certs.toArray(new X509Certificate[0]);
+    return certs.toArray(new X509Cert[0]);
   } // method buildCertPath
 
-  private X509Certificate getIssuerForCert(X509Certificate cert) {
+  private X509Cert getIssuerForCert(X509Cert cert) {
     try {
-      if (X509Util.isSelfSigned(cert)) {
+      if (cert.isSelfSigned()) {
         return null;
       }
 
       for (X509Cert cert2 : certificates.values()) {
-        if (cert2.getCert() == cert) {
+        if (cert2 == cert) {
           continue;
         }
 
-        if (X509Util.issues(cert2.getCert(), cert)) {
-          return cert2.getCert();
+        if (X509Util.issues(cert2, cert)) {
+          return cert2;
         }
       }
     } catch (CertificateEncodingException ex) {
@@ -577,7 +576,7 @@ public abstract class P11Slot implements Closeable {
       for (P11ObjectIdentifier objectId : ids) {
         X509Cert entity = certificates.get(objectId);
         sb.append("\t").append(objectId);
-        sb.append(", subject='").append(entity.getSubject()).append("'\n");
+        sb.append(", subject='").append(entity.getSubjectRfc4519Text()).append("'\n");
       }
 
       ids = getSortedObjectIds(identities.keySet());
@@ -588,8 +587,7 @@ public abstract class P11Slot implements Closeable {
         if (identity.getPublicKey() != null) {
           sb.append(", algo=").append(identity.getPublicKey().getAlgorithm());
           if (identity.getCertificate() != null) {
-            String subject = X509Util.getRfc4519Name(
-                identity.getCertificate().getSubjectX500Principal());
+            String subject = identity.getCertificate().getSubjectRfc4519Text();
             sb.append(", subject='").append(subject).append("'");
           }
         } else {
@@ -765,7 +763,7 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  public X509Certificate exportCert(P11ObjectIdentifier objectId) throws P11TokenException {
+  public X509Cert exportCert(P11ObjectIdentifier objectId) throws P11TokenException {
     Args.notNull(objectId, "objectId");
     try {
       return getIdentity(objectId).getCertificate();
@@ -777,7 +775,7 @@ public abstract class P11Slot implements Closeable {
     if (cert == null) {
       throw new P11UnknownEntityException(slotId, objectId);
     }
-    return cert.getCert();
+    return cert;
   } // method exportCert
 
   /**
@@ -880,19 +878,19 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  public P11ObjectIdentifier addCert(X509Certificate cert, P11NewObjectControl control)
+  public P11ObjectIdentifier addCert(X509Cert cert, P11NewObjectControl control)
       throws P11TokenException, CertificateException {
     Args.notNull(cert, "cert");
     Args.notNull(control, "control");
     assertWritable("addCert");
 
     if (control.getLabel() == null) {
-      String cn = X509Util.getCommonName(cert.getSubjectX500Principal());
+      String cn = cert.getCommonName();
       control = new P11NewObjectControl(control.getId(), generateLabel(cn));
     }
 
     P11ObjectIdentifier objectId = addCert0(cert, control);
-    certificates.put(objectId, new X509Cert(cert));
+    certificates.put(objectId, cert);
     updateCaCertsOfIdentities();
     LOG.info("added certificate {}", objectId);
     return objectId;
@@ -1212,7 +1210,7 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  public void updateCertificate(P11ObjectIdentifier keyId, X509Certificate newCert)
+  public void updateCertificate(P11ObjectIdentifier keyId, X509Cert newCert)
       throws P11TokenException, CertificateException {
     Args.notNull(keyId, "keyId");
     Args.notNull(newCert, "newCert");
@@ -1231,11 +1229,11 @@ public abstract class P11Slot implements Closeable {
 
     updateCertificate0(keyId, newCert);
 
-    certificates.put(keyId, new X509Cert(newCert));
+    certificates.put(keyId, newCert);
 
     P11IdentityId identityId = identity.getId();
     identityId.setCertLabel(keyId.getLabel());
-    identity.setCertificates(new X509Certificate[]{newCert});
+    identity.setCertificates(new X509Cert[]{newCert});
     updateCaCertsOfIdentities();
     LOG.info("updated certificate for key {}", keyId);
   } // method updateCertificate
@@ -1280,7 +1278,7 @@ public abstract class P11Slot implements Closeable {
 
         String algo = identity.getPublicKey().getAlgorithm();
         sb.append("\t\tAlgorithm: ").append(algo).append("\n");
-        X509Certificate[] certs = identity.certificateChain();
+        X509Cert[] certs = identity.certificateChain();
         if (certs == null || certs.length == 0) {
           sb.append("\t\tCertificate: NONE\n");
         } else {
@@ -1310,7 +1308,7 @@ public abstract class P11Slot implements Closeable {
         sb.append("\tCert-").append(i + 1).append(". ").append(objectId.getLabel());
         sb.append(" (").append("id: ").append(objectId.getIdHex())
           .append(", label: ").append(objectId.getLabel()).append(")\n");
-        formatString(null, verbose, sb, certificates.get(objectId).getCert());
+        formatString(null, verbose, sb, certificates.get(objectId));
       }
     }
 
@@ -1346,8 +1344,8 @@ public abstract class P11Slot implements Closeable {
   } // method existsCertForId
 
   private static void formatString(Integer index, boolean verbose, StringBuilder sb,
-      X509Certificate cert) {
-    String subject = X509Util.getRfc4519Name(cert.getSubjectX500Principal());
+      X509Cert cert) {
+    String subject = cert.getSubjectRfc4519Text();
     sb.append("\t\tCertificate");
     if (index != null) {
       sb.append("[").append(index).append("]");
@@ -1361,17 +1359,12 @@ public abstract class P11Slot implements Closeable {
 
     sb.append("\n\t\t\tSubject: ").append(subject);
 
-    String issuer = X509Util.getRfc4519Name(cert.getIssuerX500Principal());
-    sb.append("\n\t\t\tIssuer: ").append(issuer);
+    sb.append("\n\t\t\tIssuer: ").append(cert.getIssuerRfc4519Text());
     sb.append("\n\t\t\tSerial: ").append(LogUtil.formatCsn(cert.getSerialNumber()));
     sb.append("\n\t\t\tStart time: ").append(cert.getNotBefore());
     sb.append("\n\t\t\tEnd time: ").append(cert.getNotAfter());
     sb.append("\n\t\t\tSHA1 Sum: ");
-    try {
-      sb.append(HashAlgo.SHA1.hexHash(cert.getEncoded()));
-    } catch (CertificateEncodingException ex) {
-      sb.append("ERROR");
-    }
+    sb.append(HashAlgo.SHA1.hexHash(cert.getEncoded()));
     sb.append("\n");
   } // method formatString
 

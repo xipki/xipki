@@ -23,7 +23,6 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.cert.ocsp.BasicOCSPResp;
 import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPResp;
@@ -31,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ocsp.client.RequestOptions;
 import org.xipki.qa.BenchmarkHttpClient.ResponseHandler;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.BenchmarkExecutor;
 
@@ -83,7 +83,7 @@ public class OcspBenchmark extends BenchmarkExecutor implements ResponseHandler 
 
   private static final Logger LOG = LoggerFactory.getLogger(OcspBenchmark.class);
 
-  private final Certificate issuerCert;
+  private final X509Cert issuerCert;
 
   private final String responderUrl;
 
@@ -97,7 +97,7 @@ public class OcspBenchmark extends BenchmarkExecutor implements ResponseHandler 
 
   private AtomicInteger processedRequests = new AtomicInteger(0);
 
-  public OcspBenchmark(Certificate issuerCert, String responderUrl, RequestOptions requestOptions,
+  public OcspBenchmark(X509Cert issuerCert, String responderUrl, RequestOptions requestOptions,
       Iterator<BigInteger> serials, int maxRequests, int queueSize, String description) {
     super(description);
 

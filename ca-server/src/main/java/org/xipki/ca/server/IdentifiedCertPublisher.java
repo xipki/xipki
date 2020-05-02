@@ -18,9 +18,9 @@
 package org.xipki.ca.server;
 
 import java.io.Closeable;
-import java.security.cert.X509CRL;
 import java.util.Map;
 
+import org.bouncycastle.cert.X509CRLHolder;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
@@ -70,7 +70,7 @@ class IdentifiedCertPublisher implements Closeable {
     return certPublisher.certificateRevoked(caCert, cert, certprofile, revInfo);
   }
 
-  public boolean crlAdded(X509Cert caCert, X509CRL crl) {
+  public boolean crlAdded(X509Cert caCert, X509CRLHolder crl) {
     return certPublisher.crlAdded(caCert, crl);
   }
 

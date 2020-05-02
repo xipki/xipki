@@ -23,9 +23,6 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.security.cert.CRLException;
-import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
@@ -114,6 +111,7 @@ import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.Time;
+import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.cert.crmf.CRMFException;
 import org.bouncycastle.cert.crmf.CertificateRequestMessage;
@@ -635,11 +633,11 @@ public class CmpResponder extends BaseCmpResponder {
         }
 
         if (subject == null) {
-          subject = oldCert.getCert().getSubjectAsX500Name();
+          subject = oldCert.getCert().getCert().getSubject();
         }
 
         if (publicKey == null && !caGenerateKeypair) {
-          publicKey = oldCert.getCert().getCertHolder().getSubjectPublicKeyInfo();
+          publicKey = oldCert.getCert().getCert().getSubjectPublicKeyInfo();
         }
 
         // extensions
@@ -653,7 +651,7 @@ public class CmpResponder extends BaseCmpResponder {
         }
 
         // extract extensions from the certificate
-        Extensions oldExtensions = oldCert.getCert().getCertHolder().getExtensions();
+        Extensions oldExtensions = oldCert.getCert().getCert().toBcCert().getExtensions();
         ASN1ObjectIdentifier[] oldOids = oldExtensions.getExtensionOIDs();
         for (ASN1ObjectIdentifier oid : oldOids) {
           String id = oid.getId();
@@ -939,7 +937,7 @@ public class CmpResponder extends BaseCmpResponder {
       } catch (OperationException ex) {
         if (certInfos != null) {
           for (CertificateInfo certInfo : certInfos) {
-            BigInteger sn = certInfo.getCert().getCertHolder().getSerialNumber();
+            BigInteger sn = certInfo.getCert().getCert().getSerialNumber();
             try {
               ca.revokeCert(sn, CrlReason.CESSATION_OF_OPERATION, null, msgId);
             } catch (OperationException ex2) {
@@ -1020,7 +1018,7 @@ public class CmpResponder extends BaseCmpResponder {
     }
 
     CertOrEncCert cec = new CertOrEncCert(
-        CMPCertificate.getInstance(certInfo.getCert().getEncodedCert()));
+        CMPCertificate.getInstance(certInfo.getCert().getCert().getEncoded()));
     if (certInfo.getPrivateKey() == null) {
       // no private key will be returned.
       return new CertResponse(certReqId, statusInfo, new CertifiedKeyPair(cec), null);
@@ -1195,7 +1193,7 @@ public class CmpResponder extends BaseCmpResponder {
       ASN1Integer serialNumber = certDetails.getSerialNumber();
 
       try {
-        X500Name caSubject = getCa().getCaInfo().getCert().getSubjectAsX500Name();
+        X500Name caSubject = getCa().getCaInfo().getCert().getSubject();
 
         if (issuer == null) {
           return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badCertTemplate,
@@ -1251,7 +1249,7 @@ public class CmpResponder extends BaseCmpResponder {
 
             boolean issuerMatched = true;
 
-            byte[] caSki = getCa().getCaInfo().getCert().getSubjectKeyIdentifier();
+            byte[] caSki = getCa().getCaInfo().getCert().getSubjectKeyId();
             if (!Arrays.equals(caSki, aki.getKeyIdentifier())) {
               issuerMatched = false;
             }
@@ -1308,7 +1306,7 @@ public class CmpResponder extends BaseCmpResponder {
       ASN1Integer serialNumber = certDetails.getSerialNumber();
       // serialNumber is not null due to the check in the previous for-block.
 
-      X500Name caSubject = getCa().getCaInfo().getCert().getSubjectAsX500Name();
+      X500Name caSubject = getCa().getCaInfo().getCert().getSubject();
       BigInteger snBigInt = serialNumber.getPositiveValue();
       CertId certId = new CertId(new GeneralName(caSubject), serialNumber);
 
@@ -1650,9 +1648,9 @@ public class CmpResponder extends BaseCmpResponder {
     root.put("version", version);
     List<byte[]> certchain = new LinkedList<byte[]>();
 
-    certchain.add(caInfo.getCert().getEncodedCert());
+    certchain.add(caInfo.getCert().getEncoded());
     for (X509Cert m : caInfo.getCertchain()) {
-      certchain.add(m.getEncodedCert());
+      certchain.add(m.getEncoded());
     }
     root.put("caCertchain", certchain);
 
@@ -1694,7 +1692,7 @@ public class CmpResponder extends BaseCmpResponder {
       X509Cert[] certs = dhpocControl.getCertificates();
       List<byte[]> dhpocCerts = new LinkedList<>();
       for (X509Cert m : certs) {
-        dhpocCerts.add(m.getEncodedCert());
+        dhpocCerts.add(m.getEncoded());
       }
       root.put("dhpocs", dhpocCerts);
     }
@@ -1739,7 +1737,7 @@ public class CmpResponder extends BaseCmpResponder {
   }
 
   @Override
-  public CmpRequestorInfo getRequestor(X509Certificate requestorCert) {
+  public CmpRequestorInfo getRequestor(X509Cert requestorCert) {
     return getCa().getRequestor(requestorCert);
   }
 
@@ -1947,7 +1945,7 @@ public class CmpResponder extends BaseCmpResponder {
           case XiSecurityConstants.CMP_ACTION_GEN_CRL:
             event.addEventType(CaAuditConstants.Cmp.TYPE_genm_gen_crl);
             checkPermission(requestor, PermissionConstants.GEN_CRL);
-            X509CRL tmpCrl = ca.generateCrlOnDemand(msgId);
+            X509CRLHolder tmpCrl = ca.generateCrlOnDemand(msgId);
             if (tmpCrl == null) {
               String statusMessage = "CRL generation is not activated";
               return buildErrorMsgPkiBody(PKIStatus.rejection,
@@ -2005,7 +2003,7 @@ public class CmpResponder extends BaseCmpResponder {
         List<X509Cert> certchain = ca.getCaInfo().getCertchain();
         if (CollectionUtil.isNotEmpty(certchain)) {
           for (X509Cert m : certchain) {
-            vec.add(m.getCertHolder().toASN1Structure());
+            vec.add(m.toBcCert().toASN1Structure());
           }
         }
 
@@ -2030,7 +2028,7 @@ public class CmpResponder extends BaseCmpResponder {
       } // end switch code
 
       return buildErrorMsgPkiBody(PKIStatus.rejection, failureInfo, errorMessage);
-    } catch (CRLException ex) {
+    } catch (IOException ex) {
       return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.systemFailure,
           "CRLException: " + ex.getMessage());
     }
@@ -2048,8 +2046,8 @@ public class CmpResponder extends BaseCmpResponder {
     return (crlNumber == null) ? ca.getBcCurrentCrl() : ca.getBcCrl(crlNumber);
   }
 
-  public X509CRL generateCrlOnDemand(CmpRequestorInfo requestor, RequestType reqType, String msgId)
-      throws OperationException {
+  public X509CRLHolder generateCrlOnDemand(CmpRequestorInfo requestor, RequestType reqType,
+      String msgId) throws OperationException {
     Args.notNull(requestor, "requestor");
     try {
       checkPermission(requestor, PermissionConstants.GEN_CRL);

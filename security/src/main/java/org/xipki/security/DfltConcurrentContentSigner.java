@@ -23,15 +23,12 @@ import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SignatureException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.cert.X509CertificateHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolver;
@@ -72,9 +69,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
 
   private PublicKey publicKey;
 
-  private X509Certificate[] certificateChain;
-
-  private X509CertificateHolder[] bcCertificateChain;
+  private X509Cert[] certificateChain;
 
   static {
     final String propKey = "org.xipki.security.signservice.timeout";
@@ -185,29 +180,15 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
   }
 
   @Override
-  public void setCertificateChain(X509Certificate[] certificateChain) {
+  public void setCertificateChain(X509Cert[] certificateChain) {
     if (CollectionUtil.isEmpty(certificateChain)) {
       this.certificateChain = null;
-      this.bcCertificateChain = null;
       return;
     }
 
     this.certificateChain = certificateChain;
     setPublicKey(certificateChain[0].getPublicKey());
-    final int n = certificateChain.length;
-    this.bcCertificateChain = new X509CertificateHolder[n];
-
-    for (int i = 0; i < n; i++) {
-      X509Certificate cert = this.certificateChain[i];
-      try {
-        this.bcCertificateChain[i] = new X509CertificateHolder(cert.getEncoded());
-      } catch (CertificateEncodingException | IOException ex) {
-        throw new IllegalArgumentException(
-            String.format("%s occurred while parsing certificate at index %d: %s",
-                ex.getClass().getName(), i, ex.getMessage()), ex);
-      }
-    }
-  } // method setCertificateChain
+  }
 
   @Override
   public PublicKey getPublicKey() {
@@ -220,23 +201,13 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
   }
 
   @Override
-  public X509Certificate getCertificate() {
+  public X509Cert getCertificate() {
     return CollectionUtil.isEmpty(certificateChain) ? null : certificateChain[0];
   }
 
   @Override
-  public X509CertificateHolder getBcCertificate() {
-    return CollectionUtil.isEmpty(bcCertificateChain) ? null : bcCertificateChain[0];
-  }
-
-  @Override
-  public X509Certificate[] getCertificateChain() {
+  public X509Cert[] getCertificateChain() {
     return certificateChain;
-  }
-
-  @Override
-  public X509CertificateHolder[] getBcCertificateChain() {
-    return bcCertificateChain;
   }
 
   @Override

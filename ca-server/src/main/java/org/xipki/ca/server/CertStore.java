@@ -28,8 +28,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -46,12 +44,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.cert.X509CRLHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CertWithDbId;
@@ -331,8 +330,9 @@ public class CertStore {
           certInfo.getTransactionId(), certInfo.getRequestedSubject());
     } catch (Exception ex) {
       LOG.error("could not save certificate {}: {}. Message: {}",
-          new Object[]{certInfo.getCert().getSubject(),
-              Base64.encodeToString(certInfo.getCert().getEncodedCert(), true), ex.getMessage()});
+          new Object[]{certInfo.getCert().getCert().getSubject(),
+              Base64.encodeToString(certInfo.getCert().getCert().getEncoded(), true),
+              ex.getMessage()});
       LOG.debug("error", ex);
       return false;
     }
@@ -351,8 +351,9 @@ public class CertStore {
     long certId = idGenerator.nextId();
 
     long fpPk = FpIdCalculator.hash(encodedSubjectPublicKey);
-    String subjectText = X509Util.cutText(certificate.getSubject(), maxX500nameLen);
-    long fpSubject = X509Util.fpCanonicalizedName(certificate.getSubjectAsX500Name());
+    String subjectText = X509Util.cutText(
+        certificate.getCert().getSubjectRfc4519Text(), maxX500nameLen);
+    long fpSubject = X509Util.fpCanonicalizedName(certificate.getCert().getSubject());
 
     String reqSubjectText = null;
     Long fpReqSubject = null;
@@ -365,7 +366,7 @@ public class CertStore {
       }
     }
 
-    byte[] encodedCert = certificate.getEncodedCert();
+    byte[] encodedCert = certificate.getCert().getEncoded();
     String b64FpCert = base64Fp(encodedCert);
     String b64Cert = Base64.encodeToString(encodedCert);
     String tid = (transactionId == null) ? null : Base64.encodeToString(transactionId);
@@ -375,7 +376,7 @@ public class CertStore {
 
     try {
       // cert
-      X509Certificate cert = certificate.getCert();
+      X509Cert cert = certificate.getCert();
       int idx = 1;
       ps.setLong(idx++, certId);
       ps.setLong(idx++, System.currentTimeMillis() / 1000); // currentTimeSeconds
@@ -573,21 +574,20 @@ public class CertStore {
     }
   } // method hasCrl
 
-  public void addCrl(NameId ca, X509CRL crl) throws OperationException, CRLException {
+  public void addCrl(NameId ca, X509CRLHolder crl) throws OperationException, CRLException {
     Args.notNull(ca, "ca");
     Args.notNull(crl, "crl");
 
-    byte[] encodedExtnValue = crl.getExtensionValue(Extension.cRLNumber.getId());
+    Extensions extns = crl.getExtensions();
+    byte[] extnValue = X509Util.getCoreExtValue(extns, Extension.cRLNumber);
     Long crlNumber = null;
-    if (encodedExtnValue != null) {
-      byte[] extnValue = DEROctetString.getInstance(encodedExtnValue).getOctets();
+    if (extnValue != null) {
       crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue().longValue();
     }
 
-    encodedExtnValue = crl.getExtensionValue(Extension.deltaCRLIndicator.getId());
+    extnValue = X509Util.getCoreExtValue(extns, Extension.deltaCRLIndicator);
     Long baseCrlNumber = null;
-    if (encodedExtnValue != null) {
-      byte[] extnValue = DEROctetString.getInstance(encodedExtnValue).getOctets();
+    if (extnValue != null) {
       baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue().longValue();
     }
 
@@ -600,7 +600,12 @@ public class CertStore {
     }
     long crlId = currentMaxCrlId + 1;
 
-    String b64Crl = Base64.encodeToString(crl.getEncoded());
+    String b64Crl;
+    try {
+      b64Crl = Base64.encodeToString(crl.getEncoded());
+    } catch (IOException ex) {
+      throw new CRLException(ex.getMessage(), ex);
+    }
 
     PreparedStatement ps = null;
 
@@ -1147,8 +1152,8 @@ public class CertStore {
     }
 
     byte[] encodedCert = Base64.decodeFast(b64Cert);
-    X509Certificate cert = X509Util.parseCert(encodedCert);
-    CertWithDbId certWithMeta = new CertWithDbId(cert, encodedCert);
+    X509Cert cert = X509Util.parseCert(encodedCert);
+    CertWithDbId certWithMeta = new CertWithDbId(cert);
     certWithMeta.setCertId(certId);
     CertificateInfo certInfo = new CertificateInfo(certWithMeta, null, ca, caCert,
         cert.getPublicKey().getEncoded(), idNameMap.getCertprofile(certprofileId),
@@ -1207,7 +1212,7 @@ public class CertStore {
     }
 
     byte[] encodedCert = Base64.decodeFast(b64Cert);
-    X509Certificate cert;
+    X509Cert cert;
     try {
       cert = X509Util.parseCert(encodedCert);
     } catch (CertificateException ex) {
@@ -1220,7 +1225,7 @@ public class CertStore {
       revInfo = new CertRevocationInfo(revReason, new Date(1000 * revTime), invalidityTime);
     }
 
-    CertWithDbId certWithMeta = new CertWithDbId(cert, encodedCert);
+    CertWithDbId certWithMeta = new CertWithDbId(cert);
     certWithMeta.setCertId(certId);
 
     String profileName = idNameMap.getCertprofileName(certprofileId);
@@ -1276,9 +1281,8 @@ public class CertStore {
 
     try {
       byte[] encodedCert = Base64.decodeFast(b64Cert);
-      X509Certificate cert = X509Util.parseCert(encodedCert);
-
-      CertWithDbId certWithMeta = new CertWithDbId(cert, encodedCert);
+      X509Cert cert = X509Util.parseCert(encodedCert);
+      CertWithDbId certWithMeta = new CertWithDbId(cert);
 
       byte[] subjectPublicKeyInfo = Certificate.getInstance(encodedCert)
           .getTBSCertificate().getSubjectPublicKeyInfo().getEncoded();
@@ -1334,14 +1338,14 @@ public class CertStore {
    * @throws OperationException
    *           If error occurs.
    */
-  public List<X509Certificate> getCert(X500Name subjectName, byte[] transactionId)
+  public List<X509Cert> getCert(X500Name subjectName, byte[] transactionId)
       throws OperationException {
     final String sql = (transactionId != null)
         ? "SELECT CERT FROM CERT WHERE TID=? AND (FP_S=? OR FP_RS=?)"
         : "SELECT CERT FROM CERT WHERE FP_S=? OR FP_RS=?";
 
     long fpSubject = X509Util.fpCanonicalizedName(subjectName);
-    List<X509Certificate> certs = new LinkedList<>();
+    List<X509Cert> certs = new LinkedList<>();
 
     ResultSet rs = null;
     PreparedStatement ps = borrowPreparedStatement(sql);
@@ -1359,7 +1363,7 @@ public class CertStore {
         String b64Cert = rs.getString("CERT");
         byte[] encodedCert = Base64.decodeFast(b64Cert);
 
-        X509Certificate cert;
+        X509Cert cert;
         try {
           cert = X509Util.parseCert(encodedCert);
         } catch (CertificateException ex) {

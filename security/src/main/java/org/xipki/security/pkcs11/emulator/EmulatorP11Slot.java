@@ -36,7 +36,6 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPrivateKey;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPrivateKey;
@@ -394,7 +393,7 @@ class EmulatorP11Slot extends P11Slot {
           P11ObjectIdentifier p11ObjId = new P11ObjectIdentifier(id, label);
           X509Cert cert = ret.getCertForId(id);
           java.security.PublicKey publicKey = (cert == null) ? readPublicKey(id)
-              : cert.getCert().getPublicKey();
+              : cert.getPublicKey();
 
           if (publicKey == null) {
             LOG.warn("Neither public key nor certificate is associated with private key {}",
@@ -407,7 +406,7 @@ class EmulatorP11Slot extends P11Slot {
           PKCS8EncryptedPrivateKeyInfo epki = new PKCS8EncryptedPrivateKeyInfo(encodedValue);
           PrivateKey privateKey = privateKeyCryptor.decrypt(epki);
 
-          X509Certificate[] certs = (cert == null) ? null : new X509Certificate[]{cert.getCert()};
+          X509Cert[] certs = (cert == null) ? null : new X509Cert[]{cert};
 
           EmulatorP11Identity identity = new EmulatorP11Identity(this,
               new P11IdentityId(slotId, p11ObjId, label, label), privateKey, publicKey, certs,
@@ -487,8 +486,7 @@ class EmulatorP11Slot extends P11Slot {
 
   private X509Cert readCertificate(byte[] keyId) throws CertificateException, IOException {
     byte[] encoded = IoUtil.read(new File(certDir, hex(keyId) + VALUE_FILE_SUFFIX));
-    X509Certificate cert = X509Util.parseCert(encoded);
-    return new X509Cert(cert, encoded);
+    return X509Util.parseCert(encoded);
   }
 
   private Properties loadProperties(File file) throws P11TokenException {
@@ -793,7 +791,7 @@ class EmulatorP11Slot extends P11Slot {
     }
   }
 
-  private void savePkcs11Cert(byte[] id, String label, X509Certificate cert)
+  private void savePkcs11Cert(byte[] id, String label, X509Cert cert)
       throws P11TokenException, CertificateException {
     savePkcs11Entry(certDir, id, label, cert.getEncoded());
   }
@@ -860,7 +858,7 @@ class EmulatorP11Slot extends P11Slot {
   }
 
   @Override
-  protected P11ObjectIdentifier addCert0(X509Certificate cert, P11NewObjectControl control)
+  protected P11ObjectIdentifier addCert0(X509Cert cert, P11NewObjectControl control)
       throws P11TokenException, CertificateException {
     byte[] id = control.getId();
     if (id == null) {
@@ -1048,7 +1046,7 @@ class EmulatorP11Slot extends P11Slot {
     String keyLabel = savePkcs11PrivateKey(id, label, keypair.getPrivate());
     String pubKeyLabel = savePkcs11PublicKey(id, label, keypair.getPublic());
     String certLabel = null;
-    X509Certificate[] certs = null;
+    X509Cert[] certs = null;
     if (vendor == Vendor.YUBIKEY) {
       try {
         // Yubico generates always a self-signed certificate during keypair generation
@@ -1066,10 +1064,10 @@ class EmulatorP11Slot extends P11Slot {
             BigInteger.ONE, notBefore, notAfter, subjectDn, spki);
         X509CertificateHolder bcCert = certGenerator.build(contentSigner);
         byte[] encodedCert = bcCert.getEncoded();
-        X509Certificate cert = X509Util.parseCert(encodedCert);
+        X509Cert cert = X509Util.parseCert(encodedCert);
         savePkcs11Entry(certDir, id, label, encodedCert);
 
-        certs = new X509Certificate[] {cert};
+        certs = new X509Cert[] {cert};
       } catch (Exception ex) {
         throw new P11TokenException("cannot generate self-signed certificate", ex);
       }
@@ -1103,7 +1101,7 @@ class EmulatorP11Slot extends P11Slot {
   } // method saveP11Entity
 
   @Override
-  protected void updateCertificate0(P11ObjectIdentifier keyId, X509Certificate newCert)
+  protected void updateCertificate0(P11ObjectIdentifier keyId, X509Cert newCert)
       throws P11TokenException, CertificateException {
     removePkcs11Cert(keyId);
     savePkcs11Cert(keyId.getId(), keyId.getLabel(), newCert);

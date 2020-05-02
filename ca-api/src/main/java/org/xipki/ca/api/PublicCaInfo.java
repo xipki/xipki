@@ -17,18 +17,12 @@
 
 package org.xipki.ca.api;
 
-import java.io.IOException;
 import java.math.BigInteger;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
 import java.util.Arrays;
-
-import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
@@ -44,9 +38,7 @@ import org.xipki.util.ConfPairs;
 
 public class PublicCaInfo {
 
-  private final X500Principal subject;
-
-  private final X500Name x500Subject;
+  private final X500Name subject;
 
   private final String c14nSubject;
 
@@ -54,45 +46,36 @@ public class PublicCaInfo {
 
   private final GeneralNames subjectAltName;
 
-  private final X500Name x500Issuer;
+  private final X500Name issuer;
 
   private final BigInteger serialNumber;
 
   private final X509Cert caCert;
 
-  private X509Certificate crlSignerCert;
+  private X509Cert crlSignerCert;
 
   private final CaUris caUris;
 
   private final ConfPairs extraControl;
 
-  public PublicCaInfo(X509Certificate caCert, CaUris caUris, ConfPairs extraControl)
+  public PublicCaInfo(X509Cert caCert, CaUris caUris, ConfPairs extraControl)
       throws OperationException {
-    Args.notNull(caCert, "caCert");
+    this.caCert = Args.notNull(caCert, "caCert");
     this.caUris = (caUris == null) ? CaUris.EMPTY_INSTANCE : caUris;
-
-    this.caCert = new X509Cert(caCert);
-    this.x500Issuer = X500Name.getInstance(caCert.getIssuerX500Principal().getEncoded());
+    this.issuer = caCert.getIssuer();
     this.serialNumber = caCert.getSerialNumber();
-    this.subject = caCert.getSubjectX500Principal();
-    this.x500Subject = X500Name.getInstance(subject.getEncoded());
-    this.c14nSubject = X509Util.canonicalizName(x500Subject);
-    try {
-      this.subjectKeyIdentifier = X509Util.extractSki(caCert);
-    } catch (CertificateEncodingException ex) {
-      throw new OperationException(ErrorCode.INVALID_EXTENSION, ex);
-    }
+    this.subject = caCert.getSubject();
+    this.c14nSubject = X509Util.canonicalizName(subject);
+    this.subjectKeyIdentifier = caCert.getSubjectKeyId();
     this.extraControl = extraControl;
 
-    byte[] encodedSubjectAltName = caCert.getExtensionValue(
-        Extension.subjectAlternativeName.getId());
+    byte[] encodedSubjectAltName = caCert.getExtensionCoreValue(Extension.subjectAlternativeName);
     if (encodedSubjectAltName == null) {
       subjectAltName = null;
     } else {
       try {
-        subjectAltName = GeneralNames.getInstance(
-            JcaX509ExtensionUtils.parseExtensionValue(encodedSubjectAltName));
-      } catch (IOException ex) {
+        subjectAltName = GeneralNames.getInstance(encodedSubjectAltName);
+      } catch (RuntimeException ex) {
         throw new OperationException(ErrorCode.INVALID_EXTENSION,
             "invalid SubjectAltName extension in CA certificate");
       }
@@ -103,19 +86,13 @@ public class PublicCaInfo {
       GeneralNames subjectAltName, byte[] subjectKeyIdentifier,
       CaUris caUris, ConfPairs extraControl)
       throws OperationException {
-    this.x500Subject = Args.notNull(subject, "subject");
-    this.x500Issuer = Args.notNull(subject, "issuer");
+    this.subject = Args.notNull(subject, "subject");
+    this.issuer = Args.notNull(subject, "issuer");
     this.serialNumber = Args.notNull(serialNumber, "serialNumber");
     this.caUris = (caUris == null) ? CaUris.EMPTY_INSTANCE : caUris;
 
     this.caCert = null;
     this.c14nSubject = X509Util.canonicalizName(subject);
-    try {
-      this.subject = new X500Principal(subject.getEncoded());
-    } catch (IOException ex) {
-      throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-          "invalid SubjectAltName extension in CA certificate");
-    }
 
     this.subjectKeyIdentifier = (subjectKeyIdentifier == null) ? null
         : Arrays.copyOf(subjectKeyIdentifier, subjectKeyIdentifier.length);
@@ -132,24 +109,20 @@ public class PublicCaInfo {
     return caUris;
   }
 
-  public X509Certificate getCrlSignerCert() {
+  public X509Cert getCrlSignerCert() {
     return crlSignerCert;
   }
 
-  public void setCrlSignerCert(X509Certificate crlSignerCert) {
-    this.crlSignerCert = caCert.getCert().equals(crlSignerCert) ? null : crlSignerCert;
+  public void setCrlSignerCert(X509Cert crlSignerCert) {
+    this.crlSignerCert = caCert.equals(crlSignerCert) ? null : crlSignerCert;
   }
 
-  public X500Principal getSubject() {
+  public X500Name getSubject() {
     return subject;
   }
 
-  public X500Name getX500Subject() {
-    return x500Subject;
-  }
-
-  public X500Name getX500Issuer() {
-    return x500Issuer;
+  public X500Name getIssuer() {
+    return issuer;
   }
 
   public String getC14nSubject() {
@@ -161,13 +134,9 @@ public class PublicCaInfo {
   }
 
   public byte[] getSubjectKeyIdentifer() {
-    if (caCert != null) {
-      return caCert.getSubjectKeyIdentifier();
-    } else {
-      return (subjectKeyIdentifier == null) ? null
-          : Arrays.copyOf(subjectKeyIdentifier, subjectKeyIdentifier.length);
-    }
-  } // method getSubjectKeyIdentifer
+    return (subjectKeyIdentifier == null) ? null
+        : Arrays.copyOf(subjectKeyIdentifier, subjectKeyIdentifier.length);
+  }
 
   public BigInteger getSerialNumber() {
     return serialNumber;

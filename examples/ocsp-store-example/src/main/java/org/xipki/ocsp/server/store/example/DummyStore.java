@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Map;
 
@@ -34,6 +33,7 @@ import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 
 /**
@@ -98,7 +98,7 @@ public class DummyStore extends OcspStore {
   }
 
   @Override
-  public X509Certificate getIssuerCert(RequestIssuer reqIssuer) {
+  public X509Cert getIssuerCert(RequestIssuer reqIssuer) {
     return issuerEntry.matchHash(reqIssuer) ? issuerEntry.getCert() : null;
   }
 
@@ -150,7 +150,7 @@ public class DummyStore extends OcspStore {
     }
 
     String caCertFile = (String) objVal;
-    X509Certificate cert;
+    X509Cert cert;
     IssuerEntry issuserEntry;
     try {
       cert = X509Util.parseCert(new File(caCertFile));

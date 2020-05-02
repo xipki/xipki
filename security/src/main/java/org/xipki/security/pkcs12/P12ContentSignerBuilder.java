@@ -24,7 +24,6 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.security.Signature;
-import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPrivateKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.RSAPrivateKey;
@@ -56,6 +55,7 @@ import org.xipki.security.DSAPlainDigestSigner;
 import org.xipki.security.DfltConcurrentContentSigner;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.SignatureSigner;
+import org.xipki.security.X509Cert;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.XiWrappedContentSigner;
@@ -183,7 +183,7 @@ public class P12ContentSignerBuilder {
 
   private final PublicKey publicKey;
 
-  private final X509Certificate[] certificateChain;
+  private final X509Cert[] certificateChain;
 
   public P12ContentSignerBuilder(PrivateKey privateKey, PublicKey publicKey)
       throws XiSecurityException {
@@ -306,11 +306,11 @@ public class P12ContentSignerBuilder {
     return concurrentSigner;
   } // method createSigner
 
-  public X509Certificate getCertificate() {
+  public X509Cert getCertificate() {
     return (certificateChain != null && certificateChain.length > 0) ? certificateChain[0] : null;
   }
 
-  public X509Certificate[] getCertificateChain() {
+  public X509Cert[] getCertificateChain() {
     return certificateChain;
   }
 

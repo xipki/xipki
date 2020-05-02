@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.LruCache;
 import org.xipki.util.StringUtil;
@@ -47,7 +48,7 @@ public class TlsHelper {
 
   private static final Logger LOG = LoggerFactory.getLogger(TlsHelper.class);
 
-  private static final LruCache<String, X509Certificate> clientCerts = new LruCache<>(50);
+  private static final LruCache<String, X509Cert> clientCerts = new LruCache<>(50);
 
   private static String reverseProxyMode = null;
 
@@ -70,11 +71,12 @@ public class TlsHelper {
     LOG.info("set reverseProxyMode to {}", reverseProxyMode);
   } // method static
 
-  public static X509Certificate getTlsClientCert(HttpServletRequest request) throws IOException {
+  public static X509Cert getTlsClientCert(HttpServletRequest request)
+      throws IOException {
     if (reverseProxyMode == null) {
       X509Certificate[] certs = (X509Certificate[]) request.getAttribute(
           "javax.servlet.request.X509Certificate");
-      return (certs == null || certs.length < 1) ? null : certs[0];
+      return (certs == null || certs.length < 1) ? null : new X509Cert(certs[0]);
     } else if ("APACHE".equals(reverseProxyMode)) {
       // check whether this application is behind a reverse proxy and the TLS client
       // certificate is forwarded.
@@ -96,7 +98,7 @@ public class TlsHelper {
         return null;
       }
 
-      X509Certificate clientCert = clientCerts.get(pemClientCert);
+      X509Cert clientCert = clientCerts.get(pemClientCert);
       if (clientCert != null) {
         return clientCert;
       }

@@ -17,11 +17,11 @@
 
 package org.xipki.cmpclient;
 
-import java.security.cert.Certificate;
 import java.util.Map;
 import java.util.Set;
 
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.xipki.security.X509Cert;
 import org.xipki.security.cmp.PkiStatusInfo;
 import org.xipki.util.Args;
 
@@ -36,13 +36,13 @@ public class EnrollCertResult {
 
   public static class CertifiedKeyPairOrError {
 
-    private final Certificate certificate;
+    private final X509Cert certificate;
 
     private final PrivateKeyInfo privateKeyInfo;
 
     private final PkiStatusInfo error;
 
-    public CertifiedKeyPairOrError(Certificate certificate, PrivateKeyInfo privateKeyInfo) {
+    public CertifiedKeyPairOrError(X509Cert certificate, PrivateKeyInfo privateKeyInfo) {
       this.certificate = Args.notNull(certificate, "certificate");
       this.privateKeyInfo = privateKeyInfo;
       this.error = null;
@@ -54,7 +54,7 @@ public class EnrollCertResult {
       this.error = Args.notNull(error, "error");
     }
 
-    public Certificate getCertificate() {
+    public X509Cert getCertificate() {
       return certificate;
     }
 
@@ -68,16 +68,16 @@ public class EnrollCertResult {
 
   } // class CertifiedKeyPairOrError
 
-  private final Certificate caCert;
+  private final X509Cert caCert;
 
   private final Map<String, CertifiedKeyPairOrError> certsOrErrors;
 
-  public EnrollCertResult(Certificate caCert, Map<String, CertifiedKeyPairOrError> certsOrErrors) {
+  public EnrollCertResult(X509Cert caCert, Map<String, CertifiedKeyPairOrError> certsOrErrors) {
     this.certsOrErrors = Args.notEmpty(certsOrErrors, "certsOrErrors");
     this.caCert = caCert;
   }
 
-  public Certificate getCaCert() {
+  public X509Cert getCaCert() {
     return caCert;
   }
 

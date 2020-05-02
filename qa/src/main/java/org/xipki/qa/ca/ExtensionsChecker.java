@@ -19,8 +19,6 @@ package org.xipki.qa.ca;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -135,6 +133,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
@@ -324,12 +323,7 @@ public class ExtensionsChecker {
     Args.notNull(cert, "cert");
     Args.notNull(issuerInfo, "issuerInfo");
 
-    X509Certificate jceCert;
-    try {
-      jceCert = X509Util.toX509Cert(cert);
-    } catch (CertificateException ex) {
-      throw new IllegalArgumentException("invalid cert: " + ex.getMessage());
-    }
+    X509Cert jceCert = new X509Cert(cert);
 
     List<ValidationIssue> result = new LinkedList<>();
 
@@ -886,7 +880,7 @@ public class ExtensionsChecker {
           failureMsg.append(
               "authorityCertIssuer does not contain directoryName but expected one; ");
         } else {
-          X500Name caIssuer = issuerInfo.getBcCert().getTBSCertificate().getIssuer();
+          X500Name caIssuer = issuerInfo.getCert().getIssuer();
           if (!caIssuer.equals(x500GenName)) {
             addViolation(failureMsg, "authorityCertIssuer", x500GenName, caIssuer);
           }
@@ -1722,14 +1716,13 @@ public class ExtensionsChecker {
 
   private void checkExtnIssuerAltNames(StringBuilder failureMsg, byte[] extensionValue,
       IssuerInfo issuerInfo) {
-    Extension caSubjectAltExtension = issuerInfo.getBcCert().getTBSCertificate().getExtensions()
-        .getExtension(Extension.subjectAlternativeName);
-    if (caSubjectAltExtension == null) {
+    byte[] caSubjectAltExtensionValue = issuerInfo.getCert().getExtensionCoreValue(
+        Extension.subjectAlternativeName);
+    if (caSubjectAltExtensionValue == null) {
       failureMsg.append("issuerAlternativeName is present but expected 'none'; ");
       return;
     }
 
-    byte[] caSubjectAltExtensionValue = caSubjectAltExtension.getExtnValue().getOctets();
     if (!Arrays.equals(caSubjectAltExtensionValue, extensionValue)) {
       addViolation(failureMsg, "issuerAltNames", hex(extensionValue),
           hex(caSubjectAltExtensionValue));

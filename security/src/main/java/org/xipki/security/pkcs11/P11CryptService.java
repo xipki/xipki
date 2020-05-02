@@ -17,7 +17,6 @@
 
 package org.xipki.security.pkcs11;
 
-import java.security.cert.X509Certificate;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -83,15 +82,10 @@ public class P11CryptService {
     return (slot == null) ? null : slot.getIdentity(keyId);
   }
 
-  public X509Certificate getCert(P11SlotIdentifier slotId, P11ObjectIdentifier certId)
+  public X509Cert getCert(P11SlotIdentifier slotId, P11ObjectIdentifier certId)
       throws P11TokenException {
     P11Slot slot = module.getSlot(slotId);
-    if (slot == null) {
-      return null;
-    }
-
-    X509Cert cert = slot.getCert(certId);
-    return (cert == null) ? null : cert.getCert();
+    return slot == null ? null : slot.getCert(certId);
   }
 
   @Override

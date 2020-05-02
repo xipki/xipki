@@ -19,7 +19,6 @@ package org.xipki.security;
 
 import java.math.BigInteger;
 import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
 import java.util.Arrays;
 
 import org.bouncycastle.asn1.x500.X500Name;
@@ -47,12 +46,16 @@ public class DHSigStaticKeyCertPair {
 
   private final byte[] encodedSubject;
 
-  public DHSigStaticKeyCertPair(PrivateKey privateKey, X509Certificate certificate) {
+  public DHSigStaticKeyCertPair(PrivateKey privateKey, X509Cert certificate) {
     this.privateKey = Args.notNull(privateKey, "privateKey");
     Args.notNull(certificate, "certificate");
     this.serialNumber = certificate.getSerialNumber();
-    this.encodedIssuer = certificate.getIssuerX500Principal().getEncoded();
-    this.encodedSubject = certificate.getSubjectX500Principal().getEncoded();
+    try {
+      this.encodedIssuer = certificate.getIssuer().getEncoded();
+      this.encodedSubject = certificate.getSubject().getEncoded();
+    } catch (Exception ex) {
+      throw new IllegalArgumentException("error encoding certificate", ex);
+    }
     this.issuer = X500Name.getInstance(this.encodedIssuer);
     this.subject = X500Name.getInstance(this.encodedSubject);
   }

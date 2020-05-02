@@ -26,7 +26,6 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
-import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
@@ -51,6 +50,7 @@ import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.P11Identity;
 import org.xipki.security.pkcs11.P11IdentityId;
@@ -99,7 +99,7 @@ public class EmulatorP11Identity extends P11Identity {
   } // constructor
 
   public EmulatorP11Identity(P11Slot slot, P11IdentityId identityId, PrivateKey privateKey,
-      PublicKey publicKey, X509Certificate[] certificateChain, int maxSessions,
+      PublicKey publicKey, X509Cert[] certificateChain, int maxSessions,
       SecureRandom random)
       throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
     super(slot, identityId, publicKey, certificateChain);

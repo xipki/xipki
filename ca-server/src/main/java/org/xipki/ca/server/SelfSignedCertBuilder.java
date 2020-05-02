@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.PublicKey;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
 import java.util.List;
@@ -54,6 +53,7 @@ import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
+import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
@@ -77,9 +77,9 @@ class SelfSignedCertBuilder {
 
     private final String signerConf;
 
-    private final X509Certificate cert;
+    private final X509Cert cert;
 
-    GenerateSelfSignedResult(String signerConf, X509Certificate cert) {
+    GenerateSelfSignedResult(String signerConf, X509Cert cert) {
       this.signerConf = signerConf;
       this.cert = cert;
     }
@@ -88,7 +88,7 @@ class SelfSignedCertBuilder {
       return signerConf;
     }
 
-    X509Certificate getCert() {
+    X509Cert getCert() {
       return cert;
     }
 
@@ -161,18 +161,18 @@ class SelfSignedCertBuilder {
       }
 
       signer = securityFactory.createSigner(signerType, new SignerConf(thisSignerConf),
-          (X509Certificate[]) null);
+          (X509Cert[]) null);
     } catch (XiSecurityException | ObjectCreationException ex) {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
     }
 
-    X509Certificate newCert = generateCertificate(signer, certprofile, csr, serialNumber,
+    X509Cert newCert = generateCertificate(signer, certprofile, csr, serialNumber,
         caUris, extraControl);
 
     return new GenerateSelfSignedResult(signerConf, newCert);
   } // method generateSelfSigned
 
-  private static X509Certificate generateCertificate(ConcurrentContentSigner signer,
+  private static X509Cert generateCertificate(ConcurrentContentSigner signer,
       IdentifiedCertprofile certprofile, CertificationRequest csr, BigInteger serialNumber,
       CaUris caUris, ConfPairs extraControl)
       throws OperationException {

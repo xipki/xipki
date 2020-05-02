@@ -18,11 +18,11 @@
 package org.xipki.ocsp.server;
 
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.xipki.security.HashAlgo;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 
@@ -39,13 +39,13 @@ public class IssuerFilter {
 
   private final Set<String> excludeSha1Fps;
 
-  public IssuerFilter(Set<X509Certificate> includes, Set<X509Certificate> excludes)
+  public IssuerFilter(Set<X509Cert> includes, Set<X509Cert> excludes)
       throws CertificateEncodingException {
     if (CollectionUtil.isEmpty(includes)) {
       includeSha1Fps = null;
     } else {
       includeSha1Fps = new HashSet<>(includes.size());
-      for (X509Certificate include : includes) {
+      for (X509Cert include : includes) {
         String sha1Fp = HashAlgo.SHA1.base64Hash(include.getEncoded());
         includeSha1Fps.add(sha1Fp);
       }
@@ -55,7 +55,7 @@ public class IssuerFilter {
       excludeSha1Fps = null;
     } else {
       excludeSha1Fps = new HashSet<>(excludes.size());
-      for (X509Certificate exclude : excludes) {
+      for (X509Cert exclude : excludes) {
         String sha1Fp = HashAlgo.SHA1.base64Hash(exclude.getEncoded());
         excludeSha1Fps.add(sha1Fp);
       }

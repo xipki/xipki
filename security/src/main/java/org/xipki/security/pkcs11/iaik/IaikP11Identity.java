@@ -18,7 +18,6 @@
 package org.xipki.security.pkcs11.iaik;
 
 import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
@@ -26,6 +25,7 @@ import java.security.interfaces.RSAPublicKey;
 import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.jcajce.interfaces.XDHKey;
 import org.xipki.security.EdECConstants;
+import org.xipki.security.X509Cert;
 import org.xipki.security.pkcs11.P11Identity;
 import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11Params;
@@ -56,7 +56,7 @@ class IaikP11Identity extends P11Identity {
   }
 
   IaikP11Identity(IaikP11Slot slot, P11IdentityId identityId, PrivateKey privateKey,
-      PublicKey publicKey, X509Certificate[] certificateChain) {
+      PublicKey publicKey, X509Cert[] certificateChain) {
     super(slot, identityId, publicKey, certificateChain);
     this.signingKey = Args.notNull(privateKey, "privateKey");
 

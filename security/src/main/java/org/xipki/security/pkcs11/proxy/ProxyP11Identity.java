@@ -18,10 +18,10 @@
 package org.xipki.security.pkcs11.proxy;
 
 import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEROctetString;
+import org.xipki.security.X509Cert;
 import org.xipki.security.pkcs11.P11Identity;
 import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11Params;
@@ -47,7 +47,7 @@ class ProxyP11Identity extends P11Identity {
   }
 
   ProxyP11Identity(ProxyP11Slot slot, P11IdentityId identityId, PublicKey publicKey,
-      X509Certificate[] certificateChain) {
+      X509Cert[] certificateChain) {
     super(slot, identityId, publicKey, certificateChain);
     this.asn1KeyId = new ProxyMessage.ObjectIdentifier(identityId.getKeyId());
   }

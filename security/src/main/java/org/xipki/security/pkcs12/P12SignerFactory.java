@@ -24,7 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -42,6 +41,7 @@ import org.xipki.security.EdECConstants;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.SignerFactory;
+import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.Base64;
@@ -83,7 +83,7 @@ public class P12SignerFactory implements SignerFactory {
 
   @Override
   public ConcurrentContentSigner newSigner(String type, SignerConf conf,
-      X509Certificate[] certificateChain) throws ObjectCreationException {
+      X509Cert[] certificateChain) throws ObjectCreationException {
     if (!canCreateSigner(type)) {
       throw new ObjectCreationException("unknown signer type " + type);
     }
@@ -148,11 +148,11 @@ public class P12SignerFactory implements SignerFactory {
 
         ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(publicKeyAlg);
         if (curveOid != null && EdECConstants.isMontgomeryCurve(curveOid)) {
-          X509Certificate peerCert = null;
+          X509Cert peerCert = null;
           // peer certificate is needed
-          List<X509Certificate> peerCerts = conf.getPeerCertificates();
+          List<X509Cert> peerCerts = conf.getPeerCertificates();
           if (peerCerts != null) {
-            for (X509Certificate m : conf.getPeerCertificates()) {
+            for (X509Cert m : conf.getPeerCertificates()) {
               if (publicKeyAlg.equalsIgnoreCase(m.getPublicKey().getAlgorithm())) {
                 peerCert = m;
                 break;

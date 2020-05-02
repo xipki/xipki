@@ -36,6 +36,7 @@ import java.util.Set;
 import org.xipki.security.CertpathValidationModel;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.Securities.KeystoreConf;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
@@ -85,9 +86,9 @@ public class RequestOption {
 
   private final Set<HashAlgo> hashAlgos;
 
-  private final Set<CertWithEncoded> trustAnchors;
+  private final Set<X509Cert> trustAnchors;
 
-  private final Set<X509Certificate> certs;
+  private final Set<X509Cert> certs;
 
   private final CertpathValidationModel certpathValidationModel;
 
@@ -156,10 +157,10 @@ public class RequestOption {
     certpathValidationModel = certpathConf.getValidationModel();
 
     try {
-      Set<X509Certificate> tmpCerts = getCerts(certpathConf.getTrustAnchors());
+      Set<X509Cert> tmpCerts = getCerts(certpathConf.getTrustAnchors());
       trustAnchors = new HashSet<>(tmpCerts.size());
-      for (X509Certificate m : tmpCerts) {
-        trustAnchors.add(new CertWithEncoded(m));
+      for (X509Cert m : tmpCerts) {
+        trustAnchors.add(m);
       }
     } catch (Exception ex) {
       throw new InvalidConfException(
@@ -218,7 +219,7 @@ public class RequestOption {
     return certpathValidationModel;
   }
 
-  public Set<CertWithEncoded> getTrustAnchors() {
+  public Set<X509Cert> getTrustAnchors() {
     return trustAnchors;
   }
 
@@ -226,14 +227,14 @@ public class RequestOption {
     return versions == null || versions.contains(version);
   }
 
-  public Set<X509Certificate> getCerts() {
+  public Set<X509Cert> getCerts() {
     return certs;
   }
 
-  private static Set<X509Certificate> getCerts(OcspServerConf.CertCollection conf)
+  private static Set<X509Cert> getCerts(OcspServerConf.CertCollection conf)
       throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
     Args.notNull(conf, "conf");
-    Set<X509Certificate> tmpCerts = new HashSet<>();
+    Set<X509Cert> tmpCerts = new HashSet<>();
 
     if (conf.getKeystore() != null) {
       KeystoreConf ksConf = conf.getKeystore();
@@ -252,7 +253,9 @@ public class RequestOption {
       while (aliases.hasMoreElements()) {
         String alias = aliases.nextElement();
         if (trustStore.isCertificateEntry(alias)) {
-          tmpCerts.add((X509Certificate) trustStore.getCertificate(alias));
+          tmpCerts.add(
+              new X509Cert(
+                  (X509Certificate) trustStore.getCertificate(alias)));
         }
       }
     } else if (conf.getDir() != null) {

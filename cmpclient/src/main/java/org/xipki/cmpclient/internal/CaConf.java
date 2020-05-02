@@ -18,7 +18,6 @@
 package org.xipki.cmpclient.internal;
 
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,7 +30,7 @@ import javax.net.ssl.SSLSocketFactory;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.cmpclient.CertprofileInfo;
-import org.xipki.security.util.X509Util;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
@@ -60,27 +59,27 @@ class CaConf {
 
   static class CaInfo {
 
-    private final List<X509Certificate> certchain;
+    private final List<X509Cert> certchain;
 
-    private final List<X509Certificate> dhpocs;
+    private final List<X509Cert> dhpocs;
 
     private final Set<CertprofileInfo> certprofiles;
 
     private final CmpControl cmpControl;
 
-    CaInfo(List<X509Certificate> certchain, CmpControl cmpControl,
-        Set<CertprofileInfo> certprofiles, List<X509Certificate> dhpocs) {
+    CaInfo(List<X509Cert> certchain, CmpControl cmpControl,
+        Set<CertprofileInfo> certprofiles, List<X509Cert> dhpocs) {
       this.certchain = certchain;
       this.cmpControl = cmpControl;
       this.certprofiles = certprofiles;
       this.dhpocs = dhpocs;
     }
 
-    List<X509Certificate> getCertchain() {
+    List<X509Cert> getCertchain() {
       return certchain;
     }
 
-    List<X509Certificate> getDhpocs() {
+    List<X509Cert> getDhpocs() {
       return dhpocs;
     }
 
@@ -114,9 +113,9 @@ class CaConf {
 
   private boolean dhpocAutoconf;
 
-  private X509Certificate cert;
+  private X509Cert cert;
 
-  private List<X509Certificate> certchain;
+  private List<X509Cert> certchain;
 
   private X500Name subject;
 
@@ -130,7 +129,7 @@ class CaConf {
 
   private Map<String, CertprofileInfo> profiles = Collections.emptyMap();
 
-  private List<X509Certificate> dhpocs;
+  private List<X509Cert> dhpocs;
 
   CaConf(String name, String url, String healthUrl, String requestorName, Responder responder,
       SSLSocketFactory sslSocketFactory, HostnameVerifier hostnameVerifier) {
@@ -155,12 +154,13 @@ class CaConf {
     return healthUrl;
   }
 
-  public void setCertchain(List<X509Certificate> certchain) throws CertificateEncodingException {
+  public void setCertchain(List<X509Cert> certchain)
+      throws CertificateEncodingException {
     Args.notEmpty(certchain, "certchain");
     this.certchain = certchain;
     this.cert = certchain.get(0);
-    this.subject = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
-    this.subjectKeyIdentifier = X509Util.extractSki(cert);
+    this.subject = cert.getSubject();
+    this.subjectKeyIdentifier = cert.getSubjectKeyId();
   }
 
   public void setCertprofiles(Set<CertprofileInfo> certprofiles) {
@@ -174,11 +174,11 @@ class CaConf {
     }
   }
 
-  public X509Certificate getCert() {
+  public X509Cert getCert() {
     return cert;
   }
 
-  public List<X509Certificate> getCertchain() {
+  public List<X509Cert> getCertchain() {
     return certchain;
   }
 
@@ -190,11 +190,11 @@ class CaConf {
     this.dhpocAutoconf = dhpocAutoconf;
   }
 
-  public List<X509Certificate> getDhpocs() {
+  public List<X509Cert> getDhpocs() {
     return dhpocs;
   }
 
-  public void setDhpocs(List<X509Certificate> dhpocs) {
+  public void setDhpocs(List<X509Cert> dhpocs) {
     this.dhpocs = dhpocs;
   }
 

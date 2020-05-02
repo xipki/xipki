@@ -17,9 +17,8 @@
 
 package org.xipki.ca.api.mgmt;
 
-import java.security.cert.Certificate;
-
 import org.xipki.security.CertRevocationInfo;
+import org.xipki.security.X509Cert;
 
 /**
  * Certificate with status info.
@@ -30,7 +29,7 @@ import org.xipki.security.CertRevocationInfo;
 
 public class CertWithStatusInfo {
 
-  private Certificate cert;
+  private X509Cert cert;
 
   private String certprofile;
 
@@ -39,11 +38,11 @@ public class CertWithStatusInfo {
   public CertWithStatusInfo() {
   }
 
-  public Certificate getCert() {
+  public X509Cert getCert() {
     return cert;
   }
 
-  public void setCert(Certificate cert) {
+  public void setCert(X509Cert cert) {
     this.cert = cert;
   }
 

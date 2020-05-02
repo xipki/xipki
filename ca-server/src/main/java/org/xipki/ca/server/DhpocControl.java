@@ -99,10 +99,10 @@ public class DhpocControl {
           // we consider only XDH key
           continue;
         }
-        X509Certificate cert = (X509Certificate) ks.getCertificate(alias);
+        X509Cert cert = new X509Cert((X509Certificate) ks.getCertificate(alias));
 
         keyAndCerts.add(new DHSigStaticKeyCertPair(key, cert));
-        certs.add(new X509Cert(cert));
+        certs.add(cert);
       }
 
       this.certs = certs.toArray(new X509Cert[0]);

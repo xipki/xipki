@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,6 +41,7 @@ import org.xipki.ca.api.NameId;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
+import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
@@ -415,7 +415,7 @@ public class CaConf {
           }
 
           if (ci.getGenSelfIssued() == null) {
-            X509Certificate caCert;
+            X509Cert caCert;
 
             if (ci.getCert() != null) {
               byte[] bytes = getBinary(ci.getCert(), zipEntries);
@@ -433,7 +433,7 @@ public class CaConf {
                 SignerConf signerConf = new SignerConf(signerConfs.get(0)[1]);
 
                 signer = securityFactory.createSigner(expandConf(ci.getSignerType()), signerConf,
-                    (X509Certificate) null);
+                    (X509Cert) null);
               } catch (ObjectCreationException | XiSecurityException ex) {
                 throw new InvalidConfException("could not create CA signer for CA " + name, ex);
               }
@@ -444,7 +444,7 @@ public class CaConf {
 
             // certchain
             if (CollectionUtil.isNotEmpty(ci.getCertchain())) {
-              List<X509Certificate> certchain = new LinkedList<>();
+              List<X509Cert> certchain = new LinkedList<>();
               for (FileOrBinary cc : ci.getCertchain()) {
                 byte[] bytes = getBinary(cc, zipEntries);
                 try {

@@ -19,7 +19,6 @@ package org.xipki.ocsp.server;
 
 import java.io.IOException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +33,7 @@ import org.xipki.ocsp.server.type.ResponderID;
 import org.xipki.ocsp.server.type.TaggedCertSequence;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 
 /**
@@ -51,11 +51,11 @@ class ResponseSigner {
 
   private final TaggedCertSequence sequenceOfCert;
 
-  private final X509Certificate cert;
+  private final X509Cert cert;
 
   private final TaggedCertSequence sequenceOfCertChain;
 
-  private final X509Certificate[] certChain;
+  private final X509Cert[] certChain;
 
   private final ResponderID responderIdByName;
 
@@ -78,18 +78,18 @@ class ResponseSigner {
       byte[] keySha1 = firstSigner.getSha1OfMacKey();
       this.responderIdByKey = new ResponderID(keySha1);
     } else {
-      X509Certificate[] tmpCertChain = firstSigner.getCertificateChain();
+      X509Cert[] tmpCertChain = firstSigner.getCertificateChain();
       if (tmpCertChain == null || tmpCertChain.length == 0) {
         throw new CertificateException("no certificate is bound with the signer");
       }
       int len = tmpCertChain.length;
       if (len > 1) {
-        X509Certificate cert = tmpCertChain[len - 1];
-        if (cert.getIssuerX500Principal().equals(cert.getSubjectX500Principal())) {
+        X509Cert cert = tmpCertChain[len - 1];
+        if (cert.getIssuer().equals(cert.getSubject())) {
           len--;
         }
       }
-      this.certChain = new X509Certificate[len];
+      this.certChain = new X509Cert[len];
       System.arraycopy(tmpCertChain, 0, this.certChain, 0, len);
 
       this.cert = certChain[0];
@@ -145,11 +145,11 @@ class ResponseSigner {
     return byName ? responderIdByName :  responderIdByKey;
   }
 
-  public X509Certificate getCert() {
+  public X509Cert getCert() {
     return cert;
   }
 
-  public X509Certificate[] getCertChain() {
+  public X509Cert[] getCertChain() {
     return certChain;
   }
 

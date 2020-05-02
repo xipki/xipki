@@ -18,9 +18,9 @@
 package org.xipki.ca.api.publisher;
 
 import java.io.Closeable;
-import java.security.cert.X509CRL;
 import java.util.Map;
 
+import org.bouncycastle.cert.X509CRLHolder;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.password.PasswordResolver;
@@ -128,7 +128,7 @@ public abstract class CertPublisher implements Closeable {
    *          CRL to be published. Must not be {@code null}.
    * @return whether the CRL is published.
    */
-  public abstract boolean crlAdded(X509Cert caCert, X509CRL crl);
+  public abstract boolean crlAdded(X509Cert caCert, X509CRLHolder crl);
 
   /**
    * Publishes the revocation of a CA.

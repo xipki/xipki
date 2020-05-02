@@ -25,7 +25,6 @@ import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
-import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.List;
@@ -38,11 +37,12 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.apache.karaf.shell.support.completers.StringsCompleter;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.cert.X509CRLHolder;
 import org.xipki.scep.client.CaCertValidator;
 import org.xipki.scep.client.CaIdentifier;
 import org.xipki.scep.client.EnrolmentResponse;
 import org.xipki.scep.client.ScepClient;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
@@ -128,7 +128,7 @@ public class Actions {
 
     protected ScepClient getScepClient() throws CertificateException, IOException {
       if (scepClient == null) {
-        X509Certificate caCert = X509Util.parseCert(new File(caCertFile));
+        X509Certificate caCert = X509Util.parseCert(new File(caCertFile)).toJceCert();
         CaIdentifier tmpCaId = new CaIdentifier(url, caId);
         CaCertValidator caCertValidator = new CaCertValidator.PreprovisionedCaCertValidator(caCert);
         scepClient = new ScepClient(tmpCaId, caCertValidator);
@@ -331,10 +331,10 @@ public class Actions {
 
     @Override
     protected Object execute0() throws Exception {
-      Certificate cert = X509Util.parseBcCert(new File(certFile));
+      X509Cert cert = X509Util.parseCert(new File(certFile));
       ScepClient client = getScepClient();
-      X509CRL crl = client.scepGetCrl(getIdentityKey(), getIdentityCert(),
-          cert.getIssuer(), cert.getSerialNumber().getPositiveValue());
+      X509CRLHolder crl = client.scepGetCrl(getIdentityKey(), getIdentityCert(),
+          cert.getIssuer(), cert.getSerialNumber());
       if (crl == null) {
         throw new CmdFailure("received no CRL from server");
       }

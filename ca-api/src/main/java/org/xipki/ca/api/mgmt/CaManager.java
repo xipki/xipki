@@ -20,16 +20,16 @@ package org.xipki.ca.api.mgmt;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.cert.X509CRLHolder;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
+import org.xipki.security.X509Cert;
 
 /**
  * Interface to manage the CA system.
@@ -580,7 +580,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  X509Certificate generateCertificate(String caName, String profileName, byte[] encodedCsr,
+  X509Cert generateCertificate(String caName, String profileName, byte[] encodedCsr,
       Date notBefore, Date notAfter) throws CaMgmtException;
 
   /**
@@ -597,8 +597,8 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  X509Certificate generateRootCa(MgmtEntry.Ca caEntry, String certprofileName, byte[] encodedCsr,
-      BigInteger serialNumber) throws CaMgmtException;
+  X509Cert generateRootCa(MgmtEntry.Ca caEntry, String certprofileName,
+      byte[] encodedCsr, BigInteger serialNumber) throws CaMgmtException;
 
   /**
    * Adds a user.
@@ -645,7 +645,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  X509CRL generateCrlOnDemand(String caName) throws CaMgmtException;
+  X509CRLHolder generateCrlOnDemand(String caName) throws CaMgmtException;
 
   /**
    * Returns the CRL of CA {@code caName} with the CRL number {@code  crlNumber}.
@@ -657,7 +657,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  X509CRL getCrl(String caName, BigInteger crlNumber) throws CaMgmtException;
+  X509CRLHolder getCrl(String caName, BigInteger crlNumber) throws CaMgmtException;
 
   /**
    * Returns the latest CRL of CA {@code caName}.
@@ -667,7 +667,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  X509CRL getCurrentCrl(String caName) throws CaMgmtException;
+  X509CRLHolder getCurrentCrl(String caName) throws CaMgmtException;
 
   /**
    * Returns certificate with status information for the CA {@code caName}
@@ -705,7 +705,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if other error occurs.
    */
-  Map<String, X509Certificate> loadConf(InputStream zippedConfStream)
+  Map<String, X509Cert> loadConf(InputStream zippedConfStream)
       throws CaMgmtException, IOException;
 
   /**

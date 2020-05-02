@@ -18,7 +18,6 @@
 package org.xipki.cmpclient.internal;
 
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +27,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.xipki.security.AlgorithmValidator;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.Args;
 
@@ -114,18 +114,18 @@ abstract class Responder {
 
   static class SignaturetCmpResponder extends Responder {
 
-    private final X509Certificate cert;
+    private final X509Cert cert;
 
     private final AlgorithmValidator sigAlgoValidator;
 
-    public SignaturetCmpResponder(X509Certificate cert, AlgorithmValidator sigAlgoValidator) {
-      super(X500Name.getInstance(
-              Args.notNull(cert, "cert").getSubjectX500Principal().getEncoded()));
+    public SignaturetCmpResponder(X509Cert cert,
+        AlgorithmValidator sigAlgoValidator) {
+      super(Args.notNull(cert, "cert").getSubject());
       this.cert = cert;
       this.sigAlgoValidator = Args.notNull(sigAlgoValidator, "sigAlgoValidator");
     }
 
-    public X509Certificate getCert() {
+    public X509Cert getCert() {
       return cert;
     }
 

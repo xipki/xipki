@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
@@ -32,6 +31,7 @@ import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
+import org.xipki.security.X509Cert;
 import org.xipki.security.pkcs12.KeystoreGenerationParameters;
 import org.xipki.security.pkcs12.P12KeyGenerationResult;
 import org.xipki.security.pkcs12.P12KeyGenerator;
@@ -271,7 +271,7 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
 
     SignerConf signerConf = getKeystoreSignerConf(new ByteArrayInputStream(keystore), PASSWORD,
         signatureAlgorithm, threads + Math.max(2, threads * 5 / 4));
-    this.signer = securityFactory.createSigner(tokenType, signerConf, (X509Certificate) null);
+    this.signer = securityFactory.createSigner(tokenType, signerConf, (X509Cert) null);
   }
 
   @Override

@@ -139,7 +139,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
 
     public GeneralName requestor() throws CertificateException, IOException {
       if (requestor == null && requestorCert != null) {
-        X500Name subject = X509Util.parseBcCert(new File(requestorCert)).getSubject();
+        X500Name subject = X509Util.parseCert(new File(requestorCert)).getSubject();
         requestor = new GeneralName(subject);
       }
       return requestor;
@@ -147,7 +147,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
 
     public GeneralName responder() throws CertificateException, IOException {
       if (responder == null && responderCert != null) {
-        X500Name subject = X509Util.parseBcCert(new File(responderCert)).getSubject();
+        X500Name subject = X509Util.parseCert(new File(responderCert)).getSubject();
         responder = new GeneralName(subject);
       }
       return responder;

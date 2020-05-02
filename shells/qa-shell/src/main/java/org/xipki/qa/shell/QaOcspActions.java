@@ -26,7 +26,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -41,7 +40,6 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
-import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +61,7 @@ import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.IssuerHash;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
@@ -213,9 +212,9 @@ public class QaOcspActions {
         linuxShellFile.setExecutable(true);
       }
 
-      X509Certificate issuerCert = X509Util.parseCert(new File(issuerCertFile));
+      X509Cert issuerCert = X509Util.parseCert(new File(issuerCertFile));
 
-      X509Certificate respIssuer = null;
+      X509Cert respIssuer = null;
       if (respIssuerFile != null) {
         respIssuer = X509Util.parseCert(new File(respIssuerFile));
         IoUtil.save(new File(outDir, "responder-issuer.pem"),
@@ -226,7 +225,7 @@ public class QaOcspActions {
 
       IssuerHash issuerHash = new IssuerHash(
           HashAlgo.getNonNullInstance(requestOptions.getHashAlgorithmId()),
-          Certificate.getInstance(issuerCert.getEncoded()));
+          issuerCert);
 
       OutputStream resultOut = Files.newOutputStream(Paths.get(outDir.getPath(), "overview.txt"));
       BufferedReader snReader = Files.newBufferedReader(Paths.get(snFile));
@@ -332,7 +331,7 @@ public class QaOcspActions {
     } // method execute0
 
     private ValidationResult processOcspQuery(OcspQa ocspQa, String line, File messageDir,
-        File detailsDir, URL serverUrl, X509Certificate respIssuer, X509Certificate issuerCert,
+        File detailsDir, URL serverUrl, X509Cert respIssuer, X509Cert issuerCert,
         IssuerHash issuerHash, RequestOptions requestOptions) throws Exception {
       StringTokenizer tokens = new StringTokenizer(line, ",;:");
 
@@ -401,7 +400,7 @@ public class QaOcspActions {
 
     private ValidationResult processOcspQuery(OcspQa ocspQa, BigInteger serialNumber,
         OcspCertStatus status, Date revTime, File messageDir, File detailsDir,
-        URL serverUrl, X509Certificate respIssuer, X509Certificate issuerCert,
+        URL serverUrl, X509Cert respIssuer, X509Cert issuerCert,
         IssuerHash issuerHash, RequestOptions requestOptions) throws Exception {
       if (unknownAsGood && status == OcspCertStatus.unknown) {
         status = OcspCertStatus.good;
@@ -551,7 +550,7 @@ public class QaOcspActions {
           }
         } else  if (certFiles != null) {
           for (String certFile : certFiles) {
-            X509Certificate cert;
+            X509Cert cert;
             try {
               cert = X509Util.parseCert(new File(certFile));
             } catch (Exception ex) {
@@ -570,7 +569,7 @@ public class QaOcspActions {
         String description = StringUtil.concatObjects("issuer cert: ", issuerCertFile,
             "\nserver URL: ",serverUrl, "\nmaxRequest: ", maxRequests, "\nhash: ", hashAlgo);
 
-        Certificate issuerCert = X509Util.parseBcCert(new File(issuerCertFile));
+        X509Cert issuerCert = X509Util.parseCert(new File(issuerCertFile));
 
         RequestOptions options = getRequestOptions();
         OcspBenchmark loadTest = new OcspBenchmark(issuerCert, serverUrl, options,
@@ -648,7 +647,7 @@ public class QaOcspActions {
     private TripleState expectedNonceOccurrence;
 
     @Override
-    protected void checkParameters(X509Certificate respIssuer, List<BigInteger> serialNumbers,
+    protected void checkParameters(X509Cert respIssuer, List<BigInteger> serialNumbers,
         Map<BigInteger, byte[]> encodedCerts) throws Exception {
       Args.notEmpty(serialNumbers, "serialNunmbers");
 
@@ -703,7 +702,7 @@ public class QaOcspActions {
     } // method checkParameters
 
     @Override
-    protected void processResponse(OCSPResp response, X509Certificate respIssuer,
+    protected void processResponse(OCSPResp response, X509Cert respIssuer,
         IssuerHash issuerHash, List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
         throws Exception {
       OcspResponseOption responseOption = new OcspResponseOption();

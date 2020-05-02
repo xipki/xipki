@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,7 +38,6 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
-import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.CaConfs;
@@ -61,6 +59,7 @@ import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
@@ -153,12 +152,12 @@ public class CaActions {
     protected Object execute0() throws Exception {
       MgmtEntry.Ca caEntry = getCaEntry();
       if (certFile != null) {
-        X509Certificate caCert = X509Util.parseCert(new File(certFile));
+        X509Cert caCert = X509Util.parseCert(new File(certFile));
         caEntry.setCert(caCert);
       }
 
       if (CollectionUtil.isNotEmpty(issuerCertFiles)) {
-        List<X509Certificate> list = new ArrayList<>(issuerCertFiles.size());
+        List<X509Cert> list = new ArrayList<>(issuerCertFiles.size());
         for (String m : issuerCertFiles) {
           list.add(X509Util.parseCert(Paths.get(m).toFile()));
         }
@@ -536,8 +535,7 @@ public class CaActions {
         serialNumber = toBigInt(serialS);
       }
 
-      X509Certificate rootcaCert = caManager.generateRootCa(caEntry, rootcaProfile, csr,
-          serialNumber);
+      X509Cert rootcaCert = caManager.generateRootCa(caEntry, rootcaProfile, csr, serialNumber);
       if (rootcaCertOutFile != null) {
         saveVerbose("saved root certificate to file", rootcaCertOutFile,
             encodeCert(rootcaCert.getEncoded(), outform));
@@ -1490,7 +1488,7 @@ public class CaActions {
           confStream = Files.newInputStream(Paths.get(confFile));
         }
 
-        Map<String, X509Certificate> rootCerts = caManager.loadConf(confStream);
+        Map<String, X509Cert> rootCerts = caManager.loadConf(confStream);
         if (CollectionUtil.isEmpty(rootCerts)) {
           println("loaded " + msg);
         } else {
@@ -1982,7 +1980,7 @@ public class CaActions {
 
       MgmtEntry.Requestor entry;
       if (certFile != null) {
-        X509Certificate cert = X509Util.parseCert(IoUtil.read(certFile));
+        X509Cert cert = X509Util.parseCert(IoUtil.read(certFile));
         entry = new MgmtEntry.Requestor(new NameId(null, name), MgmtEntry.Requestor.TYPE_CERT,
             Base64.encodeToString(cert.getEncoded()));
       } else {
@@ -2105,7 +2103,7 @@ public class CaActions {
       String conf;
       if (certFile != null) {
         type = MgmtEntry.Requestor.TYPE_CERT;
-        X509Certificate cert = X509Util.parseCert(IoUtil.read(certFile));
+        X509Cert cert = X509Util.parseCert(IoUtil.read(certFile));
         conf = Base64.encodeToString(cert.getEncoded());
       } else {
         type = MgmtEntry.Requestor.TYPE_PBM;
@@ -2198,7 +2196,7 @@ public class CaActions {
     @Override
     protected Object execute0() throws Exception {
       String base64Cert = null;
-      X509Certificate signerCert = null;
+      X509Cert signerCert = null;
       if (certFile != null) {
         signerCert = X509Util.parseCert(new File(certFile));
         base64Cert = IoUtil.base64Encode(signerCert.getEncoded(), false);
@@ -2338,7 +2336,7 @@ public class CaActions {
       if (CaManager.NULL.equalsIgnoreCase(certFile)) {
         cert = CaManager.NULL;
       } else if (certFile != null) {
-        Certificate bcCert = X509Util.parseBcCert(new File(certFile));
+        X509Cert bcCert = X509Util.parseCert(new File(certFile));
         byte[] certBytes = bcCert.getEncoded();
         cert = Base64.encodeToString(certBytes);
       }

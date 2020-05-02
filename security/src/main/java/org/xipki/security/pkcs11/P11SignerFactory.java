@@ -19,7 +19,6 @@ package org.xipki.security.pkcs11;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -32,6 +31,7 @@ import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.SignerFactory;
+import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.Hex;
@@ -79,7 +79,7 @@ public class P11SignerFactory implements SignerFactory {
 
   @Override
   public ConcurrentContentSigner newSigner(String type, SignerConf conf,
-      X509Certificate[] certificateChain) throws ObjectCreationException {
+      X509Cert[] certificateChain) throws ObjectCreationException {
     if (!TYPE.equalsIgnoreCase(type)) {
       throw new ObjectCreationException("unknown signer type " + type);
     }

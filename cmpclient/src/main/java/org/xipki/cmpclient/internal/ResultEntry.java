@@ -18,7 +18,6 @@
 package org.xipki.cmpclient.internal;
 
 import java.math.BigInteger;
-import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.cmp.PKIStatus;
@@ -122,11 +121,6 @@ abstract class ResultEntry extends IdentifiedObject {
     private final BigInteger serialNumber;
 
     private byte[] authorityKeyIdentifier;
-
-    public UnrevokeOrRemoveCert(String id, X509Certificate cert) {
-      this(id, X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()),
-          cert.getSerialNumber());
-    }
 
     public UnrevokeOrRemoveCert(String id, X500Name issuer, BigInteger serialNumber) {
       super(id);

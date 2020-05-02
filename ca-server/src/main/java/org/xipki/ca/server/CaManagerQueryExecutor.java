@@ -20,7 +20,6 @@ package org.xipki.ca.server;
 import java.io.IOException;
 import java.security.cert.CertPathBuilderException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -58,6 +57,7 @@ import org.xipki.password.PasswordResolverException;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
+import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
@@ -204,7 +204,7 @@ class CaManagerQueryExecutor {
     return datasource.buildSelectFirstSql(1, coreSql);
   }
 
-  private X509Certificate generateCert(String b64Cert) throws CaMgmtException {
+  private X509Cert generateCert(String b64Cert) throws CaMgmtException {
     if (b64Cert == null) {
       return null;
     }
@@ -212,13 +212,13 @@ class CaManagerQueryExecutor {
     return parseCert(Base64.decode(b64Cert));
   } // method generateCert
 
-  private List<X509Certificate> generateCertchain(String encodedCertchain) throws CaMgmtException {
+  private List<X509Cert> generateCertchain(String encodedCertchain) throws CaMgmtException {
     if (StringUtil.isBlank(encodedCertchain)) {
       return null;
     }
 
     try {
-      List<X509Certificate> certs = X509Util.listCertificates(encodedCertchain);
+      List<X509Cert> certs = X509Util.listCertificates(encodedCertchain);
       return CollectionUtil.isEmpty(certs) ? null : certs;
     } catch (CertificateException | IOException ex) {
       throw new CaMgmtException(ex);
@@ -509,7 +509,7 @@ class CaManagerQueryExecutor {
           ? new RevokeSuspendedControl(false) : new RevokeSuspendedControl(str);
       entry.setRevokeSuspendedControl(revokeSuspended);
 
-      List<X509Certificate> certchain = generateCertchain(rs.getString("CERTCHAIN"));
+      List<X509Cert> certchain = generateCertchain(rs.getString("CERTCHAIN"));
       // validate certchain
       if (CollectionUtil.isNotEmpty(certchain)) {
         buildCertChain(entry.getCert(), certchain);
@@ -735,7 +735,7 @@ class CaManagerQueryExecutor {
       byte[] encodedCert = caEntry.getCert().getEncoded();
       ps.setString(idx++, Base64.encodeToString(encodedCert));
 
-      List<X509Certificate> certchain = caEntry.getCertchain();
+      List<X509Cert> certchain = caEntry.getCertchain();
       if (CollectionUtil.isEmpty(certchain)) {
         ps.setString(idx++, null);
       } else {
@@ -788,8 +788,6 @@ class CaManagerQueryExecutor {
       }
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource.translate(sql, ex));
-    } catch (CertificateException ex) {
-      throw new CaMgmtException(ex);
     } finally {
       datasource.releaseResources(ps, null);
     }
@@ -1046,7 +1044,7 @@ class CaManagerQueryExecutor {
     String signerType = changeCaEntry.getSignerType();
     String signerConf = changeCaEntry.getSignerConf();
 
-    X509Certificate caCert = null;
+    X509Cert caCert = null;
 
     if (signerType != null || signerConf != null || encodedCert != null
         || CollectionUtil.isNotEmpty(changeCaEntry.getEncodedCertchain())) {
@@ -1121,7 +1119,7 @@ class CaManagerQueryExecutor {
     String base64Cert = null;
     if (encodedCert != null) {
       try {
-        subject = X509Util.getRfc4519Name(X509Util.parseBcCert(encodedCert).getSubject());
+        subject = X509Util.parseCert(encodedCert).getIssuerRfc4519Text();
         base64Cert = Base64.encodeToString(encodedCert);
       } catch (CertificateException ex) {
         throw new CaMgmtException("could not parse the certificate", ex);
@@ -1198,7 +1196,7 @@ class CaManagerQueryExecutor {
       if (encodedCertchain.size() == 0) {
         certchainStr = CaManager.NULL;
       } else {
-        List<X509Certificate> certs = new LinkedList<>();
+        List<X509Cert> certs = new LinkedList<>();
         for (byte[] m : changeCaEntry.getEncodedCertchain()) {
           certs.add(parseCert(m));
         }
@@ -1902,17 +1900,17 @@ class CaManagerQueryExecutor {
     return CaManager.NULL.equalsIgnoreCase(str) ? null : str;
   }
 
-  private static String encodeCertchain(List<X509Certificate> certs) throws CaMgmtException {
+  private static String encodeCertchain(List<X509Cert> certs) throws CaMgmtException {
     try {
-      return X509Util.encodeCertificates(certs.toArray(new X509Certificate[0]));
+      return X509Util.encodeCertificates(certs.toArray(new X509Cert[0]));
     } catch (CertificateException | IOException ex) {
       throw new CaMgmtException(ex);
     }
   } // method encodeCertchain
 
-  private static List<X509Certificate> buildCertChain(X509Certificate targetCert,
-      List<X509Certificate> certs) throws CaMgmtException {
-    X509Certificate[] certchain;
+  private static List<X509Cert> buildCertChain(X509Cert targetCert,
+      List<X509Cert> certs) throws CaMgmtException {
+    X509Cert[] certchain;
     try {
       certchain = X509Util.buildCertPath(targetCert, certs, false);
     } catch (CertPathBuilderException ex) {
@@ -1925,7 +1923,7 @@ class CaManagerQueryExecutor {
     return Arrays.asList(certchain);
   } // method buildCertChain
 
-  private static X509Certificate parseCert(byte[] encodedCert) throws CaMgmtException {
+  private static X509Cert parseCert(byte[] encodedCert) throws CaMgmtException {
     try {
       return X509Util.parseCert(encodedCert);
     } catch (CertificateException ex) {

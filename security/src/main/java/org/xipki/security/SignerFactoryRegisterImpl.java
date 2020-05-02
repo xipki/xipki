@@ -17,7 +17,6 @@
 
 package org.xipki.security;
 
-import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -83,7 +82,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
 
   @Override
   public ConcurrentContentSigner newSigner(SecurityFactory securityFactory, String type,
-      SignerConf conf, X509Certificate[] certificateChain) throws ObjectCreationException {
+      SignerConf conf, X509Cert[] certificateChain) throws ObjectCreationException {
     Args.notBlank(type, "type");
 
     for (SignerFactory service : factories) {

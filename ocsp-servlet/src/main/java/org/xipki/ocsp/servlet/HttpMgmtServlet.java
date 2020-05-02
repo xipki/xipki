@@ -19,7 +19,6 @@ package org.xipki.ocsp.servlet;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.cert.X509Certificate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,6 +34,7 @@ import org.xipki.ocsp.api.mgmt.MgmtRequest;
 import org.xipki.ocsp.api.mgmt.OcspMgmtException;
 import org.xipki.ocsp.server.OcspServerImpl;
 import org.xipki.password.PasswordResolverException;
+import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.util.Args;
 import org.xipki.util.HttpConstants;
@@ -71,11 +71,11 @@ public class HttpMgmtServlet extends HttpServlet {
 
   private static final String CT_RESPONSE = "application/json";
 
-  private Set<X509Certificate> mgmtCerts;
+  private Set<X509Cert> mgmtCerts;
 
   private OcspServerImpl ocspServer;
 
-  public void setMgmtCerts(Set<X509Certificate> mgmtCerts) {
+  public void setMgmtCerts(Set<X509Cert> mgmtCerts) {
     this.mgmtCerts = new HashSet<>(Args.notEmpty(mgmtCerts, "mgmtCerts"));
   }
 
@@ -87,7 +87,7 @@ public class HttpMgmtServlet extends HttpServlet {
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
     try {
-      X509Certificate clientCert = TlsHelper.getTlsClientCert(request);
+      X509Cert clientCert = TlsHelper.getTlsClientCert(request);
       if (clientCert == null) {
         throw new MyException(HttpServletResponse.SC_UNAUTHORIZED,
             "remote management is not permitted if TLS client certificate is not present");

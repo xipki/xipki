@@ -19,7 +19,6 @@ package org.xipki.ocsp.server.store;
 
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -52,6 +51,7 @@ import org.xipki.ocsp.server.OcspServerConf;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
@@ -188,7 +188,7 @@ public class CaDbCertStatusStore extends OcspStore {
               continue;
             }
 
-            X509Certificate cert = X509Util.parseCert(certBytes);
+            X509Cert cert = X509Util.parseCert(certBytes);
 
             IssuerEntry caInfoEntry = new IssuerEntry(rs.getInt("ID"), cert);
             RequestIssuer reqIssuer = new RequestIssuer(HashAlgo.SHA1,
@@ -459,8 +459,8 @@ public class CaDbCertStatusStore extends OcspStore {
     this.certHashAlgo = HashAlgo.SHA1;
 
     try {
-      Set<X509Certificate> includeIssuers = null;
-      Set<X509Certificate> excludeIssuers = null;
+      Set<X509Cert> includeIssuers = null;
+      Set<X509Cert> excludeIssuers = null;
 
       if (caCerts != null) {
         if (CollectionUtil.isNotEmpty(caCerts.getIncludes())) {
@@ -517,7 +517,7 @@ public class CaDbCertStatusStore extends OcspStore {
   }
 
   @Override
-  public X509Certificate getIssuerCert(RequestIssuer reqIssuer) {
+  public X509Cert getIssuerCert(RequestIssuer reqIssuer) {
     if (issuerStore == null) {
       return null;
     }

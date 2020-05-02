@@ -28,6 +28,7 @@ import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -35,6 +36,8 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.BERTags;
 import org.bouncycastle.asn1.DERBitString;
+import org.bouncycastle.asn1.DERGeneralizedTime;
+import org.bouncycastle.asn1.DERUTCTime;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.CRLReason;
@@ -222,7 +225,18 @@ public class CrlStreamParser extends Asn1StreamParser {
 
         coreExtValue = X509Util.getCoreExtValue(extns, Extension.invalidityDate);
         if (coreExtValue != null) {
-          invalidityDate = readTime(coreExtValue);
+          int tag = coreExtValue[0] & 0xFF;;
+          try {
+            if (tag == BERTags.UTC_TIME) {
+              invalidityDate = DERUTCTime.getInstance(coreExtValue).getDate();
+            } else if (tag == BERTags.GENERALIZED_TIME) {
+              invalidityDate = DERGeneralizedTime.getInstance(coreExtValue).getDate();
+            } else {
+              throw new IllegalArgumentException("invalid tag " + tag);
+            }
+          } catch (ParseException ex) {
+            throw new IllegalArgumentException("error parsing time", ex);
+          }
         }
 
         coreExtValue = X509Util.getCoreExtValue(extns, Extension.reasonCode);

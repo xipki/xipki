@@ -19,10 +19,8 @@ package org.xipki.security;
 
 import java.security.InvalidKeyException;
 import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.xipki.util.Args;
@@ -39,25 +37,17 @@ import org.xipki.util.ObjectCreationException;
 public abstract class AbstractSecurityFactory implements SecurityFactory {
 
   @Override
-  public ConcurrentContentSigner createSigner(String type, SignerConf conf, X509Certificate cert)
+  public ConcurrentContentSigner createSigner(String type, SignerConf conf, X509Cert cert)
       throws ObjectCreationException {
-    X509Certificate[] certs = (cert == null) ? null : new X509Certificate[]{cert};
+    X509Cert[] certs = (cert == null) ? null : new X509Cert[]{cert};
     return createSigner(type, conf, certs);
   }
 
   @Override
-  public ContentVerifierProvider getContentVerifierProvider(X509Certificate cert)
+  public ContentVerifierProvider getContentVerifierProvider(X509Cert cert)
       throws InvalidKeyException {
     Args.notNull(cert, "cert");
     return getContentVerifierProvider(cert.getPublicKey());
-  }
-
-  @Override
-  public ContentVerifierProvider getContentVerifierProvider(X509CertificateHolder cert)
-      throws InvalidKeyException {
-    Args.notNull(cert, "cert");
-    PublicKey publicKey = generatePublicKey(cert.getSubjectPublicKeyInfo());
-    return getContentVerifierProvider(publicKey);
   }
 
   @Override

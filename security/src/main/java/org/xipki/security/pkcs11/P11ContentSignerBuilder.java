@@ -22,8 +22,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.CertPathBuilderException;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
@@ -40,6 +38,7 @@ import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.DfltConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.X509Cert;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
@@ -58,7 +57,7 @@ public class P11ContentSignerBuilder {
 
   private final PublicKey publicKey;
 
-  private final X509Certificate[] certificateChain;
+  private final X509Cert[] certificateChain;
 
   private final P11CryptService cryptService;
 
@@ -67,14 +66,14 @@ public class P11ContentSignerBuilder {
   private final P11IdentityId identityId;
 
   public P11ContentSignerBuilder(P11CryptService cryptService, SecurityFactory securityFactory,
-      P11IdentityId identityId, X509Certificate[] certificateChain)
+      P11IdentityId identityId, X509Cert[] certificateChain)
       throws XiSecurityException, P11TokenException {
     this.cryptService = Args.notNull(cryptService, "cryptService");
     this.securityFactory = Args.notNull(securityFactory, "securityFactory");
     this.identityId = Args.notNull(identityId, "identityId");
 
     P11Identity identity = cryptService.getIdentity(identityId);
-    X509Certificate signerCertInP11 = identity.getCertificate();
+    X509Cert signerCertInP11 = identity.getCertificate();
     PublicKey publicKeyInP11 = (signerCertInP11 != null) ? signerCertInP11.getPublicKey()
         : identity.getPublicKey();
 
@@ -82,9 +81,9 @@ public class P11ContentSignerBuilder {
       throw new XiSecurityException("public key with " + identityId + " does not exist");
     }
 
-    Set<Certificate> caCerts = new HashSet<>();
+    Set<X509Cert> caCerts = new HashSet<>();
 
-    X509Certificate cert;
+    X509Cert cert;
     if (certificateChain != null && certificateChain.length > 0) {
       final int n = certificateChain.length;
       cert = certificateChain[0];
@@ -100,7 +99,7 @@ public class P11ContentSignerBuilder {
     }
 
     if (cert != null) {
-      Certificate[] certsInKeystore = identity.certificateChain();
+      X509Cert[] certsInKeystore = identity.certificateChain();
       if (certsInKeystore != null && certsInKeystore.length > 1) {
         for (int i = 1; i < certsInKeystore.length; i++) {
           caCerts.add(certsInKeystore[i]);

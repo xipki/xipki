@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.PublicKey;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -36,6 +35,7 @@ import org.bouncycastle.asn1.DERSequence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.BadAsn1ObjectException;
+import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.P11CryptService;
 import org.xipki.security.pkcs11.P11DuplicateEntityException;
@@ -53,7 +53,6 @@ import org.xipki.security.pkcs11.P11UnsupportedMechanismException;
 import org.xipki.security.pkcs11.proxy.P11ProxyConstants;
 import org.xipki.security.pkcs11.proxy.ProxyMessage;
 import org.xipki.security.util.KeyUtil;
-import org.xipki.security.util.X509Util;
 import org.xipki.util.Hex;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
@@ -200,7 +199,7 @@ public class P11ProxyResponder {
         case P11ProxyConstants.ACTION_ADD_CERT: {
           ProxyMessage.AddCertParams asn1 = ProxyMessage.AddCertParams.getInstance(content);
           P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());
-          X509Certificate cert = X509Util.toX509Cert(asn1.getCertificate());
+          X509Cert cert = new X509Cert(asn1.getCertificate());
           slot.addCert(cert, asn1.getControl());
           return getSuccessResp(version, transactionId, action, (byte[]) null);
         }
@@ -281,8 +280,7 @@ public class P11ProxyResponder {
               ProxyMessage.SlotIdAndObjectId.getInstance(content);
           P11SlotIdentifier slotId = identityId.getSlotId().getValue();
           P11ObjectIdentifier certId = identityId.getObjectId().getValue();
-          X509Certificate cert = p11CryptService.getCert(slotId, certId);
-
+          X509Cert cert = p11CryptService.getCert(slotId, certId);
           if (cert == null) {
             throw new P11UnknownEntityException(slotId, certId);
           }
@@ -433,7 +431,7 @@ public class P11ProxyResponder {
           ProxyMessage.ObjectIdAndCert asn1 = ProxyMessage.ObjectIdAndCert.getInstance(content);
           P11Slot slot = getSlot(p11CryptService, asn1.getSlotId().getValue());
           slot.updateCertificate(asn1.getObjectId().getValue(),
-              X509Util.toX509Cert(asn1.getCertificate()));
+              new X509Cert(asn1.getCertificate()));
           return getSuccessResp(version, transactionId, action, (byte[])null);
         }
         default: {

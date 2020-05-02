@@ -28,10 +28,8 @@ import java.nio.file.Paths;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.cert.CertPathBuilderException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateParsingException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -99,6 +97,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
+import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
@@ -797,7 +796,7 @@ public class OcspServerImpl implements OcspServer {
           }
         } else if (master) {
           // store the issuer certificate in cache database.
-          X509Certificate issuerCert = null;
+          X509Cert issuerCert = null;
           for (OcspStore store : responder.getStores()) {
             issuerCert = store.getIssuerCert(certId.getIssuer());
             if (issuerCert != null) {
@@ -1103,15 +1102,15 @@ public class OcspServerImpl implements OcspServer {
   }
 
   private ResponseSigner initSigner(OcspServerConf.Signer signerType) throws InvalidConfException {
-    X509Certificate[] explicitCertificateChain = null;
+    X509Cert[] explicitCertificateChain = null;
 
-    X509Certificate explicitResponderCert = null;
+    X509Cert explicitResponderCert = null;
     if (signerType.getCert() != null) {
       explicitResponderCert = parseCert(signerType.getCert());
     }
 
     if (explicitResponderCert != null) {
-      Set<X509Certificate> caCerts = null;
+      Set<X509Cert> caCerts = null;
       if (signerType.getCaCerts() != null) {
         caCerts = new HashSet<>();
 
@@ -1258,10 +1257,15 @@ public class OcspServerImpl implements OcspServer {
     }
 
     OCSPReq ocspReq = new OCSPReq(req);
-    X509CertificateHolder[] certs = ocspReq.getCerts();
-    if (certs == null || certs.length < 1) {
+    X509CertificateHolder[] bcCerts = ocspReq.getCerts();
+    if (bcCerts == null || bcCerts.length < 1) {
       LOG.warn("no certificate found in request to verify the signature");
       return unsuccesfulOCSPRespMap.get(OcspResponseStatus.unauthorized);
+    }
+
+    X509Cert[] certs = new X509Cert[bcCerts.length];
+    for (int i = 0; i < certs.length; i++) {
+      certs[i] = new X509Cert(bcCerts[i]);
     }
 
     ContentVerifierProvider cvp;
@@ -1294,40 +1298,22 @@ public class OcspServerImpl implements OcspServer {
     return unsuccesfulOCSPRespMap.get(OcspResponseStatus.unauthorized);
   } // method checkSignature
 
-  private static boolean canBuildCertpath(X509CertificateHolder[] certsInReq,
+  private static boolean canBuildCertpath(X509Cert[] certsInReq,
       RequestOption requestOption, Date referenceTime) {
-    X509Certificate target;
-    try {
-      target = X509Util.toX509Cert(certsInReq[0].toASN1Structure());
-    } catch (CertificateException ex) {
-      return false;
-    }
-    Set<Certificate> certstore = new HashSet<>();
+    X509Cert target = certsInReq[0];
 
-    Set<CertWithEncoded> trustAnchors = requestOption.getTrustAnchors();
-    for (CertWithEncoded m : trustAnchors) {
-      certstore.add(m.getCert());
+    Set<X509Cert> certstore = new HashSet<>();
+    Set<X509Cert> trustAnchors = requestOption.getTrustAnchors();
+    for (X509Cert m : trustAnchors) {
+      certstore.add(m);
     }
 
-    final int n = certsInReq.length;
-    if (n > 1) {
-      for (int i = 1; i < n; i++) {
-        Certificate cert;
-        try {
-          cert = X509Util.toX509Cert(certsInReq[i].toASN1Structure());
-        } catch (CertificateException ex) {
-          continue;
-        }
-        certstore.add(cert);
-      }
-    }
-
-    Set<X509Certificate> configuredCerts = requestOption.getCerts();
+    Set<X509Cert> configuredCerts = requestOption.getCerts();
     if (CollectionUtil.isNotEmpty(configuredCerts)) {
       certstore.addAll(requestOption.getCerts());
     }
 
-    X509Certificate[] certpath;
+    X509Cert[] certpath;
     try {
       certpath = X509Util.buildCertPath(target, certstore);
     } catch (CertPathBuilderException ex) {
@@ -1339,7 +1325,7 @@ public class OcspServerImpl implements OcspServer {
 
     Date now = new Date();
     if (model == null || model == CertpathValidationModel.PKIX) {
-      for (X509Certificate m : certpath) {
+      for (X509Cert m : certpath) {
         if (m.getNotBefore().after(now) || m.getNotAfter().before(now)) {
           return false;
         }
@@ -1351,9 +1337,9 @@ public class OcspServerImpl implements OcspServer {
     }
 
     for (int i = certpath.length - 1; i >= 0; i--) {
-      X509Certificate targetCert = certpath[i];
-      for (CertWithEncoded m : trustAnchors) {
-        if (m.equalsCert(targetCert)) {
+      X509Cert targetCert = certpath[i];
+      for (X509Cert m : trustAnchors) {
+        if (m.equals(targetCert)) {
           return true;
         }
       }
@@ -1390,7 +1376,7 @@ public class OcspServerImpl implements OcspServer {
     }
   }
 
-  private static X509Certificate parseCert(FileOrBinary certConf) throws InvalidConfException {
+  private static X509Cert parseCert(FileOrBinary certConf) throws InvalidConfException {
     InputStream is = null;
     try {
       is = getInputStream(certConf);

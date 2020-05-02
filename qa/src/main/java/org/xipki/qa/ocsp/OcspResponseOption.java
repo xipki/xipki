@@ -18,9 +18,9 @@
 package org.xipki.qa.ocsp;
 
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.StringUtil;
 import org.xipki.util.TripleState;
@@ -34,7 +34,7 @@ import org.xipki.util.TripleState;
 
 public class OcspResponseOption {
 
-  private X509Certificate respIssuer;
+  private X509Cert respIssuer;
 
   private TripleState nonceOccurrence;
 
@@ -49,11 +49,11 @@ public class OcspResponseOption {
   public OcspResponseOption() {
   }
 
-  public X509Certificate getRespIssuer() {
+  public X509Cert getRespIssuer() {
     return respIssuer;
   }
 
-  public void setRespIssuer(X509Certificate respIssuer) {
+  public void setRespIssuer(X509Cert respIssuer) {
     this.respIssuer = respIssuer;
   }
 

@@ -19,8 +19,13 @@ package org.xipki.security.test;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.Security;
+
+import javax.security.cert.CertificateEncodingException;
 
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extensions;
@@ -54,8 +59,7 @@ public class CrlStreamParserTest {
   @Test
   public void parseCrl1() throws Exception {
     File crlFile = new File("src/test/resources/crls/crl-1/subcawithcrl1.crl");
-    Certificate issuerSigner = X509Util.parseBcCert(
-        new File("src/test/resources/crls/crl-1/ca.crt"));
+    Certificate issuerSigner = parseCert("src/test/resources/crls/crl-1/ca.crt");
 
     CrlStreamParser parser = new CrlStreamParser(crlFile);
     Assert.assertEquals("version", 1, parser.getVersion());
@@ -78,8 +82,7 @@ public class CrlStreamParserTest {
   @Test
   public void parseCrl2() throws Exception {
     File crlFile = new File("src/test/resources/crls/crl-2/ca1-crl.crl");
-    Certificate issuerSigner = X509Util.parseBcCert(
-        new File("src/test/resources/crls/crl-2/ca1-cert.crt"));
+    Certificate issuerSigner = parseCert("src/test/resources/crls/crl-2/ca1-cert.crt");
 
     CrlStreamParser parser = new CrlStreamParser(crlFile);
     Assert.assertEquals("version", 1, parser.getVersion());
@@ -102,8 +105,7 @@ public class CrlStreamParserTest {
   @Test
   public void parseCrlWithInvalidityDateAndXipkiSet() throws Exception {
     File crlFile = new File("src/test/resources/crls/crl-3/subcawithcrl1.crl");
-    Certificate issuerSigner = X509Util.parseBcCert(
-        new File("src/test/resources/crls/crl-3/ca.crt"));
+    Certificate issuerSigner = parseCert("src/test/resources/crls/crl-3/ca.crt");
 
     CrlStreamParser parser = new CrlStreamParser(crlFile);
     Assert.assertEquals("version", 1, parser.getVersion());
@@ -142,8 +144,7 @@ public class CrlStreamParserTest {
   @Test
   public void parseCrlWithNoRevokedCerts() throws Exception {
     File crlFile = new File("src/test/resources/crls/crl-4/no-revoked-certs.crl");
-    Certificate issuerSigner = X509Util.parseBcCert(
-        new File("src/test/resources/crls/crl-4/ca.crt"));
+    Certificate issuerSigner = parseCert("src/test/resources/crls/crl-4/ca.crt");
 
     CrlStreamParser parser = new CrlStreamParser(crlFile);
     Assert.assertEquals("version", 1, parser.getVersion());
@@ -166,8 +167,7 @@ public class CrlStreamParserTest {
   @Test
   public void parseCrlWithNoCrlNumber() throws Exception {
     File crlFile = new File("src/test/resources/crls/crl-5/no-crlnumber.crl");
-    Certificate issuerSigner = X509Util.parseBcCert(
-        new File("src/test/resources/crls/crl-5/ca.crt"));
+    Certificate issuerSigner = parseCert("src/test/resources/crls/crl-5/ca.crt");
 
     CrlStreamParser parser = new CrlStreamParser(crlFile);
     Assert.assertEquals("version", 1, parser.getVersion());
@@ -190,8 +190,7 @@ public class CrlStreamParserTest {
   @Test
   public void parseCrlWithNoExtension() throws Exception {
     File crlFile = new File("src/test/resources/crls/crl-6/no-extensions.crl");
-    Certificate issuerSigner = X509Util.parseBcCert(
-        new File("src/test/resources/crls/crl-6/ca.crt"));
+    Certificate issuerSigner = parseCert("src/test/resources/crls/crl-6/ca.crt");
 
     CrlStreamParser parser = new CrlStreamParser(crlFile);
     Assert.assertEquals("version", 1, parser.getVersion());
@@ -211,4 +210,13 @@ public class CrlStreamParserTest {
     Assert.assertEquals("#revokedCertificates", 0, numRevokedCerts);
   }
 
+  private static Certificate parseCert(String fileName)
+      throws IOException, CertificateEncodingException {
+    try {
+      return Certificate.getInstance(
+          X509Util.toDerEncoded(Files.readAllBytes(Paths.get(fileName))));
+    } catch (RuntimeException ex) {
+      throw new CertificateEncodingException("error decoding certificate: " + ex.getMessage());
+    }
+  }
 }

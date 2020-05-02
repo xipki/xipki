@@ -21,8 +21,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -53,6 +51,7 @@ import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
 import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.qa.ValidationResult;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
@@ -123,13 +122,8 @@ public class CertprofileQa {
 
     List<ValidationIssue> resultIssues = new LinkedList<ValidationIssue>();
 
-    Certificate bcCert;
-    TBSCertificate tbsCert;
-    X509Certificate cert;
-    ValidationIssue issue;
-
     // certificate size
-    issue = new ValidationIssue("X509.SIZE", "certificate size");
+    ValidationIssue issue = new ValidationIssue("X509.SIZE", "certificate size");
     resultIssues.add(issue);
 
     certBytes = X509Util.toDerEncoded(certBytes);
@@ -146,14 +140,9 @@ public class CertprofileQa {
     // certificate encoding
     issue = new ValidationIssue("X509.ENCODING", "certificate encoding");
     resultIssues.add(issue);
-    try {
-      bcCert = Certificate.getInstance(certBytes);
-      tbsCert = bcCert.getTBSCertificate();
-      cert = X509Util.parseCert(certBytes);
-    } catch (CertificateException ex) {
-      issue.setFailureMessage("certificate is not corrected encoded");
-      return new ValidationResult(resultIssues);
-    }
+    Certificate bcCert = Certificate.getInstance(certBytes);
+    TBSCertificate tbsCert = bcCert.getTBSCertificate();
+    X509Cert cert = new X509Cert(bcCert, certBytes);
 
     // syntax version
     issue = new ValidationIssue("X509.VERSION", "certificate version");
@@ -275,7 +264,7 @@ public class CertprofileQa {
     // issuer
     issue = new ValidationIssue("X509.ISSUER", "certificate issuer");
     resultIssues.add(issue);
-    if (!cert.getIssuerX500Principal().equals(issuerInfo.getCert().getSubjectX500Principal())) {
+    if (!cert.getIssuer().equals(issuerInfo.getCert().getSubject())) {
       issue.setFailureMessage("issue in certificate does not equal the subject of CA certificate");
     }
 

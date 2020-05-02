@@ -24,7 +24,6 @@ import java.security.MessageDigest;
 import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -53,7 +52,6 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AccessDescription;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
-import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
@@ -77,6 +75,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.IssuerHash;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
@@ -184,7 +183,7 @@ public class Actions {
      * @throws Exception
      *           if checking failed.
      */
-    protected abstract void checkParameters(X509Certificate respIssuer,
+    protected abstract void checkParameters(X509Cert respIssuer,
         List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts) throws Exception;
 
     /**
@@ -204,7 +203,7 @@ public class Actions {
      * @throws Exception
      *           if processing response failed.
      */
-    protected abstract void processResponse(OCSPResp response, X509Certificate respIssuer,
+    protected abstract void processResponse(OCSPResp response, X509Cert respIssuer,
         IssuerHash issuerHash, List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
         throws Exception;
 
@@ -214,7 +213,7 @@ public class Actions {
         throw new IllegalCmdParamException("Neither serialNumbers nor certFiles is set");
       }
 
-      X509Certificate issuerCert = X509Util.parseCert(new File(issuerCertFile));
+      X509Cert issuerCert = X509Util.parseCert(new File(issuerCertFile));
 
       Map<BigInteger, byte[]> encodedCerts = null;
       List<BigInteger> sns = new LinkedList<>();
@@ -232,8 +231,7 @@ public class Actions {
 
           if (isAttrCert) {
             if (issuerX500Name == null) {
-              issuerX500Name = X500Name.getInstance(
-                  issuerCert.getSubjectX500Principal().getEncoded());
+              issuerX500Name = issuerCert.getSubject();
             }
 
             X509AttributeCertificateHolder cert =
@@ -251,7 +249,7 @@ public class Actions {
             ocspUrls = extractOcspUrls(cert);
             sn = cert.getSerialNumber();
           } else {
-            X509Certificate cert = X509Util.parseCert(new File(certFile));
+            X509Cert cert = X509Util.parseCert(new File(certFile));
             if (!X509Util.issues(issuerCert, cert)) {
               throw new IllegalCmdParamException(
                   "certificate " + certFile + " is not issued by the given issuer");
@@ -311,7 +309,7 @@ public class Actions {
         throw new IllegalCmdParamException("could not get URL for the OCSP responder");
       }
 
-      X509Certificate respIssuer = null;
+      X509Cert respIssuer = null;
       if (respIssuerFile != null) {
         respIssuer = X509Util.parseCert(new File(respIssuerFile));
       }
@@ -328,7 +326,7 @@ public class Actions {
 
       IssuerHash issuerHash = new IssuerHash(
           HashAlgo.getNonNullInstance(options.getHashAlgorithmId()),
-          Certificate.getInstance(issuerCert.getEncoded()));
+          X509Util.parseCert(issuerCert.getEncoded()));
       OCSPResp response;
       try {
         response = requestor.ask(issuerCert, sns.toArray(new BigInteger[0]), serverUrlObj,
@@ -356,9 +354,9 @@ public class Actions {
       return null;
     } // method execute0
 
-    public static List<String> extractOcspUrls(X509Certificate cert)
+    public static List<String> extractOcspUrls(X509Cert cert)
         throws CertificateEncodingException {
-      byte[] extnValue = X509Util.getCoreExtValue(cert, Extension.authorityInfoAccess);
+      byte[] extnValue = cert.getExtensionCoreValue(Extension.authorityInfoAccess);
       if (extnValue == null) {
         return Collections.emptyList();
       }
@@ -369,7 +367,8 @@ public class Actions {
 
     public static List<String> extractOcspUrls(X509AttributeCertificateHolder cert)
         throws CertificateEncodingException {
-      byte[] extValue = X509Util.getCoreExtValue(cert, Extension.authorityInfoAccess);
+      byte[] extValue = X509Util.getCoreExtValue(cert.getExtensions(),
+          Extension.authorityInfoAccess);
       if (extValue == null) {
         return Collections.emptyList();
       }
@@ -461,13 +460,13 @@ public class Actions {
     private SecurityFactory securityFactory;
 
     @Override
-    protected void checkParameters(X509Certificate respIssuer, List<BigInteger> serialNumbers,
+    protected void checkParameters(X509Cert respIssuer, List<BigInteger> serialNumbers,
         Map<BigInteger, byte[]> encodedCerts) throws Exception {
       Args.notEmpty(serialNumbers, "serialNunmbers");
     }
 
     @Override
-    protected void processResponse(OCSPResp response, X509Certificate respIssuer,
+    protected void processResponse(OCSPResp response, X509Cert respIssuer,
         IssuerHash issuerHash, List<BigInteger> serialNumbers,
         Map<BigInteger, byte[]> encodedCerts) throws Exception {
       Args.notNull(response, "response");
@@ -563,10 +562,10 @@ public class Actions {
           // verify the OCSPResponse signer
           if (respIssuer != null) {
             boolean certValid = true;
-            X509Certificate jceRespSigner = X509Util.toX509Cert(respSigner.toASN1Structure());
-            if (X509Util.issues(respIssuer, jceRespSigner)) {
+            X509Cert respSigner2 = new X509Cert(respSigner);
+            if (X509Util.issues(respIssuer, respSigner2)) {
               try {
-                jceRespSigner.verify(respIssuer.getPublicKey());
+                respSigner2.verify(respIssuer.getPublicKey());
               } catch (SignatureException ex) {
                 certValid = false;
               }

@@ -20,7 +20,6 @@ package org.xipki.ocsp.server.store;
 import java.io.Closeable;
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -45,6 +44,7 @@ import org.xipki.ocsp.api.OcspRespWithCacheInfo.ResponseCacheInfo;
 import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.security.AlgorithmCode;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
@@ -218,7 +218,7 @@ public class ResponseCacher implements Closeable {
     return (issuer == null) ? null : issuer.getId();
   }
 
-  public synchronized Integer storeIssuer(X509Certificate issuerCert)
+  public synchronized Integer storeIssuer(X509Cert issuerCert)
       throws CertificateException, InvalidConfException, DataAccessException {
     if (!master) {
       throw new IllegalStateException("storeIssuer is not permitted in slave mode");
@@ -461,7 +461,7 @@ public class ResponseCacher implements Closeable {
             ps.setInt(1, id);
             rs = ps.executeQuery();
             rs.next();
-            X509Certificate cert = X509Util.parseCert(StringUtil.toUtf8Bytes(rs.getString("CERT")));
+            X509Cert cert = X509Util.parseCert(StringUtil.toUtf8Bytes(rs.getString("CERT")));
             IssuerEntry caInfoEntry = new IssuerEntry(id, cert);
             issuerStore.addIssuer(caInfoEntry);
             LOG.info("added issuer {}", id);
@@ -504,7 +504,7 @@ public class ResponseCacher implements Closeable {
 
       while (rs.next()) {
         int id = rs.getInt("ID");
-        X509Certificate cert = X509Util.parseCert(StringUtil.toUtf8Bytes(rs.getString("CERT")));
+        X509Cert cert = X509Util.parseCert(StringUtil.toUtf8Bytes(rs.getString("CERT")));
         IssuerEntry caInfoEntry = new IssuerEntry(id, cert);
         RequestIssuer reqIssuer = new RequestIssuer(HashAlgo.SHA1,
             caInfoEntry.getEncodedHash(HashAlgo.SHA1));
@@ -517,7 +517,7 @@ public class ResponseCacher implements Closeable {
           }
         }
 
-        String subject = cert.getSubjectX500Principal().getName();
+        String subject = cert.getSubject().toString();
         if (duplicated) {
           if (deleteIssuerStmt == null) {
             deleteIssuerStmt = datasource.prepareStatement(SQL_DELETE_ISSUER);

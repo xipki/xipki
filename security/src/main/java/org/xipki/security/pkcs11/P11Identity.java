@@ -18,7 +18,6 @@
 package org.xipki.security.pkcs11;
 
 import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
@@ -28,6 +27,7 @@ import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.jcajce.interfaces.XDHKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
@@ -54,7 +54,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
 
   private final int signatureKeyBitLength;
 
-  protected X509Certificate[] certificateChain;
+  protected X509Cert[] certificateChain;
 
   protected P11Identity(P11Slot slot, P11IdentityId id, int signatureBitLen) {
     this.slot = Args.notNull(slot, "slot");
@@ -64,7 +64,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
   } // constructor
 
   protected P11Identity(P11Slot slot, P11IdentityId id, PublicKey publicKey,
-      X509Certificate[] certificateChain) {
+      X509Cert[] certificateChain) {
     this.slot = Args.notNull(slot, "slot");
     this.id = Args.notNull(id, "id");
 
@@ -145,11 +145,11 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     return id;
   }
 
-  public X509Certificate getCertificate() {
+  public X509Cert getCertificate() {
     return (certificateChain != null && certificateChain.length > 0) ? certificateChain[0] : null;
   }
 
-  public X509Certificate[] certificateChain() {
+  public X509Cert[] certificateChain() {
     return (certificateChain == null) ? null
         : Arrays.copyOf(certificateChain, certificateChain.length);
   }
@@ -158,7 +158,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     return publicKey;
   }
 
-  public void setCertificates(X509Certificate[] certificateChain) throws P11TokenException {
+  public void setCertificates(X509Cert[] certificateChain) throws P11TokenException {
     if (CollectionUtil.isEmpty(certificateChain)) {
       this.certificateChain = null;
     } else {

@@ -29,7 +29,6 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -52,6 +51,7 @@ import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.SignerConf;
+import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityConstants;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.P11CryptService;
@@ -107,9 +107,9 @@ public class P11Actions {
     @Override
     protected Object execute0() throws Exception {
       byte[] id = (hexId == null) ? null : Hex.decode(hexId);
-      X509Certificate cert = X509Util.parseCert(new File(certFile));
+      X509Cert cert = X509Util.parseCert(new File(certFile));
       if (label == null) {
-        label = X509Util.getCommonName(cert.getSubjectX500Principal());
+        label = X509Util.getCommonName(cert.getSubject());
       }
       P11NewObjectControl control = new P11NewObjectControl(id, label);
       P11Slot slot = getSlot();
@@ -178,7 +178,7 @@ public class P11Actions {
     protected Object execute0() throws Exception {
       P11Slot slot = getSlot();
       P11ObjectIdentifier objIdentifier = getObjectIdentifier(id, label);
-      X509Certificate cert = slot.exportCert(objIdentifier);
+      X509Cert cert = slot.exportCert(objIdentifier);
       if (cert == null) {
         throw new CmdFailure("could not export certificate " + objIdentifier);
       }
@@ -211,7 +211,7 @@ public class P11Actions {
     protected Object execute0() throws Exception {
       P11Slot slot = getSlot();
       P11ObjectIdentifier objIdentifier = getObjectIdentifier(id, label);
-      X509Certificate newCert = X509Util.parseCert(new File(certFile));
+      X509Cert newCert = X509Util.parseCert(new File(certFile));
       slot.updateCertificate(objIdentifier, newCert);
       println("updated certificate");
       return null;
@@ -253,7 +253,7 @@ public class P11Actions {
 
       SignerConf conf = getPkcs11SignerConf(moduleName, slotIndex, label,
           idBytes, 1, HashAlgo.getNonNullInstance(hashAlgo), signatureAlgoControl);
-      return securityFactory.createSigner("PKCS11", conf, (X509Certificate[]) null);
+      return securityFactory.createSigner("PKCS11", conf, (X509Cert[]) null);
     }
 
     public static SignerConf getPkcs11SignerConf(String pkcs11ModuleName, Integer slotIndex,

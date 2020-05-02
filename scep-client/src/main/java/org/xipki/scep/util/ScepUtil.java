@@ -26,7 +26,6 @@ import java.security.cert.CRLException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
-import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.Arrays;
@@ -55,6 +54,7 @@ import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Time;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
+import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
@@ -114,7 +114,7 @@ public class ScepUtil {
     return certs;
   } // method getCertsFromSignedData
 
-  public static X509CRL getCrlFromPkiMessage(SignedData signedData) throws CRLException {
+  public static X509CRLHolder getCrlFromPkiMessage(SignedData signedData) throws CRLException {
     Args.notNull(signedData, "signedData");
     ASN1Set set = signedData.getCRLs();
     if (set == null || set.size() == 0) {
@@ -123,20 +123,8 @@ public class ScepUtil {
 
     try {
       CertificateList cl = CertificateList.getInstance(set.getObjectAt(0));
-
-      byte[] encodedCrl;
-      try {
-        encodedCrl = cl.getEncoded();
-      } catch (IOException ex) {
-        throw new CRLException("could not get encoded CRL", ex);
-      }
-
-      X509CRL crl = (X509CRL) getCertFactory().generateCRL(new ByteArrayInputStream(encodedCrl));
-      if (crl == null) {
-        throw new CRLException("the given one is not a valid X.509 CRL");
-      }
-      return crl;
-    } catch (IllegalArgumentException | CertificateException | CRLException ex) {
+      return new X509CRLHolder(cl);
+    } catch (IllegalArgumentException ex) {
       throw new CRLException(ex);
     }
   } // method getCrlFromPkiMessage

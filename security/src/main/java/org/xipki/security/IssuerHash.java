@@ -20,7 +20,6 @@ package org.xipki.security;
 import java.io.IOException;
 import java.util.Arrays;
 
-import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.util.Args;
 
 /**
@@ -47,7 +46,7 @@ public class IssuerHash {
     Args.range(issuerKeyHash.length, "issuerKeyHash.length", len, len);
   }
 
-  public IssuerHash(HashAlgo hashAlgo, Certificate issuerCert) throws IOException {
+  public IssuerHash(HashAlgo hashAlgo, X509Cert issuerCert) throws IOException {
     this.hashAlgo = Args.notNull(hashAlgo, "hashAlgo");
     Args.notNull(issuerCert, "issuerCert");
 

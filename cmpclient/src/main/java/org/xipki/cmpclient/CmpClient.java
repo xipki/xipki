@@ -19,8 +19,6 @@ package org.xipki.cmpclient;
 
 import java.io.Closeable;
 import java.math.BigInteger;
-import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +26,8 @@ import java.util.Set;
 
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.cert.X509CRLHolder;
+import org.xipki.security.X509Cert;
 import org.xipki.util.HealthCheckResult;
 import org.xipki.util.ReqRespDebug;
 
@@ -138,7 +138,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  CertIdOrError revokeCert(String caName, X509Certificate cert, int reason, Date invalidityTime,
+  CertIdOrError revokeCert(String caName, X509Cert cert, int reason, Date invalidityTime,
       ReqRespDebug debug) throws CmpClientException, PkiErrorException;
 
   /**
@@ -170,7 +170,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  X509CRL downloadCrl(String caName, ReqRespDebug debug)
+  X509CRLHolder downloadCrl(String caName, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException;
 
   /**
@@ -188,7 +188,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  X509CRL downloadCrl(String caName, BigInteger crlNumber, ReqRespDebug debug)
+  X509CRLHolder downloadCrl(String caName, BigInteger crlNumber, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException;
 
   /**
@@ -204,7 +204,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  X509CRL generateCrl(String caName, ReqRespDebug debug)
+  X509CRLHolder generateCrl(String caName, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException;
 
   /**
@@ -249,7 +249,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  CertIdOrError unrevokeCert(String caName, X509Certificate cert, ReqRespDebug debug)
+  CertIdOrError unrevokeCert(String caName, X509Cert cert, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException;
 
   /**
@@ -300,7 +300,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  CertIdOrError removeCert(String caName, X509Certificate cert, ReqRespDebug debug)
+  CertIdOrError removeCert(String caName, X509Cert cert, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException;
 
   /**
@@ -336,7 +336,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  X509Certificate getCaCert(String caName) throws CmpClientException;
+  X509Cert getCaCert(String caName) throws CmpClientException;
 
   /**
    * Returns the CA certificate chain.
@@ -346,7 +346,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  List<X509Certificate> getCaCertchain(String caName) throws CmpClientException;
+  List<X509Cert> getCaCertchain(String caName) throws CmpClientException;
 
   /**
    * Returns the subject of CA certificate.
@@ -366,7 +366,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  List<X509Certificate> getDhPocPeerCertificates(String caName) throws CmpClientException;
+  List<X509Cert> getDhPocPeerCertificates(String caName) throws CmpClientException;
 
   /**
    * Returns name of CA that supports give {@code certprofile}.

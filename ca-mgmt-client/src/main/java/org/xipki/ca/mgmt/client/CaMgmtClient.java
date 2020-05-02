@@ -27,8 +27,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +38,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.cert.X509CRLHolder;
 import org.xipki.ca.api.mgmt.CaManager;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaSystemStatus;
@@ -54,6 +53,7 @@ import org.xipki.ca.api.mgmt.MgmtRequest;
 import org.xipki.ca.api.mgmt.MgmtResponse;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.HttpConstants;
@@ -537,8 +537,8 @@ public class CaMgmtClient implements CaManager {
   } // method removeCertificate
 
   @Override
-  public X509Certificate generateCertificate(String caName, String profileName, byte[] encodedCsr,
-      Date notBefore, Date notAfter) throws CaMgmtException {
+  public X509Cert generateCertificate(String caName, String profileName,
+      byte[] encodedCsr, Date notBefore, Date notAfter) throws CaMgmtException {
     MgmtRequest.GenerateCertificate req = new MgmtRequest.GenerateCertificate();
     req.setCaName(caName);
     req.setProfileName(profileName);
@@ -552,7 +552,7 @@ public class CaMgmtClient implements CaManager {
   } // method generateCertificate
 
   @Override
-  public X509Certificate generateRootCa(MgmtEntry.Ca caEntry, String certprofileName,
+  public X509Cert generateRootCa(MgmtEntry.Ca caEntry, String certprofileName,
       byte[] encodedCsr, BigInteger serialNumber) throws CaMgmtException {
     MgmtRequest.GenerateRootCa req = new MgmtRequest.GenerateRootCa();
     req.setCaEntry(new CaEntryWrapper(caEntry));
@@ -593,14 +593,14 @@ public class CaMgmtClient implements CaManager {
   } // method getUser
 
   @Override
-  public X509CRL generateCrlOnDemand(String caName) throws CaMgmtException {
+  public X509CRLHolder generateCrlOnDemand(String caName) throws CaMgmtException {
     MgmtRequest.Name req = new MgmtRequest.Name(caName);
     byte[] respBytes = transmit(MgmtAction.generateCrlOnDemand, req);
     return parseCrl(respBytes);
   } // method generateCrlOnDemand
 
   @Override
-  public X509CRL getCrl(String caName, BigInteger crlNumber) throws CaMgmtException {
+  public X509CRLHolder getCrl(String caName, BigInteger crlNumber) throws CaMgmtException {
     MgmtRequest.GetCrl req = new MgmtRequest.GetCrl();
     req.setCaName(caName);
     req.setCrlNumber(crlNumber);
@@ -609,7 +609,7 @@ public class CaMgmtClient implements CaManager {
   } // method getCrl
 
   @Override
-  public X509CRL getCurrentCrl(String caName) throws CaMgmtException {
+  public X509CRLHolder getCurrentCrl(String caName) throws CaMgmtException {
     MgmtRequest.Name req = new MgmtRequest.Name(caName);
     byte[] respBytes = transmit(MgmtAction.getCurrentCrl, req);
     return parseCrl(respBytes);
@@ -650,7 +650,7 @@ public class CaMgmtClient implements CaManager {
   } // method getCert
 
   @Override
-  public Map<String, X509Certificate> loadConf(InputStream zippedConfStream)
+  public Map<String, X509Cert> loadConf(InputStream zippedConfStream)
       throws CaMgmtException, IOException {
     MgmtRequest.LoadConf req = new MgmtRequest.LoadConf();
     req.setConfBytes(IoUtil.read(zippedConfStream));
@@ -662,7 +662,7 @@ public class CaMgmtClient implements CaManager {
     if (nameCertMap == null) {
       return null;
     } else {
-      Map<String, X509Certificate> result = new HashMap<>(nameCertMap.size());
+      Map<String, X509Cert> result = new HashMap<>(nameCertMap.size());
       for (String caname : nameCertMap.keySet()) {
         result.put(caname, parseCert(nameCertMap.get(caname)));
       }
@@ -739,7 +739,7 @@ public class CaMgmtClient implements CaManager {
     voidTransmit(MgmtAction.refreshTokenForSignerType, req);
   } // method refreshTokenForSignerType
 
-  private X509Certificate parseCert(byte[] certBytes) throws CaMgmtException {
+  private X509Cert parseCert(byte[] certBytes) throws CaMgmtException {
     try {
       return X509Util.parseCert(certBytes);
     } catch (CertificateException ex) {
@@ -747,12 +747,12 @@ public class CaMgmtClient implements CaManager {
     }
   } // method parseCert
 
-  private X509CRL parseCrl(byte[] respBytes) throws CaMgmtException {
+  private X509CRLHolder parseCrl(byte[] respBytes) throws CaMgmtException {
     MgmtResponse.ByteArray resp = parse(respBytes, MgmtResponse.ByteArray.class);
 
     try {
       return X509Util.parseCrl(resp.getResult());
-    } catch (CertificateException | CRLException ex) {
+    } catch (CRLException ex) {
       throw new CaMgmtException("could not parse X.509 CRL", ex);
     }
   } // method parseCrl

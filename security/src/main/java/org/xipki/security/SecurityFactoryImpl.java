@@ -29,8 +29,6 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Enumeration;
 import java.util.Set;
@@ -47,7 +45,6 @@ import org.xipki.password.PasswordResolver;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.SignerUtil;
-import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
@@ -99,7 +96,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
   @Override
   public ConcurrentContentSigner createSigner(String type, SignerConf conf,
-      X509Certificate[] certificateChain) throws ObjectCreationException {
+      X509Cert[] certificateChain) throws ObjectCreationException {
     ConcurrentContentSigner signer = signerFactoryRegister.newSigner(this, type, conf,
         certificateChain);
 
@@ -180,13 +177,14 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
   }
 
   @Override
-  public KeyCertPair createPrivateKeyAndCert(String type, SignerConf conf, X509Certificate cert)
+  public KeyCertPair createPrivateKeyAndCert(String type, SignerConf conf,
+      X509Cert cert)
       throws ObjectCreationException {
     conf.putConfEntry("parallelism", Integer.toString(1));
 
-    X509Certificate[] certs = null;
+    X509Cert[] certs = null;
     if (cert != null) {
-      certs = new X509Certificate[]{cert};
+      certs = new X509Cert[]{cert};
     }
 
     ConcurrentContentSigner signer = signerFactoryRegister.newSigner(this, type, conf, certs);
@@ -206,7 +204,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
   @Override
   public byte[] extractMinimalKeyStore(String keystoreType, byte[] keystoreBytes, String keyname,
-      char[] password, X509Certificate[] newCertChain) throws KeyStoreException {
+      char[] password, X509Cert[] newCertChain) throws KeyStoreException {
     Args.notBlank(keystoreType, "keystoreType");
     Args.notNull(keystoreBytes, "keystoreBytes");
 
@@ -241,14 +239,17 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         throw new KeyStoreException("no key entry is contained in the keystore");
       }
 
-      Certificate[] certs;
+      java.security.cert.Certificate[] certs;
       if (newCertChain == null || newCertChain.length < 1) {
         if (numAliases == 1) {
           return keystoreBytes;
         }
         certs = ks.getCertificateChain(tmpKeyname);
       } else {
-        certs = newCertChain;
+        certs = new java.security.cert.Certificate[newCertChain.length];
+        for (int i = 0; i < newCertChain.length; i++) {
+          certs[i] = newCertChain[i].toJceCert();
+        }
       }
 
       KeyStore newKs = KeyUtil.getKeyStore(keystoreType);
@@ -311,9 +312,9 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         }
         signerConf.putConfEntry("algo", signatureAlgoName);
         sb.append("conf='").append(signerConf.getConf());
-        X509Certificate cert = signer.getCertificate();
+        X509Cert cert = signer.getCertificate();
         if (cert != null) {
-          String subject = X509Util.getRfc4519Name(cert.getSubjectX500Principal());
+          String subject = cert.getSubjectRfc4519Text();
           sb.append("', certificate subject='").append(subject).append("'");
         }
 

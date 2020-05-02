@@ -24,7 +24,6 @@ import java.security.PrivateKey;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
@@ -38,6 +37,7 @@ import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
 import org.bouncycastle.asn1.cms.SignedData;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cms.CMSAlgorithm;
 import org.bouncycastle.cms.CMSException;
@@ -233,8 +233,8 @@ public abstract class Client {
     return authorityCertStore;
   }
 
-  public X509CRL scepGetCrl(PrivateKey identityKey, X509Certificate identityCert, X500Name issuer,
-      BigInteger serialNumber) throws ScepClientException {
+  public X509CRLHolder scepGetCrl(PrivateKey identityKey, X509Certificate identityCert,
+      X500Name issuer, BigInteger serialNumber) throws ScepClientException {
     Args.notNull(identityKey, "identityKey");
     Args.notNull(identityCert, "identityCert");
     Args.notNull(issuer, "issuer");

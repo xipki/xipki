@@ -24,13 +24,13 @@ import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.security.Signature;
-import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.X509Cert;
 import org.xipki.security.pkcs12.KeypairWithCert;
 import org.xipki.security.pkcs12.P12ContentSignerBuilder;
 import org.xipki.security.util.X509Util;
@@ -73,7 +73,7 @@ public abstract class Pkcs12RSATest {
     }
 
     String certFile = getCertificateFile();
-    X509Certificate cert = X509Util.parseCert(new File(certFile));
+    X509Cert cert = X509Util.parseCert(new File(certFile));
 
     InputStream ks = Files.newInputStream(Paths.get(getPkcs12File()));
     char[] password = getPassword().toCharArray();
@@ -100,7 +100,7 @@ public abstract class Pkcs12RSATest {
     return getSigner().sign(data);
   }
 
-  protected boolean verify(byte[] data, byte[] signatureValue, X509Certificate cert)
+  protected boolean verify(byte[] data, byte[] signatureValue, X509Cert cert)
       throws Exception {
     Signature signature = Signature.getInstance(getSignatureAlgorithm().getAlgorithm().getId());
     signature.initVerify(cert.getPublicKey());

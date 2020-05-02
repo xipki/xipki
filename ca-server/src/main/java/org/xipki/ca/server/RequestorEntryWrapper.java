@@ -18,7 +18,6 @@
 package org.xipki.ca.server;
 
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Arrays;
 
 import org.slf4j.Logger;
@@ -28,6 +27,7 @@ import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
@@ -62,7 +62,7 @@ public class RequestorEntryWrapper {
     dbEntry.setFaulty(true);
     if (MgmtEntry.Requestor.TYPE_CERT.equalsIgnoreCase(type)) {
       try {
-        X509Certificate x509Cert = X509Util.parseCert(StringUtil.toUtf8Bytes(conf));
+        X509Cert x509Cert = X509Util.parseCert(StringUtil.toUtf8Bytes(conf));
         dbEntry.setFaulty(false);
         this.cert = new CertWithDbId(x509Cert);
       } catch (CertificateException ex) {

@@ -19,23 +19,19 @@ package org.xipki.ca.server;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.bouncycastle.asn1.cmp.CMPCertificate;
-import org.bouncycastle.asn1.x509.Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
-import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.CmpControl;
@@ -105,29 +101,17 @@ public class CaInfo {
     this.caEntry = Args.notNull(caEntry, "caEntry");
     this.certStore = Args.notNull(certStore, "certStore");
 
-    X509Certificate cert = caEntry.getCert();
+    X509Cert cert = caEntry.getCert();
     this.notBefore = cert.getNotBefore();
     this.notAfter = cert.getNotAfter();
     this.serialNumber = cert.getSerialNumber();
-    this.selfSigned = cert.getIssuerX500Principal().equals(cert.getSubjectX500Principal());
-
-    Certificate bcCert;
-    try {
-      byte[] encodedCert = cert.getEncoded();
-      bcCert = Certificate.getInstance(encodedCert);
-    } catch (CertificateEncodingException ex) {
-      throw new OperationException(ErrorCode.SYSTEM_FAILURE, "could not encode the CA certificate");
-    }
-    this.certInCmpFormat = new CMPCertificate(bcCert);
+    this.selfSigned = cert.getIssuer().equals(cert.getSubject());
+    this.certInCmpFormat = new CMPCertificate(cert.toBcCert().toASN1Structure());
 
     this.publicCaInfo = new PublicCaInfo(cert, caEntry.getCaUris(), caEntry.getExtraControl());
-    List<X509Certificate> certs = caEntry.getCertchain();
-    this.certchain = new LinkedList<>();
-    if (CollectionUtil.isNotEmpty(certs)) {
-      for (X509Certificate m : certs) {
-        this.certchain.add(new X509Cert(m));
-      }
-    }
+    List<X509Cert> certs = caEntry.getCertchain();
+    this.certchain = certs == null
+        ? Collections.emptyList() : new ArrayList<X509Cert>(certs);
 
     this.noNewCertificateAfter = notAfter.getTime() - MS_PER_DAY * caEntry.getExpirationPeriod();
 

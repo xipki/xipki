@@ -53,7 +53,7 @@ class PendingCertificatePool {
       this.certReqId = Args.notNull(certReqId, "certReqId");
       this.certInfo = Args.notNull(certInfo, "certInfo");
       this.waitForConfirmTill = waitForConfirmTill;
-      this.certHash = HashAlgo.SHA1.hash(certInfo.getCert().getEncodedCert());
+      this.certHash = HashAlgo.SHA1.hash(certInfo.getCert().getCert().getEncoded());
     } // constructor
 
     @Override
