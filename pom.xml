@@ -47,9 +47,12 @@
     <xipki.tools.version>1.0.5</xipki.tools.version>
     <servlet.version>3.1.0</servlet.version>
     <karaf.version>4.2.8</karaf.version>
-    <bc.version>1.65</bc.version>
+    <!-- BC version 1.65 does not work in OSGi environment, use 1.64 instead
+         see https://github.com/bcgit/bc-java/issues/702 for details -->
+    <bc.version>1.64</bc.version>
     <slf4j.version>1.7.25</slf4j.version>
     <pkcs11-wrapper.version>1.4.6</pkcs11-wrapper.version>
+    <!-- Liquibase: do not update to newer version due to bug related to MariaDB 10.3 -->
     <liquibase.version>3.6.3</liquibase.version>
     <snakeyaml.version>1.18</snakeyaml.version>
     <hikaricp.version>3.4.2</hikaricp.version>
