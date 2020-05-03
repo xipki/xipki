@@ -37,7 +37,6 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
-import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ctlog.CtLog;
 import org.xipki.security.ctlog.CtLog.DigitallySigned;
@@ -73,11 +72,7 @@ public class CtLogServlet extends HttpServlet {
     } catch (IOException ex) {
       throw new IllegalStateException("invalid public key");
     }
-
-    SHA256Digest sha256 = new SHA256Digest();
-    sha256.update(canonicalizedBytes, 0, canonicalizedBytes.length);
-    this.logId = new byte[32];
-    sha256.doFinal(logId, 0);
+    this.logId = HashAlgo.SHA256.hash(canonicalizedBytes);
 
     ASN1ObjectIdentifier keyAlgId = publicKeyInfo.getAlgorithm().getAlgorithm();
 
@@ -104,30 +99,28 @@ public class CtLogServlet extends HttpServlet {
     } catch (InvalidKeySpecException | NoSuchAlgorithmException ex) {
       throw new IllegalStateException("error creating private key: " + ex.getMessage());
     }
-    System.out.println("BK");
   }
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
-    AddPreChainRequest req0 = parse(req.getInputStream(), AddPreChainRequest.class);
-    List<byte[]> chain = req0.getChain();
-    if (chain == null || chain.size() < 2) {
-      resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "chain has less than two certificates");
-      return;
-    }
-
-    Certificate cert = Certificate.getInstance(chain.get(0));
-    Certificate caCert = Certificate.getInstance(chain.get(1));
-    byte[] issuerKeyHash = HashAlgo.SHA256.hash(caCert.getSubjectPublicKeyInfo().getEncoded());
-    byte[] preCertTbsCert = CtLog.getPreCertTbsCert(cert.getTBSCertificate());
-
-    byte sctVersion = 0;
-    long timestamp = System.currentTimeMillis();
-    byte[] sctExtensions = null;
-
-    byte[] respContent;
     try {
+      AddPreChainRequest req0 = parse(req.getInputStream(), AddPreChainRequest.class);
+      List<byte[]> chain = req0.getChain();
+      if (chain == null || chain.size() < 2) {
+        resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "chain has less than two certificates");
+        return;
+      }
+
+      Certificate cert = Certificate.getInstance(chain.get(0));
+      Certificate caCert = Certificate.getInstance(chain.get(1));
+      byte[] issuerKeyHash = HashAlgo.SHA256.hash(caCert.getSubjectPublicKeyInfo().getEncoded());
+      byte[] preCertTbsCert = CtLog.getPreCertTbsCert(cert.getTBSCertificate());
+
+      byte sctVersion = 0;
+      long timestamp = System.currentTimeMillis();
+      byte[] sctExtensions = null;
+
       Signature sig = Signature.getInstance(signatureAlgo);
       sig.initSign(signingKey);
       CtLog.update(sig, sctVersion, timestamp, sctExtensions, issuerKeyHash, preCertTbsCert);
@@ -141,16 +134,15 @@ public class CtLogServlet extends HttpServlet {
       DigitallySigned digitallySigned = new DigitallySigned(signatureAndHashAlgorithm, signature);
       resp0.setSignature(digitallySigned.getEncoded());
 
-      respContent = JSON.toJSONBytes(resp0);
-    } catch (Exception ex) {
-      resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "internal error");
-      return;
-    }
+      byte[] respContent = JSON.toJSONBytes(resp0);
 
-    resp.setContentType("application/json");
-    resp.setContentLengthLong(respContent.length);
-    resp.getOutputStream().write(respContent);
-    resp.setStatus(HttpServletResponse.SC_OK);
+      resp.setContentType("application/json");
+      resp.setContentLengthLong(respContent.length);
+      resp.getOutputStream().write(respContent);
+      resp.setStatus(HttpServletResponse.SC_OK);
+    } catch (Exception ex) {
+      throw new ServletException(ex.getMessage(), ex);
+    }
   } // method doPost
 
   private static <T> T parse(InputStream in, Class<?> clazz)
