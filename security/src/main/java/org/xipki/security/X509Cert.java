@@ -170,26 +170,24 @@ public class X509Cert {
    *     limit to the allowed length of the certification path.
    */
   public int getBasicConstraints() {
-    if (basicConstrains != -2) {
-      return basicConstrains;
-    }
-
-    synchronized (sync) {
-      if (bcInstance != null) {
-        byte[] extnValue = getCoreExtValue(Extension.basicConstraints);
-        if (extnValue == null) {
-          basicConstrains = -1;
-        } else {
-          BasicConstraints bc = BasicConstraints.getInstance(extnValue);
-          if (bc.isCA()) {
-            BigInteger bn = bc.getPathLenConstraint();
-            basicConstrains = bn == null ? Integer.MAX_VALUE : bn.intValueExact();
-          } else {
+    if (basicConstrains == -2) {
+      synchronized (sync) {
+        if (bcInstance != null) {
+          byte[] extnValue = getCoreExtValue(Extension.basicConstraints);
+          if (extnValue == null) {
             basicConstrains = -1;
+          } else {
+            BasicConstraints bc = BasicConstraints.getInstance(extnValue);
+            if (bc.isCA()) {
+              BigInteger bn = bc.getPathLenConstraint();
+              basicConstrains = bn == null ? Integer.MAX_VALUE : bn.intValueExact();
+            } else {
+              basicConstrains = -1;
+            }
           }
+        } else {
+          basicConstrains = jceInstance.getBasicConstraints();
         }
-      } else {
-        basicConstrains = jceInstance.getBasicConstraints();
       }
     }
 
@@ -201,49 +199,46 @@ public class X509Cert {
   }
 
   public PublicKey getPublicKey() {
-    if (publicKey != null) {
-      return publicKey;
-    }
-
-    synchronized (sync) {
-      if (bcInstance != null) {
-        try {
-          this.publicKey = KeyUtil.generatePublicKey(bcInstance.getSubjectPublicKeyInfo());
-        } catch (InvalidKeySpecException ex) {
-          throw new IllegalStateException(ex.getMessage(), ex);
+    if (publicKey == null) {
+      synchronized (sync) {
+        if (bcInstance != null) {
+          try {
+            this.publicKey = KeyUtil.generatePublicKey(bcInstance.getSubjectPublicKeyInfo());
+          } catch (InvalidKeySpecException ex) {
+            throw new IllegalStateException(ex.getMessage(), ex);
+          }
+        } else {
+          publicKey = jceInstance.getPublicKey();
         }
-      } else {
-        publicKey = jceInstance.getPublicKey();
       }
-
-      return publicKey;
     }
+
+    return publicKey;
   }
 
   public boolean[] getKeyUsage() {
-    if (keyUsageProcessed) {
-      return keyUsage;
-    }
-    
-    synchronized (sync) {
-      if (bcInstance != null) {
-        byte[] extnValue = getCoreExtValue(Extension.keyUsage);
-        if (extnValue == null) {
-          keyUsage = null;
-        } else {
-          org.bouncycastle.asn1.x509.KeyUsage bc =
-              org.bouncycastle.asn1.x509.KeyUsage.getInstance(extnValue);
-          keyUsage = new boolean[9];
-          for (KeyUsage ku : KeyUsage.values()) {
-            keyUsage[ku.getBit()] = bc.hasUsages(ku.getBcUsage());
+    if (!keyUsageProcessed) {
+      synchronized (sync) {
+        if (bcInstance != null) {
+          byte[] extnValue = getCoreExtValue(Extension.keyUsage);
+          if (extnValue == null) {
+            keyUsage = null;
+          } else {
+            org.bouncycastle.asn1.x509.KeyUsage bc =
+                org.bouncycastle.asn1.x509.KeyUsage.getInstance(extnValue);
+            keyUsage = new boolean[9];
+            for (KeyUsage ku : KeyUsage.values()) {
+              keyUsage[ku.getBit()] = bc.hasUsages(ku.getBcUsage());
+            }
           }
+        } else {
+          keyUsage = jceInstance.getKeyUsage();
         }
-      } else {
-        keyUsage = jceInstance.getKeyUsage();
       }
+
+      keyUsageProcessed = true;
     }
 
-    keyUsageProcessed = true;
     return keyUsage;
   }
 
@@ -256,14 +251,12 @@ public class X509Cert {
   }
 
   public byte[] getSubjectKeyId() {
-    if (subjectKeyId != null) {
-      return subjectKeyId;
-    }
-    
-    synchronized (sync) {
-      byte[] extnValue = getCoreExtValue(Extension.subjectKeyIdentifier);
-      if (extnValue != null) {
-        subjectKeyId = ASN1OctetString.getInstance(extnValue).getOctets();
+    if (subjectKeyId == null) {
+      synchronized (sync) {
+        byte[] extnValue = getCoreExtValue(Extension.subjectKeyIdentifier);
+        if (extnValue != null) {
+          subjectKeyId = ASN1OctetString.getInstance(extnValue).getOctets();
+        }
       }
     }
 
@@ -271,14 +264,12 @@ public class X509Cert {
   }
 
   public byte[] getAuthorityKeyId() {
-    if (authorityKeyId != null) {
-      return authorityKeyId;
-    }
-    
-    synchronized (sync) {
-      byte[] extnValue = getCoreExtValue(Extension.authorityKeyIdentifier);
-      if (extnValue != null) {
-        authorityKeyId = AuthorityKeyIdentifier.getInstance(extnValue).getKeyIdentifier();
+    if (authorityKeyId == null) {
+      synchronized (sync) {
+        byte[] extnValue = getCoreExtValue(Extension.authorityKeyIdentifier);
+        if (extnValue != null) {
+          authorityKeyId = AuthorityKeyIdentifier.getInstance(extnValue).getKeyIdentifier();
+        }
       }
     }
 
@@ -286,57 +277,53 @@ public class X509Cert {
   }
 
   public String getSubjectRfc4519Text() {
-    if (subjectRfc4519Text != null) {
-      return subjectRfc4519Text;
+    if (subjectRfc4519Text == null) {
+      synchronized (sync) {
+        subjectRfc4519Text = RFC4519Style.INSTANCE.toString(subject);
+      }
     }
 
-    synchronized (sync) {
-      subjectRfc4519Text = RFC4519Style.INSTANCE.toString(subject);
-      return subjectRfc4519Text;
-    }
+    return subjectRfc4519Text;
   }
 
   public String getIssuerRfc4519Text() {
-    if (issuerRfc4519Text != null) {
-      return issuerRfc4519Text;
+    if (issuerRfc4519Text == null) {
+      synchronized (sync) {
+        issuerRfc4519Text = RFC4519Style.INSTANCE.toString(subject);
+      }
     }
 
-    synchronized (sync) {
-      issuerRfc4519Text = RFC4519Style.INSTANCE.toString(subject);
-      return issuerRfc4519Text;
-    }
+    return issuerRfc4519Text;
   }
 
   public SubjectPublicKeyInfo getSubjectPublicKeyInfo() {
-    if (subjectPublicKeyInfo != null) {
-      return subjectPublicKeyInfo;
-    }
-
-    synchronized (sync) {
-      if (bcInstance != null) {
-        subjectPublicKeyInfo = bcInstance.getSubjectPublicKeyInfo();
-      } else {
-        try {
-          subjectPublicKeyInfo = KeyUtil.createSubjectPublicKeyInfo(jceInstance.getPublicKey());
-        } catch (InvalidKeyException ex) {
-          throw new IllegalStateException("error creating SubjectPublicKeyInfo from PublicKey", ex);
+    if (subjectPublicKeyInfo == null) {
+      synchronized (sync) {
+        if (bcInstance != null) {
+          subjectPublicKeyInfo = bcInstance.getSubjectPublicKeyInfo();
+        } else {
+          try {
+            subjectPublicKeyInfo = KeyUtil.createSubjectPublicKeyInfo(jceInstance.getPublicKey());
+          } catch (InvalidKeyException ex) {
+            throw new IllegalStateException("error creating SubjectPublicKeyInfo from PublicKey",
+                ex);
+          }
         }
       }
-      return subjectPublicKeyInfo;
     }
+
+    return subjectPublicKeyInfo;
   }
 
   public X509Certificate toJceCert() {
-    if (jceInstance != null) {
-      return jceInstance;
-    }
-    
-    synchronized (sync) {
-      encoded = getEncoded();
-      try {
-        jceInstance = X509Util.parseX509Certificate(new ByteArrayInputStream(encoded));
-      } catch (CertificateException ex) {
-        throw new IllegalStateException("error converting to X509Certificate", ex);
+    if (jceInstance == null) {
+      synchronized (sync) {
+        encoded = getEncoded();
+        try {
+          jceInstance = X509Util.parseX509Certificate(new ByteArrayInputStream(encoded));
+        } catch (CertificateException ex) {
+          throw new IllegalStateException("error converting to X509Certificate", ex);
+        }
       }
     }
 
@@ -344,16 +331,14 @@ public class X509Cert {
   }
 
   public X509CertificateHolder toBcCert() {
-    if (bcInstance != null) {
-      return bcInstance;
-    }
-    
-    synchronized (sync) {
-      try {
-        encoded = jceInstance.getEncoded();
-        bcInstance = new X509CertificateHolder(encoded);
-      } catch (CertificateEncodingException | IOException ex) {
-        throw new IllegalStateException("error encoding certificate", ex);
+    if (bcInstance == null) {
+      synchronized (sync) {
+        try {
+          encoded = jceInstance.getEncoded();
+          bcInstance = new X509CertificateHolder(encoded);
+        } catch (CertificateEncodingException | IOException ex) {
+          throw new IllegalStateException("error encoding certificate", ex);
+        }
       }
     }
 
@@ -373,19 +358,13 @@ public class X509Cert {
   }
 
   public byte[] getEncoded() {
-    if (encoded != null) {
-      return encoded;
-    }
-
-    synchronized (sync) {
-      try {
-        if (bcInstance != null) {
-          encoded = bcInstance.getEncoded();
-        } else {
-          encoded = jceInstance.getEncoded();
+    if (encoded == null) {
+      synchronized (sync) {
+        try {
+          encoded = (bcInstance != null) ? bcInstance.getEncoded() : jceInstance.getEncoded();
+        } catch (CertificateEncodingException | IOException ex) {
+          throw new IllegalStateException("error encoding certificate", ex);
         }
-      } catch (CertificateEncodingException | IOException ex) {
-        throw new IllegalStateException("error encoding certificate", ex);
       }
     }
 
@@ -401,12 +380,11 @@ public class X509Cert {
       NoSuchAlgorithmException, NoSuchProviderException {
     if (jceInstance != null) {
       jceInstance.verify(key);
-      return;
+    } else {
+      String sigName = AlgorithmUtil.getSignatureAlgoName(bcInstance.getSignatureAlgorithm());
+      Signature signature = Signature.getInstance(sigName);
+      checkBcSignature(key, signature);
     }
-
-    String sigName = AlgorithmUtil.getSignatureAlgoName(bcInstance.getSignatureAlgorithm());
-    Signature signature = Signature.getInstance(sigName);
-    checkBcSignature(key, signature);
   }
 
   public void verify(PublicKey key, Provider sigProvider)
@@ -414,16 +392,15 @@ public class X509Cert {
       InvalidKeyException, SignatureException, NoSuchProviderException {
     if (sigProvider == null) {
       verify(key);
-      return;
+    } else {
+      if (jceInstance != null) {
+        jceInstance.verify(key, sigProvider);
+      } else {
+        String sigName = AlgorithmUtil.getSignatureAlgoName(bcInstance.getSignatureAlgorithm());
+        Signature signature = Signature.getInstance(sigName, sigProvider);
+        checkBcSignature(key, signature);
+      }
     }
-
-    if (jceInstance != null) {
-      jceInstance.verify(key, sigProvider);
-    }
-
-    String sigName = AlgorithmUtil.getSignatureAlgoName(bcInstance.getSignatureAlgorithm());
-    Signature signature = Signature.getInstance(sigName, sigProvider);
-    checkBcSignature(key, signature);
   }
 
   public void verify(PublicKey key, String sigProvider)
@@ -431,16 +408,15 @@ public class X509Cert {
       InvalidKeyException, SignatureException, NoSuchProviderException {
     if (sigProvider == null) {
       verify(key);
-      return;
+    } else {
+      if (jceInstance != null) {
+        jceInstance.verify(key, sigProvider);
+      } else {
+        String sigName = AlgorithmUtil.getSignatureAlgoName(bcInstance.getSignatureAlgorithm());
+        Signature signature = Signature.getInstance(sigName, sigProvider);
+        checkBcSignature(key, signature);
+      }
     }
-
-    if (jceInstance != null) {
-      jceInstance.verify(key, sigProvider);
-    }
-
-    String sigName = AlgorithmUtil.getSignatureAlgoName(bcInstance.getSignatureAlgorithm());
-    Signature signature = Signature.getInstance(sigName, sigProvider);
-    checkBcSignature(key, signature);
   }
 
   private void checkBcSignature(PublicKey key, Signature signature)
@@ -469,21 +445,13 @@ public class X509Cert {
       return extn == null ? null : extn.getExtnValue().getOctets();
     } else {
       byte[] rawValue = jceInstance.getExtensionValue(extnType.getId());
-      if (rawValue == null) {
-        return null;
-      } else {
-        return ASN1OctetString.getInstance(rawValue).getOctets();
-      }
+      return rawValue == null ? null : ASN1OctetString.getInstance(rawValue).getOctets();
     }
   }
 
   public boolean hasKeyusage(KeyUsage usage) {
     boolean[] usages = getKeyUsage();
-    if (usages == null) {
-      return true;
-    } else {
-      return usages[usage.getBit()];
-    }
+    return usages == null ? true : usages[usage.getBit()];
   }
 
   @Override
