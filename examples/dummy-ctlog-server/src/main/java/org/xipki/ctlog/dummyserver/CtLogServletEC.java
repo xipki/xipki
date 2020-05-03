@@ -17,28 +17,27 @@
 
 package org.xipki.ctlog.dummyserver;
 
-import java.util.Arrays;
-import java.util.Base64;
+import org.xipki.util.Base64;
 
 /**
- * The CT Log servlet 2.
+ * The CT Log servlet EC.
  *
  * @author Lijun Liao
  */
 @SuppressWarnings("serial")
-public class CtLogServlet2 extends CtLogServlet {
+//CHECKSTYLE:SKIP
+public class CtLogServletEC extends CtLogServlet {
 
-  private String id;
+  private static final String privateKey =
+        "MEECAQAwEwYHKoZIzj0CAQYIKoZIzj0DAQcEJzAlAgEBBCA5yyZCYzCoBiIEspXdhwWyhQOmfB6O"
+      + "nhFO/g2UCMxkew==";
 
-  public CtLogServlet2() {
-    byte[] tmpId = new byte[32];
-    Arrays.fill(tmpId, (byte) 0x22);
-    id = Base64.getEncoder().encodeToString(tmpId);
-  }
+  private static final String publicKey =
+        "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEt13k6XhtxLVQlTmmP9NVgsLF2EA2U0Blp2ug1cm7"
+      + "H0ltv7NnrCRq+K87YyiggdGdrKwvDN5/DE1muN/jUditww==";
 
-  @Override
-  protected String getLogId() {
-    return id;
+  public CtLogServletEC() {
+    super(Base64.decode(privateKey), Base64.decode(publicKey));
   }
 
 }

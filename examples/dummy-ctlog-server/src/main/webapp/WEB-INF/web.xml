@@ -11,23 +11,23 @@
     </description>
 
     <servlet>
-        <servlet-name>ctlog1</servlet-name>
-        <servlet-class>org.xipki.ctlog.dummyserver.CtLogServlet1</servlet-class>
+        <servlet-name>ctlogrsa</servlet-name>
+        <servlet-class>org.xipki.ctlog.dummyserver.CtLogServletRSA</servlet-class>
     </servlet>
 
     <servlet>
-        <servlet-name>ctlog2</servlet-name>
-        <servlet-class>org.xipki.ctlog.dummyserver.CtLogServlet2</servlet-class>
+        <servlet-name>ctlogec</servlet-name>
+        <servlet-class>org.xipki.ctlog.dummyserver.CtLogServletEC</servlet-class>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>ctlog1</servlet-name>
-        <url-pattern>/ctlog1/ct/v1/add-pre-chain/*</url-pattern>
+        <servlet-name>ctlogrsa</servlet-name>
+        <url-pattern>/ctlogrsa/ct/v1/add-pre-chain/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>ctlog2</servlet-name>
-        <url-pattern>/ctlog2/ct/v1/add-pre-chain/*</url-pattern>
+        <servlet-name>ctlogec</servlet-name>
+        <url-pattern>/ctlogec/ct/v1/add-pre-chain/*</url-pattern>
     </servlet-mapping>
 
 </web-app>
