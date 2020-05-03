@@ -155,7 +155,7 @@ public class CtLogClient {
       long timestamp = resp.getTimestamp();
       byte[] extensions = resp.getExtensions();
 
-      PublicKey verifyKey = publicKeyFinder.getPublicKey(logId);
+      PublicKey verifyKey = publicKeyFinder == null ? null : publicKeyFinder.getPublicKey(logId);
       if (verifyKey == null) {
         LOG.warn("could not find CtLog public key 0x{} to verify the SCT", hexLogId);
       } else {
