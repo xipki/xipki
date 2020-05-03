@@ -46,8 +46,7 @@ public class IssuerFilter {
     } else {
       includeSha1Fps = new HashSet<>(includes.size());
       for (X509Cert include : includes) {
-        String sha1Fp = HashAlgo.SHA1.base64Hash(include.getEncoded());
-        includeSha1Fps.add(sha1Fp);
+        includeSha1Fps.add(HashAlgo.SHA1.base64Hash(include.getEncoded()));
       }
     }
 
@@ -56,8 +55,7 @@ public class IssuerFilter {
     } else {
       excludeSha1Fps = new HashSet<>(excludes.size());
       for (X509Cert exclude : excludes) {
-        String sha1Fp = HashAlgo.SHA1.base64Hash(exclude.getEncoded());
-        excludeSha1Fps.add(sha1Fp);
+        excludeSha1Fps.add(HashAlgo.SHA1.base64Hash(exclude.getEncoded()));
       }
     }
   }

@@ -47,7 +47,6 @@ import org.xipki.security.util.DSAParameterCache;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.Hex;
-import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 
 import iaik.pkcs.pkcs11.wrapper.Functions;
@@ -1360,7 +1359,7 @@ public abstract class P11Slot implements Closeable {
     sb.append("\n\t\t\tSubject: ").append(subject);
 
     sb.append("\n\t\t\tIssuer: ").append(cert.getIssuerRfc4519Text());
-    sb.append("\n\t\t\tSerial: ").append(LogUtil.formatCsn(cert.getSerialNumber()));
+    sb.append("\n\t\t\tSerial: ").append(cert.getSerialNumberHex());
     sb.append("\n\t\t\tStart time: ").append(cert.getNotBefore());
     sb.append("\n\t\t\tEnd time: ").append(cert.getNotAfter());
     sb.append("\n\t\t\tSHA1 Sum: ");

@@ -105,16 +105,12 @@ public class CaInfo {
     this.notBefore = cert.getNotBefore();
     this.notAfter = cert.getNotAfter();
     this.serialNumber = cert.getSerialNumber();
-    this.selfSigned = cert.getIssuer().equals(cert.getSubject());
+    this.selfSigned = cert.isSelfSigned();
     this.certInCmpFormat = new CMPCertificate(cert.toBcCert().toASN1Structure());
-
     this.publicCaInfo = new PublicCaInfo(cert, caEntry.getCaUris(), caEntry.getExtraControl());
     List<X509Cert> certs = caEntry.getCertchain();
-    this.certchain = certs == null
-        ? Collections.emptyList() : new ArrayList<X509Cert>(certs);
-
+    this.certchain = certs == null ? Collections.emptyList() : new ArrayList<>(certs);
     this.noNewCertificateAfter = notAfter.getTime() - MS_PER_DAY * caEntry.getExpirationPeriod();
-
     this.randomSnGenerator = RandomSerialNumberGenerator.getInstance();
   } // constructor
 

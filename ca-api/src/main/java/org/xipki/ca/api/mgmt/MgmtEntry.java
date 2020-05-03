@@ -40,7 +40,6 @@ import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.CompareUtil;
 import org.xipki.util.ConfPairs;
-import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 import org.xipki.util.Validity;
 
@@ -1436,7 +1435,7 @@ public abstract class MgmtEntry {
           X509Cert cert = X509Util.parseCert(StringUtil.toUtf8Bytes(conf));
           sb.append("cert:");
           sb.append("\n\tissuer: ").append(cert.getIssuerRfc4519Text());
-          sb.append("\n\tserialNumber: ").append(LogUtil.formatCsn(cert.getSerialNumber()));
+          sb.append("\n\tserialNumber: ").append(cert.getSerialNumberHex());
           sb.append("\n\tsubject: ").append(cert.getSubjectRfc4519Text()).append('\n');
         } catch (CertificateException ex) {
           sb.append("cert: ERROR(").append(ex.getMessage()).append(")\n");
@@ -1568,8 +1567,7 @@ public abstract class MgmtEntry {
       if (certificate != null || base64Cert != null) {
         if (certificate != null) {
           sb.append("\tissuer: ").append(certificate.getIssuerRfc4519Text()).append('\n');
-          sb.append("\tserialNumber: ")
-              .append(LogUtil.formatCsn(certificate.getSerialNumber())).append('\n');
+          sb.append("\tserialNumber: ").append(certificate.getSerialNumberHex()).append('\n');
           sb.append("\tsubject: ").append(certificate.getSubjectRfc4519Text());
         }
         if (verbose) {

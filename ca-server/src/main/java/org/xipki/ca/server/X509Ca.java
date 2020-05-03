@@ -790,7 +790,7 @@ public class X509Ca implements Closeable {
       PublicCaInfo pci = caInfo.getPublicCaInfo();
 
       boolean indirectCrl = (crlSigner != null);
-      X500Name crlIssuer = indirectCrl ? crlSigner.getSubjectAsX500Name() : pci.getSubject();
+      X500Name crlIssuer = indirectCrl ? crlSigner.getSubject() : pci.getSubject();
 
       X509v2CRLBuilder crlBuilder = new X509v2CRLBuilder(crlIssuer, thisUpdate);
       if (nextUpdate != null) {
@@ -1408,9 +1408,8 @@ public class X509Ca implements Closeable {
       X509Cert cert = certToRemove.getCert();
       if (LOG.isErrorEnabled()) {
         LOG.error("removing certificate issuer='{}', serial={}, subject='{}' from publisher"
-            + " {} failed.", cert.getIssuerRfc4519Text(),
-            LogUtil.formatCsn(cert.getSerialNumber()), cert.getSubjectRfc4519Text(),
-            publisher.getIdent());
+            + " {} failed.", cert.getIssuerRfc4519Text(), cert.getSerialNumberHex(),
+            cert.getSubjectRfc4519Text(), publisher.getIdent());
       }
     } // end for
 
@@ -1728,8 +1727,7 @@ public class X509Ca implements Closeable {
           CertWithDbId cert = certInfo.getCert();
           LOG.info("{} generateCertificate: CA={}, profile={}, subject='{}', serialNumber={}",
               prefix, caIdent.getName(), certprofilIdent.getName(),
-              cert.getCert().getSubjectRfc4519Text(),
-              LogUtil.formatCsn(cert.getCert().getSerialNumber()));
+              cert.getCert().getSubjectRfc4519Text(), cert.getCert().getSerialNumberHex());
         }
       } catch (OperationException ex) {
         exception = new OperationExceptionWithIndex(i, ex);

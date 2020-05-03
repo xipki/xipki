@@ -118,8 +118,7 @@ abstract class Responder {
 
     private final AlgorithmValidator sigAlgoValidator;
 
-    public SignaturetCmpResponder(X509Cert cert,
-        AlgorithmValidator sigAlgoValidator) {
+    public SignaturetCmpResponder(X509Cert cert, AlgorithmValidator sigAlgoValidator) {
       super(Args.notNull(cert, "cert").getSubject());
       this.cert = cert;
       this.sigAlgoValidator = Args.notNull(sigAlgoValidator, "sigAlgoValidator");

@@ -1723,7 +1723,7 @@ public class CmpResponder extends BaseCmpResponder {
 
     if (requestRecipient.getTagNo() == GeneralName.directoryName) {
       X500Name x500Name = X500Name.getInstance(requestRecipient.getName());
-      if (x500Name.equals(caManager.getSignerWrapper(getResponderName()).getSubjectAsX500Name())) {
+      if (x500Name.equals(caManager.getSignerWrapper(getResponderName()).getSubject())) {
         return true;
       }
     }

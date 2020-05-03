@@ -48,6 +48,7 @@ import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
+import org.xipki.util.Hex;
 
 /**
  * Wrapper to an {@link X509Certificate}.
@@ -196,6 +197,10 @@ public class X509Cert {
 
   public BigInteger getSerialNumber() {
     return serialNumber;
+  }
+
+  public String getSerialNumberHex() {
+    return "0x" + Hex.encode(serialNumber.toByteArray());
   }
 
   public PublicKey getPublicKey() {

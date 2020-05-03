@@ -40,7 +40,7 @@ public class SignerEntryWrapper {
 
   private ConcurrentContentSigner signer;
 
-  private X500Name subjectAsX500Name;
+  private X500Name subject;
 
   private GeneralName subjectAsGeneralName;
 
@@ -51,8 +51,8 @@ public class SignerEntryWrapper {
     this.dbEntry = Args.notNull(dbEntry, "dbEntry");
     signer = null;
     if (dbEntry.getCertificate() != null) {
-      subjectAsX500Name = dbEntry.getCertificate().getSubject();
-      subjectAsGeneralName = new GeneralName(subjectAsX500Name);
+      subject = dbEntry.getCertificate().getSubject();
+      subjectAsGeneralName = new GeneralName(subject);
     }
   }
 
@@ -81,8 +81,8 @@ public class SignerEntryWrapper {
 
     if (dbEntry.getBase64Cert() == null) {
       dbEntry.setCertificate(signer.getCertificate());
-      subjectAsX500Name = signer.getCertificate().getSubject();
-      subjectAsGeneralName = new GeneralName(subjectAsX500Name);
+      subject = signer.getCertificate().getSubject();
+      subjectAsGeneralName = new GeneralName(subject);
     }
   } // method initSigner
 
@@ -98,8 +98,8 @@ public class SignerEntryWrapper {
     return subjectAsGeneralName;
   }
 
-  public X500Name getSubjectAsX500Name() {
-    return subjectAsX500Name;
+  public X500Name getSubject() {
+    return subject;
   }
 
 }

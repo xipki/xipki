@@ -44,7 +44,6 @@ import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.FileOrValue;
-import org.xipki.util.LogUtil;
 
 /**
  * Publish certificates to XiPKI OCSP database.
@@ -180,7 +179,7 @@ public class OcspCertPublisher extends CertPublisher {
   private void logAndAudit(String issuer, X509Cert cert, Long certId, Exception ex,
       String messagePrefix) {
     String subjectText = cert.getSubjectRfc4519Text();
-    String serialText = LogUtil.formatCsn(cert.getSerialNumber());
+    String serialText = cert.getSerialNumberHex();
 
     LOG.error("{} (issuser='{}': subject='{}', serialNumber={}). Message: {}",
         messagePrefix, issuer, subjectText, serialText, ex.getMessage());
