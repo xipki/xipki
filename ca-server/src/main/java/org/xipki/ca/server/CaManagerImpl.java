@@ -282,6 +282,8 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   private final RestResponder restResponder;
 
+  private CtLogPublicKeyFinder ctLogPublicKeyFinder;
+
   private CaServerConf caServerConf;
 
   private boolean caSystemSetuped;
@@ -399,6 +401,12 @@ public class CaManagerImpl implements CaManager, Closeable {
 
     int shardId = caServerConf.getShardId();
     LOG.info("ca.shardId: {}", shardId);
+
+    try {
+      ctLogPublicKeyFinder = new CtLogPublicKeyFinder(caServerConf.getCtLog());
+    } catch (Exception ex) {
+      throw new CaMgmtException("could not load CtLogPublicKeyFinder: " + ex.getMessage(), ex);
+    }
 
     if (this.datasourceNameConfFileMap == null) {
       this.datasourceNameConfFileMap = new ConcurrentHashMap<>();
@@ -523,6 +531,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     certprofilesInitialized = false;
     publishersInitialized = false;
     casInitialized = false;
+    ctLogPublicKeyFinder = null;
 
     shutdownScheduledThreadPoolExecutor();
   } // method reset
@@ -3233,6 +3242,10 @@ public class CaManagerImpl implements CaManager, Closeable {
 
     return new ByteArrayInputStream(bytesStream.toByteArray());
   } // method exportConf
+
+  public CtLogPublicKeyFinder getCtLogPublicKeyFinder() {
+    return ctLogPublicKeyFinder;
+  }
 
   private static FileOrValue createFileOrValue(ZipOutputStream zipStream,
       String content, String fileName) throws IOException {

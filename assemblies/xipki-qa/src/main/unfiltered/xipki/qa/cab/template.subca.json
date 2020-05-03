@@ -35,7 +35,7 @@
 			"cmpResponderName":"responder1",
 			"ctlogControl":{
 				"enabled":true,
-				"servers":"https://localhost:8443/ctlog/ctlog1;https://localhost:8443/ctlog/ctlog2",
+				"servers":"https://localhost:8443/ctlog/ctlogrsa;https://localhost:8443/ctlog/ctlogec",
 				"sslcontext.name":"localhost"
 			},
 			"duplicateKey":true,

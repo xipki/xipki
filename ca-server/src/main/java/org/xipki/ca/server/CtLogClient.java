@@ -17,6 +17,13 @@
 
 package org.xipki.ca.server;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -24,19 +31,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.bouncycastle.cert.X509CertificateHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
-import org.xipki.security.CtLog.DigitallySigned;
-import org.xipki.security.CtLog.SerializedSCT;
-import org.xipki.security.CtLog.SignedCertificateTimestamp;
-import org.xipki.security.CtLog.SignedCertificateTimestampList;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
+import org.xipki.security.ctlog.CtLog;
+import org.xipki.security.ctlog.CtLog.DigitallySigned;
+import org.xipki.security.ctlog.CtLog.SerializedSCT;
+import org.xipki.security.ctlog.CtLog.SignatureAndHashAlgorithm;
+import org.xipki.security.ctlog.CtLog.SignedCertificateTimestamp;
+import org.xipki.security.ctlog.CtLog.SignedCertificateTimestampList;
+import org.xipki.security.ctlog.CtLogMessages.AddPreChainRequest;
+import org.xipki.security.ctlog.CtLogMessages.AddPreChainResponse;
 import org.xipki.util.Args;
 import org.xipki.util.Curl;
 import org.xipki.util.Curl.CurlResult;
 import org.xipki.util.DefaultCurl;
+import org.xipki.util.Hex;
 import org.xipki.util.StringUtil;
 import org.xipki.util.http.SslContextConf;
 
@@ -50,77 +64,6 @@ import com.alibaba.fastjson.JSON;
 public class CtLogClient {
 
   private static Logger LOG = LoggerFactory.getLogger(CtLogClient.class);
-
-  // Do not change the variable name, and the get- and set-methods.
-  public static class AddPreChainRequest {
-    private List<byte[]> chain;
-
-    public List<byte[]> getChain() {
-      return chain;
-    }
-
-    public void setChain(List<byte[]> chain) {
-      this.chain = chain;
-    }
-
-  } // class AddPreChainRequest
-
-  // Do not change the variable name, and the get- and set-methods.
-  public static class AddPreChainResponse {
-
-    // CHECKSTYLE:SKIP
-    private byte sct_version;
-
-    private byte[] id;
-
-    private long timestamp;
-
-    private byte[] extensions;
-
-    private byte[] signature;
-
-    public byte getSct_version() {
-      return sct_version;
-    }
-
-    // CHECKSTYLE:SKIP
-    public void setSct_version(byte sct_version) {
-      this.sct_version = sct_version;
-    }
-
-    public byte[] getId() {
-      return id;
-    }
-
-    public void setId(byte[] id) {
-      this.id = id;
-    }
-
-    public long getTimestamp() {
-      return timestamp;
-    }
-
-    public void setTimestamp(long timestamp) {
-      this.timestamp = timestamp;
-    }
-
-    public byte[] getExtensions() {
-      return extensions;
-    }
-
-    public void setExtensions(byte[] extensions) {
-      this.extensions = extensions;
-    }
-
-    public byte[] getSignature() {
-      return signature;
-    }
-
-    public void setSignature(byte[] signature) {
-      this.signature = signature;
-    }
-
-  } // class AddPreChainResponse
 
   private final Curl curl;
 
@@ -141,12 +84,34 @@ public class CtLogClient {
   } // constructor
 
   public SignedCertificateTimestampList getCtLogScts(
-      byte[] precert, X509Cert caCert, List<X509Cert> certchain) throws OperationException {
+      X509CertificateHolder precert, X509Cert caCert, List<X509Cert> certchain,
+      CtLogPublicKeyFinder publicKeyFinder) throws OperationException {
     AddPreChainRequest request = new AddPreChainRequest();
     List<byte[]> chain = new LinkedList<>();
     request.setChain(chain);
 
-    chain.add(precert);
+    byte[] encodedPreCert;
+    try {
+      encodedPreCert = precert.getEncoded();
+    } catch (IOException ex) {
+      throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
+    }
+
+    byte[] issuerKeyHash;
+    try {
+      issuerKeyHash = HashAlgo.SHA256.hash(caCert.getSubjectPublicKeyInfo().getEncoded());
+    } catch (IOException ex) {
+      throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
+    }
+
+    byte[] preCertTbsCert;
+    try {
+      preCertTbsCert = CtLog.getPreCertTbsCert(precert.toASN1Structure().getTBSCertificate());
+    } catch (IOException ex) {
+      throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
+    }
+
+    chain.add(encodedPreCert);
     chain.add(caCert.getEncoded());
     if (certchain != null) {
       for (X509Cert m : certchain) {
@@ -184,12 +149,80 @@ public class CtLogClient {
       AddPreChainResponse resp = JSON.parseObject(respContent, AddPreChainResponse.class);
 
       DigitallySigned ds = DigitallySigned.getInstance(resp.getSignature(), new AtomicInteger(0));
-      SignedCertificateTimestamp sct = new SignedCertificateTimestamp(resp.getSct_version(),
-          resp.getId(), resp.getTimestamp(), resp.getExtensions(), ds);
+      byte sctVersion = resp.getSct_version();
+      byte[] logId = resp.getId();
+      String hexLogId = Hex.encodeUpper(logId);
+      long timestamp = resp.getTimestamp();
+      byte[] extensions = resp.getExtensions();
+
+      PublicKey verifyKey = publicKeyFinder.getPublicKey(logId);
+      if (verifyKey == null) {
+        LOG.warn("could not find CtLog public key 0x{} to verify the SCT", hexLogId);
+      } else {
+        SignatureAndHashAlgorithm algorithm = ds.getAlgorithm();
+        String sigAlgo = getSignatureAlgo(algorithm);
+
+        boolean sigValid;
+        try {
+          Signature sig = Signature.getInstance(sigAlgo, "BC");
+          sig.initVerify(verifyKey);
+          CtLog.update(sig, sctVersion, timestamp, extensions, issuerKeyHash, preCertTbsCert);
+          sigValid = sig.verify(ds.getSignature());
+        } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException
+            | SignatureException ex) {
+          throw new OperationException(ErrorCode.SYSTEM_FAILURE, "error verifying SCT signature");
+        }
+
+        if (sigValid) {
+          LOG.info("verified SCT signature with logId {} and timestamp {}", hexLogId, timestamp);
+        } else {
+          throw new OperationException(ErrorCode.SYSTEM_FAILURE, "SCT signature is invalid");
+        }
+      }
+
+      SignedCertificateTimestamp sct = new SignedCertificateTimestamp(sctVersion,
+          logId, timestamp, extensions, ds);
       scts.add(sct);
     }
 
     return new SignedCertificateTimestampList(new SerializedSCT(scts));
   } // method getCtLogScts
+
+  private static String getSignatureAlgo(SignatureAndHashAlgorithm algorithm)
+      throws OperationException {
+    String hashName;
+    switch (algorithm.getHash()) {
+      case sha1:
+        hashName = "SHA1";
+        break;
+      case sha256:
+        hashName = "SHA256";
+        break;
+      case sha384:
+        hashName = "SHA384";
+        break;
+      case sha512:
+        hashName = "SHA512";
+        break;
+      default:
+        throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+            "unsupported hash algorithm " + algorithm.getHash());
+    }
+
+    String encAlgo = null;
+    switch (algorithm.getSignature()) {
+      case ecdsa:
+        encAlgo = "ECDSA";
+        break;
+      case rsa:
+        encAlgo = "RSA";
+        break;
+      default:
+        throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+            "unsupported signature algorithm " + algorithm.getSignature());
+    }
+
+    return hashName + "WITH" + encAlgo;
+  }
 
 }

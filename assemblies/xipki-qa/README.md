@@ -3,6 +3,7 @@
 ## In QA Folder
 - Set the XIPKI_DIR in `xipki/qa/setenv.script`.
 - Copy the file `xipki/etc/ca/ca.json` to `<tomcat/jetty_root>/xipki/etc/ca/ca.json`.
+- Copy the folder `xipki/ctlog` to `<tomcat/jetty_root>/xipki` (as sub-folder).
 
 ## In Tomcat/Jetty Folder
 - Copy the file `dummy-ctlog-server-5.2.0-SNAPSHOT.war` from project folder to `webapps/ctlog.war`.

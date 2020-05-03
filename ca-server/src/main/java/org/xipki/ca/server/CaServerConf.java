@@ -112,6 +112,44 @@ public class CaServerConf extends ValidatableConf {
 
   } // class RemoteMgmt
 
+  public static class CtLogServer {
+
+    private String name;
+
+    private FileOrBinary publicKey;
+
+    public String getName() {
+      return name;
+    }
+
+    public void setName(String name) {
+      this.name = name;
+    }
+
+    public FileOrBinary getPublicKey() {
+      return publicKey;
+    }
+
+    public void setPublicKey(FileOrBinary publicKey) {
+      this.publicKey = publicKey;
+    }
+
+  }
+
+  public static class CtLog {
+
+    private List<CtLogServer> servers;
+
+    public List<CtLogServer> getServers() {
+      return servers;
+    }
+
+    public void setServers(List<CtLogServer> servers) {
+      this.servers = servers;
+    }
+
+  }
+
   private AuditConf audit;
 
   private SecurityConf security;
@@ -132,6 +170,8 @@ public class CaServerConf extends ValidatableConf {
   private List<DataSourceConf> datasources;
 
   private List<SslContext> sslContexts;
+
+  private CtLog ctLog;
 
   /**
    * list of classes that implement org.xipki.ca.api.profile.CertprofileFactory
@@ -228,6 +268,14 @@ public class CaServerConf extends ValidatableConf {
 
   public void setCertprofileFactories(List<String> certprofileFactories) {
     this.certprofileFactories = certprofileFactories;
+  }
+
+  public CtLog getCtLog() {
+    return ctLog;
+  }
+
+  public void setCtLog(CtLog ctLog) {
+    this.ctLog = ctLog;
   }
 
   public synchronized SslContextConf getSslContextConf(String name) {

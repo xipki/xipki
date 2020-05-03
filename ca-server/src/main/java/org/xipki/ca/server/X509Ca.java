@@ -139,7 +139,6 @@ import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.CrlReason;
-import org.xipki.security.CtLog.SignedCertificateTimestampList;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.FpIdCalculator;
 import org.xipki.security.KeyUsage;
@@ -148,6 +147,7 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
+import org.xipki.security.ctlog.CtLog.SignedCertificateTimestampList;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.RSABrokenKey;
 import org.xipki.security.util.X509Util;
@@ -1866,21 +1866,15 @@ public class X509Ca implements Closeable {
             throw new OperationException(SYSTEM_FAILURE, ex);
           }
 
-          Certificate precert;
+          X509CertificateHolder precert;
           try {
-            precert = certBuilder.build(signer0.value()).toASN1Structure();
+            precert = certBuilder.build(signer0.value());
           } finally {
             // returns the signer after the signing so that it can be used by others
             gct.signer.requiteSigner(signer0);
           }
 
-          byte[] encodedPreCert;
-          try {
-            encodedPreCert = precert.getEncoded();
-          } catch (IOException ex) {
-            throw new CertIOException("could not encode PreCert", ex);
-          }
-          SignedCertificateTimestampList scts = getCtlogScts(encodedPreCert);
+          SignedCertificateTimestampList scts = getCtlogScts(precert);
 
           // remove the precertificate extension
           certBuilder.removeExtension(Extn.id_precertificate);
@@ -2785,9 +2779,10 @@ public class X509Ca implements Closeable {
     auditService().logEvent(event);
   }
 
-  private SignedCertificateTimestampList getCtlogScts(byte[] encodedPrecert)
+  private SignedCertificateTimestampList getCtlogScts(X509CertificateHolder preCert)
       throws OperationException {
-    return ctlogClient.getCtLogScts(encodedPrecert, caCert, caInfo.getCertchain());
+    return ctlogClient.getCtLogScts(preCert, caCert, caInfo.getCertchain(),
+        caManager.getCtLogPublicKeyFinder());
   }
 
 }

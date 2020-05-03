@@ -15,18 +15,28 @@
  * limitations under the License.
  */
 
-package org.xipki.security;
+package org.xipki.security.ctlog;
 
+import java.io.IOException;
 import java.math.BigInteger;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DERTaggedObject;
+import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.bouncycastle.util.Pack;
+import org.xipki.security.ObjectIdentifiers;
 import org.xipki.util.Args;
 
 /**
@@ -527,6 +537,63 @@ public class CtLog {
 
   private static byte[] copyOf(byte[] original, int from, int len) {
     return Arrays.copyOfRange(original, from, from + len);
+  }
+
+  public static void update(Signature sig, byte version, long timestamp, byte[] sctExtensions,
+      byte[] issuerKeyHash, byte[] preCertTbsCert) throws SignatureException {
+    sig.update(version);
+    sig.update((byte) 0); // signature_type = certificate_timestamp
+    byte[] timestampBytes = Pack.longToBigEndian(timestamp);
+    sig.update(timestampBytes); // timestamp
+    sig.update(new byte[] {0, 1}); // LogEntryType: precert_entry(1)
+    sig.update(issuerKeyHash);
+
+    int len = preCertTbsCert.length;
+    sig.update(encodeLength(len, 3));
+    sig.update(preCertTbsCert);
+
+    len = sctExtensions == null ? 0 : sctExtensions.length;
+    sig.update(encodeLength(len, 2));
+    if (len > 0) {
+      sig.update(sctExtensions);
+    }
+  }
+
+  public static byte[] getPreCertTbsCert(TBSCertificate tbsCert)
+      throws IOException {
+    ASN1EncodableVector vec = new ASN1EncodableVector();
+    ASN1Sequence tbs = (ASN1Sequence) tbsCert.toASN1Primitive();
+
+    // version, serialNumber, signature (algorithm), issuer, validity, subject, subjectpublickeyinfo
+    for (int i = 0; i < 7; i++) {
+      vec.add(tbs.getObjectAt(i));
+    }
+
+    ASN1TaggedObject taggedExtns = (ASN1TaggedObject) tbs.getObjectAt(7);
+    int tagNo = taggedExtns.getTagNo();
+
+    ASN1Sequence extns = (ASN1Sequence) taggedExtns.getObject().toASN1Primitive();
+    ASN1EncodableVector extnsVec = new ASN1EncodableVector(extns.size() - 1);
+    final int size = extns.size();
+    for (int i = 0; i < size; i++) {
+      ASN1Encodable extn = extns.getObjectAt(i).toASN1Primitive();
+      ASN1Encodable type = ((ASN1Sequence) extn).getObjectAt(0);
+      if (ObjectIdentifiers.Extn.id_precertificate.equals(type)
+          || ObjectIdentifiers.Extn.id_SCTs.equals(type)) {
+        continue;
+      }
+
+      extnsVec.add(extn);
+    }
+
+    vec.add(new DERTaggedObject(true, tagNo, new DERSequence(extnsVec)));
+    return new DERSequence(vec).getEncoded();
+  }
+
+  private static byte[] encodeLength(int length, int lengthBytes) {
+    byte[] encoded = new byte[lengthBytes];
+    writeInt(length, encoded, 0, lengthBytes);
+    return encoded;
   }
 
 }
