@@ -55,19 +55,6 @@
 		}
 	],
 	"ctLog":{
-	    "servers":[
-	        {
-	            "name":"dummy-ctlog-ec",
-	            "publickey": {
-	                "file":"ctlog/dummy-ctlog-ec.pubkey"
-	            }
-	        },
-	        {
-	            "name":"dummy-ctlog-rsa",
-	            "publickey": {
-	                "file":"ctlog/dummy-ctlog-rsa.pubkey"
-	            }
-	        }
-	    ]
+	    "keydir":"ctlog"
 	}
 }

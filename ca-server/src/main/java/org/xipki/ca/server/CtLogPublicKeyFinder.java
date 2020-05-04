@@ -17,6 +17,8 @@
 
 package org.xipki.ca.server;
 
+import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
@@ -27,11 +29,11 @@ import java.util.List;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.server.CaServerConf.CtLog;
-import org.xipki.ca.server.CaServerConf.CtLogServer;
+import org.xipki.ca.server.CaServerConf.CtLogConf;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.util.KeyUtil;
-import org.xipki.util.CollectionUtil;
+import org.xipki.security.util.X509Util;
+import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 
 /**
@@ -49,35 +51,52 @@ public class CtLogPublicKeyFinder {
 
   private final boolean withPublicKeys;
 
-  public CtLogPublicKeyFinder(CtLog conf) throws IOException {
-    if (conf == null || CollectionUtil.isEmpty(conf.getServers())) {
-      this.logIds = null;
-      this.publicKeys = null;
-    } else {
-      final int size = conf.getServers().size();
-      List<byte[]> logIdList = new ArrayList<>(size);
-      List<PublicKey> publicKeyList = new ArrayList<>(size);
-
-      for (CtLogServer m : conf.getServers()) {
-        byte[] keyBytes = m.getPublicKey().readContent();
-        try {
-          SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.getInstance(keyBytes);
-          byte[] logId = HashAlgo.SHA256.hash(spki.getEncoded());
-          PublicKey key = KeyUtil.generatePublicKey(spki);
-
-          logIdList.add(logId);
-          publicKeyList.add(key);
-          LOG.info("loaded CtLog public key {}", m.getName());
-        } catch (IOException | InvalidKeySpecException ex) {
-          LogUtil.error(LOG, ex, "could not load CtLog public key " + m.getName());
+  public CtLogPublicKeyFinder(CtLogConf conf) throws IOException {
+    String keydirName = conf.getKeydir();
+    File[] keyFiles = null;
+    if (keydirName != null && !keydirName.isEmpty()) {
+      keydirName = IoUtil.expandFilepath(keydirName);
+      keyFiles = new File(keydirName).listFiles(new FileFilter() {
+        @Override
+        public boolean accept(File pathname) {
+          String name = pathname.getName();
+          return pathname.isFile()
+              && (name.endsWith(".pem") || name.endsWith(".der")
+                  || name.endsWith(".key") || name.endsWith(".publickey"));
         }
-      }
-
-      this.logIds = logIdList.toArray(new byte[0][0]);
-      this.publicKeys = publicKeyList.toArray(new PublicKey[0]);
+      });
     }
 
-    withPublicKeys = logIds != null && logIds.length > 0;
+    if (keyFiles == null || keyFiles.length == 0) {
+      this.logIds = null;
+      this.publicKeys = null;
+      this.withPublicKeys = false;
+      return;
+    }
+
+    final int size = keyFiles.length;
+    List<byte[]> logIdList = new ArrayList<>(size);
+    List<PublicKey> publicKeyList = new ArrayList<>(size);
+
+    for (File m : keyFiles) {
+      byte[] keyBytes = IoUtil.read(m);
+      keyBytes = X509Util.toDerEncoded(keyBytes);
+      try {
+        SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.getInstance(keyBytes);
+        byte[] logId = HashAlgo.SHA256.hash(spki.getEncoded());
+        PublicKey key = KeyUtil.generatePublicKey(spki);
+
+        logIdList.add(logId);
+        publicKeyList.add(key);
+        LOG.info("loaded CtLog public key {}", m.getName());
+      } catch (IOException | InvalidKeySpecException ex) {
+        LogUtil.error(LOG, ex, "could not load CtLog public key " + m.getName());
+      }
+    }
+
+    this.logIds = logIdList.toArray(new byte[0][0]);
+    this.publicKeys = publicKeyList.toArray(new PublicKey[0]);
+    this.withPublicKeys = logIds != null && logIds.length > 0;
 
   }
 

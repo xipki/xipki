@@ -48,7 +48,7 @@ import junit.framework.Assert;
  */
 public class CtLogVerifyTest {
 
-  private static final String pubkeyFile = "/ctlog-certs/letsencrypt/google-xenon2020.pubkey";
+  private static final String pubkeyFile = "/ctlog-certs/letsencrypt/google-xenon2020-pubkey.pem";
 
   private static final String certFile = "/ctlog-certs/letsencrypt/letsencrypt-org.pem";
 
@@ -58,10 +58,11 @@ public class CtLogVerifyTest {
   public void testVerify() throws Exception {
     Security.addProvider(new BouncyCastleProvider());
     byte[] keyBytes = read(pubkeyFile);
-    byte[] keyId = HashAlgo.SHA256.hash(keyBytes);
+
+    SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.getInstance(X509Util.toDerEncoded(keyBytes));
+    byte[] keyId = HashAlgo.SHA256.hash(spki.getEncoded());
     System.out.println("keyId: " + Hex.encode(keyId));
 
-    SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.getInstance(keyBytes);
     PublicKey key = KeyUtil.generatePublicKey(spki);
     X509Cert cert = X509Util.parseCert(read(certFile));
     X509Cert caCert = X509Util.parseCert(read(caCertFile));
