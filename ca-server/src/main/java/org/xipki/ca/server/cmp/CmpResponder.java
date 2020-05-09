@@ -1018,7 +1018,7 @@ public class CmpResponder extends BaseCmpResponder {
     }
 
     CertOrEncCert cec = new CertOrEncCert(
-        CMPCertificate.getInstance(certInfo.getCert().getCert().getEncoded()));
+        new CMPCertificate(certInfo.getCert().getCert().toBcCert().toASN1Structure()));
     if (certInfo.getPrivateKey() == null) {
       // no private key will be returned.
       return new CertResponse(certReqId, statusInfo, new CertifiedKeyPair(cec), null);
@@ -1951,15 +1951,14 @@ public class CmpResponder extends BaseCmpResponder {
               return buildErrorMsgPkiBody(PKIStatus.rejection,
                   PKIFailureInfo.systemFailure, statusMessage);
             } else {
-              respValue = CertificateList.getInstance(tmpCrl.getEncoded());
+              respValue = tmpCrl.toASN1Structure();
             }
             break;
           case XiSecurityConstants.CMP_ACTION_GET_CRL_WITH_SN:
             event.addEventType(CaAuditConstants.Cmp.TYPE_genm_crl4number);
             checkPermission(requestor, PermissionConstants.GET_CRL);
 
-            ASN1Integer crlNumber = ASN1Integer.getInstance(reqValue);
-            respValue = ca.getBcCrl(crlNumber.getPositiveValue());
+            respValue = ca.getBcCrl(ASN1Integer.getInstance(reqValue).getPositiveValue());
             if (respValue == null) {
               String statusMessage = "no CRL is available";
               return buildErrorMsgPkiBody(PKIStatus.rejection,
@@ -2028,9 +2027,6 @@ public class CmpResponder extends BaseCmpResponder {
       } // end switch code
 
       return buildErrorMsgPkiBody(PKIStatus.rejection, failureInfo, errorMessage);
-    } catch (IOException ex) {
-      return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.systemFailure,
-          "CRLException: " + ex.getMessage());
     }
   } // method cmpGeneralMsg
 

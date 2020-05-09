@@ -326,7 +326,7 @@ public class Actions {
 
       IssuerHash issuerHash = new IssuerHash(
           HashAlgo.getNonNullInstance(options.getHashAlgorithmId()),
-          X509Util.parseCert(issuerCert.getEncoded()));
+          issuerCert);
       OCSPResp response;
       try {
         response = requestor.ask(issuerCert, sns.toArray(new BigInteger[0]), serverUrlObj,

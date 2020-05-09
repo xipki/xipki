@@ -625,15 +625,14 @@ public class ScepResponder {
   private SignedData buildSignedData(X509Cert cert) throws OperationException {
     CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
     try {
-      X509CertificateHolder certHolder = new X509CertificateHolder(cert.getEncoded());
-      cmsSignedDataGen.addCertificate(certHolder);
+      cmsSignedDataGen.addCertificate(cert.toBcCert());
       if (control.isIncludeCaCert()) {
         refreshCa();
         cmsSignedDataGen.addCertificate(caCert.toBcCert());
       }
       CMSSignedData signedData = cmsSignedDataGen.generate(new CMSAbsentContent());
       return SignedData.getInstance(signedData.toASN1Structure().getContent());
-    } catch (CMSException | IOException ex) {
+    } catch (CMSException ex) {
       LogUtil.error(LOG, ex);
       throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
     }

@@ -1203,17 +1203,8 @@ class CmpAgent {
 
         if (certConfirmBuilder != null) {
           requireConfirm = true;
-          X509CertificateHolder certHolder = null;
-          try {
-            certHolder = new X509CertificateHolder(cmpCert.getEncoded());
-          } catch (IOException ex) {
-            resultEntry = new ResultEntry.Error(thisId, PKISTATUS_RESPONSE_ERROR,
-                PKIFailureInfo.systemFailure, "could not decode the certificate");
-          }
-
-          if (certHolder != null) {
-            certConfirmBuilder.addAcceptedCertificate(certHolder, certReqId);
-          }
+          X509CertificateHolder certHolder = new X509CertificateHolder(cmpCert.getX509v3PKCert());
+          certConfirmBuilder.addAcceptedCertificate(certHolder, certReqId);
         }
       } else {
         PKIFreeText statusString = statusInfo.getStatusString();

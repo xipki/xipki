@@ -20,7 +20,6 @@ package org.xipki.ca.server;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.PublicKey;
-import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
 import java.util.List;
@@ -31,7 +30,6 @@ import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
@@ -265,12 +263,10 @@ class SelfSignedCertBuilder {
       } finally {
         signer.requiteSigner(signer0);
       }
-      Certificate bcCert = certHolder.toASN1Structure();
-      return X509Util.parseCert(bcCert.getEncoded());
+      return new X509Cert(certHolder);
     } catch (BadCertTemplateException ex) {
       throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);
-    } catch (NoIdleSignerException | CertificateException | IOException
-        | CertprofileException ex) {
+    } catch (NoIdleSignerException | IOException | CertprofileException ex) {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
     }
   } // method generateCertificate
