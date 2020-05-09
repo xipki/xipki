@@ -73,7 +73,7 @@ public class NextCaMessage {
 
   public void setRaCerts(List<X509Cert> raCerts) {
     this.raCerts = CollectionUtil.isEmpty(raCerts) ? null
-        : Collections.unmodifiableList(new ArrayList<X509Cert>(raCerts));
+        : Collections.unmodifiableList(new ArrayList<>(raCerts));
   }
 
   public ContentInfo encode(PrivateKey signingKey, X509Cert signerCert,

@@ -48,12 +48,12 @@ public class CaCaps {
   private final Set<CaCapability> capabilities;
 
   public CaCaps() {
-    this.capabilities = new HashSet<CaCapability>();
+    this.capabilities = new HashSet<>();
   }
 
   public CaCaps(Set<CaCapability> capabilities) {
     this.capabilities = CollectionUtil.isEmpty(capabilities)
-        ? new HashSet<CaCapability>() : new HashSet<CaCapability>(capabilities);
+        ? new HashSet<CaCapability>() : new HashSet<>(capabilities);
     refresh();
   }
 

@@ -70,12 +70,12 @@ public final class EnvelopedDataDecryptor {
 
   public EnvelopedDataDecryptor(List<EnvelopedDataDecryptorInstance> decryptors) {
     Args.notEmpty(decryptors, "decryptors");
-    this.decryptors = new ArrayList<EnvelopedDataDecryptorInstance>(decryptors);
+    this.decryptors = new ArrayList<>(decryptors);
   }
 
   public EnvelopedDataDecryptor(EnvelopedDataDecryptorInstance decryptor) {
     Args.notNull(decryptor, "decryptor");
-    this.decryptors = new ArrayList<EnvelopedDataDecryptorInstance>(1);
+    this.decryptors = new ArrayList<>(1);
     this.decryptors.add(decryptor);
   }
 

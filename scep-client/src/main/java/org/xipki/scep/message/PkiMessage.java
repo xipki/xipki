@@ -74,14 +74,11 @@ import org.xipki.util.Args;
 
 public class PkiMessage {
 
-  private static final Set<ASN1ObjectIdentifier> SCEP_ATTR_TYPES =
-      new HashSet<ASN1ObjectIdentifier>();
+  private static final Set<ASN1ObjectIdentifier> SCEP_ATTR_TYPES = new HashSet<>();
 
-  private final Map<ASN1ObjectIdentifier, ASN1Encodable> signedAttributes =
-      new HashMap<ASN1ObjectIdentifier, ASN1Encodable>();
+  private final Map<ASN1ObjectIdentifier, ASN1Encodable> signedAttributes = new HashMap<>();
 
-  private final Map<ASN1ObjectIdentifier, ASN1Encodable> unsignedAttributes =
-      new HashMap<ASN1ObjectIdentifier, ASN1Encodable>();
+  private final Map<ASN1ObjectIdentifier, ASN1Encodable> unsignedAttributes = new HashMap<>();
 
   private final MessageType messageType;
 

@@ -55,7 +55,7 @@ public interface CaCertValidator {
 
     public CachingCertificateValidator(CaCertValidator delegate) {
       this.delegate = Args.notNull(delegate, "delegate");
-      this.cachedAnswers = new ConcurrentHashMap<String, Boolean>();
+      this.cachedAnswers = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -93,7 +93,7 @@ public interface CaCertValidator {
 
     public PreprovisionedCaCertValidator(Set<X509Cert> certs) {
       Args.notEmpty(certs, "certs");
-      fpOfCerts = new HashSet<String>(certs.size());
+      fpOfCerts = new HashSet<>(certs.size());
 
       for (X509Cert m : certs) {
         String hexFp = HashAlgo.SHA256.hexHash(m.getEncoded());
@@ -129,7 +129,7 @@ public interface CaCertValidator {
         }
       }
 
-      this.hashValues = new HashSet<byte[]>(hashValues.size());
+      this.hashValues = new HashSet<>(hashValues.size());
       for (byte[] m : hashValues) {
         this.hashValues.add(Arrays.copyOf(m, m.length));
       }
