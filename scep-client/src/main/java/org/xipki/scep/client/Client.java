@@ -24,7 +24,6 @@ import java.security.PrivateKey;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.Date;
@@ -58,8 +57,10 @@ import org.xipki.scep.transaction.Operation;
 import org.xipki.scep.transaction.PkiStatus;
 import org.xipki.scep.transaction.TransactionId;
 import org.xipki.scep.util.ScepConstants;
-import org.xipki.scep.util.ScepHashAlgo;
 import org.xipki.scep.util.ScepUtil;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.X509Cert;
+import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
 
@@ -200,8 +201,6 @@ public abstract class Client {
     try {
       certHolder =
           new X509CertificateHolder(this.authorityCertStore.getSignatureCert().getEncoded());
-    } catch (CertificateEncodingException ex) {
-      throw new ScepClientException(ex);
     } catch (IOException ex) {
       throw new ScepClientException(ex);
     }
@@ -214,7 +213,7 @@ public abstract class Client {
     return caCaps;
   }
 
-  public X509Certificate getCaCert() {
+  public X509Cert getCaCert() {
     return authorityCertStore == null ? null : authorityCertStore.getCaCert();
   }
 
@@ -233,7 +232,7 @@ public abstract class Client {
     return authorityCertStore;
   }
 
-  public X509CRLHolder scepGetCrl(PrivateKey identityKey, X509Certificate identityCert,
+  public X509CRLHolder scepGetCrl(PrivateKey identityKey, X509Cert identityCert,
       X500Name issuer, BigInteger serialNumber) throws ScepClientException {
     Args.notNull(identityKey, "identityKey");
     Args.notNull(identityCert, "identityCert");
@@ -262,7 +261,7 @@ public abstract class Client {
     }
   } // method scepGetCrl
 
-  public List<X509Certificate> scepGetCert(PrivateKey identityKey, X509Certificate identityCert,
+  public List<X509Cert> scepGetCert(PrivateKey identityKey, X509Cert identityCert,
       X500Name issuer, BigInteger serialNumber) throws ScepClientException {
     Args.notNull(identityKey, "identityKey");
     Args.notNull(identityCert, "identityCert");
@@ -292,7 +291,7 @@ public abstract class Client {
     }
   } // method scepGetCert
 
-  public EnrolmentResponse scepCertPoll(PrivateKey identityKey, X509Certificate identityCert,
+  public EnrolmentResponse scepCertPoll(PrivateKey identityKey, X509Cert identityCert,
       CertificationRequest csr, X500Name issuer) throws ScepClientException {
     Args.notNull(csr, "csr");
 
@@ -308,7 +307,7 @@ public abstract class Client {
         csr.getCertificationRequestInfo().getSubject());
   } // method scepCertPoll
 
-  public EnrolmentResponse scepCertPoll(PrivateKey identityKey, X509Certificate identityCert,
+  public EnrolmentResponse scepCertPoll(PrivateKey identityKey, X509Cert identityCert,
       TransactionId transactionId, X500Name issuer, X500Name subject) throws ScepClientException {
     Args.notNull(identityKey, "identityKey");
     Args.notNull(identityCert, "identityCert");
@@ -330,7 +329,7 @@ public abstract class Client {
   } // method scepCertPoll
 
   public EnrolmentResponse scepEnrol(CertificationRequest csr, PrivateKey identityKey,
-      X509Certificate identityCert) throws ScepClientException {
+      X509Cert identityCert) throws ScepClientException {
     Args.notNull(csr, "csr");
     Args.notNull(identityKey, "identityKey");
     Args.notNull(identityCert, "identityCert");
@@ -343,9 +342,9 @@ public abstract class Client {
     }
 
     // draft-gutmann-scep
-    if (!ScepUtil.isSelfSigned(identityCert)) {
-      X509Certificate caCert = authorityCertStore.getCaCert();
-      if (identityCert.getIssuerX500Principal().equals(caCert.getSubjectX500Principal())) {
+    if (!identityCert.isSelfSigned()) {
+      X509Cert caCert = authorityCertStore.getCaCert();
+      if (identityCert.getIssuer().equals(caCert.getSubject())) {
         if (caCaps.containsCapability(CaCapability.Renewal)) {
           return scepRenewalReq(csr, identityKey, identityCert);
         }
@@ -360,14 +359,14 @@ public abstract class Client {
   } // method scepEnrol
 
   public EnrolmentResponse scepPkcsReq(CertificationRequest csr, PrivateKey identityKey,
-      X509Certificate identityCert) throws ScepClientException {
+      X509Cert identityCert) throws ScepClientException {
     Args.notNull(csr, "csr");
     Args.notNull(identityKey, "identityKey");
     Args.notNull(identityCert, "identityCert");
 
     initIfNotInited();
 
-    if (!ScepUtil.isSelfSigned(identityCert)) {
+    if (!identityCert.isSelfSigned()) {
       throw new IllegalArgumentException("identityCert is not self-signed");
     }
 
@@ -375,7 +374,7 @@ public abstract class Client {
   } // method scepPkcsReq
 
   public EnrolmentResponse scepRenewalReq(CertificationRequest csr, PrivateKey identityKey,
-      X509Certificate identityCert) throws ScepClientException {
+      X509Cert identityCert) throws ScepClientException {
     initIfNotInited();
 
     if (!caCaps.containsCapability(CaCapability.Renewal)) {
@@ -383,8 +382,7 @@ public abstract class Client {
           "unsupported messageType '" + MessageType.RenewalReq + "'");
     }
 
-    boolean selfSigned = ScepUtil.isSelfSigned(identityCert);
-    if (selfSigned) {
+    if (identityCert.isSelfSigned()) {
       throw new IllegalArgumentException("identityCert must not be self-signed");
     }
 
@@ -392,7 +390,7 @@ public abstract class Client {
   } // method scepRenewalReq
 
   public EnrolmentResponse scepUpdateReq(CertificationRequest csr, PrivateKey identityKey,
-      X509Certificate identityCert) throws ScepClientException {
+      X509Cert identityCert) throws ScepClientException {
     initIfNotInited();
 
     if (!caCaps.containsCapability(CaCapability.Update)) {
@@ -400,8 +398,7 @@ public abstract class Client {
           "unsupported messageType '" + MessageType.UpdateReq + "'");
     }
 
-    boolean selfSigned = ScepUtil.isSelfSigned(identityCert);
-    if (selfSigned) {
+    if (identityCert.isSelfSigned()) {
       throw new IllegalArgumentException("identityCert must not be self-signed");
     }
 
@@ -409,7 +406,7 @@ public abstract class Client {
   } // method scepUpdateReq
 
   private EnrolmentResponse enroll(MessageType messageType, CertificationRequest csr,
-      PrivateKey identityKey, X509Certificate identityCert) throws ScepClientException {
+      PrivateKey identityKey, X509Cert identityCert) throws ScepClientException {
     TransactionId tid;
     try {
       tid = TransactionId.sha1TransactionId(
@@ -442,11 +439,8 @@ public abstract class Client {
   } // method scepNextCaCert
 
   private ContentInfo encryptThenSign(PkiMessage request, PrivateKey identityKey,
-      X509Certificate identityCert) throws ScepClientException {
-    ScepHashAlgo hashAlgo = caCaps.mostSecureHashAlgo();
-    if (hashAlgo == ScepHashAlgo.MD5 && !useInsecureAlgorithms) {
-      throw new ScepClientException("Scep server supports only MD5 but it not permitted in client");
-    }
+      X509Cert identityCert) throws ScepClientException {
+    HashAlgo hashAlgo = caCaps.mostSecureHashAlgo();
     String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(identityKey, hashAlgo);
     ASN1ObjectIdentifier encAlgId;
     if (caCaps.containsCapability(CaCapability.AES)) {
@@ -461,7 +455,7 @@ public abstract class Client {
 
     try {
       return request.encode(identityKey, signatureAlgorithm, identityCert,
-          new X509Certificate[]{identityCert}, authorityCertStore.getEncryptionCert(), encAlgId);
+          new X509Cert[]{identityCert}, authorityCertStore.getEncryptionCert(), encAlgId);
     } catch (MessageEncodingException ex) {
       throw new ScepClientException(ex);
     }
@@ -535,7 +529,7 @@ public abstract class Client {
   }
 
   private DecodedPkiMessage decode(CMSSignedData pkiMessage, PrivateKey recipientKey,
-      X509Certificate recipientCert) throws ScepClientException {
+      X509Cert recipientCert) throws ScepClientException {
     DecodedPkiMessage resp;
     try {
       resp = DecodedPkiMessage.decode(pkiMessage, recipientKey, recipientCert, responseSignerCerts);
@@ -585,14 +579,6 @@ public abstract class Client {
         || caCaps.containsCapability(CaCapability.Update);
   }
 
-  private static X509Certificate parseCert(byte[] certBytes) throws ScepClientException {
-    try {
-      return ScepUtil.parseCert(certBytes);
-    } catch (CertificateException ex) {
-      throw new ScepClientException(ex);
-    }
-  }
-
   private static CMSSignedData parsePkiMessage(byte[] messageBytes) throws ScepClientException {
     try {
       return new CMSSignedData(messageBytes);
@@ -605,11 +591,15 @@ public abstract class Client {
       CaCertValidator caValidator) throws ScepClientException {
     String ct = resp.getContentType();
 
-    X509Certificate caCert = null;
-    List<X509Certificate> raCerts = new LinkedList<X509Certificate>();
+    X509Cert caCert = null;
+    List<X509Cert> raCerts = new LinkedList<>();
 
     if (ScepConstants.CT_X509_CA_CERT.equalsIgnoreCase(ct)) {
-      caCert = parseCert(resp.getContentBytes());
+      try {
+        caCert = X509Util.parseCert(resp.getContentBytes());
+      } catch (CertificateEncodingException ex) {
+        throw new ScepClientException("error parsing certificate: " + ex.getMessage(), ex);
+      }
     } else if (ScepConstants.CT_X509_CA_RA_CERT.equalsIgnoreCase(ct)) {
       ContentInfo contentInfo = ContentInfo.getInstance(resp.getContentBytes());
 
@@ -620,7 +610,7 @@ public abstract class Client {
         throw new ScepClientException("invalid SignedData message: " + ex.getMessage(), ex);
       }
 
-      List<X509Certificate> certs;
+      List<X509Cert> certs;
       try {
         certs = ScepUtil.getCertsFromSignedData(signedData);
       } catch (CertificateException ex) {
@@ -634,7 +624,7 @@ public abstract class Client {
       }
 
       for (int i = 0; i < n; i++) {
-        X509Certificate cert = certs.get(i);
+        X509Cert cert = certs.get(i);
         if (cert.getBasicConstraints() > -1) {
           if (caCert != null) {
             throw new ScepClientException(
@@ -655,7 +645,7 @@ public abstract class Client {
 
     if (!caValidator.isTrusted(caCert)) {
       throw new ScepClientException(
-          "CA certificate '" + caCert.getSubjectX500Principal() + "' is not trusted");
+          "CA certificate '" + caCert.getSubjectRfc4519Text() + "' is not trusted");
     }
 
     if (raCerts.isEmpty()) {
@@ -663,17 +653,17 @@ public abstract class Client {
     }
 
     AuthorityCertStore cs = AuthorityCertStore.getInstance(caCert,
-        raCerts.toArray(new X509Certificate[0]));
-    X509Certificate raEncCert = cs.getEncryptionCert();
-    X509Certificate raSignCert = cs.getSignatureCert();
+        raCerts.toArray(new X509Cert[0]));
+    X509Cert raEncCert = cs.getEncryptionCert();
+    X509Cert raSignCert = cs.getSignatureCert();
     try {
-      if (!ScepUtil.issues(caCert, raEncCert)) {
+      if (!X509Util.issues(caCert, raEncCert)) {
         throw new ScepClientException("RA certificate '"
-            + raEncCert.getSubjectX500Principal() + " is not issued by the CA");
+            + raEncCert.getSubjectRfc4519Text() + " is not issued by the CA");
       }
-      if (raSignCert != raEncCert && ScepUtil.issues(caCert, raSignCert)) {
+      if (raSignCert != raEncCert && X509Util.issues(caCert, raSignCert)) {
         throw new ScepClientException("RA certificate '"
-            + raSignCert.getSubjectX500Principal() + " is not issued by the CA");
+            + raSignCert.getSubjectRfc4519Text() + " is not issued by the CA");
       }
     } catch (CertificateException ex) {
       throw new ScepClientException("invalid certificate: " + ex.getMessage(), ex);

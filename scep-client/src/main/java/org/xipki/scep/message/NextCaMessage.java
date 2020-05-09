@@ -20,14 +20,12 @@ package org.xipki.scep.message;
 import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
 import org.bouncycastle.asn1.cms.ContentInfo;
-import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cms.CMSAbsentContent;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSProcessableByteArray;
@@ -40,8 +38,9 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.xipki.scep.util.ScepHashAlgo;
 import org.xipki.scep.util.ScepUtil;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 
@@ -53,56 +52,51 @@ import org.xipki.util.CollectionUtil;
 
 public class NextCaMessage {
 
-  private X509Certificate caCert;
+  private X509Cert caCert;
 
-  private List<X509Certificate> raCerts;
+  private List<X509Cert> raCerts;
 
   public NextCaMessage() {
   }
 
-  public X509Certificate getCaCert() {
+  public X509Cert getCaCert() {
     return caCert;
   }
 
-  public void setCaCert(X509Certificate caCert) {
+  public void setCaCert(X509Cert caCert) {
     this.caCert = caCert;
   }
 
-  public List<X509Certificate> getRaCerts() {
+  public List<X509Cert> getRaCerts() {
     return raCerts;
   }
 
-  public void setRaCerts(List<X509Certificate> raCerts) {
+  public void setRaCerts(List<X509Cert> raCerts) {
     this.raCerts = CollectionUtil.isEmpty(raCerts) ? null
-        : Collections.unmodifiableList(new ArrayList<X509Certificate>(raCerts));
+        : Collections.unmodifiableList(new ArrayList<X509Cert>(raCerts));
   }
 
-  public ContentInfo encode(PrivateKey signingKey, X509Certificate signerCert,
-      X509Certificate[] cmsCertSet) throws MessageEncodingException {
+  public ContentInfo encode(PrivateKey signingKey, X509Cert signerCert,
+      X509Cert[] cmsCertSet) throws MessageEncodingException {
     Args.notNull(signingKey, "signingKey");
     Args.notNull(signerCert, "signerCert");
 
     try {
-      byte[] degenratedSignedDataBytes;
-      try {
-        CMSSignedDataGenerator degenerateSignedData = new CMSSignedDataGenerator();
-        degenerateSignedData.addCertificate(new X509CertificateHolder(caCert.getEncoded()));
-        if (CollectionUtil.isNotEmpty(raCerts)) {
-          for (X509Certificate m : raCerts) {
-            degenerateSignedData.addCertificate(new X509CertificateHolder(m.getEncoded()));
-          }
+      CMSSignedDataGenerator degenerateSignedData = new CMSSignedDataGenerator();
+      degenerateSignedData.addCertificate(caCert.toBcCert());
+      if (CollectionUtil.isNotEmpty(raCerts)) {
+        for (X509Cert m : raCerts) {
+          degenerateSignedData.addCertificate(m.toBcCert());
         }
-
-        degenratedSignedDataBytes = degenerateSignedData.generate(
-            new CMSAbsentContent()).getEncoded();
-      } catch (CertificateEncodingException ex) {
-        throw new MessageEncodingException(ex.getMessage(), ex);
       }
+
+      byte[] degenratedSignedDataBytes = degenerateSignedData.generate(
+          new CMSAbsentContent()).getEncoded();
 
       CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
 
       // I don't known which hash algorithm is supported by the client, use SHA-1
-      String signatureAlgo = getSignatureAlgorithm(signingKey, ScepHashAlgo.SHA1);
+      String signatureAlgo = getSignatureAlgorithm(signingKey, HashAlgo.SHA1);
       ContentSigner signer = new JcaContentSignerBuilder(signatureAlgo).build(signingKey);
 
       // signerInfo
@@ -111,7 +105,7 @@ public class NextCaMessage {
 
       signerInfoBuilder.setSignedAttributeGenerator(new DefaultSignedAttributeTableGenerator());
 
-      SignerInfoGenerator signerInfo = signerInfoBuilder.build(signer, signerCert);
+      SignerInfoGenerator signerInfo = signerInfoBuilder.build(signer, signerCert.toBcCert());
       generator.addSignerInfoGenerator(signerInfo);
 
       CMSTypedData cmsContent = new CMSProcessableByteArray(CMSObjectIdentifiers.signedData,
@@ -126,7 +120,7 @@ public class NextCaMessage {
     }
   } // method encode
 
-  private static String getSignatureAlgorithm(PrivateKey key, ScepHashAlgo hashAlgo) {
+  private static String getSignatureAlgorithm(PrivateKey key, HashAlgo hashAlgo) {
     String algorithm = key.getAlgorithm();
     if ("RSA".equalsIgnoreCase(algorithm)) {
       return hashAlgo.getName() + "withRSA";

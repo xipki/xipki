@@ -23,7 +23,6 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
@@ -48,6 +47,7 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.util.encoders.Base64;
+import org.xipki.security.X509Cert;
 
 /**
  * SCEP client example with the common static methods.
@@ -179,15 +179,14 @@ public class CaClientExample {
     return csrBuilder.build(signer).toASN1Structure();
   }
 
-  protected static void printCert(String prefix, X509Certificate cert)
+  protected static void printCert(String prefix, X509Cert cert)
             throws CertificateEncodingException {
     System.out.println(prefix);
     System.out.print("Subject: ");
-    System.out.println(cert.getSubjectX500Principal());
+    System.out.println(cert.getSubjectRfc4519Text());
     System.out.print(" Issuer: ");
-    System.out.println(cert.getIssuerX500Principal());
-    System.out.print(" Serial: 0x");
-    System.out.println(cert.getSerialNumber().toString(16));
+    System.out.println(cert.getIssuerRfc4519Text());
+    System.out.print(" Serial: " + cert.getSerialNumberHex());
     System.out.println("NotBefore: " + cert.getNotBefore());
     System.out.println(" NotAfter: " + cert.getNotAfter());
     String pemCert = toPEM("CERTIFICATE", cert.getEncoded());

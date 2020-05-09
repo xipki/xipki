@@ -18,18 +18,18 @@
 package org.xipki.scep.message;
 
 import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.bouncycastle.cms.CMSEnvelopedData;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.KeyTransRecipient;
+import org.bouncycastle.cms.KeyTransRecipientId;
 import org.bouncycastle.cms.RecipientId;
 import org.bouncycastle.cms.RecipientInformation;
 import org.bouncycastle.cms.RecipientInformationStore;
 import org.bouncycastle.cms.jcajce.JceKeyTransEnvelopedRecipient;
-import org.bouncycastle.cms.jcajce.JceKeyTransRecipientId;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 
 /**
@@ -46,11 +46,13 @@ public final class EnvelopedDataDecryptor {
 
     private final KeyTransRecipient recipient;
 
-    public EnvelopedDataDecryptorInstance(X509Certificate recipientCert, PrivateKey privKey) {
+    public EnvelopedDataDecryptorInstance(X509Cert recipientCert, PrivateKey privKey) {
       Args.notNull(recipientCert, "recipientCert");
       Args.notNull(privKey, "privKey");
 
-      this.recipientId = new JceKeyTransRecipientId(recipientCert);
+      this.recipientId = new KeyTransRecipientId(
+          recipientCert.getIssuer(), recipientCert.getSerialNumber(),
+          recipientCert.getSubjectKeyId());
       this.recipient = new JceKeyTransEnvelopedRecipient(privKey);
     }
 

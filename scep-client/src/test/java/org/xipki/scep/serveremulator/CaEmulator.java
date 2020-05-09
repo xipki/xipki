@@ -44,7 +44,6 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.CRLReason;
-import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -70,8 +69,9 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCSException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.scep.util.ScepHashAlgo;
 import org.xipki.scep.util.ScepUtil;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 
 /**
@@ -96,7 +96,7 @@ public class CaEmulator {
 
   private final PrivateKey caKey;
 
-  private final Certificate caCert;
+  private final X509Cert caCert;
 
   private final X500Name caSubject;
 
@@ -104,9 +104,9 @@ public class CaEmulator {
 
   private final boolean generateCrl;
 
-  private final Map<BigInteger, Certificate> serialCertMap = new HashMap<BigInteger, Certificate>();
+  private final Map<BigInteger, X509Cert> serialCertMap = new HashMap<>();
 
-  private final Map<X500Name, Certificate> reqSubjectCertMap = new HashMap<X500Name, Certificate>();
+  private final Map<X500Name, X509Cert> reqSubjectCertMap = new HashMap<>();
 
   private final AtomicLong serialNumber = new AtomicLong(2);
 
@@ -114,24 +114,20 @@ public class CaEmulator {
 
   private CertificateList crl;
 
-  public CaEmulator(PrivateKey caKey, Certificate caCert, boolean generateCrl)
+  public CaEmulator(PrivateKey caKey, X509Cert caCert, boolean generateCrl)
       throws CertificateEncodingException {
     this.caKey = Args.notNull(caKey, "caKey");
     this.caCert = Args.notNull(caCert, "caCert");
     this.caSubject = caCert.getSubject();
     this.generateCrl = generateCrl;
-    try {
-      this.caCertBytes = caCert.getEncoded();
-    } catch (IOException ex) {
-      throw new CertificateEncodingException(ex.getMessage(), ex);
-    }
+    this.caCertBytes = caCert.getEncoded();
   }
 
   public PrivateKey getCaKey() {
     return caKey;
   }
 
-  public Certificate getCaCert() {
+  public X509Cert getCaCert() {
     return caCert;
   }
 
@@ -143,7 +139,7 @@ public class CaEmulator {
     return generateCrl;
   }
 
-  public Certificate generateCert(CertificationRequest csr) throws Exception {
+  public X509Cert generateCert(CertificationRequest csr) throws Exception {
     if (!verifyPopo(csr)) {
       throw new Exception("CSR invalid");
     }
@@ -151,13 +147,13 @@ public class CaEmulator {
     return generateCert(reqInfo.getSubjectPublicKeyInfo(), reqInfo.getSubject());
   }
 
-  public Certificate generateCert(SubjectPublicKeyInfo pubKeyInfo, X500Name subjectDn)
+  public X509Cert generateCert(SubjectPublicKeyInfo pubKeyInfo, X500Name subjectDn)
       throws Exception {
     return generateCert(pubKeyInfo, subjectDn,
         new Date(System.currentTimeMillis() - 10 * CaEmulator.MIN_IN_MS));
   }
 
-  public Certificate generateCert(SubjectPublicKeyInfo pubKeyInfo, X500Name subjectDn,
+  public X509Cert generateCert(SubjectPublicKeyInfo pubKeyInfo, X500Name subjectDn,
       Date notBefore) throws Exception {
     Args.notNull(pubKeyInfo, "pubKeyInfo");
     Args.notNull(subjectDn, "subjectDn");
@@ -174,16 +170,16 @@ public class CaEmulator {
     BasicConstraints bc = new BasicConstraints(false);
     certGenerator.addExtension(Extension.basicConstraints, true, bc);
 
-    String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(caKey, ScepHashAlgo.SHA256);
+    String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(caKey, HashAlgo.SHA256);
     ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(caKey);
-    Certificate asn1Cert = certGenerator.build(contentSigner).toASN1Structure();
+    X509Cert cert = new X509Cert(certGenerator.build(contentSigner));
 
-    serialCertMap.put(tmpSerialNumber, asn1Cert);
-    reqSubjectCertMap.put(subjectDn, asn1Cert);
-    return asn1Cert;
+    serialCertMap.put(tmpSerialNumber, cert);
+    reqSubjectCertMap.put(subjectDn, cert);
+    return cert;
   } // method generateCert
 
-  public Certificate getCert(X500Name issuer, BigInteger serialNumber) {
+  public X509Cert getCert(X500Name issuer, BigInteger serialNumber) {
     if (!caSubject.equals(issuer)) {
       return null;
     }
@@ -191,7 +187,7 @@ public class CaEmulator {
     return serialCertMap.get(serialNumber);
   }
 
-  public Certificate pollCert(X500Name issuer, X500Name subject) {
+  public X509Cert pollCert(X500Name issuer, X500Name subject) {
     Args.notNull(issuer, "issuer");
     Args.notNull(subject, "subject");
     if (!caSubject.equals(issuer)) {
@@ -211,7 +207,7 @@ public class CaEmulator {
     X509v2CRLBuilder crlBuilder = new X509v2CRLBuilder(caSubject, thisUpdate);
     Date nextUpdate = new Date(thisUpdate.getTime() + 30 * DAY_IN_MS);
     crlBuilder.setNextUpdate(nextUpdate);
-    Date caStartTime = caCert.getTBSCertificate().getStartDate().getDate();
+    Date caStartTime = caCert.getNotBefore();
     Date revocationTime = new Date(caStartTime.getTime() + 1);
     if (revocationTime.after(thisUpdate)) {
       revocationTime = caStartTime;
@@ -219,7 +215,7 @@ public class CaEmulator {
     crlBuilder.addCRLEntry(BigInteger.valueOf(2), revocationTime, CRLReason.keyCompromise);
     crlBuilder.addExtension(Extension.cRLNumber, false, new ASN1Integer(crlNumber.getAndAdd(1)));
 
-    String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(caKey, ScepHashAlgo.SHA256);
+    String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(caKey, HashAlgo.SHA256);
     ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(caKey);
     X509CRLHolder crl = crlBuilder.build(contentSigner);
     return crl.toASN1Structure();

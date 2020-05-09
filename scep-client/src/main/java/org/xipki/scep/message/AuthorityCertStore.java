@@ -17,8 +17,8 @@
 
 package org.xipki.scep.message;
 
-import java.security.cert.X509Certificate;
-
+import org.xipki.security.KeyUsage;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 
 /**
@@ -29,52 +29,50 @@ import org.xipki.util.Args;
 
 public class AuthorityCertStore {
 
-  private final X509Certificate caCert;
+  private final X509Cert caCert;
 
-  private final X509Certificate signatureCert;
+  private final X509Cert signatureCert;
 
-  private final X509Certificate encryptionCert;
+  private final X509Cert encryptionCert;
 
-  private AuthorityCertStore(X509Certificate caCert, X509Certificate signatureCert,
-      X509Certificate encryptionCert) {
+  private AuthorityCertStore(X509Cert caCert, X509Cert signatureCert, X509Cert encryptionCert) {
     this.caCert = caCert;
     this.signatureCert = signatureCert;
     this.encryptionCert = encryptionCert;
   }
 
-  public X509Certificate getSignatureCert() {
+  public X509Cert getSignatureCert() {
     return signatureCert;
   }
 
-  public X509Certificate getEncryptionCert() {
+  public X509Cert getEncryptionCert() {
     return encryptionCert;
   }
 
-  public X509Certificate getCaCert() {
+  public X509Cert getCaCert() {
     return caCert;
   }
 
-  public static AuthorityCertStore getInstance(X509Certificate caCert, X509Certificate... raCerts) {
+  public static AuthorityCertStore getInstance(X509Cert caCert, X509Cert... raCerts) {
     Args.notNull(caCert, "caCert");
 
-    X509Certificate encryptionCert = null;
-    X509Certificate signatureCert = null;
+    X509Cert encryptionCert = null;
+    X509Cert signatureCert = null;
 
     if (raCerts == null || raCerts.length == 0) {
       signatureCert = caCert;
       encryptionCert = caCert;
     } else {
-      for (X509Certificate cert : raCerts) {
-        boolean[] keyusage = cert.getKeyUsage();
-        if (hasKeyusage(keyusage, KeyUsage.keyEncipherment)) {
+      for (X509Cert cert : raCerts) {
+        if (cert.hasKeyusage(KeyUsage.keyEncipherment)) {
           if (encryptionCert != null) {
             throw new IllegalArgumentException("Could not determine RA certificate for encryption");
           }
           encryptionCert = cert;
         }
 
-        if (hasKeyusage(keyusage, KeyUsage.digitalSignature)
-            || hasKeyusage(keyusage, KeyUsage.contentCommitment)) {
+        if (cert.hasKeyusage(KeyUsage.digitalSignature)
+            || cert.hasKeyusage(KeyUsage.contentCommitment)) {
           if (signatureCert != null) {
             throw new IllegalArgumentException("Could not determine RA certificate for signature");
           }
@@ -93,12 +91,5 @@ public class AuthorityCertStore {
 
     return new AuthorityCertStore(caCert, signatureCert, encryptionCert);
   } // method getInstance
-
-  private static boolean hasKeyusage(boolean[] keyusage, KeyUsage usage) {
-    if (keyusage != null && keyusage.length > usage.getBit()) {
-      return keyusage[usage.getBit()];
-    }
-    return false;
-  }
 
 }

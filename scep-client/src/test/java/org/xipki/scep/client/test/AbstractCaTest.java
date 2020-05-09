@@ -17,18 +17,13 @@
 
 package org.xipki.scep.client.test;
 
-import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.Arrays;
 import java.util.List;
 
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
@@ -47,7 +42,7 @@ import org.xipki.scep.serveremulator.ScepServer;
 import org.xipki.scep.serveremulator.ScepServerContainer;
 import org.xipki.scep.transaction.CaCapability;
 import org.xipki.scep.transaction.PkiStatus;
-import org.xipki.scep.util.ScepUtil;
+import org.xipki.security.X509Cert;
 
 /**
  * Anchor of all CA tests.
@@ -133,7 +128,7 @@ public abstract class AbstractCaTest {
   public void test() throws Exception {
     CaIdentifier caId = new CaIdentifier("http://localhost:" + port + "/scep/pkiclient.exe", null);
     CaCertValidator caCertValidator = new CaCertValidator.PreprovisionedCaCertValidator(
-            ScepUtil.toX509Cert(scepServer.getCaCert()));
+            scepServer.getCaCert());
     ScepClient client = new ScepClient(caId, caCertValidator);
     client.setUseInsecureAlgorithms(useInsecureAlgorithms());
 
@@ -146,21 +141,21 @@ public abstract class AbstractCaTest {
     Assert.assertEquals("CACaps", expCaCaps, caCaps);
 
     // CA certificate
-    Certificate expCaCert = scepServer.getCaCert();
-    X509Certificate caCert = client.getAuthorityCertStore().getCaCert();
-    if (!equals(expCaCert, caCert)) {
+    X509Cert expCaCert = scepServer.getCaCert();
+    X509Cert caCert = client.getAuthorityCertStore().getCaCert();
+    if (!expCaCert.equals(caCert)) {
       Assert.fail("Configured and received CA certificate not the same");
     }
 
     boolean withRa = isWithRa();
     // RA
     if (withRa) {
-      Certificate expRaCert = scepServer.getRaCert();
-      X509Certificate raSigCert = client.getAuthorityCertStore().getSignatureCert();
-      X509Certificate raEncCert = client.getAuthorityCertStore().getEncryptionCert();
+      X509Cert expRaCert = scepServer.getRaCert();
+      X509Cert raSigCert = client.getAuthorityCertStore().getSignatureCert();
+      X509Cert raEncCert = client.getAuthorityCertStore().getEncryptionCert();
       Assert.assertEquals("RA certificate", raSigCert, raEncCert);
 
-      if (!equals(expRaCert, raSigCert)) {
+      if (!expRaCert.equals(raSigCert)) {
         Assert.fail("Configured and received RA certificate not the same");
       }
     }
@@ -169,19 +164,19 @@ public abstract class AbstractCaTest {
     if (isWithNextCa()) {
       AuthorityCertStore nextCa = client.scepNextCaCert();
 
-      Certificate expNextCaCert = scepServer.getNextCaCert();
-      X509Certificate nextCaCert = nextCa.getCaCert();
-      if (!equals(expNextCaCert, nextCaCert)) {
+      X509Cert expNextCaCert = scepServer.getNextCaCert();
+      X509Cert nextCaCert = nextCa.getCaCert();
+      if (!expNextCaCert.equals(nextCaCert)) {
         Assert.fail("Configured and received next CA certificate not the same");
       }
 
       if (withRa) {
-        Certificate expNextRaCert = scepServer.getNextRaCert();
-        X509Certificate nextRaSigCert = nextCa.getSignatureCert();
-        X509Certificate nextRaEncCert = nextCa.getEncryptionCert();
+        X509Cert expNextRaCert = scepServer.getNextRaCert();
+        X509Cert nextRaSigCert = nextCa.getSignatureCert();
+        X509Cert nextRaEncCert = nextCa.getEncryptionCert();
         Assert.assertEquals("Next RA certificate", nextRaSigCert, nextRaEncCert);
 
-        if (!equals(expNextRaCert, nextRaSigCert)) {
+        if (!expNextRaCert.equals(nextRaSigCert)) {
           Assert.fail("Configured and received next RA certificate not the same");
         }
       }
@@ -190,9 +185,9 @@ public abstract class AbstractCaTest {
     // enroll
     CertificationRequest csr;
 
-    X509Certificate selfSignedCert;
-    X509Certificate enroledCert;
-    X500Name issuerName = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
+    X509Cert selfSignedCert;
+    X509Cert enroledCert;
+    X500Name issuerName = caCert.getSubject();
     PrivateKey privKey;
 
     {
@@ -232,9 +227,9 @@ public abstract class AbstractCaTest {
       selfSignedCert = MyUtil.generateSelfsignedCert(p10Req.toASN1Structure(), privKey);
       enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey, selfSignedCert);
 
-      List<X509Certificate> certs = enrolResp.getCertificates();
+      List<X509Cert> certs = enrolResp.getCertificates();
       Assert.assertTrue("number of received certificates", certs.size() > 0);
-      X509Certificate cert = certs.get(0);
+      X509Cert cert = certs.get(0);
       Assert.assertNotNull("enroled certificate", cert);
       enroledCert = cert;
 
@@ -252,9 +247,9 @@ public abstract class AbstractCaTest {
     // certPoll
     EnrolmentResponse enrolResp = client.scepCertPoll(privKey, selfSignedCert, csr, issuerName);
 
-    List<X509Certificate> certs = enrolResp.getCertificates();
+    List<X509Cert> certs = enrolResp.getCertificates();
     Assert.assertTrue("number of received certificates", certs.size() > 0);
-    X509Certificate cert = certs.get(0);
+    X509Cert cert = certs.get(0);
     Assert.assertNotNull("enrolled certificate", cert);
 
     // getCert
@@ -289,10 +284,5 @@ public abstract class AbstractCaTest {
     }
     return caCaps;
   } // method getExpectedCaCaps
-
-  private boolean equals(Certificate bcCert, X509Certificate cert)
-      throws CertificateException, IOException {
-    return Arrays.equals(cert.getEncoded(), bcCert.getEncoded());
-  }
 
 }

@@ -22,7 +22,6 @@ import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +37,6 @@ import org.bouncycastle.asn1.pkcs.RSAPublicKey;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -51,8 +49,9 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.xipki.scep.serveremulator.CaEmulator;
-import org.xipki.scep.util.ScepHashAlgo;
 import org.xipki.scep.util.ScepUtil;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.StringUtil;
@@ -72,7 +71,7 @@ public class MyUtil {
   private static final AlgorithmIdentifier ALGID_RSA =
       new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE);
 
-  public static Certificate issueSubCaCert(PrivateKey rcaKey, X500Name issuer,
+  public static X509Cert issueSubCaCert(PrivateKey rcaKey, X500Name issuer,
       SubjectPublicKeyInfo pubKeyInfo, X500Name subject, BigInteger serialNumber,
       Date startTime) throws CertIOException, OperatorCreationException {
     Date notAfter = new Date(startTime.getTime() + CaEmulator.DAY_IN_MS * 3650);
@@ -83,9 +82,9 @@ public class MyUtil {
     BasicConstraints bc = new BasicConstraints(0);
     certGenerator.addExtension(Extension.basicConstraints, true, bc);
 
-    String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(rcaKey, ScepHashAlgo.SHA256);
+    String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(rcaKey, HashAlgo.SHA256);
     ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(rcaKey);
-    return certGenerator.build(contentSigner).toASN1Structure();
+    return new X509Cert(certGenerator.build(contentSigner));
   } // method issueSubCaCert
 
   public static PKCS10CertificationRequest generateRequest(PrivateKey privatekey,
@@ -119,18 +118,18 @@ public class MyUtil {
     }
 
     ContentSigner contentSigner = new JcaContentSignerBuilder(
-        ScepUtil.getSignatureAlgorithm(privatekey, ScepHashAlgo.SHA1)).build(privatekey);
+        ScepUtil.getSignatureAlgorithm(privatekey, HashAlgo.SHA1)).build(privatekey);
     return csrBuilder.build(contentSigner);
   } // method generateRequest
 
-  public static X509Certificate generateSelfsignedCert(CertificationRequest csr,
+  public static X509Cert generateSelfsignedCert(CertificationRequest csr,
       PrivateKey identityKey) throws CertificateException {
     Args.notNull(csr, "csr");
     return generateSelfsignedCert(csr.getCertificationRequestInfo().getSubject(),
         csr.getCertificationRequestInfo().getSubjectPublicKeyInfo(), identityKey);
   }
 
-  public static X509Certificate generateSelfsignedCert(X500Name subjectDn,
+  public static X509Cert generateSelfsignedCert(X500Name subjectDn,
       SubjectPublicKeyInfo pubKeyInfo, PrivateKey identityKey) throws CertificateException {
     Args.notNull(subjectDn, "subjectDn");
     Args.notNull(pubKeyInfo, "pubKeyInfo");
@@ -151,7 +150,7 @@ public class MyUtil {
           "could not generate self-signed certificate: " + ex.getMessage(), ex);
     }
 
-    String sigAlgorithm = ScepUtil.getSignatureAlgorithm(identityKey, ScepHashAlgo.SHA1);
+    String sigAlgorithm = ScepUtil.getSignatureAlgorithm(identityKey, HashAlgo.SHA1);
     ContentSigner contentSigner;
     try {
       contentSigner = new JcaContentSignerBuilder(sigAlgorithm).build(identityKey);
@@ -159,8 +158,7 @@ public class MyUtil {
       throw new CertificateException("error while creating signer", ex);
     }
 
-    Certificate asn1Cert = certGenerator.build(contentSigner).toASN1Structure();
-    return ScepUtil.toX509Cert(asn1Cert);
+    return new X509Cert(certGenerator.build(contentSigner));
   } // method generateSelfsignedCert
 
   public static SubjectPublicKeyInfo createSubjectPublicKeyInfo(PublicKey publicKey)

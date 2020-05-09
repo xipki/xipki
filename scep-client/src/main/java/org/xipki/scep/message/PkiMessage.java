@@ -19,8 +19,6 @@ package org.xipki.scep.message;
 
 import java.io.IOException;
 import java.security.PrivateKey;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -37,6 +35,7 @@ import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.cms.CMSAttributes;
 import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
 import org.bouncycastle.asn1.cms.ContentInfo;
+import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
 import org.bouncycastle.cms.CMSAbsentContent;
 import org.bouncycastle.cms.CMSEnvelopedData;
 import org.bouncycastle.cms.CMSEnvelopedDataGenerator;
@@ -46,23 +45,25 @@ import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.bouncycastle.cms.CMSTypedData;
 import org.bouncycastle.cms.DefaultSignedAttributeTableGenerator;
+import org.bouncycastle.cms.KeyTransRecipientInfoGenerator;
 import org.bouncycastle.cms.RecipientInfoGenerator;
 import org.bouncycastle.cms.SignerInfoGenerator;
 import org.bouncycastle.cms.SimpleAttributeTableGenerator;
 import org.bouncycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
 import org.bouncycastle.cms.jcajce.JceCMSContentEncryptorBuilder;
-import org.bouncycastle.cms.jcajce.JceKeyTransRecipientInfoGenerator;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.OutputEncryptor;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.operator.jcajce.JceAsymmetricKeyWrapper;
 import org.xipki.scep.transaction.FailInfo;
 import org.xipki.scep.transaction.MessageType;
 import org.xipki.scep.transaction.Nonce;
 import org.xipki.scep.transaction.PkiStatus;
 import org.xipki.scep.transaction.TransactionId;
 import org.xipki.scep.util.ScepUtil;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 
 /**
@@ -238,9 +239,8 @@ public class PkiMessage {
     return new AttributeTable(vec);
   }
 
-  public ContentInfo encode(PrivateKey signerKey, String signatureAlgorithm,
-      X509Certificate signerCert, X509Certificate[] signerCertSet,
-      X509Certificate recipientCert, ASN1ObjectIdentifier encAlgId)
+  public ContentInfo encode(PrivateKey signerKey, String signatureAlgorithm, X509Cert signerCert,
+      X509Cert[] signerCertSet, X509Cert recipientCert, ASN1ObjectIdentifier encAlgId)
       throws MessageEncodingException {
     Args.notNull(signerKey, "signerKey");
     ContentSigner signer;
@@ -252,9 +252,9 @@ public class PkiMessage {
     return encode(signer, signerCert, signerCertSet, recipientCert, encAlgId);
   } // method encode
 
-  public ContentInfo encode(ContentSigner signer, X509Certificate signerCert,
-      X509Certificate[] cmsCertSet, X509Certificate recipientCert,
-      ASN1ObjectIdentifier encAlgId) throws MessageEncodingException {
+  public ContentInfo encode(ContentSigner signer, X509Cert signerCert,
+      X509Cert[] cmsCertSet, X509Cert recipientCert, ASN1ObjectIdentifier encAlgId)
+          throws MessageEncodingException {
     Args.notNull(signer, "signer");
     Args.notNull(signerCert, "signerCert");
     if (messageData != null) {
@@ -297,7 +297,7 @@ public class PkiMessage {
 
       SignerInfoGenerator signerInfo;
       try {
-        signerInfo = signerInfoBuilder.build(signer, signerCert);
+        signerInfo = signerInfoBuilder.build(signer, signerCert.toBcCert());
       } catch (Exception ex) {
         throw new MessageEncodingException(ex);
       }
@@ -311,7 +311,7 @@ public class PkiMessage {
     }
   } // method encode
 
-  private CMSEnvelopedData encrypt(X509Certificate recipient, ASN1ObjectIdentifier encAlgId)
+  private CMSEnvelopedData encrypt(X509Cert recipient, ASN1ObjectIdentifier encAlgId)
       throws MessageEncodingException {
     Args.notNull(recipient, "recipient");
     Args.notNull(encAlgId, "encAlgId");
@@ -325,12 +325,10 @@ public class PkiMessage {
 
     CMSEnvelopedDataGenerator edGenerator = new CMSEnvelopedDataGenerator();
     CMSTypedData envelopable = new CMSProcessableByteArray(messageDataBytes);
-    RecipientInfoGenerator recipientGenerator;
-    try {
-      recipientGenerator = new JceKeyTransRecipientInfoGenerator(recipient);
-    } catch (CertificateEncodingException ex) {
-      throw new MessageEncodingException(ex);
-    }
+    RecipientInfoGenerator recipientGenerator =
+        new KeyTransRecipientInfoGenerator(
+            new IssuerAndSerialNumber(recipient.getIssuer(), recipient.getSerialNumber()),
+            new JceAsymmetricKeyWrapper(recipient.getPublicKey())) {};
 
     edGenerator.addRecipientInfoGenerator(recipientGenerator);
     try {

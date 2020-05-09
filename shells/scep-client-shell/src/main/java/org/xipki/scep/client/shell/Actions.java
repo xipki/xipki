@@ -80,8 +80,8 @@ public class Actions {
       CertificationRequest csr = X509Util.parseCsr(new File(csrFile));
 
       ScepClient client = getScepClient();
-      X509Certificate caCert = client.getAuthorityCertStore().getCaCert();
-      X500Name caSubject = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
+      X509Cert caCert = client.getAuthorityCertStore().getCaCert();
+      X500Name caSubject = caCert.getSubject();
 
       EnrolmentResponse resp = client.scepCertPoll(getIdentityKey(), getIdentityCert(), csr,
           caSubject);
@@ -91,7 +91,7 @@ public class Actions {
         throw new CmdFailure("server returned 'pending'");
       }
 
-      List<X509Certificate> certs = resp.getCertificates();
+      List<X509Cert> certs = resp.getCertificates();
       if (certs == null || certs.isEmpty()) {
         throw new CmdFailure("received no certficate from server");
       }
@@ -124,11 +124,11 @@ public class Actions {
 
     private ScepClient scepClient;
     private PrivateKey identityKey;
-    private X509Certificate identityCert;
+    private X509Cert identityCert;
 
     protected ScepClient getScepClient() throws CertificateException, IOException {
       if (scepClient == null) {
-        X509Certificate caCert = X509Util.parseCert(new File(caCertFile)).toJceCert();
+        X509Cert caCert = X509Util.parseCert(new File(caCertFile));
         CaIdentifier tmpCaId = new CaIdentifier(url, caId);
         CaCertValidator caCertValidator = new CaCertValidator.PreprovisionedCaCertValidator(caCert);
         scepClient = new ScepClient(tmpCaId, caCertValidator);
@@ -143,7 +143,7 @@ public class Actions {
       return identityKey;
     }
 
-    protected X509Certificate getIdentityCert() throws Exception {
+    protected X509Cert getIdentityCert() throws Exception {
       if (identityCert == null) {
         readIdentity();
       }
@@ -172,7 +172,7 @@ public class Actions {
       }
 
       this.identityKey = (PrivateKey) ks.getKey(keyname, pwd);
-      this.identityCert = (X509Certificate) ks.getCertificate(keyname);
+      this.identityCert = new X509Cert((X509Certificate) ks.getCertificate(keyname));
     }
 
   } // class ClientAction
@@ -206,7 +206,7 @@ public class Actions {
       EnrolmentResponse resp;
 
       PrivateKey key0 = getIdentityKey();
-      X509Certificate cert0 = getIdentityCert();
+      X509Cert cert0 = getIdentityCert();
       if (StringUtil.isBlank(method)) {
         resp = client.scepEnrol(csr, key0, cert0);
       } else if ("pkcs".equalsIgnoreCase(method)) {
@@ -227,7 +227,7 @@ public class Actions {
         throw new CmdFailure("server returned 'pending'");
       }
 
-      X509Certificate cert = resp.getCertificates().get(0);
+      X509Cert cert = resp.getCertificates().get(0);
       saveVerbose("saved enrolled certificate to file", outputFile,
           encodeCert(cert.getEncoded(), outform));
       return null;
@@ -259,14 +259,14 @@ public class Actions {
       CaIdentifier tmpCaId = new CaIdentifier(url, caId);
       CaCertValidator caCertValidator = new CaCertValidator() {
         @Override
-        public boolean isTrusted(X509Certificate cert) {
+        public boolean isTrusted(X509Cert cert) {
           return true;
         }
       };
 
       ScepClient client = new ScepClient(tmpCaId, caCertValidator);
       client.init();
-      X509Certificate caCert = client.getCaCert();
+      X509Cert caCert = client.getCaCert();
       if (caCert == null) {
         throw new CmdFailure("received no CA certficate from server");
       }
@@ -297,9 +297,9 @@ public class Actions {
     protected Object execute0() throws Exception {
       ScepClient client = getScepClient();
       BigInteger serial = toBigInt(serialNumber);
-      X509Certificate caCert = client.getAuthorityCertStore().getCaCert();
-      X500Name caSubject = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
-      List<X509Certificate> certs = client.scepGetCert(getIdentityKey(), getIdentityCert(),
+      X509Cert caCert = client.getAuthorityCertStore().getCaCert();
+      X500Name caSubject = caCert.getSubject();
+      List<X509Cert> certs = client.scepGetCert(getIdentityKey(), getIdentityCert(),
           caSubject, serial);
       if (certs == null || certs.isEmpty()) {
         throw new CmdFailure("received no certficate from server");

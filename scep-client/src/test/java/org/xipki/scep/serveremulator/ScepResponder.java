@@ -18,8 +18,6 @@
 package org.xipki.scep.serveremulator;
 
 import java.security.PrivateKey;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -34,10 +32,8 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.cert.X509CRLHolder;
-import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cms.CMSAbsentContent;
 import org.bouncycastle.cms.CMSAlgorithm;
 import org.bouncycastle.cms.CMSException;
@@ -60,8 +56,9 @@ import org.xipki.scep.transaction.MessageType;
 import org.xipki.scep.transaction.Nonce;
 import org.xipki.scep.transaction.PkiStatus;
 import org.xipki.scep.transaction.TransactionId;
-import org.xipki.scep.util.ScepHashAlgo;
 import org.xipki.scep.util.ScepUtil;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 
 /**
@@ -133,18 +130,11 @@ public class ScepResponder {
       throws MessageDecodingException, CaException {
     Args.notNull(requestContent, "requestContent");
     PrivateKey recipientKey = (raEmulator != null) ? raEmulator.getRaKey() : caEmulator.getCaKey();
-    Certificate recipientCert =
+    X509Cert recipientCert =
         (raEmulator != null) ? raEmulator.getRaCert() : caEmulator.getCaCert();
-    X509Certificate recipientX509Obj;
-    try {
-      recipientX509Obj = ScepUtil.toX509Cert(recipientCert);
-    } catch (CertificateException ex) {
-      throw new MessageDecodingException("could not parse recipientCert "
-          + recipientCert.getTBSCertificate().getSubject());
-    }
 
     EnvelopedDataDecryptorInstance decInstance =
-        new EnvelopedDataDecryptorInstance(recipientX509Obj, recipientKey);
+        new EnvelopedDataDecryptorInstance(recipientCert, recipientKey);
     EnvelopedDataDecryptor recipient = new EnvelopedDataDecryptor(decInstance);
 
     DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent, recipient, null);
@@ -160,12 +150,12 @@ public class ScepResponder {
     }
 
     String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(getSigningKey(),
-        ScepHashAlgo.forNameOrOid(req.getDigestAlgorithm().getId()));
+        HashAlgo.getInstance(req.getDigestAlgorithm()));
 
     try {
-      X509Certificate jceSignerCert = ScepUtil.toX509Cert(getSigningCert());
-      X509Certificate[] certs = control.isSendSignerCert()
-          ? new X509Certificate[]{jceSignerCert} : null;
+      X509Cert jceSignerCert = getSigningCert();
+      X509Cert[] certs = control.isSendSignerCert()
+          ? new X509Cert[]{jceSignerCert} : null;
 
       return rep.encode(getSigningKey(), signatureAlgorithm, jceSignerCert, certs,
           req.getSignatureCert(), req.getContentEncryptionAlgorithm());
@@ -177,9 +167,9 @@ public class ScepResponder {
   public ContentInfo encode(NextCaMessage nextCaMsg) throws CaException {
     Args.notNull(nextCaMsg, "nextCaMsg");
     try {
-      X509Certificate jceSignerCert = ScepUtil.toX509Cert(getSigningCert());
-      X509Certificate[] certs = control.isSendSignerCert()
-          ? new X509Certificate[]{jceSignerCert} : null;
+      X509Cert jceSignerCert = getSigningCert();
+      X509Cert[] certs = control.isSendSignerCert()
+          ? new X509Cert[]{jceSignerCert} : null;
       return nextCaMsg.encode(getSigningKey(), jceSignerCert, certs);
     } catch (Exception ex) {
       throw new CaException(ex);
@@ -228,27 +218,23 @@ public class ScepResponder {
 
     // check the digest algorithm
     String oid = req.getDigestAlgorithm().getId();
-    ScepHashAlgo hashAlgo = ScepHashAlgo.forNameOrOid(oid);
+    HashAlgo hashAlgo = HashAlgo.getInstance(oid);
     if (hashAlgo == null) {
       LOG.warn("tid={}: unknown digest algorithm {}", tid, oid);
       return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badAlg);
     } // end if
 
     boolean supported = false;
-    if (hashAlgo == ScepHashAlgo.SHA1) {
+    if (hashAlgo == HashAlgo.SHA1) {
       if (caCaps.containsCapability(CaCapability.SHA1)) {
         supported = true;
       }
-    } else if (hashAlgo == ScepHashAlgo.SHA256) {
+    } else if (hashAlgo == HashAlgo.SHA256) {
       if (caCaps.containsCapability(CaCapability.SHA256)) {
         supported = true;
       }
-    } else if (hashAlgo == ScepHashAlgo.SHA512) {
+    } else if (hashAlgo == HashAlgo.SHA512) {
       if (caCaps.containsCapability(CaCapability.SHA512)) {
-        supported = true;
-      }
-    } else if (hashAlgo == ScepHashAlgo.MD5) {
-      if (control.isUseInsecureAlg()) {
         supported = true;
       }
     }
@@ -288,14 +274,12 @@ public class ScepResponder {
 
     switch (messageType) {
       case PKCSReq:
-        boolean selfSigned = req.getSignatureCert().getIssuerX500Principal()
-            .equals(req.getSignatureCert().getIssuerX500Principal());
+        boolean selfSigned = req.getSignatureCert().isSelfSigned();
 
         CertificationRequest csr = CertificationRequest.getInstance(req.getMessageData());
 
         if (selfSigned) {
-          X500Name name = X500Name.getInstance(
-              req.getSignatureCert().getSubjectX500Principal().getEncoded());
+          X500Name name = req.getSignatureCert().getSubject();
           if (!name.equals(csr.getCertificationRequestInfo().getSubject())) {
             LOG.warn("tid={}: self-signed cert.subject != CSR.subject", tid);
             return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
@@ -308,7 +292,7 @@ public class ScepResponder {
           return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
         }
 
-        Certificate cert;
+        X509Cert cert;
         try {
           cert = caEmulator.generateCert(csr);
         } catch (Exception ex) {
@@ -417,14 +401,14 @@ public class ScepResponder {
     return cmsSigneddata.toASN1Structure();
   } // method createSignedData
 
-  private ContentInfo createSignedData(Certificate cert) throws CaException {
+  private ContentInfo createSignedData(X509Cert cert) throws CaException {
     CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
 
     CMSSignedData cmsSigneddata;
     try {
-      cmsSignedDataGen.addCertificate(new X509CertificateHolder(cert));
+      cmsSignedDataGen.addCertificate(cert.toBcCert());
       if (control.isSendCaCert()) {
-        cmsSignedDataGen.addCertificate(new X509CertificateHolder(caEmulator.getCaCert()));
+        cmsSignedDataGen.addCertificate(caEmulator.getCaCert().toBcCert());
       }
 
       cmsSigneddata = cmsSignedDataGen.generate(new CMSAbsentContent());
@@ -439,7 +423,7 @@ public class ScepResponder {
     return (raEmulator != null) ? raEmulator.getRaKey() : caEmulator.getCaKey();
   }
 
-  public Certificate getSigningCert() {
+  public X509Cert getSigningCert() {
     return (raEmulator != null) ? raEmulator.getRaCert() : caEmulator.getCaCert();
   }
 

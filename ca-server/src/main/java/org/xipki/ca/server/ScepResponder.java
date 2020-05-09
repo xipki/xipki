@@ -22,15 +22,12 @@ import java.math.BigInteger;
 import java.security.Key;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
@@ -43,7 +40,6 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.cert.X509CRLHolder;
-import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cms.CMSAbsentContent;
 import org.bouncycastle.cms.CMSAlgorithm;
 import org.bouncycastle.cms.CMSException;
@@ -78,8 +74,8 @@ import org.xipki.scep.transaction.MessageType;
 import org.xipki.scep.transaction.Nonce;
 import org.xipki.scep.transaction.PkiStatus;
 import org.xipki.scep.transaction.TransactionId;
-import org.xipki.scep.util.ScepHashAlgo;
 import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
@@ -230,7 +226,7 @@ public class ScepResponder {
     this.responderCert = signer.getCertificate();
     this.envelopedDataDecryptor =
         new EnvelopedDataDecryptor(
-            new EnvelopedDataDecryptorInstance(responderCert.toJceCert(), responderKey));
+            new EnvelopedDataDecryptorInstance(responderCert, responderKey));
   } // method setResponder
 
   /**
@@ -361,7 +357,7 @@ public class ScepResponder {
 
     // check the digest algorithm
     String oid = req.getDigestAlgorithm().getId();
-    ScepHashAlgo hashAlgo = ScepHashAlgo.forNameOrOid(oid);
+    HashAlgo hashAlgo = HashAlgo.getInstance(oid);
     if (hashAlgo == null) {
       LOG.warn("tid={}: unknown digest algorithm {}", tid, oid);
       rep.setPkiStatus(PkiStatus.FAILURE);
@@ -370,15 +366,15 @@ public class ScepResponder {
     }
 
     boolean supported = false;
-    if (hashAlgo == ScepHashAlgo.SHA1) {
+    if (hashAlgo == HashAlgo.SHA1) {
       if (caCaps.containsCapability(CaCapability.SHA1)) {
         supported = true;
       }
-    } else if (hashAlgo == ScepHashAlgo.SHA256) {
+    } else if (hashAlgo == HashAlgo.SHA256) {
       if (caCaps.containsCapability(CaCapability.SHA256)) {
         supported = true;
       }
-    } else if (hashAlgo == ScepHashAlgo.SHA512) {
+    } else if (hashAlgo == HashAlgo.SHA512) {
       if (caCaps.containsCapability(CaCapability.SHA512)) {
         supported = true;
       }
@@ -446,13 +442,12 @@ public class ScepResponder {
           }
 
           CertificationRequestInfo csrReqInfo = csr.getCertificationRequestInfo();
-          X509Certificate reqSignatureCert = req.getSignatureCert();
-          X500Principal reqSigCertSubject = reqSignatureCert.getSubjectX500Principal();
+          X509Cert reqSignatureCert = req.getSignatureCert();
+          X500Name reqSigCertSubject = reqSignatureCert.getSubject();
 
-          boolean selfSigned = reqSigCertSubject.equals(reqSignatureCert.getIssuerX500Principal());
+          boolean selfSigned = reqSignatureCert.isSelfSigned();
           if (selfSigned) {
-            X500Name tmp = X500Name.getInstance(reqSigCertSubject.getEncoded());
-            if (!tmp.equals(csrReqInfo.getSubject())) {
+            if (!reqSigCertSubject.equals(csrReqInfo.getSubject())) {
               LOG.warn("tid={}, self-signed identityCert.subject != csr.subject");
               throw FailInfoException.BAD_REQUEST;
             }
@@ -547,7 +542,6 @@ public class ScepResponder {
           IssuerAndSubject is = IssuerAndSubject.getInstance(req.getMessageData());
           audit(event, CaAuditConstants.NAME_issuer, X509Util.getRfc4519Name(is.getIssuer()));
           audit(event, CaAuditConstants.NAME_subject, X509Util.getRfc4519Name(is.getSubject()));
-
           ensureIssuedByThisCa(caX500Name, is.getIssuer());
           signedData = pollCert(ca, is.getSubject(), req.getTransactionId());
           break;
@@ -570,7 +564,7 @@ public class ScepResponder {
         default:
           LOG.error("unknown SCEP messageType '{}'", req.getMessageType());
           throw FailInfoException.BAD_REQUEST;
-      } // end switch<
+      } // end switch
 
       ContentInfo ci = new ContentInfo(CMSObjectIdentifiers.signedData, signedData);
       rep.setMessageData(ci);
@@ -670,11 +664,10 @@ public class ScepResponder {
     String signatureAlgorithm = getSignatureAlgorithm(responderKey, request.getDigestAlgorithm());
     ContentInfo ci;
     try {
-      X509Certificate jceResponerCert = responderCert.toJceCert();
-      X509Certificate[] cmsCertSet = control.isIncludeSignerCert()
-          ? new X509Certificate[]{jceResponerCert} : null;
+      X509Cert[] cmsCertSet = control.isIncludeSignerCert()
+          ? new X509Cert[]{responderCert} : null;
 
-      ci = response.encode(responderKey, signatureAlgorithm, jceResponerCert, cmsCertSet,
+      ci = response.encode(responderKey, signatureAlgorithm, responderCert, cmsCertSet,
           request.getSignatureCert(), request.getContentEncryptionAlgorithm());
     } catch (MessageEncodingException ex) {
       LogUtil.error(LOG, ex, "could not encode response");
@@ -701,9 +694,9 @@ public class ScepResponder {
   } // method checkUserPermission
 
   private static String getSignatureAlgorithm(PrivateKey key, ASN1ObjectIdentifier digestOid) {
-    ScepHashAlgo hashAlgo = ScepHashAlgo.forNameOrOid(digestOid.getId());
+    HashAlgo hashAlgo = HashAlgo.getInstance(digestOid.getId());
     if (hashAlgo == null) {
-      hashAlgo = ScepHashAlgo.SHA256;
+      hashAlgo = HashAlgo.SHA256;
     }
     String algorithm = key.getAlgorithm();
     if ("RSA".equalsIgnoreCase(algorithm)) {
@@ -721,17 +714,13 @@ public class ScepResponder {
     }
   } // method ensureIssuedByThisCa
 
-  static CMSSignedData createDegeneratedSigendData(X509Certificate... certs)
+  static CMSSignedData createDegeneratedSigendData(X509Cert... certs)
       throws CMSException, CertificateException {
     CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
-    try {
-      for (X509Certificate cert : certs) {
-        cmsSignedDataGen.addCertificate(new X509CertificateHolder(cert.getEncoded()));
-      }
-      return cmsSignedDataGen.generate(new CMSAbsentContent());
-    } catch (IOException ex) {
-      throw new CMSException("could not build CMS SignedDta");
+    for (X509Cert cert : certs) {
+      cmsSignedDataGen.addCertificate(cert.toBcCert());
     }
+    return cmsSignedDataGen.generate(new CMSAbsentContent());
   } // method createDegeneratedSigendData
 
   private static byte[] getTransactionIdBytes(String tid) throws OperationException {

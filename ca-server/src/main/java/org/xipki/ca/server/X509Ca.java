@@ -39,7 +39,6 @@ import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPrivateKey;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPrivateKey;
@@ -564,10 +563,10 @@ public class X509Ca implements Closeable {
     return certstore.getCert(subjectName, transactionId);
   }
 
-  public CertStore.KnowCertResult knowsCert(X509Certificate cert) throws OperationException {
+  public CertStore.KnowCertResult knowsCert(X509Cert cert) throws OperationException {
     Args.notNull(cert, "cert");
 
-    X500Name issuerX500 = X500Name.getInstance(cert.getIssuerX500Principal().getEncoded());
+    X500Name issuerX500 = cert.getIssuer();
     if (!caInfo.getSubject().equals(X509Util.getRfc4519Name(issuerX500))) {
       return CertStore.KnowCertResult.UNKNOWN;
     }

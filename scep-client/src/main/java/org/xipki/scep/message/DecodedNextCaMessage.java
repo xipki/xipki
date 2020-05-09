@@ -18,7 +18,6 @@
 package org.xipki.scep.message;
 
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
@@ -46,6 +45,7 @@ import org.bouncycastle.util.CollectionStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.scep.util.ScepUtil;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 
@@ -61,7 +61,7 @@ public class DecodedNextCaMessage {
 
   private AuthorityCertStore authorityCertStore;
 
-  private X509Certificate signatureCert;
+  private X509Cert signatureCert;
 
   private ASN1ObjectIdentifier digestAlgorithm;
 
@@ -82,11 +82,11 @@ public class DecodedNextCaMessage {
     this.authorityCertStore = authorityCertStore;
   }
 
-  public X509Certificate getSignatureCert() {
+  public X509Cert getSignatureCert() {
     return signatureCert;
   }
 
-  public void setSignatureCert(X509Certificate signatureCert) {
+  public void setSignatureCert(X509Cert signatureCert) {
     this.signatureCert = signatureCert;
   }
 
@@ -194,24 +194,14 @@ public class DecodedNextCaMessage {
       }
     } // end if
 
-    X509CertificateHolder tmpSignerCert = (X509CertificateHolder) signedDataCerts.iterator().next();
-    X509Certificate signerCert;
-    try {
-      signerCert = ScepUtil.toX509Cert(tmpSignerCert.toASN1Structure());
-    } catch (CertificateException ex) {
-      final String msg = "could not construct X509CertificateObject: " + ex.getMessage();
-      LOG.error(msg);
-      LOG.debug(msg, ex);
-      ret.setFailureMessage(msg);
-      return ret;
-    }
-    ret.setSignatureCert(signerCert);
+    X509CertificateHolder signerCert = (X509CertificateHolder) signedDataCerts.iterator().next();
+    ret.setSignatureCert(new X509Cert(signerCert));
 
     // validate the signature
     SignerInformationVerifier verifier;
     try {
-      verifier = new JcaSimpleSignerInfoVerifierBuilder().build(signerCert.getPublicKey());
-    } catch (OperatorCreationException ex) {
+      verifier = new JcaSimpleSignerInfoVerifierBuilder().build(signerCert);
+    } catch (OperatorCreationException | CertificateException ex) {
       final String msg = "could not build signature verifier: " + ex.getMessage();
       LOG.error(msg);
       LOG.debug(msg, ex);
@@ -250,7 +240,7 @@ public class DecodedNextCaMessage {
     ContentInfo contentInfo = ContentInfo.getInstance((byte[]) signedContent.getContent());
     SignedData signedData = SignedData.getInstance(contentInfo.getContent());
 
-    List<X509Certificate> certs;
+    List<X509Cert> certs;
     try {
       certs = ScepUtil.getCertsFromSignedData(signedData);
     } catch (CertificateException ex) {
@@ -263,10 +253,10 @@ public class DecodedNextCaMessage {
 
     final int n = certs.size();
 
-    X509Certificate caCert = null;
-    List<X509Certificate> raCerts = new LinkedList<X509Certificate>();
+    X509Cert caCert = null;
+    List<X509Cert> raCerts = new LinkedList<>();
     for (int i = 0; i < n; i++) {
-      X509Certificate cert = certs.get(i);
+      X509Cert cert = certs.get(i);
       if (cert.getBasicConstraints() > -1) {
         if (caCert != null) {
           final String msg = "multiple CA certificates is returned, but exactly 1 is expected";
@@ -288,8 +278,7 @@ public class DecodedNextCaMessage {
       return ret;
     }
 
-    X509Certificate[] locaRaCerts = raCerts.isEmpty()
-        ? null : raCerts.toArray(new X509Certificate[0]);
+    X509Cert[] locaRaCerts = raCerts.isEmpty() ? null : raCerts.toArray(new X509Cert[0]);
 
     AuthorityCertStore authorityCertStore = AuthorityCertStore.getInstance(caCert, locaRaCerts);
     ret.setAuthorityCertStore(authorityCertStore);

@@ -20,7 +20,6 @@ package org.xipki.scep.serveremulator;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.cert.X509Certificate;
 import java.util.Arrays;
 
 import javax.servlet.ServletException;
@@ -31,7 +30,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.bouncycastle.asn1.cms.ContentInfo;
-import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cms.CMSAbsentContent;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedData;
@@ -45,7 +43,7 @@ import org.xipki.scep.serveremulator.AuditEvent.AuditLevel;
 import org.xipki.scep.transaction.CaCapability;
 import org.xipki.scep.transaction.Operation;
 import org.xipki.scep.util.ScepConstants;
-import org.xipki.scep.util.ScepUtil;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
@@ -150,11 +148,11 @@ public class ScepServlet extends HttpServlet {
           ct = ScepConstants.CT_X509_CA_RA_CERT;
           CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
           try {
-            cmsSignedDataGen.addCertificate(new X509CertificateHolder(
-                responder.getCaEmulator().getCaCert()));
+            cmsSignedDataGen.addCertificate(
+                responder.getCaEmulator().getCaCert().toBcCert());
             ct = ScepConstants.CT_X509_CA_RA_CERT;
-            cmsSignedDataGen.addCertificate(new X509CertificateHolder(
-                responder.getRaEmulator().getRaCert()));
+            cmsSignedDataGen.addCertificate(
+                responder.getRaEmulator().getRaCert().toBcCert());
             CMSSignedData degenerateSignedData = cmsSignedDataGen.generate(
                 new CMSAbsentContent());
             respBytes = degenerateSignedData.getEncoded();
@@ -177,9 +175,9 @@ public class ScepServlet extends HttpServlet {
 
         try {
           NextCaMessage nextCaMsg = new NextCaMessage();
-          nextCaMsg.setCaCert(ScepUtil.toX509Cert(responder.getNextCaAndRa().getCaCert()));
+          nextCaMsg.setCaCert(responder.getNextCaAndRa().getCaCert());
           if (responder.getNextCaAndRa().getRaCert() != null) {
-            X509Certificate raCert = ScepUtil.toX509Cert(responder.getNextCaAndRa().getRaCert());
+            X509Cert raCert = responder.getNextCaAndRa().getRaCert();
             nextCaMsg.setRaCerts(Arrays.asList(raCert));
           }
 

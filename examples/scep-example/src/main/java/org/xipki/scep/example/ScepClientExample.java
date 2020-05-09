@@ -20,7 +20,6 @@ package org.xipki.scep.example;
 import java.io.FileInputStream;
 import java.math.BigInteger;
 import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -33,7 +32,8 @@ import org.xipki.scep.client.CaCertValidator;
 import org.xipki.scep.client.CaIdentifier;
 import org.xipki.scep.client.EnrolmentResponse;
 import org.xipki.scep.client.ScepClient;
-import org.xipki.scep.util.ScepUtil;
+import org.xipki.security.X509Cert;
+import org.xipki.security.util.X509Util;
 import org.xipki.util.IoUtil;
 
 /**
@@ -57,7 +57,7 @@ public class ScepClientExample extends CaClientExample {
     //System.setProperty("javax.net.debug", "all");
 
     try {
-      X509Certificate caCert = ScepUtil.parseCert(
+      X509Cert caCert = X509Util.parseCert(
           IoUtil.read(new FileInputStream(expandPath(CA_CERT_FILE))));
       CaIdentifier tmpCaId = new CaIdentifier(CA_URL, null);
       CaCertValidator caCertValidator = new CaCertValidator.PreprovisionedCaCertValidator(caCert);
@@ -77,7 +77,7 @@ public class ScepClientExample extends CaClientExample {
           subjectDn, keypair.getPublic());
       ContentSigner signer = new JcaContentSignerBuilder("SHA256withRSA")
           .build(keypair.getPrivate());
-      X509Certificate selfSignedCert = ScepUtil.parseCert(certGenerator.build(signer).getEncoded());
+      X509Cert selfSignedCert = new X509Cert(certGenerator.build(signer));
 
       // Enroll certificate - RSA
       EnrolmentResponse resp = (EnrolmentResponse) client.scepEnrol(csr, keypair.getPrivate(),
@@ -90,11 +90,11 @@ public class ScepClientExample extends CaClientExample {
         throw new Exception("server returned 'pending'");
       }
 
-      X509Certificate cert = resp.getCertificates().get(0);
+      X509Cert cert = resp.getCertificates().get(0);
       printCert("SCEP (RSA, Self-Signed Identity Cert)", cert);
 
       // Use the CA signed identity certificate
-      X509Certificate identityCert = cert;
+      X509Cert identityCert = cert;
       PrivateKey identityKey = keypair.getPrivate();
 
       keypair = generateRsaKeypair();

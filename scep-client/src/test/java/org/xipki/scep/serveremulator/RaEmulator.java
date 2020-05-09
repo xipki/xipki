@@ -19,7 +19,7 @@ package org.xipki.scep.serveremulator;
 
 import java.security.PrivateKey;
 
-import org.bouncycastle.asn1.x509.Certificate;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 
 /**
@@ -32,9 +32,9 @@ public class RaEmulator {
 
   private final PrivateKey raKey;
 
-  private final Certificate raCert;
+  private final X509Cert raCert;
 
-  public RaEmulator(PrivateKey raKey, Certificate raCert) {
+  public RaEmulator(PrivateKey raKey, X509Cert raCert) {
     this.raKey = Args.notNull(raKey, "raKey");
     this.raCert = Args.notNull(raCert, "raCert");
   }
@@ -43,7 +43,7 @@ public class RaEmulator {
     return raKey;
   }
 
-  public Certificate getRaCert() {
+  public X509Cert getRaCert() {
     return raCert;
   }
 

@@ -18,7 +18,6 @@
 package org.xipki.scep.client;
 
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.List;
 
@@ -31,6 +30,7 @@ import org.xipki.scep.transaction.FailInfo;
 import org.xipki.scep.transaction.MessageType;
 import org.xipki.scep.transaction.PkiStatus;
 import org.xipki.scep.util.ScepUtil;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 
 /**
@@ -43,7 +43,7 @@ public final class EnrolmentResponse {
 
   private PkiMessage pkcsRep;
 
-  private List<X509Certificate> certificates;
+  private List<X509Cert> certificates;
 
   public EnrolmentResponse(PkiMessage pkcsRep) throws ScepClientException {
     Args.notNull(pkcsRep, "pkcsRep");
@@ -69,13 +69,11 @@ public final class EnrolmentResponse {
       throw new ScepClientException("no certificate is embedded in pkcsRep");
     }
 
-    List<X509Certificate> certs;
     try {
-      certs = ScepUtil.getCertsFromSignedData(sd);
+      this.certificates = Collections.unmodifiableList(ScepUtil.getCertsFromSignedData(sd));
     } catch (CertificateException ex) {
       throw new ScepClientException(ex.getMessage(), ex);
     }
-    this.certificates = Collections.unmodifiableList(certs);
   } // constructor
 
   /**
@@ -95,7 +93,7 @@ public final class EnrolmentResponse {
     return pkcsRep.getPkiStatus() == PkiStatus.SUCCESS;
   }
 
-  public List<X509Certificate> getCertificates() {
+  public List<X509Cert> getCertificates() {
     if (isSuccess()) {
       return certificates;
     }

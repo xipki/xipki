@@ -17,18 +17,12 @@
 
 package org.xipki.scep.util;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 import java.text.ParseException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -37,7 +31,6 @@ import java.util.List;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.BERTags;
 import org.bouncycastle.asn1.DERGeneralizedTime;
@@ -48,16 +41,17 @@ import org.bouncycastle.asn1.cms.SignedData;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
-import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.CertificateList;
-import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Time;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.cert.X509CRLHolder;
+import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 
 /**
@@ -67,8 +61,6 @@ import org.xipki.util.Args;
  */
 
 public class ScepUtil {
-  private static CertificateFactory certFact;
-  private static Object certFactLock = new Object();
 
   private ScepUtil() {
   }
@@ -76,7 +68,7 @@ public class ScepUtil {
   /*
    * The first one is a non-CA certificate if there exists one non-CA certificate.
    */
-  public static List<X509Certificate> getCertsFromSignedData(SignedData signedData)
+  public static List<X509Cert> getCertsFromSignedData(SignedData signedData)
       throws CertificateException {
     Args.notNull(signedData, "signedData");
     ASN1Set set = signedData.getCertificates();
@@ -89,13 +81,13 @@ public class ScepUtil {
       return Collections.emptyList();
     }
 
-    List<X509Certificate> certs = new LinkedList<X509Certificate>();
+    List<X509Cert> certs = new LinkedList<>();
 
-    X509Certificate eeCert = null;
+    X509Cert eeCert = null;
     for (int i = 0; i < n; i++) {
-      X509Certificate cert;
+      X509Cert cert;
       try {
-        cert = toX509Cert(Certificate.getInstance(set.getObjectAt(i)));
+        cert = new X509Cert(Certificate.getInstance(set.getObjectAt(i)));
       } catch (IllegalArgumentException ex) {
         throw new CertificateException(ex);
       }
@@ -129,7 +121,7 @@ public class ScepUtil {
     }
   } // method getCrlFromPkiMessage
 
-  public static String getSignatureAlgorithm(PrivateKey key, ScepHashAlgo hashAlgo) {
+  public static String getSignatureAlgorithm(PrivateKey key, HashAlgo hashAlgo) {
     Args.notNull(key, "key");
     Args.notNull(hashAlgo, "hashAlgo");
     String algorithm = key.getAlgorithm();
@@ -140,113 +132,6 @@ public class ScepUtil {
           "getSignatureAlgorithm() for non-RSA is not supported yet.");
     }
   }
-
-  public static X509Certificate toX509Cert(org.bouncycastle.asn1.x509.Certificate asn1Cert)
-      throws CertificateException {
-    byte[] encodedCert;
-    try {
-      encodedCert = asn1Cert.getEncoded();
-    } catch (IOException ex) {
-      throw new CertificateEncodingException("could not get encoded certificate", ex);
-    }
-
-    return parseCert(encodedCert);
-  }
-
-  public static X509Certificate parseCert(byte[] certBytes) throws CertificateException {
-    Args.notNull(certBytes, "certBytes");
-    return (X509Certificate) getCertFactory().generateCertificate(
-              new ByteArrayInputStream(certBytes));
-  }
-
-  private static byte[] extractSki(X509Certificate cert) throws CertificateEncodingException {
-    byte[] extValue = getCoreExtValue(cert, Extension.subjectKeyIdentifier);
-    if (extValue == null) {
-      return null;
-    }
-
-    try {
-      return ASN1OctetString.getInstance(extValue).getOctets();
-    } catch (IllegalArgumentException ex) {
-      throw new CertificateEncodingException(ex.getMessage());
-    }
-  }
-
-  private static byte[] extractAki(X509Certificate cert) throws CertificateEncodingException {
-    byte[] extValue = getCoreExtValue(cert, Extension.authorityKeyIdentifier);
-    if (extValue == null) {
-      return null;
-    }
-
-    try {
-      AuthorityKeyIdentifier aki = AuthorityKeyIdentifier.getInstance(extValue);
-      return aki.getKeyIdentifier();
-    } catch (IllegalArgumentException ex) {
-      throw new CertificateEncodingException(
-          "invalid extension AuthorityKeyIdentifier: " + ex.getMessage());
-    }
-  }
-
-  private static byte[] getCoreExtValue(X509Certificate cert, ASN1ObjectIdentifier type)
-      throws CertificateEncodingException {
-    Args.notNull(cert, "cert");
-    Args.notNull(type, "type");
-    byte[] fullExtValue = cert.getExtensionValue(type.getId());
-    if (fullExtValue == null) {
-      return null;
-    }
-    try {
-      return ASN1OctetString.getInstance(fullExtValue).getOctets();
-    } catch (IllegalArgumentException ex) {
-      throw new CertificateEncodingException("invalid extension " + type.getId()
-        + ": " + ex.getMessage());
-    }
-  }
-
-  public static boolean isSelfSigned(X509Certificate cert) {
-    Args.notNull(cert, "cert");
-    boolean equals = cert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
-    if (!equals) {
-      return false;
-    }
-
-    try {
-      byte[] ski = extractSki(cert);
-      byte[] aki = extractAki(cert);
-
-      return (ski != null && aki != null) ? Arrays.equals(ski, aki) : true;
-    } catch (CertificateEncodingException ex) {
-      return false;
-    }
-  }
-
-  public static boolean issues(X509Certificate issuerCert, X509Certificate cert)
-      throws CertificateEncodingException {
-    Args.notNull(issuerCert, "issuerCert");
-    Args.notNull(cert, "cert");
-    boolean isCa = issuerCert.getBasicConstraints() >= 0;
-    if (!isCa) {
-      return false;
-    }
-
-    boolean issues = issuerCert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
-    if (issues) {
-      byte[] ski = extractSki(issuerCert);
-      byte[] aki = extractAki(cert);
-      if (ski != null) {
-        issues = Arrays.equals(ski, aki);
-      }
-    }
-
-    if (issues) {
-      long issuerNotBefore = issuerCert.getNotBefore().getTime();
-      long issuerNotAfter = issuerCert.getNotAfter().getTime();
-      long notBefore = cert.getNotBefore().getTime();
-      issues = notBefore <= issuerNotAfter && notBefore >= issuerNotBefore;
-    }
-
-    return issues;
-  } // method issues
 
   public static ASN1ObjectIdentifier extractDigesetAlgorithmIdentifier(String sigOid,
       byte[] sigParams) throws NoSuchAlgorithmException {
@@ -288,15 +173,15 @@ public class ScepUtil {
     return (set.size() == 0) ? null : set.getObjectAt(0);
   }
 
-  public static void addCmsCertSet(CMSSignedDataGenerator generator, X509Certificate[] cmsCertSet)
+  public static void addCmsCertSet(CMSSignedDataGenerator generator, X509Cert[] cmsCertSet)
       throws CertificateEncodingException, CMSException {
     if (cmsCertSet == null || cmsCertSet.length == 0) {
       return;
     }
     Args.notNull(generator, "geneator");
-    Collection<X509Certificate> certColl = new LinkedList<X509Certificate>();
-    for (X509Certificate m : cmsCertSet) {
-      certColl.add(m);
+    Collection<X509CertificateHolder> certColl = new LinkedList<>();
+    for (X509Cert m : cmsCertSet) {
+      certColl.add(m.toBcCert());
     }
 
     JcaCertStore certStore = new JcaCertStore(certColl);
@@ -326,18 +211,5 @@ public class ScepUtil {
       return Time.getInstance(obj).getDate();
     }
   } // method getTime
-
-  private static CertificateFactory getCertFactory() throws CertificateException {
-    synchronized (certFactLock) {
-      if (certFact == null) {
-        try {
-          certFact = CertificateFactory.getInstance("X.509", "BC");
-        } catch (NoSuchProviderException ex) {
-          certFact = CertificateFactory.getInstance("X.509");
-        }
-      }
-      return certFact;
-    }
-  }
 
 }

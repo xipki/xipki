@@ -17,12 +17,11 @@
 
 package org.xipki.scep.message;
 
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.HashSet;
 
-import org.xipki.scep.util.ScepHashAlgo;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 
 /**
@@ -42,51 +41,35 @@ public interface CertificateValidator {
    *          Additional certificate that may be used. Could be {@code null}.
    * @return whether the target certificate is trusted.
    */
-  boolean trustCertificate(X509Certificate target, X509Certificate[] otherCerts);
+  boolean trustCertificate(X509Cert target, X509Cert[] otherCerts);
 
   public static class CollectionCertificateValidator implements CertificateValidator {
 
     private final Collection<String> certHashes;
 
-    public CollectionCertificateValidator(Collection<X509Certificate> certs) {
+    public CollectionCertificateValidator(Collection<X509Cert> certs) {
       Args.notEmpty(certs, "certs");
 
-      certHashes = new HashSet<String>(certs.size());
-      for (X509Certificate cert : certs) {
-        String hash;
-        try {
-          hash = ScepHashAlgo.SHA256.hexDigest(cert.getEncoded());
-        } catch (CertificateEncodingException ex) {
-          throw new IllegalArgumentException(
-              "could not encode certificate: " + ex.getMessage(), ex);
-        }
+      certHashes = new HashSet<>(certs.size());
+      for (X509Cert cert : certs) {
+        String hash = HashAlgo.SHA256.hexHash(cert.getEncoded());
         certHashes.add(hash);
       }
     }
 
-    public CollectionCertificateValidator(X509Certificate cert) {
+    public CollectionCertificateValidator(X509Cert cert) {
       Args.notNull(cert, "cert");
 
-      certHashes = new HashSet<String>(2);
-      String hash;
-      try {
-        hash = ScepHashAlgo.SHA256.hexDigest(cert.getEncoded());
-      } catch (CertificateEncodingException ex) {
-        throw new IllegalArgumentException("could not encode certificate: " + ex.getMessage(), ex);
-      }
+      certHashes = new HashSet<>(2);
+      String hash = HashAlgo.SHA256.hexHash(cert.getEncoded());
       certHashes.add(hash);
     }
 
     @Override
-    public boolean trustCertificate(X509Certificate signerCert, X509Certificate[] otherCerts) {
+    public boolean trustCertificate(X509Cert signerCert, X509Cert[] otherCerts) {
       Args.notNull(signerCert, "signerCert");
 
-      String hash;
-      try {
-        hash = ScepHashAlgo.SHA256.hexDigest(signerCert.getEncoded());
-      } catch (CertificateEncodingException ex) {
-        throw new IllegalArgumentException("could not encode certificate: " + ex.getMessage(), ex);
-      }
+      String hash = HashAlgo.SHA256.hexHash(signerCert.getEncoded());
       return certHashes.contains(hash);
     }
 
@@ -94,7 +77,7 @@ public interface CertificateValidator {
 
   public static class TrustAllCertValidator implements CertificateValidator {
 
-    public boolean trustCertificate(X509Certificate target, X509Certificate[] otherCerts) {
+    public boolean trustCertificate(X509Cert target, X509Cert[] otherCerts) {
       return true;
     }
 

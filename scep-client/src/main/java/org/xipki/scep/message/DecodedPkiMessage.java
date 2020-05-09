@@ -19,7 +19,6 @@ package org.xipki.scep.message;
 
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -58,6 +57,7 @@ import org.xipki.scep.transaction.Nonce;
 import org.xipki.scep.transaction.PkiStatus;
 import org.xipki.scep.transaction.TransactionId;
 import org.xipki.scep.util.ScepUtil;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.StringUtil;
@@ -75,7 +75,7 @@ public class DecodedPkiMessage extends PkiMessage {
   private static final Set<ASN1ObjectIdentifier> SCEP_ATTR_TYPES
       = new HashSet<ASN1ObjectIdentifier>();
 
-  private X509Certificate signatureCert;
+  private X509Cert signatureCert;
 
   private ASN1ObjectIdentifier digestAlgorithm;
 
@@ -104,11 +104,11 @@ public class DecodedPkiMessage extends PkiMessage {
     super(transactionId, messageType, senderNonce);
   }
 
-  public X509Certificate getSignatureCert() {
+  public X509Cert getSignatureCert() {
     return signatureCert;
   }
 
-  public void setSignatureCert(X509Certificate signatureCert) {
+  public void setSignatureCert(X509Cert signatureCert) {
     this.signatureCert = signatureCert;
   }
 
@@ -161,7 +161,7 @@ public class DecodedPkiMessage extends PkiMessage {
   }
 
   public static DecodedPkiMessage decode(CMSSignedData pkiMessage, PrivateKey recipientKey,
-      X509Certificate recipientCert, CollectionStore<X509CertificateHolder> certStore)
+      X509Cert recipientCert, CollectionStore<X509CertificateHolder> certStore)
       throws MessageDecodingException {
     EnvelopedDataDecryptorInstance decInstance = new EnvelopedDataDecryptorInstance(
         recipientCert, recipientKey);
@@ -350,23 +350,13 @@ public class DecodedPkiMessage extends PkiMessage {
       } // end if
     } // end if
 
-    X509CertificateHolder tmpSignerCert = (X509CertificateHolder) signedDataCerts.iterator().next();
-    X509Certificate signerCert;
-    try {
-      signerCert = ScepUtil.toX509Cert(tmpSignerCert.toASN1Structure());
-    } catch (CertificateException ex) {
-      final String msg = "could not construct X509Certificate: " + ex.getMessage();
-      LOG.error(msg);
-      LOG.debug(msg, ex);
-      ret.setFailureMessage(msg);
-      return ret;
-    }
-    ret.setSignatureCert(signerCert);
+    X509CertificateHolder signerCert = (X509CertificateHolder) signedDataCerts.iterator().next();
+    ret.setSignatureCert(new X509Cert(signerCert));
 
     // validate the signature
     SignerInformationVerifier verifier;
     try {
-      verifier = new JcaSimpleSignerInfoVerifierBuilder().build(tmpSignerCert);
+      verifier = new JcaSimpleSignerInfoVerifierBuilder().build(signerCert);
     } catch (OperatorCreationException | CertificateException ex) {
       final String msg = "could not build signature verifier: " + ex.getMessage();
       LOG.error(msg);

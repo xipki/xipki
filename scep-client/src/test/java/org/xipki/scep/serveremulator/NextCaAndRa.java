@@ -17,7 +17,7 @@
 
 package org.xipki.scep.serveremulator;
 
-import org.bouncycastle.asn1.x509.Certificate;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 
 /**
@@ -28,20 +28,20 @@ import org.xipki.util.Args;
 
 public class NextCaAndRa {
 
-  private final Certificate caCert;
+  private final X509Cert caCert;
 
-  private final Certificate raCert;
+  private final X509Cert raCert;
 
-  public NextCaAndRa(Certificate caCert, Certificate raCert) {
+  public NextCaAndRa(X509Cert caCert, X509Cert raCert) {
     this.caCert = Args.notNull(caCert, "caCert");
     this.raCert = raCert;
   }
 
-  public Certificate getCaCert() {
+  public X509Cert getCaCert() {
     return caCert;
   }
 
-  public Certificate getRaCert() {
+  public X509Cert getRaCert() {
     return raCert;
   }
 

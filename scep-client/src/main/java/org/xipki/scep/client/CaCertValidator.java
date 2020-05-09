@@ -17,14 +17,13 @@
 
 package org.xipki.scep.client;
 
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.xipki.scep.util.ScepHashAlgo;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 
 /**
@@ -42,7 +41,7 @@ public interface CaCertValidator {
    *          Target certificate.
    * @return whether the certificate is trusted.
    */
-  boolean isTrusted(X509Certificate cert);
+  boolean isTrusted(X509Cert cert);
 
   /**
    * CA certificate validator with caching certificates.
@@ -60,15 +59,9 @@ public interface CaCertValidator {
     }
 
     @Override
-    public boolean isTrusted(X509Certificate cert) {
+    public boolean isTrusted(X509Cert cert) {
       Args.notNull(cert, "cert");
-      String hexFp;
-      try {
-        hexFp = ScepHashAlgo.SHA256.hexDigest(cert.getEncoded());
-      } catch (CertificateEncodingException ex) {
-        return false;
-      }
-
+      String hexFp = HashAlgo.SHA256.hexHash(cert.getEncoded());
       Boolean bo = cachedAnswers.get(hexFp);
 
       if (bo != null) {
@@ -90,58 +83,41 @@ public interface CaCertValidator {
 
     private final Set<String> fpOfCerts;
 
-    public PreprovisionedCaCertValidator(X509Certificate cert) {
+    public PreprovisionedCaCertValidator(X509Cert cert) {
       Args.notNull(cert, "cert");
       fpOfCerts = new HashSet<String>(1);
 
-      String hexFp;
-      try {
-        hexFp = ScepHashAlgo.SHA256.hexDigest(cert.getEncoded());
-      } catch (CertificateEncodingException ex) {
-        throw new IllegalArgumentException("at least one of the certificate could not be encoded");
-      }
-
+      String hexFp = HashAlgo.SHA256.hexHash(cert.getEncoded());
       fpOfCerts.add(hexFp);
     }
 
-    public PreprovisionedCaCertValidator(Set<X509Certificate> certs) {
+    public PreprovisionedCaCertValidator(Set<X509Cert> certs) {
       Args.notEmpty(certs, "certs");
       fpOfCerts = new HashSet<String>(certs.size());
 
-      for (X509Certificate m : certs) {
-        String hexFp;
-        try {
-          hexFp = ScepHashAlgo.SHA256.hexDigest(m.getEncoded());
-        } catch (CertificateEncodingException ex) {
-          throw new IllegalArgumentException(
-              "at least one of the certificate could not be encoded");
-        }
-
+      for (X509Cert m : certs) {
+        String hexFp = HashAlgo.SHA256.hexHash(m.getEncoded());
         fpOfCerts.add(hexFp);
       }
     }
 
     @Override
-    public boolean isTrusted(X509Certificate cert) {
+    public boolean isTrusted(X509Cert cert) {
       Args.notNull(cert, "cert");
 
-      try {
-        String hextFp = ScepHashAlgo.SHA256.hexDigest(cert.getEncoded());
-        return fpOfCerts.contains(hextFp);
-      } catch (CertificateEncodingException ex) {
-        return false;
-      }
+      String hextFp = HashAlgo.SHA256.hexHash(cert.getEncoded());
+      return fpOfCerts.contains(hextFp);
     }
 
   } // class PreprovisionedCaCertValidator
 
   public static final class PreprovisionedHashCaCertValidator implements CaCertValidator {
 
-    private final ScepHashAlgo hashAlgo;
+    private final HashAlgo hashAlgo;
 
     private final Set<byte[]> hashValues;
 
-    public PreprovisionedHashCaCertValidator(ScepHashAlgo hashAlgo, Set<byte[]> hashValues) {
+    public PreprovisionedHashCaCertValidator(HashAlgo hashAlgo, Set<byte[]> hashValues) {
       this.hashAlgo = Args.notNull(hashAlgo, "hashAlgo");
       Args.notEmpty(hashValues, "hashValues");
 
@@ -160,14 +136,9 @@ public interface CaCertValidator {
     }
 
     @Override
-    public boolean isTrusted(X509Certificate cert) {
+    public boolean isTrusted(X509Cert cert) {
       Args.notNull(cert, "cert");
-      byte[] actual;
-      try {
-        actual = hashAlgo.digest(cert.getEncoded());
-      } catch (CertificateEncodingException ex) {
-        return false;
-      }
+      byte[] actual = hashAlgo.hash(cert.getEncoded());
 
       for (byte[] m : hashValues) {
         if (Arrays.equals(actual, m)) {
