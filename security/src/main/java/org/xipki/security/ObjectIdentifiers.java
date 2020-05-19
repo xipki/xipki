@@ -56,7 +56,7 @@ public class ObjectIdentifiers {
 
     private static final ASN1ObjectIdentifier id_xipki_ext = id_xipki.branch("1");
 
-    public static final ASN1ObjectIdentifier id_xipki_ext_crlCertset = id_xipki_ext.branch("1");
+    // deprecated: id_xipk_ext_crlCertset := id_xipki_ext {1}
 
     public static final ASN1ObjectIdentifier id_xipki_ext_cmpRequestExtensions
         = id_xipki_ext.branch("2");
@@ -672,7 +672,6 @@ public class ObjectIdentifiers {
       oidNameMap.put(DN.jurisdictionOfIncorporationLocalityName,
           "jurisdictionOfIncorporationLocalityName");
 
-      oidNameMap.put(Xipki.id_xipki_ext_crlCertset, "xipki-crlCertset");
       oidNameMap.put(Xipki.id_xipki_ext_cmpRequestExtensions, "xipki-cmpRequestExtensions");
       oidNameMap.put(Xipki.id_xipki_ext_authorizationTemplate, "xipki-authorizationTemplate");
 

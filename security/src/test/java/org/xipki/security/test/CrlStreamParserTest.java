@@ -17,7 +17,6 @@
 
 package org.xipki.security.test;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -28,13 +27,9 @@ import java.security.Security;
 import javax.security.cert.CertificateEncodingException;
 
 import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.xipki.security.ObjectIdentifiers;
-import org.xipki.security.asn1.CrlCertSetStreamParser;
-import org.xipki.security.asn1.CrlCertSetStreamParser.CrlCertsIterator;
 import org.xipki.security.asn1.CrlStreamParser;
 import org.xipki.security.asn1.CrlStreamParser.RevokedCertsIterator;
 import org.xipki.security.util.X509Util;
@@ -103,7 +98,7 @@ public class CrlStreamParserTest {
   }
 
   @Test
-  public void parseCrlWithInvalidityDateAndXipkiSet() throws Exception {
+  public void parseCrlWithInvalidityDate() throws Exception {
     File crlFile = new File("src/test/resources/crls/crl-3/subcawithcrl1.crl");
     Certificate issuerSigner = parseCert("src/test/resources/crls/crl-3/ca.crt");
 
@@ -122,23 +117,7 @@ public class CrlStreamParserTest {
       }
     }
 
-    Assert.assertEquals("#revokedCertificates", 3, numRevokedCerts);
-
-    Extensions extensions = parser.getCrlExtensions();
-    Assert.assertNotNull("extensions", extensions);
-    byte[] coreExtValue = X509Util.getCoreExtValue(
-        extensions, ObjectIdentifiers.Xipki.id_xipki_ext_crlCertset);
-    CrlCertSetStreamParser crlCertParser =
-        new CrlCertSetStreamParser(new ByteArrayInputStream(coreExtValue));
-    CrlCertsIterator crlCerts = crlCertParser.crlCerts();
-
-    int numCrlCerts = 0;
-    while (crlCerts.hasNext()) {
-      crlCerts.next();
-      numCrlCerts++;
-    }
-
-    Assert.assertEquals("#numCrlCerts", 15, numCrlCerts);
+    Assert.assertEquals("#revokedCertificates", 2, numRevokedCerts);
   }
 
   @Test

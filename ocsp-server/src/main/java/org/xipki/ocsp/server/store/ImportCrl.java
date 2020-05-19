@@ -18,7 +18,6 @@
 package org.xipki.ocsp.server.store;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FilenameFilter;
@@ -56,11 +55,7 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.X509Cert;
-import org.xipki.security.asn1.CrlCertSetStreamParser;
-import org.xipki.security.asn1.CrlCertSetStreamParser.CrlCert;
-import org.xipki.security.asn1.CrlCertSetStreamParser.CrlCertsIterator;
 import org.xipki.security.asn1.CrlStreamParser;
 import org.xipki.security.asn1.CrlStreamParser.RevokedCert;
 import org.xipki.security.asn1.CrlStreamParser.RevokedCertsIterator;
@@ -877,41 +872,78 @@ class ImportCrl {
     commit(conn);
 
     // import the certificates
+    // cert dirs
+    File certsDir = new File(crlDir, "certs");
 
-    // extract the certificate
-    // this extension will be generated only be XiPKI CA.
-    byte[] extnValue = X509Util.getCoreExtValue(
-                          crl.getCrlExtensions(), ObjectIdentifiers.Xipki.id_xipki_ext_crlCertset);
-    if (extnValue != null) {
-      CrlCertSetStreamParser crlCertParser =
-          new CrlCertSetStreamParser(new ByteArrayInputStream(extnValue));
-      CrlCertsIterator crlCerts = crlCertParser.crlCerts();
+    if (!certsDir.exists()) {
+      LOG.info("the folder {} does not exist, ignore it", certsDir.getPath());
+      return;
+    }
 
+    if (!certsDir.isDirectory()) {
+      LOG.warn("the path {} does not point to a folder, ignore it", certsDir.getPath());
+      return;
+    }
+
+    if (!certsDir.canRead()) {
+      LOG.warn("the folder {} may not be read, ignore it", certsDir.getPath());
+      return;
+    }
+
+    // import certificates
+    File[] certFiles = certsDir.listFiles(new FilenameFilter() {
+      @Override
+      public boolean accept(File dir, String name) {
+        return name.endsWith(".der") || name.endsWith(".crt") || name.endsWith(".pem");
+      }
+    });
+
+    if (certFiles != null && certFiles.length > 0) {
       int num = 0;
-      while (crlCerts.hasNext()) {
+      for (File certFile : certFiles) {
         num++;
-        CrlCert crlCert = crlCerts.next();
-        BigInteger serialNumber = crlCert.getSerial();
-        X509Cert cert = crlCert.getCert();
+        X509Cert cert;
+        try {
+          cert = X509Util.parseCert(certFile);
+        } catch (IllegalArgumentException | IOException | CertificateException ex) {
+          LOG.warn("could not parse certificate {}, ignore it", certFile.getPath());
+          continue;
+        }
 
-        if (cert == null) {
-          addCertificateBySerialNumber(maxId, caId, crlInfoId, serialNumber);
-        } else {
-          if (!caCert.subject.equals(cert.getIssuer())) {
-            LOG.warn("issuer not match (serial={}) in CRL Extension Xipki-CertSet, ignore it",
-                LogUtil.formatCsn(serialNumber));
-            continue;
+        String certLogId = "(file " + certFile.getName() + ")";
+        addCertificate(maxId, crlInfoId, caCert, cert, null, certLogId);
+
+        if (num >= sqlBatchCommit) {
+          num = 0;
+          commit(conn);
+        }
+      }
+
+      commit(conn);
+    }
+
+    // import certificate serial numbers
+    File[] serialNumbersFiles = certsDir.listFiles(new FilenameFilter() {
+      @Override
+      public boolean accept(File dir, String name) {
+        return name.endsWith(".serials");
+      }
+    });
+
+    if (serialNumbersFiles != null && serialNumbersFiles.length > 0) {
+      int num = 0;
+      for (File serialNumbersFile : serialNumbersFiles) {
+        num++;
+        try (BufferedReader reader = new BufferedReader(new FileReader(serialNumbersFile))) {
+          String line;
+          while ((line = reader.readLine()) != null) {
+            BigInteger serialNumber = new BigInteger(line.trim(), 16);
+            addCertificateBySerialNumber(maxId, caId, crlInfoId, serialNumber);
           }
-
-          if (!serialNumber.equals(cert.getSerialNumber())) {
-            LOG.warn("serialNumber not match (serial={}) in CRL Extension Xipki-CertSet, ignore it",
-                LogUtil.formatCsn(serialNumber));
-            continue;
-          }
-
-          String certLogId = "(issuer='" + cert.getIssuer()
-              + "', serialNumber=" + cert.getSerialNumber() + ")";
-          addCertificate(maxId, crlInfoId, caCert, cert, null, certLogId);
+        } catch (IOException ex) {
+          LOG.warn("could not import certificates by serial numbers from file {}, ignore it",
+              serialNumbersFile.getPath());
+          continue;
         }
 
         if (num >= sqlBatchCommit) {
@@ -921,89 +953,6 @@ class ImportCrl {
       }
 
       commit(conn);
-    } else {
-      // cert dirs
-      File certsDir = new File(crlDir, "certs");
-
-      if (!certsDir.exists()) {
-        LOG.info("the folder {} does not exist, ignore it", certsDir.getPath());
-        return;
-      }
-
-      if (!certsDir.isDirectory()) {
-        LOG.warn("the path {} does not point to a folder, ignore it", certsDir.getPath());
-        return;
-      }
-
-      if (!certsDir.canRead()) {
-        LOG.warn("the folder {} may not be read, ignore it", certsDir.getPath());
-        return;
-      }
-
-      // import certificates
-      File[] certFiles = certsDir.listFiles(new FilenameFilter() {
-        @Override
-        public boolean accept(File dir, String name) {
-          return name.endsWith(".der") || name.endsWith(".crt") || name.endsWith(".pem");
-        }
-      });
-
-      if (certFiles != null && certFiles.length > 0) {
-        int num = 0;
-        for (File certFile : certFiles) {
-          num++;
-          X509Cert cert;
-          try {
-            cert = X509Util.parseCert(certFile);
-          } catch (IllegalArgumentException | IOException | CertificateException ex) {
-            LOG.warn("could not parse certificate {}, ignore it", certFile.getPath());
-            continue;
-          }
-
-          String certLogId = "(file " + certFile.getName() + ")";
-          addCertificate(maxId, crlInfoId, caCert, cert, null, certLogId);
-
-          if (num >= sqlBatchCommit) {
-            num = 0;
-            commit(conn);
-          }
-        }
-
-        commit(conn);
-      }
-
-      // import certificate serial numbers
-      File[] serialNumbersFiles = certsDir.listFiles(new FilenameFilter() {
-        @Override
-        public boolean accept(File dir, String name) {
-          return name.endsWith(".serials");
-        }
-      });
-
-      if (serialNumbersFiles != null && serialNumbersFiles.length > 0) {
-        int num = 0;
-        for (File serialNumbersFile : serialNumbersFiles) {
-          num++;
-          try (BufferedReader reader = new BufferedReader(new FileReader(serialNumbersFile))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-              BigInteger serialNumber = new BigInteger(line.trim(), 16);
-              addCertificateBySerialNumber(maxId, caId, crlInfoId, serialNumber);
-            }
-          } catch (IOException ex) {
-            LOG.warn("could not import certificates by serial numbers from file {}, ignore it",
-                serialNumbersFile.getPath());
-            continue;
-          }
-
-          if (num >= sqlBatchCommit) {
-            num = 0;
-            commit(conn);
-          }
-        }
-
-        commit(conn);
-      }
     }
   } // method importCrlRevokedCertificates
 

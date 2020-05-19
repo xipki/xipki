@@ -34,19 +34,6 @@ import org.xipki.util.TripleState;
  *<pre>
  * Example configuration
  *
- * # Whether expired certificates are considered. Default is false
- * expiredcerts.included=&lt;'true'|'false'&gt;
- *
- * # Whether XiPKI-customized extension xipki-CrlCertSet is included. Default is false
- * xipki.certset=&lt;'true'|'false'&gt;
- *
- * # Whether the extension xipki-CrlCertSet contains the raw certificates. Default is true
- * xipki.certset.certs=&lt;'true'|'false'&gt;
- *
- * # Whether the extension xipki-CrlCertSet contains the profile name of the certificate.
- * # Default is true
- * xipki.certset.profilename=&lt;'true'|'false'&gt;
- *
  * # List of OIDs of extensions to be embedded in CRL,
  * # Unspecified or empty extensions indicates that the CA decides.
  * extensions=&lt;comma delimited OIDs of extensions&gt;
@@ -142,12 +129,6 @@ public class CrlControl {
 
   public static final String KEY_EYTENSIONS = "extensions";
 
-  public static final String KEY_EXPIRED_CERTS_INCLUDED = "expiredcerts.included";
-
-  public static final String KEY_XIPKI_CERTSET = "xipki.certset";
-
-  public static final String KEY_XIPKI_CERTSET_CERTS = "xipki.certset.certs";
-
   public static final String KEY_FULLCRL_INTERVALS = "fullcrl.intervals";
 
   public static final String KEY_DELTACRL_INTERVALS = "deltacrl.intervals";
@@ -171,12 +152,6 @@ public class CrlControl {
   public static final String KEY_EXCLUDE_REASON = "exclude.reason";
 
   public static final String KEY_INVALIDITY_DATE = "invalidity.date";
-
-  private boolean xipkiCertsetIncluded;
-
-  private boolean xipkiCertsetCertIncluded = true;
-
-  private boolean includeExpiredCerts;
 
   private int fullCrlIntervals = 1;
 
@@ -210,12 +185,6 @@ public class CrlControl {
     if (str != null) {
       this.invalidityDateMode = TripleState.valueOf(str);
     }
-
-    this.includeExpiredCerts = getBoolean(props, KEY_EXPIRED_CERTS_INCLUDED, false);
-
-    this.xipkiCertsetIncluded = getBoolean(props, KEY_XIPKI_CERTSET, false);
-
-    this.xipkiCertsetCertIncluded = getBoolean(props, KEY_XIPKI_CERTSET_CERTS, true);
 
     str = props.value(KEY_EYTENSIONS);
     if (str == null) {
@@ -281,7 +250,6 @@ public class CrlControl {
     ConfPairs pairs = new ConfPairs();
     pairs.putPair(KEY_DELTACRL_INTERVALS, Integer.toString(deltaCrlIntervals));
     pairs.putPair(KEY_EXCLUDE_REASON, Boolean.toString(excludeReason));
-    pairs.putPair(KEY_EXPIRED_CERTS_INCLUDED, Boolean.toString(includeExpiredCerts));
     pairs.putPair(KEY_FULLCRL_EXTENDED_NEXTUPDATE, Boolean.toString(extendedNextUpdate));
     pairs.putPair(KEY_FULLCRL_INTERVALS, Integer.toString(fullCrlIntervals));
     pairs.putPair(KEY_INTERVAL_TIME, intervalDayTime.toString());
@@ -289,9 +257,6 @@ public class CrlControl {
     pairs.putPair(KEY_ONLY_CONTAINS_CACERTS, Boolean.toString(onlyContainsCaCerts));
     pairs.putPair(KEY_ONLY_CONTAINS_USERCERTS, Boolean.toString(onlyContainsUserCerts));
     pairs.putPair(KEY_OVERLAP_DAYS, Integer.toString(overlapDays));
-    pairs.putPair(KEY_XIPKI_CERTSET, Boolean.toString(xipkiCertsetIncluded));
-    pairs.putPair(KEY_XIPKI_CERTSET_CERTS, Boolean.toString(xipkiCertsetCertIncluded));
-    pairs.putPair(KEY_XIPKI_CERTSET, Boolean.toString(xipkiCertsetIncluded));
 
     if (CollectionUtil.isNotEmpty(extensionOids)) {
       StringBuilder extensionsSb = new StringBuilder(200);
@@ -311,19 +276,11 @@ public class CrlControl {
   }
 
   public String toString(boolean verbose) {
-    StringBuilder sb = new StringBuilder(xipkiCertsetIncluded ? "included" : "not included");
-
-    if (xipkiCertsetIncluded) {
-      sb.append("\t\tinclude cert: ").append(xipkiCertsetCertIncluded);
-    }
-    String xipkiCertSetStr = sb.toString();
-
-    sb = new StringBuilder("generate CRL at ").append(intervalDayTime);
+    StringBuilder sb = new StringBuilder("generate CRL at ").append(intervalDayTime);
     String intervalStr = sb.toString();
 
     return StringUtil.concatObjects(
-        "  include expired certificates: ", includeExpiredCerts,
-        "\n  full CRL intervals: ", fullCrlIntervals,
+        "  full CRL intervals: ", fullCrlIntervals,
         "\n  delta CRL intervals: ", deltaCrlIntervals,
         "\n  overlap: ", overlapDays, " days",
         "\n  use extended nextUpdate: ", extendedNextUpdate,
@@ -332,21 +289,8 @@ public class CrlControl {
         "\n  exclude reason: ", excludeReason,
         "\n  invalidity date mode: ", invalidityDateMode,
         "\n  interval: ", intervalStr,
-        "\n  XiPKI CertSet: ", xipkiCertSetStr,
         (verbose ? "\n  encoded: " : ""), (verbose ? getConf() : ""));
   } // method toString(boolean)
-
-  public boolean isXipkiCertsetIncluded() {
-    return xipkiCertsetIncluded;
-  }
-
-  public boolean isXipkiCertsetCertIncluded() {
-    return xipkiCertsetCertIncluded;
-  }
-
-  public boolean isIncludeExpiredCerts() {
-    return includeExpiredCerts;
-  }
 
   public int getFullCrlIntervals() {
     return fullCrlIntervals;
@@ -426,11 +370,8 @@ public class CrlControl {
 
     CrlControl obj2 = (CrlControl) obj;
     if (deltaCrlIntervals != obj2.deltaCrlIntervals
-        || xipkiCertsetIncluded != obj2.xipkiCertsetIncluded
-        || xipkiCertsetCertIncluded != obj2.xipkiCertsetCertIncluded
         || extendedNextUpdate != obj2.extendedNextUpdate
         || fullCrlIntervals != obj2.fullCrlIntervals
-        || includeExpiredCerts != obj2.includeExpiredCerts
         || onlyContainsCaCerts != obj2.onlyContainsCaCerts
         || onlyContainsUserCerts != obj2.onlyContainsUserCerts) {
       return false;

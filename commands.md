@@ -132,10 +132,6 @@ Security Commands
 
      export certificate from PKCS#12 keystore
 
-   * `xi:extract-cert`
-
-     extract certificates from CRL
-
    * `xi:import-cert`
 
      import certificates to a keystore

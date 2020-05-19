@@ -44,8 +44,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
@@ -60,13 +58,11 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -84,7 +80,6 @@ import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
 import org.bouncycastle.asn1.x509.qualified.MonetaryValue;
 import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
-import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.util.io.pem.PemObject;
@@ -112,7 +107,6 @@ import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
-import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
 import org.xipki.shell.Completers.ExtensionNameCompleter;
 import org.xipki.shell.IllegalCmdParamException;
@@ -945,68 +939,6 @@ public class Actions {
     }
 
   } // class Deobfuscate
-
-  @Command(scope = "xi", name = "extract-cert", description = "extract certificates from CRL")
-  @Service
-  public static class ExtractCert extends SecurityAction {
-
-    @Option(name = "--crl", required = true, description = "CRL file")
-    @Completion(FileCompleter.class)
-    private String crlFile;
-
-    @Option(name = "--out", aliases = "-o", required = true,
-        description = "ZIP file to save the extracted certificates")
-    @Completion(FileCompleter.class)
-    private String outFile;
-
-    @Override
-    protected Object execute0() throws Exception {
-      X509CRLHolder crl = X509Util.parseCrl(new File(crlFile));
-      byte[] extnValue = X509Util.getCoreExtValue(crl.getExtensions(),
-                            ObjectIdentifiers.Xipki.id_xipki_ext_crlCertset);
-      if (extnValue == null) {
-        throw new IllegalCmdParamException("no certificate is contained in " + crlFile);
-      }
-
-      ASN1Set asn1Set = DERSet.getInstance(extnValue);
-      final int n = asn1Set.size();
-      if (n == 0) {
-        throw new CmdFailure("no certificate is contained in " + crlFile);
-      }
-
-      ByteArrayOutputStream out = new ByteArrayOutputStream();
-      ZipOutputStream zip = new ZipOutputStream(out);
-
-      for (int i = 0; i < n; i++) {
-        ASN1Encodable asn1 = asn1Set.getObjectAt(i);
-        Certificate cert;
-        try {
-          ASN1Sequence seq = ASN1Sequence.getInstance(asn1);
-          cert = Certificate.getInstance(seq.getObjectAt(0));
-        } catch (IllegalArgumentException ex) {
-          // backwards compatibility
-          cert = Certificate.getInstance(asn1);
-        }
-
-        byte[] certBytes = cert.getEncoded();
-        String sha1FpCert = HashAlgo.SHA1.hexHash(certBytes);
-        ZipEntry certZipEntry = new ZipEntry(sha1FpCert + ".der");
-        zip.putNextEntry(certZipEntry);
-        try {
-          zip.write(certBytes);
-        } finally {
-          zip.closeEntry();
-        }
-      }
-
-      zip.flush();
-      zip.close();
-
-      saveVerbose("extracted " + n + " certificates to", outFile, out.toByteArray());
-      return null;
-    } // method execute0
-
-  } // class ExtractCert
 
   @Command(scope = "xi", name = "import-cert", description = "import certificates to a keystore")
   @Service

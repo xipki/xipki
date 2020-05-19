@@ -61,7 +61,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -70,9 +69,6 @@ import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERSet;
-import org.bouncycastle.asn1.DERTaggedObject;
-import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -83,7 +79,6 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.CRLDistPoint;
 import org.bouncycastle.asn1.x509.CRLReason;
-import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.DistributionPointName;
 import org.bouncycastle.asn1.x509.Extension;
@@ -153,7 +148,6 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.CompareUtil;
-import org.xipki.util.ConfPairs;
 import org.xipki.util.DateUtil;
 import org.xipki.util.HealthCheckResult;
 import org.xipki.util.LogUtil;
@@ -798,13 +792,8 @@ public class X509Ca implements Closeable {
 
       final int numEntries = 100;
 
-      Date notExpireAt;
-      if (control.isIncludeExpiredCerts()) {
-        notExpireAt = new Date(0);
-      } else {
-        // 10 minutes buffer
-        notExpireAt = new Date(thisUpdate.getTime() - 600L * MS_PER_SECOND);
-      }
+      // 10 minutes buffer
+      Date notExpireAt = new Date(thisUpdate.getTime() - 600L * MS_PER_SECOND);
 
       long startId = 1;
 
@@ -946,8 +935,6 @@ public class X509Ca implements Closeable {
         throw new OperationException(INVALID_EXTENSION, ex);
       }
 
-      addXipkiCertset(crlBuilder, deltaCrl, control, notExpireAt, onlyCaCerts, onlyUserCerts);
-
       @SuppressWarnings("resource")
       ConcurrentContentSigner concurrentSigner = (crlSigner == null)
           ? caInfo.getSigner(null) : crlSigner.getSigner();
@@ -985,80 +972,6 @@ public class X509Ca implements Closeable {
       }
     }
   } // method generateCrl
-
-  /**
-   * Add XiPKI extension CrlCertSet.
-   *
-   * <pre>
-   * Xipki-CrlCertSet ::= SET OF Xipki-CrlCert
-   *
-   * Xipki-CrlCert ::= SEQUENCE {
-   *   serial          INTEGER,
-   *   cert        [0] EXPLICIT    Certificate OPTIONAL,
-   *   info        [1] EXPLICIT    UTF8String  OPTIONAL
-   * }
-   * </pre>
-   */
-  private void addXipkiCertset(X509v2CRLBuilder crlBuilder, boolean deltaCrl, CrlControl control,
-      Date notExpireAt, boolean onlyCaCerts, boolean onlyUserCerts) throws OperationException {
-    if (deltaCrl || !control.isXipkiCertsetIncluded()) {
-      return;
-    }
-
-    ASN1EncodableVector vector = new ASN1EncodableVector();
-    final int numEntries = 100;
-    long startId = 1;
-
-    List<CertStore.SerialWithId> serials;
-    do {
-      serials = certstore.getSerialNumbers(caIdent, notExpireAt, startId, numEntries, false,
-          onlyCaCerts, onlyUserCerts);
-
-      long maxId = 1;
-      for (CertStore.SerialWithId sid : serials) {
-        if (sid.getId() > maxId) {
-          maxId = sid.getId();
-        }
-
-        ASN1EncodableVector vec = new ASN1EncodableVector();
-        vec.add(new ASN1Integer(sid.getSerial()));
-
-        if (control.isXipkiCertsetCertIncluded()) {
-          CertificateInfo certInfo;
-          try {
-            certInfo = certstore.getCertForId(caIdent, caCert, sid.getId(), caIdNameMap);
-          } catch (CertificateException ex) {
-            throw new OperationException(SYSTEM_FAILURE,
-                "CertificateException: " + ex.getMessage());
-          }
-
-          Certificate cert = certInfo.getCert().getCert().toBcCert().toASN1Structure();
-
-          NameId profileId = certInfo.getProfile();
-          if (profileId != null) {
-            String profileName = profileId.getName();
-            ConfPairs info = new ConfPairs();
-            info.putPair("profile", profileName);
-            vec.add(new DERTaggedObject(1, new DERUTF8String(info.getEncoded())));
-          }
-
-          vec.add(new DERTaggedObject(true, 0, cert));
-        }
-
-        vector.add(new DERSequence(vec));
-      } // end for
-
-      startId = maxId + 1;
-    } while (serials.size() >= numEntries);
-    // end do
-
-    try {
-      crlBuilder.addExtension(ObjectIdentifiers.Xipki.id_xipki_ext_crlCertset,
-          false, new DERSet(vector));
-    } catch (CertIOException ex) {
-      throw new OperationException(INVALID_EXTENSION, "CertIOException: " + ex.getMessage());
-    }
-  }
 
   public CertificateInfo regenerateCert(CertTemplateData certTemplate,
       RequestorInfo requestor, RequestType reqType, byte[] transactionId, String msgId)
