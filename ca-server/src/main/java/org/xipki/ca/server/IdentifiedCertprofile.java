@@ -19,6 +19,7 @@ package org.xipki.ca.server;
 
 import java.io.Closeable;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -59,6 +60,7 @@ import org.bouncycastle.asn1.x509.PolicyInformation;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
+import org.bouncycastle.util.encoders.Hex;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.BadFormatException;
 import org.xipki.ca.api.CaUris;
@@ -672,19 +674,66 @@ class IdentifiedCertprofile implements Closeable {
           }
         } else if (GeneralName.iPAddress == m.getTagNo()) {
           byte[] octets = DEROctetString.getInstance(m.getName()).getOctets();
-          if (octets.length == 4) { // IPv4Address
-            String ipAddressText = (0xFF & octets[0]) + "." + (0xFF & octets[1]) + "."
-                + (0xFF & octets[2]) + "." + (0xFF & octets[3]);
-            if (!commonNameInSan && ipAddressText.equals(commonName)) {
-              commonNameInSan = true;
+          if (octets.length == 4) { // IPv4 address
+            if (!commonNameInSan) {
+              String ipAddressText = (0xFF & octets[0]) + "." + (0xFF & octets[1]) + "."
+                  + (0xFF & octets[2]) + "." + (0xFF & octets[3]);
+              if (ipAddressText.equals(commonName)) {
+                commonNameInSan = true;
+              }
             }
 
-            if (!ExtensionSpec.isValidPublicIPv4Address(octets)) {
-              throw new BadCertTemplateException(
-                  "invalid IPv4Address " + ipAddressText);
+            //if (!ExtensionSpec.isValidPublicIPv4Address(octets)) {
+            //  throw new BadCertTemplateException(
+            //      "invalid IPv4Address " + ipAddressText);
+            //}
+          } else if (octets.length == 8) { // IPv6 address
+            if (!commonNameInSan) {
+              // get the number of ":"
+              List<Integer> positions = new ArrayList<>(7);
+              int n = commonName.length();
+
+              for (int i = 0; i < n; i++) {
+                if (commonName.charAt(i) == ':') {
+                  positions.add(i);
+                }
+              }
+
+              if (positions.size() == 7) {
+                String[] blocks = new String[8];
+                blocks[0] = commonName.substring(0, positions.get(0));
+                for (int i = 0; i < 6; i++) {
+                  blocks[i + 1] = commonName.substring(positions.get(i) + 1, positions.get(i + 1));
+                }
+                blocks[7] = commonName.substring(positions.get(6) + 1);
+
+                byte[] commonNameBytes = new byte[16];
+                for (int i = 0; i < 8; i++) {
+                  String block = blocks[i];
+                  int blen = block.length();
+                  if (blen == 0) {
+                    continue;
+                  } else if (blen == 1 | blen == 2) {
+                    commonNameBytes[i * 2 + 1] = (byte) Integer.parseInt(block, 16);
+                  } else if (blen == 3 | blen == 4) {
+                    commonNameBytes[i * 2] =
+                        (byte) Integer.parseInt(block.substring(0, blen - 2), 16);
+                    commonNameBytes[i * 2 + 1] =
+                        (byte) Integer.parseInt(block.substring(blen - 2), 16);
+                  } else {
+                    throw new BadCertTemplateException(
+                        "invalid IP address in commonName " + commonName);
+                  }
+                }
+
+                if (Arrays.equals(commonNameBytes, octets)) {
+                  commonNameInSan = true;
+                }
+              }
             }
           } else {
-            // TODO: implement me
+            throw new BadCertTemplateException(
+                "invalid IP address " + Hex.toHexString(octets));
           }
         }
       }
