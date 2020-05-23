@@ -2,8 +2,19 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
-## 5.3.7
+## 5.3.8
   - Release date: -
+  - CA
+    - Verify SCT before adding it to the cert
+    - Remove the verfication of certificate's signature direct after the creation.
+    - Unify the use of X.509 certificate and CRL
+  - OCSP
+    - Unify the use of X.509 certificate and CRL
+  - CLI
+    - Unify the use of X.509 certificate and CRL
+
+## 5.3.7
+  - Release date: Mar 15, 2020
   - CA
     - Make XIPKI_BASE configurable.
     - Do not set the highest bit, increase the dflt bit length from 127 to 159 of serial numbers
