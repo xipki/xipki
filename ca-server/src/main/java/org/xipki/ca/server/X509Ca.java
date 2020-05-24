@@ -298,7 +298,7 @@ public class X509Ca implements Closeable {
       }
 
       if (!(createFullCrlNow || createDeltaCrlNow)) {
-        LOG.info("No CRL is needed to be created");
+        LOG.debug("No CRL is needed to be created");
         return;
       }
 

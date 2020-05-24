@@ -21,10 +21,13 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
+import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.DSAParameterSpec;
 import java.security.spec.ECParameterSpec;
 import java.util.ArrayList;
@@ -587,8 +590,11 @@ public abstract class P11Slot implements Closeable {
       for (P11ObjectIdentifier objectId : ids) {
         P11Identity identity = identities.get(objectId);
         sb.append("\t").append(objectId);
-        if (identity.getPublicKey() != null) {
-          sb.append(", algo=").append(identity.getPublicKey().getAlgorithm());
+
+        PublicKey publicKey = identity.getPublicKey();
+        if (publicKey != null) {
+          String algo = getAlgorithmDesc(publicKey);
+          sb.append(", algo=").append(algo);
           if (identity.getCertificate() != null) {
             String subject = identity.getCertificate().getSubjectRfc4519Text();
             sb.append(", subject='").append(subject).append("'");
@@ -1278,16 +1284,7 @@ public abstract class P11Slot implements Closeable {
       sb.append(")\n");
 
       if (identity.getPublicKey() != null) {
-
-        String algo = identity.getPublicKey().getAlgorithm();
-        if ("ec".equalsIgnoreCase(algo)) {
-          ECParameterSpec paramSpec = ((ECPublicKey) identity.getPublicKey()).getParams();
-          ASN1ObjectIdentifier curveOid = KeyUtil.detectCurveOid(paramSpec);
-          if (curveOid != null) {
-            String name = AlgorithmUtil.getCurveName(curveOid);
-            algo += "/" + (name == null ? curveOid.getId() : name);
-          }
-        }
+        String algo = getAlgorithmDesc(identity.getPublicKey());
         sb.append("\t\tAlgorithm: ").append(algo).append("\n");
         X509Cert[] certs = identity.certificateChain();
         if (certs == null || certs.length == 0) {
@@ -1353,6 +1350,29 @@ public abstract class P11Slot implements Closeable {
 
     return false;
   } // method existsCertForId
+
+  private static String getAlgorithmDesc(PublicKey publicKey) {
+    String algo = publicKey.getAlgorithm();
+
+    if (publicKey instanceof ECPublicKey) {
+      String curveName = "UNKNOWN";
+      ECParameterSpec paramSpec = ((ECPublicKey) publicKey).getParams();
+      ASN1ObjectIdentifier curveOid = KeyUtil.detectCurveOid(paramSpec);
+      if (curveOid != null) {
+        String name = AlgorithmUtil.getCurveName(curveOid);
+        curveName = name == null ? curveOid.getId() : name;
+      }
+      algo += "/" + curveName;
+    } else if (publicKey instanceof RSAPublicKey) {
+      int keylen = ((RSAPublicKey) publicKey).getModulus().bitLength();
+      algo += "/" + keylen;
+    } else if (publicKey instanceof DSAPublicKey) {
+      int keylen = ((DSAPublicKey) publicKey).getParams().getP().bitLength();
+      algo += "/" + keylen;
+    }
+
+    return algo;
+  }
 
   private static void formatString(Integer index, boolean verbose, StringBuilder sb,
       X509Cert cert) {
