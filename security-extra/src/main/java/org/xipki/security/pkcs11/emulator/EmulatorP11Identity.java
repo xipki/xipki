@@ -302,7 +302,6 @@ public class EmulatorP11Identity extends P11Identity {
     }
   } // method sign0
 
-  // TODO: check the correctness
   private byte[] hmac(byte[] contentToSign, HashAlgo hashAlgo) {
     HMac hmac = new HMac(hashAlgo.createDigest());
     hmac.init(new KeyParameter(signingKey.getEncoded()));
@@ -312,7 +311,6 @@ public class EmulatorP11Identity extends P11Identity {
     return signature;
   } // method hmac
 
-  // TODO: check the correctness
   private byte[] aesGmac(P11Params params, byte[] contentToSign) throws P11TokenException {
     if (params == null) {
       throw new P11TokenException("iv may not be null");

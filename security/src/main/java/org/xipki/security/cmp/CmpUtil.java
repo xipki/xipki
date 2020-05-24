@@ -96,7 +96,6 @@ public class CmpUtil {
         newProtectedPKIMessageBuilder(pkiMessage, signerName, senderKid);
     ProtectedPKIMessage signedMessage;
     try {
-      // TODO: more efficient way to get the instance of builder
       PKMACBuilder pkMacBuilder = new PKMACBuilder(new JcePKMACValuesCalculator());
       pkMacBuilder.setParameters(pbmParameter);
       signedMessage = builder.build(pkMacBuilder.build(password));

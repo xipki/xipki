@@ -49,18 +49,15 @@ public class TlsInit {
     @Override
     public void checkClientTrusted(X509Certificate[] chain, String authType)
         throws CertificateException {
-      // TODO: implement me
     }
 
     @Override
     public void checkServerTrusted(X509Certificate[] chain, String authType)
             throws CertificateException {
-      // TODO: implement me
     }
 
     @Override
     public X509Certificate[] getAcceptedIssuers() {
-      // TODO: implement me
       return new X509Certificate[0];
     }
 
@@ -79,7 +76,6 @@ public class TlsInit {
      */
     @Override
     public boolean verify(String hostname, SSLSession session) {
-      // TODO: implement me
       return true;
     }
 
