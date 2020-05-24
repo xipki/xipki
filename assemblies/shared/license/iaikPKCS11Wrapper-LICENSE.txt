@@ -1,4 +1,9 @@
-License
+-- Part contributed by xipki
+
+Apache License 2.0 or above.
+
+
+-- Originial License of iaikPkcs11Wrapper
 
 We provide IAIK PKCS#11 Wrapper under an Apache-style license. In short, this
 means that you can use the IAIK PKCS#11 Wrapper for free for noncommercial and

@@ -1,6 +1,11 @@
+Please note this should be read in the same way as the MIT license.
+
+Please also note this licensing model is made possible through funding from
+donations and the sale of support contracts.
+
 License
 
-Copyright (c) 2000 - 2013 The Legion of the Bouncy Castle Inc.
+Copyright (c) 2000 - 2020 The Legion of the Bouncy Castle Inc.
 (http://www.bouncycastle.org)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
