@@ -23,7 +23,9 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.cert.Certificate;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Set;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
@@ -34,21 +36,15 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.jcajce.spec.SM2ParameterSpec;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignatureAlgoControl;
-import org.xipki.security.XiSecurityException;
-import org.xipki.security.pkcs11.P11CryptService;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
-import org.xipki.security.pkcs11.P11Module;
-import org.xipki.security.pkcs11.P11ObjectIdentifier;
-import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.security.pkcs11.P11SlotIdentifier;
-import org.xipki.security.pkcs11.P11TokenException;
 import org.xipki.security.pkcs11.provider.XiProvider;
 import org.xipki.security.pkcs11.provider.XiSM2ParameterSpec;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.shell.Completers;
+import org.xipki.shell.DynamicEnumCompleter;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.XiAction;
-import org.xipki.util.Hex;
+import org.xipki.util.CollectionUtil;
 import org.xipki.util.StringUtil;
 
 /**
@@ -64,53 +60,14 @@ public class QaP11Actions {
   @Service
   public static class P11provSm2Test extends P11SecurityAction {
 
-    @Option(name = "--id",
-        description = "id of the private key in the PKCS#11 device\n"
-            + "either keyId or keyLabel must be specified")
-    protected String id;
-
-    @Option(name = "--label",
-        description = "label of the private key in the PKCS#11 device\n"
-            + "either keyId or keyLabel must be specified")
-    protected String label;
-
-    @Option(name = "--verbose", aliases = "-v",
-        description = "show object information verbosely")
-    private Boolean verbose = Boolean.FALSE;
-
     @Option(name = "--ida", description = "IDA (ID user A)")
     protected String ida;
 
     @Override
-    protected Object execute0() throws Exception {
-      KeyStore ks = KeyStore.getInstance("PKCS11", XiProvider.PROVIDER_NAME);
-      ks.load(null, null);
-      if (verbose.booleanValue()) {
-        println("available aliases:");
-        Enumeration<?> aliases = ks.aliases();
-        while (aliases.hasMoreElements()) {
-          String alias2 = (String) aliases.nextElement();
-          println("    " + alias2);
-        }
-      }
-
-      String alias = getAlias();
-      println("alias: " + alias);
-      PrivateKey key = (PrivateKey) ks.getKey(alias, null);
-      if (key == null) {
-        println("could not find key with alias '" + alias + "'");
-        return null;
-      }
-
-      Certificate cert = ks.getCertificate(alias);
-      if (cert == null) {
-        println("could not find certificate to verify signature");
-        return null;
-      }
-
+    protected Object execute1(PrivateKey key, Certificate cert) throws Exception {
       String sigAlgo = "SM3withSM2";
       println("signature algorithm: " + sigAlgo);
-      Signature sig = Signature.getInstance(sigAlgo, XiProvider.PROVIDER_NAME);
+      Signature sig = Signature.getInstance(sigAlgo);
 
       if (StringUtil.isNotBlank(ida)) {
         sig.setParameter(new XiSM2ParameterSpec(StringUtil.toUtf8Bytes(ida)));
@@ -135,37 +92,12 @@ public class QaP11Actions {
       return null;
     } // method execute0
 
-    private String getAlias() throws IllegalCmdParamException {
-      if (label != null) {
-        return StringUtil.concat(moduleName, "#slotindex-", slotIndex.toString(),
-            "#keylabel-", label);
-      } else if (id != null) {
-        return StringUtil.concat(moduleName, "#slotindex-", slotIndex.toString(),
-            "#keyid-", id.toLowerCase());
-      } else {
-        throw new IllegalCmdParamException("either id or label must be specified");
-      }
-    }
-
   } // class P11provSm2Test
 
   @Command(scope = "qa", name = "p11prov-test",
       description = "test the Xipki PKCS#11 JCA/JCE provider")
   @Service
   public static class P11provTest extends P11SecurityAction {
-
-    @Option(name = "--id",
-        description = "id of the private key in the PKCS#11 device\n"
-            + "either keyId or keyLabel must be specified")
-    protected String id;
-
-    @Option(name = "--label",
-        description = "label of the private key in the PKCS#11 device\n"
-            + "either keyId or keyLabel must be specified")
-    protected String label;
-
-    @Option(name = "--verbose", aliases = "-v", description = "show object information verbosely")
-    private Boolean verbose = Boolean.FALSE;
 
     @Option(name = "--hash", description = "hash algorithm name")
     @Completion(Completers.HashAlgCompleter.class)
@@ -185,6 +117,82 @@ public class QaP11Actions {
         description = "whether to use the chinese GM algorithm for the POPO computation\n"
             + "(only applied to EC key with GM curves)")
     private Boolean gm = Boolean.FALSE;
+
+    @Override
+    protected Object execute1(PrivateKey key, Certificate cert) throws Exception {
+      PublicKey pubKey = cert.getPublicKey();
+
+      String sigAlgo = getSignatureAlgo(pubKey);
+      println("signature algorithm: " + sigAlgo);
+      Signature sig = Signature.getInstance(sigAlgo);
+      sig.initSign(key);
+
+      byte[] data = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+      sig.update(data);
+      byte[] signature = sig.sign(); // CHECKSTYLE:SKIP
+      println("signature created successfully");
+
+      Signature ver = Signature.getInstance(sigAlgo, "BC");
+      ver.initVerify(pubKey);
+      ver.update(data);
+      boolean valid = ver.verify(signature);
+      println("signature valid: " + valid);
+      return null;
+    } // method execute0
+
+    private String getSignatureAlgo(PublicKey pubKey) throws NoSuchAlgorithmException {
+      SignatureAlgoControl algoControl = new SignatureAlgoControl(rsaMgf1, dsaPlain, gm);
+      AlgorithmIdentifier sigAlgId = AlgorithmUtil.getSigAlgId(pubKey,
+          HashAlgo.getNonNullInstance(hashAlgo), algoControl);
+      return AlgorithmUtil.getSignatureAlgoName(sigAlgId);
+    }
+
+  } // class P11provTest
+
+  protected abstract static class P11SecurityAction extends XiAction {
+
+    protected static final String DEFAULT_P11MODULE_NAME =
+        P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
+
+    @Option(name = "--module", description = "name of the PKCS#11 module")
+    @Completion(P11ModuleNameCompleter.class)
+    protected String moduleName = DEFAULT_P11MODULE_NAME;
+
+    @Option(name = "--slot", required = true, description = "slot index")
+    protected Integer slotIndex;
+
+    @Option(name = "--id",
+        description = "id of the private key in the PKCS#11 device\n"
+            + "either keyId or keyLabel must be specified")
+    protected String id;
+
+    @Option(name = "--label",
+        description = "label of the private key in the PKCS#11 device\n"
+            + "either keyId or keyLabel must be specified")
+    protected String label;
+
+    @Option(name = "--verbose", aliases = "-v",
+        description = "show object information verbosely")
+    protected Boolean verbose = Boolean.FALSE;
+
+    @Reference (optional = true)
+    protected P11CryptServiceFactory p11CryptServiceFactory;
+
+    protected abstract Object execute1(PrivateKey key, Certificate cert)
+        throws Exception;
+
+    protected String getAlias() throws IllegalCmdParamException {
+      if (label != null && id == null) {
+        return StringUtil.concat(moduleName, "#slotindex-", slotIndex.toString(),
+            "#keylabel-", label);
+      } else if (label == null && id != null) {
+        return StringUtil.concat(moduleName, "#slotindex-", slotIndex.toString(),
+            "#keyid-", id.toLowerCase());
+      } else {
+        throw new IllegalCmdParamException(
+            "exactly one of id or label should be specified");
+      }
+    }
 
     @Override
     protected Object execute0() throws Exception {
@@ -212,92 +220,26 @@ public class QaP11Actions {
         println("could not find certificate to verify signature");
         return null;
       }
-      PublicKey pubKey = cert.getPublicKey();
 
-      String sigAlgo = getSignatureAlgo(pubKey);
-      println("signature algorithm: " + sigAlgo);
-      Signature sig = Signature.getInstance(sigAlgo, XiProvider.PROVIDER_NAME);
-      sig.initSign(key);
-
-      byte[] data = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-      sig.update(data);
-      byte[] signature = sig.sign(); // CHECKSTYLE:SKIP
-      println("signature created successfully");
-
-      Signature ver = Signature.getInstance(sigAlgo, "BC");
-      ver.initVerify(pubKey);
-      ver.update(data);
-      boolean valid = ver.verify(signature);
-      println("signature valid: " + valid);
-      return null;
-    } // method execute0
-
-    private String getAlias() throws IllegalCmdParamException {
-      if (label != null) {
-        return StringUtil.concat(moduleName, "#slotindex-", slotIndex.toString(),
-            "#keylabel-", label);
-      } else if (id != null) {
-        return StringUtil.concat(moduleName, "#slotindex-", slotIndex.toString(),
-            "#keyid-", id.toLowerCase());
-      } else {
-        throw new IllegalCmdParamException("either id or label must be specified");
-      }
-    }
-
-    private String getSignatureAlgo(PublicKey pubKey) throws NoSuchAlgorithmException {
-      SignatureAlgoControl algoControl = new SignatureAlgoControl(rsaMgf1, dsaPlain, gm);
-      AlgorithmIdentifier sigAlgId = AlgorithmUtil.getSigAlgId(pubKey,
-          HashAlgo.getNonNullInstance(hashAlgo), algoControl);
-      return AlgorithmUtil.getSignatureAlgoName(sigAlgId);
-    }
-
-  } // class P11provTest
-
-  public abstract static class P11SecurityAction extends XiAction {
-
-    protected static final String DEFAULT_P11MODULE_NAME =
-        P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
-
-    @Option(name = "--slot", required = true, description = "slot index")
-    protected Integer slotIndex;
-
-    @Option(name = "--module", description = "name of the PKCS#11 module")
-    protected String moduleName = DEFAULT_P11MODULE_NAME;
-
-    @Reference (optional = true)
-    protected P11CryptServiceFactory p11CryptServiceFactory;
-
-    protected P11Slot getSlot()
-        throws XiSecurityException, P11TokenException, IllegalCmdParamException {
-      P11Module module = getP11Module(moduleName);
-      P11SlotIdentifier slotId = module.getSlotIdForIndex(slotIndex);
-      return module.getSlot(slotId);
-    }
-
-    protected P11Module getP11Module(String moduleName)
-        throws XiSecurityException, P11TokenException, IllegalCmdParamException {
-      P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
-      if (p11Service == null) {
-        throw new IllegalCmdParamException("undefined module " + moduleName);
-      }
-      return p11Service.getModule();
-    }
-
-    public P11ObjectIdentifier getObjectIdentifier(String hexId, String label)
-        throws IllegalCmdParamException, XiSecurityException, P11TokenException {
-      P11Slot slot = getSlot();
-      P11ObjectIdentifier objIdentifier;
-      if (hexId != null && label == null) {
-        objIdentifier = slot.getObjectId(Hex.decode(hexId), null);
-      } else if (hexId == null && label != null) {
-        objIdentifier = slot.getObjectId(null, label);
-      } else {
-        throw new IllegalCmdParamException(
-            "exactly one of keyId or keyLabel should be specified");
-      }
-      return objIdentifier;
+      return execute1(key, cert);
     }
 
   } // class P11SecurityAction
 
+  @Service
+  public static class P11ModuleNameCompleter extends DynamicEnumCompleter {
+
+    @Reference (optional = true)
+    private P11CryptServiceFactory p11CryptServiceFactory;
+
+    @Override
+    protected Set<String> getEnums() {
+      Set<String> names = p11CryptServiceFactory.getModuleNames();
+      if (CollectionUtil.isEmpty(names)) {
+        return Collections.emptySet();
+      }
+      return names;
+    }
+
+  } // class P11ModuleNameCompleter
 }

@@ -37,6 +37,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.bsi.BSIObjectIdentifiers;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
+import org.bouncycastle.asn1.nist.NISTNamedCurves;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
@@ -115,6 +116,15 @@ public class AlgorithmUtil {
       }
 
       Map<ASN1ObjectIdentifier, String> oidNameMap = new HashMap<>();
+
+      // X962, SEC and NIST give the same curve different name, we use here only NIST names
+      @SuppressWarnings("rawtypes")
+      Enumeration nistNames = NISTNamedCurves.getNames();
+      while (nistNames.hasMoreElements()) {
+        String nistName = (String) nistNames.nextElement();
+        ASN1ObjectIdentifier oid = NISTNamedCurves.getOID(nistName);
+        oidNameMap.put(oid, nistName);
+      }
 
       for (String name : nameList) {
         ASN1ObjectIdentifier oid = nameOidMap.get(name);

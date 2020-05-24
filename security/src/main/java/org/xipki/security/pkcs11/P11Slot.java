@@ -24,7 +24,9 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
+import java.security.interfaces.ECPublicKey;
 import java.security.spec.DSAParameterSpec;
+import java.security.spec.ECParameterSpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -43,7 +45,9 @@ import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.pkcs11.P11ModuleConf.P11MechanismFilter;
+import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.DSAParameterCache;
+import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.Hex;
@@ -1276,6 +1280,14 @@ public abstract class P11Slot implements Closeable {
       if (identity.getPublicKey() != null) {
 
         String algo = identity.getPublicKey().getAlgorithm();
+        if ("ec".equalsIgnoreCase(algo)) {
+          ECParameterSpec paramSpec = ((ECPublicKey) identity.getPublicKey()).getParams();
+          ASN1ObjectIdentifier curveOid = KeyUtil.detectCurveOid(paramSpec);
+          if (curveOid != null) {
+            String name = AlgorithmUtil.getCurveName(curveOid);
+            algo += "/" + (name == null ? curveOid.getId() : name);
+          }
+        }
         sb.append("\t\tAlgorithm: ").append(algo).append("\n");
         X509Cert[] certs = identity.certificateChain();
         if (certs == null || certs.length == 0) {
