@@ -26,8 +26,6 @@ package org.xipki.security;
 
 public class XiSecurityConstants {
 
-  public static final String PROVIDER_NAME_XIPKI = "XIPKI";
-
   public static final int CMP_CRL_REASON_REMOVE = -1;
 
   public static final int CMP_ACTION_GEN_CRL = 1;

@@ -147,14 +147,6 @@ Security Commands
 
      obfuscate password
 
-   * `xi:p11prov-test`
-
-     test the Xipki PKCS#11 JCA/JCE provider
-
-   * `xi:p11prov-sm2-test`
-
-     test the SM2 implementation of the Xipki PKCS#11 JCA/JCE provider
-
    * `xi:pbe-dec`
 
      decrypt password with master password

@@ -21,8 +21,6 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.Provider;
 
-import org.xipki.security.XiSecurityConstants;
-
 /**
  * The XIPKI Provider class.
  * Supported algorithms:
@@ -283,7 +281,7 @@ public class XiProvider extends Provider {
    * Exactly the name this provider is registered under at
    * <code>java.security.Security</code>: "<code>XiPKI</code>".
    */
-  public static final String PROVIDER_NAME = XiSecurityConstants.PROVIDER_NAME_XIPKI;
+  public static final String PROVIDER_NAME = "XIPKI";
 
   /**
    * Version of this provider as registered at

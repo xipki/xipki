@@ -80,34 +80,12 @@
   <service ref="pkcs11SignerFactory"
       interface="org.xipki.security.SignerFactory"/>
 
-  <bean id="XiProviderRegister"
-      class="org.xipki.security.pkcs11.provider.XiProviderRegister"
-      init-method="regist">
-    <property name="p11CryptServiceFactory" ref="p11CryptServiceFactory"/>
-  </bean>
-
-  <!-- PKCS#11 Emulator -->
-    <bean id="emulatorP11ModuleFactory"
-      class="org.xipki.security.pkcs11.emulator.EmulatorP11ModuleFactory">
-  </bean>
-
-  <service ref="emulatorP11ModuleFactory"
-      interface="org.xipki.security.pkcs11.P11ModuleFactory"/>
-
   <!-- PKCS#11 Iaik -->
   <bean id="iaikP11ModuleFactory"
       class="org.xipki.security.pkcs11.iaik.IaikP11ModuleFactory">
   </bean>
 
   <service ref="iaikP11ModuleFactory"
-      interface="org.xipki.security.pkcs11.P11ModuleFactory"/>
-
-  <!-- PKCS#11 Proxy -->
-  <bean id="proxyP11ModuleFactory"
-      class="org.xipki.security.pkcs11.proxy.ProxyP11ModuleFactory">
-  </bean>
-
-  <service ref="proxyP11ModuleFactory"
       interface="org.xipki.security.pkcs11.P11ModuleFactory"/>
 
 </blueprint>

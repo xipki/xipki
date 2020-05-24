@@ -24,11 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.Key;
 import java.security.KeyStore;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.Signature;
-import java.security.cert.Certificate;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -41,8 +36,6 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.jcajce.spec.SM2ParameterSpec;
 import org.bouncycastle.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +45,6 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
-import org.xipki.security.XiSecurityConstants;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.P11CryptService;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
@@ -65,7 +57,6 @@ import org.xipki.security.pkcs11.P11Slot.P11NewObjectControl;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.pkcs11.P11TokenException;
 import org.xipki.security.pkcs11.P11UnsupportedMechanismException;
-import org.xipki.security.pkcs11.provider.XiSM2ParameterSpec;
 import org.xipki.security.shell.Actions.CsrGenAction;
 import org.xipki.security.shell.Actions.SecurityAction;
 import org.xipki.security.util.AlgorithmUtil;
@@ -476,196 +467,6 @@ public class P11Actions {
     }
 
   } // class DeleteObjectsP11
-
-  @Command(scope = "xi", name = "p11prov-sm2-test",
-      description = "test the SM2 implementation of Xipki PKCS#11 JCA/JCE provider")
-  @Service
-  public static class P11provSm2Test extends P11SecurityAction {
-
-    @Option(name = "--id",
-        description = "id of the private key in the PKCS#11 device\n"
-            + "either keyId or keyLabel must be specified")
-    protected String id;
-
-    @Option(name = "--label",
-        description = "label of the private key in the PKCS#11 device\n"
-            + "either keyId or keyLabel must be specified")
-    protected String label;
-
-    @Option(name = "--verbose", aliases = "-v",
-        description = "show object information verbosely")
-    private Boolean verbose = Boolean.FALSE;
-
-    @Option(name = "--ida", description = "IDA (ID user A)")
-    protected String ida;
-
-    @Override
-    protected Object execute0() throws Exception {
-      KeyStore ks = KeyStore.getInstance("PKCS11", XiSecurityConstants.PROVIDER_NAME_XIPKI);
-      ks.load(null, null);
-      if (verbose.booleanValue()) {
-        println("available aliases:");
-        Enumeration<?> aliases = ks.aliases();
-        while (aliases.hasMoreElements()) {
-          String alias2 = (String) aliases.nextElement();
-          println("    " + alias2);
-        }
-      }
-
-      String alias = getAlias();
-      println("alias: " + alias);
-      PrivateKey key = (PrivateKey) ks.getKey(alias, null);
-      if (key == null) {
-        println("could not find key with alias '" + alias + "'");
-        return null;
-      }
-
-      Certificate cert = ks.getCertificate(alias);
-      if (cert == null) {
-        println("could not find certificate to verify signature");
-        return null;
-      }
-
-      String sigAlgo = "SM3withSM2";
-      println("signature algorithm: " + sigAlgo);
-      Signature sig = Signature.getInstance(sigAlgo, XiSecurityConstants.PROVIDER_NAME_XIPKI);
-
-      if (StringUtil.isNotBlank(ida)) {
-        sig.setParameter(new XiSM2ParameterSpec(StringUtil.toUtf8Bytes(ida)));
-      }
-
-      sig.initSign(key);
-
-      byte[] data = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-      sig.update(data);
-      byte[] signature = sig.sign(); // CHECKSTYLE:SKIP
-      println("signature created successfully");
-
-      Signature ver = Signature.getInstance(sigAlgo, "BC");
-      if (StringUtil.isNotBlank(ida)) {
-        ver.setParameter(new SM2ParameterSpec(StringUtil.toUtf8Bytes(ida)));
-      }
-
-      ver.initVerify(cert.getPublicKey());
-      ver.update(data);
-      boolean valid = ver.verify(signature);
-      println("signature valid: " + valid);
-      return null;
-    } // method execute0
-
-    private String getAlias() {
-      if (label != null) {
-        return StringUtil.concat(moduleName, "#slotindex-", slotIndex.toString(),
-            "#keylabel-", label);
-      } else {
-        return StringUtil.concat(moduleName, "#slotindex-", slotIndex.toString(),
-            "#keyid-", id.toLowerCase());
-      }
-    }
-
-  } // class P11provSm2Test
-
-  @Command(scope = "xi", name = "p11prov-test",
-      description = "test the Xipki PKCS#11 JCA/JCE provider")
-  @Service
-  public static class P11provTest extends P11SecurityAction {
-
-    @Option(name = "--id",
-        description = "id of the private key in the PKCS#11 device\n"
-            + "either keyId or keyLabel must be specified")
-    protected String id;
-
-    @Option(name = "--label",
-        description = "label of the private key in the PKCS#11 device\n"
-            + "either keyId or keyLabel must be specified")
-    protected String label;
-
-    @Option(name = "--verbose", aliases = "-v", description = "show object information verbosely")
-    private Boolean verbose = Boolean.FALSE;
-
-    @Option(name = "--hash", description = "hash algorithm name")
-    @Completion(Completers.HashAlgCompleter.class)
-    protected String hashAlgo = "SHA256";
-
-    @Option(name = "--rsa-mgf1",
-        description = "whether to use the RSAPSS MGF1 for the POPO computation\n"
-            + "(only applied to RSA key)")
-    private Boolean rsaMgf1 = Boolean.FALSE;
-
-    @Option(name = "--dsa-plain",
-        description = "whether to use the Plain DSA for the POPO computation\n"
-            + "(only applied to ECDSA key)")
-    private Boolean dsaPlain = Boolean.FALSE;
-
-    @Option(name = "--gm",
-        description = "whether to use the chinese GM algorithm for the POPO computation\n"
-            + "(only applied to EC key with GM curves)")
-    private Boolean gm = Boolean.FALSE;
-
-    @Override
-    protected Object execute0() throws Exception {
-      KeyStore ks = KeyStore.getInstance("PKCS11", XiSecurityConstants.PROVIDER_NAME_XIPKI);
-      ks.load(null, null);
-      if (verbose.booleanValue()) {
-        println("available aliases:");
-        Enumeration<?> aliases = ks.aliases();
-        while (aliases.hasMoreElements()) {
-          String alias2 = (String) aliases.nextElement();
-          println("    " + alias2);
-        }
-      }
-
-      String alias = getAlias();
-      println("alias: " + alias);
-      PrivateKey key = (PrivateKey) ks.getKey(alias, null);
-      if (key == null) {
-        println("could not find key with alias '" + alias + "'");
-        return null;
-      }
-
-      Certificate cert = ks.getCertificate(alias);
-      if (cert == null) {
-        println("could not find certificate to verify signature");
-        return null;
-      }
-      PublicKey pubKey = cert.getPublicKey();
-
-      String sigAlgo = getSignatureAlgo(pubKey);
-      println("signature algorithm: " + sigAlgo);
-      Signature sig = Signature.getInstance(sigAlgo, XiSecurityConstants.PROVIDER_NAME_XIPKI);
-      sig.initSign(key);
-
-      byte[] data = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-      sig.update(data);
-      byte[] signature = sig.sign(); // CHECKSTYLE:SKIP
-      println("signature created successfully");
-
-      Signature ver = Signature.getInstance(sigAlgo, "BC");
-      ver.initVerify(pubKey);
-      ver.update(data);
-      boolean valid = ver.verify(signature);
-      println("signature valid: " + valid);
-      return null;
-    } // method execute0
-
-    private String getAlias() {
-      if (label != null) {
-        return StringUtil.concat(moduleName, "#slotindex-", slotIndex.toString(),
-            "#keylabel-", label);
-      } else {
-        return StringUtil.concat(moduleName, "#slotindex-", slotIndex.toString(),
-            "#keyid-", id.toLowerCase());
-      }
-    }
-
-    private String getSignatureAlgo(PublicKey pubKey) throws NoSuchAlgorithmException {
-      SignatureAlgoControl algoControl = new SignatureAlgoControl(rsaMgf1, dsaPlain, gm);
-      AlgorithmIdentifier sigAlgId = AlgorithmUtil.getSigAlgId(pubKey,
-          HashAlgo.getNonNullInstance(hashAlgo), algoControl);
-      return AlgorithmUtil.getSignatureAlgoName(sigAlgId);
-    }
-
-  } // class P11provTest
 
   @Command(scope = "xi", name = "refresh-p11", description = "refresh PKCS#11 module")
   @Service

@@ -40,6 +40,11 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>security-extra</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>certprofile-xijson</artifactId>
       <version>${project.version}</version>
     </dependency>
