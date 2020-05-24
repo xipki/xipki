@@ -202,49 +202,6 @@ public class KeyParametersOption {
 
   } // class ECParamatersOption
 
-  public static class GostParametersOption extends KeyParametersOption {
-
-    private Set<ASN1ObjectIdentifier> publicKeyParamSets;
-
-    private Set<ASN1ObjectIdentifier> digestParamSets;
-
-    private Set<ASN1ObjectIdentifier> encryptionParamSets;
-
-    public GostParametersOption() {
-    }
-
-    public void setPublicKeyParamSets(Set<ASN1ObjectIdentifier> publicKeyParamSets) {
-      this.publicKeyParamSets = (CollectionUtil.isEmpty(publicKeyParamSets)) ? null
-          : new HashSet<>(publicKeyParamSets);
-    }
-
-    public void setDigestParamSets(Set<ASN1ObjectIdentifier> digestParamSets) {
-      this.digestParamSets = CollectionUtil.isEmpty(digestParamSets) ? null
-          : new HashSet<>(digestParamSets);
-    }
-
-    public void setEncryptionParamSets(Set<ASN1ObjectIdentifier> encryptionParamSets) {
-      this.encryptionParamSets =  CollectionUtil.isEmpty(encryptionParamSets) ? null
-          : new HashSet<>(encryptionParamSets);
-    }
-
-    public boolean allowsPublicKeyParamSet(ASN1ObjectIdentifier oid) {
-      return publicKeyParamSets == null
-          ? true : publicKeyParamSets.contains(Args.notNull(oid, "oid"));
-    }
-
-    public boolean allowsDigestParamSet(ASN1ObjectIdentifier oid) {
-      return digestParamSets == null
-          ?  true : digestParamSets.contains(Args.notNull(oid, "oid"));
-    }
-
-    public boolean allowsEncryptionParamSet(ASN1ObjectIdentifier oid) {
-      return encryptionParamSets == null
-          ?  true : encryptionParamSets.contains(Args.notNull(oid, "oid"));
-    }
-
-  } // class GostParametersOption
-
   public static final AllowAllParametersOption ALLOW_ALL = new AllowAllParametersOption();
 
   private KeyParametersOption() {

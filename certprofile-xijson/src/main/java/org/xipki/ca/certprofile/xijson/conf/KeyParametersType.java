@@ -113,54 +113,6 @@ public class KeyParametersType extends ValidatableConf {
 
   } // class EcParametersType
 
-  public static class GostParametersType extends ValidatableConf {
-
-    private List<DescribableOid> publicKeyParamSet;
-
-    private List<DescribableOid> digestParamSet;
-
-    private List<DescribableOid> encryptionParamSet;
-
-    public List<DescribableOid> getPublicKeyParamSet() {
-      if (publicKeyParamSet == null) {
-        publicKeyParamSet = new LinkedList<>();
-      }
-      return publicKeyParamSet;
-    }
-
-    public void setPublicKeyParamSet(List<DescribableOid> publicKeyParamSet) {
-      this.publicKeyParamSet = publicKeyParamSet;
-    }
-
-    public List<DescribableOid> getDigestParamSet() {
-      if (digestParamSet == null) {
-        digestParamSet = new LinkedList<>();
-      }
-      return digestParamSet;
-    }
-
-    public void setDigestParamSet(List<DescribableOid> digestParamSet) {
-      this.digestParamSet = digestParamSet;
-    }
-
-    public List<DescribableOid> getEncryptionParamSet() {
-      if (encryptionParamSet == null) {
-        encryptionParamSet = new LinkedList<>();
-      }
-      return encryptionParamSet;
-    }
-
-    public void setEncryptionParamSet(List<DescribableOid> encryptionParamSet) {
-      this.encryptionParamSet = encryptionParamSet;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      // TODO implement me
-    }
-
-  } // class GostParametersType
-
   public static class RsaParametersType extends ValidatableConf {
 
     @JSONField(ordinal = 1)
@@ -254,8 +206,6 @@ public class KeyParametersType extends ValidatableConf {
 
   private EcParametersType ec;
 
-  private GostParametersType gost;
-
   private RsaParametersType rsa;
 
   private RsapssParametersType rsapss;
@@ -274,14 +224,6 @@ public class KeyParametersType extends ValidatableConf {
 
   public void setEc(EcParametersType ec) {
     this.ec = ec;
-  }
-
-  public GostParametersType getGost() {
-    return gost;
-  }
-
-  public void setGost(GostParametersType gost) {
-    this.gost = gost;
   }
 
   public RsaParametersType getRsa() {
@@ -342,15 +284,6 @@ public class KeyParametersType extends ValidatableConf {
       option.setQlengths(buildParametersMap(dsa.getQlengths()));
 
       return option;
-    } else if (gost != null) {
-      KeyParametersOption.GostParametersOption option =
-          new KeyParametersOption.GostParametersOption();
-
-      option.setPublicKeyParamSets(X509ProfileType.toOidSet(gost.getPublicKeyParamSet()));
-      option.setDigestParamSets(X509ProfileType.toOidSet(gost.getDigestParamSet()));
-      option.setEncryptionParamSets(X509ProfileType.toOidSet(gost.getEncryptionParamSet()));
-
-      return option;
     } else {
       return KeyParametersOption.ALLOW_ALL;
     }
@@ -387,7 +320,6 @@ public class KeyParametersType extends ValidatableConf {
   public void validate() throws InvalidConfException {
     validate(dsa);
     validate(ec);
-    validate(gost);
     validate(rsa);
     validate(rsapss);
   } // method validate
