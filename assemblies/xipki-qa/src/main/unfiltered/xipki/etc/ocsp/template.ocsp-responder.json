@@ -46,6 +46,8 @@
 		"nonce":{
 			"maxLen":32,
 			"minLen":4,
+			// valid values are ignore, forbidden, optional and required.
+			// in case of ignore and forbidded, maxLen and minLen will be ignored.
 			"occurrence":"optional"
 		},
 		"signatureRequired":false,
