@@ -222,6 +222,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // class CaRestarter
 
   private static final Logger LOG = LoggerFactory.getLogger(CaManagerImpl.class);
+  
+  private static final String version;
 
   private static final String EVENT_LOCK = "LOCK";
 
@@ -315,8 +317,20 @@ public class CaManagerImpl implements CaManager, Closeable {
   private CaManagerQueryExecutor queryExecutor;
 
   private boolean initializing;
+  
+  static {
+    String ver;
+    try {
+      ver = new String(IoUtil.read(CaManagerImpl.class.getResourceAsStream("/version"))).trim();
+    } catch (Exception ex) {
+      ver = "UNKNOWN";
+    }
+    version = ver;
+  }
 
   public CaManagerImpl() {
+    LOG.info("XiPKI CA version {}", version);
+    
     this.datasourceFactory = new DataSourceFactory();
     String calockId = null;
     File caLockFile = new File("calock");
