@@ -24,6 +24,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -116,7 +117,11 @@ public class ResponseCacher implements Closeable {
         long maxThisUpdate = System.currentTimeMillis() / 1000 - validity;
         try {
           int num = removeExpiredResponses(maxThisUpdate);
-          LOG.info("removed {} response with thisUpdate < {}", num, maxThisUpdate);
+          if (num > 0 && LOG.isInfoEnabled()) {
+            Date date = new Date(maxThisUpdate * 1000);
+            LOG.info("removed {} with thisUpdate < {} {} ({})",
+                num == 1 ? "1 response" : num + " responses", maxThisUpdate, date);
+          }
         } catch (Throwable th) {
           LogUtil.error(LOG, th, "could not remove expired responses");
         } finally {

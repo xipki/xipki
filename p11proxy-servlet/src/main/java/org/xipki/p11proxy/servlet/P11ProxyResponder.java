@@ -66,7 +66,7 @@ import org.xipki.util.LogUtil;
 
 public class P11ProxyResponder {
   private static final Logger LOG = LoggerFactory.getLogger(P11ProxyResponder.class);
-  
+
   private static final String version;
 
   private static final Set<Short> actionsRequireNonNullRequest;
@@ -106,7 +106,7 @@ public class P11ProxyResponder {
     actions.add(P11ProxyConstants.ACTION_IMPORT_SECRET_KEY);
     actions.add(P11ProxyConstants.ACTION_GEN_KEYPAIR_SM2);
     actionsRequireNonNullRequest = Collections.unmodifiableSet(actions);
-    
+
     String ver;
     try {
       ver = new String(IoUtil.read(P11ProxyResponder.class.getResourceAsStream("/version"))).trim();
