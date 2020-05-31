@@ -102,7 +102,6 @@ import org.xipki.audit.AuditService;
 import org.xipki.audit.AuditStatus;
 import org.xipki.audit.Audits;
 import org.xipki.ca.api.BadCertTemplateException;
-import org.xipki.ca.api.BadFormatException;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
@@ -1705,62 +1704,31 @@ public class X509Ca implements Closeable {
       }
     }
 
-      X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
-          caInfo.getPublicCaInfo().getSubject(), caInfo.nextSerial(), gct.grantedNotBefore,
-          gct.grantedNotAfter, gct.grantedSubject, gct.grantedPublicKey);
+    X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
+        caInfo.getPublicCaInfo().getSubject(), caInfo.nextSerial(), gct.grantedNotBefore,
+        gct.grantedNotAfter, gct.grantedSubject, gct.grantedPublicKey);
 
-      CertificateInfo ret;
+    CertificateInfo ret;
 
-      try {
-        SignerEntryWrapper crlSigner = getCrlSigner();
-        X509Cert crlSignerCert = (crlSigner == null)
-            ? null : crlSigner.getSigner().getCertificate();
+    try {
+      SignerEntryWrapper crlSigner = getCrlSigner();
+      X509Cert crlSignerCert = (crlSigner == null)
+          ? null : crlSigner.getSigner().getCertificate();
 
-        ExtensionValues extensionTuples = certprofile.getExtensions(gct.requestedSubject,
-            gct.grantedSubject, gct.extensions, gct.grantedPublicKey, caInfo.getPublicCaInfo(),
-            crlSignerCert, gct.grantedNotBefore, gct.grantedNotAfter);
-        if (extensionTuples != null) {
-          for (ASN1ObjectIdentifier extensionType : extensionTuples.getExtensionTypes()) {
-            ExtensionValue extValue = extensionTuples.getExtensionValue(extensionType);
-            certBuilder.addExtension(extensionType, extValue.isCritical(), extValue.getValue());
-          }
+      ExtensionValues extensionTuples = certprofile.getExtensions(gct.requestedSubject,
+          gct.grantedSubject, gct.extensions, gct.grantedPublicKey, caInfo.getPublicCaInfo(),
+          crlSignerCert, gct.grantedNotBefore, gct.grantedNotAfter);
+      if (extensionTuples != null) {
+        for (ASN1ObjectIdentifier extensionType : extensionTuples.getExtensionTypes()) {
+          ExtensionValue extValue = extensionTuples.getExtensionValue(extensionType);
+          certBuilder.addExtension(extensionType, extValue.isCritical(), extValue.getValue());
         }
+      }
 
-        boolean addCtlog = ctlogEnabled && extnSctCtrl != null;
+      boolean addCtlog = ctlogEnabled && extnSctCtrl != null;
 
-        if (addCtlog) {
-          certBuilder.addExtension(Extn.id_precertificate, true, DERNull.INSTANCE);
-
-          ConcurrentBagEntrySigner signer0;
-          try {
-            signer0 = gct.signer.borrowSigner();
-          } catch (NoIdleSignerException ex) {
-            throw new OperationException(SYSTEM_FAILURE, ex);
-          }
-
-          X509CertificateHolder precert;
-          try {
-            precert = certBuilder.build(signer0.value());
-          } finally {
-            // returns the signer after the signing so that it can be used by others
-            gct.signer.requiteSigner(signer0);
-          }
-
-          SignedCertificateTimestampList scts = getCtlogScts(precert);
-
-          // remove the precertificate extension
-          certBuilder.removeExtension(Extn.id_precertificate);
-
-          // add the SCTs extension
-          DEROctetString extnValue;
-          try {
-            extnValue = new DEROctetString(new DEROctetString(scts.getEncoded()).getEncoded());
-          } catch (IOException ex) {
-            throw new CertIOException("could not encode SCT extension", ex);
-          }
-          certBuilder.addExtension(
-              new Extension(Extn.id_SCTs, extnSctCtrl.isCritical(), extnValue));
-        }
+      if (addCtlog) {
+        certBuilder.addExtension(Extn.id_precertificate, true, DERNull.INSTANCE);
 
         ConcurrentBagEntrySigner signer0;
         try {
@@ -1769,52 +1737,83 @@ public class X509Ca implements Closeable {
           throw new OperationException(SYSTEM_FAILURE, ex);
         }
 
-        X509CertificateHolder bcCert;
+        X509CertificateHolder precert;
         try {
-          bcCert = certBuilder.build(signer0.value());
+          precert = certBuilder.build(signer0.value());
         } finally {
+          // returns the signer after the signing so that it can be used by others
           gct.signer.requiteSigner(signer0);
         }
 
-        byte[] encodedCert = bcCert.getEncoded();
-        int maxCertSize = gct.certprofile.getMaxCertSize();
-        if (maxCertSize > 0) {
-          int certSize = encodedCert.length;
-          if (certSize > maxCertSize) {
-            throw new OperationException(NOT_PERMITTED,
-              String.format("certificate exceeds the maximal allowed size: %d > %d",
-                certSize, maxCertSize));
-          }
-        }
+        SignedCertificateTimestampList scts = getCtlogScts(precert);
 
-        X509Cert cert = new X509Cert(bcCert, encodedCert);
-        CertWithDbId certWithMeta = new CertWithDbId(cert);
-        ret = new CertificateInfo(certWithMeta, gct.privateKey, caIdent, caCert,
-                gct.certprofile.getIdent(), requestor.getIdent());
-        if (requestor instanceof RequestorInfo.ByUserRequestorInfo) {
-          ret.setUser((((RequestorInfo.ByUserRequestorInfo) requestor).getUserId()));
-        }
-        ret.setReqType(reqType);
-        ret.setTransactionId(transactionId);
-        ret.setRequestedSubject(gct.requestedSubject);
+        // remove the precertificate extension
+        certBuilder.removeExtension(Extn.id_precertificate);
 
-        if (publishCert0(ret) == 1) {
-          throw new OperationException(SYSTEM_FAILURE, "could not save certificate");
+        // add the SCTs extension
+        DEROctetString extnValue;
+        try {
+          extnValue = new DEROctetString(new DEROctetString(scts.getEncoded()).getEncoded());
+        } catch (IOException ex) {
+          throw new CertIOException("could not encode SCT extension", ex);
         }
-      } catch (BadCertTemplateException ex) {
-        throw new OperationException(BAD_CERT_TEMPLATE, ex);
-      } catch (OperationException ex) {
-        throw ex;
-      } catch (Throwable th) {
-        LogUtil.error(LOG, th, "could not generate certificate");
-        throw new OperationException(SYSTEM_FAILURE, th);
+        certBuilder.addExtension(
+            new Extension(Extn.id_SCTs, extnSctCtrl.isCritical(), extnValue));
       }
 
-      if (gct.warning != null) {
-        ret.setWarningMessage(gct.warning);
+      ConcurrentBagEntrySigner signer0;
+      try {
+        signer0 = gct.signer.borrowSigner();
+      } catch (NoIdleSignerException ex) {
+        throw new OperationException(SYSTEM_FAILURE, ex);
       }
 
-      return ret;
+      X509CertificateHolder bcCert;
+      try {
+        bcCert = certBuilder.build(signer0.value());
+      } finally {
+        gct.signer.requiteSigner(signer0);
+      }
+
+      byte[] encodedCert = bcCert.getEncoded();
+      int maxCertSize = gct.certprofile.getMaxCertSize();
+      if (maxCertSize > 0) {
+        int certSize = encodedCert.length;
+        if (certSize > maxCertSize) {
+          throw new OperationException(NOT_PERMITTED,
+            String.format("certificate exceeds the maximal allowed size: %d > %d",
+               certSize, maxCertSize));
+        }
+      }
+
+      X509Cert cert = new X509Cert(bcCert, encodedCert);
+      CertWithDbId certWithMeta = new CertWithDbId(cert);
+      ret = new CertificateInfo(certWithMeta, gct.privateKey, caIdent, caCert,
+              gct.certprofile.getIdent(), requestor.getIdent());
+      if (requestor instanceof RequestorInfo.ByUserRequestorInfo) {
+        ret.setUser((((RequestorInfo.ByUserRequestorInfo) requestor).getUserId()));
+      }
+      ret.setReqType(reqType);
+      ret.setTransactionId(transactionId);
+      ret.setRequestedSubject(gct.requestedSubject);
+
+      if (publishCert0(ret) == 1) {
+        throw new OperationException(SYSTEM_FAILURE, "could not save certificate");
+      }
+    } catch (BadCertTemplateException ex) {
+      throw new OperationException(BAD_CERT_TEMPLATE, ex);
+    } catch (OperationException ex) {
+      throw ex;
+    } catch (Throwable th) {
+      LogUtil.error(LOG, th, "could not generate certificate");
+      throw new OperationException(SYSTEM_FAILURE, th);
+    }
+
+    if (gct.warning != null) {
+      ret.setWarningMessage(gct.warning);
+    }
+
+    return ret;
   } // method generateCertificate0
 
   private GrantedCertTemplate createGrantedCertTemplate(CertTemplateData certTemplate,

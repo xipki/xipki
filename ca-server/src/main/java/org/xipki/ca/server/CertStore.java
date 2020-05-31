@@ -182,7 +182,7 @@ public class CertStore {
       "INSERT INTO CERT (ID,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,PID,"
       + "CA_ID,RID,UID,EE,RTYPE,TID,SHA1,REQ_SUBJECT,CRL_SCOPE,CERT)"
       + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-  
+
   private static final String SQL_REVOKE_CERT =
       "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
 
@@ -1277,23 +1277,23 @@ public class CertStore {
       datasource.releaseResources(ps, rs);
     }
 
-      byte[] encodedCert = Base64.decodeFast(b64Cert);
-      X509Cert cert = X509Util.parseCert(encodedCert);
-      CertWithDbId certWithMeta = new CertWithDbId(cert);
+    byte[] encodedCert = Base64.decodeFast(b64Cert);
+    X509Cert cert = X509Util.parseCert(encodedCert);
+    CertWithDbId certWithMeta = new CertWithDbId(cert);
 
-      CertificateInfo certInfo = new CertificateInfo(certWithMeta, null, ca, caCert,
-          idNameMap.getCertprofile(certprofileId),
-          idNameMap.getRequestor(requestorId));
+    CertificateInfo certInfo = new CertificateInfo(certWithMeta, null, ca, caCert,
+        idNameMap.getCertprofile(certprofileId),
+        idNameMap.getRequestor(requestorId));
 
-      if (!revoked) {
-        return certInfo;
-      }
-
-      Date invalidityTime = (revInvTime == 0) ? null : new Date(revInvTime * 1000);
-      CertRevocationInfo revInfo = new CertRevocationInfo(revReason, new Date(revTime * 1000),
-          invalidityTime);
-      certInfo.setRevocationInfo(revInfo);
+    if (!revoked) {
       return certInfo;
+    }
+
+    Date invalidityTime = (revInvTime == 0) ? null : new Date(revInvTime * 1000);
+    CertRevocationInfo revInfo = new CertRevocationInfo(revReason, new Date(revTime * 1000),
+        invalidityTime);
+    certInfo.setRevocationInfo(revInfo);
+    return certInfo;
   } // method getCertInfo
 
   public Integer getCertprofileForCertId(NameId ca, long cid) throws OperationException {
