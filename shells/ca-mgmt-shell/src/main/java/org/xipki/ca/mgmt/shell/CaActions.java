@@ -265,14 +265,6 @@ public class CaActions {
     @Option(name = "--signer-conf", required = true, description = "CA signer configuration")
     private String signerConf;
 
-    @Option(name = "--duplicate-key", description = "whether duplicate key is permitted")
-    @Completion(Completers.YesNoCompleter.class)
-    private String duplicateKeyS = "yes";
-
-    @Option(name = "--duplicate-subject", description = "whether duplicate subject is permitted")
-    @Completion(Completers.YesNoCompleter.class)
-    private String duplicateSubjectS = "yes";
-
     @Option(name = "--support-cmp", description = "whether the CMP protocol is supported")
     @Completion(Completers.YesNoCompleter.class)
     private String supportCmpS = "no";
@@ -325,12 +317,6 @@ public class CaActions {
           signerType, signerConf, caUris, numCrls.intValue(), expirationPeriod.intValue());
 
       entry.setKeepExpiredCertInDays(keepExpiredCertInDays.intValue());
-
-      boolean duplicateKeyPermitted = isEnabled(duplicateKeyS, true, "duplicate-key");
-      entry.setDuplicateKeyPermitted(duplicateKeyPermitted);
-
-      boolean duplicateSubjectPermitted = isEnabled(duplicateSubjectS, true, "duplicate-subject");
-      entry.setDuplicateSubjectPermitted(duplicateSubjectPermitted);
 
       ProtocolSupport protocolSupport = new ProtocolSupport(
           isEnabled(supportCmpS, false, "support-cmp"),
@@ -1106,14 +1092,6 @@ public class CaActions {
     @Option(name = "--signer-conf", description = "CA signer configuration or 'null'")
     private String signerConf;
 
-    @Option(name = "--duplicate-key", description = "whether duplicate key is permitted")
-    @Completion(Completers.YesNoCompleter.class)
-    private String duplicateKeyS;
-
-    @Option(name = "--duplicate-subject", description = "whether duplicate subject is permitted")
-    @Completion(Completers.YesNoCompleter.class)
-    private String duplicateSubjectS;
-
     @Option(name = "--support-cmp", description = "whether the CMP protocol is supported")
     @Completion(Completers.YesNoCompleter.class)
     private String supportCmpS;
@@ -1193,14 +1171,6 @@ public class CaActions {
         signerConf = ShellUtil.canonicalizeSignerConf(tmpSignerType, signerConf,
             passwordResolver, securityFactory);
         entry.setSignerConf(signerConf);
-      }
-
-      if (duplicateKeyS != null) {
-        entry.setDuplicateKeyPermitted(isEnabled(duplicateKeyS, true, "duplicate-key"));
-      }
-
-      if (duplicateSubjectS != null) {
-        entry.setDuplicateSubjectPermitted(isEnabled(duplicateSubjectS, true, "duplicate-subject"));
       }
 
       if (supportCmpS != null) {

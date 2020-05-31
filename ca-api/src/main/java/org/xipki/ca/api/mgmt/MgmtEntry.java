@@ -132,10 +132,6 @@ public abstract class MgmtEntry {
 
     private String scepResponderName;
 
-    private boolean duplicateKeyPermitted;
-
-    private boolean duplicateSubjectPermitted;
-
     private ProtocolSupport protocolSupport;
 
     private boolean saveRequest;
@@ -330,22 +326,6 @@ public abstract class MgmtEntry {
       this.crlSignerName = (crlSignerName == null) ? null : crlSignerName.toLowerCase();
     }
 
-    public boolean isDuplicateKeyPermitted() {
-      return duplicateKeyPermitted;
-    }
-
-    public void setDuplicateKeyPermitted(boolean duplicateKeyPermitted) {
-      this.duplicateKeyPermitted = duplicateKeyPermitted;
-    }
-
-    public boolean isDuplicateSubjectPermitted() {
-      return duplicateSubjectPermitted;
-    }
-
-    public void setDuplicateSubjectPermitted(boolean duplicateSubjectPermitted) {
-      this.duplicateSubjectPermitted = duplicateSubjectPermitted;
-    }
-
     public ProtocolSupport getProtocoSupport() {
       return protocolSupport;
     }
@@ -455,8 +435,6 @@ public abstract class MgmtEntry {
           "\nCMP responder name: ", cmpResponderName,
           "\nSCEP responder name: ", scepResponderName,
           "\nCRL signer name: ", crlSignerName,
-          "\nduplicate key: ", duplicateKeyPermitted,
-          "\nduplicate subject: ", duplicateSubjectPermitted,
           "\n", protocolSupport,
           "\nsave request: ", saveRequest,
           "\nvalidity mode: ", validityMode,
@@ -516,8 +494,6 @@ public abstract class MgmtEntry {
           && CompareUtil.equalsObject(crlSignerName, obj.crlSignerName)
           && CompareUtil.equalsObject(ctlogControl, obj.ctlogControl)
           && CompareUtil.equalsObject(dhpocControl, obj.dhpocControl)
-          && (duplicateKeyPermitted == obj.duplicateKeyPermitted)
-          && (duplicateSubjectPermitted == obj.duplicateSubjectPermitted)
           && (expirationPeriod == obj.expirationPeriod)
           && CompareUtil.equalsObject(extraControl, obj.extraControl)
           && ident.equals(obj.ident, ignoreId)
@@ -922,10 +898,6 @@ public abstract class MgmtEntry {
 
     private String crlSignerName;
 
-    private Boolean duplicateKeyPermitted;
-
-    private Boolean duplicateSubjectPermitted;
-
     private Boolean supportCmp;
 
     private Boolean supportRest;
@@ -1073,22 +1045,6 @@ public abstract class MgmtEntry {
 
     public void setCrlSignerName(String crlSignerName) {
       this.crlSignerName = (crlSignerName == null) ? null : crlSignerName.toLowerCase();
-    }
-
-    public Boolean getDuplicateKeyPermitted() {
-      return duplicateKeyPermitted;
-    }
-
-    public void setDuplicateKeyPermitted(Boolean duplicateKeyPermitted) {
-      this.duplicateKeyPermitted = duplicateKeyPermitted;
-    }
-
-    public Boolean getDuplicateSubjectPermitted() {
-      return duplicateSubjectPermitted;
-    }
-
-    public void setDuplicateSubjectPermitted(Boolean duplicateSubjectPermitted) {
-      this.duplicateSubjectPermitted = duplicateSubjectPermitted;
     }
 
     public ValidityMode getValidityMode() {

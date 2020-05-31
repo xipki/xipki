@@ -416,18 +416,6 @@ public class QaCaActions {
             "CRL signer name", ey.getCrlSignerName(), ca.getCrlSignerName());
       }
 
-      // Duplicate key mode
-      if (ey.getDuplicateKeyPermitted() != null) {
-        assertObjEquals("Duplicate key permitted",
-            ey.getDuplicateKeyPermitted(), ca.isDuplicateKeyPermitted());
-      }
-
-      // Duplicate subject mode
-      if (ey.getDuplicateSubjectPermitted() != null) {
-        assertObjEquals("Duplicate subject permitted",
-            ey.getDuplicateSubjectPermitted(), ca.isDuplicateSubjectPermitted());
-      }
-
       // Expiration period
       if (ey.getExpirationPeriod() != null) {
         assertObjEquals("Expiration period", ey.getExpirationPeriod(), ca.getExpirationPeriod());

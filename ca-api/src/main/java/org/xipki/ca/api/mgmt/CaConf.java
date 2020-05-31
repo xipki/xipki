@@ -380,8 +380,6 @@ public class CaConf {
           caEntry.setScepResponderName(ci.getScepResponderName());
           caEntry.setCrlSignerName(ci.getCrlSignerName());
 
-          caEntry.setDuplicateKeyPermitted(ci.isDuplicateKey());
-          caEntry.setDuplicateSubjectPermitted(ci.isDuplicateSubject());
           if (ci.getExtraControl() != null) {
             caEntry.setExtraControl(new ConfPairs(ci.getExtraControl()).unmodifiable());
           }

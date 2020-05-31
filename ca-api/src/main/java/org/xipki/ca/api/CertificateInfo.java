@@ -32,8 +32,6 @@ import org.xipki.util.Args;
 
 public class CertificateInfo {
 
-  private final byte[] subjectPublicKey;
-
   private final CertWithDbId cert;
 
   private final PrivateKeyInfo privateKey;
@@ -61,18 +59,13 @@ public class CertificateInfo {
   private boolean alreadyIssued;
 
   public CertificateInfo(CertWithDbId cert, PrivateKeyInfo privateKey, NameId issuer,
-      X509Cert issuerCert, byte[] subjectPublicKey, NameId profile, NameId requestor) {
+      X509Cert issuerCert, NameId profile, NameId requestor) {
     this.profile = Args.notNull(profile, "profile");
     this.cert = Args.notNull(cert, "cert");
     this.privateKey = privateKey;
-    this.subjectPublicKey = Args.notNull(subjectPublicKey, "subjectPublicKey");
     this.issuer = Args.notNull(issuer, "issuer");
     this.issuerCert = Args.notNull(issuerCert, "issuerCert");
     this.requestor = Args.notNull(requestor, "requestor");
-  }
-
-  public byte[] getSubjectPublicKey() {
-    return subjectPublicKey;
   }
 
   public CertWithDbId getCert() {

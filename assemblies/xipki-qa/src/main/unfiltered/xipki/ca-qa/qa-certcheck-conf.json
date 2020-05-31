@@ -60,9 +60,6 @@
 		"name":"tls-c",
 		"file":"xipki/qa/certprofile/certprofile-tls-c.json"
 	},{
-		"name":"tls-inc-sn",
-		"file":"xipki/qa/certprofile/certprofile-tls-inc-sn.json"
-	},{
 		"name":"qc",
 		"file":"xipki/qa/certprofile/certprofile-qc.json"
 	},{

@@ -279,10 +279,6 @@ public class CaConfType {
      */
     private List<FileOrBinary> certchain;
 
-    private boolean duplicateKey = true;
-
-    private boolean duplicateSubject = true;
-
     private Integer expirationPeriod;
 
     private Map<String, String> extraControl;
@@ -353,22 +349,6 @@ public class CaConfType {
 
     public void setCertchain(List<FileOrBinary> certchain) {
       this.certchain = certchain;
-    }
-
-    public boolean isDuplicateKey() {
-      return duplicateKey;
-    }
-
-    public void setDuplicateKey(boolean duplicateKey) {
-      this.duplicateKey = duplicateKey;
-    }
-
-    public boolean isDuplicateSubject() {
-      return duplicateSubject;
-    }
-
-    public void setDuplicateSubject(boolean duplicateSubject) {
-      this.duplicateSubject = duplicateSubject;
     }
 
     public Integer getExpirationPeriod() {

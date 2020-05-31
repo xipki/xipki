@@ -282,7 +282,7 @@ class CaconfDbExporter extends DbPorter {
     final String sql = "SELECT ID,NAME,SN_SIZE,NEXT_CRLNO,STATUS,CA_URIS," // 6
         + "MAX_VALIDITY,CERT,CERTCHAIN,SIGNER_TYPE,CRL_SIGNER_NAME," // 5
         + "CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,CRL_CONTROL,CMP_CONTROL,SCEP_CONTROL," // 5
-        + "CTLOG_CONTROL,DUPLICATE_KEY,DUPLICATE_SUBJECT,PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION," // 6
+        + "CTLOG_CONTROL,PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION," // 6
         + "NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL," // 5
         + "SIGNER_CONF,REV_INFO,DHPOC_CONTROL,REVOKE_SUSPENDED_CONTROL FROM CA"; // 4
 
@@ -316,8 +316,6 @@ class CaconfDbExporter extends DbPorter {
         ca.setScepControl(rs.getString("SCEP_CONTROL"));
         ca.setCrlControl(rs.getString("CRL_CONTROL"));
         ca.setCtlogControl(rs.getString("CTLOG_CONTROL"));
-        ca.setDuplicateKey(rs.getInt("DUPLICATE_KEY"));
-        ca.setDuplicateSubject(rs.getInt("DUPLICATE_SUBJECT"));
         ca.setProtocolSupport(rs.getString("PROTOCOL_SUPPORT"));
         ca.setSaveReq(rs.getInt("SAVE_REQ"));
         ca.setPermission(rs.getInt("PERMISSION"));

@@ -2266,8 +2266,6 @@ public class CaManagerImpl implements CaManager, Closeable {
     entry.setCmpResponderName(caEntry.getCmpResponderName());
     entry.setScepResponderName(caEntry.getScepResponderName());
     entry.setCrlSignerName(caEntry.getCrlSignerName());
-    entry.setDuplicateKeyPermitted(caEntry.isDuplicateKeyPermitted());
-    entry.setDuplicateSubjectPermitted(caEntry.isDuplicateSubjectPermitted());
     entry.setExtraControl(caEntry.getExtraControl());
     entry.setKeepExpiredCertInDays(caEntry.getKeepExpiredCertInDays());
     entry.setMaxValidity(caEntry.getMaxValidity());
@@ -3077,8 +3075,6 @@ public class CaManagerImpl implements CaManager, Closeable {
             caInfoType.setDhpocControl(fv);
           }
 
-          caInfoType.setDuplicateKey(entry.isDuplicateKeyPermitted());
-          caInfoType.setDuplicateSubject(entry.isDuplicateSubjectPermitted());
           caInfoType.setExpirationPeriod(entry.getExpirationPeriod());
           if (entry.getExtraControl() != null) {
             caInfoType.setExtraControl(entry.getExtraControl().asMap());

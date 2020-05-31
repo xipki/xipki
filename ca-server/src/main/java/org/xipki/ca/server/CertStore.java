@@ -47,7 +47,6 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.cert.X509CRLHolder;
@@ -66,7 +65,6 @@ import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
-import org.xipki.security.FpIdCalculator;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.X509Cert;
@@ -175,11 +173,16 @@ public class CertStore {
 
   private static final Logger LOG = LoggerFactory.getLogger(CertStore.class);
 
+  private static final String SQL_ADD_CERT_V4 =
+      "INSERT INTO CERT (ID,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,PID,"
+      + "CA_ID,RID,UID,EE,RTYPE,TID,SHA1,REQ_SUBJECT,CRL_SCOPE,CERT,FP_K)"
+      + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)";
+
   private static final String SQL_ADD_CERT =
       "INSERT INTO CERT (ID,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,PID,"
-      + "CA_ID,RID,UID,FP_K,EE,RTYPE,TID,SHA1,REQ_SUBJECT,CRL_SCOPE,CERT)"
-      + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-
+      + "CA_ID,RID,UID,EE,RTYPE,TID,SHA1,REQ_SUBJECT,CRL_SCOPE,CERT)"
+      + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+  
   private static final String SQL_REVOKE_CERT =
       "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
 
@@ -244,8 +247,6 @@ public class CertStore {
 
   private final String sqlCertforSubjectIssued;
 
-  private final String sqlCertForKeyIssued;
-
   private final String sqlLatestSerialForSubjectLike;
 
   private final String sqlCrl;
@@ -306,7 +307,6 @@ public class CertStore {
     this.sqlRevForId = buildSelectFirstSql("SN,EE,REV,RR,RT,RIT FROM CERT WHERE ID=?");
     this.sqlCertStatusForSubjectFp = buildSelectFirstSql("REV FROM CERT WHERE FP_S=? AND CA_ID=?");
     this.sqlCertforSubjectIssued = buildSelectFirstSql("ID FROM CERT WHERE CA_ID=? AND FP_S=?");
-    this.sqlCertForKeyIssued = buildSelectFirstSql("ID FROM CERT WHERE CA_ID=? AND FP_K=?");
     this.sqlReqIdForSerial = buildSelectFirstSql("REQCERT.RID as REQ_ID FROM REQCERT INNER JOIN "
         + "CERT ON CERT.CA_ID=? AND CERT.SN=? AND REQCERT.CID=CERT.ID");
     this.sqlReqForId = buildSelectFirstSql("DATA FROM REQUEST WHERE ID=?");
@@ -325,7 +325,7 @@ public class CertStore {
   public boolean addCert(CertificateInfo certInfo) {
     Args.notNull(certInfo, "certInfo");
     try {
-      addCert(certInfo.getIssuer(), certInfo.getCert(), certInfo.getSubjectPublicKey(),
+      addCert(certInfo.getIssuer(), certInfo.getCert(),
           certInfo.getProfile(), certInfo.getRequestor(), certInfo.getUser(), certInfo.getReqType(),
           certInfo.getTransactionId(), certInfo.getRequestedSubject());
     } catch (Exception ex) {
@@ -340,7 +340,7 @@ public class CertStore {
     return true;
   } // method addCert
 
-  private void addCert(NameId ca, CertWithDbId certificate, byte[] encodedSubjectPublicKey,
+  private void addCert(NameId ca, CertWithDbId certificate,
       NameId certprofile, NameId requestor, Integer userId, RequestType reqType,
       byte[] transactionId, X500Name reqSubject) throws DataAccessException, OperationException {
     Args.notNull(ca, "ca");
@@ -350,7 +350,6 @@ public class CertStore {
 
     long certId = idGenerator.nextId();
 
-    long fpPk = FpIdCalculator.hash(encodedSubjectPublicKey);
     String subjectText = X509Util.cutText(
         certificate.getCert().getSubjectRfc4519Text(), maxX500nameLen);
     long fpSubject = X509Util.fpCanonicalizedName(certificate.getCert().getSubject());
@@ -371,7 +370,7 @@ public class CertStore {
     String b64Cert = Base64.encodeToString(encodedCert);
     String tid = (transactionId == null) ? null : Base64.encodeToString(transactionId);
 
-    final String sql = SQL_ADD_CERT;
+    final String sql = dbSchemaVersion < 5 ? SQL_ADD_CERT_V4 : SQL_ADD_CERT;
     PreparedStatement ps = borrowPreparedStatement(sql);
 
     try {
@@ -391,7 +390,6 @@ public class CertStore {
       ps.setInt(idx++, ca.getId());
       setInt(ps, idx++, requestor.getId());
       setInt(ps, idx++, userId);
-      ps.setLong(idx++, fpPk);
       boolean isEeCert = cert.getBasicConstraints() == -1;
       ps.setInt(idx++, isEeCert ? 1 : 0);
       ps.setInt(idx++, reqType.getCode());
@@ -407,7 +405,7 @@ public class CertStore {
 
       certificate.setCertId(certId);
     } catch (SQLException ex) {
-      throw datasource.translate(null, ex);
+      throw datasource.translate(sql, ex);
     } finally {
       datasource.releaseResources(ps, null);
     }
@@ -1156,7 +1154,7 @@ public class CertStore {
     CertWithDbId certWithMeta = new CertWithDbId(cert);
     certWithMeta.setCertId(certId);
     CertificateInfo certInfo = new CertificateInfo(certWithMeta, null, ca, caCert,
-        cert.getPublicKey().getEncoded(), idNameMap.getCertprofile(certprofileId),
+        idNameMap.getCertprofile(certprofileId),
         idNameMap.getRequestor(requestorId));
     if (!revoked) {
       return certInfo;
@@ -1279,15 +1277,12 @@ public class CertStore {
       datasource.releaseResources(ps, rs);
     }
 
-    try {
       byte[] encodedCert = Base64.decodeFast(b64Cert);
       X509Cert cert = X509Util.parseCert(encodedCert);
       CertWithDbId certWithMeta = new CertWithDbId(cert);
 
-      byte[] subjectPublicKeyInfo = Certificate.getInstance(encodedCert)
-          .getTBSCertificate().getSubjectPublicKeyInfo().getEncoded();
       CertificateInfo certInfo = new CertificateInfo(certWithMeta, null, ca, caCert,
-          subjectPublicKeyInfo, idNameMap.getCertprofile(certprofileId),
+          idNameMap.getCertprofile(certprofileId),
           idNameMap.getRequestor(requestorId));
 
       if (!revoked) {
@@ -1299,10 +1294,6 @@ public class CertStore {
           invalidityTime);
       certInfo.setRevocationInfo(revInfo);
       return certInfo;
-    } catch (IOException ex) {
-      LOG.warn("getCertificateInfo()", ex);
-      throw new OperationException(SYSTEM_FAILURE, ex);
-    }
   } // method getCertInfo
 
   public Integer getCertprofileForCertId(NameId ca, long cid) throws OperationException {
@@ -1802,24 +1793,6 @@ public class CertStore {
       datasource.releaseResources(ps, rs);
     }
   }
-
-  public boolean isCertForKeyIssued(NameId ca, long keyFp) throws OperationException {
-    Args.notNull(ca, "ca");
-    String sql = sqlCertForKeyIssued;
-    ResultSet rs = null;
-    PreparedStatement ps = borrowPreparedStatement(sql);
-
-    try {
-      ps.setInt(1, ca.getId());
-      ps.setLong(2, keyFp);
-      rs = ps.executeQuery();
-      return rs.next();
-    } catch (SQLException ex) {
-      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
-    } finally {
-      datasource.releaseResources(ps, rs);
-    }
-  } // method isCertForSubjectIssued
 
   private String base64Fp(byte[] data) {
     return HashAlgo.SHA1.base64Hash(data);

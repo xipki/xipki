@@ -182,8 +182,6 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   private boolean useIssuerAndSerialInAki;
 
-  private boolean incSerialNoIfSubjectExists;
-
   private ExtensionValue inhibitAnyPolicy;
 
   private Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms;
@@ -250,7 +248,6 @@ public class XijsonCertprofile extends BaseCertprofile {
     extendedKeyusages = null;
     extensionControls = null;
     useIssuerAndSerialInAki = false;
-    incSerialNoIfSubjectExists = false;
     inhibitAnyPolicy = null;
     keyAlgorithms = null;
     keyusages = null;
@@ -479,7 +476,6 @@ public class XijsonCertprofile extends BaseCertprofile {
     }
 
     this.subjectControl = new SubjectControl(subjectDnControls, subject.isKeepRdnOrder());
-    this.incSerialNoIfSubjectExists = subject.isIncSerialNumber();
 
     // Extensions
     Map<String, ExtensionType> extensions = conf.buildExtensions();
@@ -2056,11 +2052,6 @@ public class XijsonCertprofile extends BaseCertprofile {
     return signatureAlgorithms;
   }
 
-  @Override
-  public boolean incSerialNumberIfSubjectExists() {
-    return incSerialNoIfSubjectExists;
-  }
-
   public ExtensionValue getAdditionalInformation() {
     return additionalInformation;
   }
@@ -2096,10 +2087,6 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   public Set<ExtKeyUsageControl> getExtendedKeyusages() {
     return extendedKeyusages;
-  }
-
-  public boolean isIncSerialNoIfSubjectExists() {
-    return incSerialNoIfSubjectExists;
   }
 
   public ExtensionValue getInhibitAnyPolicy() {

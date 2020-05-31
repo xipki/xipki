@@ -259,22 +259,6 @@ public class CaInfo {
     return caEntry.toString(verbose);
   }
 
-  public boolean isDuplicateKeyPermitted() {
-    return caEntry.isDuplicateKeyPermitted();
-  }
-
-  public void setDuplicateKeyPermitted(boolean permitted) {
-    caEntry.setDuplicateKeyPermitted(permitted);
-  }
-
-  public boolean isDuplicateSubjectPermitted() {
-    return caEntry.isDuplicateSubjectPermitted();
-  }
-
-  public void setDuplicateSubjectPermitted(boolean permitted) {
-    caEntry.setDuplicateSubjectPermitted(permitted);
-  }
-
   public boolean supportsCmp() {
     return caEntry.getProtocoSupport().isCmp();
   }

@@ -75,10 +75,6 @@ public class CaCertstore extends ValidatableConf {
 
     private String revokeSuspendedControl;
 
-    private int duplicateKey;
-
-    private int duplicateSubject;
-
     private String protocolSupport;
 
     private int saveReq;
@@ -255,22 +251,6 @@ public class CaCertstore extends ValidatableConf {
 
     public void setDhpocControl(String dhpocControl) {
       this.dhpocControl = dhpocControl;
-    }
-
-    public int getDuplicateKey() {
-      return duplicateKey;
-    }
-
-    public void setDuplicateKey(int duplicateKey) {
-      this.duplicateKey = duplicateKey;
-    }
-
-    public int getDuplicateSubject() {
-      return duplicateSubject;
-    }
-
-    public void setDuplicateSubject(int duplicateSubject) {
-      this.duplicateSubject = duplicateSubject;
     }
 
     public String getProtocolSupport() {

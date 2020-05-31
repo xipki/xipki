@@ -166,12 +166,6 @@
 			"file":"${profiles.dir}/certprofile-tls-c.json"
 		}
 	},{
-		"name":"tls-inc-sn",
-		"type":"xijson",
-		"conf":{
-			"file":"${profiles.dir}/certprofile-tls-inc-sn.json"
-		}
-	},{
 		"name":"apple-wwdr",
 		"type":"xijson",
 		"conf":{

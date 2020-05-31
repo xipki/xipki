@@ -764,10 +764,6 @@ class IdentifiedCertprofile implements Closeable {
     return certprofile.checkPublicKey(Args.notNull(publicKey, "publicKey"));
   }
 
-  public boolean incSerialNumberIfSubjectExists() {
-    return certprofile.incSerialNumberIfSubjectExists();
-  }
-
   @Override
   public void close() {
     if (certprofile != null) {

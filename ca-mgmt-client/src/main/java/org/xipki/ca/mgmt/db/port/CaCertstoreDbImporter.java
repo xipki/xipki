@@ -45,7 +45,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.security.FpIdCalculator;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
@@ -68,8 +67,8 @@ class CaCertstoreDbImporter extends DbPorter {
 
   private static final String SQL_ADD_CERT =
       "INSERT INTO CERT (ID,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,RR,RT,RIT,"
-      + "PID,CA_ID,RID,UID,FP_K,EE,RTYPE,TID,SHA1,REQ_SUBJECT,CRL_SCOPE,CERT)"
-      + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+      + "PID,CA_ID,RID,UID,EE,RTYPE,TID,SHA1,REQ_SUBJECT,CRL_SCOPE,CERT)"
+      + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
   private static final String SQL_ADD_CRL =
       "INSERT INTO CRL (ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE,DELTACRL,BASECRL_NO,CRL_SCOPE,CRL)"
@@ -436,8 +435,6 @@ class CaCertstoreDbImporter extends DbPorter {
           throw new CertificateException(ex.getMessage(), ex);
         }
 
-        byte[] encodedKey = tbsCert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
-
         String b64Sha1FpCert = HashAlgo.SHA1.base64Hash(encodedCert);
 
         // cert
@@ -471,7 +468,6 @@ class CaCertstoreDbImporter extends DbPorter {
 
           setInt(stmt, idx++, cert.getRid());
           setInt(stmt, idx++, cert.getUid());
-          stmt.setLong(idx++, FpIdCalculator.hash(encodedKey));
           Extension extension = tbsCert.getExtensions().getExtension(Extension.basicConstraints);
           boolean ee = true;
           if (extension != null) {

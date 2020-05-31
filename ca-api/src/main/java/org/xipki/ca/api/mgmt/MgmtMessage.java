@@ -237,10 +237,6 @@ public abstract class MgmtMessage {
 
     private String scepResponderName;
 
-    private boolean duplicateKeyPermitted;
-
-    private boolean duplicateSubjectPermitted;
-
     private ProtocolSupport protocolSupport;
 
     private boolean saveRequest;
@@ -303,8 +299,6 @@ public abstract class MgmtMessage {
       }
 
       dhpocControl = caEntry.getDhpocControl();
-      duplicateKeyPermitted = caEntry.isDuplicateKeyPermitted();
-      duplicateSubjectPermitted = caEntry.isDuplicateSubjectPermitted();
       expirationPeriod = caEntry.getExpirationPeriod();
       if (caEntry.getExtraControl() != null) {
         extraControl = caEntry.getExtraControl().getEncoded();
@@ -446,22 +440,6 @@ public abstract class MgmtMessage {
 
     public void setScepResponderName(String scepResponderName) {
       this.scepResponderName = scepResponderName;
-    }
-
-    public boolean isDuplicateKeyPermitted() {
-      return duplicateKeyPermitted;
-    }
-
-    public void setDuplicateKeyPermitted(boolean duplicateKeyPermitted) {
-      this.duplicateKeyPermitted = duplicateKeyPermitted;
-    }
-
-    public boolean isDuplicateSubjectPermitted() {
-      return duplicateSubjectPermitted;
-    }
-
-    public void setDuplicateSubjectPermitted(boolean duplicateSubjectPermitted) {
-      this.duplicateSubjectPermitted = duplicateSubjectPermitted;
     }
 
     public ProtocolSupport getProtocolSupport() {
@@ -607,9 +585,6 @@ public abstract class MgmtMessage {
       }
 
       rv.setCrlSignerName(crlSignerName);
-
-      rv.setDuplicateKeyPermitted(duplicateKeyPermitted);
-      rv.setDuplicateSubjectPermitted(duplicateSubjectPermitted);
 
       if (extraControl != null) {
         rv.setExtraControl(new ConfPairs(extraControl));

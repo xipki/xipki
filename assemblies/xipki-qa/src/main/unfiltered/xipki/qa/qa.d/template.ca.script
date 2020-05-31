@@ -12,7 +12,7 @@ echo "#################################################################"
 ## Certificate Profiles
 
 list = [ cross subca subca-complex ocsp scep multiple-ous multi-valued-rdn \
-  qc ee-complex smime smime-legacy tls tls-c tls-inc-sn max-time fixed-partial-subject \
+  qc ee-complex smime smime-legacy tls tls-c max-time fixed-partial-subject \
   constant-ext constant-ext-implicit-tag constant-ext-explicit-tag \
   syntax-ext syntax-ext-implicit-tag syntax-ext-explicit-tag apple-wwdr gmt0015 ]
 
@@ -351,7 +351,6 @@ ca:caprofile-add \
   --profile smime-legacy \
   --profile tls \
   --profile tls-c \
-  --profile tls-inc-sn \
   --profile fixed-partial-subject
 
 ## Add publisher

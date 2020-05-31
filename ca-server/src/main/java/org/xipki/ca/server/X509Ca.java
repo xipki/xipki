@@ -55,7 +55,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -67,7 +66,6 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -134,7 +132,6 @@ import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.CrlReason;
 import org.xipki.security.EdECConstants;
-import org.xipki.security.FpIdCalculator;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.ObjectIdentifiers;
@@ -147,7 +144,6 @@ import org.xipki.security.util.RSABrokenKey;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.CompareUtil;
 import org.xipki.util.DateUtil;
 import org.xipki.util.HealthCheckResult;
 import org.xipki.util.LogUtil;
@@ -172,27 +168,22 @@ public class X509Ca implements Closeable {
     private final X500Name requestedSubject;
     private final SubjectPublicKeyInfo grantedPublicKey;
     private final PrivateKeyInfo privateKey;
-    private final byte[] grantedPublicKeyData;
-    private final long fpPublicKey;
     private final String warning;
 
     private X500Name grantedSubject;
     private String grantedSubjectText;
-    private long fpSubject;
 
     public GrantedCertTemplate(Extensions extensions, IdentifiedCertprofile certprofile,
         Date grantedNotBefore, Date grantedNotAfter, X500Name requestedSubject,
-        SubjectPublicKeyInfo grantedPublicKey, long fpPublicKey, PrivateKeyInfo privateKey,
-        byte[] grantedPublicKeyData, ConcurrentContentSigner signer, String warning) {
+        SubjectPublicKeyInfo grantedPublicKey, PrivateKeyInfo privateKey,
+        ConcurrentContentSigner signer, String warning) {
       this.extensions = extensions;
       this.certprofile = certprofile;
       this.grantedNotBefore = grantedNotBefore;
       this.grantedNotAfter = grantedNotAfter;
       this.requestedSubject = requestedSubject;
       this.grantedPublicKey = grantedPublicKey;
-      this.grantedPublicKeyData = grantedPublicKeyData;
       this.privateKey = privateKey;
-      this.fpPublicKey = fpPublicKey;
       this.signer = signer;
       this.warning = warning;
     }
@@ -200,7 +191,6 @@ public class X509Ca implements Closeable {
     public void setGrantedSubject(X500Name subject) {
       this.grantedSubject = subject;
       this.grantedSubjectText = X509Util.getRfc4519Name(subject);
-      this.fpSubject = X509Util.fpCanonicalizedName(subject);
     }
 
   }
@@ -432,10 +422,6 @@ public class X509Ca implements Closeable {
   private ScheduledFuture<?> expiredCertsRemover;
 
   private ScheduledFuture<?> suspendedCertsRevoker;
-
-  private final ConcurrentSkipListSet<Long> publicKeyCertsInProcess = new ConcurrentSkipListSet<>();
-
-  private final ConcurrentSkipListSet<Long> subjectCertsInProcess = new ConcurrentSkipListSet<>();
 
   public X509Ca(CaManagerImpl caManager, CaInfo caInfo, CertStore certstore,
       CtLogClient ctlogClient)
@@ -1706,30 +1692,7 @@ public class X509Ca implements Closeable {
     event.addEventData(CaAuditConstants.NAME_not_after,
         DateUtil.toUtcTimeyyyyMMddhhmmss(gct.grantedNotAfter));
 
-    adaptGrantedSubejct(gct);
-
     IdentifiedCertprofile certprofile = gct.certprofile;
-
-    boolean duplicatedKeyNotAllowed = !caInfo.isDuplicateKeyPermitted();
-    boolean duplicatedSubjectNotAllowed = !caInfo.isDuplicateSubjectPermitted();
-    if (duplicatedKeyNotAllowed) {
-      if (!publicKeyCertsInProcess.add(gct.fpPublicKey)) {
-        // in process already exists a request with given public key.
-        throw new OperationException(ALREADY_ISSUED,
-            "certificate with the given public key already in process");
-      }
-    }
-
-    if (duplicatedSubjectNotAllowed) {
-      if (!subjectCertsInProcess.add(gct.fpSubject)) {
-        // in process already exists a request with given subject.
-        if (duplicatedKeyNotAllowed) { // remove the added entry from publicKeyCertsInProcess
-          publicKeyCertsInProcess.remove(gct.fpPublicKey);
-        }
-        throw new OperationException(ALREADY_ISSUED,
-            "certificate with the given subject " + gct.grantedSubjectText + " already in process");
-      }
-    }
 
     ExtensionControl extnSctCtrl = certprofile.getExtensionControls().get(Extn.id_SCTs);
     boolean ctlogEnabled = caInfo.getCtlogControl() != null && caInfo.getCtlogControl().isEnabled();
@@ -1742,7 +1705,6 @@ public class X509Ca implements Closeable {
       }
     }
 
-    try {
       X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
           caInfo.getPublicCaInfo().getSubject(), caInfo.nextSerial(), gct.grantedNotBefore,
           gct.grantedNotAfter, gct.grantedSubject, gct.grantedPublicKey);
@@ -1828,7 +1790,7 @@ public class X509Ca implements Closeable {
         X509Cert cert = new X509Cert(bcCert, encodedCert);
         CertWithDbId certWithMeta = new CertWithDbId(cert);
         ret = new CertificateInfo(certWithMeta, gct.privateKey, caIdent, caCert,
-            gct.grantedPublicKeyData, gct.certprofile.getIdent(), requestor.getIdent());
+                gct.certprofile.getIdent(), requestor.getIdent());
         if (requestor instanceof RequestorInfo.ByUserRequestorInfo) {
           ret.setUser((((RequestorInfo.ByUserRequestorInfo) requestor).getUserId()));
         }
@@ -1853,74 +1815,7 @@ public class X509Ca implements Closeable {
       }
 
       return ret;
-    } finally {
-      if (duplicatedKeyNotAllowed) {
-        publicKeyCertsInProcess.remove(gct.fpPublicKey);
-      }
-      if (duplicatedSubjectNotAllowed) {
-        subjectCertsInProcess.remove(gct.fpSubject);
-      }
-    }
   } // method generateCertificate0
-
-  private void adaptGrantedSubejct(GrantedCertTemplate gct) throws OperationException {
-    if (caInfo.isDuplicateSubjectPermitted()) {
-      return;
-    }
-
-    long fpSubject = X509Util.fpCanonicalizedName(gct.grantedSubject);
-    String grantedSubjectText = X509Util.getRfc4519Name(gct.grantedSubject);
-
-    final boolean incSerial = gct.certprofile.incSerialNumberIfSubjectExists();
-    final boolean certIssued = certstore.isCertForSubjectIssued(caIdent, fpSubject);
-    if (certIssued && !incSerial) {
-      throw new OperationException(ALREADY_ISSUED,
-          "certificate for the given subject " + grantedSubjectText + " already issued");
-    }
-
-    if (!certIssued) {
-      return;
-    }
-
-    X500Name subject = gct.grantedSubject;
-
-    String latestSn;
-    try {
-      Object[] objs = incSerialNumber(gct.certprofile, subject, null);
-      latestSn = certstore.getLatestSerialNumber((X500Name) objs[0]);
-    } catch (BadFormatException ex) {
-      throw new OperationException(SYSTEM_FAILURE, ex);
-    }
-
-    boolean foundUniqueSubject = false;
-    // maximal 100 tries
-    for (int i = 0; i < 100; i++) {
-      try {
-        Object[] objs = incSerialNumber(gct.certprofile, subject, latestSn);
-        subject = (X500Name) objs[0];
-        if (CompareUtil.equalsObject(latestSn, objs[1])) {
-          break;
-        }
-        latestSn = (String) objs[1];
-      } catch (BadFormatException ex) {
-        throw new OperationException(SYSTEM_FAILURE, ex);
-      }
-
-      foundUniqueSubject = !certstore.isCertForSubjectIssued(caIdent,
-          X509Util.fpCanonicalizedName(subject));
-      if (foundUniqueSubject) {
-        break;
-      }
-    }
-
-    if (!foundUniqueSubject) {
-      throw new OperationException(ALREADY_ISSUED, "certificate for the given subject "
-          + grantedSubjectText + " and profile " + gct.certprofile.getIdent().getName()
-          + " already issued, and could not create new unique serial number");
-    }
-
-    gct.setGrantedSubject(subject);
-  }
 
   private GrantedCertTemplate createGrantedCertTemplate(CertTemplateData certTemplate,
       RequestorInfo requestor, boolean update) throws OperationException {
@@ -2165,11 +2060,6 @@ public class X509Ca implements Closeable {
           "certificate with the same subject as CA is not allowed");
     }
 
-    boolean duplicateKeyPermitted = caInfo.isDuplicateKeyPermitted();
-
-    byte[] subjectPublicKeyData = grantedPublicKeyInfo.getPublicKeyData().getBytes();
-    long fpPublicKey = FpIdCalculator.hash(subjectPublicKeyData);
-
     if (update) {
       CertStore.CertStatus certStatus = certstore.getCertStatusForSubject(caIdent, grantedSubject);
       if (certStatus == CertStore.CertStatus.REVOKED) {
@@ -2177,14 +2067,6 @@ public class X509Ca implements Closeable {
       } else if (certStatus == CertStore.CertStatus.UNKNOWN) {
         throw new OperationException(UNKNOWN_CERT);
       }
-    } else {
-      if (!duplicateKeyPermitted) {
-        if (certstore.isCertForKeyIssued(caIdent, fpPublicKey)) {
-          throw new OperationException(ALREADY_ISSUED,
-              "certificate for the given public key already issued");
-        }
-      }
-      // duplicateSubject check will be processed later
     } // end if(update)
 
     StringBuilder msgBuilder = new StringBuilder();
@@ -2236,8 +2118,8 @@ public class X509Ca implements Closeable {
       warning = msgBuilder.substring(2);
     }
     GrantedCertTemplate gct = new GrantedCertTemplate(certTemplate.getExtensions(), certprofile,
-        grantedNotBefore, grantedNotAfter, requestedSubject, grantedPublicKeyInfo, fpPublicKey,
-        privateKey, subjectPublicKeyData, signer, warning);
+        grantedNotBefore, grantedNotAfter, requestedSubject, grantedPublicKeyInfo,
+        privateKey, signer, warning);
     gct.setGrantedSubject(grantedSubject);
     return gct;
 
@@ -2637,50 +2519,6 @@ public class X509Ca implements Closeable {
 
     return changed ? new X500Name(tmpRdns.toArray(new RDN[0])) : name;
   } // method removeEmptyRdns
-
-  private static Object[] incSerialNumber(IdentifiedCertprofile profile, X500Name origName,
-      String latestSn) throws BadFormatException {
-    RDN[] rdns = origName.getRDNs();
-
-    int commonNameIndex = -1;
-    int serialNumberIndex = -1;
-    for (int i = 0; i < rdns.length; i++) {
-      RDN rdn = rdns[i];
-      ASN1ObjectIdentifier type = rdn.getFirst().getType();
-      if (ObjectIdentifiers.DN.CN.equals(type)) {
-        commonNameIndex = i;
-      } else if (ObjectIdentifiers.DN.serialNumber.equals(type)) {
-        serialNumberIndex = i;
-      }
-    }
-
-    String newSerialNumber = profile.incSerialNumber(latestSn);
-    RDN serialNumberRdn = new RDN(ObjectIdentifiers.DN.serialNumber,
-        new DERPrintableString(newSerialNumber));
-
-    X500Name newName;
-    if (serialNumberIndex != -1) {
-      rdns[serialNumberIndex] = serialNumberRdn;
-      newName = new X500Name(rdns);
-    } else {
-      List<RDN> newRdns = new ArrayList<>(rdns.length + 1);
-
-      if (commonNameIndex == -1) {
-        newRdns.add(serialNumberRdn);
-      }
-
-      for (int i = 0; i < rdns.length; i++) {
-        newRdns.add(rdns[i]);
-        if (i == commonNameIndex) {
-          newRdns.add(serialNumberRdn);
-        }
-      }
-
-      newName = new X500Name(newRdns.toArray(new RDN[0]));
-    }
-
-    return new Object[]{newName, newSerialNumber};
-  } // method incSerialNumber
 
   private void finish(AuditEvent event, boolean successful) {
     event.finish();

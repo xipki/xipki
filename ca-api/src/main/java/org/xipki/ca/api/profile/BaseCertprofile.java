@@ -235,11 +235,6 @@ public abstract class BaseCertprofile extends Certprofile {
   } // method getSubject
 
   @Override
-  public boolean incSerialNumberIfSubjectExists() {
-    return false;
-  }
-
-  @Override
   public SubjectPublicKeyInfo checkPublicKey(SubjectPublicKeyInfo publicKey)
       throws CertprofileException, BadCertTemplateException {
     Args.notNull(publicKey, "publicKey");

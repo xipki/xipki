@@ -743,8 +743,6 @@ public abstract class Certprofile implements Closeable {
       Date notBefore, Date notAfter, PublicCaInfo caInfo)
           throws CertprofileException, BadCertTemplateException;
 
-  public abstract boolean incSerialNumberIfSubjectExists();
-
   /**
    * Returns maximal size in bytes of the certificate.
    *

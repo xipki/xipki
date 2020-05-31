@@ -65,15 +65,6 @@ caqa:check-cert --issuer subca --profile smime-legacy \
 caqa:check-cert --issuer subca --profile tls \
   --csr output/tls1.csr --cert output/tls1.crt
 
-caqa:check-cert --issuer subca --profile tls-inc-sn \
-  --csr output/tls-inc-sn1.csr --cert output/tls-inc-sn1.crt
-
-caqa:check-cert --issuer subca --profile tls-inc-sn \
-  --csr output/tls-inc-sn1-1.csr --cert output/tls-inc-sn1-1.crt
-
-caqa:check-cert --issuer subca --profile tls-inc-sn \
-  --csr output/tls-inc-sn1-2.csr --cert output/tls-inc-sn1-2.crt
-
 caqa:check-cert --issuer subca --profile tls \
   --csr output/tls2.csr --cert output/tls2.crt
 

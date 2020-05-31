@@ -36,9 +36,6 @@ import com.alibaba.fastjson.annotation.JSONField;
 
 public class Subject extends ValidatableConf {
 
-  @JSONField(ordinal = 1)
-  private boolean incSerialNumber;
-
   /**
    * whether the RDNs occurs as in the defined ASN.1 order
    */
@@ -47,14 +44,6 @@ public class Subject extends ValidatableConf {
 
   @JSONField(ordinal = 3)
   private List<RdnType> rdns;
-
-  public boolean isIncSerialNumber() {
-    return incSerialNumber;
-  }
-
-  public void setIncSerialNumber(boolean incSerialNumber) {
-    this.incSerialNumber = incSerialNumber;
-  }
 
   public boolean isKeepRdnOrder() {
     return keepRdnOrder;

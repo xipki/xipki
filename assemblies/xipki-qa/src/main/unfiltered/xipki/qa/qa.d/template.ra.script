@@ -392,43 +392,6 @@ xi:update-cert-p12 --p12 output/tls1.p12 --password 1234 \
   --ca-cert output/subca1.crt \
   --ca-cert output/rootca1.crt
 
-# Certificate tls-inc-sn1 (all with same subject and profile but different key)
-# 1.
-
-xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
-  --p12 output/tls-inc-sn1.p12 --password 1234 \
-  --subject "CN=tls-inc-sn1.xipki.org,O=xipki,C=DE" \
-  --outform $OUTFORM \
-  --out output/tls-inc-sn1.csr
-
-xi:cmp-csr-enroll --csr output/tls-inc-sn1.csr \
-  --outform $OUTFORM \
-  --out output/tls-inc-sn1.crt --profile tls-inc-sn
-
-# 2.
-
-xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
-  --p12 output/tls-inc-sn1-1.p12 --password 1234 \
-  --subject "CN=tls-inc-sn1.xipki.org,O=xipki,C=DE" \
-  --outform $OUTFORM \
-  --out output/tls-inc-sn1-1.csr
-
-xi:cmp-csr-enroll --csr output/tls-inc-sn1-1.csr \
-  --outform $OUTFORM \
-  --out output/tls-inc-sn1-1.crt --profile tls-inc-sn
-
-# 3.
-
-xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
-  --p12 output/tls-inc-sn1-2.p12 --password 1234 \
-  --subject "CN=tls-inc-sn1.xipki.org,O=xipki,C=DE" \
-  --outform $OUTFORM \
-  --out output/tls-inc-sn1-2.csr
-
-xi:cmp-csr-enroll --csr output/tls-inc-sn1-2.csr \
-  --outform $OUTFORM \
-  --out output/tls-inc-sn1-2.crt --profile tls-inc-sn
-
 # Certificate tls2
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \

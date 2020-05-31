@@ -188,8 +188,8 @@ class CaManagerQueryExecutor {
     this.sqlSelectCaId = buildSelectFirstSql("ID FROM CA WHERE NAME=?");
     this.sqlSelectCa = buildSelectFirstSql("ID,SN_SIZE,NEXT_CRLNO,STATUS,MAX_VALIDITY,CERT,"
         + "CERTCHAIN,SIGNER_TYPE,CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,CRL_SIGNER_NAME,"
-        + "CMP_CONTROL,CRL_CONTROL,SCEP_CONTROL,CTLOG_CONTROL,DUPLICATE_KEY,"
-        + "DUPLICATE_SUBJECT,PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION,NUM_CRLS,KEEP_EXPIRED_CERT_DAYS,"
+        + "CMP_CONTROL,CRL_CONTROL,SCEP_CONTROL,CTLOG_CONTROL,"
+        + "PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION,NUM_CRLS,KEEP_EXPIRED_CERT_DAYS,"
         + "EXPIRATION_PERIOD,REV_INFO,VALIDITY_MODE,CA_URIS,EXTRA_CONTROL,SIGNER_CONF,"
         + "DHPOC_CONTROL,REVOKE_SUSPENDED_CONTROL "
         + "FROM CA WHERE NAME=?");
@@ -574,8 +574,6 @@ class CaManagerQueryExecutor {
         }
       }
 
-      entry.setDuplicateKeyPermitted((rs.getInt("DUPLICATE_KEY") != 0));
-      entry.setDuplicateSubjectPermitted((rs.getInt("DUPLICATE_SUBJECT") != 0));
       entry.setProtocolSupport(new ProtocolSupport(rs.getString("PROTOCOL_SUPPORT")));
       entry.setSaveRequest((rs.getInt("SAVE_REQ") != 0));
       entry.setPermission(rs.getInt("PERMISSION"));
@@ -712,10 +710,10 @@ class CaManagerQueryExecutor {
     final String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CA_URIS,"//7
         + "MAX_VALIDITY,CERT,CERTCHAIN,SIGNER_TYPE,CRL_SIGNER_NAME,"//5
         + "CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,CRL_CONTROL,CMP_CONTROL,SCEP_CONTROL,"//5
-        + "CTLOG_CONTROL,DUPLICATE_KEY,DUPLICATE_SUBJECT,PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION,"//6
+        + "CTLOG_CONTROL,PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION,"//6
         + "NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL,"//5
         + "SIGNER_CONF,DHPOC_CONTROL,REVOKE_SUSPENDED_CONTROL) "
-        + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     // insert to table ca
     PreparedStatement ps = null;
@@ -759,9 +757,6 @@ class CaManagerQueryExecutor {
 
       CtlogControl ctlogControl = caEntry.getCtlogControl();
       ps.setString(idx++, (ctlogControl == null ? null : ctlogControl.getConf()));
-
-      setBoolean(ps, idx++, caEntry.isDuplicateKeyPermitted());
-      setBoolean(ps, idx++, caEntry.isDuplicateSubjectPermitted());
 
       ProtocolSupport protocolSupport = caEntry.getProtocoSupport();
       ps.setString(idx++, (protocolSupport == null ? null : protocolSupport.getEncoded()));
@@ -1219,8 +1214,6 @@ class CaManagerQueryExecutor {
         col(STRING, "CRL_CONTROL", changeCaEntry.getCrlControl()),
         col(STRING, "SCEP_CONTROL", changeCaEntry.getScepControl()),
         col(STRING, "CTLOG_CONTROL", changeCaEntry.getCtlogControl()),
-        col(BOOL, "DUPLICATE_KEY", changeCaEntry.getDuplicateKeyPermitted()),
-        col(BOOL, "DUPLICATE_SUBJECT", changeCaEntry.getDuplicateSubjectPermitted()),
         col(STRING, "PROTOCOL_SUPPORT", protocolSupportStr),
         col(BOOL, "SAVE_REQ", changeCaEntry.getSaveRequest()),
         col(INT, "PERMISSION", changeCaEntry.getPermission()),

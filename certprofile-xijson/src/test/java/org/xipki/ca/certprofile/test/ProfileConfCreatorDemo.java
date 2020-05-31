@@ -210,8 +210,7 @@ public class ProfileConfCreatorDemo {
       certprofileQc("certprofile-qc.json");
       certprofileSmime("certprofile-smime.json", false);
       certprofileSmime("certprofile-smime-legacy.json", true);
-      certprofileTls("certprofile-tls.json", false);
-      certprofileTls("certprofile-tls-inc-sn.json", true);
+      certprofileTls("certprofile-tls.json");
       certprofileTlsC("certprofile-tls-c.json");
       certprofileMultipleOus("certprofile-multiple-ous.json");
       certprofileMultipleValuedRdn("certprofile-multi-valued-rdn.json");
@@ -875,7 +874,7 @@ public class ProfileConfCreatorDemo {
 
   private static void certprofileOcsp(String destFilename) throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile ocsp", CertLevel.EndEntity, "5y",
-        false, true);
+        false);
 
     // Subject
     Subject subject = profile.getSubject();
@@ -962,7 +961,7 @@ public class ProfileConfCreatorDemo {
 
   private static void certprofileSmime(String destFilename, boolean legacy) throws Exception {
     String desc = legacy ? "certprofile s/mime legacy" : "certprofile s/mime";
-    X509ProfileType profile = getBaseProfile(desc, CertLevel.EndEntity, "5y", true, false);
+    X509ProfileType profile = getBaseProfile(desc, CertLevel.EndEntity, "5y", true);
 
     // Subject
     Subject subject = profile.getSubject();
@@ -1085,10 +1084,9 @@ public class ProfileConfCreatorDemo {
     marshall(profile, destFilename, true);
   } // method certprofileTlsEdwardsOrMontgomery
 
-  private static void certprofileTls(String destFilename, boolean incSerial) throws Exception {
-    String desc = incSerial ? "certprofile tls-inc-sn (serial number will be added automatically)"
-        : "certprofile tls";
-    X509ProfileType profile = getBaseProfile(desc, CertLevel.EndEntity, "5y", true, incSerial);
+  private static void certprofileTls(String destFilename) throws Exception {
+    String desc = "certprofile tls";
+    X509ProfileType profile = getBaseProfile(desc, CertLevel.EndEntity, "5y", true);
 
     // Subject
     Subject subject = profile.getSubject();
@@ -1334,7 +1332,7 @@ public class ProfileConfCreatorDemo {
 
   private static void certprofileEeComplex(String destFilename) throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile ee-complex", CertLevel.EndEntity,
-        "5y", true, false);
+        "5y", true);
 
     // Subject
     Subject subject = profile.getSubject();
@@ -1530,7 +1528,7 @@ public class ProfileConfCreatorDemo {
   private static void certprofileConstantExt(String destFilename, ASN1ObjectIdentifier oidPrefix,
       Tag tag) throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile constant-extension", CertLevel.EndEntity,
-        "5y", true, false);
+        "5y", true);
 
     // Subject
     Subject subject = profile.getSubject();
@@ -1594,7 +1592,7 @@ public class ProfileConfCreatorDemo {
   private static void certprofileSyntaxExt(String destFilename,
       ASN1ObjectIdentifier oidPrefix, Tag tag) throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile syntax-extension", CertLevel.EndEntity,
-        "5y", true, false);
+        "5y", true);
 
     // Subject
     Subject subject = profile.getSubject();
@@ -2600,11 +2598,11 @@ public class ProfileConfCreatorDemo {
 
   private static X509ProfileType getBaseCabProfile(String description, CertLevel certLevel,
       String validity) {
-    return getBaseCabProfile(description, certLevel, validity, false, false);
+    return getBaseCabProfile(description, certLevel, validity, false);
   }
 
   private static X509ProfileType getBaseCabProfile(String description, CertLevel certLevel,
-      String validity, boolean useMidnightNotBefore, boolean incSerialNumber) {
+      String validity, boolean useMidnightNotBefore) {
     X509ProfileType profile = new X509ProfileType();
 
     profile.setMetadata(createDescription(description));
@@ -2640,7 +2638,6 @@ public class ProfileConfCreatorDemo {
     Subject subject = new Subject();
     profile.setSubject(subject);
     subject.setKeepRdnOrder(false);
-    subject.setIncSerialNumber(incSerialNumber);
 
     // Key
     profile.setKeyAlgorithms(createCabKeyAlgorithms());
@@ -2650,11 +2647,11 @@ public class ProfileConfCreatorDemo {
 
   private static X509ProfileType getBaseProfile(String description, CertLevel certLevel,
       String validity) {
-    return getBaseProfile(description, certLevel, validity, false, false);
+    return getBaseProfile(description, certLevel, validity, false);
   }
 
   private static X509ProfileType getBaseProfile(String description, CertLevel certLevel,
-      String validity, boolean useMidnightNotBefore, boolean incSerialNumber) {
+      String validity, boolean useMidnightNotBefore) {
     X509ProfileType profile = new X509ProfileType();
 
     profile.setMetadata(createDescription(description));
@@ -2701,7 +2698,6 @@ public class ProfileConfCreatorDemo {
     Subject subject = new Subject();
     profile.setSubject(subject);
     subject.setKeepRdnOrder(false);
-    subject.setIncSerialNumber(incSerialNumber);
 
     ASN1ObjectIdentifier[] curveIds = (CertLevel.EndEntity != certLevel) ? null :
       new ASN1ObjectIdentifier[] {SECObjectIdentifiers.secp256r1,
@@ -2751,7 +2747,6 @@ public class ProfileConfCreatorDemo {
     Subject subject = new Subject();
     profile.setSubject(subject);
     subject.setKeepRdnOrder(false);
-    subject.setIncSerialNumber(false);
 
     // KeyUsage
 

@@ -235,10 +235,10 @@ class CaconfDbImporter extends DbPorter {
     final String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CA_URIS," // 7
         + "MAX_VALIDITY,CERT,CERTCHAIN,SIGNER_TYPE,CRL_SIGNER_NAME," // 5
         + "CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,CRL_CONTROL,CMP_CONTROL,SCEP_CONTROL," // 5
-        + "CTLOG_CONTROL,DUPLICATE_KEY,DUPLICATE_SUBJECT,PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION," // 6
+        + "CTLOG_CONTROL,PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION," // 6
         + "NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL," // 5
         + "SIGNER_CONF,REV_INFO,DHPOC_CONTROL,REVOKE_SUSPENDED_CONTROL) " // 4
-        + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     PreparedStatement ps = null;
     try {
@@ -269,8 +269,6 @@ class CaconfDbImporter extends DbPorter {
           ps.setString(idx++, ca.getCmpControl());
           ps.setString(idx++, ca.getScepControl());
           ps.setString(idx++, ca.getCtlogControl());
-          ps.setInt(idx++, ca.getDuplicateKey());
-          ps.setInt(idx++, ca.getDuplicateSubject());
           ps.setString(idx++, ca.getProtocolSupport());
           ps.setInt(idx++, ca.getSaveReq());
           ps.setInt(idx++, ca.getPermission());
