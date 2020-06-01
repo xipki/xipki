@@ -548,8 +548,8 @@ public class KeyUtil {
   } // method getUncompressedEncodedECPoint
 
   /**
-   * Write the passed in value as an unsigned byte array to the {@code out} from offset
-   * {@code outOffset}.
+   * Write the passed in value as an unsigned byte array to the {@code dest} from offset
+   * {@code destPos}.
    *
    * @param value value to be converted.
    * @return a byte array without a leading zero byte if present in the signed encoding.
@@ -564,7 +564,7 @@ public class KeyUtil {
       int count = bytes.length - start;
 
       if (count > length) {
-        throw new IllegalArgumentException("standard length exceeded for value");
+        throw new IllegalArgumentException("value cannot be expressed in " + length + " bytes");
       }
 
       System.arraycopy(bytes, start, dest, destPos + length - count, count);
