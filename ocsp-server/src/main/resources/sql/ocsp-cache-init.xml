@@ -36,8 +36,8 @@
           remarks="Identifier consists of hex(SIG_ALG) | hex(CERTHASH_ALG) | hex(serial number)">
         <constraints nullable="false"/>
       </column>
-      <column name="THIS_UPDATE" type="BIGINT"
-          remarks="this update, seconds since January 1, 1970, 00:00:00 GMT">
+      <column name="GENERATED_AT" type="BIGINT"
+          remarks="generatedAt, seconds since January 1, 1970, 00:00:00 GMT">
         <constraints nullable="false"/>
       </column>
       <column name="NEXT_UPDATE" type="BIGINT"

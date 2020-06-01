@@ -146,12 +146,10 @@ public class OcspServerImpl implements OcspServer {
   private static class OcspRespControl {
     boolean canCacheInfo;
     boolean includeExtendedRevokeExtension;
-    long cacheThisUpdate;
     long cacheNextUpdate;
 
     public OcspRespControl() {
       includeExtendedRevokeExtension = false;
-      cacheThisUpdate = 0;
       cacheNextUpdate = Long.MAX_VALUE;
     }
   } // class OcspRespControl
@@ -863,9 +861,10 @@ public class OcspServerImpl implements OcspServer {
         certsInResp = signer.getSequenceOfCertChain();
       }
 
+      Date producedAt = new Date();
       byte[] encodeOcspResponse;
       try {
-        encodeOcspResponse = builder.buildOCSPResponse(concurrentSigner, certsInResp, new Date());
+        encodeOcspResponse = builder.buildOCSPResponse(concurrentSigner, certsInResp, producedAt);
       } catch (NoIdleSignerException ex) {
         return unsuccesfulOCSPRespMap.get(OcspResponseStatus.tryLater);
       } catch (OCSPException ex) {
@@ -873,17 +872,18 @@ public class OcspServerImpl implements OcspServer {
         return unsuccesfulOCSPRespMap.get(OcspResponseStatus.internalError);
       }
 
+      long producedAtSeconds = producedAt.getTime() / 1000;
       // cache response in database
       if (canCacheDb && repControl.canCacheInfo) {
         // Don't cache the response with status UNKNOWN, since this may result in DDoS
         // of storage
         responseCacher.storeOcspResponse(cacheDbIssuerId.intValue(), cacheDbSerialNumber,
-            repControl.cacheThisUpdate, repControl.cacheNextUpdate, cacheDbSigAlgCode,
+            producedAtSeconds, repControl.cacheNextUpdate, cacheDbSigAlgCode,
             encodeOcspResponse);
       }
 
       if (viaGet && repControl.canCacheInfo) {
-        ResponseCacheInfo cacheInfo = new ResponseCacheInfo(repControl.cacheThisUpdate);
+        ResponseCacheInfo cacheInfo = new ResponseCacheInfo(producedAtSeconds);
         if (repControl.cacheNextUpdate != Long.MAX_VALUE) {
           cacheInfo.setNextUpdate(repControl.cacheNextUpdate);
         }
@@ -1069,8 +1069,6 @@ public class OcspServerImpl implements OcspServer {
       builder.addResponse(certId, certStatus, thisUpdate, nextUpdate, new Extensions(extensions));
     }
 
-    repControl.cacheThisUpdate =
-        Math.max(repControl.cacheThisUpdate, thisUpdate.getTime() / 1000);
     if (nextUpdate != null) {
       repControl.cacheNextUpdate =
           Math.min(repControl.cacheNextUpdate, nextUpdate.getTime() / 1000);

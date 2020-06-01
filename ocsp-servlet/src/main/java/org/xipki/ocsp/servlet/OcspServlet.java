@@ -201,13 +201,16 @@ public class OcspServlet extends HttpServlet {
         resp.addDateHeader("Date", now);
         // RFC 5019 6.2: Last-Modified: date and time at which the OCSP responder
         // last modified the response.
-        resp.addDateHeader("Last-Modified", cacheInfo.getThisUpdate());
+        resp.addDateHeader("Last-Modified", cacheInfo.getGeneratedAt());
         // RFC 5019 6.2: Expires: This date and time will be the same as the
         // nextUpdate time-stamp in the OCSP
         // response itself.
         // This is overridden by max-age on HTTP/1.1 compatible components
-        if (cacheInfo.getNextUpdate() != null) {
-          resp.addDateHeader("Expires", cacheInfo.getNextUpdate());
+
+        Long nextUpdate = cacheInfo.getNextUpdate();
+
+        if (nextUpdate != null) {
+          resp.addDateHeader("Expires", nextUpdate.longValue());
         }
         // RFC 5019 6.2: This profile RECOMMENDS that the ETag value be the ASCII
         // HEX representation of the SHA1 hash of the OCSPResponse structure.
@@ -224,7 +227,7 @@ public class OcspServlet extends HttpServlet {
 
         if (cacheInfo.getNextUpdate() != null) {
           maxAge = Math.min(maxAge,
-              (cacheInfo.getNextUpdate() - cacheInfo.getThisUpdate()) / 1000);
+              (nextUpdate.longValue() - cacheInfo.getGeneratedAt()) / 1000);
         }
 
         resp.addHeader("Cache-Control",

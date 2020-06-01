@@ -28,16 +28,16 @@ public class OcspRespWithCacheInfo {
 
   public static final class ResponseCacheInfo {
 
-    private final long thisUpdate;
+    private final long generatedAt;
 
     private Long nextUpdate;
 
-    public ResponseCacheInfo(long thisUpdate) {
-      this.thisUpdate = thisUpdate;
+    public ResponseCacheInfo(long generatedAt) {
+      this.generatedAt = generatedAt;
     }
 
-    public long getThisUpdate() {
-      return thisUpdate;
+    public long getGeneratedAt() {
+      return generatedAt;
     }
 
     public void setNextUpdate(Long nextUpdate) {

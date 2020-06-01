@@ -67,7 +67,9 @@ public class ResponseCacher implements Closeable {
 
   private static final Logger LOG = LoggerFactory.getLogger(ResponseCacher.class);
 
-  private static final long SEC_PER_WEEK = 7L * 24 * 60 * 60;
+  private static final long SEC_DFLT_NEXT_UPDATE_DURATION = 7L * 24 * 60 * 60;
+
+  private static final long SEC_NEXT_UPDATE_BUFFER = 600;
 
   private static final String SQL_ADD_ISSUER = "INSERT INTO ISSUER (ID,S1C,CERT) VALUES (?,?,?)";
 
@@ -77,12 +79,13 @@ public class ResponseCacher implements Closeable {
 
   private static final String SQL_SELECT_ISSUER = "SELECT ID,CERT FROM ISSUER";
 
-  private static final String SQL_DELETE_EXPIRED_RESP = "DELETE FROM OCSP WHERE THIS_UPDATE<?";
+  private static final String SQL_DELETE_EXPIRED_RESP
+      = "DELETE FROM OCSP WHERE GENERATED_AT<? OR NEXT_UPDATE<?";
 
   private static final String SQL_ADD_RESP = "INSERT INTO OCSP (ID,IID,IDENT,"
-      + "THIS_UPDATE,NEXT_UPDATE,RESP) VALUES (?,?,?,?,?,?)";
+      + "GENERATED_AT,NEXT_UPDATE,RESP) VALUES (?,?,?,?,?,?)";
 
-  private static final String SQL_UPDATE_RESP = "UPDATE OCSP SET THIS_UPDATE=?,"
+  private static final String SQL_UPDATE_RESP = "UPDATE OCSP SET GENERATED_AT=?,"
       + "NEXT_UPDATE=?,RESP=? WHERE ID=?";
 
   private final ConcurrentBag<ConcurrentBagEntry<Digest>> idDigesters;
@@ -114,13 +117,17 @@ public class ResponseCacher implements Closeable {
 
       synchronized (lock) {
         inProcess.set(true);
-        long maxThisUpdate = System.currentTimeMillis() / 1000 - validity;
+        long now = System.currentTimeMillis() / 1000;
+        long maxGeneratedAt = now - validity;
+        long minNextUpdate = now + SEC_NEXT_UPDATE_BUFFER;
+
         try {
-          int num = removeExpiredResponses(maxThisUpdate);
-          if (num > 0 && LOG.isInfoEnabled()) {
-            Date date = new Date(maxThisUpdate * 1000);
-            LOG.info("removed {} with thisUpdate < {} {} ({})",
-                num == 1 ? "1 response" : num + " responses", maxThisUpdate, date);
+          int num1 = removeExpiredResponses(maxGeneratedAt, minNextUpdate);
+          if (num1 > 0 && LOG.isInfoEnabled()) {
+            LOG.info("removed {} with thisUpdate < {} {} ({}) OR nextUpdate < {} ({})",
+                num1 == 1 ? "1 response" : num1 + " responses",
+                maxGeneratedAt, new Date(maxGeneratedAt * 1000),
+                minNextUpdate, new Date(minNextUpdate * 1000));
           }
         } catch (Throwable th) {
           LogUtil.error(LOG, th, "could not remove expired responses");
@@ -159,7 +166,7 @@ public class ResponseCacher implements Closeable {
     this.validity = (int) (Args.notNull(validity, "validity").approxMinutes() * 60);
     this.sqlSelectIssuerCert = datasource.buildSelectFirstSql(1, "CERT FROM ISSUER WHERE ID=?");
     this.sqlSelectOcsp = datasource.buildSelectFirstSql(1,
-        "IID,IDENT,THIS_UPDATE,NEXT_UPDATE,RESP FROM OCSP WHERE ID=?");
+        "IID,IDENT,GENERATED_AT,NEXT_UPDATE,RESP FROM OCSP WHERE ID=?");
     this.onService = new AtomicBoolean(false);
 
     this.idDigesters = new ConcurrentBag<>();
@@ -304,10 +311,10 @@ public class ResponseCacher implements Closeable {
         }
       }
 
-      long thisUpdate = rs.getLong("THIS_UPDATE");
+      long generatedAt = rs.getLong("GENERATED_AT");
       String b64Resp = rs.getString("RESP");
       byte[] resp = Base64.decodeFast(b64Resp);
-      ResponseCacheInfo cacheInfo = new ResponseCacheInfo(thisUpdate);
+      ResponseCacheInfo cacheInfo = new ResponseCacheInfo(generatedAt);
       if (nextUpdate != 0) {
         cacheInfo.setNextUpdate(nextUpdate);
       }
@@ -319,11 +326,11 @@ public class ResponseCacher implements Closeable {
     }
   } // method getOcspResponse
 
-  public void storeOcspResponse(int issuerId, BigInteger serialNumber, long thisUpdate,
+  public void storeOcspResponse(int issuerId, BigInteger serialNumber, long generatedAt,
       Long nextUpdate, AlgorithmCode sigAlgCode, byte[] response) {
     long nowInSec = System.currentTimeMillis() / 1000;
     if (nextUpdate == null) {
-      nextUpdate = nowInSec + SEC_PER_WEEK;
+      nextUpdate = nowInSec + SEC_DFLT_NEXT_UPDATE_DURATION;
     }
 
     if (nextUpdate - nowInSec < validity) {
@@ -347,7 +354,7 @@ public class ResponseCacher implements Closeable {
           ps.setLong(idx++, id);
           ps.setInt(idx++, issuerId);
           ps.setString(idx++, ident);
-          ps.setLong(idx++, thisUpdate);
+          ps.setLong(idx++, generatedAt);
           ps.setLong(idx++, nextUpdate);
           ps.setString(idx++, b64Response);
           ps.execute();
@@ -371,7 +378,7 @@ public class ResponseCacher implements Closeable {
         ps = datasource.prepareStatement(conn, sql);
         try {
           int idx = 1;
-          ps.setLong(idx++, thisUpdate);
+          ps.setLong(idx++, generatedAt);
           ps.setLong(idx++, nextUpdate);
           ps.setString(idx++, b64Response);
           ps.setLong(idx++, id);
@@ -392,12 +399,14 @@ public class ResponseCacher implements Closeable {
     }
   } // method storeOcspResponse
 
-  private int removeExpiredResponses(long maxThisUpdate) throws DataAccessException {
+  private int removeExpiredResponses(long maxGeneratedAt, long minNextUpdate)
+      throws DataAccessException {
     final String sql = SQL_DELETE_EXPIRED_RESP;
     PreparedStatement ps = null;
     try {
       ps = datasource.prepareStatement(sql);
-      ps.setLong(1, maxThisUpdate);
+      ps.setLong(1, maxGeneratedAt);
+      ps.setLong(2, minNextUpdate);
       return ps.executeUpdate();
     } catch (SQLException ex) {
       throw datasource.translate(sql, ex);
