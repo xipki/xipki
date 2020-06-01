@@ -466,11 +466,11 @@ class ImportCrl {
         Date now = new Date();
         if (crl.getNextUpdate() != null && crl.getNextUpdate().before(now)) {
           if (ignoreExpiredCrls) {
-            LOG.error("CRL is expired");
+            LOG.error("CRL is expired, ignore it");
             return;
           }
         } else if (crl.getThisUpdate().after(now)) {
-          LOG.error("CRL is not valid yet");
+          LOG.error("CRL is not valid yet, ignore it");
           return;
         }
 
@@ -500,7 +500,7 @@ class ImportCrl {
         }
 
         if (crl.getCrlNumber() == null) {
-          LOG.error("crlNumber is not specified");
+          LOG.error("crlNumber is not specified, ignore the CRL");
           return;
         }
 
@@ -539,7 +539,7 @@ class ImportCrl {
           if (crlNumber.compareTo(oldCrlInfo.getCrlNumber()) < 0) {
             // It is permitted if the CRL number equals to the one in Database,
             // which enables the resume of importing process if error occurred.
-            LOG.error("Given CRL is older than existing CRL.");
+            LOG.error("Given CRL is older than existing CRL, ignore it");
             return;
           }
 
@@ -560,7 +560,7 @@ class ImportCrl {
 
         // Verify the signature
         if (!crl.verifySignature(crlSignerCert.getSubjectPublicKeyInfo())) {
-          LOG.error("signature of CRL is invalid");
+          LOG.error("signature of CRL is invalid, ignore the CRL");
           return;
         }
 
