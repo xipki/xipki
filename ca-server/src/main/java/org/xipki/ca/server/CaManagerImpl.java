@@ -737,13 +737,14 @@ public class CaManagerImpl implements CaManager, Closeable {
       } else {
         ctxConf = caServerConf.getSslContextConf(name);
         if (ctxConf == null) {
-          LOG.error(concat("X509CA.<init> (ca=", caName, "): found no SslContext named " + name));
+          LOG.error(concat("getSslContextConf (ca=", caName,
+              "): found no SslContext named " + name));
           return false;
         } else {
           try {
             ctxConf.getSslContext();
           } catch (ObjectCreationException ex) {
-            LOG.error(concat("X509CA.<init> (ca=", caName,
+            LOG.error(concat("startCa (ca=", caName,
                         "): could not initialize SslContext named " + name));
             return false;
           }
@@ -765,7 +766,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     try {
       caResponder = new CmpResponder(this, caName);
     } catch (NoSuchAlgorithmException ex) {
-      LogUtil.error(LOG, ex, concat("CmpResponderImpl.<init> (ca=", caName, ")"));
+      LogUtil.error(LOG, ex, concat("CmpResponder.<init> (ca=", caName, ")"));
       return false;
     }
 
@@ -775,7 +776,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       try {
         scepResponders.put(caName, new ScepResponder(this, caEntry.getCaEntry()));
       } catch (CaMgmtException ex) {
-        LogUtil.error(LOG, ex, concat("X509CA.<init> (scep=", caName, ")"));
+        LogUtil.error(LOG, ex, concat("ScepResponder.<init> (ca=", caName, ")"));
         return false;
       }
     }
@@ -804,7 +805,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       try {
         ca.close();
       } catch (Throwable th) {
-        LogUtil.error(LOG, th, concat("could not call ca.shutdown() for CA ", caName));
+        LogUtil.error(LOG, th, concat("could not call ca.close() for CA ", caName));
       }
     }
 
@@ -1113,7 +1114,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       for (MgmtEntry.CaHasRequestor entry : caReqEntries) {
         sb.append("\n    ").append(entry);
       }
-      LOG.info("CA {} is associated with following requestors:{}", name, sb);
+      LOG.info("CA {} is associated requestors:{}", name, sb);
     }
 
     Set<Integer> profileIds = queryExecutor.createCaHasProfiles(ca.getIdent());
@@ -1122,7 +1123,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       profileNames.add(idNameMap.getCertprofileName(id));
     }
     caHasProfiles.put(name, profileNames);
-    LOG.info("CA {} is associated with following profiles: {}", name, profileNames);
+    LOG.info("CA {} is associated with profiles: {}", name, profileNames);
 
     Set<Integer> publisherIds = queryExecutor.createCaHasPublishers(ca.getIdent());
     Set<String> publisherNames = new HashSet<>();
@@ -1130,7 +1131,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       publisherNames.add(idNameMap.getPublisherName(id));
     }
     caHasPublishers.put(name, publisherNames);
-    LOG.info("CA {} is associated with following publishers: {}", name, publisherNames);
+    LOG.info("CA {} is associated with publishers: {}", name, publisherNames);
 
     return true;
   } // method createCa
