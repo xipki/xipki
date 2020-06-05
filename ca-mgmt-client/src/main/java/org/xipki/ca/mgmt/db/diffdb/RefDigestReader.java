@@ -140,15 +140,11 @@ class RefDigestReader implements Closeable {
               hash = rs.getString("HASH");
               break;
             case XIPKI_CA_v4:
+            case XIPKI_CA_v5:
               if (certhashAlgo == HashAlgo.SHA1) {
                 hash = rs.getString("SHA1");
               } else {
-                byte[] encodedCert;
-                if (dbType == DbType.XIPKI_CA_v4) {
-                  encodedCert = Base64.decodeFast(rs.getString("CERT"));
-                } else {
-                  encodedCert = rs.getBytes("CERT");
-                }
+                byte[] encodedCert = Base64.decodeFast(rs.getString("CERT"));
                 hash = certhashAlgo.base64Hash(encodedCert);
               }
               break;
@@ -227,6 +223,7 @@ class RefDigestReader implements Closeable {
             Integer.toString(caId), " AND ID>=?");
         break;
       case XIPKI_CA_v4:
+      case XIPKI_CA_v5:
         coreSql = StringUtil.concat("ID,SN,REV,RR,RT,RIT,",
             (certhashAlgo == HashAlgo.SHA1 ? "SHA1" : "CERT"),
             " FROM CERT WHERE CA_ID=", Integer.toString(caId), " AND ID>=?");
@@ -278,6 +275,7 @@ class RefDigestReader implements Closeable {
           colCaId = "IID";
           break;
         case XIPKI_CA_v4:
+        case XIPKI_CA_v5:
           tblCa = "CA";
           colCaId = "CA_ID";
           break;

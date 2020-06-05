@@ -101,6 +101,7 @@ class DigestDiff {
         this.certhashAlgo = refAlgo;
         break;
       case XIPKI_CA_v4:
+      case XIPKI_CA_v5:
         this.certhashAlgo = HashAlgo.SHA1;
         break;
       default:
@@ -135,6 +136,7 @@ class DigestDiff {
         refSql = "SELECT ID FROM ISSUER";
         break;
       case XIPKI_CA_v4:
+      case XIPKI_CA_v5:
         refSql = "SELECT ID FROM CA";
         break;
       default:
@@ -248,6 +250,7 @@ class DigestDiff {
         sql += "ISSUER";
         break;
       case XIPKI_CA_v4:
+      case XIPKI_CA_v5:
         sql += "CA";
         break;
       default:
@@ -280,6 +283,8 @@ class DigestDiff {
       if (datasource.tableExists(conn, "CA")) {
         if ("4".equals(dbSchemaVersion)) {
           return DbType.XIPKI_CA_v4;
+        } else if ("5".equals(dbSchemaVersion)) {
+          return DbType.XIPKI_CA_v5;
         } else {
           throw new IllegalArgumentException("unknown DBSCHEMA version " + dbSchemaVersion);
         }

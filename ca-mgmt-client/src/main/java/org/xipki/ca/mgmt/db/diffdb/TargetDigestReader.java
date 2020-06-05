@@ -209,6 +209,7 @@ class TargetDigestReader implements Closeable {
         arrayBuffer.append(")");
         break;
       case XIPKI_CA_v4:
+      case XIPKI_CA_v5:
         String hashOrCertColumn;
         if (certHashAlgo == HashAlgo.SHA1) {
           hashOrCertColumn = "SHA1";
@@ -383,6 +384,7 @@ class TargetDigestReader implements Closeable {
       case XIPKI_OCSP_v4:
         return rs.getString("HASH");
       case XIPKI_CA_v4:
+      case XIPKI_CA_v5:
         if (certhashAlgo == HashAlgo.SHA1) {
           return rs.getString("SHA1");
         } else {

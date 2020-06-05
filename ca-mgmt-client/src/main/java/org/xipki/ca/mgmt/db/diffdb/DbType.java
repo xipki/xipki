@@ -26,5 +26,6 @@ package org.xipki.ca.mgmt.db.diffdb;
 
 enum DbType {
   XIPKI_CA_v4,
+  XIPKI_CA_v5,
   XIPKI_OCSP_v4;
 }
