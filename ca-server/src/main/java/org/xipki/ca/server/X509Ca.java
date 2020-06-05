@@ -1849,6 +1849,23 @@ public class X509Ca implements Closeable {
       }
     }
 
+    switch (certprofile.getCertLevel()) {
+      case RootCA:
+        throw new OperationException(NOT_PERMITTED,
+            "CA is not allowed to generate Root CA certificate");
+      case SubCA:
+        Integer reqPathlen = certprofile.getPathLenBasicConstraint();
+        int caPathLen = getCaInfo().getPathLenConstraint();
+        boolean allowed = (reqPathlen == null && caPathLen == Integer.MAX_VALUE)
+                            || (reqPathlen != null && reqPathlen.intValue() < caPathLen);
+        if (!allowed) {
+          throw new OperationException(NOT_PERMITTED,
+              "invalid BasicConstraint.pathLenConstraint");
+        }
+        break;
+      default:
+    }
+
     X500Name requestedSubject = removeEmptyRdns(certTemplate.getSubject());
 
     if (!certprofile.isSerialNumberInReqPermitted()) {

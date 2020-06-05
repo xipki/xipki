@@ -150,6 +150,10 @@ public class CaInfo {
     return caEntry;
   }
 
+  public int getPathLenConstraint() {
+    return caEntry.getPathLenConstraint();
+  }
+
   public NameId getIdent() {
     return caEntry.getIdent();
   }

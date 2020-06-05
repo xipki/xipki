@@ -150,6 +150,8 @@ public abstract class MgmtEntry {
 
     private X509Cert cert;
 
+    private int pathLenConstraint;
+
     /**
      * certificate chain without the certificate specified in {@code #cert}. The first one issued
      * {@code #cert}, the second one issues the first one, and so on.
@@ -530,6 +532,10 @@ public abstract class MgmtEntry {
           throw new CaMgmtException("CA certificate does not have keyusage keyCertSign");
         }
         this.cert = cert;
+        this.pathLenConstraint = cert.getBasicConstraints();
+        if (this.pathLenConstraint < 0) {
+          throw new CaMgmtException("given certificate is not a CA certificate");
+        }
         this.subject = cert.getSubjectRfc4519Text();
         byte[] encodedCert = cert.getEncoded();
         this.hexSha1OfCert = HashAlgo.SHA1.hexHash(encodedCert);
@@ -583,6 +589,10 @@ public abstract class MgmtEntry {
 
     public String getSubject() {
       return subject;
+    }
+
+    public int getPathLenConstraint() {
+      return pathLenConstraint;
     }
 
     public String getHexSha1OfCert() {
