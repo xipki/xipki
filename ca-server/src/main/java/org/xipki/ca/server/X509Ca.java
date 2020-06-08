@@ -36,6 +36,7 @@ import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
@@ -1787,6 +1788,11 @@ public class X509Ca implements Closeable {
       }
 
       X509Cert cert = new X509Cert(bcCert, encodedCert);
+      if (!verifySignature(cert)) {
+        throw new OperationException(SYSTEM_FAILURE,
+            "could not verify the signature of generated certificate");
+      }
+
       CertWithDbId certWithMeta = new CertWithDbId(cert);
       ret = new CertificateInfo(certWithMeta, gct.privateKey, caIdent, caCert,
               gct.certprofile.getIdent(), requestor.getIdent());
@@ -2447,6 +2453,18 @@ public class X509Ca implements Closeable {
     event.addEventData(CaAuditConstants.NAME_mid, msgId);
     return event;
   }
+  
+  private boolean verifySignature(X509Cert cert) {
+    Args.notNull(cert, "cert");
+    PublicKey caPublicKey = caCert.getPublicKey();
+    try {
+      cert.verify(caPublicKey);
+      return true;
+    } catch (Exception ex) {
+      LOG.debug("{} while verifying signature: {}", ex.getClass().getName(), ex.getMessage());
+      return false;
+    }
+  } // method verifySignature
 
   private SignerEntryWrapper getCrlSigner() {
     if (caInfo.getCrlControl() == null) {
