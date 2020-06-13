@@ -548,6 +548,10 @@ class IdentifiedCertprofile implements Closeable {
             extControl.isRequest());
       }
 
+      if (!extControl.isCritical() && usages.contains(ObjectIdentifiers.XKU.id_kp_timeStamping)) {
+        extControl = new ExtensionControl(true, extControl.isRequired(), extControl.isRequest());
+      }
+
       ExtendedKeyUsage value = X509Util.createExtendedUsage(usages);
       addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
     }
