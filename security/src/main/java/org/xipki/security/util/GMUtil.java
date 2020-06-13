@@ -85,6 +85,10 @@ public class GMUtil {
 
   private static void addUserId(Digest digest, byte[] userId) {
     int len = userId.length * 8;
+    if (len > 0xFFFF) {
+      throw new IllegalArgumentException("userId too long");
+    }
+
     digest.update((byte)(len >> 8 & 0xFF));
     digest.update((byte)(len & 0xFF));
     digest.update(userId, 0, userId.length);
