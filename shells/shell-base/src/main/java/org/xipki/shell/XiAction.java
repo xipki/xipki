@@ -111,7 +111,7 @@ public abstract class XiAction implements Action {
           String answer;
           if (bo) {
             answer = readPrompt("A file named '" + saveTo.getPath()
-              + "' already exists. Do you want to replace it [yes/no]? ");
+              + "' already exists. Do you want to replace it [Yes/No]? ");
           } else {
             answer = session.readLine(null, null);
           }
@@ -120,9 +120,9 @@ public abstract class XiAction implements Action {
             throw new IOException("interrupted");
           }
 
-          if ("yes".equalsIgnoreCase(answer)) {
+          if ("yes".equalsIgnoreCase(answer) || "y".equalsIgnoreCase(answer)) {
             break;
-          } else if ("no".equalsIgnoreCase(answer)) {
+          } else if ("no".equalsIgnoreCase(answer) || "n".equalsIgnoreCase(answer)) {
             String newFn;
             while (true) {
               newFn = readPrompt("Enter new path to save to ... ");
@@ -133,7 +133,7 @@ public abstract class XiAction implements Action {
 
             saveTo = new File(newFn);
           } else {
-            readPrompt("Please answer with yes or no. ");
+            readPrompt("Please answer with Yes or No. ");
             bo = false;
           }
         } // end while
@@ -367,7 +367,7 @@ public abstract class XiAction implements Action {
       } else {
         tries++;
       }
-      answer = readLine("Please answer with yes or no: ", null);
+      answer = readLine("Please answer with Yes or No: ", null);
     }
 
     return false;
