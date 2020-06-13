@@ -226,7 +226,7 @@ public class RestResponder {
 
         // skip also the first char ('/')
         String caAlias = coreUri.substring(1, sepIndex).toLowerCase();
-        command = coreUri.substring(sepIndex + 1);
+        command = coreUri.substring(sepIndex + 1).toLowerCase();
 
         caName = responderManager.getCaNameForAlias(caAlias);
         if (caName == null) {
@@ -237,6 +237,12 @@ public class RestResponder {
         if (caResponder != null) {
           ca = caResponder.getCa();
         }
+      }
+
+      if (StringUtil.isBlank(command)) {
+        String message = "command is not specified";
+        LOG.warn(message);
+        throw new HttpRespAuditException(NOT_FOUND, message, INFO, FAILED);
       }
 
       if (caName == null || ca == null || !ca.getCaInfo().supportsRest()
@@ -308,10 +314,10 @@ public class RestResponder {
       String respCt = null;
       byte[] respBytes = null;
 
-      if (RestAPIConstants.CMD_cacert.equalsIgnoreCase(command)) {
+      if (RestAPIConstants.CMD_cacert.equals(command)) {
         respCt = RestAPIConstants.CT_pkix_cert;
         respBytes = ca.getCaInfo().getCert().getEncoded();
-      } else if (RestAPIConstants.CMD_dhpoc_certs.equalsIgnoreCase(command)) {
+      } else if (RestAPIConstants.CMD_dhpoc_certs.equals(command)) {
         DhpocControl control = responderManager.getX509Ca(caName).getCaInfo().getDhpocControl();
         if (control == null) {
           respBytes = new byte[0];
@@ -320,7 +326,7 @@ public class RestResponder {
           respBytes = StringUtil.toUtf8Bytes(
                         X509Util.encodeCertificates(control.getCertificates()));
         }
-      } else if (RestAPIConstants.CMD_cacertchain.equalsIgnoreCase(command)) {
+      } else if (RestAPIConstants.CMD_cacertchain.equals(command)) {
         respCt = RestAPIConstants.CT_pem_file;
         List<X509Cert> certchain = ca.getCaInfo().getCertchain();
         int size = 1 + (certchain == null ? 0 : certchain.size());
@@ -333,8 +339,8 @@ public class RestResponder {
         }
 
         respBytes = StringUtil.toUtf8Bytes(X509Util.encodeCertificates(certchainWithCaCert));
-      } else if (RestAPIConstants.CMD_enroll_cert.equalsIgnoreCase(command)
-          || RestAPIConstants.CMD_enroll_cert_cagenkeypair.equalsIgnoreCase(command)) {
+      } else if (RestAPIConstants.CMD_enroll_cert.equals(command)
+          || RestAPIConstants.CMD_enroll_cert_cagenkeypair.equals(command)) {
         String profile = httpRetriever.getParameter(RestAPIConstants.PARAM_profile);
         if (StringUtil.isBlank(profile)) {
           throw new HttpRespAuditException(BAD_REQUEST,
@@ -362,7 +368,7 @@ public class RestResponder {
         Date notAfter = (strNotAfter == null) ? null
             : DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotAfter);
 
-        if (RestAPIConstants.CMD_enroll_cert_cagenkeypair.equalsIgnoreCase(command)) {
+        if (RestAPIConstants.CMD_enroll_cert_cagenkeypair.equals(command)) {
           String ct = httpRetriever.getHeader("Content-Type");
 
           X500Name subject;
@@ -452,10 +458,10 @@ public class RestResponder {
           respCt = RestAPIConstants.CT_pkix_cert;
           respBytes = cert.getCert().getEncoded();
         }
-      } else if (RestAPIConstants.CMD_revoke_cert.equalsIgnoreCase(command)
-          || RestAPIConstants.CMD_delete_cert.equalsIgnoreCase(command)) {
+      } else if (RestAPIConstants.CMD_revoke_cert.equals(command)
+          || RestAPIConstants.CMD_delete_cert.equals(command)) {
         int permission;
-        if (RestAPIConstants.CMD_revoke_cert.equalsIgnoreCase(command)) {
+        if (RestAPIConstants.CMD_revoke_cert.equals(command)) {
           permission = PermissionConstants.REVOKE_CERT;
         } else {
           permission = PermissionConstants.REMOVE_CERT;
@@ -488,7 +494,7 @@ public class RestResponder {
 
         BigInteger serialNumber = toBigInt(strSerialNumber);
 
-        if (RestAPIConstants.CMD_revoke_cert.equalsIgnoreCase(command)) {
+        if (RestAPIConstants.CMD_revoke_cert.equals(command)) {
           String strReason = httpRetriever.getParameter(RestAPIConstants.PARAM_reason);
           CrlReason reason = (strReason == null) ? CrlReason.UNSPECIFIED
               : CrlReason.forNameOrText(strReason);
@@ -505,10 +511,10 @@ public class RestResponder {
 
             ca.revokeCert(serialNumber, reason, invalidityTime, msgId);
           }
-        } else if (RestAPIConstants.CMD_delete_cert.equalsIgnoreCase(command)) {
+        } else if (RestAPIConstants.CMD_delete_cert.equals(command)) {
           ca.removeCert(serialNumber, msgId);
         }
-      } else if (RestAPIConstants.CMD_crl.equalsIgnoreCase(command)) {
+      } else if (RestAPIConstants.CMD_crl.equals(command)) {
         try {
           requestor.assertPermitted(PermissionConstants.GET_CRL);
         } catch (InsuffientPermissionException ex) {
@@ -536,7 +542,7 @@ public class RestResponder {
 
         respCt = RestAPIConstants.CT_pkix_crl;
         respBytes = crl.getEncoded();
-      } else if (RestAPIConstants.CMD_new_crl.equalsIgnoreCase(command)) {
+      } else if (RestAPIConstants.CMD_new_crl.equals(command)) {
         try {
           requestor.assertPermitted(PermissionConstants.GEN_CRL);
         } catch (InsuffientPermissionException ex) {

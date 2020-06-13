@@ -137,19 +137,20 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
 
     private static int getKeysize(String hmacAlgorithm) {
       int keysize;
-      if ("HMACSHA1".equalsIgnoreCase(hmacAlgorithm)) {
+      hmacAlgorithm = hmacAlgorithm.toUpperCase();
+      if ("HMACSHA1".equals(hmacAlgorithm)) {
         keysize = 160;
-      } else if ("HMACSHA224".equalsIgnoreCase(hmacAlgorithm)
-          || "HMACSHA3-224".equalsIgnoreCase(hmacAlgorithm)) {
+      } else if ("HMACSHA224".equals(hmacAlgorithm)
+          || "HMACSHA3-224".equals(hmacAlgorithm)) {
         keysize = 224;
-      } else if ("HMACSHA256".equalsIgnoreCase(hmacAlgorithm)
-          || "HMACSHA3-256".equalsIgnoreCase(hmacAlgorithm)) {
+      } else if ("HMACSHA256".equals(hmacAlgorithm)
+          || "HMACSHA3-256".equals(hmacAlgorithm)) {
         keysize = 256;
-      } else if ("HMACSHA384".equalsIgnoreCase(hmacAlgorithm)
-          || "HMACSHA3-384".equalsIgnoreCase(hmacAlgorithm)) {
+      } else if ("HMACSHA384".equals(hmacAlgorithm)
+          || "HMACSHA3-384".equals(hmacAlgorithm)) {
         keysize = 384;
-      } else if ("HMACSHA512".equalsIgnoreCase(hmacAlgorithm)
-          || "HMACSHA3-512".equalsIgnoreCase(hmacAlgorithm)) {
+      } else if ("HMACSHA512".equals(hmacAlgorithm)
+          || "HMACSHA3-512".equals(hmacAlgorithm)) {
         keysize = 512;
       } else {
         throw new IllegalArgumentException("unknown HMAC algorithm " + hmacAlgorithm);

@@ -34,9 +34,9 @@ import org.xipki.util.CollectionUtil;
 
 public interface RequestorInfo {
 
-  static final String NAME_BY_USER = "BY-USER";
+  static final String NAME_BY_USER = "by-user";
 
-  static final String NAME_BY_CA = "BY-CA";
+  static final String NAME_BY_CA = "by-ca";
 
   /**
    * CA system as the requestor.

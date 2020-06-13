@@ -1164,18 +1164,18 @@ public class OcspServerImpl implements OcspServer {
     try {
       String type = conf.getSource().getType();
       if (type != null) {
-        type = type.trim();
+        type = type.trim().toLowerCase();
       }
 
       if (StringUtil.isBlank(type)) {
         throw new ObjectCreationException("OCSP store type is not specified");
-      } else if (STORE_TYPE_XIPKI_DB.equalsIgnoreCase(type)) {
+      } else if (STORE_TYPE_XIPKI_DB.equals(type)) {
         store = new DbCertStatusStore();
-      } else if (STORE_TYPE_CRL.equalsIgnoreCase(type)) {
+      } else if (STORE_TYPE_CRL.equals(type)) {
         store = new CrlDbCertStatusStore();
-      } else if (STORE_TYPE_XIPKI_CA_DB.equalsIgnoreCase(type)) {
+      } else if (STORE_TYPE_XIPKI_CA_DB.equals(type)) {
         store = new CaDbCertStatusStore();
-      } else if (STORE_TYPE_EJBCA_DB.equalsIgnoreCase(type)) {
+      } else if (STORE_TYPE_EJBCA_DB.equals(type)) {
         store = new EjbcaCertStatusStore();
       } else if (type.startsWith("java:")) {
         String className = type.substring("java:".length()).trim();

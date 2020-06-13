@@ -100,23 +100,23 @@ public interface SinglePasswordResolver {
 
       int delimIndex = masterPasswordCallback.indexOf(' ');
       if (delimIndex == -1) {
-        type = masterPasswordCallback;
+        type = masterPasswordCallback.toUpperCase();
       } else {
-        type = masterPasswordCallback.substring(0, delimIndex);
+        type = masterPasswordCallback.substring(0, delimIndex).toUpperCase();
         conf = masterPasswordCallback.substring(delimIndex + 1);
       }
 
       PasswordCallback pwdCallback;
-      if ("FILE".equalsIgnoreCase(type)) {
+      if ("FILE".equals(type)) {
         pwdCallback = new PasswordCallback.File();
-      } else if ("GUI".equalsIgnoreCase(type)) {
+      } else if ("GUI".equals(type)) {
         pwdCallback = new PasswordCallback.Gui();
-      } else if ("PBE-GUI".equalsIgnoreCase(type)) {
+      } else if ("PBE-GUI".equals(type)) {
         pwdCallback = new PasswordCallback.PBEGui();
-      } else if ("OBF".equalsIgnoreCase(type)) {
+      } else if ("OBF".equals(type)) {
         pwdCallback = new PasswordCallback.OBF();
         if (conf != null && !StringUtil.startsWithIgnoreCase(conf, "OBF:")) {
-          conf = "OBF:" + conf;
+          conf = StringUtil.concat("OBF:", conf);
         }
       } else {
         throw new IllegalStateException("unknown PasswordCallback type '" + type + "'");

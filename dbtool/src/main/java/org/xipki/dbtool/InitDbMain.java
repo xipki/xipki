@@ -158,8 +158,8 @@ public class InitDbMain {
   } // method printDatabaseInfo
 
   private static boolean confirm(String command) throws IOException {
-    String text = read("\nDo you wish to " + command + " the database", Arrays.asList("yes", "no"));
-    return "yes".equalsIgnoreCase(text);
+    String text = read("\nDo you wish to " + command + " the database", Arrays.asList("Yes", "No"));
+    return "yes".equalsIgnoreCase(text) || "y".equalsIgnoreCase(text);
   }
 
   private static String read(String prompt, List<String> validValues) throws IOException {

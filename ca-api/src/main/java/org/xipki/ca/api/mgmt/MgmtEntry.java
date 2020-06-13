@@ -792,13 +792,13 @@ public abstract class MgmtEntry {
       this.ident = Args.notNull(ident, "ident");
       this.type = Args.toNonBlankLower(type, "type");
       this.conf = conf;
-      if ("all".equalsIgnoreCase(ident.getName()) || "null".equalsIgnoreCase(ident.getName())) {
+      if ("all".equals(ident.getName()) || "null".equals(ident.getName())) {
         throw new IllegalArgumentException("certificate profile name may not be 'all' and 'null'");
       }
     }
 
     public void setIdent(NameId ident) {
-      if ("all".equalsIgnoreCase(ident.getName()) || "null".equalsIgnoreCase(ident.getName())) {
+      if ("all".equals(ident.getName()) || "null".equals(ident.getName())) {
         throw new IllegalArgumentException("certificate profile name may not be 'all' and 'null'");
       }
       this.ident = Args.notNull(ident, "ident");
@@ -1330,8 +1330,8 @@ public abstract class MgmtEntry {
     public Requestor(NameId ident, String type, String conf) {
       this.ident = Args.notNull(ident, "ident");
       String name = ident.getName();
-      if (RequestorInfo.NAME_BY_USER.equalsIgnoreCase(name)
-          || RequestorInfo.NAME_BY_CA.equalsIgnoreCase(name)) {
+      if (RequestorInfo.NAME_BY_USER.equals(name)
+          || RequestorInfo.NAME_BY_CA.equals(name)) {
         throw new IllegalArgumentException("Requestor name could not be " + name);
       }
 
@@ -1342,8 +1342,8 @@ public abstract class MgmtEntry {
     public void setIdent(NameId ident) {
       this.ident = Args.notNull(ident, "ident");
       String name = ident.getName();
-      if (RequestorInfo.NAME_BY_USER.equalsIgnoreCase(name)
-          || RequestorInfo.NAME_BY_CA.equalsIgnoreCase(name)) {
+      if (RequestorInfo.NAME_BY_USER.equals(name)
+          || RequestorInfo.NAME_BY_CA.equals(name)) {
         throw new IllegalArgumentException("Requestor name could not be " + name);
       }
     }

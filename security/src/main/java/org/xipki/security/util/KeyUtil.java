@@ -233,14 +233,14 @@ public class KeyUtil {
         PrivateKeyInfo edPki;
         if (xdhAlgo.equalsIgnoreCase(EdECConstants.X25519)) {
           edPki = new PrivateKeyInfo(
-              new AlgorithmIdentifier(EdECConstants.id_Ed25519), xdhPki.parsePrivateKey());
+              new AlgorithmIdentifier(EdECConstants.id_ED25519), xdhPki.parsePrivateKey());
         } else if (xdhAlgo.equalsIgnoreCase(EdECConstants.X448)) {
           byte[] x448Octets = ASN1OctetString.getInstance(xdhPki.parsePrivateKey()).getOctets();
           byte[] ed448Octets = new byte[57];
           System.arraycopy(x448Octets, 0, ed448Octets, 0, 56);
 
           edPki = new PrivateKeyInfo(
-              new AlgorithmIdentifier(EdECConstants.id_Ed448),
+              new AlgorithmIdentifier(EdECConstants.id_ED448),
               new DEROctetString(ed448Octets));
         } else {
           throw new IllegalArgumentException("unknown key algorithm " + xdhAlgo);
@@ -380,14 +380,14 @@ public class KeyUtil {
       return DSAUtil.generatePublicKeyParameter(key);
     } else if (key instanceof XDHKey || key instanceof EdDSAKey) {
       byte[] encoded = key.getEncoded();
-      String algorithm = key.getAlgorithm();
-      if (EdECConstants.X25519.equalsIgnoreCase(algorithm)) {
+      String algorithm = key.getAlgorithm().toUpperCase();
+      if (EdECConstants.X25519.equals(algorithm)) {
         return new X25519PublicKeyParameters(encoded, encoded.length - 32);
-      } else if (EdECConstants.Ed25519.equalsIgnoreCase(algorithm)) {
+      } else if (EdECConstants.ED25519.equals(algorithm)) {
         return new Ed25519PublicKeyParameters(encoded, encoded.length - 32);
-      } else if (EdECConstants.X448.equalsIgnoreCase(algorithm)) {
+      } else if (EdECConstants.X448.equals(algorithm)) {
         return new X448PublicKeyParameters(encoded, encoded.length - 56);
-      } else if (EdECConstants.Ed448.equalsIgnoreCase(algorithm)) {
+      } else if (EdECConstants.ED448.equals(algorithm)) {
         return new Ed448PublicKeyParameters(encoded, encoded.length - 57);
       } else {
         throw new InvalidKeyException("unknown Edwards key " + algorithm);
@@ -458,25 +458,25 @@ public class KeyUtil {
           curveOid);
       return new SubjectPublicKeyInfo(algId, pubKey);
     } else if (publicKey instanceof XDHKey || publicKey instanceof EdDSAKey) {
-      String algorithm = publicKey.getAlgorithm();
+      String algorithm = publicKey.getAlgorithm().toUpperCase();
       byte[] encoded = publicKey.getEncoded();
 
       int keysize;
       byte[] prefix;
       ASN1ObjectIdentifier algOid;
-      if (EdECConstants.Ed25519.equalsIgnoreCase(algorithm)) {
-        algOid = EdECConstants.id_Ed25519;
+      if (EdECConstants.ED25519.equals(algorithm)) {
+        algOid = EdECConstants.id_ED25519;
         keysize = 32;
         prefix = Ed25519Prefix;
-      } else if (EdECConstants.X25519.equalsIgnoreCase(algorithm)) {
+      } else if (EdECConstants.X25519.equals(algorithm)) {
         algOid = EdECConstants.id_X25519;
         keysize = 32;
         prefix = x25519Prefix;
-      } else if (EdECConstants.Ed448.equalsIgnoreCase(algorithm)) {
-        algOid = EdECConstants.id_Ed448;
+      } else if (EdECConstants.ED448.equals(algorithm)) {
+        algOid = EdECConstants.id_ED448;
         keysize = 57;
         prefix = Ed448Prefix;
-      } else if (EdECConstants.X448.equalsIgnoreCase(algorithm)) {
+      } else if (EdECConstants.X448.equals(algorithm)) {
         algOid = EdECConstants.id_X448;
         keysize = 56;
         prefix = x448Prefix;

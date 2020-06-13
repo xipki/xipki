@@ -931,8 +931,8 @@ class IdentifiedCertprofile implements Closeable {
 
     // Edwards or Montgomery Curves (RFC8410)
     Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = certprofile.getKeyAlgorithms();
-    boolean withEdwardsCurves = keyAlgorithms.containsKey(EdECConstants.id_Ed25519)
-        || keyAlgorithms.containsKey(EdECConstants.id_Ed448);
+    boolean withEdwardsCurves = keyAlgorithms.containsKey(EdECConstants.id_ED25519)
+        || keyAlgorithms.containsKey(EdECConstants.id_ED448);
     boolean withMontgomeryCurves = keyAlgorithms.containsKey(EdECConstants.id_X25519)
         || keyAlgorithms.containsKey(EdECConstants.id_X448);
 

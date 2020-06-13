@@ -71,7 +71,7 @@ public class Actions {
 
   public abstract static class LiquibaseAction extends XiAction {
 
-    private static final List<String> YES_NO = Arrays.asList("yes", "no");
+    private static final List<String> YES_NO = Arrays.asList("Yes", "No");
 
     @Reference
     private PasswordResolver passwordResolver;
@@ -112,7 +112,7 @@ public class Actions {
 
     protected boolean confirm(String command) throws IOException {
       String text = read("\nDo you wish to " + command + " the database", YES_NO);
-      return "yes".equalsIgnoreCase(text);
+      return "yes".equalsIgnoreCase(text) || "y".equalsIgnoreCase(text);
     }
 
     private String read(String prompt, List<String> validValues) throws IOException {

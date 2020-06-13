@@ -454,8 +454,8 @@ public class X509Ca implements Closeable {
       BigInteger g = ASN1Integer.getInstance(seq.getObjectAt(2)).getValue();
       this.keypairGenControlByImplictCA = new KeypairGenControl.DSAKeypairGenControl(
           p, q, g, caSpkiAlgId);
-    } else if (caSpkiAlgId.equals(EdECConstants.id_Ed25519)
-        || caSpkiAlgId.equals(EdECConstants.id_Ed448)) {
+    } else if (caSpkiAlgId.equals(EdECConstants.id_ED25519)
+        || caSpkiAlgId.equals(EdECConstants.id_ED448)) {
       this.keypairGenControlByImplictCA = new KeypairGenControl.EDDSAKeypairGenControl(caSpkiAlgId);
     } else {
       this.keypairGenControlByImplictCA = null;
@@ -2453,7 +2453,7 @@ public class X509Ca implements Closeable {
     event.addEventData(CaAuditConstants.NAME_mid, msgId);
     return event;
   }
-  
+
   private boolean verifySignature(X509Cert cert) {
     Args.notNull(cert, "cert");
     PublicKey caPublicKey = caCert.getPublicKey();

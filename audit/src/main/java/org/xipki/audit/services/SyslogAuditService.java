@@ -135,14 +135,14 @@ public class SyslogAuditService implements AuditService {
     // port
     int port = getInt(props, "port", DFLT_SYSLOG_PORT);
     // protocol
-    String protocol = getString(props, "protocol", DFLT_SYSLOG_PROTOCOL);
+    String protocol = getString(props, "protocol", DFLT_SYSLOG_PROTOCOL).toLowerCase();
     // messageFormat
-    this.messageFormat = getString(props, "messageFormat", DFLT_MESSAGE_FORMAT);
+    this.messageFormat = getString(props, "messageFormat", DFLT_MESSAGE_FORMAT).toLowerCase();
     MessageFormat msgFormat;
-    if ("rfc3164".equalsIgnoreCase(messageFormat) || "rfc_3164".equalsIgnoreCase(messageFormat)) {
+    if ("rfc3164".equals(messageFormat) || "rfc_3164".equals(messageFormat)) {
       msgFormat = MessageFormat.RFC_3164;
-    } else if ("rfc5424".equalsIgnoreCase(messageFormat)
-        || "rfc_5424".equalsIgnoreCase(messageFormat)) {
+    } else if ("rfc5424".equals(messageFormat)
+        || "rfc_5424".equals(messageFormat)) {
       msgFormat = MessageFormat.RFC_5424;
     } else {
       LOG.warn("invalid message format '{}', use the default one '{}'", messageFormat,
@@ -150,7 +150,7 @@ public class SyslogAuditService implements AuditService {
       msgFormat = MessageFormat.RFC_5424;
     }
 
-    if ("tcp".equalsIgnoreCase(protocol)) {
+    if ("tcp".equals(protocol)) {
       TcpSyslogMessageSender lcSyslog = new TcpSyslogMessageSender();
       syslog = lcSyslog;
       lcSyslog.setSyslogServerHostname(host);
@@ -199,7 +199,7 @@ public class SyslogAuditService implements AuditService {
         }
       }
     } else {
-      if (!"udp".equalsIgnoreCase(protocol)) {
+      if (!"udp".equals(protocol)) {
         LOG.warn("unknown protocol '{}', use the default one 'udp'", protocol);
       }
 

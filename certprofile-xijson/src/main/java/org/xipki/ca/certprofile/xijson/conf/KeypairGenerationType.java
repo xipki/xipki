@@ -161,22 +161,22 @@ public class KeypairGenerationType extends ValidatableConf {
         }
         break;
       case ed25519:
-        if (!EdECConstants.id_Ed25519.getId().equalsIgnoreCase(algorithm.getOid())) {
+        if (!EdECConstants.id_ED25519.getId().equals(algorithm.getOid())) {
           throw new InvalidConfException("keyType and algorithm not match");
         }
         break;
       case ed448:
-        if (!EdECConstants.id_Ed448.getId().equalsIgnoreCase(algorithm.getOid())) {
+        if (!EdECConstants.id_ED448.getId().equals(algorithm.getOid())) {
           throw new InvalidConfException("keyType and algorithm not match");
         }
         break;
       case x25519:
-        if (!EdECConstants.id_X25519.getId().equalsIgnoreCase(algorithm.getOid())) {
+        if (!EdECConstants.id_X25519.getId().equals(algorithm.getOid())) {
           throw new InvalidConfException("keyType and algorithm not match");
         }
         break;
       case x448:
-        if (!EdECConstants.id_X448.getId().equalsIgnoreCase(algorithm.getOid())) {
+        if (!EdECConstants.id_X448.getId().equals(algorithm.getOid())) {
           throw new InvalidConfException("keyType and algorithm not match");
         }
         break;
