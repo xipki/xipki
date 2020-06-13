@@ -2729,7 +2729,7 @@ public class ProfileConfCreatorDemo {
     ASN1ObjectIdentifier algorithm;
     if (edwards) {
       keyType = curve25519 ? KeyType.ed25519 : KeyType.ed448;
-      algorithm = curve25519 ? EdECConstants.id_Ed25519 : EdECConstants.id_Ed448;
+      algorithm = curve25519 ? EdECConstants.id_ED25519 : EdECConstants.id_ED448;
     } else {
       keyType = curve25519 ? KeyType.x25519 : KeyType.x448;
       algorithm = curve25519 ? EdECConstants.id_X25519 : EdECConstants.id_X448;
@@ -2878,11 +2878,11 @@ public class ProfileConfCreatorDemo {
     List<ASN1ObjectIdentifier> oids = new LinkedList<>();
     if (edwards) {
       if (curve25519) {
-        oids.add(EdECConstants.id_Ed25519);
+        oids.add(EdECConstants.id_ED25519);
       }
 
       if (curve448) {
-        oids.add(EdECConstants.id_Ed448);
+        oids.add(EdECConstants.id_ED448);
       }
     } else {
       if (curve25519) {

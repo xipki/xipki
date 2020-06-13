@@ -317,7 +317,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       super(cryptService, identityId, signatureAlgId);
 
       ASN1ObjectIdentifier algOid = signatureAlgId.getAlgorithm();
-      if (!EdECConstants.id_Ed25519.equals(algOid)) {
+      if (!EdECConstants.id_ED25519.equals(algOid)) {
         throw new XiSecurityException("unsupproted signature algorithm " + algOid.getId());
       }
 

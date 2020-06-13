@@ -207,8 +207,8 @@ public class AlgorithmUtil {
       map.put(GMObjectIdentifiers.sm2sign_with_sm3, AlgorithmCode.SM2WITHSM3);
 
       // EDDSA
-      map.put(EdECConstants.id_Ed25519, AlgorithmCode.ED25519);
-      map.put(EdECConstants.id_Ed448, AlgorithmCode.ED448);
+      map.put(EdECConstants.id_ED25519, AlgorithmCode.ED25519);
+      map.put(EdECConstants.id_ED448, AlgorithmCode.ED448);
 
       // Hash
       for (HashAlgo hashAlgo : HashAlgo.values()) {
@@ -430,8 +430,8 @@ public class AlgorithmUtil {
       addOidNameMap(m1, m2, NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512,
           "SHA3-512WITHRSA", "RSAWITHSHA3-512");
       addOidNameMap(m1, m2, GMObjectIdentifiers.sm2sign_with_sm3, "SM3WITHSM2", "SM2WITHSM3");
-      addOidNameMap(m1, m2, EdECConstants.id_Ed25519, EdECConstants.Ed25519);
-      addOidNameMap(m1, m2, EdECConstants.id_Ed448, EdECConstants.Ed448);
+      addOidNameMap(m1, m2, EdECConstants.id_ED25519, EdECConstants.ED25519);
+      addOidNameMap(m1, m2, EdECConstants.id_ED448, EdECConstants.ED448);
 
       // DH-Poc
       addOidNameMap(m1, m2, Xipki.id_alg_dhPop_x25519_sha256, "DHPOP-X25519-SHA256");
@@ -610,11 +610,11 @@ public class AlgorithmUtil {
       } else if (pubKey instanceof DSAPublicKey) {
         return getDSASigAlgId(hashAlgo);
       } else if (pubKey instanceof EdDSAKey) {
-        String keyAlgo = pubKey.getAlgorithm();
-        if (keyAlgo.equalsIgnoreCase(EdECConstants.Ed25519)) {
-          return new AlgorithmIdentifier(EdECConstants.id_Ed25519);
-        } else if (keyAlgo.equalsIgnoreCase(EdECConstants.Ed448)) {
-          return new AlgorithmIdentifier(EdECConstants.id_Ed448);
+        String keyAlgo = pubKey.getAlgorithm().toUpperCase();
+        if (keyAlgo.equals(EdECConstants.ED25519)) {
+          return new AlgorithmIdentifier(EdECConstants.id_ED25519);
+        } else if (keyAlgo.equals(EdECConstants.ED448)) {
+          return new AlgorithmIdentifier(EdECConstants.id_ED448);
         } else {
           throw new NoSuchAlgorithmException("Unknown Edwards public key " + keyAlgo);
         }

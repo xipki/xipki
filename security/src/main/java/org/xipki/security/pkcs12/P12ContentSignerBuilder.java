@@ -216,8 +216,8 @@ public class P12ContentSignerBuilder {
       provName = "SUN";
     } else {
       ASN1ObjectIdentifier oid = signatureAlgId.getAlgorithm();
-      if (EdECConstants.id_Ed25519.equals(oid)
-          || EdECConstants.id_Ed448.equals(oid)) {
+      if (EdECConstants.id_ED25519.equals(oid)
+          || EdECConstants.id_ED448.equals(oid)) {
         provName = "BC";
       }
     }

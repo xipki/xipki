@@ -69,9 +69,9 @@ class IaikP11Identity extends P11Identity {
       expectedSignatureLen = (keyBitLen + 7) / 8 * 2;
     } else if (publicKey instanceof EdDSAKey) {
       String algName = publicKey.getAlgorithm();
-      if (EdECConstants.Ed25519.equalsIgnoreCase(algName)) {
+      if (EdECConstants.ED25519.equalsIgnoreCase(algName)) {
         expectedSignatureLen = 64;
-      } else if (EdECConstants.Ed25519.equalsIgnoreCase(algName)) {
+      } else if (EdECConstants.ED25519.equalsIgnoreCase(algName)) {
         expectedSignatureLen = 114;
       } else {
         throw new IllegalArgumentException("unknown EdDSA algorithm " + algName);

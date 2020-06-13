@@ -468,9 +468,9 @@ class EmulatorP11Slot extends P11Slot {
         throw new P11TokenException(ex.getMessage(), ex);
       }
     } else if (EdECConstants.id_X25519.getId().equals(algorithm)
-        || EdECConstants.id_Ed25519.getId().equals(algorithm)
+        || EdECConstants.id_ED25519.getId().equals(algorithm)
         || EdECConstants.id_X448.getId().equals(algorithm)
-        || EdECConstants.id_Ed448.getId().equals(algorithm)) {
+        || EdECConstants.id_ED448.getId().equals(algorithm)) {
       byte[] encodedPoint = decodeHex(props.getProperty(PROP_EC_EC_POINT));
       SubjectPublicKeyInfo pkInfo = new SubjectPublicKeyInfo(
           new AlgorithmIdentifier(new ASN1ObjectIdentifier(algorithm)), encodedPoint);
