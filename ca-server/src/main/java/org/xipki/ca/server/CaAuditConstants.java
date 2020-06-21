@@ -92,6 +92,8 @@ public class CaAuditConstants {
 
   public static final String NAME_crl_number = "crl_number";
 
+  public static final String NAME_basecrl_number = "basecrl_number";
+
   public static final String NAME_crl_type = "crl_type";
 
   public static final String NAME_expired_at = "expired_at";

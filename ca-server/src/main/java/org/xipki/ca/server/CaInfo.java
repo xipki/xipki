@@ -337,6 +337,11 @@ public class CaInfo {
     return BigInteger.valueOf(crlNo);
   }
 
+  public BigInteger getMaxFullCrlNumber() throws OperationException {
+    long crlNumber = certStore.getMaxCrlNumber(caEntry.getIdent());
+    return crlNumber == 0 ? null : BigInteger.valueOf(crlNumber);
+  }
+
   public ConcurrentContentSigner getSigner(List<String> algoNames) {
     if (CollectionUtil.isEmpty(algoNames)) {
       return dfltSigner;

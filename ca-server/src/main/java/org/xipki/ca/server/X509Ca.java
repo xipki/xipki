@@ -747,8 +747,18 @@ public class X509Ca implements Closeable {
       throw new OperationException(NOT_PERMITTED, "CRL generation is not allowed");
     }
 
-    LOG.info("     START generateCrl: ca={}, deltaCRL={}, nextUpdate={}", caIdent.getName(),
-        deltaCrl, nextUpdate);
+    BigInteger baseCrlNumber = null;
+    if (deltaCrl) {
+      baseCrlNumber = caInfo.getMaxFullCrlNumber();
+      if (baseCrlNumber == null) {
+        throw new OperationException(SYSTEM_FAILURE,
+            "Should not happen. No FullCRL is available while generating DeltaCRL");
+      }
+    }
+
+    LOG.info("     START generateCrl: ca={}, deltaCRL={}, nextUpdate={}, baseCRLNumber={}",
+        caIdent.getName(), deltaCrl, nextUpdate,
+        deltaCrl ? baseCrlNumber.toString() : "-");
     event.addEventData(CaAuditConstants.NAME_crl_type, (deltaCrl ? "DELTA_CRL" : "FULL_CRL"));
 
     if (nextUpdate == null) {
@@ -877,6 +887,9 @@ public class X509Ca implements Closeable {
 
       BigInteger crlNumber = caInfo.nextCrlNumber();
       event.addEventData(CaAuditConstants.NAME_crl_number, crlNumber);
+      if (baseCrlNumber != null) {
+        event.addEventData(CaAuditConstants.NAME_basecrl_number, baseCrlNumber);
+      }
 
       boolean onlyUserCerts = crlControl.isOnlyContainsUserCerts();
       boolean onlyCaCerts = crlControl.isOnlyContainsCaCerts();
@@ -907,6 +920,12 @@ public class X509Ca implements Closeable {
               false); // onlyContainsAttributeCerts
 
           crlBuilder.addExtension(Extension.issuingDistributionPoint, true, idp);
+        }
+
+        // Delta CRL Indicator
+        if (deltaCrl) {
+          crlBuilder.addExtension(Extension.deltaCRLIndicator, true,
+              new ASN1Integer(baseCrlNumber));
         }
 
         // freshestCRL

@@ -203,6 +203,9 @@ public class CertStore {
 
   private static final String SQL_MAX_CRLNO = "SELECT MAX(CRL_NO) FROM CRL WHERE CA_ID=?";
 
+  private static final String SQL_MAX_FULL_CRLNO =
+      "SELECT MAX(CRL_NO) FROM CRL WHERE CA_ID=? AND DELTACRL = 0";
+
   private static final String SQL_MAX_THISUPDAATE_CRL =
       "SELECT MAX(THISUPDATE) FROM CRL WHERE CA_ID=? AND DELTACRL=?";
 
@@ -511,10 +514,16 @@ public class CertStore {
     }
   } // method clearPublishQueue
 
-  public long getMaxCrlNumber(NameId ca) throws OperationException {
-    Args.notNull(ca, "ca");
+  public long getMaxFullCrlNumber(NameId ca, String sql) throws OperationException {
+    return getMaxCrlNumber(ca, SQL_MAX_FULL_CRLNO);
+  }
 
-    final String sql = SQL_MAX_CRLNO;
+  public long getMaxCrlNumber(NameId ca) throws OperationException {
+    return getMaxCrlNumber(ca, SQL_MAX_CRLNO);
+  }
+
+  private long getMaxCrlNumber(NameId ca, String sql) throws OperationException {
+    Args.notNull(ca, "ca");
     ResultSet rs = null;
     PreparedStatement ps = borrowPreparedStatement(sql);
     try {
