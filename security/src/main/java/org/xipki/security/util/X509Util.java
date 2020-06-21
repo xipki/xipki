@@ -733,19 +733,39 @@ public class X509Util {
   private static GeneralName createGeneralName(String taggedValue) throws BadInputException {
     Args.notBlank(taggedValue, "taggedValue");
 
-    int tag = -1;
+    String tagS = null;
     String value = null;
     if (taggedValue.charAt(0) == '[') {
       int idx = taggedValue.indexOf(']', 1);
       if (idx > 1 && idx < taggedValue.length() - 1) {
-        String tagS = taggedValue.substring(1, idx);
-        try {
-          tag = Integer.parseInt(tagS);
-          value = taggedValue.substring(idx + 1);
-        } catch (NumberFormatException ex) {
-          throw new BadInputException("invalid tag '" + tagS + "'");
-        }
+        tagS = taggedValue.substring(1, idx).toLowerCase();
+        value = taggedValue.substring(idx + 1);
       }
+    }
+
+    int tag = -1;
+    try {
+      if ("0".equals(tagS) || "othername".equals(tagS)) {
+        tag = 0;
+      } else if ("1".equals(tagS) || "email".equals(tagS) || "rfc822".equals(tagS)) {
+        tag = 1;
+      } else if ("2".equals(tagS) || "dns".equals(tagS)) {
+        tag = 2;
+      } else if ("4".equals(tagS) || "dirname".equals(tagS)) {
+        tag = 4;
+      } else if ("5".equals(tagS) || "edi".equals(tagS)) {
+        tag = 5;
+      } else if ("6".equals(tagS) || "uri".equals(tagS)) {
+        tag = 6;
+      } else if ("7".equals(tagS) || "ip".equals(tagS)) {
+        tag = 7;
+      } else if ("8".equals(tagS) || "registeredid".equals(tagS)) {
+        tag = 8;
+      } else {
+        throw new BadInputException("unknown tag " + tagS);
+      }
+    } catch (NumberFormatException ex) {
+      throw new BadInputException("invalid tag '" + tagS + "'");
     }
 
     if (tag == -1) {
@@ -769,14 +789,14 @@ public class X509Util {
         vector.add(type);
         vector.add(new DERTaggedObject(true, 0, new DERUTF8String(otherValue)));
         DERSequence seq = new DERSequence(vector);
-        return new GeneralName(GeneralName.otherName, seq);
+        return new GeneralName(tag, seq);
       case GeneralName.rfc822Name:
         return new GeneralName(tag, value);
       case GeneralName.dNSName:
         return new GeneralName(tag, value);
       case GeneralName.directoryName:
         X500Name x500Name = reverse(new X500Name(value));
-        return new GeneralName(GeneralName.directoryName, x500Name);
+        return new GeneralName(tag, x500Name);
       case GeneralName.ediPartyName:
         if (value == null) {
           throw new BadInputException("invalid ediPartyName: no value specified");
@@ -793,7 +813,7 @@ public class X509Util {
         }
         vector.add(new DERTaggedObject(false, 1, new DirectoryString(partyName)));
         seq = new DERSequence(vector);
-        return new GeneralName(GeneralName.ediPartyName, seq);
+        return new GeneralName(tag, seq);
       case GeneralName.uniformResourceIdentifier:
         return new GeneralName(tag, value);
       case GeneralName.iPAddress:

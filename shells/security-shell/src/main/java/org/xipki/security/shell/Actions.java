@@ -358,7 +358,11 @@ public class Actions {
     protected String hashAlgo = "SHA256";
 
     @Option(name = "--subject-alt-name", aliases = "--san", multiValued = true,
-        description = "subjectAltName")
+        description = "subjectAltName, in the form of [tagNo]value or [tagText]value. "
+            + "Valid tagNo/tagText/value: '0'/'othername'/OID=value, '1'/'email'/text,"
+            + " '2'/'dns'/text, '4'/'dirName'/X500 name e.g. CN=abc,"
+            + "'5'/'edi'/key=value, '6'/'uri'/text,"
+            + " '7'/'ip'/IP address,'8'/'registeredID'/OID")
     protected List<String> subjectAltNames;
 
     @Option(name = "--subject-info-access", aliases = "--sia", multiValued = true,
