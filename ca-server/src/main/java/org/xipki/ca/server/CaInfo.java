@@ -338,7 +338,7 @@ public class CaInfo {
   }
 
   public BigInteger getMaxFullCrlNumber() throws OperationException {
-    long crlNumber = certStore.getMaxCrlNumber(caEntry.getIdent());
+    long crlNumber = certStore.getMaxFullCrlNumber(caEntry.getIdent());
     return crlNumber == 0 ? null : BigInteger.valueOf(crlNumber);
   }
 

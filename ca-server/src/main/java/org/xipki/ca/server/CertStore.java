@@ -514,7 +514,7 @@ public class CertStore {
     }
   } // method clearPublishQueue
 
-  public long getMaxFullCrlNumber(NameId ca, String sql) throws OperationException {
+  public long getMaxFullCrlNumber(NameId ca) throws OperationException {
     return getMaxCrlNumber(ca, SQL_MAX_FULL_CRLNO);
   }
 
