@@ -37,6 +37,7 @@ import org.xipki.ca.server.CaManagerImpl;
 import org.xipki.ca.server.HttpRequestMetadataRetriever;
 import org.xipki.ca.server.RestResponder;
 import org.xipki.ca.server.RestResponder.RestResponse;
+import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
@@ -88,6 +89,9 @@ public class HttpRestServlet extends HttpServlet {
       String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
       HttpRequestMetadataRetriever httpRetriever = new HttpRequestMetadataRetrieverImpl(req);
       byte[] requestBytes = IoUtil.read(req.getInputStream());
+      // some clients may send the PEM encoded CSR.
+      requestBytes = X509Util.toDerEncoded(requestBytes);
+
       RestResponse response = rest.service(path, event, requestBytes, httpRetriever);
 
       resp.setStatus(response.getStatusCode());
