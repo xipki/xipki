@@ -362,7 +362,7 @@ public class Actions {
             + "Valid tagNo/tagText/value: '0'/'othername'/OID=value, '1'/'email'/text,"
             + " '2'/'dns'/text, '4'/'dirName'/X500 name e.g. CN=abc,"
             + "'5'/'edi'/key=value, '6'/'uri'/text,"
-            + " '7'/'ip'/IP address,'8'/'registeredID'/OID")
+            + " '7'/'ip'/IP address,'8'/'rid'/OID")
     protected List<String> subjectAltNames;
 
     @Option(name = "--subject-info-access", aliases = "--sia", multiValued = true,

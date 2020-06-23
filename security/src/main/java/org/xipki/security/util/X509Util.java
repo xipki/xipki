@@ -759,7 +759,7 @@ public class X509Util {
         tag = 6;
       } else if ("7".equals(tagS) || "ip".equals(tagS)) {
         tag = 7;
-      } else if ("8".equals(tagS) || "registeredid".equals(tagS)) {
+      } else if ("8".equals(tagS) || "rid".equals(tagS) || "registeredid".equals(tagS)) {
         tag = 8;
       } else {
         throw new BadInputException("unknown tag " + tagS);

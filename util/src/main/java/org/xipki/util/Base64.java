@@ -355,7 +355,19 @@ public class Base64 {
   }
 
   /**
-   * Encodes a raw byte array into a BASE64 <code>byte[]</code> representation i accordance with
+   * Encodes a raw byte array into a BASE64 <code>byte[]</code> representation in accordance with
+   * RFC 2045, and with line 64 characters per line.
+   * @param sArr
+   *          The bytes to convert. If <code>null</code> or length 0 an empty array will be
+   *          returned.
+   * @return A BASE64 encoded array. Never <code>null</code>.
+   */
+  public static final byte[] encodeToPemByte(byte[] sArr) {
+    return encodeToByte(sArr, true, 64);
+  }
+
+  /**
+   * Encodes a raw byte array into a BASE64 <code>byte[]</code> representation in accordance with
    * RFC 2045.
    * @param sArr
    *          The bytes to convert. If <code>null</code> or length 0 an empty array will be
@@ -367,6 +379,15 @@ public class Base64 {
    * @return A BASE64 encoded array. Never <code>null</code>.
    */
   public static final byte[] encodeToByte(byte[] sArr, boolean lineSep) {
+    return encodeToByte(sArr, lineSep, 76);
+  }
+
+  private static final byte[] encodeToByte(byte[] sArr, boolean lineSep, int charsPerLine) {
+    if ((charsPerLine & 0x3) != 0) {
+      throw new IllegalArgumentException("charsPerLine % 4 != 0");
+    }
+    final int nn = charsPerLine >> 2;
+
     // Check special case
     int sLen = sArr != null ? sArr.length : 0;
     if (sLen == 0) {
@@ -376,7 +397,7 @@ public class Base64 {
 
     int eLen = (sLen / 3) * 3;                              // Length of even 24-bits.
     int cCnt = ((sLen - 1) / 3 + 1) << 2;                   // Returned character count
-    int dLen = cCnt + (lineSep ? (cCnt - 1) / 76 << 1 : 0); // Length of returned array
+    int dLen = cCnt + (lineSep ? (cCnt - 1) / charsPerLine << 1 : 0); // Length of returned array
     byte[] dArr = new byte[dLen];
 
     // Encode even 24-bits
@@ -391,7 +412,7 @@ public class Base64 {
       dArr[d++] = (byte) CA[ i         & 0x3f];
 
       // Add optional line separator
-      if (lineSep && ++cc == 19 && d < dLen - 2) {
+      if (lineSep && ++cc == nn && d < dLen - 2) {
         dArr[d++] = '\r';
         dArr[d++] = '\n';
         cc = 0;

@@ -83,7 +83,7 @@ public class PemEncoder {
   }
 
   public static byte[] encode(byte[] data, PemLabel pemLabel) {
-    byte[] base64 = Base64.encodeToByte(data, true);
+    byte[] base64 = Base64.encodeToPemByte(data);
     byte[] out = new byte[pemLabel.prefix.length + base64.length + pemLabel.postfix.length];
     System.arraycopy(pemLabel.prefix, 0, out, 0, pemLabel.prefix.length);
     System.arraycopy(base64, 0, out, pemLabel.prefix.length, base64.length);
