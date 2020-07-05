@@ -20,6 +20,9 @@ Lijun Liao, [LinkedIn](https://www.linkedin.com/in/lijun-liao-644696b8)
 Just create [issues](https://github.com/xipki/xipki/issues), 
 or via wechat (微信）`xipki9`.
 
+For bug-report please upload the testdata and log files, describe the version of XiPKI, OS and
+JRE/JDK, and the steps to reproduce the bug.
+
 ## Prerequisite
 * OS: Linux, Windows, MacOS
 * JRE / JDK 8 (build 162+), 9, 10, 11, 12, 13

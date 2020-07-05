@@ -637,7 +637,7 @@ public class XijsonCertprofile extends BaseCertprofile {
       }
     }
 
-    // Remove the extension processed not be the Certprofile, but by the CA
+    // Remove the extension processed not by the Certprofile, but by the CA
     extnIds.remove(Extension.issuerAlternativeName);
     extnIds.remove(Extension.authorityInfoAccess);
     extnIds.remove(Extension.cRLDistributionPoints);
