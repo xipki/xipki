@@ -30,6 +30,7 @@ JRE/JDK, and the steps to reproduce the bug.
 
 ## Tested PKCS#11 Devices
 * [Softhsm v1 & v2](https://www.opendnssec.org/download/packages/),
+* [Nitrokey HSM 2](https://www.nitrokey.com/#comparison),
 * [Smartcard HSM EA+](http://www.smartcard-hsm.com/features.html#usbstick),
 * Thales nCipher Connect, Thales nCipher Solo, Utimaco Se
 
