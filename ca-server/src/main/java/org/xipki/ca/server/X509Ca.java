@@ -2582,8 +2582,13 @@ public class X509Ca implements Closeable {
 
   private SignedCertificateTimestampList getCtlogScts(X509CertificateHolder preCert)
       throws OperationException {
-    return ctlogClient.getCtLogScts(preCert, caCert, caInfo.getCertchain(),
-        caManager.getCtLogPublicKeyFinder());
+    CtLogPublicKeyFinder finder = caManager.getCtLogPublicKeyFinder();
+    if (finder == null) {
+      throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+          "ctLog not configured for CA " + caInfo.getIdent().getName());
+    }
+
+    return ctlogClient.getCtLogScts(preCert, caCert, caInfo.getCertchain(), finder);
   }
 
 }

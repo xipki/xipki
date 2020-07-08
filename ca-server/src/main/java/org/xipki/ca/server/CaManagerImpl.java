@@ -416,10 +416,12 @@ public class CaManagerImpl implements CaManager, Closeable {
     int shardId = caServerConf.getShardId();
     LOG.info("ca.shardId: {}", shardId);
 
-    try {
-      ctLogPublicKeyFinder = new CtLogPublicKeyFinder(caServerConf.getCtLog());
-    } catch (Exception ex) {
-      throw new CaMgmtException("could not load CtLogPublicKeyFinder: " + ex.getMessage(), ex);
+    if (caServerConf.getCtLog() != null) {
+      try {
+        ctLogPublicKeyFinder = new CtLogPublicKeyFinder(caServerConf.getCtLog());
+      } catch (Exception ex) {
+        throw new CaMgmtException("could not load CtLogPublicKeyFinder: " + ex.getMessage(), ex);
+      }
     }
 
     if (this.datasourceNameConfFileMap == null) {
