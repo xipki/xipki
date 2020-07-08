@@ -20,9 +20,6 @@ package org.xipki.dbtool.shell;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.Properties;
 
 import org.apache.karaf.shell.api.action.Command;
@@ -56,7 +53,7 @@ public class Actions {
 
       printDatabaseInfo(dbConf, dbSchemaFile);
       if (!force) {
-        if (!confirm("reset and initialize")) {
+        if (!confirm("reset and initialize", 3)) {
           println("cancelled");
           return null;
         }
@@ -70,8 +67,6 @@ public class Actions {
   } // class Initdb
 
   public abstract static class LiquibaseAction extends XiAction {
-
-    private static final List<String> YES_NO = Arrays.asList("Yes", "No");
 
     @Reference
     private PasswordResolver passwordResolver;
@@ -109,49 +104,6 @@ public class Actions {
       props.load(Files.newInputStream(Paths.get(IoUtil.expandFilepath(propFile))));
       return props;
     }
-
-    protected boolean confirm(String command) throws IOException {
-      String text = read("\nDo you wish to " + command + " the database", YES_NO);
-      return "yes".equalsIgnoreCase(text) || "y".equalsIgnoreCase(text);
-    }
-
-    private String read(String prompt, List<String> validValues) throws IOException {
-      List<String> tmpValidValues = validValues;
-      if (tmpValidValues == null) {
-        tmpValidValues = Collections.emptyList();
-      }
-
-      if (prompt == null) {
-        prompt = "Please enter";
-      }
-
-      if (isNotEmpty(tmpValidValues)) {
-        StringBuilder promptBuilder = new StringBuilder(prompt);
-        promptBuilder.append(" [");
-
-        for (String validValue : tmpValidValues) {
-          promptBuilder.append(validValue).append("/");
-        }
-        promptBuilder.deleteCharAt(promptBuilder.length() - 1);
-        promptBuilder.append("] ?");
-
-        prompt = promptBuilder.toString();
-      }
-
-      while (true) {
-        String answer = readPrompt(prompt);
-        if (isEmpty(tmpValidValues) || tmpValidValues.contains(answer)) {
-          return answer;
-        } else {
-          StringBuilder retryPromptBuilder = new StringBuilder("Please answer with ");
-          for (String validValue : tmpValidValues) {
-            retryPromptBuilder.append(validValue).append("/");
-          }
-          retryPromptBuilder.deleteCharAt(retryPromptBuilder.length() - 1);
-          prompt = retryPromptBuilder.toString();
-        }
-      }
-    } // method read
 
   } // class LiquibaseAction
 

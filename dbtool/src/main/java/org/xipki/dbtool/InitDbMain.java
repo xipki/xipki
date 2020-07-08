@@ -25,7 +25,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -33,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PBEPasswordService;
 import org.xipki.password.SinglePasswordResolver;
-import org.xipki.util.CollectionUtil;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
@@ -158,47 +156,10 @@ public class InitDbMain {
   } // method printDatabaseInfo
 
   private static boolean confirm(String command) throws IOException {
-    String text = read("\nDo you wish to " + command + " the database", Arrays.asList("Yes", "No"));
-    return "yes".equalsIgnoreCase(text) || "y".equalsIgnoreCase(text);
+    String prompt = "Do you wish to " + command + " the database [Yes | No]?";
+    String answer = IoUtil.readLineFromConsole(prompt);
+    return "yes".equalsIgnoreCase(answer) || "y".equalsIgnoreCase(answer);
   }
-
-  private static String read(String prompt, List<String> validValues) throws IOException {
-    List<String> tmpValidValues = validValues;
-    if (tmpValidValues == null) {
-      tmpValidValues = Collections.emptyList();
-    }
-
-    if (prompt == null) {
-      prompt = "Please enter";
-    }
-
-    if (CollectionUtil.isNotEmpty(tmpValidValues)) {
-      StringBuilder promptBuilder = new StringBuilder(prompt);
-      promptBuilder.append(" [");
-
-      for (String validValue : tmpValidValues) {
-        promptBuilder.append(validValue).append("/");
-      }
-      promptBuilder.deleteCharAt(promptBuilder.length() - 1);
-      promptBuilder.append("] ?");
-
-      prompt = promptBuilder.toString();
-    }
-
-    while (true) {
-      String answer = IoUtil.readLineFromConsole(prompt);
-      if (CollectionUtil.isEmpty(tmpValidValues) || tmpValidValues.contains(answer)) {
-        return answer;
-      } else {
-        StringBuilder retryPromptBuilder = new StringBuilder("Please answer with ");
-        for (String validValue : tmpValidValues) {
-          retryPromptBuilder.append(validValue).append("/");
-        }
-        retryPromptBuilder.deleteCharAt(retryPromptBuilder.length() - 1);
-        prompt = retryPromptBuilder.toString();
-      }
-    }
-  } // method read
 
   private static void printUsage(String prefix) {
     StringBuilder sb = new StringBuilder();

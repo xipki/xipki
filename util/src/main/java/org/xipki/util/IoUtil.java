@@ -273,7 +273,7 @@ public class IoUtil {
       throw new IllegalStateException("No console is available for input");
     }
     if (prompt != null) {
-      System.out.println(prompt);
+      System.out.print(prompt);
     }
     return console.readLine();
   }
