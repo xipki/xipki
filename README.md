@@ -32,7 +32,9 @@ JRE/JDK, and the steps to reproduce the bug.
 * [Softhsm v1 & v2](https://www.opendnssec.org/download/packages/),
 * [Nitrokey HSM 2](https://www.nitrokey.com/#comparison),
 * [Smartcard HSM EA+](http://www.smartcard-hsm.com/features.html#usbstick),
-* Thales nCipher Connect, Thales nCipher Solo, Utimaco Se
+* [nCipher Connect](https://www.ncipher.com/products/general-purpose-hsms/nshield-connect),
+* [Thales nCipher Solo](https://www.ncipher.com/products/general-purpose-hsms/nshield-solo),
+* [Utimaco Se](https://hsm.utimaco.com/products-hardware-security-modules/general-purpose-hsm/)
 
 ## Get Started
 
