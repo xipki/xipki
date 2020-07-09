@@ -85,8 +85,8 @@ public class P11Actions {
   @Service
   public static class AddCertP11 extends P11SecurityAction {
 
-    @Option(name = "--id", description = "id of the PKCS#11 objects")
-    private String hexId;
+    @Option(name = "--id", description = "id (hex) of the PKCS#11 objects")
+    private String id;
 
     @Option(name = "--label", description = "label of the PKCS#11 objects.")
     protected String label;
@@ -97,12 +97,12 @@ public class P11Actions {
 
     @Override
     protected Object execute0() throws Exception {
-      byte[] id = (hexId == null) ? null : Hex.decode(hexId);
+      byte[] id0 = (id == null) ? null : Hex.decode(id);
       X509Cert cert = X509Util.parseCert(new File(certFile));
       if (label == null) {
         label = X509Util.getCommonName(cert.getSubject());
       }
-      P11NewObjectControl control = new P11NewObjectControl(id, label);
+      P11NewObjectControl control = new P11NewObjectControl(id0, label);
       P11Slot slot = getSlot();
       P11ObjectIdentifier objectId = slot.addCert(cert, control);
       println("added certificate under " + objectId);
@@ -117,7 +117,7 @@ public class P11Actions {
   public static class DeleteCertP11 extends P11SecurityAction {
 
     @Option(name = "--id", required = true,
-        description = "id of the certificate in the PKCS#11 device")
+        description = "id (hex) of the certificate in the PKCS#11 device")
     private String id;
 
     @Option(name = "--force", aliases = "-f", description = "without prompt")
@@ -125,7 +125,7 @@ public class P11Actions {
 
     @Override
     protected Object execute0() throws Exception {
-      if (force || confirm("Do you want to remove PKCS#11 certificate object with id " + id, 3)) {
+      if (force || confirm("Do you want to remove PKCS#11 certificate object with id 0x" + id, 3)) {
         P11Slot slot = getSlot();
         P11ObjectIdentifier objectId = slot.getObjectId(Hex.decode(id), null);
         if (objectId == null) {
@@ -147,7 +147,7 @@ public class P11Actions {
   public static class ExportCertP11 extends P11SecurityAction {
 
     @Option(name = "--id",
-        description = "id of the private key in the PKCS#11 device\n"
+        description = "id (hex) of the private key in the PKCS#11 device\n"
             + "either keyId or keyLabel must be specified")
     protected String id;
 
@@ -185,7 +185,7 @@ public class P11Actions {
   public static class UpdateCertP11 extends P11SecurityAction {
 
     @Option(name = "--id",
-        description = "id of the private key in the PKCS#11 device\n"
+        description = "id (hex) of the private key in the PKCS#11 device\n"
             + "either keyId or keyLabel must be specified")
     protected String id;
 
@@ -214,11 +214,11 @@ public class P11Actions {
   @Service
   public static class CsrP11 extends CsrGenAction {
 
-    @Option(name = "--slot", required = true, description = "slot index")
-    private Integer slotIndex;
+    @Option(name = "--slot", description = "slot index")
+    private int slotIndex = 0;
 
     @Option(name = "--id",
-        description = "id of the private key in the PKCS#11 device\n"
+        description = "id (hex) of the private key in the PKCS#11 device\n"
             + "either keyId or keyLabel must be specified")
     private String id;
 
@@ -247,15 +247,11 @@ public class P11Actions {
       return securityFactory.createSigner("PKCS11", conf, (X509Cert[]) null);
     }
 
-    public static SignerConf getPkcs11SignerConf(String pkcs11ModuleName, Integer slotIndex,
+    public static SignerConf getPkcs11SignerConf(String pkcs11ModuleName, int slotIndex,
         String keyLabel, byte[] keyId, int parallelism, HashAlgo hashAlgo,
         SignatureAlgoControl signatureAlgoControl) {
       Args.positive(parallelism, "parallelism");
       Args.notNull(hashAlgo, "hashAlgo");
-
-      if (slotIndex == null) {
-        throw new IllegalArgumentException("slotIndex may not be null");
-      }
 
       if (keyId == null && keyLabel == null) {
         throw new IllegalArgumentException("at least one of keyId and keyLabel may not be null");
@@ -268,9 +264,7 @@ public class P11Actions {
         conf.putPair("module", pkcs11ModuleName);
       }
 
-      if (slotIndex != null) {
-        conf.putPair("slot", slotIndex.toString());
-      }
+      conf.putPair("slot", Integer.toString(slotIndex));
 
       if (keyId != null) {
         conf.putPair("key-id", Hex.encode(keyId));
@@ -359,7 +353,7 @@ public class P11Actions {
   public static class DeleteKeyP11 extends P11SecurityAction {
 
     @Option(name = "--id",
-        description = "id of the private key in the PKCS#11 device\n"
+        description = "id (hex) of the private key in the PKCS#11 device\n"
             + "either keyId or keyLabel must be specified")
     protected String id;
 
@@ -391,8 +385,8 @@ public class P11Actions {
 
   public abstract static class P11KeyGenAction extends P11SecurityAction {
 
-    @Option(name = "--id", description = "id of the PKCS#11 objects")
-    private String hexId;
+    @Option(name = "--id", description = "id (hex) of the PKCS#11 objects")
+    private String id;
 
     @Option(name = "--label", required = true, description = "label of the PKCS#11 objects")
     protected String label;
@@ -416,8 +410,8 @@ public class P11Actions {
     }
 
     protected P11NewKeyControl getControl() throws IllegalCmdParamException {
-      byte[] id = (hexId == null) ? null : Hex.decode(hexId);
-      P11NewKeyControl control = new P11NewKeyControl(id, label);
+      byte[] id0 = (id == null) ? null : Hex.decode(id);
+      P11NewKeyControl control = new P11NewKeyControl(id0, label);
       if (StringUtil.isNotBlank(extractable)) {
         control.setExtractable(isEnabled(extractable, false, "extractable"));
       }
@@ -681,8 +675,8 @@ public class P11Actions {
     protected static final String DEFAULT_P11MODULE_NAME =
         P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
 
-    @Option(name = "--slot", required = true, description = "slot index")
-    protected Integer slotIndex;
+    @Option(name = "--slot", description = "slot index")
+    protected int slotIndex = 0;
 
     @Option(name = "--module", description = "name of the PKCS#11 module")
     @Completion(SecurityCompleters.P11ModuleNameCompleter.class)

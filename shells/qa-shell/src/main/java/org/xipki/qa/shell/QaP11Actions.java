@@ -158,8 +158,8 @@ public class QaP11Actions {
     @Completion(P11ModuleNameCompleter.class)
     protected String moduleName = DEFAULT_P11MODULE_NAME;
 
-    @Option(name = "--slot", required = true, description = "slot index")
-    protected Integer slotIndex;
+    @Option(name = "--slot", description = "slot index")
+    protected int slotIndex = 0;
 
     @Option(name = "--id",
         description = "id of the private key in the PKCS#11 device\n"
@@ -183,10 +183,10 @@ public class QaP11Actions {
 
     protected String getAlias() throws IllegalCmdParamException {
       if (label != null && id == null) {
-        return StringUtil.concat(moduleName, "#slotindex-", slotIndex.toString(),
+        return StringUtil.concat(moduleName, "#slotindex-", Integer.toString(slotIndex),
             "#keylabel-", label);
       } else if (label == null && id != null) {
-        return StringUtil.concat(moduleName, "#slotindex-", slotIndex.toString(),
+        return StringUtil.concat(moduleName, "#slotindex-", Integer.toString(slotIndex),
             "#keyid-", id.toLowerCase());
       } else {
         throw new IllegalCmdParamException(

@@ -202,11 +202,11 @@ public class QaSecurityActions {
     @Reference (optional = true)
     protected P11CryptServiceFactory p11CryptServiceFactory;
 
-    @Option(name = "--key-id", description = "id of the PKCS#11 key")
+    @Option(name = "--key-id", description = "id (hex) of the PKCS#11 key")
     private String hexKeyId;
 
-    @Option(name = "--slot", required = true, description = "slot index")
-    protected Integer slotIndex;
+    @Option(name = "--slot", description = "slot index")
+    protected int slotIndex = 0;
 
     @Option(name = "--module", description = "name of the PKCS#11 module.")
     @Completion(QaCompleters.P11ModuleNameCompleter.class)
@@ -420,11 +420,11 @@ public class QaSecurityActions {
     @Reference (optional = true)
     protected P11CryptServiceFactory p11CryptServiceFactory;
 
-    @Option(name = "--key-id", description = "id of the PKCS#11 key")
+    @Option(name = "--key-id", description = "id (hex) of the PKCS#11 key")
     private String hexKeyId;
 
-    @Option(name = "--slot", required = true, description = "slot index")
-    protected Integer slotIndex;
+    @Option(name = "--slot", description = "slot index")
+    protected int slotIndex = 0;
 
     @Option(name = "--module", description = "Name of the PKCS#11 module.")
     @Completion(QaCompleters.P11ModuleNameCompleter.class)

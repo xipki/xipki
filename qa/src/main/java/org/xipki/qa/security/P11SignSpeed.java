@@ -32,6 +32,7 @@ import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11Slot.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
+import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.Args;
 import org.xipki.util.BenchmarkExecutor;
 import org.xipki.util.ConfPairs;
@@ -93,7 +94,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
         ASN1ObjectIdentifier curveOid) throws Exception {
       super(securityFactory, slot, signatureAlgorithm, !keyPresent,
           generateKey(keyPresent, slot, keyId, keyLabel, curveOid),
-          "PKCS#11 EC signature creation\ncurve: " + curveOid, threads);
+          "PKCS#11 EC signature creation\ncurve: " + AlgorithmUtil.getCurveName(curveOid), threads);
     }
 
     private static P11ObjectIdentifier generateKey(boolean keyPresent, P11Slot slot, byte[] keyId,
