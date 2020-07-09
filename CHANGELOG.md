@@ -4,14 +4,29 @@ See also <https://github.com/xipki/xipki/releases>
 
 ## 5.3.8
   - Release date: -
+
+## 5.3.8
+  - Release date: Jul 09, 2020
   - CA
+    - Fixed BUG: Set extension critical if contains key-purpose timeStamping
+    - Fixed Bug: add extension deltaCRLIndicator to DeltaCRL
     - Verify SCT before adding it to the cert
-    - Remove the verfication of certificate's signature direct after the creation.
     - Unify the use of X.509 certificate and CRL
+    - Add validation of IPv6 address
+    - Log software version
+    - Remove the CA controls DUPLICATE_{KEY|SUBJECT}
+    - For pre-defined DSA parameters, using Pi as seed
+    - Check pathLenConstraint before issuing certificate
+    - Use tagNo or tagName to identify a SAN tag in a certificat request
+    - accept also PEM encoded CSR in rest servlet
   - OCSP
     - Unify the use of X.509 certificate and CRL
+    - Log software version
+    - Use generatedAt instead thisUpdate for OCSP cache
   - CLI
     - Unify the use of X.509 certificate and CRL
+    - For pre-defined DSA parameters, using Pi as seed
+    - Add default value to slot, better usage for the param id .
 
 ## 5.3.7
   - Release date: Mar 15, 2020
