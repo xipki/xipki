@@ -87,7 +87,6 @@ import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.IssuingDistributionPoint;
 import org.bouncycastle.asn1.x509.ReasonFlags;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.asn1.x509.Time;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509CRLHolder;
@@ -607,8 +606,8 @@ public class X509Ca implements Closeable {
         X509CRLHolder crl = X509Util.parseCrl(encodedCrl);
         successful = true;
         if (LOG.isInfoEnabled()) {
-          String timeStr = new Time(crl.getThisUpdate()).getTime();
-          LOG.info("SUCCESSFUL getCrl: ca={}, thisUpdate={}", caIdent.getName(), timeStr);
+          LOG.info("SUCCESSFUL getCrl: ca={}, thisUpdate={}", caIdent.getName(),
+              crl.getThisUpdate());
         }
         return crl;
       } catch (CRLException ex) {

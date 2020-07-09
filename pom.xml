@@ -46,7 +46,7 @@
     <fastjson.version>1.2.72</fastjson.version>
     <!-- only for runtime -->
     <log4j.version>2.13.3</log4j.version>
-    <jdbc.mariadb.version>2.4.4</jdbc.mariadb.version>
+    <jdbc.mariadb.version>2.6.1</jdbc.mariadb.version>
     <jdbc.postgresql.version>42.2.14</jdbc.postgresql.version>
     <!-- Only for test purpose -->
     <junit.version>4.8.2</junit.version>
