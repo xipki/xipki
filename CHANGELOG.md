@@ -26,7 +26,7 @@ See also <https://github.com/xipki/xipki/releases>
   - CLI
     - Unify the use of X.509 certificate and CRL
     - For pre-defined DSA parameters, using Pi as seed
-    - Add default value to slot, better usage for the param id .
+    - Add default value to slot, better usage for the param id
 
 ## 5.3.7
   - Release date: Mar 15, 2020
