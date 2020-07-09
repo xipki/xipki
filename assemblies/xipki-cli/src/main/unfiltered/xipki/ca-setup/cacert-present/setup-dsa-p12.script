@@ -16,5 +16,3 @@ xi:replace --old "REPLACEME-CA_SIGNERCONF" \
   xipki/setup/cacert-present/ca-conf.json
 
 ca:load-conf --conf-file xipki/setup/cacert-present/ca-conf.json
-
-source xipki/ca-setup/configure-ocsp.script

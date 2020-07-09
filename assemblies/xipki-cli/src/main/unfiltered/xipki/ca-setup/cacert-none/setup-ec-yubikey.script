@@ -48,5 +48,3 @@ xi:move-file ${KEYCERTS_DIR}/ca-myca1.crt ${KEYCERTS_DIR}/myca1.der
 # xi:update-cert-p11 --slot 0 --id ${P11_ID} --cert ${KEYCERTS_DIR}/myca1.der
 
 source xipki/ca-setup/cacert-none/configure-ca.script
-
-source xipki/ca-setup/configure-ocsp.script

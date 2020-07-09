@@ -42,5 +42,3 @@ xi:update-cert-p12 --p12 ${KEYCERTS_DIR}/myca1.p12 --password 1234 \
   --cert ${KEYCERTS_DIR}/myca1.der
 
 source xipki/ca-setup/cacert-none/configure-ca.script
-
-source xipki/ca-setup/configure-ocsp.script
