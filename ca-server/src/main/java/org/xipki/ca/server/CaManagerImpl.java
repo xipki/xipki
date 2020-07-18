@@ -333,7 +333,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
     this.datasourceFactory = new DataSourceFactory();
     String calockId = null;
-    File caLockFile = new File("calock");
+    File caLockFile = new File(IoUtil.expandFilepath("calock"));
     if (caLockFile.exists()) {
       try {
         calockId = new String(IoUtil.read(caLockFile));
@@ -841,7 +841,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
     }
 
-    File caLockFile = new File("calock");
+    File caLockFile = new File(IoUtil.expandFilepath("calock"));
     if (caLockFile.exists()) {
       caLockFile.delete();
     }
