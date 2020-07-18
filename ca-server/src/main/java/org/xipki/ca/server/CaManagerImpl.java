@@ -921,6 +921,8 @@ public class CaManagerImpl implements CaManager, Closeable {
       return;
     }
 
+    queryExecutor.changeNameToLowerCase("REQUESTOR");
+
     idNameMap.clearRequestor();
     requestorDbEntries.clear();
     requestors.clear();

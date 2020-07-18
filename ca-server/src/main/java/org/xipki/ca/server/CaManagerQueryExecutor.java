@@ -359,12 +359,40 @@ class CaManagerQueryExecutor {
     }
   } // method createCertprofile
 
-  List<String> namesFromTable(String table) throws CaMgmtException {
-    return namesFromTable(table, "NAME");
+  int changeNameToLowerCase(String table) throws CaMgmtException {
+    final String sql = concat("UPDATE ", table, " SET NAME=? WHERE NAME=?");
+    PreparedStatement stmt = null;
+    List<String> names = namesFromTable(table);
+
+    int n = 0;
+    try {
+      for (String name : names) {
+        String lcName = name.toLowerCase();
+        if (name.equals(lcName)) {
+          continue;
+        }
+
+        if (stmt == null) {
+          stmt = prepareStatement(sql);
+        }
+
+        stmt.setString(1, lcName);
+        stmt.setString(2, name);
+        stmt.executeUpdate();
+        n++;
+      }
+      return n;
+    } catch (SQLException ex) {
+      throw new CaMgmtException(datasource.translate(sql, ex));
+    } finally {
+      if (stmt != null) {
+        datasource.releaseResources(stmt, null);
+      }
+    }
   }
 
-  private List<String> namesFromTable(String table, String nameColumn) throws CaMgmtException {
-    final String sql = concat("SELECT ", nameColumn, " FROM ", table);
+  List<String> namesFromTable(String table) throws CaMgmtException {
+    final String sql = concat("SELECT NAME FROM ", table);
     Statement stmt = null;
     ResultSet rs = null;
     try {
@@ -373,7 +401,7 @@ class CaManagerQueryExecutor {
 
       List<String> names = new LinkedList<>();
       while (rs.next()) {
-        String name = rs.getString(nameColumn);
+        String name = rs.getString("NAME");
         if (StringUtil.isNotBlank(name)) {
           names.add(name);
         }
@@ -896,6 +924,7 @@ class CaManagerQueryExecutor {
   } // method addRequestor
 
   void addRequestorIfNeeded(String requestorName) throws CaMgmtException {
+    requestorName = requestorName.toLowerCase();
     String sql = sqlSelectRequestorId;
     ResultSet rs = null;
     PreparedStatement stmt = null;
