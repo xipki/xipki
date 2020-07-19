@@ -444,8 +444,21 @@ public class CaManagerImpl implements CaManager, Closeable {
     if (masterMode) {
       lockCa(true);
 
-      queryExecutor.addRequestorIfNeeded(RequestorInfo.NAME_BY_CA);
-      queryExecutor.addRequestorIfNeeded(RequestorInfo.NAME_BY_USER);
+      List<String> names = queryExecutor.namesFromTable("REQUESTOR");
+      final String[] embeddedNames = {RequestorInfo.NAME_BY_CA, RequestorInfo.NAME_BY_USER};
+      for (String embeddedName : embeddedNames) {
+        boolean contained = false;
+        for (String name : names) {
+          if (embeddedName.equalsIgnoreCase(name)) {
+            contained = true;
+            break;
+          }
+        }
+
+        if (!contained) {
+          queryExecutor.addEmbeddedRequestor(embeddedName);
+        }
+      }
     }
 
     final long epoch = DateUtil.parseUtcTimeyyyyMMdd("20100101").getTime();
@@ -921,19 +934,17 @@ public class CaManagerImpl implements CaManager, Closeable {
       return;
     }
 
-    queryExecutor.changeNameToLowerCase("REQUESTOR");
-
     idNameMap.clearRequestor();
     requestorDbEntries.clear();
     requestors.clear();
     List<String> names = queryExecutor.namesFromTable("REQUESTOR");
     for (String name : names) {
-      if (RequestorInfo.NAME_BY_CA.equals(name)) {
+      if (RequestorInfo.NAME_BY_CA.equalsIgnoreCase(name)) {
         Integer id = queryExecutor.getRequestorId(name);
         NameId ident = new NameId(id, name);
         byCaRequestor = new RequestorInfo.ByCaRequestorInfo(ident);
         idNameMap.addRequestor(ident);
-      } else if (RequestorInfo.NAME_BY_USER.equals(name)) {
+      } else if (RequestorInfo.NAME_BY_USER.equalsIgnoreCase(name)) {
         Integer id = queryExecutor.getRequestorId(name);
         byUserRequestorId = new NameId(id, name);
         idNameMap.addRequestor(byUserRequestorId);

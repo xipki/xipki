@@ -359,38 +359,6 @@ class CaManagerQueryExecutor {
     }
   } // method createCertprofile
 
-  int changeNameToLowerCase(String table) throws CaMgmtException {
-    final String sql = concat("UPDATE ", table, " SET NAME=? WHERE NAME=?");
-    PreparedStatement stmt = null;
-    List<String> names = namesFromTable(table);
-
-    int n = 0;
-    try {
-      for (String name : names) {
-        String lcName = name.toLowerCase();
-        if (name.equals(lcName)) {
-          continue;
-        }
-
-        if (stmt == null) {
-          stmt = prepareStatement(sql);
-        }
-
-        stmt.setString(1, lcName);
-        stmt.setString(2, name);
-        stmt.executeUpdate();
-        n++;
-      }
-      return n;
-    } catch (SQLException ex) {
-      throw new CaMgmtException(datasource.translate(sql, ex));
-    } finally {
-      if (stmt != null) {
-        datasource.releaseResources(stmt, null);
-      }
-    }
-  }
-
   List<String> namesFromTable(String table) throws CaMgmtException {
     final String sql = concat("SELECT NAME FROM ", table);
     Statement stmt = null;
@@ -923,22 +891,12 @@ class CaManagerQueryExecutor {
     }
   } // method addRequestor
 
-  void addRequestorIfNeeded(String requestorName) throws CaMgmtException {
+  void addEmbeddedRequestor(String requestorName) throws CaMgmtException {
     requestorName = requestorName.toLowerCase();
     String sql = sqlSelectRequestorId;
     ResultSet rs = null;
     PreparedStatement stmt = null;
     try {
-      stmt = prepareStatement(sql);
-      stmt.setString(1, requestorName);
-      rs = stmt.executeQuery();
-      if (rs.next()) {
-        return;
-      }
-      datasource.releaseResources(stmt, rs);
-      stmt = null;
-      rs = null;
-
       int id = (int) datasource.getMax(null, "REQUESTOR", "ID");
 
       sql = "INSERT INTO REQUESTOR (ID,NAME,TYPE,CONF) VALUES (?,?,?,?)";

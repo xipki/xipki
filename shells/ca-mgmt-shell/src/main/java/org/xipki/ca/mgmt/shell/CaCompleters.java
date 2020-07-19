@@ -274,6 +274,8 @@ public class CaCompleters {
       }
       names.remove(RequestorInfo.NAME_BY_CA);
       names.remove(RequestorInfo.NAME_BY_USER);
+      names.remove(RequestorInfo.NAME_BY_CA.toUpperCase());
+      names.remove(RequestorInfo.NAME_BY_USER.toUpperCase());
       return names;
     }
 
