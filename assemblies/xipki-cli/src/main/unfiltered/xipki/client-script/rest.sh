@@ -4,9 +4,9 @@
 CA_URL="https://localhost:8443/ca/rest/myca"
 echo "CA URL: ${CA_URL}"
 
-OCSP_URL="http://localhost:8080/ocsp/"
+#OCSP_URL="http://localhost:8080/ocsp/"
 
-echo "OCSP URL: ${OCSP_URL}"
+#echo "OCSP URL: ${OCSP_URL}"
 
 DIR=`dirname $0`
 
@@ -103,40 +103,40 @@ SERIAL=0X`openssl x509 -inform der -serial -noout -in ${OUT_DIR}/${CN}.der | cut
 # The PEM file will be used by "openssl ocsp"
 openssl x509 -inform der -in ${OUT_DIR}/${CN}.der -out ${OUT_DIR}/${CN}.pem
 
-echo "Current OCSP status"
+#echo "Current OCSP status"
 
-openssl ocsp -nonce  -CAfile ${OUT_DIR}/cacert.pem -url ${OCSP_URL} \
-  -issuer ${OUT_DIR}/cacert.pem -cert ${OUT_DIR}/${CN}.pem
+#openssl ocsp -nonce  -CAfile ${OUT_DIR}/cacert.pem -url ${OCSP_URL} \
+#  -issuer ${OUT_DIR}/cacert.pem -cert ${OUT_DIR}/${CN}.pem
 
 echo "suspend certificate"
 
 curl ${OPTS} \
     "${CA_URL}/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=certificateHold"
 
-echo "Current OCSP status"
+#echo "Current OCSP status"
 
-openssl ocsp -nonce  -CAfile ${OUT_DIR}/cacert.pem -url ${OCSP_URL} \
-  -issuer ${OUT_DIR}/cacert.pem -cert ${OUT_DIR}/${CN}.pem
+#openssl ocsp -nonce  -CAfile ${OUT_DIR}/cacert.pem -url ${OCSP_URL} \
+#  -issuer ${OUT_DIR}/cacert.pem -cert ${OUT_DIR}/${CN}.pem
 
 echo "unsuspend certificate"
 
 curl ${OPTS} \
     "${CA_URL}/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=removeFromCRL"
 
-echo "Current OCSP status"
+#echo "Current OCSP status"
 
-openssl ocsp -nonce  -CAfile ${OUT_DIR}/cacert.pem -url ${OCSP_URL} \
-  -issuer ${OUT_DIR}/cacert.pem -cert ${OUT_DIR}/${CN}.pem
+#openssl ocsp -nonce  -CAfile ${OUT_DIR}/cacert.pem -url ${OCSP_URL} \
+#  -issuer ${OUT_DIR}/cacert.pem -cert ${OUT_DIR}/${CN}.pem
 
 echo "revoke certificate"
 
 curl ${OPTS} \
     "${CA_URL}/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=keyCompromise"
 
-echo "Current OCSP status"
+#echo "Current OCSP status"
 
-openssl ocsp -nonce  -CAfile ${OUT_DIR}/cacert.pem -url ${OCSP_URL} \
-  -issuer ${OUT_DIR}/cacert.pem -cert ${OUT_DIR}/${CN}.pem
+#openssl ocsp -nonce  -CAfile ${OUT_DIR}/cacert.pem -url ${OCSP_URL} \
+#  -issuer ${OUT_DIR}/cacert.pem -cert ${OUT_DIR}/${CN}.pem
 
 echo "generate new CRL"
 

@@ -62,33 +62,32 @@ xi:curl --out ${OUT_DIR}/${CN}.der --data-file ${OUT_DIR}/${CN}.csr \
 
 SERIAL = $(xi:cert-info --serial --hex --in ${OUT_DIR}/${CN}.der)
 
-echo "Current OCSP status"
-xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
+#echo "Current OCSP status"
+#xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
 
 echo "=====REST: Suspend====="
 
 xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=certificateHold"
 
-echo "Current OCSP status"
-xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
+#echo "Current OCSP status"
+#xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
 
 echo "=====REST: Unsuspend====="
 
 xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=removeFromCRL"
 
-echo "Current OCSP status"
-xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
+#echo "Current OCSP status"
+#xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
 
 echo "=====REST: Revoke====="
 
 xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=keyCompromise"
 
-echo "Current OCSP Status"
-xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
+#echo "Current OCSP Status"
+#xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
 
 echo "=====CMP: Generate CRL====="
 
 xi:curl --out ${OUT_DIR}/rest-myca-gen.crl $BASE_URL/new-crl
 
 xi:curl --out ${OUT_DIR}/rest-myca-get.crl $BASE_URL/crl
-
