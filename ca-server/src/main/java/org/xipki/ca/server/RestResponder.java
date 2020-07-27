@@ -389,6 +389,9 @@ public class RestResponder {
             }
             extensions = null;
           } else if (RestAPIConstants.CT_pkcs10.equalsIgnoreCase(ct)) {
+            // some clients may send the PEM encoded CSR.
+            request = X509Util.toDerEncoded(request);
+
             // The PKCS#10 will only be used for transport of subject and extensions.
             // The associated key will not be used, so the verification of POPO is skipped.
             CertificationRequestInfo certTemp =

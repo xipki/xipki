@@ -89,8 +89,6 @@ public class HttpRestServlet extends HttpServlet {
       String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
       HttpRequestMetadataRetriever httpRetriever = new HttpRequestMetadataRetrieverImpl(req);
       byte[] requestBytes = IoUtil.read(req.getInputStream());
-      // some clients may send the PEM encoded CSR.
-      requestBytes = X509Util.toDerEncoded(requestBytes);
 
       RestResponse response = rest.service(path, event, requestBytes, httpRetriever);
 
