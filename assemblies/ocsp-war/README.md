@@ -13,11 +13,13 @@ Prepare
   other type (namely `xipki-db`, `ejbca-db`, and `crl`), please copy the `ocsp-responder.json` from the sub-folder `xipki/etc/ocsp/example` to replace it.
 - If you use CRL as OCSP store
     - Initialize the database which will be used to import the CRLs.
-      `dbtool/bin/initdb.sh --db-schema xipki/sql/ocsp-init.xml --db-conf <xipki/etc/ocsp/database/ocsp-crl-db.properties`
+      In dbtool, call
+      `bin/initdb.sh --db-schema sql/ocsp-init.xml --db-conf /path/to/ocsp-crl-db.properties`
 
 - If you cache the OCSP responses
     - Initialize the database which will be used to store the cached OCSP responses.
-      `dbtool/bin/initdb.sh --db-schema xipki/sql/ocsp-cache-init.xml --db-conf <xipki/etc/ocsp/database/ocsp-cache-db.properties`
+      In dbtool, call
+      `bin/initdb.sh --db-schema sql/ocsp-cache-init.xml --db-conf /path/to/ocsp-cache-db.properties`
 
 - Adapt the configuration file `xipki/etc/ocsp-responder.json`.
 
