@@ -18,7 +18,7 @@ Lijun Liao, [LinkedIn](https://www.linkedin.com/in/lijun-liao-644696b8)
 
 ## Support
 Just create [issues](https://github.com/xipki/xipki/issues), 
-or via wechat (微信）`xipki9`.
+or via wechat `xipki9`.
 
 For bug-report please upload the testdata and log files, describe the version of XiPKI, OS and
 JRE/JDK, and the steps to reproduce the bug.
@@ -61,12 +61,19 @@ follows.
   ```sh
   mvn clean install -DskipTests
   ```
-
+ 
   Then you will find the following binaries:
+   - DB Tool: `assembles/dbtool/target/dbtool-<version>.zip`
    - CA: `assembles/ca-war/target/ca-war-<version>.zip`
    - OCSP: `assembles/ocsp-war/target/ocsp-war-<version>.zip`
    - CLI (Command Line Interface): `assembles/xipki-cli/target/xipki-cli-<version>.tar.gz`
 
+## Install DB Tool
+
+1. Unpack the binary `dbtool-<version>.zip`.
+2. If you use database other than MariaDB, MySQL and PostgreSQL, you need to get the JDBC driver and
+   copy it to the directory `lib/jdbc`.
+ 
 ## Install CA Server
 
 1. Unpack the binary `ca-war-<version>.zip` and install CA as described in the
@@ -82,10 +89,11 @@ follows.
 
 4. Initialize the databases configured in Step 2.
 
+In the directory `dbtool-<version>`, 
 ```
- ca-war-<version>/dbtool/bin/initdb.sh \
-   --db-conf xipki/etc/ca/database/ca-db.properties \
-   --db-schema xipki/sql/ca-init.xml
+ bin/initdb.sh \
+   --db-schema sql/ca-init.xml \
+   --db-conf ${CONTAINER_ROOT}/xipki/etc/ca/database/ca-db.properties
 ```
 
 ## Install OCSP Responder

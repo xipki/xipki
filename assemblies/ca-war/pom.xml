@@ -14,25 +14,6 @@
   <dependencies>
     <dependency>
       <groupId>org.xipki</groupId>
-      <artifactId>dbtool</artifactId>
-      <version>${project.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.xipki</groupId>
-          <artifactId>util</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.xipki</groupId>
-          <artifactId>password</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.xipki</groupId>
       <artifactId>ca-servlet</artifactId>
       <version>${project.version}</version>
       <type>war</type>
@@ -62,13 +43,6 @@
           <include>tomcat/**</include>
         </includes>
       </resource>
-      <resource>
-        <directory>../shared</directory>
-        <filtering>false</filtering>
-        <includes>
-          <include>dbtool/**</include>
-        </includes>
-      </resource>
     </resources>
     <plugins>
       <plugin>
@@ -92,17 +66,6 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
-            <id>copy-dbtool-dependencies</id>
-            <phase>package</phase>
-            <goals>
-              <goal>copy-dependencies</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/dbtool/lib</outputDirectory>
-              <includeTypes>jar</includeTypes>
-            </configuration>
-          </execution>
-          <execution>
             <id>copy-war</id>
             <phase>generate-resources</phase>
             <goals>
@@ -123,7 +86,7 @@
           </execution>
           <execution>
             <!-- Copy the JDBC and BouncyCastle jars -->
-            <id>jdbc</id>
+            <id>jdbc-bc</id>
             <phase>generate-resources</phase>
             <goals>
               <goal>copy</goal>
@@ -149,26 +112,6 @@
                 <artifactItem>
                   <groupId>org.bouncycastle</groupId>
                   <artifactId>bcpkix-jdk15on</artifactId>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-          <execution>
-            <!-- Extract the SQL scripts -->
-            <id>unpack-sql</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/xipki</outputDirectory>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.xipki</groupId>
-                  <artifactId>ca-server</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>sql/**</includes>
                 </artifactItem>
               </artifactItems>
             </configuration>

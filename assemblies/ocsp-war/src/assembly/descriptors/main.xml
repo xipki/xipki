@@ -10,7 +10,6 @@
     <fileSet>
       <directory>${project.build.directory}</directory>
       <includes>
-        <include>dbtool/**/*.sh</include>
         <include>tomcat/**/*.sh</include>
       </includes>
       <outputDirectory>.</outputDirectory>
@@ -21,8 +20,6 @@
     <fileSet>
       <directory>${project.build.directory}</directory>
       <includes>
-        <include>dbtool/**/*.bat</include>
-        <include>dbtool/**/*.cmd</include>
         <include>tomcat/**/*.bat</include>
         <include>tomcat/**/*.cmd</include>
       </includes>
@@ -36,7 +33,6 @@
       <includes>
         <include>xipki/**</include>
         <include>lib/**</include>
-        <include>dbtool/**</include>
         <include>README.md</include>
       </includes>
       <excludes>
