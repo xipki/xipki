@@ -67,8 +67,6 @@ public class CaServletFilter implements Filter {
 
   private static final String DFLT_CA_SERVER_CFG = "etc/ca/ca.json";
 
-  private static final String DFLT_SYSLOG_AUDIT_CFG = "etc/ca/audit.syslog.cfg";
-
   private Securities securities;
 
   private CaManagerImpl caManager;
@@ -110,10 +108,6 @@ public class CaServletFilter implements Filter {
     }
 
     String auditConf = audit.getConf();
-    if ("syslog".equalsIgnoreCase(auditType) && auditConf == null) {
-      auditConf = DFLT_SYSLOG_AUDIT_CFG;
-    }
-
     Audits.init(auditType, auditConf);
 
     securities = new Securities();

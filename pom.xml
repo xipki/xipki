@@ -35,13 +35,12 @@
     <bc.version>1.66</bc.version>
     <slf4j.version>1.7.25</slf4j.version>
     <pkcs11-wrapper.version>1.4.7</pkcs11-wrapper.version>
+    <hikaricp.version>3.4.5</hikaricp.version>
+    <fastjson.version>1.2.72</fastjson.version>
     <!-- Liquibase: do not update to newer version due to bug related to MariaDB 10.3
          see https://liquibase.jira.com/browse/CORE-3457 for details -->
     <liquibase.version>3.6.3</liquibase.version>
     <snakeyaml.version>1.18</snakeyaml.version>
-    <hikaricp.version>3.4.5</hikaricp.version>
-    <syslog-java-client.version>1.1.7</syslog-java-client.version>
-    <fastjson.version>1.2.72</fastjson.version>
     <!-- only for runtime -->
     <log4j.version>2.13.3</log4j.version>
     <jdbc.mariadb.version>2.6.1</jdbc.mariadb.version>
@@ -317,11 +316,6 @@
         <groupId>com.zaxxer</groupId>
         <artifactId>HikariCP</artifactId>
         <version>${hikaricp.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.cloudbees</groupId>
-        <artifactId>syslog-java-client</artifactId>
-        <version>${syslog-java-client.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.karaf.shell</groupId>

@@ -73,7 +73,6 @@ scep-client-*.jar,\
 security-*.jar,\
 slf4j-*.jar,\
 sunpkcs11-wrapper-*.jar,\
-syslog-java-client-*.jar,\
 util-*.jar
 ```
 

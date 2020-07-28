@@ -335,7 +335,6 @@ Features
   - API to use customized key types, e.g. smartcard
   - High performance
   - Support of health check
-  - Audit with syslog and slf4j
 
 - For CA, OCSP Responder and Toolkit
   - API to resolve password

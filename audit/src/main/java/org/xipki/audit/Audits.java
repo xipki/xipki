@@ -20,7 +20,6 @@ package org.xipki.audit;
 import java.lang.reflect.InvocationTargetException;
 
 import org.xipki.audit.services.EmbedAuditService;
-import org.xipki.audit.services.SyslogAuditService;
 
 /**
  * Helper class to configure and initialize the Audit.
@@ -35,7 +34,6 @@ public class Audits {
     /**
      * valid values are:
      *   embed: use the embedded slf4j logging
-     *   syslog: use the syslog
      *   java:&lt;name of class that implements org.xipki.audit.AuditService&gt;
      */
     private String type;
@@ -86,8 +84,6 @@ public class Audits {
       AuditService service;
       if ("embed".equalsIgnoreCase(auditType)) {
         service = new EmbedAuditService();
-      } else if ("syslog".equalsIgnoreCase(auditType)) {
-        service = new SyslogAuditService();
       } else  if (auditType.startsWith("java:")) {
         String className = auditType.substring("java:".length());
         try {
@@ -101,7 +97,7 @@ public class Audits {
         }
       } else {
         throw new AuditServiceRuntimeException("invalid Audit.Type '" + auditType
-            + "'. Valid values are 'embed', 'syslog' or java:<name of class that implements "
+            + "'. Valid values are 'embed' or java:<name of class that implements "
             + AuditService.class.getName() + ">");
       }
 

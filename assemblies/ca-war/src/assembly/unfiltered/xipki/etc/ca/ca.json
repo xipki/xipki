@@ -39,7 +39,6 @@
 	},
 	"audit":{
 		// embed: use the embedded slf4j logging
-		// syslog: use the syslog
 		// java:<name of class that implements org.xipki.audit.AuditService>
 		"type":"embed"
 		//,"conf":"..."
