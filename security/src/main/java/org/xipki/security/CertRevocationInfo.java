@@ -17,9 +17,10 @@
 
 package org.xipki.security;
 
+import static org.xipki.util.Args.notNull;
+
 import java.util.Date;
 
-import org.xipki.util.Args;
 import org.xipki.util.CompareUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.StringUtil;
@@ -53,8 +54,8 @@ public class CertRevocationInfo {
   }
 
   public CertRevocationInfo(CrlReason reason, Date revocationTime, Date invalidityTime) {
-    this.reason = Args.notNull(reason, "reason");
-    this.revocationTime = Args.notNull(revocationTime, "revocationTime");
+    this.reason = notNull(reason, "reason");
+    this.revocationTime = notNull(revocationTime, "revocationTime");
     this.invalidityTime = invalidityTime;
   }
 
@@ -67,13 +68,13 @@ public class CertRevocationInfo {
   }
 
   public CertRevocationInfo(int reasonCode, Date revocationTime, Date invalidityTime) {
-    this.revocationTime = Args.notNull(revocationTime, "revocationTime");
+    this.revocationTime = notNull(revocationTime, "revocationTime");
     this.reason = CrlReason.forReasonCode(reasonCode);
     this.invalidityTime = invalidityTime;
   }
 
   public void setReason(CrlReason reason) {
-    this.reason = Args.notNull(reason, "reason");
+    this.reason = notNull(reason, "reason");
   }
 
   public CrlReason getReason() {
@@ -81,7 +82,7 @@ public class CertRevocationInfo {
   }
 
   public void setRevocationTime(Date revocationTime) {
-    this.revocationTime = Args.notNull(revocationTime, "revocationTime");
+    this.revocationTime = notNull(revocationTime, "revocationTime");
   }
 
   /**

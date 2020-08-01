@@ -17,8 +17,11 @@
 
 package org.xipki.security;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableList;
+import static org.xipki.util.Args.range;
+
 import java.io.IOException;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,7 +33,6 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
-import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 
 /**
@@ -64,13 +66,13 @@ public class ExtensionExistence extends ASN1Object {
     this.wantExtensions = wantExtensions;
 
     if (this.needExtensions == null) {
-      List<ASN1ObjectIdentifier> list = Collections.emptyList();
-      this.needExtensions = Collections.unmodifiableList(list);
+      List<ASN1ObjectIdentifier> list = emptyList();
+      this.needExtensions = unmodifiableList(list);
     }
 
     if (this.wantExtensions == null) {
-      List<ASN1ObjectIdentifier> list = Collections.emptyList();
-      this.wantExtensions = Collections.unmodifiableList(list);
+      List<ASN1ObjectIdentifier> list = emptyList();
+      this.wantExtensions = unmodifiableList(list);
     }
 
   }
@@ -84,7 +86,7 @@ public class ExtensionExistence extends ASN1Object {
     for (int i = 0; i < size; i++) {
       ASN1TaggedObject tagObject = ASN1TaggedObject.getInstance(seq.getObjectAt(i));
       int tag = tagObject.getTagNo();
-      Args.range(tag, "tag", 0, 1);
+      range(tag, "tag", 0, 1);
       ASN1Sequence subSeq = ASN1Sequence.getInstance(tagObject.getObject());
       List<ASN1ObjectIdentifier> oids = new LinkedList<>();
       int subSize = subSeq.size();
@@ -93,18 +95,18 @@ public class ExtensionExistence extends ASN1Object {
       }
 
       if (tag == 0) {
-        needExtensions = Collections.unmodifiableList(oids);
+        needExtensions = unmodifiableList(oids);
       } else {
-        wantExtensions = Collections.unmodifiableList(oids);
+        wantExtensions = unmodifiableList(oids);
       }
     }
 
     if (needExtensions == null) {
-      needExtensions = Collections.unmodifiableList(Collections.emptyList());
+      needExtensions = unmodifiableList(emptyList());
     }
 
     if (wantExtensions == null) {
-      wantExtensions = Collections.unmodifiableList(Collections.emptyList());
+      wantExtensions = unmodifiableList(emptyList());
     }
   } // constructor
 

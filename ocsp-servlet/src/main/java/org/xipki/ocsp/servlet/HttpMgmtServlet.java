@@ -17,6 +17,9 @@
 
 package org.xipki.ocsp.servlet;
 
+import static org.xipki.util.Args.notEmpty;
+import static org.xipki.util.Args.notNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
@@ -36,7 +39,6 @@ import org.xipki.ocsp.server.OcspServerImpl;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
-import org.xipki.util.Args;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.InvalidConfException;
 
@@ -76,11 +78,11 @@ public class HttpMgmtServlet extends HttpServlet {
   private OcspServerImpl ocspServer;
 
   public void setMgmtCerts(Set<X509Cert> mgmtCerts) {
-    this.mgmtCerts = new HashSet<>(Args.notEmpty(mgmtCerts, "mgmtCerts"));
+    this.mgmtCerts = new HashSet<>(notEmpty(mgmtCerts, "mgmtCerts"));
   }
 
   public void setOcspServer(OcspServerImpl ocspServer) {
-    this.ocspServer = Args.notNull(ocspServer, "ocspServer");
+    this.ocspServer = notNull(ocspServer, "ocspServer");
   }
 
   @Override

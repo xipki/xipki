@@ -17,6 +17,8 @@
 
 package org.xipki.security;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -48,7 +50,6 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
 import org.xipki.util.Hex;
 
 /**
@@ -112,7 +113,7 @@ public class X509Cert {
 
   public X509Cert(X509Certificate cert, byte[] encoded) {
     this.bcInstance = null;
-    this.jceInstance = Args.notNull(cert, "cert");
+    this.jceInstance = notNull(cert, "cert");
     this.encoded = encoded;
 
     this.notBefore = cert.getNotBefore();
@@ -130,7 +131,7 @@ public class X509Cert {
   }
 
   public X509Cert(X509CertificateHolder cert, byte[] encoded) {
-    this.bcInstance = Args.notNull(cert, "cert");
+    this.bcInstance = notNull(cert, "cert");
     this.jceInstance = null;
     this.encoded = encoded;
 

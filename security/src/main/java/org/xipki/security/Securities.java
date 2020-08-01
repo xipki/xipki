@@ -89,7 +89,7 @@ public class Securities implements Closeable {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(type, "type");
+      notBlank(type, "type");
       validate(keystore);
     }
 

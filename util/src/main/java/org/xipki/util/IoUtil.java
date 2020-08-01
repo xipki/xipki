@@ -17,6 +17,9 @@
 
 package org.xipki.util;
 
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -172,7 +175,7 @@ public class IoUtil {
   }
 
   public static String expandFilepath(String path) {
-    Args.notBlank(path, "path");
+    notBlank(path, "path");
     if (path.startsWith("~")) {
       return USER_HOME + path.substring(1);
     } else {
@@ -250,7 +253,7 @@ public class IoUtil {
   }
 
   public static HttpURLConnection openHttpConn(URL url) throws IOException {
-    Args.notNull(url, "url");
+    notNull(url, "url");
     URLConnection conn = url.openConnection();
     if (conn instanceof HttpURLConnection) {
       return (HttpURLConnection) conn;

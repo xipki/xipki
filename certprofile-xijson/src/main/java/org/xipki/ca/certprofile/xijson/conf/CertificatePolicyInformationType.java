@@ -97,7 +97,7 @@ public class CertificatePolicyInformationType extends ValidatableConf {
     @Override
     public void validate() throws InvalidConfException {
       notNull(type, "type");
-      notEmpty(value, "value");
+      notBlank(value, "value");
     }
 
   } // class PolicyQualifier

@@ -17,6 +17,8 @@
 
 package org.xipki.cmpclient.internal;
 
+import static org.xipki.util.Args.notNull;
+
 import java.math.BigInteger;
 
 import org.bouncycastle.asn1.cmp.CMPCertificate;
@@ -26,7 +28,6 @@ import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.cmpclient.IdentifiedObject;
 import org.xipki.security.cmp.PkiStatusInfo;
-import org.xipki.util.Args;
 
 /**
  * Result entry.
@@ -47,7 +48,7 @@ abstract class ResultEntry extends IdentifiedObject {
 
     public Error(String id, PkiStatusInfo statusInfo) {
       super(id);
-      this.statusInfo = Args.notNull(statusInfo, "statusInfo");
+      this.statusInfo = notNull(statusInfo, "statusInfo");
     }
 
     public Error(String id, int status, int pkiFailureInfo, String statusMessage) {
@@ -124,8 +125,8 @@ abstract class ResultEntry extends IdentifiedObject {
 
     public UnrevokeOrRemoveCert(String id, X500Name issuer, BigInteger serialNumber) {
       super(id);
-      this.serialNumber = Args.notNull(serialNumber, "serialNumber");
-      this.issuer = Args.notNull(issuer, "issuer");
+      this.serialNumber = notNull(serialNumber, "serialNumber");
+      this.issuer = notNull(issuer, "issuer");
     }
 
     public X500Name getIssuer() {

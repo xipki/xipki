@@ -17,6 +17,8 @@
 
 package org.xipki.security.pkcs11;
 
+import static org.xipki.util.Args.notNull;
+
 import java.security.PublicKey;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
@@ -29,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
-import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 
 import iaik.pkcs.pkcs11.wrapper.Functions;
@@ -57,16 +58,16 @@ public abstract class P11Identity implements Comparable<P11Identity> {
   protected X509Cert[] certificateChain;
 
   protected P11Identity(P11Slot slot, P11IdentityId id, int signatureBitLen) {
-    this.slot = Args.notNull(slot, "slot");
-    this.id = Args.notNull(id, "id");
+    this.slot = notNull(slot, "slot");
+    this.id = notNull(id, "id");
     this.publicKey = null;
     this.signatureKeyBitLength = signatureBitLen;
   } // constructor
 
   protected P11Identity(P11Slot slot, P11IdentityId id, PublicKey publicKey,
       X509Cert[] certificateChain) {
-    this.slot = Args.notNull(slot, "slot");
-    this.id = Args.notNull(id, "id");
+    this.slot = notNull(slot, "slot");
+    this.id = notNull(id, "id");
 
     if (certificateChain != null && certificateChain.length > 0 && certificateChain[0] != null) {
       this.publicKey = certificateChain[0].getPublicKey();
@@ -104,7 +105,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
       throw new P11TokenException("this identity is not suitable for sign");
     }
 
-    Args.notNull(content, "content");
+    notNull(content, "content");
     slot.assertMechanismSupported(mechanism);
     if (!supportsMechanism(mechanism, parameters)) {
       throw new P11UnsupportedMechanismException(mechanism, id);

@@ -17,6 +17,9 @@
 
 package org.xipki.security.pkcs12;
 
+import static org.xipki.util.Args.min;
+import static org.xipki.util.Args.notNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
@@ -42,7 +45,6 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
 
 /**
  * Keypair with certificate.
@@ -59,9 +61,9 @@ public class KeypairWithCert {
   private final X509Cert[] certificateChain;
 
   public KeypairWithCert(PrivateKey key, X509Cert[] certificateChain) {
-    this.key = Args.notNull(key, "key");
-    this.certificateChain = Args.notNull(certificateChain, "certificateChain");
-    Args.min(certificateChain.length, "certificateChain.length", 1);
+    this.key = notNull(key, "key");
+    this.certificateChain = notNull(certificateChain, "certificateChain");
+    min(certificateChain.length, "certificateChain.length", 1);
     this.publicKey = certificateChain[0].getPublicKey();
   }
 
@@ -79,9 +81,9 @@ public class KeypairWithCert {
       throw new IllegalArgumentException("unsupported keystore type: " + keystoreType);
     }
 
-    Args.notNull(keystoreStream, "keystoreStream");
-    Args.notNull(keystorePassword, "keystorePassword");
-    Args.notNull(keyPassword, "keyPassword");
+    notNull(keystoreStream, "keystoreStream");
+    notNull(keystorePassword, "keystorePassword");
+    notNull(keyPassword, "keyPassword");
 
     KeyStore keystore;
     try {
@@ -108,7 +110,7 @@ public class KeypairWithCert {
   public static KeypairWithCert fromKeystore(KeyStore keystore,
       String keyname, char[] keyPassword, X509Cert[] certchain)
           throws XiSecurityException {
-    Args.notNull(keyPassword, "keyPassword");
+    notNull(keyPassword, "keyPassword");
 
     try {
 

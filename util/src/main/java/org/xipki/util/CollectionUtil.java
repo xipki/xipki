@@ -17,9 +17,12 @@
 
 package org.xipki.util;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +81,7 @@ public class CollectionUtil {
   }
 
   public static <K, V> Map<K, V> unmodifiableMap(Map<? extends K, ? extends V> map) {
-    return (map == null) ? Collections.emptyMap() : Collections.unmodifiableMap(map);
+    return (map == null) ? emptyMap() : unmodifiableMap(map);
   }
 
   public static List<String> toLowerCaseList(List<String> list) {
@@ -106,15 +109,15 @@ public class CollectionUtil {
   }
 
   public static <T> Set<T> unmodifiableSet(Set<? extends T> set) {
-    return (set == null) ? Collections.emptySet() : Collections.unmodifiableSet(set);
+    return (set == null) ? emptySet() : unmodifiableSet(set);
   }
 
   public static <T> Collection<T> unmodifiableCollection(Collection<? extends T> col) {
-    return (col == null) ? Collections.emptySet() : Collections.unmodifiableCollection(col);
+    return (col == null) ? emptySet() : unmodifiableCollection(col);
   }
 
   public static <T> List<T> unmodifiableList(List<? extends T> list) {
-    return (list == null) ? Collections.emptyList() : Collections.unmodifiableList(list);
+    return (list == null) ? emptyList() : unmodifiableList(list);
   }
 
 }

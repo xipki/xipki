@@ -17,6 +17,8 @@
 
 package org.xipki.security.pkcs11.iaik;
 
+import static org.xipki.util.Args.notNull;
+
 import java.security.PublicKey;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
@@ -30,7 +32,6 @@ import org.xipki.security.pkcs11.P11Identity;
 import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11Params;
 import org.xipki.security.pkcs11.P11TokenException;
-import org.xipki.util.Args;
 
 import iaik.pkcs.pkcs11.objects.Key;
 import iaik.pkcs.pkcs11.objects.PrivateKey;
@@ -51,14 +52,14 @@ class IaikP11Identity extends P11Identity {
 
   IaikP11Identity(IaikP11Slot slot, P11IdentityId identityId, SecretKey signingKey) {
     super(slot, identityId, 0);
-    this.signingKey = Args.notNull(signingKey, "signingKey");
+    this.signingKey = notNull(signingKey, "signingKey");
     this.expectedSignatureLen = 0;
   }
 
   IaikP11Identity(IaikP11Slot slot, P11IdentityId identityId, PrivateKey privateKey,
       PublicKey publicKey, X509Cert[] certificateChain) {
     super(slot, identityId, publicKey, certificateChain);
-    this.signingKey = Args.notNull(privateKey, "privateKey");
+    this.signingKey = notNull(privateKey, "privateKey");
 
     int keyBitLen = getSignatureKeyBitLength();
     if (publicKey instanceof RSAPublicKey) {

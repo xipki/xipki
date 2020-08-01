@@ -17,12 +17,14 @@
 
 package org.xipki.password;
 
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.Args.range;
+
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
-import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.StringUtil;
 
@@ -40,8 +42,8 @@ public class PBEPasswordService {
 
   public static char[] decryptPassword(char[] masterPassword, String passwordHint)
       throws PasswordResolverException {
-    Args.notNull(masterPassword, "masterPassword");
-    Args.notNull(passwordHint, "passwordHint");
+    notNull(masterPassword, "masterPassword");
+    notNull(passwordHint, "passwordHint");
 
     byte[] bytes = Base64.decode(passwordHint.substring("PBE:".length()));
     int len = bytes.length;
@@ -88,9 +90,9 @@ public class PBEPasswordService {
 
   public static String encryptPassword(PBEAlgo algo, int iterationCount, char[] masterPassword,
       char[] password) throws PasswordResolverException {
-    Args.range(iterationCount, "iterationCount", 1, 65535);
-    Args.notNull(masterPassword, "masterPassword");
-    Args.notNull(password, "password");
+    range(iterationCount, "iterationCount", 1, 65535);
+    notNull(masterPassword, "masterPassword");
+    notNull(password, "password");
 
     byte[] iterationCountBytes = new byte[2];
     iterationCountBytes[0] = (byte) (iterationCount >>> 8);

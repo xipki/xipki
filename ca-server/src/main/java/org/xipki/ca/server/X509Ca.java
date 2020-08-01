@@ -27,6 +27,8 @@ import static org.xipki.ca.api.OperationException.ErrorCode.SYSTEM_FAILURE;
 import static org.xipki.ca.api.OperationException.ErrorCode.SYSTEM_UNAVAILABLE;
 import static org.xipki.ca.api.OperationException.ErrorCode.UNKNOWN_CERT;
 import static org.xipki.ca.api.OperationException.ErrorCode.UNKNOWN_CERT_PROFILE;
+import static org.xipki.util.Args.notEmpty;
+import static org.xipki.util.Args.notNull;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -141,7 +143,6 @@ import org.xipki.security.ctlog.CtLog.SignedCertificateTimestampList;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.RSABrokenKey;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.DateUtil;
 import org.xipki.util.HealthCheckResult;
@@ -425,14 +426,14 @@ public class X509Ca implements Closeable {
   public X509Ca(CaManagerImpl caManager, CaInfo caInfo, CertStore certstore,
       CtLogClient ctlogClient)
       throws OperationException {
-    this.caManager = Args.notNull(caManager, "caManager");
+    this.caManager = notNull(caManager, "caManager");
     this.masterMode = caManager.isMasterMode();
     this.caIdNameMap = caManager.idNameMap();
-    this.caInfo = Args.notNull(caInfo, "caInfo");
+    this.caInfo = notNull(caInfo, "caInfo");
     this.ctlogClient = ctlogClient;
     this.caIdent = caInfo.getIdent();
     this.caCert = caInfo.getCert();
-    this.certstore = Args.notNull(certstore, "certstore");
+    this.certstore = notNull(certstore, "certstore");
 
     SubjectPublicKeyInfo caSpki = this.caCert.getSubjectPublicKeyInfo();
     ASN1ObjectIdentifier caSpkiAlgId = caSpki.getAlgorithm().getAlgorithm();
@@ -543,7 +544,7 @@ public class X509Ca implements Closeable {
   }
 
   public CertStore.KnowCertResult knowsCert(X509Cert cert) throws OperationException {
-    Args.notNull(cert, "cert");
+    notNull(cert, "cert");
 
     X500Name issuerX500 = cert.getIssuer();
     if (!caInfo.getSubject().equals(X509Util.getRfc4519Name(issuerX500))) {
@@ -563,7 +564,7 @@ public class X509Ca implements Closeable {
   }
 
   public boolean verifyCsr(CertificationRequest csr) {
-    Args.notNull(csr, "csr");
+    notNull(csr, "csr");
     return CaUtil.verifyCsr(csr, caManager.getSecurityFactory(),
         getCmpControl().getPopoAlgoValidator(), caInfo.getDhpocControl());
   }
@@ -1002,7 +1003,7 @@ public class X509Ca implements Closeable {
    *     any publishers, 2 if could be published to CA certstore but not to all publishers.
    */
   private int publishCert0(CertificateInfo certInfo) {
-    Args.notNull(certInfo, "certInfo");
+    notNull(certInfo, "certInfo");
     if (certInfo.isAlreadyIssued()) {
       return 0;
     }
@@ -1153,7 +1154,7 @@ public class X509Ca implements Closeable {
   }
 
   private boolean publishCertsInQueue(IdentifiedCertPublisher publisher) {
-    Args.notNull(publisher, "publisher");
+    notNull(publisher, "publisher");
     final int numEntries = 500;
 
     while (true) {
@@ -1513,7 +1514,7 @@ public class X509Ca implements Closeable {
   } // method shouldPublishToDeltaCrlCache
 
   public void revokeCa(CertRevocationInfo revocationInfo, String msgId) throws OperationException {
-    Args.notNull(revocationInfo, "revocationInfo");
+    notNull(revocationInfo, "revocationInfo");
     caInfo.setRevocationInfo(revocationInfo);
 
     if (caInfo.isSelfSigned()) {
@@ -1603,7 +1604,7 @@ public class X509Ca implements Closeable {
   private List<CertificateInfo> generateCerts(List<CertTemplateData> certTemplates,
       RequestorInfo requestor, boolean update, RequestType reqType, byte[] transactionId,
       String msgId) throws OperationExceptionWithIndex {
-    Args.notEmpty(certTemplates, "certTemplates");
+    notEmpty(certTemplates, "certTemplates");
     final int n = certTemplates.size();
     List<GrantedCertTemplate> gcts = new ArrayList<>(n);
 
@@ -1679,7 +1680,7 @@ public class X509Ca implements Closeable {
 
   public CertificateInfo generateCert(CertTemplateData certTemplate, RequestorInfo requestor,
       RequestType reqType, byte[] transactionId, String msgId) throws OperationException {
-    Args.notNull(certTemplate, "certTemplate");
+    notNull(certTemplate, "certTemplate");
     return generateCerts(Arrays.asList(certTemplate), requestor,
         reqType, transactionId, msgId).get(0);
   }
@@ -1700,7 +1701,7 @@ public class X509Ca implements Closeable {
 
   private CertificateInfo generateCert0(GrantedCertTemplate gct, RequestorInfo requestor,
       RequestType reqType, byte[] transactionId, AuditEvent event) throws OperationException {
-    Args.notNull(gct, "gct");
+    notNull(gct, "gct");
 
     event.addEventData(CaAuditConstants.NAME_req_subject,
         X509Util.getRfc4519Name(gct.requestedSubject));
@@ -1842,7 +1843,7 @@ public class X509Ca implements Closeable {
 
   private GrantedCertTemplate createGrantedCertTemplate(CertTemplateData certTemplate,
       RequestorInfo requestor, boolean update) throws OperationException {
-    Args.notNull(certTemplate, "certTemplate");
+    notNull(certTemplate, "certTemplate");
     if (caInfo.getRevocationInfo() != null) {
       throw new OperationException(NOT_PERMITTED, "CA is revoked");
     }
@@ -2176,7 +2177,7 @@ public class X509Ca implements Closeable {
   } // method getX509Certprofile
 
   public boolean supportsCertprofile(String certprofileName) {
-    Args.notNull(certprofileName, "certprofileName");
+    notNull(certprofileName, "certprofileName");
     Set<String> profileNames = caManager.getCertprofilesForCa(caIdent.getName());
     return profileNames.contains(certprofileName.toLowerCase());
   }
@@ -2292,7 +2293,7 @@ public class X509Ca implements Closeable {
 
   private int removeExpirtedCerts0(Date expiredAtTime, AuditEvent event, String msgId)
       throws OperationException {
-    Args.notNull(expiredAtTime, "expiredtime");
+    notNull(expiredAtTime, "expiredtime");
     if (!masterMode) {
       throw new OperationException(NOT_PERMITTED,
           "CA could not remove expired certificates in slave mode");
@@ -2460,9 +2461,9 @@ public class X509Ca implements Closeable {
   }
 
   private AuditEvent newAuditEvent(String name, String eventType, String msgId) {
-    Args.notNull(name, "name");
-    Args.notNull(eventType, "eventType");
-    Args.notNull(msgId, "msgId");
+    notNull(name, "name");
+    notNull(eventType, "eventType");
+    notNull(msgId, "msgId");
     AuditEvent event = new AuditEvent(new Date());
     event.setApplicationName(CaAuditConstants.APPNAME);
     event.setName(name);
@@ -2473,7 +2474,7 @@ public class X509Ca implements Closeable {
   }
 
   private boolean verifySignature(X509Cert cert) {
-    Args.notNull(cert, "cert");
+    notNull(cert, "cert");
     PublicKey caPublicKey = caCert.getPublicKey();
     try {
       cert.verify(caPublicKey);

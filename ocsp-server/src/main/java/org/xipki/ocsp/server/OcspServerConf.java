@@ -30,7 +30,6 @@ import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownIssuerBehaviour;
 import org.xipki.security.CertpathValidationModel;
 import org.xipki.security.Securities.KeystoreConf;
-import org.xipki.util.Args;
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
@@ -396,11 +395,11 @@ public class OcspServerConf extends ValidatableConf {
     @Override
     public void validate() throws InvalidConfException {
       notEmpty(servletPaths, "servletPaths");
-      notEmpty(signer, "signer");
-      notEmpty(request, "request");
-      notEmpty(response, "response");
+      notBlank(signer, "signer");
+      notBlank(request, "request");
+      notBlank(response, "response");
       notEmpty(stores, "stores");
-      notEmpty(name, "name");
+      notBlank(name, "name");
     }
 
   } // class Responder
@@ -512,7 +511,7 @@ public class OcspServerConf extends ValidatableConf {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(name, "name");
+      notBlank(name, "name");
     }
 
   } // class ResponseOption
@@ -587,9 +586,9 @@ public class OcspServerConf extends ValidatableConf {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(name, "name");
-      notEmpty(type, "type");
-      notEmpty(key, "key");
+      notBlank(name, "name");
+      notBlank(type, "type");
+      notBlank(key, "key");
       notEmpty(algorithms, "algorithms");
     }
 
@@ -702,7 +701,7 @@ public class OcspServerConf extends ValidatableConf {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(name, "name");
+      notBlank(name, "name");
       notNull(source, "source");
     }
 
@@ -742,7 +741,7 @@ public class OcspServerConf extends ValidatableConf {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(type, "type");
+      notBlank(type, "type");
     }
 
   } // class Source
@@ -803,7 +802,7 @@ public class OcspServerConf extends ValidatableConf {
 
   public static OcspServerConf readConfFromFile(String fileName)
       throws IOException, InvalidConfException {
-    Args.notBlank(fileName, "fileName");
+    notBlank(fileName, "fileName");
     try (InputStream is = Files.newInputStream(Paths.get(fileName))) {
       OcspServerConf conf = JSON.parseObject(is, OcspServerConf.class);
       conf.validate();

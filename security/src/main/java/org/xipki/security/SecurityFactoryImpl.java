@@ -17,6 +17,10 @@
 
 package org.xipki.security;
 
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.Args.positive;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.security.InvalidKeyException;
@@ -45,7 +49,6 @@ import org.xipki.password.PasswordResolver;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.SignerUtil;
-import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
 
@@ -159,7 +162,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
   }
 
   public void setDefaultSignerParallelism(int defaultSignerParallelism) {
-    this.defaultSignerParallelism = Args.positive(
+    this.defaultSignerParallelism = positive(
         defaultSignerParallelism, "defaultSignerParallelism");
   }
 
@@ -205,8 +208,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
   @Override
   public byte[] extractMinimalKeyStore(String keystoreType, byte[] keystoreBytes, String keyname,
       char[] password, X509Cert[] newCertChain) throws KeyStoreException {
-    Args.notBlank(keystoreType, "keystoreType");
-    Args.notNull(keystoreBytes, "keystoreBytes");
+    notBlank(keystoreType, "keystoreType");
+    notNull(keystoreBytes, "keystoreBytes");
 
     try {
       KeyStore ks = KeyUtil.getKeyStore(keystoreType);

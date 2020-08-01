@@ -17,6 +17,9 @@
 
 package org.xipki.qa.security;
 
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +38,6 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.pkcs12.KeystoreGenerationParameters;
 import org.xipki.security.pkcs12.P12KeyGenerationResult;
 import org.xipki.security.pkcs12.P12KeyGenerator;
-import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.BenchmarkExecutor;
 import org.xipki.util.ConfPairs;
@@ -265,9 +267,9 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
           throws Exception {
     super(description);
 
-    Args.notNull(securityFactory, "securityFactory");
-    Args.notBlank(signatureAlgorithm, "signatureAlgorithm");
-    Args.notNull(keystore, "keystore");
+    notNull(securityFactory, "securityFactory");
+    notBlank(signatureAlgorithm, "signatureAlgorithm");
+    notNull(keystore, "keystore");
 
     SignerConf signerConf = getKeystoreSignerConf(new ByteArrayInputStream(keystore), PASSWORD,
         signatureAlgorithm, threads + Math.max(2, threads * 5 / 4));

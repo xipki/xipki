@@ -17,6 +17,10 @@
 
 package org.xipki.util;
 
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.Args.positive;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -68,12 +72,12 @@ public class Validity implements Comparable<Validity> {
   }
 
   public Validity(int validity, Unit unit) {
-    this.validity = Args.positive(validity, "validity");
-    this.unit = Args.notNull(unit, "unit");
+    this.validity = positive(validity, "validity");
+    this.unit = notNull(unit, "unit");
   }
 
   public static Validity getInstance(String validityS) {
-    Args.notBlank(validityS, "validityS");
+    notBlank(validityS, "validityS");
 
     final int len = validityS.length();
     final char suffix = validityS.charAt(len - 1);
@@ -111,7 +115,7 @@ public class Validity implements Comparable<Validity> {
   } // method getInstance
 
   public void setValidity(int validity) {
-    this.validity = Args.positive(validity, "validity");
+    this.validity = positive(validity, "validity");
   }
 
   public int getValidity() {
@@ -119,7 +123,7 @@ public class Validity implements Comparable<Validity> {
   }
 
   public void setUnit(Unit unit) {
-    this.unit = Args.notNull(unit, "unit");
+    this.unit = notNull(unit, "unit");
   }
 
   public Unit getUnit() {
@@ -183,7 +187,7 @@ public class Validity implements Comparable<Validity> {
 
   @Override
   public int compareTo(Validity obj) {
-    Args.notNull(obj, "obj");
+    notNull(obj, "obj");
     if (unit == obj.unit) {
       if (validity == obj.validity) {
         return 0;

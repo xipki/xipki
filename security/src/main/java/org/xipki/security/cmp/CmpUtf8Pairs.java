@@ -17,14 +17,15 @@
 
 package org.xipki.security.cmp;
 
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.xipki.util.Args;
 
 /**
  * Specifies utf8Pairs defined in RFC4211.
@@ -57,7 +58,7 @@ public class CmpUtf8Pairs {
   }
 
   public CmpUtf8Pairs(String encodedCmpUtf8Pairs) {
-    String encoded = Args.notBlank(encodedCmpUtf8Pairs, "encodedCmpUtf8Pairs");
+    String encoded = notBlank(encodedCmpUtf8Pairs, "encodedCmpUtf8Pairs");
     // remove the ending '%'-symbols
     while (encoded.charAt(encoded.length() - 1) == TOKEN_TERM) {
       encoded = encoded.substring(0, encoded.length() - 1);
@@ -100,8 +101,8 @@ public class CmpUtf8Pairs {
   } // constructor
 
   public final void putUtf8Pair(String name, String value) {
-    Args.notNull(name, "name");
-    Args.notNull(value, "value");
+    notNull(name, "name");
+    notNull(value, "value");
 
     char ch = name.charAt(0);
     if (ch >= '0' && ch <= '9') {
@@ -111,12 +112,12 @@ public class CmpUtf8Pairs {
   }
 
   public void removeUtf8Pair(String name) {
-    Args.notNull(name, "name");
+    notNull(name, "name");
     pairs.remove(name);
   }
 
   public String value(String name) {
-    Args.notNull(name, "name");
+    notNull(name, "name");
     return pairs.get(name);
   }
 

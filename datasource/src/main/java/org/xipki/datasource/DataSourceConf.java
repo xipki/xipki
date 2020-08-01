@@ -50,7 +50,7 @@ public class DataSourceConf extends ValidatableConf {
 
   @Override
   public void validate() throws InvalidConfException {
-    notEmpty(name, "name");
+    notBlank(name, "name");
     notNull(conf, "conf");
     validate(conf);
   }

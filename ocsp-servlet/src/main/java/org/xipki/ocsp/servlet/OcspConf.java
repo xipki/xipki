@@ -24,7 +24,6 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import org.xipki.security.Securities.SecurityConf;
-import org.xipki.util.Args;
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
@@ -77,7 +76,7 @@ public class OcspConf extends ValidatableConf {
 
   public static OcspConf readConfFromFile(String fileName)
       throws IOException, InvalidConfException {
-    Args.notBlank(fileName, "fileName");
+    notBlank(fileName, "fileName");
     try (InputStream is = Files.newInputStream(
                             Paths.get(IoUtil.expandFilepath(fileName)))) {
       OcspConf conf = JSON.parseObject(is, OcspConf.class);

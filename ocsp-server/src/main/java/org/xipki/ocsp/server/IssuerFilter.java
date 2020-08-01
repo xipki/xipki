@@ -17,13 +17,14 @@
 
 package org.xipki.ocsp.server;
 
+import static org.xipki.util.Args.notBlank;
+
 import java.security.cert.CertificateEncodingException;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
-import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 
 /**
@@ -65,7 +66,7 @@ public class IssuerFilter {
   }
 
   public boolean includeIssuerWithSha1Fp(String sha1Fp) {
-    Args.notBlank(sha1Fp, "sha1Fp");
+    notBlank(sha1Fp, "sha1Fp");
     if (includeSha1Fps == null || includeSha1Fps.contains(sha1Fp)) {
       return (excludeSha1Fps == null) ? true : !excludeSha1Fps.contains(sha1Fp);
     } else {

@@ -17,6 +17,9 @@
 
 package org.xipki.security.pkcs11;
 
+import static org.xipki.util.Args.notEmpty;
+import static org.xipki.util.Args.notNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
-import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.StringUtil;
@@ -122,7 +124,7 @@ public class P11ModuleConf {
     }
 
     void addEntry(Set<P11SlotIdFilter> slots, Collection<Long> mechanisms) {
-      Args.notNull(mechanisms, "mechanismis");
+      notNull(mechanisms, "mechanismis");
       singleFilters.add(new P11SingleMechanismFilter(slots, mechanisms));
     }
 
@@ -131,7 +133,7 @@ public class P11ModuleConf {
     }
 
     public boolean isMechanismPermitted(P11SlotIdentifier slotId, long mechanism) {
-      Args.notNull(slotId, "slotId");
+      notNull(slotId, "slotId");
       if (CollectionUtil.isEmpty(singleFilters)) {
         return true;
       }
@@ -205,7 +207,7 @@ public class P11ModuleConf {
     }
 
     public List<char[]> getPassword(P11SlotIdentifier slotId) throws PasswordResolverException {
-      Args.notNull(slotId, "slotId");
+      notNull(slotId, "slotId");
       if (CollectionUtil.isEmpty(singleRetrievers)) {
         return null;
       }
@@ -280,7 +282,7 @@ public class P11ModuleConf {
 
     public void setSetCertObjectAttributes(Set<Long> setCertObjectAttributes) {
       this.setCertObjectAttributes =
-          Args.notNull(setCertObjectAttributes, "setCertObjectAttributes");
+          notNull(setCertObjectAttributes, "setCertObjectAttributes");
     }
 
   } // class P11NewObjectConf
@@ -311,8 +313,8 @@ public class P11ModuleConf {
 
   public P11ModuleConf(Pkcs11conf.Module moduleType, List<Pkcs11conf.MechanismSet> mechanismSets,
       PasswordResolver passwordResolver) throws InvalidConfException {
-    Args.notNull(moduleType, "moduleType");
-    Args.notEmpty(mechanismSets, "mechanismSets");
+    notNull(moduleType, "moduleType");
+    notEmpty(mechanismSets, "mechanismSets");
     this.name = moduleType.getName();
     this.readOnly = moduleType.isReadonly();
 
@@ -484,7 +486,7 @@ public class P11ModuleConf {
   }
 
   public boolean isSlotIncluded(P11SlotIdentifier slotId) {
-    Args.notNull(slotId, "slotId");
+    notNull(slotId, "slotId");
     boolean included;
     if (CollectionUtil.isEmpty(includeSlots)) {
       included = true;

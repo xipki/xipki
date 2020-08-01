@@ -215,7 +215,7 @@ public class CaConfType {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(requestorName, "requestorName");
+      notBlank(requestorName, "requestorName");
       notEmpty(permissions, "permissions");
     }
 
@@ -261,7 +261,7 @@ public class CaConfType {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(userName, "userName");
+      notBlank(userName, "userName");
       notEmpty(permissions, "permissions");
     }
 
@@ -569,12 +569,12 @@ public class CaConfType {
       }
       validate(genSelfIssued);
       validate(cert);
-      notEmpty(maxValidity, "maxValidity");
+      notBlank(maxValidity, "maxValidity");
       notEmpty(protocolSupport, "protocolSupport");
-      notEmpty(signerType, "signerType");
+      notBlank(signerType, "signerType");
       notNull(signerConf, "signerConf");
       validate(signerConf);
-      notEmpty(status, status);
+      notBlank(status, status);
       validate(caUris);
     } // method validate
 
@@ -669,7 +669,7 @@ public class CaConfType {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(name, "name");
+      notBlank(name, "name");
       validate(caInfo);
       validate(requestors);
       validate(users);
@@ -824,8 +824,8 @@ public class CaConfType {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(name, "name");
-      notEmpty(type, "type");
+      notBlank(name, "name");
+      notBlank(type, "type");
       validate(conf);
     }
 
@@ -875,8 +875,8 @@ public class CaConfType {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(name, "name");
-      notEmpty(type, "type");
+      notBlank(name, "name");
+      notBlank(type, "type");
       exactOne(conf, "conf", binaryConf, "binaryConf");
       validate(conf);
       validate(binaryConf);
@@ -928,8 +928,8 @@ public class CaConfType {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(name, "name");
-      notEmpty(type, "type");
+      notBlank(name, "name");
+      notBlank(type, "type");
       notNull(conf, "conf");
       validate(conf);
       validate(cert);
@@ -982,7 +982,7 @@ public class CaConfType {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(name, "name");
+      notBlank(name, "name");
       exactOne(password, "password", hashedPassword, "hashedPassword");
     }
 

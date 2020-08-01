@@ -17,6 +17,9 @@
 
 package org.xipki.security.pkcs11;
 
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.Args.positive;
+
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +31,6 @@ import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.DfltConcurrentContentSigner;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.XiSecurityException;
-import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
 
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
@@ -49,13 +51,13 @@ public class P11MacContentSignerBuilder {
   private final P11IdentityId identityId;
 
   public P11MacContentSignerBuilder(P11CryptService cryptService, P11IdentityId identityId) {
-    this.cryptService = Args.notNull(cryptService, "cryptService");
-    this.identityId = Args.notNull(identityId, "identityId");
+    this.cryptService = notNull(cryptService, "cryptService");
+    this.identityId = notNull(identityId, "identityId");
   } // constructor
 
   public ConcurrentContentSigner createSigner(AlgorithmIdentifier signatureAlgId, int parallelism)
       throws XiSecurityException, P11TokenException {
-    Args.positive(parallelism, "parallelism");
+    positive(parallelism, "parallelism");
 
     List<XiContentSigner> signers = new ArrayList<>(parallelism);
     for (int i = 0; i < parallelism; i++) {

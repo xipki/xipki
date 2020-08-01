@@ -17,6 +17,8 @@
 
 package org.xipki.security.bc;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.security.InvalidKeyException;
@@ -33,7 +35,6 @@ import org.bouncycastle.operator.ContentVerifier;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.xipki.security.EdECConstants;
-import org.xipki.util.Args;
 
 /**
  * {@link ContentVerifierProvider} for the signature algorithm EdDSA (Ed25519 and Ed448).
@@ -93,7 +94,7 @@ public class XiEdDSAContentVerifierProvider implements ContentVerifierProvider {
   private final PublicKey verifyKey;
 
   public XiEdDSAContentVerifierProvider(PublicKey verifyKey) {
-    this.verifyKey = Args.notNull(verifyKey, "verifyKey");
+    this.verifyKey = notNull(verifyKey, "verifyKey");
   }
 
   @Override

@@ -17,6 +17,8 @@
 
 package org.xipki.security.pkcs12;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.InvalidAlgorithmParameterException;
@@ -39,7 +41,6 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.util.Arrays;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.XiSecurityException;
-import org.xipki.util.Args;
 import org.xipki.util.IoUtil;
 
 /**
@@ -93,8 +94,8 @@ public class AESGmacContentSigner implements XiContentSigner {
 
   public AESGmacContentSigner(ASN1ObjectIdentifier oid, SecretKey signingKey)
       throws XiSecurityException {
-    this.oid = Args.notNull(oid, "oid");
-    this.signingKey = Args.notNull(signingKey, "signingKey");
+    this.oid = notNull(oid, "oid");
+    this.signingKey = notNull(signingKey, "signingKey");
 
     Cipher cipher0;
     try {

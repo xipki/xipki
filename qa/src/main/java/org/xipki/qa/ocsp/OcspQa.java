@@ -17,6 +17,9 @@
 
 package org.xipki.qa.ocsp;
 
+import static org.xipki.util.Args.notEmpty;
+import static org.xipki.util.Args.notNull;
+
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -60,7 +63,6 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
 import org.xipki.util.DateUtil;
 import org.xipki.util.TripleState;
 
@@ -76,7 +78,7 @@ public class OcspQa {
   private final SecurityFactory securityFactory;
 
   public OcspQa(SecurityFactory securityFactory) {
-    this.securityFactory = Args.notNull(securityFactory, "securityFactory");
+    this.securityFactory = notNull(securityFactory, "securityFactory");
   }
 
   public ValidationResult checkOcsp(OCSPResp response, IssuerHash issuerHash,
@@ -109,8 +111,8 @@ public class OcspQa {
   } // method checkOcsp
 
   public ValidationResult checkOcsp(OCSPResp response, OcspError expectedOcspError) {
-    Args.notNull(response, "response");
-    Args.notNull(expectedOcspError, "expectedOcspError");
+    notNull(response, "response");
+    notNull(expectedOcspError, "expectedOcspError");
 
     List<ValidationIssue> resultIssues = new LinkedList<ValidationIssue>();
 
@@ -132,10 +134,10 @@ public class OcspQa {
       Map<BigInteger, OcspCertStatus> expectedOcspStatuses,
       Map<BigInteger, Date> expectedRevTimes, OcspResponseOption responseOption,
       boolean noSigVerify) {
-    Args.notNull(response, "response");
-    Args.notEmpty(serialNumbers, "serialNumbers");
-    Args.notEmpty(expectedOcspStatuses, "expectedOcspStatuses");
-    Args.notNull(responseOption, "responseOption");
+    notNull(response, "response");
+    notEmpty(serialNumbers, "serialNumbers");
+    notEmpty(expectedOcspStatuses, "expectedOcspStatuses");
+    notNull(responseOption, "responseOption");
 
     List<ValidationIssue> resultIssues = new LinkedList<ValidationIssue>();
 

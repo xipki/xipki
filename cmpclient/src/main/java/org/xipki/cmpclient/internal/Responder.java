@@ -17,6 +17,8 @@
 
 package org.xipki.cmpclient.internal;
 
+import static org.xipki.util.Args.notNull;
+
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +31,6 @@ import org.xipki.security.AlgorithmValidator;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.AlgorithmUtil;
-import org.xipki.util.Args;
 
 /**
  * CMP responder.
@@ -43,11 +44,11 @@ abstract class Responder {
   private final GeneralName name;
 
   protected Responder(GeneralName name) {
-    this.name = Args.notNull(name, "name");
+    this.name = notNull(name, "name");
   }
 
   protected Responder(X500Name name) {
-    this.name = new GeneralName(Args.notNull(name, "name"));
+    this.name = new GeneralName(notNull(name, "name"));
   }
 
   public GeneralName getName() {
@@ -119,9 +120,9 @@ abstract class Responder {
     private final AlgorithmValidator sigAlgoValidator;
 
     public SignaturetCmpResponder(X509Cert cert, AlgorithmValidator sigAlgoValidator) {
-      super(Args.notNull(cert, "cert").getSubject());
+      super(notNull(cert, "cert").getSubject());
       this.cert = cert;
-      this.sigAlgoValidator = Args.notNull(sigAlgoValidator, "sigAlgoValidator");
+      this.sigAlgoValidator = notNull(sigAlgoValidator, "sigAlgoValidator");
     }
 
     public X509Cert getCert() {

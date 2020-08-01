@@ -17,6 +17,8 @@
 
 package org.xipki.security.ctlog;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.Signature;
@@ -79,8 +81,8 @@ public class CtLog {
     }
 
     public DigitallySigned(SignatureAndHashAlgorithm algorithm, byte[] signature) {
-      this.algorithm = Args.notNull(algorithm, "algorithm");
-      this.signature = Args.notNull(signature, "signature");
+      this.algorithm = notNull(algorithm, "algorithm");
+      this.signature = notNull(signature, "signature");
     }
 
     public SignatureAndHashAlgorithm getAlgorithm() {
@@ -281,8 +283,8 @@ public class CtLog {
     }
 
     public SignatureAndHashAlgorithm(HashAlgorithm hash, SignatureAlgorithm signature) {
-      this.hash = Args.notNull(hash, "hash");
-      this.signature = Args.notNull(signature, "signature");
+      this.hash = notNull(hash, "hash");
+      this.signature = notNull(signature, "signature");
     }
 
     public HashAlgorithm getHash() {
@@ -390,12 +392,12 @@ public class CtLog {
     public SignedCertificateTimestamp(byte version, byte[] logId, long timestamp, byte[] extensions,
         DigitallySigned digitallySigned) {
       this.version = version;
-      Args.notNull(logId, "logId");
+      notNull(logId, "logId");
       Args.equals(logId.length, "logID.length", 32);
       this.logId = logId;
       this.timestamp = timestamp;
       this.extensions = extensions == null ? new byte[0] : extensions;
-      this.digitallySigned = Args.notNull(digitallySigned, "digitallySigned");
+      this.digitallySigned = notNull(digitallySigned, "digitallySigned");
     }
 
     public int getVersion() {
@@ -469,7 +471,7 @@ public class CtLog {
     }
 
     public SignedCertificateTimestampList(SerializedSCT sctList) {
-      this.sctList = Args.notNull(sctList, "sctList");
+      this.sctList = notNull(sctList, "sctList");
     }
 
     public SerializedSCT getSctList() {

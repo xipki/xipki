@@ -17,10 +17,11 @@
 
 package org.xipki.security.pkcs11;
 
+import static org.xipki.util.Args.notNull;
+
 import java.math.BigInteger;
 import java.util.Arrays;
 
-import org.xipki.util.Args;
 import org.xipki.util.Hex;
 
 /**
@@ -47,8 +48,8 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
    *          Label. Must not be {@code null}.
    */
   public P11ObjectIdentifier(byte[] id, String label) {
-    this.id = Args.notNull(id, "id");
-    this.label = Args.notNull(label, "label");
+    this.id = notNull(id, "id");
+    this.label = notNull(label, "label");
     this.idHex = Hex.encode(id);
   }
 
@@ -98,7 +99,7 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
 
   @Override
   public int compareTo(P11ObjectIdentifier obj) {
-    Args.notNull(obj, "obj");
+    notNull(obj, "obj");
     if (this == obj) {
       return 0;
     }

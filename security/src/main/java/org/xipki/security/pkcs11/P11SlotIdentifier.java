@@ -17,7 +17,9 @@
 
 package org.xipki.security.pkcs11;
 
-import org.xipki.util.Args;
+import static org.xipki.util.Args.notNegative;
+import static org.xipki.util.Args.notNull;
+
 import org.xipki.util.StringUtil;
 
 /**
@@ -33,8 +35,8 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier> {
   private final long id;
 
   public P11SlotIdentifier(int index, long id) {
-    this.index = Args.notNegative(index, "index");
-    this.id = Args.notNegative(id, "id");
+    this.index = notNegative(index, "index");
+    this.id = notNegative(id, "id");
   }
 
   public int getIndex() {
@@ -71,7 +73,7 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier> {
 
   @Override
   public int compareTo(P11SlotIdentifier obj) {
-    Args.notNull(obj, "obj");
+    notNull(obj, "obj");
     return (this == obj)  ? 0 : Integer.signum(index - obj.index);
   }
 

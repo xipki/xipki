@@ -17,6 +17,10 @@
 
 package org.xipki.cmpclient.internal;
 
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.Args.toNonBlankLower;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -88,7 +92,6 @@ import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.CompareUtil;
 import org.xipki.util.FileOrBinary;
@@ -607,7 +610,7 @@ public final class CmpClientImpl implements CmpClient {
   public EnrollCertResult enrollCert(String caName, CertificationRequest csr, String profile,
       Date notBefore, Date notAfter, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
-    Args.notNull(csr, "csr");
+    notNull(csr, "csr");
 
     initIfNotInitialized();
 
@@ -638,7 +641,7 @@ public final class CmpClientImpl implements CmpClient {
   public EnrollCertResult enrollCerts(String caName, EnrollCertRequest request,
       ReqRespDebug debug) throws CmpClientException, PkiErrorException {
     List<EnrollCertRequest.Entry> requestEntries =
-          Args.notNull(request, "request").getRequestEntries();
+          notNull(request, "request").getRequestEntries();
     if (CollectionUtil.isEmpty(requestEntries)) {
       return null;
     }
@@ -716,7 +719,7 @@ public final class CmpClientImpl implements CmpClient {
   @Override
   public CertIdOrError revokeCert(String caName, X509Cert cert, int reason,
       Date invalidityDate, ReqRespDebug debug) throws CmpClientException, PkiErrorException {
-    Args.notNull(cert, "cert");
+    notNull(cert, "cert");
     initIfNotInitialized();
     CaConf ca = getCa(caName);
     assertIssuedByCa(cert, ca);
@@ -733,8 +736,8 @@ public final class CmpClientImpl implements CmpClient {
 
   private CertIdOrError revokeCert(CaConf ca, BigInteger serial, int reason,
       Date invalidityDate, ReqRespDebug debug) throws CmpClientException, PkiErrorException {
-    Args.notNull(ca, "ca");
-    Args.notNull(serial, "serial");
+    notNull(ca, "ca");
+    notNull(serial, "serial");
 
     final String id = "cert-1";
     RevokeCertRequest.Entry entry = new RevokeCertRequest.Entry(id, ca.getSubject(), serial, reason,
@@ -753,7 +756,7 @@ public final class CmpClientImpl implements CmpClient {
   public Map<String, CertIdOrError> revokeCerts(RevokeCertRequest request, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     List<RevokeCertRequest.Entry> requestEntries =
-          Args.notNull(request, "request").getRequestEntries();
+          notNull(request, "request").getRequestEntries();
     if (CollectionUtil.isEmpty(requestEntries)) {
       return Collections.emptyMap();
     }
@@ -809,14 +812,14 @@ public final class CmpClientImpl implements CmpClient {
   @Override
   public X509CRLHolder downloadCrl(String caName, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
-    caName = Args.toNonBlankLower(caName, "caName");
+    caName = toNonBlankLower(caName, "caName");
     return downloadCrl(caName, (BigInteger) null, debug);
   } // method downloadCrl
 
   @Override
   public X509CRLHolder downloadCrl(String caName, BigInteger crlNumber, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
-    caName = Args.toNonBlankLower(caName, "caName");
+    caName = toNonBlankLower(caName, "caName");
     initIfNotInitialized();
 
     CaConf ca = casMap.get(caName);
@@ -834,7 +837,7 @@ public final class CmpClientImpl implements CmpClient {
   @Override
   public X509CRLHolder generateCrl(String caName, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
-    caName = Args.toNonBlankLower(caName, "caName");
+    caName = toNonBlankLower(caName, "caName");
 
     initIfNotInitialized();
 
@@ -848,7 +851,7 @@ public final class CmpClientImpl implements CmpClient {
 
   @Override
   public String getCaNameByIssuer(X500Name issuer) throws CmpClientException {
-    Args.notNull(issuer, "issuer");
+    notNull(issuer, "issuer");
 
     initIfNotInitialized();
 
@@ -900,7 +903,7 @@ public final class CmpClientImpl implements CmpClient {
   }
 
   public void setConfFile(String confFile) {
-    this.confFile = Args.notBlank(confFile, "confFile");
+    this.confFile = notBlank(confFile, "confFile");
   }
 
   @Override
@@ -933,7 +936,7 @@ public final class CmpClientImpl implements CmpClient {
   @Override
   public CertIdOrError unrevokeCert(String caName, X509Cert cert, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
-    Args.notNull(cert, "cert");
+    notNull(cert, "cert");
     initIfNotInitialized();
 
     CaConf ca = getCa(caName);
@@ -951,8 +954,8 @@ public final class CmpClientImpl implements CmpClient {
 
   private CertIdOrError unrevokeCert(CaConf ca, BigInteger serial, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
-    Args.notNull(ca, "ca");
-    Args.notNull(serial, "serial");
+    notNull(ca, "ca");
+    notNull(serial, "serial");
     final String id = "cert-1";
     ResultEntry.UnrevokeOrRemoveCert entry = new ResultEntry.UnrevokeOrRemoveCert(
         id, ca.getSubject(), serial);
@@ -972,7 +975,7 @@ public final class CmpClientImpl implements CmpClient {
   @Override
   public Map<String, CertIdOrError> unrevokeCerts(UnrevokeOrRemoveCertRequest request,
       ReqRespDebug debug) throws CmpClientException, PkiErrorException {
-    Args.notNull(request, "request");
+    notNull(request, "request");
 
     initIfNotInitialized();
     List<UnrevokeOrRemoveCertRequest.Entry> requestEntries = request.getRequestEntries();
@@ -997,7 +1000,7 @@ public final class CmpClientImpl implements CmpClient {
   @Override
   public CertIdOrError removeCert(String caName, X509Cert cert, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
-    Args.notNull(cert, "cert");
+    notNull(cert, "cert");
     initIfNotInitialized();
     CaConf ca = getCa(caName);
     assertIssuedByCa(cert, ca);
@@ -1014,8 +1017,8 @@ public final class CmpClientImpl implements CmpClient {
 
   private CertIdOrError removeCert(CaConf ca, BigInteger serial, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
-    Args.notNull(ca, "ca");
-    Args.notNull(serial, "serial");
+    notNull(ca, "ca");
+    notNull(serial, "serial");
     final String id = "cert-1";
     UnrevokeOrRemoveCertRequest.Entry entry =
         new UnrevokeOrRemoveCertRequest.Entry(id, ca.getSubject(), serial);
@@ -1032,7 +1035,7 @@ public final class CmpClientImpl implements CmpClient {
   @Override
   public Map<String, CertIdOrError> removeCerts(UnrevokeOrRemoveCertRequest request,
       ReqRespDebug debug) throws CmpClientException, PkiErrorException {
-    Args.notNull(request, "request");
+    notNull(request, "request");
 
     initIfNotInitialized();
     List<UnrevokeOrRemoveCertRequest.Entry> requestEntries = request.getRequestEntries();
@@ -1056,7 +1059,7 @@ public final class CmpClientImpl implements CmpClient {
 
   @Override
   public Set<CertprofileInfo> getCertprofiles(String caName) throws CmpClientException {
-    caName = Args.toNonBlankLower(caName, "caName");
+    caName = toNonBlankLower(caName, "caName");
 
     initIfNotInitialized();
     CaConf ca = casMap.get(caName);
@@ -1078,7 +1081,7 @@ public final class CmpClientImpl implements CmpClient {
 
   @Override
   public HealthCheckResult getHealthCheckResult(String caName) throws CmpClientException {
-    caName = Args.toNonBlankLower(caName, "caName");
+    caName = toNonBlankLower(caName, "caName");
 
     String name = "X509CA";
     HealthCheckResult healthCheckResult = new HealthCheckResult();

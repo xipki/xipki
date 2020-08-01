@@ -17,6 +17,9 @@
 
 package org.xipki.qa.security;
 
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
+
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
@@ -33,7 +36,6 @@ import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11Slot.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.util.AlgorithmUtil;
-import org.xipki.util.Args;
 import org.xipki.util.BenchmarkExecutor;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.Hex;
@@ -260,10 +262,10 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
           throws ObjectCreationException {
     super(description + "\nsignature algorithm: " + signatureAlgorithm);
 
-    Args.notNull(securityFactory, "securityFactory");
-    this.slot = Args.notNull(slot, "slot");
-    Args.notBlank(signatureAlgorithm, "signatureAlgorithm");
-    this.objectId = Args.notNull(objectId, "objectId");
+    notNull(securityFactory, "securityFactory");
+    this.slot = notNull(slot, "slot");
+    notBlank(signatureAlgorithm, "signatureAlgorithm");
+    this.objectId = notNull(objectId, "objectId");
 
     this.deleteKeyAfterTest = deleteKeyAfterTest;
 

@@ -17,6 +17,8 @@
 
 package org.xipki.ocsp.client;
 
+import static org.xipki.util.Args.positive;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -33,7 +35,6 @@ import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
-import org.xipki.util.Args;
 
 /**
  * OCSP request options.
@@ -86,7 +87,7 @@ public class RequestOptions {
   }
 
   public void setNonceLen(int nonceLen) {
-    this.nonceLen = Args.positive(nonceLen, "nonceLen");
+    this.nonceLen = positive(nonceLen, "nonceLen");
   }
 
   public ASN1ObjectIdentifier getHashAlgorithmId() {

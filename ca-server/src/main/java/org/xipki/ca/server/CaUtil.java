@@ -17,6 +17,9 @@
 
 package org.xipki.ca.server;
 
+import static org.xipki.util.Args.notEmpty;
+import static org.xipki.util.Args.notNull;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -50,7 +53,6 @@ import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.ObjectIdentifiers.Xipki;
 import org.xipki.security.SecurityFactory;
-import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 
 /**
@@ -66,7 +68,7 @@ public class CaUtil {
   }
 
   public static Extensions getExtensions(CertificationRequestInfo csr) {
-    Args.notNull(csr, "csr");
+    notNull(csr, "csr");
     ASN1Set attrs = csr.getAttributes();
     for (int i = 0; i < attrs.size(); i++) {
       Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
@@ -78,7 +80,7 @@ public class CaUtil {
   } // method getExtensions
 
   public static String getChallengePassword(CertificationRequestInfo csr) {
-    Args.notNull(csr, "csr");
+    notNull(csr, "csr");
     ASN1Set attrs = csr.getAttributes();
     for (int i = 0; i < attrs.size(); i++) {
       Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
@@ -132,7 +134,7 @@ public class CaUtil {
 
   public static CRLDistPoint createCrlDistributionPoints(List<String> crlUris, X500Name caSubject,
       X500Name crlSignerSubject) {
-    Args.notEmpty(crlUris, "crlUris");
+    notEmpty(crlUris, "crlUris");
     int size = crlUris.size();
     DistributionPoint[] points = new DistributionPoint[1];
 
@@ -156,7 +158,7 @@ public class CaUtil {
   } // method createCrlDistributionPoints
 
   public static X500Name sortX509Name(X500Name name) {
-    Args.notNull(name, "name");
+    notNull(name, "name");
     RDN[] requstedRdns = name.getRDNs();
 
     List<RDN> rdns = new LinkedList<>();
@@ -183,7 +185,7 @@ public class CaUtil {
 
   public static boolean verifyCsr(CertificationRequest csr, SecurityFactory securityFactory,
       AlgorithmValidator algorithmValidator, DhpocControl dhpocControl) {
-    Args.notNull(csr, "csr");
+    notNull(csr, "csr");
 
     ASN1ObjectIdentifier algOid = csr.getSignatureAlgorithm().getAlgorithm();
 
@@ -209,8 +211,8 @@ public class CaUtil {
   } // method verifyCsr
 
   private static RDN[] getRdns(RDN[] rdns, ASN1ObjectIdentifier type) {
-    Args.notNull(rdns, "rdns");
-    Args.notNull(type, "type");
+    notNull(rdns, "rdns");
+    notNull(type, "type");
     List<RDN> ret = new ArrayList<>(1);
     for (int i = 0; i < rdns.length; i++) {
       RDN rdn = rdns[i];

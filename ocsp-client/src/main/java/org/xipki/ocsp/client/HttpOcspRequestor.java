@@ -17,6 +17,8 @@
 
 package org.xipki.ocsp.client;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -24,7 +26,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
-import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
@@ -51,9 +52,9 @@ public class HttpOcspRequestor extends AbstractOcspRequestor {
   @Override
   protected byte[] send(byte[] request, URL responderUrl, RequestOptions requestOptions)
       throws IOException {
-    Args.notNull(request, "request");
-    Args.notNull(responderUrl, "responderUrl");
-    Args.notNull(requestOptions, "requestOptions");
+    notNull(request, "request");
+    notNull(responderUrl, "responderUrl");
+    notNull(requestOptions, "requestOptions");
 
     int size = request.length;
     HttpURLConnection httpUrlConnection;

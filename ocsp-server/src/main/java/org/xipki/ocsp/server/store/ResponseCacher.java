@@ -17,6 +17,8 @@
 
 package org.xipki.ocsp.server.store;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.Closeable;
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
@@ -47,7 +49,6 @@ import org.xipki.security.AlgorithmCode;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.LogUtil;
@@ -161,9 +162,9 @@ public class ResponseCacher implements Closeable {
   private ScheduledFuture<?> issuerUpdater;
 
   public ResponseCacher(DataSourceWrapper datasource, boolean master, Validity validity) {
-    this.datasource = Args.notNull(datasource, "datasource");
+    this.datasource = notNull(datasource, "datasource");
     this.master = master;
-    this.validity = (int) (Args.notNull(validity, "validity").approxMinutes() * 60);
+    this.validity = (int) (notNull(validity, "validity").approxMinutes() * 60);
     this.sqlSelectIssuerCert = datasource.buildSelectFirstSql(1, "CERT FROM ISSUER WHERE ID=?");
     this.sqlSelectOcsp = datasource.buildSelectFirstSql(1,
         "IID,IDENT,GENERATED_AT,NEXT_UPDATE,RESP FROM OCSP WHERE ID=?");

@@ -17,6 +17,12 @@
 
 package org.xipki.security.pkcs11.emulator;
 
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.Args.positive;
+import static org.xipki.util.IoUtil.read;
+import static org.xipki.util.IoUtil.save;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -81,8 +87,6 @@ import org.xipki.security.pkcs11.P11TokenException;
 import org.xipki.security.pkcs11.P11UnknownEntityException;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
-import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 
@@ -253,11 +257,11 @@ class EmulatorP11Slot extends P11Slot {
       P11NewObjectConf newObjectConf, int maxSessions) throws P11TokenException {
     super(moduleName, slotId, readOnly, mechanismFilter);
 
-    this.newObjectConf = Args.notNull(newObjectConf, "newObjectConf");
-    this.slotDir = Args.notNull(slotDir, "slotDir");
-    this.password = Args.notNull(password, "password");
-    this.privateKeyCryptor = Args.notNull(privateKeyCryptor, "privateKeyCryptor");
-    this.maxSessions = Args.positive(maxSessions, "maxSessions");
+    this.newObjectConf = notNull(newObjectConf, "newObjectConf");
+    this.slotDir = notNull(slotDir, "slotDir");
+    this.password = notNull(password, "password");
+    this.privateKeyCryptor = notNull(privateKeyCryptor, "privateKeyCryptor");
+    this.maxSessions = positive(maxSessions, "maxSessions");
 
     this.privKeyDir = new File(slotDir, DIR_PRIV_KEY);
     if (!this.privKeyDir.exists()) {
@@ -311,7 +315,7 @@ class EmulatorP11Slot extends P11Slot {
           String label = props.getProperty(PROP_LABEL);
 
           P11ObjectIdentifier p11ObjId = new P11ObjectIdentifier(id, label);
-          byte[] encodedValue = IoUtil.read(new File(secKeyDir, hexId + VALUE_FILE_SUFFIX));
+          byte[] encodedValue = read(new File(secKeyDir, hexId + VALUE_FILE_SUFFIX));
 
           KeyStore ks = KeyStore.getInstance("JCEKS");
           ks.load(new ByteArrayInputStream(encodedValue), password);
@@ -382,7 +386,7 @@ class EmulatorP11Slot extends P11Slot {
             continue;
           }
 
-          byte[] encodedValue = IoUtil.read(new File(privKeyDir, hexId + VALUE_FILE_SUFFIX));
+          byte[] encodedValue = read(new File(privKeyDir, hexId + VALUE_FILE_SUFFIX));
 
           PKCS8EncryptedPrivateKeyInfo epki = new PKCS8EncryptedPrivateKeyInfo(encodedValue);
           PrivateKey privateKey = privateKeyCryptor.decrypt(epki);
@@ -466,7 +470,7 @@ class EmulatorP11Slot extends P11Slot {
   } // method readPublicKey
 
   private X509Cert readCertificate(byte[] keyId) throws CertificateException, IOException {
-    byte[] encoded = IoUtil.read(new File(certDir, hex(keyId) + VALUE_FILE_SUFFIX));
+    byte[] encoded = read(new File(certDir, hex(keyId) + VALUE_FILE_SUFFIX));
     return X509Util.parseCert(encoded);
   }
 
@@ -734,7 +738,7 @@ class EmulatorP11Slot extends P11Slot {
     }
 
     try {
-      IoUtil.save(new File(pubKeyDir, hexId + INFO_FILE_SUFFIX),
+      save(new File(pubKeyDir, hexId + INFO_FILE_SUFFIX),
           StringUtil.toUtf8Bytes(sb.toString()));
     } catch (IOException ex) {
       throw new P11TokenException(ex.getMessage(), ex);
@@ -765,10 +769,10 @@ class EmulatorP11Slot extends P11Slot {
 
   private void savePkcs11Entry(File dir, byte[] id, String label, byte[] value)
       throws P11TokenException {
-    Args.notNull(dir, "dir");
-    Args.notNull(id, "id");
-    Args.notBlank(label, "label");
-    Args.notNull(value, "value");
+    notNull(dir, "dir");
+    notNull(id, "id");
+    notBlank(label, "label");
+    notNull(value, "value");
 
     String hexId = hex(id);
 
@@ -776,8 +780,8 @@ class EmulatorP11Slot extends P11Slot {
         PROP_SHA1SUM, "=", HashAlgo.SHA1.hexHash(value), "\n");
 
     try {
-      IoUtil.save(new File(dir, hexId + INFO_FILE_SUFFIX), StringUtil.toUtf8Bytes(str));
-      IoUtil.save(new File(dir, hexId + VALUE_FILE_SUFFIX), value);
+      save(new File(dir, hexId + INFO_FILE_SUFFIX), StringUtil.toUtf8Bytes(str));
+      save(new File(dir, hexId + VALUE_FILE_SUFFIX), value);
     } catch (IOException ex) {
       throw new P11TokenException("could not save certificate");
     }
@@ -852,8 +856,10 @@ class EmulatorP11Slot extends P11Slot {
     } else if (PKCS11Constants.CKK_GENERIC_SECRET == keyType) {
       mech = PKCS11Constants.CKM_GENERIC_SECRET_KEY_GEN;
     } else if (PKCS11Constants.CKK_SHA_1_HMAC == keyType
-        || PKCS11Constants.CKK_SHA224_HMAC == keyType || PKCS11Constants.CKK_SHA256_HMAC == keyType
-        || PKCS11Constants.CKK_SHA384_HMAC == keyType || PKCS11Constants.CKK_SHA512_HMAC == keyType
+        || PKCS11Constants.CKK_SHA224_HMAC == keyType
+        || PKCS11Constants.CKK_SHA256_HMAC == keyType
+        || PKCS11Constants.CKK_SHA384_HMAC == keyType
+        || PKCS11Constants.CKK_SHA512_HMAC == keyType
         || PKCS11Constants.CKK_SHA3_224_HMAC == keyType
         || PKCS11Constants.CKK_SHA3_256_HMAC == keyType
         || PKCS11Constants.CKK_SHA3_384_HMAC == keyType

@@ -17,6 +17,8 @@
 
 package org.xipki.qa.ocsp;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
@@ -50,7 +52,6 @@ import org.xipki.qa.BenchmarkHttpClient.ResponseHandler;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.X509Cert;
-import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.StringUtil;
 
@@ -97,9 +98,9 @@ class OcspBenchRequestor {
   public void init(ResponseHandler responseHandler, String responderUrl, X509Cert issuerCert,
       RequestOptions requestOptions, int queueSize)
           throws OcspRequestorException, IOException, URISyntaxException {
-    Args.notNull(issuerCert, "issuerCert");
-    Args.notNull(responseHandler, "responseHandler");
-    this.requestOptions = Args.notNull(requestOptions, "requestOptions");
+    notNull(issuerCert, "issuerCert");
+    notNull(responseHandler, "responseHandler");
+    this.requestOptions = notNull(requestOptions, "requestOptions");
 
     HashAlgo hashAlgo = HashAlgo.getInstance(requestOptions.getHashAlgorithmId());
     if (hashAlgo == null) {

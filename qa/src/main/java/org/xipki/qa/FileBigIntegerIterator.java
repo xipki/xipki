@@ -17,6 +17,8 @@
 
 package org.xipki.qa;
 
+import static org.xipki.util.Args.notBlank;
+
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
@@ -27,8 +29,6 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import org.xipki.util.Args;
 
 /**
  * Iterator which iterates the {@link BigInteger} specified in the file.
@@ -52,7 +52,7 @@ public class FileBigIntegerIterator implements Iterator<BigInteger>, Closeable {
   private BigInteger currentNumber;
 
   public FileBigIntegerIterator(String fileName, boolean hex, boolean loop) throws IOException {
-    this.fileName = Args.notBlank(fileName, "fileName");
+    this.fileName = notBlank(fileName, "fileName");
     this.hex = hex;
     this.loop = loop;
     this.reader = Files.newBufferedReader(Paths.get(fileName));

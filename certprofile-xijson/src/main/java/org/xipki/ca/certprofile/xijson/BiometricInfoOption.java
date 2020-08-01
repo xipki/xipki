@@ -17,6 +17,8 @@
 
 package org.xipki.ca.certprofile.xijson;
 
+import static org.xipki.util.Args.notNull;
+
 import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.Set;
@@ -27,7 +29,6 @@ import org.xipki.ca.certprofile.xijson.conf.ExtensionType.BiometricInfo;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.BiometricTypeType;
 import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
 import org.xipki.security.util.AlgorithmUtil;
-import org.xipki.util.Args;
 import org.xipki.util.TripleState;
 
 /**
@@ -48,7 +49,7 @@ public class BiometricInfoOption {
   private final TripleState sourceDataUriOccurrence;
 
   public BiometricInfoOption(BiometricInfo value) throws NoSuchAlgorithmException {
-    Args.notNull(value, "value");
+    notNull(value, "value");
 
     this.sourceDataUriOccurrence = value.getIncludeSourceDataUri();
     this.hashAlgorithms = X509ProfileType.toOidSet(value.getHashAlgorithms());
@@ -71,7 +72,7 @@ public class BiometricInfoOption {
   } // constructor
 
   public boolean isTypePermitted(TypeOfBiometricData type) {
-    Args.notNull(type, "type");
+    notNull(type, "type");
 
     if (type.isPredefined()) {
       return predefinedTypes.contains(type.getPredefinedBiometricType());
@@ -81,7 +82,7 @@ public class BiometricInfoOption {
   }
 
   public boolean isHashAlgorithmPermitted(ASN1ObjectIdentifier hashAlgorithm) {
-    Args.notNull(hashAlgorithm, "hashAlgorithm");
+    notNull(hashAlgorithm, "hashAlgorithm");
     return hashAlgorithms.contains(hashAlgorithm);
   }
 

@@ -17,6 +17,8 @@
 
 package org.xipki.qa.ca;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.KeyPair;
@@ -41,7 +43,6 @@ import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
-import org.xipki.util.Args;
 import org.xipki.util.Base64;
 
 /**
@@ -272,7 +273,7 @@ public static final class ECKeyEntry extends CaEnrollBenchKeyEntry {
     private final SubjectPublicKeyInfo spki;
 
     public ECKeyEntry(final ASN1ObjectIdentifier curveOid) throws Exception {
-      Args.notNull(curveOid, "curveOid");
+      notNull(curveOid, "curveOid");
       KeyPair keypair;
 
       if (EdECConstants.isEdwardsOrMontgomeryCurve(curveOid)) {

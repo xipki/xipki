@@ -17,10 +17,11 @@
 
 package org.xipki.security.pkcs11;
 
+import static org.xipki.util.Args.notNull;
+
 import java.security.InvalidKeyException;
 
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
-import org.xipki.util.Args;
 
 /**
  * {@link AsymmetricKeyParameter} for PKCS#11 private key.
@@ -41,9 +42,9 @@ public class P11KeyParameter extends AsymmetricKeyParameter {
       P11ObjectIdentifier objectId) {
     super(true);
 
-    this.p11CryptService = Args.notNull(p11CryptService, "p11CryptService");
-    this.slot = Args.notNull(slot, "slot");
-    this.objectId = Args.notNull(objectId, "objectId");
+    this.p11CryptService = notNull(p11CryptService, "p11CryptService");
+    this.slot = notNull(slot, "slot");
+    this.objectId = notNull(objectId, "objectId");
   }
 
   public P11CryptService getP11CryptService() {

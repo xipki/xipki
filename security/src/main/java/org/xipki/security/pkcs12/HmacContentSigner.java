@@ -17,6 +17,8 @@
 
 package org.xipki.security.pkcs12;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
@@ -30,7 +32,6 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
-import org.xipki.util.Args;
 
 /**
  * HMAC signer.
@@ -77,8 +78,8 @@ public class HmacContentSigner implements XiContentSigner {
 
   public HmacContentSigner(HashAlgo hashAlgo, AlgorithmIdentifier algorithmIdentifier,
       SecretKey signingKey) throws XiSecurityException {
-    this.algorithmIdentifier = Args.notNull(algorithmIdentifier, "algorithmIdentifier");
-    Args.notNull(signingKey, "signingKey");
+    this.algorithmIdentifier = notNull(algorithmIdentifier, "algorithmIdentifier");
+    notNull(signingKey, "signingKey");
     try {
       this.encodedAlgorithmIdentifier = algorithmIdentifier.getEncoded();
     } catch (IOException ex) {

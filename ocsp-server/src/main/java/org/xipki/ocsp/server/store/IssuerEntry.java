@@ -17,6 +17,8 @@
 
 package org.xipki.ocsp.server.store;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
 import java.util.Arrays;
@@ -30,7 +32,6 @@ import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
-import org.xipki.util.Args;
 import org.xipki.util.CompareUtil;
 
 /**
@@ -56,7 +57,7 @@ class IssuerEntry {
 
   public IssuerEntry(int id, X509Cert cert) throws CertificateEncodingException {
     this.id = id;
-    this.cert = Args.notNull(cert, "cert");
+    this.cert = notNull(cert, "cert");
     this.notBefore = cert.getNotBefore();
     this.issuerHashMap = getIssuerHashAndKeys(cert.getEncoded());
   }
@@ -112,7 +113,7 @@ class IssuerEntry {
   }
 
   public void setRevocationInfo(Date revocationTime) {
-    Args.notNull(revocationTime, "revocationTime");
+    notNull(revocationTime, "revocationTime");
     this.revocationInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE,
         revocationTime, null);
   }

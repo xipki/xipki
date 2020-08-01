@@ -17,6 +17,9 @@
 
 package org.xipki.ocsp.server;
 
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -100,7 +103,6 @@ import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.FileOrValue;
@@ -129,7 +131,7 @@ public class OcspServerImpl implements OcspServer {
     private String str;
 
     public SizeComparableString(String str) {
-      this.str = Args.notNull(str, "str");
+      this.str = notNull(str, "str");
     }
 
     @Override
@@ -270,7 +272,7 @@ public class OcspServerImpl implements OcspServer {
   }
 
   public ResponderImpl getResponder(String name) {
-    Args.notBlank(name, "name");
+    notBlank(name, "name");
     return responders.get(name);
   }
 

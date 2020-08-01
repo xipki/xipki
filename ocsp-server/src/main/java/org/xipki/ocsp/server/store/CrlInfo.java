@@ -17,12 +17,13 @@
 
 package org.xipki.ocsp.server.store;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Date;
 
 import org.bouncycastle.asn1.ocsp.CrlID;
-import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.DateUtil;
@@ -90,11 +91,11 @@ public class CrlInfo {
 
   public CrlInfo(BigInteger crlNumber, BigInteger baseCrlNumber,
       Date thisUpdate, Date nextUpdate, CrlID crlId) {
-    this.crlNumber = Args.notNull(crlNumber, "crlNumber");
+    this.crlNumber = notNull(crlNumber, "crlNumber");
     this.baseCrlNumber = baseCrlNumber;
-    this.thisUpdate = Args.notNull(thisUpdate, "thisUpdate");
-    this.nextUpdate = Args.notNull(nextUpdate, "nextUpdate");
-    this.crlId = Args.notNull(crlId, "crlId");
+    this.thisUpdate = notNull(thisUpdate, "thisUpdate");
+    this.nextUpdate = notNull(nextUpdate, "nextUpdate");
+    this.crlId = notNull(crlId, "crlId");
     initEncoded();
   }
 

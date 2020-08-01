@@ -17,6 +17,8 @@
 
 package org.xipki.security.pkcs11;
 
+import static org.xipki.util.Args.notNull;
+
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.interfaces.DSAPublicKey;
@@ -26,7 +28,6 @@ import java.security.interfaces.RSAPublicKey;
 import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.XiSecurityException;
-import org.xipki.util.Args;
 
 /**
  * {@link PrivateKey} for PKCS#11 token.
@@ -51,8 +52,8 @@ public class P11PrivateKey implements PrivateKey {
 
   public P11PrivateKey(P11CryptService p11CryptService, P11IdentityId identityId)
       throws P11TokenException {
-    this.p11CryptService = Args.notNull(p11CryptService, "p11CryptService");
-    this.identityId = Args.notNull(identityId, "identityId");
+    this.p11CryptService = notNull(p11CryptService, "p11CryptService");
+    this.identityId = notNull(identityId, "identityId");
 
     this.publicKey = p11CryptService.getIdentity(identityId).getPublicKey();
 

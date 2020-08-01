@@ -17,9 +17,10 @@
 
 package org.xipki.cmpclient;
 
+import static org.xipki.util.Args.notNull;
+
 import org.bouncycastle.asn1.crmf.CertId;
 import org.xipki.security.cmp.PkiStatusInfo;
-import org.xipki.util.Args;
 
 /**
  * CertId or PKI error.
@@ -35,13 +36,13 @@ public class CertIdOrError {
   private final PkiStatusInfo error;
 
   public CertIdOrError(CertId certId) {
-    this.certId = Args.notNull(certId, "certId");
+    this.certId = notNull(certId, "certId");
     this.error = null;
   }
 
   public CertIdOrError(PkiStatusInfo error) {
     this.certId = null;
-    this.error = Args.notNull(error, "error");
+    this.error = notNull(error, "error");
   }
 
   public CertId getCertId() {

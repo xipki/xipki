@@ -17,6 +17,9 @@
 
 package org.xipki.qa.ca;
 
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -31,7 +34,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.profile.CertprofileException;
-import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 
@@ -64,7 +66,7 @@ public class CaQaSystemManagerImpl implements CaQaSystemManager {
   }
 
   public void setConfFile(String confFile) {
-    this.confFile = Args.notBlank(confFile, "confFile");
+    this.confFile = notBlank(confFile, "confFile");
   }
 
   @Override
@@ -152,7 +154,7 @@ public class CaQaSystemManagerImpl implements CaQaSystemManager {
   @Override
   public IssuerInfo getIssuer(String issuerName) {
     assertInitialized();
-    return x509IssuerInfoMap.get(Args.notNull(issuerName, "issuerName"));
+    return x509IssuerInfoMap.get(notNull(issuerName, "issuerName"));
   }
 
   @Override
@@ -164,7 +166,7 @@ public class CaQaSystemManagerImpl implements CaQaSystemManager {
   @Override
   public CertprofileQa getCertprofile(String certprofileName) {
     assertInitialized();
-    return x509ProfileMap.get(Args.notNull(certprofileName, "certprofileName"));
+    return x509ProfileMap.get(notNull(certprofileName, "certprofileName"));
   }
 
   private void assertInitialized() {

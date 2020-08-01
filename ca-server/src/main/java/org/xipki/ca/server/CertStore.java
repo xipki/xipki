@@ -23,6 +23,8 @@ import static org.xipki.ca.api.OperationException.ErrorCode.CERT_UNREVOKED;
 import static org.xipki.ca.api.OperationException.ErrorCode.DATABASE_FAILURE;
 import static org.xipki.ca.api.OperationException.ErrorCode.NOT_PERMITTED;
 import static org.xipki.ca.api.OperationException.ErrorCode.SYSTEM_FAILURE;
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.Args.positive;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -69,7 +71,6 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.LogUtil;
 import org.xipki.util.LruCache;
@@ -96,7 +97,7 @@ public class CertStore {
     private final Map<String, String> variables = new HashMap<>();
 
     public DbSchemaInfo(DataSourceWrapper datasource) throws DataAccessException {
-      Args.notNull(datasource, "datasource");
+      notNull(datasource, "datasource");
       final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
 
       Statement stmt = null;
@@ -122,7 +123,7 @@ public class CertStore {
     } // constructor
 
     public String variableValue(String variableName) {
-      return variables.get(Args.notNull(variableName, "variableName"));
+      return variables.get(notNull(variableName, "variableName"));
     }
 
   } // class DbSchemaInfo
@@ -287,8 +288,8 @@ public class CertStore {
 
   public CertStore(DataSourceWrapper datasource, UniqueIdGenerator idGenerator)
       throws DataAccessException {
-    this.datasource = Args.notNull(datasource, "datasource");
-    this.idGenerator = Args.notNull(idGenerator, "idGenerator");
+    this.datasource = notNull(datasource, "datasource");
+    this.idGenerator = notNull(idGenerator, "idGenerator");
 
     DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
     this.dbSchemaVersion = Integer.parseInt(dbSchemaInfo.variableValue("VERSION"));
@@ -326,7 +327,7 @@ public class CertStore {
   }
 
   public boolean addCert(CertificateInfo certInfo) {
-    Args.notNull(certInfo, "certInfo");
+    notNull(certInfo, "certInfo");
     try {
       addCert(certInfo.getIssuer(), certInfo.getCert(),
           certInfo.getProfile(), certInfo.getRequestor(), certInfo.getUser(), certInfo.getReqType(),
@@ -346,10 +347,10 @@ public class CertStore {
   private void addCert(NameId ca, CertWithDbId certificate,
       NameId certprofile, NameId requestor, Integer userId, RequestType reqType,
       byte[] transactionId, X500Name reqSubject) throws DataAccessException, OperationException {
-    Args.notNull(ca, "ca");
-    Args.notNull(certificate, "certificate");
-    Args.notNull(certprofile, "certprofile");
-    Args.notNull(requestor, "requestor");
+    notNull(ca, "ca");
+    notNull(certificate, "certificate");
+    notNull(certprofile, "certprofile");
+    notNull(requestor, "requestor");
 
     long certId = idGenerator.nextId();
 
@@ -416,7 +417,7 @@ public class CertStore {
 
   public void addToPublishQueue(NameId publisher, long certId, NameId ca)
       throws OperationException {
-    Args.notNull(ca, "ca");
+    notNull(ca, "ca");
 
     final String sql = SQL_INSERT_PUBLISHQUEUE;
     PreparedStatement ps = borrowPreparedStatement(sql);
@@ -447,7 +448,7 @@ public class CertStore {
   } // method removeFromPublishQueue
 
   public long getMaxIdOfDeltaCrlCache(NameId ca) throws OperationException {
-    Args.notNull(ca, "ca");
+    notNull(ca, "ca");
 
     final String sql = SQL_MAXID_DELTACRL_CACHE;
     PreparedStatement ps = borrowPreparedStatement(sql);
@@ -523,7 +524,7 @@ public class CertStore {
   }
 
   private long getMaxCrlNumber(NameId ca, String sql) throws OperationException {
-    Args.notNull(ca, "ca");
+    notNull(ca, "ca");
     ResultSet rs = null;
     PreparedStatement ps = borrowPreparedStatement(sql);
     try {
@@ -543,7 +544,7 @@ public class CertStore {
 
   public long getThisUpdateOfCurrentCrl(NameId ca, boolean deltaCrl)
       throws OperationException {
-    Args.notNull(ca, "ca");
+    notNull(ca, "ca");
 
     final String sql = SQL_MAX_THISUPDAATE_CRL;
     ResultSet rs = null;
@@ -564,7 +565,7 @@ public class CertStore {
   } // method getThisUpdateOfCurrentCrl
 
   public boolean hasCrl(NameId ca) throws OperationException {
-    Args.notNull(ca, "ca");
+    notNull(ca, "ca");
 
     final String sql = sqlCaHasCrl;
     PreparedStatement ps = null;
@@ -582,8 +583,8 @@ public class CertStore {
   } // method hasCrl
 
   public void addCrl(NameId ca, X509CRLHolder crl) throws OperationException, CRLException {
-    Args.notNull(ca, "ca");
-    Args.notNull(crl, "crl");
+    notNull(ca, "ca");
+    notNull(crl, "crl");
 
     Extensions extns = crl.getExtensions();
     byte[] extnValue = X509Util.getCoreExtValue(extns, Extension.cRLNumber);
@@ -643,9 +644,9 @@ public class CertStore {
   public CertWithRevocationInfo revokeCert(NameId ca, BigInteger serialNumber,
       CertRevocationInfo revInfo, boolean force, boolean publishToDeltaCrlCache,
       CaIdNameMap idNameMap) throws OperationException {
-    Args.notNull(ca, "ca");
-    Args.notNull(serialNumber, "serialNumber");
-    Args.notNull(revInfo, "revInfo");
+    notNull(ca, "ca");
+    notNull(serialNumber, "serialNumber");
+    notNull(revInfo, "revInfo");
 
     CertWithRevocationInfo certWithRevInfo =
         getCertWithRevocationInfo(ca.getId(), serialNumber, idNameMap);
@@ -713,9 +714,9 @@ public class CertStore {
   public CertWithRevocationInfo revokeSuspendedCert(NameId ca, BigInteger serialNumber,
       CrlReason reason, boolean publishToDeltaCrlCache, CaIdNameMap idNameMap)
       throws OperationException {
-    Args.notNull(ca, "ca");
-    Args.notNull(serialNumber, "serialNumber");
-    Args.notNull(reason, "reason");
+    notNull(ca, "ca");
+    notNull(serialNumber, "serialNumber");
+    notNull(reason, "reason");
 
     CertWithRevocationInfo certWithRevInfo =
         getCertWithRevocationInfo(ca.getId(), serialNumber, idNameMap);
@@ -767,8 +768,8 @@ public class CertStore {
 
   public CertWithDbId unrevokeCert(NameId ca, BigInteger serialNumber, boolean force,
       boolean publishToDeltaCrlCache, CaIdNameMap idNamMap) throws OperationException {
-    Args.notNull(ca, "ca");
-    Args.notNull(serialNumber, "serialNumber");
+    notNull(ca, "ca");
+    notNull(serialNumber, "serialNumber");
 
     CertWithRevocationInfo certWithRevInfo =
         getCertWithRevocationInfo(ca.getId(), serialNumber, idNamMap);
@@ -828,7 +829,7 @@ public class CertStore {
 
   private void publishToDeltaCrlCache(NameId ca, BigInteger serialNumber)
       throws OperationException {
-    Args.notNull(serialNumber, "serialNumber");
+    notNull(serialNumber, "serialNumber");
 
     final String sql = SQL_ADD_DELTACRL_CACHE;
     PreparedStatement ps = null;
@@ -847,8 +848,8 @@ public class CertStore {
   } // method publishToDeltaCrlCache
 
   public void removeCert(NameId ca, BigInteger serialNumber) throws OperationException {
-    Args.notNull(ca, "ca");
-    Args.notNull(serialNumber, "serialNumber");
+    notNull(ca, "ca");
+    notNull(serialNumber, "serialNumber");
 
     final String sql = SQL_REMOVE_CERT;
     PreparedStatement ps = borrowPreparedStatement(sql);
@@ -917,8 +918,8 @@ public class CertStore {
 
   public List<SerialWithId> getSerialNumbers(NameId ca,  long startId, int numEntries,
       boolean onlyRevoked) throws OperationException {
-    Args.notNull(ca, "ca");
-    Args.positive(numEntries, "numEntries");
+    notNull(ca, "ca");
+    positive(numEntries, "numEntries");
 
     final String sql = getSqlSerials(numEntries, onlyRevoked);
 
@@ -946,8 +947,8 @@ public class CertStore {
   public List<SerialWithId> getSerialNumbers(NameId ca, Date notExpiredAt, long startId,
       int numEntries, boolean onlyRevoked, boolean onlyCaCerts, boolean onlyUserCerts)
       throws OperationException {
-    Args.notNull(ca, "ca");
-    Args.positive(numEntries, "numEntries");
+    notNull(ca, "ca");
+    positive(numEntries, "numEntries");
 
     if (onlyCaCerts && onlyUserCerts) {
       throw new IllegalArgumentException("onlyCaCerts and onlyUserCerts cannot be both of true");
@@ -985,8 +986,8 @@ public class CertStore {
 
   public List<BigInteger> getExpiredSerialNumbers(NameId ca, long expiredAt, int numEntries)
       throws OperationException {
-    Args.notNull(ca, "ca");
-    Args.positive(numEntries, "numEntries");
+    notNull(ca, "ca");
+    positive(numEntries, "numEntries");
 
     final String sql = getSqlExpiredSerials(numEntries);
 
@@ -1012,8 +1013,8 @@ public class CertStore {
 
   public List<BigInteger> getSuspendedCertSerials(NameId ca, long latestLastUpdate, int numEntries)
       throws OperationException {
-    Args.notNull(ca, "ca");
-    Args.positive(numEntries, "numEntries");
+    notNull(ca, "ca");
+    positive(numEntries, "numEntries");
 
     final String sql = getSqlSuspendedSerials(numEntries);
     ResultSet rs = null;
@@ -1038,7 +1039,7 @@ public class CertStore {
   } // method getSuspendedCertIds
 
   public byte[] getEncodedCrl(NameId ca, BigInteger crlNumber) throws OperationException {
-    Args.notNull(ca, "ca");
+    notNull(ca, "ca");
 
     String sql = (crlNumber == null) ? sqlCrl : sqlCrlWithNo;
     ResultSet rs = null;
@@ -1071,8 +1072,8 @@ public class CertStore {
   } // method getEncodedCrl
 
   public int cleanupCrls(NameId ca, int numCrls) throws OperationException {
-    Args.notNull(ca, "ca");
-    Args.positive(numCrls, "numCrls");
+    notNull(ca, "ca");
+    positive(numCrls, "numCrls");
 
     String sql = "SELECT CRL_NO FROM CRL WHERE CA_ID=? AND DELTACRL=?";
     PreparedStatement ps = borrowPreparedStatement(sql);
@@ -1121,9 +1122,9 @@ public class CertStore {
 
   public CertificateInfo getCertForId(NameId ca, X509Cert caCert, long certId,
       CaIdNameMap idNameMap) throws OperationException, CertificateException {
-    Args.notNull(ca, "ca");
-    Args.notNull(caCert, "caCert");
-    Args.notNull(idNameMap, "idNameMap");
+    notNull(ca, "ca");
+    notNull(caCert, "caCert");
+    notNull(idNameMap, "idNameMap");
 
     final String sql = sqlCertForId;
 
@@ -1178,8 +1179,8 @@ public class CertStore {
 
   public CertWithRevocationInfo getCertWithRevocationInfo(int caId, BigInteger serial,
       CaIdNameMap idNameMap) throws OperationException {
-    Args.notNull(serial, "serial");
-    Args.notNull(idNameMap, "idNameMap");
+    notNull(serial, "serial");
+    notNull(idNameMap, "idNameMap");
 
     final String sql = sqlCertWithRevInfo;
 
@@ -1245,10 +1246,10 @@ public class CertStore {
 
   public CertificateInfo getCertInfo(NameId ca, X509Cert caCert, BigInteger serial,
       CaIdNameMap idNameMap) throws OperationException, CertificateException {
-    Args.notNull(ca, "ca");
-    Args.notNull(caCert, "caCert");
-    Args.notNull(idNameMap, "idNameMap");
-    Args.notNull(serial, "serial");
+    notNull(ca, "ca");
+    notNull(caCert, "caCert");
+    notNull(idNameMap, "idNameMap");
+    notNull(serial, "serial");
 
     final String sql = sqlCertInfo;
 
@@ -1306,7 +1307,7 @@ public class CertStore {
   } // method getCertInfo
 
   public Integer getCertprofileForCertId(NameId ca, long cid) throws OperationException {
-    Args.notNull(ca, "ca");
+    notNull(ca, "ca");
 
     final String sql = sqlCertprofileForCertId;
     ResultSet rs = null;
@@ -1381,8 +1382,8 @@ public class CertStore {
   } // method getCert
 
   public byte[] getCertRequest(NameId ca, BigInteger serialNumber) throws OperationException {
-    Args.notNull(ca, "ca");
-    Args.notNull(serialNumber, "serialNumber");
+    notNull(ca, "ca");
+    notNull(serialNumber, "serialNumber");
 
     String sql = sqlReqIdForSerial;
     ResultSet rs = null;
@@ -1427,8 +1428,8 @@ public class CertStore {
 
   public List<CertListInfo> listCerts(NameId ca, X500Name subjectPattern, Date validFrom,
       Date validTo, CertListOrderBy orderBy, int numEntries) throws OperationException {
-    Args.notNull(ca, "ca");
-    Args.positive(numEntries, "numEntries");
+    notNull(ca, "ca");
+    positive(numEntries, "numEntries");
 
     StringBuilder sb = new StringBuilder(200);
     sb.append("SN,NBEFORE,NAFTER,SUBJECT FROM CERT WHERE CA_ID=?");
@@ -1618,7 +1619,7 @@ public class CertStore {
   } // method getCaHasUser
 
   public KnowCertResult knowsCertForSerial(NameId ca, BigInteger serial) throws OperationException {
-    Args.notNull(serial, "serial");
+    notNull(serial, "serial");
     final String sql = sqlKnowsCertForSerial;
 
     ResultSet rs = null;
@@ -1644,9 +1645,9 @@ public class CertStore {
 
   public List<CertRevInfoWithSerial> getRevokedCerts(NameId ca, Date notExpiredAt, long startId,
       int numEntries, boolean onlyCaCerts, boolean onlyUserCerts) throws OperationException {
-    Args.notNull(ca, "ca");
-    Args.notNull(notExpiredAt, "notExpiredAt");
-    Args.positive(numEntries, "numEntries");
+    notNull(ca, "ca");
+    notNull(notExpiredAt, "notExpiredAt");
+    positive(numEntries, "numEntries");
     if (onlyCaCerts && onlyUserCerts) {
       throw new IllegalArgumentException("onlyCaCerts and onlyUserCerts cannot be both of true");
     }
@@ -1687,8 +1688,8 @@ public class CertStore {
 
   public List<CertRevInfoWithSerial> getCertsForDeltaCrl(NameId ca, long startId, int numEntries,
       boolean onlyCaCerts, boolean onlyUserCerts) throws OperationException {
-    Args.notNull(ca, "ca");
-    Args.positive(numEntries, "numEntries");
+    notNull(ca, "ca");
+    positive(numEntries, "numEntries");
 
     String sql = getSqlDeltaCrlCacheIds(numEntries);
     List<Long> ids = new LinkedList<>();
@@ -1764,7 +1765,7 @@ public class CertStore {
 
   private CertStatus getCertStatusForSubjectFp(NameId ca, long subjectFp)
       throws OperationException {
-    Args.notNull(ca, "ca");
+    notNull(ca, "ca");
 
     final String sql = sqlCertStatusForSubjectFp;
     ResultSet rs = null;
@@ -1786,7 +1787,7 @@ public class CertStore {
   } // method getCertStatusForSubjectFp
 
   public boolean isCertForSubjectIssued(NameId ca, long subjectFp) throws OperationException {
-    Args.notNull(ca, "ca");
+    notNull(ca, "ca");
     String sql = sqlCertforSubjectIssued;
     ResultSet rs = null;
     PreparedStatement ps = borrowPreparedStatement(sql);
@@ -1890,7 +1891,7 @@ public class CertStore {
   } // method deleteUnreferencedRequests
 
   public long addRequest(byte[] request) throws OperationException {
-    Args.notNull(request, "request");
+    notNull(request, "request");
 
     long id = idGenerator.nextId();
     long currentTimeSeconds = System.currentTimeMillis() / 1000;

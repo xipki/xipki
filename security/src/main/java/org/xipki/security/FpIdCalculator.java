@@ -17,7 +17,8 @@
 
 package org.xipki.security;
 
-import org.xipki.util.Args;
+import static org.xipki.util.Args.notNull;
+
 import org.xipki.util.StringUtil;
 
 /**
@@ -38,7 +39,7 @@ public class FpIdCalculator {
    * @return long represented of the first 8 bytes
    */
   public static long hash(String data) {
-    Args.notNull(data, "data");
+    notNull(data, "data");
     byte[] encoded = StringUtil.toUtf8Bytes(data);
     byte[] bytes = HashAlgo.SHA1.hash(encoded);
     return bytesToLong(bytes);
@@ -50,7 +51,7 @@ public class FpIdCalculator {
    * @return long represented of the first 8 bytes
    */
   public static long hash(byte[] data) {
-    Args.notNull(data, "data");
+    notNull(data, "data");
     byte[] bytes = HashAlgo.SHA1.hash(data);
     return bytesToLong(bytes);
   }

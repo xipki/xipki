@@ -17,6 +17,9 @@
 
 package org.xipki.security.util;
 
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
@@ -85,7 +88,6 @@ import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.util.BigIntegers;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.EdECConstants;
-import org.xipki.util.Args;
 import org.xipki.util.CompareUtil;
 
 /**
@@ -110,7 +112,7 @@ public class KeyUtil {
   }
 
   public static KeyStore getKeyStore(String storeType) throws KeyStoreException {
-    Args.notBlank(storeType, "storeType");
+    notBlank(storeType, "storeType");
     if ("JCEKS".equalsIgnoreCase(storeType)) {
       return KeyStore.getInstance(storeType);
     } else {
@@ -175,7 +177,7 @@ public class KeyUtil {
   // CHECKSTYLE:SKIP
   public static DSAPublicKey generateDSAPublicKey(DSAPublicKeySpec keySpec)
       throws InvalidKeySpecException {
-    Args.notNull(keySpec, "keySpec");
+    notNull(keySpec, "keySpec");
     KeyFactory kf = getKeyFactory("DSA");
     synchronized (kf) {
       return (DSAPublicKey) kf.generatePublic(keySpec);
@@ -185,7 +187,7 @@ public class KeyUtil {
   // CHECKSTYLE:SKIP
   public static KeyPair generateEdECKeypair(ASN1ObjectIdentifier curveId, SecureRandom random)
       throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
-    Args.notNull(curveId, "curveId");
+    notNull(curveId, "curveId");
     String algorithm = EdECConstants.getName(curveId);
     KeyPairGenerator kpGen = getKeyPairGenerator(algorithm);
     synchronized (kpGen) {
@@ -199,7 +201,7 @@ public class KeyUtil {
   // CHECKSTYLE:SKIP
   public static KeyPair generateECKeypair(ASN1ObjectIdentifier curveId, SecureRandom random)
       throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
-    Args.notNull(curveId, "curveId");
+    notNull(curveId, "curveId");
 
     ECGenParameterSpec spec = new ECGenParameterSpec(curveId.getId());
     KeyPairGenerator kpGen = getKeyPairGenerator("EC");
@@ -298,7 +300,7 @@ public class KeyUtil {
 
   public static PublicKey generatePublicKey(SubjectPublicKeyInfo pkInfo)
       throws InvalidKeySpecException {
-    Args.notNull(pkInfo, "pkInfo");
+    notNull(pkInfo, "pkInfo");
 
     X509EncodedKeySpec keyspec;
     try {
@@ -332,7 +334,7 @@ public class KeyUtil {
   // CHECKSTYLE:SKIP
   public static RSAPublicKey generateRSAPublicKey(RSAPublicKeySpec keySpec)
       throws InvalidKeySpecException {
-    Args.notNull(keySpec, "keySpec");
+    notNull(keySpec, "keySpec");
     KeyFactory kf = getKeyFactory("RSA");
     synchronized (kf) {
       return (RSAPublicKey) kf.generatePublic(keySpec);
@@ -341,7 +343,7 @@ public class KeyUtil {
 
   public static AsymmetricKeyParameter generatePrivateKeyParameter(PrivateKey key)
       throws InvalidKeyException {
-    Args.notNull(key, "key");
+    notNull(key, "key");
 
     if (key instanceof RSAPrivateCrtKey) {
       RSAPrivateCrtKey rsaKey = (RSAPrivateCrtKey) key;
@@ -369,7 +371,7 @@ public class KeyUtil {
 
   public static AsymmetricKeyParameter generatePublicKeyParameter(PublicKey key)
       throws InvalidKeyException {
-    Args.notNull(key, "key");
+    notNull(key, "key");
 
     if (key instanceof RSAPublicKey) {
       RSAPublicKey rsaKey = (RSAPublicKey) key;
@@ -399,7 +401,7 @@ public class KeyUtil {
 
   public static SubjectPublicKeyInfo createSubjectPublicKeyInfo(PublicKey publicKey)
       throws InvalidKeyException {
-    Args.notNull(publicKey, "publicKey");
+    notNull(publicKey, "publicKey");
 
     if (publicKey instanceof DSAPublicKey) {
       DSAPublicKey dsaPubKey = (DSAPublicKey) publicKey;
@@ -503,8 +505,8 @@ public class KeyUtil {
   // CHECKSTYLE:SKIP
   public static ECPublicKey createECPublicKey(byte[] encodedAlgorithmIdParameters,
       byte[] encodedPoint) throws InvalidKeySpecException {
-    Args.notNull(encodedAlgorithmIdParameters, "encodedAlgorithmIdParameters");
-    Args.notNull(encodedPoint, "encodedPoint");
+    notNull(encodedAlgorithmIdParameters, "encodedAlgorithmIdParameters");
+    notNull(encodedPoint, "encodedPoint");
 
     ASN1Encodable algParams;
     if (encodedAlgorithmIdParameters[0] == 6) {

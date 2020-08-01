@@ -17,9 +17,10 @@
 
 package org.xipki.security.cmp;
 
+import static org.xipki.util.Args.notNull;
+
 import org.bouncycastle.asn1.cmp.PKIFreeText;
 import org.xipki.security.util.CmpFailureUtil;
-import org.xipki.util.Args;
 
 /**
  * PKIStatus.
@@ -49,7 +50,7 @@ public class PkiStatusInfo {
   }
 
   public PkiStatusInfo(org.bouncycastle.asn1.cmp.PKIStatusInfo bcPkiStatusInfo) {
-    Args.notNull(bcPkiStatusInfo, "bcPkiStatusInfo");
+    notNull(bcPkiStatusInfo, "bcPkiStatusInfo");
 
     this.status = bcPkiStatusInfo.getStatus().intValue();
     this.pkiFailureInfo = (bcPkiStatusInfo.getFailInfo() == null)

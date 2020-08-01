@@ -17,6 +17,9 @@
 
 package org.xipki.security.util;
 
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.Args.range;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
@@ -56,7 +59,6 @@ import org.xipki.security.bc.XiECContentVerifierProviderBuilder;
 import org.xipki.security.bc.XiEdDSAContentVerifierProvider;
 import org.xipki.security.bc.XiRSAContentVerifierProviderBuilder;
 import org.xipki.security.bc.XiXDHContentVerifierProvider;
-import org.xipki.util.Args;
 import org.xipki.util.Hex;
 
 /**
@@ -98,7 +100,7 @@ public class SignerUtil {
 
   // CHECKSTYLE:SKIP
   public static RSAKeyParameters generateRSAPrivateKeyParameter(RSAPrivateKey key) {
-    Args.notNull(key, "key");
+    notNull(key, "key");
     if (key instanceof RSAPrivateCrtKey) {
       RSAPrivateCrtKey rsaKey = (RSAPrivateCrtKey) key;
 
@@ -119,7 +121,7 @@ public class SignerUtil {
   // CHECKSTYLE:SKIP
   public static PSSSigner createPSSRSASigner(AlgorithmIdentifier sigAlgId,
       AsymmetricBlockCipher cipher) throws XiSecurityException {
-    Args.notNull(sigAlgId, "sigAlgId");
+    notNull(sigAlgId, "sigAlgId");
     if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
       throw new XiSecurityException("signature algorithm " + sigAlgId.getAlgorithm()
         + " is not allowed");
@@ -158,11 +160,11 @@ public class SignerUtil {
   // CHECKSTYLE:SKIP
   public static byte[] EMSA_PKCS1_v1_5_encoding(byte[] hashValue, int modulusBigLength,
       HashAlgo hashAlgo) throws XiSecurityException {
-    Args.notNull(hashValue, "hashValue");
-    Args.notNull(hashAlgo, "hashAlgo");
+    notNull(hashValue, "hashValue");
+    notNull(hashAlgo, "hashAlgo");
 
     final int hashLen = hashAlgo.getLength();
-    Args.range(hashValue.length, "hashValue.length", hashLen, hashLen);
+    range(hashValue.length, "hashValue.length", hashLen, hashLen);
 
     int blockSize = (modulusBigLength + 7) / 8;
     byte[] prefix = digestPkcsPrefix.get(hashAlgo);
@@ -194,7 +196,7 @@ public class SignerUtil {
   // CHECKSTYLE:SKIP
   public static byte[] EMSA_PKCS1_v1_5_encoding(byte[] encodedDigestInfo, int modulusBigLength)
       throws XiSecurityException {
-    Args.notNull(encodedDigestInfo, "encodedDigestInfo");
+    notNull(encodedDigestInfo, "encodedDigestInfo");
 
     int msgLen = encodedDigestInfo.length;
     int blockSize = (modulusBigLength + 7) / 8;
@@ -303,7 +305,7 @@ public class SignerUtil {
 
   // CHECKSTYLE:SKIP
   public static byte[] dsaSigPlainToX962(byte[] signature) throws XiSecurityException {
-    Args.notNull(signature, "signature");
+    notNull(signature, "signature");
     if (signature.length % 2 != 0) {
       throw new XiSecurityException("signature.lenth must be even, but is odd");
     }
@@ -327,7 +329,7 @@ public class SignerUtil {
   // CHECKSTYLE:SKIP
   public static byte[] dsaSigX962ToPlain(byte[] x962Signature, int keyBitLen)
       throws XiSecurityException {
-    Args.notNull(x962Signature, "x962Signature");
+    notNull(x962Signature, "x962Signature");
     ASN1Sequence seq = ASN1Sequence.getInstance(x962Signature);
     if (seq.size() != 2) {
       throw new IllegalArgumentException("invalid X962Signature");
@@ -339,8 +341,8 @@ public class SignerUtil {
 
   public static byte[] dsaSigToPlain(BigInteger sigR, BigInteger sigS, int keyBitLen)
       throws XiSecurityException {
-    Args.notNull(sigR, "sigR");
-    Args.notNull(sigS, "sigS");
+    notNull(sigR, "sigR");
+    notNull(sigS, "sigS");
 
     final int blockSize = (keyBitLen + 7) / 8;
     int bitLenOfR = sigR.bitLength();
@@ -383,7 +385,7 @@ public class SignerUtil {
 
   public static ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey,
       DHSigStaticKeyCertPair ownerKeyAndCert) throws InvalidKeyException {
-    Args.notNull(publicKey, "publicKey");
+    notNull(publicKey, "publicKey");
 
     String keyAlg = publicKey.getAlgorithm().toUpperCase();
     if ("ED25519".equals(keyAlg) || "ED448".equals(keyAlg)) {

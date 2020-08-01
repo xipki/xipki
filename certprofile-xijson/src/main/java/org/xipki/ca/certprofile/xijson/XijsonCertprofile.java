@@ -17,6 +17,9 @@
 
 package org.xipki.ca.certprofile.xijson;
 
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -126,7 +129,6 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.LogUtil;
@@ -283,7 +285,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   @Override
   public void initialize(String data) throws CertprofileException {
-    Args.notBlank(data, "data");
+    notBlank(data, "data");
 
     X509ProfileType conf;
     try {
@@ -300,7 +302,7 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method initialize
 
   public void initialize(X509ProfileType conf) throws CertprofileException {
-    Args.notNull(conf, "conf");
+    notNull(conf, "conf");
 
     reset();
     try {
@@ -1210,7 +1212,7 @@ public class XijsonCertprofile extends BaseCertprofile {
   @Override
   protected void verifySubjectDnOccurence(X500Name requestedSubject)
       throws BadCertTemplateException {
-    Args.notNull(requestedSubject, "requestedSubject");
+    notNull(requestedSubject, "requestedSubject");
 
     ASN1ObjectIdentifier[] types = requestedSubject.getAttributeTypes();
     for (ASN1ObjectIdentifier type : types) {
@@ -1278,9 +1280,9 @@ public class XijsonCertprofile extends BaseCertprofile {
       return values;
     }
 
-    Args.notNull(requestedSubject, "requestedSubject");
-    Args.notNull(notBefore, "notBefore");
-    Args.notNull(notAfter, "notAfter");
+    notNull(requestedSubject, "requestedSubject");
+    notNull(notBefore, "notBefore");
+    notNull(notAfter, "notAfter");
 
     Set<ASN1ObjectIdentifier> occurences = new HashSet<>(extensionControls.keySet());
 

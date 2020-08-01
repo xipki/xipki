@@ -17,6 +17,9 @@
 
 package org.xipki.dbtool;
 
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
+
 import java.io.Closeable;
 import java.io.File;
 import java.net.URISyntaxException;
@@ -27,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
-import org.xipki.util.Args;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
@@ -69,9 +71,9 @@ public class LiquibaseMain implements Closeable {
     public DatabaseConf(String driver, String username, String password,
         String url, String schema) {
       this.driver = driver;
-      this.username = Args.notNull(username, "username");
+      this.username = notNull(username, "username");
       this.password = password;
-      this.url = Args.notNull(url, "url");
+      this.url = notNull(url, "url");
       this.schema = schema;
     }
 
@@ -97,7 +99,7 @@ public class LiquibaseMain implements Closeable {
 
     public static DatabaseConf getInstance(Properties dbProps, PasswordResolver passwordResolver)
         throws PasswordResolverException {
-      Args.notNull(dbProps, "dbProps");
+      notNull(dbProps, "dbProps");
 
       String schema = dbProps.getProperty("liquibase.schema");
       if (schema != null) {
@@ -236,8 +238,8 @@ public class LiquibaseMain implements Closeable {
   private Liquibase liquibase;
 
   public LiquibaseMain(DatabaseConf dbConf, String changeLogFile) {
-    this.dbConf = Args.notNull(dbConf, "dbConf");
-    this.changeLogFile = IoUtil.expandFilepath(Args.notBlank(changeLogFile, "changeLogFile"));
+    this.dbConf = notNull(dbConf, "dbConf");
+    this.changeLogFile = IoUtil.expandFilepath(notBlank(changeLogFile, "changeLogFile"));
   }
 
   public void init() throws Exception {

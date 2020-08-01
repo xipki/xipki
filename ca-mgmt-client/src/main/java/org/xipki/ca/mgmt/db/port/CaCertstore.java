@@ -327,19 +327,19 @@ public class CaCertstore extends ValidatableConf {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(name, "name");
-      notEmpty(status, "status");
-      notEmpty(maxValidity, "maxValidity");
+      notBlank(name, "name");
+      notBlank(status, "status");
+      notBlank(maxValidity, "maxValidity");
 
       notNull(cert, "cert");
       cert.validate();
 
-      notEmpty(signerType, "signerType");
+      notBlank(signerType, "signerType");
 
       notNull(signerConf, "signerConf");
       signerConf.validate();
 
-      notEmpty(protocolSupport, "protocolSupport");
+      notBlank(protocolSupport, "protocolSupport");
     }
 
   } // class Ca
@@ -368,7 +368,7 @@ public class CaCertstore extends ValidatableConf {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(name, "name");
+      notBlank(name, "name");
     }
 
   } // class Caalias
@@ -908,12 +908,12 @@ public class CaCertstore extends ValidatableConf {
 
       notNull(caId, "caId");
       notNull(ee, "ee");
-      notEmpty(file, "file");
+      notBlank(file, "file");
       notNull(pid, "pid");
       notNull(reqType, "reqType");
       notNull(rev, "rev");
       notNull(rid, "rid");
-      notEmpty(sn, "sn");
+      notBlank(sn, "sn");
       notNull(update, "update");
       notNull(crlScope, "crlScope");
       if (rev != null && rev.intValue() == 1) {
@@ -996,8 +996,8 @@ public class CaCertstore extends ValidatableConf {
     public void validate() throws InvalidConfException {
       super.validate();
       notNull(caId, "caId");
-      notEmpty(crlNo, "crlNo");
-      notEmpty(file, "file");
+      notBlank(crlNo, "crlNo");
+      notBlank(file, "file");
       notNull(crlScope, "crlScope");
     }
 
@@ -1053,7 +1053,7 @@ public class CaCertstore extends ValidatableConf {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(serial, "serial");
+      notBlank(serial, "serial");
     }
 
   } // class DeltaCrlCacheEntry
@@ -1102,8 +1102,8 @@ public class CaCertstore extends ValidatableConf {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(name, "name");
-      notEmpty(type, "type");
+      notBlank(name, "name");
+      notBlank(type, "type");
       notNull(conf, "conf");
       conf.validate();
     }
@@ -1196,7 +1196,7 @@ public class CaCertstore extends ValidatableConf {
     public void validate() throws InvalidConfException {
       super.validate();
       notNull(update, "update");
-      notEmpty(file, "file");
+      notBlank(file, "file");
     }
 
   } // class Request
@@ -1274,8 +1274,8 @@ public class CaCertstore extends ValidatableConf {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(name, "name");
-      notEmpty(type, "type");
+      notBlank(name, "name");
+      notBlank(type, "type");
       notNull(conf, "conf");
       conf.validate();
       validate(cert);
@@ -1365,8 +1365,8 @@ public class CaCertstore extends ValidatableConf {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(name, "name");
-      notEmpty(password, "password");
+      notBlank(name, "name");
+      notBlank(password, "password");
     }
 
   } // class User

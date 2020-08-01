@@ -17,12 +17,13 @@
 
 package org.xipki.security.pkcs11;
 
+import static org.xipki.util.Args.notNull;
+
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.interfaces.RSAPublicKey;
 
 import org.bouncycastle.crypto.params.RSAKeyParameters;
-import org.xipki.util.Args;
 
 /**
  * {@link RSAKeyParameters} for PKCS#11 token.
@@ -43,10 +44,10 @@ public class P11RSAKeyParameter extends RSAKeyParameters {
       BigInteger modulus, BigInteger publicExponent) {
     super(true, modulus, publicExponent);
 
-    Args.notNull(modulus,"modulus");
-    Args.notNull(publicExponent, "publicExponent");
-    this.p11CryptService = Args.notNull(p11CryptService, "p11CryptService");
-    this.identityId = Args.notNull(identityId, "identityId");
+    notNull(modulus,"modulus");
+    notNull(publicExponent, "publicExponent");
+    this.p11CryptService = notNull(p11CryptService, "p11CryptService");
+    this.identityId = notNull(identityId, "identityId");
     this.keysize = modulus.bitLength();
   }
 
@@ -64,8 +65,8 @@ public class P11RSAKeyParameter extends RSAKeyParameters {
 
   public static P11RSAKeyParameter getInstance(P11CryptService p11CryptService,
       P11IdentityId identityId) throws InvalidKeyException {
-    Args.notNull(p11CryptService, "p11CryptService");
-    Args.notNull(identityId, "identityId");
+    notNull(p11CryptService, "p11CryptService");
+    notNull(identityId, "identityId");
 
     RSAPublicKey key;
     try {

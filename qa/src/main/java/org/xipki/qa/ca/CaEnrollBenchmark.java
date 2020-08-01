@@ -17,6 +17,9 @@
 
 package org.xipki.qa.ca;
 
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.Args.positive;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,7 +67,6 @@ import org.xipki.qa.BenchmarkHttpClient.HttpClientException;
 import org.xipki.qa.BenchmarkHttpClient.ResponseHandler;
 import org.xipki.qa.BenchmarkHttpClient.SslConf;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
 import org.xipki.util.BenchmarkExecutor;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
@@ -155,9 +157,9 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(requestorCert, "requestorCert");
-      notEmpty(responderCert, "responderCert");
-      notEmpty(caUrl, "caUrl");
+      notBlank(requestorCert, "requestorCert");
+      notBlank(responderCert, "responderCert");
+      notBlank(caUrl, "caUrl");
       notNull(ssl, "ssl");
       validate(ssl);
     }
@@ -251,8 +253,8 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
       int queueSize, String description) throws IOException, InvalidConfException {
     super(description);
     this.maxRequests = maxRequests;
-    this.num = Args.positive(num, "num");
-    this.benchmarkEntry = Args.notNull(benchmarkEntry, "benchmarkEntry");
+    this.num = positive(num, "num");
+    this.benchmarkEntry = notNull(benchmarkEntry, "benchmarkEntry");
     this.index = new AtomicLong(getSecureIndex());
     this.queueSize = queueSize;
 

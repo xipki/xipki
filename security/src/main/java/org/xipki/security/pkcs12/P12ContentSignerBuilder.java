@@ -17,6 +17,9 @@
 
 package org.xipki.security.pkcs12;
 
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.Args.positive;
+
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -62,7 +65,6 @@ import org.xipki.security.XiWrappedContentSigner;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.GMUtil;
 import org.xipki.security.util.SignerUtil;
-import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 
 /**
@@ -187,13 +189,13 @@ public class P12ContentSignerBuilder {
 
   public P12ContentSignerBuilder(PrivateKey privateKey, PublicKey publicKey)
       throws XiSecurityException {
-    this.key = Args.notNull(privateKey, "privateKey");
-    this.publicKey = Args.notNull(publicKey, "publicKey");
+    this.key = notNull(privateKey, "privateKey");
+    this.publicKey = notNull(publicKey, "publicKey");
     this.certificateChain = null;
   }
 
   public P12ContentSignerBuilder(KeypairWithCert keypairWithCert) throws XiSecurityException {
-    Args.notNull(keypairWithCert, "keypairWithCert");
+    notNull(keypairWithCert, "keypairWithCert");
     this.key = keypairWithCert.getKey();
     this.publicKey = keypairWithCert.getPublicKey();
     this.certificateChain = keypairWithCert.getCertificateChain();
@@ -201,8 +203,8 @@ public class P12ContentSignerBuilder {
 
   public ConcurrentContentSigner createSigner(AlgorithmIdentifier signatureAlgId, int parallelism,
       SecureRandom random) throws XiSecurityException, NoSuchPaddingException {
-    Args.notNull(signatureAlgId, "signatureAlgId");
-    Args.positive(parallelism, "parallelism");
+    notNull(signatureAlgId, "signatureAlgId");
+    positive(parallelism, "parallelism");
 
     List<XiContentSigner> signers = new ArrayList<>(parallelism);
 

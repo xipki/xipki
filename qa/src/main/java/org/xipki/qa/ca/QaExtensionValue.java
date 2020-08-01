@@ -17,9 +17,9 @@
 
 package org.xipki.qa.ca;
 
-import java.util.Arrays;
+import static org.xipki.util.Args.notNull;
 
-import org.xipki.util.Args;
+import java.util.Arrays;
 
 /**
  * QA extension value.
@@ -35,7 +35,7 @@ public class QaExtensionValue {
   private final byte[] value;
 
   public QaExtensionValue(boolean critical, byte[] value) {
-    Args.notNull(value, "value");
+    notNull(value, "value");
     this.critical = critical;
     this.value = Arrays.copyOf(value, value.length);
   }

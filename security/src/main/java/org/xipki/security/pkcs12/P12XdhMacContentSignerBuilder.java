@@ -17,6 +17,9 @@
 
 package org.xipki.security.pkcs12;
 
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.Args.positive;
+
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -46,7 +49,6 @@ import org.xipki.security.ObjectIdentifiers.Xipki;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.XiSecurityException;
-import org.xipki.util.Args;
 
 /**
  * Builder of PKCS#12 XDH (e.g. X25519, X448) MAC signer.
@@ -125,9 +127,9 @@ public class P12XdhMacContentSignerBuilder {
 
   public P12XdhMacContentSignerBuilder(X509Cert peerCert,
       PrivateKey privateKey, PublicKey publicKey) throws XiSecurityException {
-    Args.notNull(privateKey, "privateKey");
-    Args.notNull(peerCert, "peerCert");
-    this.publicKey = Args.notNull(publicKey, "publicKey");
+    notNull(privateKey, "privateKey");
+    notNull(peerCert, "peerCert");
+    this.publicKey = notNull(publicKey, "publicKey");
     this.certificateChain = null;
     init(privateKey, peerCert);
   }
@@ -135,8 +137,8 @@ public class P12XdhMacContentSignerBuilder {
   public P12XdhMacContentSignerBuilder(KeypairWithCert keypairWithCert,
       X509Cert peerCert)
       throws XiSecurityException {
-    Args.notNull(keypairWithCert, "keypairWithCert");
-    Args.notNull(peerCert, "peerCert");
+    notNull(keypairWithCert, "keypairWithCert");
+    notNull(peerCert, "peerCert");
     this.publicKey = keypairWithCert.getPublicKey();
     this.certificateChain = keypairWithCert.getCertificateChain();
 
@@ -194,7 +196,7 @@ public class P12XdhMacContentSignerBuilder {
   } // method init
 
   public ConcurrentContentSigner createSigner(int parallelism) throws XiSecurityException {
-    Args.positive(parallelism, "parallelism");
+    positive(parallelism, "parallelism");
 
     List<XiContentSigner> signers = new ArrayList<>(parallelism);
 

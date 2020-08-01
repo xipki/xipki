@@ -17,6 +17,8 @@
 
 package org.xipki.security.pkcs11.emulator;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.IOException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -41,7 +43,6 @@ import org.bouncycastle.pkcs.jcajce.JcePKCSPBEInputDecryptorProviderBuilder;
 import org.bouncycastle.pkcs.jcajce.JcePKCSPBEOutputEncryptorBuilder;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.pkcs11.P11TokenException;
-import org.xipki.util.Args;
 
 /**
  * Encrypts and decrypts private key in the emulator.
@@ -59,7 +60,7 @@ class PrivateKeyCryptor {
   private InputDecryptorProvider decryptorProvider;
 
   PrivateKeyCryptor(char[] password) throws P11TokenException {
-    Args.notNull(password, "password");
+    notNull(password, "password");
     JcePKCSPBEOutputEncryptorBuilder eb = new JcePKCSPBEOutputEncryptorBuilder(ALGO);
     eb.setProvider("BC");
     eb.setIterationCount(ITERATION_COUNT);
@@ -75,7 +76,7 @@ class PrivateKeyCryptor {
 
   PrivateKey decrypt(PKCS8EncryptedPrivateKeyInfo encryptedPrivateKeyInfo)
       throws P11TokenException {
-    Args.notNull(encryptedPrivateKeyInfo, "encryptedPrivateKeyInfo");
+    notNull(encryptedPrivateKeyInfo, "encryptedPrivateKeyInfo");
     PrivateKeyInfo privateKeyInfo;
     synchronized (decryptorProvider) {
       try {
@@ -114,7 +115,7 @@ class PrivateKeyCryptor {
   } // method decrypt
 
   PKCS8EncryptedPrivateKeyInfo encrypt(PrivateKey privateKey) {
-    Args.notNull(privateKey, "privateKey");
+    notNull(privateKey, "privateKey");
     PrivateKeyInfo privateKeyInfo = PrivateKeyInfo.getInstance(privateKey.getEncoded());
     PKCS8EncryptedPrivateKeyInfoBuilder builder = new PKCS8EncryptedPrivateKeyInfoBuilder(
         privateKeyInfo);

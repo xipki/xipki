@@ -17,6 +17,11 @@
 
 package org.xipki.cmpclient.internal;
 
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notEmpty;
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.Args.toNonBlankLower;
+
 import java.security.cert.CertificateEncodingException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,7 +36,6 @@ import javax.net.ssl.SSLSocketFactory;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.cmpclient.CertprofileInfo;
 import org.xipki.security.X509Cert;
-import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -133,10 +137,10 @@ class CaConf {
 
   CaConf(String name, String url, String healthUrl, String requestorName, Responder responder,
       SSLSocketFactory sslSocketFactory, HostnameVerifier hostnameVerifier) {
-    this.name = Args.toNonBlankLower(name, "name");
-    this.url = Args.notBlank(url, "url");
-    this.requestorName = Args.notNull(requestorName, "requestorName");
-    this.responder = Args.notNull(responder, "responder");
+    this.name = toNonBlankLower(name, "name");
+    this.url = notBlank(url, "url");
+    this.requestorName = notNull(requestorName, "requestorName");
+    this.responder = notNull(responder, "responder");
     this.healthUrl = StringUtil.isBlank(healthUrl) ? url.replace("cmp", "health") : healthUrl;
     this.sslSocketFactory = sslSocketFactory;
     this.hostnameVerifier = hostnameVerifier;
@@ -156,7 +160,7 @@ class CaConf {
 
   public void setCertchain(List<X509Cert> certchain)
       throws CertificateEncodingException {
-    Args.notEmpty(certchain, "certchain");
+    notEmpty(certchain, "certchain");
     this.certchain = certchain;
     this.cert = certchain.get(0);
     this.subject = cert.getSubject();
@@ -211,11 +215,11 @@ class CaConf {
   }
 
   public boolean supportsProfile(String profileName) {
-    return profiles.containsKey(Args.toNonBlankLower(profileName, "profileName"));
+    return profiles.containsKey(toNonBlankLower(profileName, "profileName"));
   }
 
   public CertprofileInfo getProfile(String profileName) {
-    return profiles.get(Args.toNonBlankLower(profileName, "profileName"));
+    return profiles.get(toNonBlankLower(profileName, "profileName"));
   }
 
   public boolean isCaInfoConfigured() {

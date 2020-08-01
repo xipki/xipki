@@ -17,6 +17,8 @@
 
 package org.xipki.security.pkcs11.emulator;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
@@ -33,7 +35,6 @@ import org.xipki.security.pkcs11.P11ModuleConf;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.pkcs11.P11TokenException;
-import org.xipki.util.Args;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
@@ -183,7 +184,7 @@ public class EmulatorP11Module extends P11Module {
   } // constructor
 
   public static P11Module getInstance(P11ModuleConf moduleConf) throws P11TokenException {
-    Args.notNull(moduleConf, "moduleConf");
+    notNull(moduleConf, "moduleConf");
     return new EmulatorP11Module(moduleConf);
   }
 

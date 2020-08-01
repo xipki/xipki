@@ -17,6 +17,9 @@
 
 package org.xipki.security;
 
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
+
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,7 +28,6 @@ import java.util.Set;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.xipki.security.util.AlgorithmUtil;
-import org.xipki.util.Args;
 
 /**
  * An implementation of {@link AlgorithmValidator} where the permitted algorithms
@@ -63,7 +65,7 @@ public class CollectionAlgorithmValidator implements AlgorithmValidator {
 
   @Override
   public boolean isAlgorithmPermitted(AlgorithmIdentifier algId) {
-    Args.notNull(algId, "algId");
+    notNull(algId, "algId");
 
     if (algoNames.isEmpty()) {
       return true;
@@ -81,7 +83,7 @@ public class CollectionAlgorithmValidator implements AlgorithmValidator {
 
   @Override
   public boolean isAlgorithmPermitted(String algoName) {
-    Args.notBlank(algoName, "algoName");
+    notBlank(algoName, "algoName");
 
     if (algoNames.isEmpty()) {
       return true;

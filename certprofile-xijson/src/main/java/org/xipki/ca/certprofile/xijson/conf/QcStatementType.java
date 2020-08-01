@@ -132,7 +132,7 @@ public class QcStatementType extends ValidatableConf {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(currency, "currency");
+      notBlank(currency, "currency");
       notNull(amount, "amount");
       validate(amount);
       notNull(exponent, "exponent");
@@ -167,8 +167,8 @@ public class QcStatementType extends ValidatableConf {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(url, "url");
-      notEmpty(language, "language");
+      notBlank(url, "url");
+      notBlank(language, "language");
     }
 
   } // class QcEuLimitValueType

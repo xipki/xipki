@@ -17,6 +17,8 @@
 
 package org.xipki.security.bc;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.InvalidKeyException;
@@ -42,7 +44,6 @@ import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers.Xipki;
-import org.xipki.util.Args;
 
 /**
  * {@link ContentVerifierProvider} for the algorithm X25519/X448 static HMAC (XiPKI own
@@ -126,8 +127,8 @@ public class XiXDHContentVerifierProvider implements ContentVerifierProvider {
 
   public XiXDHContentVerifierProvider(PublicKey verifyKey, DHSigStaticKeyCertPair ownerKeyAndCert)
       throws InvalidKeyException {
-    Args.notNull(verifyKey, "verifyKey");
-    Args.notNull(ownerKeyAndCert, "ownerKeyAndCert");
+    notNull(verifyKey, "verifyKey");
+    notNull(ownerKeyAndCert, "ownerKeyAndCert");
 
     String keyAlgName = verifyKey.getAlgorithm();
 

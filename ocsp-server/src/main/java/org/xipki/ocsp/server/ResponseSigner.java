@@ -17,6 +17,8 @@
 
 package org.xipki.ocsp.server;
 
+import static org.xipki.util.Args.notEmpty;
+
 import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.util.HashMap;
@@ -34,7 +36,6 @@ import org.xipki.ocsp.server.type.TaggedCertSequence;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
-import org.xipki.util.Args;
 
 /**
  * Response signer.
@@ -64,7 +65,7 @@ class ResponseSigner {
   private final boolean macSigner;
 
   ResponseSigner(List<ConcurrentContentSigner> signers) throws CertificateException, IOException {
-    this.signers = Args.notEmpty(signers, "signers");
+    this.signers = notEmpty(signers, "signers");
     ConcurrentContentSigner firstSigner = signers.get(0);
     this.macSigner = firstSigner.isMac();
 

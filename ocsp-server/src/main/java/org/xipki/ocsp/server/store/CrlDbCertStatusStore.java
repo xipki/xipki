@@ -17,6 +17,8 @@
 
 package org.xipki.ocsp.server.store;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
@@ -27,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.ocsp.api.OcspStoreException;
-import org.xipki.util.Args;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
@@ -90,7 +91,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
    */
   public void init(Map<String, ? extends Object> sourceConf, DataSourceWrapper datasource)
       throws OcspStoreException {
-    Args.notNull(sourceConf, "sourceConf");
+    notNull(sourceConf, "sourceConf");
 
     this.dir = IoUtil.expandFilepath(getStrValue(sourceConf, "dir", true));
     String value = getStrValue(sourceConf, "sqlBatchCommit", false);

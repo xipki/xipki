@@ -17,6 +17,11 @@
 
 package org.xipki.security.pkcs11.iaik;
 
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.Args.positive;
+import static org.xipki.util.CollectionUtil.isEmpty;
+import static org.xipki.util.CollectionUtil.isNotEmpty;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -57,8 +62,6 @@ import org.xipki.security.pkcs11.P11TokenException;
 import org.xipki.security.pkcs11.P11UnknownEntityException;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
-import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.concurrent.ConcurrentBag;
 import org.xipki.util.concurrent.ConcurrentBagEntry;
@@ -136,9 +139,9 @@ class IaikP11Slot extends P11Slot {
       P11NewObjectConf newObjectConf) throws P11TokenException {
     super(moduleName, slotId, readOnly, mechanismFilter);
 
-    this.newObjectConf = Args.notNull(newObjectConf, "newObjectConf");
-    this.slot = Args.notNull(slot, "slot");
-    this.maxMessageSize = Args.positive(maxMessageSize, "maxMessageSize");
+    this.newObjectConf = notNull(newObjectConf, "newObjectConf");
+    this.slot = notNull(slot, "slot");
+    this.maxMessageSize = positive(maxMessageSize, "maxMessageSize");
 
     this.userType = userType;
     if (userType == PKCS11Constants.CKU_SO) {
@@ -351,7 +354,7 @@ class IaikP11Slot extends P11Slot {
   } // method analyseSingleKey
 
   byte[] digestKey(long mechanism, IaikP11Identity identity) throws P11TokenException {
-    Args.notNull(identity, "identity");
+    notNull(identity, "identity");
     assertMechanismSupported(mechanism);
     Key key = identity.getSigningKey();
     if (!(key instanceof SecretKey)) {
@@ -420,7 +423,7 @@ class IaikP11Slot extends P11Slot {
 
   byte[] sign(long mechanism, P11Params parameters, byte[] content, IaikP11Identity identity)
       throws P11TokenException {
-    Args.notNull(content, "content");
+    notNull(content, "content");
     assertMechanismSupported(mechanism);
 
     int expectedSignatureLen;
@@ -574,7 +577,7 @@ class IaikP11Slot extends P11Slot {
       boolean isProtectedAuthenticationPath =
           session.getToken().getTokenInfo().isProtectedAuthenticationPath();
 
-      if (isProtectedAuthenticationPath || CollectionUtil.isEmpty(password)) {
+      if (isProtectedAuthenticationPath || isEmpty(password)) {
         LOG.info("verify on PKCS11Module with PROTECTED_AUTHENTICATION_PATH");
         singleLogin(session, null);
       } else {
@@ -613,7 +616,7 @@ class IaikP11Slot extends P11Slot {
       return;
     }
 
-    if (CollectionUtil.isEmpty(password)) {
+    if (isEmpty(password)) {
       singleLogin(session, null);
     } else {
       for (char[] singlePwd : password) {
@@ -623,7 +626,7 @@ class IaikP11Slot extends P11Slot {
   } // method login
 
   private void forceLogin(Session session) throws P11TokenException {
-    if (CollectionUtil.isEmpty(password)) {
+    if (isEmpty(password)) {
       LOG.info("verify on PKCS11Module with NULL PIN");
       singleLogin(session, null);
     } else {
@@ -659,7 +662,7 @@ class IaikP11Slot extends P11Slot {
   private List<PrivateKey> getAllPrivateObjects(Session session) throws P11TokenException {
     PrivateKey template = new PrivateKey();
     List<Storage> tmpObjects = getObjects(session, template);
-    if (CollectionUtil.isEmpty(tmpObjects)) {
+    if (isEmpty(tmpObjects)) {
       return Collections.emptyList();
     }
 
@@ -677,7 +680,7 @@ class IaikP11Slot extends P11Slot {
   private List<SecretKey> getAllSecretKeyObjects(Session session) throws P11TokenException {
     SecretKey template = new SecretKey();
     List<Storage> tmpObjects = getObjects(session, template);
-    if (CollectionUtil.isEmpty(tmpObjects)) {
+    if (isEmpty(tmpObjects)) {
       return Collections.emptyList();
     }
 
@@ -717,7 +720,7 @@ class IaikP11Slot extends P11Slot {
     }
 
     List<Storage> tmpObjects = getObjects(session, template, 2);
-    if (CollectionUtil.isEmpty(tmpObjects)) {
+    if (isEmpty(tmpObjects)) {
       return null;
     }
     int size = tmpObjects.size();
@@ -741,7 +744,7 @@ class IaikP11Slot extends P11Slot {
 
     List<Storage> tmpObjects = getObjects(session, template, 2);
 
-    if (CollectionUtil.isEmpty(tmpObjects)) {
+    if (isEmpty(tmpObjects)) {
       LOG.info("found no certificate identified by {}", getDescription(keyId, keyLabel));
       return null;
     }
@@ -1055,7 +1058,7 @@ class IaikP11Slot extends P11Slot {
     Set<P11KeyUsage> usages = control.getUsages();
     // CHECKSTYLE:SKIP
     final Boolean TRUE = Boolean.TRUE;
-    if (CollectionUtil.isNotEmpty(usages)) {
+    if (isNotEmpty(usages)) {
       for (P11KeyUsage usage : usages) {
         switch (usage) {
           case DECRYPT:
@@ -1137,7 +1140,7 @@ class IaikP11Slot extends P11Slot {
     Set<P11KeyUsage> usages = control.getUsages();
     // CHECKSTYLE:SKIP
     final Boolean TRUE = Boolean.TRUE;
-    if (CollectionUtil.isNotEmpty(usages)) {
+    if (isNotEmpty(usages)) {
       for (P11KeyUsage usage : usages) {
         switch (usage) {
           case DECRYPT:
@@ -1462,7 +1465,7 @@ class IaikP11Slot extends P11Slot {
       Set<P11KeyUsage> usages = control.getUsages();
       // CHECKSTYLE:SKIP
       final Boolean TRUE = Boolean.TRUE;
-      if (CollectionUtil.isNotEmpty(usages)) {
+      if (isNotEmpty(usages)) {
         for (P11KeyUsage usage : usages) {
           switch (usage) {
             case DECRYPT:
@@ -1550,7 +1553,7 @@ class IaikP11Slot extends P11Slot {
 
     List<Storage> tmpObjects = getObjects(session, template);
 
-    if (CollectionUtil.isEmpty(tmpObjects)) {
+    if (isEmpty(tmpObjects)) {
       LOG.info("found no certificate identified by {}", getDescription(keyId, keyLabel));
       return null;
     }
@@ -1684,7 +1687,7 @@ class IaikP11Slot extends P11Slot {
   } // method idExists
 
   private static boolean labelExists(Session session, char[] keyLabel) throws P11TokenException {
-    Args.notNull(keyLabel, "keyLabel");
+    notNull(keyLabel, "keyLabel");
     Key key = new Key();
     key.getLabel().setCharArrayValue(keyLabel);
 

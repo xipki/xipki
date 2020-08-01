@@ -43,7 +43,7 @@ public abstract class ValidatableConf {
     }
   }
 
-  protected static void notEmpty(String value, String name) throws InvalidConfException {
+  protected static void notBlank(String value, String name) throws InvalidConfException {
     if (value == null) {
       throw new InvalidConfException(name + " may not be null");
     }

@@ -17,12 +17,13 @@
 
 package org.xipki.ocsp.api;
 
+import static org.xipki.util.Args.notNull;
+
 import java.util.Date;
 
 import org.bouncycastle.asn1.ocsp.CrlID;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.HashAlgo;
-import org.xipki.util.Args;
 
 /**
  * CertStatus information.
@@ -78,8 +79,8 @@ public class CertStatusInfo {
 
   private CertStatusInfo(CertStatus certStatus, Date thisUpdate, Date nextUpdate,
       String certprofile) {
-    this.certStatus = Args.notNull(certStatus, "certStatus");
-    this.thisUpdate = Args.notNull(thisUpdate, "thisUpdate");
+    this.certStatus = notNull(certStatus, "certStatus");
+    this.thisUpdate = notNull(thisUpdate, "thisUpdate");
     this.nextUpdate = nextUpdate;
     this.certprofile = certprofile;
   }
@@ -105,7 +106,7 @@ public class CertStatusInfo {
   }
 
   public void setCertStatus(CertStatus certStatus) {
-    this.certStatus = Args.notNull(certStatus, "certStatus");
+    this.certStatus = notNull(certStatus, "certStatus");
   }
 
   public CertRevocationInfo getRevocationInfo() {
@@ -175,9 +176,7 @@ public class CertStatusInfo {
   public static CertStatusInfo getRevokedCertStatusInfo(CertRevocationInfo revocationInfo,
       HashAlgo certHashAlgo, byte[] certHash, Date thisUpdate, Date nextUpdate,
       String certprofile) {
-    if (revocationInfo == null) {
-      throw new IllegalArgumentException("revocationInfo may not be null");
-    }
+    notNull(revocationInfo, "revocationInfo");
     CertStatusInfo ret = new CertStatusInfo(CertStatus.REVOKED, thisUpdate, nextUpdate,
         certprofile);
     ret.revocationInfo = revocationInfo;
@@ -188,9 +187,7 @@ public class CertStatusInfo {
 
   public static CertStatusInfo getRevokedCertStatusInfo(CertRevocationInfo revocationInfo,
       Date thisUpdate, Date nextUpdate) {
-    if (revocationInfo == null) {
-      throw new IllegalArgumentException("revocationInfo may not be null");
-    }
+    notNull(revocationInfo, "revocationInfo");
     CertStatusInfo ret = new CertStatusInfo(CertStatus.REVOKED, thisUpdate, nextUpdate, null);
     ret.revocationInfo = revocationInfo;
     return ret;

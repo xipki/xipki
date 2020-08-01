@@ -17,6 +17,8 @@
 
 package org.xipki.util;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -115,7 +117,7 @@ public class StringUtil {
   }
 
   public static boolean isNumber(String str, int radix) {
-    Args.notNull(str, "str");
+    notNull(str, "str");
     try {
       Integer.parseInt(str, radix);
       return true;
@@ -125,7 +127,7 @@ public class StringUtil {
   }
 
   public static String formatText(String text, int minLen) {
-    Args.notNull(text, "text");
+    notNull(text, "text");
     int len = text.length();
     if (len >= minLen) {
       return text;

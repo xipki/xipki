@@ -17,6 +17,8 @@
 
 package org.xipki.qa;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -33,7 +35,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.util.Args;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ValidatableConf;
@@ -339,7 +340,7 @@ public class BenchmarkHttpClient {
     if (queueSize > 0) {
       this.queueSize = queueSize;
     }
-    this.responseHandler = Args.notNull(responseHandler, "responseHandler");
+    this.responseHandler = notNull(responseHandler, "responseHandler");
     this.workerGroup = new NioEventLoopGroup(1);
     this.host = host;
     this.port = port;

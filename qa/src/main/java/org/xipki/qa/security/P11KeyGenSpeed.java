@@ -17,6 +17,8 @@
 
 package org.xipki.qa.security;
 
+import static org.xipki.util.Args.notNull;
+
 import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -26,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11Slot.P11NewKeyControl;
-import org.xipki.util.Args;
 import org.xipki.util.BenchmarkExecutor;
 
 /**
@@ -66,7 +67,7 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
 
     public EC(P11Slot slot, byte[] id, ASN1ObjectIdentifier curveOid) throws Exception {
       super(slot, id, "PKCS#11 EC key generation\ncurve: " + curveOid.getId());
-      this.curveOid = Args.notNull(curveOid, "curveOid");
+      this.curveOid = notNull(curveOid, "curveOid");
     }
 
     @Override
@@ -141,7 +142,7 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
 
   public P11KeyGenSpeed(P11Slot slot, byte[] id, String description) {
     super(description);
-    this.slot = Args.notNull(slot, "slot");
+    this.slot = notNull(slot, "slot");
     this.id = id;
   }
 

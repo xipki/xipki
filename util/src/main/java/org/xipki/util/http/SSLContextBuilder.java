@@ -30,6 +30,8 @@
 
 package org.xipki.util.http;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -52,8 +54,6 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
-
-import org.xipki.util.Args;
 
 /**
  * Builder for {@link javax.net.ssl.SSLContext} instances.
@@ -214,7 +214,7 @@ public class SSLContextBuilder {
       final File file,
       final char[] storePassword)
           throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
-    Args.notNull(file, "Truststore file");
+    notNull(file, "Truststore file");
     return loadTrustMaterial(new FileInputStream(file), storePassword);
   }
 
@@ -222,7 +222,7 @@ public class SSLContextBuilder {
       final InputStream instream,
       final char[] storePassword)
           throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
-    Args.notNull(instream, "Truststore instream");
+    notNull(instream, "Truststore instream");
     final KeyStore trustStore = KeyStore.getInstance(keyStoreType);
     try {
       trustStore.load(instream, storePassword);
@@ -256,7 +256,7 @@ public class SSLContextBuilder {
       final char[] keyPassword)
           throws NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException,
           CertificateException, IOException {
-    Args.notNull(file, "Keystore file");
+    notNull(file, "Keystore file");
     return loadKeyMaterial(new FileInputStream(file), storePassword, keyPassword);
   }
 
@@ -266,7 +266,7 @@ public class SSLContextBuilder {
       final char[] keyPassword)
           throws NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException,
           CertificateException, IOException {
-    Args.notNull(instream, "Keystore instream");
+    notNull(instream, "Keystore instream");
     final KeyStore identityStore = KeyStore.getInstance(keyStoreType);
     try {
       identityStore.load(instream, storePassword);

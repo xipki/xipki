@@ -17,6 +17,8 @@
 
 package org.xipki.qa.ca;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -54,7 +56,6 @@ import org.xipki.qa.ValidationResult;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.LogUtil;
@@ -91,11 +92,11 @@ public class CertprofileQa {
   public CertprofileQa(String data) throws CertprofileException {
     this(
         StringUtil.toUtf8Bytes(
-            Args.notNull(data, "data")));
+            notNull(data, "data")));
   }
 
   public CertprofileQa(byte[] dataBytes) throws CertprofileException {
-    Args.notNull(dataBytes, "dataBytes");
+    notNull(dataBytes, "dataBytes");
     try {
       X509ProfileType conf = X509ProfileType.parse(new ByteArrayInputStream(dataBytes));
 
@@ -115,10 +116,10 @@ public class CertprofileQa {
   public ValidationResult checkCert(byte[] certBytes, IssuerInfo issuerInfo,
       X500Name requestedSubject, SubjectPublicKeyInfo requestedPublicKey,
       Extensions requestedExtensions) {
-    Args.notNull(certBytes, "certBytes");
-    Args.notNull(issuerInfo, "issuerInfo");
-    Args.notNull(requestedSubject, "requestedSubject");
-    Args.notNull(requestedPublicKey, "requestedPublicKey");
+    notNull(certBytes, "certBytes");
+    notNull(issuerInfo, "issuerInfo");
+    notNull(requestedSubject, "requestedSubject");
+    notNull(requestedPublicKey, "requestedPublicKey");
 
     List<ValidationIssue> resultIssues = new LinkedList<ValidationIssue>();
 

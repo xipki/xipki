@@ -62,7 +62,7 @@ public abstract class Describable extends ValidatableConf {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(oid, "oid");
+      notBlank(oid, "oid");
       try {
         toXiOid();
       } catch (Exception ex) {

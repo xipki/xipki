@@ -17,6 +17,8 @@
 
 package org.xipki.security.pkcs11;
 
+import static org.xipki.util.Args.notNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.xipki.util.Args;
 import org.xipki.util.CompareUtil;
 
 /**
@@ -43,7 +44,7 @@ public abstract class P11Module {
   private final List<P11SlotIdentifier> slotIds = new ArrayList<>();
 
   public P11Module(P11ModuleConf conf) {
-    this.conf = Args.notNull(conf, "conf");
+    this.conf = notNull(conf, "conf");
   }
 
   public abstract void close();
@@ -83,7 +84,7 @@ public abstract class P11Module {
    *         if PKCS#11 token error occurs
    */
   public P11Slot getSlot(P11SlotIdentifier slotId) throws P11TokenException {
-    Args.notNull(slotId, "slotId");
+    notNull(slotId, "slotId");
     P11Slot slot = slots.get(slotId);
     if (slot == null) {
       throw new P11UnknownEntityException(slotId);

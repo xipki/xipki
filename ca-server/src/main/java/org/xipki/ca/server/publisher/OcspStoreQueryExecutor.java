@@ -17,6 +17,8 @@
 
 package org.xipki.ca.server.publisher;
 
+import static org.xipki.util.Args.notNull;
+
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.sql.PreparedStatement;
@@ -42,7 +44,6 @@ import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.LogUtil;
 
@@ -80,7 +81,7 @@ class OcspStoreQueryExecutor {
     private final List<IssuerEntry> entries;
 
     IssuerStore(List<IssuerEntry> entries) {
-      Args.notNull(entries, "entries");
+      notNull(entries, "entries");
       this.entries = new ArrayList<>(entries.size());
 
       for (IssuerEntry entry : entries) {
@@ -89,7 +90,7 @@ class OcspStoreQueryExecutor {
     } // constructor
 
     final void addIdentityEntry(IssuerEntry entry) {
-      Args.notNull(entry, "entry");
+      notNull(entry, "entry");
       for (IssuerEntry existingEntry : entries) {
         if (existingEntry.getId() == entry.getId()) {
           throw new IllegalArgumentException(
@@ -101,7 +102,7 @@ class OcspStoreQueryExecutor {
     } // method addIdentityEntry
 
     Integer getIdForCert(byte[] encodedCert) {
-      Args.notNull(encodedCert, "encodedCert");
+      notNull(encodedCert, "encodedCert");
       for (IssuerEntry entry : entries) {
         if (entry.matchCert(encodedCert)) {
           return entry.getId();
@@ -140,7 +141,7 @@ class OcspStoreQueryExecutor {
 
   OcspStoreQueryExecutor(DataSourceWrapper datasource, boolean publishGoodCerts)
       throws DataAccessException, NoSuchAlgorithmException {
-    this.datasource = Args.notNull(datasource, "datasource");
+    this.datasource = notNull(datasource, "datasource");
     this.issuerStore = initIssuerStore();
     this.publishGoodCerts = publishGoodCerts;
 
@@ -210,7 +211,7 @@ class OcspStoreQueryExecutor {
 
   private void addOrUpdateCert(X509Cert issuer, CertWithDbId certificate,
       CertRevocationInfo revInfo) throws DataAccessException, OperationException {
-    Args.notNull(issuer, "issuer");
+    notNull(issuer, "issuer");
 
     boolean revoked = (revInfo != null);
     int issuerId = getIssuerId(issuer);
@@ -329,8 +330,8 @@ class OcspStoreQueryExecutor {
   }
 
   void unrevokeCert(X509Cert issuer, CertWithDbId cert) throws DataAccessException {
-    Args.notNull(issuer, "issuer");
-    Args.notNull(cert, "cert");
+    notNull(issuer, "issuer");
+    notNull(cert, "cert");
 
     Integer issuerId = issuerStore.getIdForCert(issuer.getEncoded());
     if (issuerId == null) {
@@ -380,8 +381,8 @@ class OcspStoreQueryExecutor {
   } // method unrevokeCert
 
   void removeCert(X509Cert issuer, CertWithDbId cert) throws DataAccessException {
-    Args.notNull(issuer, "issuer");
-    Args.notNull(cert, "cert");
+    notNull(issuer, "issuer");
+    notNull(cert, "cert");
 
     Integer issuerId = issuerStore.getIdForCert(issuer.getEncoded());
     if (issuerId == null) {
@@ -403,8 +404,8 @@ class OcspStoreQueryExecutor {
   } // method removeCert
 
   void revokeCa(X509Cert caCert, CertRevocationInfo revInfo) throws DataAccessException {
-    Args.notNull(caCert, "caCert");
-    Args.notNull(revInfo, "revInfo");
+    notNull(caCert, "caCert");
+    notNull(revInfo, "revInfo");
 
     int issuerId = getIssuerId(caCert);
     final String sql = "UPDATE ISSUER SET REV_INFO=? WHERE ID=?";
@@ -438,7 +439,7 @@ class OcspStoreQueryExecutor {
   } // method unrevokeCa
 
   private int getIssuerId(X509Cert issuerCert) throws DataAccessException {
-    Args.notNull(issuerCert, "issuerCert");
+    notNull(issuerCert, "issuerCert");
     Integer id = issuerStore.getIdForCert(issuerCert.getEncoded());
     if (id == null) {
       throw new IllegalStateException("could not find issuer, "

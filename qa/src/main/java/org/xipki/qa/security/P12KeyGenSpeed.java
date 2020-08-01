@@ -17,6 +17,8 @@
 
 package org.xipki.qa.security;
 
+import static org.xipki.util.Args.notNull;
+
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
@@ -26,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.util.KeyUtil;
-import org.xipki.util.Args;
 import org.xipki.util.BenchmarkExecutor;
 
 /**
@@ -124,7 +125,7 @@ public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
 
   public P12KeyGenSpeed(String description, SecurityFactory securityFactory) {
     super(description);
-    this.securityFactory = Args.notNull(securityFactory, "securityFactory");
+    this.securityFactory = notNull(securityFactory, "securityFactory");
   }
 
   protected abstract void generateKeypair(SecureRandom random) throws Exception;

@@ -47,7 +47,7 @@ public class QaconfType extends ValidatableConf {
     @Override
     public void validate() throws InvalidConfException {
       super.validate();
-      notEmpty(name, "name");
+      notBlank(name, "name");
     }
 
   } // class class
@@ -140,7 +140,7 @@ public class QaconfType extends ValidatableConf {
     public void validate() throws InvalidConfException {
       notNull(cert, "cert");
       validate(cert);
-      notEmpty(name, "name");
+      notBlank(name, "name");
     }
 
   } // class Issuer

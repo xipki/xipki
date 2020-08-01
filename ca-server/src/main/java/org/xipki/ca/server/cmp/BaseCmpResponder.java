@@ -17,6 +17,8 @@
 
 package org.xipki.ca.server.cmp;
 
+import static org.xipki.util.Args.notNull;
+
 import java.security.InvalidKeyException;
 import java.security.SecureRandom;
 import java.text.ParseException;
@@ -62,7 +64,6 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.cmp.CmpUtil;
 import org.xipki.security.cmp.ProtectionResult;
 import org.xipki.security.cmp.ProtectionVerificationResult;
-import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.LogUtil;
 import org.xipki.util.RandomUtil;
@@ -85,7 +86,7 @@ abstract class BaseCmpResponder {
   private final SecureRandom random = new SecureRandom();
 
   protected BaseCmpResponder(SecurityFactory securityFactory) {
-    this.securityFactory = Args.notNull(securityFactory, "securityFactory");
+    this.securityFactory = notNull(securityFactory, "securityFactory");
   }
 
   protected abstract ConcurrentContentSigner getSigner();
@@ -150,8 +151,8 @@ abstract class BaseCmpResponder {
 
   public PKIMessage processPkiMessage(PKIMessage pkiMessage, X509Cert tlsClientCert,
       Map<String, String> parameters, AuditEvent event) {
-    Args.notNull(pkiMessage, "pkiMessage");
-    Args.notNull(event, "event");
+    notNull(pkiMessage, "pkiMessage");
+    notNull(event, "event");
     GeneralPKIMessage message = new GeneralPKIMessage(pkiMessage);
 
     PKIHeader reqHeader = message.getHeader();

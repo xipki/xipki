@@ -159,7 +159,7 @@ public class OcspCertstore extends ValidatableConf {
 
       notNull(iid, "iid");
 
-      notEmpty(sn, "sn");
+      notBlank(sn, "sn");
       notNull(rev, "rev");
       if (rev) {
         notNull(rr, "rr");
@@ -208,7 +208,7 @@ public class OcspCertstore extends ValidatableConf {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(certFile, "certFile");
+      notBlank(certFile, "certFile");
     }
 
     public int getId() {
@@ -255,8 +255,8 @@ public class OcspCertstore extends ValidatableConf {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(name, "name");
-      notEmpty(info, "info");
+      notBlank(name, "name");
+      notBlank(info, "info");
     }
 
     public int getId() {
@@ -340,7 +340,7 @@ public class OcspCertstore extends ValidatableConf {
 
   @Override
   public void validate() throws InvalidConfException {
-    notEmpty(certhashAlgo, "certhashAlgo");
+    notBlank(certhashAlgo, "certhashAlgo");
     validate(issuers);
     validate(crlInfos);
   }

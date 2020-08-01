@@ -17,6 +17,8 @@
 
 package org.xipki.ocsp.server.store;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -57,7 +59,6 @@ import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
@@ -543,7 +544,7 @@ public class DbCertStatusStore extends OcspStore {
       }
     }
 
-    this.datasource = Args.notNull(datasource, "datasource");
+    this.datasource = notNull(datasource, "datasource");
 
     sqlCs = datasource.buildSelectFirstSql(1,
         "NBEFORE,NAFTER,REV,RR,RT,RIT,CRL_ID FROM CERT WHERE IID=? AND SN=?");

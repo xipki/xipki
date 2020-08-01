@@ -17,6 +17,9 @@
 
 package org.xipki.util;
 
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -222,8 +225,8 @@ public class ConfPairs {
   } // constructor
 
   public void putPair(String name, String value) {
-    Args.notBlank(name, "name");
-    Args.notNull(value, "value");
+    notBlank(name, "name");
+    notNull(value, "value");
 
     char ch = name.charAt(0);
     if (ch >= '0' && ch <= '9') {
@@ -233,12 +236,12 @@ public class ConfPairs {
   }
 
   public void removePair(String name) {
-    Args.notBlank(name, "name");
+    notBlank(name, "name");
     pairs.remove(name);
   }
 
   public String value(String name) {
-    Args.notBlank(name, "name");
+    notBlank(name, "name");
     return pairs.get(name);
   }
 

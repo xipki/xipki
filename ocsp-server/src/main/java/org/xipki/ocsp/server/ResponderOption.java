@@ -17,11 +17,12 @@
 
 package org.xipki.ocsp.server;
 
+import static org.xipki.util.Args.notNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.xipki.util.Args;
 import org.xipki.util.InvalidConfException;
 
 /**
@@ -55,7 +56,7 @@ class ResponderOption {
   private final List<String> servletPaths;
 
   ResponderOption(OcspServerConf.Responder conf) throws InvalidConfException {
-    Args.notNull(conf, "conf");
+    notNull(conf, "conf");
     String str = conf.getMode();
     if (str == null || "RFC6960".equalsIgnoreCase(str) || "RFC 6960".equalsIgnoreCase(str)) {
       this.mode = OcspMode.RFC6960;

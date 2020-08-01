@@ -17,6 +17,9 @@
 
 package org.xipki.ca.servlet;
 
+import static org.xipki.util.Args.notEmpty;
+import static org.xipki.util.Args.notNull;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,7 +51,6 @@ import org.xipki.ca.api.mgmt.MgmtMessage.SignerEntryWrapper;
 import org.xipki.ca.api.mgmt.MgmtRequest;
 import org.xipki.ca.api.mgmt.MgmtResponse;
 import org.xipki.security.X509Cert;
-import org.xipki.util.Args;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
@@ -89,11 +91,11 @@ public class HttpMgmtServlet extends HttpServlet {
   private CaManager caManager;
 
   public void setMgmtCerts(Set<X509Cert> mgmtCerts) {
-    this.mgmtCerts = new HashSet<>(Args.notEmpty(mgmtCerts, "mgmtCerts"));
+    this.mgmtCerts = new HashSet<>(notEmpty(mgmtCerts, "mgmtCerts"));
   }
 
   public void setCaManager(CaManager caManager) {
-    this.caManager = Args.notNull(caManager, "caManager");
+    this.caManager = notNull(caManager, "caManager");
   }
 
   @Override

@@ -17,6 +17,8 @@
 
 package org.xipki.ocsp.server;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +41,6 @@ import org.xipki.security.Securities.KeystoreConf;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
 
@@ -93,7 +94,7 @@ public class RequestOption {
   private final CertpathValidationModel certpathValidationModel;
 
   RequestOption(OcspServerConf.RequestOption conf) throws InvalidConfException {
-    Args.notNull(conf, "conf");
+    notNull(conf, "conf");
 
     supportsHttpGet = conf.isSupportsHttpGet();
     signatureRequired = conf.isSignatureRequired();
@@ -233,7 +234,7 @@ public class RequestOption {
 
   private static Set<X509Cert> getCerts(OcspServerConf.CertCollection conf)
       throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
-    Args.notNull(conf, "conf");
+    notNull(conf, "conf");
     Set<X509Cert> tmpCerts = new HashSet<>();
 
     if (conf.getKeystore() != null) {

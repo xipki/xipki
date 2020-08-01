@@ -17,6 +17,8 @@
 
 package org.xipki.qa.ocsp;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Iterator;
@@ -31,7 +33,6 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ocsp.client.RequestOptions;
 import org.xipki.qa.BenchmarkHttpClient.ResponseHandler;
 import org.xipki.security.X509Cert;
-import org.xipki.util.Args;
 import org.xipki.util.BenchmarkExecutor;
 
 import io.netty.buffer.ByteBuf;
@@ -101,11 +102,11 @@ public class OcspBenchmark extends BenchmarkExecutor implements ResponseHandler 
       Iterator<BigInteger> serials, int maxRequests, int queueSize, String description) {
     super(description);
 
-    this.issuerCert = Args.notNull(issuerCert, "issuerCert");
-    this.responderUrl = Args.notNull(responderUrl, "responderUrl");
-    this.requestOptions = Args.notNull(requestOptions, "requestOptions");
+    this.issuerCert = notNull(issuerCert, "issuerCert");
+    this.responderUrl = notNull(responderUrl, "responderUrl");
+    this.requestOptions = notNull(requestOptions, "requestOptions");
     this.maxRequests = maxRequests;
-    this.serials = Args.notNull(serials, "serials");
+    this.serials = notNull(serials, "serials");
     this.queueSize = queueSize;
   }
 

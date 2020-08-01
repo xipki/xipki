@@ -17,6 +17,10 @@
 
 package org.xipki.qa.ca;
 
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.CollectionUtil.isEmpty;
+import static org.xipki.util.CollectionUtil.isNotEmpty;
+
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,8 +46,6 @@ import org.xipki.ca.api.profile.TextVadidator;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
-import org.xipki.util.CollectionUtil;
 
 /**
  * Subject checker.
@@ -57,12 +59,12 @@ public class SubjectChecker {
   private final SubjectControl subjectControl;
 
   public SubjectChecker(SubjectControl subjectControl) {
-    this.subjectControl = Args.notNull(subjectControl, "subjectControl");
+    this.subjectControl = notNull(subjectControl, "subjectControl");
   }
 
   public List<ValidationIssue> checkSubject(X500Name subject, X500Name requestedSubject) {
-    Args.notNull(subject, "subject");
-    Args.notNull(requestedSubject, "requestedSubject");
+    notNull(subject, "subject");
+    notNull(requestedSubject, "requestedSubject");
 
     // collect subject attribute types to check
     Set<ASN1ObjectIdentifier> oids = new HashSet<>();
@@ -81,7 +83,7 @@ public class SubjectChecker {
 
     ValidationIssue issue = new ValidationIssue("X509.SUBJECT.group", "X509 subject RDN group");
     result.add(issue);
-    if (CollectionUtil.isNotEmpty(subjectControl.getGroups())) {
+    if (isNotEmpty(subjectControl.getGroups())) {
       Set<String> groups = new HashSet<>(subjectControl.getGroups());
       for (String g : groups) {
         boolean toBreak = false;
@@ -349,7 +351,7 @@ public class SubjectChecker {
       }
     }
 
-    if (CollectionUtil.isEmpty(requestedCoreAtvTextValues)) {
+    if (isEmpty(requestedCoreAtvTextValues)) {
       if (!type.equals(ObjectIdentifiers.DN.serialNumber)) {
         failureMsg.append("is present but not contained in the request; ");
       }

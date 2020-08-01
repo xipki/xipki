@@ -17,6 +17,8 @@
 
 package org.xipki.ocsp.servlet;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.EOFException;
 import java.io.IOException;
 
@@ -29,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ocsp.api.OcspServer;
 import org.xipki.ocsp.api.ResponderAndPath;
-import org.xipki.util.Args;
 import org.xipki.util.HealthCheckResult;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.LogUtil;
@@ -54,7 +55,7 @@ public class HealthCheckServlet extends HttpServlet {
   private OcspServer server;
 
   public void setServer(OcspServer server) {
-    this.server = Args.notNull(server, "server");
+    this.server = notNull(server, "server");
   }
 
   @Override

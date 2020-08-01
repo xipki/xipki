@@ -17,6 +17,9 @@
 
 package org.xipki.ca.server;
 
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.PublicKey;
@@ -55,7 +58,6 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.InvalidConfException;
@@ -101,11 +103,11 @@ class SelfSignedCertBuilder {
       String signerType, String signerConf, IdentifiedCertprofile certprofile,
       CertificationRequest csr, BigInteger serialNumber, CaUris caUris, ConfPairs extraControl)
           throws OperationException, InvalidConfException {
-    Args.notNull(securityFactory, "securityFactory");
-    Args.notBlank(signerType, "signerType");
-    Args.notNull(certprofile, "certprofile");
-    Args.notNull(csr, "csr");
-    Args.notNull(serialNumber, "serialNumber");
+    notNull(securityFactory, "securityFactory");
+    notBlank(signerType, "signerType");
+    notNull(certprofile, "certprofile");
+    notNull(csr, "csr");
+    notNull(serialNumber, "serialNumber");
     if (serialNumber.compareTo(BigInteger.ZERO) != 1) {
       throw new IllegalArgumentException(
           "serialNumber may not be non-positive: " + serialNumber);

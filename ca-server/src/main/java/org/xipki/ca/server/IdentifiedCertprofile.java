@@ -17,6 +17,8 @@
 
 package org.xipki.ca.server;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.Closeable;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -104,7 +106,6 @@ import org.xipki.security.ObjectIdentifiers.XKU;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.Validity;
 import org.xipki.util.Validity.Unit;
@@ -125,8 +126,8 @@ class IdentifiedCertprofile implements Closeable {
 
   IdentifiedCertprofile(MgmtEntry.Certprofile dbEntry, Certprofile certprofile)
       throws CertprofileException {
-    this.dbEntry = Args.notNull(dbEntry, "dbEntry");
-    this.certprofile = Args.notNull(certprofile, "certprofile");
+    this.dbEntry = notNull(dbEntry, "dbEntry");
+    this.certprofile = notNull(certprofile, "certprofile");
 
     this.certprofile.initialize(dbEntry.getConf());
   } // constructor
@@ -362,7 +363,7 @@ class IdentifiedCertprofile implements Closeable {
       Extensions requestedExtensions, SubjectPublicKeyInfo publicKeyInfo, PublicCaInfo publicCaInfo,
       X509Cert crlSignerCert, Date notBefore, Date notAfter)
       throws CertprofileException, BadCertTemplateException {
-    Args.notNull(publicKeyInfo, "publicKeyInfo");
+    notNull(publicKeyInfo, "publicKeyInfo");
     ExtensionValues values = new ExtensionValues();
 
     Map<ASN1ObjectIdentifier, ExtensionControl> controls
@@ -765,7 +766,7 @@ class IdentifiedCertprofile implements Closeable {
 
   public SubjectPublicKeyInfo checkPublicKey(SubjectPublicKeyInfo publicKey)
       throws CertprofileException, BadCertTemplateException {
-    return certprofile.checkPublicKey(Args.notNull(publicKey, "publicKey"));
+    return certprofile.checkPublicKey(notNull(publicKey, "publicKey"));
   }
 
   @Override

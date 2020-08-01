@@ -17,12 +17,11 @@
 
 package org.xipki.qa;
 
+import static org.xipki.util.Args.notEmpty;
+
 import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.List;
-
-import org.xipki.util.Args;
-
 /**
  * Iterator which iterates the {@link BigInteger} as specified by a list of
  * {@link BigIntegerRange}s.
@@ -44,7 +43,7 @@ public class RangeBigIntegerIterator implements Iterator<BigInteger> {
   private BigInteger currentNumber;
 
   public RangeBigIntegerIterator(List<BigIntegerRange> ranges, boolean loop) {
-    this.ranges = Args.notEmpty(ranges, "ranges");
+    this.ranges = notEmpty(ranges, "ranges");
     this.sizeRanges = ranges.size();
     this.loop = loop;
     this.currentIndex = 0;

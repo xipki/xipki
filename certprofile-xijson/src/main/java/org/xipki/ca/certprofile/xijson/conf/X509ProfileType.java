@@ -336,8 +336,8 @@ public class X509ProfileType extends ValidatableConf {
   public void validate() throws InvalidConfException {
     notNull(version, "version");
     notNull(certLevel, "certLevel");
-    notEmpty(validity, "validity");
-    notEmpty(notBeforeTime, "notBeforeTime");
+    notBlank(validity, "validity");
+    notBlank(notBeforeTime, "notBeforeTime");
     validate(keypairGeneration);
     validate(keyAlgorithms);
     notNull(subject, "subject");

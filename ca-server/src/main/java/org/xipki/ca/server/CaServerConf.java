@@ -79,7 +79,7 @@ public class CaServerConf extends ValidatableConf {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(name, "name");
+      notBlank(name, "name");
     }
 
   } // class SslContext
@@ -124,7 +124,7 @@ public class CaServerConf extends ValidatableConf {
       this.keydir = keydir;
     }
 
-  }
+  } // class CtLogConf
 
   private AuditConf audit;
 
@@ -166,7 +166,7 @@ public class CaServerConf extends ValidatableConf {
 
       return conf;
     }
-  } // method readConfFromFile
+  }
 
   public boolean isMaster() {
     return master;
@@ -212,7 +212,7 @@ public class CaServerConf extends ValidatableConf {
     }
 
     return null;
-  } // method getSslContext
+  }
 
   public AuditConf getAudit() {
     return audit == null ? AuditConf.DEFAULT : audit;

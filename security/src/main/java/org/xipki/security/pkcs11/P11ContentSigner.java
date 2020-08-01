@@ -17,6 +17,8 @@
 
 package org.xipki.security.pkcs11;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -50,7 +52,6 @@ import org.xipki.security.XiContentSigner;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.GMUtil;
 import org.xipki.security.util.SignerUtil;
-import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
 
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
@@ -76,9 +77,9 @@ abstract class P11ContentSigner implements XiContentSigner {
   P11ContentSigner(P11CryptService cryptService, P11IdentityId identityId,
       AlgorithmIdentifier signatureAlgId)
       throws XiSecurityException, P11TokenException {
-    this.identityId = Args.notNull(identityId, "identityId");
-    this.cryptService = Args.notNull(cryptService, "cryptService");
-    this.algorithmIdentifier = Args.notNull(signatureAlgId, "signatureAlgId");
+    this.identityId = notNull(identityId, "identityId");
+    this.cryptService = notNull(cryptService, "cryptService");
+    this.algorithmIdentifier = notNull(signatureAlgId, "signatureAlgId");
     try {
       this.encodedAlgorithmIdentifier = algorithmIdentifier.getEncoded();
     } catch (IOException ex) {
@@ -601,7 +602,7 @@ abstract class P11ContentSigner implements XiContentSigner {
         AlgorithmIdentifier signatureAlgId, SecureRandom random)
         throws XiSecurityException, P11TokenException {
       super(cryptService, identityId, signatureAlgId);
-      Args.notNull(random, "random");
+      notNull(random, "random");
 
       ASN1ObjectIdentifier sigOid = signatureAlgId.getAlgorithm();
       if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigOid)) {

@@ -17,6 +17,9 @@
 
 package org.xipki.cmpclient.internal;
 
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -160,7 +163,6 @@ import org.xipki.security.cmp.VerifiedPkiMessage;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.CmpFailureUtil;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.DateUtil;
 import org.xipki.util.Hex;
@@ -227,10 +229,10 @@ class CmpAgent {
       String serverUrl, SecurityFactory securityFactory,
       SSLSocketFactory sslSocketFactory, HostnameVerifier hostnameVerifier) {
 
-    this.requestor = Args.notNull(requestor, "requestor");
-    this.responder = Args.notNull(responder, "responder");
-    this.securityFactory = Args.notNull(securityFactory, "securityFactory");
-    Args.notBlank(serverUrl, "serverUrl");
+    this.requestor = notNull(requestor, "requestor");
+    this.responder = notNull(responder, "responder");
+    this.securityFactory = notNull(securityFactory, "securityFactory");
+    notBlank(serverUrl, "serverUrl");
 
     boolean bothSignatureBased = (requestor instanceof Requestor.SignatureCmpRequestor)
         && (responder instanceof Responder.SignaturetCmpResponder);
@@ -252,7 +254,7 @@ class CmpAgent {
   } // constructor
 
   private byte[] send(byte[] request) throws IOException {
-    Args.notNull(request, "request");
+    notNull(request, "request");
     HttpURLConnection httpUrlConnection = IoUtil.openHttpConn(serverUrl);
     if (httpUrlConnection instanceof HttpsURLConnection) {
       if (sslSocketFactory != null) {
@@ -300,7 +302,7 @@ class CmpAgent {
   } // method send
 
   private PKIMessage sign(PKIMessage request) throws CmpClientException {
-    Args.notNull(request, "request");
+    notNull(request, "request");
     if (requestor == null) {
       throw new CmpClientException("no request signer is configured");
     }
@@ -326,7 +328,7 @@ class CmpAgent {
 
   private VerifiedPkiMessage signAndSend(PKIMessage request, ReqRespDebug debug)
       throws CmpClientException {
-    Args.notNull(request, "request");
+    notNull(request, "request");
     PKIMessage tmpRequest = requestor.signRequest() ? sign(request) : request;
 
     byte[] encodedRequest;
@@ -411,8 +413,8 @@ class CmpAgent {
 
   private ASN1Encodable extractGeneralRepContent(VerifiedPkiMessage response, String expectedType,
       boolean requireProtectionCheck) throws CmpClientException, PkiErrorException {
-    Args.notNull(response, "response");
-    Args.notNull(expectedType, "expectedType");
+    notNull(response, "response");
+    notNull(expectedType, "expectedType");
     if (requireProtectionCheck) {
       checkProtection(response);
     }
@@ -453,7 +455,7 @@ class CmpAgent {
 
   private ASN1Encodable extractXipkiActionRepContent(VerifiedPkiMessage response, int action)
       throws CmpClientException, PkiErrorException {
-    ASN1Encodable itvValue = extractGeneralRepContent(Args.notNull(response, "response"),
+    ASN1Encodable itvValue = extractGeneralRepContent(notNull(response, "response"),
         ObjectIdentifiers.Xipki.id_xipki_cmp_cmpGenmsg.getId(), true);
     return extractXiActionContent(itvValue, action);
   } // method extractXipkiActionRepContent
@@ -462,7 +464,7 @@ class CmpAgent {
       throws CmpClientException {
     ASN1Sequence seq;
     try {
-      seq = ASN1Sequence.getInstance(Args.notNull(itvValue, "itvValue"));
+      seq = ASN1Sequence.getInstance(notNull(itvValue, "itvValue"));
     } catch (IllegalArgumentException ex) {
       throw new CmpClientException("invalid syntax of the response");
     }
@@ -659,7 +661,7 @@ class CmpAgent {
 
   private PKIMessage buildMessageWithGeneralMsgContent(ASN1ObjectIdentifier type,
       ASN1Encodable value) {
-    Args.notNull(type, "type");
+    notNull(type, "type");
 
     PKIHeader header = buildPkiHeader(null);
     InfoTypeAndValue itv = (value != null) ? new InfoTypeAndValue(type, value)
@@ -670,7 +672,7 @@ class CmpAgent {
   } // method buildMessageWithGeneralMsgContent
 
   private void checkProtection(VerifiedPkiMessage response) throws PkiErrorException {
-    Args.notNull(response, "response");
+    notNull(response, "response");
 
     if (!response.hasProtection()) {
       return;
@@ -922,7 +924,7 @@ class CmpAgent {
 
   private X509CRLHolder evaluateCrlResponse(VerifiedPkiMessage response, Integer xipkiAction)
       throws CmpClientException, PkiErrorException {
-    checkProtection(Args.notNull(response, "response"));
+    checkProtection(notNull(response, "response"));
 
     PKIBody respBody = response.getPkiMessage().getBody();
     int bodyType = respBody.getType();
@@ -966,14 +968,14 @@ class CmpAgent {
 
   public RevokeCertResponse revokeCertificate(RevokeCertRequest request,
       ReqRespDebug debug) throws CmpClientException, PkiErrorException {
-    PKIMessage reqMessage = buildRevokeCertRequest(Args.notNull(request, "request"));
+    PKIMessage reqMessage = buildRevokeCertRequest(notNull(request, "request"));
     VerifiedPkiMessage response = signAndSend(reqMessage, debug);
     return parse(response, request.getRequestEntries());
   } // method revokeCertificate
 
   public RevokeCertResponse unrevokeCertificate(UnrevokeOrRemoveCertRequest request,
       ReqRespDebug debug) throws CmpClientException, PkiErrorException {
-    PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(Args.notNull(request, "request"),
+    PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(notNull(request, "request"),
         CrlReason.REMOVE_FROM_CRL.getCode());
     VerifiedPkiMessage response = signAndSend(reqMessage, debug);
     return parse(response, request.getRequestEntries());
@@ -981,7 +983,7 @@ class CmpAgent {
 
   public RevokeCertResponse removeCertificate(UnrevokeOrRemoveCertRequest request,
       ReqRespDebug debug) throws CmpClientException, PkiErrorException {
-    PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(Args.notNull(request, "request"),
+    PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(notNull(request, "request"),
             XiSecurityConstants.CMP_CRL_REASON_REMOVE);
     VerifiedPkiMessage response = signAndSend(reqMessage, debug);
     return parse(response, request.getRequestEntries());
@@ -990,7 +992,7 @@ class CmpAgent {
   private RevokeCertResponse parse(VerifiedPkiMessage response,
       List<? extends UnrevokeOrRemoveCertRequest.Entry> reqEntries)
           throws CmpClientException, PkiErrorException {
-    checkProtection(Args.notNull(response, "response"));
+    checkProtection(notNull(response, "response"));
 
     PKIBody respBody = response.getPkiMessage().getBody();
     int bodyType = respBody.getType();
@@ -1062,7 +1064,7 @@ class CmpAgent {
 
   public EnrollCertResponse requestCertificate(CsrEnrollCertRequest csr, Date notBefore,
       Date notAfter, ReqRespDebug debug) throws CmpClientException, PkiErrorException {
-    PKIMessage request = buildPkiMessage(Args.notNull(csr, "csr"), notBefore, notAfter);
+    PKIMessage request = buildPkiMessage(notNull(csr, "csr"), notBefore, notAfter);
     Map<BigInteger, String> reqIdIdMap = new HashMap<>();
     reqIdIdMap.put(MINUS_ONE, csr.getId());
     return requestCertificate0(request, reqIdIdMap, PKIBody.TYPE_CERT_REP, debug);
@@ -1070,7 +1072,7 @@ class CmpAgent {
 
   public EnrollCertResponse requestCertificate(EnrollCertRequest req, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
-    PKIMessage request = buildPkiMessage(Args.notNull(req, "req"));
+    PKIMessage request = buildPkiMessage(notNull(req, "req"));
     Map<BigInteger, String> reqIdIdMap = new HashMap<>();
     List<EnrollCertRequest.Entry> reqEntries = req.getRequestEntries();
 
@@ -1400,7 +1402,7 @@ class CmpAgent {
 
   public CaConf.CaInfo retrieveCaInfo(String caName, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
-    Args.notBlank(caName, "caName");
+    notBlank(caName, "caName");
 
     ASN1EncodableVector vec = new ASN1EncodableVector();
     vec.add(new ASN1Integer(3));

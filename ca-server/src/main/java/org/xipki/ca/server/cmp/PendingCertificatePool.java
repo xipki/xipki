@@ -17,6 +17,8 @@
 
 package org.xipki.ca.server.cmp;
 
+import static org.xipki.util.Args.notNull;
+
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,7 +28,6 @@ import java.util.Set;
 
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.security.HashAlgo;
-import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.Hex;
 
@@ -50,8 +51,8 @@ class PendingCertificatePool {
     private final byte[] certHash;
 
     MyEntry(BigInteger certReqId, long waitForConfirmTill, CertificateInfo certInfo) {
-      this.certReqId = Args.notNull(certReqId, "certReqId");
-      this.certInfo = Args.notNull(certInfo, "certInfo");
+      this.certReqId = notNull(certReqId, "certReqId");
+      this.certInfo = notNull(certInfo, "certInfo");
       this.waitForConfirmTill = waitForConfirmTill;
       this.certHash = HashAlgo.SHA1.hash(certInfo.getCert().getCert().getEncoded());
     } // constructor
@@ -82,8 +83,8 @@ class PendingCertificatePool {
 
   void addCertificate(byte[] transactionId, BigInteger certReqId, CertificateInfo certInfo,
       long waitForConfirmTill) {
-    Args.notNull(transactionId, "transactionId");
-    Args.notNull(certInfo, "certInfo");
+    notNull(transactionId, "transactionId");
+    notNull(certInfo, "certInfo");
     if (certInfo.isAlreadyIssued()) {
       return;
     }
@@ -101,9 +102,9 @@ class PendingCertificatePool {
   } // method addCertificate
 
   CertificateInfo removeCertificate(byte[] transactionId, BigInteger certReqId, byte[] certHash) {
-    Args.notNull(transactionId, "transactionId");
-    Args.notNull(certReqId, "certReqId");
-    Args.notNull(certHash, "certHash");
+    notNull(transactionId, "transactionId");
+    notNull(certReqId, "certReqId");
+    notNull(certHash, "certHash");
 
     String hexTid = Hex.encode(transactionId);
     PendingCertificatePool.MyEntry retEntry = null;
@@ -136,7 +137,7 @@ class PendingCertificatePool {
   } // method removeCertificate
 
   Set<CertificateInfo> removeCertificates(byte[] transactionId) {
-    Args.notNull(transactionId, "transactionId");
+    notNull(transactionId, "transactionId");
 
     String hexId = Hex.encode(transactionId);
     Set<PendingCertificatePool.MyEntry> entries;

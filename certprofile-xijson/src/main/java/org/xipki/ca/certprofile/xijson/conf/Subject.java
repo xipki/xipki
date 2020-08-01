@@ -97,7 +97,7 @@ public class Subject extends ValidatableConf {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(text, "text");
+      notBlank(text, "text");
     }
 
   } // class ValueType

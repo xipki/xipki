@@ -17,9 +17,11 @@
 
 package org.xipki.cmpclient.internal;
 
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
+
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.cmpclient.IdentifiedObject;
-import org.xipki.util.Args;
 
 /**
  * CMP request to enroll certificate for given CSR.
@@ -37,8 +39,8 @@ class CsrEnrollCertRequest extends IdentifiedObject {
     private final String profile;
 
     public Entry(CertificationRequest csr, String profile) {
-      this.csr = Args.notNull(csr, "csr");
-      this.profile = Args.notNull(profile, "profile");
+      this.csr = notNull(csr, "csr");
+      this.profile = notNull(profile, "profile");
     }
 
     public CertificationRequest getCsr() {
@@ -57,8 +59,8 @@ class CsrEnrollCertRequest extends IdentifiedObject {
 
   public CsrEnrollCertRequest(String id, String certprofile, CertificationRequest csr) {
     super(id);
-    this.certprofile = Args.notBlank(certprofile, "certprofile");
-    this.csr = Args.notNull(csr, "csr");
+    this.certprofile = notBlank(certprofile, "certprofile");
+    this.csr = notNull(csr, "csr");
   }
 
   public CertificationRequest getCsr() {

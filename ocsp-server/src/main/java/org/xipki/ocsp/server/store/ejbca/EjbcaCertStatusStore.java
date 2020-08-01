@@ -17,6 +17,8 @@
 
 package org.xipki.ocsp.server.store.ejbca;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -56,7 +58,6 @@ import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.Hex;
 import org.xipki.util.LogUtil;
@@ -441,7 +442,7 @@ public class EjbcaCertStatusStore extends OcspStore {
       }
     }
 
-    this.datasource = Args.notNull(datasource, "datasource");
+    this.datasource = notNull(datasource, "datasource");
 
     String coreSql = "notBefore,expireDate,status,revocationReason,revocationDate"
         + " FROM CertificateData WHERE cAFingerprint=? AND serialNumber=?";

@@ -17,6 +17,8 @@
 
 package org.xipki.security.asn1;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.BufferedInputStream;
 import java.io.Closeable;
 import java.io.File;
@@ -55,7 +57,6 @@ import org.xipki.security.CrlReason;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.SignerUtil;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
 
 /**
@@ -294,7 +295,7 @@ public class CrlStreamParser extends Asn1StreamParser {
   private final int tbsCertListEndIndex;
 
   public CrlStreamParser(File crlFile) throws IOException {
-    this.crlFile = Args.notNull(crlFile, "crlFile");
+    this.crlFile = notNull(crlFile, "crlFile");
     // Round 1
     try (BufferedInputStream instream = new BufferedInputStream(
         new FileInputStream(crlFile))) {

@@ -138,10 +138,10 @@ public class CmpClientConf extends ValidatableConf {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(name, "name");
-      notEmpty(url, "url");
-      notEmpty(requestor, "requestor");
-      notEmpty(responder, "responder");
+      notBlank(name, "name");
+      notBlank(url, "url");
+      notBlank(requestor, "requestor");
+      notBlank(responder, "responder");
       validate(cmpcontrol);
       validate(caCertchain);
       validate(certprofiles);
@@ -218,7 +218,7 @@ public class CmpClientConf extends ValidatableConf {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(name, "name");
+      notBlank(name, "name");
       validate(conf);
     }
 
@@ -334,7 +334,7 @@ public class CmpClientConf extends ValidatableConf {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(name, "name");
+      notBlank(name, "name");
       exactOne(pbmMac, "pbmMac", signature, "signature");
       validate(pbmMac);
       validate(signature);
@@ -405,10 +405,10 @@ public class CmpClientConf extends ValidatableConf {
       @Override
       public void validate() throws InvalidConfException {
         notNull(kid, "kid");
-        notEmpty(sender, "sender");
-        notEmpty(password, "password");
-        notEmpty("owf", owf);
-        notEmpty(mac, "mac");
+        notBlank(sender, "sender");
+        notBlank(password, "password");
+        notBlank("owf", owf);
+        notBlank(mac, "mac");
       }
 
     } // class PbmMac
@@ -498,7 +498,7 @@ public class CmpClientConf extends ValidatableConf {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(name, "name");
+      notBlank(name, "name");
       validate(cert);
       exactOne(pbmMac, "pbmMac", signature, "signature");
       validate(pbmMac);
@@ -643,7 +643,7 @@ public class CmpClientConf extends ValidatableConf {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(name, "name");
+      notBlank(name, "name");
     }
 
   } // class Ssl

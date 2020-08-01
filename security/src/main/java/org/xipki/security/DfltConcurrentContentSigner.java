@@ -17,6 +17,8 @@
 
 package org.xipki.security;
 
+import static org.xipki.util.Args.notEmpty;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.Key;
@@ -33,7 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.util.AlgorithmUtil;
-import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.concurrent.ConcurrentBag;
@@ -94,7 +95,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
 
   public DfltConcurrentContentSigner(boolean mac, List<XiContentSigner> signers, Key signingKey)
       throws NoSuchAlgorithmException {
-    Args.notEmpty(signers, "signers");
+    notEmpty(signers, "signers");
 
     this.mac = mac;
     AlgorithmIdentifier algorithmIdentifier = signers.get(0).getAlgorithmIdentifier();

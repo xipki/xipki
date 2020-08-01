@@ -17,12 +17,13 @@
 
 package org.xipki.security;
 
+import static org.xipki.util.Args.notNull;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.operator.RuntimeOperatorException;
-import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.Hex;
 import org.xipki.util.concurrent.ConcurrentBag;
@@ -124,8 +125,8 @@ class HashCalculator {
   }
 
   public static byte[] hash(HashAlgo hashAlgo, byte[]... datas) {
-    Args.notNull(hashAlgo, "hashAlgo");
-    Args.notNull(datas, "datas");
+    notNull(hashAlgo, "hashAlgo");
+    notNull(datas, "datas");
 
     if (!MDS_MAP.containsKey(hashAlgo)) {
       throw new IllegalArgumentException("unknown hash algo " + hashAlgo);
@@ -163,8 +164,8 @@ class HashCalculator {
   } // method hash
 
   public static byte[] hash(HashAlgo hashAlgo, byte[] data, int offset, int len) {
-    Args.notNull(hashAlgo, "hashAlgo");
-    Args.notNull(data, "data");
+    notNull(hashAlgo, "hashAlgo");
+    notNull(data, "data");
 
     if (data.length - offset < len) {
       throw new IndexOutOfBoundsException("data.length - offset < len");

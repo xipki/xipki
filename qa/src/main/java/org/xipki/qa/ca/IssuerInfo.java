@@ -17,6 +17,9 @@
 
 package org.xipki.qa.ca;
 
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.CollectionUtil.isEmpty;
+
 import java.security.cert.CertificateException;
 import java.util.Collections;
 import java.util.Date;
@@ -26,8 +29,6 @@ import java.util.Set;
 
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
-import org.xipki.util.CollectionUtil;
 
 /**
  * Certificate issuer information.
@@ -53,11 +54,11 @@ public class IssuerInfo {
   public IssuerInfo(List<String> caIssuerUrls, List<String> ocspUrls, List<String> crlUrls,
       List<String> deltaCrlUrls, byte[] certBytes, boolean cutoffNotAfter)
       throws CertificateException {
-    Args.notNull(certBytes, "certBytes");
+    notNull(certBytes, "certBytes");
 
     this.cutoffNotAfter = cutoffNotAfter;
 
-    if (CollectionUtil.isEmpty(caIssuerUrls)) {
+    if (isEmpty(caIssuerUrls)) {
       this.caIssuerUrls = null;
     } else {
       Set<String> set = new HashSet<>();
@@ -65,7 +66,7 @@ public class IssuerInfo {
       this.caIssuerUrls = Collections.unmodifiableSet(set);
     }
 
-    if (CollectionUtil.isEmpty(ocspUrls)) {
+    if (isEmpty(ocspUrls)) {
       this.ocspUrls = null;
     } else {
       Set<String> set = new HashSet<>();
@@ -73,7 +74,7 @@ public class IssuerInfo {
       this.ocspUrls = Collections.unmodifiableSet(set);
     }
 
-    if (CollectionUtil.isEmpty(crlUrls)) {
+    if (isEmpty(crlUrls)) {
       this.crlUrls = null;
     } else {
       Set<String> set = new HashSet<>();
@@ -81,7 +82,7 @@ public class IssuerInfo {
       this.crlUrls = Collections.unmodifiableSet(set);
     }
 
-    if (CollectionUtil.isEmpty(deltaCrlUrls)) {
+    if (isEmpty(deltaCrlUrls)) {
       this.deltaCrlUrls = null;
     } else {
       Set<String> set = new HashSet<>();

@@ -17,6 +17,8 @@
 
 package org.xipki.ca.server;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.Closeable;
 import java.util.Map;
 
@@ -30,7 +32,6 @@ import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
-import org.xipki.util.Args;
 import org.xipki.util.FileOrValue;
 
 /**
@@ -47,8 +48,8 @@ class IdentifiedCertPublisher implements Closeable {
   private final CertPublisher certPublisher;
 
   IdentifiedCertPublisher(MgmtEntry.Publisher entry, CertPublisher certPublisher) {
-    this.entry = Args.notNull(entry, "entry");
-    this.certPublisher = Args.notNull(certPublisher, "certPublisher");
+    this.entry = notNull(entry, "entry");
+    this.certPublisher = notNull(certPublisher, "certPublisher");
   }
 
   public void initialize(PasswordResolver passwordResolver,

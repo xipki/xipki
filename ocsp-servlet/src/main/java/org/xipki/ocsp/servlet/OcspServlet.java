@@ -17,6 +17,8 @@
 
 package org.xipki.ocsp.servlet;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -33,7 +35,6 @@ import org.xipki.ocsp.api.OcspServer;
 import org.xipki.ocsp.api.Responder;
 import org.xipki.ocsp.api.ResponderAndPath;
 import org.xipki.security.HashAlgo;
-import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.Base64Url;
 import org.xipki.util.Hex;
@@ -70,7 +71,7 @@ public class OcspServlet extends HttpServlet {
   }
 
   public void setServer(OcspServer server) {
-    this.server = Args.notNull(server, "server");
+    this.server = notNull(server, "server");
   }
 
   @Override

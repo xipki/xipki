@@ -17,6 +17,8 @@
 
 package org.xipki.ca.server;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.Key;
@@ -78,7 +80,6 @@ import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.Hex;
@@ -100,8 +101,8 @@ public class ScepResponder {
 
     public ScepCaCertRespBytes(X509Cert caCert, X509Cert responderCert)
         throws CMSException, CertificateException {
-      Args.notNull(caCert, "caCert");
-      Args.notNull(responderCert, "responderCert");
+      notNull(caCert, "caCert");
+      notNull(responderCert, "responderCert");
 
       CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
       try {
@@ -134,7 +135,7 @@ public class ScepResponder {
     private final FailInfo failInfo;
 
     private FailInfoException(FailInfo failInfo) {
-      super(Args.notNull(failInfo, "failInfo").name());
+      super(notNull(failInfo, "failInfo").name());
       this.failInfo = failInfo;
     }
 
@@ -183,8 +184,8 @@ public class ScepResponder {
   }
 
   public ScepResponder(CaManagerImpl caManager, MgmtEntry.Ca caEntry) throws CaMgmtException {
-    this.caManager = Args.notNull(caManager, "caManager");
-    this.caIdent = Args.notNull(caEntry, "caEntry").getIdent();
+    this.caManager = notNull(caManager, "caManager");
+    this.caIdent = notNull(caEntry, "caEntry").getIdent();
     this.control = caEntry.getScepControl();
     String responderName = caEntry.getScepResponderName();
 
@@ -293,9 +294,9 @@ public class ScepResponder {
   private PkiMessage servicePkiOperation0(CMSSignedData requestContent,
       DecodedPkiMessage req, String certprofileName, String msgId, AuditEvent event)
       throws MessageDecodingException, OperationException {
-    Args.notNull(requestContent, "requestContent");
+    notNull(requestContent, "requestContent");
 
-    String tid = Args.notNull(req, "req").getTransactionId().getId();
+    String tid = notNull(req, "req").getTransactionId().getId();
     // verify and decrypt the request
     audit(event, CaAuditConstants.NAME_tid, tid);
     if (req.getFailureMessage() != null) {
@@ -658,8 +659,8 @@ public class ScepResponder {
 
   private ContentInfo encodeResponse(PkiMessage response, DecodedPkiMessage request)
       throws OperationException {
-    Args.notNull(response, "response");
-    Args.notNull(request, "request");
+    notNull(response, "response");
+    notNull(request, "request");
 
     String signatureAlgorithm = getSignatureAlgorithm(responderKey, request.getDigestAlgorithm());
     ContentInfo ci;

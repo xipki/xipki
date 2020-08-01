@@ -502,7 +502,7 @@ public class ExtensionType extends ValidatableConf {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(text, "text");
+      notBlank(text, "text");
       notNull(type, "type");
     }
 
@@ -1565,7 +1565,7 @@ public class ExtensionType extends ValidatableConf {
 
     @Override
     public void validate() throws InvalidConfException {
-      notEmpty(validity, "validity");
+      notBlank(validity, "validity");
     }
 
   } // class PrivateKeyUsagePeriod
@@ -1723,7 +1723,7 @@ public class ExtensionType extends ValidatableConf {
     @Override
     public void validate() throws InvalidConfException {
       notNull(type, "type");
-      notEmpty(text, "text");
+      notBlank(text, "text");
     }
 
   } // class Restriction

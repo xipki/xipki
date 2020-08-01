@@ -17,6 +17,8 @@
 
 package org.xipki.ocsp.api;
 
+import static org.xipki.util.Args.notBlank;
+
 import java.io.Closeable;
 import java.math.BigInteger;
 import java.util.Date;
@@ -25,7 +27,6 @@ import java.util.Map;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
 import org.xipki.security.X509Cert;
-import org.xipki.util.Args;
 import org.xipki.util.Validity;
 
 /**
@@ -169,7 +170,7 @@ public abstract class OcspStore implements Closeable {
   public abstract boolean isHealthy();
 
   public void setName(String name) {
-    this.name = Args.notBlank(name, "name");
+    this.name = notBlank(name, "name");
   }
 
   public String getName() {

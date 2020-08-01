@@ -17,6 +17,9 @@
 
 package org.xipki.ocsp.server.store;
 
+import static org.xipki.util.Args.min;
+import static org.xipki.util.Args.notNull;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -60,7 +63,6 @@ import org.xipki.security.asn1.CrlStreamParser;
 import org.xipki.security.asn1.CrlStreamParser.RevokedCert;
 import org.xipki.security.asn1.CrlStreamParser.RevokedCertsIterator;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.DateUtil;
 import org.xipki.util.IoUtil;
@@ -238,10 +240,10 @@ class ImportCrl {
 
   public ImportCrl(DataSourceWrapper datasource, String basedir, int sqlBatchCommit,
       boolean ignoreExpiredCrls) throws DataAccessException {
-    this.sqlBatchCommit = Args.min(sqlBatchCommit, "sqlBatchCommit", 1);
+    this.sqlBatchCommit = min(sqlBatchCommit, "sqlBatchCommit", 1);
     this.ignoreExpiredCrls = ignoreExpiredCrls;
-    this.datasource = Args.notNull(datasource, "datasource");
-    this.basedir = Args.notNull(basedir, "basedir");
+    this.datasource = notNull(datasource, "datasource");
+    this.basedir = notNull(basedir, "basedir");
     this.certhashAlgo = DbCertStatusStore.getCertHashAlgo(datasource);
 
     LOG.info("UPDATE_CERTSTORE");

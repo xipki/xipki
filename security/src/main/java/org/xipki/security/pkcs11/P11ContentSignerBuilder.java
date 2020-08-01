@@ -17,6 +17,9 @@
 
 package org.xipki.security.pkcs11;
 
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.Args.positive;
+
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -44,7 +47,6 @@ import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.GMUtil;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
 
 /**
  * Builder of {@link ConcurrentContentSigner} for PKCS#11 token.
@@ -68,9 +70,9 @@ public class P11ContentSignerBuilder {
   public P11ContentSignerBuilder(P11CryptService cryptService, SecurityFactory securityFactory,
       P11IdentityId identityId, X509Cert[] certificateChain)
       throws XiSecurityException, P11TokenException {
-    this.cryptService = Args.notNull(cryptService, "cryptService");
-    this.securityFactory = Args.notNull(securityFactory, "securityFactory");
-    this.identityId = Args.notNull(identityId, "identityId");
+    this.cryptService = notNull(cryptService, "cryptService");
+    this.securityFactory = notNull(securityFactory, "securityFactory");
+    this.identityId = notNull(identityId, "identityId");
 
     P11Identity identity = cryptService.getIdentity(identityId);
     X509Cert signerCertInP11 = identity.getCertificate();
@@ -118,7 +120,7 @@ public class P11ContentSignerBuilder {
 
   public ConcurrentContentSigner createSigner(AlgorithmIdentifier signatureAlgId,
       int parallelism) throws XiSecurityException, P11TokenException {
-    Args.positive(parallelism, "parallelism");
+    positive(parallelism, "parallelism");
 
     List<XiContentSigner> signers = new ArrayList<>(parallelism);
 

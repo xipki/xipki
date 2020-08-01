@@ -23,7 +23,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import org.xipki.security.Securities.SecurityConf;
-import org.xipki.util.Args;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 
@@ -40,7 +39,7 @@ public class P11ProxyConf extends ValidatableConf {
 
   public static P11ProxyConf readConfFromFile(String fileName)
       throws IOException, InvalidConfException {
-    Args.notBlank(fileName, "fileName");
+    notBlank(fileName, "fileName");
     try (InputStream is = Files.newInputStream(Paths.get(fileName))) {
       P11ProxyConf conf = JSON.parseObject(is, P11ProxyConf.class);
       conf.validate();

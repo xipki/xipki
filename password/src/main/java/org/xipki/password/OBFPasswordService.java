@@ -17,9 +17,10 @@
 
 package org.xipki.password;
 
+import static org.xipki.util.Args.notNull;
+
 import java.nio.charset.StandardCharsets;
 
-import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 
 /**
@@ -34,7 +35,7 @@ public class OBFPasswordService {
   public static final String OBFUSCATE = "OBF:";
 
   public static String obfuscate(String str) {
-    Args.notNull(str, "str");
+    notNull(str, "str");
     StringBuilder buf = new StringBuilder();
     byte[] bytes = StringUtil.toUtf8Bytes(str);
 
@@ -61,7 +62,7 @@ public class OBFPasswordService {
   } // method obfuscate
 
   public static String deobfuscate(String str) {
-    Args.notNull(str, "str");
+    notNull(str, "str");
 
     if (startsWithIgnoreCase(str, OBFUSCATE)) {
       str = str.substring(4);

@@ -17,12 +17,13 @@
 
 package org.xipki.security.pkcs11;
 
+import static org.xipki.util.Args.notNull;
+
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.X509Cert;
-import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
 
 /**
@@ -39,7 +40,7 @@ public class P11CryptService {
   private P11Module module;
 
   public P11CryptService(P11Module module) throws P11TokenException {
-    this.module = Args.notNull(module, "module");
+    this.module = notNull(module, "module");
   }
 
   public synchronized void refresh() throws P11TokenException {

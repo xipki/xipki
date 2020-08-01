@@ -17,6 +17,8 @@
 
 package org.xipki.ca.server.cmp;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
@@ -155,7 +157,6 @@ import org.xipki.security.XiSecurityConstants;
 import org.xipki.security.cmp.CmpUtf8Pairs;
 import org.xipki.security.cmp.CmpUtil;
 import org.xipki.security.util.AlgorithmUtil;
-import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.DateUtil;
 import org.xipki.util.HealthCheckResult;
@@ -2032,7 +2033,7 @@ public class CmpResponder extends BaseCmpResponder {
 
   public CertificateList getCrl(CmpRequestorInfo requestor, BigInteger crlNumber)
       throws OperationException {
-    Args.notNull(requestor, "requestor");
+    notNull(requestor, "requestor");
     try {
       checkPermission(requestor, PermissionConstants.GET_CRL);
     } catch (InsuffientPermissionException ex) {
@@ -2044,7 +2045,7 @@ public class CmpResponder extends BaseCmpResponder {
 
   public X509CRLHolder generateCrlOnDemand(CmpRequestorInfo requestor, RequestType reqType,
       String msgId) throws OperationException {
-    Args.notNull(requestor, "requestor");
+    notNull(requestor, "requestor");
     try {
       checkPermission(requestor, PermissionConstants.GEN_CRL);
     } catch (InsuffientPermissionException ex) {
@@ -2056,7 +2057,7 @@ public class CmpResponder extends BaseCmpResponder {
 
   public void revokeCert(CmpRequestorInfo requestor, BigInteger serialNumber, CrlReason reason,
       Date invalidityDate, RequestType reqType, String msgId) throws OperationException {
-    Args.notNull(requestor, "requestor");
+    notNull(requestor, "requestor");
 
     int permission;
     if (reason == CrlReason.REMOVE_FROM_CRL) {
@@ -2086,7 +2087,7 @@ public class CmpResponder extends BaseCmpResponder {
 
   public void removeCert(CmpRequestorInfo requestor, BigInteger serialNumber, RequestType reqType,
       String msgId) throws OperationException {
-    Args.notNull(requestor, "requestor");
+    notNull(requestor, "requestor");
     try {
       checkPermission(requestor, PermissionConstants.REMOVE_CERT);
     } catch (InsuffientPermissionException ex) {

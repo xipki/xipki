@@ -17,12 +17,13 @@
 
 package org.xipki.security;
 
+import static org.xipki.util.Args.notNull;
+
 import java.io.IOException;
 import java.io.OutputStream;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.operator.ContentSigner;
-import org.xipki.util.Args;
 
 /**
  * An implementation of {@link XiContentSigner}.
@@ -38,7 +39,7 @@ public class XiWrappedContentSigner implements XiContentSigner {
 
   public XiWrappedContentSigner(ContentSigner signer, boolean fixedAlgorithmIdentifier)
       throws XiSecurityException {
-    this.signer = Args.notNull(signer, "signer");
+    this.signer = notNull(signer, "signer");
     if (fixedAlgorithmIdentifier) {
       try {
         this.encodedAlgorithmIdentifier = signer.getAlgorithmIdentifier().getEncoded();
