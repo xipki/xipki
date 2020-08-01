@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,13 +46,6 @@ import org.xipki.util.StringUtil;
 
 public class EmulatorP11Module extends P11Module {
 
-  public static enum Vendor {
-
-    YUBIKEY,
-    GENERAL
-
-  } // class Vendor
-
   public static final String TYPE = "emulator";
 
   public static final String DFLT_BASEDIR =
@@ -66,28 +58,14 @@ public class EmulatorP11Module extends P11Module {
   private EmulatorP11Module(P11ModuleConf moduleConf) throws P11TokenException {
     super(moduleConf);
 
-    Vendor vendor = null;
     File baseDir;
     String modulePath = moduleConf.getNativeLibrary().trim();
     String parametersStr = "";
     if (!modulePath.isEmpty()) {
       int idx = modulePath.indexOf('?');
       if (idx != -1) {
-        parametersStr = modulePath.substring(idx);
         modulePath = modulePath.substring(0, idx);
-
-        StringTokenizer tokens = new StringTokenizer(parametersStr, "?");
-        while (tokens.hasMoreTokens()) {
-          String token = tokens.nextToken();
-          List<String> strs = StringUtil.split(token, "=");
-          if (strs.size() != 2) {
-            continue;
-          }
-
-          if (strs.get(0).equalsIgnoreCase("vendor")) {
-            vendor = Vendor.valueOf(strs.get(1).toUpperCase());
-          }
-        }
+        parametersStr = modulePath.substring(idx);
       }
     }
 
@@ -197,7 +175,7 @@ public class EmulatorP11Module extends P11Module {
       int maxSessions = 20;
       P11Slot slot = new EmulatorP11Slot(moduleConf.getName(), slotDir, slotId,
           moduleConf.isReadOnly(), firstPwd, privateKeyCryptor, moduleConf.getP11MechanismFilter(),
-          moduleConf.getP11NewObjectConf(), maxSessions, vendor);
+          moduleConf.getP11NewObjectConf(), maxSessions);
       slots.add(slot);
     }
 

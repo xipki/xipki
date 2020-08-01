@@ -52,13 +52,6 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
 
 public class IaikP11Module extends P11Module {
 
-  public enum Vendor {
-
-    YUBIKEY,
-    GENERAL
-
-  }
-
   public static final String TYPE = "native";
 
   private static final Logger LOG = LoggerFactory.getLogger(IaikP11Module.class);
@@ -72,13 +65,6 @@ public class IaikP11Module extends P11Module {
     this.module = Args.notNull(module, "module");
 
     String library = moduleConf.getNativeLibrary();
-    Vendor vendor;
-    if (library.contains("ykcs11")) {
-      vendor = Vendor.YUBIKEY;
-    } else {
-      vendor = Vendor.GENERAL;
-    }
-
     try {
       Info info = module.getInfo();
       this.description = StringUtil.concatObjects("PKCS#11 IAIK",
@@ -157,7 +143,7 @@ public class IaikP11Module extends P11Module {
       }
       P11Slot p11Slot = new IaikP11Slot(moduleConf.getName(), slotId, slot,
           moduleConf.isReadOnly(), moduleConf.getUserType(), pwd, moduleConf.getMaxMessageSize(),
-          moduleConf.getP11MechanismFilter(), moduleConf.getP11NewObjectConf(), vendor);
+          moduleConf.getP11MechanismFilter(), moduleConf.getP11NewObjectConf());
 
       slots.add(p11Slot);
     }

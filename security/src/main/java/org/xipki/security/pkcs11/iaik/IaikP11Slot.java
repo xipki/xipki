@@ -55,7 +55,6 @@ import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.pkcs11.P11TokenException;
 import org.xipki.security.pkcs11.P11UnknownEntityException;
-import org.xipki.security.pkcs11.iaik.IaikP11Module.Vendor;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
@@ -132,17 +131,14 @@ class IaikP11Slot extends P11Slot {
 
   private final ConcurrentBag<ConcurrentBagEntry<Session>> sessions = new ConcurrentBag<>();
 
-  private final Vendor vendor;
-
   IaikP11Slot(String moduleName, P11SlotIdentifier slotId, Slot slot, boolean readOnly,
       long userType, List<char[]> password, int maxMessageSize, P11MechanismFilter mechanismFilter,
-      P11NewObjectConf newObjectConf, Vendor vendor) throws P11TokenException {
+      P11NewObjectConf newObjectConf) throws P11TokenException {
     super(moduleName, slotId, readOnly, mechanismFilter);
 
     this.newObjectConf = Args.notNull(newObjectConf, "newObjectConf");
     this.slot = Args.notNull(slot, "slot");
     this.maxMessageSize = Args.positive(maxMessageSize, "maxMessageSize");
-    this.vendor = Args.notNull(vendor,"vendo r");
 
     this.userType = userType;
     if (userType == PKCS11Constants.CKU_SO) {
@@ -955,16 +951,6 @@ class IaikP11Slot extends P11Slot {
       Session session = bagEntry.value();
       List<Storage> objects = getObjects(session, template);
       for (Storage obj : objects) {
-        if (vendor == Vendor.YUBIKEY) {
-          if (obj instanceof X509PublicKeyCertificate) {
-            throw new P11TokenException("cannot delete certificates in Yubikey token");
-          } else if (obj instanceof PrivateKey
-              || obj instanceof PublicKey) {
-            // do nothing: In yubikey, the triple (private key, public key, certificate) will be
-            // deleted only by deleting the certificate.
-          }
-        }
-
         session.destroyObject(obj);
       }
       return objects.size();
@@ -978,10 +964,6 @@ class IaikP11Slot extends P11Slot {
 
   @Override
   protected void removeCerts0(P11ObjectIdentifier objectId) throws P11TokenException {
-    if (vendor == Vendor.YUBIKEY) {
-      throw new P11TokenException("Unsupported operation removeCerts() in yubikey token");
-    }
-
     ConcurrentBagEntry<Session> bagEntry = borrowSession();
     try {
       Session session = bagEntry.value();
@@ -1600,31 +1582,29 @@ class IaikP11Slot extends P11Slot {
         }
       }
 
-      if (vendor != Vendor.YUBIKEY) {
-        // Yubikey: deletion of certificate implies the deletion of key pairs.
-        PrivateKey privKey = getPrivateKeyObject(session, id, label);
-        if (privKey != null) {
+      // Yubikey: deletion of certificate implies the deletion of key pairs.
+      PrivateKey privKey = getPrivateKeyObject(session, id, label);
+      if (privKey != null) {
+        try {
+          session.destroyObject(privKey);
+        } catch (TokenException ex) {
+          String msg = "could not delete private key " + keyId;
+          LogUtil.error(LOG, ex, msg);
+          throw new P11TokenException(msg);
+        }
+      }
+
+      P11ObjectIdentifier pubKeyId = identityId.getPublicKeyId();
+      if (pubKeyId != null) {
+        PublicKey pubKey = getPublicKeyObject(session,
+            pubKeyId.getId(), pubKeyId.getLabelChars());
+        if (pubKey != null) {
           try {
-            session.destroyObject(privKey);
+            session.destroyObject(pubKey);
           } catch (TokenException ex) {
-            String msg = "could not delete private key " + keyId;
+            String msg = "could not delete public key " + pubKeyId;
             LogUtil.error(LOG, ex, msg);
             throw new P11TokenException(msg);
-          }
-        }
-
-        P11ObjectIdentifier pubKeyId = identityId.getPublicKeyId();
-        if (pubKeyId != null) {
-          PublicKey pubKey = getPublicKeyObject(session,
-              pubKeyId.getId(), pubKeyId.getLabelChars());
-          if (pubKey != null) {
-            try {
-              session.destroyObject(pubKey);
-            } catch (TokenException ex) {
-              String msg = "could not delete public key " + pubKeyId;
-              LogUtil.error(LOG, ex, msg);
-              throw new P11TokenException(msg);
-            }
           }
         }
       }
