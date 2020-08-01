@@ -22,6 +22,7 @@ import java.security.spec.EllipticCurve;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.gm.GMNamedCurves;
+import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SM3Digest;
@@ -42,8 +43,17 @@ public class GMUtil {
       new byte[]{0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38,
           0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38}; // the default value
 
-  private static final BigInteger sm2primev2CurveA = new BigInteger(1,
-      Hex.decode("28E9FA9E9D9F5E344D5A9E4BCF6509A7F39789F515AB8F92DDBCBD414D940E93"));
+  private static final byte[] sm2primev2A =
+      Hex.decode("fffffffeffffffffffffffffffffffffffffffff00000000fffffffffffffffc");
+  private static final byte[] sm2primev2B =
+      Hex.decode("28e9fa9e9d9f5e344d5a9e4bcf6509a7f39789f515ab8f92ddbcbd414d940e93");
+  private static final byte[] sm2primev2Gx =
+      Hex.decode("32c4ae2c1f1981195f9904466a39c9948fe30bbff2660be1715a4589334c74c7");
+  private static final byte[] sm2primev2Gy =
+      Hex.decode("bc3736a2f4f6779c59bdcee36b692153d0a9877cc62a474002df32e52139f0a0");
+  private static final int sm2primev2FieldSize = 32;
+
+  private static final BigInteger bnSm2primev2B = new BigInteger(1, sm2primev2B);
 
   private GMUtil() {
   }
@@ -65,18 +75,24 @@ public class GMUtil {
 
     addUserId(digest, userID);
 
-    X9ECParameters ecParams = GMNamedCurves.getByOID(curveOid);
-    addFieldElement(digest, ecParams.getCurve().getA());
-    addFieldElement(digest, ecParams.getCurve().getB());
-    addFieldElement(digest, ecParams.getG().getAffineXCoord());
-    addFieldElement(digest, ecParams.getG().getAffineYCoord());
+    int fieldSize;
+    if (GMObjectIdentifiers.sm2p256v1.equals(curveOid)) {
+      fieldSize = sm2primev2FieldSize;
+      digest.update(sm2primev2A,  0, fieldSize);
+      digest.update(sm2primev2B,  0, fieldSize);
+      digest.update(sm2primev2Gx, 0, fieldSize);
+      digest.update(sm2primev2Gy, 0, fieldSize);
+    } else {
+      X9ECParameters ecParams = GMNamedCurves.getByOID(curveOid);
+      fieldSize = (ecParams.getCurve().getFieldSize() + 7) / 8;
+      addFieldElement(digest, ecParams.getCurve().getA());
+      addFieldElement(digest, ecParams.getCurve().getB());
+      addFieldElement(digest, ecParams.getG().getAffineXCoord());
+      addFieldElement(digest, ecParams.getG().getAffineYCoord());
+    }
 
-    int fieldSize = (ecParams.getCurve().getFieldSize() + 7) / 8;
-    byte[] bytes = BigIntegers.asUnsignedByteArray(fieldSize, pubPointX);
-    digest.update(bytes, 0, fieldSize);
-
-    bytes = BigIntegers.asUnsignedByteArray(fieldSize, pubPointY);
-    digest.update(bytes, 0, fieldSize);
+    digest.update(BigIntegers.asUnsignedByteArray(fieldSize, pubPointX), 0, fieldSize);
+    digest.update(BigIntegers.asUnsignedByteArray(fieldSize, pubPointY), 0, fieldSize);
 
     byte[] result = new byte[digest.getDigestSize()];
     digest.doFinal(result, 0);
@@ -100,11 +116,11 @@ public class GMUtil {
   }
 
   public static boolean isSm2primev2Curve(EllipticCurve curve) {
-    return curve.getB().equals(sm2primev2CurveA);
+    return curve.getB().equals(bnSm2primev2B);
   }
 
   public static boolean isSm2primev2Curve(ECCurve curve) {
-    return curve.getB().toBigInteger().equals(sm2primev2CurveA);
+    return curve.getB().toBigInteger().equals(bnSm2primev2B);
 
   }
 
