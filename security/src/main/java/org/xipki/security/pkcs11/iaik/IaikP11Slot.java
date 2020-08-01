@@ -1363,7 +1363,7 @@ class IaikP11Slot extends P11Slot {
           throw new P11TokenException("could not read the generated private key");
         }
 
-        // certificate: some vendors like yubikey generate also certificate
+        // certificate: some vendors generate also certificate
         X509PublicKeyCertificate cert2 = getCertificateObject(session, id, null);
         String certLabel = null;
         X509Cert[] certs = null;
@@ -1582,7 +1582,6 @@ class IaikP11Slot extends P11Slot {
         }
       }
 
-      // Yubikey: deletion of certificate implies the deletion of key pairs.
       PrivateKey privKey = getPrivateKeyObject(session, id, label);
       if (privKey != null) {
         try {
