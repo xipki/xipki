@@ -22,6 +22,8 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditEventData;
 import org.xipki.audit.AuditLevel;
@@ -41,6 +43,8 @@ public class EmbedAuditService implements AuditService {
 
   private static final Logger LOG = LoggerFactory.getLogger("xipki.audit.slf4j");
 
+  private static final Marker MARKER =  MarkerFactory.getMarker("xiaudit");
+
   public EmbedAuditService() {
   }
 
@@ -53,12 +57,12 @@ public class EmbedAuditService implements AuditService {
     switch (event.getLevel()) {
       case DEBUG:
         if (LOG.isDebugEnabled()) {
-          LOG.debug("{}", createMessage(event));
+          LOG.debug(MARKER, "{}", createMessage(event));
         }
         break;
       default:
         if (LOG.isInfoEnabled()) {
-          LOG.info("{}", createMessage(event));
+          LOG.info(MARKER, "{}", createMessage(event));
         }
         break;
     } // end switch
@@ -71,12 +75,12 @@ public class EmbedAuditService implements AuditService {
     switch (al) {
       case DEBUG:
         if (LOG.isDebugEnabled()) {
-          LOG.debug("{} | {}", al.getAlignedText(), msg);
+          LOG.debug(MARKER, "{} | {}", al.getAlignedText(), msg);
         }
         break;
       default:
         if (LOG.isInfoEnabled()) {
-          LOG.info("{} | {}", al.getAlignedText(), msg);
+          LOG.info(MARKER, "{} | {}", al.getAlignedText(), msg);
         }
         break;
     } // end switch

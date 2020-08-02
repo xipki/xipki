@@ -42,7 +42,7 @@
     <liquibase.version>3.6.3</liquibase.version>
     <snakeyaml.version>1.18</snakeyaml.version>
     <!-- only for runtime -->
-    <log4j.version>2.13.3</log4j.version>
+    <tinylog.version>2.1.2</tinylog.version>
     <jdbc.mariadb.version>2.6.1</jdbc.mariadb.version>
     <jdbc.postgresql.version>42.2.14</jdbc.postgresql.version>
     <!-- Only for test purpose -->

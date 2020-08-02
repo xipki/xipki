@@ -10,8 +10,8 @@
     <init-param>
       <param-name>logReqResp</param-name>
       <!--
-        If set to true, please also set logger.xipki.level to DEBUG
-        in the file META-INF/classes/log4j2.properties.
+        If set to true, please also set writer.level to debug
+        in the file META-INF/classes/tinylog.properties.
       -->
       <param-value>false</param-value>
     </init-param>

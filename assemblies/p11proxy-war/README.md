@@ -65,6 +65,7 @@ password-*.jar,\
 security-*.jar,\
 slf4j-*.jar,\
 sunpkcs11-wrapper-*.jar,\
+tinylog*.jar,\
 util-*.jar
 ```
 
