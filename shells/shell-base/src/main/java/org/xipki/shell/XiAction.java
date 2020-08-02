@@ -342,14 +342,14 @@ public abstract class XiAction implements Action {
   protected boolean confirm(String prompt, int maxTries) throws IOException {
     String tmpPrompt;
     if (prompt == null || prompt.isEmpty()) {
-      tmpPrompt = "[Yes/No]? ";
+      tmpPrompt = "(Yes/No)? ";
     } else {
       if ('?' == prompt.charAt(prompt.length() - 1)) {
         tmpPrompt = prompt.substring(0, prompt.length() - 1);
       } else {
         tmpPrompt = prompt;
       }
-      tmpPrompt += " [Yes/No]? ";
+      tmpPrompt += " (Yes/No)? ";
     }
 
     String answer = readLine(tmpPrompt, null);

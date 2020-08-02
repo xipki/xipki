@@ -156,7 +156,7 @@ public class InitDbMain {
   } // method printDatabaseInfo
 
   private static boolean confirm(String command) throws IOException {
-    String prompt = "Do you wish to " + command + " the database [Yes | No]?";
+    String prompt = "Do you wish to " + command + " the database (Yes/No)? ";
     String answer = IoUtil.readLineFromConsole(prompt);
     return "yes".equalsIgnoreCase(answer) || "y".equalsIgnoreCase(answer);
   }
