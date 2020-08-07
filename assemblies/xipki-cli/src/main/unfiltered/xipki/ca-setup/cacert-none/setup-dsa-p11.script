@@ -41,5 +41,3 @@ xi:move-file ${KEYCERTS_DIR}/ca-myca1.crt ${KEYCERTS_DIR}/myca1.der
 
 echo "# Update the certificate in the device"
 xi:update-cert-p11 --slot 0 --label ${P11_LABEL} --cert ${KEYCERTS_DIR}/myca1.der
-
-source xipki/ca-setup/cacert-none/configure-ca.script

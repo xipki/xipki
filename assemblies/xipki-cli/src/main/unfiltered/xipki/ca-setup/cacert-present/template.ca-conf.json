@@ -11,12 +11,6 @@
 		"conf":{
 			"value":"password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA256withRSA"
 		}
-	},{
-		"name":"scep-responder1",
-		"type":"pkcs12",
-		"conf":{
-			"value":"password=1234,keystore=file:xipki/ca-setup/keycerts/scep1.p12,algo=SHA256withRSA"
-		}
 	}],
 	"requestors":[{
 		"name":"requestor1",
@@ -88,7 +82,7 @@
 				"rr.aki.required":true,
 				"group.enroll":true,
 				"protection.sigalgo":"SHA256withRSA:SHA256withECDSA",
-				"popo.sigalgo":"SHA256withRSA:SHA256withECDSA:SHA256withDSA:SM3withSM2"
+				"popo.sigalgo":"SHA256withRSA:SHA256withECDSA:SHA256withDSA:SM3withSM2:ED25519:ED448:DHPOP-X25519-SHA256:DHPOP-X448-SHA512"
 			},
 			"cmpResponderName":"responder1",
 			"crlControl":{
@@ -114,7 +108,6 @@
 				"signercert.included":true,
 				"support.getcrl":true
 			},
-			"scepResponderName":"scep-responder1",
 			"signerType":"${token.type}",
 			"signerConf":{
 				"value":"${ca.signerConf}"
