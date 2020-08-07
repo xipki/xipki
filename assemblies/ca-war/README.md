@@ -3,27 +3,26 @@ Migration
 - From v5.3.0 - v5.3.6 to v5.3.7+
   - Remove the path prefix `xipki/` in all configuration files (`*.json`, `*.properties`, `*.cfg`)
     in the folder `xipki/`.
-- For v5.3.7+, the folder `xipki` may be placed anywhere, it must be pointed to by the java property
-  `XIPKI_BASE`.
-  It can be configured as follows:
-  - Tomcat: in the file `bin\setevn.*`
-  - Jetty: in the file `start.ini`.
 
 Deployment in Tomcat 8 and 9
 ----
-- Copy the files `setenv.sh` and `setenv.bat` in the folder `tomcat/bin` to the folder
+1. Copy the files `setenv.sh` and `setenv.bat` in the folder `tomcat/bin` to the folder
   `${CATALINA_HOME}/bin`.
-- Copy the sub-folders `webapps`, `xipki` and `lib ` to the tomcat root folder `${CATALINA_HOME}`.
+2. Copy the sub-folders `webapps`, `xipki` and `lib ` to the tomcat root folder `${CATALINA_HOME}`.
   The folder `xipki` can be moved to other location, in this case the java property `XIPKI_BASE` in
   `setenv.sh` and `setenv.bat` must be adapted to point to the new position.
-- Download the `bcprov-jdk15on-<version>.jar` and `bcpkix-jdk15on-<version>.jar` from
-  [BouncyCastle Latest Release](https://www.bouncycastle.org/latest_releases.html) and copy them to
-  the folder `${CATALINA_HOME}/lib`. They are not included in the install package since they are
-  cryptographic libraries and we need to use the latest release.
-
-- Configure the TLS listener in the file `${CATALINA_HOME}conf/server.xml`
-    - Use NIO connector
-
+3. Download the `bcprov-jdk15on-<version>.jar` and `bcpkix-jdk15on-<version>.jar` from
+  [BouncyCastle Latest Release](https://www.bouncycastle.org/latest_releases.html) to the folder
+  `${CATALINA_HOME}/lib`. The cryptographic libraries are not included since we need the latest release.
+4. (Optional) If you use database other than MariaDB and MySQL, you need to overwrite the
+   configuration templates with those in the corresponding sub folder in `${CONTAINER_ROOT}/xipki/etc/ca/database`,
+   and download the JDBC driver to the folder `${CATALINA_HOME}/lib`.
+5. Adapt the database configurations `${CONTAINER_ROOT}/xipki/etc/ca/database/ca-db.properties`.
+6. Create new databases configured in Step 5.
+7. Initialize the databases configured in Step 5.
+   In dbtool, call `bin/initdb.sh --db-schema sql/ca-init.xml --db-conf /path/to/ca-db.properties`
+8. Configure the TLS listener in the file `${CATALINA_HOME}conf/server.xml`
+   - Use NIO connector
 ```sh
     <Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"
                maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
@@ -42,9 +41,7 @@ Deployment in Tomcat 8 and 9
         </SSLHostConfig>
     </Connector>
 ```
-
-     - Use APR connector (fast)
-
+    - Use APR connector (fast)
 ```sh
     <Connector port="8443" protocol="org.apache.coyote.http11.Http11AprProtocol"
                maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
@@ -60,7 +57,7 @@ Deployment in Tomcat 8 and 9
         </SSLHostConfig>
     </Connector>
 ```
-- (optional) To accelerate the start process, append the following block to the property
+9. (optional) To accelerate the start process, append the following block to the property
 `tomcat.util.scan.StandardJarScanFilter.jarsToSkip` in the file `conf/catalina.properties`.
 
 ```
@@ -83,7 +80,6 @@ sunpkcs11-wrapper-*.jar,\
 tinylog*.jar,\
 util-*.jar
 ```
-
 - Start tomcat
   <span style="color:red">**In the tomcat root folder ${CATALINA_HOME}** (Otherwise the file path
   cannot be interpreted correctly.)</span>
@@ -95,23 +91,23 @@ util-*.jar
   Note that the start script of tomcat does not set the working directory to the tomcat root
   directory, you have to start tomcat as above so that the XiPKI can retrieve files correctly.
 
-- Shutdown tomcat
-   Shutdown tomcat from any folder
-
-```sh
-  /path/to/tomcat/bin/shutdown.sh
-```
 
 Deployment in Jetty 9
-----
-- Copy the sub-folder `webapps`, and the files in sub-folder `${JETTY_BASE}/lib` to the sub-folder
-  `${JETTY_BASE}/lib/ext` of jetty.
-- Download the `bcprov-jdk15on-<version>.jar` and `bcpkix-jdk15on-<version>.jar` from
-  [BouncyCastle Latest Release](https://www.bouncycastle.org/latest_releases.html) and copy them to
-  the folder `${JETTY_HOME}/lib/ext`. They are not included in the install package since they are
-  cryptographic libraries and we need to use the latest release.
-- Copy the sub-folder `xipki` to any position you wished.
-- Configure the TLS listener by adding the following block to the file `start.ini`. Please configure
+1. Copy the sub-folders `webapps` and `xipki` to the jetty root folder `${JETTY_BASE}`, and `lib` to
+   `${JETTY_BASE}/lib/ext`.
+   The folder `xipki` can be moved to other location, in this case a new property `XIPKI_BASE`
+   pointing to point to the new position must be added to the file `start.ini`.
+2. Download the `bcprov-jdk15on-<version>.jar` and `bcpkix-jdk15on-<version>.jar` from
+  [BouncyCastle Latest Release](https://www.bouncycastle.org/latest_releases.html) to the folder
+  `${JETTY_BASE}/lib/ext`. The cryptographic libraries are not included since we need the latest release.
+3. (Optional) If you use database other than MariaDB and MySQL, you need to overwrite the
+   configuration templates with those in the corresponding sub folder in `${JETTY_BASE}/xipki/etc/ca/database`,
+   and download the JDBC driver to the folder `${JETTY_BASE}/lib/ext`.   
+4. Adapt the database configurations `${JETTY_BASE}/xipki/etc/ca/database/ca-db.properties`.
+5. Create new databases configured in Step 4.
+6. Initialize the databases configured in Step 4.
+   In dbtool, call `bin/initdb.sh --db-schema sql/ca-init.xml --db-conf /path/to/ca-db.properties`
+7. Configure the TLS listener by adding the following block to the file `start.ini`. Please configure
   XIPKI_BASE correctly.
 
 ```sh
@@ -139,18 +135,3 @@ to
 ```
  <Set name="EndpointIdentificationAlgorithm"><Property name="jetty.sslContext.endpointIdentificationAlgorithm"/></Set>
 ```
-
-- Start jetty
-   Start jetty from any folder
-
-```sh
-  /path/to/jetty/bin/jetty.sh start
-```
-
-- Shutdown jetty
-   Shutdown jetty from any folder
-
-```sh
-  /path/to/jetty/bin/jetty.sh stop
-```
-

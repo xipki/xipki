@@ -44,7 +44,6 @@
     <!-- only for runtime -->
     <tinylog.version>2.1.2</tinylog.version>
     <jdbc.mariadb.version>2.6.1</jdbc.mariadb.version>
-    <jdbc.postgresql.version>42.2.14</jdbc.postgresql.version>
     <!-- Only for test purpose -->
     <junit.version>4.8.2</junit.version>
   </properties>

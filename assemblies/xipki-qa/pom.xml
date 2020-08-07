@@ -14,6 +14,7 @@
   <properties>
     <!-- overwrite the jdbc.mariadb.version, 2.5.1* does not work in karaf-minimal -->
     <jdbc.mariadb.version>2.4.2</jdbc.mariadb.version>
+    <jdbc.postgresql.version>42.2.14</jdbc.postgresql.version>
     <app.name>QA</app.name>
     <shared.dir>${project.basedir}/../shared</shared.dir>
     <patchkaraf.repos>mvn:org.xipki.feature/qa/${project.version}/xml/features,file:lib/jdbc/features.xml</patchkaraf.repos>

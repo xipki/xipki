@@ -71,7 +71,7 @@ follows.
 ## Install DB Tool
 
 1. Unpack the binary `dbtool-<version>.zip`.
-2. If you use database other than MariaDB, MySQL and PostgreSQL, you need to get the JDBC driver and
+2. If you use database other than MariaDB and MySQL, you need to get the JDBC driver and
    copy it to the directory `lib/jdbc`.
  
 ## Install CA Server
@@ -79,35 +79,12 @@ follows.
 1. Unpack the binary `ca-war-<version>.zip` and install CA as described in the
    unpacked README file.
 
-2. Adapt the database configurations ${CONTAINER_ROOT}/xipki/etc/ca/database/ca-db.properties.
-   - If you use database other than MariaDB and MySQL, you need to overwrite the configuration templates
-   from the sub folder.
-   - If you use database other than MariaDB, MySQL and PostgreSQL, you need to get the JDBC driver and copy
-     it to the container directory for external jars (e.g. `lib` in tomcat, and `lib/ext` in jetty).   
-
-3. Create new databases configured in Step 2.
-
-4. Initialize the databases configured in Step 2.
-
-In the directory `dbtool-<version>`, 
-```
- bin/initdb.sh \
-   --db-schema sql/ca-init.xml \
-   --db-conf ${CONTAINER_ROOT}/xipki/etc/ca/database/ca-db.properties
-```
-
 ## Install OCSP Responder
 
 Note that CA and OCSP can be installed in the same servlet container.
 
 1. Unpack the binary `ocsp-war-<version>.zip` and install OCSP responder as described in the
    unpacked README file.
-
-2. Adapt the database configuration ${CONTAINER_ROOT}/xipki/etc/ocsp/database/ca-db.properties.
-   - If you use database other than MariaDB and MySQL, you need to overwrite the configuration templates
-   from the sub folder.
-   - If you use database other than MariaDB, MySQL and PostgreSQL, you need to get the JDBC drivers and copy
-     it to the container directory for external jars (e.g. `lib` in tomcat, and `lib/ext` in jetty).   
 
 ## Install Command Line Interface
 
