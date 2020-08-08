@@ -433,7 +433,14 @@ public class CaManagerImpl implements CaManager, Closeable {
       this.datasourceNameConfFileMap = new ConcurrentHashMap<>();
       List<DataSourceConf> datasourceList = caServerConf.getDatasources();
       for (DataSourceConf datasource : datasourceList) {
-        this.datasourceNameConfFileMap.put(datasource.getName(), datasource.getConf());
+        String name = datasource.getName();
+        FileOrValue conf = datasource.getConf();
+        this.datasourceNameConfFileMap.put(name, conf);
+        if (conf.getFile() != null) {
+          LOG.info("associate datasource {} to the file {}", name, conf.getFile());
+        } else {
+          LOG.info("associate datasource {} to text value", name);
+        }
       }
 
       FileOrValue caDatasourceConf = datasourceNameConfFileMap.remove("ca");
