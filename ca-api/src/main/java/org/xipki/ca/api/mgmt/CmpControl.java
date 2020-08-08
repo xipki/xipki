@@ -408,12 +408,14 @@ public class CmpControl {
         "\n  send CA cert: ", sendCaCert,
         "\n  message time required: ", messageTimeRequired,
         "\n  send responder cert: ", sendResponderCert,
-        "\n  message time bias: ", messageTimeBias,
+        "\n  message time bias: ", messageTimeBias, "s",
         "\n  confirm waiting time: ", confirmWaitTime, "s",
         "\n  group enroll: ", groupEnroll,
         "\n  AKI in revocation request required: ", rrAkiRequired,
-        "\n  signature algorithms: ", sigAlgoValidator.getAlgoNames(),
-        "\n  POPO algorithms: ", popoAlgoValidator.getAlgoNames(),
+        "\n  signature algorithms: ",
+            CollectionUtil.sort(sigAlgoValidator.getAlgoNames()),
+        "\n  POPO algorithms: ",
+            CollectionUtil.sort(popoAlgoValidator.getAlgoNames()),
         (verbose ? "\n  encoded: " : ""), (verbose ? conf : ""));
   } // method toString
 

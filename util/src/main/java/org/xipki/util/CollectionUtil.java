@@ -117,4 +117,14 @@ public class CollectionUtil {
     return (list == null) ? Collections.emptyList() : Collections.unmodifiableList(list);
   }
 
+  public static <T extends Comparable<? super T>> List<T> sort(Collection<T> col) {
+    if (col == null) {
+      return null;
+    } else {
+      List<T> list = new ArrayList<>(col);
+      Collections.sort(list);
+      return list;
+    }
+  }
+
 }
