@@ -9,25 +9,16 @@
   </formats>
   <fileSets>
     <fileSet>
-      <directory>../shared/license</directory>
+      <directory>${shared.dir}/license</directory>
       <outputDirectory>license</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>../shared/conf/xipki</directory>
+      <directory>${shared.dir}/conf/xipki</directory>
       <includes>
-        <include>etc/**</include>
+        <include>security/example/**</include>
       </includes>
-      <outputDirectory>.</outputDirectory>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <directory>../shared/conf/xipki</directory>
-      <excludes>
-        <exclude>etc/**</exclude>
-      </excludes>
       <outputDirectory>xipki</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
@@ -144,7 +135,7 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>../shared/conf/xipki/security/example/pkcs11-emulator.json</source>
+      <source>${shared.dir}/conf/xipki/security/example/pkcs11-emulator.json</source>
       <outputDirectory>xipki/security</outputDirectory>
       <destName>pkcs11.json</destName>
       <fileMode>0644</fileMode>

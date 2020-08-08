@@ -73,7 +73,7 @@
 					"http://ca.example.org/crl"
 				],
 				"ocspUris":[
-					"http://localhost:8080/ocsp/"
+					"http://localhost:8080/ocsp"
 				]
 			},
 			"cmpControl":{
