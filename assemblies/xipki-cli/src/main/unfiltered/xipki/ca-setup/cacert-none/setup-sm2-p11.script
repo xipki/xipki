@@ -34,6 +34,8 @@ xi:replace --old "REPLACEME-CA_SIGNERCONF" \
 ca:load-conf --conf-file xipki/ca-setup/cacert-none/ca-conf.json \
   --out-dir ${KEYCERTS_DIR}
 
+ca:profile-rm --force rootca
+
 xi:move-file ${KEYCERTS_DIR}/ca-myca1.crt ${KEYCERTS_DIR}/myca1.der
 
 echo "# Update the certificate in the device"

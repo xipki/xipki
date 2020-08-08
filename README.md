@@ -153,7 +153,7 @@ preload <start script>
         `source xipki/ca-setup/cacert-present/setup-*.script`
          where * is place holder.
 
-      * If you wish to add the SCEP support, in CLI:
+      * If you wish to add the SCEP support, in CLI:  
          `source xipki/ca-setup/setup-scep.script`.
 
    * Verify the installation, execute the command in CLI:  
