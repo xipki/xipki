@@ -113,7 +113,8 @@ public class CmpControl {
 
   private final CollectionAlgorithmValidator popoAlgoValidator;
 
-  public CmpControl(String conf) throws InvalidConfException {
+  public CmpControl(String conf)
+      throws InvalidConfException {
     ConfPairs pairs = new ConfPairs(conf);
     this.confirmCert = getBoolean(pairs, KEY_CONFIRM_CERT, false);
     this.sendCaCert = getBoolean(pairs, KEY_SEND_CA, false);
@@ -252,7 +253,8 @@ public class CmpControl {
   } // constructor
 
   private void initPbm(ConfPairs pairs, List<String> pbmOwfs, List<String> pbmMacs,
-      Integer pbmIterationCount) throws InvalidConfException {
+      Integer pbmIterationCount)
+          throws InvalidConfException {
     if (pbmIterationCount == null) {
       pbmIterationCount = DFLT_PBM_ITERATIONCOUNT;
     }

@@ -139,7 +139,8 @@ public class CaEmulator {
     return generateCrl;
   }
 
-  public X509Cert generateCert(CertificationRequest csr) throws Exception {
+  public X509Cert generateCert(CertificationRequest csr)
+      throws Exception {
     if (!verifyPopo(csr)) {
       throw new Exception("CSR invalid");
     }
@@ -154,7 +155,8 @@ public class CaEmulator {
   }
 
   public X509Cert generateCert(SubjectPublicKeyInfo pubKeyInfo, X500Name subjectDn,
-      Date notBefore) throws Exception {
+      Date notBefore)
+          throws Exception {
     Args.notNull(pubKeyInfo, "pubKeyInfo");
     Args.notNull(subjectDn, "subjectDn");
     Args.notNull(notBefore, "notBefore");

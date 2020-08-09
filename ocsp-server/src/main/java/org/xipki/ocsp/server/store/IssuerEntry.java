@@ -55,7 +55,8 @@ class IssuerEntry {
 
   private CertRevocationInfo revocationInfo;
 
-  public IssuerEntry(int id, X509Cert cert) throws CertificateEncodingException {
+  public IssuerEntry(int id, X509Cert cert)
+      throws CertificateEncodingException {
     this.id = id;
     this.cert = notNull(cert, "cert");
     this.notBefore = cert.getNotBefore();

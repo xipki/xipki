@@ -39,7 +39,8 @@ public class EmulatorP11ModuleFactory implements P11ModuleFactory {
   }
 
   @Override
-  public P11Module newModule(P11ModuleConf conf) throws P11TokenException {
+  public P11Module newModule(P11ModuleConf conf)
+      throws P11TokenException {
     return EmulatorP11Module.getInstance(conf);
   }
 

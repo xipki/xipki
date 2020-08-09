@@ -446,7 +446,8 @@ public class ExtensionType extends ValidatableConf {
   }
 
   @Override
-  public void validate() throws InvalidConfException {
+  public void validate()
+      throws InvalidConfException {
     notNull(type, "type");
     validate(type);
     validate(additionalInformation);
@@ -501,7 +502,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(text, "text");
       notNull(type, "type");
     }
@@ -547,7 +549,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       validate(namingAuthority);
       notEmpty(professionInfos, "professionInfos");
       validate(professionInfos);
@@ -583,7 +586,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notEmpty(contentsOfAdmissions, "contentsOfAdmissions");
       validate(contentsOfAdmissions);
     }
@@ -713,7 +717,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
     }
 
   } // class AuthorityInfoAccess
@@ -731,7 +736,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
     }
 
   } // class AuthorityKeyIdentifier
@@ -761,7 +767,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notNull(type, "type");
       validate(type);
       notNull(accessRights, "accessRights");
@@ -783,7 +790,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
     }
 
   } // class BasicConstraints
@@ -830,7 +838,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notEmpty(hashAlgorithms, "hashAlgorithms");
       notEmpty(types, "types");
       notNull(includeSourceDataUri, "includeSourceDataUri");
@@ -863,7 +872,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notNull(oid, "oid");
       notNull(predefined, "predefined");
     }
@@ -887,7 +897,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notEmpty(certificatePolicyInformations, "certificatePolicyInformations");
       validate(certificatePolicyInformations);
     }
@@ -976,7 +987,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
     }
 
   } // class CrlDistributionPoints
@@ -997,7 +1009,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notEmpty(usages, "usages");
       validate(usages);
     }
@@ -1112,7 +1125,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notNull(type, "type");
       if (CollectionUtil.isNotEmpty(subFields)) {
         if (type == FieldType.SEQUENCE || type == FieldType.SET) {
@@ -1165,7 +1179,8 @@ public class ExtensionType extends ValidatableConf {
       }
 
       @Override
-      public void validate() throws InvalidConfException {
+      public void validate()
+          throws InvalidConfException {
         super.validate();
         if (FieldType.RAW == type()) {
           throw new InvalidConfException("FieldType RAW is not allowed");
@@ -1189,7 +1204,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
     }
 
   } // class InhibitAnyPolicy
@@ -1210,7 +1226,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notEmpty(usages, "usages");
       validate(usages);
     }
@@ -1249,7 +1266,8 @@ public class ExtensionType extends ValidatableConf {
       }
 
       @Override
-      public void validate() throws InvalidConfException {
+      public void validate()
+          throws InvalidConfException {
       }
 
     } // class Usage
@@ -1291,7 +1309,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       if (CollectionUtil.isEmpty(permittedSubtrees) && CollectionUtil.isEmpty(excludedSubtrees)) {
         throw new InvalidConfException(
             "permittedSubtrees and excludedSubtrees may not be both null");
@@ -1396,7 +1415,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       if (oid == null && url == null && text == null) {
         throw new InvalidConfException("oid, url and text may not be all null");
       }
@@ -1430,7 +1450,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       // Only for CA, at least one of requireExplicitPolicy and inhibitPolicyMapping must be present
       if (requireExplicitPolicy == null && inhibitPolicyMapping == null) {
         throw new InvalidConfException(
@@ -1438,7 +1459,8 @@ public class ExtensionType extends ValidatableConf {
       }
     }
 
-    public ASN1Sequence toXiPolicyConstrains() throws CertprofileException {
+    public ASN1Sequence toXiPolicyConstrains()
+        throws CertprofileException {
       if (requireExplicitPolicy != null && requireExplicitPolicy < 0) {
         throw new CertprofileException(
             "negative requireExplicitPolicy is not allowed: " + requireExplicitPolicy);
@@ -1495,7 +1517,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notNull(issuerDomainPolicy, "issuerDomainPolicy");
       validate(issuerDomainPolicy);
       notNull(subjectDomainPolicy, "subjectDomainPolicy");
@@ -1524,7 +1547,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notEmpty(mappings, "mappings");
       validate(mappings);
     }
@@ -1564,7 +1588,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(validity, "validity");
     }
 
@@ -1634,7 +1659,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       validate(namingAuthority);
       validate(professionOids);
       validate(registrationNumber);
@@ -1658,7 +1684,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notEmpty(qcStatements, "qcStatements");
       validate(qcStatements);
     }
@@ -1690,7 +1717,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       exactOne(regex, "regex", constant, "constant");
     }
 
@@ -1721,7 +1749,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notNull(type, "type");
       notBlank(text, "text");
     }
@@ -1744,7 +1773,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notEmpty(capabilities, "capabilities");
       validate(capabilities);
     }
@@ -1776,7 +1806,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notNull(capabilityId, "capabilityId");
       validate(capabilityId);
       validate(parameter);
@@ -1809,7 +1840,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       exactOne(integer, "integer", binary, "binary");
       validate(binary);
     }
@@ -1832,7 +1864,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notEmpty(types, "types");
       validate(types);
     }
@@ -1855,7 +1888,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notEmpty(accesses, "accesses");
       validate(accesses);
     }
@@ -1885,7 +1919,8 @@ public class ExtensionType extends ValidatableConf {
       }
 
       @Override
-      public void validate() throws InvalidConfException {
+      public void validate()
+          throws InvalidConfException {
         notNull(accessMethod, "accessMethod");
         validate(accessMethod);
         notNull(accessLocation, "accessLocation");
@@ -1912,7 +1947,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notEmpty(features, "features");
       validate(features);
     }
@@ -1932,7 +1968,8 @@ public class ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notNull(modelId, "modelId");
       validate(modelId);
     }

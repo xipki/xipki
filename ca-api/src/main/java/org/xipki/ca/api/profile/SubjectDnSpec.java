@@ -374,7 +374,8 @@ public class SubjectDnSpec {
     return control;
   } // method getRdnControl
 
-  public static void fixRdnControl(RdnControl control) throws CertprofileException {
+  public static void fixRdnControl(RdnControl control)
+      throws CertprofileException {
     Args.notNull(control, "control");
 
     ASN1ObjectIdentifier type = control.getType();

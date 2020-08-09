@@ -239,7 +239,8 @@ class ImportCrl {
   private PreparedStatement psUpdateCertLastupdate;
 
   public ImportCrl(DataSourceWrapper datasource, String basedir, int sqlBatchCommit,
-      boolean ignoreExpiredCrls) throws DataAccessException {
+      boolean ignoreExpiredCrls)
+          throws DataAccessException {
     this.sqlBatchCommit = min(sqlBatchCommit, "sqlBatchCommit", 1);
     this.ignoreExpiredCrls = ignoreExpiredCrls;
     this.datasource = notNull(datasource, "datasource");
@@ -715,7 +716,8 @@ class ImportCrl {
   } // method importCa
 
   private void importCrlInfo(Connection conn, int id, String name, CrlInfo crlInfo,
-      boolean shareCaWithOtherCrl, String sha1FpOfIssuerCert) throws DataAccessException {
+      boolean shareCaWithOtherCrl, String sha1FpOfIssuerCert)
+          throws DataAccessException {
     boolean exists = datasource.columnExists(conn, "CRL_INFO", "ID", id);
 
     PreparedStatement ps = null;
@@ -958,7 +960,8 @@ class ImportCrl {
     }
   } // method importCrlRevokedCertificates
 
-  private static X509Cert parseCert(File certFile) throws ImportCrlException {
+  private static X509Cert parseCert(File certFile)
+      throws ImportCrlException {
     try {
       return X509Util.parseCert(certFile);
     } catch (CertificateException | IOException ex) {
@@ -967,7 +970,8 @@ class ImportCrl {
     }
   } // method parseCert
 
-  private CertInfo getCertInfo(int caId, BigInteger serialNumber) throws DataAccessException {
+  private CertInfo getCertInfo(int caId, BigInteger serialNumber)
+      throws DataAccessException {
     ResultSet rs = null;
     try {
       psSelectIdCert.setInt(1, caId);
@@ -994,7 +998,8 @@ class ImportCrl {
   } // method getCertInfo
 
   private void addCertificate(AtomicLong maxId, int crlInfoId, CertWrapper caCert, X509Cert cert,
-      String profileName, String certLogId) throws DataAccessException, ImportCrlException {
+      String profileName, String certLogId)
+          throws DataAccessException, ImportCrlException {
     // CHECKSTYLE:SKIP
     int caId = caCert.databaseId.intValue();
 
@@ -1091,7 +1096,8 @@ class ImportCrl {
   } // method addCertificate
 
   private void addCertificateBySerialNumber(AtomicLong maxId, int caId, int crlInfoId,
-      BigInteger serialNumber) throws DataAccessException {
+      BigInteger serialNumber)
+          throws DataAccessException {
     LOG.info("Importing certificate by serial number {}", serialNumber);
     CertInfo existingCertInfo = getCertInfo(caId, serialNumber);
 
@@ -1186,7 +1192,8 @@ class ImportCrl {
     return intvalue;
   }
 
-  private void commit(Connection conn) throws DataAccessException {
+  private void commit(Connection conn)
+      throws DataAccessException {
     try {
       conn.commit();
     } catch (SQLException ex) {

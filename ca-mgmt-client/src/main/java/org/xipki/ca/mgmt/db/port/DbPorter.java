@@ -118,7 +118,8 @@ public class DbPorter extends DbToolBase {
 
     private String nextFilename;
 
-    public DbPortFileNameIterator(String filename) throws IOException {
+    public DbPortFileNameIterator(String filename)
+        throws IOException {
       Args.notNull(filename, "filename");
 
       this.reader = Files.newBufferedReader(Paths.get(filename));
@@ -156,7 +157,8 @@ public class DbPorter extends DbToolBase {
       }
     }
 
-    private String readNextFilenameLine() throws IOException {
+    private String readNextFilenameLine()
+        throws IOException {
       String line;
       while ((line = reader.readLine()) != null) {
         line = line.trim();
@@ -206,7 +208,8 @@ public class DbPorter extends DbToolBase {
     this.maxX500nameLen = Integer.parseInt(dbSchemaInfo.getVariableValue("X500NAME_MAXLEN"));
   }
 
-  protected FileOrValue buildFileOrValue(String content, String fileName) throws IOException {
+  protected FileOrValue buildFileOrValue(String content, String fileName)
+      throws IOException {
     if (content == null) {
       return null;
     }
@@ -235,7 +238,8 @@ public class DbPorter extends DbToolBase {
     return buildFileOrBinary(Base64.decode(base64Content), fileName);
   } // method buildFileOrBase64Binary
 
-  protected FileOrBinary buildFileOrBinary(byte[] content, String fileName) throws IOException {
+  protected FileOrBinary buildFileOrBinary(byte[] content, String fileName)
+      throws IOException {
     if (content == null) {
       return null;
     }
@@ -256,7 +260,8 @@ public class DbPorter extends DbToolBase {
     return ret;
   } // method buildFileOrBinary
 
-  protected byte[] readContent(FileOrBinary fileOrBinary) throws IOException {
+  protected byte[] readContent(FileOrBinary fileOrBinary)
+      throws IOException {
     if (fileOrBinary == null) {
       return null;
     }
@@ -269,7 +274,8 @@ public class DbPorter extends DbToolBase {
     return IoUtil.read(file);
   } // method readContent
 
-  protected String readContent(FileOrValue fileOrValue) throws IOException {
+  protected String readContent(FileOrValue fileOrValue)
+      throws IOException {
     if (fileOrValue == null) {
       return null;
     }
@@ -282,7 +288,8 @@ public class DbPorter extends DbToolBase {
     return new String(IoUtil.read(file), "UTF-8");
   } // method readContent
 
-  public static void echoToFile(String content, File file) throws IOException {
+  public static void echoToFile(String content, File file)
+      throws IOException {
     Files.write(Args.notNull(file, "file").toPath(),
         StringUtil.toUtf8Bytes(Args.notNull(content, "content")));
   }

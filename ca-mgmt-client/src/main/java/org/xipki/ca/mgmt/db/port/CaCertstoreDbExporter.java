@@ -82,7 +82,8 @@ class CaCertstoreDbExporter extends DbPorter {
     this.resume = resume;
   } // constructor
 
-  public void export() throws Exception {
+  public void export()
+      throws Exception {
     CaCertstore certstore;
     if (resume) {
       try (InputStream is = Files.newInputStream(Paths.get(baseDir, FILENAME_CA_CERTSTORE))) {
@@ -183,7 +184,8 @@ class CaCertstoreDbExporter extends DbPorter {
   } // method exportEntries
 
   private void exportEntries(CaDbEntryType type, CaCertstore certstore, File processLogFile,
-      OutputStream filenameListOs, Long idProcessedInLastProcess) throws Exception {
+      OutputStream filenameListOs, Long idProcessedInLastProcess)
+          throws Exception {
     // CHECKSTYLE:SKIP
     int numEntriesPerSelect = Math.max(1, Math.round(type.getSqlBatchFactor() * numCertsPerSelect));
     int numEntriesPerZip = Math.max(1, Math.round(type.getSqlBatchFactor() * numCertsInBundle));
@@ -570,7 +572,8 @@ class CaCertstoreDbExporter extends DbPorter {
     zipOutStream.close();
   } // method finalizeZip
 
-  private static Object createContainer(CaDbEntryType type) throws IOException {
+  private static Object createContainer(CaDbEntryType type)
+      throws IOException {
     switch (type) {
       case CERT:
         return new CaCertstore.Certs();

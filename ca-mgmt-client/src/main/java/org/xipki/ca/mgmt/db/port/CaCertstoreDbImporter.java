@@ -82,7 +82,8 @@ class CaCertstoreDbImporter extends DbPorter {
   private final int numCertsPerCommit;
 
   CaCertstoreDbImporter(DataSourceWrapper datasource, String srcDir, int numCertsPerCommit,
-      boolean resume, AtomicBoolean stopMe) throws Exception {
+      boolean resume, AtomicBoolean stopMe)
+          throws Exception {
     super(datasource, srcDir, stopMe);
 
     this.numCertsPerCommit = Args.positive(numCertsPerCommit, "numCertsPerCommit");
@@ -100,7 +101,8 @@ class CaCertstoreDbImporter extends DbPorter {
     }
   } // constructor
 
-  public void importToDb() throws Exception {
+  public void importToDb()
+      throws Exception {
     CaCertstore certstore;
     try (InputStream is = Files.newInputStream(Paths.get(baseDir, FILENAME_CA_CERTSTORE))) {
       certstore = JSON.parseObject(is, CaCertstore.class);
@@ -374,7 +376,8 @@ class CaCertstoreDbImporter extends DbPorter {
 
   private long importCerts(String entriesZipFile, long minId,
       File processLogFile, ProcessLog processLog, int numProcessedInLastProcess,
-      PreparedStatement stmt, String sql) throws Exception {
+      PreparedStatement stmt, String sql)
+          throws Exception {
     final CaDbEntryType type = CaDbEntryType.CERT;
     final int numEntriesPerCommit = Math.max(1,
         Math.round(type.getSqlBatchFactor() * numCertsPerCommit));
@@ -528,7 +531,8 @@ class CaCertstoreDbImporter extends DbPorter {
 
   private long importCrls(String entriesZipFile, long minId,
       File processLogFile, ProcessLog processLog, int numProcessedInLastProcess,
-      PreparedStatement stmt, String sql) throws Exception {
+      PreparedStatement stmt, String sql)
+          throws Exception {
     final CaDbEntryType type = CaDbEntryType.CRL;
     final int numEntriesPerCommit = Math.max(1,
         Math.round(type.getSqlBatchFactor() * numCertsPerCommit));
@@ -672,7 +676,8 @@ class CaCertstoreDbImporter extends DbPorter {
 
   private long importRequests(String entriesZipFile, long minId,
       File processLogFile, ProcessLog processLog, int numProcessedInLastProcess,
-      PreparedStatement stmt, String sql) throws Exception {
+      PreparedStatement stmt, String sql)
+          throws Exception {
     final CaDbEntryType type = CaDbEntryType.REQUEST;
     final int numEntriesPerCommit = Math.max(1,
         Math.round(type.getSqlBatchFactor() * numCertsPerCommit));
@@ -771,7 +776,8 @@ class CaCertstoreDbImporter extends DbPorter {
 
   private long importReqCerts(String entriesZipFile, long minId,
       File processLogFile, ProcessLog processLog, int numProcessedInLastProcess,
-      PreparedStatement stmt, String sql) throws Exception {
+      PreparedStatement stmt, String sql)
+          throws Exception {
     final CaDbEntryType type = CaDbEntryType.REQCERT;
     final int numEntriesPerCommit = Math.max(1,
         Math.round(type.getSqlBatchFactor() * numCertsPerCommit));

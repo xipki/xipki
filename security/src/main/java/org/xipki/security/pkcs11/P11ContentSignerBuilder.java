@@ -119,7 +119,8 @@ public class P11ContentSignerBuilder {
   } // constructor
 
   public ConcurrentContentSigner createSigner(AlgorithmIdentifier signatureAlgId,
-      int parallelism) throws XiSecurityException, P11TokenException {
+      int parallelism)
+          throws XiSecurityException, P11TokenException {
     positive(parallelism, "parallelism");
 
     List<XiContentSigner> signers = new ArrayList<>(parallelism);

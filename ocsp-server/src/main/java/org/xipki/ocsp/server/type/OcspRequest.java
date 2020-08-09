@@ -74,7 +74,8 @@ public class OcspRequest {
     this.extensions = extensions;
   }
 
-  public static OcspRequest getInstance(byte[] request) throws EncodingException {
+  public static OcspRequest getInstance(byte[] request)
+      throws EncodingException {
     // OCSPRequest
     Header hdr = readHeader(request, 0);
     // tbsRequest
@@ -163,7 +164,8 @@ public class OcspRequest {
     return new OcspRequest(version, requestList, extensions);
   } // method getInstance
 
-  public static OcspRequest getInstance(OCSPRequest req) throws EncodingException {
+  public static OcspRequest getInstance(OCSPRequest req)
+      throws EncodingException {
     TBSRequest tbsReq0 = req.getTbsRequest();
 
     org.bouncycastle.asn1.x509.Extensions extensions0 = tbsReq0.getRequestExtensions();
@@ -214,7 +216,8 @@ public class OcspRequest {
     return new OcspRequest(tbsReq0.getVersion().getValue().intValue(), requestList, extensions);
   } // method getInstance
 
-  public static int readRequestVersion(byte[] request) throws EncodingException {
+  public static int readRequestVersion(byte[] request)
+      throws EncodingException {
     // OCSPRequest
     Header hdr = readHeader(request, 0);
     // tbsRequest
@@ -234,7 +237,8 @@ public class OcspRequest {
     }
   } // method readRequestVersion
 
-  public static boolean containsSignature(byte[] request) throws EncodingException {
+  public static boolean containsSignature(byte[] request)
+      throws EncodingException {
     // OCSPRequest
     Header hdr = readHeader(request, 0);
     // tbsRequest
@@ -243,7 +247,8 @@ public class OcspRequest {
     return signatureIndex < request.length;
   }
 
-  static Header readHeader(byte[] encoded, int readerIndex) throws EncodingException {
+  static Header readHeader(byte[] encoded, int readerIndex)
+      throws EncodingException {
     int off = readerIndex;
     byte tag = encoded[off++];
     int len = 0xFF & encoded[off++];

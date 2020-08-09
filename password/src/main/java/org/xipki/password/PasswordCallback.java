@@ -46,7 +46,8 @@ public interface PasswordCallback {
    * @throws PasswordResolverException
    *         if error occurs
    */
-  void init(String conf) throws PasswordResolverException;
+  void init(String conf)
+      throws PasswordResolverException;
 
   /**
    * Resolves the password
@@ -58,7 +59,8 @@ public interface PasswordCallback {
    * @throws PasswordResolverException
    *         if error occurs
    */
-  char[] getPassword(String prompt, String testToken) throws PasswordResolverException;
+  char[] getPassword(String prompt, String testToken)
+      throws PasswordResolverException;
 
   public static class File implements PasswordCallback {
 
@@ -67,7 +69,8 @@ public interface PasswordCallback {
     private String passwordFile;
 
     @Override
-    public char[] getPassword(String prompt, String testToken) throws PasswordResolverException {
+    public char[] getPassword(String prompt, String testToken)
+        throws PasswordResolverException {
       if (passwordFile == null) {
         throw new PasswordResolverException("please initialize me first");
       }
@@ -108,7 +111,8 @@ public interface PasswordCallback {
     } // method getPassword
 
     @Override
-    public void init(String conf) throws PasswordResolverException {
+    public void init(String conf)
+        throws PasswordResolverException {
       Args.notBlank(conf, "conf");
       ConfPairs pairs = new ConfPairs(conf);
       passwordFile = pairs.value("file");
@@ -132,7 +136,8 @@ public interface PasswordCallback {
     }
 
     @Override
-    public char[] getPassword(String prompt, String testToken) throws PasswordResolverException {
+    public char[] getPassword(String prompt, String testToken)
+        throws PasswordResolverException {
       String tmpPrompt = prompt;
       if (StringUtil.isBlank(tmpPrompt)) {
         tmpPrompt = "Password required";
@@ -166,7 +171,8 @@ public interface PasswordCallback {
     }
 
     @Override
-    public void init(String conf) throws PasswordResolverException {
+    public void init(String conf)
+        throws PasswordResolverException {
       if (StringUtil.isBlank(conf)) {
         quorum = 1;
         return;
@@ -196,7 +202,8 @@ public interface PasswordCallback {
     private char[] password;
 
     @Override
-    public char[] getPassword(String prompt, String testToken) throws PasswordResolverException {
+    public char[] getPassword(String prompt, String testToken)
+        throws PasswordResolverException {
       if (password == null) {
         throw new PasswordResolverException("please initialize me first");
       }
@@ -205,7 +212,8 @@ public interface PasswordCallback {
     }
 
     @Override
-    public void init(String conf) throws PasswordResolverException {
+    public void init(String conf)
+        throws PasswordResolverException {
       Args.notBlank(conf, "conf");
       this.password = OBFPasswordService.deobfuscate(conf).toCharArray();
     }

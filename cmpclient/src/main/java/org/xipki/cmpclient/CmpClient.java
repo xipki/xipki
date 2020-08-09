@@ -42,7 +42,8 @@ public interface CmpClient extends Closeable {
 
   boolean init();
 
-  Set<String> getCaNames() throws CmpClientException;
+  Set<String> getCaNames()
+      throws CmpClientException;
 
   /**
    * Return set given Certprofiles supported by the CA caName.
@@ -53,7 +54,8 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  Set<CertprofileInfo> getCertprofiles(String caName) throws CmpClientException;
+  Set<CertprofileInfo> getCertprofiles(String caName)
+      throws CmpClientException;
 
   /**
    * Enrolls a certificate.
@@ -117,7 +119,8 @@ public interface CmpClient extends Closeable {
    *          if client error occurs.
    */
   CertIdOrError revokeCert(String caName, BigInteger serial, int reason, Date invalidityTime,
-      ReqRespDebug debug) throws CmpClientException, PkiErrorException;
+      ReqRespDebug debug)
+          throws CmpClientException, PkiErrorException;
 
   /**
    * Revokes a certificate.
@@ -139,7 +142,8 @@ public interface CmpClient extends Closeable {
    *          if client error occurs.
    */
   CertIdOrError revokeCert(String caName, X509Cert cert, int reason, Date invalidityTime,
-      ReqRespDebug debug) throws CmpClientException, PkiErrorException;
+      ReqRespDebug debug)
+          throws CmpClientException, PkiErrorException;
 
   /**
    * Revoke a set of certificates.
@@ -215,7 +219,8 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  String getCaNameByIssuer(X500Name issuer) throws CmpClientException;
+  String getCaNameByIssuer(X500Name issuer)
+      throws CmpClientException;
 
   /**
    * Unrevokes a certificate.
@@ -326,7 +331,8 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  HealthCheckResult getHealthCheckResult(String caName) throws CmpClientException;
+  HealthCheckResult getHealthCheckResult(String caName)
+      throws CmpClientException;
 
   /**
    * Returns the CA certificate.
@@ -336,7 +342,8 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  X509Cert getCaCert(String caName) throws CmpClientException;
+  X509Cert getCaCert(String caName)
+      throws CmpClientException;
 
   /**
    * Returns the CA certificate chain.
@@ -346,7 +353,8 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  List<X509Cert> getCaCertchain(String caName) throws CmpClientException;
+  List<X509Cert> getCaCertchain(String caName)
+      throws CmpClientException;
 
   /**
    * Returns the subject of CA certificate.
@@ -356,7 +364,8 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  X500Name getCaCertSubject(String caName) throws CmpClientException;
+  X500Name getCaCertSubject(String caName)
+      throws CmpClientException;
 
   /**
    * Returns the certificates held by CA for the DH KeyAgreement.
@@ -366,7 +375,8 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  List<X509Cert> getDhPocPeerCertificates(String caName) throws CmpClientException;
+  List<X509Cert> getDhPocPeerCertificates(String caName)
+      throws CmpClientException;
 
   /**
    * Returns name of CA that supports give {@code certprofile}.
@@ -376,6 +386,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *         If more than one CA supports the certificate.
    */
-  public String getCaNameForProfile(String certprofile) throws CmpClientException;
+  public String getCaNameForProfile(String certprofile)
+      throws CmpClientException;
 
 }

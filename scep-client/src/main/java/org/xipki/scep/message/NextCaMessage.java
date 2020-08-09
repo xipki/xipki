@@ -77,7 +77,8 @@ public class NextCaMessage {
   }
 
   public ContentInfo encode(PrivateKey signingKey, X509Cert signerCert,
-      X509Cert[] cmsCertSet) throws MessageEncodingException {
+      X509Cert[] cmsCertSet)
+          throws MessageEncodingException {
     Args.notNull(signingKey, "signingKey");
     Args.notNull(signerCert, "signerCert");
 

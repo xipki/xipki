@@ -64,7 +64,8 @@ public class QaP11Actions {
     protected String ida;
 
     @Override
-    protected Object execute1(PrivateKey key, Certificate cert) throws Exception {
+    protected Object execute1(PrivateKey key, Certificate cert)
+        throws Exception {
       String sigAlgo = "SM3withSM2";
       println("signature algorithm: " + sigAlgo);
       Signature sig = Signature.getInstance(sigAlgo);
@@ -119,7 +120,8 @@ public class QaP11Actions {
     private Boolean gm = Boolean.FALSE;
 
     @Override
-    protected Object execute1(PrivateKey key, Certificate cert) throws Exception {
+    protected Object execute1(PrivateKey key, Certificate cert)
+        throws Exception {
       PublicKey pubKey = cert.getPublicKey();
 
       String sigAlgo = getSignatureAlgo(pubKey);
@@ -140,7 +142,8 @@ public class QaP11Actions {
       return null;
     } // method execute0
 
-    private String getSignatureAlgo(PublicKey pubKey) throws NoSuchAlgorithmException {
+    private String getSignatureAlgo(PublicKey pubKey)
+        throws NoSuchAlgorithmException {
       SignatureAlgoControl algoControl = new SignatureAlgoControl(rsaMgf1, dsaPlain, gm);
       AlgorithmIdentifier sigAlgId = AlgorithmUtil.getSigAlgId(pubKey,
           HashAlgo.getNonNullInstance(hashAlgo), algoControl);
@@ -181,7 +184,8 @@ public class QaP11Actions {
     protected abstract Object execute1(PrivateKey key, Certificate cert)
         throws Exception;
 
-    protected String getAlias() throws IllegalCmdParamException {
+    protected String getAlias()
+        throws IllegalCmdParamException {
       if (label != null && id == null) {
         return StringUtil.concat(moduleName, "#slotindex-", Integer.toString(slotIndex),
             "#keylabel-", label);
@@ -195,7 +199,8 @@ public class QaP11Actions {
     }
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       KeyStore ks = KeyStore.getInstance("PKCS11", XiProvider.PROVIDER_NAME);
       ks.load(null, null);
       if (verbose.booleanValue()) {

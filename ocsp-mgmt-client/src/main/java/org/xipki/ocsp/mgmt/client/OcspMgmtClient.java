@@ -73,7 +73,8 @@ public class OcspMgmtClient implements OcspManager {
   public OcspMgmtClient() {
   }
 
-  public void setServerUrl(String serverUrl) throws MalformedURLException {
+  public void setServerUrl(String serverUrl)
+      throws MalformedURLException {
     Args.notBlank(serverUrl, "serverUrl");
     this.serverUrl = serverUrl.endsWith("/") ? serverUrl : serverUrl + "/";
 
@@ -86,7 +87,8 @@ public class OcspMgmtClient implements OcspManager {
     this.sslContextConf = sslContextConf;
   }
 
-  public synchronized void initIfNotDone() throws OcspMgmtException {
+  public synchronized void initIfNotDone()
+      throws OcspMgmtException {
     if (initException != null) {
       throw initException;
     }
@@ -110,22 +112,26 @@ public class OcspMgmtClient implements OcspManager {
   } // method initIfNotDone
 
   @Override
-  public void restartOcspServer() throws OcspMgmtException {
+  public void restartOcspServer()
+      throws OcspMgmtException {
     voidTransmit(MgmtAction.restartServer, null);
   }
 
   @Override
-  public void refreshTokenForSignerType(String signerType) throws OcspMgmtException {
+  public void refreshTokenForSignerType(String signerType)
+      throws OcspMgmtException {
     MgmtRequest.Name req = new MgmtRequest.Name(signerType);
     voidTransmit(MgmtAction.refreshTokenForSignerType, req);
   }
 
-  private void voidTransmit(MgmtAction action, MgmtRequest req) throws OcspMgmtException {
+  private void voidTransmit(MgmtAction action, MgmtRequest req)
+      throws OcspMgmtException {
     transmit(action, req, true);
   }
 
   @SuppressWarnings("unused")
-  private byte[] transmit(MgmtAction action, MgmtRequest req) throws OcspMgmtException {
+  private byte[] transmit(MgmtAction action, MgmtRequest req)
+      throws OcspMgmtException {
     return transmit(action, req, false);
   }
 

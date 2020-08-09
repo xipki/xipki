@@ -31,7 +31,8 @@ import org.xipki.util.HealthCheckResult;
 
 public interface OcspServer extends Closeable {
 
-  ResponderAndPath getResponderForPath(String path) throws UnsupportedEncodingException;
+  ResponderAndPath getResponderForPath(String path)
+      throws UnsupportedEncodingException;
 
   OcspRespWithCacheInfo answer(Responder responder, byte[] request, boolean viaGet);
 

@@ -78,7 +78,8 @@ public class CaServerConf extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(name, "name");
     }
 
@@ -107,7 +108,8 @@ public class CaServerConf extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
     }
 
   } // class RemoteMgmt
@@ -276,7 +278,8 @@ public class CaServerConf extends ValidatableConf {
   } // method getSslContextConf
 
   @Override
-  public void validate() throws InvalidConfException {
+  public void validate()
+      throws InvalidConfException {
     if (shardId < 0 || shardId > 127) {
       throw new InvalidConfException("shardId is not in [0, 127]");
     }

@@ -206,7 +206,8 @@ public class P11ModuleConf {
       singleRetrievers.add(new P11SinglePasswordRetriever(slots, passwords));
     }
 
-    public List<char[]> getPassword(P11SlotIdentifier slotId) throws PasswordResolverException {
+    public List<char[]> getPassword(P11SlotIdentifier slotId)
+        throws PasswordResolverException {
       notNull(slotId, "slotId");
       if (CollectionUtil.isEmpty(singleRetrievers)) {
         return null;
@@ -312,7 +313,8 @@ public class P11ModuleConf {
   private final P11NewObjectConf newObjectConf;
 
   public P11ModuleConf(Pkcs11conf.Module moduleType, List<Pkcs11conf.MechanismSet> mechanismSets,
-      PasswordResolver passwordResolver) throws InvalidConfException {
+      PasswordResolver passwordResolver)
+          throws InvalidConfException {
     notNull(moduleType, "moduleType");
     notEmpty(mechanismSets, "mechanismSets");
     this.name = moduleType.getName();

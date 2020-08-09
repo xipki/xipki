@@ -310,7 +310,8 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
   } // method ask
 
   private OCSPRequest buildRequest(X509Cert caCert, BigInteger[] serialNumbers,
-      byte[] nonce, RequestOptions requestOptions) throws OcspRequestorException {
+      byte[] nonce, RequestOptions requestOptions)
+          throws OcspRequestorException {
     HashAlgo hashAlgo = HashAlgo.getInstance(requestOptions.getHashAlgorithmId());
     if (hashAlgo == null) {
       throw new OcspRequestorException("unknown HashAlgo "

@@ -163,7 +163,8 @@ public class Actions {
     protected String hashAlgo = "SHA256";
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       X509Cert cert = X509Util.parseCert(IoUtil.read(inFile));
 
       if (serial != null && serial) {
@@ -235,7 +236,8 @@ public class Actions {
     private String outPwd;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       File realInFile = new File(IoUtil.expandFilepath(inFile));
       File realOutFile = new File(IoUtil.expandFilepath(outFile));
 
@@ -301,7 +303,8 @@ public class Actions {
     private Boolean nextUpdate;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       CertificateList crl = CertificateList.getInstance(
           X509Util.toDerEncoded(IoUtil.read(inFile)));
 
@@ -465,7 +468,8 @@ public class Actions {
      *           If getting signer failed.
      */
     protected abstract ConcurrentContentSigner getSigner(
-         SignatureAlgoControl signatureAlgoControl) throws Exception;
+         SignatureAlgoControl signatureAlgoControl)
+             throws Exception;
 
     protected List<X509Cert> getPeerCertificates()
         throws CertificateException, IOException {
@@ -491,7 +495,8 @@ public class Actions {
     } // method getPeerCertificates
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       hashAlgo = hashAlgo.trim().toUpperCase();
       if (hashAlgo.indexOf('-') != -1) {
         hashAlgo = hashAlgo.replaceAll("-", "");
@@ -753,7 +758,8 @@ public class Actions {
       return Collections.emptyList();
     }
 
-    protected List<Extension> getAdditionalExtensions() throws BadInputException {
+    protected List<Extension> getAdditionalExtensions()
+        throws BadInputException {
       return Collections.emptyList();
     }
 
@@ -778,7 +784,8 @@ public class Actions {
 
     private PKCS10CertificationRequest generateRequest(ConcurrentContentSigner signer,
         SubjectPublicKeyInfo subjectPublicKeyInfo, X500Name subjectDn,
-        Map<ASN1ObjectIdentifier, ASN1Encodable> attributes) throws XiSecurityException {
+        Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
+            throws XiSecurityException {
       Args.notNull(signer, "signer");
       Args.notNull(subjectPublicKeyInfo, "subjectPublicKeyInfo");
       Args.notNull(subjectDn, "subjectDn");
@@ -804,7 +811,8 @@ public class Actions {
       }
     } // method generateRequest
 
-    private List<String> resolveExtensionTypes(List<String> types) throws IllegalCmdParamException {
+    private List<String> resolveExtensionTypes(List<String> types)
+        throws IllegalCmdParamException {
       List<String> list = new ArrayList<>(types.size());
       for (String m : types) {
         String id = ExtensionNameCompleter.getIdForExtensionName(m);
@@ -841,7 +849,8 @@ public class Actions {
     private String keystorePassword;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       CertificationRequest csr = X509Util.parseCsr(IoUtil.read(csrFile));
 
       ASN1ObjectIdentifier algOid = csr.getSignatureAlgorithm().getAlgorithm();
@@ -918,7 +927,8 @@ public class Actions {
     private String outFile;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (!(passwordHint == null ^ passwordFile == null)) {
         throw new IllegalCmdParamException(
             "exactly one of password and password-file must be specified");
@@ -965,7 +975,8 @@ public class Actions {
     private List<String> certFiles;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       File realKsFile = new File(IoUtil.expandFilepath(ksFile));
       KeyStore ks = KeyStore.getInstance(ksType);
       char[] password = readPasswordIfNotSet(ksPwd);
@@ -1056,7 +1067,8 @@ public class Actions {
     private String outKeyPass;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       KeyStore srcKs;
       if (StringUtil.isBlank(inProvider)) {
         srcKs = KeyStore.getInstance(inType);
@@ -1161,7 +1173,8 @@ public class Actions {
     private Integer quorum = 1;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       Args.range(quorum, "k", 1, 10);
 
       char[] password;
@@ -1213,7 +1226,8 @@ public class Actions {
     private String outFile;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       Args.range(mquorum, "mk", 1, 10);
       if (!(passwordHint == null ^ passwordFile == null)) {
         throw new IllegalCmdParamException(
@@ -1284,7 +1298,8 @@ public class Actions {
     private Integer mquorum = 1;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       Args.range(iterationCount, "iterationCount", 1, 65535);
       Args.range(quorum, "k", 1, 10);
       Args.range(mquorum, "mk", 1, 10);

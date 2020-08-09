@@ -70,7 +70,8 @@ public class SubjectToSubjectAltNameType extends ValidatableConf {
   }
 
   @Override
-  public void validate() throws InvalidConfException {
+  public void validate()
+      throws InvalidConfException {
     notNull(source, "source");
     validate(source);
     notNull(target, "target");

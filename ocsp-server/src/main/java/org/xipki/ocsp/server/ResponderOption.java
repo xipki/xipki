@@ -55,7 +55,8 @@ class ResponderOption {
 
   private final List<String> servletPaths;
 
-  ResponderOption(OcspServerConf.Responder conf) throws InvalidConfException {
+  ResponderOption(OcspServerConf.Responder conf)
+      throws InvalidConfException {
     notNull(conf, "conf");
     String str = conf.getMode();
     if (str == null || "RFC6960".equalsIgnoreCase(str) || "RFC 6960".equalsIgnoreCase(str)) {

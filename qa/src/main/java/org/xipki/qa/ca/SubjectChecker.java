@@ -130,7 +130,8 @@ public class SubjectChecker {
   } // method checkSubject
 
   private ValidationIssue checkSubjectAttribute(ASN1ObjectIdentifier type, X500Name subject,
-      X500Name requestedSubject) throws BadCertTemplateException {
+      X500Name requestedSubject)
+          throws BadCertTemplateException {
     boolean multiValuedRdn = subjectControl.getGroup(type) != null;
     if (multiValuedRdn) {
       return checkSubjectAttributeMultiValued(type, subject, requestedSubject);
@@ -140,7 +141,8 @@ public class SubjectChecker {
   } // method checkSubjectAttribute
 
   private ValidationIssue checkSubjectAttributeNotMultiValued(ASN1ObjectIdentifier type,
-      X500Name subject, X500Name requestedSubject) throws BadCertTemplateException {
+      X500Name subject, X500Name requestedSubject)
+          throws BadCertTemplateException {
     ValidationIssue issue = createSubjectIssue(type);
 
     // control
@@ -222,7 +224,8 @@ public class SubjectChecker {
   } // method checkSubjectAttributeNotMultiValued
 
   private ValidationIssue checkSubjectAttributeMultiValued(ASN1ObjectIdentifier type,
-      X500Name subject, X500Name requestedSubject) throws BadCertTemplateException {
+      X500Name subject, X500Name requestedSubject)
+          throws BadCertTemplateException {
     ValidationIssue issue = createSubjectIssue(type);
 
     RDN[] rdns = subject.getRDNs(type);
@@ -306,7 +309,8 @@ public class SubjectChecker {
 
   private void checkAttributeTypeAndValue(String name, ASN1ObjectIdentifier type,
       String atvTextValue, RdnControl rdnControl, List<String> requestedCoreAtvTextValues,
-      int index, StringBuilder failureMsg) throws BadCertTemplateException {
+      int index, StringBuilder failureMsg)
+          throws BadCertTemplateException {
     if (atvTextValue != null && ObjectIdentifiers.DN.emailAddress.equals(type)) {
       atvTextValue = atvTextValue.toLowerCase();
     }

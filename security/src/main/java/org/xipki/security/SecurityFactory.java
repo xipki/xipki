@@ -124,7 +124,8 @@ public interface SecurityFactory {
    *         If the publicKey is invalid or unsupported.
    */
   ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey,
-      DHSigStaticKeyCertPair ownerKeyAndCert) throws InvalidKeyException;
+      DHSigStaticKeyCertPair ownerKeyAndCert)
+          throws InvalidKeyException;
 
   /**
    * Gets the ContentVerifierProvider from the certificate.
@@ -201,7 +202,8 @@ public interface SecurityFactory {
    * @throws InvalidKeyException
    *         if could not create public key.
    */
-  PublicKey generatePublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo) throws InvalidKeyException;
+  PublicKey generatePublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo)
+      throws InvalidKeyException;
 
   /**
    * Extracts the keystore with minimal required information.
@@ -229,7 +231,8 @@ public interface SecurityFactory {
    *          If case 3 occurs.
    */
   byte[] extractMinimalKeyStore(String keystoreType, byte[] keystoreBytes, String keyname,
-      char[] password, X509Cert[] newCertChain) throws KeyStoreException;
+      char[] password, X509Cert[] newCertChain)
+          throws KeyStoreException;
 
   SecureRandom getRandom4Sign();
 
@@ -237,6 +240,7 @@ public interface SecurityFactory {
 
   int getDfltSignerParallelism();
 
-  void refreshTokenForSignerType(String signerType) throws XiSecurityException;
+  void refreshTokenForSignerType(String signerType)
+      throws XiSecurityException;
 
 }

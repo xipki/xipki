@@ -286,7 +286,8 @@ public class HttpScepServlet extends HttpServlet {
     }
   } // method service0
 
-  protected PKIMessage generatePkiMessage(InputStream is) throws IOException {
+  protected PKIMessage generatePkiMessage(InputStream is)
+      throws IOException {
     ASN1InputStream asn1Stream = new ASN1InputStream(is);
 
     try {

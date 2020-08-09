@@ -83,7 +83,8 @@ class SM2Signer {
     this.digest = HashAlgo.SM3.createDigest();
   } // constructor
 
-  public byte[] generateSignatureForMessage(byte[] userId, byte[] message) throws CryptoException {
+  public byte[] generateSignatureForMessage(byte[] userId, byte[] message)
+      throws CryptoException {
     // CHECKSTYLE:SKIP
     byte[] z;
     if (userId == null) {
@@ -105,7 +106,8 @@ class SM2Signer {
   } // method generateSignatureForMessage
 
   // CHECKSTYLE:SKIP
-  public byte[] generateSignatureForHash(byte[] eHash) throws CryptoException {
+  public byte[] generateSignatureForHash(byte[] eHash)
+      throws CryptoException {
     BigInteger n = ecParams.getN();
     BigInteger e = new BigInteger(1, eHash);
     BigInteger d = ((ECPrivateKeyParameters)ecKey).getD();

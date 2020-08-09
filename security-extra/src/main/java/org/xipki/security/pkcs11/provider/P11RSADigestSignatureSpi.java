@@ -152,12 +152,14 @@ public class P11RSADigestSignatureSpi extends SignatureSpi {
   }
 
   @Override
-  protected void engineInitVerify(PublicKey publicKey) throws InvalidKeyException {
+  protected void engineInitVerify(PublicKey publicKey)
+      throws InvalidKeyException {
     throw new UnsupportedOperationException("engineVerify unsupported");
   }
 
   @Override
-  protected void engineInitSign(PrivateKey privateKey) throws InvalidKeyException {
+  protected void engineInitSign(PrivateKey privateKey)
+      throws InvalidKeyException {
     if (!(privateKey instanceof P11PrivateKey)) {
       throw new InvalidKeyException("privateKey is not instanceof "
           + P11PrivateKey.class.getName());
@@ -173,17 +175,20 @@ public class P11RSADigestSignatureSpi extends SignatureSpi {
   }
 
   @Override
-  protected void engineUpdate(byte input) throws SignatureException {
+  protected void engineUpdate(byte input)
+      throws SignatureException {
     digest.update(input);
   }
 
   @Override
-  protected void engineUpdate(byte[] input, int off, int len) throws SignatureException {
+  protected void engineUpdate(byte[] input, int off, int len)
+      throws SignatureException {
     digest.update(input, off, len);
   }
 
   @Override
-  protected byte[] engineSign() throws SignatureException {
+  protected byte[] engineSign()
+      throws SignatureException {
     byte[] hash = new byte[digest.getDigestSize()];
     digest.doFinal(hash, 0);
 
@@ -198,7 +203,8 @@ public class P11RSADigestSignatureSpi extends SignatureSpi {
   }
 
   @Override
-  protected boolean engineVerify(byte[] sigBytes) throws SignatureException {
+  protected boolean engineVerify(byte[] sigBytes)
+      throws SignatureException {
     throw new UnsupportedOperationException("engineVerify unsupported");
   }
 
@@ -222,7 +228,8 @@ public class P11RSADigestSignatureSpi extends SignatureSpi {
     return null;
   }
 
-  private byte[] derEncode(byte[] hash) throws IOException {
+  private byte[] derEncode(byte[] hash)
+      throws IOException {
     if (digestAlgId == null) {
       // For raw RSA, the DigestInfo must be prepared externally
       return hash;

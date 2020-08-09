@@ -98,7 +98,8 @@ public class InitDbMain {
     }
   } // method main
 
-  private static void exec(String dbConfFile, String dbSchemaFile, boolean force) throws Exception {
+  private static void exec(String dbConfFile, String dbSchemaFile, boolean force)
+      throws Exception {
     Properties props = new Properties();
     props.load(Files.newInputStream(Paths.get(IoUtil.expandFilepath(dbConfFile))));
     LiquibaseMain.DatabaseConf dbConf = LiquibaseMain.DatabaseConf.getInstance(props, null);
@@ -155,7 +156,8 @@ public class InitDbMain {
     System.out.println(msg);
   } // method printDatabaseInfo
 
-  private static boolean confirm(String command) throws IOException {
+  private static boolean confirm(String command)
+      throws IOException {
     String prompt = "Do you wish to " + command + " the database (Yes/No)? ";
     String answer = IoUtil.readLineFromConsole(prompt);
     return "yes".equalsIgnoreCase(answer) || "y".equalsIgnoreCase(answer);

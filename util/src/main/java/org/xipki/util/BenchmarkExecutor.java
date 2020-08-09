@@ -64,7 +64,8 @@ public abstract class BenchmarkExecutor {
     this.processLog = new ProcessLog(total);
   }
 
-  protected abstract Runnable getTestor() throws Exception;
+  protected abstract Runnable getTestor()
+      throws Exception;
 
   protected long getRealAccount(long account) {
     return account;

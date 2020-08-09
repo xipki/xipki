@@ -101,7 +101,8 @@ public class PublicKeyChecker {
     return resultIssues;
   } // method checkPublicKey
 
-  private void checkPublicKey(SubjectPublicKeyInfo publicKey) throws BadCertTemplateException {
+  private void checkPublicKey(SubjectPublicKeyInfo publicKey)
+      throws BadCertTemplateException {
     if (isEmpty(keyAlgorithms)) {
       return;
     }

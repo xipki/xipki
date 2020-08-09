@@ -60,7 +60,8 @@ public class XiOCSPReqBuilder {
       this.extensions = extensions;
     }
 
-    public Request toRequest() throws Exception {
+    public Request toRequest()
+        throws Exception {
       return new Request(certId, extensions);
     }
   }
@@ -172,11 +173,13 @@ public class XiOCSPReqBuilder {
    * @throws OCSPException
    *           If OCSP request cannot be built.
    */
-  public OCSPRequest build() throws OCSPException {
+  public OCSPRequest build()
+      throws OCSPException {
     return generateRequest(null, null);
   }
 
-  public OCSPRequest build(ContentSigner signer, Certificate[] chain) throws OCSPException {
+  public OCSPRequest build(ContentSigner signer, Certificate[] chain)
+      throws OCSPException {
     if (signer == null) {
       throw new IllegalArgumentException("no signer specified");
     }

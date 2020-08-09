@@ -111,7 +111,8 @@ public class KeyUtil {
   private KeyUtil() {
   }
 
-  public static KeyStore getKeyStore(String storeType) throws KeyStoreException {
+  public static KeyStore getKeyStore(String storeType)
+      throws KeyStoreException {
     notBlank(storeType, "storeType");
     if ("JCEKS".equalsIgnoreCase(storeType)) {
       return KeyStore.getInstance(storeType);
@@ -126,7 +127,8 @@ public class KeyUtil {
 
   // CHECKSTYLE:SKIP
   public static KeyPair generateRSAKeypair(int keysize, BigInteger publicExponent,
-      SecureRandom random) throws NoSuchAlgorithmException, NoSuchProviderException,
+      SecureRandom random)
+          throws NoSuchAlgorithmException, NoSuchProviderException,
       InvalidAlgorithmParameterException {
     BigInteger tmpPublicExponent = publicExponent;
     if (tmpPublicExponent == null) {
@@ -258,7 +260,8 @@ public class KeyUtil {
     }
   } // method convertXDHToDummyEdDSAPrivateKey
 
-  private static KeyFactory getKeyFactory(String algorithm) throws InvalidKeySpecException {
+  private static KeyFactory getKeyFactory(String algorithm)
+      throws InvalidKeySpecException {
     String alg = algorithm.toUpperCase();
     if ("ECDSA".equals(alg)) {
       alg = "EC";
@@ -504,7 +507,8 @@ public class KeyUtil {
 
   // CHECKSTYLE:SKIP
   public static ECPublicKey createECPublicKey(byte[] encodedAlgorithmIdParameters,
-      byte[] encodedPoint) throws InvalidKeySpecException {
+      byte[] encodedPoint)
+          throws InvalidKeySpecException {
     notNull(encodedAlgorithmIdParameters, "encodedAlgorithmIdParameters");
     notNull(encodedPoint, "encodedPoint");
 

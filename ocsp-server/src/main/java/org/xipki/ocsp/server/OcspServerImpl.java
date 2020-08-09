@@ -262,7 +262,8 @@ public class OcspServerImpl implements OcspServer {
   }
 
   @Override
-  public ResponderAndPath getResponderForPath(String path) throws UnsupportedEncodingException {
+  public ResponderAndPath getResponderForPath(String path)
+      throws UnsupportedEncodingException {
     for (String servletPath : servletPaths) {
       if (path.startsWith(servletPath)) {
         return new ResponderAndPath(servletPath, path2responderMap.get(servletPath));
@@ -280,11 +281,13 @@ public class OcspServerImpl implements OcspServer {
     return initialized.get();
   }
 
-  public void init() throws InvalidConfException, DataAccessException, PasswordResolverException {
+  public void init()
+      throws InvalidConfException, DataAccessException, PasswordResolverException {
     init(true);
   }
 
-  public void init(boolean force) throws InvalidConfException, PasswordResolverException {
+  public void init(boolean force)
+      throws InvalidConfException, PasswordResolverException {
     LOG.info("starting OCSPResponder server ...");
     if (initialized.get()) {
       if (!force) {
@@ -312,7 +315,8 @@ public class OcspServerImpl implements OcspServer {
     }
   } // method init
 
-  private void init0() throws OcspStoreException, InvalidConfException, PasswordResolverException {
+  private void init0()
+      throws OcspStoreException, InvalidConfException, PasswordResolverException {
     if (confFile == null) {
       throw new IllegalStateException("confFile is not set");
     }
@@ -902,7 +906,8 @@ public class OcspServerImpl implements OcspServer {
   private OcspRespWithCacheInfo processCertReq(AtomicBoolean unknownAsRevoked,
       CertID certId, OCSPRespBuilder builder,
       ResponderImpl responder, RequestOption reqOpt, OcspServerConf.ResponseOption repOpt,
-      OcspRespControl repControl) throws IOException {
+      OcspRespControl repControl)
+          throws IOException {
     HashAlgo reqHashAlgo = certId.getIssuer().hashAlgorithm();
     if (!reqOpt.allows(reqHashAlgo)) {
       LOG.warn("CertID.hashAlgorithm {} not allowed", reqHashAlgo);
@@ -1108,11 +1113,13 @@ public class OcspServerImpl implements OcspServer {
     return result;
   } // method healthCheck
 
-  public void refreshTokenForSignerType(String signerType) throws XiSecurityException {
+  public void refreshTokenForSignerType(String signerType)
+      throws XiSecurityException {
     securityFactory.refreshTokenForSignerType(signerType);
   }
 
-  private ResponseSigner initSigner(OcspServerConf.Signer signerType) throws InvalidConfException {
+  private ResponseSigner initSigner(OcspServerConf.Signer signerType)
+      throws InvalidConfException {
     X509Cert[] explicitCertificateChain = null;
 
     X509Cert explicitResponderCert = null;
@@ -1363,13 +1370,15 @@ public class OcspServerImpl implements OcspServer {
     return (bo == null) ? defaultValue : bo.booleanValue();
   }
 
-  private static InputStream getInputStream(FileOrBinary conf) throws IOException {
+  private static InputStream getInputStream(FileOrBinary conf)
+      throws IOException {
     return (conf.getFile() != null)
         ? Files.newInputStream(Paths.get(IoUtil.expandFilepath(conf.getFile())))
         : new ByteArrayInputStream(conf.getBinary());
   }
 
-  private static InputStream getInputStream(FileOrValue conf) throws IOException {
+  private static InputStream getInputStream(FileOrValue conf)
+      throws IOException {
     return (conf.getFile() != null)
         ? Files.newInputStream(Paths.get(IoUtil.expandFilepath(conf.getFile())))
         : new ByteArrayInputStream(StringUtil.toUtf8Bytes(conf.getValue()));
@@ -1387,7 +1396,8 @@ public class OcspServerImpl implements OcspServer {
     }
   }
 
-  private static X509Cert parseCert(FileOrBinary certConf) throws InvalidConfException {
+  private static X509Cert parseCert(FileOrBinary certConf)
+      throws InvalidConfException {
     InputStream is = null;
     try {
       is = getInputStream(certConf);
@@ -1403,7 +1413,8 @@ public class OcspServerImpl implements OcspServer {
     }
   } // method parseCert
 
-  private static OcspServerConf parseConf(String confFilename) throws InvalidConfException {
+  private static OcspServerConf parseConf(String confFilename)
+      throws InvalidConfException {
     try (InputStream is = Files.newInputStream(
           Paths.get(IoUtil.expandFilepath(confFilename)))) {
       OcspServerConf root = JSON.parseObject(is, OcspServerConf.class);

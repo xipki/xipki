@@ -42,17 +42,20 @@ public class DigestOutputStream extends OutputStream {
   }
 
   @Override
-  public void write(byte[] bytes, int off, int len) throws IOException {
+  public void write(byte[] bytes, int off, int len)
+      throws IOException {
     digest.update(bytes, off, len);
   }
 
   @Override
-  public void write(byte[] bytes) throws IOException {
+  public void write(byte[] bytes)
+      throws IOException {
     digest.update(bytes, 0, bytes.length);
   }
 
   @Override
-  public void write(int oneByte) throws IOException {
+  public void write(int oneByte)
+      throws IOException {
     digest.update((byte) oneByte);
   }
 

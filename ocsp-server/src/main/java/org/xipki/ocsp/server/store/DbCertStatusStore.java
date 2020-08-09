@@ -286,7 +286,8 @@ public class DbCertStatusStore extends OcspStore {
   @Override
   protected CertStatusInfo getCertStatus0(Date time, RequestIssuer reqIssuer,
       BigInteger serialNumber, boolean includeCertHash, boolean includeRit,
-      boolean inheritCaRevocation) throws OcspStoreException {
+      boolean inheritCaRevocation)
+          throws OcspStoreException {
     if (serialNumber.signum() != 1) { // non-positive serial number
       return CertStatusInfo.getUnknownCertStatusInfo(new Date(), null);
     }
@@ -490,7 +491,8 @@ public class DbCertStatusStore extends OcspStore {
    * @return the next idle preparedStatement, {@code null} will be returned if no
    *     PreparedStatement can be created within 5 seconds.
    */
-  private PreparedStatement preparedStatement(String sqlQuery) throws DataAccessException {
+  private PreparedStatement preparedStatement(String sqlQuery)
+      throws DataAccessException {
     return datasource.prepareStatement(sqlQuery);
   }
 
@@ -648,7 +650,8 @@ public class DbCertStatusStore extends OcspStore {
     return certs;
   }
 
-  public static HashAlgo getCertHashAlgo(DataSourceWrapper datasource) throws DataAccessException {
+  public static HashAlgo getCertHashAlgo(DataSourceWrapper datasource)
+      throws DataAccessException {
     // analyze the database
     String certHashAlgoStr = datasource.getFirstValue(null, "DBSCHEMA", "VALUE2",
         "NAME='CERTHASH_ALGO'", String.class);

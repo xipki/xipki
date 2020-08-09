@@ -105,7 +105,8 @@ public class CaClientExample {
     return path.startsWith("~") ? System.getProperty("user.home") + path.substring(1) : path;
   }
 
-  protected static MyKeypair generateRsaKeypair() throws Exception {
+  protected static MyKeypair generateRsaKeypair()
+      throws Exception {
     KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA");
     kpGen.initialize(2048);
 
@@ -119,7 +120,8 @@ public class CaClientExample {
     return new MyKeypair(kp.getPrivate(), subjectPublicKeyInfo);
   }
 
-  protected static MyKeypair generateEcKeypair() throws GeneralSecurityException {
+  protected static MyKeypair generateEcKeypair()
+      throws GeneralSecurityException {
     KeyPairGenerator kpGen = KeyPairGenerator.getInstance("EC");
     ECGenParameterSpec spec = new ECGenParameterSpec("secp256r1");
     kpGen.initialize(spec);
@@ -137,7 +139,8 @@ public class CaClientExample {
     return new MyKeypair(kp.getPrivate(), subjectPublicKeyInfo);
   }
 
-  protected static MyKeypair generateDsaKeypair() throws Exception {
+  protected static MyKeypair generateDsaKeypair()
+      throws Exception {
     // plen: 2048, qlen: 256
     DSAParameterSpec spec = new DSAParameterSpec(P2048_Q256_P, P2048_Q256_Q, P2048_Q256_G);
     KeyPairGenerator kpGen = KeyPairGenerator.getInstance("DSA");
@@ -164,7 +167,8 @@ public class CaClientExample {
   }
 
   protected static CertificationRequest genCsr(MyKeypair keypair, String subject,
-      String challengePassword) throws GeneralSecurityException, OperatorCreationException {
+      String challengePassword)
+          throws GeneralSecurityException, OperatorCreationException {
     X500Name subjectDn = new X500Name(subject);
 
     PKCS10CertificationRequestBuilder csrBuilder = new PKCS10CertificationRequestBuilder(

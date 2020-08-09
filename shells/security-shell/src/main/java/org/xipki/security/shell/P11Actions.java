@@ -96,7 +96,8 @@ public class P11Actions {
     private String certFile;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       byte[] id0 = (id == null) ? null : Hex.decode(id);
       X509Cert cert = X509Util.parseCert(new File(certFile));
       if (label == null) {
@@ -124,7 +125,8 @@ public class P11Actions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (force || confirm("Do you want to remove PKCS#11 certificate object with id 0x" + id, 3)) {
         P11Slot slot = getSlot();
         P11ObjectIdentifier objectId = slot.getObjectId(Hex.decode(id), null);
@@ -166,7 +168,8 @@ public class P11Actions {
     private String outFile;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       P11Slot slot = getSlot();
       P11ObjectIdentifier objIdentifier = getObjectIdentifier(id, label);
       X509Cert cert = slot.exportCert(objIdentifier);
@@ -199,7 +202,8 @@ public class P11Actions {
     private String certFile;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       P11Slot slot = getSlot();
       P11ObjectIdentifier objIdentifier = getObjectIdentifier(id, label);
       X509Cert newCert = X509Util.parseCert(new File(certFile));
@@ -290,7 +294,8 @@ public class P11Actions {
     private Integer qlen;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (plen % 1024 != 0) {
         throw new IllegalCmdParamException("plen is not multiple of 1024: " + plen);
       }
@@ -322,7 +327,8 @@ public class P11Actions {
     private String curveName = "secp256r1";
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       P11Slot slot = getSlot();
       P11NewKeyControl control = getControl();
 
@@ -366,7 +372,8 @@ public class P11Actions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       P11Slot slot = getSlot();
       P11ObjectIdentifier keyId = getObjectIdentifier(id, label);
       if (keyId == null) {
@@ -404,12 +411,14 @@ public class P11Actions {
     @Completion(SecurityCompleters.P11KeyUsageCompleter.class)
     private List<String> keyusages;
 
-    protected void finalize(String keyType, P11IdentityId identityId) throws Exception {
+    protected void finalize(String keyType, P11IdentityId identityId)
+        throws Exception {
       Args.notNull(identityId, "identityId");
       println("generated " + keyType + " key \"" + identityId + "\"");
     }
 
-    protected P11NewKeyControl getControl() throws IllegalCmdParamException {
+    protected P11NewKeyControl getControl()
+        throws IllegalCmdParamException {
       byte[] id0 = (id == null) ? null : Hex.decode(id);
       P11NewKeyControl control = new P11NewKeyControl(id0, label);
       if (StringUtil.isNotBlank(extractable)) {
@@ -446,7 +455,8 @@ public class P11Actions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (force || confirm("Do you want to remove the PKCS#11 objects (id = " + id
           + ", label = " + label + ")", 3)) {
         P11Slot slot = getSlot();
@@ -474,7 +484,8 @@ public class P11Actions {
     P11CryptServiceFactory p11CryptServiceFactory;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
       if (p11Service == null) {
         throw new IllegalCmdParamException("undefined module " + moduleName);
@@ -497,7 +508,8 @@ public class P11Actions {
     private String publicExponent = "0x10001";
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (keysize % 1024 != 0) {
         throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
       }
@@ -532,7 +544,8 @@ public class P11Actions {
     private Boolean createExternIfGenUnsupported = Boolean.FALSE;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (keysize % 8 != 0) {
         throw new IllegalCmdParamException("keysize is not multiple of 8: " + keysize);
       }
@@ -613,7 +626,8 @@ public class P11Actions {
     private String password;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       long p11KeyType;
       if ("AES".equalsIgnoreCase(keyType)) {
         p11KeyType = PKCS11Constants.CKK_AES;
@@ -660,7 +674,8 @@ public class P11Actions {
       return null;
     } // method execute0
 
-    protected char[] getPassword() throws IOException {
+    protected char[] getPassword()
+        throws IOException {
       char[] pwdInChar = readPasswordIfNotSet(password);
       if (pwdInChar != null) {
         password = new String(pwdInChar);
@@ -724,7 +739,8 @@ public class P11Actions {
   public static class Sm2P11 extends P11KeyGenAction {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       P11Slot slot = getSlot();
       P11IdentityId identityId = slot.generateSM2Keypair(getControl());
       finalize("SM2", identityId);
@@ -751,7 +767,8 @@ public class P11Actions {
     protected P11CryptServiceFactory p11CryptServiceFactory;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
       if (p11Service == null) {
         throw new IllegalCmdParamException("undefined module " + moduleName);

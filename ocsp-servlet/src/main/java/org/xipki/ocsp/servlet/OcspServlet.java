@@ -257,7 +257,8 @@ public class OcspServlet extends HttpServlet {
     resp.setContentLength(0);
   }
 
-  private static byte[] base64Decode(byte[] b64OcspReqBytes) throws UnsupportedEncodingException {
+  private static byte[] base64Decode(byte[] b64OcspReqBytes)
+      throws UnsupportedEncodingException {
     final int len = b64OcspReqBytes.length;
     if (Base64.containsOnlyBase64Chars(b64OcspReqBytes, 0, len)) {
       // Base64 encoded, no URL decoding is required

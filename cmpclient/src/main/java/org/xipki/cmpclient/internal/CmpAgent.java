@@ -253,7 +253,8 @@ class CmpAgent {
     }
   } // constructor
 
-  private byte[] send(byte[] request) throws IOException {
+  private byte[] send(byte[] request)
+      throws IOException {
     notNull(request, "request");
     HttpURLConnection httpUrlConnection = IoUtil.openHttpConn(serverUrl);
     if (httpUrlConnection instanceof HttpsURLConnection) {
@@ -301,7 +302,8 @@ class CmpAgent {
     return IoUtil.read(inputStream);
   } // method send
 
-  private PKIMessage sign(PKIMessage request) throws CmpClientException {
+  private PKIMessage sign(PKIMessage request)
+      throws CmpClientException {
     notNull(request, "request");
     if (requestor == null) {
       throw new CmpClientException("no request signer is configured");
@@ -412,7 +414,8 @@ class CmpAgent {
   } // method signAndSend
 
   private ASN1Encodable extractGeneralRepContent(VerifiedPkiMessage response, String expectedType,
-      boolean requireProtectionCheck) throws CmpClientException, PkiErrorException {
+      boolean requireProtectionCheck)
+          throws CmpClientException, PkiErrorException {
     notNull(response, "response");
     notNull(expectedType, "expectedType");
     if (requireProtectionCheck) {
@@ -671,7 +674,8 @@ class CmpAgent {
     return new PKIMessage(header, body);
   } // method buildMessageWithGeneralMsgContent
 
-  private void checkProtection(VerifiedPkiMessage response) throws PkiErrorException {
+  private void checkProtection(VerifiedPkiMessage response)
+      throws PkiErrorException {
     notNull(response, "response");
 
     if (!response.hasProtection()) {
@@ -703,7 +707,8 @@ class CmpAgent {
     this.sendRequestorCert = sendRequestorCert;
   }
 
-  private static byte[] decrypt(EncryptedValue ev, char[] password) throws XiSecurityException {
+  private static byte[] decrypt(EncryptedValue ev, char[] password)
+      throws XiSecurityException {
     AlgorithmIdentifier symmAlg = ev.getSymmAlg();
     if (!PKCSObjectIdentifiers.id_PBES2.equals(symmAlg.getAlgorithm())) {
       throw new XiSecurityException("unsupported symmAlg " + symmAlg.getAlgorithm().getId());
@@ -967,14 +972,16 @@ class CmpAgent {
   } // method evaluateCrlResponse
 
   public RevokeCertResponse revokeCertificate(RevokeCertRequest request,
-      ReqRespDebug debug) throws CmpClientException, PkiErrorException {
+      ReqRespDebug debug)
+          throws CmpClientException, PkiErrorException {
     PKIMessage reqMessage = buildRevokeCertRequest(notNull(request, "request"));
     VerifiedPkiMessage response = signAndSend(reqMessage, debug);
     return parse(response, request.getRequestEntries());
   } // method revokeCertificate
 
   public RevokeCertResponse unrevokeCertificate(UnrevokeOrRemoveCertRequest request,
-      ReqRespDebug debug) throws CmpClientException, PkiErrorException {
+      ReqRespDebug debug)
+          throws CmpClientException, PkiErrorException {
     PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(notNull(request, "request"),
         CrlReason.REMOVE_FROM_CRL.getCode());
     VerifiedPkiMessage response = signAndSend(reqMessage, debug);
@@ -982,7 +989,8 @@ class CmpAgent {
   } // method unrevokeCertificate
 
   public RevokeCertResponse removeCertificate(UnrevokeOrRemoveCertRequest request,
-      ReqRespDebug debug) throws CmpClientException, PkiErrorException {
+      ReqRespDebug debug)
+          throws CmpClientException, PkiErrorException {
     PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(notNull(request, "request"),
             XiSecurityConstants.CMP_CRL_REASON_REMOVE);
     VerifiedPkiMessage response = signAndSend(reqMessage, debug);
@@ -1063,7 +1071,8 @@ class CmpAgent {
   } // method parse
 
   public EnrollCertResponse requestCertificate(CsrEnrollCertRequest csr, Date notBefore,
-      Date notAfter, ReqRespDebug debug) throws CmpClientException, PkiErrorException {
+      Date notAfter, ReqRespDebug debug)
+          throws CmpClientException, PkiErrorException {
     PKIMessage request = buildPkiMessage(notNull(csr, "csr"), notBefore, notAfter);
     Map<BigInteger, String> reqIdIdMap = new HashMap<>();
     reqIdIdMap.put(MINUS_ONE, csr.getId());
@@ -1240,7 +1249,8 @@ class CmpAgent {
   } // method requestCertificate0
 
   private PKIMessage buildCertConfirmRequest(ASN1OctetString tid,
-      CertificateConfirmationContentBuilder certConfirmBuilder) throws CmpClientException {
+      CertificateConfirmationContentBuilder certConfirmBuilder)
+          throws CmpClientException {
     PKIHeader header = buildPkiHeader(implicitConfirm, tid, null, (InfoTypeAndValue[]) null);
     CertificateConfirmationContent certConfirm;
     try {
@@ -1298,7 +1308,8 @@ class CmpAgent {
   } // method buildRevokeCertRequest
 
   private PKIMessage buildUnrevokeOrRemoveCertRequest(UnrevokeOrRemoveCertRequest request,
-      int reasonCode) throws CmpClientException {
+      int reasonCode)
+          throws CmpClientException {
     PKIHeader header = buildPkiHeader(null);
 
     List<UnrevokeOrRemoveCertRequest.Entry> requestEntries = request.getRequestEntries();

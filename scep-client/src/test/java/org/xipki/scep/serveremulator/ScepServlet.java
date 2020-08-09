@@ -222,7 +222,8 @@ public class ScepServlet extends HttpServlet {
     resp.getOutputStream().write(body);
   }
 
-  protected PKIMessage generatePkiMessage(InputStream is) throws IOException {
+  protected PKIMessage generatePkiMessage(InputStream is)
+      throws IOException {
     ASN1InputStream asn1Stream = new ASN1InputStream(Args.notNull(is, "is"));
 
     try {

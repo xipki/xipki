@@ -126,7 +126,8 @@ public class P12XdhMacContentSignerBuilder {
   private final X509Cert[] certificateChain;
 
   public P12XdhMacContentSignerBuilder(X509Cert peerCert,
-      PrivateKey privateKey, PublicKey publicKey) throws XiSecurityException {
+      PrivateKey privateKey, PublicKey publicKey)
+          throws XiSecurityException {
     notNull(privateKey, "privateKey");
     notNull(peerCert, "peerCert");
     this.publicKey = notNull(publicKey, "publicKey");
@@ -195,7 +196,8 @@ public class P12XdhMacContentSignerBuilder {
         new IssuerAndSerialNumber(X500Name.getInstance(trailingInfo), peerCert.getSerialNumber());
   } // method init
 
-  public ConcurrentContentSigner createSigner(int parallelism) throws XiSecurityException {
+  public ConcurrentContentSigner createSigner(int parallelism)
+      throws XiSecurityException {
     positive(parallelism, "parallelism");
 
     List<XiContentSigner> signers = new ArrayList<>(parallelism);

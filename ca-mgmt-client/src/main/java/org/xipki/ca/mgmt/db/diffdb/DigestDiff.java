@@ -78,7 +78,8 @@ class DigestDiff {
 
   public DigestDiff(DataSourceWrapper refDatasource, DataSourceWrapper targetDatasource,
       String reportDirName, boolean revokedOnly, AtomicBoolean stopMe, int numPerSelect,
-      int numThreads) throws IOException, DataAccessException {
+      int numThreads)
+          throws IOException, DataAccessException {
     this.refDatasource = Args.notNull(refDatasource, "refDatasource");
     this.revokedOnly = revokedOnly;
     this.targetDatasource = Args.notNull(targetDatasource, "targetDatasource");
@@ -125,7 +126,8 @@ class DigestDiff {
     this.includeCaCerts = includeCaCerts;
   }
 
-  public void diff() throws Exception {
+  public void diff()
+      throws Exception {
     Map<Integer, byte[]> caIdCertMap = getCas(targetDatasource, targetDbType);
 
     List<Integer> refCaIds = new LinkedList<>();
@@ -274,7 +276,8 @@ class DigestDiff {
     return caIdCertMap;
   } // method getCas
 
-  public static DbType detectDbType(DataSourceWrapper datasource) throws DataAccessException {
+  public static DbType detectDbType(DataSourceWrapper datasource)
+      throws DataAccessException {
     Connection conn = datasource.getConnection();
     try {
       String dbSchemaVersion = datasource.getFirstValue(

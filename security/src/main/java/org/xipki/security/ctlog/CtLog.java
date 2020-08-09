@@ -542,7 +542,8 @@ public class CtLog {
   }
 
   public static void update(Signature sig, byte version, long timestamp, byte[] sctExtensions,
-      byte[] issuerKeyHash, byte[] preCertTbsCert) throws SignatureException {
+      byte[] issuerKeyHash, byte[] preCertTbsCert)
+          throws SignatureException {
     sig.update(version);
     sig.update((byte) 0); // signature_type = certificate_timestamp
     byte[] timestampBytes = Pack.longToBigEndian(timestamp);

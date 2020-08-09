@@ -179,7 +179,8 @@ class OcspStoreQueryExecutor {
     this.certhashAlgo = HashAlgo.getNonNullInstance(str);
   } // constructor
 
-  private IssuerStore initIssuerStore() throws DataAccessException {
+  private IssuerStore initIssuerStore()
+      throws DataAccessException {
     final String sql = "SELECT ID,CERT FROM ISSUER";
     PreparedStatement ps = datasource.prepareStatement(sql);
     ResultSet rs = null;
@@ -210,7 +211,8 @@ class OcspStoreQueryExecutor {
   }
 
   private void addOrUpdateCert(X509Cert issuer, CertWithDbId certificate,
-      CertRevocationInfo revInfo) throws DataAccessException, OperationException {
+      CertRevocationInfo revInfo)
+          throws DataAccessException, OperationException {
     notNull(issuer, "issuer");
 
     boolean revoked = (revInfo != null);
@@ -329,7 +331,8 @@ class OcspStoreQueryExecutor {
     addOrUpdateCert(caCert, cert, revInfo);
   }
 
-  void unrevokeCert(X509Cert issuer, CertWithDbId cert) throws DataAccessException {
+  void unrevokeCert(X509Cert issuer, CertWithDbId cert)
+      throws DataAccessException {
     notNull(issuer, "issuer");
     notNull(cert, "cert");
 
@@ -380,7 +383,8 @@ class OcspStoreQueryExecutor {
 
   } // method unrevokeCert
 
-  void removeCert(X509Cert issuer, CertWithDbId cert) throws DataAccessException {
+  void removeCert(X509Cert issuer, CertWithDbId cert)
+      throws DataAccessException {
     notNull(issuer, "issuer");
     notNull(cert, "cert");
 
@@ -403,7 +407,8 @@ class OcspStoreQueryExecutor {
     }
   } // method removeCert
 
-  void revokeCa(X509Cert caCert, CertRevocationInfo revInfo) throws DataAccessException {
+  void revokeCa(X509Cert caCert, CertRevocationInfo revInfo)
+      throws DataAccessException {
     notNull(caCert, "caCert");
     notNull(revInfo, "revInfo");
 
@@ -422,7 +427,8 @@ class OcspStoreQueryExecutor {
     }
   } // method revokeCa
 
-  void unrevokeCa(X509Cert caCert) throws DataAccessException {
+  void unrevokeCa(X509Cert caCert)
+      throws DataAccessException {
     int issuerId = getIssuerId(caCert);
     final String sql = "UPDATE ISSUER SET REV_INFO=? WHERE ID=?";
     PreparedStatement ps = datasource.prepareStatement(sql);
@@ -438,7 +444,8 @@ class OcspStoreQueryExecutor {
     }
   } // method unrevokeCa
 
-  private int getIssuerId(X509Cert issuerCert) throws DataAccessException {
+  private int getIssuerId(X509Cert issuerCert)
+      throws DataAccessException {
     notNull(issuerCert, "issuerCert");
     Integer id = issuerStore.getIdForCert(issuerCert.getEncoded());
     if (id == null) {
@@ -448,7 +455,8 @@ class OcspStoreQueryExecutor {
     return id.intValue();
   } // method getIssuerId
 
-  void addIssuer(X509Cert issuerCert) throws DataAccessException {
+  void addIssuer(X509Cert issuerCert)
+      throws DataAccessException {
     if (issuerStore.getIdForCert(issuerCert.getEncoded()) != null) {
       return;
     }
@@ -490,7 +498,8 @@ class OcspStoreQueryExecutor {
    * Returns the database Id for the given issuer and serialNumber.
    * @return the database table id if registered, <code>null</code> otherwise.
    */
-  private Long getCertId(int issuerId, BigInteger serialNumber) throws DataAccessException {
+  private Long getCertId(int issuerId, BigInteger serialNumber)
+      throws DataAccessException {
     final String sql = sqlCertRegistered;
     ResultSet rs = null;
     PreparedStatement ps = datasource.prepareStatement(sql);

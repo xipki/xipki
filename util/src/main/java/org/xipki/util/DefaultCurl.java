@@ -53,7 +53,8 @@ public class DefaultCurl implements Curl {
     this.sslContextConf = sslContextConf;
   }
 
-  private synchronized void initIfNotDone() throws ObjectCreationException {
+  private synchronized void initIfNotDone()
+      throws ObjectCreationException {
     if (initException != null) {
       throw initException;
     }
@@ -82,7 +83,8 @@ public class DefaultCurl implements Curl {
 
   @Override
   public CurlResult curlGet(String url, boolean verbose, Map<String, String> headers,
-      String userPassword) throws Exception {
+      String userPassword)
+          throws Exception {
     checkUserPassword(userPassword);
 
     return curl(false, url, verbose, headers, userPassword, null);
@@ -90,12 +92,14 @@ public class DefaultCurl implements Curl {
 
   @Override
   public CurlResult curlPost(String url, boolean verbose, Map<String, String> headers,
-      String userPassword, byte[] content) throws Exception {
+      String userPassword, byte[] content)
+          throws Exception {
     return curl(true, url, verbose, headers, userPassword, content);
   }
 
   private CurlResult curl(boolean post, String url, boolean verbose, Map<String, String> headers,
-      String userPassword, byte[] content) throws Exception {
+      String userPassword, byte[] content)
+          throws Exception {
     if (!post && content != null) {
       throw new IllegalArgumentException("method GET cannot be used to transfer non-empty content");
     }

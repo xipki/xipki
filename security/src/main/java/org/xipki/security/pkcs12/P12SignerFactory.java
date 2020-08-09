@@ -83,7 +83,8 @@ public class P12SignerFactory implements SignerFactory {
 
   @Override
   public ConcurrentContentSigner newSigner(String type, SignerConf conf,
-      X509Cert[] certificateChain) throws ObjectCreationException {
+      X509Cert[] certificateChain)
+          throws ObjectCreationException {
     if (!canCreateSigner(type)) {
       throw new ObjectCreationException("unknown signer type " + type);
     }
@@ -190,11 +191,13 @@ public class P12SignerFactory implements SignerFactory {
   } // method newSigner
 
   @Override
-  public void refreshToken(String type) throws XiSecurityException {
+  public void refreshToken(String type)
+      throws XiSecurityException {
     // Nothing to do.
   }
 
-  private static InputStream getInputStream(String str) throws ObjectCreationException {
+  private static InputStream getInputStream(String str)
+      throws ObjectCreationException {
     if (StringUtil.startsWithIgnoreCase(str, "base64:")) {
       return new ByteArrayInputStream(Base64.decode(str.substring("base64:".length())));
     } else if (StringUtil.startsWithIgnoreCase(str, "file:")) {

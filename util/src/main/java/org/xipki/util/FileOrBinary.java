@@ -60,11 +60,13 @@ public class FileOrBinary extends ValidatableConf {
   }
 
   @Override
-  public void validate() throws InvalidConfException {
+  public void validate()
+      throws InvalidConfException {
     exactOne(file, "file", binary, "binary");
   }
 
-  public byte[] readContent() throws IOException {
+  public byte[] readContent()
+      throws IOException {
     if (binary != null) {
       return binary;
     }

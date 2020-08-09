@@ -66,7 +66,8 @@ class OcspCertstoreDbExporter extends DbPorter {
   private final boolean resume;
 
   OcspCertstoreDbExporter(DataSourceWrapper datasource, String baseDir, int numCertsInBundle,
-      int numCertsPerSelect, boolean resume, AtomicBoolean stopMe) throws Exception {
+      int numCertsPerSelect, boolean resume, AtomicBoolean stopMe)
+          throws Exception {
     super(datasource, baseDir, stopMe);
 
     this.numCertsInBundle = Args.positive(numCertsInBundle, "numCertsInBundle");
@@ -81,7 +82,8 @@ class OcspCertstoreDbExporter extends DbPorter {
     this.resume = resume;
   } // constructor
 
-  public void export() throws Exception {
+  public void export()
+      throws Exception {
     OcspCertstore certstore;
     if (resume) {
       try (InputStream is = Files.newInputStream(Paths.get(baseDir, FILENAME_OCSP_CERTSTORE))) {
@@ -119,7 +121,8 @@ class OcspCertstoreDbExporter extends DbPorter {
     }
   } // method export
 
-  private void exportHashAlgo(OcspCertstore certstore) throws DataAccessException {
+  private void exportHashAlgo(OcspCertstore certstore)
+      throws DataAccessException {
     String certHashAlgoStr = dbSchemaInfo.getVariableValue("CERTHASH_ALGO");
     if (certHashAlgoStr == null) {
       throw new DataAccessException("CERTHASH_ALGO is not defined in table DBSCHEMA");
@@ -128,7 +131,8 @@ class OcspCertstoreDbExporter extends DbPorter {
     certstore.setCerthashAlgo(certHashAlgoStr);
   } // method exportHashAlgo
 
-  private void exportIssuer(OcspCertstore certstore) throws DataAccessException, IOException {
+  private void exportIssuer(OcspCertstore certstore)
+      throws DataAccessException, IOException {
     System.out.println("exporting table ISSUER");
     List<OcspCertstore.Issuer> issuers = new LinkedList<>();
     certstore.setIssuers(issuers);
@@ -168,7 +172,8 @@ class OcspCertstoreDbExporter extends DbPorter {
     System.out.println(" exported table ISSUER");
   } // method exportIssuer
 
-  private void exportCrlInfo(OcspCertstore certstore) throws DataAccessException, IOException {
+  private void exportCrlInfo(OcspCertstore certstore)
+      throws DataAccessException, IOException {
     System.out.println("exporting table CRL_INFO");
     List<OcspCertstore.CrlInfo> crlInfos = new LinkedList<>();
     certstore.setCrlInfos(crlInfos);

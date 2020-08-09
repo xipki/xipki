@@ -147,7 +147,8 @@ public class X509ProfileType extends ValidatableConf {
   @JSONField(ordinal = 14)
   private List<ExtensionType> extensions;
 
-  public static X509ProfileType parse(InputStream confStream) throws CertprofileException {
+  public static X509ProfileType parse(InputStream confStream)
+      throws CertprofileException {
     Args.notNull(confStream, "confStream");
     try {
       X509ProfileType root = JSON.parseObject(confStream, X509ProfileType.class);
@@ -333,7 +334,8 @@ public class X509ProfileType extends ValidatableConf {
   } // method toXiKeyAlgorithms
 
   @Override
-  public void validate() throws InvalidConfException {
+  public void validate()
+      throws InvalidConfException {
     notNull(version, "version");
     notNull(certLevel, "certLevel");
     notBlank(validity, "validity");

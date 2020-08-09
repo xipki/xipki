@@ -165,7 +165,8 @@ public class QaOcspActions {
     private TripleState expectedNonceOccurrence;
 
     @Override
-    protected final Object execute0() throws Exception {
+    protected final Object execute0()
+        throws Exception {
       expectedCerthashOccurrence = TripleState.valueOf(certhashOccurrenceText);
       expectedNextUpdateOccurrence = TripleState.valueOf(nextUpdateOccurrenceText);
       expectedNonceOccurrence = TripleState.valueOf(nonceOccurrenceText);
@@ -332,7 +333,8 @@ public class QaOcspActions {
 
     private ValidationResult processOcspQuery(OcspQa ocspQa, String line, File messageDir,
         File detailsDir, URL serverUrl, X509Cert respIssuer, X509Cert issuerCert,
-        IssuerHash issuerHash, RequestOptions requestOptions) throws Exception {
+        IssuerHash issuerHash, RequestOptions requestOptions)
+            throws Exception {
       StringTokenizer tokens = new StringTokenizer(line, ",;:");
 
       int count = tokens.countTokens();
@@ -401,7 +403,8 @@ public class QaOcspActions {
     private ValidationResult processOcspQuery(OcspQa ocspQa, BigInteger serialNumber,
         OcspCertStatus status, Date revTime, File messageDir, File detailsDir,
         URL serverUrl, X509Cert respIssuer, X509Cert issuerCert,
-        IssuerHash issuerHash, RequestOptions requestOptions) throws Exception {
+        IssuerHash issuerHash, RequestOptions requestOptions)
+            throws Exception {
       if (unknownAsGood && status == OcspCertStatus.unknown) {
         status = OcspCertStatus.good;
       }
@@ -465,7 +468,8 @@ public class QaOcspActions {
       return ret;
     } // method processOcspQuery
 
-    private void println(String message, OutputStream out) throws IOException {
+    private void println(String message, OutputStream out)
+        throws IOException {
       out.write(StringUtil.toUtf8Bytes(message));
       out.write('\n');
     } // method println
@@ -509,7 +513,8 @@ public class QaOcspActions {
     private Integer queueSize = 0;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       int ii = 0;
       if (serialNumberList != null) {
         ii++;
@@ -648,7 +653,8 @@ public class QaOcspActions {
 
     @Override
     protected void checkParameters(X509Cert respIssuer, List<BigInteger> serialNumbers,
-        Map<BigInteger, byte[]> encodedCerts) throws Exception {
+        Map<BigInteger, byte[]> encodedCerts)
+            throws Exception {
       Args.notEmpty(serialNumbers, "serialNunmbers");
 
       if (isBlank(errorText) && isEmpty(statusTexts)) {

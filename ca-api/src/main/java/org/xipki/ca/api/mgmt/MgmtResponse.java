@@ -64,7 +64,8 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.certId = certId;
     }
 
-    public CertWithDbId toCertWithDbId() throws CertificateException {
+    public CertWithDbId toCertWithDbId()
+        throws CertificateException {
       CertWithDbId ret = new CertWithDbId(X509Util.parseCert(cert));
       ret.setCertId(certId);
       return ret;
@@ -112,7 +113,8 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.certprofile = certprofile;
     }
 
-    public CertWithRevocationInfo toCertWithRevocationInfo() throws CertificateException {
+    public CertWithRevocationInfo toCertWithRevocationInfo()
+        throws CertificateException {
       CertWithRevocationInfo ret = new CertWithRevocationInfo();
       ret.setCert(cert.toCertWithDbId());
       ret.setCertprofile(certprofile);

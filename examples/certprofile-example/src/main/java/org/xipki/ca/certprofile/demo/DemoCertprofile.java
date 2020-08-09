@@ -80,7 +80,8 @@ public class DemoCertprofile extends XijsonCertprofile {
   }
 
   @Override
-  protected boolean initExtraExtension(ExtensionType extn) throws CertprofileException {
+  protected boolean initExtraExtension(ExtensionType extn)
+      throws CertprofileException {
     ASN1ObjectIdentifier extnId = extn.getType().toXiOid();
     if (id_demo_without_conf.equals(extnId)) {
       this.addExtraWithoutConf = true;

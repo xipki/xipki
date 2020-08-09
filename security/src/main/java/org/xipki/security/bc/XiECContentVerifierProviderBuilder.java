@@ -48,7 +48,8 @@ public class XiECContentVerifierProviderBuilder extends BcECContentVerifierProvi
   }
 
   @Override
-  protected Signer createSigner(AlgorithmIdentifier sigAlgId) throws OperatorCreationException {
+  protected Signer createSigner(AlgorithmIdentifier sigAlgId)
+      throws OperatorCreationException {
     boolean plainDsa = AlgorithmUtil.isPlainECDSASigAlg(sigAlgId);
 
     if (plainDsa) {

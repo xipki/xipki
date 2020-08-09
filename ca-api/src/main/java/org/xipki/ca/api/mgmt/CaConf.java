@@ -617,7 +617,8 @@ public class CaConf {
     return (binary == null) ? null : Base64.encodeToString(binary);
   }
 
-  private static byte[] read(InputStream in) throws IOException {
+  private static byte[] read(InputStream in)
+      throws IOException {
     ByteArrayOutputStream bout = new ByteArrayOutputStream();
     int readed = 0;
     byte[] buffer = new byte[2048];
@@ -662,7 +663,8 @@ public class CaConf {
     return confStr;
   } // method expandConf
 
-  private static int getIntPermission(List<String> permissions) throws InvalidConfException {
+  private static int getIntPermission(List<String> permissions)
+      throws InvalidConfException {
     int ret = 0;
     for (String permission : permissions) {
       Integer ii = PermissionConstants.getPermissionForText(permission);

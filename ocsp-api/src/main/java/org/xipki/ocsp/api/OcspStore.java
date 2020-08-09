@@ -108,7 +108,8 @@ public abstract class OcspStore implements Closeable {
    */
   public final CertStatusInfo getCertStatus(Date time, RequestIssuer reqIssuer,
       BigInteger serialNumber, boolean includeCertHash, boolean includeRit,
-      boolean inheritCaRevocation) throws OcspStoreException {
+      boolean inheritCaRevocation)
+          throws OcspStoreException {
     CertStatusInfo info = getCertStatus0(time, reqIssuer, serialNumber,
         includeCertHash, includeRit, inheritCaRevocation);
 
@@ -152,7 +153,8 @@ public abstract class OcspStore implements Closeable {
    */
   protected abstract CertStatusInfo getCertStatus0(Date time, RequestIssuer reqIssuer,
       BigInteger serialNumber, boolean includeCertHash, boolean includeRit,
-      boolean inheritCaRevocation) throws OcspStoreException;
+      boolean inheritCaRevocation)
+          throws OcspStoreException;
 
   /**
    * Initialize the OCSP store.

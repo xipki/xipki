@@ -120,7 +120,8 @@ public class SignerUtil {
 
   // CHECKSTYLE:SKIP
   public static PSSSigner createPSSRSASigner(AlgorithmIdentifier sigAlgId,
-      AsymmetricBlockCipher cipher) throws XiSecurityException {
+      AsymmetricBlockCipher cipher)
+          throws XiSecurityException {
     notNull(sigAlgId, "sigAlgId");
     if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
       throw new XiSecurityException("signature algorithm " + sigAlgId.getAlgorithm()
@@ -159,7 +160,8 @@ public class SignerUtil {
 
   // CHECKSTYLE:SKIP
   public static byte[] EMSA_PKCS1_v1_5_encoding(byte[] hashValue, int modulusBigLength,
-      HashAlgo hashAlgo) throws XiSecurityException {
+      HashAlgo hashAlgo)
+          throws XiSecurityException {
     notNull(hashValue, "hashValue");
     notNull(hashAlgo, "hashAlgo");
 
@@ -225,7 +227,8 @@ public class SignerUtil {
 
   // CHECKSTYLE:SKIP
   public static byte[] EMSA_PSS_ENCODE(HashAlgo contentDigest, byte[] hashValue, HashAlgo mgfDigest,
-      int saltLen, int modulusBitLength, SecureRandom random) throws XiSecurityException {
+      int saltLen, int modulusBitLength, SecureRandom random)
+          throws XiSecurityException {
     final int hLen = contentDigest.getLength();
     final byte[] salt = new byte[saltLen];
     final byte[] mDash = new byte[8 + saltLen + hLen];
@@ -304,7 +307,8 @@ public class SignerUtil {
   } // method maskGeneratorFunction1
 
   // CHECKSTYLE:SKIP
-  public static byte[] dsaSigPlainToX962(byte[] signature) throws XiSecurityException {
+  public static byte[] dsaSigPlainToX962(byte[] signature)
+      throws XiSecurityException {
     notNull(signature, "signature");
     if (signature.length % 2 != 0) {
       throw new XiSecurityException("signature.lenth must be even, but is odd");
@@ -369,7 +373,8 @@ public class SignerUtil {
     }
   } // method bigIntToBytes
 
-  private static Digest getDigest(AlgorithmIdentifier hashAlgo) throws XiSecurityException {
+  private static Digest getDigest(AlgorithmIdentifier hashAlgo)
+      throws XiSecurityException {
     HashAlgo hat = HashAlgo.getInstance(hashAlgo.getAlgorithm());
     if (hat != null) {
       return hat.createDigest();
@@ -384,7 +389,8 @@ public class SignerUtil {
   }
 
   public static ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey,
-      DHSigStaticKeyCertPair ownerKeyAndCert) throws InvalidKeyException {
+      DHSigStaticKeyCertPair ownerKeyAndCert)
+          throws InvalidKeyException {
     notNull(publicKey, "publicKey");
 
     String keyAlg = publicKey.getAlgorithm().toUpperCase();

@@ -230,7 +230,8 @@ public class Actions {
     private String outFile;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (caName != null) {
         caName = caName.toLowerCase();
       }
@@ -286,7 +287,8 @@ public class Actions {
     private String outFile;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (caName != null) {
         caName = caName.toLowerCase();
       }
@@ -361,7 +363,8 @@ public class Actions {
     private String caName;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (caName != null) {
         caName = caName.toLowerCase();
       }
@@ -423,20 +426,23 @@ public class Actions {
     private String password;
 
     @Override
-    protected SubjectPublicKeyInfo getPublicKey() throws Exception {
+    protected SubjectPublicKeyInfo getPublicKey()
+        throws Exception {
       return null;
     }
 
     @Override
     protected EnrollCertRequest.Entry buildEnrollCertRequestEntry(String id, String profile,
-        CertRequest certRequest) throws Exception {
+        CertRequest certRequest)
+            throws Exception {
       final boolean caGenKeypair = true;
       final boolean kup = false;
       return new EnrollCertRequest.Entry("id-1", profile, certRequest, null, caGenKeypair, kup);
     }
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       EnrollCertResult result = enroll();
 
       X509Cert cert = null;
@@ -475,7 +481,8 @@ public class Actions {
     } // method execute0
 
     @Override
-    protected EnrollType getCmpReqType() throws Exception {
+    protected EnrollType getCmpReqType()
+        throws Exception {
       if ("cr".equalsIgnoreCase(cmpreqType)) {
         return EnrollCertRequest.EnrollType.CERT_REQ;
       } else if ("ir".equalsIgnoreCase(cmpreqType)) {
@@ -485,7 +492,8 @@ public class Actions {
       }
     } // method getCmpReqType
 
-    private char[] getPassword() throws IOException {
+    private char[] getPassword()
+        throws IOException {
       char[] pwdInChar = readPasswordIfNotSet(password);
       if (pwdInChar != null) {
         password = new String(pwdInChar);
@@ -519,7 +527,8 @@ public class Actions {
     private ConcurrentContentSigner signer;
 
     @Override
-    protected ConcurrentContentSigner getSigner() throws ObjectCreationException {
+    protected ConcurrentContentSigner getSigner()
+        throws ObjectCreationException {
       if (signer == null) {
         byte[] keyIdBytes = null;
         if (keyId != null) {
@@ -617,7 +626,8 @@ public class Actions {
   public static class CmpGenCrl extends CrlAction {
 
     @Override
-    protected X509CRLHolder retrieveCrl() throws CmpClientException, PkiErrorException {
+    protected X509CRLHolder retrieveCrl()
+        throws CmpClientException, PkiErrorException {
       ReqRespDebug debug = getReqRespDebug();
       try {
         return client.generateCrl(caName, debug);
@@ -642,7 +652,8 @@ public class Actions {
     private String baseCrlOut;
 
     @Override
-    protected X509CRLHolder retrieveCrl() throws CmpClientException, PkiErrorException {
+    protected X509CRLHolder retrieveCrl()
+        throws CmpClientException, PkiErrorException {
       ReqRespDebug debug = getReqRespDebug();
       try {
         return client.downloadCrl(caName, debug);
@@ -652,7 +663,8 @@ public class Actions {
     }
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (caName != null) {
         caName = caName.toLowerCase();
       }
@@ -735,7 +747,8 @@ public class Actions {
     private Boolean verbose = Boolean.FALSE;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (caName != null) {
         caName = caName.toLowerCase();
       }
@@ -776,7 +789,8 @@ public class Actions {
   public static class CmpInit extends ClientAction {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       boolean succ = client.init();
       if (succ) {
         println("CA client initialized successfully");
@@ -800,7 +814,8 @@ public class Actions {
     private String invalidityDateS;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (!(certFile == null ^ getSerialNumber() == null)) {
         throw new IllegalCmdParamException("exactly one of cert and serial must be specified");
       }
@@ -848,7 +863,8 @@ public class Actions {
   public static class CmpRmCert extends UnRevRemoveCertAction {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (!(certFile == null ^ getSerialNumber() == null)) {
         throw new IllegalCmdParamException("exactly one of cert and serial must be specified");
       }
@@ -882,7 +898,8 @@ public class Actions {
   public static class CmpUnrevoke extends UnRevRemoveCertAction {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (!(certFile == null ^ getSerialNumber() == null)) {
         throw new IllegalCmdParamException("exactly one of cert and serial must be specified");
       }
@@ -932,20 +949,23 @@ public class Actions {
     private String password;
 
     @Override
-    protected SubjectPublicKeyInfo getPublicKey() throws Exception {
+    protected SubjectPublicKeyInfo getPublicKey()
+        throws Exception {
       return null;
     }
 
     @Override
     protected EnrollCertRequest.Entry buildEnrollCertRequestEntry(String id, String profile,
-        CertRequest certRequest) throws Exception {
+        CertRequest certRequest)
+            throws Exception {
       final boolean caGenKeypair = true;
       final boolean kup = true;
       return new EnrollCertRequest.Entry("id-1", profile, certRequest, null, caGenKeypair, kup);
     }
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       EnrollCertResult result = enroll();
 
       X509Cert cert = null;
@@ -983,7 +1003,8 @@ public class Actions {
       return null;
     } // method execute0
 
-    private char[] getPassword() throws IOException {
+    private char[] getPassword()
+        throws IOException {
       char[] pwdInChar = readPasswordIfNotSet(password);
       if (pwdInChar != null) {
         password = new String(pwdInChar);
@@ -1016,7 +1037,8 @@ public class Actions {
     private ConcurrentContentSigner signer;
 
     @Override
-    protected ConcurrentContentSigner getSigner() throws ObjectCreationException {
+    protected ConcurrentContentSigner getSigner()
+        throws ObjectCreationException {
       if (signer == null) {
         byte[] keyIdBytes = null;
         if (keyId != null) {
@@ -1079,7 +1101,8 @@ public class Actions {
     private ConcurrentContentSigner signer;
 
     @Override
-    protected ConcurrentContentSigner getSigner() throws ObjectCreationException {
+    protected ConcurrentContentSigner getSigner()
+        throws ObjectCreationException {
       if (signer == null) {
         if (password == null) {
           try {
@@ -1115,10 +1138,12 @@ public class Actions {
     @Completion(FileCompleter.class)
     protected String outFile;
 
-    protected abstract X509CRLHolder retrieveCrl() throws CmpClientException, PkiErrorException;
+    protected abstract X509CRLHolder retrieveCrl()
+        throws CmpClientException, PkiErrorException;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (caName != null) {
         caName = caName.toLowerCase();
       }
@@ -1240,14 +1265,18 @@ public class Actions {
     @Completion(FileCompleter.class)
     private String extraExtensionsFile;
 
-    protected abstract SubjectPublicKeyInfo getPublicKey() throws Exception;
+    protected abstract SubjectPublicKeyInfo getPublicKey()
+        throws Exception;
 
     protected abstract EnrollCertRequest.Entry buildEnrollCertRequestEntry(
-        String id, String profile, CertRequest certRequest) throws Exception;
+        String id, String profile, CertRequest certRequest)
+            throws Exception;
 
-    protected abstract EnrollCertRequest.EnrollType getCmpReqType() throws Exception;
+    protected abstract EnrollCertRequest.EnrollType getCmpReqType()
+        throws Exception;
 
-    protected String getCaName() throws CmpClientException {
+    protected String getCaName()
+        throws CmpClientException {
       if (StringUtil.isBlank(caName)) {
         caName = client.getCaNameForProfile(profile);
       }
@@ -1255,7 +1284,8 @@ public class Actions {
       return caName;
     }
 
-    protected EnrollCertResult enroll() throws Exception {
+    protected EnrollCertResult enroll()
+        throws Exception {
       // CHECKSTYLE:SKIP
       EnrollCertRequest.EnrollType type = getCmpReqType();
 
@@ -1518,7 +1548,8 @@ public class Actions {
       return ret;
     } // method textToAsn1ObjectIdentifers
 
-    static List<String> resolveExtensionTypes(List<String> types) throws IllegalCmdParamException {
+    static List<String> resolveExtensionTypes(List<String> types)
+        throws IllegalCmdParamException {
       List<String> list = new ArrayList<>(types.size());
       for (String m : types) {
         String id = Completers.ExtensionNameCompleter.getIdForExtensionName(m);
@@ -1578,13 +1609,15 @@ public class Actions {
         throws ObjectCreationException, CmpClientException;
 
     @Override
-    protected SubjectPublicKeyInfo getPublicKey() throws Exception {
+    protected SubjectPublicKeyInfo getPublicKey()
+        throws Exception {
       return getSigner().getCertificate().getSubjectPublicKeyInfo();
     }
 
     @Override
     protected EnrollCertRequest.Entry buildEnrollCertRequestEntry(String id, String profile,
-        CertRequest certRequest) throws Exception {
+        CertRequest certRequest)
+            throws Exception {
       ConcurrentContentSigner signer = getSigner();
 
       ProofOfPossessionSigningKeyBuilder popoBuilder =
@@ -1602,7 +1635,8 @@ public class Actions {
     } // method buildEnrollCertRequestEntry
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       EnrollCertResult result = enroll();
 
       X509Cert cert = null;
@@ -1621,7 +1655,8 @@ public class Actions {
     } // method execute0
 
     @Override
-    protected EnrollType getCmpReqType() throws Exception {
+    protected EnrollType getCmpReqType()
+        throws Exception {
       if ("cr".equalsIgnoreCase(cmpreqType)) {
         return EnrollCertRequest.EnrollType.CERT_REQ;
       } else if ("ir".equalsIgnoreCase(cmpreqType)) {
@@ -1735,12 +1770,15 @@ public class Actions {
     @Completion(Completers.ExtensionNameCompleter.class)
     private List<String> wantExtensionTypes;
 
-    protected abstract SubjectPublicKeyInfo getPublicKey() throws Exception;
+    protected abstract SubjectPublicKeyInfo getPublicKey()
+        throws Exception;
 
     protected abstract EnrollCertRequest.Entry buildEnrollCertRequestEntry(
-        String id, String profile, CertRequest certRequest) throws Exception;
+        String id, String profile, CertRequest certRequest)
+            throws Exception;
 
-    protected EnrollCertResult enroll() throws Exception {
+    protected EnrollCertResult enroll()
+        throws Exception {
       Set<String> caNames = client.getCaNames();
       if (caName != null) {
         caName = caName.toLowerCase();
@@ -1881,15 +1919,18 @@ public class Actions {
      * @throws ObjectCreationException
      *           if no signer can be built.
      */
-    protected abstract ConcurrentContentSigner getSigner() throws ObjectCreationException;
+    protected abstract ConcurrentContentSigner getSigner()
+        throws ObjectCreationException;
 
-    protected SubjectPublicKeyInfo getPublicKey() throws Exception {
+    protected SubjectPublicKeyInfo getPublicKey()
+        throws Exception {
       return embedsPulibcKey ? getSigner().getCertificate().getSubjectPublicKeyInfo() : null;
     } // method getPublicKey
 
     @Override
     protected EnrollCertRequest.Entry buildEnrollCertRequestEntry(String id, String profile,
-        CertRequest certRequest) throws Exception {
+        CertRequest certRequest)
+            throws Exception {
       ConcurrentContentSigner signer = getSigner();
 
       ProofOfPossessionSigningKeyBuilder popoBuilder =
@@ -1910,7 +1951,8 @@ public class Actions {
     } // method buildEnrollCertRequestEntry
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       EnrollCertResult result = enroll();
 
       X509Cert cert = null;

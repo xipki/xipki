@@ -233,7 +233,8 @@ public abstract class P11Slot implements Closeable {
   private final P11MechanismFilter mechanismFilter;
 
   protected P11Slot(String moduleName, P11SlotIdentifier slotId, boolean readOnly,
-      P11MechanismFilter mechanismFilter) throws P11TokenException {
+      P11MechanismFilter mechanismFilter)
+          throws P11TokenException {
     this.mechanismFilter = notNull(mechanismFilter, "mechanismFilter");
     this.moduleName = notBlank(moduleName, "moduleName");
     this.slotId = notNull(slotId, "slotId");
@@ -296,7 +297,8 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  protected abstract void removeIdentity0(P11IdentityId identityId) throws P11TokenException;
+  protected abstract void removeIdentity0(P11IdentityId identityId)
+      throws P11TokenException;
 
   /**
    * Adds the certificate to the PKCS#11 token under the given identifier {@code objectId}.
@@ -328,7 +330,8 @@ public abstract class P11Slot implements Closeable {
    *         if PKCS#11 token exception occurs.
    */
   protected abstract P11Identity generateSecretKey0(long keyType, int keysize,
-      P11NewKeyControl control) throws P11TokenException;
+      P11NewKeyControl control)
+          throws P11TokenException;
 
   /**
    * Imports secret key object in the PKCS#11 token. The key itself will not be generated
@@ -345,7 +348,8 @@ public abstract class P11Slot implements Closeable {
    *         if PKCS#11 token exception occurs.
    */
   protected abstract P11Identity importSecretKey0(long keyType, byte[] keyValue,
-      P11NewKeyControl control) throws P11TokenException;
+      P11NewKeyControl control)
+          throws P11TokenException;
 
   /**
    * Generates a DSA keypair.
@@ -364,7 +368,8 @@ public abstract class P11Slot implements Closeable {
    */
   // CHECKSTYLE:SKIP
   protected abstract P11Identity generateDSAKeypair0(BigInteger p, BigInteger q, BigInteger g,
-      P11NewKeyControl control) throws P11TokenException;
+      P11NewKeyControl control)
+          throws P11TokenException;
 
   /**
    * Generates an EC Edwards keypair.
@@ -379,7 +384,8 @@ public abstract class P11Slot implements Closeable {
    */
   // CHECKSTYLE:SKIP
   protected abstract P11Identity generateECEdwardsKeypair0(ASN1ObjectIdentifier curveId,
-      P11NewKeyControl control) throws P11TokenException;
+      P11NewKeyControl control)
+          throws P11TokenException;
 
   /**
    * Generates an EC Montgomery keypair.
@@ -394,7 +400,8 @@ public abstract class P11Slot implements Closeable {
    */
   // CHECKSTYLE:SKIP
   protected abstract P11Identity generateECMontgomeryKeypair0(ASN1ObjectIdentifier curveId,
-      P11NewKeyControl control) throws P11TokenException;
+      P11NewKeyControl control)
+          throws P11TokenException;
 
   /**
    * Generates an EC keypair.
@@ -409,7 +416,8 @@ public abstract class P11Slot implements Closeable {
    */
   // CHECKSTYLE:SKIP
   protected abstract P11Identity generateECKeypair0(ASN1ObjectIdentifier curveId,
-      P11NewKeyControl control) throws P11TokenException;
+      P11NewKeyControl control)
+          throws P11TokenException;
 
   /**
    * Generates an SM2p256v1 keypair.
@@ -439,11 +447,14 @@ public abstract class P11Slot implements Closeable {
    */
   // CHECKSTYLE:SKIP
   protected abstract P11Identity generateRSAKeypair0(int keysize, BigInteger publicExponent,
-      P11NewKeyControl control) throws P11TokenException;
+      P11NewKeyControl control)
+          throws P11TokenException;
 
-  protected abstract P11SlotRefreshResult refresh0() throws P11TokenException;
+  protected abstract P11SlotRefreshResult refresh0()
+      throws P11TokenException;
 
-  protected abstract void removeCerts0(P11ObjectIdentifier objectId) throws P11TokenException;
+  protected abstract void removeCerts0(P11ObjectIdentifier objectId)
+      throws P11TokenException;
 
   @Override
   public abstract void close();
@@ -459,7 +470,8 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *           If PKCS#11 error happens.
    */
-  public abstract int removeObjects(byte[] id, String label) throws P11TokenException;
+  public abstract int removeObjects(byte[] id, String label)
+      throws P11TokenException;
 
   /**
    * Gets certificate with the given identifier {@code id}.
@@ -539,7 +551,8 @@ public abstract class P11Slot implements Closeable {
     return null;
   } // method getIssuerForCert
 
-  public void refresh() throws P11TokenException {
+  public void refresh()
+      throws P11TokenException {
     P11SlotRefreshResult res = refresh0(); // CHECKSTYLE:SKIP
 
     mechanisms.clear();
@@ -613,7 +626,8 @@ public abstract class P11Slot implements Closeable {
     }
   } // method refresh
 
-  protected void addIdentity(P11Identity identity) throws P11DuplicateEntityException {
+  protected void addIdentity(P11Identity identity)
+      throws P11DuplicateEntityException {
     if (!slotId.equals(identity.getId().getSlotId())) {
       throw new IllegalArgumentException("invalid identity");
     }
@@ -666,7 +680,8 @@ public abstract class P11Slot implements Closeable {
     return readOnly;
   }
 
-  public P11Identity getIdentity(P11ObjectIdentifier keyId) throws P11UnknownEntityException {
+  public P11Identity getIdentity(P11ObjectIdentifier keyId)
+      throws P11UnknownEntityException {
     P11Identity ident = identities.get(keyId);
     if (ident == null) {
       throw new P11UnknownEntityException(slotId, keyId);
@@ -776,7 +791,8 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  public X509Cert exportCert(P11ObjectIdentifier objectId) throws P11TokenException {
+  public X509Cert exportCert(P11ObjectIdentifier objectId)
+      throws P11TokenException {
     notNull(objectId, "objectId");
     try {
       return getIdentity(objectId).getCertificate();
@@ -799,7 +815,8 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  public void removeCerts(P11ObjectIdentifier objectId) throws P11TokenException {
+  public void removeCerts(P11ObjectIdentifier objectId)
+      throws P11TokenException {
     notNull(objectId, "objectId");
     assertWritable("removeCerts");
 
@@ -834,7 +851,8 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  public void removeIdentity(P11IdentityId identityId) throws P11TokenException {
+  public void removeIdentity(P11IdentityId identityId)
+      throws P11TokenException {
     notNull(identityId, "identityId");
     assertWritable("removeIdentity");
     P11ObjectIdentifier keyId = identityId.getKeyId();
@@ -859,7 +877,8 @@ public abstract class P11Slot implements Closeable {
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
-  public void removeIdentityByKeyId(P11ObjectIdentifier keyId) throws P11TokenException {
+  public void removeIdentityByKeyId(P11ObjectIdentifier keyId)
+      throws P11TokenException {
     notNull(keyId, "keyId");
     assertWritable("removeIdentityByKeyId");
 
@@ -909,7 +928,8 @@ public abstract class P11Slot implements Closeable {
     return objectId;
   } // method addCert
 
-  protected String generateLabel(String label) throws P11TokenException {
+  protected String generateLabel(String label)
+      throws P11TokenException {
 
     String tmpLabel = label;
     int idx = 0;
@@ -988,7 +1008,8 @@ public abstract class P11Slot implements Closeable {
    *         if PKCS#11 token exception occurs.
    */
   public P11ObjectIdentifier importSecretKey(long keyType, byte[] keyValue,
-      P11NewKeyControl control) throws P11TokenException {
+      P11NewKeyControl control)
+          throws P11TokenException {
     notNull(control, "control");
     assertWritable("createSecretKey");
     assertNoIdentityAndCert(control.getId(), control.getLabel());
@@ -1016,7 +1037,8 @@ public abstract class P11Slot implements Closeable {
    */
   // CHECKSTYLE:SKIP
   public P11IdentityId generateRSAKeypair(int keysize, BigInteger publicExponent,
-      P11NewKeyControl control) throws P11TokenException {
+      P11NewKeyControl control)
+          throws P11TokenException {
     min(keysize, "keysize", 1024);
     if (keysize % 1024 != 0) {
       throw new IllegalArgumentException("key size is not multiple of 1024: " + keysize);
@@ -1083,7 +1105,8 @@ public abstract class P11Slot implements Closeable {
    */
   // CHECKSTYLE:SKIP
   public P11IdentityId generateDSAKeypair(BigInteger p, BigInteger q, BigInteger g,
-      P11NewKeyControl control) throws P11TokenException {
+      P11NewKeyControl control)
+          throws P11TokenException {
     notNull(p, "p");
     notNull(q, "q");
     notNull(g, "g");
@@ -1145,7 +1168,8 @@ public abstract class P11Slot implements Closeable {
    */
   // CHECKSTYLE:SKIP
   public P11IdentityId generateECEdwardsKeypair(ASN1ObjectIdentifier curveOid,
-      P11NewKeyControl control) throws P11TokenException {
+      P11NewKeyControl control)
+          throws P11TokenException {
     notNull(curveOid, "curveOid");
 
     assertCanGenKeypair("generateECEdwardsKeypair0",
@@ -1170,7 +1194,8 @@ public abstract class P11Slot implements Closeable {
    */
   // CHECKSTYLE:SKIP
   public P11IdentityId generateECMontgomeryKeypair(ASN1ObjectIdentifier curveOid,
-      P11NewKeyControl control) throws P11TokenException {
+      P11NewKeyControl control)
+          throws P11TokenException {
     notNull(curveOid, "curveOid");
 
     assertCanGenKeypair("generateECMontgomeryKeypair",
@@ -1192,7 +1217,8 @@ public abstract class P11Slot implements Closeable {
    *         if PKCS#11 token exception occurs.
    */
   // CHECKSTYLE:SKIP
-  public P11IdentityId generateSM2Keypair(P11NewKeyControl control) throws P11TokenException {
+  public P11IdentityId generateSM2Keypair(P11NewKeyControl control)
+      throws P11TokenException {
     assertCanGenKeypair("generateSM2Keypair", PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN, control);
 
     P11Identity identity = generateSM2Keypair0(control);
@@ -1260,7 +1286,8 @@ public abstract class P11Slot implements Closeable {
    * @throws IOException
    *         if IO error occurs.
    */
-  public void showDetails(OutputStream stream, boolean verbose) throws IOException {
+  public void showDetails(OutputStream stream, boolean verbose)
+      throws IOException {
     notNull(stream, "stream");
 
     List<P11ObjectIdentifier> sortedKeyIds = getSortedObjectIds(identities.keySet());
@@ -1329,7 +1356,8 @@ public abstract class P11Slot implements Closeable {
     }
   } // method showDetails
 
-  protected void assertWritable(String operationName) throws P11PermissionException {
+  protected void assertWritable(String operationName)
+      throws P11PermissionException {
     if (readOnly) {
       throw new P11PermissionException("Writable operation " + operationName + " is not permitted");
     }

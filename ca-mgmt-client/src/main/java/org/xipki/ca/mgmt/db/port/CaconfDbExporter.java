@@ -49,7 +49,8 @@ class CaconfDbExporter extends DbPorter {
     super(datasource, destDir, stopMe);
   }
 
-  public void export() throws Exception {
+  public void export()
+      throws Exception {
     CaCertstore.Caconf caconf = new CaCertstore.Caconf();
     caconf.setVersion(VERSION);
 

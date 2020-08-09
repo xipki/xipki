@@ -58,7 +58,8 @@ public class CmpUtil {
   }
 
   public static PKIMessage addProtection(PKIMessage pkiMessage, ConcurrentContentSigner signer,
-      GeneralName signerName, boolean addSignerCert) throws CMPException, NoIdleSignerException {
+      GeneralName signerName, boolean addSignerCert)
+          throws CMPException, NoIdleSignerException {
     notNull(pkiMessage, "pkiMessage");
     notNull(signer, "signer");
 
@@ -108,7 +109,8 @@ public class CmpUtil {
 
   // CHECKSTYLE:SKIP
   private static ProtectedPKIMessageBuilder newProtectedPKIMessageBuilder(PKIMessage pkiMessage,
-      GeneralName sender, byte[] senderKid) throws CMPException {
+      GeneralName sender, byte[] senderKid)
+          throws CMPException {
     PKIHeader header = pkiMessage.getHeader();
     ProtectedPKIMessageBuilder builder = new ProtectedPKIMessageBuilder(
         sender, header.getRecipient());

@@ -63,7 +63,8 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
 
   private P11ModuleFactoryRegister p11ModuleFactoryRegister;
 
-  public synchronized void init() throws InvalidConfException {
+  public synchronized void init()
+      throws InvalidConfException {
     if (moduleConfs != null) {
       return;
     }
@@ -150,7 +151,8 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
     this.pkcs11Conf = null;
   }
 
-  public void setPkcs11Conf(Pkcs11conf conf) throws InvalidConfException {
+  public void setPkcs11Conf(Pkcs11conf conf)
+      throws InvalidConfException {
     if (conf != null) {
       conf.validate();
     }

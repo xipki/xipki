@@ -72,7 +72,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
   private final int numCertsPerCommit;
 
   OcspCertStoreFromCaDbImporter(DataSourceWrapper datasource,  String srcDir, String publisherName,
-      int numCertsPerCommit, boolean resume, AtomicBoolean stopMe) throws Exception {
+      int numCertsPerCommit, boolean resume, AtomicBoolean stopMe)
+          throws Exception {
     super(datasource, srcDir, stopMe);
 
     this.publisherName = Args.toNonBlankLower(publisherName, "publisherName");;
@@ -92,7 +93,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
     this.resume = resume;
   } // constructor
 
-  public void importToDb() throws Exception {
+  public void importToDb()
+      throws Exception {
     CaCertstore certstore;
     try (InputStream is = Files.newInputStream(Paths.get(baseDir, FILENAME_CA_CERTSTORE))) {
       certstore = JSON.parseObject(is, CaCertstore.class);
@@ -173,7 +175,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
     System.out.println(" imported OCSP certstore to database");
   } // method importToDb
 
-  private List<Integer> getIssuerIds(List<CaCertstore.Ca> cas) throws IOException {
+  private List<Integer> getIssuerIds(List<CaCertstore.Ca> cas)
+      throws IOException {
     List<Integer> relatedCaIds = new LinkedList<>();
     for (CaCertstore.Ca issuer : cas) {
       byte[] encodedCert = issuer.getCert() == null ? null : readContent(issuer.getCert());
@@ -217,7 +220,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
   } // method importIssuer
 
   private void importIssuer0(CaCertstore.Ca issuer, String sql, PreparedStatement ps,
-      List<Integer> relatedCaIds) throws IOException, DataAccessException, CertificateException {
+      List<Integer> relatedCaIds)
+          throws IOException, DataAccessException, CertificateException {
     try {
       byte[] encodedCert = readContent(issuer.getCert());
       relatedCaIds.add(issuer.getId());
@@ -252,7 +256,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
   } // method importIssuer0
 
   private void importCert(CaCertstore certstore, boolean revokedOnly, List<Integer> caIds,
-      File processLogFile) throws Exception {
+      File processLogFile)
+          throws Exception {
     HashAlgo certhashAlgo = getCertHashAlgo(datasource);
 
     int numProcessedBefore = 0;
@@ -332,7 +337,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
 
   private long importCert0(HashAlgo certhashAlgo, PreparedStatement psCert, String certsZipFile,
       boolean revokedOnly, List<Integer> caIds, long minId, File processLogFile,
-      ProcessLog processLog, int numProcessedInLastProcess, ProcessLog importLog) throws Exception {
+      ProcessLog processLog, int numProcessedInLastProcess, ProcessLog importLog)
+          throws Exception {
     ZipFile zipFile = new ZipFile(new File(certsZipFile));
     ZipEntry certsEntry = zipFile.getEntry("overview.json");
 

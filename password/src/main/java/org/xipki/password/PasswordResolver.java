@@ -34,8 +34,10 @@ public interface PasswordResolver {
    * @throws PasswordResolverException
    *         if cannot resolve the password
    */
-  char[] resolvePassword(String passwordHint) throws PasswordResolverException;
+  char[] resolvePassword(String passwordHint)
+      throws PasswordResolverException;
 
-  public String protectPassword(String protocol, char[] password) throws PasswordResolverException;
+  public String protectPassword(String protocol, char[] password)
+      throws PasswordResolverException;
 
 }

@@ -493,7 +493,8 @@ public class CmpResponder extends BaseCmpResponder {
 
   private PKIBody processCcp(String dfltCertprofileName, PKIMessage request,
       CmpRequestorInfo requestor, ASN1OctetString tid, PKIHeader reqHeader, CertReqMessages cr,
-      CmpControl cmpControl, String msgId, AuditEvent event) throws InsuffientPermissionException {
+      CmpControl cmpControl, String msgId, AuditEvent event)
+          throws InsuffientPermissionException {
     CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName, Boolean.FALSE, request,
         requestor, tid, reqHeader, cr, false, cmpControl, msgId, event);
     return new PKIBody(PKIBody.TYPE_CROSS_CERT_REP, repMessage);
@@ -503,7 +504,8 @@ public class CmpResponder extends BaseCmpResponder {
       String dfltCertprofileName, Boolean dfltCaGenKeypair,
       PKIMessage request, CmpRequestorInfo requestor, ASN1OctetString tid, PKIHeader reqHeader,
       CertReqMessages cr, boolean allowKeyGen, CmpControl cmpControl,
-      String msgId, AuditEvent event) throws InsuffientPermissionException {
+      String msgId, AuditEvent event)
+          throws InsuffientPermissionException {
     CmpRequestorInfo tmpRequestor = (CmpRequestorInfo) requestor;
 
     CertReqMsg[] certReqMsgs = cr.toCertReqMsgArray();
@@ -1751,7 +1753,8 @@ public class CmpResponder extends BaseCmpResponder {
   private PKIBody cmpEnrollCert(String dfltCertprofileName, Boolean dfltCaGenKeypair,
       PKIMessage request, PKIHeaderBuilder respHeader, CmpControl cmpControl, PKIHeader reqHeader,
       PKIBody reqBody, CmpRequestorInfo requestor, ASN1OctetString tid, String msgId,
-      AuditEvent event) throws InsuffientPermissionException {
+      AuditEvent event)
+          throws InsuffientPermissionException {
     long confirmWaitTime = cmpControl.getConfirmWaitTime();
     if (confirmWaitTime < 0) {
       confirmWaitTime *= -1;
@@ -1877,7 +1880,8 @@ public class CmpResponder extends BaseCmpResponder {
 
   private PKIBody cmpGeneralMsg(PKIHeaderBuilder respHeader, CmpControl cmpControl,
       PKIHeader reqHeader, PKIBody reqBody, CmpRequestorInfo requestor, ASN1OctetString tid,
-      String msgId, AuditEvent event) throws InsuffientPermissionException {
+      String msgId, AuditEvent event)
+          throws InsuffientPermissionException {
     GenMsgContent genMsgBody = GenMsgContent.getInstance(reqBody.getContent());
     InfoTypeAndValue[] itvs = genMsgBody.toInfoTypeAndValueArray();
 
@@ -2044,7 +2048,8 @@ public class CmpResponder extends BaseCmpResponder {
   }
 
   public X509CRLHolder generateCrlOnDemand(CmpRequestorInfo requestor, RequestType reqType,
-      String msgId) throws OperationException {
+      String msgId)
+          throws OperationException {
     notNull(requestor, "requestor");
     try {
       checkPermission(requestor, PermissionConstants.GEN_CRL);
@@ -2056,7 +2061,8 @@ public class CmpResponder extends BaseCmpResponder {
   }
 
   public void revokeCert(CmpRequestorInfo requestor, BigInteger serialNumber, CrlReason reason,
-      Date invalidityDate, RequestType reqType, String msgId) throws OperationException {
+      Date invalidityDate, RequestType reqType, String msgId)
+          throws OperationException {
     notNull(requestor, "requestor");
 
     int permission;
@@ -2086,7 +2092,8 @@ public class CmpResponder extends BaseCmpResponder {
   }
 
   public void removeCert(CmpRequestorInfo requestor, BigInteger serialNumber, RequestType reqType,
-      String msgId) throws OperationException {
+      String msgId)
+          throws OperationException {
     notNull(requestor, "requestor");
     try {
       checkPermission(requestor, PermissionConstants.REMOVE_CERT);

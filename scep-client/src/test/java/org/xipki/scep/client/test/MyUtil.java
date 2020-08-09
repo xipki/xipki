@@ -73,7 +73,8 @@ public class MyUtil {
 
   public static X509Cert issueSubCaCert(PrivateKey rcaKey, X500Name issuer,
       SubjectPublicKeyInfo pubKeyInfo, X500Name subject, BigInteger serialNumber,
-      Date startTime) throws CertIOException, OperatorCreationException {
+      Date startTime)
+          throws CertIOException, OperatorCreationException {
     Date notAfter = new Date(startTime.getTime() + CaEmulator.DAY_IN_MS * 3650);
     X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(issuer, serialNumber,
         startTime, notAfter, subject, pubKeyInfo);
@@ -123,14 +124,16 @@ public class MyUtil {
   } // method generateRequest
 
   public static X509Cert generateSelfsignedCert(CertificationRequest csr,
-      PrivateKey identityKey) throws CertificateException {
+      PrivateKey identityKey)
+          throws CertificateException {
     Args.notNull(csr, "csr");
     return generateSelfsignedCert(csr.getCertificationRequestInfo().getSubject(),
         csr.getCertificationRequestInfo().getSubjectPublicKeyInfo(), identityKey);
   }
 
   public static X509Cert generateSelfsignedCert(X500Name subjectDn,
-      SubjectPublicKeyInfo pubKeyInfo, PrivateKey identityKey) throws CertificateException {
+      SubjectPublicKeyInfo pubKeyInfo, PrivateKey identityKey)
+          throws CertificateException {
     Args.notNull(subjectDn, "subjectDn");
     Args.notNull(pubKeyInfo, "pubKeyInfo");
     Args.notNull(identityKey, "identityKey");

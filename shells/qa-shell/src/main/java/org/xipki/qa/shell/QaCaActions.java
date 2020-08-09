@@ -93,7 +93,8 @@ public class QaCaActions {
     private CaQaSystemManager qaSystemManager;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       boolean succ = qaSystemManager.init();
       if (succ) {
         println("CA QA system initialized successfully");
@@ -134,7 +135,8 @@ public class QaCaActions {
     private CaQaSystemManager qaSystemManager;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       Set<String> issuerNames = qaSystemManager.getIssuerNames();
       if (isEmpty(issuerNames)) {
         throw new IllegalCmdParamException("no issuer is configured");
@@ -225,7 +227,8 @@ public class QaCaActions {
     private String aliasName;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("checking CA alias='" + aliasName + "', CA='" + caName + "'");
       String tmpCaName = caManager.getCaNameForAlias(aliasName);
       if (tmpCaName == null) {
@@ -285,7 +288,8 @@ public class QaCaActions {
     private Integer queueSize = 0;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (numThreads < 1) {
         throw new IllegalCmdParamException("invalid number of threads " + numThreads);
       }
@@ -339,7 +343,8 @@ public class QaCaActions {
   public static class CaCheck extends CaActions.CaUp {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       MgmtEntry.ChangeCa ey = getChangeCaEntry();
       String caName = ey.getIdent().getName();
       println("checking CA " + caName);
@@ -490,7 +495,8 @@ public class QaCaActions {
     private String profileName;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("checking CA profile CA='" + caName + "', profile='" + profileName + "'");
 
       if (caManager.getCa(caName) == null) {
@@ -522,7 +528,8 @@ public class QaCaActions {
     private String publisherName;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("checking CA publisher CA='" + caName + "', publisher='" + publisherName + "'");
 
       if (caManager.getCa(caName) == null) {
@@ -571,7 +578,8 @@ public class QaCaActions {
     private Set<String> profiles;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("checking CA requestor CA='" + caName + "', requestor='" + requestorName + "'");
 
       if (caManager.getCa(caName) == null) {
@@ -631,7 +639,8 @@ public class QaCaActions {
   public static class NegCaAdd extends CaActions.CaAdd {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-ca-add");
 
       try {
@@ -650,7 +659,8 @@ public class QaCaActions {
   public static class NegCaaliasAdd extends CaActions.CaaliasAdd {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-caalias-add");
 
       try {
@@ -669,7 +679,8 @@ public class QaCaActions {
   public static class NegCaaliasRm extends CaActions.CaaliasRm {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-caalias-rm");
 
       try {
@@ -689,7 +700,8 @@ public class QaCaActions {
   public static class NegCaprofileAdd extends CaActions.CaprofileAdd {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-caprofile-add");
 
       try {
@@ -709,7 +721,8 @@ public class QaCaActions {
   public static class NegCaprofileRm extends CaActions.CaprofileRm {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-caprofile-rm");
 
       try {
@@ -729,7 +742,8 @@ public class QaCaActions {
   public static class NegCaPubAdd extends CaActions.CapubAdd {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-capub-add");
 
       try {
@@ -749,7 +763,8 @@ public class QaCaActions {
   public static class NegCapubRm extends CaActions.CapubRm {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-capub-rm");
 
       try {
@@ -768,7 +783,8 @@ public class QaCaActions {
   public static class NegCaRm extends CaActions.CaRm {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-ca-rm");
 
       try {
@@ -788,7 +804,8 @@ public class QaCaActions {
   public static class NegCaReqAdd extends CaActions.CareqAdd {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-careq-add");
 
       try {
@@ -808,7 +825,8 @@ public class QaCaActions {
   public static class NegCareqRm extends CaActions.CareqRm {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-careq-rm");
 
       try {
@@ -827,7 +845,8 @@ public class QaCaActions {
   public static class NegCaRevoke extends CaActions.CaRevoke {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-ca-revoke");
 
       try {
@@ -846,7 +865,8 @@ public class QaCaActions {
   public static class NegCaUnrevoke extends CaActions.CaUnrevoke {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-ca-unrevoke");
 
       try {
@@ -865,7 +885,8 @@ public class QaCaActions {
   public static class NegCaUp extends CaActions.CaUp {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-ca-up");
 
       try {
@@ -885,7 +906,8 @@ public class QaCaActions {
   public static class NegClearPublishQueue extends CaActions.ClearPublishqueue {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-clear-publishqueue");
 
       try {
@@ -905,7 +927,8 @@ public class QaCaActions {
   public static class NegEnrollCert extends EnrollCert {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-enroll-cert");
 
       try {
@@ -925,7 +948,8 @@ public class QaCaActions {
   public static class NegGenRootCa extends CaActions.GenRootca {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-gen-rootca");
 
       try {
@@ -945,7 +969,8 @@ public class QaCaActions {
   public static class NegProfileAdd extends CaActions.ProfileAdd {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-profile-add");
 
       try {
@@ -965,7 +990,8 @@ public class QaCaActions {
   public static class ProfileCheck extends CaActions.ProfileUp {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("checking profile " + name);
 
       if (type == null && conf == null && confFile == null) {
@@ -999,7 +1025,8 @@ public class QaCaActions {
   public static class NegProfileRm extends CaActions.ProfileRm {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-profile-rm");
 
       try {
@@ -1019,7 +1046,8 @@ public class QaCaActions {
   public static class NegProfileUp extends CaActions.ProfileUp {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-profile-up");
 
       try {
@@ -1038,7 +1066,8 @@ public class QaCaActions {
   public static class NegPublisherAdd extends CaActions.PublisherAdd {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-publisher-add");
 
       try {
@@ -1058,7 +1087,8 @@ public class QaCaActions {
   public static class PublisherCheck extends CaActions.PublisherUp {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("checking publisher " + name);
 
       MgmtEntry.Publisher cp = caManager.getPublisher(name);
@@ -1086,7 +1116,8 @@ public class QaCaActions {
   public static class NegPublisherRm extends CaActions.PublisherRm {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-publisher-rm");
 
       try {
@@ -1106,7 +1137,8 @@ public class QaCaActions {
   public static class NegPublisherUp extends CaActions.PublisherUp {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-publisher-up");
 
       try {
@@ -1126,7 +1158,8 @@ public class QaCaActions {
   public static class NegRepublish extends CaActions.Republish {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-republish");
 
       try {
@@ -1145,7 +1178,8 @@ public class QaCaActions {
   public static class NegRequestorAdd extends CaActions.RequestorAdd {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-requestor-add");
 
       try {
@@ -1165,7 +1199,8 @@ public class QaCaActions {
   public static class RequestorCheck extends CaActions.RequestorUp {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("checking requestor " + name);
 
       MgmtEntry.Requestor cr = caManager.getRequestor(name);
@@ -1213,7 +1248,8 @@ public class QaCaActions {
   public static class NegRequestorRm extends CaActions.RequestorRm {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-requestor-rm");
 
       try {
@@ -1233,7 +1269,8 @@ public class QaCaActions {
   public static class NegRequestorUp extends CaActions.RequestorUp {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-requestor-up");
 
       try {
@@ -1252,7 +1289,8 @@ public class QaCaActions {
   public static class NegRmCert extends RmCert {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-remove-cert");
 
       try {
@@ -1272,7 +1310,8 @@ public class QaCaActions {
   public static class NegRevokeCert extends RevokeCert {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-remove-cert");
 
       try {
@@ -1291,7 +1330,8 @@ public class QaCaActions {
   public static class NegSignerAdd extends CaActions.SignerAdd {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-signer-add");
 
       try {
@@ -1310,7 +1350,8 @@ public class QaCaActions {
   public static class SignerCheck extends CaActions.SignerUp {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("checking signer " + name);
 
       MgmtEntry.Signer cr = caManager.getSigner(name);
@@ -1348,7 +1389,8 @@ public class QaCaActions {
   public static class NegSignerRm extends CaActions.SignerRm {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-signer-rm");
 
       try {
@@ -1367,7 +1409,8 @@ public class QaCaActions {
   public static class NegSignerUp extends CaActions.SignerUp {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-signer-up");
 
       try {
@@ -1387,7 +1430,8 @@ public class QaCaActions {
   public static class NegUnrevokeCert extends UnrevokeCert {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       println("neg-unrevoke-cert");
 
       try {
@@ -1401,7 +1445,8 @@ public class QaCaActions {
 
   } // class NegUnrevokeCert
 
-  public static void assertTypeEquals(String desc, String ex, String is) throws CmdFailure {
+  public static void assertTypeEquals(String desc, String ex, String is)
+      throws CmdFailure {
     String tmpEx = ex;
     if (CaManager.NULL.equals(tmpEx)) {
       tmpEx = null;
@@ -1413,7 +1458,8 @@ public class QaCaActions {
     }
   } // method assertTypeEquals
 
-  public static void assertEquals(String desc, String ex, String is) throws CmdFailure {
+  public static void assertEquals(String desc, String ex, String is)
+      throws CmdFailure {
     String tmpEx = ex;
     if (CaManager.NULL.equals(tmpEx)) {
       tmpEx = null;
@@ -1433,7 +1479,8 @@ public class QaCaActions {
     }
   } // method assertEquals
 
-  public static void assertObjEquals(String desc, Object ex, Object is) throws CmdFailure {
+  public static void assertObjEquals(String desc, Object ex, Object is)
+      throws CmdFailure {
     boolean bo = (ex == null) ? (is == null) : ex.equals(is);
     if (!bo) {
       throw new CmdFailure(desc + ": is '" + is + "', but expected '" + ex + "'");

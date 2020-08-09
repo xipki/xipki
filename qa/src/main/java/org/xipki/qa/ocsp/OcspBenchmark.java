@@ -52,7 +52,8 @@ public class OcspBenchmark extends BenchmarkExecutor implements ResponseHandler 
 
     private OcspBenchRequestor requestor;
 
-    Testor() throws Exception {
+    Testor()
+        throws Exception {
       this.requestor = new OcspBenchRequestor();
       this.requestor.init(OcspBenchmark.this, responderUrl, issuerCert, requestOptions, queueSize);
     }
@@ -111,7 +112,8 @@ public class OcspBenchmark extends BenchmarkExecutor implements ResponseHandler 
   }
 
   @Override
-  protected Runnable getTestor() throws Exception {
+  protected Runnable getTestor()
+      throws Exception {
     return new Testor();
   }
 

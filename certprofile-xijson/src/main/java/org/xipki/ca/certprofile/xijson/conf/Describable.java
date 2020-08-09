@@ -61,7 +61,8 @@ public abstract class Describable extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(oid, "oid");
       try {
         toXiOid();
@@ -90,7 +91,8 @@ public abstract class Describable extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
     }
   } // class DescribableInt
 
@@ -100,7 +102,8 @@ public abstract class Describable extends ValidatableConf {
     private String value;
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notNull(value, "value");
     }
 
@@ -120,7 +123,8 @@ public abstract class Describable extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notNull(value, "value");
     }
 

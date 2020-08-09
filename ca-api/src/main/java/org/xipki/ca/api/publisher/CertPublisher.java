@@ -54,7 +54,8 @@ public abstract class CertPublisher implements Closeable {
    *         If error during the initialization occurs.
    */
   public abstract void initialize(String conf, PasswordResolver passwordResolver,
-      Map<String, FileOrValue> datasourceConfs) throws CertPublisherException;
+      Map<String, FileOrValue> datasourceConfs)
+          throws CertPublisherException;
 
   @Override
   public void close() {

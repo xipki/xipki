@@ -47,7 +47,8 @@ public class IssuerHash {
     range(issuerKeyHash.length, "issuerKeyHash.length", len, len);
   }
 
-  public IssuerHash(HashAlgo hashAlgo, X509Cert issuerCert) throws IOException {
+  public IssuerHash(HashAlgo hashAlgo, X509Cert issuerCert)
+      throws IOException {
     this.hashAlgo = notNull(hashAlgo, "hashAlgo");
     notNull(issuerCert, "issuerCert");
 

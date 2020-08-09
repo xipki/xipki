@@ -56,7 +56,8 @@ public class CtlogControl {
 
   private String conf;
 
-  public CtlogControl(String conf) throws InvalidConfException {
+  public CtlogControl(String conf)
+      throws InvalidConfException {
     ConfPairs pairs = new ConfPairs(Args.notNull(conf, "conf"));
     enabled = getBoolean(pairs, KEY_ENABLED, false);
     // normalize the pairs

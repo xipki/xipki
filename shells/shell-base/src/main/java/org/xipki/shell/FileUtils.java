@@ -48,7 +48,8 @@ class FileUtils {
    * @throws IOException in case deletion is unsuccessful
    * @throws IllegalArgumentException if {@code directory} does not exist or is not a directory
    */
-  public static void deleteDirectory(File directory) throws IOException {
+  public static void deleteDirectory(File directory)
+      throws IOException {
     if (!directory.exists()) {
       return;
     }
@@ -81,7 +82,8 @@ class FileUtils {
    * @throws IOException if an IO error occurs while checking the file
    * @since 2.0.0
    */
-  private static boolean isSymlink(File file) throws IOException {
+  private static boolean isSymlink(File file)
+      throws IOException {
     if (file == null) {
       throw new NullPointerException("File may not be null");
     }
@@ -105,7 +107,8 @@ class FileUtils {
    * @throws IOException in case cleaning is unsuccessful
    * @throws IllegalArgumentException if {@code directory} does not exist or is not a directory
    */
-  private static void cleanDirectory(File directory) throws IOException {
+  private static void cleanDirectory(File directory)
+      throws IOException {
     if (!directory.exists()) {
       throw new IllegalArgumentException(directory + " does not exist");
     }
@@ -151,7 +154,8 @@ class FileUtils {
    * @throws FileNotFoundException if the file was not found
    * @throws IOException in case deletion is unsuccessful
    */
-  private static void forceDelete(File file) throws IOException {
+  private static void forceDelete(File file)
+      throws IOException {
     if (file.isDirectory()) {
       deleteDirectory(file);
       return;
@@ -198,7 +202,8 @@ class FileUtils {
     }
   }
 
-  public static void copyDirectory(File srcDir, File destDir) throws IOException {
+  public static void copyDirectory(File srcDir, File destDir)
+      throws IOException {
     copyDirectory(srcDir, destDir, null, true, null);
   }
 
@@ -216,7 +221,8 @@ class FileUtils {
    * @since 1.1
    */
   private static void copyDirectory(File srcDir, File destDir, FileFilter filter,
-      boolean preserveFileDate, List<String> exclusionList) throws IOException {
+      boolean preserveFileDate, List<String> exclusionList)
+          throws IOException {
     // recurse
     final File[] srcFiles = (filter == null)
         ? srcDir.listFiles()

@@ -97,7 +97,8 @@ public class CaInfo {
 
   private RevokeSuspendedControl revokeSuspendedCertsControl;
 
-  public CaInfo(MgmtEntry.Ca caEntry, CertStore certStore) throws OperationException {
+  public CaInfo(MgmtEntry.Ca caEntry, CertStore certStore)
+      throws OperationException {
     this.caEntry = Args.notNull(caEntry, "caEntry");
     this.certStore = Args.notNull(certStore, "certStore");
 
@@ -323,11 +324,13 @@ public class CaInfo {
     return caEntry.getKeepExpiredCertInDays();
   }
 
-  public BigInteger nextSerial() throws OperationException {
+  public BigInteger nextSerial()
+      throws OperationException {
     return randomSnGenerator.nextSerialNumber(caEntry.getSerialNoLen());
   }
 
-  public BigInteger nextCrlNumber() throws OperationException {
+  public BigInteger nextCrlNumber()
+      throws OperationException {
     long crlNo = caEntry.getNextCrlNumber();
     long currentMaxNo = certStore.getMaxCrlNumber(caEntry.getIdent());
     if (crlNo <= currentMaxNo) {
@@ -337,7 +340,8 @@ public class CaInfo {
     return BigInteger.valueOf(crlNo);
   }
 
-  public BigInteger getMaxFullCrlNumber() throws OperationException {
+  public BigInteger getMaxFullCrlNumber()
+      throws OperationException {
     long crlNumber = certStore.getMaxFullCrlNumber(caEntry.getIdent());
     return crlNumber == 0 ? null : BigInteger.valueOf(crlNumber);
   }
@@ -356,7 +360,8 @@ public class CaInfo {
     return null;
   } // method getSigner
 
-  public boolean initSigner(SecurityFactory securityFactory) throws XiSecurityException {
+  public boolean initSigner(SecurityFactory securityFactory)
+      throws XiSecurityException {
     if (signers != null) {
       return true;
     }
@@ -393,7 +398,8 @@ public class CaInfo {
     return true;
   } // method initSigner
 
-  public boolean initDhpocControl(SecurityFactory securityFactory) throws XiSecurityException {
+  public boolean initDhpocControl(SecurityFactory securityFactory)
+      throws XiSecurityException {
     if (dhpocControl != null) {
       return true;
     }

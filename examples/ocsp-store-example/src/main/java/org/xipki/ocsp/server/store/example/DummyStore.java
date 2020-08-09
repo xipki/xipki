@@ -89,7 +89,8 @@ public class DummyStore extends OcspStore {
   }
 
   @Override
-  public void close() throws IOException {
+  public void close()
+      throws IOException {
   }
 
   @Override
@@ -105,7 +106,8 @@ public class DummyStore extends OcspStore {
   @Override
   protected CertStatusInfo getCertStatus0(Date time, RequestIssuer reqIssuer,
       BigInteger serialNumber, boolean includeCertHash, boolean includeRit,
-      boolean inheritCaRevocation) throws OcspStoreException {
+      boolean inheritCaRevocation)
+          throws OcspStoreException {
     if (!knowsIssuer(reqIssuer)) {
       return null;
     }

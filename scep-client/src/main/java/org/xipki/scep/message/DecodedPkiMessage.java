@@ -171,7 +171,8 @@ public class DecodedPkiMessage extends PkiMessage {
 
   @SuppressWarnings("unchecked")
   public static DecodedPkiMessage decode(CMSSignedData pkiMessage, EnvelopedDataDecryptor recipient,
-      CollectionStore<X509CertificateHolder> certStore) throws MessageDecodingException {
+      CollectionStore<X509CertificateHolder> certStore)
+          throws MessageDecodingException {
     Args.notNull(pkiMessage, "pkiMessage");
     Args.notNull(recipient, "recipient");
 
@@ -455,7 +456,8 @@ public class DecodedPkiMessage extends PkiMessage {
   } // method decode
 
   private static String getPrintableStringAttrValue(AttributeTable attrs,
-      ASN1ObjectIdentifier type) throws MessageDecodingException {
+      ASN1ObjectIdentifier type)
+          throws MessageDecodingException {
     ASN1Encodable value = ScepUtil.getFirstAttrValue(attrs, type);
     if (value instanceof DERPrintableString) {
       return ((DERPrintableString) value).getString();
@@ -468,7 +470,8 @@ public class DecodedPkiMessage extends PkiMessage {
   }
 
   private static Integer getIntegerPrintStringAttrValue(AttributeTable attrs,
-      ASN1ObjectIdentifier type) throws MessageDecodingException {
+      ASN1ObjectIdentifier type)
+          throws MessageDecodingException {
     String str = getPrintableStringAttrValue(attrs, type);
     if (str == null) {
       return null;

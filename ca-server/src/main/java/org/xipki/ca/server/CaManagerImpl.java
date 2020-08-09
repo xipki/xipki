@@ -398,7 +398,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     return certPublisherFactoryRegister.getSupportedTypes();
   }
 
-  private void init() throws CaMgmtException {
+  private void init()
+      throws CaMgmtException {
     if (securityFactory == null) {
       throw new IllegalStateException("securityFactory is not set");
     }
@@ -522,7 +523,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
   } // method getCaSystemStatus
 
-  private void lockCa(boolean forceRelock) throws CaMgmtException {
+  private void lockCa(boolean forceRelock)
+      throws CaMgmtException {
     SystemEvent lockInfo = queryExecutor.getSystemEvent(EVENT_LOCK);
 
     if (lockInfo != null) {
@@ -549,7 +551,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method lockCa
 
   @Override
-  public void unlockCa() throws CaMgmtException {
+  public void unlockCa()
+      throws CaMgmtException {
     if (!masterMode) {
       throw logAndCreateException("could not unlock CA in slave mode");
     }
@@ -578,7 +581,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method reset
 
   @Override
-  public void restartCa(String name) throws CaMgmtException {
+  public void restartCa(String name)
+      throws CaMgmtException {
     name = toNonBlankLower(name, "name");
     assertMasterModeAndSetuped();
 
@@ -604,7 +608,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method restartCa
 
   @Override
-  public void restartCaSystem() throws CaMgmtException {
+  public void restartCaSystem()
+      throws CaMgmtException {
     reset();
     boolean caSystemStarted = startCaSystem0();
     auditLogPciEvent(caSystemStarted, "CA_CHANGE");
@@ -615,7 +620,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method restartCaSystem
 
   @Override
-  public void notifyCaChange() throws CaMgmtException {
+  public void notifyCaChange()
+      throws CaMgmtException {
     try {
       SystemEvent systemEvent = new SystemEvent(EVENT_CACHAGNE, lockInstanceId,
           System.currentTimeMillis() / 1000L);
@@ -941,7 +947,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     return ret;
   } // method getInactiveCaNames
 
-  private void initRequestors() throws CaMgmtException {
+  private void initRequestors()
+      throws CaMgmtException {
     if (requestorsInitialized) {
       return;
     }
@@ -979,7 +986,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     requestorsInitialized = true;
   } // method initRequestors
 
-  private void initSigners() throws CaMgmtException {
+  private void initSigners()
+      throws CaMgmtException {
     if (signerInitialized) {
       return;
     }
@@ -1010,7 +1018,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     signerInitialized = true;
   } // method initSigners
 
-  private void initCaAliases() throws CaMgmtException {
+  private void initCaAliases()
+      throws CaMgmtException {
     if (caAliasesInitialized) {
       return;
     }
@@ -1025,7 +1034,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     caAliasesInitialized = true;
   } // method initCaAliases
 
-  private void initCertprofiles() throws CaMgmtException {
+  private void initCertprofiles()
+      throws CaMgmtException {
     if (certprofilesInitialized) {
       return;
     }
@@ -1062,7 +1072,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     certprofilesInitialized = true;
   } // method initCertprofiles
 
-  private void initPublishers() throws CaMgmtException {
+  private void initPublishers()
+      throws CaMgmtException {
     if (publishersInitialized) {
       return;
     }
@@ -1099,7 +1110,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     publishersInitialized = true;
   } // method initPublishers
 
-  private void initCas() throws CaMgmtException {
+  private void initCas()
+      throws CaMgmtException {
     if (casInitialized) {
       return;
     }
@@ -1117,7 +1129,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     casInitialized = true;
   } // method initCas
 
-  private boolean createCa(String name) throws CaMgmtException {
+  private boolean createCa(String name)
+      throws CaMgmtException {
     caInfos.remove(name);
     idNameMap.removeCa(name);
     caHasProfiles.remove(name);
@@ -1163,7 +1176,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     return true;
   } // method createCa
 
-  public void commitNextCrlNo(NameId ca, long nextCrlNo) throws OperationException {
+  public void commitNextCrlNo(NameId ca, long nextCrlNo)
+      throws OperationException {
     try {
       queryExecutor.commitNextCrlNoIfLess(ca, nextCrlNo);
     } catch (CaMgmtException ex) {
@@ -1182,7 +1196,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public void addCa(MgmtEntry.Ca caEntry) throws CaMgmtException {
+  public void addCa(MgmtEntry.Ca caEntry)
+      throws CaMgmtException {
     notNull(caEntry, "caEntry");
     assertMasterModeAndSetuped();
     NameId ident = caEntry.getIdent();
@@ -1237,7 +1252,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method getCa
 
   @Override
-  public void changeCa(MgmtEntry.ChangeCa entry) throws CaMgmtException {
+  public void changeCa(MgmtEntry.ChangeCa entry)
+      throws CaMgmtException {
     notNull(entry, "entry");
     assertMasterModeAndSetuped();
     String name = entry.getIdent().getName();
@@ -1267,7 +1283,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method changeCa
 
   @Override
-  public void removeCertprofileFromCa(String profileName, String caName) throws CaMgmtException {
+  public void removeCertprofileFromCa(String profileName, String caName)
+      throws CaMgmtException {
     profileName = toNonBlankLower(profileName, "profileName");
     caName = toNonBlankLower(caName, "caName");
     assertMasterModeAndSetuped();
@@ -1283,7 +1300,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method removeCertprofileFromCa
 
   @Override
-  public void addCertprofileToCa(String profileName, String caName) throws CaMgmtException {
+  public void addCertprofileToCa(String profileName, String caName)
+      throws CaMgmtException {
     profileName = toNonBlankLower(profileName, "profileName");
     caName = toNonBlankLower(caName, "caName");
     assertMasterModeAndSetuped();
@@ -1318,7 +1336,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method addCertprofileToCa
 
   @Override
-  public void removePublisherFromCa(String publisherName, String caName) throws CaMgmtException {
+  public void removePublisherFromCa(String publisherName, String caName)
+      throws CaMgmtException {
     publisherName = toNonBlankLower(publisherName, "publisherName");
     caName = toNonBlankLower(caName, "caName");
     assertMasterModeAndSetuped();
@@ -1332,7 +1351,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method removePublisherFromCa
 
   @Override
-  public void addPublisherToCa(String publisherName, String caName) throws CaMgmtException {
+  public void addPublisherToCa(String publisherName, String caName)
+      throws CaMgmtException {
     publisherName = toNonBlankLower(publisherName, "publisherName");
     caName = toNonBlankLower(caName, "caName");
     assertMasterModeAndSetuped();
@@ -1390,7 +1410,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public void addRequestor(MgmtEntry.Requestor requestorEntry) throws CaMgmtException {
+  public void addRequestor(MgmtEntry.Requestor requestorEntry)
+      throws CaMgmtException {
     notNull(requestorEntry, "requestorEntry");
     assertMasterModeAndSetuped();
     String name = requestorEntry.getIdent().getName();
@@ -1424,7 +1445,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method addRequestor
 
   @Override
-  public void removeRequestor(String name) throws CaMgmtException {
+  public void removeRequestor(String name)
+      throws CaMgmtException {
     name = toNonBlankLower(name, "name");
     assertMasterModeAndSetuped();
 
@@ -1453,7 +1475,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method removeRequestor
 
   @Override
-  public void changeRequestor(String name, String type, String conf) throws CaMgmtException {
+  public void changeRequestor(String name, String type, String conf)
+      throws CaMgmtException {
     name = toNonBlankLower(name, "name");
     notBlank(type, "type");
     notBlank(conf, "conf");
@@ -1476,7 +1499,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method changeRequestor
 
   @Override
-  public void removeRequestorFromCa(String requestorName, String caName) throws CaMgmtException {
+  public void removeRequestorFromCa(String requestorName, String caName)
+      throws CaMgmtException {
     requestorName = toNonBlankLower(requestorName, "requestorName");
     caName = toNonBlankLower(caName, "caName");
     assertMasterModeAndSetuped();
@@ -1542,7 +1566,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method addRequestorToCa
 
   @Override
-  public void removeUserFromCa(String userName, String caName) throws CaMgmtException {
+  public void removeUserFromCa(String userName, String caName)
+      throws CaMgmtException {
     userName = toNonBlankLower(userName, "userName");
     caName = toNonBlankLower(caName, "caName");
     assertMasterModeAndSetuped();
@@ -1551,7 +1576,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method removeUserFromCa
 
   @Override
-  public void addUserToCa(MgmtEntry.CaHasUser user, String caName) throws CaMgmtException {
+  public void addUserToCa(MgmtEntry.CaHasUser user, String caName)
+      throws CaMgmtException {
     caName = toNonBlankLower(caName, "caName");
     assertMasterModeAndSetuped();
 
@@ -1564,7 +1590,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method addUserToCa
 
   @Override
-  public Map<String, MgmtEntry.CaHasUser> getCaHasUsersForUser(String user) throws CaMgmtException {
+  public Map<String, MgmtEntry.CaHasUser> getCaHasUsersForUser(String user)
+      throws CaMgmtException {
     notBlank(user, "user");
     return queryExecutor.getCaHasUsersForUser(user, idNameMap);
   }
@@ -1575,7 +1602,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public void removeCertprofile(String name) throws CaMgmtException {
+  public void removeCertprofile(String name)
+      throws CaMgmtException {
     name = toNonBlankLower(name, "name");
     assertMasterModeAndSetuped();
 
@@ -1598,7 +1626,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method removeCertprofile
 
   @Override
-  public void changeCertprofile(String name, String type, String conf) throws CaMgmtException {
+  public void changeCertprofile(String name, String type, String conf)
+      throws CaMgmtException {
     name = toNonBlankLower(name, "name");
     if (type == null && conf == null) {
       throw new IllegalArgumentException("type and conf cannot be both null");
@@ -1627,7 +1656,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method changeCertprofile
 
   @Override
-  public void addCertprofile(MgmtEntry.Certprofile certprofileEntry) throws CaMgmtException {
+  public void addCertprofile(MgmtEntry.Certprofile certprofileEntry)
+      throws CaMgmtException {
     notNull(certprofileEntry, "certprofileEntry");
     assertMasterModeAndSetuped();
     String name = certprofileEntry.getIdent().getName();
@@ -1649,7 +1679,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method addCertprofile
 
   @Override
-  public void addSigner(MgmtEntry.Signer signerEntry) throws CaMgmtException {
+  public void addSigner(MgmtEntry.Signer signerEntry)
+      throws CaMgmtException {
     notNull(signerEntry, "signerEntry");
     assertMasterModeAndSetuped();
     String name = signerEntry.getName();
@@ -1672,7 +1703,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method addSigner
 
   @Override
-  public void removeSigner(String name) throws CaMgmtException {
+  public void removeSigner(String name)
+      throws CaMgmtException {
     name = toNonBlankLower(name, "name");
     assertMasterModeAndSetuped();
     boolean bo = queryExecutor.deleteRowWithName(name, "SIGNER");
@@ -1740,7 +1772,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public void addPublisher(MgmtEntry.Publisher entry) throws CaMgmtException {
+  public void addPublisher(MgmtEntry.Publisher entry)
+      throws CaMgmtException {
     notNull(entry, "entry");
     assertMasterModeAndSetuped();
     String name = entry.getIdent().getName();
@@ -1782,7 +1815,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public void removePublisher(String name) throws CaMgmtException {
+  public void removePublisher(String name)
+      throws CaMgmtException {
     name = toNonBlankLower(name, "name");
     assertMasterModeAndSetuped();
     for (String caName : caHasPublishers.keySet()) {
@@ -1803,7 +1837,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method removePublisher
 
   @Override
-  public void changePublisher(String name, String type, String conf) throws CaMgmtException {
+  public void changePublisher(String name, String type, String conf)
+      throws CaMgmtException {
     name = toNonBlankLower(name, "name");
     assertMasterModeAndSetuped();
     if (type == null && conf == null) {
@@ -1831,7 +1866,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public void addCaAlias(String aliasName, String caName) throws CaMgmtException {
+  public void addCaAlias(String aliasName, String caName)
+      throws CaMgmtException {
     aliasName = toNonBlankLower(aliasName, "aliasName");
     caName = toNonBlankLower(caName, "caName");
     assertMasterModeAndSetuped();
@@ -1850,7 +1886,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method addCaAlias
 
   @Override
-  public void removeCaAlias(String name) throws CaMgmtException {
+  public void removeCaAlias(String name)
+      throws CaMgmtException {
     name = toNonBlankLower(name, "name");
     assertMasterModeAndSetuped();
     queryExecutor.removeCaAlias(name);
@@ -1909,7 +1946,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method getCaCertchain
 
   @Override
-  public void removeCa(String name) throws CaMgmtException {
+  public void removeCa(String name)
+      throws CaMgmtException {
     name = toNonBlankLower(name, "name");
     assertMasterModeAndSetuped();
 
@@ -1948,7 +1986,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method republishCertificates
 
   @Override
-  public void revokeCa(String caName, CertRevocationInfo revocationInfo) throws CaMgmtException {
+  public void revokeCa(String caName, CertRevocationInfo revocationInfo)
+      throws CaMgmtException {
     caName = toNonBlankLower(caName, "caName");
     notNull(revocationInfo, "revocationInfo");
     assertMasterModeAndSetuped();
@@ -1981,7 +2020,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method revokeCa
 
   @Override
-  public void unrevokeCa(String caName) throws CaMgmtException {
+  public void unrevokeCa(String caName)
+      throws CaMgmtException {
     caName = toNonBlankLower(caName, "caName");
     assertMasterModeAndSetuped();
 
@@ -2029,7 +2069,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method auditLogPciEvent
 
   @Override
-  public void clearPublishQueue(String caName, List<String> publisherNames) throws CaMgmtException {
+  public void clearPublishQueue(String caName, List<String> publisherNames)
+      throws CaMgmtException {
     assertMasterModeAndSetuped();
 
     publisherNames = CollectionUtil.toLowerCaseList(publisherNames);
@@ -2074,7 +2115,8 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   @Override
   public void revokeCertificate(String caName, BigInteger serialNumber, CrlReason reason,
-      Date invalidityTime) throws CaMgmtException {
+      Date invalidityTime)
+          throws CaMgmtException {
     caName = toNonBlankLower(caName, "caName");
     notNull(serialNumber, "serialNumber");
     assertMasterModeAndSetuped();
@@ -2090,7 +2132,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method revokeCertificate
 
   @Override
-  public void unrevokeCertificate(String caName, BigInteger serialNumber) throws CaMgmtException {
+  public void unrevokeCertificate(String caName, BigInteger serialNumber)
+      throws CaMgmtException {
     caName = toNonBlankLower(caName, "caName");
     notNull(serialNumber, "serialNumber");
 
@@ -2105,7 +2148,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method unrevokeCertificate
 
   @Override
-  public void removeCertificate(String caName, BigInteger serialNumber) throws CaMgmtException {
+  public void removeCertificate(String caName, BigInteger serialNumber)
+      throws CaMgmtException {
     caName = toNonBlankLower(caName, "caName");
     notNull(serialNumber, "serialNumber");
     assertMasterModeAndSetuped();
@@ -2125,7 +2169,8 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   @Override
   public X509Cert generateCertificate(String caName, String profileName,
-      byte[] encodedCsr, Date notBefore, Date notAfter) throws CaMgmtException {
+      byte[] encodedCsr, Date notBefore, Date notAfter)
+          throws CaMgmtException {
 
     caName = toNonBlankLower(caName, "caName");
     profileName = toNonBlankLower(profileName, "profileName");
@@ -2184,7 +2229,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     return certInfo.getCert().getCert();
   } // method generateCertificate
 
-  public X509Ca getX509Ca(String name) throws CaMgmtException {
+  public X509Ca getX509Ca(String name)
+      throws CaMgmtException {
     name = toNonBlankLower(name, "name");
     X509Ca ca = x509cas.get(name);
     if (ca == null) {
@@ -2193,7 +2239,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     return ca;
   } // method getX509Ca
 
-  public X509Ca getX509Ca(NameId ident) throws CaMgmtException {
+  public X509Ca getX509Ca(NameId ident)
+      throws CaMgmtException {
     notNull(ident, "ident");
     X509Ca ca = x509cas.get(ident.getName());
     if (ca == null) {
@@ -2224,7 +2271,8 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   @Override
   public X509Cert generateRootCa(MgmtEntry.Ca caEntry, String profileName, byte[] encodedCsr,
-      BigInteger serialNumber) throws CaMgmtException {
+      BigInteger serialNumber)
+          throws CaMgmtException {
     notNull(caEntry, "caEntry");
     profileName = toNonBlankLower(profileName, "profileName");
     notNull(encodedCsr, "encodedCsr");
@@ -2307,7 +2355,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     return caCert;
   } // method generateRootCa
 
-  private void assertMasterModeAndSetuped() throws CaMgmtException {
+  private void assertMasterModeAndSetuped()
+      throws CaMgmtException {
     if (!masterMode) {
       throw new CaMgmtException("operation not allowed in slave mode");
     }
@@ -2341,7 +2390,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
   } // method shutdownPublisher
 
-  SignerEntryWrapper createSigner(MgmtEntry.Signer entry) throws CaMgmtException {
+  SignerEntryWrapper createSigner(MgmtEntry.Signer entry)
+      throws CaMgmtException {
     notNull(entry, "entry");
     SignerEntryWrapper ret = new SignerEntryWrapper();
     ret.setDbEntry(entry);
@@ -2355,7 +2405,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     return ret;
   } // method createSigner
 
-  IdentifiedCertprofile createCertprofile(MgmtEntry.Certprofile entry) throws CaMgmtException {
+  IdentifiedCertprofile createCertprofile(MgmtEntry.Certprofile entry)
+      throws CaMgmtException {
     notNull(entry, "entry");
 
     String type = entry.getType();
@@ -2373,7 +2424,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
   } // method createCertprofile
 
-  IdentifiedCertPublisher createPublisher(MgmtEntry.Publisher entry) throws CaMgmtException {
+  IdentifiedCertPublisher createPublisher(MgmtEntry.Publisher entry)
+      throws CaMgmtException {
     notNull(entry, "entry");
     String type = entry.getType();
 
@@ -2397,19 +2449,22 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method createPublisher
 
   @Override
-  public void addUser(MgmtEntry.AddUser addUserEntry) throws CaMgmtException {
+  public void addUser(MgmtEntry.AddUser addUserEntry)
+      throws CaMgmtException {
     assertMasterModeAndSetuped();
     queryExecutor.addUser(addUserEntry);
   }
 
   @Override
-  public void changeUser(MgmtEntry.ChangeUser changeUserEntry) throws CaMgmtException {
+  public void changeUser(MgmtEntry.ChangeUser changeUserEntry)
+      throws CaMgmtException {
     assertMasterModeAndSetuped();
     queryExecutor.changeUser(changeUserEntry);
   }
 
   @Override
-  public void removeUser(String username) throws CaMgmtException {
+  public void removeUser(String username)
+      throws CaMgmtException {
     username = toNonBlankLower(username, "username");
     assertMasterModeAndSetuped();
     if (!queryExecutor.deleteRowWithName(username, "TUSER")) {
@@ -2418,7 +2473,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method removeUser
 
   @Override
-  public MgmtEntry.User getUser(String username) throws CaMgmtException {
+  public MgmtEntry.User getUser(String username)
+      throws CaMgmtException {
     return queryExecutor.getUser(username.toLowerCase());
   }
 
@@ -2427,7 +2483,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public X509CRLHolder generateCrlOnDemand(String caName) throws CaMgmtException {
+  public X509CRLHolder generateCrlOnDemand(String caName)
+      throws CaMgmtException {
     caName = toNonBlankLower(caName, "caName");
 
     X509Ca ca = getX509Ca(caName);
@@ -2439,7 +2496,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method generateCrlOnDemand
 
   @Override
-  public X509CRLHolder getCrl(String caName, BigInteger crlNumber) throws CaMgmtException {
+  public X509CRLHolder getCrl(String caName, BigInteger crlNumber)
+      throws CaMgmtException {
     caName = toNonBlankLower(caName, "caName");
     notNull(crlNumber, "crlNumber");
     X509Ca ca = getX509Ca(caName);
@@ -2455,7 +2513,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method getCrl
 
   @Override
-  public X509CRLHolder getCurrentCrl(String caName) throws CaMgmtException {
+  public X509CRLHolder getCurrentCrl(String caName)
+      throws CaMgmtException {
     caName = toNonBlankLower(caName, "caName");
     X509Ca ca = getX509Ca(caName);
     try {
@@ -2475,7 +2534,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   static String canonicalizeSignerConf(String keystoreType, String signerConf,
-      X509Cert[] certChain, SecurityFactory securityFactory) throws CaMgmtException {
+      X509Cert[] certChain, SecurityFactory securityFactory)
+          throws CaMgmtException {
     if (!signerConf.contains("file:") && !signerConf.contains("base64:")) {
       return signerConf;
     }
@@ -2563,7 +2623,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method getCert
 
   @Override
-  public byte[] getCertRequest(String caName, BigInteger serialNumber) throws CaMgmtException {
+  public byte[] getCertRequest(String caName, BigInteger serialNumber)
+      throws CaMgmtException {
     caName = toNonBlankLower(caName, "caName");
     notNull(serialNumber, "serialNumber");
     X509Ca ca = getX509Ca(caName);
@@ -2576,7 +2637,8 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   @Override
   public List<CertListInfo> listCertificates(String caName, X500Name subjectPattern, Date validFrom,
-      Date validTo, CertListOrderBy orderBy, int numEntries) throws CaMgmtException {
+      Date validTo, CertListOrderBy orderBy, int numEntries)
+          throws CaMgmtException {
     caName = toNonBlankLower(caName, "caName");
     range(numEntries, "numEntries", 1, 1000);
     X509Ca ca = getX509Ca(caName);
@@ -2588,7 +2650,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method listCertificates
 
   @Override
-  public void refreshTokenForSignerType(String signerType) throws CaMgmtException {
+  public void refreshTokenForSignerType(String signerType)
+      throws CaMgmtException {
     try {
       securityFactory.refreshTokenForSignerType(signerType);
     } catch (XiSecurityException ex) {
@@ -3286,7 +3349,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   private static FileOrValue createFileOrValue(ZipOutputStream zipStream,
-      String content, String fileName) throws IOException {
+      String content, String fileName)
+          throws IOException {
     if (StringUtil.isBlank(content)) {
       return null;
     }
@@ -3308,7 +3372,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method createFileOrValue
 
   private static FileOrBinary createFileOrBase64Value(ZipOutputStream zipStream,
-      String b64Content, String fileName) throws IOException {
+      String b64Content, String fileName)
+          throws IOException {
     if (StringUtil.isBlank(b64Content)) {
       return null;
     }
@@ -3317,7 +3382,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method createFileOrBase64Value
 
   private static FileOrBinary createFileOrBinary(ZipOutputStream zipStream,
-      byte[] content, String fileName) throws IOException {
+      byte[] content, String fileName)
+          throws IOException {
     if (content == null || content.length == 0) {
       return null;
     }

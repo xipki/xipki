@@ -65,7 +65,8 @@ public class Subject extends ValidatableConf {
   }
 
   @Override
-  public void validate() throws InvalidConfException {
+  public void validate()
+      throws InvalidConfException {
     notEmpty(rdns, "rdns");
     validate(rdns);
   }
@@ -96,7 +97,8 @@ public class Subject extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(text, "text");
     }
 
@@ -240,7 +242,8 @@ public class Subject extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notNull(type, "type");
       validate(type);
       if (minOccurs > maxOccurs) {

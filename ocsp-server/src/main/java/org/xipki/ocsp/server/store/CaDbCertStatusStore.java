@@ -226,7 +226,8 @@ public class CaDbCertStatusStore extends OcspStore {
   @Override
   protected CertStatusInfo getCertStatus0(Date time, RequestIssuer reqIssuer,
       BigInteger serialNumber, boolean includeCertHash, boolean includeRit,
-      boolean inheritCaRevocation) throws OcspStoreException {
+      boolean inheritCaRevocation)
+          throws OcspStoreException {
     if (serialNumber.signum() != 1) { // non-positive serial number
       return CertStatusInfo.getUnknownCertStatusInfo(new Date(), null);
     }
@@ -391,7 +392,8 @@ public class CaDbCertStatusStore extends OcspStore {
    * @return the next idle preparedStatement, {@code null} will be returned if no
    *     PreparedStatement can be created within 5 seconds.
    */
-  private PreparedStatement preparedStatement(String sqlQuery) throws DataAccessException {
+  private PreparedStatement preparedStatement(String sqlQuery)
+      throws DataAccessException {
     return datasource.prepareStatement(sqlQuery);
   }
 

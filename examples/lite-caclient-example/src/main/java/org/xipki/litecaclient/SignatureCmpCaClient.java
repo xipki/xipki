@@ -198,7 +198,8 @@ public class SignatureCmpCaClient extends CmpCaClient {
   } // method getContentVerifierProvider
 
   @Override
-  protected byte[] decrypt(EncryptedValue ev) throws Exception {
+  protected byte[] decrypt(EncryptedValue ev)
+      throws Exception {
     AlgorithmIdentifier keyAlg = ev.getKeyAlg();
     ASN1ObjectIdentifier keyOid = keyAlg.getAlgorithm();
 
@@ -349,7 +350,8 @@ public class SignatureCmpCaClient extends CmpCaClient {
   } // method decrypt
 
   @Override
-  protected ProtectedPKIMessage build(ProtectedPKIMessageBuilder builder) throws Exception {
+  protected ProtectedPKIMessage build(ProtectedPKIMessageBuilder builder)
+      throws Exception {
     return builder.build(requestorSigner);
   }
 

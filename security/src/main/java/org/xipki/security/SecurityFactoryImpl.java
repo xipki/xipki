@@ -99,7 +99,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
   @Override
   public ConcurrentContentSigner createSigner(String type, SignerConf conf,
-      X509Cert[] certificateChain) throws ObjectCreationException {
+      X509Cert[] certificateChain)
+          throws ObjectCreationException {
     ConcurrentContentSigner signer = signerFactoryRegister.newSigner(this, type, conf,
         certificateChain);
 
@@ -111,7 +112,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
   @Override
   public ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey,
-      DHSigStaticKeyCertPair ownerKeyAndCert) throws InvalidKeyException {
+      DHSigStaticKeyCertPair ownerKeyAndCert)
+          throws InvalidKeyException {
     return SignerUtil.getContentVerifierProvider(publicKey, ownerKeyAndCert);
   }
 
@@ -207,7 +209,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
   @Override
   public byte[] extractMinimalKeyStore(String keystoreType, byte[] keystoreBytes, String keyname,
-      char[] password, X509Cert[] newCertChain) throws KeyStoreException {
+      char[] password, X509Cert[] newCertChain)
+          throws KeyStoreException {
     notBlank(keystoreType, "keystoreType");
     notNull(keystoreBytes, "keystoreBytes");
 
@@ -288,7 +291,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
   } // method getSecureRandom
 
   private static void validateSigner(ConcurrentContentSigner signer, String signerType,
-      SignerConf signerConf) throws ObjectCreationException {
+      SignerConf signerConf)
+          throws ObjectCreationException {
     if (signer.getPublicKey() == null) {
       return;
     }
@@ -330,7 +334,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
   } // method validateSigner
 
   @Override
-  public void refreshTokenForSignerType(String signerType) throws XiSecurityException {
+  public void refreshTokenForSignerType(String signerType)
+      throws XiSecurityException {
     signerFactoryRegister.refreshTokenForSignerType(signerType);
   }
 

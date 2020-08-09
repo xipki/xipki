@@ -86,7 +86,8 @@ public class CaServletFilter implements Filter {
   private HttpMgmtServlet mgmtServlet;
 
   @Override
-  public void init(FilterConfig filterConfig) throws ServletException {
+  public void init(FilterConfig filterConfig)
+      throws ServletException {
     XipkiBaseDir.init();
 
     CaServerConf conf;

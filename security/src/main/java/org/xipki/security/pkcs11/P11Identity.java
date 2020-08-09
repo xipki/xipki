@@ -132,7 +132,8 @@ public abstract class P11Identity implements Comparable<P11Identity> {
   protected abstract byte[] sign0(long mechanism, P11Params parameters, byte[] content)
       throws P11TokenException;
 
-  public byte[] digestSecretKey(long mechanism) throws P11TokenException, XiSecurityException {
+  public byte[] digestSecretKey(long mechanism)
+      throws P11TokenException, XiSecurityException {
     slot.assertMechanismSupported(mechanism);
     if (LOG.isDebugEnabled()) {
       LOG.debug("digest secret with mechanism {}", Functions.getMechanismDescription(mechanism));
@@ -140,7 +141,8 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     return digestSecretKey0(mechanism);
   }
 
-  protected abstract byte[] digestSecretKey0(long mechanism) throws P11TokenException;
+  protected abstract byte[] digestSecretKey0(long mechanism)
+      throws P11TokenException;
 
   public P11IdentityId getId() {
     return id;
@@ -159,7 +161,8 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     return publicKey;
   }
 
-  public void setCertificates(X509Cert[] certificateChain) throws P11TokenException {
+  public void setCertificates(X509Cert[] certificateChain)
+      throws P11TokenException {
     if (CollectionUtil.isEmpty(certificateChain)) {
       this.certificateChain = null;
     } else {

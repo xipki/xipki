@@ -184,7 +184,8 @@ public class Actions {
      *           if checking failed.
      */
     protected abstract void checkParameters(X509Cert respIssuer,
-        List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts) throws Exception;
+        List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
+            throws Exception;
 
     /**
      * Check whether the response has the expected issuer, certificate serial numbers and
@@ -208,7 +209,8 @@ public class Actions {
         throws Exception;
 
     @Override
-    protected final Object execute0() throws Exception {
+    protected final Object execute0()
+        throws Exception {
       if (StringUtil.isBlank(serialNumberList) && isEmpty(certFiles)) {
         throw new IllegalCmdParamException("Neither serialNumbers nor certFiles is set");
       }
@@ -433,7 +435,8 @@ public class Actions {
     @Option(name = "--sign", description = "sign request")
     protected Boolean signRequest = Boolean.FALSE;
 
-    protected RequestOptions getRequestOptions() throws Exception {
+    protected RequestOptions getRequestOptions()
+        throws Exception {
       RequestOptions options = new RequestOptions();
       options.setUseNonce(usenonce.booleanValue());
       if (nonceLen != null) {
@@ -461,14 +464,16 @@ public class Actions {
 
     @Override
     protected void checkParameters(X509Cert respIssuer, List<BigInteger> serialNumbers,
-        Map<BigInteger, byte[]> encodedCerts) throws Exception {
+        Map<BigInteger, byte[]> encodedCerts)
+            throws Exception {
       Args.notEmpty(serialNumbers, "serialNunmbers");
     }
 
     @Override
     protected void processResponse(OCSPResp response, X509Cert respIssuer,
         IssuerHash issuerHash, List<BigInteger> serialNumbers,
-        Map<BigInteger, byte[]> encodedCerts) throws Exception {
+        Map<BigInteger, byte[]> encodedCerts)
+            throws Exception {
       Args.notNull(response, "response");
       Args.notNull(issuerHash, "issuerHash");
       Args.notNull(serialNumbers, "serialNumbers");

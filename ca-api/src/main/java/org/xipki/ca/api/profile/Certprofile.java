@@ -612,7 +612,8 @@ public abstract class Certprofile implements Closeable {
    * @throws BadFormatException
    *         If the currentSerialNumber is not a non-negative decimal long.
    */
-  public String incSerialNumber(String currentSerialNumber) throws BadFormatException {
+  public String incSerialNumber(String currentSerialNumber)
+      throws BadFormatException {
     try {
       long currentSn = (currentSerialNumber == null) ? 0
           : Long.parseLong(currentSerialNumber.trim());
@@ -659,7 +660,8 @@ public abstract class Certprofile implements Closeable {
    * @throws CertprofileException
    *         if error during the initialization occurs.
    */
-  public abstract void initialize(String data) throws CertprofileException;
+  public abstract void initialize(String data)
+      throws CertprofileException;
 
   public abstract CertLevel getCertLevel();
 

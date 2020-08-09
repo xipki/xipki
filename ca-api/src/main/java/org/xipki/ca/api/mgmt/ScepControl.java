@@ -56,7 +56,8 @@ public class ScepControl {
 
   private boolean supportGetCrl = false;
 
-  public ScepControl(String conf) throws InvalidConfException {
+  public ScepControl(String conf)
+      throws InvalidConfException {
     if (StringUtil.isBlank(conf)) {
       return;
     }

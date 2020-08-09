@@ -74,7 +74,8 @@ public class X509ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       for (X509ExtensionType m : extensions) {
         m.validate();
       }
@@ -103,7 +104,8 @@ public class X509ExtensionType extends ValidatableConf {
   }
 
   @Override
-  public void validate() throws InvalidConfException {
+  public void validate()
+      throws InvalidConfException {
     notNull(type, "type");
     notNull(constant, "constant");
     validate(type);
@@ -135,7 +137,8 @@ public class X509ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notNull(oid, "oid");
     }
   } // class DescribableOid
@@ -226,7 +229,8 @@ public class X509ExtensionType extends ValidatableConf {
     }
 
     // CHECKSTYLE:SKIP
-    public ASN1Encodable toASN1Encodable() throws InvalidConfException {
+    public ASN1Encodable toASN1Encodable()
+        throws InvalidConfException {
       ASN1Encodable rv;
 
       switch (type) {
@@ -303,7 +307,8 @@ public class X509ExtensionType extends ValidatableConf {
     } // method toASN1Encodable
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notNull(type, "type");
       validate(tag);
       if (FieldType.NULL == type) {
@@ -409,7 +414,8 @@ public class X509ExtensionType extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       if (value < 0) {
         throw new InvalidConfException("value may not be negative");
       }

@@ -107,7 +107,8 @@ public class ProxyP11Module extends P11Module {
 
   private HostnameVerifier hostnameVerifier;
 
-  private ProxyP11Module(P11ModuleConf moduleConf) throws P11TokenException {
+  private ProxyP11Module(P11ModuleConf moduleConf)
+      throws P11TokenException {
     super(moduleConf);
 
     final String modulePath = moduleConf.getNativeLibrary();
@@ -188,7 +189,8 @@ public class ProxyP11Module extends P11Module {
     refresh();
   } // constructor
 
-  public static P11Module getInstance(P11ModuleConf moduleConf) throws P11TokenException {
+  public static P11Module getInstance(P11ModuleConf moduleConf)
+      throws P11TokenException {
     Args.notNull(moduleConf, "moduleConf");
     return new ProxyP11Module(moduleConf);
   }
@@ -198,7 +200,8 @@ public class ProxyP11Module extends P11Module {
     return readOnly || super.isReadOnly();
   }
 
-  public void refresh() throws P11TokenException {
+  public void refresh()
+      throws P11TokenException {
     byte[] resp = send(P11ProxyConstants.ACTION_GET_SERVER_CAPS, null);
 
     ProxyMessage.ServerCaps caps;
@@ -267,7 +270,8 @@ public class ProxyP11Module extends P11Module {
     }
   }
 
-  protected byte[] send(byte[] request) throws IOException {
+  protected byte[] send(byte[] request)
+      throws IOException {
     Args.notNull(request, "request");
     HttpURLConnection httpUrlConnection = IoUtil.openHttpConn(serverUrl);
 
@@ -368,7 +372,8 @@ public class ProxyP11Module extends P11Module {
    * @return result.
    * @throws P11TokenException If error occurred.
    */
-  public byte[] send(short action, ASN1Object content) throws P11TokenException {
+  public byte[] send(short action, ASN1Object content)
+      throws P11TokenException {
     byte[] encodedContent;
     if (content == null) {
       encodedContent = null;

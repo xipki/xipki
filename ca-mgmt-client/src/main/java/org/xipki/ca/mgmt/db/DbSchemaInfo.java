@@ -40,7 +40,8 @@ public class DbSchemaInfo {
 
   private final Map<String, String> variables = new HashMap<>();
 
-  public DbSchemaInfo(DataSourceWrapper datasource) throws DataAccessException {
+  public DbSchemaInfo(DataSourceWrapper datasource)
+      throws DataAccessException {
     Args.notNull(datasource, "datasource");
 
     final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";

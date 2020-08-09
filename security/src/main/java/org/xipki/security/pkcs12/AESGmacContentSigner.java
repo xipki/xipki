@@ -56,17 +56,20 @@ public class AESGmacContentSigner implements XiContentSigner {
   private class AESGmacOutputStream extends OutputStream {
 
     @Override
-    public void write(int bb) throws IOException {
+    public void write(int bb)
+        throws IOException {
       cipher.updateAAD(new byte[]{(byte) bb});
     }
 
     @Override
-    public void write(byte[] bytes) throws IOException {
+    public void write(byte[] bytes)
+        throws IOException {
       cipher.updateAAD(bytes);
     }
 
     @Override
-    public void write(byte[] bytes, int off, int len) throws IOException {
+    public void write(byte[] bytes, int off, int len)
+        throws IOException {
       cipher.updateAAD(bytes, off, len);
     }
 

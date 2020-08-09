@@ -56,7 +56,8 @@ abstract class CrmfKeyWrapper {
 
   abstract AlgorithmIdentifier getAlgorithmIdentifier();
 
-  abstract byte[] generateWrappedKey(byte[] encryptionKey) throws OperatorException;
+  abstract byte[] generateWrappedKey(byte[] encryptionKey)
+      throws OperatorException;
 
   // CHECKSTYLE:SKIP
   static class RSAOAEPAsymmetricKeyWrapper extends CrmfKeyWrapper {
@@ -76,7 +77,8 @@ abstract class CrmfKeyWrapper {
     }
 
     @Override
-    public byte[] generateWrappedKey(byte[] encryptionKey) throws OperatorException {
+    public byte[] generateWrappedKey(byte[] encryptionKey)
+        throws OperatorException {
       try {
         Cipher cipher = Cipher.getInstance("RSA/NONE/OAEPPADDING", "BC");
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
@@ -125,7 +127,8 @@ abstract class CrmfKeyWrapper {
      * </pre>
      */
     @Override
-    public byte[] generateWrappedKey(byte[] keyToWrap) throws OperatorException {
+    public byte[] generateWrappedKey(byte[] keyToWrap)
+        throws OperatorException {
       try {
         BlockCipher cbcCipher = new CBCBlockCipher(new AESEngine());
         IESCipher cipher = new IESCipher(

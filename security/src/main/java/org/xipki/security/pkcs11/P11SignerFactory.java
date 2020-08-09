@@ -79,7 +79,8 @@ public class P11SignerFactory implements SignerFactory {
 
   @Override
   public ConcurrentContentSigner newSigner(String type, SignerConf conf,
-      X509Cert[] certificateChain) throws ObjectCreationException {
+      X509Cert[] certificateChain)
+          throws ObjectCreationException {
     if (!TYPE.equalsIgnoreCase(type)) {
       throw new ObjectCreationException("unknown signer type " + type);
     }
@@ -188,7 +189,8 @@ public class P11SignerFactory implements SignerFactory {
   } // method newSigner
 
   @Override
-  public void refreshToken(String type) throws XiSecurityException {
+  public void refreshToken(String type)
+      throws XiSecurityException {
     if (!TYPE.equalsIgnoreCase(type)) {
       // Nothing to do
       return;

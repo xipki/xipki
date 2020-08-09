@@ -62,7 +62,8 @@ class TargetDigestReader implements Closeable {
 
     private PreparedStatement inArraySelectStmt;
 
-    Retriever(boolean revokedOnly) throws DataAccessException {
+    Retriever(boolean revokedOnly)
+        throws DataAccessException {
       this.revokedOnly = revokedOnly;
       conn = datasource.getConnection();
 
@@ -133,7 +134,8 @@ class TargetDigestReader implements Closeable {
       datasource.returnConnection(conn);
     } // method run
 
-    private Map<BigInteger, DigestEntry> query(CertsBundle bundle) throws DataAccessException {
+    private Map<BigInteger, DigestEntry> query(CertsBundle bundle)
+        throws DataAccessException {
       List<BigInteger> serialNumbers = bundle.getSerialNumbers();
       int size = serialNumbers.size();
       boolean batchSupported = datasource.getDatabaseType() != DatabaseType.H2;
@@ -261,7 +263,8 @@ class TargetDigestReader implements Closeable {
   }
 
   private Map<BigInteger, DigestEntry> getCertsViaSingleSelect(PreparedStatement singleSelectStmt,
-      List<BigInteger> serialNumbers) throws DataAccessException {
+      List<BigInteger> serialNumbers)
+          throws DataAccessException {
     Map<BigInteger, DigestEntry> ret = new HashMap<>(serialNumbers.size());
 
     for (BigInteger serialNumber : serialNumbers) {
@@ -275,7 +278,8 @@ class TargetDigestReader implements Closeable {
   } // method getCertsViaSingleSelect
 
   private Map<BigInteger, DigestEntry> getCertsViaInArraySelect(PreparedStatement batchSelectStmt,
-      List<BigInteger> serialNumbers) throws DataAccessException {
+      List<BigInteger> serialNumbers)
+          throws DataAccessException {
     final int n = serialNumbers.size();
     if (n != numPerSelect) {
       throw new IllegalArgumentException("size of serialNumbers is not '" + numPerSelect
@@ -365,7 +369,8 @@ class TargetDigestReader implements Closeable {
     datasource.releaseResources(ps, rs);
   }
 
-  public void awaitTerminiation() throws Exception {
+  public void awaitTerminiation()
+      throws Exception {
     executor.shutdown();
 
     while (!executor.awaitTermination(1000, TimeUnit.MILLISECONDS)) {
@@ -379,7 +384,8 @@ class TargetDigestReader implements Closeable {
     }
   } // method awaitTerminiation
 
-  private String getBase64HashValue(ResultSet rs) throws SQLException {
+  private String getBase64HashValue(ResultSet rs)
+      throws SQLException {
     switch (dbType) {
       case XIPKI_OCSP_v4:
         return rs.getString("HASH");

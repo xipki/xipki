@@ -55,7 +55,8 @@ public class CtLogVerifyTest {
   private static final String caCertFile = "/ctlog-certs/letsencrypt/ca-of-letsencrypt-org.pem";
 
   @Test
-  public void testVerify() throws Exception {
+  public void testVerify()
+      throws Exception {
     Security.addProvider(new BouncyCastleProvider());
     byte[] keyBytes = read(pubkeyFile);
 
@@ -94,7 +95,8 @@ public class CtLogVerifyTest {
     Assert.assertEquals("signature valid", true, sigValid);
   }
 
-  public static byte[] read(String name) throws IOException {
+  public static byte[] read(String name)
+      throws IOException {
     InputStream is = CtLogVerifyTest.class.getResourceAsStream(name);
     if (is == null) {
       throw new IOException("could not find " + name);

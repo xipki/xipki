@@ -93,7 +93,8 @@ class RefDigestReader implements Closeable {
     private PreparedStatement selectCertStmt;
     private boolean endReached;
 
-    Retriever() throws DataAccessException {
+    Retriever()
+        throws DataAccessException {
       try {
         selectCertStmt = datasource.prepareStatement(conn, selectCertSql);
       } catch (DataAccessException ex) {
@@ -118,7 +119,8 @@ class RefDigestReader implements Closeable {
       selectCertStmt = null;
     } // method run
 
-    private void query() throws InterruptedException {
+    private void query()
+        throws InterruptedException {
       long startId = lastProcessedId + 1;
       DigestEntrySet result = new DigestEntrySet(startId);
 
@@ -191,7 +193,8 @@ class RefDigestReader implements Closeable {
   } // class Retriever
 
   private RefDigestReader(DataSourceWrapper datasource, X509Cert caCert,
-      int totalAccount, long minId, int numBlocksToRead, AtomicBoolean stopMe) throws Exception {
+      int totalAccount, long minId, int numBlocksToRead, AtomicBoolean stopMe)
+          throws Exception {
     this.datasource = Args.notNull(datasource, "datasource");
     this.caCert = Args.notNull(caCert, "caCert");
     this.stopMe = Args.notNull(stopMe, "stopMe");
@@ -326,7 +329,8 @@ class RefDigestReader implements Closeable {
     return totalAccount;
   }
 
-  public synchronized CertsBundle nextCerts() throws Exception {
+  public synchronized CertsBundle nextCerts()
+      throws Exception {
     if (endReached.get() && outQueue.isEmpty()) {
       return null;
     }

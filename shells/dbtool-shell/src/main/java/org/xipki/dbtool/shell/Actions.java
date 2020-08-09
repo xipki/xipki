@@ -48,7 +48,8 @@ public class Actions {
   public static class Initdb extends LiquibaseAction {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       LiquibaseMain.DatabaseConf dbConf = getDatabaseConf();
 
       printDatabaseInfo(dbConf, dbSchemaFile);
@@ -99,7 +100,8 @@ public class Actions {
       return LiquibaseMain.DatabaseConf.getInstance(props, passwordResolver);
     }
 
-    protected static Properties getPropertiesFromFile(String propFile) throws IOException {
+    protected static Properties getPropertiesFromFile(String propFile)
+        throws IOException {
       Properties props = new Properties();
       props.load(Files.newInputStream(Paths.get(IoUtil.expandFilepath(propFile))));
       return props;

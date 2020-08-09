@@ -165,7 +165,8 @@ public class P12ContentSignerBuilder {
   // CHECKSTYLE:SKIP
   private static class SM2ContentSignerBuilder extends BcContentSignerBuilder {
 
-    private SM2ContentSignerBuilder() throws NoSuchAlgorithmException {
+    private SM2ContentSignerBuilder()
+        throws NoSuchAlgorithmException {
       super(ALGID_SM2_SM3, ALGID_SM3);
     }
 
@@ -194,7 +195,8 @@ public class P12ContentSignerBuilder {
     this.certificateChain = null;
   }
 
-  public P12ContentSignerBuilder(KeypairWithCert keypairWithCert) throws XiSecurityException {
+  public P12ContentSignerBuilder(KeypairWithCert keypairWithCert)
+      throws XiSecurityException {
     notNull(keypairWithCert, "keypairWithCert");
     this.key = keypairWithCert.getKey();
     this.publicKey = keypairWithCert.getPublicKey();
@@ -202,7 +204,8 @@ public class P12ContentSignerBuilder {
   }
 
   public ConcurrentContentSigner createSigner(AlgorithmIdentifier signatureAlgId, int parallelism,
-      SecureRandom random) throws XiSecurityException, NoSuchPaddingException {
+      SecureRandom random)
+          throws XiSecurityException, NoSuchPaddingException {
     notNull(signatureAlgId, "signatureAlgId");
     positive(parallelism, "parallelism");
 

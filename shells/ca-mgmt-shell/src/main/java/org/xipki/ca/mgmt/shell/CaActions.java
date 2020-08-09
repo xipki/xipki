@@ -149,7 +149,8 @@ public class CaActions {
     private List<String> issuerCertFiles;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       MgmtEntry.Ca caEntry = getCaEntry();
       if (certFile != null) {
         X509Cert caCert = X509Util.parseCert(new File(certFile));
@@ -291,7 +292,8 @@ public class CaActions {
     @Reference
     private PasswordResolver passwordResolver;
 
-    protected MgmtEntry.Ca getCaEntry() throws Exception {
+    protected MgmtEntry.Ca getCaEntry()
+        throws Exception {
       Args.range(snLen, "snLen",
           CaManager.MIN_SERIALNUMBER_SIZE, CaManager.MAX_SERIALNUMBER_SIZE);
 
@@ -404,7 +406,8 @@ public class CaActions {
     private String caAlias;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       String msg = "CA alias " + caAlias + " associated with CA " + caName;
       try {
         caManager.addCaAlias(caAlias, caName);
@@ -426,7 +429,8 @@ public class CaActions {
     private String caAlias;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       Set<String> aliasNames = caManager.getCaAliasNames();
 
       StringBuilder sb = new StringBuilder();
@@ -474,7 +478,8 @@ public class CaActions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       String msg = "CA alias " + caAlias;
       if (force || confirm("Do you want to remove " + msg, 3)) {
         try {
@@ -513,7 +518,8 @@ public class CaActions {
     private String rootcaCertOutFile;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       MgmtEntry.Ca caEntry = getCaEntry();
       byte[] csr = IoUtil.read(csrFile);
       BigInteger serialNumber = null;
@@ -544,7 +550,8 @@ public class CaActions {
     private Boolean verbose = Boolean.FALSE;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       StringBuilder sb = new StringBuilder();
       if (name == null) {
         sb.append("successful CAs:\n");
@@ -590,7 +597,8 @@ public class CaActions {
     private List<String> profileNames;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       for (String profileName : profileNames) {
         String msg = StringUtil.concat("certificate profile ", profileName, " to CA ", caName);
         try {
@@ -615,7 +623,8 @@ public class CaActions {
     private String caName;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (caManager.getCa(caName) == null) {
         throw new CmdFailure("could not find CA '" + caName + "'");
       }
@@ -655,7 +664,8 @@ public class CaActions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       for (String profileName : profileNames) {
         String msg = StringUtil.concat("certificate profile ", profileName, " from CA ", caName);
         if (force || confirm("Do you want to remove " + msg, 3)) {
@@ -687,7 +697,8 @@ public class CaActions {
     private List<String> publisherNames;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       for (String publisherName : publisherNames) {
         String msg = "publisher " + publisherName + " to CA " + caName;
         try {
@@ -713,7 +724,8 @@ public class CaActions {
     private String caName;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (caManager.getCa(caName) == null) {
         throw new CmdFailure("could not find CA '" + caName + "'");
       }
@@ -752,7 +764,8 @@ public class CaActions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       for (String publisherName : publisherNames) {
         String msg = "publisher " + publisherName + " from CA " + caName;
         if (force || confirm("Do you want to remove " + msg, 3)) {
@@ -782,7 +795,8 @@ public class CaActions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       String msg = "CA " + name;
       if (force || confirm("Do you want to remove " + msg, 3)) {
         try {
@@ -823,7 +837,8 @@ public class CaActions {
     private Set<String> profiles;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       boolean ra = isEnabled(raS, false, "ra");
 
       MgmtEntry.CaHasRequestor entry =
@@ -854,7 +869,8 @@ public class CaActions {
     private String caName;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (caManager.getCa(caName) == null) {
         throw new CmdFailure("could not find CA '" + caName + "'");
       }
@@ -893,7 +909,8 @@ public class CaActions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       for (String requestorName : requestorNames) {
         String msg = "requestor " + requestorName + " from CA " + caName;
         if (force || confirm("Do you want to remove " + msg, 3)) {
@@ -937,7 +954,8 @@ public class CaActions {
     private String invalidityDateS;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       CrlReason crlReason = CrlReason.forNameOrText(reason);
 
       if (!PERMITTED_REASONS.contains(crlReason)) {
@@ -980,7 +998,8 @@ public class CaActions {
     private String caName;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (!caManager.getCaNames().contains(caName)) {
         throw new IllegalCmdParamException("invalid CA name " + caName);
       }
@@ -1118,7 +1137,8 @@ public class CaActions {
     @Reference
     private PasswordResolver passwordResolver;
 
-    protected MgmtEntry.ChangeCa getChangeCaEntry() throws Exception {
+    protected MgmtEntry.ChangeCa getChangeCaEntry()
+        throws Exception {
       MgmtEntry.ChangeCa entry = new MgmtEntry.ChangeCa(new NameId(null, caName));
 
       if (snLen != null) {
@@ -1257,7 +1277,8 @@ public class CaActions {
     } // method getChangeCaEntry
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       String msg = "CA " + caName;
       try {
         caManager.changeCa(getChangeCaEntry());
@@ -1307,7 +1328,8 @@ public class CaActions {
     private Set<String> profiles;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       MgmtEntry.CaHasUser entry = new MgmtEntry.CaHasUser(new NameId(null, userName));
       entry.setProfiles(profiles);
       int intPermission = ShellUtil.getPermission(permissions);
@@ -1340,7 +1362,8 @@ public class CaActions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       String msg = "user " + userName + " from CA " + caName;
       if (force || confirm("Do you want to remove " + msg, 3)) {
         try {
@@ -1369,7 +1392,8 @@ public class CaActions {
     private List<String> publisherNames;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (publisherNames == null) {
         throw new IllegalStateException("should not reach here");
       }
@@ -1416,7 +1440,8 @@ public class CaActions {
     private List<String> caNames;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       String msg = "configuration to file " + confFile;
       try {
         InputStream is = caManager.exportConf(caNames);
@@ -1448,7 +1473,8 @@ public class CaActions {
     private String outDir = ".";
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       String msg = "configuration " + confFile;
       try {
         InputStream confStream;
@@ -1483,7 +1509,8 @@ public class CaActions {
   public static class NotifyChange extends CaAction {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       String msg = "the change of CA system";
       try {
         caManager.notifyCaChange();
@@ -1515,7 +1542,8 @@ public class CaActions {
     private String confFile;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (conf == null && confFile != null) {
         conf = new String(IoUtil.read(confFile));
       }
@@ -1548,7 +1576,8 @@ public class CaActions {
     private String confFile;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       MgmtEntry.Certprofile entry = caManager.getCertprofile(name);
       if (entry == null) {
         throw new IllegalCmdParamException("no certificate profile named " + name + " is defined");
@@ -1579,7 +1608,8 @@ public class CaActions {
     private Boolean verbose = Boolean.FALSE;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       StringBuilder sb = new StringBuilder();
 
       if (name == null) {
@@ -1626,7 +1656,8 @@ public class CaActions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       String msg = "certificate profile " + name;
       if (force || confirm("Do you want to remove " + msg, 3)) {
         try {
@@ -1661,7 +1692,8 @@ public class CaActions {
     protected String confFile;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (type == null && conf == null && confFile == null) {
         throw new IllegalCmdParamException("nothing to update");
       }
@@ -1701,7 +1733,8 @@ public class CaActions {
     private String confFile;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (conf == null && confFile != null) {
         conf = new String(IoUtil.read(confFile));
       }
@@ -1733,7 +1766,8 @@ public class CaActions {
     private String confFile;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       MgmtEntry.Publisher entry = caManager.getPublisher(name);
       if (entry == null) {
         throw new IllegalCmdParamException("no publisher named " + name + " is defined");
@@ -1759,7 +1793,8 @@ public class CaActions {
     private String name;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (name == null) {
         Set<String> names = caManager.getPublisherNames();
         int size = names.size();
@@ -1805,7 +1840,8 @@ public class CaActions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       String msg = "publisher " + name;
       if (force || confirm("Do you want to remove " + msg, 3)) {
         try {
@@ -1840,7 +1876,8 @@ public class CaActions {
     protected String confFile;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (type == null && conf == null && confFile == null) {
         throw new IllegalCmdParamException("nothing to update");
       }
@@ -1870,7 +1907,8 @@ public class CaActions {
     protected String type;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       caManager.refreshTokenForSignerType(type);
       println("refreshed token for signer type " + type);
       return null;
@@ -1895,7 +1933,8 @@ public class CaActions {
     private List<String> publisherNames;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (publisherNames == null) {
         throw new IllegalStateException("should not reach here");
       }
@@ -1943,7 +1982,8 @@ public class CaActions {
     private String password;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (!(certFile == null ^ password == null)) {
         throw new CmdFailure("exactly one of cert and password must be specified");
       }
@@ -1986,7 +2026,8 @@ public class CaActions {
     private Boolean verbose = Boolean.FALSE;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       StringBuilder sb = new StringBuilder();
 
       if (name == null) {
@@ -2033,7 +2074,8 @@ public class CaActions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       String msg = "CMP requestor " + name;
       if (force || confirm("Do you want to remove " + msg, 3)) {
         try {
@@ -2065,7 +2107,8 @@ public class CaActions {
     protected String password;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       // check if the certificate is valid
       String msg = "CMP requestor " + name;
 
@@ -2100,7 +2143,8 @@ public class CaActions {
     private String name;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       try {
         caManager.restartCa(name);
         System.out.println("restarted CA " + name);
@@ -2117,7 +2161,8 @@ public class CaActions {
   public static class Restart extends CaAction {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       try {
         caManager.restartCaSystem();
       } catch (CaMgmtException ex) {
@@ -2164,7 +2209,8 @@ public class CaActions {
     private PasswordResolver passwordResolver;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       String base64Cert = null;
       X509Cert signerCert = null;
       if (certFile != null) {
@@ -2201,7 +2247,8 @@ public class CaActions {
     private Boolean verbose = Boolean.FALSE;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       StringBuilder sb = new StringBuilder();
 
       if (name == null) {
@@ -2247,7 +2294,8 @@ public class CaActions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       String msg = "signer " + name;
       if (force || confirm("Do you want to remove " + msg, 3)) {
         try {
@@ -2284,7 +2332,8 @@ public class CaActions {
     @Option(name = "--conf", description = "conf of the signer or 'null'")
     private String conf;
 
-    protected String getSignerConf() throws Exception {
+    protected String getSignerConf()
+        throws Exception {
       if (conf == null) {
         return null;
       }
@@ -2301,7 +2350,8 @@ public class CaActions {
     } // method getSigenrConf
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       String cert = null;
       if (CaManager.NULL.equalsIgnoreCase(certFile)) {
         cert = CaManager.NULL;
@@ -2328,7 +2378,8 @@ public class CaActions {
   public static class SystemStatus extends CaAction {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       CaSystemStatus status = caManager.getCaSystemStatus();
       if (status != null) {
         println(status.toString());
@@ -2345,7 +2396,8 @@ public class CaActions {
   public static class Unlock extends CaAction {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       try {
         caManager.unlockCa();
         println("unlocked CA system, calling ca:restart to restart CA system");
@@ -2371,7 +2423,8 @@ public class CaActions {
     private Boolean inactive = Boolean.FALSE;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       if (password == null) {
         password = new String(readPassword());
       }
@@ -2397,7 +2450,8 @@ public class CaActions {
     private String name;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       MgmtEntry.User userEntry = caManager.getUser(name);
       if (userEntry == null) {
         throw new CmdFailure("no user named '" + name + "' is configured");
@@ -2431,7 +2485,8 @@ public class CaActions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       String msg = "user " + name;
       if (force || confirm("Do you want to remove " + msg, 3)) {
         try {
@@ -2463,7 +2518,8 @@ public class CaActions {
     private String password;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       Boolean realActive;
       if (active != null) {
         if (inactive != null) {

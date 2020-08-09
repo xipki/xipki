@@ -44,7 +44,8 @@ public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
     private final int plength;
     private final int qlength;
 
-    public DSA(int plength, int qlength, SecurityFactory securityFactory) throws Exception {
+    public DSA(int plength, int qlength, SecurityFactory securityFactory)
+        throws Exception {
       super("PKCS#12 DSA key generation\nplength: " + plength + "\nqlength: " + qlength,
           securityFactory);
 
@@ -53,7 +54,8 @@ public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
     }
 
     @Override
-    protected void generateKeypair(SecureRandom random) throws Exception {
+    protected void generateKeypair(SecureRandom random)
+        throws Exception {
       KeyUtil.generateDSAKeypair(plength, qlength, random);
     }
 
@@ -64,13 +66,15 @@ public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
 
     private final ASN1ObjectIdentifier curveOid;
 
-    public EC(ASN1ObjectIdentifier curveOid, SecurityFactory securityFactory) throws Exception {
+    public EC(ASN1ObjectIdentifier curveOid, SecurityFactory securityFactory)
+        throws Exception {
       super("PKCS#12 EC key generation\ncurve: " + curveOid.getId(), securityFactory);
       this.curveOid = curveOid;
     }
 
     @Override
-    protected void generateKeypair(SecureRandom random) throws Exception {
+    protected void generateKeypair(SecureRandom random)
+        throws Exception {
       if (EdECConstants.isEdwardsOrMontgomeryCurve(curveOid)) {
         KeyUtil.generateEdECKeypair(curveOid, random);
       } else {
@@ -96,7 +100,8 @@ public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
     }
 
     @Override
-    protected void generateKeypair(SecureRandom random) throws Exception {
+    protected void generateKeypair(SecureRandom random)
+        throws Exception {
       KeyUtil.generateRSAKeypair(keysize, publicExponent, random);
     }
 
@@ -128,10 +133,12 @@ public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
     this.securityFactory = notNull(securityFactory, "securityFactory");
   }
 
-  protected abstract void generateKeypair(SecureRandom random) throws Exception;
+  protected abstract void generateKeypair(SecureRandom random)
+      throws Exception;
 
   @Override
-  protected Runnable getTestor() throws Exception {
+  protected Runnable getTestor()
+      throws Exception {
     return new Testor();
   }
 

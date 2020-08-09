@@ -47,7 +47,8 @@ public class DataSourceFactory {
   private static final Logger LOG = LoggerFactory.getLogger(DataSourceFactory.class);
 
   public DataSourceWrapper createDataSource(String name, FileOrValue conf,
-      PasswordResolver passwordResolver) throws PasswordResolverException, IOException {
+      PasswordResolver passwordResolver)
+          throws PasswordResolverException, IOException {
     Args.notNull(conf, "conf");
 
     Properties props = new Properties();
@@ -59,7 +60,8 @@ public class DataSourceFactory {
   } // method createDataSource
 
   public DataSourceWrapper createDataSource(String name, InputStream conf,
-      PasswordResolver passwordResolver) throws PasswordResolverException, IOException {
+      PasswordResolver passwordResolver)
+          throws PasswordResolverException, IOException {
     Args.notNull(conf, "conf");
     Properties config = new Properties();
     try {
@@ -76,7 +78,8 @@ public class DataSourceFactory {
   } // method createDataSource
 
   public DataSourceWrapper createDataSource(String name, Properties conf,
-      PasswordResolver passwordResolver) throws PasswordResolverException {
+      PasswordResolver passwordResolver)
+          throws PasswordResolverException {
     Args.notNull(conf, "conf");
     DatabaseType databaseType;
     String className = conf.getProperty("dataSourceClassName");
@@ -148,7 +151,8 @@ public class DataSourceFactory {
   } // method createDataSource
 
   public DataSourceWrapper createDataSourceForFile(String name, String confFile,
-      PasswordResolver passwordResolver) throws PasswordResolverException, IOException {
+      PasswordResolver passwordResolver)
+          throws PasswordResolverException, IOException {
     Args.notBlank(confFile, "confFile");
     InputStream fileIn = Files.newInputStream(Paths.get(IoUtil.expandFilepath(confFile)));
     return createDataSource(name, fileIn, passwordResolver);

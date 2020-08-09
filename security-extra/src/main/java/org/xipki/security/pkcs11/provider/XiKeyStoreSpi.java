@@ -151,7 +151,8 @@ public class XiKeyStoreSpi extends KeyStoreSpi {
     }
   } // class engineLoad
 
-  private void engineLoad(String moduleName) throws P11TokenException, XiSecurityException {
+  private void engineLoad(String moduleName)
+      throws P11TokenException, XiSecurityException {
     P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
     P11Module module = p11Service.getModule();
     List<P11SlotIdentifier> slotIds = module.getSlotIds();
@@ -234,12 +235,14 @@ public class XiKeyStoreSpi extends KeyStoreSpi {
   }
 
   @Override
-  public void engineSetCertificateEntry(String alias, Certificate cert) throws KeyStoreException {
+  public void engineSetCertificateEntry(String alias, Certificate cert)
+      throws KeyStoreException {
     throw new KeyStoreException("keystore is read only");
   }
 
   @Override
-  public void engineDeleteEntry(String alias) throws KeyStoreException {
+  public void engineDeleteEntry(String alias)
+      throws KeyStoreException {
     throw new KeyStoreException("keystore is read only");
   }
 

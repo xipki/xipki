@@ -37,7 +37,8 @@ import org.xipki.util.IoUtil;
 public class CtLogTest {
 
   @Test
-  public void parseCtLogInCerts() throws Exception {
+  public void parseCtLogInCerts()
+      throws Exception {
     String[] certFiles = new String[]{
         "/ctlog-certs/githubcom.pem",
         "/ctlog-certs/cab-domain-validated1.crt"
@@ -52,7 +53,8 @@ public class CtLogTest {
     }
   }
 
-  private void parseCtLogInCert(String certFile) throws Exception {
+  private void parseCtLogInCert(String certFile)
+      throws Exception {
     byte[] certBytes = IoUtil.read(getClass().getResourceAsStream(certFile));
     certBytes = X509Util.toDerEncoded(certBytes);
     Certificate cert = Certificate.getInstance(certBytes);

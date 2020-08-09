@@ -326,7 +326,8 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(name, "name");
       notBlank(status, "status");
       notBlank(maxValidity, "maxValidity");
@@ -367,7 +368,8 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(name, "name");
     }
 
@@ -529,7 +531,8 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       validate(signers);
       validate(requestors);
       validate(publishers);
@@ -571,7 +574,8 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
     }
 
   } // class CaHasPublisher
@@ -589,7 +593,8 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
     }
 
   } // class CaHasProfile
@@ -637,7 +642,8 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
     }
 
   } // class CaHasRequestor
@@ -695,7 +701,8 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
     }
 
   } // class CaHasUser
@@ -903,7 +910,8 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       super.validate();
 
       notNull(caId, "caId");
@@ -944,7 +952,8 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       validate(certs);
     }
 
@@ -993,7 +1002,8 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       super.validate();
       notNull(caId, "caId");
       notBlank(crlNo, "crlNo");
@@ -1023,7 +1033,8 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       validate(crls);
     }
 
@@ -1052,7 +1063,8 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(serial, "serial");
     }
 
@@ -1101,7 +1113,8 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(name, "name");
       notBlank(type, "type");
       notNull(conf, "conf");
@@ -1133,7 +1146,8 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       super.validate();
       notNull(rid, "rid");
       notNull(cid, "cid");
@@ -1164,7 +1178,8 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       validate(reqCerts);
     }
 
@@ -1193,7 +1208,8 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       super.validate();
       notNull(update, "update");
       notBlank(file, "file");
@@ -1224,7 +1240,8 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       validate(requests);
     }
 
@@ -1273,7 +1290,8 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(name, "name");
       notBlank(type, "type");
       notNull(conf, "conf");
@@ -1316,7 +1334,8 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
     }
 
   } // class ToPublish
@@ -1364,7 +1383,8 @@ public class CaCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(name, "name");
       notBlank(password, "password");
     }
@@ -1448,7 +1468,8 @@ public class CaCertstore extends ValidatableConf {
   }
 
   @Override
-  public void validate() throws InvalidConfException {
+  public void validate()
+      throws InvalidConfException {
     validate(publishQueue);
     validate(deltaCrlCache);
   }

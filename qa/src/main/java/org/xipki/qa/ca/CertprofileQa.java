@@ -89,13 +89,15 @@ public class CertprofileQa {
 
   private final XijsonCertprofile certprofile;
 
-  public CertprofileQa(String data) throws CertprofileException {
+  public CertprofileQa(String data)
+      throws CertprofileException {
     this(
         StringUtil.toUtf8Bytes(
             notNull(data, "data")));
   }
 
-  public CertprofileQa(byte[] dataBytes) throws CertprofileException {
+  public CertprofileQa(byte[] dataBytes)
+      throws CertprofileException {
     notNull(dataBytes, "dataBytes");
     try {
       X509ProfileType conf = X509ProfileType.parse(new ByteArrayInputStream(dataBytes));
@@ -297,7 +299,8 @@ public class CertprofileQa {
   } // method checkCert
 
   public static Map<ASN1ObjectIdentifier, QaExtensionValue> buildConstantExtesions(
-      Map<String, ExtensionType> extensionsType) throws CertprofileException {
+      Map<String, ExtensionType> extensionsType)
+          throws CertprofileException {
     if (extensionsType == null) {
       return null;
     }

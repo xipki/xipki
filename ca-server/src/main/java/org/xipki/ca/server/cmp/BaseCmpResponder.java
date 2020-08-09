@@ -335,7 +335,8 @@ abstract class BaseCmpResponder {
   } // method randomBytes
 
   private ProtectionVerificationResult verifyProtection(String tid, GeneralPKIMessage pkiMessage,
-      CmpControl cmpControl) throws CMPException, InvalidKeyException, OperatorCreationException {
+      CmpControl cmpControl)
+          throws CMPException, InvalidKeyException, OperatorCreationException {
     ProtectedPKIMessage protectedMsg = new ProtectedPKIMessage(pkiMessage);
 
     PKIHeader header = protectedMsg.getHeader();

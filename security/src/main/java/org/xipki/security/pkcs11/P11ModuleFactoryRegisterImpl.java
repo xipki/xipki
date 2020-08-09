@@ -70,7 +70,8 @@ public class P11ModuleFactoryRegisterImpl implements P11ModuleFactoryRegister {
   }
 
   @Override
-  public P11Module getP11Module(P11ModuleConf conf) throws P11TokenException {
+  public P11Module getP11Module(P11ModuleConf conf)
+      throws P11TokenException {
     String type = conf.getType().toLowerCase();
 
     String nativeLib = conf.getNativeLibrary();

@@ -76,7 +76,8 @@ public class PbmMacCmpCaClient extends CmpCaClient {
   private AlgorithmIdentifier requestMac;
 
   public PbmMacCmpCaClient(String caUri, X509Certificate caCert, X500Name requestorSubject,
-      X500Name responderSubject, String hashAlgo) throws Exception {
+      X500Name responderSubject, String hashAlgo)
+          throws Exception {
     super(caUri, caCert, requestorSubject, responderSubject, hashAlgo);
   }
 
@@ -166,7 +167,8 @@ public class PbmMacCmpCaClient extends CmpCaClient {
   } // method verifyProtection
 
   @Override
-  protected byte[] decrypt(EncryptedValue ev) throws Exception {
+  protected byte[] decrypt(EncryptedValue ev)
+      throws Exception {
     AlgorithmIdentifier symmAlg = ev.getSymmAlg();
     if (!PKCSObjectIdentifiers.id_PBES2.equals(symmAlg.getAlgorithm())) {
       throw new Exception("unsupported symmAlg " + symmAlg.getAlgorithm().getId());
@@ -211,7 +213,8 @@ public class PbmMacCmpCaClient extends CmpCaClient {
   } // method decrypt
 
   @Override
-  protected ProtectedPKIMessage build(ProtectedPKIMessageBuilder builder) throws Exception {
+  protected ProtectedPKIMessage build(ProtectedPKIMessageBuilder builder)
+      throws Exception {
     builder.setSenderKID(kid);
     byte[] salt = new byte[64];
     new SecureRandom().nextBytes(salt);

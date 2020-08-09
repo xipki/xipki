@@ -184,7 +184,8 @@ abstract class P11ContentSigner implements XiContentSigner {
       }
     }
 
-    private byte[] getPlainSignature() throws XiSecurityException, P11TokenException {
+    private byte[] getPlainSignature()
+        throws XiSecurityException, P11TokenException {
       byte[] dataToSign;
       if (outputStream instanceof ByteArrayOutputStream) {
         dataToSign = ((ByteArrayOutputStream) outputStream).toByteArray();
@@ -291,7 +292,8 @@ abstract class P11ContentSigner implements XiContentSigner {
       }
     }
 
-    private byte[] getPlainSignature() throws XiSecurityException, P11TokenException {
+    private byte[] getPlainSignature()
+        throws XiSecurityException, P11TokenException {
       byte[] dataToSign;
       if (outputStream instanceof ByteArrayOutputStream) {
         dataToSign = ((ByteArrayOutputStream) outputStream).toByteArray();
@@ -359,7 +361,8 @@ abstract class P11ContentSigner implements XiContentSigner {
     private final ByteArrayOutputStream outputStream;
 
     Mac(P11CryptService cryptService, P11IdentityId identityId,
-        AlgorithmIdentifier macAlgId) throws XiSecurityException, P11TokenException {
+        AlgorithmIdentifier macAlgId)
+            throws XiSecurityException, P11TokenException {
       super(cryptService, identityId, macAlgId);
 
       ASN1ObjectIdentifier oid = macAlgId.getAlgorithm();
@@ -458,7 +461,8 @@ abstract class P11ContentSigner implements XiContentSigner {
     } // method static
 
     RSA(P11CryptService cryptService, P11IdentityId identityId,
-        AlgorithmIdentifier signatureAlgId) throws XiSecurityException, P11TokenException {
+        AlgorithmIdentifier signatureAlgId)
+            throws XiSecurityException, P11TokenException {
       super(cryptService, identityId, signatureAlgId);
 
       ASN1ObjectIdentifier algOid = signatureAlgId.getAlgorithm();
@@ -558,17 +562,20 @@ abstract class P11ContentSigner implements XiContentSigner {
       }
 
       @Override
-      public void write(int oneByte) throws IOException {
+      public void write(int oneByte)
+          throws IOException {
         pssSigner.update((byte) oneByte);
       }
 
       @Override
-      public void write(byte[] bytes) throws IOException {
+      public void write(byte[] bytes)
+          throws IOException {
         pssSigner.update(bytes, 0, bytes.length);
       }
 
       @Override
-      public void write(byte[] bytes, int off, int len) throws IOException {
+      public void write(byte[] bytes, int off, int len)
+          throws IOException {
         pssSigner.update(bytes, off, len);
       }
 
@@ -577,14 +584,17 @@ abstract class P11ContentSigner implements XiContentSigner {
       }
 
       @Override
-      public void flush() throws IOException {
+      public void flush()
+          throws IOException {
       }
 
       @Override
-      public void close() throws IOException {
+      public void close()
+          throws IOException {
       }
 
-      byte[] generateSignature() throws DataLengthException, CryptoException {
+      byte[] generateSignature()
+          throws DataLengthException, CryptoException {
         byte[] signature = pssSigner.generateSignature();
         pssSigner.reset();
         return signature;
@@ -710,7 +720,8 @@ abstract class P11ContentSigner implements XiContentSigner {
 
     SM2(P11CryptService cryptService, P11IdentityId identityId,
         AlgorithmIdentifier signatureAlgId, ASN1ObjectIdentifier curveOid, BigInteger pubPointX,
-        BigInteger pubPointY) throws XiSecurityException, P11TokenException {
+        BigInteger pubPointY)
+            throws XiSecurityException, P11TokenException {
       super(cryptService, identityId, signatureAlgId);
 
       String algOid = signatureAlgId.getAlgorithm().getId();
@@ -768,7 +779,8 @@ abstract class P11ContentSigner implements XiContentSigner {
       }
     }
 
-    private byte[] getPlainSignature() throws XiSecurityException, P11TokenException {
+    private byte[] getPlainSignature()
+        throws XiSecurityException, P11TokenException {
       byte[] dataToSign;
       P11Params.P11ByteArrayParams params;
       if (outputStream instanceof ByteArrayOutputStream) {

@@ -56,7 +56,8 @@ public class DhpocControl {
 
   private final X509Cert[] certs;
 
-  public DhpocControl(String conf, SecurityFactory securityFactory) throws XiSecurityException {
+  public DhpocControl(String conf, SecurityFactory securityFactory)
+      throws XiSecurityException {
     ConfPairs pairs = new ConfPairs(conf);
     String type = pairs.value("type");
     String passwordStr = pairs.value("password");

@@ -68,18 +68,21 @@ public class Passwords {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
     }
 
   } // class PasswordConf
 
   private PasswordResolverImpl passwordResolver;
 
-  public void init() throws IOException, InvalidConfException {
+  public void init()
+      throws IOException, InvalidConfException {
     init(null);
   }
 
-  public void init(PasswordConf conf) throws IOException, InvalidConfException {
+  public void init(PasswordConf conf)
+      throws IOException, InvalidConfException {
     passwordResolver = new PasswordResolverImpl();
     if (conf == null) {
       conf = PasswordConf.DEFAULT;

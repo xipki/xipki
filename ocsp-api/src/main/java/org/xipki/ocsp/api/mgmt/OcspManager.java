@@ -26,7 +26,9 @@ package org.xipki.ocsp.api.mgmt;
 
 public interface OcspManager {
 
-  void restartOcspServer() throws OcspMgmtException;
+  void restartOcspServer()
+      throws OcspMgmtException;
 
-  void refreshTokenForSignerType(String signerType) throws OcspMgmtException;
+  void refreshTokenForSignerType(String signerType)
+      throws OcspMgmtException;
 }

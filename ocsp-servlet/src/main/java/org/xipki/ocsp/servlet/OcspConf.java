@@ -61,7 +61,8 @@ public class OcspConf extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
     }
 
   } // class RemoteMgmt
@@ -111,7 +112,8 @@ public class OcspConf extends ValidatableConf {
   }
 
   @Override
-  public void validate() throws InvalidConfException {
+  public void validate()
+      throws InvalidConfException {
     validate(remoteMgmt);
     validate(security);
   }

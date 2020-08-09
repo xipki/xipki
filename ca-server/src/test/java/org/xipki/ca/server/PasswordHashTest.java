@@ -45,7 +45,8 @@ public class PasswordHashTest {
   }
 
   @Test
-  public void testDuplication() throws NoSuchAlgorithmException, InvalidKeySpecException {
+  public void testDuplication()
+      throws NoSuchAlgorithmException, InvalidKeySpecException {
     Set<String> passwordHashes = new HashSet<>(20);
     for (int i = 0; i < 10; i++) {
       String passwordHash = PasswordHash.createHash("p\r\nassw0Rd!");
@@ -56,7 +57,8 @@ public class PasswordHashTest {
   }
 
   @Test
-  public void testValidation() throws NoSuchAlgorithmException, InvalidKeySpecException {
+  public void testValidation()
+      throws NoSuchAlgorithmException, InvalidKeySpecException {
     boolean failure = false;
     for (int i = 0; i < 100; i++) {
       String password = "" + i;

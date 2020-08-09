@@ -183,7 +183,8 @@ public class ScepResponder {
     AES_ENC_ALGOS.add(CMSAlgorithm.AES256_GCM);
   }
 
-  public ScepResponder(CaManagerImpl caManager, MgmtEntry.Ca caEntry) throws CaMgmtException {
+  public ScepResponder(CaManagerImpl caManager, MgmtEntry.Ca caEntry)
+      throws CaMgmtException {
     this.caManager = notNull(caManager, "caManager");
     this.caIdent = notNull(caEntry, "caEntry").getIdent();
     this.control = caEntry.getScepControl();
@@ -203,7 +204,8 @@ public class ScepResponder {
     setResponder(responder);
   } // constructor
 
-  public final void setResponder(SignerEntryWrapper responder) throws CaMgmtException {
+  public final void setResponder(SignerEntryWrapper responder)
+      throws CaMgmtException {
     if (responder == null) {
       this.responderKey = null;
       this.responderCert = null;
@@ -247,7 +249,8 @@ public class ScepResponder {
     return caCaps;
   }
 
-  public ScepCaCertRespBytes getCaCertResp() throws OperationException {
+  public ScepCaCertRespBytes getCaCertResp()
+      throws OperationException {
     refreshCa();
     return caCertRespBytes;
   }
@@ -272,7 +275,8 @@ public class ScepResponder {
   } // method isOnService
 
   public ContentInfo servicePkiOperation(CMSSignedData requestContent, String certprofileName,
-      String msgId, AuditEvent event) throws MessageDecodingException, OperationException {
+      String msgId, AuditEvent event)
+          throws MessageDecodingException, OperationException {
     if (!isOnService()) {
       LOG.warn("SCEP {} is not active", caIdent.getName());
       throw new OperationException(ErrorCode.SYSTEM_UNAVAILABLE);
@@ -617,7 +621,8 @@ public class ScepResponder {
     return buildSignedData(certs.get(0));
   } // method pollCert
 
-  private SignedData buildSignedData(X509Cert cert) throws OperationException {
+  private SignedData buildSignedData(X509Cert cert)
+      throws OperationException {
     CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
     try {
       cmsSignedDataGen.addCertificate(cert.toBcCert());
@@ -724,7 +729,8 @@ public class ScepResponder {
     return cmsSignedDataGen.generate(new CMSAbsentContent());
   } // method createDegeneratedSigendData
 
-  private static byte[] getTransactionIdBytes(String tid) throws OperationException {
+  private static byte[] getTransactionIdBytes(String tid)
+      throws OperationException {
     byte[] bytes = null;
     final int n = tid.length();
     if (n % 2 != 0) { // neither hex nor base64 encoded
@@ -758,7 +764,8 @@ public class ScepResponder {
     audit.addEventData(name, (value == null) ? "null" : value);
   }
 
-  private void refreshCa() throws OperationException {
+  private void refreshCa()
+      throws OperationException {
     try {
       X509Ca ca = caManager.getX509Ca(caIdent);
       X509Cert currentCaCert = ca.getCaInfo().getCert();

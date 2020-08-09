@@ -218,7 +218,8 @@ public class EjbcaCertStatusStore extends OcspStore {
   @Override
   protected CertStatusInfo getCertStatus0(Date time, RequestIssuer reqIssuer,
       BigInteger serialNumber, boolean includeCertHash, boolean includeRit,
-      boolean inheritCaRevocation) throws OcspStoreException {
+      boolean inheritCaRevocation)
+          throws OcspStoreException {
     if (includeRit) {
       throw new OcspStoreException("EJBCA store does not support includeRit");
     }
@@ -380,7 +381,8 @@ public class EjbcaCertStatusStore extends OcspStore {
    * @return the next idle preparedStatement, {@code null} will be returned if no
    *     PreparedStatement can be created within 5 seconds.
    */
-  private PreparedStatement preparedStatement(String sqlQuery) throws DataAccessException {
+  private PreparedStatement preparedStatement(String sqlQuery)
+      throws DataAccessException {
     return datasource.prepareStatement(sqlQuery);
   }
 

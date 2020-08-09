@@ -59,7 +59,8 @@ public class PasswordBasedEncryption {
    *         if error occurs.
    */
   public static byte[] encrypt(PBEAlgo algo, byte[] plaintext, char[] password,
-      int iterationCount, byte[] salt) throws GeneralSecurityException {
+      int iterationCount, byte[] salt)
+          throws GeneralSecurityException {
     notNull(plaintext, "plaintext");
     notNull(password, "password");
     positive(iterationCount, "iterationCount");
@@ -94,7 +95,8 @@ public class PasswordBasedEncryption {
   } // method encrypt
 
   public static byte[] decrypt(PBEAlgo algo, byte[] cipherTextWithIv, char[] password,
-      int iterationCount, byte[] salt) throws GeneralSecurityException {
+      int iterationCount, byte[] salt)
+          throws GeneralSecurityException {
     notNull(cipherTextWithIv, "cipherTextWithIv");
     notNull(password, "password");
     positive(iterationCount, "iterationCount");

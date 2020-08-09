@@ -134,7 +134,8 @@ public class ConcurrentBag<T extends IConcurrentBagEntry> implements AutoCloseab
    * @return a borrowed instance from the bag or null if a timeout occurs
    * @throws InterruptedException if interrupted while waiting
    */
-  public T borrow(long timeout, TimeUnit timeUnit) throws InterruptedException {
+  public T borrow(long timeout, TimeUnit timeUnit)
+      throws InterruptedException {
     // Try the thread-local list first
     final List<Object> list = threadList.get();
     for (int i = list.size() - 1; i >= 0; i--) {

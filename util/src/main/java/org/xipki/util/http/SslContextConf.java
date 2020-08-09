@@ -132,7 +132,8 @@ public class SslContextConf {
     this.sslHostnameVerifier = emptyAsNull(sslHostnameVerifier);
   }
 
-  public SSLContext getSslContext() throws ObjectCreationException {
+  public SSLContext getSslContext()
+      throws ObjectCreationException {
     if (!useSslConf) {
       return null;
     }
@@ -167,7 +168,8 @@ public class SslContextConf {
     return sslContext;
   } // method getSslContext
 
-  public SSLSocketFactory getSslSocketFactory() throws ObjectCreationException {
+  public SSLSocketFactory getSslSocketFactory()
+      throws ObjectCreationException {
     if (!useSslConf) {
       return null;
     }
@@ -180,7 +182,8 @@ public class SslContextConf {
     return sslSocketFactory;
   }
 
-  public HostnameVerifier buildHostnameVerifier() throws ObjectCreationException {
+  public HostnameVerifier buildHostnameVerifier()
+      throws ObjectCreationException {
     if (!useSslConf) {
       return null;
     }

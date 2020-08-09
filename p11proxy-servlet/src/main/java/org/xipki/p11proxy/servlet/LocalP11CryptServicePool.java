@@ -58,7 +58,8 @@ public class LocalP11CryptServicePool {
     return initialized.get();
   }
 
-  public void init() throws P11TokenException, XiSecurityException {
+  public void init()
+      throws P11TokenException, XiSecurityException {
     LOG.info("initializing ...");
     if (initialized.get()) {
       LOG.info("already initialized, skipping ...");
@@ -95,7 +96,8 @@ public class LocalP11CryptServicePool {
   }
 
   /* ID = SHA1(moduleName.getBytes("UTF-8")[1..15] */
-  private static short deriveModuleId(String moduleName) throws XiSecurityException {
+  private static short deriveModuleId(String moduleName)
+      throws XiSecurityException {
     byte[] hash = HashAlgo.SHA1.hash(StringUtil.toUtf8Bytes(moduleName));
     int intCode = 0x7FFF & ((0xFF & hash[0]) << 8) | (0xFF & hash[1]);
     return (short) intCode;

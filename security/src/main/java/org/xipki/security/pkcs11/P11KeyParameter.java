@@ -60,7 +60,8 @@ public class P11KeyParameter extends AsymmetricKeyParameter {
   }
 
   public static P11KeyParameter getInstance(P11CryptService p11CryptService,
-      P11SlotIdentifier slot, P11ObjectIdentifier objectId) throws InvalidKeyException {
+      P11SlotIdentifier slot, P11ObjectIdentifier objectId)
+          throws InvalidKeyException {
     return new P11KeyParameter(p11CryptService, slot, objectId);
   }
 

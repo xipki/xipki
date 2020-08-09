@@ -39,7 +39,8 @@ public abstract class IdentifidDbObject extends ValidatableConf {
   }
 
   @Override
-  public void validate() throws InvalidConfException {
+  public void validate()
+      throws InvalidConfException {
     notNull(id, "id");
   }
 

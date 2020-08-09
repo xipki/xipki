@@ -249,7 +249,8 @@ public class X509Ca implements Closeable {
       }
     } // method run
 
-    private void run0() throws OperationException {
+    private void run0()
+        throws OperationException {
       CrlControl control = caInfo.getCrlControl();
       // In seconds
       long lastIssueTimeOfFullCrl = certstore.getThisUpdateOfCurrentCrl(caIdent, false);
@@ -543,7 +544,8 @@ public class X509Ca implements Closeable {
     return certstore.getCert(subjectName, transactionId);
   }
 
-  public CertStore.KnowCertResult knowsCert(X509Cert cert) throws OperationException {
+  public CertStore.KnowCertResult knowsCert(X509Cert cert)
+      throws OperationException {
     notNull(cert, "cert");
 
     X500Name issuerX500 = cert.getIssuer();
@@ -559,7 +561,8 @@ public class X509Ca implements Closeable {
     return certstore.getCertWithRevocationInfo(caIdent.getId(), serialNumber, caIdNameMap);
   }
 
-  public byte[] getCertRequest(BigInteger serialNumber) throws OperationException {
+  public byte[] getCertRequest(BigInteger serialNumber)
+      throws OperationException {
     return certstore.getCertRequest(caIdent, serialNumber);
   }
 
@@ -570,15 +573,18 @@ public class X509Ca implements Closeable {
   }
 
   public List<CertListInfo> listCerts(X500Name subjectPattern, Date validFrom,
-      Date validTo, CertListOrderBy orderBy, int numEntries) throws OperationException {
+      Date validTo, CertListOrderBy orderBy, int numEntries)
+          throws OperationException {
     return certstore.listCerts(caIdent, subjectPattern, validFrom, validTo, orderBy, numEntries);
   }
 
-  public NameId authenticateUser(String user, byte[] password) throws OperationException {
+  public NameId authenticateUser(String user, byte[] password)
+      throws OperationException {
     return certstore.authenticateUser(user.toLowerCase(), password);
   }
 
-  public NameId getUserIdent(int userId) throws OperationException {
+  public NameId getUserIdent(int userId)
+      throws OperationException {
     String name = certstore.getUsername(userId);
     return (name == null) ? null : new NameId(userId, name);
   }
@@ -589,11 +595,13 @@ public class X509Ca implements Closeable {
     return (caHasUser == null) ? null : caManager.createByUserRequestor(caHasUser);
   }
 
-  public X509CRLHolder getCurrentCrl() throws OperationException {
+  public X509CRLHolder getCurrentCrl()
+      throws OperationException {
     return getCrl(null);
   }
 
-  public X509CRLHolder getCrl(BigInteger crlNumber) throws OperationException {
+  public X509CRLHolder getCrl(BigInteger crlNumber)
+      throws OperationException {
     LOG.info("     START getCrl: ca={}, crlNumber={}", caIdent.getName(), crlNumber);
     boolean successful = false;
 
@@ -623,11 +631,13 @@ public class X509Ca implements Closeable {
     }
   } // method getCrl
 
-  public CertificateList getBcCurrentCrl() throws OperationException {
+  public CertificateList getBcCurrentCrl()
+      throws OperationException {
     return getBcCrl(null);
   }
 
-  public CertificateList getBcCrl(BigInteger crlNumber) throws OperationException {
+  public CertificateList getBcCrl(BigInteger crlNumber)
+      throws OperationException {
     LOG.info("     START getCrl: ca={}, crlNumber={}", caIdent.getName(), crlNumber);
     boolean successful = false;
 
@@ -655,7 +665,8 @@ public class X509Ca implements Closeable {
     }
   } // method getCrl
 
-  private void cleanupCrlsWithoutException(String msgId) throws OperationException {
+  private void cleanupCrlsWithoutException(String msgId)
+      throws OperationException {
     try {
       cleanupCrls(msgId);
     } catch (Throwable th) {
@@ -663,7 +674,8 @@ public class X509Ca implements Closeable {
     }
   }
 
-  private void cleanupCrls(String msgId) throws OperationException {
+  private void cleanupCrls(String msgId)
+      throws OperationException {
     int numCrls = caInfo.getNumCrls();
     LOG.info("     START cleanupCrls: ca={}, numCrls={}", caIdent.getName(), numCrls);
 
@@ -685,7 +697,8 @@ public class X509Ca implements Closeable {
     }
   } // method cleanupCrls
 
-  public X509CRLHolder generateCrlOnDemand(String msgId) throws OperationException {
+  public X509CRLHolder generateCrlOnDemand(String msgId)
+      throws OperationException {
     CrlControl control = caInfo.getCrlControl();
     if (control == null) {
       throw new OperationException(NOT_PERMITTED, "CA could not generate CRL");
@@ -728,7 +741,8 @@ public class X509Ca implements Closeable {
   } // method generateCrlOnDemand
 
   private X509CRLHolder generateCrl(boolean deltaCrl, Date thisUpdate, Date nextUpdate,
-      String msgId) throws OperationException {
+      String msgId)
+          throws OperationException {
     boolean successful = false;
     AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_gen_crl, msgId);
     try {
@@ -741,7 +755,8 @@ public class X509Ca implements Closeable {
   }
 
   private X509CRLHolder generateCrl0(boolean deltaCrl, Date thisUpdate, Date nextUpdate,
-      AuditEvent event, String msgId) throws OperationException {
+      AuditEvent event, String msgId)
+          throws OperationException {
     CrlControl control = caInfo.getCrlControl();
     if (control == null) {
       throw new OperationException(NOT_PERMITTED, "CRL generation is not allowed");
@@ -1118,7 +1133,8 @@ public class X509Ca implements Closeable {
     }
   } // method republishCerts
 
-  public void clearPublishQueue(List<String> publisherNames) throws CaMgmtException {
+  public void clearPublishQueue(List<String> publisherNames)
+      throws CaMgmtException {
     if (publisherNames == null) {
       try {
         certstore.clearPublishQueue(caIdent, null);
@@ -1221,7 +1237,8 @@ public class X509Ca implements Closeable {
   } // method publishCrl
 
   public CertWithRevocationInfo revokeCert(BigInteger serialNumber, CrlReason reason,
-      Date invalidityTime, String msgId) throws OperationException {
+      Date invalidityTime, String msgId)
+          throws OperationException {
     if (caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber)) {
       throw new OperationException(NOT_PERMITTED,
           "insufficient permission to revoke CA certificate");
@@ -1279,7 +1296,8 @@ public class X509Ca implements Closeable {
     }
   } // method unrevokeCertificate
 
-  public CertWithDbId removeCert(BigInteger serialNumber, String msgId) throws OperationException {
+  public CertWithDbId removeCert(BigInteger serialNumber, String msgId)
+      throws OperationException {
     if (caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber)) {
       throw new OperationException(NOT_PERMITTED,
           "insufficient permission to remove CA certificate");
@@ -1339,7 +1357,8 @@ public class X509Ca implements Closeable {
   } // method removeCertificate0
 
   private CertWithRevocationInfo revokeCertificate0(BigInteger serialNumber, CrlReason reason,
-      Date invalidityTime, boolean force, AuditEvent event) throws OperationException {
+      Date invalidityTime, boolean force, AuditEvent event)
+          throws OperationException {
     String hexSerial = LogUtil.formatCsn(serialNumber);
     event.addEventData(CaAuditConstants.NAME_serial, hexSerial);
     event.addEventData(CaAuditConstants.NAME_reason, reason.getDescription());
@@ -1395,7 +1414,8 @@ public class X509Ca implements Closeable {
   } // method revokeCertificate0
 
   private CertWithRevocationInfo revokeSuspendedCert(BigInteger serialNumber,
-      CrlReason reason, String msgId) throws OperationException {
+      CrlReason reason, String msgId)
+          throws OperationException {
     AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_revoke_suspendedCert, msgId);
 
     boolean successful = false;
@@ -1409,7 +1429,8 @@ public class X509Ca implements Closeable {
   }
 
   private CertWithRevocationInfo revokeSuspendedCert0(BigInteger serialNumber,
-      CrlReason reason, AuditEvent event) throws OperationException {
+      CrlReason reason, AuditEvent event)
+          throws OperationException {
     String hexSerial = LogUtil.formatCsn(serialNumber);
 
     event.addEventData(CaAuditConstants.NAME_serial, hexSerial);
@@ -1513,7 +1534,8 @@ public class X509Ca implements Closeable {
     return deltaCrlInterval != 0 && deltaCrlInterval < control.getFullCrlIntervals();
   } // method shouldPublishToDeltaCrlCache
 
-  public void revokeCa(CertRevocationInfo revocationInfo, String msgId) throws OperationException {
+  public void revokeCa(CertRevocationInfo revocationInfo, String msgId)
+      throws OperationException {
     notNull(revocationInfo, "revocationInfo");
     caInfo.setRevocationInfo(revocationInfo);
 
@@ -1549,7 +1571,8 @@ public class X509Ca implements Closeable {
     }
   } // method revokeCa
 
-  public void unrevokeCa(String msgId) throws OperationException {
+  public void unrevokeCa(String msgId)
+      throws OperationException {
     caInfo.setRevocationInfo(null);
     if (caInfo.isSelfSigned()) {
       AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_unrevoke_cert, msgId);
@@ -1583,11 +1606,13 @@ public class X509Ca implements Closeable {
 
   } // method unrevokeCa
 
-  public long addRequest(byte[] request) throws OperationException {
+  public long addRequest(byte[] request)
+      throws OperationException {
     return certstore.addRequest(request);
   }
 
-  public void addRequestCert(long requestId, long certId) throws OperationException {
+  public void addRequestCert(long requestId, long certId)
+      throws OperationException {
     certstore.addRequestCert(requestId, certId);
   }
 
@@ -1603,7 +1628,8 @@ public class X509Ca implements Closeable {
 
   private List<CertificateInfo> generateCerts(List<CertTemplateData> certTemplates,
       RequestorInfo requestor, boolean update, RequestType reqType, byte[] transactionId,
-      String msgId) throws OperationExceptionWithIndex {
+      String msgId)
+          throws OperationExceptionWithIndex {
     notEmpty(certTemplates, "certTemplates");
     final int n = certTemplates.size();
     List<GrantedCertTemplate> gcts = new ArrayList<>(n);
@@ -1679,14 +1705,16 @@ public class X509Ca implements Closeable {
   }
 
   public CertificateInfo generateCert(CertTemplateData certTemplate, RequestorInfo requestor,
-      RequestType reqType, byte[] transactionId, String msgId) throws OperationException {
+      RequestType reqType, byte[] transactionId, String msgId)
+          throws OperationException {
     notNull(certTemplate, "certTemplate");
     return generateCerts(Arrays.asList(certTemplate), requestor,
         reqType, transactionId, msgId).get(0);
   }
 
   private CertificateInfo generateCert(GrantedCertTemplate gct, RequestorInfo requestor,
-      RequestType reqType, byte[] transactionId, String msgId) throws OperationException {
+      RequestType reqType, byte[] transactionId, String msgId)
+          throws OperationException {
     AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_gen_cert, msgId);
 
     boolean successful = false;
@@ -1700,7 +1728,8 @@ public class X509Ca implements Closeable {
   }
 
   private CertificateInfo generateCert0(GrantedCertTemplate gct, RequestorInfo requestor,
-      RequestType reqType, byte[] transactionId, AuditEvent event) throws OperationException {
+      RequestType reqType, byte[] transactionId, AuditEvent event)
+          throws OperationException {
     notNull(gct, "gct");
 
     event.addEventData(CaAuditConstants.NAME_req_subject,
@@ -1842,7 +1871,8 @@ public class X509Ca implements Closeable {
   } // method generateCertificate0
 
   private GrantedCertTemplate createGrantedCertTemplate(CertTemplateData certTemplate,
-      RequestorInfo requestor, boolean update) throws OperationException {
+      RequestorInfo requestor, boolean update)
+          throws OperationException {
     notNull(certTemplate, "certTemplate");
     if (caInfo.getRevocationInfo() != null) {
       throw new OperationException(NOT_PERMITTED, "CA is revoked");
@@ -2277,7 +2307,8 @@ public class X509Ca implements Closeable {
     return (t1 >= tcal) ? cal.getTime() : new Date(cal.getTimeInMillis() - MS_PER_DAY);
   }
 
-  private int removeExpirtedCerts(Date expiredAtTime, String msgId) throws OperationException {
+  private int removeExpirtedCerts(Date expiredAtTime, String msgId)
+      throws OperationException {
     LOG.debug("revoking suspended certificates");
     AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_remove_expired_certs, msgId);
     boolean successful = false;
@@ -2330,7 +2361,8 @@ public class X509Ca implements Closeable {
     } // end while (true)
   } // method removeExpirtedCerts
 
-  private int revokeSuspendedCerts(String msgId) throws OperationException {
+  private int revokeSuspendedCerts(String msgId)
+      throws OperationException {
     LOG.debug("revoking suspended certificates");
     AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_revoke_suspendedCert, msgId);
     boolean successful = false;
@@ -2344,7 +2376,8 @@ public class X509Ca implements Closeable {
     }
   }
 
-  private int revokeSuspendedCerts0(AuditEvent event, String msgId) throws OperationException {
+  private int revokeSuspendedCerts0(AuditEvent event, String msgId)
+      throws OperationException {
     if (!masterMode) {
       throw new OperationException(NOT_PERMITTED,
           "CA could not remove expired certificates in slave mode");

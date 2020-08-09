@@ -99,7 +99,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.certificate = certificate.toBcCert().toASN1Structure();
     }
 
-    private AddCertParams(ASN1Sequence seq) throws BadAsn1ObjectException {
+    private AddCertParams(ASN1Sequence seq)
+        throws BadAsn1ObjectException {
       requireRange(seq, 3, 3);
       int idx = 0;
       slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getValue();
@@ -107,7 +108,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.certificate = getCertificate0(seq.getObjectAt(idx++));
     }
 
-    public static AddCertParams getInstance(Object obj) throws BadAsn1ObjectException {
+    public static AddCertParams getInstance(Object obj)
+        throws BadAsn1ObjectException {
       if (obj == null || obj instanceof AddCertParams) {
         return (AddCertParams) obj;
       }
@@ -166,7 +168,8 @@ public abstract class ProxyMessage extends ASN1Object {
 
     private final Mechanism mechanism;
 
-    private DigestSecretKeyTemplate(ASN1Sequence seq) throws BadAsn1ObjectException {
+    private DigestSecretKeyTemplate(ASN1Sequence seq)
+        throws BadAsn1ObjectException {
       requireRange(seq, 3, 3);
       int idx = 0;
       this.slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++));
@@ -256,7 +259,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.g = Args.notNull(g, "g");
     }
 
-    private GenDSAKeypairParams(ASN1Sequence seq) throws BadAsn1ObjectException {
+    private GenDSAKeypairParams(ASN1Sequence seq)
+        throws BadAsn1ObjectException {
       requireRange(seq, 5, 5);
       int idx = 0;
       slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getValue();
@@ -266,7 +270,8 @@ public abstract class ProxyMessage extends ASN1Object {
       g = getInteger(seq.getObjectAt(idx++));
     }
 
-    public static GenDSAKeypairParams getInstance(Object obj) throws BadAsn1ObjectException {
+    public static GenDSAKeypairParams getInstance(Object obj)
+        throws BadAsn1ObjectException {
       if (obj == null || obj instanceof GenDSAKeypairParams) {
         return (GenDSAKeypairParams) obj;
       }
@@ -343,7 +348,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.curveId = Args.notNull(curveId, "curveId");
     }
 
-    private GenECKeypairParams(ASN1Sequence seq) throws BadAsn1ObjectException {
+    private GenECKeypairParams(ASN1Sequence seq)
+        throws BadAsn1ObjectException {
       requireRange(seq, 3, 3);
       int idx = 0;
       slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getValue();
@@ -351,7 +357,8 @@ public abstract class ProxyMessage extends ASN1Object {
       curveId = getObjectIdentifier(seq.getObjectAt(idx++));
     }
 
-    public static GenECKeypairParams getInstance(Object obj) throws BadAsn1ObjectException {
+    public static GenECKeypairParams getInstance(Object obj)
+        throws BadAsn1ObjectException {
       if (obj == null || obj instanceof GenECKeypairParams) {
         return (GenECKeypairParams) obj;
       }
@@ -418,7 +425,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.curveOid = Args.notNull(curveOid, "curveOid");
     }
 
-    private GenECEdwardsOrMontgomeryKeypairParams(ASN1Sequence seq) throws BadAsn1ObjectException {
+    private GenECEdwardsOrMontgomeryKeypairParams(ASN1Sequence seq)
+        throws BadAsn1ObjectException {
       requireRange(seq, 3, 3);
       int idx = 0;
       slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getValue();
@@ -498,7 +506,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.publicExponent = publicExponent;
     }
 
-    private GenRSAKeypairParams(ASN1Sequence seq) throws BadAsn1ObjectException {
+    private GenRSAKeypairParams(ASN1Sequence seq)
+        throws BadAsn1ObjectException {
       requireRange(seq, 3, 4);
       final int size = seq.size();
       int idx = 0;
@@ -588,7 +597,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.keysize = Args.min(keysize, "keysize", 1);
     }
 
-    private GenSecretKeyParams(ASN1Sequence seq) throws BadAsn1ObjectException {
+    private GenSecretKeyParams(ASN1Sequence seq)
+        throws BadAsn1ObjectException {
       requireRange(seq, 4, 4);
       int idx = 0;
       slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getValue();
@@ -598,7 +608,8 @@ public abstract class ProxyMessage extends ASN1Object {
       Args.min(keysize, "keysize", 1);
     }
 
-    public static GenSecretKeyParams getInstance(Object obj) throws BadAsn1ObjectException {
+    public static GenSecretKeyParams getInstance(Object obj)
+        throws BadAsn1ObjectException {
       if (obj == null || obj instanceof GenSecretKeyParams) {
         return (GenSecretKeyParams) obj;
       }
@@ -665,14 +676,16 @@ public abstract class ProxyMessage extends ASN1Object {
       this.control = Args.notNull(control, "control");
     }
 
-    private GenSM2KeypairParams(ASN1Sequence seq) throws BadAsn1ObjectException {
+    private GenSM2KeypairParams(ASN1Sequence seq)
+        throws BadAsn1ObjectException {
       requireRange(seq, 2, 2);
       int idx = 0;
       slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getValue();
       control = NewKeyControl.getInstance(seq.getObjectAt(idx++)).getControl();
     }
 
-    public static GenSM2KeypairParams getInstance(Object obj) throws BadAsn1ObjectException {
+    public static GenSM2KeypairParams getInstance(Object obj)
+        throws BadAsn1ObjectException {
       if (obj == null || obj instanceof GenSM2KeypairParams) {
         return (GenSM2KeypairParams) obj;
       }
@@ -738,7 +751,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.keyValue = Args.notNull(keyValue, "keyValue");
     }
 
-    private ImportSecretKeyParams(ASN1Sequence seq) throws BadAsn1ObjectException {
+    private ImportSecretKeyParams(ASN1Sequence seq)
+        throws BadAsn1ObjectException {
       requireRange(seq, 4, 4);
       int idx = 0;
       slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getValue();
@@ -747,7 +761,8 @@ public abstract class ProxyMessage extends ASN1Object {
       keyValue = ASN1OctetString.getInstance(seq.getObjectAt(idx++)).getOctets();
     }
 
-    public static ImportSecretKeyParams getInstance(Object obj) throws BadAsn1ObjectException {
+    public static ImportSecretKeyParams getInstance(Object obj)
+        throws BadAsn1ObjectException {
       if (obj == null || obj instanceof ImportSecretKeyParams) {
         return (ImportSecretKeyParams) obj;
       }
@@ -812,7 +827,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.params = params;
     }
 
-    private Mechanism(ASN1Sequence seq) throws BadAsn1ObjectException {
+    private Mechanism(ASN1Sequence seq)
+        throws BadAsn1ObjectException {
       requireRange(seq, 1, 2);
       int size = seq.size();
       int idx = 0;
@@ -820,7 +836,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.params = (size > 1)  ? P11Params.getInstance(seq.getObjectAt(idx++)) : null;
     }
 
-    public static Mechanism getInstance(Object obj) throws BadAsn1ObjectException {
+    public static Mechanism getInstance(Object obj)
+        throws BadAsn1ObjectException {
       if (obj == null || obj instanceof Mechanism) {
         return (Mechanism) obj;
       }
@@ -903,7 +920,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.control = Args.notNull(control, "control");
     }
 
-    private NewKeyControl(ASN1Sequence seq) throws BadAsn1ObjectException {
+    private NewKeyControl(ASN1Sequence seq)
+        throws BadAsn1ObjectException {
       final int size = seq.size();
       Args.min(size, "seq.size", 1);
       String label = DERUTF8String.getInstance(seq.getObjectAt(0)).getString();
@@ -944,7 +962,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.control.setExtractable(extractable);
     } // constructor
 
-    public static NewKeyControl getInstance(Object obj) throws BadAsn1ObjectException {
+    public static NewKeyControl getInstance(Object obj)
+        throws BadAsn1ObjectException {
       if (obj == null || obj instanceof NewKeyControl) {
         return (NewKeyControl) obj;
       }
@@ -1012,7 +1031,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.control = Args.notNull(control, "control");
     }
 
-    private NewObjectControl(ASN1Sequence seq) throws BadAsn1ObjectException {
+    private NewObjectControl(ASN1Sequence seq)
+        throws BadAsn1ObjectException {
       final int size = seq.size();
       Args.min(size, "seq.size", 1);
       String label = DERUTF8String.getInstance(seq.getObjectAt(0)).getString();
@@ -1034,7 +1054,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.control = new P11NewKeyControl(id, label);
     }
 
-    public static NewObjectControl getInstance(Object obj) throws BadAsn1ObjectException {
+    public static NewObjectControl getInstance(Object obj)
+        throws BadAsn1ObjectException {
       if (obj == null || obj instanceof NewObjectControl) {
         return (NewObjectControl) obj;
       }
@@ -1104,7 +1125,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.certificate = certificate.toBcCert().toASN1Structure();
     }
 
-    private ObjectIdAndCert(ASN1Sequence seq) throws BadAsn1ObjectException {
+    private ObjectIdAndCert(ASN1Sequence seq)
+        throws BadAsn1ObjectException {
       requireRange(seq, 3, 3);
       int idx = 0;
       this.slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++));
@@ -1112,7 +1134,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.certificate = getCertificate0(seq.getObjectAt(idx++));
     }
 
-    public static ObjectIdAndCert getInstance(Object obj) throws BadAsn1ObjectException {
+    public static ObjectIdAndCert getInstance(Object obj)
+        throws BadAsn1ObjectException {
       if (obj == null || obj instanceof ObjectIdAndCert) {
         return (ObjectIdAndCert) obj;
       }
@@ -1172,7 +1195,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.value = Args.notNull(value, "value");
     }
 
-    private IdentityId(ASN1Sequence seq) throws BadAsn1ObjectException {
+    private IdentityId(ASN1Sequence seq)
+        throws BadAsn1ObjectException {
       requireRange(seq, 2, 4);
       P11SlotIdentifier slotId =
           SlotIdentifier.getInstance(seq.getObjectAt(0)).getValue();
@@ -1199,7 +1223,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.value = new P11IdentityId(slotId, keyId, publicKeyLabel, certLabel);
     }
 
-    public static IdentityId getInstance(Object obj) throws BadAsn1ObjectException {
+    public static IdentityId getInstance(Object obj)
+        throws BadAsn1ObjectException {
       if (obj == null || obj instanceof IdentityId) {
         return (IdentityId) obj;
       }
@@ -1259,7 +1284,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.value = Args.notNull(value, "value");
     }
 
-    private ObjectIdentifier(ASN1Sequence seq) throws BadAsn1ObjectException {
+    private ObjectIdentifier(ASN1Sequence seq)
+        throws BadAsn1ObjectException {
       requireRange(seq, 2, 2);
       int idx = 0;
       byte[] id = getOctetStringBytes(seq.getObjectAt(idx++));
@@ -1267,7 +1293,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.value = new P11ObjectIdentifier(id, label);
     }
 
-    public static ObjectIdentifier getInstance(Object obj) throws BadAsn1ObjectException {
+    public static ObjectIdentifier getInstance(Object obj)
+        throws BadAsn1ObjectException {
       if (obj == null || obj instanceof ObjectIdentifier) {
         return (ObjectIdentifier) obj;
       }
@@ -1314,7 +1341,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.objectIds = Args.notNull(objectIds, "objectIds");
     }
 
-    private ObjectIdentifiers(ASN1Sequence seq) throws BadAsn1ObjectException {
+    private ObjectIdentifiers(ASN1Sequence seq)
+        throws BadAsn1ObjectException {
       this.objectIds = new LinkedList<>();
       final int size = seq.size();
       for (int i = 0; i < size; i++) {
@@ -1322,7 +1350,8 @@ public abstract class ProxyMessage extends ASN1Object {
       }
     }
 
-    public static ObjectIdentifiers getInstance(Object obj) throws BadAsn1ObjectException {
+    public static ObjectIdentifiers getInstance(Object obj)
+        throws BadAsn1ObjectException {
       if (obj == null || obj instanceof ObjectIdentifiers) {
         return (ObjectIdentifiers) obj;
       }
@@ -1381,12 +1410,14 @@ public abstract class ProxyMessage extends ASN1Object {
       this.p11Params = Args.notNull(p11Params, "p11Params");
     }
 
-    private P11Params(ASN1TaggedObject taggedObject) throws BadAsn1ObjectException {
+    private P11Params(ASN1TaggedObject taggedObject)
+        throws BadAsn1ObjectException {
       this.tagNo = taggedObject.getTagNo();
       this.p11Params = taggedObject.getObject();
     }
 
-    public static P11Params getInstance(Object obj) throws BadAsn1ObjectException {
+    public static P11Params getInstance(Object obj)
+        throws BadAsn1ObjectException {
       if (obj == null || obj instanceof P11Params) {
         return (P11Params) obj;
       }
@@ -1448,14 +1479,16 @@ public abstract class ProxyMessage extends ASN1Object {
       this.objectId = Args.notNull(objectId, "objectId");
     }
 
-    private SlotIdAndObjectId(ASN1Sequence seq) throws BadAsn1ObjectException {
+    private SlotIdAndObjectId(ASN1Sequence seq)
+        throws BadAsn1ObjectException {
       requireRange(seq, 2, 2);
       int idx = 0;
       this.slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++));
       this.objectId = ObjectIdentifier.getInstance(seq.getObjectAt(idx++));
     }
 
-    public static SlotIdAndObjectId getInstance(Object obj) throws BadAsn1ObjectException {
+    public static SlotIdAndObjectId getInstance(Object obj)
+        throws BadAsn1ObjectException {
       if (obj == null || obj instanceof SlotIdAndObjectId) {
         return (SlotIdAndObjectId) obj;
       }
@@ -1505,7 +1538,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.value = Args.notNull(value, "value");
     }
 
-    private SlotIdentifier(ASN1Sequence seq) throws BadAsn1ObjectException {
+    private SlotIdentifier(ASN1Sequence seq)
+        throws BadAsn1ObjectException {
       requireRange(seq, 2, 2);
       int idx = 0;
       long id = getInteger(seq.getObjectAt(idx++)).longValue();
@@ -1513,7 +1547,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.value = new P11SlotIdentifier(index, id);
     }
 
-    public static SlotIdentifier getInstance(Object obj) throws BadAsn1ObjectException {
+    public static SlotIdentifier getInstance(Object obj)
+        throws BadAsn1ObjectException {
       if (obj == null || obj instanceof SlotIdentifier) {
         return (SlotIdentifier) obj;
       }
@@ -1575,7 +1610,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.slotId = slotId;
     }
 
-    private RemoveObjectsParams(ASN1Sequence seq) throws BadAsn1ObjectException {
+    private RemoveObjectsParams(ASN1Sequence seq)
+        throws BadAsn1ObjectException {
       requireRange(seq, 2, 3);
       int idx = 0;
       slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getValue();
@@ -1603,7 +1639,8 @@ public abstract class ProxyMessage extends ASN1Object {
       }
     }
 
-    public static RemoveObjectsParams getInstance(Object obj) throws BadAsn1ObjectException {
+    public static RemoveObjectsParams getInstance(Object obj)
+        throws BadAsn1ObjectException {
       if (obj == null || obj instanceof RemoveObjectsParams) {
         return (RemoveObjectsParams) obj;
       }
@@ -1662,7 +1699,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.pkcsPssParams = Args.notNull(pkcsPssParams, "pkcsPssParams");
     }
 
-    private RSAPkcsPssParams(ASN1Sequence seq) throws BadAsn1ObjectException {
+    private RSAPkcsPssParams(ASN1Sequence seq)
+        throws BadAsn1ObjectException {
       requireRange(seq, 3, 3);
       int idx = 0;
       long contentHash = getInteger(seq.getObjectAt(idx++)).longValue();
@@ -1671,7 +1709,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.pkcsPssParams = new P11RSAPkcsPssParams(contentHash, mgfHash, saltLength);
     } // constructor
 
-    public static RSAPkcsPssParams getInstance(Object obj) throws BadAsn1ObjectException {
+    public static RSAPkcsPssParams getInstance(Object obj)
+        throws BadAsn1ObjectException {
       if (obj == null || obj instanceof RSAPkcsPssParams) {
         return (RSAPkcsPssParams) obj;
       }
@@ -1726,7 +1765,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.versions = Collections.unmodifiableSet(Args.notEmpty(versions, "versions"));
     }
 
-    private ServerCaps(ASN1Sequence seq) throws BadAsn1ObjectException {
+    private ServerCaps(ASN1Sequence seq)
+        throws BadAsn1ObjectException {
       requireRange(seq, 2, 2);
       try {
         this.readOnly = ASN1Boolean.getInstance(seq.getObjectAt(0)).isTrue();
@@ -1756,7 +1796,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.versions = Collections.unmodifiableSet(tmpVersions);
     }
 
-    public static ServerCaps getInstance(Object obj) throws BadAsn1ObjectException {
+    public static ServerCaps getInstance(Object obj)
+        throws BadAsn1ObjectException {
       if (obj == null || obj instanceof ServerCaps) {
         return (ServerCaps) obj;
       }
@@ -1817,7 +1858,8 @@ public abstract class ProxyMessage extends ASN1Object {
 
     private final byte[] message;
 
-    private SignTemplate(ASN1Sequence seq) throws BadAsn1ObjectException {
+    private SignTemplate(ASN1Sequence seq)
+        throws BadAsn1ObjectException {
       requireRange(seq, 4, 4);
       int idx = 0;
       this.slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++));
@@ -1834,7 +1876,8 @@ public abstract class ProxyMessage extends ASN1Object {
       this.mechanism = new Mechanism(mechanism, parameter);
     }
 
-    public static SignTemplate getInstance(Object obj) throws BadAsn1ObjectException {
+    public static SignTemplate getInstance(Object obj)
+        throws BadAsn1ObjectException {
       if (obj == null || obj instanceof SignTemplate) {
         return (SignTemplate) obj;
       }
@@ -1890,7 +1933,8 @@ public abstract class ProxyMessage extends ASN1Object {
     }
   }
 
-  private static Certificate getCertificate0(ASN1Encodable object) throws BadAsn1ObjectException {
+  private static Certificate getCertificate0(ASN1Encodable object)
+      throws BadAsn1ObjectException {
     try {
       return Certificate.getInstance(object);
     } catch (IllegalArgumentException ex) {
@@ -1898,7 +1942,8 @@ public abstract class ProxyMessage extends ASN1Object {
     }
   }
 
-  private static BigInteger getInteger(ASN1Encodable object) throws BadAsn1ObjectException {
+  private static BigInteger getInteger(ASN1Encodable object)
+      throws BadAsn1ObjectException {
     try {
       return ASN1Integer.getInstance(object).getValue();
     } catch (IllegalArgumentException ex) {
@@ -1906,7 +1951,8 @@ public abstract class ProxyMessage extends ASN1Object {
     }
   }
 
-  private static String getUtf8String(ASN1Encodable object) throws BadAsn1ObjectException {
+  private static String getUtf8String(ASN1Encodable object)
+      throws BadAsn1ObjectException {
     try {
       return DERUTF8String.getInstance(object).getString();
     } catch (IllegalArgumentException ex) {
@@ -1914,7 +1960,8 @@ public abstract class ProxyMessage extends ASN1Object {
     }
   }
 
-  public static byte[] getOctetStringBytes(ASN1Encodable object) throws BadAsn1ObjectException {
+  public static byte[] getOctetStringBytes(ASN1Encodable object)
+      throws BadAsn1ObjectException {
     try {
       return DEROctetString.getInstance(object).getOctets();
     } catch (IllegalArgumentException ex) {

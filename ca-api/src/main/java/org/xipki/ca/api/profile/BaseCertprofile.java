@@ -360,7 +360,8 @@ public abstract class BaseCertprofile extends Certprofile {
       throws BadCertTemplateException;
 
   protected RDN createSubjectRdn(String text, ASN1ObjectIdentifier type, RdnControl option,
-      int index) throws BadCertTemplateException {
+      int index)
+          throws BadCertTemplateException {
     if (ObjectIdentifiers.DN.emailAddress.equals(type)) {
       text = text.toLowerCase();
     }
@@ -369,7 +370,8 @@ public abstract class BaseCertprofile extends Certprofile {
     return (rdnValue == null) ? null : new RDN(type, rdnValue);
   } // method createSubjectRdn
 
-  protected void fixRdnControl(RdnControl rdnControl) throws CertprofileException {
+  protected void fixRdnControl(RdnControl rdnControl)
+      throws CertprofileException {
     SubjectDnSpec.fixRdnControl(rdnControl);
   }
 
@@ -493,7 +495,8 @@ public abstract class BaseCertprofile extends Certprofile {
   } // method createDateOfBirthRdn
 
   private static RDN createPostalAddressRdn(ASN1ObjectIdentifier type, ASN1Encodable rdnValue,
-      RdnControl control, int index) throws BadCertTemplateException {
+      RdnControl control, int index)
+          throws BadCertTemplateException {
     Args.notNull(type, "type");
 
     if (!(rdnValue instanceof ASN1Sequence)) {
@@ -541,7 +544,8 @@ public abstract class BaseCertprofile extends Certprofile {
   } // method getRdns
 
   private static ASN1Encodable createRdnValue(String text, ASN1ObjectIdentifier type,
-      RdnControl option, int index) throws BadCertTemplateException {
+      RdnControl option, int index)
+          throws BadCertTemplateException {
     String tmpText = text.trim();
 
     StringType stringType = null;

@@ -91,7 +91,8 @@ public class PasswordResolverImpl implements PasswordResolver {
   } // method unregistResolver
 
   @Override
-  public char[] resolvePassword(String passwordHint) throws PasswordResolverException {
+  public char[] resolvePassword(String passwordHint)
+      throws PasswordResolverException {
     notNull(passwordHint, "passwordHint");
     int index = passwordHint.indexOf(':');
     if (index == -1) {
@@ -111,7 +112,8 @@ public class PasswordResolverImpl implements PasswordResolver {
   } // method resolvePassword
 
   @Override
-  public String protectPassword(String protocol, char[] password) throws PasswordResolverException {
+  public String protectPassword(String protocol, char[] password)
+      throws PasswordResolverException {
     notNull(protocol, "protocol");
     notNull(password, "password");
 

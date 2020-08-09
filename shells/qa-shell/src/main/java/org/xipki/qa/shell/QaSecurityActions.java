@@ -128,10 +128,12 @@ public class QaSecurityActions {
     @Option(name = "--thread", description = "number of threads")
     private Integer numThreads = 5;
 
-    protected abstract BenchmarkExecutor getTester() throws Exception;
+    protected abstract BenchmarkExecutor getTester()
+        throws Exception;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       BenchmarkExecutor tester = getTester();
       tester.setDuration(duration);
       tester.setThreads(getNumThreads());
@@ -156,10 +158,12 @@ public class QaSecurityActions {
     @Option(name = "--thread", description = "number of threads")
     private Integer numThreads = 5;
 
-    protected abstract BenchmarkExecutor nextTester() throws Exception;
+    protected abstract BenchmarkExecutor nextTester()
+        throws Exception;
 
     @Override
-    protected Object execute0() throws InterruptedException {
+    protected Object execute0()
+        throws InterruptedException {
       while (true) {
         println("============================================");
         BenchmarkExecutor tester;
@@ -244,7 +248,8 @@ public class QaSecurityActions {
     }
 
     @Override
-    protected BenchmarkExecutor nextTester() throws Exception {
+    protected BenchmarkExecutor nextTester()
+        throws Exception {
       KeyControl.DSA control = queue.poll();
       if (control == null) {
         return null;
@@ -279,7 +284,8 @@ public class QaSecurityActions {
     }
 
     @Override
-    protected BenchmarkExecutor nextTester() throws Exception {
+    protected BenchmarkExecutor nextTester()
+        throws Exception {
       KeyControl.DSA control = queue.poll();
       if (control == null) {
         return null;
@@ -311,7 +317,8 @@ public class QaSecurityActions {
     }
 
     @Override
-    protected BenchmarkExecutor nextTester() throws Exception {
+    protected BenchmarkExecutor nextTester()
+        throws Exception {
       KeyControl.EC control = queue.poll();
       if (control == null) {
         return null;
@@ -345,7 +352,8 @@ public class QaSecurityActions {
     }
 
     @Override
-    protected BenchmarkExecutor nextTester() throws Exception {
+    protected BenchmarkExecutor nextTester()
+        throws Exception {
       KeyControl.EC control = queue.poll();
       if (control == null) {
         return null;
@@ -372,7 +380,8 @@ public class QaSecurityActions {
     }
 
     @Override
-    protected BenchmarkExecutor nextTester() throws Exception {
+    protected BenchmarkExecutor nextTester()
+        throws Exception {
       KeyControl.RSA control = queue.poll();
       if (control == null) {
         return null;
@@ -403,7 +412,8 @@ public class QaSecurityActions {
     }
 
     @Override
-    protected BenchmarkExecutor nextTester() throws Exception {
+    protected BenchmarkExecutor nextTester()
+        throws Exception {
       KeyControl.RSA control = queue.poll();
       if (control == null) {
         return null;
@@ -458,7 +468,8 @@ public class QaSecurityActions {
     private Integer qlen;
 
     @Override
-    protected BenchmarkExecutor getTester() throws Exception {
+    protected BenchmarkExecutor getTester()
+        throws Exception {
       if (qlen == null) {
         qlen = (plen >= 2048) ? 256 : 160;
       }
@@ -488,7 +499,8 @@ public class QaSecurityActions {
     private String sigAlgo;
 
     @Override
-    protected BenchmarkExecutor getTester() throws Exception {
+    protected BenchmarkExecutor getTester()
+        throws Exception {
       if (qlen == null) {
         qlen = (plen >= 2048) ? 256 : 160;
       }
@@ -515,7 +527,8 @@ public class QaSecurityActions {
     private String curveName;
 
     @Override
-    protected BenchmarkExecutor getTester() throws Exception {
+    protected BenchmarkExecutor getTester()
+        throws Exception {
       ASN1ObjectIdentifier curveOid = getCurveOid(curveName);
       return new P11KeyGenSpeed.EC(getSlot(), getKeyId(), curveOid);
     }
@@ -541,7 +554,8 @@ public class QaSecurityActions {
     private String sigAlgo;
 
     @Override
-    protected BenchmarkExecutor getTester() throws Exception {
+    protected BenchmarkExecutor getTester()
+        throws Exception {
       return new P11SignSpeed.EC(keyPresent, securityFactory, getSlot(), getKeyId(), keyLabel,
           sigAlgo, getNumThreads(), AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName));
     }
@@ -558,7 +572,8 @@ public class QaSecurityActions {
     private String curveName;
 
     @Override
-    protected BenchmarkExecutor getTester() throws Exception {
+    protected BenchmarkExecutor getTester()
+        throws Exception {
       ASN1ObjectIdentifier curveOid = getCurveOid(curveName);
       return new P11KeyGenSpeed.EC(getSlot(), getKeyId(), curveOid);
     }
@@ -580,7 +595,8 @@ public class QaSecurityActions {
     private String sigAlgo;
 
     @Override
-    protected BenchmarkExecutor getTester() throws Exception {
+    protected BenchmarkExecutor getTester()
+        throws Exception {
       ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(sigAlgo);
       if (curveOid == null) {
         throw new IllegalCmdParamException("invalid sigAlgo " + sigAlgo);
@@ -602,7 +618,8 @@ public class QaSecurityActions {
     private String sigAlgo;
 
     @Override
-    protected BenchmarkExecutor getTester() throws Exception {
+    protected BenchmarkExecutor getTester()
+        throws Exception {
       return new P11SignSpeed.HMAC(keyPresent, securityFactory, getSlot(), getKeyId(), keyLabel,
           sigAlgo, getNumThreads());
     }
@@ -621,7 +638,8 @@ public class QaSecurityActions {
     private String publicExponent = "0x10001";
 
     @Override
-    protected BenchmarkExecutor getTester() throws Exception {
+    protected BenchmarkExecutor getTester()
+        throws Exception {
       return new P11KeyGenSpeed.RSA(getSlot(), getKeyId(), keysize, toBigInt(publicExponent));
     }
 
@@ -648,7 +666,8 @@ public class QaSecurityActions {
     private String sigAlgo;
 
     @Override
-    protected BenchmarkExecutor getTester() throws Exception {
+    protected BenchmarkExecutor getTester()
+        throws Exception {
       return new P11SignSpeed.RSA(keyPresent, securityFactory, getSlot(), getKeyId(), keyLabel,
           sigAlgo, getNumThreads(), keysize, toBigInt(publicExponent));
     }
@@ -671,7 +690,8 @@ public class QaSecurityActions {
   public static class SpeedSm2GenP11 extends SpeedP11Action {
 
     @Override
-    protected BenchmarkExecutor getTester() throws Exception {
+    protected BenchmarkExecutor getTester()
+        throws Exception {
       return new P11KeyGenSpeed.SM2(getSlot(), getKeyId());
     }
 
@@ -688,7 +708,8 @@ public class QaSecurityActions {
   public static class SpeedSm2SignP11 extends SpeedP11SignAction {
 
     @Override
-    protected BenchmarkExecutor getTester() throws Exception {
+    protected BenchmarkExecutor getTester()
+        throws Exception {
       return new P11SignSpeed.SM2(keyPresent, securityFactory, getSlot(), getKeyId(), keyLabel,
           getNumThreads());
     }
@@ -710,7 +731,8 @@ public class QaSecurityActions {
     }
 
     @Override
-    protected BenchmarkExecutor nextTester() throws Exception {
+    protected BenchmarkExecutor nextTester()
+        throws Exception {
       KeyControl.DSA control = queue.poll();
       return (control == null) ? null
           : new P12KeyGenSpeed.DSA(control.plen(), control.qlen(), securityFactory);
@@ -733,7 +755,8 @@ public class QaSecurityActions {
     }
 
     @Override
-    protected BenchmarkExecutor nextTester() throws Exception {
+    protected BenchmarkExecutor nextTester()
+        throws Exception {
       KeyControl.DSA control = queue.poll();
       if (control == null) {
         return null;
@@ -762,7 +785,8 @@ public class QaSecurityActions {
     }
 
     @Override
-    protected BenchmarkExecutor nextTester() throws Exception {
+    protected BenchmarkExecutor nextTester()
+        throws Exception {
       KeyControl.EC control = queue.poll();
       ASN1ObjectIdentifier curveOid = getCurveOid(control.curveName());
       return (control == null) ? null : new P12KeyGenSpeed.EC(curveOid, securityFactory);
@@ -784,7 +808,8 @@ public class QaSecurityActions {
     }
 
     @Override
-    protected BenchmarkExecutor nextTester() throws Exception {
+    protected BenchmarkExecutor nextTester()
+        throws Exception {
       KeyControl.EC control = queue.poll();
       return (control == null) ? null
           : new P12SignSpeed.EC(securityFactory, sigAlgo, getNumThreads(),
@@ -808,7 +833,8 @@ public class QaSecurityActions {
     }
 
     @Override
-    protected BenchmarkExecutor nextTester() throws Exception {
+    protected BenchmarkExecutor nextTester()
+        throws Exception {
       KeyControl.RSA control = queue.poll();
       return (control == null) ? null
           : new P12KeyGenSpeed.RSA(control.modulusLen(), toBigInt("0x10001"), securityFactory);
@@ -831,7 +857,8 @@ public class QaSecurityActions {
     }
 
     @Override
-    protected BenchmarkExecutor nextTester() throws Exception {
+    protected BenchmarkExecutor nextTester()
+        throws Exception {
       KeyControl.RSA control = queue.poll();
       return (control == null) ? null
         : new P12SignSpeed.RSA(securityFactory, sigAlgo, getNumThreads(),
@@ -860,7 +887,8 @@ public class QaSecurityActions {
     }
 
     @Override
-    protected BenchmarkExecutor getTester() throws Exception {
+    protected BenchmarkExecutor getTester()
+        throws Exception {
       return new P12SignSpeed.AESGmac(securityFactory, sigAlgo, getNumThreads());
     }
 
@@ -878,7 +906,8 @@ public class QaSecurityActions {
     private Integer qlen;
 
     @Override
-    protected BenchmarkExecutor getTester() throws Exception {
+    protected BenchmarkExecutor getTester()
+        throws Exception {
       if (qlen == null) {
         qlen = (plen >= 2048) ? 256 : 160;
       }
@@ -903,7 +932,8 @@ public class QaSecurityActions {
     private String sigAlgo;
 
     @Override
-    protected BenchmarkExecutor getTester() throws Exception {
+    protected BenchmarkExecutor getTester()
+        throws Exception {
       if (qlen == null) {
         qlen = (plen >= 2048) ? 256 : 160;
       }
@@ -922,7 +952,8 @@ public class QaSecurityActions {
     private String curveName;
 
     @Override
-    protected BenchmarkExecutor getTester() throws Exception {
+    protected BenchmarkExecutor getTester()
+        throws Exception {
       return new P12KeyGenSpeed.EC(getCurveOid(curveName), securityFactory);
     }
 
@@ -942,7 +973,8 @@ public class QaSecurityActions {
     private String sigAlgo;
 
     @Override
-    protected BenchmarkExecutor getTester() throws Exception {
+    protected BenchmarkExecutor getTester()
+        throws Exception {
       return new P12SignSpeed.EC(securityFactory, sigAlgo, getNumThreads(),
           getCurveOid(curveName));
     }
@@ -959,7 +991,8 @@ public class QaSecurityActions {
     private String curveName;
 
     @Override
-    protected BenchmarkExecutor getTester() throws Exception {
+    protected BenchmarkExecutor getTester()
+        throws Exception {
       return new P12KeyGenSpeed.EC(getCurveOid(curveName), securityFactory);
     }
 
@@ -975,7 +1008,8 @@ public class QaSecurityActions {
     private String sigAlgo;
 
     @Override
-    protected BenchmarkExecutor getTester() throws Exception {
+    protected BenchmarkExecutor getTester()
+        throws Exception {
       ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(sigAlgo);
       return new P12SignSpeed.EC(securityFactory, sigAlgo, getNumThreads(), curveOid);
     }
@@ -992,7 +1026,8 @@ public class QaSecurityActions {
     private String sigAlgo;
 
     @Override
-    protected BenchmarkExecutor getTester() throws Exception {
+    protected BenchmarkExecutor getTester()
+        throws Exception {
       return new P12SignSpeed.HMAC(securityFactory, sigAlgo, getNumThreads());
     }
 
@@ -1010,7 +1045,8 @@ public class QaSecurityActions {
     private String publicExponent = "0x10001";
 
     @Override
-    protected BenchmarkExecutor getTester() throws Exception {
+    protected BenchmarkExecutor getTester()
+        throws Exception {
       return new P12KeyGenSpeed.RSA(keysize, toBigInt(publicExponent), securityFactory);
     }
 
@@ -1032,7 +1068,8 @@ public class QaSecurityActions {
     private String sigAlgo;
 
     @Override
-    protected BenchmarkExecutor getTester() throws Exception {
+    protected BenchmarkExecutor getTester()
+        throws Exception {
       return new P12SignSpeed.RSA(securityFactory, sigAlgo, getNumThreads(), keysize,
           toBigInt(publicExponent));
     }
@@ -1049,7 +1086,8 @@ public class QaSecurityActions {
   public static class SpeedSm2GenP12 extends SingleSpeedAction {
 
     @Override
-    protected BenchmarkExecutor getTester() throws Exception {
+    protected BenchmarkExecutor getTester()
+        throws Exception {
       return new P12KeyGenSpeed.EC(GMObjectIdentifiers.sm2p256v1, securityFactory);
     }
 
@@ -1061,7 +1099,8 @@ public class QaSecurityActions {
   public static class SpeedSm2SignP12 extends SpeedP12SignAction {
 
     @Override
-    protected BenchmarkExecutor getTester() throws Exception {
+    protected BenchmarkExecutor getTester()
+        throws Exception {
       return new P12SignSpeed.SM2(securityFactory, getNumThreads());
     }
 

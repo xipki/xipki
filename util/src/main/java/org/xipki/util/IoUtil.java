@@ -74,19 +74,22 @@ public class IoUtil {
     }
   }
 
-  public static byte[] read(String fileName) throws IOException {
+  public static byte[] read(String fileName)
+      throws IOException {
     return Files.readAllBytes(
         Paths.get(
             expandFilepath(fileName)));
   }
 
-  public static byte[] read(File file) throws IOException {
+  public static byte[] read(File file)
+      throws IOException {
     return Files.readAllBytes(
         Paths.get(
             expandFilepath(file.getPath())));
   }
 
-  public static byte[] read(InputStream in) throws IOException {
+  public static byte[] read(InputStream in)
+      throws IOException {
     try {
       ByteArrayOutputStream bout = new ByteArrayOutputStream();
       int readed = 0;
@@ -105,11 +108,13 @@ public class IoUtil {
     }
   }
 
-  public static void save(String fileName, byte[] encoded) throws IOException {
+  public static void save(String fileName, byte[] encoded)
+      throws IOException {
     save(new File(expandFilepath(fileName)), encoded);
   }
 
-  public static void save(File file, byte[] content) throws IOException {
+  public static void save(File file, byte[] content)
+      throws IOException {
     File tmpFile = expandFilepath(file);
     mkdirsParent(tmpFile.toPath());
 
@@ -117,14 +122,16 @@ public class IoUtil {
         StandardCopyOption.REPLACE_EXISTING);
   }
 
-  public static void mkdirsParent(Path path) throws IOException {
+  public static void mkdirsParent(Path path)
+      throws IOException {
     Path parent = path.getParent();
     if (parent != null) {
       Files.createDirectories(parent);
     }
   }
 
-  public static String getHostAddress() throws SocketException {
+  public static String getHostAddress()
+      throws SocketException {
     List<String> addresses = new LinkedList<>();
 
     Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
@@ -252,7 +259,8 @@ public class IoUtil {
     return Base64.encodeToString(data, withLineBreak);
   }
 
-  public static HttpURLConnection openHttpConn(URL url) throws IOException {
+  public static HttpURLConnection openHttpConn(URL url)
+      throws IOException {
     notNull(url, "url");
     URLConnection conn = url.openConnection();
     if (conn instanceof HttpURLConnection) {
@@ -281,7 +289,8 @@ public class IoUtil {
     return console.readLine();
   }
 
-  public static Properties loadProperties(String path) throws IOException {
+  public static Properties loadProperties(String path)
+      throws IOException {
     Path realPath = Paths.get(expandFilepath(path));
     if (!Files.exists(realPath)) {
       throw new IOException("File " + path + " does not exist");

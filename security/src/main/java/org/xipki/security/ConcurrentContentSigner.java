@@ -84,7 +84,8 @@ public interface ConcurrentContentSigner extends Closeable {
    * @throws XiSecurityException
    *         if error during the initialization occurs.
    */
-  void initialize(String conf, PasswordResolver passwordResolver) throws XiSecurityException;
+  void initialize(String conf, PasswordResolver passwordResolver)
+      throws XiSecurityException;
 
   /**
    * Sign the data.
@@ -96,7 +97,8 @@ public interface ConcurrentContentSigner extends Closeable {
    * @throws SignatureException
    *         if could not sign the data.
    */
-  byte[] sign(byte[] data) throws NoIdleSignerException, SignatureException;
+  byte[] sign(byte[] data)
+      throws NoIdleSignerException, SignatureException;
 
   /**
    * Sign the data.
@@ -108,7 +110,8 @@ public interface ConcurrentContentSigner extends Closeable {
    * @throws SignatureException
    *         if could not sign the data.
    */
-  byte[][] sign(byte[][] data) throws NoIdleSignerException, SignatureException;
+  byte[][] sign(byte[][] data)
+      throws NoIdleSignerException, SignatureException;
 
   /**
    * Borrows a signer with implementation-dependent default timeout.
@@ -116,7 +119,8 @@ public interface ConcurrentContentSigner extends Closeable {
    * @throws NoIdleSignerException
    *         If no idle signer is available
    */
-  ConcurrentBagEntrySigner borrowSigner() throws NoIdleSignerException;
+  ConcurrentBagEntrySigner borrowSigner()
+      throws NoIdleSignerException;
 
   /**
    * Borrows a signer with the given {@code soTimeout}.
@@ -125,7 +129,8 @@ public interface ConcurrentContentSigner extends Closeable {
    * @throws NoIdleSignerException
    *         If no idle signer is available
    */
-  ConcurrentBagEntrySigner borrowSigner(int soTimeout) throws NoIdleSignerException;
+  ConcurrentBagEntrySigner borrowSigner(int soTimeout)
+      throws NoIdleSignerException;
 
   void requiteSigner(ConcurrentBagEntrySigner signer);
 

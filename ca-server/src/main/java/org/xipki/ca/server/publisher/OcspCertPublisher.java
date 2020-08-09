@@ -69,7 +69,8 @@ public class OcspCertPublisher extends CertPublisher {
 
   @Override
   public void initialize(String conf, PasswordResolver passwordResolver,
-      Map<String, FileOrValue> datasourceConfs) throws CertPublisherException {
+      Map<String, FileOrValue> datasourceConfs)
+          throws CertPublisherException {
     Args.notNull(conf, "conf");
 
     ConfPairs pairs = new ConfPairs(conf);
@@ -101,7 +102,8 @@ public class OcspCertPublisher extends CertPublisher {
   } // method initialize
 
   private DataSourceWrapper loadDatasource(String datasourceName, FileOrValue datasourceConf,
-      PasswordResolver passwordResolver) throws CertPublisherException {
+      PasswordResolver passwordResolver)
+          throws CertPublisherException {
     try {
       DataSourceWrapper datasource = new DataSourceFactory().createDataSource(
           datasourceName, datasourceConf, passwordResolver);

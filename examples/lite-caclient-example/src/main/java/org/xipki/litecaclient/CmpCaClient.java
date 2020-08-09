@@ -129,7 +129,8 @@ public abstract class CmpCaClient implements Closeable {
   private X500Name caSubject;
 
   public CmpCaClient(String caUri, X509Certificate caCert, X500Name requestorSubject,
-      X500Name responderSubject, String hashAlgo) throws Exception {
+      X500Name responderSubject, String hashAlgo)
+          throws Exception {
     this.caUri = SdkUtil.requireNonBlank("caUri", caUri);
     this.caUrl = new URL(this.caUri);
     this.hashAlgo = (hashAlgo == null) ? "SHA256" : hashAlgo;
@@ -146,7 +147,8 @@ public abstract class CmpCaClient implements Closeable {
     }
   } // constructor
 
-  public void init() throws Exception {
+  public void init()
+      throws Exception {
     TlsInit.init();
 
     if (caCert != null) {
@@ -186,9 +188,11 @@ public abstract class CmpCaClient implements Closeable {
     return bytes;
   }
 
-  protected abstract ProtectedPKIMessage build(ProtectedPKIMessageBuilder builder) throws Exception;
+  protected abstract ProtectedPKIMessage build(ProtectedPKIMessageBuilder builder)
+      throws Exception;
 
-  private Certificate[] cmpCaCerts() throws Exception {
+  private Certificate[] cmpCaCerts()
+      throws Exception {
     ProtectedPKIMessageBuilder builder = new ProtectedPKIMessageBuilder(
         PKIHeader.CMP_2000, requestorSubject, responderSubject);
     builder.setMessageTime(new Date());
@@ -247,9 +251,11 @@ public abstract class CmpCaClient implements Closeable {
     return itv.getInfoValue();
   } // method extractGeneralRepContent
 
-  protected abstract boolean verifyProtection(GeneralPKIMessage pkiMessage) throws Exception;
+  protected abstract boolean verifyProtection(GeneralPKIMessage pkiMessage)
+      throws Exception;
 
-  private PKIMessage transmit(ProtectedPKIMessage request, String uri) throws Exception {
+  private PKIMessage transmit(ProtectedPKIMessage request, String uri)
+      throws Exception {
     byte[] encodedResponse = send(request.toASN1Structure().getEncoded(), uri);
     GeneralPKIMessage response = new GeneralPKIMessage(encodedResponse);
 
@@ -288,7 +294,8 @@ public abstract class CmpCaClient implements Closeable {
   } // method transmit
 
   private Map<BigInteger, KeyAndCert> parseEnrollCertResult(PKIMessage response,
-      int resonseBodyType, int numCerts) throws Exception {
+      int resonseBodyType, int numCerts)
+          throws Exception {
     PKIBody respBody = response.getBody();
     final int bodyType = respBody.getType();
 
@@ -345,7 +352,8 @@ public abstract class CmpCaClient implements Closeable {
   } // method parseEnrollCertResult
 
   public X509Certificate enrollCertViaCsr(String certprofile, CertificationRequest csr,
-      boolean profileInUri) throws Exception {
+      boolean profileInUri)
+          throws Exception {
     ProtectedPKIMessageBuilder builder = new ProtectedPKIMessageBuilder(
         PKIHeader.CMP_2000, requestorSubject, responderSubject);
     builder.setMessageTime(new Date());
@@ -487,13 +495,15 @@ public abstract class CmpCaClient implements Closeable {
   } // method enrollCertsViaCrmf
 
   public KeyAndCert enrollCertViaCrmfCaGenKeypair(String certprofile, String subject,
-      boolean profileAndMetaInUri) throws Exception {
+      boolean profileAndMetaInUri)
+          throws Exception {
     return enrollCertsViaCrmfCaGenKeypair(new String[]{certprofile},
         new String[] {subject}, profileAndMetaInUri)[0];
   } // method enrollCertViaCrmfCaGenKeypair
 
   public KeyAndCert[] enrollCertsViaCrmfCaGenKeypair(String[] certprofiles,
-      String[] subject, boolean profileAndMetaInUri) throws Exception {
+      String[] subject, boolean profileAndMetaInUri)
+          throws Exception {
     final int n = certprofiles.length;
 
     String uri = null;
@@ -559,13 +569,15 @@ public abstract class CmpCaClient implements Closeable {
   } // method enrollCertsViaCrmfCaGenKeypair
 
   public X509Certificate updateCertViaCrmf(PrivateKey privateKey, X500Name issuer,
-      BigInteger oldCertSerialNumber) throws Exception {
+      BigInteger oldCertSerialNumber)
+          throws Exception {
     return updateCertsViaCrmf(new PrivateKey[]{privateKey}, issuer,
         new BigInteger[] {oldCertSerialNumber})[0];
   }
 
   public X509Certificate[] updateCertsViaCrmf(PrivateKey[] privateKey,
-      X500Name issuer, BigInteger[] oldCertSerialNumbers) throws Exception {
+      X500Name issuer, BigInteger[] oldCertSerialNumbers)
+          throws Exception {
     final int n = privateKey.length;
 
     CertReqMsg[] certReqMsgs = new CertReqMsg[n];
@@ -616,13 +628,15 @@ public abstract class CmpCaClient implements Closeable {
   } // method updateCertsViaCrmf
 
   public KeyAndCert updateCertViaCrmfCaGenKeypair(X500Name issuer, BigInteger oldCertSerialNumber,
-      boolean profileAndMetaInUri) throws Exception {
+      boolean profileAndMetaInUri)
+          throws Exception {
     return updateCertsViaCrmfCaGenKeypair(issuer, new BigInteger[] {oldCertSerialNumber},
         profileAndMetaInUri)[0];
   }
 
   public KeyAndCert[] updateCertsViaCrmfCaGenKeypair(X500Name issuer,
-      BigInteger[] oldCertSerialNumbers, boolean profileAndMetaInUri) throws Exception {
+      BigInteger[] oldCertSerialNumbers, boolean profileAndMetaInUri)
+          throws Exception {
     final int n = oldCertSerialNumbers.length;
 
     CertReqMsg[] certReqMsgs = new CertReqMsg[n];
@@ -680,7 +694,8 @@ public abstract class CmpCaClient implements Closeable {
     return ret;
   } // updateCertsViaCrmfCaGenKeypair
 
-  public boolean revokeCert(BigInteger serialNumber, CRLReason reason) throws Exception {
+  public boolean revokeCert(BigInteger serialNumber, CRLReason reason)
+      throws Exception {
     ProtectedPKIMessageBuilder builder = new ProtectedPKIMessageBuilder(
         PKIHeader.CMP_2000, requestorSubject, responderSubject);
     builder.setMessageTime(new Date());
@@ -726,18 +741,22 @@ public abstract class CmpCaClient implements Closeable {
     }
   } // method verify
 
-  public boolean unrevokeCert(BigInteger serialNumber) throws Exception {
+  public boolean unrevokeCert(BigInteger serialNumber)
+      throws Exception {
     return revokeCert(serialNumber, CRLReason.lookup(CRLReason.removeFromCRL));
   }
 
-  public byte[] send(byte[] request, String uri) throws IOException {
+  public byte[] send(byte[] request, String uri)
+      throws IOException {
     URL url = ((uri == null) ? caUrl : new URL(uri));
     return SdkUtil.send(url, "POST", request, CMP_REQUEST_MIMETYPE, CMP_RESPONSE_MIMETYPE);
   } // method send
 
-  protected abstract byte[] decrypt(EncryptedValue ev) throws Exception;
+  protected abstract byte[] decrypt(EncryptedValue ev)
+      throws Exception;
 
-  protected ContentSigner buildSigner(PrivateKey signingKey) throws OperatorCreationException {
+  protected ContentSigner buildSigner(PrivateKey signingKey)
+      throws OperatorCreationException {
     String keyAlgo = signingKey.getAlgorithm().toUpperCase();
     String sigAlgo = "EC".equals(keyAlgo) ? hashAlgo + "WITHECDSA" : hashAlgo + "WITH" + keyAlgo;
     return new JcaContentSignerBuilder(sigAlgo).build(signingKey);

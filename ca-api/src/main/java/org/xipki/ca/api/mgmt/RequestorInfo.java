@@ -77,7 +77,8 @@ public interface RequestorInfo {
     }
 
     @Override
-    public void assertPermitted(int requiredPermission) throws InsuffientPermissionException {
+    public void assertPermitted(int requiredPermission)
+        throws InsuffientPermissionException {
     }
 
   } // class ByCaRequestorInfo
@@ -156,7 +157,8 @@ public interface RequestorInfo {
     }
 
     @Override
-    public void assertPermitted(int permission) throws InsuffientPermissionException {
+    public void assertPermitted(int permission)
+        throws InsuffientPermissionException {
       if (!isPermitted(permission)) {
         throw new  InsuffientPermissionException("Permission "
             + PermissionConstants.getTextForCode(permission) + " is not permitted");
@@ -223,7 +225,8 @@ public interface RequestorInfo {
     }
 
     @Override
-    public void assertPermitted(int permission) throws InsuffientPermissionException {
+    public void assertPermitted(int permission)
+        throws InsuffientPermissionException {
       if (!isPermitted(permission)) {
         throw new InsuffientPermissionException("Permission "
             + PermissionConstants.getTextForCode(permission) + " is not permitted");
@@ -240,8 +243,10 @@ public interface RequestorInfo {
 
   boolean isPermitted(int requiredPermission);
 
-  void assertCertprofilePermitted(String certprofile) throws InsuffientPermissionException;
+  void assertCertprofilePermitted(String certprofile)
+      throws InsuffientPermissionException;
 
-  void assertPermitted(int requiredPermission) throws InsuffientPermissionException;
+  void assertPermitted(int requiredPermission)
+      throws InsuffientPermissionException;
 
 }

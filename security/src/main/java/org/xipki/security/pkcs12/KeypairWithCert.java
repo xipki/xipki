@@ -76,7 +76,8 @@ public class KeypairWithCert {
 
   public static KeypairWithCert fromKeystore(String keystoreType, InputStream keystoreStream,
       char[] keystorePassword, String keyname, char[] keyPassword,
-      X509Cert[] certchain) throws XiSecurityException {
+      X509Cert[] certchain)
+          throws XiSecurityException {
     if (!("PKCS12".equalsIgnoreCase(keystoreType) || "JCEKS".equalsIgnoreCase(keystoreType))) {
       throw new IllegalArgumentException("unsupported keystore type: " + keystoreType);
     }

@@ -88,7 +88,8 @@ public class Securities implements Closeable {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(type, "type");
       validate(keystore);
     }
@@ -167,7 +168,8 @@ public class Securities implements Closeable {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       validate(password);
     }
 
@@ -228,11 +230,13 @@ public class Securities implements Closeable {
     return p11CryptServiceFactory;
   }
 
-  public void init() throws IOException, InvalidConfException {
+  public void init()
+      throws IOException, InvalidConfException {
     init(null);
   }
 
-  public void init(SecurityConf conf) throws IOException, InvalidConfException {
+  public void init(SecurityConf conf)
+      throws IOException, InvalidConfException {
     if (Security.getProvider("BC") == null) {
       LOG.info("add BouncyCastleProvider");
       Security.addProvider(new BouncyCastleProvider());
@@ -268,7 +272,8 @@ public class Securities implements Closeable {
     }
   } // method close
 
-  private void initSecurityFactory(SecurityConf conf) throws IOException, InvalidConfException {
+  private void initSecurityFactory(SecurityConf conf)
+      throws IOException, InvalidConfException {
     Passwords passwords = new Passwords();
     passwords.init(conf.getPassword());
 

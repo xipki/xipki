@@ -54,7 +54,8 @@ public class Actions {
     private String prompt;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       boolean toContinue = confirm(prompt + "\nDo you want to continue", 3);
       if (!toContinue) {
         throw new CmdFailure("User cancelled");
@@ -81,7 +82,8 @@ public class Actions {
     private String dest;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       source = expandFilepath(source);
       dest = expandFilepath(dest);
 
@@ -126,7 +128,8 @@ public class Actions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       source = expandFilepath(source);
       dest = expandFilepath(dest);
 
@@ -199,7 +202,8 @@ public class Actions {
     private org.xipki.util.Curl curl;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       byte[] content = null;
       if (postData != null) {
         content = postData.getBytes(postDataCharSet);
@@ -299,7 +303,8 @@ public class Actions {
     private String dirName;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       File target = new File(expandFilepath(dirName));
       if (target.exists()) {
         if (!target.isDirectory()) {
@@ -331,7 +336,8 @@ public class Actions {
     private String dest;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       source = expandFilepath(source);
       dest = expandFilepath(dest);
 
@@ -377,7 +383,8 @@ public class Actions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       source = expandFilepath(source);
       dest = expandFilepath(dest);
 
@@ -426,7 +433,8 @@ public class Actions {
     private String newText;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       File sourceFile = new File(expandFilepath(source));
       if (!sourceFile.exists()) {
         System.err.println(source + " does not exist");
@@ -444,7 +452,8 @@ public class Actions {
       return null;
     }
 
-    private void replaceFile(File file, String oldText, String newText) throws Exception {
+    private void replaceFile(File file, String oldText, String newText)
+        throws Exception {
       BufferedReader reader = Files.newBufferedReader(file.toPath());
       ByteArrayOutputStream writer = new ByteArrayOutputStream();
 
@@ -492,7 +501,8 @@ public class Actions {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       targetPath = expandFilepath(targetPath);
 
       File target = new File(targetPath);

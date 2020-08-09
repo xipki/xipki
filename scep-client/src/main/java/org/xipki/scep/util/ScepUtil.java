@@ -106,7 +106,8 @@ public class ScepUtil {
     return certs;
   } // method getCertsFromSignedData
 
-  public static X509CRLHolder getCrlFromPkiMessage(SignedData signedData) throws CRLException {
+  public static X509CRLHolder getCrlFromPkiMessage(SignedData signedData)
+      throws CRLException {
     Args.notNull(signedData, "signedData");
     ASN1Set set = signedData.getCRLs();
     if (set == null || set.size() == 0) {
@@ -134,7 +135,8 @@ public class ScepUtil {
   }
 
   public static ASN1ObjectIdentifier extractDigesetAlgorithmIdentifier(String sigOid,
-      byte[] sigParams) throws NoSuchAlgorithmException {
+      byte[] sigParams)
+          throws NoSuchAlgorithmException {
     Args.notBlank(sigOid, "sigOid");
 
     ASN1ObjectIdentifier algOid = new ASN1ObjectIdentifier(sigOid);

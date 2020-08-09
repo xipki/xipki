@@ -160,11 +160,13 @@ class OcspBenchRequestor {
     this.httpClient.start();
   } // method init
 
-  public void shutdown() throws Exception {
+  public void shutdown()
+      throws Exception {
     httpClient.shutdown();
   }
 
-  public void ask(BigInteger[] serialNumbers) throws OcspRequestorException, HttpClientException {
+  public void ask(BigInteger[] serialNumbers)
+      throws OcspRequestorException, HttpClientException {
     byte[] ocspReq = buildRequest(serialNumbers);
     int size = ocspReq.length;
 
@@ -192,7 +194,8 @@ class OcspBenchRequestor {
     httpClient.send(request);
   } // method ask
 
-  private byte[] buildRequest(BigInteger[] serialNumbers) throws OcspRequestorException {
+  private byte[] buildRequest(BigInteger[] serialNumbers)
+      throws OcspRequestorException {
     boolean canCache = (serialNumbers.length == 1) && !requestOptions.isUseNonce();
     if (canCache) {
       byte[] request = requests.get(serialNumbers[0]);

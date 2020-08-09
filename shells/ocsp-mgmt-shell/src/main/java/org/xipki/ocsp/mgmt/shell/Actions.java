@@ -48,7 +48,8 @@ public class Actions {
   public static class OcspSystemRestartAction extends OcspAction {
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       try {
         ocspManager.restartOcspServer();
       } catch (OcspMgmtException ex) {
@@ -71,7 +72,8 @@ public class Actions {
     protected String type;
 
     @Override
-    protected Object execute0() throws Exception {
+    protected Object execute0()
+        throws Exception {
       ocspManager.refreshTokenForSignerType(type);
       println("refreshed token for signer type " + type);
       return null;

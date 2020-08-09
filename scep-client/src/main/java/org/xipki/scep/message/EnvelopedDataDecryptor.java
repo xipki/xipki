@@ -79,7 +79,8 @@ public final class EnvelopedDataDecryptor {
     this.decryptors.add(decryptor);
   }
 
-  public byte[] decrypt(CMSEnvelopedData envData) throws MessageDecodingException {
+  public byte[] decrypt(CMSEnvelopedData envData)
+      throws MessageDecodingException {
     Args.notNull(envData, "envData");
     final RecipientInformationStore recipientInfos = envData.getRecipientInfos();
     RecipientInformation recipientInfo = null;

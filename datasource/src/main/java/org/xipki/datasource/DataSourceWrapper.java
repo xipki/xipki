@@ -89,7 +89,8 @@ public abstract class DataSourceWrapper implements Closeable {
     }
 
     @Override
-    public long nextSeqValue(Connection conn, String sequenceName) throws DataAccessException {
+    public long nextSeqValue(Connection conn, String sequenceName)
+        throws DataAccessException {
       final String sqlUpdate = buildAndCacheNextSeqValueSql(sequenceName);
       final String sqlSelect = "SELECT @cur_value";
       String sql = null;
@@ -413,7 +414,8 @@ public abstract class DataSourceWrapper implements Closeable {
     return service.getMaximumPoolSize();
   }
 
-  public final Connection getConnection() throws DataAccessException {
+  public final Connection getConnection()
+      throws DataAccessException {
     try {
       return service.getConnection();
     } catch (Exception ex) {
@@ -457,11 +459,13 @@ public abstract class DataSourceWrapper implements Closeable {
     }
   } // method close
 
-  public final PrintWriter getLogWriter() throws SQLException {
+  public final PrintWriter getLogWriter()
+      throws SQLException {
     return service.getLogWriter();
   }
 
-  public Statement createStatement(Connection conn) throws DataAccessException {
+  public Statement createStatement(Connection conn)
+      throws DataAccessException {
     notNull(conn, "conn");
     try {
       return conn.createStatement();
@@ -470,7 +474,8 @@ public abstract class DataSourceWrapper implements Closeable {
     }
   } // method createStatement
 
-  public Statement createStatement() throws DataAccessException {
+  public Statement createStatement()
+      throws DataAccessException {
     Connection conn = getConnection();
     boolean succ = false;
     try {
@@ -496,7 +501,8 @@ public abstract class DataSourceWrapper implements Closeable {
     }
   } // method prepareStatement
 
-  public PreparedStatement prepareStatement(String sqlQuery) throws DataAccessException {
+  public PreparedStatement prepareStatement(String sqlQuery)
+      throws DataAccessException {
     Connection conn = getConnection();
 
     boolean succ = false;
@@ -561,7 +567,8 @@ public abstract class DataSourceWrapper implements Closeable {
   public abstract String buildSelectFirstSql(int rows, String orderBy, String coreSql);
 
   public <T> T getFirstValue(Connection conn, String table, String column, String criteria,
-      Class<T> type) throws DataAccessException {
+      Class<T> type)
+          throws DataAccessException {
     final String sql = "SELECT " + column + " FROM " + table + " WHERE " + criteria;
     Statement stmt = null;
     ResultSet rs = null;
@@ -580,7 +587,8 @@ public abstract class DataSourceWrapper implements Closeable {
     }
   } // method getFirstValue
 
-  public long getMin(Connection conn, String table, String column) throws DataAccessException {
+  public long getMin(Connection conn, String table, String column)
+      throws DataAccessException {
     return getMin(conn, table, column, null);
   }
 
@@ -606,7 +614,8 @@ public abstract class DataSourceWrapper implements Closeable {
     }
   } // method getMin
 
-  public int getCount(Connection conn, String table) throws DataAccessException {
+  public int getCount(Connection conn, String table)
+      throws DataAccessException {
     notBlank(table, "table");
 
     final String sql = concat("SELECT COUNT(*) FROM ", table);
@@ -625,7 +634,8 @@ public abstract class DataSourceWrapper implements Closeable {
     }
   } // method getCount
 
-  public long getMax(Connection conn, String table, String column) throws DataAccessException {
+  public long getMax(Connection conn, String table, String column)
+      throws DataAccessException {
     return getMax(conn, table, column, null);
   }
 
@@ -664,7 +674,8 @@ public abstract class DataSourceWrapper implements Closeable {
   } // method deleteFromTable
 
   public void deleteFromTableWithException(Connection conn, String table, String idColumn,
-      long id) throws SQLException, DataAccessException {
+      long id)
+          throws SQLException, DataAccessException {
     notBlank(table, "table");
     notBlank(idColumn, "idColumn");
     final String sql = concat("DELETE FROM ", table, " WHERE ", idColumn,
@@ -730,7 +741,8 @@ public abstract class DataSourceWrapper implements Closeable {
     }
   } // method tableHasColumn
 
-  public boolean tableExists(Connection conn, String table) throws DataAccessException {
+  public boolean tableExists(Connection conn, String table)
+      throws DataAccessException {
     notBlank(table, "table");
 
     final String sql = buildSelectFirstSql(1, concat("1 FROM ", table));
@@ -776,7 +788,8 @@ public abstract class DataSourceWrapper implements Closeable {
     createSequence(sequenceName, startValue);
   } // method dropAndCreateSequence
 
-  public void createSequence(String sequenceName, long startValue) throws DataAccessException {
+  public void createSequence(String sequenceName, long startValue)
+      throws DataAccessException {
     notBlank(sequenceName, "sequenceName");
     final String sql = buildCreateSequenceSql(sequenceName, startValue);
     Statement stmt = null;
@@ -791,7 +804,8 @@ public abstract class DataSourceWrapper implements Closeable {
     }
   } // method createSequence
 
-  public void dropSequence(String sequenceName) throws DataAccessException {
+  public void dropSequence(String sequenceName)
+      throws DataAccessException {
     notBlank(sequenceName, "sequenceName");
     final String sql = buildDropSequenceSql(sequenceName);
     Statement stmt = null;
@@ -811,7 +825,8 @@ public abstract class DataSourceWrapper implements Closeable {
     lastUsedSeqValues.put(sequenceName, sequenceValue);
   }
 
-  public long nextSeqValue(Connection conn, String sequenceName) throws DataAccessException {
+  public long nextSeqValue(Connection conn, String sequenceName)
+      throws DataAccessException {
     notBlank(sequenceName, "sequenceName");
     final String sql = buildAndCacheNextSeqValueSql(sequenceName);
     Statement stmt = null;
@@ -916,7 +931,8 @@ public abstract class DataSourceWrapper implements Closeable {
 
   public void addForeignKeyConstraint(Connection conn, String constraintName, String baseTable,
       String baseColumn, String referencedTable, String referencedColumn, String onDeleteAction,
-      String onUpdateAction) throws DataAccessException {
+      String onUpdateAction)
+          throws DataAccessException {
     final String sql = getSqlToAddForeignKeyConstraint(constraintName, baseTable, baseColumn,
         referencedTable, referencedColumn, onDeleteAction, onUpdateAction);
     executeUpdate(conn, sql);
@@ -987,7 +1003,8 @@ public abstract class DataSourceWrapper implements Closeable {
   } // method getSqlToAddUniqueConstrain
 
   public void addUniqueConstrain(Connection conn, String constraintName,
-      String table, String... columns) throws DataAccessException {
+      String table, String... columns)
+          throws DataAccessException {
     executeUpdate(conn, getSqlToAddUniqueConstrain(constraintName, table, columns));
   }
 
@@ -1119,7 +1136,8 @@ public abstract class DataSourceWrapper implements Closeable {
     return msg.contains(sql) ? msg : concat("SQL [", sql, "]; ", msg);
   }
 
-  private void executeUpdate(Connection conn, String sql) throws DataAccessException {
+  private void executeUpdate(Connection conn, String sql)
+      throws DataAccessException {
     Statement stmt = null;
     try {
       stmt = conn == null ? createStatement() : createStatement(conn);

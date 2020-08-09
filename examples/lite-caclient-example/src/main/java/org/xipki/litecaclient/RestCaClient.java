@@ -67,13 +67,15 @@ public class RestCaClient implements Closeable {
 
   private String caCertSha1Fp;
 
-  public RestCaClient(String caUrl, String user, String password) throws Exception {
+  public RestCaClient(String caUrl, String user, String password)
+      throws Exception {
     this.caUrl = new URL(SdkUtil.requireNonBlank("caUrl", caUrl)).toString();
     this.authorization = Base64.getEncoder().encodeToString(
                             (user + ":" + password).getBytes(StandardCharsets.UTF_8));
   }
 
-  public void init() throws Exception {
+  public void init()
+      throws Exception {
     TlsInit.init();
 
     // Get CA certificate
@@ -93,7 +95,8 @@ public class RestCaClient implements Closeable {
     TlsInit.close();
   }
 
-  private List<X509Certificate> httpgetCaCertchain() throws Exception {
+  private List<X509Certificate> httpgetCaCertchain()
+      throws Exception {
     List<X509Certificate> certchain = new LinkedList<>();
     // Get CA certificate chain
     byte[] bytes = httpGet(caUrl + "/cacertchain", CT_PEM_FILE);
@@ -125,7 +128,8 @@ public class RestCaClient implements Closeable {
     return cert;
   } // method requestCert
 
-  public boolean revokeCert(BigInteger serialNumber, CRLReason reason) throws Exception {
+  public boolean revokeCert(BigInteger serialNumber, CRLReason reason)
+      throws Exception {
     StringBuilder sb = new StringBuilder(200);
     sb.append(caUrl).append("/revoke-cert?ca-sha1=").append(caCertSha1Fp);
     sb.append("&serial-number=0X").append(serialNumber.toString(16));
@@ -134,7 +138,8 @@ public class RestCaClient implements Closeable {
     return simpleHttpGet(url);
   } // method revokeCert
 
-  public boolean unrevokeCert(BigInteger serialNumber) throws Exception {
+  public boolean unrevokeCert(BigInteger serialNumber)
+      throws Exception {
     return revokeCert(serialNumber, CRLReason.lookup(CRLReason.removeFromCRL));
   }
 
@@ -160,7 +165,8 @@ public class RestCaClient implements Closeable {
     }
   } // method verify
 
-  private boolean simpleHttpGet(String url) throws IOException {
+  private boolean simpleHttpGet(String url)
+      throws IOException {
     HttpURLConnection conn = SdkUtil.openHttpConn(new URL(url));
     conn.setDoOutput(true);
     conn.setUseCaches(false);
@@ -176,7 +182,8 @@ public class RestCaClient implements Closeable {
     return ok;
   } // method simpleHttpGet
 
-  private byte[] httpGet(String url, String responseCt) throws IOException {
+  private byte[] httpGet(String url, String responseCt)
+      throws IOException {
     HttpURLConnection conn = SdkUtil.openHttpConn(new URL(url));
     conn.setDoOutput(true);
     conn.setUseCaches(false);

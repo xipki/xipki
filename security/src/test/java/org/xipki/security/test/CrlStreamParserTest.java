@@ -52,7 +52,8 @@ public class CrlStreamParserTest {
   }
 
   @Test
-  public void parseCrl1() throws Exception {
+  public void parseCrl1()
+      throws Exception {
     File crlFile = new File("src/test/resources/crls/crl-1/subcawithcrl1.crl");
     Certificate issuerSigner = parseCert("src/test/resources/crls/crl-1/ca.crt");
 
@@ -75,7 +76,8 @@ public class CrlStreamParserTest {
   }
 
   @Test
-  public void parseCrl2() throws Exception {
+  public void parseCrl2()
+      throws Exception {
     File crlFile = new File("src/test/resources/crls/crl-2/ca1-crl.crl");
     Certificate issuerSigner = parseCert("src/test/resources/crls/crl-2/ca1-cert.crt");
 
@@ -98,7 +100,8 @@ public class CrlStreamParserTest {
   }
 
   @Test
-  public void parseCrlWithInvalidityDate() throws Exception {
+  public void parseCrlWithInvalidityDate()
+      throws Exception {
     File crlFile = new File("src/test/resources/crls/crl-3/subcawithcrl1.crl");
     Certificate issuerSigner = parseCert("src/test/resources/crls/crl-3/ca.crt");
 
@@ -121,7 +124,8 @@ public class CrlStreamParserTest {
   }
 
   @Test
-  public void parseCrlWithNoRevokedCerts() throws Exception {
+  public void parseCrlWithNoRevokedCerts()
+      throws Exception {
     File crlFile = new File("src/test/resources/crls/crl-4/no-revoked-certs.crl");
     Certificate issuerSigner = parseCert("src/test/resources/crls/crl-4/ca.crt");
 
@@ -144,7 +148,8 @@ public class CrlStreamParserTest {
   }
 
   @Test
-  public void parseCrlWithNoCrlNumber() throws Exception {
+  public void parseCrlWithNoCrlNumber()
+      throws Exception {
     File crlFile = new File("src/test/resources/crls/crl-5/no-crlnumber.crl");
     Certificate issuerSigner = parseCert("src/test/resources/crls/crl-5/ca.crt");
 
@@ -167,7 +172,8 @@ public class CrlStreamParserTest {
   }
 
   @Test
-  public void parseCrlWithNoExtension() throws Exception {
+  public void parseCrlWithNoExtension()
+      throws Exception {
     File crlFile = new File("src/test/resources/crls/crl-6/no-extensions.crl");
     Certificate issuerSigner = parseCert("src/test/resources/crls/crl-6/ca.crt");
 

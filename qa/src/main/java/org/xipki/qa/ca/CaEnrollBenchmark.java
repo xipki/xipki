@@ -139,7 +139,8 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
       this.ssl = ssl;
     }
 
-    public GeneralName requestor() throws CertificateException, IOException {
+    public GeneralName requestor()
+        throws CertificateException, IOException {
       if (requestor == null && requestorCert != null) {
         X500Name subject = X509Util.parseCert(new File(requestorCert)).getSubject();
         requestor = new GeneralName(subject);
@@ -147,7 +148,8 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
       return requestor;
     }
 
-    public GeneralName responder() throws CertificateException, IOException {
+    public GeneralName responder()
+        throws CertificateException, IOException {
       if (responder == null && responderCert != null) {
         X500Name subject = X509Util.parseCert(new File(responderCert)).getSubject();
         responder = new GeneralName(subject);
@@ -156,7 +158,8 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(requestorCert, "requestorCert");
       notBlank(responderCert, "responderCert");
       notBlank(caUrl, "caUrl");
@@ -202,7 +205,8 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
       }
     }
 
-    private void testNext(PKIMessage certReq) throws HttpClientException, IOException {
+    private void testNext(PKIMessage certReq)
+        throws HttpClientException, IOException {
       byte[] encoded = certReq.getEncoded();
       ByteBuf content = Unpooled.wrappedBuffer(encoded);
       FullHttpRequest httpReq = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1,
@@ -250,7 +254,8 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
   private final SslContext sslContext;
 
   public CaEnrollBenchmark(CaEnrollBenchEntry benchmarkEntry, int maxRequests, int num,
-      int queueSize, String description) throws IOException, InvalidConfException {
+      int queueSize, String description)
+          throws IOException, InvalidConfException {
     super(description);
     this.maxRequests = maxRequests;
     this.num = positive(num, "num");
@@ -286,7 +291,8 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
   } // constructor
 
   @Override
-  protected Runnable getTestor() throws Exception {
+  protected Runnable getTestor()
+      throws Exception {
     return new Testor();
   }
 
@@ -295,7 +301,8 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
     return num * account;
   }
 
-  public PKIMessage nextCertRequest() throws IOException, CertificateException {
+  public PKIMessage nextCertRequest()
+      throws IOException, CertificateException {
     if (maxRequests > 0) {
       int num = processedRequests.getAndAdd(1);
       if (num >= maxRequests) {

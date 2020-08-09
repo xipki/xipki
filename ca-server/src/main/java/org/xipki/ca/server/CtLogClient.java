@@ -85,7 +85,8 @@ public class CtLogClient {
 
   public SignedCertificateTimestampList getCtLogScts(
       X509CertificateHolder precert, X509Cert caCert, List<X509Cert> certchain,
-      CtLogPublicKeyFinder publicKeyFinder) throws OperationException {
+      CtLogPublicKeyFinder publicKeyFinder)
+          throws OperationException {
     AddPreChainRequest request = new AddPreChainRequest();
     List<byte[]> chain = new LinkedList<>();
     request.setChain(chain);

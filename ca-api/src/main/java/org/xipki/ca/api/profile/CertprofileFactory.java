@@ -54,6 +54,7 @@ public interface CertprofileFactory {
    * @throws ObjectCreationException
    *           if certificate profile could not be created.
    */
-  Certprofile newCertprofile(String type) throws ObjectCreationException;
+  Certprofile newCertprofile(String type)
+      throws ObjectCreationException;
 
 }

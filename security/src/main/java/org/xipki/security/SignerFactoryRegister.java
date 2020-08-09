@@ -53,8 +53,10 @@ public interface SignerFactoryRegister {
    *           If signer could not be created.
    */
   ConcurrentContentSigner newSigner(SecurityFactory securityFactory, String type, SignerConf conf,
-      X509Cert[] certificateChain) throws ObjectCreationException;
+      X509Cert[] certificateChain)
+          throws ObjectCreationException;
 
-  void refreshTokenForSignerType(String signerType) throws XiSecurityException;
+  void refreshTokenForSignerType(String signerType)
+      throws XiSecurityException;
 
 }

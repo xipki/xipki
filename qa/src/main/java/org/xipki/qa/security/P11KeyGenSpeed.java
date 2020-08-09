@@ -46,14 +46,16 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
 
     private final int qlength;
 
-    public DSA(P11Slot slot, byte[] id, int plength, int qlength) throws Exception {
+    public DSA(P11Slot slot, byte[] id, int plength, int qlength)
+        throws Exception {
       super(slot, id, "PKCS#11 DSA key generation\nplength: " + plength + "\nqlength: " + qlength);
       this.plength = plength;
       this.qlength = qlength;
     }
 
     @Override
-    protected void genKeypair() throws Exception {
+    protected void genKeypair()
+        throws Exception {
       P11IdentityId objId = slot.generateDSAKeypair(plength, qlength, getControl());
       slot.removeIdentity(objId);
     }
@@ -65,13 +67,15 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
 
     private final ASN1ObjectIdentifier curveOid;
 
-    public EC(P11Slot slot, byte[] id, ASN1ObjectIdentifier curveOid) throws Exception {
+    public EC(P11Slot slot, byte[] id, ASN1ObjectIdentifier curveOid)
+        throws Exception {
       super(slot, id, "PKCS#11 EC key generation\ncurve: " + curveOid.getId());
       this.curveOid = notNull(curveOid, "curveOid");
     }
 
     @Override
-    protected void genKeypair() throws Exception {
+    protected void genKeypair()
+        throws Exception {
       P11IdentityId objId = slot.generateECKeypair(curveOid, getControl());
       slot.removeIdentity(objId);
     }
@@ -94,7 +98,8 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
     }
 
     @Override
-    protected void genKeypair() throws Exception {
+    protected void genKeypair()
+        throws Exception {
       P11IdentityId objId = slot.generateRSAKeypair(keysize, publicExponent, getControl());
       slot.removeIdentity(objId);
     }
@@ -103,12 +108,14 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
 
   //CHECKSTYLE:SKIP
   public static class SM2 extends P11KeyGenSpeed {
-    public SM2(P11Slot slot, byte[] id) throws Exception {
+    public SM2(P11Slot slot, byte[] id)
+        throws Exception {
       super(slot, id, "PKCS#11 SM2 key generation");
     }
 
     @Override
-    protected void genKeypair() throws Exception {
+    protected void genKeypair()
+        throws Exception {
       P11IdentityId objId = slot.generateSM2Keypair(getControl());
       slot.removeIdentity(objId);
     }
@@ -146,14 +153,16 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
     this.id = id;
   }
 
-  protected abstract void genKeypair() throws Exception;
+  protected abstract void genKeypair()
+      throws Exception;
 
   protected P11NewKeyControl getControl() {
     return new P11NewKeyControl(id, "speed-" + idx.getAndIncrement());
   }
 
   @Override
-  protected Runnable getTestor() throws Exception {
+  protected Runnable getTestor()
+      throws Exception {
     return new Testor();
   }
 

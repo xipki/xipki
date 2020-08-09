@@ -65,6 +65,7 @@ public interface Curl {
       throws Exception;
 
   CurlResult curlPost(String url, boolean verbose, Map<String, String> headers, String userPassword,
-      byte[] content) throws Exception;
+      byte[] content)
+          throws Exception;
 
 }

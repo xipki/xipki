@@ -340,7 +340,8 @@ public class CaConfs {
   } // method resolveFilePath
 
   private static String convertSignerConf(FileOrValue confFv, Map<String, String> properties,
-      String baseDir) throws IOException {
+      String baseDir)
+          throws IOException {
 
     String conf;
     if (confFv.getValue() != null) {

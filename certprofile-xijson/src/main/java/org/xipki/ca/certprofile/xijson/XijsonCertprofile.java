@@ -284,7 +284,8 @@ public class XijsonCertprofile extends BaseCertprofile {
   }
 
   @Override
-  public void initialize(String data) throws CertprofileException {
+  public void initialize(String data)
+      throws CertprofileException {
     notBlank(data, "data");
 
     X509ProfileType conf;
@@ -301,7 +302,8 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   } // method initialize
 
-  public void initialize(X509ProfileType conf) throws CertprofileException {
+  public void initialize(X509ProfileType conf)
+      throws CertprofileException {
     notNull(conf, "conf");
 
     reset();
@@ -314,7 +316,8 @@ public class XijsonCertprofile extends BaseCertprofile {
     }
   } // method initialize
 
-  private void initialize0(X509ProfileType conf) throws CertprofileException {
+  private void initialize0(X509ProfileType conf)
+      throws CertprofileException {
     this.version = conf.getVersion();
     if (this.version == null) {
       this.version = X509CertVersion.v3;
@@ -673,7 +676,8 @@ public class XijsonCertprofile extends BaseCertprofile {
    * @throws CertprofileException
    *           If initialization of the extra extension failed.
    */
-  protected boolean initExtraExtension(ExtensionType extn) throws CertprofileException {
+  protected boolean initExtraExtension(ExtensionType extn)
+      throws CertprofileException {
     return false;
   }
 
@@ -704,7 +708,8 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method initSubjectToSubjectAltNames
 
   private void initAdditionalInformation(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     ASN1ObjectIdentifier type = Extn.id_extension_additionalInformation;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -718,7 +723,8 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method initAdditionalInformation
 
   private void initAdmission(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     ASN1ObjectIdentifier type = Extn.id_extension_admission;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -736,7 +742,8 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method initAdmission
 
   private void initAuthorityInfoAccess(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     ASN1ObjectIdentifier type = Extension.authorityInfoAccess;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -749,7 +756,8 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method initAuthorityInfoAccess
 
   private void initAuthorityKeyIdentifier(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     ASN1ObjectIdentifier type = Extension.authorityKeyIdentifier;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -759,7 +767,8 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method initAuthorityKeyIdentifier
 
   private void initAuthorizationTemplate(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     ASN1ObjectIdentifier type = ObjectIdentifiers.Xipki.id_xipki_ext_authorizationTemplate;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -776,7 +785,8 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method initAuthorizationTemplate
 
   private void initBasicConstraints(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     ASN1ObjectIdentifier type = Extension.basicConstraints;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -788,7 +798,8 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method initBasicConstraints
 
   private void initBiometricInfo(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     ASN1ObjectIdentifier type = Extension.biometricInfo;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -804,7 +815,8 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method initBiometricInfo
 
   private void initCertificatePolicies(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     ASN1ObjectIdentifier type = Extension.certificatePolicies;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -816,7 +828,8 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method initCertificatePolicies
 
   private void initCrlDistributionPoints(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     ASN1ObjectIdentifier type = Extension.cRLDistributionPoints;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -828,7 +841,8 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method initCrlDistributionPoints
 
   private void initExtendedKeyUsage(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     ASN1ObjectIdentifier type = Extension.extendedKeyUsage;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -840,7 +854,8 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method initExtendedKeyUsage
 
   private void initFreshestCrl(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     ASN1ObjectIdentifier type = Extension.freshestCRL;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -852,7 +867,8 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method initFreshestCrl
 
   private void initInhibitAnyPolicy(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     ASN1ObjectIdentifier type = Extension.inhibitAnyPolicy;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -870,7 +886,8 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method initInhibitAnyPolicy
 
   private void initKeyUsage(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     ASN1ObjectIdentifier type = Extension.keyUsage;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -882,7 +899,8 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method initKeyUsage
 
   private void initNameConstraints(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     ASN1ObjectIdentifier type = Extension.nameConstraints;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -895,7 +913,8 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method initNameConstraints
 
   private void initPrivateKeyUsagePeriod(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     ASN1ObjectIdentifier type = Extension.privateKeyUsagePeriod;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -907,7 +926,8 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method initPrivateKeyUsagePeriod
 
   private void initPolicyConstraints(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     ASN1ObjectIdentifier type = Extension.policyConstraints;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -921,7 +941,8 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method initPolicyConstraints
 
   private void initPolicyMappings(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     ASN1ObjectIdentifier type = Extension.policyMappings;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -934,7 +955,8 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method initPolicyMappings
 
   private void initQcStatements(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     ASN1ObjectIdentifier type = Extension.qCStatements;
     if (!extensionControls.containsKey(type)) {
       return;
@@ -1037,7 +1059,8 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method initQcStatements
 
   private void initRestriction(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     ASN1ObjectIdentifier type = Extn.id_extension_restriction;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -1050,7 +1073,8 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method initRestriction
 
   private void initSmimeCapabilities(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     ASN1ObjectIdentifier type = Extn.id_smimeCapabilities;
     if (!extensionControls.containsKey(type)) {
       return;
@@ -1086,7 +1110,8 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method initSmimeCapabilities
 
   private void initSubjectAlternativeName(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     ASN1ObjectIdentifier type = Extension.subjectAlternativeName;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -1098,7 +1123,8 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method initSubjectAlternativeName
 
   private void initSubjectInfoAccess(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     ASN1ObjectIdentifier type = Extension.subjectInfoAccess;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -1116,7 +1142,8 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method initSubjectInfoAccess
 
   private void initTlsFeature(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     ASN1ObjectIdentifier type = Extn.id_pe_tlsfeature;
     if (!extensionControls.containsKey(type)) {
       return;
@@ -1156,7 +1183,8 @@ public class XijsonCertprofile extends BaseCertprofile {
    * </pre>
    */
   private void initValidityModel(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     ASN1ObjectIdentifier type = Extn.id_extension_validityModel;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -1170,7 +1198,8 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method initValidityModel
 
   private void initSubjectDirAttrs(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     ASN1ObjectIdentifier type = Extension.subjectDirectoryAttributes;
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
@@ -1184,7 +1213,8 @@ public class XijsonCertprofile extends BaseCertprofile {
   } // method initSubjectDirAttrs
 
   private void initGmt0015Extensions(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     extnIds.remove(Extn.id_GMT_0015_ICRegistrationNumber);
     extnIds.remove(Extn.id_GMT_0015_IdentityCode);
     extnIds.remove(Extn.id_GMT_0015_InsuranceNumber);
@@ -1274,7 +1304,8 @@ public class XijsonCertprofile extends BaseCertprofile {
       Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
       X500Name requestedSubject, X500Name grantedSubject,
       Map<ASN1ObjectIdentifier, Extension> requestedExtensions, Date notBefore, Date notAfter,
-      PublicCaInfo caInfo) throws CertprofileException, BadCertTemplateException {
+      PublicCaInfo caInfo)
+          throws CertprofileException, BadCertTemplateException {
     ExtensionValues values = new ExtensionValues();
     if (CollectionUtil.isEmpty(extensionControls)) {
       return values;
@@ -2156,7 +2187,8 @@ public class XijsonCertprofile extends BaseCertprofile {
   }
 
   private static ExtensionType getExtension(ASN1ObjectIdentifier type,
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     ExtensionType extension = extensions.get(type.getId());
     if (extension == null) {
       throw new IllegalStateException("should not reach here: undefined extension "
@@ -2166,7 +2198,8 @@ public class XijsonCertprofile extends BaseCertprofile {
     return extension;
   } // method getExtension
 
-  private static ASN1Encodable readAsn1Encodable(byte[] encoded) throws CertprofileException {
+  private static ASN1Encodable readAsn1Encodable(byte[] encoded)
+      throws CertprofileException {
     ASN1StreamParser parser = new ASN1StreamParser(encoded);
     try {
       return parser.readObject();

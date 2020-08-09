@@ -154,7 +154,8 @@ public class CaConfType {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       validate(signers);
       validate(requestors);
       validate(publishers);
@@ -214,7 +215,8 @@ public class CaConfType {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(requestorName, "requestorName");
       notEmpty(permissions, "permissions");
     }
@@ -260,7 +262,8 @@ public class CaConfType {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(userName, "userName");
       notEmpty(permissions, "permissions");
     }
@@ -561,7 +564,8 @@ public class CaConfType {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       if (genSelfIssued != null) {
         if (cert != null) {
           throw new InvalidConfException("cert and genSelfIssued may not be both non-null");
@@ -668,7 +672,8 @@ public class CaConfType {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(name, "name");
       validate(caInfo);
       validate(requestors);
@@ -732,7 +737,8 @@ public class CaConfType {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
     }
 
   } // class CaUris
@@ -783,7 +789,8 @@ public class CaConfType {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notNull(csr, "csr");
       validate(csr);
     }
@@ -823,7 +830,8 @@ public class CaConfType {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(name, "name");
       notBlank(type, "type");
       validate(conf);
@@ -874,7 +882,8 @@ public class CaConfType {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(name, "name");
       notBlank(type, "type");
       exactOne(conf, "conf", binaryConf, "binaryConf");
@@ -927,7 +936,8 @@ public class CaConfType {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(name, "name");
       notBlank(type, "type");
       notNull(conf, "conf");
@@ -981,7 +991,8 @@ public class CaConfType {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(name, "name");
       exactOne(password, "password", hashedPassword, "hashedPassword");
     }

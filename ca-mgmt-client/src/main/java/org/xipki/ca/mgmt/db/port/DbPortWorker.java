@@ -52,7 +52,8 @@ public abstract class DbPortWorker implements Runnable {
   private Exception exception;
 
   public DbPortWorker(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
-      String dbConfFile) throws PasswordResolverException, IOException {
+      String dbConfFile)
+          throws PasswordResolverException, IOException {
     Properties props = DbPorter.getDbConfProperties(
         Files.newInputStream(Paths.get(IoUtil.expandFilepath(dbConfFile))));
     this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, props,
@@ -77,7 +78,8 @@ public abstract class DbPortWorker implements Runnable {
     }
   } // method run
 
-  protected abstract void run0() throws Exception;
+  protected abstract void run0()
+      throws Exception;
 
   public static class ImportCaDb extends DbPortWorker {
 
@@ -97,7 +99,8 @@ public abstract class DbPortWorker implements Runnable {
     }
 
     @Override
-    protected void run0() throws Exception {
+    protected void run0()
+        throws Exception {
       File processLogFile = new File(srcFolder, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
       if (resume) {
         if (!processLogFile.exists()) {
@@ -149,7 +152,8 @@ public abstract class DbPortWorker implements Runnable {
 
     public ExportCaDb(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
         String dbConfFile, String destFolder, boolean resume, int numCertsInBundle,
-        int numCertsPerSelect) throws PasswordResolverException, IOException {
+        int numCertsPerSelect)
+            throws PasswordResolverException, IOException {
       super(datasourceFactory, passwordResolver, dbConfFile);
       this.destFolder = IoUtil.expandFilepath(destFolder);
       this.resume = resume;
@@ -158,7 +162,8 @@ public abstract class DbPortWorker implements Runnable {
       checkDestFolder();
     }
 
-    private void checkDestFolder() throws IOException {
+    private void checkDestFolder()
+        throws IOException {
       File file = new File(destFolder);
       if (!file.exists()) {
         file.mkdirs();
@@ -186,7 +191,8 @@ public abstract class DbPortWorker implements Runnable {
     } // method checkDestFolder
 
     @Override
-    protected void run0() throws Exception {
+    protected void run0()
+        throws Exception {
       long start = System.currentTimeMillis();
       try {
         if (!resume) {
@@ -226,7 +232,8 @@ public abstract class DbPortWorker implements Runnable {
 
     public ExportOcspDb(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
         String dbConfFile, String destFolder, boolean resume, int numCertsInBundle,
-        int numCertsPerSelect) throws PasswordResolverException, IOException {
+        int numCertsPerSelect)
+            throws PasswordResolverException, IOException {
       super(datasourceFactory, passwordResolver, dbConfFile);
 
       this.destFolder = Args.notBlank(destFolder, destFolder);
@@ -256,7 +263,8 @@ public abstract class DbPortWorker implements Runnable {
     } // constructor
 
     @Override
-    protected void run0() throws Exception {
+    protected void run0()
+        throws Exception {
       long start = System.currentTimeMillis();
       try {
         // CertStore
@@ -287,7 +295,8 @@ public abstract class DbPortWorker implements Runnable {
 
     public ImportOcspDb(DataSourceFactory datasourceFactory,
         PasswordResolver passwordResolver, String dbConfFile, boolean resume, String srcFolder,
-        int batchEntriesPerCommit) throws PasswordResolverException, IOException {
+        int batchEntriesPerCommit)
+            throws PasswordResolverException, IOException {
       super(datasourceFactory, passwordResolver, dbConfFile);
       this.resume = resume;
       this.srcFolder = IoUtil.expandFilepath(srcFolder);
@@ -295,7 +304,8 @@ public abstract class DbPortWorker implements Runnable {
     }
 
     @Override
-    protected void run0() throws Exception {
+    protected void run0()
+        throws Exception {
       long start = System.currentTimeMillis();
       // CertStore
       try {
@@ -338,7 +348,8 @@ public abstract class DbPortWorker implements Runnable {
     }
 
     @Override
-    protected void run0() throws Exception {
+    protected void run0()
+        throws Exception {
       long start = System.currentTimeMillis();
       // CertStore
       try {

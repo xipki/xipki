@@ -173,7 +173,8 @@ public class CrlControl {
 
   private final Set<String> extensionOids;
 
-  public CrlControl(String conf) throws InvalidConfException {
+  public CrlControl(String conf)
+      throws InvalidConfException {
     ConfPairs props;
     try {
       props = new ConfPairs(conf);
@@ -332,7 +333,8 @@ public class CrlControl {
     return invalidityDateMode;
   }
 
-  public final void validate() throws InvalidConfException {
+  public final void validate()
+      throws InvalidConfException {
     if (onlyContainsCaCerts && onlyContainsUserCerts) {
       throw new InvalidConfException(
           "onlyContainsCACerts and onlyContainsUserCerts can not be both true");

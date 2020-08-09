@@ -108,7 +108,8 @@ public class ExtensionsConfCreatorDemo {
 
   } // method marshal
 
-  private static void check(Path path) throws Exception {
+  private static void check(Path path)
+      throws Exception {
     byte[] bytes = IoUtil.read(path.toFile());
     ExtensionsType extraExtensions = JSON.parseObject(bytes, ExtensionsType.class);
     extraExtensions.validate();
@@ -123,7 +124,8 @@ public class ExtensionsConfCreatorDemo {
     }
   } // method check
 
-  private static void extensionsEeCompelx(String destFilename) throws Exception {
+  private static void extensionsEeCompelx(String destFilename)
+      throws Exception {
     ExtensionsType extensions = new ExtensionsType();
     // Extensions
     // Extensions - general
@@ -221,7 +223,8 @@ public class ExtensionsConfCreatorDemo {
   } // method extensionsEeCompelx
 
   private static void extensionsSyntaxExt(String destFilename, ASN1ObjectIdentifier oidPrefix,
-      Tag tag) throws Exception {
+      Tag tag)
+          throws Exception {
     ExtensionsType extensions = new ExtensionsType();
     // Extensions
     // Extensions - general
@@ -435,7 +438,8 @@ public class ExtensionsConfCreatorDemo {
     return subFields;
   } // method createConstantSequenceOfOrSetOf
 
-  private static void extensionsAppleWwdr(String destFilename) throws Exception {
+  private static void extensionsAppleWwdr(String destFilename)
+      throws Exception {
     ExtensionsType extensions = new ExtensionsType();
     List<X509ExtensionType> list = new LinkedList<>();
     extensions.setExtensions(list);
@@ -503,7 +507,8 @@ public class ExtensionsConfCreatorDemo {
     marshall(extensions, destFilename);
   } // method extensionsAppleWwdr
 
-  private static void extensionsGmt0015(String destFilename) throws Exception {
+  private static void extensionsGmt0015(String destFilename)
+      throws Exception {
     ExtensionsType extensions = new ExtensionsType();
     List<X509ExtensionType> list = new LinkedList<>();
     extensions.setExtensions(list);

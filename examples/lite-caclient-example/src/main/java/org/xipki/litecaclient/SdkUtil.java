@@ -51,7 +51,8 @@ public class SdkUtil {
   private SdkUtil() {
   }
 
-  public static X509Certificate parseCert(File file) throws IOException, CertificateException {
+  public static X509Certificate parseCert(File file)
+      throws IOException, CertificateException {
     requireNonNull("file", file);
     InputStream in = Files.newInputStream(file.toPath());
     try {
@@ -61,12 +62,14 @@ public class SdkUtil {
     }
   } // method parseCert
 
-  public static X509Certificate parseCert(byte[] certBytes) throws CertificateException {
+  public static X509Certificate parseCert(byte[] certBytes)
+      throws CertificateException {
     requireNonNull("certBytes", certBytes);
     return parseCert(new ByteArrayInputStream(certBytes));
   }
 
-  public static X509Certificate parseCert(InputStream certStream) throws CertificateException {
+  public static X509Certificate parseCert(InputStream certStream)
+      throws CertificateException {
     requireNonNull("certStream", certStream);
     X509Certificate cert = (X509Certificate) getCertFactory().generateCertificate(certStream);
     if (cert == null) {
@@ -75,7 +78,8 @@ public class SdkUtil {
     return cert;
   } // method parseCert
 
-  private static CertificateFactory getCertFactory() throws CertificateException {
+  private static CertificateFactory getCertFactory()
+      throws CertificateException {
     synchronized (certFactLock) {
       if (certFact == null) {
         certFact = CertificateFactory.getInstance("X.509");
@@ -84,7 +88,8 @@ public class SdkUtil {
     }
   } // method getCertFactory
 
-  public static byte[] extractSki(X509Certificate cert) throws CertificateEncodingException {
+  public static byte[] extractSki(X509Certificate cert)
+      throws CertificateEncodingException {
     byte[] fullExtValue = cert.getExtensionValue(Extension.subjectKeyIdentifier.getId());
     if (fullExtValue == null) {
       return null;
@@ -94,11 +99,13 @@ public class SdkUtil {
     return ASN1OctetString.getInstance(extValue).getOctets();
   }
 
-  public static byte[] read(File file) throws IOException {
+  public static byte[] read(File file)
+      throws IOException {
     return read(Files.newInputStream(file.toPath()));
   }
 
-  public static byte[] read(InputStream in) throws IOException {
+  public static byte[] read(InputStream in)
+      throws IOException {
     try {
       ByteArrayOutputStream bout = new ByteArrayOutputStream();
       int readed = 0;
@@ -117,7 +124,8 @@ public class SdkUtil {
     }
   } // method read
 
-  public static void save(File file, byte[] content) throws IOException {
+  public static void save(File file, byte[] content)
+      throws IOException {
     File parent = file.getParentFile();
 
     if (parent != null && !parent.exists()) {
@@ -128,7 +136,8 @@ public class SdkUtil {
         new ByteArrayInputStream(content), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
   }
 
-  public static HttpURLConnection openHttpConn(URL url) throws IOException {
+  public static HttpURLConnection openHttpConn(URL url)
+      throws IOException {
     requireNonNull("url", url);
     URLConnection conn = url.openConnection();
     if (conn instanceof HttpURLConnection) {
@@ -150,7 +159,8 @@ public class SdkUtil {
   }
 
   public static byte[] send(URL url, String httpMethod, byte[] request, String requestContentType,
-      String expectedResponseContentType) throws IOException {
+      String expectedResponseContentType)
+          throws IOException {
     HttpURLConnection httpUrlConnection = SdkUtil.openHttpConn(url);
     httpUrlConnection.setDoOutput(true);
     httpUrlConnection.setUseCaches(false);

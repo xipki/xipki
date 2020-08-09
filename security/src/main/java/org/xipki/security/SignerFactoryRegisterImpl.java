@@ -82,7 +82,8 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
 
   @Override
   public ConcurrentContentSigner newSigner(SecurityFactory securityFactory, String type,
-      SignerConf conf, X509Cert[] certificateChain) throws ObjectCreationException {
+      SignerConf conf, X509Cert[] certificateChain)
+          throws ObjectCreationException {
     Args.notBlank(type, "type");
 
     for (SignerFactory service : factories) {
@@ -95,7 +96,8 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
   }
 
   @Override
-  public void refreshTokenForSignerType(String signerType) throws XiSecurityException {
+  public void refreshTokenForSignerType(String signerType)
+      throws XiSecurityException {
     for (SignerFactory service : factories) {
       if (service.canCreateSigner(signerType)) {
         service.refreshToken(signerType);

@@ -53,7 +53,8 @@ public class GeneralNameType extends ValidatableConf {
     this.modes = modes;
   }
 
-  public Set<GeneralNameMode> toGeneralNameModes() throws CertprofileException {
+  public Set<GeneralNameMode> toGeneralNameModes()
+      throws CertprofileException {
     if (modes == null || modes.isEmpty()) {
       throw new CertprofileException("GeneralNameType may not be empty");
     }
@@ -108,7 +109,8 @@ public class GeneralNameType extends ValidatableConf {
   } // method addOtherNames
 
   @Override
-  public void validate() throws InvalidConfException {
+  public void validate()
+      throws InvalidConfException {
     notEmpty(modes, "modes");
   }
 }

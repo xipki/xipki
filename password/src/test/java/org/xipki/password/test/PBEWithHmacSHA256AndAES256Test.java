@@ -38,7 +38,8 @@ public class PBEWithHmacSHA256AndAES256Test {
   private static byte[] salt = new byte[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 15, 16};
 
   @Test
-  public void encrypThenDecrypt() throws Exception {
+  public void encrypThenDecrypt()
+      throws Exception {
     char[] password = "qwert".toCharArray();
     byte[] plainText = StringUtil.toUtf8Bytes("123456");
     int iterationCount = 1000;
@@ -50,7 +51,8 @@ public class PBEWithHmacSHA256AndAES256Test {
   }
 
   @Test
-  public void decrypt() throws Exception {
+  public void decrypt()
+      throws Exception {
     char[] password = "qwert".toCharArray();
     int iterationCount = 1000;
     byte[] encrypted = new byte[]{16, // length of IV

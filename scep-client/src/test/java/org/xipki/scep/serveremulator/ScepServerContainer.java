@@ -35,11 +35,13 @@ public class ScepServerContainer {
 
   private Server server;
 
-  public ScepServerContainer(int port, ScepServer scepServer) throws Exception {
+  public ScepServerContainer(int port, ScepServer scepServer)
+      throws Exception {
     this(port, Arrays.asList(Args.notNull(scepServer, "scepServer")));
   }
 
-  public ScepServerContainer(int port, List<ScepServer> scepServers) throws Exception {
+  public ScepServerContainer(int port, List<ScepServer> scepServers)
+      throws Exception {
     Args.notEmpty(scepServers, "scepServers");
     server = new Server(port);
     ServletHandler handler = new ServletHandler();
@@ -53,7 +55,8 @@ public class ScepServerContainer {
     server.join();
   }
 
-  public void start() throws Exception {
+  public void start()
+      throws Exception {
     try {
       server.start();
     } catch (Exception ex) {
@@ -62,7 +65,8 @@ public class ScepServerContainer {
     }
   }
 
-  public void stop() throws Exception {
+  public void stop()
+      throws Exception {
     server.stop();
   }
 

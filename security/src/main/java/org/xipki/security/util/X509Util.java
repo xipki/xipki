@@ -184,7 +184,8 @@ public class X509Util {
     return new X509Cert(certHolder, derBytes);
   }
 
-  public static CertificationRequest parseCsr(File file) throws IOException {
+  public static CertificationRequest parseCsr(File file)
+      throws IOException {
     notNull(file, "file");
     InputStream in = Files.newInputStream(expandFilepath(file).toPath());
     try {
@@ -194,7 +195,8 @@ public class X509Util {
     }
   }
 
-  private static CertificationRequest parseCsr(InputStream csrStream) throws IOException {
+  private static CertificationRequest parseCsr(InputStream csrStream)
+      throws IOException {
     notNull(csrStream, "csrStream");
     return parseCsr(read(csrStream));
   }
@@ -249,7 +251,8 @@ public class X509Util {
     return bytes;
   } // method toDerEncoded
 
-  private static CertificateFactory getCertFactory() throws CertificateException {
+  private static CertificateFactory getCertFactory()
+      throws CertificateException {
     synchronized (certFactLock) {
       if (certFact == null) {
         try {
@@ -262,7 +265,8 @@ public class X509Util {
     }
   }
 
-  public static String toPemCert(X509Cert cert) throws CertificateException {
+  public static String toPemCert(X509Cert cert)
+      throws CertificateException {
     notNull(cert, "cert");
     return new String(PemEncoder.encode(cert.getEncoded(), PemLabel.CERTIFICATE));
   }
@@ -672,7 +676,8 @@ public class X509Util {
   } // method createExtnSubjectAltName
 
   public static Extension createExtnSubjectInfoAccess(List<String> accessMethodAndLocations,
-      boolean critical) throws BadInputException {
+      boolean critical)
+          throws BadInputException {
     if (isEmpty(accessMethodAndLocations)) {
       return null;
     }
@@ -734,7 +739,8 @@ public class X509Util {
   * @throws BadInputException
   *         if the {@code taggedValue} is invalid.
   */
-  private static GeneralName createGeneralName(String taggedValue) throws BadInputException {
+  private static GeneralName createGeneralName(String taggedValue)
+      throws BadInputException {
     notBlank(taggedValue, "taggedValue");
 
     String tagS = null;

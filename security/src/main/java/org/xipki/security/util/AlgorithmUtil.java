@@ -555,11 +555,13 @@ public class AlgorithmUtil {
     return isPlainECDSASigAlg(algId);
   } // method isDSAPlainSigAlg
 
-  public static String canonicalizeSignatureAlgo(String algoName) throws NoSuchAlgorithmException {
+  public static String canonicalizeSignatureAlgo(String algoName)
+      throws NoSuchAlgorithmException {
     return getSignatureAlgoName(getSigAlgId(algoName));
   } // method canonicalizeSignatureAlgo
 
-  public static AlgorithmIdentifier getMacAlgId(String macAlgName) throws NoSuchAlgorithmException {
+  public static AlgorithmIdentifier getMacAlgId(String macAlgName)
+      throws NoSuchAlgorithmException {
     String algoS = notNull(macAlgName, "macAlgName").toUpperCase();
     algoS = canonicalizeAlgoText(algoS);
 
@@ -570,7 +572,8 @@ public class AlgorithmUtil {
     return new AlgorithmIdentifier(oid, DERNull.INSTANCE);
   } // method getMacAlgId
 
-  public static AlgorithmIdentifier getSigAlgId(String sigAlgName) throws NoSuchAlgorithmException {
+  public static AlgorithmIdentifier getSigAlgId(String sigAlgName)
+      throws NoSuchAlgorithmException {
     String algoS = notNull(sigAlgName, "sigAlgName").toUpperCase();
     algoS = canonicalizeAlgoText(algoS);
 
@@ -628,7 +631,8 @@ public class AlgorithmUtil {
   } // method getSigAlgId
 
   public static AlgorithmIdentifier getSigAlgId(PublicKey pubKey, HashAlgo hashAlgo,
-      SignatureAlgoControl algoControl) throws NoSuchAlgorithmException {
+      SignatureAlgoControl algoControl)
+          throws NoSuchAlgorithmException {
     notNull(hashAlgo, "hashAlgo");
 
     if (pubKey instanceof RSAPublicKey) {
@@ -761,7 +765,8 @@ public class AlgorithmUtil {
 
   // CHECKSTYLE:SKIP
   private static AlgorithmIdentifier getECSigAlgId(HashAlgo hashAlgo, boolean plainSignature,
-      boolean gm) throws NoSuchAlgorithmException {
+      boolean gm)
+          throws NoSuchAlgorithmException {
     notNull(hashAlgo, "hashAlgo");
     if (gm && plainSignature) {
       throw new IllegalArgumentException("plainSignature and gm cannot be both true");

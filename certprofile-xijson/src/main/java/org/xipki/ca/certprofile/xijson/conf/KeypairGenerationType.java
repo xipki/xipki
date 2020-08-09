@@ -132,7 +132,8 @@ public class KeypairGenerationType extends ValidatableConf {
   }
 
   @Override
-  public void validate() throws InvalidConfException {
+  public void validate()
+      throws InvalidConfException {
     if (inheritCA || forbidden) {
       return;
     }

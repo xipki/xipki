@@ -154,7 +154,8 @@ public class OcspCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       super.validate();
 
       notNull(iid, "iid");
@@ -190,7 +191,8 @@ public class OcspCertstore extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       validate(certs);
     }
 
@@ -207,7 +209,8 @@ public class OcspCertstore extends ValidatableConf {
     private String revInfo;
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(certFile, "certFile");
     }
 
@@ -254,7 +257,8 @@ public class OcspCertstore extends ValidatableConf {
     private String info;
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(name, "name");
       notBlank(info, "info");
     }
@@ -339,7 +343,8 @@ public class OcspCertstore extends ValidatableConf {
   }
 
   @Override
-  public void validate() throws InvalidConfException {
+  public void validate()
+      throws InvalidConfException {
     notBlank(certhashAlgo, "certhashAlgo");
     validate(issuers);
     validate(crlInfos);

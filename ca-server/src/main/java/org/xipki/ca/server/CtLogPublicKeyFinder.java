@@ -51,7 +51,8 @@ public class CtLogPublicKeyFinder {
 
   private final boolean withPublicKeys;
 
-  public CtLogPublicKeyFinder(CtLogConf conf) throws IOException {
+  public CtLogPublicKeyFinder(CtLogConf conf)
+      throws IOException {
     String keydirName = conf.getKeydir();
     File[] keyFiles = null;
     if (keydirName != null && !keydirName.isEmpty()) {

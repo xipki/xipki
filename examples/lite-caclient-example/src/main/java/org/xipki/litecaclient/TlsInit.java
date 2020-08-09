@@ -81,7 +81,8 @@ public class TlsInit {
 
   } // class SdkHostnameVerifier
 
-  public static void init() throws GeneralSecurityException {
+  public static void init()
+      throws GeneralSecurityException {
     System.err.println("***** ONLY FOR TEST, DO NOT USE IT IN PRODUCTION ENVIRONMENT ******");
     TrustManager[] trustManagers = {new InternX509TrustManager()};
     SSLContext sc = SSLContext.getInstance("SSL");

@@ -1582,7 +1582,8 @@ public class ExtensionsChecker {
   } // method checkExtnSubjectAltName
 
   private GeneralName[] getRequestedSubjectAltNames(X500Name requestedSubject,
-      Extensions requestedExtns) throws CertprofileException, BadCertTemplateException {
+      Extensions requestedExtns)
+          throws CertprofileException, BadCertTemplateException {
     ASN1Encodable extValue = (requestedExtns == null) ? null
         : requestedExtns.getExtensionParsedValue(Extension.subjectAlternativeName);
 
@@ -2360,7 +2361,8 @@ public class ExtensionsChecker {
   }
 
   private static Map<ASN1ObjectIdentifier, QaExtensionValue> buildConstantExtesions(
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     if (extensions == null) {
       return null;
     }
@@ -2400,7 +2402,8 @@ public class ExtensionsChecker {
   } // method buildConstantExtesions
 
   private static Map<ASN1ObjectIdentifier, ExtnSyntax> buildExtesionSyntaxes(
-      Map<String, ExtensionType> extensions) throws CertprofileException {
+      Map<String, ExtensionType> extensions)
+          throws CertprofileException {
     if (extensions == null) {
       return null;
     }
@@ -2421,7 +2424,8 @@ public class ExtensionsChecker {
     return Collections.unmodifiableMap(map);
   } // method buildExtesionSyntaxes
 
-  private static ASN1Encodable readAsn1Encodable(byte[] encoded) throws CertprofileException {
+  private static ASN1Encodable readAsn1Encodable(byte[] encoded)
+      throws CertprofileException {
     ASN1StreamParser parser = new ASN1StreamParser(encoded);
     try {
       return parser.readObject();

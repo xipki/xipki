@@ -242,7 +242,8 @@ public class LiquibaseMain implements Closeable {
     this.changeLogFile = IoUtil.expandFilepath(notBlank(changeLogFile, "changeLogFile"));
   }
 
-  public void init() throws Exception {
+  public void init()
+      throws Exception {
 
     ResourceAccessor fsOpener = new FileSystemResourceAccessor() {
       @Override
@@ -309,18 +310,21 @@ public class LiquibaseMain implements Closeable {
     }
   } // method init
 
-  public void releaseLocks() throws Exception {
+  public void releaseLocks()
+      throws Exception {
     LockService lockService = LockServiceFactory.getInstance().getLockService(database);
     lockService.forceReleaseLock();
     System.out.println("successfully released the database");
   }
 
-  public void dropAll() throws Exception {
+  public void dropAll()
+      throws Exception {
     liquibase.dropAll();
     System.out.println("successfully  dropped the database");
   }
 
-  public void update() throws Exception {
+  public void update()
+      throws Exception {
     liquibase.update((String) null);
     System.out.println("successfully  updated the database");
   }

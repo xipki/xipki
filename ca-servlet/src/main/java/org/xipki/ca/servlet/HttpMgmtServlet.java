@@ -698,7 +698,8 @@ public class HttpMgmtServlet extends HttpServlet {
     return new MgmtResponse.ByteArray(encoded);
   } // method toByteArray
 
-  private static String getNameFromRequest(InputStream in) throws CaMgmtException {
+  private static String getNameFromRequest(InputStream in)
+      throws CaMgmtException {
     MgmtRequest.Name req = parse(in, MgmtRequest.Name.class);
     return req.getName();
   } // method getNameFromRequest

@@ -61,17 +61,20 @@ public class XiXDHContentVerifierProvider implements ContentVerifierProvider {
     private class HmacOutputStream extends OutputStream {
 
       @Override
-      public void write(int bb) throws IOException {
+      public void write(int bb)
+          throws IOException {
         hmac.update((byte) bb);
       }
 
       @Override
-      public void write(byte[] bytes) throws IOException {
+      public void write(byte[] bytes)
+          throws IOException {
         hmac.update(bytes, 0, bytes.length);
       }
 
       @Override
-      public void write(byte[] bytes, int off, int len) throws IOException {
+      public void write(byte[] bytes, int off, int len)
+          throws IOException {
         hmac.update(bytes, off, len);
       }
 

@@ -101,7 +101,8 @@ public class ScepResponder {
   }
 
   public ScepResponder(CaCaps caCaps, CaEmulator caEmulator, RaEmulator raEmulator,
-      NextCaAndRa nextCaAndRa, ScepControl control) throws Exception {
+      NextCaAndRa nextCaAndRa, ScepControl control)
+          throws Exception {
     this.caCaps = Args.notNull(caCaps, "caCaps");
     this.caEmulator = Args.notNull(caEmulator, "caEmulator");
     this.control = Args.notNull(control, "control");
@@ -164,7 +165,8 @@ public class ScepResponder {
     }
   } // method servicePkiOperation
 
-  public ContentInfo encode(NextCaMessage nextCaMsg) throws CaException {
+  public ContentInfo encode(NextCaMessage nextCaMsg)
+      throws CaException {
     Args.notNull(nextCaMsg, "nextCaMsg");
     try {
       X509Cert jceSignerCert = getSigningCert();
@@ -387,7 +389,8 @@ public class ScepResponder {
     return rep;
   } // method servicePkiOperation0
 
-  private ContentInfo createSignedData(CertificateList crl) throws CaException {
+  private ContentInfo createSignedData(CertificateList crl)
+      throws CaException {
     CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
     cmsSignedDataGen.addCRL(new X509CRLHolder(crl));
 
@@ -401,7 +404,8 @@ public class ScepResponder {
     return cmsSigneddata.toASN1Structure();
   } // method createSignedData
 
-  private ContentInfo createSignedData(X509Cert cert) throws CaException {
+  private ContentInfo createSignedData(X509Cert cert)
+      throws CaException {
     CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
 
     CMSSignedData cmsSigneddata;

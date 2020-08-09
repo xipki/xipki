@@ -277,7 +277,8 @@ public class ResponseCacher implements Closeable {
   } // method storeIssuer
 
   public OcspRespWithCacheInfo getOcspResponse(int issuerId, BigInteger serialNumber,
-      AlgorithmCode sigAlg) throws DataAccessException {
+      AlgorithmCode sigAlg)
+          throws DataAccessException {
     final String sql = sqlSelectOcsp;
     byte[] identBytes = buildIdent(serialNumber, sigAlg);
     long id = deriveId(issuerId, identBytes);
@@ -506,7 +507,8 @@ public class ResponseCacher implements Closeable {
     return true;
   } // method updateCacheStore0
 
-  private boolean initIssuerStore() throws DataAccessException, CertificateException {
+  private boolean initIssuerStore()
+      throws DataAccessException, CertificateException {
     PreparedStatement ps = null;
     ResultSet rs = null;
 

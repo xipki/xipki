@@ -64,7 +64,8 @@ public abstract class MgmtEntry {
     private AddUser() {
     }
 
-    public AddUser(NameId ident, boolean active, String password) throws CaMgmtException {
+    public AddUser(NameId ident, boolean active, String password)
+        throws CaMgmtException {
       this.ident = Args.notNull(ident, "ident");
       this.active = active;
       this.password = Args.notBlank(password, "password");
@@ -189,7 +190,8 @@ public abstract class MgmtEntry {
       this.caUris = (caUris == null) ? CaUris.EMPTY_INSTANCE : caUris;
     } // constructor Ca
 
-    public static List<String[]> splitCaSignerConfs(String conf) throws XiSecurityException {
+    public static List<String[]> splitCaSignerConfs(String conf)
+        throws XiSecurityException {
       ConfPairs pairs = new ConfPairs(conf);
       String str = pairs.value("algo");
       if (str == null) {
@@ -522,7 +524,8 @@ public abstract class MgmtEntry {
       return ident.hashCode();
     }
 
-    public void setCert(X509Cert cert) throws CaMgmtException {
+    public void setCert(X509Cert cert)
+        throws CaMgmtException {
       if (cert == null) {
         this.cert = null;
         this.subject = null;
@@ -941,7 +944,8 @@ public abstract class MgmtEntry {
     private ChangeCa() {
     }
 
-    public ChangeCa(NameId ident) throws CaMgmtException {
+    public ChangeCa(NameId ident)
+        throws CaMgmtException {
       this.ident = Args.notNull(ident, "ident");
     }
 
@@ -1188,7 +1192,8 @@ public abstract class MgmtEntry {
     private ChangeUser() {
     }
 
-    public ChangeUser(NameId ident) throws CaMgmtException {
+    public ChangeUser(NameId ident)
+        throws CaMgmtException {
       this.ident = Args.notNull(ident, "ident");
     }
 
@@ -1581,7 +1586,8 @@ public abstract class MgmtEntry {
     private User() {
     }
 
-    public User(NameId ident, boolean active, String hashedPassword) throws CaMgmtException {
+    public User(NameId ident, boolean active, String hashedPassword)
+        throws CaMgmtException {
       this.ident = Args.notNull(ident, "ident");
       this.active = active;
       this.hashedPassword = Args.notBlank(hashedPassword, "hashedPassword");

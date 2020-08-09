@@ -43,7 +43,8 @@ public abstract class ValidatableConf {
     }
   }
 
-  protected static void notBlank(String value, String name) throws InvalidConfException {
+  protected static void notBlank(String value, String name)
+      throws InvalidConfException {
     if (value == null) {
       throw new InvalidConfException(name + " may not be null");
     }
@@ -52,7 +53,8 @@ public abstract class ValidatableConf {
     }
   }
 
-  protected static void notEmpty(Collection<?> value, String name) throws InvalidConfException {
+  protected static void notEmpty(Collection<?> value, String name)
+      throws InvalidConfException {
     if (value == null) {
       throw new InvalidConfException(name + " may not be null");
     }
@@ -61,14 +63,16 @@ public abstract class ValidatableConf {
     }
   }
 
-  protected static void notNull(Object value, String name) throws InvalidConfException {
+  protected static void notNull(Object value, String name)
+      throws InvalidConfException {
     if (value == null) {
       throw new InvalidConfException(name + " may not be null");
     }
   }
 
   // CHECKSTYLE:SKIP
-  protected static void _null(Object value, String name) throws InvalidConfException {
+  protected static void _null(Object value, String name)
+      throws InvalidConfException {
     if (value != null) {
       throw new InvalidConfException(name + " may not be non-null");
     }
@@ -84,6 +88,7 @@ public abstract class ValidatableConf {
   }
 
   // CHECKSTYLE:SKIP
-  public abstract void validate() throws InvalidConfException;
+  public abstract void validate()
+      throws InvalidConfException;
 
 }

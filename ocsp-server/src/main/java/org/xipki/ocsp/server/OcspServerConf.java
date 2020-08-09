@@ -74,7 +74,8 @@ public class OcspServerConf extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       exactOne(keystore, "keystore", dir, "dir");
       validate(keystore);
     }
@@ -117,7 +118,8 @@ public class OcspServerConf extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notNull(occurrence, "occurrence");
     }
 
@@ -242,7 +244,8 @@ public class OcspServerConf extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notEmpty(versions, "versions");
       notNull(nonce, "nonce");
       validate(nonce);
@@ -284,7 +287,8 @@ public class OcspServerConf extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notNull(validationModel, "validationModel");
       notNull(trustAnchors, "trustAnchors");
       validate(trustAnchors);
@@ -393,7 +397,8 @@ public class OcspServerConf extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notEmpty(servletPaths, "servletPaths");
       notBlank(signer, "signer");
       notBlank(request, "request");
@@ -431,7 +436,8 @@ public class OcspServerConf extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notNull(datasource, "datasource");
     }
 
@@ -510,7 +516,8 @@ public class OcspServerConf extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(name, "name");
     }
 
@@ -585,7 +592,8 @@ public class OcspServerConf extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(name, "name");
       notBlank(type, "type");
       notBlank(key, "key");
@@ -700,7 +708,8 @@ public class OcspServerConf extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(name, "name");
       notNull(source, "source");
     }
@@ -740,7 +749,8 @@ public class OcspServerConf extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(type, "type");
     }
 
@@ -777,7 +787,8 @@ public class OcspServerConf extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
     }
 
   } // class CaCerts
@@ -902,7 +913,8 @@ public class OcspServerConf extends ValidatableConf {
   }
 
   @Override
-  public void validate() throws InvalidConfException {
+  public void validate()
+      throws InvalidConfException {
     notEmpty(responders, "responders");
     validate(responders);
 

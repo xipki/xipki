@@ -780,7 +780,8 @@ class IdentifiedCertprofile implements Closeable {
     return certprofile.useIssuerAndSerialInAki();
   }
 
-  public String incSerialNumber(String currentSerialNumber) throws BadFormatException {
+  public String incSerialNumber(String currentSerialNumber)
+      throws BadFormatException {
     return certprofile.incSerialNumber(currentSerialNumber);
   }
 
@@ -808,7 +809,8 @@ class IdentifiedCertprofile implements Closeable {
     return certprofile.getMaxCertSize();
   }
 
-  public void validate() throws CertprofileException {
+  public void validate()
+      throws CertprofileException {
     StringBuilder msg = new StringBuilder();
 
     Map<ASN1ObjectIdentifier, ExtensionControl> controls = getExtensionControls();
@@ -1311,7 +1313,8 @@ class IdentifiedCertprofile implements Closeable {
 
   private static ASN1Sequence createSubjectInfoAccess(
       Map<ASN1ObjectIdentifier, Extension> requestedExtensions,
-      Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> modes) throws BadCertTemplateException {
+      Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> modes)
+          throws BadCertTemplateException {
     if (modes == null) {
       return null;
     }
@@ -1351,7 +1354,8 @@ class IdentifiedCertprofile implements Closeable {
   private static void addExtension(ExtensionValues values, ASN1ObjectIdentifier extType,
       ExtensionValue extValue, ExtensionControl extControl,
       Set<ASN1ObjectIdentifier> neededExtensionTypes,
-      Set<ASN1ObjectIdentifier> wantedExtensionTypes) throws CertprofileException {
+      Set<ASN1ObjectIdentifier> wantedExtensionTypes)
+          throws CertprofileException {
     if (extValue != null) {
       values.addExtension(extType, extValue);
       neededExtensionTypes.remove(extType);
@@ -1368,7 +1372,8 @@ class IdentifiedCertprofile implements Closeable {
   private static void addExtension(ExtensionValues values, ASN1ObjectIdentifier extType,
       ASN1Encodable extValue, ExtensionControl extControl,
       Set<ASN1ObjectIdentifier> neededExtensionTypes,
-      Set<ASN1ObjectIdentifier> wantedExtensionTypes) throws CertprofileException {
+      Set<ASN1ObjectIdentifier> wantedExtensionTypes)
+          throws CertprofileException {
     if (extValue != null) {
       values.addExtension(extType, extControl.isCritical(), extValue);
       neededExtensionTypes.remove(extType);

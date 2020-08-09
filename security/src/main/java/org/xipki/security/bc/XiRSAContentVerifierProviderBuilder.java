@@ -47,7 +47,8 @@ public class XiRSAContentVerifierProviderBuilder extends BcRSAContentVerifierPro
   }
 
   @Override
-  protected Signer createSigner(AlgorithmIdentifier sigAlgId) throws OperatorCreationException {
+  protected Signer createSigner(AlgorithmIdentifier sigAlgId)
+      throws OperatorCreationException {
     if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
       try {
         return SignerUtil.createPSSRSASigner(sigAlgId);

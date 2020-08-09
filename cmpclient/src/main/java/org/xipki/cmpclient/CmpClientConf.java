@@ -137,7 +137,8 @@ public class CmpClientConf extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(name, "name");
       notBlank(url, "url");
       notBlank(requestor, "requestor");
@@ -173,7 +174,8 @@ public class CmpClientConf extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       if (!autoconf) {
         notEmpty(certificates, "certificates");
         for (FileOrBinary m : certificates) {
@@ -217,7 +219,8 @@ public class CmpClientConf extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(name, "name");
       validate(conf);
     }
@@ -254,7 +257,8 @@ public class CmpClientConf extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       if (!autoconf) {
         validate(profiles);
       }
@@ -285,7 +289,8 @@ public class CmpClientConf extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
     }
 
   } // class Cmpcontrol
@@ -333,7 +338,8 @@ public class CmpClientConf extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(name, "name");
       exactOne(pbmMac, "pbmMac", signature, "signature");
       validate(pbmMac);
@@ -403,7 +409,8 @@ public class CmpClientConf extends ValidatableConf {
       }
 
       @Override
-      public void validate() throws InvalidConfException {
+      public void validate()
+          throws InvalidConfException {
         notNull(kid, "kid");
         notBlank(sender, "sender");
         notBlank(password, "password");
@@ -446,7 +453,8 @@ public class CmpClientConf extends ValidatableConf {
       }
 
       @Override
-      public void validate() throws InvalidConfException {
+      public void validate()
+          throws InvalidConfException {
         validate(cert);
       }
 
@@ -497,7 +505,8 @@ public class CmpClientConf extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(name, "name");
       validate(cert);
       exactOne(pbmMac, "pbmMac", signature, "signature");
@@ -534,7 +543,8 @@ public class CmpClientConf extends ValidatableConf {
       }
 
       @Override
-      public void validate() throws InvalidConfException {
+      public void validate()
+          throws InvalidConfException {
         notEmpty(owfAlgos, "owfAlgos");
         notEmpty(macAlgos, "macAlgos");
       }
@@ -557,7 +567,8 @@ public class CmpClientConf extends ValidatableConf {
       }
 
       @Override
-      public void validate() throws InvalidConfException {
+      public void validate()
+          throws InvalidConfException {
         notEmpty(signatureAlgos, "signatureAlgos");
       }
 
@@ -642,7 +653,8 @@ public class CmpClientConf extends ValidatableConf {
     }
 
     @Override
-    public void validate() throws InvalidConfException {
+    public void validate()
+        throws InvalidConfException {
       notBlank(name, "name");
     }
 
@@ -716,7 +728,8 @@ public class CmpClientConf extends ValidatableConf {
   }
 
   @Override
-  public void validate() throws InvalidConfException {
+  public void validate()
+      throws InvalidConfException {
     validate(ssls);
     notEmpty(requestors, "requestors");
     validate(requestors);

@@ -92,7 +92,8 @@ public class Foo {
     }
   }
 
-  private static byte[] createRequest(Control control) throws Exception {
+  private static byte[] createRequest(Control control)
+      throws Exception {
     GeneralName requestorName = control.withRequestName
         ? new GeneralName(new X500Name("CN=requestor1")) : null;
 

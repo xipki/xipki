@@ -61,6 +61,7 @@ public interface SignerFactory {
   ConcurrentContentSigner newSigner(String type, SignerConf conf, X509Cert[] certificateChain)
       throws ObjectCreationException;
 
-  void refreshToken(String type) throws XiSecurityException;
+  void refreshToken(String type)
+      throws XiSecurityException;
 
 }

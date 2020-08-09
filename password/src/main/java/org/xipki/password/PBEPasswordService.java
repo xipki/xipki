@@ -89,7 +89,8 @@ public class PBEPasswordService {
   } // method decryptPassword
 
   public static String encryptPassword(PBEAlgo algo, int iterationCount, char[] masterPassword,
-      char[] password) throws PasswordResolverException {
+      char[] password)
+          throws PasswordResolverException {
     range(iterationCount, "iterationCount", 1, 65535);
     notNull(masterPassword, "masterPassword");
     notNull(password, "password");

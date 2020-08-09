@@ -263,7 +263,8 @@ public class ProfileConfCreatorDemo {
 
   } // method marshal
 
-  private static void certprofileCabRootCa(String destFilename) throws Exception {
+  private static void certprofileCabRootCa(String destFilename)
+      throws Exception {
     X509ProfileType profile = getBaseCabProfile("certprofile RootCA (CA/Browser Forum BR)",
         CertLevel.RootCA, "10y");
 
@@ -293,7 +294,8 @@ public class ProfileConfCreatorDemo {
     marshall(profile, destFilename, true);
   } // method certprofileCabRootCa
 
-  private static void certprofileCabSubCa(String destFilename) throws Exception {
+  private static void certprofileCabSubCa(String destFilename)
+      throws Exception {
     X509ProfileType profile = getBaseCabProfile("certprofile SubCA (CA/Browser Forum BR)",
         CertLevel.SubCA, "8y");
 
@@ -340,7 +342,8 @@ public class ProfileConfCreatorDemo {
     marshall(profile, destFilename, true);
   } // method certprofileCabSubCa
 
-  private static void certprofileCabDomainValidatedTls(String destFilename) throws Exception {
+  private static void certprofileCabDomainValidatedTls(String destFilename)
+      throws Exception {
     X509ProfileType profile = getBaseCabSubscriberProfile(
         "certprofile TLS (CA/Browser Forum BR, Domain Validated)");
 
@@ -363,7 +366,8 @@ public class ProfileConfCreatorDemo {
     marshall(profile, destFilename, true);
   } // method certprofileCabDomainValidatedTls
 
-  private static void certprofileCabOrganizationValidatedTls(String destFilename) throws Exception {
+  private static void certprofileCabOrganizationValidatedTls(String destFilename)
+      throws Exception {
     X509ProfileType profile = getBaseCabSubscriberProfile(
         "certprofile TLS (CA/Browser Forum BR, Organization Validiated)");
 
@@ -389,7 +393,8 @@ public class ProfileConfCreatorDemo {
     marshall(profile, destFilename, true);
   } // method certprofileCabOrganizationValidatedTls
 
-  private static void certprofileCabIndividualValidatedTls(String destFilename) throws Exception {
+  private static void certprofileCabIndividualValidatedTls(String destFilename)
+      throws Exception {
     X509ProfileType profile = getBaseCabSubscriberProfile(
         "certprofile TLS (CA/Browser Forum BR, Individual Validiated)");
 
@@ -415,7 +420,8 @@ public class ProfileConfCreatorDemo {
     marshall(profile, destFilename, true);
   } // method certprofileCabOrganizationValidatedTls
 
-  private static X509ProfileType getBaseCabSubscriberProfile(String desc) throws Exception {
+  private static X509ProfileType getBaseCabSubscriberProfile(String desc)
+      throws Exception {
     X509ProfileType profile = getBaseCabProfile(desc, CertLevel.EndEntity, "2y");
 
     // SubjectToSubjectAltName
@@ -466,7 +472,8 @@ public class ProfileConfCreatorDemo {
     return profile;
   } // method getBaseCabSubscriberProfile
 
-  private static void certprofileRootCa(String destFilename) throws Exception {
+  private static void certprofileRootCa(String destFilename)
+      throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile rootca", CertLevel.RootCA, "10y");
 
     // Subject
@@ -497,7 +504,8 @@ public class ProfileConfCreatorDemo {
     marshall(profile, destFilename, true);
   } // method certprofileRootCa
 
-  private static void certprofileCross(String destFilename) throws Exception {
+  private static void certprofileCross(String destFilename)
+      throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile cross", CertLevel.SubCA, "10y");
 
     // Subject
@@ -533,7 +541,8 @@ public class ProfileConfCreatorDemo {
     marshall(profile, destFilename, true);
   } // method certprofileCross
 
-  private static void certprofileSubCa(String destFilename) throws Exception {
+  private static void certprofileSubCa(String destFilename)
+      throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile subca", CertLevel.SubCA, "8y");
 
     // Subject
@@ -573,7 +582,8 @@ public class ProfileConfCreatorDemo {
     marshall(profile, destFilename, true);
   } // method certprofileSubCa
 
-  private static void certprofileSubCaComplex(String destFilename) throws Exception {
+  private static void certprofileSubCaComplex(String destFilename)
+      throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile subca-complex (with most extensions)",
         CertLevel.SubCA, "8y");
 
@@ -872,7 +882,8 @@ public class ProfileConfCreatorDemo {
     return subFields;
   } // method createSyntaxSequenceOfOrSetOf
 
-  private static void certprofileOcsp(String destFilename) throws Exception {
+  private static void certprofileOcsp(String destFilename)
+      throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile ocsp", CertLevel.EndEntity, "5y",
         false);
 
@@ -919,7 +930,8 @@ public class ProfileConfCreatorDemo {
     marshall(profile, destFilename, true);
   } // method certprofileOcsp
 
-  private static void certprofileScep(String destFilename) throws Exception {
+  private static void certprofileScep(String destFilename)
+      throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile scep", CertLevel.EndEntity, "5y");
 
     profile.setKeyAlgorithms(createRSAKeyAlgorithms());
@@ -959,7 +971,8 @@ public class ProfileConfCreatorDemo {
     marshall(profile, destFilename, true);
   } // method certprofileScep
 
-  private static void certprofileSmime(String destFilename, boolean legacy) throws Exception {
+  private static void certprofileSmime(String destFilename, boolean legacy)
+      throws Exception {
     String desc = legacy ? "certprofile s/mime legacy" : "certprofile s/mime";
     X509ProfileType profile = getBaseProfile(desc, CertLevel.EndEntity, "5y", true);
 
@@ -1026,7 +1039,8 @@ public class ProfileConfCreatorDemo {
   } // method certprofileSmime
 
   private static void certprofileTlsEdwardsOrMontgomery(String destFilename, boolean edwards,
-      boolean curve25519) throws Exception {
+      boolean curve25519)
+          throws Exception {
     String desc = "certprofile tls with "
                     + (edwards ? "edwards " : "montmomery ")
                     + (curve25519 ? "25519" : "448")
@@ -1084,7 +1098,8 @@ public class ProfileConfCreatorDemo {
     marshall(profile, destFilename, true);
   } // method certprofileTlsEdwardsOrMontgomery
 
-  private static void certprofileTls(String destFilename) throws Exception {
+  private static void certprofileTls(String destFilename)
+      throws Exception {
     String desc = "certprofile tls";
     X509ProfileType profile = getBaseProfile(desc, CertLevel.EndEntity, "5y", true);
 
@@ -1143,7 +1158,8 @@ public class ProfileConfCreatorDemo {
     marshall(profile, destFilename, true);
   } // method certprofileTls
 
-  private static void certprofileTlsC(String destFilename) throws Exception {
+  private static void certprofileTlsC(String destFilename)
+      throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile tls-c", CertLevel.EndEntity, "5y");
 
     // Subject
@@ -1189,7 +1205,8 @@ public class ProfileConfCreatorDemo {
     marshall(profile, destFilename, true);
   } // method certprofileTlsC
 
-  private static void certprofileMultipleOus(String destFilename) throws Exception {
+  private static void certprofileMultipleOus(String destFilename)
+      throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile multiple-ous", CertLevel.EndEntity, "5y");
 
     // Subject
@@ -1233,7 +1250,8 @@ public class ProfileConfCreatorDemo {
   /*
    * O and OU in one RDN
    */
-  private static void certprofileMultipleValuedRdn(String destFilename) throws Exception {
+  private static void certprofileMultipleValuedRdn(String destFilename)
+      throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile multiple-valued-rdn",
         CertLevel.EndEntity, "5y");
 
@@ -1274,7 +1292,8 @@ public class ProfileConfCreatorDemo {
     marshall(profile, destFilename, true);
   } // method certprofileMultipleValuedRdn
 
-  private static void certprofileQc(String destFilename) throws Exception {
+  private static void certprofileQc(String destFilename)
+      throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile qc", CertLevel.EndEntity, "1000d");
 
     // Subject
@@ -1330,7 +1349,8 @@ public class ProfileConfCreatorDemo {
     marshall(profile, destFilename, true);
   } // method certprofileQc
 
-  private static void certprofileEeComplex(String destFilename) throws Exception {
+  private static void certprofileEeComplex(String destFilename)
+      throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile ee-complex", CertLevel.EndEntity,
         "5y", true);
 
@@ -1513,20 +1533,24 @@ public class ProfileConfCreatorDemo {
     marshall(profile, destFilename, true);
   } // method certprofileEeComplex
 
-  private static void certprofileConstantExtImplicitTag(String destFilename) throws Exception {
+  private static void certprofileConstantExtImplicitTag(String destFilename)
+      throws Exception {
     certprofileConstantExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.2"), new Tag(1, false));
   }
 
-  private static void certprofileConstantExtExplicitTag(String destFilename) throws Exception {
+  private static void certprofileConstantExtExplicitTag(String destFilename)
+      throws Exception {
     certprofileConstantExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.3"), new Tag(1, true));
   }
 
-  private static void certprofileConstantExt(String destFilename) throws Exception {
+  private static void certprofileConstantExt(String destFilename)
+      throws Exception {
     certprofileConstantExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.1"), null);
   }
 
   private static void certprofileConstantExt(String destFilename, ASN1ObjectIdentifier oidPrefix,
-      Tag tag) throws Exception {
+      Tag tag)
+          throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile constant-extension", CertLevel.EndEntity,
         "5y", true);
 
@@ -1577,20 +1601,24 @@ public class ProfileConfCreatorDemo {
     marshall(profile, destFilename, true);
   } // method certprofileConstantExt
 
-  private static void certprofileSyntaxExtImplicitTag(String destFilename) throws Exception {
+  private static void certprofileSyntaxExtImplicitTag(String destFilename)
+      throws Exception {
     certprofileSyntaxExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.2"), new Tag(1, false));
   }
 
-  private static void certprofileSyntaxExtExplicitTag(String destFilename) throws Exception {
+  private static void certprofileSyntaxExtExplicitTag(String destFilename)
+      throws Exception {
     certprofileSyntaxExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.3"), new Tag(1, true));
   }
 
-  private static void certprofileSyntaxExt(String destFilename) throws Exception {
+  private static void certprofileSyntaxExt(String destFilename)
+      throws Exception {
     certprofileSyntaxExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.1"), null);
   }
 
   private static void certprofileSyntaxExt(String destFilename,
-      ASN1ObjectIdentifier oidPrefix, Tag tag) throws Exception {
+      ASN1ObjectIdentifier oidPrefix, Tag tag)
+          throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile syntax-extension", CertLevel.EndEntity,
         "5y", true);
 
@@ -1642,7 +1670,8 @@ public class ProfileConfCreatorDemo {
   } // method certprofileSyntaxExt
 
   private static List<ExtensionType> createConstantExtensions(
-      ASN1ObjectIdentifier oidPrefix, Tag tag) throws IOException {
+      ASN1ObjectIdentifier oidPrefix, Tag tag)
+          throws IOException {
     List<ExtensionType> list = new LinkedList<>();
 
     // Custom Constant Extension Value
@@ -1756,7 +1785,8 @@ public class ProfileConfCreatorDemo {
     return list;
   } // method createSyntaxExtensions
 
-  private static void certprofileMaxTime(String destFilename) throws Exception {
+  private static void certprofileMaxTime(String destFilename)
+      throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile max-time", CertLevel.EndEntity,
         "9999y");
 
@@ -1797,7 +1827,8 @@ public class ProfileConfCreatorDemo {
     marshall(profile, destFilename, true);
   } // method certprofileMaxTime
 
-  private static void certprofileFixedPartialSubject(String destFilename) throws Exception {
+  private static void certprofileFixedPartialSubject(String destFilename)
+      throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile fixed subject O and C",
         CertLevel.EndEntity, "365d");
 
@@ -1847,7 +1878,8 @@ public class ProfileConfCreatorDemo {
     marshall(profile, destFilename, true);
   } // method certprofileFixedPartialSubject
 
-  private static void certprofileAppleWwdr(String destFilename) throws Exception {
+  private static void certprofileAppleWwdr(String destFilename)
+      throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile apple WWDR",
         CertLevel.EndEntity, "395d");
 
@@ -1986,7 +2018,8 @@ public class ProfileConfCreatorDemo {
     marshall(profile, destFilename, true);
   } // method certprofileAppleWwdr
 
-  private static void certprofileGmt0015(String destFilename) throws Exception {
+  private static void certprofileGmt0015(String destFilename)
+      throws Exception {
     String desc = "certprofile GMT 0015";
     X509ProfileType profile = getBaseProfile(desc, CertLevel.EndEntity, "5y");
 
@@ -2049,7 +2082,8 @@ public class ProfileConfCreatorDemo {
     marshall(profile, destFilename, true);
   } // method certprofileGmt0015
 
-  private static void certprofileExtended(String destFilename) throws Exception {
+  private static void certprofileExtended(String destFilename)
+      throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile extended", CertLevel.EndEntity, "5y");
 
     // Subject

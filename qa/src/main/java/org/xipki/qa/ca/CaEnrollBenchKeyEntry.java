@@ -98,7 +98,8 @@ public abstract class CaEnrollBenchKeyEntry {
 
     private final SubjectPublicKeyInfo spki;
 
-    public RSAKeyEntry(int keysize) throws Exception {
+    public RSAKeyEntry(int keysize)
+        throws Exception {
       if (keysize % 1024 != 0) {
         throw new IllegalArgumentException("invalid RSA keysize " + keysize);
       }
@@ -222,7 +223,8 @@ public abstract class CaEnrollBenchKeyEntry {
 
     private SubjectPublicKeyInfo spki;
 
-    public DSAKeyEntry(int plength) throws Exception {
+    public DSAKeyEntry(int plength)
+        throws Exception {
       if (plength == 1024) {
         init(P_1024, Q_1024, G_1024, Y_1024);
       } else if (plength == 2048) {
@@ -246,11 +248,13 @@ public abstract class CaEnrollBenchKeyEntry {
       return new BigInteger(1, Base64.decode(base64Str));
     }
 
-    private void init(String p, String q, String g, String y) throws IOException {
+    private void init(String p, String q, String g, String y)
+        throws IOException {
       init(base64ToInt(p), base64ToInt(q), base64ToInt(g), base64ToInt(y));
     }
 
-    private void init(BigInteger p, BigInteger q, BigInteger g, BigInteger y) throws IOException {
+    private void init(BigInteger p, BigInteger q, BigInteger g, BigInteger y)
+        throws IOException {
       ASN1EncodableVector vec = new ASN1EncodableVector();
       vec.add(new ASN1Integer(p));
       vec.add(new ASN1Integer(q));
@@ -272,7 +276,8 @@ public static final class ECKeyEntry extends CaEnrollBenchKeyEntry {
 
     private final SubjectPublicKeyInfo spki;
 
-    public ECKeyEntry(final ASN1ObjectIdentifier curveOid) throws Exception {
+    public ECKeyEntry(final ASN1ObjectIdentifier curveOid)
+        throws Exception {
       notNull(curveOid, "curveOid");
       KeyPair keypair;
 

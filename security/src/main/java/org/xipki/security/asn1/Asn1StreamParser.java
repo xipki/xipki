@@ -77,12 +77,14 @@ public class Asn1StreamParser {
     return bytes;
   } // method readBlock
 
-  protected static int markAndReadTag(InputStream instream) throws IOException {
+  protected static int markAndReadTag(InputStream instream)
+      throws IOException {
     instream.mark(10);
     return instream.read();
   }
 
-  protected static int readLength(MyInt lenBytesSize, InputStream instream) throws IOException {
+  protected static int readLength(MyInt lenBytesSize, InputStream instream)
+      throws IOException {
     // Length SEQUENCE of CertificateList
     int b = instream.read();
     if ((b & 0x80) == 0) {
@@ -140,7 +142,8 @@ public class Asn1StreamParser {
     }
   } // method readTime
 
-  protected static void skip(InputStream instream, long count) throws IOException {
+  protected static void skip(InputStream instream, long count)
+      throws IOException {
     long remaining = count;
     while (remaining > 0) {
       remaining -= instream.skip(remaining);

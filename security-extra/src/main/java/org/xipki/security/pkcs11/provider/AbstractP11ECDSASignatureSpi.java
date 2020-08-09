@@ -67,12 +67,14 @@ abstract class AbstractP11ECDSASignatureSpi extends SignatureSpi {
   }
 
   @Override
-  protected void engineInitVerify(PublicKey publicKey) throws InvalidKeyException {
+  protected void engineInitVerify(PublicKey publicKey)
+      throws InvalidKeyException {
     throw new UnsupportedOperationException("engineInitVerify unsupported");
   }
 
   @Override
-  protected void engineInitSign(PrivateKey privateKey) throws InvalidKeyException {
+  protected void engineInitSign(PrivateKey privateKey)
+      throws InvalidKeyException {
     if (!(privateKey instanceof P11PrivateKey)) {
       throw new InvalidKeyException("privateKey is not instanceof "
           + P11PrivateKey.class.getName());
@@ -128,7 +130,8 @@ abstract class AbstractP11ECDSASignatureSpi extends SignatureSpi {
   } // method engineInitSign
 
   @Override
-  protected void engineUpdate(byte input) throws SignatureException {
+  protected void engineUpdate(byte input)
+      throws SignatureException {
     try {
       outputStream.write((int) input);
     } catch (IOException ex) {
@@ -137,7 +140,8 @@ abstract class AbstractP11ECDSASignatureSpi extends SignatureSpi {
   }
 
   @Override
-  protected void engineUpdate(byte[] input, int off, int len) throws SignatureException {
+  protected void engineUpdate(byte[] input, int off, int len)
+      throws SignatureException {
     try {
       outputStream.write(input, off, len);
     } catch (IOException ex) {
@@ -146,7 +150,8 @@ abstract class AbstractP11ECDSASignatureSpi extends SignatureSpi {
   }
 
   @Override
-  protected byte[] engineSign() throws SignatureException {
+  protected byte[] engineSign()
+      throws SignatureException {
     byte[] dataToSign;
     if (outputStream instanceof ByteArrayOutputStream) {
       dataToSign = ((ByteArrayOutputStream) outputStream).toByteArray();
@@ -180,7 +185,8 @@ abstract class AbstractP11ECDSASignatureSpi extends SignatureSpi {
   }
 
   @Override
-  protected boolean engineVerify(byte[] sigBytes) throws SignatureException {
+  protected boolean engineVerify(byte[] sigBytes)
+      throws SignatureException {
     throw new UnsupportedOperationException("engineVerify unsupported");
   }
 

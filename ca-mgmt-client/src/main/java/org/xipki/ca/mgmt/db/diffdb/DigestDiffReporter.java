@@ -70,7 +70,8 @@ class DigestDiffReporter implements Closeable {
 
   private AtomicInteger numError = new AtomicInteger(0);
 
-  public DigestDiffReporter(String reportDirname, byte[] caCertBytes) throws IOException {
+  public DigestDiffReporter(String reportDirname, byte[] caCertBytes)
+      throws IOException {
     this.reportDirname = Args.notBlank(reportDirname, "reportDirname");
     File dir = new File(reportDirname);
     dir.mkdirs();
@@ -95,22 +96,26 @@ class DigestDiffReporter implements Closeable {
     return reportDirname;
   }
 
-  public void addMissing(BigInteger serialNumber) throws IOException {
+  public void addMissing(BigInteger serialNumber)
+      throws IOException {
     numMissing.incrementAndGet();
     writeSerialNumberLine(missingWriter, serialNumber);
   }
 
-  public void addGood(BigInteger serialNumber) throws IOException {
+  public void addGood(BigInteger serialNumber)
+      throws IOException {
     numGood.incrementAndGet();
     writeSerialNumberLine(goodWriter, serialNumber);
   }
 
-  public void addUnexpected(BigInteger serialNumber) throws IOException {
+  public void addUnexpected(BigInteger serialNumber)
+      throws IOException {
     numUnexpected.incrementAndGet();
     writeSerialNumberLine(unexpectedWriter, serialNumber);
   }
 
-  public void addDiff(DigestEntry refCert, DigestEntry targetCert) throws IOException {
+  public void addDiff(DigestEntry refCert, DigestEntry targetCert)
+      throws IOException {
     Args.notNull(refCert, "refCert");
     Args.notNull(targetCert, "targetCert");
 
@@ -126,7 +131,8 @@ class DigestDiffReporter implements Closeable {
     }
   } // method addDiff
 
-  public void addError(String errorMessage) throws IOException {
+  public void addError(String errorMessage)
+      throws IOException {
     Args.notNull(errorMessage, "errorMessage");
 
     numError.incrementAndGet();
@@ -136,7 +142,8 @@ class DigestDiffReporter implements Closeable {
     }
   } // method addError
 
-  public void addNoCaMatch() throws IOException {
+  public void addNoCaMatch()
+      throws IOException {
     synchronized (errorWriter) {
       errorWriter.write("could not find corresponding CA in target to diff\n");
     }
