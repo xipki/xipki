@@ -1929,7 +1929,7 @@ public abstract class ProxyMessage extends ASN1Object {
     if (size < minSize || size > maxSize) {
       String msg = String.format("seq.size() must not be out of the range [%d, %d]: %d",
           minSize, maxSize, size);
-      throw new IllegalArgumentException(msg);
+      throw new BadAsn1ObjectException(msg);
     }
   }
 

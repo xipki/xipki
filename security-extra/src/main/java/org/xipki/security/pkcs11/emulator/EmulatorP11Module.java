@@ -108,7 +108,7 @@ public class EmulatorP11Module extends P11Module {
 
     for (File child : children) {
       if ((child.isDirectory() && child.canRead() && !child.exists())) {
-        LOG.warn("ignore path {}, it does not point to a readable exist directory",
+        LOG.warn("ignore path {}, it does not point to a readable existing directory",
             child.getPath());
         continue;
       }

@@ -1221,9 +1221,6 @@ class IaikP11Slot extends P11Slot {
   protected P11Identity generateRSAKeypair0(int keysize, BigInteger publicExponent,
       P11NewKeyControl control)
           throws P11TokenException {
-    long mech = PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN;
-    assertMechanismSupported(mech);
-
     RSAPrivateKey privateKey = new RSAPrivateKey();
     RSAPublicKey publicKey = new RSAPublicKey();
     setKeyAttributes(control, publicKey, privateKey);
@@ -1233,6 +1230,7 @@ class IaikP11Slot extends P11Slot {
       publicKey.getPublicExponent().setByteArrayValue(publicExponent.toByteArray());
     }
 
+    long mech = PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN;
     return generateKeyPair(mech, control.getId(), privateKey, publicKey);
   } // method generateRSAKeypair0
 
@@ -1241,9 +1239,6 @@ class IaikP11Slot extends P11Slot {
   protected P11Identity generateDSAKeypair0(BigInteger p, BigInteger q, BigInteger g,
       P11NewKeyControl control)
           throws P11TokenException {
-    long mech = PKCS11Constants.CKM_DSA_KEY_PAIR_GEN;
-    assertMechanismSupported(mech);
-
     DSAPrivateKey privateKey = new DSAPrivateKey();
     DSAPublicKey publicKey = new DSAPublicKey();
     setKeyAttributes(control, publicKey, privateKey);
@@ -1251,6 +1246,8 @@ class IaikP11Slot extends P11Slot {
     publicKey.getPrime().setByteArrayValue(Util.unsignedBigIntergerToByteArray(p));
     publicKey.getSubprime().setByteArrayValue(Util.unsignedBigIntergerToByteArray(q));
     publicKey.getBase().setByteArrayValue(Util.unsignedBigIntergerToByteArray(g));
+
+    long mech = PKCS11Constants.CKM_DSA_KEY_PAIR_GEN;
     return generateKeyPair(mech, control.getId(), privateKey, publicKey);
   } // method generateDSAKeypair0
 
@@ -1258,9 +1255,6 @@ class IaikP11Slot extends P11Slot {
   protected P11Identity generateECEdwardsKeypair0(ASN1ObjectIdentifier curveId,
       P11NewKeyControl control)
           throws P11TokenException {
-    long mech = PKCS11Constants.CKM_EC_EDWARDS_KEY_PAIR_GEN;
-    assertMechanismSupported(mech);
-
     ECPrivateKey privateKey = new ECPrivateKey(KeyType.EC_EDWARDS);
     ECPublicKey publicKey = new ECPublicKey(KeyType.EC_EDWARDS);
     setKeyAttributes(control, publicKey, privateKey);
@@ -1271,6 +1265,7 @@ class IaikP11Slot extends P11Slot {
       throw new P11TokenException(ex.getMessage(), ex);
     }
     publicKey.getEcdsaParams().setByteArrayValue(encodedCurveId);
+    long mech = PKCS11Constants.CKM_EC_EDWARDS_KEY_PAIR_GEN;
     return generateKeyPair(mech, control.getId(), privateKey, publicKey);
   } // method generateECEdwardsKeypair0
 
@@ -1278,9 +1273,6 @@ class IaikP11Slot extends P11Slot {
   protected P11Identity generateECMontgomeryKeypair0(ASN1ObjectIdentifier curveId,
       P11NewKeyControl control)
           throws P11TokenException {
-    long mech = PKCS11Constants.CKM_EC_MONTGOMERY_KEY_PAIR_GEN;
-    assertMechanismSupported(mech);
-
     ECPrivateKey privateKey = new ECPrivateKey(KeyType.EC_MONTGOMERY);
     ECPublicKey publicKey = new ECPublicKey(KeyType.EC_MONTGOMERY);
     setKeyAttributes(control, publicKey, privateKey);
@@ -1291,15 +1283,14 @@ class IaikP11Slot extends P11Slot {
       throw new P11TokenException(ex.getMessage(), ex);
     }
     publicKey.getEcdsaParams().setByteArrayValue(encodedCurveId);
+
+    long mech = PKCS11Constants.CKM_EC_MONTGOMERY_KEY_PAIR_GEN;
     return generateKeyPair(mech, control.getId(), privateKey, publicKey);
   } // method generateECMontgomeryKeypair0
 
   @Override
   protected P11Identity generateECKeypair0(ASN1ObjectIdentifier curveId, P11NewKeyControl control)
       throws P11TokenException {
-    long mech = PKCS11Constants.CKM_EC_KEY_PAIR_GEN;
-    assertMechanismSupported(mech);
-
     ECPrivateKey privateKey = new ECPrivateKey();
     ECPublicKey publicKey = new ECPublicKey();
     setKeyAttributes(control, publicKey, privateKey);
@@ -1309,6 +1300,8 @@ class IaikP11Slot extends P11Slot {
     } catch (IOException ex) {
       throw new P11TokenException(ex.getMessage(), ex);
     }
+
+    long mech = PKCS11Constants.CKM_EC_KEY_PAIR_GEN;
     try {
       publicKey.getEcdsaParams().setByteArrayValue(encodedCurveId);
       return generateKeyPair(mech, control.getId(), privateKey, publicKey);
@@ -1331,12 +1324,11 @@ class IaikP11Slot extends P11Slot {
   @Override
   protected P11Identity generateSM2Keypair0(P11NewKeyControl control)
       throws P11TokenException {
-    long mech = PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN;
-    assertMechanismSupported(mech);
-
     ECPrivateKey privateKey = new ECPrivateKey(KeyType.VENDOR_SM2);
     ECPublicKey publicKey = new ECPublicKey(KeyType.VENDOR_SM2);
     setKeyAttributes(control, publicKey, privateKey);
+
+    long mech = PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN;
     return generateKeyPair(mech, control.getId(), privateKey, publicKey);
   } // method generateSM2Keypair0
 

@@ -425,8 +425,8 @@ class EmulatorP11Slot extends P11Slot {
 
     String algorithm = props.getProperty(PROP_ALGORITHM);
     if (PKCSObjectIdentifiers.rsaEncryption.getId().equals(algorithm)) {
-      BigInteger exp = new BigInteger(1, decodeHex(props.getProperty(PROP_RSA_PUBLIC_EXPONENT)));
-      BigInteger mod = new BigInteger(1, decodeHex(props.getProperty(PROP_RSA_MODUS)));
+      BigInteger exp = new BigInteger(props.getProperty(PROP_RSA_PUBLIC_EXPONENT), 16);
+      BigInteger mod = new BigInteger(props.getProperty(PROP_RSA_MODUS), 16);
 
       RSAPublicKeySpec keySpec = new RSAPublicKeySpec(mod, exp);
       try {
@@ -435,10 +435,10 @@ class EmulatorP11Slot extends P11Slot {
         throw new P11TokenException(ex.getMessage(), ex);
       }
     } else if (X9ObjectIdentifiers.id_dsa.getId().equals(algorithm)) {
-      BigInteger prime = new BigInteger(1, decodeHex(props.getProperty(PROP_DSA_PRIME))); // p
-      BigInteger subPrime = new BigInteger(1, decodeHex(props.getProperty(PROP_DSA_SUBPRIME))); // q
-      BigInteger base = new BigInteger(1, decodeHex(props.getProperty(PROP_DSA_BASE))); // g
-      BigInteger value = new BigInteger(1, decodeHex(props.getProperty(PROP_DSA_VALUE))); // y
+      BigInteger prime = new BigInteger(props.getProperty(PROP_DSA_PRIME), 16); // p
+      BigInteger subPrime = new BigInteger(props.getProperty(PROP_DSA_SUBPRIME), 16); // q
+      BigInteger base = new BigInteger(props.getProperty(PROP_DSA_BASE), 16); // g
+      BigInteger value = new BigInteger(props.getProperty(PROP_DSA_VALUE), 16); // y
 
       DSAPublicKeySpec keySpec = new DSAPublicKeySpec(value, prime, subPrime, base);
       try {
@@ -931,8 +931,6 @@ class EmulatorP11Slot extends P11Slot {
   protected P11Identity generateRSAKeypair0(int keysize, BigInteger publicExponent,
       P11NewKeyControl control)
           throws P11TokenException {
-    assertMechanismSupported(PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN);
-
     KeyPair keypair;
     try {
       keypair = KeyUtil.generateRSAKeypair(keysize, publicExponent, random);
@@ -948,7 +946,6 @@ class EmulatorP11Slot extends P11Slot {
   protected P11Identity generateDSAKeypair0(BigInteger p, BigInteger q, BigInteger g,
       P11NewKeyControl control)
           throws P11TokenException {
-    assertMechanismSupported(PKCS11Constants.CKM_DSA_KEY_PAIR_GEN);
     DSAParameters dsaParams = new DSAParameters(p, q, g);
     KeyPair keypair;
     try {
@@ -963,7 +960,6 @@ class EmulatorP11Slot extends P11Slot {
   @Override
   protected P11Identity generateSM2Keypair0(P11NewKeyControl control)
       throws P11TokenException {
-    assertMechanismSupported(PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN);
     return generateECKeypair0(GMObjectIdentifiers.sm2p256v1, control);
   }
 
@@ -971,8 +967,6 @@ class EmulatorP11Slot extends P11Slot {
   protected P11Identity generateECEdwardsKeypair0(ASN1ObjectIdentifier curveOid,
       P11NewKeyControl control)
           throws P11TokenException {
-    assertMechanismSupported(PKCS11Constants.CKM_EC_EDWARDS_KEY_PAIR_GEN);
-
     KeyPair keypair;
     try {
       if (!EdECConstants.isEdwardsCurve(curveOid)) {
@@ -991,8 +985,6 @@ class EmulatorP11Slot extends P11Slot {
   protected P11Identity generateECMontgomeryKeypair0(ASN1ObjectIdentifier curveOid,
       P11NewKeyControl control)
           throws P11TokenException {
-    assertMechanismSupported(PKCS11Constants.CKM_EC_MONTGOMERY_KEY_PAIR_GEN);
-
     KeyPair keypair;
     try {
       if (!EdECConstants.isMontgomeryCurve(curveOid)) {
@@ -1011,7 +1003,6 @@ class EmulatorP11Slot extends P11Slot {
   protected P11Identity generateECKeypair0(ASN1ObjectIdentifier curveId,
       P11NewKeyControl control)
           throws P11TokenException {
-    assertMechanismSupported(PKCS11Constants.CKM_EC_KEY_PAIR_GEN);
     KeyPair keypair;
     try {
       keypair = KeyUtil.generateECKeypair(curveId, random);
@@ -1033,13 +1024,11 @@ class EmulatorP11Slot extends P11Slot {
 
     String keyLabel = savePkcs11PrivateKey(id, label, keypair.getPrivate());
     String pubKeyLabel = savePkcs11PublicKey(id, label, keypair.getPublic());
-    String certLabel = null;
-    X509Cert[] certs = null;
     P11IdentityId identityId = new P11IdentityId(slotId,
-        new P11ObjectIdentifier(id, keyLabel), pubKeyLabel, certLabel);
+        new P11ObjectIdentifier(id, keyLabel), pubKeyLabel, null);
     try {
       return new EmulatorP11Identity(this,identityId, keypair.getPrivate(),
-          keypair.getPublic(), certs, maxSessions, random);
+          keypair.getPublic(), null, maxSessions, random);
     } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException ex) {
       throw new P11TokenException(
           "could not construct KeyStoreP11Identity: " + ex.getMessage(), ex);
