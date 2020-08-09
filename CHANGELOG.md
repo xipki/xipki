@@ -2,8 +2,27 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
-## 5.3.8
+## 5.3.10
   - Release date: -
+
+## 5.3.9
+  - Release date: Aug 9, 2020
+  - CA
+    - Relax FQDN check
+    - Handle the file calock correclty
+    - Fixed #179 handle requestor name case-insensitive
+    - Fixed #180 CA cannot process certificate request (CA generate keypair) via REST service
+    - Removed support of audit over syslog (not needed)
+    - Removed support of yubikey token (not tested)
+    - Use tinylog instead log4j2
+  - OCSP
+    - Removed support of yubikey token (not tested)
+    - Use tinylog instead log4j2
+  - CLI
+    - Removed support of yubikey token (not tested)
+    - Use tinylog instead log4j2
+  - DB Tool
+    - New module introduced.
 
 ## 5.3.8
   - Release date: Jul 09, 2020

@@ -36,7 +36,7 @@
     <slf4j.version>1.7.25</slf4j.version>
     <pkcs11-wrapper.version>1.4.7</pkcs11-wrapper.version>
     <hikaricp.version>3.4.5</hikaricp.version>
-    <fastjson.version>1.2.72</fastjson.version>
+    <fastjson.version>1.2.73</fastjson.version>
     <!-- Liquibase: do not update to newer version due to bug related to MariaDB 10.3
          see https://liquibase.jira.com/browse/CORE-3457 for details -->
     <liquibase.version>3.6.3</liquibase.version>
