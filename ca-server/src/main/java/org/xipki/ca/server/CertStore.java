@@ -69,7 +69,6 @@ import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.datasource.DatabaseType;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
@@ -1689,7 +1688,7 @@ public class CertStore {
 
     Set<BigInteger> allSnSet = null;
 
-    boolean supportInSql = datasource.getDatabaseType() != DatabaseType.H2;
+    boolean supportInSql = datasource.getDatabaseType().supportsInArray();
     List<BigInteger> snList = new LinkedList<>();
 
     List<CertRevInfoWithSerial> ret = new LinkedList<>();

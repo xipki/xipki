@@ -28,7 +28,7 @@ import org.xipki.util.Args;
 
 public enum DatabaseType {
 
-  H2,
+  H2(false),
   DB2,
   HSQL,
   MYSQL,
@@ -36,6 +36,20 @@ public enum DatabaseType {
   ORACLE,
   POSTGRES,
   UNKNOWN;
+
+  private final boolean supportsInArray;
+
+  private DatabaseType() {
+    this.supportsInArray = true;
+  }
+
+  private DatabaseType(boolean supportsInArray) {
+    this.supportsInArray = supportsInArray;
+  }
+
+  public boolean supportsInArray() {
+    return supportsInArray;
+  }
 
   public static DatabaseType forDriver(String driverClass) {
     Args.notNull(driverClass, "driverClass");

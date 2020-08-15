@@ -36,7 +36,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.datasource.DatabaseType;
 import org.xipki.security.HashAlgo;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
@@ -138,9 +137,8 @@ class TargetDigestReader implements Closeable {
         throws DataAccessException {
       List<BigInteger> serialNumbers = bundle.getSerialNumbers();
       int size = serialNumbers.size();
-      boolean batchSupported = datasource.getDatabaseType() != DatabaseType.H2;
 
-      return (batchSupported && size == numPerSelect)
+      return (datasource.getDatabaseType().supportsInArray() && size == numPerSelect)
         ? getCertsViaInArraySelect(inArraySelectStmt, serialNumbers)
         : getCertsViaSingleSelect(singleSelectStmt, serialNumbers);
     } // method query
