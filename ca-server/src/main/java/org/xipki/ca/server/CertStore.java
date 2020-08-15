@@ -268,8 +268,6 @@ public class CertStore {
 
   private final LruCache<Integer, String> cacheSqlRevokedCerts = new LruCache<>(5);
 
-  private final LruCache<Integer, String> cacheSqlRevokedCertsWithEe = new LruCache<>(5);
-
   private final LruCache<Integer, String> cacheSqlSerials = new LruCache<>(5);
 
   private final LruCache<Integer, String> cacheSqlSerialsRevoked = new LruCache<>(5);
@@ -1640,17 +1638,13 @@ public class CertStore {
   } // method knowsCertForSerial
 
   public List<CertRevInfoWithSerial> getRevokedCerts(NameId ca, Date notExpiredAt, long startId,
-      int numEntries, boolean onlyCaCerts, boolean onlyUserCerts)
+      int numEntries)
           throws OperationException {
     notNull(ca, "ca");
     notNull(notExpiredAt, "notExpiredAt");
     positive(numEntries, "numEntries");
-    if (onlyCaCerts && onlyUserCerts) {
-      throw new IllegalArgumentException("onlyCaCerts and onlyUserCerts cannot be both of true");
-    }
-    boolean withEe = onlyCaCerts || onlyUserCerts;
 
-    String sql = getSqlRevokedCerts(numEntries, withEe);
+    String sql = getSqlRevokedCerts(numEntries);
 
     ResultSet rs = null;
     PreparedStatement ps = borrowPreparedStatement(sql);
@@ -1660,9 +1654,6 @@ public class CertStore {
       ps.setLong(idx++, startId - 1);
       ps.setInt(idx++, ca.getId());
       ps.setLong(idx++, notExpiredAt.getTime() / 1000 + 1);
-      if (withEe) {
-        setBoolean(ps, idx++, onlyUserCerts);
-      }
       rs = ps.executeQuery();
 
       List<CertRevInfoWithSerial> ret = new LinkedList<>();
@@ -1684,7 +1675,7 @@ public class CertStore {
   } // method getRevokedCerts
 
   public List<CertRevInfoWithSerial> getCertsForDeltaCrl(NameId ca, BigInteger baseCrlNumber,
-      Date notExpiredAt, boolean onlyCaCerts, boolean onlyUserCerts)
+      Date notExpiredAt)
           throws OperationException {
     notNull(ca, "ca");
     notNull(notExpiredAt, "notExpiredAt");
@@ -2053,17 +2044,13 @@ public class CertStore {
     return sql;
   } // method getSqlSuspendedSerials
 
-  private String getSqlRevokedCerts(int numEntries, boolean withEe) {
-    LruCache<Integer, String> cache = withEe ? cacheSqlRevokedCertsWithEe : cacheSqlRevokedCerts;
-    String sql = cache.get(numEntries);
+  private String getSqlRevokedCerts(int numEntries) {
+    String sql = cacheSqlRevokedCerts.get(numEntries);
     if (sql == null) {
       String coreSql =
           "ID,SN,RR,RT,RIT FROM CERT WHERE ID>? AND CA_ID=? AND REV=1 AND NAFTER>?";
-      if (withEe) {
-        coreSql += " AND EE=?";
-      }
       sql = datasource.buildSelectFirstSql(numEntries, "ID ASC", coreSql);
-      cache.put(numEntries, sql);
+      cacheSqlRevokedCerts.put(numEntries, sql);
     }
     return sql;
   } // method getSqlRevokedCerts

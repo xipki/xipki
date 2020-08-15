@@ -790,15 +790,13 @@ public class X509Ca implements Closeable {
       List<CertRevInfoWithSerial> allRevInfos = new LinkedList<>();
 
       if (deltaCrl) {
-        allRevInfos = certstore.getCertsForDeltaCrl(caIdent, baseCrlNumber, notExpiredAt,
-            control.isOnlyContainsCaCerts(), control.isOnlyContainsUserCerts());
+        allRevInfos = certstore.getCertsForDeltaCrl(caIdent, baseCrlNumber, notExpiredAt);
       } else {
         long startId = 1;
 
         List<CertRevInfoWithSerial> revInfos;
         do {
-          revInfos = certstore.getRevokedCerts(caIdent, notExpiredAt, startId, numEntries,
-              control.isOnlyContainsCaCerts(), control.isOnlyContainsUserCerts());
+          revInfos = certstore.getRevokedCerts(caIdent, notExpiredAt, startId, numEntries);
           allRevInfos.addAll(revInfos);
 
           long maxId = 1;
@@ -885,13 +883,6 @@ public class X509Ca implements Closeable {
         event.addEventData(CaAuditConstants.NAME_basecrl_number, baseCrlNumber);
       }
 
-      boolean onlyUserCerts = crlControl.isOnlyContainsUserCerts();
-      boolean onlyCaCerts = crlControl.isOnlyContainsCaCerts();
-      if (onlyUserCerts && onlyCaCerts) {
-        throw new IllegalStateException(
-            "should not reach here, onlyUserCerts and onlyCACerts are both true");
-      }
-
       try {
         // AuthorityKeyIdentifier
         byte[] akiValues = indirectCrl
@@ -904,11 +895,11 @@ public class X509Ca implements Closeable {
         crlBuilder.addExtension(Extension.cRLNumber, false, new ASN1Integer(crlNumber));
 
         // IssuingDistributionPoint
-        if (onlyUserCerts || onlyCaCerts || indirectCrl) {
+        if (indirectCrl) {
           IssuingDistributionPoint idp = new IssuingDistributionPoint(
               (DistributionPointName) null, // distributionPoint,
-              onlyUserCerts, // onlyContainsUserCerts,
-              onlyCaCerts, // onlyContainsCACerts,
+              false, // onlyContainsUserCerts,
+              false, // onlyContainsCACerts,
               (ReasonFlags) null, // onlySomeReasons,
               indirectCrl, // indirectCRL,
               false); // onlyContainsAttributeCerts

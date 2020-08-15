@@ -60,14 +60,6 @@ import org.xipki.util.TripleState;
  * # Default is false
  * fullcrl.extended.nextupdate=&lt;'true'|'false'&gt;
  *
- * # Whether only user certificates are considered in CRL
- * # Default is false
- * user.certs.only=&lt;'true'|'false'&gt;
- *
- * # Whether only CA certificates are considered in CRL
- * # Default if false
- * ca.certs.only=&lt;'true'|'false'&gt;
- *
  * # Whether Revocation reason is contained in CRL
  * # Default is false
  * exclude.reason=&lt;'true'|'false'&gt;
@@ -145,10 +137,6 @@ public class CrlControl {
 
   public static final String KEY_FULLCRL_EXTENDED_NEXTUPDATE = "fullcrl.extended.nextupdate";
 
-  public static final String KEY_ONLY_CONTAINS_USERCERTS = "user.certs.only";
-
-  public static final String KEY_ONLY_CONTAINS_CACERTS = "ca.certs.only";
-
   public static final String KEY_EXCLUDE_REASON = "exclude.reason";
 
   public static final String KEY_INVALIDITY_DATE = "invalidity.date";
@@ -162,10 +150,6 @@ public class CrlControl {
   private boolean extendedNextUpdate;
 
   private HourMinute intervalDayTime;
-
-  private boolean onlyContainsUserCerts;
-
-  private boolean onlyContainsCaCerts;
 
   private boolean excludeReason;
 
@@ -203,8 +187,6 @@ public class CrlControl {
       this.extensionOids = oids;
     }
 
-    this.onlyContainsCaCerts = getBoolean(props, KEY_ONLY_CONTAINS_CACERTS, false);
-    this.onlyContainsUserCerts = getBoolean(props, KEY_ONLY_CONTAINS_USERCERTS, false);
     this.excludeReason = getBoolean(props, KEY_EXCLUDE_REASON, false);
 
     // Maximal interval allowed by CA/Browser Forum's Baseline Requirements
@@ -255,8 +237,6 @@ public class CrlControl {
     pairs.putPair(KEY_FULLCRL_INTERVALS, Integer.toString(fullCrlIntervals));
     pairs.putPair(KEY_INTERVAL_TIME, intervalDayTime.toString());
     pairs.putPair(KEY_INVALIDITY_DATE, invalidityDateMode.name());
-    pairs.putPair(KEY_ONLY_CONTAINS_CACERTS, Boolean.toString(onlyContainsCaCerts));
-    pairs.putPair(KEY_ONLY_CONTAINS_USERCERTS, Boolean.toString(onlyContainsUserCerts));
     pairs.putPair(KEY_OVERLAP_DAYS, Integer.toString(overlapDays));
 
     if (CollectionUtil.isNotEmpty(extensionOids)) {
@@ -285,8 +265,6 @@ public class CrlControl {
         "\n  delta CRL intervals: ", deltaCrlIntervals,
         "\n  overlap: ", overlapDays, " days",
         "\n  use extended nextUpdate: ", extendedNextUpdate,
-        "\n  only user certificates: ", onlyContainsUserCerts,
-        "\n  only CA certificates: ", onlyContainsCaCerts,
         "\n  exclude reason: ", excludeReason,
         "\n  invalidity date mode: ", invalidityDateMode,
         "\n  interval: ", intervalStr,
@@ -317,14 +295,6 @@ public class CrlControl {
     return extendedNextUpdate;
   }
 
-  public boolean isOnlyContainsUserCerts() {
-    return onlyContainsUserCerts;
-  }
-
-  public boolean isOnlyContainsCaCerts() {
-    return onlyContainsCaCerts;
-  }
-
   public boolean isExcludeReason() {
     return excludeReason;
   }
@@ -335,11 +305,6 @@ public class CrlControl {
 
   public final void validate()
       throws InvalidConfException {
-    if (onlyContainsCaCerts && onlyContainsUserCerts) {
-      throw new InvalidConfException(
-          "onlyContainsCACerts and onlyContainsUserCerts can not be both true");
-    }
-
     if (fullCrlIntervals < deltaCrlIntervals) {
       throw new InvalidConfException(
           "fullCRLIntervals may not be less than deltaCRLIntervals "
@@ -373,9 +338,7 @@ public class CrlControl {
     CrlControl obj2 = (CrlControl) obj;
     if (deltaCrlIntervals != obj2.deltaCrlIntervals
         || extendedNextUpdate != obj2.extendedNextUpdate
-        || fullCrlIntervals != obj2.fullCrlIntervals
-        || onlyContainsCaCerts != obj2.onlyContainsCaCerts
-        || onlyContainsUserCerts != obj2.onlyContainsUserCerts) {
+        || fullCrlIntervals != obj2.fullCrlIntervals) {
       return false;
     }
 
