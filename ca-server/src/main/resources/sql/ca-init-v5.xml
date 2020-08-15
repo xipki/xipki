@@ -25,7 +25,7 @@
     </createTable>
     <insert tableName="DBSCHEMA">
       <column name="NAME" value="VERSION"/>
-      <column name="VALUE2" value="6"/>
+      <column name="VALUE2" value="5"/>
     </insert>
     <insert tableName="DBSCHEMA">
       <column name="NAME" value="X500NAME_MAXLEN"/>
@@ -376,6 +376,18 @@
         <constraints nullable="false"/>
       </column>
       <column name="CA_ID" type="SMALLINT">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <!-- table DELTACRL_CACHE -->
+    <createTable tableName="DELTACRL_CACHE">
+      <column name="ID" type="BIGINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="CA_ID" type="SMALLINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="SN" type="VARCHAR(40)">
         <constraints nullable="false"/>
       </column>
     </createTable>

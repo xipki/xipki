@@ -105,7 +105,6 @@ class CaCertstoreDbExporter extends DbPorter {
     try {
       if (!resume) {
         exportPublishQueue(certstore);
-        exportDeltaCrlCache(certstore);
       }
 
       File processLogFile = new File(baseDir, DbPorter.EXPORT_PROCESS_LOG_FILENAME);
@@ -526,38 +525,6 @@ class CaCertstoreDbExporter extends DbPorter {
     }
     System.out.println(" exported table PUBLISHQUEUE");
   } // method exportPublishQueue
-
-  private void exportDeltaCrlCache(CaCertstore certstore)
-      throws DataAccessException, InvalidConfException {
-    System.out.println("exporting table DELTACRL_CACHE");
-
-    final String sql = "SELECT SN,CA_ID FROM DELTACRL_CACHE";
-
-    List<CaCertstore.DeltaCrlCacheEntry> deltaCache = new LinkedList<>();
-    certstore.setDeltaCrlCache(deltaCache);
-
-    PreparedStatement ps = prepareStatement(sql);
-    ResultSet rs = null;
-
-    try {
-      rs = ps.executeQuery();
-
-      while (rs.next()) {
-        CaCertstore.DeltaCrlCacheEntry entry = new CaCertstore.DeltaCrlCacheEntry();
-        entry.setCaId(rs.getInt("CA_ID"));
-        entry.setSerial(rs.getString("SN"));
-
-        entry.validate();
-        deltaCache.add(entry);
-      }
-    } catch (SQLException ex) {
-      throw translate(sql, ex);
-    } finally {
-      releaseResources(ps, rs);
-    }
-
-    System.out.println(" exported table DELTACRL_CACHE");
-  } // method exportDeltaCrlCache
 
   private void finalizeZip(ZipOutputStream zipOutStream, String filename, Object container)
       throws IOException {

@@ -185,7 +185,6 @@ class CaCertstoreDbImporter extends DbPorter {
       }
 
       importPublishQueue(certstore.getPublishQueue());
-      importDeltaCrlCache(certstore.getDeltaCrlCache());
 
       processLogFile.delete();
     } catch (Exception ex) {
@@ -220,33 +219,6 @@ class CaCertstoreDbImporter extends DbPorter {
 
     System.out.println(" imported table PUBLISHQUEUE");
   } // method importPublishQueue
-
-  private void importDeltaCrlCache(List<CaCertstore.DeltaCrlCacheEntry> deltaCrlCache)
-      throws DataAccessException {
-    final String sql = "INSERT INTO DELTACRL_CACHE (ID,SN,CA_ID) VALUES (?,?,?)";
-    System.out.println("importing table DELTACRL_CACHE");
-    PreparedStatement ps = prepareStatement(sql);
-
-    try {
-      long id = 1;
-      for (CaCertstore.DeltaCrlCacheEntry entry : deltaCrlCache) {
-        try {
-          ps.setLong(1, id++);
-          ps.setString(2, entry.getSerial());
-          ps.setInt(3, entry.getCaId());
-          ps.execute();
-        } catch (SQLException ex) {
-          System.err.println("could not import DELTACRL_CACHE with caId=" + entry.getCaId()
-              + " and serial=" + entry.getSerial() + ", message: " + ex.getMessage());
-          throw translate(sql, ex);
-        }
-      }
-    } finally {
-      releaseResources(ps, null);
-    }
-
-    System.out.println(" imported table DELTACRL_CACHE");
-  } // method importDeltaCRLCache
 
   private Exception importEntries(CaDbEntryType type, CaCertstore certstore,
       File processLogFile, Integer numProcessedInLastProcess, Long idProcessedInLastProcess) {

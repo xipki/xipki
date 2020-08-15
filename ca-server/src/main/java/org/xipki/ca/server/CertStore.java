@@ -20,6 +20,7 @@ package org.xipki.ca.server;
 import static org.xipki.ca.api.OperationException.ErrorCode.BAD_REQUEST;
 import static org.xipki.ca.api.OperationException.ErrorCode.CERT_REVOKED;
 import static org.xipki.ca.api.OperationException.ErrorCode.CERT_UNREVOKED;
+import static org.xipki.ca.api.OperationException.ErrorCode.CRL_FAILURE;
 import static org.xipki.ca.api.OperationException.ErrorCode.DATABASE_FAILURE;
 import static org.xipki.ca.api.OperationException.ErrorCode.NOT_PERMITTED;
 import static org.xipki.ca.api.OperationException.ErrorCode.SYSTEM_FAILURE;
@@ -38,6 +39,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -49,8 +51,10 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.asn1.x509.TBSCertList.CRLEntry;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +69,7 @@ import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.datasource.DatabaseType;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
@@ -197,12 +202,6 @@ public class CertStore {
   private static final String SQL_REMOVE_PUBLISHQUEUE =
       "DELETE FROM PUBLISHQUEUE WHERE PID=? AND CID=?";
 
-  private static final String SQL_MAXID_DELTACRL_CACHE =
-      "SELECT MAX(ID) FROM DELTACRL_CACHE WHERE CA_ID=?";
-
-  private static final String SQL_CLEAR_DELTACRL_CACHE =
-      "DELETE FROM DELTACRL_CACHE WHERE ID<? AND CA_ID=?";
-
   private static final String SQL_MAX_CRLNO = "SELECT MAX(CRL_NO) FROM CRL WHERE CA_ID=?";
 
   private static final String SQL_MAX_FULL_CRLNO =
@@ -214,9 +213,6 @@ public class CertStore {
   private static final String SQL_ADD_CRL =
       "INSERT INTO CRL (ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE,DELTACRL,BASECRL_NO,CRL_SCOPE,CRL)"
       + " VALUES (?,?,?,?,?,?,?,?,?)";
-
-  private static final String SQL_ADD_DELTACRL_CACHE =
-      "INSERT INTO DELTACRL_CACHE (ID,CA_ID,SN) VALUES (?,?,?)";
 
   private static final String SQL_REMOVE_CERT = "DELETE FROM CERT WHERE CA_ID=? AND SN=?";
 
@@ -246,8 +242,6 @@ public class CertStore {
 
   private final String sqlKnowsCertForSerial;
 
-  private final String sqlRevForId;
-
   private final String sqlCertStatusForSubjectFp;
 
   private final String sqlCertforSubjectIssued;
@@ -262,13 +256,15 @@ public class CertStore {
 
   private final String sqlReqForId;
 
+  private final String sqlSelectUnrevokedSn100;
+
+  private final String sqlSelectUnrevokedSn;
+
   private final LruCache<Integer, String> cacheSqlCidFromPublishQueue = new LruCache<>(5);
 
   private final LruCache<Integer, String> cacheSqlExpiredSerials = new LruCache<>(5);
 
   private final LruCache<Integer, String> cacheSqlSuspendedSerials = new LruCache<>(5);
-
-  private final LruCache<Integer, String> cacheSqlDeltaCrlCacheIds = new LruCache<>(5);
 
   private final LruCache<Integer, String> cacheSqlRevokedCerts = new LruCache<>(5);
 
@@ -280,7 +276,6 @@ public class CertStore {
 
   private final DataSourceWrapper datasource;
 
-  @SuppressWarnings("unused")
   private final int dbSchemaVersion;
 
   private final int maxX500nameLen;
@@ -309,7 +304,6 @@ public class CertStore {
     this.sqlCaHasUser = buildSelectFirstSql(
         "PERMISSION,PROFILES FROM CA_HAS_USER WHERE CA_ID=? AND USER_ID=?");
     this.sqlKnowsCertForSerial = buildSelectFirstSql("UID FROM CERT WHERE SN=? AND CA_ID=?");
-    this.sqlRevForId = buildSelectFirstSql("SN,EE,REV,RR,RT,RIT FROM CERT WHERE ID=?");
     this.sqlCertStatusForSubjectFp = buildSelectFirstSql("REV FROM CERT WHERE FP_S=? AND CA_ID=?");
     this.sqlCertforSubjectIssued = buildSelectFirstSql("ID FROM CERT WHERE CA_ID=? AND FP_S=?");
     this.sqlReqIdForSerial = buildSelectFirstSql("REQCERT.RID as REQ_ID FROM REQCERT INNER JOIN "
@@ -321,7 +315,22 @@ public class CertStore {
         "THISUPDATE,CRL FROM CRL WHERE CA_ID=?");
     this.sqlCrlWithNo = datasource.buildSelectFirstSql(1, "THISUPDATE DESC",
         "THISUPDATE,CRL FROM CRL WHERE CA_ID=? AND CRL_NO=?");
+
+    this.sqlSelectUnrevokedSn = datasource.buildSelectFirstSql(1,
+        "SELECT LUPDATE FROM CERT WHERE REV = 0 AND SN=?");
+    final String prefix = "SELECT SN,LUPDATE FROM CERT WHERE REV = 0 AND SN";
+    this.sqlSelectUnrevokedSn100 = buildArraySql(datasource, prefix, 100);
   } // constructor
+
+  private static final String buildArraySql(DataSourceWrapper datasource, String prefix, int num) {
+    StringBuilder sb = new StringBuilder(prefix.length() + num * 3);
+    sb.append(prefix).append(" IN (?");
+    for (int i = 1; i < num; i++) {
+      sb.append(",?");
+    }
+    sb.append(")");
+    return datasource.buildSelectFirstSql(num, sb.toString());
+  }
 
   private String buildSelectFirstSql(String coreSql) {
     return datasource.buildSelectFirstSql(1, coreSql);
@@ -449,41 +458,6 @@ public class CertStore {
       datasource.releaseResources(ps, null);
     }
   } // method removeFromPublishQueue
-
-  public long getMaxIdOfDeltaCrlCache(NameId ca)
-      throws OperationException {
-    notNull(ca, "ca");
-
-    final String sql = SQL_MAXID_DELTACRL_CACHE;
-    PreparedStatement ps = borrowPreparedStatement(sql);
-    try {
-      ps.setInt(1, ca.getId());
-      ResultSet rs = ps.executeQuery();
-      if (!rs.next()) {
-        return 0;
-      }
-      return rs.getLong(1);
-    } catch (SQLException ex) {
-      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
-    } finally {
-      datasource.releaseResources(ps, null);
-    }
-  } // method getMaxIdOfDeltaCrlCache
-
-  public void clearDeltaCrlCache(NameId ca, long maxId)
-      throws OperationException {
-    final String sql = SQL_CLEAR_DELTACRL_CACHE;
-    PreparedStatement ps = borrowPreparedStatement(sql);
-    try {
-      ps.setLong(1, maxId + 1);
-      ps.setInt(2, ca.getId());
-      ps.executeUpdate();
-    } catch (SQLException ex) {
-      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
-    } finally {
-      datasource.releaseResources(ps, null);
-    }
-  } // method clearDeltaCrlCache
 
   public void clearPublishQueue(NameId ca, NameId publisher)
       throws OperationException {
@@ -653,8 +627,7 @@ public class CertStore {
   } // method addCrl
 
   public CertWithRevocationInfo revokeCert(NameId ca, BigInteger serialNumber,
-      CertRevocationInfo revInfo, boolean force, boolean publishToDeltaCrlCache,
-      CaIdNameMap idNameMap)
+      CertRevocationInfo revInfo, boolean force, CaIdNameMap idNameMap)
           throws OperationException {
     notNull(ca, "ca");
     notNull(serialNumber, "serialNumber");
@@ -715,16 +688,12 @@ public class CertStore {
       datasource.releaseResources(ps, null);
     }
 
-    if (publishToDeltaCrlCache) {
-      publishToDeltaCrlCache(ca, certWithRevInfo.getCert().getCert().getSerialNumber());
-    }
-
     certWithRevInfo.setRevInfo(revInfo);
     return certWithRevInfo;
   } // method revokeCert
 
   public CertWithRevocationInfo revokeSuspendedCert(NameId ca, BigInteger serialNumber,
-      CrlReason reason, boolean publishToDeltaCrlCache, CaIdNameMap idNameMap)
+      CrlReason reason, CaIdNameMap idNameMap)
       throws OperationException {
     notNull(ca, "ca");
     notNull(serialNumber, "serialNumber");
@@ -770,16 +739,12 @@ public class CertStore {
       datasource.releaseResources(ps, null);
     }
 
-    if (publishToDeltaCrlCache) {
-      publishToDeltaCrlCache(ca, certWithRevInfo.getCert().getCert().getSerialNumber());
-    }
-
     currentRevInfo.setReason(reason);
     return certWithRevInfo;
   } // method revokeSuspendedCert
 
   public CertWithDbId unrevokeCert(NameId ca, BigInteger serialNumber, boolean force,
-      boolean publishToDeltaCrlCache, CaIdNameMap idNamMap)
+      CaIdNameMap idNamMap)
           throws OperationException {
     notNull(ca, "ca");
     notNull(serialNumber, "serialNumber");
@@ -833,32 +798,8 @@ public class CertStore {
       datasource.releaseResources(ps, null);
     }
 
-    if (publishToDeltaCrlCache) {
-      publishToDeltaCrlCache(ca, certWithRevInfo.getCert().getCert().getSerialNumber());
-    }
-
     return certWithRevInfo.getCert();
   } // method unrevokeCert
-
-  private void publishToDeltaCrlCache(NameId ca, BigInteger serialNumber)
-      throws OperationException {
-    notNull(serialNumber, "serialNumber");
-
-    final String sql = SQL_ADD_DELTACRL_CACHE;
-    PreparedStatement ps = null;
-    try {
-      long id = idGenerator.nextId();
-      ps = borrowPreparedStatement(sql);
-      ps.setLong(1, id);
-      ps.setInt(2, ca.getId());
-      ps.setString(3, serialNumber.toString(16));
-      ps.executeUpdate();
-    } catch (SQLException ex) {
-      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
-    } finally {
-      datasource.releaseResources(ps, null);
-    }
-  } // method publishToDeltaCrlCache
 
   public void removeCert(NameId ca, BigInteger serialNumber)
       throws OperationException {
@@ -1054,21 +995,17 @@ public class CertStore {
     }
   } // method getSuspendedCertIds
 
-  public byte[] getEncodedCrl(NameId ca, BigInteger crlNumber)
+  public byte[] getEncodedCrl(NameId ca)
       throws OperationException {
     notNull(ca, "ca");
 
-    String sql = (crlNumber == null) ? sqlCrl : sqlCrlWithNo;
     ResultSet rs = null;
-    PreparedStatement ps = borrowPreparedStatement(sql);
+    PreparedStatement ps = borrowPreparedStatement(sqlCrl);
 
     String b64Crl = null;
     try {
       int idx = 1;
       ps.setInt(idx++, ca.getId());
-      if (crlNumber != null) {
-        ps.setLong(idx++, crlNumber.longValue());
-      }
       rs = ps.executeQuery();
       long currentThisUpdate = 0;
       // iterate all entries to make sure that the latest CRL will be returned
@@ -1080,7 +1017,38 @@ public class CertStore {
         }
       }
     } catch (SQLException ex) {
-      throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
+      throw new OperationException(DATABASE_FAILURE, datasource.translate(sqlCrl, ex).getMessage());
+    } finally {
+      datasource.releaseResources(ps, rs);
+    }
+
+    return (b64Crl == null) ? null : Base64.decodeFast(b64Crl);
+  } // method getEncodedCrl
+
+  public byte[] getEncodedCrl(NameId ca, BigInteger crlNumber)
+      throws OperationException {
+    notNull(ca, "ca");
+
+    if (crlNumber == null) {
+      return getEncodedCrl(ca);
+    }
+
+    ResultSet rs = null;
+    PreparedStatement ps = borrowPreparedStatement(sqlCrlWithNo);
+
+    String b64Crl = null;
+    try {
+      int idx = 1;
+      ps.setInt(idx++, ca.getId());
+      ps.setLong(idx++, crlNumber.longValue());
+      rs = ps.executeQuery();
+
+      if (rs.next()) {
+        b64Crl = rs.getString("CRL");
+      }
+    } catch (SQLException ex) {
+      throw new OperationException(DATABASE_FAILURE,
+          datasource.translate(sqlCrlWithNo, ex).getMessage());
     } finally {
       datasource.releaseResources(ps, rs);
     }
@@ -1715,75 +1683,166 @@ public class CertStore {
     }
   } // method getRevokedCerts
 
-  public List<CertRevInfoWithSerial> getCertsForDeltaCrl(NameId ca, long startId, int numEntries,
-      boolean onlyCaCerts, boolean onlyUserCerts)
+  public List<CertRevInfoWithSerial> getCertsForDeltaCrl(NameId ca, BigInteger baseCrlNumber,
+      Date notExpiredAt, boolean onlyCaCerts, boolean onlyUserCerts)
           throws OperationException {
     notNull(ca, "ca");
-    positive(numEntries, "numEntries");
+    notNull(notExpiredAt, "notExpiredAt");
+    notNull(baseCrlNumber, "baseCrlNumber");
 
-    String sql = getSqlDeltaCrlCacheIds(numEntries);
-    List<Long> ids = new LinkedList<>();
-    ResultSet rs = null;
+    // Get the Base FullCRL
+    byte[] encodedCrl = getEncodedCrl(ca, baseCrlNumber);
+    CertificateList crl = CertificateList.getInstance(encodedCrl);
+    // Get revoked certs in CRL
+    Enumeration<?> revokedCertsInCrl = crl.getRevokedCertificateEnumeration();
 
-    PreparedStatement ps = borrowPreparedStatement(sql);
+    Set<BigInteger> allSnSet = null;
+
+    boolean supportInSql = datasource.getDatabaseType() != DatabaseType.H2;
+    List<BigInteger> snList = new LinkedList<>();
+
+    List<CertRevInfoWithSerial> ret = new LinkedList<>();
+
+    PreparedStatement ps = null;
     try {
-      ps.setLong(1, startId - 1);
-      ps.setInt(2, ca.getId());
-      rs = ps.executeQuery();
-      while (rs.next()) {
-        long id = rs.getLong("ID");
-        ids.add(id);
+      while (revokedCertsInCrl.hasMoreElements()) {
+        CRLEntry crlEntry = (CRLEntry) revokedCertsInCrl.nextElement();
+        if (allSnSet == null) {
+          // guess the size of revoked certificate, very rough
+          int averageSize = encodedCrl.length / crlEntry.getEncoded().length;
+          allSnSet = new HashSet<>((int) (1.1 * averageSize));
+        }
+
+        BigInteger sn = crlEntry.getUserCertificate().getPositiveValue();
+        snList.add(sn);
+        allSnSet.add(sn);
+
+        if (!supportInSql) {
+          continue;
+        }
+
+        if (snList.size() == 100) {
+          // check whether revoked certificates have been unrevoked.
+
+          if (ps == null) {
+            ps = borrowPreparedStatement(sqlSelectUnrevokedSn100);
+          }
+
+          for (int i = 1; i < 101; i++) {
+            ps.setString(i, snList.get(i - 1).toString(16));
+          }
+          snList.clear();
+
+          ResultSet rs = ps.executeQuery();
+          try {
+            while (rs.next()) {
+              ret.add(new CertRevInfoWithSerial(0L,
+                  new BigInteger(rs.getString("SN"), 16), // serial
+                  CrlReason.REMOVE_FROM_CRL, // reason
+                  new Date(100L * rs.getLong("LUPDATE")), //revocationTime,
+                  null)); // invalidityTime
+            }
+          } finally {
+            datasource.releaseResources(null, rs);
+          }
+        }
+      }
+    } catch (SQLException ex) {
+      throw new OperationException(DATABASE_FAILURE,
+          datasource.translate(sqlSelectUnrevokedSn100, ex).getMessage());
+    } catch (IOException ex) {
+      throw new OperationException(CRL_FAILURE, ex.getMessage());
+    } finally {
+      datasource.releaseResources(ps, null);
+    }
+
+    if (!snList.isEmpty()) {
+      // check whether revoked certificates have been unrevoked.
+      ps = borrowPreparedStatement(sqlSelectUnrevokedSn);
+      try {
+        for (BigInteger sn : snList) {
+          ps.setString(1, sn.toString(16));
+          ResultSet rs = ps.executeQuery();
+          try {
+            if (rs.next()) {
+              ret.add(new CertRevInfoWithSerial(0L,
+                  sn, // serial
+                  CrlReason.REMOVE_FROM_CRL, // reason
+                  new Date(100L * rs.getLong("LUPDATE")), //revocationTime,
+                  null)); // invalidityTime
+            }
+          } finally {
+            datasource.releaseResources(null, rs);
+          }
+        }
+      } catch (SQLException ex) {
+        throw new OperationException(DATABASE_FAILURE,
+            datasource.translate(sqlSelectUnrevokedSn, ex).getMessage());
+      } finally {
+        datasource.releaseResources(ps, null);
+      }
+    }
+
+    // get list of certificates revoked after the generation of Base FullCRL
+    // we check all revoked certificates with LUPDATE field (last update) > THISUPDATE - 1.
+    final int numEntries = 1000;
+
+    String coreSql =
+        "ID,SN,RR,RT,RIT FROM CERT WHERE ID>? AND CA_ID=? AND REV=1 AND NAFTER>? AND LUPDATE>?";
+    String sql = datasource.buildSelectFirstSql(numEntries, "ID ASC", coreSql);
+    ps = borrowPreparedStatement(sql);
+    long startId = 1;
+
+    // -1: so that no entry is ignored: consider all revoked certificates with
+    // Database.lastUpdate >= CRL.thisUpdate
+    final long updatedSince = crl.getThisUpdate().getDate().getTime() / 1000 - 1;
+
+    try {
+      ResultSet rs = null;
+      while (true) {
+        ps.setLong(1, startId - 1);
+        ps.setInt(2, ca.getId());
+        ps.setLong(3, notExpiredAt.getTime() / 1000 + 1);
+        ps.setLong(4, updatedSince);
+        rs = ps.executeQuery();
+
+        try {
+          int num = 0;
+          while (rs.next()) {
+            num++;
+            long id = rs.getLong("ID");
+            if (id > startId) {
+              startId = id;
+            }
+
+            BigInteger sn = new BigInteger(rs.getString("SN"), 16);
+            if (allSnSet.contains(sn)) {
+              // already contained in CRL
+              continue;
+            }
+
+            long revInvalidityTime = rs.getLong("RIT");
+            Date invalidityTime = (revInvalidityTime == 0)
+                                    ? null : new Date(1000 * revInvalidityTime);
+            CertRevInfoWithSerial revInfo = new CertRevInfoWithSerial(id,
+                sn, rs.getInt("RR"), // revReason
+                new Date(1000 * rs.getLong("RT")), invalidityTime);
+            ret.add(revInfo);
+          }
+
+          if (num < numEntries) {
+            // no more entries
+            break;
+          }
+        } finally {
+          datasource.releaseResources(null,rs);
+        }
       }
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
     } finally {
-      datasource.releaseResources(ps, rs);
+      datasource.releaseResources(ps, null);
     }
-
-    sql = sqlRevForId;
-    ps = borrowPreparedStatement(sql);
-
-    List<CertRevInfoWithSerial> ret = new ArrayList<>();
-    for (Long id : ids) {
-      try {
-        ps.setLong(1, id);
-        rs = ps.executeQuery();
-
-        if (!rs.next()) {
-          continue;
-        }
-
-        int ee = rs.getInt("EE");
-        if (onlyCaCerts) {
-          if (ee != 0) {
-            continue;
-          }
-        } else if (onlyUserCerts) {
-          if (ee != 1) {
-            continue;
-          }
-        }
-
-        CertRevInfoWithSerial revInfo;
-
-        String serial = rs.getString("SN");
-        boolean revoked = rs.getBoolean("REVOEKD");
-        if (revoked) {
-          long revInvTime = rs.getLong("RIT");
-          Date invalidityTime = (revInvTime == 0) ? null : new Date(1000 * revInvTime);
-          revInfo = new CertRevInfoWithSerial(id, new BigInteger(serial, 16), rs.getInt("RR"),
-              new Date(1000 * rs.getLong("RT")), invalidityTime);
-        } else {
-          revInfo = new CertRevInfoWithSerial(id, new BigInteger(serial, 16),
-              CrlReason.REMOVE_FROM_CRL.getCode(), new Date(1000 * rs.getLong("LUPDATE")), null);
-        }
-        ret.add(revInfo);
-      } catch (SQLException ex) {
-        throw new OperationException(DATABASE_FAILURE, datasource.translate(sql, ex).getMessage());
-      } finally {
-        datasource.releaseResources(null, rs);
-      }
-    } // end for
 
     return ret;
   } // method getCertsForDeltaCrl
@@ -1993,16 +2052,6 @@ public class CertStore {
     }
     return sql;
   } // method getSqlSuspendedSerials
-
-  private String getSqlDeltaCrlCacheIds(int numEntries) {
-    String sql = cacheSqlDeltaCrlCacheIds.get(numEntries);
-    if (sql == null) {
-      sql = datasource.buildSelectFirstSql(numEntries, "ID ASC",
-          "ID FROM DELTACRL_CACHE WHERE ID>? AND CA_ID=?");
-      cacheSqlDeltaCrlCacheIds.put(numEntries, sql);
-    }
-    return sql;
-  } // method getSqlDeltaCrlCacheIds
 
   private String getSqlRevokedCerts(int numEntries, boolean withEe) {
     LruCache<Integer, String> cache = withEe ? cacheSqlRevokedCertsWithEe : cacheSqlRevokedCerts;

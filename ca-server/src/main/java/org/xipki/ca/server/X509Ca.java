@@ -308,19 +308,11 @@ public class X509Ca implements Closeable {
           new Date(getScheduledCrlGenTimeNotAfter(now).getTime()
               + (intervals + control.getOverlapDays()) * MS_PER_DAY);
 
-      long maxIdOfDeltaCrlCache;
       try {
-        maxIdOfDeltaCrlCache = certstore.getMaxIdOfDeltaCrlCache(caIdent);
         generateCrl(createDeltaCrlNow, now, nextUpdate, CaAuditConstants.MSGID_ca_routine);
       } catch (Throwable th) {
         LogUtil.error(LOG, th);
         return;
-      }
-
-      try {
-        certstore.clearDeltaCrlCache(caIdent, maxIdOfDeltaCrlCache);
-      } catch (Throwable th) {
-        LogUtil.error(LOG, th, "could not clear DeltaCRLCache of CA " + caIdent);
       }
     } // method run0
 
@@ -723,18 +715,7 @@ public class X509Ca implements Closeable {
       Date nextUpdate = new Date(nearestScheduledIssueTime.getTime()
           + (intervals + control.getOverlapDays()) * MS_PER_DAY);
 
-      long maxIdOfDeltaCrlCache = certstore.getMaxIdOfDeltaCrlCache(caIdent);
-      X509CRLHolder crl = generateCrl(false, thisUpdate, nextUpdate, msgId);
-      if (crl == null) {
-        return null;
-      }
-
-      try {
-        certstore.clearDeltaCrlCache(caIdent, maxIdOfDeltaCrlCache);
-      } catch (Throwable th) {
-        LogUtil.error(LOG, th, "could not clear DeltaCRLCache of CA " + caIdent);
-      }
-      return crl;
+      return generateCrl(false, thisUpdate, nextUpdate, msgId);
     } finally {
       crlGenInProcess.set(false);
     }
@@ -772,8 +753,7 @@ public class X509Ca implements Closeable {
     }
 
     LOG.info("     START generateCrl: ca={}, deltaCRL={}, nextUpdate={}, baseCRLNumber={}",
-        caIdent.getName(), deltaCrl, nextUpdate,
-        deltaCrl ? baseCrlNumber.toString() : "-");
+        caIdent.getName(), deltaCrl, nextUpdate, deltaCrl ? baseCrlNumber : "-");
     event.addEventData(CaAuditConstants.NAME_crl_type, (deltaCrl ? "DELTA_CRL" : "FULL_CRL"));
 
     if (nextUpdate == null) {
@@ -804,36 +784,35 @@ public class X509Ca implements Closeable {
       final int numEntries = 100;
 
       // 10 minutes buffer
-      Date notExpireAt = new Date(thisUpdate.getTime() - 600L * MS_PER_SECOND);
-
-      long startId = 1;
+      Date notExpiredAt = new Date(thisUpdate.getTime() - 600L * MS_PER_SECOND);
 
       // we have to cache the serial entries to sort them
       List<CertRevInfoWithSerial> allRevInfos = new LinkedList<>();
 
-      List<CertRevInfoWithSerial> revInfos;
+      if (deltaCrl) {
+        allRevInfos = certstore.getCertsForDeltaCrl(caIdent, baseCrlNumber, notExpiredAt,
+            control.isOnlyContainsCaCerts(), control.isOnlyContainsUserCerts());
+      } else {
+        long startId = 1;
 
-      do {
-        if (deltaCrl) {
-          revInfos = certstore.getCertsForDeltaCrl(caIdent, startId, numEntries,
+        List<CertRevInfoWithSerial> revInfos;
+        do {
+          revInfos = certstore.getRevokedCerts(caIdent, notExpiredAt, startId, numEntries,
               control.isOnlyContainsCaCerts(), control.isOnlyContainsUserCerts());
-        } else {
-          revInfos = certstore.getRevokedCerts(caIdent, notExpireAt, startId, numEntries,
-              control.isOnlyContainsCaCerts(), control.isOnlyContainsUserCerts());
+          allRevInfos.addAll(revInfos);
+
+          long maxId = 1;
+          for (CertRevInfoWithSerial revInfo : revInfos) {
+            if (revInfo.getId() > maxId) {
+              maxId = revInfo.getId();
+            }
+          } // end for
+          startId = maxId + 1;
+        } while (revInfos.size() >= numEntries); // end do
+
+        if (revInfos != null) { // free the memory
+          revInfos.clear();
         }
-        allRevInfos.addAll(revInfos);
-
-        long maxId = 1;
-        for (CertRevInfoWithSerial revInfo : revInfos) {
-          if (revInfo.getId() > maxId) {
-            maxId = revInfo.getId();
-          }
-        } // end for
-        startId = maxId + 1;
-      } while (revInfos.size() >= numEntries); // end do
-
-      if (revInfos != null) { // free the memory
-        revInfos.clear();
       }
 
       // sort the list by SerialNumber ASC
@@ -1373,8 +1352,7 @@ public class X509Ca implements Closeable {
     CertWithRevocationInfo revokedCert = null;
 
     CertRevocationInfo revInfo = new CertRevocationInfo(reason, new Date(), invalidityTime);
-    revokedCert = certstore.revokeCert(caIdent, serialNumber, revInfo, force,
-        shouldPublishToDeltaCrlCache(), caIdNameMap);
+    revokedCert = certstore.revokeCert(caIdent, serialNumber, revInfo, force, caIdNameMap);
     if (revokedCert == null) {
       return null;
     }
@@ -1442,7 +1420,7 @@ public class X509Ca implements Closeable {
     }
 
     CertWithRevocationInfo revokedCert = certstore.revokeSuspendedCert(caIdent,
-        serialNumber, reason, shouldPublishToDeltaCrlCache(), caIdNameMap);
+        serialNumber, reason, caIdNameMap);
     if (revokedCert == null) {
       return null;
     }
@@ -1488,8 +1466,7 @@ public class X509Ca implements Closeable {
     LOG.info("     START unrevokeCertificate: ca={}, serialNumber={}", caIdent.getName(),
         hexSerial);
 
-    CertWithDbId unrevokedCert = certstore.unrevokeCert(caIdent, serialNumber, force,
-        shouldPublishToDeltaCrlCache(), caIdNameMap);
+    CertWithDbId unrevokedCert = certstore.unrevokeCert(caIdent, serialNumber, force, caIdNameMap);
     if (unrevokedCert == null) {
       return null;
     }
@@ -1523,16 +1500,6 @@ public class X509Ca implements Closeable {
 
     return unrevokedCert;
   } // doUnrevokeCertificate
-
-  private boolean shouldPublishToDeltaCrlCache() {
-    CrlControl control = caInfo.getCrlControl();
-    if (control == null) {
-      return false;
-    }
-
-    int deltaCrlInterval = control.getDeltaCrlIntervals();
-    return deltaCrlInterval != 0 && deltaCrlInterval < control.getFullCrlIntervals();
-  } // method shouldPublishToDeltaCrlCache
 
   public void revokeCa(CertRevocationInfo revocationInfo, String msgId)
       throws OperationException {
