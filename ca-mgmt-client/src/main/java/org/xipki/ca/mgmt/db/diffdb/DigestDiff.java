@@ -291,7 +291,7 @@ class DigestDiff {
           return DbType.XIPKI_CA_v4;
         } else if ("5".equals(dbSchemaVersion)) {
           return DbType.XIPKI_CA_v5;
-        } else if ("5".equals(dbSchemaVersion)) {
+        } else if ("6".equals(dbSchemaVersion)) {
           return DbType.XIPKI_CA_v6;
         } else {
           throw new IllegalArgumentException("unknown DBSCHEMA version " + dbSchemaVersion);

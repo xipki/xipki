@@ -315,13 +315,13 @@ public class CertStore {
         "THISUPDATE,CRL FROM CRL WHERE CA_ID=? AND CRL_NO=?");
 
     this.sqlSelectUnrevokedSn = datasource.buildSelectFirstSql(1,
-        "SELECT LUPDATE FROM CERT WHERE REV = 0 AND SN=?");
-    final String prefix = "SELECT SN,LUPDATE FROM CERT WHERE REV = 0 AND SN";
+        "LUPDATE FROM CERT WHERE REV=0 AND SN=?");
+    final String prefix = "SN,LUPDATE FROM CERT WHERE REV=0 AND SN";
     this.sqlSelectUnrevokedSn100 = buildArraySql(datasource, prefix, 100);
   } // constructor
 
   private static final String buildArraySql(DataSourceWrapper datasource, String prefix, int num) {
-    StringBuilder sb = new StringBuilder(prefix.length() + num * 3);
+    StringBuilder sb = new StringBuilder(prefix.length() + num * 2);
     sb.append(prefix).append(" IN (?");
     for (int i = 1; i < num; i++) {
       sb.append(",?");
