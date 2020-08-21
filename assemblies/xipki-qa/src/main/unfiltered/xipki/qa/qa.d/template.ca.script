@@ -105,8 +105,6 @@ ca:gen-rootca \
   --ca-cert-uri http://example.org/rootca1.der \
   --cmp-control "send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA:SM3withSM2" \
   --cmp-responder responder1 \
-  --duplicate-subject yes \
-  --duplicate-key yes \
   --validity-mode cutoff \
   --support-cmp yes --support-rest yes \
   --save-req yes
@@ -324,8 +322,6 @@ ca:ca-add \
   --ca-cert-uri http://example.org/subca1.der \
   --cmp-control "send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA:SM3withSM2" \
   --cmp-responder responder1 \
-  --duplicate-subject yes \
-  --duplicate-key yes \
   --support-cmp yes --support-rest yes \
   --save-req no \
   --revoke-suspended-control enabled=true,targetReason=cessationOfOperation,unchangedSince=15d \
@@ -403,8 +399,6 @@ ca:ca-add \
   --crl-control "update.mode=interval,fullcrl.intervals=7,overlap.days=3,interval.time=02:00,xipki.certset=false" \
   --scep-control "cacert.included=false,signercert.included=true,support.getcrl=true" \
   --cmp-responder responder1 \
-  --duplicate-subject yes \
-  --duplicate-key yes \
   --validity-mode lax \
   --support-cmp yes --support-rest yes --support-scep yes \
   --save-req yes \

@@ -285,8 +285,6 @@ if { $printUsage equals "true" } then {
     --ca-cert-uri http://example.org/subca1.der \
     --cmp-control $CMP_CONTROL \
     --cmp-responder responder1 \
-    --duplicate-subject yes \
-    --duplicate-key yes \
     --certchain output/rootca1.crt
 
   caqa:ca-check --name rootca1 \
@@ -299,8 +297,6 @@ if { $printUsage equals "true" } then {
     --ca-cert-uri http://example.org/rootca1.der \
     --cmp-control $CMP_CONTROL \
     --cmp-responder responder1 \
-    --duplicate-subject yes \
-    --duplicate-key yes \
     --validity-mode cutoff \
     --certchain NULL
 
@@ -319,8 +315,6 @@ if { $printUsage equals "true" } then {
     --ca-cert-uri http://example.org/subca1.der \
     --cmp-control $CMP_CONTROL \
     --cmp-responder responder1 \
-    --duplicate-subject yes \
-    --duplicate-key yes \
     --support-cmp yes --support-rest yes \
     --save-req no \
     --revoke-suspended-control enabled=true,targetReason=cessationOfOperation,unchangedSince=15d \
@@ -333,8 +327,6 @@ if { $printUsage equals "true" } then {
     --max-validity 8y \
     --ocsp-uri http://localhost:8080/ocsp/responder2 \
     --ca-cert-uri http://example.org/rootca1-2.der \
-    --duplicate-subject no \
-    --duplicate-key no \
     --validity-mode strict
 
   caqa:ca-check --name rootca1 \
@@ -348,8 +340,6 @@ if { $printUsage equals "true" } then {
     --ca-cert-uri http://example.org/rootca1-2.der \
     --cmp-control $CMP_CONTROL \
     --cmp-responder responder1 \
-    --duplicate-subject no \
-    --duplicate-key no \
     --validity-mode strict
 
   # for commands neg-gen-rootca
@@ -381,8 +371,6 @@ if { $printUsage equals "true" } then {
     --ca-cert-uri http://example.org/rootca1.der \
     --cmp-control $CMP_CONTROL \
     --cmp-responder responder1 \
-    --duplicate-subject yes \
-    --duplicate-key yes \
     --validity-mode cutoff
 
   ca:profile-rm -f rootca
@@ -402,8 +390,6 @@ if { $printUsage equals "true" } then {
     --ca-cert-uri http://example.org/rootca1.der \
     --cmp-control $CMP_CONTROL \
     --cmp-responder responder1 \
-    --duplicate-subject  yes \
-    --duplicate-key yes \
     --validity-mode cutoff
 
   echo "neg-ca-add: certchain does not match"
@@ -421,8 +407,6 @@ if { $printUsage equals "true" } then {
     --ca-cert-uri http://example.org/rootca1.der \
     --cmp-control $CMP_CONTROL \
     --cmp-responder responder1 \
-    --duplicate-subject  yes \
-    --duplicate-key yes \
     --validity-mode cutoff \
     --certchain output/subcawithcrl1.crt
 
@@ -440,8 +424,6 @@ if { $printUsage equals "true" } then {
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://example.org/rootca1.der \
     --cmp-responder responder1 \
-    --duplicate-subject  yes \
-    --duplicate-key yes \
     --validity-mode cutoff
 
   echo "neg-ca-add: CMP control name does not exist"
@@ -458,8 +440,6 @@ if { $printUsage equals "true" } then {
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://example.org/rootca1.der \
     --cmp-responder responder1 \
-    --duplicate-subject  yes \
-    --duplicate-key yes \
     --validity-mode cutoff
 
   echo "neg-ca-add: CRL signer name does not exist"
@@ -478,8 +458,6 @@ if { $printUsage equals "true" } then {
     --crl-signer crlsigner2 \
     --cmp-control $CMP_CONTROL \
     --cmp-responder responder1 \
-    --duplicate-subject  yes \
-    --duplicate-key yes \
     --validity-mode cutoff
 
   echo "neg-ca-add: signer name does not exist"
@@ -497,8 +475,6 @@ if { $printUsage equals "true" } then {
     --ca-cert-uri http://example.org/rootca1.der \
     --cmp-control $CMP_CONTROL \
     --cmp-responder responder2 \
-    --duplicate-subject  yes \
-    --duplicate-key yes \
     --validity-mode cutoff
 
   echo "#################################################################"
@@ -725,8 +701,6 @@ if { $printUsage equals "true" } then {
     --max-validity 8y \
     --ocsp-uri http://localhost:8080/ocsp/responder2 \
     --ca-cert-uri http://example.org/rootca1-2.der \
-    --duplicate-subject no \
-    --duplicate-key no \
     --validity-mode strict
 
   ca:ca-up --name rootca1 \
@@ -734,7 +708,5 @@ if { $printUsage equals "true" } then {
     --max-validity 10y \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://example.org/rootca1.der \
-    --duplicate-subject yes \
-    --duplicate-key yes \
     --validity-mode cutoff
 }
