@@ -17,7 +17,7 @@
 				"crlUris":[
 					"http://subcawithcrl.example.org/crl"
 				],
-				"delteCrlUris":[
+				"deltaCrlUris":[
 					"http://subcawithcrl.example.org/deltacrl"
 				],
 				"ocspUris":[
