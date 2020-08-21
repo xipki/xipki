@@ -89,7 +89,6 @@ import org.xipki.ca.certprofile.xijson.conf.ExtensionType.AdditionalInformation;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.AdmissionSyntax;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.AuthorityInfoAccess;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.AuthorityKeyIdentifier;
-import org.xipki.ca.certprofile.xijson.conf.ExtensionType.AuthorizationTemplate;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.BasicConstraints;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.BiometricInfo;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.CertificatePolicies;
@@ -161,8 +160,6 @@ public class XijsonCertprofile extends BaseCertprofile {
   private Set<GeneralNameMode> subjectAltNameModes;
 
   private Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> subjectInfoAccessModes;
-
-  private ExtensionValue authorizationTemplate;
 
   private BiometricInfoOption biometricInfo;
 
@@ -239,7 +236,6 @@ public class XijsonCertprofile extends BaseCertprofile {
     subjectToSubjectAltNameModes = null;
     subjectAltNameModes = null;
     subjectInfoAccessModes = null;
-    authorizationTemplate = null;
     biometricInfo = null;
     certDomain = null;
     certLevel = null;
@@ -504,9 +500,6 @@ public class XijsonCertprofile extends BaseCertprofile {
     // AuthorityKeyIdentifier
     initAuthorityKeyIdentifier(extnIds, extensions);
 
-    // AuthorizationTemplate
-    initAuthorizationTemplate(extnIds, extensions);
-
     // BasicConstrains
     initBasicConstraints(extnIds, extensions);
 
@@ -765,24 +758,6 @@ public class XijsonCertprofile extends BaseCertprofile {
       this.useIssuerAndSerialInAki = (extConf == null) ? false : extConf.isUseIssuerAndSerial();
     }
   } // method initAuthorityKeyIdentifier
-
-  private void initAuthorizationTemplate(Set<ASN1ObjectIdentifier> extnIds,
-      Map<String, ExtensionType> extensions)
-          throws CertprofileException {
-    ASN1ObjectIdentifier type = ObjectIdentifiers.Xipki.id_xipki_ext_authorizationTemplate;
-    if (extensionControls.containsKey(type)) {
-      extnIds.remove(type);
-      AuthorizationTemplate extConf = getExtension(type, extensions).getAuthorizationTemplate();
-      if (extConf != null) {
-        ASN1EncodableVector vec = new ASN1EncodableVector();
-        vec.add(new ASN1ObjectIdentifier(extConf.getType().getOid()));
-        vec.add(new DEROctetString(extConf.getAccessRights().getValue()));
-        ASN1Encodable extValue = new DERSequence(vec);
-        authorizationTemplate =
-            new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
-      }
-    }
-  } // method initAuthorizationTemplate
 
   private void initBasicConstraints(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions)
@@ -1736,14 +1711,6 @@ public class XijsonCertprofile extends BaseCertprofile {
       }
     }
 
-    // AuthorizationTemplate
-    type = ObjectIdentifiers.Xipki.id_xipki_ext_authorizationTemplate;
-    if (authorizationTemplate != null) {
-      if (occurences.remove(type)) {
-        values.addExtension(type, authorizationTemplate);
-      }
-    }
-
     // SMIME
     type = Extn.id_smimeCapabilities;
     if (smimeCapabilities != null) {
@@ -2100,10 +2067,6 @@ public class XijsonCertprofile extends BaseCertprofile {
   @Override
   public Set<GeneralNameMode> getSubjectAltNameModes() {
     return subjectAltNameModes;
-  }
-
-  public ExtensionValue getAuthorizationTemplate() {
-    return authorizationTemplate;
   }
 
   public BiometricInfoOption getBiometricInfo() {

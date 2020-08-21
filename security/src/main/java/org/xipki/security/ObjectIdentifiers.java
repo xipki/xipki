@@ -62,8 +62,7 @@ public class ObjectIdentifiers {
     public static final ASN1ObjectIdentifier id_xipki_ext_cmpRequestExtensions
         = id_xipki_ext.branch("2");
 
-    public static final ASN1ObjectIdentifier id_xipki_ext_authorizationTemplate
-        = id_xipki_ext.branch("3");
+    // deprecated id_xipki_ext_authorizationTemplate := id_xipki_ext {3}
 
     private static final ASN1ObjectIdentifier id_xipki_cmp = id_xipki.branch("2");
 
@@ -674,7 +673,6 @@ public class ObjectIdentifiers {
           "jurisdictionOfIncorporationLocalityName");
 
       oidNameMap.put(Xipki.id_xipki_ext_cmpRequestExtensions, "xipki-cmpRequestExtensions");
-      oidNameMap.put(Xipki.id_xipki_ext_authorizationTemplate, "xipki-authorizationTemplate");
 
       oidNameMap.put(Extn.id_pkix_ocsp_extendedRevoke, "pkix-ocsp-extendedRevoke");
       oidNameMap.put(Extn.id_pkix_ocsp_prefSigAlgs, "pkix-ocsp-prefSigAlgs");

@@ -106,9 +106,6 @@ public class ExtensionType extends ValidatableConf {
   private AuthorityKeyIdentifier authorityKeyIdentifier;
 
   @JSONField(ordinal = 5)
-  private AuthorizationTemplate authorizationTemplate;
-
-  @JSONField(ordinal = 5)
   private BasicConstraints basicConstrains;
 
   @JSONField(ordinal = 5)
@@ -251,14 +248,6 @@ public class ExtensionType extends ValidatableConf {
 
   public void setAuthorityKeyIdentifier(AuthorityKeyIdentifier authorityKeyIdentifier) {
     this.authorityKeyIdentifier = authorityKeyIdentifier;
-  }
-
-  public AuthorizationTemplate getAuthorizationTemplate() {
-    return authorizationTemplate;
-  }
-
-  public void setAuthorizationTemplate(AuthorizationTemplate authorizationTemplate) {
-    this.authorizationTemplate = authorizationTemplate;
   }
 
   public BasicConstraints getBasicConstrains() {
@@ -454,7 +443,6 @@ public class ExtensionType extends ValidatableConf {
     validate(admissionSyntax);
     validate(authorityInfoAccess);
     validate(authorityKeyIdentifier);
-    validate(authorizationTemplate);
     validate(basicConstrains);
     validate(biometricInfo);
     validate(certificatePolicies);
@@ -741,41 +729,6 @@ public class ExtensionType extends ValidatableConf {
     }
 
   } // class AuthorityKeyIdentifier
-
-  public static class AuthorizationTemplate extends ValidatableConf {
-
-    @JSONField(ordinal = 1)
-    private DescribableOid type;
-
-    @JSONField(ordinal = 2)
-    private DescribableBinary accessRights;
-
-    public DescribableOid getType() {
-      return type;
-    }
-
-    public void setType(DescribableOid type) {
-      this.type = type;
-    }
-
-    public DescribableBinary getAccessRights() {
-      return accessRights;
-    }
-
-    public void setAccessRights(DescribableBinary accessRights) {
-      this.accessRights = accessRights;
-    }
-
-    @Override
-    public void validate()
-        throws InvalidConfException {
-      notNull(type, "type");
-      validate(type);
-      notNull(accessRights, "accessRights");
-      validate(accessRights);
-    }
-
-  } // class AuthorizationTemplate
 
   public static class BasicConstraints extends ValidatableConf {
 

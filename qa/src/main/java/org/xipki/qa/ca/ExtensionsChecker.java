@@ -109,7 +109,6 @@ import org.xipki.ca.certprofile.xijson.conf.CertificatePolicyInformationType.Pol
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableInt;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.AdditionalInformation;
-import org.xipki.ca.certprofile.xijson.conf.ExtensionType.AuthorizationTemplate;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.CertificatePolicies;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.ExtnSyntax;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.InhibitAnyPolicy;
@@ -189,8 +188,6 @@ public class ExtensionsChecker {
   private ASN1ObjectIdentifier validityModelId;
 
   private QcStatements qcStatements;
-
-  private AuthorizationTemplate authorizationTemplate;
 
   private TlsFeature tlsFeature;
 
@@ -273,12 +270,6 @@ public class ExtensionsChecker {
     type = Extn.id_pe_tlsfeature;
     if (extensionControls.containsKey(type)) {
       this.tlsFeature = extensions.get(type.getId()).getTlsFeature();
-    }
-
-    // AuthorizationTemplate
-    type = ObjectIdentifiers.Xipki.id_xipki_ext_authorizationTemplate;
-    if (extensionControls.containsKey(type)) {
-      this.authorizationTemplate = extensions.get(type.getId()).getAuthorizationTemplate();
     }
 
     // SMIMECapabilities
@@ -468,9 +459,6 @@ public class ExtensionsChecker {
         } else if (Extn.id_pe_tlsfeature.equals(oid)) {
           // tlsFeature
           checkExtnTlsFeature(failureMsg, extnValue, requestedExtns, extnControl);
-        } else if (ObjectIdentifiers.Xipki.id_xipki_ext_authorizationTemplate.equals(oid)) {
-          // authorizationTemplate
-          checkExtnAuthorizationTemplate(failureMsg, extnValue, requestedExtns, extnControl);
         } else if (Extn.id_smimeCapabilities.equals(oid)) {
           byte[] expected = smimeCapabilities.getValue();
           if (!Arrays.equals(expected, extnValue)) {
@@ -2281,36 +2269,6 @@ public class ExtensionsChecker {
       }
     }
   } // method checkExtnBiometricInfo
-
-  private void checkExtnAuthorizationTemplate(StringBuilder failureMsg,
-      byte[] extensionValue, Extensions requestedExtns, ExtensionControl extControl) {
-    AuthorizationTemplate conf = authorizationTemplate;
-    if (conf == null) {
-      checkConstantExtnValue(ObjectIdentifiers.Xipki.id_xipki_ext_authorizationTemplate,
-          failureMsg, extensionValue, requestedExtns, extControl);
-
-      byte[] expected = getExpectedExtValue(
-          ObjectIdentifiers.Xipki.id_xipki_ext_authorizationTemplate, requestedExtns, extControl);
-      if (!Arrays.equals(expected, extensionValue)) {
-        addViolation(failureMsg, "extension values", hex(extensionValue),
-            (expected == null) ? "not present" : hex(expected));
-      }
-      return;
-    }
-
-    ASN1Sequence seq = ASN1Sequence.getInstance(extensionValue);
-    ASN1ObjectIdentifier type = ASN1ObjectIdentifier.getInstance(seq.getObjectAt(0));
-    ASN1OctetString accessRights = DEROctetString.getInstance(seq.getObjectAt(1));
-    if (!conf.getType().getOid().equals(type.getId())) {
-      addViolation(failureMsg, "type", type.getId(), conf.getType());
-    }
-
-    byte[] isRights = accessRights.getOctets();
-    if (!Arrays.equals(conf.getAccessRights().getValue(), isRights)) {
-      addViolation(failureMsg, "accessRights",
-          hex(isRights), hex(conf.getAccessRights().getValue()));
-    }
-  } // method checkExtnAuthorizationTemplate
 
   private void checkScts(StringBuilder failureMsg,
       byte[] extensionValue, ExtensionControl extControl) {

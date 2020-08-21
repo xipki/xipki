@@ -512,24 +512,6 @@
 		}
 	},{
 		"type":{
-			"oid":"1.3.6.1.4.1.45522.1.3",
-			"description":"xipki-authorizationTemplate"
-		},
-		"critical":false,
-		"required":true,
-		"permittedInRequest":false,
-		"authorizationTemplate":{
-			"type":{
-				"oid":"1.2.3.4.5",
-				"description":"dummy type"
-			},
-			"accessRights":{
-				"value":"AQIDBA==",
-				"description":"dummy access rights"
-			}
-		}
-	},{
-		"type":{
 			"oid":"2.5.29.17",
 			"description":"subjectAlternativeName"
 		},

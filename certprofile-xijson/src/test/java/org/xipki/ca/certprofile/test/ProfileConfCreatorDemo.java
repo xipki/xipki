@@ -66,7 +66,6 @@ import org.xipki.ca.certprofile.xijson.conf.ExtensionType.AdmissionSyntax;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.AdmissionsType;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.AuthorityInfoAccess;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.AuthorityKeyIdentifier;
-import org.xipki.ca.certprofile.xijson.conf.ExtensionType.AuthorizationTemplate;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.BasicConstraints;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.BiometricInfo;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType.BiometricTypeType;
@@ -1486,11 +1485,6 @@ public class ProfileConfCreatorDemo {
     list.add(createExtension(Extension.biometricInfo, true, false));
     last(list).setBiometricInfo(createBiometricInfo());
 
-    // authorizationTemplate
-    list.add(createExtension(
-              ObjectIdentifiers.Xipki.id_xipki_ext_authorizationTemplate, true, false));
-    last(list).setAuthorizationTemplate(createAuthorizationTemplate());
-
     // SubjectAltName
     list.add(createExtension(Extension.subjectAlternativeName, true, true));
     GeneralNameType gn = new GeneralNameType();
@@ -2517,17 +2511,6 @@ public class ProfileConfCreatorDemo {
     extValue.setIncludeSourceDataUri(TripleState.required);
     return extValue;
   } // method createBiometricInfo
-
-  private static AuthorizationTemplate createAuthorizationTemplate() {
-    AuthorizationTemplate extValue = new AuthorizationTemplate();
-    extValue.setType(createOidType(new ASN1ObjectIdentifier("1.2.3.4.5"), "dummy type"));
-    DescribableBinary accessRights = new DescribableBinary();
-    accessRights.setDescription("dummy access rights");
-    accessRights.setValue(new byte[]{1, 2, 3, 4});
-    extValue.setAccessRights(accessRights);
-
-    return extValue;
-  } // method createAuthorizationTemplate
 
   private static ValidityModel createValidityModel(DescribableOid modelId) {
     ValidityModel extValue = new ValidityModel();
