@@ -55,13 +55,9 @@ public class ObjectIdentifiers {
 
   public static final class Xipki {
 
-    private static final ASN1ObjectIdentifier id_xipki_ext = id_xipki.branch("1");
-
+    // id_xipki_ext := id_xipki ext{1}
     // deprecated: id_xipk_ext_crlCertset := id_xipki_ext {1}
-
-    public static final ASN1ObjectIdentifier id_xipki_ext_cmpRequestExtensions
-        = id_xipki_ext.branch("2");
-
+    // deprecated id_xipki_ext_cmpRequestExtensions := id_xipki_ext {2}
     // deprecated id_xipki_ext_authorizationTemplate := id_xipki_ext {3}
 
     private static final ASN1ObjectIdentifier id_xipki_cmp = id_xipki.branch("2");
@@ -671,8 +667,6 @@ public class ObjectIdentifiers {
           "jurisdictionOfIncorporationStateOrProvinceName");
       oidNameMap.put(DN.jurisdictionOfIncorporationLocalityName,
           "jurisdictionOfIncorporationLocalityName");
-
-      oidNameMap.put(Xipki.id_xipki_ext_cmpRequestExtensions, "xipki-cmpRequestExtensions");
 
       oidNameMap.put(Extn.id_pkix_ocsp_extendedRevoke, "pkix-ocsp-extendedRevoke");
       oidNameMap.put(Extn.id_pkix_ocsp_prefSigAlgs, "pkix-ocsp-prefSigAlgs");

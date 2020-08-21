@@ -92,7 +92,6 @@ import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.EdECConstants;
-import org.xipki.security.ExtensionExistence;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.NoIdleSignerException;
@@ -108,7 +107,6 @@ import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.Completers;
-import org.xipki.shell.Completers.ExtensionNameCompleter;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.XiAction;
 import org.xipki.util.Args;
@@ -448,17 +446,6 @@ public class Actions {
     @Completion(FileCompleter.class)
     private String extraExtensionsFile;
 
-    @Option(name = "--need-extension", multiValued = true,
-        description = "types (name or OID) of extension that must be contained in the certificate")
-    @Completion(Completers.ExtensionNameCompleter.class)
-    private List<String> needExtensionTypes;
-
-    @Option(name = "--want-extension", multiValued = true,
-        description = "types (name or OID) of extension that should be contained in the "
-                        + "certificate if possible")
-    @Completion(Completers.ExtensionNameCompleter.class)
-    private List<String> wantExtensionTypes;
-
     /**
      * Gets the signer for the give signatureAlgoControl.
      * @param signatureAlgoControl
@@ -502,18 +489,6 @@ public class Actions {
         hashAlgo = hashAlgo.replaceAll("-", "");
       }
 
-      if (needExtensionTypes != null) {
-        needExtensionTypes = resolveExtensionTypes(needExtensionTypes);
-      } else {
-        needExtensionTypes = new LinkedList<>();
-      }
-
-      if (wantExtensionTypes != null) {
-        wantExtensionTypes = resolveExtensionTypes(wantExtensionTypes);
-      } else {
-        wantExtensionTypes = new LinkedList<>();
-      }
-
       if (extkeyusages != null) {
         List<String> list = new ArrayList<>(extkeyusages.size());
         for (String m : extkeyusages) {
@@ -538,7 +513,6 @@ public class Actions {
       if (extnValue != null) {
         ASN1ObjectIdentifier oid = Extension.subjectAlternativeName;
         extensions.add(new Extension(oid, false, extnValue));
-        needExtensionTypes.add(oid.getId());
       }
 
       // SubjectInfoAccess
@@ -548,7 +522,6 @@ public class Actions {
       if (extnValue != null) {
         ASN1ObjectIdentifier oid = Extension.subjectInfoAccess;
         extensions.add(new Extension(oid, false, extnValue));
-        needExtensionTypes.add(oid.getId());
       }
 
       // Keyusage
@@ -560,7 +533,6 @@ public class Actions {
         org.bouncycastle.asn1.x509.KeyUsage extValue = X509Util.createKeyUsage(usages);
         ASN1ObjectIdentifier extType = Extension.keyUsage;
         extensions.add(new Extension(extType, false, extValue.getEncoded()));
-        needExtensionTypes.add(extType.getId());
       }
 
       // ExtendedKeyusage
@@ -569,7 +541,6 @@ public class Actions {
             textToAsn1ObjectIdentifers(extkeyusages));
         ASN1ObjectIdentifier extType = Extension.extendedKeyUsage;
         extensions.add(new Extension(extType, false, extValue.getEncoded()));
-        needExtensionTypes.add(extType.getId());
       }
 
       // QcEuLimitValue
@@ -605,7 +576,6 @@ public class Actions {
         ASN1ObjectIdentifier extType = Extension.qCStatements;
         ASN1Sequence extValue = new DERSequence(vec);
         extensions.add(new Extension(extType, false, extValue.getEncoded()));
-        needExtensionTypes.add(extType.getId());
       }
 
       // biometricInfo
@@ -634,7 +604,6 @@ public class Actions {
         ASN1ObjectIdentifier extType = Extension.biometricInfo;
         ASN1Sequence extValue = new DERSequence(vec);
         extensions.add(new Extension(extType, false, extValue.getEncoded()));
-        needExtensionTypes.add(extType.getId());
       } else if (biometricType == null && biometricHashAlgo == null && biometricFile == null) {
         // Do nothing
       } else {
@@ -661,17 +630,6 @@ public class Actions {
 
       for (Extension addExt : getAdditionalExtensions()) {
         extensions.add(addExt);
-      }
-
-      needExtensionTypes.addAll(getAdditionalNeedExtensionTypes());
-      wantExtensionTypes.addAll(getAdditionalWantExtensionTypes());
-
-      if (isNotEmpty(needExtensionTypes) || isNotEmpty(wantExtensionTypes)) {
-        ExtensionExistence ee = new ExtensionExistence(
-            textToAsn1ObjectIdentifers(needExtensionTypes),
-            textToAsn1ObjectIdentifers(wantExtensionTypes));
-        extensions.add(new Extension(ObjectIdentifiers.Xipki.id_xipki_ext_cmpRequestExtensions,
-            false, ee.toASN1Primitive().getEncoded()));
       }
 
       ConcurrentContentSigner signer = getSigner(new SignatureAlgoControl(rsaMgf1, dsaPlain, gm));
@@ -810,22 +768,6 @@ public class Actions {
         signer.requiteSigner(signer0);
       }
     } // method generateRequest
-
-    private List<String> resolveExtensionTypes(List<String> types)
-        throws IllegalCmdParamException {
-      List<String> list = new ArrayList<>(types.size());
-      for (String m : types) {
-        String id = ExtensionNameCompleter.getIdForExtensionName(m);
-        if (id == null) {
-          try {
-            id = new ASN1ObjectIdentifier(m).getId();
-          } catch (Exception ex) {
-            throw new IllegalCmdParamException("invalid extension type " + m);
-          }
-        }
-      }
-      return list;
-    } // method resolveExtensionTypes
 
   } // class CsrGenAction
 

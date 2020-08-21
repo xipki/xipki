@@ -130,7 +130,6 @@ import org.xipki.ca.certprofile.xijson.conf.QcStatementType.QcStatementValueType
 import org.xipki.ca.certprofile.xijson.conf.QcStatementType.Range2Type;
 import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
 import org.xipki.qa.ValidationIssue;
-import org.xipki.security.ExtensionExistence;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
@@ -598,38 +597,21 @@ public class ExtensionsChecker {
       }
     }
 
-    Set<ASN1ObjectIdentifier> wantedExtensionTypes = new HashSet<>();
-
-    if (requestedExtns != null) {
-      Extension reqExtension = requestedExtns.getExtension(
-          ObjectIdentifiers.Xipki.id_xipki_ext_cmpRequestExtensions);
-      if (reqExtension != null) {
-        ExtensionExistence ee = ExtensionExistence.getInstance(reqExtension.getParsedValue());
-        types.addAll(ee.getNeedExtensions());
-        wantedExtensionTypes.addAll(ee.getWantExtensions());
-      }
-    }
-
-    if (isEmpty(wantedExtensionTypes)) {
-      return types;
-    }
-
-    // wanted extension types
     // Authority key identifier
     ASN1ObjectIdentifier type = Extension.authorityKeyIdentifier;
-    if (wantedExtensionTypes.contains(type)) {
-      types.add(type);
+    if (extensionControls.containsKey(type)) {
+      addIfNotIn(types, type);
     }
 
-    // Subject key identifier
+    // Subject key identifier, Subject Ke
     type = Extension.subjectKeyIdentifier;
-    if (wantedExtensionTypes.contains(type)) {
-      types.add(type);
+    if (extensionControls.containsKey(type)) {
+      addIfNotIn(types, type);
     }
 
     // KeyUsage
     type = Extension.keyUsage;
-    if (wantedExtensionTypes.contains(type)) {
+    if (extensionControls.containsKey(type)) {
       boolean required = false;
       if (requestedExtns != null && requestedExtns.getExtension(type) != null) {
         required = true;
@@ -643,68 +625,68 @@ public class ExtensionsChecker {
       }
 
       if (required) {
-        types.add(type);
+        addIfNotIn(types, type);
       }
     }
 
     // CertificatePolicies
     type = Extension.certificatePolicies;
-    if (wantedExtensionTypes.contains(type)) {
+    if (extensionControls.containsKey(type)) {
       if (certificatePolicies != null) {
-        types.add(type);
+        addIfNotIn(types, type);
       }
     }
 
     // Policy Mappings
     type = Extension.policyMappings;
-    if (wantedExtensionTypes.contains(type)) {
+    if (extensionControls.containsKey(type)) {
       if (policyMappings != null) {
-        types.add(type);
+        addIfNotIn(types, type);
       }
     }
 
     // SubjectAltNames
     type = Extension.subjectAlternativeName;
-    if (wantedExtensionTypes.contains(type)) {
+    if (extensionControls.containsKey(type)) {
       if (requestedExtns != null && requestedExtns.getExtension(type) != null) {
-        types.add(type);
+        addIfNotIn(types, type);
       }
     }
 
     // IssuerAltName
     type = Extension.issuerAlternativeName;
-    if (wantedExtensionTypes.contains(type)) {
+    if (extensionControls.containsKey(type)) {
       if (cert.getTBSCertificate().getExtensions().getExtension(Extension.subjectAlternativeName)
           != null) {
-        types.add(type);
+        addIfNotIn(types, type);
       }
     }
 
     // BasicConstraints
     type = Extension.basicConstraints;
-    if (wantedExtensionTypes.contains(type)) {
-      types.add(type);
+    if (extensionControls.containsKey(type)) {
+      addIfNotIn(types, type);
     }
 
     // Name Constraints
     type = Extension.nameConstraints;
-    if (wantedExtensionTypes.contains(type)) {
+    if (extensionControls.containsKey(type)) {
       if (nameConstraints != null) {
-        types.add(type);
+        addIfNotIn(types, type);
       }
     }
 
     // PolicyConstrains
     type = Extension.policyConstraints;
-    if (wantedExtensionTypes.contains(type)) {
+    if (extensionControls.containsKey(type)) {
       if (policyConstraints != null) {
-        types.add(type);
+        addIfNotIn(types, type);
       }
     }
 
     // ExtendedKeyUsage
     type = Extension.extendedKeyUsage;
-    if (wantedExtensionTypes.contains(type)) {
+    if (extensionControls.containsKey(type)) {
       boolean required = false;
       if (requestedExtns != null && requestedExtns.getExtension(type) != null) {
         required = true;
@@ -718,76 +700,81 @@ public class ExtensionsChecker {
       }
 
       if (required) {
-        types.add(type);
+        addIfNotIn(types, type);
       }
     }
 
     // CRLDistributionPoints
     type = Extension.cRLDistributionPoints;
-    if (wantedExtensionTypes.contains(type)) {
+    if (extensionControls.containsKey(type)) {
       if (issuerInfo.getCrlUrls() != null) {
-        types.add(type);
+        addIfNotIn(types, type);
       }
     }
 
     // Inhibit anyPolicy
     type = Extension.inhibitAnyPolicy;
-    if (wantedExtensionTypes.contains(type)) {
+    if (extensionControls.containsKey(type)) {
       if (inhibitAnyPolicy != null) {
-        types.add(type);
+        addIfNotIn(types, type);
       }
     }
 
     // FreshestCRL
     type = Extension.freshestCRL;
-    if (wantedExtensionTypes.contains(type)) {
+    if (extensionControls.containsKey(type)) {
       if (issuerInfo.getDeltaCrlUrls() != null) {
-        types.add(type);
+        addIfNotIn(types, type);
       }
     }
 
     // AuthorityInfoAccess
     type = Extension.authorityInfoAccess;
-    if (wantedExtensionTypes.contains(type)) {
+    if (extensionControls.containsKey(type)) {
       if (issuerInfo.getOcspUrls() != null) {
-        types.add(type);
+        addIfNotIn(types, type);
       }
     }
 
     // SubjectInfoAccess
     type = Extension.subjectInfoAccess;
-    if (wantedExtensionTypes.contains(type)) {
+    if (extensionControls.containsKey(type)) {
       if (requestedExtns != null && requestedExtns.getExtension(type) != null) {
-        types.add(type);
+        addIfNotIn(types, type);
       }
     }
 
     // Admission
     type = Extn.id_extension_admission;
-    if (wantedExtensionTypes.contains(type)) {
+    if (extensionControls.containsKey(type)) {
       if (certprofile.getAdmission() != null) {
-        types.add(type);
+        addIfNotIn(types, type);
       }
     }
 
     // ocsp-nocheck
     type = Extn.id_extension_pkix_ocsp_nocheck;
-    if (wantedExtensionTypes.contains(type)) {
-      types.add(type);
+    if (extensionControls.containsKey(type)) {
+      addIfNotIn(types, type);
     }
 
-    wantedExtensionTypes.removeAll(types);
-
-    for (ASN1ObjectIdentifier oid : wantedExtensionTypes) {
-      if (requestedExtns != null && requestedExtns.getExtension(oid) != null) {
-        if (constantExtensions.containsKey(oid)) {
-          types.add(oid);
+    if (requestedExtns != null) {
+      ASN1ObjectIdentifier[] extOids = requestedExtns.getExtensionOIDs();
+      for (ASN1ObjectIdentifier oid : extOids) {
+        if (extensionControls.containsKey(oid)) {
+          addIfNotIn(types, oid);
         }
       }
     }
 
     return types;
   } // method getExensionTypes
+
+  private static void addIfNotIn(Set<ASN1ObjectIdentifier> set, ASN1ObjectIdentifier oid) {
+    if (!set.contains(oid)) {
+      set.add(oid);
+    }
+  }
 
   private ValidationIssue createExtensionIssue(ASN1ObjectIdentifier extId) {
     String extName = ObjectIdentifiers.getName(extId);
@@ -1811,7 +1798,7 @@ public class ExtensionsChecker {
         }
       }
 
-      Set<String> expCrlUrls = issuerInfo.getCrlUrls();
+      Set<String> expCrlUrls = issuerInfo.getDeltaCrlUrls();
       Set<String> diffs = strInBnotInA(expCrlUrls, isCrlUrls);
       if (isNotEmpty(diffs)) {
         failureMsg.append("deltaCRL URLs ").append(diffs).append(" are present but not expected; ");

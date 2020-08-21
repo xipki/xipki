@@ -97,7 +97,6 @@ import org.xipki.cmpclient.PkiErrorException;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.CrlReason;
-import org.xipki.security.ExtensionExistence;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
@@ -1243,17 +1242,6 @@ public class Actions {
     @Option(name = "--biometric-uri", description = "Biometric source data URI")
     private String biometricUri;
 
-    @Option(name = "--need-extension", multiValued = true,
-        description = "type (name or OID) of extension that must be contained in the certificate")
-    @Completion(Completers.ExtensionNameCompleter.class)
-    private List<String> needExtensionTypes;
-
-    @Option(name = "--want-extension", multiValued = true,
-        description = "type (name or OID) of extension that should be contained in the"
-            + " certificate if possible")
-    @Completion(Completers.ExtensionNameCompleter.class)
-    private List<String> wantExtensionTypes;
-
     @Option(name = "--dateOfBirth", description = "Date of birth YYYYMMdd in subject")
     private String dateOfBirth;
 
@@ -1288,18 +1276,6 @@ public class Actions {
         throws Exception {
       // CHECKSTYLE:SKIP
       EnrollCertRequest.EnrollType type = getCmpReqType();
-
-      if (needExtensionTypes != null) {
-        needExtensionTypes = resolveExtensionTypes(needExtensionTypes);
-      } else {
-        needExtensionTypes = new LinkedList<>();
-      }
-
-      if (wantExtensionTypes != null) {
-        wantExtensionTypes = resolveExtensionTypes(wantExtensionTypes);
-      } else {
-        wantExtensionTypes = new LinkedList<>();
-      }
 
       if (extkeyusages != null) {
         List<String> list = new ArrayList<>(extkeyusages.size());
@@ -1381,13 +1357,11 @@ public class Actions {
       List<Extension> extensions = new LinkedList<>();
       if (isNotEmpty(subjectAltNames)) {
         extensions.add(X509Util.createExtnSubjectAltName(subjectAltNames, false));
-        needExtensionTypes.add(Extension.subjectAlternativeName.getId());
       }
 
       // SubjectInfoAccess
       if (isNotEmpty(subjectInfoAccesses)) {
         extensions.add(X509Util.createExtnSubjectInfoAccess(subjectInfoAccesses, false));
-        needExtensionTypes.add(Extension.subjectInfoAccess.getId());
       }
 
       // Keyusage
@@ -1399,7 +1373,6 @@ public class Actions {
         org.bouncycastle.asn1.x509.KeyUsage extValue = X509Util.createKeyUsage(usages);
         ASN1ObjectIdentifier extType = Extension.keyUsage;
         extensions.add(new Extension(extType, false, extValue.getEncoded()));
-        needExtensionTypes.add(extType.getId());
       }
 
       // ExtendedKeyusage
@@ -1408,7 +1381,6 @@ public class Actions {
             textToAsn1ObjectIdentifers(extkeyusages));
         ASN1ObjectIdentifier extType = Extension.extendedKeyUsage;
         extensions.add(new Extension(extType, false, extValue.getEncoded()));
-        needExtensionTypes.add(extType.getId());
       }
 
       // QcEuLimitValue
@@ -1444,7 +1416,6 @@ public class Actions {
         ASN1ObjectIdentifier extType = Extension.qCStatements;
         ASN1Sequence extValue = new DERSequence(vec);
         extensions.add(new Extension(extType, false, extValue.getEncoded()));
-        needExtensionTypes.add(extType.getId());
       }
 
       // biometricInfo
@@ -1473,7 +1444,6 @@ public class Actions {
         ASN1ObjectIdentifier extType = Extension.biometricInfo;
         ASN1Sequence extValue = new DERSequence(vec);
         extensions.add(new Extension(extType, false, extValue.getEncoded()));
-        needExtensionTypes.add(extType.getId());
       } else if (biometricType == null && biometricHashAlgo == null && biometricFile == null) {
         // Do nothing
       } else {
@@ -1494,17 +1464,8 @@ public class Actions {
             byte[] encodedExtnValue =
                 m.getConstant().toASN1Encodable().toASN1Primitive().getEncoded(ASN1Encoding.DER);
             extensions.add(new Extension(new ASN1ObjectIdentifier(id), false, encodedExtnValue));
-            needExtensionTypes.add(id);
           }
         }
-      }
-
-      if (isNotEmpty(needExtensionTypes) || isNotEmpty(wantExtensionTypes)) {
-        ExtensionExistence ee = new ExtensionExistence(
-            textToAsn1ObjectIdentifers(needExtensionTypes),
-            textToAsn1ObjectIdentifers(wantExtensionTypes));
-        extensions.add(new Extension(ObjectIdentifiers.Xipki.id_xipki_ext_cmpRequestExtensions,
-                          false, ee.toASN1Primitive().getEncoded()));
       }
 
       if (isNotEmpty(extensions)) {
@@ -1547,22 +1508,6 @@ public class Actions {
       }
       return ret;
     } // method textToAsn1ObjectIdentifers
-
-    static List<String> resolveExtensionTypes(List<String> types)
-        throws IllegalCmdParamException {
-      List<String> list = new ArrayList<>(types.size());
-      for (String m : types) {
-        String id = Completers.ExtensionNameCompleter.getIdForExtensionName(m);
-        if (id == null) {
-          try {
-            id = new ASN1ObjectIdentifier(m).getId();
-          } catch (Exception ex) {
-            throw new IllegalCmdParamException("invalid extension type " + m);
-          }
-        }
-      }
-      return list;
-    } // method resolveExtensionTypes
 
   } // class EnrollAction
 
@@ -1759,17 +1704,6 @@ public class Actions {
     @Option(name = "--oldcert-serial", description = "serial number of the old certificate")
     private String oldCSerialNumber;
 
-    @Option(name = "--need-extension", multiValued = true,
-        description = "type (name or OID) of extension that must be contained in the certificate")
-    @Completion(Completers.ExtensionNameCompleter.class)
-    private List<String> needExtensionTypes;
-
-    @Option(name = "--want-extension", multiValued = true,
-        description = "type (name or OID) of extension that should be contained in the"
-            + " certificate if possible")
-    @Completion(Completers.ExtensionNameCompleter.class)
-    private List<String> wantExtensionTypes;
-
     protected abstract SubjectPublicKeyInfo getPublicKey()
         throws Exception;
 
@@ -1793,18 +1727,6 @@ public class Actions {
         }
       }
 
-      if (needExtensionTypes != null) {
-        needExtensionTypes = EnrollAction.resolveExtensionTypes(needExtensionTypes);
-      } else {
-        needExtensionTypes = new LinkedList<>();
-      }
-
-      if (wantExtensionTypes != null) {
-        wantExtensionTypes = EnrollAction.resolveExtensionTypes(wantExtensionTypes);
-      } else {
-        wantExtensionTypes = new LinkedList<>();
-      }
-
       CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
 
       if (subject != null && !subject.isEmpty()) {
@@ -1826,14 +1748,6 @@ public class Actions {
       }
 
       List<Extension> extensions = new LinkedList<>();
-
-      if (isNotEmpty(needExtensionTypes) || isNotEmpty(wantExtensionTypes)) {
-        ExtensionExistence ee = new ExtensionExistence(
-            EnrollAction.textToAsn1ObjectIdentifers(needExtensionTypes),
-            EnrollAction.textToAsn1ObjectIdentifers(wantExtensionTypes));
-        extensions.add(new Extension(ObjectIdentifiers.Xipki.id_xipki_ext_cmpRequestExtensions,
-                          false, ee.toASN1Primitive().getEncoded()));
-      }
 
       if (isNotEmpty(extensions)) {
         Extensions asn1Extensions = new Extensions(extensions.toArray(new Extension[0]));

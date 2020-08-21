@@ -44,15 +44,13 @@ xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --p12 output/ocsp1.p12 --password 1234 \
   --outform $OUTFORM \
   --out output/ocsp1.csr \
-  --subject "CN=ocsp1,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
-  --need-extension authorityInfoAccess
+  --subject "CN=ocsp1,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
 
 xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --p12 output/ocsp1.p12 --password 1234 \
   --outform $OUTFORM \
   --out output/ocsp1.crt --profile OCSP \
-  --subject "CN=ocsp1,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
-  --need-extension authorityInfoAccess
+  --subject "CN=ocsp1,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
 
 xi:update-cert-p12 --p12 output/ocsp1.p12 --password 1234 \
   --cert output/ocsp1.crt \
@@ -66,15 +64,13 @@ xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --p12 output/ocsp2.p12 --password 1234 \
   --outform $OUTFORM \
   --out output/ocsp2.csr \
-  --subject "CN=ocsp2,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
-  --need-extension authorityInfoAccess
+  --subject "CN=ocsp2,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
 
 xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --p12 output/ocsp2.p12 --password 1234 \
   --outform $OUTFORM \
   --out output/ocsp2.crt --profile OCSP \
-  --subject "CN=ocsp2,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
-  --need-extension authorityInfoAccess
+  --subject "CN=ocsp2,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
 
 xi:update-cert-p12 --p12 output/ocsp2.p12 --password 1234 \
   --cert output/ocsp2.crt --ca-cert output/subcawithcrl1.crt \
@@ -154,15 +150,13 @@ xi:update-cert-p12 --p12 output/multi-valued-rdn1.p12 --password 1234 \
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --p12 output/qc1.p12 --password 1234 \
   --out output/qc1.csr \
-  --subject "CN=qc1,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
-  --need-extension authorityInfoAccess
+  --subject "CN=qc1,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
 
 xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --p12 output/qc1.p12 --password 1234 \
   --outform $OUTFORM \
   --out output/qc1.crt --profile qc \
-  --subject "CN=qc1,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
-  --need-extension authorityInfoAccess
+  --subject "CN=qc1,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
 
 xi:update-cert-p12 --p12 output/qc1.p12 --password 1234 \
   --cert output/qc1.crt \

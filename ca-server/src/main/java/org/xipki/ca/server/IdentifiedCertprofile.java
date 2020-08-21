@@ -95,7 +95,6 @@ import org.xipki.ca.api.profile.KeyParametersOption.RSAParametersOption;
 import org.xipki.ca.api.profile.KeypairGenControl;
 import org.xipki.ca.api.profile.SubjectDnSpec;
 import org.xipki.security.EdECConstants;
-import org.xipki.security.ExtensionExistence;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
@@ -372,29 +371,6 @@ class IdentifiedCertprofile implements Closeable {
     // CTLog extension will be processed by the CA
     controls.remove(Extn.id_SCTs);
 
-    Set<ASN1ObjectIdentifier> neededExtTypes = new HashSet<>(2);
-    Set<ASN1ObjectIdentifier> wantedExtTypes = new HashSet<>(2);
-    if (requestedExtensions != null) {
-      Extension reqExtension = requestedExtensions.getExtension(
-          ObjectIdentifiers.Xipki.id_xipki_ext_cmpRequestExtensions);
-
-      if (reqExtension != null) {
-        ExtensionExistence ee = ExtensionExistence.getInstance(reqExtension.getParsedValue());
-        neededExtTypes.addAll(ee.getNeedExtensions());
-        wantedExtTypes.addAll(ee.getWantExtensions());
-      }
-
-      for (ASN1ObjectIdentifier oid : neededExtTypes) {
-        if (wantedExtTypes.contains(oid)) {
-          wantedExtTypes.remove(oid);
-        }
-
-        if (!controls.containsKey(oid)) {
-          throw new BadCertTemplateException("could not add needed extension " + oid.getId());
-        }
-      }
-    }
-
     Map<ASN1ObjectIdentifier, Extension> requestedExtns = new HashMap<>();
     // remove the request extensions which are not permitted in the request
     if (requestedExtensions != null) {
@@ -410,17 +386,17 @@ class IdentifiedCertprofile implements Closeable {
     // SubjectKeyIdentifier
     ASN1ObjectIdentifier extType = Extension.subjectKeyIdentifier;
     ExtensionControl extControl = controls.remove(extType);
-    if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
+    if (extControl != null) {
       byte[] encodedSpki = publicKeyInfo.getPublicKeyData().getBytes();
       byte[] skiValue = HashAlgo.SHA1.hash(encodedSpki);
       SubjectKeyIdentifier value = new SubjectKeyIdentifier(skiValue);
-      addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
+      addExtension(values, extType, value, extControl);
     }
 
     // Authority key identifier
     extType = Extension.authorityKeyIdentifier;
     extControl = controls.remove(extType);
-    if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
+    if (extControl != null) {
       AuthorityKeyIdentifier value = null;
       if (certprofile.useIssuerAndSerialInAki()) {
         GeneralNames x509CaIssuer = new GeneralNames(
@@ -433,15 +409,15 @@ class IdentifiedCertprofile implements Closeable {
         }
       }
 
-      addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
+      addExtension(values, extType, value, extControl);
     }
 
     // IssuerAltName
     extType = Extension.issuerAlternativeName;
     extControl = controls.remove(extType);
-    if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
+    if (extControl != null) {
       GeneralNames value = publicCaInfo.getSubjectAltName();
-      addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
+      addExtension(values, extType, value, extControl);
     }
 
     // AuthorityInfoAccess
@@ -449,7 +425,7 @@ class IdentifiedCertprofile implements Closeable {
     extControl = controls.remove(extType);
     CaUris caUris = publicCaInfo.getCaUris();
 
-    if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
+    if (extControl != null) {
       AuthorityInfoAccessControl aiaControl = certprofile.getAiaControl();
 
       List<String> caIssuers = null;
@@ -467,7 +443,7 @@ class IdentifiedCertprofile implements Closeable {
         value = CaUtil.createAuthorityInformationAccess(
             caIssuers, ocspUris);
       }
-      addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
+      addExtension(values, extType, value, extControl);
     }
 
     if (controls.containsKey(Extension.cRLDistributionPoints)
@@ -478,41 +454,41 @@ class IdentifiedCertprofile implements Closeable {
       // CRLDistributionPoints
       extType = Extension.cRLDistributionPoints;
       extControl = controls.remove(extType);
-      if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
+      if (extControl != null) {
         CRLDistPoint value = null;
         if (CollectionUtil.isNotEmpty(caUris.getCrlUris())) {
           value = CaUtil.createCrlDistributionPoints(caUris.getCrlUris(),
               x500CaPrincipal, crlSignerSubject);
         }
-        addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
+        addExtension(values, extType, value, extControl);
       }
 
       // FreshestCRL
       extType = Extension.freshestCRL;
       extControl = controls.remove(extType);
-      if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
+      if (extControl != null) {
         CRLDistPoint value = null;
         if (CollectionUtil.isNotEmpty(caUris.getDeltaCrlUris())) {
           value = CaUtil.createCrlDistributionPoints(caUris.getDeltaCrlUris(),
               x500CaPrincipal, crlSignerSubject);
         }
-        addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
+        addExtension(values, extType, value, extControl);
       }
     }
 
     // BasicConstraints
     extType = Extension.basicConstraints;
     extControl = controls.remove(extType);
-    if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
+    if (extControl != null) {
       BasicConstraints value = CaUtil.createBasicConstraints(certprofile.getCertLevel(),
           certprofile.getPathLenBasicConstraint());
-      addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
+      addExtension(values, extType, value, extControl);
     }
 
     // KeyUsage
     extType = Extension.keyUsage;
     extControl = controls.remove(extType);
-    if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
+    if (extControl != null) {
       Set<KeyUsage> usages = new HashSet<>();
       Set<KeyUsageControl> usageOccs = certprofile.getKeyUsage();
       for (KeyUsageControl k : usageOccs) {
@@ -525,13 +501,13 @@ class IdentifiedCertprofile implements Closeable {
       addRequestedKeyusage(usages, requestedExtns, usageOccs);
 
       org.bouncycastle.asn1.x509.KeyUsage value = X509Util.createKeyUsage(usages);
-      addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
+      addExtension(values, extType, value, extControl);
     }
 
     // ExtendedKeyUsage
     extType = Extension.extendedKeyUsage;
     extControl = controls.remove(extType);
-    if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
+    if (extControl != null) {
       List<ASN1ObjectIdentifier> usages = new LinkedList<>();
       Set<ExtKeyUsageControl> usageOccs = certprofile.getExtendedKeyUsages();
       for (ExtKeyUsageControl k : usageOccs) {
@@ -554,61 +530,32 @@ class IdentifiedCertprofile implements Closeable {
       }
 
       ExtendedKeyUsage value = X509Util.createExtendedUsage(usages);
-      addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
+      addExtension(values, extType, value, extControl);
     }
 
     // ocsp-nocheck
     extType = ObjectIdentifiers.Extn.id_extension_pkix_ocsp_nocheck;
     extControl = controls.remove(extType);
-    if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
+    if (extControl != null) {
       // the extension ocsp-nocheck will only be set if requested explicitly
-      addExtension(values, extType, DERNull.INSTANCE, extControl, neededExtTypes, wantedExtTypes);
+      addExtension(values, extType, DERNull.INSTANCE, extControl);
     }
 
     // SubjectInfoAccess
     extType = Extension.subjectInfoAccess;
     extControl = controls.remove(extType);
-    if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
+    if (extControl != null) {
       ASN1Sequence value = createSubjectInfoAccess(requestedExtns,
             certprofile.getSubjectInfoAccessModes());
-      addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
+      addExtension(values, extType, value, extControl);
     }
 
     // CertificatePolicies
     extType = Extension.certificatePolicies;
     extControl = controls.remove(extType);
-    if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
+    if (extControl != null) {
       ASN1Encodable value = certprofile.getCertificatePolicies();
-      addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
-    }
-
-    // remove extensions that are not required from the list, and not contained in the request
-    List<ASN1ObjectIdentifier> listToRm = null;
-    for (ASN1ObjectIdentifier extnType : controls.keySet()) {
-      ExtensionControl ctrl = controls.get(extnType);
-      if (ctrl.isRequired()) {
-        continue;
-      }
-
-      if (neededExtTypes.contains(extnType) || wantedExtTypes.contains(extnType)) {
-        continue;
-      }
-
-      if (requestedExtns.get(extnType) != null) {
-        // contained in the request
-        continue;
-      }
-
-      if (listToRm == null) {
-        listToRm = new LinkedList<>();
-      }
-      listToRm.add(extnType);
-    }
-
-    if (listToRm != null) {
-      for (ASN1ObjectIdentifier extnType : listToRm) {
-        controls.remove(extnType);
-      }
+      addExtension(values, extType, value, extControl);
     }
 
     ExtensionValues subvalues = certprofile.getExtensions(Collections.unmodifiableMap(controls),
@@ -617,21 +564,16 @@ class IdentifiedCertprofile implements Closeable {
     Set<ASN1ObjectIdentifier> extTypes = new HashSet<>(controls.keySet());
     for (ASN1ObjectIdentifier type : extTypes) {
       extControl = controls.get(type);
-      boolean addMe = addMe(type, extControl, neededExtTypes, wantedExtTypes);
-      if (addMe) {
-        ExtensionValue value = subvalues.getExtensionValue(type);
-        if (value == null && requestedExtns != null && extControl.isRequest()) {
-          Extension reqExt = requestedExtns.get(type);
-          if (reqExt != null) {
-            value = new ExtensionValue(extControl.isCritical(), reqExt.getParsedValue());
-          }
+      ExtensionValue value = subvalues.getExtensionValue(type);
+      if (value == null && requestedExtns != null && extControl.isRequest()) {
+        Extension reqExt = requestedExtns.get(type);
+        if (reqExt != null) {
+          value = new ExtensionValue(extControl.isCritical(), reqExt.getParsedValue());
         }
+      }
 
-        if (value != null) {
-          addExtension(values, type, value, extControl, neededExtTypes, wantedExtTypes);
-          controls.remove(type);
-        }
-      } else {
+      if (value != null) {
+        addExtension(values, type, value, extControl);
         controls.remove(type);
       }
     }
@@ -646,11 +588,6 @@ class IdentifiedCertprofile implements Closeable {
     if (CollectionUtil.isNotEmpty(unprocessedExtTypes)) {
       throw new CertprofileException(
           "could not add required extensions " + toString(unprocessedExtTypes));
-    }
-
-    if (CollectionUtil.isNotEmpty(neededExtTypes)) {
-      throw new BadCertTemplateException(
-          "could not add requested extensions " + toString(neededExtTypes));
     }
 
     // Check the SubjectAltNames
@@ -1262,15 +1199,6 @@ class IdentifiedCertprofile implements Closeable {
     return false;
   }
 
-  private static boolean addMe(ASN1ObjectIdentifier extType, ExtensionControl extControl,
-      Set<ASN1ObjectIdentifier> neededExtTypes, Set<ASN1ObjectIdentifier> wantedExtTypes) {
-    if (extControl.isRequired()) {
-      return true;
-    }
-
-    return neededExtTypes.contains(extType) || wantedExtTypes.contains(extType);
-  } // method addMe
-
   private static void addRequestedKeyusage(Set<KeyUsage> usages,
       Map<ASN1ObjectIdentifier, Extension> requestedExtensions,
       Set<KeyUsageControl> usageOccs) {
@@ -1352,14 +1280,10 @@ class IdentifiedCertprofile implements Closeable {
   } // method createSubjectInfoAccess
 
   private static void addExtension(ExtensionValues values, ASN1ObjectIdentifier extType,
-      ExtensionValue extValue, ExtensionControl extControl,
-      Set<ASN1ObjectIdentifier> neededExtensionTypes,
-      Set<ASN1ObjectIdentifier> wantedExtensionTypes)
+      ExtensionValue extValue, ExtensionControl extControl)
           throws CertprofileException {
     if (extValue != null) {
       values.addExtension(extType, extValue);
-      neededExtensionTypes.remove(extType);
-      wantedExtensionTypes.remove(extType);
     } else if (extControl.isRequired()) {
       String description = ObjectIdentifiers.getName(extType);
       if (description == null) {
@@ -1370,14 +1294,10 @@ class IdentifiedCertprofile implements Closeable {
   } // method addExtension
 
   private static void addExtension(ExtensionValues values, ASN1ObjectIdentifier extType,
-      ASN1Encodable extValue, ExtensionControl extControl,
-      Set<ASN1ObjectIdentifier> neededExtensionTypes,
-      Set<ASN1ObjectIdentifier> wantedExtensionTypes)
+      ASN1Encodable extValue, ExtensionControl extControl)
           throws CertprofileException {
     if (extValue != null) {
       values.addExtension(extType, extControl.isCritical(), extValue);
-      neededExtensionTypes.remove(extType);
-      wantedExtensionTypes.remove(extType);
     } else if (extControl.isRequired()) {
       String description = ObjectIdentifiers.getName(extType);
       if (description == null) {
