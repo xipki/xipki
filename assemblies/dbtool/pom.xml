@@ -53,13 +53,13 @@
                   <groupId>org.xipki</groupId>
                   <artifactId>ca-server</artifactId>
                   <version>${project.version}</version>
-                  <includes>sql/**</includes>
+                  <includes>sql/*-init.xml</includes>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki</groupId>
                   <artifactId>ocsp-server</artifactId>
                   <version>${project.version}</version>
-                  <includes>sql/**</includes>
+                  <includes>sql/*-init.xml</includes>
                 </artifactItem>
               </artifactItems>
             </configuration>

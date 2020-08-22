@@ -12,7 +12,6 @@
       <outputDirectory>lib</outputDirectory>
       <excludes>
         <exclude>org.mariadb.jdbc:mariadb-java-client</exclude>
-        <exclude>org.postgresql:postgresql</exclude>
       </excludes>
     </dependencySet>
     <dependencySet>
@@ -20,7 +19,6 @@
       <outputDirectory>lib/jdbc</outputDirectory>
       <includes>
         <include>org.mariadb.jdbc:mariadb-java-client</include>
-        <include>org.postgresql:postgresql</include>
       </includes>
     </dependencySet>
   </dependencySets>
