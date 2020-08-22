@@ -234,7 +234,6 @@ public class CmpResponder extends BaseCmpResponder {
   static {
     KNOWN_GENMSG_IDS.add(CMPObjectIdentifiers.it_currentCRL.getId());
     KNOWN_GENMSG_IDS.add(ObjectIdentifiers.Xipki.id_xipki_cmp_cmpGenmsg.getId());
-    KNOWN_GENMSG_IDS.add(ObjectIdentifiers.Xipki.id_xipki_cmp_cacertchain.getId());
 
     String oid = NISTObjectIdentifiers.id_aes128_GCM.getId();
     aesGcm_ciphers = new ConcurrentBag<>();
@@ -1989,6 +1988,18 @@ public class CmpResponder extends BaseCmpResponder {
             String systemInfo = getSystemInfo(requestor, acceptVersions);
             respValue = new DERUTF8String(systemInfo);
             break;
+          case XiSecurityConstants.CMP_ACTION_CACERTCHAIN:
+            event.addEventType(CaAuditConstants.Cmp.TYPE_genm_cacertchain);
+            ASN1EncodableVector vec = new ASN1EncodableVector();
+            vec.add(ca.getCaInfo().getCertInCmpFormat());
+            List<X509Cert> certchain = ca.getCaInfo().getCertchain();
+            if (CollectionUtil.isNotEmpty(certchain)) {
+              for (X509Cert m : certchain) {
+                vec.add(m.toBcCert().toASN1Structure());
+              }
+            }
+            respValue = new DERSequence(vec);
+            break;
           default:
             return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
                 "unsupported XiPKI action code " + action);
@@ -1999,18 +2010,6 @@ public class CmpResponder extends BaseCmpResponder {
         if (respValue != null) {
           vec.add(respValue);
         }
-        itvResp = new InfoTypeAndValue(infoType, new DERSequence(vec));
-      } else if (ObjectIdentifiers.Xipki.id_xipki_cmp_cacertchain.equals(infoType)) {
-        event.addEventType(CaAuditConstants.Cmp.TYPE_genm_cacertchain);
-        ASN1EncodableVector vec = new ASN1EncodableVector();
-        vec.add(ca.getCaInfo().getCertInCmpFormat());
-        List<X509Cert> certchain = ca.getCaInfo().getCertchain();
-        if (CollectionUtil.isNotEmpty(certchain)) {
-          for (X509Cert m : certchain) {
-            vec.add(m.toBcCert().toASN1Structure());
-          }
-        }
-
         itvResp = new InfoTypeAndValue(infoType, new DERSequence(vec));
       }
 

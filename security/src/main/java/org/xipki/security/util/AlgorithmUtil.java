@@ -157,6 +157,8 @@ public class AlgorithmUtil {
       map.put(NISTObjectIdentifiers.id_hmacWithSHA3_256, AlgorithmCode.HMAC_SHA256);
       map.put(NISTObjectIdentifiers.id_hmacWithSHA3_384, AlgorithmCode.HMAC_SHA384);
       map.put(NISTObjectIdentifiers.id_hmacWithSHA3_512, AlgorithmCode.HMAC_SHA512);
+
+      // RFC 6955 - Diffie-Hellman Proof-of-Possession Algorithms
       map.put(Xipki.id_alg_dhPop_x25519_sha256, AlgorithmCode.DHPOP_X25519_SHA256);
       map.put(Xipki.id_alg_dhPop_x448_sha512, AlgorithmCode.DHPOP_X448_SHA512);
 
@@ -191,6 +193,7 @@ public class AlgorithmUtil {
       map.put(NISTObjectIdentifiers.id_dsa_with_sha3_256, AlgorithmCode.SHA3_256WITHDSA);
       map.put(NISTObjectIdentifiers.id_dsa_with_sha3_384, AlgorithmCode.SHA3_384WITHDSA);
       map.put(NISTObjectIdentifiers.id_dsa_with_sha3_512, AlgorithmCode.SHA3_512WITHDSA);
+
       // RSA
       map.put(PKCSObjectIdentifiers.sha1WithRSAEncryption, AlgorithmCode.SHA1WITHRSA);
       map.put(PKCSObjectIdentifiers.sha224WithRSAEncryption, AlgorithmCode.SHA224WITHRSA);
