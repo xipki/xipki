@@ -424,11 +424,11 @@ public abstract class MgmtEntry {
           "id: ", ident.getId(), "\nname: ", ident.getName(),
           "\nstatus: ", (status == null ? "null" : status.getStatus()),
           "\nmax. validity: ", maxValidity,
-          "\nexpiration period: ", expirationPeriod, " days",
+          "\nexpiration period: ", expirationPeriod, "d",
           "\nsigner type: ", signerType,
           "\nsigner conf: ", (signerConf == null
                 ? "null" : signerConfToString(signerConf, verbose, ignoreSensitiveInfo)),
-          "\nDHPoc control: ", (dhpocControl == null
+          "\nDHPoc control:\n", (dhpocControl == null
                 ? "null" : signerConfToString(dhpocControl, verbose, ignoreSensitiveInfo)),
           "\nCMP control:\n", (cmpControl == null ? "  null" : cmpControl.toString(verbose)),
           "\nCRL control:\n", (crlControl == null ? "  null" : crlControl.toString(verbose)),
@@ -445,7 +445,7 @@ public abstract class MgmtEntry {
           "\npermission:", permissionText,
           "\nkeep expired certs: ",
               (keepExpiredCertInDays < 0 ? "forever" : keepExpiredCertInDays + " days"),
-          "\nextra control: ", extraCtrlText,
+          "\nextra control:\n", extraCtrlText,
           "\nserial number length: ", serialNoLen, " bytes",
           "\nnext CRL number: ", nextCrlNumber, "\n", caUris,
           "\nrevocation: ", (revocationInfo == null ? "not revoked" : "revoked"), revInfoText,
