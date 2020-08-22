@@ -428,7 +428,7 @@ public abstract class MgmtEntry {
           "\nsigner type: ", signerType,
           "\nsigner conf: ", (signerConf == null
                 ? "null" : signerConfToString(signerConf, verbose, ignoreSensitiveInfo)),
-          "\nDHPoc control:\n", (dhpocControl == null
+          "\nDHPoc control: ", (dhpocControl == null
                 ? "null" : signerConfToString(dhpocControl, verbose, ignoreSensitiveInfo)),
           "\nCMP control:\n", (cmpControl == null ? "  null" : cmpControl.toString(verbose)),
           "\nCRL control:\n", (crlControl == null ? "  null" : crlControl.toString(verbose)),
@@ -445,7 +445,7 @@ public abstract class MgmtEntry {
           "\npermission:", permissionText,
           "\nkeep expired certs: ",
               (keepExpiredCertInDays < 0 ? "forever" : keepExpiredCertInDays + " days"),
-          "\nextra control:\n", extraCtrlText,
+          "\nextra control: ", extraCtrlText,
           "\nserial number length: ", serialNoLen, " bytes",
           "\nnext CRL number: ", nextCrlNumber, "\n", caUris,
           "\nrevocation: ", (revocationInfo == null ? "not revoked" : "revoked"), revInfoText,
