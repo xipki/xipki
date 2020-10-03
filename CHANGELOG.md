@@ -4,6 +4,17 @@ See also <https://github.com/xipki/xipki/releases>
 
 ## 5.3.10
   - Release date: -
+  - CA
+    - Fixed "Duplicate primary key ID" database error in some cluster databases. #186
+    - Added option to control whether to include the expired certificate. #188
+    - Add a dummy CRLEntry in an indirect CRL without revoked certificates to contain the certificate's issuer name. #189
+    - Removed table DELTACRL_CACHE. Use better method to generate the delta CRL.
+    - Removed generation of CRL with only CA or EE certs, this feature will not be used in usual.
+    - Removed support of custom extension xipki-authorizationTemplate
+    - Removed unsupproted options duplicate-subject and duplicate-key
+    - Removed xipki custom request extension cmpRequestExtensions (1.3.6.1.4.1.45522.1.3)
+  - OCSP
+    - Fixed "Duplicate primary key ID" database error in some cluster databases. #186
 
 ## 5.3.9
   - Release date: Aug 9, 2020
