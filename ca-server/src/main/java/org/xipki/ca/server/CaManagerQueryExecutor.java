@@ -36,6 +36,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,6 +85,17 @@ class CaManagerQueryExecutor {
     STRING,
     BOOL
   } // class ColumnType
+
+  private static enum Table {
+    // SMALLINT or INT
+    REQUESTOR,
+    PUBLISHER,
+    PROFILE,
+    TUSER,
+    CA,
+    // BigInt
+    CA_HAS_USER;
+  }
 
   private static class SqlColumn {
 
@@ -178,7 +190,13 @@ class CaManagerQueryExecutor {
   private final String sqlSelectUserId;
   private final String sqlSelectUser;
 
+  private final Map<Table, AtomicLong> cachedIdMap = new HashMap<>();
+
   CaManagerQueryExecutor(DataSourceWrapper datasource) {
+    for (Table m : Table.values()) {
+      cachedIdMap.put(m, new AtomicLong(0));
+    }
+
     this.datasource = notNull(datasource, "datasource");
     this.sqlSelectProfileId = buildSelectFirstSql("ID FROM PROFILE WHERE NAME=?");
     this.sqlSelectProfile = buildSelectFirstSql("ID,TYPE,CONF FROM PROFILE WHERE NAME=?");
@@ -719,12 +737,7 @@ class CaManagerQueryExecutor {
       throws CaMgmtException {
     notNull(caEntry, "caEntry");
 
-    try {
-      int id = (int) datasource.getMax(null, "CA", "ID");
-      caEntry.getIdent().setId(id + 1);
-    } catch (DataAccessException ex) {
-      throw new CaMgmtException(ex);
-    }
+    caEntry.getIdent().setId((int) getNextId(Table.CA));
 
     final String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CA_URIS,"//7
         + "MAX_VALIDITY,CERT,CERTCHAIN,SIGNER_TYPE,CRL_SIGNER_NAME,"//5
@@ -834,12 +847,7 @@ class CaManagerQueryExecutor {
     notNull(dbEntry, "dbEntry");
     final String sql = "INSERT INTO PROFILE (ID,NAME,TYPE,CONF) VALUES (?,?,?,?)";
 
-    try {
-      int id = (int) datasource.getMax(null, "PROFILE", "ID");
-      dbEntry.getIdent().setId(id + 1);
-    } catch (DataAccessException ex) {
-      throw new CaMgmtException(ex);
-    }
+    dbEntry.getIdent().setId((int) getNextId(Table.PROFILE));
 
     PreparedStatement ps = null;
     try {
@@ -889,12 +897,7 @@ class CaManagerQueryExecutor {
       throws CaMgmtException {
     notNull(dbEntry, "dbEntry");
 
-    try {
-      int id = (int) datasource.getMax(null, "REQUESTOR", "ID");
-      dbEntry.getIdent().setId(id + 1);
-    } catch (DataAccessException ex) {
-      throw new CaMgmtException(ex);
-    }
+    dbEntry.getIdent().setId((int) getNextId(Table.REQUESTOR));
 
     final String sql = "INSERT INTO REQUESTOR (ID,NAME,TYPE,CONF) VALUES (?,?,?,?)";
     PreparedStatement ps = null;
@@ -924,12 +927,14 @@ class CaManagerQueryExecutor {
     String sql = sqlSelectRequestorId;
     ResultSet rs = null;
     PreparedStatement stmt = null;
-    try {
-      int id = (int) datasource.getMax(null, "REQUESTOR", "ID");
 
+    int nextId = (int) getNextId(Table.REQUESTOR);
+
+    try {
       sql = "INSERT INTO REQUESTOR (ID,NAME,TYPE,CONF) VALUES (?,?,?,?)";
       stmt = prepareStatement(sql);
-      stmt.setInt(1, id + 1);
+
+      stmt.setInt(1, nextId);
       stmt.setString(2, requestorName);
       // ANY VALUE
       stmt.setString(3, "EMBEDDED");
@@ -939,8 +944,6 @@ class CaManagerQueryExecutor {
       LOG.info("added requestor '{}'", requestorName);
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource.translate(sql, ex));
-    } catch (DataAccessException ex) {
-      throw new CaMgmtException(ex);
     } finally {
       datasource.releaseResources(stmt, rs);
     }
@@ -985,12 +988,7 @@ class CaManagerQueryExecutor {
     notNull(dbEntry, "dbEntry");
     final String sql = "INSERT INTO PUBLISHER (ID,NAME,TYPE,CONF) VALUES (?,?,?,?)";
 
-    try {
-      int id = (int) datasource.getMax(null, "PUBLISHER", "ID");
-      dbEntry.getIdent().setId(id + 1);
-    } catch (DataAccessException ex) {
-      throw new CaMgmtException(ex);
-    }
+    dbEntry.getIdent().setId((int) getNextId(Table.PUBLISHER));
 
     String name = dbEntry.getIdent().getName();
     PreparedStatement ps = null;
@@ -1696,13 +1694,7 @@ class CaManagerQueryExecutor {
       throw new CaMgmtException(concat("user named '", name, " ' already exists"));
     }
 
-    long id;
-    try {
-      long maxId = datasource.getMax(null, "TUSER", "ID");
-      id = maxId + 1;
-    } catch (DataAccessException ex) {
-      throw new CaMgmtException(ex);
-    }
+    long id = getNextId(Table.TUSER);
 
     final String sql = "INSERT INTO TUSER (ID,NAME,ACTIVE,PASSWORD) VALUES (?,?,?,?)";
 
@@ -1788,18 +1780,13 @@ class CaManagerQueryExecutor {
     final String sql = "INSERT INTO CA_HAS_USER (ID,CA_ID,USER_ID, PERMISSION,PROFILES)"
         + " VALUES (?,?,?,?,?)";
 
-    long maxId;
-    try {
-      maxId = datasource.getMax(null, "CA_HAS_USER", "ID");
-    } catch (DataAccessException ex) {
-      throw new CaMgmtException(ex);
-    }
+    long id = getNextId(Table.CA_HAS_USER);
 
     try {
       ps = prepareStatement(sql);
 
       int idx = 1;
-      ps.setLong(idx++, maxId + 1);
+      ps.setLong(idx++, id);
       ps.setInt(idx++, ca.getId());
       ps.setInt(idx++, userIdent.getId());
       ps.setInt(idx++, user.getPermission());
@@ -2021,6 +2008,18 @@ class CaManagerQueryExecutor {
 
     return ret;
   } // method getIdNameMap
+
+  private long getNextId(Table table) throws CaMgmtException {
+    try {
+      long idInDb = datasource.getMax(null, table.name(), "ID");
+      AtomicLong cachedId = cachedIdMap.get(table);
+      long nextId = Math.max(idInDb, cachedId.get()) + 1;
+      cachedId.set(nextId);
+      return nextId;
+    } catch (DataAccessException ex) {
+      throw new CaMgmtException(ex);
+    }
+  }
 
   private static String concat(String s1, String... strs) {
     return StringUtil.concat(s1, strs);

@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -138,6 +139,8 @@ class OcspStoreQueryExecutor {
   private final int maxX500nameLen;
 
   private final HashAlgo certhashAlgo;
+
+  private final AtomicInteger cachedIssuerId = new AtomicInteger(0);
 
   OcspStoreQueryExecutor(DataSourceWrapper datasource, boolean publishGoodCerts)
       throws DataAccessException, NoSuchAlgorithmException {
@@ -462,8 +465,9 @@ class OcspStoreQueryExecutor {
     }
 
     String sha1FpCert = HashAlgo.SHA1.base64Hash(issuerCert.getEncoded());
-    long maxId = datasource.getMax(null, "ISSUER", "ID");
-    int id = (int) maxId + 1;
+    int maxIdInDb = (int) datasource.getMax(null, "ISSUER", "ID");
+    int id = Math.max(maxIdInDb, cachedIssuerId.get()) + 1;
+    cachedIssuerId.set(id);
 
     byte[] encodedCert = issuerCert.getEncoded();
     long notBeforeSeconds = issuerCert.getNotBefore().getTime() / 1000;

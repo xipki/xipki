@@ -40,6 +40,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -237,6 +238,8 @@ class ImportCrl {
   private PreparedStatement psUpdateCertRev;
 
   private PreparedStatement psUpdateCertLastupdate;
+
+  private final AtomicInteger cachedIssuerId = new AtomicInteger(0);
 
   public ImportCrl(DataSourceWrapper datasource, String basedir, int sqlBatchCommit,
       boolean ignoreExpiredCrls)
@@ -683,7 +686,8 @@ class ImportCrl {
       if (issuerId == null) {
         // issuer not exists
         int maxId = (int) datasource.getMax(conn, "ISSUER", "ID");
-        issuerId = maxId + 1;
+        issuerId = Math.max(cachedIssuerId.get(), maxId) + 1;
+        cachedIssuerId.set(issuerId);
 
         sql = "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1C,CERT,REV_INFO)"
             + " VALUES(?,?,?,?,?,?,?)";

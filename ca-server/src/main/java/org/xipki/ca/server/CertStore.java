@@ -46,6 +46,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DERPrintableString;
@@ -278,6 +279,8 @@ public class CertStore {
   private final int maxX500nameLen;
 
   private final UniqueIdGenerator idGenerator;
+
+  private final AtomicLong cachedCrlId = new AtomicLong(0);
 
   public CertStore(DataSourceWrapper datasource, UniqueIdGenerator idGenerator)
       throws DataAccessException {
@@ -588,7 +591,8 @@ public class CertStore {
     } catch (DataAccessException ex) {
       throw new OperationException(DATABASE_FAILURE, ex.getMessage());
     }
-    long crlId = currentMaxCrlId + 1;
+    long crlId = Math.max(cachedCrlId.get(), currentMaxCrlId) + 1;
+    cachedCrlId.set(crlId);
 
     String b64Crl;
     try {

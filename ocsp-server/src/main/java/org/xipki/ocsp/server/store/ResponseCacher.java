@@ -35,6 +35,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bouncycastle.crypto.Digest;
 import org.slf4j.Logger;
@@ -161,6 +162,8 @@ public class ResponseCacher implements Closeable {
 
   private ScheduledFuture<?> issuerUpdater;
 
+  private final AtomicInteger cachedIssuerId = new AtomicInteger(0);
+
   public ResponseCacher(DataSourceWrapper datasource, boolean master, Validity validity) {
     this.datasource = notNull(datasource, "datasource");
     this.master = master;
@@ -247,7 +250,9 @@ public class ResponseCacher implements Closeable {
     String sha1FpCert = HashAlgo.SHA1.base64Hash(encodedCert);
 
     int maxId = (int) datasource.getMax(null, "ISSUER", "ID");
-    int id = maxId + 1;
+    int id = Math.max(maxId, cachedIssuerId.get()) + 1;
+    cachedIssuerId.set(id);
+
     try {
       final String sql = SQL_ADD_ISSUER;
       PreparedStatement ps = null;
