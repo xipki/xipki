@@ -20,7 +20,7 @@ See also <https://github.com/xipki/xipki/releases>
   - Release date: Aug 9, 2020
   - CA
     - Relax FQDN check
-    - Handle the file calock correclty
+    - Handle the file calock correctly
     - Fixed #179 handle requestor name case-insensitive
     - Fixed #180 CA cannot process certificate request (CA generate keypair) via REST service
     - Removed support of audit over syslog (not needed)
