@@ -783,8 +783,11 @@ public class X509Ca implements Closeable {
 
       final int numEntries = 100;
 
+      CrlControl crlControl = caInfo.getCrlControl();
+
       // 10 minutes buffer
-      Date notExpiredAt = new Date(thisUpdate.getTime() - 600L * MS_PER_SECOND);
+      Date notExpiredAt = crlControl.isIncludeExpiredcerts()
+                          ? new Date(0) : new Date(thisUpdate.getTime() - 600L * MS_PER_SECOND);
 
       // we have to cache the serial entries to sort them
       List<CertRevInfoWithSerial> allRevInfos = new LinkedList<>();
@@ -817,7 +820,6 @@ public class X509Ca implements Closeable {
       Collections.sort(allRevInfos);
 
       boolean isFirstCrlEntry = true;
-      CrlControl crlControl = caInfo.getCrlControl();
 
       for (CertRevInfoWithSerial revInfo : allRevInfos) {
         CrlReason reason = revInfo.getReason();

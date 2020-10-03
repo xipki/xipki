@@ -68,6 +68,10 @@ import org.xipki.util.TripleState;
  * # Default is false
  * invalidity.date=&lt;'required'|'optional'|'forbidden'&gt;
  *
+ * # Whether to include the expired certificates
+ * # Default is false
+ * include.expiredcerts=&lt;'true'|'false'&gt;
+ *
  * </pre>
  * @author Lijun Liao
  * @since 2.0.0
@@ -139,6 +143,8 @@ public class CrlControl {
 
   public static final String KEY_EXCLUDE_REASON = "exclude.reason";
 
+  public static final String KEY_INCLUDE_EXPIREDCERTS = "include.expiredcerts";
+
   public static final String KEY_INVALIDITY_DATE = "invalidity.date";
 
   private int fullCrlIntervals = 1;
@@ -152,6 +158,8 @@ public class CrlControl {
   private HourMinute intervalDayTime;
 
   private boolean excludeReason;
+
+  private boolean includeExpiredCerts;
 
   private TripleState invalidityDateMode = TripleState.optional;
 
@@ -188,6 +196,7 @@ public class CrlControl {
     }
 
     this.excludeReason = getBoolean(props, KEY_EXCLUDE_REASON, false);
+    this.includeExpiredCerts = getBoolean(props, KEY_INCLUDE_EXPIREDCERTS, false);
 
     // Maximal interval allowed by CA/Browser Forum's Baseline Requirements
     this.fullCrlIntervals = getInteger(props, KEY_FULLCRL_INTERVALS, 7);
@@ -233,6 +242,7 @@ public class CrlControl {
     ConfPairs pairs = new ConfPairs();
     pairs.putPair(KEY_DELTACRL_INTERVALS, Integer.toString(deltaCrlIntervals));
     pairs.putPair(KEY_EXCLUDE_REASON, Boolean.toString(excludeReason));
+    pairs.putPair(KEY_INCLUDE_EXPIREDCERTS, Boolean.toString(includeExpiredCerts));
     pairs.putPair(KEY_FULLCRL_EXTENDED_NEXTUPDATE, Boolean.toString(extendedNextUpdate));
     pairs.putPair(KEY_FULLCRL_INTERVALS, Integer.toString(fullCrlIntervals));
     pairs.putPair(KEY_INTERVAL_TIME, intervalDayTime.toString());
@@ -266,6 +276,7 @@ public class CrlControl {
         "\n  overlap: ", overlapDays, " days",
         "\n  use extended nextUpdate: ", extendedNextUpdate,
         "\n  exclude reason: ", excludeReason,
+        "\n  include expired certs: ", includeExpiredCerts,
         "\n  invalidity date mode: ", invalidityDateMode,
         "\n  interval: ", intervalStr,
         (verbose ? "\n  encoded: " : ""), (verbose ? getConf() : ""));
@@ -297,6 +308,10 @@ public class CrlControl {
 
   public boolean isExcludeReason() {
     return excludeReason;
+  }
+
+  public boolean isIncludeExpiredcerts() {
+    return includeExpiredCerts;
   }
 
   public TripleState getInvalidityDateMode() {
@@ -338,7 +353,8 @@ public class CrlControl {
     CrlControl obj2 = (CrlControl) obj;
     if (deltaCrlIntervals != obj2.deltaCrlIntervals
         || extendedNextUpdate != obj2.extendedNextUpdate
-        || fullCrlIntervals != obj2.fullCrlIntervals) {
+        || fullCrlIntervals != obj2.fullCrlIntervals
+        || includeExpiredCerts != obj2.includeExpiredCerts) {
       return false;
     }
 
