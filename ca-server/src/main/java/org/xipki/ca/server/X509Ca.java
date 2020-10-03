@@ -816,6 +816,13 @@ public class X509Ca implements Closeable {
         }
       }
 
+      if (indirectCrl && allRevInfos.isEmpty()) {
+        // add dummy entry, see https://github.com/xipki/xipki/issues/189
+        Extensions extensions = new Extensions(createCertificateIssuerExtension(pci.getSubject()));
+        crlBuilder.addCRLEntry(BigInteger.ZERO, new Date(0), extensions);
+        LOG.debug("added cert ca={} serial=0 to the indirect CRL", caIdent);
+      }
+
       // sort the list by SerialNumber ASC
       Collections.sort(allRevInfos);
 
