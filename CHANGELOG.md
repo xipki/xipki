@@ -2,8 +2,19 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
-## 5.3.10
+## 5.3.11
   - Release date: -
+  - CA
+    - *
+  - OCSP
+    - *
+  - CLI
+    - *
+  - DB Tool
+    - *
+
+## 5.3.10
+  - Release date: Oct 7, 2020
   - CA
     - Fixed "Duplicate primary key ID" database error in some cluster databases. #186
     - Added option to control whether to include the expired certificate. #188
@@ -15,6 +26,10 @@ See also <https://github.com/xipki/xipki/releases>
     - Removed xipki custom request extension cmpRequestExtensions (1.3.6.1.4.1.45522.1.3)
   - OCSP
     - Fixed "Duplicate primary key ID" database error in some cluster databases. #186
+  - CLI
+    - N/A
+  - DB Tool
+    - N/A
 
 ## 5.3.9
   - Release date: Aug 9, 2020

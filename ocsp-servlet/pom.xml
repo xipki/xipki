@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki</groupId>
     <artifactId>xipki-parent</artifactId>
-    <version>5.3.10-SNAPSHOT</version>
+    <version>5.3.10</version>
   </parent>
   <artifactId>ocsp-servlet</artifactId>
   <packaging>war</packaging>
