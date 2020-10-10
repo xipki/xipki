@@ -30,6 +30,11 @@ import org.xipki.util.StringUtil;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
+/**
+ *  Extension with Syntax.
+ * @author Lijun Liao
+ *
+ */
 public class ExtnSyntax extends Describable {
 
   @JSONField(ordinal = 1)

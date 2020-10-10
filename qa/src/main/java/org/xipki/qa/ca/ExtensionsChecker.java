@@ -747,7 +747,7 @@ public class ExtensionsChecker {
     // Admission
     type = Extn.id_extension_admission;
     if (extensionControls.containsKey(type)) {
-      if (certprofile.getAdmission() != null) {
+      if (certprofile.extensions().getAdmission() != null) {
         addIfNotIn(types, type);
       }
     }
@@ -800,7 +800,7 @@ public class ExtensionsChecker {
     }
 
     BigInteger tmpPathLen = bc.getPathLenConstraint();
-    Integer pathLen = certprofile.getPathLen();
+    Integer pathLen = certprofile.extensions().getPathLen();
     if (pathLen == null) {
       if (tmpPathLen != null) {
         addViolation(failureMsg, "pathLen", tmpPathLen, "absent");
@@ -1302,7 +1302,7 @@ public class ExtensionsChecker {
 
   private void checkExtnSubjectDirAttrs(StringBuilder failureMsg, byte[] extensionValue,
       Extensions requestedExtns, ExtensionControl extControl) {
-    SubjectDirectoryAttributesControl conf = certprofile.getSubjectDirAttrsControl();
+    SubjectDirectoryAttributesControl conf = certprofile.extensions().getSubjectDirAttrsControl();
     if (conf == null) {
       failureMsg.append("extension is present but not expected; ");
       return;
@@ -1563,7 +1563,7 @@ public class ExtensionsChecker {
         : requestedExtns.getExtensionParsedValue(Extension.subjectAlternativeName);
 
     Map<ASN1ObjectIdentifier, GeneralNameTag> subjectToSubjectAltNameModes =
-        certprofile.getSubjectToSubjectAltNameModes();
+        certprofile.extensions().getSubjectToSubjectAltNameModes();
     if (extValue == null && subjectToSubjectAltNameModes == null) {
       return null;
     }
@@ -1813,7 +1813,7 @@ public class ExtensionsChecker {
 
   private void checkExtnAdmission(StringBuilder failureMsg, byte[] extensionValue,
       Extensions requestedExtns, X500Name requestedSubject, ExtensionControl extControl) {
-    AdmissionExtension.AdmissionSyntaxOption conf = certprofile.getAdmission();
+    AdmissionExtension.AdmissionSyntaxOption conf = certprofile.extensions().getAdmission();
     ASN1ObjectIdentifier type = Extn.id_extension_admission;
     if (conf == null) {
       checkConstantExtnValue(type, failureMsg, extensionValue, requestedExtns, extControl);
@@ -1964,7 +1964,7 @@ public class ExtensionsChecker {
       byte[] extensionValue, Date certNotBefore, Date certNotAfter) {
     ASN1GeneralizedTime notBefore = new ASN1GeneralizedTime(certNotBefore);
     Date dateNotAfter;
-    Validity privateKeyUsagePeriod = certprofile.getPrivateKeyUsagePeriod();
+    Validity privateKeyUsagePeriod = certprofile.extensions().getPrivateKeyUsagePeriod();
     if (privateKeyUsagePeriod == null) {
       dateNotAfter = certNotAfter;
     } else {
@@ -2158,7 +2158,7 @@ public class ExtensionsChecker {
 
   private void checkExtnBiometricInfo(StringBuilder failureMsg, byte[] extensionValue,
       Extensions requestedExtns, ExtensionControl extControl) {
-    BiometricInfoOption conf = certprofile.getBiometricInfo();
+    BiometricInfoOption conf = certprofile.extensions().getBiometricInfo();
 
     if (conf == null) {
       failureMsg.append("extension is present but not expected; ");
@@ -2276,7 +2276,7 @@ public class ExtensionsChecker {
   private Set<KeyUsageControl> getKeyusage(boolean required) {
     Set<KeyUsageControl> ret = new HashSet<>();
 
-    Set<KeyUsageControl> controls = certprofile.getKeyusages();
+    Set<KeyUsageControl> controls = certprofile.extensions().getKeyusages();
     if (controls != null) {
       for (KeyUsageControl control : controls) {
         if (control.isRequired() == required) {
@@ -2290,7 +2290,7 @@ public class ExtensionsChecker {
   private Set<ExtKeyUsageControl> getExtKeyusage(boolean required) {
     Set<ExtKeyUsageControl> ret = new HashSet<>();
 
-    Set<ExtKeyUsageControl> controls = certprofile.getExtendedKeyusages();
+    Set<ExtKeyUsageControl> controls = certprofile.extensions().getExtendedKeyusages();
     if (controls != null) {
       for (ExtKeyUsageControl control : controls) {
         if (control.isRequired() == required) {
