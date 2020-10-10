@@ -41,7 +41,6 @@ import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.KeyParametersOption;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
-import org.xipki.ca.certprofile.xijson.conf.ExtensionType.ExtnSyntax;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;

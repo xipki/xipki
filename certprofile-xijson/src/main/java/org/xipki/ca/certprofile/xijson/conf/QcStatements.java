@@ -17,6 +17,7 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableBinary;
@@ -28,43 +29,12 @@ import org.xipki.util.ValidatableConf;
 import com.alibaba.fastjson.annotation.JSONField;
 
 /**
- * Configuration of the extension QCStatements.
+ * Extension QCStatements.
  *
  * @author Lijun Liao
- * @since 2.0.0
  */
 
-public class QcStatementType extends ValidatableConf {
-
-  @JSONField(ordinal = 1)
-  private DescribableOid statementId;
-
-  @JSONField(ordinal = 2)
-  private QcStatementValueType statementValue;
-
-  public DescribableOid getStatementId() {
-    return statementId;
-  }
-
-  public void setStatementId(DescribableOid statementId) {
-    this.statementId = statementId;
-  }
-
-  public QcStatementValueType getStatementValue() {
-    return statementValue;
-  }
-
-  public void setStatementValue(QcStatementValueType statementValue) {
-    this.statementValue = statementValue;
-  }
-
-  @Override
-  public void validate()
-      throws InvalidConfException {
-    notNull(statementId, "statementId");
-    validate(statementId);
-    validate(statementValue);
-  }
+public class QcStatements extends ValidatableConf {
 
   public static class Range2Type extends ValidatableConf {
 
@@ -255,4 +225,58 @@ public class QcStatementType extends ValidatableConf {
 
   } // class QcStatementValueType
 
-}
+  public static class QcStatementType extends ValidatableConf {
+
+    @JSONField(ordinal = 1)
+    private DescribableOid statementId;
+
+    @JSONField(ordinal = 2)
+    private QcStatementValueType statementValue;
+
+    public DescribableOid getStatementId() {
+      return statementId;
+    }
+
+    public void setStatementId(DescribableOid statementId) {
+      this.statementId = statementId;
+    }
+
+    public QcStatementValueType getStatementValue() {
+      return statementValue;
+    }
+
+    public void setStatementValue(QcStatementValueType statementValue) {
+      this.statementValue = statementValue;
+    }
+
+    @Override
+    public void validate()
+        throws InvalidConfException {
+      notNull(statementId, "statementId");
+      validate(statementId);
+      validate(statementValue);
+    }
+
+  }
+
+  private List<QcStatementType> qcStatements;
+
+  public List<QcStatementType> getQcStatements() {
+    if (qcStatements == null) {
+      qcStatements = new LinkedList<>();
+    }
+    return qcStatements;
+  }
+
+  public void setQcStatements(List<QcStatementType> qcStatements) {
+    this.qcStatements = qcStatements;
+  }
+
+  @Override
+  public void validate()
+      throws InvalidConfException {
+    notEmpty(qcStatements, "qcStatements");
+    validate(qcStatements);
+  }
+
+} // class QcStatements

@@ -45,8 +45,8 @@ import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.profile.TextVadidator;
-import org.xipki.ca.certprofile.xijson.conf.ExtensionType.ExtnSyntax;
-import org.xipki.ca.certprofile.xijson.conf.ExtensionType.ExtnSyntax.SubFieldSyntax;
+import org.xipki.ca.certprofile.xijson.conf.ExtnSyntax;
+import org.xipki.ca.certprofile.xijson.conf.ExtnSyntax.SubFieldSyntax;
 import org.xipki.security.X509ExtensionType.FieldType;
 import org.xipki.security.X509ExtensionType.Tag;
 

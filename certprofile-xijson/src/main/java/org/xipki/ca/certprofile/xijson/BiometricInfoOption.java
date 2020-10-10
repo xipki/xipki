@@ -25,8 +25,8 @@ import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
-import org.xipki.ca.certprofile.xijson.conf.ExtensionType.BiometricInfo;
-import org.xipki.ca.certprofile.xijson.conf.ExtensionType.BiometricTypeType;
+import org.xipki.ca.certprofile.xijson.conf.BiometricInfo;
+import org.xipki.ca.certprofile.xijson.conf.BiometricInfo.BiometricTypeType;
 import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.TripleState;
