@@ -44,10 +44,17 @@ import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaSystemStatus;
 import org.xipki.ca.api.mgmt.CertListInfo;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
-import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.ca.api.mgmt.MgmtMessage.CaEntryWrapper;
 import org.xipki.ca.api.mgmt.MgmtMessage.MgmtAction;
 import org.xipki.ca.api.mgmt.MgmtMessage.SignerEntryWrapper;
+import org.xipki.ca.api.mgmt.entry.CaEntry;
+import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
+import org.xipki.ca.api.mgmt.entry.CaHasUserEntry;
+import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
+import org.xipki.ca.api.mgmt.entry.PublisherEntry;
+import org.xipki.ca.api.mgmt.entry.RequestorEntry;
+import org.xipki.ca.api.mgmt.entry.SignerEntry;
+import org.xipki.ca.api.mgmt.entry.UserEntry;
 import org.xipki.ca.api.mgmt.MgmtRequest;
 import org.xipki.ca.api.mgmt.MgmtResponse;
 import org.xipki.security.X509Cert;
@@ -132,7 +139,7 @@ public class HttpMgmtServlet extends HttpServlet {
       switch (action) {
         case addCa: {
           MgmtRequest.AddCa req = parse(in, MgmtRequest.AddCa.class);
-          MgmtEntry.Ca caEntry;
+          CaEntry caEntry;
           try {
             caEntry = req.getCaEntry().toCaEntry();
           } catch (CertificateException | InvalidConfException ex) {
@@ -268,7 +275,7 @@ public class HttpMgmtServlet extends HttpServlet {
         case generateRootCa: {
           MgmtRequest.GenerateRootCa req = parse(in, MgmtRequest.GenerateRootCa.class);
 
-          MgmtEntry.Ca caEntry;
+          CaEntry caEntry;
           try {
             caEntry = req.getCaEntry().toCaEntry();
           } catch (CertificateException | InvalidConfException ex) {
@@ -290,7 +297,7 @@ public class HttpMgmtServlet extends HttpServlet {
         }
         case getCa: {
           String name = getNameFromRequest(in);
-          MgmtEntry.Ca caEntry = caManager.getCa(name);
+          CaEntry caEntry = caManager.getCa(name);
           if (caEntry == null) {
             throw new CaMgmtException("Unknown CA " + name);
           }
@@ -304,7 +311,7 @@ public class HttpMgmtServlet extends HttpServlet {
         }
         case getCaHasUsersForUser: {
           String userName = getNameFromRequest(in);
-          Map<String, MgmtEntry.CaHasUser> result = caManager.getCaHasUsersForUser(userName);
+          Map<String, CaHasUserEntry> result = caManager.getCaHasUsersForUser(userName);
           if (result == null) {
             throw new CaMgmtException("Unknown user " + userName);
           }
@@ -342,7 +349,7 @@ public class HttpMgmtServlet extends HttpServlet {
         }
         case getCertprofile: {
           String name = getNameFromRequest(in);
-          MgmtEntry.Certprofile result = caManager.getCertprofile(name);
+          CertprofileEntry result = caManager.getCertprofile(name);
           if (result == null) {
             throw new CaMgmtException("Unknown Certprofile " + name);
           }
@@ -401,7 +408,7 @@ public class HttpMgmtServlet extends HttpServlet {
         }
         case getPublisher: {
           String name = getNameFromRequest(in);
-          MgmtEntry.Publisher result = caManager.getPublisher(name);
+          PublisherEntry result = caManager.getPublisher(name);
           if (result == null) {
             throw new CaMgmtException("Unknown publisher " + name);
           }
@@ -415,13 +422,13 @@ public class HttpMgmtServlet extends HttpServlet {
         }
         case getPublishersForCa: {
           String caName = getNameFromRequest(in);
-          List<MgmtEntry.Publisher> result = caManager.getPublishersForCa(caName);
+          List<PublisherEntry> result = caManager.getPublishersForCa(caName);
           resp = new MgmtResponse.GetPublischersForCa(result);
           break;
         }
         case getRequestor: {
           String name = getNameFromRequest(in);
-          MgmtEntry.Requestor result = caManager.getRequestor(name);
+          RequestorEntry result = caManager.getRequestor(name);
           if (result == null) {
             throw new CaMgmtException("Unknown requestor " + name);
           }
@@ -435,13 +442,13 @@ public class HttpMgmtServlet extends HttpServlet {
         }
         case getRequestorsForCa: {
           String caName = getNameFromRequest(in);
-          Set<MgmtEntry.CaHasRequestor> result = caManager.getRequestorsForCa(caName);
+          Set<CaHasRequestorEntry> result = caManager.getRequestorsForCa(caName);
           resp = new MgmtResponse.GetRequestorsForCa(result);
           break;
         }
         case getSigner: {
           String name = getNameFromRequest(in);
-          MgmtEntry.Signer result = caManager.getSigner(name);
+          SignerEntry result = caManager.getSigner(name);
           if (result == null) {
             throw new CaMgmtException("Unknown signer " + name);
           }
@@ -475,7 +482,7 @@ public class HttpMgmtServlet extends HttpServlet {
         }
         case getUser: {
           String name = getNameFromRequest(in);
-          MgmtEntry.User result = caManager.getUser(name);
+          UserEntry result = caManager.getUser(name);
           if (result == null) {
             throw new CaMgmtException("Unknown user " + name);
           }

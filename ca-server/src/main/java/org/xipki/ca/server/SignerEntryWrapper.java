@@ -21,7 +21,7 @@ import static org.xipki.util.Args.notNull;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.GeneralName;
-import org.xipki.ca.api.mgmt.MgmtEntry;
+import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
@@ -37,7 +37,7 @@ import org.xipki.util.ObjectCreationException;
 
 public class SignerEntryWrapper {
 
-  private MgmtEntry.Signer dbEntry;
+  private SignerEntry dbEntry;
 
   private ConcurrentContentSigner signer;
 
@@ -48,7 +48,7 @@ public class SignerEntryWrapper {
   public SignerEntryWrapper() {
   }
 
-  public void setDbEntry(MgmtEntry.Signer dbEntry) {
+  public void setDbEntry(SignerEntry dbEntry) {
     this.dbEntry = notNull(dbEntry, "dbEntry");
     signer = null;
     if (dbEntry.getCertificate() != null) {
@@ -88,7 +88,7 @@ public class SignerEntryWrapper {
     }
   } // method initSigner
 
-  public MgmtEntry.Signer getDbEntry() {
+  public SignerEntry getDbEntry() {
     return dbEntry;
   }
 

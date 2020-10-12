@@ -38,7 +38,7 @@ import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CertListInfo;
 import org.xipki.ca.api.mgmt.CertListOrderBy;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
-import org.xipki.ca.api.mgmt.MgmtEntry;
+import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.mgmt.shell.CaActions.CaAction;
 import org.xipki.security.CrlReason;
 import org.xipki.security.X509Cert;
@@ -111,7 +111,7 @@ public class CertActions {
     @Override
     protected Object execute0()
         throws Exception {
-      MgmtEntry.Ca ca = caManager.getCa(caName);
+      CaEntry ca = caManager.getCa(caName);
       if (ca == null) {
         throw new CmdFailure("CA " + caName + " not available");
       }
@@ -172,7 +172,7 @@ public class CertActions {
     @Override
     protected Object execute0()
         throws Exception {
-      MgmtEntry.Ca ca = caManager.getCa(caName);
+      CaEntry ca = caManager.getCa(caName);
       if (ca == null) {
         throw new CmdFailure("CA " + caName + " not available");
       }
@@ -278,7 +278,7 @@ public class CertActions {
     @Override
     protected Object execute0()
         throws Exception {
-      MgmtEntry.Ca ca = caManager.getCa(caName);
+      CaEntry ca = caManager.getCa(caName);
       if (ca == null) {
         throw new CmdFailure("CA " + caName + " not available");
       }
@@ -550,7 +550,7 @@ public class CertActions {
     protected BigInteger getSerialNumber()
         throws CmdFailure, IllegalCmdParamException, CertificateException, IOException,
           CaMgmtException  {
-      MgmtEntry.Ca ca = caManager.getCa(caName);
+      CaEntry ca = caManager.getCa(caName);
       if (ca == null) {
         throw new CmdFailure("CA " + caName + " not available");
       }

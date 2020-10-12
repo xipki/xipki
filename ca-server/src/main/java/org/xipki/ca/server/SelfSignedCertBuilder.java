@@ -44,7 +44,7 @@ import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.PublicCaInfo;
-import org.xipki.ca.api.mgmt.MgmtEntry;
+import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
@@ -134,7 +134,7 @@ class SelfSignedCertBuilder {
 
     ConcurrentContentSigner signer;
     try {
-      List<String[]> signerConfs = MgmtEntry.Ca.splitCaSignerConfs(signerConf);
+      List<String[]> signerConfs = CaEntry.splitCaSignerConfs(signerConf);
       List<String> restrictedSigAlgos = certprofile.getSignatureAlgorithms();
 
       String thisSignerConf = null;

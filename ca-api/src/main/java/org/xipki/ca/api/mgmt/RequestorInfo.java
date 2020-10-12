@@ -22,6 +22,8 @@ import java.util.Set;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.InsuffientPermissionException;
 import org.xipki.ca.api.NameId;
+import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
+import org.xipki.ca.api.mgmt.entry.CaHasUserEntry;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 
@@ -89,7 +91,7 @@ public interface RequestorInfo {
    */
   public class CmpRequestorInfo implements RequestorInfo {
 
-    private final MgmtEntry.CaHasRequestor caHasRequestor;
+    private final CaHasRequestorEntry caHasRequestor;
 
     private final CertWithDbId cert;
 
@@ -97,14 +99,14 @@ public interface RequestorInfo {
 
     private final byte[] keyId;
 
-    public CmpRequestorInfo(MgmtEntry.CaHasRequestor caHasRequestor, CertWithDbId cert) {
+    public CmpRequestorInfo(CaHasRequestorEntry caHasRequestor, CertWithDbId cert) {
       this.caHasRequestor = Args.notNull(caHasRequestor, "caHasRequestor");
       this.cert = Args.notNull(cert, "cert");
       this.password = null;
       this.keyId = null;
     }
 
-    public CmpRequestorInfo(MgmtEntry.CaHasRequestor caHasRequestor,
+    public CmpRequestorInfo(CaHasRequestorEntry caHasRequestor,
         char[] password, byte[] keyId) {
       this.caHasRequestor = Args.notNull(caHasRequestor, "caHasRequestor");
       this.cert = null;
@@ -112,7 +114,7 @@ public interface RequestorInfo {
       this.keyId = Args.notNull(keyId, "keyId");
     }
 
-    public MgmtEntry.CaHasRequestor getCaHasRequestor() {
+    public CaHasRequestorEntry getCaHasRequestor() {
       return caHasRequestor;
     }
 
@@ -176,9 +178,9 @@ public interface RequestorInfo {
 
     private final NameId ident;
 
-    private final MgmtEntry.CaHasUser caHasUser;
+    private final CaHasUserEntry caHasUser;
 
-    public ByUserRequestorInfo(NameId ident, MgmtEntry.CaHasUser caHasUser) {
+    public ByUserRequestorInfo(NameId ident, CaHasUserEntry caHasUser) {
       this.ident = Args.notNull(ident, "ident");
       this.caHasUser = Args.notNull(caHasUser, "caHasUser");
     }
@@ -197,7 +199,7 @@ public interface RequestorInfo {
       return caHasUser.getUserIdent().getId();
     }
 
-    public MgmtEntry.CaHasUser getCaHasUser() {
+    public CaHasUserEntry getCaHasUser() {
       return caHasUser;
     }
 

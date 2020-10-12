@@ -77,6 +77,17 @@ import org.xipki.ca.api.RequestType;
 import org.xipki.ca.api.mgmt.CaConf;
 import org.xipki.ca.api.mgmt.CaConfType;
 import org.xipki.ca.api.mgmt.CaConfType.NameTypeConf;
+import org.xipki.ca.api.mgmt.entry.AddUserEntry;
+import org.xipki.ca.api.mgmt.entry.CaEntry;
+import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
+import org.xipki.ca.api.mgmt.entry.CaHasUserEntry;
+import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
+import org.xipki.ca.api.mgmt.entry.ChangeCaEntry;
+import org.xipki.ca.api.mgmt.entry.ChangeUserEntry;
+import org.xipki.ca.api.mgmt.entry.PublisherEntry;
+import org.xipki.ca.api.mgmt.entry.RequestorEntry;
+import org.xipki.ca.api.mgmt.entry.SignerEntry;
+import org.xipki.ca.api.mgmt.entry.UserEntry;
 import org.xipki.ca.api.mgmt.CaManager;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaStatus;
@@ -85,7 +96,6 @@ import org.xipki.ca.api.mgmt.CertListInfo;
 import org.xipki.ca.api.mgmt.CertListOrderBy;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.api.mgmt.CtlogControl;
-import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.ca.api.mgmt.PermissionConstants;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.profile.Certprofile;
@@ -252,25 +262,25 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   private Map<String, SignerEntryWrapper> signers = new ConcurrentHashMap<>();
 
-  private Map<String, MgmtEntry.Signer> signerDbEntries = new ConcurrentHashMap<>();
+  private Map<String, SignerEntry> signerDbEntries = new ConcurrentHashMap<>();
 
   private final Map<String, IdentifiedCertprofile> certprofiles = new ConcurrentHashMap<>();
 
-  private final Map<String, MgmtEntry.Certprofile> certprofileDbEntries = new ConcurrentHashMap<>();
+  private final Map<String, CertprofileEntry> certprofileDbEntries = new ConcurrentHashMap<>();
 
   private final Map<String, IdentifiedCertPublisher> publishers = new ConcurrentHashMap<>();
 
-  private final Map<String, MgmtEntry.Publisher> publisherDbEntries = new ConcurrentHashMap<>();
+  private final Map<String, PublisherEntry> publisherDbEntries = new ConcurrentHashMap<>();
 
   private final Map<String, RequestorEntryWrapper> requestors = new ConcurrentHashMap<>();
 
-  private final Map<String, MgmtEntry.Requestor> requestorDbEntries = new ConcurrentHashMap<>();
+  private final Map<String, RequestorEntry> requestorDbEntries = new ConcurrentHashMap<>();
 
   private final Map<String, Set<String>> caHasProfiles = new ConcurrentHashMap<>();
 
   private final Map<String, Set<String>> caHasPublishers = new ConcurrentHashMap<>();
 
-  private final Map<String, Set<MgmtEntry.CaHasRequestor>> caHasRequestors =
+  private final Map<String, Set<CaHasRequestorEntry>> caHasRequestors =
       new ConcurrentHashMap<>();
 
   private final Map<String, Integer> caAliases = new ConcurrentHashMap<>();
@@ -968,7 +978,7 @@ public class CaManagerImpl implements CaManager, Closeable {
         byUserRequestorId = new NameId(id, name);
         idNameMap.addRequestor(byUserRequestorId);
       } else {
-        MgmtEntry.Requestor requestorDbEntry = queryExecutor.createRequestor(name);
+        RequestorEntry requestorDbEntry = queryExecutor.createRequestor(name);
         if (requestorDbEntry == null) {
           LOG.error("could not load requestor {}", name);
           continue;
@@ -997,7 +1007,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
     List<String> names = queryExecutor.namesFromTable("SIGNER");
     for (String name : names) {
-      MgmtEntry.Signer entry = queryExecutor.createSigner(name);
+      SignerEntry entry = queryExecutor.createSigner(name);
       if (entry == null) {
         LOG.error("could not initialize signer '{}'", name);
         continue;
@@ -1049,7 +1059,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
     List<String> names = queryExecutor.namesFromTable("PROFILE");
     for (String name : names) {
-      MgmtEntry.Certprofile dbEntry = queryExecutor.createCertprofile(name);
+      CertprofileEntry dbEntry = queryExecutor.createCertprofile(name);
       if (dbEntry == null) {
         LOG.error("could not initialize Certprofile '{}'", name);
         continue;
@@ -1087,7 +1097,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
     List<String> names = queryExecutor.namesFromTable("PUBLISHER");
     for (String name : names) {
-      MgmtEntry.Publisher dbEntry = queryExecutor.createPublisher(name);
+      PublisherEntry dbEntry = queryExecutor.createPublisher(name);
       if (dbEntry == null) {
         LOG.error("could not initialize publisher '{}'", name);
         continue;
@@ -1147,11 +1157,11 @@ public class CaManagerImpl implements CaManager, Closeable {
     LOG.info("created CA {}: {}", name, ca.toString(false));
     caInfos.put(name, ca);
     idNameMap.addCa(ca.getIdent());
-    Set<MgmtEntry.CaHasRequestor> caReqEntries = queryExecutor.createCaHasRequestors(ca.getIdent());
+    Set<CaHasRequestorEntry> caReqEntries = queryExecutor.createCaHasRequestors(ca.getIdent());
     caHasRequestors.put(name, caReqEntries);
     if (LOG.isInfoEnabled()) {
       StringBuilder sb = new StringBuilder();
-      for (MgmtEntry.CaHasRequestor entry : caReqEntries) {
+      for (CaHasRequestorEntry entry : caReqEntries) {
         sb.append("\n    ").append(entry);
       }
       LOG.info("CA {} is associated requestors:{}", name, sb);
@@ -1191,12 +1201,12 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
   } // method commitNextCrlNo
 
-  public RequestorInfo.ByUserRequestorInfo createByUserRequestor(MgmtEntry.CaHasUser caHasUser) {
+  public RequestorInfo.ByUserRequestorInfo createByUserRequestor(CaHasUserEntry caHasUser) {
     return new RequestorInfo.ByUserRequestorInfo(byUserRequestorId, caHasUser);
   }
 
   @Override
-  public void addCa(MgmtEntry.Ca caEntry)
+  public void addCa(CaEntry caEntry)
       throws CaMgmtException {
     notNull(caEntry, "caEntry");
     assertMasterModeAndSetuped();
@@ -1215,7 +1225,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
 
     try {
-      List<String[]> signerConfs = MgmtEntry.Ca.splitCaSignerConfs(caEntry.getSignerConf());
+      List<String[]> signerConfs = CaEntry.splitCaSignerConfs(caEntry.getSignerConf());
       ConcurrentContentSigner signer;
       for (String[] m : signerConfs) {
         SignerConf signerConf = new SignerConf(m[1]);
@@ -1246,13 +1256,13 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method addCa
 
   @Override
-  public MgmtEntry.Ca getCa(String name) {
+  public CaEntry getCa(String name) {
     CaInfo caInfo = caInfos.get(toNonBlankLower(name, "name"));
     return (caInfo == null) ? null : caInfo.getCaEntry();
   } // method getCa
 
   @Override
-  public void changeCa(MgmtEntry.ChangeCa entry)
+  public void changeCa(ChangeCaEntry entry)
       throws CaMgmtException {
     notNull(entry, "entry");
     assertMasterModeAndSetuped();
@@ -1396,12 +1406,12 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public Set<MgmtEntry.CaHasRequestor> getRequestorsForCa(String caName) {
+  public Set<CaHasRequestorEntry> getRequestorsForCa(String caName) {
     return caHasRequestors.get(caName = toNonBlankLower(caName, "caName"));
   }
 
   @Override
-  public MgmtEntry.Requestor getRequestor(String name) {
+  public RequestorEntry getRequestor(String name) {
     return requestorDbEntries.get(toNonBlankLower(name, "name"));
   }
 
@@ -1410,7 +1420,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public void addRequestor(MgmtEntry.Requestor requestorEntry)
+  public void addRequestor(RequestorEntry requestorEntry)
       throws CaMgmtException {
     notNull(requestorEntry, "requestorEntry");
     assertMasterModeAndSetuped();
@@ -1421,7 +1431,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
     // encrypt the password
     PasswordResolver pwdResolver = securityFactory.getPasswordResolver();
-    if (MgmtEntry.Requestor.TYPE_PBM.equalsIgnoreCase(requestorEntry.getType())) {
+    if (RequestorEntry.TYPE_PBM.equalsIgnoreCase(requestorEntry.getType())) {
       String conf = requestorEntry.getConf();
       if (!StringUtil.startsWithIgnoreCase(conf, "PBE:")) {
         String encryptedPassword;
@@ -1430,7 +1440,7 @@ public class CaManagerImpl implements CaManager, Closeable {
         } catch (PasswordResolverException ex) {
           throw new CaMgmtException("could not encrypt requestor " + name, ex);
         }
-        requestorEntry = new MgmtEntry.Requestor(requestorEntry.getIdent(),
+        requestorEntry = new RequestorEntry(requestorEntry.getIdent(),
                             requestorEntry.getType(), encryptedPassword);
       }
     }
@@ -1452,7 +1462,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
     for (String caName : caHasRequestors.keySet()) {
       boolean removeMe = false;
-      for (MgmtEntry.CaHasRequestor caHasRequestor : caHasRequestors.get(caName)) {
+      for (CaHasRequestorEntry caHasRequestor : caHasRequestors.get(caName)) {
         if (caHasRequestor.getRequestorIdent().getName().equals(name)) {
           removeMe = true;
           break;
@@ -1512,9 +1522,9 @@ public class CaManagerImpl implements CaManager, Closeable {
 
     queryExecutor.removeRequestorFromCa(requestorName, caName);
     if (caHasRequestors.containsKey(caName)) {
-      Set<MgmtEntry.CaHasRequestor> entries = caHasRequestors.get(caName);
-      MgmtEntry.CaHasRequestor entry = null;
-      for (MgmtEntry.CaHasRequestor m : entries) {
+      Set<CaHasRequestorEntry> entries = caHasRequestors.get(caName);
+      CaHasRequestorEntry entry = null;
+      for (CaHasRequestorEntry m : entries) {
         if (m.getRequestorIdent().getName().equals(requestorName)) {
           entry = m;
         }
@@ -1524,7 +1534,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method removeRequestorFromCa
 
   @Override
-  public void addRequestorToCa(MgmtEntry.CaHasRequestor requestor, String caName)
+  public void addRequestorToCa(CaHasRequestorEntry requestor, String caName)
       throws CaMgmtException {
     notNull(requestor, "requestor");
     caName = toNonBlankLower(caName, "caName");
@@ -1546,12 +1556,12 @@ public class CaManagerImpl implements CaManager, Closeable {
     // Set the ID of requestor
     requestorIdent.setId(ident.getId());
 
-    Set<MgmtEntry.CaHasRequestor> cmpRequestors = caHasRequestors.get(caName);
+    Set<CaHasRequestorEntry> cmpRequestors = caHasRequestors.get(caName);
     if (cmpRequestors == null) {
       cmpRequestors = new HashSet<>();
       caHasRequestors.put(caName, cmpRequestors);
     } else {
-      for (MgmtEntry.CaHasRequestor entry : cmpRequestors) {
+      for (CaHasRequestorEntry entry : cmpRequestors) {
         String requestorName = requestorIdent.getName();
         if (entry.getRequestorIdent().getName().equals(requestorName)) {
           String msg = concat("Requestor ", requestorName, " already associated with CA ", caName);
@@ -1576,7 +1586,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method removeUserFromCa
 
   @Override
-  public void addUserToCa(MgmtEntry.CaHasUser user, String caName)
+  public void addUserToCa(CaHasUserEntry user, String caName)
       throws CaMgmtException {
     caName = toNonBlankLower(caName, "caName");
     assertMasterModeAndSetuped();
@@ -1590,14 +1600,14 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method addUserToCa
 
   @Override
-  public Map<String, MgmtEntry.CaHasUser> getCaHasUsersForUser(String user)
+  public Map<String, CaHasUserEntry> getCaHasUsersForUser(String user)
       throws CaMgmtException {
     notBlank(user, "user");
     return queryExecutor.getCaHasUsersForUser(user, idNameMap);
   }
 
   @Override
-  public MgmtEntry.Certprofile getCertprofile(String name) {
+  public CertprofileEntry getCertprofile(String name) {
     return certprofileDbEntries.get(name.toLowerCase());
   }
 
@@ -1656,7 +1666,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method changeCertprofile
 
   @Override
-  public void addCertprofile(MgmtEntry.Certprofile certprofileEntry)
+  public void addCertprofile(CertprofileEntry certprofileEntry)
       throws CaMgmtException {
     notNull(certprofileEntry, "certprofileEntry");
     assertMasterModeAndSetuped();
@@ -1679,7 +1689,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method addCertprofile
 
   @Override
-  public void addSigner(MgmtEntry.Signer signerEntry)
+  public void addSigner(SignerEntry signerEntry)
       throws CaMgmtException {
     notNull(signerEntry, "signerEntry");
     assertMasterModeAndSetuped();
@@ -1763,7 +1773,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method changeSigner
 
   @Override
-  public MgmtEntry.Signer getSigner(String name) {
+  public SignerEntry getSigner(String name) {
     return signerDbEntries.get(toNonBlankLower(name, "name"));
   }
 
@@ -1772,7 +1782,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public void addPublisher(MgmtEntry.Publisher entry)
+  public void addPublisher(PublisherEntry entry)
       throws CaMgmtException {
     notNull(entry, "entry");
     assertMasterModeAndSetuped();
@@ -1793,14 +1803,14 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method addPublisher
 
   @Override
-  public List<MgmtEntry.Publisher> getPublishersForCa(String caName) {
+  public List<PublisherEntry> getPublishersForCa(String caName) {
     caName = toNonBlankLower(caName, "caName");
     Set<String> publisherNames = caHasPublishers.get(caName);
     if (publisherNames == null) {
       return Collections.emptyList();
     }
 
-    List<MgmtEntry.Publisher> ret = new ArrayList<>(publisherNames.size());
+    List<PublisherEntry> ret = new ArrayList<>(publisherNames.size());
     for (String publisherName : publisherNames) {
       ret.add(publisherDbEntries.get(publisherName));
     }
@@ -1809,7 +1819,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method getPublishersForCa
 
   @Override
-  public MgmtEntry.Publisher getPublisher(String name) {
+  public PublisherEntry getPublisher(String name) {
     name = toNonBlankLower(name, "name");
     return publisherDbEntries.get(name);
   }
@@ -2270,7 +2280,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method getIdentifiedPublishersForCa
 
   @Override
-  public X509Cert generateRootCa(MgmtEntry.Ca caEntry, String profileName, byte[] encodedCsr,
+  public X509Cert generateRootCa(CaEntry caEntry, String profileName, byte[] encodedCsr,
       BigInteger serialNumber)
           throws CaMgmtException {
     notNull(caEntry, "caEntry");
@@ -2333,7 +2343,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     String name = caEntry.getIdent().getName();
     long nextCrlNumber = caEntry.getNextCrlNumber();
 
-    MgmtEntry.Ca entry = new MgmtEntry.Ca(new NameId(null, name), caEntry.getSerialNoLen(),
+    CaEntry entry = new CaEntry(new NameId(null, name), caEntry.getSerialNoLen(),
         nextCrlNumber, signerType, signerConf, caEntry.getCaUris(), numCrls, expirationPeriod);
     entry.setCert(caCert);
     entry.setCmpControl(caEntry.getCmpControl());
@@ -2390,7 +2400,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
   } // method shutdownPublisher
 
-  SignerEntryWrapper createSigner(MgmtEntry.Signer entry)
+  SignerEntryWrapper createSigner(SignerEntry entry)
       throws CaMgmtException {
     notNull(entry, "entry");
     SignerEntryWrapper ret = new SignerEntryWrapper();
@@ -2405,7 +2415,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     return ret;
   } // method createSigner
 
-  IdentifiedCertprofile createCertprofile(MgmtEntry.Certprofile entry)
+  IdentifiedCertprofile createCertprofile(CertprofileEntry entry)
       throws CaMgmtException {
     notNull(entry, "entry");
 
@@ -2424,7 +2434,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
   } // method createCertprofile
 
-  IdentifiedCertPublisher createPublisher(MgmtEntry.Publisher entry)
+  IdentifiedCertPublisher createPublisher(PublisherEntry entry)
       throws CaMgmtException {
     notNull(entry, "entry");
     String type = entry.getType();
@@ -2449,14 +2459,14 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method createPublisher
 
   @Override
-  public void addUser(MgmtEntry.AddUser addUserEntry)
+  public void addUser(AddUserEntry addUserEntry)
       throws CaMgmtException {
     assertMasterModeAndSetuped();
     queryExecutor.addUser(addUserEntry);
   }
 
   @Override
-  public void changeUser(MgmtEntry.ChangeUser changeUserEntry)
+  public void changeUser(ChangeUserEntry changeUserEntry)
       throws CaMgmtException {
     assertMasterModeAndSetuped();
     queryExecutor.changeUser(changeUserEntry);
@@ -2473,7 +2483,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   } // method removeUser
 
   @Override
-  public MgmtEntry.User getUser(String username)
+  public UserEntry getUser(String username)
       throws CaMgmtException {
     return queryExecutor.getUser(username.toLowerCase());
   }
@@ -2679,8 +2689,8 @@ public class CaManagerImpl implements CaManager, Closeable {
 
     // Responder
     for (String name : conf.getSignerNames()) {
-      MgmtEntry.Signer entry = conf.getSigner(name);
-      MgmtEntry.Signer entryB = signerDbEntries.get(name);
+      SignerEntry entry = conf.getSigner(name);
+      SignerEntry entryB = signerDbEntries.get(name);
       if (entryB != null) {
         if (entry.equals(entryB)) {
           LOG.info("ignore existed signer {}", name);
@@ -2704,8 +2714,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     final boolean ignoreId = true;
     // Requestor
     for (String name : conf.getRequestorNames()) {
-      MgmtEntry.Requestor entry = conf.getRequestor(name);
-      MgmtEntry.Requestor entryB = requestorDbEntries.get(name);
+      RequestorEntry entry = conf.getRequestor(name);
+      RequestorEntry entryB = requestorDbEntries.get(name);
       if (entryB != null) {
         if (entry.equals(entryB, ignoreId)) {
           LOG.info("ignore existed CMP requestor {}", name);
@@ -2728,8 +2738,8 @@ public class CaManagerImpl implements CaManager, Closeable {
 
     // Publisher
     for (String name : conf.getPublisherNames()) {
-      MgmtEntry.Publisher entry = conf.getPublisher(name);
-      MgmtEntry.Publisher entryB = publisherDbEntries.get(name);
+      PublisherEntry entry = conf.getPublisher(name);
+      PublisherEntry entryB = publisherDbEntries.get(name);
       if (entryB != null) {
         if (entry.equals(entryB, ignoreId)) {
           LOG.info("ignore existed publisher {}", name);
@@ -2752,8 +2762,8 @@ public class CaManagerImpl implements CaManager, Closeable {
 
     // Certprofile
     for (String name : conf.getCertprofileNames()) {
-      MgmtEntry.Certprofile entry = conf.getCertprofile(name);
-      MgmtEntry.Certprofile entryB = certprofileDbEntries.get(name);
+      CertprofileEntry entry = conf.getCertprofile(name);
+      CertprofileEntry entryB = certprofileDbEntries.get(name);
       if (entryB != null) {
         if (entry.equals(entryB, ignoreId)) {
           LOG.info("ignore existed certprofile {}", name);
@@ -2777,15 +2787,15 @@ public class CaManagerImpl implements CaManager, Closeable {
     // User
     for (String name : conf.getUserNames()) {
       Object obj = conf.getUser(name);
-      MgmtEntry.User entryB = queryExecutor.getUser(name, true);
+      UserEntry entryB = queryExecutor.getUser(name, true);
 
       if (entryB != null) {
         boolean equals = false;
-        if (obj instanceof MgmtEntry.User) {
-          MgmtEntry.User entry = (MgmtEntry.User) obj;
+        if (obj instanceof UserEntry) {
+          UserEntry entry = (UserEntry) obj;
           equals = entry.equals(entryB, ignoreId);
         } else {
-          MgmtEntry.AddUser entry = (MgmtEntry.AddUser) obj;
+          AddUserEntry entry = (AddUserEntry) obj;
           equals = PasswordHash.validatePassword(entry.getPassword(), entryB.getHashedPassword());
         }
 
@@ -2798,10 +2808,10 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
 
       try {
-        if (obj instanceof MgmtEntry.User) {
-          queryExecutor.addUser((MgmtEntry.User) obj);
+        if (obj instanceof UserEntry) {
+          queryExecutor.addUser((UserEntry) obj);
         } else {
-          queryExecutor.addUser((MgmtEntry.AddUser) obj);
+          queryExecutor.addUser((AddUserEntry) obj);
         }
         LOG.info("added user {}", name);
       } catch (CaMgmtException ex) {
@@ -2815,10 +2825,10 @@ public class CaManagerImpl implements CaManager, Closeable {
     for (String caName : conf.getCaNames()) {
       CaConf.SingleCa scc = conf.getCa(caName);
       CaConf.GenSelfIssued genSelfIssued = scc.getGenSelfIssued();
-      MgmtEntry.Ca caEntry = scc.getCaEntry();
+      CaEntry caEntry = scc.getCaEntry();
       if (caEntry != null) {
         if (caInfos.containsKey(caName)) {
-          MgmtEntry.Ca entryB = caInfos.get(caName).getCaEntry();
+          CaEntry entryB = caInfos.get(caName).getCaEntry();
           if (caEntry.getCert() == null && genSelfIssued != null) {
             SignerConf signerConf = new SignerConf(caEntry.getSignerConf());
             ConcurrentContentSigner signer;
@@ -2910,13 +2920,13 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
 
       if (scc.getRequestors() != null) {
-        Set<MgmtEntry.CaHasRequestor> requestorsB = caHasRequestors.get(caName);
+        Set<CaHasRequestorEntry> requestorsB = caHasRequestors.get(caName);
 
-        for (MgmtEntry.CaHasRequestor requestor : scc.getRequestors()) {
+        for (CaHasRequestorEntry requestor : scc.getRequestors()) {
           String requestorName = requestor.getRequestorIdent().getName();
-          MgmtEntry.CaHasRequestor requestorB = null;
+          CaHasRequestorEntry requestorB = null;
           if (requestorsB != null) {
-            for (MgmtEntry.CaHasRequestor m : requestorsB) {
+            for (CaHasRequestorEntry m : requestorsB) {
               if (m.getRequestorIdent().getName().equals(requestorName)) {
                 requestorB = m;
                 break;
@@ -2945,13 +2955,13 @@ public class CaManagerImpl implements CaManager, Closeable {
       } // scc.getRequestors()
 
       if (scc.getUsers() != null) {
-        List<MgmtEntry.CaHasUser> usersB = queryExecutor.getCaHasUsersForCa(caName, idNameMap);
+        List<CaHasUserEntry> usersB = queryExecutor.getCaHasUsersForCa(caName, idNameMap);
 
-        for (MgmtEntry.CaHasUser user : scc.getUsers()) {
+        for (CaHasUserEntry user : scc.getUsers()) {
           String userName = user.getUserIdent().getName();
-          MgmtEntry.CaHasUser userB = null;
+          CaHasUserEntry userB = null;
           if (usersB != null) {
-            for (MgmtEntry.CaHasUser m : usersB) {
+            for (CaHasUserEntry m : usersB) {
               if (m.getUserIdent().getName().equals(userName)) {
                 userB = m;
                 break;
@@ -3041,11 +3051,11 @@ public class CaManagerImpl implements CaManager, Closeable {
           }
 
           // CaHasRequestors
-          Set<MgmtEntry.CaHasRequestor> requestors = caHasRequestors.get(name);
+          Set<CaHasRequestorEntry> requestors = caHasRequestors.get(name);
           if (CollectionUtil.isNotEmpty(requestors)) {
             ca.setRequestors(new ArrayList<>());
 
-            for (MgmtEntry.CaHasRequestor m : requestors) {
+            for (CaHasRequestorEntry m : requestors) {
               String requestorName = m.getRequestorIdent().getName();
               includeRequestorNames.add(requestorName);
 
@@ -3060,11 +3070,11 @@ public class CaManagerImpl implements CaManager, Closeable {
           }
 
           // CaHasUsers
-          List<MgmtEntry.CaHasUser> caHasUsers = queryExecutor.getCaHasUsersForCa(name, idNameMap);
+          List<CaHasUserEntry> caHasUsers = queryExecutor.getCaHasUsersForCa(name, idNameMap);
           if (CollectionUtil.isNotEmpty(caHasUsers)) {
             ca.setUsers(new ArrayList<>());
 
-            for (MgmtEntry.CaHasUser m : caHasUsers) {
+            for (CaHasUserEntry m : caHasUsers) {
               String username = m.getUserIdent().getName();
               CaConfType.CaHasUser chu = new CaConfType.CaHasUser();
               chu.setUserName(username);
@@ -3077,7 +3087,7 @@ public class CaManagerImpl implements CaManager, Closeable {
               }
 
               // add also the user to the users
-              MgmtEntry.User userEntry = queryExecutor.getUser(username);
+              UserEntry userEntry = queryExecutor.getUser(username);
               CaConfType.User userType = new CaConfType.User();
               if (!userEntry.isActive()) {
                 userType.setActive(Boolean.FALSE);
@@ -3105,7 +3115,7 @@ public class CaManagerImpl implements CaManager, Closeable {
           CaConfType.CaInfo caInfoType = new CaConfType.CaInfo();
           ca.setCaInfo(caInfoType);
 
-          MgmtEntry.Ca entry = x509cas.get(name).getCaInfo().getCaEntry();
+          CaEntry entry = x509cas.get(name).getCaInfo().getCaEntry();
           // CA URIs
           CaUris caUris = entry.getCaUris();
           if (caUris != null) {
@@ -3226,12 +3236,12 @@ public class CaManagerImpl implements CaManager, Closeable {
             continue;
           }
 
-          MgmtEntry.Requestor entry = requestorDbEntries.get(name);
+          RequestorEntry entry = requestorDbEntries.get(name);
           CaConfType.Requestor type = new CaConfType.Requestor();
           type.setName(name);
           type.setType(entry.getType());
 
-          if (MgmtEntry.Requestor.TYPE_CERT.equalsIgnoreCase(entry.getType())) {
+          if (RequestorEntry.TYPE_CERT.equalsIgnoreCase(entry.getType())) {
             FileOrBinary fob = createFileOrBinary(zipStream,
                 Base64.decode(entry.getConf()), concat("files/requestor-", name, ".der"));
             type.setBinaryConf(fob);
@@ -3257,7 +3267,7 @@ public class CaManagerImpl implements CaManager, Closeable {
           if (!includePublisherNames.contains(name)) {
             continue;
           }
-          MgmtEntry.Publisher entry = publisherDbEntries.get(name);
+          PublisherEntry entry = publisherDbEntries.get(name);
           NameTypeConf conf = new NameTypeConf();
           conf.setName(name);
           conf.setType(entry.getType());
@@ -3278,7 +3288,7 @@ public class CaManagerImpl implements CaManager, Closeable {
           if (!includeProfileNames.contains(name)) {
             continue;
           }
-          MgmtEntry.Certprofile entry = certprofileDbEntries.get(name);
+          CertprofileEntry entry = certprofileDbEntries.get(name);
           NameTypeConf conf = new NameTypeConf();
           conf.setName(name);
           conf.setType(entry.getType());
@@ -3301,7 +3311,7 @@ public class CaManagerImpl implements CaManager, Closeable {
             continue;
           }
 
-          MgmtEntry.Signer entry = signerDbEntries.get(name);
+          SignerEntry entry = signerDbEntries.get(name);
           CaConfType.Signer conf = new CaConfType.Signer();
           conf.setName(name);
           conf.setType(entry.getType());

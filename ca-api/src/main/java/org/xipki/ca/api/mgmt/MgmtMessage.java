@@ -23,6 +23,8 @@ import java.util.List;
 
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
+import org.xipki.ca.api.mgmt.entry.CaEntry;
+import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
@@ -145,7 +147,7 @@ public abstract class MgmtMessage {
     public SignerEntryWrapper() {
     }
 
-    public SignerEntryWrapper(MgmtEntry.Signer signerEntry) {
+    public SignerEntryWrapper(SignerEntry signerEntry) {
       this.name = signerEntry.getName();
       this.type = signerEntry.getType();
       this.conf = signerEntry.getConf();
@@ -195,13 +197,13 @@ public abstract class MgmtMessage {
       this.faulty = faulty;
     }
 
-    public MgmtEntry.Signer toSignerEntry() {
+    public SignerEntry toSignerEntry() {
       String base64Cert = null;
       if (encodedCert != null) {
         base64Cert = Base64.encodeToString(encodedCert);
       }
 
-      MgmtEntry.Signer ret = new MgmtEntry.Signer(name, type, conf, base64Cert);
+      SignerEntry ret = new SignerEntry(name, type, conf, base64Cert);
       ret.setConfFaulty(faulty);
       return ret;
     }
@@ -268,7 +270,7 @@ public abstract class MgmtMessage {
     public CaEntryWrapper() {
     }
 
-    public CaEntryWrapper(MgmtEntry.Ca caEntry) {
+    public CaEntryWrapper(CaEntry caEntry) {
       caUris = caEntry.getCaUris();
 
       if (caEntry.getCert() != null) {
@@ -554,9 +556,9 @@ public abstract class MgmtMessage {
       this.revocationInfo = revocationInfo;
     }
 
-    public MgmtEntry.Ca toCaEntry()
+    public CaEntry toCaEntry()
         throws CertificateException, CaMgmtException, InvalidConfException {
-      MgmtEntry.Ca rv = new MgmtEntry.Ca(ident, serialNoLen, nextCrlNumber,
+      CaEntry rv = new CaEntry(ident, serialNoLen, nextCrlNumber,
                           signerType, signerConf, caUris, numCrls, expirationPeriod);
       if (certBytes != null) {
         rv.setCert(X509Util.parseCert(certBytes));

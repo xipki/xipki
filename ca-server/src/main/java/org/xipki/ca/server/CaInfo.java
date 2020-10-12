@@ -37,12 +37,12 @@ import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.CmpControl;
 import org.xipki.ca.api.mgmt.CrlControl;
 import org.xipki.ca.api.mgmt.CtlogControl;
-import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.ca.api.mgmt.PermissionConstants;
 import org.xipki.ca.api.mgmt.ProtocolSupport;
 import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
 import org.xipki.ca.api.mgmt.ScepControl;
 import org.xipki.ca.api.mgmt.ValidityMode;
+import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
@@ -67,7 +67,7 @@ public class CaInfo {
 
   private static final long MS_PER_DAY = 24L * 60 * 60 * 1000;
 
-  private final MgmtEntry.Ca caEntry;
+  private final CaEntry caEntry;
 
   private final long noNewCertificateAfter;
 
@@ -97,7 +97,7 @@ public class CaInfo {
 
   private RevokeSuspendedControl revokeSuspendedCertsControl;
 
-  public CaInfo(MgmtEntry.Ca caEntry, CertStore certStore)
+  public CaInfo(CaEntry caEntry, CertStore certStore)
       throws OperationException {
     this.caEntry = Args.notNull(caEntry, "caEntry");
     this.certStore = Args.notNull(certStore, "certStore");
@@ -147,7 +147,7 @@ public class CaInfo {
     return noNewCertificateAfter;
   }
 
-  public MgmtEntry.Ca getCaEntry() {
+  public CaEntry getCaEntry() {
     return caEntry;
   }
 
@@ -367,7 +367,7 @@ public class CaInfo {
     }
     dfltSigner = null;
 
-    List<String[]> signerConfs = MgmtEntry.Ca.splitCaSignerConfs(caEntry.getSignerConf());
+    List<String[]> signerConfs = CaEntry.splitCaSignerConfs(caEntry.getSignerConf());
 
     Map<String, ConcurrentContentSigner> tmpSigners = new HashMap<>();
     for (String[] m : signerConfs) {

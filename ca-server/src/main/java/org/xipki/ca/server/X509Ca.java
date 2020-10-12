@@ -119,7 +119,9 @@ import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.api.mgmt.CmpControl;
 import org.xipki.ca.api.mgmt.CrlControl;
 import org.xipki.ca.api.mgmt.CrlControl.HourMinute;
-import org.xipki.ca.api.mgmt.MgmtEntry;
+import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
+import org.xipki.ca.api.mgmt.entry.CaHasUserEntry;
+import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.mgmt.ValidityMode;
 import org.xipki.ca.api.profile.Certprofile;
@@ -583,7 +585,7 @@ public class X509Ca implements Closeable {
 
   public RequestorInfo.ByUserRequestorInfo getByUserRequestor(NameId userIdent)
       throws OperationException {
-    MgmtEntry.CaHasUser caHasUser = certstore.getCaHasUser(caIdent, userIdent);
+    CaHasUserEntry caHasUser = certstore.getCaHasUser(caIdent, userIdent);
     return (caHasUser == null) ? null : caManager.createByUserRequestor(caHasUser);
   }
 
@@ -2180,13 +2182,13 @@ public class X509Ca implements Closeable {
   }
 
   public RequestorInfo.CmpRequestorInfo getRequestor(X500Name requestorSender) {
-    Set<MgmtEntry.CaHasRequestor> requestorEntries =
+    Set<CaHasRequestorEntry> requestorEntries =
         caManager.getRequestorsForCa(caIdent.getName());
     if (CollectionUtil.isEmpty(requestorEntries)) {
       return null;
     }
 
-    for (MgmtEntry.CaHasRequestor m : requestorEntries) {
+    for (CaHasRequestorEntry m : requestorEntries) {
       RequestorEntryWrapper entry =
           caManager.getRequestorWrapper(m.getRequestorIdent().getName());
 
@@ -2194,7 +2196,7 @@ public class X509Ca implements Closeable {
         continue;
       }
 
-      if (!MgmtEntry.Requestor.TYPE_CERT.equals(entry.getDbEntry().getType())) {
+      if (!RequestorEntry.TYPE_CERT.equals(entry.getDbEntry().getType())) {
         continue;
       }
 
@@ -2207,16 +2209,16 @@ public class X509Ca implements Closeable {
   } // method getRequestor
 
   public RequestorInfo.CmpRequestorInfo getRequestor(X509Cert requestorCert) {
-    Set<MgmtEntry.CaHasRequestor> requestorEntries =
+    Set<CaHasRequestorEntry> requestorEntries =
         caManager.getRequestorsForCa(caIdent.getName());
     if (CollectionUtil.isEmpty(requestorEntries)) {
       return null;
     }
 
-    for (MgmtEntry.CaHasRequestor m : requestorEntries) {
+    for (CaHasRequestorEntry m : requestorEntries) {
       RequestorEntryWrapper entry =
           caManager.getRequestorWrapper(m.getRequestorIdent().getName());
-      if (!MgmtEntry.Requestor.TYPE_CERT.equals(entry.getDbEntry().getType())) {
+      if (!RequestorEntry.TYPE_CERT.equals(entry.getDbEntry().getType())) {
         continue;
       }
 
@@ -2230,16 +2232,16 @@ public class X509Ca implements Closeable {
 
   // CHECKSTYLE:SKIP
   public RequestorInfo.CmpRequestorInfo getMacRequestor(X500Name sender, byte[] senderKID) {
-    Set<MgmtEntry.CaHasRequestor> requestorEntries =
+    Set<CaHasRequestorEntry> requestorEntries =
         caManager.getRequestorsForCa(caIdent.getName());
     if (CollectionUtil.isEmpty(requestorEntries)) {
       return null;
     }
 
-    for (MgmtEntry.CaHasRequestor m : requestorEntries) {
+    for (CaHasRequestorEntry m : requestorEntries) {
       RequestorEntryWrapper entry =
           caManager.getRequestorWrapper(m.getRequestorIdent().getName());
-      if (!MgmtEntry.Requestor.TYPE_PBM.equals(entry.getDbEntry().getType())) {
+      if (!RequestorEntry.TYPE_PBM.equals(entry.getDbEntry().getType())) {
         continue;
       }
 

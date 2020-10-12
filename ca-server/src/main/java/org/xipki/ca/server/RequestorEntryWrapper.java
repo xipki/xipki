@@ -23,7 +23,7 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CertWithDbId;
-import org.xipki.ca.api.mgmt.MgmtEntry;
+import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.HashAlgo;
@@ -43,7 +43,7 @@ import org.xipki.util.StringUtil;
 public class RequestorEntryWrapper {
   private static final Logger LOG = LoggerFactory.getLogger(RequestorEntryWrapper.class);
 
-  private MgmtEntry.Requestor dbEntry;
+  private RequestorEntry dbEntry;
 
   private CertWithDbId cert;
 
@@ -54,13 +54,13 @@ public class RequestorEntryWrapper {
   public RequestorEntryWrapper() {
   }
 
-  public void setDbEntry(MgmtEntry.Requestor dbEntry, PasswordResolver passwordResolver) {
+  public void setDbEntry(RequestorEntry dbEntry, PasswordResolver passwordResolver) {
     this.dbEntry = Args.notNull(dbEntry, "dbEntry");
     String type = dbEntry.getType();
     String conf = dbEntry.getConf();
 
     dbEntry.setFaulty(true);
-    if (MgmtEntry.Requestor.TYPE_CERT.equalsIgnoreCase(type)) {
+    if (RequestorEntry.TYPE_CERT.equalsIgnoreCase(type)) {
       try {
         X509Cert x509Cert = X509Util.parseCert(StringUtil.toUtf8Bytes(conf));
         dbEntry.setFaulty(false);
@@ -68,7 +68,7 @@ public class RequestorEntryWrapper {
       } catch (CertificateException ex) {
         LogUtil.error(LOG, ex, "error while parsing certificate of requestor" + dbEntry.getIdent());
       }
-    } else if (MgmtEntry.Requestor.TYPE_PBM.equalsIgnoreCase(type)) {
+    } else if (RequestorEntry.TYPE_PBM.equalsIgnoreCase(type)) {
       try {
         this.keyId = HashAlgo.SHA1.hash(StringUtil.toUtf8Bytes(dbEntry.getIdent().getName()));
         this.password = passwordResolver.resolvePassword(conf);
@@ -83,7 +83,7 @@ public class RequestorEntryWrapper {
     return cert;
   }
 
-  public MgmtEntry.Requestor getDbEntry() {
+  public RequestorEntry getDbEntry() {
     return dbEntry;
   }
 

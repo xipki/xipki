@@ -68,7 +68,7 @@ import org.xipki.ca.api.BadFormatException;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.PublicCaInfo;
-import org.xipki.ca.api.mgmt.MgmtEntry;
+import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
 import org.xipki.ca.api.profile.BaseCertprofile;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.Certprofile.AuthorityInfoAccessControl;
@@ -120,10 +120,10 @@ class IdentifiedCertprofile implements Closeable {
 
   private static Validity maxCabEeValidity = new Validity(825, Unit.DAY);
 
-  private final MgmtEntry.Certprofile dbEntry;
+  private final CertprofileEntry dbEntry;
   private final Certprofile certprofile;
 
-  IdentifiedCertprofile(MgmtEntry.Certprofile dbEntry, Certprofile certprofile)
+  IdentifiedCertprofile(CertprofileEntry dbEntry, Certprofile certprofile)
       throws CertprofileException {
     this.dbEntry = notNull(dbEntry, "dbEntry");
     this.certprofile = notNull(certprofile, "certprofile");
@@ -135,7 +135,7 @@ class IdentifiedCertprofile implements Closeable {
     return dbEntry.getIdent();
   }
 
-  public MgmtEntry.Certprofile getDbEntry() {
+  public CertprofileEntry getDbEntry() {
     return dbEntry;
   }
 

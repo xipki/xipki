@@ -21,6 +21,14 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
+import org.xipki.ca.api.mgmt.entry.AddUserEntry;
+import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
+import org.xipki.ca.api.mgmt.entry.CaHasUserEntry;
+import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
+import org.xipki.ca.api.mgmt.entry.ChangeCaEntry;
+import org.xipki.ca.api.mgmt.entry.ChangeUserEntry;
+import org.xipki.ca.api.mgmt.entry.PublisherEntry;
+import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 
@@ -62,13 +70,13 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   public static class AddCertprofile extends MgmtRequest {
 
-    private MgmtEntry.Certprofile certprofileEntry;
+    private CertprofileEntry certprofileEntry;
 
-    public MgmtEntry.Certprofile getCertprofileEntry() {
+    public CertprofileEntry getCertprofileEntry() {
       return certprofileEntry;
     }
 
-    public void setCertprofileEntry(MgmtEntry.Certprofile certprofileEntry) {
+    public void setCertprofileEntry(CertprofileEntry certprofileEntry) {
       this.certprofileEntry = certprofileEntry;
     }
 
@@ -90,13 +98,13 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   public static class AddPublisher extends MgmtRequest {
 
-    private MgmtEntry.Publisher publisherEntry;
+    private PublisherEntry publisherEntry;
 
-    public MgmtEntry.Publisher getPublisherEntry() {
+    public PublisherEntry getPublisherEntry() {
       return publisherEntry;
     }
 
-    public void setPublisherEntry(MgmtEntry.Publisher publisherEntry) {
+    public void setPublisherEntry(PublisherEntry publisherEntry) {
       this.publisherEntry = publisherEntry;
     }
 
@@ -118,13 +126,13 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   public static class AddRequestor extends MgmtRequest {
 
-    private MgmtEntry.Requestor requestorEntry;
+    private RequestorEntry requestorEntry;
 
-    public MgmtEntry.Requestor getRequestorEntry() {
+    public RequestorEntry getRequestorEntry() {
       return requestorEntry;
     }
 
-    public void setRequestorEntry(MgmtEntry.Requestor requestorEntry) {
+    public void setRequestorEntry(RequestorEntry requestorEntry) {
       this.requestorEntry = requestorEntry;
     }
 
@@ -132,13 +140,13 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   public static class AddRequestorToCa extends CaNameRequest {
 
-    private MgmtEntry.CaHasRequestor requestor;
+    private CaHasRequestorEntry requestor;
 
-    public MgmtEntry.CaHasRequestor getRequestor() {
+    public CaHasRequestorEntry getRequestor() {
       return requestor;
     }
 
-    public void setRequestor(MgmtEntry.CaHasRequestor requestor) {
+    public void setRequestor(CaHasRequestorEntry requestor) {
       this.requestor = requestor;
     }
 
@@ -160,13 +168,13 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   public static class AddUser extends MgmtRequest {
 
-    private MgmtEntry.AddUser addUserEntry;
+    private AddUserEntry addUserEntry;
 
-    public MgmtEntry.AddUser getAddUserEntry() {
+    public AddUserEntry getAddUserEntry() {
       return addUserEntry;
     }
 
-    public void setAddUserEntry(MgmtEntry.AddUser addUserEntry) {
+    public void setAddUserEntry(AddUserEntry addUserEntry) {
       this.addUserEntry = addUserEntry;
     }
 
@@ -174,13 +182,13 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   public static class AddUserToCa extends CaNameRequest {
 
-    private MgmtEntry.CaHasUser user;
+    private CaHasUserEntry user;
 
-    public MgmtEntry.CaHasUser getUser() {
+    public CaHasUserEntry getUser() {
       return user;
     }
 
-    public void setUser(MgmtEntry.CaHasUser user) {
+    public void setUser(CaHasUserEntry user) {
       this.user = user;
     }
 
@@ -202,13 +210,13 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   public static class ChangeCa extends MgmtRequest {
 
-    private MgmtEntry.ChangeCa changeCaEntry;
+    private ChangeCaEntry changeCaEntry;
 
-    public MgmtEntry.ChangeCa getChangeCaEntry() {
+    public ChangeCaEntry getChangeCaEntry() {
       return changeCaEntry;
     }
 
-    public void setChangeCaEntry(MgmtEntry.ChangeCa changeCaEntry) {
+    public void setChangeCaEntry(ChangeCaEntry changeCaEntry) {
       this.changeCaEntry = changeCaEntry;
     }
 
@@ -303,13 +311,13 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   public static class ChangeUser extends MgmtRequest {
 
-    private MgmtEntry.ChangeUser changeUserEntry;
+    private ChangeUserEntry changeUserEntry;
 
-    public MgmtEntry.ChangeUser getChangeUserEntry() {
+    public ChangeUserEntry getChangeUserEntry() {
       return changeUserEntry;
     }
 
-    public void setChangeUserEntry(MgmtEntry.ChangeUser changeUserEntry) {
+    public void setChangeUserEntry(ChangeUserEntry changeUserEntry) {
       this.changeUserEntry = changeUserEntry;
     }
 

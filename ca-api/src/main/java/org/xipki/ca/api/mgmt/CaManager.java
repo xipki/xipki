@@ -27,6 +27,17 @@ import java.util.Set;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CRLHolder;
+import org.xipki.ca.api.mgmt.entry.AddUserEntry;
+import org.xipki.ca.api.mgmt.entry.CaEntry;
+import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
+import org.xipki.ca.api.mgmt.entry.CaHasUserEntry;
+import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
+import org.xipki.ca.api.mgmt.entry.ChangeCaEntry;
+import org.xipki.ca.api.mgmt.entry.ChangeUserEntry;
+import org.xipki.ca.api.mgmt.entry.PublisherEntry;
+import org.xipki.ca.api.mgmt.entry.RequestorEntry;
+import org.xipki.ca.api.mgmt.entry.SignerEntry;
+import org.xipki.ca.api.mgmt.entry.UserEntry;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.X509Cert;
@@ -204,7 +215,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void addCa(MgmtEntry.Ca caEntry)
+  void addCa(CaEntry caEntry)
       throws CaMgmtException;
 
   /**
@@ -215,7 +226,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  MgmtEntry.Ca getCa(String caName)
+  CaEntry getCa(String caName)
       throws CaMgmtException;
 
   /**
@@ -226,7 +237,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void changeCa(MgmtEntry.ChangeCa changeCaEntry)
+  void changeCa(ChangeCaEntry changeCaEntry)
       throws CaMgmtException;
 
   /**
@@ -297,7 +308,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  Set<MgmtEntry.CaHasRequestor> getRequestorsForCa(String caName)
+  Set<CaHasRequestorEntry> getRequestorsForCa(String caName)
       throws CaMgmtException;
 
   /**
@@ -308,7 +319,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  MgmtEntry.Requestor getRequestor(String name)
+  RequestorEntry getRequestor(String name)
       throws CaMgmtException;
 
   /**
@@ -318,7 +329,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void addRequestor(MgmtEntry.Requestor requestorEntry)
+  void addRequestor(RequestorEntry requestorEntry)
       throws CaMgmtException;
 
   /**
@@ -366,7 +377,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void addRequestorToCa(MgmtEntry.CaHasRequestor requestor, String caName)
+  void addRequestorToCa(CaHasRequestorEntry requestor, String caName)
       throws CaMgmtException;
 
   /**
@@ -390,7 +401,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void addUserToCa(MgmtEntry.CaHasUser user, String caName)
+  void addUserToCa(CaHasUserEntry user, String caName)
       throws CaMgmtException;
 
   /**
@@ -400,7 +411,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  Map<String, MgmtEntry.CaHasUser> getCaHasUsersForUser(String user)
+  Map<String, CaHasUserEntry> getCaHasUsersForUser(String user)
       throws CaMgmtException;
 
   /**
@@ -411,7 +422,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  MgmtEntry.Certprofile getCertprofile(String profileName)
+  CertprofileEntry getCertprofile(String profileName)
       throws CaMgmtException;
 
   /**
@@ -445,7 +456,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void addCertprofile(MgmtEntry.Certprofile certprofileEntry)
+  void addCertprofile(CertprofileEntry certprofileEntry)
       throws CaMgmtException;
 
   /**
@@ -455,7 +466,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void addSigner(MgmtEntry.Signer signerEntry)
+  void addSigner(SignerEntry signerEntry)
       throws CaMgmtException;
 
   /**
@@ -476,7 +487,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  MgmtEntry.Signer getSigner(String name)
+  SignerEntry getSigner(String name)
       throws CaMgmtException;
 
   /**
@@ -502,7 +513,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void addPublisher(MgmtEntry.Publisher entry)
+  void addPublisher(PublisherEntry entry)
       throws CaMgmtException;
 
   /**
@@ -513,7 +524,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  List<MgmtEntry.Publisher> getPublishersForCa(String caName)
+  List<PublisherEntry> getPublishersForCa(String caName)
       throws CaMgmtException;
 
   /**
@@ -524,7 +535,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  MgmtEntry.Publisher getPublisher(String publisherName)
+  PublisherEntry getPublisher(String publisherName)
       throws CaMgmtException;
 
   /**
@@ -654,7 +665,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  X509Cert generateRootCa(MgmtEntry.Ca caEntry, String certprofileName,
+  X509Cert generateRootCa(CaEntry caEntry, String certprofileName,
       byte[] encodedCsr, BigInteger serialNumber)
           throws CaMgmtException;
 
@@ -665,7 +676,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void addUser(MgmtEntry.AddUser addUserEntry)
+  void addUser(AddUserEntry addUserEntry)
       throws CaMgmtException;
 
   /**
@@ -675,7 +686,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  void changeUser(MgmtEntry.ChangeUser changeUserEntry)
+  void changeUser(ChangeUserEntry changeUserEntry)
       throws CaMgmtException;
 
   /**
@@ -696,7 +707,7 @@ public interface CaManager {
    * @throws CaMgmtException
    *          if error occurs.
    */
-  MgmtEntry.User getUser(String username)
+  UserEntry getUser(String username)
       throws CaMgmtException;
 
   /**

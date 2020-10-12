@@ -23,6 +23,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.xipki.ca.api.CertWithDbId;
+import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
+import org.xipki.ca.api.mgmt.entry.CaHasUserEntry;
+import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
+import org.xipki.ca.api.mgmt.entry.PublisherEntry;
+import org.xipki.ca.api.mgmt.entry.RequestorEntry;
+import org.xipki.ca.api.mgmt.entry.UserEntry;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.util.X509Util;
 
@@ -210,20 +216,20 @@ public abstract class MgmtResponse extends MgmtMessage {
 
   public static class GetCaHasUserForUser extends MgmtResponse {
 
-    private Map<String, MgmtEntry.CaHasUser> result;
+    private Map<String, CaHasUserEntry> result;
 
     public GetCaHasUserForUser() {
     }
 
-    public GetCaHasUserForUser(Map<String, MgmtEntry.CaHasUser> result) {
+    public GetCaHasUserForUser(Map<String, CaHasUserEntry> result) {
       this.result = result;
     }
 
-    public Map<String, MgmtEntry.CaHasUser> getResult() {
+    public Map<String, CaHasUserEntry> getResult() {
       return result;
     }
 
-    public void setResult(Map<String, MgmtEntry.CaHasUser> result) {
+    public void setResult(Map<String, CaHasUserEntry> result) {
       this.result = result;
     }
 
@@ -231,20 +237,20 @@ public abstract class MgmtResponse extends MgmtMessage {
 
   public static class GetCaHasUsersForUser extends MgmtResponse {
 
-    private Map<String, MgmtEntry.CaHasUser> result;
+    private Map<String, CaHasUserEntry> result;
 
     public GetCaHasUsersForUser() {
     }
 
-    public GetCaHasUsersForUser(Map<String, MgmtEntry.CaHasUser> result) {
+    public GetCaHasUsersForUser(Map<String, CaHasUserEntry> result) {
       this.result = result;
     }
 
-    public Map<String, MgmtEntry.CaHasUser> getResult() {
+    public Map<String, CaHasUserEntry> getResult() {
       return result;
     }
 
-    public void setResult(Map<String, MgmtEntry.CaHasUser> result) {
+    public void setResult(Map<String, CaHasUserEntry> result) {
       this.result = result;
     }
 
@@ -273,20 +279,20 @@ public abstract class MgmtResponse extends MgmtMessage {
 
   public static class GetCertprofile extends MgmtResponse {
 
-    private MgmtEntry.Certprofile result;
+    private CertprofileEntry result;
 
     public GetCertprofile() {
     }
 
-    public GetCertprofile(MgmtEntry.Certprofile result) {
+    public GetCertprofile(CertprofileEntry result) {
       this.result = result;
     }
 
-    public MgmtEntry.Certprofile getResult() {
+    public CertprofileEntry getResult() {
       return result;
     }
 
-    public void setResult(MgmtEntry.Certprofile result) {
+    public void setResult(CertprofileEntry result) {
       this.result = result;
     }
 
@@ -315,20 +321,20 @@ public abstract class MgmtResponse extends MgmtMessage {
 
   public static class GetPublischersForCa extends MgmtResponse {
 
-    private List<MgmtEntry.Publisher> result;
+    private List<PublisherEntry> result;
 
     public GetPublischersForCa() {
     }
 
-    public GetPublischersForCa(List<MgmtEntry.Publisher> result) {
+    public GetPublischersForCa(List<PublisherEntry> result) {
       this.result = result;
     }
 
-    public List<MgmtEntry.Publisher> getResult() {
+    public List<PublisherEntry> getResult() {
       return result;
     }
 
-    public void setResult(List<MgmtEntry.Publisher> result) {
+    public void setResult(List<PublisherEntry> result) {
       this.result = result;
     }
 
@@ -336,20 +342,20 @@ public abstract class MgmtResponse extends MgmtMessage {
 
   public static class GetPublisher extends MgmtResponse {
 
-    private MgmtEntry.Publisher result;
+    private PublisherEntry result;
 
     public GetPublisher() {
     }
 
-    public GetPublisher(MgmtEntry.Publisher result) {
+    public GetPublisher(PublisherEntry result) {
       this.result = result;
     }
 
-    public MgmtEntry.Publisher getResult() {
+    public PublisherEntry getResult() {
       return result;
     }
 
-    public void setResult(MgmtEntry.Publisher result) {
+    public void setResult(PublisherEntry result) {
       this.result = result;
     }
 
@@ -357,20 +363,20 @@ public abstract class MgmtResponse extends MgmtMessage {
 
   public static class GetRequestor extends MgmtResponse {
 
-    private MgmtEntry.Requestor result;
+    private RequestorEntry result;
 
     public GetRequestor() {
     }
 
-    public GetRequestor(MgmtEntry.Requestor result) {
+    public GetRequestor(RequestorEntry result) {
       this.result = result;
     }
 
-    public MgmtEntry.Requestor getResult() {
+    public RequestorEntry getResult() {
       return result;
     }
 
-    public void setResult(MgmtEntry.Requestor result) {
+    public void setResult(RequestorEntry result) {
       this.result = result;
     }
 
@@ -378,20 +384,20 @@ public abstract class MgmtResponse extends MgmtMessage {
 
   public static class GetRequestorsForCa extends MgmtResponse {
 
-    private Set<MgmtEntry.CaHasRequestor> result;
+    private Set<CaHasRequestorEntry> result;
 
     public GetRequestorsForCa() {
     }
 
-    public GetRequestorsForCa(Set<MgmtEntry.CaHasRequestor> result) {
+    public GetRequestorsForCa(Set<CaHasRequestorEntry> result) {
       this.result = result;
     }
 
-    public Set<MgmtEntry.CaHasRequestor> getResult() {
+    public Set<CaHasRequestorEntry> getResult() {
       return result;
     }
 
-    public void setResult(Set<MgmtEntry.CaHasRequestor> result) {
+    public void setResult(Set<CaHasRequestorEntry> result) {
       this.result = result;
     }
 
@@ -420,20 +426,20 @@ public abstract class MgmtResponse extends MgmtMessage {
 
   public static class GetUser extends MgmtResponse {
 
-    private MgmtEntry.User result;
+    private UserEntry result;
 
     public GetUser() {
     }
 
-    public GetUser(MgmtEntry.User result) {
+    public GetUser(UserEntry result) {
       this.result = result;
     }
 
-    public MgmtEntry.User getResult() {
+    public UserEntry getResult() {
       return result;
     }
 
-    public void setResult(MgmtEntry.User result) {
+    public void setResult(UserEntry result) {
       this.result = result;
     }
 

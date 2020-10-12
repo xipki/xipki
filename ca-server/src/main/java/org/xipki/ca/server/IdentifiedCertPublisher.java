@@ -26,7 +26,7 @@ import org.bouncycastle.cert.X509CRLHolder;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.mgmt.MgmtEntry;
+import org.xipki.ca.api.mgmt.entry.PublisherEntry;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.password.PasswordResolver;
@@ -43,11 +43,11 @@ import org.xipki.util.FileOrValue;
 
 class IdentifiedCertPublisher implements Closeable {
 
-  private final MgmtEntry.Publisher entry;
+  private final PublisherEntry entry;
 
   private final CertPublisher certPublisher;
 
-  IdentifiedCertPublisher(MgmtEntry.Publisher entry, CertPublisher certPublisher) {
+  IdentifiedCertPublisher(PublisherEntry entry, CertPublisher certPublisher) {
     this.entry = notNull(entry, "entry");
     this.certPublisher = notNull(certPublisher, "certPublisher");
   }
@@ -75,7 +75,7 @@ class IdentifiedCertPublisher implements Closeable {
     return certPublisher.crlAdded(caCert, crl);
   }
 
-  public MgmtEntry.Publisher getDbEntry() {
+  public PublisherEntry getDbEntry() {
     return entry;
   }
 

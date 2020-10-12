@@ -58,10 +58,10 @@ import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.RequestType;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaStatus;
-import org.xipki.ca.api.mgmt.MgmtEntry;
 import org.xipki.ca.api.mgmt.PermissionConstants;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.mgmt.ScepControl;
+import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.scep.message.CaCaps;
 import org.xipki.scep.message.DecodedPkiMessage;
 import org.xipki.scep.message.EnvelopedDataDecryptor;
@@ -183,7 +183,7 @@ public class ScepResponder {
     AES_ENC_ALGOS.add(CMSAlgorithm.AES256_GCM);
   }
 
-  public ScepResponder(CaManagerImpl caManager, MgmtEntry.Ca caEntry)
+  public ScepResponder(CaManagerImpl caManager, CaEntry caEntry)
       throws CaMgmtException {
     this.caManager = notNull(caManager, "caManager");
     this.caIdent = notNull(caEntry, "caEntry").getIdent();

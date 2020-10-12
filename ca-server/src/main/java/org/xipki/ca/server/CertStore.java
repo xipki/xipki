@@ -67,7 +67,7 @@ import org.xipki.ca.api.RequestType;
 import org.xipki.ca.api.mgmt.CertListInfo;
 import org.xipki.ca.api.mgmt.CertListOrderBy;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
-import org.xipki.ca.api.mgmt.MgmtEntry;
+import org.xipki.ca.api.mgmt.entry.CaHasUserEntry;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.CertRevocationInfo;
@@ -1585,7 +1585,7 @@ public class CertStore {
     }
   } // method getUsername
 
-  public MgmtEntry.CaHasUser getCaHasUser(NameId ca, NameId user)
+  public CaHasUserEntry getCaHasUser(NameId ca, NameId user)
       throws OperationException {
     final String sql = sqlCaHasUser;
     ResultSet rs = null;
@@ -1603,7 +1603,7 @@ public class CertStore {
       List<String> list = StringUtil.split(rs.getString("PROFILES"), ",");
       Set<String> profiles = (list == null) ? null : new HashSet<>(list);
 
-      MgmtEntry.CaHasUser entry = new MgmtEntry.CaHasUser(user);
+      CaHasUserEntry entry = new CaHasUserEntry(user);
       entry.setPermission(rs.getInt("PERMISSION"));
       entry.setProfiles(profiles);
       return entry;
