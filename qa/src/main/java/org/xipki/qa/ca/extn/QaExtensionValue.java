@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.qa.ca;
+package org.xipki.qa.ca.extn;
 
 import static org.xipki.util.Args.notNull;
 

@@ -53,6 +53,8 @@ import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
 import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.qa.ValidationResult;
+import org.xipki.qa.ca.extn.ExtensionsChecker;
+import org.xipki.qa.ca.extn.QaExtensionValue;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
