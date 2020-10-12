@@ -27,7 +27,7 @@ import org.xipki.ca.mgmt.shell.CertActions.UnrevokeCert;
 import org.xipki.shell.CmdFailure;
 
 /**
- * Actions of QA for CA.
+ * Actions of negative tests for CA.
  *
  * @author Lijun Liao
  */
