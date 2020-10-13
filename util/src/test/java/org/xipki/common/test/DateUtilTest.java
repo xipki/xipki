@@ -22,7 +22,7 @@ import java.util.Date;
 import org.junit.Test;
 import org.xipki.util.DateUtil;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * Test for {@link DateUtil}.

@@ -34,7 +34,7 @@ import org.xipki.security.asn1.CrlStreamParser;
 import org.xipki.security.asn1.CrlStreamParser.RevokedCertsIterator;
 import org.xipki.security.util.X509Util;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * CRL Stream Parser test.

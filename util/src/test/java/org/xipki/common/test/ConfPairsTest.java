@@ -24,7 +24,7 @@ import java.util.Set;
 import org.junit.Test;
 import org.xipki.util.ConfPairs;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * Test for {@link ConfPairs}.

@@ -21,10 +21,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.xipki.security.cmp.CmpUtf8Pairs;
-
-import junit.framework.Assert;
 
 /**
  * Test the {@link CmpUtf8Pairs}.

@@ -39,7 +39,7 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.Hex;
 import org.xipki.util.IoUtil;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * Public keys can be found under https://ct.grahamedgecombe.com/
