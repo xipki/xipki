@@ -17,21 +17,23 @@
 
 package org.xipki.ocsp.server;
 
+import static org.xipki.ocsp.server.OcspServerUtil.canBuildCertpath;
+import static org.xipki.ocsp.server.OcspServerUtil.closeStream;
+import static org.xipki.ocsp.server.OcspServerUtil.getInputStream;
+import static org.xipki.ocsp.server.OcspServerUtil.initSigner;
+import static org.xipki.ocsp.server.OcspServerUtil.newStore;
+import static org.xipki.ocsp.server.OcspServerUtil.parseConf;
+import static org.xipki.ocsp.server.OcspServerUtil.removeExtension;
 import static org.xipki.util.Args.notBlank;
 import static org.xipki.util.Args.notNull;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.cert.CertPathBuilderException;
-import java.security.cert.CertificateException;
 import java.security.cert.CertificateParsingException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,11 +78,7 @@ import org.xipki.ocsp.api.ResponderAndPath;
 import org.xipki.ocsp.server.OcspServerConf.EmbedCertsMode;
 import org.xipki.ocsp.server.OcspServerConf.Source;
 import org.xipki.ocsp.server.ResponderOption.OcspMode;
-import org.xipki.ocsp.server.store.CaDbCertStatusStore;
-import org.xipki.ocsp.server.store.CrlDbCertStatusStore;
-import org.xipki.ocsp.server.store.DbCertStatusStore;
 import org.xipki.ocsp.server.store.ResponseCacher;
-import org.xipki.ocsp.server.store.ejbca.EjbcaCertStatusStore;
 import org.xipki.ocsp.server.type.CertID;
 import org.xipki.ocsp.server.type.EncodingException;
 import org.xipki.ocsp.server.type.ExtendedExtension;
@@ -94,28 +92,19 @@ import org.xipki.ocsp.server.type.WritableOnlyExtension;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.AlgorithmCode;
 import org.xipki.security.CertRevocationInfo;
-import org.xipki.security.CertpathValidationModel;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.SecurityFactory;
-import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
-import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.FileOrBinary;
-import org.xipki.util.FileOrValue;
 import org.xipki.util.HealthCheckResult;
 import org.xipki.util.Hex;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ObjectCreationException;
 import org.xipki.util.StringUtil;
-import org.xipki.util.Validity;
-
-import com.alibaba.fastjson.JSON;
 
 /**
  * Implementation of {@link OcspServer}.
@@ -157,14 +146,6 @@ public class OcspServerImpl implements OcspServer {
   } // class OcspRespControl
 
   public static final long DFLT_CACHE_MAX_AGE = 60; // 1 minute
-
-  private static final String STORE_TYPE_XIPKI_DB = "xipki-db";
-
-  private static final String STORE_TYPE_XIPKI_CA_DB = "xipki-ca-db";
-
-  private static final String STORE_TYPE_CRL = "crl";
-
-  private static final String STORE_TYPE_EJBCA_DB = "ejbca-db";
 
   private static final byte[] DERNullBytes = new byte[]{0x05, 0x00};
 
@@ -490,7 +471,7 @@ public class OcspServerImpl implements OcspServer {
     //-- initializes the responders
     // signers
     for (OcspServerConf.Signer m : conf.getSigners()) {
-      ResponseSigner signer = initSigner(m);
+      ResponseSigner signer = initSigner(m, securityFactory);
       signers.put(m.getName(), signer);
     }
 
@@ -1118,138 +1099,8 @@ public class OcspServerImpl implements OcspServer {
     securityFactory.refreshTokenForSignerType(signerType);
   }
 
-  private ResponseSigner initSigner(OcspServerConf.Signer signerType)
-      throws InvalidConfException {
-    X509Cert[] explicitCertificateChain = null;
-
-    X509Cert explicitResponderCert = null;
-    if (signerType.getCert() != null) {
-      explicitResponderCert = parseCert(signerType.getCert());
-    }
-
-    if (explicitResponderCert != null) {
-      Set<X509Cert> caCerts = null;
-      if (signerType.getCaCerts() != null) {
-        caCerts = new HashSet<>();
-
-        for (FileOrBinary certConf : signerType.getCaCerts()) {
-          caCerts.add(parseCert(certConf));
-        }
-      }
-
-      try {
-        explicitCertificateChain = X509Util.buildCertPath(explicitResponderCert, caCerts);
-      } catch (CertPathBuilderException ex) {
-        throw new InvalidConfException(ex);
-      }
-    }
-
-    String responderSignerType = signerType.getType();
-    String responderKeyConf = signerType.getKey();
-
-    List<String> sigAlgos = signerType.getAlgorithms();
-    List<ConcurrentContentSigner> singleSigners = new ArrayList<>(sigAlgos.size());
-    for (String sigAlgo : sigAlgos) {
-      try {
-        ConcurrentContentSigner requestorSigner = securityFactory.createSigner(
-            responderSignerType, new SignerConf("algo=" + sigAlgo + "," + responderKeyConf),
-            explicitCertificateChain);
-        singleSigners.add(requestorSigner);
-      } catch (ObjectCreationException ex) {
-        throw new InvalidConfException(ex.getMessage(), ex);
-      }
-    }
-
-    try {
-      return new ResponseSigner(singleSigners);
-    } catch (CertificateException | IOException ex) {
-      throw new InvalidConfException(ex.getMessage(), ex);
-    }
-  } // method initSigner
-
-  private OcspStore newStore(OcspServerConf.Store conf, Map<String, DataSourceWrapper> datasources)
-      throws InvalidConfException {
-    OcspStore store;
-    try {
-      String type = conf.getSource().getType();
-      if (type != null) {
-        type = type.trim().toLowerCase();
-      }
-
-      if (StringUtil.isBlank(type)) {
-        throw new ObjectCreationException("OCSP store type is not specified");
-      } else if (STORE_TYPE_XIPKI_DB.equals(type)) {
-        store = new DbCertStatusStore();
-      } else if (STORE_TYPE_CRL.equals(type)) {
-        store = new CrlDbCertStatusStore();
-      } else if (STORE_TYPE_XIPKI_CA_DB.equals(type)) {
-        store = new CaDbCertStatusStore();
-      } else if (STORE_TYPE_EJBCA_DB.equals(type)) {
-        store = new EjbcaCertStatusStore();
-      } else if (type.startsWith("java:")) {
-        String className = type.substring("java:".length()).trim();
-        try {
-          Class<?> clazz = Class.forName(className, false, getClass().getClassLoader());
-          store = (OcspStore) clazz.newInstance();
-        } catch (ClassNotFoundException | ClassCastException | InstantiationException
-                | IllegalAccessException ex) {
-          throw new InvalidConfException("ObjectCreationException of store " + conf.getName()
-              + ":" + ex.getMessage(), ex);
-        }
-      } else {
-        throw new ObjectCreationException("unknown OCSP store type " + type);
-      }
-    } catch (ObjectCreationException ex) {
-      throw new InvalidConfException("ObjectCreationException of store " + conf.getName()
-          + ":" + ex.getMessage(), ex);
-    }
-
-    store.setName(conf.getName());
-    Integer interval = conf.getRetentionInterval();
-    int retentionInterva = (interval == null) ? -1 : interval.intValue();
-    store.setRetentionInterval(retentionInterva);
-    store.setUnknownCertBehaviour(conf.getUnknownCertBehaviour());
-
-    store.setIncludeArchiveCutoff(getBoolean(conf.getIncludeArchiveCutoff(), true));
-    store.setIncludeCrlId(getBoolean(conf.getIncludeCrlId(), true));
-
-    store.setIgnoreExpiredCert(getBoolean(conf.getIgnoreExpiredCert(), true));
-    store.setIgnoreNotYetValidCert(getBoolean(conf.getIgnoreNotYetValidCert(), true));
-    if (conf.getMinNextUpdatePeriod() != null) {
-      store.setMinNextUpdatePeriod(Validity.getInstance(conf.getMinNextUpdatePeriod()));
-    } else {
-      store.setMinNextUpdatePeriod(null);
-    }
-
-    if ("NEVER".equalsIgnoreCase(conf.getUpdateInterval())) {
-      store.setUpdateInterval(null);
-    } else {
-      String str = conf.getUpdateInterval();
-      Validity updateInterval = Validity.getInstance(StringUtil.isBlank(str) ? "5m" : str);
-      store.setUpdateInterval(updateInterval);
-    }
-
-    String datasourceName = conf.getSource().getDatasource();
-    DataSourceWrapper datasource = null;
-    if (datasourceName != null) {
-      datasource = datasources.get(datasourceName);
-      if (datasource == null) {
-        throw new InvalidConfException("datasource named '" + datasourceName + "' not defined");
-      }
-    }
-    try {
-      Map<String, ? extends Object> sourceConf = conf.getSource().getConf();
-      store.init(sourceConf, datasource);
-    } catch (OcspStoreException ex) {
-      throw new InvalidConfException("CertStatusStoreException of store " + conf.getName()
-          + ":" + ex.getMessage(), ex);
-    }
-
-    return store;
-  } // method newStore
-
   private Object checkSignature(byte[] request, RequestOption requestOption)
-      throws OCSPException, CertificateParsingException, InvalidAlgorithmParameterException {
+          throws OCSPException, CertificateParsingException, InvalidAlgorithmParameterException {
     OCSPRequest req;
     try {
       if (!requestOption.isValidateSignature()) {
@@ -1315,131 +1166,5 @@ public class OcspServerImpl implements OcspServer {
     LOG.warn("could not build certpath for the request's signer certificate");
     return unsuccesfulOCSPRespMap.get(OcspResponseStatus.unauthorized);
   } // method checkSignature
-
-  private static boolean canBuildCertpath(X509Cert[] certsInReq,
-      RequestOption requestOption, Date referenceTime) {
-    X509Cert target = certsInReq[0];
-
-    Set<X509Cert> certstore = new HashSet<>();
-    Set<X509Cert> trustAnchors = requestOption.getTrustAnchors();
-    for (X509Cert m : trustAnchors) {
-      certstore.add(m);
-    }
-
-    Set<X509Cert> configuredCerts = requestOption.getCerts();
-    if (CollectionUtil.isNotEmpty(configuredCerts)) {
-      certstore.addAll(requestOption.getCerts());
-    }
-
-    X509Cert[] certpath;
-    try {
-      certpath = X509Util.buildCertPath(target, certstore);
-    } catch (CertPathBuilderException ex) {
-      LogUtil.warn(LOG, ex);
-      return false;
-    }
-
-    CertpathValidationModel model = requestOption.getCertpathValidationModel();
-
-    Date now = new Date();
-    if (model == null || model == CertpathValidationModel.PKIX) {
-      for (X509Cert m : certpath) {
-        if (m.getNotBefore().after(now) || m.getNotAfter().before(now)) {
-          return false;
-        }
-      }
-    } else if (model == CertpathValidationModel.CHAIN) {
-      // do nothing
-    } else {
-      throw new IllegalStateException("invalid CertpathValidationModel " + model.name());
-    }
-
-    for (int i = certpath.length - 1; i >= 0; i--) {
-      X509Cert targetCert = certpath[i];
-      for (X509Cert m : trustAnchors) {
-        if (m.equals(targetCert)) {
-          return true;
-        }
-      }
-    }
-
-    return false;
-  } // method canBuildCertpath
-
-  private static boolean getBoolean(Boolean bo, boolean defaultValue) {
-    return (bo == null) ? defaultValue : bo.booleanValue();
-  }
-
-  private static InputStream getInputStream(FileOrBinary conf)
-      throws IOException {
-    return (conf.getFile() != null)
-        ? Files.newInputStream(Paths.get(IoUtil.expandFilepath(conf.getFile())))
-        : new ByteArrayInputStream(conf.getBinary());
-  }
-
-  private static InputStream getInputStream(FileOrValue conf)
-      throws IOException {
-    return (conf.getFile() != null)
-        ? Files.newInputStream(Paths.get(IoUtil.expandFilepath(conf.getFile())))
-        : new ByteArrayInputStream(StringUtil.toUtf8Bytes(conf.getValue()));
-  }
-
-  private static void closeStream(InputStream stream) {
-    if (stream == null) {
-      return;
-    }
-
-    try {
-      stream.close();
-    } catch (IOException ex) {
-      LOG.warn("could not close stream: {}", ex.getMessage());
-    }
-  }
-
-  private static X509Cert parseCert(FileOrBinary certConf)
-      throws InvalidConfException {
-    InputStream is = null;
-    try {
-      is = getInputStream(certConf);
-      return X509Util.parseCert(is);
-    } catch (IOException | CertificateException ex) {
-      String msg = "could not parse certificate";
-      if (certConf.getFile() != null) {
-        msg += " from file " + certConf.getFile();
-      }
-      throw new InvalidConfException(msg);
-    } finally {
-      closeStream(is);
-    }
-  } // method parseCert
-
-  private static OcspServerConf parseConf(String confFilename)
-      throws InvalidConfException {
-    try (InputStream is = Files.newInputStream(
-          Paths.get(IoUtil.expandFilepath(confFilename)))) {
-      OcspServerConf root = JSON.parseObject(is, OcspServerConf.class);
-      root.validate();
-      return root;
-    } catch (IOException | RuntimeException ex) {
-      throw new InvalidConfException("parse profile failed, message: " + ex.getMessage(), ex);
-    }
-  } // method parseConf
-
-  private static ExtendedExtension removeExtension(List<ExtendedExtension> extensions,
-      OID extnType) {
-    ExtendedExtension extn = null;
-    for (ExtendedExtension m : extensions) {
-      if (extnType == m.getExtnType()) {
-        extn = m;
-        break;
-      }
-    }
-
-    if (extn != null) {
-      extensions.remove(extn);
-    }
-
-    return extn;
-  } // method removeExtension
 
 }
