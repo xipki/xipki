@@ -51,7 +51,11 @@ import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.mgmt.shell.CaActions;
 import org.xipki.ca.mgmt.shell.CaActions.CaAction;
 import org.xipki.ca.mgmt.shell.CaCompleters;
+import org.xipki.ca.mgmt.shell.ProfileCaActions;
+import org.xipki.ca.mgmt.shell.PublisherCaActions;
+import org.xipki.ca.mgmt.shell.RequestorCaActions;
 import org.xipki.ca.mgmt.shell.ShellUtil;
+import org.xipki.ca.mgmt.shell.SignerCaActions;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.qa.ValidationResult;
 import org.xipki.qa.ca.CaEnrollBenchEntry;
@@ -638,7 +642,7 @@ public class QaCaActions {
   @Command(scope = "caqa", name = "profile-check",
       description = "check information of profiles (QA)")
   @Service
-  public static class ProfileCheck extends CaActions.ProfileUp {
+  public static class ProfileCheck extends ProfileCaActions.ProfileUp {
 
     @Override
     protected Object execute0()
@@ -674,7 +678,7 @@ public class QaCaActions {
   @Command(scope = "caqa", name = "publisher-check",
       description = "check information of publishers (QA)")
   @Service
-  public static class PublisherCheck extends CaActions.PublisherUp {
+  public static class PublisherCheck extends PublisherCaActions.PublisherUp {
 
     @Override
     protected Object execute0()
@@ -703,7 +707,7 @@ public class QaCaActions {
   @Command(scope = "caqa", name = "requestor-check",
       description = "check information of requestors (QA)")
   @Service
-  public static class RequestorCheck extends CaActions.RequestorUp {
+  public static class RequestorCheck extends RequestorCaActions.RequestorUp {
 
     @Override
     protected Object execute0()
@@ -751,7 +755,7 @@ public class QaCaActions {
 
   @Command(scope = "caqa", name = "signer-check", description = "check information of signer (QA)")
   @Service
-  public static class SignerCheck extends CaActions.SignerUp {
+  public static class SignerCheck extends SignerCaActions.SignerUp {
 
     @Override
     protected Object execute0()
