@@ -88,7 +88,7 @@ import org.xipki.util.Validity.Unit;
 
 class CertprofileUtil {
 
-  private static Validity maxCabEeValidity = new Validity(825, Unit.DAY); // TODO
+  private static Validity maxCabEeValidity = new Validity(397, Unit.DAY);
 
   public static SubjectInfo getSubject(Certprofile certprofile, X500Name requestedSubject)
       throws CertprofileException, BadCertTemplateException {
