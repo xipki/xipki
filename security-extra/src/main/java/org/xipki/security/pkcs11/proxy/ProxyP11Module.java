@@ -49,6 +49,8 @@ import org.xipki.security.pkcs11.P11ModuleConf;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.pkcs11.P11TokenException;
+import org.xipki.security.pkcs11.proxy.asn1.ServerCaps;
+import org.xipki.security.pkcs11.proxy.asn1.SlotIdentifier;
 import org.xipki.util.Args;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.IoUtil;
@@ -204,9 +206,9 @@ public class ProxyP11Module extends P11Module {
       throws P11TokenException {
     byte[] resp = send(P11ProxyConstants.ACTION_GET_SERVER_CAPS, null);
 
-    ProxyMessage.ServerCaps caps;
+    ServerCaps caps;
     try {
-      caps = ProxyMessage.ServerCaps.getInstance(resp);
+      caps = ServerCaps.getInstance(resp);
     } catch (BadAsn1ObjectException ex) {
       throw new P11TokenException("response is a valid Asn1ServerCaps", ex);
     }
@@ -229,10 +231,10 @@ public class ProxyP11Module extends P11Module {
 
     Set<P11Slot> slots = new HashSet<>();
     for (int i = 0; i < n; i++) {
-      ProxyMessage.SlotIdentifier asn1SlotId;
+      SlotIdentifier asn1SlotId;
       try {
         ASN1Encodable obj = seq.getObjectAt(i);
-        asn1SlotId = ProxyMessage.SlotIdentifier.getInstance(obj);
+        asn1SlotId = SlotIdentifier.getInstance(obj);
       } catch (Exception ex) {
         throw new P11TokenException(ex.getMessage(), ex);
       }

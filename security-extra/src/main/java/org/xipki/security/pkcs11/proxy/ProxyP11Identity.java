@@ -28,6 +28,10 @@ import org.xipki.security.pkcs11.P11Params;
 import org.xipki.security.pkcs11.P11Params.P11ByteArrayParams;
 import org.xipki.security.pkcs11.P11Params.P11IVParams;
 import org.xipki.security.pkcs11.P11Params.P11RSAPkcsPssParams;
+import org.xipki.security.pkcs11.proxy.asn1.DigestSecretKeyTemplate;
+import org.xipki.security.pkcs11.proxy.asn1.ObjectIdentifier;
+import org.xipki.security.pkcs11.proxy.asn1.RSAPkcsPssParams;
+import org.xipki.security.pkcs11.proxy.asn1.SignTemplate;
 import org.xipki.security.pkcs11.P11TokenException;
 
 /**
@@ -39,40 +43,43 @@ import org.xipki.security.pkcs11.P11TokenException;
 
 class ProxyP11Identity extends P11Identity {
 
-  private final ProxyMessage.ObjectIdentifier asn1KeyId;
+  private final ObjectIdentifier asn1KeyId;
 
   ProxyP11Identity(ProxyP11Slot slot, P11IdentityId identityId) {
     super(slot, identityId, 0);
-    this.asn1KeyId = new ProxyMessage.ObjectIdentifier(identityId.getKeyId());
+    this.asn1KeyId = new ObjectIdentifier(identityId.getKeyId());
   }
 
   ProxyP11Identity(ProxyP11Slot slot, P11IdentityId identityId, PublicKey publicKey,
       X509Cert[] certificateChain) {
     super(slot, identityId, publicKey, certificateChain);
-    this.asn1KeyId = new ProxyMessage.ObjectIdentifier(identityId.getKeyId());
+    this.asn1KeyId = new ObjectIdentifier(identityId.getKeyId());
   }
 
   @Override
   protected byte[] sign0(long mechanism, P11Params parameters, byte[] content)
       throws P11TokenException {
-    ProxyMessage.P11Params p11Param = null;
+    org.xipki.security.pkcs11.proxy.asn1.P11Params p11Param = null;
     if (parameters != null) {
       if (parameters instanceof P11RSAPkcsPssParams) {
-        p11Param = new ProxyMessage.P11Params(ProxyMessage.P11Params.TAG_RSA_PKCS_PSS,
-            new ProxyMessage.RSAPkcsPssParams((P11RSAPkcsPssParams) parameters));
+        p11Param = new org.xipki.security.pkcs11.proxy.asn1.P11Params(
+            org.xipki.security.pkcs11.proxy.asn1.P11Params.TAG_RSA_PKCS_PSS,
+            new RSAPkcsPssParams((P11RSAPkcsPssParams) parameters));
       } else if (parameters instanceof P11ByteArrayParams) {
         byte[] bytes = ((P11ByteArrayParams) parameters).getBytes();
-        p11Param = new ProxyMessage.P11Params(ProxyMessage.P11Params.TAG_OPAQUE,
+        p11Param = new org.xipki.security.pkcs11.proxy.asn1.P11Params(
+            org.xipki.security.pkcs11.proxy.asn1.P11Params.TAG_OPAQUE,
             new DEROctetString(bytes));
       } else if (parameters instanceof P11IVParams) {
-        p11Param = new ProxyMessage.P11Params(ProxyMessage.P11Params.TAG_IV,
+        p11Param = new org.xipki.security.pkcs11.proxy.asn1.P11Params(
+            org.xipki.security.pkcs11.proxy.asn1.P11Params.TAG_IV,
             new DEROctetString(((P11IVParams) parameters).getIV()));
       } else {
         throw new IllegalArgumentException("unkown parameter 'parameters'");
       }
     }
 
-    ProxyMessage.SignTemplate signTemplate = new ProxyMessage.SignTemplate(
+    SignTemplate signTemplate = new SignTemplate(
         ((ProxyP11Slot) slot).getAsn1SlotId(), asn1KeyId, mechanism, p11Param, content);
     byte[] result = ((ProxyP11Slot) slot).getModule().send(P11ProxyConstants.ACTION_SIGN,
         signTemplate);
@@ -90,8 +97,8 @@ class ProxyP11Identity extends P11Identity {
   @Override
   protected byte[] digestSecretKey0(long mechanism)
       throws P11TokenException {
-    ProxyMessage.DigestSecretKeyTemplate template =
-        new ProxyMessage.DigestSecretKeyTemplate(
+    DigestSecretKeyTemplate template =
+        new DigestSecretKeyTemplate(
             ((ProxyP11Slot) slot).getAsn1SlotId(), asn1KeyId, mechanism);
     byte[] result = ((ProxyP11Slot) slot).getModule().send(
         P11ProxyConstants.ACTION_DIGEST_SECRETKEY, template);
