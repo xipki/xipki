@@ -263,12 +263,12 @@ public abstract class P11Slot implements Closeable {
     return Hex.decode(hex);
   }
 
-  protected static String getDescription(byte[] keyId, char[] keyLabel) {
+  public static String getDescription(byte[] keyId, char[] keyLabel) {
     return concat("id ", (keyId == null ? "null" : hex(keyId)), " and label ",
         (keyLabel == null ? "null" : new String(keyLabel)));
   }
 
-  protected static String getDescription(byte[] keyId, String keyLabel) {
+  public static String getDescription(byte[] keyId, String keyLabel) {
     return concat("id ", (keyId == null ? "null" : hex(keyId)), " and label ", keyLabel);
   }
 
@@ -1373,6 +1373,16 @@ public abstract class P11Slot implements Closeable {
     return false;
   } // method existsIdentityForId
 
+  protected boolean existsIdentityForLabel(String label) {
+    for (P11ObjectIdentifier objectId : identities.keySet()) {
+      if (objectId.matchesLabel(label)) {
+        return true;
+      }
+    }
+
+    return false;
+  } // method existsIdentityForLabel
+
   protected boolean existsCertForId(byte[] id) {
     for (P11ObjectIdentifier objectId : certificates.keySet()) {
       if (objectId.matchesId(id)) {
@@ -1382,6 +1392,16 @@ public abstract class P11Slot implements Closeable {
 
     return false;
   } // method existsCertForId
+
+  protected boolean existsCertForLabel(String label) {
+    for (P11ObjectIdentifier objectId : certificates.keySet()) {
+      if (objectId.matchesLabel(label)) {
+        return true;
+      }
+    }
+
+    return false;
+  } // method existsCertForLabel
 
   private static String getAlgorithmDesc(PublicKey publicKey) {
     String algo = publicKey.getAlgorithm();

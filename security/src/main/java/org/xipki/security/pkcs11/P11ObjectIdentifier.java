@@ -61,6 +61,10 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
     return Arrays.equals(id, this.id);
   }
 
+  public boolean matchesLabel(String label) {
+    return label.equals(label);
+  }
+
   public String getIdHex() {
     return idHex;
   }
