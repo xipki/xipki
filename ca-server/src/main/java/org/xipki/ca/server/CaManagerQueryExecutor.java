@@ -208,14 +208,18 @@ class CaManagerQueryExecutor {
     }
 
     this.datasource = notNull(datasource, "datasource");
-    this.sqlSelectProfileId = buildSelectFirstSql("ID FROM PROFILE WHERE NAME=?");
-    this.sqlSelectProfile = buildSelectFirstSql("ID,TYPE,CONF FROM PROFILE WHERE NAME=?");
+
+    this.sqlSelectProfileId   = buildSelectFirstSql("ID FROM PROFILE WHERE NAME=?");
+    this.sqlSelectCaId        = buildSelectFirstSql("ID FROM CA WHERE NAME=?");
     this.sqlSelectPublisherId = buildSelectFirstSql("ID FROM PUBLISHER WHERE NAME=?");
-    this.sqlSelectPublisher = buildSelectFirstSql("ID,TYPE,CONF FROM PUBLISHER WHERE NAME=?");
     this.sqlSelectRequestorId = buildSelectFirstSql("ID FROM REQUESTOR WHERE NAME=?");
-    this.sqlSelectRequestor = buildSelectFirstSql("ID,TYPE,CONF FROM REQUESTOR WHERE NAME=?");
-    this.sqlSelectSigner = buildSelectFirstSql("TYPE,CERT,CONF FROM SIGNER WHERE NAME=?");
-    this.sqlSelectCaId = buildSelectFirstSql("ID FROM CA WHERE NAME=?");
+    this.sqlSelectUserId      = buildSelectFirstSql("ID FROM TUSER WHERE NAME=?");
+
+    this.sqlSelectProfile     = buildSelectFirstSql("ID,TYPE,CONF FROM PROFILE WHERE NAME=?");
+    this.sqlSelectPublisher   = buildSelectFirstSql("ID,TYPE,CONF FROM PUBLISHER WHERE NAME=?");
+    this.sqlSelectRequestor   = buildSelectFirstSql("ID,TYPE,CONF FROM REQUESTOR WHERE NAME=?");
+    this.sqlSelectSigner      = buildSelectFirstSql("TYPE,CERT,CONF FROM SIGNER WHERE NAME=?");
+
     this.sqlSelectCa = buildSelectFirstSql("ID,SN_SIZE,NEXT_CRLNO,STATUS,MAX_VALIDITY,CERT,"
         + "CERTCHAIN,SIGNER_TYPE,CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,CRL_SIGNER_NAME,"
         + "CMP_CONTROL,CRL_CONTROL,SCEP_CONTROL,CTLOG_CONTROL,"
@@ -223,10 +227,12 @@ class CaManagerQueryExecutor {
         + "EXPIRATION_PERIOD,REV_INFO,VALIDITY_MODE,CA_URIS,EXTRA_CONTROL,SIGNER_CONF,"
         + "DHPOC_CONTROL,REVOKE_SUSPENDED_CONTROL "
         + "FROM CA WHERE NAME=?");
+
     this.sqlNextSelectCrlNo = buildSelectFirstSql("NEXT_CRLNO FROM CA WHERE ID=?");
+
     this.sqlSelectSystemEvent = buildSelectFirstSql(
         "EVENT_TIME,EVENT_OWNER FROM SYSTEM_EVENT WHERE NAME=?");
-    this.sqlSelectUserId = buildSelectFirstSql("ID FROM TUSER WHERE NAME=?");
+
     this.sqlSelectUser = buildSelectFirstSql("ID,ACTIVE,PASSWORD FROM TUSER WHERE NAME=?");
   } // constructor
 
@@ -886,22 +892,37 @@ class CaManagerQueryExecutor {
     notNull(ca, "ca");
 
     final String sql = "INSERT INTO CA_HAS_PROFILE (CA_ID,PROFILE_ID) VALUES (?,?)";
+    addEntityToCa("profile", profile, ca, sql);
+  } // method addCertprofileToCa
+
+  void addPublisherToCa(NameId publisher, NameId ca)
+      throws CaMgmtException {
+    notNull(publisher, "publisher");
+    notNull(ca, "ca");
+
+    final String sql = "INSERT INTO CA_HAS_PUBLISHER (CA_ID,PUBLISHER_ID) VALUES (?,?)";
+    addEntityToCa("publisher", publisher, ca, sql);
+  } // method addPublisherToCa
+
+  void addEntityToCa(String desc, NameId entity, NameId ca, String sql)
+      throws CaMgmtException {
     PreparedStatement ps = null;
     try {
       ps = prepareStatement(sql);
       ps.setInt(1, ca.getId());
-      ps.setInt(2, profile.getId());
+      ps.setInt(2, entity.getId());
       if (ps.executeUpdate() == 0) {
-        throw new CaMgmtException("could not add profile " + profile + " to CA " + ca);
+        throw new CaMgmtException(
+            String.format("could not add %s to CA %s", desc, entity, ca));
       }
 
-      LOG.info("added profile '{}' to CA '{}'", profile, ca);
+      LOG.info("added {} '{}' to CA '{}'", desc, entity, ca);
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource.translate(sql, ex));
     } finally {
       datasource.releaseResources(ps, null);
     }
-  } // method addCertprofileToCa
+  } // method addPublisherToCa
 
   void addRequestor(RequestorEntry dbEntry)
       throws CaMgmtException {
@@ -1008,8 +1029,7 @@ class CaManagerQueryExecutor {
       ps.setInt(idx++, dbEntry.getIdent().getId());
       ps.setString(idx++, name);
       ps.setString(idx++, dbEntry.getType());
-      String conf = dbEntry.getConf();
-      ps.setString(idx++, conf);
+      ps.setString(idx++, dbEntry.getConf());
       if (ps.executeUpdate() == 0) {
         throw new CaMgmtException("could not add publisher " + dbEntry.getIdent());
       }
@@ -1021,26 +1041,6 @@ class CaManagerQueryExecutor {
       datasource.releaseResources(ps, null);
     }
   } // method addPublisher
-
-  void addPublisherToCa(NameId publisher, NameId ca)
-      throws CaMgmtException {
-    final String sql = "INSERT INTO CA_HAS_PUBLISHER (CA_ID,PUBLISHER_ID) VALUES (?,?)";
-    PreparedStatement ps = null;
-    try {
-      ps = prepareStatement(sql);
-      ps.setInt(1, ca.getId());
-      ps.setInt(2, publisher.getId());
-      if (ps.executeUpdate() == 0) {
-        throw new CaMgmtException("could not add publisher " + publisher + " to CA " + ca);
-      }
-
-      LOG.info("added publisher '{}' to CA '{}'", publisher, ca);
-    } catch (SQLException ex) {
-      throw new CaMgmtException(datasource.translate(sql, ex));
-    } finally {
-      datasource.releaseResources(ps, null);
-    }
-  } // method addPublisherToCa
 
   void changeCa(ChangeCaEntry changeCaEntry, CaEntry currentCaEntry,
       SecurityFactory securityFactory)
@@ -1535,22 +1535,8 @@ class CaManagerQueryExecutor {
     notBlank(profileName, "profileName");
     notBlank(caName, "caName");
 
-    int caId = getNonNullIdForName(sqlSelectCaId, caName);
-    int profileId = getNonNullIdForName(sqlSelectProfileId, profileName);
-    final String sql = "DELETE FROM CA_HAS_PROFILE WHERE CA_ID=? AND PROFILE_ID=?";
-    PreparedStatement ps = null;
-    try {
-      ps = prepareStatement(sql);
-      ps.setInt(1, caId);
-      ps.setInt(2, profileId);
-      if (ps.executeUpdate() == 0) {
-        throw new CaMgmtException("could not remove profile " + profileName + " from CA " + caName);
-      }
-    } catch (SQLException ex) {
-      throw new CaMgmtException(datasource.translate(sql, ex));
-    } finally {
-      datasource.releaseResources(ps, null);
-    }
+    removeEntityFromCa("profile", profileName, caName, sqlSelectProfileId,
+        "DELETE FROM CA_HAS_PROFILE WHERE CA_ID=? AND PROFILE_ID=?");
   } // method removeCertprofileFromCa
 
   void removeRequestorFromCa(String requestorName, String caName)
@@ -1558,48 +1544,53 @@ class CaManagerQueryExecutor {
     notBlank(requestorName, "requestorName");
     notBlank(caName, "caName");
 
-    int caId = getNonNullIdForName(sqlSelectCaId, caName);
-    int requestorId = getNonNullIdForName(sqlSelectRequestorId, requestorName);
-    final String sql = "DELETE FROM CA_HAS_REQUESTOR WHERE CA_ID=? AND REQUESTOR_ID=?";
-    PreparedStatement ps = null;
-    try {
-      ps = prepareStatement(sql);
-      ps.setInt(1, caId);
-      ps.setInt(2, requestorId);
-      if (ps.executeUpdate() == 0) {
-        throw new CaMgmtException(
-            "could not remove requestor " + requestorName + " from CA " + caName);
-      }
-    } catch (SQLException ex) {
-      throw new CaMgmtException(datasource.translate(sql, ex));
-    } finally {
-      datasource.releaseResources(ps, null);
-    }
+    removeEntityFromCa("requestor", requestorName, caName, sqlSelectRequestorId,
+        "DELETE FROM CA_HAS_REQUESTOR WHERE CA_ID=? AND REQUESTOR_ID=?");
   } // method removeRequestorFromCa
 
   void removePublisherFromCa(String publisherName, String caName)
       throws CaMgmtException {
     notBlank(publisherName, "publisherName");
     notBlank(caName, "caName");
-    int caId = getNonNullIdForName(sqlSelectCaId, caName);
-    int publisherId = getNonNullIdForName(sqlSelectPublisherId, publisherName);
 
-    final String sql = "DELETE FROM CA_HAS_PUBLISHER WHERE CA_ID=? AND PUBLISHER_ID=?";
+    removeEntityFromCa("publisher", publisherName, caName, sqlSelectPublisherId,
+        "DELETE FROM CA_HAS_PUBLISHER WHERE CA_ID=? AND PUBLISHER_ID=?");
+  } // method removePublisherFromCa
+
+  void removeUserFromCa(String username, String caName)
+      throws CaMgmtException {
+    notBlank(username, "username");
+    notBlank(caName, "caName");
+
+    removeEntityFromCa("user", username, caName, sqlSelectUserId,
+        "DELETE FROM CA_HAS_USER WHERE CA_ID=? AND USER_ID=?");
+  } // method removeUserFromCa
+
+  private void removeEntityFromCa(String desc, String name, String caName,
+      String sqlSelectId, String sqlRemove)
+          throws CaMgmtException {
+    Integer id = getIdForName(sqlSelectId, name);
+    if (id == null) {
+      throw new CaMgmtException(String.format("unknown %s %s ", desc, name));
+    }
+
+    int caId = getNonNullIdForName(sqlSelectCaId, caName);
+
     PreparedStatement ps = null;
     try {
-      ps = prepareStatement(sql);
+      ps = prepareStatement(sqlRemove);
       ps.setInt(1, caId);
-      ps.setInt(2, publisherId);
+      ps.setInt(2, id);
       if (ps.executeUpdate() == 0) {
         throw new CaMgmtException(
-            "could not remove publisher " + publisherName + " from CA " + caName);
+            String.format("could not remove %s from CA %s", name, caName));
       }
     } catch (SQLException ex) {
-      throw new CaMgmtException(datasource.translate(sql, ex));
+      throw new CaMgmtException(datasource.translate(sqlRemove, ex));
     } finally {
       datasource.releaseResources(ps, null);
     }
-  } // method removePublisherFromCa
+  } // method removeUserFromCa
 
   void revokeCa(String caName, CertRevocationInfo revocationInfo)
       throws CaMgmtException {
@@ -1748,31 +1739,6 @@ class CaManagerQueryExecutor {
     changeIfNotNull("TUSER", col(INT, "ID", existingId), col(BOOL, "ACTIVE", userEntry.getActive()),
         col(STRING, "PASSWORD", hashedPassword, true, false));
   } // method changeUser
-
-  void removeUserFromCa(String username, String caName)
-      throws CaMgmtException {
-    Integer id = getIdForName(sqlSelectUserId, username);
-    if (id == null) {
-      throw new CaMgmtException("unknown user " + username);
-    }
-
-    int caId = getNonNullIdForName(sqlSelectCaId, caName);
-
-    final String sql = "DELETE FROM CA_HAS_USER WHERE CA_ID=? AND USER_ID=?";
-    PreparedStatement ps = null;
-    try {
-      ps = prepareStatement(sql);
-      ps.setInt(1, caId);
-      ps.setInt(2, id);
-      if (ps.executeUpdate() == 0) {
-        throw new CaMgmtException("could not remove user " + username + " from CA " + caName);
-      }
-    } catch (SQLException ex) {
-      throw new CaMgmtException(datasource.translate(sql, ex));
-    } finally {
-      datasource.releaseResources(ps, null);
-    }
-  } // method removeUserFromCa
 
   void addUserToCa(CaHasUserEntry user, NameId ca)
       throws CaMgmtException {
