@@ -97,7 +97,7 @@ import org.xipki.util.Validity;
  * @since 2.0.0
  */
 
-class IdentifiedCertprofile implements Closeable {
+public class IdentifiedCertprofile implements Closeable {
 
   private final CertprofileEntry dbEntry;
   private final Certprofile certprofile;

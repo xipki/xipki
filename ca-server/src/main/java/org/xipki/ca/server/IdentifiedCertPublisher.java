@@ -41,7 +41,7 @@ import org.xipki.util.FileOrValue;
  * @since 2.0.0
  */
 
-class IdentifiedCertPublisher implements Closeable {
+public class IdentifiedCertPublisher implements Closeable {
 
   private final PublisherEntry entry;
 

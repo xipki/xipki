@@ -20,9 +20,17 @@ package org.xipki.ca.server;
 import static org.xipki.util.Args.notEmpty;
 import static org.xipki.util.Args.notNull;
 
+import java.io.IOException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertPathBuilderException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Set;
@@ -47,13 +55,25 @@ import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.xipki.ca.api.profile.Certprofile.CertLevel;
+import org.xipki.password.PasswordResolverException;
+import org.xipki.ca.api.mgmt.CaMgmtException;
+import org.xipki.ca.api.mgmt.PermissionConstants;
 import org.xipki.ca.api.profile.SubjectDnSpec;
 import org.xipki.security.AlgorithmValidator;
 import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.ObjectIdentifiers.Xipki;
+import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.security.util.X509Util;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.X509Cert;
+import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
+import org.xipki.util.ConfPairs;
+import org.xipki.util.FileOrBinary;
+import org.xipki.util.FileOrValue;
+import org.xipki.util.IoUtil;
+import org.xipki.util.StringUtil;
 
 /**
  * Util class of CA.
@@ -223,5 +243,160 @@ public class CaUtil {
 
     return CollectionUtil.isEmpty(ret) ? null : ret.toArray(new RDN[0]);
   } // method getRdns
+
+  public static String canonicalizeSignerConf(String keystoreType, String signerConf,
+      X509Cert[] certChain, SecurityFactory securityFactory)
+          throws CaMgmtException {
+    if (!signerConf.contains("file:") && !signerConf.contains("base64:")) {
+      return signerConf;
+    }
+
+    ConfPairs pairs = new ConfPairs(signerConf);
+
+    String algo = pairs.value("algo");
+    if (algo != null) {
+      try {
+        algo = AlgorithmUtil.canonicalizeSignatureAlgo(algo);
+      } catch (NoSuchAlgorithmException ex) {
+        throw new CaMgmtException("Unknown signature algo: " + ex.getMessage(), ex);
+      }
+      pairs.putPair("algo", algo);
+    }
+
+    String keystoreConf = pairs.value("keystore");
+    String passwordHint = pairs.value("password");
+    String keyLabel = pairs.value("key-label");
+
+    byte[] ksBytes;
+    if (StringUtil.startsWithIgnoreCase(keystoreConf, "file:")) {
+      String keystoreFile = keystoreConf.substring("file:".length());
+      try {
+        ksBytes = IoUtil.read(keystoreFile);
+      } catch (IOException ex) {
+        throw new CaMgmtException("IOException: " + ex.getMessage(), ex);
+      }
+    } else if (StringUtil.startsWithIgnoreCase(keystoreConf, "base64:")) {
+      ksBytes = Base64.decode(keystoreConf.substring("base64:".length()));
+    } else {
+      return signerConf;
+    }
+
+    try {
+      char[] password = securityFactory.getPasswordResolver().resolvePassword(passwordHint);
+      ksBytes = securityFactory.extractMinimalKeyStore(keystoreType, ksBytes, keyLabel,
+          password, certChain);
+    } catch (KeyStoreException ex) {
+      throw new CaMgmtException("KeyStoreException: " + ex.getMessage(), ex);
+    } catch (PasswordResolverException ex) {
+      throw new CaMgmtException("PasswordResolverException: " + ex.getMessage(), ex);
+    }
+    pairs.putPair("keystore", "base64:" + Base64.encodeToString(ksBytes));
+    return pairs.getEncoded();
+  } // method canonicalizeSignerConf
+
+  public static FileOrValue createFileOrValue(ZipOutputStream zipStream,
+      String content, String fileName)
+          throws IOException {
+    if (StringUtil.isBlank(content)) {
+      return null;
+    }
+
+    FileOrValue ret = new FileOrValue();
+    if (content.length() < 256) {
+      ret.setValue(content);
+    } else {
+      ret.setFile(fileName);
+      ZipEntry certZipEntry = new ZipEntry(fileName);
+      zipStream.putNextEntry(certZipEntry);
+      try {
+        zipStream.write(StringUtil.toUtf8Bytes(content));
+      } finally {
+        zipStream.closeEntry();
+      }
+    }
+    return ret;
+  } // method createFileOrValue
+
+  public static FileOrBinary createFileOrBase64Value(ZipOutputStream zipStream,
+      String b64Content, String fileName)
+          throws IOException {
+    if (StringUtil.isBlank(b64Content)) {
+      return null;
+    }
+
+    return createFileOrBinary(zipStream, Base64.decode(b64Content), fileName);
+  } // method createFileOrBase64Value
+
+  public static FileOrBinary createFileOrBinary(ZipOutputStream zipStream,
+      byte[] content, String fileName)
+          throws IOException {
+    if (content == null || content.length == 0) {
+      return null;
+    }
+
+    FileOrBinary ret = new FileOrBinary();
+    if (content.length < 256) {
+      ret.setBinary(content);
+    } else {
+      ret.setFile(fileName);
+      ZipEntry certZipEntry = new ZipEntry(fileName);
+      zipStream.putNextEntry(certZipEntry);
+      try {
+        zipStream.write(content);
+      } finally {
+        zipStream.closeEntry();
+      }
+    }
+    return ret;
+  } // method createFileOrBinary
+
+  public static List<String> getPermissions(int permission) {
+    List<String> list = new LinkedList<>();
+    if (PermissionConstants.ALL == permission) {
+      list.add(PermissionConstants.getTextForCode(permission));
+    } else {
+      for (Integer code : PermissionConstants.getPermissions()) {
+        if ((permission & code) != 0) {
+          list.add(PermissionConstants.getTextForCode(code));
+        }
+      }
+    }
+
+    return list;
+  } // method getPermissions
+
+  public static String encodeCertchain(List<X509Cert> certs)
+      throws CaMgmtException {
+    try {
+      return X509Util.encodeCertificates(certs.toArray(new X509Cert[0]));
+    } catch (CertificateException | IOException ex) {
+      throw new CaMgmtException(ex);
+    }
+  } // method encodeCertchain
+
+  public static List<X509Cert> buildCertChain(X509Cert targetCert,
+      List<X509Cert> certs)
+          throws CaMgmtException {
+    X509Cert[] certchain;
+    try {
+      certchain = X509Util.buildCertPath(targetCert, certs, false);
+    } catch (CertPathBuilderException ex) {
+      throw new CaMgmtException(ex);
+    }
+
+    if (certchain == null || certs.size() != certchain.length) {
+      throw new CaMgmtException("could not build certchain containing all specified certs");
+    }
+    return Arrays.asList(certchain);
+  } // method buildCertChain
+
+  public static X509Cert parseCert(byte[] encodedCert)
+      throws CaMgmtException {
+    try {
+      return X509Util.parseCert(encodedCert);
+    } catch (CertificateException ex) {
+      throw new CaMgmtException("could not parse certificate", ex);
+    }
+  } // method parseCert
 
 }

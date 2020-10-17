@@ -17,11 +17,17 @@
 
 package org.xipki.ca.server;
 
+import static org.xipki.ca.server.CaUtil.canonicalizeSignerConf;
+import static org.xipki.ca.server.CaUtil.createFileOrBase64Value;
+import static org.xipki.ca.server.CaUtil.createFileOrBinary;
+import static org.xipki.ca.server.CaUtil.createFileOrValue;
+import static org.xipki.ca.server.CaUtil.getPermissions;
 import static org.xipki.util.Args.notBlank;
 import static org.xipki.util.Args.notNull;
 import static org.xipki.util.Args.positive;
 import static org.xipki.util.Args.range;
 import static org.xipki.util.Args.toNonBlankLower;
+import static org.xipki.util.StringUtil.concat;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -31,7 +37,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.SocketException;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.sql.Connection;
@@ -77,6 +82,15 @@ import org.xipki.ca.api.RequestType;
 import org.xipki.ca.api.mgmt.CaConf;
 import org.xipki.ca.api.mgmt.CaConfType;
 import org.xipki.ca.api.mgmt.CaConfType.NameTypeConf;
+import org.xipki.ca.api.mgmt.CaManager;
+import org.xipki.ca.api.mgmt.CaMgmtException;
+import org.xipki.ca.api.mgmt.CaStatus;
+import org.xipki.ca.api.mgmt.CaSystemStatus;
+import org.xipki.ca.api.mgmt.CertListInfo;
+import org.xipki.ca.api.mgmt.CertListOrderBy;
+import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
+import org.xipki.ca.api.mgmt.CtlogControl;
+import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.mgmt.entry.AddUserEntry;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
@@ -88,25 +102,16 @@ import org.xipki.ca.api.mgmt.entry.PublisherEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.api.mgmt.entry.UserEntry;
-import org.xipki.ca.api.mgmt.CaManager;
-import org.xipki.ca.api.mgmt.CaMgmtException;
-import org.xipki.ca.api.mgmt.CaStatus;
-import org.xipki.ca.api.mgmt.CaSystemStatus;
-import org.xipki.ca.api.mgmt.CertListInfo;
-import org.xipki.ca.api.mgmt.CertListOrderBy;
-import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
-import org.xipki.ca.api.mgmt.CtlogControl;
-import org.xipki.ca.api.mgmt.PermissionConstants;
-import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.CertprofileFactoryRegister;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertPublisherFactoryRegister;
-import org.xipki.ca.server.CaManagerQueryExecutor.SystemEvent;
 import org.xipki.ca.server.SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.ca.server.cmp.CmpResponder;
+import org.xipki.ca.server.db.CaManagerQueryExecutor;
+import org.xipki.ca.server.db.SystemEvent;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceConf;
 import org.xipki.datasource.DataSourceFactory;
@@ -120,7 +125,6 @@ import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
-import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
@@ -2400,7 +2404,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
   } // method shutdownPublisher
 
-  SignerEntryWrapper createSigner(SignerEntry entry)
+  public SignerEntryWrapper createSigner(SignerEntry entry)
       throws CaMgmtException {
     notNull(entry, "entry");
     SignerEntryWrapper ret = new SignerEntryWrapper();
@@ -2415,7 +2419,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     return ret;
   } // method createSigner
 
-  IdentifiedCertprofile createCertprofile(CertprofileEntry entry)
+  public IdentifiedCertprofile createCertprofile(CertprofileEntry entry)
       throws CaMgmtException {
     notNull(entry, "entry");
 
@@ -2434,7 +2438,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
   } // method createCertprofile
 
-  IdentifiedCertPublisher createPublisher(PublisherEntry entry)
+  public IdentifiedCertPublisher createPublisher(PublisherEntry entry)
       throws CaMgmtException {
     notNull(entry, "entry");
     String type = entry.getType();
@@ -2542,56 +2546,6 @@ public class CaManagerImpl implements CaManager, Closeable {
     name = toNonBlankLower(name, "name");
     return (scepResponders == null) ? null : scepResponders.get(name);
   }
-
-  static String canonicalizeSignerConf(String keystoreType, String signerConf,
-      X509Cert[] certChain, SecurityFactory securityFactory)
-          throws CaMgmtException {
-    if (!signerConf.contains("file:") && !signerConf.contains("base64:")) {
-      return signerConf;
-    }
-
-    ConfPairs pairs = new ConfPairs(signerConf);
-
-    String algo = pairs.value("algo");
-    if (algo != null) {
-      try {
-        algo = AlgorithmUtil.canonicalizeSignatureAlgo(algo);
-      } catch (NoSuchAlgorithmException ex) {
-        throw new CaMgmtException("Unknown signature algo: " + ex.getMessage(), ex);
-      }
-      pairs.putPair("algo", algo);
-    }
-
-    String keystoreConf = pairs.value("keystore");
-    String passwordHint = pairs.value("password");
-    String keyLabel = pairs.value("key-label");
-
-    byte[] ksBytes;
-    if (StringUtil.startsWithIgnoreCase(keystoreConf, "file:")) {
-      String keystoreFile = keystoreConf.substring("file:".length());
-      try {
-        ksBytes = IoUtil.read(keystoreFile);
-      } catch (IOException ex) {
-        throw new CaMgmtException("IOException: " + ex.getMessage(), ex);
-      }
-    } else if (StringUtil.startsWithIgnoreCase(keystoreConf, "base64:")) {
-      ksBytes = Base64.decode(keystoreConf.substring("base64:".length()));
-    } else {
-      return signerConf;
-    }
-
-    try {
-      char[] password = securityFactory.getPasswordResolver().resolvePassword(passwordHint);
-      ksBytes = securityFactory.extractMinimalKeyStore(keystoreType, ksBytes, keyLabel,
-          password, certChain);
-    } catch (KeyStoreException ex) {
-      throw new CaMgmtException("KeyStoreException: " + ex.getMessage(), ex);
-    } catch (PasswordResolverException ex) {
-      throw new CaMgmtException("PasswordResolverException: " + ex.getMessage(), ex);
-    }
-    pairs.putPair("keystore", "base64:" + Base64.encodeToString(ksBytes));
-    return pairs.getEncoded();
-  } // method canonicalizeSignerConf
 
   @Override
   public CertWithRevocationInfo getCert(String caName, BigInteger serialNumber)
@@ -3358,88 +3312,13 @@ public class CaManagerImpl implements CaManager, Closeable {
     return ctLogPublicKeyFinder;
   }
 
-  private static FileOrValue createFileOrValue(ZipOutputStream zipStream,
-      String content, String fileName)
-          throws IOException {
-    if (StringUtil.isBlank(content)) {
-      return null;
-    }
-
-    FileOrValue ret = new FileOrValue();
-    if (content.length() < 256) {
-      ret.setValue(content);
-    } else {
-      ret.setFile(fileName);
-      ZipEntry certZipEntry = new ZipEntry(fileName);
-      zipStream.putNextEntry(certZipEntry);
-      try {
-        zipStream.write(StringUtil.toUtf8Bytes(content));
-      } finally {
-        zipStream.closeEntry();
-      }
-    }
-    return ret;
-  } // method createFileOrValue
-
-  private static FileOrBinary createFileOrBase64Value(ZipOutputStream zipStream,
-      String b64Content, String fileName)
-          throws IOException {
-    if (StringUtil.isBlank(b64Content)) {
-      return null;
-    }
-
-    return createFileOrBinary(zipStream, Base64.decode(b64Content), fileName);
-  } // method createFileOrBase64Value
-
-  private static FileOrBinary createFileOrBinary(ZipOutputStream zipStream,
-      byte[] content, String fileName)
-          throws IOException {
-    if (content == null || content.length == 0) {
-      return null;
-    }
-
-    FileOrBinary ret = new FileOrBinary();
-    if (content.length < 256) {
-      ret.setBinary(content);
-    } else {
-      ret.setFile(fileName);
-      ZipEntry certZipEntry = new ZipEntry(fileName);
-      zipStream.putNextEntry(certZipEntry);
-      try {
-        zipStream.write(content);
-      } finally {
-        zipStream.closeEntry();
-      }
-    }
-    return ret;
-  } // method createFileOrBinary
-
   public RestResponder getRestResponder() {
     return restResponder;
-  }
-
-  private static String concat(String s1, String... strs) {
-    return StringUtil.concat(s1, strs);
   }
 
   private static CaMgmtException logAndCreateException(String msg) {
     LOG.error(msg);
     return new CaMgmtException(msg);
   }
-
-  private static List<String> getPermissions(int permission) {
-    List<String> list = new LinkedList<>();
-    if (PermissionConstants.ALL == permission) {
-      list.add(PermissionConstants.getTextForCode(permission));
-    } else {
-      for (Integer code : PermissionConstants.getPermissions()) {
-        if ((permission & code) != 0) {
-          list.add(PermissionConstants.getTextForCode(code));
-        }
-      }
-    }
-
-    return list;
-  } // method getPermissions
 
 }
