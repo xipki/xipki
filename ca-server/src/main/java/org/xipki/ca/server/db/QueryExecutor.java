@@ -17,12 +17,9 @@
 
 package org.xipki.ca.server.db;
 
-import static org.xipki.ca.server.CaUtil.parseCert;
 import static org.xipki.util.Args.notNull;
 import static org.xipki.util.StringUtil.concat;
 
-import java.io.IOException;
-import java.security.cert.CertificateException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -34,7 +31,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,10 +39,6 @@ import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.SignerConf;
-import org.xipki.security.X509Cert;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.Base64;
-import org.xipki.util.CollectionUtil;
 import org.xipki.util.StringUtil;
 
 /**
@@ -55,7 +47,7 @@ import org.xipki.util.StringUtil;
  * @author Lijun Liao
  * @since 2.0.0
  */
-class CaManagerQueryExecutorBase {
+class QueryExecutor {
 
   protected static enum ColumnType {
     INT,
@@ -64,17 +56,6 @@ class CaManagerQueryExecutorBase {
     BOOL,
     TIMESTAMP,
   } // class ColumnType
-
-  protected static enum Table {
-    // SMALLINT or INT
-    REQUESTOR,
-    PUBLISHER,
-    PROFILE,
-    TUSER,
-    CA,
-    // BigInt
-    CA_HAS_USER;
-  }
 
   static class ResultRow {
 
@@ -221,17 +202,11 @@ class CaManagerQueryExecutorBase {
 
   } // class SqlColumn3
 
-  private static final Logger LOG = LoggerFactory.getLogger(CaManagerQueryExecutorBase.class);
+  private static final Logger LOG = LoggerFactory.getLogger(QueryExecutor.class);
 
   protected final DataSourceWrapper datasource;
 
-  private final Map<Table, AtomicLong> cachedIdMap = new HashMap<>();
-
-  CaManagerQueryExecutorBase(DataSourceWrapper datasource) {
-    for (Table m : Table.values()) {
-      cachedIdMap.put(m, new AtomicLong(0));
-    }
-
+  QueryExecutor(DataSourceWrapper datasource) {
     this.datasource = notNull(datasource, "datasource");
   } // constructor
 
@@ -653,40 +628,5 @@ class CaManagerQueryExecutorBase {
 
     return ret;
   } // method getIdNameMap
-
-  protected long getNextId(Table table) throws CaMgmtException {
-    try {
-      long idInDb = datasource.getMax(null, table.name(), "ID");
-      AtomicLong cachedId = cachedIdMap.get(table);
-      long nextId = Math.max(idInDb, cachedId.get()) + 1;
-      cachedId.set(nextId);
-      return nextId;
-    } catch (DataAccessException ex) {
-      throw new CaMgmtException(ex);
-    }
-  }
-
-  protected static X509Cert generateCert(String b64Cert)
-      throws CaMgmtException {
-    if (b64Cert == null) {
-      return null;
-    }
-
-    return parseCert(Base64.decode(b64Cert));
-  } // method generateCert
-
-  protected static List<X509Cert> generateCertchain(String encodedCertchain)
-      throws CaMgmtException {
-    if (StringUtil.isBlank(encodedCertchain)) {
-      return null;
-    }
-
-    try {
-      List<X509Cert> certs = X509Util.listCertificates(encodedCertchain);
-      return CollectionUtil.isEmpty(certs) ? null : certs;
-    } catch (CertificateException | IOException ex) {
-      throw new CaMgmtException(ex);
-    }
-  } // method generateCertchain
 
 }

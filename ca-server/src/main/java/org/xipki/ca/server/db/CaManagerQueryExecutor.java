@@ -24,6 +24,7 @@ import static org.xipki.util.Args.notBlank;
 import static org.xipki.util.Args.notNull;
 import static org.xipki.util.StringUtil.concat;
 
+import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.sql.Timestamp;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +65,6 @@ import org.xipki.ca.server.CaIdNameMap;
 import org.xipki.ca.server.CaInfo;
 import org.xipki.ca.server.CaManagerImpl;
 import org.xipki.ca.server.CaUtil;
-import org.xipki.ca.server.CertStore;
 import org.xipki.ca.server.IdentifiedCertPublisher;
 import org.xipki.ca.server.IdentifiedCertprofile;
 import org.xipki.ca.server.PasswordHash;
@@ -93,7 +94,18 @@ import org.xipki.util.Validity;
  * @author Lijun Liao
  * @since 2.0.0
  */
-public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
+public class CaManagerQueryExecutor extends QueryExecutor {
+  
+  private static enum Table {
+    // SMALLINT or INT
+    REQUESTOR,
+    PUBLISHER,
+    PROFILE,
+    TUSER,
+    CA,
+    // BigInt
+    CA_HAS_USER;
+  }
 
   private static final Logger LOG = LoggerFactory.getLogger(CaManagerQueryExecutor.class);
 
@@ -111,8 +123,14 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   private final String sqlSelectUserId;
   private final String sqlSelectUser;
 
+  private final Map<Table, AtomicLong> cachedIdMap = new HashMap<>();
+
   public CaManagerQueryExecutor(DataSourceWrapper datasource) {
     super(datasource);
+
+    for (Table m : Table.values()) {
+      cachedIdMap.put(m, new AtomicLong(0));
+    }
 
     this.sqlSelectProfileId   = buildSelectFirstSql("ID FROM PROFILE WHERE NAME=?");
     this.sqlSelectCaId        = buildSelectFirstSql("ID FROM CA WHERE NAME=?");
@@ -149,20 +167,16 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
    */
   public SystemEvent getSystemEvent(String eventName)
       throws CaMgmtException {
-    String sql = sqlSelectSystemEvent;
     SqlColumn3[] resultColumns = {col3Long("EVENT_TIME")};
-    ResultRow rs = executeQuery1PreparedStament(sql, resultColumns, col2Str(eventName));
-    if (rs == null) {
-      return null;
-    }
-
-    return new SystemEvent(eventName, rs.getString("EVENT_OWNER"), rs.getLong("EVENT_TIME"));
+    ResultRow rs = executeQuery1PreparedStament(sqlSelectSystemEvent,
+                    resultColumns, col2Str(eventName));
+    return (rs == null) ? null
+              : new SystemEvent(eventName, rs.getString("EVENT_OWNER"), rs.getLong("EVENT_TIME"));
   } // method getSystemEvent
 
   private void deleteSystemEvent(String eventName)
       throws CaMgmtException {
-    final String sql = "DELETE FROM SYSTEM_EVENT WHERE NAME=?";
-    executeUpdatePreparedStament(sql, col2Str(eventName));
+    executeUpdatePreparedStament("DELETE FROM SYSTEM_EVENT WHERE NAME=?", col2Str(eventName));
   } // method deleteSystemEvent
 
   private void addSystemEvent(SystemEvent systemEvent)
@@ -192,9 +206,8 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       throws CaMgmtException {
     Map<String, Integer> map = new HashMap<>();
 
-    final String sql = "SELECT NAME,CA_ID FROM CAALIAS";
     SqlColumn3[] resultColumns = {col3Int("CA_ID")};
-    List<ResultRow> rows = executeQueryStament(sql, resultColumns);
+    List<ResultRow> rows = executeQueryStament("SELECT NAME,CA_ID FROM CAALIAS", resultColumns);
     for (ResultRow m : rows) {
       map.put(m.getString("NAME"), m.getInt("CA_ID"));
     }
@@ -203,9 +216,8 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
 
   public CertprofileEntry createCertprofile(String name)
       throws CaMgmtException {
-    String sql = sqlSelectProfile;
     SqlColumn3[] resultColumns = {col3Int("ID")};
-    ResultRow rs = executeQuery1PreparedStament(sql, resultColumns, col2Str(name));
+    ResultRow rs = executeQuery1PreparedStament(sqlSelectProfile, resultColumns, col2Str(name));
 
     if (rs == null) {
       throw new CaMgmtException("unknown CA " + name);
@@ -217,9 +229,8 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
 
   public PublisherEntry createPublisher(String name)
       throws CaMgmtException {
-    String sql = sqlSelectPublisher;
     SqlColumn3[] resultColumns = {col3Int("ID")};
-    ResultRow rs = executeQuery1PreparedStament(sql, resultColumns, col2Str(name));
+    ResultRow rs = executeQuery1PreparedStament(sqlSelectPublisher, resultColumns, col2Str(name));
 
     if (rs == null) {
       throw new CaMgmtException("unkown Publisher " + name);
@@ -231,22 +242,16 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
 
   public Integer getRequestorId(String requestorName)
       throws CaMgmtException {
-    String sql = sqlSelectRequestorId;
     SqlColumn3[] resultColumns = {col3Int("ID")};
-    ResultRow rs = executeQuery1PreparedStament(sql, resultColumns, col2Str(requestorName));
-
-    if (rs == null) {
-      return null;
-    }
-
-    return rs.getInt("ID");
+    ResultRow rs = executeQuery1PreparedStament(sqlSelectRequestorId,
+                    resultColumns, col2Str(requestorName));
+    return (rs == null) ? null : rs.getInt("ID");
   } // method getRequestorId
 
   public RequestorEntry createRequestor(String name)
       throws CaMgmtException {
-    String sql = sqlSelectRequestor;
     SqlColumn3[] resultColumns = {col3Int("ID")};
-    ResultRow rs = executeQuery1PreparedStament(sql, resultColumns, col2Str(name));
+    ResultRow rs = executeQuery1PreparedStament(sqlSelectRequestor, resultColumns, col2Str(name));
 
     if (rs == null) {
       throw new CaMgmtException("unknown Requestor " + name);
@@ -258,8 +263,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
 
   public SignerEntry createSigner(String name)
       throws CaMgmtException {
-    String sql = sqlSelectSigner;
-    ResultRow rs = executeQuery1PreparedStament(sql, null, col2Str(name));
+    ResultRow rs = executeQuery1PreparedStament(sqlSelectSigner, null, col2Str(name));
 
     if (rs == null) {
       throw new CaMgmtException("unknown signer " + name);
@@ -270,13 +274,11 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
 
   public CaInfo createCaInfo(String name, boolean masterMode, CertStore certstore)
       throws CaMgmtException {
-    final String sql = sqlSelectCa;
-
     SqlColumn3[] resultColumns = {col3Int("SN_SIZE"), col3Int("ID"), col3Long("NEXT_CRLNO"),
         col3Int("NUM_CRLS"), col3Int("EXPIRATION_PERIOD"), col3Int("KEEP_EXPIRED_CERT_DAYS"),
         col3Int("SAVE_REQ"), col3Int("PERMISSION")};
 
-    ResultRow rs = executeQuery1PreparedStament(sql, resultColumns, col2Str(name));
+    ResultRow rs = executeQuery1PreparedStament(sqlSelectCa, resultColumns, col2Str(name));
     if (rs == null) {
       throw new CaMgmtException("uknown CA " + name);
     }
@@ -438,6 +440,18 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
 
     return ret;
   } // method createCaHasEntities
+  
+  private long getNextId(Table table) throws CaMgmtException {
+    try {
+      long idInDb = datasource.getMax(null, table.name(), "ID");
+      AtomicLong cachedId = cachedIdMap.get(table);
+      long nextId = Math.max(idInDb, cachedId.get()) + 1;
+      cachedId.set(nextId);
+      return nextId;
+    } catch (DataAccessException ex) {
+      throw new CaMgmtException(ex);
+    }
+  }
 
   public void addCa(CaEntry caEntry)
       throws CaMgmtException {
@@ -879,7 +893,8 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         try {
           conf = passwordResolver.protectPassword("PBE", conf.toCharArray());
         } catch (PasswordResolverException ex) {
-          throw new CaMgmtException("could not encrypt requestor " + nameId.getName(), ex);
+          throw new CaMgmtException(
+              "could not encrypt password of requestor " + nameId.getName(), ex);
         }
       }
     }
@@ -947,9 +962,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   public void removeCaAlias(String aliasName)
       throws CaMgmtException {
     notBlank(aliasName, "aliasName");
-    final String sql = "DELETE FROM CAALIAS WHERE NAME=?";
-
-    int num = executeUpdatePreparedStament(sql, col2Str(aliasName));
+    int num = executeUpdatePreparedStament("DELETE FROM CAALIAS WHERE NAME=?", col2Str(aliasName));
     if (num == 0) {
       throw new CaMgmtException("could not remove CA Alias " + aliasName);
     }
@@ -1011,8 +1024,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       throws CaMgmtException {
     notBlank(caName, "caName");
     notNull(revocationInfo, "revocationInfo");
-    final String sql = "UPDATE CA SET REV_INFO=? WHERE NAME=?";
-    int num = executeUpdatePreparedStament(sql,
+    int num = executeUpdatePreparedStament("UPDATE CA SET REV_INFO=? WHERE NAME=?",
                 col2Str(revocationInfo.getEncoded()), col2Str(caName));
     if (num == 0) {
       throw new CaMgmtException("could not revoke CA " + caName);
@@ -1022,9 +1034,9 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   public void addSigner(SignerEntry dbEntry)
       throws CaMgmtException {
     notNull(dbEntry, "dbEntry");
-    final String sql = "INSERT INTO SIGNER (NAME,TYPE,CERT,CONF) VALUES (?,?,?,?)";
 
-    int num = executeUpdatePreparedStament(sql,
+    int num = executeUpdatePreparedStament(
+            "INSERT INTO SIGNER (NAME,TYPE,CERT,CONF) VALUES (?,?,?,?)",
             col2Str(dbEntry.getName()),       col2Str(dbEntry.getType()),
             col2Str(dbEntry.getBase64Cert()), col2Str(dbEntry.getConf()));
 
@@ -1037,8 +1049,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
 
   public void unlockCa()
       throws CaMgmtException {
-    final String sql = "DELETE FROM SYSTEM_EVENT WHERE NAME='LOCK'";
-    int num = executeUpdateStament(sql);
+    int num = executeUpdateStament("DELETE FROM SYSTEM_EVENT WHERE NAME='LOCK'");
     if (num == 0) {
       throw new CaMgmtException("could not unlock CA");
     }
@@ -1201,11 +1212,9 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     notBlank(username, "username");
     NameId ident = new NameId(null, username);
 
-    final String sql = sqlSelectUser;
-
     SqlColumn3[] resultColumns = {col3Int("ID"), col3Bool("ACTIVE")};
     ResultRow rs =
-        executeQuery1PreparedStament(sql, resultColumns, col2Str(ident.getName()));
+        executeQuery1PreparedStament(sqlSelectUser, resultColumns, col2Str(ident.getName()));
     if (rs == null) {
       if (nullable) {
         return null;
@@ -1217,5 +1226,24 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     ident.setId(rs.getInt("ID"));
     return new UserEntry(ident, rs.getBoolean("ACTIVE"), rs.getString("PASSWORD"));
   } // method getUser
+  
+  private static X509Cert generateCert(String b64Cert)
+      throws CaMgmtException {
+    return (b64Cert == null) ? null : parseCert(Base64.decode(b64Cert));
+  } // method generateCert
+  
+  private static List<X509Cert> generateCertchain(String encodedCertchain)
+      throws CaMgmtException {
+    if (StringUtil.isBlank(encodedCertchain)) {
+      return null;
+    }
+
+    try {
+      List<X509Cert> certs = X509Util.listCertificates(encodedCertchain);
+      return CollectionUtil.isEmpty(certs) ? null : certs;
+    } catch (CertificateException | IOException ex) {
+      throw new CaMgmtException(ex);
+    }
+  } // method generateCertchain
 
 }
