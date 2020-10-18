@@ -119,17 +119,19 @@ import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.api.mgmt.CmpControl;
 import org.xipki.ca.api.mgmt.CrlControl;
 import org.xipki.ca.api.mgmt.CrlControl.HourMinute;
+import org.xipki.ca.api.mgmt.RequestorInfo;
+import org.xipki.ca.api.mgmt.ValidityMode;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.CaHasUserEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
-import org.xipki.ca.api.mgmt.RequestorInfo;
-import org.xipki.ca.api.mgmt.ValidityMode;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.Certprofile.ExtensionControl;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.KeypairGenControl;
+import org.xipki.ca.server.db.CertStore;
+import org.xipki.ca.server.db.CertStore.KnowCertResult;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
@@ -538,13 +540,13 @@ public class X509Ca implements Closeable {
     return certstore.getCert(subjectName, transactionId);
   }
 
-  public CertStore.KnowCertResult knowsCert(X509Cert cert)
+  public KnowCertResult knowsCert(X509Cert cert)
       throws OperationException {
     notNull(cert, "cert");
 
     X500Name issuerX500 = cert.getIssuer();
     if (!caInfo.getSubject().equals(X509Util.getRfc4519Name(issuerX500))) {
-      return CertStore.KnowCertResult.UNKNOWN;
+      return KnowCertResult.UNKNOWN;
     }
 
     return certstore.knowsCertForSerial(caIdent, cert.getSerialNumber());
@@ -1172,7 +1174,7 @@ public class X509Ca implements Closeable {
 
         try {
           certInfo = certstore.getCertForId(caIdent, caCert, certId, caIdNameMap);
-        } catch (OperationException | CertificateException ex) {
+        } catch (OperationException ex) {
           LogUtil.error(LOG, ex);
           return false;
         }

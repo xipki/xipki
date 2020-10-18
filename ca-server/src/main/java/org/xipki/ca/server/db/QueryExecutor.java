@@ -18,7 +18,6 @@
 package org.xipki.ca.server.db;
 
 import static org.xipki.util.Args.notNull;
-import static org.xipki.util.StringUtil.concat;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -32,14 +31,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.mgmt.CaManager;
-import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.security.SignerConf;
-import org.xipki.util.StringUtil;
 
 /**
  * Base class to execute the database queries to manage CA system.
@@ -202,7 +195,41 @@ class QueryExecutor {
 
   } // class SqlColumn3
 
-  private static final Logger LOG = LoggerFactory.getLogger(QueryExecutor.class);
+  protected static class DbSchemaInfo {
+    private final Map<String, String> variables = new HashMap<>();
+
+    protected DbSchemaInfo(DataSourceWrapper datasource)
+        throws DataAccessException {
+      notNull(datasource, "datasource");
+      final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
+
+      Statement stmt = null;
+      ResultSet rs = null;
+
+      try {
+        stmt = datasource.createStatement();
+        if (stmt == null) {
+          throw new DataAccessException("could not create statement");
+        }
+
+        rs = stmt.executeQuery(sql);
+        while (rs.next()) {
+          String name = rs.getString("NAME");
+          String value = rs.getString("VALUE2");
+          variables.put(name, value);
+        }
+      } catch (SQLException ex) {
+        throw datasource.translate(sql, ex);
+      } finally {
+        datasource.releaseResources(stmt, rs);
+      }
+    } // constructor
+
+    public String variableValue(String variableName) {
+      return variables.get(notNull(variableName, "variableName"));
+    }
+
+  } // class DbSchemaInfo
 
   protected final DataSourceWrapper datasource;
 
@@ -214,46 +241,9 @@ class QueryExecutor {
     return datasource.buildSelectFirstSql(1, coreSql);
   }
 
-  private Statement createStatement()
-      throws CaMgmtException {
-    try {
-      return datasource.createStatement();
-    } catch (DataAccessException ex) {
-      throw new CaMgmtException(ex);
-    }
-  } // method createStatement
-
-  private PreparedStatement prepareStatement(String sql)
-      throws CaMgmtException {
-    try {
-      return datasource.prepareStatement(sql);
-    } catch (DataAccessException ex) {
-      throw new CaMgmtException(ex);
-    }
-  } // method prepareStatement
-
-  public List<String> namesFromTable(String table)
-      throws CaMgmtException {
-    final String sql = concat("SELECT NAME FROM ", table);
-    List<ResultRow> rows = executeQueryStament(sql, null);
-
-    List<String> names = new LinkedList<>();
-    for (ResultRow rs : rows) {
-      String name = rs.getString("NAME");
-      if (StringUtil.isNotBlank(name)) {
-        names.add(name);
-      }
-    }
-
-    return names;
-  } // method namesFromTable
-
-  public boolean deleteRowWithName(String name, String table)
-      throws CaMgmtException {
-    final String sql = concat("DELETE FROM ", table, " WHERE NAME=?");
-    int num = executeUpdatePreparedStament(sql, col2Str(name));
-    return num > 0;
-  } // method deleteRowWithName
+  protected String buildSelectFirstSql(String orderBy, String coreSql) {
+    return datasource.buildSelectFirstSql(1, orderBy, coreSql);
+  }
 
   protected static SqlColumn colBool(String name, boolean value) {
     return new SqlColumn(ColumnType.BOOL, name, value);
@@ -308,43 +298,38 @@ class QueryExecutor {
     return new SqlColumn3(label, ColumnType.LONG);
   }
 
-  protected static String str(String sa, String sb) {
-    return (sa != null) ? getRealString(sa) : sb;
-  }
-
-  protected int executeUpdateStament(String sql)
-      throws CaMgmtException {
-    Statement ps = createStatement();
+  protected int execUpdateStmt(String sql)
+      throws DataAccessException {
+    Statement ps = datasource.createStatement();
     try {
       return ps.executeUpdate(sql);
     } catch (SQLException ex) {
-      throw new CaMgmtException(datasource.translate(sql, ex));
+      throw datasource.translate(sql, ex);
     } finally {
       datasource.releaseResources(ps, null);
     }
   }
 
-  protected int executeUpdatePreparedStament(String sql, SqlColumn2... params)
-      throws CaMgmtException {
-    PreparedStatement ps = buildPreparedStament(sql, params);
+  protected int execUpdatePrepStmt(String sql, SqlColumn2... params)
+      throws DataAccessException {
+    PreparedStatement ps = buildPrepStmt(sql, params);
     try {
       return ps.executeUpdate();
     } catch (SQLException ex) {
-      throw new CaMgmtException(datasource.translate(sql, ex));
+      throw datasource.translate(sql, ex);
     } finally {
       datasource.releaseResources(ps, null);
     }
   }
 
-  protected List<ResultRow> executeQueryStament(String sql, SqlColumn3[] resultColumns)
-      throws CaMgmtException {
-    return executeQueryStament(false, sql, resultColumns);
+  protected List<ResultRow> execQueryStmt(String sql, SqlColumn3[] resultColumns)
+      throws DataAccessException {
+    return execQueryStmt(false, sql, resultColumns);
   }
 
-  private List<ResultRow> executeQueryStament(boolean single,
-      String sql, SqlColumn3[] resultColumns)
-      throws CaMgmtException {
-    Statement stmt = createStatement();
+  private List<ResultRow> execQueryStmt(boolean single, String sql, SqlColumn3[] resultColumns)
+      throws DataAccessException {
+    Statement stmt = datasource.createStatement();
     ResultSet rs = null;
 
     try {
@@ -358,29 +343,29 @@ class QueryExecutor {
       }
       return rows;
     } catch (SQLException ex) {
-      throw new CaMgmtException(datasource.translate(sql, ex));
+      throw datasource.translate(sql, ex);
     } finally {
       datasource.releaseResources(stmt, rs);
     }
   }
 
-  protected ResultRow executeQuery1PreparedStament(
+  protected ResultRow execQuery1PrepStmt(
       String sql, SqlColumn3[] resultColumns, SqlColumn2... params)
-      throws CaMgmtException {
-    List<ResultRow> rows = executeQueryPreparedStament(true, sql, resultColumns, params);
+      throws DataAccessException {
+    List<ResultRow> rows = execQueryPrepStmt(true, sql, resultColumns, params);
     return rows.isEmpty() ? null : rows.get(0);
   }
 
-  protected List<ResultRow> executeQueryPreparedStament(
+  protected List<ResultRow> execQueryPrepStmt(
       String sql, SqlColumn3[] resultColumns, SqlColumn2... params)
-      throws CaMgmtException {
-    return executeQueryPreparedStament(false, sql, resultColumns, params);
+      throws DataAccessException {
+    return execQueryPrepStmt(false, sql, resultColumns, params);
   }
 
-  private List<ResultRow> executeQueryPreparedStament(boolean single,
+  private List<ResultRow> execQueryPrepStmt(boolean single,
       String sql, SqlColumn3[] resultColumns, SqlColumn2... params)
-      throws CaMgmtException {
-    PreparedStatement ps = buildPreparedStament(sql, params);
+      throws DataAccessException {
+    PreparedStatement ps = buildPrepStmt(sql, params);
     ResultSet rs = null;
     try {
       rs = ps.executeQuery();
@@ -393,18 +378,18 @@ class QueryExecutor {
       }
       return rows;
     } catch (SQLException ex) {
-      throw new CaMgmtException(datasource.translate(sql, ex));
+      throw datasource.translate(sql, ex);
     } finally {
       datasource.releaseResources(ps, rs);
     }
   }
 
-  protected PreparedStatement buildPreparedStament(String sql,  SqlColumn2... columns)
-      throws CaMgmtException {
+  protected PreparedStatement buildPrepStmt(String sql,  SqlColumn2... columns)
+      throws DataAccessException {
     PreparedStatement ps = null;
     boolean succ = false;
     try {
-      ps = prepareStatement(sql);
+      ps = datasource.prepareStatement(sql);
 
       int index = 0;
       for (SqlColumn2 col : columns) {
@@ -444,7 +429,7 @@ class QueryExecutor {
             throw new IllegalStateException("should not reach here, unknown type " + type);
           }
         } catch (SQLException ex) {
-          throw new CaMgmtException(datasource.translate(sql, ex));
+          throw datasource.translate(sql, ex);
         }
       }
 
@@ -457,176 +442,24 @@ class QueryExecutor {
     }
   }
 
-  protected void changeIfNotNull(String tableName, SqlColumn whereColumn, SqlColumn... columns)
-      throws CaMgmtException {
-    StringBuilder buf = new StringBuilder("UPDATE ");
-    buf.append(tableName).append(" SET ");
-    boolean noAction = true;
-    for (SqlColumn col : columns) {
-      if (col.value() != null) {
-        noAction = false;
-        buf.append(col.name()).append("=?,");
-      }
-    }
-
-    if (noAction) {
-      throw new IllegalArgumentException("nothing to change");
-    }
-
-    buf.deleteCharAt(buf.length() - 1); // delete the last ','
-    buf.append(" WHERE ").append(whereColumn.name()).append("=?");
-
-    String sql = buf.toString();
-
-    PreparedStatement ps = null;
-    try {
-      ps = prepareStatement(sql);
-
-      Map<String, String> changedColumns = new HashMap<>();
-
-      int index = 1;
-      for (SqlColumn col : columns) {
-        if (col.value() != null) {
-          setColumn(changedColumns, ps, index, col);
-          index++;
-        }
-      }
-      setColumn(null, ps, index, whereColumn);
-
-      if (ps.executeUpdate() == 0) {
-        throw new CaMgmtException("could not update table " + tableName);
-      }
-
-      LOG.info("updated table {} WHERE {}={}: {}", tableName,
-          whereColumn.name(), whereColumn.value(), changedColumns);
-    } catch (SQLException ex) {
-      throw new CaMgmtException(datasource.translate(sql, ex));
-    } finally {
-      datasource.releaseResources(ps, null);
-    }
-  } // method changeIfNotNull
-
-  private void setColumn(Map<String, String> changedColumns, PreparedStatement ps,
-      int index, SqlColumn column)
-          throws SQLException {
-    String name = column.name();
-    ColumnType type = column.type();
-    Object value = column.value();
-
-    boolean sensitive = column.sensitive();
-
-    String valText;
-    if (type == ColumnType.STRING) {
-      String val = getRealString((String) value);
-      ps.setString(index, val);
-
-      valText = val;
-      if (val != null && column.isSignerConf()) {
-        valText = SignerConf.eraseSensitiveData(valText);
-
-        if (valText.length() > 100) {
-          valText = StringUtil.concat(valText.substring(0, 97), "...");
-        }
-      }
-    } else if (type == ColumnType.INT) {
-      if (value == null) {
-        ps.setNull(index, Types.INTEGER);
-        valText = "null";
-      } else {
-        int val = ((Integer) value).intValue();
-        ps.setInt(index, val);
-        valText = Integer.toString(val);
-      }
-    } else if (type == ColumnType.LONG) {
-      if (value == null) {
-        ps.setNull(index, Types.BIGINT);
-        valText = "null";
-      } else {
-        long val = ((Long) value).longValue();
-        ps.setLong(index, val);
-        valText = Long.toString(val);
-      }
-    } else if (type == ColumnType.BOOL) {
-      if (value == null) {
-        ps.setNull(index, Types.INTEGER);
-        valText = "null";
-      } else {
-        int val = (Boolean) value ? 1 : 0;
-        ps.setInt(index, val);
-        valText = Integer.toString(val);
-      }
-    } else if (type == ColumnType.TIMESTAMP) {
-      if (value == null) {
-        ps.setNull(index, Types.TIMESTAMP);
-        valText = "null";
-      } else {
-        Timestamp val = (Timestamp) value;
-        ps.setTimestamp(index, val);
-        valText = val.toString();
-      }
-    } else {
-      throw new IllegalStateException("should not reach here, unknown type " + column.type());
-    }
-
-    if (changedColumns != null) {
-      changedColumns.put(name, sensitive ? "*****" : valText);
-    }
-  } // method setColumn
-
-  private static String getRealString(String str) {
-    return CaManager.NULL.equalsIgnoreCase(str) ? null : str;
+  protected void notNulls(Object param1, String name1, Object param2, String name2) {
+    notNull(param1, name1);
+    notNull(param2, name2);
   }
 
-  protected int getNonNullIdForName(String sql, String name)
-      throws CaMgmtException {
-    Integer id = getIdForName(sql, name);
-    if (id != null) {
-      return id.intValue();
-    }
+  protected void notNulls(Object param1, String name1, Object param2, String name2,
+      Object param3, String name3) {
+    notNull(param1, name1);
+    notNull(param2, name2);
+    notNull(param3, name3);
+  }
 
-    throw new CaMgmtException(concat("Found no entry named ",name));
-  } // method getNonNullIdForName
-
-  protected Integer getIdForName(String sql, String name)
-      throws CaMgmtException {
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-    try {
-      ps = prepareStatement(sql);
-      ps.setString(1, name);
-      rs = ps.executeQuery();
-      if (!rs.next()) {
-        return null;
-      }
-
-      return rs.getInt("ID");
-    } catch (SQLException ex) {
-      throw new CaMgmtException(datasource.translate(sql, ex));
-    } finally {
-      datasource.releaseResources(ps, rs);
-    }
-  } // method getIdForName
-
-  protected Map<Integer, String> getIdNameMap(String tableName)
-      throws CaMgmtException {
-    final String sql = concat("SELECT ID,NAME FROM ", tableName);
-    Statement ps = null;
-    ResultSet rs = null;
-
-    Map<Integer, String> ret = new HashMap<>();
-    try {
-      ps = createStatement();
-      rs = ps.executeQuery(sql);
-      while (rs.next()) {
-        ret.put(rs.getInt("ID"), rs.getString("NAME"));
-      }
-    } catch (SQLException ex) {
-      throw new CaMgmtException(datasource.translate(sql, ex));
-    } finally {
-      datasource.releaseResources(ps, rs);
-    }
-
-    return ret;
-  } // method getIdNameMap
+  protected void notNulls(Object param1, String name1, Object param2, String name2,
+      Object param3, String name3, Object param4, String name4) {
+    notNull(param1, name1);
+    notNull(param2, name2);
+    notNull(param3, name3);
+    notNull(param4, name4);
+  }
 
 }

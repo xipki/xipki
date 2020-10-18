@@ -39,7 +39,7 @@ import org.xipki.util.Args;
  *
  */
 
-class UniqueIdGenerator {
+public class UniqueIdGenerator {
 
   private static class OffsetIncrement implements IntBinaryOperator {
 

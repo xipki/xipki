@@ -17,7 +17,6 @@
 
 package org.xipki.ca.server;
 
-import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -32,6 +31,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
+import org.xipki.ca.server.db.CertStore;
+import org.xipki.ca.server.db.CertStore.SerialWithId;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
@@ -61,13 +62,13 @@ class CertRepublisher {
 
   private class SerialWithIdQueueEntry implements QueueEntry {
 
-    private final CertStore.SerialWithId serialWithId;
+    private final SerialWithId serialWithId;
 
-    public SerialWithIdQueueEntry(CertStore.SerialWithId serialWithId) {
+    public SerialWithIdQueueEntry(SerialWithId serialWithId) {
       this.serialWithId = Args.notNull(serialWithId, "serialWithId");
     }
 
-    public CertStore.SerialWithId serialWithId() {
+    public SerialWithId serialWithId() {
       return serialWithId;
     }
 
@@ -86,11 +87,11 @@ class CertRepublisher {
       long startId = 1;
 
       try {
-        List<CertStore.SerialWithId> serials;
+        List<SerialWithId> serials;
         do {
           serials = certstore.getSerialNumbers(ca, startId, numEntries, onlyRevokedCerts);
           long maxId = 1;
-          for (CertStore.SerialWithId sid : serials) {
+          for (SerialWithId sid : serials) {
             if (sid.getId() > maxId) {
               maxId = sid.getId();
             }
@@ -149,13 +150,13 @@ class CertRepublisher {
           break;
         }
 
-        CertStore.SerialWithId sid = ((SerialWithIdQueueEntry) entry).serialWithId();
+        SerialWithId sid = ((SerialWithIdQueueEntry) entry).serialWithId();
 
         CertificateInfo certInfo;
 
         try {
           certInfo = certstore.getCertForId(ca, caCert, sid.getId(), caIdNameMap);
-        } catch (OperationException | CertificateException ex) {
+        } catch (OperationException ex) {
           LogUtil.error(LOG, ex);
           failed = true;
           break;

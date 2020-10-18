@@ -70,6 +70,7 @@ import org.xipki.ca.server.IdentifiedCertprofile;
 import org.xipki.ca.server.PasswordHash;
 import org.xipki.ca.server.RequestorEntryWrapper;
 import org.xipki.ca.server.SignerEntryWrapper;
+import org.xipki.ca.server.db.CertStore.SystemEvent;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
@@ -94,18 +95,7 @@ import org.xipki.util.Validity;
  * @author Lijun Liao
  * @since 2.0.0
  */
-public class CaManagerQueryExecutor extends QueryExecutor {
-  
-  private static enum Table {
-    // SMALLINT or INT
-    REQUESTOR,
-    PUBLISHER,
-    PROFILE,
-    TUSER,
-    CA,
-    // BigInt
-    CA_HAS_USER;
-  }
+public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
 
   private static final Logger LOG = LoggerFactory.getLogger(CaManagerQueryExecutor.class);
 
@@ -165,26 +155,22 @@ public class CaManagerQueryExecutor extends QueryExecutor {
    * @throws CaMgmtException
    *            If error occurs.
    */
-  public SystemEvent getSystemEvent(String eventName)
-      throws CaMgmtException {
+  public SystemEvent getSystemEvent(String eventName) throws CaMgmtException {
     SqlColumn3[] resultColumns = {col3Long("EVENT_TIME")};
-    ResultRow rs = executeQuery1PreparedStament(sqlSelectSystemEvent,
-                    resultColumns, col2Str(eventName));
+    ResultRow rs = execQuery1PrepStmt0(sqlSelectSystemEvent, resultColumns, col2Str(eventName));
     return (rs == null) ? null
               : new SystemEvent(eventName, rs.getString("EVENT_OWNER"), rs.getLong("EVENT_TIME"));
   } // method getSystemEvent
 
-  private void deleteSystemEvent(String eventName)
-      throws CaMgmtException {
-    executeUpdatePreparedStament("DELETE FROM SYSTEM_EVENT WHERE NAME=?", col2Str(eventName));
+  private void deleteSystemEvent(String eventName) throws CaMgmtException {
+    execUpdatePrepStmt0("DELETE FROM SYSTEM_EVENT WHERE NAME=?", col2Str(eventName));
   } // method deleteSystemEvent
 
-  private void addSystemEvent(SystemEvent systemEvent)
-      throws CaMgmtException {
+  private void addSystemEvent(SystemEvent systemEvent) throws CaMgmtException {
     final String sql =
         "INSERT INTO SYSTEM_EVENT (NAME,EVENT_TIME,EVENT_TIME2,EVENT_OWNER) VALUES (?,?,?,?)";
 
-    int num = executeUpdatePreparedStament(sql,
+    int num = execUpdatePrepStmt0(sql,
         col2Str(systemEvent.getName()), col2Long(systemEvent.getEventTime()),
         col2Timestamp(new Timestamp(systemEvent.getEventTime() * 1000L)),
         col2Str(systemEvent.getOwner()));
@@ -196,28 +182,25 @@ public class CaManagerQueryExecutor extends QueryExecutor {
     LOG.info("added system event {}", systemEvent.getName());
   } // method addSystemEvent
 
-  public void changeSystemEvent(SystemEvent systemEvent)
-      throws CaMgmtException {
+  public void changeSystemEvent(SystemEvent systemEvent) throws CaMgmtException {
     deleteSystemEvent(systemEvent.getName());
     addSystemEvent(systemEvent);
   } // method changeSystemEvent
 
-  public Map<String, Integer> createCaAliases()
-      throws CaMgmtException {
+  public Map<String, Integer> createCaAliases() throws CaMgmtException {
     Map<String, Integer> map = new HashMap<>();
 
     SqlColumn3[] resultColumns = {col3Int("CA_ID")};
-    List<ResultRow> rows = executeQueryStament("SELECT NAME,CA_ID FROM CAALIAS", resultColumns);
+    List<ResultRow> rows = execQueryStmt0("SELECT NAME,CA_ID FROM CAALIAS", resultColumns);
     for (ResultRow m : rows) {
       map.put(m.getString("NAME"), m.getInt("CA_ID"));
     }
     return map;
   } // method createCaAliases
 
-  public CertprofileEntry createCertprofile(String name)
-      throws CaMgmtException {
+  public CertprofileEntry createCertprofile(String name) throws CaMgmtException {
     SqlColumn3[] resultColumns = {col3Int("ID")};
-    ResultRow rs = executeQuery1PreparedStament(sqlSelectProfile, resultColumns, col2Str(name));
+    ResultRow rs = execQuery1PrepStmt0(sqlSelectProfile, resultColumns, col2Str(name));
 
     if (rs == null) {
       throw new CaMgmtException("unknown CA " + name);
@@ -227,10 +210,9 @@ public class CaManagerQueryExecutor extends QueryExecutor {
         rs.getString("TYPE"), rs.getString("CONF"));
   } // method createCertprofile
 
-  public PublisherEntry createPublisher(String name)
-      throws CaMgmtException {
+  public PublisherEntry createPublisher(String name) throws CaMgmtException {
     SqlColumn3[] resultColumns = {col3Int("ID")};
-    ResultRow rs = executeQuery1PreparedStament(sqlSelectPublisher, resultColumns, col2Str(name));
+    ResultRow rs = execQuery1PrepStmt0(sqlSelectPublisher, resultColumns, col2Str(name));
 
     if (rs == null) {
       throw new CaMgmtException("unkown Publisher " + name);
@@ -240,18 +222,15 @@ public class CaManagerQueryExecutor extends QueryExecutor {
         rs.getString("TYPE"), rs.getString("CONF"));
   } // method createPublisher
 
-  public Integer getRequestorId(String requestorName)
-      throws CaMgmtException {
+  public Integer getRequestorId(String requestorName) throws CaMgmtException {
     SqlColumn3[] resultColumns = {col3Int("ID")};
-    ResultRow rs = executeQuery1PreparedStament(sqlSelectRequestorId,
-                    resultColumns, col2Str(requestorName));
+    ResultRow rs = execQuery1PrepStmt0(sqlSelectRequestorId, resultColumns, col2Str(requestorName));
     return (rs == null) ? null : rs.getInt("ID");
   } // method getRequestorId
 
-  public RequestorEntry createRequestor(String name)
-      throws CaMgmtException {
+  public RequestorEntry createRequestor(String name) throws CaMgmtException {
     SqlColumn3[] resultColumns = {col3Int("ID")};
-    ResultRow rs = executeQuery1PreparedStament(sqlSelectRequestor, resultColumns, col2Str(name));
+    ResultRow rs = execQuery1PrepStmt0(sqlSelectRequestor, resultColumns, col2Str(name));
 
     if (rs == null) {
       throw new CaMgmtException("unknown Requestor " + name);
@@ -261,9 +240,8 @@ public class CaManagerQueryExecutor extends QueryExecutor {
         rs.getString("TYPE"), rs.getString("CONF"));
   } // method createRequestor
 
-  public SignerEntry createSigner(String name)
-      throws CaMgmtException {
-    ResultRow rs = executeQuery1PreparedStament(sqlSelectSigner, null, col2Str(name));
+  public SignerEntry createSigner(String name) throws CaMgmtException {
+    ResultRow rs = execQuery1PrepStmt0(sqlSelectSigner, null, col2Str(name));
 
     if (rs == null) {
       throw new CaMgmtException("unknown signer " + name);
@@ -278,7 +256,7 @@ public class CaManagerQueryExecutor extends QueryExecutor {
         col3Int("NUM_CRLS"), col3Int("EXPIRATION_PERIOD"), col3Int("KEEP_EXPIRED_CERT_DAYS"),
         col3Int("SAVE_REQ"), col3Int("PERMISSION")};
 
-    ResultRow rs = executeQuery1PreparedStament(sqlSelectCa, resultColumns, col2Str(name));
+    ResultRow rs = execQuery1PrepStmt0(sqlSelectCa, resultColumns, col2Str(name));
     if (rs == null) {
       throw new CaMgmtException("uknown CA " + name);
     }
@@ -388,15 +366,14 @@ public class CaManagerQueryExecutor extends QueryExecutor {
     }
   } // method createCaInfo
 
-  public Set<CaHasRequestorEntry> createCaHasRequestors(NameId ca)
-      throws CaMgmtException {
+  public Set<CaHasRequestorEntry> createCaHasRequestors(NameId ca) throws CaMgmtException {
     Map<Integer, String> idNameMap = getIdNameMap("REQUESTOR");
 
     final String sql =
         "SELECT REQUESTOR_ID,RA,PERMISSION,PROFILES FROM CA_HAS_REQUESTOR WHERE CA_ID=?";
 
     SqlColumn3[] resultColumns = {col3Int("REQUESTOR_ID"), col3Bool("RA"), col3Int("PERMISSION")};
-    List<ResultRow> rows = executeQueryPreparedStament(sql, resultColumns, col2Int(ca.getId()));
+    List<ResultRow> rows = execQueryPrepStmt0(sql, resultColumns, col2Int(ca.getId()));
 
     Set<CaHasRequestorEntry> ret = new HashSet<>();
     for (ResultRow rs : rows) {
@@ -416,13 +393,11 @@ public class CaManagerQueryExecutor extends QueryExecutor {
     return ret;
   } // method createCaHasRequestors
 
-  public Set<Integer> createCaHasProfiles(NameId ca)
-      throws CaMgmtException {
+  public Set<Integer> createCaHasProfiles(NameId ca) throws CaMgmtException {
     return createCaHasEntities("CA_HAS_PROFILE", "PROFILE_ID", ca);
   } // method createCaHasProfiles
 
-  public Set<Integer> createCaHasPublishers(NameId ca)
-      throws CaMgmtException {
+  public Set<Integer> createCaHasPublishers(NameId ca) throws CaMgmtException {
     return createCaHasEntities("CA_HAS_PUBLISHER", "PUBLISHER_ID", ca);
   } // method createCaHasPublishers
 
@@ -431,7 +406,7 @@ public class CaManagerQueryExecutor extends QueryExecutor {
     final String sql = "SELECT " + column + " FROM " + table + " WHERE CA_ID=?";
 
     SqlColumn3[] resultColumns = {col3Int(column)};
-    List<ResultRow> rows = executeQueryPreparedStament(sql, resultColumns, col2Int(ca.getId()));
+    List<ResultRow> rows = execQueryPrepStmt0(sql, resultColumns, col2Int(ca.getId()));
 
     Set<Integer> ret = new HashSet<>();
     for (ResultRow rs : rows) {
@@ -440,7 +415,7 @@ public class CaManagerQueryExecutor extends QueryExecutor {
 
     return ret;
   } // method createCaHasEntities
-  
+
   private long getNextId(Table table) throws CaMgmtException {
     try {
       long idInDb = datasource.getMax(null, table.name(), "ID");
@@ -453,8 +428,7 @@ public class CaManagerQueryExecutor extends QueryExecutor {
     }
   }
 
-  public void addCa(CaEntry caEntry)
-      throws CaMgmtException {
+  public void addCa(CaEntry caEntry) throws CaMgmtException {
     notNull(caEntry, "caEntry");
 
     caEntry.getIdent().setId((int) getNextId(Table.CA));
@@ -483,7 +457,7 @@ public class CaManagerQueryExecutor extends QueryExecutor {
     RevokeSuspendedControl revokeSuspended = caEntry.getRevokeSuspendedControl();
 
     // insert to table ca
-    int num = executeUpdatePreparedStament(sql,
+    int num = execUpdatePrepStmt0(sql,
         col2Int(caEntry.getIdent().getId()),         col2Str(caEntry.getIdent().getName()),
         col2Str(caEntry.getSubject()),               col2Int(caEntry.getSerialNoLen()),
         col2Long(caEntry.getNextCrlNumber()),        col2Str(caEntry.getStatus().getStatus()),
@@ -515,13 +489,11 @@ public class CaManagerQueryExecutor extends QueryExecutor {
     }
   } // method addCa
 
-  public void addCaAlias(String aliasName, NameId ca)
-      throws CaMgmtException {
-    notNull(aliasName, "aliasName");
-    notNull(ca, "ca");
+  public void addCaAlias(String aliasName, NameId ca) throws CaMgmtException {
+    notNulls(aliasName, "aliasName", ca, "ca");
 
     final String sql = "INSERT INTO CAALIAS (NAME,CA_ID) VALUES (?,?)";
-    int num = executeUpdatePreparedStament(sql, col2Str(aliasName), col2Int(ca.getId()));
+    int num = execUpdatePrepStmt0(sql, col2Str(aliasName), col2Int(ca.getId()));
 
     if (num == 0) {
       throw new CaMgmtException("could not add CA alias " + aliasName);
@@ -529,14 +501,13 @@ public class CaManagerQueryExecutor extends QueryExecutor {
     LOG.info("added CA alias '{}' for CA '{}'", aliasName, ca);
   } // method addCaAlias
 
-  public void addCertprofile(CertprofileEntry dbEntry)
-      throws CaMgmtException {
+  public void addCertprofile(CertprofileEntry dbEntry) throws CaMgmtException {
     notNull(dbEntry, "dbEntry");
     final String sql = "INSERT INTO PROFILE (ID,NAME,TYPE,CONF) VALUES (?,?,?,?)";
 
     dbEntry.getIdent().setId((int) getNextId(Table.PROFILE));
 
-    int num = executeUpdatePreparedStament(sql,
+    int num = execUpdatePrepStmt0(sql,
         col2Int(dbEntry.getIdent().getId()), col2Str(dbEntry.getIdent().getName()),
         col2Str(dbEntry.getType()),          col2Str(dbEntry.getConf()));
 
@@ -547,19 +518,15 @@ public class CaManagerQueryExecutor extends QueryExecutor {
     LOG.info("added profile '{}': {}", dbEntry.getIdent(), dbEntry);
   } // method addCertprofile
 
-  public void addCertprofileToCa(NameId profile, NameId ca)
-      throws CaMgmtException {
-    notNull(profile, "profile");
-    notNull(ca, "ca");
+  public void addCertprofileToCa(NameId profile, NameId ca) throws CaMgmtException {
+    notNulls(profile, "profile", ca, "ca");
 
     final String sql = "INSERT INTO CA_HAS_PROFILE (CA_ID,PROFILE_ID) VALUES (?,?)";
     addEntityToCa("profile", profile, ca, sql);
   } // method addCertprofileToCa
 
-  public void addPublisherToCa(NameId publisher, NameId ca)
-      throws CaMgmtException {
-    notNull(publisher, "publisher");
-    notNull(ca, "ca");
+  public void addPublisherToCa(NameId publisher, NameId ca) throws CaMgmtException {
+    notNulls(publisher, "publisher", ca, "ca");
 
     final String sql = "INSERT INTO CA_HAS_PUBLISHER (CA_ID,PUBLISHER_ID) VALUES (?,?)";
     addEntityToCa("publisher", publisher, ca, sql);
@@ -567,7 +534,7 @@ public class CaManagerQueryExecutor extends QueryExecutor {
 
   public void addEntityToCa(String desc, NameId entity, NameId ca, String sql)
       throws CaMgmtException {
-    int num = executeUpdatePreparedStament(sql, col2Int(ca.getId()), col2Int(entity.getId()));
+    int num = execUpdatePrepStmt0(sql, col2Int(ca.getId()), col2Int(entity.getId()));
     if (num == 0) {
       throw new CaMgmtException("could not add " + desc + " " + entity + " to CA " +  ca);
     }
@@ -575,14 +542,13 @@ public class CaManagerQueryExecutor extends QueryExecutor {
     LOG.info("added {} '{}' to CA '{}'", desc, entity, ca);
   } // method addPublisherToCa
 
-  public void addRequestor(RequestorEntry dbEntry)
-      throws CaMgmtException {
+  public void addRequestor(RequestorEntry dbEntry) throws CaMgmtException {
     notNull(dbEntry, "dbEntry");
 
     dbEntry.getIdent().setId((int) getNextId(Table.REQUESTOR));
 
     final String sql = "INSERT INTO REQUESTOR (ID,NAME,TYPE,CONF) VALUES (?,?,?,?)";
-    int num = executeUpdatePreparedStament(sql,
+    int num = execUpdatePrepStmt0(sql,
         col2Int(dbEntry.getIdent().getId()), col2Str(dbEntry.getIdent().getName()),
         col2Str(dbEntry.getType()),          col2Str(dbEntry.getConf()));
 
@@ -595,14 +561,13 @@ public class CaManagerQueryExecutor extends QueryExecutor {
     }
   } // method addRequestor
 
-  public void addEmbeddedRequestor(String requestorName)
-      throws CaMgmtException {
+  public void addEmbeddedRequestor(String requestorName) throws CaMgmtException {
     requestorName = requestorName.toLowerCase();
 
     String sql = "INSERT INTO REQUESTOR (ID,NAME,TYPE,CONF) VALUES (?,?,?,?)";
     int nextId = (int) getNextId(Table.REQUESTOR);
 
-    int num = executeUpdatePreparedStament(sql,
+    int num = execUpdatePrepStmt0(sql,
           col2Int(nextId), col2Str(requestorName), col2Str("EMBEDDED"), col2Str("DEFAULT"));
 
     if (num == 0) {
@@ -611,10 +576,8 @@ public class CaManagerQueryExecutor extends QueryExecutor {
     LOG.info("added requestor '{}'", requestorName);
   } // method addRequestorIfNeeded
 
-  public void addRequestorToCa(CaHasRequestorEntry requestor, NameId ca)
-      throws CaMgmtException {
-    notNull(requestor, "requestor");
-    notNull(ca, "ca");
+  public void addRequestorToCa(CaHasRequestorEntry requestor, NameId ca) throws CaMgmtException {
+    notNulls(requestor, "requestor", ca, "ca");
 
     final String sql = "INSERT INTO CA_HAS_REQUESTOR (CA_ID,REQUESTOR_ID,RA, PERMISSION,PROFILES)"
         + " VALUES (?,?,?,?,?)";
@@ -622,7 +585,7 @@ public class CaManagerQueryExecutor extends QueryExecutor {
     String profilesText = StringUtil.collectionAsString(requestor.getProfiles(), ",");
     final NameId requestorIdent = requestor.getRequestorIdent();
 
-    int num = executeUpdatePreparedStament(sql,
+    int num = execUpdatePrepStmt0(sql,
           col2Int(ca.getId()), col2Int(requestorIdent.getId()), col2Bool(requestor.isRa()),
           col2Int(requestor.getPermission()), col2Str(profilesText));
 
@@ -634,15 +597,14 @@ public class CaManagerQueryExecutor extends QueryExecutor {
         requestorIdent, ca, requestor.isRa(), requestor.getPermission(), profilesText);
   } // method addRequestorToCa
 
-  public void addPublisher(PublisherEntry dbEntry)
-      throws CaMgmtException {
+  public void addPublisher(PublisherEntry dbEntry) throws CaMgmtException {
     notNull(dbEntry, "dbEntry");
     final String sql = "INSERT INTO PUBLISHER (ID,NAME,TYPE,CONF) VALUES (?,?,?,?)";
 
     dbEntry.getIdent().setId((int) getNextId(Table.PUBLISHER));
     String name = dbEntry.getIdent().getName();
 
-    int num = executeUpdatePreparedStament(sql, col2Int(dbEntry.getIdent().getId()), col2Str(name),
+    int num = execUpdatePrepStmt0(sql, col2Int(dbEntry.getIdent().getId()), col2Str(name),
                 col2Str(dbEntry.getType()), col2Str(dbEntry.getConf()));
 
     if (num == 0) {
@@ -653,10 +615,8 @@ public class CaManagerQueryExecutor extends QueryExecutor {
   } // method addPublisher
 
   public void changeCa(ChangeCaEntry changeCaEntry, CaEntry currentCaEntry,
-      SecurityFactory securityFactory)
-          throws CaMgmtException {
-    notNull(changeCaEntry, "changeCaEntry");
-    notNull(securityFactory, "securityFactory");
+      SecurityFactory securityFactory) throws CaMgmtException {
+    notNulls(changeCaEntry, "changeCaEntry", securityFactory, "securityFactory");
 
     byte[] encodedCert = changeCaEntry.getEncodedCert();
     if (encodedCert != null) {
@@ -686,8 +646,7 @@ public class CaManagerQueryExecutor extends QueryExecutor {
       } else {
         final String sql = "SELECT CERT FROM CA WHERE ID=?";
 
-        ResultRow rs = executeQuery1PreparedStament(sql, null,
-                        col2Int(changeCaEntry.getIdent().getId()));
+        ResultRow rs = execQuery1PrepStmt0(sql, null, col2Int(changeCaEntry.getIdent().getId()));
         if (rs == null) {
           throw new CaMgmtException("unknown CA '" + changeCaEntry.getIdent());
         }
@@ -699,8 +658,7 @@ public class CaManagerQueryExecutor extends QueryExecutor {
         // validate the signer configuration
         final String sql = "SELECT SIGNER_TYPE,SIGNER_CONF FROM CA WHERE ID=?";
 
-        ResultRow rs = executeQuery1PreparedStament(sql, null,
-            col2Int(changeCaEntry.getIdent().getId()));
+        ResultRow rs = execQuery1PrepStmt0(sql, null, col2Int(changeCaEntry.getIdent().getId()));
 
         if (rs == null) {
           throw new CaMgmtException("unknown CA '" + changeCaEntry.getIdent());
@@ -844,22 +802,19 @@ public class CaManagerQueryExecutor extends QueryExecutor {
         colStr("REVOKE_SUSPENDED_CONTROL", changeCaEntry.getRevokeSuspendedControl()));
   } // method changeCa
 
-  public void commitNextCrlNoIfLess(NameId ca, long nextCrlNo)
-      throws CaMgmtException {
+  public void commitNextCrlNoIfLess(NameId ca, long nextCrlNo) throws CaMgmtException {
     SqlColumn3[] resultColumns = {col3Long("NEXT_CRLNO")};
-    ResultRow rs = executeQuery1PreparedStament(sqlNextSelectCrlNo,
-                    resultColumns, col2Int(ca.getId()));
+    ResultRow rs = execQuery1PrepStmt0(sqlNextSelectCrlNo, resultColumns, col2Int(ca.getId()));
     long nextCrlNoInDb = rs.getLong("NEXT_CRLNO");
 
     if (nextCrlNoInDb < nextCrlNo) {
-      executeUpdatePreparedStament("UPDATE CA SET NEXT_CRLNO=? WHERE ID=?",
+      execUpdatePrepStmt0("UPDATE CA SET NEXT_CRLNO=? WHERE ID=?",
           col2Long(nextCrlNo), col2Int(ca.getId()));
     }
   } // method commitNextCrlNoIfLess
 
   public IdentifiedCertprofile changeCertprofile(NameId nameId, String type, String conf,
-      CaManagerImpl caManager)
-          throws CaMgmtException {
+      CaManagerImpl caManager) throws CaMgmtException {
     CertprofileEntry currentDbEntry = createCertprofile(nameId.getName());
     CertprofileEntry newDbEntry = new CertprofileEntry(currentDbEntry.getIdent(),
         str(type, currentDbEntry.getType()), str(conf, currentDbEntry.getConf()));
@@ -883,8 +838,7 @@ public class CaManagerQueryExecutor extends QueryExecutor {
   } // method changeCertprofile
 
   public RequestorEntryWrapper changeRequestor(NameId nameId, String type, String conf,
-      PasswordResolver passwordResolver)
-          throws CaMgmtException {
+      PasswordResolver passwordResolver) throws CaMgmtException {
     notNull(nameId, "nameId");
     RequestorEntryWrapper requestor = new RequestorEntryWrapper();
 
@@ -911,8 +865,7 @@ public class CaManagerQueryExecutor extends QueryExecutor {
   } // method changeRequestor
 
   public SignerEntryWrapper changeSigner(String name, String type, String conf, String base64Cert,
-      CaManagerImpl caManager, SecurityFactory securityFactory)
-          throws CaMgmtException {
+      CaManagerImpl caManager, SecurityFactory securityFactory) throws CaMgmtException {
     notBlank(name, "name");
     notNull(caManager, "caManager");
 
@@ -933,8 +886,7 @@ public class CaManagerQueryExecutor extends QueryExecutor {
   } // method changeSigner
 
   public IdentifiedCertPublisher changePublisher(String name, String type, String conf,
-      CaManagerImpl caManager)
-          throws CaMgmtException {
+      CaManagerImpl caManager) throws CaMgmtException {
     notBlank(name, "name");
     notNull(caManager, "caManager");
 
@@ -953,23 +905,21 @@ public class CaManagerQueryExecutor extends QueryExecutor {
     notBlank(caName, "caName");
     final String sql = "DELETE FROM CA WHERE NAME=?";
 
-    int num = executeUpdatePreparedStament(sql, col2Str(caName));
+    int num = execUpdatePrepStmt0(sql, col2Str(caName));
     if (num == 0) {
       throw new CaMgmtException("could not delelted CA " + caName);
     }
   } // method removeCa
 
-  public void removeCaAlias(String aliasName)
-      throws CaMgmtException {
+  public void removeCaAlias(String aliasName) throws CaMgmtException {
     notBlank(aliasName, "aliasName");
-    int num = executeUpdatePreparedStament("DELETE FROM CAALIAS WHERE NAME=?", col2Str(aliasName));
+    int num = execUpdatePrepStmt0("DELETE FROM CAALIAS WHERE NAME=?", col2Str(aliasName));
     if (num == 0) {
       throw new CaMgmtException("could not remove CA Alias " + aliasName);
     }
   } // method removeCaAlias
 
-  public void removeCertprofileFromCa(String profileName, String caName)
-      throws CaMgmtException {
+  public void removeCertprofileFromCa(String profileName, String caName) throws CaMgmtException {
     notBlank(profileName, "profileName");
     notBlank(caName, "caName");
 
@@ -977,8 +927,7 @@ public class CaManagerQueryExecutor extends QueryExecutor {
         "DELETE FROM CA_HAS_PROFILE WHERE CA_ID=? AND PROFILE_ID=?");
   } // method removeCertprofileFromCa
 
-  public void removeRequestorFromCa(String requestorName, String caName)
-      throws CaMgmtException {
+  public void removeRequestorFromCa(String requestorName, String caName) throws CaMgmtException {
     notBlank(requestorName, "requestorName");
     notBlank(caName, "caName");
 
@@ -986,8 +935,7 @@ public class CaManagerQueryExecutor extends QueryExecutor {
         "DELETE FROM CA_HAS_REQUESTOR WHERE CA_ID=? AND REQUESTOR_ID=?");
   } // method removeRequestorFromCa
 
-  public void removePublisherFromCa(String publisherName, String caName)
-      throws CaMgmtException {
+  public void removePublisherFromCa(String publisherName, String caName) throws CaMgmtException {
     notBlank(publisherName, "publisherName");
     notBlank(caName, "caName");
 
@@ -995,8 +943,7 @@ public class CaManagerQueryExecutor extends QueryExecutor {
         "DELETE FROM CA_HAS_PUBLISHER WHERE CA_ID=? AND PUBLISHER_ID=?");
   } // method removePublisherFromCa
 
-  public void removeUserFromCa(String username, String caName)
-      throws CaMgmtException {
+  public void removeUserFromCa(String username, String caName) throws CaMgmtException {
     notBlank(username, "username");
     notBlank(caName, "caName");
 
@@ -1005,8 +952,7 @@ public class CaManagerQueryExecutor extends QueryExecutor {
   } // method removeUserFromCa
 
   private void removeEntityFromCa(String desc, String name, String caName,
-      String sqlSelectId, String sqlRemove)
-          throws CaMgmtException {
+      String sqlSelectId, String sqlRemove) throws CaMgmtException {
     Integer id = getIdForName(sqlSelectId, name);
     if (id == null) {
       throw new CaMgmtException(String.format("unknown %s %s ", desc, name));
@@ -1014,28 +960,26 @@ public class CaManagerQueryExecutor extends QueryExecutor {
 
     int caId = getNonNullIdForName(sqlSelectCaId, caName);
 
-    int num = executeUpdatePreparedStament(sqlRemove, col2Int(caId), col2Int(id));
+    int num = execUpdatePrepStmt0(sqlRemove, col2Int(caId), col2Int(id));
     if (num == 0) {
       throw new CaMgmtException(String.format("could not remove %s from CA %s", name, caName));
     }
   } // method removeUserFromCa
 
-  public void revokeCa(String caName, CertRevocationInfo revocationInfo)
-      throws CaMgmtException {
+  public void revokeCa(String caName, CertRevocationInfo revocationInfo) throws CaMgmtException {
     notBlank(caName, "caName");
     notNull(revocationInfo, "revocationInfo");
-    int num = executeUpdatePreparedStament("UPDATE CA SET REV_INFO=? WHERE NAME=?",
+    int num = execUpdatePrepStmt0("UPDATE CA SET REV_INFO=? WHERE NAME=?",
                 col2Str(revocationInfo.getEncoded()), col2Str(caName));
     if (num == 0) {
       throw new CaMgmtException("could not revoke CA " + caName);
     }
   } // method revokeCa
 
-  public void addSigner(SignerEntry dbEntry)
-      throws CaMgmtException {
+  public void addSigner(SignerEntry dbEntry) throws CaMgmtException {
     notNull(dbEntry, "dbEntry");
 
-    int num = executeUpdatePreparedStament(
+    int num = execUpdatePrepStmt0(
             "INSERT INTO SIGNER (NAME,TYPE,CERT,CONF) VALUES (?,?,?,?)",
             col2Str(dbEntry.getName()),       col2Str(dbEntry.getType()),
             col2Str(dbEntry.getBase64Cert()), col2Str(dbEntry.getConf()));
@@ -1047,41 +991,36 @@ public class CaManagerQueryExecutor extends QueryExecutor {
     LOG.info("added signer: {}", dbEntry.toString(false, true));
   } // method addSigner
 
-  public void unlockCa()
-      throws CaMgmtException {
-    int num = executeUpdateStament("DELETE FROM SYSTEM_EVENT WHERE NAME='LOCK'");
+  public void unlockCa() throws CaMgmtException {
+    int num = execUpdateStmt0("DELETE FROM SYSTEM_EVENT WHERE NAME='LOCK'");
     if (num == 0) {
       throw new CaMgmtException("could not unlock CA");
     }
   } // method unlockCa
 
-  public void unrevokeCa(String caName)
-      throws CaMgmtException {
+  public void unrevokeCa(String caName) throws CaMgmtException {
     notBlank(caName, "caName");
     LOG.info("Unrevoking of CA '{}'", caName);
 
-    int num = executeUpdatePreparedStament("UPDATE CA SET REV_INFO=? WHERE NAME=?",
+    int num = execUpdatePrepStmt0("UPDATE CA SET REV_INFO=? WHERE NAME=?",
                 col2Str(null), col2Str(caName));
     if (num == 0) {
       throw new CaMgmtException("could not unrevoke CA " + caName);
     }
   } // method unrevokeCa
 
-  public void addUser(AddUserEntry userEntry)
-      throws CaMgmtException {
+  public void addUser(AddUserEntry userEntry) throws CaMgmtException {
     notNull(userEntry, "userEntry");
     String hashedPassword = PasswordHash.createHash(userEntry.getPassword());
     addUser(userEntry.getIdent().getName(), userEntry.isActive(), hashedPassword);
   } // method addUser
 
-  public void addUser(UserEntry userEntry)
-      throws CaMgmtException {
+  public void addUser(UserEntry userEntry) throws CaMgmtException {
     notNull(userEntry, "userEntry");
     addUser(userEntry.getIdent().getName(), userEntry.isActive(), userEntry.getHashedPassword());
   }
 
-  private void addUser(String name, boolean active, String hashedPassword)
-      throws CaMgmtException {
+  private void addUser(String name, boolean active, String hashedPassword) throws CaMgmtException {
     Integer existingId = getIdForName(sqlSelectUserId, name);
     if (existingId != null) {
       throw new CaMgmtException(concat("user named '", name, " ' already exists"));
@@ -1089,8 +1028,7 @@ public class CaManagerQueryExecutor extends QueryExecutor {
 
     long id = getNextId(Table.TUSER);
 
-    int num = executeUpdatePreparedStament(
-            "INSERT INTO TUSER (ID,NAME,ACTIVE,PASSWORD) VALUES (?,?,?,?)",
+    int num = execUpdatePrepStmt0("INSERT INTO TUSER (ID,NAME,ACTIVE,PASSWORD) VALUES (?,?,?,?)",
             col2Long(id), col2Str(name), col2Bool(active), col2Str(hashedPassword));
     if (num == 0) {
       throw new CaMgmtException("could not add user " + name);
@@ -1098,8 +1036,7 @@ public class CaManagerQueryExecutor extends QueryExecutor {
     LOG.info("added user '{}'", name);
   } // method addUser
 
-  public void changeUser(ChangeUserEntry userEntry)
-      throws CaMgmtException {
+  public void changeUser(ChangeUserEntry userEntry) throws CaMgmtException {
     String username = userEntry.getIdent().getName();
 
     Integer existingId = getIdForName(sqlSelectUserId, username);
@@ -1118,10 +1055,8 @@ public class CaManagerQueryExecutor extends QueryExecutor {
         colStr("PASSWORD", hashedPassword, true, false));
   } // method changeUser
 
-  public void addUserToCa(CaHasUserEntry user, NameId ca)
-      throws CaMgmtException {
-    notNull(user, "user");
-    notNull(ca, "ca");
+  public void addUserToCa(CaHasUserEntry user, NameId ca) throws CaMgmtException {
+    notNulls(user, "user", ca, "ca");
 
     final NameId userIdent = user.getUserIdent();
     Integer existingId = getIdForName(sqlSelectUserId, userIdent.getName());
@@ -1133,7 +1068,7 @@ public class CaManagerQueryExecutor extends QueryExecutor {
     long id = getNextId(Table.CA_HAS_USER);
     String profilesText = StringUtil.collectionAsString(user.getProfiles(), ",");
 
-    int num = executeUpdatePreparedStament(
+    int num = execUpdatePrepStmt0(
             "INSERT INTO CA_HAS_USER (ID,CA_ID,USER_ID, PERMISSION,PROFILES) VALUES (?,?,?,?,?)",
             col2Long(id), col2Int(ca.getId()), col2Int(userIdent.getId()),
             col2Int(user.getPermission()), col2Str(profilesText));
@@ -1156,7 +1091,7 @@ public class CaManagerQueryExecutor extends QueryExecutor {
     final String sql = "SELECT CA_ID,PERMISSION,PROFILES FROM CA_HAS_USER WHERE USER_ID=?";
 
     SqlColumn3[] resultColumns = {col3Int("PERMISSION"), col3Int("CA_ID")};
-    List<ResultRow> rows = executeQueryPreparedStament(sql, resultColumns, col2Int(existingId));
+    List<ResultRow> rows = execQueryPrepStmt0(sql, resultColumns, col2Int(existingId));
 
     Map<String, CaHasUserEntry> ret = new HashMap<>();
     for (ResultRow rs : rows) {
@@ -1186,8 +1121,8 @@ public class CaManagerQueryExecutor extends QueryExecutor {
         + " ON CA_ID=? AND TUSER.ID=CA_HAS_USER.USER_ID";
 
     SqlColumn3[] resultColumns = {col3Int("PERMISSION")};
-    List<ResultRow> rows =
-        executeQueryPreparedStament(sql, resultColumns, col2Int(caIdent.getId().intValue()));
+    List<ResultRow> rows = execQueryPrepStmt0(sql, resultColumns,
+                            col2Int(caIdent.getId().intValue()));
 
     List<CaHasUserEntry> ret = new LinkedList<>();
     for (ResultRow rs : rows) {
@@ -1202,19 +1137,16 @@ public class CaManagerQueryExecutor extends QueryExecutor {
     return ret;
   } // method getCaHasUsersForCa
 
-  public UserEntry getUser(String username)
-      throws CaMgmtException {
+  public UserEntry getUser(String username) throws CaMgmtException {
     return getUser(username, false);
   }
 
-  public UserEntry getUser(String username, boolean nullable)
-      throws CaMgmtException {
+  public UserEntry getUser(String username, boolean nullable) throws CaMgmtException {
     notBlank(username, "username");
     NameId ident = new NameId(null, username);
 
     SqlColumn3[] resultColumns = {col3Int("ID"), col3Bool("ACTIVE")};
-    ResultRow rs =
-        executeQuery1PreparedStament(sqlSelectUser, resultColumns, col2Str(ident.getName()));
+    ResultRow rs = execQuery1PrepStmt0(sqlSelectUser, resultColumns, col2Str(ident.getName()));
     if (rs == null) {
       if (nullable) {
         return null;
@@ -1226,14 +1158,12 @@ public class CaManagerQueryExecutor extends QueryExecutor {
     ident.setId(rs.getInt("ID"));
     return new UserEntry(ident, rs.getBoolean("ACTIVE"), rs.getString("PASSWORD"));
   } // method getUser
-  
-  private static X509Cert generateCert(String b64Cert)
-      throws CaMgmtException {
+
+  private static X509Cert generateCert(String b64Cert) throws CaMgmtException {
     return (b64Cert == null) ? null : parseCert(Base64.decode(b64Cert));
   } // method generateCert
-  
-  private static List<X509Cert> generateCertchain(String encodedCertchain)
-      throws CaMgmtException {
+
+  private static List<X509Cert> generateCertchain(String encodedCertchain) throws CaMgmtException {
     if (StringUtil.isBlank(encodedCertchain)) {
       return null;
     }

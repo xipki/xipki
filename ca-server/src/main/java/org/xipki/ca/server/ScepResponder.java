@@ -62,6 +62,7 @@ import org.xipki.ca.api.mgmt.PermissionConstants;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.mgmt.ScepControl;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
+import org.xipki.ca.server.db.CertStore.KnowCertResult;
 import org.xipki.scep.message.CaCaps;
 import org.xipki.scep.message.DecodedPkiMessage;
 import org.xipki.scep.message.EnvelopedDataDecryptor;
@@ -499,7 +500,7 @@ public class ScepResponder {
             if (userIdent == null) {
               // up to draft-nourse-scep-23 the client sends all messages to enroll
               // certificate via MessageType PKCSReq
-              CertStore.KnowCertResult knowCertRes = ca.knowsCert(reqSignatureCert);
+              KnowCertResult knowCertRes = ca.knowsCert(reqSignatureCert);
               if (!knowCertRes.isKnown()) {
                 LOG.warn("tid={}: signature certificate is not trusted by the CA", tid);
                 throw FailInfoException.BAD_REQUEST;
