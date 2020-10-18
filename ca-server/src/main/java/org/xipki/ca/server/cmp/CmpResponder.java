@@ -17,35 +17,32 @@
 
 package org.xipki.ca.server.cmp;
 
-import static org.xipki.util.Args.notNull;
+import static org.bouncycastle.asn1.cmp.PKIFailureInfo.badCertId;
+import static org.bouncycastle.asn1.cmp.PKIFailureInfo.badCertTemplate;
+import static org.bouncycastle.asn1.cmp.PKIFailureInfo.badPOP;
+import static org.bouncycastle.asn1.cmp.PKIFailureInfo.badRequest;
+import static org.bouncycastle.asn1.cmp.PKIFailureInfo.certRevoked;
+import static org.bouncycastle.asn1.cmp.PKIFailureInfo.notAuthorized;
+import static org.bouncycastle.asn1.cmp.PKIFailureInfo.systemFailure;
+import static org.bouncycastle.asn1.cmp.PKIStatus.GRANTED;
+import static org.bouncycastle.asn1.cmp.PKIStatus.GRANTED_WITH_MODS;
+import static org.bouncycastle.asn1.cmp.PKIStatus.WAITING;
+import static org.bouncycastle.asn1.cmp.PKIStatus.granted;
+import static org.bouncycastle.asn1.cmp.PKIStatus.rejection;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.interfaces.ECPublicKey;
-import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.GCMParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -55,18 +52,15 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.cmp.CMPObjectIdentifiers;
 import org.bouncycastle.asn1.cmp.CertConfirmContent;
-import org.bouncycastle.asn1.cmp.CertOrEncCert;
 import org.bouncycastle.asn1.cmp.CertRepMessage;
 import org.bouncycastle.asn1.cmp.CertResponse;
 import org.bouncycastle.asn1.cmp.CertStatus;
-import org.bouncycastle.asn1.cmp.CertifiedKeyPair;
 import org.bouncycastle.asn1.cmp.ErrorMsgContent;
 import org.bouncycastle.asn1.cmp.GenMsgContent;
 import org.bouncycastle.asn1.cmp.GenRepContent;
@@ -82,30 +76,16 @@ import org.bouncycastle.asn1.cmp.PKIStatusInfo;
 import org.bouncycastle.asn1.cmp.RevDetails;
 import org.bouncycastle.asn1.cmp.RevRepContentBuilder;
 import org.bouncycastle.asn1.cmp.RevReqContent;
-import org.bouncycastle.asn1.cms.GCMParameters;
-import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
 import org.bouncycastle.asn1.crmf.AttributeTypeAndValue;
 import org.bouncycastle.asn1.crmf.CertId;
 import org.bouncycastle.asn1.crmf.CertReqMessages;
 import org.bouncycastle.asn1.crmf.CertReqMsg;
 import org.bouncycastle.asn1.crmf.CertTemplate;
 import org.bouncycastle.asn1.crmf.Controls;
-import org.bouncycastle.asn1.crmf.DhSigStatic;
-import org.bouncycastle.asn1.crmf.EncryptedValue;
 import org.bouncycastle.asn1.crmf.OptionalValidity;
-import org.bouncycastle.asn1.crmf.POPOSigningKey;
-import org.bouncycastle.asn1.crmf.ProofOfPossession;
-import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
-import org.bouncycastle.asn1.pkcs.EncryptionScheme;
-import org.bouncycastle.asn1.pkcs.KeyDerivationFunc;
-import org.bouncycastle.asn1.pkcs.PBES2Parameters;
-import org.bouncycastle.asn1.pkcs.PBKDF2Params;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.Extension;
@@ -114,11 +94,7 @@ import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.Time;
 import org.bouncycastle.cert.X509CRLHolder;
-import org.bouncycastle.cert.cmp.GeneralPKIMessage;
-import org.bouncycastle.cert.crmf.CRMFException;
 import org.bouncycastle.cert.crmf.CertificateRequestMessage;
-import org.bouncycastle.jcajce.spec.PBKDF2KeySpec;
-import org.bouncycastle.operator.ContentVerifierProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
@@ -131,43 +107,25 @@ import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.RequestType;
 import org.xipki.ca.api.mgmt.CaMgmtException;
-import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.api.mgmt.CmpControl;
 import org.xipki.ca.api.mgmt.PermissionConstants;
-import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.mgmt.RequestorInfo.CmpRequestorInfo;
-import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
 import org.xipki.ca.server.CaAuditConstants;
-import org.xipki.ca.server.CaInfo;
 import org.xipki.ca.server.CaManagerImpl;
 import org.xipki.ca.server.CaUtil;
 import org.xipki.ca.server.CertTemplateData;
-import org.xipki.ca.server.DhpocControl;
 import org.xipki.ca.server.X509Ca;
-import org.xipki.security.AlgorithmValidator;
-import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.CrlReason;
-import org.xipki.security.DHSigStaticKeyCertPair;
-import org.xipki.security.EdECConstants;
 import org.xipki.security.ObjectIdentifiers;
-import org.xipki.security.ObjectIdentifiers.Xipki;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityConstants;
 import org.xipki.security.cmp.CmpUtf8Pairs;
 import org.xipki.security.cmp.CmpUtil;
-import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.DateUtil;
-import org.xipki.util.HealthCheckResult;
 import org.xipki.util.Hex;
 import org.xipki.util.LogUtil;
-import org.xipki.util.StringUtil;
-import org.xipki.util.concurrent.ConcurrentBag;
-import org.xipki.util.concurrent.ConcurrentBagEntry;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 
 /**
  * CMP responder.
@@ -178,13 +136,13 @@ import com.alibaba.fastjson.JSONObject;
 
 public class CmpResponder extends BaseCmpResponder {
 
+  private static final Logger LOG = LoggerFactory.getLogger(BaseCmpResponder.class);
+
   private class PendingPoolCleaner implements Runnable {
 
     @Override
     public void run() {
-      Set<CertificateInfo> remainingCerts =
-          pendingCertPool.removeConfirmTimeoutedCertificates();
-
+      Set<CertificateInfo> remainingCerts = pendingCertPool.removeConfirmTimeoutedCertificates();
       if (CollectionUtil.isEmpty(remainingCerts)) {
         return;
       }
@@ -192,9 +150,8 @@ public class CmpResponder extends BaseCmpResponder {
       Date invalidityDate = new Date();
       X509Ca ca = getCa();
       for (CertificateInfo remainingCert : remainingCerts) {
-        BigInteger serialNumber = null;
+        BigInteger serialNumber = remainingCert.getCert().getCert().getSerialNumber();
         try {
-          serialNumber = remainingCert.getCert().getCert().getSerialNumber();
           ca.revokeCert(serialNumber, CrlReason.CESSATION_OF_OPERATION,
               invalidityDate, CaAuditConstants.MSGID_ca_routine);
         } catch (Throwable th) {
@@ -206,312 +163,27 @@ public class CmpResponder extends BaseCmpResponder {
 
   } // class PendingPoolCleaner
 
-  private static final Set<String> KNOWN_GENMSG_IDS = new HashSet<>();
-
-  private static final Logger LOG = LoggerFactory.getLogger(CmpResponder.class);
-
-  private static final AlgorithmIdentifier prf_hmacWithSHA256 =
-      new AlgorithmIdentifier(PKCSObjectIdentifiers.id_hmacWithSHA256, DERNull.INSTANCE);
-
-  private static final ConcurrentBag<ConcurrentBagEntry<Cipher>> aesGcm_ciphers;
-
-  private static final ConcurrentBag<ConcurrentBagEntry<SecretKeyFactory>> pbkdf2_kdfs;
-
-  private static boolean aesGcm_ciphers_initialized;
-
-  private static boolean pbkdf2_kdfs_initialized;
-
-  private static final Set<String> kupCertExtnIds;
-
   private final PendingCertificatePool pendingCertPool;
 
-  private final KeyGenerator aesKeyGen;
+  public CmpResponder(CaManagerImpl caManager, String caName) throws NoSuchAlgorithmException {
+    super(caManager, caName);
 
-  private final String caName;
-
-  private final CaManagerImpl caManager;
-
-  static {
-    KNOWN_GENMSG_IDS.add(CMPObjectIdentifiers.it_currentCRL.getId());
-    KNOWN_GENMSG_IDS.add(ObjectIdentifiers.Xipki.id_xipki_cmp_cmpGenmsg.getId());
-
-    String oid = NISTObjectIdentifiers.id_aes128_GCM.getId();
-    aesGcm_ciphers = new ConcurrentBag<>();
-    for (int i = 0; i < 64; i++) {
-      Cipher cipher;
-      try {
-        cipher = Cipher.getInstance(oid);
-      } catch (NoSuchAlgorithmException | NoSuchPaddingException ex) {
-        LogUtil.error(LOG, ex, "could not get Cipher of " + oid);
-        break;
-      }
-      aesGcm_ciphers.add(new ConcurrentBagEntry<Cipher>(cipher));
-    }
-    int size = aesGcm_ciphers.size();
-    aesGcm_ciphers_initialized = size > 0;
-    if (size > 0) {
-      LOG.info("initialized {} AES GCM Cipher instances", size);
-    } else {
-      LOG.error("could not initialize any AES GCM Cipher instance");
-    }
-
-    oid = PKCSObjectIdentifiers.id_PBKDF2.getId();
-    pbkdf2_kdfs = new ConcurrentBag<>();
-    for (int i = 0; i < 64; i++) {
-      SecretKeyFactory keyFact;
-      try {
-        keyFact = SecretKeyFactory.getInstance(oid);
-      } catch (NoSuchAlgorithmException ex) {
-        LogUtil.error(LOG, ex, "could not get SecretKeyFactory of " + oid);
-        break;
-      }
-      pbkdf2_kdfs.add(new ConcurrentBagEntry<SecretKeyFactory>(keyFact));
-    }
-
-    size = pbkdf2_kdfs.size();
-    pbkdf2_kdfs_initialized = size > 0;
-    if (size > 0) {
-      LOG.info("initialized {} PBKDF2 SecretKeyFactory instances", size);
-    } else {
-      LOG.error("could not initialize any PBKDF2 SecretKeyFactory instance");
-    }
-
-    kupCertExtnIds = new HashSet<>();
-    kupCertExtnIds.add(Extension.biometricInfo.getId());
-    kupCertExtnIds.add(Extension.extendedKeyUsage.getId());
-    kupCertExtnIds.add(Extension.keyUsage.getId());
-    kupCertExtnIds.add(Extension.qCStatements.getId());
-    kupCertExtnIds.add(Extension.subjectAlternativeName.getId());
-    kupCertExtnIds.add(Extension.subjectInfoAccess.getId());
-  }
-
-  public CmpResponder(CaManagerImpl caManager, String caName)
-      throws NoSuchAlgorithmException {
-    super(caManager.getSecurityFactory());
-
-    this.aesKeyGen = KeyGenerator.getInstance("AES");
-    this.caManager = caManager;
     this.pendingCertPool = new PendingCertificatePool();
-    this.caName = caName;
-
-    PendingPoolCleaner pendingPoolCleaner = new PendingPoolCleaner();
-    caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(pendingPoolCleaner, 10, 10,
-        TimeUnit.MINUTES);
+    caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(
+        new PendingPoolCleaner(), 10, 10, TimeUnit.MINUTES);
   }
 
-  public X509Ca getCa() {
-    try {
-      return caManager.getX509Ca(caName);
-    } catch (CaMgmtException ex) {
-      throw new IllegalStateException(ex.getMessage(), ex);
-    }
-  }
-
-  @Override
-  public boolean isOnService() {
-    if (!super.isOnService()) {
-      return false;
-    }
-
-    CaInfo caInfo = getCa().getCaInfo();
-
-    return caInfo.getStatus() == CaStatus.ACTIVE
-        && caInfo.supportsCmp();
-  }
-
-  public HealthCheckResult healthCheck() {
-    HealthCheckResult result = getCa().healthCheck();
-
-    boolean healthy = result.isHealthy();
-
-    boolean responderHealthy =
-        caManager.getSignerWrapper(getResponderName()).getSigner().isHealthy();
-    healthy &= responderHealthy;
-
-    HealthCheckResult responderHealth = new HealthCheckResult();
-    responderHealth.setName("Responder");
-    responderHealth.setHealthy(responderHealthy);
-    result.addChildCheck(responderHealth);
-
-    result.setHealthy(healthy);
-    return result;
-  }
-
-  public String getCaName() {
-    return caName;
-  }
-
-  public String getResponderName() {
-    return getCa().getCaInfo().getCmpResponderName();
-  }
-
-  @Override
-  protected PKIMessage processPkiMessage0(PKIMessage request, RequestorInfo requestor,
-      ASN1OctetString tid, GeneralPKIMessage message, String msgId,
-      Map<String, String> parameters, AuditEvent event) {
-    if (!(requestor instanceof CmpRequestorInfo)) {
-      throw new IllegalArgumentException(
-          "unknown requestor type " + requestor.getClass().getName());
-    }
-
-    CmpRequestorInfo cmpRequestor = (CmpRequestorInfo) requestor;
-    event.addEventData(CaAuditConstants.NAME_requestor, cmpRequestor.getIdent().getName());
-
-    PKIHeader reqHeader = message.getHeader();
-    PKIHeaderBuilder respHeader = new PKIHeaderBuilder(
-        reqHeader.getPvno().getValue().intValue(), getSender(), reqHeader.getSender());
-    respHeader.setTransactionID(tid);
-    ASN1OctetString senderNonce = reqHeader.getSenderNonce();
-    if (senderNonce != null) {
-      respHeader.setRecipNonce(senderNonce);
-    }
-
-    PKIBody respBody;
-    PKIBody reqBody = message.getBody();
-    final int type = reqBody.getType();
-
-    CmpControl cmpControl = getCmpControl();
-
-    try {
-      switch (type) {
-        case PKIBody.TYPE_INIT_REQ:
-        case PKIBody.TYPE_CERT_REQ:
-        case PKIBody.TYPE_KEY_UPDATE_REQ:
-        case PKIBody.TYPE_P10_CERT_REQ:
-        case PKIBody.TYPE_CROSS_CERT_REQ:
-          String eventType = null;
-          if (PKIBody.TYPE_CERT_REQ == type) {
-            eventType = CaAuditConstants.Cmp.TYPE_cr;
-          } else if (PKIBody.TYPE_INIT_REQ == type) {
-            eventType = CaAuditConstants.Cmp.TYPE_ir;
-          } else if (PKIBody.TYPE_KEY_UPDATE_REQ == type) {
-            eventType = CaAuditConstants.Cmp.TYPE_kur;
-          } else if (PKIBody.TYPE_P10_CERT_REQ == type) {
-            eventType = CaAuditConstants.Cmp.TYPE_p10cr;
-          } else if (PKIBody.TYPE_CROSS_CERT_REQ == type) {
-            eventType = CaAuditConstants.Cmp.TYPE_ccr;
-          }
-
-          if (eventType != null) {
-            event.addEventType(eventType);
-          }
-
-          String dfltCertprofileName = null;
-          Boolean dfltCaGenerateKeypair = null;
-          if (parameters != null) {
-            dfltCertprofileName = parameters.get("certprofile");
-
-            String str = parameters.get("ca-generate-keypair");
-            if (str != null) {
-              dfltCaGenerateKeypair = "true".equalsIgnoreCase(str);
-            }
-          }
-          respBody = cmpEnrollCert(dfltCertprofileName, dfltCaGenerateKeypair, request, respHeader,
-              cmpControl, reqHeader, reqBody, cmpRequestor, tid, msgId, event);
-          break;
-        case PKIBody.TYPE_CERT_CONFIRM:
-          event.addEventType(CaAuditConstants.Cmp.TYPE_certConf);
-          CertConfirmContent certConf = (CertConfirmContent) reqBody.getContent();
-          respBody = confirmCertificates(tid, certConf, msgId);
-          break;
-        case PKIBody.TYPE_REVOCATION_REQ:
-          respBody = cmpUnRevokeRemoveCertificates(request, respHeader, cmpControl, reqHeader,
-              reqBody, cmpRequestor, msgId, event);
-          break;
-        case PKIBody.TYPE_CONFIRM:
-          event.addEventType(CaAuditConstants.Cmp.TYPE_pkiconf);
-          respBody = new PKIBody(PKIBody.TYPE_CONFIRM, DERNull.INSTANCE);
-          break;
-        case PKIBody.TYPE_GEN_MSG:
-          respBody = cmpGeneralMsg(respHeader, cmpControl, reqHeader, reqBody, cmpRequestor,
-              tid, msgId, event);
-          break;
-        case PKIBody.TYPE_ERROR:
-          event.addEventType(CaAuditConstants.Cmp.TYPE_error);
-          revokePendingCertificates(tid, msgId);
-          respBody = new PKIBody(PKIBody.TYPE_CONFIRM, DERNull.INSTANCE);
-          break;
-        default:
-          event.addEventType("PKIBody." + type);
-          respBody = buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
-              "unsupported type " + type);
-          break;
-      } // end switch (type)
-    } catch (InsuffientPermissionException ex) {
-      ErrorMsgContent emc = new ErrorMsgContent(
-          new PKIStatusInfo(PKIStatus.rejection, new PKIFreeText(ex.getMessage()),
-              new PKIFailureInfo(PKIFailureInfo.notAuthorized)));
-
-      respBody = new PKIBody(PKIBody.TYPE_ERROR, emc);
-    }
-
-    if (respBody.getType() == PKIBody.TYPE_ERROR) {
-      ErrorMsgContent errorMsgContent = (ErrorMsgContent) respBody.getContent();
-
-      org.xipki.security.cmp.PkiStatusInfo pkiStatus =
-          new org.xipki.security.cmp.PkiStatusInfo(errorMsgContent.getPKIStatusInfo());
-
-      event.setStatus(AuditStatus.FAILED);
-      String statusString = pkiStatus.statusMessage();
-      if (statusString != null) {
-        event.addEventData(CaAuditConstants.NAME_message, statusString);
-      }
-    } else if (event.getStatus() == null) {
-      event.setStatus(AuditStatus.SUCCESSFUL);
-    }
-
-    return new PKIMessage(respHeader.build(), respBody);
-  } // method processPKIMessage0
-
-  private PKIBody processIr(String dfltCertprofileName, Boolean dfltCaGenKeypair,
-      PKIMessage request, CmpRequestorInfo requestor, ASN1OctetString tid, PKIHeader reqHeader,
-      CertReqMessages cr, CmpControl cmpControl, String msgId, AuditEvent event)
-          throws InsuffientPermissionException {
-    CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName, dfltCaGenKeypair,
-        request, requestor, tid, reqHeader, cr, true, cmpControl, msgId, event);
-    return new PKIBody(PKIBody.TYPE_INIT_REP, repMessage);
-  }
-
-  private PKIBody processCr(String dfltCertprofileName, Boolean dfltCaGenKeypair,
-      PKIMessage request, CmpRequestorInfo requestor, ASN1OctetString tid, PKIHeader reqHeader,
-      CertReqMessages cr, CmpControl cmpControl, String msgId, AuditEvent event)
-          throws InsuffientPermissionException {
-    CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName, dfltCaGenKeypair,
-        request, requestor, tid, reqHeader, cr, true, cmpControl, msgId, event);
-    return new PKIBody(PKIBody.TYPE_CERT_REP, repMessage);
-  }
-
-  private PKIBody processKur(String dfltCertprofileName, Boolean dfltCaGenKeypair,
-      PKIMessage request, CmpRequestorInfo requestor, ASN1OctetString tid, PKIHeader reqHeader,
-      CertReqMessages kur, CmpControl cmpControl, String msgId, AuditEvent event)
-          throws InsuffientPermissionException {
-    CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName, dfltCaGenKeypair,
-        request, requestor, tid, reqHeader, kur, true, cmpControl, msgId, event);
-    return new PKIBody(PKIBody.TYPE_KEY_UPDATE_REP, repMessage);
-  }
-
-  private PKIBody processCcp(String dfltCertprofileName, PKIMessage request,
-      CmpRequestorInfo requestor, ASN1OctetString tid, PKIHeader reqHeader, CertReqMessages cr,
-      CmpControl cmpControl, String msgId, AuditEvent event)
-          throws InsuffientPermissionException {
-    CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName, Boolean.FALSE, request,
-        requestor, tid, reqHeader, cr, false, cmpControl, msgId, event);
-    return new PKIBody(PKIBody.TYPE_CROSS_CERT_REP, repMessage);
-  }
-
-  private CertRepMessage processCertReqMessages(
-      String dfltCertprofileName, Boolean dfltCaGenKeypair,
-      PKIMessage request, CmpRequestorInfo requestor, ASN1OctetString tid, PKIHeader reqHeader,
-      CertReqMessages cr, boolean allowKeyGen, CmpControl cmpControl,
-      String msgId, AuditEvent event)
-          throws InsuffientPermissionException {
+  private CertRepMessage processCertReqMessages(String dfltCertprofileName,
+      Boolean dfltCaGenKeypair, PKIMessage request, CmpRequestorInfo requestor, ASN1OctetString tid,
+      PKIHeader reqHeader, CertReqMessages cr, boolean allowKeyGen, CmpControl cmpControl,
+      String msgId, AuditEvent event) throws InsuffientPermissionException {
     CmpRequestorInfo tmpRequestor = (CmpRequestorInfo) requestor;
 
     CertReqMsg[] certReqMsgs = cr.toCertReqMsgArray();
     final int n = certReqMsgs.length;
 
     List<CertTemplateData> certTemplateDatas = new ArrayList<>(n);
-    List<CertResponse> certResponses = new ArrayList<>(1);
+    List<CertResponse> resps = new ArrayList<>(1);
 
     boolean kup = (request.getBody().getType() == PKIBody.TYPE_KEY_UPDATE_REQ);
 
@@ -533,8 +205,8 @@ public class CmpResponder extends BaseCmpResponder {
       X500Name subject = certTemp.getSubject();
       Extensions extensions = certTemp.getExtensions();
 
-      String certprofileName = (keyvalues == null) ? null
-          : keyvalues.value(CmpUtf8Pairs.KEY_CERTPROFILE);
+      String certprofileName = (keyvalues == null)
+          ? null : keyvalues.value(CmpUtf8Pairs.KEY_CERTPROFILE);
       if (certprofileName == null) {
         certprofileName = dfltCertprofileName;
       }
@@ -562,9 +234,7 @@ public class CmpResponder extends BaseCmpResponder {
           try {
             seq = ASN1Sequence.getInstance(controls.getEncoded());
           } catch (IOException ex) {
-            certResponses.add(
-                buildErrorCertResponse(certReqId, PKIFailureInfo.systemFailure,
-                    "could not parse the controls"));
+            addErrCertResp(resps, certReqId, systemFailure, "could not parse the controls");
             continue;
           }
 
@@ -580,18 +250,14 @@ public class CmpResponder extends BaseCmpResponder {
         }
 
         if (oldCertIdAtv == null) {
-          certResponses.add(
-              buildErrorCertResponse(certReqId, PKIFailureInfo.badCertTemplate,
-                  "no getCtrl oldCertID is specified"));
+          addErrCertResp(resps, certReqId, badCertTemplate, "no getCtrl oldCertID is specified");
           continue;
         }
 
         CertId oldCertId = CertId.getInstance(oldCertIdAtv.getValue());
 
         if (GeneralName.directoryName != oldCertId.getIssuer().getTagNo()) {
-          certResponses.add(
-              buildErrorCertResponse(certReqId, PKIFailureInfo.badCertId,
-                  "invalid regCtrl oldCertID"));
+          addErrCertResp(resps, certReqId, badCertId, "invalid regCtrl oldCertID");
           continue;
         }
 
@@ -601,26 +267,20 @@ public class CmpResponder extends BaseCmpResponder {
         try {
           oldCert = caManager.getCert(issuer, serialNumber);
         } catch (CaMgmtException ex) {
-          certResponses.add(
-              buildErrorCertResponse(certReqId, PKIFailureInfo.systemFailure,
-                  "error while finding certificate with the issuer " + issuer
-                  + "and serial number " + serialNumber));
+          addErrCertResp(resps, certReqId, systemFailure, "error while finding certificate with "
+              + "the issuer " + issuer + "and serial number " + serialNumber);
           continue;
         }
 
         if (oldCert == null) {
-          certResponses.add(
-              buildErrorCertResponse(certReqId, PKIFailureInfo.badCertId,
-                  "found no certificate with the issuer " + issuer
-                  + "and serial number " + serialNumber));
+          addErrCertResp(resps, certReqId, badCertId, "found no certificate with the issuer "
+              + issuer + "and serial number " + serialNumber);
           continue;
         }
 
         if (oldCert.isRevoked()) {
-          certResponses.add(
-              buildErrorCertResponse(certReqId, PKIFailureInfo.certRevoked,
-                  "could not update a revoked certificate with the issuer " + issuer
-                  + "and serial number " + serialNumber));
+          addErrCertResp(resps, certReqId, certRevoked, "could not update a revoked certificate "
+              + "with the issuer " + issuer + "and serial number " + serialNumber);
           continue;
         }
 
@@ -629,8 +289,7 @@ public class CmpResponder extends BaseCmpResponder {
         }
         if (certprofileName == null) {
           LOG.warn("no certprofile is specified");
-          certResponses.add(buildErrorCertResponse(
-                              certReqId, PKIFailureInfo.badCertTemplate, "no certificate profile"));
+          addErrCertResp(resps, certReqId, badCertTemplate, "no certificate profile");
           continue;
         }
 
@@ -657,7 +316,7 @@ public class CmpResponder extends BaseCmpResponder {
         ASN1ObjectIdentifier[] oldOids = oldExtensions.getExtensionOIDs();
         for (ASN1ObjectIdentifier oid : oldOids) {
           String id = oid.getId();
-          if (! (extns.containsKey(id) || kupCertExtnIds.contains(id))) {
+          if (!(extns.containsKey(id) || kupCertExtnIds.contains(id))) {
             extns.put(id, oldExtensions.getExtension(oid));
           }
         }
@@ -666,28 +325,26 @@ public class CmpResponder extends BaseCmpResponder {
       } else {
         if (certprofileName == null) {
           LOG.warn("no certprofile is specified");
-          certResponses.add(buildErrorCertResponse(
-                              certReqId, PKIFailureInfo.badCertTemplate, "no certificate profile"));
+          addErrCertResp(resps, certReqId, badCertTemplate, "no certificate profile");
           continue;
         }
       }
 
       if (!tmpRequestor.isCertprofilePermitted(certprofileName)) {
-        String msg = "certprofile " + certprofileName + " is not allowed";
-        certResponses.add(buildErrorCertResponse(certReqId, PKIFailureInfo.notAuthorized, msg));
+        addErrCertResp(resps, certReqId, notAuthorized,
+            "certprofile " + certprofileName + " is not allowed");
         continue;
       }
 
       if (publicKey != null) {
         if (!req.hasProofOfPossession()) {
-          certResponses.add(buildErrorCertResponse(certReqId, PKIFailureInfo.badPOP, "no POP"));
+          addErrCertResp(resps, certReqId, badPOP, "no POP");
           continue;
         }
 
         if (!verifyPopo(req, publicKey, tmpRequestor.isRa())) {
           LOG.warn("could not validate POP for request {}", certReqId.getValue());
-          certResponses.add(buildErrorCertResponse(certReqId, PKIFailureInfo.badPOP,
-              "invalid POP"));
+          addErrCertResp(resps, certReqId, badPOP, "invalid POP");
           continue;
         }
       } else if (caGenerateKeypair) {
@@ -696,14 +353,12 @@ public class CmpResponder extends BaseCmpResponder {
         } else {
           LOG.warn("no public key is specified and key generation is not allowed {}",
               certReqId.getValue());
-          certResponses.add(buildErrorCertResponse(certReqId, PKIFailureInfo.badCertTemplate,
-              "no public key"));
+          addErrCertResp(resps, certReqId, badCertTemplate, "no public key");
           continue;
         }
       } else {
         LOG.warn("no public key is specified {}", certReqId.getValue());
-        certResponses.add(buildErrorCertResponse(certReqId, PKIFailureInfo.badCertTemplate,
-            "no public key"));
+        addErrCertResp(resps, certReqId, badCertTemplate, "no public key");
         continue;
       }
 
@@ -722,16 +377,15 @@ public class CmpResponder extends BaseCmpResponder {
         }
       }
 
-      CertTemplateData certTempData = new CertTemplateData(subject, publicKey, notBefore, notAfter,
-          extensions, certprofileName, certReqId, caGenerateKeypair);
-      certTemplateDatas.add(certTempData);
+      certTemplateDatas.add(new CertTemplateData(subject, publicKey, notBefore, notAfter,
+          extensions, certprofileName, certReqId, caGenerateKeypair));
     } // end for
 
-    if (certResponses.size() == n) {
+    if (resps.size() == n) {
       // all error
       CertResponse[] certResps = new CertResponse[n];
       for (int i = 0; i < n; i++) {
-        certResps[i] = certResponses.get(i);
+        certResps[i] = resps.get(i);
       }
       event.setStatus(AuditStatus.FAILED);
       return new CertRepMessage(null, certResps);
@@ -743,7 +397,7 @@ public class CmpResponder extends BaseCmpResponder {
       int lastFailureIndex = certTemplateDatas.size();
       BigInteger failCertReqId =
           certReqMsgs[lastFailureIndex].getCertReq().getCertReqId().getValue();
-      CertResponse failCertResp = certResponses.get(lastFailureIndex);
+      CertResponse failCertResp = resps.get(lastFailureIndex);
       PKIStatus failStatus = PKIStatus.getInstance(
           new ASN1Integer(failCertResp.getStatus().getStatus()));
       PKIFailureInfo failureInfo = new PKIFailureInfo(failCertResp.getStatus().getFailInfo());
@@ -756,10 +410,9 @@ public class CmpResponder extends BaseCmpResponder {
           continue;
         }
 
-        ASN1Integer certReqId = certResps[i].getCertReqId();
-        String msg = "error in certReq " + failCertReqId;
-        PKIStatusInfo tmpStatus = generateRejectionStatus(failStatus, failureInfo.intValue(), msg);
-        certResps[i] = new CertResponse(certReqId, tmpStatus);
+        PKIStatusInfo tmpStatus = generateRejectionStatus(failStatus, failureInfo.intValue(),
+            "error in certReq " + failCertReqId);
+        certResps[i] = new CertResponse(certResps[i].getCertReqId(), tmpStatus);
       }
 
       return new CertRepMessage(null, certResps);
@@ -770,7 +423,7 @@ public class CmpResponder extends BaseCmpResponder {
 
     CertResponse[] certResps = new CertResponse[n];
     int index = 0;
-    for (CertResponse errorResp : certResponses) {
+    for (CertResponse errorResp : resps) {
       // error single CertResponse
       certResps[index++] = errorResp;
     }
@@ -788,6 +441,7 @@ public class CmpResponder extends BaseCmpResponder {
           break;
         }
       }
+
       if (anyCertEnrolled && cmpControl.isSendCaCert()) {
         caPubs = new CMPCertificate[]{getCa().getCaInfo().getCertInCmpFormat()};
       }
@@ -801,7 +455,6 @@ public class CmpResponder extends BaseCmpResponder {
    * Since it is not possible to add attribute to the PKCS#10 request (CSR), the certificate
    * profile must be specified in the attribute regInfo-utf8Pairs (1.3.6.1.5.5.7.5.2.1) within
    * PKIHeader.generalInfo
-   *
    */
   private PKIBody processP10cr(String dfltCertprofileName, PKIMessage request,
       CmpRequestorInfo requestor, ASN1OctetString tid, PKIHeader reqHeader,
@@ -815,7 +468,7 @@ public class CmpResponder extends BaseCmpResponder {
 
     if (!ca.verifyCsr(p10cr)) {
       LOG.warn("could not validate POP for the pkcs#10 requst");
-      certResp = buildErrorCertResponse(certReqId, PKIFailureInfo.badPOP, "invalid POP");
+      certResp = buildErrCertResp(certReqId, badPOP, "invalid POP");
     } else {
       CertificationRequestInfo certTemp = p10cr.getCertificationRequestInfo();
 
@@ -825,8 +478,7 @@ public class CmpResponder extends BaseCmpResponder {
       } catch (IllegalArgumentException ex) {
         extensions = null;
         LOG.warn("could not parse extensions of the pkcs#10 requst");
-        certResp = buildErrorCertResponse(certReqId, PKIFailureInfo.badCertTemplate,
-                    "invalid extensions");
+        certResp = buildErrCertResp(certReqId, badCertTemplate, "invalid extensions");
       }
 
       if (certResp == null) {
@@ -857,13 +509,12 @@ public class CmpResponder extends BaseCmpResponder {
 
         if (certprofileName == null) {
           LOG.warn("no certprofile is specified");
-          certResp = buildErrorCertResponse(certReqId, PKIFailureInfo.badCertTemplate,
-              "badCertTemplate");
+          certResp = buildErrCertResp(certReqId, badCertTemplate, "badCertTemplate");
         } else {
           certprofileName = certprofileName.toLowerCase();
           if (!requestor.isCertprofilePermitted(certprofileName)) {
             String msg = "certprofile " + certprofileName + " is not allowed";
-            certResp = buildErrorCertResponse(certReqId, PKIFailureInfo.notAuthorized, msg);
+            certResp = buildErrCertResp(certReqId, notAuthorized, msg);
           } else {
             CertTemplateData certTemplateData = new CertTemplateData(subject, publicKeyInfo,
                 notBefore, notAfter, extensions, certprofileName, certReqId, false);
@@ -883,8 +534,7 @@ public class CmpResponder extends BaseCmpResponder {
 
     if (event.getStatus() == null || event.getStatus() != AuditStatus.FAILED) {
       int status = certResp.getStatus().getStatus().intValue();
-      if (status != PKIStatus.GRANTED && status != PKIStatus.GRANTED_WITH_MODS
-          && status != PKIStatus.WAITING) {
+      if (status != GRANTED && status != GRANTED_WITH_MODS && status != WAITING) {
         event.setStatus(AuditStatus.FAILED);
         PKIFreeText statusStr = certResp.getStatus().getStatusString();
         if (statusStr != null) {
@@ -893,9 +543,8 @@ public class CmpResponder extends BaseCmpResponder {
       }
     }
 
-    CertRepMessage repMessage = new CertRepMessage(caPubs, new CertResponse[]{certResp});
-
-    return new PKIBody(PKIBody.TYPE_CERT_REP, repMessage);
+    return new PKIBody(PKIBody.TYPE_CERT_REP,
+        new CertRepMessage(caPubs, new CertResponse[]{certResp}));
   } // method processP10cr
 
   private List<CertResponse> generateCertificates(List<CertTemplateData> certTemplates,
@@ -909,20 +558,15 @@ public class CmpResponder extends BaseCmpResponder {
     if (cmpControl.isGroupEnroll()) {
       List<CertificateInfo> certInfos = null;
       try {
-        if (kup) {
-          certInfos = ca.regenerateCerts(certTemplates, requestor, RequestType.CMP,
-              tid.getOctets(), msgId);
-        } else {
-          certInfos = ca.generateCerts(certTemplates, requestor, RequestType.CMP,
-              tid.getOctets(), msgId);
-        }
+        certInfos = kup
+            ? ca.regenerateCerts(certTemplates, requestor, RequestType.CMP, tid.getOctets(), msgId)
+            : ca.generateCerts(certTemplates,   requestor, RequestType.CMP, tid.getOctets(), msgId);
 
         // save the request
         Long reqDbId = null;
         if (ca.getCaInfo().isSaveRequest()) {
           try {
-            byte[] encodedRequest = request.getEncoded();
-            reqDbId = ca.addRequest(encodedRequest);
+            reqDbId = ca.addRequest(request.getEncoded());
           } catch (Exception ex) {
             LOG.warn("could not save request");
           }
@@ -930,8 +574,14 @@ public class CmpResponder extends BaseCmpResponder {
 
         for (int i = 0; i < n; i++) {
           CertificateInfo certInfo = certInfos.get(i);
-          ret.add(postProcessCertInfo(certTemplates.get(i).getCertReqId(), requestor, certInfo, tid,
-              cmpControl));
+
+          ASN1Integer certReqId = certTemplates.get(i).getCertReqId();
+          if (cmpControl.isConfirmCert()) {
+            pendingCertPool.addCertificate(tid.getOctets(), certReqId.getPositiveValue(), certInfo,
+                System.currentTimeMillis() + cmpControl.getConfirmWaitTimeMs());
+          }
+          ret.add(postProcessCertInfo(certReqId, requestor, certInfo, tid, cmpControl));
+
           if (reqDbId != null) {
             ca.addRequestCert(reqDbId, certInfo.getCert().getCertId());
           }
@@ -963,13 +613,9 @@ public class CmpResponder extends BaseCmpResponder {
 
         CertificateInfo certInfo;
         try {
-          if (kup) {
-            certInfo = ca.regenerateCert(certTemplate, requestor, RequestType.CMP,
-                tid.getOctets(), msgId);
-          } else {
-            certInfo = ca.generateCert(certTemplate, requestor, RequestType.CMP,
-                tid.getOctets(), msgId);
-          }
+          certInfo = kup
+              ? ca.regenerateCert(certTemplate, requestor, RequestType.CMP, tid.getOctets(), msgId)
+              : ca.generateCert(certTemplate, requestor, RequestType.CMP, tid.getOctets(), msgId);
 
           if (ca.getCaInfo().isSaveRequest()) {
             if (reqDbId == null && !savingRequestFailed) {
@@ -987,9 +633,7 @@ public class CmpResponder extends BaseCmpResponder {
             }
           }
 
-          CertResponse certResponse =
-              postProcessCertInfo(certReqId, requestor, certInfo, tid, cmpControl);
-          ret.add(certResponse);
+          ret.add(postProcessCertInfo(certReqId, requestor, certInfo, tid, cmpControl));
         } catch (OperationException ex) {
           event.setStatus(AuditStatus.FAILED);
           ret.add(postProcessException(certReqId, ex));
@@ -999,186 +643,6 @@ public class CmpResponder extends BaseCmpResponder {
 
     return ret;
   } // method generateCertificates
-
-  private CertResponse postProcessCertInfo(ASN1Integer certReqId, CmpRequestorInfo requestor,
-      CertificateInfo certInfo, ASN1OctetString tid, CmpControl cmpControl) {
-    if (cmpControl.isConfirmCert()) {
-      pendingCertPool.addCertificate(tid.getOctets(), certReqId.getPositiveValue(), certInfo,
-          System.currentTimeMillis() + cmpControl.getConfirmWaitTimeMs());
-    }
-
-    String warningMsg = certInfo.getWarningMessage();
-
-    PKIStatusInfo statusInfo;
-    if (StringUtil.isBlank(warningMsg)) {
-      statusInfo = certInfo.isAlreadyIssued()
-          ? new PKIStatusInfo(PKIStatus.grantedWithMods, new PKIFreeText("ALREADY_ISSUED"))
-          : new PKIStatusInfo(PKIStatus.granted);
-    } else {
-      statusInfo = new PKIStatusInfo(PKIStatus.grantedWithMods,
-          new PKIFreeText(warningMsg));
-    }
-
-    CertOrEncCert cec = new CertOrEncCert(
-        new CMPCertificate(certInfo.getCert().getCert().toBcCert().toASN1Structure()));
-    if (certInfo.getPrivateKey() == null) {
-      // no private key will be returned.
-      return new CertResponse(certReqId, statusInfo, new CertifiedKeyPair(cec), null);
-    }
-
-    final int aesGcmTagByteLen = 16;
-    final int aesGcmNonceLen = 12;
-
-    PrivateKeyInfo privKey = certInfo.getPrivateKey();
-    AlgorithmIdentifier intendedAlg = privKey.getPrivateKeyAlgorithm();
-    EncryptedValue encKey;
-
-    // Due to the bug mentioned in https://github.com/bcgit/bc-java/issues/359
-    // we cannot use BoucyCastle's EncryptedValueBuilder to build the EncryptedValue.
-    try {
-      if (requestor.getCert() != null) {
-        // use public key of the requestor to encrypt the private key
-        PublicKey reqPub = requestor.getCert().getCert().getPublicKey();
-        CrmfKeyWrapper wrapper = null;
-        if (reqPub instanceof RSAPublicKey) {
-          wrapper = new CrmfKeyWrapper.RSAOAEPAsymmetricKeyWrapper(reqPub);
-        } else if (reqPub instanceof ECPublicKey) {
-          wrapper = new CrmfKeyWrapper.ECIESAsymmetricKeyWrapper(reqPub);
-        } else {
-          String msg = "Requestors's public key can not be used for encryption";
-          LOG.error(msg);
-          return new CertResponse(certReqId,
-              new PKIStatusInfo(PKIStatus.rejection, new PKIFreeText(msg)));
-        }
-
-        byte[] symmKeyBytes = new byte[16];
-        synchronized (aesKeyGen) {
-          symmKeyBytes = aesKeyGen.generateKey().getEncoded();
-        }
-
-        // encrypt the symmKey
-        byte[] encSymmKey = wrapper.generateWrappedKey(symmKeyBytes);
-        // algorithmIdentifier after the encryption process.
-        AlgorithmIdentifier keyAlg = wrapper.getAlgorithmIdentifier();
-
-        // encrypt the data
-        ASN1ObjectIdentifier symmAlgOid = NISTObjectIdentifiers.id_aes128_GCM;
-        byte[] nonce = randomBytes(aesGcmNonceLen);
-
-        ConcurrentBagEntry<Cipher> cipher0 = null;
-        if (aesGcm_ciphers_initialized) {
-          try {
-            cipher0 = aesGcm_ciphers.borrow(5, TimeUnit.SECONDS);
-          } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
-          }
-        }
-
-        Cipher dataCipher = (cipher0 != null)
-            ? cipher0.value() : Cipher.getInstance(symmAlgOid.getId());
-
-        byte[] encValue;
-
-        try {
-          try {
-            dataCipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(symmKeyBytes, "AES"),
-                new GCMParameterSpec(aesGcmTagByteLen << 3, nonce));
-          } catch (InvalidKeyException | InvalidAlgorithmParameterException ex) {
-            throw new IllegalStateException(ex);
-          }
-
-          encValue = dataCipher.doFinal(privKey.getEncoded());
-        } finally {
-          if (cipher0 != null) {
-            aesGcm_ciphers.requite(cipher0);
-          }
-        }
-
-        GCMParameters params = new GCMParameters(nonce, aesGcmTagByteLen);
-        AlgorithmIdentifier symmAlg = new AlgorithmIdentifier(symmAlgOid, params);
-
-        encKey = new EncryptedValue(intendedAlg, symmAlg,
-            new DERBitString(encSymmKey), keyAlg, null, new DERBitString(encValue));
-      } else {
-        final ASN1ObjectIdentifier encAlgOid = NISTObjectIdentifiers.id_aes128_GCM;
-        final int keysizeBits = 128; // one of 128, 192 and 256. Must match the encAlgOid
-        final int iterationCount = 10240; // >= 1000
-        final int nonceLen = 12; // fixed value
-        final int tagByteLen = 16; // fixed value
-
-        byte[] nonce = randomBytes(nonceLen);
-
-        // use password of the requestor to encrypt the private key
-        byte[] pbkdfSalt = randomBytes(keysizeBits / 8);
-
-        ConcurrentBagEntry<SecretKeyFactory> keyFact0 = null;
-        if (pbkdf2_kdfs_initialized) {
-          try {
-            keyFact0 = pbkdf2_kdfs.borrow(5, TimeUnit.SECONDS);
-          } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
-          }
-        }
-
-        SecretKeyFactory keyFact = (keyFact0 != null) ? keyFact0.value()
-            : SecretKeyFactory.getInstance(PKCSObjectIdentifiers.id_PBKDF2.getId());
-
-        SecretKey key;
-
-        try {
-          key = keyFact.generateSecret(
-              new PBKDF2KeySpec(requestor.getPassword(), pbkdfSalt, iterationCount,
-                  keysizeBits, prf_hmacWithSHA256));
-          byte[] encoded = key.getEncoded();
-          key = new SecretKeySpec(encoded, "AES");
-        } finally {
-          if (keyFact0 != null) {
-            pbkdf2_kdfs.requite(keyFact0);
-          }
-        }
-
-        GCMParameterSpec gcmParamSpec = new GCMParameterSpec(tagByteLen * 8, nonce);
-
-        ConcurrentBagEntry<Cipher> cipher0 = null;
-        if (aesGcm_ciphers_initialized) {
-          try {
-            cipher0 = aesGcm_ciphers.borrow(5, TimeUnit.SECONDS);
-          } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
-          }
-        }
-
-        byte[] encValue;
-
-        Cipher dataCipher = (cipher0 != null)
-            ? cipher0.value() : Cipher.getInstance(encAlgOid.getId());
-
-        try {
-          dataCipher.init(Cipher.ENCRYPT_MODE, key, gcmParamSpec);
-          encValue = dataCipher.doFinal(privKey.getEncoded());
-        } finally {
-          if (cipher0 != null) {
-            aesGcm_ciphers.requite(cipher0);
-          }
-        }
-
-        AlgorithmIdentifier symmAlg = new AlgorithmIdentifier(PKCSObjectIdentifiers.id_PBES2,
-            new PBES2Parameters(
-                new KeyDerivationFunc(PKCSObjectIdentifiers.id_PBKDF2,
-                    new PBKDF2Params(pbkdfSalt, iterationCount, keysizeBits / 8,
-                        prf_hmacWithSHA256)),
-                new EncryptionScheme(encAlgOid, new GCMParameters(nonce, tagByteLen))));
-
-        encKey = new EncryptedValue(intendedAlg, symmAlg,
-            null, null, null, new DERBitString(encValue));
-      }
-    } catch (Throwable th) {
-      String msg = "error while encrypting the private key";
-      LOG.error(msg);
-      return new CertResponse(certReqId,
-          new PKIStatusInfo(PKIStatus.rejection, new PKIFreeText(msg)));
-    }
-
-    return new CertResponse(certReqId, statusInfo,
-        new CertifiedKeyPair(cec, encKey, null), null);
-  }
 
   private PKIBody unRevokeRemoveCertificates(PKIMessage request, RevReqContent rr,
       int permission, CmpControl cmpControl, String msgId, AuditEvent event) {
@@ -1198,32 +662,28 @@ public class CmpResponder extends BaseCmpResponder {
         X500Name caSubject = getCa().getCaInfo().getCert().getSubject();
 
         if (issuer == null) {
-          return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badCertTemplate,
-              "issuer is not present");
+          return buildErrorMsgPkiBody(rejection, badCertTemplate, "issuer is not present");
         }
 
         if (!issuer.equals(caSubject)) {
-          return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badCertTemplate,
+          return buildErrorMsgPkiBody(rejection, badCertTemplate,
               "issuer does not target at the CA");
         }
 
         if (serialNumber == null) {
-          return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badCertTemplate,
-              "serialNumber is not present");
+          return buildErrorMsgPkiBody(rejection, badCertTemplate, "serialNumber is not present");
         }
 
-        if (certDetails.getSigningAlg() != null   || certDetails.getValidity() != null
-            || certDetails.getSubject() != null   || certDetails.getPublicKey() != null
+        if (certDetails.getSigningAlg()   != null || certDetails.getValidity() != null
+            || certDetails.getSubject()   != null || certDetails.getPublicKey() != null
             || certDetails.getIssuerUID() != null || certDetails.getSubjectUID() != null) {
-          return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badCertTemplate,
-              "only version, issuer and serialNumber in RevDetails.certDetails are "
-              + "allowed, but more is specified");
+          return buildErrorMsgPkiBody(rejection, badCertTemplate, "only version, issuer and "
+              + "serialNumber in RevDetails.certDetails are allowed, but more is specified");
         }
 
         if (certDetails.getExtensions() == null) {
           if (cmpControl.isRrAkiRequired()) {
-            return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badCertTemplate,
-                "issuer's AKI not present");
+            return buildErrorMsgPkiBody(rejection, badCertTemplate, "issuer's AKI not present");
           }
         } else {
           Extensions exts = certDetails.getExtensions();
@@ -1231,7 +691,7 @@ public class CmpResponder extends BaseCmpResponder {
           if (oids != null) {
             for (ASN1ObjectIdentifier oid : oids) {
               if (!Extension.authorityKeyIdentifier.equals(oid)) {
-                return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badCertTemplate,
+                return buildErrorMsgPkiBody(rejection, badCertTemplate,
                     "unknown critical extension " + oid.getId());
               }
             }
@@ -1239,14 +699,12 @@ public class CmpResponder extends BaseCmpResponder {
 
           Extension ext = exts.getExtension(Extension.authorityKeyIdentifier);
           if (ext == null) {
-            return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badCertTemplate,
-                "issuer's AKI not present");
+            return buildErrorMsgPkiBody(rejection, badCertTemplate, "issuer's AKI not present");
           } else {
             AuthorityKeyIdentifier aki = AuthorityKeyIdentifier.getInstance(ext.getParsedValue());
 
             if (aki.getKeyIdentifier() == null) {
-              return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badCertTemplate,
-                  "issuer's AKI not present");
+              return buildErrorMsgPkiBody(rejection, badCertTemplate, "issuer's AKI not present");
             }
 
             boolean issuerMatched = true;
@@ -1279,14 +737,13 @@ public class CmpResponder extends BaseCmpResponder {
             }
 
             if (!issuerMatched) {
-              return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badCertTemplate,
+              return buildErrorMsgPkiBody(rejection, badCertTemplate,
                   "issuer does not target at the CA");
             }
           }
         }
       } catch (IllegalArgumentException ex) {
-        return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
-            "the request is not invalid");
+        return buildErrorMsgPkiBody(rejection, badRequest, "the request is not invalid");
       }
     } // end for
 
@@ -1373,27 +830,18 @@ public class CmpResponder extends BaseCmpResponder {
           }
           ca.addRequestCert(reqDbId, certDbId);
         }
-        status = new PKIStatusInfo(PKIStatus.granted);
+        status = new PKIStatusInfo(granted);
       } catch (OperationException ex) {
         ErrorCode code = ex.getErrorCode();
         LOG.warn("{}, OperationException: code={}, message={}",
             PermissionConstants.getTextForCode(permission), code.name(), ex.getErrorMessage());
-        String errorMessage;
-        switch (code) {
-          case DATABASE_FAILURE:
-          case SYSTEM_FAILURE:
-            errorMessage = code.name();
-            break;
-          default:
-            errorMessage = code.name() + ": " + ex.getErrorMessage();
-            break;
-        } // end switch code
+        String errorMsg = (code == ErrorCode.DATABASE_FAILURE || code == ErrorCode.SYSTEM_FAILURE)
+            ? code.name() : code.name() + ": " + ex.getErrorMessage();
 
         int failureInfo = getPKiFailureInfo(ex);
-        status = generateRejectionStatus(failureInfo, errorMessage);
-        event.setLevel(AuditLevel.ERROR);
-        event.setStatus(AuditStatus.FAILED);
-        event.addEventData(CaAuditConstants.NAME_message, errorMessage);
+        status = generateRejectionStatus(failureInfo, errorMsg);
+        event.update(AuditLevel.ERROR, AuditStatus.FAILED);
+        event.addEventData(CaAuditConstants.NAME_message, errorMsg);
       } // end try
 
       repContentBuilder.add(status, certId);
@@ -1402,82 +850,8 @@ public class CmpResponder extends BaseCmpResponder {
     return new PKIBody(PKIBody.TYPE_REVOCATION_REP, repContentBuilder.build());
   } // method revokeOrUnrevokeOrRemoveCertificates
 
-  private CertResponse postProcessException(ASN1Integer certReqId, OperationException ex) {
-    ErrorCode code = ex.getErrorCode();
-    LOG.warn("generate certificate, OperationException: code={}, message={}",
-        code.name(), ex.getErrorMessage());
-
-    String errorMessage;
-    switch (code) {
-      case DATABASE_FAILURE:
-      case SYSTEM_FAILURE:
-        errorMessage = code.name();
-        break;
-      default:
-        errorMessage = code.name() + ": " + ex.getErrorMessage();
-        break;
-    } // end switch code
-
-    int failureInfo = getPKiFailureInfo(ex);
-    return new CertResponse(certReqId, generateRejectionStatus(failureInfo, errorMessage));
-  }
-
-  private int getPKiFailureInfo(OperationException ex) {
-    ErrorCode code = ex.getErrorCode();
-
-    int failureInfo;
-    switch (code) {
-      case ALREADY_ISSUED:
-        failureInfo = PKIFailureInfo.badRequest;
-        break;
-      case BAD_CERT_TEMPLATE:
-        failureInfo = PKIFailureInfo.badCertTemplate;
-        break;
-      case BAD_REQUEST:
-        failureInfo = PKIFailureInfo.badRequest;
-        break;
-      case CERT_REVOKED:
-        failureInfo = PKIFailureInfo.certRevoked;
-        break;
-      case CERT_UNREVOKED:
-        failureInfo = PKIFailureInfo.notAuthorized;
-        break;
-      case BAD_POP:
-        failureInfo = PKIFailureInfo.badPOP;
-        break;
-      case CRL_FAILURE:
-        failureInfo = PKIFailureInfo.systemFailure;
-        break;
-      case DATABASE_FAILURE:
-        failureInfo = PKIFailureInfo.systemFailure;
-        break;
-      case NOT_PERMITTED:
-        failureInfo = PKIFailureInfo.notAuthorized;
-        break;
-      case INVALID_EXTENSION:
-        failureInfo = PKIFailureInfo.badRequest;
-        break;
-      case SYSTEM_FAILURE:
-        failureInfo = PKIFailureInfo.systemFailure;
-        break;
-      case SYSTEM_UNAVAILABLE:
-        failureInfo = PKIFailureInfo.systemUnavail;
-        break;
-      case UNKNOWN_CERT:
-        failureInfo = PKIFailureInfo.badCertId;
-        break;
-      case UNKNOWN_CERT_PROFILE:
-        failureInfo = PKIFailureInfo.badCertTemplate;
-        break;
-      default:
-        failureInfo = PKIFailureInfo.systemFailure;
-        break;
-    } // end switch (code)
-
-    return failureInfo;
-  }
-
-  private PKIBody confirmCertificates(ASN1OctetString transactionId, CertConfirmContent certConf,
+  @Override
+  protected PKIBody confirmCertificates(ASN1OctetString transactionId, CertConfirmContent certConf,
       String msgId) {
     CertStatus[] certStatuses = certConf.toCertStatusArray();
 
@@ -1488,10 +862,8 @@ public class CmpResponder extends BaseCmpResponder {
       CertificateInfo certInfo = pendingCertPool.removeCertificate(
           transactionId.getOctets(), certReqId.getPositiveValue(), certHash);
       if (certInfo == null) {
-        if (LOG.isWarnEnabled()) {
-          LOG.warn("no cert under transactionId={}, certReqId={} and certHash=0X{}",
-              transactionId, certReqId.getPositiveValue(), Hex.encode(certHash));
-        }
+        LOG.warn("no cert under transactionId={}, certReqId={} and certHash=0X{}",
+            transactionId, certReqId.getPositiveValue(), Hex.encode(certHash));
         continue;
       }
 
@@ -1499,7 +871,7 @@ public class CmpResponder extends BaseCmpResponder {
       boolean accept = true;
       if (statusInfo != null) {
         int status = statusInfo.getStatus().intValue();
-        if (PKIStatus.GRANTED != status && PKIStatus.GRANTED_WITH_MODS != status) {
+        if (GRANTED != status && GRANTED_WITH_MODS != status) {
           accept = false;
         }
       }
@@ -1530,11 +902,11 @@ public class CmpResponder extends BaseCmpResponder {
     }
 
     return new PKIBody(PKIBody.TYPE_ERROR,
-        new ErrorMsgContent(new PKIStatusInfo(PKIStatus.rejection, null,
-                new PKIFailureInfo(PKIFailureInfo.systemFailure))));
+        new ErrorMsgContent(new PKIStatusInfo(rejection, null, new PKIFailureInfo(systemFailure))));
   } // method confirmCertificates
 
-  private boolean revokePendingCertificates(ASN1OctetString transactionId, String msgId) {
+  @Override
+  protected boolean revokePendingCertificates(ASN1OctetString transactionId, String msgId) {
     Set<CertificateInfo> remainingCerts = pendingCertPool.removeCertificates(
         transactionId.getOctets());
 
@@ -1557,203 +929,11 @@ public class CmpResponder extends BaseCmpResponder {
     return successful;
   } // method revokePendingCertificates
 
-  private boolean verifyPopo(CertificateRequestMessage certRequest, SubjectPublicKeyInfo spki,
-      boolean allowRaPopo) {
-    int popType = certRequest.getProofOfPossessionType();
-    if (popType == CertificateRequestMessage.popRaVerified && allowRaPopo) {
-      return true;
-    }
-
-    if (popType != CertificateRequestMessage.popSigningKey) {
-      LOG.error("unsupported POP type: " + popType);
-      return false;
-    }
-
-    // check the POP signature algorithm
-    ProofOfPossession pop = certRequest.toASN1Structure().getPopo();
-    POPOSigningKey popoSign = POPOSigningKey.getInstance(pop.getObject());
-    AlgorithmIdentifier popoAlgId = popoSign.getAlgorithmIdentifier();
-    AlgorithmValidator algoValidator = getCmpControl().getPopoAlgoValidator();
-    if (!algoValidator.isAlgorithmPermitted(popoAlgId)) {
-      String algoName;
-      try {
-        algoName = AlgorithmUtil.getSignatureAlgoName(popoAlgId);
-      } catch (NoSuchAlgorithmException ex) {
-        algoName = popoAlgId.getAlgorithm().getId();
-      }
-      LOG.error("POPO signature algorithm {} not permitted", algoName);
-      return false;
-    }
-
-    try {
-      PublicKey publicKey = securityFactory.generatePublicKey(spki);
-      ASN1ObjectIdentifier algOid = popoAlgId.getAlgorithm();
-
-      DhpocControl dhpocControl = getCa().getCaInfo().getDhpocControl();
-
-      DHSigStaticKeyCertPair kaKeyAndCert = null;
-      if (Xipki.id_alg_dhPop_x25519_sha256.equals(algOid)
-          || Xipki.id_alg_dhPop_x448_sha512.equals(algOid)) {
-        if (dhpocControl != null) {
-          DhSigStatic dhSigStatic = DhSigStatic.getInstance(popoSign.getSignature().getBytes());
-          IssuerAndSerialNumber isn = dhSigStatic.getIssuerAndSerial();
-
-          ASN1ObjectIdentifier keyAlgOid = spki.getAlgorithm().getAlgorithm();
-          kaKeyAndCert = dhpocControl.getKeyCertPair(isn.getName(),
-              isn.getSerialNumber().getValue(), EdECConstants.getName(keyAlgOid));
-        }
-
-        if (kaKeyAndCert == null) {
-          return false;
-        }
-      }
-
-      ContentVerifierProvider cvp = securityFactory.getContentVerifierProvider(
-          publicKey, kaKeyAndCert);
-      return certRequest.isValidSigningKeyPOP(cvp);
-    } catch (InvalidKeyException | IllegalStateException | CRMFException ex) {
-      LogUtil.error(LOG, ex);
-    }
-    return false;
-  } // method verifyPopo
-
   @Override
-  protected CmpControl getCmpControl() {
-    return getCa().getCmpControl();
-  }
-
-  private void checkPermission(CmpRequestorInfo requestor, int requiredPermission)
-      throws InsuffientPermissionException {
-    X509Ca ca = getCa();
-    int permission = ca.getCaInfo().getPermission();
-    if (!PermissionConstants.contains(permission, requiredPermission)) {
-      throw new InsuffientPermissionException("Permission "
-          + PermissionConstants.getTextForCode(requiredPermission) + "is not permitted");
-    }
-
-    requestor.assertPermitted(requiredPermission);
-  } // method checkPermission
-
-  private String getSystemInfo(CmpRequestorInfo requestor, Set<Integer> acceptVersions)
-      throws OperationException {
-    X509Ca ca = getCa();
-    CaInfo caInfo = ca.getCaInfo();
-
-    // current only version 3 is supported
-    int version = 3;
-    if (acceptVersions != null && !acceptVersions.contains(version)) {
-      throw new OperationException(ErrorCode.BAD_REQUEST,
-          "none of versions " + acceptVersions + " is supported");
-    }
-
-    JSONObject root = new JSONObject(false);
-    root.put("version", version);
-    List<byte[]> certchain = new LinkedList<byte[]>();
-
-    certchain.add(caInfo.getCert().getEncoded());
-    for (X509Cert m : caInfo.getCertchain()) {
-      certchain.add(m.getEncoded());
-    }
-    root.put("caCertchain", certchain);
-
-    JSONObject jsonCmpControl = new JSONObject(false);
-    jsonCmpControl.put("rrAkiRequired", getCmpControl().isRrAkiRequired());
-    root.put("cmpControl", jsonCmpControl);
-
-    // Profiles
-    Set<String> requestorProfiles = requestor.getCaHasRequestor().getProfiles();
-    Set<String> supportedProfileNames = new HashSet<>();
-    Set<String> caProfileNames =
-        ca.getCaManager().getCertprofilesForCa(caInfo.getIdent().getName());
-    for (String caProfileName : caProfileNames) {
-      if (requestorProfiles.contains("all") || requestorProfiles.contains(caProfileName)) {
-        supportedProfileNames.add(caProfileName);
-      }
-    }
-
-    if (CollectionUtil.isNotEmpty(supportedProfileNames)) {
-      List<JSONObject> jsonCertprofiles = new LinkedList<>();
-      root.put("certprofiles", jsonCertprofiles);
-      for (String name : supportedProfileNames) {
-        CertprofileEntry entry = ca.getCaManager().getCertprofile(name);
-        if (entry.isFaulty()) {
-          continue;
-        }
-
-        JSONObject jsonCertprofile = new JSONObject(false);
-        jsonCertprofile.put("name", name);
-        jsonCertprofile.put("type", entry.getType());
-        jsonCertprofile.put("conf", entry.getConf());
-        jsonCertprofiles.add(jsonCertprofile);
-      }
-    }
-
-    // DHPocs
-    DhpocControl dhpocControl = ca.getCaInfo().getDhpocControl();
-    if (dhpocControl != null) {
-      X509Cert[] certs = dhpocControl.getCertificates();
-      List<byte[]> dhpocCerts = new LinkedList<>();
-      for (X509Cert m : certs) {
-        dhpocCerts.add(m.getEncoded());
-      }
-      root.put("dhpocs", dhpocCerts);
-    }
-
-    return JSON.toJSONString(root, false);
-  } // method getSystemInfo
-
-  @Override
-  protected ConcurrentContentSigner getSigner() {
-    String name = getResponderName();
-    return caManager.getSignerWrapper(name).getSigner();
-  }
-
-  @Override
-  protected GeneralName getSender() {
-    return caManager.getSignerWrapper(getResponderName()).getSubjectAsGeneralName();
-  }
-
-  @Override
-  protected boolean intendsMe(GeneralName requestRecipient) {
-    if (requestRecipient == null) {
-      return false;
-    }
-
-    if (getSender().equals(requestRecipient)) {
-      return true;
-    }
-
-    if (requestRecipient.getTagNo() == GeneralName.directoryName) {
-      X500Name x500Name = X500Name.getInstance(requestRecipient.getName());
-      if (x500Name.equals(caManager.getSignerWrapper(getResponderName()).getSubject())) {
-        return true;
-      }
-    }
-
-    return false;
-  } // method intendsMe
-
-  @Override
-  public CmpRequestorInfo getRequestor(X500Name requestorSender) {
-    return getCa().getRequestor(requestorSender);
-  }
-
-  @Override
-  public CmpRequestorInfo getRequestor(X509Cert requestorCert) {
-    return getCa().getRequestor(requestorCert);
-  }
-
-  @Override
-  // CHECKSTYLE:SKIP
-  public CmpRequestorInfo getMacRequestor(X500Name requestorSender, byte[] senderKID) {
-    return getCa().getMacRequestor(requestorSender, senderKID);
-  }
-
-  private PKIBody cmpEnrollCert(String dfltCertprofileName, Boolean dfltCaGenKeypair,
+  protected PKIBody cmpEnrollCert(String dfltCertprofileName, Boolean dfltCaGenKeypair,
       PKIMessage request, PKIHeaderBuilder respHeader, CmpControl cmpControl, PKIHeader reqHeader,
       PKIBody reqBody, CmpRequestorInfo requestor, ASN1OctetString tid, String msgId,
-      AuditEvent event)
-          throws InsuffientPermissionException {
+      AuditEvent event) throws InsuffientPermissionException {
     long confirmWaitTime = cmpControl.getConfirmWaitTime();
     if (confirmWaitTime < 0) {
       confirmWaitTime *= -1;
@@ -1763,34 +943,36 @@ public class CmpResponder extends BaseCmpResponder {
     PKIBody respBody;
 
     int type = reqBody.getType();
-    switch (type) {
-      case PKIBody.TYPE_INIT_REQ:
-        checkPermission(requestor, PermissionConstants.ENROLL_CERT);
-        respBody = processIr(dfltCertprofileName, dfltCaGenKeypair, request, requestor, tid,
-            reqHeader, CertReqMessages.getInstance(reqBody.getContent()), cmpControl, msgId, event);
-        break;
-      case PKIBody.TYPE_CERT_REQ:
-        checkPermission(requestor, PermissionConstants.ENROLL_CERT);
-        respBody = processCr(dfltCertprofileName, dfltCaGenKeypair, request, requestor, tid,
-            reqHeader, CertReqMessages.getInstance(reqBody.getContent()), cmpControl, msgId, event);
-        break;
-      case PKIBody.TYPE_KEY_UPDATE_REQ:
-        checkPermission(requestor, PermissionConstants.KEY_UPDATE);
-        respBody = processKur(dfltCertprofileName, dfltCaGenKeypair, request, requestor, tid,
-            reqHeader, CertReqMessages.getInstance(reqBody.getContent()), cmpControl, msgId, event);
-        break;
-      case PKIBody.TYPE_P10_CERT_REQ:
-        checkPermission(requestor, PermissionConstants.ENROLL_CERT);
-        respBody = processP10cr(dfltCertprofileName, request, requestor, tid, reqHeader,
-            CertificationRequest.getInstance(reqBody.getContent()), cmpControl, msgId, event);
-        break;
-      case PKIBody.TYPE_CROSS_CERT_REQ:
-        checkPermission(requestor, PermissionConstants.ENROLL_CROSS);
-        respBody = processCcp(dfltCertprofileName, request, requestor, tid, reqHeader,
-            CertReqMessages.getInstance(reqBody.getContent()), cmpControl, msgId, event);
-        break;
-      default:
-        throw new IllegalStateException("should not reach here");
+    if (type == PKIBody.TYPE_INIT_REQ) {
+      checkPermission(requestor, PermissionConstants.ENROLL_CERT);
+      CertReqMessages cr = CertReqMessages.getInstance(reqBody.getContent());
+      CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName, dfltCaGenKeypair,
+          request, requestor, tid, reqHeader, cr, true, cmpControl, msgId, event);
+      return new PKIBody(PKIBody.TYPE_INIT_REP, repMessage);
+    } else if (type == PKIBody.TYPE_CERT_REQ) {
+      checkPermission(requestor, PermissionConstants.ENROLL_CERT);
+      CertReqMessages cr = CertReqMessages.getInstance(reqBody.getContent());
+      CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName, dfltCaGenKeypair,
+          request, requestor, tid, reqHeader, cr, true, cmpControl, msgId, event);
+      respBody = new PKIBody(PKIBody.TYPE_CERT_REP, repMessage);
+    } else if (type == PKIBody.TYPE_KEY_UPDATE_REQ) {
+      checkPermission(requestor, PermissionConstants.KEY_UPDATE);
+      CertReqMessages kur = CertReqMessages.getInstance(reqBody.getContent());
+      CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName, dfltCaGenKeypair,
+          request, requestor, tid, reqHeader, kur, true, cmpControl, msgId, event);
+      return new PKIBody(PKIBody.TYPE_KEY_UPDATE_REP, repMessage);
+    } else if (type == PKIBody.TYPE_P10_CERT_REQ) {
+      checkPermission(requestor, PermissionConstants.ENROLL_CERT);
+      respBody = processP10cr(dfltCertprofileName, request, requestor, tid, reqHeader,
+          CertificationRequest.getInstance(reqBody.getContent()), cmpControl, msgId, event);
+    } else if (type == PKIBody.TYPE_CROSS_CERT_REQ) {
+      checkPermission(requestor, PermissionConstants.ENROLL_CROSS);
+      CertReqMessages cr = CertReqMessages.getInstance(reqBody.getContent());
+      CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName, Boolean.FALSE,
+          request, requestor, tid, reqHeader, cr, false, cmpControl, msgId, event);
+      return new PKIBody(PKIBody.TYPE_CROSS_CERT_REP, repMessage);
+    } else {
+      throw new IllegalStateException("should not reach here");
     } // switch type
 
     InfoTypeAndValue tv = null;
@@ -1808,7 +990,8 @@ public class CmpResponder extends BaseCmpResponder {
     return respBody;
   } // method cmpEnrollCert
 
-  private PKIBody cmpUnRevokeRemoveCertificates(PKIMessage request, PKIHeaderBuilder respHeader,
+  @Override
+  protected PKIBody cmpUnRevokeRemoveCertificates(PKIMessage request, PKIHeaderBuilder respHeader,
       CmpControl cmpControl, PKIHeader reqHeader, PKIBody reqBody, CmpRequestorInfo requestor,
       String msgId, AuditEvent event) {
     Integer requiredPermission = null;
@@ -1859,9 +1042,8 @@ public class CmpResponder extends BaseCmpResponder {
 
     if (!allRevdetailsOfSameType) {
       ErrorMsgContent emc = new ErrorMsgContent(
-          new PKIStatusInfo(PKIStatus.rejection,
-          new PKIFreeText("not all revDetails are of the same type"),
-          new PKIFailureInfo(PKIFailureInfo.badRequest)));
+          new PKIStatusInfo(rejection, new PKIFreeText("not all revDetails are of the same type"),
+          new PKIFailureInfo(badRequest)));
 
       return new PKIBody(PKIBody.TYPE_ERROR, emc);
     }
@@ -1871,16 +1053,16 @@ public class CmpResponder extends BaseCmpResponder {
     } catch (InsuffientPermissionException ex) {
       event.setStatus(AuditStatus.FAILED);
       event.addEventData(CaAuditConstants.NAME_message, "NOT_PERMITTED");
-      return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.notAuthorized, null);
+      return buildErrorMsgPkiBody(rejection, notAuthorized, null);
     }
 
     return unRevokeRemoveCertificates(request, rr, requiredPermission, cmpControl, msgId, event);
   } // method cmpRevokeOrUnrevokeOrRemoveCertificates
 
-  private PKIBody cmpGeneralMsg(PKIHeaderBuilder respHeader, CmpControl cmpControl,
+  @Override
+  protected PKIBody cmpGeneralMsg(PKIHeaderBuilder respHeader, CmpControl cmpControl,
       PKIHeader reqHeader, PKIBody reqBody, CmpRequestorInfo requestor, ASN1OctetString tid,
-      String msgId, AuditEvent event)
-          throws InsuffientPermissionException {
+      String msgId, AuditEvent event) throws InsuffientPermissionException {
     GenMsgContent genMsgBody = GenMsgContent.getInstance(reqBody.getContent());
     InfoTypeAndValue[] itvs = genMsgBody.toInfoTypeAndValueArray();
 
@@ -1898,7 +1080,7 @@ public class CmpResponder extends BaseCmpResponder {
     if (itv == null) {
       String statusMessage = "PKIBody type " + PKIBody.TYPE_GEN_MSG
           + " is only supported with the sub-types " + KNOWN_GENMSG_IDS.toString();
-      return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest, statusMessage);
+      return buildErrorMsgPkiBody(rejection, badRequest, statusMessage);
     }
 
     InfoTypeAndValue itvResp = null;
@@ -1921,8 +1103,7 @@ public class CmpResponder extends BaseCmpResponder {
         }
 
         if (crl == null) {
-          return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.systemFailure,
-              "no CRL is available");
+          return buildErrorMsgPkiBody(rejection, systemFailure, "no CRL is available");
         }
 
         itvResp = new InfoTypeAndValue(infoType, crl);
@@ -1938,72 +1119,64 @@ public class CmpResponder extends BaseCmpResponder {
             reqValue = seq.getObjectAt(1);
           }
         } catch (IllegalArgumentException ex) {
-          return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
+          return buildErrorMsgPkiBody(rejection, badRequest,
               "invalid value of the InfoTypeAndValue for " + infoType.getId());
         }
 
         ASN1Encodable respValue;
 
         int action = asn1Code.getPositiveValue().intValue();
-        switch (action) {
-          case XiSecurityConstants.CMP_ACTION_GEN_CRL:
-            event.addEventType(CaAuditConstants.Cmp.TYPE_genm_gen_crl);
-            checkPermission(requestor, PermissionConstants.GEN_CRL);
-            X509CRLHolder tmpCrl = ca.generateCrlOnDemand(msgId);
-            if (tmpCrl == null) {
-              String statusMessage = "CRL generation is not activated";
-              return buildErrorMsgPkiBody(PKIStatus.rejection,
-                  PKIFailureInfo.systemFailure, statusMessage);
-            } else {
-              respValue = tmpCrl.toASN1Structure();
-            }
-            break;
-          case XiSecurityConstants.CMP_ACTION_GET_CRL_WITH_SN:
-            event.addEventType(CaAuditConstants.Cmp.TYPE_genm_crl4number);
-            checkPermission(requestor, PermissionConstants.GET_CRL);
+        if (action == XiSecurityConstants.CMP_ACTION_GEN_CRL) {
+          event.addEventType(CaAuditConstants.Cmp.TYPE_genm_gen_crl);
+          checkPermission(requestor, PermissionConstants.GEN_CRL);
+          X509CRLHolder tmpCrl = ca.generateCrlOnDemand(msgId);
+          if (tmpCrl == null) {
+            return buildErrorMsgPkiBody(rejection, systemFailure,
+                    "CRL generation is not activated");
+          } else {
+            respValue = tmpCrl.toASN1Structure();
+          }
+        } else if (action == XiSecurityConstants.CMP_ACTION_GET_CRL_WITH_SN) {
+          event.addEventType(CaAuditConstants.Cmp.TYPE_genm_crl4number);
+          checkPermission(requestor, PermissionConstants.GET_CRL);
 
-            respValue = ca.getBcCrl(ASN1Integer.getInstance(reqValue).getPositiveValue());
-            if (respValue == null) {
-              String statusMessage = "no CRL is available";
-              return buildErrorMsgPkiBody(PKIStatus.rejection,
-                  PKIFailureInfo.systemFailure, statusMessage);
+          respValue = ca.getBcCrl(ASN1Integer.getInstance(reqValue).getPositiveValue());
+          if (respValue == null) {
+            return buildErrorMsgPkiBody(rejection, systemFailure, "no CRL is available");
+          }
+        } else if (action == XiSecurityConstants.CMP_ACTION_GET_CAINFO) {
+          event.addEventType(CaAuditConstants.Cmp.TYPE_genm_cainfo);
+          Set<Integer> acceptVersions = new HashSet<>();
+          if (reqValue != null) {
+            ASN1Sequence seq = DERSequence.getInstance(reqValue);
+            int size = seq.size();
+            for (int i = 0; i < size; i++) {
+              ASN1Integer ai = ASN1Integer.getInstance(seq.getObjectAt(i));
+              acceptVersions.add(ai.getPositiveValue().intValue());
             }
-            break;
-          case XiSecurityConstants.CMP_ACTION_GET_CAINFO:
-            event.addEventType(CaAuditConstants.Cmp.TYPE_genm_cainfo);
-            Set<Integer> acceptVersions = new HashSet<>();
-            if (reqValue != null) {
-              ASN1Sequence seq = DERSequence.getInstance(reqValue);
-              int size = seq.size();
-              for (int i = 0; i < size; i++) {
-                ASN1Integer ai = ASN1Integer.getInstance(seq.getObjectAt(i));
-                acceptVersions.add(ai.getPositiveValue().intValue());
-              }
-            }
+          }
 
-            if (CollectionUtil.isEmpty(acceptVersions)) {
-              acceptVersions.add(3);
-            }
+          if (CollectionUtil.isEmpty(acceptVersions)) {
+            acceptVersions.add(3);
+          }
 
-            String systemInfo = getSystemInfo(requestor, acceptVersions);
-            respValue = new DERUTF8String(systemInfo);
-            break;
-          case XiSecurityConstants.CMP_ACTION_CACERTCHAIN:
-            event.addEventType(CaAuditConstants.Cmp.TYPE_genm_cacertchain);
-            ASN1EncodableVector vec = new ASN1EncodableVector();
-            vec.add(ca.getCaInfo().getCertInCmpFormat());
-            List<X509Cert> certchain = ca.getCaInfo().getCertchain();
-            if (CollectionUtil.isNotEmpty(certchain)) {
-              for (X509Cert m : certchain) {
-                vec.add(m.toBcCert().toASN1Structure());
-              }
+          String systemInfo = getSystemInfo(requestor, acceptVersions);
+          respValue = new DERUTF8String(systemInfo);
+        } else if (action == XiSecurityConstants.CMP_ACTION_CACERTCHAIN) {
+          event.addEventType(CaAuditConstants.Cmp.TYPE_genm_cacertchain);
+          ASN1EncodableVector vec = new ASN1EncodableVector();
+          vec.add(ca.getCaInfo().getCertInCmpFormat());
+          List<X509Cert> certchain = ca.getCaInfo().getCertchain();
+          if (CollectionUtil.isNotEmpty(certchain)) {
+            for (X509Cert m : certchain) {
+              vec.add(m.toBcCert().toASN1Structure());
             }
-            respValue = new DERSequence(vec);
-            break;
-          default:
-            return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
-                "unsupported XiPKI action code " + action);
-        } // end switch (action)
+          }
+          respValue = new DERSequence(vec);
+        } else {
+          return buildErrorMsgPkiBody(rejection, badRequest,
+                  "unsupported XiPKI action code " + action);
+        }
 
         ASN1EncodableVector vec = new ASN1EncodableVector();
         vec.add(asn1Code);
@@ -2019,104 +1192,12 @@ public class CmpResponder extends BaseCmpResponder {
       failureInfo = getPKiFailureInfo(ex);
       ErrorCode code = ex.getErrorCode();
 
-      String errorMessage;
-      switch (code) {
-        case DATABASE_FAILURE:
-        case SYSTEM_FAILURE:
-          errorMessage = code.name();
-          break;
-        default:
-          errorMessage = code.name() + ": " + ex.getErrorMessage();
-          break;
-      } // end switch code
+      String errorMessage =
+          (code == ErrorCode.DATABASE_FAILURE || code == ErrorCode.SYSTEM_FAILURE)
+          ? code.name() : code.name() + ": " + ex.getErrorMessage();
 
-      return buildErrorMsgPkiBody(PKIStatus.rejection, failureInfo, errorMessage);
+      return buildErrorMsgPkiBody(rejection, failureInfo, errorMessage);
     }
   } // method cmpGeneralMsg
-
-  public CertificateList getCrl(CmpRequestorInfo requestor, BigInteger crlNumber)
-      throws OperationException {
-    notNull(requestor, "requestor");
-    try {
-      checkPermission(requestor, PermissionConstants.GET_CRL);
-    } catch (InsuffientPermissionException ex) {
-      throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
-    }
-    X509Ca ca = getCa();
-    return (crlNumber == null) ? ca.getBcCurrentCrl() : ca.getBcCrl(crlNumber);
-  }
-
-  public X509CRLHolder generateCrlOnDemand(CmpRequestorInfo requestor, RequestType reqType,
-      String msgId)
-          throws OperationException {
-    notNull(requestor, "requestor");
-    try {
-      checkPermission(requestor, PermissionConstants.GEN_CRL);
-    } catch (InsuffientPermissionException ex) {
-      throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
-    }
-
-    return getCa().generateCrlOnDemand(msgId);
-  }
-
-  public void revokeCert(CmpRequestorInfo requestor, BigInteger serialNumber, CrlReason reason,
-      Date invalidityDate, RequestType reqType, String msgId)
-          throws OperationException {
-    notNull(requestor, "requestor");
-
-    int permission;
-    if (reason == CrlReason.REMOVE_FROM_CRL) {
-      permission = PermissionConstants.UNREVOKE_CERT;
-    } else {
-      permission = PermissionConstants.REVOKE_CERT;
-    }
-    try {
-      checkPermission(requestor, permission);
-    } catch (InsuffientPermissionException ex) {
-      throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
-    }
-
-    X509Ca ca = getCa();
-    Object returnedObj;
-    if (PermissionConstants.UNREVOKE_CERT == permission) {
-      // unrevoke
-      returnedObj = ca.unrevokeCert(serialNumber, msgId);
-    } else {
-      returnedObj = ca.revokeCert(serialNumber, reason, invalidityDate, msgId);
-    } // end if (permission)
-
-    if (returnedObj == null) {
-      throw new OperationException(ErrorCode.UNKNOWN_CERT, "cert not exists");
-    }
-  }
-
-  public void removeCert(CmpRequestorInfo requestor, BigInteger serialNumber, RequestType reqType,
-      String msgId)
-          throws OperationException {
-    notNull(requestor, "requestor");
-    try {
-      checkPermission(requestor, PermissionConstants.REMOVE_CERT);
-    } catch (InsuffientPermissionException ex) {
-      throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
-    }
-
-    CertWithDbId returnedObj = getCa().removeCert(serialNumber, msgId);
-    if (returnedObj == null) {
-      throw new OperationException(ErrorCode.UNKNOWN_CERT, "cert not exists");
-    }
-  }
-
-  private static PKIBody buildErrorMsgPkiBody(PKIStatus pkiStatus, int failureInfo,
-      String statusMessage) {
-    PKIFreeText pkiStatusMsg = (statusMessage == null) ? null : new PKIFreeText(statusMessage);
-    ErrorMsgContent emc = new ErrorMsgContent(
-        new PKIStatusInfo(pkiStatus, pkiStatusMsg, new PKIFailureInfo(failureInfo)));
-    return new PKIBody(PKIBody.TYPE_ERROR, emc);
-  }
-
-  private CertResponse buildErrorCertResponse(ASN1Integer certReqId, int pkiFailureInfo,
-      String pkiStatusText) {
-    return new CertResponse(certReqId, generateRejectionStatus(pkiFailureInfo, pkiStatusText));
-  }
 
 }

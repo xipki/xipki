@@ -83,6 +83,11 @@ public class AuditEvent {
     return name;
   }
 
+  public void update(AuditLevel level, AuditStatus status) {
+    this.level = level;
+    this.status = status;
+  }
+
   public void setName(String name) {
     this.name = name;
   }
