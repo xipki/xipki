@@ -1,6 +1,0 @@
-112K  ./ca-server/src/main/java/org/xipki/ca/server/CaManagerImpl.java
-92K  ./ca-server/src/main/java/org/xipki/ca/server/X509Ca.java
-80K  ./ca-server/src/main/java/org/xipki/ca/server/cmp/CmpResponder.java
-72K  ./ca-server/src/main/java/org/xipki/ca/server/CertStore.java
-72K  ./ca-server/src/main/java/org/xipki/ca/server/CaManagerQueryExecutor.java
-
