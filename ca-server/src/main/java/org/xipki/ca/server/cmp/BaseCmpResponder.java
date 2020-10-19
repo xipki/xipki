@@ -602,15 +602,15 @@ abstract class BaseCmpResponder {
         if (pr == ProtectionResult.SIGNATURE_VALID || pr == ProtectionResult.MAC_VALID) {
           errorStatus = null;
         } else if (pr == ProtectionResult.SIGNATURE_INVALID) {
-          errorStatus = "request is private by signature but invalid";
+          errorStatus = "request is protected by signature but invalid";
         } else if (pr == ProtectionResult.MAC_INVALID) {
-          errorStatus = "request is private by MAC but invalid";
+          errorStatus = "request is protected by MAC but invalid";
         } else if (pr == ProtectionResult.SENDER_NOT_AUTHORIZED) {
-          errorStatus = "request isprivate but the requestor is not authorized";
+          errorStatus = "request is protected but the requestor is not authorized";
         } else if (pr == ProtectionResult.SIGNATURE_ALGO_FORBIDDEN) {
-          errorStatus = "request is private by signature but the algorithm is forbidden";
+          errorStatus = "request is protected by signature but the algorithm is forbidden";
         } else if (pr == ProtectionResult.MAC_ALGO_FORBIDDEN) {
-          errorStatus = "request is private by MAC but the algorithm is forbidden";
+          errorStatus = "request is protected by MAC but the algorithm is forbidden";
         } else {
           throw new IllegalStateException("should not reach here, unknown ProtectionResult " + pr);
         }
@@ -658,7 +658,7 @@ abstract class BaseCmpResponder {
     if (isProtected) {
       resp = addProtection(resp, event, requestor);
     } else {
-      // private by TLS connection
+      // protected by TLS connection
     }
 
     return resp;
