@@ -399,4 +399,21 @@ public class CaUtil {
     }
   } // method parseCert
 
+  // remove the RDNs with empty content
+  public static X500Name removeEmptyRdns(X500Name name) {
+    RDN[] rdns = name.getRDNs();
+    List<RDN> tmpRdns = new ArrayList<>(rdns.length);
+    boolean changed = false;
+    for (RDN rdn : rdns) {
+      String textValue = X509Util.rdnValueToString(rdn.getFirst().getValue());
+      if (StringUtil.isBlank(textValue)) {
+        changed = true;
+      } else {
+        tmpRdns.add(rdn);
+      }
+    }
+
+    return changed ? new X500Name(tmpRdns.toArray(new RDN[0])) : name;
+  } // method removeEmptyRdns
+
 }
