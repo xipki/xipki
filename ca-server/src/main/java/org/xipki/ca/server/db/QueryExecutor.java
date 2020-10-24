@@ -63,7 +63,7 @@ class QueryExecutor {
         ColumnType type = ColumnType.STRING;
         if (resultColumns != null) {
           for (SqlColumn3 c3 : resultColumns) {
-            if (label.equalsIgnoreCase(label)) {
+            if (label.equalsIgnoreCase(c3.label)) {
               type = c3.type();
               break;
             }
@@ -245,15 +245,15 @@ class QueryExecutor {
     return datasource.buildSelectFirstSql(1, orderBy, coreSql);
   }
 
-  protected static SqlColumn colBool(String name, boolean value) {
+  protected static SqlColumn colBool(String name, Boolean value) {
     return new SqlColumn(ColumnType.BOOL, name, value);
   }
 
-  protected static SqlColumn colInt(String name, int value) {
+  protected static SqlColumn colInt(String name, Integer value) {
     return new SqlColumn(ColumnType.INT, name, value);
   }
 
-  protected static SqlColumn colLong(String name, long value) {
+  protected static SqlColumn colLong(String name, Long value) {
     return new SqlColumn(ColumnType.LONG, name, value);
   }
 
@@ -266,15 +266,15 @@ class QueryExecutor {
     return new SqlColumn(ColumnType.STRING, name, value, sensitive, signerConf);
   }
 
-  protected static SqlColumn2 col2Bool(boolean value) {
+  protected static SqlColumn2 col2Bool(Boolean value) {
     return new SqlColumn2(ColumnType.BOOL, value);
   }
 
-  protected static SqlColumn2 col2Int(int value) {
+  protected static SqlColumn2 col2Int(Integer value) {
     return new SqlColumn2(ColumnType.INT, value);
   }
 
-  protected static SqlColumn2 col2Long(long value) {
+  protected static SqlColumn2 col2Long(Long value) {
     return new SqlColumn2(ColumnType.LONG, value);
   }
 

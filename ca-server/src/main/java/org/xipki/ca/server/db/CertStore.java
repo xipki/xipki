@@ -769,7 +769,7 @@ public class CertStore extends CertStoreBase {
     notNulls(serial, "serial", idNameMap, "idNameMap");
 
     ResultRow rs = execQuery1PrepStmt0(sqlCertWithRevInfo,
-        col3s(COL3_PID, COL3_RID, COL3_REV, COL3_RR, COL3_RT, COL3_RIT),
+        col3s(COL3_ID, COL3_PID, COL3_RID, COL3_REV, COL3_RR, COL3_RT, COL3_RIT),
         col2Int(caId), col2Str(serial.toString(16)));
     if (rs == null) {
       return null;
