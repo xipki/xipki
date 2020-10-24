@@ -25,6 +25,7 @@ import static org.xipki.cmpclient.internal.CmpAgentUtil.parse;
 import static org.xipki.util.Args.notBlank;
 import static org.xipki.util.Args.notNull;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -223,7 +224,26 @@ class CmpAgent {
     httpUrlConnection.setRequestMethod("POST");
     httpUrlConnection.setRequestProperty("Content-Type", CMP_REQUEST_MIMETYPE);
     httpUrlConnection.setRequestProperty("Content-Length", java.lang.Integer.toString(size));
-    OutputStream outputstream = httpUrlConnection.getOutputStream();
+    OutputStream outputstream = null;
+
+    for (int i = 0; i < 3; i++) {
+      try {
+        outputstream = httpUrlConnection.getOutputStream();
+        break;
+      } catch (EOFException ex) {
+        if (i == 2) {
+          throw ex;
+        } else {
+          // wait for 200 ms
+          try {
+            Thread.sleep(200);
+          } catch (InterruptedException ex2) {
+            // do nothing
+          }
+        }
+      }
+    }
+
     outputstream.write(request);
     outputstream.flush();
 
