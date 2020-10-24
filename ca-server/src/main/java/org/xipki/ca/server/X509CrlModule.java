@@ -63,6 +63,7 @@ import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.mgmt.CrlControl;
 import org.xipki.ca.api.mgmt.CrlControl.HourMinute;
 import org.xipki.ca.server.db.CertStore;
+import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.CrlReason;

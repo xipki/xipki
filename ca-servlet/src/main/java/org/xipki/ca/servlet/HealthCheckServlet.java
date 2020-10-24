@@ -27,8 +27,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.server.CaManagerImpl;
 import org.xipki.ca.server.cmp.CmpResponder;
+import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.util.Args;
 import org.xipki.util.HealthCheckResult;
 import org.xipki.util.HttpConstants;

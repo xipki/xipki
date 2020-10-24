@@ -54,6 +54,7 @@ import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.PermissionConstants;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.server.cmp.CmpResponder;
+import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.security.CrlReason;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;

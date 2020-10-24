@@ -47,7 +47,7 @@ public class IdentifiedCertPublisher implements Closeable {
 
   private final CertPublisher certPublisher;
 
-  IdentifiedCertPublisher(PublisherEntry entry, CertPublisher certPublisher) {
+  public IdentifiedCertPublisher(PublisherEntry entry, CertPublisher certPublisher) {
     this.entry = notNull(entry, "entry");
     this.certPublisher = notNull(certPublisher, "certPublisher");
   }

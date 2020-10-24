@@ -63,6 +63,7 @@ import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.mgmt.ScepControl;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.server.db.CertStore.KnowCertResult;
+import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.scep.message.CaCaps;
 import org.xipki.scep.message.DecodedPkiMessage;
 import org.xipki.scep.message.EnvelopedDataDecryptor;

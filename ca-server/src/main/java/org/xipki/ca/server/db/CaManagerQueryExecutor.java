@@ -63,7 +63,6 @@ import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.api.mgmt.entry.UserEntry;
 import org.xipki.ca.server.CaIdNameMap;
 import org.xipki.ca.server.CaInfo;
-import org.xipki.ca.server.CaManagerImpl;
 import org.xipki.ca.server.CaUtil;
 import org.xipki.ca.server.IdentifiedCertPublisher;
 import org.xipki.ca.server.IdentifiedCertprofile;
@@ -71,6 +70,7 @@ import org.xipki.ca.server.PasswordHash;
 import org.xipki.ca.server.RequestorEntryWrapper;
 import org.xipki.ca.server.SignerEntryWrapper;
 import org.xipki.ca.server.db.CertStore.SystemEvent;
+import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
@@ -814,12 +814,12 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   } // method commitNextCrlNoIfLess
 
   public IdentifiedCertprofile changeCertprofile(NameId nameId, String type, String conf,
-      CaManagerImpl caManager) throws CaMgmtException {
+      CaManagerImpl certprofileManager) throws CaMgmtException {
     CertprofileEntry currentDbEntry = createCertprofile(nameId.getName());
     CertprofileEntry newDbEntry = new CertprofileEntry(currentDbEntry.getIdent(),
         str(type, currentDbEntry.getType()), str(conf, currentDbEntry.getConf()));
 
-    IdentifiedCertprofile profile = caManager.createCertprofile(newDbEntry);
+    IdentifiedCertprofile profile = certprofileManager.createCertprofile(newDbEntry);
     if (profile == null) {
       throw new CaMgmtException("could not create certprofile object");
     }
@@ -865,9 +865,9 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   } // method changeRequestor
 
   public SignerEntryWrapper changeSigner(String name, String type, String conf, String base64Cert,
-      CaManagerImpl caManager, SecurityFactory securityFactory) throws CaMgmtException {
+      CaManagerImpl signerManager, SecurityFactory securityFactory) throws CaMgmtException {
     notBlank(name, "name");
-    notNull(caManager, "caManager");
+    notNull(signerManager, "signerManager");
 
     SignerEntry dbEntry = createSigner(name);
     String tmpType = (type == null ? dbEntry.getType() : type);
@@ -878,7 +878,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     SignerEntry newDbEntry = new SignerEntry(name, tmpType,
         (conf == null ? dbEntry.getConf() : conf),
         (base64Cert == null ? dbEntry.getBase64Cert() : base64Cert));
-    SignerEntryWrapper responder = caManager.createSigner(newDbEntry);
+    SignerEntryWrapper responder = signerManager.createSigner(newDbEntry);
 
     changeIfNotNull("SIGNER", colStr("NAME", name), colStr("TYPE", type),
         colStr("CERT", base64Cert), colStr("CONF", conf, false, true));
@@ -886,15 +886,15 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   } // method changeSigner
 
   public IdentifiedCertPublisher changePublisher(String name, String type, String conf,
-      CaManagerImpl caManager) throws CaMgmtException {
+      CaManagerImpl publisherManager) throws CaMgmtException {
     notBlank(name, "name");
-    notNull(caManager, "caManager");
+    notNull(publisherManager, "publisherManager");
 
     PublisherEntry currentDbEntry = createPublisher(name);
     PublisherEntry dbEntry = new PublisherEntry(currentDbEntry.getIdent(),
         (type == null ? currentDbEntry.getType() : type),
         (conf == null ? currentDbEntry.getConf() : conf));
-    IdentifiedCertPublisher publisher = caManager.createPublisher(dbEntry);
+    IdentifiedCertPublisher publisher = publisherManager.createPublisher(dbEntry);
 
     changeIfNotNull("PUBLISHER", colStr("NAME", name), colStr("TYPE", type), colStr("CONF", conf));
     return publisher;

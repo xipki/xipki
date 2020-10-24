@@ -102,7 +102,7 @@ public class IdentifiedCertprofile implements Closeable {
   private final CertprofileEntry dbEntry;
   private final Certprofile certprofile;
 
-  IdentifiedCertprofile(CertprofileEntry dbEntry, Certprofile certprofile)
+  public IdentifiedCertprofile(CertprofileEntry dbEntry, Certprofile certprofile)
       throws CertprofileException {
     this.dbEntry = notNull(dbEntry, "dbEntry");
     this.certprofile = notNull(certprofile, "certprofile");

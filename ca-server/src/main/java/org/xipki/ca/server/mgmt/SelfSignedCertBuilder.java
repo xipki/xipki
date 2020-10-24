@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.server;
+package org.xipki.ca.server.mgmt;
 
 import static org.xipki.util.Args.notBlank;
 import static org.xipki.util.Args.notNull;
@@ -49,6 +49,7 @@ import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
+import org.xipki.ca.server.IdentifiedCertprofile;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.NoIdleSignerException;

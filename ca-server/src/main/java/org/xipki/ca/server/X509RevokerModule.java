@@ -37,6 +37,7 @@ import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.server.db.CertStore;
+import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.util.CollectionUtil;
