@@ -96,6 +96,10 @@ public final class CmpClientImpl implements CmpClient {
     configurer.setSecurityFactory(securityFactory);
   }
 
+  public void setConfFile(String confFile) {
+    configurer.setConfFile(confFile);
+  }
+
   private void initIfNotInitialized()
       throws CmpClientException {
     configurer.initIfNotInitialized();
