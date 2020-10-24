@@ -49,6 +49,7 @@ import org.xipki.audit.AuditStatus;
 import org.xipki.audit.PciAuditEvent;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
+import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.mgmt.CaManager;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaStatus;
@@ -796,7 +797,12 @@ public class CaManagerImpl implements CaManager, Closeable {
     ca2Manager.commitNextCrlNo(ca, nextCrlNo);
   }
 
-  public RequestorInfo.ByUserRequestorInfo createByUserRequestor(CaHasUserEntry caHasUser) {
+  public RequestorInfo.ByUserRequestorInfo createByUserRequestor(CaHasUserEntry caHasUser)
+      throws OperationException {
+    if (byUserRequestorId == null) {
+      throw new OperationException(ErrorCode.SYSTEM_UNAVAILABLE,
+          "CA system has not been initialized yet");
+    }
     return new RequestorInfo.ByUserRequestorInfo(byUserRequestorId, caHasUser);
   }
 
