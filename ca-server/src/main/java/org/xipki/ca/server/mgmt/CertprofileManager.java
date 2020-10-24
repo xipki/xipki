@@ -37,10 +37,9 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
 
 /**
- * Manages the CA system.
+ * Manages the certificate profiles.
  *
  * @author Lijun Liao
- * @since 2.0.0
  */
 
 class CertprofileManager {

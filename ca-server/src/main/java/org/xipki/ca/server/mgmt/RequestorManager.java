@@ -39,10 +39,9 @@ import org.xipki.password.PasswordResolverException;
 import org.xipki.util.StringUtil;
 
 /**
- * Manages the CA system.
+ * Manages the requestors.
  *
  * @author Lijun Liao
- * @since 2.0.0
  */
 
 class RequestorManager {

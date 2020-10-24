@@ -84,10 +84,9 @@ import org.xipki.util.ObjectCreationException;
 import org.xipki.util.http.SslContextConf;
 
 /**
- * Manages the CA system.
+ * Manages the CAs.
  *
  * @author Lijun Liao
- * @since 2.0.0
  */
 
 class Ca2Manager {

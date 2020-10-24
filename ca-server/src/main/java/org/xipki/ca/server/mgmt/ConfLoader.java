@@ -75,10 +75,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 
 /**
- * Manages the CA system.
+ * Load / export CA configuration.
  *
  * @author Lijun Liao
- * @since 2.0.0
  */
 
 class ConfLoader {

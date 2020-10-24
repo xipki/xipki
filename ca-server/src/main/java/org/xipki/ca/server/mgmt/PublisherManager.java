@@ -46,7 +46,7 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
 
 /**
- * Manages the CA system.
+ * Manages the publishers.
  *
  * @author Lijun Liao
  * @since 2.0.0

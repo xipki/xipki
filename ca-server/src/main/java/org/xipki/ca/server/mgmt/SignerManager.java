@@ -33,10 +33,9 @@ import org.xipki.ca.server.SignerEntryWrapper;
 import org.xipki.util.ObjectCreationException;
 
 /**
- * Manages the CA system.
+ * Manages the signers.
  *
  * @author Lijun Liao
- * @since 2.0.0
  */
 
 class SignerManager {
