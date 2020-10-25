@@ -42,38 +42,6 @@ import org.xipki.security.util.X509Util;
  */
 public class CertStoreBase extends QueryExecutor {
 
-  protected static final SqlColumn3 COL3_ID = col3Long("ID");
-
-  protected static final SqlColumn3 COL3_PID = col3Int("PID");
-
-  protected static final SqlColumn3 COL3_RID = col3Int("RID");
-
-  protected static final SqlColumn3 COL3_REV = col3Bool("REV");
-
-  protected static final SqlColumn3 COL3_RR  = col3Int("RR");
-
-  protected static final SqlColumn3 COL3_RT  = col3Long("RT");
-
-  protected static final SqlColumn3 COL3_RIT = col3Long("RIT");
-
-  protected static final SqlColumn3 COL3_REQ_ID = col3Long("REQ_ID");
-
-  protected static final SqlColumn3 COL3_NBEFORE = col3Long("NBEFORE");
-
-  protected static final SqlColumn3 COL3_NAFTER = col3Long("NAFTER");
-
-  protected static final SqlColumn3 COL3_UID = col3Int("UID");
-
-  protected static final SqlColumn3 COL3_CID = col3Int("CID");
-
-  protected static final SqlColumn3 COL3_THISUPDATE = col3Long("THISUPDATE");
-
-  protected static final SqlColumn3 COL3_NEXTUPDATE = col3Long("NEXTUPDATE");
-
-  protected static final SqlColumn3 COL3_CRL_NO = col3Long("CRL_NO");
-
-  protected static final SqlColumn3 COL3_PERMISSION = col3Int("PERMISSION");
-
   protected static final String SQL_ADD_CERT =
       "INSERT INTO CERT (ID,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,PID,"
       + "CA_ID,RID,UID,EE,RTYPE,TID,SHA1,REQ_SUBJECT,CRL_SCOPE,CERT)"
@@ -128,21 +96,17 @@ public class CertStoreBase extends QueryExecutor {
     this.maxX500nameLen = Integer.parseInt(dbSchemaInfo.variableValue("X500NAME_MAXLEN"));
   } // constructor
 
-  protected static SqlColumn3[] col3s(SqlColumn3... cols) {
-    return cols;
-  }
-
-  protected static CertRevocationInfo buildCertRevInfo(ResultRow rs) {
-    boolean revoked = rs.getBoolean("REV");
+  protected static CertRevocationInfo buildCertRevInfo(ResultRow rs) throws OperationException {
+    boolean revoked = getBoolean(rs, "REV");
     if (!revoked) {
       return null;
     }
 
-    long revTime    = rs.getLong("RT");
-    long revInvTime = rs.getLong("RIT");
+    long revTime    = getLong(rs, "RT");
+    long revInvTime = getLong(rs, "RIT");
 
     Date invalidityTime = (revInvTime == 0) ? null : new Date(revInvTime * 1000);
-    return new CertRevocationInfo(rs.getInt("RR"), new Date(revTime * 1000), invalidityTime);
+    return new CertRevocationInfo(getInt(rs, "RR"), new Date(revTime * 1000), invalidityTime);
   }
 
   protected long getMax(String table, String column) throws OperationException {
@@ -171,30 +135,28 @@ public class CertStoreBase extends QueryExecutor {
     }
   }
 
-  protected List<ResultRow> execQueryStmt0(String sql, SqlColumn3[] resultColumns)
+  protected List<ResultRow> execQueryStmt0(String sql)
       throws OperationException {
     try {
-      return execQueryStmt(sql, resultColumns);
+      return execQueryStmt(sql);
     } catch (DataAccessException ex) {
       throw new OperationException(ErrorCode.DATABASE_FAILURE, ex);
     }
   }
 
-  protected ResultRow execQuery1PrepStmt0(
-      String sql, SqlColumn3[] resultColumns, SqlColumn2... params)
+  protected ResultRow execQuery1PrepStmt0(String sql, SqlColumn2... params)
       throws OperationException {
     try {
-      return execQuery1PrepStmt(sql, resultColumns, params);
+      return execQuery1PrepStmt(sql, params);
     } catch (DataAccessException ex) {
       throw new OperationException(ErrorCode.DATABASE_FAILURE, ex);
     }
   }
 
-  protected List<ResultRow> execQueryPrepStmt0(
-      String sql, SqlColumn3[] resultColumns, SqlColumn2... params)
+  protected List<ResultRow> execQueryPrepStmt0(String sql, SqlColumn2... params)
       throws OperationException {
     try {
-      return execQueryPrepStmt(sql, resultColumns, params);
+      return execQueryPrepStmt(sql, params);
     } catch (DataAccessException ex) {
       throw new OperationException(ErrorCode.DATABASE_FAILURE, ex);
     }
@@ -247,6 +209,30 @@ public class CertStoreBase extends QueryExecutor {
       return X509Util.parseCert(encodedCert);
     } catch (CertificateException ex) {
       throw new OperationException(SYSTEM_FAILURE, ex);
+    }
+  }
+
+  protected static boolean getBoolean(ResultRow rs, String label) throws OperationException {
+    try {
+      return rs.getBoolean(label);
+    } catch (SQLException ex) {
+      throw new OperationException(DATABASE_FAILURE, ex);
+    }
+  }
+
+  protected static int getInt(ResultRow rs, String label) throws OperationException {
+    try {
+      return rs.getInt(label);
+    } catch (SQLException ex) {
+      throw new OperationException(DATABASE_FAILURE, ex);
+    }
+  }
+
+  protected static long getLong(ResultRow rs, String label) throws OperationException {
+    try {
+      return rs.getLong(label);
+    } catch (SQLException ex) {
+      throw new OperationException(DATABASE_FAILURE, ex);
     }
   }
 

@@ -557,12 +557,11 @@ public class CertStore extends CertStoreBase {
       cacheSqlCidFromPublishQueue.put(numEntries, sql);
     }
 
-    List<ResultRow> rows = execQueryPrepStmt0(sql, col3s(COL3_CID),
-        col2Int(publisher.getId()), col2Int(ca.getId()));
+    List<ResultRow> rows = execQueryPrepStmt0(sql, col2Int(publisher.getId()), col2Int(ca.getId()));
 
     List<Long> ret = new ArrayList<>();
     for (ResultRow rs : rows) {
-      long certId = rs.getLong("CID");
+      long certId = getLong(rs, "CID");
       if (!ret.contains(certId)) {
         ret.add(certId);
       }
@@ -629,11 +628,11 @@ public class CertStore extends CertStoreBase {
 
   private List<SerialWithId> getSerialWithIds(String sql, int numEntries, SqlColumn2... params)
       throws OperationException {
-    List<ResultRow> rows = execQueryPrepStmt0(sql, col3s(COL3_ID), params);
+    List<ResultRow> rows = execQueryPrepStmt0(sql, params);
 
     List<SerialWithId> ret = new ArrayList<>();
     for (ResultRow rs : rows) {
-      ret.add(new SerialWithId(rs.getLong("ID"), new BigInteger(rs.getString("SN"), 16)));
+      ret.add(new SerialWithId(getLong(rs, "ID"), new BigInteger(rs.getString("SN"), 16)));
       if (ret.size() >= numEntries) {
         break;
       }
@@ -674,7 +673,7 @@ public class CertStore extends CertStoreBase {
 
   private List<BigInteger> getSerialNumbers0(String sql, int numEntries, SqlColumn2... params)
       throws OperationException {
-    List<ResultRow> rows = execQueryPrepStmt0(sql, null, params);
+    List<ResultRow> rows = execQueryPrepStmt0(sql, params);
     List<BigInteger> ret = new ArrayList<>();
     for (ResultRow row : rows) {
       ret.add(new BigInteger(row.getString("SN"), 16));
@@ -688,13 +687,13 @@ public class CertStore extends CertStoreBase {
   public byte[] getEncodedCrl(NameId ca) throws OperationException {
     notNull(ca, "ca");
 
-    List<ResultRow> rows = execQueryPrepStmt0(sqlCrl, col3s(COL3_THISUPDATE), col2Int(ca.getId()));
+    List<ResultRow> rows = execQueryPrepStmt0(sqlCrl, col2Int(ca.getId()));
     long currentThisUpdate = 0;
 
     String b64Crl = null;
     // iterate all entries to make sure that the latest CRL will be returned
     for (ResultRow rs : rows) {
-      long thisUpdate = rs.getLong("THISUPDATE");
+      long thisUpdate = getLong(rs, "THISUPDATE");
       if (thisUpdate >= currentThisUpdate) {
         b64Crl = rs.getString("CRL");
         currentThisUpdate = thisUpdate;
@@ -724,9 +723,9 @@ public class CertStore extends CertStoreBase {
     List<Long> crlNumbers = new LinkedList<>();
 
     List<ResultRow> rows = execQueryPrepStmt0("SELECT CRL_NO FROM CRL WHERE CA_ID=? AND DELTACRL=?",
-        col3s(COL3_CRL_NO), col2Int(ca.getId()), col2Bool(false));
+        col2Int(ca.getId()), col2Bool(false));
     for (ResultRow rs : rows) {
-      crlNumbers.add(rs.getLong("CRL_NO"));
+      crlNumbers.add(getLong(rs, "CRL_NO"));
     }
 
     int size = crlNumbers.size();
@@ -738,8 +737,7 @@ public class CertStore extends CertStoreBase {
     }
 
     long crlNumber = crlNumbers.get(numCrlsToDelete - 1);
-    execUpdatePrepStmt0("DELETE FROM CRL WHERE CA_ID=? AND CRL_NO<?",
-        col2Int(ca.getId()), col2Long(crlNumber + 1));
+    execUpdatePrepStmt0("DELETE FROM CRL WHERE CA_ID=? AND CRL_NO<?", col2Long(crlNumber + 1));
 
     return numCrlsToDelete;
   } // method cleanupCrls
@@ -748,9 +746,7 @@ public class CertStore extends CertStoreBase {
       CaIdNameMap idNameMap) throws OperationException {
     notNulls(ca, "ca", caCert, "caCert", idNameMap, "idNameMap");
 
-    final SqlColumn3[] resultColumns =
-        col3s(COL3_PID, COL3_RID, COL3_REV, COL3_RR, COL3_RT, COL3_RIT);
-    ResultRow rs = execQuery1PrepStmt0(sqlCertForId, resultColumns, col2Long(certId));
+    ResultRow rs = execQuery1PrepStmt0(sqlCertForId, col2Long(certId));
     if (rs == null) {
       return null;
     }
@@ -759,7 +755,7 @@ public class CertStore extends CertStoreBase {
     CertWithDbId certWithMeta = new CertWithDbId(cert);
     certWithMeta.setCertId(certId);
     CertificateInfo certInfo = new CertificateInfo(certWithMeta, null, ca, caCert,
-        idNameMap.getCertprofile(rs.getInt("PID")), idNameMap.getRequestor(rs.getInt("RID")));
+        idNameMap.getCertprofile(getInt(rs, "PID")), idNameMap.getRequestor(getInt(rs, "RID")));
     certInfo.setRevocationInfo(buildCertRevInfo(rs));
     return certInfo;
   } // method getCertForId
@@ -769,7 +765,6 @@ public class CertStore extends CertStoreBase {
     notNulls(serial, "serial", idNameMap, "idNameMap");
 
     ResultRow rs = execQuery1PrepStmt0(sqlCertWithRevInfo,
-        col3s(COL3_ID, COL3_PID, COL3_RID, COL3_REV, COL3_RR, COL3_RT, COL3_RIT),
         col2Int(caId), col2Str(serial.toString(16)));
     if (rs == null) {
       return null;
@@ -777,10 +772,10 @@ public class CertStore extends CertStoreBase {
 
     X509Cert cert = parseCert(Base64.decodeFast(rs.getString("CERT")));
     CertWithDbId certWithMeta = new CertWithDbId(cert);
-    certWithMeta.setCertId(rs.getLong("ID"));
+    certWithMeta.setCertId(getLong(rs, "ID"));
 
     CertWithRevocationInfo ret = new CertWithRevocationInfo();
-    ret.setCertprofile(idNameMap.getCertprofileName(rs.getInt("PID")));
+    ret.setCertprofile(idNameMap.getCertprofileName(getInt(rs, "PID")));
     ret.setCert(certWithMeta);
     ret.setRevInfo(buildCertRevInfo(rs));
     return ret;
@@ -791,7 +786,6 @@ public class CertStore extends CertStoreBase {
     notNulls(ca, "ca", caCert, "caCert", idNameMap, "idNameMap", serial, "serial");
 
     ResultRow rs = execQuery1PrepStmt0(sqlCertInfo,
-        col3s(COL3_PID, COL3_RID, COL3_REV, COL3_RR, COL3_RT, COL3_RIT),
         col2Int(ca.getId()), col2Str(serial.toString(16)));
     if (rs == null) {
       return null;
@@ -801,8 +795,8 @@ public class CertStore extends CertStoreBase {
     CertWithDbId certWithMeta = new CertWithDbId(parseCert(encodedCert));
 
     CertificateInfo certInfo = new CertificateInfo(certWithMeta, null, ca, caCert,
-        idNameMap.getCertprofile(rs.getInt("PID")),
-        idNameMap.getRequestor(rs.getInt("RID")));
+        idNameMap.getCertprofile(getInt(rs, "PID")),
+        idNameMap.getRequestor(getInt(rs, "RID")));
 
     certInfo.setRevocationInfo(buildCertRevInfo(rs));
     return certInfo;
@@ -810,9 +804,9 @@ public class CertStore extends CertStoreBase {
 
   public Integer getCertprofileForCertId(NameId ca, long cid) throws OperationException {
     notNull(ca, "ca");
-    ResultRow rs = execQuery1PrepStmt0(sqlCertprofileForCertId, col3s(COL3_PID),
+    ResultRow rs = execQuery1PrepStmt0(sqlCertprofileForCertId,
         col2Long(cid), col2Int(ca.getId()));
-    return rs == null ? null : rs.getInt("PID");
+    return rs == null ? null : getInt(rs, "PID");
   } // method getCertprofileForId
 
   /**
@@ -842,7 +836,7 @@ public class CertStore extends CertStoreBase {
     params[idx++] = col2Long(fpSubject);
     params[idx++] = col2Long(fpSubject);
 
-    List<ResultRow> rows = execQueryPrepStmt0(sql, null, params);
+    List<ResultRow> rows = execQueryPrepStmt0(sql, params);
     for (ResultRow rs : rows) {
       certs.add(parseCert(Base64.decodeFast(rs.getString("CERT"))));
     }
@@ -852,14 +846,14 @@ public class CertStore extends CertStoreBase {
   public byte[] getCertRequest(NameId ca, BigInteger serialNumber) throws OperationException {
     notNulls(ca, "ca", serialNumber, "serialNumber");
 
-    ResultRow row = execQuery1PrepStmt0(sqlReqIdForSerial, col3s(COL3_REQ_ID),
+    ResultRow row = execQuery1PrepStmt0(sqlReqIdForSerial,
         col2Int(ca.getId()), col2Str(serialNumber.toString(16)));
 
     if (row == null) {
       return null;
     }
 
-    row = execQuery1PrepStmt0(sqlReqForId, null, col2Long(row.getLong("REQ_ID")));
+    row = execQuery1PrepStmt0(sqlReqForId, null, col2Long(getLong(row, "REQ_ID")));
     return (row == null) ? null : Base64.decodeFast(row.getString("DATA"));
   } // method getCertRequest
 
@@ -925,14 +919,13 @@ public class CertStore extends CertStoreBase {
     }
 
     final String sql = datasource.buildSelectFirstSql(numEntries, sortByStr, sb.toString());
-    List<ResultRow> rows = execQueryPrepStmt0(sql, col3s(COL3_NBEFORE, COL3_NAFTER),
-                            params.toArray(new SqlColumn2[0]));
+    List<ResultRow> rows = execQueryPrepStmt0(sql, params.toArray(new SqlColumn2[0]));
 
     List<CertListInfo> ret = new LinkedList<>();
     for (ResultRow rs : rows) {
       CertListInfo info = new CertListInfo(new BigInteger(rs.getString("SN"), 16),
-          rs.getString("SUBJECT"), new Date(rs.getLong("NBEFORE") * 1000),
-          new Date(rs.getLong("NAFTER") * 1000));
+          rs.getString("SUBJECT"), new Date(getLong(rs, "NBEFORE") * 1000),
+          new Date(getLong(rs, "NAFTER") * 1000));
       ret.add(info);
     }
     return ret;
@@ -941,12 +934,12 @@ public class CertStore extends CertStoreBase {
   public NameId authenticateUser(String user, byte[] password) throws OperationException {
     final String sql = sqlActiveUserInfoForName;
 
-    ResultRow rs = execQuery1PrepStmt0(sql, col3s(col3Int("ID")), col2Str(user));
+    ResultRow rs = execQuery1PrepStmt0(sql, col2Str(user));
     if (rs == null) {
       return null;
     }
 
-    int id = rs.getInt("ID");
+    int id = getInt(rs, "ID");
     String expPasswordText = rs.getString("PASSWORD");
 
     if (StringUtil.isBlank(expPasswordText)) {
@@ -963,8 +956,7 @@ public class CertStore extends CertStoreBase {
   } // method getUsername
 
   public CaHasUserEntry getCaHasUser(NameId ca, NameId user) throws OperationException {
-    ResultRow rs = execQuery1PrepStmt0(sqlCaHasUser, col3s(COL3_PERMISSION),
-                    col2Int(ca.getId()), col2Int(user.getId()));
+    ResultRow rs = execQuery1PrepStmt0(sqlCaHasUser, col2Int(ca.getId()), col2Int(user.getId()));
     if (rs == null) {
       return null;
     }
@@ -973,7 +965,7 @@ public class CertStore extends CertStoreBase {
     Set<String> profiles = (list == null) ? null : new HashSet<>(list);
 
     CaHasUserEntry entry = new CaHasUserEntry(user);
-    entry.setPermission(rs.getInt("PERMISSION"));
+    entry.setPermission(getInt(rs, "PERMISSION"));
     entry.setProfiles(profiles);
     return entry;
   } // method getCaHasUser
@@ -981,9 +973,9 @@ public class CertStore extends CertStoreBase {
   public KnowCertResult knowsCertForSerial(NameId ca, BigInteger serial) throws OperationException {
     notNull(serial, "serial");
 
-    ResultRow rs = execQuery1PrepStmt0(sqlKnowsCertForSerial, col3s(COL3_UID),
+    ResultRow rs = execQuery1PrepStmt0(sqlKnowsCertForSerial,
                     col2Str(serial.toString(16)), col2Int(ca.getId()));
-    return rs == null ? KnowCertResult.UNKNOWN : new KnowCertResult(true, rs.getInt("UID"));
+    return rs == null ? KnowCertResult.UNKNOWN : new KnowCertResult(true, getInt(rs, "UID"));
   } // method knowsCertForSerial
 
   public List<CertRevInfoWithSerial> getRevokedCerts(NameId ca, Date notExpiredAt, long startId,
@@ -998,17 +990,16 @@ public class CertStore extends CertStoreBase {
       cacheSqlRevokedCerts.put(numEntries, sql);
     }
 
-    SqlColumn3[] resultColumns = col3s(COL3_RIT, COL3_ID, COL3_RR, COL3_RT);
-    List<ResultRow> rows = execQueryPrepStmt0(sql, resultColumns,
+    List<ResultRow> rows = execQueryPrepStmt0(sql,
         col2Long(startId - 1), col2Int(ca.getId()), col2Long(notExpiredAt.getTime() / 1000 + 1));
 
     List<CertRevInfoWithSerial> ret = new LinkedList<>();
     for (ResultRow rs : rows) {
-      long revInvalidityTime = rs.getLong("RIT");
+      long revInvalidityTime = getLong(rs, "RIT");
       Date invalidityTime = (revInvalidityTime == 0) ? null : new Date(1000 * revInvalidityTime);
-      CertRevInfoWithSerial revInfo = new CertRevInfoWithSerial(rs.getLong("ID"),
-          new BigInteger(rs.getString("SN"), 16), rs.getInt("RR"), // revReason
-          new Date(1000 * rs.getLong("RT")), invalidityTime);
+      CertRevInfoWithSerial revInfo = new CertRevInfoWithSerial(getLong(rs, "ID"),
+          new BigInteger(rs.getString("SN"), 16), getInt(rs, "RR"), // revReason
+          new Date(1000 * getLong(rs, "RT")), invalidityTime);
       ret.add(revInfo);
     }
 
@@ -1175,16 +1166,16 @@ public class CertStore extends CertStoreBase {
 
   public CertStatus getCertStatusForSubject(NameId ca, X500Name subject) throws OperationException {
     long subjectFp = X509Util.fpCanonicalizedName(subject);
-    ResultRow rs = execQuery1PrepStmt0(sqlCertStatusForSubjectFp, col3s(COL3_REV),
+    ResultRow rs = execQuery1PrepStmt0(sqlCertStatusForSubjectFp,
                     col2Long(subjectFp), col2Int(ca.getId()));
     return (rs == null) ? CertStatus.UNKNOWN
-                        : rs.getBoolean("REV") ? CertStatus.REVOKED : CertStatus.GOOD;
+                        : getBoolean(rs, "REV") ? CertStatus.REVOKED : CertStatus.GOOD;
   } // method getCertStatusForSubjectFp
 
   public boolean isCertForSubjectIssued(NameId ca, long subjectFp) throws OperationException {
     notNull(ca, "ca");
 
-    ResultRow rs = execQuery1PrepStmt0(sqlCertforSubjectIssued, col3s(COL3_ID),
+    ResultRow rs = execQuery1PrepStmt0(sqlCertforSubjectIssued,
                     col2Int(ca.getId()), col2Long(subjectFp));
     return rs != null;
   }

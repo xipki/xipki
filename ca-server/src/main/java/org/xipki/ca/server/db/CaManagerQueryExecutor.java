@@ -26,6 +26,7 @@ import static org.xipki.util.StringUtil.concat;
 
 import java.io.IOException;
 import java.security.cert.CertificateException;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -156,10 +157,9 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
    *            If error occurs.
    */
   public SystemEvent getSystemEvent(String eventName) throws CaMgmtException {
-    SqlColumn3[] resultColumns = {col3Long("EVENT_TIME")};
-    ResultRow rs = execQuery1PrepStmt0(sqlSelectSystemEvent, resultColumns, col2Str(eventName));
+    ResultRow rs = execQuery1PrepStmt0(sqlSelectSystemEvent, col2Str(eventName));
     return (rs == null) ? null
-              : new SystemEvent(eventName, rs.getString("EVENT_OWNER"), rs.getLong("EVENT_TIME"));
+              : new SystemEvent(eventName, rs.getString("EVENT_OWNER"), getLong(rs, "EVENT_TIME"));
   } // method getSystemEvent
 
   private void deleteSystemEvent(String eventName) throws CaMgmtException {
@@ -190,53 +190,48 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   public Map<String, Integer> createCaAliases() throws CaMgmtException {
     Map<String, Integer> map = new HashMap<>();
 
-    SqlColumn3[] resultColumns = {col3Int("CA_ID")};
-    List<ResultRow> rows = execQueryStmt0("SELECT NAME,CA_ID FROM CAALIAS", resultColumns);
+    List<ResultRow> rows = execQueryStmt0("SELECT NAME,CA_ID FROM CAALIAS");
     for (ResultRow m : rows) {
-      map.put(m.getString("NAME"), m.getInt("CA_ID"));
+      map.put(m.getString("NAME"), getInt(m, "CA_ID"));
     }
     return map;
   } // method createCaAliases
 
   public CertprofileEntry createCertprofile(String name) throws CaMgmtException {
-    SqlColumn3[] resultColumns = {col3Int("ID")};
-    ResultRow rs = execQuery1PrepStmt0(sqlSelectProfile, resultColumns, col2Str(name));
+    ResultRow rs = execQuery1PrepStmt0(sqlSelectProfile, col2Str(name));
 
     if (rs == null) {
       throw new CaMgmtException("unknown CA " + name);
     }
 
-    return new CertprofileEntry(new NameId(rs.getInt("ID"), name),
+    return new CertprofileEntry(new NameId(getInt(rs, "ID"), name),
         rs.getString("TYPE"), rs.getString("CONF"));
   } // method createCertprofile
 
   public PublisherEntry createPublisher(String name) throws CaMgmtException {
-    SqlColumn3[] resultColumns = {col3Int("ID")};
-    ResultRow rs = execQuery1PrepStmt0(sqlSelectPublisher, resultColumns, col2Str(name));
+    ResultRow rs = execQuery1PrepStmt0(sqlSelectPublisher, col2Str(name));
 
     if (rs == null) {
       throw new CaMgmtException("unkown Publisher " + name);
     }
 
-    return new PublisherEntry(new NameId(rs.getInt("ID"), name),
+    return new PublisherEntry(new NameId(getInt(rs, "ID"), name),
         rs.getString("TYPE"), rs.getString("CONF"));
   } // method createPublisher
 
   public Integer getRequestorId(String requestorName) throws CaMgmtException {
-    SqlColumn3[] resultColumns = {col3Int("ID")};
-    ResultRow rs = execQuery1PrepStmt0(sqlSelectRequestorId, resultColumns, col2Str(requestorName));
-    return (rs == null) ? null : rs.getInt("ID");
+    ResultRow rs = execQuery1PrepStmt0(sqlSelectRequestorId, col2Str(requestorName));
+    return (rs == null) ? null : getInt(rs, "ID");
   } // method getRequestorId
 
   public RequestorEntry createRequestor(String name) throws CaMgmtException {
-    SqlColumn3[] resultColumns = {col3Int("ID")};
-    ResultRow rs = execQuery1PrepStmt0(sqlSelectRequestor, resultColumns, col2Str(name));
+    ResultRow rs = execQuery1PrepStmt0(sqlSelectRequestor, col2Str(name));
 
     if (rs == null) {
       throw new CaMgmtException("unknown Requestor " + name);
     }
 
-    return new RequestorEntry(new NameId(rs.getInt("ID"), name),
+    return new RequestorEntry(new NameId(getInt(rs, "ID"), name),
         rs.getString("TYPE"), rs.getString("CONF"));
   } // method createRequestor
 
@@ -252,27 +247,23 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
 
   public CaInfo createCaInfo(String name, boolean masterMode, CertStore certstore)
       throws CaMgmtException {
-    SqlColumn3[] resultColumns = {col3Int("SN_SIZE"), col3Int("ID"), col3Long("NEXT_CRLNO"),
-        col3Int("NUM_CRLS"), col3Int("EXPIRATION_PERIOD"), col3Int("KEEP_EXPIRED_CERT_DAYS"),
-        col3Int("SAVE_REQ"), col3Int("PERMISSION")};
-
-    ResultRow rs = execQuery1PrepStmt0(sqlSelectCa, resultColumns, col2Str(name));
+    ResultRow rs = execQuery1PrepStmt0(sqlSelectCa, col2Str(name));
     if (rs == null) {
       throw new CaMgmtException("uknown CA " + name);
     }
 
     String caUrisText = rs.getString("CA_URIS");
     CaUris caUris = (caUrisText == null) ? null : CaUris.decode(caUrisText);
-    int snSize = rs.getInt("SN_SIZE");
+    int snSize = getInt(rs, "SN_SIZE");
     if (snSize > CaManager.MAX_SERIALNUMBER_SIZE) {
       snSize = CaManager.MAX_SERIALNUMBER_SIZE;
     } else if (snSize < CaManager.MIN_SERIALNUMBER_SIZE) {
       snSize = CaManager.MIN_SERIALNUMBER_SIZE;
     }
 
-    CaEntry entry = new CaEntry(new NameId(rs.getInt("ID"), name), snSize,
-        rs.getLong("NEXT_CRLNO"), rs.getString("SIGNER_TYPE"), rs.getString("SIGNER_CONF"),
-        caUris, rs.getInt("NUM_CRLS"), rs.getInt("EXPIRATION_PERIOD"));
+    CaEntry entry = new CaEntry(new NameId(getInt(rs, "ID"), name), snSize,
+        getLong(rs, "NEXT_CRLNO"), rs.getString("SIGNER_TYPE"), rs.getString("SIGNER_CONF"),
+        caUris, getInt(rs, "NUM_CRLS"), getInt(rs, "EXPIRATION_PERIOD"));
 
     entry.setCert(generateCert(rs.getString("CERT")));
     entry.setDhpocControl(rs.getString("DHPOC_CONTROL"));
@@ -290,7 +281,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
 
     entry.setStatus(CaStatus.forName(rs.getString("STATUS")));
     entry.setMaxValidity(Validity.getInstance(rs.getString("MAX_VALIDITY")));
-    entry.setKeepExpiredCertInDays(rs.getInt("KEEP_EXPIRED_CERT_DAYS"));
+    entry.setKeepExpiredCertInDays(getInt(rs, "KEEP_EXPIRED_CERT_DAYS"));
 
     String crlsignerName = rs.getString("CRL_SIGNER_NAME");
     if (StringUtil.isNotBlank(crlsignerName)) {
@@ -347,8 +338,8 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     }
 
     entry.setProtocolSupport(new ProtocolSupport(rs.getString("PROTOCOL_SUPPORT")));
-    entry.setSaveRequest((rs.getInt("SAVE_REQ") != 0));
-    entry.setPermission(rs.getInt("PERMISSION"));
+    entry.setSaveRequest((getInt(rs, "SAVE_REQ") != 0));
+    entry.setPermission(getInt(rs, "PERMISSION"));
 
     String revInfo = rs.getString("REV_INFO");
     CertRevocationInfo revocationInfo = (revInfo == null)
@@ -372,19 +363,18 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     final String sql =
         "SELECT REQUESTOR_ID,RA,PERMISSION,PROFILES FROM CA_HAS_REQUESTOR WHERE CA_ID=?";
 
-    SqlColumn3[] resultColumns = {col3Int("REQUESTOR_ID"), col3Bool("RA"), col3Int("PERMISSION")};
-    List<ResultRow> rows = execQueryPrepStmt0(sql, resultColumns, col2Int(ca.getId()));
+    List<ResultRow> rows = execQueryPrepStmt0(sql, col2Int(ca.getId()));
 
     Set<CaHasRequestorEntry> ret = new HashSet<>();
     for (ResultRow rs : rows) {
-      int id = rs.getInt("REQUESTOR_ID");
+      int id = getInt(rs, "REQUESTOR_ID");
       String name = idNameMap.get(id);
 
       List<String> list = StringUtil.split(rs.getString("PROFILES"), ",");
       Set<String> profiles = (list == null) ? null : new HashSet<>(list);
       CaHasRequestorEntry entry = new CaHasRequestorEntry(new NameId(id, name));
-      entry.setRa(rs.getBoolean("RA"));
-      entry.setPermission(rs.getInt("PERMISSION"));
+      entry.setRa(getBoolean(rs, "RA"));
+      entry.setPermission(getInt(rs, "PERMISSION"));
       entry.setProfiles(profiles);
 
       ret.add(entry);
@@ -405,12 +395,11 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       throws CaMgmtException {
     final String sql = "SELECT " + column + " FROM " + table + " WHERE CA_ID=?";
 
-    SqlColumn3[] resultColumns = {col3Int(column)};
-    List<ResultRow> rows = execQueryPrepStmt0(sql, resultColumns, col2Int(ca.getId()));
+    List<ResultRow> rows = execQueryPrepStmt0(sql, col2Int(ca.getId()));
 
     Set<Integer> ret = new HashSet<>();
     for (ResultRow rs : rows) {
-      ret.add(rs.getInt(column));
+      ret.add(getInt(rs, column));
     }
 
     return ret;
@@ -803,9 +792,8 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   } // method changeCa
 
   public void commitNextCrlNoIfLess(NameId ca, long nextCrlNo) throws CaMgmtException {
-    SqlColumn3[] resultColumns = {col3Long("NEXT_CRLNO")};
-    ResultRow rs = execQuery1PrepStmt0(sqlNextSelectCrlNo, resultColumns, col2Int(ca.getId()));
-    long nextCrlNoInDb = rs.getLong("NEXT_CRLNO");
+    ResultRow rs = execQuery1PrepStmt0(sqlNextSelectCrlNo, col2Int(ca.getId()));
+    long nextCrlNoInDb = getLong(rs, "NEXT_CRLNO");
 
     if (nextCrlNoInDb < nextCrlNo) {
       execUpdatePrepStmt0("UPDATE CA SET NEXT_CRLNO=? WHERE ID=?",
@@ -1090,18 +1078,17 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
 
     final String sql = "SELECT CA_ID,PERMISSION,PROFILES FROM CA_HAS_USER WHERE USER_ID=?";
 
-    SqlColumn3[] resultColumns = {col3Int("PERMISSION"), col3Int("CA_ID")};
-    List<ResultRow> rows = execQueryPrepStmt0(sql, resultColumns, col2Int(existingId));
+    List<ResultRow> rows = execQueryPrepStmt0(sql, col2Int(existingId));
 
     Map<String, CaHasUserEntry> ret = new HashMap<>();
     for (ResultRow rs : rows) {
       List<String> list = StringUtil.split(rs.getString("PROFILES"), ",");
       Set<String> profiles = (list == null) ? null : new HashSet<>(list);
       CaHasUserEntry caHasUser = new CaHasUserEntry(new NameId(existingId, user));
-      caHasUser.setPermission(rs.getInt("PERMISSION"));
+      caHasUser.setPermission(getInt(rs, "PERMISSION"));
       caHasUser.setProfiles(profiles);
 
-      int caId = rs.getInt("CA_ID");
+      int caId = getInt(rs, "CA_ID");
       String caName = idNameMap.getCaName(caId);
 
       ret.put(caName, caHasUser);
@@ -1120,16 +1107,14 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     final String sql = "SELECT NAME,PERMISSION,PROFILES FROM CA_HAS_USER INNER JOIN TUSER"
         + " ON CA_ID=? AND TUSER.ID=CA_HAS_USER.USER_ID";
 
-    SqlColumn3[] resultColumns = {col3Int("PERMISSION")};
-    List<ResultRow> rows = execQueryPrepStmt0(sql, resultColumns,
-                            col2Int(caIdent.getId().intValue()));
+    List<ResultRow> rows = execQueryPrepStmt0(sql, col2Int(caIdent.getId().intValue()));
 
     List<CaHasUserEntry> ret = new LinkedList<>();
     for (ResultRow rs : rows) {
       List<String> list = StringUtil.split(rs.getString("PROFILES"), ",");
       Set<String> profiles = (list == null) ? null : new HashSet<>(list);
       CaHasUserEntry caHasUser = new CaHasUserEntry(new NameId(null, rs.getString("NAME")));
-      caHasUser.setPermission(rs.getInt("PERMISSION"));
+      caHasUser.setPermission(getInt(rs, "PERMISSION"));
       caHasUser.setProfiles(profiles);
 
       ret.add(caHasUser);
@@ -1145,8 +1130,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     notBlank(username, "username");
     NameId ident = new NameId(null, username);
 
-    SqlColumn3[] resultColumns = {col3Int("ID"), col3Bool("ACTIVE")};
-    ResultRow rs = execQuery1PrepStmt0(sqlSelectUser, resultColumns, col2Str(ident.getName()));
+    ResultRow rs = execQuery1PrepStmt0(sqlSelectUser, col2Str(ident.getName()));
     if (rs == null) {
       if (nullable) {
         return null;
@@ -1155,8 +1139,8 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       }
     }
 
-    ident.setId(rs.getInt("ID"));
-    return new UserEntry(ident, rs.getBoolean("ACTIVE"), rs.getString("PASSWORD"));
+    ident.setId(getInt(rs, "ID"));
+    return new UserEntry(ident, getBoolean(rs, "ACTIVE"), rs.getString("PASSWORD"));
   } // method getUser
 
   private static X509Cert generateCert(String b64Cert) throws CaMgmtException {
@@ -1175,5 +1159,29 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       throw new CaMgmtException(ex);
     }
   } // method generateCertchain
+
+  private static boolean getBoolean(ResultRow rs, String label) throws CaMgmtException {
+    try {
+      return rs.getBoolean(label);
+    } catch (SQLException ex) {
+      throw new CaMgmtException(ex);
+    }
+  }
+
+  private static int getInt(ResultRow rs, String label) throws CaMgmtException {
+    try {
+      return rs.getInt(label);
+    } catch (SQLException ex) {
+      throw new CaMgmtException(ex);
+    }
+  }
+
+  private static long getLong(ResultRow rs, String label) throws CaMgmtException {
+    try {
+      return rs.getLong(label);
+    } catch (SQLException ex) {
+      throw new CaMgmtException(ex);
+    }
+  }
 
 }

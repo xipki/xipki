@@ -62,14 +62,13 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
 
   CaManagerQueryExecutorBase(DataSourceWrapper datasource) {
     super(datasource);
-  } // constructor
+  }
 
   protected String buildSelectFirstSql(String coreSql) {
     return datasource.buildSelectFirstSql(1, coreSql);
   }
 
-  private Statement createStatement()
-      throws CaMgmtException {
+  private Statement createStatement() throws CaMgmtException {
     try {
       return datasource.createStatement();
     } catch (DataAccessException ex) {
@@ -77,8 +76,7 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
     }
   } // method createStatement
 
-  private PreparedStatement prepareStatement(String sql)
-      throws CaMgmtException {
+  private PreparedStatement prepareStatement(String sql) throws CaMgmtException {
     try {
       return datasource.prepareStatement(sql);
     } catch (DataAccessException ex) {
@@ -86,10 +84,9 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
     }
   } // method prepareStatement
 
-  public List<String> namesFromTable(String table)
-      throws CaMgmtException {
+  public List<String> namesFromTable(String table) throws CaMgmtException {
     final String sql = concat("SELECT NAME FROM ", table);
-    List<ResultRow> rows = execQueryStmt0(sql, null);
+    List<ResultRow> rows = execQueryStmt0(sql);
 
     List<String> names = new LinkedList<>();
     for (ResultRow rs : rows) {
@@ -102,8 +99,7 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
     return names;
   } // method namesFromTable
 
-  public boolean deleteRowWithName(String name, String table)
-      throws CaMgmtException {
+  public boolean deleteRowWithName(String name, String table) throws CaMgmtException {
     final String sql = concat("DELETE FROM ", table, " WHERE NAME=?");
     int num = execUpdatePrepStmt0(sql, col2Str(name));
     return num > 0;
@@ -122,8 +118,7 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
     }
   }
 
-  protected int execUpdatePrepStmt0(String sql, SqlColumn2... params)
-      throws CaMgmtException {
+  protected int execUpdatePrepStmt0(String sql, SqlColumn2... params) throws CaMgmtException {
     try {
       return execUpdatePrepStmt(sql, params);
     } catch (DataAccessException ex) {
@@ -131,30 +126,27 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
     }
   }
 
-  protected List<ResultRow> execQueryStmt0(String sql, SqlColumn3[] resultColumns)
-      throws CaMgmtException {
+  protected List<ResultRow> execQueryStmt0(String sql) throws CaMgmtException {
     try {
-      return execQueryStmt(sql, resultColumns);
+      return execQueryStmt(sql);
     } catch (DataAccessException ex) {
       throw new CaMgmtException(ex);
     }
   }
 
-  protected ResultRow execQuery1PrepStmt0(
-      String sql, SqlColumn3[] resultColumns, SqlColumn2... params)
+  protected ResultRow execQuery1PrepStmt0(String sql, SqlColumn2... params)
       throws CaMgmtException {
     try {
-      return execQuery1PrepStmt(sql, resultColumns, params);
+      return execQuery1PrepStmt(sql, params);
     } catch (DataAccessException ex) {
       throw new CaMgmtException(ex);
     }
   }
 
-  protected List<ResultRow> execQueryPrepStmt0(
-      String sql, SqlColumn3[] resultColumns, SqlColumn2... params)
+  protected List<ResultRow> execQueryPrepStmt0(String sql, SqlColumn2... params)
       throws CaMgmtException {
     try {
-      return execQueryPrepStmt(sql, resultColumns, params);
+      return execQueryPrepStmt(sql, params);
     } catch (DataAccessException ex) {
       throw new CaMgmtException(ex);
     }
@@ -218,9 +210,8 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
     }
   } // method changeIfNotNull
 
-  private void setColumn(Map<String, String> changedColumns, PreparedStatement ps,
-      int index, SqlColumn column)
-          throws SQLException {
+  private void setColumn(Map<String, String> changedColumns, PreparedStatement ps, int index,
+      SqlColumn column) throws SQLException {
     String name = column.name();
     ColumnType type = column.type();
     Object value = column.value();
@@ -289,8 +280,7 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
     return CaManager.NULL.equalsIgnoreCase(str) ? null : str;
   }
 
-  protected int getNonNullIdForName(String sql, String name)
-      throws CaMgmtException {
+  protected int getNonNullIdForName(String sql, String name) throws CaMgmtException {
     Integer id = getIdForName(sql, name);
     if (id != null) {
       return id.intValue();
@@ -299,8 +289,7 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
     throw new CaMgmtException(concat("Found no entry named ",name));
   } // method getNonNullIdForName
 
-  protected Integer getIdForName(String sql, String name)
-      throws CaMgmtException {
+  protected Integer getIdForName(String sql, String name) throws CaMgmtException {
     PreparedStatement ps = null;
     ResultSet rs = null;
     try {
@@ -319,8 +308,7 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
     }
   } // method getIdForName
 
-  protected Map<Integer, String> getIdNameMap(String tableName)
-      throws CaMgmtException {
+  protected Map<Integer, String> getIdNameMap(String tableName) throws CaMgmtException {
     final String sql = concat("SELECT ID,NAME FROM ", tableName);
     Statement ps = null;
     ResultSet rs = null;

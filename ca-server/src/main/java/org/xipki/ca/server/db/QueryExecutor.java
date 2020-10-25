@@ -19,11 +19,16 @@ package org.xipki.ca.server.db;
 
 import static org.xipki.util.Args.notNull;
 
+import java.math.BigDecimal;
+import java.sql.Blob;
+import java.sql.Clob;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.HashMap;
@@ -54,59 +59,249 @@ class QueryExecutor {
 
     private final Map<String, Object> columns = new HashMap<>();
 
-    public ResultRow(ResultSet rs, SqlColumn3[] resultColumns)
-        throws SQLException {
+    public ResultRow(ResultSet rs) throws SQLException {
       ResultSetMetaData metaData = rs.getMetaData();
       int count = metaData.getColumnCount();
+
       for (int index = 1; index <= count; index++) {
         String label = metaData.getColumnLabel(index);
-        ColumnType type = ColumnType.STRING;
-        if (resultColumns != null) {
-          for (SqlColumn3 c3 : resultColumns) {
-            if (label.equalsIgnoreCase(c3.label)) {
-              type = c3.type();
-              break;
-            }
-          }
-        }
+        int itype = metaData.getColumnType(index);
 
         Object value;
-        if (type == ColumnType.BOOL) {
-          value = rs.getBoolean(label);
-        } else if (type == ColumnType.INT) {
-          value = rs.getInt(label);
-        } else if (type == ColumnType.LONG) {
-          value = rs.getLong(label);
-        } else if (type == ColumnType.STRING) {
-          value = rs.getString(label);
-        } else if (type == ColumnType.TIMESTAMP) {
-          value = rs.getTimestamp(label);
-        } else {
-          throw new IllegalArgumentException("unknown ColumnType " + type);
+        switch (itype) {
+          case Types.BOOLEAN:
+          case Types.BIT:
+            value = rs.getBoolean(index);
+            break;
+          case Types.TINYINT:
+          case Types.SMALLINT:
+          case Types.INTEGER:
+            value = rs.getInt(index);
+            break;
+          case Types.BIGINT:
+            value = rs.getLong(index);
+            break;
+          case Types.CHAR:
+          case Types.VARCHAR:
+          case Types.LONGVARCHAR:
+          case Types.NCHAR:
+          case Types.NVARCHAR:
+          case Types.LONGNVARCHAR:
+            value = rs.getString(index);
+            break;
+          case Types.CLOB:
+          case Types.NCLOB:
+            Clob clob = rs.getClob(index);
+            long len = clob.length();
+            value = clob.getSubString(1, (int) len);
+            break;
+          case Types.TIMESTAMP:
+          case Types.TIMESTAMP_WITH_TIMEZONE:
+            value = rs.getTimestamp(index);
+            break;
+          case Types.DATE:
+            value = rs.getDate(index);
+            break;
+          case Types.TIME:
+            value = rs.getTime(index);
+            break;
+          case Types.REAL:
+            value = rs.getFloat(index);
+            break;
+          case Types.FLOAT:
+          case Types.DOUBLE:
+            value = rs.getDouble(index);
+            break;
+          case Types.NUMERIC:
+          case Types.DECIMAL:
+            value = rs.getBigDecimal(index);
+            break;
+          case Types.BINARY:
+          case Types.VARBINARY:
+          case Types.LONGVARBINARY:
+            value = rs.getBytes(index);
+            break;
+          case Types.BLOB:
+            Blob blob = rs.getBlob(index);
+            value = blob.getBytes(1, (int) blob.length());
+            break;
+          default:
+            throw new SQLException("unknown data type " + itype);
         }
 
         columns.put(label.toUpperCase(), value);
       }
     }
 
-    public int getInt(String label) {
-      return (int) columns.get(label.toUpperCase());
+    public int getInt(String label) throws SQLException {
+      Object obj = columns.get(label.toUpperCase());
+      if (obj == null) {
+        return 0;
+      }
+
+      if (obj instanceof Integer) {
+        return (int) obj;
+      } else if (obj instanceof Long) {
+        return (int) ((long) obj);
+      } else if (obj instanceof Boolean) {
+        return ((boolean) obj) ? 1 : 0;
+      } else {
+        throw new IllegalArgumentException(
+            "cannot convert " + obj.getClass().getName() + " to int");
+      }
     }
 
-    public boolean getBoolean(String label) {
-      return (boolean) columns.get(label.toUpperCase());
+    public boolean getBoolean(String label) throws SQLException {
+      Object obj = columns.get(label.toUpperCase());
+      if (obj == null) {
+        return false;
+      }
+
+      if (obj instanceof Boolean) {
+        return (boolean) obj;
+      } else if (obj instanceof Integer) {
+        return ((int) obj) != 0;
+      } else if (obj instanceof Long) {
+        return ((long) obj) != 0;
+      } else {
+        throw new IllegalArgumentException(
+            "cannot convert " + obj.getClass().getName() + " to boolean");
+      }
     }
 
-    public long getLong(String label) {
-      return (long) columns.get(label.toUpperCase());
+    public long getLong(String label) throws SQLException {
+      Object obj = columns.get(label.toUpperCase());
+      if (obj == null) {
+        return 0;
+      }
+
+      if (obj instanceof Long) {
+        return (long) obj;
+      } else if (obj instanceof Integer) {
+        return (long) ((int) obj);
+      } else if (obj instanceof Boolean) {
+        return ((boolean) obj) ? 1 : 0;
+      } else {
+        throw new IllegalArgumentException(
+            "cannot convert " + obj.getClass().getName() + " to long");
+      }
     }
 
     public String getString(String label) {
-      return (String) columns.get(label.toUpperCase());
+      Object obj = columns.get(label.toUpperCase());
+      if (obj == null) {
+        return null;
+      }
+
+      if (obj instanceof Boolean) {
+        return ((boolean) obj) ? "TRUE" : "FALSE";
+      } else if (obj instanceof String) {
+        return (String) obj;
+      } else {
+        return obj.toString();
+      }
     }
 
-    public Timestamp getTimestamp(String label) {
-      return (Timestamp) columns.get(label.toUpperCase());
+    public Timestamp getTimestamp(String label) throws SQLException {
+      Object obj = columns.get(label.toUpperCase());
+      if (obj == null) {
+        return null;
+      }
+
+      if (obj instanceof Timestamp) {
+        return (Timestamp) obj;
+      } else {
+        throw new IllegalArgumentException(
+            "cannot convert " + obj.getClass().getName() + " to Timestamp");
+      }
+    }
+
+    public byte[] getBytes(String label) throws SQLException {
+      Object obj = columns.get(label.toUpperCase());
+      if (obj == null) {
+        return null;
+      }
+
+      if (obj instanceof byte[]) {
+        return (byte[]) obj;
+      } else {
+        throw new IllegalArgumentException(
+            "cannot convert " + obj.getClass().getName() + " to byte[]");
+      }
+    }
+
+    public Time getTime(String label) throws SQLException {
+      Object obj = columns.get(label.toUpperCase());
+      if (obj == null) {
+        return null;
+      }
+
+      if (obj instanceof Time) {
+        return (Time) obj;
+      } else {
+        throw new IllegalArgumentException(
+            "cannot convert " + obj.getClass().getName() + " to Time");
+      }
+    }
+
+    public Date getDate(String label) throws SQLException {
+      Object obj = columns.get(label.toUpperCase());
+      if (obj == null) {
+        return null;
+      }
+
+      if (obj instanceof Date) {
+        return (Date) obj;
+      } else {
+        throw new IllegalArgumentException(
+            "cannot convert " + obj.getClass().getName() + " to Date");
+      }
+    }
+
+    public float getFloat(String label) throws SQLException {
+      Object obj = columns.get(label.toUpperCase());
+      if (obj == null) {
+        return 0;
+      }
+
+      if (obj instanceof Float) {
+        return (float) obj;
+      } else if (obj instanceof Double) {
+        return (float) ((double) obj);
+      } else {
+        throw new IllegalArgumentException(
+            "cannot convert " + obj.getClass().getName() + " to float");
+      }
+    }
+
+    public double getDouble(String label) throws SQLException {
+      Object obj = columns.get(label.toUpperCase());
+      if (obj == null) {
+        return 0;
+      }
+
+      if (obj instanceof Double) {
+        return (double) obj;
+      } else if (obj instanceof Float) {
+        return (double) ((float) obj);
+      } else {
+        throw new IllegalArgumentException(
+            "cannot convert " + obj.getClass().getName() + " to double");
+      }
+    }
+
+    public BigDecimal getBigDecimal(String label) throws SQLException {
+      Object obj = columns.get(label.toUpperCase());
+      if (obj == null) {
+        return null;
+      }
+
+      if (obj instanceof BigDecimal) {
+        return (BigDecimal) obj;
+      } else {
+        throw new IllegalArgumentException(
+            "cannot convert " + obj.getClass().getName() + " to BigDecimal");
+      }
     }
 
   }
@@ -173,27 +368,6 @@ class QueryExecutor {
     }
 
   } // class SqlColumn2
-
-  protected static class SqlColumn3 {
-
-    private String label;
-
-    private ColumnType type;
-
-    public SqlColumn3(String label, ColumnType type) {
-      this.label = notNull(label, "label");
-      this.type = notNull(type, "type");
-    }
-
-    public String label() {
-      return label;
-    }
-
-    public ColumnType type() {
-      return type;
-    }
-
-  } // class SqlColumn3
 
   protected static class DbSchemaInfo {
     private final Map<String, String> variables = new HashMap<>();
@@ -286,18 +460,6 @@ class QueryExecutor {
     return new SqlColumn2(ColumnType.TIMESTAMP, value);
   }
 
-  protected static SqlColumn3 col3Bool(String label) {
-    return new SqlColumn3(label, ColumnType.BOOL);
-  }
-
-  protected static SqlColumn3 col3Int(String label) {
-    return new SqlColumn3(label, ColumnType.INT);
-  }
-
-  protected static SqlColumn3 col3Long(String label) {
-    return new SqlColumn3(label, ColumnType.LONG);
-  }
-
   protected int execUpdateStmt(String sql)
       throws DataAccessException {
     Statement ps = datasource.createStatement();
@@ -322,13 +484,11 @@ class QueryExecutor {
     }
   }
 
-  protected List<ResultRow> execQueryStmt(String sql, SqlColumn3[] resultColumns)
-      throws DataAccessException {
-    return execQueryStmt(false, sql, resultColumns);
+  protected List<ResultRow> execQueryStmt(String sql) throws DataAccessException {
+    return execQueryStmt(false, sql);
   }
 
-  private List<ResultRow> execQueryStmt(boolean single, String sql, SqlColumn3[] resultColumns)
-      throws DataAccessException {
+  private List<ResultRow> execQueryStmt(boolean single, String sql) throws DataAccessException {
     Statement stmt = datasource.createStatement();
     ResultSet rs = null;
 
@@ -336,7 +496,7 @@ class QueryExecutor {
       rs = stmt.executeQuery(sql);
       List<ResultRow> rows = new LinkedList<>();
       while (rs.next()) {
-        rows.add(new ResultRow(rs, resultColumns));
+        rows.add(new ResultRow(rs));
         if (single) {
           break;
         }
@@ -349,21 +509,18 @@ class QueryExecutor {
     }
   }
 
-  protected ResultRow execQuery1PrepStmt(
-      String sql, SqlColumn3[] resultColumns, SqlColumn2... params)
+  protected ResultRow execQuery1PrepStmt(String sql, SqlColumn2... params)
       throws DataAccessException {
-    List<ResultRow> rows = execQueryPrepStmt(true, sql, resultColumns, params);
+    List<ResultRow> rows = execQueryPrepStmt(true, sql, params);
     return rows.isEmpty() ? null : rows.get(0);
   }
 
-  protected List<ResultRow> execQueryPrepStmt(
-      String sql, SqlColumn3[] resultColumns, SqlColumn2... params)
+  protected List<ResultRow> execQueryPrepStmt(String sql, SqlColumn2... params)
       throws DataAccessException {
-    return execQueryPrepStmt(false, sql, resultColumns, params);
+    return execQueryPrepStmt(false, sql, params);
   }
 
-  private List<ResultRow> execQueryPrepStmt(boolean single,
-      String sql, SqlColumn3[] resultColumns, SqlColumn2... params)
+  private List<ResultRow> execQueryPrepStmt(boolean single, String sql, SqlColumn2... params)
       throws DataAccessException {
     PreparedStatement ps = buildPrepStmt(sql, params);
     ResultSet rs = null;
@@ -371,7 +528,7 @@ class QueryExecutor {
       rs = ps.executeQuery();
       List<ResultRow> rows = new LinkedList<>();
       while (rs.next()) {
-        rows.add(new ResultRow(rs, resultColumns));
+        rows.add(new ResultRow(rs));
         if (single) {
           break;
         }
