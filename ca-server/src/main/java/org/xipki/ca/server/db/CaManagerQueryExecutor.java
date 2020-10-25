@@ -236,7 +236,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   } // method createRequestor
 
   public SignerEntry createSigner(String name) throws CaMgmtException {
-    ResultRow rs = execQuery1PrepStmt0(sqlSelectSigner, null, col2Str(name));
+    ResultRow rs = execQuery1PrepStmt0(sqlSelectSigner, col2Str(name));
 
     if (rs == null) {
       throw new CaMgmtException("unknown signer " + name);
@@ -635,7 +635,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       } else {
         final String sql = "SELECT CERT FROM CA WHERE ID=?";
 
-        ResultRow rs = execQuery1PrepStmt0(sql, null, col2Int(changeCaEntry.getIdent().getId()));
+        ResultRow rs = execQuery1PrepStmt0(sql, col2Int(changeCaEntry.getIdent().getId()));
         if (rs == null) {
           throw new CaMgmtException("unknown CA '" + changeCaEntry.getIdent());
         }
@@ -647,7 +647,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         // validate the signer configuration
         final String sql = "SELECT SIGNER_TYPE,SIGNER_CONF FROM CA WHERE ID=?";
 
-        ResultRow rs = execQuery1PrepStmt0(sql, null, col2Int(changeCaEntry.getIdent().getId()));
+        ResultRow rs = execQuery1PrepStmt0(sql, col2Int(changeCaEntry.getIdent().getId()));
 
         if (rs == null) {
           throw new CaMgmtException("unknown CA '" + changeCaEntry.getIdent());

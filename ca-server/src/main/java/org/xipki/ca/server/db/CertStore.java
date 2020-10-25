@@ -671,7 +671,7 @@ public class CertStore extends CertStoreBase {
       return getEncodedCrl(ca);
     }
 
-    ResultRow rs = execQuery1PrepStmt0(sqlCrlWithNo, null,
+    ResultRow rs = execQuery1PrepStmt0(sqlCrlWithNo,
         col2Int(ca.getId()), col2Long(crlNumber.longValue()));
 
     return rs == null ? null : Base64.decodeFast(rs.getString("CRL"));
@@ -832,7 +832,7 @@ public class CertStore extends CertStoreBase {
       return null;
     }
 
-    row = execQuery1PrepStmt0(sqlReqForId, null, col2Long(getLong(row, "REQ_ID")));
+    row = execQuery1PrepStmt0(sqlReqForId, col2Long(getLong(row, "REQ_ID")));
     return (row == null) ? null : Base64.decodeFast(row.getString("DATA"));
   } // method getCertRequest
 
@@ -930,7 +930,7 @@ public class CertStore extends CertStoreBase {
   } // method authenticateUser
 
   public String getUsername(int id) throws OperationException {
-    ResultRow rs = execQuery1PrepStmt0(sqlActiveUserNameForId, null, col2Int(id));
+    ResultRow rs = execQuery1PrepStmt0(sqlActiveUserNameForId, col2Int(id));
     return rs == null ? null : rs.getString("NAME");
   } // method getUsername
 
