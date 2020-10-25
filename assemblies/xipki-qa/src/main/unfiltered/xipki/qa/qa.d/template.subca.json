@@ -48,7 +48,7 @@
 				"targetReason":"cessationOfOperation",
 				"unchangedSince":"15d"
 			},
-			"saveReq":false,
+			"saveReq":true,
 			"signerType":"${token.type}",
 			"signerConf":{
 				"value":"${ca.signerConf}"
