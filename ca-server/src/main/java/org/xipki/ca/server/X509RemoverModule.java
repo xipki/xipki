@@ -34,6 +34,7 @@ import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.server.db.CertStore;
+import org.xipki.ca.server.db.CertStore.SerialWithId;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
@@ -118,41 +119,46 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
         minutesOfDay + random.nextInt(60), minutesOfDay, TimeUnit.MINUTES);
   } // constructor
 
+  public CertWithDbId removeCert(SerialWithId serialNumber, String msgId)
+      throws OperationException {
+    return removeCert0(serialNumber.getId(), serialNumber.getSerial(), msgId);
+  }
+
   public CertWithDbId removeCert(BigInteger serialNumber, String msgId) throws OperationException {
+    return removeCert0(0, serialNumber, msgId);
+  }
+
+  private CertWithDbId removeCert0(long certId, BigInteger serialNumber, String msgId)
+      throws OperationException {
     if (caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber)) {
-      throw new OperationException(NOT_PERMITTED,
-          "insufficient permission to remove CA certificate");
+      throw new OperationException(NOT_PERMITTED, "could not remove CA certificate");
     }
 
     AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_remove_cert, msgId);
     boolean successful = true;
     try {
-      CertWithDbId ret = removeCert0(serialNumber, event);
-      successful = (ret != null);
-      return ret;
+      event.addEventData(CaAuditConstants.NAME_serial, LogUtil.formatCsn(serialNumber));
+      CertWithRevocationInfo certWithRevInfo = (certId == 0)
+          ? certstore.getCertWithRevocationInfo(caIdent.getId(), serialNumber, caIdNameMap)
+          : certstore.getCertWithRevocationInfo(certId, caIdNameMap);
+
+      if (certWithRevInfo == null) {
+        return null;
+      }
+
+      CertWithDbId certToRemove = certWithRevInfo.getCert();
+      boolean succ = publisherModule.publishCertRemoved(certToRemove);
+      if (!succ) {
+        return null;
+      }
+
+      certstore.removeCert(certWithRevInfo.getCert().getCertId());
+      successful = (certToRemove != null);
+      return certToRemove;
     } finally {
       finish(event, successful);
     }
   } // method removeCertificate
-
-  private CertWithDbId removeCert0(BigInteger serialNumber, AuditEvent event)
-      throws OperationException {
-    event.addEventData(CaAuditConstants.NAME_serial, LogUtil.formatCsn(serialNumber));
-    CertWithRevocationInfo certWithRevInfo =
-        certstore.getCertWithRevocationInfo(caIdent.getId(), serialNumber, caIdNameMap);
-    if (certWithRevInfo == null) {
-      return null;
-    }
-
-    CertWithDbId certToRemove = certWithRevInfo.getCert();
-    boolean succ = publisherModule.publishCertRemoved(certToRemove);
-    if (!succ) {
-      return null;
-    }
-
-    certstore.removeCert(caIdent, serialNumber);
-    return certToRemove;
-  } // method removeCertificate0
 
   private int removeExpirtedCerts0(Date expiredAtTime, AuditEvent event, String msgId)
       throws OperationException {
@@ -169,12 +175,13 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
 
     int sum = 0;
     while (true) {
-      List<BigInteger> serials = certstore.getExpiredSerialNumbers(caIdent, expiredAt, numEntries);
+      List<SerialWithId> serials = certstore.getExpiredSerialNumbers(
+            caIdent, expiredAt, numEntries);
       if (CollectionUtil.isEmpty(serials)) {
         return sum;
       }
 
-      for (BigInteger serial : serials) {
+      for (SerialWithId serial : serials) {
         // do not delete CA's own certificate
         if ((caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serial))) {
           continue;
@@ -186,7 +193,8 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
           }
         } catch (OperationException ex) {
           LOG.info("removed {} expired certificates of CA {}", sum, caIdent.getName());
-          LogUtil.error(LOG, ex, "could not remove expired certificate with serial" + serial);
+          LogUtil.error(LOG, ex, "could not remove expired certificate with serial"
+              + serial.getSerial());
           throw ex;
         }
       } // end for

@@ -135,9 +135,9 @@ public class ProtocolSupport {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("supported protocols:");
-    sb.append("\n  CMP:").append(cmp);
-    sb.append("\n  REST:").append(rest);
-    sb.append("\n  SCEP:").append(scep);
+    sb.append("\n  CMP: ").append(cmp);
+    sb.append("\n  REST: ").append(rest);
+    sb.append("\n  SCEP: ").append(scep);
     return sb.toString();
   }
 

@@ -474,7 +474,9 @@
       onDelete="NO ACTION" onUpdate="NO ACTION"
       baseColumnNames="PID" baseTableName="CERT"
       referencedColumnNames="ID" referencedTableName="PROFILE"/>
-    <addForeignKeyConstraint constraintName="FK_PUBLISHQUEUE_PUBLISHER1"
+    <!-- Remove the foreignKey constraint due to unsync. in some
+         high-available database systems-->
+    <!--addForeignKeyConstraint constraintName="FK_PUBLISHQUEUE_PUBLISHER1"
       deferrable="false" initiallyDeferred="false"
       onDelete="CASCADE" onUpdate="NO ACTION"
       baseColumnNames="PID" baseTableName="PUBLISHQUEUE"
@@ -493,6 +495,6 @@
       deferrable="false" initiallyDeferred="false"
       onDelete="CASCADE" onUpdate="NO ACTION"
       baseColumnNames="CID" baseTableName="REQCERT"
-      referencedColumnNames="ID" referencedTableName="CERT"/>
+      referencedColumnNames="ID" referencedTableName="CERT"/-->
   </changeSet>
 </databaseChangeLog>

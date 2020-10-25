@@ -37,6 +37,7 @@ import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.server.db.CertStore;
+import org.xipki.ca.server.db.CertStore.SerialWithId;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
@@ -209,7 +210,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
     return revokedCert;
   } // method revokeCertificate0
 
-  private CertWithRevocationInfo revokeSuspendedCert(BigInteger serialNumber, CrlReason reason,
+  private CertWithRevocationInfo revokeSuspendedCert(SerialWithId serialNumber, CrlReason reason,
       String msgId) throws OperationException {
     AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_revoke_suspendedCert, msgId);
 
@@ -223,9 +224,9 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
     }
   }
 
-  private CertWithRevocationInfo revokeSuspendedCert0(BigInteger serialNumber, CrlReason reason,
+  private CertWithRevocationInfo revokeSuspendedCert0(SerialWithId serialNumber, CrlReason reason,
       AuditEvent event) throws OperationException {
-    String hexSerial = LogUtil.formatCsn(serialNumber);
+    String hexSerial = LogUtil.formatCsn(serialNumber.getSerial());
 
     event.addEventData(CaAuditConstants.NAME_serial, hexSerial);
     event.addEventData(CaAuditConstants.NAME_reason, reason.getDescription());
@@ -365,13 +366,13 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
 
     int sum = 0;
     while (true) {
-      List<BigInteger> serials =
+      List<SerialWithId> serials =
           certstore.getSuspendedCertSerials(caIdent, latestLastUpdatedAt, numEntries);
       if (CollectionUtil.isEmpty(serials)) {
         return sum;
       }
 
-      for (BigInteger serial : serials) {
+      for (SerialWithId serial : serials) {
         boolean revoked = false;
         try {
           revoked = revokeSuspendedCert(serial, reason, msgId) != null;

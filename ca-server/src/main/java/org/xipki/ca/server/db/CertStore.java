@@ -443,15 +443,15 @@ public class CertStore extends CertStoreBase {
     return certWithRevInfo;
   } // method revokeCert
 
-  public CertWithRevocationInfo revokeSuspendedCert(NameId ca, BigInteger serialNumber,
+  public CertWithRevocationInfo revokeSuspendedCert(NameId ca, SerialWithId serialNumber,
       CrlReason reason, CaIdNameMap idNameMap) throws OperationException {
     notNulls(ca, "ca", serialNumber, "serialNumber", reason, "reason");
 
     CertWithRevocationInfo certWithRevInfo =
-        getCertWithRevocationInfo(ca.getId(), serialNumber, idNameMap);
+        getCertWithRevocationInfo(serialNumber.getId(), idNameMap);
     if (certWithRevInfo == null) {
       LOG.warn("certificate with CA={} and serialNumber={} does not exist",
-          ca.getName(), LogUtil.formatCsn(serialNumber));
+          ca.getName(), LogUtil.formatCsn(serialNumber.getSerial()));
       return null;
     }
 
@@ -468,7 +468,7 @@ public class CertStore extends CertStoreBase {
 
     int count = execUpdatePrepStmt0(SQL_REVOKE_SUSPENDED_CERT,
         col2Long(System.currentTimeMillis() / 1000), col2Int(reason.getCode()),
-        col2Long(certWithRevInfo.getCert().getCertId().longValue())); // certId
+        col2Long(serialNumber.getId())); // certId
 
     if (count != 1) {
       String message = (count > 1) ? count + " rows modified, but exactly one is expected"
@@ -525,16 +525,17 @@ public class CertStore extends CertStoreBase {
 
   public void removeCert(NameId ca, BigInteger serialNumber) throws OperationException {
     notNulls(ca, "ca", serialNumber, "serialNumber");
-
-    int count = execUpdatePrepStmt0(SQL_REMOVE_CERT,
-        col2Int(ca.getId()), col2Str(serialNumber.toString(16)));
-
-    if (count != 1) {
-      String message = (count > 1) ? count + " rows modified, but exactly one is expected"
-          : "no row is modified, but exactly one is expected";
-      throw new OperationException(SYSTEM_FAILURE, message);
+    long id = getCertId(ca, serialNumber);
+    if (id == 0) {
+      return;
     }
+
+    removeCert(id);
   } // method removeCert
+
+  public void removeCert(long id) throws OperationException {
+    execUpdatePrepStmt0(SQL_REMOVE_CERT_FOR_ID, col2Long(id));
+  }
 
   public List<Long> getPublishQueueEntries(NameId ca, NameId publisher, int numEntries)
       throws OperationException {
@@ -600,29 +601,30 @@ public class CertStore extends CertStoreBase {
     return ret;
   }
 
-  public List<BigInteger> getExpiredSerialNumbers(NameId ca, long expiredAt, int numEntries)
+  public List<SerialWithId> getExpiredSerialNumbers(NameId ca, long expiredAt, int numEntries)
       throws OperationException {
     notNull(ca, "ca");
     positive(numEntries, "numEntries");
 
     String sql = cacheSqlExpiredSerials.get(numEntries);
     if (sql == null) {
-      sql = datasource.buildSelectFirstSql(numEntries, "SN FROM CERT WHERE CA_ID=? AND NAFTER<?");
+      sql = datasource.buildSelectFirstSql(numEntries,
+            "ID,SN FROM CERT WHERE CA_ID=? AND NAFTER<?");
       cacheSqlExpiredSerials.put(numEntries, sql);
     }
 
     return getSerialNumbers0(sql, numEntries, col2Int(ca.getId()), col2Long(expiredAt));
   } // method getExpiredSerialNumbers
 
-  public List<BigInteger> getSuspendedCertSerials(NameId ca, long latestLastUpdate, int numEntries)
-      throws OperationException {
+  public List<SerialWithId> getSuspendedCertSerials(NameId ca, long latestLastUpdate,
+      int numEntries) throws OperationException {
     notNull(ca, "ca");
     positive(numEntries, "numEntries");
 
     String sql = cacheSqlSuspendedSerials.get(numEntries);
     if (sql == null) {
       sql = datasource.buildSelectFirstSql(numEntries,
-          "SN FROM CERT WHERE CA_ID=? AND LUPDATE<? AND RR=?");
+          "ID,SN FROM CERT WHERE CA_ID=? AND LUPDATE<? AND RR=?");
       cacheSqlSuspendedSerials.put(numEntries, sql);
     }
 
@@ -630,12 +632,12 @@ public class CertStore extends CertStoreBase {
             col2Int(CrlReason.CERTIFICATE_HOLD.getCode()));
   } // method getSuspendedCertIds
 
-  private List<BigInteger> getSerialNumbers0(String sql, int numEntries, SqlColumn2... params)
+  private List<SerialWithId> getSerialNumbers0(String sql, int numEntries, SqlColumn2... params)
       throws OperationException {
     List<ResultRow> rows = execQueryPrepStmt0(sql, params);
-    List<BigInteger> ret = new ArrayList<>();
+    List<SerialWithId> ret = new ArrayList<>();
     for (ResultRow row : rows) {
-      ret.add(new BigInteger(row.getString("SN"), 16));
+      ret.add(new SerialWithId(getLong(row, "ID"), new BigInteger(row.getString("SN"), 16)));
       if (ret.size() >= numEntries) {
         break;
       }
@@ -719,6 +721,15 @@ public class CertStore extends CertStoreBase {
     return certInfo;
   } // method getCertForId
 
+  public CertWithRevocationInfo getCertWithRevocationInfo(long certId, CaIdNameMap idNameMap)
+      throws OperationException {
+    ResultRow rs = execQuery1PrepStmt0(sqlCertForId, col2Long(certId));
+    if (rs == null) {
+      return null;
+    }
+    return buildCertWithRevInfo(certId, rs, idNameMap);
+  }
+
   public CertWithRevocationInfo getCertWithRevocationInfo(int caId, BigInteger serial,
       CaIdNameMap idNameMap) throws OperationException {
     notNulls(serial, "serial", idNameMap, "idNameMap");
@@ -729,9 +740,14 @@ public class CertStore extends CertStoreBase {
       return null;
     }
 
+    return buildCertWithRevInfo(getLong(rs, "ID"), rs, idNameMap);
+  } // method getCertWithRevocationInfo
+
+  private CertWithRevocationInfo buildCertWithRevInfo(long certId, ResultRow rs,
+      CaIdNameMap idNameMap) throws OperationException {
     X509Cert cert = parseCert(Base64.decodeFast(rs.getString("CERT")));
     CertWithDbId certWithMeta = new CertWithDbId(cert);
-    certWithMeta.setCertId(getLong(rs, "ID"));
+    certWithMeta.setCertId(certId);
 
     CertWithRevocationInfo ret = new CertWithRevocationInfo();
     ret.setCertprofile(idNameMap.getCertprofileName(getInt(rs, "PID")));
@@ -739,6 +755,17 @@ public class CertStore extends CertStoreBase {
     ret.setRevInfo(buildCertRevInfo(rs));
     return ret;
   } // method getCertWithRevocationInfo
+
+  public long getCertId(NameId ca, BigInteger serial) throws OperationException {
+    notNulls(ca, "ca", serial, "serial");
+
+    ResultRow rs = execQuery1PrepStmt0(sqlCertInfo,
+        col2Int(ca.getId()), col2Str(serial.toString(16)));
+    if (rs == null) {
+      return 0;
+    }
+    return getLong(rs, "ID");
+  }
 
   public CertificateInfo getCertInfo(NameId ca, X509Cert caCert, BigInteger serial,
       CaIdNameMap idNameMap) throws OperationException {

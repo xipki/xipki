@@ -74,7 +74,7 @@ public class CertStoreBase extends QueryExecutor {
       "INSERT INTO CRL (ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE,DELTACRL,BASECRL_NO,CRL_SCOPE,CRL)"
       + " VALUES (?,?,?,?,?,?,?,?,?)";
 
-  protected static final String SQL_REMOVE_CERT = "DELETE FROM CERT WHERE CA_ID=? AND SN=?";
+  protected static final String SQL_REMOVE_CERT_FOR_ID = "DELETE FROM CERT WHERE ID=?";
 
   protected static final String SQL_DELETE_UNREFERENCED_REQUEST =
       "DELETE FROM REQUEST WHERE ID NOT IN (SELECT req.RID FROM REQCERT req)";
