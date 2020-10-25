@@ -521,7 +521,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     addEntityToCa("publisher", publisher, ca, sql);
   } // method addPublisherToCa
 
-  public void addEntityToCa(String desc, NameId entity, NameId ca, String sql)
+  private void addEntityToCa(String desc, NameId entity, NameId ca, String sql)
       throws CaMgmtException {
     int num = execUpdatePrepStmt0(sql, col2Int(ca.getId()), col2Int(entity.getId()));
     if (num == 0) {

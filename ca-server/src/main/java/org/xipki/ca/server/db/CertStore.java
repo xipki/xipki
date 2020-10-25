@@ -45,7 +45,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.CertificateList;
@@ -73,7 +72,6 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
@@ -178,8 +176,6 @@ public class CertStore extends CertStoreBase {
 
   private final String sqlCertInfo;
 
-  private final String sqlCertprofileForCertId;
-
   private final String sqlActiveUserInfoForName;
 
   private final String sqlActiveUserNameForId;
@@ -189,10 +185,6 @@ public class CertStore extends CertStoreBase {
   private final String sqlKnowsCertForSerial;
 
   private final String sqlCertStatusForSubjectFp;
-
-  private final String sqlCertforSubjectIssued;
-
-  private final String sqlLatestSerialForSubjectLike;
 
   private final String sqlCrl;
 
@@ -233,7 +225,6 @@ public class CertStore extends CertStoreBase {
         "ID,REV,RR,RT,RIT,PID,CERT FROM CERT WHERE CA_ID=? AND SN=?");
     this.sqlCertInfo = buildSelectFirstSql(
         "PID,RID,REV,RR,RT,RIT,CERT FROM CERT WHERE CA_ID=? AND SN=?");
-    this.sqlCertprofileForCertId = buildSelectFirstSql("PID FROM CERT WHERE ID=? AND CA_ID=?");
     this.sqlActiveUserInfoForName = buildSelectFirstSql(
         "ID,PASSWORD FROM TUSER WHERE NAME=? AND ACTIVE=1");
     this.sqlActiveUserNameForId = buildSelectFirstSql("NAME FROM TUSER WHERE ID=? AND ACTIVE=1");
@@ -241,12 +232,9 @@ public class CertStore extends CertStoreBase {
         "PERMISSION,PROFILES FROM CA_HAS_USER WHERE CA_ID=? AND USER_ID=?");
     this.sqlKnowsCertForSerial = buildSelectFirstSql("UID FROM CERT WHERE SN=? AND CA_ID=?");
     this.sqlCertStatusForSubjectFp = buildSelectFirstSql("REV FROM CERT WHERE FP_S=? AND CA_ID=?");
-    this.sqlCertforSubjectIssued = buildSelectFirstSql("ID FROM CERT WHERE CA_ID=? AND FP_S=?");
     this.sqlReqIdForSerial = buildSelectFirstSql("REQCERT.RID as REQ_ID FROM REQCERT INNER JOIN "
         + "CERT ON CERT.CA_ID=? AND CERT.SN=? AND REQCERT.CID=CERT.ID");
     this.sqlReqForId = buildSelectFirstSql("DATA FROM REQUEST WHERE ID=?");
-    this.sqlLatestSerialForSubjectLike = buildSelectFirstSql("NBEFORE DESC",
-        "SUBJECT FROM CERT WHERE SUBJECT LIKE ?");
     this.sqlCrl = buildSelectFirstSql("THISUPDATE DESC", "THISUPDATE,CRL FROM CRL WHERE CA_ID=?");
     this.sqlCrlWithNo = buildSelectFirstSql("THISUPDATE DESC",
         "THISUPDATE,CRL FROM CRL WHERE CA_ID=? AND CRL_NO=?");
@@ -597,35 +585,6 @@ public class CertStore extends CertStoreBase {
     return getSerialWithIds(sql, numEntries, col2Long(startId - 1), col2Int(ca.getId()));
   } // method getSerialNumbers
 
-  public List<SerialWithId> getSerialNumbers(NameId ca, Date notExpiredAt, long startId,
-      int numEntries, boolean onlyRevoked, boolean onlyCaCerts, boolean onlyUserCerts)
-      throws OperationException {
-    notNulls(ca, "ca", numEntries, "numEntries");
-
-    if (onlyCaCerts && onlyUserCerts) {
-      throw new IllegalArgumentException("onlyCaCerts and onlyUserCerts cannot be both of true");
-    }
-
-    List<SqlColumn2> params = new ArrayList<>(4);
-    params.add(col2Long(startId - 1));
-    params.add(col2Int(ca.getId()));
-    if (notExpiredAt != null) {
-      params.add(col2Long(notExpiredAt.getTime() / 1000 + 1));
-    }
-
-    boolean withEe = onlyCaCerts || onlyUserCerts;
-    if (withEe) {
-      params.add(col2Bool(onlyUserCerts));
-    }
-
-    String sqlCore = StringUtil.concat("ID,SN FROM CERT WHERE ID>? AND CA_ID=?",
-        (notExpiredAt != null ? " AND NAFTER>?" : ""),
-        (onlyRevoked ? " AND REV=1" : ""), (withEe ? " AND EE=?" : ""));
-    String sql = datasource.buildSelectFirstSql(numEntries, "ID ASC", sqlCore);
-
-    return getSerialWithIds(sql, numEntries, params.toArray(new SqlColumn2[0]));
-  } // method getSerialNumbers
-
   private List<SerialWithId> getSerialWithIds(String sql, int numEntries, SqlColumn2... params)
       throws OperationException {
     List<ResultRow> rows = execQueryPrepStmt0(sql, params);
@@ -684,7 +643,7 @@ public class CertStore extends CertStoreBase {
     return ret;
   } // method getExpiredSerialNumbers
 
-  public byte[] getEncodedCrl(NameId ca) throws OperationException {
+  private byte[] getEncodedCrl(NameId ca) throws OperationException {
     notNull(ca, "ca");
 
     List<ResultRow> rows = execQueryPrepStmt0(sqlCrl, col2Int(ca.getId()));
@@ -801,13 +760,6 @@ public class CertStore extends CertStoreBase {
     certInfo.setRevocationInfo(buildCertRevInfo(rs));
     return certInfo;
   } // method getCertInfo
-
-  public Integer getCertprofileForCertId(NameId ca, long cid) throws OperationException {
-    notNull(ca, "ca");
-    ResultRow rs = execQuery1PrepStmt0(sqlCertprofileForCertId,
-        col2Long(cid), col2Int(ca.getId()));
-    return rs == null ? null : getInt(rs, "PID");
-  } // method getCertprofileForId
 
   /**
    * Get certificates for given subject and transactionId.
@@ -1172,14 +1124,6 @@ public class CertStore extends CertStoreBase {
                         : getBoolean(rs, "REV") ? CertStatus.REVOKED : CertStatus.GOOD;
   } // method getCertStatusForSubjectFp
 
-  public boolean isCertForSubjectIssued(NameId ca, long subjectFp) throws OperationException {
-    notNull(ca, "ca");
-
-    ResultRow rs = execQuery1PrepStmt0(sqlCertforSubjectIssued,
-                    col2Int(ca.getId()), col2Long(subjectFp));
-    return rs != null;
-  }
-
   public boolean isHealthy() {
     try {
       execUpdateStmt("SELECT ID FROM CA");
@@ -1190,31 +1134,6 @@ public class CertStore extends CertStoreBase {
       return false;
     }
   } // method isHealthy
-
-  public String getLatestSerialNumber(X500Name nameWithSn) throws OperationException {
-    RDN[] rdns1 = nameWithSn.getRDNs();
-    RDN[] rdns2 = new RDN[rdns1.length];
-    for (int i = 0; i < rdns1.length; i++) {
-      RDN rdn = rdns1[i];
-      rdns2[i] =  rdn.getFirst().getType().equals(ObjectIdentifiers.DN.serialNumber)
-          ? new RDN(ObjectIdentifiers.DN.serialNumber, new DERPrintableString("%")) : rdn;
-    }
-
-    String namePattern = X509Util.getRfc4519Name(new X500Name(rdns2));
-
-    ResultRow rs = execQuery1PrepStmt0(sqlLatestSerialForSubjectLike, null, col2Str(namePattern));
-    if (rs == null) {
-      return null;
-    }
-
-    X500Name lastName = new X500Name(rs.getString("SUBJECT"));
-    RDN[] rdns = lastName.getRDNs(ObjectIdentifiers.DN.serialNumber);
-    if (rdns == null || rdns.length == 0) {
-      return null;
-    }
-
-    return X509Util.rdnValueToString(rdns[0].getFirst().getValue());
-  } // method getLatestSerialNumber
 
   public void deleteUnreferencedRequests() throws OperationException {
     execUpdateStmt0(SQL_DELETE_UNREFERENCED_REQUEST);
