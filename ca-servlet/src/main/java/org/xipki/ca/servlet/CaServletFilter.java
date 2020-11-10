@@ -18,6 +18,7 @@
 package org.xipki.ca.servlet;
 
 import java.io.IOException;
+import java.security.Security;
 import java.security.cert.CertificateException;
 import java.util.HashSet;
 import java.util.List;
@@ -31,6 +32,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,10 +86,15 @@ public class CaServletFilter implements Filter {
   private boolean logReqResp;
 
   private HttpMgmtServlet mgmtServlet;
-
+  
   @Override
   public void init(FilterConfig filterConfig)
       throws ServletException {
+      
+    LOG.info("Init of CAServeletFilter");
+  // init BC provider as early as possible
+    Security.addProvider(new BouncyCastleProvider());
+    
     XipkiBaseDir.init();
 
     CaServerConf conf;
