@@ -62,7 +62,7 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
   }
 
   public boolean matchesLabel(String label) {
-    return label.equals(label);
+    return this.label.equals(label);
   }
 
   public String getIdHex() {
