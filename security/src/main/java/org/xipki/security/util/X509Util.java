@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -457,7 +458,25 @@ public class X509Util {
   public static X509Cert[] buildCertPath(X509Cert targetCert,
       Collection<X509Cert> certs, boolean includeTargetCert)
           throws CertPathBuilderException {
+    return buildCertPath(targetCert, certs, null, includeTargetCert);
+  }
+
+  public static X509Cert[] buildCertPath(X509Cert targetCert,
+      Collection<X509Cert> certs, Collection<X509Cert> trustAnchors,
+      boolean includeTargetCert)
+          throws CertPathBuilderException {
     notNull(targetCert, "cert");
+
+    if (trustAnchors == null) {
+      trustAnchors = Collections.emptySet();
+    }
+
+    if (!trustAnchors.isEmpty()) {
+      Set<X509Cert> coll = new HashSet<>(certs);
+      coll.addAll(trustAnchors);
+      certs = coll;
+    }
+
     List<X509Cert> certChain = new LinkedList<>();
     certChain.add(targetCert);
     try {
@@ -468,14 +487,20 @@ public class X509Util {
             break;
           }
           certChain.add(caCert);
-          if (caCert.isSelfSigned()) {
-            // reaches root self-signed certificate
+          if (caCert.isSelfSigned() || trustAnchors.contains(caCert)) {
+            // reaches root self-signed certificate or trustanchor
             break;
           }
         }
       }
     } catch (CertificateEncodingException ex) {
       LOG.warn("CertificateEncodingException: {}", ex.getMessage());
+    }
+
+    if (!trustAnchors.isEmpty()) {
+      if (!trustAnchors.contains(certChain.get(certChain.size() - 1))) {
+        return null;
+      }
     }
 
     final int n = certChain.size();
