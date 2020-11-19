@@ -483,30 +483,6 @@ public class X509Util {
       return includeTargetCert ? certChain.toArray(new X509Cert[0]) : null;
     }
 
-    // check the basicConstrains
-    int minPathLen;
-    int targetPathLen = targetCert.getBasicConstraints();
-    if (targetPathLen != -1) {
-      // targetCert is non-CA
-      minPathLen = 0;
-    } else {
-      if (targetPathLen == Integer.MAX_VALUE) {
-        minPathLen = 1;
-      } else {
-        minPathLen = targetPathLen + 1;
-      }
-    }
-
-    for (int i = 1; i < n; i++) {
-      int pathLen = certChain.get(i).getBasicConstraints();
-      if (pathLen < minPathLen) {
-        throw new CertPathBuilderException("PathLen too small of certificate "
-            + certChain.get(i).getSubject().toString());
-      } else {
-        minPathLen = 1 + (pathLen == Integer.MAX_VALUE ? minPathLen : pathLen);
-      }
-    }
-
     if (!includeTargetCert) {
       certChain.remove(0);
     }
