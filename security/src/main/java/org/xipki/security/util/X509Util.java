@@ -580,6 +580,20 @@ public class X509Util {
     notNull(issuerCert, "issuerCert");
     notNull(cert, "cert");
 
+    // check basicConstraints
+    int pathLen = issuerCert.getBasicConstraints();
+    if (pathLen == -1) {
+      // issuerCert is not a CA certificate
+      return false;
+    }
+
+    // assert issuerCert.pathLen > cert.pathLen
+    if (pathLen != Integer.MAX_VALUE) {
+      if (pathLen <= cert.getBasicConstraints()) {
+        return false;
+      }
+    }
+
     boolean issues = issuerCert.getSubject().equals(cert.getIssuer());
     if (issues) {
       byte[] ski = issuerCert.getSubjectKeyId();
