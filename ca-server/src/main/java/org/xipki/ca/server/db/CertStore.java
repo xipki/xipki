@@ -601,7 +601,8 @@ public class CertStore extends CertStoreBase {
     return ret;
   }
 
-  public List<SerialWithId> getExpiredSerialNumbers(NameId ca, long expiredAt, int numEntries)
+  public List<SerialWithId> getExpiredUnrevokedSerialNumbers(
+      NameId ca, long expiredAt, int numEntries)
       throws OperationException {
     notNull(ca, "ca");
     positive(numEntries, "numEntries");
@@ -609,7 +610,7 @@ public class CertStore extends CertStoreBase {
     String sql = cacheSqlExpiredSerials.get(numEntries);
     if (sql == null) {
       sql = datasource.buildSelectFirstSql(numEntries,
-            "ID,SN FROM CERT WHERE CA_ID=? AND NAFTER<?");
+            "ID,SN FROM CERT WHERE CA_ID=? AND NAFTER<? AND REV=0");
       cacheSqlExpiredSerials.put(numEntries, sql);
     }
 

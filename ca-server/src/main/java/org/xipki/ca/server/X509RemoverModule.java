@@ -175,7 +175,7 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
 
     int sum = 0;
     while (true) {
-      List<SerialWithId> serials = certstore.getExpiredSerialNumbers(
+      List<SerialWithId> serials = certstore.getExpiredUnrevokedSerialNumbers(
             caIdent, expiredAt, numEntries);
       if (CollectionUtil.isEmpty(serials)) {
         return sum;
