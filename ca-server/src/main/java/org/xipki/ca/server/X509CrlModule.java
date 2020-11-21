@@ -42,6 +42,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.CRLDistPoint;
@@ -417,8 +418,10 @@ public class X509CrlModule extends X509CaModule implements Closeable {
 
       CrlControl crlControl = caInfo.getCrlControl();
 
+      boolean withExpiredCerts = crlControl.isIncludeExpiredcerts();
+
       // 10 minutes buffer
-      Date notExpiredAt = crlControl.isIncludeExpiredcerts()
+      Date notExpiredAt = withExpiredCerts
                           ? new Date(0) : new Date(thisUpdate.getTime() - 600L * MS_PER_SECOND);
 
       // we have to cache the serial entries to sort them
@@ -560,6 +563,11 @@ public class X509CrlModule extends X509CaModule implements Closeable {
           CRLDistPoint cdp = CaUtil.createCrlDistributionPoints(deltaCrlUris, pci.getSubject(),
               crlIssuer);
           crlBuilder.addExtension(Extension.freshestCRL, false, cdp);
+        }
+
+        if (withExpiredCerts) {
+          DERGeneralizedTime statusSince = new DERGeneralizedTime(caCert.getNotBefore());
+          crlBuilder.addExtension(Extension.expiredCertsOnCRL, false, statusSince);
         }
       } catch (CertIOException ex) {
         LogUtil.error(LOG, ex, "crlBuilder.addExtension");
