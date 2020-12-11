@@ -21,6 +21,7 @@ import java.security.InvalidKeyException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import javax.crypto.Cipher;
@@ -32,6 +33,8 @@ import javax.crypto.spec.SecretKeySpec;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.cmp.PBMParameter;
+import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
+import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.EnvelopedData;
 import org.bouncycastle.asn1.cms.GCMParameters;
 import org.bouncycastle.asn1.crmf.EncryptedKey;
@@ -49,6 +52,11 @@ import org.bouncycastle.cert.cmp.ProtectedPKIMessageBuilder;
 import org.bouncycastle.cert.crmf.CRMFException;
 import org.bouncycastle.cert.crmf.PKMACBuilder;
 import org.bouncycastle.cert.crmf.jcajce.JcePKMACValuesCalculator;
+import org.bouncycastle.cms.CMSEnvelopedData;
+import org.bouncycastle.cms.PasswordRecipientInformation;
+import org.bouncycastle.cms.RecipientInformation;
+import org.bouncycastle.cms.RecipientInformationStore;
+import org.bouncycastle.cms.bc.BcPasswordEnvelopedRecipient;
 import org.bouncycastle.jcajce.spec.PBKDF2KeySpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -173,11 +181,26 @@ public class PbmMacCmpCaClient extends CmpCaClient {
       throws Exception {
     ASN1Encodable ekValue = ek.getValue();
     if (ekValue instanceof EnvelopedData) {
-      throw new UnsupportedOperationException("EncryptedKey.[0]envelopedData unsupported yet");
+      return decrypt((EnvelopedData) ekValue);
+    } else {
+      return decrypt((EncryptedValue) ekValue);
     }
+  }
 
-    EncryptedValue ev = (EncryptedValue) ekValue;
+  private byte[] decrypt(EnvelopedData ed0)
+      throws Exception {
+    ContentInfo ci = new ContentInfo(CMSObjectIdentifiers.envelopedData, ed0);
+    CMSEnvelopedData ed = new CMSEnvelopedData(ci);
 
+    RecipientInformationStore recipients = ed.getRecipientInfos();
+    Iterator<RecipientInformation> it = recipients.getRecipients().iterator();
+    PasswordRecipientInformation recipient = (PasswordRecipientInformation) it.next();
+
+    return recipient.getContent(new BcPasswordEnvelopedRecipient(password));
+  }
+
+  private byte[] decrypt(EncryptedValue ev)
+      throws Exception {
     AlgorithmIdentifier symmAlg = ev.getSymmAlg();
     if (!PKCSObjectIdentifiers.id_PBES2.equals(symmAlg.getAlgorithm())) {
       throw new Exception("unsupported symmAlg " + symmAlg.getAlgorithm().getId());

@@ -30,6 +30,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -61,6 +62,8 @@ import org.bouncycastle.asn1.cmp.PKIFreeText;
 import org.bouncycastle.asn1.cmp.PKIStatus;
 import org.bouncycastle.asn1.cmp.PKIStatusInfo;
 import org.bouncycastle.asn1.cmp.RevRepContent;
+import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
+import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.EnvelopedData;
 import org.bouncycastle.asn1.cms.GCMParameters;
 import org.bouncycastle.asn1.crmf.CertId;
@@ -78,6 +81,16 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.cert.X509CRLHolder;
+import org.bouncycastle.cms.CMSAlgorithm;
+import org.bouncycastle.cms.CMSEnvelopedData;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.PasswordRecipientInformation;
+import org.bouncycastle.cms.Recipient;
+import org.bouncycastle.cms.RecipientInformation;
+import org.bouncycastle.cms.RecipientInformationStore;
+import org.bouncycastle.cms.bc.BcPasswordEnvelopedRecipient;
+import org.bouncycastle.cms.jcajce.JceKeyAgreeEnvelopedRecipient;
+import org.bouncycastle.cms.jcajce.JceKeyTransEnvelopedRecipient;
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.agreement.ECDHBasicAgreement;
 import org.bouncycastle.crypto.engines.AESEngine;
@@ -243,14 +256,29 @@ class CmpAgentUtil {
       throws XiSecurityException {
     ASN1Encodable ekValue = ek.getValue();
     if (ekValue instanceof EnvelopedData) {
-      throw new UnsupportedOperationException("EncryptedKey.[0]envelopedData unsupported yet");
+      return decrypt((EnvelopedData) ekValue, password);
+    } else {
+      return decrypt((EncryptedValue) ekValue, password);
     }
-
-    EncryptedValue ev = (EncryptedValue) ekValue;
-    return decrypt(ev, password);
   }
 
-  static byte[] decrypt(EncryptedValue ev, char[] password)
+  private static byte[] decrypt(EnvelopedData ed0, char[] password)
+      throws XiSecurityException {
+    try {
+      ContentInfo ci = new ContentInfo(CMSObjectIdentifiers.envelopedData, ed0);
+      CMSEnvelopedData ed = new CMSEnvelopedData(ci);
+
+      RecipientInformationStore recipients = ed.getRecipientInfos();
+      Iterator<RecipientInformation> it = recipients.getRecipients().iterator();
+      PasswordRecipientInformation recipient = (PasswordRecipientInformation) it.next();
+
+      return recipient.getContent(new BcPasswordEnvelopedRecipient(password));
+    } catch (CMSException ex) {
+      throw new XiSecurityException(ex.getMessage(), ex);
+    }
+  }
+
+  private static byte[] decrypt(EncryptedValue ev, char[] password)
       throws XiSecurityException {
     AlgorithmIdentifier symmAlg = ev.getSymmAlg();
     if (!PKCSObjectIdentifiers.id_PBES2.equals(symmAlg.getAlgorithm())) {
@@ -292,14 +320,42 @@ class CmpAgentUtil {
       throws XiSecurityException {
     ASN1Encodable ekValue = ek.getValue();
     if (ekValue instanceof EnvelopedData) {
-      throw new UnsupportedOperationException("EncryptedKey.[0]envelopedData unsupported yet");
+      return decrypt((EnvelopedData) ekValue, decKey);
+    } else {
+      return decrypt((EncryptedValue) ekValue, decKey);
     }
-
-    EncryptedValue ev = (EncryptedValue) ekValue;
-    return decrypt(ev, decKey);
   }
 
-  static byte[] decrypt(EncryptedValue ev, PrivateKey decKey)
+  private static byte[] decrypt(EnvelopedData ed0, PrivateKey decKey)
+      throws XiSecurityException {
+    try {
+      ContentInfo ci = new ContentInfo(CMSObjectIdentifiers.envelopedData, ed0);
+      CMSEnvelopedData ed = new CMSEnvelopedData(ci);
+
+      RecipientInformationStore recipients = ed.getRecipientInfos();
+      Iterator<RecipientInformation> it = recipients.getRecipients().iterator();
+      RecipientInformation ri = it.next();
+
+      ASN1ObjectIdentifier encAlg = ri.getKeyEncryptionAlgorithm().getAlgorithm();
+      Recipient recipient = null;
+      if (encAlg.equals(CMSAlgorithm.ECDH_SHA1KDF)
+          || encAlg.equals(CMSAlgorithm.ECDH_SHA224KDF)
+          || encAlg.equals(CMSAlgorithm.ECDH_SHA256KDF)
+          || encAlg.equals(CMSAlgorithm.ECDH_SHA384KDF)
+          || encAlg.equals(CMSAlgorithm.ECDH_SHA384KDF)
+          || encAlg.equals(CMSAlgorithm.ECDH_SHA512KDF)) {
+        recipient = new JceKeyAgreeEnvelopedRecipient(decKey).setProvider("BC");
+      } else {
+        recipient = new JceKeyTransEnvelopedRecipient(decKey).setProvider("BC");
+      }
+
+      return ri.getContent(recipient);
+    } catch (CMSException ex) {
+      throw new XiSecurityException(ex.getMessage(), ex);
+    }
+  }
+
+  private static byte[] decrypt(EncryptedValue ev, PrivateKey decKey)
       throws XiSecurityException {
     AlgorithmIdentifier keyAlg = ev.getKeyAlg();
     ASN1ObjectIdentifier keyOid = keyAlg.getAlgorithm();
