@@ -32,7 +32,9 @@ import javax.crypto.spec.SecretKeySpec;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.cmp.PBMParameter;
+import org.bouncycastle.asn1.cms.EnvelopedData;
 import org.bouncycastle.asn1.cms.GCMParameters;
+import org.bouncycastle.asn1.crmf.EncryptedKey;
 import org.bouncycastle.asn1.crmf.EncryptedValue;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PBES2Parameters;
@@ -167,8 +169,15 @@ public class PbmMacCmpCaClient extends CmpCaClient {
   } // method verifyProtection
 
   @Override
-  protected byte[] decrypt(EncryptedValue ev)
+  protected byte[] decrypt(EncryptedKey ek)
       throws Exception {
+    ASN1Encodable ekValue = ek.getValue();
+    if (ekValue instanceof EnvelopedData) {
+      throw new UnsupportedOperationException("EncryptedKey.[0]envelopedData unsupported yet");
+    }
+
+    EncryptedValue ev = (EncryptedValue) ekValue;
+
     AlgorithmIdentifier symmAlg = ev.getSymmAlg();
     if (!PKCSObjectIdentifiers.id_PBES2.equals(symmAlg.getAlgorithm())) {
       throw new Exception("unsupported symmAlg " + symmAlg.getAlgorithm().getId());

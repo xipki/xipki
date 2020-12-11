@@ -66,7 +66,7 @@ import org.bouncycastle.asn1.crmf.CertReqMsg;
 import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.CertTemplateBuilder;
 import org.bouncycastle.asn1.crmf.Controls;
-import org.bouncycastle.asn1.crmf.EncryptedValue;
+import org.bouncycastle.asn1.crmf.EncryptedKey;
 import org.bouncycastle.asn1.crmf.POPOSigningKey;
 import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
@@ -337,7 +337,7 @@ public abstract class CmpCaClient implements Closeable {
               + ": the returned certificate is not issued by the given CA");
         }
 
-        EncryptedValue encKey = cvk.getPrivateKey();
+        EncryptedKey encKey = cvk.getPrivateKey();
         PrivateKeyInfo key = null;
         if (encKey != null) {
           byte[] keyBytes = decrypt(encKey);
@@ -752,7 +752,7 @@ public abstract class CmpCaClient implements Closeable {
     return SdkUtil.send(url, "POST", request, CMP_REQUEST_MIMETYPE, CMP_RESPONSE_MIMETYPE);
   } // method send
 
-  protected abstract byte[] decrypt(EncryptedValue ev)
+  protected abstract byte[] decrypt(EncryptedKey ev)
       throws Exception;
 
   protected ContentSigner buildSigner(PrivateKey signingKey)

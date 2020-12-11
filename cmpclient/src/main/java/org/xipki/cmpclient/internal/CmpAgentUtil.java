@@ -61,8 +61,10 @@ import org.bouncycastle.asn1.cmp.PKIFreeText;
 import org.bouncycastle.asn1.cmp.PKIStatus;
 import org.bouncycastle.asn1.cmp.PKIStatusInfo;
 import org.bouncycastle.asn1.cmp.RevRepContent;
+import org.bouncycastle.asn1.cms.EnvelopedData;
 import org.bouncycastle.asn1.cms.GCMParameters;
 import org.bouncycastle.asn1.crmf.CertId;
+import org.bouncycastle.asn1.crmf.EncryptedKey;
 import org.bouncycastle.asn1.crmf.EncryptedValue;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PBES2Parameters;
@@ -237,6 +239,17 @@ class CmpAgentUtil {
     }
   } // method checkProtection
 
+  static byte[] decrypt(EncryptedKey ek, char[] password)
+      throws XiSecurityException {
+    ASN1Encodable ekValue = ek.getValue();
+    if (ekValue instanceof EnvelopedData) {
+      throw new UnsupportedOperationException("EncryptedKey.[0]envelopedData unsupported yet");
+    }
+
+    EncryptedValue ev = (EncryptedValue) ekValue;
+    return decrypt(ev, password);
+  }
+
   static byte[] decrypt(EncryptedValue ev, char[] password)
       throws XiSecurityException {
     AlgorithmIdentifier symmAlg = ev.getSymmAlg();
@@ -274,6 +287,17 @@ class CmpAgentUtil {
       throw new XiSecurityException("Error while decrypting the EncryptedValue", ex);
     }
   } // method decrypt
+
+  static byte[] decrypt(EncryptedKey ek, PrivateKey decKey)
+      throws XiSecurityException {
+    ASN1Encodable ekValue = ek.getValue();
+    if (ekValue instanceof EnvelopedData) {
+      throw new UnsupportedOperationException("EncryptedKey.[0]envelopedData unsupported yet");
+    }
+
+    EncryptedValue ev = (EncryptedValue) ekValue;
+    return decrypt(ev, decKey);
+  }
 
   static byte[] decrypt(EncryptedValue ev, PrivateKey decKey)
       throws XiSecurityException {

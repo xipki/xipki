@@ -39,13 +39,16 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.cmp.PKIHeader;
+import org.bouncycastle.asn1.cms.EnvelopedData;
 import org.bouncycastle.asn1.cms.GCMParameters;
+import org.bouncycastle.asn1.crmf.EncryptedKey;
 import org.bouncycastle.asn1.crmf.EncryptedValue;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -198,8 +201,15 @@ public class SignatureCmpCaClient extends CmpCaClient {
   } // method getContentVerifierProvider
 
   @Override
-  protected byte[] decrypt(EncryptedValue ev)
+  protected byte[] decrypt(EncryptedKey ek)
       throws Exception {
+    ASN1Encodable ekValue = ek.getValue();
+    if (ekValue instanceof EnvelopedData) {
+      throw new UnsupportedOperationException("EncryptedKey.[0]envelopedData unsupported yet");
+    }
+
+    EncryptedValue ev = (EncryptedValue) ekValue;
+
     AlgorithmIdentifier keyAlg = ev.getKeyAlg();
     ASN1ObjectIdentifier keyOid = keyAlg.getAlgorithm();
 
