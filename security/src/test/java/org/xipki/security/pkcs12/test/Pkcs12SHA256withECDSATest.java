@@ -17,9 +17,8 @@
 
 package org.xipki.security.pkcs12.test;
 
-import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 
 /**
  * JUnit tests to test the signature creation and verification of PKCS#12 token
@@ -29,22 +28,21 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
-public class Pkcs12SHA256withRSATest extends Pkcs12RSATest {
+public class Pkcs12SHA256withECDSATest extends Pkcs12RSATest {
 
   @Override
   protected String getPkcs12File() {
-    return "src/test/resources/test1.p12";
+    return "src/test/resources/test-ec.p12";
   }
 
   @Override
   protected String getCertificateFile() {
-    return "src/test/resources/test1.der";
+    return "src/test/resources/test-ec.der";
   }
 
   @Override
   protected AlgorithmIdentifier getSignatureAlgorithm() {
-    return new AlgorithmIdentifier(PKCSObjectIdentifiers.sha256WithRSAEncryption,
-        DERNull.INSTANCE);
+    return new AlgorithmIdentifier(X9ObjectIdentifiers.ecdsa_with_SHA256);
   }
 
 }
