@@ -18,6 +18,7 @@
 package org.xipki.util;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,16 @@ public class XipkiBaseDir {
     }
 
     String str = System.getProperty(PROP_XIPKI_BASE);
+
+    String workingDir;
+    try {
+      workingDir = new File(".").getCanonicalPath();
+    } catch (IOException ex) {
+      workingDir = new File(".").getAbsolutePath();
+    }
+
+    LOG.info("working dir is {}", workingDir);
+
     if (StringUtil.isBlank(str)) {
       basedir = new File("xipki").getAbsolutePath();
       LOG.info("use default basedir '{}', can be specified via the property '{}'",
