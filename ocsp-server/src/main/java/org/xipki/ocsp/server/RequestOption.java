@@ -107,14 +107,10 @@ public class RequestOption {
 
     nonceMinLen = nonceConf.getMinLen() != null ? nonceConf.getMinLen() : 4;
 
-    nonceMaxLen = nonceConf.getMaxLen() != null ? nonceConf.getMaxLen() : 32;
+    nonceMaxLen = nonceConf.getMaxLen() != null ? nonceConf.getMaxLen() : 96;
 
     if (nonceMinLen < 0) {
       throw new InvalidConfException("invalid nonceMinLen (<1): " + nonceMinLen);
-    }
-
-    if (nonceMaxLen > 32) {
-      throw new InvalidConfException("invalid nonceMaxLen (>32): " + nonceMaxLen);
     }
 
     if (nonceMinLen > nonceMaxLen) {
