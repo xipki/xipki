@@ -1149,6 +1149,8 @@ class IaikP11Slot extends P11Slot {
     while (true) {
       byte[] keyId = new byte[newObjectConf.getIdLength()];
       random.nextBytes(keyId);
+      // clear the first bit
+      keyId[0] = (byte) (0x7F & keyId[0]);
 
       if (existsIdentityForId(keyId) || existsCertForId(keyId)) {
         continue;
