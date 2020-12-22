@@ -723,7 +723,16 @@ class IaikP11Slot extends P11Slot {
 
     assertMechanismSupported(mech);
 
-    char[] labelChars = newObjectConf.isIgnoreLabel() ? null : control.getLabel().toCharArray();
+    char[] labelChars;
+    if (newObjectConf.isIgnoreLabel()) {
+      if (control.getLabel() != null) {
+        LOG.warn("label is set, but ignored: '{}'", control.getLabel());
+      }
+      labelChars = null;
+    } else {
+      labelChars = control.getLabel().toCharArray();
+    }
+
     byte[] id = control.getId();
 
     ValuedSecretKey template = new ValuedSecretKey(keyType);
@@ -766,7 +775,16 @@ class IaikP11Slot extends P11Slot {
   protected P11Identity importSecretKey0(long keyType, byte[] keyValue, P11NewKeyControl control)
       throws P11TokenException {
     ValuedSecretKey template = new ValuedSecretKey(keyType);
-    char[] labelChars = newObjectConf.isIgnoreLabel() ? null : control.getLabel().toCharArray();
+    char[] labelChars;
+    if (newObjectConf.isIgnoreLabel()) {
+      if (control.getLabel() != null) {
+        LOG.warn("label is set, but ignored: '{}'", control.getLabel());
+      }
+      labelChars = null;
+    } else {
+      labelChars = control.getLabel().toCharArray();
+    }
+
     setKeyAttributes(control, template, labelChars);
     template.getValue().setByteArrayValue(keyValue);
 
@@ -949,6 +967,10 @@ class IaikP11Slot extends P11Slot {
               + Functions.mechanismCodeToString(mech), ex);
         }
 
+        if (labelChars == null) {
+          throw new P11TokenException("Label of the generated PrivateKey is not set");
+        }
+
         // CHECKSTYLE:SKIP
         String pubKeyLabel = valueStr(keypair.getPublicKey().getLabel());
 
@@ -1008,7 +1030,11 @@ class IaikP11Slot extends P11Slot {
 
     newCertTemp.getId().setByteArrayValue(id);
 
-    if (!newObjectConf.isIgnoreLabel()) {
+    if (newObjectConf.isIgnoreLabel()) {
+      if (control.getLabel() != null) {
+        LOG.warn("label is set, but ignored: '{}'", control.getLabel());
+      }
+    } else {
       newCertTemp.getLabel().setCharArrayValue(control.getLabel().toCharArray());
     }
 

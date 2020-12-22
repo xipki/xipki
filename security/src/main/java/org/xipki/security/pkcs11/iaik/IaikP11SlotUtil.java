@@ -363,7 +363,11 @@ class IaikP11SlotUtil {
       PublicKey publicKey, PrivateKey privateKey, P11NewObjectConf newObjectConf) {
     if (privateKey != null) {
       privateKey.getToken().setBooleanValue(true);
-      if (!newObjectConf.isIgnoreLabel()) {
+      if (newObjectConf.isIgnoreLabel()) {
+        if (control.getLabel() != null) {
+          LOG.warn("label is set, but ignored: '{}'", control.getLabel());
+        }
+      } else {
         privateKey.getLabel().setCharArrayValue(control.getLabel().toCharArray());
       }
       privateKey.getPrivate().setBooleanValue(true);
