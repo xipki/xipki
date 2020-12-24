@@ -147,7 +147,7 @@ public class X509Cert {
   /**
    * Gets the certificate constraints path length from the
    * critical {@code BasicConstraints} extension, (OID = 2.5.29.19).
-   * <p/>
+   * <p></p>
    * The basic constraints extension identifies whether the subject
    * of the certificate is a Certificate Authority (CA) and
    * how deep a certification path may exist through that CA. The
@@ -156,7 +156,7 @@ public class X509Cert {
    * maximum number of CA certificates that may follow this certificate in a
    * certification path. A value of zero indicates that only an end-entity
    * certificate may follow in the path.
-   * <p/>
+   * <p></p>
    * The ASN.1 definition for this is:
    * <pre>
    * BasicConstraints ::= SEQUENCE {

@@ -337,8 +337,6 @@ public class IdentifiedCertprofile implements Closeable {
    *          NotBefore. Must not be {@code null}.
    * @param notAfter
    *          NotAfter. Must not be {@code null}.
-   * @param caInfo
-   *          CA information.
    * @return the extensions of the certificate to be issued.
    */
   public ExtensionValues getExtensions(X500Name requestedSubject, X500Name grantedSubject,
