@@ -106,10 +106,7 @@
       </column>
       <column name="PASSWORD" type="VARCHAR(150)" remarks="salted hashed password in hex">
         <constraints nullable="false"/>
-        <!-- byte 1: identifies hash algorithm,
-             byte 2: identifies length of salt,
-             byte 3 and 4: specifies the iteration,
-             further bytes: salt and hash value-->
+        <!-- iterations:salt:derived key (algorithm is PBKDF2)-->
       </column>
     </createTable>
     <addUniqueConstraint tableName="TUSER" columnNames="NAME" constraintName="CONST_USER_NAME"/>
