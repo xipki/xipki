@@ -2,16 +2,32 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
-## 5.3.11
+
+## 5.3.12
   - Release date: -
   - CA
-    - *
   - OCSP
-    - *
   - CLI
-    - *
   - DB Tool
-    - *
+
+## 5.3.11
+  - Release date: Dec 24, 2020
+  - CA
+    - Split large java classes
+    - Changed max. validity of CAB EE cert: 825 -> 397
+    - Simplified the SQL queries
+    - Added expiredCertsOnCrl extesion if expired certificates in contained in CRL
+    - Do not remove revoked but expired certs
+    - Bump bouncycastle from 1.66 to 1.68
+  - OCSP
+    - Split large java classes
+    - Simplified the SQL queries
+     - Bump bouncycastle from 1.66 to 1.68
+  - CLI
+    - Split large java classes
+     - Bump bouncycastle from 1.66 to 1.68
+  - DB Tool
+    - Split large java classes
 
 ## 5.3.10
   - Release date: Oct 7, 2020
