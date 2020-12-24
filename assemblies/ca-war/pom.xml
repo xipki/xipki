@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki.assembly</groupId>
     <artifactId>assemblies</artifactId>
-    <version>5.3.11</version>
+    <version>5.3.12-SNAPSHOT</version>
   </parent>
   <artifactId>ca-war</artifactId>
   <packaging>pom</packaging>
