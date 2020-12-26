@@ -204,10 +204,10 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
     --outform $OUTFORM \
     --out output/subcawithcrl1.csr \
     --subject "CN=subcawithcrl1, O=xipki, C=DE" \
-    --subject-alt-name "[1]info@xipki.org" \
-    --subject-alt-name "[2]xipki.org" \
+    --subject-alt-name "[1]info@example.org" \
+    --subject-alt-name "[2]example.org" \
     --subject-alt-name "[5]edi-nameAssigner-1=edi-partyName1" \
-    --subject-alt-name "[6]http://xipki.org/abc" \
+    --subject-alt-name "[6]http://example.org/abc" \
     --subject-alt-name "[7]192.168.0.1" \
     --subject-alt-name "[8]1.2.3.4" \
     --subject-alt-name "[0]2.5.4.10=long organization name" \
@@ -221,10 +221,10 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
     --outform $OUTFORM \
     --out output/subcawithcrl1.csr \
     --subject "CN=subcawithcrl1, O=xipki, C=DE" \
-    --subject-alt-name "[1]info@xipki.org" \
-    --subject-alt-name "[2]xipki.org" \
+    --subject-alt-name "[1]info@example.org" \
+    --subject-alt-name "[2]example.org" \
     --subject-alt-name "[5]edi-nameAssigner-1=edi-partyName1" \
-    --subject-alt-name "[6]http://xipki.org/abc" \
+    --subject-alt-name "[6]http://example.org/abc" \
     --subject-alt-name "[7]192.168.0.1" \
     --subject-alt-name "[8]1.2.3.4" \
     --subject-alt-name "[0]2.5.4.10=long organization name" \

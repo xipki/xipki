@@ -72,7 +72,7 @@ echo "enroll certificate (CA generate keypair)"
 
 curl ${OPTS} \
     --header "Content-Type: text/plain; encoding=utf-8" \
-    --data-ascii "subject=CN=${CN}.xipki.org,O=xipki,C=DE" \
+    --data-ascii "subject=CN=${CN}.example.org,O=example,C=DE" \
     --output ${OUT_DIR}/${CN}.pem \
     "${CA_URL}/enroll-cert-cagenkeypair?profile=tls"
 
@@ -87,7 +87,7 @@ echo "generate CSR"
 
 openssl req -new -sha256 -key ${OUT_DIR}/${CN}-key.pem -outform der \
     -out ${OUT_DIR}/${CN}.csr \
-    -subj "/CN=${CN}.xipki.org/O=xipki/C=DE"
+    -subj "/CN=${CN}.example.org/O=xipki/C=DE"
 
 echo "enroll certificate"
 

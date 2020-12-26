@@ -56,7 +56,7 @@ if { $printUsage equals "true" } then {
     # Loadtest RSA key
     echo "Enroll benchmark"
     xiqa:cmp-benchmark-enroll  --duration $duration --thread $threads \
-      --key-type RSA --subject "CN=xipki.org,O=example PKI company RSA,C=DE" \
+      --key-type RSA --subject "CN=example.org,O=example PKI company RSA,C=DE" \
       --profile TLS -n 5 --random-dn O
 
   } elif { "$action" equals "ocsp" } then {

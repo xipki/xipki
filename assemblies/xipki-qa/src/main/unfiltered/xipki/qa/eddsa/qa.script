@@ -12,12 +12,12 @@ each ($list) {
 
   xi:csr-p12 \
     --p12 output/${type}-1.p12 --password 1234 \
-    --subject "CN=${type}-1.xipki.org,C=DE" \
+    --subject "CN=${type}-1.example.org,C=DE" \
     --out output/${type}-1.csr
 
   xi:csr-p12 \
     --p12 output/${type}-2.p12 --password 1234 \
-    --subject "CN=${type}-2.xipki.org,C=DE" \
+    --subject "CN=${type}-2.example.org,C=DE" \
     --out output/${type}-2.csr
  }
 
@@ -27,13 +27,13 @@ each ($list) {
 
   xi:csr-p12 \
     --p12 output/${type}-1.p12 --password 1234 \
-    --subject "CN=${type}-1.xipki.org,C=DE" \
+    --subject "CN=${type}-1.example.org,C=DE" \
     --peer-certs output/dhpoc-certs.pem \
     --out output/${type}-1.csr
 
   xi:csr-p12 \
     --p12 output/${type}-2.p12 --password 1234 \
-    --subject "CN=${type}-2.xipki.org,C=DE" \
+    --subject "CN=${type}-2.example.org,C=DE" \
     --peer-certs output/dhpoc-certs.pem \
     --out output/${type}-2.csr
 }

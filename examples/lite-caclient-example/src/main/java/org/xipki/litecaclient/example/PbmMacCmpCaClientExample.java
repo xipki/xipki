@@ -211,7 +211,7 @@ public class PbmMacCmpCaClientExample extends CaClientExample {
   } // method main
 
   private static String getSubject() {
-    return "CN=CMP-" + index.incrementAndGet() + ".xipki.org,O=xipki,C=DE";
+    return "CN=CMP-" + index.incrementAndGet() + ".example.org,O=example,C=DE";
   }
 
 }

@@ -77,7 +77,7 @@ xi:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}.p12" \
 
 xi:cmp-enroll-p12 --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --out ${OUT_DIR}/${CN}.der --profile tls \
-  --subject "CN=${CN}-${CUR_TIME}.xipki.org,O=xipki,C=DE"
+  --subject "CN=${CN}-${CUR_TIME}.example.org,O=xipki,C=DE"
 
 xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --cert ${OUT_DIR}/${CN}.der
@@ -89,7 +89,7 @@ CN = cmp-crmf-ca-genkey-tls
 xi:cmp-enroll-cagenkey \
   --p12-out ${OUT_DIR}/${CN}.p12 --password 1234 \
   --cert-out ${OUT_DIR}/${CN}.der --profile tls \
-  --subject "CN=${CN}-${CUR_TIME}.xipki.org,O=xipki,C=DE"
+  --subject "CN=${CN}-${CUR_TIME}.example.org,O=xipki,C=DE"
 
 echo "=====CMP: Enroll via CSR====="
 
@@ -100,7 +100,7 @@ xi:rsa-p12 --password 1234 --out ${OUT_DIR}/${CN}.p12 \
 
 xi:csr-p12 --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --out ${OUT_DIR}/${CN}.csr \
-  --subject "CN=${CN}-${CUR_TIME}.xipki.org,O=xipki,C=DE"
+  --subject "CN=${CN}-${CUR_TIME}.example.org,O=xipki,C=DE"
 
 xi:cmp-csr-enroll --csr ${OUT_DIR}/${CN}.csr --out ${OUT_DIR}/${CN}.der --profile tls
 

@@ -109,7 +109,7 @@
 			"maxOccurs":1,
 			"value":{
 				"overridable":false,
-				"text":"fixed xipki.org"
+				"text":"fixed example.org"
 			}
 		},{
 			"type":{
