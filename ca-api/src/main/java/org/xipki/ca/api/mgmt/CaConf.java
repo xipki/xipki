@@ -208,7 +208,7 @@ public class CaConf {
   public CaConf(File confFile, SecurityFactory securityFactory)
       throws IOException, InvalidConfException, CaMgmtException {
     Args.notNull(securityFactory, "securityFactory");
-    confFile = IoUtil.expandFilepath(Args.notNull(confFile, "confFile"));
+    confFile = IoUtil.expandFilepath(Args.notNull(confFile, "confFile"), true);
 
     init(Files.newInputStream(confFile.toPath()), securityFactory);
   }

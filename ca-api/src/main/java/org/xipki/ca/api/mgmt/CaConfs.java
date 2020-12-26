@@ -79,7 +79,7 @@ public class CaConfs {
     zipStream.setLevel(Deflater.BEST_SPEED);
 
     File confFile = new File(confFilename);
-    confFile = IoUtil.expandFilepath(confFile);
+    confFile = IoUtil.expandFilepath(confFile, true);
 
     InputStream caConfStream = null;
     String baseDir = null;

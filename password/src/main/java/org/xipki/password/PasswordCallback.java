@@ -75,10 +75,12 @@ public interface PasswordCallback {
         throw new PasswordResolverException("please initialize me first");
       }
 
+      passwordFile = IoUtil.detectPath(passwordFile);
+
       String passwordHint = null;
       BufferedReader reader = null;
       try {
-        reader = Files.newBufferedReader(Paths.get(IoUtil.expandFilepath(passwordFile)));
+        reader = Files.newBufferedReader(Paths.get(passwordFile));
         String line;
         while ((line = reader.readLine()) != null) {
           line = line.trim();

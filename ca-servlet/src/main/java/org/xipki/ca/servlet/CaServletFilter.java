@@ -65,7 +65,7 @@ public class CaServletFilter implements Filter {
 
   private static final Logger LOG = LoggerFactory.getLogger(CaServletFilter.class);
 
-  private static final String DFLT_CA_SERVER_CFG = "etc/ca/ca.json";
+  private static final String DFLT_CA_SERVER_CFG = "ca/etc/ca.json";
 
   private Securities securities;
 
@@ -92,7 +92,7 @@ public class CaServletFilter implements Filter {
 
     CaServerConf conf;
     try {
-      conf = CaServerConf.readConfFromFile(IoUtil.expandFilepath(DFLT_CA_SERVER_CFG));
+      conf = CaServerConf.readConfFromFile(IoUtil.expandFilepath(DFLT_CA_SERVER_CFG, true));
     } catch (IOException | InvalidConfException ex) {
       throw new IllegalArgumentException(
           "could not parse CA configuration file " + DFLT_CA_SERVER_CFG, ex);

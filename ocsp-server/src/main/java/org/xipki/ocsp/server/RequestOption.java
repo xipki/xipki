@@ -253,7 +253,7 @@ public class RequestOption {
 
       String fileName = ksConf.getKeystore().getFile();
       InputStream is = (fileName != null)
-          ? Files.newInputStream(Paths.get(IoUtil.expandFilepath(fileName)))
+          ? Files.newInputStream(Paths.get(IoUtil.expandFilepath(fileName, true)))
           : new ByteArrayInputStream(ksConf.getKeystore().getBinary());
 
       char[] password = (ksConf.getPassword() == null)  ? null

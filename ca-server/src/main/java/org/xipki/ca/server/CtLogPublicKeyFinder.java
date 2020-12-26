@@ -56,7 +56,7 @@ public class CtLogPublicKeyFinder {
     String keydirName = conf.getKeydir();
     File[] keyFiles = null;
     if (keydirName != null && !keydirName.isEmpty()) {
-      keydirName = IoUtil.expandFilepath(keydirName);
+      keydirName = IoUtil.expandFilepath(keydirName, true);
       keyFiles = new File(keydirName).listFiles(new FileFilter() {
         @Override
         public boolean accept(File pathname) {
@@ -80,7 +80,7 @@ public class CtLogPublicKeyFinder {
     List<PublicKey> publicKeyList = new ArrayList<>(size);
 
     for (File m : keyFiles) {
-      byte[] keyBytes = IoUtil.read(m);
+      byte[] keyBytes = IoUtil.read(m, true);
       keyBytes = X509Util.toDerEncoded(keyBytes);
       try {
         SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.getInstance(keyBytes);

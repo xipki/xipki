@@ -203,7 +203,7 @@ public class P12SignerFactory implements SignerFactory {
     } else if (StringUtil.startsWithIgnoreCase(str, "file:")) {
       String fn = str.substring("file:".length());
       try {
-        return Files.newInputStream(Paths.get(IoUtil.expandFilepath(fn)));
+        return Files.newInputStream(Paths.get(IoUtil.detectPath(fn)));
       } catch (IOException ex) {
         throw new ObjectCreationException("file not found: " + fn);
       }

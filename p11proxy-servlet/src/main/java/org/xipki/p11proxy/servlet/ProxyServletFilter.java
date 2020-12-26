@@ -63,7 +63,7 @@ public class ProxyServletFilter implements Filter {
 
     P11ProxyConf conf;
     try {
-      conf = P11ProxyConf.readConfFromFile(IoUtil.expandFilepath(DFLT_SERVER_CFG));
+      conf = P11ProxyConf.readConfFromFile(IoUtil.expandFilepath(DFLT_SERVER_CFG, true));
     } catch (IOException | InvalidConfException ex) {
       throw new IllegalArgumentException(
           "could not parse PKCS#11 Proxy configuration file " + DFLT_SERVER_CFG, ex);

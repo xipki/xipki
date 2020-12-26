@@ -76,16 +76,24 @@ public class IoUtil {
 
   public static byte[] read(String fileName)
       throws IOException {
+    return read(fileName, false);
+  }
+
+  public static byte[] read(String fileName, boolean prependBaseDir)
+      throws IOException {
     return Files.readAllBytes(
-        Paths.get(
-            expandFilepath(fileName)));
+        Paths.get(expandFilepath(fileName, prependBaseDir)));
   }
 
   public static byte[] read(File file)
       throws IOException {
+    return read(file, false);
+  }
+
+  public static byte[] read(File file, boolean prependBaseDir)
+      throws IOException {
     return Files.readAllBytes(
-        Paths.get(
-            expandFilepath(file.getPath())));
+        Paths.get(expandFilepath(file.getPath(), prependBaseDir)));
   }
 
   public static byte[] read(InputStream in)
@@ -110,12 +118,22 @@ public class IoUtil {
 
   public static void save(String fileName, byte[] encoded)
       throws IOException {
-    save(new File(expandFilepath(fileName)), encoded);
+    save(fileName, encoded, false);
+  }
+
+  public static void save(String fileName, byte[] encoded, boolean prependBaseDir)
+      throws IOException {
+    save(new File(fileName), encoded, prependBaseDir);
   }
 
   public static void save(File file, byte[] content)
       throws IOException {
-    File tmpFile = expandFilepath(file);
+    save(file, content, false);
+  }
+
+  public static void save(File file, byte[] content, boolean prependBaseDir)
+      throws IOException {
+    File tmpFile = expandFilepath(file, prependBaseDir);
     mkdirsParent(tmpFile.toPath());
 
     Files.copy(new ByteArrayInputStream(content), tmpFile.toPath(),
@@ -170,11 +188,19 @@ public class IoUtil {
   }
 
   public static boolean deleteFile(String path) {
-    return deleteFile(new File(expandFilepath(path)));
+    return deleteFile(new File(path), false);
+  }
+
+  public static boolean deleteFile(String path, boolean prependBaseDir) {
+    return deleteFile(new File(path), prependBaseDir);
   }
 
   public static boolean deleteFile(File file) {
-    file = expandFilepath(file);
+    return deleteFile(file, false);
+  }
+
+  public static boolean deleteFile(File file, boolean prependBaseDir) {
+    file = expandFilepath(file, prependBaseDir);
     if (file.exists()) {
       return file.delete();
     }
@@ -182,22 +208,41 @@ public class IoUtil {
   }
 
   public static String expandFilepath(String path) {
+    return expandFilepath(path, false);
+  }
+
+  public static String expandFilepath(String path, boolean prependBaseDir) {
     notBlank(path, "path");
     if (path.startsWith("~")) {
       return USER_HOME + path.substring(1);
     } else {
       if (path.startsWith("/")) {
+        // unix
         return path;
       } else {
-        String basedir = XipkiBaseDir.basedir();
-        return basedir == null ? path : Paths.get(basedir, path).toString();
+        int index = path.indexOf(':');
+        if (index == 1 || index == 2) {
+          // windows
+          return path;
+        }
+
+        if (prependBaseDir) {
+          String basedir = XipkiBaseDir.basedir();
+          return basedir == null ? path : Paths.get(basedir, path).toString();
+        } else {
+          return path;
+        }
       }
     }
   }
 
   public static File expandFilepath(File file) {
+    return expandFilepath(file, false);
+  }
+
+  public static File expandFilepath(File file, boolean prependBaseDir) {
     String path = file.getPath();
-    String expandedPath = expandFilepath(path);
+    String expandedPath = expandFilepath(path, prependBaseDir);
     return path.equals(expandedPath) ? file : new File(expandedPath);
   }
 
@@ -291,7 +336,12 @@ public class IoUtil {
 
   public static Properties loadProperties(String path)
       throws IOException {
-    Path realPath = Paths.get(expandFilepath(path));
+    return loadProperties(path, false);
+  }
+
+  public static Properties loadProperties(String path, boolean prependBaseDir)
+      throws IOException {
+    Path realPath = Paths.get(expandFilepath(path, prependBaseDir));
     if (!Files.exists(realPath)) {
       throw new IOException("File " + path + " does not exist");
     }
@@ -305,6 +355,23 @@ public class IoUtil {
       props.load(is);
     }
     return props;
+  }
+
+  public static String detectPath(String path) {
+    File file = new File(path);
+    file = expandFilepath(file, false);
+    if (!file.exists()) {
+      File file2 = expandFilepath(file, true);
+      if (file2.exists()) {
+        file = file2;
+      }
+    }
+
+    try {
+      return file.getCanonicalPath();
+    } catch (IOException ex) {
+      return path;
+    }
   }
 
 }

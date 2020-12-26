@@ -672,7 +672,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     rdnControls.add(createRdn(DN.C, null, null, value));
 
     value = new ValueType();
-    value.setText("fixed xipki.org");
+    value.setText("fixed example.org");
     value.setOverridable(false);
     rdnControls.add(createRdn(DN.O, null, null, value));
 

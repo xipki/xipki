@@ -46,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditStatus;
+import org.xipki.audit.Audits;
 import org.xipki.audit.PciAuditEvent;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
@@ -302,7 +303,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
     this.datasourceFactory = new DataSourceFactory();
     String calockId = null;
-    File caLockFile = new File(IoUtil.expandFilepath("calock"));
+    File caLockFile = new File("calock");
     if (caLockFile.exists()) {
       try {
         calockId = new String(IoUtil.read(caLockFile));
@@ -736,7 +737,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
     certprofileManager.close();
 
-    File caLockFile = new File(IoUtil.expandFilepath("calock"));
+    File caLockFile = new File("calock");
     if (caLockFile.exists()) {
       caLockFile.delete();
     }
@@ -1061,6 +1062,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     event.setAffectedResource("CORE");
     event.setStatus((successful ? AuditStatus.SUCCESSFUL : AuditStatus.FAILED).name());
     event.setLevel(successful ? AuditLevel.INFO : AuditLevel.ERROR);
+    Audits.getAuditService().logEvent(event);
   }
 
   @Override

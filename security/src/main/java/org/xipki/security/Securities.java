@@ -205,11 +205,12 @@ public class Securities implements Closeable {
     ClassLoader cl = Securities.class.getClassLoader();
 
     for (String className : classNames) {
-      Class<?> clazz = null;
+      Class<?> clazz;
       try {
         clazz = cl.loadClass(className);
       } catch (ClassNotFoundException ex) {
         LOG.info("{} not in the classpath, ignore it", className);
+        continue;
       }
 
       try {

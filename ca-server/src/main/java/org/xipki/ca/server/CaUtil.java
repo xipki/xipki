@@ -271,7 +271,7 @@ public class CaUtil {
     if (StringUtil.startsWithIgnoreCase(keystoreConf, "file:")) {
       String keystoreFile = keystoreConf.substring("file:".length());
       try {
-        ksBytes = IoUtil.read(keystoreFile);
+        ksBytes = IoUtil.read(keystoreFile, true);
       } catch (IOException ex) {
         throw new CaMgmtException("IOException: " + ex.getMessage(), ex);
       }

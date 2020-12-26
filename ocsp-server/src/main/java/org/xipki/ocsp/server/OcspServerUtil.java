@@ -269,14 +269,14 @@ public class OcspServerUtil {
   private static InputStream getInputStream(FileOrBinary conf)
       throws IOException {
     return (conf.getFile() != null)
-        ? Files.newInputStream(Paths.get(IoUtil.expandFilepath(conf.getFile())))
+        ? Files.newInputStream(Paths.get(IoUtil.expandFilepath(conf.getFile(), true)))
         : new ByteArrayInputStream(conf.getBinary());
   }
 
   static InputStream getInputStream(FileOrValue conf)
       throws IOException {
     return (conf.getFile() != null)
-        ? Files.newInputStream(Paths.get(IoUtil.expandFilepath(conf.getFile())))
+        ? Files.newInputStream(Paths.get(IoUtil.expandFilepath(conf.getFile(), true)))
         : new ByteArrayInputStream(StringUtil.toUtf8Bytes(conf.getValue()));
   }
 
@@ -312,7 +312,7 @@ public class OcspServerUtil {
   static OcspServerConf parseConf(String confFilename)
       throws InvalidConfException {
     try (InputStream is = Files.newInputStream(
-          Paths.get(IoUtil.expandFilepath(confFilename)))) {
+          Paths.get(IoUtil.expandFilepath(confFilename, true)))) {
       OcspServerConf root = JSON.parseObject(is, OcspServerConf.class);
       root.validate();
       return root;

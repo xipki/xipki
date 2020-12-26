@@ -93,7 +93,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
       throws OcspStoreException {
     notNull(sourceConf, "sourceConf");
 
-    this.dir = IoUtil.expandFilepath(getStrValue(sourceConf, "dir", true));
+    this.dir = IoUtil.expandFilepath(getStrValue(sourceConf, "dir", true), true);
     String value = getStrValue(sourceConf, "sqlBatchCommit", false);
     this.sqlBatchCommit = StringUtil.isBlank(value) ? 1000 : Integer.parseInt(value);
 
