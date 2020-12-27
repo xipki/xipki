@@ -1,6 +1,6 @@
 {
 	"metadata":{
-		"details":"certprofile tls with edwards 448 curves",
+		"details":"certprofile tls with ed448 curves",
 		"category":"A"
 	},
 	"version":"v3",

@@ -1,6 +1,6 @@
 {
 	"metadata":{
-		"details":"certprofile tls with edwards 25519 curves",
+		"details":"certprofile tls with ed25519 curves",
 		"category":"A"
 	},
 	"version":"v3",

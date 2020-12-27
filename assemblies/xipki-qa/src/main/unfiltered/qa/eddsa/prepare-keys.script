@@ -14,13 +14,13 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
   each ($list) {
     xi:delete-key-p11 --force --slot $SLOT --label ${it}
 
-    xi:ec-p11 --curve edwards${KEYSPEC} --slot $SLOT --label ${it}
+    xi:ec-p11 --curve Ed${KEYSPEC} --slot $SLOT --label ${it}
   }
 
 } elif { $TOKEN_TYPE equals "pkcs12" } then {
 
   each ($list) {
-    xi:ec-p12 --curve edwards${KEYSPEC} --password 1234 --out output/${it}.p12
+    xi:ec-p12 --curve Ed${KEYSPEC} --password 1234 --out output/${it}.p12
   }
 
 }
