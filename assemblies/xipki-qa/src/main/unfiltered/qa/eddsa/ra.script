@@ -15,10 +15,10 @@ xi:cmp-health --ca subca1
 
 list = [ "2" "3" "4" ]
 each ($list) {
-  xi:ec-p12 --curve edwards25519 --password 1234 --out output/ed25519-${it}.p12
-  xi:ec-p12 --curve curve25519   --password 1234 --out output/x25519-${it}.p12
-  xi:ec-p12 --curve edwards448   --password 1234 --out output/ed448-${it}.p12
-  xi:ec-p12 --curve curve448     --password 1234 --out output/x448-${it}.p12
+  xi:ec-p12 --curve ed25519 --password 1234 --out output/ed25519-${it}.p12
+  xi:ec-p12 --curve x25519   --password 1234 --out output/x25519-${it}.p12
+  xi:ec-p12 --curve ed448   --password 1234 --out output/ed448-${it}.p12
+  xi:ec-p12 --curve x448     --password 1234 --out output/x448-${it}.p12
 }
 
 # Enroll Certificate (CA generate keypair)

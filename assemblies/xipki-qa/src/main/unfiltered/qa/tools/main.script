@@ -73,7 +73,7 @@ OUT_DIR=output/x25519
 
 SIGNER_CONF="algo=Ed25519,password=1234,keystore=file:${OUT_DIR}/ca/tls-ca.p12"
 
-xi:ec-p12 --password 1234 --out ${OUT_DIR}/ca/tls-ca.p12 --curve edwards25519
+xi:ec-p12 --password 1234 --out ${OUT_DIR}/ca/tls-ca.p12 --curve ed25519
 
 source qa/tools/gencerts.script
 
@@ -88,7 +88,7 @@ OUT_DIR=output/ed25519
 
 SIGNER_CONF="algo=Ed25519,password=1234,keystore=file:${OUT_DIR}/ca/tls-ca.p12"
 
-xi:ec-p12 --password 1234 --out ${OUT_DIR}/ca/tls-ca.p12 --curve edwards25519
+xi:ec-p12 --password 1234 --out ${OUT_DIR}/ca/tls-ca.p12 --curve ed25519
 
 source qa/tools/gencerts.script
 
@@ -103,7 +103,7 @@ OUT_DIR=output/x448
 
 SIGNER_CONF="algo=Ed448,password=1234,keystore=file:${OUT_DIR}/ca/tls-ca.p12"
 
-xi:ec-p12 --password 1234 --out ${OUT_DIR}/ca/tls-ca.p12 --curve edwards448
+xi:ec-p12 --password 1234 --out ${OUT_DIR}/ca/tls-ca.p12 --curve ed448
 
 source qa/tools/gencerts.script
 
@@ -118,6 +118,6 @@ OUT_DIR=output/ed448
 
 SIGNER_CONF="algo=Ed448,password=1234,keystore=file:${OUT_DIR}/ca/tls-ca.p12"
 
-xi:ec-p12 --password 1234 --out ${OUT_DIR}/ca/tls-ca.p12 --curve edwards448
+xi:ec-p12 --password 1234 --out ${OUT_DIR}/ca/tls-ca.p12 --curve ed448
 
 source qa/tools/gencerts.script
