@@ -1,0 +1,78 @@
+printUsage = "false"
+
+argsValid = "false"
+
+if { "$1" equals "" } then {
+  printUsage = "true"
+  argsValid = "true"
+} else {
+  action = $1
+  if { "$action" equals "help" } then {
+    printUsage = "true"
+    argsValid = "true"
+  } else {
+    list = [enroll ocsp]; each ($list) {
+      if { "$action" equals $it } then {
+        argsValid = "true"
+        break
+      }
+    }
+  }
+}
+
+if { $argsValid equals "false" } then {
+  echo "invalid arguments $args"
+  echo ""
+  printUsage = "true"
+}
+
+if { $printUsage equals "true" } then {
+  echo "Usage: "
+  echo ""
+  echo "source file:./qa/benchmark.script <test type> [<durataion> [<threads>]]"
+  echo "test type:       enroll, ocsp"
+  echo "duration:        duration in seconds, default is 15"
+  echo "threads:         number of threads, default is 5"
+} else {
+  if { "$2" equals "" } then {
+    argsValid = "true"
+    duration = "15s"
+    threads = 5
+  } else {
+    argsValid = "true"
+    duration = "$2"
+    if { "$3" equals "" } then {
+      threads = 5
+    } else {
+      threads = "$3"
+    }
+  }
+
+  if { "$action" equals "enroll" } then {
+
+    echo "Sleeping 1 second"
+    sleep 1
+
+    # Loadtest RSA key
+    echo "Enroll benchmark"
+    xiqa:cmp-benchmark-enroll  --duration $duration --thread $threads \
+      --key-type RSA --subject "CN=example.org,O=example PKI company RSA,C=DE" \
+      --profile TLS -n 5 --random-dn O
+
+  } elif { "$action" equals "ocsp" } then {
+
+    URL = http://localhost:8080/ocsp/responder1
+    URL_CRL = http://localhost:8080/ocsp/responder2
+
+    echo "Sleeping 1 second"
+    sleep 1
+    echo "OCSP status benchmark"
+    xiqa:benchmark-ocsp-status --duration $duration --thread $threads \
+      --issuer output/subca1.crt --cert output/tls-c2.crt --url $URL
+
+    echo "Loadtest OCSP status"
+    xiqa:benchmark-ocsp-status --duration $duration --thread $threads \
+      --issuer output/subcawithcrl1.crt --cert output/ocsp2.crt --url $URL_CRL
+
+  }
+}

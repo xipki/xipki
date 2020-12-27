@@ -53,7 +53,13 @@ public class XipkiBaseDir {
     LOG.info("working dir is {}", workingDir);
 
     if (StringUtil.isBlank(str)) {
-      basedir = new File("xipki").getAbsolutePath();
+      String os = System.getProperty("os.name");
+      boolean windows = os.toLowerCase().contains("windows");
+      if (windows) {
+        basedir = "C:\\Program Files\\xipki";
+      } else {
+        basedir = "/opt/xipki";
+      }
       LOG.info("use default basedir '{}', can be specified via the property '{}'",
           basedir, PROP_XIPKI_BASE);
     } else {
@@ -61,7 +67,11 @@ public class XipkiBaseDir {
         str = IoUtil.USER_HOME + str.substring(1);
       }
 
-      basedir = new File(IoUtil.expandFilepath(str)).getAbsolutePath();
+      try {
+        basedir = new File(str).getCanonicalPath();
+      } catch (IOException ex) {
+        throw new IllegalStateException("error getCanonicalPath of " + str);
+      }
       LOG.info("use basedir '{}', ", basedir);
     }
   }

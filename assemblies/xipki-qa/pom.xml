@@ -29,6 +29,12 @@
       <classifier>features</classifier>
       <type>xml</type>
     </dependency>
+    <dependency>
+      <groupId>org.xipki.example</groupId>
+      <artifactId>dummy-ctlog-server</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
   </dependencies>
   <build>
     <resources>
@@ -72,6 +78,25 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
+            <id>copy-war</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/webapps</outputDirectory>
+              <stripVersion>true</stripVersion>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xipki.example</groupId>
+                  <artifactId>dummy-ctlog-server</artifactId>
+                  <version>${project.version}</version>
+                  <type>war</type>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+          <execution>
             <!-- Copy the JDBC jars -->
             <id>jdbc</id>
             <phase>generate-resources</phase>
@@ -111,33 +136,6 @@
                   <version>${karaf.version}</version>
                   <type>tar.gz</type>
                   <outputDirectory>${project.build.directory}</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-          <execution>
-            <!-- Extract the SQL scripts -->
-            <id>unpack-sql</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/classes/xipki</outputDirectory>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.xipki</groupId>
-                  <artifactId>ca-server</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>sql/**</includes>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki</groupId>
-                  <artifactId>ocsp-server</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>sql/**</includes>
                 </artifactItem>
               </artifactItems>
             </configuration>

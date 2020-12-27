@@ -1,0 +1,141 @@
+echo "#################################################################"
+echo "#              Manage certificate with CMP Client               #"
+echo "#################################################################"
+
+xi:cmp-init
+
+echo "Sleeping 1 second"
+sleep 1
+
+## Check the healthy status
+
+xi:cmp-health --ca rootca1
+
+xi:cmp-health --ca subca1
+
+list = [ "2" "3" "4" ]
+each ($list) {
+  xi:ec-p12 --curve edwards25519 --password 1234 --out output/ed25519-${it}.p12
+  xi:ec-p12 --curve curve25519   --password 1234 --out output/x25519-${it}.p12
+  xi:ec-p12 --curve edwards448   --password 1234 --out output/ed448-${it}.p12
+  xi:ec-p12 --curve curve448     --password 1234 --out output/x448-${it}.p12
+}
+
+# Enroll Certificate (CA generate keypair)
+
+list = [ ed25519 ed448 x25519 x448 ]
+each ($list) {
+  type = $it
+
+  xi:cmp-enroll-cagenkey \
+    --p12-out output/${type}-1.p12 --password 1234 \
+    --cert-out output/${type}-1.crt --profile ${type} \
+    --subject "CN=${type}-1.example.org,C=DE"
+
+  xi:update-cert-p12 --p12 output/${type}-1.p12 --password 1234 \
+    --cert output/${type}-1.crt \
+    --ca-cert output/subca1.crt \
+    --ca-cert output/rootca1.crt
+}
+
+# Certificate (via CMP)
+
+list = [ ed25519 ed448 x25519 x448 ]
+each ($list) {
+  type = $it
+
+  xi:cmp-enroll-p12 \
+    --p12 output/${type}-2.p12 --password 1234 \
+    --out output/${type}-2.crt --profile ${type} \
+    --subject "CN=${type}-2.example.org,C=DE"
+
+  xi:update-cert-p12 --p12 output/${type}-2.p12 --password 1234 \
+    --cert output/${type}-2.crt \
+    --ca-cert output/subca1.crt \
+    --ca-cert output/rootca1.crt
+}
+
+# Certificate (via CSR)
+
+list = [ ed25519 ed448 ]
+each ($list) {
+  type = $it
+
+  xi:csr-p12 \
+    --p12 output/${type}-3.p12 --password 1234 \
+    --subject "CN=${type}-3.example.org,C=DE" \
+    --out output/${type}-3.csr
+}
+
+list = [ x25519 x448 ]
+each ($list) {
+  type = $it
+
+  xi:csr-p12 \
+    --p12 output/${type}-3.p12 --password 1234 \
+    --subject "CN=${type}-3.example.org,C=DE" \
+    --peer-certs qa/keys/dhpoc_certs.pem \
+    --out output/${type}-3.csr
+}
+
+list = [ ed25519 ed448 x25519 x448 ]
+each ($list) {
+  type = $it
+
+  xi:cmp-csr-enroll --csr output/${type}-3.csr \
+    --out output/${type}-3.crt --profile ${type}
+
+  xi:update-cert-p12 --p12 output/${type}-3.p12 --password 1234 \
+    --cert output/${type}-3.crt \
+    --ca-cert output/subca1.crt \
+    --ca-cert output/rootca1.crt
+}
+
+echo "#################################################################"
+echo "#             Manage certificate with REST Client               #"
+echo "#################################################################"
+
+BASE_URL = https://localhost:8443/ca/rest/subca
+
+echo "Sleeping 1 second"
+sleep 1
+
+echo "REST DH POC certificates"
+
+xi:curl --out output/dhpoc-certs.pem $BASE_URL/dhpoc-certs
+
+list = [ ed25519 ed448 ]
+each ($list) {
+  type = $it
+
+  xi:csr-p12 \
+    --p12 output/${type}-4.p12 --password 1234 \
+    --subject "CN=${type}-4.example.org,C=DE" \
+    --out output/${type}-4.csr
+}
+
+list = [ x25519 x448 ]
+each ($list) {
+  type = $it
+
+  xi:csr-p12 \
+    --p12 output/${type}-4.p12 --password 1234 \
+    --subject "CN=${type}-4.example.org,C=DE" \
+    --peer-certs output/dhpoc-certs.pem \
+    --out output/${type}-4.csr
+}
+
+list = [ ed25519 ed448 x25519 x448 ]
+each ($list) {
+  type = $it
+
+  xi:curl --out output/${type}-4.crt \
+    --data-file output/${type}-4.csr \
+    --header "Content-Type: application/pkcs10" \
+    "$BASE_URL/enroll-cert?profile=${type}"
+
+  xi:update-cert-p12 --p12 output/${type}-4.p12 --password 1234 \
+    --cert output/${type}-4.crt \
+    --ca-cert output/subca1.crt \
+    --ca-cert output/rootca1.crt
+}

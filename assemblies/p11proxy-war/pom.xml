@@ -35,14 +35,6 @@
           <include>**/*</include>
         </includes>
       </resource>
-      <resource>
-        <directory>../shared/conf</directory>
-        <filtering>false</filtering>
-        <includes>
-          <include>xipki/**</include>
-          <include>tomcat/**</include>
-        </includes>
-      </resource>
     </resources>
     <plugins>
       <plugin>
@@ -91,7 +83,7 @@
               <goal>unpack</goal>
             </goals>
             <configuration>
-              <outputDirectory>${project.build.directory}/xipki/keycerts/tlskeys</outputDirectory>
+              <outputDirectory>${project.build.directory}/xipki/p11proxy/keycerts/tlskeys</outputDirectory>
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xipki.tools</groupId>

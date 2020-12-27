@@ -16,7 +16,7 @@
  */
 
 package org.xipki.scep.serveremulator;
-x
+
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;

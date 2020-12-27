@@ -1,0 +1,266 @@
+printUsage = "false"
+argsValid = "false"
+errMsg = ""
+
+if { "$1" equals "" } then {
+  printUsage = "true"
+  argsValid = "true"
+} elif { "$1" equals "help" } then {
+  printUsage = "true"
+  argsValid = "true"
+} else {
+  if { "$1" equals "-l" } then {
+    OUTFORM = $2
+    HASH = $3
+    TOKEN_TYPE = $4
+    SIG_TYPE = $5
+    KEYSPEC = $6
+  } else {
+    OUTFORM = $1
+    HASH = $2
+    TOKEN_TYPE = $3
+    SIG_TYPE = $4
+    KEYSPEC = $5
+  }
+
+  if { "$HASH" equals "sm3" } then {
+    STDHASH = sha256
+  } else {
+    STDHASH = "$HASH"
+  }
+
+  list = [pkcs11 pkcs12]; each ($list) {
+    if { "$TOKEN_TYPE" equals $it } then {
+      argsValid = "true"
+      break
+    }
+  }
+
+  if { "$argsValid" equals "false" } then {
+    errMsg = "invalid TOKEN_TYPE $TOKEN_TYPE"
+  } else {
+    argsValid = "false"
+
+    list = [rsa rsapss ec plainec dsa sm2]; each ($list) {
+      if { "$SIG_TYPE" equals $it } then {
+        argsValid = "true"
+        break
+      }
+    }
+  }
+
+  if { "$argsValid" equals "false" } then {
+    errMsg = "invalid SIG_TYPE $SIG_TYPE"
+  } else {
+    argsValid = "false"
+
+    if { "$SIG_TYPE" equals "plainec" } then {
+      list = [sha1 sha256 sha384 sha512]; each ($list) {
+        if { "$HASH" equals $it } then {
+          argsValid = "true"
+          break
+        }
+      }
+
+      if { "$argsValid" equals "false" } then {
+        errMsg = "invalid combination $HASH and $SIG_TYPE"
+      }
+    } elif { "$SIG_TYPE" equals "sm2" } then {
+      list = [sm3]; each ($list) {
+        if { "$HASH" equals $it } then {
+          argsValid = "true"
+          break
+        }
+      }
+
+      if { "$argsValid" equals "false" } then {
+        errMsg = "invalid combination $HASH and $SIG_TYPE"
+      }
+    } else {
+      list = [sha1 sha256 sha384 sha512 sha3-224 sha3-256 sha3-384 sha3-512]; each ($list) {
+        if { "$HASH" equals $it } then {
+          argsValid = "true"
+          break
+        }
+      }
+    }
+
+    if { "$argsValid" equals "false" } then {
+      if { "$errMsg" equals ""} then {
+        errMsg = "invalid HASH $HASH"
+      }
+    }
+
+  }
+}
+
+if { $argsValid equals "false" } then {
+  echo "$errMsg"
+  echo ""
+  printUsage = "true"
+}
+
+if { $printUsage equals "true" } then {
+  echo "Usage: "
+  echo ""
+  echo "source file:./qa/lifecycle.script [option] <outform> <hash algo> <token type> <signature type> [<keyspec>]"
+  echo "    outform:         Output format of the certificates, CRLs and CSRs"
+  echo "    hash algo:       sha1, sha224, sha256, sha384, sha512"
+  echo "                     sha3-224, sha3-256, sha3-384, sha3-512"
+  echo "                     sm3 (only for signature type sm2)"
+  echo "                     The sha3 algorithms are not for plainec."
+  echo "    token type:      pkcs11, pkcs12"
+  echo "    signature type:  rsa, rsapss, ec, plainec, dsa, sm2"
+  echo "    keyspec:         keysize for signature types rsa, rsapss and dsa,"
+  echo "                     curve name for signature types ec and plainec"
+  echo "options"
+  echo "    -l               configure CAs using command 'load-conf'"
+} else {
+  source file:./qa/qa.d/prepare-keys.script
+
+  ## Prepare OCSP responder configuration
+  xi:copy-file -f \
+    xipki/ocsp/etc/template.ocsp-responder.json \
+    xipki/ocsp/etc/ocsp-responder.json
+
+  xi:replace --old "REPLACEME-TOKENTYPE" --new "$TOKEN_TYPE" \
+    xipki/ocsp/etc/ocsp-responder.json
+
+  xi:replace --old "REPLACEME-TOKENKEY" --new "$OCSP_KEYCONF" \
+    xipki/ocsp/etc/ocsp-responder.json
+
+  xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
+    xipki/ocsp/etc/ocsp-responder.json
+
+  ## CA client configuration
+  xi:copy-file -f xipki/cmpclient/template.cmpclient.json \
+    xipki/cmpclient/cmpclient.json
+
+  xi:replace --old "REPLACEME-CMP_SIGALGO" --new "$CMP_SIGALGO" \
+    xipki/cmpclient/cmpclient.json
+
+  ## Prepare scripts
+  xi:copy-file -f qa/template.rest.script qa/rest.script
+
+  xi:copy-file -f qa/qa.d/template.ca-load.script \
+    qa/qa.d/ca-load.script
+
+  xi:copy-file -f qa/qa.d/template.ca.script \
+    qa/qa.d/ca.script
+
+  xi:copy-file -f qa/qa.d/template.ra.script \
+    qa/qa.d/ra.script
+
+  xi:replace --old "REPLACEME-CMP_SIGALGO" --new "$CMP_SIGALGO" \
+    qa/qa.d/ca.script
+
+  dsaPlain = ""
+
+  if { "$SIG_TYPE" equals "plainec" } then {
+    dsaPlain = "--dsa-plain"
+  }
+
+  xi:replace --old "REPLACEME-DSAPLAIN" --new "${dsaPlain}" qa/rest.script
+
+  xi:replace --old "REPLACEME-DSAPLAIN" --new "${dsaPlain}" \
+    qa/qa.d/ca-load.script
+
+  xi:replace --old "REPLACEME-DSAPLAIN" --new "${dsaPlain}" \
+    qa/qa.d/ca.script
+
+  xi:replace --old "REPLACEME-DSAPLAIN" --new "${dsaPlain}" \
+    qa/qa.d/ra.script
+
+  rsaMgf1 = ""
+  if { "$SIG_TYPE" equals "rsapss" } then {
+    rsaMgf1 = "--rsa-mgf1"
+  }
+
+  xi:replace --old "REPLACEME-RSAMGF1" --new "${rsaMgf1}" \
+    qa/qa.d/ca-load.script
+
+  xi:replace --old "REPLACEME-RSAMGF1" --new "${rsaMgf1}" \
+    qa/rest.script
+
+  xi:replace --old "REPLACEME-RSAMGF1" --new "${rsaMgf1}" \
+    qa/qa.d/ca.script
+
+  xi:replace --old "REPLACEME-RSAMGF1" --new "${rsaMgf1}" \
+    qa/qa.d/ra.script
+
+  gm = ""
+
+  if { "$SIG_TYPE" equals "sm2" } then {
+    gm = "--gm"
+  }
+
+  xi:replace --old "REPLACEME-GM" --new "${gm}" qa/rest.script
+
+  xi:replace --old "REPLACEME-GM" --new "${gm}" \
+    qa/qa.d/ca-load.script
+
+  xi:replace --old "REPLACEME-GM" --new "${gm}" \
+    qa/qa.d/ca.script
+
+  xi:replace --old "REPLACEME-GM" --new "${gm}" \
+    qa/qa.d/ra.script
+
+  if { "$1" equals "-l" } then {
+    source file:./qa/qa.d/ca-load.script
+  } else {
+    source file:./qa/qa.d/ca.script
+  }
+
+  echo "#################################################################"
+  echo "#                  CA certificate commands                      #"
+  echo "#################################################################"
+
+  #### list certs ####
+
+  ca:list-cert --ca rootca1 --subject "CN=*ca*,O=xipki" --order subject -n 100
+
+  # get the serial number
+  SERIAL = $(xi:cert-info --serial --hex --in output/subca1.crt)
+
+  # save the certificate request
+  ca:get-request --ca rootca1 --serial $SERIAL --out output/subca1.request
+
+  source file:./qa/qa.d/ra.script
+
+  source file:./qa/ca-qa.script
+
+  source file:./qa/rest.script
+
+  # Copy the configuration of OCSP responder
+  xi:copy-file -f \
+    xipki/ocsp/etc/ocsp-responder.json \
+    /opt/xipki/ocsp/etc/ocsp-responder.json
+
+  if { "$TOKEN_TYPE" equals "pkcs12" } then {
+    xi:copy-file -f output/ocsp99.p12 \
+      /opt/xipki/ocsp/keycerts/ocsp99.p12
+  }
+
+  xi:rm -r -f /opt/xipki/ocsp/crls/example-crls
+
+  xi:copy-dir /opt/xipki/ocsp/crls/template \
+    /opt/xipki/ocsp/crls/example-crls
+
+  xi:rm -f /opt/xipki/ocsp/crls/example-crls/crl-mycrl1/REVOCATION
+
+  xi:copy-file -f output/subcawithcrl1.crt \
+    /opt/xipki/ocsp/crls/example-crls/crl-mycrl1/ca.crt
+
+  xi:copy-file -f output/subcawithcrl1.crl \
+    /opt/xipki/ocsp/crls/example-crls/crl-mycrl1/ca.crl
+
+  if { $TOKEN_TYPE equals "pkcs11" } then {
+    ocsp:refresh-token --type pkcs11
+  }
+
+  # Restart OCSP server
+  ocsp:restart-server
+
+  source file:./qa/ocsp.script
+
+}

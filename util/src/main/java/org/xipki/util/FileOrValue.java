@@ -71,7 +71,7 @@ public class FileOrValue extends ValidatableConf {
       return value;
     }
 
-    return new String(IoUtil.read(file), "UTF-8");
+    return new String(IoUtil.read(IoUtil.detectPath(file)), "UTF-8");
   }
 
 }

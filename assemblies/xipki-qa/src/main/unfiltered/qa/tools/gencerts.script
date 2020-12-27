@@ -1,0 +1,63 @@
+if { "${CA_TYPE}" equals "SM2" } then {
+  xi:csr-p12 --hash SM3 --gm --p12 ${OUT_DIR}/ca/tls-ca.p12 --password 1234 --out output/tls-ca.csr \
+    --subject "CN=TLS Demo CA,OU=${CA_TYPE},O=xipki,C=DE"
+} else {
+  xi:csr-p12 --p12 ${OUT_DIR}/ca/tls-ca.p12 --password 1234 --out output/tls-ca.csr \
+    --subject "CN=TLS Demo CA,OU=${CA_TYPE},O=xipki,C=DE"
+}
+
+sleep 1
+
+xi:initdb --force \
+  --db-conf /opt/xipki/ca/etc/database/ca-db.properties \
+  --db-schema xipki/sql/ca-init.xml
+
+ca:restart
+
+xi:copy-file -f qa/tools/template.ca-conf.json qa/tools/ca-conf.json
+
+xi:replace --old "REPLACEME-CA_SIGNERCONF" --new "${SIGNER_CONF}" qa/tools/ca-conf.json
+
+xi:replace --old "REPLACEME-TLS_PROFILE" --new "${TLS_PROFILE}" qa/tools/ca-conf.json
+
+ca:load-conf --conf-file qa/tools/ca-conf.json --out-dir ${OUT_DIR}/ca
+
+xi:rm -f output/tls-ca.csr
+
+xi:move-file -f ${OUT_DIR}/ca/ca-tls-ca.crt ${OUT_DIR}/ca/tls-ca-cert.der
+
+############## RA ###################
+xi:cmp-init
+
+## Server
+
+xi:cmp-enroll-cagenkey --password 1234 --profile tls \
+  --p12-out ${OUT_DIR}/server/tls-server.p12 \
+  --cert-out ${OUT_DIR}/server/tls-server-cert.der \
+  --subject "CN=localhost,OU=${CA_TYPE},O=xipki demo,C=DE"
+
+list = [client client2 client3]
+each ($list) {
+  name = $it
+  xi:cmp-enroll-cagenkey --password 1234 --profile tls \
+    --p12-out ${OUT_DIR}/${name}/tls-${name}.p12 \
+    --cert-out ${OUT_DIR}/${name}/tls-${name}-cert.der \
+    --subject "CN=${name},OU=${CA_TYPE},O=xipki demo,C=DE"
+}
+
+############# Export other files ##########
+list = [ca server client client2 client3]
+each ($list) {
+  name = $it
+
+  xi:update-cert-p12 --p12 ${OUT_DIR}/${name}/tls-${name}.p12 --password 1234 \
+    --cert ${OUT_DIR}/${name}/tls-${name}-cert.der \
+    --ca-cert ${OUT_DIR}/ca/tls-ca-cert.der
+
+  xi:import-cert --type pkcs12 --keystore ${OUT_DIR}/${name}/tls-${name}-cert.p12 --password 1234 \
+    --cert ${OUT_DIR}/${name}/tls-${name}-cert.der
+
+  xi:pkcs12 --p12 ${OUT_DIR}/${name}/tls-${name}.p12 --password 1234 \
+    --key-out ${OUT_DIR}/${name}/tls-${name}-key.pem \
+    --cert-out ${OUT_DIR}/${name}/tls-${name}-cert.pem
+}

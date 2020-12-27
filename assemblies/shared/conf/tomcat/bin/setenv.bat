@@ -1,1 +1,0 @@
-set JAVA_OPTS=%JAVA_OPTS% -DXIPKI_BASE=xipki

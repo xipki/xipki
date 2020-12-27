@@ -71,7 +71,7 @@ public class FileOrBinary extends ValidatableConf {
       return binary;
     }
 
-    return IoUtil.read(file);
+    return IoUtil.read(IoUtil.detectPath(file));
   }
 
 }

@@ -1,0 +1,444 @@
+source file:./qa/qa.d/initdb.script
+
+echo "Sleeping 1 second"
+sleep 1
+
+ca:restart
+
+echo "#################################################################"
+echo "#                       Prepare environment                    #"
+echo "#################################################################"
+
+## Certificate Profiles
+
+list = [ cross subca subca-complex ocsp scep multiple-ous multi-valued-rdn \
+  qc ee-complex smime smime-legacy tls tls-c max-time fixed-partial-subject \
+  constant-ext constant-ext-implicit-tag constant-ext-explicit-tag \
+  syntax-ext syntax-ext-implicit-tag syntax-ext-explicit-tag apple-wwdr gmt0015 ]
+
+each ($list) {
+  ca:profile-add --type xijson --name ${it} \
+    --conf-file qa/certprofile/certprofile-${it}.json
+}
+
+ca:profile-add \
+  --name tlsa \
+  --type xijson \
+  --conf-file qa/certprofile/certprofile-tls.json
+
+## Publishers
+ca:publisher-add \
+  --name ocsp-publisher \
+  --type ocsp \
+  --conf datasource=ocsp,publish.goodcerts=true
+
+# Signer
+ca:signer-add \
+  --name responder1 \
+  --type pkcs12 \
+  --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=REPLACEME-CMP_SIGALGO
+
+# CMP Requestors
+ca:requestor-add \
+  --name requestor1 \
+  --cert xipki/keycerts/tlskeys/client/tls-client-cert.der
+
+ca:requestor-add \
+  --name requestor-mac1 \
+  --password 123456
+
+echo "Sleeping 1 second"
+sleep 1
+
+echo "#################################################################"
+echo "#                        Generate rootca                        #"
+echo "#################################################################"
+## Add the profile rootca
+ca:profile-add \
+  --name rootca \
+  --type xijson \
+  --conf-file qa/certprofile/certprofile-rootca.json
+
+## Create the CSR for the command caqa:check-cert in QA
+if { $TOKEN_TYPE equals "pkcs11" } then {
+  xi:csr-p11 \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+    --slot $SLOT \
+    --label rootca1 \
+    --out output/rootca1.csr \
+    --subject "CN=rootca1,O=xipki,C=DE" \
+    --keyusage cRLSign
+} else {
+  xi:csr-p12 \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+    --p12 output/rootca1.p12 \
+    --password 1234 \
+    --out output/rootca1.csr \
+    --subject "CN=rootca1,O=xipki,C=DE" \
+    --keyusage cRLSign
+}
+
+## Generate selfsigned rootca
+
+if { $TOKEN_TYPE equals "pkcs11" } then {
+  ca:refresh-token --type pkcs11
+
+  CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=rootca1"
+} else {
+  CA_SIGNER_CONF = "algo=$SIGALGO,keystore=file:output/rootca1.p12,password=1234"
+}
+
+ca:gen-rootca \
+  --name rootca1 \
+  --csr output/rootca1.csr \
+  --profile rootca \
+  --serial 1 \
+  --outform $OUTFORM \
+  --out output/rootca1.crt \
+  --permission all \
+  --sn-len 20 \
+  --next-crl-no 2 \
+  --max-validity 10y \
+  --signer-type $TOKEN_TYPE \
+  --signer-conf "$CA_SIGNER_CONF" \
+  --ocsp-uri http://localhost:8080/ocsp/responder1 \
+  --ca-cert-uri http://example.org/rootca1.der \
+  --cmp-control "send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA:SM3withSM2" \
+  --cmp-responder responder1 \
+  --validity-mode cutoff \
+  --support-cmp yes --support-rest yes \
+  --save-req yes
+
+## Remove the profile rootca
+ca:profile-rm -f rootca
+
+## Update the certificate in the device
+if { $TOKEN_TYPE equals "pkcs11" } then {
+  xi:update-cert-p11 \
+    --slot $SLOT \
+    --label rootca1 \
+    --cert output/rootca1.crt
+} else {
+  xi:update-cert-p12 \
+    --p12 output/rootca1.p12 \
+    --password 1234 \
+    --cert output/rootca1.crt
+}
+
+ca:caalias-add \
+  --ca rootca1 \
+  --alias rootca
+
+## Add Profiles
+ca:caprofile-add \
+  --ca rootca1 \
+  --profile cross \
+  --profile subca \
+  --profile subca-complex \
+  --profile ocsp
+
+## Add publisher
+ca:capub-add \
+  --ca rootca1 \
+  --publisher ocsp-publisher
+
+# Add requestor to CA
+ca:careq-add \
+  --requestor requestor1 \
+  --permission all \
+  --ra yes \
+  --profile all \
+  --ca rootca1
+
+ca:careq-add \
+  --requestor requestor-mac1 \
+  --permission all \
+  --ra yes \
+  --profile all \
+  --ca rootca1
+
+## Generate keys and CSR for subca1
+if { $TOKEN_TYPE equals "pkcs11" } then {
+  xi:csr-p11 \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+    --slot $SLOT \
+    --label subca1 \
+    --outform $OUTFORM \
+    --out output/subca1.csr \
+    --subject "CN=subca1,O=xipki,C=DE"
+} else {
+  xi:csr-p12 \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+    --p12 output/subca1.p12 \
+    --password 1234 \
+    --outform $OUTFORM \
+    --out output/subca1.csr \
+    --subject "CN=subca1,O=xipki,C=DE"
+}
+
+ca:enroll-cert \
+  --ca rootca1 \
+  --csr output/subca1.csr \
+  --outform $OUTFORM \
+  --out output/subca1.crt \
+  --profile subca
+
+if { $TOKEN_TYPE equals "pkcs11" } then {
+  xi:update-cert-p11 \
+    --slot $SLOT \
+    --label subca1 \
+    --cert output/subca1.crt \
+} else {
+  xi:update-cert-p12 \
+    --p12 output/subca1.p12 \
+    --password 1234 \
+    --cert output/subca1.crt \
+    --ca-cert output/rootca1.crt
+}
+
+## Generate keys and CSR for subcawithcrl1
+if { $TOKEN_TYPE equals "pkcs11" } then {
+  xi:csr-p11 \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+    --slot $SLOT --label subcawithcrl1 \
+    --outform $OUTFORM \
+    --out output/subcawithcrl1.csr \
+    --subject "CN=subcawithcrl1, O=xipki, C=DE" \
+    --subject-alt-name "[1]info@example.org" \
+    --subject-alt-name "[2]example.org" \
+    --subject-alt-name "[5]edi-nameAssigner-1=edi-partyName1" \
+    --subject-alt-name "[6]http://example.org/abc" \
+    --subject-alt-name "[7]192.168.0.1" \
+    --subject-alt-name "[8]1.2.3.4" \
+    --subject-alt-name "[0]2.5.4.10=long organization name" \
+    --subject-info-access "1.3.6.1.5.5.7.48.5=[6]http://example.org/abc" \
+    --keyusage cRLSign
+} else {
+  xi:csr-p12 \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+    --p12 output/subcawithcrl1.p12 \
+    --password 1234 \
+    --outform $OUTFORM \
+    --out output/subcawithcrl1.csr \
+    --subject "CN=subcawithcrl1, O=xipki, C=DE" \
+    --subject-alt-name "[1]info@example.org" \
+    --subject-alt-name "[2]example.org" \
+    --subject-alt-name "[5]edi-nameAssigner-1=edi-partyName1" \
+    --subject-alt-name "[6]http://example.org/abc" \
+    --subject-alt-name "[7]192.168.0.1" \
+    --subject-alt-name "[8]1.2.3.4" \
+    --subject-alt-name "[0]2.5.4.10=long organization name" \
+    --subject-info-access "1.3.6.1.5.5.7.48.5=[6]http://example.org/abc" \
+    --keyusage cRLSign
+}
+
+ca:enroll-cert \
+  --ca rootca1 \
+  --csr output/subcawithcrl1.csr \
+  --outform $OUTFORM \
+  --out output/subcawithcrl1.crt \
+  --profile subca-complex
+
+if { $TOKEN_TYPE equals "pkcs11" } then {
+  xi:update-cert-p11 \
+    --slot $SLOT \
+    --label subcawithcrl1 \
+    --cert output/subcawithcrl1.crt \
+} else {
+  xi:update-cert-p12 \
+    --p12 output/subcawithcrl1.p12 \
+    --password 1234 \
+    --cert output/subcawithcrl1.crt \
+    --ca-cert output/rootca1.crt
+}
+
+## Generate keys and CSR for OCSPResponder
+if { $TOKEN_TYPE equals "pkcs11" } then {
+  xi:csr-p11 \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+    --slot $SLOT \
+    --label ocsp99 \
+    --outform $OUTFORM \
+    --out output/ocsp99.csr \
+    --subject "CN=ocsp99,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
+} else {
+  xi:csr-p12 \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+    --p12 output/ocsp99.p12 \
+    --password 1234 \
+    --outform $OUTFORM \
+    --out output/ocsp99.csr \
+    --subject "CN=ocsp99,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
+}
+
+ca:enroll-cert \
+  --ca rootca1 \
+  --csr output/ocsp99.csr \
+  --outform $OUTFORM \
+  --out output/ocsp99.crt \
+  --profile ocsp
+
+if { $TOKEN_TYPE equals "pkcs11" } then {
+  xi:update-cert-p11 \
+    --slot $SLOT \
+    --label ocsp99 \
+    --cert output/ocsp99.crt \
+} else {
+  xi:update-cert-p12 \
+    --p12 output/ocsp99.p12 \
+    --password 1234 \
+    --cert output/ocsp99.crt \
+    --ca-cert output/rootca1.crt
+}
+
+ca:caprofile-rm -f \
+  --ca rootca1 \
+  --profile ocsp
+
+if { $TOKEN_TYPE equals "pkcs11" } then {
+  ca:refresh-token --type pkcs11
+}
+
+echo "#################################################################"
+echo "#                        Add subca with ocsp                    #"
+echo "#################################################################"
+## Add CA
+
+if { $TOKEN_TYPE equals "pkcs11" } then {
+  CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=subca1"
+} else {
+  CA_SIGNER_CONF = "password=1234,keystore=file:output/subca1.p12,algo=$SIGALGO"
+}
+
+ca:ca-add \
+  --name subca1 \
+  --permission all \
+  --sn-len 20 \
+  --next-crl-no 2 \
+  --max-validity 5y \
+  --signer-type $TOKEN_TYPE \
+  --signer-conf "$CA_SIGNER_CONF" \
+  --ocsp-uri http://localhost:8080/ocsp/responder1 \
+  --ca-cert-uri http://example.org/subca1.der \
+  --cmp-control "send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA:SM3withSM2" \
+  --cmp-responder responder1 \
+  --support-cmp yes --support-rest yes \
+  --save-req no \
+  --revoke-suspended-control enabled=true,targetReason=cessationOfOperation,unchangedSince=15d \
+  --certchain output/rootca1.crt \
+  --ctlog-control "enabled=true,sslcontext.name=localhost,servers=https://localhost/ctlog/"
+
+ca:caalias-add \
+  --ca subca1 \
+  --alias subca
+
+## Add cert profile to CA
+ca:caprofile-add \
+  --ca subca1 \
+  --profile qc \
+  --profile ee-complex \
+  --profile constant-ext \
+  --profile constant-ext-implicit-tag \
+  --profile constant-ext-explicit-tag \
+  --profile syntax-ext \
+  --profile syntax-ext-implicit-tag \
+  --profile syntax-ext-explicit-tag \
+  --profile smime \
+  --profile smime-legacy \
+  --profile tls \
+  --profile tls-c \
+  --profile fixed-partial-subject
+
+## Add publisher
+ca:capub-add \
+  --ca subca1 \
+  --publisher ocsp-publisher
+
+# Add requestor to CA
+ca:careq-add \
+  --requestor requestor1 \
+  --permission all \
+  --ra yes \
+  --profile all \
+  --ca subca1
+
+ca:careq-add \
+  --requestor requestor-mac1 \
+  --permission all \
+  --ra yes \
+  --profile all \
+  --ca subca1
+
+## Restart the CA
+#ca:restart
+
+echo "#################################################################"
+echo "#                       Add subca with CRL                      #"
+echo "#################################################################"
+## Add CA
+
+if { $TOKEN_TYPE equals "pkcs11" } then {
+  CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=subcawithcrl1"
+} else {
+  CA_SIGNER_CONF = "password=1234,keystore=file:output/subcawithcrl1.p12,algo=$SIGALGO"
+}
+
+ca:ca-add \
+  --name subcawithcrl1 \
+  --permission all \
+  --sn-len 20 \
+  --next-crl-no 2 \
+  --max-validity 8000y \
+  --signer-type $TOKEN_TYPE \
+  --signer-conf "$CA_SIGNER_CONF" \
+  --ocsp-uri http://localhost:8080/ocsp/responder2 \
+  --ca-cert-uri http://example.org/subcawithcrl1.der \
+  --crl-uri http://subcawithcrl.example.org/crl \
+  --deltacrl-uri http://subcawithcrl.example.org/deltacrl \
+  --cmp-control "send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA:SM3withSM2" \
+  --crl-control "update.mode=interval,fullcrl.intervals=7,overlap.days=3,interval.time=02:00,xipki.certset=false" \
+  --scep-control "cacert.included=false,signercert.included=true,support.getcrl=true" \
+  --cmp-responder responder1 \
+  --validity-mode lax \
+  --support-cmp yes --support-rest yes --support-scep yes \
+  --save-req yes \
+  --certchain output/rootca1.crt
+
+ca:caalias-add \
+  --ca subcawithcrl1 \
+  --alias subcawithcrl
+
+## Add cert profile to CA
+ca:caprofile-add \
+  --ca subcawithcrl1 \
+  --profile ocsp \
+  --profile tlsa \
+  --profile scep \
+  --profile multiple-ous \
+  --profile multi-valued-rdn \
+  --profile max-time \
+  --profile apple-wwdr \
+  --profile gmt0015
+
+## Add CMP requestor to CA
+ca:careq-add \
+  --requestor requestor1 \
+  --permission all \
+  --ra yes \
+  --profile all \
+  --ca subcawithcrl1
+
+ca:careq-add \
+  --requestor requestor-mac1 \
+  --permission all \
+  --ra yes \
+  --profile all \
+  --ca subcawithcrl1
+
+## add user to system
+ca:user-add --name user1 --password password1
+
+## Add user to CA subcawithcrl1
+ca:causer-add --user user1 --ca subcawithcrl1 --profile all --permission all
+
+source file:./qa/qa.d/scep-server.script

@@ -1,0 +1,545 @@
+## Generate CRL
+ca:gen-crl --ca subcawithcrl1 \
+  --outform $OUTFORM \
+  --out output/subcawithcrl1-camgmt-gen.crl
+
+## Get CRL
+ca:get-crl --ca subcawithcrl1 \
+  --outform $OUTFORM \
+  --out output/subcawithcrl1-camgmt-get.crl
+
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/cross1.p12 --password 1234 \
+  --subject "CN=cross1,O=xipki,C=DE" \
+  --outform $OUTFORM \
+  --out output/cross1.csr
+
+ca:enroll-cert --ca rootca1 --profile cross \
+  --csr output/cross1.csr \
+  --outform $OUTFORM \
+  --out output/cross1.crt
+
+echo "#################################################################"
+echo "#              Manage certificate with RA Client                #"
+echo "#################################################################"
+
+xi:cmp-init
+
+echo "Sleeping 1 second"
+sleep 1
+
+## Check the healthy status
+
+xi:cmp-health --ca rootca1
+
+xi:cmp-health --ca subca1
+
+xi:cmp-health --ca subcawithcrl1
+
+## Enroll certificates
+# Certificate ocsp1
+
+## Create the CSR for the command caqa:check-cert in QA
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/ocsp1.p12 --password 1234 \
+  --outform $OUTFORM \
+  --out output/ocsp1.csr \
+  --subject "CN=ocsp1,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
+
+xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/ocsp1.p12 --password 1234 \
+  --outform $OUTFORM \
+  --out output/ocsp1.crt --profile OCSP \
+  --subject "CN=ocsp1,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
+
+xi:update-cert-p12 --p12 output/ocsp1.p12 --password 1234 \
+  --cert output/ocsp1.crt \
+  --ca-cert output/subcawithcrl1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate ocsp2
+
+## Create the CSR for the command caqa:check-cert in QA
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/ocsp2.p12 --password 1234 \
+  --outform $OUTFORM \
+  --out output/ocsp2.csr \
+  --subject "CN=ocsp2,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
+
+xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/ocsp2.p12 --password 1234 \
+  --outform $OUTFORM \
+  --out output/ocsp2.crt --profile OCSP \
+  --subject "CN=ocsp2,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
+
+xi:update-cert-p12 --p12 output/ocsp2.p12 --password 1234 \
+  --cert output/ocsp2.crt --ca-cert output/subcawithcrl1.crt \
+  --ca-cert output/rootca1.crt
+
+# CMP: Enroll (CA generate key pair) via CRMF
+
+CN = cmp-crmf-ca-genkey-tls
+
+xi:cmp-enroll-cagenkey \
+  --p12-out output/${CN}.p12 --password 1234 \
+  --cert-outform $OUTFORM \
+  --cert-out output/${CN}.crt --profile tls --subject "CN=${CN}.example.org,O=xipki,C=DE"
+
+## Revocate certificates
+xi:cmp-revoke --ca subcawithcrl1 --cert output/ocsp2.crt --reason keyCompromise
+
+# Certificate multiple-ous
+
+## Create the CSR for the command caqa:check-cert in QA
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/multiple-ous1.p12 --password 1234 \
+  --outform $OUTFORM \
+  --out output/multiple-ous1.csr \
+  --subject "CN=multiple-ous1,OU=A12345,OU=54321,O=xipki,C=DE"
+
+xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/multiple-ous1.p12 --password 1234 \
+  --outform $OUTFORM \
+  --out output/multiple-ous1.crt --profile multiple-ous \
+  --subject "CN=multiple-ous1,OU=A12345,OU=54321,O=xipki,C=DE"
+
+xi:update-cert-p12 --p12 output/multiple-ous1.p12 --password 1234 \
+  --cert output/multiple-ous1.crt \
+  --ca-cert output/subcawithcrl1.crt \
+  --ca-cert output/rootca1.crt
+
+## Create the CSR for the command caqa:check-cert in QA
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/multiple-ous2.p12 --password 1234 \
+  --outform $OUTFORM \
+  --out output/multiple-ous2.csr \
+  --subject "CN=multiple-ous2,OU=54321,OU=A12345,O=xipki,C=DE"
+
+xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/multiple-ous2.p12 --password 1234 \
+  --outform $OUTFORM \
+  --out output/multiple-ous2.crt --profile multiple-ous \
+  --subject "CN=multiple-ous2,OU=54321,OU=A12345,O=xipki,C=DE"
+
+xi:update-cert-p12 --p12 output/multiple-ous2.p12 --password 1234 \
+  --cert output/multiple-ous2.crt \
+  --ca-cert output/subcawithcrl1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate multi-valued-rdn
+
+## Create the CSR for the command caqa:check-cert in QA
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/multi-valued-rdn1.p12 --password 1234 \
+  --out output/multi-valued-rdn1.csr \
+  --subject "CN=multi-valued-rdn1,OU=A12345,O=xipki,C=DE"
+
+xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/multi-valued-rdn1.p12  --password 1234 \
+  --outform $OUTFORM \
+  --out output/multi-valued-rdn1.crt --profile multi-valued-rdn \
+  --subject "CN=multi-valued-rdn1,OU=A12345,O=xipki,C=DE"
+
+xi:update-cert-p12 --p12 output/multi-valued-rdn1.p12 --password 1234 \
+  --cert output/multi-valued-rdn1.crt \
+  --ca-cert output/subcawithcrl1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate qc
+
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/qc1.p12 --password 1234 \
+  --out output/qc1.csr \
+  --subject "CN=qc1,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
+
+xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/qc1.p12 --password 1234 \
+  --outform $OUTFORM \
+  --out output/qc1.crt --profile qc \
+  --subject "CN=qc1,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
+
+xi:update-cert-p12 --p12 output/qc1.p12 --password 1234 \
+  --cert output/qc1.crt \
+  --ca-cert output/subcawithcrl1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate fixed-partial-subject1
+
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/fixed-partial-subject1.p12 --password 1234 \
+  --out output/fixed-partial-subject1.csr \
+  --subject "CN=fixed-partial-subject1"
+
+xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/fixed-partial-subject1.p12 --password 1234 \
+  --outform $OUTFORM \
+  --out output/fixed-partial-subject1.crt --profile fixed-partial-subject \
+  --subject "CN=fixed-partial-subject1"
+
+xi:update-cert-p12 --p12 output/fixed-partial-subject1.p12 --password 1234 \
+  --cert output/fixed-partial-subject1.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate fixed-partial-subject2
+
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/fixed-partial-subject2.p12 --password 1234 \
+  --out output/fixed-partial-subject2.csr \
+  --subject "CN=fixed-partial-subject2,C=FR"
+
+xi:cmp-enroll-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/fixed-partial-subject2.p12 --password 1234 \
+  --outform $OUTFORM \
+  --out output/fixed-partial-subject2.crt --profile fixed-partial-subject \
+  --subject "CN=fixed-partial-subject2,C=FR"
+
+xi:update-cert-p12 --p12 output/fixed-partial-subject2.p12 --password 1234 \
+  --cert output/fixed-partial-subject2.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate ee-complex1 with complex subject (parsable in openssl)
+
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/ee-complex1.p12 --password 1234 \
+  --outform $OUTFORM \
+  --out output/ee-complex1.csr \
+  --subject "UID=abc-def,CN=ee-complex1,O=xipki,C=DE,1.3.6.1.4.1.311.60.2.1.3=CN,1.3.6.1.4.1.311.60.2.1.2=Guandong,1.3.6.1.4.1.311.60.2.1.1=Shenzhen,1.3.36.8.3.3=registrationNumber\=aaab" \
+  --qc-eu-limit EUR:150:15 \
+  --biometric-type 0 \
+  --biometric-hash SHA256 \
+  --biometric-file etc/jre.properties \
+  --biometric-uri https://example.org/?id=123 \
+  --san '[0]1.2.3.1=SAN-I am otherName 1.2.3.1' \
+  --san '[0]1.2.3.2=SAN-I am otherName 1.2.3.2' \
+  --san '[1]SNA-info@example.org' \
+  --san '[2]SAN-dns.example.org' \
+  --san '[4]CN=demo,C=DE' \
+  --san '[5]SAN-assigner1=SAN-party1' \
+  --san '[6]SAN-uri.example.org' \
+  --san '[7]69.1.2.190' \
+  --san '[8]2.3.4.5' \
+  --sia '1.3.6.1.5.5.7.48.5=[0]1.2.3.1\=SIA-I am otherName 1.2.3.1' \
+  --sia '2.3.4.1=[0]1.2.3.2\=SIA-I am otherName 1.2.3.2' \
+  --sia '2.3.4.2=[1]SNA-info@example.org' \
+  --sia '2.3.4.3=[2]SIA-dns.example.org' \
+  --sia '2.3.4.4=[4]CN\=demo\,C\=DE' \
+  --sia '2.3.4.5=[5]SIA-assigner1\=SIA-party1' \
+  --sia '2.3.4.6=[6]SIA-uri.example.org' \
+  --sia '2.3.4.7=[7]69.1.2.190' \
+  --sia '2.3.4.8=[8]2.3.4.5' \
+  --extra-extensions-file qa/extensions/extensions-ee-complex.json
+
+xi:cmp-csr-enroll --csr output/ee-complex1.csr \
+  --outform $OUTFORM \
+  --out output/ee-complex1.crt \
+  --profile ee-complex
+
+xi:update-cert-p12 --p12 output/ee-complex1.p12 --password 1234 \
+  --cert output/ee-complex1.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate ee-complex2 with complex subject (not parsable in openssl due to complex subject)
+
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/ee-complex2.p12 --password 1234 \
+  --outform $OUTFORM \
+  --out output/ee-complex2.csr \
+  --subject "UID=abc-def,CN=ee-complex2,O=xipki,C=DE,1.3.6.1.4.1.311.60.2.1.3=CN,1.3.6.1.4.1.311.60.2.1.2=Guandong,1.3.6.1.4.1.311.60.2.1.1=Shenzhen,1.3.36.8.3.3=registrationNumber\=aaab" \
+  --dateOfBirth 19810102 \
+  --postalAddress "street example 1" \
+  --postalAddress "D-69112 Heidelberg" \
+  --qc-eu-limit EUR:150:15 \
+  --biometric-type 0 \
+  --biometric-hash SHA256 \
+  --biometric-file etc/jre.properties \
+  --biometric-uri https://example.org/?id=123 \
+  --san '[0]1.2.3.1=SAN-I am otherName 1.2.3.1' \
+  --san '[0]1.2.3.2=SAN-I am otherName 1.2.3.2' \
+  --san '[1]SNA-info@example.org' \
+  --san '[2]SAN-dns.example.org' \
+  --san '[4]CN=demo,C=DE' \
+  --san '[5]SAN-assigner1=SAN-party1' \
+  --san '[6]SAN-uri.example.org' \
+  --san '[7]69.1.2.190' \
+  --san '[8]2.3.4.5' \
+  --sia '1.3.6.1.5.5.7.48.5=[0]1.2.3.1\=SIA-I am otherName 1.2.3.1' \
+  --sia '2.3.4.1=[0]1.2.3.2\=SIA-I am otherName 1.2.3.2' \
+  --sia '2.3.4.2=[1]SNA-info@example.org' \
+  --sia '2.3.4.3=[2]SIA-dns.example.org' \
+  --sia '2.3.4.4=[4]CN\=demo\,C\=DE' \
+  --sia '2.3.4.5=[5]SIA-assigner1\=SIA-party1' \
+  --sia '2.3.4.6=[6]SIA-uri.example.org' \
+  --sia '2.3.4.7=[7]69.1.2.190' \
+  --sia '2.3.4.8=[8]2.3.4.5' \
+  --extra-extensions-file qa/extensions/extensions-ee-complex.json
+
+xi:cmp-csr-enroll --csr output/ee-complex2.csr \
+  --outform $OUTFORM \
+  --out output/ee-complex2.crt \
+  --profile ee-complex
+
+xi:update-cert-p12 --p12 output/ee-complex2.p12 --password 1234 \
+  --cert output/ee-complex2.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificates constant-ext1, constant-ext-implicit-tag1 and constant-ext-explicit-tag1
+
+list = [ constant-ext constant-ext-implicit-tag constant-ext-explicit-tag ]
+
+each ($list) {
+  certname = $it
+
+  xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+    --subject "CN=${certname}1,O=xipki,C=DE" \
+    --p12 output/${certname}1.p12 --password 1234 \
+    --outform $OUTFORM \
+    --out output/${certname}1.csr
+
+  xi:cmp-csr-enroll --csr output/${certname}1.csr \
+    --outform $OUTFORM \
+    --out output/${certname}1.crt \
+    --profile ${certname}
+
+  xi:update-cert-p12 --p12 output/${certname}1.p12 --password 1234 \
+    --cert output/${certname}1.crt \
+    --ca-cert output/subca1.crt \
+    --ca-cert output/rootca1.crt
+}
+
+# Certificates syntax-ext1, syntax-ext-implicit-tag1 and syntax-ext-explicit-tag1
+
+list = [ syntax-ext syntax-ext-implicit-tag syntax-ext-explicit-tag ]
+
+each ($list) {
+  certname = $it
+
+  xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+    --subject "CN=${certname}1,O=xipki,C=DE" \
+    --p12 output/${certname}1.p12 --password 1234 \
+    --outform $OUTFORM \
+    --out output/${certname}1.csr \
+    --extra-extensions-file qa/extensions/extensions-${certname}.json
+
+  xi:cmp-csr-enroll --csr output/${certname}1.csr \
+    --outform $OUTFORM \
+    --out output/${certname}1.crt \
+    --profile ${certname}
+
+  xi:update-cert-p12 --p12 output/${certname}1.p12 --password 1234 \
+    --cert output/${certname}1.crt \
+    --ca-cert output/subca1.crt \
+    --ca-cert output/rootca1.crt
+}
+
+# Certificate smime1
+
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/smime1.p12 --password 1234 \
+  --subject "CN=smime1,E=InFo@example.com,O=xipki,C=DE" \
+  --outform $OUTFORM \
+  --out output/smime1.csr \
+
+xi:cmp-csr-enroll --csr output/smime1.csr \
+  --outform $OUTFORM \
+  --out output/smime1.crt --profile smime
+
+xi:update-cert-p12 --p12 output/smime1.p12 --password 1234 \
+  --cert output/smime1.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate smime-legacy1
+
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/smime-legacy1.p12 --password 1234 \
+  --subject "CN=smime-legacy1,E=InFo@example.com,O=xipki,C=DE" \
+  --outform $OUTFORM \
+  --out output/smime-legacy1.csr \
+
+xi:cmp-csr-enroll --csr output/smime-legacy1.csr \
+  --outform $OUTFORM \
+  --out output/smime-legacy1.crt --profile smime-legacy
+
+xi:update-cert-p12 --p12 output/smime-legacy1.p12 --password 1234 \
+  --cert output/smime-legacy1.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate tls1
+
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/tls1.p12 --password 1234 \
+  --subject "CN=tls1.example.org,O=xipki,C=DE" \
+  --outform $OUTFORM \
+  --out output/tls1.csr \
+
+xi:cmp-csr-enroll --csr output/tls1.csr \
+  --outform $OUTFORM \
+  --out output/tls1.crt --profile tls
+
+xi:update-cert-p12 --p12 output/tls1.p12 --password 1234 \
+  --cert output/tls1.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate tls2
+
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/tls2.p12 --password 1234 \
+  --subject "CN=tls2.example.org,O=xipki,C=DE" \
+  --outform $OUTFORM \
+  --out output/tls2.csr
+
+xi:cmp-csr-enroll --csr output/tls2.csr \
+  --outform $OUTFORM \
+  --out output/tls2.crt --profile tls
+
+xi:update-cert-p12 --p12 output/tls2.p12 --password 1234 \
+  --cert output/tls2.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
+## Suspend certificates
+xi:cmp-revoke --ca subca1 --cert output/tls2.crt --reason certificateHold
+
+xi:cmp-unrevoke --ca subca1 --cert output/tls2.crt
+
+## Revocate certificates
+xi:cmp-revoke --ca subca1 --cert output/tls2.crt --reason affiliationChanged
+
+## Enroll certificates
+
+# Certificate tls-c1
+
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/tls-c1.p12 --password 1234 \
+  --subject "CN=tls-c1,O=xipki,C=DE" \
+  --outform $OUTFORM \
+  --out output/tls-c1.csr
+
+xi:cmp-csr-enroll --csr output/tls-c1.csr \
+  --outform $OUTFORM \
+  --out output/tls-c1.crt --profile tls-c
+
+xi:update-cert-p12 --p12 output/tls-c1.p12 --password 1234 \
+  --cert output/tls-c1.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate tls-c2
+
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/tls-c2.p12 --password 1234 \
+  --subject "CN=tls-c2,O=xipki,C=DE" \
+  --outform $OUTFORM \
+  --out output/tls-c2.csr
+
+xi:cmp-csr-enroll --csr output/tls-c2.csr \
+  --outform $OUTFORM \
+  --out output/tls-c2.crt \
+  --profile tls-c
+
+xi:update-cert-p12 --p12 output/tls-c2.p12 --password 1234 \
+  --cert output/tls-c2.crt \
+  --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
+## Revocate certificates
+xi:cmp-revoke --ca subca1 --cert output/tls-c2.crt --reason affiliationChanged
+
+# Certificate max-time1
+
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/max-time1.p12 --password 1234 \
+  --subject "CN=max-time1.example.org,O=xipki,C=DE" \
+  --outform $OUTFORM \
+  --out output/max-time1.csr
+
+xi:cmp-csr-enroll --csr output/max-time1.csr \
+  --outform $OUTFORM \
+  --out output/max-time1.crt --profile max-time
+
+xi:update-cert-p12 --p12 output/max-time1.p12 --password 1234 \
+  --cert output/max-time1.crt \
+  --ca-cert output/subcawithcrl1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate apple-wwdr1
+
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/apple-wwdr1.p12 --password 1234 \
+  --subject "UID=abc.def.myBlog,CN=Apple Push Services: abc.def.myBlog,OU=AP12ZMG7I7,O=def,C=DE" \
+  --outform $OUTFORM \
+  --out output/apple-wwdr1.csr \
+  --extra-extensions-file qa/extensions/extensions-apple-wwdr.json
+
+xi:cmp-csr-enroll --csr output/apple-wwdr1.csr \
+  --outform $OUTFORM \
+  --out output/apple-wwdr1.crt --profile apple-wwdr
+
+xi:update-cert-p12 --p12 output/apple-wwdr1.p12 --password 1234 \
+  --cert output/apple-wwdr1.crt \
+  --ca-cert output/subcawithcrl1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate gmt0015_1
+
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/gmt0015_1.p12 --password 1234 \
+  --subject "CN=gmt0015_1,OU=my OU,O=my O,C=CN" \
+  --outform $OUTFORM \
+  --out output/gmt0015_1.csr \
+  --extra-extensions-file qa/extensions/extensions-gmt0015.json
+
+xi:cmp-csr-enroll --csr output/gmt0015_1.csr \
+  --outform $OUTFORM \
+  --out output/gmt0015_1.crt --profile gmt0015
+
+xi:update-cert-p12 --p12 output/gmt0015_1.p12 --password 1234 \
+  --cert output/gmt0015_1.crt \
+  --ca-cert output/subcawithcrl1.crt \
+  --ca-cert output/rootca1.crt
+
+# Certificate gmt0015_2
+
+xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+  --p12 output/gmt0015_2.p12 --password 1234 \
+  --subject "CN=gmt0015_2,OU=my OU,O=my O,C=CN,1.2.156.10260.4.1.1=[0]362323880212651,1.2.156.10260.4.1.2=insurance123,1.2.156.10260.4.1.3=cor1234,1.2.156.10260.4.1.4=orgcode1234,1.2.156.10260.4.1.5=taxcode1234" \
+  --outform $OUTFORM \
+  --out output/gmt0015_2.csr
+
+xi:cmp-csr-enroll --csr output/gmt0015_2.csr \
+  --outform $OUTFORM \
+  --out output/gmt0015_2.crt --profile gmt0015
+
+xi:update-cert-p12 --p12 output/gmt0015_2.p12 --password 1234 \
+  --cert output/gmt0015_2.crt \
+  --ca-cert output/subcawithcrl1.crt \
+  --ca-cert output/rootca1.crt
+
+## Get CRL
+xi:cmp-get-crl --ca subcawithcrl1 \
+  --outform $OUTFORM \
+  --out output/subcawithcrl1-1-get.crl
+
+## Generate CRL
+## DER format is required by the OCSP service.
+xi:cmp-gen-crl --ca subcawithcrl1 \
+  --outform der \
+  --out output/subcawithcrl1.crl
+
+## Get CRL
+xi:cmp-get-crl --ca subcawithcrl1 \
+  --outform $OUTFORM \
+  --out output/subcawithcrl1-get.crl
+
+echo "#################################################################"
+echo "#              Uninstall unneeded features                      #"
+echo "#################################################################"
+
+source file:./qa/scep.script
+

@@ -28,81 +28,81 @@
 	}],
 	"certprofiles":[{
 		"name":"rootca",
-		"file":"xipki/qa/certprofile/certprofile-rootca.json"
+		"file":"qa/certprofile/certprofile-rootca.json"
 	},{
 		"name":"cross",
-		"file":"xipki/qa/certprofile/certprofile-cross.json"
+		"file":"qa/certprofile/certprofile-cross.json"
 	},{
 		"name":"subca",
-		"file":"xipki/qa/certprofile/certprofile-subca.json"
+		"file":"qa/certprofile/certprofile-subca.json"
 	},{
 		"name":"subca-complex",
-		"file":"xipki/qa/certprofile/certprofile-subca-complex.json"
+		"file":"qa/certprofile/certprofile-subca-complex.json"
 	},{
 		"name":"ocsp",
-		"file":"xipki/qa/certprofile/certprofile-ocsp.json"
+		"file":"qa/certprofile/certprofile-ocsp.json"
 	},{
 		"name":"multiple-ous",
-		"file":"xipki/qa/certprofile/certprofile-multiple-ous.json"
+		"file":"qa/certprofile/certprofile-multiple-ous.json"
 	},{
 		"name":"multi-valued-rdn",
-		"file":"xipki/qa/certprofile/certprofile-multi-valued-rdn.json"
+		"file":"qa/certprofile/certprofile-multi-valued-rdn.json"
 	},{
 		"name":"smime",
-		"file":"xipki/qa/certprofile/certprofile-smime.json"
+		"file":"qa/certprofile/certprofile-smime.json"
 	},{
 		"name":"smime-legacy",
-		"file":"xipki/qa/certprofile/certprofile-smime-legacy.json"
+		"file":"qa/certprofile/certprofile-smime-legacy.json"
 	},{
 		"name":"tls",
-		"file":"xipki/qa/certprofile/certprofile-tls.json"
+		"file":"qa/certprofile/certprofile-tls.json"
 	},{
 		"name":"tls-c",
-		"file":"xipki/qa/certprofile/certprofile-tls-c.json"
+		"file":"qa/certprofile/certprofile-tls-c.json"
 	},{
 		"name":"qc",
-		"file":"xipki/qa/certprofile/certprofile-qc.json"
+		"file":"qa/certprofile/certprofile-qc.json"
 	},{
 		"name":"ee-complex",
-		"file":"xipki/qa/certprofile/certprofile-ee-complex.json"
+		"file":"qa/certprofile/certprofile-ee-complex.json"
 	},{
 		"name":"max-time",
-		"file":"xipki/qa/certprofile/certprofile-max-time.json"
+		"file":"qa/certprofile/certprofile-max-time.json"
 	},{
 		"name":"apple-wwdr",
-		"file":"xipki/qa/certprofile/certprofile-apple-wwdr.json"
+		"file":"qa/certprofile/certprofile-apple-wwdr.json"
 	},{
 		"name":"gmt0015",
-		"file":"xipki/qa/certprofile/certprofile-gmt0015.json"
+		"file":"qa/certprofile/certprofile-gmt0015.json"
 	},{
 		"name":"fixed-partial-subject",
-		"file":"xipki/qa/certprofile/certprofile-fixed-partial-subject.json"
+		"file":"qa/certprofile/certprofile-fixed-partial-subject.json"
 	},{
 		"name":"ed25519",
-		"file":"xipki/qa/certprofile/certprofile-ed25519.json"
+		"file":"qa/certprofile/certprofile-ed25519.json"
 	},{
 		"name":"ed448",
-		"file":"xipki/qa/certprofile/certprofile-ed448.json"
+		"file":"qa/certprofile/certprofile-ed448.json"
 	},{
 		"name":"x25519",
-		"file":"xipki/qa/certprofile/certprofile-x25519.json"
+		"file":"qa/certprofile/certprofile-x25519.json"
 	},{
 		"name":"x448",
-		"file":"xipki/qa/certprofile/certprofile-x448.json"
+		"file":"qa/certprofile/certprofile-x448.json"
 	},{
 		"name":"cab-rootca",
-		"file":"xipki/qa/certprofile/certprofile-cab-rootca.json"
+		"file":"qa/certprofile/certprofile-cab-rootca.json"
 	},{
 		"name":"cab-subca",
-		"file":"xipki/qa/certprofile/certprofile-cab-subca.json"
+		"file":"qa/certprofile/certprofile-cab-subca.json"
 	},{
 		"name":"cab-domain-validated",
-		"file":"xipki/qa/certprofile/certprofile-cab-domain-validated.json"
+		"file":"qa/certprofile/certprofile-cab-domain-validated.json"
 	},{
 		"name":"cab-org-validated",
-		"file":"xipki/qa/certprofile/certprofile-cab-org-validated.json"
+		"file":"qa/certprofile/certprofile-cab-org-validated.json"
 	},{
 		"name":"cab-individual-validated",
-		"file":"xipki/qa/certprofile/certprofile-cab-individual-validated.json"
+		"file":"qa/certprofile/certprofile-cab-individual-validated.json"
 	}]
 }

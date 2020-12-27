@@ -1,0 +1,24 @@
+echo "#################################################################"
+echo "#                      Initialize the database                  #"
+echo "#################################################################"
+
+echo "Sleeping 1 second"
+sleep 1
+
+xi:initdb \
+  --force \
+  --db-conf /opt/xipki/ca/etc/database/ca-db.properties \
+  --db-schema /opt/xipki/ca/sql/ca-init.xml
+
+xi:initdb \
+  --force \
+  --db-conf /opt/xipki/ca/etc/database/ocsp-db.properties \
+  --db-schema /opt/xipki/ca/sql/ocsp-init.xml
+
+xi:initdb --force \
+  --db-conf /opt/xipki/ocsp/etc/database/ocsp-cache-db.properties \
+  --db-schema /opt/xipki/ocsp/sql/ocsp-cache-init.xml
+
+xi:initdb --force \
+  --db-conf /opt/xipki/ocsp/etc/database/ocsp-crl-db.properties \
+  --db-schema /opt/xipki/ocsp/sql/ocsp-init.xml

@@ -35,14 +35,6 @@
           <include>**/*</include>
         </includes>
       </resource>
-      <resource>
-        <directory>../shared/conf</directory>
-        <filtering>false</filtering>
-        <includes>
-          <include>xipki/**</include>
-          <include>tomcat/**</include>
-        </includes>
-      </resource>
     </resources>
     <plugins>
       <plugin>
@@ -104,13 +96,32 @@
             </configuration>
           </execution>
           <execution>
+            <!-- Extract the SQL scripts -->
+            <id>unpack-sql</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/xipki/ca</outputDirectory>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xipki</groupId>
+                  <artifactId>ca-server</artifactId>
+                  <version>${project.version}</version>
+                  <includes>sql/*-init.xml</includes>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+          <execution>
             <id>unpack-tlskeys</id>
             <phase>generate-resources</phase>
             <goals>
               <goal>unpack</goal>
             </goals>
             <configuration>
-              <outputDirectory>${project.build.directory}/xipki/keycerts/tlskeys</outputDirectory>
+              <outputDirectory>${project.build.directory}/xipki/ca/keycerts/tlskeys</outputDirectory>
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xipki.tools</groupId>

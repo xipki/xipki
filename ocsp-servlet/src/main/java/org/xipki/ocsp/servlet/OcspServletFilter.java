@@ -57,7 +57,7 @@ public class OcspServletFilter implements Filter {
 
   private static final Logger LOG = LoggerFactory.getLogger(OcspServletFilter.class);
 
-  private static final String DFLT_CONF_FILE = "etc/ocsp/ocsp.json";
+  private static final String DFLT_CONF_FILE = "ocsp/etc/ocsp.json";
 
   private Securities securities;
 

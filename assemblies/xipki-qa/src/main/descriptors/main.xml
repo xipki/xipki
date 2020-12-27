@@ -9,12 +9,6 @@
   </formats>
   <fileSets>
     <fileSet>
-      <directory>${shared.dir}/license</directory>
-      <outputDirectory>license</outputDirectory>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
       <directory>${shared.dir}/conf/xipki</directory>
       <includes>
         <include>security/example/**</include>
@@ -23,49 +17,30 @@
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
-    <!-- ${project.build.directory}/classes -->
     <fileSet>
       <directory>${project.build.directory}/classes</directory>
       <includes>
-        <include>bin/**</include>
         <include>**/*.sh</include>
       </includes>
-      <excludes>
-        <exclude>bin/*.bat</exclude>
-      </excludes>
       <outputDirectory>.</outputDirectory>
-      <lineEnding>unix</lineEnding>
       <fileMode>0755</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
       <directory>${project.build.directory}/classes</directory>
-      <includes>
-        <include>bin/*.bat</include>
-      </includes>
-      <outputDirectory>.</outputDirectory>
-      <lineEnding>dos</lineEnding>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <directory>${project.build.directory}/classes</directory>
       <excludes>
-        <exclude>bin/**</exclude>
         <exclude>**/*.sh</exclude>
       </excludes>
       <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
-    <!-- QA -->
     <fileSet>
-      <directory>src/qa/unfiltered</directory>
-      <outputDirectory>.</outputDirectory>
+      <directory>${project.build.directory}/classes/xipki/keycerts</directory>
+      <outputDirectory>xipki/ocsp/keycerts</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
-    <!-- Copy over start scripts -->
     <!-- Copy over start scripts -->
     <fileSet>
       <directory>${project.build.directory}/apache-karaf-minimal-${karaf.version}/bin</directory>
@@ -126,6 +101,12 @@
     <file>
       <source>README.md</source>
       <outputDirectory>.</outputDirectory>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>${project.build.directory}/webapps/dummy-ctlog-server.war</source>
+      <outputDirectory>xipki/webapps</outputDirectory>
+      <destName>ctlog.war</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>

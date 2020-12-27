@@ -44,16 +44,5 @@
       <directoryMode>0755</directoryMode>
       <lineEnding>dos</lineEnding>
     </fileSet>
-    <fileSet>
-      <directory>${project.build.directory}</directory>
-      <includes>
-        <include>sql/ca-init.xml</include>
-        <include>sql/ocsp-cache-init.xml</include>
-        <include>sql/ocsp-init.xml</include>
-      </includes>
-      <outputDirectory>.</outputDirectory>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
   </fileSets>
 </assembly>

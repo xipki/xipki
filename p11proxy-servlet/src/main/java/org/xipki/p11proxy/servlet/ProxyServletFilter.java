@@ -48,7 +48,7 @@ public class ProxyServletFilter implements Filter {
 
   private static final Logger LOG = LoggerFactory.getLogger(ProxyServletFilter.class);
 
-  private static final String DFLT_SERVER_CFG = "etc/p11proxy/p11proxy.json";
+  private static final String DFLT_SERVER_CFG = "p11proxy/etc/p11proxy.json";
 
   private Securities securities;
 
