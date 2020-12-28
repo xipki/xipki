@@ -327,7 +327,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       mechanism = PKCS11Constants.CKM_EDDSA;
 
       P11Slot slot = cryptService.getSlot(identityId.getSlotId());
-      if (slot.supportsMechanism(mechanism)) {
+      if (!slot.supportsMechanism(mechanism)) {
         throw new XiSecurityException("unsupported signature algorithm " + algOid.getId());
       }
 
