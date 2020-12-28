@@ -663,12 +663,12 @@ public class ExtensionConfBuilder {
 
     PdsLocationType pdsLocation = new PdsLocationType();
     pdsLocations.add(pdsLocation);
-    pdsLocation.setUrl("http://pki.example.org/pds/en");
+    pdsLocation.setUrl("http://pki.myorg.org/pds/en");
     pdsLocation.setLanguage("en");
 
     pdsLocation = new PdsLocationType();
     pdsLocations.add(pdsLocation);
-    pdsLocation.setUrl("http://pki.example.org/pds/de");
+    pdsLocation.setUrl("http://pki.myorg.org/pds/de");
     pdsLocation.setLanguage("de");
 
     // QC Constant value
@@ -791,7 +791,7 @@ public class ExtensionConfBuilder {
 
     GeneralSubtreeType single = new GeneralSubtreeType();
     single.setBase(new GeneralSubtreeType.Base());
-    single.getBase().setDirectoryName("O=example organization, C=DE");
+    single.getBase().setDirectoryName("O=myorg organization, C=DE");
     permitted.add(single);
 
     List<GeneralSubtreeType> excluded = new LinkedList<>();
@@ -799,7 +799,7 @@ public class ExtensionConfBuilder {
     excluded.add(single);
 
     single.setBase(new GeneralSubtreeType.Base());
-    single.getBase().setDirectoryName("OU=bad OU, O=example organization, C=DE");
+    single.getBase().setDirectoryName("OU=bad OU, O=myorg organization, C=DE");
     ret.setExcludedSubtrees(excluded);
 
     return ret;

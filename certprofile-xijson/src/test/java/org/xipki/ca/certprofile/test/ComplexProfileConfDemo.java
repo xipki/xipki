@@ -145,7 +145,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     list.add(createExtension(Extension.certificatePolicies, true, false));
 
     Map<ASN1ObjectIdentifier, String> policies = new HashMap<>();
-    policies.put(new ASN1ObjectIdentifier("1.2.3.4.5"), "http://example.org/ca1-cps");
+    policies.put(new ASN1ObjectIdentifier("1.2.3.4.5"), "http://myorg.org/ca1-cps");
     policies.put(new ASN1ObjectIdentifier("2.4.3.2.1"), null);
     last(list).setCertificatePolicies(createCertificatePolicies(policies));
 
@@ -426,7 +426,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
 
     NamingAuthorityType namingAuthorityL2 = new NamingAuthorityType();
     namingAuthorityL2.setOid(createOidType(new ASN1ObjectIdentifier("1.2.3.4.5")));
-    namingAuthorityL2.setUrl("http://naming-authority-level2.example.org");
+    namingAuthorityL2.setUrl("http://naming-authority-level2.myorg.org");
     namingAuthorityL2.setText("namingAuthrityText level 2");
     admissions.setNamingAuthority(namingAuthorityL2);
 
@@ -440,7 +440,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
 
     NamingAuthorityType namingAuthorityL3 = new NamingAuthorityType();
     namingAuthorityL3.setOid(createOidType(new ASN1ObjectIdentifier("1.2.3.4.5")));
-    namingAuthorityL3.setUrl("http://naming-authority-level3.example.org");
+    namingAuthorityL3.setUrl("http://naming-authority-level3.myorg.org");
     namingAuthorityL3.setText("namingAuthrityText level 3");
     pi.setNamingAuthority(namingAuthorityL3);
     pi.setAddProfessionInfo(new byte[]{1, 2, 3, 4});
@@ -672,7 +672,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     rdnControls.add(createRdn(DN.C, null, null, value));
 
     value = new ValueType();
-    value.setText("fixed example.org");
+    value.setText("fixed myorg.org");
     value.setOverridable(false);
     rdnControls.add(createRdn(DN.O, null, null, value));
 

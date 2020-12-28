@@ -200,7 +200,7 @@ public abstract class AbstractCaTest {
       privKey = keypair.getPrivate();
       SubjectPublicKeyInfo subjectPublicKeyInfo = MyUtil.createSubjectPublicKeyInfo(
               keypair.getPublic());
-      X500Name subject = new X500Name("CN=EE1, OU=emulator, O=example.org, C=DE");
+      X500Name subject = new X500Name("CN=EE1, OU=emulator, O=myorg.org, C=DE");
 
       // first try without secret
       PKCS10CertificationRequest p10Req = MyUtil.generateRequest(privKey, subjectPublicKeyInfo,

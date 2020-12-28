@@ -98,13 +98,13 @@ public class ScepServer {
     KeyPair keypair = kpGen.generateKeyPair();
     // CHECKSTYLE:SKIP
     PrivateKey rcaKey = keypair.getPrivate();
-    rcaSubject = new X500Name("CN=RCA1, OU=emulator, O=example.org, C=DE");
+    rcaSubject = new X500Name("CN=RCA1, OU=emulator, O=myorg.org, C=DE");
 
     kpGen.initialize(2048);
     keypair = kpGen.generateKeyPair();
 
     SubjectPublicKeyInfo pkInfo = MyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
-    X500Name subject = new X500Name("CN=CA1, OU=emulator, O=example.org, C=DE");
+    X500Name subject = new X500Name("CN=CA1, OU=emulator, O=myorg.org, C=DE");
     this.caCert = MyUtil.issueSubCaCert(rcaKey, rcaSubject, pkInfo, subject, BigInteger.valueOf(2),
         new Date(System.currentTimeMillis() - 10 * CaEmulator.MIN_IN_MS));
     CaEmulator ca = new CaEmulator(keypair.getPrivate(), this.caCert, generateCrl);
@@ -115,7 +115,7 @@ public class ScepServer {
       keypair = kpGen.generateKeyPair();
       pkInfo = MyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
 
-      subject = new X500Name("CN=RA1, OU=emulator, O=example.org, C=DE");
+      subject = new X500Name("CN=RA1, OU=emulator, O=myorg.org, C=DE");
       this.raCert = ca.generateCert(pkInfo, subject);
       ra = new RaEmulator(keypair.getPrivate(), this.raCert);
     }
@@ -126,7 +126,7 @@ public class ScepServer {
       keypair = kpGen.generateKeyPair();
 
       pkInfo = MyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
-      subject = new X500Name("CN=CA2, OU=emulator, O=example.org, C=DE");
+      subject = new X500Name("CN=CA2, OU=emulator, O=myorg.org, C=DE");
 
       Date startTime = new Date(System.currentTimeMillis() + 365 * CaEmulator.DAY_IN_MS);
       this.nextCaCert = MyUtil.issueSubCaCert(rcaKey, rcaSubject, pkInfo, subject,
@@ -138,7 +138,7 @@ public class ScepServer {
         keypair = kpGen.generateKeyPair();
         pkInfo = MyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
 
-        subject = new X500Name("CN=RA2, OU=emulator, O=example.org, C=DE");
+        subject = new X500Name("CN=RA2, OU=emulator, O=myorg.org, C=DE");
         Date raStartTime = new Date(startTime.getTime() + 10 * CaEmulator.DAY_IN_MS);
         this.nextRaCert = tmpCa.generateCert(pkInfo, subject, raStartTime);
       } // end if(withRA)

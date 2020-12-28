@@ -300,7 +300,7 @@ public class OcspServerConf extends ValidatableConf {
   public static class Responder extends ValidatableConf {
 
     /**
-     * To answer OCSP request via URI http://example.com/foo/abc, you can use the combination
+     * To answer OCSP request via URI http://myorg.com/foo/abc, you can use the combination
      * (servlet.alias = '/', servletPath = '/foo/abc') or
      * (servlet.alias = '/foo', servletPath = '/abc').
      */

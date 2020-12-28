@@ -315,7 +315,8 @@ public class IdentifiedCertprofile implements Closeable {
   } // method getSubject
 
   private boolean containsRdn(X500Name subject, ASN1ObjectIdentifier o) {
-    return subject.getRDNs(o) != null;
+    RDN[] rdns = subject.getRDNs(o);
+    return rdns != null && rdns.length != 0;
   }
 
   /**

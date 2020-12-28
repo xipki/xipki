@@ -83,8 +83,6 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     List<ExtensionType> list = profile.getExtensions();
 
     list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
-    list.add(createExtension(Extension.cRLDistributionPoints, false, false));
-    list.add(createExtension(Extension.freshestCRL, false, false));
 
     // Extensions - basicConstraints
     list.add(createExtension(Extension.basicConstraints, true, true));

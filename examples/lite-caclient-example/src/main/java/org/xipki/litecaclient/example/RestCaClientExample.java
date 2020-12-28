@@ -104,7 +104,7 @@ public class RestCaClientExample extends CaClientExample {
   } // method main
 
   private static String getSubject() {
-    return "CN=REST-" + index.incrementAndGet() + ".example.org,O=example,C=DE";
+    return "CN=REST-" + index.incrementAndGet() + ".myorg.org,O=myorg,C=DE";
   }
 
 }
