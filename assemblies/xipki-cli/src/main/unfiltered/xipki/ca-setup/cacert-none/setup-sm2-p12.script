@@ -1,5 +1,5 @@
 # Please adapt me
-CA_SUBJECT="CN=myca1,O=xipki,C=DE"
+CA_SUBJECT="CN=myca1,O=myorg,C=DE"
 
 KEYCERTS_DIR = xipki/ca-setup/keycerts
 

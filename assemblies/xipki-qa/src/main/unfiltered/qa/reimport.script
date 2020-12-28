@@ -32,7 +32,7 @@ echo "==========================================================================
 xi:initdb \
   --force \
   --db-conf /opt/xipki/ca/etc/database/ca-db.properties \
-  --db-schema xipki/sql/ca-init.xml
+  --db-schema /optxipki/sql/ca-init.xml
 
 ca:import-ca --in-dir output/dbexport/ca \
   --db-conf /opt/xipki/ca/etc/database/ca-db.properties
@@ -46,7 +46,7 @@ echo "==========================================================================
 xi:initdb \
   --force \
   --db-conf /opt/xipki/ca/etc/database/ocsp-db.properties \
-  --db-schema xipki/sql/ocsp-init.xml
+  --db-schema /optxipki/sql/ocsp-init.xml
 
 ca:import-ocsp --in-dir output/dbexport/ocsp \
   --db-conf /opt/xipki/ca/etc/database/ocsp-db.properties
@@ -60,7 +60,7 @@ echo "==========================================================================
 xi:initdb \
   --force \
   --db-conf /opt/xipki/ca/etc/database/ocsp-db.properties \
-  --db-schema xipki/sql/ocsp-init.xml
+  --db-schema /optxipki/sql/ocsp-init.xml
 
 ca:import-ocspfromca --in-dir output/dbexport/ca \
   --db-conf /opt/xipki/ca/etc/database/ocsp-db.properties

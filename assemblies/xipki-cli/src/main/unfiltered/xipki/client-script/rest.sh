@@ -55,7 +55,7 @@ echo "generate CSR"
 
 openssl req -new -sha256 -key ${OUT_DIR}/${CN}-key.pem -outform der \
     -out ${OUT_DIR}/${CN}.csr \
-    -subj "/CN=${CN}/emailAddress=info@example.com/O=xipki/C=DE"
+    -subj "/CN=${CN}/emailAddress=info@example.com/O=myorg/C=DE"
 
 echo "enroll certificate"
 
@@ -87,7 +87,7 @@ echo "generate CSR"
 
 openssl req -new -sha256 -key ${OUT_DIR}/${CN}-key.pem -outform der \
     -out ${OUT_DIR}/${CN}.csr \
-    -subj "/CN=${CN}.example.org/O=xipki/C=DE"
+    -subj "/CN=${CN}.example.org/O=myorg/C=DE"
 
 echo "enroll certificate"
 

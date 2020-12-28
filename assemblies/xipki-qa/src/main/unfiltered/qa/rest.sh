@@ -28,7 +28,7 @@ echo "generate CSR"
 
 openssl req -new -sha256 -key ${filename}-key.pem -outform der \
     -out ${filename}.csr \
-    -subj "/CN=${filename}.example.org/O=xipki/C=DE"
+    -subj "/CN=${filename}.example.org/O=myorg/C=DE"
 
 echo "get CA certificate"
 
@@ -46,7 +46,7 @@ echo "enroll certificate (CA generate keypair)"
 
 curl ${OPTS} \
     --header "Content-Type: text/plain; charset=utf-8" \
-    --data-ascii "subject=CN=${filename}-cagenkeypair.example.org,O=xipki,C=DE" \
+    --data-ascii "subject=CN=${filename}-cagenkeypair.example.org,O=myorg,C=DE" \
     --output ${filename}-cagenkeypair.pem -v \
     "${BASE_URL}/enroll-cert-cagenkeypair?profile=tlsa"
 

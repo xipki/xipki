@@ -1,7 +1,7 @@
 ## Add SCEP support to subcawith
 
 xi:csr-p12 --hash $STDHASH --p12 output/scep1.p12 --password 1234 \
-  --subject "CN=scep responder1,O=xipki,C=DE" --out output/scep1.csr
+  --subject "CN=scep responder1,O=myorg,C=DE" --out output/scep1.csr
 
 ca:enroll-cert --ca subcawithcrl1 --csr output/scep1.csr \
   --outform $OUTFORM \

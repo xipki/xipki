@@ -28,7 +28,7 @@ CN = rest-smime-${CUR_TIME}
 xi:rsa-p12 --password 1234 --out ${OUT_DIR}/${CN}.p12 --subject "CN=${CN}"
 
 xi:csr-p12 --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
-  --subject "CN=${CN},E=info@myorg.com,O=xipki,C=DE" \
+  --subject "CN=${CN},E=info@myorg.com,O=myorg,C=DE" \
   --out ${OUT_DIR}/${CN}.csr
 
 xi:curl --out ${OUT_DIR}/${CN}.der --data-file ${OUT_DIR}/${CN}.csr \
@@ -42,7 +42,7 @@ echo "=====REST: Enroll (CA generate keypair)====="
 CN = rest-tls-cagenkey-${CUR_TIME}
 
 xi:curl --out ${OUT_DIR}/${CN}.pem \
-  --data "subject=CN=${CN}.myorg.org,O=xipki,C=DE" \
+  --data "subject=CN=${CN}.myorg.org,O=myorg,C=DE" \
   --header "Content-Type: text/plain; encoding=utf-8" \
   "$BASE_URL/enroll-cert-cagenkeypair?profile=tls"
 
@@ -53,7 +53,7 @@ CN = rest-tls-${CUR_TIME}
 xi:rsa-p12 --password 1234 --out ${OUT_DIR}/${CN}.p12 --subject "CN=${CN}"
 
 xi:csr-p12 --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
-  --subject "CN=${CN}.myorg.org,O=xipki,C=DE" \
+  --subject "CN=${CN}.myorg.org,O=myorg,C=DE" \
   --out ${OUT_DIR}/${CN}.csr
 
 xi:curl --out ${OUT_DIR}/${CN}.der --data-file ${OUT_DIR}/${CN}.csr \

@@ -106,7 +106,7 @@ if { $printUsage equals "true" } then {
 
   #### list certs ####
 
-  ca:list-cert --ca rootca1 --subject "CN=*ca*,O=xipki" --order subject -n 100
+  ca:list-cert --ca rootca1 --subject "CN=*ca*,O=myorg" --order subject -n 100
 
   # get the serial number
   SERIAL = $(xi:cert-info --serial --hex --in output/subca1.crt)

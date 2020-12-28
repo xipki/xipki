@@ -66,7 +66,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
     --slot $SLOT \
     --label rootca1 \
     --out output/rootca1.csr \
-    --subject "CN=rootca1,O=xipki,C=DE" \
+    --subject "CN=rootca1,O=myorg,C=DE" \
     --keyusage cRLSign
 } else {
   xi:csr-p12 \
@@ -74,7 +74,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
     --p12 output/rootca1.p12 \
     --password 1234 \
     --out output/rootca1.csr \
-    --subject "CN=rootca1,O=xipki,C=DE" \
+    --subject "CN=rootca1,O=myorg,C=DE" \
     --keyusage cRLSign
 }
 
@@ -165,7 +165,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
     --label subca1 \
     --outform $OUTFORM \
     --out output/subca1.csr \
-    --subject "CN=subca1,O=xipki,C=DE"
+    --subject "CN=subca1,O=myorg,C=DE"
 } else {
   xi:csr-p12 \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
@@ -173,7 +173,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
     --password 1234 \
     --outform $OUTFORM \
     --out output/subca1.csr \
-    --subject "CN=subca1,O=xipki,C=DE"
+    --subject "CN=subca1,O=myorg,C=DE"
 }
 
 ca:enroll-cert \
@@ -203,7 +203,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
     --slot $SLOT --label subcawithcrl1 \
     --outform $OUTFORM \
     --out output/subcawithcrl1.csr \
-    --subject "CN=subcawithcrl1, O=xipki, C=DE" \
+    --subject "CN=subcawithcrl1, O=myorg, C=DE" \
     --subject-alt-name "[1]info@myorg.org" \
     --subject-alt-name "[2]myorg.org" \
     --subject-alt-name "[5]edi-nameAssigner-1=edi-partyName1" \
@@ -220,7 +220,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
     --password 1234 \
     --outform $OUTFORM \
     --out output/subcawithcrl1.csr \
-    --subject "CN=subcawithcrl1, O=xipki, C=DE" \
+    --subject "CN=subcawithcrl1, O=myorg, C=DE" \
     --subject-alt-name "[1]info@myorg.org" \
     --subject-alt-name "[2]myorg.org" \
     --subject-alt-name "[5]edi-nameAssigner-1=edi-partyName1" \
@@ -260,7 +260,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
     --label ocsp99 \
     --outform $OUTFORM \
     --out output/ocsp99.csr \
-    --subject "CN=ocsp99,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
+    --subject "CN=ocsp99,2.5.4.97=VATDE-123456789,O=myorg,C=DE"
 } else {
   xi:csr-p12 \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
@@ -268,7 +268,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
     --password 1234 \
     --outform $OUTFORM \
     --out output/ocsp99.csr \
-    --subject "CN=ocsp99,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
+    --subject "CN=ocsp99,2.5.4.97=VATDE-123456789,O=myorg,C=DE"
 }
 
 ca:enroll-cert \
@@ -396,7 +396,7 @@ ca:ca-add \
   --crl-uri http://subcawithcrl.myorg.org/crl \
   --deltacrl-uri http://subcawithcrl.myorg.org/deltacrl \
   --cmp-control "send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA:SM3withSM2" \
-  --crl-control "update.mode=interval,fullcrl.intervals=7,overlap.days=3,interval.time=02:00,xipki.certset=false" \
+  --crl-control "update.mode=interval,fullcrl.intervals=7,overlap.days=3,interval.time=02:00" \
   --scep-control "cacert.included=false,signercert.included=true,support.getcrl=true" \
   --cmp-responder responder1 \
   --validity-mode lax \

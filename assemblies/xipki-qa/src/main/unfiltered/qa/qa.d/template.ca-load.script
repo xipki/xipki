@@ -10,13 +10,13 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
   xi:csr-p11 \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
     --slot $SLOT --label rootca1 --out output/rootca1.csr \
-    --subject "CN=rootca1,O=xipki,C=DE" --keyusage cRLSign
+    --subject "CN=rootca1,O=myorg,C=DE" --keyusage cRLSign
 } else {
   xi:csr-p12 \
     --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
     --p12 output/rootca1.p12 --password 1234 \
     --out output/rootca1.csr \
-    --subject "CN=rootca1,O=xipki,C=DE" \
+    --subject "CN=rootca1,O=myorg,C=DE" \
     --keyusage cRLSign
 }
 
@@ -73,13 +73,13 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
     --slot $SLOT --label subca1 \
     --outform $OUTFORM \
     --out output/subca1.csr \
-    --subject "CN=subca1,O=xipki,C=DE"
+    --subject "CN=subca1,O=myorg,C=DE"
 } else {
   xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
     --p12 output/subca1.p12 --password 1234 \
     --outform $OUTFORM \
     --out output/subca1.csr \
-    --subject "CN=subca1,O=xipki,C=DE"
+    --subject "CN=subca1,O=myorg,C=DE"
 }
 
 ca:enroll-cert --ca rootca1 --csr output/subca1.csr \
@@ -101,7 +101,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
     --slot $SLOT --label subcawithcrl1 \
     --outform $OUTFORM \
     --out output/subcawithcrl1.csr \
-    --subject "CN=subcawithcrl, O=xipki, C=DE" \
+    --subject "CN=subcawithcrl, O=myorg, C=DE" \
     --subject-alt-name "[1]info@myorg.org" \
     --subject-alt-name "[2]myorg.org" \
     --subject-alt-name "[5]edi-nameAssigner-1=edi-partyName1" \
@@ -117,7 +117,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
     --p12 output/subcawithcrl1.p12 --password 1234 \
     --outform $OUTFORM \
     --out output/subcawithcrl1.csr \
-    --subject "CN=subcawithcrl1, O=xipki, C=DE" \
+    --subject "CN=subcawithcrl1, O=myorg, C=DE" \
     --subject-alt-name "[1]info@myorg.org" \
     --subject-alt-name "[2]myorg.org" \
     --subject-alt-name "[5]edi-nameAssigner-1=edi-partyName1" \
@@ -148,13 +148,13 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
     --slot $SLOT --label ocsp99 \
     --outform $OUTFORM \
     --out output/ocsp99.csr \
-    --subject "CN=ocsp99,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
+    --subject "CN=ocsp99,2.5.4.97=VATDE-123456789,O=myorg,C=DE"
 } else {
   xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
     --p12 output/ocsp99.p12 --password 1234 \
     --outform $OUTFORM \
     --out output/ocsp99.csr \
-    --subject "CN=ocsp99,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
+    --subject "CN=ocsp99,2.5.4.97=VATDE-123456789,O=myorg,C=DE"
 }
 
 ca:enroll-cert --ca rootca1 --csr output/ocsp99.csr \

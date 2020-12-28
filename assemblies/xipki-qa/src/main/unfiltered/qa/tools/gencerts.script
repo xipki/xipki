@@ -1,16 +1,16 @@
 if { "${CA_TYPE}" equals "SM2" } then {
   xi:csr-p12 --hash SM3 --gm --p12 ${OUT_DIR}/ca/tls-ca.p12 --password 1234 --out output/tls-ca.csr \
-    --subject "CN=TLS Demo CA,OU=${CA_TYPE},O=xipki,C=DE"
+    --subject "CN=TLS Demo CA,OU=${CA_TYPE},O=myorg,C=DE"
 } else {
   xi:csr-p12 --p12 ${OUT_DIR}/ca/tls-ca.p12 --password 1234 --out output/tls-ca.csr \
-    --subject "CN=TLS Demo CA,OU=${CA_TYPE},O=xipki,C=DE"
+    --subject "CN=TLS Demo CA,OU=${CA_TYPE},O=myorg,C=DE"
 }
 
 sleep 1
 
 xi:initdb --force \
   --db-conf /opt/xipki/ca/etc/database/ca-db.properties \
-  --db-schema xipki/sql/ca-init.xml
+  --db-schema /opt/xipki/ca/sql/ca-init.xml
 
 ca:restart
 
@@ -34,7 +34,7 @@ xi:cmp-init
 xi:cmp-enroll-cagenkey --password 1234 --profile tls \
   --p12-out ${OUT_DIR}/server/tls-server.p12 \
   --cert-out ${OUT_DIR}/server/tls-server-cert.der \
-  --subject "CN=localhost,OU=${CA_TYPE},O=xipki demo,C=DE"
+  --subject "CN=localhost,OU=${CA_TYPE},O=myorg demo,C=DE"
 
 list = [client client2 client3]
 each ($list) {
@@ -42,7 +42,7 @@ each ($list) {
   xi:cmp-enroll-cagenkey --password 1234 --profile tls \
     --p12-out ${OUT_DIR}/${name}/tls-${name}.p12 \
     --cert-out ${OUT_DIR}/${name}/tls-${name}-cert.der \
-    --subject "CN=${name},OU=${CA_TYPE},O=xipki demo,C=DE"
+    --subject "CN=${name},OU=${CA_TYPE},O=myorg demo,C=DE"
 }
 
 ############# Export other files ##########

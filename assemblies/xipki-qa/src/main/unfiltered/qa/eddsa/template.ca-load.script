@@ -9,12 +9,12 @@ ca:restart
 if { $TOKEN_TYPE equals "pkcs11" } then {
   xi:csr-p11 \
     --slot $SLOT --label rootca1 --out output/rootca1.csr \
-    --subject "CN=rootca1,O=xipki,C=DE"
+    --subject "CN=rootca1,O=myorg,C=DE"
 } else {
   xi:csr-p12 \
     --p12 output/rootca1.p12 --password 1234 \
     --out output/rootca1.csr \
-    --subject "CN=rootca1,O=xipki,C=DE"
+    --subject "CN=rootca1,O=myorg,C=DE"
 }
 
 echo "#################################################################"
@@ -58,12 +58,12 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
   xi:csr-p11 \
     --slot $SLOT --label subca1 \
     --out output/subca1.csr \
-    --subject "CN=subca1,O=xipki,C=DE"
+    --subject "CN=subca1,O=myorg,C=DE"
 } else {
   xi:csr-p12 \
     --p12 output/subca1.p12 --password 1234 \
     --out output/subca1.csr \
-    --subject "CN=subca1,O=xipki,C=DE"
+    --subject "CN=subca1,O=myorg,C=DE"
 }
 
 ca:enroll-cert --ca rootca1 --csr output/subca1.csr \

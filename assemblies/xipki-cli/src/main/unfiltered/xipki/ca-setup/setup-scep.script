@@ -1,5 +1,5 @@
 # Please adapt me
-SCEP_SUBJECT="CN=SCEP1,O=xipki,C=DE"
+SCEP_SUBJECT="CN=SCEP1,O=myorg,C=DE"
 
 # Please adapt me
 HASH = SHA256
