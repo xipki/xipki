@@ -282,7 +282,7 @@ if { $printUsage equals "true" } then {
     --sn-len 20  \
     --signer-type $TOKEN_TYPE \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
-    --ca-cert-uri http://example.org/subca1.der \
+    --ca-cert-uri http://myorg.org/subca1.der \
     --cmp-control $CMP_CONTROL \
     --cmp-responder responder1 \
     --certchain output/rootca1.crt
@@ -294,7 +294,7 @@ if { $printUsage equals "true" } then {
     --signer-type $TOKEN_TYPE \
     --cert output/rootca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
-    --ca-cert-uri http://example.org/rootca1.der \
+    --ca-cert-uri http://myorg.org/rootca1.der \
     --cmp-control $CMP_CONTROL \
     --cmp-responder responder1 \
     --validity-mode cutoff \
@@ -312,7 +312,7 @@ if { $printUsage equals "true" } then {
     --signer-type $TOKEN_TYPE \
     --cert output/subca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
-    --ca-cert-uri http://example.org/subca1.der \
+    --ca-cert-uri http://myorg.org/subca1.der \
     --cmp-control $CMP_CONTROL \
     --cmp-responder responder1 \
     --support-cmp yes --support-rest yes \
@@ -326,7 +326,7 @@ if { $printUsage equals "true" } then {
     --permission revoke_cert \
     --max-validity 8y \
     --ocsp-uri http://localhost:8080/ocsp/responder2 \
-    --ca-cert-uri http://example.org/rootca1-2.der \
+    --ca-cert-uri http://myorg.org/rootca1-2.der \
     --validity-mode strict
 
   caqa:ca-check --name rootca1 \
@@ -337,7 +337,7 @@ if { $printUsage equals "true" } then {
     --signer-type $TOKEN_TYPE \
     --cert output/rootca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder2 \
-    --ca-cert-uri http://example.org/rootca1-2.der \
+    --ca-cert-uri http://myorg.org/rootca1-2.der \
     --cmp-control $CMP_CONTROL \
     --cmp-responder responder1 \
     --validity-mode strict
@@ -368,7 +368,7 @@ if { $printUsage equals "true" } then {
     --signer-type $TOKEN_TYPE \
     --signer-conf $CA_SIGNER_CONF_RCA \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
-    --ca-cert-uri http://example.org/rootca1.der \
+    --ca-cert-uri http://myorg.org/rootca1.der \
     --cmp-control $CMP_CONTROL \
     --cmp-responder responder1 \
     --validity-mode cutoff
@@ -387,7 +387,7 @@ if { $printUsage equals "true" } then {
     --signer-conf $CA_SIGNER_CONF_RCA \
     --cert output/subca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
-    --ca-cert-uri http://example.org/rootca1.der \
+    --ca-cert-uri http://myorg.org/rootca1.der \
     --cmp-control $CMP_CONTROL \
     --cmp-responder responder1 \
     --validity-mode cutoff
@@ -404,7 +404,7 @@ if { $printUsage equals "true" } then {
     --signer-conf $CA_SIGNER_CONF_RCA \
     --cert output/subca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
-    --ca-cert-uri http://example.org/rootca1.der \
+    --ca-cert-uri http://myorg.org/rootca1.der \
     --cmp-control $CMP_CONTROL \
     --cmp-responder responder1 \
     --validity-mode cutoff \
@@ -422,7 +422,7 @@ if { $printUsage equals "true" } then {
     --signer-conf $CA_SIGNER_CONF_RCA \
     --cert output/rootca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
-    --ca-cert-uri http://example.org/rootca1.der \
+    --ca-cert-uri http://myorg.org/rootca1.der \
     --cmp-responder responder1 \
     --validity-mode cutoff
 
@@ -438,7 +438,7 @@ if { $printUsage equals "true" } then {
     --signer-conf $CA_SIGNER_CONF_RCA \
     --cert output/rootca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
-    --ca-cert-uri http://example.org/rootca1.der \
+    --ca-cert-uri http://myorg.org/rootca1.der \
     --cmp-responder responder1 \
     --validity-mode cutoff
 
@@ -454,7 +454,7 @@ if { $printUsage equals "true" } then {
     --signer-conf $CA_SIGNER_CONF_RCA \
     --cert output/rootca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
-    --ca-cert-uri http://example.org/rootca1.der \
+    --ca-cert-uri http://myorg.org/rootca1.der \
     --crl-signer crlsigner2 \
     --cmp-control $CMP_CONTROL \
     --cmp-responder responder1 \
@@ -472,7 +472,7 @@ if { $printUsage equals "true" } then {
     --signer-conf $CA_SIGNER_CONF_RCA \
     --cert output/rootca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
-    --ca-cert-uri http://example.org/rootca1.der \
+    --ca-cert-uri http://myorg.org/rootca1.der \
     --cmp-control $CMP_CONTROL \
     --cmp-responder responder2 \
     --validity-mode cutoff
@@ -700,13 +700,13 @@ if { $printUsage equals "true" } then {
     --permission revoke_cert \
     --max-validity 8y \
     --ocsp-uri http://localhost:8080/ocsp/responder2 \
-    --ca-cert-uri http://example.org/rootca1-2.der \
+    --ca-cert-uri http://myorg.org/rootca1-2.der \
     --validity-mode strict
 
   ca:ca-up --name rootca1 \
     --permission all \
     --max-validity 10y \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
-    --ca-cert-uri http://example.org/rootca1.der \
+    --ca-cert-uri http://myorg.org/rootca1.der \
     --validity-mode cutoff
 }

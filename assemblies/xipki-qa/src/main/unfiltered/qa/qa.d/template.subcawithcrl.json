@@ -12,13 +12,13 @@
 		"caInfo":{
 			"caUris":{
 				"cacertUris":[
-					"http://example.org/subcawithcrl1.der"
+					"http://myorg.org/subcawithcrl1.der"
 				],
 				"crlUris":[
-					"http://subcawithcrl.example.org/crl"
+					"http://subcawithcrl.myorg.org/crl"
 				],
 				"deltaCrlUris":[
-					"http://subcawithcrl.example.org/deltacrl"
+					"http://subcawithcrl.myorg.org/deltacrl"
 				],
 				"ocspUris":[
 					"http://localhost:8080/ocsp/responder2"

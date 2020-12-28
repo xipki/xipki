@@ -109,7 +109,7 @@
 			"maxOccurs":1,
 			"value":{
 				"overridable":false,
-				"text":"fixed example.org"
+				"text":"fixed myorg.org"
 			}
 		},{
 			"type":{

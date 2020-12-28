@@ -30,7 +30,7 @@ each ($list) {
   xi:cmp-enroll-cagenkey \
     --p12-out output/${type}-1.p12 --password 1234 \
     --cert-out output/${type}-1.crt --profile ${type} \
-    --subject "CN=${type}-1.example.org,C=DE"
+    --subject "CN=${type}-1.myorg.org,C=DE"
 
   xi:update-cert-p12 --p12 output/${type}-1.p12 --password 1234 \
     --cert output/${type}-1.crt \
@@ -47,7 +47,7 @@ each ($list) {
   xi:cmp-enroll-p12 \
     --p12 output/${type}-2.p12 --password 1234 \
     --out output/${type}-2.crt --profile ${type} \
-    --subject "CN=${type}-2.example.org,C=DE"
+    --subject "CN=${type}-2.myorg.org,C=DE"
 
   xi:update-cert-p12 --p12 output/${type}-2.p12 --password 1234 \
     --cert output/${type}-2.crt \
@@ -63,7 +63,7 @@ each ($list) {
 
   xi:csr-p12 \
     --p12 output/${type}-3.p12 --password 1234 \
-    --subject "CN=${type}-3.example.org,C=DE" \
+    --subject "CN=${type}-3.myorg.org,C=DE" \
     --out output/${type}-3.csr
 }
 
@@ -73,7 +73,7 @@ each ($list) {
 
   xi:csr-p12 \
     --p12 output/${type}-3.p12 --password 1234 \
-    --subject "CN=${type}-3.example.org,C=DE" \
+    --subject "CN=${type}-3.myorg.org,C=DE" \
     --peer-certs qa/keys/dhpoc_certs.pem \
     --out output/${type}-3.csr
 }
@@ -110,7 +110,7 @@ each ($list) {
 
   xi:csr-p12 \
     --p12 output/${type}-4.p12 --password 1234 \
-    --subject "CN=${type}-4.example.org,C=DE" \
+    --subject "CN=${type}-4.myorg.org,C=DE" \
     --out output/${type}-4.csr
 }
 
@@ -120,7 +120,7 @@ each ($list) {
 
   xi:csr-p12 \
     --p12 output/${type}-4.p12 --password 1234 \
-    --subject "CN=${type}-4.example.org,C=DE" \
+    --subject "CN=${type}-4.myorg.org,C=DE" \
     --peer-certs output/dhpoc-certs.pem \
     --out output/${type}-4.csr
 }

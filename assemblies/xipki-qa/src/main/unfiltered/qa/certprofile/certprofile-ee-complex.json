@@ -333,7 +333,7 @@
 					"oid":{
 						"oid":"1.2.3.4.5"
 					},
-					"url":"http://naming-authority-level2.example.org",
+					"url":"http://naming-authority-level2.myorg.org",
 					"text":"namingAuthrityText level 2"
 				},
 				"professionInfos":[{
@@ -341,7 +341,7 @@
 						"oid":{
 							"oid":"1.2.3.4.5"
 						},
-						"url":"http://naming-authority-level3.example.org",
+						"url":"http://naming-authority-level3.myorg.org",
 						"text":"namingAuthrityText level 3"
 					},
 					"professionOids":[{
@@ -456,10 +456,10 @@
 				},
 				"statementValue":{
 					"pdsLocations":[{
-						"url":"http://pki.example.org/pds/en",
+						"url":"http://pki.myorg.org/pds/en",
 						"language":"en"
 					},{
-						"url":"http://pki.example.org/pds/de",
+						"url":"http://pki.myorg.org/pds/de",
 						"language":"de"
 					}]
 				}

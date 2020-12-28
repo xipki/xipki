@@ -283,10 +283,10 @@
 				},
 				"statementValue":{
 					"pdsLocations":[{
-						"url":"http://pki.example.org/pds/en",
+						"url":"http://pki.myorg.org/pds/en",
 						"language":"en"
 					},{
-						"url":"http://pki.example.org/pds/de",
+						"url":"http://pki.myorg.org/pds/de",
 						"language":"de"
 					}]
 				}

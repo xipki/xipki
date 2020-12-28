@@ -137,13 +137,13 @@ if { $printUsage equals "true" } then {
 
   each ($list) {
     name = $it
-    caqa:check-cert --issuer subca --profile ${name} \
+    caqa:check-cert --issuer cab-subca --profile ${name} \
     --csr output/${name}1.csr --cert output/${name}1.crt
   }
 
   each ($list) {
     name = $it
-    caqa:check-cert --issuer subca --profile ${name} \
+    caqa:check-cert --issuer cab-subca --profile ${name} \
     --csr output/${name}2.csr --cert output/${name}2.crt
   }
 

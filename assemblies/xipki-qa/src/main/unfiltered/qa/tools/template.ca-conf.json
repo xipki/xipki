@@ -40,7 +40,7 @@
 		"caInfo":{
 			"caUris":{
 				"crlUris":[
-					"http://ca.example.org/crl"
+					"http://ca.myorg.org/crl"
 				],
 				"ocspUris":[
 					"http://localhost:8080/ocsp/responder1"

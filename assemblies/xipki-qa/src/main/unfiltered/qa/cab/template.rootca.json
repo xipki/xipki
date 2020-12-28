@@ -78,10 +78,10 @@
 		"caInfo":{
 			"caUris":{
 				"cacertUris":[
-					"http://example.org/rootca1.der"
+					"http://myorg.org/rootca1.der"
 				],
 				"crlUris":[
-					"http://rootca.example.org/crl"
+					"http://rootca.myorg.org/crl"
 				],
 				"ocspUris":[
 					"http://localhost:8080/ocsp/responder1"

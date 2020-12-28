@@ -83,7 +83,7 @@ CN = cmp-crmf-ca-genkey-tls
 xi:cmp-enroll-cagenkey \
   --p12-out output/${CN}.p12 --password 1234 \
   --cert-outform $OUTFORM \
-  --cert-out output/${CN}.crt --profile tls --subject "CN=${CN}.example.org,O=xipki,C=DE"
+  --cert-out output/${CN}.crt --profile tls --subject "CN=${CN}.myorg.org,O=xipki,C=DE"
 
 ## Revocate certificates
 xi:cmp-revoke --ca subcawithcrl1 --cert output/ocsp2.crt --reason keyCompromise
@@ -210,23 +210,23 @@ xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --biometric-type 0 \
   --biometric-hash SHA256 \
   --biometric-file etc/jre.properties \
-  --biometric-uri https://example.org/?id=123 \
+  --biometric-uri https://myorg.org/?id=123 \
   --san '[0]1.2.3.1=SAN-I am otherName 1.2.3.1' \
   --san '[0]1.2.3.2=SAN-I am otherName 1.2.3.2' \
-  --san '[1]SNA-info@example.org' \
-  --san '[2]SAN-dns.example.org' \
+  --san '[1]SNA-info@myorg.org' \
+  --san '[2]SAN-dns.myorg.org' \
   --san '[4]CN=demo,C=DE' \
   --san '[5]SAN-assigner1=SAN-party1' \
-  --san '[6]SAN-uri.example.org' \
+  --san '[6]SAN-uri.myorg.org' \
   --san '[7]69.1.2.190' \
   --san '[8]2.3.4.5' \
   --sia '1.3.6.1.5.5.7.48.5=[0]1.2.3.1\=SIA-I am otherName 1.2.3.1' \
   --sia '2.3.4.1=[0]1.2.3.2\=SIA-I am otherName 1.2.3.2' \
-  --sia '2.3.4.2=[1]SNA-info@example.org' \
-  --sia '2.3.4.3=[2]SIA-dns.example.org' \
+  --sia '2.3.4.2=[1]SNA-info@myorg.org' \
+  --sia '2.3.4.3=[2]SIA-dns.myorg.org' \
   --sia '2.3.4.4=[4]CN\=demo\,C\=DE' \
   --sia '2.3.4.5=[5]SIA-assigner1\=SIA-party1' \
-  --sia '2.3.4.6=[6]SIA-uri.example.org' \
+  --sia '2.3.4.6=[6]SIA-uri.myorg.org' \
   --sia '2.3.4.7=[7]69.1.2.190' \
   --sia '2.3.4.8=[8]2.3.4.5' \
   --extra-extensions-file qa/extensions/extensions-ee-complex.json
@@ -249,29 +249,29 @@ xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --out output/ee-complex2.csr \
   --subject "UID=abc-def,CN=ee-complex2,O=xipki,C=DE,1.3.6.1.4.1.311.60.2.1.3=CN,1.3.6.1.4.1.311.60.2.1.2=Guandong,1.3.6.1.4.1.311.60.2.1.1=Shenzhen,1.3.36.8.3.3=registrationNumber\=aaab" \
   --dateOfBirth 19810102 \
-  --postalAddress "street example 1" \
+  --postalAddress "street myorg 1" \
   --postalAddress "D-69112 Heidelberg" \
   --qc-eu-limit EUR:150:15 \
   --biometric-type 0 \
   --biometric-hash SHA256 \
   --biometric-file etc/jre.properties \
-  --biometric-uri https://example.org/?id=123 \
+  --biometric-uri https://myorg.org/?id=123 \
   --san '[0]1.2.3.1=SAN-I am otherName 1.2.3.1' \
   --san '[0]1.2.3.2=SAN-I am otherName 1.2.3.2' \
-  --san '[1]SNA-info@example.org' \
-  --san '[2]SAN-dns.example.org' \
+  --san '[1]SNA-info@myorg.org' \
+  --san '[2]SAN-dns.myorg.org' \
   --san '[4]CN=demo,C=DE' \
   --san '[5]SAN-assigner1=SAN-party1' \
-  --san '[6]SAN-uri.example.org' \
+  --san '[6]SAN-uri.myorg.org' \
   --san '[7]69.1.2.190' \
   --san '[8]2.3.4.5' \
   --sia '1.3.6.1.5.5.7.48.5=[0]1.2.3.1\=SIA-I am otherName 1.2.3.1' \
   --sia '2.3.4.1=[0]1.2.3.2\=SIA-I am otherName 1.2.3.2' \
-  --sia '2.3.4.2=[1]SNA-info@example.org' \
-  --sia '2.3.4.3=[2]SIA-dns.example.org' \
+  --sia '2.3.4.2=[1]SNA-info@myorg.org' \
+  --sia '2.3.4.3=[2]SIA-dns.myorg.org' \
   --sia '2.3.4.4=[4]CN\=demo\,C\=DE' \
   --sia '2.3.4.5=[5]SIA-assigner1\=SIA-party1' \
-  --sia '2.3.4.6=[6]SIA-uri.example.org' \
+  --sia '2.3.4.6=[6]SIA-uri.myorg.org' \
   --sia '2.3.4.7=[7]69.1.2.190' \
   --sia '2.3.4.8=[8]2.3.4.5' \
   --extra-extensions-file qa/extensions/extensions-ee-complex.json
@@ -339,7 +339,7 @@ each ($list) {
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --p12 output/smime1.p12 --password 1234 \
-  --subject "CN=smime1,E=InFo@example.com,O=xipki,C=DE" \
+  --subject "CN=smime1,E=InFo@myorg.com,O=xipki,C=DE" \
   --outform $OUTFORM \
   --out output/smime1.csr \
 
@@ -356,7 +356,7 @@ xi:update-cert-p12 --p12 output/smime1.p12 --password 1234 \
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --p12 output/smime-legacy1.p12 --password 1234 \
-  --subject "CN=smime-legacy1,E=InFo@example.com,O=xipki,C=DE" \
+  --subject "CN=smime-legacy1,E=InFo@myorg.com,O=xipki,C=DE" \
   --outform $OUTFORM \
   --out output/smime-legacy1.csr \
 
@@ -373,7 +373,7 @@ xi:update-cert-p12 --p12 output/smime-legacy1.p12 --password 1234 \
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --p12 output/tls1.p12 --password 1234 \
-  --subject "CN=tls1.example.org,O=xipki,C=DE" \
+  --subject "CN=tls1.myorg.org,O=xipki,C=DE" \
   --outform $OUTFORM \
   --out output/tls1.csr \
 
@@ -390,7 +390,7 @@ xi:update-cert-p12 --p12 output/tls1.p12 --password 1234 \
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --p12 output/tls2.p12 --password 1234 \
-  --subject "CN=tls2.example.org,O=xipki,C=DE" \
+  --subject "CN=tls2.myorg.org,O=xipki,C=DE" \
   --outform $OUTFORM \
   --out output/tls2.csr
 
@@ -455,7 +455,7 @@ xi:cmp-revoke --ca subca1 --cert output/tls-c2.crt --reason affiliationChanged
 
 xi:csr-p12 --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
   --p12 output/max-time1.p12 --password 1234 \
-  --subject "CN=max-time1.example.org,O=xipki,C=DE" \
+  --subject "CN=max-time1.myorg.org,O=xipki,C=DE" \
   --outform $OUTFORM \
   --out output/max-time1.csr
 

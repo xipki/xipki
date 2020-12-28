@@ -217,7 +217,7 @@
 				"policyQualifiers":[
 					{
 						"type":"cpsUri",
-						"value":"http://example.org/ca1-cps"
+						"value":"http://myorg.org/ca1-cps"
 					}
 				]
 			},{
@@ -275,12 +275,12 @@
 		"nameConstraints":{
 			"permittedSubtrees":[{
 				"base":{
-					"directoryName":"O=example organization, C=DE"
+					"directoryName":"O=myorg organization, C=DE"
 				}
 			}],
 			"excludedSubtrees":[{
 				"base":{
-					"directoryName":"OU=bad OU, O=example organization, C=DE"
+					"directoryName":"OU=bad OU, O=myorg organization, C=DE"
 				}
 			}]
 		}

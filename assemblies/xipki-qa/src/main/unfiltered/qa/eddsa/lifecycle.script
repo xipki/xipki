@@ -50,7 +50,7 @@ if { $printUsage equals "true" } then {
   echo ""
   echo "source file:./qa/eddsa/lifecycle.script <token type> <keyspec>"
   echo "    token type:      pkcs11, pkcs12"
-  echo "    keyspec:         keyspec, 25519 or 448"
+  echo "    keyspec:         25519, 448"
 } else {
   echo "========================================================"
   echo "TOKEN_TYPE: $TOKEN_TYPE"

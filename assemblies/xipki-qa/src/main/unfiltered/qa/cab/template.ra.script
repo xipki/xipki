@@ -17,7 +17,7 @@ xi:cmp-health --ca subca1
 
 xi:csr-p12 --hash $HASH REPLACEME-RSAMGF1 \
   --p12 output/cab-domain-validated1.p12 --password 1234 \
-  --subject "CN=abc.domain-validated.example.org,C=DE" \
+  --subject "CN=abc.domain-validated.myorg.org,C=DE" \
   --out output/cab-domain-validated1.csr
 
 xi:cmp-csr-enroll --csr output/cab-domain-validated1.csr \
@@ -32,7 +32,7 @@ xi:update-cert-p12 --p12 output/cab-domain-validated1.p12 --password 1234 \
 
 xi:csr-p12 --hash $HASH REPLACEME-RSAMGF1 \
   --p12 output/cab-domain-validated2.p12 --password 1234 \
-  --subject "CN=*.domain-validated.example.org,C=DE" \
+  --subject "CN=*.domain-validated.myorg.org,C=DE" \
   --out output/cab-domain-validated2.csr
 
 xi:cmp-csr-enroll --csr output/cab-domain-validated2.csr \
@@ -47,7 +47,7 @@ xi:update-cert-p12 --p12 output/cab-domain-validated2.p12 --password 1234 \
 
 xi:csr-p12 --hash $HASH REPLACEME-RSAMGF1 \
   --p12 output/cab-org-validated1.p12 --password 1234 \
-  --subject "CN=abc.org-validated.example.org,O=example.org,L=Frankfurt,C=DE" \
+  --subject "CN=abc.org-validated.myorg.org,O=myorg.org,L=Frankfurt,C=DE" \
   --out output/cab-org-validated1.csr
 
 xi:cmp-csr-enroll --csr output/cab-org-validated1.csr \
@@ -62,7 +62,7 @@ xi:update-cert-p12 --p12 output/cab-org-validated1.p12 --password 1234 \
 
 xi:csr-p12 --hash $HASH REPLACEME-RSAMGF1 \
   --p12 output/cab-org-validated2.p12 --password 1234 \
-  --subject "CN=*.org-validated.example.org,O=example.org,L=Frankfurt,C=DE" \
+  --subject "CN=*.org-validated.myorg.org,O=myorg.org,L=Frankfurt,C=DE" \
   --out output/cab-org-validated2.csr
 
 xi:cmp-csr-enroll --csr output/cab-org-validated2.csr \
@@ -77,7 +77,7 @@ xi:update-cert-p12 --p12 output/cab-org-validated2.p12 --password 1234 \
 
 xi:csr-p12 --hash $HASH REPLACEME-RSAMGF1 \
   --p12 output/cab-individual-validated1.p12 --password 1234 \
-  --subject "CN=abc.individual-validated.example.org,givenName=alice,surName=mysurname,L=Frankfurt,C=DE" \
+  --subject "CN=abc.individual-validated.myorg.org,givenName=alice,surName=mysurname,L=Frankfurt,C=DE" \
   --out output/cab-individual-validated1.csr
 
 xi:cmp-csr-enroll --csr output/cab-individual-validated1.csr \
@@ -92,7 +92,7 @@ xi:update-cert-p12 --p12 output/cab-individual-validated1.p12 --password 1234 \
 
 xi:csr-p12 --hash $HASH REPLACEME-RSAMGF1 \
   --p12 output/cab-individual-validated2.p12 --password 1234 \
-  --subject "CN=*.individual-validated.example.org,givenName=alice,surName=mysurname,L=Frankfurt,C=DE" \
+  --subject "CN=*.individual-validated.myorg.org,givenName=alice,surName=mysurname,L=Frankfurt,C=DE" \
   --out output/cab-individual-validated2.csr
 
 xi:cmp-csr-enroll --csr output/cab-individual-validated2.csr \

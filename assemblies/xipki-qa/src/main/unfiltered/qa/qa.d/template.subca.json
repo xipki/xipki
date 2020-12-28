@@ -12,7 +12,7 @@
 		"caInfo":{
 			"caUris":{
 				"cacertUris":[
-					"http://example.org/subca1.der"
+					"http://myorg.org/subca1.der"
 				],
 				"ocspUris":[
 					"http://localhost:8080/ocsp/responder1"

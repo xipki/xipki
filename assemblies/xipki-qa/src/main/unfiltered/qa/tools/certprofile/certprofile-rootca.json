@@ -135,22 +135,6 @@
 		"permittedInRequest":false
 	},{
 		"type":{
-			"oid":"2.5.29.31",
-			"description":"cRLDistributionPoints"
-		},
-		"critical":false,
-		"required":false,
-		"permittedInRequest":false
-	},{
-		"type":{
-			"oid":"2.5.29.46",
-			"description":"freshestCRL"
-		},
-		"critical":false,
-		"required":false,
-		"permittedInRequest":false
-	},{
-		"type":{
 			"oid":"2.5.29.19",
 			"description":"basicConstraints"
 		},

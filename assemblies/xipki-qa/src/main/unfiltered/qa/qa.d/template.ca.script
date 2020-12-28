@@ -102,7 +102,7 @@ ca:gen-rootca \
   --signer-type $TOKEN_TYPE \
   --signer-conf "$CA_SIGNER_CONF" \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
-  --ca-cert-uri http://example.org/rootca1.der \
+  --ca-cert-uri http://myorg.org/rootca1.der \
   --cmp-control "send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA:SM3withSM2" \
   --cmp-responder responder1 \
   --validity-mode cutoff \
@@ -204,14 +204,14 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
     --outform $OUTFORM \
     --out output/subcawithcrl1.csr \
     --subject "CN=subcawithcrl1, O=xipki, C=DE" \
-    --subject-alt-name "[1]info@example.org" \
-    --subject-alt-name "[2]example.org" \
+    --subject-alt-name "[1]info@myorg.org" \
+    --subject-alt-name "[2]myorg.org" \
     --subject-alt-name "[5]edi-nameAssigner-1=edi-partyName1" \
-    --subject-alt-name "[6]http://example.org/abc" \
+    --subject-alt-name "[6]http://myorg.org/abc" \
     --subject-alt-name "[7]192.168.0.1" \
     --subject-alt-name "[8]1.2.3.4" \
     --subject-alt-name "[0]2.5.4.10=long organization name" \
-    --subject-info-access "1.3.6.1.5.5.7.48.5=[6]http://example.org/abc" \
+    --subject-info-access "1.3.6.1.5.5.7.48.5=[6]http://myorg.org/abc" \
     --keyusage cRLSign
 } else {
   xi:csr-p12 \
@@ -221,14 +221,14 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
     --outform $OUTFORM \
     --out output/subcawithcrl1.csr \
     --subject "CN=subcawithcrl1, O=xipki, C=DE" \
-    --subject-alt-name "[1]info@example.org" \
-    --subject-alt-name "[2]example.org" \
+    --subject-alt-name "[1]info@myorg.org" \
+    --subject-alt-name "[2]myorg.org" \
     --subject-alt-name "[5]edi-nameAssigner-1=edi-partyName1" \
-    --subject-alt-name "[6]http://example.org/abc" \
+    --subject-alt-name "[6]http://myorg.org/abc" \
     --subject-alt-name "[7]192.168.0.1" \
     --subject-alt-name "[8]1.2.3.4" \
     --subject-alt-name "[0]2.5.4.10=long organization name" \
-    --subject-info-access "1.3.6.1.5.5.7.48.5=[6]http://example.org/abc" \
+    --subject-info-access "1.3.6.1.5.5.7.48.5=[6]http://myorg.org/abc" \
     --keyusage cRLSign
 }
 
@@ -319,7 +319,7 @@ ca:ca-add \
   --signer-type $TOKEN_TYPE \
   --signer-conf "$CA_SIGNER_CONF" \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
-  --ca-cert-uri http://example.org/subca1.der \
+  --ca-cert-uri http://myorg.org/subca1.der \
   --cmp-control "send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA:SM3withSM2" \
   --cmp-responder responder1 \
   --support-cmp yes --support-rest yes \
@@ -392,9 +392,9 @@ ca:ca-add \
   --signer-type $TOKEN_TYPE \
   --signer-conf "$CA_SIGNER_CONF" \
   --ocsp-uri http://localhost:8080/ocsp/responder2 \
-  --ca-cert-uri http://example.org/subcawithcrl1.der \
-  --crl-uri http://subcawithcrl.example.org/crl \
-  --deltacrl-uri http://subcawithcrl.example.org/deltacrl \
+  --ca-cert-uri http://myorg.org/subcawithcrl1.der \
+  --crl-uri http://subcawithcrl.myorg.org/crl \
+  --deltacrl-uri http://subcawithcrl.myorg.org/deltacrl \
   --cmp-control "send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA:SM3withSM2" \
   --crl-control "update.mode=interval,fullcrl.intervals=7,overlap.days=3,interval.time=02:00,xipki.certset=false" \
   --scep-control "cacert.included=false,signercert.included=true,support.getcrl=true" \

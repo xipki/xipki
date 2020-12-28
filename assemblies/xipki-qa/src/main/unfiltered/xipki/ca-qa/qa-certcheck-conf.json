@@ -5,15 +5,34 @@
 			"file":"output/rootca1.crt"
 		},
 		"validityMode":"cutoff",
-		"caIssuerUrls":["http://example.org/rootca1.der"],
-		"ocspUrls":["http://localhost:8080/ocsp/responder1"]
+		"caIssuerUrls":["http://myorg.org/rootca1.der"],
+		"ocspUrls":["http://localhost:8080/ocsp/responder1"],
+		"crlUrls":["http://rootca.myorg.org/crl"]
+	},{
+		"name":"ed-subca",
+		"cert":{
+			"file":"output/subca1.crt"
+		},
+		"validityMode":"cutoff",
+		"caIssuerUrls":["http://myorg.org/subca1.der"],
+		"ocspUrls":["http://localhost:8080/ocsp/responder1"],
+		"crlUrls":["http://ca-subca.myorg.org/crl"]
+	},{
+		"name":"cab-subca",
+		"cert":{
+			"file":"output/subca1.crt"
+		},
+		"validityMode":"cutoff",
+		"caIssuerUrls":["http://myorg.org/subca1.der"],
+		"ocspUrls":["http://localhost:8080/ocsp/responder1"],
+		"crlUrls":["http://ca-subca.myorg.org/crl"]
 	},{
 		"name":"subca",
 		"cert":{
 			"file":"output/subca1.crt"
 		},
 		"validityMode":"cutoff",
-		"caIssuerUrls":["http://example.org/subca1.der"],
+		"caIssuerUrls":["http://myorg.org/subca1.der"],
 		"ocspUrls":["http://localhost:8080/ocsp/responder1"]
 	},{
 		"name":"subcawithcrl",
@@ -21,10 +40,10 @@
 			"file":"output/subcawithcrl1.crt"
 		},
 		"validityMode":"lax",
-		"caIssuerUrls":["http://example.org/subcawithcrl1.der"],
+		"caIssuerUrls":["http://myorg.org/subcawithcrl1.der"],
 		"ocspUrls":["http://localhost:8080/ocsp/responder2"],
-		"crlUrls":["http://subcawithcrl.example.org/crl"],
-		"deltaCrlUrls":["http://subcawithcrl.example.org/deltacrl"]
+		"crlUrls":["http://subcawithcrl.myorg.org/crl"],
+		"deltaCrlUrls":["http://subcawithcrl.myorg.org/deltacrl"]
 	}],
 	"certprofiles":[{
 		"name":"rootca",
