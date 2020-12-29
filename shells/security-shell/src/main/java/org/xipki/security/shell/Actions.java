@@ -377,7 +377,8 @@ public class Actions {
     @Completion(FileCompleter.class)
     private String peerCertsFile;
 
-    @Option(name = "--subject", aliases = "-s", required = true, description = "subject in the CSR")
+    @Option(name = "--subject", aliases = "-s", description = "subject in the CSR, "
+        + "if not set, use the subject in the signer's certificate ")
     private String subject;
 
     @Option(name = "--dateOfBirth", description = "Date of birth YYYYMMdd in subject")
@@ -650,48 +651,65 @@ public class Actions {
         subjectPublicKeyInfo = KeyUtil.createSubjectPublicKeyInfo(signer.getPublicKey());
       }
 
-      X500Name subjectDn = getSubject(subject);
-
-      List<RDN> list = new LinkedList<RDN>();
-
-      if (StringUtil.isNotBlank(dateOfBirth)) {
-        ASN1ObjectIdentifier id = ObjectIdentifiers.DN.dateOfBirth;
-        RDN[] rdns = subjectDn.getRDNs(id);
-
-        if (rdns == null || rdns.length == 0) {
-          Date date = DateUtil.parseUtcTimeyyyyMMdd(dateOfBirth);
-          date = new Date(date.getTime() + _12_HOURS_MS);
-          ASN1Encodable atvValue = new DERGeneralizedTime(
-              DateUtil.toUtcTimeyyyyMMddhhmmss(date) + "Z");
-          RDN rdn = new RDN(id, atvValue);
-          list.add(rdn);
+      X500Name subjectDn;
+      if (subject == null) {
+        if (StringUtil.isNotBlank(dateOfBirth)) {
+          throw new IllegalCmdParamException("dateOfBirth cannot be set if subject is not set");
         }
-      }
 
-      if (CollectionUtil.isNotEmpty(postalAddress)) {
-        ASN1ObjectIdentifier id = ObjectIdentifiers.DN.postalAddress;
-        RDN[] rdns = subjectDn.getRDNs(id);
+        if (CollectionUtil.isNotEmpty(postalAddress)) {
+          throw new IllegalCmdParamException("postalAddress cannot be set if subject is not set");
+        }
 
-        if (rdns == null || rdns.length == 0) {
-          ASN1EncodableVector vec = new ASN1EncodableVector();
-          for (String m : postalAddress) {
-            vec.add(new DERUTF8String(m));
-          }
+        X509Cert signerCert = signer.getCertificate();
+        if (signerCert == null) {
+          throw new IllegalCmdParamException("subject must be set");
+        }
+        subjectDn = signerCert.getSubject();
+      } else {
+        subjectDn = getSubject(subject);
 
-          if (vec.size() > 0) {
-            ASN1Sequence atvValue = new DERSequence(vec);
+        List<RDN> list = new LinkedList<RDN>();
+
+        if (StringUtil.isNotBlank(dateOfBirth)) {
+          ASN1ObjectIdentifier id = ObjectIdentifiers.DN.dateOfBirth;
+          RDN[] rdns = subjectDn.getRDNs(id);
+
+          if (rdns == null || rdns.length == 0) {
+            Date date = DateUtil.parseUtcTimeyyyyMMdd(dateOfBirth);
+            date = new Date(date.getTime() + _12_HOURS_MS);
+            ASN1Encodable atvValue = new DERGeneralizedTime(
+                DateUtil.toUtcTimeyyyyMMddhhmmss(date) + "Z");
             RDN rdn = new RDN(id, atvValue);
             list.add(rdn);
           }
         }
-      }
 
-      if (!list.isEmpty()) {
-        for (RDN rdn : subjectDn.getRDNs()) {
-          list.add(rdn);
+        if (CollectionUtil.isNotEmpty(postalAddress)) {
+          ASN1ObjectIdentifier id = ObjectIdentifiers.DN.postalAddress;
+          RDN[] rdns = subjectDn.getRDNs(id);
+
+          if (rdns == null || rdns.length == 0) {
+            ASN1EncodableVector vec = new ASN1EncodableVector();
+            for (String m : postalAddress) {
+              vec.add(new DERUTF8String(m));
+            }
+
+            if (vec.size() > 0) {
+              ASN1Sequence atvValue = new DERSequence(vec);
+              RDN rdn = new RDN(id, atvValue);
+              list.add(rdn);
+            }
+          }
         }
 
-        subjectDn = new X500Name(list.toArray(new RDN[0]));
+        if (!list.isEmpty()) {
+          for (RDN rdn : subjectDn.getRDNs()) {
+            list.add(rdn);
+          }
+
+          subjectDn = new X500Name(list.toArray(new RDN[0]));
+        }
       }
 
       PKCS10CertificationRequest csr = generateRequest(signer, subjectPublicKeyInfo, subjectDn,

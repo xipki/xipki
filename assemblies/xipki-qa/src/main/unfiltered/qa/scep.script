@@ -8,7 +8,6 @@ echo "#################################################################"
 
 xi:csr-p12 --hash $STDHASH --p12 output/scep-ocsp1.p12 --password 1234 \
   --challenge-password user1:password1 \
-  --subject "CN=scep-ocsp1,O=myorg,C=DE" \
   --outform $OUTFORM \
   --out output/scep-ocsp1.csr
 
