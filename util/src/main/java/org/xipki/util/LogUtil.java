@@ -52,8 +52,6 @@ public class LogUtil {
     } else {
       log.debug("Exception", th);
     }
-
-    log.debug("Exception", th);
   }
 
   public static void error(Logger log, Throwable th, String msg) {

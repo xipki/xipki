@@ -455,7 +455,8 @@ public class ScepResponder {
           boolean selfSigned = reqSignatureCert.isSelfSigned();
           if (selfSigned) {
             if (!reqSigCertSubject.equals(csrReqInfo.getSubject())) {
-              LOG.warn("tid={}, self-signed identityCert.subject != csr.subject");
+              LOG.warn("tid={}, self-signed identityCert.subject ({}) != csr.subject ({})",
+                  tid, reqSigCertSubject, csrReqInfo.getSubject());
               throw FailInfoException.BAD_REQUEST;
             }
           }
