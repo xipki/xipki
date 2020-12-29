@@ -1,10 +1,19 @@
 {
+//	"responseCache":{
+//		"datasource":{
+//			"name":"datasource-cache",
+//			"conf":{
+//				"file":"etc/ocsp/database/ocsp-cache-db.properties"
+//			}
+//		},
+//		"validity":"1d"
+//	},
 	"master":true,
 	"unknownIssuerBehaviour":"malformedRequest",
 	"datasources":[{
 		"name":"datasource1",
 		"conf":{
-			"file":"ocsp/etc/database/ejbca-db.properties"
+			"file":"etc/ocsp/database/ca-db.properties"
 		}
 	}],
 	"requestOptions":[{
@@ -20,7 +29,8 @@
 			"occurrence":"optional"
 		},
 		"signatureRequired":false,
-		"supportsHttpGet":false,
+		"supportsHttpGet":true,
+		"validateSignature":false,
 		"versions":["v1"]
 	}],
 	"responders":[{
@@ -46,13 +56,13 @@
 		"type":"pkcs12",
 		"algorithms":["SHA256withRSA"],
 		"caCerts":[],
-		"key":"password=1234,keystore=file:ocsp/keycerts/ocsp1.p12"
+		"key":"password=1234,keystore=file:keycerts/ocsp1.p12"
 	}],
 	"stores":[{
 		"name":"store1",
 		"ignoreExpiredCert":true,
 		"ignoreNotYetValidCert":true,
-		"includeArchiveCutoff":true,
+		"includeArchiveCutoff":false,
 		"includeCrlId":false,
 		"retentionInterval":-1,
 		"minNextUpdatePeriod":"1d",
@@ -60,7 +70,7 @@
 		"updateInterval":"10m",
 		"source":{
 			"datasource":"datasource1",
-			"type":"ejbca-db",
+			"type":"xipki-ca-db",
 			"conf":{
 			}
 		}

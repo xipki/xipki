@@ -3,7 +3,7 @@
 //		"datasource":{
 //			"name":"datasource-cache",
 //			"conf":{
-//				"file":"ocsp/etc/database/ocsp-cache-db.properties"
+//				"file":"etc/ocsp/database/ocsp-cache-db.properties"
 //			}
 //		},
 //		"validity":"1d"
@@ -13,7 +13,7 @@
 	"datasources":[{
 		"name":"datasource1",
 		"conf":{
-			"file":"ocsp/etc/database/ocsp-crl-db.properties"
+			"file":"etc/ocsp/database/ocsp-crl-db.properties"
 		}
 	}],
 	"requestOptions":[{
@@ -56,7 +56,7 @@
 		"type":"pkcs12",
 		"algorithms":["SHA256withRSA"],
 		"caCerts":[],
-		"key":"password=1234,keystore=file:ocsp/keycerts/ocsp1.p12"
+		"key":"password=1234,keystore=file:keycerts/ocsp1.p12"
 	}],
 	"stores":[{
 		"name":"store1",
@@ -72,7 +72,7 @@
 			"datasource":"datasource1",
 			"type":"crl",
 			"conf":{
-				"dir":"ocsp/crls/example-crls",
+				"dir":"crls/example-crls",
 				"ignoreExpiredCrls":true,
 				"sqlBatchCommit":1000
 			}

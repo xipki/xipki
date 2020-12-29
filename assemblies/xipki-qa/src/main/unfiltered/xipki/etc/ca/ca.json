@@ -6,19 +6,19 @@
 	"datasources":[{
 		"name":"ca",
 		"conf":{
-			"file":"ca/etc/database/ca-db.properties"
+			"file":"etc/ca/database/ca-db.properties"
 		}
 	},{
 		"name":"ocsp",
 		"conf":{
-			"file":"ca/etc/database/ocsp-db.properties"
+			"file":"etc/ca/database/ocsp-db.properties"
 		}
 	}],
 	"remoteMgmt":{
 		"enabled":true,
 		"certs":[
 			{
-				"file":"ca/keycerts/tlskeys/client2/tls-client2-cert.der"
+				"file":"keycerts/tlskeys/client2/tls-client2-cert.der"
 			}
 		]
 	},
@@ -29,10 +29,10 @@
 		"signStrongrandomEnabled":false,
 		"defaultSignerParallelism":32,
 		"pkcs11Conf":{
-			"file":"ca/security/pkcs11.json"
+			"file":"security/pkcs11.json"
 		},
 		"password":{
-			"masterPasswordCallback":"FILE file=ca/security/masterpassword.secret"
+			"masterPasswordCallback":"FILE file=security/masterpassword.secret"
 		}
 	},
 	"audit":{
@@ -46,7 +46,7 @@
 			"name":"localhost",
 			"truststore":{
 				"keystore":{
-					"file":"ca/keycerts/tlskeys/ca/tls-ca-cert.p12"
+					"file":"keycerts/tlskeys/ca/tls-ca-cert.p12"
 				},
 				"password":"1234",
 				"type":"PKCS12"
@@ -54,6 +54,6 @@
 		}
 	],
 	"ctLog":{
-	    "keydir":"ca/ctlog"
+	    "keydir":"ctlog"
 	}
 }

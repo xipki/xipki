@@ -10,17 +10,38 @@
     <fileSet>
       <directory>${project.build.directory}</directory>
       <includes>
-        <include>README.md</include>
-        <include>xipki/**</include>
-        <include>lib/**</include>
+        <include>tomcat/**/*.sh</include>
+      </includes>
+      <outputDirectory>.</outputDirectory>
+      <fileMode>0755</fileMode>
+      <directoryMode>0755</directoryMode>
+      <lineEnding>unix</lineEnding>
+    </fileSet>
+    <fileSet>
+      <directory>${project.build.directory}</directory>
+      <includes>
+        <include>tomcat/**/*.bat</include>
+        <include>tomcat/**/*.cmd</include>
       </includes>
       <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
+      <lineEnding>dos</lineEnding>
     </fileSet>
     <fileSet>
-      <directory>../shared/conf/xipki</directory>
-      <outputDirectory>xipki/ca</outputDirectory>
+      <directory>${project.build.directory}</directory>
+      <includes>
+        <include>README.md</include>
+        <include>xipki/**</include>
+        <include>tomcat/**</include>
+        <include>lib/**</include>
+      </includes>
+      <excludes>
+        <exclude>**/*.sh</exclude>
+        <exclude>**/*.bat</exclude>
+        <exclude>**/*.cmd</exclude>
+      </excludes>
+      <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
@@ -43,14 +64,14 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>../shared/conf/xipki/security/example/pkcs11-emulator.json</source>
-      <outputDirectory>xipki/ca/security</outputDirectory>
+      <source>${project.build.directory}/xipki/security/example/pkcs11-emulator.json</source>
+      <outputDirectory>xipki/security</outputDirectory>
       <destName>pkcs11.json</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>${project.build.directory}/xipki/ca/etc/database/mariadb/ca-db.properties</source>
-      <outputDirectory>xipki/ca/etc/database</outputDirectory>
+      <source>${project.build.directory}/xipki/etc/ca/database/mariadb/ca-db.properties</source>
+      <outputDirectory>xipki/etc/ca/database</outputDirectory>
       <fileMode>0644</fileMode>
     </file>
   </files>

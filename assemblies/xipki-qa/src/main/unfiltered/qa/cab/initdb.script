@@ -5,12 +5,14 @@ echo "#################################################################"
 echo "Sleeping 1 second"
 sleep 1
 
-xi:initdb \
-  --force \
-  --db-conf /opt/xipki/ca/etc/database/ca-db.properties \
-  --db-schema /opt/xipki/ca/sql/ca-init.xml
+source qa/setenv.script
 
 xi:initdb \
   --force \
-  --db-conf /opt/xipki/ca/etc/database/ocsp-db.properties \
-  --db-schema /opt/xipki/ca/sql/ocsp-init.xml
+  --db-conf ${XIPKI_DIR}/etc/ca/database/ca-db.properties \
+  --db-schema xipki/sql/ca-init.xml
+
+xi:initdb \
+  --force \
+  --db-conf ${XIPKI_DIR}/etc/ca/database/ocsp-db.properties \
+  --db-schema xipki/sql/ocsp-init.xml

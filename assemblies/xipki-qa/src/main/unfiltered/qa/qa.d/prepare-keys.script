@@ -86,7 +86,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
 
 } elif { $TOKEN_TYPE equals "pkcs12" } then {
 
-  OCSP_KEYCONF = "password=1234,keystore=file:ocsp/keycerts/ocsp99.p12"
+  OCSP_KEYCONF = "password=1234,keystore=file:keycerts/ocsp99.p12"
 
   each ($list) {
     if { $KEY_TYPE equals "rsa" } then {

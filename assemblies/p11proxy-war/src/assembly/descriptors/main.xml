@@ -16,13 +16,25 @@
       <outputDirectory>.</outputDirectory>
     </fileSet>
     <fileSet>
-      <directory>../shared/conf/xipki</directory>
-      <outputDirectory>xipki/p11proxy</outputDirectory>
-      <excludes>
-        <exclude>security/example/pkcs11-proxy*</exclude>
-      </excludes>
+      <directory>${project.build.directory}</directory>
+      <includes>
+        <include>tomcat/**/*.sh</include>
+      </includes>
+      <outputDirectory>.</outputDirectory>
+      <fileMode>0755</fileMode>
+      <directoryMode>0755</directoryMode>
+      <lineEnding>unix</lineEnding>
+    </fileSet>
+    <fileSet>
+      <directory>${project.build.directory}</directory>
+      <includes>
+        <include>tomcat/**/*.bat</include>
+        <include>tomcat/**/*.cmd</include>
+      </includes>
+      <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
+      <lineEnding>dos</lineEnding>
     </fileSet>
   </fileSets>
   <files>
@@ -43,8 +55,8 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>../shared/conf/xipki/security/example/pkcs11-emulator.json</source>
-      <outputDirectory>xipki/p11proxy/security</outputDirectory>
+      <source>${project.build.directory}/xipki/security/example/pkcs11-emulator.json</source>
+      <outputDirectory>xipki/security</outputDirectory>
       <destName>pkcs11.json</destName>
       <fileMode>0644</fileMode>
     </file>

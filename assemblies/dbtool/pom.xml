@@ -37,6 +37,37 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- Extract the SQL scripts -->
+            <id>unpack-sql</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}</outputDirectory>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xipki</groupId>
+                  <artifactId>ca-server</artifactId>
+                  <version>${project.version}</version>
+                  <includes>sql/*-init.xml</includes>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki</groupId>
+                  <artifactId>ocsp-server</artifactId>
+                  <version>${project.version}</version>
+                  <includes>sql/*-init.xml</includes>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
         <executions>
           <execution>

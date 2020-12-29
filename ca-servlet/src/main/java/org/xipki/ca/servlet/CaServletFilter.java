@@ -65,7 +65,7 @@ public class CaServletFilter implements Filter {
 
   private static final Logger LOG = LoggerFactory.getLogger(CaServletFilter.class);
 
-  private static final String DFLT_CA_SERVER_CFG = "ca/etc/ca.json";
+  private static final String DFLT_CA_SERVER_CFG = "etc/ca/ca.json";
 
   private Securities securities;
 

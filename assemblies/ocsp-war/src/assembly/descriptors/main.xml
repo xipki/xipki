@@ -10,19 +10,37 @@
     <fileSet>
       <directory>${project.build.directory}</directory>
       <includes>
-        <include>README.md</include>
-        <include>xipki/**</include>
-        <include>lib/**</include>
+        <include>tomcat/**/*.sh</include>
+      </includes>
+      <outputDirectory>.</outputDirectory>
+      <fileMode>0755</fileMode>
+      <directoryMode>0755</directoryMode>
+      <lineEnding>unix</lineEnding>
+    </fileSet>
+    <fileSet>
+      <directory>${project.build.directory}</directory>
+      <includes>
+        <include>tomcat/**/*.bat</include>
+        <include>tomcat/**/*.cmd</include>
       </includes>
       <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
+      <lineEnding>dos</lineEnding>
     </fileSet>
     <fileSet>
-      <directory>../shared/conf/xipki</directory>
-      <outputDirectory>xipki/ocsp</outputDirectory>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
+      <directory>${project.build.directory}</directory>
+      <includes>
+        <include>xipki/**</include>
+        <include>lib/**</include>
+        <include>README.md</include>
+      </includes>
+      <excludes>
+        <exclude>**/*.sh</exclude>
+        <exclude>**/*.bat</exclude>
+        <exclude>**/*.cmd</exclude>
+      </excludes>
+      <outputDirectory>.</outputDirectory>
     </fileSet>
   </fileSets>
   <files>
@@ -43,19 +61,19 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>../shared/conf/xipki/security/example/pkcs11-emulator.json</source>
-      <outputDirectory>xipki/ocsp/security</outputDirectory>
+      <source>${project.build.directory}/xipki/security/example/pkcs11-emulator.json</source>
+      <outputDirectory>xipki/security</outputDirectory>
       <destName>pkcs11.json</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>${project.build.directory}/xipki/ocsp/etc/database/mariadb/ca-db.properties</source>
-      <outputDirectory>xipki/ocsp/etc/database</outputDirectory>
+      <source>${project.build.directory}/xipki/etc/ocsp/database/mariadb/ca-db.properties</source>
+      <outputDirectory>xipki/etc/ocsp/database</outputDirectory>
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>${project.build.directory}/xipki/ocsp/etc/example/xipki-ca-db-store/ocsp-responder.json</source>
-      <outputDirectory>xipki/ocsp/etc</outputDirectory>
+      <source>${project.build.directory}/xipki/etc/ocsp/example/xipki-ca-db-store/ocsp-responder.json</source>
+      <outputDirectory>xipki/etc/ocsp</outputDirectory>
       <fileMode>0644</fileMode>
     </file>
   </files>

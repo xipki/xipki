@@ -35,6 +35,14 @@
           <include>**/*</include>
         </includes>
       </resource>
+      <resource>
+        <directory>../shared/conf</directory>
+        <filtering>false</filtering>
+        <includes>
+          <include>xipki/**</include>
+          <include>tomcat/**</include>
+        </includes>
+      </resource>
     </resources>
     <plugins>
       <plugin>
@@ -93,51 +101,6 @@
                   <version>${jdbc.mariadb.version}</version>
                 </artifactItem>
               </artifactItems>
-            </configuration>
-          </execution>
-          <execution>
-            <!-- Extract the SQL scripts -->
-            <id>unpack-sql</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/xipki/ocsp</outputDirectory>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.xipki</groupId>
-                  <artifactId>ca-server</artifactId>
-                  <version>${project.version}</version>
-                  <includes>sql/ocsp-init.xml</includes>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki</groupId>
-                  <artifactId>ocsp-server</artifactId>
-                  <version>${project.version}</version>
-                  <includes>sql/*-init.xml</includes>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-          <execution>
-            <id>unpack-tlskeys</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/xipki/ocsp/keycerts/tlskeys</outputDirectory>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.xipki.tools</groupId>
-                  <artifactId>tlskeys-example</artifactId>
-                  <classifier>rsa</classifier>
-                  <version>${xipki.tools.version}</version>
-                  <type>zip</type>
-                </artifactItem>
-              </artifactItems>
-              <includes>ca/tls-ca-cert.p12,ca/tls-ca-cert.pem,server/*,client/tls-client.p12,client2/tls-client2-cert.der</includes>
             </configuration>
           </execution>
         </executions>
