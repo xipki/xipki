@@ -213,27 +213,15 @@ public class CertStoreBase extends QueryExecutor {
   }
 
   protected static boolean getBoolean(ResultRow rs, String label) throws OperationException {
-    try {
-      return rs.getBoolean(label);
-    } catch (SQLException ex) {
-      throw new OperationException(DATABASE_FAILURE, ex);
-    }
+    return rs.getBoolean(label);
   }
 
   protected static int getInt(ResultRow rs, String label) throws OperationException {
-    try {
-      return rs.getInt(label);
-    } catch (SQLException ex) {
-      throw new OperationException(DATABASE_FAILURE, ex);
-    }
+    return rs.getInt(label);
   }
 
   protected static long getLong(ResultRow rs, String label) throws OperationException {
-    try {
-      return rs.getLong(label);
-    } catch (SQLException ex) {
-      throw new OperationException(DATABASE_FAILURE, ex);
-    }
+    return rs.getLong(label);
   }
 
 }

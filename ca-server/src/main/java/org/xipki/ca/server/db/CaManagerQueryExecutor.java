@@ -26,7 +26,6 @@ import static org.xipki.util.StringUtil.concat;
 
 import java.io.IOException;
 import java.security.cert.CertificateException;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1161,27 +1160,15 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   } // method generateCertchain
 
   private static boolean getBoolean(ResultRow rs, String label) throws CaMgmtException {
-    try {
-      return rs.getBoolean(label);
-    } catch (SQLException ex) {
-      throw new CaMgmtException(ex);
-    }
+    return rs.getBoolean(label);
   }
 
   private static int getInt(ResultRow rs, String label) throws CaMgmtException {
-    try {
-      return rs.getInt(label);
-    } catch (SQLException ex) {
-      throw new CaMgmtException(ex);
-    }
+    return rs.getInt(label);
   }
 
   private static long getLong(ResultRow rs, String label) throws CaMgmtException {
-    try {
-      return rs.getLong(label);
-    } catch (SQLException ex) {
-      throw new CaMgmtException(ex);
-    }
+    return rs.getLong(label);
   }
 
 }

@@ -112,7 +112,7 @@ class ResultRow {
     }
   }
 
-  int getInt(String label) throws SQLException {
+  int getInt(String label) {
     Object obj = columns.get(label.toUpperCase());
     if (obj == null) {
       return 0;
@@ -130,7 +130,7 @@ class ResultRow {
     }
   }
 
-  boolean getBoolean(String label) throws SQLException {
+  boolean getBoolean(String label) {
     Object obj = columns.get(label.toUpperCase());
     if (obj == null) {
       return false;
@@ -148,7 +148,7 @@ class ResultRow {
     }
   }
 
-  long getLong(String label) throws SQLException {
+  long getLong(String label) {
     Object obj = columns.get(label.toUpperCase());
     if (obj == null) {
       return 0;
@@ -181,7 +181,7 @@ class ResultRow {
     }
   }
 
-  Timestamp getTimestamp(String label) throws SQLException {
+  Timestamp getTimestamp(String label) {
     Object obj = columns.get(label.toUpperCase());
     if (obj == null) {
       return null;
@@ -195,7 +195,7 @@ class ResultRow {
     }
   }
 
-  byte[] getBytes(String label) throws SQLException {
+  byte[] getBytes(String label) {
     Object obj = columns.get(label.toUpperCase());
     if (obj == null) {
       return null;
@@ -209,7 +209,7 @@ class ResultRow {
     }
   }
 
-  Time getTime(String label) throws SQLException {
+  Time getTime(String label) {
     Object obj = columns.get(label.toUpperCase());
     if (obj == null) {
       return null;
@@ -223,7 +223,7 @@ class ResultRow {
     }
   }
 
-  Date getDate(String label) throws SQLException {
+  Date getDate(String label) {
     Object obj = columns.get(label.toUpperCase());
     if (obj == null) {
       return null;
@@ -237,7 +237,7 @@ class ResultRow {
     }
   }
 
-  float getFloat(String label) throws SQLException {
+  float getFloat(String label) {
     Object obj = columns.get(label.toUpperCase());
     if (obj == null) {
       return 0;
@@ -253,7 +253,7 @@ class ResultRow {
     }
   }
 
-  double getDouble(String label) throws SQLException {
+  double getDouble(String label) {
     Object obj = columns.get(label.toUpperCase());
     if (obj == null) {
       return 0;
@@ -269,7 +269,7 @@ class ResultRow {
     }
   }
 
-  BigDecimal getBigDecimal(String label) throws SQLException {
+  BigDecimal getBigDecimal(String label) {
     Object obj = columns.get(label.toUpperCase());
     if (obj == null) {
       return null;
