@@ -1,21 +1,21 @@
 {
-	"serverConf":"ocsp/etc/ocsp-responder.json",
+	"serverConf":"etc/ocsp/ocsp-responder.json",
 	"security":{
 		"keyStrongrandomEnabled":false,
 		"signStrongrandomEnabled":false,
 		"defaultSignerParallelism":32,
 		"pkcs11Conf":{
-			"file":"ocsp/security/pkcs11.json"
+			"file":"security/pkcs11.json"
 		},
 		"password":{
-			"masterPasswordCallback":"FILE file=ocsp/security/masterpassword.secret"
+			"masterPasswordCallback":"FILE file=security/masterpassword.secret"
 		}
 	}
 	,
 	"remoteMgmt":{
 		"enabled":true,
 		"certs":[{
-			"file":"ocsp/keycerts/tlskeys/client2/tls-client2-cert.der"
+			"file":"keycerts/tlskeys/client2/tls-client2-cert.der"
 		}]
 	}
 }

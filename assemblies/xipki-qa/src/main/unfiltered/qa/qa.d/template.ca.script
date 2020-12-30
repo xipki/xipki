@@ -103,6 +103,7 @@ ca:gen-rootca \
   --signer-conf "$CA_SIGNER_CONF" \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://myorg.org/rootca1.der \
+  --crl-uri http://rootca.myorg.org/crl \
   --cmp-control "send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA:SM3withSM2" \
   --cmp-responder responder1 \
   --validity-mode cutoff \

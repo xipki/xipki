@@ -152,6 +152,12 @@
       <destName>commands.md</destName>
       <fileMode>0644</fileMode>
     </file>
+    <file>
+      <source>${project.build.directory}/webapps/dummy-ctlog-server.war</source>
+      <outputDirectory>xipki/webapps</outputDirectory>
+      <destName>ctlog.war</destName>
+      <fileMode>0644</fileMode>
+    </file>
   </files>
 
 </assembly>

@@ -1,15 +1,11 @@
 # Prepare
 
 ## In QA Folder
-- Set the XIPKI_DIR in `qa/setenv.script`.
-- Copy the file `xipki/etc/ca/ca.json` to `<tomcat/jetty_root>/xipki/etc/ca/ca.json`.
-- Copy the folder `xipki/ctlog` to `<tomcat/jetty_root>/xipki` (as sub-folder).
-
-## In Tomcat/Jetty Folder
-- Copy the file `dummy-ctlog-server-5.2.0-SNAPSHOT.war` from project folder to `webapps/ctlog.war`.
-- Comment-in the remoteMgmt block in `xipki/etc/ocsp/ocsp.json`.
-- Copy the database files `xipki/etc/ca/database/mariadb/*.properties` to `xipki/etc/ca/database/`.
-- Copy the database files `xipki/etc/ocsp/database/mariadb/*.properties` to `xipki/etc/ocsp/database/`.
+- Adapt the `XIPKI_DIR` and `WEBAPPS_DIR` in `xipki/prepare.sh`.
+- Execute `xipki/prepare.sh`.
 
 ## In Tomcat conf/server.xml
 - Add `maxKeepAliveRequests="-1"` to the Connectors listening on port 8080 and 8443.
+
+## Misc
+  For SSH: you may use "-o StrictHostKeyChecking=no" to skip the host key check.

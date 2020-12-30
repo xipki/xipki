@@ -9,8 +9,8 @@ if { "${CA_TYPE}" equals "SM2" } then {
 sleep 1
 
 xi:initdb --force \
-  --db-conf /opt/xipki/ca/etc/database/ca-db.properties \
-  --db-schema /opt/xipki/ca/sql/ca-init.xml
+  --db-conf ${XIPKI_DIR}/etc/ca/database/ca-db.properties \
+  --db-schema sql/ca-init.xml
 
 ca:restart
 

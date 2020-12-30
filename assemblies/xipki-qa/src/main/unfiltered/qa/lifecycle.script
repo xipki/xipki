@@ -120,17 +120,17 @@ if { $printUsage equals "true" } then {
 
   ## Prepare OCSP responder configuration
   xi:copy-file -f \
-    xipki/ocsp/etc/template.ocsp-responder.json \
-    xipki/ocsp/etc/ocsp-responder.json
+    xipki/etc/ocsp/template.ocsp-responder.json \
+    xipki/etc/ocsp/ocsp-responder.json
 
   xi:replace --old "REPLACEME-TOKENTYPE" --new "$TOKEN_TYPE" \
-    xipki/ocsp/etc/ocsp-responder.json
+    xipki/etc/ocsp/ocsp-responder.json
 
   xi:replace --old "REPLACEME-TOKENKEY" --new "$OCSP_KEYCONF" \
-    xipki/ocsp/etc/ocsp-responder.json
+    xipki/etc/ocsp/ocsp-responder.json
 
   xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
-    xipki/ocsp/etc/ocsp-responder.json
+    xipki/etc/ocsp/ocsp-responder.json
 
   ## CA client configuration
   xi:copy-file -f xipki/cmpclient/template.cmpclient.json \
@@ -233,26 +233,26 @@ if { $printUsage equals "true" } then {
 
   # Copy the configuration of OCSP responder
   xi:copy-file -f \
-    xipki/ocsp/etc/ocsp-responder.json \
-    /opt/xipki/ocsp/etc/ocsp-responder.json
+    xipki/etc/ocsp/ocsp-responder.json \
+    ${XIPKI_DIR}/etc/ocsp/ocsp-responder.json
 
   if { "$TOKEN_TYPE" equals "pkcs12" } then {
     xi:copy-file -f output/ocsp99.p12 \
-      /opt/xipki/ocsp/keycerts/ocsp99.p12
+      ${XIPKI_DIR}/keycerts/ocsp99.p12
   }
 
-  xi:rm -r -f /opt/xipki/ocsp/crls/example-crls
+  xi:rm -r -f ${XIPKI_DIR}/crls/example-crls
 
-  xi:copy-dir /opt/xipki/ocsp/crls/template \
-    /opt/xipki/ocsp/crls/example-crls
+  xi:copy-dir ${XIPKI_DIR}/crls/template \
+    ${XIPKI_DIR}/crls/example-crls
 
-  xi:rm -f /opt/xipki/ocsp/crls/example-crls/crl-mycrl1/REVOCATION
+  xi:rm -f ${XIPKI_DIR}/crls/example-crls/crl-mycrl1/REVOCATION
 
   xi:copy-file -f output/subcawithcrl1.crt \
-    /opt/xipki/ocsp/crls/example-crls/crl-mycrl1/ca.crt
+    ${XIPKI_DIR}/crls/example-crls/crl-mycrl1/ca.crt
 
   xi:copy-file -f output/subcawithcrl1.crl \
-    /opt/xipki/ocsp/crls/example-crls/crl-mycrl1/ca.crl
+    ${XIPKI_DIR}/crls/example-crls/crl-mycrl1/ca.crl
 
   if { $TOKEN_TYPE equals "pkcs11" } then {
     ocsp:refresh-token --type pkcs11
