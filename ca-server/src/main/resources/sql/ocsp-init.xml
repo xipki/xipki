@@ -19,6 +19,10 @@
       </column>
     </createTable>
     <insert tableName="DBSCHEMA">
+      <column name="NAME" value="VENDOR"/>
+      <column name="VALUE2" value="XIPKI"/>
+    </insert>
+    <insert tableName="DBSCHEMA">
       <column name="NAME" value="VERSION"/>
       <column name="VALUE2" value="4"/>
     </insert>
