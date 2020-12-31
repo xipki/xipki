@@ -58,6 +58,7 @@ import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
+import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CertListInfo;
 import org.xipki.ca.api.mgmt.CertListOrderBy;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
@@ -215,7 +216,7 @@ public class CertStore extends CertStoreBase {
   private final AtomicInteger cachedCrlId = new AtomicInteger(0);
 
   public CertStore(DataSourceWrapper datasource, UniqueIdGenerator idGenerator)
-      throws DataAccessException {
+      throws DataAccessException, CaMgmtException {
     super(datasource);
 
     this.idGenerator = notNull(idGenerator, "idGenerator");

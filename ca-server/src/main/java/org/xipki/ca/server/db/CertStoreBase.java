@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
+import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.CertRevocationInfo;
@@ -88,10 +89,16 @@ public class CertStoreBase extends QueryExecutor {
 
   protected final int maxX500nameLen;
 
-  protected CertStoreBase(DataSourceWrapper datasource) throws DataAccessException {
+  protected CertStoreBase(DataSourceWrapper datasource)
+      throws DataAccessException, CaMgmtException {
     super(datasource);
 
     DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
+    String vendor = dbSchemaInfo.variableValue("VENDOR");
+    if (vendor != null && !vendor.equalsIgnoreCase("XIPKI")) {
+      throw new CaMgmtException("unsupported vendor " + vendor);
+    }
+
     this.dbSchemaVersion = Integer.parseInt(dbSchemaInfo.variableValue("VERSION"));
     this.maxX500nameLen = Integer.parseInt(dbSchemaInfo.variableValue("X500NAME_MAXLEN"));
   } // constructor
