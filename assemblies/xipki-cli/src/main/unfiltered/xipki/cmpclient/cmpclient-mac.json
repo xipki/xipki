@@ -16,8 +16,7 @@
 			"kid":"Rmgnx3V6cK9xygM4wBNhqrIBnc8=",
 			"mac":"HMAC-SHA256",
 			"owf":"SHA256",
-			"password":"123456",
-			"sender":"CN=PBMMAC"
+			"password":"123456"
 		}
 	}],
 	"responders":[{

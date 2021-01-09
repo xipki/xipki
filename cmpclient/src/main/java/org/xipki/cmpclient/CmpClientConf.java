@@ -350,8 +350,6 @@ public class CmpClientConf extends ValidatableConf {
 
       private byte[] kid;
 
-      private String sender;
-
       private String password;
 
       private String owf;
@@ -366,14 +364,6 @@ public class CmpClientConf extends ValidatableConf {
 
       public void setKid(byte[] kid) {
         this.kid = kid;
-      }
-
-      public String getSender() {
-        return sender;
-      }
-
-      public void setSender(String sender) {
-        this.sender = sender;
       }
 
       public String getPassword() {
@@ -412,7 +402,6 @@ public class CmpClientConf extends ValidatableConf {
       public void validate()
           throws InvalidConfException {
         notNull(kid, "kid");
-        notBlank(sender, "sender");
         notBlank(password, "password");
         notBlank("owf", owf);
         notBlank(mac, "mac");

@@ -296,6 +296,10 @@ abstract class BaseCmpResponder {
       if (x500Name.equals(caManager.getSignerWrapper(getResponderName()).getSubject())) {
         return true;
       }
+
+      if (x500Name.equals(getCa().getCaCert().getSubject())) {
+        return true;
+      }
     }
 
     return false;
@@ -362,8 +366,8 @@ abstract class BaseCmpResponder {
   }
 
   // CHECKSTYLE:SKIP
-  private CmpRequestorInfo getMacRequestor(X500Name requestorSender, byte[] senderKID) {
-    return getCa().getMacRequestor(requestorSender, senderKID);
+  private CmpRequestorInfo getMacRequestor(byte[] senderKID) {
+    return getCa().getMacRequestor(senderKID);
   }
 
   private CmpRequestorInfo getRequestor(X500Name requestorSender) {
@@ -718,10 +722,10 @@ abstract class BaseCmpResponder {
       byte[] senderKID = (asn1 == null) ? null : asn1.getOctets();
       PKMACBuilder pkMacBuilder = new PKMACBuilder(new JcePKMACValuesCalculator());
 
-      CmpRequestorInfo requestor = getMacRequestor(sender, senderKID);
+      CmpRequestorInfo requestor = getMacRequestor(senderKID);
 
       if (requestor == null) {
-        LOG.warn("tid={}: not authorized requestor '{}' with senderKID '{}", tid, sender,
+        LOG.warn("tid={}: not authorized requestor with senderKID '{}", tid,
             (senderKID == null) ? "null" : Hex.toHexString(senderKID));
         return new ProtectionVerificationResult(null, ProtectionResult.SENDER_NOT_AUTHORIZED);
       }

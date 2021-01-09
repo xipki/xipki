@@ -46,6 +46,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
 
+import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.slf4j.Logger;
@@ -148,6 +149,8 @@ final class CmpClientConfigurer {
   } // class SslConf
 
   private static final Logger LOG = LoggerFactory.getLogger(CmpClientConfigurer.class);
+
+  private static final X500Name NULL_GENERALNAME = new X500Name(new RDN[0]);
 
   private final Map<String, CaConf> casMap = new HashMap<>();
 
@@ -476,7 +479,6 @@ final class CmpClientConfigurer {
         }
       } else {
         CmpClientConf.Requestor.PbmMac cf = requestorConf.getPbmMac();
-        X500Name x500name = new X500Name(cf.getSender());
         AlgorithmIdentifier owf = HashAlgo.getNonNullInstance(cf.getOwf()).getAlgorithmIdentifier();
         AlgorithmIdentifier mac;
         try {
@@ -486,7 +488,7 @@ final class CmpClientConfigurer {
           return false;
         }
 
-        requestor = new PbmMacCmpRequestor(signRequest, x500name,
+        requestor = new PbmMacCmpRequestor(signRequest, NULL_GENERALNAME,
             cf.getPassword().toCharArray(), cf.getKid(), owf, cf.getIterationCount(), mac);
       }
 

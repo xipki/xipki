@@ -693,7 +693,7 @@ public class X509Ca extends X509CaModule implements Closeable {
   }
 
   // CHECKSTYLE:SKIP
-  public RequestorInfo.CmpRequestorInfo getMacRequestor(X500Name sender, byte[] senderKID) {
+  public RequestorInfo.CmpRequestorInfo getMacRequestor(byte[] senderKID) {
     Set<CaHasRequestorEntry> requestorEntries = caManager.getRequestorsForCa(caIdent.getName());
     if (CollectionUtil.isEmpty(requestorEntries)) {
       return null;
