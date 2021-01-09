@@ -45,6 +45,8 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.RSAPublicKey;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
@@ -237,6 +239,11 @@ public class P12KeyGenerator {
     // Generate keystore
     X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(subjectDn,
         BigInteger.ONE, notBefore, notAfter, subjectDn, subjectPublicKeyInfo);
+
+    byte[] encodedSpki = kp.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
+    byte[] skiValue = HashAlgo.SHA1.hash(encodedSpki);
+    certGenerator.addExtension(Extension.subjectKeyIdentifier, false,
+        new SubjectKeyIdentifier(skiValue));
 
     KeyAndCertPair identity = new KeyAndCertPair(
         new X509Cert(certGenerator.build(contentSigner)),
