@@ -43,11 +43,11 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
-public abstract class Pkcs12RSATest {
+public abstract class Pkcs12SignVerifyTest {
 
   private ConcurrentContentSigner signer;
 
-  protected Pkcs12RSATest() {
+  protected Pkcs12SignVerifyTest() {
     if (Security.getProvider("BC") == null) {
       Security.addProvider(new BouncyCastleProvider());
     }

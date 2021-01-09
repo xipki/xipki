@@ -29,16 +29,16 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
-public class Pkcs12SHA256withRSATest extends Pkcs12RSATest {
+public class Pkcs12SHA256withRSATest extends Pkcs12SignVerifyTest {
 
   @Override
   protected String getPkcs12File() {
-    return "src/test/resources/test1.p12";
+    return "src/test/resources/pkcs12test/test1.p12";
   }
 
   @Override
   protected String getCertificateFile() {
-    return "src/test/resources/test1.der";
+    return "src/test/resources/pkcs12test/test1.der";
   }
 
   @Override

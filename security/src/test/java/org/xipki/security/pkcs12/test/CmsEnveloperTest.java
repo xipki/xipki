@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.security.cmp.test;
+package org.xipki.security.pkcs12.test;
 
 import java.io.FileInputStream;
 import java.security.KeyPair;
@@ -89,7 +89,7 @@ public class CmsEnveloperTest {
       throws Exception {
     KeyStore ks = KeyStore.getInstance("PKCS12");
     char[] password = "1234".toCharArray();
-    ks.load(new FileInputStream("src/test/resources/test-ec.p12"), password);
+    ks.load(new FileInputStream("src/test/resources/pkcs12test/test-ec.p12"), password);
 
     X509Certificate reciCert = (X509Certificate) ks.getCertificate("main");
     PrivateKey reciPrivKey = (PrivateKey) ks.getKey("main", password);
@@ -151,7 +151,7 @@ public class CmsEnveloperTest {
     HashAlgo hashAlgo = HashAlgo.SHA256;
     KeyStore ks = KeyStore.getInstance("PKCS12");
     char[] password = "1234".toCharArray();
-    ks.load(new FileInputStream("src/test/resources/test1.p12"), password);
+    ks.load(new FileInputStream("src/test/resources/pkcs12test/test1.p12"), password);
 
     X509Certificate reciCert = (X509Certificate) ks.getCertificate("main");
     PrivateKey reciKey = (PrivateKey) ks.getKey("main", password);
