@@ -37,7 +37,7 @@ import org.bouncycastle.jcajce.spec.SM2ParameterSpec;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
-import org.xipki.security.pkcs11.provider.XiProvider;
+import org.xipki.security.pkcs11.provider.XiPkcs11Provider;
 import org.xipki.security.pkcs11.provider.XiSM2ParameterSpec;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.shell.Completers;
@@ -201,7 +201,7 @@ public class QaP11Actions {
     @Override
     protected Object execute0()
         throws Exception {
-      KeyStore ks = KeyStore.getInstance("PKCS11", XiProvider.PROVIDER_NAME);
+      KeyStore ks = KeyStore.getInstance("PKCS11", XiPkcs11Provider.PROVIDER_NAME);
       ks.load(null, null);
       if (verbose.booleanValue()) {
         println("available aliases:");

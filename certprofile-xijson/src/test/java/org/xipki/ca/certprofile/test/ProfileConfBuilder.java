@@ -327,6 +327,10 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     algos.add("SM3withSM2");
     algos.add("Ed25519");
     algos.add("Ed448");
+    algos.add("SHAKE128withRSAPSS");
+    algos.add("SHAKE256withRSAPSS");
+    algos.add("SHAKE128withECDSA");
+    algos.add("SHAKE256withECDSA");
 
     // Subject
     Subject subject = new Subject();

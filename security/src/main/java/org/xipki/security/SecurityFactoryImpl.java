@@ -301,7 +301,12 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
     try {
       byte[] dummyContent = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-      Signature verifier = Signature.getInstance(signatureAlgoName, "BC");
+      Signature verifier;
+      try {
+        verifier = Signature.getInstance(signatureAlgoName, "BC");
+      } catch (NoSuchAlgorithmException ex) {
+        verifier = Signature.getInstance(signatureAlgoName);
+      }
 
       byte[] signatureValue = signer.sign(dummyContent);
 

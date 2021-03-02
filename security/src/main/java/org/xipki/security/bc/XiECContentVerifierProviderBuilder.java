@@ -19,14 +19,15 @@ package org.xipki.security.bc;
 
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.Signer;
+import org.bouncycastle.crypto.signers.DSADigestSigner;
 import org.bouncycastle.crypto.signers.ECDSASigner;
 import org.bouncycastle.crypto.signers.SM2Signer;
 import org.bouncycastle.operator.DigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcECContentVerifierProviderBuilder;
 import org.xipki.security.DSAPlainDigestSigner;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.util.AlgorithmUtil;
 
 /**
@@ -40,27 +41,27 @@ import org.xipki.security.util.AlgorithmUtil;
 // CHECKSTYLE:SKIP
 public class XiECContentVerifierProviderBuilder extends BcECContentVerifierProviderBuilder {
 
-  private DigestAlgorithmIdentifierFinder digestAlgorithmFinder;
+  private static final DigestAlgorithmIdentifierFinder digestAlgorithmFinder
+      = XiDigestAlgorithmIdentifierFinder.INSTANCE;
 
-  public XiECContentVerifierProviderBuilder(DigestAlgorithmIdentifierFinder digestAlgorithmFinder) {
+  public XiECContentVerifierProviderBuilder() {
     super(digestAlgorithmFinder);
-    this.digestAlgorithmFinder = digestAlgorithmFinder;
   }
 
   @Override
   protected Signer createSigner(AlgorithmIdentifier sigAlgId)
       throws OperatorCreationException {
+    AlgorithmIdentifier digAlg = digestAlgorithmFinder.find(sigAlgId);
+    HashAlgo hashAlgo = HashAlgo.getInstance(digAlg.getAlgorithm());
+
     boolean plainDsa = AlgorithmUtil.isPlainECDSASigAlg(sigAlgId);
 
     if (plainDsa) {
-      AlgorithmIdentifier digAlg = digestAlgorithmFinder.find(sigAlgId);
-      Digest dig = digestProvider.get(digAlg);
-      return new DSAPlainDigestSigner(new ECDSASigner(), dig);
+      return new DSAPlainDigestSigner(new ECDSASigner(), hashAlgo.createDigest());
     }
 
     boolean sm2 = AlgorithmUtil.isSM2SigAlg(sigAlgId);
     if (sm2) {
-      AlgorithmIdentifier digAlg = digestAlgorithmFinder.find(sigAlgId);
       if (GMObjectIdentifiers.sm3.equals(digAlg.getAlgorithm())) {
         return new SM2Signer();
       } else {
@@ -69,7 +70,7 @@ public class XiECContentVerifierProviderBuilder extends BcECContentVerifierProvi
       }
     }
 
-    return super.createSigner(sigAlgId);
+    return new DSADigestSigner(new ECDSASigner(), hashAlgo.createDigest());
   } // method createSigner
 
 }

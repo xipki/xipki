@@ -24,7 +24,14 @@ if { $SIG_TYPE equals "rsa" } then {
 } elif { $SIG_TYPE equals "rsapss" } then {
   KEY_TYPE = "rsa"
   KEY_DIR = "rsa"
-  SIGALGO = "${HASH}withRSAandMGF1"
+
+  if { $HASH equals "shake128" } then {
+    SIGALGO = "${HASH}withRSAPSS"
+  } elif { $HASH equals "shake256" } then {
+    SIGALGO = "${HASH}withRSAPSS"
+  } else {
+    SIGALGO = "${HASH}withRSAandMGF1"
+  }
 } elif { $SIG_TYPE equals "ec" } then {
   KEY_TYPE = "ec"
   KEY_DIR = "ec"

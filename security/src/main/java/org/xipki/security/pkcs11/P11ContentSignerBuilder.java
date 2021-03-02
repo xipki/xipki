@@ -40,6 +40,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.DfltConcurrentContentSigner;
+import org.xipki.security.ObjectIdentifiers.Shake;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiContentSigner;
@@ -198,9 +199,15 @@ public class P11ContentSignerBuilder {
   // CHECKSTYLE:SKIP
   private XiContentSigner createRSAContentSigner(AlgorithmIdentifier signatureAlgId)
       throws XiSecurityException, P11TokenException {
-    if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(signatureAlgId.getAlgorithm())) {
+    ASN1ObjectIdentifier oid = signatureAlgId.getAlgorithm();
+
+    if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(oid)) {
       return new P11ContentSigner.RSAPSS(cryptService, identityId, signatureAlgId,
           securityFactory.getRandom4Sign());
+    } else if (Shake.id_RSASSA_PSS_SHAKE128.equals(oid)
+        || Shake.id_RSASSA_PSS_SHAKE256.equals(oid)) {
+      return new P11ContentSigner.RSAPSSSHAKE(cryptService, identityId, signatureAlgId,
+          securityFactory.getRandom4Key());
     } else {
       return new P11ContentSigner.RSA(cryptService, identityId, signatureAlgId);
     }

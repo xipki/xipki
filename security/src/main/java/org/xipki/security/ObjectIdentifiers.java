@@ -83,6 +83,21 @@ public class ObjectIdentifiers {
         new ASN1ObjectIdentifier("2.23.140.1.2.3");
   }
 
+  public static class Shake { // SHAKE
+    public static final ASN1ObjectIdentifier id_shake128 =
+        new ASN1ObjectIdentifier("2.16.840.1.101.3.4.2.11");
+    public static final ASN1ObjectIdentifier id_shake256 =
+        new ASN1ObjectIdentifier("2.16.840.1.101.3.4.2.12");
+    public static final ASN1ObjectIdentifier id_RSASSA_PSS_SHAKE128 =
+        new ASN1ObjectIdentifier("1.3.6.1.5.5.7.6.30");
+    public static final ASN1ObjectIdentifier id_RSASSA_PSS_SHAKE256 =
+        new ASN1ObjectIdentifier("1.3.6.1.5.5.7.6.31");
+    public static final ASN1ObjectIdentifier id_ecdsa_with_shake128 =
+        new ASN1ObjectIdentifier("1.3.6.1.5.5.7.6.32");
+    public static final ASN1ObjectIdentifier id_ecdsa_with_shake256 =
+        new ASN1ObjectIdentifier("1.3.6.1.5.5.7.6.33");
+  }
+
   // CHECKSTYLE:SKIP
   public static class DN {
     /**

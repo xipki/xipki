@@ -27,6 +27,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.xipki.security.bc.XiProvider;
 
 /**
  * PasswordHash test.
@@ -39,6 +40,10 @@ public class PasswordHashTest {
 
   @Before
   public void addBouncyCastleProvider() {
+    if (Security.getProvider(XiProvider.PROVIDER_NAME) == null) {
+      Security.addProvider(new XiProvider());
+    }
+
     if (Security.getProvider("BC") == null) {
       Security.addProvider(new BouncyCastleProvider());
     }

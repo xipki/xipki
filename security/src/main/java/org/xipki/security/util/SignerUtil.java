@@ -34,6 +34,7 @@ import java.util.Map;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -41,6 +42,7 @@ import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.AsymmetricBlockCipher;
 import org.bouncycastle.crypto.Digest;
+import org.bouncycastle.crypto.Signer;
 import org.bouncycastle.crypto.engines.RSABlindedEngine;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
@@ -54,10 +56,13 @@ import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
 import org.bouncycastle.operator.bc.BcDSAContentVerifierProviderBuilder;
 import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.ObjectIdentifiers.Shake;
 import org.xipki.security.XiSecurityException;
+import org.xipki.security.bc.ShakePSSSigner;
 import org.xipki.security.bc.XiECContentVerifierProviderBuilder;
 import org.xipki.security.bc.XiEdDSAContentVerifierProvider;
 import org.xipki.security.bc.XiRSAContentVerifierProviderBuilder;
+import org.xipki.security.bc.XiShakeDigest;
 import org.xipki.security.bc.XiXDHContentVerifierProvider;
 import org.xipki.util.Hex;
 
@@ -73,8 +78,8 @@ public class SignerUtil {
 
   private static final Map<HashAlgo, byte[]> digestPkcsPrefix = new HashMap<>();
 
-  private static final DigestAlgorithmIdentifierFinder DIGESTALG_IDENTIFIER_FINDER =
-      new DefaultDigestAlgorithmIdentifierFinder();
+  private static final DigestAlgorithmIdentifierFinder DIGESTALG_IDENTIFIER_FINDER
+      = new DefaultDigestAlgorithmIdentifierFinder();
 
   private static final Map<String, BcContentVerifierProviderBuilder> VERIFIER_PROVIDER_BUILDER =
       new HashMap<>();
@@ -113,41 +118,53 @@ public class SignerUtil {
   }
 
   // CHECKSTYLE:SKIP
-  public static PSSSigner createPSSRSASigner(AlgorithmIdentifier sigAlgId)
+  public static Signer createPSSRSASigner(AlgorithmIdentifier sigAlgId)
       throws XiSecurityException {
     return createPSSRSASigner(sigAlgId, null);
   }
 
   // CHECKSTYLE:SKIP
-  public static PSSSigner createPSSRSASigner(AlgorithmIdentifier sigAlgId,
+  public static Signer createPSSRSASigner(AlgorithmIdentifier sigAlgId,
       AsymmetricBlockCipher cipher)
           throws XiSecurityException {
     notNull(sigAlgId, "sigAlgId");
-    if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
-      throw new XiSecurityException("signature algorithm " + sigAlgId.getAlgorithm()
-        + " is not allowed");
-    }
+    ASN1ObjectIdentifier oid = sigAlgId.getAlgorithm();
 
-    AlgorithmIdentifier digAlgId;
-    try {
-      digAlgId = AlgorithmUtil.extractDigesetAlgFromSigAlg(sigAlgId);
-    } catch (NoSuchAlgorithmException ex) {
-      throw new XiSecurityException(ex.getMessage(), ex);
-    }
-
-    RSASSAPSSparams param = RSASSAPSSparams.getInstance(sigAlgId.getParameters());
-
-    AlgorithmIdentifier mfgDigAlgId = AlgorithmIdentifier.getInstance(
-        param.getMaskGenAlgorithm().getParameters());
-
-    Digest dig = getDigest(digAlgId);
-    Digest mfgDig = getDigest(mfgDigAlgId);
-
-    int saltSize = param.getSaltLength().intValue();
-    int trailerField = param.getTrailerField().intValue();
     AsymmetricBlockCipher tmpCipher = (cipher == null) ? new RSABlindedEngine() : cipher;
 
-    return new PSSSigner(tmpCipher, dig, mfgDig, saltSize, getTrailer(trailerField));
+    if (Shake.id_RSASSA_PSS_SHAKE128.equals(oid)
+        || Shake.id_RSASSA_PSS_SHAKE256.equals(oid)) {
+      XiShakeDigest dig;
+      if (Shake.id_RSASSA_PSS_SHAKE128.equals(oid)) {
+        dig = (XiShakeDigest) HashAlgo.SHAKE128.createDigest();
+      } else {
+        dig = (XiShakeDigest) HashAlgo.SHAKE256.createDigest();
+      }
+
+      return new ShakePSSSigner(tmpCipher, dig);
+    } else if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(oid)) {
+      AlgorithmIdentifier digAlgId;
+      try {
+        digAlgId = AlgorithmUtil.extractDigesetAlgFromSigAlg(sigAlgId);
+      } catch (NoSuchAlgorithmException ex) {
+        throw new XiSecurityException(ex.getMessage(), ex);
+      }
+
+      RSASSAPSSparams param = RSASSAPSSparams.getInstance(sigAlgId.getParameters());
+
+      AlgorithmIdentifier mfgDigAlgId = AlgorithmIdentifier.getInstance(
+          param.getMaskGenAlgorithm().getParameters());
+
+      Digest dig = getDigest(digAlgId);
+      Digest mgfDig = getDigest(mfgDigAlgId);
+
+      int saltSize = param.getSaltLength().intValue();
+      int trailerField = param.getTrailerField().intValue();
+      return new PSSSigner(tmpCipher, dig, mgfDig, saltSize, getTrailer(trailerField));
+    } else {
+      throw new XiSecurityException("signature algorithm " + oid
+          + " is not allowed");
+    }
   } // method createPSSRSASigner
 
   private static byte getTrailer(int trailerField) {
@@ -229,6 +246,21 @@ public class SignerUtil {
   public static byte[] EMSA_PSS_ENCODE(HashAlgo contentDigest, byte[] hashValue, HashAlgo mgfDigest,
       int saltLen, int modulusBitLength, SecureRandom random)
           throws XiSecurityException {
+    switch (contentDigest) {
+      case SHAKE128:
+      case SHAKE256:
+        if (mgfDigest != contentDigest) {
+          throw new XiSecurityException("contentDigest != mgfDigest");
+        }
+
+        if (saltLen != contentDigest.getLength()) {
+          throw new XiSecurityException("saltLen != " + contentDigest.getLength() + ": " + saltLen);
+        }
+        break;
+      default:
+        break;
+    }
+
     final int hLen = contentDigest.getLength();
     final byte[] salt = new byte[saltLen];
     final byte[] mDash = new byte[8 + saltLen + hLen];
@@ -254,7 +286,19 @@ public class SignerUtil {
     block[block.length - saltLen - 1 - hLen - 1] = 0x01;
     System.arraycopy(salt, 0, block, block.length - saltLen - hLen - 1, saltLen);
 
-    byte[] dbMask = maskGeneratorFunction1(mgfDigest, hv, block.length - hLen - 1);
+    byte[] dbMask;
+    int dbMaskLen = block.length - hLen - 1;
+    switch (contentDigest) {
+      case SHAKE128:
+      case SHAKE256:
+        XiShakeDigest digest = (XiShakeDigest) contentDigest.createDigest();
+        dbMask = digest.maskGeneratorFunction(hv, dbMaskLen);
+        break;
+      default:
+        dbMask = maskGeneratorFunction1(mgfDigest, hv, dbMaskLen);
+        break;
+    }
+
     for (int i = 0; i != dbMask.length; i++) {
       block[i] ^= dbMask[i];
     }
@@ -373,13 +417,18 @@ public class SignerUtil {
     }
   } // method bigIntToBytes
 
-  private static Digest getDigest(AlgorithmIdentifier hashAlgo)
+  private static Digest getDigest(AlgorithmIdentifier hashAlgId)
       throws XiSecurityException {
-    HashAlgo hat = HashAlgo.getInstance(hashAlgo.getAlgorithm());
+    return getDigest(hashAlgId.getAlgorithm());
+  }
+
+  private static Digest getDigest(ASN1ObjectIdentifier hashAlgOid)
+      throws XiSecurityException {
+    HashAlgo hat = HashAlgo.getInstance(hashAlgOid);
     if (hat != null) {
       return hat.createDigest();
     } else {
-      throw new XiSecurityException("could not get digest for " + hashAlgo.getAlgorithm().getId());
+      throw new XiSecurityException("could not get digest for " + hashAlgOid.getId());
     }
   }
 
@@ -407,11 +456,11 @@ public class SignerUtil {
 
     if (builder == null) {
       if ("RSA".equals(keyAlg)) {
-        builder = new XiRSAContentVerifierProviderBuilder(DIGESTALG_IDENTIFIER_FINDER);
+        builder = new XiRSAContentVerifierProviderBuilder();
       } else if ("DSA".equals(keyAlg)) {
         builder = new BcDSAContentVerifierProviderBuilder(DIGESTALG_IDENTIFIER_FINDER);
       } else if ("EC".equals(keyAlg) || "ECDSA".equals(keyAlg)) {
-        builder = new XiECContentVerifierProviderBuilder(DIGESTALG_IDENTIFIER_FINDER);
+        builder = new XiECContentVerifierProviderBuilder();
       } else {
         throw new InvalidKeyException("unknown key algorithm of the public key " + keyAlg);
       }

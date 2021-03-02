@@ -30,6 +30,7 @@ import org.junit.Test;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.X509Cert;
+import org.xipki.security.bc.XiProvider;
 import org.xipki.security.ctlog.CtLog;
 import org.xipki.security.ctlog.CtLog.SerializedSCT;
 import org.xipki.security.ctlog.CtLog.SignedCertificateTimestamp;
@@ -58,6 +59,7 @@ public class CtLogVerifyTest {
   public void testVerify()
       throws Exception {
     Security.addProvider(new BouncyCastleProvider());
+    Security.addProvider(new XiProvider());
     byte[] keyBytes = read(pubkeyFile);
 
     SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.getInstance(X509Util.toDerEncoded(keyBytes));

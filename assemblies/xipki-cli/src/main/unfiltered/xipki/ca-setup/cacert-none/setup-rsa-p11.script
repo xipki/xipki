@@ -4,7 +4,7 @@ CA_SUBJECT="CN=myca1,O=myorg,C=DE"
 # Please adapt me
 HASH = SHA256
 
-# Signature type: RSA or RSAandMGF1
+# Signature type: RSA, RSAandMGF1, or RSAPSS for hash algorithms SHAKE128 and SHAKE256
 SIGTYPE=RSA
 
 # Please adapt me

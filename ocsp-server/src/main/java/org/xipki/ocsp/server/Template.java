@@ -22,7 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers;
 import org.bouncycastle.asn1.isismtt.ocsp.CertHash;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -61,7 +60,7 @@ class Template {
     for (HashAlgo h : HashAlgo.values()) {
       int hlen = h.getLength();
 
-      AlgorithmIdentifier algId = new AlgorithmIdentifier(h.getOid(), DERNull.INSTANCE);
+      AlgorithmIdentifier algId = h.getAlgorithmIdentifier();
       byte[] encoded;
       try {
         CertHash certHash = new CertHash(algId, new byte[hlen]);

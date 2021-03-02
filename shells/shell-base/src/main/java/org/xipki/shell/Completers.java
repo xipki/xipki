@@ -140,7 +140,7 @@ public class Completers {
 
     public HashAlgCompleter() {
       setTokens("SHA1", "SHA224", "SHA256", "SHA384", "SHA512",
-          "SHA3-224", "SHA3-256", "SHA3-384", "SHA3-512", "SM3");
+          "SHA3-224", "SHA3-256", "SHA3-384", "SHA3-512", "SM3", "SHAKE128", "SHAKE256");
     }
 
   } // class HashAlgCompleter
@@ -176,6 +176,10 @@ public class Completers {
       }
 
       enums.add("SM3withSM2");
+      enums.add("SHAKE128WITHECDSA");
+      enums.add("SHAKE256WITHECDSA");
+      enums.add("SHAKE128WITHRSAPSS");
+      enums.add("SHAKE256WITHRSAPSS");
       setTokens(enums);
     }
 

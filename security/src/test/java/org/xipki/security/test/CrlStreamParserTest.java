@@ -49,6 +49,7 @@ public class CrlStreamParserTest {
     if (Security.getProvider("BC") == null) {
       Security.addProvider(new BouncyCastleProvider());
     }
+
   }
 
   private static Certificate getIssuerSigner()

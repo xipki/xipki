@@ -22,7 +22,7 @@ import java.security.PrivilegedAction;
 import java.security.Provider;
 
 /**
- * The XIPKI Provider class.
+ * The XIPKI PKCS#11 Provider class.
  * Supported algorithms:
  *
  * <p>Keystore
@@ -94,14 +94,14 @@ import java.security.Provider;
  * @since 2.0.0
  */
 
-public class XiProvider extends Provider {
+public class XiPkcs11Provider extends Provider {
 
   @SuppressWarnings("rawtypes")
   private static class MyPrivilegedAction implements PrivilegedAction {
 
-    private final XiProvider provider;
+    private final XiPkcs11Provider provider;
 
-    MyPrivilegedAction(XiProvider provider) {
+    MyPrivilegedAction(XiPkcs11Provider provider) {
       this.provider = provider;
     }
 
@@ -279,9 +279,9 @@ public class XiProvider extends Provider {
 
   /**
    * Exactly the name this provider is registered under at
-   * <code>java.security.Security</code>: "<code>XiPKI</code>".
+   * <code>java.security.Security</code>: "<code>XIPKI-P11</code>".
    */
-  public static final String PROVIDER_NAME = "XIPKI";
+  public static final String PROVIDER_NAME = "XIPKI-P11";
 
   /**
    * Version of this provider as registered at
@@ -293,12 +293,12 @@ public class XiProvider extends Provider {
    * An informational text giving the name and the version of this provider
    * and also telling about the provided algorithms.
    */
-  private static final String PROVIDER_INFO = "XiPKI JCA/JCE provider";
+  private static final String PROVIDER_INFO = "XiPKI PKCS#11 JCA/JCE provider";
 
   private static final long serialVersionUID = 1L;
 
   @SuppressWarnings("unchecked")
-  public XiProvider() {
+  public XiPkcs11Provider() {
     super(PROVIDER_NAME, PROVIDER_VERSION, PROVIDER_INFO);
     AccessController.doPrivileged(new MyPrivilegedAction(this));
   }

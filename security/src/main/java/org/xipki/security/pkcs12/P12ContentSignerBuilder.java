@@ -38,7 +38,6 @@ import javax.crypto.NoSuchPaddingException;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.Signer;
@@ -62,6 +61,7 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.XiWrappedContentSigner;
+import org.xipki.security.bc.XiDigestProvider;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.GMUtil;
 import org.xipki.security.util.SignerUtil;
@@ -88,24 +88,23 @@ public class P12ContentSignerBuilder {
     private RSAContentSignerBuilder(AlgorithmIdentifier signatureAlgId)
         throws NoSuchAlgorithmException, NoSuchPaddingException {
       super(signatureAlgId, AlgorithmUtil.extractDigesetAlgFromSigAlg(signatureAlgId));
+      super.digestProvider = XiDigestProvider.INSTANCE;
     }
 
     protected Signer createSigner(AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
         throws OperatorCreationException {
-      if (!AlgorithmUtil.isRSASigAlgId(sigAlgId)) {
-        throw new OperatorCreationException("the given algorithm is not a valid RSA signature "
-            + "algirthm '" + sigAlgId.getAlgorithm().getId() + "'");
-      }
-
-      if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
+      if (AlgorithmUtil.isRSAPSSSigAlgId(sigAlgId)) {
+        try {
+          return SignerUtil.createPSSRSASigner(sigAlgId);
+        } catch (XiSecurityException ex) {
+          throw new OperatorCreationException(ex.getMessage(), ex);
+        }
+      } else if (AlgorithmUtil.isRSASigAlgId(sigAlgId)) {
         Digest dig = digestProvider.get(digAlgId);
         return new RSADigestSigner(dig);
-      }
-
-      try {
-        return SignerUtil.createPSSRSASigner(sigAlgId);
-      } catch (XiSecurityException ex) {
-        throw new OperatorCreationException(ex.getMessage(), ex);
+      } else {
+        throw new OperatorCreationException("the given algorithm is not a valid RSA signature "
+            + "algirthm '" + sigAlgId.getAlgorithm().getId() + "'");
       }
     }
 
@@ -145,6 +144,7 @@ public class P12ContentSignerBuilder {
         throws NoSuchAlgorithmException {
       super(signatureAlgId, AlgorithmUtil.extractDigesetAlgFromSigAlg(signatureAlgId));
       this.plain = plain;
+      super.digestProvider = XiDigestProvider.INSTANCE;
     }
 
     protected Signer createSigner(AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)

@@ -51,6 +51,7 @@ import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.ObjectIdentifiers.Shake;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 
@@ -157,6 +158,10 @@ public class ScepUtil {
     } else if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid)) {
       RSASSAPSSparams param = RSASSAPSSparams.getInstance(sigParams);
       digestAlgOid = param.getHashAlgorithm().getAlgorithm();
+    } else if (Shake.id_RSASSA_PSS_SHAKE128.equals(algOid)) {
+      digestAlgOid = Shake.id_shake128;
+    } else if (Shake.id_RSASSA_PSS_SHAKE256.equals(algOid)) {
+      digestAlgOid = Shake.id_shake256;
     } else {
       throw new NoSuchAlgorithmException("unknown signature algorithm" + algOid.getId());
     }

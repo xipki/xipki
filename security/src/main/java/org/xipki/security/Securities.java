@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.Passwords;
 import org.xipki.password.Passwords.PasswordConf;
+import org.xipki.security.bc.XiProvider;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.security.pkcs11.P11CryptServiceFactoryImpl;
 import org.xipki.security.pkcs11.P11ModuleFactory;
@@ -238,6 +239,13 @@ public class Securities implements Closeable {
 
   public void init(SecurityConf conf)
       throws IOException, InvalidConfException {
+    if (Security.getProvider(XiProvider.PROVIDER_NAME) == null) {
+      LOG.info("add XiProvider");
+      Security.addProvider(new XiProvider());
+    } else {
+      LOG.info("XiProvider already added");
+    }
+
     if (Security.getProvider("BC") == null) {
       LOG.info("add BouncyCastleProvider");
       Security.addProvider(new BouncyCastleProvider());

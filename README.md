@@ -201,6 +201,7 @@ Features
   - X.509 Certificate v3 (RFC 5280)
   - X.509 CRL v2 (RFC 5280)
   - EdDSA Certificates (RFC 8410, RFC 8032)
+  - SHAKE Certificates (RFC 8692)
   - Diffie-Hellman Proof-of-Possession Algorithms (RFC 6955)
   - SCEP (draft-gutmann-scep-00, draft-nourse-scep-23)
   - EN 319 411 (eIDAS)
@@ -223,10 +224,12 @@ Features
     - X25519, X448
   - Signature algorithms of certificates
     - Ed25519, Ed448
+    - SHAKE128withRSAPSS, SHAKE256withRSAPSS, 
     - SHA3-*withRSA: where * is 224, 256, 384 and 512
     - SHA3-*withRSAandMGF1: where * is 224, 256, 384 and 512
     - SHA3-*withECDSA: where * is 224, 256, 384 and 512
     - SHA3-*withDSA: where * is 224, 256, 384 and 512
+    - SHAKE128withECDSA, SHAKE256withECDSA, 
     - SHA*withRSA: where * is 1, 224, 256, 384 and 512
     - SHA*withRSAandMGF1: where * is 1, 224, 256, 384 and 512
     - SHA*withECDSA: where * is 1, 224, 256, 384 and 512

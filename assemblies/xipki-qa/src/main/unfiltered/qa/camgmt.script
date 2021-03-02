@@ -25,6 +25,10 @@ if { "$1" equals "" } then {
 
   if { "$HASH" equals "sm3" } then {
     STDHASH = sha256
+  } elif { "$HASH" equals "shake128" } then {
+    STDHASH = sha256
+  } elif { "$HASH" equals "shake256" } then {
+    STDHASH = sha512
   } else {
     STDHASH = "$HASH"
   }
@@ -76,8 +80,23 @@ if { "$1" equals "" } then {
       if { "$argsValid" equals "false" } then {
         errMsg = "invalid combination $HASH and $SIG_TYPE"
       }
-    } else {
+    } elif { "$SIG_TYPE" equals "rsa" } then {
       list = [sha1 sha256 sha384 sha512 sha3-224 sha3-256 sha3-384 sha3-512]; each ($list) {
+        if { "$HASH" equals $it } then {
+          argsValid = "true"
+          break
+        }
+      }
+    } elif { "$SIG_TYPE" equals "dsa" } then {
+      list = [sha1 sha256 sha384 sha512 sha3-224 sha3-256 sha3-384 sha3-512]; each ($list) {
+        if { "$HASH" equals $it } then {
+          argsValid = "true"
+          break
+        }
+      }
+    } else {
+    # ec and rsapss
+      list = [sha1 sha256 sha384 sha512 sha3-224 sha3-256 sha3-384 sha3-512 shake128 shake256]; each ($list) {
         if { "$HASH" equals $it } then {
           argsValid = "true"
           break
@@ -107,7 +126,8 @@ if { $printUsage equals "true" } then {
   echo "    outform:         Output format of the certificates, CRLs and CSRs"
   echo "    hash algo:       sha1, sha224, sha256, sha384, sha512"
   echo "                     sha3-224, sha3-256, sha3-384, sha3-512"
-  echo "                     sm3 (only for signature type sm2)"
+  echo "                     shake128, shake256 (for signature types rsapss and ec)"
+  echo "                     sm3 (for signature type sm2)"
   echo "                     The sha3 algorithms are not for plainec."
   echo "    token type:      pkcs11, pkcs12"
   echo "    signature type:  rsa, rsapss, ec, plainec, dsa, sm2"

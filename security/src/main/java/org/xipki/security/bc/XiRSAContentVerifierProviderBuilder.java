@@ -17,7 +17,6 @@
 
 package org.xipki.security.bc;
 
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.Signer;
 import org.bouncycastle.crypto.signers.RSADigestSigner;
@@ -26,6 +25,7 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcECContentVerifierProviderBuilder;
 import org.bouncycastle.operator.bc.BcRSAContentVerifierProviderBuilder;
 import org.xipki.security.XiSecurityException;
+import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.SignerUtil;
 
 /**
@@ -38,18 +38,17 @@ import org.xipki.security.util.SignerUtil;
 
 // CHECKSTYLE:SKIP
 public class XiRSAContentVerifierProviderBuilder extends BcRSAContentVerifierProviderBuilder {
-  private DigestAlgorithmIdentifierFinder digestAlgorithmFinder;
+  private static final DigestAlgorithmIdentifierFinder digestAlgorithmFinder
+      = XiDigestAlgorithmIdentifierFinder.INSTANCE;
 
-  public XiRSAContentVerifierProviderBuilder(
-      DigestAlgorithmIdentifierFinder digestAlgorithmFinder) {
+  public XiRSAContentVerifierProviderBuilder() {
     super(digestAlgorithmFinder);
-    this.digestAlgorithmFinder = digestAlgorithmFinder;
   }
 
   @Override
   protected Signer createSigner(AlgorithmIdentifier sigAlgId)
       throws OperatorCreationException {
-    if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
+    if (AlgorithmUtil.isRSAPSSSigAlgId(sigAlgId)) {
       try {
         return SignerUtil.createPSSRSASigner(sigAlgId);
       } catch (XiSecurityException ex) {

@@ -45,7 +45,6 @@ import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
@@ -88,6 +87,7 @@ import org.xipki.ca.certprofile.xijson.conf.Subject;
 import org.xipki.ca.certprofile.xijson.conf.Subject.RdnType;
 import org.xipki.ca.certprofile.xijson.conf.Subject.ValueType;
 import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.util.AlgorithmUtil;
@@ -873,7 +873,7 @@ public class XijsonCertprofile extends BaseCertprofile {
             throw new BadCertTemplateException("could not reach here, unknown tripleState");
         }
 
-        AlgorithmIdentifier newHashAlg = new AlgorithmIdentifier(hashAlgo, DERNull.INSTANCE);
+        AlgorithmIdentifier newHashAlg = HashAlgo.getInstance(hashAlgo).getAlgorithmIdentifier();
         BiometricData newBiometricData = new BiometricData(bdType, newHashAlg,
             new DEROctetString(hashValue), sourceDataUri);
         vec.add(newBiometricData);

@@ -155,6 +155,7 @@ class HashCalculator {
           md.update(data, 0, data.length);
         }
       }
+
       byte[] bytes = new byte[md.getDigestSize()];
       md.doFinal(bytes, 0);
       return bytes;

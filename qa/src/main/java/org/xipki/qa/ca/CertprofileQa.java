@@ -262,6 +262,12 @@ public class CertprofileQa {
     resultIssues.add(issue);
     try {
       cert.verify(issuerInfo.getCert().getPublicKey(), "BC");
+    } catch (NoSuchAlgorithmException ex) {
+      try {
+        cert.verify(issuerInfo.getCert().getPublicKey());
+      } catch (Exception ex1) {
+        issue.setFailureMessage("invalid signature");
+      }
     } catch (Exception ex) {
       issue.setFailureMessage("invalid signature");
     }

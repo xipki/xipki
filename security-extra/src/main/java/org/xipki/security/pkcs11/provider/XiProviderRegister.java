@@ -22,7 +22,7 @@ import java.security.Security;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
 
 /**
- * Helper class to register the {@link XiProvider}.
+ * Helper class to register the {@link XiPkcs11Provider}.
  *
  * @author Lijun Liao
  * @since 2.0.0
@@ -31,8 +31,8 @@ import org.xipki.security.pkcs11.P11CryptServiceFactory;
 public class XiProviderRegister {
 
   public void regist() {
-    if (Security.getProperty(XiProvider.PROVIDER_NAME) == null) {
-      Security.addProvider(new XiProvider());
+    if (Security.getProperty(XiPkcs11Provider.PROVIDER_NAME) == null) {
+      Security.addProvider(new XiPkcs11Provider());
     }
   }
 

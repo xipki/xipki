@@ -42,12 +42,13 @@ import org.bouncycastle.crypto.AsymmetricBlockCipher;
 import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.crypto.DataLengthException;
 import org.bouncycastle.crypto.RuntimeCryptoException;
+import org.bouncycastle.crypto.Signer;
 import org.bouncycastle.crypto.params.ParametersWithRandom;
-import org.bouncycastle.crypto.signers.PSSSigner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.ObjectIdentifiers.Shake;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.GMUtil;
@@ -96,6 +97,56 @@ abstract class P11ContentSigner implements XiContentSigner {
   public final byte[] getEncodedAlgorithmIdentifier() {
     return Arrays.copyOf(encodedAlgorithmIdentifier, encodedAlgorithmIdentifier.length);
   }
+
+  // CHECKSTYLE:SKIP
+  private static class SignerOutputStream extends OutputStream {
+
+    private Signer pssSigner;
+
+    SignerOutputStream(Signer pssSigner) {
+      this.pssSigner = pssSigner;
+    }
+
+    @Override
+    public void write(int oneByte)
+        throws IOException {
+      pssSigner.update((byte) oneByte);
+    }
+
+    @Override
+    public void write(byte[] bytes)
+        throws IOException {
+      pssSigner.update(bytes, 0, bytes.length);
+    }
+
+    @Override
+    public void write(byte[] bytes, int off, int len)
+        throws IOException {
+      pssSigner.update(bytes, off, len);
+    }
+
+    public void reset() {
+      pssSigner.reset();
+    }
+
+    @Override
+    public void flush()
+        throws IOException {
+    }
+
+    @Override
+    public void close()
+        throws IOException {
+    }
+
+    byte[] generateSignature()
+        throws DataLengthException, CryptoException {
+      byte[] signature = pssSigner.generateSignature();
+      pssSigner.reset();
+      return signature;
+    }
+
+  } // class SignerOutputStream
 
   // CHECKSTYLE:SKIP
   static class DSA extends P11ContentSigner {
@@ -223,6 +274,8 @@ abstract class P11ContentSigner implements XiContentSigner {
       sigAlgHashMap.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_256.getId(), HashAlgo.SHA3_256);
       sigAlgHashMap.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_384.getId(), HashAlgo.SHA3_384);
       sigAlgHashMap.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_512.getId(), HashAlgo.SHA3_512);
+      sigAlgHashMap.put(Shake.id_ecdsa_with_shake128.getId(), HashAlgo.SHAKE128);
+      sigAlgHashMap.put(Shake.id_ecdsa_with_shake256.getId(), HashAlgo.SHAKE256);
 
       sigAlgHashMap.put(BSIObjectIdentifiers.ecdsa_plain_SHA1.getId(), HashAlgo.SHA1);
       sigAlgHashMap.put(BSIObjectIdentifiers.ecdsa_plain_SHA224.getId(), HashAlgo.SHA224);
@@ -256,8 +309,8 @@ abstract class P11ContentSigner implements XiContentSigner {
 
       P11Slot slot = cryptService.getSlot(identityId.getSlotId());
 
-      long mech = hashMechMap.get(hashAlgo).longValue();
-      if (slot.supportsMechanism(mech)) {
+      Long mech = hashMechMap.get(hashAlgo);
+      if (mech != null && slot.supportsMechanism(mech)) {
         mechanism = mech;
         this.outputStream = new ByteArrayOutputStream();
       } else if (slot.supportsMechanism(PKCS11Constants.CKM_ECDSA)) {
@@ -552,56 +605,6 @@ abstract class P11ContentSigner implements XiContentSigner {
       hashAlgMechMap.put(HashAlgo.SHA3_512, PKCS11Constants.CKM_SHA3_512_RSA_PKCS_PSS);
     } // method static
 
-    // CHECKSTYLE:SKIP
-    private static class PSSSignerOutputStream extends OutputStream {
-
-      private PSSSigner pssSigner;
-
-      PSSSignerOutputStream(PSSSigner pssSigner) {
-        this.pssSigner = pssSigner;
-      }
-
-      @Override
-      public void write(int oneByte)
-          throws IOException {
-        pssSigner.update((byte) oneByte);
-      }
-
-      @Override
-      public void write(byte[] bytes)
-          throws IOException {
-        pssSigner.update(bytes, 0, bytes.length);
-      }
-
-      @Override
-      public void write(byte[] bytes, int off, int len)
-          throws IOException {
-        pssSigner.update(bytes, off, len);
-      }
-
-      public void reset() {
-        pssSigner.reset();
-      }
-
-      @Override
-      public void flush()
-          throws IOException {
-      }
-
-      @Override
-      public void close()
-          throws IOException {
-      }
-
-      byte[] generateSignature()
-          throws DataLengthException, CryptoException {
-        byte[] signature = pssSigner.generateSignature();
-        pssSigner.reset();
-        return signature;
-      }
-
-    } // class PSSSignerOutputStream
-
     private final long mechanism;
 
     private final P11Params.P11RSAPkcsPssParams parameters;
@@ -649,9 +652,9 @@ abstract class P11ContentSigner implements XiContentSigner {
         } catch (InvalidKeyException ex) {
           throw new XiSecurityException(ex.getMessage(), ex);
         }
-        PSSSigner pssSigner = SignerUtil.createPSSRSASigner(signatureAlgId, cipher);
+        Signer pssSigner = SignerUtil.createPSSRSASigner(signatureAlgId, cipher);
         pssSigner.init(true, new ParametersWithRandom(keyParam, random));
-        this.outputStream = new PSSSignerOutputStream(pssSigner);
+        this.outputStream = new SignerOutputStream(pssSigner);
       } else {
         throw new XiSecurityException("unsupported signature algorithm "
             + sigOid.getId() + " with " + hashAlgo);
@@ -665,7 +668,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       } else if (outputStream instanceof DigestOutputStream) {
         ((DigestOutputStream) outputStream).reset();
       } else {
-        ((PSSSignerOutputStream) outputStream).reset();
+        ((SignerOutputStream) outputStream).reset();
       }
 
       return outputStream;
@@ -673,9 +676,9 @@ abstract class P11ContentSigner implements XiContentSigner {
 
     @Override
     public byte[] getSignature() {
-      if (outputStream instanceof PSSSignerOutputStream) {
+      if (outputStream instanceof SignerOutputStream) {
         try {
-          return ((PSSSignerOutputStream) outputStream).generateSignature();
+          return ((SignerOutputStream) outputStream).generateSignature();
         } catch (CryptoException ex) {
           LogUtil.warn(LOG, ex);
           throw new RuntimeCryptoException("CryptoException: " + ex.getMessage());
@@ -699,6 +702,55 @@ abstract class P11ContentSigner implements XiContentSigner {
     } // method getSignature
 
   } // class RSAPSS
+
+  // CHECKSTYLE:SKIP
+  static class RSAPSSSHAKE extends P11ContentSigner {
+
+    private final SignerOutputStream outputStream;
+
+    RSAPSSSHAKE(P11CryptService cryptService, P11IdentityId identityId,
+        AlgorithmIdentifier signatureAlgId, SecureRandom random)
+        throws XiSecurityException, P11TokenException {
+      super(cryptService, identityId, signatureAlgId);
+      notNull(random, "random");
+
+      P11SlotIdentifier slotId = identityId.getSlotId();
+      P11Slot slot = cryptService.getSlot(slotId);
+
+      if (slot.supportsMechanism(PKCS11Constants.CKM_RSA_X_509)) {
+        AsymmetricBlockCipher cipher = new P11PlainRSASigner();
+        P11RSAKeyParameter keyParam;
+        try {
+          keyParam = P11RSAKeyParameter.getInstance(cryptService, identityId);
+        } catch (InvalidKeyException ex) {
+          throw new XiSecurityException(ex.getMessage(), ex);
+        }
+        Signer pssSigner = SignerUtil.createPSSRSASigner(signatureAlgId, cipher);
+        pssSigner.init(true, new ParametersWithRandom(keyParam, random));
+        this.outputStream = new SignerOutputStream(pssSigner);
+      } else {
+        throw new XiSecurityException("unsupported signature algorithm "
+            + signatureAlgId.getAlgorithm().getId());
+      }
+    } // constructor
+
+    @Override
+    public OutputStream getOutputStream() {
+      outputStream.reset();
+      return outputStream;
+    }
+
+    @Override
+    public byte[] getSignature() {
+      try {
+        return outputStream.generateSignature();
+      } catch (CryptoException ex) {
+        LogUtil.warn(LOG, ex);
+        throw new RuntimeCryptoException("CryptoException: " + ex.getMessage());
+      }
+    } // method getSignature
+
+  } // class RSAPSSSHAKE
 
   static class SM2 extends P11ContentSigner {
 

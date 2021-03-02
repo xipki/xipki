@@ -31,7 +31,9 @@
 		"SHA384withECDSA",
 		"SHA256withECDSA",
 		"SHA1withECDSA",
-		"SM3withSM2"],
+		"SM3withSM2",
+		"SHAKE128withECDSA",
+		"SHAKE256withECDSA"],
 	"keyAlgorithms":[{
 		"algorithms":[{
 			"oid":"1.2.840.10040.4.1",

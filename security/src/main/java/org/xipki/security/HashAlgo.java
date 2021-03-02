@@ -24,7 +24,7 @@ import java.util.Map;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.crypto.Digest;
+import org.bouncycastle.crypto.ExtendedDigest;
 import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.crypto.digests.SHA224Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
@@ -32,6 +32,8 @@ import org.bouncycastle.crypto.digests.SHA384Digest;
 import org.bouncycastle.crypto.digests.SHA3Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.crypto.digests.SM3Digest;
+import org.xipki.security.ObjectIdentifiers.Shake;
+import org.xipki.security.bc.XiShakeDigest;
 import org.xipki.util.Args;
 
 /**
@@ -52,7 +54,9 @@ public enum HashAlgo {
   SHA3_256(32, AlgorithmCode.SHA3_256, "2.16.840.1.101.3.4.2.8",  "SHA3-256"),
   SHA3_384(48, AlgorithmCode.SHA3_384, "2.16.840.1.101.3.4.2.9",  "SHA3-384"),
   SHA3_512(64, AlgorithmCode.SHA3_512, "2.16.840.1.101.3.4.2.10", "SHA3-512"),
-  SM3(32,      AlgorithmCode.SM3,      "1.2.156.10197.1.401",     "SM3");
+  SM3(32,      AlgorithmCode.SM3,      "1.2.156.10197.1.401",     "SM3"),
+  SHAKE128(32, AlgorithmCode.SHAKE128, Shake.id_shake128.getId(), "SHAKE128-256"),
+  SHAKE256(64, AlgorithmCode.SHAKE256, Shake.id_shake256.getId(), "SHAKE256-512");
 
   private static final Map<String, HashAlgo> map = new HashMap<>();
 
@@ -83,13 +87,19 @@ public enum HashAlgo {
     map.put("SHA3256", SHA3_256);
     map.put("SHA3384", SHA3_384);
     map.put("SHA3512", SHA3_512);
+    map.put("SHAKE128", SHAKE128);
+    map.put("SHAKE256", SHAKE256);
   }
 
   private HashAlgo(int length, AlgorithmCode algorithmCode, String oid, String name) {
     this.length = length;
     this.algorithmCode = algorithmCode;
     this.oid = new ASN1ObjectIdentifier(oid).intern();
-    this.algId = new AlgorithmIdentifier(this.oid, DERNull.INSTANCE);
+    if (this.oid.equals(Shake.id_shake128) || this.oid.equals(Shake.id_shake256)) {
+      this.algId = new AlgorithmIdentifier(this.oid);
+    } else {
+      this.algId = new AlgorithmIdentifier(this.oid, DERNull.INSTANCE);
+    }
     this.name = name;
 
     try {
@@ -175,7 +185,7 @@ public enum HashAlgo {
     return algId;
   }
 
-  public Digest createDigest() {
+  public ExtendedDigest createDigest() {
     switch (this) {
       case SHA1:
         return new SHA1Digest();
@@ -197,6 +207,10 @@ public enum HashAlgo {
         return new SHA3Digest(512);
       case SM3:
         return new SM3Digest();
+      case SHAKE128:
+        return new XiShakeDigest.XiShake128Digest();
+      case SHAKE256:
+        return new XiShakeDigest.XiShake256Digest();
       default:
         throw new IllegalStateException("should not reach here, unknown HashAlgo " + name());
     }

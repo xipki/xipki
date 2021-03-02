@@ -35,6 +35,8 @@ import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.ObjectIdentifiers.Shake;
 
 /**
  * OCSP request options.
@@ -154,14 +156,25 @@ public class RequestOptions {
   private static AlgorithmIdentifier createAlgId(String algoName) {
     algoName = algoName.toUpperCase();
     ASN1ObjectIdentifier algOid = null;
+
+    ASN1Encodable params = null;
+
     if ("SHA1WITHRSA".equals(algoName)) {
       algOid = PKCSObjectIdentifiers.sha1WithRSAEncryption;
+      params = DERNull.INSTANCE;
     } else if ("SHA256WITHRSA".equals(algoName)) {
       algOid = PKCSObjectIdentifiers.sha256WithRSAEncryption;
+      params = DERNull.INSTANCE;
     } else if ("SHA384WITHRSA".equals(algoName)) {
       algOid = PKCSObjectIdentifiers.sha384WithRSAEncryption;
+      params = DERNull.INSTANCE;
     } else if ("SHA512WITHRSA".equals(algoName)) {
       algOid = PKCSObjectIdentifiers.sha512WithRSAEncryption;
+      params = DERNull.INSTANCE;
+    } else if ("SHAKE128WITHRSAPSS".equals(algoName)) {
+      algOid = Shake.id_RSASSA_PSS_SHAKE128;
+    } else if ("SHAKE256WITHRSAPSS".equals(algoName)) {
+      algOid = Shake.id_RSASSA_PSS_SHAKE256;
     } else if ("SHA1WITHECDSA".equals(algoName)) {
       algOid = X9ObjectIdentifiers.ecdsa_with_SHA1;
     } else if ("SHA256WITHECDSA".equals(algoName)) {
@@ -170,15 +183,14 @@ public class RequestOptions {
       algOid = X9ObjectIdentifiers.ecdsa_with_SHA384;
     } else if ("SHA512WITHECDSA".equals(algoName)) {
       algOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
+    } else if ("SHAKE128WITHECDSA".equals(algoName)) {
+      algOid = Shake.id_ecdsa_with_shake128;
+    } else if ("SHAKE256WITHECDSA".equals(algoName)) {
+      algOid = Shake.id_ecdsa_with_shake256;
     } else if ("SHA1WITHRSAANDMGF1".equals(algoName) || "SHA256WITHRSAANDMGF1".equals(algoName)
         || "SHA384WITHRSAANDMGF1".equals(algoName) || "SHA512WITHRSAANDMGF1".equals(algoName)) {
       algOid = PKCSObjectIdentifiers.id_RSASSA_PSS;
-    } else {
-      throw new IllegalStateException("Unsupported algorithm " + algoName); // should not happen
-    }
 
-    ASN1Encodable params;
-    if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid)) {
       ASN1ObjectIdentifier digestAlgOid = null;
       if ("SHA1WITHRSAANDMGF1".equals(algoName)) {
         digestAlgOid = X509ObjectIdentifiers.id_SHA1;
@@ -191,7 +203,7 @@ public class RequestOptions {
       }
       params = createPSSRSAParams(digestAlgOid);
     } else {
-      params = DERNull.INSTANCE;
+      throw new IllegalStateException("Unsupported algorithm " + algoName); // should not happen
     }
 
     return new AlgorithmIdentifier(algOid, params);
@@ -214,7 +226,7 @@ public class RequestOptions {
       throw new IllegalStateException("unknown digest algorithm " + digestAlgOid);
     }
 
-    AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(digestAlgOid, DERNull.INSTANCE);
+    AlgorithmIdentifier digAlgId = HashAlgo.getInstance(digestAlgOid).getAlgorithmIdentifier();
     return new RSASSAPSSparams(digAlgId,
         new AlgorithmIdentifier(PKCSObjectIdentifiers.id_mgf1, digAlgId),
         new ASN1Integer(saltSize), RSASSAPSSparams.DEFAULT_TRAILER_FIELD);

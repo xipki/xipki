@@ -30,7 +30,9 @@
 		"SHA512withRSAandMGF1",
 		"SHA384withRSAandMGF1",
 		"SHA256withRSAandMGF1",
-		"SHA1withRSAandMGF1"],
+		"SHA1withRSAandMGF1",
+		"SHAKE128withRSAPSS",
+ 		"SHAKE256withRSAPSS"],
 	"keyAlgorithms":[{
 		"algorithms":[{
 			"oid":"1.2.840.113549.1.1.1",

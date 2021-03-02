@@ -46,6 +46,8 @@ public enum AlgorithmCode {
   SHA3_256WITHRSAANDMGF1((byte) 0x17),
   SHA3_384WITHRSAANDMGF1((byte) 0x18),
   SHA3_512WITHRSAANDMGF1((byte) 0x19),
+  SHAKE128WITHRSAPSS((byte) 0x1A),
+  SHAKE256WITHRSAPSS((byte) 0x1B),
 
   // DSA
   SHA1WITHDSA((byte) 0x21),
@@ -69,6 +71,8 @@ public enum AlgorithmCode {
   SHA3_384WITHECDSA((byte) 0x38),
   SHA3_512WITHECDSA((byte) 0x39),
   SM2WITHSM3((byte) 0x3A),
+  SHAKE128WITHECDSA((byte) 0x3B),
+  SHAKE256WITHECDSA((byte) 0x3C),
 
   // PlainECDSA
   SHA1WITHPLAIN_ECDSA((byte) 0x41),
@@ -111,7 +115,9 @@ public enum AlgorithmCode {
   SHA3_256((byte) 0xE7),
   SHA3_384((byte) 0xE8),
   SHA3_512((byte) 0xE9),
-  SM3((byte) 0xEA);
+  SM3((byte) 0xEA),
+  SHAKE128((byte) 0xEB),
+  SHAKE256((byte) 0xEC);
 
   private byte code;
 
