@@ -114,7 +114,7 @@ public class SignerConf {
     sb.append("conf: ");
     sb.append(conf);
     if (hashAlgo != null) {
-      sb.append("\nhash algo: ").append(hashAlgo.getName());
+      sb.append("\nhash algo: ").append(hashAlgo.getJceName());
     }
 
     if (signatureAlgoControl != null) {

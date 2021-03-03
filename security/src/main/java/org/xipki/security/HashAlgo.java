@@ -66,7 +66,7 @@ public enum HashAlgo {
 
   private final AlgorithmIdentifier algId;
 
-  private final String name;
+  private final String jceName;
 
   private final AlgorithmCode algorithmCode;
 
@@ -75,7 +75,7 @@ public enum HashAlgo {
   static {
     for (HashAlgo type : HashAlgo.values()) {
       map.put(type.oid.getId(), type);
-      map.put(type.name, type);
+      map.put(type.jceName, type);
     }
 
     map.put("SHA-1",   SHA1);
@@ -91,7 +91,7 @@ public enum HashAlgo {
     map.put("SHAKE256", SHAKE256);
   }
 
-  private HashAlgo(int length, AlgorithmCode algorithmCode, String oid, String name) {
+  private HashAlgo(int length, AlgorithmCode algorithmCode, String oid, String jceName) {
     this.length = length;
     this.algorithmCode = algorithmCode;
     this.oid = new ASN1ObjectIdentifier(oid).intern();
@@ -100,7 +100,7 @@ public enum HashAlgo {
     } else {
       this.algId = new AlgorithmIdentifier(this.oid, DERNull.INSTANCE);
     }
-    this.name = name;
+    this.jceName = jceName;
 
     try {
       this.encoded = new ASN1ObjectIdentifier(oid).getEncoded();
@@ -121,8 +121,8 @@ public enum HashAlgo {
     return oid;
   }
 
-  public String getName() {
-    return name;
+  public String getJceName() {
+    return jceName;
   }
 
   public static HashAlgo getInstance(ASN1ObjectIdentifier oid) {

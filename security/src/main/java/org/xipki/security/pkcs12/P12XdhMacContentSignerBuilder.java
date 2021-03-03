@@ -191,7 +191,7 @@ public class P12XdhMacContentSignerBuilder {
 
     }
     byte[] k = this.hash.hash(leadingInfo, zz, trailingInfo);
-    this.key = new SecretKeySpec(k, "HMAC-" + this.hash.getName());
+    this.key = new SecretKeySpec(k, "HMAC-" + this.hash.getJceName());
     this.peerIssuerAndSerial =
         new IssuerAndSerialNumber(X500Name.getInstance(trailingInfo), peerCert.getSerialNumber());
   } // method init

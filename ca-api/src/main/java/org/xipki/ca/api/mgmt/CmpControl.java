@@ -283,7 +283,7 @@ public class CmpControl {
       } catch (Exception ex) {
         throw new InvalidConfException("invalid pbmPwf " + algo, ex);
       }
-      canonicalizedAlgos.add(ha.getName());
+      canonicalizedAlgos.add(ha.getJceName());
       requestPbmOwfs.add(ha.getOid());
 
       if (i == 0) {

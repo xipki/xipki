@@ -718,7 +718,7 @@ public class ExtensionConfBuilder {
     // hash algorithm
     HashAlgo[] hashAlgos = new HashAlgo[]{HashAlgo.SHA256, HashAlgo.SHA384};
     for (HashAlgo hashAlgo : hashAlgos) {
-      extValue.getHashAlgorithms().add(createOidType(hashAlgo.getOid(), hashAlgo.getName()));
+      extValue.getHashAlgorithms().add(createOidType(hashAlgo.getOid(), hashAlgo.getJceName()));
     }
 
     extValue.setIncludeSourceDataUri(TripleState.required);

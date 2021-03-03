@@ -128,7 +128,7 @@ public class ScepUtil {
     Args.notNull(hashAlgo, "hashAlgo");
     String algorithm = key.getAlgorithm();
     if ("RSA".equalsIgnoreCase(algorithm)) {
-      return hashAlgo.getName() + "withRSA";
+      return hashAlgo.getJceName() + "withRSA";
     } else {
       throw new UnsupportedOperationException(
           "getSignatureAlgorithm() for non-RSA is not supported yet.");
