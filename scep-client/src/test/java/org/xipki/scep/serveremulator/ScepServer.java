@@ -93,10 +93,6 @@ public class ScepServer {
       Security.addProvider(new XiProvider());
     }
 
-    if (Security.getProvider(XiProvider.PROVIDER_NAME) == null) {
-      Security.addProvider(new XiProvider());
-    }
-
     if (Security.getProvider("BC") == null) {
       Security.addProvider(new BouncyCastleProvider());
     }

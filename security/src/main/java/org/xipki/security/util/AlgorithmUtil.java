@@ -385,80 +385,50 @@ public class AlgorithmUtil {
       Map<ASN1ObjectIdentifier, String> m1 = new HashMap<>();
       Map<String, ASN1ObjectIdentifier> m2 = new HashMap<>();
 
-      addOidNameMap(m1, m2, X9ObjectIdentifiers.ecdsa_with_SHA1, "SHA1WITHECDSA",
-          "ECDSAWITHSHA1");
-      addOidNameMap(m1, m2, X9ObjectIdentifiers.ecdsa_with_SHA224, "SHA224WITHECDSA",
-          "ECDSAWITHSHA224");
-      addOidNameMap(m1, m2, X9ObjectIdentifiers.ecdsa_with_SHA256, "SHA256WITHECDSA",
-          "ECDSAWITHSHA256");
-      addOidNameMap(m1, m2, X9ObjectIdentifiers.ecdsa_with_SHA384, "SHA384WITHECDSA",
-          "ECDSAWITHSHA384");
-      addOidNameMap(m1, m2, X9ObjectIdentifiers.ecdsa_with_SHA512, "SHA512WITHECDSA",
-          "ECDSAWITHSHA512");
-      addOidNameMap(m1, m2, NISTObjectIdentifiers.id_ecdsa_with_sha3_224,
-          "SHA3-224WITHECDSA", "ECDSAWITHSHA3-224");
-      addOidNameMap(m1, m2, NISTObjectIdentifiers.id_ecdsa_with_sha3_256,
-          "SHA3-256WITHECDSA", "ECDSAWITHSHA3-256");
-      addOidNameMap(m1, m2, NISTObjectIdentifiers.id_ecdsa_with_sha3_384,
-          "SHA3-384WITHECDSA", "ECDSAWITHSHA3-384");
-      addOidNameMap(m1, m2, NISTObjectIdentifiers.id_ecdsa_with_sha3_512,
-          "SHA3-512WITHECDSA", "ECDSAWITHSHA3-512");
-      addOidNameMap(m1, m2, Shake.id_ecdsa_with_shake128, "ECDSAWITHSHAKE128", "SHAKE128WITHECDSA");
-      addOidNameMap(m1, m2, Shake.id_ecdsa_with_shake256, "ECDSAWITHSHAKE256", "SHAKE256WITHECDSA");
+      addOidNameMap(m1, m2, X9ObjectIdentifiers.ecdsa_with_SHA1, "SHA1WITHECDSA");
+      addOidNameMap(m1, m2, X9ObjectIdentifiers.ecdsa_with_SHA224, "SHA224WITHECDSA");
+      addOidNameMap(m1, m2, X9ObjectIdentifiers.ecdsa_with_SHA256, "SHA256WITHECDSA");
+      addOidNameMap(m1, m2, X9ObjectIdentifiers.ecdsa_with_SHA384, "SHA384WITHECDSA");
+      addOidNameMap(m1, m2, X9ObjectIdentifiers.ecdsa_with_SHA512, "SHA512WITHECDSA");
+      addOidNameMap(m1, m2, NISTObjectIdentifiers.id_ecdsa_with_sha3_224, "SHA3-224WITHECDSA");
+      addOidNameMap(m1, m2, NISTObjectIdentifiers.id_ecdsa_with_sha3_256, "SHA3-256WITHECDSA");
+      addOidNameMap(m1, m2, NISTObjectIdentifiers.id_ecdsa_with_sha3_384, "SHA3-384WITHECDSA");
+      addOidNameMap(m1, m2, NISTObjectIdentifiers.id_ecdsa_with_sha3_512, "SHA3-512WITHECDSA");
+      addOidNameMap(m1, m2, Shake.id_ecdsa_with_shake128, "SHAKE128WITHECDSA");
+      addOidNameMap(m1, m2, Shake.id_ecdsa_with_shake256, "SHAKE256WITHECDSA");
 
-      addOidNameMap(m1, m2, BSIObjectIdentifiers.ecdsa_plain_SHA1,
-          "SHA1WITHPLAINECDSA", "PLAINECDSAWITHSHA1");
-      addOidNameMap(m1, m2, BSIObjectIdentifiers.ecdsa_plain_SHA224,
-          "SHA224WITHPLAIN-ECDSA", "PLAINECDSAWITHSHA224");
-      addOidNameMap(m1, m2, BSIObjectIdentifiers.ecdsa_plain_SHA256,
-          "SHA256WITHPLAINECDSA", "PLAINECDSAWITHSHA256");
-      addOidNameMap(m1, m2, BSIObjectIdentifiers.ecdsa_plain_SHA384,
-          "SHA384WITHPLAINECDSA", "PLAINECDSAWITHSHA384");
-      addOidNameMap(m1, m2, BSIObjectIdentifiers.ecdsa_plain_SHA512,
-          "SHA512WITHPLAINECDSA", "PLAINECDSAWITHSHA512");
-      addOidNameMap(m1, m2, X9ObjectIdentifiers.id_dsa_with_sha1, "SHA1WITHDSA",
-          "DSAWITHSHA1");
-      addOidNameMap(m1, m2, NISTObjectIdentifiers.dsa_with_sha224, "SHA224WITHDSA",
-          "DSAWITHSHA224");
-      addOidNameMap(m1, m2, NISTObjectIdentifiers.dsa_with_sha256, "SHA256WITHDSA",
-          "DSAWITHSHA256");
-      addOidNameMap(m1, m2, NISTObjectIdentifiers.dsa_with_sha384, "SHA384WITHDSA",
-          "DSAWITHSHA384");
-      addOidNameMap(m1, m2, NISTObjectIdentifiers.dsa_with_sha512, "SHA512WITHDSA",
-          "DSAWITHSHA512");
-      addOidNameMap(m1, m2, NISTObjectIdentifiers.id_dsa_with_sha3_224, "SHA3-224WITHDSA",
-          "DSAWITHSHA3-224");
-      addOidNameMap(m1, m2, NISTObjectIdentifiers.id_dsa_with_sha3_256, "SHA3-256WITHDSA",
-          "DSAWITHSHA3-256");
-      addOidNameMap(m1, m2, NISTObjectIdentifiers.id_dsa_with_sha3_384, "SHA3-384WITHDSA",
-          "DSAWITHSHA3-384");
-      addOidNameMap(m1, m2, NISTObjectIdentifiers.id_dsa_with_sha3_512, "SHA3-512WITHDSA",
-          "DSAWITHSHA3-512");
-      addOidNameMap(m1, m2, PKCSObjectIdentifiers.sha1WithRSAEncryption, "SHA1WITHRSA",
-          "RSAWITHSHA1");
-      addOidNameMap(m1, m2, PKCSObjectIdentifiers.sha224WithRSAEncryption, "SHA224WITHRSA",
-          "RSAWITHSHA224");
-      addOidNameMap(m1, m2, PKCSObjectIdentifiers.sha256WithRSAEncryption, "SHA256WITHRSA",
-          "RSAWITHSHA256");
-      addOidNameMap(m1, m2, PKCSObjectIdentifiers.sha384WithRSAEncryption, "SHA384WITHRSA",
-          "RSAWITHSHA384");
-      addOidNameMap(m1, m2, PKCSObjectIdentifiers.sha512WithRSAEncryption, "SHA512WITHRSA",
-          "RSAWITHSHA512");
+      addOidNameMap(m1, m2, BSIObjectIdentifiers.ecdsa_plain_SHA1, "SHA1WITHPLAINECDSA");
+      addOidNameMap(m1, m2, BSIObjectIdentifiers.ecdsa_plain_SHA224, "SHA224WITHPLAIN-ECDSA");
+      addOidNameMap(m1, m2, BSIObjectIdentifiers.ecdsa_plain_SHA256, "SHA256WITHPLAINECDSA");
+      addOidNameMap(m1, m2, BSIObjectIdentifiers.ecdsa_plain_SHA384, "SHA384WITHPLAINECDSA");
+      addOidNameMap(m1, m2, BSIObjectIdentifiers.ecdsa_plain_SHA512, "SHA512WITHPLAINECDSA");
+      addOidNameMap(m1, m2, X9ObjectIdentifiers.id_dsa_with_sha1, "SHA1WITHDSA");
+      addOidNameMap(m1, m2, NISTObjectIdentifiers.dsa_with_sha224, "SHA224WITHDSA");
+      addOidNameMap(m1, m2, NISTObjectIdentifiers.dsa_with_sha256, "SHA256WITHDSA");
+      addOidNameMap(m1, m2, NISTObjectIdentifiers.dsa_with_sha384, "SHA384WITHDSA");
+      addOidNameMap(m1, m2, NISTObjectIdentifiers.dsa_with_sha512, "SHA512WITHDSA");
+      addOidNameMap(m1, m2, NISTObjectIdentifiers.id_dsa_with_sha3_224, "SHA3-224WITHDSA");
+      addOidNameMap(m1, m2, NISTObjectIdentifiers.id_dsa_with_sha3_256, "SHA3-256WITHDSA");
+      addOidNameMap(m1, m2, NISTObjectIdentifiers.id_dsa_with_sha3_384, "SHA3-384WITHDSA");
+      addOidNameMap(m1, m2, NISTObjectIdentifiers.id_dsa_with_sha3_512, "SHA3-512WITHDSA");
+      addOidNameMap(m1, m2, PKCSObjectIdentifiers.sha1WithRSAEncryption, "SHA1WITHRSA");
+      addOidNameMap(m1, m2, PKCSObjectIdentifiers.sha224WithRSAEncryption, "SHA224WITHRSA");
+      addOidNameMap(m1, m2, PKCSObjectIdentifiers.sha256WithRSAEncryption, "SHA256WITHRSA");
+      addOidNameMap(m1, m2, PKCSObjectIdentifiers.sha384WithRSAEncryption, "SHA384WITHRSA");
+      addOidNameMap(m1, m2, PKCSObjectIdentifiers.sha512WithRSAEncryption, "SHA512WITHRSA");
       addOidNameMap(m1, m2, NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_224,
-          "SHA3-224WITHRSA", "RSAWITHSHA3-224");
+          "SHA3-224WITHRSA");
       addOidNameMap(m1, m2, NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_256,
-          "SHA3-256WITHRSA", "RSAWITHSHA3-256");
+          "SHA3-256WITHRSA");
       addOidNameMap(m1, m2, NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_384,
-          "SHA3-384WITHRSA", "RSAWITHSHA3-384");
+          "SHA3-384WITHRSA");
       addOidNameMap(m1, m2, NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512,
-          "SHA3-512WITHRSA", "RSAWITHSHA3-512");
+          "SHA3-512WITHRSA");
 
-      addOidNameMap(m1, m2, Shake.id_RSASSA_PSS_SHAKE128,
-          "SHAKE128WITHRSAPSS", "RSAPSSWITHSHAKE128");
-      addOidNameMap(m1, m2, Shake.id_RSASSA_PSS_SHAKE256,
-          "SHAKE256WITHRSAPSS", "RSAPSSWITHSHAKE256");
+      addOidNameMap(m1, m2, Shake.id_RSASSA_PSS_SHAKE128, "SHAKE128WITHRSAPSS");
+      addOidNameMap(m1, m2, Shake.id_RSASSA_PSS_SHAKE256, "SHAKE256WITHRSAPSS");
 
-      addOidNameMap(m1, m2, GMObjectIdentifiers.sm2sign_with_sm3, "SM3WITHSM2", "SM2WITHSM3");
+      addOidNameMap(m1, m2, GMObjectIdentifiers.sm2sign_with_sm3, "SM3WITHSM2");
       addOidNameMap(m1, m2, EdECConstants.id_ED25519, EdECConstants.ED25519);
       addOidNameMap(m1, m2, EdECConstants.id_ED448, EdECConstants.ED448);
 
@@ -490,8 +460,27 @@ public class AlgorithmUtil {
       Map<String, ASN1ObjectIdentifier> nameOidMap, ASN1ObjectIdentifier oid, String... names) {
     oidNameMap.put(oid, names[0].toUpperCase());
     nameOidMap.put(oid.getId(), oid);
+
     for (String name : names) {
-      nameOidMap.put(name.toUpperCase(), oid);
+      name = name.toUpperCase();
+      nameOidMap.put(name, oid);
+
+      boolean withMinus = name.indexOf('-') != -1;
+      if (withMinus) {
+        nameOidMap.put(name.replace("-", ""), oid);
+      }
+
+      int index = name.indexOf("WITH");
+      if (index != -1) {
+        String before = name.substring(0, index);
+        String after = name.substring(index + "WITH".length());
+
+        String inverseName = after + "WITH" + before;
+        nameOidMap.put(inverseName, oid);
+        if (withMinus) {
+          nameOidMap.put(inverseName.replace("-", ""), oid);
+        }
+      }
     }
   } // method addOidNameMap
 
@@ -500,7 +489,25 @@ public class AlgorithmUtil {
     oidNameMap.put(hashAlgo.getOid(), names[0].toUpperCase());
     nameOidMap.put(hashAlgo.getOid().getId(), hashAlgo);
     for (String name : names) {
-      nameOidMap.put(name.toUpperCase(), hashAlgo);
+      name = name.toUpperCase();
+      nameOidMap.put(name, hashAlgo);
+
+      boolean withMinus = name.indexOf('-') != -1;
+      if (withMinus) {
+        nameOidMap.put(name.replace("-", ""), hashAlgo);
+      }
+
+      int index = name.indexOf("WITH");
+      if (index != -1) {
+        String before = name.substring(0, index);
+        String after = name.substring(index + "WITH".length());
+
+        String inverseName = after + "WITH" + before;
+        nameOidMap.put(inverseName, hashAlgo);
+        if (withMinus) {
+          nameOidMap.put(inverseName.replace("-", ""), hashAlgo);
+        }
+      }
     }
   } // method addHashAlgoNameMap
 
