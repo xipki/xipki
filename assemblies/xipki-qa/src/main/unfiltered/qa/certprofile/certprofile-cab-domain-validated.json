@@ -24,9 +24,9 @@
 		"SHA512withECDSA",
 		"SHA384withECDSA",
 		"SHA256withECDSA",
-		"SHA512withRSAandMGF1",
-		"SHA384withRSAandMGF1",
-		"SHA256withRSAandMGF1"
+		"SHA512withRSAPSS",
+		"SHA384withRSAPSS",
+		"SHA256withRSAPSS"
 	],
 	"keyAlgorithms":[{
 		"algorithms":[{
