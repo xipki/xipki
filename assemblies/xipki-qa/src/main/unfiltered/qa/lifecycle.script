@@ -191,21 +191,21 @@ if { $printUsage equals "true" } then {
   xi:replace --old "REPLACEME-DSAPLAIN" --new "${dsaPlain}" \
     qa/qa.d/ra.script
 
-  rsaMgf1 = ""
+  rsaPss = ""
   if { "$SIG_TYPE" equals "rsapss" } then {
-    rsaMgf1 = "--rsa-mgf1"
+    rsaPss = "--rsa-pss"
   }
 
-  xi:replace --old "REPLACEME-RSAMGF1" --new "${rsaMgf1}" \
+  xi:replace --old "REPLACEME-RSAPSS" --new "${rsaPss}" \
     qa/qa.d/ca-load.script
 
-  xi:replace --old "REPLACEME-RSAMGF1" --new "${rsaMgf1}" \
+  xi:replace --old "REPLACEME-RSAPSS" --new "${rsaPss}" \
     qa/rest.script
 
-  xi:replace --old "REPLACEME-RSAMGF1" --new "${rsaMgf1}" \
+  xi:replace --old "REPLACEME-RSAPSS" --new "${rsaPss}" \
     qa/qa.d/ca.script
 
-  xi:replace --old "REPLACEME-RSAMGF1" --new "${rsaMgf1}" \
+  xi:replace --old "REPLACEME-RSAPSS" --new "${rsaPss}" \
     qa/qa.d/ra.script
 
   gm = ""

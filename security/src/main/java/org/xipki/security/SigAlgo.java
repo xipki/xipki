@@ -462,7 +462,7 @@ public enum SigAlgo {
       AlgorithmIdentifier mgfDigestAlgId = AlgorithmIdentifier.getInstance(
           mgf.getParameters());
       if (!digestAlgId.equals(mgfDigestAlgId)) {
-        throw new NoSuchAlgorithmException("digestAlg != mgf.digestAlg");
+        throw new NoSuchAlgorithmException("digestAlg != MGF1.digestAlg");
       }
 
       if (PSSParameterSpec.TRAILER_FIELD_BC != param.getTrailerField().intValueExact()) {
@@ -471,7 +471,7 @@ public enum SigAlgo {
 
       HashAlgo hashAlgo = HashAlgo.getInstance(digestAlgId);
       if (hashAlgo == null) {
-        throw new NoSuchAlgorithmException("hash  != MGF1");
+        throw new NoSuchAlgorithmException("hash != MGF1");
       }
 
       if (hashAlgo.getLength() != param.getSaltLength().intValueExact()) {

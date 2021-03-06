@@ -87,15 +87,15 @@ if { $printUsage equals "true" } then {
   xi:copy-file -f qa/cab/template.ra.script \
     qa/cab/ra.script
 
-  rsaMgf1 = ""
+  rsaPss = ""
   if { "$SIG_TYPE" equals "rsapss" } then {
-    rsaMgf1 = "--rsa-mgf1"
+    rsaPss = "--rsa-pss"
   }
 
-  xi:replace --old "REPLACEME-RSAMGF1" --new "${rsaMgf1}" \
+  xi:replace --old "REPLACEME-RSAPSS" --new "${rsaPss}" \
     qa/cab/ca-load.script
 
-  xi:replace --old "REPLACEME-RSAMGF1" --new "${rsaMgf1}" \
+  xi:replace --old "REPLACEME-RSAPSS" --new "${rsaPss}" \
     qa/cab/ra.script
 
   source file:./qa/cab/ca-load.script

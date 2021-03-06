@@ -104,10 +104,10 @@ public class QaP11Actions {
     @Completion(Completers.HashAlgCompleter.class)
     protected String hashAlgo = "SHA256";
 
-    @Option(name = "--rsa-mgf1",
-        description = "whether to use the RSAPSS MGF1 for the POPO computation\n"
+    @Option(name = "--rsa-pss",
+        description = "whether to use the RSAPSS for the POPO computation\n"
             + "(only applied to RSA key)")
-    private Boolean rsaMgf1 = Boolean.FALSE;
+    private Boolean rsaPss = Boolean.FALSE;
 
     @Option(name = "--dsa-plain",
         description = "whether to use the Plain DSA for the POPO computation\n"
@@ -145,7 +145,7 @@ public class QaP11Actions {
 
     private SigAlgo getSignatureAlgo(PublicKey pubKey)
         throws NoSuchAlgorithmException {
-      SignatureAlgoControl algoControl = new SignatureAlgoControl(rsaMgf1, dsaPlain, gm);
+      SignatureAlgoControl algoControl = new SignatureAlgoControl(rsaPss, dsaPlain, gm);
       return SigAlgo.getInstance(pubKey, HashAlgo.getInstance(hashAlgo), algoControl);
     }
 

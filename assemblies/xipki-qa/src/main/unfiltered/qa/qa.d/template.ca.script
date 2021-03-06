@@ -62,7 +62,7 @@ ca:profile-add \
 ## Create the CSR for the command caqa:check-cert in QA
 if { $TOKEN_TYPE equals "pkcs11" } then {
   xi:csr-p11 \
-    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
     --slot $SLOT \
     --label rootca1 \
     --out output/rootca1.csr \
@@ -70,7 +70,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
     --keyusage cRLSign
 } else {
   xi:csr-p12 \
-    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
     --p12 output/rootca1.p12 \
     --password 1234 \
     --out output/rootca1.csr \
@@ -161,7 +161,7 @@ ca:careq-add \
 ## Generate keys and CSR for subca1
 if { $TOKEN_TYPE equals "pkcs11" } then {
   xi:csr-p11 \
-    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
     --slot $SLOT \
     --label subca1 \
     --outform $OUTFORM \
@@ -169,7 +169,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
     --subject "CN=subca1,O=myorg,C=DE"
 } else {
   xi:csr-p12 \
-    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
     --p12 output/subca1.p12 \
     --password 1234 \
     --outform $OUTFORM \
@@ -200,7 +200,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
 ## Generate keys and CSR for subcawithcrl1
 if { $TOKEN_TYPE equals "pkcs11" } then {
   xi:csr-p11 \
-    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
     --slot $SLOT --label subcawithcrl1 \
     --outform $OUTFORM \
     --out output/subcawithcrl1.csr \
@@ -216,7 +216,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
     --keyusage cRLSign
 } else {
   xi:csr-p12 \
-    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
     --p12 output/subcawithcrl1.p12 \
     --password 1234 \
     --outform $OUTFORM \
@@ -256,7 +256,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
 ## Generate keys and CSR for OCSPResponder
 if { $TOKEN_TYPE equals "pkcs11" } then {
   xi:csr-p11 \
-    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
     --slot $SLOT \
     --label ocsp99 \
     --outform $OUTFORM \
@@ -264,7 +264,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
     --subject "CN=ocsp99,2.5.4.97=VATDE-123456789,O=myorg,C=DE"
 } else {
   xi:csr-p12 \
-    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAMGF1 \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
     --p12 output/ocsp99.p12 \
     --password 1234 \
     --outform $OUTFORM \

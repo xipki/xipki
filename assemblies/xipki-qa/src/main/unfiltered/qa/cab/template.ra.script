@@ -15,7 +15,7 @@ xi:cmp-health --ca subca1
 
 # Certificate cab-domain-validated1
 
-xi:csr-p12 --hash $HASH REPLACEME-RSAMGF1 \
+xi:csr-p12 --hash $HASH REPLACEME-RSAPSS \
   --p12 output/cab-domain-validated1.p12 --password 1234 \
   --subject "CN=abc.domain-validated.myorg.org,C=DE" \
   --out output/cab-domain-validated1.csr
@@ -30,7 +30,7 @@ xi:update-cert-p12 --p12 output/cab-domain-validated1.p12 --password 1234 \
 
 # Certificate cab-domain-validated2 (wildcard domain)
 
-xi:csr-p12 --hash $HASH REPLACEME-RSAMGF1 \
+xi:csr-p12 --hash $HASH REPLACEME-RSAPSS \
   --p12 output/cab-domain-validated2.p12 --password 1234 \
   --subject "CN=*.domain-validated.myorg.org,C=DE" \
   --out output/cab-domain-validated2.csr
@@ -45,7 +45,7 @@ xi:update-cert-p12 --p12 output/cab-domain-validated2.p12 --password 1234 \
 
 # Certificate cab-org-validated1
 
-xi:csr-p12 --hash $HASH REPLACEME-RSAMGF1 \
+xi:csr-p12 --hash $HASH REPLACEME-RSAPSS \
   --p12 output/cab-org-validated1.p12 --password 1234 \
   --subject "CN=abc.org-validated.myorg.org,O=myorg.org,L=Frankfurt,C=DE" \
   --out output/cab-org-validated1.csr
@@ -60,7 +60,7 @@ xi:update-cert-p12 --p12 output/cab-org-validated1.p12 --password 1234 \
 
 # Certificate cab-org-validated2 (wildcard domain)
 
-xi:csr-p12 --hash $HASH REPLACEME-RSAMGF1 \
+xi:csr-p12 --hash $HASH REPLACEME-RSAPSS \
   --p12 output/cab-org-validated2.p12 --password 1234 \
   --subject "CN=*.org-validated.myorg.org,O=myorg.org,L=Frankfurt,C=DE" \
   --out output/cab-org-validated2.csr
@@ -75,7 +75,7 @@ xi:update-cert-p12 --p12 output/cab-org-validated2.p12 --password 1234 \
 
 # Certificate cab-individual-validated1
 
-xi:csr-p12 --hash $HASH REPLACEME-RSAMGF1 \
+xi:csr-p12 --hash $HASH REPLACEME-RSAPSS \
   --p12 output/cab-individual-validated1.p12 --password 1234 \
   --subject "CN=abc.individual-validated.myorg.org,givenName=alice,surName=mysurname,L=Frankfurt,C=DE" \
   --out output/cab-individual-validated1.csr
@@ -90,7 +90,7 @@ xi:update-cert-p12 --p12 output/cab-individual-validated1.p12 --password 1234 \
 
 # Certificate cab-individual-validated2 (wildcard domain)
 
-xi:csr-p12 --hash $HASH REPLACEME-RSAMGF1 \
+xi:csr-p12 --hash $HASH REPLACEME-RSAPSS \
   --p12 output/cab-individual-validated2.p12 --password 1234 \
   --subject "CN=*.individual-validated.myorg.org,givenName=alice,surName=mysurname,L=Frankfurt,C=DE" \
   --out output/cab-individual-validated2.csr

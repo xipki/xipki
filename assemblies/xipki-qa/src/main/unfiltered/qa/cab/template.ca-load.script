@@ -8,12 +8,12 @@ ca:restart
 ## Create the CSR for the command caqa:check-cert in QA
 if { $TOKEN_TYPE equals "pkcs11" } then {
   xi:csr-p11 \
-    --hash $HASH REPLACEME-RSAMGF1 \
+    --hash $HASH REPLACEME-RSAPSS \
     --slot $SLOT --label rootca1 --out output/rootca1.csr \
     --subject "CN=rootca1,O=myorg,C=DE"
 } else {
   xi:csr-p12 \
-    --hash $HASH REPLACEME-RSAMGF1 \
+    --hash $HASH REPLACEME-RSAPSS \
     --p12 output/rootca1.p12 --password 1234 \
     --out output/rootca1.csr \
     --subject "CN=rootca1,O=myorg,C=DE"
@@ -64,12 +64,12 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
 
 ## Generate keys and CSR for subca1
 if { $TOKEN_TYPE equals "pkcs11" } then {
-  xi:csr-p11 --hash $HASH REPLACEME-RSAMGF1 \
+  xi:csr-p11 --hash $HASH REPLACEME-RSAPSS \
     --slot $SLOT --label subca1 \
     --out output/subca1.csr \
     --subject "CN=subca1,O=myorg,C=DE"
 } else {
-  xi:csr-p12 --hash $HASH REPLACEME-RSAMGF1 \
+  xi:csr-p12 --hash $HASH REPLACEME-RSAPSS \
     --p12 output/subca1.p12 --password 1234 \
     --out output/subca1.csr \
     --subject "CN=subca1,O=myorg,C=DE"

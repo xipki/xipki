@@ -386,10 +386,10 @@ public class Actions {
     @Option(name = "--postalAddress", multiValued = true, description = "postal address in subject")
     private List<String> postalAddress;
 
-    @Option(name = "--rsa-mgf1",
-        description = "whether to use the RSAPSS MGF1 for the POPO computation\n"
+    @Option(name = "--rsa-pss",
+        description = "whether to use the RSAPSS for the POPO computation\n"
             + "(only applied to RSA key)")
-    private Boolean rsaMgf1 = Boolean.FALSE;
+    private Boolean rsaPss = Boolean.FALSE;
 
     @Option(name = "--dsa-plain",
         description = "whether to use the Plain DSA for the POPO computation")
@@ -629,7 +629,7 @@ public class Actions {
         extensions.add(addExt);
       }
 
-      ConcurrentContentSigner signer = getSigner(new SignatureAlgoControl(rsaMgf1, dsaPlain, gm));
+      ConcurrentContentSigner signer = getSigner(new SignatureAlgoControl(rsaPss, dsaPlain, gm));
 
       Map<ASN1ObjectIdentifier, ASN1Encodable> attributes = new HashMap<>();
       if (CollectionUtil.isNotEmpty(extensions)) {
