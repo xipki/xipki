@@ -146,8 +146,14 @@ public class RequestOption {
       hashAlgos.addAll(SUPPORTED_HASH_ALGORITHMS);
     } else {
       for (String token : conf.getHashAlgorithms()) {
-        HashAlgo algo = HashAlgo.getInstance(token);
-        if (algo != null && SUPPORTED_HASH_ALGORITHMS.contains(algo)) {
+        HashAlgo algo;
+        try {
+          algo = HashAlgo.getInstance(token);
+        } catch (NoSuchAlgorithmException ex) {
+          throw new InvalidConfException(ex.getMessage());
+        }
+
+        if (SUPPORTED_HASH_ALGORITHMS.contains(algo)) {
           hashAlgos.add(algo);
         } else {
           throw new InvalidConfException("hash algorithm " + token + " is unsupported");

@@ -34,11 +34,10 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.cms.GCMParameters;
-import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.util.Arrays;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.XiSecurityException;
 import org.xipki.util.IoUtil;
@@ -83,7 +82,7 @@ public class AESGmacContentSigner implements XiContentSigner {
 
   private final SecureRandom random;
 
-  private final ASN1ObjectIdentifier oid;
+  private final SigAlgo sigAlgo;
 
   private final Cipher cipher;
 
@@ -95,9 +94,9 @@ public class AESGmacContentSigner implements XiContentSigner {
 
   private final int nonceOffset;
 
-  public AESGmacContentSigner(ASN1ObjectIdentifier oid, SecretKey signingKey)
+  public AESGmacContentSigner(SigAlgo sigAlgo, SecretKey signingKey)
       throws XiSecurityException {
-    this.oid = notNull(oid, "oid");
+    this.sigAlgo = notNull(sigAlgo, "sigAlgo");
     this.signingKey = notNull(signingKey, "signingKey");
 
     Cipher cipher0;
@@ -117,7 +116,7 @@ public class AESGmacContentSigner implements XiContentSigner {
 
     GCMParameters params = new GCMParameters(nonce, tagByteLen);
     try {
-      this.sigAlgIdTemplate = new AlgorithmIdentifier(oid, params).getEncoded();
+      this.sigAlgIdTemplate = new AlgorithmIdentifier(sigAlgo.getOid(), params).getEncoded();
     } catch (IOException ex) {
       throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
     }
@@ -125,15 +124,15 @@ public class AESGmacContentSigner implements XiContentSigner {
 
     int keyLen = signingKey.getEncoded().length;
     if (keyLen == 16) {
-      if (!oid.equals(NISTObjectIdentifiers.id_aes128_GCM)) {
+      if (SigAlgo.GMAC_AES128 != sigAlgo) {
         throw new XiSecurityException("oid and singingKey do not match");
       }
     } else if (keyLen == 24) {
-      if (!oid.equals(NISTObjectIdentifiers.id_aes192_GCM)) {
+      if (SigAlgo.GMAC_AES192 != sigAlgo) {
         throw new XiSecurityException("oid and singingKey do not match");
       }
     } else if (keyLen == 32) {
-      if (!oid.equals(NISTObjectIdentifiers.id_aes256_GCM)) {
+      if (SigAlgo.GMAC_AES256 != sigAlgo) {
         throw new XiSecurityException("oid and singingKey do not match");
       }
     } else {
@@ -151,7 +150,7 @@ public class AESGmacContentSigner implements XiContentSigner {
   @Override
   public AlgorithmIdentifier getAlgorithmIdentifier() {
     GCMParameters params = new GCMParameters(nonce, tagByteLen);
-    return new AlgorithmIdentifier(oid, params);
+    return new AlgorithmIdentifier(sigAlgo.getOid(), params);
   }
 
   @Override

@@ -17,9 +17,7 @@
 
 package org.xipki.security.pkcs12.test;
 
-import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.xipki.security.SigAlgo;
 
 /**
  * JUnit tests to test the signature creation and verification of PKCS#12 token
@@ -42,9 +40,8 @@ public class Pkcs12SHA256withRSATest extends Pkcs12SignVerifyTest {
   }
 
   @Override
-  protected AlgorithmIdentifier getSignatureAlgorithm() {
-    return new AlgorithmIdentifier(PKCSObjectIdentifiers.sha256WithRSAEncryption,
-        DERNull.INSTANCE);
+  protected SigAlgo getSignatureAlgorithm() {
+    return SigAlgo.RSA_SHA256;
   }
 
 }

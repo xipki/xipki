@@ -19,6 +19,7 @@ package org.xipki.ca.mgmt.db.diffdb;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -314,7 +315,11 @@ class DigestDiff {
       throws DataAccessException {
     String str = datasource.getFirstValue(null, "DBSCHEMA", "VALUE2", "NAME='CERTHASH_ALGO'",
         String.class);
-    return HashAlgo.getNonNullInstance(str);
+    try {
+      return HashAlgo.getInstance(str);
+    } catch (NoSuchAlgorithmException ex) {
+      throw new IllegalArgumentException(ex);
+    }
   } // method detectOcspDbCerthashAlgo
 
 }

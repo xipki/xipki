@@ -43,10 +43,12 @@ import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
 import org.xipki.ca.api.mgmt.ScepControl;
 import org.xipki.ca.api.mgmt.ValidityMode;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
+import org.xipki.ca.api.mgmt.entry.CaEntry.CaSignerConf;
 import org.xipki.ca.server.db.CertStore;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
@@ -92,7 +94,7 @@ public class CaInfo {
 
   private DhpocControl dhpocControl;
 
-  private Map<String, ConcurrentContentSigner> signers;
+  private Map<SigAlgo, ConcurrentContentSigner> signers;
 
   private ConcurrentContentSigner dfltSigner;
 
@@ -347,14 +349,14 @@ public class CaInfo {
     return crlNumber == 0 ? null : BigInteger.valueOf(crlNumber);
   }
 
-  public ConcurrentContentSigner getSigner(List<String> algoNames) {
-    if (CollectionUtil.isEmpty(algoNames)) {
+  public ConcurrentContentSigner getSigner(List<SigAlgo> algos) {
+    if (CollectionUtil.isEmpty(algos)) {
       return dfltSigner;
     }
 
-    for (String name : algoNames) {
-      if (signers.containsKey(name)) {
-        return signers.get(name);
+    for (SigAlgo m : algos) {
+      if (signers.containsKey(m)) {
+        return signers.get(m);
       }
     }
 
@@ -368,12 +370,11 @@ public class CaInfo {
     }
     dfltSigner = null;
 
-    List<String[]> signerConfs = CaEntry.splitCaSignerConfs(caEntry.getSignerConf());
+    List<CaSignerConf> signerConfs = CaEntry.splitCaSignerConfs(caEntry.getSignerConf());
 
-    Map<String, ConcurrentContentSigner> tmpSigners = new HashMap<>();
-    for (String[] m : signerConfs) {
-      String algo = m[0];
-      SignerConf signerConf = new SignerConf(m[1]);
+    Map<SigAlgo, ConcurrentContentSigner> tmpSigners = new HashMap<>();
+    for (CaSignerConf m : signerConfs) {
+      SignerConf signerConf = new SignerConf(m.getConf());
       ConcurrentContentSigner signer;
       try {
         signer = securityFactory.createSigner(caEntry.getSignerType(), signerConf,
@@ -381,7 +382,7 @@ public class CaInfo {
         if (dfltSigner == null) {
           dfltSigner = signer;
         }
-        tmpSigners.put(algo, signer);
+        tmpSigners.put(m.getAlgo(), signer);
       } catch (Throwable th) {
         for (ConcurrentContentSigner ccs : tmpSigners.values()) {
           try {

@@ -25,11 +25,11 @@ import java.security.SecureRandom;
 import java.security.Security;
 import java.security.Signature;
 
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.pkcs12.KeypairWithCert;
 import org.xipki.security.pkcs12.P12ContentSignerBuilder;
@@ -53,7 +53,7 @@ public abstract class Pkcs12SignVerifyTest {
     }
   }
 
-  protected abstract AlgorithmIdentifier getSignatureAlgorithm();
+  protected abstract SigAlgo getSignatureAlgorithm();
 
   protected abstract String getPkcs12File();
 
@@ -101,7 +101,7 @@ public abstract class Pkcs12SignVerifyTest {
 
   protected boolean verify(byte[] data, byte[] signatureValue, X509Cert cert)
       throws Exception {
-    Signature signature = Signature.getInstance(getSignatureAlgorithm().getAlgorithm().getId());
+    Signature signature = Signature.getInstance(getSignatureAlgorithm().getJceName());
     signature.initVerify(cert.getPublicKey());
     signature.update(data);
     return signature.verify(signatureValue);

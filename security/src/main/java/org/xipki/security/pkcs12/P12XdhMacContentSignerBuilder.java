@@ -39,13 +39,12 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.pkcs.IssuerAndSerialNumber;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.operator.RuntimeOperatorException;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.DfltConcurrentContentSigner;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.ObjectIdentifiers.Xipki;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.XiSecurityException;
@@ -64,11 +63,11 @@ public class P12XdhMacContentSignerBuilder {
 
     private final int hashLen;
 
-    private XdhMacContentSigner(HashAlgo hashAlgo, AlgorithmIdentifier algorithmIdentifier,
+    private XdhMacContentSigner(SigAlgo sigAlgo,
         SecretKey signingKey, IssuerAndSerialNumber peerIssuerAndSerial)
             throws XiSecurityException {
-      super(hashAlgo, algorithmIdentifier, signingKey);
-      this.hashLen = hashAlgo.getLength();
+      super(sigAlgo, signingKey);
+      this.hashLen = sigAlgo.getHashAlgo().getLength();
 
       ASN1EncodableVector vec = new ASN1EncodableVector();
       if (peerIssuerAndSerial != null) {
@@ -115,9 +114,7 @@ public class P12XdhMacContentSignerBuilder {
 
   private SecretKey key;
 
-  private AlgorithmIdentifier algId;
-
-  private HashAlgo hash;
+  private SigAlgo algo;
 
   private IssuerAndSerialNumber peerIssuerAndSerial;
 
@@ -150,11 +147,9 @@ public class P12XdhMacContentSignerBuilder {
       throws XiSecurityException {
     String algorithm = privateKey.getAlgorithm();
     if (EdECConstants.X25519.equalsIgnoreCase(algorithm)) {
-      this.algId = new AlgorithmIdentifier(Xipki.id_alg_dhPop_x25519_sha256);
-      this.hash = HashAlgo.SHA256;
+      this.algo = SigAlgo.DHPOP_X25519_SHA256;
     } else if (EdECConstants.X448.equalsIgnoreCase(algorithm)) {
-      this.algId = new AlgorithmIdentifier(Xipki.id_alg_dhPop_x448_sha512);
-      this.hash = HashAlgo.SHA512;
+      this.algo = SigAlgo.DHPOP_X448_SHA512;
     } else {
       throw new IllegalArgumentException("unsupported key.getAlgorithm(): " + algorithm);
     }
@@ -190,10 +185,10 @@ public class P12XdhMacContentSignerBuilder {
       throw new XiSecurityException("error encoding certificate", ex);
 
     }
-    byte[] k = this.hash.hash(leadingInfo, zz, trailingInfo);
-    this.key = new SecretKeySpec(k, "HMAC-" + this.hash.getJceName());
-    this.peerIssuerAndSerial =
-        new IssuerAndSerialNumber(X500Name.getInstance(trailingInfo), peerCert.getSerialNumber());
+    byte[] k = this.algo.getHashAlgo().hash(leadingInfo, zz, trailingInfo);
+    this.key = new SecretKeySpec(k, algo.getJceName());
+    this.peerIssuerAndSerial = new IssuerAndSerialNumber(
+        X500Name.getInstance(trailingInfo), peerCert.getSerialNumber());
   } // method init
 
   public ConcurrentContentSigner createSigner(int parallelism)
@@ -203,8 +198,7 @@ public class P12XdhMacContentSignerBuilder {
     List<XiContentSigner> signers = new ArrayList<>(parallelism);
 
     for (int i = 0; i < parallelism; i++) {
-      XiContentSigner signer =
-          new XdhMacContentSigner(hash, algId, key, peerIssuerAndSerial);
+      XiContentSigner signer = new XdhMacContentSigner(algo, key, peerIssuerAndSerial);
       signers.add(signer);
     }
 

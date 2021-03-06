@@ -38,7 +38,6 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.ocsp.CertID;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.cert.ocsp.CertificateID;
@@ -51,6 +50,7 @@ import org.xipki.qa.BenchmarkHttpClient.HttpClientException;
 import org.xipki.qa.BenchmarkHttpClient.ResponseHandler;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Base64;
 import org.xipki.util.StringUtil;
@@ -79,7 +79,7 @@ class OcspBenchRequestor {
 
   private final ConcurrentHashMap<BigInteger, byte[]> requests = new ConcurrentHashMap<>();
 
-  private AlgorithmIdentifier issuerhashAlg;
+  private HashAlgo issuerhashAlg;
 
   private ASN1OctetString issuerNameHash;
 
@@ -102,24 +102,19 @@ class OcspBenchRequestor {
     notNull(responseHandler, "responseHandler");
     this.requestOptions = notNull(requestOptions, "requestOptions");
 
-    HashAlgo hashAlgo = HashAlgo.getInstance(requestOptions.getHashAlgorithmId());
-    if (hashAlgo == null) {
-      throw new OcspRequestorException("unknown HashAlgo "
-          + requestOptions.getHashAlgorithmId().getId());
-    }
+    this.issuerhashAlg = requestOptions.getHashAlgorithm();
+    this.issuerNameHash = new DEROctetString(
+        issuerhashAlg.hash(issuerCert.getSubject().getEncoded()));
+    this.issuerKeyHash = new DEROctetString(
+        issuerhashAlg.hash(issuerCert.getSubjectPublicKeyInfo().getPublicKeyData().getOctets()));
 
-    this.issuerhashAlg = hashAlgo.getAlgorithmIdentifier();
-    this.issuerNameHash = new DEROctetString(hashAlgo.hash(issuerCert.getSubject().getEncoded()));
-    this.issuerKeyHash = new DEROctetString(hashAlgo.hash(
-            issuerCert.getSubjectPublicKeyInfo().getPublicKeyData().getOctets()));
-
-    List<AlgorithmIdentifier> prefSigAlgs = requestOptions.getPreferredSignatureAlgorithms();
+    List<SigAlgo> prefSigAlgs = requestOptions.getPreferredSignatureAlgorithms();
     if (prefSigAlgs == null || prefSigAlgs.size() == 0) {
       this.extensions = null;
     } else {
       ASN1EncodableVector vec = new ASN1EncodableVector();
-      for (AlgorithmIdentifier algId : prefSigAlgs) {
-        ASN1Sequence prefSigAlgObj = new DERSequence(algId);
+      for (SigAlgo algId : prefSigAlgs) {
+        ASN1Sequence prefSigAlgObj = new DERSequence(algId.getAlgorithmIdentifier());
         vec.add(prefSigAlgObj);
       }
 
@@ -224,8 +219,8 @@ class OcspBenchRequestor {
 
     try {
       for (BigInteger serialNumber : serialNumbers) {
-        CertID certId = new CertID(issuerhashAlg, issuerNameHash, issuerKeyHash,
-            new ASN1Integer(serialNumber));
+        CertID certId = new CertID(issuerhashAlg.getAlgorithmIdentifier(),
+            issuerNameHash, issuerKeyHash, new ASN1Integer(serialNumber));
         reqBuilder.addRequest(new CertificateID(certId));
       }
 

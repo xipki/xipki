@@ -120,7 +120,7 @@ public class EmulatorP11Identity extends P11Identity {
     mechHashMap.put(PKCS11Constants.CKM_SHA3_512,   HashAlgo.SHA3_512);
     mechHashMap.put(PKCS11Constants.CKM_VENDOR_SM3, HashAlgo.SM3);
 
-    // ECDSA sign metchanisms
+    // ECDSA sign mechanisms
     mechHashMap.put(PKCS11Constants.CKM_ECDSA_SHA1,     HashAlgo.SHA1);
     mechHashMap.put(PKCS11Constants.CKM_ECDSA_SHA224,   HashAlgo.SHA224);
     mechHashMap.put(PKCS11Constants.CKM_ECDSA_SHA256,   HashAlgo.SHA256);
@@ -134,7 +134,7 @@ public class EmulatorP11Identity extends P11Identity {
     // SM2 sign mechanisms
     mechHashMap.put(PKCS11Constants.CKM_VENDOR_SM2_SM3, HashAlgo.SM3);
 
-    // DSA sign metchanisms
+    // DSA sign mechanisms
     mechHashMap.put(PKCS11Constants.CKM_DSA_SHA1,     HashAlgo.SHA1);
     mechHashMap.put(PKCS11Constants.CKM_DSA_SHA224,   HashAlgo.SHA224);
     mechHashMap.put(PKCS11Constants.CKM_DSA_SHA256,   HashAlgo.SHA256);
@@ -145,7 +145,7 @@ public class EmulatorP11Identity extends P11Identity {
     mechHashMap.put(PKCS11Constants.CKM_DSA_SHA3_384, HashAlgo.SHA3_384);
     mechHashMap.put(PKCS11Constants.CKM_DSA_SHA3_512, HashAlgo.SHA3_512);
 
-    // DSA sign metchanisms
+    // RSA PKCS#1v1.5 sign mechanisms
     mechHashMap.put(PKCS11Constants.CKM_SHA1_RSA_PKCS,       HashAlgo.SHA1);
     mechHashMap.put(PKCS11Constants.CKM_SHA224_RSA_PKCS,     HashAlgo.SHA224);
     mechHashMap.put(PKCS11Constants.CKM_SHA256_RSA_PKCS,     HashAlgo.SHA256);
@@ -155,6 +155,17 @@ public class EmulatorP11Identity extends P11Identity {
     mechHashMap.put(PKCS11Constants.CKM_SHA3_256_RSA_PKCS,   HashAlgo.SHA3_256);
     mechHashMap.put(PKCS11Constants.CKM_SHA3_384_RSA_PKCS,   HashAlgo.SHA3_384);
     mechHashMap.put(PKCS11Constants.CKM_SHA3_512_RSA_PKCS,   HashAlgo.SHA3_512);
+
+    // RSA PSS MGF1 sign mechanisms
+    mechHashMap.put(PKCS11Constants.CKM_SHA1_RSA_PKCS_PSS,     HashAlgo.SHA1);
+    mechHashMap.put(PKCS11Constants.CKM_SHA224_RSA_PKCS_PSS,   HashAlgo.SHA224);
+    mechHashMap.put(PKCS11Constants.CKM_SHA256_RSA_PKCS_PSS,   HashAlgo.SHA256);
+    mechHashMap.put(PKCS11Constants.CKM_SHA384_RSA_PKCS_PSS,   HashAlgo.SHA384);
+    mechHashMap.put(PKCS11Constants.CKM_SHA512_RSA_PKCS_PSS,   HashAlgo.SHA512);
+    mechHashMap.put(PKCS11Constants.CKM_SHA3_224_RSA_PKCS_PSS, HashAlgo.SHA3_224);
+    mechHashMap.put(PKCS11Constants.CKM_SHA3_256_RSA_PKCS_PSS, HashAlgo.SHA3_256);
+    mechHashMap.put(PKCS11Constants.CKM_SHA3_384_RSA_PKCS_PSS, HashAlgo.SHA3_384);
+    mechHashMap.put(PKCS11Constants.CKM_SHA3_512_RSA_PKCS_PSS, HashAlgo.SHA3_512);
 
     // HMAC
     mechHashMap.put(PKCS11Constants.CKM_SHA_1_HMAC,    HashAlgo.SHA1);
@@ -377,9 +388,8 @@ public class EmulatorP11Identity extends P11Identity {
     return signature;
   } // method aesGmac
 
-  private byte[] rsaPkcsPssSign(P11Params parameters, byte[] contentToSign,
-      HashAlgo hashAlgo)
-          throws P11TokenException {
+  private byte[] rsaPkcsPssSign(P11Params parameters, byte[] contentToSign, HashAlgo hashAlgo)
+      throws P11TokenException {
     if (!(parameters instanceof P11Params.P11RSAPkcsPssParams)) {
       throw new P11TokenException("the parameters is not of "
           + P11Params.P11RSAPkcsPssParams.class.getName());

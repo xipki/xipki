@@ -34,12 +34,10 @@ import java.util.List;
 
 import javax.crypto.SecretKey;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.DfltConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.KeyUtil;
@@ -97,29 +95,18 @@ public class P12MacContentSignerBuilder {
     }
   } // constructor
 
-  public ConcurrentContentSigner createSigner(AlgorithmIdentifier signatureAlgId,
+  public ConcurrentContentSigner createSigner(SigAlgo sigAlg,
       int parallelism, SecureRandom random)
           throws XiSecurityException {
-    notNull(signatureAlgId, "signatureAlgId");
+    notNull(sigAlg, "sigAlg");
     positive(parallelism, "parallelism");
 
     List<XiContentSigner> signers = new ArrayList<>(parallelism);
 
-    boolean gmac = false;
-    ASN1ObjectIdentifier oid = signatureAlgId.getAlgorithm();
-    if (oid.equals(NISTObjectIdentifiers.id_aes128_GCM)
-        || oid.equals(NISTObjectIdentifiers.id_aes192_GCM)
-        || oid.equals(NISTObjectIdentifiers.id_aes256_GCM)) {
-      gmac = true;
-    }
-
     for (int i = 0; i < parallelism; i++) {
-      XiContentSigner signer;
-      if (gmac) {
-        signer = new AESGmacContentSigner(oid, key);
-      } else {
-        signer = new HmacContentSigner(signatureAlgId, key);
-      }
+      XiContentSigner signer = sigAlg.isGmac()
+          ? new AESGmacContentSigner(sigAlg, key)
+          : new HmacContentSigner(sigAlg, key);
       signers.add(signer);
     }
 

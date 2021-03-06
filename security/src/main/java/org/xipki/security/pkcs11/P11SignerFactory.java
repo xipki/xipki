@@ -24,16 +24,15 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.SignerConf;
 import org.xipki.security.SignerFactory;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
-import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.Hex;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
@@ -156,32 +155,25 @@ public class P11SignerFactory implements SignerFactory {
     }
 
     try {
-      AlgorithmIdentifier macAlgId = null;
+      SigAlgo algo = null;
       String algoName = conf.getConfValue("algo");
       if (algoName != null) {
-        try {
-          macAlgId = AlgorithmUtil.getMacAlgId(algoName);
-        } catch (NoSuchAlgorithmException ex) {
-          // do nothing
-        }
+        algo = SigAlgo.getInstance(algoName);
       }
 
-      if (macAlgId != null) {
+      if (algo != null && algo.isMac()) {
         P11MacContentSignerBuilder signerBuilder = new P11MacContentSignerBuilder(
             p11Service, identityId);
-        return signerBuilder.createSigner(macAlgId, parallelism);
+        return signerBuilder.createSigner(algo, parallelism);
       } else {
-        AlgorithmIdentifier signatureAlgId;
-        if (conf.getHashAlgo() == null) {
-          signatureAlgId = AlgorithmUtil.getSigAlgId(null, conf);
-        } else {
+        if (algo == null) {
           PublicKey pubKey = slot.getIdentity(identityId.getKeyId()).getPublicKey();
-          signatureAlgId = AlgorithmUtil.getSigAlgId(pubKey, conf);
+          algo = SigAlgo.getInstance(pubKey, conf);
         }
 
         P11ContentSignerBuilder signerBuilder = new P11ContentSignerBuilder(p11Service,
             securityFactory, identityId, certificateChain);
-        return signerBuilder.createSigner(signatureAlgId, parallelism);
+        return signerBuilder.createSigner(algo, parallelism);
       }
     } catch (P11TokenException | NoSuchAlgorithmException | XiSecurityException ex) {
       throw new ObjectCreationException(ex.getMessage(), ex);

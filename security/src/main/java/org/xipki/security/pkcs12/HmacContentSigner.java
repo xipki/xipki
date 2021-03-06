@@ -28,10 +28,9 @@ import javax.crypto.SecretKey;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
-import org.xipki.security.HashAlgo;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.XiSecurityException;
-import org.xipki.security.util.AlgorithmUtil;
 
 /**
  * HMAC signer.
@@ -64,7 +63,7 @@ public class HmacContentSigner implements XiContentSigner {
 
   } // method HmacOutputStream
 
-  private final AlgorithmIdentifier algorithmIdentifier;
+  private final SigAlgo algorithm;
 
   private final byte[] encodedAlgorithmIdentifier;
 
@@ -74,26 +73,17 @@ public class HmacContentSigner implements XiContentSigner {
 
   private final int outLen;
 
-  public HmacContentSigner(AlgorithmIdentifier algorithmIdentifier, SecretKey signingKey)
+  public HmacContentSigner(SigAlgo algorithm, SecretKey signingKey)
       throws XiSecurityException {
-    this(null, algorithmIdentifier, signingKey);
-  }
-
-  public HmacContentSigner(HashAlgo hashAlgo, AlgorithmIdentifier algorithmIdentifier,
-      SecretKey signingKey)
-          throws XiSecurityException {
-    this.algorithmIdentifier = notNull(algorithmIdentifier, "algorithmIdentifier");
+    this.algorithm = notNull(algorithm, "algorithm");
     notNull(signingKey, "signingKey");
     try {
-      this.encodedAlgorithmIdentifier = algorithmIdentifier.getEncoded();
+      this.encodedAlgorithmIdentifier = algorithm.getAlgorithmIdentifier().getEncoded();
     } catch (IOException ex) {
       throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
     }
-    if (hashAlgo == null) {
-      hashAlgo = AlgorithmUtil.extractHashAlgoFromMacAlg(algorithmIdentifier);
-    }
 
-    this.hmac = new HMac(hashAlgo.createDigest());
+    this.hmac = new HMac(algorithm.getHashAlgo().createDigest());
     byte[] keyBytes = signingKey.getEncoded();
     this.hmac.init(new KeyParameter(keyBytes, 0, keyBytes.length));
     this.outLen = hmac.getMacSize();
@@ -102,7 +92,7 @@ public class HmacContentSigner implements XiContentSigner {
 
   @Override
   public AlgorithmIdentifier getAlgorithmIdentifier() {
-    return algorithmIdentifier;
+    return algorithm.getAlgorithmIdentifier();
   }
 
   @Override

@@ -18,9 +18,11 @@
 package org.xipki.security;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -45,18 +47,18 @@ import org.xipki.util.Args;
 
 public enum HashAlgo {
 
-  SHA1(20,     AlgorithmCode.SHA1,     "1.3.14.3.2.26", "SHA1"),
-  SHA224(28,   AlgorithmCode.SHA224,   "2.16.840.1.101.3.4.2.4",  "SHA224"),
-  SHA256(32,   AlgorithmCode.SHA256,   "2.16.840.1.101.3.4.2.1",  "SHA256"),
-  SHA384(48,   AlgorithmCode.SHA384,   "2.16.840.1.101.3.4.2.2",  "SHA384"),
-  SHA512(64,   AlgorithmCode.SHA512,   "2.16.840.1.101.3.4.2.3",  "SHA512"),
-  SHA3_224(28, AlgorithmCode.SHA3_224, "2.16.840.1.101.3.4.2.7",  "SHA3-224"),
-  SHA3_256(32, AlgorithmCode.SHA3_256, "2.16.840.1.101.3.4.2.8",  "SHA3-256"),
-  SHA3_384(48, AlgorithmCode.SHA3_384, "2.16.840.1.101.3.4.2.9",  "SHA3-384"),
-  SHA3_512(64, AlgorithmCode.SHA3_512, "2.16.840.1.101.3.4.2.10", "SHA3-512"),
-  SM3(32,      AlgorithmCode.SM3,      "1.2.156.10197.1.401",     "SM3"),
-  SHAKE128(32, AlgorithmCode.SHAKE128, Shake.id_shake128.getId(), "SHAKE128-256"),
-  SHAKE256(64, AlgorithmCode.SHAKE256, Shake.id_shake256.getId(), "SHAKE256-512");
+  SHA1(20,     "1.3.14.3.2.26", "SHA1"),
+  SHA224(28,   "2.16.840.1.101.3.4.2.4",  "SHA224"),
+  SHA256(32,   "2.16.840.1.101.3.4.2.1",  "SHA256"),
+  SHA384(48,   "2.16.840.1.101.3.4.2.2",  "SHA384"),
+  SHA512(64,   "2.16.840.1.101.3.4.2.3",  "SHA512"),
+  SHA3_224(28, "2.16.840.1.101.3.4.2.7",  "SHA3-224"),
+  SHA3_256(32, "2.16.840.1.101.3.4.2.8",  "SHA3-256"),
+  SHA3_384(48, "2.16.840.1.101.3.4.2.9",  "SHA3-384"),
+  SHA3_512(64, "2.16.840.1.101.3.4.2.10", "SHA3-512"),
+  SM3(32,      "1.2.156.10197.1.401",     "SM3"),
+  SHAKE128(32, Shake.id_shake128.getId(), "SHAKE128-256"),
+  SHAKE256(64, Shake.id_shake256.getId(), "SHAKE256-512");
 
   private static final Map<String, HashAlgo> map = new HashMap<>();
 
@@ -67,8 +69,6 @@ public enum HashAlgo {
   private final AlgorithmIdentifier algId;
 
   private final String jceName;
-
-  private final AlgorithmCode algorithmCode;
 
   private final byte[] encoded;
 
@@ -91,9 +91,8 @@ public enum HashAlgo {
     map.put("SHAKE256", SHAKE256);
   }
 
-  private HashAlgo(int length, AlgorithmCode algorithmCode, String oid, String jceName) {
+  private HashAlgo(int length, String oid, String jceName) {
     this.length = length;
-    this.algorithmCode = algorithmCode;
     this.oid = new ASN1ObjectIdentifier(oid).intern();
     if (this.oid.equals(Shake.id_shake128) || this.oid.equals(Shake.id_shake256)) {
       this.algId = new AlgorithmIdentifier(this.oid);
@@ -113,10 +112,6 @@ public enum HashAlgo {
     return length;
   }
 
-  public AlgorithmCode getAlgorithmCode() {
-    return algorithmCode;
-  }
-
   public ASN1ObjectIdentifier getOid() {
     return oid;
   }
@@ -125,41 +120,54 @@ public enum HashAlgo {
     return jceName;
   }
 
-  public static HashAlgo getInstance(ASN1ObjectIdentifier oid) {
+  public boolean isShake() {
+    switch (this) {
+      case SHAKE128:
+      case SHAKE256:
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  public static HashAlgo getInstance(AlgorithmIdentifier id)
+      throws NoSuchAlgorithmException {
+    Args.notNull(id, "id");
+    ASN1Encodable params = id.getParameters();
+    if (params != null && !DERNull.INSTANCE.equals(params)) {
+      throw new NoSuchAlgorithmException("params is present but is not NULL");
+    }
+
+    return getInstance(id.getAlgorithm());
+  }
+
+  public static HashAlgo getInstance(ASN1ObjectIdentifier oid)
+      throws NoSuchAlgorithmException {
     Args.notNull(oid, "oid");
     for (HashAlgo hashAlgo : values()) {
       if (hashAlgo.oid.equals(oid)) {
         return hashAlgo;
       }
     }
-    return null;
+    throw new NoSuchAlgorithmException("Unknown HashAlgo OID '" + oid.getId() + "'");
   }
 
-  public static HashAlgo getInstance(String nameOrOid) {
-    return map.get(nameOrOid.toUpperCase());
-  }
-
-  public static HashAlgo getNonNullInstance(ASN1ObjectIdentifier oid) {
-    HashAlgo type = getInstance(oid);
-    if (type == null) {
-      throw new IllegalArgumentException("Unknown HashAlgo OID '" + oid.getId() + "'");
+  public static HashAlgo getInstance(String nameOrOid)
+      throws NoSuchAlgorithmException {
+    HashAlgo alg = map.get(nameOrOid.toUpperCase());
+    if (alg == null) {
+      throw new NoSuchAlgorithmException("Found no HashAlgo for name/OID '" + nameOrOid + "'");
     }
-    return type;
+    return alg;
   }
 
-  public static HashAlgo getNonNullInstance(String nameOrOid) {
-    HashAlgo type = getInstance(nameOrOid);
-    if (type == null) {
-      throw new IllegalArgumentException("Unknown HashAlgo OID/name '" + nameOrOid + "'");
-    }
-    return type;
-  }
-
-  public static HashAlgo getInstanceForEncoded(byte[] encoded) {
+  public static HashAlgo getInstanceForEncoded(byte[] encoded)
+      throws NoSuchAlgorithmException {
     return getInstanceForEncoded(encoded, 0, encoded.length);
   }
 
-  public static HashAlgo getInstanceForEncoded(byte[] encoded, int offset, int len) {
+  public static HashAlgo getInstanceForEncoded(byte[] encoded, int offset, int len)
+      throws NoSuchAlgorithmException {
     for (HashAlgo value : values()) {
       byte[] ve = value.encoded;
       if (ve.length != len) {
@@ -178,7 +186,7 @@ public enum HashAlgo {
         return value;
       }
     }
-    return null;
+    throw new NoSuchAlgorithmException("Found no HashAlgo for encoded");
   }
 
   public AlgorithmIdentifier getAlgorithmIdentifier() {

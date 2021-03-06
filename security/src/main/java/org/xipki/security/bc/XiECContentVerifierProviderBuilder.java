@@ -17,7 +17,8 @@
 
 package org.xipki.security.bc;
 
-import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
+import java.security.NoSuchAlgorithmException;
+
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.Signer;
 import org.bouncycastle.crypto.signers.DSADigestSigner;
@@ -28,7 +29,7 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcECContentVerifierProviderBuilder;
 import org.xipki.security.DSAPlainDigestSigner;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.security.SigAlgo;
 
 /**
  * Extends {@link BcECContentVerifierProviderBuilder} to support the signature algorithms
@@ -51,26 +52,22 @@ public class XiECContentVerifierProviderBuilder extends BcECContentVerifierProvi
   @Override
   protected Signer createSigner(AlgorithmIdentifier sigAlgId)
       throws OperatorCreationException {
-    AlgorithmIdentifier digAlg = digestAlgorithmFinder.find(sigAlgId);
-    HashAlgo hashAlgo = HashAlgo.getInstance(digAlg.getAlgorithm());
+    SigAlgo sigAlgo;
+    try {
+      sigAlgo = SigAlgo.getInstance(sigAlgId);
+    } catch (NoSuchAlgorithmException ex) {
+      throw new OperatorCreationException(ex.getMessage(), ex);
+    }
 
-    boolean plainDsa = AlgorithmUtil.isPlainECDSASigAlg(sigAlgId);
+    HashAlgo hashAlgo = sigAlgo.getHashAlgo();
 
-    if (plainDsa) {
+    if (SigAlgo.SM2_SM3 == sigAlgo) {
+      return new SM2Signer();
+    } else if (sigAlgo.isPlainECDSASigAlgo()) {
       return new DSAPlainDigestSigner(new ECDSASigner(), hashAlgo.createDigest());
+    } else {
+      return new DSADigestSigner(new ECDSASigner(), hashAlgo.createDigest());
     }
-
-    boolean sm2 = AlgorithmUtil.isSM2SigAlg(sigAlgId);
-    if (sm2) {
-      if (GMObjectIdentifiers.sm3.equals(digAlg.getAlgorithm())) {
-        return new SM2Signer();
-      } else {
-        throw new OperatorCreationException("cannot create SM2 signer for hash algorithm "
-            + digAlg.getAlgorithm().getId());
-      }
-    }
-
-    return new DSADigestSigner(new ECDSASigner(), hashAlgo.createDigest());
   } // method createSigner
 
 }

@@ -30,11 +30,9 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolver;
-import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.concurrent.ConcurrentBag;
@@ -58,15 +56,13 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
 
   private final String name;
 
-  private final String algorithmName;
+  private final SigAlgo algorithm;
 
   private final boolean mac;
 
   private byte[] sha1OfMacKey;
 
   private final Key signingKey;
-
-  private final AlgorithmCode algorithmCode;
 
   private PublicKey publicKey;
 
@@ -98,9 +94,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
     notEmpty(signers, "signers");
 
     this.mac = mac;
-    AlgorithmIdentifier algorithmIdentifier = signers.get(0).getAlgorithmIdentifier();
-    this.algorithmName = AlgorithmUtil.getSigOrMacAlgoName(algorithmIdentifier);
-    this.algorithmCode = AlgorithmUtil.getSigOrMacAlgoCode(algorithmIdentifier);
+    this.algorithm = SigAlgo.getInstance(signers.get(0).getAlgorithmIdentifier());
 
     for (XiContentSigner signer : signers) {
       this.signers.add(new ConcurrentBagEntrySigner(signer));
@@ -136,8 +130,8 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
   }
 
   @Override
-  public AlgorithmCode getAlgorithmCode() {
-    return algorithmCode;
+  public SigAlgo getAlgorithm() {
+    return algorithm;
   }
 
   @Override
@@ -230,11 +224,6 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
         requiteSigner(signer);
       }
     }
-  }
-
-  @Override
-  public String getAlgorithmName() {
-    return algorithmName;
   }
 
   @Override

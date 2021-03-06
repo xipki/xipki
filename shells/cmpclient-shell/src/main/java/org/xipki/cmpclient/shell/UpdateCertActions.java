@@ -200,7 +200,7 @@ public class UpdateCertActions {
         }
 
         SignerConf signerConf = getPkcs11SignerConf(moduleName, slotIndex, keyLabel,
-            keyIdBytes, HashAlgo.getInstance(hashAlgo), getSignatureAlgoControl());
+            keyIdBytes, getHashAlgo(hashAlgo), getSignatureAlgoControl());
         signer = securityFactory.createSigner("PKCS11", signerConf, (X509Cert[]) null);
       }
       return signer;
@@ -270,7 +270,7 @@ public class UpdateCertActions {
         conf.putPair("parallelism", Integer.toString(1));
         conf.putPair("keystore", "file:" + p12File);
         SignerConf signerConf = new SignerConf(conf.getEncoded(),
-            HashAlgo.getNonNullInstance(hashAlgo), getSignatureAlgoControl());
+            getHashAlgo(hashAlgo), getSignatureAlgoControl());
         signer = securityFactory.createSigner("PKCS12", signerConf, (X509Cert[]) null);
       }
       return signer;

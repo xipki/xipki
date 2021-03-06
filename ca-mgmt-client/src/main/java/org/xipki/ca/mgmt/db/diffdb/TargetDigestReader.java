@@ -19,6 +19,7 @@ package org.xipki.ca.mgmt.db.diffdb;
 
 import java.io.Closeable;
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -187,7 +188,14 @@ class TargetDigestReader implements Closeable {
     if (dbType == DbType.XIPKI_OCSP_v4) {
       String certHashAlgoInDb = datasource.getFirstValue(
           null, "DBSCHEMA", "VALUE2", "NAME='CERTHASH_ALGO'", String.class);
-      if (certHashAlgo != HashAlgo.getInstance(certHashAlgoInDb)) {
+      HashAlgo ha;
+      try {
+        ha = HashAlgo.getInstance(certHashAlgoInDb);
+      } catch (NoSuchAlgorithmException ex) {
+        throw new IllegalArgumentException(ex);
+      }
+
+      if (certHashAlgo != ha) {
         throw new IllegalArgumentException("certHashAlgo in parameter (" + certHashAlgo
             + ") != in DB (" + certHashAlgoInDb + ")");
       }

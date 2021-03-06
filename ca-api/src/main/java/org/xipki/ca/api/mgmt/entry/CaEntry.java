@@ -38,9 +38,9 @@ import org.xipki.ca.api.mgmt.ValidityMode;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
-import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
@@ -56,6 +56,27 @@ import org.xipki.util.Validity;
  */
 
 public class CaEntry extends MgmtEntry {
+
+  public static class CaSignerConf {
+
+    private final SigAlgo algo;
+
+    private final String conf;
+
+    private CaSignerConf(SigAlgo algo, String conf) {
+      this.algo = algo;
+      this.conf = conf;
+    }
+
+    public SigAlgo getAlgo() {
+      return algo;
+    }
+
+    public String getConf() {
+      return conf;
+    }
+
+  }
 
   private NameId ident;
 
@@ -142,7 +163,7 @@ public class CaEntry extends MgmtEntry {
     this.caUris = (caUris == null) ? CaUris.EMPTY_INSTANCE : caUris;
   } // constructor Ca
 
-  public static List<String[]> splitCaSignerConfs(String conf)
+  public static List<CaSignerConf> splitCaSignerConfs(String conf)
       throws XiSecurityException {
     ConfPairs pairs = new ConfPairs(conf);
     String str = pairs.value("algo");
@@ -155,16 +176,16 @@ public class CaEntry extends MgmtEntry {
       throw new XiSecurityException("empty algo is defined in CA signerConf");
     }
 
-    List<String[]> signerConfs = new ArrayList<>(list.size());
+    List<CaSignerConf> signerConfs = new ArrayList<>(list.size());
     for (String n : list) {
-      String c14nAlgo;
+      SigAlgo sigAlgo;
       try {
-        c14nAlgo = AlgorithmUtil.canonicalizeSignatureAlgo(n);
+        sigAlgo = SigAlgo.getInstance(n);
       } catch (NoSuchAlgorithmException ex) {
         throw new XiSecurityException(ex.getMessage(), ex);
       }
-      pairs.putPair("algo", c14nAlgo);
-      signerConfs.add(new String[]{c14nAlgo, pairs.getEncoded()});
+      pairs.putPair("algo", sigAlgo.getJceName());
+      signerConfs.add(new CaSignerConf(sigAlgo, pairs.getEncoded()));
     }
 
     return signerConfs;

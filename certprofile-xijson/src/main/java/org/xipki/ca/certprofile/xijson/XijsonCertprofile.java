@@ -90,7 +90,7 @@ import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
-import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
@@ -125,7 +125,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   private NotBeforeOption notBeforeOption;
 
-  private List<String> signatureAlgorithms;
+  private List<SigAlgo> signatureAlgorithms;
 
   private SubjectControl subjectControl;
 
@@ -197,10 +197,10 @@ public class XijsonCertprofile extends BaseCertprofile {
 
     if (conf.getSignatureAlgorithms() != null) {
       List<String> algoNames = conf.getSignatureAlgorithms();
-      List<String> list = new ArrayList<>(algoNames.size());
+      List<SigAlgo> list = new ArrayList<>(algoNames.size());
       for (String algoName : algoNames) {
         try {
-          list.add(AlgorithmUtil.canonicalizeSignatureAlgo(algoName));
+          list.add(SigAlgo.getInstance(algoName));
         } catch (NoSuchAlgorithmException ex) {
           throw new CertprofileException(ex.getMessage(), ex);
         }
@@ -837,19 +837,20 @@ public class XijsonCertprofile extends BaseCertprofile {
               "biometricInfo[" + i + "].typeOfBiometricData is not permitted");
         }
 
-        ASN1ObjectIdentifier hashAlgo = bd.getHashAlgorithm().getAlgorithm();
+        HashAlgo hashAlgo;
+        try {
+          hashAlgo = HashAlgo.getInstance(bd.getHashAlgorithm());
+        } catch (NoSuchAlgorithmException ex) {
+          throw new CertprofileException(
+              "biometricInfo[" + i + "].hashAlgorithm: " + ex.getMessage());
+        }
+
         if (!biometricInfo.isHashAlgorithmPermitted(hashAlgo)) {
           throw new BadCertTemplateException(
               "biometricInfo[" + i + "].hashAlgorithm is not permitted");
         }
 
-        int expHashValueSize;
-        try {
-          expHashValueSize = AlgorithmUtil.getHashOutputSizeInOctets(hashAlgo);
-        } catch (NoSuchAlgorithmException ex) {
-          throw new CertprofileException("should not happen, unknown hash algorithm " + hashAlgo);
-        }
-
+        int expHashValueSize = hashAlgo.getLength();
         byte[] hashValue = bd.getBiometricDataHash().getOctets();
         if (hashValue.length != expHashValueSize) {
           throw new BadCertTemplateException(
@@ -873,7 +874,7 @@ public class XijsonCertprofile extends BaseCertprofile {
             throw new BadCertTemplateException("could not reach here, unknown tripleState");
         }
 
-        AlgorithmIdentifier newHashAlg = HashAlgo.getInstance(hashAlgo).getAlgorithmIdentifier();
+        AlgorithmIdentifier newHashAlg = hashAlgo.getAlgorithmIdentifier();
         BiometricData newBiometricData = new BiometricData(bdType, newHashAlg,
             new DEROctetString(hashValue), sourceDataUri);
         vec.add(newBiometricData);
@@ -1163,7 +1164,7 @@ public class XijsonCertprofile extends BaseCertprofile {
   }
 
   @Override
-  public List<String> getSignatureAlgorithms() {
+  public List<SigAlgo> getSignatureAlgorithms() {
     return signatureAlgorithms;
   }
 

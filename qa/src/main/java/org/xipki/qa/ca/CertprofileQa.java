@@ -55,8 +55,8 @@ import org.xipki.qa.ValidationIssue;
 import org.xipki.qa.ValidationResult;
 import org.xipki.qa.ca.extn.ExtensionsChecker;
 import org.xipki.qa.ca.extn.QaExtensionValue;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.X509Cert;
-import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.InvalidConfException;
@@ -173,7 +173,7 @@ public class CertprofileQa {
     }
 
     // signatureAlgorithm
-    List<String> signatureAlgorithms = certprofile.getSignatureAlgorithms();
+    List<SigAlgo> signatureAlgorithms = certprofile.getSignatureAlgorithms();
     if (CollectionUtil.isNotEmpty(signatureAlgorithms)) {
       issue = new ValidationIssue("X509.SIGALG", "signature algorithm");
       resultIssues.add(issue);
@@ -186,19 +186,10 @@ public class CertprofileQa {
       }
 
       try {
-
-        String sigAlgo = AlgorithmUtil.getSignatureAlgoName(sigAlgId);
         if (!issue.isFailed()) {
+          SigAlgo sigAlgo = SigAlgo.getInstance(sigAlgId);
           if (!signatureAlgorithms.contains(sigAlgo)) {
             issue.setFailureMessage("signatureAlgorithm '" + sigAlgo + "' is not allowed");
-          }
-        }
-
-        // check parameters
-        if (!issue.isFailed()) {
-          AlgorithmIdentifier expSigAlgId = AlgorithmUtil.getSigAlgId(sigAlgo);
-          if (!expSigAlgId.equals(sigAlgId)) {
-            issue.setFailureMessage("invalid parameters");
           }
         }
       } catch (NoSuchAlgorithmException ex) {

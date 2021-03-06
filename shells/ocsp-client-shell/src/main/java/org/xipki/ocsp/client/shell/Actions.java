@@ -21,6 +21,7 @@ import java.io.File;
 import java.math.BigInteger;
 import java.net.URL;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.cert.CertificateEncodingException;
@@ -75,8 +76,8 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.IssuerHash;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.X509Cert;
-import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
@@ -326,9 +327,7 @@ public class Actions {
         debug = new ReqRespDebug(saveReq, saveResp);
       }
 
-      IssuerHash issuerHash = new IssuerHash(
-          HashAlgo.getNonNullInstance(options.getHashAlgorithmId()),
-          issuerCert);
+      IssuerHash issuerHash = new IssuerHash(options.getHashAlgorithm(), issuerCert);
       OCSPResp response;
       try {
         response = requestor.ask(issuerCert, sns.toArray(new BigInteger[0]), serverUrlObj,
@@ -443,12 +442,17 @@ public class Actions {
         options.setNonceLen(nonceLen);
       }
       options.setAllowNoNonceInResponse(allowNoNonceInResponse.booleanValue());
-      options.setHashAlgorithmId(AlgorithmUtil.getHashAlg(hashAlgo));
+      options.setHashAlgorithm(HashAlgo.getInstance(hashAlgo));
       options.setSignRequest(signRequest.booleanValue());
       options.setUseHttpGetForRequest(useHttpGetForSmallRequest.booleanValue());
 
       if (isNotEmpty(prefSigAlgs)) {
-        options.setPreferredSignatureAlgorithms(prefSigAlgs.toArray(new String[0]));
+        SigAlgo[] algos = new SigAlgo[prefSigAlgs.size()];
+        for (int i = 0; i < algos.length; i++) {
+          algos[i] = SigAlgo.getInstance(prefSigAlgs.get(i));
+        }
+
+        options.setPreferredSignatureAlgorithms(algos);
       }
       return options;
     } // method getRequestOptions
@@ -633,7 +637,7 @@ public class Actions {
         StringBuilder msg = new StringBuilder();
 
         CertificateID certId = singleResp.getCertID();
-        HashAlgo hashAlgo = HashAlgo.getNonNullInstance(certId.getHashAlgOID());
+        HashAlgo hashAlgo = HashAlgo.getInstance(certId.getHashAlgOID());
         boolean issuerMatch = issuerHash.match(hashAlgo, certId.getIssuerNameHash(),
             certId.getIssuerKeyHash());
         BigInteger serialNumber = certId.getSerialNumber();
@@ -683,8 +687,10 @@ public class Actions {
           if (sigAlg == null) {
             msg.append(("\nresponse is not signed"));
           } else {
-            String sigAlgName = AlgorithmUtil.getSignatureAlgoName(sigAlg);
-            if (sigAlgName == null) {
+            String sigAlgName;
+            try {
+              sigAlgName = SigAlgo.getInstance(sigAlg).getJceName();
+            } catch (NoSuchAlgorithmException ex) {
               sigAlgName = "unknown";
             }
             msg.append("\nresponse is signed with ").append(sigAlgName);

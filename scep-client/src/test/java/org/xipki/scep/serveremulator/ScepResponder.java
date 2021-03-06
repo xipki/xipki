@@ -17,6 +17,7 @@
 
 package org.xipki.scep.serveremulator;
 
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.util.Date;
 import java.util.HashSet;
@@ -128,7 +129,7 @@ public class ScepResponder {
   }
 
   public ContentInfo servicePkiOperation(CMSSignedData requestContent, AuditEvent event)
-      throws MessageDecodingException, CaException {
+      throws MessageDecodingException, CaException, NoSuchAlgorithmException {
     Args.notNull(requestContent, "requestContent");
     PrivateKey recipientKey = (raEmulator != null) ? raEmulator.getRaKey() : caEmulator.getCaKey();
     X509Cert recipientCert =
@@ -179,7 +180,7 @@ public class ScepResponder {
   }
 
   private PkiMessage servicePkiOperation0(DecodedPkiMessage req, AuditEvent event)
-      throws MessageDecodingException, CaException {
+      throws MessageDecodingException, CaException, NoSuchAlgorithmException {
     TransactionId tid = req.getTransactionId();
     PkiMessage rep = new PkiMessage(tid, MessageType.CertRep, Nonce.randomNonce());
     rep.setPkiStatus(PkiStatus.SUCCESS);

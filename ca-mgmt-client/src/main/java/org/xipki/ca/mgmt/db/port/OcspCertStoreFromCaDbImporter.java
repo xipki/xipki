@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -489,7 +490,11 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
           "Column with NAME='CERTHASH_ALGO' is not defined in table DBSCHEMA");
     }
 
-    return HashAlgo.getNonNullInstance(certHashAlgoStr);
+    try {
+      return HashAlgo.getInstance(certHashAlgoStr);
+    } catch (NoSuchAlgorithmException ex) {
+      throw new IllegalArgumentException(ex);
+    }
   } // method getCertHashAlgo
 
 }

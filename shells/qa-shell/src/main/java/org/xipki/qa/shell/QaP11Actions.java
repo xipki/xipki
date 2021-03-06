@@ -32,14 +32,14 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.jcajce.spec.SM2ParameterSpec;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.SignatureAlgoControl;
+import org.xipki.security.bc.XiProvider;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.security.pkcs11.provider.XiPkcs11Provider;
 import org.xipki.security.pkcs11.provider.XiSM2ParameterSpec;
-import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.shell.Completers;
 import org.xipki.shell.DynamicEnumCompleter;
 import org.xipki.shell.IllegalCmdParamException;
@@ -124,9 +124,9 @@ public class QaP11Actions {
         throws Exception {
       PublicKey pubKey = cert.getPublicKey();
 
-      String sigAlgo = getSignatureAlgo(pubKey);
+      SigAlgo sigAlgo = getSignatureAlgo(pubKey);
       println("signature algorithm: " + sigAlgo);
-      Signature sig = Signature.getInstance(sigAlgo);
+      Signature sig = Signature.getInstance(sigAlgo.getJceName());
       sig.initSign(key);
 
       byte[] data = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
@@ -134,7 +134,8 @@ public class QaP11Actions {
       byte[] signature = sig.sign(); // CHECKSTYLE:SKIP
       println("signature created successfully");
 
-      Signature ver = Signature.getInstance(sigAlgo, "BC");
+      String provName = sigAlgo.getHashAlgo().isShake() ? XiProvider.PROVIDER_NAME : "BC";
+      Signature ver = Signature.getInstance(sigAlgo.getJceName(), provName);
       ver.initVerify(pubKey);
       ver.update(data);
       boolean valid = ver.verify(signature);
@@ -142,12 +143,10 @@ public class QaP11Actions {
       return null;
     } // method execute0
 
-    private String getSignatureAlgo(PublicKey pubKey)
+    private SigAlgo getSignatureAlgo(PublicKey pubKey)
         throws NoSuchAlgorithmException {
       SignatureAlgoControl algoControl = new SignatureAlgoControl(rsaMgf1, dsaPlain, gm);
-      AlgorithmIdentifier sigAlgId = AlgorithmUtil.getSigAlgId(pubKey,
-          HashAlgo.getNonNullInstance(hashAlgo), algoControl);
-      return AlgorithmUtil.getSignatureAlgoName(sigAlgId);
+      return SigAlgo.getInstance(pubKey, HashAlgo.getInstance(hashAlgo), algoControl);
     }
 
   } // class P11provTest

@@ -40,6 +40,7 @@ import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.entry.AddUserEntry;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
+import org.xipki.ca.api.mgmt.entry.CaEntry.CaSignerConf;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.CaHasUserEntry;
 import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
@@ -435,9 +436,9 @@ public class CaConf {
               // extract from the signer configuration
               ConcurrentContentSigner signer;
               try {
-                List<String[]> signerConfs = CaEntry.splitCaSignerConfs(
+                List<CaSignerConf> signerConfs = CaEntry.splitCaSignerConfs(
                     getValue(ci.getSignerConf(), zipEntries));
-                SignerConf signerConf = new SignerConf(signerConfs.get(0)[1]);
+                SignerConf signerConf = new SignerConf(signerConfs.get(0).getConf());
 
                 signer = securityFactory.createSigner(expandConf(ci.getSignerType()), signerConf,
                     (X509Cert) null);

@@ -121,14 +121,14 @@ import org.xipki.security.AlgorithmValidator;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.EdECConstants;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
-import org.xipki.security.ObjectIdentifiers.Xipki;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.cmp.CmpUtil;
 import org.xipki.security.cmp.ProtectionResult;
 import org.xipki.security.cmp.ProtectionVerificationResult;
-import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.HealthCheckResult;
@@ -699,15 +699,27 @@ abstract class BaseCmpResponder {
     if (protectedMsg.hasPasswordBasedMacProtection()) {
       PBMParameter parameter =
           PBMParameter.getInstance(pkiMessage.getHeader().getProtectionAlg().getParameters());
-      AlgorithmIdentifier algId = parameter.getOwf();
-      if (!cmpControl.isRequestPbmOwfPermitted(algId)) {
-        LOG.warn("MAC_ALGO_FORBIDDEN (PBMParameter.owf: {})", algId.getAlgorithm().getId());
+      HashAlgo owfAlg;
+      try {
+        owfAlg = HashAlgo.getInstance(parameter.getOwf());
+      } catch (NoSuchAlgorithmException ex) {
+        LogUtil.warn(LOG, ex);
+        return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
+      }
+      if (!cmpControl.isRequestPbmOwfPermitted(owfAlg)) {
+        LOG.warn("MAC_ALGO_FORBIDDEN (PBMParameter.owf: {})", owfAlg.getJceName());
         return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
       }
 
-      algId = parameter.getMac();
-      if (!cmpControl.isRequestPbmMacPermitted(algId)) {
-        LOG.warn("MAC_ALGO_FORBIDDEN (PBMParameter.mac: {})", algId.getAlgorithm().getId());
+      SigAlgo macAlg;
+      try {
+        macAlg = SigAlgo.getInstance(parameter.getMac());
+      } catch (NoSuchAlgorithmException ex) {
+        LogUtil.warn(LOG, ex);
+        return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
+      }
+      if (!cmpControl.isRequestPbmMacPermitted(macAlg)) {
+        LOG.warn("MAC_ALGO_FORBIDDEN (PBMParameter.mac: {})", macAlg.getJceName());
         return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
       }
 
@@ -770,8 +782,10 @@ abstract class BaseCmpResponder {
             control.isSendResponderCert());
       }
 
-      PBMParameter parameter = new PBMParameter(randomSalt(), control.getResponsePbmOwf(),
-          control.getResponsePbmIterationCount(), control.getResponsePbmMac());
+      PBMParameter parameter = new PBMParameter(randomSalt(),
+          control.getResponsePbmOwf().getAlgorithmIdentifier(),
+          control.getResponsePbmIterationCount(),
+          control.getResponsePbmMac().getAlgorithmIdentifier());
       return CmpUtil.addProtection(pkiMessage, requestor.getPassword(), parameter,
           getSender(), requestor.getKeyId());
     } catch (Exception ex) {
@@ -938,28 +952,26 @@ abstract class BaseCmpResponder {
     // check the POP signature algorithm
     ProofOfPossession pop = certRequest.toASN1Structure().getPopo();
     POPOSigningKey popoSign = POPOSigningKey.getInstance(pop.getObject());
-    AlgorithmIdentifier popoAlgId = popoSign.getAlgorithmIdentifier();
+    SigAlgo popoAlg;
+    try {
+      popoAlg = SigAlgo.getInstance(popoSign.getAlgorithmIdentifier());
+    } catch (NoSuchAlgorithmException ex) {
+      LogUtil.error(LOG, ex, "Cannot parse POPO signature algorithm");
+      return false;
+    }
+
     AlgorithmValidator algoValidator = getCmpControl().getPopoAlgoValidator();
-    if (!algoValidator.isAlgorithmPermitted(popoAlgId)) {
-      String algoName;
-      try {
-        algoName = AlgorithmUtil.getSignatureAlgoName(popoAlgId);
-      } catch (NoSuchAlgorithmException ex) {
-        algoName = popoAlgId.getAlgorithm().getId();
-      }
-      LOG.error("POPO signature algorithm {} not permitted", algoName);
+    if (!algoValidator.isAlgorithmPermitted(popoAlg)) {
+      LOG.error("POPO signature algorithm {} not permitted", popoAlg.getJceName());
       return false;
     }
 
     try {
       PublicKey publicKey = securityFactory.generatePublicKey(spki);
-      ASN1ObjectIdentifier algOid = popoAlgId.getAlgorithm();
-
       DhpocControl dhpocControl = getCa().getCaInfo().getDhpocControl();
 
       DHSigStaticKeyCertPair kaKeyAndCert = null;
-      if (Xipki.id_alg_dhPop_x25519_sha256.equals(algOid)
-          || Xipki.id_alg_dhPop_x448_sha512.equals(algOid)) {
+      if (SigAlgo.DHPOP_X25519_SHA256 == popoAlg || SigAlgo.DHPOP_X448_SHA512 == popoAlg) {
         if (dhpocControl != null) {
           DhSigStatic dhSigStatic = DhSigStatic.getInstance(popoSign.getSignature().getBytes());
           IssuerAndSerialNumber isn = dhSigStatic.getIssuerAndSerial();

@@ -17,12 +17,6 @@
 
 package org.xipki.security.pkcs11;
 
-import java.math.BigInteger;
-
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.xipki.security.HashAlgo;
 
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
@@ -81,92 +75,48 @@ public interface P11Params {
       this.saltLength = saltLength;
     }
 
-    public P11RSAPkcsPssParams(RSASSAPSSparams asn1Params) {
-      ASN1ObjectIdentifier asn1Oid = asn1Params.getHashAlgorithm().getAlgorithm();
-      HashAlgo contentHashAlgo = HashAlgo.getInstance(asn1Oid);
-      if (contentHashAlgo == null) {
-        throw new IllegalArgumentException("unsupported hash algorithm " + asn1Oid.getId());
-      }
+    public P11RSAPkcsPssParams(HashAlgo hashAlgo) {
+      this.saltLength = hashAlgo.getLength();
 
-      AlgorithmIdentifier mga = asn1Params.getMaskGenAlgorithm();
-      asn1Oid = mga.getAlgorithm();
-      if (!PKCSObjectIdentifiers.id_mgf1.equals(asn1Oid)) {
-        throw new IllegalArgumentException("unsupported MGF algorithm " + asn1Oid.getId());
-      }
-
-      asn1Oid = AlgorithmIdentifier.getInstance(mga.getParameters()).getAlgorithm();
-      HashAlgo mgfHashAlgo = HashAlgo.getInstance(asn1Oid);
-      if (mgfHashAlgo == null) {
-        throw new IllegalArgumentException("unsupported MGF hash algorithm " + asn1Oid.getId());
-      }
-      this.saltLength = asn1Params.getSaltLength().longValue();
-      BigInteger trailerField = asn1Params.getTrailerField();
-      if (!RSASSAPSSparams.DEFAULT_TRAILER_FIELD.getValue().equals(trailerField)) {
-        throw new IllegalArgumentException("unsupported trailerField " + trailerField);
-      }
-
-      switch (contentHashAlgo) {
+      switch (hashAlgo) {
         case SHA1:
           this.hashAlgorithm = PKCS11Constants.CKM_SHA_1;
-          break;
-        case SHA224:
-          this.hashAlgorithm = PKCS11Constants.CKM_SHA224;
-          break;
-        case SHA256:
-          this.hashAlgorithm = PKCS11Constants.CKM_SHA256;
-          break;
-        case SHA384:
-          this.hashAlgorithm = PKCS11Constants.CKM_SHA384;
-          break;
-        case SHA512:
-          this.hashAlgorithm = PKCS11Constants.CKM_SHA512;
-          break;
-        case SHA3_224:
-          this.hashAlgorithm = PKCS11Constants.CKM_SHA3_224;
-          break;
-        case SHA3_256:
-          this.hashAlgorithm = PKCS11Constants.CKM_SHA3_256;
-          break;
-        case SHA3_384:
-          this.hashAlgorithm = PKCS11Constants.CKM_SHA3_384;
-          break;
-        case SHA3_512:
-          this.hashAlgorithm = PKCS11Constants.CKM_SHA3_512;
-          break;
-        default:
-          throw new IllegalStateException("should not reach here");
-      }
-
-      switch (mgfHashAlgo) {
-        case SHA1:
           this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA1;
           break;
         case SHA224:
+          this.hashAlgorithm = PKCS11Constants.CKM_SHA224;
           this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA224;
           break;
         case SHA256:
+          this.hashAlgorithm = PKCS11Constants.CKM_SHA256;
           this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA256;
           break;
         case SHA384:
+          this.hashAlgorithm = PKCS11Constants.CKM_SHA384;
           this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA384;
           break;
         case SHA512:
+          this.hashAlgorithm = PKCS11Constants.CKM_SHA512;
           this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA512;
           break;
         case SHA3_224:
+          this.hashAlgorithm = PKCS11Constants.CKM_SHA3_224;
           this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA3_224;
           break;
         case SHA3_256:
+          this.hashAlgorithm = PKCS11Constants.CKM_SHA3_256;
           this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA3_256;
           break;
         case SHA3_384:
+          this.hashAlgorithm = PKCS11Constants.CKM_SHA3_384;
           this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA3_384;
           break;
         case SHA3_512:
+          this.hashAlgorithm = PKCS11Constants.CKM_SHA3_512;
           this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA3_512;
           break;
         default:
-          throw new IllegalStateException("should not reach here");
+          throw new IllegalStateException("unsupported Hash algorithm " + hashAlgo);
       }
     }
 

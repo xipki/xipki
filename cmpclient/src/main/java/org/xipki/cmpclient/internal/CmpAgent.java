@@ -82,7 +82,6 @@ import org.bouncycastle.asn1.crmf.CertReqMsg;
 import org.bouncycastle.asn1.crmf.CertTemplateBuilder;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralName;
@@ -97,7 +96,6 @@ import org.bouncycastle.cert.crmf.PKMACBuilder;
 import org.bouncycastle.cert.crmf.jcajce.JcePKMACValuesCalculator;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.DigestCalculatorProvider;
-import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,9 +106,11 @@ import org.xipki.cmpclient.RevokeCertRequest;
 import org.xipki.cmpclient.UnrevokeOrRemoveCertRequest;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.CrlReason;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityConstants;
 import org.xipki.security.XiSecurityException;
@@ -119,7 +119,6 @@ import org.xipki.security.cmp.CmpUtil;
 import org.xipki.security.cmp.ProtectionResult;
 import org.xipki.security.cmp.ProtectionVerificationResult;
 import org.xipki.security.cmp.VerifiedPkiMessage;
-import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.DateUtil;
 import org.xipki.util.Hex;
@@ -367,7 +366,7 @@ class CmpAgent {
         ProtectionVerificationResult verifyProtection = verifyProtection(
             Hex.encode(tid.getOctets()), response);
         ret.setProtectionVerificationResult(verifyProtection);
-      } catch (InvalidKeyException | OperatorCreationException | CMPException ex) {
+      } catch (InvalidKeyException | CMPException ex) {
         throw new CmpClientException(ex.getMessage(), ex);
       }
     } else if (requestor.signRequest()) {
@@ -452,7 +451,7 @@ class CmpAgent {
   }
 
   private ProtectionVerificationResult verifyProtection(String tid, GeneralPKIMessage pkiMessage)
-      throws CMPException, InvalidKeyException, OperatorCreationException {
+      throws CMPException, InvalidKeyException {
     ProtectedPKIMessage protectedMsg = new ProtectedPKIMessage(pkiMessage);
 
     PKIHeader header = protectedMsg.getHeader();
@@ -467,15 +466,29 @@ class CmpAgent {
       Responder.PbmMacCmpResponder macResponder = (Responder.PbmMacCmpResponder) responder;
       PBMParameter parameter =
           PBMParameter.getInstance(pkiMessage.getHeader().getProtectionAlg().getParameters());
-      AlgorithmIdentifier algId = parameter.getOwf();
-      if (!macResponder.isPbmOwfPermitted(algId)) {
-        LOG.warn("MAC_ALGO_FORBIDDEN (PBMParameter.owf: {})", algId.getAlgorithm().getId());
+      HashAlgo owf;
+      try {
+        owf = HashAlgo.getInstance(parameter.getOwf());
+      } catch (NoSuchAlgorithmException ex) {
+        LOG.warn("MAC_ALGO_FORBIDDEN (PBMParameter.owf)", ex);
         return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
       }
 
-      algId = parameter.getMac();
-      if (!macResponder.isPbmMacPermitted(algId)) {
-        LOG.warn("MAC_ALGO_FORBIDDEN (PBMParameter.mac: {})", algId.getAlgorithm().getId());
+      if (!macResponder.isPbmOwfPermitted(owf)) {
+        LOG.warn("MAC_ALGO_FORBIDDEN (PBMParameter.owf: {})", owf);
+        return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
+      }
+
+      SigAlgo mac;
+      try {
+        mac = SigAlgo.getInstance(parameter.getMac());
+      } catch (NoSuchAlgorithmException ex) {
+        LOG.warn("MAC_ALGO_FORBIDDEN (PBMParameter.mac)", ex);
+        return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
+      }
+
+      if (!macResponder.isPbmMacPermitted(mac)) {
+        LOG.warn("MAC_ALGO_FORBIDDEN (PBMParameter.mac: {})", mac);
         return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
       }
 
@@ -507,18 +520,18 @@ class CmpAgent {
         }
       }
 
-      Responder.SignaturetCmpResponder sigResponder =
-          (Responder.SignaturetCmpResponder) responder;
-      AlgorithmIdentifier protectionAlgo = protectedMsg.getHeader().getProtectionAlg();
+      Responder.SignaturetCmpResponder sigResponder = (Responder.SignaturetCmpResponder) responder;
+      SigAlgo protectionAlgo;
+      try {
+        protectionAlgo = SigAlgo.getInstance(protectedMsg.getHeader().getProtectionAlg());
+      } catch (NoSuchAlgorithmException ex) {
+        LOG.warn("tid={}: unknown response protection algorithm: {}", tid, ex.getMessage());
+        return new ProtectionVerificationResult(null, ProtectionResult.SIGNATURE_INVALID);
+      }
+
       if (!sigResponder.getSigAlgoValidator().isAlgorithmPermitted(protectionAlgo)) {
-        String algoName;
-        try {
-          algoName = AlgorithmUtil.getSignatureAlgoName(protectionAlgo);
-        } catch (NoSuchAlgorithmException ex) {
-          algoName = protectionAlgo.getAlgorithm().getId();
-        }
         LOG.warn("tid={}: response protected by untrusted protection algorithm '{}'",
-            tid, algoName);
+            tid, protectionAlgo.getJceName());
         return new ProtectionVerificationResult(null, ProtectionResult.SIGNATURE_INVALID);
       }
 

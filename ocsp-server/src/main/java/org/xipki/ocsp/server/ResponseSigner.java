@@ -20,21 +20,21 @@ package org.xipki.ocsp.server;
 import static org.xipki.util.Args.notEmpty;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.ocsp.server.type.ResponderID;
 import org.xipki.ocsp.server.type.TaggedCertSequence;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.X509Cert;
 
 /**
@@ -46,7 +46,7 @@ import org.xipki.security.X509Cert;
 
 class ResponseSigner {
 
-  private final Map<String, ConcurrentContentSigner> algoSignerMap;
+  private final Map<SigAlgo, ConcurrentContentSigner> algoSignerMap;
 
   private final List<ConcurrentContentSigner> signers;
 
@@ -115,8 +115,8 @@ class ResponseSigner {
 
     algoSignerMap = new HashMap<>();
     for (ConcurrentContentSigner signer : signers) {
-      String algoName = signer.getAlgorithmName();
-      algoSignerMap.put(algoName, signer);
+      SigAlgo algo = signer.getAlgorithm();
+      algoSignerMap.put(algo, signer);
     }
   } // constructor
 
@@ -135,11 +135,30 @@ class ResponseSigner {
     }
 
     for (AlgorithmIdentifier sigAlgId : prefSigAlgs) {
-      String algoName = getSignatureAlgorithmName(sigAlgId);
-      if (algoSignerMap.containsKey(algoName)) {
-        return algoSignerMap.get(algoName);
+      if (sigAlgId.getAlgorithm().equals(PKCSObjectIdentifiers.id_RSASSA_PSS)) {
+        // return any RSAPSS with MGF1 algorithms
+        ASN1Encodable params = sigAlgId.getParameters();
+        if (params == null) {
+          for (SigAlgo m : algoSignerMap.keySet()) {
+            if (m.isRSAPSSMGF1SigAlgo()) {
+              return algoSignerMap.get(m);
+            }
+          }
+        }
+      }
+
+      SigAlgo algo;
+      try {
+        algo = SigAlgo.getInstance(sigAlgId);
+      } catch (NoSuchAlgorithmException ex) {
+        continue;
+      }
+
+      if (algoSignerMap.containsKey(algo)) {
+        return algoSignerMap.get(algo);
       }
     }
+
     return null;
   }
 
@@ -171,18 +190,6 @@ class ResponseSigner {
     }
 
     return true;
-  }
-
-  private static String getSignatureAlgorithmName(AlgorithmIdentifier sigAlgId) {
-    ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
-    if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid)) {
-      return algOid.getId();
-    }
-
-    ASN1Encodable asn1Encodable = sigAlgId.getParameters();
-    RSASSAPSSparams param = RSASSAPSSparams.getInstance(asn1Encodable);
-    ASN1ObjectIdentifier digestAlgOid = param.getHashAlgorithm().getAlgorithm();
-    return digestAlgOid.getId() + "WITHRSAANDMGF1";
   }
 
 }

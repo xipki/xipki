@@ -39,7 +39,6 @@ import org.bouncycastle.asn1.isismtt.ocsp.CertHash;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.ocsp.ResponderID;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.ocsp.BasicOCSPResp;
@@ -59,8 +58,8 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.IssuerHash;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.X509Cert;
-import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.DateUtil;
@@ -199,14 +198,13 @@ public class OcspQa {
       issue = new ValidationIssue("OCSP.SIG.ALG", "signature algorithm");
       resultIssues.add(issue);
 
-      String expectedSigalgo = responseOption.getSignatureAlgName();
+      SigAlgo expectedSigalgo = responseOption.getSignatureAlg();
       if (expectedSigalgo != null) {
-        AlgorithmIdentifier sigAlg = basicResp.getSignatureAlgorithmID();
         try {
-          String sigAlgName = AlgorithmUtil.getSignatureAlgoName(sigAlg);
-          if (!AlgorithmUtil.equalsAlgoName(sigAlgName, expectedSigalgo)) {
-            issue.setFailureMessage("is '" + sigAlgName + "', but expected '"
-                + expectedSigalgo + "'");
+          SigAlgo sigAlgo = SigAlgo.getInstance(basicResp.getSignatureAlgorithmID());
+          if (sigAlgo != expectedSigalgo) {
+            issue.setFailureMessage("is '" + sigAlgo.getJceName() + "', but expected '"
+                + expectedSigalgo.getJceName() + "'");
           }
         } catch (NoSuchAlgorithmException ex) {
           issue.setFailureMessage("could not extract the signature algorithm");
@@ -325,7 +323,7 @@ public class OcspQa {
 
       List<ValidationIssue> issues = checkSingleCert(i, singleResp, issuerHash, expectedStatus,
           encodedCert, expectedRevTime, extendedRevoke, responseOption.getNextUpdateOccurrence(),
-          responseOption.getCerthashOccurrence(), responseOption.getCerthashAlgId());
+          responseOption.getCerthashOccurrence(), responseOption.getCerthashAlg());
       resultIssues.addAll(issues);
     } // end for
 
@@ -335,7 +333,7 @@ public class OcspQa {
   private List<ValidationIssue> checkSingleCert(int index, SingleResp singleResp,
       IssuerHash issuerHash, OcspCertStatus expectedStatus, byte[] encodedCert,
       Date expectedRevTime, boolean extendedRevoke, TripleState nextupdateOccurrence,
-      TripleState certhashOccurrence, ASN1ObjectIdentifier certhashAlg) {
+      TripleState certhashOccurrence, HashAlgo certhashAlg) {
     if (expectedStatus == OcspCertStatus.unknown
         || expectedStatus == OcspCertStatus.issuerUnknown) {
       certhashOccurrence = TripleState.forbidden;
@@ -349,13 +347,13 @@ public class OcspQa {
     issues.add(issue);
 
     CertificateID certId = singleResp.getCertID();
-    HashAlgo hashAlgo = HashAlgo.getInstance(certId.getHashAlgOID());
-    if (hashAlgo == null) {
-      issue.setFailureMessage("unknown hash algorithm " + certId.getHashAlgOID().getId());
-    } else {
+    try {
+      HashAlgo hashAlgo = HashAlgo.getInstance(certId.getHashAlgOID());
       if (!issuerHash.match(hashAlgo, certId.getIssuerNameHash(), certId.getIssuerKeyHash())) {
         issue.setFailureMessage("issuer not match");
       }
+    } catch (NoSuchAlgorithmException ex) {
+      issue.setFailureMessage("unknown hash algorithm " + certId.getHashAlgOID().getId());
     }
 
     // status
@@ -460,10 +458,13 @@ public class OcspQa {
         issue = new ValidationIssue("OCSP.RESPONSE." + index + ".CHASH.ALG", "certhash algorithm");
         issues.add(issue);
 
-        ASN1ObjectIdentifier is = certHash.getHashAlgorithm().getAlgorithm();
-        if (!certhashAlg.equals(is)) {
-          issue.setFailureMessage("is '" + is.getId() + "', but expected '" + certhashAlg.getId()
-              + "'");
+        try {
+          HashAlgo is = HashAlgo.getInstance(certHash.getHashAlgorithm());
+          if (is != certhashAlg) {
+            issue.setFailureMessage("is '" + is + "', but expected '" + certhashAlg + "'");
+          }
+        } catch (NoSuchAlgorithmException ex) {
+          issue.setFailureMessage(ex.getMessage());
         }
       }
 

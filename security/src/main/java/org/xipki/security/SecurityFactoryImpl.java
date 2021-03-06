@@ -46,7 +46,6 @@ import org.bouncycastle.pkcs.PKCSException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolver;
-import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.SignerUtil;
 import org.xipki.util.LogUtil;
@@ -136,7 +135,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
       if (!algoValidator.isAlgorithmPermitted(algId)) {
         String algoName;
         try {
-          algoName = AlgorithmUtil.getSignatureAlgoName(algId);
+          algoName = SigAlgo.getInstance(algId).getJceName();
         } catch (NoSuchAlgorithmException ex) {
           algoName = algId.getAlgorithm().getId();
         }
@@ -297,9 +296,9 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
       return;
     }
 
-    String signatureAlgoName = signer.getAlgorithmName();
-
     try {
+      String signatureAlgoName = signer.getAlgorithm().getJceName();
+
       byte[] dummyContent = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
       Signature verifier;
       try {

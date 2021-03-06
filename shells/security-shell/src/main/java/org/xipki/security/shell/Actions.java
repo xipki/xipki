@@ -68,7 +68,6 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
@@ -95,12 +94,12 @@ import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Xipki;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.X509Cert;
 import org.xipki.security.X509ExtensionType;
 import org.xipki.security.X509ExtensionType.ExtensionsType;
 import org.xipki.security.XiSecurityException;
-import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.Completers;
@@ -582,9 +581,9 @@ public class Actions {
             ? new TypeOfBiometricData(Integer.parseInt(biometricType))
             : new TypeOfBiometricData(new ASN1ObjectIdentifier(biometricType));
 
-        ASN1ObjectIdentifier tmpBiometricHashAlgo = AlgorithmUtil.getHashAlg(biometricHashAlgo);
+        HashAlgo tmpBiometricHashAlgo = HashAlgo.getInstance(biometricHashAlgo);
         byte[] biometricBytes = IoUtil.read(biometricFile);
-        MessageDigest md = MessageDigest.getInstance(tmpBiometricHashAlgo.getId());
+        MessageDigest md = MessageDigest.getInstance(tmpBiometricHashAlgo.getJceName());
         md.reset();
         byte[] tmpBiometricDataHash = md.digest(biometricBytes);
 
@@ -593,7 +592,7 @@ public class Actions {
           tmpSourceDataUri = new DERIA5String(biometricUri);
         }
         BiometricData biometricData = new BiometricData(tmpBiometricType,
-            new AlgorithmIdentifier(tmpBiometricHashAlgo),
+            tmpBiometricHashAlgo.getAlgorithmIdentifier(),
             new DEROctetString(tmpBiometricDataHash), tmpSourceDataUri);
 
         ASN1EncodableVector vec = new ASN1EncodableVector();
@@ -857,10 +856,10 @@ public class Actions {
 
       }
 
-      String sigAlgo = AlgorithmUtil.getSignatureAlgoName(csr.getSignatureAlgorithm());
       boolean bo = securityFactory.verifyPopo(csr, null, peerKeyAndCert);
       String txt = bo ? "valid" : "invalid";
-      println("The POP is " + txt + " (signature algorithm " + sigAlgo + ").");
+      SigAlgo sigAlgo = SigAlgo.getInstance(csr.getSignatureAlgorithm());
+      println("The POP is " + txt + " (signature algorithm " + sigAlgo.getJceName() + ").");
       return null;
     }
 

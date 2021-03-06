@@ -42,7 +42,6 @@ import org.bouncycastle.asn1.ocsp.CertID;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.ocsp.OCSPRequest;
 import org.bouncycastle.asn1.ocsp.Request;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
@@ -58,6 +57,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
@@ -312,12 +312,8 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
   private OCSPRequest buildRequest(X509Cert caCert, BigInteger[] serialNumbers,
       byte[] nonce, RequestOptions requestOptions)
           throws OcspRequestorException {
-    HashAlgo hashAlgo = HashAlgo.getInstance(requestOptions.getHashAlgorithmId());
-    if (hashAlgo == null) {
-      throw new OcspRequestorException("unknown HashAlgo "
-          + requestOptions.getHashAlgorithmId().getId());
-    }
-    List<AlgorithmIdentifier> prefSigAlgs = requestOptions.getPreferredSignatureAlgorithms();
+    HashAlgo hashAlgo = requestOptions.getHashAlgorithm();
+    List<SigAlgo> prefSigAlgs = requestOptions.getPreferredSignatureAlgorithms();
 
     XiOCSPReqBuilder reqBuilder = new XiOCSPReqBuilder();
     List<Extension> extensions = new LinkedList<>();
@@ -328,8 +324,8 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
 
     if (prefSigAlgs != null && prefSigAlgs.size() > 0) {
       ASN1EncodableVector vec = new ASN1EncodableVector();
-      for (AlgorithmIdentifier algId : prefSigAlgs) {
-        vec.add(new DERSequence(algId));
+      for (SigAlgo algId : prefSigAlgs) {
+        vec.add(new DERSequence(algId.getAlgorithmIdentifier()));
       }
 
       ASN1Sequence extnValue = new DERSequence(vec);

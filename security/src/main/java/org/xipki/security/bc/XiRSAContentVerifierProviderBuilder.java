@@ -17,6 +17,8 @@
 
 package org.xipki.security.bc;
 
+import java.security.NoSuchAlgorithmException;
+
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.Signer;
 import org.bouncycastle.crypto.signers.RSADigestSigner;
@@ -24,8 +26,8 @@ import org.bouncycastle.operator.DigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcECContentVerifierProviderBuilder;
 import org.bouncycastle.operator.bc.BcRSAContentVerifierProviderBuilder;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.XiSecurityException;
-import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.SignerUtil;
 
 /**
@@ -48,9 +50,16 @@ public class XiRSAContentVerifierProviderBuilder extends BcRSAContentVerifierPro
   @Override
   protected Signer createSigner(AlgorithmIdentifier sigAlgId)
       throws OperatorCreationException {
-    if (AlgorithmUtil.isRSAPSSSigAlgId(sigAlgId)) {
+    SigAlgo sigAlgo;
+    try {
+      sigAlgo = SigAlgo.getInstance(sigAlgId);
+    } catch (NoSuchAlgorithmException ex) {
+      throw new OperatorCreationException(ex.getMessage(), ex);
+    }
+
+    if (sigAlgo.isRSAPSSSigAlgo()) {
       try {
-        return SignerUtil.createPSSRSASigner(sigAlgId);
+        return SignerUtil.createPSSRSASigner(sigAlgo);
       } catch (XiSecurityException ex) {
         throw new OperatorCreationException(ex.getMessage(), ex);
       }

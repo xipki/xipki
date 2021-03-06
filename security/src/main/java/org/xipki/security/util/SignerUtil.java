@@ -23,7 +23,6 @@ import static org.xipki.util.Args.range;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.interfaces.RSAPrivateCrtKey;
@@ -34,12 +33,8 @@ import java.util.Map;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.AsymmetricBlockCipher;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.Signer;
@@ -56,7 +51,7 @@ import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
 import org.bouncycastle.operator.bc.BcDSAContentVerifierProviderBuilder;
 import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.ObjectIdentifiers.Shake;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.bc.ShakePSSSigner;
 import org.xipki.security.bc.XiECContentVerifierProviderBuilder;
@@ -118,62 +113,35 @@ public class SignerUtil {
   }
 
   // CHECKSTYLE:SKIP
-  public static Signer createPSSRSASigner(AlgorithmIdentifier sigAlgId)
+  public static Signer createPSSRSASigner(SigAlgo sigAlg)
       throws XiSecurityException {
-    return createPSSRSASigner(sigAlgId, null);
+    return createPSSRSASigner(sigAlg, null);
   }
 
   // CHECKSTYLE:SKIP
-  public static Signer createPSSRSASigner(AlgorithmIdentifier sigAlgId,
-      AsymmetricBlockCipher cipher)
-          throws XiSecurityException {
-    notNull(sigAlgId, "sigAlgId");
-    ASN1ObjectIdentifier oid = sigAlgId.getAlgorithm();
+  public static Signer createPSSRSASigner(SigAlgo sigAlg, AsymmetricBlockCipher cipher)
+      throws XiSecurityException {
+    notNull(sigAlg, "sigAlg");
+    if (!sigAlg.isRSAPSSSigAlgo()) {
+      throw new XiSecurityException(sigAlg + " is not an RSAPSS algorithm");
+    }
+
+    HashAlgo hashAlgo = sigAlg.getHashAlgo();
 
     AsymmetricBlockCipher tmpCipher = (cipher == null) ? new RSABlindedEngine() : cipher;
 
-    if (Shake.id_RSASSA_PSS_SHAKE128.equals(oid)
-        || Shake.id_RSASSA_PSS_SHAKE256.equals(oid)) {
-      XiShakeDigest dig;
-      if (Shake.id_RSASSA_PSS_SHAKE128.equals(oid)) {
-        dig = (XiShakeDigest) HashAlgo.SHAKE128.createDigest();
-      } else {
-        dig = (XiShakeDigest) HashAlgo.SHAKE256.createDigest();
-      }
+    if (hashAlgo.isShake()) {
+      return new ShakePSSSigner(tmpCipher, (XiShakeDigest) hashAlgo.createDigest());
+    } else if (sigAlg.isRSAPSSSigAlgo()) {
+      Digest dig = hashAlgo.createDigest();
+      Digest mgfDig = hashAlgo.createDigest();
 
-      return new ShakePSSSigner(tmpCipher, dig);
-    } else if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(oid)) {
-      AlgorithmIdentifier digAlgId;
-      try {
-        digAlgId = AlgorithmUtil.extractDigesetAlgFromSigAlg(sigAlgId);
-      } catch (NoSuchAlgorithmException ex) {
-        throw new XiSecurityException(ex.getMessage(), ex);
-      }
-
-      RSASSAPSSparams param = RSASSAPSSparams.getInstance(sigAlgId.getParameters());
-
-      AlgorithmIdentifier mfgDigAlgId = AlgorithmIdentifier.getInstance(
-          param.getMaskGenAlgorithm().getParameters());
-
-      Digest dig = getDigest(digAlgId);
-      Digest mgfDig = getDigest(mfgDigAlgId);
-
-      int saltSize = param.getSaltLength().intValue();
-      int trailerField = param.getTrailerField().intValue();
-      return new PSSSigner(tmpCipher, dig, mgfDig, saltSize, getTrailer(trailerField));
+      return new PSSSigner(tmpCipher, dig, mgfDig, hashAlgo.getLength(),
+          org.bouncycastle.crypto.signers.PSSSigner.TRAILER_IMPLICIT);
     } else {
-      throw new XiSecurityException("signature algorithm " + oid
-          + " is not allowed");
+      throw new XiSecurityException("signature algorithm " + sigAlg + " is not allowed");
     }
   } // method createPSSRSASigner
-
-  private static byte getTrailer(int trailerField) {
-    if (trailerField == 1) {
-      return org.bouncycastle.crypto.signers.PSSSigner.TRAILER_IMPLICIT;
-    }
-
-    throw new IllegalArgumentException("unknown trailer field");
-  }
 
   // CHECKSTYLE:SKIP
   public static byte[] EMSA_PKCS1_v1_5_encoding(byte[] hashValue, int modulusBigLength,
@@ -416,21 +384,6 @@ public class SignerUtil {
       System.arraycopy(bytes, bytes.length - length, dest, destPos, length);
     }
   } // method bigIntToBytes
-
-  private static Digest getDigest(AlgorithmIdentifier hashAlgId)
-      throws XiSecurityException {
-    return getDigest(hashAlgId.getAlgorithm());
-  }
-
-  private static Digest getDigest(ASN1ObjectIdentifier hashAlgOid)
-      throws XiSecurityException {
-    HashAlgo hat = HashAlgo.getInstance(hashAlgOid);
-    if (hat != null) {
-      return hat.createDigest();
-    } else {
-      throw new XiSecurityException("could not get digest for " + hashAlgOid.getId());
-    }
-  }
 
   public static byte[] getDigestPkcsPrefix(HashAlgo hashAlgo) {
     byte[] bytes = digestPkcsPrefix.get(hashAlgo);

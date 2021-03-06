@@ -17,7 +17,6 @@
 
 package org.xipki.ca.server;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -35,7 +34,6 @@ import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x509.AccessDescription;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.CertificatePolicies;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
@@ -74,7 +72,7 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.BaseRequirements;
 import org.xipki.security.ObjectIdentifiers.DN;
 import org.xipki.security.ObjectIdentifiers.XKU;
-import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.security.SigAlgo;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.Validity;
 import org.xipki.util.Validity.Unit;
@@ -488,22 +486,16 @@ class CertprofileUtil {
     }
 
     // Signature/hash algorithm
-    List<String> sigAlgos = certprofile.getSignatureAlgorithms();
+    List<SigAlgo> sigAlgos = certprofile.getSignatureAlgorithms();
     if (sigAlgos == null) {
       msg.append("signature algorithms not defined, ");
     } else {
       List<HashAlgo> allowedHashAlgos =
           Arrays.asList(HashAlgo.SHA256, HashAlgo.SHA384, HashAlgo.SHA512);
-      for (String m : sigAlgos) {
-        try {
-          AlgorithmIdentifier sigAlgId = AlgorithmUtil.getSigAlgId(m);
-          AlgorithmIdentifier digestAlgId = AlgorithmUtil.extractDigesetAlgFromSigAlg(sigAlgId);
-          HashAlgo hashAlgo = HashAlgo.getNonNullInstance(digestAlgId.getAlgorithm());
-          if (!allowedHashAlgos.contains(hashAlgo)) {
-            msg.append("unpermitted hash algorithm ").append(hashAlgo).append(", ");
-          }
-        } catch (IllegalArgumentException | NoSuchAlgorithmException ex) {
-          msg.append("unknown signature algorithm ").append(m).append(", ");
+      for (SigAlgo sigAlgo : sigAlgos) {
+        HashAlgo hashAlgo = sigAlgo.getHashAlgo();
+        if (!allowedHashAlgos.contains(hashAlgo)) {
+          msg.append("unpermitted hash algorithm ").append(hashAlgo).append(", ");
         }
       }
     }

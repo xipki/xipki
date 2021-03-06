@@ -30,14 +30,12 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.crypto.Signer;
 import org.bouncycastle.crypto.params.ParametersWithRandom;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
-import org.xipki.security.ObjectIdentifiers.Shake;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.SignerUtil;
 
@@ -55,10 +53,9 @@ public class ShakePSSSignatureSpi
   private Signer signer;
 
   // care - this constructor is actually used by outside organisations
-  protected ShakePSSSignatureSpi(
-      ASN1ObjectIdentifier algOid) {
+  protected ShakePSSSignatureSpi(SigAlgo sigAlgo) {
     try {
-      this.signer = SignerUtil.createPSSRSASigner(new AlgorithmIdentifier(algOid));
+      this.signer = SignerUtil.createPSSRSASigner(sigAlgo);
     } catch (XiSecurityException ex) {
       throw new IllegalStateException("ShakePSSSignatureSpi.<cinit>", ex);
     }
@@ -171,13 +168,13 @@ public class ShakePSSSignatureSpi
 
   static public class SHAKE128 extends ShakePSSSignatureSpi {
     public SHAKE128() {
-      super(Shake.id_RSASSA_PSS_SHAKE128);
+      super(SigAlgo.RSAPSS_SHAKE128);
     }
   }
 
   static public class SHAKE256 extends ShakePSSSignatureSpi {
     public SHAKE256() {
-      super(Shake.id_RSASSA_PSS_SHAKE256);
+      super(SigAlgo.RSAPSS_SHAKE128);
     }
   }
 }

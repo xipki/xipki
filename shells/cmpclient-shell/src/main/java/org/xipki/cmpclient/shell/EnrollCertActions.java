@@ -21,7 +21,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyStore;
-import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
@@ -58,7 +57,6 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
@@ -88,7 +86,6 @@ import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
 import org.xipki.security.X509ExtensionType;
 import org.xipki.security.X509ExtensionType.ExtensionsType;
-import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
@@ -319,7 +316,7 @@ public class EnrollCertActions {
         }
 
         SignerConf signerConf = getPkcs11SignerConf(moduleName, slotIndex, keyLabel,
-            keyIdBytes, HashAlgo.getInstance(hashAlgo), getSignatureAlgoControl());
+            keyIdBytes, getHashAlgo(hashAlgo), getSignatureAlgoControl());
         signer = securityFactory.createSigner("PKCS11", signerConf, (X509Cert[]) null);
       }
       return signer;
@@ -389,7 +386,7 @@ public class EnrollCertActions {
         conf.putPair("parallelism", Integer.toString(1));
         conf.putPair("keystore", "file:" + p12File);
         SignerConf signerConf = new SignerConf(conf.getEncoded(),
-            HashAlgo.getNonNullInstance(hashAlgo), getSignatureAlgoControl());
+            getHashAlgo(hashAlgo), getSignatureAlgoControl());
 
         String caName = getCaName().toLowerCase();
         List<X509Cert> peerCerts = client.getDhPocPeerCertificates(caName);
@@ -645,18 +642,16 @@ public class EnrollCertActions {
             ? new TypeOfBiometricData(Integer.parseInt(biometricType))
             : new TypeOfBiometricData(new ASN1ObjectIdentifier(biometricType));
 
-        ASN1ObjectIdentifier objBiometricHashAlgo = AlgorithmUtil.getHashAlg(biometricHashAlgo);
+        HashAlgo objBiometricHashAlgo = getHashAlgo(biometricHashAlgo);
         byte[] biometricBytes = IoUtil.read(biometricFile);
-        MessageDigest md = MessageDigest.getInstance(objBiometricHashAlgo.getId());
-        md.reset();
-        byte[] biometricDataHash = md.digest(biometricBytes);
+        byte[] biometricDataHash = objBiometricHashAlgo.hash(biometricBytes);
 
         DERIA5String sourceDataUri = null;
         if (biometricUri != null) {
           sourceDataUri = new DERIA5String(biometricUri);
         }
         BiometricData biometricData = new BiometricData(objBiometricType,
-            new AlgorithmIdentifier(objBiometricHashAlgo),
+            objBiometricHashAlgo.getAlgorithmIdentifier(),
             new DEROctetString(biometricDataHash), sourceDataUri);
 
         ASN1EncodableVector vec = new ASN1EncodableVector();

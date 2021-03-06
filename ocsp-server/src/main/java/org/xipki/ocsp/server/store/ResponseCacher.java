@@ -46,8 +46,8 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.ocsp.api.OcspRespWithCacheInfo;
 import org.xipki.ocsp.api.OcspRespWithCacheInfo.ResponseCacheInfo;
 import org.xipki.ocsp.api.RequestIssuer;
-import org.xipki.security.AlgorithmCode;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
@@ -282,7 +282,7 @@ public class ResponseCacher implements Closeable {
   } // method storeIssuer
 
   public OcspRespWithCacheInfo getOcspResponse(int issuerId, BigInteger serialNumber,
-      AlgorithmCode sigAlg)
+      SigAlgo sigAlg)
           throws DataAccessException {
     final String sql = sqlSelectOcsp;
     byte[] identBytes = buildIdent(serialNumber, sigAlg);
@@ -334,7 +334,7 @@ public class ResponseCacher implements Closeable {
   } // method getOcspResponse
 
   public void storeOcspResponse(int issuerId, BigInteger serialNumber, long generatedAt,
-      Long nextUpdate, AlgorithmCode sigAlgCode, byte[] response) {
+      Long nextUpdate, SigAlgo sigAlg, byte[] response) {
     long nowInSec = System.currentTimeMillis() / 1000;
     if (nextUpdate == null) {
       nextUpdate = nowInSec + SEC_DFLT_NEXT_UPDATE_DURATION;
@@ -344,7 +344,7 @@ public class ResponseCacher implements Closeable {
       return;
     }
 
-    byte[] identBytes = buildIdent(serialNumber, sigAlgCode);
+    byte[] identBytes = buildIdent(serialNumber, sigAlg);
     String ident = Base64.encodeToString(identBytes);
     try {
       long id = deriveId(issuerId, identBytes);
@@ -566,7 +566,7 @@ public class ResponseCacher implements Closeable {
     return true;
   } // method initIssuerStore
 
-  private static byte[] buildIdent(BigInteger serialNumber, AlgorithmCode sigAlg) {
+  private static byte[] buildIdent(BigInteger serialNumber, SigAlgo sigAlg) {
     byte[] snBytes = serialNumber.toByteArray();
     byte[] bytes = new byte[1 + snBytes.length];
     bytes[0] = sigAlg.getCode();

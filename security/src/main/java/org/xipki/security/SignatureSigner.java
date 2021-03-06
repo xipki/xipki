@@ -88,6 +88,11 @@ public class SignatureSigner implements XiContentSigner {
 
   private final PrivateKey key;
 
+  public SignatureSigner(SigAlgo sigAlg, Signature signer, PrivateKey key)
+      throws XiSecurityException {
+    this(sigAlg.getAlgorithmIdentifier(), signer, key);
+  }
+
   public SignatureSigner(AlgorithmIdentifier sigAlgId, Signature signer, PrivateKey key)
       throws XiSecurityException {
     this.sigAlgId = notNull(sigAlgId, "sigAlgId");

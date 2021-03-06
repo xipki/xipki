@@ -247,7 +247,7 @@ public class P11Actions {
       }
 
       SignerConf conf = getPkcs11SignerConf(moduleName, slotIndex, label,
-          idBytes, 1, HashAlgo.getNonNullInstance(hashAlgo), signatureAlgoControl);
+          idBytes, 1, HashAlgo.getInstance(hashAlgo), signatureAlgoControl);
       return securityFactory.createSigner("PKCS11", conf, (X509Cert[]) null);
     }
 

@@ -30,6 +30,6 @@ public interface AlgorithmValidator {
 
   boolean isAlgorithmPermitted(AlgorithmIdentifier algId);
 
-  boolean isAlgorithmPermitted(String algName);
+  boolean isAlgorithmPermitted(SigAlgo algo);
 
 }

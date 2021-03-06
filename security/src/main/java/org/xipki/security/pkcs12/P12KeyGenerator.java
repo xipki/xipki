@@ -25,6 +25,7 @@ import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.cert.Certificate;
@@ -48,18 +49,14 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.jcajce.interfaces.XDHKey;
 import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.bc.BcContentSignerBuilder;
-import org.bouncycastle.operator.bc.BcDSAContentSignerBuilder;
-import org.bouncycastle.operator.bc.BcECContentSignerBuilder;
-import org.bouncycastle.operator.bc.BcRSAContentSignerBuilder;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.SignatureSigner;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.KeyUtil;
@@ -234,7 +231,8 @@ public class P12KeyGenerator {
     String dnStr = (selfSignedCertSubject == null) ? "CN=DUMMY" : selfSignedCertSubject;
     X500Name subjectDn = new X500Name(dnStr);
     SubjectPublicKeyInfo subjectPublicKeyInfo = kp.getSubjectPublicKeyInfo();
-    ContentSigner contentSigner = getContentSigner(kp.getKeypair().getPrivate());
+    ContentSigner contentSigner = getContentSigner(
+        kp.getKeypair().getPrivate(), kp.getKeypair().getPublic());
 
     // Generate keystore
     X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(subjectDn,
@@ -267,55 +265,9 @@ public class P12KeyGenerator {
     return result;
   } // method generateIdentity
 
-  private static ContentSigner getContentSigner(PrivateKey key)
+  private static ContentSigner getContentSigner(PrivateKey key, PublicKey publicKey)
       throws Exception {
-    BcContentSignerBuilder builder;
-
-    if (key instanceof RSAPrivateKey) {
-      ASN1ObjectIdentifier hashOid = X509ObjectIdentifiers.id_SHA1;
-      ASN1ObjectIdentifier sigOid = PKCSObjectIdentifiers.sha1WithRSAEncryption;
-
-      builder = new BcRSAContentSignerBuilder(buildAlgId(sigOid), buildAlgId(hashOid));
-    } else if (key instanceof DSAPrivateKey) {
-      ASN1ObjectIdentifier hashOid = X509ObjectIdentifiers.id_SHA1;
-      AlgorithmIdentifier sigId = new AlgorithmIdentifier(
-          X9ObjectIdentifiers.id_dsa_with_sha1);
-
-      builder = new BcDSAContentSignerBuilder(sigId, buildAlgId(hashOid));
-    } else if (key instanceof ECPrivateKey) {
-      HashAlgo hashAlgo;
-      ASN1ObjectIdentifier sigOid;
-
-      int keysize = ((ECPrivateKey) key).getParams().getOrder().bitLength();
-      if (keysize > 384) {
-        hashAlgo = HashAlgo.SHA512;
-        sigOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
-      } else if (keysize > 256) {
-        hashAlgo = HashAlgo.SHA384;
-        sigOid = X9ObjectIdentifiers.ecdsa_with_SHA384;
-      } else if (keysize > 224) {
-        hashAlgo = HashAlgo.SHA224;
-        sigOid = X9ObjectIdentifiers.ecdsa_with_SHA224;
-      } else if (keysize > 160) {
-        hashAlgo = HashAlgo.SHA256;
-        sigOid = X9ObjectIdentifiers.ecdsa_with_SHA256;
-      } else {
-        hashAlgo = HashAlgo.SHA1;
-        sigOid = X9ObjectIdentifiers.ecdsa_with_SHA1;
-      }
-
-      builder = new BcECContentSignerBuilder(new AlgorithmIdentifier(sigOid),
-          buildAlgId(hashAlgo.getOid()));
-    } else if (key instanceof EdDSAKey) {
-      String algorithm = key.getAlgorithm();
-      ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(algorithm);
-      if (curveOid == null || !EdECConstants.isEdwardsCurve(curveOid)) {
-        throw new InvalidKeyException("unknown EdDSA key algorithm " + algorithm);
-      }
-      Signature signer = Signature.getInstance("EdDSA", "BC");
-
-      return new SignatureSigner(new AlgorithmIdentifier(curveOid), signer, key);
-    } else if (key instanceof XDHKey) {
+    if (key instanceof XDHKey) {
       String algorithm = key.getAlgorithm();
       ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(algorithm);
       if (curveOid == null || !EdECConstants.isMontgomeryCurve(curveOid)) {
@@ -326,15 +278,41 @@ public class P12KeyGenerator {
       // Just dummy: signature created by the signKey cannot be verified by the public key.
       PrivateKey signKey = KeyUtil.convertXDHToDummyEdDSAPrivateKey(key);
       return new SignatureSigner(new AlgorithmIdentifier(curveOid), signer, signKey);
+    }
+
+    P12ContentSignerBuilder builder = new P12ContentSignerBuilder(key, publicKey);
+
+    SigAlgo algo;
+    if (key instanceof RSAPrivateKey) {
+      algo = SigAlgo.RSA_SHA256;
+    } else if (key instanceof DSAPrivateKey) {
+      algo = SigAlgo.DSA_SHA256;
+    } else if (key instanceof ECPrivateKey) {
+      int keysize = ((ECPrivateKey) key).getParams().getOrder().bitLength();
+      if (keysize > 384) {
+        algo = SigAlgo.ECDSA_SHA512;
+      } else if (keysize > 256) {
+        algo = SigAlgo.ECDSA_SHA384;
+      } else if (keysize > 160) {
+        algo = SigAlgo.ECDSA_SHA256;
+      } else {
+        algo = SigAlgo.ECDSA_SHA1;
+      }
+    } else if (key instanceof EdDSAKey) {
+      String algorithm = key.getAlgorithm();
+      ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(algorithm);
+      if (EdECConstants.id_ED25519.equals(curveOid)) {
+        algo = SigAlgo.ED25519;
+      } else if (EdECConstants.id_ED448.equals(curveOid)) {
+        algo = SigAlgo.ED448;
+      } else {
+        throw new IllegalArgumentException("unknown EdDSA key algorithm " + algorithm);
+      }
     } else {
       throw new IllegalArgumentException("unknown type of key " + key.getClass().getName());
     }
 
-    return builder.build(KeyUtil.generatePrivateKeyParameter(key));
+    return builder.createSigner(algo, 1, null).borrowSigner().value();
   } // method getContentSigner
-
-  private static AlgorithmIdentifier buildAlgId(ASN1ObjectIdentifier identifier) {
-    return new AlgorithmIdentifier(identifier, DERNull.INSTANCE);
-  }
 
 }

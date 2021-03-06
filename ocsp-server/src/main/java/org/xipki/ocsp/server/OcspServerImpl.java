@@ -90,12 +90,12 @@ import org.xipki.ocsp.server.type.ResponderID;
 import org.xipki.ocsp.server.type.TaggedCertSequence;
 import org.xipki.ocsp.server.type.WritableOnlyExtension;
 import org.xipki.password.PasswordResolverException;
-import org.xipki.security.AlgorithmCode;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.util.CollectionUtil;
@@ -763,7 +763,7 @@ public class OcspServerImpl implements OcspServer {
         concurrentSigner = signer.getFirstSigner();
       }
 
-      AlgorithmCode cacheDbSigAlgCode = null;
+      SigAlgo cacheDbSigAlg = null;
       BigInteger cacheDbSerialNumber = null;
       Integer cacheDbIssuerId = null;
 
@@ -779,14 +779,14 @@ public class OcspServerImpl implements OcspServer {
           return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
         }
 
-        cacheDbSigAlgCode = concurrentSigner.getAlgorithmCode();
+        cacheDbSigAlg = concurrentSigner.getAlgorithm();
 
         cacheDbIssuerId = responseCacher.getIssuerId(certId.getIssuer());
         cacheDbSerialNumber = certId.getSerialNumber();
 
         if (cacheDbIssuerId != null) {
           OcspRespWithCacheInfo cachedResp = responseCacher.getOcspResponse(
-              cacheDbIssuerId.intValue(), cacheDbSerialNumber, cacheDbSigAlgCode);
+              cacheDbIssuerId.intValue(), cacheDbSerialNumber, cacheDbSigAlg);
           if (cachedResp != null) {
             return cachedResp;
           }
@@ -865,8 +865,7 @@ public class OcspServerImpl implements OcspServer {
         // Don't cache the response with status UNKNOWN, since this may result in DDoS
         // of storage
         responseCacher.storeOcspResponse(cacheDbIssuerId.intValue(), cacheDbSerialNumber,
-            producedAtSeconds, repControl.cacheNextUpdate, cacheDbSigAlgCode,
-            encodeOcspResponse);
+            producedAtSeconds, repControl.cacheNextUpdate, cacheDbSigAlg, encodeOcspResponse);
       }
 
       if (viaGet && repControl.canCacheInfo) {

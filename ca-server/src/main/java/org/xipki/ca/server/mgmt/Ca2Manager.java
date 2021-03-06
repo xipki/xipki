@@ -58,6 +58,7 @@ import org.xipki.ca.api.mgmt.CtlogControl;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.ChangeCaEntry;
+import org.xipki.ca.api.mgmt.entry.CaEntry.CaSignerConf;
 import org.xipki.ca.server.CaAuditConstants;
 import org.xipki.ca.server.CaInfo;
 import org.xipki.ca.server.CertTemplateData;
@@ -341,10 +342,10 @@ class Ca2Manager {
     }
 
     try {
-      List<String[]> signerConfs = CaEntry.splitCaSignerConfs(caEntry.getSignerConf());
+      List<CaSignerConf> signerConfs = CaEntry.splitCaSignerConfs(caEntry.getSignerConf());
       ConcurrentContentSigner signer;
-      for (String[] m : signerConfs) {
-        SignerConf signerConf = new SignerConf(m[1]);
+      for (CaSignerConf m : signerConfs) {
+        SignerConf signerConf = new SignerConf(m.getConf());
         signer = securityFactory.createSigner(caEntry.getSignerType(), signerConf,
             caEntry.getCert());
         if (caEntry.getCert() == null) {

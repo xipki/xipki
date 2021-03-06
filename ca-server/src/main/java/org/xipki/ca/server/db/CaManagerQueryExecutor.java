@@ -61,6 +61,7 @@ import org.xipki.ca.api.mgmt.entry.PublisherEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.api.mgmt.entry.UserEntry;
+import org.xipki.ca.api.mgmt.entry.CaEntry.CaSignerConf;
 import org.xipki.ca.server.CaIdNameMap;
 import org.xipki.ca.server.CaInfo;
 import org.xipki.ca.server.CaUtil;
@@ -664,9 +665,9 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         }
 
         try {
-          List<String[]> signerConfs = CaEntry.splitCaSignerConfs(signerConf);
-          for (String[] m : signerConfs) {
-            securityFactory.createSigner(signerType, new SignerConf(m[1]), caCert);
+          List<CaSignerConf> signerConfs = CaEntry.splitCaSignerConfs(signerConf);
+          for (CaSignerConf m : signerConfs) {
+            securityFactory.createSigner(signerType, new SignerConf(m.getConf()), caCert);
           }
         } catch (XiSecurityException | ObjectCreationException ex) {
           throw new CaMgmtException("could not create signer for CA '"

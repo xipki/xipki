@@ -18,6 +18,7 @@
 package org.xipki.cmpclient.shell;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Set;
 
@@ -28,6 +29,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.cmpclient.CmpClient;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
@@ -37,6 +39,7 @@ import org.xipki.shell.XiAction;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.HealthCheckResult;
 import org.xipki.util.IoUtil;
+import org.xipki.util.ObjectCreationException;
 import org.xipki.util.ReqRespDebug;
 import org.xipki.util.ReqRespDebug.ReqRespPair;
 import org.xipki.util.StringUtil;
@@ -63,6 +66,15 @@ public class Actions {
     @Option(name = "--resp-out", description = "where to save the response")
     @Completion(FileCompleter.class)
     private String respout;
+
+    protected static HashAlgo getHashAlgo(String algoStr)
+        throws ObjectCreationException {
+      try {
+        return HashAlgo.getInstance(algoStr);
+      } catch (NoSuchAlgorithmException ex) {
+        throw new ObjectCreationException(ex.getMessage(), ex);
+      }
+    }
 
     protected ReqRespDebug getReqRespDebug() {
       boolean saveReq = isNotBlank(reqout);

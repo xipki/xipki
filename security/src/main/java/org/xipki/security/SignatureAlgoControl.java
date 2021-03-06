@@ -26,7 +26,7 @@ package org.xipki.security;
 
 public class SignatureAlgoControl {
 
-  private final boolean rsaMgf1;
+  private final boolean rsaPss;
 
   private final boolean dsaPlain;
 
@@ -36,18 +36,18 @@ public class SignatureAlgoControl {
     this(false, false, false);
   }
 
-  public SignatureAlgoControl(boolean rsaMgf1, boolean dsaPlain) {
-    this(rsaMgf1, dsaPlain, false);
+  public SignatureAlgoControl(boolean rsaPss, boolean dsaPlain) {
+    this(rsaPss, dsaPlain, false);
   }
 
-  public SignatureAlgoControl(boolean rsaMgf1, boolean dsaPlain, boolean gm) {
-    this.rsaMgf1 = rsaMgf1;
+  public SignatureAlgoControl(boolean rsaPss, boolean dsaPlain, boolean gm) {
+    this.rsaPss = rsaPss;
     this.dsaPlain = dsaPlain;
     this.gm = gm;
   }
 
-  public boolean isRsaMgf1() {
-    return rsaMgf1;
+  public boolean isRsaPss() {
+    return rsaPss;
   }
 
   public boolean isDsaPlain() {

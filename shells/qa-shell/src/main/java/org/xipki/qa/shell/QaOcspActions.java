@@ -61,8 +61,8 @@ import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.IssuerHash;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.X509Cert;
-import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
@@ -224,9 +224,7 @@ public class QaOcspActions {
 
       RequestOptions requestOptions = getRequestOptions();
 
-      IssuerHash issuerHash = new IssuerHash(
-          HashAlgo.getNonNullInstance(requestOptions.getHashAlgorithmId()),
-          issuerCert);
+      IssuerHash issuerHash = new IssuerHash(requestOptions.getHashAlgorithm(), issuerCert);
 
       OutputStream resultOut = Files.newOutputStream(Paths.get(outDir.getPath(), "overview.txt"));
       BufferedReader snReader = Files.newBufferedReader(Paths.get(snFile));
@@ -444,9 +442,9 @@ public class QaOcspActions {
       responseOption.setCerthashOccurrence(expectedCerthashOccurrence);
       responseOption.setNonceOccurrence(expectedNonceOccurrence);
       responseOption.setRespIssuer(respIssuer);
-      responseOption.setSignatureAlgName(sigAlg);
+      responseOption.setSignatureAlg(SigAlgo.getInstance(sigAlg));
       if (isNotBlank(certhashAlg)) {
-        responseOption.setCerthashAlgId(AlgorithmUtil.getHashAlg(certhashAlg));
+        responseOption.setCerthashAlg(HashAlgo.getInstance(certhashAlg));
       }
 
       ValidationResult ret = ocspQa.checkOcsp(response, issuerHash, serialNumber, null,
@@ -716,9 +714,12 @@ public class QaOcspActions {
       responseOption.setCerthashOccurrence(expectedCerthashOccurrence);
       responseOption.setNonceOccurrence(expectedNonceOccurrence);
       responseOption.setRespIssuer(respIssuer);
-      responseOption.setSignatureAlgName(sigAlg);
+      if (isNotBlank(sigAlg)) {
+        responseOption.setSignatureAlg(SigAlgo.getInstance(sigAlg));
+      }
+
       if (isNotBlank(certhashAlg)) {
-        responseOption.setCerthashAlgId(AlgorithmUtil.getHashAlg(certhashAlg));
+        responseOption.setCerthashAlg(HashAlgo.getInstance(certhashAlg));
       }
 
       if (ocspQa == null) {

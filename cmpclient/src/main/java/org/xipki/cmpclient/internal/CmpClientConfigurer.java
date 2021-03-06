@@ -48,7 +48,6 @@ import javax.net.ssl.SSLSocketFactory;
 
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.cmpclient.CertprofileInfo;
@@ -63,9 +62,9 @@ import org.xipki.security.CollectionAlgorithmValidator;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
-import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.FileOrBinary;
@@ -297,7 +296,7 @@ final class CmpClientConfigurer {
         }
         AlgorithmValidator sigAlgoValidator;
         try {
-          sigAlgoValidator = new CollectionAlgorithmValidator(algoNames);
+          sigAlgoValidator = CollectionAlgorithmValidator.ofAlgorithmNames(algoNames);
         } catch (NoSuchAlgorithmException ex) {
           LogUtil.error(LOG, ex, "could not initialize CollectionAlgorithmValidator");
           return false;
@@ -307,7 +306,13 @@ final class CmpClientConfigurer {
       } else { // if (m.getPbmMac() != null)
         CmpClientConf.Responder.PbmMac mac = m.getPbmMac();
         X500Name subject = cert.getSubject();
-        responder = new Responder.PbmMacCmpResponder(subject, mac.getOwfAlgos(), mac.getMacAlgos());
+        try {
+          responder = new Responder.PbmMacCmpResponder(subject, mac.getOwfAlgos(),
+              mac.getMacAlgos());
+        } catch (NoSuchAlgorithmException ex) {
+          LogUtil.error(LOG, ex, "could not initialize PbmMacCmpResponder");
+          return false;
+        }
       }
 
       responders.put(m.getName(), responder);
@@ -331,6 +336,7 @@ final class CmpClientConfigurer {
           SslConf sslConf = sslConfs.get(caType.getSsl());
           if (sslConf == null) {
             LOG.error("no ssl named {} is configured", caType.getSsl());
+            return false;
           } else {
             sslSocketFactory = sslConf.getSslSocketFactory();
             hostnameVerifier = sslConf.getHostnameVerifier();
@@ -426,7 +432,8 @@ final class CmpClientConfigurer {
             || ca.isDhpocAutoconf()) {
           autoConfCaNames.add(caName);
         }
-      } catch (IOException | CertificateException | CertPathBuilderException ex) {
+      } catch (IOException | CertificateException
+          | CertPathBuilderException ex) {
         LogUtil.error(LOG, ex, "could not configure CA " + caName);
         return false;
       }
@@ -479,17 +486,24 @@ final class CmpClientConfigurer {
         }
       } else {
         CmpClientConf.Requestor.PbmMac cf = requestorConf.getPbmMac();
-        AlgorithmIdentifier owf = HashAlgo.getNonNullInstance(cf.getOwf()).getAlgorithmIdentifier();
-        AlgorithmIdentifier mac;
+        HashAlgo owfAlgo;
         try {
-          mac = AlgorithmUtil.getMacAlgId(cf.getMac());
+          owfAlgo = HashAlgo.getInstance(cf.getOwf());
+        } catch (NoSuchAlgorithmException ex1) {
+          LOG.error("Unknown OWF algorithm {}", cf.getOwf());
+          return false;
+        }
+
+        SigAlgo macAlgo;
+        try {
+          macAlgo = SigAlgo.getInstance(cf.getMac());
         } catch (NoSuchAlgorithmException ex) {
           LOG.error("Unknown MAC algorithm {}", cf.getMac());
           return false;
         }
 
         requestor = new PbmMacCmpRequestor(signRequest, NULL_GENERALNAME,
-            cf.getPassword().toCharArray(), cf.getKid(), owf, cf.getIterationCount(), mac);
+            cf.getPassword().toCharArray(), cf.getKid(), owfAlgo, cf.getIterationCount(), macAlgo);
       }
 
       requestors.put(name, requestor);

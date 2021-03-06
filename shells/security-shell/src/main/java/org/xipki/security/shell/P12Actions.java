@@ -279,8 +279,15 @@ public class P12Actions {
       ConfPairs conf = new ConfPairs("password", new String(pwd));
       conf.putPair("parallelism", Integer.toString(1));
       conf.putPair("keystore", "file:" + p12File);
-      SignerConf signerConf = new SignerConf(conf.getEncoded(),
-                                  HashAlgo.getNonNullInstance(hashAlgo), signatureAlgoControl);
+
+      HashAlgo ha;
+      try {
+        ha = HashAlgo.getInstance(hashAlgo);
+      } catch (NoSuchAlgorithmException ex) {
+        throw new ObjectCreationException(ex.getMessage());
+      }
+
+      SignerConf signerConf = new SignerConf(conf.getEncoded(), ha, signatureAlgoControl);
       try {
         signerConf.setPeerCertificates(getPeerCertificates());
       } catch (CertificateException | IOException ex) {

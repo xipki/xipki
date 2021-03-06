@@ -17,6 +17,7 @@
 
 package org.xipki.ocsp.api;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -63,11 +64,11 @@ public class RequestIssuer {
     this.hashAlgo = hashAlgo;
   } // constructor
 
-  public RequestIssuer(byte[] data) {
+  public RequestIssuer(byte[] data) throws NoSuchAlgorithmException {
     this(data, 0, data.length);
   } // constructor
 
-  public RequestIssuer(byte[] data, int from, int length) {
+  public RequestIssuer(byte[] data, int from, int length) throws NoSuchAlgorithmException {
     this.data = data;
     this.from = from;
     this.length = length;

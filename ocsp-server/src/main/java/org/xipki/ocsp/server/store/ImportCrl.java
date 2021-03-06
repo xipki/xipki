@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -243,7 +244,7 @@ class ImportCrl {
 
   public ImportCrl(DataSourceWrapper datasource, String basedir, int sqlBatchCommit,
       boolean ignoreExpiredCrls)
-          throws DataAccessException {
+          throws DataAccessException, NoSuchAlgorithmException {
     this.sqlBatchCommit = min(sqlBatchCommit, "sqlBatchCommit", 1);
     this.ignoreExpiredCrls = ignoreExpiredCrls;
     this.datasource = notNull(datasource, "datasource");

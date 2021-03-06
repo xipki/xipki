@@ -179,7 +179,7 @@ class OcspStoreQueryExecutor {
     this.maxX500nameLen = Integer.parseInt(str);
 
     str = variables.get("CERTHASH_ALGO");
-    this.certhashAlgo = HashAlgo.getNonNullInstance(str);
+    this.certhashAlgo = HashAlgo.getInstance(str);
   } // constructor
 
   private IssuerStore initIssuerStore()

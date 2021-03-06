@@ -23,14 +23,12 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.xipki.security.AlgorithmValidator;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.X509Cert;
-import org.xipki.security.util.AlgorithmUtil;
 
 /**
  * CMP responder.
@@ -57,58 +55,33 @@ abstract class Responder {
 
   static class PbmMacCmpResponder extends Responder {
 
-    private final List<ASN1ObjectIdentifier> owfAlgos;
+    private final List<HashAlgo> owfAlgos;
 
-    private final List<ASN1ObjectIdentifier> macAlgos;
+    private final List<SigAlgo> macAlgos;
 
-    PbmMacCmpResponder(X500Name x500Name, List<String> owfs, List<String> macs) {
+    PbmMacCmpResponder(X500Name x500Name, List<String> owfs, List<String> macs)
+        throws NoSuchAlgorithmException {
       super(x500Name);
 
       this.owfAlgos = new ArrayList<>(owfs.size());
 
       for (int i = 0; i < owfs.size(); i++) {
-        String algo = owfs.get(i);
-        HashAlgo ha;
-        try {
-          ha = HashAlgo.getNonNullInstance(algo);
-        } catch (Exception ex) {
-          throw new IllegalArgumentException("invalid owf " + algo, ex);
-        }
-        owfAlgos.add(ha.getOid());
+        owfAlgos.add(HashAlgo.getInstance(owfs.get(i)));
       }
 
       this.macAlgos = new ArrayList<>(macs.size());
       for (int i = 0; i < macs.size(); i++) {
-        String algo = macs.get(i);
-        AlgorithmIdentifier algId;
-        try {
-          algId = AlgorithmUtil.getMacAlgId(algo);
-        } catch (NoSuchAlgorithmException ex) {
-          throw new IllegalArgumentException("invalid mac" + algo, ex);
-        }
-        macAlgos.add(algId.getAlgorithm());
+        macAlgos.add(SigAlgo.getInstance(macs.get(i)));
       }
 
     }
 
-    public boolean isPbmOwfPermitted(AlgorithmIdentifier pbmOwf) {
-      ASN1ObjectIdentifier owfOid = pbmOwf.getAlgorithm();
-      for (ASN1ObjectIdentifier oid : owfAlgos) {
-        if (oid.equals(owfOid)) {
-          return true;
-        }
-      }
-      return false;
+    public boolean isPbmOwfPermitted(HashAlgo pbmOwf) {
+      return owfAlgos.contains(pbmOwf);
     }
 
-    public boolean isPbmMacPermitted(AlgorithmIdentifier pbmMac) {
-      ASN1ObjectIdentifier macOid = pbmMac.getAlgorithm();
-      for (ASN1ObjectIdentifier oid : macAlgos) {
-        if (oid.equals(macOid)) {
-          return true;
-        }
-      }
-      return false;
+    public boolean isPbmMacPermitted(SigAlgo pbmMac) {
+      return macAlgos.contains(pbmMac);
     }
 
   } // class PbmMacCmpResponder

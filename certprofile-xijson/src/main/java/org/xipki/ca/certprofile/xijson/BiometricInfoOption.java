@@ -27,8 +27,8 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
 import org.xipki.ca.certprofile.xijson.conf.BiometricInfo;
 import org.xipki.ca.certprofile.xijson.conf.BiometricInfo.BiometricTypeType;
-import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
-import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
+import org.xipki.security.HashAlgo;
 import org.xipki.util.TripleState;
 
 /**
@@ -44,7 +44,7 @@ public class BiometricInfoOption {
 
   private final Set<ASN1ObjectIdentifier> idTypes;
 
-  private final Set<ASN1ObjectIdentifier> hashAlgorithms;
+  private final Set<HashAlgo> hashAlgorithms;
 
   private final TripleState sourceDataUriOccurrence;
 
@@ -53,10 +53,9 @@ public class BiometricInfoOption {
     notNull(value, "value");
 
     this.sourceDataUriOccurrence = value.getIncludeSourceDataUri();
-    this.hashAlgorithms = X509ProfileType.toOidSet(value.getHashAlgorithms());
-
-    for (ASN1ObjectIdentifier m : hashAlgorithms) {
-      AlgorithmUtil.getHashOutputSizeInOctets(m);
+    this.hashAlgorithms = new HashSet<>();
+    for (DescribableOid doid : value.getHashAlgorithms()) {
+      hashAlgorithms.add(HashAlgo.getInstance(doid.getOid()));
     }
 
     this.predefinedTypes = new HashSet<>();
@@ -82,7 +81,7 @@ public class BiometricInfoOption {
     }
   }
 
-  public boolean isHashAlgorithmPermitted(ASN1ObjectIdentifier hashAlgorithm) {
+  public boolean isHashAlgorithmPermitted(HashAlgo hashAlgorithm) {
     notNull(hashAlgorithm, "hashAlgorithm");
     return hashAlgorithms.contains(hashAlgorithm);
   }

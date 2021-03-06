@@ -45,6 +45,7 @@ import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
+import org.xipki.ca.api.mgmt.entry.CaEntry.CaSignerConf;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
@@ -54,6 +55,7 @@ import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
@@ -135,17 +137,17 @@ class SelfSignedCertBuilder {
 
     ConcurrentContentSigner signer;
     try {
-      List<String[]> signerConfs = CaEntry.splitCaSignerConfs(signerConf);
-      List<String> restrictedSigAlgos = certprofile.getSignatureAlgorithms();
+      List<CaSignerConf> signerConfs = CaEntry.splitCaSignerConfs(signerConf);
+      List<SigAlgo> restrictedSigAlgos = certprofile.getSignatureAlgorithms();
 
       String thisSignerConf = null;
       if (CollectionUtil.isEmpty(restrictedSigAlgos)) {
-        thisSignerConf = signerConfs.get(0)[1];
+        thisSignerConf = signerConfs.get(0).getConf();
       } else {
-        for (String algo : restrictedSigAlgos) {
-          for (String[] m : signerConfs) {
-            if (m[0].equals(algo)) {
-              thisSignerConf = m[1];
+        for (SigAlgo algo : restrictedSigAlgos) {
+          for (CaSignerConf m : signerConfs) {
+            if (m.getAlgo() == algo) {
+              thisSignerConf = m.getConf();
               break;
             }
           }

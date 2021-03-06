@@ -22,6 +22,7 @@ import static org.xipki.util.Args.notNull;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.Key;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.interfaces.RSAPublicKey;
@@ -364,8 +365,10 @@ public class ScepResponder {
 
     // check the digest algorithm
     String oid = req.getDigestAlgorithm().getId();
-    HashAlgo hashAlgo = HashAlgo.getInstance(oid);
-    if (hashAlgo == null) {
+    HashAlgo hashAlgo;
+    try {
+      hashAlgo = HashAlgo.getInstance(oid);
+    } catch (NoSuchAlgorithmException ex1) {
       LOG.warn("tid={}: unknown digest algorithm {}", tid, oid);
       rep.setPkiStatus(PkiStatus.FAILURE);
       rep.setFailInfo(FailInfo.badAlg);
@@ -670,7 +673,22 @@ public class ScepResponder {
     notNull(response, "response");
     notNull(request, "request");
 
-    String signatureAlgorithm = getSignatureAlgorithm(responderKey, request.getDigestAlgorithm());
+    String algorithm = responderKey.getAlgorithm();
+
+    String signatureAlgorithm;
+    if (!"RSA".equalsIgnoreCase(algorithm)) {
+      throw new UnsupportedOperationException(
+          "getSignatureAlgorithm() for non-RSA is not supported yet.");
+    }
+
+    HashAlgo hashAlgo;
+    try {
+      hashAlgo = HashAlgo.getInstance(request.getDigestAlgorithm());
+    } catch (NoSuchAlgorithmException ex) {
+      throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
+    }
+    signatureAlgorithm = hashAlgo.getJceName() + "withRSA";
+
     ContentInfo ci;
     try {
       X509Cert[] cmsCertSet = control.isIncludeSignerCert()
@@ -701,20 +719,6 @@ public class ScepResponder {
           + requestor.getCaHasUser().getUserIdent().getName());
     }
   } // method checkUserPermission
-
-  private static String getSignatureAlgorithm(PrivateKey key, ASN1ObjectIdentifier digestOid) {
-    HashAlgo hashAlgo = HashAlgo.getInstance(digestOid.getId());
-    if (hashAlgo == null) {
-      hashAlgo = HashAlgo.SHA256;
-    }
-    String algorithm = key.getAlgorithm();
-    if ("RSA".equalsIgnoreCase(algorithm)) {
-      return hashAlgo.getJceName() + "withRSA";
-    } else {
-      throw new UnsupportedOperationException(
-          "getSignatureAlgorithm() for non-RSA is not supported yet.");
-    }
-  } // method getSignatureAlgorithm
 
   private static void ensureIssuedByThisCa(X500Name thisCaX500Name, X500Name caX500Name)
       throws FailInfoException {

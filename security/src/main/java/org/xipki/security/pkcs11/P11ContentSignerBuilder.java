@@ -35,17 +35,14 @@ import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.DfltConcurrentContentSigner;
-import org.xipki.security.ObjectIdentifiers.Shake;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.XiSecurityException;
-import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.GMUtil;
 import org.xipki.security.util.X509Util;
 
@@ -119,7 +116,7 @@ public class P11ContentSignerBuilder {
     }
   } // constructor
 
-  public ConcurrentContentSigner createSigner(AlgorithmIdentifier signatureAlgId,
+  public ConcurrentContentSigner createSigner(SigAlgo sigAlgo,
       int parallelism)
           throws XiSecurityException, P11TokenException {
     positive(parallelism, "parallelism");
@@ -130,48 +127,25 @@ public class P11ContentSignerBuilder {
     for (int i = 0; i < parallelism; i++) {
       XiContentSigner signer;
       if (publicKey instanceof RSAPublicKey) {
-        if (i == 0 && !AlgorithmUtil.isRSASigAlgId(signatureAlgId)) {
-          throw new XiSecurityException(
-              "the given algorithm is not a valid RSA signature algorithm '"
-              + signatureAlgId.getAlgorithm().getId() + "'");
-        }
-        signer = createRSAContentSigner(signatureAlgId);
+        signer = createRSAContentSigner(sigAlgo);
       } else if (publicKey instanceof ECPublicKey) {
         ECPublicKey ecKey = (ECPublicKey) publicKey;
 
         if (i == 0) {
           isSm2p256v1 = GMUtil.isSm2primev2Curve(ecKey.getParams().getCurve());
-          if (isSm2p256v1) {
-            if (!AlgorithmUtil.isSM2SigAlg(signatureAlgId)) {
-              throw new XiSecurityException(
-                "the given algorithm is not a valid SM2 signature algorithm '"
-                + signatureAlgId.getAlgorithm().getId() + "'");
-            }
-          } else {
-            if (!AlgorithmUtil.isECSigAlg(signatureAlgId)) {
-              throw new XiSecurityException(
-                "the given algorithm is not a valid EC signature algorithm '"
-                + signatureAlgId.getAlgorithm().getId() + "'");
-            }
-          }
         }
 
         if (isSm2p256v1) {
           java.security.spec.ECPoint w = ecKey.getW();
-          signer = createSM2ContentSigner(signatureAlgId, GMObjectIdentifiers.sm2p256v1,
+          signer = createSM2ContentSigner(sigAlgo, GMObjectIdentifiers.sm2p256v1,
               w.getAffineX(), w.getAffineY());
         } else {
-          signer = createECContentSigner(signatureAlgId);
+          signer = createECContentSigner(sigAlgo);
         }
       } else if (publicKey instanceof DSAPublicKey) {
-        if (i == 0 && !AlgorithmUtil.isDSASigAlg(signatureAlgId)) {
-          throw new XiSecurityException(
-              "the given algorithm is not a valid DSA signature algorithm '"
-              + signatureAlgId.getAlgorithm().getId() + "'");
-        }
-        signer = createDSAContentSigner(signatureAlgId);
+        signer = createDSAContentSigner(sigAlgo);
       } else if (publicKey instanceof EdDSAKey) {
-        signer = createEdDSAContentSigner(signatureAlgId);
+        signer = createEdDSAContentSigner(sigAlgo);
       } else {
         throw new XiSecurityException("unsupported key " + publicKey.getClass().getName());
       }
@@ -197,48 +171,40 @@ public class P11ContentSignerBuilder {
   } // method createSigner
 
   // CHECKSTYLE:SKIP
-  private XiContentSigner createRSAContentSigner(AlgorithmIdentifier signatureAlgId)
+  private XiContentSigner createRSAContentSigner(SigAlgo sigAlgo)
       throws XiSecurityException, P11TokenException {
-    ASN1ObjectIdentifier oid = signatureAlgId.getAlgorithm();
-
-    if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(oid)) {
-      return new P11ContentSigner.RSAPSS(cryptService, identityId, signatureAlgId,
+    if (sigAlgo.isRSAPSSSigAlgo()) {
+      return new P11ContentSigner.RSAPSS(cryptService, identityId, sigAlgo,
           securityFactory.getRandom4Sign());
-    } else if (Shake.id_RSASSA_PSS_SHAKE128.equals(oid)
-        || Shake.id_RSASSA_PSS_SHAKE256.equals(oid)) {
-      return new P11ContentSigner.RSAPSSSHAKE(cryptService, identityId, signatureAlgId,
-          securityFactory.getRandom4Key());
     } else {
-      return new P11ContentSigner.RSA(cryptService, identityId, signatureAlgId);
+      return new P11ContentSigner.RSA(cryptService, identityId, sigAlgo);
     }
   }
 
   // CHECKSTYLE:SKIP
-  private XiContentSigner createECContentSigner(AlgorithmIdentifier signatureAlgId)
+  private XiContentSigner createECContentSigner(SigAlgo sigAlgo)
       throws XiSecurityException, P11TokenException {
-    return new P11ContentSigner.ECDSA(cryptService, identityId, signatureAlgId,
-        AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId));
+    return new P11ContentSigner.ECDSA(cryptService, identityId, sigAlgo);
   }
 
   // CHECKSTYLE:SKIP
-  private XiContentSigner createSM2ContentSigner(AlgorithmIdentifier signatureAlgId,
+  private XiContentSigner createSM2ContentSigner(SigAlgo sigAlgo,
       ASN1ObjectIdentifier curveOid, BigInteger pubPointX, BigInteger pubPointy)
       throws XiSecurityException, P11TokenException {
-    return new P11ContentSigner.SM2(cryptService, identityId, signatureAlgId,
+    return new P11ContentSigner.SM2(cryptService, identityId, sigAlgo,
         curveOid, pubPointX, pubPointy);
   }
 
   // CHECKSTYLE:SKIP
-  private XiContentSigner createDSAContentSigner(AlgorithmIdentifier signatureAlgId)
+  private XiContentSigner createDSAContentSigner(SigAlgo sigAlgo)
       throws XiSecurityException, P11TokenException {
-    return new P11ContentSigner.DSA(cryptService, identityId, signatureAlgId,
-        AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId));
+    return new P11ContentSigner.DSA(cryptService, identityId, sigAlgo);
   }
 
   // CHECKSTYLE:SKIP
-  private XiContentSigner createEdDSAContentSigner(AlgorithmIdentifier signatureAlgId)
+  private XiContentSigner createEdDSAContentSigner(SigAlgo sigAlgo)
       throws XiSecurityException, P11TokenException {
-    return new P11ContentSigner.EdDSA(cryptService, identityId, signatureAlgId);
+    return new P11ContentSigner.EdDSA(cryptService, identityId, sigAlgo);
   }
 
 }

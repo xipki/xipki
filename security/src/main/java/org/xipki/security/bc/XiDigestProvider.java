@@ -17,6 +17,8 @@
 
 package org.xipki.security.bc;
 
+import java.security.NoSuchAlgorithmException;
+
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.ExtendedDigest;
 import org.bouncycastle.operator.OperatorCreationException;
@@ -40,9 +42,15 @@ public class XiDigestProvider implements BcDigestProvider {
   @Override
   public ExtendedDigest get(AlgorithmIdentifier digestAlgorithmIdentifier)
       throws OperatorCreationException {
-    HashAlgo ha = HashAlgo.getInstance(digestAlgorithmIdentifier.getAlgorithm());
-    if (ha != null) {
-      return ha.createDigest();
+    HashAlgo hashAlgo;
+    try {
+      hashAlgo = HashAlgo.getInstance(digestAlgorithmIdentifier.getAlgorithm());
+    } catch (NoSuchAlgorithmException ex) {
+      throw new OperatorCreationException(ex.getMessage(), ex);
+    }
+
+    if (hashAlgo != null) {
+      return hashAlgo.createDigest();
     } else {
       return BcDefaultDigestProvider.INSTANCE.get(digestAlgorithmIdentifier);
     }

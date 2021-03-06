@@ -64,8 +64,8 @@ import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.ObjectIdentifiers.Xipki;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.X509Cert;
-import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
@@ -256,9 +256,9 @@ public class CaUtil {
     String algo = pairs.value("algo");
     if (algo != null) {
       try {
-        algo = AlgorithmUtil.canonicalizeSignatureAlgo(algo);
+        algo = SigAlgo.getInstance(algo).getJceName();
       } catch (NoSuchAlgorithmException ex) {
-        throw new CaMgmtException("Unknown signature algo: " + ex.getMessage(), ex);
+        throw new CaMgmtException(ex);
       }
       pairs.putPair("algo", algo);
     }

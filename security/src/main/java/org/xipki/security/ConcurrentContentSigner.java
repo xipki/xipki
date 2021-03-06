@@ -36,13 +36,11 @@ public interface ConcurrentContentSigner extends Closeable {
 
   String getName();
 
-  String getAlgorithmName();
-
   /**
-   * Returns the algorithm code in XiPKI context.
-   * @return algorithm code
+   * Returns the algorithm.
+   * @return algorithm
    */
-  AlgorithmCode getAlgorithmCode();
+  SigAlgo getAlgorithm();
 
   boolean isMac();
 

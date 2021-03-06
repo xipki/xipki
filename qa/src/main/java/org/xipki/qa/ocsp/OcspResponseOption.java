@@ -17,12 +17,9 @@
 
 package org.xipki.qa.ocsp;
 
-import java.security.NoSuchAlgorithmException;
-
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.X509Cert;
-import org.xipki.security.util.AlgorithmUtil;
-import org.xipki.util.StringUtil;
 import org.xipki.util.TripleState;
 
 /**
@@ -42,9 +39,9 @@ public class OcspResponseOption {
 
   private TripleState nextUpdateOccurrence;
 
-  private ASN1ObjectIdentifier certhashAlgId;
+  private HashAlgo certhashAlg;
 
-  private String signatureAlgName;
+  private SigAlgo signatureAlg;
 
   public OcspResponseOption() {
   }
@@ -81,22 +78,20 @@ public class OcspResponseOption {
     this.nextUpdateOccurrence = nextUpdateOccurrence;
   }
 
-  public ASN1ObjectIdentifier getCerthashAlgId() {
-    return certhashAlgId;
+  public HashAlgo getCerthashAlg() {
+    return certhashAlg;
   }
 
-  public void setCerthashAlgId(ASN1ObjectIdentifier certhashAlgId) {
-    this.certhashAlgId = certhashAlgId;
+  public void setCerthashAlg(HashAlgo certhashAlg) {
+    this.certhashAlg = certhashAlg;
   }
 
-  public String getSignatureAlgName() {
-    return signatureAlgName;
+  public SigAlgo getSignatureAlg() {
+    return signatureAlg;
   }
 
-  public void setSignatureAlgName(String signatureAlgName)
-      throws NoSuchAlgorithmException {
-    this.signatureAlgName = StringUtil.isBlank(signatureAlgName) ? null
-        : AlgorithmUtil.canonicalizeSignatureAlgo(signatureAlgName);
+  public void setSignatureAlg(SigAlgo signatureAlg) {
+    this.signatureAlg = signatureAlg;
   }
 
 }

@@ -23,10 +23,11 @@ import java.security.SecureRandom;
 
 import org.bouncycastle.asn1.cmp.PBMParameter;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.X509Cert;
 
 /**
@@ -69,15 +70,15 @@ abstract class Requestor {
     // CHECKSTYLE:SKIP
     private final byte[] senderKID;
 
-    private final AlgorithmIdentifier owf;
+    private final HashAlgo owf;
 
     private final int iterationCount;
 
-    private final AlgorithmIdentifier mac;
+    private final SigAlgo mac;
 
     PbmMacCmpRequestor(boolean signRequest, X500Name x500name, char[] password,
         // CHECKSTYLE:SKIP
-        byte[] senderKID, AlgorithmIdentifier owf, int iterationCount, AlgorithmIdentifier mac) {
+        byte[] senderKID, HashAlgo owf, int iterationCount, SigAlgo mac) {
       super(signRequest, x500name);
       this.password = password;
       this.senderKID = senderKID;
@@ -96,10 +97,11 @@ abstract class Requestor {
     }
 
     public PBMParameter getParameter() {
-      return new PBMParameter(randomSalt(), owf, iterationCount, mac);
+      return new PBMParameter(randomSalt(), owf.getAlgorithmIdentifier(),
+          iterationCount, mac.getAlgorithmIdentifier());
     }
 
-    public AlgorithmIdentifier getOwf() {
+    public HashAlgo getOwf() {
       return owf;
     }
 
@@ -107,7 +109,7 @@ abstract class Requestor {
       return iterationCount;
     }
 
-    public AlgorithmIdentifier getMac() {
+    public SigAlgo getMac() {
       return mac;
     }
 

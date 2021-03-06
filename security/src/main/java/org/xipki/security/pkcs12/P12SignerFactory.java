@@ -33,17 +33,16 @@ import java.util.Set;
 import javax.crypto.NoSuchPaddingException;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.SignerConf;
 import org.xipki.security.SignerFactory;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
-import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
 import org.xipki.util.ObjectCreationException;
@@ -127,21 +126,16 @@ public class P12SignerFactory implements SignerFactory {
     InputStream keystoreStream = getInputStream(str);
 
     try {
-      AlgorithmIdentifier macAlgId = null;
+      SigAlgo sigAlg = null;
       String algoName = conf.getConfValue("algo");
       if (algoName != null) {
-        try {
-          macAlgId = AlgorithmUtil.getMacAlgId(algoName);
-        } catch (NoSuchAlgorithmException ex) {
-          // do nothing
-        }
+        sigAlg = SigAlgo.getInstance(algoName);
       }
 
-      if (macAlgId != null) {
+      if (sigAlg != null && sigAlg.isMac()) {
         P12MacContentSignerBuilder signerBuilder = new P12MacContentSignerBuilder(
             type, keystoreStream, password, keyLabel, password);
-
-        return signerBuilder.createSigner(macAlgId, parallelism, securityFactory.getRandom4Sign());
+        return signerBuilder.createSigner(sigAlg, parallelism, securityFactory.getRandom4Sign());
       } else {
         KeypairWithCert keypairWithCert = KeypairWithCert.fromKeystore(
             type, keystoreStream, password, keyLabel, password, certificateChain);
@@ -172,15 +166,12 @@ public class P12SignerFactory implements SignerFactory {
         } else {
           P12ContentSignerBuilder signerBuilder = new P12ContentSignerBuilder(keypairWithCert);
 
-          AlgorithmIdentifier signatureAlgId;
-          if (conf.getHashAlgo() == null) {
-            signatureAlgId = AlgorithmUtil.getSigAlgId(null, conf);
-          } else {
+          if (sigAlg == null) {
             PublicKey pubKey = signerBuilder.getCertificate().getPublicKey();
-            signatureAlgId = AlgorithmUtil.getSigAlgId(pubKey, conf);
+            sigAlg = SigAlgo.getInstance(pubKey, conf);
           }
 
-          return signerBuilder.createSigner(signatureAlgId, parallelism,
+          return signerBuilder.createSigner(sigAlg, parallelism,
               securityFactory.getRandom4Sign());
         }
       }

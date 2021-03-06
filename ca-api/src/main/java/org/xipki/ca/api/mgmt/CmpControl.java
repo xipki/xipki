@@ -24,12 +24,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.xipki.security.AlgorithmValidator;
 import org.xipki.security.CollectionAlgorithmValidator;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.security.SigAlgo;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
@@ -99,13 +97,13 @@ public class CmpControl {
 
   private final boolean rrAkiRequired;
 
-  private AlgorithmIdentifier responsePbmOwf;
+  private HashAlgo responsePbmOwf;
 
-  private List<ASN1ObjectIdentifier> requestPbmOwfs;
+  private List<HashAlgo> requestPbmOwfs;
 
-  private AlgorithmIdentifier responsePbmMac;
+  private SigAlgo responsePbmMac;
 
-  private List<ASN1ObjectIdentifier> requestPbmMacs;
+  private List<SigAlgo> requestPbmMacs;
 
   private int responsePbmIterationCount = DFLT_PBM_ITERATIONCOUNT;
 
@@ -137,7 +135,7 @@ public class CmpControl {
     }
     Set<String> algos = splitAlgos(str);
     try {
-      this.sigAlgoValidator = new CollectionAlgorithmValidator(algos);
+      this.sigAlgoValidator = CollectionAlgorithmValidator.ofAlgorithmNames(algos);
     } catch (NoSuchAlgorithmException ex) {
       throw new InvalidConfException("invalid " + key + ": " + str, ex);
     }
@@ -152,7 +150,7 @@ public class CmpControl {
     }
     algos = splitAlgos(str);
     try {
-      this.popoAlgoValidator = new CollectionAlgorithmValidator(algos);
+      this.popoAlgoValidator = CollectionAlgorithmValidator.ofAlgorithmNames(algos);
     } catch (NoSuchAlgorithmException ex) {
       throw new InvalidConfException("invalid " + key + ": " + str, ex);
     }
@@ -217,7 +215,7 @@ public class CmpControl {
 
     this.groupEnroll = (groupEnroll == null) ? false : groupEnroll;
     try {
-      this.sigAlgoValidator = new CollectionAlgorithmValidator(sigAlgos);
+      this.sigAlgoValidator = CollectionAlgorithmValidator.ofAlgorithmNames(sigAlgos);
     } catch (NoSuchAlgorithmException ex) {
       throw new InvalidConfException("invalid sigAlgos", ex);
     }
@@ -227,7 +225,7 @@ public class CmpControl {
     }
 
     try {
-      this.popoAlgoValidator = new CollectionAlgorithmValidator(popoAlgos);
+      this.popoAlgoValidator = CollectionAlgorithmValidator.ofAlgorithmNames(popoAlgos);
     } catch (NoSuchAlgorithmException ex) {
       throw new InvalidConfException("invalid popoAlgos", ex);
     }
@@ -279,15 +277,15 @@ public class CmpControl {
       String algo = pbmOwfs.get(i);
       HashAlgo ha;
       try {
-        ha = HashAlgo.getNonNullInstance(algo);
+        ha = HashAlgo.getInstance(algo);
       } catch (Exception ex) {
         throw new InvalidConfException("invalid pbmPwf " + algo, ex);
       }
       canonicalizedAlgos.add(ha.getJceName());
-      requestPbmOwfs.add(ha.getOid());
+      requestPbmOwfs.add(ha);
 
       if (i == 0) {
-        responsePbmOwf = ha.getAlgorithmIdentifier();
+        responsePbmOwf = ha;
       }
     }
     pairs.putPair(KEY_PROTECTION_PBM_OWF, algosAsString(canonicalizedAlgos));
@@ -297,17 +295,17 @@ public class CmpControl {
     this.requestPbmMacs = new ArrayList<>(pbmMacs.size());
     for (int i = 0; i < pbmMacs.size(); i++) {
       String algo = pbmMacs.get(i);
-      AlgorithmIdentifier algId;
+      SigAlgo sigAlgo;
       try {
-        algId = AlgorithmUtil.getMacAlgId(algo);
-        canonicalizedAlgos.add(AlgorithmUtil.getSigOrMacAlgoName(algId));
+        sigAlgo = SigAlgo.getInstance(algo);
       } catch (NoSuchAlgorithmException ex) {
         throw new InvalidConfException("invalid pbmMac " + algo, ex);
       }
-      requestPbmMacs.add(algId.getAlgorithm());
+      canonicalizedAlgos.add(sigAlgo.getJceName());
+      requestPbmMacs.add(sigAlgo);
 
       if (i == 0) {
-        responsePbmMac = algId;
+        responsePbmMac = sigAlgo;
       }
     }
 
@@ -358,11 +356,11 @@ public class CmpControl {
     return popoAlgoValidator;
   }
 
-  public AlgorithmIdentifier getResponsePbmOwf() {
+  public HashAlgo getResponsePbmOwf() {
     return responsePbmOwf;
   }
 
-  public AlgorithmIdentifier getResponsePbmMac() {
+  public SigAlgo getResponsePbmMac() {
     return responsePbmMac;
   }
 
@@ -370,25 +368,13 @@ public class CmpControl {
     return responsePbmIterationCount;
   }
 
-  public boolean isRequestPbmOwfPermitted(AlgorithmIdentifier pbmOwf) {
-    ASN1ObjectIdentifier owfOid = pbmOwf.getAlgorithm();
-    for (ASN1ObjectIdentifier oid : requestPbmOwfs) {
-      if (oid.equals(owfOid)) {
-        return true;
-      }
-    }
-    return false;
-  } // method isRequestPbmOwfPermitted
+  public boolean isRequestPbmOwfPermitted(HashAlgo pbmOwf) {
+    return requestPbmOwfs.contains(pbmOwf);
+  }
 
-  public boolean isRequestPbmMacPermitted(AlgorithmIdentifier pbmMac) {
-    ASN1ObjectIdentifier macOid = pbmMac.getAlgorithm();
-    for (ASN1ObjectIdentifier oid : requestPbmMacs) {
-      if (oid.equals(macOid)) {
-        return true;
-      }
-    }
-    return false;
-  } // method isRequestPbmMacPermitted
+  public boolean isRequestPbmMacPermitted(SigAlgo pbmMac) {
+    return requestPbmMacs.contains(pbmMac);
+  }
 
   public String getConf() {
     return conf;

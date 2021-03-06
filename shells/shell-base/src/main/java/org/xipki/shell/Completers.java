@@ -159,7 +159,7 @@ public class Completers {
   public static class SigAlgCompleter extends EnumCompleter {
 
     public SigAlgCompleter() {
-      String[] encAlgs = {"RSA", "RSAandMGF1", "ECDSA", "DSA"};
+      String[] encAlgs = {"RSA", "RSAPSS", "ECDSA", "DSA"};
       String[] hashAlgs = {"SHA1", "SHA224", "SHA256", "SHA384", "SHA512",
         "SHA3-224, SHA3-256, SHA3-384, SHA3-512"};
 

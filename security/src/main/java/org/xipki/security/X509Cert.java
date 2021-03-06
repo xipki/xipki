@@ -25,7 +25,6 @@ import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.Provider;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
@@ -47,7 +46,6 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
-import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Hex;
@@ -388,25 +386,9 @@ public class X509Cert {
     if (jceInstance != null) {
       jceInstance.verify(key);
     } else {
-      String sigName = AlgorithmUtil.getSignatureAlgoName(bcInstance.getSignatureAlgorithm());
-      Signature signature = Signature.getInstance(sigName);
+      SigAlgo sigAlgo = SigAlgo.getInstance(bcInstance.getSignatureAlgorithm());
+      Signature signature = sigAlgo.newSignature();
       checkBcSignature(key, signature);
-    }
-  }
-
-  public void verify(PublicKey key, Provider sigProvider)
-      throws CertificateException, NoSuchAlgorithmException,
-      InvalidKeyException, SignatureException, NoSuchProviderException {
-    if (sigProvider == null) {
-      verify(key);
-    } else {
-      if (jceInstance != null) {
-        jceInstance.verify(key, sigProvider);
-      } else {
-        String sigName = AlgorithmUtil.getSignatureAlgoName(bcInstance.getSignatureAlgorithm());
-        Signature signature = Signature.getInstance(sigName, sigProvider);
-        checkBcSignature(key, signature);
-      }
     }
   }
 
@@ -419,8 +401,8 @@ public class X509Cert {
       if (jceInstance != null) {
         jceInstance.verify(key, sigProvider);
       } else {
-        String sigName = AlgorithmUtil.getSignatureAlgoName(bcInstance.getSignatureAlgorithm());
-        Signature signature = Signature.getInstance(sigName, sigProvider);
+        SigAlgo sigAlgo = SigAlgo.getInstance(bcInstance.getSignatureAlgorithm());
+        Signature signature = sigAlgo.newSignature(sigProvider);
         checkBcSignature(key, signature);
       }
     }

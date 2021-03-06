@@ -42,6 +42,7 @@ import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.BadFormatException;
 import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.security.KeyUsage;
+import org.xipki.security.SigAlgo;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.StringUtil;
@@ -572,7 +573,7 @@ public abstract class Certprofile implements Closeable {
     return X509CertVersion.v3;
   }
 
-  public List<String> getSignatureAlgorithms() {
+  public List<SigAlgo> getSignatureAlgorithms() {
     return null;
   }
 

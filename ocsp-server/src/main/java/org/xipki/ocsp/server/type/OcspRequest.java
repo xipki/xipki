@@ -20,6 +20,7 @@ package org.xipki.ocsp.server.type;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -115,8 +116,13 @@ public class OcspRequest {
       Header hdrNameHash = readHeader(request, hdrHashAlgo.readerIndex + hdrHashAlgo.len);
       Header hdrKeyHash = readHeader(request, hdrNameHash.readerIndex + hdrNameHash.len);
       Header hdrSerial = readHeader(request, hdrKeyHash.readerIndex + hdrKeyHash.len);
-      RequestIssuer issuer = new RequestIssuer(request, hdrCertId.readerIndex,
-          hdrKeyHash.readerIndex + hdrKeyHash.len - hdrCertId.readerIndex);
+      RequestIssuer issuer;
+      try {
+        issuer = new RequestIssuer(request, hdrCertId.readerIndex,
+            hdrKeyHash.readerIndex + hdrKeyHash.len - hdrCertId.readerIndex);
+      } catch (NoSuchAlgorithmException ex) {
+        throw new EncodingException(ex);
+      }
 
       BigInteger serialNumber = new BigInteger(readContent(request, hdrSerial));
       CertID certId = new CertID(issuer, serialNumber);
@@ -188,14 +194,13 @@ public class OcspRequest {
         out.write(certId0.getHashAlgorithm().getEncoded());
         out.write(certId0.getIssuerNameHash().getEncoded());
         out.write(certId0.getIssuerKeyHash().getEncoded());
-      } catch (IOException ex) {
+        byte[] encodedIssuer = out.toByteArray();
+        RequestIssuer issuer = new RequestIssuer(encodedIssuer,0, encodedIssuer.length);
+        CertID certId = new CertID(issuer, certId0.getSerialNumber().getValue());
+        requestList.add(certId);
+      } catch (IOException | NoSuchAlgorithmException ex) {
         throw new EncodingException(ex.getMessage(), ex);
       }
-
-      byte[] encodedIssuer = out.toByteArray();
-      RequestIssuer issuer = new RequestIssuer(encodedIssuer,0, encodedIssuer.length);
-      CertID certId = new CertID(issuer, certId0.getSerialNumber().getValue());
-      requestList.add(certId);
     }
 
     List<ExtendedExtension> extensions = new LinkedList<>();

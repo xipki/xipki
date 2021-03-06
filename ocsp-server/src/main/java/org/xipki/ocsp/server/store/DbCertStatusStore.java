@@ -22,6 +22,7 @@ import static org.xipki.util.Args.notNull;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -560,7 +561,7 @@ public class DbCertStatusStore extends OcspStore {
 
     try {
       this.certHashAlgo = getCertHashAlgo(datasource);
-    } catch (DataAccessException ex) {
+    } catch (NoSuchAlgorithmException | DataAccessException ex) {
       throw new OcspStoreException(
           "Could not retrieve the certhash's algorithm from the database", ex);
     }
@@ -651,7 +652,7 @@ public class DbCertStatusStore extends OcspStore {
   }
 
   public static HashAlgo getCertHashAlgo(DataSourceWrapper datasource)
-      throws DataAccessException {
+      throws DataAccessException, NoSuchAlgorithmException {
     // analyze the database
     String certHashAlgoStr = datasource.getFirstValue(null, "DBSCHEMA", "VALUE2",
         "NAME='CERTHASH_ALGO'", String.class);
@@ -661,7 +662,7 @@ public class DbCertStatusStore extends OcspStore {
           "Column with NAME='CERTHASH_ALGO' is not defined in table DBSCHEMA");
     }
 
-    return HashAlgo.getNonNullInstance(certHashAlgoStr);
+    return HashAlgo.getInstance(certHashAlgoStr);
   }
 
 }
