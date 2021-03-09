@@ -282,10 +282,10 @@ public class ResponseCacher implements Closeable {
   } // method storeIssuer
 
   public OcspRespWithCacheInfo getOcspResponse(int issuerId, BigInteger serialNumber,
-      SignAlgo sigAlg)
+      SignAlgo sigAlgo)
           throws DataAccessException {
     final String sql = sqlSelectOcsp;
-    byte[] identBytes = buildIdent(serialNumber, sigAlg);
+    byte[] identBytes = buildIdent(serialNumber, sigAlgo);
     long id = deriveId(issuerId, identBytes);
     PreparedStatement ps = datasource.prepareStatement(sql);
     ResultSet rs = null;
@@ -334,7 +334,7 @@ public class ResponseCacher implements Closeable {
   } // method getOcspResponse
 
   public void storeOcspResponse(int issuerId, BigInteger serialNumber, long generatedAt,
-      Long nextUpdate, SignAlgo sigAlg, byte[] response) {
+      Long nextUpdate, SignAlgo sigAlgo, byte[] response) {
     long nowInSec = System.currentTimeMillis() / 1000;
     if (nextUpdate == null) {
       nextUpdate = nowInSec + SEC_DFLT_NEXT_UPDATE_DURATION;
@@ -344,7 +344,7 @@ public class ResponseCacher implements Closeable {
       return;
     }
 
-    byte[] identBytes = buildIdent(serialNumber, sigAlg);
+    byte[] identBytes = buildIdent(serialNumber, sigAlgo);
     String ident = Base64.encodeToString(identBytes);
     try {
       long id = deriveId(issuerId, identBytes);
@@ -566,10 +566,10 @@ public class ResponseCacher implements Closeable {
     return true;
   } // method initIssuerStore
 
-  private static byte[] buildIdent(BigInteger serialNumber, SignAlgo sigAlg) {
+  private static byte[] buildIdent(BigInteger serialNumber, SignAlgo sigAlgo) {
     byte[] snBytes = serialNumber.toByteArray();
     byte[] bytes = new byte[1 + snBytes.length];
-    bytes[0] = sigAlg.getCode();
+    bytes[0] = sigAlgo.getCode();
     System.arraycopy(snBytes, 0, bytes, 1, snBytes.length);
     return bytes;
   }

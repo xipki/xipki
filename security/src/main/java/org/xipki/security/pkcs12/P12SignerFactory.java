@@ -126,16 +126,16 @@ public class P12SignerFactory implements SignerFactory {
     InputStream keystoreStream = getInputStream(str);
 
     try {
-      SignAlgo sigAlg = null;
+      SignAlgo sigAlgo = null;
       String algoName = conf.getConfValue("algo");
       if (algoName != null) {
-        sigAlg = SignAlgo.getInstance(algoName);
+        sigAlgo = SignAlgo.getInstance(algoName);
       }
 
-      if (sigAlg != null && sigAlg.isMac()) {
+      if (sigAlgo != null && sigAlgo.isMac()) {
         P12MacContentSignerBuilder signerBuilder = new P12MacContentSignerBuilder(
             type, keystoreStream, password, keyLabel, password);
-        return signerBuilder.createSigner(sigAlg, parallelism, securityFactory.getRandom4Sign());
+        return signerBuilder.createSigner(sigAlgo, parallelism, securityFactory.getRandom4Sign());
       } else {
         KeypairWithCert keypairWithCert = KeypairWithCert.fromKeystore(
             type, keystoreStream, password, keyLabel, password, certificateChain);
@@ -166,12 +166,12 @@ public class P12SignerFactory implements SignerFactory {
         } else {
           P12ContentSignerBuilder signerBuilder = new P12ContentSignerBuilder(keypairWithCert);
 
-          if (sigAlg == null) {
+          if (sigAlgo == null) {
             PublicKey pubKey = signerBuilder.getCertificate().getPublicKey();
-            sigAlg = SignAlgo.getInstance(pubKey, conf);
+            sigAlgo = SignAlgo.getInstance(pubKey, conf);
           }
 
-          return signerBuilder.createSigner(sigAlg, parallelism,
+          return signerBuilder.createSigner(sigAlgo, parallelism,
               securityFactory.getRandom4Sign());
         }
       }

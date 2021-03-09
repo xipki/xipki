@@ -66,9 +66,9 @@ public class QaP11Actions {
     @Override
     protected Object execute1(PrivateKey key, Certificate cert)
         throws Exception {
-      String sigAlgo = "SM3withSM2";
-      println("signature algorithm: " + sigAlgo);
-      Signature sig = Signature.getInstance(sigAlgo);
+      String signAlgo = "SM3withSM2";
+      println("signature algorithm: " + signAlgo);
+      Signature sig = Signature.getInstance(signAlgo);
 
       if (StringUtil.isNotBlank(ida)) {
         sig.setParameter(new XiSM2ParameterSpec(StringUtil.toUtf8Bytes(ida)));
@@ -81,7 +81,7 @@ public class QaP11Actions {
       byte[] signature = sig.sign(); // CHECKSTYLE:SKIP
       println("signature created successfully");
 
-      Signature ver = Signature.getInstance(sigAlgo, "BC");
+      Signature ver = Signature.getInstance(signAlgo, "BC");
       if (StringUtil.isNotBlank(ida)) {
         ver.setParameter(new SM2ParameterSpec(StringUtil.toUtf8Bytes(ida)));
       }
@@ -124,9 +124,9 @@ public class QaP11Actions {
         throws Exception {
       PublicKey pubKey = cert.getPublicKey();
 
-      SignAlgo sigAlgo = getSignatureAlgo(pubKey);
-      println("signature algorithm: " + sigAlgo);
-      Signature sig = Signature.getInstance(sigAlgo.getJceName());
+      SignAlgo signAlgo = getSignatureAlgo(pubKey);
+      println("signature algorithm: " + signAlgo);
+      Signature sig = Signature.getInstance(signAlgo.getJceName());
       sig.initSign(key);
 
       byte[] data = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
@@ -134,8 +134,8 @@ public class QaP11Actions {
       byte[] signature = sig.sign(); // CHECKSTYLE:SKIP
       println("signature created successfully");
 
-      String provName = sigAlgo.getHashAlgo().isShake() ? XiProvider.PROVIDER_NAME : "BC";
-      Signature ver = Signature.getInstance(sigAlgo.getJceName(), provName);
+      String provName = signAlgo.getHashAlgo().isShake() ? XiProvider.PROVIDER_NAME : "BC";
+      Signature ver = Signature.getInstance(signAlgo.getJceName(), provName);
       ver.initVerify(pubKey);
       ver.update(data);
       boolean valid = ver.verify(signature);

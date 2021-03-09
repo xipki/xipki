@@ -492,8 +492,8 @@ class CertprofileUtil {
     } else {
       List<HashAlgo> allowedHashAlgos =
           Arrays.asList(HashAlgo.SHA256, HashAlgo.SHA384, HashAlgo.SHA512);
-      for (SignAlgo sigAlgo : sigAlgos) {
-        HashAlgo hashAlgo = sigAlgo.getHashAlgo();
+      for (SignAlgo signAlgo : sigAlgos) {
+        HashAlgo hashAlgo = signAlgo.getHashAlgo();
         if (!allowedHashAlgos.contains(hashAlgo)) {
           msg.append("unpermitted hash algorithm ").append(hashAlgo).append(", ");
         }

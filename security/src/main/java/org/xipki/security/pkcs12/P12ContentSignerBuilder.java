@@ -77,24 +77,24 @@ public class P12ContentSignerBuilder {
   // CHECKSTYLE:SKIP
   private static class RSAContentSignerBuilder extends BcContentSignerBuilder {
 
-    private final SignAlgo sigAlgo;
+    private final SignAlgo signAlgo;
 
-    private RSAContentSignerBuilder(SignAlgo sigAlgo)
+    private RSAContentSignerBuilder(SignAlgo signAlgo)
         throws NoSuchAlgorithmException, NoSuchPaddingException {
-      super(sigAlgo.getAlgorithmIdentifier(), sigAlgo.getHashAlgo().getAlgorithmIdentifier());
-      if (!(sigAlgo.isRSAPSSSigAlgo() || sigAlgo.isRSAPkcs1SigAlgo())) {
+      super(signAlgo.getAlgorithmIdentifier(), signAlgo.getHashAlgo().getAlgorithmIdentifier());
+      if (!(signAlgo.isRSAPSSSigAlgo() || signAlgo.isRSAPkcs1SigAlgo())) {
         throw new NoSuchAlgorithmException("the given algorithm is not a valid RSA signature "
-            + "algorithm '" + sigAlgo + "'");
+            + "algorithm '" + signAlgo + "'");
       }
-      this.sigAlgo = sigAlgo;
+      this.signAlgo = signAlgo;
     }
 
     protected Signer createSigner(AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
         throws OperatorCreationException {
-      sigAlgo.assertSameAlgorithm(sigAlgId, digAlgId);
-      if (sigAlgo.isRSAPSSSigAlgo()) {
+      signAlgo.assertSameAlgorithm(sigAlgId, digAlgId);
+      if (signAlgo.isRSAPSSSigAlgo()) {
         try {
-          return SignerUtil.createPSSRSASigner(sigAlgo);
+          return SignerUtil.createPSSRSASigner(signAlgo);
         } catch (XiSecurityException ex) {
           throw new OperatorCreationException(ex.getMessage(), ex);
         }
@@ -109,22 +109,22 @@ public class P12ContentSignerBuilder {
   // CHECKSTYLE:SKIP
   private static class DSAContentSignerBuilder extends BcContentSignerBuilder {
 
-    private final SignAlgo sigAlgo;
+    private final SignAlgo signAlgo;
 
-    private DSAContentSignerBuilder(SignAlgo sigAlgo)
+    private DSAContentSignerBuilder(SignAlgo signAlgo)
         throws NoSuchAlgorithmException, NoSuchPaddingException {
-      super(sigAlgo.getAlgorithmIdentifier(), sigAlgo.getHashAlgo().getAlgorithmIdentifier());
-      if (!sigAlgo.isDSASigAlgo()) {
+      super(signAlgo.getAlgorithmIdentifier(), signAlgo.getHashAlgo().getAlgorithmIdentifier());
+      if (!signAlgo.isDSASigAlgo()) {
         throw new NoSuchAlgorithmException("the given algorithm is not a valid DSA signature "
-            + "algirthm " + sigAlgo);
+            + "algirthm " + signAlgo);
       }
-      this.sigAlgo = sigAlgo;
+      this.signAlgo = signAlgo;
     }
 
     protected Signer createSigner(AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
         throws OperatorCreationException {
-      sigAlgo.assertSameAlgorithm(sigAlgId, digAlgId);
-      Digest dig = sigAlgo.getHashAlgo().createDigest();
+      signAlgo.assertSameAlgorithm(sigAlgId, digAlgId);
+      Digest dig = signAlgo.getHashAlgo().createDigest();
       return new DSADigestSigner(new DSASigner(), dig);
     }
 
@@ -133,26 +133,26 @@ public class P12ContentSignerBuilder {
   // CHECKSTYLE:SKIP
   private static class ECDSAContentSignerBuilder extends BcContentSignerBuilder {
 
-    private final SignAlgo sigAlgo;
+    private final SignAlgo signAlgo;
 
-    private ECDSAContentSignerBuilder(SignAlgo sigAlgo)
+    private ECDSAContentSignerBuilder(SignAlgo signAlgo)
         throws NoSuchAlgorithmException, NoSuchPaddingException {
-      super(sigAlgo.getAlgorithmIdentifier(), sigAlgo.getHashAlgo().getAlgorithmIdentifier());
-      if (!sigAlgo.isECDSASigAlgo()) {
+      super(signAlgo.getAlgorithmIdentifier(), signAlgo.getHashAlgo().getAlgorithmIdentifier());
+      if (!signAlgo.isECDSASigAlgo()) {
         throw new NoSuchAlgorithmException("the given algorithm is not a valid ECDSA signature "
-            + "algirthm " + sigAlgo);
+            + "algirthm " + signAlgo);
       }
-      this.sigAlgo = sigAlgo;
+      this.signAlgo = signAlgo;
     }
 
     protected Signer createSigner(AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
         throws OperatorCreationException {
-      sigAlgo.assertSameAlgorithm(sigAlgId, digAlgId);
+      signAlgo.assertSameAlgorithm(sigAlgId, digAlgId);
 
-      Digest dig = sigAlgo.getHashAlgo().createDigest();
+      Digest dig = signAlgo.getHashAlgo().createDigest();
       ECDSASigner dsaSigner = new ECDSASigner();
 
-      return sigAlgo.isPlainECDSASigAlgo()
+      return signAlgo.isPlainECDSASigAlgo()
           ? new DSAPlainDigestSigner(dsaSigner, dig)
           : new DSADigestSigner(dsaSigner, dig);
     }
@@ -162,22 +162,22 @@ public class P12ContentSignerBuilder {
   // CHECKSTYLE:SKIP
   private static class SM2ContentSignerBuilder extends BcContentSignerBuilder {
 
-    private final SignAlgo sigAlgo;
+    private final SignAlgo signAlgo;
 
-    private SM2ContentSignerBuilder(SignAlgo sigAlgo)
+    private SM2ContentSignerBuilder(SignAlgo signAlgo)
         throws NoSuchAlgorithmException, NoSuchPaddingException {
-      super(sigAlgo.getAlgorithmIdentifier(), sigAlgo.getHashAlgo().getAlgorithmIdentifier());
-      if (!sigAlgo.isSM2SigAlgo()) {
+      super(signAlgo.getAlgorithmIdentifier(), signAlgo.getHashAlgo().getAlgorithmIdentifier());
+      if (!signAlgo.isSM2SigAlgo()) {
         throw new NoSuchAlgorithmException("the given algorithm is not a valid SM2 signature "
-            + "algirthm " + sigAlgo);
+            + "algirthm " + signAlgo);
       }
-      this.sigAlgo = sigAlgo;
+      this.signAlgo = signAlgo;
     }
 
     protected Signer createSigner(AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
         throws OperatorCreationException {
-      sigAlgo.assertSameAlgorithm(sigAlgId, digAlgId);
-      return new SM2Signer(sigAlgo.getHashAlgo().createDigest());
+      signAlgo.assertSameAlgorithm(sigAlgId, digAlgId);
+      return new SM2Signer(signAlgo.getHashAlgo().createDigest());
     }
 
   } // class SM2ContentSignerBuilder
@@ -215,22 +215,22 @@ public class P12ContentSignerBuilder {
     return key;
   }
 
-  public ContentSigner createContentSigner(SignAlgo sigAlgo, SecureRandom random)
+  public ContentSigner createContentSigner(SignAlgo signAlgo, SecureRandom random)
           throws XiSecurityException, NoSuchPaddingException {
-    notNull(sigAlgo, "sigAlgo");
+    notNull(signAlgo, "signAlgo");
 
-    String provName = getProviderName(sigAlgo);
+    String provName = getProviderName(signAlgo);
 
     if (provName != null && Security.getProvider(provName) != null) {
       try {
-        Signature signature = createSignature(sigAlgo, provName, true);
-        return new SignatureSigner(sigAlgo, signature, key);
+        Signature signature = createSignature(signAlgo, provName, true);
+        return new SignatureSigner(signAlgo, signature, key);
       } catch (Exception ex) {
         // do nothing
       }
     }
 
-    Object[] rv = ff(sigAlgo, random);
+    Object[] rv = ff(signAlgo, random);
     BcContentSignerBuilder signerBuilder = (BcContentSignerBuilder) rv[0];
     AsymmetricKeyParameter keyparam = (AsymmetricKeyParameter) rv[1];
 
@@ -241,20 +241,20 @@ public class P12ContentSignerBuilder {
     }
   } // method createContentSigner
 
-  public ConcurrentContentSigner createSigner(SignAlgo sigAlgo, int parallelism,
+  public ConcurrentContentSigner createSigner(SignAlgo signAlgo, int parallelism,
       SecureRandom random)
           throws XiSecurityException, NoSuchPaddingException {
-    notNull(sigAlgo, "sigAlgo");
+    notNull(signAlgo, "signAlgo");
     positive(parallelism, "parallelism");
 
     List<XiContentSigner> signers = new ArrayList<>(parallelism);
 
-    String provName = getProviderName(sigAlgo);
+    String provName = getProviderName(signAlgo);
     if (provName != null && Security.getProvider(provName) != null) {
       try {
         for (int i = 0; i < parallelism; i++) {
-          Signature signature = createSignature(sigAlgo, provName, i == 0);
-          XiContentSigner signer = new SignatureSigner(sigAlgo, signature, key);
+          Signature signature = createSignature(signAlgo, provName, i == 0);
+          XiContentSigner signer = new SignatureSigner(signAlgo, signature, key);
           signers.add(signer);
         }
       } catch (Exception ex) {
@@ -263,7 +263,7 @@ public class P12ContentSignerBuilder {
     }
 
     if (CollectionUtil.isEmpty(signers)) {
-      Object[] rv = ff(sigAlgo, random);
+      Object[] rv = ff(signAlgo, random);
       BcContentSignerBuilder signerBuilder = (BcContentSignerBuilder) rv[0];
       AsymmetricKeyParameter keyparam = (AsymmetricKeyParameter) rv[1];
 
@@ -294,26 +294,26 @@ public class P12ContentSignerBuilder {
     return concurrentSigner;
   } // method createSigner
 
-  private String getProviderName(SignAlgo sigAlgo) {
+  private String getProviderName(SignAlgo signAlgo) {
     String provName = null;
-    if (sigAlgo.isRSAPkcs1SigAlgo()) {
+    if (signAlgo.isRSAPkcs1SigAlgo()) {
       provName = "SunRsaSign";
-    } else if (sigAlgo.isECDSASigAlgo()) {
+    } else if (signAlgo.isECDSASigAlgo()) {
       // Currently, the provider SunEC is much slower (5x) than BC,
       // so we do not use the Signature variant.
       provName = null;
-    } else if (sigAlgo.isDSASigAlgo()) {
+    } else if (signAlgo.isDSASigAlgo()) {
       provName = "SUN";
-    } else if (sigAlgo.isEDDSASigAlgo()) {
+    } else if (signAlgo.isEDDSASigAlgo()) {
       provName = "BC";
     }
     return provName;
   }
 
-  private Signature createSignature(SignAlgo sigAlgo, String provName, boolean test)
+  private Signature createSignature(SignAlgo signAlgo, String provName, boolean test)
       throws NoSuchAlgorithmException, NoSuchProviderException,
       InvalidKeyException, SignatureException {
-    Signature signature = Signature.getInstance(sigAlgo.getJceName(), provName);
+    Signature signature = Signature.getInstance(signAlgo.getJceName(), provName);
     signature.initSign(key);
     if (test) {
       signature.update(new byte[]{1, 2, 3, 4});
@@ -322,24 +322,24 @@ public class P12ContentSignerBuilder {
     return signature;
   }
 
-  private Object[] ff(SignAlgo sigAlgo, SecureRandom random)
+  private Object[] ff(SignAlgo signAlgo, SecureRandom random)
       throws NoSuchPaddingException, XiSecurityException {
     BcContentSignerBuilder signerBuilder;
     AsymmetricKeyParameter keyparam;
     try {
       if (key instanceof RSAPrivateKey) {
         keyparam = SignerUtil.generateRSAPrivateKeyParameter((RSAPrivateKey) key);
-        signerBuilder = new RSAContentSignerBuilder(sigAlgo);
+        signerBuilder = new RSAContentSignerBuilder(signAlgo);
       } else if (key instanceof DSAPrivateKey) {
         keyparam = DSAUtil.generatePrivateKeyParameter(key);
-        signerBuilder = new DSAContentSignerBuilder(sigAlgo);
+        signerBuilder = new DSAContentSignerBuilder(signAlgo);
       } else if (key instanceof ECPrivateKey) {
         keyparam = ECUtil.generatePrivateKeyParameter(key);
         EllipticCurve curve = ((ECPrivateKey) key).getParams().getCurve();
         if (GMUtil.isSm2primev2Curve(curve)) {
-          signerBuilder = new SM2ContentSignerBuilder(sigAlgo);
+          signerBuilder = new SM2ContentSignerBuilder(signAlgo);
         } else {
-          signerBuilder = new ECDSAContentSignerBuilder(sigAlgo);
+          signerBuilder = new ECDSAContentSignerBuilder(signAlgo);
         }
       } else {
         throw new XiSecurityException("unsupported key " + key.getClass().getName());

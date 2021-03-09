@@ -82,7 +82,7 @@ public class AESGmacContentSigner implements XiContentSigner {
 
   private final SecureRandom random;
 
-  private final SignAlgo sigAlgo;
+  private final SignAlgo signAlgo;
 
   private final Cipher cipher;
 
@@ -94,9 +94,9 @@ public class AESGmacContentSigner implements XiContentSigner {
 
   private final int nonceOffset;
 
-  public AESGmacContentSigner(SignAlgo sigAlgo, SecretKey signingKey)
+  public AESGmacContentSigner(SignAlgo signAlgo, SecretKey signingKey)
       throws XiSecurityException {
-    this.sigAlgo = notNull(sigAlgo, "sigAlgo");
+    this.signAlgo = notNull(signAlgo, "signAlgo");
     this.signingKey = notNull(signingKey, "signingKey");
 
     Cipher cipher0;
@@ -116,7 +116,7 @@ public class AESGmacContentSigner implements XiContentSigner {
 
     GCMParameters params = new GCMParameters(nonce, tagByteLen);
     try {
-      this.sigAlgIdTemplate = new AlgorithmIdentifier(sigAlgo.getOid(), params).getEncoded();
+      this.sigAlgIdTemplate = new AlgorithmIdentifier(signAlgo.getOid(), params).getEncoded();
     } catch (IOException ex) {
       throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
     }
@@ -124,15 +124,15 @@ public class AESGmacContentSigner implements XiContentSigner {
 
     int keyLen = signingKey.getEncoded().length;
     if (keyLen == 16) {
-      if (SignAlgo.GMAC_AES128 != sigAlgo) {
+      if (SignAlgo.GMAC_AES128 != signAlgo) {
         throw new XiSecurityException("oid and singingKey do not match");
       }
     } else if (keyLen == 24) {
-      if (SignAlgo.GMAC_AES192 != sigAlgo) {
+      if (SignAlgo.GMAC_AES192 != signAlgo) {
         throw new XiSecurityException("oid and singingKey do not match");
       }
     } else if (keyLen == 32) {
-      if (SignAlgo.GMAC_AES256 != sigAlgo) {
+      if (SignAlgo.GMAC_AES256 != signAlgo) {
         throw new XiSecurityException("oid and singingKey do not match");
       }
     } else {
@@ -150,7 +150,7 @@ public class AESGmacContentSigner implements XiContentSigner {
   @Override
   public AlgorithmIdentifier getAlgorithmIdentifier() {
     GCMParameters params = new GCMParameters(nonce, tagByteLen);
-    return new AlgorithmIdentifier(sigAlgo.getOid(), params);
+    return new AlgorithmIdentifier(signAlgo.getOid(), params);
   }
 
   @Override

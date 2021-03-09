@@ -95,18 +95,18 @@ public class P12MacContentSignerBuilder {
     }
   } // constructor
 
-  public ConcurrentContentSigner createSigner(SignAlgo sigAlg,
+  public ConcurrentContentSigner createSigner(SignAlgo sigAlgo,
       int parallelism, SecureRandom random)
           throws XiSecurityException {
-    notNull(sigAlg, "sigAlg");
+    notNull(sigAlgo, "sigAlgo");
     positive(parallelism, "parallelism");
 
     List<XiContentSigner> signers = new ArrayList<>(parallelism);
 
     for (int i = 0; i < parallelism; i++) {
-      XiContentSigner signer = sigAlg.isGmac()
-          ? new AESGmacContentSigner(sigAlg, key)
-          : new HmacContentSigner(sigAlg, key);
+      XiContentSigner signer = sigAlgo.isGmac()
+          ? new AESGmacContentSigner(sigAlgo, key)
+          : new HmacContentSigner(sigAlgo, key);
       signers.add(signer);
     }
 

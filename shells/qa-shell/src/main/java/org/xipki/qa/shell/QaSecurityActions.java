@@ -272,7 +272,7 @@ public class QaSecurityActions {
 
     @Option(name = "--sig-algo", required = true, description = "signature algorithm")
     @Completion(QaCompleters.DSASigAlgCompleter.class)
-    private String sigAlgo;
+    private String signAlgo;
 
     private final Queue<KeyControl.DSA> queue = new LinkedList<>();
 
@@ -292,12 +292,12 @@ public class QaSecurityActions {
       }
 
       if (control.plen() == 1024) {
-        if (!"SHA1withDSA".equalsIgnoreCase(sigAlgo)) {
+        if (!"SHA1withDSA".equalsIgnoreCase(signAlgo)) {
           throw new IllegalCmdParamException("only SHA1withDSA is permitted for DSA with 1024 bit");
         }
       }
 
-      return new P11SignSpeed.DSA(securityFactory, getSlot(), getKeyId(), sigAlgo, getNumThreads(),
+      return new P11SignSpeed.DSA(securityFactory, getSlot(), getKeyId(), signAlgo, getNumThreads(),
           control.plen(), control.qlen());
     }
 
@@ -341,7 +341,7 @@ public class QaSecurityActions {
 
     @Option(name = "--sig-algo", required = true, description = "signature algorithm")
     @Completion(QaCompleters.ECDSASigAlgCompleter.class)
-    private String sigAlgo;
+    private String signAlgo;
 
     private final Queue<KeyControl.EC> queue = new LinkedList<>();
 
@@ -359,7 +359,7 @@ public class QaSecurityActions {
         return null;
       }
 
-      return new P11SignSpeed.EC(securityFactory, getSlot(), getKeyId(), sigAlgo, getNumThreads(),
+      return new P11SignSpeed.EC(securityFactory, getSlot(), getKeyId(), signAlgo, getNumThreads(),
           AlgorithmUtil.getCurveOidForCurveNameOrOid(control.curveName));
     }
 
@@ -400,7 +400,7 @@ public class QaSecurityActions {
 
     @Option(name = "--sig-algo", required = true, description = "signature algorithm")
     @Completion(QaCompleters.RSASigAlgCompleter.class)
-    private String sigAlgo;
+    private String signAlgo;
 
     private final Queue<KeyControl.RSA> queue = new LinkedList<>();
 
@@ -419,7 +419,7 @@ public class QaSecurityActions {
         return null;
       }
 
-      return new P11SignSpeed.RSA(securityFactory, getSlot(), getKeyId(), sigAlgo, getNumThreads(),
+      return new P11SignSpeed.RSA(securityFactory, getSlot(), getKeyId(), signAlgo, getNumThreads(),
           control.modulusLen(), toBigInt("0x10001"));
     }
 
@@ -496,7 +496,7 @@ public class QaSecurityActions {
 
     @Option(name = "--sig-algo", required = true, description = "signature algorithm")
     @Completion(QaCompleters.DSASigAlgCompleter.class)
-    private String sigAlgo;
+    private String signAlgo;
 
     @Override
     protected BenchmarkExecutor getTester()
@@ -506,13 +506,13 @@ public class QaSecurityActions {
       }
 
       if (plen == 1024) {
-        if (!"SHA1withDSA".equalsIgnoreCase(sigAlgo)) {
+        if (!"SHA1withDSA".equalsIgnoreCase(signAlgo)) {
           throw new IllegalCmdParamException("only SHA1withDSA is permitted for DSA with 1024 bit");
         }
       }
 
       return new P11SignSpeed.DSA(keyPresent, securityFactory, getSlot(), getKeyId(), keyLabel,
-          sigAlgo, getNumThreads(), plen, qlen);
+          signAlgo, getNumThreads(), plen, qlen);
     }
 
   } // class SpeedDsaSignP11
@@ -551,13 +551,13 @@ public class QaSecurityActions {
 
     @Option(name = "--sig-algo", required = true, description = "signature algorithm")
     @Completion(QaCompleters.ECDSASigAlgCompleter.class)
-    private String sigAlgo;
+    private String signAlgo;
 
     @Override
     protected BenchmarkExecutor getTester()
         throws Exception {
       return new P11SignSpeed.EC(keyPresent, securityFactory, getSlot(), getKeyId(), keyLabel,
-          sigAlgo, getNumThreads(), AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName));
+          signAlgo, getNumThreads(), AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName));
     }
 
   } // class SpeedEcSignP11
@@ -592,18 +592,18 @@ public class QaSecurityActions {
 
     @Option(name = "--sig-algo", required = true, description = "signature algorithm")
     @Completion(QaCompleters.EDDSASigAlgCompleter.class)
-    private String sigAlgo;
+    private String signAlgo;
 
     @Override
     protected BenchmarkExecutor getTester()
         throws Exception {
-      ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(sigAlgo);
+      ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(signAlgo);
       if (curveOid == null) {
-        throw new IllegalCmdParamException("invalid sigAlgo " + sigAlgo);
+        throw new IllegalCmdParamException("invalid signAlgo " + signAlgo);
       }
 
       return new P11SignSpeed.EC(keyPresent, securityFactory, getSlot(), getKeyId(), keyLabel,
-          sigAlgo, getNumThreads(), curveOid);
+          signAlgo, getNumThreads(), curveOid);
     }
 
   } // class SpeedEdSignP11
@@ -615,13 +615,13 @@ public class QaSecurityActions {
 
     @Option(name = "--sig-algo", required = true, description = "signature algorithm")
     @Completion(QaCompleters.HMACSigAlgCompleter.class)
-    private String sigAlgo;
+    private String signAlgo;
 
     @Override
     protected BenchmarkExecutor getTester()
         throws Exception {
       return new P11SignSpeed.HMAC(keyPresent, securityFactory, getSlot(), getKeyId(), keyLabel,
-          sigAlgo, getNumThreads());
+          signAlgo, getNumThreads());
     }
 
   } // class SpeedHmacSignP11
@@ -663,13 +663,13 @@ public class QaSecurityActions {
 
     @Option(name = "--sig-algo", required = true, description = "signature algorithm")
     @Completion(QaCompleters.RSASigAlgCompleter.class)
-    private String sigAlgo;
+    private String signAlgo;
 
     @Override
     protected BenchmarkExecutor getTester()
         throws Exception {
       return new P11SignSpeed.RSA(keyPresent, securityFactory, getSlot(), getKeyId(), keyLabel,
-          sigAlgo, getNumThreads(), keysize, toBigInt(publicExponent));
+          signAlgo, getNumThreads(), keysize, toBigInt(publicExponent));
     }
 
   } // class SpeedRsaSignP11
@@ -762,10 +762,10 @@ public class QaSecurityActions {
         return null;
       }
       if (control.plen() == 1024) {
-        sigAlgo = "SHA1withDSA";
+        signAlgo = "SHA1withDSA";
       }
 
-      return new P12SignSpeed.DSA(securityFactory, sigAlgo, getNumThreads(),
+      return new P12SignSpeed.DSA(securityFactory, signAlgo, getNumThreads(),
           control.plen(), control.qlen());
     }
 
@@ -812,7 +812,7 @@ public class QaSecurityActions {
         throws Exception {
       KeyControl.EC control = queue.poll();
       return (control == null) ? null
-          : new P12SignSpeed.EC(securityFactory, sigAlgo, getNumThreads(),
+          : new P12SignSpeed.EC(securityFactory, signAlgo, getNumThreads(),
                   getCurveOid(control.curveName()));
     }
 
@@ -861,7 +861,7 @@ public class QaSecurityActions {
         throws Exception {
       KeyControl.RSA control = queue.poll();
       return (control == null) ? null
-        : new P12SignSpeed.RSA(securityFactory, sigAlgo, getNumThreads(),
+        : new P12SignSpeed.RSA(securityFactory, signAlgo, getNumThreads(),
             control.modulusLen(), toBigInt("0x10001"));
     }
   } // class BspeedRsaSignP12
@@ -869,7 +869,7 @@ public class QaSecurityActions {
   public abstract static class BSpeedP12SignAction extends BatchSpeedAction {
 
     @Option(name = "--sig-algo", required = true, description = "signature algorithm")
-    protected String sigAlgo;
+    protected String signAlgo;
 
   }
 
@@ -881,7 +881,7 @@ public class QaSecurityActions {
 
     @Option(name = "--sig-algo", required = true, description = "signature algorithm")
     @Completion(QaCompleters.GMACSigAlgCompleter.class)
-    private String sigAlgo;
+    private String signAlgo;
 
     public SpeedP12AESGmacSignAction() {
     }
@@ -889,7 +889,7 @@ public class QaSecurityActions {
     @Override
     protected BenchmarkExecutor getTester()
         throws Exception {
-      return new P12SignSpeed.AESGmac(securityFactory, sigAlgo, getNumThreads());
+      return new P12SignSpeed.AESGmac(securityFactory, signAlgo, getNumThreads());
     }
 
   } // class BSpeedP12SignAction
@@ -929,7 +929,7 @@ public class QaSecurityActions {
 
     @Option(name = "--sig-algo", required = true, description = "signature algorithm")
     @Completion(QaCompleters.DSASigAlgCompleter.class)
-    private String sigAlgo;
+    private String signAlgo;
 
     @Override
     protected BenchmarkExecutor getTester()
@@ -937,7 +937,7 @@ public class QaSecurityActions {
       if (qlen == null) {
         qlen = (plen >= 2048) ? 256 : 160;
       }
-      return new P12SignSpeed.DSA(securityFactory, sigAlgo, getNumThreads(), plen, qlen);
+      return new P12SignSpeed.DSA(securityFactory, signAlgo, getNumThreads(), plen, qlen);
     }
 
   } // class SpeedDsaSignP12
@@ -970,12 +970,12 @@ public class QaSecurityActions {
 
     @Option(name = "--sig-algo", required = true, description = "signature algorithm")
     @Completion(QaCompleters.ECDSASigAlgCompleter.class)
-    private String sigAlgo;
+    private String signAlgo;
 
     @Override
     protected BenchmarkExecutor getTester()
         throws Exception {
-      return new P12SignSpeed.EC(securityFactory, sigAlgo, getNumThreads(),
+      return new P12SignSpeed.EC(securityFactory, signAlgo, getNumThreads(),
           getCurveOid(curveName));
     }
 
@@ -1005,13 +1005,13 @@ public class QaSecurityActions {
 
     @Option(name = "--sig-algo", required = true, description = "signature algorithm")
     @Completion(QaCompleters.EDDSASigAlgCompleter.class)
-    private String sigAlgo;
+    private String signAlgo;
 
     @Override
     protected BenchmarkExecutor getTester()
         throws Exception {
-      ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(sigAlgo);
-      return new P12SignSpeed.EC(securityFactory, sigAlgo, getNumThreads(), curveOid);
+      ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(signAlgo);
+      return new P12SignSpeed.EC(securityFactory, signAlgo, getNumThreads(), curveOid);
     }
 
   } // class SpeedEdSignP12
@@ -1023,12 +1023,12 @@ public class QaSecurityActions {
 
     @Option(name = "--sig-algo", required = true, description = "signature algorithm")
     @Completion(QaCompleters.HMACSigAlgCompleter.class)
-    private String sigAlgo;
+    private String signAlgo;
 
     @Override
     protected BenchmarkExecutor getTester()
         throws Exception {
-      return new P12SignSpeed.HMAC(securityFactory, sigAlgo, getNumThreads());
+      return new P12SignSpeed.HMAC(securityFactory, signAlgo, getNumThreads());
     }
 
   } // class SpeedHmacSignP12
@@ -1065,12 +1065,12 @@ public class QaSecurityActions {
 
     @Option(name = "--sig-algo", required = true, description = "signature algorithm")
     @Completion(QaCompleters.RSASigAlgCompleter.class)
-    private String sigAlgo;
+    private String signAlgo;
 
     @Override
     protected BenchmarkExecutor getTester()
         throws Exception {
-      return new P12SignSpeed.RSA(securityFactory, sigAlgo, getNumThreads(), keysize,
+      return new P12SignSpeed.RSA(securityFactory, signAlgo, getNumThreads(), keysize,
           toBigInt(publicExponent));
     }
 

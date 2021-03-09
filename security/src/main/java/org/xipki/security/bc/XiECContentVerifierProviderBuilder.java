@@ -52,18 +52,18 @@ public class XiECContentVerifierProviderBuilder extends BcECContentVerifierProvi
   @Override
   protected Signer createSigner(AlgorithmIdentifier sigAlgId)
       throws OperatorCreationException {
-    SignAlgo sigAlgo;
+    SignAlgo signAlgo;
     try {
-      sigAlgo = SignAlgo.getInstance(sigAlgId);
+      signAlgo = SignAlgo.getInstance(sigAlgId);
     } catch (NoSuchAlgorithmException ex) {
       throw new OperatorCreationException(ex.getMessage(), ex);
     }
 
-    HashAlgo hashAlgo = sigAlgo.getHashAlgo();
+    HashAlgo hashAlgo = signAlgo.getHashAlgo();
 
-    if (SignAlgo.SM2_SM3 == sigAlgo) {
+    if (SignAlgo.SM2_SM3 == signAlgo) {
       return new SM2Signer();
-    } else if (sigAlgo.isPlainECDSASigAlgo()) {
+    } else if (signAlgo.isPlainECDSASigAlgo()) {
       return new DSAPlainDigestSigner(new ECDSASigner(), hashAlgo.createDigest());
     } else {
       return new DSADigestSigner(new ECDSASigner(), hashAlgo.createDigest());

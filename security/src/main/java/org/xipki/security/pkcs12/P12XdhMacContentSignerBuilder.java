@@ -63,11 +63,11 @@ public class P12XdhMacContentSignerBuilder {
 
     private final int hashLen;
 
-    private XdhMacContentSigner(SignAlgo sigAlgo,
+    private XdhMacContentSigner(SignAlgo signAlgo,
         SecretKey signingKey, IssuerAndSerialNumber peerIssuerAndSerial)
             throws XiSecurityException {
-      super(sigAlgo, signingKey);
-      this.hashLen = sigAlgo.getHashAlgo().getLength();
+      super(signAlgo, signingKey);
+      this.hashLen = signAlgo.getHashAlgo().getLength();
 
       ASN1EncodableVector vec = new ASN1EncodableVector();
       if (peerIssuerAndSerial != null) {

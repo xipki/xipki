@@ -187,9 +187,9 @@ public class CertprofileQa {
 
       try {
         if (!issue.isFailed()) {
-          SignAlgo sigAlgo = SignAlgo.getInstance(sigAlgId);
-          if (!signatureAlgorithms.contains(sigAlgo)) {
-            issue.setFailureMessage("signatureAlgorithm '" + sigAlgo + "' is not allowed");
+          SignAlgo signAlgo = SignAlgo.getInstance(sigAlgId);
+          if (!signatureAlgorithms.contains(signAlgo)) {
+            issue.setFailureMessage("signatureAlgorithm '" + signAlgo + "' is not allowed");
           }
         }
       } catch (NoSuchAlgorithmException ex) {

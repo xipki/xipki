@@ -113,33 +113,33 @@ public class SignerUtil {
   }
 
   // CHECKSTYLE:SKIP
-  public static Signer createPSSRSASigner(SignAlgo sigAlg)
+  public static Signer createPSSRSASigner(SignAlgo sigAlgo)
       throws XiSecurityException {
-    return createPSSRSASigner(sigAlg, null);
+    return createPSSRSASigner(sigAlgo, null);
   }
 
   // CHECKSTYLE:SKIP
-  public static Signer createPSSRSASigner(SignAlgo sigAlg, AsymmetricBlockCipher cipher)
+  public static Signer createPSSRSASigner(SignAlgo sigAlgo, AsymmetricBlockCipher cipher)
       throws XiSecurityException {
-    notNull(sigAlg, "sigAlg");
-    if (!sigAlg.isRSAPSSSigAlgo()) {
-      throw new XiSecurityException(sigAlg + " is not an RSAPSS algorithm");
+    notNull(sigAlgo, "sigAlgo");
+    if (!sigAlgo.isRSAPSSSigAlgo()) {
+      throw new XiSecurityException(sigAlgo + " is not an RSAPSS algorithm");
     }
 
-    HashAlgo hashAlgo = sigAlg.getHashAlgo();
+    HashAlgo hashAlgo = sigAlgo.getHashAlgo();
 
     AsymmetricBlockCipher tmpCipher = (cipher == null) ? new RSABlindedEngine() : cipher;
 
     if (hashAlgo.isShake()) {
       return new ShakePSSSigner(tmpCipher, (XiShakeDigest) hashAlgo.createDigest());
-    } else if (sigAlg.isRSAPSSSigAlgo()) {
+    } else if (sigAlgo.isRSAPSSSigAlgo()) {
       Digest dig = hashAlgo.createDigest();
       Digest mgfDig = hashAlgo.createDigest();
 
       return new PSSSigner(tmpCipher, dig, mgfDig, hashAlgo.getLength(),
           org.bouncycastle.crypto.signers.PSSSigner.TRAILER_IMPLICIT);
     } else {
-      throw new XiSecurityException("signature algorithm " + sigAlg + " is not allowed");
+      throw new XiSecurityException("signature algorithm " + sigAlgo + " is not allowed");
     }
   } // method createPSSRSASigner
 

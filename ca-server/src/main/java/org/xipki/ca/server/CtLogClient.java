@@ -161,11 +161,11 @@ public class CtLogClient {
         LOG.warn("could not find CtLog public key 0x{} to verify the SCT", hexLogId);
       } else {
         SignatureAndHashAlgorithm algorithm = ds.getAlgorithm();
-        String sigAlgo = getSignatureAlgo(algorithm);
+        String signAlgo = getSignatureAlgo(algorithm);
 
         boolean sigValid;
         try {
-          Signature sig = Signature.getInstance(sigAlgo, "BC");
+          Signature sig = Signature.getInstance(signAlgo, "BC");
           sig.initVerify(verifyKey);
           CtLog.update(sig, sctVersion, timestamp, extensions, issuerKeyHash, preCertTbsCert);
           sigValid = sig.verify(ds.getSignature());

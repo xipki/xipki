@@ -209,13 +209,13 @@ public class CaClientExample {
   protected static ContentSigner buildSigner(PrivateKey signingKey, String hashAlgo)
       throws OperatorCreationException {
     String keyAlgo = signingKey.getAlgorithm();
-    String sigAlgo;
+    String signAlgo;
     if ("EC".equalsIgnoreCase(keyAlgo)) {
-      sigAlgo = hashAlgo + "WITHECDSA";
+      signAlgo = hashAlgo + "WITHECDSA";
     } else {
-      sigAlgo = hashAlgo + "WITH" + keyAlgo;
+      signAlgo = hashAlgo + "WITH" + keyAlgo;
     }
-    return new JcaContentSignerBuilder(sigAlgo).build(signingKey);
+    return new JcaContentSignerBuilder(signAlgo).build(signingKey);
   } // method buildSigner
 
   private static void copyArray(byte[] source, byte[] dest, int destPos, int length) {

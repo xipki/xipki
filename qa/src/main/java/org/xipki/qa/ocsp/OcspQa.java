@@ -201,9 +201,9 @@ public class OcspQa {
       SignAlgo expectedSigalgo = responseOption.getSignatureAlg();
       if (expectedSigalgo != null) {
         try {
-          SignAlgo sigAlgo = SignAlgo.getInstance(basicResp.getSignatureAlgorithmID());
-          if (sigAlgo != expectedSigalgo) {
-            issue.setFailureMessage("is '" + sigAlgo.getJceName() + "', but expected '"
+          SignAlgo signAlgo = SignAlgo.getInstance(basicResp.getSignatureAlgorithmID());
+          if (signAlgo != expectedSigalgo) {
+            issue.setFailureMessage("is '" + signAlgo.getJceName() + "', but expected '"
                 + expectedSigalgo.getJceName() + "'");
           }
         } catch (NoSuchAlgorithmException ex) {

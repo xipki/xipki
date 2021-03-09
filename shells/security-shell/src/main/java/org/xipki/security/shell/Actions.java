@@ -858,8 +858,8 @@ public class Actions {
 
       boolean bo = securityFactory.verifyPopo(csr, null, peerKeyAndCert);
       String txt = bo ? "valid" : "invalid";
-      SignAlgo sigAlgo = SignAlgo.getInstance(csr.getSignatureAlgorithm());
-      println("The POP is " + txt + " (signature algorithm " + sigAlgo.getJceName() + ").");
+      SignAlgo signAlgo = SignAlgo.getInstance(csr.getSignatureAlgorithm());
+      println("The POP is " + txt + " (signature algorithm " + signAlgo.getJceName() + ").");
       return null;
     }
 

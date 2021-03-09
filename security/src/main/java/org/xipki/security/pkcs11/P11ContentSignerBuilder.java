@@ -116,7 +116,7 @@ public class P11ContentSignerBuilder {
     }
   } // constructor
 
-  public ConcurrentContentSigner createSigner(SignAlgo sigAlgo,
+  public ConcurrentContentSigner createSigner(SignAlgo signAlgo,
       int parallelism)
           throws XiSecurityException, P11TokenException {
     positive(parallelism, "parallelism");
@@ -127,7 +127,7 @@ public class P11ContentSignerBuilder {
     for (int i = 0; i < parallelism; i++) {
       XiContentSigner signer;
       if (publicKey instanceof RSAPublicKey) {
-        signer = createRSAContentSigner(sigAlgo);
+        signer = createRSAContentSigner(signAlgo);
       } else if (publicKey instanceof ECPublicKey) {
         ECPublicKey ecKey = (ECPublicKey) publicKey;
 
@@ -137,15 +137,15 @@ public class P11ContentSignerBuilder {
 
         if (isSm2p256v1) {
           java.security.spec.ECPoint w = ecKey.getW();
-          signer = createSM2ContentSigner(sigAlgo, GMObjectIdentifiers.sm2p256v1,
+          signer = createSM2ContentSigner(signAlgo, GMObjectIdentifiers.sm2p256v1,
               w.getAffineX(), w.getAffineY());
         } else {
-          signer = createECContentSigner(sigAlgo);
+          signer = createECContentSigner(signAlgo);
         }
       } else if (publicKey instanceof DSAPublicKey) {
-        signer = createDSAContentSigner(sigAlgo);
+        signer = createDSAContentSigner(signAlgo);
       } else if (publicKey instanceof EdDSAKey) {
-        signer = createEdDSAContentSigner(sigAlgo);
+        signer = createEdDSAContentSigner(signAlgo);
       } else {
         throw new XiSecurityException("unsupported key " + publicKey.getClass().getName());
       }
@@ -171,40 +171,40 @@ public class P11ContentSignerBuilder {
   } // method createSigner
 
   // CHECKSTYLE:SKIP
-  private XiContentSigner createRSAContentSigner(SignAlgo sigAlgo)
+  private XiContentSigner createRSAContentSigner(SignAlgo signAlgo)
       throws XiSecurityException, P11TokenException {
-    if (sigAlgo.isRSAPSSSigAlgo()) {
-      return new P11ContentSigner.RSAPSS(cryptService, identityId, sigAlgo,
+    if (signAlgo.isRSAPSSSigAlgo()) {
+      return new P11ContentSigner.RSAPSS(cryptService, identityId, signAlgo,
           securityFactory.getRandom4Sign());
     } else {
-      return new P11ContentSigner.RSA(cryptService, identityId, sigAlgo);
+      return new P11ContentSigner.RSA(cryptService, identityId, signAlgo);
     }
   }
 
   // CHECKSTYLE:SKIP
-  private XiContentSigner createECContentSigner(SignAlgo sigAlgo)
+  private XiContentSigner createECContentSigner(SignAlgo signAlgo)
       throws XiSecurityException, P11TokenException {
-    return new P11ContentSigner.ECDSA(cryptService, identityId, sigAlgo);
+    return new P11ContentSigner.ECDSA(cryptService, identityId, signAlgo);
   }
 
   // CHECKSTYLE:SKIP
-  private XiContentSigner createSM2ContentSigner(SignAlgo sigAlgo,
+  private XiContentSigner createSM2ContentSigner(SignAlgo signAlgo,
       ASN1ObjectIdentifier curveOid, BigInteger pubPointX, BigInteger pubPointy)
       throws XiSecurityException, P11TokenException {
-    return new P11ContentSigner.SM2(cryptService, identityId, sigAlgo,
+    return new P11ContentSigner.SM2(cryptService, identityId, signAlgo,
         curveOid, pubPointX, pubPointy);
   }
 
   // CHECKSTYLE:SKIP
-  private XiContentSigner createDSAContentSigner(SignAlgo sigAlgo)
+  private XiContentSigner createDSAContentSigner(SignAlgo signAlgo)
       throws XiSecurityException, P11TokenException {
-    return new P11ContentSigner.DSA(cryptService, identityId, sigAlgo);
+    return new P11ContentSigner.DSA(cryptService, identityId, signAlgo);
   }
 
   // CHECKSTYLE:SKIP
-  private XiContentSigner createEdDSAContentSigner(SignAlgo sigAlgo)
+  private XiContentSigner createEdDSAContentSigner(SignAlgo signAlgo)
       throws XiSecurityException, P11TokenException {
-    return new P11ContentSigner.EdDSA(cryptService, identityId, sigAlgo);
+    return new P11ContentSigner.EdDSA(cryptService, identityId, signAlgo);
   }
 
 }

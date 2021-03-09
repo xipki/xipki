@@ -132,7 +132,7 @@ public class QaOcspActions {
 
     @Option(name = "--exp-sig-alg", description = "expected signature algorithm")
     @Completion(Completers.SigAlgCompleter.class)
-    private String sigAlg;
+    private String sigAlgo;
 
     @Option(name = "--exp-nextupdate", description = "occurrence of nextUpdate")
     @Completion(QaCompleters.OccurrenceCompleter.class)
@@ -442,7 +442,7 @@ public class QaOcspActions {
       responseOption.setCerthashOccurrence(expectedCerthashOccurrence);
       responseOption.setNonceOccurrence(expectedNonceOccurrence);
       responseOption.setRespIssuer(respIssuer);
-      responseOption.setSignatureAlg(SignAlgo.getInstance(sigAlg));
+      responseOption.setSignatureAlg(SignAlgo.getInstance(sigAlgo));
       if (isNotBlank(certhashAlg)) {
         responseOption.setCerthashAlg(HashAlgo.getInstance(certhashAlg));
       }
@@ -609,7 +609,7 @@ public class QaOcspActions {
 
     @Option(name = "--exp-sig-alg", description = "expected signature algorithm")
     @Completion(Completers.SigAlgCompleter.class)
-    private String sigAlg;
+    private String sigAlgo;
 
     @Option(name = "--no-sig-verify", description = "no verification of the signature")
     private Boolean noSigVerify = Boolean.FALSE;
@@ -714,8 +714,8 @@ public class QaOcspActions {
       responseOption.setCerthashOccurrence(expectedCerthashOccurrence);
       responseOption.setNonceOccurrence(expectedNonceOccurrence);
       responseOption.setRespIssuer(respIssuer);
-      if (isNotBlank(sigAlg)) {
-        responseOption.setSignatureAlg(SignAlgo.getInstance(sigAlg));
+      if (isNotBlank(sigAlgo)) {
+        responseOption.setSignatureAlg(SignAlgo.getInstance(sigAlgo));
       }
 
       if (isNotBlank(certhashAlg)) {

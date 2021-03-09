@@ -683,17 +683,17 @@ public class Actions {
             msg.append(time.getTimeString());
           }
 
-          AlgorithmIdentifier sigAlg = basicResp.getSignatureAlgorithmID();
-          if (sigAlg == null) {
+          AlgorithmIdentifier sigAlgo = basicResp.getSignatureAlgorithmID();
+          if (sigAlgo == null) {
             msg.append(("\nresponse is not signed"));
           } else {
-            String sigAlgName;
+            String sigAlgoName;
             try {
-              sigAlgName = SignAlgo.getInstance(sigAlg).getJceName();
+              sigAlgoName = SignAlgo.getInstance(sigAlgo).getJceName();
             } catch (NoSuchAlgorithmException ex) {
-              sigAlgName = "unknown";
+              sigAlgoName = "unknown";
             }
-            msg.append("\nresponse is signed with ").append(sigAlgName);
+            msg.append("\nresponse is signed with ").append(sigAlgoName);
           }
 
           // extensions

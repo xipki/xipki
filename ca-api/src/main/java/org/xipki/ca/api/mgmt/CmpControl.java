@@ -295,17 +295,17 @@ public class CmpControl {
     this.requestPbmMacs = new ArrayList<>(pbmMacs.size());
     for (int i = 0; i < pbmMacs.size(); i++) {
       String algo = pbmMacs.get(i);
-      SignAlgo sigAlgo;
+      SignAlgo signAlgo;
       try {
-        sigAlgo = SignAlgo.getInstance(algo);
+        signAlgo = SignAlgo.getInstance(algo);
       } catch (NoSuchAlgorithmException ex) {
         throw new InvalidConfException("invalid pbmMac " + algo, ex);
       }
-      canonicalizedAlgos.add(sigAlgo.getJceName());
-      requestPbmMacs.add(sigAlgo);
+      canonicalizedAlgos.add(signAlgo.getJceName());
+      requestPbmMacs.add(signAlgo);
 
       if (i == 0) {
-        responsePbmMac = sigAlgo;
+        responsePbmMac = signAlgo;
       }
     }
 

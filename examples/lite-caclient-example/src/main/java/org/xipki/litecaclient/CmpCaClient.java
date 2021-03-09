@@ -758,8 +758,8 @@ public abstract class CmpCaClient implements Closeable {
   protected ContentSigner buildSigner(PrivateKey signingKey)
       throws OperatorCreationException {
     String keyAlgo = signingKey.getAlgorithm().toUpperCase();
-    String sigAlgo = "EC".equals(keyAlgo) ? hashAlgo + "WITHECDSA" : hashAlgo + "WITH" + keyAlgo;
-    return new JcaContentSignerBuilder(sigAlgo).build(signingKey);
+    String signAlgo = "EC".equals(keyAlgo) ? hashAlgo + "WITHECDSA" : hashAlgo + "WITH" + keyAlgo;
+    return new JcaContentSignerBuilder(signAlgo).build(signingKey);
   }
 
   private static String buildText(PKIStatusInfo pkiStatusInfo) {

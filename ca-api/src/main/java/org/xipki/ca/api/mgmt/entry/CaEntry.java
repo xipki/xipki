@@ -178,14 +178,14 @@ public class CaEntry extends MgmtEntry {
 
     List<CaSignerConf> signerConfs = new ArrayList<>(list.size());
     for (String n : list) {
-      SignAlgo sigAlgo;
+      SignAlgo signAlgo;
       try {
-        sigAlgo = SignAlgo.getInstance(n);
+        signAlgo = SignAlgo.getInstance(n);
       } catch (NoSuchAlgorithmException ex) {
         throw new XiSecurityException(ex.getMessage(), ex);
       }
-      pairs.putPair("algo", sigAlgo.getJceName());
-      signerConfs.add(new CaSignerConf(sigAlgo, pairs.getEncoded()));
+      pairs.putPair("algo", signAlgo.getJceName());
+      signerConfs.add(new CaSignerConf(signAlgo, pairs.getEncoded()));
     }
 
     return signerConfs;

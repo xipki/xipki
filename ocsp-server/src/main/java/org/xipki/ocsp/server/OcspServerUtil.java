@@ -112,10 +112,10 @@ public class OcspServerUtil {
 
     List<String> sigAlgos = signerType.getAlgorithms();
     List<ConcurrentContentSigner> singleSigners = new ArrayList<>(sigAlgos.size());
-    for (String sigAlgo : sigAlgos) {
+    for (String signAlgo : sigAlgos) {
       try {
         ConcurrentContentSigner requestorSigner = securityFactory.createSigner(
-            responderSignerType, new SignerConf("algo=" + sigAlgo + "," + responderKeyConf),
+            responderSignerType, new SignerConf("algo=" + signAlgo + "," + responderKeyConf),
             explicitCertificateChain);
         singleSigners.add(requestorSigner);
       } catch (ObjectCreationException ex) {

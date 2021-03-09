@@ -53,9 +53,9 @@ public class ShakePSSSignatureSpi
   private Signer signer;
 
   // care - this constructor is actually used by outside organisations
-  protected ShakePSSSignatureSpi(SignAlgo sigAlgo) {
+  protected ShakePSSSignatureSpi(SignAlgo signAlgo) {
     try {
-      this.signer = SignerUtil.createPSSRSASigner(sigAlgo);
+      this.signer = SignerUtil.createPSSRSASigner(signAlgo);
     } catch (XiSecurityException ex) {
       throw new IllegalStateException("ShakePSSSignatureSpi.<cinit>", ex);
     }

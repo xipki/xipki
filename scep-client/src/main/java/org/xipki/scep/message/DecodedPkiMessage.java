@@ -335,10 +335,10 @@ public class DecodedPkiMessage extends PkiMessage {
 
       String sigAlgOid = signerInfo.getEncryptionAlgOID();
       if (!PKCSObjectIdentifiers.rsaEncryption.getId().equals(sigAlgOid)) {
-        SignAlgo sigAlgo = SignAlgo.getInstance(
+        SignAlgo signAlgo = SignAlgo.getInstance(
             signerInfo.toASN1Structure().getDigestEncryptionAlgorithm());
 
-        if (digestAlgo != sigAlgo.getHashAlgo()) {
+        if (digestAlgo != signAlgo.getHashAlgo()) {
           ret.setFailureMessage(
               "digestAlgorithm and encryptionAlgorithm do not use the same digestAlgorithm");
           return ret;
