@@ -27,7 +27,7 @@ import java.util.Set;
 import org.xipki.security.AlgorithmValidator;
 import org.xipki.security.CollectionAlgorithmValidator;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
@@ -101,9 +101,9 @@ public class CmpControl {
 
   private List<HashAlgo> requestPbmOwfs;
 
-  private SigAlgo responsePbmMac;
+  private SignAlgo responsePbmMac;
 
-  private List<SigAlgo> requestPbmMacs;
+  private List<SignAlgo> requestPbmMacs;
 
   private int responsePbmIterationCount = DFLT_PBM_ITERATIONCOUNT;
 
@@ -295,9 +295,9 @@ public class CmpControl {
     this.requestPbmMacs = new ArrayList<>(pbmMacs.size());
     for (int i = 0; i < pbmMacs.size(); i++) {
       String algo = pbmMacs.get(i);
-      SigAlgo sigAlgo;
+      SignAlgo sigAlgo;
       try {
-        sigAlgo = SigAlgo.getInstance(algo);
+        sigAlgo = SignAlgo.getInstance(algo);
       } catch (NoSuchAlgorithmException ex) {
         throw new InvalidConfException("invalid pbmMac " + algo, ex);
       }
@@ -360,7 +360,7 @@ public class CmpControl {
     return responsePbmOwf;
   }
 
-  public SigAlgo getResponsePbmMac() {
+  public SignAlgo getResponsePbmMac() {
     return responsePbmMac;
   }
 
@@ -372,7 +372,7 @@ public class CmpControl {
     return requestPbmOwfs.contains(pbmOwf);
   }
 
-  public boolean isRequestPbmMacPermitted(SigAlgo pbmMac) {
+  public boolean isRequestPbmMacPermitted(SignAlgo pbmMac) {
     return requestPbmMacs.contains(pbmMac);
   }
 

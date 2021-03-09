@@ -47,7 +47,7 @@ import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 
@@ -121,7 +121,7 @@ public class ScepUtil {
 
   public static String getSignatureAlgName(Key key, HashAlgo hashAlgo)
       throws NoSuchAlgorithmException {
-    return SigAlgo.getInstance(key, hashAlgo, null).getJceName();
+    return SignAlgo.getInstance(key, hashAlgo, null).getJceName();
   }
 
   public static ASN1Encodable getFirstAttrValue(AttributeTable attrs, ASN1ObjectIdentifier type) {

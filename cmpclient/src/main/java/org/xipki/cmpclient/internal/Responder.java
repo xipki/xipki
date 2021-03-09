@@ -27,7 +27,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.xipki.security.AlgorithmValidator;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 
 /**
@@ -57,7 +57,7 @@ abstract class Responder {
 
     private final List<HashAlgo> owfAlgos;
 
-    private final List<SigAlgo> macAlgos;
+    private final List<SignAlgo> macAlgos;
 
     PbmMacCmpResponder(X500Name x500Name, List<String> owfs, List<String> macs)
         throws NoSuchAlgorithmException {
@@ -71,7 +71,7 @@ abstract class Responder {
 
       this.macAlgos = new ArrayList<>(macs.size());
       for (int i = 0; i < macs.size(); i++) {
-        macAlgos.add(SigAlgo.getInstance(macs.get(i)));
+        macAlgos.add(SignAlgo.getInstance(macs.get(i)));
       }
 
     }
@@ -80,7 +80,7 @@ abstract class Responder {
       return owfAlgos.contains(pbmOwf);
     }
 
-    public boolean isPbmMacPermitted(SigAlgo pbmMac) {
+    public boolean isPbmMacPermitted(SignAlgo pbmMac) {
       return macAlgos.contains(pbmMac);
     }
 

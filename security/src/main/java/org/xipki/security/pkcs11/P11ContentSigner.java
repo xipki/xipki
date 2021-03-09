@@ -51,7 +51,7 @@ import org.bouncycastle.crypto.params.ParametersWithRandom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.GMUtil;
@@ -74,12 +74,12 @@ abstract class P11ContentSigner implements XiContentSigner {
 
   protected final P11IdentityId identityId;
 
-  protected final SigAlgo sigAlgo;
+  protected final SignAlgo sigAlgo;
 
   protected final byte[] encodedAlgorithmIdentifier;
 
   P11ContentSigner(P11CryptService cryptService, P11IdentityId identityId,
-      SigAlgo sigAlgo)
+      SignAlgo sigAlgo)
       throws XiSecurityException, P11TokenException {
     this.identityId = notNull(identityId, "identityId");
     this.cryptService = notNull(cryptService, "cryptService");
@@ -172,7 +172,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       hashMechMap.put(SHA3_512, PKCS11Constants.CKM_DSA_SHA3_512);
     } // method static
 
-    DSA(P11CryptService cryptService, P11IdentityId identityId, SigAlgo sigAlgo)
+    DSA(P11CryptService cryptService, P11IdentityId identityId, SignAlgo sigAlgo)
         throws XiSecurityException, P11TokenException {
       super(cryptService, identityId, sigAlgo);
 
@@ -255,7 +255,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       hashMechMap.put(SHA3_512, PKCS11Constants.CKM_ECDSA_SHA3_512);
     } // method static
 
-    ECDSA(P11CryptService cryptService, P11IdentityId identityId, SigAlgo sigAlgo)
+    ECDSA(P11CryptService cryptService, P11IdentityId identityId, SignAlgo sigAlgo)
         throws XiSecurityException, P11TokenException {
       super(cryptService, identityId, sigAlgo);
       if (!sigAlgo.isECDSASigAlgo()) {
@@ -323,11 +323,11 @@ abstract class P11ContentSigner implements XiContentSigner {
 
     private final long mechanism;
 
-    EdDSA(P11CryptService cryptService, P11IdentityId identityId, SigAlgo sigAlgo)
+    EdDSA(P11CryptService cryptService, P11IdentityId identityId, SignAlgo sigAlgo)
         throws XiSecurityException, P11TokenException {
       super(cryptService, identityId, sigAlgo);
 
-      if (SigAlgo.ED25519 != sigAlgo) {
+      if (SignAlgo.ED25519 != sigAlgo) {
         throw new XiSecurityException("unsupproted signature algorithm " + sigAlgo);
       }
 
@@ -381,7 +381,7 @@ abstract class P11ContentSigner implements XiContentSigner {
     } // method static
 
     Mac(P11CryptService cryptService, P11IdentityId identityId,
-        SigAlgo sigAlgo)
+        SignAlgo sigAlgo)
             throws XiSecurityException, P11TokenException {
       super(cryptService, identityId, sigAlgo);
 
@@ -449,7 +449,7 @@ abstract class P11ContentSigner implements XiContentSigner {
     } // method static
 
     RSA(P11CryptService cryptService, P11IdentityId identityId,
-        SigAlgo sigAlgo)
+        SignAlgo sigAlgo)
             throws XiSecurityException, P11TokenException {
       super(cryptService, identityId, sigAlgo);
 
@@ -547,7 +547,7 @@ abstract class P11ContentSigner implements XiContentSigner {
     private final OutputStream outputStream;
 
     RSAPSS(P11CryptService cryptService, P11IdentityId identityId,
-        SigAlgo sigAlgo, SecureRandom random)
+        SignAlgo sigAlgo, SecureRandom random)
         throws XiSecurityException, P11TokenException {
       super(cryptService, identityId, sigAlgo);
       if (!sigAlgo.isRSAPSSSigAlgo()) {
@@ -646,7 +646,7 @@ abstract class P11ContentSigner implements XiContentSigner {
     }
 
     SM2(P11CryptService cryptService, P11IdentityId identityId,
-        SigAlgo sigAlgo, ASN1ObjectIdentifier curveOid, BigInteger pubPointX,
+        SignAlgo sigAlgo, ASN1ObjectIdentifier curveOid, BigInteger pubPointX,
         BigInteger pubPointY)
             throws XiSecurityException, P11TokenException {
       super(cryptService, identityId, sigAlgo);

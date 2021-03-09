@@ -110,7 +110,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityConstants;
 import org.xipki.security.XiSecurityException;
@@ -479,9 +479,9 @@ class CmpAgent {
         return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
       }
 
-      SigAlgo mac;
+      SignAlgo mac;
       try {
-        mac = SigAlgo.getInstance(parameter.getMac());
+        mac = SignAlgo.getInstance(parameter.getMac());
       } catch (NoSuchAlgorithmException ex) {
         LOG.warn("MAC_ALGO_FORBIDDEN (PBMParameter.mac)", ex);
         return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
@@ -521,9 +521,9 @@ class CmpAgent {
       }
 
       Responder.SignaturetCmpResponder sigResponder = (Responder.SignaturetCmpResponder) responder;
-      SigAlgo protectionAlgo;
+      SignAlgo protectionAlgo;
       try {
-        protectionAlgo = SigAlgo.getInstance(protectedMsg.getHeader().getProtectionAlg());
+        protectionAlgo = SignAlgo.getInstance(protectedMsg.getHeader().getProtectionAlg());
       } catch (NoSuchAlgorithmException ex) {
         LOG.warn("tid={}: unknown response protection algorithm: {}", tid, ex.getMessage());
         return new ProtectionVerificationResult(null, ProtectionResult.SIGNATURE_INVALID);

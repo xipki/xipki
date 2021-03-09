@@ -65,7 +65,7 @@ import org.xipki.util.Args;
  * @since 2.0.0
  */
 // See https://www.itu.int/ITU-T/formal-language/itu-t/x/x509/2019/AlgorithmObjectIdentifiers.html
-public enum SigAlgo {
+public enum SignAlgo {
 
   // RSA PKCS#1v1.5
   RSA_SHA1("SHA1WITHRSA", 0x01, sha1WithRSAEncryption, SHA1, true),
@@ -164,9 +164,9 @@ public enum SigAlgo {
   DHPOP_X25519_SHA256("DHPOP-X25519-SHA256", 0x5A, Xipki.id_alg_dhPop_x25519_sha256, SHA256, false),
   DHPOP_X448_SHA512("DHPOP-X448-SHA512",  0x5B, Xipki.id_alg_dhPop_x448_sha512, SHA512, false);
 
-  private static final Map<String, SigAlgo> map = new HashMap<>();
+  private static final Map<String, SignAlgo> map = new HashMap<>();
 
-  private static final Map<HashAlgo, SigAlgo> mgf1HashToSigMap = new HashMap<>();
+  private static final Map<HashAlgo, SignAlgo> mgf1HashToSigMap = new HashMap<>();
 
   private final ASN1ObjectIdentifier oid;
 
@@ -179,7 +179,7 @@ public enum SigAlgo {
   private final HashAlgo hashAlgo;
 
   static {
-    for (SigAlgo type : SigAlgo.values()) {
+    for (SignAlgo type : SignAlgo.values()) {
       if (id_RSASSA_PSS.equals(type.oid)) {
         mgf1HashToSigMap.put(type.hashAlgo, type);
       } else {
@@ -216,7 +216,7 @@ public enum SigAlgo {
     }
   }
 
-  private SigAlgo(String jceName, int code, ASN1ObjectIdentifier oid,
+  private SignAlgo(String jceName, int code, ASN1ObjectIdentifier oid,
       HashAlgo hashAlgo, boolean withNullParams) {
     this.code = (byte) Args.range(code, "code", 0, 255);
     this.jceName = jceName.toUpperCase();
@@ -230,7 +230,7 @@ public enum SigAlgo {
   }
 
   // RSA PSS with MGF1
-  private SigAlgo(String jceName, int code, HashAlgo hashAlgo) {
+  private SignAlgo(String jceName, int code, HashAlgo hashAlgo) {
     this.code = (byte) Args.range(code, "code", 0, 255);
     this.jceName = jceName.toUpperCase();
     this.hashAlgo = hashAlgo;
@@ -246,7 +246,7 @@ public enum SigAlgo {
   }
 
   // For GMAC: See https://tools.ietf.org/html/draft-ietf-lamps-cms-aes-gmac-alg-03
-  private SigAlgo(String jceName, int code, ASN1ObjectIdentifier oid) {
+  private SignAlgo(String jceName, int code, ASN1ObjectIdentifier oid) {
     if (!(jceName.startsWith("AES") && jceName.endsWith("GMAC"))) {
       throw new IllegalArgumentException("not AES*GMAC: " + jceName);
     }
@@ -462,12 +462,12 @@ public enum SigAlgo {
     return isHmac() || isGmac();
   }
 
-  public static SigAlgo getInstance(AlgorithmIdentifier algId)
+  public static SignAlgo getInstance(AlgorithmIdentifier algId)
       throws NoSuchAlgorithmException {
     ASN1ObjectIdentifier oid = algId.getAlgorithm();
     ASN1Encodable params = algId.getParameters();
 
-    SigAlgo rv = null;
+    SignAlgo rv = null;
     if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(oid)) {
       RSASSAPSSparams param = RSASSAPSSparams.getInstance(params);
       AlgorithmIdentifier digestAlgId = param.getHashAlgorithm();
@@ -498,15 +498,15 @@ public enum SigAlgo {
       }
 
       return mgf1HashToSigMap.get(hashAlgo);
-    } else if (SigAlgo.GMAC_AES128.oid.equals(oid)
-        || SigAlgo.GMAC_AES192.oid.equals(oid)
-        || SigAlgo.GMAC_AES256.oid.equals(oid)) {
-      if (SigAlgo.GMAC_AES128.equals(oid)) {
-        return SigAlgo.GMAC_AES128;
-      } else if (SigAlgo.GMAC_AES128.equals(oid)) {
-        return SigAlgo.GMAC_AES192;
+    } else if (SignAlgo.GMAC_AES128.oid.equals(oid)
+        || SignAlgo.GMAC_AES192.oid.equals(oid)
+        || SignAlgo.GMAC_AES256.oid.equals(oid)) {
+      if (SignAlgo.GMAC_AES128.equals(oid)) {
+        return SignAlgo.GMAC_AES128;
+      } else if (SignAlgo.GMAC_AES128.equals(oid)) {
+        return SignAlgo.GMAC_AES192;
       } else {
-        return SigAlgo.GMAC_AES256;
+        return SignAlgo.GMAC_AES256;
       }
     } else {
       if (params != null) {
@@ -515,7 +515,7 @@ public enum SigAlgo {
         }
       }
 
-      for (SigAlgo algo : values()) {
+      for (SignAlgo algo : values()) {
         if (algo.oid.equals(oid)) {
           rv = algo;
         }
@@ -524,9 +524,9 @@ public enum SigAlgo {
     return rv;
   }
 
-  public static SigAlgo getInstance(String nameOrOid)
+  public static SignAlgo getInstance(String nameOrOid)
       throws NoSuchAlgorithmException {
-    SigAlgo alg = map.get(nameOrOid.toUpperCase());
+    SignAlgo alg = map.get(nameOrOid.toUpperCase());
     if (alg == null) {
       throw new NoSuchAlgorithmException(
           "Unknown HashAlgo OID/name '" + nameOrOid + "'");
@@ -534,7 +534,7 @@ public enum SigAlgo {
     return alg;
   }
 
-  public static SigAlgo getInstance(Key key, SignerConf signerConf)
+  public static SignAlgo getInstance(Key key, SignerConf signerConf)
       throws NoSuchAlgorithmException {
     if (notNull(signerConf, "signerConf").getHashAlgo() == null) {
       return getInstance(signerConf.getConfValue("algo"));
@@ -566,7 +566,7 @@ public enum SigAlgo {
     }
   } // method getInstance
 
-  public static SigAlgo getInstance(Key key, HashAlgo hashAlgo,
+  public static SignAlgo getInstance(Key key, HashAlgo hashAlgo,
       SignatureAlgoControl algoControl)
           throws NoSuchAlgorithmException {
     notNull(hashAlgo, "hashAlgo");
@@ -596,7 +596,7 @@ public enum SigAlgo {
   } // method getInstance
 
   // CHECKSTYLE:SKIP
-  private static SigAlgo getRSAInstance(HashAlgo hashAlgo, boolean rsaPss)
+  private static SignAlgo getRSAInstance(HashAlgo hashAlgo, boolean rsaPss)
       throws NoSuchAlgorithmException {
     notNull(hashAlgo, "hashAlgo");
     switch (hashAlgo) {
@@ -628,7 +628,7 @@ public enum SigAlgo {
   } // method getRSAInstance
 
   // CHECKSTYLE:SKIP
-  private static SigAlgo getDSASigAlgo(HashAlgo hashAlgo)
+  private static SignAlgo getDSASigAlgo(HashAlgo hashAlgo)
       throws NoSuchAlgorithmException {
     notNull(hashAlgo, "hashAlgo");
     switch (hashAlgo) {
@@ -660,7 +660,7 @@ public enum SigAlgo {
   } // method getDSASigAlgo
 
   // CHECKSTYLE:SKIP
-  private static SigAlgo getECSigAlgo(HashAlgo hashAlgo, boolean plainSignature,
+  private static SignAlgo getECSigAlgo(HashAlgo hashAlgo, boolean plainSignature,
       boolean gm)
           throws NoSuchAlgorithmException {
     notNull(hashAlgo, "hashAlgo");

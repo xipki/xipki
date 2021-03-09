@@ -29,7 +29,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.pkcs12.KeypairWithCert;
 import org.xipki.security.pkcs12.P12ContentSignerBuilder;
@@ -53,7 +53,7 @@ public abstract class Pkcs12SignVerifyTest {
     }
   }
 
-  protected abstract SigAlgo getSignatureAlgorithm();
+  protected abstract SignAlgo getSignatureAlgorithm();
 
   protected abstract String getPkcs12File();
 

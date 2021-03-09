@@ -28,7 +28,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.DigestAlgorithmIdentifierFinder;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 
 /**
  * Extends the DefaultDigestAlgorithmIdentifierFinder to support SHAKE* digests.
@@ -51,8 +51,8 @@ public class XiDigestAlgorithmIdentifierFinder
   static {
     digestOids.put(SHAKE128.getOid(), SHAKE128);
     digestOids.put(SHAKE256.getOid(), SHAKE256);
-    digestOids.put(SigAlgo.RSAPSS_SHAKE128.getOid(), SHAKE128);
-    digestOids.put(SigAlgo.RSAPSS_SHAKE256.getOid(), SHAKE256);
+    digestOids.put(SignAlgo.RSAPSS_SHAKE128.getOid(), SHAKE128);
+    digestOids.put(SignAlgo.RSAPSS_SHAKE256.getOid(), SHAKE256);
 
     digestNameToOids.put(SHAKE128.name(), SHAKE128);
     digestNameToOids.put(SHAKE128.getJceName(), SHAKE128);

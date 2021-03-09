@@ -90,7 +90,7 @@ import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
@@ -125,7 +125,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   private NotBeforeOption notBeforeOption;
 
-  private List<SigAlgo> signatureAlgorithms;
+  private List<SignAlgo> signatureAlgorithms;
 
   private SubjectControl subjectControl;
 
@@ -197,10 +197,10 @@ public class XijsonCertprofile extends BaseCertprofile {
 
     if (conf.getSignatureAlgorithms() != null) {
       List<String> algoNames = conf.getSignatureAlgorithms();
-      List<SigAlgo> list = new ArrayList<>(algoNames.size());
+      List<SignAlgo> list = new ArrayList<>(algoNames.size());
       for (String algoName : algoNames) {
         try {
-          list.add(SigAlgo.getInstance(algoName));
+          list.add(SignAlgo.getInstance(algoName));
         } catch (NoSuchAlgorithmException ex) {
           throw new CertprofileException(ex.getMessage(), ex);
         }
@@ -1164,7 +1164,7 @@ public class XijsonCertprofile extends BaseCertprofile {
   }
 
   @Override
-  public List<SigAlgo> getSignatureAlgorithms() {
+  public List<SignAlgo> getSignatureAlgorithms() {
     return signatureAlgorithms;
   }
 

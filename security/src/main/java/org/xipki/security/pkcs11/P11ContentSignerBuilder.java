@@ -39,7 +39,7 @@ import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.DfltConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.XiSecurityException;
@@ -116,7 +116,7 @@ public class P11ContentSignerBuilder {
     }
   } // constructor
 
-  public ConcurrentContentSigner createSigner(SigAlgo sigAlgo,
+  public ConcurrentContentSigner createSigner(SignAlgo sigAlgo,
       int parallelism)
           throws XiSecurityException, P11TokenException {
     positive(parallelism, "parallelism");
@@ -171,7 +171,7 @@ public class P11ContentSignerBuilder {
   } // method createSigner
 
   // CHECKSTYLE:SKIP
-  private XiContentSigner createRSAContentSigner(SigAlgo sigAlgo)
+  private XiContentSigner createRSAContentSigner(SignAlgo sigAlgo)
       throws XiSecurityException, P11TokenException {
     if (sigAlgo.isRSAPSSSigAlgo()) {
       return new P11ContentSigner.RSAPSS(cryptService, identityId, sigAlgo,
@@ -182,13 +182,13 @@ public class P11ContentSignerBuilder {
   }
 
   // CHECKSTYLE:SKIP
-  private XiContentSigner createECContentSigner(SigAlgo sigAlgo)
+  private XiContentSigner createECContentSigner(SignAlgo sigAlgo)
       throws XiSecurityException, P11TokenException {
     return new P11ContentSigner.ECDSA(cryptService, identityId, sigAlgo);
   }
 
   // CHECKSTYLE:SKIP
-  private XiContentSigner createSM2ContentSigner(SigAlgo sigAlgo,
+  private XiContentSigner createSM2ContentSigner(SignAlgo sigAlgo,
       ASN1ObjectIdentifier curveOid, BigInteger pubPointX, BigInteger pubPointy)
       throws XiSecurityException, P11TokenException {
     return new P11ContentSigner.SM2(cryptService, identityId, sigAlgo,
@@ -196,13 +196,13 @@ public class P11ContentSignerBuilder {
   }
 
   // CHECKSTYLE:SKIP
-  private XiContentSigner createDSAContentSigner(SigAlgo sigAlgo)
+  private XiContentSigner createDSAContentSigner(SignAlgo sigAlgo)
       throws XiSecurityException, P11TokenException {
     return new P11ContentSigner.DSA(cryptService, identityId, sigAlgo);
   }
 
   // CHECKSTYLE:SKIP
-  private XiContentSigner createEdDSAContentSigner(SigAlgo sigAlgo)
+  private XiContentSigner createEdDSAContentSigner(SignAlgo sigAlgo)
       throws XiSecurityException, P11TokenException {
     return new P11ContentSigner.EdDSA(cryptService, identityId, sigAlgo);
   }

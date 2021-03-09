@@ -44,7 +44,7 @@ import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.DfltConcurrentContentSigner;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.XiSecurityException;
@@ -63,7 +63,7 @@ public class P12XdhMacContentSignerBuilder {
 
     private final int hashLen;
 
-    private XdhMacContentSigner(SigAlgo sigAlgo,
+    private XdhMacContentSigner(SignAlgo sigAlgo,
         SecretKey signingKey, IssuerAndSerialNumber peerIssuerAndSerial)
             throws XiSecurityException {
       super(sigAlgo, signingKey);
@@ -114,7 +114,7 @@ public class P12XdhMacContentSignerBuilder {
 
   private SecretKey key;
 
-  private SigAlgo algo;
+  private SignAlgo algo;
 
   private IssuerAndSerialNumber peerIssuerAndSerial;
 
@@ -147,9 +147,9 @@ public class P12XdhMacContentSignerBuilder {
       throws XiSecurityException {
     String algorithm = privateKey.getAlgorithm();
     if (EdECConstants.X25519.equalsIgnoreCase(algorithm)) {
-      this.algo = SigAlgo.DHPOP_X25519_SHA256;
+      this.algo = SignAlgo.DHPOP_X25519_SHA256;
     } else if (EdECConstants.X448.equalsIgnoreCase(algorithm)) {
-      this.algo = SigAlgo.DHPOP_X448_SHA512;
+      this.algo = SignAlgo.DHPOP_X448_SHA512;
     } else {
       throw new IllegalArgumentException("unsupported key.getAlgorithm(): " + algorithm);
     }

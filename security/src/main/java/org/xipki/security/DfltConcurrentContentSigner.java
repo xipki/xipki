@@ -56,7 +56,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
 
   private final String name;
 
-  private final SigAlgo algorithm;
+  private final SignAlgo algorithm;
 
   private final boolean mac;
 
@@ -94,7 +94,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
     notEmpty(signers, "signers");
 
     this.mac = mac;
-    this.algorithm = SigAlgo.getInstance(signers.get(0).getAlgorithmIdentifier());
+    this.algorithm = SignAlgo.getInstance(signers.get(0).getAlgorithmIdentifier());
 
     for (XiContentSigner signer : signers) {
       this.signers.add(new ConcurrentBagEntrySigner(signer));
@@ -130,7 +130,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
   }
 
   @Override
-  public SigAlgo getAlgorithm() {
+  public SignAlgo getAlgorithm() {
     return algorithm;
   }
 

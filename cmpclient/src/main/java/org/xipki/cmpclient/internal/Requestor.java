@@ -27,7 +27,7 @@ import org.bouncycastle.asn1.x509.GeneralName;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SecurityFactory;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 
 /**
@@ -74,11 +74,11 @@ abstract class Requestor {
 
     private final int iterationCount;
 
-    private final SigAlgo mac;
+    private final SignAlgo mac;
 
     PbmMacCmpRequestor(boolean signRequest, X500Name x500name, char[] password,
         // CHECKSTYLE:SKIP
-        byte[] senderKID, HashAlgo owf, int iterationCount, SigAlgo mac) {
+        byte[] senderKID, HashAlgo owf, int iterationCount, SignAlgo mac) {
       super(signRequest, x500name);
       this.password = password;
       this.senderKID = senderKID;
@@ -109,7 +109,7 @@ abstract class Requestor {
       return iterationCount;
     }
 
-    public SigAlgo getMac() {
+    public SignAlgo getMac() {
       return mac;
     }
 

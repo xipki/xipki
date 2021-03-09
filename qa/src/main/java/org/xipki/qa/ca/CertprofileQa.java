@@ -55,7 +55,7 @@ import org.xipki.qa.ValidationIssue;
 import org.xipki.qa.ValidationResult;
 import org.xipki.qa.ca.extn.ExtensionsChecker;
 import org.xipki.qa.ca.extn.QaExtensionValue;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
@@ -173,7 +173,7 @@ public class CertprofileQa {
     }
 
     // signatureAlgorithm
-    List<SigAlgo> signatureAlgorithms = certprofile.getSignatureAlgorithms();
+    List<SignAlgo> signatureAlgorithms = certprofile.getSignatureAlgorithms();
     if (CollectionUtil.isNotEmpty(signatureAlgorithms)) {
       issue = new ValidationIssue("X509.SIGALG", "signature algorithm");
       resultIssues.add(issue);
@@ -187,7 +187,7 @@ public class CertprofileQa {
 
       try {
         if (!issue.isFailed()) {
-          SigAlgo sigAlgo = SigAlgo.getInstance(sigAlgId);
+          SignAlgo sigAlgo = SignAlgo.getInstance(sigAlgId);
           if (!signatureAlgorithms.contains(sigAlgo)) {
             issue.setFailureMessage("signatureAlgorithm '" + sigAlgo + "' is not allowed");
           }

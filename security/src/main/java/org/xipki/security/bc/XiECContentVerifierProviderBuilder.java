@@ -29,7 +29,7 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcECContentVerifierProviderBuilder;
 import org.xipki.security.DSAPlainDigestSigner;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 
 /**
  * Extends {@link BcECContentVerifierProviderBuilder} to support the signature algorithms
@@ -52,16 +52,16 @@ public class XiECContentVerifierProviderBuilder extends BcECContentVerifierProvi
   @Override
   protected Signer createSigner(AlgorithmIdentifier sigAlgId)
       throws OperatorCreationException {
-    SigAlgo sigAlgo;
+    SignAlgo sigAlgo;
     try {
-      sigAlgo = SigAlgo.getInstance(sigAlgId);
+      sigAlgo = SignAlgo.getInstance(sigAlgId);
     } catch (NoSuchAlgorithmException ex) {
       throw new OperatorCreationException(ex.getMessage(), ex);
     }
 
     HashAlgo hashAlgo = sigAlgo.getHashAlgo();
 
-    if (SigAlgo.SM2_SM3 == sigAlgo) {
+    if (SignAlgo.SM2_SM3 == sigAlgo) {
       return new SM2Signer();
     } else if (sigAlgo.isPlainECDSASigAlgo()) {
       return new DSAPlainDigestSigner(new ECDSASigner(), hashAlgo.createDigest());

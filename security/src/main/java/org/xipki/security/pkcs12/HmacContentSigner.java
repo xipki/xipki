@@ -28,7 +28,7 @@ import javax.crypto.SecretKey;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.XiSecurityException;
 
@@ -63,7 +63,7 @@ public class HmacContentSigner implements XiContentSigner {
 
   } // method HmacOutputStream
 
-  private final SigAlgo algorithm;
+  private final SignAlgo algorithm;
 
   private final byte[] encodedAlgorithmIdentifier;
 
@@ -73,7 +73,7 @@ public class HmacContentSigner implements XiContentSigner {
 
   private final int outLen;
 
-  public HmacContentSigner(SigAlgo algorithm, SecretKey signingKey)
+  public HmacContentSigner(SignAlgo algorithm, SecretKey signingKey)
       throws XiSecurityException {
     this.algorithm = notNull(algorithm, "algorithm");
     notNull(signingKey, "signingKey");

@@ -124,7 +124,7 @@ import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.cmp.CmpUtil;
 import org.xipki.security.cmp.ProtectionResult;
@@ -157,7 +157,7 @@ abstract class BaseCmpResponder {
   protected static final Set<String> KNOWN_GENMSG_IDS = new HashSet<>();
 
   private static final AlgorithmIdentifier prf_hmacWithSHA256 =
-      SigAlgo.HMAC_SHA256.getAlgorithmIdentifier();
+      SignAlgo.HMAC_SHA256.getAlgorithmIdentifier();
 
   private static final ConcurrentBag<ConcurrentBagEntry<Cipher>> aesGcm_ciphers;
 
@@ -711,9 +711,9 @@ abstract class BaseCmpResponder {
         return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
       }
 
-      SigAlgo macAlg;
+      SignAlgo macAlg;
       try {
-        macAlg = SigAlgo.getInstance(parameter.getMac());
+        macAlg = SignAlgo.getInstance(parameter.getMac());
       } catch (NoSuchAlgorithmException ex) {
         LogUtil.warn(LOG, ex);
         return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
@@ -952,9 +952,9 @@ abstract class BaseCmpResponder {
     // check the POP signature algorithm
     ProofOfPossession pop = certRequest.toASN1Structure().getPopo();
     POPOSigningKey popoSign = POPOSigningKey.getInstance(pop.getObject());
-    SigAlgo popoAlg;
+    SignAlgo popoAlg;
     try {
-      popoAlg = SigAlgo.getInstance(popoSign.getAlgorithmIdentifier());
+      popoAlg = SignAlgo.getInstance(popoSign.getAlgorithmIdentifier());
     } catch (NoSuchAlgorithmException ex) {
       LogUtil.error(LOG, ex, "Cannot parse POPO signature algorithm");
       return false;
@@ -971,7 +971,7 @@ abstract class BaseCmpResponder {
       DhpocControl dhpocControl = getCa().getCaInfo().getDhpocControl();
 
       DHSigStaticKeyCertPair kaKeyAndCert = null;
-      if (SigAlgo.DHPOP_X25519_SHA256 == popoAlg || SigAlgo.DHPOP_X448_SHA512 == popoAlg) {
+      if (SignAlgo.DHPOP_X25519_SHA256 == popoAlg || SignAlgo.DHPOP_X448_SHA512 == popoAlg) {
         if (dhpocControl != null) {
           DhSigStatic dhSigStatic = DhSigStatic.getInstance(popoSign.getSignature().getBytes());
           IssuerAndSerialNumber isn = dhSigStatic.getIssuerAndSerial();

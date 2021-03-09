@@ -37,7 +37,7 @@ import javax.crypto.spec.GCMParameterSpec;
 import org.bouncycastle.asn1.cms.GCMParameters;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.util.Arrays;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.XiSecurityException;
 import org.xipki.util.IoUtil;
@@ -82,7 +82,7 @@ public class AESGmacContentSigner implements XiContentSigner {
 
   private final SecureRandom random;
 
-  private final SigAlgo sigAlgo;
+  private final SignAlgo sigAlgo;
 
   private final Cipher cipher;
 
@@ -94,7 +94,7 @@ public class AESGmacContentSigner implements XiContentSigner {
 
   private final int nonceOffset;
 
-  public AESGmacContentSigner(SigAlgo sigAlgo, SecretKey signingKey)
+  public AESGmacContentSigner(SignAlgo sigAlgo, SecretKey signingKey)
       throws XiSecurityException {
     this.sigAlgo = notNull(sigAlgo, "sigAlgo");
     this.signingKey = notNull(signingKey, "signingKey");
@@ -124,15 +124,15 @@ public class AESGmacContentSigner implements XiContentSigner {
 
     int keyLen = signingKey.getEncoded().length;
     if (keyLen == 16) {
-      if (SigAlgo.GMAC_AES128 != sigAlgo) {
+      if (SignAlgo.GMAC_AES128 != sigAlgo) {
         throw new XiSecurityException("oid and singingKey do not match");
       }
     } else if (keyLen == 24) {
-      if (SigAlgo.GMAC_AES192 != sigAlgo) {
+      if (SignAlgo.GMAC_AES192 != sigAlgo) {
         throw new XiSecurityException("oid and singingKey do not match");
       }
     } else if (keyLen == 32) {
-      if (SigAlgo.GMAC_AES256 != sigAlgo) {
+      if (SignAlgo.GMAC_AES256 != sigAlgo) {
         throw new XiSecurityException("oid and singingKey do not match");
       }
     } else {

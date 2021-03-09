@@ -386,7 +386,7 @@ public class X509Cert {
     if (jceInstance != null) {
       jceInstance.verify(key);
     } else {
-      SigAlgo sigAlgo = SigAlgo.getInstance(bcInstance.getSignatureAlgorithm());
+      SignAlgo sigAlgo = SignAlgo.getInstance(bcInstance.getSignatureAlgorithm());
       Signature signature = sigAlgo.newSignature();
       checkBcSignature(key, signature);
     }
@@ -401,7 +401,7 @@ public class X509Cert {
       if (jceInstance != null) {
         jceInstance.verify(key, sigProvider);
       } else {
-        SigAlgo sigAlgo = SigAlgo.getInstance(bcInstance.getSignatureAlgorithm());
+        SignAlgo sigAlgo = SignAlgo.getInstance(bcInstance.getSignatureAlgorithm());
         Signature signature = sigAlgo.newSignature(sigProvider);
         checkBcSignature(key, signature);
       }

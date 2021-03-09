@@ -55,7 +55,7 @@ import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.SecurityFactory;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
@@ -138,13 +138,13 @@ class SelfSignedCertBuilder {
     ConcurrentContentSigner signer;
     try {
       List<CaSignerConf> signerConfs = CaEntry.splitCaSignerConfs(signerConf);
-      List<SigAlgo> restrictedSigAlgos = certprofile.getSignatureAlgorithms();
+      List<SignAlgo> restrictedSigAlgos = certprofile.getSignatureAlgorithms();
 
       String thisSignerConf = null;
       if (CollectionUtil.isEmpty(restrictedSigAlgos)) {
         thisSignerConf = signerConfs.get(0).getConf();
       } else {
-        for (SigAlgo algo : restrictedSigAlgos) {
+        for (SignAlgo algo : restrictedSigAlgos) {
           for (CaSignerConf m : signerConfs) {
             if (m.getAlgo() == algo) {
               thisSignerConf = m.getConf();

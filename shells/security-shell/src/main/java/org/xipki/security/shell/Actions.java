@@ -94,7 +94,7 @@ import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Xipki;
 import org.xipki.security.SecurityFactory;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.X509Cert;
 import org.xipki.security.X509ExtensionType;
@@ -858,7 +858,7 @@ public class Actions {
 
       boolean bo = securityFactory.verifyPopo(csr, null, peerKeyAndCert);
       String txt = bo ? "valid" : "invalid";
-      SigAlgo sigAlgo = SigAlgo.getInstance(csr.getSignatureAlgorithm());
+      SignAlgo sigAlgo = SignAlgo.getInstance(csr.getSignatureAlgorithm());
       println("The POP is " + txt + " (signature algorithm " + sigAlgo.getJceName() + ").");
       return null;
     }

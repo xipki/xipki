@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.SignerConf;
 import org.xipki.security.SignerFactory;
 import org.xipki.security.X509Cert;
@@ -155,10 +155,10 @@ public class P11SignerFactory implements SignerFactory {
     }
 
     try {
-      SigAlgo algo = null;
+      SignAlgo algo = null;
       String algoName = conf.getConfValue("algo");
       if (algoName != null) {
-        algo = SigAlgo.getInstance(algoName);
+        algo = SignAlgo.getInstance(algoName);
       }
 
       if (algo != null && algo.isMac()) {
@@ -168,7 +168,7 @@ public class P11SignerFactory implements SignerFactory {
       } else {
         if (algo == null) {
           PublicKey pubKey = slot.getIdentity(identityId.getKeyId()).getPublicKey();
-          algo = SigAlgo.getInstance(pubKey, conf);
+          algo = SignAlgo.getInstance(pubKey, conf);
         }
 
         P11ContentSignerBuilder signerBuilder = new P11ContentSignerBuilder(p11Service,

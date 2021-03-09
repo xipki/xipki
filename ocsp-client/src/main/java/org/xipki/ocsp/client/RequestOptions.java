@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.xipki.security.HashAlgo;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 
 /**
  * OCSP request options.
@@ -46,7 +46,7 @@ public class RequestOptions {
 
   private HashAlgo hashAlgorithm = HashAlgo.SHA256;
 
-  private List<SigAlgo> preferredSignatureAlgorithms;
+  private List<SignAlgo> preferredSignatureAlgorithms;
 
   public RequestOptions() {
   }
@@ -75,12 +75,12 @@ public class RequestOptions {
     this.hashAlgorithm = hashAlgorithm;
   }
 
-  public List<SigAlgo> getPreferredSignatureAlgorithms() {
+  public List<SignAlgo> getPreferredSignatureAlgorithms() {
     return preferredSignatureAlgorithms;
   }
 
   public void setPreferredSignatureAlgorithms(
-      SigAlgo[] preferredSignatureAlgorithms) {
+      SignAlgo[] preferredSignatureAlgorithms) {
     this.preferredSignatureAlgorithms = Arrays.asList(preferredSignatureAlgorithms);
   }
 

@@ -40,7 +40,7 @@ public interface ConcurrentContentSigner extends Closeable {
    * Returns the algorithm.
    * @return algorithm
    */
-  SigAlgo getAlgorithm();
+  SignAlgo getAlgorithm();
 
   boolean isMac();
 

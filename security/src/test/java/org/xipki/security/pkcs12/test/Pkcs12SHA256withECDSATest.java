@@ -17,7 +17,7 @@
 
 package org.xipki.security.pkcs12.test;
 
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 
 /**
  * JUnit tests to test the signature creation and verification of PKCS#12 token
@@ -40,8 +40,8 @@ public class Pkcs12SHA256withECDSATest extends Pkcs12SignVerifyTest {
   }
 
   @Override
-  protected SigAlgo getSignatureAlgorithm() {
-    return SigAlgo.ECDSA_SHA256;
+  protected SignAlgo getSignatureAlgorithm() {
+    return SignAlgo.ECDSA_SHA256;
   }
 
 }

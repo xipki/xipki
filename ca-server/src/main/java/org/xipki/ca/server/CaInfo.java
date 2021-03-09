@@ -48,7 +48,7 @@ import org.xipki.ca.server.db.CertStore;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
@@ -94,7 +94,7 @@ public class CaInfo {
 
   private DhpocControl dhpocControl;
 
-  private Map<SigAlgo, ConcurrentContentSigner> signers;
+  private Map<SignAlgo, ConcurrentContentSigner> signers;
 
   private ConcurrentContentSigner dfltSigner;
 
@@ -349,12 +349,12 @@ public class CaInfo {
     return crlNumber == 0 ? null : BigInteger.valueOf(crlNumber);
   }
 
-  public ConcurrentContentSigner getSigner(List<SigAlgo> algos) {
+  public ConcurrentContentSigner getSigner(List<SignAlgo> algos) {
     if (CollectionUtil.isEmpty(algos)) {
       return dfltSigner;
     }
 
-    for (SigAlgo m : algos) {
+    for (SignAlgo m : algos) {
       if (signers.containsKey(m)) {
         return signers.get(m);
       }
@@ -372,7 +372,7 @@ public class CaInfo {
 
     List<CaSignerConf> signerConfs = CaEntry.splitCaSignerConfs(caEntry.getSignerConf());
 
-    Map<SigAlgo, ConcurrentContentSigner> tmpSigners = new HashMap<>();
+    Map<SignAlgo, ConcurrentContentSigner> tmpSigners = new HashMap<>();
     for (CaSignerConf m : signerConfs) {
       SignerConf signerConf = new SignerConf(m.getConf());
       ConcurrentContentSigner signer;

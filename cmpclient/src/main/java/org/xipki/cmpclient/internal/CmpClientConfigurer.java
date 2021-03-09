@@ -62,7 +62,7 @@ import org.xipki.security.CollectionAlgorithmValidator;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SecurityFactory;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
@@ -494,9 +494,9 @@ final class CmpClientConfigurer {
           return false;
         }
 
-        SigAlgo macAlgo;
+        SignAlgo macAlgo;
         try {
-          macAlgo = SigAlgo.getInstance(cf.getMac());
+          macAlgo = SignAlgo.getInstance(cf.getMac());
         } catch (NoSuchAlgorithmException ex) {
           LOG.error("Unknown MAC algorithm {}", cf.getMac());
           return false;

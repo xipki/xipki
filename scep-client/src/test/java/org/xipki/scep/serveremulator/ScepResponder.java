@@ -58,7 +58,7 @@ import org.xipki.scep.transaction.Nonce;
 import org.xipki.scep.transaction.PkiStatus;
 import org.xipki.scep.transaction.TransactionId;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 
@@ -151,7 +151,7 @@ public class ScepResponder {
       event.putEventData(AuditEvent.NAME_failInfo, rep.getFailInfo());
     }
 
-    SigAlgo signatureAlgorithm = SigAlgo.getInstance(getSigningKey(),
+    SignAlgo signatureAlgorithm = SignAlgo.getInstance(getSigningKey(),
         req.getDigestAlgorithm(), null);
 
     try {

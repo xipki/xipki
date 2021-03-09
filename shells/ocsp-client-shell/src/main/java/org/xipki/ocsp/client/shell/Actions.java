@@ -76,7 +76,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.IssuerHash;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
@@ -447,9 +447,9 @@ public class Actions {
       options.setUseHttpGetForRequest(useHttpGetForSmallRequest.booleanValue());
 
       if (isNotEmpty(prefSigAlgs)) {
-        SigAlgo[] algos = new SigAlgo[prefSigAlgs.size()];
+        SignAlgo[] algos = new SignAlgo[prefSigAlgs.size()];
         for (int i = 0; i < algos.length; i++) {
-          algos[i] = SigAlgo.getInstance(prefSigAlgs.get(i));
+          algos[i] = SignAlgo.getInstance(prefSigAlgs.get(i));
         }
 
         options.setPreferredSignatureAlgorithms(algos);
@@ -689,7 +689,7 @@ public class Actions {
           } else {
             String sigAlgName;
             try {
-              sigAlgName = SigAlgo.getInstance(sigAlg).getJceName();
+              sigAlgName = SignAlgo.getInstance(sigAlg).getJceName();
             } catch (NoSuchAlgorithmException ex) {
               sigAlgName = "unknown";
             }

@@ -95,7 +95,7 @@ import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.SecurityFactory;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.util.CollectionUtil;
@@ -763,7 +763,7 @@ public class OcspServerImpl implements OcspServer {
         concurrentSigner = signer.getFirstSigner();
       }
 
-      SigAlgo cacheDbSigAlg = null;
+      SignAlgo cacheDbSigAlg = null;
       BigInteger cacheDbSerialNumber = null;
       Integer cacheDbIssuerId = null;
 

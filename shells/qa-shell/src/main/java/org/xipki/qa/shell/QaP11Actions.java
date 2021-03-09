@@ -34,7 +34,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.jcajce.spec.SM2ParameterSpec;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.SignatureAlgoControl;
 import org.xipki.security.bc.XiProvider;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
@@ -124,7 +124,7 @@ public class QaP11Actions {
         throws Exception {
       PublicKey pubKey = cert.getPublicKey();
 
-      SigAlgo sigAlgo = getSignatureAlgo(pubKey);
+      SignAlgo sigAlgo = getSignatureAlgo(pubKey);
       println("signature algorithm: " + sigAlgo);
       Signature sig = Signature.getInstance(sigAlgo.getJceName());
       sig.initSign(key);
@@ -143,10 +143,10 @@ public class QaP11Actions {
       return null;
     } // method execute0
 
-    private SigAlgo getSignatureAlgo(PublicKey pubKey)
+    private SignAlgo getSignatureAlgo(PublicKey pubKey)
         throws NoSuchAlgorithmException {
       SignatureAlgoControl algoControl = new SignatureAlgoControl(rsaPss, dsaPlain, gm);
-      return SigAlgo.getInstance(pubKey, HashAlgo.getInstance(hashAlgo), algoControl);
+      return SignAlgo.getInstance(pubKey, HashAlgo.getInstance(hashAlgo), algoControl);
     }
 
   } // class P11provTest

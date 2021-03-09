@@ -34,7 +34,7 @@ import org.xipki.ocsp.server.type.ResponderID;
 import org.xipki.ocsp.server.type.TaggedCertSequence;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 
 /**
@@ -46,7 +46,7 @@ import org.xipki.security.X509Cert;
 
 class ResponseSigner {
 
-  private final Map<SigAlgo, ConcurrentContentSigner> algoSignerMap;
+  private final Map<SignAlgo, ConcurrentContentSigner> algoSignerMap;
 
   private final List<ConcurrentContentSigner> signers;
 
@@ -115,7 +115,7 @@ class ResponseSigner {
 
     algoSignerMap = new HashMap<>();
     for (ConcurrentContentSigner signer : signers) {
-      SigAlgo algo = signer.getAlgorithm();
+      SignAlgo algo = signer.getAlgorithm();
       algoSignerMap.put(algo, signer);
     }
   } // constructor
@@ -139,7 +139,7 @@ class ResponseSigner {
         // return any RSAPSS with MGF1 algorithms
         ASN1Encodable params = sigAlgId.getParameters();
         if (params == null) {
-          for (SigAlgo m : algoSignerMap.keySet()) {
+          for (SignAlgo m : algoSignerMap.keySet()) {
             if (m.isRSAPSSMGF1SigAlgo()) {
               return algoSignerMap.get(m);
             }
@@ -147,9 +147,9 @@ class ResponseSigner {
         }
       }
 
-      SigAlgo algo;
+      SignAlgo algo;
       try {
-        algo = SigAlgo.getInstance(sigAlgId);
+        algo = SignAlgo.getInstance(sigAlgId);
       } catch (NoSuchAlgorithmException ex) {
         continue;
       }

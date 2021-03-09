@@ -53,7 +53,7 @@ import org.bouncycastle.operator.bc.BcContentSignerBuilder;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.DSAPlainDigestSigner;
 import org.xipki.security.DfltConcurrentContentSigner;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.SignatureSigner;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiContentSigner;
@@ -75,9 +75,9 @@ public class P12ContentSignerBuilder {
   // CHECKSTYLE:SKIP
   private static class RSAContentSignerBuilder extends BcContentSignerBuilder {
 
-    private final SigAlgo sigAlgo;
+    private final SignAlgo sigAlgo;
 
-    private RSAContentSignerBuilder(SigAlgo sigAlgo)
+    private RSAContentSignerBuilder(SignAlgo sigAlgo)
         throws NoSuchAlgorithmException, NoSuchPaddingException {
       super(sigAlgo.getAlgorithmIdentifier(), sigAlgo.getHashAlgo().getAlgorithmIdentifier());
       if (!(sigAlgo.isRSAPSSSigAlgo() || sigAlgo.isRSAPkcs1SigAlgo())) {
@@ -107,9 +107,9 @@ public class P12ContentSignerBuilder {
   // CHECKSTYLE:SKIP
   private static class DSAContentSignerBuilder extends BcContentSignerBuilder {
 
-    private final SigAlgo sigAlgo;
+    private final SignAlgo sigAlgo;
 
-    private DSAContentSignerBuilder(SigAlgo sigAlgo)
+    private DSAContentSignerBuilder(SignAlgo sigAlgo)
         throws NoSuchAlgorithmException, NoSuchPaddingException {
       super(sigAlgo.getAlgorithmIdentifier(), sigAlgo.getHashAlgo().getAlgorithmIdentifier());
       if (!sigAlgo.isDSASigAlgo()) {
@@ -131,9 +131,9 @@ public class P12ContentSignerBuilder {
   // CHECKSTYLE:SKIP
   private static class ECDSAContentSignerBuilder extends BcContentSignerBuilder {
 
-    private final SigAlgo sigAlgo;
+    private final SignAlgo sigAlgo;
 
-    private ECDSAContentSignerBuilder(SigAlgo sigAlgo)
+    private ECDSAContentSignerBuilder(SignAlgo sigAlgo)
         throws NoSuchAlgorithmException, NoSuchPaddingException {
       super(sigAlgo.getAlgorithmIdentifier(), sigAlgo.getHashAlgo().getAlgorithmIdentifier());
       if (!sigAlgo.isECDSASigAlgo()) {
@@ -160,9 +160,9 @@ public class P12ContentSignerBuilder {
   // CHECKSTYLE:SKIP
   private static class SM2ContentSignerBuilder extends BcContentSignerBuilder {
 
-    private final SigAlgo sigAlgo;
+    private final SignAlgo sigAlgo;
 
-    private SM2ContentSignerBuilder(SigAlgo sigAlgo)
+    private SM2ContentSignerBuilder(SignAlgo sigAlgo)
         throws NoSuchAlgorithmException, NoSuchPaddingException {
       super(sigAlgo.getAlgorithmIdentifier(), sigAlgo.getHashAlgo().getAlgorithmIdentifier());
       if (!sigAlgo.isSM2SigAlgo()) {
@@ -201,7 +201,7 @@ public class P12ContentSignerBuilder {
     this.certificateChain = keypairWithCert.getCertificateChain();
   }
 
-  public ContentSigner createContentSigner(SigAlgo sigAlgo, SecureRandom random)
+  public ContentSigner createContentSigner(SignAlgo sigAlgo, SecureRandom random)
           throws XiSecurityException, NoSuchPaddingException {
     notNull(sigAlgo, "sigAlgo");
 
@@ -270,7 +270,7 @@ public class P12ContentSignerBuilder {
     }
   } // method createContentSigner
 
-  public ConcurrentContentSigner createSigner(SigAlgo sigAlgo, int parallelism,
+  public ConcurrentContentSigner createSigner(SignAlgo sigAlgo, int parallelism,
       SecureRandom random)
           throws XiSecurityException, NoSuchPaddingException {
     notNull(sigAlgo, "sigAlgo");

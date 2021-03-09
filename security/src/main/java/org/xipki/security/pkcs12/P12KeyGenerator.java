@@ -56,7 +56,7 @@ import org.bouncycastle.jcajce.interfaces.XDHKey;
 import org.bouncycastle.operator.ContentSigner;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.SignatureSigner;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.KeyUtil;
@@ -282,29 +282,29 @@ public class P12KeyGenerator {
 
     P12ContentSignerBuilder builder = new P12ContentSignerBuilder(key, publicKey);
 
-    SigAlgo algo;
+    SignAlgo algo;
     if (key instanceof RSAPrivateKey) {
-      algo = SigAlgo.RSA_SHA256;
+      algo = SignAlgo.RSA_SHA256;
     } else if (key instanceof DSAPrivateKey) {
-      algo = SigAlgo.DSA_SHA256;
+      algo = SignAlgo.DSA_SHA256;
     } else if (key instanceof ECPrivateKey) {
       int keysize = ((ECPrivateKey) key).getParams().getOrder().bitLength();
       if (keysize > 384) {
-        algo = SigAlgo.ECDSA_SHA512;
+        algo = SignAlgo.ECDSA_SHA512;
       } else if (keysize > 256) {
-        algo = SigAlgo.ECDSA_SHA384;
+        algo = SignAlgo.ECDSA_SHA384;
       } else if (keysize > 160) {
-        algo = SigAlgo.ECDSA_SHA256;
+        algo = SignAlgo.ECDSA_SHA256;
       } else {
-        algo = SigAlgo.ECDSA_SHA1;
+        algo = SignAlgo.ECDSA_SHA1;
       }
     } else if (key instanceof EdDSAKey) {
       String algorithm = key.getAlgorithm();
       ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(algorithm);
       if (EdECConstants.id_ED25519.equals(curveOid)) {
-        algo = SigAlgo.ED25519;
+        algo = SignAlgo.ED25519;
       } else if (EdECConstants.id_ED448.equals(curveOid)) {
-        algo = SigAlgo.ED448;
+        algo = SignAlgo.ED448;
       } else {
         throw new IllegalArgumentException("unknown EdDSA key algorithm " + algorithm);
       }

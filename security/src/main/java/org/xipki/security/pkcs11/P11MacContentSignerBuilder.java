@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.DfltConcurrentContentSigner;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.XiSecurityException;
 import org.xipki.util.LogUtil;
@@ -55,7 +55,7 @@ public class P11MacContentSignerBuilder {
     this.identityId = notNull(identityId, "identityId");
   } // constructor
 
-  public ConcurrentContentSigner createSigner(SigAlgo sigAlgo, int parallelism)
+  public ConcurrentContentSigner createSigner(SignAlgo sigAlgo, int parallelism)
       throws XiSecurityException, P11TokenException {
     positive(parallelism, "parallelism");
 

@@ -72,7 +72,7 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.BaseRequirements;
 import org.xipki.security.ObjectIdentifiers.DN;
 import org.xipki.security.ObjectIdentifiers.XKU;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.Validity;
 import org.xipki.util.Validity.Unit;
@@ -486,13 +486,13 @@ class CertprofileUtil {
     }
 
     // Signature/hash algorithm
-    List<SigAlgo> sigAlgos = certprofile.getSignatureAlgorithms();
+    List<SignAlgo> sigAlgos = certprofile.getSignatureAlgorithms();
     if (sigAlgos == null) {
       msg.append("signature algorithms not defined, ");
     } else {
       List<HashAlgo> allowedHashAlgos =
           Arrays.asList(HashAlgo.SHA256, HashAlgo.SHA384, HashAlgo.SHA512);
-      for (SigAlgo sigAlgo : sigAlgos) {
+      for (SignAlgo sigAlgo : sigAlgos) {
         HashAlgo hashAlgo = sigAlgo.getHashAlgo();
         if (!allowedHashAlgos.contains(hashAlgo)) {
           msg.append("unpermitted hash algorithm ").append(hashAlgo).append(", ");

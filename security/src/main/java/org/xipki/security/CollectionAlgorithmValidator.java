@@ -37,7 +37,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 
 public class CollectionAlgorithmValidator implements AlgorithmValidator {
 
-  private final Set<SigAlgo> algos;
+  private final Set<SignAlgo> algos;
 
   private final Set<String> algoNames;
 
@@ -49,9 +49,9 @@ public class CollectionAlgorithmValidator implements AlgorithmValidator {
    */
   public static CollectionAlgorithmValidator ofAlgorithmNames(Collection<String> algoNames)
       throws NoSuchAlgorithmException {
-    Set<SigAlgo> algos = new HashSet<>();
+    Set<SignAlgo> algos = new HashSet<>();
     for (String algoName : algoNames) {
-      algos.add(SigAlgo.getInstance(algoName));
+      algos.add(SignAlgo.getInstance(algoName));
     }
     return new CollectionAlgorithmValidator(algos);
   }
@@ -62,17 +62,17 @@ public class CollectionAlgorithmValidator implements AlgorithmValidator {
    *            all algorithms
    * @throws NoSuchAlgorithmException if any algoName is unknown.
    */
-  public CollectionAlgorithmValidator(Collection<SigAlgo> algos)
+  public CollectionAlgorithmValidator(Collection<SignAlgo> algos)
       throws NoSuchAlgorithmException {
     this.algos = Collections.unmodifiableSet(new HashSet<>(algos));
     Set<String> names = new HashSet<>();
-    for (SigAlgo m : algos) {
+    for (SignAlgo m : algos) {
       names.add(m.getJceName());
     }
     this.algoNames = Collections.unmodifiableSet(names);
   }
 
-  public Set<SigAlgo> getAlgos() {
+  public Set<SignAlgo> getAlgos() {
     return algos;
   }
 
@@ -88,9 +88,9 @@ public class CollectionAlgorithmValidator implements AlgorithmValidator {
       return true;
     }
 
-    SigAlgo algo;
+    SignAlgo algo;
     try {
-      algo = SigAlgo.getInstance(algId);
+      algo = SignAlgo.getInstance(algId);
     } catch (NoSuchAlgorithmException ex) {
       return false;
     }
@@ -99,7 +99,7 @@ public class CollectionAlgorithmValidator implements AlgorithmValidator {
   }
 
   @Override
-  public boolean isAlgorithmPermitted(SigAlgo algo) {
+  public boolean isAlgorithmPermitted(SignAlgo algo) {
     notNull(algo, "algo");
     return algos.contains(algo);
   }

@@ -38,7 +38,7 @@ import org.xipki.ca.api.mgmt.ValidityMode;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.X509Util;
@@ -59,16 +59,16 @@ public class CaEntry extends MgmtEntry {
 
   public static class CaSignerConf {
 
-    private final SigAlgo algo;
+    private final SignAlgo algo;
 
     private final String conf;
 
-    private CaSignerConf(SigAlgo algo, String conf) {
+    private CaSignerConf(SignAlgo algo, String conf) {
       this.algo = algo;
       this.conf = conf;
     }
 
-    public SigAlgo getAlgo() {
+    public SignAlgo getAlgo() {
       return algo;
     }
 
@@ -178,9 +178,9 @@ public class CaEntry extends MgmtEntry {
 
     List<CaSignerConf> signerConfs = new ArrayList<>(list.size());
     for (String n : list) {
-      SigAlgo sigAlgo;
+      SignAlgo sigAlgo;
       try {
-        sigAlgo = SigAlgo.getInstance(n);
+        sigAlgo = SignAlgo.getInstance(n);
       } catch (NoSuchAlgorithmException ex) {
         throw new XiSecurityException(ex.getMessage(), ex);
       }

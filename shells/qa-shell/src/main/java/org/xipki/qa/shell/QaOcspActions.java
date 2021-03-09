@@ -61,7 +61,7 @@ import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.IssuerHash;
 import org.xipki.security.SecurityFactory;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
@@ -442,7 +442,7 @@ public class QaOcspActions {
       responseOption.setCerthashOccurrence(expectedCerthashOccurrence);
       responseOption.setNonceOccurrence(expectedNonceOccurrence);
       responseOption.setRespIssuer(respIssuer);
-      responseOption.setSignatureAlg(SigAlgo.getInstance(sigAlg));
+      responseOption.setSignatureAlg(SignAlgo.getInstance(sigAlg));
       if (isNotBlank(certhashAlg)) {
         responseOption.setCerthashAlg(HashAlgo.getInstance(certhashAlg));
       }
@@ -715,7 +715,7 @@ public class QaOcspActions {
       responseOption.setNonceOccurrence(expectedNonceOccurrence);
       responseOption.setRespIssuer(respIssuer);
       if (isNotBlank(sigAlg)) {
-        responseOption.setSignatureAlg(SigAlgo.getInstance(sigAlg));
+        responseOption.setSignatureAlg(SignAlgo.getInstance(sigAlg));
       }
 
       if (isNotBlank(certhashAlg)) {

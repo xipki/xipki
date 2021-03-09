@@ -135,7 +135,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
       if (!algoValidator.isAlgorithmPermitted(algId)) {
         String algoName;
         try {
-          algoName = SigAlgo.getInstance(algId).getJceName();
+          algoName = SignAlgo.getInstance(algId).getJceName();
         } catch (NoSuchAlgorithmException ex) {
           algoName = algId.getAlgorithm().getId();
         }

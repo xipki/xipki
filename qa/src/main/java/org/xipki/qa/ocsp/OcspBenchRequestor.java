@@ -50,7 +50,7 @@ import org.xipki.qa.BenchmarkHttpClient.HttpClientException;
 import org.xipki.qa.BenchmarkHttpClient.ResponseHandler;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Base64;
 import org.xipki.util.StringUtil;
@@ -108,12 +108,12 @@ class OcspBenchRequestor {
     this.issuerKeyHash = new DEROctetString(
         issuerhashAlg.hash(issuerCert.getSubjectPublicKeyInfo().getPublicKeyData().getOctets()));
 
-    List<SigAlgo> prefSigAlgs = requestOptions.getPreferredSignatureAlgorithms();
+    List<SignAlgo> prefSigAlgs = requestOptions.getPreferredSignatureAlgorithms();
     if (prefSigAlgs == null || prefSigAlgs.size() == 0) {
       this.extensions = null;
     } else {
       ASN1EncodableVector vec = new ASN1EncodableVector();
-      for (SigAlgo algId : prefSigAlgs) {
+      for (SignAlgo algId : prefSigAlgs) {
         ASN1Sequence prefSigAlgObj = new DERSequence(algId.getAlgorithmIdentifier());
         vec.add(prefSigAlgObj);
       }

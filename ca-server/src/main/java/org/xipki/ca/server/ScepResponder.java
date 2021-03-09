@@ -81,7 +81,7 @@ import org.xipki.scep.transaction.PkiStatus;
 import org.xipki.scep.transaction.TransactionId;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
@@ -675,7 +675,7 @@ public class ScepResponder {
 
     ContentInfo ci;
     try {
-      SigAlgo signatureAlgorithm = SigAlgo.getInstance(hashAlgo.getJceName() + "withRSA");
+      SignAlgo signatureAlgorithm = SignAlgo.getInstance(hashAlgo.getJceName() + "withRSA");
       X509Cert[] cmsCertSet = control.isIncludeSignerCert()
           ? new X509Cert[]{responderCert} : null;
 

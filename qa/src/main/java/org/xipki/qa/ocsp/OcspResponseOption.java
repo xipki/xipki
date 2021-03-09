@@ -18,7 +18,7 @@
 package org.xipki.qa.ocsp;
 
 import org.xipki.security.HashAlgo;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.TripleState;
 
@@ -41,7 +41,7 @@ public class OcspResponseOption {
 
   private HashAlgo certhashAlg;
 
-  private SigAlgo signatureAlg;
+  private SignAlgo signatureAlg;
 
   public OcspResponseOption() {
   }
@@ -86,11 +86,11 @@ public class OcspResponseOption {
     this.certhashAlg = certhashAlg;
   }
 
-  public SigAlgo getSignatureAlg() {
+  public SignAlgo getSignatureAlg() {
     return signatureAlg;
   }
 
-  public void setSignatureAlg(SigAlgo signatureAlg) {
+  public void setSignatureAlg(SignAlgo signatureAlg) {
     this.signatureAlg = signatureAlg;
   }
 

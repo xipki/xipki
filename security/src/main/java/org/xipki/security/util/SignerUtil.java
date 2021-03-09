@@ -51,7 +51,7 @@ import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
 import org.bouncycastle.operator.bc.BcDSAContentVerifierProviderBuilder;
 import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.bc.ShakePSSSigner;
 import org.xipki.security.bc.XiECContentVerifierProviderBuilder;
@@ -113,13 +113,13 @@ public class SignerUtil {
   }
 
   // CHECKSTYLE:SKIP
-  public static Signer createPSSRSASigner(SigAlgo sigAlg)
+  public static Signer createPSSRSASigner(SignAlgo sigAlg)
       throws XiSecurityException {
     return createPSSRSASigner(sigAlg, null);
   }
 
   // CHECKSTYLE:SKIP
-  public static Signer createPSSRSASigner(SigAlgo sigAlg, AsymmetricBlockCipher cipher)
+  public static Signer createPSSRSASigner(SignAlgo sigAlg, AsymmetricBlockCipher cipher)
       throws XiSecurityException {
     notNull(sigAlg, "sigAlg");
     if (!sigAlg.isRSAPSSSigAlgo()) {

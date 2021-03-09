@@ -38,7 +38,7 @@ import org.xipki.password.PasswordResolverException;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.SecurityFactory;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.SignerConf;
 import org.xipki.security.SignerFactory;
 import org.xipki.security.X509Cert;
@@ -126,10 +126,10 @@ public class P12SignerFactory implements SignerFactory {
     InputStream keystoreStream = getInputStream(str);
 
     try {
-      SigAlgo sigAlg = null;
+      SignAlgo sigAlg = null;
       String algoName = conf.getConfValue("algo");
       if (algoName != null) {
-        sigAlg = SigAlgo.getInstance(algoName);
+        sigAlg = SignAlgo.getInstance(algoName);
       }
 
       if (sigAlg != null && sigAlg.isMac()) {
@@ -168,7 +168,7 @@ public class P12SignerFactory implements SignerFactory {
 
           if (sigAlg == null) {
             PublicKey pubKey = signerBuilder.getCertificate().getPublicKey();
-            sigAlg = SigAlgo.getInstance(pubKey, conf);
+            sigAlg = SignAlgo.getInstance(pubKey, conf);
           }
 
           return signerBuilder.createSigner(sigAlg, parallelism,

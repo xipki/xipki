@@ -47,7 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.scep.util.ScepUtil;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
@@ -179,7 +179,7 @@ public class DecodedNextCaMessage {
 
       String sigAlgOid = signerInfo.getEncryptionAlgOID();
       if (!PKCSObjectIdentifiers.rsaEncryption.getId().equals(sigAlgOid)) {
-        SigAlgo sigAlgo = SigAlgo.getInstance(
+        SignAlgo sigAlgo = SignAlgo.getInstance(
             signerInfo.toASN1Structure().getDigestEncryptionAlgorithm());
 
         if (digestAlgo != sigAlgo.getHashAlgo()) {

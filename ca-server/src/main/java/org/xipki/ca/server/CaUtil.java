@@ -64,7 +64,7 @@ import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.ObjectIdentifiers.Xipki;
 import org.xipki.security.SecurityFactory;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
@@ -256,7 +256,7 @@ public class CaUtil {
     String algo = pairs.value("algo");
     if (algo != null) {
       try {
-        algo = SigAlgo.getInstance(algo).getJceName();
+        algo = SignAlgo.getInstance(algo).getJceName();
       } catch (NoSuchAlgorithmException ex) {
         throw new CaMgmtException(ex);
       }

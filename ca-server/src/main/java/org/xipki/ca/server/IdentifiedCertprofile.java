@@ -82,7 +82,7 @@ import org.xipki.ca.api.profile.SubjectDnSpec;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.ObjectIdentifiers.BaseRequirements;
 import org.xipki.security.ObjectIdentifiers.DN;
 import org.xipki.security.ObjectIdentifiers.Extn;
@@ -123,7 +123,7 @@ public class IdentifiedCertprofile implements Closeable {
     return certprofile.getVersion();
   }
 
-  public List<SigAlgo> getSignatureAlgorithms() {
+  public List<SignAlgo> getSignatureAlgorithms() {
     return certprofile.getSignatureAlgorithms();
   }
 

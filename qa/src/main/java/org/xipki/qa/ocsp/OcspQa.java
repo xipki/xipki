@@ -58,7 +58,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.IssuerHash;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
@@ -198,10 +198,10 @@ public class OcspQa {
       issue = new ValidationIssue("OCSP.SIG.ALG", "signature algorithm");
       resultIssues.add(issue);
 
-      SigAlgo expectedSigalgo = responseOption.getSignatureAlg();
+      SignAlgo expectedSigalgo = responseOption.getSignatureAlg();
       if (expectedSigalgo != null) {
         try {
-          SigAlgo sigAlgo = SigAlgo.getInstance(basicResp.getSignatureAlgorithmID());
+          SignAlgo sigAlgo = SignAlgo.getInstance(basicResp.getSignatureAlgorithmID());
           if (sigAlgo != expectedSigalgo) {
             issue.setFailureMessage("is '" + sigAlgo.getJceName() + "', but expected '"
                 + expectedSigalgo.getJceName() + "'");

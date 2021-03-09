@@ -57,7 +57,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
@@ -313,7 +313,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
       byte[] nonce, RequestOptions requestOptions)
           throws OcspRequestorException {
     HashAlgo hashAlgo = requestOptions.getHashAlgorithm();
-    List<SigAlgo> prefSigAlgs = requestOptions.getPreferredSignatureAlgorithms();
+    List<SignAlgo> prefSigAlgs = requestOptions.getPreferredSignatureAlgorithms();
 
     XiOCSPReqBuilder reqBuilder = new XiOCSPReqBuilder();
     List<Extension> extensions = new LinkedList<>();
@@ -324,7 +324,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
 
     if (prefSigAlgs != null && prefSigAlgs.size() > 0) {
       ASN1EncodableVector vec = new ASN1EncodableVector();
-      for (SigAlgo algId : prefSigAlgs) {
+      for (SignAlgo algId : prefSigAlgs) {
         vec.add(new DERSequence(algId.getAlgorithmIdentifier()));
       }
 

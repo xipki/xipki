@@ -37,7 +37,7 @@ import javax.crypto.SecretKey;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.DfltConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.KeyUtil;
@@ -95,7 +95,7 @@ public class P12MacContentSignerBuilder {
     }
   } // constructor
 
-  public ConcurrentContentSigner createSigner(SigAlgo sigAlg,
+  public ConcurrentContentSigner createSigner(SignAlgo sigAlg,
       int parallelism, SecureRandom random)
           throws XiSecurityException {
     notNull(sigAlg, "sigAlg");

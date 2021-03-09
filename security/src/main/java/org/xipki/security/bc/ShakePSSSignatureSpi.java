@@ -35,7 +35,7 @@ import org.bouncycastle.crypto.Signer;
 import org.bouncycastle.crypto.params.ParametersWithRandom;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
-import org.xipki.security.SigAlgo;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.SignerUtil;
 
@@ -53,7 +53,7 @@ public class ShakePSSSignatureSpi
   private Signer signer;
 
   // care - this constructor is actually used by outside organisations
-  protected ShakePSSSignatureSpi(SigAlgo sigAlgo) {
+  protected ShakePSSSignatureSpi(SignAlgo sigAlgo) {
     try {
       this.signer = SignerUtil.createPSSRSASigner(sigAlgo);
     } catch (XiSecurityException ex) {
@@ -168,13 +168,13 @@ public class ShakePSSSignatureSpi
 
   static public class SHAKE128 extends ShakePSSSignatureSpi {
     public SHAKE128() {
-      super(SigAlgo.RSAPSS_SHAKE128);
+      super(SignAlgo.RSAPSS_SHAKE128);
     }
   }
 
   static public class SHAKE256 extends ShakePSSSignatureSpi {
     public SHAKE256() {
-      super(SigAlgo.RSAPSS_SHAKE128);
+      super(SignAlgo.RSAPSS_SHAKE128);
     }
   }
 }
