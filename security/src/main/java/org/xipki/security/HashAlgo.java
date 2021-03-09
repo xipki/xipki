@@ -34,7 +34,6 @@ import org.bouncycastle.crypto.digests.SHA384Digest;
 import org.bouncycastle.crypto.digests.SHA3Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.crypto.digests.SM3Digest;
-import org.xipki.security.ObjectIdentifiers.Shake;
 import org.xipki.security.bc.XiShakeDigest;
 import org.xipki.util.Args;
 
@@ -45,9 +44,11 @@ import org.xipki.util.Args;
  * @since 2.0.0
  */
 
+//See https://www.itu.int/ITU-T/formal-language/itu-t/x/x509/2019/AlgorithmObjectIdentifiers.html
 public enum HashAlgo {
 
-  SHA1(20,     "1.3.14.3.2.26", "SHA1"),
+  SHA1(20,     "1.3.14.3.2.26", "SHA1", true),
+  // rfc5754: no parameters
   SHA224(28,   "2.16.840.1.101.3.4.2.4",  "SHA224"),
   SHA256(32,   "2.16.840.1.101.3.4.2.1",  "SHA256"),
   SHA384(48,   "2.16.840.1.101.3.4.2.2",  "SHA384"),
@@ -57,8 +58,9 @@ public enum HashAlgo {
   SHA3_384(48, "2.16.840.1.101.3.4.2.9",  "SHA3-384"),
   SHA3_512(64, "2.16.840.1.101.3.4.2.10", "SHA3-512"),
   SM3(32,      "1.2.156.10197.1.401",     "SM3"),
-  SHAKE128(32, Shake.id_shake128.getId(), "SHAKE128-256"),
-  SHAKE256(64, Shake.id_shake256.getId(), "SHAKE256-512");
+
+  SHAKE128(32, "2.16.840.1.101.3.4.2.11", "SHAKE128-256"),
+  SHAKE256(64, "2.16.840.1.101.3.4.2.12", "SHAKE256-512");
 
   private static final Map<String, HashAlgo> map = new HashMap<>();
 
@@ -92,12 +94,16 @@ public enum HashAlgo {
   }
 
   private HashAlgo(int length, String oid, String jceName) {
+    this(length, oid, jceName, false);
+  }
+
+  private HashAlgo(int length, String oid, String jceName, boolean withNullParams) {
     this.length = length;
     this.oid = new ASN1ObjectIdentifier(oid).intern();
-    if (this.oid.equals(Shake.id_shake128) || this.oid.equals(Shake.id_shake256)) {
-      this.algId = new AlgorithmIdentifier(this.oid);
-    } else {
+    if (withNullParams) {
       this.algId = new AlgorithmIdentifier(this.oid, DERNull.INSTANCE);
+    } else {
+      this.algId = new AlgorithmIdentifier(this.oid);
     }
     this.jceName = jceName;
 

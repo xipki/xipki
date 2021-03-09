@@ -25,16 +25,18 @@ import static org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.*;
 import static org.bouncycastle.asn1.x9.X9ObjectIdentifiers.*;
 import static org.xipki.security.EdECConstants.*;
 import static org.xipki.security.HashAlgo.*;
-import static org.xipki.security.ObjectIdentifiers.Shake.*;
 import static org.xipki.util.Args.notNull;
 //CHECKSTYLE:ON
 
+import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.PublicKey;
 import java.security.Signature;
+import java.security.interfaces.DSAPrivateKey;
 import java.security.interfaces.DSAPublicKey;
+import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PSSParameterSpec;
 import java.util.HashMap;
@@ -62,7 +64,7 @@ import org.xipki.util.Args;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+// See https://www.itu.int/ITU-T/formal-language/itu-t/x/x509/2019/AlgorithmObjectIdentifiers.html
 public enum SigAlgo {
 
   // RSA PKCS#1v1.5
@@ -90,8 +92,11 @@ public enum SigAlgo {
   RSAPSS_SHA3_512("SHA3-512WITHRSAANDMGF1", 0x19, SHA3_512),
 
   // RSA PSS with SHAKE
-  RSAPSS_SHAKE128("SHAKE128WITHRSAPSS", 0x1A, id_RSASSA_PSS_SHAKE128, SHAKE128, false),
-  RSAPSS_SHAKE256("SHAKE256WITHRSAPSS", 0x1B, id_RSASSA_PSS_SHAKE256, SHAKE256, false),
+
+  RSAPSS_SHAKE128("SHAKE128WITHRSAPSS", 0x1A,
+      new ASN1ObjectIdentifier("1.3.6.1.5.5.7.6.30"), SHAKE128, false),
+  RSAPSS_SHAKE256("SHAKE256WITHRSAPSS", 0x1B,
+      new ASN1ObjectIdentifier("1.3.6.1.5.5.7.6.31"), SHAKE256, false),
 
   // DSA
   DSA_SHA1("SHA1WITHDSA", 0x21, id_dsa_with_sha1, SHA1, false),
@@ -121,8 +126,10 @@ public enum SigAlgo {
   SM2_SM3("SM3WITHSM2", 0x3A, sm2sign_with_sm3, SM3, false),
 
   // ECDSA with SHAKE
-  ECDSA_SHAKE128("SHAKE128WITHECDSA", 0x3B, id_ecdsa_with_shake128, SHAKE128, false),
-  ECDSA_SHAKE256("SHAKE256WITHECDSA", 0x3C, id_ecdsa_with_shake256, SHAKE256, false),
+  ECDSA_SHAKE128("SHAKE128WITHECDSA", 0x3B,
+      new ASN1ObjectIdentifier("1.3.6.1.5.5.7.6.32"), SHAKE128, false),
+  ECDSA_SHAKE256("SHAKE256WITHECDSA", 0x3C,
+      new ASN1ObjectIdentifier("1.3.6.1.5.5.7.6.33"), SHAKE256, false),
 
   // Plain ECDSA
   PLAINECDSA_SHA1("SHA1WITHPLAINECDSA", 0x41, ecdsa_plain_SHA1, SHA1, false),
@@ -137,21 +144,21 @@ public enum SigAlgo {
   ED448("ED448", 0x47, id_ED448, null, false),
 
   // HMAC
-  HMAC_SHA1("HMACSHA1", 0x51, id_hmacWithSHA1, SHA1, false),
-  HMAC_SHA224("HMACSHA224", 0x52, id_hmacWithSHA224, SHA224, false),
-  HMAC_SHA256("HMACSHA256", 0x53, id_hmacWithSHA256, SHA256, false),
-  HMAC_SHA384("HMACSHA384", 0x54, id_hmacWithSHA384, SHA384, false),
-  HMAC_SHA512("HMACSHA512", 0x55, id_hmacWithSHA512, SHA512, false),
-  HMAC_SHA3_224("HMACSHA3-224", 0x56, id_hmacWithSHA3_224, SHA3_224, false),
-  HMAC_SHA3_256("HMACSHA3-256", 0x57, id_hmacWithSHA3_256, SHA3_256, false),
-  HMAC_SHA3_384("HMACSHA3-384", 0x58, id_hmacWithSHA3_384, SHA3_384, false),
-  HMAC_SHA3_512("HMACSHA3-512", 0x59, id_hmacWithSHA3_512, SHA3_512, false),
+  HMAC_SHA1("HMACSHA1", 0x51, id_hmacWithSHA1, SHA1, true),
+  HMAC_SHA224("HMACSHA224", 0x52, id_hmacWithSHA224, SHA224, true),
+  HMAC_SHA256("HMACSHA256", 0x53, id_hmacWithSHA256, SHA256, true),
+  HMAC_SHA384("HMACSHA384", 0x54, id_hmacWithSHA384, SHA384, true),
+  HMAC_SHA512("HMACSHA512", 0x55, id_hmacWithSHA512, SHA512, true),
+  HMAC_SHA3_224("HMACSHA3-224", 0x56, id_hmacWithSHA3_224, SHA3_224, true),
+  HMAC_SHA3_256("HMACSHA3-256", 0x57, id_hmacWithSHA3_256, SHA3_256, true),
+  HMAC_SHA3_384("HMACSHA3-384", 0x58, id_hmacWithSHA3_384, SHA3_384, true),
+  HMAC_SHA3_512("HMACSHA3-512", 0x59, id_hmacWithSHA3_512, SHA3_512, true),
 
   // AES-GMAC
   // we ignore there the params of GMAC
-  GMAC_AES128("AES128GMAC", 0x61, id_aes128_GCM),
-  GMAC_AES192("AES192GMAC", 0x62, id_aes192_GCM),
-  GMAC_AES256("AES256GMAC", 0x63, id_aes256_GCM),
+  GMAC_AES128("AES128GMAC", 0x61, new ASN1ObjectIdentifier("2.16.840.1.101.3.4.1.9")),
+  GMAC_AES192("AES192GMAC", 0x62, new ASN1ObjectIdentifier("2.16.840.1.101.3.4.1.29")),
+  GMAC_AES256("AES256GMAC", 0x63, new ASN1ObjectIdentifier("2.16.840.1.101.3.4.1.49")),
 
   //DHPOC-MAC
   DHPOP_X25519_SHA256("DHPOP-X25519-SHA256", 0x5A, Xipki.id_alg_dhPop_x25519_sha256, SHA256, false),
@@ -238,7 +245,7 @@ public enum SigAlgo {
     this.algId = new AlgorithmIdentifier(this.oid, params);
   }
 
-  // For GMAC
+  // For GMAC: See https://tools.ietf.org/html/draft-ietf-lamps-cms-aes-gmac-alg-03
   private SigAlgo(String jceName, int code, ASN1ObjectIdentifier oid) {
     if (!(jceName.startsWith("AES") && jceName.endsWith("GMAC"))) {
       throw new IllegalArgumentException("not AES*GMAC: " + jceName);
@@ -249,11 +256,23 @@ public enum SigAlgo {
     this.oid = oid;
     this.hashAlgo = null;
 
-    final int tagByteLen = 16;
+    final int tagLen = 12;
     final int nonceLen = 12;
 
-    // nonce here is only place holder, must be replaced before use
-    GCMParameters params = new GCMParameters(new byte[nonceLen], tagByteLen);
+    /*
+     * GMACParameters ::= SEQUENCE {
+     *   nonce        OCTET STRING, -- recommended size is 12 octets
+     *   length       MACLength DEFAULT 12 }
+     *
+     * MACLength ::= INTEGER (12 | 13 | 14 | 15 | 16)
+     *
+     */
+
+    // nonce here is only place holder, must be replaced before use: we use default
+    // length (MACLength)
+    // GMACParameters has exactly the same definition as GCMParameters (see RFC 5084)
+    // so we use GCMParameters here (GMACParameters is not defined in BouncyCastle)
+    GCMParameters params = new GCMParameters(new byte[nonceLen], tagLen);
     this.algId = new AlgorithmIdentifier(oid, params);
   }
 
@@ -479,6 +498,16 @@ public enum SigAlgo {
       }
 
       return mgf1HashToSigMap.get(hashAlgo);
+    } else if (SigAlgo.GMAC_AES128.oid.equals(oid)
+        || SigAlgo.GMAC_AES192.oid.equals(oid)
+        || SigAlgo.GMAC_AES256.oid.equals(oid)) {
+      if (SigAlgo.GMAC_AES128.equals(oid)) {
+        return SigAlgo.GMAC_AES128;
+      } else if (SigAlgo.GMAC_AES128.equals(oid)) {
+        return SigAlgo.GMAC_AES192;
+      } else {
+        return SigAlgo.GMAC_AES256;
+      }
     } else {
       if (params != null) {
         if (!DERNull.INSTANCE.equals(params)) {
@@ -505,7 +534,7 @@ public enum SigAlgo {
     return alg;
   }
 
-  public static SigAlgo getInstance(PublicKey pubKey, SignerConf signerConf)
+  public static SigAlgo getInstance(Key key, SignerConf signerConf)
       throws NoSuchAlgorithmException {
     if (notNull(signerConf, "signerConf").getHashAlgo() == null) {
       return getInstance(signerConf.getConfValue("algo"));
@@ -514,17 +543,17 @@ public enum SigAlgo {
     SignatureAlgoControl algoControl = signerConf.getSignatureAlgoControl();
     HashAlgo hashAlgo = signerConf.getHashAlgo();
 
-    if (pubKey instanceof RSAPublicKey) {
+    if (key instanceof RSAPublicKey || key instanceof RSAPrivateKey) {
       boolean rsaPss = (algoControl == null) ? false : algoControl.isRsaPss();
       return getRSAInstance(hashAlgo, rsaPss);
-    } else if (pubKey instanceof ECPublicKey) {
+    } else if (key instanceof ECPublicKey || key instanceof ECPrivateKey) {
       boolean dsaPlain = (algoControl == null) ? false : algoControl.isDsaPlain();
       boolean gm =  (algoControl == null) ? false : algoControl.isGm();
       return getECSigAlgo(hashAlgo, dsaPlain, gm);
-    } else if (pubKey instanceof DSAPublicKey) {
+    } else if (key instanceof DSAPublicKey || key instanceof DSAPrivateKey) {
       return getDSASigAlgo(hashAlgo);
-    } else if (pubKey instanceof EdDSAKey) {
-      String keyAlgo = pubKey.getAlgorithm().toUpperCase();
+    } else if (key instanceof EdDSAKey) {
+      String keyAlgo = key.getAlgorithm().toUpperCase();
       if (keyAlgo.equals(EdECConstants.ED25519)) {
         return ED25519;
       } else if (keyAlgo.equals(EdECConstants.ED448)) {
@@ -533,26 +562,36 @@ public enum SigAlgo {
         throw new NoSuchAlgorithmException("Unknown Edwards public key " + keyAlgo);
       }
     } else {
-      throw new NoSuchAlgorithmException("Unknown public key " + pubKey.getClass().getName());
+      throw new NoSuchAlgorithmException("Unknown key " + key.getClass().getName());
     }
   } // method getInstance
 
-  public static SigAlgo getInstance(PublicKey pubKey, HashAlgo hashAlgo,
+  public static SigAlgo getInstance(Key key, HashAlgo hashAlgo,
       SignatureAlgoControl algoControl)
           throws NoSuchAlgorithmException {
     notNull(hashAlgo, "hashAlgo");
+    notNull(key, "key");
 
-    if (pubKey instanceof RSAPublicKey) {
+    if (key instanceof RSAPublicKey || key instanceof RSAPrivateKey) {
       boolean rsaPss = (algoControl == null) ? false : algoControl.isRsaPss();
       return getRSAInstance(hashAlgo, rsaPss);
-    } else if (pubKey instanceof ECPublicKey) {
+    } else if (key instanceof ECPublicKey || key instanceof ECPrivateKey) {
       boolean dsaPlain = (algoControl == null) ? false : algoControl.isDsaPlain();
       boolean gm =  (algoControl == null) ? false : algoControl.isGm();
       return getECSigAlgo(hashAlgo, dsaPlain, gm);
-    } else if (pubKey instanceof DSAPublicKey) {
+    } else if (key instanceof DSAPublicKey || key instanceof DSAPrivateKey) {
       return getDSASigAlgo(hashAlgo);
+    } else if (key instanceof EdDSAKey) {
+      String keyAlgo = key.getAlgorithm().toUpperCase();
+      if (keyAlgo.equals(EdECConstants.ED25519)) {
+        return ED25519;
+      } else if (keyAlgo.equals(EdECConstants.ED448)) {
+        return ED448;
+      } else {
+        throw new NoSuchAlgorithmException("Unknown Edwards public key " + keyAlgo);
+      }
     } else {
-      throw new NoSuchAlgorithmException("Unknown public key '" + pubKey.getClass().getName());
+      throw new NoSuchAlgorithmException("Unknown key '" + key.getClass().getName());
     }
   } // method getInstance
 
