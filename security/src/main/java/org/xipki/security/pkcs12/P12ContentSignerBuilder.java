@@ -22,11 +22,13 @@ import static org.xipki.util.Args.positive;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.security.Signature;
+import java.security.SignatureException;
 import java.security.interfaces.DSAPrivateKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.RSAPrivateKey;
@@ -201,10 +203,98 @@ public class P12ContentSignerBuilder {
     this.certificateChain = keypairWithCert.getCertificateChain();
   }
 
+  public X509Cert getCertificate() {
+    return (certificateChain != null && certificateChain.length > 0) ? certificateChain[0] : null;
+  }
+
+  public X509Cert[] getCertificateChain() {
+    return certificateChain;
+  }
+
+  public PrivateKey getKey() {
+    return key;
+  }
+
   public ContentSigner createContentSigner(SignAlgo sigAlgo, SecureRandom random)
           throws XiSecurityException, NoSuchPaddingException {
     notNull(sigAlgo, "sigAlgo");
 
+    String provName = getProviderName(sigAlgo);
+
+    if (provName != null && Security.getProvider(provName) != null) {
+      try {
+        Signature signature = createSignature(sigAlgo, provName, true);
+        return new SignatureSigner(sigAlgo, signature, key);
+      } catch (Exception ex) {
+        // do nothing
+      }
+    }
+
+    Object[] rv = ff(sigAlgo, random);
+    BcContentSignerBuilder signerBuilder = (BcContentSignerBuilder) rv[0];
+    AsymmetricKeyParameter keyparam = (AsymmetricKeyParameter) rv[1];
+
+    try {
+      return signerBuilder.build(keyparam);
+    } catch (OperatorCreationException ex) {
+      throw new XiSecurityException("operator creation error", ex);
+    }
+  } // method createContentSigner
+
+  public ConcurrentContentSigner createSigner(SignAlgo sigAlgo, int parallelism,
+      SecureRandom random)
+          throws XiSecurityException, NoSuchPaddingException {
+    notNull(sigAlgo, "sigAlgo");
+    positive(parallelism, "parallelism");
+
+    List<XiContentSigner> signers = new ArrayList<>(parallelism);
+
+    String provName = getProviderName(sigAlgo);
+    if (provName != null && Security.getProvider(provName) != null) {
+      try {
+        for (int i = 0; i < parallelism; i++) {
+          Signature signature = createSignature(sigAlgo, provName, i == 0);
+          XiContentSigner signer = new SignatureSigner(sigAlgo, signature, key);
+          signers.add(signer);
+        }
+      } catch (Exception ex) {
+        signers.clear();
+      }
+    }
+
+    if (CollectionUtil.isEmpty(signers)) {
+      Object[] rv = ff(sigAlgo, random);
+      BcContentSignerBuilder signerBuilder = (BcContentSignerBuilder) rv[0];
+      AsymmetricKeyParameter keyparam = (AsymmetricKeyParameter) rv[1];
+
+      for (int i = 0; i < parallelism; i++) {
+        ContentSigner signer;
+        try {
+          signer = signerBuilder.build(keyparam);
+        } catch (OperatorCreationException ex) {
+          throw new XiSecurityException("operator creation error", ex);
+        }
+        signers.add(new XiWrappedContentSigner(signer, true));
+      }
+    }
+
+    final boolean mac = false;
+    ConcurrentContentSigner concurrentSigner;
+    try {
+      concurrentSigner = new DfltConcurrentContentSigner(mac, signers, key);
+    } catch (NoSuchAlgorithmException ex) {
+      throw new XiSecurityException(ex.getMessage(), ex);
+    }
+
+    if (certificateChain != null) {
+      concurrentSigner.setCertificateChain(certificateChain);
+    } else {
+      concurrentSigner.setPublicKey(publicKey);
+    }
+    return concurrentSigner;
+  } // method createSigner
+
+  private String getProviderName(SignAlgo sigAlgo) {
     String provName = null;
     if (sigAlgo.isRSAPkcs1SigAlgo()) {
       provName = "SunRsaSign";
@@ -217,22 +307,23 @@ public class P12ContentSignerBuilder {
     } else if (sigAlgo.isEDDSASigAlgo()) {
       provName = "BC";
     }
+    return provName;
+  }
 
-    if (provName != null && Security.getProvider(provName) != null) {
-      String algoName = sigAlgo.getJceName();
-
-      try {
-        Signature signature = Signature.getInstance(algoName, provName);
-        // test whether it works
-        signature.initSign(key);
-        signature.update(new byte[]{1, 2, 3, 4});
-        signature.sign();
-        return new SignatureSigner(sigAlgo, signature, key);
-      } catch (Exception ex) {
-        // do nothing
-      }
+  private Signature createSignature(SignAlgo sigAlgo, String provName, boolean test)
+      throws NoSuchAlgorithmException, NoSuchProviderException,
+      InvalidKeyException, SignatureException {
+    Signature signature = Signature.getInstance(sigAlgo.getJceName(), provName);
+    signature.initSign(key);
+    if (test) {
+      signature.update(new byte[]{1, 2, 3, 4});
+      signature.sign();
     }
+    return signature;
+  }
 
+  private Object[] ff(SignAlgo sigAlgo, SecureRandom random)
+      throws NoSuchPaddingException, XiSecurityException {
     BcContentSignerBuilder signerBuilder;
     AsymmetricKeyParameter keyparam;
     try {
@@ -263,121 +354,7 @@ public class P12ContentSignerBuilder {
       signerBuilder.setSecureRandom(random);
     }
 
-    try {
-      return signerBuilder.build(keyparam);
-    } catch (OperatorCreationException ex) {
-      throw new XiSecurityException("operator creation error", ex);
-    }
-  } // method createContentSigner
-
-  public ConcurrentContentSigner createSigner(SignAlgo sigAlgo, int parallelism,
-      SecureRandom random)
-          throws XiSecurityException, NoSuchPaddingException {
-    notNull(sigAlgo, "sigAlgo");
-    positive(parallelism, "parallelism");
-
-    List<XiContentSigner> signers = new ArrayList<>(parallelism);
-
-    String provName = null;
-    if (sigAlgo.isRSAPkcs1SigAlgo()) {
-      provName = "SunRsaSign";
-    } else if (sigAlgo.isECDSASigAlgo()) {
-      // Currently, the provider SunEC is much slower (5x) than BC,
-      // so we do not use the Signature variant.
-      provName = null;
-    } else if (sigAlgo.isDSASigAlgo()) {
-      provName = "SUN";
-    } else if (sigAlgo.isEDDSASigAlgo()) {
-      provName = "BC";
-    }
-
-    if (provName != null && Security.getProvider(provName) != null) {
-      String algoName = sigAlgo.getJceName();
-
-      try {
-        for (int i = 0; i < parallelism; i++) {
-          Signature signature = Signature.getInstance(algoName, provName);
-          signature.initSign(key);
-          if (i == 0) {
-            signature.update(new byte[]{1, 2, 3, 4});
-            signature.sign();
-          }
-          XiContentSigner signer = new SignatureSigner(sigAlgo, signature, key);
-          signers.add(signer);
-        }
-      } catch (Exception ex) {
-        signers.clear();
-      }
-    }
-
-    if (CollectionUtil.isEmpty(signers)) {
-      BcContentSignerBuilder signerBuilder;
-      AsymmetricKeyParameter keyparam;
-      try {
-        if (key instanceof RSAPrivateKey) {
-          keyparam = SignerUtil.generateRSAPrivateKeyParameter((RSAPrivateKey) key);
-          signerBuilder = new RSAContentSignerBuilder(sigAlgo);
-        } else if (key instanceof DSAPrivateKey) {
-          keyparam = DSAUtil.generatePrivateKeyParameter(key);
-          signerBuilder = new DSAContentSignerBuilder(sigAlgo);
-        } else if (key instanceof ECPrivateKey) {
-          keyparam = ECUtil.generatePrivateKeyParameter(key);
-          EllipticCurve curve = ((ECPrivateKey) key).getParams().getCurve();
-          if (GMUtil.isSm2primev2Curve(curve)) {
-            signerBuilder = new SM2ContentSignerBuilder(sigAlgo);
-          } else {
-            signerBuilder = new ECDSAContentSignerBuilder(sigAlgo);
-          }
-        } else {
-          throw new XiSecurityException("unsupported key " + key.getClass().getName());
-        }
-      } catch (InvalidKeyException ex) {
-        throw new XiSecurityException("invalid key", ex);
-      } catch (NoSuchAlgorithmException ex) {
-        throw new XiSecurityException("no such algorithm", ex);
-      }
-
-      for (int i = 0; i < parallelism; i++) {
-        if (random != null) {
-          signerBuilder.setSecureRandom(random);
-        }
-
-        ContentSigner signer;
-        try {
-          signer = signerBuilder.build(keyparam);
-        } catch (OperatorCreationException ex) {
-          throw new XiSecurityException("operator creation error", ex);
-        }
-        signers.add(new XiWrappedContentSigner(signer, true));
-      }
-    }
-
-    final boolean mac = false;
-    ConcurrentContentSigner concurrentSigner;
-    try {
-      concurrentSigner = new DfltConcurrentContentSigner(mac, signers, key);
-    } catch (NoSuchAlgorithmException ex) {
-      throw new XiSecurityException(ex.getMessage(), ex);
-    }
-
-    if (certificateChain != null) {
-      concurrentSigner.setCertificateChain(certificateChain);
-    } else {
-      concurrentSigner.setPublicKey(publicKey);
-    }
-    return concurrentSigner;
-  } // method createSigner
-
-  public X509Cert getCertificate() {
-    return (certificateChain != null && certificateChain.length > 0) ? certificateChain[0] : null;
-  }
-
-  public X509Cert[] getCertificateChain() {
-    return certificateChain;
-  }
-
-  public PrivateKey getKey() {
-    return key;
+    return new Object[] {signerBuilder, keyparam};
   }
 
 }
