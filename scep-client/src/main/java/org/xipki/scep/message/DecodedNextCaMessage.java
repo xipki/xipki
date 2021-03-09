@@ -17,6 +17,7 @@
 
 package org.xipki.scep.message;
 
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.util.Collection;
 import java.util.Date;
@@ -45,6 +46,8 @@ import org.bouncycastle.util.CollectionStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.scep.util.ScepUtil;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
@@ -63,7 +66,7 @@ public class DecodedNextCaMessage {
 
   private X509Cert signatureCert;
 
-  private ASN1ObjectIdentifier digestAlgorithm;
+  private HashAlgo digestAlgorithm;
 
   private Boolean signatureValid;
 
@@ -90,11 +93,11 @@ public class DecodedNextCaMessage {
     this.signatureCert = signatureCert;
   }
 
-  public ASN1ObjectIdentifier getDigestAlgorithm() {
+  public HashAlgo getDigestAlgorithm() {
     return digestAlgorithm;
   }
 
-  public void setDigestAlgorithm(ASN1ObjectIdentifier digestAlgorithm) {
+  public void setDigestAlgorithm(HashAlgo digestAlgorithm) {
     this.digestAlgorithm = digestAlgorithm;
   }
 
@@ -170,29 +173,28 @@ public class DecodedNextCaMessage {
       ret.setSigningTime(signingTime);
     }
 
-    ASN1ObjectIdentifier digestAlgOid = signerInfo.getDigestAlgorithmID().getAlgorithm();
-    ret.setDigestAlgorithm(digestAlgOid);
+    try {
+      HashAlgo digestAlgo = HashAlgo.getInstance(signerInfo.getDigestAlgorithmID());
+      ret.setDigestAlgorithm(digestAlgo);
 
-    String sigAlgOid = signerInfo.getEncryptionAlgOID();
-    if (!PKCSObjectIdentifiers.rsaEncryption.getId().equals(sigAlgOid)) {
-      ASN1ObjectIdentifier tmpDigestAlgOid;
-      try {
-        tmpDigestAlgOid = ScepUtil.extractDigesetAlgorithmIdentifier(
-            signerInfo.getEncryptionAlgOID(), signerInfo.getEncryptionAlgParams());
-      } catch (Exception ex) {
-        final String msg = "could not extract digest algorithm from signerInfo.signatureAlgorithm: "
-            + ex.getMessage();
-        LOG.error(msg);
-        LOG.debug(msg, ex);
-        ret.setFailureMessage(msg);
-        return ret;
-      }
-      if (!digestAlgOid.equals(tmpDigestAlgOid)) {
-        ret.setFailureMessage("digestAlgorithm and encryptionAlgorithm do not use"
-            + " the same digestAlgorithm");
-        return ret;
-      }
-    } // end if
+      String sigAlgOid = signerInfo.getEncryptionAlgOID();
+      if (!PKCSObjectIdentifiers.rsaEncryption.getId().equals(sigAlgOid)) {
+        SigAlgo sigAlgo = SigAlgo.getInstance(
+            signerInfo.toASN1Structure().getDigestEncryptionAlgorithm());
+
+        if (digestAlgo != sigAlgo.getHashAlgo()) {
+          ret.setFailureMessage("digestAlgorithm and encryptionAlgorithm do not use"
+              + " the same digestAlgorithm");
+          return ret;
+        }
+      } // end if
+    } catch (NoSuchAlgorithmException ex) {
+      String msg = ex.getMessage();
+      LOG.error(msg);
+      LOG.debug(msg, ex);
+      ret.setFailureMessage(msg);
+      return ret;
+    }
 
     X509CertificateHolder signerCert = (X509CertificateHolder) signedDataCerts.iterator().next();
     ret.setSignatureCert(new X509Cert(signerCert));

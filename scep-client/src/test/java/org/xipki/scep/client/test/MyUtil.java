@@ -19,6 +19,7 @@ package org.xipki.scep.client.test;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.CertificateException;
@@ -74,18 +75,21 @@ public class MyUtil {
   public static X509Cert issueSubCaCert(PrivateKey rcaKey, X500Name issuer,
       SubjectPublicKeyInfo pubKeyInfo, X500Name subject, BigInteger serialNumber,
       Date startTime)
-          throws CertIOException, OperatorCreationException {
+          throws OperatorCreationException {
     Date notAfter = new Date(startTime.getTime() + CaEmulator.DAY_IN_MS * 3650);
     X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(issuer, serialNumber,
         startTime, notAfter, subject, pubKeyInfo);
     X509KeyUsage ku = new X509KeyUsage(X509KeyUsage.keyCertSign | X509KeyUsage.cRLSign);
-    certGenerator.addExtension(Extension.keyUsage, true, ku);
-    BasicConstraints bc = new BasicConstraints(0);
-    certGenerator.addExtension(Extension.basicConstraints, true, bc);
-
-    String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(rcaKey, HashAlgo.SHA256);
-    ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(rcaKey);
-    return new X509Cert(certGenerator.build(contentSigner));
+    try {
+      certGenerator.addExtension(Extension.keyUsage, true, ku);
+      BasicConstraints bc = new BasicConstraints(0);
+      certGenerator.addExtension(Extension.basicConstraints, true, bc);
+      String signatureAlgorithm = ScepUtil.getSignatureAlgName(rcaKey, HashAlgo.SHA256);
+      ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(rcaKey);
+      return new X509Cert(certGenerator.build(contentSigner));
+    } catch (CertIOException | NoSuchAlgorithmException ex) {
+      throw new OperatorCreationException(ex.getMessage(), ex);
+    }
   } // method issueSubCaCert
 
   public static PKCS10CertificationRequest generateRequest(PrivateKey privatekey,
@@ -118,8 +122,14 @@ public class MyUtil {
       }
     }
 
-    ContentSigner contentSigner = new JcaContentSignerBuilder(
-        ScepUtil.getSignatureAlgorithm(privatekey, HashAlgo.SHA1)).build(privatekey);
+    String sigAlgName;
+    try {
+      sigAlgName = ScepUtil.getSignatureAlgName(privatekey, HashAlgo.SHA1);
+    } catch (NoSuchAlgorithmException ex) {
+      throw new OperatorCreationException(ex.getMessage(), ex);
+    }
+
+    ContentSigner contentSigner = new JcaContentSignerBuilder(sigAlgName).build(privatekey);
     return csrBuilder.build(contentSigner);
   } // method generateRequest
 
@@ -153,11 +163,11 @@ public class MyUtil {
           "could not generate self-signed certificate: " + ex.getMessage(), ex);
     }
 
-    String sigAlgorithm = ScepUtil.getSignatureAlgorithm(identityKey, HashAlgo.SHA1);
     ContentSigner contentSigner;
     try {
+      String sigAlgorithm = ScepUtil.getSignatureAlgName(identityKey, HashAlgo.SHA1);
       contentSigner = new JcaContentSignerBuilder(sigAlgorithm).build(identityKey);
-    } catch (OperatorCreationException ex) {
+    } catch (OperatorCreationException | NoSuchAlgorithmException ex) {
       throw new CertificateException("error while creating signer", ex);
     }
 

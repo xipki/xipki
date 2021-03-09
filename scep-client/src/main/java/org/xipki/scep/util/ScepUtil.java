@@ -17,8 +17,8 @@
 
 package org.xipki.scep.util;
 
+import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -38,20 +38,16 @@ import org.bouncycastle.asn1.DERUTCTime;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.cms.SignedData;
-import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.Time;
-import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.ObjectIdentifiers.Shake;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 
@@ -123,51 +119,10 @@ public class ScepUtil {
     }
   } // method getCrlFromPkiMessage
 
-  public static String getSignatureAlgorithm(PrivateKey key, HashAlgo hashAlgo) {
-    Args.notNull(key, "key");
-    Args.notNull(hashAlgo, "hashAlgo");
-    String algorithm = key.getAlgorithm();
-    if ("RSA".equalsIgnoreCase(algorithm)) {
-      return hashAlgo.getJceName() + "withRSA";
-    } else {
-      throw new UnsupportedOperationException(
-          "getSignatureAlgorithm() for non-RSA is not supported yet.");
-    }
+  public static String getSignatureAlgName(Key key, HashAlgo hashAlgo)
+      throws NoSuchAlgorithmException {
+    return SigAlgo.getInstance(key, hashAlgo, null).getJceName();
   }
-
-  public static ASN1ObjectIdentifier extractDigesetAlgorithmIdentifier(String sigOid,
-      byte[] sigParams)
-          throws NoSuchAlgorithmException {
-    Args.notBlank(sigOid, "sigOid");
-
-    ASN1ObjectIdentifier algOid = new ASN1ObjectIdentifier(sigOid);
-
-    ASN1ObjectIdentifier digestAlgOid;
-    if (PKCSObjectIdentifiers.md5WithRSAEncryption.equals(algOid)) {
-      digestAlgOid = PKCSObjectIdentifiers.md5;
-    } else if (PKCSObjectIdentifiers.sha1WithRSAEncryption.equals(algOid)) {
-      digestAlgOid = X509ObjectIdentifiers.id_SHA1;
-    } else if (PKCSObjectIdentifiers.sha224WithRSAEncryption.equals(algOid)) {
-      digestAlgOid = NISTObjectIdentifiers.id_sha224;
-    } else if (PKCSObjectIdentifiers.sha256WithRSAEncryption.equals(algOid)) {
-      digestAlgOid = NISTObjectIdentifiers.id_sha256;
-    } else if (PKCSObjectIdentifiers.sha384WithRSAEncryption.equals(algOid)) {
-      digestAlgOid = NISTObjectIdentifiers.id_sha384;
-    } else if (PKCSObjectIdentifiers.sha512WithRSAEncryption.equals(algOid)) {
-      digestAlgOid = NISTObjectIdentifiers.id_sha512;
-    } else if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid)) {
-      RSASSAPSSparams param = RSASSAPSSparams.getInstance(sigParams);
-      digestAlgOid = param.getHashAlgorithm().getAlgorithm();
-    } else if (Shake.id_RSASSA_PSS_SHAKE128.equals(algOid)) {
-      digestAlgOid = Shake.id_shake128;
-    } else if (Shake.id_RSASSA_PSS_SHAKE256.equals(algOid)) {
-      digestAlgOid = Shake.id_shake256;
-    } else {
-      throw new NoSuchAlgorithmException("unknown signature algorithm" + algOid.getId());
-    }
-
-    return digestAlgOid;
-  } // method extractDigesetAlgorithmIdentifier
 
   public static ASN1Encodable getFirstAttrValue(AttributeTable attrs, ASN1ObjectIdentifier type) {
     Args.notNull(attrs, "attrs");

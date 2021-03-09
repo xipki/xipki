@@ -74,7 +74,7 @@ public class AESGmacContentSigner implements XiContentSigner {
 
   } // class AESGmacOutputStream
 
-  private static final int tagByteLen = 16;
+  private static final int tagByteLen = 12;
 
   private static final int nonceLen = 12;
 

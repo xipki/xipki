@@ -57,8 +57,8 @@ import org.xipki.scep.transaction.MessageType;
 import org.xipki.scep.transaction.Nonce;
 import org.xipki.scep.transaction.PkiStatus;
 import org.xipki.scep.transaction.TransactionId;
-import org.xipki.scep.util.ScepUtil;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 
@@ -151,8 +151,8 @@ public class ScepResponder {
       event.putEventData(AuditEvent.NAME_failInfo, rep.getFailInfo());
     }
 
-    String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(getSigningKey(),
-        HashAlgo.getInstance(req.getDigestAlgorithm()));
+    SigAlgo signatureAlgorithm = SigAlgo.getInstance(getSigningKey(),
+        req.getDigestAlgorithm(), null);
 
     try {
       X509Cert jceSignerCert = getSigningCert();
@@ -220,12 +220,7 @@ public class ScepResponder {
     }
 
     // check the digest algorithm
-    String oid = req.getDigestAlgorithm().getId();
-    HashAlgo hashAlgo = HashAlgo.getInstance(oid);
-    if (hashAlgo == null) {
-      LOG.warn("tid={}: unknown digest algorithm {}", tid, oid);
-      return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badAlg);
-    } // end if
+    HashAlgo hashAlgo = req.getDigestAlgorithm();
 
     boolean supported = false;
     if (hashAlgo == HashAlgo.SHA1) {
@@ -243,7 +238,7 @@ public class ScepResponder {
     }
 
     if (!supported) {
-      LOG.warn("tid={}: unsupported digest algorithm {}", tid, oid);
+      LOG.warn("tid={}: unsupported digest algorithm {}", tid, hashAlgo);
       return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badAlg);
     } // end if
 

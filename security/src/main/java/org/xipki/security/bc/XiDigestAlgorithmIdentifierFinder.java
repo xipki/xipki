@@ -17,6 +17,9 @@
 
 package org.xipki.security.bc;
 
+import static org.xipki.security.HashAlgo.SHAKE128;
+import static org.xipki.security.HashAlgo.SHAKE256;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,7 +28,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.DigestAlgorithmIdentifierFinder;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.ObjectIdentifiers.Shake;
+import org.xipki.security.SigAlgo;
 
 /**
  * Extends the DefaultDigestAlgorithmIdentifierFinder to support SHAKE* digests.
@@ -46,15 +49,15 @@ public class XiDigestAlgorithmIdentifierFinder
       = new DefaultDigestAlgorithmIdentifierFinder();
 
   static {
-    digestOids.put(Shake.id_ecdsa_with_shake128, HashAlgo.SHAKE128);
-    digestOids.put(Shake.id_ecdsa_with_shake256, HashAlgo.SHAKE256);
-    digestOids.put(Shake.id_RSASSA_PSS_SHAKE128, HashAlgo.SHAKE128);
-    digestOids.put(Shake.id_RSASSA_PSS_SHAKE256, HashAlgo.SHAKE256);
+    digestOids.put(SHAKE128.getOid(), SHAKE128);
+    digestOids.put(SHAKE256.getOid(), SHAKE256);
+    digestOids.put(SigAlgo.RSAPSS_SHAKE128.getOid(), SHAKE128);
+    digestOids.put(SigAlgo.RSAPSS_SHAKE256.getOid(), SHAKE256);
 
-    digestNameToOids.put("SHAKE128", HashAlgo.SHAKE128);
-    digestNameToOids.put("SHAKE128-256", HashAlgo.SHAKE128);
-    digestNameToOids.put("SHAKE256", HashAlgo.SHAKE256);
-    digestNameToOids.put("SHAKE256-512", HashAlgo.SHAKE256);
+    digestNameToOids.put(SHAKE128.name(), SHAKE128);
+    digestNameToOids.put(SHAKE128.getJceName(), SHAKE128);
+    digestNameToOids.put(SHAKE256.name(), SHAKE256);
+    digestNameToOids.put(SHAKE256.getJceName(), SHAKE256);
   }
 
   @Override

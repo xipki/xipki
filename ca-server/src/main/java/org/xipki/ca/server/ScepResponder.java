@@ -81,6 +81,7 @@ import org.xipki.scep.transaction.PkiStatus;
 import org.xipki.scep.transaction.TransactionId;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
@@ -364,17 +365,7 @@ public class ScepResponder {
     } // end if
 
     // check the digest algorithm
-    String oid = req.getDigestAlgorithm().getId();
-    HashAlgo hashAlgo;
-    try {
-      hashAlgo = HashAlgo.getInstance(oid);
-    } catch (NoSuchAlgorithmException ex1) {
-      LOG.warn("tid={}: unknown digest algorithm {}", tid, oid);
-      rep.setPkiStatus(PkiStatus.FAILURE);
-      rep.setFailInfo(FailInfo.badAlg);
-      return rep;
-    }
-
+    HashAlgo hashAlgo = req.getDigestAlgorithm();
     boolean supported = false;
     if (hashAlgo == HashAlgo.SHA1) {
       if (caCaps.containsCapability(CaCapability.SHA1)) {
@@ -391,7 +382,7 @@ public class ScepResponder {
     }
 
     if (!supported) {
-      LOG.warn("tid={}: unsupported digest algorithm {}", tid, oid);
+      LOG.warn("tid={}: unsupported digest algorithm {}", tid, hashAlgo);
       rep.setPkiStatus(PkiStatus.FAILURE);
       rep.setFailInfo(FailInfo.badAlg);
       return rep;
@@ -675,28 +666,22 @@ public class ScepResponder {
 
     String algorithm = responderKey.getAlgorithm();
 
-    String signatureAlgorithm;
     if (!"RSA".equalsIgnoreCase(algorithm)) {
       throw new UnsupportedOperationException(
           "getSignatureAlgorithm() for non-RSA is not supported yet.");
     }
 
-    HashAlgo hashAlgo;
-    try {
-      hashAlgo = HashAlgo.getInstance(request.getDigestAlgorithm());
-    } catch (NoSuchAlgorithmException ex) {
-      throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
-    }
-    signatureAlgorithm = hashAlgo.getJceName() + "withRSA";
+    HashAlgo hashAlgo = request.getDigestAlgorithm();
 
     ContentInfo ci;
     try {
+      SigAlgo signatureAlgorithm = SigAlgo.getInstance(hashAlgo.getJceName() + "withRSA");
       X509Cert[] cmsCertSet = control.isIncludeSignerCert()
           ? new X509Cert[]{responderCert} : null;
 
       ci = response.encode(responderKey, signatureAlgorithm, responderCert, cmsCertSet,
           request.getSignatureCert(), request.getContentEncryptionAlgorithm());
-    } catch (MessageEncodingException ex) {
+    } catch (MessageEncodingException | NoSuchAlgorithmException ex) {
       LogUtil.error(LOG, ex, "could not encode response");
       throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
     }

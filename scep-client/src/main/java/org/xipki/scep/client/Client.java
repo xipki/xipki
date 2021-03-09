@@ -20,6 +20,7 @@ package org.xipki.scep.client;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateEncodingException;
@@ -59,6 +60,7 @@ import org.xipki.scep.transaction.TransactionId;
 import org.xipki.scep.util.ScepConstants;
 import org.xipki.scep.util.ScepUtil;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
@@ -462,7 +464,6 @@ public abstract class Client {
       X509Cert identityCert)
           throws ScepClientException {
     HashAlgo hashAlgo = caCaps.mostSecureHashAlgo();
-    String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(identityKey, hashAlgo);
     ASN1ObjectIdentifier encAlgId;
     if (caCaps.containsCapability(CaCapability.AES)) {
       encAlgId = CMSAlgorithm.AES128_CBC;
@@ -475,9 +476,10 @@ public abstract class Client {
     }
 
     try {
+      SigAlgo signatureAlgorithm = SigAlgo.getInstance(identityKey, hashAlgo, null);
       return request.encode(identityKey, signatureAlgorithm, identityCert,
           new X509Cert[]{identityCert}, authorityCertStore.getEncryptionCert(), encAlgId);
-    } catch (MessageEncodingException ex) {
+    } catch (MessageEncodingException | NoSuchAlgorithmException ex) {
       throw new ScepClientException(ex);
     }
   } // method encryptThenSign

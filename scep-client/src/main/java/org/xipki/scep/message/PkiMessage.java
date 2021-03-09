@@ -63,6 +63,7 @@ import org.xipki.scep.transaction.Nonce;
 import org.xipki.scep.transaction.PkiStatus;
 import org.xipki.scep.transaction.TransactionId;
 import org.xipki.scep.util.ScepUtil;
+import org.xipki.security.SigAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 
@@ -236,13 +237,13 @@ public class PkiMessage {
     return new AttributeTable(vec);
   }
 
-  public ContentInfo encode(PrivateKey signerKey, String signatureAlgorithm, X509Cert signerCert,
+  public ContentInfo encode(PrivateKey signerKey, SigAlgo signatureAlgorithm, X509Cert signerCert,
       X509Cert[] signerCertSet, X509Cert recipientCert, ASN1ObjectIdentifier encAlgId)
       throws MessageEncodingException {
     Args.notNull(signerKey, "signerKey");
     ContentSigner signer;
     try {
-      signer = new JcaContentSignerBuilder(signatureAlgorithm).build(signerKey);
+      signer = new JcaContentSignerBuilder(signatureAlgorithm.getJceName()).build(signerKey);
     } catch (OperatorCreationException ex) {
       throw new MessageEncodingException(ex);
     }

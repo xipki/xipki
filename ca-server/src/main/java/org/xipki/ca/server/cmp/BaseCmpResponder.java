@@ -157,7 +157,7 @@ abstract class BaseCmpResponder {
   protected static final Set<String> KNOWN_GENMSG_IDS = new HashSet<>();
 
   private static final AlgorithmIdentifier prf_hmacWithSHA256 =
-      new AlgorithmIdentifier(PKCSObjectIdentifiers.id_hmacWithSHA256, DERNull.INSTANCE);
+      SigAlgo.HMAC_SHA256.getAlgorithmIdentifier();
 
   private static final ConcurrentBag<ConcurrentBagEntry<Cipher>> aesGcm_ciphers;
 
@@ -697,8 +697,8 @@ abstract class BaseCmpResponder {
     AlgorithmIdentifier protectionAlg = header.getProtectionAlg();
 
     if (protectedMsg.hasPasswordBasedMacProtection()) {
-      PBMParameter parameter =
-          PBMParameter.getInstance(pkiMessage.getHeader().getProtectionAlg().getParameters());
+      PBMParameter parameter = PBMParameter.getInstance(
+          pkiMessage.getHeader().getProtectionAlg().getParameters());
       HashAlgo owfAlg;
       try {
         owfAlg = HashAlgo.getInstance(parameter.getOwf());

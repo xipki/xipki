@@ -172,7 +172,7 @@ public class CaEmulator {
     BasicConstraints bc = new BasicConstraints(false);
     certGenerator.addExtension(Extension.basicConstraints, true, bc);
 
-    String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(caKey, HashAlgo.SHA256);
+    String signatureAlgorithm = ScepUtil.getSignatureAlgName(caKey, HashAlgo.SHA256);
     ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(caKey);
     X509Cert cert = new X509Cert(certGenerator.build(contentSigner));
 
@@ -217,7 +217,7 @@ public class CaEmulator {
     crlBuilder.addCRLEntry(BigInteger.valueOf(2), revocationTime, CRLReason.keyCompromise);
     crlBuilder.addExtension(Extension.cRLNumber, false, new ASN1Integer(crlNumber.getAndAdd(1)));
 
-    String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(caKey, HashAlgo.SHA256);
+    String signatureAlgorithm = ScepUtil.getSignatureAlgName(caKey, HashAlgo.SHA256);
     ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(caKey);
     X509CRLHolder crl = crlBuilder.build(contentSigner);
     return crl.toASN1Structure();
