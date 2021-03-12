@@ -70,6 +70,8 @@ public enum HashAlgo {
 
   private final AlgorithmIdentifier algId;
 
+  private final AlgorithmIdentifier algIdWithNullParams;
+
   private final String jceName;
 
   private final byte[] encoded;
@@ -102,8 +104,10 @@ public enum HashAlgo {
     this.oid = new ASN1ObjectIdentifier(oid).intern();
     if (withNullParams) {
       this.algId = new AlgorithmIdentifier(this.oid, DERNull.INSTANCE);
+      this.algIdWithNullParams = this.algId;
     } else {
       this.algId = new AlgorithmIdentifier(this.oid);
+      this.algIdWithNullParams = new AlgorithmIdentifier(this.oid, DERNull.INSTANCE);
     }
     this.jceName = jceName;
 
@@ -197,6 +201,10 @@ public enum HashAlgo {
 
   public AlgorithmIdentifier getAlgorithmIdentifier() {
     return algId;
+  }
+
+  public AlgorithmIdentifier getAlgIdWithNullParams() {
+    return algIdWithNullParams;
   }
 
   public ExtendedDigest createDigest() {

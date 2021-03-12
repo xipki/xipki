@@ -235,7 +235,7 @@ public enum SignAlgo {
     this.jceName = jceName.toUpperCase();
     this.hashAlgo = hashAlgo;
 
-    AlgorithmIdentifier digAlgId = hashAlgo.getAlgorithmIdentifier();
+    AlgorithmIdentifier digAlgId = hashAlgo.getAlgIdWithNullParams();
     int saltSize = hashAlgo.getLength();
     RSASSAPSSparams params = new RSASSAPSSparams(digAlgId,
         new AlgorithmIdentifier(PKCSObjectIdentifiers.id_mgf1, digAlgId),
