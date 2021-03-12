@@ -188,8 +188,15 @@ public class CertprofileQa {
       try {
         if (!issue.isFailed()) {
           SignAlgo signAlgo = SignAlgo.getInstance(sigAlgId);
+
           if (!signatureAlgorithms.contains(signAlgo)) {
             issue.setFailureMessage("signatureAlgorithm '" + signAlgo + "' is not allowed");
+          }
+
+          if (!issue.isFailed()) {
+            if (!sigAlgId.equals(signAlgo.getAlgorithmIdentifier())) {
+              issue.setFailureMessage("signatureAlgorithm has invalid content");
+            }
           }
         }
       } catch (NoSuchAlgorithmException ex) {
