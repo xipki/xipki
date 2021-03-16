@@ -42,28 +42,11 @@ public class CollectionAlgorithmValidator implements AlgorithmValidator {
   private final Set<String> algoNames;
 
   /**
-   * New CollectionAlgorithmValidator for algorithm names.
-   * @param algoNames algorithm names that can be accepted. <code>null</code> or empty to accept
-   *            all algorithms
-   * @throws NoSuchAlgorithmException if any algoName is unknown.
-   */
-  public static CollectionAlgorithmValidator ofAlgorithmNames(Collection<String> algoNames)
-      throws NoSuchAlgorithmException {
-    Set<SignAlgo> algos = new HashSet<>();
-    for (String algoName : algoNames) {
-      algos.add(SignAlgo.getInstance(algoName));
-    }
-    return new CollectionAlgorithmValidator(algos);
-  }
-
-  /**
    * constructor.
    * @param algos algorithms that can be accepted. <code>null</code> or empty to accept
    *            all algorithms
-   * @throws NoSuchAlgorithmException if any algoName is unknown.
    */
-  public CollectionAlgorithmValidator(Collection<SignAlgo> algos)
-      throws NoSuchAlgorithmException {
+  public CollectionAlgorithmValidator(Collection<SignAlgo> algos) {
     this.algos = Collections.unmodifiableSet(new HashSet<>(algos));
     Set<String> names = new HashSet<>();
     for (SignAlgo m : algos) {

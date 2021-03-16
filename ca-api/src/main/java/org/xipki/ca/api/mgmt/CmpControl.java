@@ -21,9 +21,12 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.security.AlgorithmValidator;
 import org.xipki.security.CollectionAlgorithmValidator;
 import org.xipki.security.HashAlgo;
@@ -76,6 +79,8 @@ public class CmpControl {
   private static final int DFLT_CONFIRM_WAIT_TIME = 300; // 300 seconds
 
   private static final int DFLT_PBM_ITERATIONCOUNT = 10240;
+
+  private static final Logger LOG = LoggerFactory.getLogger(CmpControl.class);
 
   private final String conf;
 
@@ -135,10 +140,11 @@ public class CmpControl {
     }
     Set<String> algos = splitAlgos(str);
     try {
-      this.sigAlgoValidator = CollectionAlgorithmValidator.ofAlgorithmNames(algos);
+      this.sigAlgoValidator = buildAlgorithmValidator(algos);
     } catch (NoSuchAlgorithmException ex) {
       throw new InvalidConfException("invalid " + key + ": " + str, ex);
     }
+
     algos = this.sigAlgoValidator.getAlgoNames();
     pairs.putPair(key, algosAsString(algos));
 
@@ -150,7 +156,7 @@ public class CmpControl {
     }
     algos = splitAlgos(str);
     try {
-      this.popoAlgoValidator = CollectionAlgorithmValidator.ofAlgorithmNames(algos);
+      this.popoAlgoValidator = buildAlgorithmValidator(algos);
     } catch (NoSuchAlgorithmException ex) {
       throw new InvalidConfException("invalid " + key + ": " + str, ex);
     }
@@ -215,7 +221,7 @@ public class CmpControl {
 
     this.groupEnroll = (groupEnroll == null) ? false : groupEnroll;
     try {
-      this.sigAlgoValidator = CollectionAlgorithmValidator.ofAlgorithmNames(sigAlgos);
+      this.sigAlgoValidator = buildAlgorithmValidator(sigAlgos);
     } catch (NoSuchAlgorithmException ex) {
       throw new InvalidConfException("invalid sigAlgos", ex);
     }
@@ -225,7 +231,7 @@ public class CmpControl {
     }
 
     try {
-      this.popoAlgoValidator = CollectionAlgorithmValidator.ofAlgorithmNames(popoAlgos);
+      this.popoAlgoValidator = buildAlgorithmValidator(popoAlgos);
     } catch (NoSuchAlgorithmException ex) {
       throw new InvalidConfException("invalid popoAlgos", ex);
     }
@@ -438,6 +444,30 @@ public class CmpControl {
 
   private static Set<String> splitAlgos(String encoded) {
     return StringUtil.splitAsSet(encoded, ALGO_DELIMITER);
+  }
+
+  private CollectionAlgorithmValidator buildAlgorithmValidator(
+      Collection<String> algoNames)
+      throws NoSuchAlgorithmException {
+    Set<SignAlgo> algos = new HashSet<>();
+    for (String algoName : algoNames) {
+      SignAlgo sa;
+      try {
+        sa = SignAlgo.getInstance(algoName);
+      } catch (NoSuchAlgorithmException ex) {
+        LOG.warn("algorithm is not supported {}, ignore it", algoName);
+        continue;
+      }
+
+      algos.add(sa);
+    }
+
+    if (algos.isEmpty()) {
+      throw new NoSuchAlgorithmException("none of the signature algorithms "
+          + algoNames + " are supported");
+    }
+
+    return new CollectionAlgorithmValidator(algos);
   }
 
 }

@@ -202,8 +202,13 @@ public class XijsonCertprofile extends BaseCertprofile {
         try {
           list.add(SignAlgo.getInstance(algoName));
         } catch (NoSuchAlgorithmException ex) {
-          throw new CertprofileException(ex.getMessage(), ex);
+          LOG.warn("unsupported signature algorithm: {}, ignore it", algoName);
         }
+      }
+
+      if (list.isEmpty()) {
+        throw new CertprofileException("none of the signature algorithms is supported: "
+            + conf.getSignatureAlgorithms());
       }
 
       this.signatureAlgorithms = Collections.unmodifiableList(list);

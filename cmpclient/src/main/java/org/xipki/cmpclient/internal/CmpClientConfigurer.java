@@ -294,9 +294,28 @@ final class CmpClientConfigurer {
         for (String algo : m.getSignature().getSignatureAlgos()) {
           algoNames.add(algo);
         }
+
+        Set<SignAlgo> algos = new HashSet<>();
+        for (String algoName : algoNames) {
+          SignAlgo sa;
+          try {
+            sa = SignAlgo.getInstance(algoName);
+          } catch (NoSuchAlgorithmException ex) {
+            LOG.warn("algorithm is not supported {}, ignore it", algoName);
+            continue;
+          }
+
+          algos.add(sa);
+        }
+
         AlgorithmValidator sigAlgoValidator;
         try {
-          sigAlgoValidator = CollectionAlgorithmValidator.ofAlgorithmNames(algoNames);
+          if (algos.isEmpty()) {
+            throw new NoSuchAlgorithmException("none of the signature algorithms "
+                + algoNames + " are supported");
+          }
+
+          sigAlgoValidator = new CollectionAlgorithmValidator(algos);
         } catch (NoSuchAlgorithmException ex) {
           LogUtil.error(LOG, ex, "could not initialize CollectionAlgorithmValidator");
           return false;
