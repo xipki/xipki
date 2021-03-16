@@ -147,9 +147,7 @@ public class P12XdhMacContentSignerBuilder {
       throws XiSecurityException {
     String algorithm = privateKey.getAlgorithm();
     if (EdECConstants.X25519.equalsIgnoreCase(algorithm)) {
-      this.algo = SignAlgo.DHPOP_X25519_SHA256;
-    } else if (EdECConstants.X448.equalsIgnoreCase(algorithm)) {
-      this.algo = SignAlgo.DHPOP_X448_SHA512;
+      this.algo = SignAlgo.DHPOP_X25519;
     } else {
       throw new IllegalArgumentException("unsupported key.getAlgorithm(): " + algorithm);
     }

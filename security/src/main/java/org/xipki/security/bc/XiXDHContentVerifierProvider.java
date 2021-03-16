@@ -46,7 +46,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers.Xipki;
 
 /**
- * {@link ContentVerifierProvider} for the algorithm X25519/X448 static HMAC (XiPKI own
+ * {@link ContentVerifierProvider} for the algorithm X25519 static HMAC (XiPKI own
  * algorithm, based on RFC 6955).
  *
  * @author Lijun Liao
@@ -137,11 +137,7 @@ public class XiXDHContentVerifierProvider implements ContentVerifierProvider {
 
     HashAlgo hash;
     if (EdECConstants.X25519.equalsIgnoreCase(keyAlgName)) {
-      this.sigAlgOid = Xipki.id_alg_dhPop_x25519_sha256;
-      this.hmacAlgoithm = "HMAC-SHA256";
-      hash = HashAlgo.SHA256;
-    } else if (EdECConstants.X448.equalsIgnoreCase(keyAlgName)) {
-      this.sigAlgOid = Xipki.id_alg_dhPop_x448_sha512;
+      this.sigAlgOid = Xipki.id_alg_dhPop_x25519;
       this.hmacAlgoithm = "HMAC-SHA512";
       hash = HashAlgo.SHA512;
     }  else {
