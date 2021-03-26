@@ -26,6 +26,7 @@ import static org.bouncycastle.asn1.x9.X9ObjectIdentifiers.*;
 import static org.xipki.security.EdECConstants.*;
 import static org.xipki.security.HashAlgo.*;
 import static org.xipki.util.Args.notNull;
+import static org.bouncycastle.asn1.cms.CMSObjectIdentifiers.*;
 //CHECKSTYLE:ON
 
 import java.security.Key;
@@ -93,10 +94,8 @@ public enum SignAlgo {
 
   // RSA PSS with SHAKE
 
-  RSAPSS_SHAKE128("SHAKE128WITHRSAPSS", 0x1A,
-      new ASN1ObjectIdentifier("1.3.6.1.5.5.7.6.30"), SHAKE128, false),
-  RSAPSS_SHAKE256("SHAKE256WITHRSAPSS", 0x1B,
-      new ASN1ObjectIdentifier("1.3.6.1.5.5.7.6.31"), SHAKE256, false),
+  RSAPSS_SHAKE128("SHAKE128WITHRSAPSS", 0x1A, id_RSASSA_PSS_SHAKE128, SHAKE128, false),
+  RSAPSS_SHAKE256("SHAKE256WITHRSAPSS", 0x1B, id_RSASSA_PSS_SHAKE256, SHAKE256, false),
 
   // DSA
   DSA_SHA1("SHA1WITHDSA", 0x21, id_dsa_with_sha1, SHA1, false),
@@ -126,10 +125,8 @@ public enum SignAlgo {
   SM2_SM3("SM3WITHSM2", 0x3A, sm2sign_with_sm3, SM3, false),
 
   // ECDSA with SHAKE
-  ECDSA_SHAKE128("SHAKE128WITHECDSA", 0x3B,
-      new ASN1ObjectIdentifier("1.3.6.1.5.5.7.6.32"), SHAKE128, false),
-  ECDSA_SHAKE256("SHAKE256WITHECDSA", 0x3C,
-      new ASN1ObjectIdentifier("1.3.6.1.5.5.7.6.33"), SHAKE256, false),
+  ECDSA_SHAKE128("SHAKE128WITHECDSA", 0x3B, id_ecdsa_with_shake128, SHAKE128, false),
+  ECDSA_SHAKE256("SHAKE256WITHECDSA", 0x3C, id_ecdsa_with_shake256, SHAKE256, false),
 
   // Plain ECDSA
   PLAINECDSA_SHA1("SHA1WITHPLAINECDSA", 0x41, ecdsa_plain_SHA1, SHA1, false),

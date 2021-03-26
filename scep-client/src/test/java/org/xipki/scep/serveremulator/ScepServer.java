@@ -30,7 +30,6 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.xipki.scep.client.test.MyUtil;
 import org.xipki.scep.message.CaCaps;
 import org.xipki.security.X509Cert;
-import org.xipki.security.bc.XiProvider;
 import org.xipki.util.Args;
 
 /**
@@ -87,10 +86,6 @@ public class ScepServer {
       throws Exception {
     if (servlet != null) {
       return servlet;
-    }
-
-    if (Security.getProvider(XiProvider.PROVIDER_NAME) == null) {
-      Security.addProvider(new XiProvider());
     }
 
     if (Security.getProvider("BC") == null) {

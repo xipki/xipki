@@ -32,7 +32,7 @@
     <xipki.tools.version>1.0.5</xipki.tools.version>
     <servlet.version>3.1.0</servlet.version>
     <karaf.version>4.2.9</karaf.version>
-    <bc.version>1.68</bc.version>
+    <bc.version>1.69b04</bc.version>
     <slf4j.version>1.7.25</slf4j.version>
     <pkcs11-wrapper.version>1.4.7</pkcs11-wrapper.version>
     <hikaricp.version>3.4.5</hikaricp.version>

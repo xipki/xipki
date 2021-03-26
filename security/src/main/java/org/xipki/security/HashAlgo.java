@@ -17,6 +17,8 @@
 
 package org.xipki.security;
 
+import static org.bouncycastle.asn1.nist.NISTObjectIdentifiers.*;
+
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -25,16 +27,12 @@ import java.util.Map;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
+import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
+import org.bouncycastle.asn1.oiw.OIWObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.ExtendedDigest;
-import org.bouncycastle.crypto.digests.SHA1Digest;
-import org.bouncycastle.crypto.digests.SHA224Digest;
-import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.bouncycastle.crypto.digests.SHA384Digest;
-import org.bouncycastle.crypto.digests.SHA3Digest;
-import org.bouncycastle.crypto.digests.SHA512Digest;
-import org.bouncycastle.crypto.digests.SM3Digest;
-import org.xipki.security.bc.XiShakeDigest;
+import org.bouncycastle.crypto.digests.*;
 import org.xipki.util.Args;
 
 /**
@@ -47,20 +45,20 @@ import org.xipki.util.Args;
 //See https://www.itu.int/ITU-T/formal-language/itu-t/x/x509/2019/AlgorithmObjectIdentifiers.html
 public enum HashAlgo {
 
-  SHA1(20,     "1.3.14.3.2.26", "SHA1", true),
+  SHA1(20, OIWObjectIdentifiers.idSHA1, "SHA1", true),
   // rfc5754: no parameters
-  SHA224(28,   "2.16.840.1.101.3.4.2.4",  "SHA224"),
-  SHA256(32,   "2.16.840.1.101.3.4.2.1",  "SHA256"),
-  SHA384(48,   "2.16.840.1.101.3.4.2.2",  "SHA384"),
-  SHA512(64,   "2.16.840.1.101.3.4.2.3",  "SHA512"),
-  SHA3_224(28, "2.16.840.1.101.3.4.2.7",  "SHA3-224"),
-  SHA3_256(32, "2.16.840.1.101.3.4.2.8",  "SHA3-256"),
-  SHA3_384(48, "2.16.840.1.101.3.4.2.9",  "SHA3-384"),
-  SHA3_512(64, "2.16.840.1.101.3.4.2.10", "SHA3-512"),
-  SM3(32,      "1.2.156.10197.1.401",     "SM3"),
+  SHA224(28, id_sha224,  "SHA224"),
+  SHA256(32,   id_sha256, "SHA256"),
+  SHA384(48,   id_sha384,  "SHA384"),
+  SHA512(64,   id_sha512,  "SHA512"),
+  SHA3_224(28, id_sha3_224,  "SHA3-224"),
+  SHA3_256(32, id_sha3_256,  "SHA3-256"),
+  SHA3_384(48, id_sha3_384,  "SHA3-384"),
+  SHA3_512(64, id_sha3_512, "SHA3-512"),
+  SM3(32, GMObjectIdentifiers.sm3,     "SM3"),
 
-  SHAKE128(32, "2.16.840.1.101.3.4.2.11", "SHAKE128-256"),
-  SHAKE256(64, "2.16.840.1.101.3.4.2.12", "SHAKE256-512");
+  SHAKE128(32, id_shake128, "SHAKE128"),
+  SHAKE256(64, id_shake256, "SHAKE256");
 
   private static final Map<String, HashAlgo> map = new HashMap<>();
 
@@ -95,13 +93,13 @@ public enum HashAlgo {
     map.put("SHAKE256", SHAKE256);
   }
 
-  private HashAlgo(int length, String oid, String jceName) {
+  private HashAlgo(int length, ASN1ObjectIdentifier oid, String jceName) {
     this(length, oid, jceName, false);
   }
 
-  private HashAlgo(int length, String oid, String jceName, boolean withNullParams) {
+  private HashAlgo(int length, ASN1ObjectIdentifier oid, String jceName, boolean withNullParams) {
     this.length = length;
-    this.oid = new ASN1ObjectIdentifier(oid).intern();
+    this.oid = oid;
     if (withNullParams) {
       this.algId = new AlgorithmIdentifier(this.oid, DERNull.INSTANCE);
       this.algIdWithNullParams = this.algId;
@@ -112,7 +110,7 @@ public enum HashAlgo {
     this.jceName = jceName;
 
     try {
-      this.encoded = new ASN1ObjectIdentifier(oid).getEncoded();
+      this.encoded = oid.getEncoded();
     } catch (IOException ex) {
       throw new IllegalArgumentException("invalid oid: " + oid);
     }
@@ -230,9 +228,9 @@ public enum HashAlgo {
       case SM3:
         return new SM3Digest();
       case SHAKE128:
-        return new XiShakeDigest.XiShake128Digest();
+        return new SHAKEDigest(128);
       case SHAKE256:
-        return new XiShakeDigest.XiShake256Digest();
+        return new SHAKEDigest(256);
       default:
         throw new IllegalStateException("should not reach here, unknown HashAlgo " + name());
     }

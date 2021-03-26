@@ -38,6 +38,7 @@ import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.crypto.AsymmetricBlockCipher;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.Signer;
+import org.bouncycastle.crypto.Xof;
 import org.bouncycastle.crypto.engines.RSABlindedEngine;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
@@ -53,11 +54,9 @@ import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.XiSecurityException;
-import org.xipki.security.bc.ShakePSSSigner;
 import org.xipki.security.bc.XiECContentVerifierProviderBuilder;
 import org.xipki.security.bc.XiEdDSAContentVerifierProvider;
 import org.xipki.security.bc.XiRSAContentVerifierProviderBuilder;
-import org.xipki.security.bc.XiShakeDigest;
 import org.xipki.security.bc.XiXDHContentVerifierProvider;
 import org.xipki.util.Hex;
 
@@ -130,17 +129,11 @@ public class SignerUtil {
 
     AsymmetricBlockCipher tmpCipher = (cipher == null) ? new RSABlindedEngine() : cipher;
 
-    if (hashAlgo.isShake()) {
-      return new ShakePSSSigner(tmpCipher, (XiShakeDigest) hashAlgo.createDigest());
-    } else if (sigAlgo.isRSAPSSSigAlgo()) {
-      Digest dig = hashAlgo.createDigest();
-      Digest mgfDig = hashAlgo.createDigest();
+    Digest dig = hashAlgo.createDigest();
+    Digest mgfDig = hashAlgo.createDigest();
 
-      return new PSSSigner(tmpCipher, dig, mgfDig, hashAlgo.getLength(),
-          org.bouncycastle.crypto.signers.PSSSigner.TRAILER_IMPLICIT);
-    } else {
-      throw new XiSecurityException("signature algorithm " + sigAlgo + " is not allowed");
-    }
+    return new PSSSigner(tmpCipher, dig, mgfDig, hashAlgo.getLength(),
+        org.bouncycastle.crypto.signers.PSSSigner.TRAILER_IMPLICIT);
   } // method createPSSRSASigner
 
   // CHECKSTYLE:SKIP
@@ -259,8 +252,10 @@ public class SignerUtil {
     switch (contentDigest) {
       case SHAKE128:
       case SHAKE256:
-        XiShakeDigest digest = (XiShakeDigest) contentDigest.createDigest();
-        dbMask = digest.maskGeneratorFunction(hv, dbMaskLen);
+        Xof xof = (Xof) contentDigest.createDigest();
+        xof.update(hv, 0, hv.length);
+        dbMask = new byte[dbMaskLen];
+        xof.doFinal(dbMask, 0, dbMaskLen);
         break;
       default:
         dbMask = maskGeneratorFunction1(mgfDigest, hv, dbMaskLen);

@@ -36,7 +36,6 @@ import org.bouncycastle.jcajce.spec.SM2ParameterSpec;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.SignatureAlgoControl;
-import org.xipki.security.bc.XiProvider;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.security.pkcs11.provider.XiPkcs11Provider;
 import org.xipki.security.pkcs11.provider.XiSM2ParameterSpec;
@@ -134,7 +133,7 @@ public class QaP11Actions {
       byte[] signature = sig.sign(); // CHECKSTYLE:SKIP
       println("signature created successfully");
 
-      String provName = signAlgo.getHashAlgo().isShake() ? XiProvider.PROVIDER_NAME : "BC";
+      String provName = "BC";
       Signature ver = Signature.getInstance(signAlgo.getJceName(), provName);
       ver.initVerify(pubKey);
       ver.update(data);

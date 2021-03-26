@@ -23,7 +23,6 @@ import java.security.Security;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.bc.XiProvider;
 
 /**
  * Helper class to register providers {@link BouncyCastleProvider}.
@@ -45,13 +44,6 @@ public class Providers implements Closeable {
   }
 
   private void addBcProvider() {
-    if (Security.getProvider(XiProvider.PROVIDER_NAME) == null) {
-      LOG.info("add XiProvider");
-      Security.addProvider(new XiProvider());
-    } else {
-      LOG.info("XiProvider already added");
-    }
-
     if (Security.getProvider("BC") == null) {
       LOG.info("add BouncyCastleProvider");
       Security.addProvider(new BouncyCastleProvider());
