@@ -17,6 +17,12 @@
 
 package org.xipki.util.http;
 
+import org.xipki.util.FileOrBinary;
+import org.xipki.util.ObjectCreationException;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.KeyManagementException;
@@ -24,13 +30,6 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-
-import org.xipki.util.FileOrBinary;
-import org.xipki.util.ObjectCreationException;
 
 /**
  * Configuration of SSL context.

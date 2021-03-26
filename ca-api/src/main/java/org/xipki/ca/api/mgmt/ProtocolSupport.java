@@ -17,10 +17,10 @@
 
 package org.xipki.ca.api.mgmt;
 
+import org.xipki.util.StringUtil;
+
 import java.util.Set;
 import java.util.StringTokenizer;
-
-import org.xipki.util.StringUtil;
 
 /**
  * Protocol support control (e.g. CMP, REST and SCEP).

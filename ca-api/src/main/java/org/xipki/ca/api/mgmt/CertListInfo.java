@@ -17,10 +17,10 @@
 
 package org.xipki.ca.api.mgmt;
 
+import org.xipki.util.Args;
+
 import java.math.BigInteger;
 import java.util.Date;
-
-import org.xipki.util.Args;
 
 /**
  * Certificate list container.

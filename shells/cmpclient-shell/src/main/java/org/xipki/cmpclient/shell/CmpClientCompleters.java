@@ -17,14 +17,14 @@
 
 package org.xipki.cmpclient.shell;
 
-import java.util.Collections;
-import java.util.Set;
-
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.cmpclient.CmpClient;
 import org.xipki.cmpclient.CmpClientException;
 import org.xipki.shell.DynamicEnumCompleter;
+
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * Shell completers.

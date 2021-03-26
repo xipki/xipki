@@ -17,23 +17,18 @@
 
 package org.xipki.security.pkcs11;
 
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.Args.positive;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.security.*;
+import org.xipki.util.LogUtil;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.DfltConcurrentContentSigner;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.XiContentSigner;
-import org.xipki.security.XiSecurityException;
-import org.xipki.util.LogUtil;
-
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.Args.positive;
 
 /**
  * Builder to create {@link ConcurrentContentSigner} for PKCS#11 token.

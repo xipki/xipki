@@ -17,16 +17,16 @@
 
 package org.xipki.security.util;
 
+import org.bouncycastle.crypto.digests.SHA512Digest;
+import org.bouncycastle.crypto.generators.DSAParametersGenerator;
+import org.bouncycastle.crypto.params.DSAParameterGenerationParameters;
+import org.bouncycastle.crypto.params.DSAParameters;
+
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.security.spec.DSAParameterSpec;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.bouncycastle.crypto.digests.SHA512Digest;
-import org.bouncycastle.crypto.generators.DSAParametersGenerator;
-import org.bouncycastle.crypto.params.DSAParameterGenerationParameters;
-import org.bouncycastle.crypto.params.DSAParameters;
 
 /**
  * Cache for DSA parameter specs.

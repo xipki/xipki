@@ -17,9 +17,9 @@
 
 package org.xipki.security.pkcs11;
 
-import static org.xipki.util.Args.notNull;
-
 import org.xipki.util.CompareUtil;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * Identifier of {@link P11Identity}.

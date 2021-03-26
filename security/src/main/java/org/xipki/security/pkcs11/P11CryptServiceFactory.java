@@ -17,10 +17,10 @@
 
 package org.xipki.security.pkcs11;
 
+import org.xipki.security.XiSecurityException;
+
 import java.io.Closeable;
 import java.util.Set;
-
-import org.xipki.security.XiSecurityException;
 
 /**
  * Factory to create {@link P11CryptService}.

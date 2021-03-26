@@ -17,12 +17,12 @@
 
 package org.xipki.audit;
 
+import org.xipki.util.Args;
+
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.xipki.util.Args;
 
 /**
  * Audit event.

@@ -17,9 +17,6 @@
 
 package org.xipki.ca.mgmt.shell;
 
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
@@ -35,6 +32,9 @@ import org.xipki.ca.api.mgmt.entry.UserEntry;
 import org.xipki.ca.mgmt.shell.CaActions.CaAction;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.IllegalCmdParamException;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Actions to manage users.

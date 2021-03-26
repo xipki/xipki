@@ -17,10 +17,10 @@
 
 package org.xipki.security.pkcs12;
 
-import java.security.KeyStore;
-
 import org.xipki.security.KeypairGenerationResult;
 import org.xipki.util.Args;
+
+import java.security.KeyStore;
 
 /**
  * Result of the KeyStore generation.

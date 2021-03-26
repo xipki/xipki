@@ -17,18 +17,6 @@
 
 package org.xipki.qa.ca.extn;
 
-import static org.xipki.qa.ca.extn.CheckerUtil.addViolation;
-import static org.xipki.qa.ca.extn.CheckerUtil.getKeyUsage;
-import static org.xipki.qa.ca.extn.CheckerUtil.hex;
-import static org.xipki.util.CollectionUtil.isEmpty;
-import static org.xipki.util.CollectionUtil.isNotEmpty;
-
-import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
@@ -45,6 +33,16 @@ import org.xipki.qa.ca.IssuerInfo;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CompareUtil;
+
+import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static org.xipki.qa.ca.extn.CheckerUtil.*;
+import static org.xipki.util.CollectionUtil.isEmpty;
+import static org.xipki.util.CollectionUtil.isNotEmpty;
 
 /**
  * Checker for extensions whose name is from H to N.

@@ -17,18 +17,23 @@
 
 package org.xipki.security.pkcs12;
 
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.Args.positive;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.crypto.Digest;
+import org.bouncycastle.crypto.Signer;
+import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
+import org.bouncycastle.crypto.signers.*;
+import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSAUtil;
+import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.bc.BcContentSignerBuilder;
+import org.xipki.security.*;
+import org.xipki.security.util.GMUtil;
+import org.xipki.security.util.SignerUtil;
+import org.xipki.util.CollectionUtil;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.SecureRandom;
-import java.security.Security;
-import java.security.Signature;
-import java.security.SignatureException;
+import javax.crypto.NoSuchPaddingException;
+import java.security.*;
 import java.security.interfaces.DSAPrivateKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.RSAPrivateKey;
@@ -36,34 +41,8 @@ import java.security.spec.EllipticCurve;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.crypto.NoSuchPaddingException;
-
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.crypto.Digest;
-import org.bouncycastle.crypto.Signer;
-import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
-import org.bouncycastle.crypto.signers.DSADigestSigner;
-import org.bouncycastle.crypto.signers.DSASigner;
-import org.bouncycastle.crypto.signers.ECDSASigner;
-import org.bouncycastle.crypto.signers.RSADigestSigner;
-import org.bouncycastle.crypto.signers.SM2Signer;
-import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSAUtil;
-import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
-import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.bc.BcContentSignerBuilder;
-import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.DSAPlainDigestSigner;
-import org.xipki.security.DfltConcurrentContentSigner;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.SignatureSigner;
-import org.xipki.security.X509Cert;
-import org.xipki.security.XiContentSigner;
-import org.xipki.security.XiSecurityException;
-import org.xipki.security.XiWrappedContentSigner;
-import org.xipki.security.util.GMUtil;
-import org.xipki.security.util.SignerUtil;
-import org.xipki.util.CollectionUtil;
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.Args.positive;
 
 /**
  * Builder of signer based PKCS#12 keystore.

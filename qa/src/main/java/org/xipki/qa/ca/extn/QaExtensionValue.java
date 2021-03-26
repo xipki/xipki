@@ -17,9 +17,9 @@
 
 package org.xipki.qa.ca.extn;
 
-import static org.xipki.util.Args.notNull;
-
 import java.util.Arrays;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * QA extension value.

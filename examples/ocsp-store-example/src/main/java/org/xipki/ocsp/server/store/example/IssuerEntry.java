@@ -17,16 +17,16 @@
 
 package org.xipki.ocsp.server.store.example;
 
-import java.io.IOException;
-import java.security.cert.CertificateEncodingException;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.CompareUtil;
+
+import java.io.IOException;
+import java.security.cert.CertificateEncodingException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Issuer entry.

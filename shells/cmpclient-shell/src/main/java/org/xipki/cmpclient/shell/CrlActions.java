@@ -17,9 +17,7 @@
 
 package org.xipki.cmpclient.shell;
 
-import java.math.BigInteger;
-import java.util.Set;
-
+import com.alibaba.fastjson.JSON;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -39,7 +37,8 @@ import org.xipki.util.HealthCheckResult;
 import org.xipki.util.ReqRespDebug;
 import org.xipki.util.StringUtil;
 
-import com.alibaba.fastjson.JSON;
+import java.math.BigInteger;
+import java.util.Set;
 
 /**
  * CMP client actions related to CRL.

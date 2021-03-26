@@ -17,7 +17,9 @@
 
 package org.xipki.security.pkcs11;
 
-import static org.xipki.util.Args.notNull;
+import org.bouncycastle.jcajce.interfaces.EdDSAKey;
+import org.xipki.security.EdECConstants;
+import org.xipki.security.XiSecurityException;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -25,9 +27,7 @@ import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
-import org.bouncycastle.jcajce.interfaces.EdDSAKey;
-import org.xipki.security.EdECConstants;
-import org.xipki.security.XiSecurityException;
+import static org.xipki.util.Args.notNull;
 
 /**
  * {@link PrivateKey} for PKCS#11 token.

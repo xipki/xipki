@@ -17,10 +17,6 @@
 
 package org.xipki.qa.shell;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -37,21 +33,16 @@ import org.xipki.qa.security.P12SignSpeed;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.XiSecurityException;
-import org.xipki.security.pkcs11.P11CryptService;
-import org.xipki.security.pkcs11.P11CryptServiceFactory;
-import org.xipki.security.pkcs11.P11Module;
-import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.security.pkcs11.P11SlotIdentifier;
-import org.xipki.security.pkcs11.P11TokenException;
+import org.xipki.security.pkcs11.*;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.XiAction;
-import org.xipki.util.Args;
-import org.xipki.util.BenchmarkExecutor;
-import org.xipki.util.Hex;
-import org.xipki.util.LogUtil;
-import org.xipki.util.StringUtil;
+import org.xipki.util.*;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 /**
  * Actions of QA for security.

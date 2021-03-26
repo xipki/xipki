@@ -17,8 +17,6 @@
 
 package org.xipki.qa;
 
-import static org.xipki.util.Args.notBlank;
-
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
@@ -29,6 +27,8 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import static org.xipki.util.Args.notBlank;
 
 /**
  * Iterator which iterates the {@link BigInteger} specified in the file.

@@ -17,12 +17,11 @@
 
 package org.xipki.security.pkcs11;
 
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import org.bouncycastle.crypto.AsymmetricBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.crypto.RuntimeCryptoException;
-
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 
 /**
  * Plain-RSA signer for PKCS#11 token.

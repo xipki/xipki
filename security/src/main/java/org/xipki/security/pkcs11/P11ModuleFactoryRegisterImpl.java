@@ -17,13 +17,13 @@
 
 package org.xipki.security.pkcs11;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedDeque;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.util.LogUtil;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
  * An implementation of {@link P11ModuleFactoryRegister}s.

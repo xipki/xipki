@@ -17,17 +17,16 @@
 
 package org.xipki.security.pkcs12;
 
-import static org.xipki.util.Args.min;
-import static org.xipki.util.Args.notNull;
+import org.bouncycastle.jcajce.interfaces.EdDSAKey;
+import org.bouncycastle.jcajce.interfaces.XDHKey;
+import org.xipki.security.X509Cert;
+import org.xipki.security.XiSecurityException;
+import org.xipki.security.util.KeyUtil;
+import org.xipki.security.util.X509Util;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.UnrecoverableKeyException;
+import java.security.*;
 import java.security.cert.CertPathBuilderException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -39,12 +38,8 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.bouncycastle.jcajce.interfaces.EdDSAKey;
-import org.bouncycastle.jcajce.interfaces.XDHKey;
-import org.xipki.security.X509Cert;
-import org.xipki.security.XiSecurityException;
-import org.xipki.security.util.KeyUtil;
-import org.xipki.security.util.X509Util;
+import static org.xipki.util.Args.min;
+import static org.xipki.util.Args.notNull;
 
 /**
  * Keypair with certificate.

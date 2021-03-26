@@ -17,6 +17,18 @@
 
 package org.xipki.ca.api.mgmt;
 
+import com.alibaba.fastjson.JSON;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.ca.api.CaUris;
+import org.xipki.ca.api.NameId;
+import org.xipki.ca.api.mgmt.entry.*;
+import org.xipki.ca.api.mgmt.entry.CaEntry.CaSignerConf;
+import org.xipki.security.*;
+import org.xipki.security.util.X509Util;
+import org.xipki.util.Base64;
+import org.xipki.util.*;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -24,48 +36,9 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.security.cert.CertificateException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.CaUris;
-import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.mgmt.entry.AddUserEntry;
-import org.xipki.ca.api.mgmt.entry.CaEntry;
-import org.xipki.ca.api.mgmt.entry.CaEntry.CaSignerConf;
-import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
-import org.xipki.ca.api.mgmt.entry.CaHasUserEntry;
-import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
-import org.xipki.ca.api.mgmt.entry.PublisherEntry;
-import org.xipki.ca.api.mgmt.entry.RequestorEntry;
-import org.xipki.ca.api.mgmt.entry.SignerEntry;
-import org.xipki.ca.api.mgmt.entry.UserEntry;
-import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.SecurityFactory;
-import org.xipki.security.SignerConf;
-import org.xipki.security.X509Cert;
-import org.xipki.security.XiSecurityException;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
-import org.xipki.util.Base64;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.FileOrBinary;
-import org.xipki.util.FileOrValue;
-import org.xipki.util.InvalidConfException;
-import org.xipki.util.IoUtil;
-import org.xipki.util.ObjectCreationException;
-import org.xipki.util.Validity;
-
-import com.alibaba.fastjson.JSON;
 
 /**
  * CA configuration.

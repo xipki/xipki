@@ -17,6 +17,30 @@
 
 package org.xipki.cmpclient.shell;
 
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
+import org.bouncycastle.asn1.cmp.CMPObjectIdentifiers;
+import org.bouncycastle.asn1.crmf.*;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.*;
+import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.xipki.cmpclient.EnrollCertRequest;
+import org.xipki.cmpclient.EnrollCertResult;
+import org.xipki.cmpclient.EnrollCertResult.CertifiedKeyPairOrError;
+import org.xipki.cmpclient.shell.Actions.ClientAction;
+import org.xipki.security.*;
+import org.xipki.security.util.X509Util;
+import org.xipki.shell.CmdFailure;
+import org.xipki.shell.Completers;
+import org.xipki.shell.IllegalCmdParamException;
+import org.xipki.util.*;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -26,53 +50,6 @@ import java.security.cert.Certificate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
-import org.apache.karaf.shell.api.action.Command;
-import org.apache.karaf.shell.api.action.Completion;
-import org.apache.karaf.shell.api.action.Option;
-import org.apache.karaf.shell.api.action.lifecycle.Reference;
-import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.apache.karaf.shell.support.completers.FileCompleter;
-import org.bouncycastle.asn1.cmp.CMPObjectIdentifiers;
-import org.bouncycastle.asn1.crmf.AttributeTypeAndValue;
-import org.bouncycastle.asn1.crmf.CertId;
-import org.bouncycastle.asn1.crmf.CertRequest;
-import org.bouncycastle.asn1.crmf.CertTemplateBuilder;
-import org.bouncycastle.asn1.crmf.Controls;
-import org.bouncycastle.asn1.crmf.OptionalValidity;
-import org.bouncycastle.asn1.crmf.POPOSigningKey;
-import org.bouncycastle.asn1.crmf.ProofOfPossession;
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.asn1.x509.Time;
-import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.xipki.cmpclient.EnrollCertRequest;
-import org.xipki.cmpclient.EnrollCertResult;
-import org.xipki.cmpclient.EnrollCertResult.CertifiedKeyPairOrError;
-import org.xipki.cmpclient.shell.Actions.ClientAction;
-import org.xipki.security.ConcurrentBagEntrySigner;
-import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.SecurityFactory;
-import org.xipki.security.SignatureAlgoControl;
-import org.xipki.security.SignerConf;
-import org.xipki.security.X509Cert;
-import org.xipki.security.util.X509Util;
-import org.xipki.shell.CmdFailure;
-import org.xipki.shell.Completers;
-import org.xipki.shell.IllegalCmdParamException;
-import org.xipki.util.Args;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.DateUtil;
-import org.xipki.util.Hex;
-import org.xipki.util.ObjectCreationException;
-import org.xipki.util.ReqRespDebug;
-import org.xipki.util.StringUtil;
 
 /**
  * CMP client actions to update certificates.

@@ -19,16 +19,11 @@ package org.xipki.qa.shell;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.mgmt.shell.CaActions;
+import org.xipki.ca.mgmt.shell.*;
 import org.xipki.ca.mgmt.shell.CertActions.EnrollCert;
 import org.xipki.ca.mgmt.shell.CertActions.RevokeCert;
 import org.xipki.ca.mgmt.shell.CertActions.RmCert;
 import org.xipki.ca.mgmt.shell.CertActions.UnrevokeCert;
-import org.xipki.ca.mgmt.shell.MiscCaActions;
-import org.xipki.ca.mgmt.shell.ProfileCaActions;
-import org.xipki.ca.mgmt.shell.PublisherCaActions;
-import org.xipki.ca.mgmt.shell.RequestorCaActions;
-import org.xipki.ca.mgmt.shell.SignerCaActions;
 import org.xipki.shell.CmdFailure;
 
 /**

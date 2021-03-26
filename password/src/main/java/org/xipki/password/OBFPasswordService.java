@@ -17,11 +17,11 @@
 
 package org.xipki.password;
 
-import static org.xipki.util.Args.notNull;
+import org.xipki.util.StringUtil;
 
 import java.nio.charset.StandardCharsets;
 
-import org.xipki.util.StringUtil;
+import static org.xipki.util.Args.notNull;
 
 /**
  * OBF (jetty's Obfuscate) password service.

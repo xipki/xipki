@@ -17,11 +17,6 @@
 
 package org.xipki.ca.mgmt.shell;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
@@ -41,6 +36,11 @@ import org.xipki.shell.Completers;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Actions to manage requestors.

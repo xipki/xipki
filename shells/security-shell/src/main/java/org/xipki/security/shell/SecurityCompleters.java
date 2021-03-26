@@ -17,11 +17,6 @@
 
 package org.xipki.security.shell;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
@@ -30,6 +25,11 @@ import org.xipki.shell.DynamicEnumCompleter;
 import org.xipki.shell.EnumCompleter;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.CollectionUtil;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Completers for security shells.

@@ -17,13 +17,6 @@
 
 package org.xipki.ca.mgmt.shell;
 
-import java.io.File;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.security.cert.CertificateException;
-import java.util.Date;
-import java.util.List;
-
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -50,6 +43,13 @@ import org.xipki.util.DateUtil;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
+
+import java.io.File;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.cert.CertificateException;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Actions to management certificates and CRLs.

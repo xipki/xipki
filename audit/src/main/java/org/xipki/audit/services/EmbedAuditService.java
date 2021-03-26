@@ -17,20 +17,15 @@
 
 package org.xipki.audit.services;
 
-import java.io.CharArrayWriter;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
-import org.xipki.audit.AuditEvent;
-import org.xipki.audit.AuditEventData;
-import org.xipki.audit.AuditLevel;
-import org.xipki.audit.AuditService;
-import org.xipki.audit.AuditStatus;
-import org.xipki.audit.PciAuditEvent;
+import org.xipki.audit.*;
 import org.xipki.util.Args;
+
+import java.io.CharArrayWriter;
+import java.util.List;
 
 /**
  * The embedded audit service. It uses Log4j logger xipki.audit.sl4fj.

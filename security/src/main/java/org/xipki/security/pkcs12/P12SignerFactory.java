@@ -17,6 +17,16 @@
 
 package org.xipki.security.pkcs12;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.xipki.password.PasswordResolver;
+import org.xipki.password.PasswordResolverException;
+import org.xipki.security.*;
+import org.xipki.util.Base64;
+import org.xipki.util.IoUtil;
+import org.xipki.util.ObjectCreationException;
+import org.xipki.util.StringUtil;
+
+import javax.crypto.NoSuchPaddingException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,29 +34,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.crypto.NoSuchPaddingException;
-
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.password.PasswordResolver;
-import org.xipki.password.PasswordResolverException;
-import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.EdECConstants;
-import org.xipki.security.SecurityFactory;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.SignerConf;
-import org.xipki.security.SignerFactory;
-import org.xipki.security.X509Cert;
-import org.xipki.security.XiSecurityException;
-import org.xipki.util.Base64;
-import org.xipki.util.IoUtil;
-import org.xipki.util.ObjectCreationException;
-import org.xipki.util.StringUtil;
+import java.util.*;
 
 /**
  * {@link SignerFactory} for the types pkcs12 and jceks.

@@ -17,14 +17,13 @@
 
 package org.xipki.common.test;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.xipki.util.ConfPairs;
 
-import org.junit.Assert;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Test for {@link ConfPairs}.

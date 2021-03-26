@@ -17,36 +17,9 @@
 
 package org.xipki.security.asn1;
 
-import static org.xipki.util.Args.notNull;
-
-import java.io.BufferedInputStream;
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.math.BigInteger;
-import java.security.InvalidKeyException;
-import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.text.ParseException;
-import java.util.Date;
-import java.util.Iterator;
-
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.BERTags;
-import org.bouncycastle.asn1.DERBitString;
-import org.bouncycastle.asn1.DERGeneralizedTime;
-import org.bouncycastle.asn1.DERUTCTime;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.CRLReason;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.operator.ContentVerifier;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.OperatorCreationException;
@@ -58,6 +31,17 @@ import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.SignerUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.LogUtil;
+
+import java.io.*;
+import java.math.BigInteger;
+import java.security.InvalidKeyException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.Iterator;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * Both BouncyCastle and JDK read the whole CRL during the initialization. The

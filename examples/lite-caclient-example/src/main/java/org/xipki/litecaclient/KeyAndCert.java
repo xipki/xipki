@@ -17,9 +17,9 @@
 
 package org.xipki.litecaclient;
 
-import java.security.cert.X509Certificate;
-
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+
+import java.security.cert.X509Certificate;
 
 /**
  * Private key and certificate.

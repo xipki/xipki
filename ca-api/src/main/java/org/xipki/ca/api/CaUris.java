@@ -17,13 +17,13 @@
 
 package org.xipki.ca.api;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.CompareUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.StringUtil;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * CA URIs.

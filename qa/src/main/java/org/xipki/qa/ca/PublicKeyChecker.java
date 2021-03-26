@@ -17,14 +17,6 @@
 
 package org.xipki.qa.ca;
 
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.CollectionUtil.isEmpty;
-
-import java.security.spec.InvalidKeySpecException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -46,6 +38,14 @@ import org.xipki.qa.ValidationIssue;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.LruCache;
+
+import java.security.spec.InvalidKeySpecException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.CollectionUtil.isEmpty;
 
 /**
  * Public key checker.

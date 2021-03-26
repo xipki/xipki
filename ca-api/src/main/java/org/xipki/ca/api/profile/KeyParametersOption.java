@@ -17,12 +17,12 @@
 
 package org.xipki.ca.api.profile;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Control the permitted public key in the certificate.

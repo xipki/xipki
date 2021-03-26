@@ -17,22 +17,6 @@
 
 package org.xipki.dbtool;
 
-import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notNull;
-
-import java.io.Closeable;
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xipki.password.PasswordResolver;
-import org.xipki.password.PasswordResolverException;
-import org.xipki.util.IoUtil;
-import org.xipki.util.StringUtil;
-
 import liquibase.CatalogAndSchema;
 import liquibase.Liquibase;
 import liquibase.database.Database;
@@ -46,6 +30,21 @@ import liquibase.lockservice.LockServiceFactory;
 import liquibase.resource.CompositeResourceAccessor;
 import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.resource.ResourceAccessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.password.PasswordResolver;
+import org.xipki.password.PasswordResolverException;
+import org.xipki.util.IoUtil;
+import org.xipki.util.StringUtil;
+
+import java.io.Closeable;
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Properties;
+
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
 
 /**
  * Class for executing Liquibase via the command line.

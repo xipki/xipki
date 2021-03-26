@@ -17,24 +17,7 @@
 
 package org.xipki.qa.ca;
 
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.CollectionUtil.isEmpty;
-import static org.xipki.util.CollectionUtil.isNotEmpty;
-
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1GeneralizedTime;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERBMPString;
-import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DERPrintableString;
-import org.bouncycastle.asn1.DERT61String;
-import org.bouncycastle.asn1.DERUTF8String;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -46,6 +29,15 @@ import org.xipki.ca.api.profile.TextVadidator;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
+
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.CollectionUtil.isEmpty;
+import static org.xipki.util.CollectionUtil.isNotEmpty;
 
 /**
  * Subject checker.

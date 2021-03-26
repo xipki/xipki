@@ -17,23 +17,7 @@
 
 package org.xipki.ca.api.profile;
 
-import java.io.Closeable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DERBMPString;
-import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DERPrintableString;
-import org.bouncycastle.asn1.DERT61String;
-import org.bouncycastle.asn1.DERUTF8String;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.CertificatePolicies;
 import org.bouncycastle.asn1.x509.Extension;
@@ -47,6 +31,9 @@ import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.StringUtil;
 import org.xipki.util.Validity;
+
+import java.io.Closeable;
+import java.util.*;
 
 /**
  * Defines how the certificate looks like. All Certprofile classes must extend this class.

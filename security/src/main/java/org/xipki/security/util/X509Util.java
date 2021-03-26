@@ -17,49 +17,7 @@
 
 package org.xipki.security.util;
 
-import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.CollectionUtil.isEmpty;
-import static org.xipki.util.IoUtil.expandFilepath;
-import static org.xipki.util.IoUtil.read;
-import static org.xipki.util.StringUtil.concat;
-import static org.xipki.util.StringUtil.toUtf8Bytes;
-
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.nio.file.Files;
-import java.security.NoSuchProviderException;
-import java.security.cert.CRLException;
-import java.security.cert.CertPathBuilderException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Encoding;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1String;
-import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERTaggedObject;
-import org.bouncycastle.asn1.DERUTF8String;
-import org.bouncycastle.asn1.DERUniversalString;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
@@ -68,34 +26,33 @@ import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x500.style.RFC4519Style;
-import org.bouncycastle.asn1.x509.AccessDescription;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.DSAParameter;
-import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.asn1.x509.KeyPurposeId;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.BadInputException;
-import org.xipki.security.EdECConstants;
-import org.xipki.security.FpIdCalculator;
 import org.xipki.security.KeyUsage;
-import org.xipki.security.ObjectIdentifiers;
-import org.xipki.security.X509Cert;
+import org.xipki.security.*;
 import org.xipki.util.Base64;
-import org.xipki.util.CompareUtil;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.Hex;
-import org.xipki.util.LogUtil;
-import org.xipki.util.PemEncoder;
+import org.xipki.util.*;
 import org.xipki.util.PemEncoder.PemLabel;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.security.NoSuchProviderException;
+import java.security.cert.*;
+import java.security.spec.InvalidKeySpecException;
+import java.util.*;
+
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.CollectionUtil.isEmpty;
+import static org.xipki.util.IoUtil.expandFilepath;
+import static org.xipki.util.IoUtil.read;
+import static org.xipki.util.StringUtil.concat;
+import static org.xipki.util.StringUtil.toUtf8Bytes;
 
 /**
  * X.509 certificate utility class.

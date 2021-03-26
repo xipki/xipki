@@ -17,20 +17,11 @@
 
 package org.xipki.security.cmp;
 
-import static org.xipki.util.Args.notNull;
-
-import java.util.Date;
-
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERUTF8String;
-import org.bouncycastle.asn1.cmp.CMPObjectIdentifiers;
-import org.bouncycastle.asn1.cmp.InfoTypeAndValue;
-import org.bouncycastle.asn1.cmp.PBMParameter;
-import org.bouncycastle.asn1.cmp.PKIFreeText;
-import org.bouncycastle.asn1.cmp.PKIHeader;
-import org.bouncycastle.asn1.cmp.PKIMessage;
+import org.bouncycastle.asn1.cmp.*;
 import org.bouncycastle.asn1.crmf.AttributeTypeAndValue;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.GeneralName;
@@ -44,6 +35,10 @@ import org.bouncycastle.cert.crmf.jcajce.JcePKMACValuesCalculator;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.NoIdleSignerException;
+
+import java.util.Date;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * CMP utility class.

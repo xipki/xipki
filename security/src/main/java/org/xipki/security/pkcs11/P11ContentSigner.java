@@ -17,17 +17,20 @@
 
 package org.xipki.security.pkcs11;
 
-import static org.xipki.security.HashAlgo.SHA1;
-import static org.xipki.security.HashAlgo.SHA224;
-import static org.xipki.security.HashAlgo.SHA256;
-import static org.xipki.security.HashAlgo.SHA384;
-import static org.xipki.security.HashAlgo.SHA3_224;
-import static org.xipki.security.HashAlgo.SHA3_256;
-import static org.xipki.security.HashAlgo.SHA3_384;
-import static org.xipki.security.HashAlgo.SHA3_512;
-import static org.xipki.security.HashAlgo.SHA512;
-import static org.xipki.security.HashAlgo.SM3;
-import static org.xipki.util.Args.notNull;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.crypto.*;
+import org.bouncycastle.crypto.params.ParametersWithRandom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.SignAlgo;
+import org.xipki.security.XiContentSigner;
+import org.xipki.security.XiSecurityException;
+import org.xipki.security.util.GMUtil;
+import org.xipki.security.util.SignerUtil;
+import org.xipki.util.LogUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -40,25 +43,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.crypto.AsymmetricBlockCipher;
-import org.bouncycastle.crypto.CryptoException;
-import org.bouncycastle.crypto.DataLengthException;
-import org.bouncycastle.crypto.RuntimeCryptoException;
-import org.bouncycastle.crypto.Signer;
-import org.bouncycastle.crypto.params.ParametersWithRandom;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.XiContentSigner;
-import org.xipki.security.XiSecurityException;
-import org.xipki.security.util.GMUtil;
-import org.xipki.security.util.SignerUtil;
-import org.xipki.util.LogUtil;
-
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import static org.xipki.security.HashAlgo.*;
+import static org.xipki.util.Args.notNull;
 
 /**
  * PKCS#11 {@link XiContentSigner}.

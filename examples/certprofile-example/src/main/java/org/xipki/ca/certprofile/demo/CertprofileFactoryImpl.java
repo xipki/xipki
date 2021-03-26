@@ -17,14 +17,14 @@
 
 package org.xipki.ca.certprofile.demo;
 
+import org.xipki.ca.api.profile.Certprofile;
+import org.xipki.ca.api.profile.CertprofileFactory;
+import org.xipki.util.ObjectCreationException;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.xipki.ca.api.profile.Certprofile;
-import org.xipki.ca.api.profile.CertprofileFactory;
-import org.xipki.util.ObjectCreationException;
 
 /**
  * Factory to create certprofile of type demo-profiletype.

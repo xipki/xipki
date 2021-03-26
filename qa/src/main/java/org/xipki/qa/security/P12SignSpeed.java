@@ -17,24 +17,11 @@
 
 package org.xipki.qa.security;
 
-import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notNull;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigInteger;
-import java.security.SecureRandom;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.EdECConstants;
-import org.xipki.security.SecurityFactory;
-import org.xipki.security.SignerConf;
-import org.xipki.security.X509Cert;
+import org.xipki.security.*;
 import org.xipki.security.pkcs12.KeystoreGenerationParameters;
 import org.xipki.security.pkcs12.P12KeyGenerationResult;
 import org.xipki.security.pkcs12.P12KeyGenerator;
@@ -42,6 +29,15 @@ import org.xipki.util.Base64;
 import org.xipki.util.BenchmarkExecutor;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.IoUtil;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigInteger;
+import java.security.SecureRandom;
+
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
 
 /**
  * Speed test of PKCS#12 signature creation.

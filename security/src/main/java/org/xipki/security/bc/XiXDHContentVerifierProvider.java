@@ -17,21 +17,6 @@
 
 package org.xipki.security.bc;
 
-import static org.xipki.util.Args.notNull;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PublicKey;
-import java.util.Arrays;
-
-import javax.crypto.KeyAgreement;
-import javax.crypto.Mac;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.crmf.DhSigStatic;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -44,6 +29,20 @@ import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers.Xipki;
+
+import javax.crypto.KeyAgreement;
+import javax.crypto.Mac;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PublicKey;
+import java.util.Arrays;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * {@link ContentVerifierProvider} for the algorithm X25519 static HMAC (XiPKI own

@@ -17,11 +17,11 @@
 
 package org.xipki.qa;
 
-import static org.xipki.util.Args.notEmpty;
-
 import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.List;
+
+import static org.xipki.util.Args.notEmpty;
 /**
  * Iterator which iterates the {@link BigInteger} as specified by a list of
  * {@link BigIntegerRange}s.

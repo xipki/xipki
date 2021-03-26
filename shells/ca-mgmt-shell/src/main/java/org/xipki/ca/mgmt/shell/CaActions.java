@@ -17,17 +17,6 @@
 
 package org.xipki.ca.mgmt.shell;
 
-import java.io.File;
-import java.math.BigInteger;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
@@ -37,16 +26,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.mgmt.CaManager;
-import org.xipki.ca.api.mgmt.CaMgmtException;
-import org.xipki.ca.api.mgmt.CaStatus;
-import org.xipki.ca.api.mgmt.CmpControl;
-import org.xipki.ca.api.mgmt.CrlControl;
-import org.xipki.ca.api.mgmt.CtlogControl;
-import org.xipki.ca.api.mgmt.ProtocolSupport;
-import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
-import org.xipki.ca.api.mgmt.ScepControl;
-import org.xipki.ca.api.mgmt.ValidityMode;
+import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.api.mgmt.entry.ChangeCaEntry;
 import org.xipki.password.PasswordResolver;
@@ -59,13 +39,12 @@ import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.XiAction;
-import org.xipki.util.Args;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.DateUtil;
-import org.xipki.util.IoUtil;
-import org.xipki.util.StringUtil;
-import org.xipki.util.Validity;
+import org.xipki.util.*;
+
+import java.io.File;
+import java.math.BigInteger;
+import java.nio.file.Paths;
+import java.util.*;
 
 /**
  * Actions to manage CA.

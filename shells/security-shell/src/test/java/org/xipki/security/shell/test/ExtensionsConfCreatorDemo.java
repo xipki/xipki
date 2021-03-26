@@ -17,16 +17,8 @@
 
 package org.xipki.security.shell.test;
 
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -34,17 +26,16 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.X509ExtensionType;
-import org.xipki.security.X509ExtensionType.ConstantExtnValue;
-import org.xipki.security.X509ExtensionType.DescribableOid;
-import org.xipki.security.X509ExtensionType.ExtensionsType;
-import org.xipki.security.X509ExtensionType.FieldType;
-import org.xipki.security.X509ExtensionType.Tag;
+import org.xipki.security.X509ExtensionType.*;
 import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.IoUtil;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 /**
  * Demonstrate how to create constant extension configuration that can be used

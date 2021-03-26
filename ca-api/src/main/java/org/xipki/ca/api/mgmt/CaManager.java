@@ -17,6 +17,13 @@
 
 package org.xipki.ca.api.mgmt;
 
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.cert.X509CRLHolder;
+import org.xipki.ca.api.mgmt.entry.*;
+import org.xipki.security.CertRevocationInfo;
+import org.xipki.security.CrlReason;
+import org.xipki.security.X509Cert;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
@@ -24,23 +31,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.cert.X509CRLHolder;
-import org.xipki.ca.api.mgmt.entry.AddUserEntry;
-import org.xipki.ca.api.mgmt.entry.CaEntry;
-import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
-import org.xipki.ca.api.mgmt.entry.CaHasUserEntry;
-import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
-import org.xipki.ca.api.mgmt.entry.ChangeCaEntry;
-import org.xipki.ca.api.mgmt.entry.ChangeUserEntry;
-import org.xipki.ca.api.mgmt.entry.PublisherEntry;
-import org.xipki.ca.api.mgmt.entry.RequestorEntry;
-import org.xipki.ca.api.mgmt.entry.SignerEntry;
-import org.xipki.ca.api.mgmt.entry.UserEntry;
-import org.xipki.security.CertRevocationInfo;
-import org.xipki.security.CrlReason;
-import org.xipki.security.X509Cert;
 
 /**
  * Interface to manage the CA system.

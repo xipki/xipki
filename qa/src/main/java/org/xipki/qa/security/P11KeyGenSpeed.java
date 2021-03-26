@@ -17,11 +17,6 @@
 
 package org.xipki.qa.security;
 
-import static org.xipki.util.Args.notNull;
-
-import java.math.BigInteger;
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +24,11 @@ import org.xipki.security.pkcs11.P11IdentityId;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11Slot.P11NewKeyControl;
 import org.xipki.util.BenchmarkExecutor;
+
+import java.math.BigInteger;
+import java.util.concurrent.atomic.AtomicLong;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * Speed test of PKCS#11 keypair generation.

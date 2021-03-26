@@ -17,32 +17,22 @@
 
 package org.xipki.security.pkcs11.iaik;
 
-import static org.xipki.util.Args.notNull;
+import iaik.pkcs.pkcs11.*;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.password.PasswordResolverException;
+import org.xipki.security.pkcs11.*;
+import org.xipki.util.LogUtil;
+import org.xipki.util.StringUtil;
 
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xipki.password.PasswordResolverException;
-import org.xipki.security.pkcs11.P11Module;
-import org.xipki.security.pkcs11.P11ModuleConf;
-import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.security.pkcs11.P11SlotIdentifier;
-import org.xipki.security.pkcs11.P11TokenException;
-import org.xipki.util.LogUtil;
-import org.xipki.util.StringUtil;
-
-import iaik.pkcs.pkcs11.DefaultInitializeArgs;
-import iaik.pkcs.pkcs11.Info;
-import iaik.pkcs.pkcs11.Module;
-import iaik.pkcs.pkcs11.Slot;
-import iaik.pkcs.pkcs11.SlotInfo;
-import iaik.pkcs.pkcs11.TokenException;
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
-import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
+import static org.xipki.util.Args.notNull;
 
 /**
  * {@link P11Module} based on the IAIK PKCS#11 wrapper.

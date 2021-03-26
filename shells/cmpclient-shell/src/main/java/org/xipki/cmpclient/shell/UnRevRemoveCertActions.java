@@ -17,17 +17,6 @@
 
 package org.xipki.cmpclient.shell;
 
-import java.io.File;
-import java.math.BigInteger;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
-import java.util.Arrays;
-import java.util.Date;
-
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -45,6 +34,17 @@ import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.Args;
 import org.xipki.util.DateUtil;
 import org.xipki.util.ReqRespDebug;
+
+import java.io.File;
+import java.math.BigInteger;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SignatureException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.util.Arrays;
+import java.util.Date;
 
 /**
  * CMP client actions to revoke, unrevoke and remove certificates.

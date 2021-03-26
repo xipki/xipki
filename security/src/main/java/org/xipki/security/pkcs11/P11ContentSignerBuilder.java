@@ -17,8 +17,12 @@
 
 package org.xipki.security.pkcs11;
 
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.Args.positive;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
+import org.bouncycastle.jcajce.interfaces.EdDSAKey;
+import org.xipki.security.*;
+import org.xipki.security.util.GMUtil;
+import org.xipki.security.util.X509Util;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
@@ -33,18 +37,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
-import org.bouncycastle.jcajce.interfaces.EdDSAKey;
-import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.DfltConcurrentContentSigner;
-import org.xipki.security.SecurityFactory;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.X509Cert;
-import org.xipki.security.XiContentSigner;
-import org.xipki.security.XiSecurityException;
-import org.xipki.security.util.GMUtil;
-import org.xipki.security.util.X509Util;
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.Args.positive;
 
 /**
  * Builder of {@link ConcurrentContentSigner} for PKCS#11 token.

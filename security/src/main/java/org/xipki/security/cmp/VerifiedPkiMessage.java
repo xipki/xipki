@@ -17,9 +17,9 @@
 
 package org.xipki.security.cmp;
 
-import static org.xipki.util.Args.notNull;
-
 import org.bouncycastle.cert.cmp.GeneralPKIMessage;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * PKI message with verification result.

@@ -17,16 +17,6 @@
 
 package org.xipki.qa.shell;
 
-import java.security.KeyStore;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.Signature;
-import java.security.cert.Certificate;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Set;
-
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -45,6 +35,12 @@ import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.XiAction;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.StringUtil;
+
+import java.security.*;
+import java.security.cert.Certificate;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Set;
 
 /**
  * Actions for PKCS#11 security.

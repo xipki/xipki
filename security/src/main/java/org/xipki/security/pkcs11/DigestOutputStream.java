@@ -17,10 +17,10 @@
 
 package org.xipki.security.pkcs11;
 
+import org.bouncycastle.crypto.Digest;
+
 import java.io.IOException;
 import java.io.OutputStream;
-
-import org.bouncycastle.crypto.Digest;
 
 /**
  * {@link OutputStream} with a {@link Digest} as the backend.

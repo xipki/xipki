@@ -17,6 +17,16 @@
 
 package org.xipki.litecaclient.example;
 
+import org.bouncycastle.asn1.pkcs.CertificationRequest;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.CRLReason;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.xipki.litecaclient.CmpCaClient;
+import org.xipki.litecaclient.KeyAndCert;
+import org.xipki.litecaclient.SdkUtil;
+import org.xipki.litecaclient.SignatureCmpCaClient;
+
 import java.io.File;
 import java.io.InputStream;
 import java.math.BigInteger;
@@ -28,16 +38,6 @@ import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.concurrent.atomic.AtomicLong;
-
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.CRLReason;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.xipki.litecaclient.CmpCaClient;
-import org.xipki.litecaclient.KeyAndCert;
-import org.xipki.litecaclient.SdkUtil;
-import org.xipki.litecaclient.SignatureCmpCaClient;
 
 /**
  * Example to use {@link CmpCaClient}.

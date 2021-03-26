@@ -17,12 +17,15 @@
 
 package org.xipki.litecaclient;
 
-import java.io.ByteArrayInputStream;
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import org.bouncycastle.asn1.pkcs.CertificationRequest;
+import org.bouncycastle.asn1.x509.CRLReason;
+import org.bouncycastle.util.encoders.Hex;
+import org.bouncycastle.util.io.pem.PemObject;
+import org.bouncycastle.util.io.pem.PemReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -34,14 +37,6 @@ import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.bouncycastle.asn1.x509.CRLReason;
-import org.bouncycastle.util.encoders.Hex;
-import org.bouncycastle.util.io.pem.PemObject;
-import org.bouncycastle.util.io.pem.PemReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * CA client which communicates with CA via REST API.

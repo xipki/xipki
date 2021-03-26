@@ -17,12 +17,12 @@
 
 package org.xipki.password;
 
-import static org.xipki.util.Args.notNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.xipki.util.Args.notNull;
 
 /**
  * An implementation of {@link PasswordResolver}.

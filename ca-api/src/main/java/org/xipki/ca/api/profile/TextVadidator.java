@@ -17,9 +17,9 @@
 
 package org.xipki.ca.api.profile;
 
-import java.util.regex.Pattern;
-
 import org.xipki.util.LruCache;
+
+import java.util.regex.Pattern;
 
 /**
  * Text validator.

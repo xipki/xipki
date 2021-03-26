@@ -17,17 +17,17 @@
 
 package org.xipki.ocsp.api;
 
-import static org.xipki.util.Args.notBlank;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
+import org.xipki.security.X509Cert;
+import org.xipki.util.Validity;
 
 import java.io.Closeable;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.Map;
 
-import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
-import org.xipki.security.X509Cert;
-import org.xipki.util.Validity;
+import static org.xipki.util.Args.notBlank;
 
 /**
  * Store of certificate status.

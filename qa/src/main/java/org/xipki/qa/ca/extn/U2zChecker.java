@@ -17,13 +17,13 @@
 
 package org.xipki.qa.ca.extn;
 
-import static org.xipki.qa.ca.extn.CheckerUtil.addViolation;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.xipki.ca.api.profile.Certprofile.ExtensionControl;
 import org.xipki.security.ObjectIdentifiers.Extn;
+
+import static org.xipki.qa.ca.extn.CheckerUtil.addViolation;
 
 /**
  * Checker for extensions whose name is from U to Z.

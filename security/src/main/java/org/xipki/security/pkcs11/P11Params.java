@@ -17,9 +17,8 @@
 
 package org.xipki.security.pkcs11;
 
-import org.xipki.security.HashAlgo;
-
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import org.xipki.security.HashAlgo;
 
 /**
  * PKCS#11 params.

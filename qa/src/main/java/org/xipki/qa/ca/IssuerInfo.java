@@ -17,18 +17,14 @@
 
 package org.xipki.qa.ca;
 
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.CollectionUtil.isEmpty;
-
-import java.security.cert.CertificateException;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
+
+import java.security.cert.CertificateException;
+import java.util.*;
+
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.CollectionUtil.isEmpty;
 
 /**
  * Certificate issuer information.

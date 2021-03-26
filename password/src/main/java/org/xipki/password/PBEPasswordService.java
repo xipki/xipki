@@ -17,16 +17,16 @@
 
 package org.xipki.password;
 
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.Args.range;
+import org.xipki.util.Base64;
+import org.xipki.util.StringUtil;
 
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
-import org.xipki.util.Base64;
-import org.xipki.util.StringUtil;
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.Args.range;
 
 /**
  * PBE (Password Based Encrytion) password service.

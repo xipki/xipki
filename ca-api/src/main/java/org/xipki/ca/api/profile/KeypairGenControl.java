@@ -17,9 +17,6 @@
 
 package org.xipki.ca.api.profile;
 
-import java.math.BigInteger;
-import java.security.spec.DSAParameterSpec;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -28,6 +25,9 @@ import org.bouncycastle.asn1.x509.DSAParameter;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.xipki.security.util.DSAParameterCache;
 import org.xipki.util.Args;
+
+import java.math.BigInteger;
+import java.security.spec.DSAParameterSpec;
 
 /**
  * Control of how the CA generate keypair for the new certificate.

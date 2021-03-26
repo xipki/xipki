@@ -17,17 +17,6 @@
 
 package org.xipki.security.bc;
 
-import static org.xipki.util.Args.notNull;
-
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PublicKey;
-import java.security.Signature;
-import java.security.SignatureException;
-
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.crypto.RuntimeCryptoException;
@@ -35,6 +24,12 @@ import org.bouncycastle.operator.ContentVerifier;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.xipki.security.EdECConstants;
+
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.security.*;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * {@link ContentVerifierProvider} for the signature algorithm EdDSA (Ed25519 and Ed448).

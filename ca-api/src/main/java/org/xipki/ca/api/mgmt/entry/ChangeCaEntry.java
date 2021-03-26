@@ -17,8 +17,6 @@
 
 package org.xipki.ca.api.mgmt.entry;
 
-import java.util.List;
-
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.CaManager;
@@ -28,6 +26,8 @@ import org.xipki.ca.api.mgmt.ValidityMode;
 import org.xipki.util.Args;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.Validity;
+
+import java.util.List;
 
 /**
  * Management Entry Change CA.

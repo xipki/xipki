@@ -17,20 +17,19 @@
 
 package org.xipki.security.pkcs12;
 
-import static org.xipki.util.Args.notNull;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Arrays;
-
-import javax.crypto.SecretKey;
-
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.XiSecurityException;
+
+import javax.crypto.SecretKey;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Arrays;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * HMAC signer.

@@ -17,13 +17,6 @@
 
 package org.xipki.ocsp.server.store.example;
 
-import java.io.File;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.security.cert.CertificateException;
-import java.util.Date;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataSourceWrapper;
@@ -35,6 +28,13 @@ import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
+
+import java.io.File;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.cert.CertificateException;
+import java.util.Date;
+import java.util.Map;
 
 /**
  * This is just an example that demonstrates how to use the custom OcspStore.

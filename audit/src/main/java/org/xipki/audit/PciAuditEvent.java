@@ -17,12 +17,10 @@
 
 package org.xipki.audit;
 
+import org.xipki.util.Args;
+
 import java.io.CharArrayWriter;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -30,8 +28,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.xipki.util.Args;
 
 /**
  * PCI audit event.

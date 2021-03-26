@@ -17,29 +17,6 @@
 
 package org.xipki.security.pkcs12;
 
-import static org.xipki.util.Args.notNull;
-
-import java.io.ByteArrayOutputStream;
-import java.math.BigInteger;
-import java.security.InvalidKeyException;
-import java.security.KeyPair;
-import java.security.KeyStore;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.SecureRandom;
-import java.security.Signature;
-import java.security.cert.Certificate;
-import java.security.interfaces.DSAPrivateKey;
-import java.security.interfaces.DSAPublicKey;
-import java.security.interfaces.ECPrivateKey;
-import java.security.interfaces.ECPublicKey;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Date;
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -54,13 +31,21 @@ import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.jcajce.interfaces.XDHKey;
 import org.bouncycastle.operator.ContentSigner;
-import org.xipki.security.EdECConstants;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.SignatureSigner;
-import org.xipki.security.X509Cert;
+import org.xipki.security.*;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.ByteArrayOutputStream;
+import java.math.BigInteger;
+import java.security.*;
+import java.security.cert.Certificate;
+import java.security.interfaces.*;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Date;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * PKCS#12 key generator.

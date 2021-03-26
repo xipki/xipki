@@ -17,13 +17,13 @@
 
 package org.xipki.qa;
 
-import static org.xipki.util.Args.notEmpty;
+import org.xipki.util.CollectionUtil;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.xipki.util.CollectionUtil;
+import static org.xipki.util.Args.notEmpty;
 
 /**
  * Validation result consisting of failed validation issues and successful issues.

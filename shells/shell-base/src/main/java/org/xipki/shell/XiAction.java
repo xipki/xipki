@@ -17,6 +17,15 @@
 
 package org.xipki.shell;
 
+import org.apache.karaf.shell.api.action.Action;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.api.console.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.password.SecurePasswordInputPanel;
+import org.xipki.util.*;
+import org.xipki.util.PemEncoder.PemLabel;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -26,22 +35,6 @@ import java.nio.file.StandardCopyOption;
 import java.security.SecureRandom;
 import java.util.Collection;
 import java.util.List;
-
-import org.apache.karaf.shell.api.action.Action;
-import org.apache.karaf.shell.api.action.lifecycle.Reference;
-import org.apache.karaf.shell.api.console.Session;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xipki.password.SecurePasswordInputPanel;
-import org.xipki.util.Base64;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.Hex;
-import org.xipki.util.IoUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.PemEncoder;
-import org.xipki.util.PemEncoder.PemLabel;
-import org.xipki.util.StringUtil;
 
 /**
  * Anchor class for all actions. All actions should derive from this one.

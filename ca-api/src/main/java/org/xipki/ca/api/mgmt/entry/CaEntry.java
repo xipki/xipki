@@ -17,37 +17,17 @@
 
 package org.xipki.ca.api.mgmt.entry;
 
+import org.xipki.ca.api.CaUris;
+import org.xipki.ca.api.NameId;
+import org.xipki.ca.api.mgmt.*;
+import org.xipki.security.*;
+import org.xipki.security.util.X509Util;
+import org.xipki.util.*;
+
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import org.xipki.ca.api.CaUris;
-import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.mgmt.CaManager;
-import org.xipki.ca.api.mgmt.CaMgmtException;
-import org.xipki.ca.api.mgmt.CaStatus;
-import org.xipki.ca.api.mgmt.CmpControl;
-import org.xipki.ca.api.mgmt.CrlControl;
-import org.xipki.ca.api.mgmt.CtlogControl;
-import org.xipki.ca.api.mgmt.PermissionConstants;
-import org.xipki.ca.api.mgmt.ProtocolSupport;
-import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
-import org.xipki.ca.api.mgmt.ScepControl;
-import org.xipki.ca.api.mgmt.ValidityMode;
-import org.xipki.security.CertRevocationInfo;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.KeyUsage;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.X509Cert;
-import org.xipki.security.XiSecurityException;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.CompareUtil;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.StringUtil;
-import org.xipki.util.Validity;
 
 /**
  * Management Entry CA.

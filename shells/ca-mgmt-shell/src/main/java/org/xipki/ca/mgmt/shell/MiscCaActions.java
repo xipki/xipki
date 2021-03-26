@@ -17,13 +17,6 @@
 
 package org.xipki.ca.mgmt.shell;
 
-import java.io.File;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
@@ -39,6 +32,13 @@ import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.IoUtil;
+
+import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Misc actions to manage CA.

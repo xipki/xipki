@@ -17,23 +17,6 @@
 
 package org.xipki.qa.shell;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.math.BigInteger;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.SecureRandom;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -47,35 +30,26 @@ import org.xipki.ocsp.client.OcspRequestor;
 import org.xipki.ocsp.client.RequestOptions;
 import org.xipki.ocsp.client.shell.Actions.BaseOcspStatusAction;
 import org.xipki.ocsp.client.shell.Actions.CommonOcspStatusAction;
-import org.xipki.qa.BigIntegerRange;
-import org.xipki.qa.FileBigIntegerIterator;
-import org.xipki.qa.RangeBigIntegerIterator;
-import org.xipki.qa.ValidationIssue;
-import org.xipki.qa.ValidationResult;
-import org.xipki.qa.ocsp.OcspBenchmark;
-import org.xipki.qa.ocsp.OcspCertStatus;
-import org.xipki.qa.ocsp.OcspError;
-import org.xipki.qa.ocsp.OcspQa;
-import org.xipki.qa.ocsp.OcspResponseOption;
-import org.xipki.security.CrlReason;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.IssuerHash;
-import org.xipki.security.SecurityFactory;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.X509Cert;
+import org.xipki.qa.*;
+import org.xipki.qa.ocsp.*;
+import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
-import org.xipki.util.Args;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.DateUtil;
-import org.xipki.util.IoUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.ReqRespDebug;
+import org.xipki.util.*;
 import org.xipki.util.ReqRespDebug.ReqRespPair;
-import org.xipki.util.StringUtil;
-import org.xipki.util.TripleState;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.math.BigInteger;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.SecureRandom;
+import java.util.*;
 
 /**
  * Actions of QA for OCSP.

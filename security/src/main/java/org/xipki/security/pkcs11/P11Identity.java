@@ -17,14 +17,8 @@
 
 package org.xipki.security.pkcs11;
 
-import static org.xipki.util.Args.notNull;
-
-import java.security.PublicKey;
-import java.security.interfaces.DSAPublicKey;
-import java.security.interfaces.ECPublicKey;
-import java.security.interfaces.RSAPublicKey;
-import java.util.Arrays;
-
+import iaik.pkcs.pkcs11.wrapper.Functions;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.jcajce.interfaces.XDHKey;
 import org.slf4j.Logger;
@@ -33,8 +27,13 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.util.CollectionUtil;
 
-import iaik.pkcs.pkcs11.wrapper.Functions;
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import java.security.PublicKey;
+import java.security.interfaces.DSAPublicKey;
+import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPublicKey;
+import java.util.Arrays;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * PKCS#11 identity (private key and the corresponding public key and certificates).

@@ -17,8 +17,6 @@
 
 package org.xipki.ca.api.mgmt;
 
-import java.util.Set;
-
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.InsuffientPermissionException;
 import org.xipki.ca.api.NameId;
@@ -26,6 +24,8 @@ import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.CaHasUserEntry;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
+
+import java.util.Set;
 
 /**
  * Requestor info interface.

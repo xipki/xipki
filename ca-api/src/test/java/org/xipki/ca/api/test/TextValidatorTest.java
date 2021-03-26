@@ -17,10 +17,10 @@
 
 package org.xipki.ca.api.test;
 
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Test;
 import org.xipki.ca.api.profile.TextVadidator;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * TextValidator test.

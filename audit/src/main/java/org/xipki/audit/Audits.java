@@ -17,9 +17,9 @@
 
 package org.xipki.audit;
 
-import java.lang.reflect.InvocationTargetException;
-
 import org.xipki.audit.services.EmbedAuditService;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Helper class to configure and initialize the Audit.

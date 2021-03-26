@@ -17,22 +17,16 @@
 
 package org.xipki.security.pkcs11.iaik;
 
-import static org.xipki.security.pkcs11.P11Slot.getDescription;
-import static org.xipki.util.CollectionUtil.isEmpty;
-import static org.xipki.util.CollectionUtil.isNotEmpty;
-
-import java.math.BigInteger;
-import java.security.cert.CertificateException;
-import java.security.spec.DSAPublicKeySpec;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.RSAPublicKeySpec;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
+import iaik.pkcs.pkcs11.Mechanism;
+import iaik.pkcs.pkcs11.*;
+import iaik.pkcs.pkcs11.objects.*;
+import iaik.pkcs.pkcs11.objects.Key.KeyType;
+import iaik.pkcs.pkcs11.parameters.InitializationVectorParameters;
+import iaik.pkcs.pkcs11.parameters.OpaqueParameters;
+import iaik.pkcs.pkcs11.parameters.Parameters;
+import iaik.pkcs.pkcs11.parameters.RSAPkcsPssParameters;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -51,30 +45,16 @@ import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.LogUtil;
 
-import iaik.pkcs.pkcs11.Mechanism;
-import iaik.pkcs.pkcs11.Session;
-import iaik.pkcs.pkcs11.SessionInfo;
-import iaik.pkcs.pkcs11.State;
-import iaik.pkcs.pkcs11.TokenException;
-import iaik.pkcs.pkcs11.objects.Attribute;
-import iaik.pkcs.pkcs11.objects.ByteArrayAttribute;
-import iaik.pkcs.pkcs11.objects.CharArrayAttribute;
-import iaik.pkcs.pkcs11.objects.DSAPublicKey;
-import iaik.pkcs.pkcs11.objects.ECPublicKey;
-import iaik.pkcs.pkcs11.objects.Key.KeyType;
-import iaik.pkcs.pkcs11.objects.PKCS11Object;
-import iaik.pkcs.pkcs11.objects.PrivateKey;
-import iaik.pkcs.pkcs11.objects.PublicKey;
-import iaik.pkcs.pkcs11.objects.RSAPublicKey;
-import iaik.pkcs.pkcs11.objects.SecretKey;
-import iaik.pkcs.pkcs11.objects.Storage;
-import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
-import iaik.pkcs.pkcs11.parameters.InitializationVectorParameters;
-import iaik.pkcs.pkcs11.parameters.OpaqueParameters;
-import iaik.pkcs.pkcs11.parameters.Parameters;
-import iaik.pkcs.pkcs11.parameters.RSAPkcsPssParameters;
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
-import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
+import java.math.BigInteger;
+import java.security.cert.CertificateException;
+import java.security.spec.DSAPublicKeySpec;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.RSAPublicKeySpec;
+import java.util.*;
+
+import static org.xipki.security.pkcs11.P11Slot.getDescription;
+import static org.xipki.util.CollectionUtil.isEmpty;
+import static org.xipki.util.CollectionUtil.isNotEmpty;
 
 /**
  * IAIK PKCS#11 wrapper util.

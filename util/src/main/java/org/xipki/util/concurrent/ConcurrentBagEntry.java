@@ -17,9 +17,9 @@
 
 package org.xipki.util.concurrent;
 
-import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
-
 import org.xipki.util.concurrent.ConcurrentBag.IConcurrentBagEntry;
+
+import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
 /**
  * ConcurrentBagEntry.

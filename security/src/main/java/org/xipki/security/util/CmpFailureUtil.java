@@ -17,14 +17,14 @@
 
 package org.xipki.security.util;
 
-import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.bouncycastle.asn1.cmp.PKIFreeText;
 import org.bouncycastle.asn1.cmp.PKIStatus;
 import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
+
+import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * CMP failure utility class.

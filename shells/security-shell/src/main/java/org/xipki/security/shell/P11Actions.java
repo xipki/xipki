@@ -17,18 +17,7 @@
 
 package org.xipki.security.shell;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.Key;
-import java.security.KeyStore;
-import java.util.Enumeration;
-import java.util.List;
-
-import javax.crypto.SecretKey;
-
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -39,24 +28,10 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.EdECConstants;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.SignatureAlgoControl;
-import org.xipki.security.SignerConf;
-import org.xipki.security.X509Cert;
-import org.xipki.security.XiSecurityException;
-import org.xipki.security.pkcs11.P11CryptService;
-import org.xipki.security.pkcs11.P11CryptServiceFactory;
-import org.xipki.security.pkcs11.P11IdentityId;
-import org.xipki.security.pkcs11.P11Module;
-import org.xipki.security.pkcs11.P11ObjectIdentifier;
-import org.xipki.security.pkcs11.P11Slot;
+import org.xipki.security.*;
+import org.xipki.security.pkcs11.*;
 import org.xipki.security.pkcs11.P11Slot.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11Slot.P11NewObjectControl;
-import org.xipki.security.pkcs11.P11SlotIdentifier;
-import org.xipki.security.pkcs11.P11TokenException;
-import org.xipki.security.pkcs11.P11UnsupportedMechanismException;
 import org.xipki.security.shell.Actions.CsrGenAction;
 import org.xipki.security.shell.Actions.SecurityAction;
 import org.xipki.security.util.AlgorithmUtil;
@@ -64,14 +39,18 @@ import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
-import org.xipki.util.Args;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.Hex;
-import org.xipki.util.IoUtil;
-import org.xipki.util.StringUtil;
+import org.xipki.util.*;
 
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import javax.crypto.SecretKey;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.Key;
+import java.security.KeyStore;
+import java.util.Enumeration;
+import java.util.List;
 
 /**
  * Actions for PKCS#11 security.

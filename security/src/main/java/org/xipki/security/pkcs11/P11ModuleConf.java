@@ -17,19 +17,8 @@
 
 package org.xipki.security.pkcs11;
 
-import static org.xipki.util.Args.notEmpty;
-import static org.xipki.util.Args.notNull;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import iaik.pkcs.pkcs11.wrapper.Functions;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolver;
@@ -38,8 +27,10 @@ import org.xipki.util.CollectionUtil;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.StringUtil;
 
-import iaik.pkcs.pkcs11.wrapper.Functions;
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import java.util.*;
+
+import static org.xipki.util.Args.notEmpty;
+import static org.xipki.util.Args.notNull;
 
 /**
  * Configuration of a PKCS#11 module.

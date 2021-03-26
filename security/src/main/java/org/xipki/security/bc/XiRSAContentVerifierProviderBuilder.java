@@ -17,8 +17,6 @@
 
 package org.xipki.security.bc;
 
-import java.security.NoSuchAlgorithmException;
-
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.Signer;
 import org.bouncycastle.crypto.signers.RSADigestSigner;
@@ -29,6 +27,8 @@ import org.bouncycastle.operator.bc.BcRSAContentVerifierProviderBuilder;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.SignerUtil;
+
+import java.security.NoSuchAlgorithmException;
 
 /**
  * Extends {@link BcECContentVerifierProviderBuilder} to support the signature algorithms

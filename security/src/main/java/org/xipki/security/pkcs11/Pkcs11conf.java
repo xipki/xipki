@@ -17,13 +17,12 @@
 
 package org.xipki.security.pkcs11;
 
-import java.util.LinkedList;
-import java.util.List;
-
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Configuration of PKCS#11.

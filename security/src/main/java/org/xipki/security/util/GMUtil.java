@@ -17,9 +17,6 @@
 
 package org.xipki.security.util;
 
-import java.math.BigInteger;
-import java.security.spec.EllipticCurve;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.gm.GMNamedCurves;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
@@ -30,6 +27,9 @@ import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECFieldElement;
 import org.bouncycastle.util.BigIntegers;
 import org.xipki.util.Hex;
+
+import java.math.BigInteger;
+import java.security.spec.EllipticCurve;
 
 /**
  * Chinese GM/SM Util class.

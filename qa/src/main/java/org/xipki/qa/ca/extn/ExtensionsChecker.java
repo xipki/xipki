@@ -17,34 +17,7 @@
 
 package org.xipki.qa.ca.extn;
 
-import static org.xipki.qa.ca.extn.CheckerUtil.addIfNotIn;
-import static org.xipki.qa.ca.extn.CheckerUtil.addViolation;
-import static org.xipki.qa.ca.extn.CheckerUtil.buildConstantExtesions;
-import static org.xipki.qa.ca.extn.CheckerUtil.buildExtesionSyntaxes;
-import static org.xipki.qa.ca.extn.CheckerUtil.hex;
-import static org.xipki.qa.ca.extn.CheckerUtil.readAsn1Encodable;
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.CollectionUtil.isNotEmpty;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Primitive;
-import org.bouncycastle.asn1.ASN1String;
-import org.bouncycastle.asn1.DERBMPString;
-import org.bouncycastle.asn1.DERPrintableString;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERT61String;
-import org.bouncycastle.asn1.DERUTF8String;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
@@ -59,25 +32,21 @@ import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.certprofile.xijson.DirectoryStringType;
 import org.xipki.ca.certprofile.xijson.ExtensionSyntaxChecker;
 import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
-import org.xipki.ca.certprofile.xijson.conf.AdditionalInformation;
-import org.xipki.ca.certprofile.xijson.conf.CertificatePolicies;
-import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
-import org.xipki.ca.certprofile.xijson.conf.ExtnSyntax;
-import org.xipki.ca.certprofile.xijson.conf.InhibitAnyPolicy;
-import org.xipki.ca.certprofile.xijson.conf.NameConstraints;
-import org.xipki.ca.certprofile.xijson.conf.PolicyConstraints;
-import org.xipki.ca.certprofile.xijson.conf.PolicyMappings;
-import org.xipki.ca.certprofile.xijson.conf.QcStatements;
-import org.xipki.ca.certprofile.xijson.conf.Restriction;
+import org.xipki.ca.certprofile.xijson.conf.*;
 import org.xipki.ca.certprofile.xijson.conf.SmimeCapabilities.SmimeCapability;
 import org.xipki.ca.certprofile.xijson.conf.SmimeCapabilities.SmimeCapabilityParameter;
-import org.xipki.ca.certprofile.xijson.conf.TlsFeature;
-import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.qa.ca.IssuerInfo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.X509Cert;
+
+import java.io.IOException;
+import java.util.*;
+
+import static org.xipki.qa.ca.extn.CheckerUtil.*;
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.CollectionUtil.isNotEmpty;
 
 /**
  * Extensions checker.

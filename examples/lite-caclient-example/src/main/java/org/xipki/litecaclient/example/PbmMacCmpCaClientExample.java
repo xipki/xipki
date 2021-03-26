@@ -17,15 +17,6 @@
 
 package org.xipki.litecaclient.example;
 
-import java.io.File;
-import java.math.BigInteger;
-import java.security.PrivateKey;
-import java.security.Security;
-import java.security.cert.X509Certificate;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
@@ -39,6 +30,15 @@ import org.bouncycastle.util.encoders.Hex;
 import org.xipki.litecaclient.KeyAndCert;
 import org.xipki.litecaclient.PbmMacCmpCaClient;
 import org.xipki.litecaclient.SdkUtil;
+
+import java.io.File;
+import java.math.BigInteger;
+import java.security.PrivateKey;
+import java.security.Security;
+import java.security.cert.X509Certificate;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Example to use {@link PbmMacCmpCaClient}.

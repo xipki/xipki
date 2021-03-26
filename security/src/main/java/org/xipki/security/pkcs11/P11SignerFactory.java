@@ -17,25 +17,19 @@
 
 package org.xipki.security.pkcs11;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.security.*;
+import org.xipki.util.Hex;
+import org.xipki.util.LogUtil;
+import org.xipki.util.ObjectCreationException;
+
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.SecurityFactory;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.SignerConf;
-import org.xipki.security.SignerFactory;
-import org.xipki.security.X509Cert;
-import org.xipki.security.XiSecurityException;
-import org.xipki.util.Hex;
-import org.xipki.util.LogUtil;
-import org.xipki.util.ObjectCreationException;
 
 /**
  * {@link SignerFactory} for PKCS#11 token.

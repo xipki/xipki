@@ -17,13 +17,11 @@
 
 package org.xipki.util;
 
-import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.Args.positive;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
+
+import static org.xipki.util.Args.*;
 
 /**
  * Validity like the certificate validity, e.g. 3 years.

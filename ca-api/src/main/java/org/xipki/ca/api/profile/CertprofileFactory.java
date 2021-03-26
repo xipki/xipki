@@ -17,9 +17,9 @@
 
 package org.xipki.ca.api.profile;
 
-import java.util.Set;
-
 import org.xipki.util.ObjectCreationException;
+
+import java.util.Set;
 
 /**
  * Certprofile factory.

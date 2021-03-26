@@ -17,13 +17,13 @@
 
 package org.xipki.litecaclient.example;
 
-import java.math.BigInteger;
-import java.security.cert.X509Certificate;
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x509.CRLReason;
 import org.xipki.litecaclient.RestCaClient;
+
+import java.math.BigInteger;
+import java.security.cert.X509Certificate;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Example to use {@link RestCaClient}.

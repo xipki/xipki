@@ -17,9 +17,9 @@
 
 package org.xipki.util;
 
-import java.math.BigInteger;
-
 import org.slf4j.Logger;
+
+import java.math.BigInteger;
 
 /**
  * LOG utility class.

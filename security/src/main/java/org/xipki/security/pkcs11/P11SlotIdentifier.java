@@ -17,10 +17,10 @@
 
 package org.xipki.security.pkcs11;
 
+import org.xipki.util.StringUtil;
+
 import static org.xipki.util.Args.notNegative;
 import static org.xipki.util.Args.notNull;
-
-import org.xipki.util.StringUtil;
 
 /**
  * Identifier of a {@link P11Slot}.

@@ -17,47 +17,11 @@
 
 package org.xipki.qa.ca.extn;
 
-import static org.xipki.qa.ca.extn.CheckerUtil.addViolation;
-import static org.xipki.qa.ca.extn.CheckerUtil.createGeneralName;
-import static org.xipki.qa.ca.extn.CheckerUtil.hex;
-import static org.xipki.qa.ca.extn.CheckerUtil.strInBnotInA;
-import static org.xipki.util.CollectionUtil.isNotEmpty;
-
-import java.io.IOException;
-import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
-
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1GeneralizedTime;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERPrintableString;
-import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AccessDescription;
-import org.bouncycastle.asn1.x509.Attribute;
-import org.bouncycastle.asn1.x509.CertPolicyId;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.asn1.x509.SubjectDirectoryAttributes;
-import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
 import org.bouncycastle.asn1.x509.qualified.MonetaryValue;
 import org.bouncycastle.asn1.x509.qualified.QCStatement;
@@ -69,18 +33,12 @@ import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.TextVadidator;
 import org.xipki.ca.certprofile.xijson.SubjectDirectoryAttributesControl;
 import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
+import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableInt;
 import org.xipki.ca.certprofile.xijson.conf.PolicyConstraints;
 import org.xipki.ca.certprofile.xijson.conf.PolicyMappings;
 import org.xipki.ca.certprofile.xijson.conf.PolicyMappings.PolicyIdMappingType;
-import org.xipki.ca.certprofile.xijson.conf.QcStatements;
-import org.xipki.ca.certprofile.xijson.conf.QcStatements.PdsLocationType;
-import org.xipki.ca.certprofile.xijson.conf.QcStatements.QcEuLimitValueType;
-import org.xipki.ca.certprofile.xijson.conf.QcStatements.QcStatementType;
-import org.xipki.ca.certprofile.xijson.conf.QcStatements.QcStatementValueType;
-import org.xipki.ca.certprofile.xijson.conf.QcStatements.Range2Type;
-import org.xipki.ca.certprofile.xijson.conf.Restriction;
-import org.xipki.ca.certprofile.xijson.conf.TlsFeature;
-import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableInt;
+import org.xipki.ca.certprofile.xijson.conf.*;
+import org.xipki.ca.certprofile.xijson.conf.QcStatements.*;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
@@ -88,6 +46,13 @@ import org.xipki.security.ctlog.CtLog.SignedCertificateTimestampList;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.LogUtil;
 import org.xipki.util.Validity;
+
+import java.io.IOException;
+import java.math.BigInteger;
+import java.util.*;
+
+import static org.xipki.qa.ca.extn.CheckerUtil.*;
+import static org.xipki.util.CollectionUtil.isNotEmpty;
 
 /**
  * Checker for extensions whose name is from O to T.

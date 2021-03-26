@@ -17,17 +17,16 @@
 
 package org.xipki.password;
 
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.Args.positive;
-
-import java.security.GeneralSecurityException;
-
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
+import java.security.GeneralSecurityException;
+
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.Args.positive;
 
 /**
  * Password based encryption utility class.

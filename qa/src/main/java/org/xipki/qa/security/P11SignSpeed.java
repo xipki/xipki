@@ -17,12 +17,7 @@
 
 package org.xipki.qa.security;
 
-import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notNull;
-
-import java.math.BigInteger;
-import java.security.SecureRandom;
-
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,14 +31,13 @@ import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11Slot.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.util.AlgorithmUtil;
-import org.xipki.util.BenchmarkExecutor;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.Hex;
-import org.xipki.util.LogUtil;
-import org.xipki.util.ObjectCreationException;
-import org.xipki.util.StringUtil;
+import org.xipki.util.*;
 
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import java.math.BigInteger;
+import java.security.SecureRandom;
+
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
 
 /**
  * Speed test of PKCS#11 signature creation.

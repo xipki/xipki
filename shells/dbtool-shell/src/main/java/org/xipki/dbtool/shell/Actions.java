@@ -17,11 +17,6 @@
 
 package org.xipki.dbtool.shell;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Properties;
-
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -35,6 +30,11 @@ import org.xipki.password.PasswordResolverException;
 import org.xipki.shell.XiAction;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Properties;
 
 /**
  * Actions of database tool.

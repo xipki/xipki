@@ -17,13 +17,13 @@
 
 package org.xipki.security.pkcs11;
 
-import static org.xipki.util.Args.notNull;
+import org.bouncycastle.crypto.params.RSAKeyParameters;
 
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.interfaces.RSAPublicKey;
 
-import org.bouncycastle.crypto.params.RSAKeyParameters;
+import static org.xipki.util.Args.notNull;
 
 /**
  * {@link RSAKeyParameters} for PKCS#11 token.

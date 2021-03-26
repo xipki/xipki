@@ -17,11 +17,20 @@
 
 package org.xipki.security.pkcs11;
 
-import static org.xipki.util.Args.min;
-import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.StringUtil.concat;
-import static org.xipki.util.StringUtil.toUtf8Bytes;
+import iaik.pkcs.pkcs11.wrapper.Functions;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.security.EdECConstants;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.X509Cert;
+import org.xipki.security.pkcs11.P11ModuleConf.P11MechanismFilter;
+import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.security.util.DSAParameterCache;
+import org.xipki.security.util.KeyUtil;
+import org.xipki.security.util.X509Util;
+import org.xipki.util.Hex;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -36,32 +45,12 @@ import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.DSAParameterSpec;
 import java.security.spec.ECParameterSpec;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xipki.security.EdECConstants;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.X509Cert;
-import org.xipki.security.pkcs11.P11ModuleConf.P11MechanismFilter;
-import org.xipki.security.util.AlgorithmUtil;
-import org.xipki.security.util.DSAParameterCache;
-import org.xipki.security.util.KeyUtil;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.Hex;
-
-import iaik.pkcs.pkcs11.wrapper.Functions;
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import static org.xipki.util.Args.*;
+import static org.xipki.util.StringUtil.concat;
+import static org.xipki.util.StringUtil.toUtf8Bytes;
 
 /**
  * PKCS#11 slot.

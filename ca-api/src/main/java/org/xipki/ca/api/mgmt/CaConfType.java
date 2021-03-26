@@ -17,16 +17,12 @@
 
 package org.xipki.ca.api.mgmt;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.FileOrValue;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
+
+import java.util.*;
 
 /**
  * CA configuration types.

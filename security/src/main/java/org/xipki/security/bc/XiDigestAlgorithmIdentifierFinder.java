@@ -17,18 +17,18 @@
 
 package org.xipki.security.bc;
 
-import static org.xipki.security.HashAlgo.SHAKE128;
-import static org.xipki.security.HashAlgo.SHAKE256;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.DigestAlgorithmIdentifierFinder;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.xipki.security.HashAlgo.SHAKE128;
+import static org.xipki.security.HashAlgo.SHAKE256;
 
 /**
  * Extends the DefaultDigestAlgorithmIdentifierFinder to support SHAKE* digests.

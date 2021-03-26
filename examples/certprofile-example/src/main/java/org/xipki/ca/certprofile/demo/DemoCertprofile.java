@@ -17,10 +17,8 @@
 
 package org.xipki.ca.certprofile.demo;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
@@ -36,8 +34,9 @@ import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
 import org.xipki.util.ConfPairs;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Example Certprofile.

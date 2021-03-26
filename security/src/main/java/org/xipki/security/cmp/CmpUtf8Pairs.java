@@ -17,15 +17,10 @@
 
 package org.xipki.security.cmp;
 
+import java.util.*;
+
 import static org.xipki.util.Args.notBlank;
 import static org.xipki.util.Args.notNull;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Specifies utf8Pairs defined in RFC4211.

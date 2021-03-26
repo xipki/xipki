@@ -17,21 +17,6 @@
 
 package org.xipki.qa.ocsp;
 
-import static org.xipki.util.Args.notEmpty;
-import static org.xipki.util.Args.notNull;
-
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers;
@@ -41,29 +26,25 @@ import org.bouncycastle.asn1.ocsp.ResponderID;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cert.ocsp.BasicOCSPResp;
-import org.bouncycastle.cert.ocsp.CertificateID;
-import org.bouncycastle.cert.ocsp.CertificateStatus;
-import org.bouncycastle.cert.ocsp.OCSPException;
-import org.bouncycastle.cert.ocsp.OCSPResp;
-import org.bouncycastle.cert.ocsp.RevokedStatus;
-import org.bouncycastle.cert.ocsp.SingleResp;
-import org.bouncycastle.cert.ocsp.UnknownStatus;
+import org.bouncycastle.cert.ocsp.*;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.xipki.ocsp.client.OcspResponseException.Unsuccessful;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.qa.ValidationResult;
-import org.xipki.security.CrlReason;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.IssuerHash;
-import org.xipki.security.ObjectIdentifiers;
-import org.xipki.security.SecurityFactory;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.X509Cert;
+import org.xipki.security.*;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.DateUtil;
 import org.xipki.util.TripleState;
+
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.util.*;
+
+import static org.xipki.util.Args.notEmpty;
+import static org.xipki.util.Args.notNull;
 
 /**
  * OCSP QA.

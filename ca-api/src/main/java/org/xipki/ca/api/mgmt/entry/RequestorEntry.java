@@ -17,14 +17,14 @@
 
 package org.xipki.ca.api.mgmt.entry;
 
-import java.security.cert.CertificateException;
-
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
+
+import java.security.cert.CertificateException;
 
 /**
  * Management Entry Requestor.

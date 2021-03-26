@@ -17,12 +17,12 @@
 
 package org.xipki.security.pkcs11;
 
-import static org.xipki.util.Args.notNull;
+import org.xipki.util.Hex;
 
 import java.math.BigInteger;
 import java.util.Arrays;
 
-import org.xipki.util.Hex;
+import static org.xipki.util.Args.notNull;
 
 /**
  * Identifier of a PKCS#11 Object.

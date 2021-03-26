@@ -17,16 +17,11 @@
 
 package org.xipki.shell;
 
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
+
+import java.nio.file.Path;
+import java.util.*;
 
 /**
  * Completers for actions.

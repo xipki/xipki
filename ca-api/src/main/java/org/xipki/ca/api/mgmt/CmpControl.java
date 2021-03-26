@@ -17,25 +17,16 @@
 
 package org.xipki.ca.api.mgmt;
 
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.AlgorithmValidator;
 import org.xipki.security.CollectionAlgorithmValidator;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
-import org.xipki.util.Args;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.InvalidConfException;
-import org.xipki.util.StringUtil;
+import org.xipki.util.*;
+
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 
 /**
  * CMP control.

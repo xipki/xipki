@@ -17,19 +17,6 @@
 
 package org.xipki.litecaclient;
 
-import java.security.InvalidKeyException;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.GCMParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.cmp.PBMParameter;
@@ -60,6 +47,18 @@ import org.bouncycastle.cms.bc.BcPasswordEnvelopedRecipient;
 import org.bouncycastle.jcajce.spec.PBKDF2KeySpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.InvalidKeyException;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * CMP CA Client using PBM MAC to protect the integrity of requests.

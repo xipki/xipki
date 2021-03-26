@@ -17,13 +17,13 @@
 
 package org.xipki.ca.api.mgmt;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.xipki.util.Args;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.StringUtil;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Certificate Transparency Log control.

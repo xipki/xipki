@@ -17,12 +17,6 @@
 
 package org.xipki.scep.example;
 
-import java.io.FileInputStream;
-import java.math.BigInteger;
-import java.security.PrivateKey;
-import java.util.Date;
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
@@ -35,6 +29,12 @@ import org.xipki.scep.client.ScepClient;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.IoUtil;
+
+import java.io.FileInputStream;
+import java.math.BigInteger;
+import java.security.PrivateKey;
+import java.util.Date;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * SCEP client example with concrete test data.

@@ -17,20 +17,6 @@
 
 package org.xipki.security.util;
 
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.Args.range;
-
-import java.io.IOException;
-import java.math.BigInteger;
-import java.security.InvalidKeyException;
-import java.security.PublicKey;
-import java.security.SecureRandom;
-import java.security.interfaces.RSAPrivateCrtKey;
-import java.security.interfaces.RSAPrivateKey;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -59,6 +45,20 @@ import org.xipki.security.bc.XiEdDSAContentVerifierProvider;
 import org.xipki.security.bc.XiRSAContentVerifierProviderBuilder;
 import org.xipki.security.bc.XiXDHContentVerifierProvider;
 import org.xipki.util.Hex;
+
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.InvalidKeyException;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.interfaces.RSAPrivateCrtKey;
+import java.security.interfaces.RSAPrivateKey;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.Args.range;
 
 /**
  * utility class for converting java.security RSA objects into their

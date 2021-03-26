@@ -17,13 +17,13 @@
 
 package org.xipki.password;
 
-import java.io.IOException;
-import java.util.List;
-
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.StringUtil;
 import org.xipki.util.ValidatableConf;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Utility class to initialize {@link PasswordResolver}.

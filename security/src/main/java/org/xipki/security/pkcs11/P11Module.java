@@ -17,16 +17,11 @@
 
 package org.xipki.security.pkcs11;
 
-import static org.xipki.util.Args.notNull;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.xipki.util.CompareUtil;
+
+import java.util.*;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * PKCS#11 module.

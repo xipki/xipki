@@ -17,21 +17,7 @@
 
 package org.xipki.ctlog.dummyserver;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.Signature;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.List;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.alibaba.fastjson.JSON;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Certificate;
@@ -46,7 +32,19 @@ import org.xipki.security.ctlog.CtLog.SignatureAndHashAlgorithm;
 import org.xipki.security.ctlog.CtLogMessages.AddPreChainRequest;
 import org.xipki.security.ctlog.CtLogMessages.AddPreChainResponse;
 
-import com.alibaba.fastjson.JSON;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.Signature;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.List;
 
 /**
  * HTTP servlet of CT Log server.

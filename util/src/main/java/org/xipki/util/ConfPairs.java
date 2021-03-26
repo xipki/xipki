@@ -17,15 +17,10 @@
 
 package org.xipki.util;
 
+import java.util.*;
+
 import static org.xipki.util.Args.notBlank;
 import static org.xipki.util.Args.notNull;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Container of name-value pairs.

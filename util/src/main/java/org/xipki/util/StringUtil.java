@@ -17,18 +17,12 @@
 
 package org.xipki.util;
 
-import static org.xipki.util.Args.notNull;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.*;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * Utility class for String.

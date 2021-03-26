@@ -17,11 +17,11 @@
 
 package org.xipki.util.http;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLSession;
-
 import org.xipki.util.ObjectCreationException;
 import org.xipki.util.StringUtil;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
 
 /**
  * Utility class to create {@link HostnameVerifier}.

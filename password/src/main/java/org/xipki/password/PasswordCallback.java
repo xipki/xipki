@@ -17,17 +17,17 @@
 
 package org.xipki.password;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.util.Args;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * Callback to get password.

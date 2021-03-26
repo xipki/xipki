@@ -17,13 +17,13 @@
 
 package org.xipki.ocsp.api;
 
-import static org.xipki.util.Args.notNull;
-
-import java.util.Date;
-
 import org.bouncycastle.asn1.ocsp.CrlID;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.HashAlgo;
+
+import java.util.Date;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * CertStatus information.

@@ -17,23 +17,14 @@
 
 package org.xipki.security.util;
 
-import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.Args.toNonBlankLower;
-
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.nist.NISTNamedCurves;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.xipki.util.StringUtil;
+
+import java.util.*;
+
+import static org.xipki.util.Args.*;
 
 /**
  * Algorithm utility class.

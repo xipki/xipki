@@ -17,13 +17,13 @@
 
 package org.xipki.ocsp.api;
 
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.security.HashAlgo;
 import org.xipki.util.CompareUtil;
 import org.xipki.util.Hex;
+
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 /**
  * Issuer in the OCSP request.

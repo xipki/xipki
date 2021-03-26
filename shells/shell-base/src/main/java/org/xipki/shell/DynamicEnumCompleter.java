@@ -17,13 +17,13 @@
 
 package org.xipki.shell;
 
-import java.util.List;
-import java.util.Set;
-
 import org.apache.karaf.shell.api.console.CommandLine;
 import org.apache.karaf.shell.api.console.Completer;
 import org.apache.karaf.shell.api.console.Session;
 import org.apache.karaf.shell.support.completers.StringsCompleter;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * Completer with dynamic enums.

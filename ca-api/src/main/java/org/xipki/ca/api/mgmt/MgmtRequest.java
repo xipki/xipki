@@ -17,20 +17,13 @@
 
 package org.xipki.ca.api.mgmt;
 
+import org.xipki.ca.api.mgmt.entry.*;
+import org.xipki.security.CertRevocationInfo;
+import org.xipki.security.CrlReason;
+
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
-
-import org.xipki.ca.api.mgmt.entry.AddUserEntry;
-import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
-import org.xipki.ca.api.mgmt.entry.CaHasUserEntry;
-import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
-import org.xipki.ca.api.mgmt.entry.ChangeCaEntry;
-import org.xipki.ca.api.mgmt.entry.ChangeUserEntry;
-import org.xipki.ca.api.mgmt.entry.PublisherEntry;
-import org.xipki.ca.api.mgmt.entry.RequestorEntry;
-import org.xipki.security.CertRevocationInfo;
-import org.xipki.security.CrlReason;
 
 /**
  * CA Management request via the REST API.

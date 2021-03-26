@@ -18,14 +18,9 @@
 
 package org.xipki.util.concurrent;
 
-import static java.lang.Thread.yield;
-import static java.util.concurrent.TimeUnit.MICROSECONDS;
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
-import static java.util.concurrent.locks.LockSupport.parkNanos;
-import static org.xipki.util.concurrent.ConcurrentBag.IConcurrentBagEntry.STATE_IN_USE;
-import static org.xipki.util.concurrent.ConcurrentBag.IConcurrentBagEntry.STATE_NOT_IN_USE;
-import static org.xipki.util.concurrent.ConcurrentBag.IConcurrentBagEntry.STATE_REMOVED;
-import static org.xipki.util.concurrent.ConcurrentBag.IConcurrentBagEntry.STATE_RESERVED;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.util.concurrent.ConcurrentBag.IConcurrentBagEntry;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -37,9 +32,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xipki.util.concurrent.ConcurrentBag.IConcurrentBagEntry;
+import static java.lang.Thread.yield;
+import static java.util.concurrent.TimeUnit.MICROSECONDS;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
+import static java.util.concurrent.locks.LockSupport.parkNanos;
+import static org.xipki.util.concurrent.ConcurrentBag.IConcurrentBagEntry.*;
 
 /**
  * This is a specialized concurrent bag that achieves superior performance

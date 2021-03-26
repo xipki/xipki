@@ -17,11 +17,7 @@
 
 package org.xipki.cmpclient.shell;
 
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.util.List;
-import java.util.Set;
-
+import com.alibaba.fastjson.JSON;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -36,15 +32,13 @@ import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.XiAction;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.HealthCheckResult;
-import org.xipki.util.IoUtil;
-import org.xipki.util.ObjectCreationException;
-import org.xipki.util.ReqRespDebug;
+import org.xipki.util.*;
 import org.xipki.util.ReqRespDebug.ReqRespPair;
-import org.xipki.util.StringUtil;
 
-import com.alibaba.fastjson.JSON;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
+import java.util.Set;
 
 /**
  * CMP client actions.

@@ -17,12 +17,11 @@
 
 package org.xipki.common.test;
 
-import java.util.Date;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.xipki.util.DateUtil;
 
-import org.junit.Assert;
+import java.util.Date;
 
 /**
  * Test for {@link DateUtil}.

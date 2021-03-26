@@ -17,17 +17,17 @@
 
 package org.xipki.security.asn1;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.ParseException;
-import java.util.Date;
-
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.BERTags;
 import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.DERUTCTime;
 import org.bouncycastle.asn1.x509.Time;
+
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.ParseException;
+import java.util.Date;
 
 /**
  * ASN.1 stream parser.

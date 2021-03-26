@@ -17,8 +17,12 @@
 
 package org.xipki.qa.ca;
 
-import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notNull;
+import com.alibaba.fastjson.JSON;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.ca.api.profile.CertprofileException;
+import org.xipki.util.LogUtil;
+import org.xipki.util.StringUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,13 +35,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.profile.CertprofileException;
-import org.xipki.util.LogUtil;
-import org.xipki.util.StringUtil;
-
-import com.alibaba.fastjson.JSON;
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
 
 /**
  * An implementation of {@link CaQaSystemManager}.

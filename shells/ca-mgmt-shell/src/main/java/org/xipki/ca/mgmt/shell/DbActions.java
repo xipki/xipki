@@ -17,14 +17,6 @@
 
 package org.xipki.ca.mgmt.shell;
 
-import java.io.File;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -38,6 +30,14 @@ import org.xipki.password.PasswordResolver;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.Completers;
 import org.xipki.shell.XiAction;
+
+import java.io.File;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Actions to operate on databases directly.

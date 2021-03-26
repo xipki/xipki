@@ -17,11 +17,6 @@
 
 package org.xipki.qa.shell;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.qa.ca.CaQaSystemManager;
@@ -33,6 +28,11 @@ import org.xipki.shell.DynamicEnumCompleter;
 import org.xipki.shell.EnumCompleter;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.TripleState;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Completers for QA shells.

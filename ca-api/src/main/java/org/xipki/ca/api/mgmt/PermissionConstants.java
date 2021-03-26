@@ -17,13 +17,9 @@
 
 package org.xipki.ca.api.mgmt;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.xipki.util.StringUtil;
+
+import java.util.*;
 
 /**
  * CA permission constants.

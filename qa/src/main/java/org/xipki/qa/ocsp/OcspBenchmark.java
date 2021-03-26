@@ -17,14 +17,9 @@
 
 package org.xipki.qa.ocsp;
 
-import static org.xipki.util.Args.notNull;
-
-import java.io.IOException;
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.concurrent.atomic.AtomicInteger;
-
+import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import org.bouncycastle.cert.ocsp.BasicOCSPResp;
 import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPResp;
@@ -35,9 +30,13 @@ import org.xipki.qa.BenchmarkHttpClient.ResponseHandler;
 import org.xipki.security.X509Cert;
 import org.xipki.util.BenchmarkExecutor;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpResponseStatus;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * OCSP benchmark.

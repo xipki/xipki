@@ -17,11 +17,11 @@
 
 package org.xipki.security.pkcs11;
 
-import static org.xipki.util.Args.notNull;
+import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 
 import java.security.InvalidKeyException;
 
-import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
+import static org.xipki.util.Args.notNull;
 
 /**
  * {@link AsymmetricKeyParameter} for PKCS#11 private key.

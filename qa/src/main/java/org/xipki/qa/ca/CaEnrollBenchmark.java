@@ -17,8 +17,30 @@
 
 package org.xipki.qa.ca;
 
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.Args.positive;
+import com.alibaba.fastjson.JSON;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.handler.codec.http.*;
+import io.netty.handler.ssl.SslContext;
+import org.bouncycastle.asn1.ASN1GeneralizedTime;
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.DERUTF8String;
+import org.bouncycastle.asn1.cmp.*;
+import org.bouncycastle.asn1.crmf.*;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.qa.BenchmarkHttpClient;
+import org.xipki.qa.BenchmarkHttpClient.HttpClientException;
+import org.xipki.qa.BenchmarkHttpClient.ResponseHandler;
+import org.xipki.qa.BenchmarkHttpClient.SslConf;
+import org.xipki.security.util.X509Util;
+import org.xipki.util.BenchmarkExecutor;
+import org.xipki.util.InvalidConfException;
+import org.xipki.util.ValidatableConf;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,54 +57,8 @@ import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.bouncycastle.asn1.ASN1GeneralizedTime;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DERUTF8String;
-import org.bouncycastle.asn1.cmp.CMPObjectIdentifiers;
-import org.bouncycastle.asn1.cmp.CertRepMessage;
-import org.bouncycastle.asn1.cmp.CertResponse;
-import org.bouncycastle.asn1.cmp.ErrorMsgContent;
-import org.bouncycastle.asn1.cmp.InfoTypeAndValue;
-import org.bouncycastle.asn1.cmp.PKIBody;
-import org.bouncycastle.asn1.cmp.PKIHeader;
-import org.bouncycastle.asn1.cmp.PKIHeaderBuilder;
-import org.bouncycastle.asn1.cmp.PKIMessage;
-import org.bouncycastle.asn1.cmp.PKIStatus;
-import org.bouncycastle.asn1.cmp.PKIStatusInfo;
-import org.bouncycastle.asn1.crmf.AttributeTypeAndValue;
-import org.bouncycastle.asn1.crmf.CertReqMessages;
-import org.bouncycastle.asn1.crmf.CertReqMsg;
-import org.bouncycastle.asn1.crmf.CertRequest;
-import org.bouncycastle.asn1.crmf.CertTemplate;
-import org.bouncycastle.asn1.crmf.CertTemplateBuilder;
-import org.bouncycastle.asn1.crmf.ProofOfPossession;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xipki.qa.BenchmarkHttpClient;
-import org.xipki.qa.BenchmarkHttpClient.HttpClientException;
-import org.xipki.qa.BenchmarkHttpClient.ResponseHandler;
-import org.xipki.qa.BenchmarkHttpClient.SslConf;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.BenchmarkExecutor;
-import org.xipki.util.InvalidConfException;
-import org.xipki.util.ValidatableConf;
-
-import com.alibaba.fastjson.JSON;
-
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.handler.codec.http.DefaultFullHttpRequest;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
-import io.netty.handler.ssl.SslContext;
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.Args.positive;
 
 /**
  * CA enrollment benchmark.
