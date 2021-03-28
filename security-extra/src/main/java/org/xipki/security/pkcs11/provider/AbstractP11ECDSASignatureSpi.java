@@ -133,7 +133,7 @@ abstract class AbstractP11ECDSASignatureSpi extends SignatureSpi {
   protected void engineUpdate(byte input)
       throws SignatureException {
     try {
-      outputStream.write((int) input);
+      outputStream.write(input);
     } catch (IOException ex) {
       throw new SignatureException("IOException: " + ex.getMessage(), ex);
     }

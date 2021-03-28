@@ -31,7 +31,7 @@ import java.io.OutputStream;
 
 public class DigestOutputStream extends OutputStream {
 
-  private Digest digest;
+  private final Digest digest;
 
   public DigestOutputStream(Digest digest) {
     this.digest = digest;

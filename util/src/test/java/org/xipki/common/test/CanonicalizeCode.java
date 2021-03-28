@@ -40,7 +40,7 @@ public class CanonicalizeCode {
           Arrays.asList("txt", "xml", "xsd", "cfg", "properties", "script", "jxb", "info"));
 
   private static final Set<String> excludeTextFiles =
-      new HashSet<>(Arrays.asList("draft-gutmann-scep-00.txt"));
+      new HashSet<>(Collections.singletonList("draft-gutmann-scep-00.txt"));
 
   private static Throwable initializationError;
 
@@ -50,7 +50,13 @@ public class CanonicalizeCode {
 
   static {
     try {
-      BufferedReader reader = Files.newBufferedReader(Paths.get("src/test/resources/HEADER.txt"));
+      String path = "src/test/resources/HEADER.txt";
+      File file = new File(path);
+      if (!file.exists()) {
+        file = new File("util/" + path);
+      }
+
+      BufferedReader reader = Files.newBufferedReader(file.toPath());
       String line;
       while ((line = reader.readLine()) != null) {
         headerLines.add(StringUtil.toUtf8Bytes(line));
@@ -93,6 +99,10 @@ public class CanonicalizeCode {
 
   private void canonicalizeDir(File dir, boolean root)
       throws Exception {
+    if (dir.getName().equals(".idea")) {
+      return;
+    }
+
     if (!root) {
       // skip git submodules
       if (new File(dir, ".git").exists()) {
@@ -250,8 +260,6 @@ public class CanonicalizeCode {
             && !file.getName().equals("tbd")) {
           checkWarningsInDir(file, false);
         }
-
-        continue;
       } else {
         String filename = file.getName();
         int idx = filename.lastIndexOf('.');
@@ -274,7 +282,6 @@ public class CanonicalizeCode {
     BufferedReader reader = Files.newBufferedReader(file.toPath());
 
     boolean authorsLineAvailable = false;
-    boolean thirdparty = false;
 
     List<Integer> lineNumbers = new LinkedList<>();
 
@@ -304,7 +311,7 @@ public class CanonicalizeCode {
           + ": lines " + Arrays.toString(lineNumbers.toArray(new Integer[0])));
     }
 
-    if (!authorsLineAvailable && !thirdparty) {
+    if (!authorsLineAvailable) {
       System.out.println("Please check file " + file.getPath().substring(baseDirLen)
           + ": no authors line");
     }

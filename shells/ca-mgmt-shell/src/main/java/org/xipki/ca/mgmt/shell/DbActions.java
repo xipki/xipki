@@ -221,7 +221,7 @@ public class DbActions {
     protected DbPortWorker getDbPortWorker()
         throws Exception {
       return new DbPortWorker.ImportCaDb(datasourceFactory, passwordResolver, dbconfFile, resume,
-          indir, numCertsPerCommit.intValue());
+          indir, numCertsPerCommit);
     }
 
   } // class ImportCa
@@ -248,7 +248,7 @@ public class DbActions {
     protected DbPortWorker getDbPortWorker()
         throws Exception {
       return new DbPortWorker.ImportOcspDb(datasourceFactory, passwordResolver, dbconfFile, resume,
-          indir, numCertsPerCommit.intValue());
+          indir, numCertsPerCommit);
     }
 
   } // class ImportOcsp
@@ -284,7 +284,7 @@ public class DbActions {
     protected DbPortWorker getDbPortWorker()
         throws Exception {
       return new DbPortWorker.ImportOcspFromCaDb(datasourceFactory, passwordResolver, dbconfFile,
-          publisherName, resume, indir, numCertsPerCommit.intValue(), testOnly.booleanValue());
+          publisherName, resume, indir, numCertsPerCommit, testOnly.booleanValue());
     }
 
   } // class ImportOcspfromca

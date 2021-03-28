@@ -57,34 +57,23 @@ public class IssuerInfo {
     if (isEmpty(caIssuerUrls)) {
       this.caIssuerUrls = null;
     } else {
-      Set<String> set = new HashSet<>();
-      set.addAll(caIssuerUrls);
-      this.caIssuerUrls = Collections.unmodifiableSet(set);
+      this.caIssuerUrls = Collections.unmodifiableSet(new HashSet<>(caIssuerUrls));
     }
 
     if (isEmpty(ocspUrls)) {
       this.ocspUrls = null;
     } else {
-      Set<String> set = new HashSet<>();
-      set.addAll(ocspUrls);
-      this.ocspUrls = Collections.unmodifiableSet(set);
+      this.ocspUrls = Collections.unmodifiableSet(new HashSet<>(ocspUrls));
     }
 
     if (isEmpty(crlUrls)) {
       this.crlUrls = null;
     } else {
-      Set<String> set = new HashSet<>();
-      set.addAll(crlUrls);
-      this.crlUrls = Collections.unmodifiableSet(set);
+      this.crlUrls = Collections.unmodifiableSet(new HashSet<>(crlUrls));
     }
 
-    if (isEmpty(deltaCrlUrls)) {
-      this.deltaCrlUrls = null;
-    } else {
-      Set<String> set = new HashSet<>();
-      set.addAll(deltaCrlUrls);
-      this.deltaCrlUrls = Collections.unmodifiableSet(set);
-    }
+    this.deltaCrlUrls = isEmpty(deltaCrlUrls) ? null
+            : Collections.unmodifiableSet(new HashSet<>(deltaCrlUrls));
 
     this.cert = X509Util.parseCert(certBytes);
   } // constructor

@@ -38,7 +38,6 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.jcajce.interfaces.XDHKey;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.security.DHSigStaticKeyCertPair;
-import org.xipki.security.SecurityFactory;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.KeyUtil;
@@ -56,7 +55,7 @@ public class DhpocControl {
 
   private final X509Cert[] certs;
 
-  public DhpocControl(String conf, SecurityFactory securityFactory)
+  public DhpocControl(String conf)
       throws XiSecurityException {
     ConfPairs pairs = new ConfPairs(conf);
     String type = pairs.value("type");

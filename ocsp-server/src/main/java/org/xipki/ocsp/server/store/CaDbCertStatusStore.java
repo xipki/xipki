@@ -17,27 +17,7 @@
 
 package org.xipki.ocsp.server.store;
 
-import static org.xipki.util.Args.notNull;
-
-import java.math.BigInteger;
-import java.security.cert.CertificateException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-
+import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException;
@@ -59,7 +39,18 @@ import org.xipki.util.Base64;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
 
-import com.alibaba.fastjson.JSON;
+import java.math.BigInteger;
+import java.security.cert.CertificateException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.*;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * OcspStore for XiPKI OCSP database.
@@ -99,7 +90,7 @@ public class CaDbCertStatusStore extends OcspStore {
 
   private IssuerFilter issuerFilter;
 
-  private IssuerStore issuerStore = new IssuerStore();
+  private final IssuerStore issuerStore = new IssuerStore();
 
   private HashAlgo certHashAlgo;
 
@@ -108,7 +99,7 @@ public class CaDbCertStatusStore extends OcspStore {
   private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
   protected List<Runnable> getScheduledServices() {
-    return Arrays.asList(storeUpdateService);
+    return Collections.singletonList(storeUpdateService);
   }
 
   private void updateIssuerStore() {
@@ -150,8 +141,7 @@ public class CaDbCertStatusStore extends OcspStore {
 
             // no change in the issuerStore
             Set<Integer> newIds = newIssuers.keySet();
-            Set<Integer> ids = (issuerStore != null)
-                                  ? issuerStore.getIds() : Collections.emptySet();
+            Set<Integer> ids = issuerStore.getIds();
 
             boolean issuersUnchanged = (ids.size() == newIds.size())
                 && ids.containsAll(newIds) && newIds.containsAll(ids);
@@ -253,7 +243,6 @@ public class CaDbCertStatusStore extends OcspStore {
       Date thisUpdate = new Date();
 
       ResultSet rs = null;
-      CertStatusInfo certStatusInfo = null;
 
       boolean unknown = true;
       boolean ignore = false;
@@ -274,7 +263,7 @@ public class CaDbCertStatusStore extends OcspStore {
           unknown = false;
 
           long timeInSec = time.getTime() / 1000;
-          if (!ignore && ignoreNotYetValidCert) {
+          if (ignoreNotYetValidCert) {
             long notBeforeInSec = rs.getLong("NBEFORE");
             if (notBeforeInSec != 0 && timeInSec < notBeforeInSec) {
               ignore = true;
@@ -309,8 +298,9 @@ public class CaDbCertStatusStore extends OcspStore {
         releaseDbResources(ps, rs);
       }
 
-      Date nextUpdate = null;
+      final Date nextUpdate = null;
 
+      CertStatusInfo certStatusInfo;
       if (unknown) {
         certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, nextUpdate);
       } else if (ignore) {
@@ -437,7 +427,7 @@ public class CaDbCertStatusStore extends OcspStore {
    * @param datasource DataSource.
    */
   @Override
-  public void init(Map<String, ? extends Object> sourceConf, DataSourceWrapper datasource)
+  public void init(Map<String, ?> sourceConf, DataSourceWrapper datasource)
       throws OcspStoreException {
     OcspServerConf.CaCerts caCerts = null;
     if (sourceConf != null) {
@@ -516,14 +506,11 @@ public class CaDbCertStatusStore extends OcspStore {
 
   @Override
   public boolean knowsIssuer(RequestIssuer reqIssuer) {
-    return issuerStore != null && null != issuerStore.getIssuerForFp(reqIssuer);
+    return null != issuerStore.getIssuerForFp(reqIssuer);
   }
 
   @Override
   public X509Cert getIssuerCert(RequestIssuer reqIssuer) {
-    if (issuerStore == null) {
-      return null;
-    }
     IssuerEntry issuer = issuerStore.getIssuerForFp(reqIssuer);
     return (issuer == null) ? null : issuer.getCert();
   } // method getIssuerCert

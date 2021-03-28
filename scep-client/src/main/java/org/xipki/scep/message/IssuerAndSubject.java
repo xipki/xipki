@@ -33,9 +33,9 @@ import org.xipki.util.Args;
 
 public class IssuerAndSubject extends ASN1Object {
 
-  private X500Name issuer;
+  private final X500Name issuer;
 
-  private X500Name subject;
+  private final X500Name subject;
 
   private IssuerAndSubject(ASN1Sequence seq) {
     Args.notNull(seq, "seq");

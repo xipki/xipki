@@ -38,7 +38,7 @@ public interface SinglePasswordResolver {
       throws PasswordResolverException;
 
   // CHECKSTYLE:SKIP
-  public static class OBF implements SinglePasswordResolver {
+  class OBF implements SinglePasswordResolver {
 
     public OBF() {
     }
@@ -63,7 +63,7 @@ public interface SinglePasswordResolver {
   } // class OBF
 
   // CHECKSTYLE:SKIP
-  public static class PBE implements SinglePasswordResolver {
+  class PBE implements SinglePasswordResolver {
 
     private char[] masterPassword;
 
@@ -112,19 +112,24 @@ public interface SinglePasswordResolver {
       }
 
       PasswordCallback pwdCallback;
-      if ("FILE".equals(type)) {
-        pwdCallback = new PasswordCallback.File();
-      } else if ("GUI".equals(type)) {
-        pwdCallback = new PasswordCallback.Gui();
-      } else if ("PBE-GUI".equals(type)) {
-        pwdCallback = new PasswordCallback.PBEGui();
-      } else if ("OBF".equals(type)) {
-        pwdCallback = new PasswordCallback.OBF();
-        if (conf != null && !StringUtil.startsWithIgnoreCase(conf, "OBF:")) {
-          conf = StringUtil.concat("OBF:", conf);
-        }
-      } else {
-        throw new IllegalStateException("unknown PasswordCallback type '" + type + "'");
+      switch (type) {
+        case "FILE":
+          pwdCallback = new PasswordCallback.File();
+          break;
+        case "GUI":
+          pwdCallback = new PasswordCallback.Gui();
+          break;
+        case "PBE-GUI":
+          pwdCallback = new PasswordCallback.PBEGui();
+          break;
+        case "OBF":
+          pwdCallback = new PasswordCallback.OBF();
+          if (conf != null && !StringUtil.startsWithIgnoreCase(conf, "OBF:")) {
+            conf = StringUtil.concat("OBF:", conf);
+          }
+          break;
+        default:
+          throw new IllegalStateException("unknown PasswordCallback type '" + type + "'");
       }
 
       try {

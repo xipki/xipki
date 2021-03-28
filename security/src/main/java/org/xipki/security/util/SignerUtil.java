@@ -403,14 +403,19 @@ public class SignerUtil {
     BcContentVerifierProviderBuilder builder = VERIFIER_PROVIDER_BUILDER.get(keyAlg);
 
     if (builder == null) {
-      if ("RSA".equals(keyAlg)) {
-        builder = new XiRSAContentVerifierProviderBuilder();
-      } else if ("DSA".equals(keyAlg)) {
-        builder = new BcDSAContentVerifierProviderBuilder(DIGESTALG_IDENTIFIER_FINDER);
-      } else if ("EC".equals(keyAlg) || "ECDSA".equals(keyAlg)) {
-        builder = new XiECContentVerifierProviderBuilder();
-      } else {
-        throw new InvalidKeyException("unknown key algorithm of the public key " + keyAlg);
+      switch (keyAlg) {
+        case "RSA":
+          builder = new XiRSAContentVerifierProviderBuilder();
+          break;
+        case "DSA":
+          builder = new BcDSAContentVerifierProviderBuilder(DIGESTALG_IDENTIFIER_FINDER);
+          break;
+        case "EC":
+        case "ECDSA":
+          builder = new XiECContentVerifierProviderBuilder();
+          break;
+        default:
+          throw new InvalidKeyException("unknown key algorithm of the public key " + keyAlg);
       }
       VERIFIER_PROVIDER_BUILDER.put(keyAlg, builder);
     }

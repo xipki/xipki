@@ -74,9 +74,9 @@ class IaikP11Slot extends P11Slot {
 
   private List<char[]> password;
 
-  private int maxSessionCount;
+  private final int maxSessionCount;
 
-  private long timeOutWaitNewSession = 10000; // maximal wait for 10 second
+  private final long timeOutWaitNewSession = 10000; // maximal wait for 10 second
 
   private final AtomicLong countSessions = new AtomicLong(0);
 
@@ -141,7 +141,7 @@ class IaikP11Slot extends P11Slot {
       this.maxSessionCount = (int) maxSessionCount2;
       LOG.info("maxSessionCount: {}", this.maxSessionCount);
 
-      sessions.add(new ConcurrentBagEntry<Session>(session));
+      sessions.add(new ConcurrentBagEntry<>(session));
       refresh();
       successful = true;
     } finally {
@@ -214,7 +214,6 @@ class IaikP11Slot extends P11Slot {
         } catch (XiSecurityException ex) {
           LogUtil.error(LOG, ex, "XiSecurityException while initializing private key "
               + "with id " + hex(keyId));
-          continue;
         } catch (Throwable th) {
           String label = "";
           if (privKey.getLabel() != null) {
@@ -222,7 +221,6 @@ class IaikP11Slot extends P11Slot {
           }
           LOG.error("unexpected exception while initializing private key with id "
               + hex(keyId) + " and label " + label, th);
-          continue;
         }
       }
 
@@ -284,7 +282,7 @@ class IaikP11Slot extends P11Slot {
     }
 
     String certLabel = null;
-    java.security.PublicKey pubKey = null;
+    java.security.PublicKey pubKey;
     X509Cert cert = refreshResult.getCertForId(id);
 
     if (cert != null) {
@@ -1117,9 +1115,9 @@ class IaikP11Slot extends P11Slot {
         X509PublicKeyCertificate[] certs =
             getCertificateObjects(session, certId.getId(), certId.getLabelChars());
         if (certs != null && certs.length > 0) {
-          for (int i = 0; i < certs.length; i++) {
+          for (X509PublicKeyCertificate cert : certs) {
             try {
-              session.destroyObject(certs[i]);
+              session.destroyObject(cert);
             } catch (TokenException ex) {
               String msg = "could not delete certificate " + certId;
               LogUtil.error(LOG, ex, msg);

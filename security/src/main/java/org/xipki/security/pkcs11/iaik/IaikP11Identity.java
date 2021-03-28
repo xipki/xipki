@@ -71,7 +71,7 @@ class IaikP11Identity extends P11Identity {
       String algName = publicKey.getAlgorithm();
       if (EdECConstants.ED25519.equalsIgnoreCase(algName)) {
         expectedSignatureLen = 64;
-      } else if (EdECConstants.ED25519.equalsIgnoreCase(algName)) {
+      } else if (EdECConstants.ED448.equalsIgnoreCase(algName)) {
         expectedSignatureLen = 114;
       } else {
         throw new IllegalArgumentException("unknown EdDSA algorithm " + algName);
@@ -95,12 +95,12 @@ class IaikP11Identity extends P11Identity {
     }
 
     Boolean bv = ((SecretKey) signingKey).getExtractable().getBooleanValue();
-    if (bv != null && !bv.booleanValue()) {
+    if (bv != null && !bv) {
       throw new P11TokenException("could not digest unextractable key");
     }
 
     bv = ((SecretKey) signingKey).getNeverExtractable().getBooleanValue();
-    if (bv != null && bv.booleanValue()) {
+    if (bv != null && bv) {
       throw new P11TokenException("could not digest unextractable key");
     }
 

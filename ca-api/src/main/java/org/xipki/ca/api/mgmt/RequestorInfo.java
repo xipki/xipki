@@ -36,16 +36,16 @@ import java.util.Set;
 
 public interface RequestorInfo {
 
-  static final String NAME_BY_USER = "by-user";
+  String NAME_BY_USER = "by-user";
 
-  static final String NAME_BY_CA = "by-ca";
+  String NAME_BY_CA = "by-ca";
 
   /**
    * CA system as the requestor.
    *
    */
 
-  public static class ByCaRequestorInfo implements RequestorInfo {
+  class ByCaRequestorInfo implements RequestorInfo {
 
     private final NameId ident;
 
@@ -89,7 +89,7 @@ public interface RequestorInfo {
    * CMP requestor info.
    *
    */
-  public class CmpRequestorInfo implements RequestorInfo {
+  class CmpRequestorInfo implements RequestorInfo {
 
     private final CaHasRequestorEntry caHasRequestor;
 
@@ -174,7 +174,7 @@ public interface RequestorInfo {
    *
    */
 
-  public static class ByUserRequestorInfo implements RequestorInfo {
+  class ByUserRequestorInfo implements RequestorInfo {
 
     private final NameId ident;
 

@@ -28,6 +28,6 @@ public enum TripleState {
 
   required,
   optional,
-  forbidden;
+  forbidden
 
 }

@@ -103,22 +103,22 @@ public class CertStoreBase extends QueryExecutor {
     this.maxX500nameLen = Integer.parseInt(dbSchemaInfo.variableValue("X500NAME_MAXLEN"));
   } // constructor
 
-  protected static CertRevocationInfo buildCertRevInfo(ResultRow rs) throws OperationException {
-    boolean revoked = getBoolean(rs, "REV");
+  protected static CertRevocationInfo buildCertRevInfo(ResultRow rs) {
+    boolean revoked = rs.getBoolean("REV");
     if (!revoked) {
       return null;
     }
 
-    long revTime    = getLong(rs, "RT");
-    long revInvTime = getLong(rs, "RIT");
+    long revTime    = rs.getLong("RT");
+    long revInvTime = rs.getLong("RIT");
 
     Date invalidityTime = (revInvTime == 0) ? null : new Date(revInvTime * 1000);
-    return new CertRevocationInfo(getInt(rs, "RR"), new Date(revTime * 1000), invalidityTime);
+    return new CertRevocationInfo(rs.getInt("RR"), new Date(revTime * 1000), invalidityTime);
   }
 
   protected long getMax(String table, String column) throws OperationException {
     try {
-      return datasource.getMax(null, "CRL", "ID");
+      return datasource.getMax(null, table, column);
     } catch (DataAccessException ex) {
       throw new OperationException(DATABASE_FAILURE, ex.getMessage());
     }
@@ -217,18 +217,6 @@ public class CertStoreBase extends QueryExecutor {
     } catch (CertificateException ex) {
       throw new OperationException(SYSTEM_FAILURE, ex);
     }
-  }
-
-  protected static boolean getBoolean(ResultRow rs, String label) throws OperationException {
-    return rs.getBoolean(label);
-  }
-
-  protected static int getInt(ResultRow rs, String label) throws OperationException {
-    return rs.getInt(label);
-  }
-
-  protected static long getLong(ResultRow rs, String label) throws OperationException {
-    return rs.getLong(label);
   }
 
 }

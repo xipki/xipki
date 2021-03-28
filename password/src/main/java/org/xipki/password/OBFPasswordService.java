@@ -91,8 +91,8 @@ public class OBFPasswordService {
   } // method deobfuscate
 
   private static boolean startsWithIgnoreCase(String str, String prefix) {
-    return (str.length() < prefix.length()) ? false
-        : prefix.equalsIgnoreCase(str.substring(0, prefix.length()));
+    return str.length() >= prefix.length()
+            && prefix.equalsIgnoreCase(str.substring(0, prefix.length()));
   }
 
 }

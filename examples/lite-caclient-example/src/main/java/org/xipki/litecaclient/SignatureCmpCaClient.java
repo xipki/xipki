@@ -158,14 +158,19 @@ public class SignatureCmpCaClient extends CmpCaClient {
 
     DigestAlgorithmIdentifierFinder digAlgFinder = new DefaultDigestAlgorithmIdentifierFinder();
     BcContentVerifierProviderBuilder builder;
-    if ("RSA".equals(keyAlg)) {
-      builder = new BcRSAContentVerifierProviderBuilder(digAlgFinder);
-    } else if ("DSA".equals(keyAlg)) {
-      builder = new BcDSAContentVerifierProviderBuilder(digAlgFinder);
-    } else if ("EC".equals(keyAlg) || "ECDSA".equals(keyAlg)) {
-      builder = new BcECContentVerifierProviderBuilder(digAlgFinder);
-    } else {
-      throw new InvalidKeyException("unknown key algorithm of the public key " + keyAlg);
+    switch (keyAlg) {
+      case "RSA":
+        builder = new BcRSAContentVerifierProviderBuilder(digAlgFinder);
+        break;
+      case "DSA":
+        builder = new BcDSAContentVerifierProviderBuilder(digAlgFinder);
+        break;
+      case "EC":
+      case "ECDSA":
+        builder = new BcECContentVerifierProviderBuilder(digAlgFinder);
+        break;
+      default:
+        throw new InvalidKeyException("unknown key algorithm of the public key " + keyAlg);
     }
 
     AsymmetricKeyParameter keyParam;
@@ -209,7 +214,7 @@ public class SignatureCmpCaClient extends CmpCaClient {
     RecipientInformation ri = it.next();
 
     ASN1ObjectIdentifier encAlg = ri.getKeyEncryptionAlgorithm().getAlgorithm();
-    Recipient recipient = null;
+    Recipient recipient;
     if (encAlg.equals(CMSAlgorithm.ECDH_SHA1KDF)
         || encAlg.equals(CMSAlgorithm.ECDH_SHA224KDF)
         || encAlg.equals(CMSAlgorithm.ECDH_SHA256KDF)

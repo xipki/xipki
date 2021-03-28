@@ -48,15 +48,15 @@ public class CrlInfo {
 
   public static final String THIS_UPDATE = "this-update";
 
-  private BigInteger crlNumber;
+  private final BigInteger crlNumber;
 
   private BigInteger baseCrlNumber;
 
-  private Date thisUpdate;
+  private final Date thisUpdate;
 
-  private Date nextUpdate;
+  private final Date nextUpdate;
 
-  private CrlID crlId;
+  private final CrlID crlId;
 
   private String encoded;
 
@@ -81,7 +81,7 @@ public class CrlInfo {
     initEncoded();
   } // constructor
 
-  private static final String getNotBlankValue(ConfPairs pairs, String name) {
+  private static String getNotBlankValue(ConfPairs pairs, String name) {
     String str = pairs.value(name);
     if (StringUtil.isBlank(str)) {
       throw new IllegalArgumentException(name + " is not specified");

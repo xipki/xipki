@@ -34,6 +34,7 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPrivateKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.RSAPrivateKey;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
@@ -141,9 +142,7 @@ public class KeypairWithCert {
         cert = certchain[0];
         final int n = certchain.length;
         if (n > 1) {
-          for (int i = 1; i < n; i++) {
-            caCerts.add(certchain[i]);
-          }
+          caCerts.addAll(Arrays.asList(certchain).subList(1, n));
         }
       } else {
         cert = new X509Cert((X509Certificate) keystore.getCertificate(tmpKeyname));

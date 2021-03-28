@@ -88,7 +88,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
 
   private String signerCertFile;
 
-  private SecureRandom random = new SecureRandom();
+  private final SecureRandom random = new SecureRandom();
 
   protected AbstractOcspRequestor() {
   }

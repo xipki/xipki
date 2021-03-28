@@ -53,7 +53,8 @@ public abstract class BaseCertprofile extends Certprofile {
 
   private static final Logger LOG = LoggerFactory.getLogger(BaseCertprofile.class);
 
-  private static LruCache<ASN1ObjectIdentifier, Integer> ecCurveFieldSizes = new LruCache<>(100);
+  private static final LruCache<ASN1ObjectIdentifier, Integer> ecCurveFieldSizes
+          = new LruCache<>(100);
 
   protected BaseCertprofile() {
   }
@@ -136,7 +137,7 @@ public abstract class BaseCertprofile extends Certprofile {
       if (len == 1) {
         RDN rdn;
         if (cvalue != null) {
-          rdn = createSubjectRdn(cvalue, type, control, 0);
+          rdn = createSubjectRdn(cvalue, type, control);
         } else {
           ASN1Encodable rdnValue = thisRdns[0].getFirst().getValue();
           if (ObjectIdentifiers.DN.dateOfBirth.equals(type)) {
@@ -145,7 +146,7 @@ public abstract class BaseCertprofile extends Certprofile {
             rdn = createPostalAddressRdn(type, rdnValue, control, 0);
           } else {
             String value = X509Util.rdnValueToString(rdnValue);
-            rdn = createSubjectRdn(value, type, control, 0);
+            rdn = createSubjectRdn(value, type, control);
           }
         }
 
@@ -169,9 +170,8 @@ public abstract class BaseCertprofile extends Certprofile {
             values[i] = X509Util.rdnValueToString(thisRdns[i].getFirst().getValue());
           }
 
-          int idx = 0;
           for (String value : values) {
-            rdns.add(createSubjectRdn(value, type, control, idx++));
+            rdns.add(createSubjectRdn(value, type, control));
           }
         } // if
       } // if
@@ -338,14 +338,13 @@ public abstract class BaseCertprofile extends Certprofile {
   protected abstract void verifySubjectDnOccurence(X500Name requestedSubject)
       throws BadCertTemplateException;
 
-  protected RDN createSubjectRdn(String text, ASN1ObjectIdentifier type, RdnControl option,
-      int index)
+  protected RDN createSubjectRdn(String text, ASN1ObjectIdentifier type, RdnControl option)
           throws BadCertTemplateException {
     if (ObjectIdentifiers.DN.emailAddress.equals(type)) {
       text = text.toLowerCase();
     }
 
-    ASN1Encodable rdnValue = createRdnValue(text, type, option, index);
+    ASN1Encodable rdnValue = createRdnValue(text, type, option);
     return (rdnValue == null) ? null : new RDN(type, rdnValue);
   } // method createSubjectRdn
 
@@ -432,7 +431,7 @@ public abstract class BaseCertprofile extends Certprofile {
         }
 
         DirectoryString ds = DirectoryString.getInstance(
-            ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx++)).getObject());
+            ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx)).getObject());
         String partyName = ds.getString();
 
         vector = new ASN1EncodableVector();
@@ -500,7 +499,7 @@ public abstract class BaseCertprofile extends Certprofile {
           String.format("postalAddress[%d] has incorrect syntax", i));
       }
 
-      ASN1Encodable asn1Line = createRdnValue(text, type, control, index);
+      ASN1Encodable asn1Line = createRdnValue(text, type, control);
       vec.add(asn1Line);
     }
 
@@ -512,8 +511,7 @@ public abstract class BaseCertprofile extends Certprofile {
     Args.notNull(type, "type");
 
     List<RDN> ret = new ArrayList<>(1);
-    for (int i = 0; i < rdns.length; i++) {
-      RDN rdn = rdns[i];
+    for (RDN rdn : rdns) {
       if (rdn.getFirst().getType().equals(type)) {
         ret.add(rdn);
       }
@@ -523,7 +521,7 @@ public abstract class BaseCertprofile extends Certprofile {
   } // method getRdns
 
   private static ASN1Encodable createRdnValue(String text, ASN1ObjectIdentifier type,
-      RdnControl option, int index)
+      RdnControl option)
           throws BadCertTemplateException {
     String tmpText = text.trim();
 

@@ -47,7 +47,7 @@ import org.xipki.util.StringUtil;
  */
 class CaManagerQueryExecutorBase extends QueryExecutor {
 
-  protected static enum Table {
+  protected enum Table {
     // SMALLINT or INT
     REQUESTOR,
     PUBLISHER,
@@ -55,7 +55,7 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
     TUSER,
     CA,
     // BigInt
-    CA_HAS_USER;
+    CA_HAS_USER
   }
 
   private static final Logger LOG = LoggerFactory.getLogger(QueryExecutor.class);
@@ -236,7 +236,7 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
         ps.setNull(index, Types.INTEGER);
         valText = "null";
       } else {
-        int val = ((Integer) value).intValue();
+        int val = ((Integer) value);
         ps.setInt(index, val);
         valText = Integer.toString(val);
       }
@@ -245,7 +245,7 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
         ps.setNull(index, Types.BIGINT);
         valText = "null";
       } else {
-        long val = ((Long) value).longValue();
+        long val = ((Long) value);
         ps.setLong(index, val);
         valText = Long.toString(val);
       }
@@ -283,7 +283,7 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
   protected int getNonNullIdForName(String sql, String name) throws CaMgmtException {
     Integer id = getIdForName(sql, name);
     if (id != null) {
-      return id.intValue();
+      return id;
     }
 
     throw new CaMgmtException(concat("Found no entry named ",name));

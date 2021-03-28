@@ -67,11 +67,7 @@ public class Range {
     if (min != null && val < min) {
       return false;
     }
-    if (max != null && val > max) {
-      return false;
-    }
-
-    return true;
+    return max == null || val <= max;
   }
 
   public void validate() {

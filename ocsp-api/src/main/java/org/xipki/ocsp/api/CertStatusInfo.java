@@ -34,7 +34,7 @@ import static org.xipki.util.Args.notNull;
 
 public class CertStatusInfo {
 
-  public static enum CertStatus {
+  public enum CertStatus {
     GOOD,
     REVOKED,
     UNKNOWN,
@@ -48,7 +48,7 @@ public class CertStatusInfo {
     good,
     malformedRequest,
     internalError,
-    tryLater;
+    tryLater
   } // class UnknownCertBehaviour
 
   public enum UnknownIssuerBehaviour {
@@ -56,7 +56,7 @@ public class CertStatusInfo {
     malformedRequest,
     internalError,
     unauthorized,
-    tryLater;
+    tryLater
   } // class UnknownIssuerBehaviour
 
   private CertStatus certStatus;

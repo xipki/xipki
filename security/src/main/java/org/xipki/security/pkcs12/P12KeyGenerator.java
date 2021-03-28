@@ -58,9 +58,9 @@ public class P12KeyGenerator {
 
   private static class KeyPairWithSubjectPublicKeyInfo {
 
-    private KeyPair keypair;
+    private final KeyPair keypair;
 
-    private SubjectPublicKeyInfo subjectPublicKeyInfo;
+    private final SubjectPublicKeyInfo subjectPublicKeyInfo;
 
     KeyPairWithSubjectPublicKeyInfo(KeyPair keypair, SubjectPublicKeyInfo subjectPublicKeyInfo)
         throws InvalidKeySpecException {
@@ -96,8 +96,7 @@ public class P12KeyGenerator {
 
   private static final long DAY = 24L * 60 * 60 * 1000;
 
-  public P12KeyGenerator()
-      throws Exception {
+  public P12KeyGenerator() {
   }
 
   // CHECKSTYLE:SKIP
@@ -202,7 +201,7 @@ public class P12KeyGenerator {
       SecureRandom random)
           throws Exception {
     KeyPair kp = KeyUtil.generateDSAKeypair(plength, qlength, random);
-    SubjectPublicKeyInfo spki = KeyUtil.createSubjectPublicKeyInfo((DSAPublicKey) kp.getPublic());
+    SubjectPublicKeyInfo spki = KeyUtil.createSubjectPublicKeyInfo(kp.getPublic());
     return new KeyPairWithSubjectPublicKeyInfo(kp, spki);
   }
 

@@ -26,9 +26,9 @@ package org.xipki.ocsp.api;
 
 public class ResponderAndPath {
 
-  private String servletPath;
+  private final String servletPath;
 
-  private Responder responder;
+  private final Responder responder;
 
   public ResponderAndPath(String servletPath, Responder responder) {
     this.servletPath = servletPath;

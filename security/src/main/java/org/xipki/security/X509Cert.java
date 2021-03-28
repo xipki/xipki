@@ -409,8 +409,7 @@ public class X509Cert {
   }
 
   private void checkBcSignature(PublicKey key, Signature signature)
-      throws CertificateException, NoSuchAlgorithmException,
-          SignatureException, InvalidKeyException {
+      throws CertificateException, SignatureException, InvalidKeyException {
     Certificate c = bcInstance.toASN1Structure();
     if (!c.getSignatureAlgorithm().equals(c.getTBSCertificate().getSignature())) {
       throw new CertificateException("signature algorithm in TBS cert not same as outer cert");
@@ -440,7 +439,7 @@ public class X509Cert {
 
   public boolean hasKeyusage(KeyUsage usage) {
     boolean[] usages = getKeyUsage();
-    return usages == null ? true : usages[usage.getBit()];
+    return usages == null || usages[usage.getBit()];
   }
 
   @Override

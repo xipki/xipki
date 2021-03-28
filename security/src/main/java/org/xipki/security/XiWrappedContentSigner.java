@@ -35,7 +35,7 @@ import org.bouncycastle.operator.ContentSigner;
 public class XiWrappedContentSigner implements XiContentSigner {
 
   private byte[] encodedAlgorithmIdentifier;
-  private ContentSigner signer;
+  private final ContentSigner signer;
 
   public XiWrappedContentSigner(ContentSigner signer, boolean fixedAlgorithmIdentifier)
       throws XiSecurityException {

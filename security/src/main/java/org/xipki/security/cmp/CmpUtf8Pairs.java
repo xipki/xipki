@@ -77,8 +77,7 @@ public class CmpUtf8Pairs {
 
     // parse the token
     int beginIndex = 0;
-    for (int i = 0; i < positions.size(); i++) {
-      int endIndex = positions.get(i);
+    for (int endIndex : positions) {
       String token = encoded.substring(beginIndex, endIndex);
 
       int sepIdx = token.indexOf(NAME_TERM);
@@ -174,11 +173,11 @@ public class CmpUtf8Pairs {
 
   private static String encodeNameOrValue(String str) {
     String tmpStr = str;
-    if (tmpStr.indexOf("%") != -1) {
+    if (tmpStr.contains("%")) {
       tmpStr = tmpStr.replaceAll("%", "%25");
     }
 
-    if (tmpStr.indexOf("?") != -1) {
+    if (tmpStr.contains("?")) {
       tmpStr = tmpStr.replaceAll("\\?", "%3f");
     }
 

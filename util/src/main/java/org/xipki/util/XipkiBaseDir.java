@@ -69,7 +69,7 @@ public class XipkiBaseDir {
   private XipkiBaseDir() {
   }
 
-  public static final String basedir() {
+  public static String basedir() {
     return basedir;
   }
 

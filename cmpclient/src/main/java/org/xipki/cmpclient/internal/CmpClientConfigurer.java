@@ -90,7 +90,7 @@ final class CmpClientConfigurer {
 
     private static final long MINUTE = 60L * 1000;
 
-    private AtomicBoolean inProcess = new AtomicBoolean(false);
+    private final AtomicBoolean inProcess = new AtomicBoolean(false);
 
     private long lastUpdate;
 
@@ -161,7 +161,7 @@ final class CmpClientConfigurer {
 
   private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
-  private AtomicBoolean initialized = new AtomicBoolean(false);
+  private final AtomicBoolean initialized = new AtomicBoolean(false);
 
   CmpClientConfigurer() {
   }
@@ -290,10 +290,7 @@ final class CmpClientConfigurer {
 
       Responder responder;
       if (m.getSignature() != null) {
-        Set<String> algoNames = new HashSet<>();
-        for (String algo : m.getSignature().getSignatureAlgos()) {
-          algoNames.add(algo);
-        }
+        Set<String> algoNames = new HashSet<>(m.getSignature().getSignatureAlgos());
 
         Set<SignAlgo> algos = new HashSet<>();
         for (String algoName : algoNames) {
@@ -389,7 +386,7 @@ final class CmpClientConfigurer {
 
             ca.setCertchain(Arrays.asList(certchain));
           } else {
-            ca.setCertchain(Arrays.asList(caCert));
+            ca.setCertchain(Collections.singletonList(caCert));
           }
         }
 
@@ -419,7 +416,7 @@ final class CmpClientConfigurer {
           ca.setCmpControlAutoconf(false);
           Boolean tmpBo = cmpCtrlType.getRrAkiRequired();
           CaConf.CmpControl control = new CaConf.CmpControl(
-              (tmpBo == null) ? false : tmpBo.booleanValue());
+                  tmpBo != null && tmpBo);
           ca.setCmpControl(control);
         }
 
@@ -632,7 +629,6 @@ final class CmpClientConfigurer {
 
     Set<String> caNamesWithError = new HashSet<>();
 
-    Set<String> errorCaNames = new HashSet<>();
     for (String name : caNames) {
       CaConf ca = casMap.get(name);
 
@@ -653,7 +649,6 @@ final class CmpClientConfigurer {
         LOG.info("retrieved CAInfo for CA " + name);
       } catch (CmpClientException | PkiErrorException | CertificateEncodingException
             | RuntimeException ex) {
-        errorCaNames.add(name);
         caNamesWithError.add(name);
         LogUtil.error(LOG, ex, "could not retrieve CAInfo for CA " + name);
       }

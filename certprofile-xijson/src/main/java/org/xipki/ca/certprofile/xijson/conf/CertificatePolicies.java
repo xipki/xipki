@@ -28,7 +28,6 @@ import org.bouncycastle.asn1.x509.PolicyInformation;
 import org.bouncycastle.asn1.x509.PolicyQualifierId;
 import org.bouncycastle.asn1.x509.PolicyQualifierInfo;
 import org.bouncycastle.asn1.x509.UserNotice;
-import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.certprofile.xijson.CertificatePolicyInformation;
 import org.xipki.ca.certprofile.xijson.CertificatePolicyQualifier;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
@@ -47,7 +46,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 
 public class CertificatePolicies extends ValidatableConf {
 
-  public static enum PolicyQualfierType {
+  public enum PolicyQualfierType {
     cpsUri,
     userNotice
   } // class PolicyQualfierType
@@ -141,8 +140,7 @@ public class CertificatePolicies extends ValidatableConf {
     validate(certificatePolicyInformations);
   }
 
-  public org.bouncycastle.asn1.x509.CertificatePolicies toXiCertificatePolicies()
-      throws CertprofileException {
+  public org.bouncycastle.asn1.x509.CertificatePolicies toXiCertificatePolicies() {
     List<CertificatePolicyInformationType> policyPairs = getCertificatePolicyInformations();
     List<CertificatePolicyInformation> policyInfos = new ArrayList<>(policyPairs.size());
 

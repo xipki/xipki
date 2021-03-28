@@ -94,7 +94,7 @@ public class OcspQa {
     notNull(response, "response");
     notNull(expectedOcspError, "expectedOcspError");
 
-    List<ValidationIssue> resultIssues = new LinkedList<ValidationIssue>();
+    List<ValidationIssue> resultIssues = new LinkedList<>();
 
     int status = response.getStatus();
 
@@ -119,7 +119,7 @@ public class OcspQa {
     notEmpty(expectedOcspStatuses, "expectedOcspStatuses");
     notNull(responseOption, "responseOption");
 
-    List<ValidationIssue> resultIssues = new LinkedList<ValidationIssue>();
+    List<ValidationIssue> resultIssues = new LinkedList<>();
 
     int status = response.getStatus();
 
@@ -487,7 +487,7 @@ public class OcspQa {
     return issue;
   } // method checkOccurrence
 
-  private static final String formatTime(Date date) {
+  private static String formatTime(Date date) {
     return DateUtil.toUtcTimeyyyyMMddhhmmss(date);
   }
 }

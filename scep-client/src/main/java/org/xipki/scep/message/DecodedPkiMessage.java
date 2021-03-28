@@ -75,8 +75,7 @@ public class DecodedPkiMessage extends PkiMessage {
 
   private static final Logger LOG = LoggerFactory.getLogger(DecodedPkiMessage.class);
 
-  private static final Set<ASN1ObjectIdentifier> SCEP_ATTR_TYPES
-      = new HashSet<ASN1ObjectIdentifier>();
+  private static final Set<ASN1ObjectIdentifier> SCEP_ATTR_TYPES = new HashSet<>();
 
   private X509Cert signatureCert;
 
@@ -262,7 +261,7 @@ public class DecodedPkiMessage extends PkiMessage {
     }
 
     PkiStatus pkiStatus = null;
-    FailInfo failInfo = null;
+    FailInfo failInfo;
     if (MessageType.CertRep == messageType) {
       // pkiStatus
       try {

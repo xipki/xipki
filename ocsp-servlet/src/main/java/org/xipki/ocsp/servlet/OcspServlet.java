@@ -17,17 +17,6 @@
 
 package org.xipki.ocsp.servlet;
 
-import static org.xipki.util.Args.notNull;
-
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ocsp.api.OcspRespWithCacheInfo;
@@ -35,13 +24,16 @@ import org.xipki.ocsp.api.OcspServer;
 import org.xipki.ocsp.api.Responder;
 import org.xipki.ocsp.api.ResponderAndPath;
 import org.xipki.security.HashAlgo;
-import org.xipki.util.Base64;
-import org.xipki.util.Base64Url;
-import org.xipki.util.Hex;
-import org.xipki.util.HttpConstants;
-import org.xipki.util.IoUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.StringUtil;
+import org.xipki.util.*;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.EOFException;
+import java.io.IOException;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * HTTP servlet of the OCSP responder.
@@ -104,6 +96,7 @@ public class OcspServlet extends HttpServlet {
       if (ocspRespWithCacheInfo == null || ocspRespWithCacheInfo.getResponse() == null) {
         LOG.error("processRequest returned null, this should not happen");
         sendError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        return;
       }
 
       byte[] encodedOcspResp = ocspRespWithCacheInfo.getResponse();
@@ -211,7 +204,7 @@ public class OcspServlet extends HttpServlet {
         Long nextUpdate = cacheInfo.getNextUpdate();
 
         if (nextUpdate != null) {
-          resp.addDateHeader("Expires", nextUpdate.longValue());
+          resp.addDateHeader("Expires", nextUpdate);
         }
         // RFC 5019 6.2: This profile RECOMMENDS that the ETag value be the ASCII
         // HEX representation of the SHA1 hash of the OCSPResponse structure.
@@ -221,14 +214,14 @@ public class OcspServlet extends HttpServlet {
         // Max age must be in seconds in the cache-control header
         long maxAge;
         if (responder.getCacheMaxAge() != null) {
-          maxAge = responder.getCacheMaxAge().longValue();
+          maxAge = responder.getCacheMaxAge();
         } else {
           maxAge = DFLT_CACHE_MAX_AGE;
         }
 
-        if (cacheInfo.getNextUpdate() != null) {
+        if (nextUpdate != null) {
           maxAge = Math.min(maxAge,
-              (nextUpdate.longValue() - cacheInfo.getGeneratedAt()) / 1000);
+              (nextUpdate - cacheInfo.getGeneratedAt()) / 1000);
         }
 
         resp.addHeader("Cache-Control",
@@ -257,8 +250,7 @@ public class OcspServlet extends HttpServlet {
     resp.setContentLength(0);
   }
 
-  private static byte[] base64Decode(byte[] b64OcspReqBytes)
-      throws UnsupportedEncodingException {
+  private static byte[] base64Decode(byte[] b64OcspReqBytes) {
     final int len = b64OcspReqBytes.length;
     if (Base64.containsOnlyBase64Chars(b64OcspReqBytes, 0, len)) {
       // Base64 encoded, no URL decoding is required

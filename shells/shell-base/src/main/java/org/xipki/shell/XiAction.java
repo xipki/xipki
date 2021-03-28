@@ -60,7 +60,7 @@ public abstract class XiAction implements Action {
   }
 
   protected boolean isTrue(Boolean bo) {
-    return bo != null && bo.booleanValue();
+    return bo != null && bo;
   }
 
   protected ConfPairs embedFileContent(ConfPairs confPairs)
@@ -141,14 +141,15 @@ public abstract class XiAction implements Action {
       }
     } // end if(saveTo.exists())
 
-    int retries = 2;
+    int tries = 2;
     while (true) {
       try {
+        tries--;
         save(saveTo, encoded);
         break;
       } catch (IOException ex) {
         println("ERROR: " + ex.getMessage());
-        if (retries > 0) {
+        if (tries > 0) {
           String newFn;
           while (true) {
             newFn = readPrompt("Enter new path to save to ... ");
@@ -157,7 +158,7 @@ public abstract class XiAction implements Action {
             }
           }
           saveTo = new File(newFn);
-        } else if (retries == 0) {
+        } else if (tries == 0) {
           // save it to tmp file
           saveTo = new File("tmp-" + randomHex(6));
         } else {

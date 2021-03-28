@@ -845,12 +845,12 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   @Override
   public Set<String> getCertprofilesForCa(String caName) {
-    return caHasProfiles.get(caName = toNonBlankLower(caName, "caName"));
+    return caHasProfiles.get(toNonBlankLower(caName, "caName"));
   }
 
   @Override
   public Set<CaHasRequestorEntry> getRequestorsForCa(String caName) {
-    return caHasRequestors.get(caName = toNonBlankLower(caName, "caName"));
+    return caHasRequestors.get(toNonBlankLower(caName, "caName"));
   }
 
   @Override
@@ -1201,7 +1201,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   public ScepResponder getScepResponder(String name) {
     name = toNonBlankLower(name, "name");
-    return (scepResponders == null) ? null : scepResponders.get(name);
+    return scepResponders.get(name);
   }
 
   @Override

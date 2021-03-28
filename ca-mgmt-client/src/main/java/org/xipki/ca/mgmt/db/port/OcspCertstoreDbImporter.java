@@ -20,7 +20,7 @@ package org.xipki.ca.mgmt.db.port;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.cert.CertificateException;
@@ -162,9 +162,9 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
           ps.setString(idx++, issuer.getRevInfo());
           ps.setString(idx++, b64Cert);
           if (issuer.getCrlId() == null) {
-            ps.setNull(idx++, Types.INTEGER);
+            ps.setNull(idx, Types.INTEGER);
           } else {
-            ps.setInt(idx++, issuer.getCrlId());
+            ps.setInt(idx, issuer.getCrlId());
           }
 
           ps.execute();
@@ -183,7 +183,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
   }
 
   private void importCrlInfo(List<OcspCertstore.CrlInfo> crlInfos)
-      throws DataAccessException, CertificateException, IOException {
+      throws DataAccessException {
     if (CollectionUtil.isEmpty(crlInfos)) {
       return;
     }
@@ -197,7 +197,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
           int idx = 1;
           ps.setInt(idx++, crlInfo.getId());
           ps.setString(idx++, crlInfo.getName());
-          ps.setString(idx++, crlInfo.getInfo());
+          ps.setString(idx, crlInfo.getInfo());
           ps.execute();
         } catch (SQLException ex) {
           System.err.println("could not import CRL_INFO with id=" + crlInfo.getId());
@@ -241,12 +241,11 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
 
     OcspDbEntryType type = OcspDbEntryType.CERT;
 
-    DbPortFileNameIterator certsFileIterator = new DbPortFileNameIterator(
-        baseDir + File.separator + type.getDirName() + ".mf");
-    try {
+    try (DbPortFileNameIterator certsFileIterator = new DbPortFileNameIterator(
+            baseDir + File.separator + type.getDirName() + ".mf")) {
       while (certsFileIterator.hasNext()) {
         String certsFile = baseDir + File.separator + type.getDirName() + File.separator
-            + certsFileIterator.next();
+                + certsFileIterator.next();
 
         // extract the toId from the filename
         int fromIdx = certsFile.indexOf('-');
@@ -267,18 +266,17 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
 
         try {
           long lastId = importCert0(psCert, certsFile, minId, processLogFile, processLog,
-              numProcessedBefore);
+                  numProcessedBefore);
           minId = lastId + 1;
         } catch (Exception ex) {
           System.err.println("\ncould not import certificates from file " + certsFile
-              + ".\nplease continue with the option '--resume'");
+                  + ".\nplease continue with the option '--resume'");
           LOG.error("Exception", ex);
           throw ex;
         }
       } // end for
     } finally {
       releaseResources(psCert, null);
-      certsFileIterator.close();
     }
 
     processLog.printTrailer();
@@ -294,7 +292,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
 
     OcspCertstore.Certs certs;
     try {
-      certs = JSON.parseObject(zipFile.getInputStream(certsEntry), Charset.forName("UTF-8"),
+      certs = JSON.parseObject(zipFile.getInputStream(certsEntry), StandardCharsets.UTF_8,
                 OcspCertstore.Certs.class);
     } catch (Exception ex) {
       try {
@@ -338,16 +336,16 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
           psCert.setLong(idx++, cert.getUpdate());
           psCert.setLong(idx++, cert.getNbefore());
           psCert.setLong(idx++, cert.getNafter());
-          setBoolean(psCert, idx++, cert.getRev().booleanValue());
+          setBoolean(psCert, idx++, cert.getRev());
           setInt(psCert, idx++, cert.getRr());
           setLong(psCert, idx++, cert.getRt());
           setLong(psCert, idx++, cert.getRit());
           psCert.setString(idx++, cert.getHash());
           psCert.setString(idx++, cert.getSubject());
           if (cert.getCrlId() == null) {
-            psCert.setNull(idx++, Types.INTEGER);
+            psCert.setNull(idx, Types.INTEGER);
           } else {
-            psCert.setInt(idx++, cert.getCrlId().intValue());
+            psCert.setInt(idx, cert.getCrlId());
           }
           psCert.addBatch();
         } catch (SQLException ex) {

@@ -53,7 +53,7 @@ public class CaCaps {
 
   public CaCaps(Set<CaCapability> capabilities) {
     this.capabilities = CollectionUtil.isEmpty(capabilities)
-        ? new HashSet<CaCapability>() : new HashSet<>(capabilities);
+        ? new HashSet<>() : new HashSet<>(capabilities);
     refresh();
   }
 
@@ -63,9 +63,7 @@ public class CaCaps {
 
   public void addCapabilities(CaCapability... caps) {
     Args.notNull(caps, "caps");
-    for (CaCapability m : caps) {
-      capabilities.add(m);
-    }
+    Collections.addAll(capabilities, caps);
     refresh();
   }
 

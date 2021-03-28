@@ -214,7 +214,7 @@ public class XijsonCertprofile extends BaseCertprofile {
       this.signatureAlgorithms = Collections.unmodifiableList(list);
     }
 
-    this.raOnly = conf.getRaOnly() == null ? false : conf.getRaOnly();
+    this.raOnly = conf.getRaOnly() != null && conf.getRaOnly();
     this.maxSize = conf.getMaxSize();
 
     this.validity = Validity.getInstance(conf.getValidity());
@@ -272,11 +272,11 @@ public class XijsonCertprofile extends BaseCertprofile {
       int seperatorIdx = str.indexOf(':');
       String timezoneId = (seperatorIdx == -1)
           ? "GMT+0" : str.substring(seperatorIdx + 1).toUpperCase();
-      final List<String> validIds = Arrays.asList(new String[]{
+      final List<String> validIds = Arrays.asList(
           "GMT+0", "GMT+1", "GMT+2", "GMT+3", "GMT+4", "GMT+5",
           "GMT+6", "GMT+7", "GMT+8", "GMT+9", "GMT+10", "GMT+11", "GMT+12",
           "GMT-0", "GMT-1", "GMT-2", "GMT-3", "GMT-4", "GMT-5",
-          "GMT-6", "GMT-7", "GMT-8", "GMT-9", "GMT-10", "GMT-11", "GMT-12"});
+          "GMT-6", "GMT-7", "GMT-8", "GMT-9", "GMT-10", "GMT-11", "GMT-12");
 
       if (!validIds.contains(timezoneId)) {
         throw new CertprofileException("invalid time zone id " + timezoneId);
@@ -352,7 +352,7 @@ public class XijsonCertprofile extends BaseCertprofile {
       rdnControl.setSuffix(rdn.getSuffix());
       rdnControl.setGroup(rdn.getGroup());
       if (rdn.getNotInSubject() != null) {
-        rdnControl.setNotInSubject(rdn.getNotInSubject().booleanValue());
+        rdnControl.setNotInSubject(rdn.getNotInSubject());
       }
       fixRdnControl(rdnControl);
     }
@@ -518,9 +518,8 @@ public class XijsonCertprofile extends BaseCertprofile {
 
       Vector<?> reqSubDirAttrs = SubjectDirectoryAttributes.getInstance(
           extension.getParsedValue()).getAttributes();
-      final int n = reqSubDirAttrs.size();
-      for (int i = 0; i < n; i++) {
-        Attribute attr = (Attribute) reqSubDirAttrs.get(i);
+      for (Object reqSubDirAttr : reqSubDirAttrs) {
+        Attribute attr = (Attribute) reqSubDirAttr;
         ASN1ObjectIdentifier attrType = attr.getAttrType();
         ASN1Encodable attrVal = attr.getAttributeValues()[0];
 
@@ -668,10 +667,12 @@ public class XijsonCertprofile extends BaseCertprofile {
     }
 
     AdmissionSyntaxOption admission = extensions.getAdmission();
-    if (occurences.contains(type) && admission != null
-        && (((admission.isInputFromRequestRequired()) && admissionRdns != null)
-            || !admission.isInputFromRequestRequired())) {
+    if (occurences.contains(type) && admission != null) {
       if (admission.isInputFromRequestRequired()) {
+        if (admissionRdns == null) {
+          throw new BadCertTemplateException(
+                  "admission required in the request but not present");
+        }
         List<List<String>> reqRegNumsList = new LinkedList<>();
         for (RDN m : admissionRdns) {
           String str = X509Util.rdnValueToString(m.getFirst().getValue());
@@ -751,7 +752,7 @@ public class XijsonCertprofile extends BaseCertprofile {
       if (qcStatments != null) {
         values.addExtension(type, qcStatments);
         occurences.remove(type);
-      } else if (requestedExtensions != null && qcStatementsOption != null) {
+      } else if (requestedExtensions != null) {
         // extract the data from request
         extension = requestedExtensions.get(type);
         if (extension == null) {
@@ -924,7 +925,7 @@ public class XijsonCertprofile extends BaseCertprofile {
       int tag = -1;
       String extnStr = null;
 
-      extension = requestedExtensions.get(type);
+      extension = requestedExtensions == null ? null : requestedExtensions.get(type);
       if (extension != null) {
         // extract from extension
         ASN1Encodable reqExtnValue = extension.getParsedValue();
@@ -944,17 +945,15 @@ public class XijsonCertprofile extends BaseCertprofile {
           }
         }
       } else {
-        String str = null;
         // extract from the subject
         RDN[] rdns = requestedSubject.getRDNs(type);
         if (rdns != null && rdns.length > 0) {
-          str = X509Util.rdnValueToString(rdns[0].getFirst().getValue());
-        }
-
-        // [tag]value where tag is only one digit 0, 1 or 2
-        if (str.length() > 3 && str.charAt(0) == '[' && str.charAt(2) == ']') {
-          tag = Integer.parseInt(str.substring(1, 2));
-          extnStr = str.substring(3);
+          String str = X509Util.rdnValueToString(rdns[0].getFirst().getValue());
+          // [tag]value where tag is only one digit 0, 1 or 2
+          if (str.length() > 3 && str.charAt(0) == '[' && str.charAt(2) == ']') {
+            tag = Integer.parseInt(str.substring(1, 2));
+            extnStr = str.substring(3);
+          }
         }
       }
 
@@ -989,7 +988,7 @@ public class XijsonCertprofile extends BaseCertprofile {
       if (occurences.contains(m)) {
         String extnStr = null;
 
-        extension = requestedExtensions.get(m);
+        extension = requestedExtensions == null ? null : requestedExtensions.get(m);
         if (extension != null) {
           // extract from the extension
           extnStr = ((ASN1String) extension.getParsedValue()).getString();

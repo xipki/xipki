@@ -53,7 +53,7 @@ public class TlsExtensionType implements Comparable<TlsExtensionType> {
 
   @Override
   public int compareTo(TlsExtensionType obj) {
-    return Integer.valueOf(code).compareTo(obj.code);
+    return Integer.compare(code, obj.code);
   }
 
 }

@@ -65,13 +65,13 @@ abstract class Responder {
 
       this.owfAlgos = new ArrayList<>(owfs.size());
 
-      for (int i = 0; i < owfs.size(); i++) {
-        owfAlgos.add(HashAlgo.getInstance(owfs.get(i)));
+      for (String owf : owfs) {
+        owfAlgos.add(HashAlgo.getInstance(owf));
       }
 
       this.macAlgos = new ArrayList<>(macs.size());
-      for (int i = 0; i < macs.size(); i++) {
-        macAlgos.add(SignAlgo.getInstance(macs.get(i)));
+      for (String mac : macs) {
+        macAlgos.add(SignAlgo.getInstance(mac));
       }
 
     }

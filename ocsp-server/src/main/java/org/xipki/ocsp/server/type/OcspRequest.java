@@ -17,22 +17,20 @@
 
 package org.xipki.ocsp.server.type;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ocsp.OCSPRequest;
 import org.bouncycastle.asn1.ocsp.Request;
 import org.bouncycastle.asn1.ocsp.TBSRequest;
 import org.xipki.ocsp.api.RequestIssuer;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * OCSP request.
@@ -172,17 +170,10 @@ public class OcspRequest {
 
   public static OcspRequest getInstance(OCSPRequest req)
       throws EncodingException {
-    TBSRequest tbsReq0 = req.getTbsRequest();
+    TBSRequest tbsReq = req.getTbsRequest();
 
-    org.bouncycastle.asn1.x509.Extensions extensions0 = tbsReq0.getRequestExtensions();
-    Set<String> criticalExtensionOids = new HashSet<>();
-    if (extensions0 != null) {
-      for (ASN1ObjectIdentifier oid : extensions0.getCriticalExtensionOIDs()) {
-        criticalExtensionOids.add(oid.getId());
-      }
-    }
-
-    ASN1Sequence requestList0 = tbsReq0.getRequestList();
+    org.bouncycastle.asn1.x509.Extensions extensions0 = tbsReq.getRequestExtensions();
+    ASN1Sequence requestList0 = tbsReq.getRequestList();
 
     final int n = requestList0.size();
     List<CertID> requestList = new ArrayList<>(n);
@@ -218,7 +209,7 @@ public class OcspRequest {
       }
     }
 
-    return new OcspRequest(tbsReq0.getVersion().getValue().intValue(), requestList, extensions);
+    return new OcspRequest(tbsReq.getVersion().getValue().intValue(), requestList, extensions);
   } // method getInstance
 
   public static int readRequestVersion(byte[] request)

@@ -55,7 +55,7 @@ class HashCalculator {
   private static ConcurrentBag<ConcurrentBagEntry<Digest>> getMessageDigests(HashAlgo hashAlgo) {
     ConcurrentBag<ConcurrentBagEntry<Digest>> mds = new ConcurrentBag<>();
     for (int i = 0; i < PARALLELISM; i++) {
-      mds.add(new ConcurrentBagEntry<Digest>(hashAlgo.createDigest()));
+      mds.add(new ConcurrentBagEntry<>(hashAlgo.createDigest()));
     }
     return mds;
   }

@@ -66,7 +66,7 @@ public class DbToolBase implements Closeable {
 
   protected Connection connection;
 
-  private boolean connectionAutoCommit;
+  private final boolean connectionAutoCommit;
 
   public DbToolBase(DataSourceWrapper datasource, String baseDir, AtomicBoolean stopMe)
       throws DataAccessException {
@@ -218,7 +218,7 @@ public class DbToolBase implements Closeable {
   protected static void setLong(PreparedStatement ps, int index, Long value)
       throws SQLException {
     if (value != null) {
-      ps.setLong(index, value.longValue());
+      ps.setLong(index, value);
     } else {
       ps.setNull(index, Types.BIGINT);
     }
@@ -227,7 +227,7 @@ public class DbToolBase implements Closeable {
   protected static void setInt(PreparedStatement ps, int index, Integer value)
       throws SQLException {
     if (value != null) {
-      ps.setInt(index, value.intValue());
+      ps.setInt(index, value);
     } else {
       ps.setNull(index, Types.INTEGER);
     }

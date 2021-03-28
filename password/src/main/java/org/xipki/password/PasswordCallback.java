@@ -62,7 +62,7 @@ public interface PasswordCallback {
   char[] getPassword(String prompt, String testToken)
       throws PasswordResolverException;
 
-  public static class File implements PasswordCallback {
+  class File implements PasswordCallback {
 
     private static final Logger LOG = LoggerFactory.getLogger(File.class);
 
@@ -127,7 +127,7 @@ public interface PasswordCallback {
 
   }
 
-  public static class Gui implements PasswordCallback {
+  class Gui implements PasswordCallback {
 
     private int quorum = 1;
 
@@ -182,7 +182,7 @@ public interface PasswordCallback {
 
       ConfPairs pairs = new ConfPairs(conf);
       String str = pairs.value("quorum");
-      quorum = Integer.valueOf(str);
+      quorum = Integer.parseInt(str);
       if (quorum < 1 || quorum > 10) {
         throw new PasswordResolverException("quorum " + quorum + " is not in [1,10]");
       }
@@ -199,7 +199,7 @@ public interface PasswordCallback {
   }
 
   // CHECKSTYLE:SKIP
-  public static class OBF implements PasswordCallback {
+  class OBF implements PasswordCallback {
 
     private char[] password;
 
@@ -223,7 +223,7 @@ public interface PasswordCallback {
   }
 
   // CHECKSTYLE:SKIP
-  public static class PBEGui extends Gui {
+  class PBEGui extends Gui {
 
     @Override
     protected boolean isPasswordValid(char[] password, String testToken) {

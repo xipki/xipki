@@ -116,7 +116,7 @@ public class CertActions {
         throw new CmdFailure("CA " + caName + " not available");
       }
 
-      X509CRLHolder crl = null;
+      X509CRLHolder crl;
       try {
         crl = retrieveCrl();
       } catch (Exception ex) {

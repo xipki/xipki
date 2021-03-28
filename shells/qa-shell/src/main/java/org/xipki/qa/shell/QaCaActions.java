@@ -53,13 +53,11 @@ import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.XiAction;
 import org.xipki.util.*;
+import org.xipki.util.Base64;
 
 import java.io.File;
 import java.rmi.UnexpectedException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Actions of QA for CA.
@@ -791,7 +789,7 @@ public class QaCaActions {
       tmpEx = null;
     }
 
-    boolean bo = (tmpEx == null) ? (is == null) : tmpEx.equals(is);
+    boolean bo = Objects.equals(tmpEx, is);
     if (!bo) {
       throw new CmdFailure(desc + ": is '" + is + "', but expected '" + tmpEx + "'");
     }
@@ -799,7 +797,7 @@ public class QaCaActions {
 
   private static void assertObjEquals(String desc, Object ex, Object is)
       throws CmdFailure {
-    boolean bo = (ex == null) ? (is == null) : ex.equals(is);
+    boolean bo = Objects.equals(ex, is);
     if (!bo) {
       throw new CmdFailure(desc + ": is '" + is + "', but expected '" + ex + "'");
     }

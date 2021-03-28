@@ -106,7 +106,7 @@ public class NameConstraints extends ValidatableConf {
       throws CertprofileException {
     Args.notNull(type, "type");
     GeneralSubtreeType.Base baseType = type.getBase();
-    GeneralName base = null;
+    GeneralName base;
     if (baseType.getDirectoryName() != null) {
       base = new GeneralName(X509Util.reverse(new X500Name(baseType.getDirectoryName())));
     } else if (baseType.getDnsName() != null) {
@@ -126,13 +126,13 @@ public class NameConstraints extends ValidatableConf {
     if (min != null && min < 0) {
       throw new CertprofileException("negative minimum is not allowed: " + min);
     }
-    BigInteger minimum = (min == null) ? null : BigInteger.valueOf(min.intValue());
+    BigInteger minimum = (min == null) ? null : BigInteger.valueOf(min);
 
     Integer max = type.getMaximum();
     if (max != null && max < 0) {
       throw new CertprofileException("negative maximum is not allowed: " + max);
     }
-    BigInteger maximum = (max == null) ? null : BigInteger.valueOf(max.intValue());
+    BigInteger maximum = (max == null) ? null : BigInteger.valueOf(max);
 
     return new GeneralSubtree(base, minimum, maximum);
   } // method buildGeneralSubtree

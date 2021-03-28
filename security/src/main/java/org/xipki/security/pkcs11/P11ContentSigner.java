@@ -66,7 +66,7 @@ abstract class P11ContentSigner implements XiContentSigner {
 
   P11ContentSigner(P11CryptService cryptService, P11IdentityId identityId,
       SignAlgo signAlgo)
-      throws XiSecurityException, P11TokenException {
+      throws XiSecurityException {
     this.identityId = notNull(identityId, "identityId");
     this.cryptService = notNull(cryptService, "cryptService");
     this.signAlgo = notNull(signAlgo, "signAlgo");
@@ -90,7 +90,7 @@ abstract class P11ContentSigner implements XiContentSigner {
   // CHECKSTYLE:SKIP
   private static class SignerOutputStream extends OutputStream {
 
-    private Signer pssSigner;
+    private final Signer pssSigner;
 
     SignerOutputStream(Signer pssSigner) {
       this.pssSigner = pssSigner;

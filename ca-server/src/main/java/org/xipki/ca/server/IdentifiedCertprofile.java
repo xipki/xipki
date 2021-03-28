@@ -548,7 +548,7 @@ public class IdentifiedCertprofile implements Closeable {
     for (ASN1ObjectIdentifier type : extTypes) {
       extControl = controls.get(type);
       ExtensionValue value = subvalues.getExtensionValue(type);
-      if (value == null && requestedExtns != null && extControl.isRequest()) {
+      if (value == null && extControl.isRequest()) {
         Extension reqExt = requestedExtns.get(type);
         if (reqExt != null) {
           value = new ExtensionValue(extControl.isCritical(), reqExt.getParsedValue());
@@ -579,7 +579,7 @@ public class IdentifiedCertprofile implements Closeable {
         && getCertLevel() == CertLevel.EndEntity) {
       // Make sure that the commonName included in SubjectAltName
       String commonName = X509Util.getCommonName(grantedSubject);
-      boolean commonNameInSan = commonName == null ? true : false;
+      boolean commonNameInSan = commonName == null;
 
       // No private IP address is permitted
       GeneralName[] genNames = GeneralNames.getInstance(

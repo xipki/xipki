@@ -36,12 +36,14 @@ import org.xipki.ca.certprofile.xijson.conf.CertificatePolicies;
 import org.xipki.ca.certprofile.xijson.conf.CertificatePolicies.CertificatePolicyInformationType;
 import org.xipki.ca.certprofile.xijson.conf.CertificatePolicies.PolicyQualifier;
 import org.xipki.qa.ca.IssuerInfo;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 import static org.xipki.qa.ca.extn.CheckerUtil.*;
@@ -280,26 +282,25 @@ class A2gChecker extends ExtensionChecker {
         addViolation(failureMsg, "biometricData[" + i + "].typeOfBiometricData", isStr, expStr);
       }
 
-      ASN1ObjectIdentifier is = isData.getHashAlgorithm().getAlgorithm();
-      ASN1ObjectIdentifier exp = expData.getHashAlgorithm().getAlgorithm();
-      if (!is.equals(exp)) {
-        addViolation(failureMsg, "biometricData[" + i + "].hashAlgorithm", is.getId(), exp.getId());
+      HashAlgo hashAlgo;
+      try {
+        hashAlgo = HashAlgo.getInstance(expData.getHashAlgorithm());
+      } catch (NoSuchAlgorithmException e) {
+        hashAlgo = null;
+        failureMsg.append("biometricData[").append(i)
+                .append("].biometricDataHash of the request has incorrect syntax; ");
       }
 
-      ASN1Encodable isHashAlgoParam = isData.getHashAlgorithm().getParameters();
-      if (isHashAlgoParam == null) {
-        failureMsg.append("biometricData[").append(i)
-          .append("].hashAlgorithm.parameters is 'present' but expected 'absent'; ");
-      } else {
-        try {
-          byte[] isBytes = isHashAlgoParam.toASN1Primitive().getEncoded();
-          if (!Arrays.equals(isBytes, DER_NULL)) {
-            addViolation(failureMsg, "biometricData[" + i + "].biometricDataHash.parameters",
-                hex(isBytes), hex(DER_NULL));
+      if (hashAlgo != null) {
+        if(!hashAlgo.getAlgorithmIdentifier().equals(isData.getHashAlgorithm())) {
+          try {
+            addViolation(failureMsg, "biometricData[" + i + "].hashAlgorithm",
+                    Hex.encode(isData.getHashAlgorithm().getEncoded()),
+                    Hex.encode(hashAlgo.getAlgorithmIdentifier().getEncoded()));
+          } catch (Exception ex) {
+            failureMsg.append("biometricData[").append(i)
+                    .append("].biometricDataHash: could not encode; ");
           }
-        } catch (IOException ex) {
-          failureMsg.append("biometricData[").append(i)
-            .append("].biometricDataHash.parameters has incorrect syntax; ");
         }
       }
 

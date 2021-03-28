@@ -39,11 +39,11 @@ public enum DatabaseType {
 
   private final boolean supportsInArray;
 
-  private DatabaseType() {
+  DatabaseType() {
     this.supportsInArray = true;
   }
 
-  private DatabaseType(boolean supportsInArray) {
+  DatabaseType(boolean supportsInArray) {
     this.supportsInArray = supportsInArray;
   }
 

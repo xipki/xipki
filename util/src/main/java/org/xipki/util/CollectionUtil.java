@@ -77,7 +77,7 @@ public class CollectionUtil {
 
   public static List<String> toLowerCaseList(List<String> list) {
     if (list == null) {
-      return list;
+      return null;
     }
 
     List<String> upperList = new ArrayList<>(list.size());
@@ -89,7 +89,7 @@ public class CollectionUtil {
 
   public static Set<String> toLowerCaseSet(Set<String> set) {
     if (set == null) {
-      return set;
+      return null;
     }
 
     Set<String> upperSet = new HashSet<>();

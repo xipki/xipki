@@ -817,7 +817,7 @@ class Ca2Manager {
 
   ScepResponder getScepResponder(String name) {
     name = toNonBlankLower(name, "name");
-    return (manager.scepResponders == null) ? null : manager.scepResponders.get(name);
+    return manager.scepResponders.get(name);
   }
 
   CertWithRevocationInfo getCert(String caName, BigInteger serialNumber)

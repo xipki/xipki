@@ -17,23 +17,22 @@
 
 package org.xipki.security;
 
-import static org.bouncycastle.asn1.nist.NISTObjectIdentifiers.*;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
+import org.bouncycastle.asn1.oiw.OIWObjectIdentifiers;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.crypto.ExtendedDigest;
+import org.bouncycastle.crypto.digests.*;
+import org.xipki.util.Args;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
-import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
-import org.bouncycastle.asn1.oiw.OIWObjectIdentifiers;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.crypto.ExtendedDigest;
-import org.bouncycastle.crypto.digests.*;
-import org.xipki.util.Args;
+import static org.bouncycastle.asn1.nist.NISTObjectIdentifiers.*;
 
 /**
  * Hash algorithm enum.

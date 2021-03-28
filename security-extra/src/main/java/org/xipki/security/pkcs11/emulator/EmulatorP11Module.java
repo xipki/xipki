@@ -115,7 +115,7 @@ public class EmulatorP11Module extends P11Module {
 
       String filename = child.getName();
       String[] tokens = filename.split("-");
-      if (tokens == null || tokens.length != 2) {
+      if (tokens.length != 2) {
         LOG.warn("ignore dir {}, invalid filename syntax", child.getPath());
         continue;
       }
@@ -131,12 +131,12 @@ public class EmulatorP11Module extends P11Module {
       }
 
       if (allSlotIndexes.contains(slotIndex)) {
-        LOG.error("ignore slot dir, the same slot index has been assigned", filename);
+        LOG.error("ignore slot dir {}, the same slot index has been assigned", filename);
         continue;
       }
 
       if (allSlotIdentifiers.contains(slotId)) {
-        LOG.error("ignore slot dir, the same slot identifier has been assigned", filename);
+        LOG.error("ignore slot dir {}, the same slot identifier has been assigned", filename);
         continue;
       }
 
@@ -197,7 +197,7 @@ public class EmulatorP11Module extends P11Module {
 
   @Override
   public void close() {
-    LOG.info("close", "close pkcs11 module: {}", getName());
+    LOG.info("close pkcs11 module: {}", getName());
   }
 
   private void createExampleRepository(File dir, int numSlots)

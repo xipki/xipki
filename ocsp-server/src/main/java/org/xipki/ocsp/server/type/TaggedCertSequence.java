@@ -36,8 +36,8 @@ public class TaggedCertSequence extends ASN1Type {
 
   public TaggedCertSequence(byte[][] encodedCerts) {
     int seqBodyLen = 0;
-    for (int i = 0; i < encodedCerts.length; i++) {
-      seqBodyLen += encodedCerts[i].length;
+    for (byte[] encodedCert : encodedCerts) {
+      seqBodyLen += encodedCert.length;
     }
 
     int seqLen = getLen(seqBodyLen);
@@ -47,8 +47,8 @@ public class TaggedCertSequence extends ASN1Type {
     int idx = 0;
     idx += writeHeader((byte) 0xa0, seqLen, encoded, idx);
     idx += writeHeader((byte) 0x30, seqBodyLen, encoded, idx);
-    for (int i = 0; i < encodedCerts.length; i++) {
-      idx += arraycopy(encodedCerts[i], encoded, idx);
+    for (byte[] encodedCert : encodedCerts) {
+      idx += arraycopy(encodedCert, encoded, idx);
     }
   }
 

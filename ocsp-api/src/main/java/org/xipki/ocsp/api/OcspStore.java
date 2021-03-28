@@ -166,7 +166,7 @@ public abstract class OcspStore implements Closeable {
    * @throws OcspStoreException
    *           If OCSP store cannot be initialized.
    */
-  public abstract void init(Map<String, ? extends Object> sourceConf, DataSourceWrapper datasource)
+  public abstract void init(Map<String, ?> sourceConf, DataSourceWrapper datasource)
       throws OcspStoreException;
 
   public abstract boolean isHealthy();

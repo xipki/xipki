@@ -118,7 +118,7 @@ public class OcspServletFilter implements Filter {
     this.ocspServlet.setLogReqResp(logReqResp);
 
     RemoteMgmt remoteMgmt = conf.getRemoteMgmt();
-    this.remoteMgmtEnabled = remoteMgmt == null ? false : remoteMgmt.isEnabled();
+    this.remoteMgmtEnabled = remoteMgmt != null && remoteMgmt.isEnabled();
     LOG.info("remote management is {}", remoteMgmtEnabled ? "enabled" : "disabled");
 
     if (remoteMgmtEnabled) {

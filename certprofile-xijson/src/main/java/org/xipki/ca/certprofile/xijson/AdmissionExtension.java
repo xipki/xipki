@@ -125,9 +125,8 @@ public class AdmissionExtension {
 
         for (int i = 0; i < pis.length; i++) {
           ProfessionInfoOption pio = piList.get(i);
-          DirectoryString[] professionItems = null;
           int size = pio.getProfessionItems().size();
-          professionItems = new DirectoryString[size];
+          DirectoryString[] professionItems = new DirectoryString[size];
           for (int j = 0; j < size; j++) {
             professionItems[j] = new DirectoryString(pio.getProfessionItems().get(j));
           }
@@ -219,9 +218,8 @@ public class AdmissionExtension {
 
         for (int j = 0; j < pis.length; j++) {
           ProfessionInfoOption pio = piList.get(j);
-          DirectoryString[] professionItems = null;
           int size = pio.getProfessionItems().size();
-          professionItems = new DirectoryString[size];
+          DirectoryString[] professionItems = new DirectoryString[size];
           for (int k = 0; k < size; k++) {
             professionItems[k] = new DirectoryString(pio.getProfessionItems().get(k));
           }

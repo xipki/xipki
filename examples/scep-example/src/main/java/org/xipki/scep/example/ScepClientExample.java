@@ -80,7 +80,7 @@ public class ScepClientExample extends CaClientExample {
       X509Cert selfSignedCert = new X509Cert(certGenerator.build(signer));
 
       // Enroll certificate - RSA
-      EnrolmentResponse resp = (EnrolmentResponse) client.scepEnrol(csr, keypair.getPrivate(),
+      EnrolmentResponse resp = client.scepEnrol(csr, keypair.getPrivate(),
           selfSignedCert);
       if (resp.isFailure()) {
         throw new Exception("server returned 'failure'");
@@ -101,7 +101,7 @@ public class ScepClientExample extends CaClientExample {
       csr = genCsr(keypair, getSubject(), challengePassword);
 
       // Enroll certificate - RSA
-      resp = (EnrolmentResponse) client.scepEnrol(csr, identityKey, identityCert);
+      resp = client.scepEnrol(csr, identityKey, identityCert);
       if (resp.isFailure()) {
         throw new Exception("server returned 'failure'");
       }

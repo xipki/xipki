@@ -138,7 +138,7 @@ public class CmsEnveloperTest {
 
     RecipientInformationStore recipients = ed.getRecipientInfos();
     Iterator<RecipientInformation> it = recipients.getRecipients().iterator();
-    RecipientInformation recipient = (RecipientInformation)it.next();
+    RecipientInformation recipient = it.next();
 
     byte[] recData = recipient.getContent(
         new JceKEKEnvelopedRecipient(kek).setKeySizeValidation(true).setProvider("BC"));
@@ -178,7 +178,7 @@ public class CmsEnveloperTest {
 
     RecipientInformationStore recipients = ed.getRecipientInfos();
     Iterator<RecipientInformation> it = recipients.getRecipients().iterator();
-    RecipientInformation recipient = (RecipientInformation)it.next();
+    RecipientInformation recipient = it.next();
 
     byte[] recData = recipient.getContent(
         new JceKeyTransEnvelopedRecipient(reciKey).setProvider(bc));

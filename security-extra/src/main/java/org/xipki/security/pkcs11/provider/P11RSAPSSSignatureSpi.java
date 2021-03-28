@@ -149,9 +149,9 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
 
   private static class NullPssDigest implements Digest {
 
-    private ByteArrayOutputStream baOut = new ByteArrayOutputStream();
+    private final ByteArrayOutputStream baOut = new ByteArrayOutputStream();
 
-    private Digest baseDigest;
+    private final Digest baseDigest;
 
     private boolean oddTime = true;
 
@@ -207,9 +207,9 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
 
   private PSSParameterSpec paramSpec;
 
-  private PSSParameterSpec originalSpec;
+  private final PSSParameterSpec originalSpec;
 
-  private P11PlainRSASigner signer = new P11PlainRSASigner();
+  private final P11PlainRSASigner signer = new P11PlainRSASigner();
 
   private Digest contentDigest;
 
@@ -219,7 +219,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
 
   private byte trailer;
 
-  private boolean isRaw;
+  private final boolean isRaw;
 
   private P11PrivateKey signingKey;
 

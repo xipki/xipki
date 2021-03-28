@@ -142,19 +142,19 @@ public class CrlControl {
 
   public static final String KEY_INVALIDITY_DATE = "invalidity.date";
 
-  private int fullCrlIntervals = 1;
+  private final int fullCrlIntervals;
 
-  private int deltaCrlIntervals;
+  private final int deltaCrlIntervals;
 
   private int overlapDays = 3;
 
-  private boolean extendedNextUpdate;
+  private final boolean extendedNextUpdate;
 
-  private HourMinute intervalDayTime;
+  private final HourMinute intervalDayTime;
 
-  private boolean excludeReason;
+  private final boolean excludeReason;
 
-  private boolean includeExpiredCerts;
+  private final boolean includeExpiredCerts;
 
   private TripleState invalidityDateMode = TripleState.optional;
 
@@ -262,9 +262,6 @@ public class CrlControl {
   }
 
   public String toString(boolean verbose) {
-    StringBuilder sb = new StringBuilder("generate CRL at ").append(intervalDayTime);
-    String intervalStr = sb.toString();
-
     return StringUtil.concatObjects(
         "  full CRL intervals: ", fullCrlIntervals,
         "\n  delta CRL intervals: ", deltaCrlIntervals,
@@ -273,7 +270,7 @@ public class CrlControl {
         "\n  exclude reason: ", excludeReason,
         "\n  include expired certs: ", includeExpiredCerts,
         "\n  invalidity date mode: ", invalidityDateMode,
-        "\n  interval: ", intervalStr,
+        "\n  intervalDayTime: ", "generate CRL at " + intervalDayTime,
         (verbose ? "\n  encoded: " : ""), (verbose ? getConf() : ""));
   } // method toString(boolean)
 
@@ -361,11 +358,7 @@ public class CrlControl {
       return false;
     }
 
-    if (!intervalDayTime.equals(obj2.intervalDayTime)) {
-      return false;
-    }
-
-    return true;
+    return intervalDayTime.equals(obj2.intervalDayTime);
   } // method equals
 
   private static int getInteger(ConfPairs props, String propKey, int dfltValue)

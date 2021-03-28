@@ -269,7 +269,7 @@ class OcspStoreQueryExecutor {
           ps.setNull(idx++, Types.BIGINT);
         }
         int reasonCode = (revInfo.getReason() == null) ? 0 : revInfo.getReason().getCode();
-        ps.setInt(idx++, reasonCode);
+        ps.setInt(idx, reasonCode);
       }
 
       try {
@@ -320,7 +320,7 @@ class OcspStoreQueryExecutor {
         ps.setNull(idx++, Types.INTEGER); // rev_invalidity_time
         ps.setNull(idx++, Types.INTEGER); // rev_reason
       }
-      ps.setLong(idx++, registeredCertId);
+      ps.setLong(idx, registeredCertId);
       ps.executeUpdate();
     } catch (SQLException ex) {
       throw datasource.translate(sql, ex);
@@ -362,7 +362,7 @@ class OcspStoreQueryExecutor {
         ps.setNull(idx++, Types.INTEGER);
         ps.setNull(idx++, Types.INTEGER);
         ps.setNull(idx++, Types.INTEGER);
-        ps.setLong(idx++, certRegisteredId);
+        ps.setLong(idx, certRegisteredId);
         ps.executeUpdate();
       } catch (SQLException ex) {
         throw datasource.translate(sql, ex);
@@ -455,7 +455,7 @@ class OcspStoreQueryExecutor {
       throw new IllegalStateException("could not find issuer, "
           + "please start XiPKI in master mode first the restart this XiPKI system");
     }
-    return id.intValue();
+    return id;
   } // method getIssuerId
 
   void addIssuer(X509Cert issuerCert)
@@ -487,7 +487,7 @@ class OcspStoreQueryExecutor {
       ps.setLong(idx++, notBeforeSeconds);
       ps.setLong(idx++, notAfterSeconds);
       ps.setString(idx++, sha1FpCert);
-      ps.setString(idx++, b64Cert);
+      ps.setString(idx, b64Cert);
 
       ps.execute();
       issuerStore.addIdentityEntry(new IssuerEntry(id, b64Cert));

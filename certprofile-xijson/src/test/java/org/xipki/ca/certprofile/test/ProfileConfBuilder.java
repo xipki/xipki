@@ -22,11 +22,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
@@ -120,8 +116,7 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
 
   } // method marshal
 
-  protected static X509ProfileType getBaseCabSubscriberProfile(String desc)
-      throws Exception {
+  protected static X509ProfileType getBaseCabSubscriberProfile(String desc) {
     X509ProfileType profile = getBaseCabProfile(desc, CertLevel.EndEntity, "2y");
 
     // SubjectToSubjectAltName
@@ -393,7 +388,7 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
       : new KeyUsage[]{KeyUsage.keyAgreement};
 
     List<AlgorithmType> keyAlgorithms = createEdwardsOrMontgomeryKeyAlgorithms(
-        edwards, !edwards, curve25519, !curve25519);
+        edwards, curve25519, !curve25519);
 
     profile.setKeyAlgorithms(keyAlgorithms);
     List<ExtensionType> extensions = profile.getExtensions();
@@ -447,7 +442,7 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
       curves.add(createOidType(curveId, name));
     }
 
-    ecParams.setPointEncodings(Arrays.asList(((byte) 4)));
+    ecParams.setPointEncodings(Collections.singletonList(((byte) 4)));
 
     return list;
   } // method createCabKeyAlgorithms
@@ -499,18 +494,18 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
       }
     }
 
-    ecParams.setPointEncodings(Arrays.asList(((byte) 4)));
+    ecParams.setPointEncodings(Collections.singletonList(((byte) 4)));
 
     // EdDSA
     if (certLevel == CertLevel.RootCA || certLevel == CertLevel.SubCA) {
-      list.addAll(createEdwardsOrMontgomeryKeyAlgorithms(true, false, true, true));
+      list.addAll(createEdwardsOrMontgomeryKeyAlgorithms(true, true, true));
     }
 
     return list;
   } // method createKeyAlgorithms
 
   protected static List<AlgorithmType> createEdwardsOrMontgomeryKeyAlgorithms(
-      boolean edwards, boolean montgomery, boolean curve25519, boolean curve448) {
+      boolean edwards, boolean curve25519, boolean curve448) {
     List<AlgorithmType> list = new LinkedList<>();
 
     List<ASN1ObjectIdentifier> oids = new LinkedList<>();

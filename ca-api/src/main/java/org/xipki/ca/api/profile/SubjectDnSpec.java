@@ -73,10 +73,10 @@ public class SubjectDnSpec {
           StringType.teletexString, StringType.utf8String));
 
   private static final Set<StringType> PRINTABLE_STRING_ONLY = new HashSet<>(
-      Arrays.asList(StringType.printableString));
+          Collections.singletonList(StringType.printableString));
 
   private static final Set<StringType> IA5_STRING_ONLY = new HashSet<>(
-      Arrays.asList(StringType.ia5String));
+          Collections.singletonList(StringType.ia5String));
 
   private static final Map<ASN1ObjectIdentifier, StringType> DFLT_STRING_TYPES = new HashMap<>();
 
@@ -135,12 +135,6 @@ public class SubjectDnSpec {
         sb.delete(sb.length() - 2, sb.length());
       }
       LOG.info(sb.toString());
-    }
-
-    List<ASN1ObjectIdentifier> tmpBackwardDNs = new ArrayList<>(25);
-    int size = tmpForwardDNs.size();
-    for (int i = size - 1; i >= 0; i--) {
-      tmpBackwardDNs.add(tmpForwardDNs.get(i));
     }
 
     // ----- country/area code -----
@@ -432,7 +426,7 @@ public class SubjectDnSpec {
 
   public static boolean isValidCountryAreaCode(String code) {
     Args.notBlank(code, "code");
-    return COUNTRY_AREA_CODES.isEmpty() ? true : COUNTRY_AREA_CODES.contains(code.toUpperCase());
+    return COUNTRY_AREA_CODES.isEmpty() || COUNTRY_AREA_CODES.contains(code.toUpperCase());
   }
 
   private static BufferedReader getReader(String propKey, String fallbackResource) {

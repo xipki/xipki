@@ -65,7 +65,7 @@ abstract class CrmfKeyWrapper {
     private static final AlgorithmIdentifier OAEP_DFLT = new AlgorithmIdentifier(
         PKCSObjectIdentifiers.id_RSAES_OAEP, new RSAESOAEPparams());
 
-    private PublicKey publicKey;
+    private final PublicKey publicKey;
 
     public RSAOAEPAsymmetricKeyWrapper(PublicKey publicKey) {
       this.publicKey = publicKey;
@@ -93,11 +93,11 @@ abstract class CrmfKeyWrapper {
   // CHECKSTYLE:SKIP
   static class ECIESAsymmetricKeyWrapper extends CrmfKeyWrapper {
 
-    private AlgorithmIdentifier algorithmIdentifier;
+    private final AlgorithmIdentifier algorithmIdentifier;
 
-    private int ephemeralPublicKeyLen = 65; // 1 (04)+ 32 (Qx) + 32 (Qy)
+    private final int ephemeralPublicKeyLen = 65; // 1 (04)+ 32 (Qx) + 32 (Qy)
 
-    private int macLen = 20; // SHA1
+    private final int macLen = 20; // SHA1
 
     private final int aesKeySize = 128;
 

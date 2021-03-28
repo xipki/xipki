@@ -17,6 +17,8 @@
 
 package org.xipki.util;
 
+import java.util.Objects;
+
 /**
  * Utility class for the comparison.
  *
@@ -30,7 +32,7 @@ public class CompareUtil {
   }
 
   public static boolean equalsObject(Object oa, Object ob) {
-    return (oa == null) ? (ob == null) : oa.equals(ob);
+    return Objects.equals(oa, ob);
   }
 
   public static boolean areEqual(byte[] a1, int a1Pos, byte[] a2, int a2Pos, int len) {

@@ -38,7 +38,7 @@ public class CertprofileFactoryRegister {
 
   private static final Logger LOG = LoggerFactory.getLogger(CertprofileFactoryRegister.class);
 
-  private ConcurrentLinkedDeque<CertprofileFactory> factories = new ConcurrentLinkedDeque<>();
+  private final ConcurrentLinkedDeque<CertprofileFactory> factories = new ConcurrentLinkedDeque<>();
 
   /**
    * Retrieves the types of supported certificate profiles.

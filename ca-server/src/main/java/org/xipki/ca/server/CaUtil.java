@@ -184,9 +184,7 @@ public class CaUtil {
     List<RDN> rdns = new LinkedList<>();
 
     List<ASN1ObjectIdentifier> sortedDNs = SubjectDnSpec.getForwardDNs();
-    int size = sortedDNs.size();
-    for (int i = 0; i < size; i++) {
-      ASN1ObjectIdentifier type = sortedDNs.get(i);
+    for (ASN1ObjectIdentifier type : sortedDNs) {
       RDN[] thisRdns = getRdns(requstedRdns, type);
       if (thisRdns == null) {
         continue;
@@ -195,9 +193,7 @@ public class CaUtil {
         continue;
       }
 
-      for (RDN m : thisRdns) {
-        rdns.add(m);
-      }
+      rdns.addAll(Arrays.asList(thisRdns));
     }
 
     return new X500Name(rdns.toArray(new RDN[0]));
@@ -233,8 +229,7 @@ public class CaUtil {
     notNull(rdns, "rdns");
     notNull(type, "type");
     List<RDN> ret = new ArrayList<>(1);
-    for (int i = 0; i < rdns.length; i++) {
-      RDN rdn = rdns[i];
+    for (RDN rdn : rdns) {
       if (rdn.getFirst().getType().equals(type)) {
         ret.add(rdn);
       }

@@ -39,7 +39,7 @@ public class OcspCertPublisherFactory implements CertPublisherFactory {
   private static final String TYPE = "ocsp";
 
   private static final Set<String> types = Collections.unmodifiableSet(
-      new HashSet<>(Arrays.asList(TYPE)));
+      new HashSet<>(Collections.singletonList(TYPE)));
 
   @Override
   public Set<String> getSupportedTypes() {

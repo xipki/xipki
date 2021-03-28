@@ -197,7 +197,7 @@ public class QaP11Actions {
         throws Exception {
       KeyStore ks = KeyStore.getInstance("PKCS11", XiPkcs11Provider.PROVIDER_NAME);
       ks.load(null, null);
-      if (verbose.booleanValue()) {
+      if (verbose) {
         println("available aliases:");
         Enumeration<?> aliases = ks.aliases();
         while (aliases.hasMoreElements()) {

@@ -47,7 +47,7 @@ public interface CaCertValidator {
    * CA certificate validator with caching certificates.
    */
 
-  public static final class CachingCertificateValidator implements CaCertValidator {
+  final class CachingCertificateValidator implements CaCertValidator {
 
     private final ConcurrentHashMap<String, Boolean> cachedAnswers;
 
@@ -79,13 +79,13 @@ public interface CaCertValidator {
    * {@link CaCertValidator} with pre-povisioned CA certificates.
    *
    */
-  public static final class PreprovisionedCaCertValidator implements CaCertValidator {
+  final class PreprovisionedCaCertValidator implements CaCertValidator {
 
     private final Set<String> fpOfCerts;
 
     public PreprovisionedCaCertValidator(X509Cert cert) {
       Args.notNull(cert, "cert");
-      fpOfCerts = new HashSet<String>(1);
+      fpOfCerts = new HashSet<>(1);
 
       String hexFp = HashAlgo.SHA256.hexHash(cert.getEncoded());
       fpOfCerts.add(hexFp);
@@ -111,7 +111,7 @@ public interface CaCertValidator {
 
   } // class PreprovisionedCaCertValidator
 
-  public static final class PreprovisionedHashCaCertValidator implements CaCertValidator {
+  final class PreprovisionedHashCaCertValidator implements CaCertValidator {
 
     private final HashAlgo hashAlgo;
 

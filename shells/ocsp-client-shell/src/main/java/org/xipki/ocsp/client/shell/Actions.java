@@ -345,8 +345,7 @@ public class Actions {
       return extractOcspUrls(aia);
     } // method extractOcspUrls
 
-    public static List<String> extractOcspUrls(AuthorityInformationAccess aia)
-        throws CertificateEncodingException {
+    public static List<String> extractOcspUrls(AuthorityInformationAccess aia) {
       AccessDescription[] accessDescriptions = aia.getAccessDescriptions();
       List<AccessDescription> ocspAccessDescriptions = new LinkedList<>();
       for (AccessDescription accessDescription : accessDescriptions) {
@@ -357,8 +356,8 @@ public class Actions {
 
       final int n = ocspAccessDescriptions.size();
       List<String> ocspUris = new ArrayList<>(n);
-      for (int i = 0; i < n; i++) {
-        GeneralName accessLocation = ocspAccessDescriptions.get(i).getAccessLocation();
+      for (AccessDescription ocspAccessDescription : ocspAccessDescriptions) {
+        GeneralName accessLocation = ocspAccessDescription.getAccessLocation();
         if (accessLocation.getTagNo() == GeneralName.uniformResourceIdentifier) {
           String ocspUri = ((ASN1String) accessLocation.getName()).getString();
           ocspUris.add(ocspUri);
@@ -405,14 +404,14 @@ public class Actions {
     protected RequestOptions getRequestOptions()
         throws Exception {
       RequestOptions options = new RequestOptions();
-      options.setUseNonce(usenonce.booleanValue());
+      options.setUseNonce(usenonce);
       if (nonceLen != null) {
         options.setNonceLen(nonceLen);
       }
-      options.setAllowNoNonceInResponse(allowNoNonceInResponse.booleanValue());
+      options.setAllowNoNonceInResponse(allowNoNonceInResponse);
       options.setHashAlgorithm(HashAlgo.getInstance(hashAlgo));
-      options.setSignRequest(signRequest.booleanValue());
-      options.setUseHttpGetForRequest(useHttpGetForSmallRequest.booleanValue());
+      options.setSignRequest(signRequest);
+      options.setUseHttpGetForRequest(useHttpGetForSmallRequest);
 
       if (isNotEmpty(prefSigAlgs)) {
         SignAlgo[] algos = new SignAlgo[prefSigAlgs.size()];
@@ -557,7 +556,7 @@ public class Actions {
           } // end if(respIssuer)
         } // end if(validOn)
 
-        if (verbose.booleanValue()) {
+        if (verbose) {
           println("responder is " + X509Util.getRfc4519Name(responderCerts[0].getSubject()));
         }
       } // end if
@@ -614,7 +613,7 @@ public class Actions {
         msg.append("\nserialNumber: ").append(LogUtil.formatCsn(serialNumber));
         msg.append("\nCertificate status: ").append(status);
 
-        if (verbose.booleanValue()) {
+        if (verbose) {
           msg.append("\nthisUpdate: ").append(singleResp.getThisUpdate());
           msg.append("\nnextUpdate: ").append(singleResp.getNextUpdate());
 

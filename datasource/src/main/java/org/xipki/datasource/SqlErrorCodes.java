@@ -17,6 +17,7 @@
 
 package org.xipki.datasource;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -189,11 +190,7 @@ class SqlErrorCodes {
       return Collections.emptySet();
     }
 
-    Set<String> set = new HashSet<String>();
-    for (String str : strs) {
-      set.add(str);
-    }
-    return Collections.unmodifiableSet(set);
+    return Collections.unmodifiableSet(new HashSet<>(Arrays.asList(strs)));
   } // method toSet
 
   private static Set<String> toSet(int... ints) {

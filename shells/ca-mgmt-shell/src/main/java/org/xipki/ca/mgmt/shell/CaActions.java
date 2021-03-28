@@ -66,7 +66,7 @@ public class CaActions {
       return CaManager.NULL.equalsIgnoreCase(str) ? null : str;
     }
 
-    protected static String toString(Collection<? extends Object> col) {
+    protected static String toString(Collection<?> col) {
       if (col == null) {
         return "null";
       }
@@ -99,7 +99,8 @@ public class CaActions {
         if (CollectionUtil.isEmpty(aliases)) {
           sb.append(prefix).append(caName);
         } else {
-          sb.append(prefix).append(caName + " (aliases " + aliases + ")");
+          sb.append(prefix).append(caName).append(" (aliases ")
+                  .append(aliases).append(")");
         }
         sb.append("\n");
       }
@@ -288,9 +289,9 @@ public class CaActions {
 
       CaUris caUris = new CaUris(caCertUris, ocspUris, crlUris, deltaCrlUris);
       CaEntry entry = new CaEntry(new NameId(null, caName), snLen, nextCrlNumber,
-          signerType, signerConf, caUris, numCrls.intValue(), expirationPeriod.intValue());
+          signerType, signerConf, caUris, numCrls, expirationPeriod);
 
-      entry.setKeepExpiredCertInDays(keepExpiredCertInDays.intValue());
+      entry.setKeepExpiredCertInDays(keepExpiredCertInDays);
 
       ProtocolSupport protocolSupport = new ProtocolSupport(
           isEnabled(supportCmpS, false, "support-cmp"),
@@ -622,7 +623,7 @@ public class CaActions {
         throw new IllegalCmdParamException("invalid CA name " + caName);
       }
 
-      Date revocationDate = null;
+      Date revocationDate;
       revocationDate = isNotBlank(revocationDateS)
           ? DateUtil.parseUtcTimeyyyyMMddhhmmss(revocationDateS) : new Date();
 

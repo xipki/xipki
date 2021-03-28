@@ -25,7 +25,7 @@ package org.xipki.util;
  */
 public class PemEncoder {
 
-  public static enum PemLabel {
+  public enum PemLabel {
     /**
      * RFC5280 Certificate.
      */
@@ -75,7 +75,7 @@ public class PemEncoder {
 
     private final byte[] postfix;
 
-    private PemLabel(String label) {
+    PemLabel(String label) {
       this.prefix = StringUtil.toUtf8Bytes("-----BEGIN " + label + "-----\r\n");
       this.postfix = StringUtil.toUtf8Bytes("\r\n-----END " + label + "-----");
     }

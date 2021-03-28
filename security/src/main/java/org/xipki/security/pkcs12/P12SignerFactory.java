@@ -123,7 +123,7 @@ public class P12SignerFactory implements SignerFactory {
       if (sigAlgo != null && sigAlgo.isMac()) {
         P12MacContentSignerBuilder signerBuilder = new P12MacContentSignerBuilder(
             type, keystoreStream, password, keyLabel, password);
-        return signerBuilder.createSigner(sigAlgo, parallelism, securityFactory.getRandom4Sign());
+        return signerBuilder.createSigner(sigAlgo, parallelism);
       } else {
         KeypairWithCert keypairWithCert = KeypairWithCert.fromKeystore(
             type, keystoreStream, password, keyLabel, password, certificateChain);
@@ -170,8 +170,7 @@ public class P12SignerFactory implements SignerFactory {
   } // method newSigner
 
   @Override
-  public void refreshToken(String type)
-      throws XiSecurityException {
+  public void refreshToken(String type) {
     // Nothing to do.
   }
 

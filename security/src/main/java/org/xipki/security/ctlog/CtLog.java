@@ -95,10 +95,6 @@ public class CtLog {
           return new BigInteger[] {
               ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue(),
               ASN1Integer.getInstance(seq.getObjectAt(1)).getPositiveValue()};
-        case rsa:
-          return signature;
-        case anonymous:
-          return signature;
         default:
           return signature;
       }
@@ -170,7 +166,7 @@ public class CtLog {
     }
 
     public byte[] getEncoded() {
-      if (scts == null || scts.isEmpty()) {
+      if (scts.isEmpty()) {
         return new byte[] {0, 0};
       }
 
@@ -200,7 +196,7 @@ public class CtLog {
 
   } // class SerializedSCT
 
-  public static enum HashAlgorithm {
+  public enum HashAlgorithm {
     none((byte) 0),
     md5((byte) 1),
     sha1((byte) 2),
@@ -209,9 +205,9 @@ public class CtLog {
     sha384((byte) 5),
     sha512((byte) 6);
 
-    private byte code;
+    private final byte code;
 
-    private HashAlgorithm(byte code) {
+    HashAlgorithm(byte code) {
       this.code = code;
     }
 
@@ -229,15 +225,15 @@ public class CtLog {
     }
   } // class HashAlgorithm
 
-  public static enum SignatureAlgorithm {
+  public enum SignatureAlgorithm {
     anonymous((byte) 0),
     rsa((byte) 1),
     dsa((byte) 2),
     ecdsa((byte) 3);
 
-    private byte code;
+    private final byte code;
 
-    private SignatureAlgorithm(byte code) {
+    SignatureAlgorithm(byte code) {
       this.code = code;
     }
 

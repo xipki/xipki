@@ -332,7 +332,7 @@ public class UpdateCertActions {
         certTemplateBuilder.setExtensions(asn1Extensions);
       }
 
-      if (!(oldCertFile == null ^ oldCSerialNumber == null)) {
+      if ((oldCertFile == null) == (oldCSerialNumber == null)) {
         throw new IllegalCmdParamException(
             "exactly one of oldcert and oldcert-serial must be specified");
       }

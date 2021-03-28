@@ -74,12 +74,11 @@ public class CtlogControl {
     this.conf = pairs.getEncoded();
   } // constructor
 
-  public CtlogControl(Boolean enabled, List<String> servers, String sslContextName)
-      throws InvalidConfException {
+  public CtlogControl(Boolean enabled, List<String> servers, String sslContextName) {
     Args.notEmpty(servers, "servers");
 
     ConfPairs pairs = new ConfPairs();
-    this.enabled = (enabled == null) ? false : enabled;
+    this.enabled = enabled != null && enabled;
     pairs.putPair(KEY_ENABLED, Boolean.toString(this.enabled));
 
     pairs.putPair(KEY_SERVERS, StringUtil.collectionAsString(servers, ";"));

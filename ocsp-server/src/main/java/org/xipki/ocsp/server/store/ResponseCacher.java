@@ -17,26 +17,6 @@
 
 package org.xipki.ocsp.server.store;
 
-import static org.xipki.util.Args.notNull;
-
-import java.io.Closeable;
-import java.math.BigInteger;
-import java.security.cert.CertificateException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.bouncycastle.crypto.Digest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,12 +31,27 @@ import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
-import org.xipki.util.InvalidConfException;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 import org.xipki.util.Validity;
 import org.xipki.util.concurrent.ConcurrentBag;
 import org.xipki.util.concurrent.ConcurrentBagEntry;
+
+import java.io.Closeable;
+import java.math.BigInteger;
+import java.security.cert.CertificateException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * Response cacher.
@@ -126,7 +121,7 @@ public class ResponseCacher implements Closeable {
         try {
           int num1 = removeExpiredResponses(maxGeneratedAt, minNextUpdate);
           if (num1 > 0 && LOG.isInfoEnabled()) {
-            LOG.info("removed {} with thisUpdate < {} {} ({}) OR nextUpdate < {} ({})",
+            LOG.info("removed {} with thisUpdate < {} ({}) OR nextUpdate < {} ({})",
                 num1 == 1 ? "1 response" : num1 + " responses",
                 maxGeneratedAt, new Date(maxGeneratedAt * 1000),
                 minNextUpdate, new Date(minNextUpdate * 1000));
@@ -154,7 +149,7 @@ public class ResponseCacher implements Closeable {
 
   private DataSourceWrapper datasource;
 
-  private IssuerStore issuerStore = new IssuerStore();
+  private final IssuerStore issuerStore = new IssuerStore();
 
   private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
@@ -176,12 +171,12 @@ public class ResponseCacher implements Closeable {
     this.idDigesters = new ConcurrentBag<>();
     for (int i = 0; i < 20; i++) {
       Digest md = HashAlgo.SHA1.createDigest();
-      idDigesters.add(new ConcurrentBagEntry<Digest>(md));
+      idDigesters.add(new ConcurrentBagEntry<>(md));
     }
   }
 
   public boolean isOnService() {
-    return onService.get() && issuerStore != null;
+    return onService.get();
   }
 
   public void init() {
@@ -235,7 +230,7 @@ public class ResponseCacher implements Closeable {
   }
 
   public synchronized Integer storeIssuer(X509Cert issuerCert)
-      throws CertificateException, InvalidConfException, DataAccessException {
+      throws CertificateException, DataAccessException {
     if (!master) {
       throw new IllegalStateException("storeIssuer is not permitted in slave mode");
     }
@@ -261,7 +256,7 @@ public class ResponseCacher implements Closeable {
         int idx = 1;
         ps.setInt(idx++, id);
         ps.setString(idx++, sha1FpCert);
-        ps.setString(idx++, Base64.encodeToString(encodedCert));
+        ps.setString(idx, Base64.encodeToString(encodedCert));
 
         ps.execute();
 
@@ -363,7 +358,7 @@ public class ResponseCacher implements Closeable {
           ps.setString(idx++, ident);
           ps.setLong(idx++, generatedAt);
           ps.setLong(idx++, nextUpdate);
-          ps.setString(idx++, b64Response);
+          ps.setString(idx, b64Response);
           ps.execute();
         } catch (SQLException ex) {
           DataAccessException dex = datasource.translate(sql, ex);
@@ -388,7 +383,7 @@ public class ResponseCacher implements Closeable {
           ps.setLong(idx++, generatedAt);
           ps.setLong(idx++, nextUpdate);
           ps.setString(idx++, b64Response);
-          ps.setLong(idx++, id);
+          ps.setLong(idx, id);
           ps.executeUpdate();
         } catch (SQLException ex) {
           throw datasource.translate(sql, ex);
@@ -438,10 +433,6 @@ public class ResponseCacher implements Closeable {
    */
   private boolean updateCacheStore0() {
     try {
-      if (this.issuerStore == null) {
-        return initIssuerStore();
-      }
-
       // check for new issuers
       PreparedStatement ps = null;
       ResultSet rs = null;
@@ -466,7 +457,6 @@ public class ResponseCacher implements Closeable {
       }
 
       // add the new issuers
-      ps = null;
       rs = null;
 
       ids.removeAll(issuerStore.getIds());
@@ -504,9 +494,6 @@ public class ResponseCacher implements Closeable {
     } catch (DataAccessException ex) {
       LogUtil.error(LOG, ex, "could not executing updateCacheStore()");
       return false;
-    } catch (CertificateException ex) {
-      // don't set the onService to false.
-      LogUtil.error(LOG, ex, "could not executing updateCacheStore()");
     }
 
     return true;
@@ -584,7 +571,7 @@ public class ResponseCacher implements Closeable {
 
     boolean newDigest = (digest0 == null);
     if (newDigest) {
-      digest0 = new ConcurrentBagEntry<Digest>(HashAlgo.SHA1.createDigest());
+      digest0 = new ConcurrentBagEntry<>(HashAlgo.SHA1.createDigest());
     }
 
     byte[] hash = new byte[20];

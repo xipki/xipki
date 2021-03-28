@@ -200,7 +200,7 @@ public class BenchmarkHttpClient {
 
   private static final Logger LOG = LoggerFactory.getLogger(BenchmarkHttpClient.class);
 
-  public static interface ResponseHandler {
+  public interface ResponseHandler {
 
     void onComplete(FullHttpResponse response);
 
@@ -224,7 +224,7 @@ public class BenchmarkHttpClient {
 
   private class HttpClientInitializer extends ChannelInitializer<SocketChannel> {
 
-    private SslContext sslContext;
+    private final SslContext sslContext;
 
     public HttpClientInitializer(SslContext sslContext) {
       this.sslContext = sslContext;
@@ -275,21 +275,21 @@ public class BenchmarkHttpClient {
 
   private int queueSize = 1000;
 
-  private ResponseHandler responseHandler;
+  private final ResponseHandler responseHandler;
 
   private EventLoopGroup workerGroup;
 
   private Channel channel;
 
-  private SslContext sslContext;
+  private final SslContext sslContext;
 
   private int pendingRequests = 0;
 
-  private String host;
+  private final String host;
 
-  private int port;
+  private final int port;
 
-  private String hostHeader;
+  private final String hostHeader;
 
   static {
     String os = System.getProperty("os.name").toLowerCase();
@@ -344,7 +344,7 @@ public class BenchmarkHttpClient {
     final int numThreads = 1;
 
     ClassLoader loader = getClass().getClassLoader();
-    if (epollAvailable != null && epollAvailable.booleanValue()) {
+    if (epollAvailable != null && epollAvailable) {
       try {
         channelClass = (Class<? extends SocketChannel>)
             Class.forName("io.netty.channel.epoll.EpollSocketChannel", false, loader);
@@ -362,7 +362,7 @@ public class BenchmarkHttpClient {
         channelClass = null;
         this.workerGroup = null;
       }
-    } else if (kqueueAvailable != null && kqueueAvailable.booleanValue()) {
+    } else if (kqueueAvailable != null && kqueueAvailable) {
       try {
         channelClass = (Class<? extends SocketChannel>)
                 Class.forName("io.netty.channel.kqueue.KQueueSocketChannel", false, loader);

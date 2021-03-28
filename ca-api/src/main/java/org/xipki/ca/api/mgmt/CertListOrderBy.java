@@ -35,7 +35,7 @@ public enum CertListOrderBy {
 
   private final String text;
 
-  private CertListOrderBy(String text) {
+  CertListOrderBy(String text) {
     this.text = text;
   }
 

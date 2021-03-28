@@ -211,7 +211,7 @@ public class CrlStreamParser extends Asn1StreamParser {
 
         coreExtValue = X509Util.getCoreExtValue(extns, Extension.invalidityDate);
         if (coreExtValue != null) {
-          int tag = coreExtValue[0] & 0xFF;;
+          int tag = coreExtValue[0] & 0xFF;
           try {
             if (tag == BERTags.UTC_TIME) {
               invalidityDate = DERUTCTime.getInstance(coreExtValue).getDate();
@@ -382,7 +382,7 @@ public class CrlStreamParser extends Asn1StreamParser {
         this.firstRevokedCertificateOffset = -1;
       }
 
-      int crlExtensionsTag = BERTags.TAGGED | BERTags.CONSTRUCTED | 0; // [0] EXPLICIT
+      int crlExtensionsTag = BERTags.TAGGED | BERTags.CONSTRUCTED; // [0] EXPLICIT
 
       Extensions extns = null;
       if (offset < tbsCertListEndIndex) {

@@ -327,8 +327,7 @@ public class CaInfo {
     return caEntry.getKeepExpiredCertInDays();
   }
 
-  public BigInteger nextSerial()
-      throws OperationException {
+  public BigInteger nextSerial() {
     return randomSnGenerator.nextSerialNumber(caEntry.getSerialNoLen());
   }
 
@@ -407,7 +406,7 @@ public class CaInfo {
     }
 
     if (caEntry.getDhpocControl() != null) {
-      this.dhpocControl = new DhpocControl(caEntry.getDhpocControl(), securityFactory);
+      this.dhpocControl = new DhpocControl(caEntry.getDhpocControl());
     } else {
       this.dhpocControl = null;
     }

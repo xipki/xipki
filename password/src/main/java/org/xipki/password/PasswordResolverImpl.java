@@ -35,7 +35,7 @@ public class PasswordResolverImpl implements PasswordResolver {
 
   private static final Logger LOG = LoggerFactory.getLogger(PasswordResolverImpl.class);
 
-  private ConcurrentLinkedQueue<SinglePasswordResolver> resolvers =
+  private final ConcurrentLinkedQueue<SinglePasswordResolver> resolvers =
       new ConcurrentLinkedQueue<>();
 
   private boolean initialized = false;

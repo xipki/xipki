@@ -35,12 +35,12 @@ import org.xipki.util.Args;
 
 public class EnrollCertRequest {
 
-  public static enum EnrollType {
+  public enum EnrollType {
 
     CERT_REQ,
     INIT_REQ,
     KEY_UPDATE,
-    CROSS_CERT_REQ;
+    CROSS_CERT_REQ
 
   } // class EnrollType
 

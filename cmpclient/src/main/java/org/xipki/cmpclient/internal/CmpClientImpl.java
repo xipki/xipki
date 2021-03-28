@@ -327,7 +327,7 @@ public final class CmpClientImpl implements CmpClient {
   public X509CRLHolder downloadCrl(String caName, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     caName = toNonBlankLower(caName, "caName");
-    return downloadCrl(caName, (BigInteger) null, debug);
+    return downloadCrl(caName, null, debug);
   } // method downloadCrl
 
   @Override
@@ -342,10 +342,8 @@ public final class CmpClientImpl implements CmpClient {
     }
 
     CmpAgent agent = ca.getAgent();
-    X509CRLHolder result = (crlNumber == null) ? agent.downloadCurrentCrl(debug)
+    return (crlNumber == null) ? agent.downloadCurrentCrl(debug)
           : agent.downloadCrl(crlNumber, debug);
-
-    return result;
   } // method downloadCrl
 
   @Override

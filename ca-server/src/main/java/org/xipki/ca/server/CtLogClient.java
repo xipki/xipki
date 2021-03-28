@@ -63,7 +63,7 @@ import com.alibaba.fastjson.JSON;
  */
 public class CtLogClient {
 
-  private static Logger LOG = LoggerFactory.getLogger(CtLogClient.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CtLogClient.class);
 
   private final Curl curl;
 
@@ -210,7 +210,7 @@ public class CtLogClient {
             "unsupported hash algorithm " + algorithm.getHash());
     }
 
-    String encAlgo = null;
+    String encAlgo;
     switch (algorithm.getSignature()) {
       case ecdsa:
         encAlgo = "ECDSA";

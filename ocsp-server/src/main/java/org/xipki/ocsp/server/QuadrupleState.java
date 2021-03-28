@@ -29,6 +29,6 @@ public enum QuadrupleState {
   ignore,
   required,
   optional,
-  forbidden;
+  forbidden
 
 }

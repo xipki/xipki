@@ -51,6 +51,7 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -144,13 +145,12 @@ class OcspBenchRequestor {
       }
     }
 
-    this.httpClient = new BenchmarkHttpClient(uri.getHost(), uri.getPort(), null,
+    this.httpClient = new BenchmarkHttpClient(uri.getHost(), port, null,
         responseHandler, queueSize);
     this.httpClient.start();
   } // method init
 
-  public void shutdown()
-      throws Exception {
+  public void shutdown() {
     httpClient.shutdown();
   }
 
@@ -204,9 +204,7 @@ class OcspBenchRequestor {
       }
 
       if (extensions != null) {
-        for (Extension extn : extensions) {
-          extns.add(extn);
-        }
+        extns.addAll(Arrays.asList(extensions));
       }
       reqBuilder.setRequestExtensions(new Extensions(extns.toArray(extnType)));
     }

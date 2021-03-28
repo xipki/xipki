@@ -56,15 +56,13 @@ public class P11ModuleConf {
 
     boolean match(P11SlotIdentifier slotId) {
       if (index != null) {
-        if (index.intValue() != slotId.getIndex()) {
+        if (index != slotId.getIndex()) {
           return false;
         }
       }
 
       if (id != null) {
-        if (id.longValue() != slotId.getId()) {
-          return false;
-        }
+        return id == slotId.getId();
       }
 
       return true;
@@ -172,7 +170,7 @@ public class P11ModuleConf {
           return null;
         }
 
-        List<char[]> ret = new ArrayList<char[]>(passwords.size());
+        List<char[]> ret = new ArrayList<>(passwords.size());
         for (String password : passwords) {
           if (passwordResolver == null) {
             ret.add(password.toCharArray());
@@ -233,10 +231,10 @@ public class P11ModuleConf {
 
     public P11NewObjectConf(Pkcs11conf.NewObjectConf conf) {
       Boolean bb = conf.getIgnoreLabel();
-      this.ignoreLabel = (bb == null) ? false : bb.booleanValue();
+      this.ignoreLabel = bb != null && bb;
 
       Integer ii = conf.getIdLength();
-      this.idLength = (ii == null) ? 8 : ii.intValue();
+      this.idLength = (ii == null) ? 8 : ii;
 
       List<Pkcs11conf.NewObjectConf.CertAttribute> attrs = conf.getCertAttributes();
       Set<Long> set = new HashSet<>();
@@ -312,22 +310,27 @@ public class P11ModuleConf {
     this.readOnly = moduleType.isReadonly();
 
     String userTypeStr = moduleType.getUser().toUpperCase();
-    if ("CKU_USER".equals(userTypeStr)) {
-      this.userType = PKCS11Constants.CKU_USER;
-    } else if ("CKU_SO".equals(userTypeStr)) {
-      this.userType = PKCS11Constants.CKU_SO;
-    } else if ("CKU_CONTEXT_SPECIFIC".equals(userTypeStr)) {
-      this.userType = PKCS11Constants.CKU_CONTEXT_SPECIFIC;
-    } else {
-      try {
-        if (userTypeStr.startsWith("0X")) {
-          this.userType = Long.parseLong(userTypeStr.substring(2), 16);
-        } else {
-          this.userType = Long.parseLong(userTypeStr);
+    switch (userTypeStr) {
+      case "CKU_USER":
+        this.userType = PKCS11Constants.CKU_USER;
+        break;
+      case "CKU_SO":
+        this.userType = PKCS11Constants.CKU_SO;
+        break;
+      case "CKU_CONTEXT_SPECIFIC":
+        this.userType = PKCS11Constants.CKU_CONTEXT_SPECIFIC;
+        break;
+      default:
+        try {
+          if (userTypeStr.startsWith("0X")) {
+            this.userType = Long.parseLong(userTypeStr.substring(2), 16);
+          } else {
+            this.userType = Long.parseLong(userTypeStr);
+          }
+        } catch (NumberFormatException ex) {
+          throw new InvalidConfException("invalid user " + userTypeStr);
         }
-      } catch (NumberFormatException ex) {
-        throw new InvalidConfException("invalid user " + userTypeStr);
-      }
+        break;
     }
 
     this.maxMessageSize = moduleType.getMaxMessageSize();
@@ -388,7 +391,7 @@ public class P11ModuleConf {
     mechanismFilter = new P11MechanismFilter();
 
     List<Pkcs11conf.MechanimFilter> mechFilters = moduleType.getMechanismFilters();
-    if (mechFilters != null && CollectionUtil.isNotEmpty(mechFilters)) {
+    if (CollectionUtil.isNotEmpty(mechFilters)) {
       for (Pkcs11conf.MechanimFilter filterType : mechFilters) {
         Set<P11SlotIdFilter> slots = getSlotIdFilters(filterType.getSlots());
         String mechanismSetName = filterType.getMechanismSet();
@@ -410,7 +413,7 @@ public class P11ModuleConf {
     // Password retriever
     passwordRetriever = new P11PasswordsRetriever();
     List<Pkcs11conf.PasswordSet> passwordsList = moduleType.getPasswordSets();
-    if (passwordsList != null && CollectionUtil.isNotEmpty(passwordsList)) {
+    if (CollectionUtil.isNotEmpty(passwordsList)) {
       passwordRetriever.setPasswordResolver(passwordResolver);
       for (Pkcs11conf.PasswordSet passwordType : passwordsList) {
         Set<P11SlotIdFilter> slots = getSlotIdFilters(passwordType.getSlots());
@@ -498,7 +501,7 @@ public class P11ModuleConf {
     }
 
     if (CollectionUtil.isEmpty(excludeSlots)) {
-      return included;
+      return true;
     }
 
     for (P11SlotIdFilter entry : excludeSlots) {

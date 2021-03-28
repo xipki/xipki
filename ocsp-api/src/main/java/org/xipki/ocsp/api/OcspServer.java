@@ -31,8 +31,7 @@ import java.io.UnsupportedEncodingException;
 
 public interface OcspServer extends Closeable {
 
-  ResponderAndPath getResponderForPath(String path)
-      throws UnsupportedEncodingException;
+  ResponderAndPath getResponderForPath(String path);
 
   OcspRespWithCacheInfo answer(Responder responder, byte[] request, boolean viaGet);
 

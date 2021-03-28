@@ -20,7 +20,7 @@ package org.xipki.ca.mgmt.db.port;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
@@ -77,7 +77,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
           throws Exception {
     super(datasource, srcDir, stopMe);
 
-    this.publisherName = Args.toNonBlankLower(publisherName, "publisherName");;
+    this.publisherName = Args.toNonBlankLower(publisherName, "publisherName");
     this.numCertsPerCommit = Args.positive(numCertsPerCommit, "numCertsPerCommit");
 
     File processLogFile = new File(baseDir, DbPorter.IMPORT_TO_OCSP_PROCESS_LOG_FILENAME);
@@ -244,7 +244,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
       ps.setString(idx++, HashAlgo.SHA1.base64Hash(encodedCert));
       ps.setString(idx++, issuer.getRevInfo());
       ps.setString(idx++, Base64.encodeToString(encodedCert));
-      ps.setNull(idx++, Types.INTEGER); // CRL_ID
+      ps.setNull(idx, Types.INTEGER); // CRL_ID
 
       ps.execute();
     } catch (SQLException ex) {
@@ -259,7 +259,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
   private void importCert(CaCertstore certstore, boolean revokedOnly, List<Integer> caIds,
       File processLogFile)
           throws Exception {
-    HashAlgo certhashAlgo = getCertHashAlgo(datasource);
+    HashAlgo certhashAlgo = getCertHashAlgo();
 
     int numProcessedBefore = 0;
     long minId = 1;
@@ -290,13 +290,11 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
 
     PreparedStatement psCert = prepareStatement(SQL_ADD_CERT);
 
-    DbPortFileNameIterator certsFileIterator = new DbPortFileNameIterator(
-        baseDir + File.separator + CaDbEntryType.CERT.getDirName() + ".mf");
-
-    try {
+    try (DbPortFileNameIterator certsFileIterator = new DbPortFileNameIterator(
+            baseDir + File.separator + CaDbEntryType.CERT.getDirName() + ".mf")) {
       while (certsFileIterator.hasNext()) {
         String certsFile = baseDir + File.separator + CaDbEntryType.CERT.getDirName()
-                              + File.separator + certsFileIterator.next();
+                + File.separator + certsFileIterator.next();
         // extract the toId from the filename
         int fromIdx = certsFile.indexOf('-');
         int toIdx = certsFile.indexOf(".zip");
@@ -316,18 +314,17 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
 
         try {
           long lastId = importCert0(certhashAlgo, psCert, certsFile, revokedOnly, caIds,
-              minId, processLogFile, processLog, numProcessedBefore, importLog);
+                  minId, processLogFile, processLog, numProcessedBefore, importLog);
           minId = lastId + 1;
         } catch (Exception ex) {
           System.err.println("\ncould not import certificates from file " + certsFile
-              + ".\nplease continue with the option '--resume'");
+                  + ".\nplease continue with the option '--resume'");
           LOG.error("Exception", ex);
           throw ex;
         }
       }
     } finally {
       releaseResources(psCert, null);
-      certsFileIterator.close();
     }
 
     processLog.printTrailer();
@@ -345,7 +342,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
 
     CaCertstore.Certs certs;
     try {
-      certs = JSON.parseObject(zipFile.getInputStream(certsEntry), Charset.forName("UTF-8"),
+      certs = JSON.parseObject(zipFile.getInputStream(certsEntry), StandardCharsets.UTF_8,
           CaCertstore.Certs.class);
     } catch (Exception ex) {
       try {
@@ -383,7 +380,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
 
         numProcessedEntriesInBatch++;
 
-        if (!revokedOnly || (cert.getRev() != null && cert.getRev().intValue() == 1)) {
+        if (!revokedOnly || (cert.getRev() != null && cert.getRev() == 1)) {
           int caId = cert.getCaId();
           if (caIds.contains(caId)) {
             numImportedEntriesInBatch++;
@@ -423,7 +420,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
 
               psCert.setString(idx++, certhash);
               psCert.setString(idx++, subject);
-              psCert.setNull(idx++, Types.INTEGER);
+              psCert.setNull(idx, Types.INTEGER);
 
               psCert.addBatch();
             } catch (SQLException ex) {
@@ -482,7 +479,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
     }
   } // method importCert0
 
-  private HashAlgo getCertHashAlgo(DataSourceWrapper datasource)
+  private HashAlgo getCertHashAlgo()
       throws DataAccessException {
     String certHashAlgoStr = dbSchemaInfo.getVariableValue("CERTHASH_ALGO");
     if (certHashAlgoStr == null) {

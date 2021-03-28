@@ -157,13 +157,13 @@ public class CaClientExample {
   }
 
   protected static CertificationRequest genCsr(MyKeypair keypair, String subject)
-      throws GeneralSecurityException, OperatorCreationException {
+      throws OperatorCreationException {
     return genCsr(keypair, subject, null);
   }
 
   protected static CertificationRequest genCsr(MyKeypair keypair, String subject,
       String challengePassword)
-          throws GeneralSecurityException, OperatorCreationException {
+          throws OperatorCreationException {
     X500Name subjectDn = new X500Name(subject);
 
     PKCS10CertificationRequestBuilder csrBuilder = new PKCS10CertificationRequestBuilder(
@@ -178,8 +178,7 @@ public class CaClientExample {
     return csrBuilder.build(signer).toASN1Structure();
   }
 
-  protected static void printCert(String prefix, X509Cert cert)
-            throws CertificateEncodingException {
+  protected static void printCert(String prefix, X509Cert cert) {
     System.out.println(prefix);
     System.out.print("Subject: ");
     System.out.println(cert.getSubjectRfc4519Text());
@@ -226,7 +225,7 @@ public class CaClientExample {
   }
 
   // CHECKSTYLE:SKIP
-  private static String toPEM(String type, byte[] data) {
+  private static String toPEM(String  type, byte[] data) {
     byte[] base64Data = Base64.encode(data);
 
     StringBuilder sb = new StringBuilder();

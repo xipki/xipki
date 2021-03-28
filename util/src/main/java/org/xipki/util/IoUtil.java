@@ -87,7 +87,7 @@ public class IoUtil {
       throws IOException {
     try {
       ByteArrayOutputStream bout = new ByteArrayOutputStream();
-      int readed = 0;
+      int readed;
       byte[] buffer = new byte[2048];
       while ((readed = in.read(buffer)) != -1) {
         bout.write(buffer, 0, readed);

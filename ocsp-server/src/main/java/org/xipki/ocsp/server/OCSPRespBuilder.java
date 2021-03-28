@@ -49,9 +49,9 @@ public class OCSPRespBuilder {
   private static final byte[] successfulStatus = Hex.decode("0a0100");
   private static final byte[] responseTypeBasic = Hex.decode("06092b0601050507300101");
 
-  private List<SingleResponse> list = new LinkedList<>();
+  private final List<SingleResponse> list = new LinkedList<>();
   private Extensions responseExtensions = null;
-  private ResponderID responderId;
+  private final ResponderID responderId;
 
   /**
    * basic constructor.

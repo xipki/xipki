@@ -113,19 +113,19 @@ class Template {
   } // method getArchiveOffExtension
 
   public static byte[] getEncodeRevokedInfo(CrlReason reason, Date revocationTime) {
+    byte[] encoded;
     if (reason == null) {
-      byte[] encoded = new byte[19];
+      encoded = new byte[19];
       System.arraycopy(revokedInfoNoReasonPrefix, 0, encoded, 0, 2);
       ASN1Type.writeGeneralizedTime(revocationTime, encoded, 2);
-      return encoded;
     } else {
-      byte[] encoded = new byte[24];
+      encoded = new byte[24];
       System.arraycopy(revokedInfoWithReasonPrefix, 0, encoded, 0, 2);
       ASN1Type.writeGeneralizedTime(revocationTime, encoded, 2);
       System.arraycopy(reasonPrefix, 0, encoded, 19, 4);
       encoded[23] = (byte) reason.getCode();
-      return encoded;
     }
+    return encoded;
   } // method getEncodeRevokedInfo
 
 }

@@ -32,9 +32,9 @@ import org.xipki.util.Args;
 
 class CertsBundle {
 
-  private Map<BigInteger, DigestEntry> certs;
+  private final Map<BigInteger, DigestEntry> certs;
 
-  private List<BigInteger> serialNumbers;
+  private final List<BigInteger> serialNumbers;
 
   public CertsBundle(Map<BigInteger, DigestEntry> certs, List<BigInteger> serialNumbers) {
     this.certs = Args.notEmpty(certs, "certs");

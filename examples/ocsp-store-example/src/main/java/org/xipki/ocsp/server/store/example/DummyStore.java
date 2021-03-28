@@ -75,7 +75,7 @@ public class DummyStore extends OcspStore {
 
   } // class DummySourceConf
 
-  private static Logger LOG = LoggerFactory.getLogger(DummyStore.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DummyStore.class);
 
   private static final BigInteger BN_3 = BigInteger.valueOf(3);
 
@@ -139,7 +139,7 @@ public class DummyStore extends OcspStore {
    * @param datasource DataSource.
    */
   @Override
-  public void init(Map<String, ? extends Object> sourceConf, DataSourceWrapper datasource)
+  public void init(Map<String, ?> sourceConf, DataSourceWrapper datasource)
       throws OcspStoreException {
     Object objVal = sourceConf.get("caCert");
     if (objVal == null) {

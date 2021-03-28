@@ -62,9 +62,6 @@ public class SecurityCompleters {
       Set<P11KeyUsage> usages = new HashSet<>();
       for (String usageText : usageTexts) {
         P11KeyUsage usage = P11KeyUsage.valueOf(usageText.toUpperCase());
-        if (usage == null) {
-          throw new IllegalCmdParamException("invalid usage " + usageText);
-        }
         usages.add(usage);
       }
       return usages;

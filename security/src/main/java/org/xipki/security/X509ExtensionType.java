@@ -348,7 +348,7 @@ public class X509ExtensionType extends ValidatableConf {
 
   } // class ConstantExtnValue
 
-  public static enum FieldType {
+  public enum FieldType {
     TeletexString("TeletexString"),
     PrintableString("PrintableString"),
     UTF8String("UTF8String"),
@@ -372,7 +372,7 @@ public class X509ExtensionType extends ValidatableConf {
 
     private final String text;
 
-    private FieldType(String text) {
+    FieldType(String text) {
       this.text = text;
     }
 

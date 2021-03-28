@@ -41,7 +41,7 @@ import java.util.Objects;
 public class SdkUtil {
 
   private static CertificateFactory certFact;
-  private static Object certFactLock = new Object();
+  private static final Object certFactLock = new Object();
 
   private SdkUtil() {
   }
@@ -49,11 +49,8 @@ public class SdkUtil {
   public static X509Certificate parseCert(File file)
       throws IOException, CertificateException {
     requireNonNull("file", file);
-    InputStream in = Files.newInputStream(file.toPath());
-    try {
+    try (InputStream in = Files.newInputStream(file.toPath())) {
       return parseCert(in);
-    } finally {
-      in.close();
     }
   } // method parseCert
 
@@ -83,8 +80,7 @@ public class SdkUtil {
     }
   } // method getCertFactory
 
-  public static byte[] extractSki(X509Certificate cert)
-      throws CertificateEncodingException {
+  public static byte[] extractSki(X509Certificate cert) {
     byte[] fullExtValue = cert.getExtensionValue(Extension.subjectKeyIdentifier.getId());
     if (fullExtValue == null) {
       return null;
@@ -103,7 +99,7 @@ public class SdkUtil {
       throws IOException {
     try {
       ByteArrayOutputStream bout = new ByteArrayOutputStream();
-      int readed = 0;
+      int readed;
       byte[] buffer = new byte[2048];
       while ((readed = in.read(buffer)) != -1) {
         bout.write(buffer, 0, readed);

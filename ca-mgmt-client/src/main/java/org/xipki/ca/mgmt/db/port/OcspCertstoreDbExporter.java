@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -173,7 +174,7 @@ class OcspCertstoreDbExporter extends DbPorter {
   } // method exportIssuer
 
   private void exportCrlInfo(OcspCertstore certstore)
-      throws DataAccessException, IOException {
+      throws DataAccessException {
     System.out.println("exporting table CRL_INFO");
     List<OcspCertstore.CrlInfo> crlInfos = new LinkedList<>();
     certstore.setCrlInfos(crlInfos);
@@ -401,9 +402,7 @@ class OcspCertstoreDbExporter extends DbPorter {
 
         writeLine(certsFileOs, currentCertsFilename);
         certstore.setCountCerts(numProcessedBefore + sum);
-        if (id != null) {
-          echoToFile(Long.toString(id), processLogFile);
-        }
+        echoToFile(Long.toString(id), processLogFile);
 
         processLog.addNumProcessed(numCertInCurrentFile);
       } else {
@@ -428,7 +427,7 @@ class OcspCertstoreDbExporter extends DbPorter {
     ZipEntry certZipEntry = new ZipEntry("certs.json");
     zipOutStream.putNextEntry(certZipEntry);
     try {
-      JSON.writeJSONString(zipOutStream, Charset.forName("UTF-8"), certs);
+      JSON.writeJSONString(zipOutStream, StandardCharsets.UTF_8, certs);
     } finally {
       zipOutStream.closeEntry();
     }

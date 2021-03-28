@@ -112,11 +112,7 @@ class DomainValidator {
    */
   public boolean isValid(String domain) {
     String[] groups = domainRegex.match(domain.startsWith("*.") ? domain.substring(2) : domain);
-    if (groups != null && groups.length > 0) {
-      return true;
-    } else {
-      return false;
-    }
+    return groups != null && groups.length > 0;
   }
 
 }

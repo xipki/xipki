@@ -30,7 +30,6 @@ import org.xipki.util.StringUtil;
  * @since 2.0.0
  */
 
-@SuppressWarnings("serial")
 public abstract class OcspResponseException extends Exception {
 
   public static class InvalidResponse extends OcspResponseException {
@@ -111,7 +110,7 @@ public abstract class OcspResponseException extends Exception {
 
     private static final Map<Integer, String> codeStatusMap = new HashMap<>();
 
-    private int status;
+    private final int status;
 
     static {
       codeStatusMap.put(0, "successful");

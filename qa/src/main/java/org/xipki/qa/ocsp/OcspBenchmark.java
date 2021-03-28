@@ -49,7 +49,7 @@ public class OcspBenchmark extends BenchmarkExecutor implements ResponseHandler 
 
   final class Testor implements Runnable {
 
-    private OcspBenchRequestor requestor;
+    private final OcspBenchRequestor requestor;
 
     Testor()
         throws Exception {
@@ -96,7 +96,7 @@ public class OcspBenchmark extends BenchmarkExecutor implements ResponseHandler 
 
   private final int queueSize;
 
-  private AtomicInteger processedRequests = new AtomicInteger(0);
+  private final AtomicInteger processedRequests = new AtomicInteger(0);
 
   public OcspBenchmark(X509Cert issuerCert, String responderUrl, RequestOptions requestOptions,
       Iterator<BigInteger> serials, int maxRequests, int queueSize, String description) {

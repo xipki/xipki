@@ -80,6 +80,8 @@ public class EmulatorP11Identity extends P11Identity {
 
   private static final Logger LOG = LoggerFactory.getLogger(EmulatorP11Identity.class);
 
+  private static final Map<Long, HashAlgo> mgfMechHashMap = new HashMap<>();
+
   private static final Map<Long, HashAlgo> mechHashMap = new HashMap<>();
 
   private final Key signingKey;
@@ -98,15 +100,15 @@ public class EmulatorP11Identity extends P11Identity {
 
   static {
     // MGF1 mechanisms
-    mechHashMap.put(PKCS11Constants.CKG_MGF1_SHA1,     HashAlgo.SHA1);
-    mechHashMap.put(PKCS11Constants.CKG_MGF1_SHA224,   HashAlgo.SHA224);
-    mechHashMap.put(PKCS11Constants.CKG_MGF1_SHA256,   HashAlgo.SHA256);
-    mechHashMap.put(PKCS11Constants.CKG_MGF1_SHA384,   HashAlgo.SHA384);
-    mechHashMap.put(PKCS11Constants.CKG_MGF1_SHA512,   HashAlgo.SHA512);
-    mechHashMap.put(PKCS11Constants.CKG_MGF1_SHA3_224, HashAlgo.SHA3_224);
-    mechHashMap.put(PKCS11Constants.CKG_MGF1_SHA3_256, HashAlgo.SHA3_256);
-    mechHashMap.put(PKCS11Constants.CKG_MGF1_SHA3_384, HashAlgo.SHA3_384);
-    mechHashMap.put(PKCS11Constants.CKG_MGF1_SHA3_512, HashAlgo.SHA3_512);
+    mgfMechHashMap.put(PKCS11Constants.CKG_MGF1_SHA1,     HashAlgo.SHA1);
+    mgfMechHashMap.put(PKCS11Constants.CKG_MGF1_SHA224,   HashAlgo.SHA224);
+    mgfMechHashMap.put(PKCS11Constants.CKG_MGF1_SHA256,   HashAlgo.SHA256);
+    mgfMechHashMap.put(PKCS11Constants.CKG_MGF1_SHA384,   HashAlgo.SHA384);
+    mgfMechHashMap.put(PKCS11Constants.CKG_MGF1_SHA512,   HashAlgo.SHA512);
+    mgfMechHashMap.put(PKCS11Constants.CKG_MGF1_SHA3_224, HashAlgo.SHA3_224);
+    mgfMechHashMap.put(PKCS11Constants.CKG_MGF1_SHA3_256, HashAlgo.SHA3_256);
+    mgfMechHashMap.put(PKCS11Constants.CKG_MGF1_SHA3_384, HashAlgo.SHA3_384);
+    mgfMechHashMap.put(PKCS11Constants.CKG_MGF1_SHA3_512, HashAlgo.SHA3_512);
 
     // Hash mechanisms
     mechHashMap.put(PKCS11Constants.CKM_SHA_1,      HashAlgo.SHA1);
@@ -272,7 +274,7 @@ public class EmulatorP11Identity extends P11Identity {
       throw new P11TokenException(
           "unknown mechanism " + Functions.mechanismCodeToString(mechanism));
     }
-    return hashAlgo.hash(((SecretKey) signingKey).getEncoded());
+    return hashAlgo.hash(signingKey.getEncoded());
   }
 
   @Override
@@ -286,8 +288,6 @@ public class EmulatorP11Identity extends P11Identity {
       return dsaAndEcdsaSign(content, null);
     } else if (mechanism == PKCS11Constants.CKM_EDDSA) {
       return eddsaSign(content);
-    } else if (mechanism == PKCS11Constants.CKM_VENDOR_SM2) {
-      return sm2SignHash(content);
     } else if (mechanism == PKCS11Constants.CKM_RSA_X_509) {
       return rsaX509Sign(content);
     } else if (mechanism == PKCS11Constants.CKM_RSA_PKCS) {
@@ -403,7 +403,7 @@ public class EmulatorP11Identity extends P11Identity {
       throw new P11TokenException("Invalid parameters: invalid hash algorithm");
     }
 
-    HashAlgo mgfHash =  mechHashMap.get(pssParam.getMaskGenerationFunction());
+    HashAlgo mgfHash =  mgfMechHashMap.get(pssParam.getMaskGenerationFunction());
     if (mgfHash == null) {
       throw new P11TokenException(
           "unsupported MaskGenerationFunction " + pssParam.getHashAlgorithm());

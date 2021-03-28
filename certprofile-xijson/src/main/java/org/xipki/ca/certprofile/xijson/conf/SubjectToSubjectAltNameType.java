@@ -36,7 +36,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 
 public class SubjectToSubjectAltNameType extends ValidatableConf {
 
-  private static List<GeneralNameTag> allowedTargets = Arrays.asList(
+  private static final List<GeneralNameTag> allowedTargets = Arrays.asList(
       GeneralNameTag.rfc822Name,
       GeneralNameTag.DNSName,
       GeneralNameTag.directoryName,

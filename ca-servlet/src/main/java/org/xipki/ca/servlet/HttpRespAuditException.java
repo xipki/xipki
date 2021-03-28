@@ -40,7 +40,7 @@ public class HttpRespAuditException extends Exception {
 
   private final AuditLevel auditLevel;
 
-  private AuditStatus auditStatus;
+  private final AuditStatus auditStatus;
 
   public HttpRespAuditException(int httpStatus, String auditMessage,
       AuditLevel auditLevel, AuditStatus auditStatus) {

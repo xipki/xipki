@@ -131,11 +131,9 @@ public class Actions {
       if (no instanceof Byte) {
         return "0x" + Hex.encode(new byte[]{(byte) no});
       } else if (no instanceof Short) {
-        return "0x" + Integer.toHexString(Integer.valueOf((short) no));
+        return "0x" + Integer.toHexString((int) (short) no);
       } else if (no instanceof Integer) {
         return "0x" + Integer.toHexString((int) no);
-      } else if (no instanceof Long) {
-        return "0x" + Long.toHexString((long) no);
       } else if (no instanceof Long) {
         return "0x" + Long.toHexString((long) no);
       } else if (no instanceof BigInteger) {
@@ -188,11 +186,8 @@ public class Actions {
       outKs.load(null);
 
       char[] inPassword = readPasswordIfNotSet("password of the source keystore", inPwd);
-      InputStream inStream = Files.newInputStream(realInFile.toPath());
-      try {
+      try (InputStream inStream = Files.newInputStream(realInFile.toPath())) {
         inKs.load(inStream, inPassword);
-      } finally {
-        inStream.close();
       }
 
       char[] outPassword = readPasswordIfNotSet("password of the destination keystore", outPwd);
@@ -276,8 +271,6 @@ public class Actions {
         return "0X" + Integer.toHexString(Integer.valueOf((short) no));
       } else if (no instanceof Integer) {
         return "0X" + Integer.toHexString((int) no);
-      } else if (no instanceof Long) {
-        return "0X" + Long.toHexString((long) no);
       } else if (no instanceof Long) {
         return "0X" + Long.toHexString((long) no);
       } else if (no instanceof BigInteger) {
@@ -416,7 +409,7 @@ public class Actions {
         }
       } else if (StringUtil.isNotBlank(peerCertFile)) {
         X509Cert cert = X509Util.parseCert(Paths.get(peerCertFile).toFile());
-        return Arrays.asList(cert);
+        return Collections.singletonList(cert);
       } else {
         return null;
       }
@@ -569,9 +562,7 @@ public class Actions {
         }
       }
 
-      for (Extension addExt : getAdditionalExtensions()) {
-        extensions.add(addExt);
-      }
+      extensions.addAll(getAdditionalExtensions());
 
       ConcurrentContentSigner signer = getSigner(new SignatureAlgoControl(rsaPss, dsaPlain, gm));
 
@@ -612,7 +603,7 @@ public class Actions {
       } else {
         subjectDn = getSubject(subject);
 
-        List<RDN> list = new LinkedList<RDN>();
+        List<RDN> list = new LinkedList<>();
 
         if (StringUtil.isNotBlank(dateOfBirth)) {
           ASN1ObjectIdentifier id = ObjectIdentifiers.DN.dateOfBirth;
@@ -647,9 +638,7 @@ public class Actions {
         }
 
         if (!list.isEmpty()) {
-          for (RDN rdn : subjectDn.getRDNs()) {
-            list.add(rdn);
-          }
+          Collections.addAll(list, subjectDn.getRDNs());
 
           subjectDn = new X500Name(list.toArray(new RDN[0]));
         }

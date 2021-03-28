@@ -29,7 +29,7 @@ import static java.util.concurrent.TimeUnit.*;
  */
 public interface ClockSource {
 
-  static ClockSource CLOCK = Factory.create();
+  ClockSource CLOCK = Factory.create();
 
   /**
    * Get the current time-stamp (resolution is opaque).

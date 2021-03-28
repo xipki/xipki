@@ -96,19 +96,19 @@ public class KeyParametersOption {
     }
 
     public boolean allowsHashAlg(ASN1ObjectIdentifier hashAlg) {
-      return (hashAlgs == null) ? true : hashAlgs.contains(hashAlg);
+      return hashAlgs == null || hashAlgs.contains(hashAlg);
     }
 
     public boolean allowsMaskGenAlg(ASN1ObjectIdentifier maskGenAlg) {
-      return (maskGenAlgs == null) ? true : maskGenAlgs.contains(maskGenAlg);
+      return maskGenAlgs == null || maskGenAlgs.contains(maskGenAlg);
     }
 
     public boolean allowsSaltLength(int saltLength) {
-      return (saltLengths == null) ? true : saltLengths.contains(saltLength);
+      return saltLengths == null || saltLengths.contains(saltLength);
     }
 
     public boolean allowsTrailerField(int trailerField) {
-      return (trailerFields == null) ? true : trailerFields.contains(trailerField);
+      return trailerFields == null || trailerFields.contains(trailerField);
     }
 
   } // class RSAPSSParametersOption
@@ -193,11 +193,11 @@ public class KeyParametersOption {
 
     public boolean allowsCurve(ASN1ObjectIdentifier curveOid) {
       Args.notNull(curveOid, "curveOid");
-      return (curveOids == null) ? true : curveOids.contains(curveOid);
+      return curveOids == null || curveOids.contains(curveOid);
     }
 
     public boolean allowsPointEncoding(byte encoding) {
-      return (pointEncodings == null) ? true : pointEncodings.contains(encoding);
+      return pointEncodings == null || pointEncodings.contains(encoding);
     }
 
   } // class ECParamatersOption

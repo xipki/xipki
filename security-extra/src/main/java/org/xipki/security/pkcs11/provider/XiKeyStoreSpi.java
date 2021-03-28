@@ -73,7 +73,7 @@ public class XiKeyStoreSpi extends KeyStoreSpi {
 
   private static class MyEnumeration<E> implements Enumeration<E> {
 
-    private Iterator<E> iter;
+    private final Iterator<E> iter;
 
     MyEnumeration(Iterator<E> iter) {
       this.iter = iter;
@@ -93,9 +93,9 @@ public class XiKeyStoreSpi extends KeyStoreSpi {
 
   private static class KeyCertEntry {
 
-    private PrivateKey key;
+    private final PrivateKey key;
 
-    private Certificate[] chain;
+    private final Certificate[] chain;
 
     KeyCertEntry(PrivateKey key, X509Cert[] chain) {
       this.key = Args.notNull(key, "key");
@@ -127,7 +127,7 @@ public class XiKeyStoreSpi extends KeyStoreSpi {
 
   private Date creationDate;
 
-  private Map<String, KeyCertEntry> keyCerts = new HashMap<>();
+  private final Map<String, KeyCertEntry> keyCerts = new HashMap<>();
 
   public static void setP11CryptServiceFactory(P11CryptServiceFactory service) {
     p11CryptServiceFactory = service;

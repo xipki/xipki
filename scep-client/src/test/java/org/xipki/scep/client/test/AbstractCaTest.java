@@ -186,13 +186,12 @@ public abstract class AbstractCaTest {
     }
 
     // enroll
-    CertificationRequest csr;
-
     X509Cert selfSignedCert;
     X509Cert enroledCert;
     X500Name issuerName = caCert.getSubject();
     PrivateKey privKey;
 
+    CertificationRequest csr;
     {
       KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA");
       kpGen.initialize(2048);
@@ -205,7 +204,7 @@ public abstract class AbstractCaTest {
       // first try without secret
       PKCS10CertificationRequest p10Req = MyUtil.generateRequest(privKey, subjectPublicKeyInfo,
           subject, null, null);
-      csr = p10Req.toASN1Structure();
+      p10Req.toASN1Structure();
 
       selfSignedCert = MyUtil.generateSelfsignedCert(p10Req.toASN1Structure(), privKey);
       EnrolmentResponse enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey,
@@ -216,7 +215,7 @@ public abstract class AbstractCaTest {
       // then try invalid secret
       p10Req = MyUtil.generateRequest(privKey, subjectPublicKeyInfo, subject,
           "invalid-" + secret, null);
-      csr = p10Req.toASN1Structure();
+      p10Req.toASN1Structure();
 
       selfSignedCert = MyUtil.generateSelfsignedCert(p10Req.toASN1Structure(), privKey);
       enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey, selfSignedCert);
@@ -225,7 +224,7 @@ public abstract class AbstractCaTest {
 
       // try with valid secret
       p10Req = MyUtil.generateRequest(privKey, subjectPublicKeyInfo, subject, secret, null);
-      csr = p10Req.toASN1Structure();
+      p10Req.toASN1Structure();
 
       selfSignedCert = MyUtil.generateSelfsignedCert(p10Req.toASN1Structure(), privKey);
       enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey, selfSignedCert);

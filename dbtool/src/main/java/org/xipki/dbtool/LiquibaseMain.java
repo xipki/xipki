@@ -226,7 +226,7 @@ public class LiquibaseMain implements Closeable {
 
   }
 
-  private static Logger LOG = LoggerFactory.getLogger(LiquibaseMain.class);
+  private static final Logger LOG = LoggerFactory.getLogger(LiquibaseMain.class);
 
   private final DatabaseConf dbConf;
 
@@ -267,17 +267,17 @@ public class LiquibaseMain implements Closeable {
     String defaultSchemaName = dbConf.getSchema();
     this.database = CommandLineUtils.createDatabaseObject(clOpener, // resourceAccessor
       dbConf.getUrl(), dbConf.getUsername(), dbConf.getPassword(), dbConf.getDriver(),
-      (String) null, // defaultCatalogName
+      null, // defaultCatalogName
       defaultSchemaName, // defaultSchemaName
       false, // outputDefaultCatalog
       false, // outputDefaultSchema
-      (String) null, // databaseClass
-      (String) null, // driverPropertiesFile
-      (String) null, // propertyProviderClass
-      (String) null, // liquibaseCatalogName
-      (String) null, // liquibaseSchemaName
-      (String) null, // databaseChangeLogTableName
-      (String) null); // databaseChangeLogLockTableName
+      null, // databaseClass
+      null, // driverPropertiesFile
+      null, // propertyProviderClass
+      null, // liquibaseCatalogName
+      null, // liquibaseSchemaName
+      null, // databaseChangeLogTableName
+      null); // databaseChangeLogLockTableName
 
     try {
       CompositeResourceAccessor fileOpener = new CompositeResourceAccessor(fsOpener, clOpener);

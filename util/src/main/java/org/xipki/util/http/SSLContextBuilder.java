@@ -38,6 +38,7 @@ import java.io.InputStream;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -74,8 +75,8 @@ public class SSLContextBuilder {
 
   public SSLContextBuilder() {
     super();
-    this.keyManagers = new LinkedHashSet<KeyManager>();
-    this.trustManagers = new LinkedHashSet<TrustManager>();
+    this.keyManagers = new LinkedHashSet<>();
+    this.trustManagers = new LinkedHashSet<>();
   }
 
   /**
@@ -186,16 +187,14 @@ public class SSLContextBuilder {
     tmfactory.init(truststore);
     final TrustManager[] tms = tmfactory.getTrustManagers();
     if (tms != null) {
-      for (final TrustManager tm : tms) {
-        this.trustManagers.add(tm);
-      }
+      Collections.addAll(this.trustManagers, tms);
     }
     return this;
   }
 
   public SSLContextBuilder loadTrustMaterial()
     throws NoSuchAlgorithmException, KeyStoreException {
-    return loadTrustMaterial((KeyStore) null);
+    return loadTrustMaterial(null);
   }
 
   public SSLContextBuilder loadTrustMaterial(
@@ -231,9 +230,7 @@ public class SSLContextBuilder {
     kmfactory.init(keystore, keyPassword);
     final KeyManager[] kms = kmfactory.getKeyManagers();
     if (kms != null) {
-      for (final KeyManager km : kms) {
-        keyManagers.add(km);
-      }
+      Collections.addAll(keyManagers, kms);
     }
     return this;
   }
@@ -271,9 +268,9 @@ public class SSLContextBuilder {
       final SecureRandom secureRandom)
           throws KeyManagementException {
     sslContext.init(
-        !keyManagers.isEmpty() ? keyManagers.toArray(new KeyManager[keyManagers.size()]) : null,
+        !keyManagers.isEmpty() ? keyManagers.toArray(new KeyManager[0]) : null,
         !trustManagers.isEmpty()
-            ? trustManagers.toArray(new TrustManager[trustManagers.size()]) : null,
+            ? trustManagers.toArray(new TrustManager[0]) : null,
         secureRandom);
   }
 

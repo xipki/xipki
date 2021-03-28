@@ -111,7 +111,7 @@ class SelfSignedCertBuilder {
     notNull(certprofile, "certprofile");
     notNull(csr, "csr");
     notNull(serialNumber, "serialNumber");
-    if (serialNumber.compareTo(BigInteger.ZERO) != 1) {
+    if (serialNumber.signum() != 1) {
       throw new IllegalArgumentException(
           "serialNumber may not be non-positive: " + serialNumber);
     }

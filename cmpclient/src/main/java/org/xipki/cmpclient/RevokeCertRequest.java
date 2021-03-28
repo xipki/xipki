@@ -37,9 +37,9 @@ public class RevokeCertRequest {
 
   public static class Entry extends UnrevokeOrRemoveCertRequest.Entry {
 
-    private int reason;
+    private final int reason;
 
-    private Date invalidityDate;
+    private final Date invalidityDate;
 
     private byte[] authorityKeyIdentifier;
 

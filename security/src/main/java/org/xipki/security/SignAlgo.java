@@ -212,8 +212,8 @@ public enum SignAlgo {
     }
   }
 
-  private SignAlgo(String jceName, int code, ASN1ObjectIdentifier oid,
-      HashAlgo hashAlgo, boolean withNullParams) {
+  SignAlgo(String jceName, int code, ASN1ObjectIdentifier oid,
+           HashAlgo hashAlgo, boolean withNullParams) {
     this.code = (byte) Args.range(code, "code", 0, 255);
     this.jceName = jceName.toUpperCase();
     this.oid = oid;
@@ -226,7 +226,7 @@ public enum SignAlgo {
   }
 
   // RSA PSS with MGF1
-  private SignAlgo(String jceName, int code, HashAlgo hashAlgo) {
+  SignAlgo(String jceName, int code, HashAlgo hashAlgo) {
     this.code = (byte) Args.range(code, "code", 0, 255);
     this.jceName = jceName.toUpperCase();
     this.hashAlgo = hashAlgo;
@@ -242,7 +242,7 @@ public enum SignAlgo {
   }
 
   // For GMAC: See https://tools.ietf.org/html/draft-ietf-lamps-cms-aes-gmac-alg-03
-  private SignAlgo(String jceName, int code, ASN1ObjectIdentifier oid) {
+  SignAlgo(String jceName, int code, ASN1ObjectIdentifier oid) {
     if (!(jceName.startsWith("AES") && jceName.endsWith("GMAC"))) {
       throw new IllegalArgumentException("not AES*GMAC: " + jceName);
     }
@@ -368,12 +368,9 @@ public enum SignAlgo {
   // CHECKSTYLE:SKIP
   public boolean isSM2SigAlgo() {
     ASN1ObjectIdentifier oid = notNull(algId, "algId").getAlgorithm();
-    if (GMObjectIdentifiers.sm2sign_with_sm3.equals(oid)) {
-      return true;
-    }
+    return GMObjectIdentifiers.sm2sign_with_sm3.equals(oid);
 
     // other algorithms not supported yet.
-    return false;
   } // method isSM2SigAlg
 
   // CHECKSTYLE:SKIP
@@ -485,10 +482,6 @@ public enum SignAlgo {
       }
 
       HashAlgo hashAlgo = HashAlgo.getInstance(digestAlgId);
-      if (hashAlgo == null) {
-        throw new NoSuchAlgorithmException("hash != MGF1");
-      }
-
       if (hashAlgo.getLength() != param.getSaltLength().intValueExact()) {
         return null;
       }
@@ -497,9 +490,9 @@ public enum SignAlgo {
     } else if (SignAlgo.GMAC_AES128.oid.equals(oid)
         || SignAlgo.GMAC_AES192.oid.equals(oid)
         || SignAlgo.GMAC_AES256.oid.equals(oid)) {
-      if (SignAlgo.GMAC_AES128.equals(oid)) {
+      if (SignAlgo.GMAC_AES128.oid.equals(oid)) {
         return SignAlgo.GMAC_AES128;
-      } else if (SignAlgo.GMAC_AES128.equals(oid)) {
+      } else if (SignAlgo.GMAC_AES192.oid.equals(oid)) {
         return SignAlgo.GMAC_AES192;
       } else {
         return SignAlgo.GMAC_AES256;
@@ -540,11 +533,11 @@ public enum SignAlgo {
     HashAlgo hashAlgo = signerConf.getHashAlgo();
 
     if (key instanceof RSAPublicKey || key instanceof RSAPrivateKey) {
-      boolean rsaPss = (algoControl == null) ? false : algoControl.isRsaPss();
+      boolean rsaPss = algoControl != null && algoControl.isRsaPss();
       return getRSAInstance(hashAlgo, rsaPss);
     } else if (key instanceof ECPublicKey || key instanceof ECPrivateKey) {
-      boolean dsaPlain = (algoControl == null) ? false : algoControl.isDsaPlain();
-      boolean gm =  (algoControl == null) ? false : algoControl.isGm();
+      boolean dsaPlain = algoControl != null && algoControl.isDsaPlain();
+      boolean gm = algoControl != null && algoControl.isGm();
       return getECSigAlgo(hashAlgo, dsaPlain, gm);
     } else if (key instanceof DSAPublicKey || key instanceof DSAPrivateKey) {
       return getDSASigAlgo(hashAlgo);
@@ -569,11 +562,11 @@ public enum SignAlgo {
     notNull(key, "key");
 
     if (key instanceof RSAPublicKey || key instanceof RSAPrivateKey) {
-      boolean rsaPss = (algoControl == null) ? false : algoControl.isRsaPss();
+      boolean rsaPss = algoControl != null && algoControl.isRsaPss();
       return getRSAInstance(hashAlgo, rsaPss);
     } else if (key instanceof ECPublicKey || key instanceof ECPrivateKey) {
-      boolean dsaPlain = (algoControl == null) ? false : algoControl.isDsaPlain();
-      boolean gm =  (algoControl == null) ? false : algoControl.isGm();
+      boolean dsaPlain = algoControl != null && algoControl.isDsaPlain();
+      boolean gm = algoControl != null && algoControl.isGm();
       return getECSigAlgo(hashAlgo, dsaPlain, gm);
     } else if (key instanceof DSAPublicKey || key instanceof DSAPrivateKey) {
       return getDSASigAlgo(hashAlgo);
@@ -665,12 +658,10 @@ public enum SignAlgo {
     }
 
     if (gm) {
-      switch (hashAlgo) {
-        case SM3:
-          return SM2_SM3;
-        default:
-          throw new NoSuchAlgorithmException("unsupported hash " + hashAlgo + " for SM2");
+      if (hashAlgo == SM3) {
+        return SM2_SM3;
       }
+      throw new NoSuchAlgorithmException("unsupported hash " + hashAlgo + " for SM2");
     } else if (plainSignature) {
       switch (hashAlgo) {
         case SHA1:
@@ -718,7 +709,7 @@ public enum SignAlgo {
 
   public void assertSameAlgorithm(AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
       throws OperatorCreationException {
-    if (!sigAlgId.equals(sigAlgId)) {
+    if (!this.algId.equals(sigAlgId)) {
       throw new OperatorCreationException("sigAlgId differs");
     }
 

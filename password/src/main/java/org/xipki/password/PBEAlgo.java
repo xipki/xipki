@@ -29,11 +29,11 @@ public enum PBEAlgo {
 
   PBEWithHmacSHA256AndAES_256(1, "PBEWithHmacSHA256AndAES_256");
 
-  private int code;
+  private final int code;
 
-  private String algoName;
+  private final String algoName;
 
-  private PBEAlgo(int code, String algoName) {
+  PBEAlgo(int code, String algoName) {
     this.code = code;
     this.algoName = algoName;
   }

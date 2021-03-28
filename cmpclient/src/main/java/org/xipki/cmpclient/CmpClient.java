@@ -386,7 +386,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *         If more than one CA supports the certificate.
    */
-  public String getCaNameForProfile(String certprofile)
+  String getCaNameForProfile(String certprofile)
       throws CmpClientException;
 
 }

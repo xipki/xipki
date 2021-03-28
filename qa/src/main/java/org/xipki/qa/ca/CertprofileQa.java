@@ -108,7 +108,7 @@ public class CertprofileQa {
     notNull(requestedSubject, "requestedSubject");
     notNull(requestedPublicKey, "requestedPublicKey");
 
-    List<ValidationIssue> resultIssues = new LinkedList<ValidationIssue>();
+    List<ValidationIssue> resultIssues = new LinkedList<>();
 
     // certificate size
     ValidationIssue issue = new ValidationIssue("X509.SIZE", "certificate size");

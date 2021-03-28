@@ -152,7 +152,7 @@ public abstract class P11Slot implements Closeable {
 
   } // class P11NewObjectControl
 
-  public static enum P11KeyUsage {
+  public enum P11KeyUsage {
     DECRYPT,
     DERIVE,
     SIGN,
@@ -688,8 +688,8 @@ public abstract class P11Slot implements Closeable {
     objectIds.addAll(certificates.keySet());
 
     for (P11ObjectIdentifier objectId : objectIds) {
-      boolean matchId = (id == null) ? false : objectId.matchesId(id);
-      boolean matchLabel = (label == null) ? false : label.equals(objectId.getLabel());
+      boolean matchId = id != null && objectId.matchesId(id);
+      boolean matchLabel = label != null && label.equals(objectId.getLabel());
 
       if (matchId || matchLabel) {
         StringBuilder sb = new StringBuilder("Identity or Certificate with ");
@@ -871,7 +871,7 @@ public abstract class P11Slot implements Closeable {
     notNull(keyId, "keyId");
     assertWritable("removeIdentityByKeyId");
 
-    P11IdentityId entityId = null;
+    P11IdentityId entityId;
     if (identities.containsKey(keyId)) {
       entityId = identities.get(keyId).getId();
       if (entityId.getCertId() != null) {
@@ -917,9 +917,7 @@ public abstract class P11Slot implements Closeable {
     return objectId;
   } // method addCert
 
-  protected String generateLabel(String label)
-      throws P11TokenException {
-
+  protected String generateLabel(String label) {
     String tmpLabel = label;
     int idx = 0;
     while (true) {

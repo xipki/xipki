@@ -53,8 +53,7 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
     }
   } // method main
 
-  private static void certprofileCabRootCa(String destFilename)
-      throws Exception {
+  private static void certprofileCabRootCa(String destFilename) {
     X509ProfileType profile = getBaseCabProfile("certprofile RootCA (CA/Browser Forum BR)",
         CertLevel.RootCA, "10y");
 
@@ -84,8 +83,7 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
     marshall(profile, destFilename, true);
   } // method certprofileCabRootCa
 
-  private static void certprofileCabSubCa(String destFilename)
-      throws Exception {
+  private static void certprofileCabSubCa(String destFilename) {
     X509ProfileType profile = getBaseCabProfile("certprofile SubCA (CA/Browser Forum BR)",
         CertLevel.SubCA, "8y");
 

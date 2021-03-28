@@ -50,9 +50,9 @@ public class OcspRespWithCacheInfo {
 
   } // class ResponseCacheInfo
 
-  private byte[] response;
+  private final byte[] response;
 
-  private ResponseCacheInfo cacheInfo;
+  private final ResponseCacheInfo cacheInfo;
 
   public OcspRespWithCacheInfo(byte[] response, ResponseCacheInfo cacheInfo) {
     this.response = response;

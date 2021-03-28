@@ -49,7 +49,7 @@ import org.xipki.util.StringUtil;
 public class TlsHelper {
 
   private static class Reference {
-    private Object obj;
+    private final Object obj;
 
     Reference(Object obj) {
       this.obj = obj;
@@ -72,7 +72,7 @@ public class TlsHelper {
   private static final LruCache<String, X509Cert> clientCerts = new LruCache<>(50);
   private static final LruCache<Reference, X509Cert> clientCerts0 = new LruCache<>(50);
 
-  private static String reverseProxyMode = null;
+  private static final String reverseProxyMode;
 
   static {
     String propName = "org.xipki.reverseproxy.mode";

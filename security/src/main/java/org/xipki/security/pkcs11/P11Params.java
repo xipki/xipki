@@ -29,7 +29,7 @@ import org.xipki.security.HashAlgo;
 
 public interface P11Params {
 
-  public static class P11ByteArrayParams implements P11Params {
+  class P11ByteArrayParams implements P11Params {
 
     private final byte[] bytes;
 
@@ -44,7 +44,7 @@ public interface P11Params {
   }
 
   // CHECKSTYLE:SKIP
-  public class P11IVParams implements P11Params {
+  class P11IVParams implements P11Params {
 
     private final byte[] iv;
 
@@ -60,7 +60,7 @@ public interface P11Params {
   }
 
   //CHECKSTYLE:SKIP
-  public class P11RSAPkcsPssParams implements P11Params {
+  class P11RSAPkcsPssParams implements P11Params {
 
     private final long hashAlgorithm;
 

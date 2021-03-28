@@ -165,7 +165,7 @@ class CmpAgent {
 
   private boolean sendRequestorCert;
 
-  private boolean implicitConfirm = true;
+  private final boolean implicitConfirm = true;
 
   private final URL serverUrl;
 
@@ -223,9 +223,10 @@ class CmpAgent {
     httpUrlConnection.setRequestMethod("POST");
     httpUrlConnection.setRequestProperty("Content-Type", CMP_REQUEST_MIMETYPE);
     httpUrlConnection.setRequestProperty("Content-Length", java.lang.Integer.toString(size));
-    OutputStream outputstream = null;
+    OutputStream outputstream;
 
-    for (int i = 0; i < 3; i++) {
+    // try max. 3 times
+    for (int i = 0; ;i++) {
       try {
         outputstream = httpUrlConnection.getOutputStream();
         break;
@@ -381,11 +382,11 @@ class CmpAgent {
   } // method signAndSend
 
   private PKIHeader buildPkiHeader(ASN1OctetString tid) {
-    return buildPkiHeader(false, tid, (CmpUtf8Pairs) null, (InfoTypeAndValue[]) null);
+    return buildPkiHeader(false, tid, null, (InfoTypeAndValue[]) null);
   }
 
   private PKIHeader buildPkiHeader(boolean addImplictConfirm, ASN1OctetString tid) {
-    return buildPkiHeader(addImplictConfirm, tid, (CmpUtf8Pairs) null, (InfoTypeAndValue[]) null);
+    return buildPkiHeader(addImplictConfirm, tid, null, (InfoTypeAndValue[]) null);
   }
 
   private PKIHeader buildPkiHeader(boolean addImplictConfirm, ASN1OctetString tid,
@@ -506,7 +507,7 @@ class CmpAgent {
       }
 
       if (recipientName != null) {
-        boolean authorizedResponder = true;
+        boolean authorizedResponder;
         if (header.getSender().getTagNo() != GeneralName.directoryName) {
           authorizedResponder = false;
         } else {
@@ -594,7 +595,7 @@ class CmpAgent {
 
   public X509CRLHolder downloadCurrentCrl(ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
-    return downloadCrl((BigInteger) null, debug);
+    return downloadCrl(null, debug);
   } // method downloadCurrentCrl
 
   public X509CRLHolder downloadCrl(BigInteger crlNumber, ReqRespDebug debug)
@@ -705,9 +706,9 @@ class CmpAgent {
     // CA certificates
     CMPCertificate[] caPubs = certRep.getCaPubs();
     if (caPubs != null && caPubs.length > 0) {
-      for (int i = 0; i < caPubs.length; i++) {
-        if (caPubs[i] != null) {
-          result.addCaCertificate(caPubs[i]);
+      for (CMPCertificate caPub : caPubs) {
+        if (caPub != null) {
+          result.addCaCertificate(caPub);
         }
       }
     }
@@ -748,8 +749,8 @@ class CmpAgent {
         }
 
         if (requestor == null) {
-          resultEntry = new ResultEntry.Error(thisId, PKISTATUS_RESPONSE_ERROR,
-              PKIFailureInfo.systemFailure, "could not decrypt PrivateKeyInfo/requestor is null");
+          result.addResultEntry(new ResultEntry.Error(thisId, PKISTATUS_RESPONSE_ERROR,
+              PKIFailureInfo.systemFailure,"could not decrypt PrivateKeyInfo/requestor is null"));
           continue;
         }
 
@@ -772,8 +773,8 @@ class CmpAgent {
                   ((Requestor.PbmMacCmpRequestor) requestor).getPassword());
             }
           } catch (XiSecurityException ex) {
-            resultEntry = new ResultEntry.Error(thisId, PKISTATUS_RESPONSE_ERROR,
-                PKIFailureInfo.systemFailure, "could not decrypt PrivateKeyInfo");
+            result.addResultEntry(new ResultEntry.Error(thisId, PKISTATUS_RESPONSE_ERROR,
+                PKIFailureInfo.systemFailure, "could not decrypt PrivateKeyInfo"));
             continue;
           }
           privKeyInfo = PrivateKeyInfo.getInstance(decryptedValue);

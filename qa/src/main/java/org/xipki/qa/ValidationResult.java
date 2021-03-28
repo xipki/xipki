@@ -19,7 +19,7 @@ package org.xipki.qa;
 
 import org.xipki.util.CollectionUtil;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -41,7 +41,7 @@ public class ValidationResult {
   private final List<ValidationIssue> successfulValidationIssues;
 
   public ValidationResult(ValidationIssue validationIssues) {
-    this(Arrays.asList(validationIssues));
+    this(Collections.singletonList(validationIssues));
   }
 
   public ValidationResult(List<ValidationIssue> validationIssues) {

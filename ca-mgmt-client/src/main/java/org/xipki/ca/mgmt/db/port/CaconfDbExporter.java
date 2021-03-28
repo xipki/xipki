@@ -141,7 +141,7 @@ class CaconfDbExporter extends DbPorter {
   } // method exportRequestor
 
   private void exportUser(CaCertstore.Caconf caconf)
-      throws DataAccessException, IOException, InvalidConfException {
+      throws DataAccessException, InvalidConfException {
     System.out.println("exporting table TUSER");
     List<CaCertstore.User> users = new LinkedList<>();
     final String sql = "SELECT ID,NAME,ACTIVE,PASSWORD FROM TUSER";

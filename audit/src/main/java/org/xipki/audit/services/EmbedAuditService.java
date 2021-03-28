@@ -49,36 +49,30 @@ public class EmbedAuditService implements AuditService {
 
   @Override
   public void logEvent(AuditEvent event) {
-    switch (event.getLevel()) {
-      case DEBUG:
-        if (LOG.isDebugEnabled()) {
-          LOG.debug(MARKER, "{}", createMessage(event));
-        }
-        break;
-      default:
-        if (LOG.isInfoEnabled()) {
-          LOG.info(MARKER, "{}", createMessage(event));
-        }
-        break;
-    } // end switch
+    if (event.getLevel() == AuditLevel.DEBUG) {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug(MARKER, "{}", createMessage(event));
+      }
+    } else {
+      if (LOG.isInfoEnabled()) {
+        LOG.info(MARKER, "{}", createMessage(event));
+      }
+    }
   } // method logEvent
 
   @Override
   public void logEvent(PciAuditEvent event) {
     CharArrayWriter msg = event.toCharArrayWriter("");
     AuditLevel al = event.getLevel();
-    switch (al) {
-      case DEBUG:
-        if (LOG.isDebugEnabled()) {
-          LOG.debug(MARKER, "{} | {}", al.getAlignedText(), msg);
-        }
-        break;
-      default:
-        if (LOG.isInfoEnabled()) {
-          LOG.info(MARKER, "{} | {}", al.getAlignedText(), msg);
-        }
-        break;
-    } // end switch
+    if (al == AuditLevel.DEBUG) {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug(MARKER, "{} | {}", al.getAlignedText(), msg);
+      }
+    } else {
+      if (LOG.isInfoEnabled()) {
+        LOG.info(MARKER, "{} | {}", al.getAlignedText(), msg);
+      }
+    }
   } // method logEvent
 
   protected static String createMessage(AuditEvent event) {

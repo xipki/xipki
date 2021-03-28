@@ -28,7 +28,6 @@ import org.bouncycastle.math.ec.ECCurve;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.BadCertTemplateException;
-import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.KeyParametersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.AllowAllParametersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.DSAParametersOption;
@@ -61,10 +60,9 @@ public class PublicKeyChecker {
   private static final LruCache<ASN1ObjectIdentifier, Integer> EC_CURVEFIELD_SIZES
       = new LruCache<>(100);
 
-  private Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms;
+  private final Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms;
 
-  public PublicKeyChecker(Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms)
-      throws CertprofileException {
+  public PublicKeyChecker(Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms) {
     this.keyAlgorithms = keyAlgorithms;
   }
 

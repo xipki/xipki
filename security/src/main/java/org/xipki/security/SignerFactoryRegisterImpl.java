@@ -38,7 +38,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
 
   private static final Logger LOG = LoggerFactory.getLogger(SignerFactoryRegisterImpl.class);
 
-  private ConcurrentLinkedDeque<SignerFactory> factories = new ConcurrentLinkedDeque<>();
+  private final ConcurrentLinkedDeque<SignerFactory> factories = new ConcurrentLinkedDeque<>();
 
   public SignerFactoryRegisterImpl() {
   }

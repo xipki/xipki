@@ -24,7 +24,6 @@ package org.xipki.ocsp.api.mgmt;
  * @since 2.0.0
  */
 
-@SuppressWarnings("serial")
 public class OcspMgmtException extends Exception {
 
   public OcspMgmtException() {

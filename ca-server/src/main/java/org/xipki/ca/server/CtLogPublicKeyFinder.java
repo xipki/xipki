@@ -57,14 +57,11 @@ public class CtLogPublicKeyFinder {
     File[] keyFiles = null;
     if (keydirName != null && !keydirName.isEmpty()) {
       keydirName = IoUtil.expandFilepath(keydirName, true);
-      keyFiles = new File(keydirName).listFiles(new FileFilter() {
-        @Override
-        public boolean accept(File pathname) {
-          String name = pathname.getName();
-          return pathname.isFile()
-              && (name.endsWith(".pem") || name.endsWith(".der")
-                  || name.endsWith(".key") || name.endsWith(".publickey"));
-        }
+      keyFiles = new File(keydirName).listFiles(pathname -> {
+        String name = pathname.getName();
+        return pathname.isFile()
+            && (name.endsWith(".pem") || name.endsWith(".der")
+                || name.endsWith(".key") || name.endsWith(".publickey"));
       });
     }
 
@@ -97,8 +94,7 @@ public class CtLogPublicKeyFinder {
 
     this.logIds = logIdList.toArray(new byte[0][0]);
     this.publicKeys = publicKeyList.toArray(new PublicKey[0]);
-    this.withPublicKeys = logIds != null && logIds.length > 0;
-
+    this.withPublicKeys = logIds.length > 0;
   }
 
   public PublicKey getPublicKey(byte[] logId) {

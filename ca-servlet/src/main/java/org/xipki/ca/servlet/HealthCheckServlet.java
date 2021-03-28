@@ -43,7 +43,6 @@ import com.alibaba.fastjson.JSON;
  * @since 3.0.1
  */
 
-@SuppressWarnings("serial")
 public class HealthCheckServlet extends HttpServlet {
 
   private static final Logger LOG = LoggerFactory.getLogger(HealthCheckServlet.class);

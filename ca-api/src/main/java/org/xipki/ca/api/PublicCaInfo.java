@@ -84,10 +84,9 @@ public class PublicCaInfo {
 
   public PublicCaInfo(X500Name subject, X500Name issuer, BigInteger serialNumber,
       GeneralNames subjectAltName, byte[] subjectKeyIdentifier,
-      CaUris caUris, ConfPairs extraControl)
-      throws OperationException {
+      CaUris caUris, ConfPairs extraControl) {
     this.subject = Args.notNull(subject, "subject");
-    this.issuer = Args.notNull(subject, "issuer");
+    this.issuer = Args.notNull(issuer, "issuer");
     this.serialNumber = Args.notNull(serialNumber, "serialNumber");
     this.caUris = (caUris == null) ? CaUris.EMPTY_INSTANCE : caUris;
 

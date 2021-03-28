@@ -24,7 +24,6 @@ import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.cert.CertificateEncodingException;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
@@ -112,10 +111,7 @@ public class CaEmulator {
 
   private final AtomicLong crlNumber = new AtomicLong(2);
 
-  private CertificateList crl;
-
-  public CaEmulator(PrivateKey caKey, X509Cert caCert, boolean generateCrl)
-      throws CertificateEncodingException {
+  public CaEmulator(PrivateKey caKey, X509Cert caCert, boolean generateCrl) {
     this.caKey = Args.notNull(caKey, "caKey");
     this.caCert = Args.notNull(caCert, "caCert");
     this.caSubject = caCert.getSubject();
@@ -201,10 +197,6 @@ public class CaEmulator {
 
   public synchronized CertificateList getCrl(X500Name issuer, BigInteger serialNumber)
       throws Exception {
-    if (crl != null) {
-      return crl;
-    }
-
     Date thisUpdate = new Date();
     X509v2CRLBuilder crlBuilder = new X509v2CRLBuilder(caSubject, thisUpdate);
     Date nextUpdate = new Date(thisUpdate.getTime() + 30 * DAY_IN_MS);
@@ -249,14 +241,18 @@ public class CaEmulator {
 
     BcContentVerifierProviderBuilder builder = VERIFIER_PROVIDER_BUILDER.get(keyAlg);
     if (builder == null) {
-      if ("RSA".equals(keyAlg)) {
-        builder = new BcRSAContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
-      } else if ("DSA".equals(keyAlg)) {
-        builder = new BcDSAContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
-      } else if ("ECDSA".equals(keyAlg)) {
-        builder = new BcECContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
-      } else {
-        throw new InvalidKeyException("unknown key algorithm of the public key " + keyAlg);
+      switch (keyAlg) {
+        case "RSA":
+          builder = new BcRSAContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
+          break;
+        case "DSA":
+          builder = new BcDSAContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
+          break;
+        case "ECDSA":
+          builder = new BcECContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
+          break;
+        default:
+          throw new InvalidKeyException("unknown key algorithm of the public key " + keyAlg);
       }
       VERIFIER_PROVIDER_BUILDER.put(keyAlg, builder);
     }

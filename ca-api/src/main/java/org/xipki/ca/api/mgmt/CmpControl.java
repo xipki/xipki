@@ -161,7 +161,6 @@ public class CmpControl {
         : StringUtil.split(str, ALGO_DELIMITER);
 
     // PasswordBasedMac.mac
-    key = KEY_PROTECTION_PBM_MAC;
     str = pairs.value(KEY_PROTECTION_PBM_MAC);
     List<String> listMacAlgos = StringUtil.isBlank(str) ? null
         : StringUtil.split(str, ALGO_DELIMITER);
@@ -186,20 +185,19 @@ public class CmpControl {
 
     ConfPairs pairs = new ConfPairs();
 
-    this.confirmCert = (confirmCert == null) ? false : confirmCert;
+    this.confirmCert = confirmCert != null && confirmCert;
     pairs.putPair(KEY_CONFIRM_CERT, Boolean.toString(this.confirmCert));
 
-    this.sendCaCert = (sendCaCert == null) ? false : sendCaCert;
+    this.sendCaCert = sendCaCert != null && sendCaCert;
     pairs.putPair(KEY_SEND_CA, Boolean.toString(this.sendCaCert));
 
-    this.messageTimeRequired = (messageTimeRequired == null) ? true : messageTimeRequired;
+    this.messageTimeRequired = messageTimeRequired == null || messageTimeRequired;
     pairs.putPair(KEY_MESSAGETIME_REQUIRED, Boolean.toString(this.messageTimeRequired));
 
-    this.sendResponderCert = (sendResponderCert == null) ? true
-        : sendResponderCert.booleanValue();
+    this.sendResponderCert = sendResponderCert == null || sendResponderCert;
     pairs.putPair(KEY_SEND_RESPONDER, Boolean.toString(this.sendResponderCert));
 
-    this.rrAkiRequired = (rrAkiRequired == null) ? true : rrAkiRequired.booleanValue();
+    this.rrAkiRequired = rrAkiRequired == null || rrAkiRequired;
     pairs.putPair(KEY_RR_AKI_REQUIRED, Boolean.toString(this.rrAkiRequired));
 
     this.messageTimeBias = (messageTimeBias == null) ? DFLT_MESSAGE_TIME_BIAS : messageTimeBias;
@@ -210,7 +208,7 @@ public class CmpControl {
 
     this.confirmWaitTimeMs = this.confirmWaitTime * 1000L;
 
-    this.groupEnroll = (groupEnroll == null) ? false : groupEnroll;
+    this.groupEnroll = groupEnroll != null && groupEnroll;
     try {
       this.sigAlgoValidator = buildAlgorithmValidator(sigAlgos);
     } catch (NoSuchAlgorithmException ex) {
@@ -255,11 +253,11 @@ public class CmpControl {
     }
 
     if (CollectionUtil.isEmpty(pbmOwfs)) {
-      pbmOwfs = Arrays.asList("SHA256");
+      pbmOwfs = Collections.singletonList("SHA256");
     }
 
     if (CollectionUtil.isEmpty(pbmMacs)) {
-      pbmMacs = Arrays.asList("HMACSHA256");
+      pbmMacs = Collections.singletonList("HMACSHA256");
     }
 
     if (pbmIterationCount <= 0) {

@@ -55,12 +55,16 @@ public class ProtocolSupport {
 
     for (String protocol : protocols) {
       protocol = protocol.toLowerCase();
-      if (CMP.equals(protocol)) {
-        cmp = true;
-      } else if (REST.equals(protocol)) {
-        rest = true;
-      } else if (SCEP.equals(protocol)) {
-        scep = true;
+      switch (protocol) {
+        case CMP:
+          cmp = true;
+          break;
+        case REST:
+          rest = true;
+          break;
+        case SCEP:
+          scep = true;
+          break;
       }
     }
   }
@@ -73,12 +77,16 @@ public class ProtocolSupport {
     StringTokenizer st = new StringTokenizer(encoded, ",");
     while (st.hasMoreTokens()) {
       String protocol = st.nextToken().toLowerCase();
-      if (CMP.equals(protocol)) {
-        cmp = true;
-      } else if (REST.equals(protocol)) {
-        rest = true;
-      } else if (SCEP.equals(protocol)) {
-        scep = true;
+      switch (protocol) {
+        case CMP:
+          cmp = true;
+          break;
+        case REST:
+          rest = true;
+          break;
+        case SCEP:
+          scep = true;
+          break;
       }
     }
   } // constructor

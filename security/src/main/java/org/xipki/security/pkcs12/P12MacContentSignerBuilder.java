@@ -43,8 +43,7 @@ public class P12MacContentSignerBuilder {
 
   private final SecretKey key;
 
-  public P12MacContentSignerBuilder(SecretKey key)
-      throws XiSecurityException {
+  public P12MacContentSignerBuilder(SecretKey key) {
     this.key = notNull(key, "key");
   }
 
@@ -86,7 +85,7 @@ public class P12MacContentSignerBuilder {
   } // constructor
 
   public ConcurrentContentSigner createSigner(SignAlgo sigAlgo,
-      int parallelism, SecureRandom random)
+      int parallelism)
           throws XiSecurityException {
     notNull(sigAlgo, "sigAlgo");
     positive(parallelism, "parallelism");

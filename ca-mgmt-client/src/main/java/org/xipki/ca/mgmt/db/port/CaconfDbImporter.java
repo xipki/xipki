@@ -104,7 +104,7 @@ class CaconfDbImporter extends DbPorter {
           ps.setString(idx++, signer.getName());
           ps.setString(idx++, signer.getType());
           ps.setString(idx++, b64Cert);
-          ps.setString(idx++, readContent(signer.getConf()));
+          ps.setString(idx, readContent(signer.getConf()));
 
           ps.executeUpdate();
         } catch (SQLException ex) {
@@ -147,7 +147,7 @@ class CaconfDbImporter extends DbPorter {
   } // method importRequestor
 
   private void importUser(List<CaCertstore.User> users)
-      throws DataAccessException, IOException {
+      throws DataAccessException {
     System.out.println("importing table TUSER");
     final String sql = "INSERT INTO TUSER (ID,NAME,ACTIVE,PASSWORD) VALUES (?,?,?,?)";
     PreparedStatement ps = null;
@@ -186,7 +186,7 @@ class CaconfDbImporter extends DbPorter {
           ps.setInt(idx++, publisher.getId());
           ps.setString(idx++, publisher.getName());
           ps.setString(idx++, publisher.getType());
-          ps.setString(idx++, readContent(publisher.getConf()));
+          ps.setString(idx, readContent(publisher.getConf()));
 
           ps.executeUpdate();
         } catch (SQLException ex) {
@@ -213,7 +213,7 @@ class CaconfDbImporter extends DbPorter {
           ps.setInt(idx++, certprofile.getId());
           ps.setString(idx++, certprofile.getName());
           ps.setString(idx++, certprofile.getType());
-          ps.setString(idx++, readContent(certprofile.getConf()));
+          ps.setString(idx, readContent(certprofile.getConf()));
 
           ps.executeUpdate();
         } catch (SQLException ex) {
@@ -274,9 +274,7 @@ class CaconfDbImporter extends DbPorter {
           ps.setString(idx++, ca.getProtocolSupport());
           ps.setInt(idx++, ca.getSaveReq());
           ps.setInt(idx++, ca.getPermission());
-          Integer numCrls = ca.getNumCrls();
-          int tmpNumCrls = (numCrls == null) ? 30 : numCrls.intValue();
-          ps.setInt(idx++, tmpNumCrls);
+          ps.setInt(idx++, ca.getNumCrls());
           ps.setInt(idx++, ca.getExpirationPeriod());
           ps.setInt(idx++, ca.getKeepExpiredCertDays());
           ps.setString(idx++, ca.getValidityMode());
@@ -284,7 +282,7 @@ class CaconfDbImporter extends DbPorter {
           ps.setString(idx++, readContent(ca.getSignerConf()));
           ps.setString(idx++, ca.getRevInfo());
           ps.setString(idx++, ca.getDhpocControl());
-          ps.setString(idx++, ca.getRevokeSuspendedControl());
+          ps.setString(idx, ca.getRevokeSuspendedControl());
 
           ps.executeUpdate();
         } catch (SQLException ex) {
@@ -339,7 +337,7 @@ class CaconfDbImporter extends DbPorter {
           ps.setInt(idx++, entry.getRequestorId());
           ps.setInt(idx++, entry.getRa());
           ps.setInt(idx++, entry.getPermission());
-          ps.setString(idx++, entry.getProfiles());
+          ps.setString(idx, entry.getProfiles());
 
           ps.executeUpdate();
         } catch (SQLException ex) {
@@ -368,7 +366,7 @@ class CaconfDbImporter extends DbPorter {
           ps.setInt(idx++, entry.getCaId());
           ps.setInt(idx++, entry.getUserId());
           ps.setInt(idx++, entry.getPermission());
-          ps.setString(idx++, entry.getProfiles());
+          ps.setString(idx, entry.getProfiles());
 
           ps.executeUpdate();
         } catch (SQLException ex) {

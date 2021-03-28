@@ -74,8 +74,7 @@ public class ScepResponder {
 
   private static final long DFLT_MAX_SIGNINGTIME_BIAS = 5L * 60 * 1000; // 5 minutes
 
-  private static final Set<ASN1ObjectIdentifier> AES_ENC_ALGS =
-      new HashSet<ASN1ObjectIdentifier>();
+  private static final Set<ASN1ObjectIdentifier> AES_ENC_ALGS = new HashSet<>();
 
   private final CaCaps caCaps;
 
@@ -102,19 +101,17 @@ public class ScepResponder {
   }
 
   public ScepResponder(CaCaps caCaps, CaEmulator caEmulator, RaEmulator raEmulator,
-      NextCaAndRa nextCaAndRa, ScepControl control)
-          throws Exception {
+      NextCaAndRa nextCaAndRa, ScepControl control) {
     this.caCaps = Args.notNull(caCaps, "caCaps");
     this.caEmulator = Args.notNull(caEmulator, "caEmulator");
     this.control = Args.notNull(control, "control");
 
     this.raEmulator = raEmulator;
     this.nextCaAndRa = nextCaAndRa;
-    CaCaps caps = caCaps;
     if (nextCaAndRa == null) {
-      caps.removeCapabilities(CaCapability.GetNextCACert);
+      caCaps.removeCapabilities(CaCapability.GetNextCACert);
     } else {
-      caps.addCapabilities(CaCapability.GetNextCACert);
+      caCaps.addCapabilities(CaCapability.GetNextCACert);
     }
   }
 
@@ -180,7 +177,7 @@ public class ScepResponder {
   }
 
   private PkiMessage servicePkiOperation0(DecodedPkiMessage req, AuditEvent event)
-      throws MessageDecodingException, CaException, NoSuchAlgorithmException {
+      throws CaException {
     TransactionId tid = req.getTransactionId();
     PkiMessage rep = new PkiMessage(tid, MessageType.CertRep, Nonce.randomNonce());
     rep.setPkiStatus(PkiStatus.SUCCESS);
@@ -191,18 +188,18 @@ public class ScepResponder {
     }
 
     Boolean bo = req.isSignatureValid();
-    if (bo != null && !bo.booleanValue()) {
+    if (bo != null && !bo) {
       return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badMessageCheck);
     }
 
     bo = req.isDecryptionSuccessful();
-    if (bo != null && !bo.booleanValue()) {
+    if (bo != null && !bo) {
       return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
     }
 
     Date signingTime = req.getSigningTime();
     if (maxSigningTimeBiasInMs > 0) {
-      boolean isTimeBad = false;
+      boolean isTimeBad;
       if (signingTime == null) {
         isTimeBad = true;
       } else {
@@ -246,7 +243,7 @@ public class ScepResponder {
     ASN1ObjectIdentifier encOid = req.getContentEncryptionAlgorithm();
     if (CMSAlgorithm.DES_EDE3_CBC.equals(encOid)) {
       if (!caCaps.containsCapability(CaCapability.DES3)) {
-        LOG.warn("tid={}: encryption with DES3 algorithm is not permitted", tid, encOid);
+        LOG.warn("tid={}: encryption with DES3 algorithm {} is not permitted", tid, encOid);
         return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badAlg);
       }
     } else if (AES_ENC_ALGS.contains(encOid)) {
@@ -285,7 +282,7 @@ public class ScepResponder {
         }
 
         String challengePwd = getChallengePassword(csr.getCertificationRequestInfo());
-        if (challengePwd == null || !control.getSecret().equals(challengePwd)) {
+        if (!control.getSecret().equals(challengePwd)) {
           LOG.warn("challengePassword is not trusted");
           return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
         }
@@ -457,8 +454,8 @@ public class ScepResponder {
 
   private static PkiMessage buildPkiMessage(PkiMessage message, PkiStatus status,
       FailInfo failInfo) {
-    message.setPkiStatus(PkiStatus.FAILURE);
-    message.setFailInfo(FailInfo.badRequest);
+    message.setPkiStatus(status);
+    message.setFailInfo(failInfo);
     return message;
   }
 

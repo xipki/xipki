@@ -26,10 +26,7 @@ import java.security.cert.CRLException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.cms.ContentInfo;
@@ -95,8 +92,7 @@ public abstract class Client {
 
   private boolean useInsecureAlgorithms;
 
-  public Client(CaIdentifier caId, CaCertValidator caCertValidator)
-      throws MalformedURLException {
+  public Client(CaIdentifier caId, CaCertValidator caCertValidator) {
     this.caId = Args.notNull(caId, "caId");
     this.caCertValidator = Args.notNull(caCertValidator, "caCertValidator");
   }
@@ -212,8 +208,8 @@ public abstract class Client {
     } catch (IOException ex) {
       throw new ScepClientException(ex);
     }
-    this.responseSignerCerts = new CollectionStore<X509CertificateHolder>(
-        Arrays.asList(certHolder));
+    this.responseSignerCerts = new CollectionStore<>(
+            Collections.singletonList(certHolder));
   } // method refresh
 
   public CaCaps getCaCaps()
@@ -498,9 +494,7 @@ public abstract class Client {
     CMSSignedData cmsSignedData;
     try {
       cmsSignedData = new CMSSignedData(httpResp.getContentBytes());
-    } catch (CMSException ex) {
-      throw new ScepClientException("invalid SignedData message: " + ex.getMessage(), ex);
-    } catch (IllegalArgumentException ex) {
+    } catch (CMSException | IllegalArgumentException ex) {
       throw new ScepClientException("invalid SignedData message: " + ex.getMessage(), ex);
     }
 
@@ -516,7 +510,7 @@ public abstract class Client {
     }
 
     Boolean bo = resp.isSignatureValid();
-    if (bo != null && !bo.booleanValue()) {
+    if (bo != null && !bo) {
       throw new ScepClientException("Signature is invalid");
     }
 
@@ -567,12 +561,12 @@ public abstract class Client {
     }
 
     Boolean bo = resp.isSignatureValid();
-    if (bo != null && !bo.booleanValue()) {
+    if (bo != null && !bo) {
       throw new ScepClientException("Signature is invalid");
     }
 
     bo = resp.isDecryptionSuccessful();
-    if (bo != null && !bo.booleanValue()) {
+    if (bo != null && !bo) {
       throw new ScepClientException("Decryption failed");
     }
 
@@ -650,12 +644,11 @@ public abstract class Client {
             "at least 2 certificates are expected, but only " + n + " is available");
       }
 
-      for (int i = 0; i < n; i++) {
-        X509Cert cert = certs.get(i);
+      for (X509Cert cert : certs) {
         if (cert.getBasicConstraints() > -1) {
           if (caCert != null) {
             throw new ScepClientException(
-                "multiple CA certificates is returned, but exactly 1 is expected");
+                    "multiple CA certificates is returned, but exactly 1 is expected");
           }
           caCert = cert;
         } else {

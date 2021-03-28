@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.util.*;
 
 import java.io.*;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -53,7 +53,7 @@ public class CaConfs {
     Args.notNull(root, "root");
     Args.notNull(out, "out");
     root.validate();
-    JSON.writeJSONString(out, Charset.forName("UTF8"), root, SerializerFeature.PrettyFormat);
+    JSON.writeJSONString(out, StandardCharsets.UTF_8, root, SerializerFeature.PrettyFormat);
   } // method marshal
 
   public static InputStream convertFileConfToZip(String confFilename)
@@ -68,7 +68,7 @@ public class CaConfs {
     confFile = IoUtil.expandFilepath(confFile, true);
 
     InputStream caConfStream = null;
-    String baseDir = null;
+    String baseDir;
 
     try {
       caConfStream = Files.newInputStream(confFile.toPath());
@@ -257,7 +257,7 @@ public class CaConfs {
         try {
           caConfStream.close();
         } catch (IOException ex) {
-          LOG.info("could not clonse caConfStream", ex.getMessage());
+          LOG.info("could not close caConfStream: {}", ex.getMessage());
         }
       }
 
@@ -293,7 +293,7 @@ public class CaConfs {
   private static String getValue(String fileName, Map<String, String> properties, String baseDir)
       throws IOException {
     byte[] binary = getBinary(fileName, properties, baseDir);
-    return new String(binary, "UTF-8");
+    return new String(binary, StandardCharsets.UTF_8);
   } // method getValue
 
   private static byte[] getBinary(String fileName, Map<String, String> properties, String baseDir)

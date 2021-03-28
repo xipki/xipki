@@ -86,7 +86,7 @@ import org.xipki.util.Validity.Unit;
 
 class CertprofileUtil {
 
-  private static Validity maxCabEeValidity = new Validity(397, Unit.DAY);
+  private static final Validity maxCabEeValidity = new Validity(397, Unit.DAY);
 
   public static SubjectInfo getSubject(Certprofile certprofile, X500Name requestedSubject)
       throws CertprofileException, BadCertTemplateException {
@@ -542,7 +542,7 @@ class CertprofileUtil {
             msg.append("unpermitted DSA (p,q) are configured, ");
           }
         } else {
-          msg.append("keyAlgorithm ").append(m.getId() + " is not permitted, ");
+          msg.append("keyAlgorithm ").append(m.getId()).append(" is not permitted, ");
         }
       }
     }
@@ -653,7 +653,7 @@ class CertprofileUtil {
 
         if (!(XKU.id_kp_serverAuth.equals(oid) || XKU.id_kp_clientAuth.equals(oid)
             || XKU.id_kp_emailProtection.equals(oid))) {
-          msg.append("extendedKeyUsage ").append(oid.getId() + " is not permitted, ");
+          msg.append("extendedKeyUsage ").append(oid.getId()).append(" is not permitted, ");
         }
       }
 

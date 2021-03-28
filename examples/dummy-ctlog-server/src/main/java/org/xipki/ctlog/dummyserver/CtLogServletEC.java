@@ -24,7 +24,6 @@ import org.xipki.util.Base64;
  *
  * @author Lijun Liao
  */
-@SuppressWarnings("serial")
 //CHECKSTYLE:SKIP
 public class CtLogServletEC extends CtLogServlet {
 

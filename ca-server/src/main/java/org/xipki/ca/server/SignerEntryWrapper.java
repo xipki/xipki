@@ -93,7 +93,7 @@ public class SignerEntryWrapper {
   }
 
   public boolean isHealthy() {
-    return (signer == null) ? false : signer.isHealthy();
+    return signer != null && signer.isHealthy();
   }
 
   public GeneralName getSubjectAsGeneralName() {

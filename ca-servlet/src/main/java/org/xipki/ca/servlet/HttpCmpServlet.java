@@ -54,7 +54,6 @@ import org.xipki.util.LogUtil;
  * @since 3.0.1
  */
 
-@SuppressWarnings("serial")
 public class HttpCmpServlet extends HttpServlet {
 
   private static final Logger LOG = LoggerFactory.getLogger(HttpCmpServlet.class);

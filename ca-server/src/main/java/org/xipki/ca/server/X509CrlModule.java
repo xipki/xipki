@@ -48,13 +48,11 @@ import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.CRLDistPoint;
 import org.bouncycastle.asn1.x509.CRLReason;
 import org.bouncycastle.asn1.x509.CertificateList;
-import org.bouncycastle.asn1.x509.DistributionPointName;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.IssuingDistributionPoint;
-import org.bouncycastle.asn1.x509.ReasonFlags;
 import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509v2CRLBuilder;
@@ -171,7 +169,6 @@ public class X509CrlModule extends X509CaModule implements Closeable {
         generateCrl(createDeltaCrlNow, now, nextUpdate, CaAuditConstants.MSGID_ca_routine);
       } catch (Throwable th) {
         LogUtil.error(LOG, th);
-        return;
       }
     } // method run0
 
@@ -183,11 +180,11 @@ public class X509CrlModule extends X509CaModule implements Closeable {
 
   private final CaManagerImpl caManager;
 
-  private AtomicBoolean crlGenInProcess = new AtomicBoolean(false);
+  private final AtomicBoolean crlGenInProcess = new AtomicBoolean(false);
 
   private ScheduledFuture<?> crlGenerationService;
 
-  private X509PublisherModule publisher;
+  private final X509PublisherModule publisher;
 
   public X509CrlModule(CaManagerImpl caManager, CaInfo caInfo, CertStore certstore,
       X509PublisherModule publisher) throws OperationException {
@@ -255,9 +252,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
               crl.getThisUpdate());
         }
         return crl;
-      } catch (CRLException ex) {
-        throw new OperationException(SYSTEM_FAILURE, ex);
-      } catch (RuntimeException ex) {
+      } catch (CRLException | RuntimeException ex) {
         throw new OperationException(SYSTEM_FAILURE, ex);
       }
     } finally {
@@ -299,7 +294,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
     }
   } // method getCrl
 
-  private void cleanupCrlsWithoutException(String msgId) throws OperationException {
+  private void cleanupCrlsWithoutException(String msgId) {
     try {
       int numCrls = caInfo.getNumCrls();
       LOG.info("     START cleanupCrls: ca={}, numCrls={}", caIdent.getName(), numCrls);
@@ -446,9 +441,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
           startId = maxId + 1;
         } while (revInfos.size() >= numEntries); // end do
 
-        if (revInfos != null) { // free the memory
-          revInfos.clear();
-        }
+        revInfos.clear();
       }
 
       if (indirectCrl && allRevInfos.isEmpty()) {
@@ -541,10 +534,10 @@ public class X509CrlModule extends X509CaModule implements Closeable {
         // IssuingDistributionPoint
         if (indirectCrl) {
           IssuingDistributionPoint idp = new IssuingDistributionPoint(
-              (DistributionPointName) null, // distributionPoint,
+              null, // distributionPoint,
               false, // onlyContainsUserCerts,
               false, // onlyContainsCACerts,
-              (ReasonFlags) null, // onlySomeReasons,
+              null, // onlySomeReasons,
               indirectCrl, // indirectCRL,
               false); // onlyContainsAttributeCerts
 
@@ -649,7 +642,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
     SignerEntryWrapper signer = getCrlSigner();
     if (signer != null && signer.getSigner() != null) {
       boolean crlSignerHealthy = signer.isHealthy();
-      healthy &= crlSignerHealthy;
+      healthy = crlSignerHealthy;
 
       HealthCheckResult crlSignerHealth = new HealthCheckResult();
       crlSignerHealth.setName("CRLSigner");

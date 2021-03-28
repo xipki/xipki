@@ -390,8 +390,7 @@ public class P11Actions {
     @Completion(SecurityCompleters.P11KeyUsageCompleter.class)
     private List<String> keyusages;
 
-    protected void finalize(String keyType, P11IdentityId identityId)
-        throws Exception {
+    protected void finalize(String keyType, P11IdentityId identityId) {
       Args.notNull(identityId, "identityId");
       println("generated " + keyType + " key \"" + identityId + "\"");
     }
@@ -543,7 +542,7 @@ public class P11Actions {
       P11Slot slot = getSlot();
       P11NewKeyControl control = getControl();
 
-      P11IdentityId identityId = null;
+      P11IdentityId identityId;
       try {
         identityId = slot.generateSecretKey(p11KeyType, keysize, control);
         finalize(keyType, identityId);

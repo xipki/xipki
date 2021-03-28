@@ -27,7 +27,7 @@ import java.util.Map;
 
 public interface Curl {
 
-  public static class CurlResult {
+  class CurlResult {
 
     private String contentType;
 

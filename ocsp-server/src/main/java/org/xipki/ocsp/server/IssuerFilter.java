@@ -68,7 +68,7 @@ public class IssuerFilter {
   public boolean includeIssuerWithSha1Fp(String sha1Fp) {
     notBlank(sha1Fp, "sha1Fp");
     if (includeSha1Fps == null || includeSha1Fps.contains(sha1Fp)) {
-      return (excludeSha1Fps == null) ? true : !excludeSha1Fps.contains(sha1Fp);
+      return excludeSha1Fps == null || !excludeSha1Fps.contains(sha1Fp);
     } else {
       return false;
     }

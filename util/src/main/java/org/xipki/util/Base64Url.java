@@ -26,7 +26,7 @@ public class Base64Url {
     IA['='] = 0;
   }
 
-  public static final boolean containsOnlyBase64UrlChars(byte[] bytes, int offset, int len) {
+  public static boolean containsOnlyBase64UrlChars(byte[] bytes, int offset, int len) {
     final int maxIndex = Math.min(bytes.length, offset + len);
 
     for (int i = offset; i < maxIndex; i++) {
@@ -57,7 +57,7 @@ public class Base64Url {
    *          returned.
    * @return A BASE64Url encoded array. Never <code>null</code>.
    */
-  public final static char[] encodeToChar(byte[] sArr) {
+  public static char[] encodeToChar(byte[] sArr) {
     // Check special case
     int sLen = sArr != null ? sArr.length : 0;
     if (sLen == 0) {
@@ -66,8 +66,7 @@ public class Base64Url {
     //assert sArr != null;
 
     int eLen = (sLen / 3) * 3;              // Length of even 24-bits.
-    int cCnt = ((sLen - 1) / 3 + 1) << 2;   // Returned character count
-    int dLen = cCnt; // Length of returned array
+    int dLen = ((sLen - 1) / 3 + 1) << 2;   // Returned character / byte count
     char[] dArr = new char[dLen];
 
     // Encode even 24-bits
@@ -109,7 +108,7 @@ public class Base64Url {
    *          an exception.
    * @return The decoded array of bytes. May be of length 0.
    */
-  public final static byte[] decodeFast(char[] sArr) {
+  public static byte[] decodeFast(char[] sArr) {
     // Check special case
     int sLen = sArr.length;
     if (sLen == 0) {
@@ -175,7 +174,7 @@ public class Base64Url {
    *          returned.
    * @return A BASE64Url encoded array. Never <code>null</code>.
    */
-  public static final byte[] encodeToByte(byte[] sArr) {
+  public static byte[] encodeToByte(byte[] sArr) {
     // Check special case
     int sLen = sArr != null ? sArr.length : 0;
     if (sLen == 0) {
@@ -184,8 +183,7 @@ public class Base64Url {
     //assert sArr != null;
 
     int eLen = (sLen / 3) * 3;                              // Length of even 24-bits.
-    int cCnt = ((sLen - 1) / 3 + 1) << 2;                   // Returned character count
-    int dLen = cCnt; // Length of returned array
+    int dLen = ((sLen - 1) / 3 + 1) << 2;                   // Returned character / byte count
     byte[] dArr = new byte[dLen];
 
     // Encode even 24-bits
@@ -227,7 +225,7 @@ public class Base64Url {
    *          an exception.
    * @return The decoded array of bytes. May be of length 0.
    */
-  public final static byte[] decodeFast(byte[] sArr) {
+  public static byte[] decodeFast(byte[] sArr) {
     // Check special case
     int sLen = sArr.length;
     if (sLen == 0) {
@@ -293,7 +291,7 @@ public class Base64Url {
    *          returned.
    * @return A BASE64Url encoded array. Never <code>null</code>.
    */
-  public final static String encodeToString(byte[] sArr) {
+  public static String encodeToString(byte[] sArr) {
     // Reuse char[] since we can't create a String incrementally anyway and StringBuffer/Builder
     // would be slower.
     return new String(encodeToChar(sArr));
@@ -311,7 +309,7 @@ public class Base64Url {
    *          throw an exception.
    * @return The decoded array of bytes. May be of length 0.
    */
-  public final static byte[] decodeFast(String s) {
+  public static byte[] decodeFast(String s) {
     // Check special case
     int sLen = s.length();
     if (sLen == 0) {

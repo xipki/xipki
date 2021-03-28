@@ -82,7 +82,7 @@ public class RestResponder {
 
     private String contentType;
 
-    private Map<String, String> headers = new HashMap<>();
+    private Map<String, String> headers;
 
     private byte[] body;
 
@@ -139,7 +139,7 @@ public class RestResponder {
 
     private final AuditLevel auditLevel;
 
-    private AuditStatus auditStatus;
+    private final AuditStatus auditStatus;
 
     public HttpRespAuditException(int httpStatus, String auditMessage,
         AuditLevel auditLevel, AuditStatus auditStatus) {

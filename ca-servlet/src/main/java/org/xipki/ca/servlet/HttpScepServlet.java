@@ -63,7 +63,6 @@ import org.xipki.util.RandomUtil;
  * @since 3.0.1
  */
 
-@SuppressWarnings("serial")
 public class HttpScepServlet extends HttpServlet {
 
   private static final Logger LOG = LoggerFactory.getLogger(HttpScepServlet.class);

@@ -59,7 +59,7 @@ public class PasswordActions {
     @Override
     protected Object execute0()
         throws Exception {
-      if (!(passwordHint == null ^ passwordFile == null)) {
+      if ((passwordHint == null) == (passwordFile == null)) {
         throw new IllegalCmdParamException(
             "exactly one of password and password-file must be specified");
       }
@@ -152,7 +152,7 @@ public class PasswordActions {
     protected Object execute0()
         throws Exception {
       Args.range(mquorum, "mk", 1, 10);
-      if (!(passwordHint == null ^ passwordFile == null)) {
+      if ((passwordHint == null) == (passwordFile == null)) {
         throw new IllegalCmdParamException(
             "exactly one of password and password-file must be specified");
       }

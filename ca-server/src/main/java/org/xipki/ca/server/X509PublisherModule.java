@@ -52,8 +52,7 @@ class X509PublisherModule extends X509CaModule {
 
   private final CaManagerImpl caManager;
 
-  X509PublisherModule(CaManagerImpl caManager, CaInfo caInfo, CertStore certstore)
-      throws OperationException {
+  X509PublisherModule(CaManagerImpl caManager, CaInfo caInfo, CertStore certstore) {
     super(caInfo);
 
     this.caManager = notNull(caManager, "caManager");
@@ -104,7 +103,7 @@ class X509PublisherModule extends X509CaModule {
 
       Long certId = certInfo.getCert().getCertId();
       try {
-        certstore.addToPublishQueue(publisher.getIdent(), certId.longValue(), caIdent);
+        certstore.addToPublishQueue(publisher.getIdent(), certId, caIdent);
       } catch (Throwable th) {
         LogUtil.error(LOG, th, "could not add entry to PublishQueue");
         return 2;
@@ -265,7 +264,6 @@ class X509PublisherModule extends X509CaModule {
         } catch (OperationException ex) {
           LogUtil.warn(LOG, ex, "could not remove republished cert id=" + certId
               + " and publisher=" + publisher.getIdent().getName());
-          continue;
         }
       } // end for
     } // end while
@@ -342,7 +340,7 @@ class X509PublisherModule extends X509CaModule {
 
       Long certId = revokedCert.getCert().getCertId();
       try {
-        certstore.addToPublishQueue(publisher.getIdent(), certId.longValue(), caIdent);
+        certstore.addToPublishQueue(publisher.getIdent(), certId, caIdent);
       } catch (Throwable th) {
         LogUtil.error(LOG, th, "could not add entry to PublishQueue");
       }
@@ -368,7 +366,7 @@ class X509PublisherModule extends X509CaModule {
 
       Long certId = unrevokedCert.getCertId();
       try {
-        certstore.addToPublishQueue(publisher.getIdent(), certId.longValue(), caIdent);
+        certstore.addToPublishQueue(publisher.getIdent(), certId, caIdent);
       } catch (Throwable th) {
         LogUtil.error(LOG, th, "could not add entry to PublishQueue");
       }

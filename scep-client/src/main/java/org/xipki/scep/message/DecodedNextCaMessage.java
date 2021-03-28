@@ -239,7 +239,7 @@ public class DecodedNextCaMessage {
       }
     }
 
-    ContentInfo contentInfo = ContentInfo.getInstance((byte[]) signedContent.getContent());
+    ContentInfo contentInfo = ContentInfo.getInstance(signedContent.getContent());
     SignedData signedData = SignedData.getInstance(contentInfo.getContent());
 
     List<X509Cert> certs;
@@ -253,12 +253,9 @@ public class DecodedNextCaMessage {
       return ret;
     }
 
-    final int n = certs.size();
-
     X509Cert caCert = null;
     List<X509Cert> raCerts = new LinkedList<>();
-    for (int i = 0; i < n; i++) {
-      X509Cert cert = certs.get(i);
+    for (X509Cert cert : certs) {
       if (cert.getBasicConstraints() > -1) {
         if (caCert != null) {
           final String msg = "multiple CA certificates is returned, but exactly 1 is expected";

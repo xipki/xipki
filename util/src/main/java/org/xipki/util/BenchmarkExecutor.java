@@ -43,7 +43,7 @@ public abstract class BenchmarkExecutor {
 
   private boolean interrupted;
 
-  private String description;
+  private final String description;
 
   private final ProcessLog processLog;
 
@@ -51,7 +51,7 @@ public abstract class BenchmarkExecutor {
 
   private int threads = DEFAULT_THREADS;
 
-  private AtomicLong errorAccount = new AtomicLong(0);
+  private final AtomicLong errorAccount = new AtomicLong(0);
 
   private String unit = "";
 

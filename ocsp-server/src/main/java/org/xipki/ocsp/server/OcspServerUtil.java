@@ -70,7 +70,7 @@ import com.alibaba.fastjson.JSON;
 
 public class OcspServerUtil {
 
-  private static Logger LOG = LoggerFactory.getLogger(OcspServerUtil.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OcspServerUtil.class);
 
   private static final String STORE_TYPE_XIPKI_DB = "xipki-db";
 
@@ -170,7 +170,7 @@ public class OcspServerUtil {
 
     store.setName(conf.getName());
     Integer interval = conf.getRetentionInterval();
-    int retentionInterva = (interval == null) ? -1 : interval.intValue();
+    int retentionInterva = (interval == null) ? -1 : interval;
     store.setRetentionInterval(retentionInterva);
     store.setUnknownCertBehaviour(conf.getUnknownCertBehaviour());
 
@@ -202,7 +202,7 @@ public class OcspServerUtil {
       }
     }
     try {
-      Map<String, ? extends Object> sourceConf = conf.getSource().getConf();
+      Map<String, ?> sourceConf = conf.getSource().getConf();
       store.init(sourceConf, datasource);
     } catch (OcspStoreException ex) {
       throw new InvalidConfException("CertStatusStoreException of store " + conf.getName()
@@ -216,11 +216,8 @@ public class OcspServerUtil {
       RequestOption requestOption, Date referenceTime) {
     X509Cert target = certsInReq[0];
 
-    Set<X509Cert> certstore = new HashSet<>();
     Set<X509Cert> trustAnchors = requestOption.getTrustAnchors();
-    for (X509Cert m : trustAnchors) {
-      certstore.add(m);
-    }
+    Set<X509Cert> certstore = new HashSet<>(trustAnchors);
 
     Set<X509Cert> configuredCerts = requestOption.getCerts();
     if (CollectionUtil.isNotEmpty(configuredCerts)) {
@@ -263,7 +260,7 @@ public class OcspServerUtil {
   } // method canBuildCertpath
 
   private static boolean getBoolean(Boolean bo, boolean defaultValue) {
-    return (bo == null) ? defaultValue : bo.booleanValue();
+    return (bo == null) ? defaultValue : bo;
   }
 
   private static InputStream getInputStream(FileOrBinary conf)

@@ -183,7 +183,7 @@ public class Securities implements Closeable {
 
   private SecurityFactoryImpl securityFactory;
 
-  private List<P11ModuleFactory> p11ModuleFactories;
+  private final List<P11ModuleFactory> p11ModuleFactories;
 
   public Securities() {
     this(createDefaultFactories());
@@ -314,8 +314,7 @@ public class Securities implements Closeable {
 
   } // method initSecurityFactory
 
-  private void initSecurityPkcs12(SignerFactoryRegisterImpl signerFactoryRegister)
-      throws IOException {
+  private void initSecurityPkcs12(SignerFactoryRegisterImpl signerFactoryRegister) {
     P12SignerFactory p12SignerFactory = new P12SignerFactory();
     p12SignerFactory.setSecurityFactory(securityFactory);
     signerFactoryRegister.registFactory(p12SignerFactory);

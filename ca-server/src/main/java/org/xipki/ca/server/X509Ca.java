@@ -28,11 +28,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -316,7 +312,7 @@ public class X509Ca extends X509CaModule implements Closeable {
 
   public CertificateInfo regenerateCert(CertTemplateData certTemplate, RequestorInfo requestor,
       RequestType reqType, byte[] transactionId, String msgId) throws OperationException {
-    return regenerateCerts(Arrays.asList(certTemplate), requestor, reqType,
+    return regenerateCerts(Collections.singletonList(certTemplate), requestor, reqType,
         transactionId, msgId).get(0);
   }
 
@@ -464,7 +460,7 @@ public class X509Ca extends X509CaModule implements Closeable {
   public CertificateInfo generateCert(CertTemplateData certTemplate, RequestorInfo requestor,
       RequestType reqType, byte[] transactionId, String msgId) throws OperationException {
     notNull(certTemplate, "certTemplate");
-    return generateCerts(Arrays.asList(certTemplate), requestor,
+    return generateCerts(Collections.singletonList(certTemplate), requestor,
         reqType, transactionId, msgId).get(0);
   }
 
@@ -727,7 +723,7 @@ public class X509Ca extends X509CaModule implements Closeable {
     ConcurrentContentSigner signer = caInfo.getSigner(null);
     if (signer != null) {
       boolean caSignerHealthy = signer.isHealthy();
-      healthy &= caSignerHealthy;
+      healthy = caSignerHealthy;
 
       HealthCheckResult signerHealth = new HealthCheckResult();
       signerHealth.setName("Signer");

@@ -44,11 +44,11 @@ public class SecurePasswordInputPanel extends Panel {
 
   private static final String OK = "OK";
 
-  private static final Map<Integer, String[]> KEYS_MAP = new HashMap<Integer, String[]>();
+  private static final Map<Integer, String[]> KEYS_MAP = new HashMap<>();
 
   private final JPasswordField passwordField;
 
-  private final Set<JButton> buttons = new HashSet<JButton>();
+  private final Set<JButton> buttons = new HashSet<>();
 
   private String password = "";
   private boolean caps;
@@ -62,7 +62,7 @@ public class SecurePasswordInputPanel extends Panel {
         ".", "-", "/"});
     KEYS_MAP.put(idx++, new String[]{"q", "w", "e", "r", "z", "y", "u", "i", "o", "p"});
     KEYS_MAP.put(idx++, new String[]{"a", "s", "d", "f", "g", "h", "j", "k", "j", BACKSPACE});
-    KEYS_MAP.put(idx++, new String[] {CAPS, "z", "x", "c", "v", "b", "n", "m", CLEAR});
+    KEYS_MAP.put(idx, new String[] {CAPS, "z", "x", "c", "v", "b", "n", "m", CLEAR});
   } // method static
 
   private SecurePasswordInputPanel() {
@@ -73,7 +73,7 @@ public class SecurePasswordInputPanel extends Panel {
 
     add(passwordField);
 
-    Set<Integer> rows = new HashSet<Integer>(KEYS_MAP.keySet());
+    Set<Integer> rows = new HashSet<>(KEYS_MAP.keySet());
     final int n = rows.size();
 
     SecureRandom random = new SecureRandom();
@@ -87,8 +87,7 @@ public class SecurePasswordInputPanel extends Panel {
       rows.remove(row);
 
       JPanel panel = new JPanel();
-      for (int column = 0; column < keys.length; column++) {
-        String text = keys[column];
+      for (String text : keys) {
         JButton button = new JButton(text);
         button.setFont(button.getFont().deriveFont(Font.TRUETYPE_FONT));
         if (CLEAR.equalsIgnoreCase(text)) {
@@ -153,7 +152,7 @@ public class SecurePasswordInputPanel extends Panel {
         tmpPrompt = "Password required";
       }
 
-      int option = JOptionPane.showOptionDialog(null, gui, tmpPrompt,  JOptionPane.NO_OPTION,
+      int option = JOptionPane.showOptionDialog(null, gui, tmpPrompt, JOptionPane.NO_OPTION,
           JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
 
       if (option == 0) { // pressing OK button

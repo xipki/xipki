@@ -194,8 +194,7 @@ class RefDigestReader implements Closeable {
   } // class Retriever
 
   private RefDigestReader(DataSourceWrapper datasource, X509Cert caCert,
-      int totalAccount, long minId, int numBlocksToRead, AtomicBoolean stopMe)
-          throws Exception {
+      int totalAccount, long minId, int numBlocksToRead, AtomicBoolean stopMe) {
     this.datasource = Args.notNull(datasource, "datasource");
     this.caCert = Args.notNull(caCert, "caCert");
     this.stopMe = Args.notNull(stopMe, "stopMe");

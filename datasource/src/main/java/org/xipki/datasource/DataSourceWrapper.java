@@ -93,7 +93,7 @@ public abstract class DataSourceWrapper implements Closeable {
         throws DataAccessException {
       final String sqlUpdate = buildAndCacheNextSeqValueSql(sequenceName);
       final String sqlSelect = "SELECT @cur_value";
-      String sql = null;
+      String sql = sqlUpdate;
 
       Statement stmt = null;
       ResultSet rs = null;
@@ -101,7 +101,6 @@ public abstract class DataSourceWrapper implements Closeable {
       long ret;
       try {
         stmt = conn == null ? createStatement() : createStatement(conn);
-        sql = sqlUpdate;
         stmt.executeUpdate(sql);
 
         sql = sqlSelect;
@@ -112,7 +111,7 @@ public abstract class DataSourceWrapper implements Closeable {
           throw new DataAccessException("could not increment the sequence " + sequenceName);
         }
       } catch (SQLException ex) {
-        throw translate(sqlUpdate, ex);
+        throw translate(sql, ex);
       } finally {
         releaseResources(stmt, rs, conn == null);
       }
@@ -534,7 +533,9 @@ public abstract class DataSourceWrapper implements Closeable {
 
     if (ps == null) {
       return;
-    } else if (returnConnection) {
+    }
+
+    if (returnConnection) {
       Connection conn = null;
       try {
         conn = ps.getConnection();

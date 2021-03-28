@@ -187,7 +187,7 @@ public class KeyUtil {
   // CHECKSTYLE:SKIP
   public static PrivateKey convertXDHToDummyEdDSAPrivateKey(PrivateKey key)
       throws InvalidKeySpecException {
-    if (key instanceof XDHKey && key instanceof PrivateKey) {
+    if (key instanceof XDHKey) {
       PrivateKeyInfo xdhPki = PrivateKeyInfo.getInstance(key.getEncoded());
       String xdhAlgo = key.getAlgorithm();
 
@@ -225,18 +225,18 @@ public class KeyUtil {
       alg = "EC";
     }
     synchronized (KEY_FACTORIES) {
-      KeyFactory kf = KEY_FACTORIES.get(algorithm);
+      KeyFactory kf = KEY_FACTORIES.get(alg);
       if (kf != null) {
         return kf;
       }
 
       try {
-        kf = KeyFactory.getInstance(algorithm, "BC");
+        kf = KeyFactory.getInstance(alg, "BC");
       } catch (NoSuchAlgorithmException | NoSuchProviderException ex) {
-        throw new InvalidKeySpecException("could not find KeyFactory for " + algorithm
+        throw new InvalidKeySpecException("could not find KeyFactory for " + alg
             + ": " + ex.getMessage());
       }
-      KEY_FACTORIES.put(algorithm, kf);
+      KEY_FACTORIES.put(alg, kf);
       return kf;
     }
   } // method getKeyFactory
@@ -247,14 +247,15 @@ public class KeyUtil {
     if ("ECDSA".equals(alg)) {
       alg = "EC";
     }
+
     synchronized (KEYPAIR_GENERATORS) {
-      KeyPairGenerator kg = KEYPAIR_GENERATORS.get(algorithm);
+      KeyPairGenerator kg = KEYPAIR_GENERATORS.get(alg);
       if (kg != null) {
         return kg;
       }
 
-      kg = KeyPairGenerator.getInstance(algorithm, "BC");
-      KEYPAIR_GENERATORS.put(algorithm, kg);
+      kg = KeyPairGenerator.getInstance(alg, "BC");
+      KEYPAIR_GENERATORS.put(alg, kg);
       return kg;
     }
   } // method getKeyPairGenerator
@@ -344,16 +345,17 @@ public class KeyUtil {
     } else if (key instanceof XDHKey || key instanceof EdDSAKey) {
       byte[] encoded = key.getEncoded();
       String algorithm = key.getAlgorithm().toUpperCase();
-      if (EdECConstants.X25519.equals(algorithm)) {
-        return new X25519PublicKeyParameters(encoded, encoded.length - 32);
-      } else if (EdECConstants.ED25519.equals(algorithm)) {
-        return new Ed25519PublicKeyParameters(encoded, encoded.length - 32);
-      } else if (EdECConstants.X448.equals(algorithm)) {
-        return new X448PublicKeyParameters(encoded, encoded.length - 56);
-      } else if (EdECConstants.ED448.equals(algorithm)) {
-        return new Ed448PublicKeyParameters(encoded, encoded.length - 57);
-      } else {
-        throw new InvalidKeyException("unknown Edwards key " + algorithm);
+      switch (algorithm) {
+        case EdECConstants.X25519:
+          return new X25519PublicKeyParameters(encoded, encoded.length - 32);
+        case EdECConstants.ED25519:
+          return new Ed25519PublicKeyParameters(encoded, encoded.length - 32);
+        case EdECConstants.X448:
+          return new X448PublicKeyParameters(encoded, encoded.length - 56);
+        case EdECConstants.ED448:
+          return new Ed448PublicKeyParameters(encoded, encoded.length - 57);
+        default:
+          throw new InvalidKeyException("unknown Edwards key " + algorithm);
       }
     } else {
       throw new InvalidKeyException("unknown key " + key.getClass().getName());
@@ -427,24 +429,29 @@ public class KeyUtil {
       int keysize;
       byte[] prefix;
       ASN1ObjectIdentifier algOid;
-      if (EdECConstants.ED25519.equals(algorithm)) {
-        algOid = EdECConstants.id_ED25519;
-        keysize = 32;
-        prefix = Ed25519Prefix;
-      } else if (EdECConstants.X25519.equals(algorithm)) {
-        algOid = EdECConstants.id_X25519;
-        keysize = 32;
-        prefix = x25519Prefix;
-      } else if (EdECConstants.ED448.equals(algorithm)) {
-        algOid = EdECConstants.id_ED448;
-        keysize = 57;
-        prefix = Ed448Prefix;
-      } else if (EdECConstants.X448.equals(algorithm)) {
-        algOid = EdECConstants.id_X448;
-        keysize = 56;
-        prefix = x448Prefix;
-      } else {
-        throw new IllegalArgumentException("invalid algorithm " + algorithm);
+      switch (algorithm) {
+        case EdECConstants.ED25519:
+          algOid = EdECConstants.id_ED25519;
+          keysize = 32;
+          prefix = Ed25519Prefix;
+          break;
+        case EdECConstants.X25519:
+          algOid = EdECConstants.id_X25519;
+          keysize = 32;
+          prefix = x25519Prefix;
+          break;
+        case EdECConstants.ED448:
+          algOid = EdECConstants.id_ED448;
+          keysize = 57;
+          prefix = Ed448Prefix;
+          break;
+        case EdECConstants.X448:
+          algOid = EdECConstants.id_X448;
+          keysize = 56;
+          prefix = x448Prefix;
+          break;
+        default:
+          throw new IllegalArgumentException("invalid algorithm " + algorithm);
       }
 
       if (encoded.length != prefix.length + keysize) {
@@ -516,7 +523,7 @@ public class KeyUtil {
    * {@code destPos}.
    *
    * @param value value to be converted.
-   * @return a byte array without a leading zero byte if present in the signed encoding.
+   * @param destPos destination
    */
   private static void unsignedByteArrayCopy(byte[] dest, int destPos,
       int length, BigInteger value) {

@@ -137,7 +137,7 @@ public class ExtensionConfBuilder {
     subFields.add(subField);
     ConstantExtnValue subsubField = new ConstantExtnValue(FieldType.UTF8String);
     subsubField.setValue("app");
-    subField.setListValue(Arrays.asList(subsubField));
+    subField.setListValue(Collections.singletonList(subsubField));
 
     // Line 5
     subField = new ConstantExtnValue(FieldType.UTF8String);
@@ -151,7 +151,7 @@ public class ExtensionConfBuilder {
     subField.setTag(new Tag(1, true));
     subsubField = new ConstantExtnValue(FieldType.UTF8String);
     subsubField.setValue("void");
-    subField.setListValue(Arrays.asList(subsubField));
+    subField.setListValue(Collections.singletonList(subsubField));
 
     // Line 8
     subField = new ConstantExtnValue(FieldType.UTF8String);
@@ -165,7 +165,7 @@ public class ExtensionConfBuilder {
     subField.setTag(new Tag(9, false));
     subsubField = new ConstantExtnValue(FieldType.UTF8String);
     subsubField.setValue("complication");
-    subField.setListValue(Arrays.asList(subsubField));
+    subField.setListValue(Collections.singletonList(subsubField));
 
     return subFields;
   } // method createConstantSequenceOrSet
@@ -193,7 +193,7 @@ public class ExtensionConfBuilder {
     subField = new SubFieldSyntax(FieldType.SEQUENCE);
     subFields.add(subField);
     SubFieldSyntax subsubField = new SubFieldSyntax(FieldType.UTF8String);
-    subField.setSubFields(Arrays.asList(subsubField));
+    subField.setSubFields(Collections.singletonList(subsubField));
 
     // Line 5
     subField = new SubFieldSyntax(FieldType.UTF8String);
@@ -205,7 +205,7 @@ public class ExtensionConfBuilder {
     subFields.add(subField);
     subField.setTag(new Tag(1, true));
     subsubField = new SubFieldSyntax(FieldType.UTF8String);
-    subField.setSubFields(Arrays.asList(subsubField));
+    subField.setSubFields(Collections.singletonList(subsubField));
 
     // Line 8
     subField = new SubFieldSyntax(FieldType.UTF8String);
@@ -217,7 +217,7 @@ public class ExtensionConfBuilder {
     subFields.add(subField);
     subField.setTag(new Tag(9, false));
     subsubField = new SubFieldSyntax(FieldType.UTF8String);
-    subField.setSubFields(Arrays.asList(subsubField));
+    subField.setSubFields(Collections.singletonList(subsubField));
 
     return subFields;
   } // method createSyntaxSequenceOrSet
@@ -300,7 +300,7 @@ public class ExtensionConfBuilder {
      *  4.     UTF8String
      *  5. }
      */
-    List<SubFieldSyntax> subFields = new LinkedList<SubFieldSyntax>();
+    List<SubFieldSyntax> subFields = new LinkedList<>();
 
     // Line 2-4
     SubFieldSyntax subField = new SubFieldSyntax(FieldType.SEQUENCE);
@@ -536,14 +536,14 @@ public class ExtensionConfBuilder {
     AuthorityInfoAccess extnValue = new AuthorityInfoAccess();
     extnValue.setIncludeCaIssuers(true);
     extnValue.setIncludeOcsp(true);
-    extnValue.setCaIssuersProtocols(new HashSet<>(Arrays.asList("http")));
-    extnValue.setOcspProtocols(new HashSet<>(Arrays.asList("http")));
+    extnValue.setCaIssuersProtocols(new HashSet<>(Collections.singletonList("http")));
+    extnValue.setOcspProtocols(new HashSet<>(Collections.singletonList("http")));
     return extnValue;
   } // method createAuthorityInfoAccess
 
   public static CrlDistributionPoints createCrlDistibutoionPoints() {
     CrlDistributionPoints extnValue = new CrlDistributionPoints();
-    extnValue.setProtocols(new HashSet<>(Arrays.asList("http")));
+    extnValue.setProtocols(new HashSet<>(Collections.singletonList("http")));
     return extnValue;
   }
 

@@ -41,7 +41,7 @@ import org.xipki.datasource.DataSourceWrapper;
  */
 class QueryExecutor {
 
-  protected static enum ColumnType {
+  protected enum ColumnType {
     INT,
     LONG,
     STRING,
@@ -51,11 +51,11 @@ class QueryExecutor {
 
   protected static class SqlColumn {
 
-    private ColumnType type;
-    private String name;
-    private Object value;
-    private boolean sensitive;
-    private boolean signerConf;
+    private final ColumnType type;
+    private final String name;
+    private final Object value;
+    private final boolean sensitive;
+    private final boolean signerConf;
 
     public SqlColumn(ColumnType type, String name, Object value) {
       this(type, name, value, false, false);
@@ -94,8 +94,8 @@ class QueryExecutor {
 
   protected static class SqlColumn2 {
 
-    private ColumnType type;
-    private Object value;
+    private final ColumnType type;
+    private final Object value;
 
     public SqlColumn2(ColumnType type, Object value) {
       this.type = notNull(type, "type");
@@ -305,13 +305,13 @@ class QueryExecutor {
             if (value == null) {
               ps.setNull(index, Types.INTEGER);
             } else {
-              ps.setInt(index, ((Integer) value).intValue());
+              ps.setInt(index, (Integer) value);
             }
           } else if (type == ColumnType.LONG) {
             if (value == null) {
               ps.setNull(index, Types.BIGINT);
             } else {
-              ps.setLong(index, ((Long) value).longValue());
+              ps.setLong(index, (Long) value);
             }
           } else if (type == ColumnType.BOOL) {
             if (value == null) {

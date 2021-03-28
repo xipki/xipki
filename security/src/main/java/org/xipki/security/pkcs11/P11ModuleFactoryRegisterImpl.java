@@ -38,8 +38,8 @@ public class P11ModuleFactoryRegisterImpl implements P11ModuleFactoryRegister {
 
   private static final Map<String, P11Module> modules = new HashMap<>();
 
-  private ConcurrentLinkedDeque<P11ModuleFactory> factories =
-      new ConcurrentLinkedDeque<P11ModuleFactory>();
+  private final ConcurrentLinkedDeque<P11ModuleFactory> factories =
+          new ConcurrentLinkedDeque<>();
 
   public void registFactory(P11ModuleFactory factory) {
     //might be null if dependency is optional

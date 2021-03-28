@@ -97,7 +97,7 @@ public abstract class Certprofile implements Closeable {
 
   } // class CrlDistributionPointsControl
 
-  public static enum CertDomain {
+  public enum CertDomain {
     RFC5280,
     CABForumBR
   } // class CertDomain
@@ -171,7 +171,7 @@ public abstract class Certprofile implements Closeable {
 
     private final int tag;
 
-    private GeneralNameTag(int tag) {
+    GeneralNameTag(int tag) {
       this.tag = tag;
     }
 
@@ -250,7 +250,7 @@ public abstract class Certprofile implements Closeable {
 
     private String value;
 
-    private boolean valueOverridable;
+    private final boolean valueOverridable;
 
     private String group;
 
@@ -513,7 +513,7 @@ public abstract class Certprofile implements Closeable {
     v2(2),
     v3(3);
 
-    private int versionNumber;
+    private final int versionNumber;
 
     X509CertVersion(int versionNumber) {
       this.versionNumber = versionNumber;

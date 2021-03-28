@@ -337,10 +337,8 @@ class EmulatorP11Slot extends P11Slot {
           ret.addIdentity(identity);
         } catch (ClassCastException ex) {
           LogUtil.warn(LOG, ex,"InvalidKeyException while initializing key with key-id " + hexId);
-          continue;
         } catch (Throwable th) {
           LOG.error("unexpected exception while initializing key with key-id " + hexId, th);
-          continue;
         }
       }
     }
@@ -402,10 +400,8 @@ class EmulatorP11Slot extends P11Slot {
           ret.addIdentity(identity);
         } catch (InvalidKeyException ex) {
           LogUtil.warn(LOG, ex,"InvalidKeyException while initializing key with key-id " + hexId);
-          continue;
         } catch (Throwable th) {
           LOG.error("unexpected exception while initializing key with key-id " + hexId, th);
-          continue;
         }
       }
     }
@@ -521,7 +517,7 @@ class EmulatorP11Slot extends P11Slot {
       } else {
         Properties props = loadProperties(infoFile);
 
-        return label.equals(props.getProperty("label")) ? deletePkcs11Entry(dir, id) : false;
+        return label.equals(props.getProperty("label")) && deletePkcs11Entry(dir, id);
       }
     }
 
@@ -771,7 +767,7 @@ class EmulatorP11Slot extends P11Slot {
   }
 
   private void savePkcs11Cert(byte[] id, String label, X509Cert cert)
-      throws P11TokenException, CertificateException {
+      throws P11TokenException {
     savePkcs11Entry(certDir, id, label, cert.getEncoded());
   }
 
@@ -816,7 +812,7 @@ class EmulatorP11Slot extends P11Slot {
 
     boolean b1 = true;
     if (identityId.getCertId() != null) {
-      removePkcs11Entry(certDir, identityId.getCertId());
+      b1 = removePkcs11Entry(certDir, identityId.getCertId());
     }
 
     boolean b2 = removePkcs11Entry(privKeyDir, keyId);
@@ -1056,8 +1052,7 @@ class EmulatorP11Slot extends P11Slot {
     savePkcs11Cert(keyId.getId(), keyId.getLabel(), newCert);
   } // method updateCertificate0
 
-  private byte[] generateId()
-      throws P11TokenException {
+  private byte[] generateId() {
     while (true) {
       byte[] id = new byte[newObjectConf.getIdLength()];
       random.nextBytes(id);

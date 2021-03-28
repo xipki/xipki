@@ -57,6 +57,6 @@ public class AuditEventData {
 
   @Override
   public String toString() {
-    return new StringBuilder(name).append(": ").append(value).toString();
+    return name + ": " + value;
   }
 }

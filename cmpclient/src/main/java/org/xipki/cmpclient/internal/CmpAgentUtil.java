@@ -145,17 +145,12 @@ class CmpAgentUtil {
    */
   protected static final int PKISTATUS_RESPONSE_ERROR = -1;
 
-  protected static final int PKISTATUS_NO_ANSWER = -2;
-
   private static ASN1Encodable extractGeneralRepContent(VerifiedPkiMessage response,
-      String expectedType,
-      boolean requireProtectionCheck)
+      String expectedType)
           throws CmpClientException, PkiErrorException {
     notNull(response, "response");
     notNull(expectedType, "expectedType");
-    if (requireProtectionCheck) {
-      checkProtection(response);
-    }
+    checkProtection(response);
 
     PKIBody respBody = response.getPkiMessage().getBody();
     int bodyType = respBody.getType();
@@ -191,11 +186,11 @@ class CmpAgentUtil {
     return itv.getInfoValue();
   } // method extractGeneralRepContent
 
-  static ASN1Encodable extractXipkiActionRepContent(VerifiedPkiMessage response, int action)
+  static ASN1Encodable extractXipkiActionRepContent(VerifiedPkiMessage response)
       throws CmpClientException, PkiErrorException {
     ASN1Encodable itvValue = extractGeneralRepContent(notNull(response, "response"),
-        ObjectIdentifiers.Xipki.id_xipki_cmp_cmpGenmsg.getId(), true);
-    return extractXiActionContent(itvValue, action);
+        ObjectIdentifiers.Xipki.id_xipki_cmp_cmpGenmsg.getId());
+    return extractXiActionContent(itvValue, XiSecurityConstants.CMP_ACTION_GET_CAINFO);
   } // method extractXipkiActionRepContent
 
   private static ASN1Encodable extractXiActionContent(ASN1Encodable itvValue, int action)
@@ -337,7 +332,7 @@ class CmpAgentUtil {
       RecipientInformation ri = it.next();
 
       ASN1ObjectIdentifier encAlg = ri.getKeyEncryptionAlgorithm().getAlgorithm();
-      Recipient recipient = null;
+      Recipient recipient;
       if (encAlg.equals(CMSAlgorithm.ECDH_SHA1KDF)
           || encAlg.equals(CMSAlgorithm.ECDH_SHA224KDF)
           || encAlg.equals(CMSAlgorithm.ECDH_SHA256KDF)
@@ -615,11 +610,9 @@ class CmpAgentUtil {
         LOG.warn("certId is not present in response for (issuer='{}', serialNumber={})",
             X509Util.getRfc4519Name(re.getIssuer()), LogUtil.formatCsn(re.getSerialNumber()));
         certId = new CertId(new GeneralName(re.getIssuer()), re.getSerialNumber());
-        continue;
       }
 
-      ResultEntry resultEntry = new ResultEntry.RevokeCert(re.getId(), certId);
-      result.addResultEntry(resultEntry);
+      result.addResultEntry(new ResultEntry.RevokeCert(re.getId(), certId));
     }
 
     return result;
@@ -635,14 +628,12 @@ class CmpAgentUtil {
       throw new CmpClientException("could not encoded AuthorityKeyIdentifier", ex);
     }
     Extension extAki = new Extension(Extension.authorityKeyIdentifier, false, encodedAki);
-    Extensions certTempExts = new Extensions(extAki);
-    return certTempExts;
+    return new Extensions(extAki);
   } // method getCertTempExtensions
 
   public static CaConf.CaInfo retrieveCaInfo(VerifiedPkiMessage response, String caName)
       throws CmpClientException, PkiErrorException {
-    ASN1Encodable itvValue = extractXipkiActionRepContent(response,
-                                XiSecurityConstants.CMP_ACTION_GET_CAINFO);
+    ASN1Encodable itvValue = extractXipkiActionRepContent(response);
     DERUTF8String utf8Str = DERUTF8String.getInstance(itvValue);
     String systemInfoStr = utf8Str.getString();
 
@@ -694,7 +685,7 @@ class CmpAgentUtil {
       JSONObject jsonCmpControl = root.getJSONObject("cmpControl");
       if (jsonCmpControl != null) {
         Boolean tmpBool = jsonCmpControl.getBoolean("rrAkiRequired");
-        boolean required = (tmpBool == null) ? false : tmpBool.booleanValue();
+        boolean required = tmpBool != null && tmpBool;
         cmpControl = new CmpControl(required);
       }
 

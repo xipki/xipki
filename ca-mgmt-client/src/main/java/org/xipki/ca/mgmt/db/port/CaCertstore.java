@@ -924,7 +924,7 @@ public class CaCertstore extends ValidatableConf {
       notBlank(sn, "sn");
       notNull(update, "update");
       notNull(crlScope, "crlScope");
-      if (rev != null && rev.intValue() == 1) {
+      if (rev == 1) {
         notNull(rr, "rr");
         notNull(rt, "rt");
       }

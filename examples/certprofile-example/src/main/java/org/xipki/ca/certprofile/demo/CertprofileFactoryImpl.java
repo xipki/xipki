@@ -21,7 +21,6 @@ import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileFactory;
 import org.xipki.util.ObjectCreationException;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -37,7 +36,7 @@ public class CertprofileFactoryImpl implements CertprofileFactory {
 
   private static final String TYPE = "demo-profiletype";
   private static final Set<String> types = Collections.unmodifiableSet(
-      new HashSet<>(Arrays.asList(TYPE)));
+      new HashSet<>(Collections.singletonList(TYPE)));
 
   @Override
   public Set<String> getSupportedTypes() {

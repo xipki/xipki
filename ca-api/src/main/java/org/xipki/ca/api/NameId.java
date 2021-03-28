@@ -82,7 +82,7 @@ public class NameId {
       return false;
     }
 
-    return ignoreId ? true : CompareUtil.equalsObject(id, obj.id);
+    return ignoreId || CompareUtil.equalsObject(id, obj.id);
   }
 
   @Override

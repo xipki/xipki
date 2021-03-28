@@ -37,7 +37,7 @@ public class P11CryptService {
 
   private static final Logger LOG = LoggerFactory.getLogger(P11CryptService.class);
 
-  private P11Module module;
+  private final P11Module module;
 
   public P11CryptService(P11Module module)
       throws P11TokenException {

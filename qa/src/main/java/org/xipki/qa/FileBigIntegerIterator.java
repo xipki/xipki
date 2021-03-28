@@ -47,7 +47,7 @@ public class FileBigIntegerIterator implements Iterator<BigInteger>, Closeable {
 
   private BufferedReader reader;
 
-  private ConcurrentLinkedQueue<BigInteger> nextNumbers = new ConcurrentLinkedQueue<>();
+  private final ConcurrentLinkedQueue<BigInteger> nextNumbers = new ConcurrentLinkedQueue<>();
 
   private BigInteger currentNumber;
 

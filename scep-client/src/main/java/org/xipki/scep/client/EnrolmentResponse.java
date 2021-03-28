@@ -41,7 +41,7 @@ import org.xipki.util.Args;
 
 public final class EnrolmentResponse {
 
-  private PkiMessage pkcsRep;
+  private final PkiMessage pkcsRep;
 
   private List<X509Cert> certificates;
 

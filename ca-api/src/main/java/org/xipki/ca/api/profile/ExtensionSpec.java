@@ -98,16 +98,12 @@ public abstract class ExtensionSpec {
     if (byte0 == 10) {
       return false;
     } else if (byte0 == 172) {
-      if (byte1 >= 16 && byte1 <= 31) {
-        return false;
-      }
+      return !(byte1 >= 16 && byte1 <= 31);
     } else if (byte0 == 192) {
-      if (byte1 == 168) {
-        return false;
-      }
+      return byte1 != 168;
+    } else {
+      return true;
     }
-
-    return true;
   } // method isValidPublicIPv4Address
 
   public static ExtensionSpec getExtensionSpec(CertDomain domain, CertLevel certLevel) {
@@ -207,8 +203,7 @@ public abstract class ExtensionSpec {
             Extension.keyUsage)));
 
     private static final Set<ASN1ObjectIdentifier> NON_CRITICAL_ONLY_EXTENSIONS =
-        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-            )));
+        Collections.emptySet();
 
     private final Set<ASN1ObjectIdentifier> requiredExtensions;
 
@@ -227,17 +222,17 @@ public abstract class ExtensionSpec {
 
     @Override
     public boolean isNotPermitted(ASN1ObjectIdentifier type) {
-      return NON_PERMITTED_EXTENSIONS.contains(type) ? true : super.isNotPermitted(type);
+      return NON_PERMITTED_EXTENSIONS.contains(type) || super.isNotPermitted(type);
     }
 
     @Override
     public boolean isCriticalOnly(ASN1ObjectIdentifier type) {
-      return CRITICAL_ONLY_EXTENSIONS.contains(type) ? true : super.isCriticalOnly(type);
+      return CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isCriticalOnly(type);
     }
 
     @Override
     public boolean isNonCriticalOnly(ASN1ObjectIdentifier type) {
-      return NON_CRITICAL_ONLY_EXTENSIONS.contains(type) ? true : super.isNonCriticalOnly(type);
+      return NON_CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isNonCriticalOnly(type);
     }
 
   } // class Rfc5280RootCA
@@ -252,8 +247,7 @@ public abstract class ExtensionSpec {
             Extension.keyUsage)));
 
     private static final Set<ASN1ObjectIdentifier> NON_PERMITTED_EXTENSIONS =
-        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-            )));
+        Collections.emptySet();
 
     private static final Set<ASN1ObjectIdentifier> CRITICAL_ONLY_EXTENSIONS =
         Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
@@ -286,17 +280,17 @@ public abstract class ExtensionSpec {
 
     @Override
     public boolean isNotPermitted(ASN1ObjectIdentifier type) {
-      return NON_PERMITTED_EXTENSIONS.contains(type) ? true : super.isNotPermitted(type);
+      return NON_PERMITTED_EXTENSIONS.contains(type) || super.isNotPermitted(type);
     }
 
     @Override
     public boolean isCriticalOnly(ASN1ObjectIdentifier type) {
-      return CRITICAL_ONLY_EXTENSIONS.contains(type) ? true : super.isCriticalOnly(type);
+      return CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isCriticalOnly(type);
     }
 
     @Override
     public boolean isNonCriticalOnly(ASN1ObjectIdentifier type) {
-      return NON_CRITICAL_ONLY_EXTENSIONS.contains(type) ? true : super.isNonCriticalOnly(type);
+      return NON_CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isNonCriticalOnly(type);
     }
 
   } // class Rfc5280SubCA
@@ -305,9 +299,8 @@ public abstract class ExtensionSpec {
   private static class Rfc5280EndEntity extends Rfc5280 {
 
     private static final Set<ASN1ObjectIdentifier> REQUIRED_EXTENSIONS =
-        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-            Extension.subjectKeyIdentifier
-            )));
+        Collections.unmodifiableSet(new HashSet<>(Collections.singletonList(
+                Extension.subjectKeyIdentifier)));
 
     private static final Set<ASN1ObjectIdentifier> NON_PERMITTED_EXTENSIONS =
         Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
@@ -318,12 +311,10 @@ public abstract class ExtensionSpec {
             )));
 
     private static final Set<ASN1ObjectIdentifier> CRITICAL_ONLY_EXTENSIONS =
-        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-            )));
+        Collections.emptySet();
 
     private static final Set<ASN1ObjectIdentifier> NON_CRITICAL_ONLY_EXTENSIONS =
-        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-            )));
+        Collections.emptySet();
 
     @Override
     public Set<ASN1ObjectIdentifier> getRequiredExtensions() {
@@ -332,17 +323,17 @@ public abstract class ExtensionSpec {
 
     @Override
     public boolean isNotPermitted(ASN1ObjectIdentifier type) {
-      return NON_PERMITTED_EXTENSIONS.contains(type) ? true : super.isNotPermitted(type);
+      return NON_PERMITTED_EXTENSIONS.contains(type) || super.isNotPermitted(type);
     }
 
     @Override
     public boolean isCriticalOnly(ASN1ObjectIdentifier type) {
-      return CRITICAL_ONLY_EXTENSIONS.contains(type) ? true : super.isCriticalOnly(type);
+      return CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isCriticalOnly(type);
     }
 
     @Override
     public boolean isNonCriticalOnly(ASN1ObjectIdentifier type) {
-      return NON_CRITICAL_ONLY_EXTENSIONS.contains(type) ? true : super.isNonCriticalOnly(type);
+      return NON_CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isNonCriticalOnly(type);
     }
 
   } // class Rfc5280EndEntity
@@ -365,8 +356,7 @@ public abstract class ExtensionSpec {
             )));
 
     private static final Set<ASN1ObjectIdentifier> NON_PERMITTED_EXTENSIONS =
-        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-            )));
+        Collections.emptySet();
 
     private static final Set<ASN1ObjectIdentifier> CRITICAL_ONLY_EXTENSIONS =
         Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
@@ -399,17 +389,17 @@ public abstract class ExtensionSpec {
 
     @Override
     public boolean isNotPermitted(ASN1ObjectIdentifier type) {
-      return NON_PERMITTED_EXTENSIONS.contains(type) ? true : super.isNotPermitted(type);
+      return NON_PERMITTED_EXTENSIONS.contains(type) || super.isNotPermitted(type);
     }
 
     @Override
     public boolean isCriticalOnly(ASN1ObjectIdentifier type) {
-      return CRITICAL_ONLY_EXTENSIONS.contains(type) ? true : super.isCriticalOnly(type);
+      return CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isCriticalOnly(type);
     }
 
     @Override
     public boolean isNonCriticalOnly(ASN1ObjectIdentifier type) {
-      return NON_CRITICAL_ONLY_EXTENSIONS.contains(type) ? true : super.isNonCriticalOnly(type);
+      return NON_CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isNonCriticalOnly(type);
     }
 
   } // class BrowserForumBRSubCA
@@ -426,12 +416,10 @@ public abstract class ExtensionSpec {
             )));
 
     private static final Set<ASN1ObjectIdentifier> NON_PERMITTED_EXTENSIONS =
-        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-            )));
+        Collections.emptySet();
 
     private static final Set<ASN1ObjectIdentifier> CRITICAL_ONLY_EXTENSIONS =
-        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-            )));
+        Collections.emptySet();
 
     private static final Set<ASN1ObjectIdentifier> NON_CRITICAL_ONLY_EXTENSIONS =
         Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
@@ -456,17 +444,17 @@ public abstract class ExtensionSpec {
 
     @Override
     public boolean isNotPermitted(ASN1ObjectIdentifier type) {
-      return NON_PERMITTED_EXTENSIONS.contains(type) ? true : super.isNotPermitted(type);
+      return NON_PERMITTED_EXTENSIONS.contains(type) || super.isNotPermitted(type);
     }
 
     @Override
     public boolean isCriticalOnly(ASN1ObjectIdentifier type) {
-      return CRITICAL_ONLY_EXTENSIONS.contains(type) ? true : super.isCriticalOnly(type);
+      return CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isCriticalOnly(type);
     }
 
     @Override
     public boolean isNonCriticalOnly(ASN1ObjectIdentifier type) {
-      return NON_CRITICAL_ONLY_EXTENSIONS.contains(type) ? true : super.isNonCriticalOnly(type);
+      return NON_CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isNonCriticalOnly(type);
     }
 
   } // class BrowserForumBREndEntity

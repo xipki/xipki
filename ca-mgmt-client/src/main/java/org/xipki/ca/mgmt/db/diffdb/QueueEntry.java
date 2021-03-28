@@ -29,22 +29,22 @@ import java.util.List;
 
 interface QueueEntry {
 
-  static final EndOfQueue END_OF_QUEUE = new EndOfQueue();
+  EndOfQueue END_OF_QUEUE = new EndOfQueue();
 
-  static class EndOfQueue implements QueueEntry {
+  class EndOfQueue implements QueueEntry {
 
     private EndOfQueue() {
     }
 
   } // class EndOfQueue
 
-  static class DigestEntrySet implements QueueEntry, Comparable<DigestEntrySet> {
+  class DigestEntrySet implements QueueEntry, Comparable<DigestEntrySet> {
 
     private final long startId;
 
     private Exception exception;
 
-    private List<IdentifiedDigestEntry> entries = new LinkedList<>();
+    private final List<IdentifiedDigestEntry> entries = new LinkedList<>();
 
     public DigestEntrySet(long startId) {
       this.startId = startId;
@@ -72,14 +72,8 @@ interface QueueEntry {
 
     @Override
     public int compareTo(DigestEntrySet obj) {
-      if (startId < obj.startId) {
-        return -1;
-      } else if (startId == obj.startId) {
-        return 0;
-      } else {
-        return 1;
-      }
-    } // method compareTo
+      return Long.compare(startId, obj.startId);
+    }
 
   } // class DigestEntrySet
 }

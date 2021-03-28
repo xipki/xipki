@@ -17,16 +17,14 @@
 
 package org.xipki.ca.server;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.Security;
-import java.security.spec.InvalidKeySpecException;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.security.Security;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * PasswordHash test.
@@ -45,8 +43,7 @@ public class PasswordHashTest {
   }
 
   @Test
-  public void testDuplication()
-      throws NoSuchAlgorithmException, InvalidKeySpecException {
+  public void testDuplication() {
     Set<String> passwordHashes = new HashSet<>(20);
     for (int i = 0; i < 10; i++) {
       String passwordHash = PasswordHash.createHash("p\r\nassw0Rd!");
@@ -57,8 +54,7 @@ public class PasswordHashTest {
   }
 
   @Test
-  public void testValidation()
-      throws NoSuchAlgorithmException, InvalidKeySpecException {
+  public void testValidation() {
     boolean failure = false;
     for (int i = 0; i < 100; i++) {
       String password = "" + i;

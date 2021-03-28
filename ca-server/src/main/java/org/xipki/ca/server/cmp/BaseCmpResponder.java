@@ -94,7 +94,6 @@ import org.bouncycastle.cert.crmf.PKMACBuilder;
 import org.bouncycastle.cert.crmf.jcajce.JcePKMACValuesCalculator;
 import org.bouncycastle.jcajce.spec.PBKDF2KeySpec;
 import org.bouncycastle.operator.ContentVerifierProvider;
-import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -165,9 +164,9 @@ abstract class BaseCmpResponder {
 
   private static final Map<ErrorCode, Integer> errorCodeToPkiFailureMap = new HashMap<>(20);
 
-  private static boolean aesGcm_ciphers_initialized;
+  private static final boolean aesGcm_ciphers_initialized;
 
-  private static boolean pbkdf2_kdfs_initialized;
+  private static final boolean pbkdf2_kdfs_initialized;
 
   protected static final Set<String> kupCertExtnIds;
 
@@ -195,7 +194,7 @@ abstract class BaseCmpResponder {
         LogUtil.error(LOG, ex, "could not get Cipher of " + oid);
         break;
       }
-      aesGcm_ciphers.add(new ConcurrentBagEntry<Cipher>(cipher));
+      aesGcm_ciphers.add(new ConcurrentBagEntry<>(cipher));
     }
     int size = aesGcm_ciphers.size();
     aesGcm_ciphers_initialized = size > 0;
@@ -215,7 +214,7 @@ abstract class BaseCmpResponder {
         LogUtil.error(LOG, ex, "could not get SecretKeyFactory of " + oid);
         break;
       }
-      pbkdf2_kdfs.add(new ConcurrentBagEntry<SecretKeyFactory>(keyFact));
+      pbkdf2_kdfs.add(new ConcurrentBagEntry<>(keyFact));
     }
 
     size = pbkdf2_kdfs.size();
@@ -297,9 +296,7 @@ abstract class BaseCmpResponder {
         return true;
       }
 
-      if (x500Name.equals(getCa().getCaCert().getSubject())) {
-        return true;
-      }
+      return x500Name.equals(getCa().getCaCert().getSubject());
     }
 
     return false;
@@ -389,9 +386,9 @@ abstract class BaseCmpResponder {
    *          Original request. Will only be used for the storage. Could be{@code null}.
    * @param requestor
    *          Requestor. Must not be {@code null}.
-   * @param transactionId
+   * @param tid
    *          Transaction id. Must not be {@code null}.
-   * @param pkiMessage
+   * @param message
    *          PKI message. Must not be {@code null}.
    * @param msgId
    *          Message id. Must not be {@code null}.
@@ -431,7 +428,7 @@ abstract class BaseCmpResponder {
       if (type == PKIBody.TYPE_INIT_REQ || type == PKIBody.TYPE_CERT_REQ
           || type == PKIBody.TYPE_KEY_UPDATE_REQ || type == PKIBody.TYPE_P10_CERT_REQ
           || type == PKIBody.TYPE_CROSS_CERT_REQ) {
-        String eventType = null;
+        String eventType;
 
         if (PKIBody.TYPE_CERT_REQ == type) {
           eventType = CaAuditConstants.Cmp.TYPE_cr;
@@ -441,13 +438,11 @@ abstract class BaseCmpResponder {
           eventType = CaAuditConstants.Cmp.TYPE_kur;
         } else if (PKIBody.TYPE_P10_CERT_REQ == type) {
           eventType = CaAuditConstants.Cmp.TYPE_p10cr;
-        } else if (PKIBody.TYPE_CROSS_CERT_REQ == type) {
+        } else {// if (PKIBody.TYPE_CROSS_CERT_REQ == type) {
           eventType = CaAuditConstants.Cmp.TYPE_ccr;
         }
 
-        if (eventType != null) {
-          event.addEventType(eventType);
-        }
+        event.addEventType(eventType);
 
         String dfltCertprofileName = null;
         Boolean dfltCaGenerateKeypair = null;
@@ -518,27 +513,20 @@ abstract class BaseCmpResponder {
     PKIHeader reqHeader = message.getHeader();
     ASN1OctetString tid = reqHeader.getTransactionID();
 
-    String msgId = null;
-    if (event != null) {
-      msgId = RandomUtil.nextHexLong();
-      event.addEventData(CaAuditConstants.NAME_mid, msgId);
-    }
+    String msgId = RandomUtil.nextHexLong();
+    event.addEventData(CaAuditConstants.NAME_mid, msgId);
 
     if (tid == null) {
       byte[] randomBytes = randomTransactionId();
       tid = new DEROctetString(randomBytes);
     }
     String tidStr = Base64.encodeToString(tid.getOctets());
-    if (event != null) {
-      event.addEventData(CaAuditConstants.NAME_tid, tidStr);
-    }
+    event.addEventData(CaAuditConstants.NAME_tid, tidStr);
 
     int reqPvno = reqHeader.getPvno().getValue().intValue();
     if (reqPvno != PVNO_CMP2000) {
-      if (event != null) {
-        event.update(AuditLevel.INFO, AuditStatus.FAILED);
-        event.addEventData(CaAuditConstants.NAME_message, "unsupproted version " + reqPvno);
-      }
+      event.update(AuditLevel.INFO, AuditStatus.FAILED);
+      event.addEventData(CaAuditConstants.NAME_message, "unsupproted version " + reqPvno);
       return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.unsupportedVersion, null);
     }
 
@@ -557,7 +545,7 @@ abstract class BaseCmpResponder {
     }
 
     GeneralName recipient = reqHeader.getRecipient();
-    boolean intentMe = (recipient == null) ? true : intendsMe(recipient);
+    boolean intentMe = recipient == null || intendsMe(recipient);
     if (!intentMe) {
       LOG.warn("tid={}: I am not the intended recipient, but '{}'", tid, reqHeader.getRecipient());
       failureCode = PKIFailureInfo.badRequest;
@@ -586,10 +574,8 @@ abstract class BaseCmpResponder {
     }
 
     if (failureCode != null) {
-      if (event != null) {
-        event.update(AuditLevel.INFO, AuditStatus.FAILED);
-        event.addEventData(CaAuditConstants.NAME_message, statusText);
-      }
+      event.update(AuditLevel.INFO, AuditStatus.FAILED);
+      event.addEventData(CaAuditConstants.NAME_message, statusText);
       return buildErrorPkiMessage(tid, reqHeader, failureCode, statusText);
     }
 
@@ -649,10 +635,8 @@ abstract class BaseCmpResponder {
     }
 
     if (errorStatus != null) {
-      if (event != null) {
-        event.update(AuditLevel.INFO, AuditStatus.FAILED);
-        event.addEventData(CaAuditConstants.NAME_message, errorStatus);
-      }
+      event.update(AuditLevel.INFO, AuditStatus.FAILED);
+      event.addEventData(CaAuditConstants.NAME_message, errorStatus);
       return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.badMessageCheck, errorStatus);
     }
 
@@ -661,9 +645,8 @@ abstract class BaseCmpResponder {
 
     if (isProtected) {
       resp = addProtection(resp, event, requestor);
-    } else {
-      // protected by TLS connection
     }
+    // otherwise protected by TLS connection
 
     return resp;
   } // method processPkiMessage
@@ -684,7 +667,7 @@ abstract class BaseCmpResponder {
 
   private ProtectionVerificationResult verifyProtection(String tid, GeneralPKIMessage pkiMessage,
       CmpControl cmpControl)
-          throws CMPException, InvalidKeyException, OperatorCreationException {
+          throws CMPException, InvalidKeyException {
     ProtectedPKIMessage protectedMsg = new ProtectedPKIMessage(pkiMessage);
 
     PKIHeader header = protectedMsg.getHeader();
@@ -853,7 +836,7 @@ abstract class BaseCmpResponder {
 
     JSONObject root = new JSONObject(false);
     root.put("version", version);
-    List<byte[]> certchain = new LinkedList<byte[]>();
+    List<byte[]> certchain = new LinkedList<>();
 
     certchain.add(caInfo.getCert().getEncoded());
     for (X509Cert m : caInfo.getCertchain()) {
@@ -1012,7 +995,7 @@ abstract class BaseCmpResponder {
   }
 
   protected CertResponse postProcessCertInfo(ASN1Integer certReqId, CmpRequestorInfo requestor,
-      CertificateInfo certInfo, ASN1OctetString tid, CmpControl cmpControl) {
+      CertificateInfo certInfo) {
     String warningMsg = certInfo.getWarningMessage();
 
     PKIStatusInfo statusInfo;
@@ -1045,7 +1028,7 @@ abstract class BaseCmpResponder {
       if (requestor.getCert() != null) {
         // use private key of the requestor to encrypt the private key
         PublicKey reqPub = requestor.getCert().getCert().getPublicKey();
-        CrmfKeyWrapper wrapper = null;
+        CrmfKeyWrapper wrapper;
         if (reqPub instanceof RSAPublicKey) {
           wrapper = new CrmfKeyWrapper.RSAOAEPAsymmetricKeyWrapper(reqPub);
         } else if (reqPub instanceof ECPublicKey) {
@@ -1057,7 +1040,7 @@ abstract class BaseCmpResponder {
               new PKIStatusInfo(PKIStatus.rejection, new PKIFreeText(msg)));
         }
 
-        byte[] symmKeyBytes = new byte[16];
+        byte[] symmKeyBytes;
         synchronized (aesKeyGen) {
           symmKeyBytes = aesKeyGen.generateKey().getEncoded();
         }

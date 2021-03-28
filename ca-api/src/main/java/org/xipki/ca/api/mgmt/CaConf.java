@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.cert.CertificateException;
 import java.util.*;
@@ -112,11 +113,9 @@ public class CaConf {
               "caEntry may not be null if genSelfIssued is non-null");
         }
 
-        if (caEntry instanceof CaEntry) {
-          if (((CaEntry) caEntry).getCert() != null) {
-            throw new IllegalArgumentException(
-                "caEntry.cert may not be null if genSelfIssued is non-null");
-          }
+        if ((caEntry).getCert() != null) {
+          throw new IllegalArgumentException(
+                  "caEntry.cert may not be null if genSelfIssued is non-null");
         }
       }
 
@@ -194,7 +193,7 @@ public class CaConf {
     init(confFileZipStream, securityFactory);
   }
 
-  private final void init(InputStream zipFileStream, SecurityFactory securityFactory)
+  private void init(InputStream zipFileStream, SecurityFactory securityFactory)
       throws IOException, InvalidConfException, CaMgmtException {
     ZipInputStream zipStream = new ZipInputStream(zipFileStream);
 
@@ -215,18 +214,18 @@ public class CaConf {
       try {
         zipFileStream.close();
       } catch (IOException ex) {
-        LOG.info("could not clonse zipFileStream", ex.getMessage());
+        LOG.info("could not close zipFileStream: {}", ex.getMessage());
       }
 
       try {
         zipStream.close();
       } catch (IOException ex) {
-        LOG.info("could not clonse zipStream", ex.getMessage());
+        LOG.info("could not close zipStream: {}", ex.getMessage());
       }
     }
   } // method init
 
-  private final void init0(CaConfType.CaSystem root, Map<String, byte[]> zipEntries,
+  private void init0(CaConfType.CaSystem root, Map<String, byte[]> zipEntries,
       SecurityFactory securityFactory)
       throws IOException, InvalidConfException, CaMgmtException {
     if (root.getProperties() != null) {
@@ -331,9 +330,9 @@ public class CaConf {
           }
 
           int exprirationPeriod = (ci.getExpirationPeriod() == null) ? 365
-              : ci.getExpirationPeriod().intValue();
+              : ci.getExpirationPeriod();
 
-          int numCrls = (ci.getNumCrls() == null) ? 30 : ci.getNumCrls().intValue();
+          int numCrls = (ci.getNumCrls() == null) ? 30 : ci.getNumCrls();
 
           caEntry = new CaEntry(new NameId(null, name), ci.getSnSize(), ci.getNextCrlNo(),
               expandConf(ci.getSignerType()), getValue(ci.getSignerConf(), zipEntries), caUris,
@@ -368,7 +367,7 @@ public class CaConf {
           }
 
           int keepExpiredCertDays = (ci.getKeepExpiredCertDays() == null) ? -1
-              : ci.getKeepExpiredCertDays().intValue();
+              : ci.getKeepExpiredCertDays();
           caEntry.setKeepExpiredCertInDays(keepExpiredCertDays);
 
           caEntry.setMaxValidity(Validity.getInstance(ci.getMaxValidity()));
@@ -591,7 +590,7 @@ public class CaConf {
       throw new IOException("could not find ZIP entry " + fileName);
     }
 
-    return expandConf(new String(binary, "UTF-8"));
+    return expandConf(new String(binary, StandardCharsets.UTF_8));
   } // method getValue
 
   private String getBase64Binary(FileOrBinary fileOrBinary, Map<String, byte[]> zipEntries)
@@ -603,7 +602,7 @@ public class CaConf {
   private static byte[] read(InputStream in)
       throws IOException {
     ByteArrayOutputStream bout = new ByteArrayOutputStream();
-    int readed = 0;
+    int readed;
     byte[] buffer = new byte[2048];
     while ((readed = in.read(buffer)) != -1) {
       bout.write(buffer, 0, readed);

@@ -30,11 +30,8 @@ import static org.xipki.util.Args.notNull;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.cert.CertificateParsingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -117,7 +114,7 @@ public class OcspServerImpl implements OcspServer {
 
   private static class SizeComparableString implements Comparable<SizeComparableString> {
 
-    private String str;
+    private final String str;
 
     public SizeComparableString(String str) {
       this.str = notNull(str, "str");
@@ -144,8 +141,6 @@ public class OcspServerImpl implements OcspServer {
       cacheNextUpdate = Long.MAX_VALUE;
     }
   } // class OcspRespControl
-
-  public static final long DFLT_CACHE_MAX_AGE = 60; // 1 minute
 
   private static final byte[] DERNullBytes = new byte[]{0x05, 0x00};
 
@@ -178,21 +173,21 @@ public class OcspServerImpl implements OcspServer {
 
   private ResponseCacher responseCacher;
 
-  private Map<String, ResponderImpl> responders = new HashMap<>();
+  private final Map<String, ResponderImpl> responders = new HashMap<>();
 
-  private Map<String, ResponseSigner> signers = new HashMap<>();
+  private final Map<String, ResponseSigner> signers = new HashMap<>();
 
-  private Map<String, RequestOption> requestOptions = new HashMap<>();
+  private final Map<String, RequestOption> requestOptions = new HashMap<>();
 
-  private Map<String, OcspServerConf.ResponseOption> responseOptions = new HashMap<>();
+  private final Map<String, OcspServerConf.ResponseOption> responseOptions = new HashMap<>();
 
-  private Map<String, OcspStore> stores = new HashMap<>();
+  private final Map<String, OcspStore> stores = new HashMap<>();
 
-  private List<String> servletPaths = new ArrayList<>();
+  private final List<String> servletPaths = new ArrayList<>();
 
-  private Map<String, ResponderImpl> path2responderMap = new HashMap<>();
+  private final Map<String, ResponderImpl> path2responderMap = new HashMap<>();
 
-  private AtomicBoolean initialized = new AtomicBoolean(false);
+  private final AtomicBoolean initialized = new AtomicBoolean(false);
 
   static {
     unsuccesfulOCSPRespMap = new HashMap<>(10);
@@ -243,8 +238,7 @@ public class OcspServerImpl implements OcspServer {
   }
 
   @Override
-  public ResponderAndPath getResponderForPath(String path)
-      throws UnsupportedEncodingException {
+  public ResponderAndPath getResponderForPath(String path) {
     for (String servletPath : servletPaths) {
       if (path.startsWith(servletPath)) {
         return new ResponderAndPath(servletPath, path2responderMap.get(servletPath));
@@ -281,13 +275,8 @@ public class OcspServerImpl implements OcspServer {
       init0();
       initialized.set(true);
       LOG.info("started OCSPResponder server");
-    } catch (InvalidConfException | PasswordResolverException ex) {
-      LOG.error("could not start OCSP responder", ex);
-      throw ex;
-    } catch (Error ex) {
-      LOG.error("could not start OCSP responder", ex);
-      throw ex;
-    } catch (RuntimeException ex) {
+    } catch (InvalidConfException | PasswordResolverException
+            | Error | RuntimeException  ex) {
       LOG.error("could not start OCSP responder", ex);
       throw ex;
     } catch (Throwable th) {
@@ -354,7 +343,7 @@ public class OcspServerImpl implements OcspServer {
       for (int i = 0; i < name.length(); i++) {
         char ch = name.charAt(i);
         if (!((ch >= '0' && ch <= '9') || (ch >= 'A' && ch <= 'Z')
-            || (ch >= 'a' && ch <= 'z') || ch == '-') || ch == '_' || ch == '.') {
+            || (ch >= 'a' && ch <= 'z') || ch == '-' || ch == '_' || ch == '.')) {
           throw new InvalidConfException("invalid OCSP responder name '" + name + "'");
         }
       } // end for
@@ -401,6 +390,7 @@ public class OcspServerImpl implements OcspServer {
       if (set.contains(name)) {
         throw new InvalidConfException("duplicated definition of store named '" + name + "'");
       }
+      set.add(name);
     }
 
     // Duplication name check: datasource
@@ -527,13 +517,6 @@ public class OcspServerImpl implements OcspServer {
         throw new InvalidConfException("no responseOption named '" + respOptName + "' is defined");
       }
 
-      // required HashAlgorithms for certificate
-      List<OcspServerConf.Store> storeDefs = conf.getStores();
-      Set<String> storeNames = new HashSet<>(storeDefs.size());
-      for (OcspServerConf.Store storeDef : storeDefs) {
-        storeNames.add(storeDef.getName());
-      }
-
       responderOptions.put(m.getName(), option);
     } // end for
 
@@ -592,7 +575,8 @@ public class OcspServerImpl implements OcspServer {
     for (SizeComparableString m : tmpList) {
       list2.add(m.str);
     }
-    this.servletPaths = list2;
+    this.servletPaths.clear();
+    this.servletPaths.addAll(list2);
   } // method init0
 
   @Override
@@ -637,6 +621,7 @@ public class OcspServerImpl implements OcspServer {
     try {
       Object reqOrRrrorResp = checkSignature(request, reqOpt);
       if (reqOrRrrorResp instanceof OcspRespWithCacheInfo) {
+        // error
         return (OcspRespWithCacheInfo) reqOrRrrorResp;
       }
 
@@ -786,7 +771,7 @@ public class OcspServerImpl implements OcspServer {
 
         if (cacheDbIssuerId != null) {
           OcspRespWithCacheInfo cachedResp = responseCacher.getOcspResponse(
-              cacheDbIssuerId.intValue(), cacheDbSerialNumber, cacheDbSigAlg);
+              cacheDbIssuerId, cacheDbSerialNumber, cacheDbSigAlg);
           if (cachedResp != null) {
             return cachedResp;
           }
@@ -815,10 +800,10 @@ public class OcspServerImpl implements OcspServer {
 
       boolean unknownAsRevoked = false;
       AtomicBoolean unknownAsRevoked0 = new AtomicBoolean(false);
-      for (int i = 0; i < requestsSize; i++) {
+      for (CertID certID : requestList) {
         OcspRespWithCacheInfo failureOcspResp = processCertReq(
-            unknownAsRevoked0, requestList.get(i),
-            builder, responder, reqOpt, repOpt, repControl);
+                unknownAsRevoked0, certID,
+                builder, responder, reqOpt, repOpt, repControl);
 
         if (failureOcspResp != null) {
           return failureOcspResp;
@@ -864,7 +849,7 @@ public class OcspServerImpl implements OcspServer {
       if (canCacheDb && repControl.canCacheInfo) {
         // Don't cache the response with status UNKNOWN, since this may result in DDoS
         // of storage
-        responseCacher.storeOcspResponse(cacheDbIssuerId.intValue(), cacheDbSerialNumber,
+        responseCacher.storeOcspResponse(cacheDbIssuerId, cacheDbSerialNumber,
             producedAtSeconds, repControl.cacheNextUpdate, cacheDbSigAlg, encodeOcspResponse);
       }
 
@@ -886,8 +871,7 @@ public class OcspServerImpl implements OcspServer {
   private OcspRespWithCacheInfo processCertReq(AtomicBoolean unknownAsRevoked,
       CertID certId, OCSPRespBuilder builder,
       ResponderImpl responder, RequestOption reqOpt, OcspServerConf.ResponseOption repOpt,
-      OcspRespControl repControl)
-          throws IOException {
+      OcspRespControl repControl) {
     HashAlgo reqHashAlgo = certId.getIssuer().hashAlgorithm();
     if (!reqOpt.allows(reqHashAlgo)) {
       LOG.warn("CertID.hashAlgorithm {} not allowed", reqHashAlgo);
@@ -1026,7 +1010,7 @@ public class OcspServerImpl implements OcspServer {
     }
 
     if (LOG.isDebugEnabled()) {
-      String certStatusText = null;
+      String certStatusText;
       if (Arrays.equals(certStatus, bytes_certstatus_good)) {
         certStatusText = "good";
       } else if (Arrays.equals(certStatus, bytes_certstatus_unknown)) {
@@ -1099,7 +1083,7 @@ public class OcspServerImpl implements OcspServer {
   }
 
   private Object checkSignature(byte[] request, RequestOption requestOption)
-          throws OCSPException, CertificateParsingException, InvalidAlgorithmParameterException {
+          throws OCSPException {
     OCSPRequest req;
     try {
       if (!requestOption.isValidateSignature()) {

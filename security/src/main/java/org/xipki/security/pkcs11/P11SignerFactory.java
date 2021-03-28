@@ -26,7 +26,6 @@ import org.xipki.util.ObjectCreationException;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -46,7 +45,7 @@ public class P11SignerFactory implements SignerFactory {
   private static final String TYPE = "pkcs11";
 
   private static final Set<String> types = Collections.unmodifiableSet(
-      new HashSet<>(Arrays.asList(TYPE)));
+      new HashSet<>(Collections.singletonList(TYPE)));
 
   private P11CryptServiceFactory p11CryptServiceFactory;
 
@@ -132,10 +131,8 @@ public class P11SignerFactory implements SignerFactory {
       P11SlotIdentifier p11SlotId;
       if (slotId != null) {
         p11SlotId = module.getSlotIdForId(slotId);
-      } else if (slotIndex != null) {
-        p11SlotId = module.getSlotIdForIndex(slotIndex);
       } else {
-        throw new IllegalStateException("should not reach here");
+        p11SlotId = module.getSlotIdForIndex(slotIndex);
       }
       slot = module.getSlot(p11SlotId);
     } catch (P11TokenException | XiSecurityException ex) {

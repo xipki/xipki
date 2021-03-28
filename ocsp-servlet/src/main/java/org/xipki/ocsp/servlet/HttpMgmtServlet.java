@@ -51,12 +51,11 @@ import com.alibaba.fastjson.JSON;
  * @since 3.0.1
  */
 
-@SuppressWarnings("serial")
 public class HttpMgmtServlet extends HttpServlet {
 
   private static final class MyException extends Exception {
 
-    private int status;
+    private final int status;
 
     public MyException(int status, String message) {
       super(message);

@@ -31,7 +31,7 @@ public enum CaStatus {
   ACTIVE("active"),
   INACTIVE("inactive");
 
-  private String status;
+  private final String status;
 
   CaStatus(String status) {
     this.status = status;

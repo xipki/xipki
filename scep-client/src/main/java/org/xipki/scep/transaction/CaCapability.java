@@ -37,7 +37,7 @@ public enum CaCapability {
   SHA512("SHA-512"),
   Update("Update");
 
-  private String text;
+  private final String text;
 
   CaCapability(String text) {
     this.text = text;

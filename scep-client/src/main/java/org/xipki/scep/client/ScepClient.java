@@ -50,8 +50,7 @@ public class ScepClient extends Client {
   }
 
   public ScepClient(CaIdentifier caId, CaCertValidator caCertValidator,
-      SSLSocketFactory sslSocketFactory, HostnameVerifier hostnameVerifier)
-      throws MalformedURLException {
+      SSLSocketFactory sslSocketFactory, HostnameVerifier hostnameVerifier) {
     super(caId, caCertValidator);
     this.sslSocketFactory = sslSocketFactory;
     this.hostnameVerifier = hostnameVerifier;

@@ -214,7 +214,7 @@ public class ProcessLog {
     // processed percent
     if (hasTotal) {
       int percent = (int) (tmpNumProcessed * 100 / total);
-      String percentS = Integer.toString(percent) + "%";
+      String percentS = percent + "%";
       sb.append(formatText(percentS, PERCENT_LEN));
     }
 

@@ -391,8 +391,7 @@ public class X509ProfileType extends ValidatableConf {
     return Collections.unmodifiableMap(map);
   } // buildConstantExtesions
 
-  public Map<ASN1ObjectIdentifier, ExtnSyntax> buildExtesionsWithSyntax()
-      throws CertprofileException {
+  public Map<ASN1ObjectIdentifier, ExtnSyntax> buildExtesionsWithSyntax() {
     Map<ASN1ObjectIdentifier, ExtnSyntax> map = new HashMap<>();
 
     for (ExtensionType m : getExtensions()) {

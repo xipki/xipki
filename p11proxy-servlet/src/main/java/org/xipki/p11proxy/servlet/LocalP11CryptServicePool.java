@@ -43,9 +43,9 @@ public class LocalP11CryptServicePool {
 
   private P11CryptServiceFactory p11CryptServiceFactory;
 
-  private Map<Short, P11CryptService> p11CryptServices = new HashMap<>();
+  private final Map<Short, P11CryptService> p11CryptServices = new HashMap<>();
 
-  private AtomicBoolean initialized = new AtomicBoolean(false);
+  private final AtomicBoolean initialized = new AtomicBoolean(false);
 
   public LocalP11CryptServicePool() {
   }
@@ -96,8 +96,7 @@ public class LocalP11CryptServicePool {
   }
 
   /* ID = SHA1(moduleName.getBytes("UTF-8")[1..15] */
-  private static short deriveModuleId(String moduleName)
-      throws XiSecurityException {
+  private static short deriveModuleId(String moduleName) {
     byte[] hash = HashAlgo.SHA1.hash(StringUtil.toUtf8Bytes(moduleName));
     int intCode = 0x7FFF & ((0xFF & hash[0]) << 8) | (0xFF & hash[1]);
     return (short) intCode;

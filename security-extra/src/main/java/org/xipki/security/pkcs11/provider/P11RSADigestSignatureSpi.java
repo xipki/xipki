@@ -135,9 +135,9 @@ public class P11RSADigestSignatureSpi extends SignatureSpi {
 
   } // class NoneRSA
 
-  private Digest digest;
+  private final Digest digest;
 
-  private AlgorithmIdentifier digestAlgId;
+  private final AlgorithmIdentifier digestAlgId;
 
   private P11PrivateKey signingKey;
 

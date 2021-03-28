@@ -76,7 +76,7 @@ public class X509Util {
 
   private static CertificateFactory certFact;
 
-  private static Object certFactLock = new Object();
+  private static final Object certFactLock = new Object();
 
   private X509Util() {
   }
@@ -115,11 +115,8 @@ public class X509Util {
   public static X509Cert parseCert(File file)
       throws IOException, CertificateException {
     notNull(file, "file");
-    InputStream in = Files.newInputStream(expandFilepath(file).toPath());
-    try {
+    try (InputStream in = Files.newInputStream(expandFilepath(file).toPath())) {
       return parseCert(in);
-    } finally {
-      in.close();
     }
   }
 
@@ -145,11 +142,8 @@ public class X509Util {
   public static CertificationRequest parseCsr(File file)
       throws IOException {
     notNull(file, "file");
-    InputStream in = Files.newInputStream(expandFilepath(file).toPath());
-    try {
+    try (InputStream in = Files.newInputStream(expandFilepath(file).toPath())) {
       return parseCsr(in);
-    } finally {
-      in.close();
     }
   }
 
@@ -223,8 +217,7 @@ public class X509Util {
     }
   }
 
-  public static String toPemCert(X509Cert cert)
-      throws CertificateException {
+  public static String toPemCert(X509Cert cert) {
     notNull(cert, "cert");
     return new String(PemEncoder.encode(cert.getEncoded(), PemLabel.CERTIFICATE));
   }
@@ -286,8 +279,7 @@ public class X509Util {
       RDN[] rdns = name.getRDNs(new ASN1ObjectIdentifier(type));
 
       List<String> values = new ArrayList<>(1);
-      for (int j = 0; j < rdns.length; j++) {
-        RDN rdn = rdns[j];
+      for (RDN rdn : rdns) {
         if (rdn.isMultiValued()) {
           AttributeTypeAndValue[] atvs = rdn.getTypesAndValues();
           for (AttributeTypeAndValue atv : atvs) {
@@ -420,8 +412,7 @@ public class X509Util {
 
   public static X509Cert[] buildCertPath(X509Cert targetCert,
       Collection<X509Cert> certs, Collection<X509Cert> trustAnchors,
-      boolean includeTargetCert)
-          throws CertPathBuilderException {
+      boolean includeTargetCert) {
     notNull(targetCert, "cert");
 
     if (trustAnchors == null) {
@@ -725,7 +716,7 @@ public class X509Util {
       }
     }
 
-    int tag = -1;
+    int tag;
     try {
       if ("0".equals(tagS) || "othername".equals(tagS)) {
         tag = 0;
@@ -750,16 +741,8 @@ public class X509Util {
       throw new BadInputException("invalid tag '" + tagS + "'");
     }
 
-    if (tag == -1) {
-      throw new BadInputException("invalid taggedValue " + taggedValue);
-    }
-
     switch (tag) {
       case GeneralName.otherName:
-        if (value == null) {
-          throw new BadInputException("invalid otherName: no value specified");
-        }
-
         int idxSep = value.indexOf("=");
         if (idxSep == -1 || idxSep == 0 || idxSep == value.length() - 1) {
           throw new BadInputException("invalid otherName " + value);
@@ -773,16 +756,15 @@ public class X509Util {
         DERSequence seq = new DERSequence(vector);
         return new GeneralName(tag, seq);
       case GeneralName.rfc822Name:
-        return new GeneralName(tag, value);
+      case GeneralName.uniformResourceIdentifier:
+      case GeneralName.iPAddress:
+      case GeneralName.registeredID:
       case GeneralName.dNSName:
         return new GeneralName(tag, value);
       case GeneralName.directoryName:
         X500Name x500Name = reverse(new X500Name(value));
         return new GeneralName(tag, x500Name);
       case GeneralName.ediPartyName:
-        if (value == null) {
-          throw new BadInputException("invalid ediPartyName: no value specified");
-        }
         idxSep = value.indexOf("=");
         if (idxSep == -1 || idxSep == value.length() - 1) {
           throw new BadInputException("invalid ediPartyName " + value);
@@ -796,12 +778,6 @@ public class X509Util {
         vector.add(new DERTaggedObject(false, 1, new DirectoryString(partyName)));
         seq = new DERSequence(vector);
         return new GeneralName(tag, seq);
-      case GeneralName.uniformResourceIdentifier:
-        return new GeneralName(tag, value);
-      case GeneralName.iPAddress:
-        return new GeneralName(tag, value);
-      case GeneralName.registeredID:
-        return new GeneralName(tag, value);
       default:
         throw new IllegalStateException("unsupported tag " + tag);
     } // end switch (tag)

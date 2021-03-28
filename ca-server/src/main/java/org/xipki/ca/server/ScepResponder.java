@@ -301,7 +301,7 @@ public class ScepResponder {
 
   private PkiMessage servicePkiOperation0(CMSSignedData requestContent,
       DecodedPkiMessage req, String certprofileName, String msgId, AuditEvent event)
-      throws MessageDecodingException, OperationException {
+      throws OperationException {
     notNull(requestContent, "requestContent");
 
     String tid = notNull(req, "req").getTransactionId().getId();
@@ -311,11 +311,11 @@ public class ScepResponder {
       audit(event, CaAuditConstants.Scep.NAME_failure_message, req.getFailureMessage());
     }
     Boolean bo = req.isSignatureValid();
-    if (bo != null && !bo.booleanValue()) {
+    if (bo != null && !bo) {
       audit(event, CaAuditConstants.Scep.NAME_signature, "invalid");
     }
     bo = req.isDecryptionSuccessful();
-    if (bo != null && !bo.booleanValue()) {
+    if (bo != null && !bo) {
       audit(event, CaAuditConstants.Scep.NAME_decryption, "failed");
     }
 
@@ -330,14 +330,14 @@ public class ScepResponder {
     }
 
     bo = req.isSignatureValid();
-    if (bo != null && !bo.booleanValue()) {
+    if (bo != null && !bo) {
       rep.setPkiStatus(PkiStatus.FAILURE);
       rep.setFailInfo(FailInfo.badMessageCheck);
       return rep;
     }
 
     bo = req.isDecryptionSuccessful();
-    if (bo != null && !bo.booleanValue()) {
+    if (bo != null && !bo) {
       rep.setPkiStatus(PkiStatus.FAILURE);
       rep.setFailInfo(FailInfo.badRequest);
       return rep;
@@ -345,7 +345,7 @@ public class ScepResponder {
 
     Date signingTime = req.getSigningTime();
     if (maxSigningTimeBiasInMs > 0) {
-      boolean isTimeBad = false;
+      boolean isTimeBad;
       if (signingTime == null) {
         isTimeBad = true;
       } else {
@@ -392,7 +392,7 @@ public class ScepResponder {
     ASN1ObjectIdentifier encOid = req.getContentEncryptionAlgorithm();
     if (CMSAlgorithm.DES_EDE3_CBC.equals(encOid)) {
       if (!caCaps.containsCapability(CaCapability.DES3)) {
-        LOG.warn("tid={}: encryption with DES3 algorithm is not permitted", tid, encOid);
+        LOG.warn("tid={}: encryption with DES3 algorithm {} is not permitted", tid, encOid);
         rep.setPkiStatus(PkiStatus.FAILURE);
         rep.setFailInfo(FailInfo.badAlg);
         return rep;
@@ -465,7 +465,7 @@ public class ScepResponder {
           String challengePwd = CaUtil.getChallengePassword(csrReqInfo);
           if (challengePwd != null) {
             String[] strs = challengePwd.split(":");
-            if (strs == null || strs.length != 2) {
+            if (strs.length != 2) {
               LOG.warn("tid={}: challengePassword does not have the format <user>:<password>", tid);
               throw FailInfoException.BAD_REQUEST;
             }
@@ -519,7 +519,7 @@ public class ScepResponder {
 
           Extensions extensions = CaUtil.getExtensions(csrReqInfo);
           CertTemplateData certTemplateData = new CertTemplateData(csrReqInfo.getSubject(),
-              csrReqInfo.getSubjectPublicKeyInfo(), (Date) null, (Date) null, extensions,
+              csrReqInfo.getSubjectPublicKeyInfo(), null, null, extensions,
               certprofileName);
           CertificateInfo cert = ca.generateCert(certTemplateData, requestor,
               RequestType.SCEP, tidBytes, msgId);
@@ -713,7 +713,7 @@ public class ScepResponder {
   } // method ensureIssuedByThisCa
 
   static CMSSignedData createDegeneratedSigendData(X509Cert... certs)
-      throws CMSException, CertificateException {
+      throws CMSException {
     CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
     for (X509Cert cert : certs) {
       cmsSignedDataGen.addCertificate(cert.toBcCert());

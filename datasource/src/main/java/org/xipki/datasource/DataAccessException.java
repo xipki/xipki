@@ -25,10 +25,9 @@ import org.xipki.util.Args;
  *
  * @author Rod Johnson
  */
-@SuppressWarnings("serial")
 public class DataAccessException extends Exception {
 
-  public static enum Reason {
+  public enum Reason {
     /**
      * Root reason.
      */
@@ -166,7 +165,7 @@ public class DataAccessException extends Exception {
 
     private final Reason parent;
 
-    private Reason(Reason parent) {
+    Reason(Reason parent) {
       this.parent = parent;
     }
 
@@ -184,7 +183,7 @@ public class DataAccessException extends Exception {
     }
 
     public boolean isAncestorOrSelfOf(Reason reason) {
-      return (this == reason) ? true : isAncestorOf(reason);
+      return this == reason || isAncestorOf(reason);
     }
 
     public boolean isDescendantOf(Reason reason) {
@@ -192,7 +191,7 @@ public class DataAccessException extends Exception {
     }
 
     public boolean isDescendantOrSelfOf(Reason reason) {
-      return (this == reason) ? true : isDescendantOf(reason);
+      return this == reason || isDescendantOf(reason);
     }
 
   }

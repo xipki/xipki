@@ -60,15 +60,15 @@ class DigestDiffReporter implements Closeable {
 
   private Date startTime;
 
-  private AtomicInteger numGood = new AtomicInteger(0);
+  private final AtomicInteger numGood = new AtomicInteger(0);
 
-  private AtomicInteger numDiff = new AtomicInteger(0);
+  private final AtomicInteger numDiff = new AtomicInteger(0);
 
-  private AtomicInteger numMissing = new AtomicInteger(0);
+  private final AtomicInteger numMissing = new AtomicInteger(0);
 
-  private AtomicInteger numUnexpected = new AtomicInteger(0);
+  private final AtomicInteger numUnexpected = new AtomicInteger(0);
 
-  private AtomicInteger numError = new AtomicInteger(0);
+  private final AtomicInteger numError = new AtomicInteger(0);
 
   public DigestDiffReporter(String reportDirname, byte[] caCertBytes)
       throws IOException {

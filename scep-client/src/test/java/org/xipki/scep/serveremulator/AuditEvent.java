@@ -31,10 +31,10 @@ import org.slf4j.Logger;
 
 class AuditEvent {
 
-  public static enum AuditLevel {
+  public enum AuditLevel {
 
     ERROR,
-    INFO;
+    INFO
 
   }
 

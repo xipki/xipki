@@ -28,7 +28,7 @@ import org.xipki.util.StringUtil;
 
 /**
  * PBKDF2 salted password hashing.
- * @author: havoc AT defuse.ca, www: http://crackstation.net/hashing-security.htm
+ * @author havoc AT defuse.ca, www: http://crackstation.net/hashing-security.htm
  */
 public class PasswordHash {
 
@@ -160,8 +160,7 @@ public class PasswordHash {
   public static byte[] pbkdf2(byte[] password, byte[] salt, int iterations, int bytes) {
     synchronized (GEN) {
       GEN.init(password, salt, iterations);
-      byte[] dk = ((KeyParameter) GEN.generateDerivedParameters(bytes * 8)).getKey();
-      return dk;
+      return ((KeyParameter) GEN.generateDerivedParameters(bytes * 8)).getKey();
     }
   }
 

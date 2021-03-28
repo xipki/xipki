@@ -18,6 +18,7 @@
 package org.xipki.scep.serveremulator;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jetty.server.Server;
@@ -33,11 +34,11 @@ import org.xipki.util.Args;
 
 public class ScepServerContainer {
 
-  private Server server;
+  private final Server server;
 
   public ScepServerContainer(int port, ScepServer scepServer)
       throws Exception {
-    this(port, Arrays.asList(Args.notNull(scepServer, "scepServer")));
+    this(port, Collections.singletonList(Args.notNull(scepServer, "scepServer")));
   }
 
   public ScepServerContainer(int port, List<ScepServer> scepServers)

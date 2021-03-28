@@ -32,7 +32,7 @@ public enum AuditStatus {
   FAILED,
   UNDEFINED;
 
-  private AuditStatus() {
+  AuditStatus() {
   }
 
   public static AuditStatus forName(final String name) {

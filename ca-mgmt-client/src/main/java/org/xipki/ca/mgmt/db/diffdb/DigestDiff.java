@@ -80,7 +80,7 @@ class DigestDiff {
   public DigestDiff(DataSourceWrapper refDatasource, DataSourceWrapper targetDatasource,
       String reportDirName, boolean revokedOnly, AtomicBoolean stopMe, int numPerSelect,
       int numThreads)
-          throws IOException, DataAccessException {
+          throws DataAccessException {
     this.refDatasource = Args.notNull(refDatasource, "refDatasource");
     this.revokedOnly = revokedOnly;
     this.targetDatasource = Args.notNull(targetDatasource, "targetDatasource");
@@ -176,7 +176,7 @@ class DigestDiff {
   } // method diff
 
   private void diffSingleCa(RefDigestReader refReader, Map<Integer, byte[]> caIdCertBytesMap)
-      throws CertificateException, IOException, InterruptedException {
+      throws IOException, InterruptedException {
     X509Cert caCert = refReader.getCaCert();
     byte[] caCertBytes = caCert.getEncoded();
 

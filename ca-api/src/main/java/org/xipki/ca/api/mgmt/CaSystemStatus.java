@@ -30,6 +30,6 @@ public enum CaSystemStatus {
   NOT_INITED,
   INITIALIZING,
   LOCK_FAILED,
-  ERROR;
+  ERROR
 
 }

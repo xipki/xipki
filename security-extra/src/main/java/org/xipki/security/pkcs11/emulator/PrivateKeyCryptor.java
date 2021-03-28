@@ -56,8 +56,8 @@ class PrivateKeyCryptor {
       PKCSObjectIdentifiers.pbeWithSHAAnd2_KeyTripleDES_CBC;
   private static final int ITERATION_COUNT = 2048;
 
-  private OutputEncryptor encryptor;
-  private InputDecryptorProvider decryptorProvider;
+  private final OutputEncryptor encryptor;
+  private final InputDecryptorProvider decryptorProvider;
 
   PrivateKeyCryptor(char[] password)
       throws P11TokenException {

@@ -504,10 +504,7 @@ public class EnrollCertActions {
       }
 
       if (!list.isEmpty()) {
-        for (RDN rdn : subjectDn.getRDNs()) {
-          list.add(rdn);
-        }
-
+        Collections.addAll(list, subjectDn.getRDNs());
         subjectDn = new X500Name(list.toArray(new RDN[0]));
       }
 

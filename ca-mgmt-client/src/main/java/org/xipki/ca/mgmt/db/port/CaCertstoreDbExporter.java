@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -142,7 +142,7 @@ class CaCertstoreDbExporter extends DbPorter {
 
       certstore.validate();
       try (OutputStream os = Files.newOutputStream(Paths.get(baseDir, FILENAME_CA_CERTSTORE))) {
-        JSON.writeJSONString(os, Charset.forName("UTF-8"), certstore);
+        JSON.writeJSONString(os, StandardCharsets.UTF_8, certstore);
       }
     } catch (Exception ex) {
       System.err.println("could not export CA certstore from database");
@@ -216,7 +216,7 @@ class CaCertstoreDbExporter extends DbPorter {
         throw new IllegalStateException("unknown CaDbEntryType " + type);
     }
 
-    Long minId = (idProcessedInLastProcess != null) ? idProcessedInLastProcess + 1
+    long minId = (idProcessedInLastProcess != null) ? idProcessedInLastProcess + 1
         : min(tableName, "ID");
 
     String tablesText = "table " + type.getTableName();
@@ -231,7 +231,7 @@ class CaCertstoreDbExporter extends DbPorter {
     String sql = datasource.buildSelectFirstSql(numEntriesPerSelect, "ID ASC", coreSql);
 
     Object entriesInCurrentFile = createContainer(type);
-    PreparedStatement ps = prepareStatement(sql.toString());
+    PreparedStatement ps = prepareStatement(sql);
 
     int numEntriesInCurrentFile = 0;
 
@@ -344,7 +344,7 @@ class CaCertstoreDbExporter extends DbPorter {
           } else if (CaDbEntryType.CRL == type) {
             byte[] crlBytes = Base64.decodeFast(rs.getString("CRL"));
 
-            X509CRLHolder x509Crl = null;
+            X509CRLHolder x509Crl;
             try {
               x509Crl = X509Util.parseCrl(crlBytes);
             } catch (CRLException ex) {
@@ -426,7 +426,7 @@ class CaCertstoreDbExporter extends DbPorter {
 
             writeLine(filenameListOs, currentEntriesFilename);
             setCount(type, certstore, numProcessedBefore + sum);
-            echoToFile(tableName + ":" + Long.toString(id), processLogFile);
+            echoToFile(tableName + ":" + id, processLogFile);
 
             processLog.addNumProcessed(numEntriesInCurrentFile);
             processLog.printStatus();
@@ -531,7 +531,7 @@ class CaCertstoreDbExporter extends DbPorter {
     ZipEntry certZipEntry = new ZipEntry(filename);
     zipOutStream.putNextEntry(certZipEntry);
     try {
-      JSON.writeJSONString(zipOutStream, Charset.forName("UTF-8"), container);
+      JSON.writeJSONString(zipOutStream, StandardCharsets.UTF_8, container);
     } finally {
       zipOutStream.closeEntry();
     }
@@ -539,8 +539,7 @@ class CaCertstoreDbExporter extends DbPorter {
     zipOutStream.close();
   } // method finalizeZip
 
-  private static Object createContainer(CaDbEntryType type)
-      throws IOException {
+  private static Object createContainer(CaDbEntryType type) {
     switch (type) {
       case CERT:
         return new CaCertstore.Certs();

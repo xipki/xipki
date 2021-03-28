@@ -171,7 +171,7 @@ class GrandCertTemplateBuilder {
         Integer reqPathlen = certprofile.getPathLenBasicConstraint();
         int caPathLen = caInfo.getPathLenConstraint();
         boolean allowed = (reqPathlen == null && caPathLen == Integer.MAX_VALUE)
-                            || (reqPathlen != null && reqPathlen.intValue() < caPathLen);
+                            || (reqPathlen != null && reqPathlen < caPathLen);
         if (!allowed) {
           throw new OperationException(NOT_PERMITTED,
               "invalid BasicConstraint.pathLenConstraint");

@@ -24,7 +24,6 @@ import org.xipki.password.SinglePasswordResolver;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Connection;
@@ -133,14 +132,11 @@ public class InitDbMain {
 
   public static void initDb(LiquibaseMain.DatabaseConf dbConf, String dbSchemaFile)
       throws Exception {
-    LiquibaseMain liquibase = new LiquibaseMain(dbConf, dbSchemaFile);
-    try {
+    try (LiquibaseMain liquibase = new LiquibaseMain(dbConf, dbSchemaFile)) {
       liquibase.init();
       liquibase.releaseLocks();
       liquibase.dropAll();
       liquibase.update();
-    } finally {
-      liquibase.close();
     }
 
     dropLiquibaseTables(dbConf);
@@ -156,8 +152,7 @@ public class InitDbMain {
     System.out.println(msg);
   } // method printDatabaseInfo
 
-  private static boolean confirm(String command)
-      throws IOException {
+  private static boolean confirm(String command) {
     String prompt = "Do you wish to " + command + " the database (Yes/No)? ";
     String answer = IoUtil.readLineFromConsole(prompt);
     return "yes".equalsIgnoreCase(answer) || "y".equalsIgnoreCase(answer);

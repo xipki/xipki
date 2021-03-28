@@ -17,12 +17,7 @@
 
 package org.xipki.ca.certprofile.test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -103,8 +98,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     }
   } // method main
 
-  private static void certprofileSubCaComplex(String destFilename)
-      throws Exception {
+  private static void certprofileSubCaComplex(String destFilename) {
     X509ProfileType profile = getBaseProfile("certprofile subca-complex (with most extensions)",
         CertLevel.SubCA, "8y");
 
@@ -197,8 +191,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     marshall(profile, destFilename, true);
   } // method certprofileSubCaComplex
 
-  private static void certprofileMultipleOus(String destFilename)
-      throws Exception {
+  private static void certprofileMultipleOus(String destFilename) {
     X509ProfileType profile = getBaseProfile("certprofile multiple-ous", CertLevel.EndEntity, "5y");
 
     // Subject
@@ -242,8 +235,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
   /*
    * O and OU in one RDN
    */
-  private static void certprofileMultipleValuedRdn(String destFilename)
-      throws Exception {
+  private static void certprofileMultipleValuedRdn(String destFilename) {
     X509ProfileType profile = getBaseProfile("certprofile multiple-valued-rdn",
         CertLevel.EndEntity, "5y");
 
@@ -284,8 +276,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     marshall(profile, destFilename, true);
   } // method certprofileMultipleValuedRdn
 
-  private static void certprofileQc(String destFilename)
-      throws Exception {
+  private static void certprofileQc(String destFilename) {
     X509ProfileType profile = getBaseProfile("certprofile qc", CertLevel.EndEntity, "1000d");
 
     // Subject
@@ -588,24 +579,20 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     marshall(profile, destFilename, true);
   } // method certprofileConstantExt
 
-  private static void certprofileSyntaxExtImplicitTag(String destFilename)
-      throws Exception {
+  private static void certprofileSyntaxExtImplicitTag(String destFilename) {
     certprofileSyntaxExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.2"), new Tag(1, false));
   }
 
-  private static void certprofileSyntaxExtExplicitTag(String destFilename)
-      throws Exception {
+  private static void certprofileSyntaxExtExplicitTag(String destFilename) {
     certprofileSyntaxExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.3"), new Tag(1, true));
   }
 
-  private static void certprofileSyntaxExt(String destFilename)
-      throws Exception {
+  private static void certprofileSyntaxExt(String destFilename) {
     certprofileSyntaxExt(destFilename, new ASN1ObjectIdentifier("1.2.3.6.1"), null);
   }
 
   private static void certprofileSyntaxExt(String destFilename,
-      ASN1ObjectIdentifier oidPrefix, Tag tag)
-          throws Exception {
+      ASN1ObjectIdentifier oidPrefix, Tag tag) {
     X509ProfileType profile = getBaseProfile("certprofile syntax-extension", CertLevel.EndEntity,
         "5y", true);
 
@@ -656,8 +643,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     marshall(profile, destFilename, true);
   } // method certprofileSyntaxExt
 
-  private static void certprofileFixedPartialSubject(String destFilename)
-      throws Exception {
+  private static void certprofileFixedPartialSubject(String destFilename) {
     X509ProfileType profile = getBaseProfile("certprofile fixed subject O and C",
         CertLevel.EndEntity, "365d");
 
@@ -707,8 +693,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     marshall(profile, destFilename, true);
   } // method certprofileFixedPartialSubject
 
-  private static void certprofileAppleWwdr(String destFilename)
-      throws Exception {
+  private static void certprofileAppleWwdr(String destFilename) {
     X509ProfileType profile = getBaseProfile("certprofile apple WWDR",
         CertLevel.EndEntity, "395d");
 
@@ -812,7 +797,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
 
     SubFieldSyntax subsubField = new SubFieldSyntax(FieldType.UTF8String);
     subsubField.setRequired(true);
-    subField.setSubFields(Arrays.asList(subsubField));
+    subField.setSubFields(Collections.singletonList(subsubField));
 
     // Line 5
     subField = new SubFieldSyntax(FieldType.UTF8String);
@@ -826,7 +811,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     subField.setRequired(true);
     subsubField = new SubFieldSyntax(FieldType.UTF8String);
     subsubField.setRequired(true);
-    subField.setSubFields(Arrays.asList(subsubField));
+    subField.setSubFields(Collections.singletonList(subsubField));
 
     // Line 8
     subField = new SubFieldSyntax(FieldType.UTF8String);
@@ -840,15 +825,14 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     subField.setRequired(true);
     subsubField = new SubFieldSyntax(FieldType.UTF8String);
     subsubField.setRequired(true);
-    subField.setSubFields(Arrays.asList(subsubField));
+    subField.setSubFields(Collections.singletonList(subsubField));
 
     syntax.setSubFields(subFields);
 
     marshall(profile, destFilename, true);
   } // method certprofileAppleWwdr
 
-  private static void certprofileExtended(String destFilename)
-      throws Exception {
+  private static void certprofileExtended(String destFilename) {
     X509ProfileType profile = getBaseProfile("certprofile extended", CertLevel.EndEntity, "5y");
 
     // Subject
@@ -911,9 +895,8 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     // Extensions - tlsFeature
     list.add(createExtension(Extn.id_pe_tlsfeature, true, true));
     last(list).setTlsFeature(
-        createTlsFeature(
-            new TlsExtensionType[]{TlsExtensionType.STATUS_REQUEST,
-                TlsExtensionType.CLIENT_CERTIFICATE_URL}));
+        createTlsFeature(TlsExtensionType.STATUS_REQUEST,
+                TlsExtensionType.CLIENT_CERTIFICATE_URL));
 
     // Extensions - SMIMECapabilities
     list.add(createExtension(Extn.id_smimeCapabilities, true, false));

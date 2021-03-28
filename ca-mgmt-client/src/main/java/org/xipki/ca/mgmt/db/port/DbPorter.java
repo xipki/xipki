@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Iterator;
@@ -58,7 +59,7 @@ public class DbPorter extends DbToolBase {
 
     private final float sqlBatchFactor;
 
-    private OcspDbEntryType(String dirName, String tableName, float sqlBatchFactor) {
+    OcspDbEntryType(String dirName, String tableName, float sqlBatchFactor) {
       this.dirName = dirName;
       this.tableName = tableName;
       this.sqlBatchFactor = sqlBatchFactor;
@@ -90,7 +91,7 @@ public class DbPorter extends DbToolBase {
 
     private final float sqlBatchFactor;
 
-    private CaDbEntryType(String dirName, String tableName, float sqlBatchFactor) {
+    CaDbEntryType(String dirName, String tableName, float sqlBatchFactor) {
       this.dirName = dirName;
       this.tableName = tableName;
       this.sqlBatchFactor = sqlBatchFactor;
@@ -114,7 +115,7 @@ public class DbPorter extends DbToolBase {
 
     private static final Logger LOG = LoggerFactory.getLogger(DbPortFileNameIterator.class);
 
-    private BufferedReader reader;
+    private final BufferedReader reader;
 
     private String nextFilename;
 
@@ -178,12 +179,6 @@ public class DbPorter extends DbToolBase {
   public static final String FILENAME_CA_CERTSTORE = "ca-certstore.json";
 
   public static final String FILENAME_OCSP_CERTSTORE = "ocsp-certstore.json";
-
-  public static final String DIRNAME_CRL = "crl";
-
-  public static final String DIRNAME_CERT = "cert";
-
-  public static final String PREFIX_FILENAME_CERTS = "certs-";
 
   public static final String EXPORT_PROCESS_LOG_FILENAME = "export.process";
 
@@ -285,7 +280,7 @@ public class DbPorter extends DbToolBase {
     }
 
     File file = new File(baseDir, fileOrValue.getFile());
-    return new String(IoUtil.read(file), "UTF-8");
+    return new String(IoUtil.read(file), StandardCharsets.UTF_8);
   } // method readContent
 
   public static void echoToFile(String content, File file)

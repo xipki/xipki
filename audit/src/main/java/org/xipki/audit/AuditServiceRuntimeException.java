@@ -23,8 +23,6 @@ package org.xipki.audit;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
-@SuppressWarnings("serial")
 public class AuditServiceRuntimeException extends RuntimeException {
 
   public AuditServiceRuntimeException(String message, Throwable cause) {

@@ -43,7 +43,7 @@ public interface CertificateValidator {
    */
   boolean trustCertificate(X509Cert target, X509Cert[] otherCerts);
 
-  public static class CollectionCertificateValidator implements CertificateValidator {
+  class CollectionCertificateValidator implements CertificateValidator {
 
     private final Collection<String> certHashes;
 
@@ -75,7 +75,7 @@ public interface CertificateValidator {
 
   } // class CollectionCertificateValidator
 
-  public static class TrustAllCertValidator implements CertificateValidator {
+  class TrustAllCertValidator implements CertificateValidator {
 
     public boolean trustCertificate(X509Cert target, X509Cert[] otherCerts) {
       return true;

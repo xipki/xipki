@@ -47,11 +47,11 @@ import org.xipki.util.ProcessLog;
 
 class CertRepublisher {
 
-  private static interface QueueEntry {
+  private interface QueueEntry {
 
-    public static final EndOfQueue END_OF_QUEUE = new EndOfQueue();
+    EndOfQueue END_OF_QUEUE = new EndOfQueue();
 
-    public static class EndOfQueue implements QueueEntry {
+    class EndOfQueue implements QueueEntry {
 
       private EndOfQueue() {
       }
@@ -60,7 +60,7 @@ class CertRepublisher {
 
   } // class QueueEntry
 
-  private class SerialWithIdQueueEntry implements QueueEntry {
+  private static class SerialWithIdQueueEntry implements QueueEntry {
 
     private final SerialWithId serialWithId;
 
@@ -102,10 +102,7 @@ class CertRepublisher {
         } while (serials.size() >= numEntries && !failed && !stopMe.get());
 
         queue.put(QueueEntry.END_OF_QUEUE);
-      } catch (OperationException ex) {
-        LogUtil.error(LOG, ex, "error in RepublishProducer");
-        failed = true;
-      } catch (InterruptedException ex) {
+      } catch (OperationException | InterruptedException ex) {
         LogUtil.error(LOG, ex, "error in RepublishProducer");
         failed = true;
       }

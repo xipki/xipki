@@ -17,30 +17,7 @@
 
 package org.xipki.ocsp.server.store.ejbca;
 
-import static org.xipki.util.Args.notNull;
-
-import java.io.File;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.security.cert.CertificateException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-
+import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException;
@@ -63,7 +40,20 @@ import org.xipki.util.Hex;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 
-import com.alibaba.fastjson.JSON;
+import java.io.File;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.cert.CertificateException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.*;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * OcspStore for the EJBCA database.
@@ -110,7 +100,7 @@ public class EjbcaCertStatusStore extends OcspStore {
   private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
   protected List<Runnable> getScheduledServices() {
-    return Arrays.asList(storeUpdateService);
+    return Collections.singletonList(storeUpdateService);
   }
 
   private void updateIssuerStore() {
@@ -134,7 +124,7 @@ public class EjbcaCertStatusStore extends OcspStore {
             String caData = rs.getString("data");
 
             String str = extractTextFromCaData(caData, "catype", "int");
-            if (!"1".contentEquals(str)) {
+            if (!"1".equals(str)) {
               // not X.509CA
               continue;
             }
@@ -245,10 +235,9 @@ public class EjbcaCertStatusStore extends OcspStore {
       String sql = includeCertHash ? sqlCsWithCertHash : sqlCs;
 
       Date thisUpdate = new Date();
-      Date nextUpdate = null;
+      final Date nextUpdate = null;
 
       ResultSet rs = null;
-      CertStatusInfo certStatusInfo = null;
 
       boolean unknown = true;
       boolean ignore = false;
@@ -269,7 +258,7 @@ public class EjbcaCertStatusStore extends OcspStore {
           unknown = false;
 
           long timeInMs = time.getTime();
-          if (!ignore && ignoreNotYetValidCert) {
+          if (ignoreNotYetValidCert) {
             long notBefore = rs.getLong("notBefore");
             if (timeInMs < notBefore) {
               ignore = true;
@@ -302,6 +291,7 @@ public class EjbcaCertStatusStore extends OcspStore {
         releaseDbResources(ps, rs);
       }
 
+      CertStatusInfo certStatusInfo;
       if (unknown) {
         certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, nextUpdate);
       } else if (ignore) {
@@ -430,7 +420,7 @@ public class EjbcaCertStatusStore extends OcspStore {
    * @param datasource DataSource.
    */
   @Override
-  public void init(Map<String, ? extends Object> sourceConf, DataSourceWrapper datasource)
+  public void init(Map<String, ?> sourceConf, DataSourceWrapper datasource)
       throws OcspStoreException {
     if (includeCrlId) {
       throw new OcspStoreException("includeCrlId must not be true");

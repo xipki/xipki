@@ -39,11 +39,11 @@ public enum KeyUsage {
   encipherOnly(7,      org.bouncycastle.asn1.x509.KeyUsage.encipherOnly,     "encipherOnly"),
   decipherOnly(8,      org.bouncycastle.asn1.x509.KeyUsage.decipherOnly,     "decipherOnly");
 
-  private int bit;
+  private final int bit;
 
-  private int bcUsage;
+  private final int bcUsage;
 
-  private String[] names;
+  private final String[] names;
 
   KeyUsage(int bit, int bcUsage, String... names) {
     this.bit = bit;

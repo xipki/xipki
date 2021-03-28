@@ -153,7 +153,7 @@ public class ScepUtil {
   public static Date getTime(Object obj) {
     if (obj instanceof byte[]) {
       byte[] encoded = (byte[]) obj;
-      int tag = encoded[0] & 0xFF;;
+      int tag = encoded[0] & 0xFF;
       try {
         if (tag == BERTags.UTC_TIME) {
           return DERUTCTime.getInstance(encoded).getDate();

@@ -21,6 +21,7 @@ import static org.xipki.util.Args.notNull;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -89,7 +90,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
    * </ul>
    * @param datasource DataSource.
    */
-  public void init(Map<String, ? extends Object> sourceConf, DataSourceWrapper datasource)
+  public void init(Map<String, ?> sourceConf, DataSourceWrapper datasource)
       throws OcspStoreException {
     notNull(sourceConf, "sourceConf");
 
@@ -98,14 +99,14 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     this.sqlBatchCommit = StringUtil.isBlank(value) ? 1000 : Integer.parseInt(value);
 
     value = getStrValue(sourceConf, "ignoreExpiredCrls", false);
-    this.ignoreExpiredCrls = StringUtil.isBlank(value) ? true : Boolean.parseBoolean(value);
+    this.ignoreExpiredCrls = StringUtil.isBlank(value) || Boolean.parseBoolean(value);
 
     super.datasource = datasource;
     updateStore(true);
     super.init(sourceConf, datasource);
   } // method init
 
-  private static String getStrValue(Map<String, ? extends Object> sourceConf,
+  private static String getStrValue(Map<String, ?> sourceConf,
       String confName, boolean mandatory) {
     Object objVal = sourceConf.get(confName);
     if (objVal == null) {
@@ -131,7 +132,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
 
   @Override
   protected List<Runnable> getScheduledServices() {
-    return Arrays.asList(storeUpdateService);
+    return Collections.singletonList(storeUpdateService);
   }
 
   @Override

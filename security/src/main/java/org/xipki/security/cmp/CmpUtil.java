@@ -104,8 +104,7 @@ public class CmpUtil {
 
   // CHECKSTYLE:SKIP
   private static ProtectedPKIMessageBuilder newProtectedPKIMessageBuilder(PKIMessage pkiMessage,
-      GeneralName sender, byte[] senderKid)
-          throws CMPException {
+      GeneralName sender, byte[] senderKid) {
     PKIHeader header = pkiMessage.getHeader();
     ProtectedPKIMessageBuilder builder = new ProtectedPKIMessageBuilder(
         sender, header.getRecipient());

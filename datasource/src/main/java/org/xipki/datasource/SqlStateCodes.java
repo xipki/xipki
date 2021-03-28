@@ -177,10 +177,8 @@ public class SqlStateCodes {
       return Collections.emptySet();
     }
 
-    Set<String> set = new HashSet<String>();
-    for (String str : strs) {
-      set.add(str);
-    }
+    Set<String> set = new HashSet<>();
+    Collections.addAll(set, strs);
     return Collections.unmodifiableSet(set);
   } // method toSet
 
@@ -188,11 +186,9 @@ public class SqlStateCodes {
     if (strs == null || strs.length == 0) {
       return baseSet;
     }
-    Set<String> newSet = new HashSet<String>(baseSet.size() + strs.length);
+    Set<String> newSet = new HashSet<>(baseSet.size() + strs.length);
     newSet.addAll(baseSet);
-    for (String str : strs) {
-      newSet.add(str);
-    }
+    Collections.addAll(newSet, strs);
     return Collections.unmodifiableSet(newSet);
   } // method addToSet
 

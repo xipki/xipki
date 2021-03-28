@@ -43,11 +43,11 @@ public enum OID {
   ID_PKIX_OCSP_ARCHIVE_CUTOFF(OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff),
   ID_PKIX_OCSP_RESPONSE(OCSPObjectIdentifiers.id_pkix_ocsp_response);
 
-  private String id;
+  private final String id;
 
-  private byte[] encoded;
+  private final byte[] encoded;
 
-  private OID(ASN1ObjectIdentifier oid) {
+  OID(ASN1ObjectIdentifier oid) {
     this.id = oid.getId();
     try {
       this.encoded = oid.getEncoded();

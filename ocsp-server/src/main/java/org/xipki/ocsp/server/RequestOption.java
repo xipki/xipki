@@ -178,9 +178,7 @@ public class RequestOption {
     try {
       Set<X509Cert> tmpCerts = getCerts(certpathConf.getTrustAnchors());
       trustAnchors = new HashSet<>(tmpCerts.size());
-      for (X509Cert m : tmpCerts) {
-        trustAnchors.add(m);
-      }
+      trustAnchors.addAll(tmpCerts);
     } catch (Exception ex) {
       throw new InvalidConfException(
           "could not initialize the trustAnchors: " + ex.getMessage(), ex);
@@ -231,7 +229,7 @@ public class RequestOption {
   }
 
   public boolean allows(HashAlgo hashAlgo) {
-    return (hashAlgo == null) ? false : hashAlgos.contains(hashAlgo);
+    return hashAlgo != null && hashAlgos.contains(hashAlgo);
   }
 
   public CertpathValidationModel getCertpathValidationModel() {

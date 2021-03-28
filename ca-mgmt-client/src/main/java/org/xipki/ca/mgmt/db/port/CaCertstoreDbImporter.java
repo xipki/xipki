@@ -134,8 +134,7 @@ class CaCertstoreDbImporter extends DbPorter {
 
       boolean entriesFinished = false;
       // finished for the given type
-      if (typeProcessedInLastProcess != null && (idProcessedInLastProcess != null
-          && idProcessedInLastProcess == -1)) {
+      if (typeProcessedInLastProcess != null && idProcessedInLastProcess == -1) {
         numProcessedInLastProcess = 0;
         idProcessedInLastProcess = 0L;
 
@@ -264,18 +263,15 @@ class CaCertstoreDbImporter extends DbPorter {
       System.out.println("importing entries to " + tablesText + " from ID " + minId);
       processLog.printHeader();
 
-      DbPortFileNameIterator entriesFileIterator = null;
       PreparedStatement stmt = null;
-
-      try {
-        entriesFileIterator = new DbPortFileNameIterator(
-            baseDir + File.separator + type.getDirName() + ".mf");
+      try (DbPortFileNameIterator entriesFileIterator = new DbPortFileNameIterator(
+              baseDir + File.separator + type.getDirName() + ".mf")) {
 
         stmt = prepareStatement(sql);
 
         while (entriesFileIterator.hasNext()) {
           String entriesFile = baseDir + File.separator + type.getDirName()
-              + File.separator + entriesFileIterator.next();
+                  + File.separator + entriesFileIterator.next();
 
           // extract the toId from the filename
           int fromIdx = entriesFile.indexOf('-');
@@ -299,19 +295,19 @@ class CaCertstoreDbImporter extends DbPorter {
             switch (type) {
               case CERT:
                 lastId = importCerts(entriesFile, minId, processLogFile,
-                    processLog, numProcessedBefore, stmt, sql);
+                        processLog, numProcessedBefore, stmt, sql);
                 break;
               case CRL:
                 lastId = importCrls(entriesFile, minId, processLogFile,
-                    processLog, numProcessedBefore, stmt, sql);
+                        processLog, numProcessedBefore, stmt, sql);
                 break;
               case REQUEST:
                 lastId = importRequests(entriesFile, minId, processLogFile,
-                    processLog, numProcessedBefore, stmt, sql);
+                        processLog, numProcessedBefore, stmt, sql);
                 break;
               case REQCERT:
                 lastId = importReqCerts(entriesFile, minId, processLogFile,
-                    processLog, numProcessedBefore, stmt, sql);
+                        processLog, numProcessedBefore, stmt, sql);
                 break;
               default:
                 throw new IllegalStateException("unknown CaDbEntryType " + type);
@@ -320,16 +316,13 @@ class CaCertstoreDbImporter extends DbPorter {
             minId = lastId + 1;
           } catch (Exception ex) {
             System.err.println("\ncould not import entries from file "
-                + entriesFile + ".\nplease continue with the option '--resume'");
+                    + entriesFile + ".\nplease continue with the option '--resume'");
             LOG.error("Exception", ex);
             return ex;
           }
         } // end for
       } finally {
         releaseResources(stmt, null);
-        if (entriesFileIterator != null) {
-          entriesFileIterator.close();
-        }
       }
 
       processLog.printTrailer();
@@ -460,7 +453,7 @@ class CaCertstoreDbImporter extends DbPorter {
           stmt.setString(idx++, b64Sha1FpCert);
           stmt.setString(idx++, cert.getRs());
           stmt.setInt(idx++, cert.getCrlScope());
-          stmt.setString(idx++, Base64.encodeToString(encodedCert));
+          stmt.setString(idx, Base64.encodeToString(encodedCert));
           stmt.addBatch();
         } catch (SQLException ex) {
           throw translate(sql, ex);
@@ -553,14 +546,14 @@ class CaCertstoreDbImporter extends DbPorter {
         // rawcert
         byte[] encodedCrl = IoUtil.read(zipFile.getInputStream(zipEnty));
 
-        X509CRLHolder x509crl = null;
+        X509CRLHolder x509crl;
         try {
           x509crl = X509Util.parseCrl(encodedCrl);
         } catch (Exception ex) {
           LOG.error("could not parse CRL in file {}", filename);
           LOG.debug("could not parse CRL in file " + filename, ex);
           if (ex instanceof CRLException) {
-            throw (CRLException) ex;
+            throw ex;
           } else {
             throw new CRLException(ex.getMessage(), ex);
           }
@@ -602,7 +595,7 @@ class CaCertstoreDbImporter extends DbPorter {
           }
 
           stmt.setInt(idx++, crl.getCrlScope());
-          stmt.setString(idx++, Base64.encodeToString(encodedCrl));
+          stmt.setString(idx, Base64.encodeToString(encodedCrl));
 
           stmt.addBatch();
         } catch (SQLException ex) {
@@ -703,7 +696,7 @@ class CaCertstoreDbImporter extends DbPorter {
           int idx = 1;
           stmt.setLong(idx++, request.getId());
           stmt.setLong(idx++, request.getUpdate());
-          stmt.setString(idx++, Base64.encodeToString(encodedRequest));
+          stmt.setString(idx, Base64.encodeToString(encodedRequest));
           stmt.addBatch();
         } catch (SQLException ex) {
           System.err.println("could not import REQUEST with ID=" + request.getId()
@@ -797,7 +790,7 @@ class CaCertstoreDbImporter extends DbPorter {
           int idx = 1;
           stmt.setLong(idx++, reqCert.getId());
           stmt.setLong(idx++, reqCert.getRid());
-          stmt.setLong(idx++, reqCert.getCid());
+          stmt.setLong(idx, reqCert.getCid());
           stmt.addBatch();
         } catch (SQLException ex) {
           System.err.println("could not import REQUEST with ID=" + reqCert.getId()

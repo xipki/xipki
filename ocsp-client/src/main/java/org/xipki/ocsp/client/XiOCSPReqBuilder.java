@@ -47,11 +47,11 @@ import org.bouncycastle.operator.ContentSigner;
  */
 // CHECKSTYLE:SKIP
 public class XiOCSPReqBuilder {
-  private List<RequestObject> list = new ArrayList<>();
+  private final List<RequestObject> list = new ArrayList<>();
   private GeneralName requestorName = null;
   private Extensions requestExtensions = null;
 
-  private class RequestObject {
+  private static class RequestObject {
     CertID certId;
     Extensions  extensions;
 
@@ -60,8 +60,7 @@ public class XiOCSPReqBuilder {
       this.extensions = extensions;
     }
 
-    public Request toRequest()
-        throws Exception {
+    public Request toRequest() {
       return new Request(certId, extensions);
     }
   }
@@ -123,7 +122,7 @@ public class XiOCSPReqBuilder {
 
     while (it.hasNext()) {
       try {
-        requests.add(((RequestObject)it.next()).toRequest());
+        requests.add(it.next().toRequest());
       } catch (Exception ex) {
         throw new OCSPException("exception creating Request", ex);
       }

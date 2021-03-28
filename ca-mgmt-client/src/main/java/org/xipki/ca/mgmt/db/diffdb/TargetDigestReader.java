@@ -56,7 +56,7 @@ class TargetDigestReader implements Closeable {
 
     private final boolean revokedOnly;
 
-    private Connection conn;
+    private final Connection conn;
 
     private PreparedStatement singleSelectStmt;
 
@@ -81,7 +81,7 @@ class TargetDigestReader implements Closeable {
     @Override
     public void run() {
       while (!stopMe.get()) {
-        CertsBundle bundle = null;
+        CertsBundle bundle;
         try {
           bundle = reader.nextCerts();
         } catch (Exception ex) {
@@ -162,7 +162,7 @@ class TargetDigestReader implements Closeable {
 
   private Exception exception;
 
-  private ExecutorService executor;
+  private final ExecutorService executor;
 
   private final RefDigestReader reader;
 

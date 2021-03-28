@@ -59,7 +59,7 @@ public class P12ContentSignerBuilder {
     private final SignAlgo signAlgo;
 
     private RSAContentSignerBuilder(SignAlgo signAlgo)
-        throws NoSuchAlgorithmException, NoSuchPaddingException {
+        throws NoSuchAlgorithmException {
       super(signAlgo.getAlgorithmIdentifier(), signAlgo.getHashAlgo().getAlgorithmIdentifier());
       if (!(signAlgo.isRSAPSSSigAlgo() || signAlgo.isRSAPkcs1SigAlgo())) {
         throw new NoSuchAlgorithmException("the given algorithm is not a valid RSA signature "
@@ -91,7 +91,7 @@ public class P12ContentSignerBuilder {
     private final SignAlgo signAlgo;
 
     private DSAContentSignerBuilder(SignAlgo signAlgo)
-        throws NoSuchAlgorithmException, NoSuchPaddingException {
+        throws NoSuchAlgorithmException {
       super(signAlgo.getAlgorithmIdentifier(), signAlgo.getHashAlgo().getAlgorithmIdentifier());
       if (!signAlgo.isDSASigAlgo()) {
         throw new NoSuchAlgorithmException("the given algorithm is not a valid DSA signature "
@@ -115,7 +115,7 @@ public class P12ContentSignerBuilder {
     private final SignAlgo signAlgo;
 
     private ECDSAContentSignerBuilder(SignAlgo signAlgo)
-        throws NoSuchAlgorithmException, NoSuchPaddingException {
+        throws NoSuchAlgorithmException {
       super(signAlgo.getAlgorithmIdentifier(), signAlgo.getHashAlgo().getAlgorithmIdentifier());
       if (!signAlgo.isECDSASigAlgo()) {
         throw new NoSuchAlgorithmException("the given algorithm is not a valid ECDSA signature "
@@ -144,7 +144,7 @@ public class P12ContentSignerBuilder {
     private final SignAlgo signAlgo;
 
     private SM2ContentSignerBuilder(SignAlgo signAlgo)
-        throws NoSuchAlgorithmException, NoSuchPaddingException {
+        throws NoSuchAlgorithmException {
       super(signAlgo.getAlgorithmIdentifier(), signAlgo.getHashAlgo().getAlgorithmIdentifier());
       if (!signAlgo.isSM2SigAlgo()) {
         throw new NoSuchAlgorithmException("the given algorithm is not a valid SM2 signature "
@@ -167,8 +167,7 @@ public class P12ContentSignerBuilder {
 
   private final X509Cert[] certificateChain;
 
-  public P12ContentSignerBuilder(PrivateKey privateKey, PublicKey publicKey)
-      throws XiSecurityException {
+  public P12ContentSignerBuilder(PrivateKey privateKey, PublicKey publicKey) {
     this.key = notNull(privateKey, "privateKey");
     this.publicKey = notNull(publicKey, "publicKey");
     this.certificateChain = null;
@@ -195,7 +194,7 @@ public class P12ContentSignerBuilder {
   }
 
   public ContentSigner createContentSigner(SignAlgo signAlgo, SecureRandom random)
-          throws XiSecurityException, NoSuchPaddingException {
+          throws XiSecurityException {
     notNull(signAlgo, "signAlgo");
 
     String provName = getProviderName(signAlgo);
@@ -274,19 +273,19 @@ public class P12ContentSignerBuilder {
   } // method createSigner
 
   private String getProviderName(SignAlgo signAlgo) {
-    String provName = null;
     if (signAlgo.isRSAPkcs1SigAlgo()) {
-      provName = "SunRsaSign";
+      return "SunRsaSign";
     } else if (signAlgo.isECDSASigAlgo()) {
       // Currently, the provider SunEC is much slower (5x) than BC,
       // so we do not use the Signature variant.
-      provName = null;
+      return null;
     } else if (signAlgo.isDSASigAlgo()) {
-      provName = "SUN";
+      return "SUN";
     } else if (signAlgo.isEDDSASigAlgo()) {
-      provName = "BC";
+      return "BC";
+    } else {
+      return null;
     }
-    return provName;
   }
 
   private Signature createSignature(SignAlgo signAlgo, String provName, boolean test)
@@ -302,7 +301,7 @@ public class P12ContentSignerBuilder {
   }
 
   private Object[] ff(SignAlgo signAlgo, SecureRandom random)
-      throws NoSuchPaddingException, XiSecurityException {
+      throws XiSecurityException {
     BcContentSignerBuilder signerBuilder;
     AsymmetricKeyParameter keyparam;
     try {

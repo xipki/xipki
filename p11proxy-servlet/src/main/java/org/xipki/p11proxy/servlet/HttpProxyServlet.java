@@ -37,7 +37,6 @@ import org.xipki.util.LogUtil;
  * @since 2.0.0
  */
 
-@SuppressWarnings("serial")
 public class HttpProxyServlet extends HttpServlet {
 
   private static final Logger LOG = LoggerFactory.getLogger(HttpProxyServlet.class);

@@ -128,7 +128,7 @@ public class CrlActions {
 
       saveVerbose("saved CRL to file", outFile, encodeCrl(crl.getEncoded(), outform));
 
-      if (!withBaseCrl.booleanValue()) {
+      if (!withBaseCrl) {
         return null;
       }
 
@@ -254,7 +254,7 @@ public class CrlActions {
         }
       }
 
-      X509CRLHolder crl = null;
+      X509CRLHolder crl;
       try {
         crl = retrieveCrl();
       } catch (PkiErrorException ex) {

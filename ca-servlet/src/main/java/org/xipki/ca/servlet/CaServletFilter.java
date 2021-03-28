@@ -149,7 +149,7 @@ public class CaServletFilter implements Filter {
     this.scepServlet.setLogReqResp(logReqResp);
 
     RemoteMgmt remoteMgmt = conf.getRemoteMgmt();
-    this.remoteMgmtEnabled = remoteMgmt == null ? false : remoteMgmt.isEnabled();
+    this.remoteMgmtEnabled = remoteMgmt != null && remoteMgmt.isEnabled();
     LOG.info("remote management is {}", remoteMgmtEnabled ? "enabled" : "disabled");
 
     if (this.remoteMgmtEnabled) {
@@ -234,8 +234,7 @@ public class CaServletFilter implements Filter {
     res.setContentLength(0);
   } // method sendError
 
-  private CertprofileFactoryRegister initCertprofileFactoryRegister(List<String> factories)
-      throws ServletException {
+  private CertprofileFactoryRegister initCertprofileFactoryRegister(List<String> factories) {
     CertprofileFactoryRegister certprofileFactoryRegister = new CertprofileFactoryRegister();
     certprofileFactoryRegister.registFactory(new CertprofileFactoryImpl());
 

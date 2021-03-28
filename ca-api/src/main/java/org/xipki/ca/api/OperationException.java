@@ -75,7 +75,7 @@ public class OperationException extends Exception {
     return errorMessage;
   }
 
-  private static final String getMessage(Throwable throwable) {
+  private static String getMessage(Throwable throwable) {
     if (throwable == null) {
       return null;
     }

@@ -17,16 +17,6 @@
 
 package org.xipki.scep.serveremulator;
 
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.bouncycastle.asn1.cms.ContentInfo;
@@ -48,6 +38,14 @@ import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
 
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
+
 /**
  * URL http://host:port/scep/&lt;name&gt;/&lt;profile-alias&gt;/pkiclient.exe
  *
@@ -62,7 +60,7 @@ public class ScepServlet extends HttpServlet {
 
   private static final String CT_RESPONSE = ScepConstants.CT_PKI_MESSAGE;
 
-  private ScepResponder responder;
+  private final ScepResponder responder;
 
   public ScepServlet(ScepResponder responder) {
     this.responder = Args.notNull(responder, "responder");
@@ -70,7 +68,7 @@ public class ScepServlet extends HttpServlet {
 
   @Override
   protected void service(HttpServletRequest req, HttpServletResponse resp)
-          throws ServletException, IOException {
+          throws IOException {
     boolean post;
 
     String method = req.getMethod();
@@ -178,7 +176,7 @@ public class ScepServlet extends HttpServlet {
           nextCaMsg.setCaCert(responder.getNextCaAndRa().getCaCert());
           if (responder.getNextCaAndRa().getRaCert() != null) {
             X509Cert raCert = responder.getNextCaAndRa().getRaCert();
-            nextCaMsg.setRaCerts(Arrays.asList(raCert));
+            nextCaMsg.setRaCerts(Collections.singletonList(raCert));
           }
 
           ContentInfo signedData = responder.encode(nextCaMsg);

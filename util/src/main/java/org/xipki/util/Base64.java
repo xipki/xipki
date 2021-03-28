@@ -99,7 +99,7 @@ public class Base64 {
     IA['='] = 0;
   }
 
-  public static final boolean containsOnlyBase64Chars(byte[] bytes, int offset, int len) {
+  public static boolean containsOnlyBase64Chars(byte[] bytes, int offset, int len) {
     final int maxIndex = Math.min(bytes.length, offset + len);
 
     for (int i = offset; i < maxIndex; i++) {
@@ -132,7 +132,7 @@ public class Base64 {
    *        returned.
    * @return A BASE64 encoded array without line separator.
    */
-  public static final char[] encodeToChar(byte[] sArr) {
+  public static char[] encodeToChar(byte[] sArr) {
     return encodeToChar(sArr, false);
   }
 
@@ -149,7 +149,7 @@ public class Base64 {
    *          will be a little faster.
    * @return A BASE64 encoded array. Never <code>null</code>.
    */
-  public final static char[] encodeToChar(byte[] sArr, boolean lineSep) {
+  public static char[] encodeToChar(byte[] sArr, boolean lineSep) {
     // Check special case
     int sLen = sArr != null ? sArr.length : 0;
     if (sLen == 0) {
@@ -205,7 +205,7 @@ public class Base64 {
    *         If the legal characters (including '=') isn't divideable by 4.
    *         (I.e. definitely corrupted).
    */
-  public final static byte[] decode(char[] sArr) {
+  public static byte[] decode(char[] sArr) {
     // Check special case
     int sLen = sArr != null ? sArr.length : 0;
     if (sLen == 0) {
@@ -277,7 +277,7 @@ public class Base64 {
    *          an exception.
    * @return The decoded array of bytes. May be of length 0.
    */
-  public final static byte[] decodeFast(char[] sArr) {
+  public static byte[] decodeFast(char[] sArr) {
     // Check special case
     int sLen = sArr.length;
     if (sLen == 0) {
@@ -350,7 +350,7 @@ public class Base64 {
    *          returned.
    * @return A BASE64 encoded array without line separator. Never <code>null</code>.
    */
-  public static final byte[] encodeToByte(byte[] sArr) {
+  public static byte[] encodeToByte(byte[] sArr) {
     return encodeToByte(sArr, false);
   }
 
@@ -362,7 +362,7 @@ public class Base64 {
    *          returned.
    * @return A BASE64 encoded array. Never <code>null</code>.
    */
-  public static final byte[] encodeToPemByte(byte[] sArr) {
+  public static byte[] encodeToPemByte(byte[] sArr) {
     return encodeToByte(sArr, true, 64);
   }
 
@@ -378,11 +378,11 @@ public class Base64 {
    *         will be a little faster.
    * @return A BASE64 encoded array. Never <code>null</code>.
    */
-  public static final byte[] encodeToByte(byte[] sArr, boolean lineSep) {
+  public static byte[] encodeToByte(byte[] sArr, boolean lineSep) {
     return encodeToByte(sArr, lineSep, 76);
   }
 
-  private static final byte[] encodeToByte(byte[] sArr, boolean lineSep, int charsPerLine) {
+  private static byte[] encodeToByte(byte[] sArr, boolean lineSep, int charsPerLine) {
     if ((charsPerLine & 0x3) != 0) {
       throw new IllegalArgumentException("charsPerLine % 4 != 0");
     }
@@ -445,7 +445,7 @@ public class Base64 {
    *         If the legal characters (including '=') isn't divideable by 4.
    *         (I.e. definitely corrupted).
    */
-  public final static byte[] decode(byte[] sArr) {
+  public static byte[] decode(byte[] sArr) {
     // Check special case
     int sLen = sArr.length;
 
@@ -453,8 +453,8 @@ public class Base64 {
     // will be, so we don't have to reallocate & copy it later.
     // Number of separator characters. (Actually illegal characters, but that's a bonus...)
     int sepCnt = 0;
-    for (int i = 0; i < sLen; ++i) {
-      if (IA[sArr[i] & 0xff] < 0) {
+    for (byte b : sArr) {
+      if (IA[b & 0xff] < 0) {
         ++sepCnt;
       }
     }
@@ -514,7 +514,7 @@ public class Base64 {
    *          an exception.
    * @return The decoded array of bytes. May be of length 0.
    */
-  public final static byte[] decodeFast(byte[] sArr) {
+  public static byte[] decodeFast(byte[] sArr) {
     // Check special case
     int sLen = sArr.length;
     if (sLen == 0) {
@@ -588,7 +588,7 @@ public class Base64 {
    *          returned.
    * @return A BASE64 encoded array without line separator. Never <code>null</code>.
    */
-  public static final String encodeToString(byte[] sArr) {
+  public static String encodeToString(byte[] sArr) {
     return encodeToString(sArr, false);
   }
 
@@ -604,7 +604,7 @@ public class Base64 {
    *          will be a little faster.
    * @return A BASE64 encoded array. Never <code>null</code>.
    */
-  public final static String encodeToString(byte[] sArr, boolean lineSep) {
+  public static String encodeToString(byte[] sArr, boolean lineSep) {
     // Reuse char[] since we can't create a String incrementally anyway and StringBuffer/Builder
     // would be slower.
     return new String(encodeToChar(sArr, lineSep));
@@ -623,7 +623,7 @@ public class Base64 {
    *         If the legal characters (including '=') isn't divideable by 4.
    *         (I.e. definitely corrupted).
    */
-  public final static byte[] decode(String str) {    // Check special case
+  public static byte[] decode(String str) {    // Check special case
     int sLen = str != null ? str.length() : 0;
     if (sLen == 0) {
       return new byte[0];
@@ -696,7 +696,7 @@ public class Base64 {
    *          throw an exception.
    * @return The decoded array of bytes. May be of length 0.
    */
-  public final static byte[] decodeFast(String s) {
+  public static byte[] decodeFast(String s) {
     // Check special case
     int sLen = s.length();
     if (sLen == 0) {

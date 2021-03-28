@@ -98,8 +98,7 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
   private ScheduledFuture<?> expiredCertsRemover;
 
   public X509RemoverModule(CaManagerImpl caManager, CaInfo caInfo, CertStore certstore,
-      X509PublisherModule publisherModule)
-      throws OperationException {
+      X509PublisherModule publisherModule) {
     super(caInfo);
 
     this.caIdNameMap = caManager.idNameMap();
@@ -183,7 +182,7 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
 
       for (SerialWithId serial : serials) {
         // do not delete CA's own certificate
-        if ((caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serial))) {
+        if ((caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serial.getSerial()))) {
           continue;
         }
 

@@ -51,11 +51,11 @@ public class CaQaSystemManagerImpl implements CaQaSystemManager {
 
   private String confFile;
 
-  private Map<String, CertprofileQa> x509ProfileMap = new HashMap<>();
+  private final Map<String, CertprofileQa> x509ProfileMap = new HashMap<>();
 
-  private Map<String, IssuerInfo> x509IssuerInfoMap = new HashMap<>();
+  private final Map<String, IssuerInfo> x509IssuerInfoMap = new HashMap<>();
 
-  private AtomicBoolean initialized = new AtomicBoolean(false);
+  private final AtomicBoolean initialized = new AtomicBoolean(false);
 
   public CaQaSystemManagerImpl() {
   }
@@ -130,7 +130,6 @@ public class CaQaSystemManagerImpl implements CaQaSystemManager {
         LOG.info("configured X509 certificate profile {}", name);
       } catch (IOException | CertprofileException ex) {
         LogUtil.error(LOG, ex, "could not parse QA certificate profile " + name);
-        continue;
       }
     }
 

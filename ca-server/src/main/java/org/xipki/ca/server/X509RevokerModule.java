@@ -99,8 +99,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
   private ScheduledFuture<?> suspendedCertsRevoker;
 
   public X509RevokerModule(CaManagerImpl caManager, CaInfo caInfo, CertStore certstore,
-      X509PublisherModule publisherModule)
-      throws OperationException {
+      X509PublisherModule publisherModule) {
     super(caInfo);
 
     this.caIdNameMap = caManager.idNameMap();
@@ -191,7 +190,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
     LOG.info("     START revokeCertificate: ca={}, serialNumber={}, reason={}, invalidityTime={}",
         caIdent.getName(), hexSerial, reason.getDescription(), invalidityTime);
 
-    CertWithRevocationInfo revokedCert = null;
+    CertWithRevocationInfo revokedCert;
 
     CertRevocationInfo revInfo = new CertRevocationInfo(reason, new Date(), invalidityTime);
     revokedCert = certstore.revokeCert(caIdent, serialNumber, revInfo, force, caIdNameMap);
@@ -322,7 +321,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
     AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_revoke_suspendedCert, msgId);
     boolean successful = false;
     try {
-      int num = revokeSuspendedCerts0(event, msgId);
+      int num = revokeSuspendedCerts0(msgId);
       LOG.info("revoked {} suspended certificates of CA {}", num, caIdent.getName());
       successful = true;
       return num;
@@ -331,7 +330,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
     }
   }
 
-  private int revokeSuspendedCerts0(AuditEvent event, String msgId) throws OperationException {
+  private int revokeSuspendedCerts0(String msgId) throws OperationException {
     if (!masterMode) {
       throw new OperationException(NOT_PERMITTED,
           "CA could not remove expired certificates in slave mode");
@@ -373,7 +372,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
       }
 
       for (SerialWithId serial : serials) {
-        boolean revoked = false;
+        boolean revoked;
         try {
           revoked = revokeSuspendedCert(serial, reason, msgId) != null;
           if (revoked) {

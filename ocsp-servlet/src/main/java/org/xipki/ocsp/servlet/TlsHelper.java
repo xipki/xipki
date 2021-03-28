@@ -50,7 +50,7 @@ public class TlsHelper {
 
   private static final LruCache<String, X509Cert> clientCerts = new LruCache<>(50);
 
-  private static String reverseProxyMode = null;
+  private static String reverseProxyMode;
 
   static {
     String propName = "org.xipki.reverseproxy.mode";

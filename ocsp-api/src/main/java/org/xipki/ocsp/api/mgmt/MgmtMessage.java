@@ -30,7 +30,7 @@ public abstract class MgmtMessage {
     refreshTokenForSignerType,
     restartServer;
 
-    public static final MgmtAction ofName(String str) {
+    public static MgmtAction ofName(String str) {
       for (MgmtAction action : MgmtAction.values()) {
         if (action.name().equalsIgnoreCase(str)) {
           return action;

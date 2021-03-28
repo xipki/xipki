@@ -31,11 +31,9 @@ import org.xipki.util.Args;
  */
 public class NotBeforeOption {
 
-  static NotBeforeOption CURRENT_TIME = new NotBeforeOption(null, 0L);
+  private final TimeZone midNightTimeZone;
 
-  private TimeZone midNightTimeZone;
-
-  private Long offsetMillis;
+  private final Long offsetMillis;
 
   private NotBeforeOption(TimeZone midNightTimeZone, Long offsetSeconds) {
     this.midNightTimeZone = midNightTimeZone;
@@ -57,8 +55,7 @@ public class NotBeforeOption {
       long notOlderThan = (offsetMillis != null && offsetMillis < 0)
           ? now + offsetMillis : now;
 
-      long notBefore = (requestedNotBefore.getTime() >= notOlderThan)
-          ? requestedNotBefore.getTime() : notOlderThan;
+      long notBefore = Math.max(requestedNotBefore.getTime(), notOlderThan);
 
       return (midNightTimeZone == null) ? new Date(notBefore) : setToMidnight(notBefore);
     } else {

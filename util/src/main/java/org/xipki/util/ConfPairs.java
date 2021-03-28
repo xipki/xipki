@@ -35,7 +35,7 @@ public class ConfPairs {
 
   private static class Unmodifiable extends ConfPairs {
 
-    private ConfPairs underlying;
+    private final ConfPairs underlying;
 
     private Unmodifiable(ConfPairs underlying) {
       this.underlying = underlying;
@@ -72,8 +72,6 @@ public class ConfPairs {
         return true;
       } else if (obj instanceof Unmodifiable) {
         return underlying.equals(((Unmodifiable) obj).underlying);
-      } else if (obj instanceof ConfPairs) {
-        return underlying.equals((ConfPairs) obj);
       } else {
         return underlying.equals(obj);
       }
@@ -109,7 +107,7 @@ public class ConfPairs {
     putPair(name, value);
   }
 
-  public ConfPairs(Map<String, ? extends Object> pairs) {
+  public ConfPairs(Map<String, ?> pairs) {
     for (String name : pairs.keySet()) {
       Object value = pairs.get(name);
       putPair(name, value == null ? null : value.toString());

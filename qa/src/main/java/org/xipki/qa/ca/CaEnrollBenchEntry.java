@@ -97,8 +97,7 @@ public class CaEnrollBenchEntry {
           throw new IllegalStateException("should not reach here, unknown randomDn " + randomDn);
       }
 
-      if (this.subjectRdnForIncrement != null
-          && this.subjectTemplate.getRDNs(this.subjectRdnForIncrement).length == 0) {
+      if (this.subjectTemplate.getRDNs(this.subjectRdnForIncrement).length == 0) {
         throw new IllegalArgumentException("subjectTemplate does not contain DN field "
             + ObjectIdentifiers.oidToDisplayName(this.subjectRdnForIncrement));
       }

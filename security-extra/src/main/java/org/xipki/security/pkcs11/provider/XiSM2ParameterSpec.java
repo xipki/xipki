@@ -28,7 +28,7 @@ import org.bouncycastle.util.Arrays;
  *
  */
 public class XiSM2ParameterSpec implements AlgorithmParameterSpec {
-  private byte[] id;
+  private final byte[] id;
 
   /**
    * Base constructor.

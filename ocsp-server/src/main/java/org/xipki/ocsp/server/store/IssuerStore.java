@@ -57,7 +57,7 @@ class IssuerStore {
     }
 
     // to accelerate the switch
-    List<IssuerEntry> copy = new ArrayList<IssuerEntry>(issuers);
+    List<IssuerEntry> copy = new ArrayList<>(issuers);
     this.ids = Collections.unmodifiableSet(newIds);
     this.issuers = copy;
   } // method setIssuers
@@ -105,7 +105,7 @@ class IssuerStore {
 
   public void setCrlInfos(Map<Integer, CrlInfo> crlInfos) {
     this.crlInfos = crlInfos == null
-        ? Collections.emptyMap() : new HashMap<Integer, CrlInfo>(crlInfos);
+        ? Collections.emptyMap() : new HashMap<>(crlInfos);
   }
 
   public CrlInfo getCrlInfo(int crlInfoId) {

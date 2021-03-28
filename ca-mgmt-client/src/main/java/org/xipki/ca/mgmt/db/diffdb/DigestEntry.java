@@ -110,7 +110,7 @@ class DigestEntry {
       return false;
     }
 
-    if (serialNumber != obj.serialNumber) {
+    if (!serialNumber.equals(obj.serialNumber)) {
       return false;
     }
 
@@ -130,11 +130,7 @@ class DigestEntry {
       return false;
     }
 
-    if (!equals(base64HashValue, obj.base64HashValue)) {
-      return false;
-    }
-
-    return true;
+    return equals(base64HashValue, obj.base64HashValue);
   } // method contentEquals
 
   public static DigestEntry decode(String encoded) {

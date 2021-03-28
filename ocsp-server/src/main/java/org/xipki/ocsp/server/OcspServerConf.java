@@ -48,7 +48,7 @@ public class OcspServerConf extends ValidatableConf {
   public enum EmbedCertsMode {
     NONE,
     SIGNER,
-    SIGNER_AND_CA;
+    SIGNER_AND_CA
   } // class EmbedCertsMode
 
   public static class CertCollection extends ValidatableConf {

@@ -59,7 +59,7 @@ public class TlsInit {
 
   private static class SdkHostnameVerifier implements HostnameVerifier {
 
-    private static SdkHostnameVerifier INSTANCE = new SdkHostnameVerifier();
+    private static final SdkHostnameVerifier INSTANCE = new SdkHostnameVerifier();
 
     /**
      * Verify that the host name is an acceptable match with the server's authentication scheme.

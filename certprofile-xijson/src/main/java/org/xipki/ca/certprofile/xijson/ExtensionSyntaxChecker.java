@@ -260,7 +260,7 @@ public class ExtensionSyntaxChecker {
 
   private static void checkSetSyntax(String name, ASN1Set set, List<SubFieldSyntax> subFields)
       throws BadCertTemplateException {
-    List<SubFieldSyntax> subFields0 = new ArrayList<SubFieldSyntax>(subFields);
+    List<SubFieldSyntax> subFields0 = new ArrayList<>(subFields);
 
     final int size = set.size();
 

@@ -67,7 +67,7 @@ public class FpIdCalculator {
         | (bs[6] & 0xff) << 8
         | (bs[7] & 0xff);
 
-    return ((long)(hi & 0xffffffffL) << 32) | (long)(lo & 0xffffffffL);
+    return ((hi & 0xffffffffL) << 32) | (lo & 0xffffffffL);
   } // method bytesToLong
 
 }

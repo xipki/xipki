@@ -713,7 +713,7 @@ public class QaOcspActions {
       sb.append("OCSP response is ");
       sb.append(result.isAllSuccessful() ? "valid" : "invalid");
 
-      if (verbose.booleanValue()) {
+      if (verbose) {
         for (ValidationIssue issue : result.getValidationIssues()) {
           sb.append("\n");
           format(issue, "    ", sb);

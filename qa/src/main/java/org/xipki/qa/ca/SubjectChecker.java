@@ -30,10 +30,7 @@ import org.xipki.qa.ValidationIssue;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.xipki.util.Args.notNull;
 import static org.xipki.util.CollectionUtil.isEmpty;
@@ -67,9 +64,7 @@ public class SubjectChecker {
       }
     }
 
-    for (ASN1ObjectIdentifier oid : subject.getAttributeTypes()) {
-      oids.add(oid);
-    }
+    Collections.addAll(oids, subject.getAttributeTypes());
 
     List<ValidationIssue> result = new LinkedList<>();
 
@@ -164,7 +159,6 @@ public class SubjectChecker {
         requestedCoreAtvTextValues.add(rdnControl.getValue());
       }
     } else {
-      // rdnControl.getValue() could not be non-null here.
       requestedCoreAtvTextValues.add(rdnControl.getValue());
     }
 
@@ -192,7 +186,8 @@ public class SubjectChecker {
       RDN rdn = rdns[i];
       AttributeTypeAndValue[] atvs = rdn.getTypesAndValues();
       if (atvs.length > 1) {
-        failureMsg.append("size of RDN[" + i + "] is '" + atvs.length + "' but expected '1'");
+        failureMsg.append("size of RDN[").append(i).append("] is '")
+                .append(atvs.length).append("' but expected '1'");
         failureMsg.append("; ");
         continue;
       }
@@ -251,10 +246,6 @@ public class SubjectChecker {
         String textValue = getRdnTextValueOfRequest(requestedRdn);
         requestedCoreAtvTextValues.add(textValue);
       }
-    }
-
-    if (rdns == null) { // return always false, only to make the null checker happy
-      return issue;
     }
 
     StringBuilder failureMsg = new StringBuilder();

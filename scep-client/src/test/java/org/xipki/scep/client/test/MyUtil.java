@@ -100,8 +100,7 @@ public class MyUtil {
     Args.notNull(subjectPublicKeyInfo, "subjectPublicKeyInfo");
     Args.notNull(subjectDn, "subjectDn");
 
-    Map<ASN1ObjectIdentifier, ASN1Encodable> attributes =
-        new HashMap<ASN1ObjectIdentifier, ASN1Encodable>();
+    Map<ASN1ObjectIdentifier, ASN1Encodable> attributes = new HashMap<>();
 
     if (StringUtil.isNotBlank(challengePassword)) {
       DERPrintableString asn1Pwd = new DERPrintableString(challengePassword);
@@ -116,10 +115,8 @@ public class MyUtil {
     PKCS10CertificationRequestBuilder csrBuilder =
         new PKCS10CertificationRequestBuilder(subjectDn, subjectPublicKeyInfo);
 
-    if (attributes != null) {
-      for (ASN1ObjectIdentifier attrType : attributes.keySet()) {
-        csrBuilder.addAttribute(attrType, attributes.get(attrType));
-      }
+    for (ASN1ObjectIdentifier attrType : attributes.keySet()) {
+      csrBuilder.addAttribute(attrType, attributes.get(attrType));
     }
 
     String sigAlgName;

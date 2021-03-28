@@ -46,7 +46,7 @@ public class StringUtil {
     }
 
     StringTokenizer st = new StringTokenizer(str, delim);
-    List<String> ret = new ArrayList<String>(st.countTokens());
+    List<String> ret = new ArrayList<>(st.countTokens());
 
     while (st.hasMoreTokens()) {
       ret.add(st.nextToken());
@@ -73,7 +73,7 @@ public class StringUtil {
     }
 
     StringTokenizer st = new StringTokenizer(str, delim);
-    Set<String> ret = new HashSet<String>(st.countTokens());
+    Set<String> ret = new HashSet<>(st.countTokens());
 
     while (st.hasMoreTokens()) {
       ret.add(st.nextToken());
@@ -148,7 +148,7 @@ public class StringUtil {
       StringBuilder sb = new StringBuilder(n + 3);
       int firstBlockLen = n % 3;
       if (firstBlockLen != 0) {
-        sb.append(accountS.substring(0, firstBlockLen));
+        sb.append(accountS, 0, firstBlockLen);
         sb.append(',');
       }
 
@@ -158,7 +158,7 @@ public class StringUtil {
           break;
         }
 
-        sb.append(accountS.substring(offset, offset + 3));
+        sb.append(accountS, offset, offset + 3);
         if (offset + 3 < n) {
           sb.append(',');
         }
@@ -203,14 +203,13 @@ public class StringUtil {
 
   public static char[] merge(char[][] parts) {
     int sum = 0;
-    for (int i = 0; i < parts.length; i++) {
-      sum += parts[i].length;
+    for (char[] chars : parts) {
+      sum += chars.length;
     }
 
     char[] ret = new char[sum];
     int destPos = 0;
-    for (int i = 0; i < parts.length; i++) {
-      char[] part = parts[i];
+    for (char[] part : parts) {
       System.arraycopy(part, 0, ret, destPos, part.length);
       destPos += part.length;
     }

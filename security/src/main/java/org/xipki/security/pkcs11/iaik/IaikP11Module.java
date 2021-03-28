@@ -47,7 +47,7 @@ public class IaikP11Module extends P11Module {
 
   private static final Logger LOG = LoggerFactory.getLogger(IaikP11Module.class);
 
-  private Module module;
+  private final Module module;
 
   private String description;
 
@@ -123,7 +123,7 @@ public class IaikP11Module extends P11Module {
         try {
           msg.append(slot.getSlotInfo()).append("\n");
         } catch (TokenException ex) {
-          msg.append("error: " + ex.getMessage());
+          msg.append("error: ").append(ex.getMessage());
         }
       }
 
@@ -209,7 +209,7 @@ public class IaikP11Module extends P11Module {
       return;
     }
 
-    LOG.info("close", "close pkcs11 module: {}", modulePath);
+    LOG.info("close pkcs11 module: {}", modulePath);
     try {
       module.finalize(null);
     } catch (Throwable th) {

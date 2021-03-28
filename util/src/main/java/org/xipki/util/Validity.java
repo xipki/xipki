@@ -39,9 +39,9 @@ public class Validity implements Comparable<Validity> {
     HOUR("h"),
     MINUTE("m");
 
-    private String suffix;
+    private final String suffix;
 
-    private Unit(String suffix) {
+    Unit(String suffix) {
       this.suffix = suffix;
     }
 
@@ -141,7 +141,10 @@ public class Validity implements Comparable<Validity> {
           int day = cal.get(Calendar.DAY_OF_MONTH);
           if (day > 28) {
             int year = cal.get(Calendar.YEAR);
-            day = isLeapYear(year) ? 29 : 28;
+            int maxDay = isLeapYear(year) ? 29 : 28;
+            if (day > maxDay) {
+              cal.set(Calendar.DAY_OF_MONTH, maxDay);
+            }
           }
         }
 
@@ -163,7 +166,7 @@ public class Validity implements Comparable<Validity> {
   public long approxMinutes() {
     switch (unit) {
       case YEAR:
-        return (365L * 24 * validity + 6 * validity) * 60;
+        return (365L * 24 * validity + 6L * validity) * 60;
       case WEEK:
         return 7L * 24 * 60 * validity;
       case DAY:

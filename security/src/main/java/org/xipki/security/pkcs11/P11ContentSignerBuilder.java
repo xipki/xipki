@@ -32,10 +32,7 @@ import java.security.cert.CertPathBuilderException;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.xipki.util.Args.notNull;
 import static org.xipki.util.Args.positive;
@@ -82,9 +79,7 @@ public class P11ContentSignerBuilder {
       final int n = certificateChain.length;
       cert = certificateChain[0];
       if (n > 1) {
-        for (int i = 1; i < n; i++) {
-          caCerts.add(certificateChain[i]);
-        }
+        caCerts.addAll(Arrays.asList(certificateChain).subList(1, n));
       }
       this.publicKey = cert.getPublicKey();
     } else {
@@ -95,9 +90,7 @@ public class P11ContentSignerBuilder {
     if (cert != null) {
       X509Cert[] certsInKeystore = identity.certificateChain();
       if (certsInKeystore != null && certsInKeystore.length > 1) {
-        for (int i = 1; i < certsInKeystore.length; i++) {
-          caCerts.add(certsInKeystore[i]);
-        }
+        caCerts.addAll(Arrays.asList(certsInKeystore).subList(1, certsInKeystore.length));
       }
 
       try {
