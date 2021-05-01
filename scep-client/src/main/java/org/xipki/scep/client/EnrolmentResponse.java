@@ -17,10 +17,6 @@
 
 package org.xipki.scep.client;
 
-import java.security.cert.CertificateException;
-import java.util.Collections;
-import java.util.List;
-
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.cms.ContentInfo;
@@ -32,6 +28,10 @@ import org.xipki.scep.transaction.PkiStatus;
 import org.xipki.scep.util.ScepUtil;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
+
+import java.security.cert.CertificateException;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Response of certificate enrolment.

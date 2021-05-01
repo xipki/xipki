@@ -17,16 +17,16 @@
 
 package org.xipki.ocsp.server.type;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.Arrays;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ocsp.server.type.OcspRequest.Header;
 import org.xipki.util.CompareUtil;
 import org.xipki.util.Hex;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.Arrays;
 
 /**
  * ASN.1 extension that can be read and written.

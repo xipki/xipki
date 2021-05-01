@@ -17,19 +17,18 @@
 
 package org.xipki.ocsp.servlet;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-
+import com.alibaba.fastjson.JSON;
 import org.xipki.security.Securities.SecurityConf;
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.ValidatableConf;
 
-import com.alibaba.fastjson.JSON;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 
 /**
  * Configuration of the OCSP server.

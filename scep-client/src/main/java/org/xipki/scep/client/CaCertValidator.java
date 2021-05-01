@@ -17,14 +17,14 @@
 
 package org.xipki.scep.client;
 
+import org.xipki.security.HashAlgo;
+import org.xipki.security.X509Cert;
+import org.xipki.util.Args;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.xipki.security.HashAlgo;
-import org.xipki.security.X509Cert;
-import org.xipki.util.Args;
 
 /**
  * CA Certificate validator.

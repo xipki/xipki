@@ -17,6 +17,24 @@
 
 package org.xipki.ca.mgmt.client;
 
+import com.alibaba.fastjson.JSON;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.cert.X509CRLHolder;
+import org.xipki.ca.api.mgmt.*;
+import org.xipki.ca.api.mgmt.MgmtMessage.CaEntryWrapper;
+import org.xipki.ca.api.mgmt.MgmtMessage.MgmtAction;
+import org.xipki.ca.api.mgmt.MgmtMessage.SignerEntryWrapper;
+import org.xipki.ca.api.mgmt.entry.*;
+import org.xipki.security.CertRevocationInfo;
+import org.xipki.security.CrlReason;
+import org.xipki.security.X509Cert;
+import org.xipki.security.util.X509Util;
+import org.xipki.util.*;
+import org.xipki.util.http.SslContextConf;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,53 +45,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSocketFactory;
-
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.cert.X509CRLHolder;
-import org.xipki.ca.api.mgmt.CaManager;
-import org.xipki.ca.api.mgmt.CaMgmtException;
-import org.xipki.ca.api.mgmt.CaSystemStatus;
-import org.xipki.ca.api.mgmt.CertListInfo;
-import org.xipki.ca.api.mgmt.CertListOrderBy;
-import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
-import org.xipki.ca.api.mgmt.MgmtMessage.CaEntryWrapper;
-import org.xipki.ca.api.mgmt.MgmtMessage.MgmtAction;
-import org.xipki.ca.api.mgmt.MgmtMessage.SignerEntryWrapper;
-import org.xipki.ca.api.mgmt.entry.AddUserEntry;
-import org.xipki.ca.api.mgmt.entry.CaEntry;
-import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
-import org.xipki.ca.api.mgmt.entry.CaHasUserEntry;
-import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
-import org.xipki.ca.api.mgmt.entry.ChangeCaEntry;
-import org.xipki.ca.api.mgmt.entry.ChangeUserEntry;
-import org.xipki.ca.api.mgmt.entry.PublisherEntry;
-import org.xipki.ca.api.mgmt.entry.RequestorEntry;
-import org.xipki.ca.api.mgmt.entry.SignerEntry;
-import org.xipki.ca.api.mgmt.entry.UserEntry;
-import org.xipki.ca.api.mgmt.MgmtRequest;
-import org.xipki.ca.api.mgmt.MgmtResponse;
-import org.xipki.security.CertRevocationInfo;
-import org.xipki.security.CrlReason;
-import org.xipki.security.X509Cert;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
-import org.xipki.util.HttpConstants;
-import org.xipki.util.InvalidConfException;
-import org.xipki.util.IoUtil;
-import org.xipki.util.ObjectCreationException;
-import org.xipki.util.StringUtil;
-import org.xipki.util.http.SslContextConf;
-
-import com.alibaba.fastjson.JSON;
+import java.util.*;
 
 /**
  * CA management client via REST API.

@@ -17,14 +17,14 @@
 
 package org.xipki.cmpclient;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.FileOrValue;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Configuration of CMP client.

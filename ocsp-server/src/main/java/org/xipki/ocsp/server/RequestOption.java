@@ -17,7 +17,14 @@
 
 package org.xipki.ocsp.server;
 
-import static org.xipki.util.Args.notNull;
+import org.xipki.security.CertpathValidationModel;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.Securities.KeystoreConf;
+import org.xipki.security.X509Cert;
+import org.xipki.security.util.KeyUtil;
+import org.xipki.security.util.X509Util;
+import org.xipki.util.InvalidConfException;
+import org.xipki.util.IoUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -35,14 +42,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.xipki.security.CertpathValidationModel;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.Securities.KeystoreConf;
-import org.xipki.security.X509Cert;
-import org.xipki.security.util.KeyUtil;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.InvalidConfException;
-import org.xipki.util.IoUtil;
+import static org.xipki.util.Args.notNull;
 
 /**
  * OCSP request option.

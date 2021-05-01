@@ -17,11 +17,6 @@
 
 package org.xipki.scep.client.test;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.PrivateKey;
-import java.util.List;
-
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -43,6 +38,11 @@ import org.xipki.scep.serveremulator.ScepServerContainer;
 import org.xipki.scep.transaction.CaCapability;
 import org.xipki.scep.transaction.PkiStatus;
 import org.xipki.security.X509Cert;
+
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.util.List;
 
 /**
  * Anchor of all CA tests.

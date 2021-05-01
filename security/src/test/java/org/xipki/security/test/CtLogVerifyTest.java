@@ -17,15 +17,10 @@
 
 package org.xipki.security.test;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.PublicKey;
-import java.security.Security;
-import java.security.Signature;
-
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.junit.Assert;
 import org.junit.Test;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
@@ -39,7 +34,11 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.Hex;
 import org.xipki.util.IoUtil;
 
-import org.junit.Assert;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.PublicKey;
+import java.security.Security;
+import java.security.Signature;
 
 /**
  * Public keys can be found under https://ct.grahamedgecombe.com/

@@ -17,13 +17,13 @@
 
 package org.xipki.security.cmp.test;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.xipki.security.cmp.CmpUtf8Pairs;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Test the {@link CmpUtf8Pairs}.

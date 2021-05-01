@@ -17,10 +17,10 @@
 
 package org.xipki.cmpclient;
 
-import static org.xipki.util.Args.notNull;
-
 import org.bouncycastle.asn1.crmf.CertId;
 import org.xipki.security.cmp.PkiStatusInfo;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * CertId or PKI error.

@@ -17,7 +17,12 @@
 
 package org.xipki.security;
 
-import static org.xipki.util.Args.notEmpty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.password.PasswordResolver;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.LogUtil;
+import org.xipki.util.concurrent.ConcurrentBag;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -30,12 +35,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xipki.password.PasswordResolver;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.concurrent.ConcurrentBag;
+import static org.xipki.util.Args.notEmpty;
 
 /**
  * An implementation of {@link ConcurrentContentSigner}.

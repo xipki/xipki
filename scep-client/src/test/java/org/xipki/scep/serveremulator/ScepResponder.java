@@ -17,12 +17,6 @@
 
 package org.xipki.scep.serveremulator;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1String;
@@ -35,32 +29,23 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.cert.X509CRLHolder;
-import org.bouncycastle.cms.CMSAbsentContent;
-import org.bouncycastle.cms.CMSAlgorithm;
-import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.cms.CMSSignedData;
-import org.bouncycastle.cms.CMSSignedDataGenerator;
+import org.bouncycastle.cms.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.scep.message.CaCaps;
-import org.xipki.scep.message.DecodedPkiMessage;
-import org.xipki.scep.message.EnvelopedDataDecryptor;
+import org.xipki.scep.message.*;
 import org.xipki.scep.message.EnvelopedDataDecryptor.EnvelopedDataDecryptorInstance;
-import org.xipki.scep.message.IssuerAndSubject;
-import org.xipki.scep.message.MessageDecodingException;
-import org.xipki.scep.message.NextCaMessage;
-import org.xipki.scep.message.PkiMessage;
 import org.xipki.scep.serveremulator.AuditEvent.AuditLevel;
-import org.xipki.scep.transaction.CaCapability;
-import org.xipki.scep.transaction.FailInfo;
-import org.xipki.scep.transaction.MessageType;
-import org.xipki.scep.transaction.Nonce;
-import org.xipki.scep.transaction.PkiStatus;
-import org.xipki.scep.transaction.TransactionId;
+import org.xipki.scep.transaction.*;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
+
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * SCEP responder.

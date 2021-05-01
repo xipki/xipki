@@ -17,22 +17,17 @@
 
 package org.xipki.security;
 
-import static org.xipki.util.Args.notNull;
-
-import java.io.IOException;
-import java.math.BigInteger;
-
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.DSA;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.Signer;
-import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
-import org.bouncycastle.crypto.params.DSAPrivateKeyParameters;
-import org.bouncycastle.crypto.params.DSAPublicKeyParameters;
-import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
-import org.bouncycastle.crypto.params.ECPublicKeyParameters;
-import org.bouncycastle.crypto.params.ParametersWithRandom;
+import org.bouncycastle.crypto.params.*;
 import org.xipki.security.util.SignerUtil;
+
+import java.io.IOException;
+import java.math.BigInteger;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * Plain-DSA signer. The signature is not encoded as ASN.1 structure, but just the

@@ -17,15 +17,6 @@
 
 package org.xipki.ca.server;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +26,14 @@ import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
+
+import java.io.File;
+import java.io.IOException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * CtLog public key finder.

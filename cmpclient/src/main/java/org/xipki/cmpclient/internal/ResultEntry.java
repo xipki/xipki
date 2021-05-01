@@ -17,10 +17,6 @@
 
 package org.xipki.cmpclient.internal;
 
-import static org.xipki.util.Args.notNull;
-
-import java.math.BigInteger;
-
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.cmp.PKIStatus;
 import org.bouncycastle.asn1.crmf.CertId;
@@ -28,6 +24,10 @@ import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.cmpclient.IdentifiedObject;
 import org.xipki.security.cmp.PkiStatusInfo;
+
+import java.math.BigInteger;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * Result entry.

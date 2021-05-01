@@ -17,12 +17,12 @@
 
 package org.xipki.ca.server;
 
-import java.math.BigInteger;
-import java.util.Date;
-
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.util.Args;
+
+import java.math.BigInteger;
+import java.util.Date;
 
 /**
  * Certificate revocation information with serial number and database table id.

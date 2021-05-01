@@ -17,14 +17,8 @@
 
 package org.xipki.ca.server;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.annotation.JSONField;
 import org.xipki.audit.Audits.AuditConf;
 import org.xipki.datasource.DataSourceConf;
 import org.xipki.security.Securities.KeystoreConf;
@@ -35,8 +29,13 @@ import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 import org.xipki.util.http.SslContextConf;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.annotation.JSONField;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * CA server configuration.

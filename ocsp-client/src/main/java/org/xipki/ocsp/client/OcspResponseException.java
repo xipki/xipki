@@ -17,11 +17,11 @@
 
 package org.xipki.ocsp.client;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.xipki.util.Hex;
 import org.xipki.util.StringUtil;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Exception related to the OCSP response.

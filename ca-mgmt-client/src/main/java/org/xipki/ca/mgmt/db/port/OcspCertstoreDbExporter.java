@@ -17,11 +17,20 @@
 
 package org.xipki.ca.mgmt.db.port;
 
+import com.alibaba.fastjson.JSON;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.datasource.DataAccessException;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.util.Args;
+import org.xipki.util.IoUtil;
+import org.xipki.util.ProcessLog;
+import org.xipki.util.StringUtil;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -35,17 +44,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xipki.datasource.DataAccessException;
-import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.util.Args;
-import org.xipki.util.IoUtil;
-import org.xipki.util.ProcessLog;
-import org.xipki.util.StringUtil;
-
-import com.alibaba.fastjson.JSON;
 
 /**
  * Database exporter of OCSP CertStore.

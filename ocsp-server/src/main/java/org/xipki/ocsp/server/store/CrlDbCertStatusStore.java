@@ -17,15 +17,6 @@
 
 package org.xipki.ocsp.server.store;
 
-import static org.xipki.util.Args.notNull;
-
-import java.io.File;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataSourceWrapper;
@@ -33,6 +24,14 @@ import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
+
+import java.io.File;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * OcspStore for CRLs. Note that the CRLs will be imported to XiPKI OCSP database.

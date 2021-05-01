@@ -17,20 +17,7 @@
 
 package org.xipki.ocsp.server;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.cert.CertPathBuilderException;
-import java.security.cert.CertificateException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataSourceWrapper;
@@ -43,23 +30,18 @@ import org.xipki.ocsp.server.store.DbCertStatusStore;
 import org.xipki.ocsp.server.store.ejbca.EjbcaCertStatusStore;
 import org.xipki.ocsp.server.type.ExtendedExtension;
 import org.xipki.ocsp.server.type.OID;
-import org.xipki.security.CertpathValidationModel;
-import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.SecurityFactory;
-import org.xipki.security.SignerConf;
-import org.xipki.security.X509Cert;
+import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.FileOrBinary;
-import org.xipki.util.FileOrValue;
-import org.xipki.util.InvalidConfException;
-import org.xipki.util.IoUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.ObjectCreationException;
-import org.xipki.util.StringUtil;
-import org.xipki.util.Validity;
+import org.xipki.util.*;
 
-import com.alibaba.fastjson.JSON;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.cert.CertPathBuilderException;
+import java.security.cert.CertificateException;
+import java.util.*;
 
 /**
  * Implementation of {@link OcspServer}.

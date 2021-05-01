@@ -17,20 +17,14 @@
 
 package org.xipki.scep.message;
 
-import java.security.PrivateKey;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bouncycastle.cms.CMSEnvelopedData;
-import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.cms.KeyTransRecipient;
-import org.bouncycastle.cms.KeyTransRecipientId;
-import org.bouncycastle.cms.RecipientId;
-import org.bouncycastle.cms.RecipientInformation;
-import org.bouncycastle.cms.RecipientInformationStore;
+import org.bouncycastle.cms.*;
 import org.bouncycastle.cms.jcajce.JceKeyTransEnvelopedRecipient;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
+
+import java.security.PrivateKey;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * EnvelopedData decryptor.

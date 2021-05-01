@@ -17,17 +17,7 @@
 
 package org.xipki.ca.server.cmp;
 
-import java.security.PublicKey;
-import java.security.SecureRandom;
-
-import javax.crypto.Cipher;
-
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERTaggedObject;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.RSAESOAEPparams;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -45,6 +35,10 @@ import org.bouncycastle.jce.spec.IESParameterSpec;
 import org.bouncycastle.operator.OperatorException;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
+
+import javax.crypto.Cipher;
+import java.security.PublicKey;
+import java.security.SecureRandom;
 
 /**
  * CRMF key wrapper.

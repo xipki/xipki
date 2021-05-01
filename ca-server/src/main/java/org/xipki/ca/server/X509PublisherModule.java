@@ -17,11 +17,6 @@
 
 package org.xipki.ca.server;
 
-import static org.xipki.util.Args.notNull;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bouncycastle.cert.X509CRLHolder;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
@@ -37,6 +32,11 @@ import org.xipki.security.X509Cert;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.HealthCheckResult;
 import org.xipki.util.LogUtil;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * X509CA publisher module.

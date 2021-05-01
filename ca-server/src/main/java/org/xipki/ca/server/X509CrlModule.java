@@ -17,42 +17,11 @@
 
 package org.xipki.ca.server;
 
-import static org.xipki.ca.api.OperationException.ErrorCode.CRL_FAILURE;
-import static org.xipki.ca.api.OperationException.ErrorCode.INVALID_EXTENSION;
-import static org.xipki.ca.api.OperationException.ErrorCode.NOT_PERMITTED;
-import static org.xipki.ca.api.OperationException.ErrorCode.SYSTEM_FAILURE;
-import static org.xipki.ca.api.OperationException.ErrorCode.SYSTEM_UNAVAILABLE;
-import static org.xipki.util.Args.notNull;
-
-import java.io.Closeable;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.security.cert.CRLException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
-import org.bouncycastle.asn1.x509.CRLDistPoint;
-import org.bouncycastle.asn1.x509.CRLReason;
-import org.bouncycastle.asn1.x509.CertificateList;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.asn1.x509.IssuingDistributionPoint;
+import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509v2CRLBuilder;
@@ -63,17 +32,26 @@ import org.xipki.ca.api.mgmt.CrlControl;
 import org.xipki.ca.api.mgmt.CrlControl.HourMinute;
 import org.xipki.ca.server.db.CertStore;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
-import org.xipki.security.ConcurrentBagEntrySigner;
-import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.CrlReason;
 import org.xipki.security.KeyUsage;
-import org.xipki.security.NoIdleSignerException;
-import org.xipki.security.X509Cert;
+import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.DateUtil;
 import org.xipki.util.HealthCheckResult;
 import org.xipki.util.LogUtil;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.cert.CRLException;
+import java.util.*;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.xipki.ca.api.OperationException.ErrorCode.*;
+import static org.xipki.util.Args.notNull;
 
 /**
  * X509CA CRL module.

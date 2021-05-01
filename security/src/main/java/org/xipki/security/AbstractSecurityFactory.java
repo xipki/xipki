@@ -17,14 +17,14 @@
 
 package org.xipki.security;
 
-import java.security.InvalidKeyException;
-import java.security.PublicKey;
-
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.xipki.util.Args;
 import org.xipki.util.ObjectCreationException;
+
+import java.security.InvalidKeyException;
+import java.security.PublicKey;
 
 /**
  * Abstract implementation of {@link SecurityFactory}. It provides some common

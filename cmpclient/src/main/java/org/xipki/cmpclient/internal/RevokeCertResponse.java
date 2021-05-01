@@ -17,10 +17,10 @@
 
 package org.xipki.cmpclient.internal;
 
+import org.xipki.util.Args;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.xipki.util.Args;
 
 /**
  * Response of revoking certificates.

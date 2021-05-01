@@ -17,19 +17,6 @@
 
 package org.xipki.ca.server;
 
-import static org.xipki.audit.AuditLevel.ERROR;
-import static org.xipki.audit.AuditLevel.INFO;
-import static org.xipki.audit.AuditStatus.FAILED;
-
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.math.BigInteger;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -42,14 +29,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditStatus;
-import org.xipki.ca.api.CertWithDbId;
-import org.xipki.ca.api.CertificateInfo;
-import org.xipki.ca.api.InsuffientPermissionException;
-import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.OperationException;
+import org.xipki.ca.api.*;
 import org.xipki.ca.api.OperationException.ErrorCode;
-import org.xipki.ca.api.RequestType;
-import org.xipki.ca.api.RestAPIConstants;
 import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.PermissionConstants;
 import org.xipki.ca.api.mgmt.RequestorInfo;
@@ -58,14 +39,18 @@ import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.security.CrlReason;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
 import org.xipki.util.Base64;
-import org.xipki.util.DateUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.PemEncoder;
+import org.xipki.util.*;
 import org.xipki.util.PemEncoder.PemLabel;
-import org.xipki.util.RandomUtil;
-import org.xipki.util.StringUtil;
+
+import java.io.ByteArrayInputStream;
+import java.io.EOFException;
+import java.math.BigInteger;
+import java.util.*;
+
+import static org.xipki.audit.AuditLevel.ERROR;
+import static org.xipki.audit.AuditLevel.INFO;
+import static org.xipki.audit.AuditStatus.FAILED;
 
 /**
  * REST API responder.

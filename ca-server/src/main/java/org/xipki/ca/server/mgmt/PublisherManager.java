@@ -17,19 +17,6 @@
 
 package org.xipki.ca.server.mgmt;
 
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.Args.positive;
-import static org.xipki.util.Args.toNonBlankLower;
-import static org.xipki.util.StringUtil.concat;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.NameId;
@@ -44,6 +31,11 @@ import org.xipki.ca.server.X509Ca;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
+
+import java.util.*;
+
+import static org.xipki.util.Args.*;
+import static org.xipki.util.StringUtil.concat;
 
 /**
  * Manages the publishers.

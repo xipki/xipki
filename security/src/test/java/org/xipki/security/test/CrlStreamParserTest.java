@@ -17,15 +17,6 @@
 
 package org.xipki.security.test;
 
-import java.io.File;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.Security;
-
-import javax.security.cert.CertificateEncodingException;
-
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
@@ -34,6 +25,14 @@ import org.junit.Test;
 import org.xipki.security.asn1.CrlStreamParser;
 import org.xipki.security.asn1.CrlStreamParser.RevokedCertsIterator;
 import org.xipki.security.util.X509Util;
+
+import javax.security.cert.CertificateEncodingException;
+import java.io.File;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.Security;
 
 /**
  * CRL Stream Parser test.

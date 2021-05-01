@@ -17,6 +17,12 @@
 
 package org.xipki.scep.client;
 
+import org.xipki.util.Args;
+import org.xipki.util.StringUtil;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -24,13 +30,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSocketFactory;
-
-import org.xipki.util.Args;
-import org.xipki.util.StringUtil;
 
 /**
  * A concrete SCEP client.

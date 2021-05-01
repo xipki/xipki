@@ -17,19 +17,6 @@
 
 package org.xipki.ca.server.db;
 
-import static org.xipki.util.StringUtil.concat;
-
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.mgmt.CaManager;
@@ -38,6 +25,14 @@ import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.SignerConf;
 import org.xipki.util.StringUtil;
+
+import java.sql.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import static org.xipki.util.StringUtil.concat;
 
 /**
  * Base class to execute the database queries to manage CA system.

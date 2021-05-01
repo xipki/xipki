@@ -17,6 +17,14 @@
 
 package org.xipki.ca.mgmt.db.port;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.ca.mgmt.db.DbSchemaInfo;
+import org.xipki.ca.mgmt.db.DbToolBase;
+import org.xipki.datasource.DataAccessException;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.util.*;
+
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
@@ -26,20 +34,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xipki.ca.mgmt.db.DbSchemaInfo;
-import org.xipki.ca.mgmt.db.DbToolBase;
-import org.xipki.datasource.DataAccessException;
-import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.util.Args;
-import org.xipki.util.Base64;
-import org.xipki.util.FileOrBinary;
-import org.xipki.util.FileOrValue;
-import org.xipki.util.IoUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.StringUtil;
 
 /**
  * Database porter.

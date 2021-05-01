@@ -17,23 +17,6 @@
 
 package org.xipki.ca.server.publisher;
 
-import static org.xipki.util.Args.notNull;
-
-import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CertWithDbId;
@@ -47,6 +30,14 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.LogUtil;
+
+import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.sql.*;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * XiPKI OCSP database query executor.

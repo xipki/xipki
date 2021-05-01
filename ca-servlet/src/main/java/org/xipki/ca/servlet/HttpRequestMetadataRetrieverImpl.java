@@ -17,12 +17,11 @@
 
 package org.xipki.ca.servlet;
 
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.xipki.ca.server.HttpRequestMetadataRetriever;
 import org.xipki.security.X509Cert;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
 /**
  * HTTP request metadata retriever.

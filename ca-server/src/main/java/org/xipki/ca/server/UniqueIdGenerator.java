@@ -17,10 +17,10 @@
 
 package org.xipki.ca.server;
 
+import org.xipki.util.Args;
+
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntBinaryOperator;
-
-import org.xipki.util.Args;
 
 /**
  * Unique Identifier Generator.

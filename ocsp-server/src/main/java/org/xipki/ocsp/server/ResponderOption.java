@@ -17,13 +17,13 @@
 
 package org.xipki.ocsp.server;
 
-import static org.xipki.util.Args.notNull;
+import org.xipki.util.InvalidConfException;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.xipki.util.InvalidConfException;
+import static org.xipki.util.Args.notNull;
 
 /**
  * Responder option.

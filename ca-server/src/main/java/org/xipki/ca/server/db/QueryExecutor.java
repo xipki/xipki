@@ -17,21 +17,16 @@
 
 package org.xipki.ca.server.db;
 
-import static org.xipki.util.Args.notNull;
+import org.xipki.datasource.DataAccessException;
+import org.xipki.datasource.DataSourceWrapper;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.sql.Types;
+import java.sql.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.xipki.datasource.DataAccessException;
-import org.xipki.datasource.DataSourceWrapper;
+import static org.xipki.util.Args.notNull;
 
 /**
  * Base class to execute the database queries to manage CA system.

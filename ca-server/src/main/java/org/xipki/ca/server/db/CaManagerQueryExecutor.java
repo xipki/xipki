@@ -17,78 +17,36 @@
 
 package org.xipki.ca.server.db;
 
-import static org.xipki.ca.server.CaUtil.buildCertChain;
-import static org.xipki.ca.server.CaUtil.encodeCertchain;
-import static org.xipki.ca.server.CaUtil.parseCert;
-import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.StringUtil.concat;
-
-import java.io.IOException;
-import java.security.cert.CertificateException;
-import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
-import org.xipki.ca.api.mgmt.CaManager;
-import org.xipki.ca.api.mgmt.CaMgmtException;
-import org.xipki.ca.api.mgmt.CaStatus;
-import org.xipki.ca.api.mgmt.CmpControl;
-import org.xipki.ca.api.mgmt.CrlControl;
-import org.xipki.ca.api.mgmt.CtlogControl;
-import org.xipki.ca.api.mgmt.ProtocolSupport;
-import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
-import org.xipki.ca.api.mgmt.ScepControl;
-import org.xipki.ca.api.mgmt.ValidityMode;
-import org.xipki.ca.api.mgmt.entry.AddUserEntry;
-import org.xipki.ca.api.mgmt.entry.CaEntry;
-import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
-import org.xipki.ca.api.mgmt.entry.CaHasUserEntry;
-import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
-import org.xipki.ca.api.mgmt.entry.ChangeCaEntry;
-import org.xipki.ca.api.mgmt.entry.ChangeUserEntry;
-import org.xipki.ca.api.mgmt.entry.PublisherEntry;
-import org.xipki.ca.api.mgmt.entry.RequestorEntry;
-import org.xipki.ca.api.mgmt.entry.SignerEntry;
-import org.xipki.ca.api.mgmt.entry.UserEntry;
+import org.xipki.ca.api.mgmt.*;
+import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.ca.api.mgmt.entry.CaEntry.CaSignerConf;
-import org.xipki.ca.server.CaIdNameMap;
-import org.xipki.ca.server.CaInfo;
-import org.xipki.ca.server.CaUtil;
-import org.xipki.ca.server.IdentifiedCertPublisher;
-import org.xipki.ca.server.IdentifiedCertprofile;
-import org.xipki.ca.server.PasswordHash;
-import org.xipki.ca.server.RequestorEntryWrapper;
-import org.xipki.ca.server.SignerEntryWrapper;
+import org.xipki.ca.server.*;
 import org.xipki.ca.server.db.CertStore.SystemEvent;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
-import org.xipki.security.CertRevocationInfo;
-import org.xipki.security.SecurityFactory;
-import org.xipki.security.SignerConf;
-import org.xipki.security.X509Cert;
-import org.xipki.security.XiSecurityException;
+import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.InvalidConfException;
-import org.xipki.util.ObjectCreationException;
-import org.xipki.util.StringUtil;
-import org.xipki.util.Validity;
+import org.xipki.util.*;
+
+import java.io.IOException;
+import java.security.cert.CertificateException;
+import java.sql.Timestamp;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
+
+import static org.xipki.ca.server.CaUtil.*;
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.StringUtil.concat;
 
 /**
  * Execute the database queries to manage CA system.

@@ -17,34 +17,7 @@
 
 package org.xipki.cmpclient.internal;
 
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.Args.toNonBlankLower;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigInteger;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PublicKey;
-import java.security.SignatureException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.net.ssl.HttpsURLConnection;
-
+import com.alibaba.fastjson.JSON;
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.cmp.PKIFailureInfo;
 import org.bouncycastle.asn1.cmp.PKIStatus;
@@ -54,26 +27,26 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.cmpclient.CertIdOrError;
-import org.xipki.cmpclient.CertprofileInfo;
-import org.xipki.cmpclient.CmpClient;
-import org.xipki.cmpclient.CmpClientException;
-import org.xipki.cmpclient.EnrollCertRequest;
-import org.xipki.cmpclient.EnrollCertResult;
-import org.xipki.cmpclient.PkiErrorException;
-import org.xipki.cmpclient.RevokeCertRequest;
-import org.xipki.cmpclient.UnrevokeOrRemoveCertRequest;
+import org.xipki.cmpclient.*;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.CompareUtil;
-import org.xipki.util.HealthCheckResult;
-import org.xipki.util.IoUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.ReqRespDebug;
+import org.xipki.util.*;
 
-import com.alibaba.fastjson.JSON;
+import javax.net.ssl.HttpsURLConnection;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigInteger;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.*;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.util.*;
+
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.Args.toNonBlankLower;
 
 /**
  * Implementation of the interface {@link CmpClient}.

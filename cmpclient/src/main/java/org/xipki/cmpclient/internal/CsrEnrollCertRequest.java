@@ -17,11 +17,11 @@
 
 package org.xipki.cmpclient.internal;
 
-import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notNull;
-
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.cmpclient.IdentifiedObject;
+
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
 
 /**
  * CMP request to enroll certificate for given CSR.

@@ -17,11 +17,11 @@
 
 package org.xipki.scep.serveremulator;
 
+import org.slf4j.Logger;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.slf4j.Logger;
 
 /**
  * Audit event.

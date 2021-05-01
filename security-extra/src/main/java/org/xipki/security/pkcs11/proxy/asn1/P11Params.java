@@ -17,14 +17,14 @@
 
 package org.xipki.security.pkcs11.proxy.asn1;
 
-import java.io.IOException;
-
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.xipki.security.BadAsn1ObjectException;
 import org.xipki.util.Args;
+
+import java.io.IOException;
 
 /**
  * ASN.1 PKCS#11 params.

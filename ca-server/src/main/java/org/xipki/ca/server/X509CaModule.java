@@ -17,21 +17,17 @@
 
 package org.xipki.ca.server;
 
-import static org.xipki.util.Args.notNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.audit.*;
+import org.xipki.ca.api.NameId;
+import org.xipki.security.X509Cert;
 
 import java.security.PublicKey;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xipki.audit.AuditEvent;
-import org.xipki.audit.AuditLevel;
-import org.xipki.audit.AuditService;
-import org.xipki.audit.AuditStatus;
-import org.xipki.audit.Audits;
-import org.xipki.ca.api.NameId;
-import org.xipki.security.X509Cert;
+import static org.xipki.util.Args.notNull;
 
 /**
  * X509CA module base class.

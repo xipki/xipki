@@ -17,9 +17,9 @@
 
 package org.xipki.security;
 
-import static org.xipki.util.Args.notNull;
-
 import java.security.PrivateKey;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * Private key and certificate.

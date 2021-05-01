@@ -17,15 +17,6 @@
 
 package org.xipki.ca.server;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CertificateInfo;
@@ -37,6 +28,11 @@ import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ProcessLog;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Publish certificates.

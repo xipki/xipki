@@ -17,12 +17,6 @@
 
 package org.xipki.ca.server.publisher;
 
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.sql.Connection;
-import java.util.Date;
-import java.util.Map;
-
 import org.bouncycastle.cert.X509CRLHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +38,12 @@ import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.FileOrValue;
+
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.sql.Connection;
+import java.util.Date;
+import java.util.Map;
 
 /**
  * Publish certificates to XiPKI OCSP database.

@@ -17,37 +17,25 @@
 
 package org.xipki.security.pkcs12;
 
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.Args.positive;
-
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.crypto.KeyAgreement;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.pkcs.IssuerAndSerialNumber;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.operator.RuntimeOperatorException;
-import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.DfltConcurrentContentSigner;
-import org.xipki.security.EdECConstants;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.X509Cert;
-import org.xipki.security.XiContentSigner;
-import org.xipki.security.XiSecurityException;
+import org.xipki.security.*;
+
+import javax.crypto.KeyAgreement;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.IOException;
+import java.security.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.Args.positive;
 
 /**
  * Builder of PKCS#12 XDH (e.g. X25519, X448) MAC signer.

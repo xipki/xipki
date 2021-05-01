@@ -17,26 +17,17 @@
 
 package org.xipki.cmpclient.internal;
 
-import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notEmpty;
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.Args.toNonBlankLower;
-
-import java.security.cert.CertificateEncodingException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLSocketFactory;
-
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.cmpclient.CertprofileInfo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.StringUtil;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSocketFactory;
+import java.security.cert.CertificateEncodingException;
+import java.util.*;
+
+import static org.xipki.util.Args.*;
 
 /**
  * Configuration of the remote CA.

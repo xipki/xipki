@@ -17,11 +17,11 @@
 
 package org.xipki.security;
 
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.Args.range;
-
 import java.io.IOException;
 import java.util.Arrays;
+
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.Args.range;
 
 /**
  * Contains issuerNameHash and issuerKeyHash as specified in the OCSP standard RFC 6960.

@@ -17,14 +17,14 @@
 
 package org.xipki.scep.transaction;
 
-import java.io.IOException;
-import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
-
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.xipki.util.Args;
 import org.xipki.util.Hex;
+
+import java.io.IOException;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
 
 /**
  * Transaction Id.

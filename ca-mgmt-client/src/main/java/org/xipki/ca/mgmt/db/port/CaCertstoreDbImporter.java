@@ -17,6 +17,22 @@
 
 package org.xipki.ca.mgmt.db.port;
 
+import com.alibaba.fastjson.JSON;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.x509.*;
+import org.bouncycastle.cert.X509CRLHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.datasource.DataAccessException;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.util.X509Util;
+import org.xipki.util.Args;
+import org.xipki.util.Base64;
+import org.xipki.util.IoUtil;
+import org.xipki.util.ProcessLog;
+
 import java.io.File;
 import java.io.InputStream;
 import java.math.BigInteger;
@@ -32,27 +48,6 @@ import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.asn1.x509.TBSCertificate;
-import org.bouncycastle.cert.X509CRLHolder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xipki.datasource.DataAccessException;
-import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
-import org.xipki.util.Base64;
-import org.xipki.util.IoUtil;
-import org.xipki.util.ProcessLog;
-
-import com.alibaba.fastjson.JSON;
 
 /**
  * Database importer of CA CertStore.

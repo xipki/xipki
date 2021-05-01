@@ -17,20 +17,6 @@
 
 package org.xipki.ocsp.servlet;
 
-import java.io.IOException;
-import java.security.cert.CertificateException;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException;
@@ -40,12 +26,15 @@ import org.xipki.password.PasswordResolverException;
 import org.xipki.security.Securities;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.FileOrBinary;
-import org.xipki.util.HttpConstants;
-import org.xipki.util.InvalidConfException;
-import org.xipki.util.LogUtil;
-import org.xipki.util.XipkiBaseDir;
+import org.xipki.util.*;
+
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.security.cert.CertificateException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * The Servlet Filter of OCSP servlets.

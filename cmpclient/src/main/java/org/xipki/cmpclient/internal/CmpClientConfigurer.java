@@ -17,8 +17,26 @@
 
 package org.xipki.cmpclient.internal;
 
-import static org.xipki.util.Args.notBlank;
+import com.alibaba.fastjson.JSON;
+import org.bouncycastle.asn1.x500.RDN;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.cmpclient.CertprofileInfo;
+import org.xipki.cmpclient.CmpClientConf;
+import org.xipki.cmpclient.CmpClientConf.Certs;
+import org.xipki.cmpclient.CmpClientException;
+import org.xipki.cmpclient.PkiErrorException;
+import org.xipki.cmpclient.internal.Requestor.PbmMacCmpRequestor;
+import org.xipki.cmpclient.internal.Requestor.SignatureCmpRequestor;
+import org.xipki.security.*;
+import org.xipki.security.util.X509Util;
+import org.xipki.util.*;
+import org.xipki.util.http.HostnameVerifiers;
+import org.xipki.util.http.SSLContextBuilder;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSocketFactory;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -31,51 +49,12 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertPathBuilderException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLSocketFactory;
-
-import org.bouncycastle.asn1.x500.RDN;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xipki.cmpclient.CertprofileInfo;
-import org.xipki.cmpclient.CmpClientConf;
-import org.xipki.cmpclient.CmpClientConf.Certs;
-import org.xipki.cmpclient.CmpClientException;
-import org.xipki.cmpclient.PkiErrorException;
-import org.xipki.cmpclient.internal.Requestor.PbmMacCmpRequestor;
-import org.xipki.cmpclient.internal.Requestor.SignatureCmpRequestor;
-import org.xipki.security.AlgorithmValidator;
-import org.xipki.security.CollectionAlgorithmValidator;
-import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.SecurityFactory;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.SignerConf;
-import org.xipki.security.X509Cert;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.FileOrBinary;
-import org.xipki.util.InvalidConfException;
-import org.xipki.util.IoUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.ObjectCreationException;
-import org.xipki.util.http.HostnameVerifiers;
-import org.xipki.util.http.SSLContextBuilder;
-
-import com.alibaba.fastjson.JSON;
+import static org.xipki.util.Args.notBlank;
 
 /**
  * CmpClientImpl configurer.

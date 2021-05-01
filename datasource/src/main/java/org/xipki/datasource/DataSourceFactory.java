@@ -17,6 +17,14 @@
 
 package org.xipki.datasource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.password.PasswordResolver;
+import org.xipki.password.PasswordResolverException;
+import org.xipki.util.Args;
+import org.xipki.util.FileOrValue;
+import org.xipki.util.IoUtil;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -26,14 +34,6 @@ import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xipki.password.PasswordResolver;
-import org.xipki.password.PasswordResolverException;
-import org.xipki.util.Args;
-import org.xipki.util.FileOrValue;
-import org.xipki.util.IoUtil;
 
 /**
  * Factory to create {@link DataSourceWrapper}.

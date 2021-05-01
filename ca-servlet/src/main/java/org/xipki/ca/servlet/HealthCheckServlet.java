@@ -17,14 +17,7 @@
 
 package org.xipki.ca.servlet;
 
-import java.io.EOFException;
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.server.cmp.CmpResponder;
@@ -34,7 +27,12 @@ import org.xipki.util.HealthCheckResult;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.LogUtil;
 
-import com.alibaba.fastjson.JSON;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.EOFException;
+import java.io.IOException;
 
 /**
  * Health check servlet.

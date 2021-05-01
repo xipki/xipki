@@ -17,13 +17,6 @@
 
 package org.xipki.ca.server.mgmt;
 
-import static org.xipki.ca.server.CaUtil.canonicalizeSignerConf;
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.Args.toNonBlankLower;
-import static org.xipki.util.StringUtil.concat;
-
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.mgmt.CaMgmtException;
@@ -31,6 +24,13 @@ import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.server.CaInfo;
 import org.xipki.ca.server.SignerEntryWrapper;
 import org.xipki.util.ObjectCreationException;
+
+import java.util.List;
+
+import static org.xipki.ca.server.CaUtil.canonicalizeSignerConf;
+import static org.xipki.util.Args.notNull;
+import static org.xipki.util.Args.toNonBlankLower;
+import static org.xipki.util.StringUtil.concat;
 
 /**
  * Manages the signers.

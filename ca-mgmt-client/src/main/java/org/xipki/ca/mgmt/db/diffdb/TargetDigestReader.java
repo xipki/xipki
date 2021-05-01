@@ -17,24 +17,6 @@
 
 package org.xipki.ca.mgmt.db.diffdb;
 
-import java.io.Closeable;
-import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.HashAlgo;
@@ -42,6 +24,16 @@ import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.ProcessLog;
 import org.xipki.util.StringUtil;
+
+import java.io.Closeable;
+import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.sql.*;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Reader of certificate information for the comparison from the target database.

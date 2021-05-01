@@ -17,22 +17,9 @@
 
 package org.xipki.ca.servlet;
 
-import java.io.IOException;
-import java.util.Date;
-import java.util.Map;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.audit.AuditEvent;
-import org.xipki.audit.AuditLevel;
-import org.xipki.audit.AuditService;
-import org.xipki.audit.AuditStatus;
-import org.xipki.audit.Audits;
+import org.xipki.audit.*;
 import org.xipki.ca.server.HttpRequestMetadataRetriever;
 import org.xipki.ca.server.RestResponder;
 import org.xipki.ca.server.RestResponder.RestResponse;
@@ -41,6 +28,14 @@ import org.xipki.util.Args;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Date;
+import java.util.Map;
 
 /**
  * REST API exception.

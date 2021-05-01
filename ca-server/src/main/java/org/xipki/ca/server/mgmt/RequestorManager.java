@@ -17,15 +17,6 @@
 
 package org.xipki.ca.server.mgmt;
 
-import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.Args.toNonBlankLower;
-import static org.xipki.util.StringUtil.concat;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.NameId;
@@ -37,6 +28,13 @@ import org.xipki.ca.server.RequestorEntryWrapper;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.util.StringUtil;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static org.xipki.util.Args.*;
+import static org.xipki.util.StringUtil.concat;
 
 /**
  * Manages the requestors.

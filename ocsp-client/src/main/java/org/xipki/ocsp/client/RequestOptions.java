@@ -17,13 +17,13 @@
 
 package org.xipki.ocsp.client;
 
-import static org.xipki.util.Args.positive;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.SignAlgo;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.xipki.security.HashAlgo;
-import org.xipki.security.SignAlgo;
+import static org.xipki.util.Args.positive;
 
 /**
  * OCSP request options.

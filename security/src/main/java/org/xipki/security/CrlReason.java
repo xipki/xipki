@@ -17,14 +17,10 @@
 
 package org.xipki.security;
 
-import java.security.cert.CRLReason;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.xipki.util.Args;
+
+import java.security.cert.CRLReason;
+import java.util.*;
 
 /**
  * The CRLReason enumeration specifies the reason that a certificate

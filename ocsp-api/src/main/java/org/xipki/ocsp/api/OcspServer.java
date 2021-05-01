@@ -20,7 +20,6 @@ package org.xipki.ocsp.api;
 import org.xipki.util.HealthCheckResult;
 
 import java.io.Closeable;
-import java.io.UnsupportedEncodingException;
 
 /**
  * OCSP server interface.

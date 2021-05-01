@@ -17,19 +17,15 @@
 
 package org.xipki.ca.server.cmp;
 
-import static org.xipki.util.Args.notNull;
-
-import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.security.HashAlgo;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.Hex;
+
+import java.math.BigInteger;
+import java.util.*;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * Pending certificate pool.

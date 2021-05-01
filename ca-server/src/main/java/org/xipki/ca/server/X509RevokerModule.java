@@ -17,19 +17,6 @@
 
 package org.xipki.ca.server;
 
-import static org.xipki.ca.api.OperationException.ErrorCode.NOT_PERMITTED;
-import static org.xipki.ca.api.OperationException.ErrorCode.SYSTEM_FAILURE;
-import static org.xipki.util.Args.notNull;
-
-import java.io.Closeable;
-import java.math.BigInteger;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
@@ -45,6 +32,19 @@ import org.xipki.util.CollectionUtil;
 import org.xipki.util.DateUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.Validity;
+
+import java.io.Closeable;
+import java.math.BigInteger;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import static org.xipki.ca.api.OperationException.ErrorCode.NOT_PERMITTED;
+import static org.xipki.ca.api.OperationException.ErrorCode.SYSTEM_FAILURE;
+import static org.xipki.util.Args.notNull;
 
 /**
  * X509CA revoker module.

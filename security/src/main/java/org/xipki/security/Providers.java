@@ -17,12 +17,12 @@
 
 package org.xipki.security;
 
-import java.io.Closeable;
-import java.security.Security;
-
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.Closeable;
+import java.security.Security;
 
 /**
  * Helper class to register providers {@link BouncyCastleProvider}.

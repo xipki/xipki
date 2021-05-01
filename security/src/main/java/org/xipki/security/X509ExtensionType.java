@@ -17,41 +17,17 @@
 
 package org.xipki.security;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.xipki.security.util.X509Util;
+import org.xipki.util.*;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.bouncycastle.asn1.ASN1Boolean;
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Enumerated;
-import org.bouncycastle.asn1.ASN1GeneralizedTime;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1StreamParser;
-import org.bouncycastle.asn1.ASN1UTCTime;
-import org.bouncycastle.asn1.DERBMPString;
-import org.bouncycastle.asn1.DERBitString;
-import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERPrintableString;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERSet;
-import org.bouncycastle.asn1.DERT61String;
-import org.bouncycastle.asn1.DERTaggedObject;
-import org.bouncycastle.asn1.DERUTF8String;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
-import org.xipki.util.Base64;
-import org.xipki.util.InvalidConfException;
-import org.xipki.util.StringUtil;
-import org.xipki.util.ValidatableConf;
-
-import com.alibaba.fastjson.annotation.JSONField;
 
 /**
  * Configuration of an X.509 extension.

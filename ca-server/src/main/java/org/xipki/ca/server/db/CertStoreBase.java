@@ -17,16 +17,6 @@
 
 package org.xipki.ca.server.db;
 
-import static org.xipki.ca.api.OperationException.ErrorCode.DATABASE_FAILURE;
-import static org.xipki.ca.api.OperationException.ErrorCode.SYSTEM_FAILURE;
-
-import java.security.cert.CertificateException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.List;
-
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.mgmt.CaMgmtException;
@@ -35,6 +25,16 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
+
+import java.security.cert.CertificateException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.List;
+
+import static org.xipki.ca.api.OperationException.ErrorCode.DATABASE_FAILURE;
+import static org.xipki.ca.api.OperationException.ErrorCode.SYSTEM_FAILURE;
 
 /**
  * Base class to exec the database queries to manage CA system.

@@ -17,10 +17,10 @@
 
 package org.xipki.ca.server;
 
+import org.xipki.ca.api.NameId;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import org.xipki.ca.api.NameId;
 
 /**
  * Container of NameId of CA management entries.

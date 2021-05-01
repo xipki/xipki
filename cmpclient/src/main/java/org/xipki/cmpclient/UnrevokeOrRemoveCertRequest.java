@@ -17,13 +17,13 @@
 
 package org.xipki.cmpclient;
 
+import org.bouncycastle.asn1.x500.X500Name;
+import org.xipki.util.Args;
+
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.util.Args;
 
 /**
  * CMP request to unrevoke or remove certificates.

@@ -17,33 +17,6 @@
 
 package org.xipki.ca.server.db;
 
-import static org.xipki.ca.api.OperationException.ErrorCode.BAD_REQUEST;
-import static org.xipki.ca.api.OperationException.ErrorCode.CERT_REVOKED;
-import static org.xipki.ca.api.OperationException.ErrorCode.CERT_UNREVOKED;
-import static org.xipki.ca.api.OperationException.ErrorCode.CRL_FAILURE;
-import static org.xipki.ca.api.OperationException.ErrorCode.DATABASE_FAILURE;
-import static org.xipki.ca.api.OperationException.ErrorCode.NOT_PERMITTED;
-import static org.xipki.ca.api.OperationException.ErrorCode.SYSTEM_FAILURE;
-import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.Args.positive;
-
-import java.io.IOException;
-import java.math.BigInteger;
-import java.security.cert.CRLException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -63,11 +36,7 @@ import org.xipki.ca.api.mgmt.CertListInfo;
 import org.xipki.ca.api.mgmt.CertListOrderBy;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.api.mgmt.entry.CaHasUserEntry;
-import org.xipki.ca.server.CaIdNameMap;
-import org.xipki.ca.server.CaUtil;
-import org.xipki.ca.server.CertRevInfoWithSerial;
-import org.xipki.ca.server.PasswordHash;
-import org.xipki.ca.server.UniqueIdGenerator;
+import org.xipki.ca.server.*;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.CertRevocationInfo;
@@ -79,6 +48,18 @@ import org.xipki.util.Base64;
 import org.xipki.util.LogUtil;
 import org.xipki.util.LruCache;
 import org.xipki.util.StringUtil;
+
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.cert.CRLException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.xipki.ca.api.OperationException.ErrorCode.*;
+import static org.xipki.util.Args.*;
 
 /**
  * CA database store.

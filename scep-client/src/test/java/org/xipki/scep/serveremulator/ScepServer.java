@@ -17,13 +17,6 @@
 
 package org.xipki.scep.serveremulator;
 
-import java.math.BigInteger;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.PrivateKey;
-import java.security.Security;
-import java.util.Date;
-
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -31,6 +24,13 @@ import org.xipki.scep.client.test.MyUtil;
 import org.xipki.scep.message.CaCaps;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
+
+import java.math.BigInteger;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.Security;
+import java.util.Date;
 
 /**
  * SCEP server.

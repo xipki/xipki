@@ -17,26 +17,6 @@
 
 package org.xipki.security;
 
-import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.Args.positive;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.security.InvalidKeyException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.SecureRandom;
-import java.security.Signature;
-import java.security.SignatureException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Enumeration;
-import java.util.Set;
-
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.RuntimeCryptoException;
@@ -50,6 +30,15 @@ import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.SignerUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.security.*;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Enumeration;
+import java.util.Set;
+
+import static org.xipki.util.Args.*;
 
 /**
  * An implementation of {@link SecurityFactory}.

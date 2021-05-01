@@ -17,13 +17,13 @@
 
 package org.xipki.security;
 
+import org.bouncycastle.operator.ContentSigner;
+import org.xipki.password.PasswordResolver;
+
 import java.io.Closeable;
 import java.security.Key;
 import java.security.PublicKey;
 import java.security.SignatureException;
-
-import org.bouncycastle.operator.ContentSigner;
-import org.xipki.password.PasswordResolver;
 
 /**
  * Concurrent {@link ContentSigner}.

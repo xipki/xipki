@@ -17,11 +17,11 @@
 
 package org.xipki.ca.mgmt.db.diffdb;
 
+import org.xipki.util.Args;
+
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
-
-import org.xipki.util.Args;
 
 /**
  * Container of the map of serial number to digest value of certificates.

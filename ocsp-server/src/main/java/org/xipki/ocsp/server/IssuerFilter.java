@@ -17,15 +17,15 @@
 
 package org.xipki.ocsp.server;
 
-import static org.xipki.util.Args.notBlank;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.X509Cert;
+import org.xipki.util.CollectionUtil;
 
 import java.security.cert.CertificateEncodingException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.xipki.security.HashAlgo;
-import org.xipki.security.X509Cert;
-import org.xipki.util.CollectionUtil;
+import static org.xipki.util.Args.notBlank;
 
 /**
  * Certificate issuer filter.

@@ -42,8 +42,10 @@ import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.Certificate;
-import java.security.interfaces.*;
-import java.security.spec.EllipticCurve;
+import java.security.interfaces.DSAPrivateKey;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
 

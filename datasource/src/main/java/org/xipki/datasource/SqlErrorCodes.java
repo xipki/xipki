@@ -17,12 +17,12 @@
 
 package org.xipki.datasource;
 
+import org.xipki.util.Args;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.xipki.util.Args;
 
 /**
  * JDBC error codes for a particular database.

@@ -17,7 +17,9 @@
 
 package org.xipki.ocsp.client;
 
-import static org.xipki.util.Args.notNull;
+import org.xipki.util.Base64;
+import org.xipki.util.IoUtil;
+import org.xipki.util.StringUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,9 +28,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
-import org.xipki.util.Base64;
-import org.xipki.util.IoUtil;
-import org.xipki.util.StringUtil;
+import static org.xipki.util.Args.notNull;
 
 /**
  * HTTP OCSP requestor.

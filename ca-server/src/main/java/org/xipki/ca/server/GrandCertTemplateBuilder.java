@@ -17,30 +17,6 @@
 
 package org.xipki.ca.server;
 
-import static org.xipki.ca.api.OperationException.ErrorCode.ALREADY_ISSUED;
-import static org.xipki.ca.api.OperationException.ErrorCode.BAD_CERT_TEMPLATE;
-import static org.xipki.ca.api.OperationException.ErrorCode.CERT_REVOKED;
-import static org.xipki.ca.api.OperationException.ErrorCode.NOT_PERMITTED;
-import static org.xipki.ca.api.OperationException.ErrorCode.SYSTEM_FAILURE;
-import static org.xipki.ca.api.OperationException.ErrorCode.UNKNOWN_CERT;
-import static org.xipki.ca.api.OperationException.ErrorCode.UNKNOWN_CERT_PROFILE;
-
-import java.io.IOException;
-import java.math.BigInteger;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.KeyPair;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SecureRandom;
-import java.security.interfaces.DSAPrivateKey;
-import java.security.interfaces.DSAPublicKey;
-import java.security.interfaces.ECPrivateKey;
-import java.security.interfaces.ECPublicKey;
-import java.security.interfaces.RSAPrivateCrtKey;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Date;
-
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -75,6 +51,15 @@ import org.xipki.security.util.RSABrokenKey;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.LogUtil;
 import org.xipki.util.Validity;
+
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.*;
+import java.security.interfaces.*;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Date;
+
+import static org.xipki.ca.api.OperationException.ErrorCode.*;
 
 /**
  * X509CA GrandCertTemplate builder.

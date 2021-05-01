@@ -17,7 +17,7 @@
 
 package org.xipki.security;
 
-import static org.xipki.util.Args.notNull;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import static org.xipki.util.Args.notNull;
 
 /**
  * An implementation of {@link AlgorithmValidator} where the permitted algorithms

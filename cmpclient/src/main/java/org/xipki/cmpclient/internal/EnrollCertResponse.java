@@ -17,11 +17,11 @@
 
 package org.xipki.cmpclient.internal;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.xipki.util.Args;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Response of certificate enrollment.

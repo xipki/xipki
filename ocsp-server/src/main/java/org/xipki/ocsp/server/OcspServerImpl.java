@@ -17,33 +17,6 @@
 
 package org.xipki.ocsp.server;
 
-import static org.xipki.ocsp.server.OcspServerUtil.canBuildCertpath;
-import static org.xipki.ocsp.server.OcspServerUtil.closeStream;
-import static org.xipki.ocsp.server.OcspServerUtil.getInputStream;
-import static org.xipki.ocsp.server.OcspServerUtil.initSigner;
-import static org.xipki.ocsp.server.OcspServerUtil.newStore;
-import static org.xipki.ocsp.server.OcspServerUtil.parseConf;
-import static org.xipki.ocsp.server.OcspServerUtil.removeExtension;
-import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notNull;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigInteger;
-import java.security.InvalidKeyException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -61,47 +34,30 @@ import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceConf;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.ocsp.api.CertStatusInfo;
+import org.xipki.ocsp.api.*;
 import org.xipki.ocsp.api.CertStatusInfo.CertStatus;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownIssuerBehaviour;
-import org.xipki.ocsp.api.OcspRespWithCacheInfo;
 import org.xipki.ocsp.api.OcspRespWithCacheInfo.ResponseCacheInfo;
-import org.xipki.ocsp.api.OcspServer;
-import org.xipki.ocsp.api.OcspStore;
-import org.xipki.ocsp.api.OcspStoreException;
-import org.xipki.ocsp.api.RequestIssuer;
-import org.xipki.ocsp.api.Responder;
-import org.xipki.ocsp.api.ResponderAndPath;
 import org.xipki.ocsp.server.OcspServerConf.EmbedCertsMode;
 import org.xipki.ocsp.server.OcspServerConf.Source;
 import org.xipki.ocsp.server.ResponderOption.OcspMode;
 import org.xipki.ocsp.server.store.ResponseCacher;
-import org.xipki.ocsp.server.type.CertID;
-import org.xipki.ocsp.server.type.EncodingException;
-import org.xipki.ocsp.server.type.ExtendedExtension;
-import org.xipki.ocsp.server.type.Extension;
-import org.xipki.ocsp.server.type.Extensions;
-import org.xipki.ocsp.server.type.OID;
-import org.xipki.ocsp.server.type.OcspRequest;
-import org.xipki.ocsp.server.type.ResponderID;
-import org.xipki.ocsp.server.type.TaggedCertSequence;
-import org.xipki.ocsp.server.type.WritableOnlyExtension;
+import org.xipki.ocsp.server.type.*;
 import org.xipki.password.PasswordResolverException;
-import org.xipki.security.CertRevocationInfo;
-import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.NoIdleSignerException;
-import org.xipki.security.SecurityFactory;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.X509Cert;
-import org.xipki.security.XiSecurityException;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.HealthCheckResult;
-import org.xipki.util.Hex;
-import org.xipki.util.InvalidConfException;
-import org.xipki.util.IoUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.StringUtil;
+import org.xipki.security.*;
+import org.xipki.util.*;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigInteger;
+import java.security.InvalidKeyException;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.xipki.ocsp.server.OcspServerUtil.*;
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
 
 /**
  * Implementation of {@link OcspServer}.

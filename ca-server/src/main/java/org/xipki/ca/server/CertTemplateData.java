@@ -17,13 +17,13 @@
 
 package org.xipki.ca.server;
 
-import java.util.Date;
-
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.util.Args;
+
+import java.util.Date;
 
 /**
  * Certificate template data.

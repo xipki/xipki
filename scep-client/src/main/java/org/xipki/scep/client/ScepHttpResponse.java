@@ -17,12 +17,12 @@
 
 package org.xipki.scep.client;
 
+import org.xipki.util.Args;
+import org.xipki.util.IoUtil;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-import org.xipki.util.Args;
-import org.xipki.util.IoUtil;
 
 /**
  * HTTP Response.

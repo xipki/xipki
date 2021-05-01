@@ -17,14 +17,6 @@
 
 package org.xipki.security.pkcs12.test;
 
-import java.io.File;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.SecureRandom;
-import java.security.Security;
-import java.security.Signature;
-
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Test;
@@ -34,6 +26,14 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.pkcs12.KeypairWithCert;
 import org.xipki.security.pkcs12.P12ContentSignerBuilder;
 import org.xipki.security.util.X509Util;
+
+import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.SecureRandom;
+import java.security.Security;
+import java.security.Signature;
 
 /**
  * Abstract class of JUnit tests to test the signature creation and verification

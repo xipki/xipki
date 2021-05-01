@@ -17,14 +17,14 @@
 
 package org.xipki.ocsp.server;
 
-import static org.xipki.util.Args.notEmpty;
-import static org.xipki.util.Args.notNull;
-
-import java.util.List;
-
 import org.xipki.ocsp.api.OcspStore;
 import org.xipki.ocsp.api.Responder;
 import org.xipki.ocsp.server.OcspServerConf.ResponseOption;
+
+import java.util.List;
+
+import static org.xipki.util.Args.notEmpty;
+import static org.xipki.util.Args.notNull;
 
 /**
  * Implementation of {@link Responder}.

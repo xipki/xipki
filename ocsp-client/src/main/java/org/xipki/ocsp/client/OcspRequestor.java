@@ -17,12 +17,12 @@
 
 package org.xipki.ocsp.client;
 
-import java.math.BigInteger;
-import java.net.URL;
-
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.xipki.security.X509Cert;
 import org.xipki.util.ReqRespDebug;
+
+import java.math.BigInteger;
+import java.net.URL;
 
 /**
  * OCSP requestor interface.

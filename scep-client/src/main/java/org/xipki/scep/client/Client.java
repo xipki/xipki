@@ -17,17 +17,6 @@
 
 package org.xipki.scep.client;
 
-import java.io.IOException;
-import java.math.BigInteger;
-import java.net.MalformedURLException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.cert.CRLException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.*;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
@@ -41,19 +30,8 @@ import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.util.CollectionStore;
 import org.xipki.scep.client.ScepClientException.OperationNotSupportedException;
-import org.xipki.scep.message.AuthorityCertStore;
-import org.xipki.scep.message.CaCaps;
-import org.xipki.scep.message.DecodedNextCaMessage;
-import org.xipki.scep.message.DecodedPkiMessage;
-import org.xipki.scep.message.IssuerAndSubject;
-import org.xipki.scep.message.MessageDecodingException;
-import org.xipki.scep.message.MessageEncodingException;
-import org.xipki.scep.message.PkiMessage;
-import org.xipki.scep.transaction.CaCapability;
-import org.xipki.scep.transaction.MessageType;
-import org.xipki.scep.transaction.Operation;
-import org.xipki.scep.transaction.PkiStatus;
-import org.xipki.scep.transaction.TransactionId;
+import org.xipki.scep.message.*;
+import org.xipki.scep.transaction.*;
 import org.xipki.scep.util.ScepConstants;
 import org.xipki.scep.util.ScepUtil;
 import org.xipki.security.HashAlgo;
@@ -62,6 +40,19 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
+
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.cert.CRLException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * SCEP client.

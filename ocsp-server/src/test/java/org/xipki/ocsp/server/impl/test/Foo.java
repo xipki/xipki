@@ -17,24 +17,8 @@
 
 package org.xipki.ocsp.server.impl.test;
 
-import java.math.BigInteger;
-import java.util.Arrays;
-
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERBitString;
-import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERTaggedObject;
-import org.bouncycastle.asn1.ocsp.CertID;
-import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
-import org.bouncycastle.asn1.ocsp.OCSPRequest;
-import org.bouncycastle.asn1.ocsp.Request;
-import org.bouncycastle.asn1.ocsp.Signature;
-import org.bouncycastle.asn1.ocsp.TBSRequest;
+import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.ocsp.*;
 import org.bouncycastle.asn1.oiw.OIWObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -44,6 +28,9 @@ import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.xipki.ocsp.server.type.OcspRequest;
 import org.xipki.security.ObjectIdentifiers;
+
+import java.math.BigInteger;
+import java.util.Arrays;
 
 /**
  * Dummy class to do some tests.

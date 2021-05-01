@@ -17,17 +17,17 @@
 
 package org.xipki.security;
 
-import static org.xipki.util.Args.notNull;
-
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.operator.RuntimeOperatorException;
 import org.xipki.util.Base64;
 import org.xipki.util.Hex;
 import org.xipki.util.concurrent.ConcurrentBag;
 import org.xipki.util.concurrent.ConcurrentBagEntry;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * Utility class to calculate hash values.

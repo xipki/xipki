@@ -17,13 +17,13 @@
 
 package org.xipki.security;
 
-import static org.xipki.util.Args.notNull;
-
-import java.util.Date;
-
 import org.xipki.util.CompareUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.StringUtil;
+
+import java.util.Date;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * Certificate revocation information.

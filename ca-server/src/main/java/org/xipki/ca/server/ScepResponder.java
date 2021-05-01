@@ -17,21 +17,6 @@
 
 package org.xipki.ca.server;
 
-import static org.xipki.util.Args.notNull;
-
-import java.io.IOException;
-import java.math.BigInteger;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.cert.CertificateException;
-import java.security.interfaces.RSAPublicKey;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
 import org.bouncycastle.asn1.cms.ContentInfo;
@@ -43,11 +28,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.cert.X509CRLHolder;
-import org.bouncycastle.cms.CMSAbsentContent;
-import org.bouncycastle.cms.CMSAlgorithm;
-import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.cms.CMSSignedData;
-import org.bouncycastle.cms.CMSSignedDataGenerator;
+import org.bouncycastle.cms.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
@@ -57,38 +38,31 @@ import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.RequestType;
-import org.xipki.ca.api.mgmt.CaMgmtException;
-import org.xipki.ca.api.mgmt.CaStatus;
-import org.xipki.ca.api.mgmt.PermissionConstants;
-import org.xipki.ca.api.mgmt.RequestorInfo;
-import org.xipki.ca.api.mgmt.ScepControl;
+import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.server.db.CertStore.KnowCertResult;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
-import org.xipki.scep.message.CaCaps;
-import org.xipki.scep.message.DecodedPkiMessage;
-import org.xipki.scep.message.EnvelopedDataDecryptor;
+import org.xipki.scep.message.*;
 import org.xipki.scep.message.EnvelopedDataDecryptor.EnvelopedDataDecryptorInstance;
-import org.xipki.scep.message.IssuerAndSubject;
-import org.xipki.scep.message.MessageDecodingException;
-import org.xipki.scep.message.MessageEncodingException;
-import org.xipki.scep.message.PkiMessage;
-import org.xipki.scep.transaction.CaCapability;
-import org.xipki.scep.transaction.FailInfo;
-import org.xipki.scep.transaction.MessageType;
-import org.xipki.scep.transaction.Nonce;
-import org.xipki.scep.transaction.PkiStatus;
-import org.xipki.scep.transaction.TransactionId;
+import org.xipki.scep.transaction.*;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.Hex;
-import org.xipki.util.LogUtil;
-import org.xipki.util.StringUtil;
+import org.xipki.util.*;
+
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.cert.CertificateException;
+import java.security.interfaces.RSAPublicKey;
+import java.util.*;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * SCEP responder.

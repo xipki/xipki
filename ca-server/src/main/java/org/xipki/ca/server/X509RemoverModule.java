@@ -17,8 +17,15 @@
 
 package org.xipki.ca.server;
 
-import static org.xipki.ca.api.OperationException.ErrorCode.NOT_PERMITTED;
-import static org.xipki.util.Args.notNull;
+import org.xipki.audit.AuditEvent;
+import org.xipki.ca.api.CertWithDbId;
+import org.xipki.ca.api.OperationException;
+import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
+import org.xipki.ca.server.db.CertStore;
+import org.xipki.ca.server.db.CertStore.SerialWithId;
+import org.xipki.ca.server.mgmt.CaManagerImpl;
+import org.xipki.util.CollectionUtil;
+import org.xipki.util.LogUtil;
 
 import java.io.Closeable;
 import java.math.BigInteger;
@@ -29,15 +36,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.xipki.audit.AuditEvent;
-import org.xipki.ca.api.CertWithDbId;
-import org.xipki.ca.api.OperationException;
-import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
-import org.xipki.ca.server.db.CertStore;
-import org.xipki.ca.server.db.CertStore.SerialWithId;
-import org.xipki.ca.server.mgmt.CaManagerImpl;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.LogUtil;
+import static org.xipki.ca.api.OperationException.ErrorCode.NOT_PERMITTED;
+import static org.xipki.util.Args.notNull;
 
 /**
  * X509CA revoker module.

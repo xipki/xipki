@@ -17,17 +17,17 @@
 
 package org.xipki.ocsp.server.store;
 
-import static org.xipki.util.Args.notNull;
-
-import java.io.IOException;
-import java.math.BigInteger;
-import java.util.Date;
-
 import org.bouncycastle.asn1.ocsp.CrlID;
 import org.xipki.util.Base64;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.DateUtil;
 import org.xipki.util.StringUtil;
+
+import java.io.IOException;
+import java.math.BigInteger;
+import java.util.Date;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * CRL information.

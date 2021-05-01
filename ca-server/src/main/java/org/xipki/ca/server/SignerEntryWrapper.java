@@ -17,8 +17,6 @@
 
 package org.xipki.ca.server;
 
-import static org.xipki.util.Args.notNull;
-
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
@@ -27,6 +25,8 @@ import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
 import org.xipki.util.ObjectCreationException;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * Wrapper of signer database entry.

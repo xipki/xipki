@@ -17,15 +17,15 @@
 
 package org.xipki.scep.client;
 
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
-
 import org.xipki.scep.transaction.Operation;
 import org.xipki.scep.transaction.TransactionException;
 import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
+
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
 
 /**
  * CA identifier.

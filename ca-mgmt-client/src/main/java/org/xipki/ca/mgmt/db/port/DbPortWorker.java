@@ -17,13 +17,6 @@
 
 package org.xipki.ca.mgmt.db.port;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Properties;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataSourceFactory;
@@ -33,6 +26,13 @@ import org.xipki.password.PasswordResolverException;
 import org.xipki.util.Args;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Worker for database export / import.

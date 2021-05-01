@@ -18,32 +18,6 @@
 package org.xipki.security;
 
 // CHECKSTYLE:OFF
-import static org.bouncycastle.asn1.bsi.BSIObjectIdentifiers.*;
-import static org.bouncycastle.asn1.gm.GMObjectIdentifiers.*;
-import static org.bouncycastle.asn1.nist.NISTObjectIdentifiers.*;
-import static org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.*;
-import static org.bouncycastle.asn1.x9.X9ObjectIdentifiers.*;
-import static org.xipki.security.EdECConstants.*;
-import static org.xipki.security.HashAlgo.*;
-import static org.xipki.util.Args.notNull;
-import static org.bouncycastle.asn1.cms.CMSObjectIdentifiers.*;
-//CHECKSTYLE:ON
-
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.Signature;
-import java.security.interfaces.DSAPrivateKey;
-import java.security.interfaces.DSAPublicKey;
-import java.security.interfaces.ECPrivateKey;
-import java.security.interfaces.ECPublicKey;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.PSSParameterSpec;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
@@ -58,6 +32,28 @@ import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.xipki.security.ObjectIdentifiers.Xipki;
 import org.xipki.util.Args;
+
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.Signature;
+import java.security.interfaces.*;
+import java.security.spec.PSSParameterSpec;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import static org.bouncycastle.asn1.bsi.BSIObjectIdentifiers.*;
+import static org.bouncycastle.asn1.cms.CMSObjectIdentifiers.*;
+import static org.bouncycastle.asn1.gm.GMObjectIdentifiers.sm2sign_with_sm3;
+import static org.bouncycastle.asn1.nist.NISTObjectIdentifiers.*;
+import static org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.*;
+import static org.bouncycastle.asn1.x9.X9ObjectIdentifiers.*;
+import static org.xipki.security.EdECConstants.id_ED25519;
+import static org.xipki.security.EdECConstants.id_ED448;
+import static org.xipki.security.HashAlgo.*;
+import static org.xipki.util.Args.notNull;
 
 /**
  * Hash algorithm enum.

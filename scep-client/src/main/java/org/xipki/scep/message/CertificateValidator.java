@@ -17,12 +17,12 @@
 
 package org.xipki.scep.message;
 
-import java.util.Collection;
-import java.util.HashSet;
-
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
+
+import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * Certificate validator.

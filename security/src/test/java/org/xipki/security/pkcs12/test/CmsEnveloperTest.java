@@ -17,18 +17,6 @@
 
 package org.xipki.security.pkcs12.test;
 
-import java.io.FileInputStream;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.KeyStore;
-import java.security.PrivateKey;
-import java.security.Security;
-import java.security.cert.X509Certificate;
-import java.util.Iterator;
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
 import org.bouncycastle.asn1.cms.ContentInfo;
@@ -36,32 +24,23 @@ import org.bouncycastle.asn1.cms.EnvelopedData;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.RSAESOAEPparams;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.cms.CMSAlgorithm;
-import org.bouncycastle.cms.CMSEnvelopedData;
-import org.bouncycastle.cms.CMSEnvelopedDataGenerator;
-import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.cms.CMSProcessableByteArray;
-import org.bouncycastle.cms.PasswordRecipient;
-import org.bouncycastle.cms.PasswordRecipientInformation;
-import org.bouncycastle.cms.RecipientId;
-import org.bouncycastle.cms.RecipientInformation;
-import org.bouncycastle.cms.RecipientInformationStore;
+import org.bouncycastle.cms.*;
 import org.bouncycastle.cms.bc.BcPasswordEnvelopedRecipient;
 import org.bouncycastle.cms.bc.BcPasswordRecipientInfoGenerator;
-import org.bouncycastle.cms.jcajce.JceCMSContentEncryptorBuilder;
-import org.bouncycastle.cms.jcajce.JceKEKEnvelopedRecipient;
-import org.bouncycastle.cms.jcajce.JceKEKRecipientInfoGenerator;
-import org.bouncycastle.cms.jcajce.JceKeyAgreeEnvelopedRecipient;
-import org.bouncycastle.cms.jcajce.JceKeyAgreeRecipientId;
-import org.bouncycastle.cms.jcajce.JceKeyAgreeRecipientInfoGenerator;
-import org.bouncycastle.cms.jcajce.JceKeyTransEnvelopedRecipient;
-import org.bouncycastle.cms.jcajce.JceKeyTransRecipientInfoGenerator;
+import org.bouncycastle.cms.jcajce.*;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.xipki.security.HashAlgo;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.FileInputStream;
+import java.security.*;
+import java.security.cert.X509Certificate;
+import java.util.Iterator;
 
 /**
  * CMS EnvelopedData test class.

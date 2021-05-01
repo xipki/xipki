@@ -17,35 +17,24 @@
 
 package org.xipki.security;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.security.Security;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+import com.alibaba.fastjson.JSON;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.Passwords;
 import org.xipki.password.Passwords.PasswordConf;
-import org.xipki.security.pkcs11.P11CryptServiceFactory;
-import org.xipki.security.pkcs11.P11CryptServiceFactoryImpl;
-import org.xipki.security.pkcs11.P11ModuleFactory;
-import org.xipki.security.pkcs11.P11ModuleFactoryRegisterImpl;
-import org.xipki.security.pkcs11.P11SignerFactory;
-import org.xipki.security.pkcs11.Pkcs11conf;
+import org.xipki.security.pkcs11.*;
 import org.xipki.security.pkcs11.iaik.IaikP11ModuleFactory;
 import org.xipki.security.pkcs12.P12SignerFactory;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.FileOrBinary;
-import org.xipki.util.FileOrValue;
-import org.xipki.util.InvalidConfException;
-import org.xipki.util.LogUtil;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.*;
 
-import com.alibaba.fastjson.JSON;
+import java.io.Closeable;
+import java.io.IOException;
+import java.security.Security;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Utility class to initialize {@link SecurityFactory} and {@link P11CryptServiceFactory}.

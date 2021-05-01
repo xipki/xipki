@@ -17,9 +17,9 @@
 
 package org.xipki.ocsp.server.type;
 
-import java.math.BigInteger;
-
 import org.xipki.ocsp.api.RequestIssuer;
+
+import java.math.BigInteger;
 
 /**
  * ASN.1 CertID.

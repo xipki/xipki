@@ -17,11 +17,6 @@
 
 package org.xipki.security;
 
-import static org.xipki.util.Args.notNull;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -29,6 +24,11 @@ import org.bouncycastle.asn1.x500.style.RFC4519Style;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.xipki.util.StringUtil;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * Collection of OBJECT IDENFIFIERS.

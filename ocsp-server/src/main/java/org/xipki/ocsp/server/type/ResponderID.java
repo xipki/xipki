@@ -17,10 +17,10 @@
 
 package org.xipki.ocsp.server.type;
 
-import java.io.IOException;
-
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x500.X500Name;
+
+import java.io.IOException;
 
 /**
  * ASN.1 ResponderID.

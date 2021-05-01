@@ -17,9 +17,6 @@
 
 package org.xipki.ca.server;
 
-import java.security.cert.CertificateException;
-import java.util.Arrays;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CertWithDbId;
@@ -32,6 +29,9 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
+
+import java.security.cert.CertificateException;
+import java.util.Arrays;
 
 /**
  * Wrapper of requestor database entry.

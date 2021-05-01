@@ -17,25 +17,19 @@
 
 package org.xipki.ocsp.server;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.bouncycastle.cert.ocsp.OCSPException;
-import org.xipki.ocsp.server.type.ASN1Type;
-import org.xipki.ocsp.server.type.CertID;
-import org.xipki.ocsp.server.type.Extensions;
-import org.xipki.ocsp.server.type.ResponderID;
-import org.xipki.ocsp.server.type.ResponseData;
-import org.xipki.ocsp.server.type.SingleResponse;
-import org.xipki.ocsp.server.type.TaggedCertSequence;
+import org.xipki.ocsp.server.type.*;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.XiContentSigner;
 import org.xipki.util.Hex;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Generator for OCSP response objects.

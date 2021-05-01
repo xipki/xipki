@@ -52,8 +52,8 @@ import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.XiAction;
-import org.xipki.util.*;
 import org.xipki.util.Base64;
+import org.xipki.util.*;
 
 import java.io.File;
 import java.rmi.UnexpectedException;

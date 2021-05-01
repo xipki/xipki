@@ -17,14 +17,7 @@
 
 package org.xipki.ocsp.server;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
+import com.alibaba.fastjson.JSON;
 import org.xipki.datasource.DataSourceConf;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownIssuerBehaviour;
@@ -36,7 +29,13 @@ import org.xipki.util.ValidatableConf;
 import org.xipki.util.Validity;
 import org.xipki.util.Validity.Unit;
 
-import com.alibaba.fastjson.JSON;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Configuration of OCSP server.

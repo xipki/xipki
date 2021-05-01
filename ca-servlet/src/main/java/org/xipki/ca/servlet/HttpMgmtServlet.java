@@ -17,52 +17,33 @@
 
 package org.xipki.ca.servlet;
 
-import static org.xipki.util.Args.notEmpty;
-import static org.xipki.util.Args.notNull;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.cert.CertificateException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.alibaba.fastjson.JSON;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.mgmt.CaManager;
-import org.xipki.ca.api.mgmt.CaMgmtException;
-import org.xipki.ca.api.mgmt.CaSystemStatus;
-import org.xipki.ca.api.mgmt.CertListInfo;
-import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
+import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.MgmtMessage.CaEntryWrapper;
 import org.xipki.ca.api.mgmt.MgmtMessage.MgmtAction;
 import org.xipki.ca.api.mgmt.MgmtMessage.SignerEntryWrapper;
-import org.xipki.ca.api.mgmt.entry.CaEntry;
-import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
-import org.xipki.ca.api.mgmt.entry.CaHasUserEntry;
-import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
-import org.xipki.ca.api.mgmt.entry.PublisherEntry;
-import org.xipki.ca.api.mgmt.entry.RequestorEntry;
-import org.xipki.ca.api.mgmt.entry.SignerEntry;
-import org.xipki.ca.api.mgmt.entry.UserEntry;
-import org.xipki.ca.api.mgmt.MgmtRequest;
-import org.xipki.ca.api.mgmt.MgmtResponse;
+import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.security.X509Cert;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.IoUtil;
 
-import com.alibaba.fastjson.JSON;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.cert.CertificateException;
+import java.util.*;
+
+import static org.xipki.util.Args.notEmpty;
+import static org.xipki.util.Args.notNull;
 
 /**
  * CA management servlet.

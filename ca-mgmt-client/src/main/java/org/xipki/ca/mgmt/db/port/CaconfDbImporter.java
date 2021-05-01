@@ -17,6 +17,13 @@
 
 package org.xipki.ca.mgmt.db.port;
 
+import com.alibaba.fastjson.JSON;
+import org.xipki.datasource.DataAccessException;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.security.X509Cert;
+import org.xipki.security.util.X509Util;
+import org.xipki.util.Base64;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -26,14 +33,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.xipki.datasource.DataAccessException;
-import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.security.X509Cert;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.Base64;
-
-import com.alibaba.fastjson.JSON;
 
 /**
  * Database importer of CA configuration.

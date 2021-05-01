@@ -17,12 +17,12 @@
 
 package org.xipki.ca.mgmt.db.diffdb;
 
+import org.xipki.util.Args;
+import org.xipki.util.StringUtil;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.xipki.util.Args;
-import org.xipki.util.StringUtil;
 
 /**
  * Certificate entry containing the serial number, revocation information and hash value of

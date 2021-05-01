@@ -17,18 +17,17 @@
 
 package org.xipki.ca.servlet;
 
-import java.io.IOException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.LruCache;
 import org.xipki.util.StringUtil;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
 /**
  * TLS helper.

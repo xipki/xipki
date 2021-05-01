@@ -17,15 +17,6 @@
 
 package org.xipki.ocsp.server;
 
-import static org.xipki.util.Args.notEmpty;
-
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -36,6 +27,15 @@ import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
+
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.xipki.util.Args.notEmpty;
 
 /**
  * Response signer.

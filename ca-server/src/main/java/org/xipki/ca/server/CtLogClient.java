@@ -17,20 +17,7 @@
 
 package org.xipki.ca.server;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PublicKey;
-import java.security.Signature;
-import java.security.SignatureException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-
+import com.alibaba.fastjson.JSON;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,22 +26,17 @@ import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.ctlog.CtLog;
-import org.xipki.security.ctlog.CtLog.DigitallySigned;
-import org.xipki.security.ctlog.CtLog.SerializedSCT;
-import org.xipki.security.ctlog.CtLog.SignatureAndHashAlgorithm;
-import org.xipki.security.ctlog.CtLog.SignedCertificateTimestamp;
-import org.xipki.security.ctlog.CtLog.SignedCertificateTimestampList;
+import org.xipki.security.ctlog.CtLog.*;
 import org.xipki.security.ctlog.CtLogMessages.AddPreChainRequest;
 import org.xipki.security.ctlog.CtLogMessages.AddPreChainResponse;
-import org.xipki.util.Args;
-import org.xipki.util.Curl;
+import org.xipki.util.*;
 import org.xipki.util.Curl.CurlResult;
-import org.xipki.util.DefaultCurl;
-import org.xipki.util.Hex;
-import org.xipki.util.StringUtil;
 import org.xipki.util.http.SslContextConf;
 
-import com.alibaba.fastjson.JSON;
+import java.io.IOException;
+import java.security.*;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Certificate transparency (CT) log client.

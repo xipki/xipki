@@ -17,18 +17,18 @@
 
 package org.xipki.cmpclient.internal;
 
-import static org.xipki.util.Args.notNull;
-
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.xipki.security.AlgorithmValidator;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
+
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * CMP responder.

@@ -17,9 +17,9 @@
 
 package org.xipki.security.pkcs12;
 
-import java.security.SecureRandom;
-
 import org.xipki.util.Args;
+
+import java.security.SecureRandom;
 
 /**
  * Parameters for the keystore generation.

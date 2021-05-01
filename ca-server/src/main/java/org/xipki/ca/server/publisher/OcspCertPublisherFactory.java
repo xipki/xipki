@@ -17,14 +17,13 @@
 
 package org.xipki.ca.server.publisher;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherFactory;
 import org.xipki.util.ObjectCreationException;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Factory of {@link OcspCertPublisher}.

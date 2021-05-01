@@ -17,9 +17,9 @@
 
 package org.xipki.security;
 
-import static org.xipki.util.Args.notNull;
-
 import org.xipki.util.StringUtil;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * MD'5 Fingerprint calculator.

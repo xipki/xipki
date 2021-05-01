@@ -17,10 +17,10 @@
 
 package org.xipki.scep.transaction;
 
+import org.xipki.util.Args;
+
 import java.security.SecureRandom;
 import java.util.Arrays;
-
-import org.xipki.util.Args;
 
 /**
  * Nonce.

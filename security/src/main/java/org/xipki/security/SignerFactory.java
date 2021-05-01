@@ -17,9 +17,9 @@
 
 package org.xipki.security;
 
-import java.util.Set;
-
 import org.xipki.util.ObjectCreationException;
+
+import java.util.Set;
 
 /**
  * Factory to create {@link ConcurrentContentSigner}.

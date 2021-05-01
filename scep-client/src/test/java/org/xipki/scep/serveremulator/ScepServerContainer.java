@@ -17,14 +17,13 @@
 
 package org.xipki.scep.serveremulator;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.xipki.util.Args;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * This class starts and shutdowns he Jetty HTTP server.

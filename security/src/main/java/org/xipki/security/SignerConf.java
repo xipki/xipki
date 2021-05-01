@@ -17,15 +17,15 @@
 
 package org.xipki.security;
 
-import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notNull;
-
-import java.util.List;
-
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.StringUtil;
+
+import java.util.List;
+
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
 
 /**
  * Configuration of {@link ConcurrentContentSigner}.

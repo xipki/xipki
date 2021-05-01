@@ -17,7 +17,8 @@
 
 package org.xipki.security;
 
-import static org.xipki.util.Args.notNull;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.operator.RuntimeOperatorException;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -27,8 +28,7 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.util.Arrays;
 
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.operator.RuntimeOperatorException;
+import static org.xipki.util.Args.notNull;
 
 /**
  * {@link XiContentSigner} based on {@link Signature}.

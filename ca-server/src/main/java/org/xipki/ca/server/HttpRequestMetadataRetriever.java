@@ -17,9 +17,9 @@
 
 package org.xipki.ca.server;
 
-import java.io.IOException;
-
 import org.xipki.security.X509Cert;
+
+import java.io.IOException;
 
 /**
  * Interface to retrieve the meta data of HTTP request.

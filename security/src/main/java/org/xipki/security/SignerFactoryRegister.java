@@ -17,9 +17,9 @@
 
 package org.xipki.security;
 
-import java.util.Set;
-
 import org.xipki.util.ObjectCreationException;
+
+import java.util.Set;
 
 /**
  * Interface to register {@link SignerFactory} and to create new

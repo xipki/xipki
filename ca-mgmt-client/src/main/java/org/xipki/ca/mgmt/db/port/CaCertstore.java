@@ -17,13 +17,13 @@
 
 package org.xipki.ca.mgmt.db.port;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.FileOrValue;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * CA CertStore configuration.

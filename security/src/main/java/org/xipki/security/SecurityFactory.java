@@ -17,18 +17,18 @@
 
 package org.xipki.security;
 
-import java.security.InvalidKeyException;
-import java.security.KeyStoreException;
-import java.security.PublicKey;
-import java.security.SecureRandom;
-import java.util.Set;
-
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.xipki.password.PasswordResolver;
 import org.xipki.util.ObjectCreationException;
+
+import java.security.InvalidKeyException;
+import java.security.KeyStoreException;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.util.Set;
 
 /**
  * This is the core interface. It specifies the method to create

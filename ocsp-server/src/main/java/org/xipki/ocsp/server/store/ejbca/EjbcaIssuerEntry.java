@@ -17,7 +17,13 @@
 
 package org.xipki.ocsp.server.store.ejbca;
 
-import static org.xipki.util.Args.notNull;
+import org.bouncycastle.asn1.x509.Certificate;
+import org.xipki.ocsp.api.RequestIssuer;
+import org.xipki.security.CertRevocationInfo;
+import org.xipki.security.CrlReason;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.X509Cert;
+import org.xipki.util.CompareUtil;
 
 import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
@@ -26,13 +32,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.ocsp.api.RequestIssuer;
-import org.xipki.security.CertRevocationInfo;
-import org.xipki.security.CrlReason;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.X509Cert;
-import org.xipki.util.CompareUtil;
+import static org.xipki.util.Args.notNull;
 
 /**
  * IssuerEntry for the EJBCA database.

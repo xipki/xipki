@@ -17,10 +17,10 @@
 
 package org.xipki.scep.serveremulator;
 
-import java.security.PrivateKey;
-
 import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
+
+import java.security.PrivateKey;
 
 /**
  * RA emulator.

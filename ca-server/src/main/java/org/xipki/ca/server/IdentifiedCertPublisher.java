@@ -17,11 +17,6 @@
 
 package org.xipki.ca.server;
 
-import static org.xipki.util.Args.notNull;
-
-import java.io.Closeable;
-import java.util.Map;
-
 import org.bouncycastle.cert.X509CRLHolder;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
@@ -33,6 +28,11 @@ import org.xipki.password.PasswordResolver;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.FileOrValue;
+
+import java.io.Closeable;
+import java.util.Map;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * CertPublisher with identifier.

@@ -17,11 +17,11 @@
 
 package org.xipki.ca.mgmt.db.port;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.slf4j.Logger;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.HashAlgo;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Base class for the OCSP CertStore database importer.

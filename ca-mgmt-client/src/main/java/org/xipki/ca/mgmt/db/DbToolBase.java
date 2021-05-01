@@ -17,25 +17,6 @@
 
 package org.xipki.ca.mgmt.db;
 
-import java.io.BufferedOutputStream;
-import java.io.Closeable;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Savepoint;
-import java.sql.Statement;
-import java.sql.Types;
-import java.util.Properties;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.zip.Deflater;
-import java.util.zip.ZipOutputStream;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException;
@@ -44,6 +25,14 @@ import org.xipki.util.Args;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.sql.*;
+import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.zip.Deflater;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Database tool base.

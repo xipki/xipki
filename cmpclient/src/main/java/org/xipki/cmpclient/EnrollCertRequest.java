@@ -17,14 +17,14 @@
 
 package org.xipki.cmpclient;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.xipki.util.Args;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * CMP request to enroll certificates.
