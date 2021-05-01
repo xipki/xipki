@@ -22,8 +22,13 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
+import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.xipki.security.*;
 import org.xipki.security.pkcs12.KeypairWithCert;
 import org.xipki.security.pkcs12.KeystoreGenerationParameters;
@@ -209,7 +214,16 @@ public class P12Actions {
           pairs.putPair("password", new String(password));
         }
 
-        SignerConf conf = new SignerConf(pairs.getEncoded(), HashAlgo.SHA256, null);
+        HashAlgo hashAlgo = HashAlgo.SHA256;
+        SignatureAlgoControl algoControl = null;
+        AlgorithmIdentifier algId = cert.getSubjectPublicKeyInfo().getAlgorithm();
+        if (X9ObjectIdentifiers.id_ecPublicKey.equals(algId.getAlgorithm())) {
+          if (ASN1ObjectIdentifier.getInstance(algId.getParameters()).equals(GMObjectIdentifiers.sm2p256v1)) {
+            hashAlgo = HashAlgo.SM3;
+            algoControl = new SignatureAlgoControl(false, false, true);
+          }
+        }
+        SignerConf conf = new SignerConf(pairs.getEncoded(), hashAlgo, algoControl);
         securityFactory.createSigner("PKCS12", conf, cert);
       }
     } // method assertMatch

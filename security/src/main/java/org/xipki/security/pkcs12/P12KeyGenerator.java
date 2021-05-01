@@ -32,6 +32,7 @@ import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.jcajce.interfaces.XDHKey;
 import org.bouncycastle.operator.ContentSigner;
 import org.xipki.security.*;
+import org.xipki.security.util.GMUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 
@@ -42,6 +43,7 @@ import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.interfaces.*;
+import java.security.spec.EllipticCurve;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
 
@@ -272,15 +274,19 @@ public class P12KeyGenerator {
     } else if (key instanceof DSAPrivateKey) {
       algo = SignAlgo.DSA_SHA256;
     } else if (key instanceof ECPrivateKey) {
-      int keysize = ((ECPrivateKey) key).getParams().getOrder().bitLength();
-      if (keysize > 384) {
-        algo = SignAlgo.ECDSA_SHA512;
-      } else if (keysize > 256) {
-        algo = SignAlgo.ECDSA_SHA384;
-      } else if (keysize > 160) {
-        algo = SignAlgo.ECDSA_SHA256;
+      if (GMUtil.isSm2primev2Curve(((ECPublicKey) publicKey).getParams().getCurve())) {
+        algo = SignAlgo.SM2_SM3;
       } else {
-        algo = SignAlgo.ECDSA_SHA1;
+        int keysize = ((ECPrivateKey) key).getParams().getOrder().bitLength();
+        if (keysize > 384) {
+          algo = SignAlgo.ECDSA_SHA512;
+        } else if (keysize > 256) {
+          algo = SignAlgo.ECDSA_SHA384;
+        } else if (keysize > 160) {
+          algo = SignAlgo.ECDSA_SHA256;
+        } else {
+          algo = SignAlgo.ECDSA_SHA1;
+        }
       }
     } else if (key instanceof EdDSAKey) {
       String algorithm = key.getAlgorithm();
