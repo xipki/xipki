@@ -10,7 +10,7 @@ sleep 1
 
 xi:initdb --force \
   --db-conf ${XIPKI_DIR}/etc/ca/database/ca-db.properties \
-  --db-schema sql/ca-init.xml
+  --db-schema xipki/sql/ca-init.xml
 
 ca:restart
 
