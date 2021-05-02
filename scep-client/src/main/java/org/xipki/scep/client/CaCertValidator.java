@@ -65,7 +65,7 @@ public interface CaCertValidator {
       Boolean bo = cachedAnswers.get(hexFp);
 
       if (bo != null) {
-        return bo.booleanValue();
+        return bo;
       } else {
         boolean answer = delegate.isTrusted(cert);
         cachedAnswers.put(hexFp, answer);

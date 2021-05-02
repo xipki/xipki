@@ -231,12 +231,10 @@ public class RestResponder {
         throw new HttpRespAuditException(NOT_FOUND, message, INFO, FAILED);
       }
 
-      if (caName == null || ca == null || !ca.getCaInfo().supportsRest()
+      if (ca == null || !ca.getCaInfo().supportsRest()
           || ca.getCaInfo().getStatus() != CaStatus.ACTIVE) {
         String message;
-        if (caName == null) {
-          message = "no CA is specified";
-        } else if (ca == null) {
+        if (ca == null) {
           message = "unknown CA '" + caName + "'";
         } else if (!ca.getCaInfo().supportsRest()) {
           message = "REST is not supported by the CA '" + caName + "'";

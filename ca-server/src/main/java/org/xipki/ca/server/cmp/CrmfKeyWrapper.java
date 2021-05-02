@@ -95,7 +95,7 @@ abstract class CrmfKeyWrapper {
 
     private final int aesKeySize = 128;
 
-    private PublicKey publicKey;
+    private final PublicKey publicKey;
 
     public ECIESAsymmetricKeyWrapper(PublicKey publicKey) {
       this.publicKey = publicKey;

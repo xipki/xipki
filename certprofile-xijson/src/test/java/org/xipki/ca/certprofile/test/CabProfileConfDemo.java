@@ -130,8 +130,7 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
     marshall(profile, destFilename, true);
   } // method certprofileCabSubCa
 
-  private static void certprofileCabDomainValidatedTls(String destFilename)
-      throws Exception {
+  private static void certprofileCabDomainValidatedTls(String destFilename) {
     X509ProfileType profile = getBaseCabSubscriberProfile(
         "certprofile TLS (CA/Browser Forum BR, Domain Validated)");
 
@@ -154,8 +153,7 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
     marshall(profile, destFilename, true);
   } // method certprofileCabDomainValidatedTls
 
-  private static void certprofileCabOrganizationValidatedTls(String destFilename)
-      throws Exception {
+  private static void certprofileCabOrganizationValidatedTls(String destFilename) {
     X509ProfileType profile = getBaseCabSubscriberProfile(
         "certprofile TLS (CA/Browser Forum BR, Organization Validiated)");
 
@@ -181,8 +179,7 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
     marshall(profile, destFilename, true);
   } // method certprofileCabOrganizationValidatedTls
 
-  private static void certprofileCabIndividualValidatedTls(String destFilename)
-      throws Exception {
+  private static void certprofileCabIndividualValidatedTls(String destFilename) {
     X509ProfileType profile = getBaseCabSubscriberProfile(
         "certprofile TLS (CA/Browser Forum BR, Individual Validiated)");
 

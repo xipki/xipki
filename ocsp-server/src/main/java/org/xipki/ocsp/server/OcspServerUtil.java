@@ -216,10 +216,10 @@ public class OcspServerUtil {
 
     CertpathValidationModel model = requestOption.getCertpathValidationModel();
 
-    Date now = new Date();
     if (model == null || model == CertpathValidationModel.PKIX) {
       for (X509Cert m : certpath) {
-        if (m.getNotBefore().after(now) || m.getNotAfter().before(now)) {
+        if (m.getNotBefore().after(referenceTime)
+                || m.getNotAfter().before(referenceTime)) {
           return false;
         }
       }

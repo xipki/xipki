@@ -88,11 +88,7 @@ class PendingCertificatePool {
     String hexTid = Hex.encode(transactionId);
     PendingCertificatePool.MyEntry myEntry = new MyEntry(certReqId, waitForConfirmTill, certInfo);
     synchronized (map) {
-      Set<PendingCertificatePool.MyEntry> entries = map.get(hexTid);
-      if (entries == null) {
-        entries = new HashSet<>();
-        map.put(hexTid, entries);
-      }
+      Set<PendingCertificatePool.MyEntry> entries = map.computeIfAbsent(hexTid, k -> new HashSet<>());
       entries.add(myEntry);
     }
   } // method addCertificate

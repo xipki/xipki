@@ -41,8 +41,7 @@ public class AddUserEntry extends MgmtEntry {
   private AddUserEntry() {
   }
 
-  public AddUserEntry(NameId ident, boolean active, String password)
-      throws CaMgmtException {
+  public AddUserEntry(NameId ident, boolean active, String password) {
     this.ident = Args.notNull(ident, "ident");
     this.active = active;
     this.password = Args.notBlank(password, "password");

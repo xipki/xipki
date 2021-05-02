@@ -203,7 +203,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     return new SignerEntry(name, rs.getString("TYPE"), rs.getString("CONF"), rs.getString("CERT"));
   } // method createSigner
 
-  public CaInfo createCaInfo(String name, boolean masterMode, CertStore certstore)
+  public CaInfo createCaInfo(String name, CertStore certstore)
       throws CaMgmtException {
     ResultRow rs = execQuery1PrepStmt0(sqlSelectCa, col2Str(name));
     if (rs == null) {
@@ -1065,7 +1065,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     final String sql = "SELECT NAME,PERMISSION,PROFILES FROM CA_HAS_USER INNER JOIN TUSER"
         + " ON CA_ID=? AND TUSER.ID=CA_HAS_USER.USER_ID";
 
-    List<ResultRow> rows = execQueryPrepStmt0(sql, col2Int(caIdent.getId().intValue()));
+    List<ResultRow> rows = execQueryPrepStmt0(sql, col2Int(caIdent.getId()));
 
     List<CaHasUserEntry> ret = new LinkedList<>();
     for (ResultRow rs : rows) {
@@ -1118,15 +1118,15 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     }
   } // method generateCertchain
 
-  private static boolean getBoolean(ResultRow rs, String label) throws CaMgmtException {
+  private static boolean getBoolean(ResultRow rs, String label) {
     return rs.getBoolean(label);
   }
 
-  private static int getInt(ResultRow rs, String label) throws CaMgmtException {
+  private static int getInt(ResultRow rs, String label) {
     return rs.getInt(label);
   }
 
-  private static long getLong(ResultRow rs, String label) throws CaMgmtException {
+  private static long getLong(ResultRow rs, String label) {
     return rs.getLong(label);
   }
 

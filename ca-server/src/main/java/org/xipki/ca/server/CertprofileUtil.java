@@ -366,13 +366,11 @@ class CertprofileUtil {
     if (withEdwardsCurves || withMontgomeryCurves) {
       Set<KeyUsage> requiredUsages = new HashSet<>();
       Set<KeyUsage> optionalUsages = new HashSet<>();
-      if (usages != null) {
-        for (KeyUsageControl m : usages) {
-          if (m.isRequired()) {
-            requiredUsages.add(m.getKeyUsage());
-          } else {
-            optionalUsages.add(m.getKeyUsage());
-          }
+      for (KeyUsageControl m : usages) {
+        if (m.isRequired()) {
+          requiredUsages.add(m.getKeyUsage());
+        } else {
+          optionalUsages.add(m.getKeyUsage());
         }
       }
 
@@ -445,7 +443,7 @@ class CertprofileUtil {
     // validity
     if (certLevel == CertLevel.EndEntity) {
       Validity validity = certprofile.getValidity();
-      if (validity.compareTo(maxCabEeValidity) == 1) {
+      if (validity.compareTo(maxCabEeValidity) > 0) {
         msg.append("validity exceeds the maximal validity of subscriber certificate, ");
       }
     }

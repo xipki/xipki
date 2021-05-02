@@ -70,8 +70,6 @@ class RefDigestReader implements Closeable {
 
   private ExecutorService executor;
 
-  private Retriever retriever;
-
   private Connection conn;
 
   private String selectCertSql;
@@ -231,7 +229,7 @@ class RefDigestReader implements Closeable {
     this.selectCertSql = datasource.buildSelectFirstSql(numPerSelect, "ID ASC", coreSql);
 
     try {
-      retriever = new Retriever();
+      Retriever retriever = new Retriever();
       executor = Executors.newFixedThreadPool(1);
       executor.execute(retriever);
     } catch (Exception ex) {

@@ -98,8 +98,7 @@ public class ChangeCaEntry extends MgmtEntry {
   private ChangeCaEntry() {
   }
 
-  public ChangeCaEntry(NameId ident)
-      throws CaMgmtException {
+  public ChangeCaEntry(NameId ident) {
     this.ident = Args.notNull(ident, "ident");
   }
 

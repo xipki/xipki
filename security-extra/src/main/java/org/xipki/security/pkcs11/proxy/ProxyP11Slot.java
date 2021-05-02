@@ -152,7 +152,7 @@ public class ProxyP11Slot extends P11Slot {
   }
 
   private PublicKey getPublicKey(P11ObjectIdentifier objectId)
-      throws P11UnknownEntityException, P11TokenException {
+      throws P11TokenException {
     ASN1Object req =
         new SlotIdAndObjectId(asn1SlotId, new ObjectIdentifier(objectId));
     byte[] resp = module.send(P11ProxyConstants.ACTION_GET_PUBLICKEY, req);

@@ -119,11 +119,7 @@ public class CertprofileEntry extends MgmtEntry {
       return false;
     }
 
-    if (!CompareUtil.equalsObject(conf, obj.conf)) {
-      return false;
-    }
-
-    return true;
+    return CompareUtil.equalsObject(conf, obj.conf);
   }
 
   @Override

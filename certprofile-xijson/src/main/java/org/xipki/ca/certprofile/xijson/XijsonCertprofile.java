@@ -536,11 +536,7 @@ public class XijsonCertprofile extends BaseCertprofile {
           String country = DERPrintableString.getInstance(attrVal).getString();
           countryOfResidenceList.add(country);
         } else {
-          List<ASN1Encodable> otherAttrVals = otherAttrs.get(attrType);
-          if (otherAttrVals == null) {
-            otherAttrVals = new LinkedList<>();
-            otherAttrs.put(attrType, otherAttrVals);
-          }
+          List<ASN1Encodable> otherAttrVals = otherAttrs.computeIfAbsent(attrType, k -> new LinkedList<>());
           otherAttrVals.add(attrVal);
         }
       }

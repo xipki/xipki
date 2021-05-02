@@ -252,7 +252,7 @@ public class Pkcs11conf extends ValidatableConf {
     }
 
     public int getMaxMessageSize() {
-      return maxMessageSize == null ? 16384 : maxMessageSize.intValue();
+      return maxMessageSize == null ? 16384 : maxMessageSize;
     }
 
     @Override
@@ -316,7 +316,7 @@ public class Pkcs11conf extends ValidatableConf {
 
       private final long pkcs11CkaCode;
 
-      private CertAttribute(long pkcs11CkaCode) {
+      CertAttribute(long pkcs11CkaCode) {
         this.pkcs11CkaCode = pkcs11CkaCode;
       }
 

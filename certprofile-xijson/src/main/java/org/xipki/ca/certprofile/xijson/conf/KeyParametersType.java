@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.KeyParametersOption;
 import org.xipki.ca.api.profile.Range;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
@@ -139,80 +138,11 @@ public class KeyParametersType extends ValidatableConf {
 
   } // class RsaParametersType
 
-  public static class RsapssParametersType extends RsaParametersType {
-
-    @JSONField(ordinal = 2)
-    private List<DescribableOid> hashAlgorithms;
-
-    @JSONField(ordinal = 3)
-    private List<DescribableOid> maskGenAlgorithms;
-
-    @JSONField(ordinal = 4)
-    private List<Integer> saltLengths;
-
-    @JSONField(ordinal = 5)
-    private List<Integer> trailerFields;
-
-    public List<DescribableOid> getHashAlgorithms() {
-      if (hashAlgorithms == null) {
-        hashAlgorithms = new LinkedList<>();
-      }
-      return hashAlgorithms;
-    }
-
-    public void setHashAlgorithms(List<DescribableOid> hashAlgorithms) {
-      this.hashAlgorithms = hashAlgorithms;
-    }
-
-    public List<DescribableOid> getMaskGenAlgorithms() {
-      if (maskGenAlgorithms == null) {
-        maskGenAlgorithms = new LinkedList<>();
-      }
-      return maskGenAlgorithms;
-    }
-
-    public void setMaskGenAlgorithms(List<DescribableOid> maskGenAlgorithms) {
-      this.maskGenAlgorithms = maskGenAlgorithms;
-    }
-
-    public List<Integer> getSaltLengths() {
-      if (saltLengths == null) {
-        saltLengths = new LinkedList<>();
-      }
-      return saltLengths;
-    }
-
-    public void setSaltLengths(List<Integer> saltLengths) {
-      this.saltLengths = saltLengths;
-    }
-
-    public List<Integer> getTrailerFields() {
-      if (trailerFields == null) {
-        trailerFields = new LinkedList<>();
-      }
-      return trailerFields;
-    }
-
-    public void setTrailerFields(List<Integer> trailerFields) {
-      this.trailerFields = trailerFields;
-    }
-
-    @Override
-    public void validate()
-        throws InvalidConfException {
-      validate(hashAlgorithms);
-      validate(maskGenAlgorithms);
-    }
-
-  } // class RsapssParametersType
-
   private DsaParametersType dsa;
 
   private EcParametersType ec;
 
   private RsaParametersType rsa;
-
-  private RsapssParametersType rsapss;
 
   public DsaParametersType getDsa() {
     return dsa;
@@ -238,16 +168,7 @@ public class KeyParametersType extends ValidatableConf {
     this.rsa = rsa;
   }
 
-  public RsapssParametersType getRsapss() {
-    return rsapss;
-  }
-
-  public void setRsapss(RsapssParametersType rsapss) {
-    this.rsapss = rsapss;
-  }
-
-  public KeyParametersOption toXiKeyParametersOption()
-      throws CertprofileException {
+  public KeyParametersOption toXiKeyParametersOption() {
     if (ec != null) {
       KeyParametersOption.ECParamatersOption option = new KeyParametersOption.ECParamatersOption();
 
@@ -267,18 +188,6 @@ public class KeyParametersType extends ValidatableConf {
       KeyParametersOption.RSAParametersOption option =
           new KeyParametersOption.RSAParametersOption();
       option.setModulusLengths(buildParametersMap(rsa.getModulusLengths()));
-      return option;
-    } else if (rsapss != null) {
-      KeyParametersOption.RSAPSSParametersOption option =
-          new KeyParametersOption.RSAPSSParametersOption();
-
-      Set<Range> modulusLengths = buildParametersMap(rsapss.getModulusLengths());
-      option.setModulusLengths(modulusLengths);
-      option.setHashAlgs(X509ProfileType.toOidSet(rsapss.getHashAlgorithms()));
-      option.setMaskGenAlgs(X509ProfileType.toOidSet(rsapss.getMaskGenAlgorithms()));
-      option.setSaltLengths(new HashSet<>(rsapss.getSaltLengths()));
-      option.setTrailerFields(new HashSet<>(rsapss.getTrailerFields()));
-
       return option;
     } else if (dsa != null) {
       KeyParametersOption.DSAParametersOption option =
@@ -327,7 +236,6 @@ public class KeyParametersType extends ValidatableConf {
     validate(dsa);
     validate(ec);
     validate(rsa);
-    validate(rsapss);
   } // method validate
 
 }

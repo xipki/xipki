@@ -135,7 +135,7 @@ public abstract class BenchmarkExecutor {
     return interrupted;
   }
 
-  public void setDuration(String duration) {
+  public BenchmarkExecutor setDuration(String duration) {
     Args.notBlank(duration, "duration");
     char unit = duration.charAt(duration.length() - 1);
 
@@ -171,12 +171,15 @@ public abstract class BenchmarkExecutor {
       default:
         throw new IllegalStateException("invalid duration unit " + unit);
     }
+
+    return this;
   }
 
-  public void setThreads(int threads) {
+  public BenchmarkExecutor setThreads(int threads) {
     if (threads > 0) {
       this.threads = threads;
     }
+    return this;
   }
 
   public long getErrorAccout() {
@@ -211,8 +214,9 @@ public abstract class BenchmarkExecutor {
     processLog.printStatus();
   }
 
-  public void setUnit(String unit) {
+  public BenchmarkExecutor setUnit(String unit) {
     this.unit = Args.notNull(unit, "unit");
+    return this;
   }
 
   protected void printSummary() {

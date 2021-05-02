@@ -65,55 +65,6 @@ public class KeyParametersOption {
   } // class RSAParametersOption
 
   // CHECKSTYLE:SKIP
-  public static class RSAPSSParametersOption extends RSAParametersOption {
-
-    private Set<ASN1ObjectIdentifier> hashAlgs;
-
-    private Set<ASN1ObjectIdentifier> maskGenAlgs;
-
-    private Set<Integer> saltLengths;
-
-    private Set<Integer> trailerFields;
-
-    public RSAPSSParametersOption() {
-    }
-
-    public void setHashAlgs(Set<ASN1ObjectIdentifier> hashAlgs) {
-      this.hashAlgs = CollectionUtil.isEmpty(hashAlgs) ? null : new HashSet<>(hashAlgs);
-    }
-
-    public void setMaskGenAlgs(Set<ASN1ObjectIdentifier> maskGenAlgs) {
-      this.maskGenAlgs = CollectionUtil.isEmpty(maskGenAlgs) ? null : new HashSet<>(maskGenAlgs);
-    }
-
-    public void setSaltLengths(Set<Integer> saltLengths) {
-      this.saltLengths = CollectionUtil.isEmpty(saltLengths) ? null : new HashSet<>(saltLengths);
-    }
-
-    public void setTrailerFields(Set<Integer> trailerFields) {
-      this.trailerFields = CollectionUtil.isEmpty(trailerFields) ? null
-          : new HashSet<>(trailerFields);
-    }
-
-    public boolean allowsHashAlg(ASN1ObjectIdentifier hashAlg) {
-      return hashAlgs == null || hashAlgs.contains(hashAlg);
-    }
-
-    public boolean allowsMaskGenAlg(ASN1ObjectIdentifier maskGenAlg) {
-      return maskGenAlgs == null || maskGenAlgs.contains(maskGenAlg);
-    }
-
-    public boolean allowsSaltLength(int saltLength) {
-      return saltLengths == null || saltLengths.contains(saltLength);
-    }
-
-    public boolean allowsTrailerField(int trailerField) {
-      return trailerFields == null || trailerFields.contains(trailerField);
-    }
-
-  } // class RSAPSSParametersOption
-
-  // CHECKSTYLE:SKIP
   public static class DSAParametersOption extends KeyParametersOption {
 
     private Set<Range> plengths;

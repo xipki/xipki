@@ -338,7 +338,7 @@ public abstract class DbPortWorker implements Runnable {
 
     public ImportOcspFromCaDb(DataSourceFactory datasourceFactory,
         PasswordResolver passwordResolver, String dbConfFile, String publisherName,
-        boolean resume, String srcFolder, int batchEntriesPerCommit, boolean evaluateOnly)
+        boolean resume, String srcFolder, int batchEntriesPerCommit)
         throws PasswordResolverException, IOException {
       super(datasourceFactory, passwordResolver, dbConfFile);
       this.publisherName = publisherName;

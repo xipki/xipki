@@ -720,7 +720,7 @@ public class CaMgmtClient implements CaManager {
 
   @Override
   public InputStream exportConf(List<String> caNames)
-      throws CaMgmtException, IOException {
+      throws CaMgmtException {
     MgmtRequest.ExportConf req = new MgmtRequest.ExportConf();
     req.setCaNames(caNames);
     byte[] respBytes = transmit(MgmtAction.exportConf, req);

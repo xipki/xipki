@@ -284,7 +284,7 @@ public class DbActions {
     protected DbPortWorker getDbPortWorker()
         throws Exception {
       return new DbPortWorker.ImportOcspFromCaDb(datasourceFactory, passwordResolver, dbconfFile,
-          publisherName, resume, indir, numCertsPerCommit, testOnly.booleanValue());
+          publisherName, resume, indir, numCertsPerCommit);
     }
 
   } // class ImportOcspfromca

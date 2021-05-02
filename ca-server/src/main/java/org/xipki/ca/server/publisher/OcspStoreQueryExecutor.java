@@ -438,8 +438,7 @@ class OcspStoreQueryExecutor {
     }
   } // method unrevokeCa
 
-  private int getIssuerId(X509Cert issuerCert)
-      throws DataAccessException {
+  private int getIssuerId(X509Cert issuerCert) {
     notNull(issuerCert, "issuerCert");
     Integer id = issuerStore.getIdForCert(issuerCert.getEncoded());
     if (id == null) {

@@ -544,11 +544,7 @@ public class CaConfType {
     public void setSnSize(int snSize) {
       if (snSize > CaManager.MAX_SERIALNUMBER_SIZE) {
         this.snSize = CaManager.MAX_SERIALNUMBER_SIZE;
-      } else if (snSize < CaManager.MIN_SERIALNUMBER_SIZE) {
-        this.snSize = CaManager.MIN_SERIALNUMBER_SIZE;
-      } else {
-        this.snSize = snSize;
-      }
+      } else this.snSize = Math.max(snSize, CaManager.MIN_SERIALNUMBER_SIZE);
     }
 
     public CaUris getCaUris() {

@@ -46,7 +46,7 @@ import java.util.Map;
 
 public class HttpRestServlet extends HttpServlet {
 
-  private static Logger LOG = LoggerFactory.getLogger(HttpRestServlet.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HttpRestServlet.class);
 
   private boolean logReqResp;
 

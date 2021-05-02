@@ -99,15 +99,15 @@ public class ProxyP11Module extends P11Module {
 
   private final String description;
 
-  private URL serverUrl;
+  private final URL serverUrl;
 
-  private short moduleId;
+  private final short moduleId;
 
   private boolean readOnly;
 
-  private SSLSocketFactory sslSocketFactory;
+  private final SSLSocketFactory sslSocketFactory;
 
-  private HostnameVerifier hostnameVerifier;
+  private final HostnameVerifier hostnameVerifier;
 
   private ProxyP11Module(P11ModuleConf moduleConf)
       throws P11TokenException {
@@ -320,7 +320,7 @@ public class ProxyP11Module extends P11Module {
           + ", message=" + httpUrlConnection.getResponseMessage());
     }
 
-    InputStream inputstream = null;
+    InputStream inputstream;
     try {
       inputstream = httpUrlConnection.getInputStream();
     } catch (IOException ex) {

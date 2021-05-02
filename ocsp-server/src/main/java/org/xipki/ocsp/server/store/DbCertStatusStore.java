@@ -96,7 +96,7 @@ public class DbCertStatusStore extends OcspStore {
 
   private IssuerFilter issuerFilter;
 
-  private IssuerStore issuerStore = new IssuerStore();
+  private final IssuerStore issuerStore = new IssuerStore();
 
   private HashAlgo certHashAlgo;
 
@@ -105,7 +105,7 @@ public class DbCertStatusStore extends OcspStore {
   private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
   protected List<Runnable> getScheduledServices() {
-    return Arrays.asList(storeUpdateService);
+    return Collections.singletonList(storeUpdateService);
   }
 
   protected IssuerStore getIssuerStore() {
@@ -177,7 +177,7 @@ public class DbCertStatusStore extends OcspStore {
 
           // no change in the issuerStore
           Set<Integer> newIds = newIssuers.keySet();
-          Set<Integer> ids = (issuerStore != null) ? issuerStore.getIds() : Collections.emptySet();
+          Set<Integer> ids = issuerStore.getIds();
 
           boolean issuersUnchanged = (ids.size() == newIds.size())
               && ids.containsAll(newIds) && newIds.containsAll(ids);
@@ -313,7 +313,7 @@ public class DbCertStatusStore extends OcspStore {
       }
 
       ResultSet rs = null;
-      CertStatusInfo certStatusInfo = null;
+      CertStatusInfo certStatusInfo;
 
       boolean unknown = true;
       boolean ignore = false;
@@ -336,7 +336,7 @@ public class DbCertStatusStore extends OcspStore {
           crlId = rs.getInt("CRL_ID");
 
           long timeInSec = time.getTime() / 1000;
-          if (!ignore && ignoreNotYetValidCert) {
+          if (ignoreNotYetValidCert) {
             long notBeforeInSec = rs.getLong("NBEFORE");
             if (notBeforeInSec != 0 && timeInSec < notBeforeInSec) {
               ignore = true;
@@ -526,7 +526,7 @@ public class DbCertStatusStore extends OcspStore {
    * @param datasource DataSource.
    */
   @Override
-  public void init(Map<String, ? extends Object> sourceConf, DataSourceWrapper datasource)
+  public void init(Map<String, ?> sourceConf, DataSourceWrapper datasource)
       throws OcspStoreException {
     OcspServerConf.CaCerts caCerts = null;
     if (sourceConf != null) {
@@ -610,14 +610,11 @@ public class DbCertStatusStore extends OcspStore {
 
   @Override
   public boolean knowsIssuer(RequestIssuer reqIssuer) {
-    return issuerStore != null && null != issuerStore.getIssuerForFp(reqIssuer);
+    return null != issuerStore.getIssuerForFp(reqIssuer);
   }
 
   @Override
   public X509Cert getIssuerCert(RequestIssuer reqIssuer) {
-    if (issuerStore == null) {
-      return null;
-    }
     IssuerEntry issuer = issuerStore.getIssuerForFp(reqIssuer);
     return (issuer == null) ? null : issuer.getCert();
   }

@@ -198,7 +198,7 @@ class SqlErrorCodes {
       return Collections.emptySet();
     }
 
-    Set<String> set = new HashSet<String>();
+    Set<String> set = new HashSet<>();
     for (int i : ints) {
       set.add(Integer.toString(i));
     }

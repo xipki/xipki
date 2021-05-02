@@ -38,7 +38,7 @@ public class CertPublisherFactoryRegister {
 
   private static final Logger LOG = LoggerFactory.getLogger(CertPublisherFactoryRegister.class);
 
-  private ConcurrentLinkedDeque<CertPublisherFactory> factories = new ConcurrentLinkedDeque<>();
+  private final ConcurrentLinkedDeque<CertPublisherFactory> factories = new ConcurrentLinkedDeque<>();
 
   /**
    * Whether publisher of given type can be created.

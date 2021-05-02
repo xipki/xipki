@@ -739,11 +739,11 @@ public class OcspServerConf extends ValidatableConf {
       this.datasource = value;
     }
 
-    public Map<String, ? extends Object> getConf() {
+    public Map<String, ?> getConf() {
       return conf;
     }
 
-    public void setConf(Map<String, ? extends Object> value) {
+    public void setConf(Map<String, ?> value) {
       this.conf = value;
     }
 

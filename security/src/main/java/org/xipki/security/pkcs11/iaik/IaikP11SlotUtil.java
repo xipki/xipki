@@ -131,9 +131,7 @@ class IaikP11SlotUtil {
       throw new P11TokenException("unknown P11Parameters " + parameters.getClass().getName());
     }
 
-    if (paramObj != null) {
-      ret.setParameters(paramObj);
-    }
+    ret.setParameters(paramObj);
 
     return ret;
   } // method getMechanism
@@ -268,7 +266,7 @@ class IaikP11SlotUtil {
       }
     } else if (p11Key instanceof ECPublicKey) {
       ECPublicKey ecP11Key = (ECPublicKey) p11Key;
-      long keyType = ecP11Key.getKeyType().getLongValue().longValue();
+      long keyType = ecP11Key.getKeyType().getLongValue();
       byte[] ecParameters = value(ecP11Key.getEcdsaParams());
       byte[] encodedPoint = DEROctetString.getInstance(value(ecP11Key.getEcPoint())).getOctets();
 
@@ -378,7 +376,7 @@ class IaikP11SlotUtil {
           }
         }
       } else {
-        long keyType = privateKey.getKeyType().getLongValue().longValue();
+        long keyType = privateKey.getKeyType().getLongValue();
         // if not set
         if (keyType == PKCS11Constants.CKK_EC
             || keyType == PKCS11Constants.CKK_RSA

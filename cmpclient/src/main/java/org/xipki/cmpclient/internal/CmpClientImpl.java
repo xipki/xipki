@@ -59,7 +59,7 @@ public final class CmpClientImpl implements CmpClient {
 
   private static final Logger LOG = LoggerFactory.getLogger(CmpClientImpl.class);
 
-  private CmpClientConfigurer configurer;
+  private final CmpClientConfigurer configurer;
 
   public CmpClientImpl() {
     configurer = new CmpClientConfigurer();

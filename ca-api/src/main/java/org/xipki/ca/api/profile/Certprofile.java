@@ -452,11 +452,7 @@ public abstract class Certprofile implements Closeable {
 
         groupSet.add(group);
         typeGroups.put(type, group);
-        Set<ASN1ObjectIdentifier> typeSet = groupTypes.get(group);
-        if (typeSet == null) {
-          typeSet = new HashSet<>();
-          groupTypes.put(group, typeSet);
-        }
+        Set<ASN1ObjectIdentifier> typeSet = groupTypes.computeIfAbsent(group, k -> new HashSet<>());
         typeSet.add(type);
       }
 

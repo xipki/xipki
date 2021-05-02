@@ -43,8 +43,7 @@ public class ScepClient extends Client {
 
   private final HostnameVerifier hostnameVerifier;
 
-  public ScepClient(CaIdentifier caId, CaCertValidator caCertValidator)
-      throws MalformedURLException {
+  public ScepClient(CaIdentifier caId, CaCertValidator caCertValidator) {
     this(caId, caCertValidator, null, null);
   }
 

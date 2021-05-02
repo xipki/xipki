@@ -243,7 +243,7 @@ public class HttpMgmtServlet extends HttpServlet {
           MgmtRequest.GenerateCertificate req = parse(in, MgmtRequest.GenerateCertificate.class);
           X509Cert cert = caManager.generateCertificate(req.getCaName(),
               req.getProfileName(), req.getEncodedCsr(), req.getNotBefore(), req.getNotAfter());
-          resp = toByteArray(action, cert);
+          resp = toByteArray(cert);
           break;
         }
         case generateCrlOnDemand: {
@@ -266,7 +266,7 @@ public class HttpMgmtServlet extends HttpServlet {
 
           X509Cert cert = caManager.generateRootCa(caEntry,
               req.getCertprofileName(), req.getEncodedCsr(), req.getSerialNumber());
-          resp = toByteArray(action, cert);
+          resp = toByteArray(cert);
           break;
         }
         case getAliasesForCa: {
@@ -657,8 +657,7 @@ public class HttpMgmtServlet extends HttpServlet {
     }
   } // method doPost
 
-  private static MgmtResponse.ByteArray toByteArray(MgmtAction action, X509Cert cert)
-      throws MyException {
+  private static MgmtResponse.ByteArray toByteArray(X509Cert cert) {
     if (cert == null) {
       return new MgmtResponse.ByteArray(null);
     }

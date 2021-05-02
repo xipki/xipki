@@ -92,11 +92,11 @@ public enum HashAlgo {
     map.put("SHAKE256", SHAKE256);
   }
 
-  private HashAlgo(int length, ASN1ObjectIdentifier oid, String jceName) {
+  HashAlgo(int length, ASN1ObjectIdentifier oid, String jceName) {
     this(length, oid, jceName, false);
   }
 
-  private HashAlgo(int length, ASN1ObjectIdentifier oid, String jceName, boolean withNullParams) {
+  HashAlgo(int length, ASN1ObjectIdentifier oid, String jceName, boolean withNullParams) {
     this.length = length;
     this.oid = oid;
     if (withNullParams) {

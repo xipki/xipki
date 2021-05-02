@@ -406,7 +406,7 @@ public class CaEntry extends MgmtEntry {
         certchainStr.toString());
   } // method toString(boolean, boolean)
 
-  protected static String urisToString(Collection<? extends Object> tokens) {
+  protected static String urisToString(Collection<?> tokens) {
     if (CollectionUtil.isEmpty(tokens)) {
       return null;
     }

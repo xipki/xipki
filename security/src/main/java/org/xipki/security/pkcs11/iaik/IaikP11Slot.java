@@ -763,9 +763,7 @@ class IaikP11Slot extends P11Slot {
         id = generateId(session);
       }
 
-      if (id != null) {
-        template.getId().setByteArrayValue(id);
-      }
+      template.getId().setByteArrayValue(id);
 
       try {
         key = (SecretKey) session.createObject(template);

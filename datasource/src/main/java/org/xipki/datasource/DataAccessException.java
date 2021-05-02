@@ -196,7 +196,7 @@ public class DataAccessException extends Exception {
 
   }
 
-  private Reason reason;
+  private final Reason reason;
 
   /**
    * Constructor for DataAccessException.

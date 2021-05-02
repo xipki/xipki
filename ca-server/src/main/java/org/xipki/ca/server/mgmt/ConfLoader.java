@@ -187,7 +187,7 @@ class ConfLoader {
       UserEntry entryB = queryExecutor.getUser(name, true);
 
       if (entryB != null) {
-        boolean equals = false;
+        boolean equals;
         if (obj instanceof UserEntry) {
           UserEntry entry = (UserEntry) obj;
           equals = entry.equals(entryB, ignoreId);
@@ -403,11 +403,7 @@ class ConfLoader {
       }
       caNames = tmpCaNames;
     } else {
-      List<String> tmpCaNames = new ArrayList<>(manager.x509cas.size());
-      for (String name : manager.x509cas.keySet()) {
-        tmpCaNames.add(name);
-      }
-      caNames = tmpCaNames;
+      caNames = new ArrayList<>(manager.x509cas.keySet());
     }
 
     ByteArrayOutputStream bytesStream = new ByteArrayOutputStream(1048576); // initial 1M

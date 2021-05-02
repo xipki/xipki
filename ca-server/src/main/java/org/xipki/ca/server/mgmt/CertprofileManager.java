@@ -59,11 +59,9 @@ class CertprofileManager {
   }
 
   void close() {
-    if (manager.certprofiles != null) {
-      for (String name : manager.certprofiles.keySet()) {
-        IdentifiedCertprofile certprofile = manager.certprofiles.get(name);
-        shutdownCertprofile(certprofile);
-      }
+    for (String name : manager.certprofiles.keySet()) {
+      IdentifiedCertprofile certprofile = manager.certprofiles.get(name);
+      shutdownCertprofile(certprofile);
     }
   }
 

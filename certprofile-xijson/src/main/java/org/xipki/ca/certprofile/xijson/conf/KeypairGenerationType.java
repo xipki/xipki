@@ -186,7 +186,7 @@ public class KeypairGenerationType extends ValidatableConf {
     }
   } // method validate
 
-  public static enum KeyType {
+  public enum KeyType {
     rsa,
     ec,
     dsa,

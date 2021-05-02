@@ -265,7 +265,7 @@ class Ca2Manager {
 
     CaManagerQueryExecutor queryExecutor = manager.queryExecutor;
 
-    CaInfo ca = queryExecutor.createCaInfo(name, manager.masterMode, manager.certstore);
+    CaInfo ca = queryExecutor.createCaInfo(name, manager.certstore);
     LOG.info("created CA {}: {}", name, ca.toString(false));
     manager.caInfos.put(name, ca);
     manager.idNameMap.addCa(ca.getIdent());
@@ -680,7 +680,7 @@ class Ca2Manager {
     CertificateInfo certInfo;
     try {
       certInfo = ca.generateCert(certTemplateData, manager.byCaRequestor, RequestType.CA,
-          (byte[]) null, CaAuditConstants.MSGID_ca_mgmt);
+              null, CaAuditConstants.MSGID_ca_mgmt);
     } catch (OperationException ex) {
       throw new CaMgmtException(ex.getMessage(), ex);
     }
@@ -901,7 +901,7 @@ class Ca2Manager {
       }
 
       try {
-        manager.certstore.clearPublishQueue((NameId) null, (NameId) null);
+        manager.certstore.clearPublishQueue(null, null);
       } catch (OperationException ex) {
         throw new CaMgmtException(ex.getMessage(), ex);
       }

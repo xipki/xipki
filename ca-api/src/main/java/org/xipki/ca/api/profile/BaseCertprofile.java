@@ -143,7 +143,7 @@ public abstract class BaseCertprofile extends Certprofile {
           if (ObjectIdentifiers.DN.dateOfBirth.equals(type)) {
             rdn = createDateOfBirthRdn(type, rdnValue);
           } else if (ObjectIdentifiers.DN.postalAddress.equals(type)) {
-            rdn = createPostalAddressRdn(type, rdnValue, control, 0);
+            rdn = createPostalAddressRdn(type, rdnValue, control);
           } else {
             String value = X509Util.rdnValueToString(rdnValue);
             rdn = createSubjectRdn(value, type, control);
@@ -161,7 +161,7 @@ public abstract class BaseCertprofile extends Certprofile {
         } else if (ObjectIdentifiers.DN.postalAddress.equals(type)) {
           for (int i = 0; i < len; i++) {
             RDN rdn = createPostalAddressRdn(type, thisRdns[i].getFirst().getValue(),
-                control, i);
+                control);
             rdns.add(rdn);
           }
         } else {
@@ -345,7 +345,7 @@ public abstract class BaseCertprofile extends Certprofile {
     }
 
     ASN1Encodable rdnValue = createRdnValue(text, type, option);
-    return (rdnValue == null) ? null : new RDN(type, rdnValue);
+    return new RDN(type, rdnValue);
   } // method createSubjectRdn
 
   protected void fixRdnControl(RdnControl rdnControl)
@@ -473,7 +473,7 @@ public abstract class BaseCertprofile extends Certprofile {
   } // method createDateOfBirthRdn
 
   private static RDN createPostalAddressRdn(ASN1ObjectIdentifier type, ASN1Encodable rdnValue,
-      RdnControl control, int index)
+                                            RdnControl control)
           throws BadCertTemplateException {
     Args.notNull(type, "type");
 

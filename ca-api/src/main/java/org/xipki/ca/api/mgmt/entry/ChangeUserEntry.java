@@ -40,8 +40,7 @@ public class ChangeUserEntry extends MgmtEntry {
   private ChangeUserEntry() {
   }
 
-  public ChangeUserEntry(NameId ident)
-      throws CaMgmtException {
+  public ChangeUserEntry(NameId ident) {
     this.ident = Args.notNull(ident, "ident");
   }
 
