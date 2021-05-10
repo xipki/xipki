@@ -12,8 +12,6 @@
   <packaging>pom</packaging>
   <name>XiPKI :: assembly :: ${project.artifactId}</name>
   <properties>
-    <!-- overwrite the jdbc.mariadb.version, 2.5.1* does not work in karaf-minimal -->
-    <jdbc.mariadb.version>2.4.2</jdbc.mariadb.version>
     <jdbc.postgresql.version>42.2.14</jdbc.postgresql.version>
     <app.name>QA</app.name>
     <shared.dir>${project.basedir}/../shared</shared.dir>
@@ -110,13 +108,13 @@
                   <groupId>org.mariadb.jdbc</groupId>
                   <artifactId>mariadb-java-client</artifactId>
                   <version>${jdbc.mariadb.version}</version>
-                  <outputDirectory>${project.build.directory}/classes/lib/jdbc</outputDirectory>
+                  <outputDirectory>${project.build.directory}/classes/lib/ext</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.postgresql</groupId>
                   <artifactId>postgresql</artifactId>
                   <version>${jdbc.postgresql.version}</version>
-                  <outputDirectory>${project.build.directory}/classes/lib/jdbc</outputDirectory>
+                  <outputDirectory>${project.build.directory}/classes/lib/ext</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -260,9 +258,9 @@
                     token="-Dcom.sun.management.jmxremote"
                     value=""/>
                 <replace
-                    file="${project.build.directory}/classes/system/org/xipki/feature/qa/${project.version}/qa-${project.version}-features.xml"
-                    token="&lt;!--feature&gt;intern-xipki-jdbc&lt;/feature--&gt;"
-                    value="&lt;feature&gt;intern-xipki-jdbc&lt;/feature&gt;"/>
+                        file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/jre.properties"
+                        token="org.xml.sax.helpers"
+                        value="org.xml.sax.helpers, com.ibm.db2.jcc, org.h2.jdbcx, org.hsqldb.jdbc, org.mariadb.jdbc, com.mysql.jdbc.jdbc2.optional, oracle.jdbc.pool, org.postgresql.ds"/>
               </target>
             </configuration>
             <goals>

@@ -43,7 +43,7 @@
     <snakeyaml.version>1.18</snakeyaml.version>
     <!-- only for runtime -->
     <tinylog.version>2.1.2</tinylog.version>
-    <jdbc.mariadb.version>2.6.1</jdbc.mariadb.version>
+    <jdbc.mariadb.version>2.7.2</jdbc.mariadb.version>
     <!-- Only for test purpose -->
     <junit.version>4.13.1</junit.version>
   </properties>

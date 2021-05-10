@@ -90,6 +90,7 @@ Note that CA and OCSP can be installed in the same servlet container.
 
 1. Unpack the binary `xipki-cli-<version>.tar.gz`
 2. Adapt the CMP client configuration `xipki/cmpclient/cmpclient.json`
+3. If you get "java.lang.ClassNotFoundException: &lt;jdbc class&gt;", please copy the missing JDBC driver jar to the directory `lib/ext`.
 
 ## Configure PKCS#11 device (optional)
 

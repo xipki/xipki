@@ -54,6 +54,7 @@
     <bundle>mvn:org.xipki.shell/ocsp-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-camgmt" version="${project.version}" description="CA management shell">
+    <bundle>mvn:org.osgi/org.osgi.service.jdbc/1.0.0</bundle>
     <bundle>mvn:org.xipki/util/${project.version}</bundle>
     <bundle>mvn:org.xipki/password/${project.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>

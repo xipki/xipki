@@ -77,6 +77,25 @@
             </configuration>
           </execution>
           <execution>
+            <!-- Copy the JDBC jars -->
+            <id>jdbc</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <stripVersion>false</stripVersion>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.mariadb.jdbc</groupId>
+                  <artifactId>mariadb-java-client</artifactId>
+                  <version>${jdbc.mariadb.version}</version>
+                  <outputDirectory>${project.build.directory}/classes/lib/ext</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+          <execution>
             <!-- Extract the TLS keys -->
             <id>unpack-tlskeys</id>
             <phase>generate-resources</phase>
@@ -172,6 +191,10 @@
                     file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/bin/inc"
                     token="-Dcom.sun.management.jmxremote"
                     value=""/>
+                <replace
+                        file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/jre.properties"
+                        token="org.xml.sax.helpers"
+                        value="org.xml.sax.helpers, com.ibm.db2.jcc, org.h2.jdbcx, org.hsqldb.jdbc, org.mariadb.jdbc, com.mysql.jdbc.jdbc2.optional, oracle.jdbc.pool, org.postgresql.ds"/>
               </target>
             </configuration>
             <goals>
