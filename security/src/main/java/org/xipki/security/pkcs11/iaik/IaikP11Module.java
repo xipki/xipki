@@ -47,11 +47,11 @@ public class IaikP11Module extends P11Module {
 
   private static final Logger LOG = LoggerFactory.getLogger(IaikP11Module.class);
 
-  private final Module module;
+  private final iaik.pkcs.pkcs11.Module module;
 
   private String description;
 
-  private IaikP11Module(Module module, P11ModuleConf moduleConf)
+  private IaikP11Module(iaik.pkcs.pkcs11.Module module, P11ModuleConf moduleConf)
       throws P11TokenException {
     super(moduleConf);
     this.module = notNull(module, "module");
@@ -73,7 +73,7 @@ public class IaikP11Module extends P11Module {
 
     Slot[] slotList;
     try {
-      slotList = module.getSlotList(Module.SlotRequirement.ALL_SLOTS);
+      slotList = module.getSlotList(iaik.pkcs.pkcs11.Module.SlotRequirement.ALL_SLOTS);
     } catch (Throwable th) {
       final String msg = "could not getSlotList of module " + moduleConf.getName();
       LogUtil.error(LOG, th, msg);
@@ -151,9 +151,9 @@ public class IaikP11Module extends P11Module {
       throws P11TokenException {
     notNull(moduleConf, "moduleConf");
 
-    Module module;
+    iaik.pkcs.pkcs11.Module module;
     try {
-      module = Module.getInstance(moduleConf.getNativeLibrary());
+      module = iaik.pkcs.pkcs11.Module.getInstance(moduleConf.getNativeLibrary());
     } catch (IOException ex) {
       final String msg = "could not load the PKCS#11 module " + moduleConf.getName();
       LogUtil.error(LOG, ex, msg);
@@ -204,7 +204,7 @@ public class IaikP11Module extends P11Module {
     close(conf.getNativeLibrary(), module);
   }
 
-  private static void close(String modulePath, Module module) {
+  private static void close(String modulePath, iaik.pkcs.pkcs11.Module module) {
     if (module == null) {
       return;
     }
