@@ -261,21 +261,21 @@ if { $printUsage equals "true" } then {
   echo "#################################################################"
   echo "#                    Add certificate profile                    #"
   echo "#################################################################"
-  caqa:profile-check --name subca --type xijson \
+  caqa:profile-check --name subca \
     --conf-file qa/certprofile/certprofile-subca.json
 
-  ca:profile-add --name qa-subca --type xijson \
+  ca:profile-add --name qa-subca \
     --conf-file qa/certprofile/certprofile-subca-complex.json
 
   # name already exists
-  caqa:neg-profile-add --name qa-subca --type xijson \
+  caqa:neg-profile-add --name qa-subca \
     --conf-file qa/certprofile/certprofile-subca-complex.json
 
   # unknown type
   caqa:neg-profile-add --name qa-subca2 --type java:packagename.classname
 
   # invalid conf for the given type
-  caqa:neg-profile-add --name qa-subca --type xijson \
+  caqa:neg-profile-add --name qa-subca \
     --conf invalid-profile-conf
 
   # invalid type
@@ -284,7 +284,7 @@ if { $printUsage equals "true" } then {
   # invalid conf
   caqa:neg-profile-up --name qa-subca --conf invalid-profile-conf
 
-  caqa:profile-check --name qa-subca --type xijson \
+  caqa:profile-check --name qa-subca \
     --conf-file qa/certprofile/certprofile-subca-complex.json
 
   ca:profile-rm -f qa-subca
@@ -363,7 +363,7 @@ if { $printUsage equals "true" } then {
     --validity-mode strict
 
   # for commands neg-gen-rootca
-  ca:profile-add --name rootca --type xijson --conf-file qa/certprofile/certprofile-rootca.json
+  ca:profile-add --name rootca --conf-file qa/certprofile/certprofile-rootca.json
 
   # The CA named rootca2 exists. No new CA with the same name is allowed
 

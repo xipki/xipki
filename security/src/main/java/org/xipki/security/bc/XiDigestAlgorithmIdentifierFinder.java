@@ -62,11 +62,16 @@ public class XiDigestAlgorithmIdentifierFinder
 
   @Override
   public AlgorithmIdentifier find(AlgorithmIdentifier sigAlgId) {
-    HashAlgo algo = digestOids.get(sigAlgId.getAlgorithm());
+    return find(sigAlgId.getAlgorithm());
+  }
+
+  @Override
+  public AlgorithmIdentifier find(ASN1ObjectIdentifier digestOid) {
+    HashAlgo algo = digestOids.get(digestOid);
     if (algo != null) {
       return algo.getAlgorithmIdentifier();
     } else {
-      return dfltFinder.find(sigAlgId);
+      return dfltFinder.find(digestOid);
     }
   }
 

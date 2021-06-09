@@ -154,7 +154,7 @@ public class ProfileCaActions {
 
     @Option(name = "--type", required = true, description = "profile type")
     @Completion(CaCompleters.ProfileTypeCompleter.class)
-    private String type;
+    private String type = "xijson";
 
     @Option(name = "--conf", description = "certificate profile configuration")
     private String conf;
@@ -304,7 +304,7 @@ public class ProfileCaActions {
 
     @Option(name = "--type", description = "profile type")
     @Completion(CaCompleters.ProfileTypeCompleter.class)
-    protected String type;
+    protected String type = "xijson";
 
     @Option(name = "--conf", description = "certificate profile configuration or 'null'")
     protected String conf;

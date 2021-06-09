@@ -17,13 +17,12 @@ list = [ cross subca subca-complex ocsp scep multiple-ous multi-valued-rdn \
   syntax-ext syntax-ext-implicit-tag syntax-ext-explicit-tag apple-wwdr gmt0015 ]
 
 each ($list) {
-  ca:profile-add --type xijson --name ${it} \
+  ca:profile-add --name ${it} \
     --conf-file qa/certprofile/certprofile-${it}.json
 }
 
 ca:profile-add \
   --name tlsa \
-  --type xijson \
   --conf-file qa/certprofile/certprofile-tls.json
 
 ## Publishers
@@ -56,7 +55,6 @@ echo "#################################################################"
 ## Add the profile rootca
 ca:profile-add \
   --name rootca \
-  --type xijson \
   --conf-file qa/certprofile/certprofile-rootca.json
 
 ## Create the CSR for the command caqa:check-cert in QA
