@@ -38,7 +38,7 @@ Deployment in Tomcat 8 and 9
 2. Copy the sub-folders `webapps`, `xipki` and `lib ` to the folder `${CATALINA_HOME}`.
   The folder `xipki` can be moved to other location, in this case the java property `XIPKI_BASE` in
   `setenv.sh` and `setenv.bat` must be adapted to point to the new position.
-3. Download the `bcprov-jdk15on-<version>.jar` and `bcpkix-jdk15on-<version>.jar` from
+3. Download the `bcutil-jdk15on-<version>.jar`, `bcprov-jdk15on-<version>.jar` and `bcpkix-jdk15on-<version>.jar` from
   [BouncyCastle Latest Release](https://www.bouncycastle.org/latest_releases.html) to the folder
   `${CATALINA_HOME}/lib`. The cryptographic libraries are not included since we need the latest release.
 4. (Optional) If you use database other than MariaDB and MySQL, you need to overwrite the
