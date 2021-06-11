@@ -209,7 +209,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.contentCommitment},
         null));
 
-    // Extensions - extenedKeyUsage
+    // Extensions - extendedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
         new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_ocspSigning}, null));
@@ -310,7 +310,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
             KeyUsage.keyEncipherment},
         null));
 
-    // Extensions - extenedKeyUsage
+    // Extensions - extendedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
         new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_emailProtection},
@@ -372,7 +372,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     // Extensions - AuthorityKeyIdentifier
     list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
 
-    // Extensions - extenedKeyUsage
+    // Extensions - extendedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
         new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_serverAuth,
@@ -432,7 +432,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
             KeyUsage.keyEncipherment},
         null));
 
-    // Extensions - extenedKeyUsage
+    // Extensions - extendedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
         new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_serverAuth},
@@ -478,7 +478,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
             KeyUsage.keyEncipherment},
         null));
 
-    // Extensions - extenedKeyUsage
+    // Extensions - extendedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
         new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth},
@@ -570,7 +570,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
             KeyUsage.keyEncipherment},
         null));
 
-    // Extensions - extenedKeyUsage
+    // Extensions - extendedKeyUsage
     list.add(createExtension(Extension.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
         new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth},
