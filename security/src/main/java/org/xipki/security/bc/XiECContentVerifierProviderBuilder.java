@@ -22,6 +22,7 @@ import org.bouncycastle.crypto.Signer;
 import org.bouncycastle.crypto.signers.DSADigestSigner;
 import org.bouncycastle.crypto.signers.ECDSASigner;
 import org.bouncycastle.crypto.signers.SM2Signer;
+import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.DigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcECContentVerifierProviderBuilder;
@@ -43,7 +44,7 @@ import java.security.NoSuchAlgorithmException;
 public class XiECContentVerifierProviderBuilder extends BcECContentVerifierProviderBuilder {
 
   private static final DigestAlgorithmIdentifierFinder digestAlgorithmFinder
-      = XiDigestAlgorithmIdentifierFinder.INSTANCE;
+      = new DefaultDigestAlgorithmIdentifierFinder();
 
   public XiECContentVerifierProviderBuilder() {
     super(digestAlgorithmFinder);
