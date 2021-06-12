@@ -37,10 +37,7 @@
     <pkcs11-wrapper.version>1.4.7</pkcs11-wrapper.version>
     <hikaricp.version>3.4.5</hikaricp.version>
     <fastjson.version>1.2.73</fastjson.version>
-    <!-- Liquibase: do not update to newer version due to bug related to MariaDB 10.3
-         see https://liquibase.jira.com/browse/CORE-3457 for details -->
-    <liquibase.version>3.6.3</liquibase.version>
-    <snakeyaml.version>1.18</snakeyaml.version>
+    <liquibase.version>3.10.3</liquibase.version>
     <!-- only for runtime -->
     <tinylog.version>2.1.2</tinylog.version>
     <jdbc.mariadb.version>2.7.2</jdbc.mariadb.version>
@@ -320,17 +317,6 @@
         <groupId>org.apache.karaf.shell</groupId>
         <artifactId>org.apache.karaf.shell.core</artifactId>
         <version>${karaf.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.liquibase</groupId>
-        <artifactId>liquibase-core</artifactId>
-        <version>${liquibase.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>junit</groupId>
