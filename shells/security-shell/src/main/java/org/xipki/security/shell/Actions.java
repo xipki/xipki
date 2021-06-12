@@ -31,6 +31,7 @@ import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.asn1.x509.qualified.*;
+import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.util.io.pem.PemObject;
@@ -49,6 +50,7 @@ import org.xipki.util.*;
 
 import java.io.*;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.Key;
@@ -103,7 +105,33 @@ public class Actions {
     @Override
     protected Object execute0()
         throws Exception {
-      X509Cert cert = X509Util.parseCert(IoUtil.read(inFile));
+      byte[] bytes = IoUtil.read(inFile);
+      byte[] certBytes = null;
+      byte[] PEM_PREFIX = "-----BEGIN".getBytes(StandardCharsets.UTF_8);
+      if (CompareUtil.areEqual(bytes, 0, PEM_PREFIX, 0, PEM_PREFIX.length)) {
+        try (PemReader r = new PemReader(new InputStreamReader(new ByteArrayInputStream(bytes)))) {
+          PemObject obj;
+          while (true) {
+            obj = r.readPemObject();
+            if (obj == null) {
+              break;
+            }
+
+            if (obj.getType().equalsIgnoreCase("CERTIFICATE")) {
+              certBytes = obj.getContent();
+              break;
+            }
+          }
+
+          if (certBytes == null) {
+            throw new IllegalCmdParamException("found no certificate in " + inFile);
+          }
+        }
+      } else {
+        certBytes = bytes;
+      }
+
+      X509Cert cert = X509Util.parseCert(certBytes);
 
       if (serial != null && serial) {
         return getNumber(cert.getSerialNumber());
