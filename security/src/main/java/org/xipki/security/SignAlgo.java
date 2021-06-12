@@ -154,7 +154,10 @@ public enum SignAlgo {
   GMAC_AES256("AES256GMAC", 0x63, new ASN1ObjectIdentifier("2.16.840.1.101.3.4.1.49")),
 
   //DHPOC-MAC
-  DHPOP_X25519("DHPOP-X25519", 0x5A, Xipki.id_alg_dhPop_x25519, SHA512, false);
+  DHPOP_X25519("DHPOP-X25519", 0x5A, Xipki.id_alg_dhPop_x25519, SHA512, false),
+  DHPOP_X448("DHPOP-X448", 0x5B, Xipki.id_alg_dhPop_x448, SHA512, false);
+
+  private static final int TRAILER_FIELD_BC = 1;
 
   private static final Map<String, SignAlgo> map = new HashMap<>();
 
@@ -473,7 +476,7 @@ public enum SignAlgo {
         throw new NoSuchAlgorithmException("digestAlg != MGF1.digestAlg");
       }
 
-      if (PSSParameterSpec.TRAILER_FIELD_BC != param.getTrailerField().intValueExact()) {
+      if (TRAILER_FIELD_BC != param.getTrailerField().intValueExact()) {
         return null;
       }
 

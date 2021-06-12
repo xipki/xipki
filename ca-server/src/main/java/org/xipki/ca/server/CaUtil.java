@@ -186,7 +186,8 @@ public class CaUtil {
     ASN1ObjectIdentifier algOid = csr.getSignatureAlgorithm().getAlgorithm();
 
     DHSigStaticKeyCertPair kaKeyAndCert = null;
-    if (Xipki.id_alg_dhPop_x25519.equals(algOid)) {
+    if (Xipki.id_alg_dhPop_x25519.equals(algOid)
+            || Xipki.id_alg_dhPop_x448.equals(algOid)) {
       if (dhpocControl != null) {
         DhSigStatic dhSigStatic = DhSigStatic.getInstance(csr.getSignature().getBytes());
         IssuerAndSerialNumber isn = dhSigStatic.getIssuerAndSerial();

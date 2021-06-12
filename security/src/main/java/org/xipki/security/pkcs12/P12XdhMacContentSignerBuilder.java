@@ -136,6 +136,8 @@ public class P12XdhMacContentSignerBuilder {
     String algorithm = privateKey.getAlgorithm();
     if (EdECConstants.X25519.equalsIgnoreCase(algorithm)) {
       this.algo = SignAlgo.DHPOP_X25519;
+    } else if (EdECConstants.X448.equalsIgnoreCase(algorithm)) {
+      this.algo = SignAlgo.DHPOP_X448;
     } else {
       throw new IllegalArgumentException("unsupported key.getAlgorithm(): " + algorithm);
     }

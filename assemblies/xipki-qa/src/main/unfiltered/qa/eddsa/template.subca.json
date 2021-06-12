@@ -30,7 +30,7 @@
 				"rr.aki.required":true,
 				"group.enroll":true,
 				"protection.sigalgo":"SHA256withRSA",
-				"popo.sigalgo":"Ed25519:Ed448:DHPOP-X25519"
+				"popo.sigalgo":"Ed25519:Ed448:DHPOP-X25519:DHPOP-X448"
 			},
 			"cmpResponderName":"responder1",
 			"duplicateKey":true,

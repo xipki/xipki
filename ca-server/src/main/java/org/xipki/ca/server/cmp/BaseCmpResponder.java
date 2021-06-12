@@ -896,7 +896,7 @@ abstract class BaseCmpResponder {
       DhpocControl dhpocControl = getCa().getCaInfo().getDhpocControl();
 
       DHSigStaticKeyCertPair kaKeyAndCert = null;
-      if (SignAlgo.DHPOP_X25519 == popoAlg) {
+      if (SignAlgo.DHPOP_X25519 == popoAlg || SignAlgo.DHPOP_X448 == popoAlg) {
         if (dhpocControl != null) {
           DhSigStatic dhSigStatic = DhSigStatic.getInstance(popoSign.getSignature().getBytes());
           IssuerAndSerialNumber isn = dhSigStatic.getIssuerAndSerial();

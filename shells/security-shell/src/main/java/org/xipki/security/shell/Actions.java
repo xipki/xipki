@@ -745,7 +745,8 @@ public class Actions {
       ASN1ObjectIdentifier algOid = csr.getSignatureAlgorithm().getAlgorithm();
 
       DHSigStaticKeyCertPair peerKeyAndCert = null;
-      if (Xipki.id_alg_dhPop_x25519.equals(algOid)) {
+      if (Xipki.id_alg_dhPop_x25519.equals(algOid)
+              || Xipki.id_alg_dhPop_x448.equals(algOid)) {
         if (peerKeystoreFile == null || keystorePassword == null) {
           System.err.println("could not verify CSR, please specify the peer's keystore");
           return null;

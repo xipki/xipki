@@ -70,6 +70,8 @@ public class ObjectIdentifiers {
 
     public static final ASN1ObjectIdentifier id_alg_dhPop_x25519 = id_xipki_alg.branch("1");
 
+    public static final ASN1ObjectIdentifier id_alg_dhPop_x448 = id_xipki_alg.branch("2");
+
   } // class Xipki
 
   public static class BaseRequirements { // base requirements

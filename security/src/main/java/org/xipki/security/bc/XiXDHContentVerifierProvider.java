@@ -139,6 +139,10 @@ public class XiXDHContentVerifierProvider implements ContentVerifierProvider {
       this.sigAlgOid = Xipki.id_alg_dhPop_x25519;
       this.hmacAlgoithm = "HMAC-SHA512";
       hash = HashAlgo.SHA512;
+    } else if (EdECConstants.X448.equalsIgnoreCase(keyAlgName)) {
+      this.sigAlgOid = Xipki.id_alg_dhPop_x448;
+      this.hmacAlgoithm = "HMAC-SHA512";
+      hash = HashAlgo.SHA512;
     }  else {
       throw new InvalidKeyException("unsupported verifyKey.getAlgorithm(): " + keyAlgName);
     }

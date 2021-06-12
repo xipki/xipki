@@ -88,7 +88,7 @@
 				"rr.aki.required":true,
 				"group.enroll":true,
 				"protection.sigalgo":"SHA256withRSA:SHA256withECDSA",
-				"popo.sigalgo":"SHA256withRSA:SHA256withECDSA:SHA256withDSA:SM3withSM2:ED25519:ED448:DHPOP-X25519"
+				"popo.sigalgo":"SHA256withRSA:SHA256withECDSA:SHA256withDSA:SM3withSM2:ED25519:ED448:DHPOP-X25519:DHPOP-X448"
 			},
 			"cmpResponderName":"responder1",
 			"crlControl":{
