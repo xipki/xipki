@@ -1,0 +1,101 @@
+# Please adapt me
+ROOTCA_SUBJECT="CN=CDRM Root CA1,O=myorg,C=CN"
+SERVER_CA_SUBJECT="CN=CDRM Server CA1,O=myorg,C=CN"
+CLIENT_CA_SUBJECT="CN=CDRM Client CA1,O=myorg,C=CN"
+
+KEYCERTS_DIR = xipki/ca-setup/keycerts
+
+echo "#################################################################"
+echo "#  RootCA:           Load rootca-conf.json                      #"
+echo "#################################################################"
+
+# Generate key and CSR
+
+xi:sm2-p12 --password 1234 --out ${KEYCERTS_DIR}/rootca1.p12
+
+xi:csr-p12 --hash SM3 --gm --p12 ${KEYCERTS_DIR}/rootca1.p12 --password 1234 \
+  --out ${KEYCERTS_DIR}/rootca1.csr --subject "${ROOTCA_SUBJECT}"
+
+# Configure RootCA
+
+xi:copy-file -f xipki/ca-setup/cacert-none/template.rootca-conf.json \
+  xipki/ca-setup/cacert-none/rootca-conf.json
+
+xi:replace --old "REPLACEME-TOKEN_TYPE" --new "pkcs12" \
+  xipki/ca-setup/cacert-none/rootca-conf.json
+
+xi:replace --old "REPLACEME-CA_SIGNERCONF" \
+  --new "algo=SM3withSM2,password=1234,keystore=file:xipki/ca-setup/keycerts/rootca1.p12" \
+  xipki/ca-setup/cacert-none/rootca-conf.json
+
+ca:load-conf --conf-file xipki/ca-setup/cacert-none/rootca-conf.json \
+  --out-dir ${KEYCERTS_DIR}
+
+ca:profile-rm --force rootca
+
+xi:move-file ${KEYCERTS_DIR}/ca-rootca1.crt ${KEYCERTS_DIR}/rootca1.der
+
+xi:update-cert-p12 --p12 ${KEYCERTS_DIR}/rootca1.p12 --password 1234 \
+  --cert ${KEYCERTS_DIR}/rootca1.der
+
+echo "#################################################################"
+echo "#  Server CA:         Load server-ca-conf.json                  #"
+echo "#################################################################"
+
+## Generate keys and CSR
+xi:sm2-p12 --password 1234 --out ${KEYCERTS_DIR}/server-ca1.p12
+
+xi:csr-p12 --hash SM3 --gm --p12 ${KEYCERTS_DIR}/server-ca1.p12 --password 1234 \
+  --out ${KEYCERTS_DIR}/server-ca1.csr --subject "${SERVER_CA_SUBJECT}"
+
+ca:enroll-cert --ca rootca1 --csr ${KEYCERTS_DIR}/server-ca1.csr \
+  --out ${KEYCERTS_DIR}/server-ca1.der --profile server-subca
+
+xi:update-cert-p12 --p12 ${KEYCERTS_DIR}/server-ca1.p12 --password 1234 \
+  --cert ${KEYCERTS_DIR}/server-ca1.der
+
+# Configure CA
+
+xi:copy-file -f xipki/ca-setup/cacert-present/template.server-ca-conf.json \
+  xipki/ca-setup/cacert-present/server-ca-conf.json
+
+xi:replace --old "REPLACEME-TOKEN_TYPE" --new "pkcs12" \
+  xipki/ca-setup/cacert-present/server-ca-conf.json
+
+xi:replace --old "REPLACEME-CA_SIGNERCONF" \
+  --new "algo=SM3withSM2,password=1234,keystore=file:xipki/ca-setup/keycerts/server-ca1.p12" \
+  xipki/ca-setup/cacert-present/server-ca-conf.json
+
+ca:load-conf --conf-file xipki/ca-setup/cacert-present/server-ca-conf.json \
+  --out-dir ${KEYCERTS_DIR}
+
+echo "#################################################################"
+echo "#  Client CA:         Load client-ca-conf.json                  #"
+echo "#################################################################"
+
+## Generate keys and CSR
+xi:sm2-p12 --password 1234 --out ${KEYCERTS_DIR}/client-ca1.p12
+
+xi:csr-p12 --hash SM3 --gm --p12 ${KEYCERTS_DIR}/client-ca1.p12 --password 1234 \
+  --out ${KEYCERTS_DIR}/client-ca1.csr --subject "${CLIENT_CA_SUBJECT}"
+
+ca:enroll-cert --ca rootca1 --csr ${KEYCERTS_DIR}/client-ca1.csr \
+  --out ${KEYCERTS_DIR}/client-ca1.der --profile client-subca
+
+xi:update-cert-p12 --p12 ${KEYCERTS_DIR}/client-ca1.p12 --password 1234 \
+  --cert ${KEYCERTS_DIR}/client-ca1.der
+
+# Configure CA
+
+xi:copy-file -f xipki/ca-setup/cacert-present/template.client-ca-conf.json \
+  xipki/ca-setup/cacert-present/client-ca-conf.json
+
+xi:replace --old "REPLACEME-TOKEN_TYPE" --new "pkcs12" \
+  xipki/ca-setup/cacert-present/client-ca-conf.json
+
+xi:replace --old "REPLACEME-CA_SIGNERCONF" \
+  --new "algo=SM3withSM2,password=1234,keystore=file:xipki/ca-setup/keycerts/client-ca1.p12" \
+  xipki/ca-setup/cacert-present/client-ca-conf.json
+
+ca:load-conf --conf-file xipki/ca-setup/cacert-present/client-ca-conf.json \
+  --out-dir ${KEYCERTS_DIR}

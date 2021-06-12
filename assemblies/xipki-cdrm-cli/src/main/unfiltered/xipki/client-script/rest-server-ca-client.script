@@ -1,0 +1,55 @@
+BASE_URL = https://localhost:8443/ca/rest/server-ca
+
+echo "#################################################################"
+echo "# Server CA:      Manage certificate via REST API               #"
+echo "#################################################################"
+
+CUR_TIME = $(date '+%Y%m%d-%H%M%S')
+
+OUT_DIR=output/server-ca/rest-${CUR_TIME}
+
+CACERT = ${OUT_DIR}/cacert.der
+
+echo "# Get CA certificate"
+
+xi:curl --out ${CACERT} $BASE_URL/cacert
+
+xi:curl --out ${OUT_DIR}/cacertchain.pem $BASE_URL/cacertchain
+
+CA_SHA1FP = $(xi:cert-info --fingerprint --hash SHA1 --in ${CACERT})
+
+## Enroll certificates
+
+echo "=====REST: Enroll (CA generate keypair)====="
+
+list = [contentencryption keygateway keymanagement ocsp server]; each ($list) {
+  profile = $it
+  CN = rest-${profile}-${CUR_TIME}
+
+  xi:curl --out ${OUT_DIR}/${CN}.pem \
+    --data "subject=CN=${CN}.myorg.org,O=myorg CDRM,C=CN" \
+    --header "Content-Type: text/plain; encoding=utf-8" \
+    "$BASE_URL/enroll-cert-cagenkeypair?profile=${profile}"
+}
+
+## Test suspend / unsuspend / revoke
+
+# Generate first test certificate
+profile = server
+CN = reset-${profile}-${CUR_TIME}-revoketest
+
+xi:curl --out ${OUT_DIR}/${CN}.pem \
+  --data "subject=CN=${CN}.myorg.org,O=myorg CDRM,C=CN" \
+  --header "Content-Type: text/plain; encoding=utf-8" \
+  "$BASE_URL/enroll-cert-cagenkeypair?profile=${profile}"
+
+SERIAL = $(xi:cert-info --serial --hex --in ${OUT_DIR}/${CN}.pem)
+
+echo "=====REST: Suspend====="
+xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=certificateHold"
+
+echo "=====REST: Unsuspend====="
+xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=removeFromCRL"
+
+echo "=====REST: Revoke====="
+xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=keyCompromise"

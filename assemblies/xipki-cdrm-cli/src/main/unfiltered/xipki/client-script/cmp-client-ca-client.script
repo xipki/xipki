@@ -1,0 +1,65 @@
+echo "#################################################################"
+echo "# Reset CMP client (only required if CA changed the             #"
+echo "# configuration since last reset / initialization               #"
+echo "#################################################################"
+
+xi:cmp-init
+
+HASH = SHA256
+
+echo "#################################################################"
+echo "#                 Manage certificate via CMP                    #"
+echo "#################################################################"
+
+CUR_TIME = $(date '+%Y%m%d-%H%M%S')
+
+OUT_DIR=output/client-ca/cmp-${CUR_TIME}
+
+CACERT = ${OUT_DIR}/cacert.der
+
+echo "# Get CA certificate"
+
+xi:cmp-cacert \
+  --ca client-ca \
+  --out ${CACERT}
+
+xi:cmp-cacertchain \
+  --ca client-ca \
+  --out ${OUT_DIR}/cacertchain.pem
+
+## Enroll certificates
+
+echo "=====CMP: Enroll (CA generate key pair) via CRMF====="
+
+list = [client]; each ($list) {
+  profile = $it
+  CN = cmp-${profile}-${CUR_TIME}
+  # TODO: only for debug, should be computed by the CA
+  SN = 1234567890123456789012345678901234567890123456789012345678901234
+
+  xi:cmp-enroll-cagenkey \
+    --p12-out ${OUT_DIR}/${CN}.p12 --password 1234 \
+    --cert-out ${OUT_DIR}/${CN}.der --profile ${profile} \
+    --subject "CN=${CN}.myorg.org,SerialNumber=${SN},O=myorg CDRM,C=CN"
+}
+
+## Test suspend / unsuspend / revoke
+
+# Generate first test certificate
+profile = client
+CN = cmp-${profile}-${CUR_TIME}-revoketest
+SN = 1234567890123456789012345678901234567890123456789012345678901234
+
+xi:cmp-enroll-cagenkey \
+  --p12-out ${OUT_DIR}/${CN}.p12 --password 1234 \
+  --cert-out ${OUT_DIR}/${CN}.der --profile ${profile} \
+  --subject "CN=${CN}.myorg.org,SerialNumber=${SN},O=myorg CDRM,C=CN"
+
+echo "=====CMP: Suspend certificate====="
+xi:cmp-revoke --ca client-ca --cert ${OUT_DIR}/${CN}.der --reason certificateHold
+
+echo "=====CMP: Unsuspend certificate====="
+xi:cmp-unrevoke --ca client-ca --cert ${OUT_DIR}/${CN}.der
+
+echo "=====CMP: Revocate certificate====="
+xi:cmp-revoke --ca client-ca --cert ${OUT_DIR}/${CN}.der --reason affiliationChanged

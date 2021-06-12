@@ -1,0 +1,59 @@
+{
+	"cainfoUpdateInterval":10,
+	"cas":[{
+		"name":"rootca",
+		"requestor":"requestor1",
+		"responder":"responder1",
+		"ssl":"ssl1",
+		"url":"https://localhost:8443/ca/cmp/rootca"
+	},{
+		"name":"server-ca",
+		"requestor":"requestor1",
+		"responder":"responder1",
+		"ssl":"ssl1",
+		"url":"https://localhost:8443/ca/cmp/server-ca"
+	},{
+		"name":"client-ca",
+		"requestor":"requestor1",
+		"responder":"responder1",
+		"ssl":"ssl1",
+		"url":"https://localhost:8443/ca/cmp/client-ca"
+	}],
+	"requestors":[{
+		"name":"requestor1",
+		"signRequest":false,
+		"signature":{
+			// Can be commented if the certificate can be retrieved from the signerType and signerConf
+			//"cert":{
+			//	"file":"xipki/keycerts/tlskeys/client/tls-client-cert.der"
+			//},
+			// signerType and signerConf are required if signRequest is true and/or you wish the CA to generate private key
+			"signerType":"pkcs12",
+			"signerConf":"password=1234,algo=SHA256WITHRSA,keystore=file:xipki/keycerts/tlskeys/client/tls-client.p12"
+		}
+	}],
+	"responders":[{
+		"name":"responder1",
+		"cert":{
+			"file":"xipki/keycerts/tlskeys/server/tls-server-cert.der"
+		},
+		"signature":{
+			"signatureAlgos":[
+				"SHA256WITHRSA"
+			]
+		}
+	}],
+	"ssls":[{
+		"name":"ssl1",
+		"hostnameVerifier":"default",
+		"storeType":"pkcs12",
+		"keystore":{
+			"file":"xipki/keycerts/tlskeys/client/tls-client.p12"
+		},
+		"keystorePassword":"1234",
+		"truststore":{
+			"file":"xipki/keycerts/tlskeys/ca/tls-ca-cert.p12"
+		},
+		"truststorePassword":"1234"
+	}]
+}

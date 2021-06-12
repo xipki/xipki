@@ -1,0 +1,63 @@
+echo "#################################################################"
+echo "# Reset CMP client (only required if CA changed the             #"
+echo "# configuration since last reset / initialization               #"
+echo "#################################################################"
+
+xi:cmp-init
+
+HASH = SHA256
+
+echo "#################################################################"
+echo "#                 Manage certificate via CMP                    #"
+echo "#################################################################"
+
+CUR_TIME = $(date '+%Y%m%d-%H%M%S')
+
+OUT_DIR=output/server-ca/cmp-${CUR_TIME}
+
+CACERT = ${OUT_DIR}/cacert.der
+
+echo "# Get CA certificate"
+
+xi:cmp-cacert \
+  --ca server-ca \
+  --out ${CACERT}
+
+xi:cmp-cacertchain \
+  --ca server-ca \
+  --out ${OUT_DIR}/cacertchain.pem
+
+## Enroll certificates
+
+echo "=====CMP: Enroll (CA generate key pair) via CRMF====="
+
+list = [contentencryption keygateway keymanagement ocsp server]; each ($list) {
+  profile = $it
+  CN = cmp-${profile}-${CUR_TIME}
+
+  xi:cmp-enroll-cagenkey \
+    --p12-out ${OUT_DIR}/${CN}.p12 --password 1234 \
+    --cert-out ${OUT_DIR}/${CN}.der --profile ${profile} \
+    --subject "CN=${CN}.myorg.org,O=myorg CDRM,C=CN"
+}
+
+## Test suspend / unsuspend / revoke
+
+# Generate first test certificate
+profile = server
+CN = cmp-${profile}-${CUR_TIME}-revoketest
+
+xi:cmp-enroll-cagenkey \
+  --p12-out ${OUT_DIR}/${CN}.p12 --password 1234 \
+  --cert-out ${OUT_DIR}/${CN}.der --profile ${profile} \
+  --subject "CN=${CN}.myorg.org,O=myorg CDRM,C=CN"
+
+echo "=====CMP: Suspend certificate====="
+xi:cmp-revoke --ca server-ca --cert ${OUT_DIR}/${CN}.der --reason certificateHold
+
+echo "=====CMP: Unsuspend certificate====="
+xi:cmp-unrevoke --ca server-ca --cert ${OUT_DIR}/${CN}.der
+
+echo "=====CMP: Revocate certificate====="
+xi:cmp-revoke --ca server-ca --cert ${OUT_DIR}/${CN}.der --reason affiliationChanged
+
