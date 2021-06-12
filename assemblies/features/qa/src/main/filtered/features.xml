@@ -3,16 +3,6 @@
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
   <repository>mvn:org.xipki.feature/cli/${project.version}/xml/features</repository>
-  <feature name="xipki-dbtool" version="${project.version}" description="Database tool">
-    <bundle>mvn:org.osgi/org.osgi.service.jdbc/1.0.0</bundle>
-    <bundle>mvn:org.xipki/util/${project.version}</bundle>
-    <bundle>mvn:org.xipki/password/${project.version}</bundle>
-    <bundle>mvn:org.yaml/snakeyaml/${snakeyaml.version}</bundle>
-    <bundle>mvn:org.liquibase/liquibase-core/${liquibase.version}</bundle>
-    <bundle>mvn:org.xipki/dbtool/${project.version}</bundle>
-    <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
-    <bundle>mvn:org.xipki.shell/dbtool-shell/${project.version}</bundle>
-  </feature>
   <feature name="netty-tcnative" version="${netty-tcnative.version}" description="netty-tcnative">
     <bundle>mvn:io.netty/netty-tcnative-boringssl-static/${netty-tcnative.version}</bundle>
   </feature>

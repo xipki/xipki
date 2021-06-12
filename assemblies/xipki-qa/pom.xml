@@ -33,6 +33,12 @@
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
+    <dependency>
+      <groupId>org.xipki.assembly</groupId>
+      <artifactId>dbtool</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
   </dependencies>
   <build>
     <resources>
@@ -185,6 +191,24 @@
               </artifactItems>
             </configuration>
           </execution>
+          <execution>
+            <id>copy-dbtool</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}</outputDirectory>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xipki.assembly</groupId>
+                  <artifactId>dbtool</artifactId>
+                  <version>${project.version}</version>
+                  <type>zip</type>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>
@@ -212,7 +236,7 @@
                 <feature>xipki-caclient</feature>
                 <feature>xipki-ocspclient</feature>
                 <feature>xipki-scepclient</feature>
-                <feature>xipki-dbtool</feature>
+                <!--feature>xipki-dbtool</feature-->
                 <feature>xipki-camgmt</feature>
                 <feature>xipki-ocspmgmt</feature>
                 <feature>netty-tcnative</feature>

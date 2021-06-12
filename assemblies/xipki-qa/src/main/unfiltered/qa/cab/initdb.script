@@ -7,12 +7,12 @@ sleep 1
 
 source qa/setenv.script
 
-xi:initdb \
+shell:exec dbtool/bin/initdb.sh \
   --force \
   --db-conf ${XIPKI_DIR}/etc/ca/database/ca-db.properties \
-  --db-schema xipki/sql/ca-init.xml
+  --db-schema dbtool/sql/ca-init.xml
 
-xi:initdb \
+shell:exec dbtool/bin/initdb.sh \
   --force \
   --db-conf ${XIPKI_DIR}/etc/ca/database/ocsp-db.properties \
-  --db-schema xipki/sql/ocsp-init.xml
+  --db-schema dbtool/sql/ocsp-init.xml

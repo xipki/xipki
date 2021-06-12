@@ -8,7 +8,8 @@ if { "${CA_TYPE}" equals "SM2" } then {
 
 sleep 1
 
-xi:initdb --force \
+shell:exec dbtool/bin/initdb.sh \
+  --force \
   --db-conf ${XIPKI_DIR}/etc/ca/database/ca-db.properties \
   --db-schema xipki/sql/ca-init.xml
 

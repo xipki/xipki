@@ -65,8 +65,7 @@
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
-    <!-- Copy over start scripts -->
-    <!-- Copy over start scripts -->
+    <!-- Copy start scripts -->
     <fileSet>
       <directory>${project.build.directory}/apache-karaf-minimal-${karaf.version}/bin</directory>
       <includes>
@@ -121,6 +120,23 @@
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
+    <!-- Copy dbtool -->
+    <fileSet>
+      <directory>${project.build.directory}/dbtool-${project.version}/</directory>
+      <excludes>
+        <exclude>lib/jdbc/*</exclude>
+        <exclude>bin/*</exclude>
+      </excludes>
+      <outputDirectory>dbtool</outputDirectory>
+    </fileSet>
+    <!--fileSet>
+      <directory>${project.build.directory}/dbtool-${project.version}/</directory>
+      <excludes>
+        <exclude>lib/jdbc/*</exclude>
+        <exclude>bin/*</exclude>
+      </excludes>
+      <outputDirectory>dbtool</outputDirectory>
+    </fileSet-->
   </fileSets>
   <files>
     <file>

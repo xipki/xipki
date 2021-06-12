@@ -34,7 +34,7 @@ echo "==========================================================================
 echo "||                             Import CA Database                         ||"
 echo "============================================================================"
 
-xi:initdb \
+shell:exec dbtool/bin/initdb.sh \
   --force \
   --db-conf ${XIPKI_DIR}/etc/ca/database/ca-db.properties \
   --db-schema xipki/sql/ca-init.xml
@@ -48,7 +48,7 @@ echo "==========================================================================
 echo "||                            Import OCSP Database                        ||"
 echo "============================================================================"
 
-xi:initdb \
+shell:exec dbtool/bin/initdb.sh \
   --force \
   --db-conf ${XIPKI_DIR}/etc/ca/database/ocsp-db.properties \
   --db-schema xipki/sql/ocsp-init.xml
@@ -62,7 +62,7 @@ echo "==========================================================================
 echo "||                        IMPORT OCSP DATABASE FROM CA                    ||"
 echo "============================================================================"
 
-xi:initdb \
+shell:exec dbtool/bin/initdb.sh \
   --force \
   --db-conf ${XIPKI_DIR}/etc/ca/database/ocsp-db.properties \
   --db-schema xipki/sql/ocsp-init.xml
