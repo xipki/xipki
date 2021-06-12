@@ -39,7 +39,6 @@ import org.xipki.ca.certprofile.xijson.conf.PolicyMappings;
 import org.xipki.ca.certprofile.xijson.conf.PolicyMappings.PolicyIdMappingType;
 import org.xipki.ca.certprofile.xijson.conf.*;
 import org.xipki.ca.certprofile.xijson.conf.QcStatements.*;
-import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.ctlog.CtLog.SignedCertificateTimestampList;
@@ -788,8 +787,15 @@ class O2tChecker extends ExtensionChecker {
     // subjectKeyIdentifier
     SubjectKeyIdentifier asn1 = SubjectKeyIdentifier.getInstance(extnValue);
     byte[] ski = asn1.getKeyIdentifier();
-    byte[] pkData = subjectPublicKeyInfo.getPublicKeyData().getBytes();
-    byte[] expectedSki = HashAlgo.SHA1.hash(pkData);
+
+    byte[] expectedSki ;
+    try {
+      expectedSki = getCertprofile().getSubjectKeyIdentifier(subjectPublicKeyInfo).getKeyIdentifier();
+    } catch (CertprofileException e) {
+      failureMsg.append("error computing expected SubjectKeyIdentifier");
+      return;
+    }
+
     if (!Arrays.equals(expectedSki, ski)) {
       addViolation(failureMsg, "SKI", hex(ski), hex(expectedSki));
     }

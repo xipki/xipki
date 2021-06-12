@@ -17,6 +17,7 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
+import org.xipki.ca.api.profile.SubjectKeyIdentifierControl;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.security.X509ExtensionType.ConstantExtnValue;
 import org.xipki.util.InvalidConfException;
@@ -60,6 +61,9 @@ public class ExtensionType extends ValidatableConf {
 
   @JSONField(ordinal = 5)
   private AuthorityKeyIdentifier authorityKeyIdentifier;
+
+  @JSONField(ordinal = 5)
+  private SubjectKeyIdentifierControl subjectKeyIdentifier;
 
   @JSONField(ordinal = 5)
   private BasicConstraints basicConstrains;
@@ -204,6 +208,14 @@ public class ExtensionType extends ValidatableConf {
 
   public void setAuthorityKeyIdentifier(AuthorityKeyIdentifier authorityKeyIdentifier) {
     this.authorityKeyIdentifier = authorityKeyIdentifier;
+  }
+
+  public SubjectKeyIdentifierControl getSubjectKeyIdentifier() {
+    return subjectKeyIdentifier;
+  }
+
+  public void setSubjectKeyIdentifier(SubjectKeyIdentifierControl subjectKeyIdentifier) {
+    this.subjectKeyIdentifier = subjectKeyIdentifier;
   }
 
   public BasicConstraints getBasicConstrains() {
@@ -416,6 +428,7 @@ public class ExtensionType extends ValidatableConf {
     validate(subjectAltName);
     validate(subjectDirectoryAttributs);
     validate(subjectInfoAccess);
+    validate(subjectKeyIdentifier);
     validate(tlsFeature);
     validate(validityModel);
     validate(syntax);

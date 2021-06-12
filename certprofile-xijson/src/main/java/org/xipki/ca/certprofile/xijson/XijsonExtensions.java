@@ -60,43 +60,18 @@ import org.xipki.ca.api.profile.Certprofile.KeyUsageControl;
 import org.xipki.ca.api.profile.Certprofile.SubjectControl;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
-import org.xipki.ca.certprofile.xijson.conf.AdditionalInformation;
-import org.xipki.ca.certprofile.xijson.conf.AdmissionSyntax;
-import org.xipki.ca.certprofile.xijson.conf.AuthorityInfoAccess;
-import org.xipki.ca.certprofile.xijson.conf.AuthorityKeyIdentifier;
-import org.xipki.ca.certprofile.xijson.conf.BasicConstraints;
-import org.xipki.ca.certprofile.xijson.conf.BiometricInfo;
-import org.xipki.ca.certprofile.xijson.conf.CertificatePolicies;
-import org.xipki.ca.certprofile.xijson.conf.CrlDistributionPoints;
+import org.xipki.ca.api.profile.SubjectKeyIdentifierControl;
+import org.xipki.ca.certprofile.xijson.conf.*;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableInt;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
-import org.xipki.ca.certprofile.xijson.conf.ExtendedKeyUsage;
-import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
-import org.xipki.ca.certprofile.xijson.conf.ExtnSyntax;
-import org.xipki.ca.certprofile.xijson.conf.GeneralNameType;
-import org.xipki.ca.certprofile.xijson.conf.InhibitAnyPolicy;
-import org.xipki.ca.certprofile.xijson.conf.KeyUsage;
-import org.xipki.ca.certprofile.xijson.conf.NameConstraints;
-import org.xipki.ca.certprofile.xijson.conf.PolicyConstraints;
-import org.xipki.ca.certprofile.xijson.conf.PolicyMappings;
-import org.xipki.ca.certprofile.xijson.conf.PrivateKeyUsagePeriod;
-import org.xipki.ca.certprofile.xijson.conf.QcStatements;
 import org.xipki.ca.certprofile.xijson.conf.QcStatements.PdsLocationType;
 import org.xipki.ca.certprofile.xijson.conf.QcStatements.QcEuLimitValueType;
 import org.xipki.ca.certprofile.xijson.conf.QcStatements.QcStatementType;
 import org.xipki.ca.certprofile.xijson.conf.QcStatements.QcStatementValueType;
 import org.xipki.ca.certprofile.xijson.conf.QcStatements.Range2Type;
-import org.xipki.ca.certprofile.xijson.conf.Restriction;
-import org.xipki.ca.certprofile.xijson.conf.SmimeCapabilities;
 import org.xipki.ca.certprofile.xijson.conf.SmimeCapabilities.SmimeCapability;
 import org.xipki.ca.certprofile.xijson.conf.SmimeCapabilities.SmimeCapabilityParameter;
-import org.xipki.ca.certprofile.xijson.conf.SubjectDirectoryAttributs;
-import org.xipki.ca.certprofile.xijson.conf.SubjectInfoAccess;
 import org.xipki.ca.certprofile.xijson.conf.SubjectInfoAccess.Access;
-import org.xipki.ca.certprofile.xijson.conf.SubjectToSubjectAltNameType;
-import org.xipki.ca.certprofile.xijson.conf.TlsFeature;
-import org.xipki.ca.certprofile.xijson.conf.ValidityModel;
-import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.util.X509Util;
@@ -141,6 +116,8 @@ public class XijsonExtensions {
   private final Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls;
 
   private boolean useIssuerAndSerialInAki;
+
+  private SubjectKeyIdentifierControl subjectKeyIdentifier;
 
   private ExtensionValue inhibitAnyPolicy;
 
@@ -196,6 +173,9 @@ public class XijsonExtensions {
 
     // AuthorityKeyIdentifier
     initAuthorityKeyIdentifier(extnIds, extensions);
+
+    // SubjectKeyIdentifier
+    initSubjectKeyIdentifier(extnIds, extensions);
 
     // BasicConstrains
     initBasicConstraints(extnIds, extensions);
@@ -449,6 +429,15 @@ public class XijsonExtensions {
       this.useIssuerAndSerialInAki = extConf != null && extConf.isUseIssuerAndSerial();
     }
   } // method initAuthorityKeyIdentifier
+
+  private void initSubjectKeyIdentifier(Set<ASN1ObjectIdentifier> extnIds,
+                                          Map<String, ExtensionType> extensions) {
+    ASN1ObjectIdentifier type = Extension.subjectKeyIdentifier;
+    if (extensionControls.containsKey(type)) {
+      extnIds.remove(type);
+      this.subjectKeyIdentifier = getExtension(type, extensions).getSubjectKeyIdentifier();
+    }
+  } // method initSubjectKeyIdentifier
 
   private void initBasicConstraints(Set<ASN1ObjectIdentifier> extnIds,
       Map<String, ExtensionType> extensions) {
@@ -1022,6 +1011,10 @@ public class XijsonExtensions {
 
   public boolean isUseIssuerAndSerialInAki() {
     return useIssuerAndSerialInAki;
+  }
+
+  public SubjectKeyIdentifierControl getSubjectKeyIdentifier() {
+    return subjectKeyIdentifier;
   }
 
   public ExtensionValue getInhibitAnyPolicy() {

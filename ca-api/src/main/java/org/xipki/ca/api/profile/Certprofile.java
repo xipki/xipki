@@ -21,10 +21,12 @@ import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.CertificatePolicies;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.BadFormatException;
 import org.xipki.ca.api.PublicCaInfo;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.SignAlgo;
 import org.xipki.util.Args;
@@ -33,6 +35,7 @@ import org.xipki.util.StringUtil;
 import org.xipki.util.Validity;
 
 import java.io.Closeable;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 /**
@@ -737,6 +740,46 @@ public abstract class Certprofile implements Closeable {
    */
   public int getMaxCertSize() {
     return 0;
+  }
+
+  public SubjectKeyIdentifier getSubjectKeyIdentifier(
+          SubjectPublicKeyInfo subjectPublicKeyInfo) throws CertprofileException {
+    SubjectKeyIdentifierControl control = getSubjectKeyIdentifierControl();
+    SubjectKeyIdentifierControl.SubjectKeyIdentifierMethod method = null;
+    String hashAlgo = null;
+    if (control != null) {
+      method = control.getMethod();
+      hashAlgo = control.getHashAlgo();
+    }
+
+    HashAlgo hash;
+    if (hashAlgo == null) {
+      hash = HashAlgo.SHA1;
+    } else {
+      try {
+        hash = HashAlgo.getInstance(hashAlgo);
+      } catch (NoSuchAlgorithmException e) {
+        throw new CertprofileException("unknown hash algorithm " + hashAlgo);
+      }
+    }
+
+    byte[] encodedSpki = subjectPublicKeyInfo.getPublicKeyData().getBytes();
+    byte[] skiValue = hash.hash(encodedSpki);
+    if (method == null || method == SubjectKeyIdentifierControl.SubjectKeyIdentifierMethod.METHOD_1) {
+      // do nothing
+    } else if (method == SubjectKeyIdentifierControl.SubjectKeyIdentifierMethod.METHOD_2) {
+      byte[] bytes = Arrays.copyOfRange(skiValue, skiValue.length - 8, skiValue.length);
+      bytes[0] &= 0x0F;
+      bytes[0] |= 0x40;
+    } else {
+      throw new CertprofileException("unknown SubjectKeyIdentifierMethod " + method);
+    }
+
+    return new SubjectKeyIdentifier(skiValue);
+  }
+
+  protected SubjectKeyIdentifierControl getSubjectKeyIdentifierControl() {
+    return null;
   }
 
 }

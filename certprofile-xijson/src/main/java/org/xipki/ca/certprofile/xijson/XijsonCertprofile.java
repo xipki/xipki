@@ -68,25 +68,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.PublicCaInfo;
-import org.xipki.ca.api.profile.BaseCertprofile;
-import org.xipki.ca.api.profile.CertprofileException;
-import org.xipki.ca.api.profile.ExtensionValue;
-import org.xipki.ca.api.profile.ExtensionValues;
-import org.xipki.ca.api.profile.KeyParametersOption;
-import org.xipki.ca.api.profile.KeypairGenControl;
-import org.xipki.ca.api.profile.Range;
-import org.xipki.ca.api.profile.SubjectDnSpec;
-import org.xipki.ca.api.profile.TextVadidator;
+import org.xipki.ca.api.profile.*;
 import org.xipki.ca.certprofile.xijson.AdmissionExtension.AdmissionSyntaxOption;
-import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
-import org.xipki.ca.certprofile.xijson.conf.ExtnSyntax;
-import org.xipki.ca.certprofile.xijson.conf.KeypairGenerationType;
+import org.xipki.ca.certprofile.xijson.conf.*;
 import org.xipki.ca.certprofile.xijson.conf.KeypairGenerationType.KeyType;
 import org.xipki.ca.certprofile.xijson.conf.QcStatements.Range2Type;
-import org.xipki.ca.certprofile.xijson.conf.Subject;
 import org.xipki.ca.certprofile.xijson.conf.Subject.RdnType;
 import org.xipki.ca.certprofile.xijson.conf.Subject.ValueType;
-import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
@@ -1123,6 +1111,11 @@ public class XijsonCertprofile extends BaseCertprofile {
   @Override
   public boolean useIssuerAndSerialInAki() {
     return extensions.isUseIssuerAndSerialInAki();
+  }
+
+  @Override
+  protected SubjectKeyIdentifierControl getSubjectKeyIdentifierControl() {
+    return extensions.getSubjectKeyIdentifier();
   }
 
   @Override
