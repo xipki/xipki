@@ -17,62 +17,28 @@
 
 package org.xipki.p11proxy.servlet;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.PublicKey;
-import java.security.cert.CertificateException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1Object;
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.BadAsn1ObjectException;
 import org.xipki.security.X509Cert;
-import org.xipki.security.XiSecurityException;
-import org.xipki.security.pkcs11.P11CryptService;
-import org.xipki.security.pkcs11.P11DuplicateEntityException;
-import org.xipki.security.pkcs11.P11Identity;
-import org.xipki.security.pkcs11.P11IdentityId;
-import org.xipki.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.security.pkcs11.P11Params;
+import org.xipki.security.pkcs11.*;
 import org.xipki.security.pkcs11.P11Params.P11ByteArrayParams;
 import org.xipki.security.pkcs11.P11Params.P11IVParams;
-import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.security.pkcs11.P11SlotIdentifier;
-import org.xipki.security.pkcs11.P11TokenException;
-import org.xipki.security.pkcs11.P11UnknownEntityException;
-import org.xipki.security.pkcs11.P11UnsupportedMechanismException;
 import org.xipki.security.pkcs11.proxy.P11ProxyConstants;
-import org.xipki.security.pkcs11.proxy.asn1.AddCertParams;
-import org.xipki.security.pkcs11.proxy.asn1.DigestSecretKeyTemplate;
-import org.xipki.security.pkcs11.proxy.asn1.GenDSAKeypairParams;
-import org.xipki.security.pkcs11.proxy.asn1.GenECEdwardsOrMontgomeryKeypairParams;
-import org.xipki.security.pkcs11.proxy.asn1.GenECKeypairParams;
-import org.xipki.security.pkcs11.proxy.asn1.GenRSAKeypairParams;
-import org.xipki.security.pkcs11.proxy.asn1.GenSM2KeypairParams;
-import org.xipki.security.pkcs11.proxy.asn1.GenSecretKeyParams;
-import org.xipki.security.pkcs11.proxy.asn1.IdentityId;
-import org.xipki.security.pkcs11.proxy.asn1.ImportSecretKeyParams;
-import org.xipki.security.pkcs11.proxy.asn1.ObjectIdAndCert;
-import org.xipki.security.pkcs11.proxy.asn1.ObjectIdentifier;
-import org.xipki.security.pkcs11.proxy.asn1.RSAPkcsPssParams;
-import org.xipki.security.pkcs11.proxy.asn1.RemoveObjectsParams;
-import org.xipki.security.pkcs11.proxy.asn1.ServerCaps;
-import org.xipki.security.pkcs11.proxy.asn1.SignTemplate;
-import org.xipki.security.pkcs11.proxy.asn1.SlotIdAndObjectId;
-import org.xipki.security.pkcs11.proxy.asn1.SlotIdentifier;
+import org.xipki.security.pkcs11.proxy.asn1.*;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.Hex;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
+
+import java.io.IOException;
+import java.security.PublicKey;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * The responder of P11Proxy.

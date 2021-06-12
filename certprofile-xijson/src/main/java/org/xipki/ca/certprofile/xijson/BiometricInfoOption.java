@@ -17,12 +17,6 @@
 
 package org.xipki.ca.certprofile.xijson;
 
-import static org.xipki.util.Args.notNull;
-
-import java.security.NoSuchAlgorithmException;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
 import org.xipki.ca.certprofile.xijson.conf.BiometricInfo;
@@ -30,6 +24,12 @@ import org.xipki.ca.certprofile.xijson.conf.BiometricInfo.BiometricTypeType;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.security.HashAlgo;
 import org.xipki.util.TripleState;
+
+import java.security.NoSuchAlgorithmException;
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * Control of the extension BiometricInfo.

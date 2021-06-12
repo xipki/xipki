@@ -17,10 +17,7 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
+import com.alibaba.fastjson.annotation.JSONField;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
@@ -36,7 +33,9 @@ import org.xipki.util.CollectionUtil;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Extension CertificatePolicies.

@@ -17,19 +17,7 @@
 
 package org.xipki.security.pkcs11.provider;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.SignatureException;
-import java.security.SignatureSpi;
-import java.security.interfaces.ECPublicKey;
-import java.security.spec.AlgorithmParameterSpec;
-import java.security.spec.ECPoint;
-
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.XiSecurityException;
@@ -42,7 +30,13 @@ import org.xipki.security.util.GMUtil;
 import org.xipki.security.util.SignerUtil;
 import org.xipki.util.StringUtil;
 
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.security.*;
+import java.security.interfaces.ECPublicKey;
+import java.security.spec.AlgorithmParameterSpec;
+import java.security.spec.ECPoint;
 
 /**
  * PKCS#11 SM3withSM2 {@link SignatureSpi}.

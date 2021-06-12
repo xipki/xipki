@@ -17,10 +17,7 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import java.math.BigInteger;
-import java.util.LinkedList;
-import java.util.List;
-
+import com.alibaba.fastjson.annotation.JSONField;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralSubtree;
@@ -31,7 +28,9 @@ import org.xipki.util.CollectionUtil;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import java.math.BigInteger;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Extension NameConstraints.

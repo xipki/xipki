@@ -17,26 +17,18 @@
 
 package org.xipki.security.pkcs11.emulator;
 
-import static org.xipki.util.Args.notNull;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolverException;
-import org.xipki.security.pkcs11.P11Module;
-import org.xipki.security.pkcs11.P11ModuleConf;
-import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.security.pkcs11.P11SlotIdentifier;
-import org.xipki.security.pkcs11.P11TokenException;
+import org.xipki.security.pkcs11.*;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * {@link P11Module} for PKCS#11 emulator.

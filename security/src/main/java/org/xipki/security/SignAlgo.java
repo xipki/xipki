@@ -38,7 +38,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.Signature;
 import java.security.interfaces.*;
-import java.security.spec.PSSParameterSpec;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;

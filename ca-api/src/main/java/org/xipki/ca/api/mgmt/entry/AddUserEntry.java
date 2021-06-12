@@ -18,7 +18,6 @@
 package org.xipki.ca.api.mgmt.entry;
 
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.util.Args;
 import org.xipki.util.StringUtil;
 

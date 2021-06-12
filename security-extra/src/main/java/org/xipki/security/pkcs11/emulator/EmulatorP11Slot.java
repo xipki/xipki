@@ -17,46 +17,8 @@
 
 package org.xipki.security.pkcs11.emulator;
 
-import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notNull;
-import static org.xipki.util.Args.positive;
-import static org.xipki.util.IoUtil.read;
-import static org.xipki.util.IoUtil.save;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigInteger;
-import java.nio.file.Files;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.KeyPair;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.SecureRandom;
-import java.security.cert.CertificateException;
-import java.security.interfaces.DSAPublicKey;
-import java.security.interfaces.ECPublicKey;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.DSAPublicKeySpec;
-import java.security.spec.ECParameterSpec;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.RSAPublicKeySpec;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-
+import iaik.pkcs.pkcs11.wrapper.Functions;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
@@ -76,22 +38,36 @@ import org.slf4j.LoggerFactory;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
-import org.xipki.security.pkcs11.P11Identity;
-import org.xipki.security.pkcs11.P11IdentityId;
+import org.xipki.security.pkcs11.*;
 import org.xipki.security.pkcs11.P11ModuleConf.P11MechanismFilter;
 import org.xipki.security.pkcs11.P11ModuleConf.P11NewObjectConf;
-import org.xipki.security.pkcs11.P11ObjectIdentifier;
-import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.security.pkcs11.P11SlotIdentifier;
-import org.xipki.security.pkcs11.P11TokenException;
-import org.xipki.security.pkcs11.P11UnknownEntityException;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 
-import iaik.pkcs.pkcs11.wrapper.Functions;
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.*;
+import java.math.BigInteger;
+import java.nio.file.Files;
+import java.security.*;
+import java.security.cert.CertificateException;
+import java.security.interfaces.DSAPublicKey;
+import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.DSAPublicKeySpec;
+import java.security.spec.ECParameterSpec;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.RSAPublicKeySpec;
+import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
+
+import static org.xipki.util.Args.*;
+import static org.xipki.util.IoUtil.read;
+import static org.xipki.util.IoUtil.save;
 
 /**
  * {@link P11Slot} for PKCS#11 emulator.

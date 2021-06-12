@@ -17,9 +17,9 @@
 
 package org.xipki.security.pkcs11.provider;
 
-import java.security.SignatureSpi;
-
 import org.xipki.security.HashAlgo;
+
+import java.security.SignatureSpi;
 
 /**
  * PKCS#11 ECDSA {@link SignatureSpi}.

@@ -17,16 +17,16 @@
 
 package org.xipki.security.pkcs11.proxy.asn1;
 
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
 import org.xipki.security.BadAsn1ObjectException;
 import org.xipki.util.Args;
+
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * List of {@link ObjectIdentifier}s.

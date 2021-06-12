@@ -17,8 +17,6 @@
 
 package org.xipki.security.pkcs11.proxy;
 
-import java.security.PublicKey;
-
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.xipki.security.X509Cert;
@@ -28,11 +26,13 @@ import org.xipki.security.pkcs11.P11Params;
 import org.xipki.security.pkcs11.P11Params.P11ByteArrayParams;
 import org.xipki.security.pkcs11.P11Params.P11IVParams;
 import org.xipki.security.pkcs11.P11Params.P11RSAPkcsPssParams;
+import org.xipki.security.pkcs11.P11TokenException;
 import org.xipki.security.pkcs11.proxy.asn1.DigestSecretKeyTemplate;
 import org.xipki.security.pkcs11.proxy.asn1.ObjectIdentifier;
 import org.xipki.security.pkcs11.proxy.asn1.RSAPkcsPssParams;
 import org.xipki.security.pkcs11.proxy.asn1.SignTemplate;
-import org.xipki.security.pkcs11.P11TokenException;
+
+import java.security.PublicKey;
 
 /**
  * {@link P11Identity} for PKCS#11 proxy.

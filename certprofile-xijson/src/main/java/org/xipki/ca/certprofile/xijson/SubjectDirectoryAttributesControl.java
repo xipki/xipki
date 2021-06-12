@@ -17,11 +17,11 @@
 
 package org.xipki.ca.certprofile.xijson;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.util.Args;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Control of SubjectDirectoryAttributes.

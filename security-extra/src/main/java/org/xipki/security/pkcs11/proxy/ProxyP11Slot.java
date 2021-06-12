@@ -17,13 +17,6 @@
 
 package org.xipki.security.pkcs11.proxy;
 
-import java.math.BigInteger;
-import java.security.PublicKey;
-import java.security.cert.CertificateException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -31,32 +24,19 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.security.BadAsn1ObjectException;
 import org.xipki.security.X509Cert;
-import org.xipki.security.pkcs11.P11Identity;
-import org.xipki.security.pkcs11.P11IdentityId;
+import org.xipki.security.pkcs11.*;
 import org.xipki.security.pkcs11.P11ModuleConf.P11MechanismFilter;
-import org.xipki.security.pkcs11.proxy.asn1.AddCertParams;
-import org.xipki.security.pkcs11.proxy.asn1.GenDSAKeypairParams;
-import org.xipki.security.pkcs11.proxy.asn1.GenECEdwardsOrMontgomeryKeypairParams;
-import org.xipki.security.pkcs11.proxy.asn1.GenECKeypairParams;
-import org.xipki.security.pkcs11.proxy.asn1.GenRSAKeypairParams;
-import org.xipki.security.pkcs11.proxy.asn1.GenSM2KeypairParams;
-import org.xipki.security.pkcs11.proxy.asn1.GenSecretKeyParams;
-import org.xipki.security.pkcs11.proxy.asn1.IdentityId;
-import org.xipki.security.pkcs11.proxy.asn1.ImportSecretKeyParams;
-import org.xipki.security.pkcs11.proxy.asn1.ObjectIdAndCert;
-import org.xipki.security.pkcs11.proxy.asn1.ObjectIdentifier;
-import org.xipki.security.pkcs11.proxy.asn1.ObjectIdentifiers;
-import org.xipki.security.pkcs11.proxy.asn1.RemoveObjectsParams;
-import org.xipki.security.pkcs11.proxy.asn1.SlotIdAndObjectId;
-import org.xipki.security.pkcs11.proxy.asn1.SlotIdentifier;
-import org.xipki.security.pkcs11.P11ObjectIdentifier;
-import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.security.pkcs11.P11SlotIdentifier;
-import org.xipki.security.pkcs11.P11TokenException;
-import org.xipki.security.pkcs11.P11UnknownEntityException;
+import org.xipki.security.pkcs11.proxy.asn1.*;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.StringUtil;
+
+import java.math.BigInteger;
+import java.security.PublicKey;
+import java.security.cert.CertificateException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * {@link P11Slot} for PKCS#11 proxy.

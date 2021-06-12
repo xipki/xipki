@@ -17,8 +17,6 @@
 
 package org.xipki.ca.certprofile.test;
 
-import java.util.*;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
@@ -26,28 +24,18 @@ import org.bouncycastle.asn1.x509.GeneralName;
 import org.xipki.ca.api.profile.Certprofile.CertLevel;
 import org.xipki.ca.api.profile.Certprofile.GeneralNameTag;
 import org.xipki.ca.certprofile.xijson.DirectoryStringType;
-import org.xipki.ca.certprofile.xijson.conf.AdmissionSyntax;
+import org.xipki.ca.certprofile.xijson.conf.*;
 import org.xipki.ca.certprofile.xijson.conf.AdmissionSyntax.AdmissionsType;
 import org.xipki.ca.certprofile.xijson.conf.AdmissionSyntax.NamingAuthorityType;
 import org.xipki.ca.certprofile.xijson.conf.AdmissionSyntax.ProfessionInfoType;
 import org.xipki.ca.certprofile.xijson.conf.AdmissionSyntax.RegistrationNumber;
-import org.xipki.ca.certprofile.xijson.conf.CertificatePolicies;
 import org.xipki.ca.certprofile.xijson.conf.CertificatePolicies.CertificatePolicyInformationType;
 import org.xipki.ca.certprofile.xijson.conf.CertificatePolicies.PolicyQualfierType;
 import org.xipki.ca.certprofile.xijson.conf.CertificatePolicies.PolicyQualifier;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
-import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
-import org.xipki.ca.certprofile.xijson.conf.ExtnSyntax;
 import org.xipki.ca.certprofile.xijson.conf.ExtnSyntax.SubFieldSyntax;
-import org.xipki.ca.certprofile.xijson.conf.GeneralNameType;
-import org.xipki.ca.certprofile.xijson.conf.PolicyMappings;
-import org.xipki.ca.certprofile.xijson.conf.Subject;
 import org.xipki.ca.certprofile.xijson.conf.Subject.RdnType;
 import org.xipki.ca.certprofile.xijson.conf.Subject.ValueType;
-import org.xipki.ca.certprofile.xijson.conf.SubjectDirectoryAttributs;
-import org.xipki.ca.certprofile.xijson.conf.SubjectInfoAccess;
-import org.xipki.ca.certprofile.xijson.conf.SubjectToSubjectAltNameType;
-import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.DN;
@@ -55,6 +43,8 @@ import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.TlsExtensionType;
 import org.xipki.security.X509ExtensionType.FieldType;
 import org.xipki.security.X509ExtensionType.Tag;
+
+import java.util.*;
 
 /**
  * Demo the creation of xijson configuration for complex certificates.

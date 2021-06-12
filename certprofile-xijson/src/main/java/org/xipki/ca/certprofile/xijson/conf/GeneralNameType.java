@@ -17,11 +17,6 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.ca.api.profile.Certprofile.GeneralNameMode;
 import org.xipki.ca.api.profile.Certprofile.GeneralNameTag;
@@ -30,6 +25,11 @@ import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.StringUtil;
 import org.xipki.util.ValidatableConf;
+
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Configuration of GeneralName.

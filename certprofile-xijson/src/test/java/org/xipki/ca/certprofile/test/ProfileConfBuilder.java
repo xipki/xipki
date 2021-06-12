@@ -17,13 +17,8 @@
 
 package org.xipki.ca.certprofile.test;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
-
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -37,21 +32,14 @@ import org.xipki.ca.api.profile.Certprofile.GeneralNameTag;
 import org.xipki.ca.api.profile.Certprofile.X509CertVersion;
 import org.xipki.ca.api.profile.Range;
 import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
-import org.xipki.ca.certprofile.xijson.conf.AlgorithmType;
+import org.xipki.ca.certprofile.xijson.conf.*;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
-import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
-import org.xipki.ca.certprofile.xijson.conf.GeneralNameType;
-import org.xipki.ca.certprofile.xijson.conf.KeyParametersType;
 import org.xipki.ca.certprofile.xijson.conf.KeyParametersType.DsaParametersType;
 import org.xipki.ca.certprofile.xijson.conf.KeyParametersType.EcParametersType;
 import org.xipki.ca.certprofile.xijson.conf.KeyParametersType.RsaParametersType;
-import org.xipki.ca.certprofile.xijson.conf.KeypairGenerationType;
 import org.xipki.ca.certprofile.xijson.conf.KeypairGenerationType.KeyType;
-import org.xipki.ca.certprofile.xijson.conf.Subject;
 import org.xipki.ca.certprofile.xijson.conf.Subject.RdnType;
 import org.xipki.ca.certprofile.xijson.conf.Subject.ValueType;
-import org.xipki.ca.certprofile.xijson.conf.SubjectToSubjectAltNameType;
-import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
@@ -61,8 +49,12 @@ import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 /**
  * Builder to create xijson configuration.

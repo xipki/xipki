@@ -17,10 +17,10 @@
 
 package org.xipki.ca.certprofile.xijson;
 
-import static org.xipki.util.Args.notNull;
-
 import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
 import org.xipki.ca.certprofile.xijson.conf.QcStatements.Range2Type;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * Control of the MonetaryValue (in the extension QCStatements).

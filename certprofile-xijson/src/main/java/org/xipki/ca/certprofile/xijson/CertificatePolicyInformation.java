@@ -17,10 +17,10 @@
 
 package org.xipki.ca.certprofile.xijson;
 
-import java.util.List;
-
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
+
+import java.util.List;
 
 /**
  * Control of the CertificatePolicyInformation (in the extension CertificatePolicies).

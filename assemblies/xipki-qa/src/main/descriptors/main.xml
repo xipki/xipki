@@ -129,14 +129,6 @@
       </excludes>
       <outputDirectory>dbtool</outputDirectory>
     </fileSet>
-    <!--fileSet>
-      <directory>${project.build.directory}/dbtool-${project.version}/</directory>
-      <excludes>
-        <exclude>lib/jdbc/*</exclude>
-        <exclude>bin/*</exclude>
-      </excludes>
-      <outputDirectory>dbtool</outputDirectory>
-    </fileSet-->
   </fileSets>
   <files>
     <file>

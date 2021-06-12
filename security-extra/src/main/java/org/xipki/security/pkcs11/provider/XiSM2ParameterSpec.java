@@ -17,9 +17,9 @@
 
 package org.xipki.security.pkcs11.provider;
 
-import java.security.spec.AlgorithmParameterSpec;
-
 import org.bouncycastle.util.Arrays;
+
+import java.security.spec.AlgorithmParameterSpec;
 
 /**
  * Parameter spec for SM2 ID parameter.

@@ -17,11 +17,11 @@
 
 package org.xipki.ca.certprofile.xijson;
 
+import org.xipki.util.Args;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
-
-import org.xipki.util.Args;
 
 /**
  * Control of the certificate's NotBefore field.

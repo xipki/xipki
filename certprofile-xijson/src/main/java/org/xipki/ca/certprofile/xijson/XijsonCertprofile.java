@@ -17,53 +17,12 @@
 
 package org.xipki.ca.certprofile.xijson;
 
-import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notNull;
-
-import java.io.ByteArrayInputStream;
-import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.Vector;
-
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1GeneralizedTime;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1String;
-import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DERGeneralizedTime;
-import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERPrintableString;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERSet;
-import org.bouncycastle.asn1.DERTaggedObject;
-import org.bouncycastle.asn1.DERUTF8String;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.Attribute;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.asn1.x509.SubjectDirectoryAttributes;
-import org.bouncycastle.asn1.x509.qualified.BiometricData;
-import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
-import org.bouncycastle.asn1.x509.qualified.MonetaryValue;
-import org.bouncycastle.asn1.x509.qualified.QCStatement;
-import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
+import org.bouncycastle.asn1.x509.*;
+import org.bouncycastle.asn1.x509.qualified.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.BadCertTemplateException;
@@ -80,11 +39,15 @@ import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.LogUtil;
-import org.xipki.util.StringUtil;
-import org.xipki.util.Validity;
+import org.xipki.util.*;
+
+import java.io.ByteArrayInputStream;
+import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
+
+import static org.xipki.util.Args.notBlank;
+import static org.xipki.util.Args.notNull;
 
 /**
  * Certprofile configured by JSON.
@@ -524,7 +487,8 @@ public class XijsonCertprofile extends BaseCertprofile {
           String country = DERPrintableString.getInstance(attrVal).getString();
           countryOfResidenceList.add(country);
         } else {
-          List<ASN1Encodable> otherAttrVals = otherAttrs.computeIfAbsent(attrType, k -> new LinkedList<>());
+          List<ASN1Encodable> otherAttrVals =
+                  otherAttrs.computeIfAbsent(attrType, k -> new LinkedList<>());
           otherAttrVals.add(attrVal);
         }
       }

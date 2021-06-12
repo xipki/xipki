@@ -17,11 +17,6 @@
 
 package org.xipki.p11proxy.servlet;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.HashAlgo;
@@ -30,6 +25,11 @@ import org.xipki.security.pkcs11.P11CryptService;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.security.pkcs11.P11TokenException;
 import org.xipki.util.StringUtil;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Pool of local {@link P11CryptService}s.

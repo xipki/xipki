@@ -215,7 +215,8 @@ public class P12Actions {
         SignatureAlgoControl algoControl = null;
         AlgorithmIdentifier algId = cert.getSubjectPublicKeyInfo().getAlgorithm();
         if (X9ObjectIdentifiers.id_ecPublicKey.equals(algId.getAlgorithm())) {
-          if (ASN1ObjectIdentifier.getInstance(algId.getParameters()).equals(GMObjectIdentifiers.sm2p256v1)) {
+          if (ASN1ObjectIdentifier.getInstance(algId.getParameters())
+                  .equals(GMObjectIdentifiers.sm2p256v1)) {
             hashAlgo = HashAlgo.SM3;
             algoControl = new SignatureAlgoControl(false, false, true);
           }

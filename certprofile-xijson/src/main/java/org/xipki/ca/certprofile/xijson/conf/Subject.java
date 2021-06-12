@@ -17,15 +17,14 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import java.util.LinkedList;
-import java.util.List;
-
+import com.alibaba.fastjson.annotation.JSONField;
 import org.xipki.ca.api.profile.Certprofile.StringType;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Configuration of the certificates's subject field.

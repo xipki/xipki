@@ -17,10 +17,9 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
-
-import com.alibaba.fastjson.annotation.JSONField;
 
 /**
  * Configuration of GeneralSubtree.

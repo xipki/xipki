@@ -17,10 +17,6 @@
 
 package org.xipki.ca.certprofile.test;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
 import org.xipki.ca.api.profile.Certprofile.CertLevel;
@@ -31,6 +27,10 @@ import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers.BaseRequirements;
 import org.xipki.security.ObjectIdentifiers.DN;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Demo the creation of xijson configuration for CA/Browser Forum certificates.

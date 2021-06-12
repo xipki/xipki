@@ -236,7 +236,6 @@
                 <feature>xipki-caclient</feature>
                 <feature>xipki-ocspclient</feature>
                 <feature>xipki-scepclient</feature>
-                <!--feature>xipki-dbtool</feature-->
                 <feature>xipki-camgmt</feature>
                 <feature>xipki-ocspmgmt</feature>
                 <feature>netty-tcnative</feature>

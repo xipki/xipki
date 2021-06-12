@@ -17,19 +17,6 @@
 
 package org.xipki.security.pkcs11.provider;
 
-import java.io.ByteArrayOutputStream;
-import java.security.AlgorithmParameters;
-import java.security.InvalidKeyException;
-import java.security.InvalidParameterException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.SecureRandom;
-import java.security.SignatureException;
-import java.security.SignatureSpi;
-import java.security.spec.AlgorithmParameterSpec;
-import java.security.spec.MGF1ParameterSpec;
-import java.security.spec.PSSParameterSpec;
-
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.crypto.Digest;
@@ -38,6 +25,12 @@ import org.bouncycastle.jcajce.provider.util.DigestFactory;
 import org.xipki.security.pkcs11.P11PlainRSASigner;
 import org.xipki.security.pkcs11.P11PrivateKey;
 import org.xipki.security.pkcs11.P11RSAKeyParameter;
+
+import java.io.ByteArrayOutputStream;
+import java.security.*;
+import java.security.spec.AlgorithmParameterSpec;
+import java.security.spec.MGF1ParameterSpec;
+import java.security.spec.PSSParameterSpec;
 
 /**
  * PKCS#11 RSAPSS {@link SignatureSpi}.

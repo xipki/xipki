@@ -17,11 +17,23 @@
 
 package org.xipki.security.pkcs11.proxy;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1Object;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.security.BadAsn1ObjectException;
+import org.xipki.security.pkcs11.*;
+import org.xipki.security.pkcs11.proxy.asn1.ServerCaps;
+import org.xipki.security.pkcs11.proxy.asn1.SlotIdentifier;
+import org.xipki.util.*;
+import org.xipki.util.http.HostnameVerifiers;
+import org.xipki.util.http.SSLContextBuilder;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -33,32 +45,6 @@ import java.security.cert.CertificateException;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSocketFactory;
-
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1Object;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xipki.security.BadAsn1ObjectException;
-import org.xipki.security.pkcs11.P11Module;
-import org.xipki.security.pkcs11.P11ModuleConf;
-import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.security.pkcs11.P11SlotIdentifier;
-import org.xipki.security.pkcs11.P11TokenException;
-import org.xipki.security.pkcs11.proxy.asn1.ServerCaps;
-import org.xipki.security.pkcs11.proxy.asn1.SlotIdentifier;
-import org.xipki.util.Args;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.IoUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.ObjectCreationException;
-import org.xipki.util.StringUtil;
-import org.xipki.util.http.HostnameVerifiers;
-import org.xipki.util.http.SSLContextBuilder;
 
 /**
  * {@link P11Module} for PKCS#11 proxy.

@@ -17,15 +17,11 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
 import org.xipki.ca.api.profile.Certprofile.KeyUsageControl;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
+
+import java.util.*;
 
 /**
  * Extension KeyUsage.

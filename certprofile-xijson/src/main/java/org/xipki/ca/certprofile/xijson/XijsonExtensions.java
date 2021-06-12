@@ -17,29 +17,7 @@
 
 package org.xipki.ca.certprofile.xijson;
 
-import static org.xipki.util.Args.notNull;
-
-import java.io.IOException;
-import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1StreamParser;
-import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DERPrintableString;
-import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
@@ -50,25 +28,14 @@ import org.bouncycastle.asn1.x509.qualified.MonetaryValue;
 import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.profile.BaseCertprofile;
-import org.xipki.ca.api.profile.Certprofile.AuthorityInfoAccessControl;
-import org.xipki.ca.api.profile.Certprofile.CrlDistributionPointsControl;
-import org.xipki.ca.api.profile.Certprofile.ExtKeyUsageControl;
-import org.xipki.ca.api.profile.Certprofile.ExtensionControl;
-import org.xipki.ca.api.profile.Certprofile.GeneralNameMode;
-import org.xipki.ca.api.profile.Certprofile.GeneralNameTag;
-import org.xipki.ca.api.profile.Certprofile.KeyUsageControl;
-import org.xipki.ca.api.profile.Certprofile.SubjectControl;
+import org.xipki.ca.api.profile.Certprofile.*;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.SubjectKeyIdentifierControl;
 import org.xipki.ca.certprofile.xijson.conf.*;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableInt;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
-import org.xipki.ca.certprofile.xijson.conf.QcStatements.PdsLocationType;
-import org.xipki.ca.certprofile.xijson.conf.QcStatements.QcEuLimitValueType;
-import org.xipki.ca.certprofile.xijson.conf.QcStatements.QcStatementType;
-import org.xipki.ca.certprofile.xijson.conf.QcStatements.QcStatementValueType;
-import org.xipki.ca.certprofile.xijson.conf.QcStatements.Range2Type;
+import org.xipki.ca.certprofile.xijson.conf.QcStatements.*;
 import org.xipki.ca.certprofile.xijson.conf.SmimeCapabilities.SmimeCapability;
 import org.xipki.ca.certprofile.xijson.conf.SmimeCapabilities.SmimeCapabilityParameter;
 import org.xipki.ca.certprofile.xijson.conf.SubjectInfoAccess.Access;
@@ -78,6 +45,13 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.StringUtil;
 import org.xipki.util.Validity;
+
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * Extenions configuration.

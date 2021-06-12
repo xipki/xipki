@@ -20,7 +20,6 @@ package org.xipki.ca.api.mgmt.entry;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.CaManager;
-import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.ValidityMode;
 import org.xipki.util.Args;

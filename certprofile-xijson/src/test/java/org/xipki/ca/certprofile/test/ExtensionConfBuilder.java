@@ -17,18 +17,6 @@
 
 package org.xipki.ca.certprofile.test;
 
-import java.io.IOException;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -36,43 +24,19 @@ import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.x509.Extension;
 import org.xipki.ca.api.profile.Range;
 import org.xipki.ca.certprofile.xijson.DirectoryStringType;
-import org.xipki.ca.certprofile.xijson.conf.AdditionalInformation;
-import org.xipki.ca.certprofile.xijson.conf.AuthorityInfoAccess;
-import org.xipki.ca.certprofile.xijson.conf.AuthorityKeyIdentifier;
-import org.xipki.ca.certprofile.xijson.conf.BasicConstraints;
-import org.xipki.ca.certprofile.xijson.conf.BiometricInfo;
+import org.xipki.ca.certprofile.xijson.conf.*;
 import org.xipki.ca.certprofile.xijson.conf.BiometricInfo.BiometricTypeType;
-import org.xipki.ca.certprofile.xijson.conf.CertificatePolicies;
 import org.xipki.ca.certprofile.xijson.conf.CertificatePolicies.CertificatePolicyInformationType;
 import org.xipki.ca.certprofile.xijson.conf.CertificatePolicies.PolicyQualfierType;
 import org.xipki.ca.certprofile.xijson.conf.CertificatePolicies.PolicyQualifier;
-import org.xipki.ca.certprofile.xijson.conf.CrlDistributionPoints;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableBinary;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableInt;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
-import org.xipki.ca.certprofile.xijson.conf.ExtendedKeyUsage;
-import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
-import org.xipki.ca.certprofile.xijson.conf.ExtnSyntax;
 import org.xipki.ca.certprofile.xijson.conf.ExtnSyntax.SubFieldSyntax;
-import org.xipki.ca.certprofile.xijson.conf.GeneralSubtreeType;
-import org.xipki.ca.certprofile.xijson.conf.InhibitAnyPolicy;
-import org.xipki.ca.certprofile.xijson.conf.KeyUsage;
-import org.xipki.ca.certprofile.xijson.conf.NameConstraints;
-import org.xipki.ca.certprofile.xijson.conf.PolicyConstraints;
 import org.xipki.ca.certprofile.xijson.conf.PolicyMappings.PolicyIdMappingType;
-import org.xipki.ca.certprofile.xijson.conf.PrivateKeyUsagePeriod;
-import org.xipki.ca.certprofile.xijson.conf.QcStatements;
-import org.xipki.ca.certprofile.xijson.conf.QcStatements.PdsLocationType;
-import org.xipki.ca.certprofile.xijson.conf.QcStatements.QcEuLimitValueType;
-import org.xipki.ca.certprofile.xijson.conf.QcStatements.QcStatementType;
-import org.xipki.ca.certprofile.xijson.conf.QcStatements.QcStatementValueType;
-import org.xipki.ca.certprofile.xijson.conf.QcStatements.Range2Type;
-import org.xipki.ca.certprofile.xijson.conf.Restriction;
-import org.xipki.ca.certprofile.xijson.conf.SmimeCapabilities;
+import org.xipki.ca.certprofile.xijson.conf.QcStatements.*;
 import org.xipki.ca.certprofile.xijson.conf.SmimeCapabilities.SmimeCapability;
 import org.xipki.ca.certprofile.xijson.conf.SmimeCapabilities.SmimeCapabilityParameter;
-import org.xipki.ca.certprofile.xijson.conf.TlsFeature;
-import org.xipki.ca.certprofile.xijson.conf.ValidityModel;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.Extn;
@@ -83,6 +47,10 @@ import org.xipki.security.X509ExtensionType.Tag;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.TripleState;
+
+import java.io.IOException;
+import java.math.BigInteger;
+import java.util.*;
 
 /**
  * Extension builder for xijson configuration.

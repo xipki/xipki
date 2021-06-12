@@ -17,41 +17,21 @@
 
 package org.xipki.security.pkcs11.provider;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.Key;
-import java.security.KeyStoreException;
-import java.security.KeyStoreSpi;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
-import org.xipki.security.pkcs11.P11CryptService;
-import org.xipki.security.pkcs11.P11CryptServiceFactory;
-import org.xipki.security.pkcs11.P11Identity;
-import org.xipki.security.pkcs11.P11Module;
-import org.xipki.security.pkcs11.P11ObjectIdentifier;
-import org.xipki.security.pkcs11.P11PrivateKey;
-import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.security.pkcs11.P11SlotIdentifier;
-import org.xipki.security.pkcs11.P11TokenException;
+import org.xipki.security.pkcs11.*;
 import org.xipki.util.Args;
 import org.xipki.util.LogUtil;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.security.*;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.util.*;
 
 /**
  * Construction of alias is as follows.

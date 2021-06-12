@@ -17,10 +17,6 @@
 
 package org.xipki.security.pkcs11.emulator;
 
-import java.io.IOException;
-import java.math.BigInteger;
-import java.security.SecureRandom;
-
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1Integer;
@@ -41,6 +37,10 @@ import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.math.ec.FixedPointCombMultiplier;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.util.GMUtil;
+
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 
 /**
  * The RAW SM2 Digital Signature algorithm. The message is the hash value over the real message.

@@ -17,16 +17,7 @@
 
 package org.xipki.security.pkcs11.provider;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.security.InvalidKeyException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.SignatureException;
-import java.security.SignatureSpi;
-import java.security.spec.AlgorithmParameterSpec;
-
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.DigestOutputStream;
@@ -34,7 +25,11 @@ import org.xipki.security.pkcs11.P11PrivateKey;
 import org.xipki.security.pkcs11.P11TokenException;
 import org.xipki.security.util.SignerUtil;
 
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.security.*;
+import java.security.spec.AlgorithmParameterSpec;
 
 /**
  * PKCS#11 ECDSA/Plain-ECDSA {@link SignatureSpi}.

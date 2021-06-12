@@ -17,13 +17,13 @@
 
 package org.xipki.ca.certprofile.xijson;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileFactory;
 import org.xipki.util.ObjectCreationException;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * CertprofileFactory for the Certprofile of type 'xijson'.

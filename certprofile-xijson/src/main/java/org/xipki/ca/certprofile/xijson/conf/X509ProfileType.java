@@ -17,17 +17,8 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.annotation.JSONField;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
@@ -47,8 +38,9 @@ import org.xipki.util.CollectionUtil;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.annotation.JSONField;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
 
 /**
  * Root configuration of the xijson Certprofile.

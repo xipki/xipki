@@ -17,12 +17,11 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import java.util.Set;
-
+import com.alibaba.fastjson.annotation.JSONField;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import java.util.Set;
 
 /**
  * Extension AuthorityInfoAccess.

@@ -17,10 +17,7 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import com.alibaba.fastjson.annotation.JSONField;
 import org.xipki.security.X509ExtensionType.FieldType;
 import org.xipki.security.X509ExtensionType.Tag;
 import org.xipki.util.Args;
@@ -28,7 +25,9 @@ import org.xipki.util.CollectionUtil;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.StringUtil;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  *  Extension with Syntax.

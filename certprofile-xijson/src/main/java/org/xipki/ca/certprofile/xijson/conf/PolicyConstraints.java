@@ -17,18 +17,13 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import java.math.BigInteger;
-
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERTaggedObject;
+import com.alibaba.fastjson.annotation.JSONField;
+import org.bouncycastle.asn1.*;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import java.math.BigInteger;
 
 /**
  * Extension PolicyConstraints.

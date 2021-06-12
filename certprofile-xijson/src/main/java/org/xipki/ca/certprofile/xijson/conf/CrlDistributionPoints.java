@@ -17,10 +17,10 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import java.util.Set;
-
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
+
+import java.util.Set;
 
 /**
  * Extension CRLDistributionPoints.

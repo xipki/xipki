@@ -17,10 +17,7 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-
+import com.alibaba.fastjson.annotation.JSONField;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.isismtt.x509.NamingAuthority;
@@ -34,7 +31,9 @@ import org.xipki.util.InvalidConfException;
 import org.xipki.util.StringUtil;
 import org.xipki.util.ValidatableConf;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Extension Admission.

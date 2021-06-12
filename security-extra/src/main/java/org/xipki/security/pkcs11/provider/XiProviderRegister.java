@@ -17,9 +17,9 @@
 
 package org.xipki.security.pkcs11.provider;
 
-import java.security.Security;
-
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
+
+import java.security.Security;
 
 /**
  * Helper class to register the {@link XiPkcs11Provider}.

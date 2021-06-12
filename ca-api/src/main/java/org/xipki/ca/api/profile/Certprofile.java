@@ -765,7 +765,8 @@ public abstract class Certprofile implements Closeable {
 
     byte[] encodedSpki = subjectPublicKeyInfo.getPublicKeyData().getBytes();
     byte[] skiValue = hash.hash(encodedSpki);
-    if (method == null || method == SubjectKeyIdentifierControl.SubjectKeyIdentifierMethod.METHOD_1) {
+    if (method == null
+            || method == SubjectKeyIdentifierControl.SubjectKeyIdentifierMethod.METHOD_1) {
       // do nothing
     } else if (method == SubjectKeyIdentifierControl.SubjectKeyIdentifierMethod.METHOD_2) {
       byte[] bytes = Arrays.copyOfRange(skiValue, skiValue.length - 8, skiValue.length);

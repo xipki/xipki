@@ -788,9 +788,10 @@ class O2tChecker extends ExtensionChecker {
     SubjectKeyIdentifier asn1 = SubjectKeyIdentifier.getInstance(extnValue);
     byte[] ski = asn1.getKeyIdentifier();
 
-    byte[] expectedSki ;
+    byte[] expectedSki;
     try {
-      expectedSki = getCertprofile().getSubjectKeyIdentifier(subjectPublicKeyInfo).getKeyIdentifier();
+      expectedSki = getCertprofile().getSubjectKeyIdentifier(subjectPublicKeyInfo)
+                      .getKeyIdentifier();
     } catch (CertprofileException e) {
       failureMsg.append("error computing expected SubjectKeyIdentifier");
       return;

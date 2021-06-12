@@ -17,31 +17,7 @@
 
 package org.xipki.ca.certprofile.xijson;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bouncycastle.asn1.ASN1Boolean;
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1Enumerated;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.ASN1String;
-import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DERBMPString;
-import org.bouncycastle.asn1.DERBitString;
-import org.bouncycastle.asn1.DERGeneralizedTime;
-import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERPrintableString;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERSet;
-import org.bouncycastle.asn1.DERT61String;
-import org.bouncycastle.asn1.DERUTCTime;
-import org.bouncycastle.asn1.DERUTF8String;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.profile.TextVadidator;
@@ -49,6 +25,9 @@ import org.xipki.ca.certprofile.xijson.conf.ExtnSyntax;
 import org.xipki.ca.certprofile.xijson.conf.ExtnSyntax.SubFieldSyntax;
 import org.xipki.security.X509ExtensionType.FieldType;
 import org.xipki.security.X509ExtensionType.Tag;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The extension syntax checker.

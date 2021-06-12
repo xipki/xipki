@@ -17,6 +17,18 @@
 
 package org.xipki.ocsp.mgmt.client;
 
+import com.alibaba.fastjson.JSON;
+import org.xipki.ocsp.api.mgmt.MgmtMessage.MgmtAction;
+import org.xipki.ocsp.api.mgmt.MgmtRequest;
+import org.xipki.ocsp.api.mgmt.MgmtResponse;
+import org.xipki.ocsp.api.mgmt.OcspManager;
+import org.xipki.ocsp.api.mgmt.OcspMgmtException;
+import org.xipki.util.*;
+import org.xipki.util.http.SslContextConf;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,24 +37,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSocketFactory;
-
-import org.xipki.ocsp.api.mgmt.MgmtMessage.MgmtAction;
-import org.xipki.ocsp.api.mgmt.MgmtRequest;
-import org.xipki.ocsp.api.mgmt.MgmtResponse;
-import org.xipki.ocsp.api.mgmt.OcspManager;
-import org.xipki.ocsp.api.mgmt.OcspMgmtException;
-import org.xipki.util.Args;
-import org.xipki.util.HttpConstants;
-import org.xipki.util.IoUtil;
-import org.xipki.util.ObjectCreationException;
-import org.xipki.util.StringUtil;
-import org.xipki.util.http.SslContextConf;
-
-import com.alibaba.fastjson.JSON;
 
 /**
  * OCSP Management client. It communicates with the server via REST API.

@@ -17,15 +17,7 @@
 
 package org.xipki.ca.certprofile.xijson;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.isismtt.x509.AdmissionSyntax;
 import org.bouncycastle.asn1.isismtt.x509.Admissions;
 import org.bouncycastle.asn1.isismtt.x509.NamingAuthority;
@@ -36,6 +28,10 @@ import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Control of the extension extension Admission (Germany national standard CommonPKI).
