@@ -30,8 +30,7 @@
 		"active":true,
 		"password":"password1"
 	}],
-	"publishers":[{
-	}],
+	"publishers":[],
 	"profiles":[{
 		"name":"rootca",
 		"type":"xijson",

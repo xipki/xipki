@@ -1,3 +1,8 @@
+# Please adapt me
+ROOTCA_P11_LABEL = rootca1
+SERVER_CA_P11_LABEL = server-ca1
+CLIENT_CA_P11_LABEL = client-ca1
+
 KEYCERTS_DIR = xipki/ca-setup/keycerts
 
 echo "#################################################################"
