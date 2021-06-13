@@ -33,28 +33,28 @@ echo "=====CMP: Enroll (CA generate key pair) via CRMF====="
 
 list = [client]; each ($list) {
   profile = $it
-  CN = cmp-${profile}-${CUR_TIME}
-  SUBJECT = "CN=${CN}.myorg.org,O=myorg CDRM,C=CN";
+  NAME = cmp-${profile}
+  SUBJECT = "CN=${NAME}-${CUR_TIME}.myorg.org,O=myorg CDRM,C=CN";
 
-  xi:cmp-enroll-cagenkey --p12-out ${OUT_DIR}/${CN}.p12 --password 1234 --cert-out ${OUT_DIR}/${CN}.der --profile ${profile} --subject "${SUBJECT}"
+  xi:cmp-enroll-cagenkey --p12-out ${OUT_DIR}/${NAME}.p12 --password 1234 --cert-out ${OUT_DIR}/${NAME}.der --profile ${profile} --subject "${SUBJECT}"
 }
 
 ## Test suspend / unsuspend / revoke
 
 # Generate first test certificate
 profile = client
-CN = cmp-${profile}-${CUR_TIME}-revoketest
+NAME = cmp-${profile}-revoketest
 
 xi:cmp-enroll-cagenkey \
-  --p12-out ${OUT_DIR}/${CN}.p12 --password 1234 \
-  --cert-out ${OUT_DIR}/${CN}.der --profile ${profile} \
-  --subject "CN=${CN}.myorg.org,O=myorg CDRM,C=CN"
+  --p12-out ${OUT_DIR}/${NAME}.p12 --password 1234 \
+  --cert-out ${OUT_DIR}/${NAME}.der --profile ${profile} \
+  --subject "CN=${NAME}-${CUR_TIME}-revoketest.myorg.org,O=myorg CDRM,C=CN"
 
 echo "=====CMP: Suspend certificate====="
-xi:cmp-revoke --ca client-ca --cert ${OUT_DIR}/${CN}.der --reason certificateHold
+xi:cmp-revoke --ca client-ca --cert ${OUT_DIR}/${NAME}.der --reason certificateHold
 
 echo "=====CMP: Unsuspend certificate====="
-xi:cmp-unrevoke --ca client-ca --cert ${OUT_DIR}/${CN}.der
+xi:cmp-unrevoke --ca client-ca --cert ${OUT_DIR}/${NAME}.der
 
 echo "=====CMP: Revocate certificate====="
-xi:cmp-revoke --ca client-ca --cert ${OUT_DIR}/${CN}.der --reason affiliationChanged
+xi:cmp-revoke --ca client-ca --cert ${OUT_DIR}/${NAME}.der --reason affiliationChanged

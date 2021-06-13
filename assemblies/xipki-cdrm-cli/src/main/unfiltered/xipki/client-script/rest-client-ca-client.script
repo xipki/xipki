@@ -25,26 +25,26 @@ HEADER = "Content-Type: text/plain; encoding=utf-8"
 
 list = [client]; each ($list) {
   profile = $it
-  CN = rest-${profile}-${CUR_TIME}
-  SUBJECT = "CN=${CN}.myorg.org,O=myorg CDRM,C=CN"
+  NAME = rest-${profile}
+  SUBJECT = "CN=${NAME}-${CUR_TIME}.myorg.org,O=myorg CDRM,C=CN"
   URL = "$BASE_URL/enroll-cert-cagenkeypair?profile=${profile}"
 
-  xi:curl --out ${OUT_DIR}/${CN}.pem --data "subject=${SUBJECT}" --header "${HEADER}" "${URL}"
+  xi:curl --out ${OUT_DIR}/${NAME}.pem --data "subject=${SUBJECT}" --header "${HEADER}" "${URL}"
 }
 
 ## Test suspend / unsuspend / revoke
 
-# Generate first test certificate
+# Generate test certificate
 profile = client
 
-CN = rest-${profile}-${CUR_TIME}-revoketest
+NAME = rest-${profile}-revoketest
 
-xi:curl --out ${OUT_DIR}/${CN}.pem \
-  --data "subject=CN=${CN}.myorg.org,O=myorg CDRM,C=CN" \
+xi:curl --out ${OUT_DIR}/${NAME}.pem \
+  --data "subject=CN=${NAME}-${CUR_TIME}-revoketest.myorg.org,O=myorg CDRM,C=CN" \
   --header "Content-Type: text/plain; encoding=utf-8" \
   "$BASE_URL/enroll-cert-cagenkeypair?profile=${profile}"
 
-SERIAL = $(xi:cert-info --serial --hex --in ${OUT_DIR}/${CN}.pem)
+SERIAL = $(xi:cert-info --serial --hex --in ${OUT_DIR}/${NAME}.pem)
 
 echo "=====REST: Suspend====="
 xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=certificateHold"
