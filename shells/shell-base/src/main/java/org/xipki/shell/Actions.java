@@ -536,7 +536,7 @@ public class Actions {
 
     @Argument(name = "format", description = "format")
     @Completion(FileCompleter.class)
-    private String format = "yyyyMMdd-hhmmss";
+    private String format = "yyyyMMdd-HHmmss";
 
     @Override
     protected Object execute0()
