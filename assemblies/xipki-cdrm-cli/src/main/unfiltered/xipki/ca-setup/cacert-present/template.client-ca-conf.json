@@ -12,6 +12,9 @@
 		"caInfo":{
 			"caUris":{
 			},
+			"certchain":[{
+				"file":"xipki/ca-setup/keycerts/rootca1.der"
+			}],
 			"cmpControl":{
 				"send.ca":true,
 				"messagetime.bias":300,
