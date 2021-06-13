@@ -41,6 +41,7 @@ import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 /**
@@ -149,20 +150,15 @@ public abstract class BaseCertprofile extends Certprofile {
       if (len == 1) {
         RDN rdn;
         if (cvalue != null) {
-          if (cvalue.equalsIgnoreCase(":SM3(SubjectPublicKeyInfo)")
-                  || cvalue.equalsIgnoreCase(":SHA1(SubjectPublicKeyInfo)")
-                  || cvalue.equalsIgnoreCase(":SHA256(SubjectPublicKeyInfo)")) {
-            if (publicKeyInfo == null) {
-              throw new CertprofileException("publicKeyInfo is not set");
-            }
-
+          String lcvalue = cvalue.toLowerCase();
+          if (lcvalue.startsWith(":") && lcvalue.endsWith("(subjectpublickeyinfo)")) {
+            String hashAlgName = lcvalue.substring(1,
+                    lcvalue.length() - "(subjectpublickeyinfo)".length());
             HashAlgo ha;
-            if (cvalue.equalsIgnoreCase(":SM3(SubjectPublicKeyInfo)")) {
-              ha = HashAlgo.SM3;
-            } else if (cvalue.equalsIgnoreCase(":SHA1(SubjectPublicKeyInfo)")) {
-              ha = HashAlgo.SHA1;
-            } else {
-              ha = HashAlgo.SHA256;
+            try {
+              ha = HashAlgo.getInstance(hashAlgName);
+            } catch (NoSuchAlgorithmException e) {
+              throw new CertprofileException("Unsupported Hash algorithm " + hashAlgName);
             }
             byte[] pkData = publicKeyInfo.getPublicKeyData().getOctets();
             rdn = createSubjectRdn(ha.hexHash(pkData), type, control);
