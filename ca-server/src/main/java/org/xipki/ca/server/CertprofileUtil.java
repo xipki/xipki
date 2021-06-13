@@ -43,7 +43,7 @@ import org.xipki.util.Validity.Unit;
 import java.util.*;
 
 /**
- * CertProfiel with identifier.
+ * CertProfile with identifier.
  *
  * @author Lijun Liao
  * @since 2.0.0

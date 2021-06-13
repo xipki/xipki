@@ -87,8 +87,7 @@ public class HttpScepServlet extends HttpServlet {
     service0(req, resp, true);
   }
 
-  private void service0(HttpServletRequest req, HttpServletResponse resp, boolean viaPost)
-      throws ServletException, IOException {
+  private void service0(HttpServletRequest req, HttpServletResponse resp, boolean viaPost) {
     String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
     String caAlias = null;
     String certprofileName = null;

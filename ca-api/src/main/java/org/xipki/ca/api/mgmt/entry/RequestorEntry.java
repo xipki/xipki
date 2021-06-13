@@ -121,7 +121,7 @@ public class RequestorEntry extends MgmtEntry {
     if (verbose || conf.length() < 101) {
       sb.append(conf);
     } else {
-      sb.append(conf.substring(0, 97)).append("...");
+      sb.append(conf, 0, 97).append("...");
     }
 
     sb.append("\nfaulty: ").append(faulty).append('\n');
