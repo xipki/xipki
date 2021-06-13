@@ -64,7 +64,7 @@ class ResultRow {
         case Types.CLOB:
         case Types.NCLOB:
           Clob clob = rs.getClob(index);
-          value = clob.getSubString(1, (int) clob.length());
+          value = clob == null ? null : clob.getSubString(1, (int) clob.length());
           break;
         case Types.TIMESTAMP:
         case Types.TIMESTAMP_WITH_TIMEZONE:
@@ -94,7 +94,7 @@ class ResultRow {
           break;
         case Types.BLOB:
           Blob blob = rs.getBlob(index);
-          value = blob.getBytes(1, (int) blob.length());
+          value = blob == null ? null : blob.getBytes(1, (int) blob.length());
           break;
         default:
           throw new SQLException("unknown data type " + itype);
