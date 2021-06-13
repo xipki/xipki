@@ -58,7 +58,7 @@ public class CdrmProfileConfDemo extends ExtensionConfBuilder {
       certprofileContentEncryption("certprofile-cdrm-contentencryption.json");
       certprofileKeyGateway("certprofile-cdrm-keygateway.json");
       certprofileKeyManagent("certprofile-cdrm-keymanagement.json");
-      certprofileServer("cerprofile-cdrm-server.json");
+      certprofileServer("certprofile-cdrm-server.json");
     } catch (Exception ex) {
       ex.printStackTrace();
     }
@@ -243,7 +243,6 @@ public class CdrmProfileConfDemo extends ExtensionConfBuilder {
   private static void certprofileClient(
           String destFilename) {
     X509ProfileType profile = getBaseProfile("China DRM Device", CertLevel.EndEntity, "20y");
-    profile.setSerialNumberInReq(true);
 
     // Subject
     Subject subject = profile.getSubject();
@@ -252,7 +251,7 @@ public class CdrmProfileConfDemo extends ExtensionConfBuilder {
     rdnControls.add(createRdn(DN.C, 0, 1));
     rdnControls.add(createRdn(DN.O, 1, 1));
     rdnControls.add(createRdn(DN.OU, 0, 1));
-    rdnControls.add(createRdn(DN.SN, 1, 1));
+    rdnControls.add(createRdn(DN.SN, 1, 1, null, null, null, null, ":SM3(SubjectPublicKeyInfo"));
     rdnControls.add(createRdn(DN.CN, 1, 1));
 
     // Extensions

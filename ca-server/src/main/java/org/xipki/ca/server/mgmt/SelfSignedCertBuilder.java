@@ -207,7 +207,7 @@ class SelfSignedCertBuilder {
     Certprofile.SubjectInfo subjectInfo;
     // subject
     try {
-      subjectInfo = certprofile.getSubject(requestedSubject);
+      subjectInfo = certprofile.getSubject(requestedSubject, publicKeyInfo);
     } catch (CertprofileException ex) {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE,
           "exception in cert profile " + certprofile.getIdent());

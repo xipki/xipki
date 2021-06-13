@@ -9,7 +9,7 @@
 	"maxSize":1000,
 	"validity":"20y",
 	"notBeforeTime":"current",
-	"serialNumberInReq":true,
+	"serialNumberInReq":false,
 	"keypairGeneration":{
 		"inheritCA":true,
 		"forbidden":false
@@ -61,7 +61,11 @@
 				"description":"serialNumber"
 			},
 			"minOccurs":1,
-			"maxOccurs":1
+			"maxOccurs":1,
+			"value":{
+				"overridable":true,
+				"text":":SM3(SubjectPublicKeyInfo"
+			}
 		},{
 			"type":{
 				"oid":"2.5.4.3",

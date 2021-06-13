@@ -88,9 +88,9 @@ public class IdentifiedCertprofile implements Closeable {
     return certprofile.getValidity();
   }
 
-  public SubjectInfo getSubject(X500Name requestedSubject)
+  public SubjectInfo getSubject(X500Name requestedSubject, SubjectPublicKeyInfo publicKeyInfo)
       throws CertprofileException, BadCertTemplateException {
-    SubjectInfo subjectInfo = certprofile.getSubject(requestedSubject);
+    SubjectInfo subjectInfo = certprofile.getSubject(requestedSubject, publicKeyInfo);
 
     if (certprofile.getCertDomain() == CertDomain.CABForumBR) {
       X500Name subject = subjectInfo.getGrantedSubject();

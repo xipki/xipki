@@ -352,7 +352,7 @@ class GrandCertTemplateBuilder {
     // subject
     Certprofile.SubjectInfo subjectInfo;
     try {
-      subjectInfo = certprofile.getSubject(requestedSubject);
+      subjectInfo = certprofile.getSubject(requestedSubject, grantedPublicKeyInfo);
     } catch (CertprofileException ex) {
       throw new OperationException(SYSTEM_FAILURE, "exception in cert profile " + certprofileIdent);
     } catch (BadCertTemplateException ex) {

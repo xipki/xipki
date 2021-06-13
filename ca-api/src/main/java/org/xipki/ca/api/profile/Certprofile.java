@@ -704,6 +704,24 @@ public abstract class Certprofile implements Closeable {
       throws CertprofileException, BadCertTemplateException;
 
   /**
+   * Checks the requested subject. If the check passes, returns the canonicalized subject.
+   *
+   * @param requestedSubject
+   *          Requested subject. Must not be {@code null}.
+   * @param publicKeyInfo
+   *          SubjectPublicKeyInfo of the certificate.
+   * @return the granted subject
+   * @throws BadCertTemplateException
+   *         if the subject is not permitted.
+   * @throws CertprofileException
+   *         if error occurs.
+   */
+  public SubjectInfo getSubject(X500Name requestedSubject, SubjectPublicKeyInfo publicKeyInfo)
+          throws CertprofileException, BadCertTemplateException {
+    return getSubject(requestedSubject);
+  }
+
+  /**
    * Checks the requested extensions and returns the canonicalized ones.
    *
    * @param extensionControls

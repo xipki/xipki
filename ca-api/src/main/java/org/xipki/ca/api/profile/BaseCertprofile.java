@@ -35,6 +35,7 @@ import org.xipki.ca.api.profile.KeyParametersOption.DSAParametersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.ECParamatersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.RSAParametersOption;
 import org.xipki.security.EdECConstants;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.X509Util;
@@ -94,7 +95,18 @@ public abstract class BaseCertprofile extends Certprofile {
 
   @Override
   public SubjectInfo getSubject(X500Name requestedSubject)
+          throws CertprofileException, BadCertTemplateException {
+    return doGetSubject(requestedSubject, null);
+  }
+
+  @Override
+  public SubjectInfo getSubject(X500Name requestedSubject, SubjectPublicKeyInfo publicKeyInfo)
       throws CertprofileException, BadCertTemplateException {
+    return doGetSubject(requestedSubject, publicKeyInfo);
+  }
+
+  private SubjectInfo doGetSubject(X500Name requestedSubject, SubjectPublicKeyInfo publicKeyInfo)
+          throws CertprofileException, BadCertTemplateException {
     Args.notNull(requestedSubject, "requestedSubject");
 
     verifySubjectDnOccurence(requestedSubject);
@@ -137,7 +149,26 @@ public abstract class BaseCertprofile extends Certprofile {
       if (len == 1) {
         RDN rdn;
         if (cvalue != null) {
-          rdn = createSubjectRdn(cvalue, type, control);
+          if (cvalue.equalsIgnoreCase(":SM3(SubjectPublicKeyInfo)")
+                  || cvalue.equalsIgnoreCase(":SHA1(SubjectPublicKeyInfo)")
+                  || cvalue.equalsIgnoreCase(":SHA256(SubjectPublicKeyInfo)")) {
+            if (publicKeyInfo == null) {
+              throw new CertprofileException("publicKeyInfo is not set");
+            }
+
+            HashAlgo ha;
+            if (cvalue.equalsIgnoreCase(":SM3(SubjectPublicKeyInfo)")) {
+              ha = HashAlgo.SM3;
+            } else if (cvalue.equalsIgnoreCase(":SHA1(SubjectPublicKeyInfo)")) {
+              ha = HashAlgo.SHA1;
+            } else {
+              ha = HashAlgo.SHA256;
+            }
+            byte[] pkData = publicKeyInfo.getPublicKeyData().getOctets();
+            rdn = createSubjectRdn(ha.hexHash(pkData), type, control);
+          } else {
+            rdn = createSubjectRdn(cvalue, type, control);
+          }
         } else {
           ASN1Encodable rdnValue = thisRdns[0].getFirst().getValue();
           if (ObjectIdentifiers.DN.dateOfBirth.equals(type)) {

@@ -34,9 +34,7 @@ echo "=====CMP: Enroll (CA generate key pair) via CRMF====="
 list = [client]; each ($list) {
   profile = $it
   CN = cmp-${profile}-${CUR_TIME}
-  # TODO: only for debug, should be computed by the CA
-  SN = 1234567890123456789012345678901234567890123456789012345678901234
-  SUBJECT = "CN=${CN}.myorg.org,SerialNumber=${SN},O=myorg CDRM,C=CN";
+  SUBJECT = "CN=${CN}.myorg.org,O=myorg CDRM,C=CN";
 
   xi:cmp-enroll-cagenkey --p12-out ${OUT_DIR}/${CN}.p12 --password 1234 --cert-out ${OUT_DIR}/${CN}.der --profile ${profile} --subject "${SUBJECT}"
 }
@@ -46,12 +44,11 @@ list = [client]; each ($list) {
 # Generate first test certificate
 profile = client
 CN = cmp-${profile}-${CUR_TIME}-revoketest
-SN = 1234567890123456789012345678901234567890123456789012345678901234
 
 xi:cmp-enroll-cagenkey \
   --p12-out ${OUT_DIR}/${CN}.p12 --password 1234 \
   --cert-out ${OUT_DIR}/${CN}.der --profile ${profile} \
-  --subject "CN=${CN}.myorg.org,SerialNumber=${SN},O=myorg CDRM,C=CN"
+  --subject "CN=${CN}.myorg.org,O=myorg CDRM,C=CN"
 
 echo "=====CMP: Suspend certificate====="
 xi:cmp-revoke --ca client-ca --cert ${OUT_DIR}/${CN}.der --reason certificateHold
