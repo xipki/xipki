@@ -58,8 +58,9 @@ Deployment in Tomcat 8 and 9
 `tomcat.util.scan.StandardJarScanFilter.jarsToSkip` in the file `conf/catalina.properties`.
 
 ```
-bcprov-*.jar,\
 bcpkix-*.jar,\
+bcprov-*.jar,\
+bcutil-*.jar,\
 fastjson-*.jar,\
 log4j-*.jar,\
 password-*.jar,\

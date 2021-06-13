@@ -62,8 +62,9 @@ Deployment in Tomcat 8 and 9
 
 ```
 audit-*.jar,\
-bcprov-*.jar,\
 bcpkix-*.jar,\
+bcprov-*.jar,\
+bcutil-*.jar,\
 ca-*.jar,\
 certprofile-*.jar,\
 datasource-*.jar,\
