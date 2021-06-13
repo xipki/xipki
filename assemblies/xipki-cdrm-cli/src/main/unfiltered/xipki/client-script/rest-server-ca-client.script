@@ -4,9 +4,9 @@ echo "#################################################################"
 echo "# Server CA:      Manage certificate via REST API               #"
 echo "#################################################################"
 
-CUR_TIME = $(date '+%Y%m%d-%H%M%S')
+CUR_TIME = $(xi:datetime)
 
-OUT_DIR=output/server-ca/rest-${CUR_TIME}
+OUT_DIR = output/server-ca/rest-${CUR_TIME}
 
 CACERT = ${OUT_DIR}/cacert.der
 

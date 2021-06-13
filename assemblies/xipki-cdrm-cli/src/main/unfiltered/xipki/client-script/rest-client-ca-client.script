@@ -4,9 +4,9 @@ echo "#################################################################"
 echo "#        Client-CA: Manage certificate via REST API             #"
 echo "#################################################################"
 
-CUR_TIME = $(date '+%Y%m%d-%H%M%S')
+CUR_TIME = $(xi:datetime)
 
-OUT_DIR=output/client-ca/rest-${CUR_TIME}
+OUT_DIR = output/client-ca/rest-${CUR_TIME}
 
 CACERT = ${OUT_DIR}/cacert.der
 
@@ -21,16 +21,17 @@ CA_SHA1FP = $(xi:cert-info --fingerprint --hash SHA1 --in ${CACERT})
 ## Enroll certificates
 echo "=====REST: Enroll (CA generate keypair)====="
 
+HEADER = "Content-Type: text/plain; encoding=utf-8"
+
 list = [client]; each ($list) {
   profile = $it
   CN = rest-${profile}-${CUR_TIME}
   # TODO: only for debug, should be computed by the CA
   SN = 1234567890123456789012345678901234567890123456789012345678901234
+  SUBJECT = "CN=${CN}.myorg.org,SerialNumber=${SN},O=myorg CDRM,C=CN"
+  URL = "$BASE_URL/enroll-cert-cagenkeypair?profile=${profile}"
 
-  xi:curl --out ${OUT_DIR}/${CN}.pem \
-    --data "subject=CN=${CN}.myorg.org,SerialNumber=${SN},O=myorg CDRM,C=CN" \
-    --header "Content-Type: text/plain; encoding=utf-8" \
-    "$BASE_URL/enroll-cert-cagenkeypair?profile=${profile}"
+  xi:curl --out ${OUT_DIR}/${CN}.pem --data "subject=${SUBJECT}" --header "${HEADER}" "${URL}"
 }
 
 ## Test suspend / unsuspend / revoke

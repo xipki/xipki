@@ -33,10 +33,8 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Basic actions.
@@ -531,5 +529,21 @@ public class Actions {
     }
 
   } // class Rm
+
+  @Command(scope = "xi", name = "datetime", description = "get current date-time")
+  @Service
+  public static class DateTime extends XiAction {
+
+    @Argument(name = "format", description = "format")
+    @Completion(FileCompleter.class)
+    private String format = "yyyyMMdd-hhmmss";
+
+    @Override
+    protected Object execute0()
+            throws Exception {
+      SimpleDateFormat sdf = new SimpleDateFormat(format);
+      return sdf.format(new Date());
+    }
+  }
 
 }

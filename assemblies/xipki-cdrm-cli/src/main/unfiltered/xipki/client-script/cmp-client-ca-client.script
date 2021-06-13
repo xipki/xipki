@@ -11,9 +11,9 @@ echo "#################################################################"
 echo "#                 Manage certificate via CMP                    #"
 echo "#################################################################"
 
-CUR_TIME = $(date '+%Y%m%d-%H%M%S')
+CUR_TIME = $(xi:datetime)
 
-OUT_DIR=output/client-ca/cmp-${CUR_TIME}
+OUT_DIR = output/client-ca/cmp-${CUR_TIME}
 
 CACERT = ${OUT_DIR}/cacert.der
 
@@ -36,11 +36,9 @@ list = [client]; each ($list) {
   CN = cmp-${profile}-${CUR_TIME}
   # TODO: only for debug, should be computed by the CA
   SN = 1234567890123456789012345678901234567890123456789012345678901234
+  SUBJECT = "CN=${CN}.myorg.org,SerialNumber=${SN},O=myorg CDRM,C=CN";
 
-  xi:cmp-enroll-cagenkey \
-    --p12-out ${OUT_DIR}/${CN}.p12 --password 1234 \
-    --cert-out ${OUT_DIR}/${CN}.der --profile ${profile} \
-    --subject "CN=${CN}.myorg.org,SerialNumber=${SN},O=myorg CDRM,C=CN"
+  xi:cmp-enroll-cagenkey --p12-out ${OUT_DIR}/${CN}.p12 --password 1234 --cert-out ${OUT_DIR}/${CN}.der --profile ${profile} --subject "${SUBJECT}"
 }
 
 ## Test suspend / unsuspend / revoke
