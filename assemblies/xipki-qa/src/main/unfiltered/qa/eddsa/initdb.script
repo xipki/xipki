@@ -7,12 +7,26 @@ sleep 1
 
 source qa/setenv.script
 
-shell:exec dbtool/bin/initdb.sh \
-  --force \
-  --db-conf ${XIPKI_DIR}/etc/ca/database/ca-db.properties \
-  --db-schema xipki/sql/ca-init.xml
+OS_NAME = $(osinfo --name)
 
-shell:exec dbtool/bin/initdb.sh \
-  --force \
-  --db-conf ${XIPKI_DIR}/etc/ca/database/ocsp-db.properties \
-  --db-schema xipki/sql/ocsp-init.xml
+## CA Database
+
+DB_CONF = "${XIPKI_DIR}/etc/ca/database/ca-db.properties"
+DB_SCHEMA = xipki/sql/ca-init.xml
+
+if { "${osname}" equals "windows" } then {
+  shell:exec dbtool\\bin\\initdb.bat --force --db-conf "${DB_CONF}" --db-schema ${DB_SCHEMA}
+} else {
+  shell:exec dbtool/bin/initdb.sh --force --db-conf "${DB_CONF}" --db-schema ${DB_SCHEMA}
+}
+
+## OCSP Database
+
+DB_CONF = "${XIPKI_DIR}/etc/ca/database/ocsp-db.properties"
+DB_SCHEMA = xipki/sql/ocsp-init.xml
+
+if { "${osname}" equals "windows" } then {
+  shell:exec dbtool\\bin\\initdb.bat --force --db-conf "${DB_CONF}" --db-schema ${DB_SCHEMA}
+} else {
+  shell:exec dbtool/bin/initdb.sh --force --db-conf "${DB_CONF}" --db-schema ${DB_SCHEMA}
+}

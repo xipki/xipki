@@ -546,4 +546,45 @@ public class Actions {
     }
   }
 
+  @Command(scope = "xi", name = "osinfo", description = "get info of operation system")
+  @Service
+  public static class OsInfo extends XiAction {
+
+    @Option(name = "--name", aliases = "-n", description = "output OS name")
+    private Boolean printName;
+
+    @Option(name = "--arch", aliases = "-a", description = "output OS arch")
+    private Boolean printArch;
+
+    @Override
+    protected Object execute0()
+            throws Exception {
+      String name = System.getProperty("os.name").toLowerCase(Locale.ROOT);
+      if (name.startsWith("windows")) {
+        name = "windows";
+      } else if (name.startsWith("linux")) {
+        name = "linux";
+      } else if (name.startsWith("mac os x")) {
+        name = "macosx";
+      }
+
+      String arch = System.getProperty("os.arch").toLowerCase(Locale.ROOT);
+      if (printName == null && printArch == null) {
+        return name + "/" + arch;
+      }
+
+      boolean bName = printName == null ? false : printName.booleanValue();
+      boolean bArch = printArch == null ? false : printArch.booleanValue();
+      if (bName && bArch) {
+        return name + "/" + arch;
+      } else if (bName) {
+        return name;
+      } else if (bArch) {
+        return arch;
+      } else {
+        return "";
+      }
+    }
+  }
+
 }
