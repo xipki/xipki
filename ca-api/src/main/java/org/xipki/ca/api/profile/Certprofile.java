@@ -790,6 +790,7 @@ public abstract class Certprofile implements Closeable {
       byte[] bytes = Arrays.copyOfRange(skiValue, skiValue.length - 8, skiValue.length);
       bytes[0] &= 0x0F;
       bytes[0] |= 0x40;
+      skiValue = bytes;
     } else {
       throw new CertprofileException("unknown SubjectKeyIdentifierMethod " + method);
     }
