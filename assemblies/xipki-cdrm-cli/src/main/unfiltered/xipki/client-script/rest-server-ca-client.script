@@ -25,11 +25,10 @@ echo "=====REST: Enroll (CA generate keypair)====="
 list = [contentencryption keygateway keymanagement ocsp server]; each ($list) {
   profile = $it
   CN = rest-${profile}-${CUR_TIME}
+  SUBJECT = "CN=${CN}.myorg.org,O=myorg CDRM,C=CN"
+  URL = "$BASE_URL/enroll-cert-cagenkeypair?profile=${profile}"
 
-  xi:curl --out ${OUT_DIR}/${CN}.pem \
-    --data "subject=CN=${CN}.myorg.org,O=myorg CDRM,C=CN" \
-    --header "Content-Type: text/plain; encoding=utf-8" \
-    "$BASE_URL/enroll-cert-cagenkeypair?profile=${profile}"
+  xi:curl --out ${OUT_DIR}/${CN}.pem --data "subject=${SUBJECT}" --header "${HEADER}" "${URL}"
 }
 
 ## Test suspend / unsuspend / revoke
