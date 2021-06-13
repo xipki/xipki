@@ -113,7 +113,7 @@ public class CmpResponder extends BaseCmpResponder {
   private CertRepMessage processCertReqMessages(String dfltCertprofileName,
       Boolean dfltCaGenKeypair, PKIMessage request, CmpRequestorInfo requestor, ASN1OctetString tid,
       CertReqMessages cr, boolean allowKeyGen, CmpControl cmpControl,
-      String msgId, AuditEvent event) throws InsuffientPermissionException {
+      String msgId, AuditEvent event) throws InsufficientPermissionException {
     CertReqMsg[] certReqMsgs = cr.toCertReqMsgArray();
     final int n = certReqMsgs.length;
 
@@ -864,7 +864,7 @@ public class CmpResponder extends BaseCmpResponder {
   protected PKIBody cmpEnrollCert(String dfltCertprofileName, Boolean dfltCaGenKeypair,
       PKIMessage request, PKIHeaderBuilder respHeader, CmpControl cmpControl, PKIHeader reqHeader,
       PKIBody reqBody, CmpRequestorInfo requestor, ASN1OctetString tid, String msgId,
-      AuditEvent event) throws InsuffientPermissionException {
+      AuditEvent event) throws InsufficientPermissionException {
     long confirmWaitTime = cmpControl.getConfirmWaitTime();
     if (confirmWaitTime < 0) {
       confirmWaitTime *= -1;
@@ -979,7 +979,7 @@ public class CmpResponder extends BaseCmpResponder {
 
     try {
       checkPermission(requestor, requiredPermission);
-    } catch (InsuffientPermissionException ex) {
+    } catch (InsufficientPermissionException ex) {
       event.setStatus(AuditStatus.FAILED);
       event.addEventData(CaAuditConstants.NAME_message, "NOT_PERMITTED");
       return buildErrorMsgPkiBody(rejection, notAuthorized, null);
@@ -991,7 +991,7 @@ public class CmpResponder extends BaseCmpResponder {
   @Override
   protected PKIBody cmpGeneralMsg(PKIHeaderBuilder respHeader, CmpControl cmpControl,
       PKIHeader reqHeader, PKIBody reqBody, CmpRequestorInfo requestor, ASN1OctetString tid,
-      String msgId, AuditEvent event) throws InsuffientPermissionException {
+      String msgId, AuditEvent event) throws InsufficientPermissionException {
     GenMsgContent genMsgBody = GenMsgContent.getInstance(reqBody.getContent());
     InfoTypeAndValue[] itvs = genMsgBody.toInfoTypeAndValueArray();
 

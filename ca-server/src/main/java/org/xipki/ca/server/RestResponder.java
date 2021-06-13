@@ -335,7 +335,7 @@ public class RestResponder {
 
         try {
           requestor.assertPermitted(PermissionConstants.ENROLL_CERT);
-        } catch (InsuffientPermissionException ex) {
+        } catch (InsufficientPermissionException ex) {
           throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
         }
 
@@ -455,7 +455,7 @@ public class RestResponder {
         }
         try {
           requestor.assertPermitted(permission);
-        } catch (InsuffientPermissionException ex) {
+        } catch (InsufficientPermissionException ex) {
           throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
         }
 
@@ -504,7 +504,7 @@ public class RestResponder {
       } else if (RestAPIConstants.CMD_crl.equals(command)) {
         try {
           requestor.assertPermitted(PermissionConstants.GET_CRL);
-        } catch (InsuffientPermissionException ex) {
+        } catch (InsufficientPermissionException ex) {
           throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
         }
 
@@ -532,7 +532,7 @@ public class RestResponder {
       } else if (RestAPIConstants.CMD_new_crl.equals(command)) {
         try {
           requestor.assertPermitted(PermissionConstants.GEN_CRL);
-        } catch (InsuffientPermissionException ex) {
+        } catch (InsufficientPermissionException ex) {
           throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
         }
 

@@ -50,7 +50,7 @@ import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditStatus;
 import org.xipki.ca.api.CertificateInfo;
-import org.xipki.ca.api.InsuffientPermissionException;
+import org.xipki.ca.api.InsufficientPermissionException;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.mgmt.*;
@@ -199,7 +199,7 @@ abstract class BaseCmpResponder {
   protected abstract PKIBody cmpEnrollCert(String dfltCertprofileName, Boolean dfltCaGenKeypair,
       PKIMessage request, PKIHeaderBuilder respHeader, CmpControl cmpControl, PKIHeader reqHeader,
       PKIBody reqBody, CmpRequestorInfo requestor, ASN1OctetString tid, String msgId,
-      AuditEvent event) throws InsuffientPermissionException;
+      AuditEvent event) throws InsufficientPermissionException;
 
   protected abstract PKIBody cmpUnRevokeRemoveCertificates(PKIMessage request,
       PKIHeaderBuilder respHeader, CmpControl cmpControl, PKIHeader reqHeader, PKIBody reqBody,
@@ -207,7 +207,7 @@ abstract class BaseCmpResponder {
 
   protected abstract PKIBody cmpGeneralMsg(PKIHeaderBuilder respHeader, CmpControl cmpControl,
       PKIHeader reqHeader, PKIBody reqBody, CmpRequestorInfo requestor, ASN1OctetString tid,
-      String msgId, AuditEvent event) throws InsuffientPermissionException;
+      String msgId, AuditEvent event) throws InsufficientPermissionException;
 
   protected abstract PKIBody confirmCertificates(ASN1OctetString transactionId,
       CertConfirmContent certConf, String msgId);
@@ -420,7 +420,7 @@ abstract class BaseCmpResponder {
         respBody = buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
             "unsupported type " + type);
       }
-    } catch (InsuffientPermissionException ex) {
+    } catch (InsufficientPermissionException ex) {
       ErrorMsgContent emc = new ErrorMsgContent(
           new PKIStatusInfo(PKIStatus.rejection, new PKIFreeText(ex.getMessage()),
               new PKIFailureInfo(PKIFailureInfo.notAuthorized)));
@@ -833,11 +833,11 @@ abstract class BaseCmpResponder {
   } // method getSystemInfo
 
   protected void checkPermission(CmpRequestorInfo requestor, int requiredPermission)
-      throws InsuffientPermissionException {
+      throws InsufficientPermissionException {
     X509Ca ca = getCa();
     int permission = ca.getCaInfo().getPermission();
     if (!PermissionConstants.contains(permission, requiredPermission)) {
-      throw new InsuffientPermissionException("Permission "
+      throw new InsufficientPermissionException("Permission "
           + PermissionConstants.getTextForCode(requiredPermission) + "is not permitted");
     }
 

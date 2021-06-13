@@ -18,7 +18,7 @@
 package org.xipki.ca.api.mgmt;
 
 import org.xipki.ca.api.CertWithDbId;
-import org.xipki.ca.api.InsuffientPermissionException;
+import org.xipki.ca.api.InsufficientPermissionException;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.CaHasUserEntry;
@@ -74,13 +74,8 @@ public interface RequestorInfo {
     }
 
     @Override
-    public void assertCertprofilePermitted(String certprofile)
-        throws InsuffientPermissionException {
-    }
-
-    @Override
     public void assertPermitted(int requiredPermission)
-        throws InsuffientPermissionException {
+        throws InsufficientPermissionException {
     }
 
   } // class ByCaRequestorInfo
@@ -151,18 +146,10 @@ public interface RequestorInfo {
     }
 
     @Override
-    public void assertCertprofilePermitted(String certprofile)
-        throws InsuffientPermissionException {
-      if (!isCertprofilePermitted(certprofile)) {
-        throw new InsuffientPermissionException("Certprofile " + certprofile + " is not permitted");
-      }
-    }
-
-    @Override
     public void assertPermitted(int permission)
-        throws InsuffientPermissionException {
+        throws InsufficientPermissionException {
       if (!isPermitted(permission)) {
-        throw new  InsuffientPermissionException("Permission "
+        throw new  InsufficientPermissionException("Permission "
             + PermissionConstants.getTextForCode(permission) + " is not permitted");
       }
     }
@@ -219,18 +206,10 @@ public interface RequestorInfo {
     }
 
     @Override
-    public void assertCertprofilePermitted(String certprofile)
-        throws InsuffientPermissionException {
-      if (!isCertprofilePermitted(certprofile)) {
-        throw new InsuffientPermissionException("Certprofile " + certprofile + " is not permitted");
-      }
-    }
-
-    @Override
     public void assertPermitted(int permission)
-        throws InsuffientPermissionException {
+        throws InsufficientPermissionException {
       if (!isPermitted(permission)) {
-        throw new InsuffientPermissionException("Permission "
+        throw new InsufficientPermissionException("Permission "
             + PermissionConstants.getTextForCode(permission) + " is not permitted");
       }
     }
@@ -245,10 +224,7 @@ public interface RequestorInfo {
 
   boolean isPermitted(int requiredPermission);
 
-  void assertCertprofilePermitted(String certprofile)
-      throws InsuffientPermissionException;
-
   void assertPermitted(int requiredPermission)
-      throws InsuffientPermissionException;
+      throws InsufficientPermissionException;
 
 }
