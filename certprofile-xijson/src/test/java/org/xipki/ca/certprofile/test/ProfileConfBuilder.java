@@ -174,7 +174,7 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
   }
 
   protected static RdnType createRdn(ASN1ObjectIdentifier type, int min, int max,
-      String regex, String prefix, String suffix, String group, String value) {
+      String regex, String prefix, String suffix, String group, ValueType value) {
     RdnType ret = new RdnType();
     ret.setType(createOidType(type));
     ret.setMinOccurs(min);
@@ -196,11 +196,8 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
       ret.setGroup(group);
     }
 
-    if (StringUtil.isNotBlank(value)) {
-      ValueType valueType = new ValueType();
-      valueType.setOverridable(true);
-      valueType.setText(value);
-      ret.setValue(valueType);
+    if (value != null) {
+      ret.setValue(value);
     }
 
     if (NOT_IN_SUBJECT_RDNS.contains(type)) {

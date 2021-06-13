@@ -63,7 +63,7 @@
 			"minOccurs":1,
 			"maxOccurs":1,
 			"value":{
-				"overridable":true,
+				"overridable":false,
 				"text":":SM3(SubjectPublicKeyInfo)"
 			}
 		},{
