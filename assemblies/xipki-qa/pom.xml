@@ -15,7 +15,7 @@
     <jdbc.postgresql.version>42.2.14</jdbc.postgresql.version>
     <app.name>QA</app.name>
     <shared.dir>${project.basedir}/../shared</shared.dir>
-    <patchkaraf.repos>mvn:org.xipki.feature/qa/${project.version}/xml/features,file:lib/jdbc/features.xml</patchkaraf.repos>
+    <patchkaraf.repos>mvn:org.xipki.feature/qa/${project.version}/xml/features</patchkaraf.repos>
     <patchkaraf.features>(-jaas,-ssh,-config,aries-blueprint/${karaf.version},wrap,netty-tcnative),xipki-security,xipki-caclient,xipki-scepclient,xipki-ocspclient,xipki-camgmt,xipki-ocspmgmt,xipki-dbtool,xipki-qa</patchkaraf.features>
   </properties>
   <dependencies>

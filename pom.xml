@@ -31,16 +31,16 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <xipki.tools.version>1.0.5</xipki.tools.version>
     <servlet.version>3.1.0</servlet.version>
-    <karaf.version>4.2.9</karaf.version>
+    <karaf.version>4.2.11</karaf.version>
     <bc.version>1.69</bc.version>
     <slf4j.version>1.7.25</slf4j.version>
     <pkcs11-wrapper.version>1.4.7</pkcs11-wrapper.version>
-    <hikaricp.version>3.4.5</hikaricp.version>
-    <fastjson.version>1.2.73</fastjson.version>
+    <hikaricp.version>4.0.3</hikaricp.version>
+    <fastjson.version>1.2.76</fastjson.version>
     <liquibase.version>3.10.3</liquibase.version>
     <!-- only for runtime -->
-    <tinylog.version>2.1.2</tinylog.version>
-    <jdbc.mariadb.version>2.7.2</jdbc.mariadb.version>
+    <tinylog.version>2.3.2</tinylog.version>
+    <jdbc.mariadb.version>2.7.3</jdbc.mariadb.version>
     <!-- Only for test purpose -->
     <junit.version>4.13.1</junit.version>
   </properties>
