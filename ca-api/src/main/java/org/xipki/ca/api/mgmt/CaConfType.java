@@ -743,11 +743,6 @@ public class CaConfType {
 
     private String serialNumber;
 
-    /**
-     * Output format of the generated certificate.
-     */
-    private String certOutform;
-
     public FileOrBinary getCsr() {
       return csr;
     }
@@ -770,14 +765,6 @@ public class CaConfType {
 
     public void setSerialNumber(String serialNumber) {
       this.serialNumber = serialNumber;
-    }
-
-    public String getCertOutform() {
-      return certOutform;
-    }
-
-    public void setCertOutform(String certOutform) {
-      this.certOutform = certOutform;
     }
 
     @Override

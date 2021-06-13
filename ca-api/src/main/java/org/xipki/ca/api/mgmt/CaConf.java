@@ -58,14 +58,10 @@ public class CaConf {
 
     private final BigInteger serialNumber;
 
-    private final String certOutputFormat;
-
-    public GenSelfIssued(String profile, byte[] csr, BigInteger serialNumber,
-        String certOutputFormat) {
+    public GenSelfIssued(String profile, byte[] csr, BigInteger serialNumber) {
       this.profile = Args.notBlank(profile, "profile");
       this.csr = Args.notNull(csr, "csr");
       this.serialNumber = serialNumber;
-      this.certOutputFormat = certOutputFormat;
     }
 
     public String getProfile() {
@@ -80,9 +76,6 @@ public class CaConf {
       return serialNumber;
     }
 
-    public String getCertOutputFormat() {
-      return certOutputFormat;
-    }
   } // class GenSelfIssued
 
   public static class SingleCa {
@@ -317,7 +310,7 @@ public class CaConf {
             }
 
             genSelfIssued = new GenSelfIssued(ci.getGenSelfIssued().getProfile(),
-                csr, serialNumber, ci.getGenSelfIssued().getCertOutform());
+                csr, serialNumber);
           }
 
           CaUris caUris;
