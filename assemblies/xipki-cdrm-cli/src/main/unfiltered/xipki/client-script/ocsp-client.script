@@ -1,0 +1,86 @@
+echo "If not done, configure the OCSP responder xipki/etc/ocsp/ocsp-responder.json"
+echo "  - Copy the ocsp responder p12 file to xipki/keycerts/ocsp1.p12"
+echo "  - Change 'responderIdByName' from 'true' to 'false'."
+
+xi:confirm "Please restart the OCSP server."
+
+echo "# Server-CA: Test OCSP + suspend / unsuspend / revoke           #"
+echo "#################################################################"
+
+BASE_URL = https://localhost:8443/ca/rest/server-ca
+CUR_TIME = $(xi:datetime)
+OUT_DIR = output/server-ca/ocsp-${CUR_TIME}
+CACERT = ${OUT_DIR}/cacert.der
+CA_NAME = server-ca
+
+echo "# Get CA certificate"
+
+xi:curl --out ${CACERT} $BASE_URL/cacert
+
+# Generate test certificate
+profile = server
+NAME = server-ca-revoketest
+
+xi:cmp-enroll-cagenkey \
+  --p12-out ${OUT_DIR}/${NAME}.p12 --password 1234 \
+  --cert-out ${OUT_DIR}/${NAME}.der --profile ${profile} \
+  --subject "CN=${NAME}-${CUR_TIME}.myorg.org,O=myorg CDRM,C=CN"
+
+echo "=====CMP: Suspend certificate====="
+xi:cmp-revoke --ca ${CA_NAME} --cert ${OUT_DIR}/${NAME}.der --reason certificateHold
+
+echo "Current OCSP Status"
+xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${NAME}.der
+
+echo "=====CMP: Unsuspend certificate====="
+xi:cmp-unrevoke --ca ${CA_NAME} --cert ${OUT_DIR}/${NAME}.der
+
+echo "Current OCSP Status"
+xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${NAME}.der
+
+echo "=====CMP: Revoke certificate====="
+xi:cmp-revoke --ca ${CA_NAME} --cert ${OUT_DIR}/${NAME}.der --reason affiliationChanged
+
+#echo "Current OCSP Status"
+xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${NAME}.der
+
+echo "#################################################################"
+echo "# Client-CA: Test OCSP + suspend / unsuspend / revoke           #"
+echo "#################################################################"
+
+BASE_URL = https://localhost:8443/ca/rest/client-ca
+CUR_TIME = $(xi:datetime)
+OUT_DIR = output/client-ca/ocsp-${CUR_TIME}
+CACERT = ${OUT_DIR}/cacert.der
+CA_NAME = server-ca
+
+echo "# Get CA certificate"
+
+xi:curl --out ${CACERT} $BASE_URL/cacert
+
+# Generate test certificate
+profile = client
+NAME = client-ca-revoketest
+
+xi:cmp-enroll-cagenkey \
+  --p12-out ${OUT_DIR}/${NAME}.p12 --password 1234 \
+  --cert-out ${OUT_DIR}/${NAME}.der --profile ${profile} \
+  --subject "CN=${NAME}-${CUR_TIME}.myorg.org,O=myorg CDRM,C=CN"
+
+echo "=====CMP: Suspend certificate====="
+xi:cmp-revoke --ca ${CA_NAME} --cert ${OUT_DIR}/${NAME}.der --reason certificateHold
+
+echo "Current OCSP Status"
+xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${NAME}.der
+
+echo "=====CMP: Unsuspend certificate====="
+xi:cmp-unrevoke --ca ${CA_NAME} --cert ${OUT_DIR}/${NAME}.der
+
+echo "Current OCSP Status"
+xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${NAME}.der
+
+echo "=====CMP: Revoke certificate====="
+xi:cmp-revoke --ca ${CA_NAME} --cert ${OUT_DIR}/${NAME}.der --reason affiliationChanged
+
+#echo "Current OCSP Status"
+xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${NAME}.der

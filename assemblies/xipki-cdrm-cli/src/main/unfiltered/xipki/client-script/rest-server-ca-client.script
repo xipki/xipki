@@ -32,25 +32,3 @@ list = [contentencryption keygateway keymanagement ocsp server]; each ($list) {
 
   xi:curl --out ${OUT_DIR}/${NAME}.pem --data "subject=${SUBJECT}" --header "${HEADER}" "${URL}"
 }
-
-## Test suspend / unsuspend / revoke
-
-# Generate test certificate
-profile = server
-NAME = rest-${profile}-revoketest
-
-xi:curl --out ${OUT_DIR}/${NAME}.pem \
-  --data "subject=CN=${NAME}-${CUR_TIME}-revoketest.myorg.org,O=myorg CDRM,C=CN" \
-  --header "Content-Type: text/plain; encoding=utf-8" \
-  "$BASE_URL/enroll-cert-cagenkeypair?profile=${profile}"
-
-SERIAL = $(xi:cert-info --serial --hex --in ${OUT_DIR}/${NAME}.pem)
-
-echo "=====REST: Suspend====="
-xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=certificateHold"
-
-echo "=====REST: Unsuspend====="
-xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=removeFromCRL"
-
-echo "=====REST: Revoke====="
-xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=keyCompromise"

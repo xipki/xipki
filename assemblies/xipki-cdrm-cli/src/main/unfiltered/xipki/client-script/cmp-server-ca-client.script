@@ -38,24 +38,3 @@ list = [contentencryption keygateway keymanagement ocsp server]; each ($list) {
 
   xi:cmp-enroll-cagenkey --p12-out ${OUT_DIR}/${NAME}.p12 --password 1234 --cert-out ${OUT_DIR}/${NAME}.der --profile ${profile} --subject "${SUBJECT}"
 }
-
-## Test suspend / unsuspend / revoke
-
-# Generate first test certificate
-profile = server
-NAME = cmp-${profile}-revoketest
-
-xi:cmp-enroll-cagenkey \
-  --p12-out ${OUT_DIR}/${NAME}.p12 --password 1234 \
-  --cert-out ${OUT_DIR}/${NAME}.der --profile ${profile} \
-  --subject "CN=${NAME}-${CUR_TIME}-revoketest.myorg.org,O=myorg CDRM,C=CN"
-
-echo "=====CMP: Suspend certificate====="
-xi:cmp-revoke --ca server-ca --cert ${OUT_DIR}/${NAME}.der --reason certificateHold
-
-echo "=====CMP: Unsuspend certificate====="
-xi:cmp-unrevoke --ca server-ca --cert ${OUT_DIR}/${NAME}.der
-
-echo "=====CMP: Revocate certificate====="
-xi:cmp-revoke --ca server-ca --cert ${OUT_DIR}/${NAME}.der --reason affiliationChanged
-
