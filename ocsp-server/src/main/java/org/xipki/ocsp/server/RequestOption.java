@@ -67,6 +67,7 @@ public class RequestOption {
     SUPPORTED_HASH_ALGORITHMS.add(HashAlgo.SHA3_512);
     SUPPORTED_HASH_ALGORITHMS.add(HashAlgo.SHAKE128);
     SUPPORTED_HASH_ALGORITHMS.add(HashAlgo.SHAKE256);
+    SUPPORTED_HASH_ALGORITHMS.add(HashAlgo.SM3);
   }
 
   private final boolean supportsHttpGet;
