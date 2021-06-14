@@ -1,13 +1,18 @@
 CUR_TIME = $(xi:datetime)
 
-xi:cmp-enroll-cagenkey --p12-out output/ocsp1-sm2.p12 --password 1234 --cert-out output/ocsp1-sm2.der --profile ocsp \
-  --subject "CN=OCSP1-SM2-${CUR_TIME},O=myorg CDRM,C=CN"
+FILE_OCSP = output/ocsp1-sm2.p12
 
-echo "If not done"
-echo "  - Copy the file output/ocsp1-sm2.p12 to <ocsp responder dir>/xipki/keycerts/"
-echo "  - Copy the file xipki/ocsp-setup/ocsp-responder.json to <ocsp responder dir>/xipki/etc/ocsp/"
+FE = $(xi:file-exists ${FILE_OCSP})
 
-xi:confirm "Please restart the OCSP server and enter Y!"
+if { ${FE} equals false} then {
+  xi:cmp-enroll-cagenkey --p12-out ${FILE_OCSP} --password 1234 --cert-out output/ocsp1-sm2.der --profile ocsp \
+    --subject "CN=OCSP1-SM2-${CUR_TIME},O=myorg CDRM,C=CN"
+
+  echo "  - Copy the file ${FILE_OCSP} to <ocsp responder dir>/xipki/keycerts/"
+  echo "  - Copy the file xipki/ocsp-setup/ocsp-responder.json to <ocsp responder dir>/xipki/etc/ocsp/"
+
+  xi:confirm "Please restart the OCSP server and enter Y!"
+}
 
 OCSP_URL=http://localhost:8080/ocsp/
 
@@ -65,8 +70,8 @@ list = [server-ca client-ca]; each ($list) {
   xi:ocsp-status --hash SM3 --url ${OCSP_URL} --issuer ${CACERT} --cert ${OUT_DIR}/${NAME}.der --req-out ${OUT_DIR}/${NAME}-revoked.req --resp-out ${OUT_DIR}/${NAME}-revoked.resp
 
   echo "=====Generate new CRL====="
-  xi:curl --out ${OUT_DIR}/rest-myca-gen.crl $BASE_URL/new-crl
+  xi:curl --out ${OUT_DIR}/${CA_NAME}-gen.crl $BASE_URL/new-crl
 
   echo "=====Get the current CRL====="
-  xi:curl --out ${OUT_DIR}/rest-myca-get.crl $BASE_URL/crl
+  xi:curl --out ${OUT_DIR}/${CA_NAME}-get.crl $BASE_URL/crl
 }
