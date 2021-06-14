@@ -30,6 +30,7 @@ import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers;
 import org.bouncycastle.asn1.isismtt.ocsp.CertHash;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
+import org.bouncycastle.asn1.ocsp.OCSPResponseStatus;
 import org.bouncycastle.asn1.ocsp.ResponderID;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.*;
@@ -433,6 +434,9 @@ public class Actions {
     @Reference
     private SecurityFactory securityFactory;
 
+    @Option(name = "--quiet", description = "Do not throw error if OCSP status is not 'OK'")
+    protected Boolean quiet = Boolean.FALSE;
+
     @Override
     protected void checkParameters(X509Cert respIssuer, List<BigInteger> serialNumbers,
         Map<BigInteger, byte[]> encodedCerts)
@@ -451,7 +455,12 @@ public class Actions {
 
       int statusCode = response.getStatus();
       if (statusCode != 0) {
-        throw new OcspResponseException.Unsuccessful(statusCode);
+        if (quiet) {
+          println(new OcspResponseException.Unsuccessful(statusCode).statusText());
+          return;
+        } else {
+          throw new OcspResponseException.Unsuccessful(statusCode);
+        }
       }
 
       BasicOCSPResp basicResp;

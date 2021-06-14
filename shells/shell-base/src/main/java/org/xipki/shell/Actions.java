@@ -160,6 +160,22 @@ public class Actions {
 
   } // class CopyFile
 
+  @Command(scope = "xi", name = "file-exists", description = "test whether file or folder exists")
+  @Service
+  public static class FileExists extends XiAction {
+
+    @Argument(name = "target", required = true, description = "file or dir to be checked")
+    @Completion(FileCompleter.class)
+    private String target;
+
+    @Override
+    protected Object execute0()
+            throws Exception {
+      return new File(target).exists();
+    }
+
+  } // class CopyFile
+
   @Command(scope = "xi", name = "curl", description = "transfer a URL")
   @Service
   public static class Curl extends XiAction {
