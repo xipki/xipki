@@ -105,33 +105,7 @@ public class Actions {
     @Override
     protected Object execute0()
         throws Exception {
-      byte[] bytes = IoUtil.read(inFile);
-      byte[] certBytes = null;
-      byte[] PEM_PREFIX = "-----BEGIN".getBytes(StandardCharsets.UTF_8);
-      if (CompareUtil.areEqual(bytes, 0, PEM_PREFIX, 0, PEM_PREFIX.length)) {
-        try (PemReader r = new PemReader(new InputStreamReader(new ByteArrayInputStream(bytes)))) {
-          PemObject obj;
-          while (true) {
-            obj = r.readPemObject();
-            if (obj == null) {
-              break;
-            }
-
-            if (obj.getType().equalsIgnoreCase("CERTIFICATE")) {
-              certBytes = obj.getContent();
-              break;
-            }
-          }
-
-          if (certBytes == null) {
-            throw new IllegalCmdParamException("found no certificate in " + inFile);
-          }
-        }
-      } else {
-        certBytes = bytes;
-      }
-
-      X509Cert cert = X509Util.parseCert(certBytes);
+      X509Cert cert = X509Util.parseCert(IoUtil.read(inFile));
 
       if (serial != null && serial) {
         return getNumber(cert.getSerialNumber());

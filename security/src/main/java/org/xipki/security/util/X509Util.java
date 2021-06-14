@@ -31,6 +31,8 @@ import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.util.io.pem.PemObject;
+import org.bouncycastle.util.io.pem.PemReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.KeyUsage;
@@ -40,6 +42,7 @@ import org.xipki.util.*;
 import org.xipki.util.PemEncoder.PemLabel;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.NoSuchProviderException;
 import java.security.cert.*;
@@ -73,6 +76,8 @@ public class X509Util {
   private static final String BEGIN_CERTIFICATE = "-----BEGIN CERTIFICATE-----";
 
   private static final String END_CERTIFICATE = "-----END CERTIFICATE-----";
+
+  private static final byte[] PEM_PREFIX = "-----BEGIN".getBytes(StandardCharsets.UTF_8);
 
   private static CertificateFactory certFact;
 
@@ -126,9 +131,38 @@ public class X509Util {
     return parseCert(read(certStream));
   }
 
-  public static X509Cert parseCert(byte[] certBytes)
+  public static X509Cert parseCert(byte[] bytes)
       throws CertificateEncodingException {
-    notNull(certBytes, "certBytes");
+    notNull(bytes, "bytes");
+
+    byte[] certBytes = null;
+    if (CompareUtil.areEqual(bytes, 0, PEM_PREFIX, 0, PEM_PREFIX.length)) {
+      try {
+        try (PemReader r = new PemReader(new InputStreamReader(new ByteArrayInputStream(bytes)))) {
+          PemObject obj;
+          while (true) {
+            obj = r.readPemObject();
+            if (obj == null) {
+              break;
+            }
+
+            if (obj.getType().equalsIgnoreCase("CERTIFICATE")) {
+              certBytes = obj.getContent();
+              break;
+            }
+          }
+
+          if (certBytes == null) {
+            throw new CertificateEncodingException("found no certificate");
+          }
+        }
+      } catch (IOException ex) {
+        throw new CertificateEncodingException("error while parsing bytes");
+      }
+    } else {
+      certBytes = bytes;
+    }
+
     byte[] derBytes = toDerEncoded(certBytes);
     X509CertificateHolder certHolder;
     try {
