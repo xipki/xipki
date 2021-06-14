@@ -140,7 +140,7 @@ public class CdrmProfileConfDemo extends ExtensionConfBuilder {
 
   private static void certprofileOcsp(String destFilename) {
     String desc = "China DRM OCSP";
-    X509ProfileType profile = getBaseProfile(desc, CertLevel.EndEntity, "3m");
+    X509ProfileType profile = getBaseProfile(desc, CertLevel.EndEntity, "90d");
 
     // Subject
     Subject subject = profile.getSubject();

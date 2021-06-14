@@ -7,7 +7,7 @@
 	"certDomain":"RFC5280",
 	"certLevel":"EndEntity",
 	"maxSize":1000,
-	"validity":"3m",
+	"validity":"90d",
 	"notBeforeTime":"current",
 	"serialNumberInReq":false,
 	"keypairGeneration":{
