@@ -19,40 +19,5 @@ xi:replace --old "REPLACEME-CA_SIGNERCONF" \
 ca:load-conf --conf-file xipki/ca-setup/cacert-present/rootca-conf.json \
   --out-dir ${KEYCERTS_DIR}
 
-echo "#################################################################"
-echo "#  Server CA:         Load server-ca-conf.json                  #"
-echo "#################################################################"
-
-# Configure CA
-
-xi:copy-file -f xipki/ca-setup/cacert-present/template.server-ca-conf.json \
-  xipki/ca-setup/cacert-present/server-ca-conf.json
-
-xi:replace --old "REPLACEME-TOKEN_TYPE" --new "pkcs12" \
-  xipki/ca-setup/cacert-present/server-ca-conf.json
-
-xi:replace --old "REPLACEME-CA_SIGNERCONF" \
-  --new "algo=SM3withSM2,password=1234,keystore=file:xipki/ca-setup/keycerts/server-ca1.p12" \
-  xipki/ca-setup/cacert-present/server-ca-conf.json
-
-ca:load-conf --conf-file xipki/ca-setup/cacert-present/server-ca-conf.json \
-  --out-dir ${KEYCERTS_DIR}
-
-echo "#################################################################"
-echo "#  Client CA:         Load client-ca-conf.json                  #"
-echo "#################################################################"
-
-# Configure CA
-
-xi:copy-file -f xipki/ca-setup/cacert-present/template.client-ca-conf.json \
-  xipki/ca-setup/cacert-present/client-ca-conf.json
-
-xi:replace --old "REPLACEME-TOKEN_TYPE" --new "pkcs12" \
-  xipki/ca-setup/cacert-present/client-ca-conf.json
-
-xi:replace --old "REPLACEME-CA_SIGNERCONF" \
-  --new "algo=SM3withSM2,password=1234,keystore=file:xipki/ca-setup/keycerts/client-ca1.p12" \
-  xipki/ca-setup/cacert-present/client-ca-conf.json
-
-ca:load-conf --conf-file xipki/ca-setup/cacert-present/client-ca-conf.json \
-  --out-dir ${KEYCERTS_DIR}
+## Load server-ca and client-ca
+source xipki/ca-setup/cacert-present/setup-subca-p12.script
