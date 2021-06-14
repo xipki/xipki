@@ -4,6 +4,8 @@ echo "  - Change 'responderIdByName' from 'true' to 'false'."
 
 xi:confirm "Please restart the OCSP server."
 
+OCSP_URL=http://localhost:8080/ocsp/
+
 echo "# Server-CA: Test OCSP + suspend / unsuspend / revoke           #"
 echo "#################################################################"
 
@@ -30,19 +32,19 @@ echo "=====CMP: Suspend certificate====="
 xi:cmp-revoke --ca ${CA_NAME} --cert ${OUT_DIR}/${NAME}.der --reason certificateHold
 
 echo "Current OCSP Status"
-xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${NAME}.der
+xi:ocsp-status --url ${OCSP_URL} --issuer ${CACERT} --cert ${OUT_DIR}/${NAME}.der
 
 echo "=====CMP: Unsuspend certificate====="
 xi:cmp-unrevoke --ca ${CA_NAME} --cert ${OUT_DIR}/${NAME}.der
 
 echo "Current OCSP Status"
-xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${NAME}.der
+xi:ocsp-status --url ${OCSP_URL} --issuer ${CACERT} --cert ${OUT_DIR}/${NAME}.der
 
 echo "=====CMP: Revoke certificate====="
 xi:cmp-revoke --ca ${CA_NAME} --cert ${OUT_DIR}/${NAME}.der --reason affiliationChanged
 
 #echo "Current OCSP Status"
-xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${NAME}.der
+xi:ocsp-status --url ${OCSP_URL} --issuer ${CACERT} --cert ${OUT_DIR}/${NAME}.der
 
 echo "#################################################################"
 echo "# Client-CA: Test OCSP + suspend / unsuspend / revoke           #"
@@ -52,7 +54,7 @@ BASE_URL = https://localhost:8443/ca/rest/client-ca
 CUR_TIME = $(xi:datetime)
 OUT_DIR = output/client-ca/ocsp-${CUR_TIME}
 CACERT = ${OUT_DIR}/cacert.der
-CA_NAME = server-ca
+CA_NAME = client-ca
 
 echo "# Get CA certificate"
 
@@ -71,16 +73,16 @@ echo "=====CMP: Suspend certificate====="
 xi:cmp-revoke --ca ${CA_NAME} --cert ${OUT_DIR}/${NAME}.der --reason certificateHold
 
 echo "Current OCSP Status"
-xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${NAME}.der
+xi:ocsp-status --url ${OCSP_URL} --issuer ${CACERT} --cert ${OUT_DIR}/${NAME}.der
 
 echo "=====CMP: Unsuspend certificate====="
 xi:cmp-unrevoke --ca ${CA_NAME} --cert ${OUT_DIR}/${NAME}.der
 
 echo "Current OCSP Status"
-xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${NAME}.der
+xi:ocsp-status --url ${OCSP_URL} --issuer ${CACERT} --cert ${OUT_DIR}/${NAME}.der
 
 echo "=====CMP: Revoke certificate====="
 xi:cmp-revoke --ca ${CA_NAME} --cert ${OUT_DIR}/${NAME}.der --reason affiliationChanged
 
 #echo "Current OCSP Status"
-xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${NAME}.der
+xi:ocsp-status --url ${OCSP_URL} --issuer ${CACERT} --cert ${OUT_DIR}/${NAME}.der
