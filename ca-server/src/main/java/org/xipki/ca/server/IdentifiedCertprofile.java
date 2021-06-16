@@ -632,6 +632,10 @@ public class IdentifiedCertprofile implements Closeable {
     return certprofile.getKeypairGenControl();
   }
 
+  public String getSerialNumberMode() {
+    return certprofile.getSerialNumberMode();
+  }
+
   public boolean isOnlyForRa() {
     return certprofile.isOnlyForRa();
   }

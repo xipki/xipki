@@ -802,4 +802,12 @@ public abstract class Certprofile implements Closeable {
     return null;
   }
 
+  /**
+   * How to generate the certificate's serial number
+   * @return the mode to generate serial number.
+   */
+  public String getSerialNumberMode() {
+    return null;
+  }
+
 }

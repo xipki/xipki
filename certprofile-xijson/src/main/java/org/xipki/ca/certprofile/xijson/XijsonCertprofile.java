@@ -66,6 +66,8 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   private KeypairGenControl keypairGenControl;
 
+  private String serialNumberMode;
+
   private Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms;
 
   private Integer maxSize;
@@ -90,6 +92,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     certDomain = null;
     certLevel = null;
     keypairGenControl = null;
+    serialNumberMode = null;
     keyAlgorithms = null;
     maxSize = null;
     raOnly = false;
@@ -178,6 +181,8 @@ public class XijsonCertprofile extends BaseCertprofile {
 
     // KeypairGenControl
     KeypairGenerationType kg = conf.getKeypairGeneration();
+
+    this.serialNumberMode = conf.getSerialNumberMode();
 
     if (kg == null || kg.isForbidden()) {
       this.keypairGenControl = KeypairGenControl.ForbiddenKeypairGenControl.INSTANCE;
@@ -1035,6 +1040,11 @@ public class XijsonCertprofile extends BaseCertprofile {
   @Override
   public KeypairGenControl getKeypairGenControl() {
     return keypairGenControl;
+  }
+
+  @Override
+  public String getSerialNumberMode() {
+    return serialNumberMode;
   }
 
   @Override

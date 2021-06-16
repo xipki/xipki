@@ -244,6 +244,8 @@ public class CdrmProfileConfDemo extends ExtensionConfBuilder {
           String destFilename) {
     X509ProfileType profile = getBaseProfile("China DRM Device", CertLevel.EndEntity, "20y");
 
+    // TODO: profile.setSerialNumberMode("CDRM-CLIENT");
+
     // Subject
     Subject subject = profile.getSubject();
 

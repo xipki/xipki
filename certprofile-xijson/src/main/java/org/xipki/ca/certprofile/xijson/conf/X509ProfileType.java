@@ -117,25 +117,31 @@ public class X509ProfileType extends ValidatableConf {
   private KeypairGenerationType keypairGeneration;
 
   /**
+   * Control how to generate the serial number of certificate
+   */
+  @JSONField(ordinal = 10)
+  private String serialNumberMode;
+
+  /**
    * Signature algorithm name. Algorithms supported by the CA are
    * SHA*withECDSA, SHA*withDSA, SHA*withRSA, SHA*withRSAandMGF1, SHA*withPlainECDSA
    * where * is for 1, 224, 256, 384 and 512,
    * and SHA3-*withECDSA, SHA3-*withDSA, SHA3-*withRSA, SHA3-*withRSAandMGF1
    * where * is for 224, 256, 384 and 512.
    */
-  @JSONField(ordinal = 10)
+  @JSONField(ordinal = 11)
   private List<String> signatureAlgorithms;
 
-  @JSONField(ordinal = 11)
+  @JSONField(ordinal = 12)
   private List<AlgorithmType> keyAlgorithms;
 
-  @JSONField(ordinal = 12)
+  @JSONField(ordinal = 13)
   private Subject subject;
 
-  @JSONField(ordinal = 13)
+  @JSONField(ordinal = 14)
   private List<SubjectToSubjectAltNameType> subjectToSubjectAltNames;
 
-  @JSONField(ordinal = 14)
+  @JSONField(ordinal = 15)
   private List<ExtensionType> extensions;
 
   public static X509ProfileType parse(InputStream confStream)
@@ -232,6 +238,14 @@ public class X509ProfileType extends ValidatableConf {
 
   public void setKeypairGeneration(KeypairGenerationType keypairGeneration) {
     this.keypairGeneration = keypairGeneration;
+  }
+
+  public String getSerialNumberMode() {
+    return serialNumberMode;
+  }
+
+  public void setSerialNumberMode(String serialNumberMode) {
+    this.serialNumberMode = serialNumberMode;
   }
 
   public List<AlgorithmType> getKeyAlgorithms() {

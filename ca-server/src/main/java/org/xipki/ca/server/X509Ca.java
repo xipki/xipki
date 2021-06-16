@@ -40,6 +40,7 @@ import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.CaHasUserEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.api.profile.Certprofile.ExtensionControl;
+import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.server.db.CertStore;
@@ -49,10 +50,7 @@ import org.xipki.security.*;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.ctlog.CtLog.SignedCertificateTimestampList;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.DateUtil;
-import org.xipki.util.HealthCheckResult;
-import org.xipki.util.LogUtil;
+import org.xipki.util.*;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -483,8 +481,20 @@ public class X509Ca extends X509CaModule implements Closeable {
       }
     }
 
+    String serialNumberMode = certprofile.getSerialNumberMode();
+    BigInteger serialNumber;
+    if (StringUtil.isBlank(serialNumberMode) || "CA".equalsIgnoreCase(serialNumberMode)) {
+      serialNumber = caInfo.nextSerial();
+    } else if ("CDRM-CLIENT".equalsIgnoreCase(serialNumberMode)) {
+      throw new OperationException(BAD_CERT_TEMPLATE,
+              "SerialNumberMode '" + serialNumberMode + "' unsupported yet");
+    } else {
+      throw new OperationException(BAD_CERT_TEMPLATE,
+              "unknown SerialNumberMode '" + serialNumberMode + "'");
+    }
+
     X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
-        caInfo.getPublicCaInfo().getSubject(), caInfo.nextSerial(), gct.grantedNotBefore,
+        caInfo.getPublicCaInfo().getSubject(), serialNumber, gct.grantedNotBefore,
         gct.grantedNotAfter, gct.grantedSubject, gct.grantedPublicKey);
 
     CertificateInfo ret;
