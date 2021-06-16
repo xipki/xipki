@@ -5,7 +5,7 @@
     |   +-- setup-p11.script
     |   |   : Use PKCS#11 (e.g. HSM) to save the key and certificates
     |   |
-    |   +-- setup-p11.script
+    |   +-- setup-p12.script
     |       : Use PKCS#12 file to save the key and certificates
     |
     +-- cacert-present: scripts to setup CAs if CA certificates are not present
@@ -13,7 +13,7 @@
         +-- setup-p11.script
         |   : Use PKCS#11 (e.g. HSM) to save the key and certificates
         |
-        +-- setup-p11.script
+        +-- setup-p12.script
             : Use PKCS#12 file to save the key and certificates
 
 *-- client-script: Scripts to communicate with the CA server and OCSP responder

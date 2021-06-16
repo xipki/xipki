@@ -13,11 +13,11 @@ a highly scalable and high-performance open source PKI (CA and OCSP responder).
 * The Apache Software License, Version 2.0
 
 ## Owner
-Lijun Liao, [LinkedIn](https://www.linkedin.com/in/lijun-liao-644696b8)
+Lijun Liao, [LinkedIn](https://www.linkedin.com/in/lijun-liao-644696b8), wechat `xipki9`
 
 ## Support
 Just create [issues](https://github.com/xipki/xipki/issues), 
-or via wechat `xipki9`.
+or via wechat.
 
 For bug-report please upload the testdata and log files, describe the version of XiPKI, OS and
 JRE/JDK, and the steps to reproduce the bug.
@@ -26,6 +26,7 @@ JRE/JDK, and the steps to reproduce the bug.
 * OS: Linux, Windows, MacOS
 * JRE / JDK 8 (build 162+), 9, 10, 11, 12, 13
 * Database: DB2, MariaDB, MySQL, Oracle, PostgreSQL, H2, HSQLDB
+* Hardware: Any available hardware (tested on Raspberry Pi 2 Model B with 900MHz quad-core ARM CPU and 1 GB Memory)
 
 ## Tested PKCS#11 Devices
 * [Softhsm v1 & v2](https://www.opendnssec.org/download/packages/),
@@ -276,7 +277,7 @@ Features
  - Support of database cluster
  - Multiple software instances (all can be in active mode) for the same CA
  - Native support of management of CA via embedded OSGi commands
- - API to specify CA management, e.g. GUI
+ - API to manage CA. This allows one to implement proprietary CLI, e.g. Website, to manage CA.
  - Database tool (export and import CA database) simplifies the switch of
    databases, upgrade of XiPKi and switch from other CA system to XiPKI CA
  - Client to enroll, revoke, unrevoke and remove certificates, to generate and
