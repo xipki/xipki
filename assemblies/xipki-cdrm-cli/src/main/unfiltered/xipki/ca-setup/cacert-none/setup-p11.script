@@ -56,7 +56,7 @@ echo "#################################################################"
 # Wait 2 seconds to get different startDate
 sleep 2
 
-P11_LABEL = ${CLIENT_CA_P11_LABEL}
+P11_LABEL = ${SERVER_CA_P11_LABEL}
 
 ## Generate keys and CSR
 xi:sm2-p11 --slot 0 --label ${P11_LABEL}
