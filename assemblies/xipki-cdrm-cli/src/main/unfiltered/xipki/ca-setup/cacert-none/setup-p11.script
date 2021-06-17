@@ -8,6 +8,16 @@ ROOTCA_P11_LABEL = rootca1
 SERVER_CA_P11_LABEL = server-ca1
 CLIENT_CA_P11_LABEL = client-ca1
 
+list = [${ROOTCA_P11_LABEL} ${SERVER_CA_P11_LABEL} ${CLIENT_CA_P11_LABEL}]; each ($list) {
+  P11_LABEL = $it
+  KEYEXISTS = $(xi:key-exists-p11 --slot 0 --label ${P11_LABEL})
+
+  if { ${KEYEXISTS} } then {
+     xi:delete-key-p11 --slot 0  --label ${P11_LABEL}
+  }
+
+}
+
 KEYCERTS_DIR = xipki/ca-setup/keycerts
 
 echo "#################################################################"

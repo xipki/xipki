@@ -110,7 +110,7 @@ public class P11Actions {
         P11Slot slot = getSlot();
         P11ObjectIdentifier objectId = slot.getObjectId(Hex.decode(id), null);
         if (objectId == null) {
-          println("unkown certificates");
+          println("unknown certificates");
         } else {
           slot.removeCerts(objectId);
           println("deleted certificates");
@@ -356,7 +356,7 @@ public class P11Actions {
       P11Slot slot = getSlot();
       P11ObjectIdentifier keyId = getObjectIdentifier(id, label);
       if (keyId == null) {
-        println("unkown identity");
+        println("unknown identity");
         return null;
       }
 
@@ -368,6 +368,30 @@ public class P11Actions {
     }
 
   } // class DeleteKeyP11
+
+  @Command(scope = "xi", name = "key-exists-p11",
+          description = "return whether key and certs exist in PKCS#11 device")
+  @Service
+  public static class KeyExistsP11 extends P11SecurityAction {
+
+    @Option(name = "--id",
+            description = "id (hex) of the private key in the PKCS#11 device\n"
+                    + "either keyId or keyLabel must be specified")
+    protected String id;
+
+    @Option(name = "--label",
+            description = "label of the private key in the PKCS#11 device\n"
+                    + "either keyId or keyLabel must be specified")
+    protected String label;
+
+    @Override
+    protected Object execute0()
+            throws Exception {
+      P11ObjectIdentifier keyId = getObjectIdentifier(id, label);
+      return keyId != null;
+    }
+
+  } // class KeyExistsP11
 
   public abstract static class P11KeyGenAction extends P11SecurityAction {
 
