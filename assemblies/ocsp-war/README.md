@@ -50,6 +50,7 @@ Deployment in Tomcat 8 and 9
 `tomcat.util.scan.StandardJarScanFilter.jarsToSkip` in the file `conf/catalina.properties`.
 
 ```
+animal-sniffer-annotations*.jar,\
 bcpkix-*.jar,\
 bcprov-*.jar,\
 bcutil-*.jar,\
