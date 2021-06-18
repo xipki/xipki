@@ -97,16 +97,16 @@ public class Securities implements Closeable {
 
     private PasswordConf password;
 
+    /**
+     * list of classes that implement org.xipki.security.SignerFactory
+     */
+    private List<String> signerFactories;
+
     public static final SecurityConf DEFAULT;
 
     static {
       DEFAULT = new SecurityConf();
     }
-
-    /**
-     * list of classes that implement org.xipki.security.SignerFactory
-     */
-    private List<String> signerFactories;
 
     public boolean isKeyStrongrandomEnabled() {
       return keyStrongrandomEnabled;
