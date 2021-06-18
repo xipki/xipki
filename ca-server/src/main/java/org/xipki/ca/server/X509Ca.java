@@ -39,7 +39,6 @@ import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.CaHasUserEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
-import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.Certprofile.ExtensionControl;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;

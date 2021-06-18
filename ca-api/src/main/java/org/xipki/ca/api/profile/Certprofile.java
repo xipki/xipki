@@ -31,7 +31,6 @@ import org.xipki.security.KeyUsage;
 import org.xipki.security.SignAlgo;
 import org.xipki.util.*;
 
-import javax.security.auth.Subject;
 import java.io.Closeable;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;

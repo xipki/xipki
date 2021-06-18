@@ -23,7 +23,6 @@ import org.xipki.ca.api.mgmt.CaManager;
 import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.ValidityMode;
 import org.xipki.util.Args;
-import org.xipki.util.ConfPairs;
 import org.xipki.util.Validity;
 
 import java.util.List;
