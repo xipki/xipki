@@ -652,7 +652,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         : changeCaEntry.getMaxValidity().toString();
     // CHECKSTYLE:SKIP
     String extraControl = (changeCaEntry.getExtraControl() == null) ? null
-        : changeCaEntry.getExtraControl().getEncoded();
+        : new ConfPairs(changeCaEntry.getExtraControl()).getEncoded(); // check also the validity
     // CHECKSTYLE:SKIP
     String validityMode = (changeCaEntry.getValidityMode() == null) ? null
         : changeCaEntry.getValidityMode().name();

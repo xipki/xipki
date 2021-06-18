@@ -80,7 +80,7 @@ public class ChangeCaEntry extends MgmtEntry {
 
   private Integer expirationPeriod;
 
-  private ConfPairs extraControl;
+  private String extraControl;
 
   private CaUris caUris;
 
@@ -277,11 +277,11 @@ public class ChangeCaEntry extends MgmtEntry {
     this.keepExpiredCertInDays = days;
   }
 
-  public ConfPairs getExtraControl() {
+  public String getExtraControl() {
     return extraControl;
   }
 
-  public void setExtraControl(ConfPairs extraControl) {
+  public void setExtraControl(String extraControl) {
     this.extraControl = extraControl;
   }
 

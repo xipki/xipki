@@ -29,10 +29,7 @@ import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.api.mgmt.entry.CaEntry.CaSignerConf;
 import org.xipki.ca.server.db.CertStore;
 import org.xipki.security.*;
-import org.xipki.util.Args;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.Validity;
+import org.xipki.util.*;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -81,6 +78,8 @@ public class CaInfo {
 
   private RevokeSuspendedControl revokeSuspendedCertsControl;
 
+  private ConfPairs extraControl;
+
   public CaInfo(CaEntry caEntry, CertStore certStore)
       throws OperationException {
     this.caEntry = Args.notNull(caEntry, "caEntry");
@@ -97,6 +96,7 @@ public class CaInfo {
     this.certchain = certs == null ? Collections.emptyList() : new ArrayList<>(certs);
     this.noNewCertificateAfter = notAfter.getTime() - MS_PER_DAY * caEntry.getExpirationPeriod();
     this.randomSnGenerator = RandomSerialNumberGenerator.getInstance();
+    this.extraControl = caEntry.getExtraControl();
   } // constructor
 
   public PublicCaInfo getPublicCaInfo() {
@@ -221,6 +221,14 @@ public class CaInfo {
 
   public void setScepControl(ScepControl control) {
     caEntry.setScepControl(control);
+  }
+
+  public ConfPairs getExtraControl() {
+    return extraControl;
+  }
+
+  public void setExtraControl(ConfPairs extraControl) {
+    this.extraControl = extraControl;
   }
 
   public int getNumCrls() {

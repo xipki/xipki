@@ -92,6 +92,10 @@ public class ConfPairs {
       throw new UnsupportedOperationException("removePair() is not supported");
     }
 
+    @Override
+    public Map<String, String> asMap() {
+      return underlying.asMap();
+    }
   }
 
   public static final char NAME_TERM = '=';

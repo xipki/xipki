@@ -62,10 +62,6 @@ public class CaActions {
     @Reference
     protected SecurityFactory securityFactory;
 
-    protected static String getRealString(String str) {
-      return CaManager.NULL.equalsIgnoreCase(str) ? null : str;
-    }
-
     protected static String toString(Collection<?> col) {
       if (col == null) {
         return "null";
@@ -923,7 +919,7 @@ public class CaActions {
       }
 
       if (extraControl != null) {
-        entry.setExtraControl(new ConfPairs(extraControl).unmodifiable());
+        entry.setExtraControl(new ConfPairs(extraControl).getEncoded());
       }
 
       if (numCrls != null) {
