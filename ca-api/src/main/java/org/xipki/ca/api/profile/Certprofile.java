@@ -29,12 +29,11 @@ import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.SignAlgo;
-import org.xipki.util.Args;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.StringUtil;
-import org.xipki.util.Validity;
+import org.xipki.util.*;
 
+import javax.security.auth.Subject;
 import java.io.Closeable;
+import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
@@ -803,11 +802,36 @@ public abstract class Certprofile implements Closeable {
   }
 
   /**
-   * How to generate the certificate's serial number
+   * How to generate the certificate's serial number.
    * @return the mode to generate serial number.
+   *         null, empty or 'CA': CA generates serial number
+   *         'PROFILE': The function
+   *           {@link #generateSerialNumber(X500Name, SubjectPublicKeyInfo, X500Name,
+   *           SubjectPublicKeyInfo, ConfPairs)} will
+   *           be called to generate the serial number. The list is case-sensitive.
    */
   public String getSerialNumberMode() {
     return null;
+  }
+
+  /**
+   * Generate Serial Number of the certificate
+   * @param caSubject CA's subject
+   * @param caPublicKeyInfo CA's public key info.
+   * @param requestSubject requested subject.
+   * @param publicKeyInfo requested public key info.
+   * @param caExtraControl Key-value pairs of CA's extraControl.
+   * @return
+   * @throws CertprofileException
+   */
+  public BigInteger generateSerialNumber(
+          X500Name caSubject,
+          SubjectPublicKeyInfo caPublicKeyInfo,
+          X500Name requestSubject,
+          SubjectPublicKeyInfo publicKeyInfo,
+          ConfPairs caExtraControl)
+          throws CertprofileException {
+    throw new UnsupportedOperationException("generateSerialNumber unsupported");
   }
 
 }

@@ -36,9 +36,11 @@ import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
+import org.xipki.util.ConfPairs;
 import org.xipki.util.Validity;
 
 import java.io.Closeable;
+import java.math.BigInteger;
 import java.util.*;
 
 import static org.xipki.ca.server.CertprofileUtil.*;
@@ -634,6 +636,17 @@ public class IdentifiedCertprofile implements Closeable {
 
   public String getSerialNumberMode() {
     return certprofile.getSerialNumberMode();
+  }
+
+  public BigInteger generateSerialNumber(
+          X500Name caSubject,
+          SubjectPublicKeyInfo caPublicKeyInfo,
+          X500Name requestSubject,
+          SubjectPublicKeyInfo publicKeyInfo,
+          ConfPairs caExtraControl)
+          throws CertprofileException {
+    return certprofile.generateSerialNumber(caSubject, caPublicKeyInfo,
+            requestSubject, publicKeyInfo, caExtraControl);
   }
 
   public boolean isOnlyForRa() {
