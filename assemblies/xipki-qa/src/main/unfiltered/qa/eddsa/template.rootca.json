@@ -11,7 +11,7 @@
 		"name":"responder1",
 		"type":"pkcs12",
 		"conf":{
-			"value":"password=1234,keystore=file:${keycerts.dir}/tlskeys/server/tls-server.p12,algo=SHA256withRSA"
+			"value":"password=1234,keystore=file:${keycerts.dir}/tlskeys/server/tls-server.p12,algo=SHA256withECDSA"
 		}
 	}],
 	"requestors":[{
@@ -98,7 +98,7 @@
 				"messagetime.bias":300,
 				"rr.aki.required":true,
 				"group.enroll":true,
-				"protection.sigalgo":"SHA256withRSA",
+				"protection.sigalgo":"SHA256withECDSA",
 				"popo.sigalgo":"Ed25519:Ed448:DHPOP-X25519:DHPOP-X448"
 			},
 			"cmpResponderName":"responder1",

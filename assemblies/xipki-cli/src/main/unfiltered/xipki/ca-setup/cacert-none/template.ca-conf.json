@@ -9,7 +9,7 @@
 		"name":"responder1",
 		"type":"pkcs12",
 		"conf":{
-			"value":"password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA256withRSA"
+			"value":"password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA256withECDSA"
 		}
 	}],
 	"requestors":[{

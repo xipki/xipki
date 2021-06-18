@@ -17,7 +17,7 @@
 			//},
 			// signerType and signerConf are required if signRequest is true and/or you wish the CA to generate private key
 			"signerType":"pkcs12",
-			"signerConf":"password=1234,algo=SHA256WITHRSA,keystore=file:xipki/keycerts/tlskeys/client/tls-client.p12"
+			"signerConf":"password=1234,algo=SHA256WITHECDSA,keystore=file:xipki/keycerts/tlskeys/client/tls-client.p12"
 		}
 	}],
 	"responders":[{
@@ -27,7 +27,7 @@
 		},
 		"signature":{
 			"signatureAlgos":[
-				"SHA256WITHRSA"
+				"SHA256WITHECDSA"
 			]
 		}
 	}],

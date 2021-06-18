@@ -43,11 +43,7 @@ if { $SIG_TYPE equals "rsa" } then {
   SIGALGO = "${HASH}withSM2"
 }
 
-if { $SIG_TYPE equals "rsapss" } then {
-  CMP_SIGALGO = "${STDHASH}withRSAPSS"
-} else {
-  CMP_SIGALGO = "${STDHASH}withRSA"
-}
+CMP_SIGALGO = "SHA256withECDSA"
 
 xi:copy-dir qa/p12/shared output
 
