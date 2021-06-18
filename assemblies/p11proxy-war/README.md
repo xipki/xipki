@@ -28,7 +28,7 @@ Deployment in Tomcat 8 and 9
                 truststoreFile="${XIPKI_BASE}/keycerts/tlskeys/ca/tls-ca-cert.p12"
                 truststorePassword="1234"
                 truststoreType="PKCS12">
-            <Certificate type="RSA"
+            <Certificate
                          certificateKeystoreFile="${XIPKI_BASE}/keycerts/tlskeys/server/tls-server.p12"
                          certificateKeystorePassword="1234"
                          certificateKeystoreType="PKCS12"/>
@@ -47,7 +47,7 @@ Deployment in Tomcat 8 and 9
                 protocols="TLSv1.2"
                 ciphers="TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,  TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
                 caCertificateFile="xipki/keycerts/tlskeys/ca/tls-ca-cert.pem">
-            <Certificate type="RSA"
+            <Certificate
                          certificateKeyFile="xipki/keycerts/tlskeys/server/tls-server-key.pem"
                          certificateFile="xipki/keycerts/tlskeys/server/tls-server-cert.pem"/>
         </SSLHostConfig>
