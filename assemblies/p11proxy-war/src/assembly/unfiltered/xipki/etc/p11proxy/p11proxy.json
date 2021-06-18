@@ -8,6 +8,7 @@
 		},
 		"password":{
 			"masterPasswordCallback":"FILE file=security/masterpassword.secret"
-		}
+		},
+		"signerFactories": []
 	}
 }
