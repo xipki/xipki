@@ -244,8 +244,6 @@ public class CdrmProfileConfDemo extends ExtensionConfBuilder {
           String destFilename) {
     X509ProfileType profile = getBaseProfile("China DRM Device", CertLevel.EndEntity, "20y");
 
-    // TODO: profile.setSerialNumberMode("CDRM-CLIENT");
-
     // Subject
     Subject subject = profile.getSubject();
 
@@ -253,6 +251,12 @@ public class CdrmProfileConfDemo extends ExtensionConfBuilder {
     rdnControls.add(createRdn(DN.C, 0, 1));
     rdnControls.add(createRdn(DN.O, 1, 1));
     rdnControls.add(createRdn(DN.OU, 0, 1));
+
+    // add control RDN
+    RdnType rnd = new RdnType();
+    rnd.setType(createOidType(DN.generation));
+    rnd.setNotInSubject(Boolean.TRUE);
+    rdnControls.add(rnd);
 
     Subject.ValueType snValueType = new Subject.ValueType();
     snValueType.setOverridable(false);
