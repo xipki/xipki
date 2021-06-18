@@ -31,10 +31,14 @@ xi:cmp-cacertchain \
 
 echo "=====CMP: Enroll (CA generate key pair) via CRMF====="
 
+# Batch Number (hex-encoded, 4 bytes, will be used in the serial number of certificate)
+
+BATCH_NO = 8899AABB
+
 list = [client]; each ($list) {
   profile = $it
   NAME = cmp-${profile}
-  SUBJECT = "CN=${NAME}-${CUR_TIME}.myorg.org,O=myorg CDRM,C=CN";
+  SUBJECT = "GENERATION=${BATCH_NO},CN=${NAME}-${CUR_TIME}.myorg.org,O=myorg CDRM,C=CN";
 
   xi:cmp-enroll-cagenkey --p12-out ${OUT_DIR}/${NAME}.p12 --password 1234 --cert-out ${OUT_DIR}/${NAME}.der --profile ${profile} --subject "${SUBJECT}"
 }

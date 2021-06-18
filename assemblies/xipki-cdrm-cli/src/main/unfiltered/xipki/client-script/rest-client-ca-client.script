@@ -23,10 +23,11 @@ echo "=====REST: Enroll (CA generate keypair)====="
 
 HEADER = "Content-Type: text/plain; encoding=utf-8"
 
+BATCH_NO = 8899AABB
 list = [client]; each ($list) {
   profile = $it
   NAME = rest-${profile}
-  SUBJECT = "CN=${NAME}-${CUR_TIME}.myorg.org,O=myorg CDRM,C=CN"
+  SUBJECT = "GENERATION=${BATCH_NO},CN=${NAME}-${CUR_TIME}.myorg.org,O=myorg CDRM,C=CN"
   URL = "$BASE_URL/enroll-cert-cagenkeypair?profile=${profile}"
 
   xi:curl --out ${OUT_DIR}/${NAME}.pem --data "subject=${SUBJECT}" --header "${HEADER}" "${URL}"

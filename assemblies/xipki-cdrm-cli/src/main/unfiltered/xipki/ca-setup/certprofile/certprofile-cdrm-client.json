@@ -57,6 +57,14 @@
 			"maxOccurs":1
 		},{
 			"type":{
+				"oid":"2.5.4.44",
+				"description":"generationQualifier"
+			},
+			"minOccurs":1,
+			"maxOccurs":1,
+			"notInSubject":true
+		},{
+			"type":{
 				"oid":"2.5.4.5",
 				"description":"serialNumber"
 			},

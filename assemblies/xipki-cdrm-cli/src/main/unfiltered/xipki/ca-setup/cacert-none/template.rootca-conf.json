@@ -51,7 +51,7 @@
 		}
 	},{
 		"name":"client",
-		"type":"xijson",
+		"type":"cdrm-client",
 		"conf":{
 			"file":"${profiles.dir}/certprofile-cdrm-client.json"
 		}

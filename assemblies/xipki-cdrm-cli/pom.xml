@@ -26,6 +26,11 @@
       <classifier>features</classifier>
       <type>xml</type>
     </dependency>
+    <dependency>
+      <groupId>org.xipki.example</groupId>
+      <artifactId>certprofile-example</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
   <build>
     <resources>
@@ -83,6 +88,25 @@
                   <version>${karaf.version}</version>
                   <type>tar.gz</type>
                   <outputDirectory>${project.build.directory}</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+          <execution>
+            <!-- Copy additional patch jars -->
+            <id>patch-jars</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <stripVersion>false</stripVersion>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xipki.example</groupId>
+                  <artifactId>certprofile-example</artifactId>
+                  <version>${project.version}</version>
+                  <outputDirectory>${project.build.directory}/classes/xipki/patch</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>

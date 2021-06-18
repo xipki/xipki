@@ -23,10 +23,13 @@ list = [server-ca client-ca]; each ($list) {
   echo "# ${CA_NAME}: Test OCSP + suspend / unsuspend / revoke"
   echo "#################################################################"
 
-  if { "${CA_NAME}" equals "server-ca" } then {
-    profile = server
-  } else {
+  if { "${CA_NAME}" equals "client-ca" } then {
     profile = client
+    BATCH_NO = 8899AABB
+    SUBJECT = "GENERATION=${BATCH_NO},CN=${NAME}-${CUR_TIME}.myorg.org,O=myorg CDRM,C=CN"
+  } else {
+    profile = server
+    SUBJECT = "CN=${NAME}-${CUR_TIME}.myorg.org,O=myorg CDRM,C=CN"
   }
 
   BASE_URL = https://localhost:8443/ca/rest/${CA_NAME}
@@ -39,7 +42,6 @@ list = [server-ca client-ca]; each ($list) {
 
   # Generate test certificate
   NAME = ${CA_NAME}-revoketest
-  SUBJECT = "CN=${NAME}-${CUR_TIME}.myorg.org,O=myorg CDRM,C=CN"
 
   xi:cmp-enroll-cagenkey --p12-out ${OUT_DIR}/${NAME}.p12 --password 1234 --cert-out ${OUT_DIR}/${NAME}.der --profile ${profile} --subject "${SUBJECT}"
 

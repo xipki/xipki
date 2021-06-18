@@ -53,7 +53,10 @@
 			},
 			"snSize":20,
 			"status":"active",
-			"validityMode":"cutoff"
+			"validityMode":"cutoff",
+			"extraControl": {
+				"cdrm.caid":"4660"
+			}
 		},
 		"profiles":[
 			"client"
