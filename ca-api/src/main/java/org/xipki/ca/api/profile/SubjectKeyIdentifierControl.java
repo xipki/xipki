@@ -39,6 +39,15 @@ public class SubjectKeyIdentifierControl extends ValidatableConf {
 
   private String hashAlgo;
 
+  /**
+   * Format
+   *   - 'L':'&lt;size&gt: Use the left most size bytes.
+   *   - 'R':'&lt;size&gt: Use the right most size bytes.
+   *
+   * Method to truncate the output of {{@link #getMethod()}} is longer than the expected size,
+   */
+  private String truncateMethod;
+
   public SubjectKeyIdentifierMethod getMethod() {
     return method;
   }
@@ -53,6 +62,14 @@ public class SubjectKeyIdentifierControl extends ValidatableConf {
 
   public void setHashAlgo(String hashAlgo) {
     this.hashAlgo = hashAlgo;
+  }
+
+  public String getTruncateMethod() {
+    return truncateMethod;
+  }
+
+  public void setTruncateMethod(String truncateMethod) {
+    this.truncateMethod = truncateMethod;
   }
 
   @Override

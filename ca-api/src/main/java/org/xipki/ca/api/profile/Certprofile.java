@@ -793,6 +793,33 @@ public abstract class Certprofile implements Closeable {
       throw new CertprofileException("unknown SubjectKeyIdentifierMethod " + method);
     }
 
+    String truncateMethod = control.getTruncateMethod();
+    if (StringUtil.isNotBlank(truncateMethod)) {
+      boolean leftmost;
+      if (StringUtil.startsWithIgnoreCase(truncateMethod, "L:")) {
+        leftmost = true;
+      } else if (StringUtil.startsWithIgnoreCase(truncateMethod, "R:")) {
+        leftmost = false;
+      } else {
+        throw new CertprofileException("unknown TruncateMethod " + truncateMethod);
+      }
+
+      int size;
+      try {
+        size = Integer.parseUnsignedInt(truncateMethod.substring(2));
+      } catch (NumberFormatException ex) {
+        throw new CertprofileException("invalid TruncateMethod " + truncateMethod);
+      }
+
+      if (size < skiValue.length) {
+        if (leftmost) {
+          skiValue = Arrays.copyOf(skiValue, size);
+        } else {
+          skiValue = Arrays.copyOfRange(skiValue, skiValue.length - size, skiValue.length);
+        }
+      }
+    }
+
     return new SubjectKeyIdentifier(skiValue);
   }
 
