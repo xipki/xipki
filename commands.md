@@ -22,6 +22,14 @@ Basic Commands
 
      transfer a URL
 
+   * `xi:datetime`
+
+     return date and time
+
+   * `xi:file-exists`
+
+     return whether a file or dir exists
+
    * `xi:mkdir`
 
      make directories
@@ -33,6 +41,10 @@ Basic Commands
    * `xi:move-file`
 
      move file
+
+   * `xi:osinfo`
+
+     return OS info
 
    * `xi:replace`
 
@@ -83,6 +95,10 @@ Security Commands
    * `xi:crl-info`
 
      print CRL information
+
+   * `xi:convert-keystore`
+
+     convert keystore
 
    * `xi:csr-p11`
 
@@ -140,6 +156,10 @@ Security Commands
 
      import secret key with given value in PKCS#11 device
 
+   * `xi:key-exists-p11`
+
+     return whether key and certs exist in PKCS#11 device)
+
    * `xi:keystore-convert`
      convert the keystore format
 
@@ -154,6 +174,10 @@ Security Commands
    * `xi:pbe-enc`
 
      encrypt password with master password
+
+   * `pkcs12`
+
+     export PKCS#12 key store, like the 'openssl pkcs12' command
 
    * `xi:refresh-p11`
 
