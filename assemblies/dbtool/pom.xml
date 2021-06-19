@@ -81,7 +81,6 @@
                 <descriptor>src/assembly/descriptors/main.xml</descriptor>
               </descriptors>
               <appendAssemblyId>false</appendAssemblyId>
-              <!-- Don't install/publish the result -->
               <attach>true</attach>
             </configuration>
           </execution>
