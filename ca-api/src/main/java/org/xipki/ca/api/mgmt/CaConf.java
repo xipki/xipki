@@ -56,9 +56,9 @@ public class CaConf {
 
     private final byte[] csr;
 
-    private final BigInteger serialNumber;
+    private final String serialNumber;
 
-    public GenSelfIssued(String profile, byte[] csr, BigInteger serialNumber) {
+    public GenSelfIssued(String profile, byte[] csr, String serialNumber) {
       this.profile = Args.notBlank(profile, "profile");
       this.csr = Args.notNull(csr, "csr");
       this.serialNumber = serialNumber;
@@ -72,7 +72,7 @@ public class CaConf {
       return csr;
     }
 
-    public BigInteger getSerialNumber() {
+    public String getSerialNumber() {
       return serialNumber;
     }
 
@@ -299,15 +299,7 @@ public class CaConf {
               throw new InvalidConfException("cert.file of CA " + name + " may not be set");
             }
             byte[] csr = getBinary(ci.getGenSelfIssued().getCsr(), zipEntries);
-            BigInteger serialNumber = null;
-            String str = ci.getGenSelfIssued().getSerialNumber();
-            if (str != null) {
-              if (str.startsWith("0x") || str.startsWith("0X")) {
-                serialNumber = new BigInteger(str.substring(2), 16);
-              } else {
-                serialNumber = new BigInteger(str);
-              }
-            }
+            String serialNumber = ci.getGenSelfIssued().getSerialNumber();
 
             genSelfIssued = new GenSelfIssued(ci.getGenSelfIssued().getProfile(),
                 csr, serialNumber);

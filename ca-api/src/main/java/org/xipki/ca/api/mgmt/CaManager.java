@@ -652,13 +652,15 @@ public interface CaManager {
    * @param encodedCsr
    *          CSR. Must not be {@code null}.
    * @param serialNumber
-   *          Serial number. Could be {@code null}.
+   *          Serial number. {@code null}: lets CA choose the serial number;
+   *          fixed serialnumber: decimal or heximal (beginning with 0x) number;
+   *          RANDOM:&ltsize in bytes&gt: random number with given length.
    * @return the generated certificate
    * @throws CaMgmtException
    *          if error occurs.
    */
   X509Cert generateRootCa(CaEntry caEntry, String certprofileName,
-      byte[] encodedCsr, BigInteger serialNumber)
+      byte[] encodedCsr, String serialNumber)
           throws CaMgmtException;
 
   /**

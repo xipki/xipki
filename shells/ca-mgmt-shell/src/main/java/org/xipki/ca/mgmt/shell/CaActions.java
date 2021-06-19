@@ -42,7 +42,6 @@ import org.xipki.shell.XiAction;
 import org.xipki.util.*;
 
 import java.io.File;
-import java.math.BigInteger;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -491,12 +490,7 @@ public class CaActions {
         throws Exception {
       CaEntry caEntry = getCaEntry();
       byte[] csr = IoUtil.read(csrFile);
-      BigInteger serialNumber = null;
-      if (serialS != null) {
-        serialNumber = toBigInt(serialS);
-      }
-
-      X509Cert rootcaCert = caManager.generateRootCa(caEntry, rootcaProfile, csr, serialNumber);
+      X509Cert rootcaCert = caManager.generateRootCa(caEntry, rootcaProfile, csr, serialS);
       if (rootcaCertOutFile != null) {
         saveVerbose("saved root certificate to file", rootcaCertOutFile,
             encodeCert(rootcaCert.getEncoded(), outform));

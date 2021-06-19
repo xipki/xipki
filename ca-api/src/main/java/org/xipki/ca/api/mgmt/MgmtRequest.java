@@ -396,7 +396,7 @@ public abstract class MgmtRequest extends MgmtMessage {
 
     private byte[] encodedCsr;
 
-    private BigInteger serialNumber;
+    private String serialNumber;
 
     public CaEntryWrapper getCaEntry() {
       return caEntry;
@@ -422,11 +422,11 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.encodedCsr = encodedCsr;
     }
 
-    public BigInteger getSerialNumber() {
+    public String getSerialNumber() {
       return serialNumber;
     }
 
-    public void setSerialNumber(BigInteger serialNumber) {
+    public void setSerialNumber(String serialNumber) {
       this.serialNumber = serialNumber;
     }
 

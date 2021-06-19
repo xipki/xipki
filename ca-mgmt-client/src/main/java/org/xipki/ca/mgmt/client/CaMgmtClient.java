@@ -593,7 +593,7 @@ public class CaMgmtClient implements CaManager {
 
   @Override
   public X509Cert generateRootCa(CaEntry caEntry, String certprofileName,
-      byte[] encodedCsr, BigInteger serialNumber)
+      byte[] encodedCsr, String serialNumber)
           throws CaMgmtException {
     MgmtRequest.GenerateRootCa req = new MgmtRequest.GenerateRootCa();
     req.setCaEntry(new CaEntryWrapper(caEntry));

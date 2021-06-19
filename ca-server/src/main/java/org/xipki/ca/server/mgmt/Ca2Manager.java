@@ -46,14 +46,12 @@ import org.xipki.ca.server.mgmt.SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.InvalidConfException;
-import org.xipki.util.LogUtil;
-import org.xipki.util.ObjectCreationException;
+import org.xipki.util.*;
 import org.xipki.util.http.SslContextConf;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.util.*;
 
@@ -556,7 +554,7 @@ class Ca2Manager {
   } // method getX509Ca
 
   X509Cert generateRootCa(CaEntry caEntry, String profileName, byte[] encodedCsr,
-      BigInteger serialNumber) throws CaMgmtException {
+      String serialNumber) throws CaMgmtException {
     assertMasterModeAndSetuped();
 
     notNull(caEntry, "caEntry");
@@ -590,7 +588,34 @@ class Ca2Manager {
       throw new CaMgmtException(concat("unknown certprofile ", profileName));
     }
 
-    BigInteger serialOfThisCert = (serialNumber != null) ? serialNumber : BigInteger.ONE;
+    BigInteger serialOfThisCert;
+    if (serialNumber == null) {
+      serialOfThisCert = BigInteger.ONE;
+    } else if (StringUtil.startsWithIgnoreCase(serialNumber, "RANDOM:")) {
+      int numBytes = -1;
+      try {
+        numBytes = Integer.parseUnsignedInt(serialNumber.substring("RANDOM:".length()));
+      } catch (NumberFormatException ex) {
+        LogUtil.error(LOG, ex, "cannot parse int in " + serialNumber);
+      }
+
+      if (numBytes < 1 || numBytes > 20) {
+        throw new CaMgmtException(concat("invalid SerialNumber for SelfSigned " + serialNumber,
+                profileName));
+      }
+      byte[] bytes = new byte[numBytes];
+      SecureRandom rnd = new SecureRandom();
+      rnd.nextBytes(bytes);
+      // clear the highest bit
+      bytes[0] &= 0x7F;
+      serialOfThisCert = new BigInteger(bytes);
+    } else {
+      if (StringUtil.startsWithIgnoreCase(serialNumber, "0x")) {
+        serialOfThisCert = new BigInteger(serialNumber.substring(2), 16);
+      } else {
+        serialOfThisCert = new BigInteger(serialNumber);
+      }
+    }
 
     GenerateSelfSignedResult result;
     try {
