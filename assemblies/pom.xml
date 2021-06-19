@@ -16,7 +16,6 @@
     <module>features</module>
     <module>dbtool</module>
     <module>xipki-cli</module>
-    <module>xipki-cdrm-cli</module>
     <module>xipki-qa</module>
     <module>ocsp-war</module>
     <module>ca-war</module>

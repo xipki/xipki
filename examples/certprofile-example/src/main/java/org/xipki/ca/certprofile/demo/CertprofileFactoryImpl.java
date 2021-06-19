@@ -37,10 +37,8 @@ public class CertprofileFactoryImpl implements CertprofileFactory {
 
   private static final String TYPE = "demo-profiletype";
 
-  private static final String CDRM_CLIENT_TYPE = "cdrm-client";
-
   private static final Set<String> types = Collections.unmodifiableSet(
-      new HashSet<>(Arrays.asList(TYPE, CDRM_CLIENT_TYPE)));
+      new HashSet<>(Arrays.asList(TYPE)));
 
   @Override
   public Set<String> getSupportedTypes() {
@@ -57,8 +55,6 @@ public class CertprofileFactoryImpl implements CertprofileFactory {
       throws ObjectCreationException {
     if (TYPE.equalsIgnoreCase(type)) {
       return new DemoCertprofile();
-    } else if (CDRM_CLIENT_TYPE.equalsIgnoreCase(type)) {
-      return new CdrmClientCertprofile();
     } else {
       throw new ObjectCreationException("unknown certprofile type '" + type + "'");
     }
