@@ -46,11 +46,15 @@ public class ScepControl {
 
   public static final String KEY_CACERT_INCLUDED = "cacert.included";
 
+  public static final String KEY_CERTCHAIN_INCLUDED = "certchain.included";
+
   public static final String KEY_SIGNERCERT_INCLUDED = "signercert.included";
 
   public static final String KEY_SUPPORT_GETCRL = "support.getcrl";
 
   private boolean includeCaCert = true;
+
+  private boolean includeCertChain = false;
 
   private boolean includeSignerCert = true;
 
@@ -70,6 +74,7 @@ public class ScepControl {
     }
 
     this.includeCaCert = getBoolean(props, KEY_CACERT_INCLUDED, true);
+    this.includeCertChain = getBoolean(props, KEY_CERTCHAIN_INCLUDED, false);
     this.includeSignerCert = getBoolean(props, KEY_SIGNERCERT_INCLUDED, true);
     this.supportGetCrl = getBoolean(props, KEY_SUPPORT_GETCRL, false);
   } // constructor
@@ -77,6 +82,7 @@ public class ScepControl {
   public String getConf() {
     ConfPairs pairs = new ConfPairs();
     pairs.putPair(KEY_CACERT_INCLUDED, Boolean.toString(includeCaCert));
+    pairs.putPair(KEY_CERTCHAIN_INCLUDED, Boolean.toString(includeCertChain));
     pairs.putPair(KEY_SIGNERCERT_INCLUDED, Boolean.toString(includeSignerCert));
     pairs.putPair(KEY_SUPPORT_GETCRL, Boolean.toString(supportGetCrl));
 
@@ -89,6 +95,14 @@ public class ScepControl {
 
   public void setIncludeCaCert(boolean includeCaCert) {
     this.includeCaCert = includeCaCert;
+  }
+
+  public boolean isIncludeCertChain() {
+    return includeCertChain;
+  }
+
+  public void setIncludeCertChain(boolean includeCertChain) {
+    this.includeCertChain = includeCertChain;
   }
 
   public boolean isIncludeSignerCert() {
@@ -113,7 +127,9 @@ public class ScepControl {
   }
 
   public String toString(boolean verbose) {
-    return StringUtil.concatObjects("  include CA cert: ", includeCaCert,
+    return StringUtil.concatObjects(
+        "  include CA cert: ", includeCaCert,
+        "\n  include certchain: ", includeCertChain,
         "\n  include signer cert: ", includeSignerCert,
         "\n  operation GetCRL: ", (supportGetCrl ? "supported" : "not supported"),
         (verbose ? "\n  encoded: " : ""), (verbose ? getConf() : ""));
@@ -133,7 +149,8 @@ public class ScepControl {
     }
 
     ScepControl obj2 = (ScepControl) obj;
-    return includeCaCert == obj2.includeCaCert && includeSignerCert == obj2.includeSignerCert;
+    return includeCertChain == obj2.includeCertChain && includeCaCert == obj2.includeCaCert
+            && includeSignerCert == obj2.includeSignerCert && supportGetCrl == obj2.supportGetCrl;
   } // method equals
 
   private static boolean getBoolean(ConfPairs props, String propKey, boolean dfltValue)

@@ -145,6 +145,8 @@ public class ScepResponder {
 
   private X509Cert caCert;
 
+  private List<X509Cert> certchain;
+
   private ScepCaCertRespBytes caCertRespBytes;
 
   private long maxSigningTimeBiasInMs = DFLT_MAX_SIGNINGTIME_BIAS;
@@ -597,9 +599,14 @@ public class ScepResponder {
     CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
     try {
       cmsSignedDataGen.addCertificate(cert.toBcCert());
-      if (control.isIncludeCaCert()) {
+      if (control.isIncludeCaCert() || control.isIncludeCertChain()) {
         refreshCa();
         cmsSignedDataGen.addCertificate(caCert.toBcCert());
+        if (control.isIncludeCertChain()) {
+          for (X509Cert c : certchain) {
+            cmsSignedDataGen.addCertificate(c.toBcCert());
+          }
+        }
       }
       CMSSignedData signedData = cmsSignedDataGen.generate(new CMSAbsentContent());
       return SignedData.getInstance(signedData.toASN1Structure().getContent());
@@ -740,6 +747,8 @@ public class ScepResponder {
       }
 
       caCert = currentCaCert;
+      certchain = ca.getCaInfo().getCertchain();
+
       caCertRespBytes = new ScepCaCertRespBytes(currentCaCert, responderCert);
     } catch (CaMgmtException | CertificateException | CMSException ex) {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());

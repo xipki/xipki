@@ -48,6 +48,7 @@
 			},
 			"cmpControl":{
 				"send.ca":true,
+				"send.certchain":false,
 				"messagetime.bias":300,
 				"rr.aki.required":true,
 				"group.enroll":true,
@@ -80,6 +81,7 @@
 			"saveReq":false,
 			"scepControl":{
 				"cacert.included":true,
+				"certchain.included":false,
 				"signercert.included":true,
 				"support.getcrl":true
 			},

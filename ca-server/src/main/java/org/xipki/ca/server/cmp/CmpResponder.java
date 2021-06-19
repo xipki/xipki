@@ -368,7 +368,7 @@ public class CmpResponder extends BaseCmpResponder {
     }
 
     CMPCertificate[] caPubs = null;
-    if (cmpControl.isSendCaCert()) {
+    if (cmpControl.isSendCaCert() || cmpControl.isSendCertChain()) {
       boolean anyCertEnrolled = false;
       for (CertResponse certResp : generateCertResponses) {
         if (certResp.getCertifiedKeyPair() != null) {
@@ -377,8 +377,14 @@ public class CmpResponder extends BaseCmpResponder {
         }
       }
 
-      if (anyCertEnrolled && cmpControl.isSendCaCert()) {
-        caPubs = new CMPCertificate[]{getCa().getCaInfo().getCertInCmpFormat()};
+      if (anyCertEnrolled ) {
+        List<CMPCertificate> certchain = new ArrayList<>(2);
+        certchain.add(getCa().getCaInfo().getCertInCmpFormat());
+        if (cmpControl.isSendCertChain()) {
+          certchain.addAll(getCa().getCaInfo().getCertchainInCmpFormat());
+        }
+
+        caPubs = certchain.toArray(new CMPCertificate[0]);
       }
     }
 
@@ -463,8 +469,15 @@ public class CmpResponder extends BaseCmpResponder {
     }
 
     CMPCertificate[] caPubs = null;
-    if (certGenerated && cmpControl.isSendCaCert()) {
-      caPubs = new CMPCertificate[]{ca.getCaInfo().getCertInCmpFormat()};
+
+    if (certGenerated && (cmpControl.isSendCaCert() || cmpControl.isSendCertChain())) {
+      List<CMPCertificate> certchain = new ArrayList<>(2);
+      certchain.add(getCa().getCaInfo().getCertInCmpFormat());
+      if (cmpControl.isSendCertChain()) {
+        certchain.addAll(getCa().getCaInfo().getCertchainInCmpFormat());
+      }
+
+      caPubs = certchain.toArray(new CMPCertificate[0]);
     }
 
     if (event.getStatus() == null || event.getStatus() != AuditStatus.FAILED) {

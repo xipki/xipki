@@ -66,6 +66,8 @@ public class CaInfo {
 
   private final List<X509Cert> certchain;
 
+  private final List<CMPCertificate> certchainInCmpFormat;
+
   private final CertStore certStore;
 
   private final RandomSerialNumberGenerator randomSnGenerator;
@@ -93,7 +95,16 @@ public class CaInfo {
     this.certInCmpFormat = new CMPCertificate(cert.toBcCert().toASN1Structure());
     this.publicCaInfo = new PublicCaInfo(cert, caEntry.getCaUris(), caEntry.getExtraControl());
     List<X509Cert> certs = caEntry.getCertchain();
-    this.certchain = certs == null ? Collections.emptyList() : new ArrayList<>(certs);
+    if (certs == null || certs.isEmpty()) {
+      this.certchain = Collections.emptyList();
+      this.certchainInCmpFormat = Collections.emptyList();
+    } else {
+      this.certchain = new ArrayList<>(certs);
+      this.certchainInCmpFormat = new ArrayList<>(certs.size());
+      for (X509Cert c : certs) {
+        this.certchainInCmpFormat.add(new CMPCertificate(c.toBcCert().toASN1Structure()));
+      }
+    }
     this.noNewCertificateAfter = notAfter.getTime() - MS_PER_DAY * caEntry.getExpirationPeriod();
     this.randomSnGenerator = RandomSerialNumberGenerator.getInstance();
     this.extraControl = caEntry.getExtraControl();
@@ -161,6 +172,10 @@ public class CaInfo {
 
   public List<X509Cert> getCertchain() {
     return certchain;
+  }
+
+  public List<CMPCertificate> getCertchainInCmpFormat() {
+    return certchainInCmpFormat;
   }
 
   public String getSignerConf() {

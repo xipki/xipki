@@ -68,17 +68,19 @@ public class EnrollCertResult {
 
   } // class CertifiedKeyPairOrError
 
-  private final X509Cert caCert;
+  private final X509Cert[] caCertChain;
 
   private final Map<String, CertifiedKeyPairOrError> certsOrErrors;
 
-  public EnrollCertResult(X509Cert caCert, Map<String, CertifiedKeyPairOrError> certsOrErrors) {
+  public EnrollCertResult(
+          X509Cert[] caCertChain, Map<String,
+          CertifiedKeyPairOrError> certsOrErrors) {
     this.certsOrErrors = Args.notEmpty(certsOrErrors, "certsOrErrors");
-    this.caCert = caCert;
+    this.caCertChain = caCertChain;
   }
 
-  public X509Cert getCaCert() {
-    return caCert;
+  public X509Cert[] getCaCertChain() {
+    return caCertChain;
   }
 
   public CertifiedKeyPairOrError getCertOrError(String id) {

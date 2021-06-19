@@ -181,7 +181,7 @@ if { $printUsage equals "true" } then {
   xi:replace --old "REPLACEME-GM" --new "${gm}" \
     qa/qa.d/ca.script
 
-  CMP_CONTROL = "send.ca=true,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=${$CMP_SIGALGO},popo.sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA:SM3withSM2"
+  CMP_CONTROL = "send.ca=true,send.certchain=false,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=${$CMP_SIGALGO},popo.sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA:SM3withSM2"
 
   if { "$1" equals "-l" } then {
     source file:./qa/qa.d/ca-load.script

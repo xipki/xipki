@@ -41,6 +41,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.*;
+import java.security.cert.CertPathBuilderException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.util.*;
@@ -727,7 +728,21 @@ public final class CmpClientImpl implements CmpClient {
       }
     }
 
-    return new EnrollCertResult(caCert, certOrErrors);
+    // find further certificates
+    caPubs.remove(caCert);
+    X509Cert[] caCertChain;
+    if (caPubs.isEmpty()) {
+      caCertChain = new X509Cert[]{caCert};
+    } else {
+      try {
+        caCertChain = X509Util.buildCertPath(caCert, caPubs, true);
+      } catch (CertPathBuilderException e) {
+        LOG.warn("could not build certpath for the CA certificate");
+        caCertChain = new X509Cert[]{caCert};
+      }
+    }
+
+    return new EnrollCertResult(caCertChain, certOrErrors);
   } // method parseEnrollCertResult
 
   private CaConf getCa(String caName)

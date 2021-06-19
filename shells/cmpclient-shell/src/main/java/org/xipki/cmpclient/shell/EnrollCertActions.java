@@ -56,7 +56,7 @@ import java.io.File;
 import java.io.IOException;
 import java.security.KeyStore;
 import java.security.PrivateKey;
-import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.*;
 
 /**
@@ -204,12 +204,22 @@ public class EnrollCertActions {
             encodeCert(cert.getEncoded(), certOutform));
       }
 
+      X509Cert[] caCertChain = result.getCaCertChain();
+      int size = caCertChain == null ? 1 : 1 + caCertChain.length;
+      X509Certificate[] certchain = new X509Certificate[size];
+      certchain[0] = cert.toJceCert();
+      if (size > 1) {
+        for (int i = 0; i < caCertChain.length; i++) {
+          certchain[i + 1] = caCertChain[i].toJceCert();
+        }
+      }
+
       PrivateKey privateKey = BouncyCastleProvider.getPrivateKey(privateKeyInfo);
 
       KeyStore ks = KeyStore.getInstance("PKCS12");
       char[] pwd = getPassword();
       ks.load(null, pwd);
-      ks.setKeyEntry("main", privateKey, pwd, new Certificate[] {cert.toJceCert()});
+      ks.setKeyEntry("main", privateKey, pwd, certchain);
       ByteArrayOutputStream bout = new ByteArrayOutputStream();
       ks.store(bout, pwd);
       saveVerbose("saved key to file", p12OutputFile, bout.toByteArray());

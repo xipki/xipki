@@ -43,6 +43,8 @@ public class CmpControl {
 
   public static final String KEY_SEND_CA = "send.ca";
 
+  public static final String KEY_SEND_CERTCHAIN = "send.certchain";
+
   public static final String KEY_SEND_RESPONDER = "send.responder";
 
   public static final String KEY_MESSAGETIME_REQUIRED = "messagetime.required";
@@ -79,6 +81,8 @@ public class CmpControl {
 
   private final boolean sendCaCert;
 
+  private final boolean sendCertChain;
+
   private final boolean messageTimeRequired;
 
   private final boolean sendResponderCert;
@@ -112,6 +116,7 @@ public class CmpControl {
     ConfPairs pairs = new ConfPairs(conf);
     this.confirmCert = getBoolean(pairs, KEY_CONFIRM_CERT, false);
     this.sendCaCert = getBoolean(pairs, KEY_SEND_CA, false);
+    this.sendCertChain = getBoolean(pairs, KEY_SEND_CERTCHAIN, false);
     this.sendResponderCert = getBoolean(pairs, KEY_SEND_RESPONDER, true);
     this.groupEnroll = getBoolean(pairs, KEY_GROUP_ENROLL, false);
     this.messageTimeRequired = getBoolean(pairs, KEY_MESSAGETIME_REQUIRED, true);
@@ -173,7 +178,7 @@ public class CmpControl {
     this.conf = pairs.getEncoded();
   } // constructor
 
-  public CmpControl(Boolean confirmCert, Boolean sendCaCert,
+  public CmpControl(Boolean confirmCert, Boolean sendCaCert, Boolean sendCertChain,
       Boolean messageTimeRequired, Boolean sendResponderCert, Boolean rrAkiRequired,
       Integer messageTimeBias, Integer confirmWaitTime, Boolean groupEnroll,
       List<String> sigAlgos, List<String> popoAlgos,
@@ -190,6 +195,9 @@ public class CmpControl {
 
     this.sendCaCert = sendCaCert != null && sendCaCert;
     pairs.putPair(KEY_SEND_CA, Boolean.toString(this.sendCaCert));
+
+    this.sendCertChain = sendCertChain != null && sendCertChain;
+    pairs.putPair(KEY_SEND_CERTCHAIN, Boolean.toString(this.sendCertChain));
 
     this.messageTimeRequired = messageTimeRequired == null || messageTimeRequired;
     pairs.putPair(KEY_MESSAGETIME_REQUIRED, Boolean.toString(this.messageTimeRequired));
@@ -331,6 +339,10 @@ public class CmpControl {
     return sendCaCert;
   }
 
+  public boolean isSendCertChain() {
+    return sendCertChain;
+  }
+
   public boolean isRrAkiRequired() {
     return rrAkiRequired;
   }
@@ -389,6 +401,7 @@ public class CmpControl {
     return StringUtil.concatObjects(
         "  confirm cert: ", confirmCert,
         "\n  send CA cert: ", sendCaCert,
+        "\n  send CA cert chain: ", sendCertChain,
         "\n  message time required: ", messageTimeRequired,
         "\n  send responder cert: ", sendResponderCert,
         "\n  message time bias: ", messageTimeBias, "s",
