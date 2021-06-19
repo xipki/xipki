@@ -37,6 +37,7 @@ import org.xipki.qa.BenchmarkHttpClient;
 import org.xipki.qa.BenchmarkHttpClient.HttpClientException;
 import org.xipki.qa.BenchmarkHttpClient.ResponseHandler;
 import org.xipki.qa.BenchmarkHttpClient.SslConf;
+import org.xipki.security.cmp.CmpUtf8Pairs;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.BenchmarkExecutor;
 import org.xipki.util.InvalidConfException;
@@ -229,8 +230,14 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
 
   private final SslContext sslContext;
 
-  public CaEnrollBenchmark(CaEnrollBenchEntry benchmarkEntry, int maxRequests, int num,
-      int queueSize, String description)
+  private final boolean caGenKeyPair;
+
+  public CaEnrollBenchmark(
+          CaEnrollBenchEntry benchmarkEntry,
+          int maxRequests,
+          int num,
+          int queueSize,
+          String description)
           throws IOException, InvalidConfException {
     super(description);
     this.maxRequests = maxRequests;
@@ -238,6 +245,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
     this.benchmarkEntry = notNull(benchmarkEntry, "benchmarkEntry");
     this.index = new AtomicLong(getSecureIndex());
     this.queueSize = queueSize;
+    this.caGenKeyPair = benchmarkEntry.getSubjectPublicKeyInfo() == null;
 
     try (InputStream is = Files.newInputStream(Paths.get(CONf_FILE))) {
       Conf tmpConf = JSON.parseObject(is, Conf.class);
@@ -294,12 +302,19 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
       long thisIndex = index.getAndIncrement();
       certTempBuilder.setSubject(benchmarkEntry.getX500Name(thisIndex));
 
-      SubjectPublicKeyInfo spki = benchmarkEntry.getSubjectPublicKeyInfo();
-      certTempBuilder.setPublicKey(spki);
+      if (!caGenKeyPair) {
+        SubjectPublicKeyInfo spki = benchmarkEntry.getSubjectPublicKeyInfo();
+        certTempBuilder.setPublicKey(spki);
+      }
+
       CertTemplate certTemplate = certTempBuilder.build();
       CertRequest certRequest = new CertRequest(new ASN1Integer(i + 1), certTemplate, null);
 
-      String utf8pairs = "certprofile?" + benchmarkEntry.getCertprofile() + "%";
+      String utf8pairs = CmpUtf8Pairs.KEY_CERTPROFILE + "?" + benchmarkEntry.getCertprofile() + "%";
+      if (caGenKeyPair) {
+        utf8pairs += CmpUtf8Pairs.KEY_CA_GENERATE_KEYPAIR + "?true%";
+      }
+
       AttributeTypeAndValue certprofileInfo =
           new AttributeTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
               new DERUTF8String(utf8pairs));

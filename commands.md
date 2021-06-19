@@ -226,13 +226,13 @@ Security Commands
 OCSP Management Commands
 -----
 
-* `ocsp:refresh-token`
+   * `ocsp:refresh-token`
 
-  refresh token for signers
+      refresh token for signers
 
-* `ocsp:restart-server`
+   * `ocsp:restart-server`
 
-  restart OCSP server
+      restart OCSP server
 
 CA Management Commands
 -----
@@ -367,7 +367,7 @@ CA Management Commands
 
    * `ca:refresh-token`
 
-    refresh token for signers
+     refresh token for signers
 
    * `ca:restart`
 

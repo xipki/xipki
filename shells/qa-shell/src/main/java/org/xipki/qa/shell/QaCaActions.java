@@ -224,28 +224,77 @@ public class QaCaActions {
 
   } // class CaAliasCheck
 
-  @Command(scope = "xiqa", name = "cmp-benchmark-enroll",
-      description = "CA client enroll (benchmark)")
-  @Service
-  public static class CmpBenchmarkEnroll extends XiAction {
+  private static abstract  class AbstractCmpBenchmarkEnroll extends XiAction {
 
     @Option(name = "--profile", aliases = "-p", required = true,
-        description =  "certificate profile that allows duplication of public key")
-    private String certprofile;
+            description = "certificate profile that allows duplication of public key")
+    protected String certprofile;
 
     @Option(name = "--subject", aliases = "-s", required = true, description = "subject template")
-    private String subjectTemplate;
+    protected String subjectTemplate;
 
     @Option(name = "--random-dn", description = "DN name to be incremented")
     @Completion(value = StringsCompleter.class, values = {"GIVENNAME", "SURNAME", "STREET",
-        "POSTALCODE", "O", "OU", "CN"})
-    private String randomDnStr = "O";
+            "POSTALCODE", "O", "OU", "CN"})
+    protected String randomDnStr = "O";
 
     @Option(name = "--duration", description = "duration")
-    private String duration = "30s";
+    protected String duration = "30s";
 
     @Option(name = "--thread", description = "number of threads")
-    private Integer numThreads = 5;
+    protected Integer numThreads = 5;
+
+    @Option(name = "-n", description = "number of certificates to be requested in one request")
+    protected Integer num = 1;
+
+    @Option(name = "--max-num", description = "maximal number of requests\n0 for unlimited")
+    protected Integer maxRequests = 0;
+
+    @Option(name = "--queue-size",
+            description = "Number of maximal HTTP requests in the sending queue\n"
+                    + "0 for implemention default")
+    protected Integer queueSize = 0;
+  }
+
+  @Command(scope = "xiqa", name = "cmp-benchmark-cagen-enroll",
+          description = "CA client enroll (benchmark)")
+  @Service
+  public static class CmpBenchmarkCaGenEnroll extends AbstractCmpBenchmarkEnroll {
+    @Override
+    protected Object execute0()
+            throws Exception {
+      if (numThreads < 1) {
+        throw new IllegalCmdParamException("invalid number of threads " + numThreads);
+      }
+
+      String description = StringUtil.concatObjectsCap(200, "subjectTemplate: ", subjectTemplate,
+              "\nprofile: ", certprofile, "\nmaxRequests: ", maxRequests);
+
+      RandomDn randomDn = null;
+      if (randomDnStr != null) {
+        randomDn = RandomDn.getInstance(randomDnStr);
+        if (randomDn == null) {
+          throw new IllegalCmdParamException("invalid randomDn " + randomDnStr);
+        }
+      }
+
+      CaEnrollBenchEntry benchmarkEntry = new CaEnrollBenchEntry(certprofile, null,
+              subjectTemplate, randomDn);
+      CaEnrollBenchmark benchmark = new CaEnrollBenchmark(benchmarkEntry, maxRequests, num,
+              queueSize, description);
+
+      benchmark.setDuration(duration);
+      benchmark.setThreads(numThreads);
+      benchmark.execute();
+
+      return null;
+    } // method execute0
+  }
+
+  @Command(scope = "xiqa", name = "cmp-benchmark-enroll",
+      description = "CA client enroll (benchmark)")
+  @Service
+  public static class CmpBenchmarkEnroll extends AbstractCmpBenchmarkEnroll {
 
     @Completion(value = StringsCompleter.class, values = {"RSA", "EC", "DSA"})
     @Option(name = "--key-type", description = "key type to be requested")
@@ -257,17 +306,6 @@ public class QaCaActions {
     @Option(name = "--curve", description = "EC curve name or OID of EC key")
     @Completion(Completers.ECCurveNameCompleter.class)
     private String curveName;
-
-    @Option(name = "-n", description = "number of certificates to be requested in one request")
-    private Integer num = 1;
-
-    @Option(name = "--max-num", description = "maximal number of requests\n0 for unlimited")
-    private Integer maxRequests = 0;
-
-    @Option(name = "--queue-size",
-        description = "Number of maximal HTTP requests in the sending queue\n"
-            + "0 for implemention default")
-    private Integer queueSize = 0;
 
     @Override
     protected Object execute0()

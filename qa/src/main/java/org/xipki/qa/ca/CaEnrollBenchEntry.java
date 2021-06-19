@@ -136,12 +136,12 @@ public class CaEnrollBenchEntry {
   public CaEnrollBenchEntry(String certprofile, CaEnrollBenchKeyEntry keyEntry,
       String subjectTemplate, RandomDn randomDn) {
     this.certprofile = notBlank(certprofile, "certprofile");
-    this.keyEntry = notNull(keyEntry, "keyEntry");
+    this.keyEntry = keyEntry;
     this.subject = new IncreasableSubject(subjectTemplate, randomDn);
   }
 
   public SubjectPublicKeyInfo getSubjectPublicKeyInfo() {
-    return keyEntry.getSubjectPublicKeyInfo();
+    return keyEntry == null ? null : keyEntry.getSubjectPublicKeyInfo();
   }
 
   public X500Name getX500Name(long index) {
