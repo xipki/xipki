@@ -4,7 +4,7 @@ See also <https://github.com/xipki/xipki/releases>
 
 
 ## 5.3.12
-  - Release date: -
+  - Release date: June 20, 2021
   - CA
     - Bug fix: Fix file path bug in Windows
     - Bug fix: In CMP, Use NULL Sender if MAC is used to protect the message
