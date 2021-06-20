@@ -53,6 +53,7 @@
       <excludes>
         <exclude>bin/**</exclude>
         <exclude>**/*.sh</exclude>
+        <exclude>system/org/apache/karaf/features/**</exclude>
       </excludes>
       <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>
@@ -116,6 +117,10 @@
         <exclude>etc/org.apache.karaf.features.repos.cfg</exclude>
         <exclude>etc/org.apache.karaf.jaas.cfg</exclude>
         <exclude>etc/org.apache.karaf.kar</exclude>
+        <!-- do not use the bc* from the apache karaf -->
+        <exclude>system/org/bouncycastle/bcutil-jdk15on/**</exclude>
+        <exclude>system/org/bouncycastle/bcprov-jdk15on/**</exclude>
+        <exclude>system/org/bouncycastle/bcpkix-jdk15on/**</exclude>
       </excludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>

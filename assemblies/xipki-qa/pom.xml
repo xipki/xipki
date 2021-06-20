@@ -284,6 +284,14 @@
                         file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/jre.properties"
                         token="org.xml.sax.helpers"
                         value="org.xml.sax.helpers, com.ibm.db2.jcc, org.h2.jdbcx, org.hsqldb.jdbc, org.mariadb.jdbc, com.mysql.jdbc.jdbc2.optional, oracle.jdbc.pool, org.postgresql.ds"/>
+                <replace
+                        file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/system/org/apache/karaf/features/standard/${karaf.version}/standard-${karaf.version}-features.xml"
+                        token="bcprov-jdk15on/${karaf.bc.version}&lt;/bundle>"
+                        value='bcprov-jdk15on/${bc.version}&lt;/bundle>&#10;        &lt;bundle start-level="30">mvn:org.bouncycastle/bcutil-jdk15on/${bc.version}&lt;/bundle>'/>
+                <replace
+                        file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/system/org/apache/karaf/features/standard/${karaf.version}/standard-${karaf.version}-features.xml"
+                        token="bcpkix-jdk15on/${karaf.bc.version}"
+                        value="bcpkix-jdk15on/${bc.version}"/>
               </target>
             </configuration>
             <goals>
