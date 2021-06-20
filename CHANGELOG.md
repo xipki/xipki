@@ -2,6 +2,18 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
+## 5.3.13
+- Release date: N/A
+- CA
+  - N/A
+- OCSP
+  - N/A.
+- CLI
+  - N/A
+- DB Tool
+  - N/A
+- Dependencies
+  - N/A
 
 ## 5.3.12
   - Release date: June 20, 2021

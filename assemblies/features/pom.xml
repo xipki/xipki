@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki.assembly</groupId>
     <artifactId>assemblies</artifactId>
-    <version>5.3.12</version>
+    <version>5.3.13-SNAPSHOT</version>
   </parent>
   <groupId>org.xipki.feature</groupId>
   <artifactId>features</artifactId>
