@@ -6,9 +6,34 @@ See also <https://github.com/xipki/xipki/releases>
 ## 5.3.12
   - Release date: -
   - CA
+    - Bug fix: Fix file path bug in Windows
+    - Bug fix: In CMP, Use NULL Sender if MAC is used to protect the message
+    - Bug fix: Fixed incorrect behaviour of extra-control
+    - Feature: Add support of certificates signed with SHAKE128WITHRSAPSS, SHAKE256WITHRSAPSS, ECDSAWITHSHAKE128 and ECDSAWITHSHAKE256. 
+    - Feature: Allow the configuration of signature algorithm *withRSAandMGF1 with *withRSAPSS.
+    - Feature: Allow the configuration of method to compute SubjectKeyIdentifier
+    - Feature: Reduce the minimal size of serial number from 9 to 1
+    - Feature: Allow the derivation of subject field from the SubjectPublicKeyInfo
+    - Feature: Allow sending certchain in CMP and SCEP response
+    - Feature: Allow generating random serial number for self-signed certificate
   - OCSP
+    - Feature: Better Hash Algorithm's Parameters (ASN.1)
+    - Feature: Allow configuration of signature algorithm *withRSAandMGF1 with *withRSAPSS.
   - CLI
+    - Bug fix: Fixed ClassNotFoundException for JDBC classes.
+    - Bug fix: Fixed incorrect behaviour of extra-control
+    - Feature: Allow configuration of signature algorithm *withRSAandMGF1 with *withRSAPSS.
+    - Feature: Set the default type of cert profile of ca:profile-add to xijson.
+    - Feature: Add commands xi:osinfo, xi:file-exists, xi:datetime, xi:key-exists-p11.
   - DB Tool
+    - N/A
+  - Dependencies
+    - Bump bouncycastle from 1.68 to 1.69
+    - Bump apache-karaf from 4.2.9 to 4.2.11
+    - Bump hikaricp from 3.4.5 to 4.0.3
+    - Bump fastjson from 1.2.73 to 1.2.76
+    - Bump fastjson from 2.1.2 to 2.3.2
+    - Bump liquibase from 3.6.3 to 3.10.3.
 
 ## 5.3.11
   - Release date: Dec 24, 2020
@@ -22,10 +47,10 @@ See also <https://github.com/xipki/xipki/releases>
   - OCSP
     - Split large java classes
     - Simplified the SQL queries
-     - Bump bouncycastle from 1.66 to 1.68
+    - Bump bouncycastle from 1.66 to 1.68
   - CLI
     - Split large java classes
-     - Bump bouncycastle from 1.66 to 1.68
+    - Bump bouncycastle from 1.66 to 1.68
   - DB Tool
     - Split large java classes
 
