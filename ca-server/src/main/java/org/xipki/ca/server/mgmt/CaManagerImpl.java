@@ -259,21 +259,21 @@ public class CaManagerImpl implements CaManager, Closeable {
 
     this.datasourceFactory = new DataSourceFactory();
     String calockId = null;
-    File caLockFile = new File("calock");
-    if (caLockFile.exists()) {
+    File calockFile = new File("calock");
+    if (calockFile.exists()) {
       try {
-        calockId = new String(IoUtil.read(caLockFile));
+        calockId = new String(IoUtil.read(calockFile));
       } catch (IOException ex) {
-        LOG.error("could not read {}: {}", caLockFile.getName(), ex.getMessage());
+        LOG.error("could not read {}: {}", calockFile.getName(), ex.getMessage());
       }
     }
 
     if (calockId == null) {
       calockId = UUID.randomUUID().toString();
       try {
-        IoUtil.save(caLockFile, StringUtil.toUtf8Bytes(calockId));
+        IoUtil.save(calockFile, StringUtil.toUtf8Bytes(calockId));
       } catch (IOException ex) {
-        LOG.error("could not save {}: {}", caLockFile.getName(), ex.getMessage());
+        LOG.error("could not save {}: {}", calockFile.getName(), ex.getMessage());
       }
     }
 
