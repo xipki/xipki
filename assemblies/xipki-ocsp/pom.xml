@@ -8,13 +8,13 @@
     <artifactId>assemblies</artifactId>
     <version>5.3.13-SNAPSHOT</version>
   </parent>
-  <artifactId>p11proxy-war</artifactId>
+  <artifactId>xipki-ocsp</artifactId>
   <packaging>pom</packaging>
   <name>XiPKI :: assembly :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
       <groupId>org.xipki</groupId>
-      <artifactId>p11proxy-servlet</artifactId>
+      <artifactId>ocsp-servlet</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
@@ -77,7 +77,7 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xipki</groupId>
-                  <artifactId>p11proxy-servlet</artifactId>
+                  <artifactId>ocsp-servlet</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                 </artifactItem>
@@ -85,23 +85,22 @@
             </configuration>
           </execution>
           <execution>
-            <id>unpack-tlskeys</id>
+            <!-- Copy the JDBC and BouncyCastle jars -->
+            <id>jdbc-bc</id>
             <phase>generate-resources</phase>
             <goals>
-              <goal>unpack</goal>
+              <goal>copy</goal>
             </goals>
             <configuration>
-              <outputDirectory>${project.build.directory}/xipki/keycerts/tlskeys</outputDirectory>
+              <stripVersion>false</stripVersion>
+              <outputDirectory>${project.build.directory}/lib</outputDirectory>
               <artifactItems>
                 <artifactItem>
-                  <groupId>org.xipki.tools</groupId>
-                  <artifactId>tlskeys-example</artifactId>
-                  <classifier>ec</classifier>
-                  <version>${xipki.tools.version}</version>
-                  <type>zip</type>
+                  <groupId>org.mariadb.jdbc</groupId>
+                  <artifactId>mariadb-java-client</artifactId>
+                  <version>${jdbc.mariadb.version}</version>
                 </artifactItem>
               </artifactItems>
-              <includes>ca/tls-ca-cert.p12,server/tls-server.p12,ca/tls-ca-cert.pem,server/tls-server-*.pem</includes>
             </configuration>
           </execution>
         </executions>

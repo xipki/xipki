@@ -122,7 +122,7 @@
     </fileSet>
     <!-- Copy dbtool -->
     <fileSet>
-      <directory>${project.build.directory}/dbtool-${project.version}/</directory>
+      <directory>${project.build.directory}/xipki-dbtool-${project.version}/</directory>
       <excludes>
         <exclude>lib/jdbc/*</exclude>
         <exclude>bin/*</exclude>

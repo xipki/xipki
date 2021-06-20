@@ -14,11 +14,11 @@
   <packaging>pom</packaging>
   <modules>
     <module>features</module>
-    <module>dbtool</module>
+    <module>xipki-dbtool</module>
     <module>xipki-cli</module>
     <module>xipki-qa</module>
-    <module>ocsp-war</module>
-    <module>ca-war</module>
-    <module>p11proxy-war</module>
+    <module>xipki-ocsp</module>
+    <module>xipki-ca</module>
+    <module>xipki-p11proxy</module>
   </modules>
 </project>

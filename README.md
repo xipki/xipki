@@ -44,7 +44,7 @@ JRE/JDK, and the steps to reproduce the bug.
 
 ### CA Server and OCSP Responder
 
-Download the binaries `ca-war-<version>.zip`, `ocsp-war-<version>.zip` and
+Download the binaries `xipki-ca-<version>.zip`, `xipki-ocsp-<version>.zip` and
 `xipki-cli-<version>.tar.gz` from
 [releases](https://github.com/xipki/xipki/releases).
 
@@ -63,27 +63,27 @@ follows.
   ```
  
   Then you will find the following binaries:
-   - DB Tool: `assembles/dbtool/target/dbtool-<version>.zip`
-   - CA: `assembles/ca-war/target/ca-war-<version>.zip`
-   - OCSP: `assembles/ocsp-war/target/ocsp-war-<version>.zip`
+   - DB Tool: `assembles/xipki-dbtool/target/xipki-dbtool-<version>.zip`
+   - CA: `assembles/xipki-ca/target/xipki-ca-<version>.zip`
+   - OCSP: `assembles/xipki-ocsp/target/xipki-ocsp-<version>.zip`
    - CLI (Command Line Interface): `assembles/xipki-cli/target/xipki-cli-<version>.tar.gz`
 
 ## Install DB Tool
 
-1. Unpack the binary `dbtool-<version>.zip`.
+1. Unpack the binary `xipki-dbtool-<version>.zip`.
 2. If you use database other than MariaDB and MySQL, you need to get the JDBC driver and
    copy it to the directory `lib/jdbc`.
  
 ## Install CA Server
 
-1. Unpack the binary `ca-war-<version>.zip` and install CA as described in the
+1. Unpack the binary `xipki-ca-<version>.zip` and install CA as described in the
    unpacked README file.
 
 ## Install OCSP Responder
 
 Note that CA and OCSP can be installed in the same servlet container.
 
-1. Unpack the binary `ocsp-war-<version>.zip` and install OCSP responder as described in the
+1. Unpack the binary `xipki-ocsp-<version>.zip` and install OCSP responder as described in the
    unpacked README file.
 
 ## Install Command Line Interface

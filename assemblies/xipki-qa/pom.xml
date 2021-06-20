@@ -35,7 +35,7 @@
     </dependency>
     <dependency>
       <groupId>org.xipki.assembly</groupId>
-      <artifactId>dbtool</artifactId>
+      <artifactId>xipki-dbtool</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
     </dependency>
@@ -202,7 +202,7 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xipki.assembly</groupId>
-                  <artifactId>dbtool</artifactId>
+                  <artifactId>xipki-dbtool</artifactId>
                   <version>${project.version}</version>
                   <type>zip</type>
                 </artifactItem>
