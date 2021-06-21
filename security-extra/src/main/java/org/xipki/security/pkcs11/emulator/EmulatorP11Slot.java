@@ -32,7 +32,6 @@ import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.jcajce.interfaces.XDHKey;
 import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
-import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.EdECConstants;
@@ -60,7 +59,6 @@ import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
-import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -104,6 +102,7 @@ class EmulatorP11Slot extends P11Slot {
   private static final String PROP_ID = "id";
   private static final String PROP_LABEL = "label";
   private static final String PROP_SHA1SUM = "sha1";
+  private static final String PROP_ALGO = "algo";
 
   private static final String PROP_ALGORITHM = "algorithm";
 
@@ -220,7 +219,7 @@ class EmulatorP11Slot extends P11Slot {
 
   private final char[] password;
 
-  private final PrivateKeyCryptor privateKeyCryptor;
+  private final KeyCryptor keyCryptor;
 
   private final SecureRandom random = new SecureRandom();
 
@@ -229,15 +228,15 @@ class EmulatorP11Slot extends P11Slot {
   private final P11NewObjectConf newObjectConf;
 
   EmulatorP11Slot(String moduleName, File slotDir, P11SlotIdentifier slotId, boolean readOnly,
-      char[] password, PrivateKeyCryptor privateKeyCryptor, P11MechanismFilter mechanismFilter,
-      P11NewObjectConf newObjectConf, int maxSessions)
+                  char[] password, KeyCryptor keyCryptor, P11MechanismFilter mechanismFilter,
+                  P11NewObjectConf newObjectConf, int maxSessions)
           throws P11TokenException {
     super(moduleName, slotId, readOnly, mechanismFilter);
 
     this.newObjectConf = notNull(newObjectConf, "newObjectConf");
     this.slotDir = notNull(slotDir, "slotDir");
     this.password = notNull(password, "password");
-    this.privateKeyCryptor = notNull(privateKeyCryptor, "privateKeyCryptor");
+    this.keyCryptor = notNull(keyCryptor, "privateKeyCryptor");
     this.maxSessions = positive(maxSessions, "maxSessions");
 
     this.privKeyDir = new File(slotDir, DIR_PRIV_KEY);
@@ -291,22 +290,12 @@ class EmulatorP11Slot extends P11Slot {
         try {
           Properties props = loadProperties(secKeyInfoFile);
           String label = props.getProperty(PROP_LABEL);
-
+          String keyAlgo = props.getProperty(PROP_ALGO);
           P11ObjectIdentifier p11ObjId = new P11ObjectIdentifier(id, label);
           byte[] encodedValue = read(new File(secKeyDir, hexId + VALUE_FILE_SUFFIX));
 
-          KeyStore ks = KeyStore.getInstance("JCEKS");
-          ks.load(new ByteArrayInputStream(encodedValue), password);
-          SecretKey key = null;
-          Enumeration<String> aliases = ks.aliases();
-          while (aliases.hasMoreElements()) {
-            String alias = aliases.nextElement();
-            if (ks.isKeyEntry(alias)) {
-              key = (SecretKey) ks.getKey(alias, password);
-              break;
-            }
-          }
-
+          byte[] keyValue = keyCryptor.decrypt(encodedValue);
+          SecretKey key = new SecretKeySpec(keyValue, keyAlgo);
           EmulatorP11Identity identity = new EmulatorP11Identity(this,
               new P11IdentityId(slotId, p11ObjId, null, null), key, maxSessions, random);
           LOG.info("added PKCS#11 secret key {}", p11ObjId);
@@ -363,9 +352,7 @@ class EmulatorP11Slot extends P11Slot {
           }
 
           byte[] encodedValue = read(new File(privKeyDir, hexId + VALUE_FILE_SUFFIX));
-
-          PKCS8EncryptedPrivateKeyInfo epki = new PKCS8EncryptedPrivateKeyInfo(encodedValue);
-          PrivateKey privateKey = privateKeyCryptor.decrypt(epki);
+          PrivateKey privateKey = keyCryptor.decryptPrivateKey(encodedValue);
 
           X509Cert[] certs = (cert == null) ? null : new X509Cert[]{cert};
 
@@ -582,36 +569,15 @@ class EmulatorP11Slot extends P11Slot {
 
   private String savePkcs11SecretKey(byte[] id, String label, SecretKey secretKey)
       throws P11TokenException {
-    byte[] encrytedValue;
-    try {
-      KeyStore ks = KeyStore.getInstance("JCEKS");
-      ks.load(null, password);
-      ks.setKeyEntry("main", secretKey, password, null);
-      ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-      ks.store(outStream, password);
-      outStream.flush();
-      encrytedValue = outStream.toByteArray();
-    } catch (NoSuchAlgorithmException | KeyStoreException | CertificateException | IOException ex) {
-      throw new P11TokenException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
-    }
-
-    savePkcs11Entry(secKeyDir, id, label, encrytedValue);
-
+    byte[] encrytedValue = keyCryptor.encrypt(secretKey);
+    savePkcs11Entry(secKeyDir, id, label, secretKey.getAlgorithm(), encrytedValue);
     return label;
   } // method savePkcs11SecretKey
 
   private String savePkcs11PrivateKey(byte[] id, String label, PrivateKey privateKey)
       throws P11TokenException {
-    PKCS8EncryptedPrivateKeyInfo encryptedPrivKeyInfo = privateKeyCryptor.encrypt(privateKey);
-    byte[] encoded;
-    try {
-      encoded = encryptedPrivKeyInfo.getEncoded();
-    } catch (IOException ex) {
-      LogUtil.error(LOG, ex);
-      throw new P11TokenException("could not encode PrivateKey");
-    }
-
-    savePkcs11Entry(privKeyDir, id, label, encoded);
+    byte[] encryptedPrivKeyInfo = keyCryptor.encrypt(privateKey);
+    savePkcs11Entry(privKeyDir, id, label, privateKey.getAlgorithm(), encryptedPrivKeyInfo);
     return label;
   } // method savePkcs11PrivateKey
 
@@ -744,10 +710,10 @@ class EmulatorP11Slot extends P11Slot {
 
   private void savePkcs11Cert(byte[] id, String label, X509Cert cert)
       throws P11TokenException {
-    savePkcs11Entry(certDir, id, label, cert.getEncoded());
+    savePkcs11Entry(certDir, id, label, null, cert.getEncoded());
   }
 
-  private void savePkcs11Entry(File dir, byte[] id, String label, byte[] value)
+  private void savePkcs11Entry(File dir, byte[] id, String label, String algo, byte[] value)
       throws P11TokenException {
     notNull(dir, "dir");
     notNull(id, "id");
@@ -756,8 +722,12 @@ class EmulatorP11Slot extends P11Slot {
 
     String hexId = hex(id);
 
-    String str = StringUtil.concat(PROP_ID, "=", hexId, "\n", PROP_LABEL, "=", label, "\n",
-        PROP_SHA1SUM, "=", HashAlgo.SHA1.hexHash(value), "\n");
+    String str = StringUtil.concat(PROP_ID, "=", hexId, "\n", PROP_LABEL, "=", label, "\n");
+    if (algo != null) {
+      str = StringUtil.concat(str, PROP_ALGO, "=", algo, "\n");
+    }
+
+    str = StringUtil.concat(str, PROP_SHA1SUM, "=", HashAlgo.SHA1.hexHash(value), "\n");
 
     try {
       save(new File(dir, hexId + INFO_FILE_SUFFIX), StringUtil.toUtf8Bytes(str));
@@ -994,13 +964,21 @@ class EmulatorP11Slot extends P11Slot {
 
     String label = control.getLabel();
 
+    long t1 = System.currentTimeMillis();
+
     String keyLabel = savePkcs11PrivateKey(id, label, keypair.getPrivate());
+    long t2 = System.currentTimeMillis();
     String pubKeyLabel = savePkcs11PublicKey(id, label, keypair.getPublic());
+    long t3 = System.currentTimeMillis();
     P11IdentityId identityId = new P11IdentityId(slotId,
         new P11ObjectIdentifier(id, keyLabel), pubKeyLabel, null);
+    long t4 = System.currentTimeMillis();
     try {
-      return new EmulatorP11Identity(this,identityId, keypair.getPrivate(),
+      EmulatorP11Identity ret = new EmulatorP11Identity(this,identityId, keypair.getPrivate(),
           keypair.getPublic(), null, maxSessions, random);
+      long t5 = System.currentTimeMillis();
+      LOG.info("duration: t1: {}ms t2: {}ms t3 {}ms t4 {}ms t5", t2 - t1, t3 - t2, t4 - t3, t5 -t4);
+      return ret;
     } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException ex) {
       throw new P11TokenException(
           "could not construct KeyStoreP11Identity: " + ex.getMessage(), ex);
