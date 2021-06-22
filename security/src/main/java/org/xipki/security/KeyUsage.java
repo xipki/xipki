@@ -28,16 +28,15 @@ import static org.xipki.util.Args.notNull;
 
 public enum KeyUsage {
 
-  digitalSignature(0,  org.bouncycastle.asn1.x509.KeyUsage.digitalSignature, "digitalSignature"),
-  contentCommitment(1, org.bouncycastle.asn1.x509.KeyUsage.nonRepudiation,   "contentCommitment",
-                                                                             "nonRepudiation"),
-  keyEncipherment(2,   org.bouncycastle.asn1.x509.KeyUsage.keyEncipherment,  "keyEncipherment"),
-  dataEncipherment(3,  org.bouncycastle.asn1.x509.KeyUsage.dataEncipherment, "dataEncipherment"),
-  keyAgreement(4,      org.bouncycastle.asn1.x509.KeyUsage.keyAgreement,     "keyAgreement"),
-  keyCertSign(5,       org.bouncycastle.asn1.x509.KeyUsage.keyCertSign,      "keyCertSign"),
-  cRLSign(6,           org.bouncycastle.asn1.x509.KeyUsage.cRLSign,          "cRLSign"),
-  encipherOnly(7,      org.bouncycastle.asn1.x509.KeyUsage.encipherOnly,     "encipherOnly"),
-  decipherOnly(8,      org.bouncycastle.asn1.x509.KeyUsage.decipherOnly,     "decipherOnly");
+  digitalSignature(0,  org.bouncycastle.asn1.x509.KeyUsage.digitalSignature),
+  contentCommitment(1, org.bouncycastle.asn1.x509.KeyUsage.nonRepudiation, "nonRepudiation"),
+  keyEncipherment(2,   org.bouncycastle.asn1.x509.KeyUsage.keyEncipherment),
+  dataEncipherment(3,  org.bouncycastle.asn1.x509.KeyUsage.dataEncipherment),
+  keyAgreement(4,      org.bouncycastle.asn1.x509.KeyUsage.keyAgreement),
+  keyCertSign(5,       org.bouncycastle.asn1.x509.KeyUsage.keyCertSign),
+  cRLSign(6,           org.bouncycastle.asn1.x509.KeyUsage.cRLSign),
+  encipherOnly(7,      org.bouncycastle.asn1.x509.KeyUsage.encipherOnly),
+  decipherOnly(8,      org.bouncycastle.asn1.x509.KeyUsage.decipherOnly);
 
   private final int bit;
 
@@ -45,10 +44,15 @@ public enum KeyUsage {
 
   private final String[] names;
 
-  KeyUsage(int bit, int bcUsage, String... names) {
+  KeyUsage(int bit, int bcUsage, String... aliases) {
     this.bit = bit;
     this.bcUsage = bcUsage;
-    this.names = names;
+    int len = aliases == null ? 1 : 1 + aliases.length;
+    this.names = new String[len];
+    this.names[0] = name();
+    if (len > 1) {
+      System.arraycopy(aliases, 0, names, 1, len - 1);
+    }
   }
 
   public int getBit() {
@@ -65,12 +69,17 @@ public enum KeyUsage {
 
   public static KeyUsage getKeyUsage(String usage) {
     notNull(usage, "usage");
+    String u = usage.trim();
 
     for (KeyUsage ku : KeyUsage.values()) {
       for (String name : ku.names) {
-        if (name.equals(usage)) {
+        if (name.equalsIgnoreCase(u)) {
           return ku;
         }
+      }
+
+      if (Integer.toString(ku.bit).equals(u)) {
+        return ku;
       }
     }
 

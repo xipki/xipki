@@ -476,7 +476,7 @@ public class ExtensionConfBuilder {
     if (requiredUsages != null) {
       for (org.xipki.security.KeyUsage m : requiredUsages) {
         KeyUsage.Usage usage = new KeyUsage.Usage();
-        usage.setValue(m);
+        usage.setValue(m.name());
         usage.setRequired(true);
         extValue.getUsages().add(usage);
       }
@@ -484,7 +484,7 @@ public class ExtensionConfBuilder {
     if (optionalUsages != null) {
       for (org.xipki.security.KeyUsage m : optionalUsages) {
         KeyUsage.Usage usage = new KeyUsage.Usage();
-        usage.setValue(m);
+        usage.setValue(m.name());
         usage.setRequired(false);
         extValue.getUsages().add(usage);
       }
