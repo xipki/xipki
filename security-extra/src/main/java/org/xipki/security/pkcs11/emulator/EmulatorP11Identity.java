@@ -80,6 +80,10 @@ public class EmulatorP11Identity extends P11Identity {
 
   private final SecureRandom random;
 
+  private final int maxSessions;
+
+  private boolean initialized;
+
   static {
     // MGF1 mechanisms
     mgfMechHashMap.put(PKCS11Constants.CKG_MGF1_SHA1,     HashAlgo.SHA1);
@@ -168,6 +172,7 @@ public class EmulatorP11Identity extends P11Identity {
     super(slot, identityId, 0);
     this.signingKey = notNull(signingKey, "signingKey");
     this.random = notNull(random, "random");
+    this.maxSessions = maxSessions;
   } // constructor
 
   public EmulatorP11Identity(P11Slot slot, P11IdentityId identityId, PrivateKey privateKey,
@@ -177,72 +182,86 @@ public class EmulatorP11Identity extends P11Identity {
     super(slot, identityId, publicKey, certificateChain);
     this.signingKey = notNull(privateKey, "privateKey");
     this.random = notNull(random, "random");
+    this.maxSessions = maxSessions;
+  }
 
-    if (this.publicKey instanceof RSAPublicKey) {
-      String providerName = "BC";
-      LOG.info("use provider {}", providerName);
+  private synchronized void init() throws P11TokenException {
+    if (initialized) {
+      return;
+    }
 
-      for (int i = 0; i < maxSessions; i++) {
-        Cipher rsaCipher;
-        try {
-          final String algo = "RSA/ECB/NoPadding";
-          rsaCipher = Cipher.getInstance(algo, providerName);
-          LOG.info("use cipher algorithm {}", algo);
-        } catch (NoSuchPaddingException ex) {
-          throw new NoSuchAlgorithmException("NoSuchPadding", ex);
-        } catch (NoSuchAlgorithmException ex) {
-          final String algo = "RSA/NONE/NoPadding";
+    try {
+      if (this.publicKey instanceof RSAPublicKey) {
+        String providerName = "BC";
+        LOG.info("use provider {}", providerName);
+
+        for (int i = 0; i < maxSessions; i++) {
+          Cipher rsaCipher;
           try {
+            final String algo = "RSA/ECB/NoPadding";
             rsaCipher = Cipher.getInstance(algo, providerName);
             LOG.info("use cipher algorithm {}", algo);
-          } catch (NoSuchPaddingException e1) {
-            throw new NoSuchAlgorithmException("NoSuchPadding", ex);
+          } catch (NoSuchPaddingException ex) {
+            throw new P11TokenException("NoSuchPadding", ex);
+          } catch (NoSuchAlgorithmException ex) {
+            final String algo = "RSA/NONE/NoPadding";
+            try {
+              rsaCipher = Cipher.getInstance(algo, providerName);
+              LOG.info("use cipher algorithm {}", algo);
+            } catch (NoSuchPaddingException e1) {
+              throw new P11TokenException("NoSuchPadding", ex);
+            }
+          }
+          rsaCipher.init(Cipher.ENCRYPT_MODE, signingKey);
+          rsaCiphers.add(new ConcurrentBagEntry<>(rsaCipher));
+        }
+      } else {
+        String algorithm;
+        if (this.publicKey instanceof ECPublicKey) {
+          boolean sm2curve = GMUtil.isSm2primev2Curve(
+                  ((ECPublicKey) this.publicKey).getParams().getCurve());
+          algorithm = sm2curve ? null : "NONEwithECDSA";
+        } else if (this.publicKey instanceof DSAPublicKey) {
+          algorithm = "NONEwithDSA";
+        } else if (this.publicKey instanceof EdDSAKey) {
+          algorithm = null;
+        } else if (this.publicKey instanceof XDHKey) {
+          algorithm = null;
+        } else {
+          throw new P11TokenException("Currently only RSA, DSA, EC, EC Edwards and EC "
+                  + "Montgomery public key are supported, but not " + this.publicKey.getAlgorithm()
+                  + " (class: " + this.publicKey.getClass().getName() + ")");
+        }
+
+        if (algorithm != null) {
+          for (int i = 0; i < maxSessions; i++) {
+            Signature dsaSignature = Signature.getInstance(algorithm, "BC");
+            dsaSignature.initSign((PrivateKey) signingKey, random);
+            dsaSignatures.add(new ConcurrentBagEntry<>(dsaSignature));
+          }
+        } else if (this.publicKey instanceof EdDSAKey) {
+          algorithm = this.publicKey.getAlgorithm();
+          for (int i = 0; i < maxSessions; i++) {
+            Signature signature = Signature.getInstance(algorithm, "BC");
+            signature.initSign((PrivateKey) signingKey);
+            eddsaSignatures.add(new ConcurrentBagEntry<>(signature));
+          }
+        } else if (this.publicKey instanceof XDHKey) {
+          // do nothing. not suitable for sign.
+        } else {
+          for (int i = 0; i < maxSessions; i++) {
+            SM2Signer sm2signer = new SM2Signer(
+                    ECUtil.generatePrivateKeyParameter((PrivateKey) signingKey));
+            sm2Signers.add(new ConcurrentBagEntry<>(sm2signer));
           }
         }
-        rsaCipher.init(Cipher.ENCRYPT_MODE, privateKey);
-        rsaCiphers.add(new ConcurrentBagEntry<>(rsaCipher));
       }
-    } else {
-      String algorithm;
-      if (this.publicKey instanceof ECPublicKey) {
-        boolean sm2curve = GMUtil.isSm2primev2Curve(
-            ((ECPublicKey) this.publicKey).getParams().getCurve());
-        algorithm = sm2curve ? null : "NONEwithECDSA";
-      } else if (this.publicKey instanceof DSAPublicKey) {
-        algorithm = "NONEwithDSA";
-      } else if (this.publicKey instanceof EdDSAKey) {
-        algorithm = null;
-      } else if (this.publicKey instanceof XDHKey) {
-        algorithm = null;
-      } else {
-        throw new IllegalArgumentException("Currently only RSA, DSA, EC, EC Edwards and EC "
-            + "Montgomery public key are supported, but not " + this.publicKey.getAlgorithm()
-            + " (class: " + this.publicKey.getClass().getName() + ")");
-      }
-
-      if (algorithm != null) {
-        for (int i = 0; i < maxSessions; i++) {
-          Signature dsaSignature = Signature.getInstance(algorithm, "BC");
-          dsaSignature.initSign(privateKey, random);
-          dsaSignatures.add(new ConcurrentBagEntry<>(dsaSignature));
-        }
-      } else if (this.publicKey instanceof EdDSAKey) {
-        algorithm = this.publicKey.getAlgorithm();
-        for (int i = 0; i < maxSessions; i++) {
-          Signature signature = Signature.getInstance(algorithm, "BC");
-          signature.initSign(privateKey);
-          eddsaSignatures.add(new ConcurrentBagEntry<>(signature));
-        }
-      } else if (this.publicKey instanceof XDHKey) {
-        // do nothing. not suitable for sign.
-      } else {
-        for (int i = 0; i < maxSessions; i++) {
-          SM2Signer sm2signer = new SM2Signer(ECUtil.generatePrivateKeyParameter(privateKey));
-          sm2Signers.add(new ConcurrentBagEntry<>(sm2signer));
-        }
-      }
+    } catch (GeneralSecurityException ex) {
+      throw new P11TokenException(ex);
+    } finally {
+      initialized = true;
     }
-  } // constructor
+  }
 
   @Override
   protected byte[] digestSecretKey0(long mechanism)
@@ -262,6 +281,8 @@ public class EmulatorP11Identity extends P11Identity {
   @Override
   protected byte[] sign0(long mechanism, P11Params parameters, byte[] content)
       throws P11TokenException {
+    init();
+
     if (mechanism == PKCS11Constants.CKM_ECDSA) {
       return dsaAndEcdsaSign(content, null);
     } else if (mechanism == PKCS11Constants.CKM_VENDOR_SM2) {
