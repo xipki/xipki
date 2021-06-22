@@ -2,16 +2,33 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
-## 5.3.13
+## 5.3.14
 - Release date: N/A
 - CA
   - N/A
 - OCSP
-  - N/A.
+  - N/A
 - CLI
   - N/A
 - DB Tool
   - N/A
+- Dependencies
+  - N/A
+
+## 5.3.13
+- Release date: June 20, 2021
+- CA
+  - Bug fix: Fix NullPointerException if no SubjectKeyIdentifier mode is configured in CertProfile.
+  - Feature: In PKCS#11 emulator, use AES_GCM instead of PBE to encrypt the secret/private keys
+  - Feature: Rename the binary from ca-war-*.zip to xipki-ca-*.zip
+- OCSP
+  - Feature: In PKCS#11 emulator, use AES_GCM instead of PBE to encrypt the secret/private keys
+  - Feature: Rename the binary from ocsp-war-*.zip to xipki-ocsp-*.zip
+- CLI
+  - Feature: Exclude the original bouncycastle jars delivered in karaf.
+  - Feature: In PKCS#11 emulator, use AES_GCM instead of PBE to encrypt the secret/private keys
+- DB Tool
+  - Feature: Rename the binary from dbtool-*.zip to xipki-dbtool-*.zip
 - Dependencies
   - N/A
 
