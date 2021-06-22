@@ -693,7 +693,7 @@ public class OcspServerImpl implements OcspServer {
                 oids.add(m.getExtnType());
               }
             }
-            LOG.warn("could not process critial request extensions: {}", oids);
+            LOG.warn("could not process critical request extensions: {}", oids);
           }
 
           return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
@@ -888,6 +888,7 @@ public class OcspServerImpl implements OcspServer {
     }
 
     if (certStatusInfo == null) {
+      LOG.info("issuer unknown, return {}", unknownIssuerBehaviour);
       switch (unknownIssuerBehaviour) {
         case unknown:
           final long msPerDay = 86400000L; // 24 * 60 * 60 * 1000L;
@@ -903,7 +904,7 @@ public class OcspServerImpl implements OcspServer {
         case tryLater:
           return unsuccesfulOCSPRespMap.get(OcspResponseStatus.tryLater);
         default:
-          break;
+          throw new IllegalStateException("unreachable code");
       }
     }
 

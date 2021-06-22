@@ -199,7 +199,7 @@ public class OcspBenchmark extends BenchmarkExecutor implements ResponseHandler 
     }
 
     if (ocspResp.getStatus() != 0) {
-      LOG.warn("bad response: response status is other than OK");
+      LOG.warn("bad response: response status is other than OK: {}", ocspResp.getStatus());
       return false;
     }
 

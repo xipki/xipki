@@ -550,7 +550,7 @@ public class QaOcspActions {
 
         RequestOptions options = getRequestOptions();
         OcspBenchmark loadTest = new OcspBenchmark(issuerCert, serverUrl, options,
-            serialNumberIterator, maxRequests, queueSize, description.toString());
+            serialNumberIterator, maxRequests, queueSize, description);
         loadTest.setDuration(duration);
         loadTest.setThreads(numThreads);
         loadTest.execute();
