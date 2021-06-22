@@ -794,7 +794,7 @@ public abstract class Certprofile implements Closeable {
       throw new CertprofileException("unknown SubjectKeyIdentifierMethod " + method);
     }
 
-    String truncateMethod = control.getTruncateMethod();
+    String truncateMethod = control == null ? null : control.getTruncateMethod();
     if (StringUtil.isNotBlank(truncateMethod)) {
       boolean leftmost;
       if (StringUtil.startsWithIgnoreCase(truncateMethod, "L:")) {
