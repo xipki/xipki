@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki.example</groupId>
     <artifactId>examples</artifactId>
-    <version>5.3.13</version>
+    <version>5.3.14-SNAPSHOT</version>
   </parent>
   <artifactId>lite-caclient-example</artifactId>
   <packaging>bundle</packaging>
