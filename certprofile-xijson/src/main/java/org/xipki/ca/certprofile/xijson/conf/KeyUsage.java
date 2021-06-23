@@ -64,15 +64,15 @@ public class KeyUsage extends ValidatableConf {
 
   public static class Usage extends ValidatableConf {
 
-    private org.xipki.security.KeyUsage value;
+    private String value;
 
     private boolean required;
 
-    public org.xipki.security.KeyUsage getValue() {
+    public String getValue() {
       return value;
     }
 
-    public void setValue(org.xipki.security.KeyUsage value) {
+    public void setValue(String value) {
       this.value = value;
     }
 

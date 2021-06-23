@@ -654,7 +654,7 @@ public interface CaManager {
    * @param serialNumber
    *          Serial number. {@code null}: lets CA choose the serial number;
    *          fixed serialnumber: decimal or heximal (beginning with 0x) number;
-   *          RANDOM:&ltsize in bytes&gt: random number with given length.
+   *          RANDOM:&lt;size in bytes&gt; random number with given length.
    * @return the generated certificate
    * @throws CaMgmtException
    *          if error occurs.
