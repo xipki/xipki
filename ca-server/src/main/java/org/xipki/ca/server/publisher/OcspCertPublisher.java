@@ -78,7 +78,7 @@ public class OcspCertPublisher extends CertPublisher {
     this.publishsGoodCert = str == null || Boolean.parseBoolean(str);
 
     str = pairs.value("asyn");
-    this.asyn = Boolean.parseBoolean(str);
+    this.asyn = str == null ? false : Boolean.parseBoolean(str);
 
     ConfPairs confPairs = new ConfPairs(conf);
     String datasourceName = confPairs.value("datasource");
