@@ -208,7 +208,7 @@
       </column>
     </createTable>
     <!-- table CA_HAS_PROFILE -->
-    <createTable tableName="CA_HAS_PROFILE"><column name="PROFILES" type="VARCHAR(200)"/>
+    <createTable tableName="CA_HAS_PROFILE">
       <column name="CA_ID" type="SMALLINT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
