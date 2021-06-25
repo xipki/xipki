@@ -196,6 +196,10 @@ CLI Commands
 -----
 Please refer to [commands.md](commands.md) for more details.
 
+Docker container
+-----
+See discussion in [issue #205](https://github.com/xipki/xipki/issues/205).
+
 Features
 -----
 - CA (Certification Authority)
