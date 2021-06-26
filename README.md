@@ -36,6 +36,39 @@ JRE/JDK, and the steps to reproduce the bug.
 * [nCipher Solo](https://www.ncipher.com/products/general-purpose-hsms/nshield-solo),
 * [Utimaco Se](https://hsm.utimaco.com/products-hardware-security-modules/general-purpose-hsm/)
 
+## Performance
+
+### Test Settings
+- OS: Ubuntu 20.04, X86_64
+- CPU: Intel Core i3-7100U CPU @ 2.40GHz, 4 Core
+- Disk: SanDisk SD8SN8U (SSD)
+- Memory: 8GB
+- Database: mysql  Ver 8.0.25-0ubuntu0.20.04.1 for Linux on x86_64 ((Ubuntu))
+- Communication: database, CA, OCSP and test clients on the same machine.
+- Cryptograhic Token: PKCS#12 keystore
+
+### CA
+
+- Certificate Enrollment
+
+| Key Type      | Certificates per econd |
+|:-------------:|:-------------:|
+| RSA 2048      | 220 |
+| DSA 2048      | 240 |
+| EC NIST P-256 | 240 |
+| SM2           | 240 |
+
+### OCSP
+
+- OCSP Cache Disabled
+
+| Key Type      | Responses per second |
+|:-------------:|:-------------:|
+| RSA 2048      | 880  |
+| DSA 2048      | 2000 |
+| EC NIST P-256 | 3600 |
+| SM2           | 4000 |
+
 ## Get Started
 
 ### JAVA_HOME
@@ -195,6 +228,10 @@ preload <start script>
 CLI Commands
 -----
 Please refer to [commands.md](commands.md) for more details.
+
+Docker container
+-----
+See discussion in [issue #205](https://github.com/xipki/xipki/issues/205).
 
 Features
 -----

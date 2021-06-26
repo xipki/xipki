@@ -7,6 +7,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
   logicalFilePath="ca-init.xml">
+  <property name="cert.cert.type" value="VARCHAR(6000)"/>
   <property name="x500name.type" value="VARCHAR(350)"/>
   <!-- 100 MB for DB2 -->
   <property name="crl.data.type" value="CLOB(104857600)" dbms="db2"/>
@@ -58,7 +59,7 @@
       <column name="TYPE" type="VARCHAR(100)">
         <constraints nullable="false"/>
       </column>
-      <column name="CERT" type="VARCHAR(6000)"/>
+      <column name="CERT" type="${cert.cert.type}"/>
       <column name="CONF" type="CLOB"/>
     </createTable>
     <!-- table REQUESTOR -->
@@ -208,7 +209,7 @@
       </column>
     </createTable>
     <!-- table CA_HAS_PROFILE -->
-    <createTable tableName="CA_HAS_PROFILE"><column name="PROFILES" type="VARCHAR(200)"/>
+    <createTable tableName="CA_HAS_PROFILE">
       <column name="CA_ID" type="SMALLINT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
