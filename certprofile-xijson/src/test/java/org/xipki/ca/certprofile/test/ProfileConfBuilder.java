@@ -334,8 +334,15 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     subject.setKeepRdnOrder(false);
 
     ASN1ObjectIdentifier[] curveIds = (CertLevel.EndEntity != certLevel) ? null :
-      new ASN1ObjectIdentifier[] {SECObjectIdentifiers.secp256r1,
-        TeleTrusTObjectIdentifiers.brainpoolP256r1, GMObjectIdentifiers.sm2p256v1};
+      new ASN1ObjectIdentifier[] {
+              SECObjectIdentifiers.secp256r1,
+              SECObjectIdentifiers.secp384r1,
+              SECObjectIdentifiers.secp521r1,
+              TeleTrusTObjectIdentifiers.brainpoolP256r1,
+              TeleTrusTObjectIdentifiers.brainpoolP256r1,
+              TeleTrusTObjectIdentifiers.brainpoolP384r1,
+              TeleTrusTObjectIdentifiers.brainpoolP512r1,
+              GMObjectIdentifiers.sm2p256v1};
 
     // Key
     profile.setKeyAlgorithms(createKeyAlgorithms(curveIds, certLevel));
@@ -433,8 +440,10 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     EcParametersType ecParams = new EcParametersType();
     last(list).getParameters().setEc(ecParams);
 
-    ASN1ObjectIdentifier[] curveIds = new ASN1ObjectIdentifier[] {SECObjectIdentifiers.secp256r1,
-        SECObjectIdentifiers.secp384r1, SECObjectIdentifiers.secp521r1};
+    ASN1ObjectIdentifier[] curveIds = new ASN1ObjectIdentifier[] {
+            SECObjectIdentifiers.secp256r1,
+            SECObjectIdentifiers.secp384r1,
+            SECObjectIdentifiers.secp521r1};
     List<DescribableOid> curves = new LinkedList<>();
     ecParams.setCurves(curves);
 
@@ -497,9 +506,20 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
 
     ecParams.setPointEncodings(Collections.singletonList(((byte) 4)));
 
-    // EdDSA
+    // EdDSA / XDH
     if (certLevel == CertLevel.RootCA || certLevel == CertLevel.SubCA) {
       list.addAll(createEdwardsOrMontgomeryKeyAlgorithms(true, true, true));
+    } else {
+      List<ASN1ObjectIdentifier> oids = new LinkedList<>();
+      oids.add(EdECConstants.id_ED25519);
+      oids.add(EdECConstants.id_ED448);
+      oids.add(EdECConstants.id_X25519);
+      oids.add(EdECConstants.id_X448);
+
+      for (ASN1ObjectIdentifier oid : oids) {
+        list.add(new AlgorithmType());
+        last(list).getAlgorithms().add(createOidType(oid));
+      }
     }
 
     return list;
