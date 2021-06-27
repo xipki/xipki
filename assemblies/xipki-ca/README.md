@@ -19,8 +19,8 @@ Deployment in Tomcat 8 and 9
 5 (Optional) If you use database other than MariaDB and MySQL, you need to overwrite the
    configuration templates with those in the corresponding sub folder in `${CONTAINER_ROOT}/xipki/etc/ca/database`.
 6. Adapt the database configurations `${CONTAINER_ROOT}/xipki/etc/ca/database/ca-db.properties`.
-7. Create new databases configured in Step 5.
-8. Initialize the databases configured in Step 5.
+7. Create new databases configured in Step 6.
+8. Initialize the databases configured in Step 6.
    In dbtool, call `bin/initdb.sh --db-schema sql/ca-init.xml --db-conf /path/to/ca-db.properties`
 9. Configure the TLS listener in the file `${CATALINA_HOME}conf/server.xml`
    - Use NIO connector
@@ -109,8 +109,8 @@ Deployment in Jetty 9
 4 (Optional) If you use database other than MariaDB and MySQL, you need to overwrite the
    configuration templates with those in the corresponding sub folder in `${JETTY_BASE}/xipki/etc/ca/database`.
 5. Adapt the database configurations `${JETTY_BASE}/xipki/etc/ca/database/ca-db.properties`.
-6. Create new databases configured in Step 4.
-7. Initialize the databases configured in Step 4.
+6. Create new databases configured in Step 5.
+7. Initialize the databases configured in Step 5.
    In dbtool, call `bin/initdb.sh --db-schema sql/ca-init.xml --db-conf /path/to/ca-db.properties`
 8. Configure the TLS listener by adding the following block to the file `start.ini`. Please configure
   XIPKI_BASE correctly.
