@@ -14,14 +14,15 @@ Deployment in Tomcat 8 and 9
 3. Download the `bcutil-jdk15on-<version>.jar`, `bcprov-jdk15on-<version>.jar` and `bcpkix-jdk15on-<version>.jar` from
   [BouncyCastle Latest Release](https://www.bouncycastle.org/latest_releases.html) to the folder
   `${CATALINA_HOME}/lib`. The cryptographic libraries are not included since we need the latest release.
-4. (Optional) If you use database other than MariaDB and MySQL, you need to overwrite the
-   configuration templates with those in the corresponding sub folder in `${CONTAINER_ROOT}/xipki/etc/ca/database`,
-   and download the JDBC driver to the folder `${CATALINA_HOME}/lib`.
-5. Adapt the database configurations `${CONTAINER_ROOT}/xipki/etc/ca/database/ca-db.properties`.
-6. Create new databases configured in Step 5.
-7. Initialize the databases configured in Step 5.
+4 (Optional) If you use database other than PostgreSQL, MariaDB and MySQL, you need to
+   download the JDBC driver to the folder `${CATALINA_HOME}/lib`.
+5 (Optional) If you use database other than MariaDB and MySQL, you need to overwrite the
+   configuration templates with those in the corresponding sub folder in `${CONTAINER_ROOT}/xipki/etc/ca/database`.
+6. Adapt the database configurations `${CONTAINER_ROOT}/xipki/etc/ca/database/ca-db.properties`.
+7. Create new databases configured in Step 5.
+8. Initialize the databases configured in Step 5.
    In dbtool, call `bin/initdb.sh --db-schema sql/ca-init.xml --db-conf /path/to/ca-db.properties`
-8. Configure the TLS listener in the file `${CATALINA_HOME}conf/server.xml`
+9. Configure the TLS listener in the file `${CATALINA_HOME}conf/server.xml`
    - Use NIO connector
 ```sh
     <Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"
@@ -57,7 +58,7 @@ Deployment in Tomcat 8 and 9
         </SSLHostConfig>
     </Connector>
 ```
-9. (optional) To accelerate the start process, append the following block to the property
+10. (optional) To accelerate the start process, append the following block to the property
 `tomcat.util.scan.StandardJarScanFilter.jarsToSkip` in the file `conf/catalina.properties`.
 
 ```
@@ -103,14 +104,15 @@ Deployment in Jetty 9
 2. Download the `bcprov-jdk15on-<version>.jar` and `bcpkix-jdk15on-<version>.jar` from
   [BouncyCastle Latest Release](https://www.bouncycastle.org/latest_releases.html) to the folder
   `${JETTY_BASE}/lib/ext`. The cryptographic libraries are not included since we need the latest release.
-3. (Optional) If you use database other than MariaDB and MySQL, you need to overwrite the
-   configuration templates with those in the corresponding sub folder in `${JETTY_BASE}/xipki/etc/ca/database`,
-   and download the JDBC driver to the folder `${JETTY_BASE}/lib/ext`.   
-4. Adapt the database configurations `${JETTY_BASE}/xipki/etc/ca/database/ca-db.properties`.
-5. Create new databases configured in Step 4.
-6. Initialize the databases configured in Step 4.
+3 (Optional) If you use database other than PostgreSQL, MariaDB and MySQL, you need to
+   download the JDBC driver to the folder `${JETTY_BASE}/lib/ext`.
+4 (Optional) If you use database other than MariaDB and MySQL, you need to overwrite the
+   configuration templates with those in the corresponding sub folder in `${JETTY_BASE}/xipki/etc/ca/database`.
+5. Adapt the database configurations `${JETTY_BASE}/xipki/etc/ca/database/ca-db.properties`.
+6. Create new databases configured in Step 4.
+7. Initialize the databases configured in Step 4.
    In dbtool, call `bin/initdb.sh --db-schema sql/ca-init.xml --db-conf /path/to/ca-db.properties`
-7. Configure the TLS listener by adding the following block to the file `start.ini`. Please configure
+8. Configure the TLS listener by adding the following block to the file `start.ini`. Please configure
   XIPKI_BASE correctly.
 
 ```sh

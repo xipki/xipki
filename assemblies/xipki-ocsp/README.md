@@ -41,12 +41,13 @@ Deployment in Tomcat 8 and 9
 3. Download the `bcutil-jdk15on-<version>.jar`, `bcprov-jdk15on-<version>.jar` and `bcpkix-jdk15on-<version>.jar` from
   [BouncyCastle Latest Release](https://www.bouncycastle.org/latest_releases.html) to the folder
   `${CATALINA_HOME}/lib`. The cryptographic libraries are not included since we need the latest release.
-4. (Optional) If you use database other than MariaDB and MySQL, you need to overwrite the
-   configuration templates with those in the corresponding sub folder in `${CONTAINER_ROOT}/xipki/etc/ocsp/database`,
-   and download the JDBC driver to the folder `${CATALINA_HOME}/lib`.
-5. Add the line `org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true`
+4. (Optional) If you use database other than PostgreSQL, MariaDB and MySQL, you need to download
+   the JDBC driver to the folder `${CATALINA_HOME}/lib`.
+5. (Optional) If you use database other than MariaDB and MySQL, you need to overwrite the
+   configuration templates with those in the corresponding sub folder in `${CONTAINER_ROOT}/xipki/etc/ocsp/database`.
+6. Add the line `org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true`
    to the file `conf/catalina.properties` if OCSP over HTTP supported is activated.
-6. (optional) To accelerate the start process, append the following block to the property
+7. (optional) To accelerate the start process, append the following block to the property
 `tomcat.util.scan.StandardJarScanFilter.jarsToSkip` in the file `conf/catalina.properties`.
 
 ```
@@ -87,10 +88,11 @@ Deployment in Jetty 9
 2. Download the `bcprov-jdk15on-<version>.jar` and `bcpkix-jdk15on-<version>.jar` from
   [BouncyCastle Latest Release](https://www.bouncycastle.org/latest_releases.html) to the folder
   `${JETTY_HOME}/lib/ext`. The cryptographic libraries are not included since we need the latest release.
-3. (Optional) If you use database other than MariaDB and MySQL, you need to overwrite the
-   configuration templates with those in the corresponding sub folder in `${JETTY_BASE}/xipki/etc/ocsp/database`,
-   and download the JDBC driver to the folder `${JETTY_BASE}/lib/ext`.   
-4. Configure the XIPKI_BASE by adding the following block to the file `start.ini`. Please configure
+3. (Optional) If you use database other than PostgreSQL, MariaDB and MySQL, you need to download the
+   JDBC driver to the folder `${JETTY_BASE}/lib/ext`.
+4. (Optional) If you use database other than MariaDB and MySQL, you need to overwrite the
+   configuration templates with those in the corresponding sub folder in `${JETTY_BASE}/xipki/etc/ocsp/database`.
+5. Configure the XIPKI_BASE by adding the following block to the file `start.ini`. Please configure
   XIPKI_BASE correctly.
 
 ```sh

@@ -131,7 +131,7 @@ follows.
 ## Install DB Tool
 
 1. Unpack the binary `xipki-dbtool-<version>.zip`.
-2. If you use database other than MariaDB and MySQL, you need to get the JDBC driver and
+2. If you use database other than PostgreSQL, MariaDB and MySQL, you need to get the JDBC driver and
    copy it to the directory `lib/jdbc`.
  
 ## Install CA Server

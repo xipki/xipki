@@ -23,6 +23,11 @@
       <version>${jdbc.mariadb.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>${jdbc.postgresql.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.tinylog</groupId>
       <artifactId>slf4j-tinylog</artifactId>
       <version>${tinylog.version}</version>
