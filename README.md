@@ -43,31 +43,58 @@ JRE/JDK, and the steps to reproduce the bug.
 - CPU: Intel Core i3-7100U CPU @ 2.40GHz, 4 Core
 - Disk: SanDisk SD8SN8U (SSD)
 - Memory: 8GB
-- Database: mysql  Ver 8.0.25-0ubuntu0.20.04.1 for Linux on x86_64 ((Ubuntu))
-- Communication: database, CA, OCSP and test clients on the same machine.
 - Cryptograhic Token: PKCS#12 keystore
+- Database: postgresql 12 (with default configuration)
+- Database, CA server, OCSP server and test clients on the same machine.
+- Server: Apache Tomcat/8.5.34
+- Server JDK: 11.0.11+9-Ubuntu-0ubuntu2.20.04
+- Test Client: XiPKI QA, tested with 5 threads and in 60 seconds.
 
 ### CA
 
 - Certificate Enrollment
 
-| Key Type      | Certificates per econd |
-|:-------------:|:-------------:|
-| RSA 2048      | 220 |
-| DSA 2048      | 240 |
-| EC NIST P-256 | 240 |
-| SM2           | 240 |
+| Key type      | Key size / Curve | Certificates per second |
+|:-------------:|-------------:|-------------:|
+| RSA           | 2048          | 450   |
+|               | 3072          | 210   |
+|               | 4096          | 120   |
+| DSA           | 2048          | 470   |
+|               | 3072          | 300   |
+| EC            | NIST P-256    | 470   |
+|               | NIST P-384    | 290   |
+|               | NIST P-521    | 220   |
+|           | Brainpool P-256R1 | 401   |
+|           | Brainpool P-384R1 | 240   |
+|           | Brainpool P-512R1 | 140   |
+| SM2           | SM2P256V1     | 500   |
+| EdDSA         | Ed25519       | 1,200 |
+|               | Ed448         | 800   |
 
 ### OCSP
 
 - OCSP Cache Disabled
 
-| Key Type      | Responses per second |
-|:-------------:|:-------------:|
-| RSA 2048      | 880  |
-| DSA 2048      | 2000 |
-| EC NIST P-256 | 3600 |
-| SM2           | 4000 |
+| Key type      | Key size / Curve | Responses per second |
+|:-------------:|:-------------:|-------------:|
+| RSA           | 2048          | 880   |
+|               | 3072          | 350   |
+|               | 3072          | 160   |
+| DSA           | 2048          | 2,000 |
+|               | 3072          | 1,000 |
+| EC            | NIST P-256    | 3,600 |
+|               | NIST P-384    | 2,400 |
+|               | NIST P-521    | 1,400 |
+|           | Brainpool P-256R1 | 1,500 |
+|           | Brainpool P-384R1 | 850   |
+|           | Brainpool P-512R1 | 500   |
+| SM2           | SM2P256V1     | 4,000 |
+| EdDSA         | Ed25519       | 5,000 |
+|               | Ed448         | 3,300 |
+
+- OCSP Cache enabled
+  - If the OCSP requests contain nonce: same as without cache (see above).
+  - Otherwise, (much) better than without cache.
 
 ## Get Started
 
