@@ -48,7 +48,7 @@ JRE/JDK, and the steps to reproduce the bug.
 - Database, CA server, OCSP server and test clients on the same machine.
 - Server: Apache Tomcat/8.5.34
 - Server JDK: 11.0.11+9-Ubuntu-0ubuntu2.20.04
-- Test Client: XiPKI QA, tested with 5 threads and in 60 seconds.
+- Test Client: XiPKI QA, tested with 5 threads for 60 seconds.
 
 ### CA
 
@@ -237,8 +237,7 @@ preload <start script>
   - `source xipki/client-script/scep-client.script`
 
 * XiPKI CLI
-  XiPKI CLI provides both the full-featured client and the lite version to enroll and
-  revoke certificates via CMP.
+  XiPKI CLI provides commands to enroll and revoke certificates via CMP.
 
   The binary `xipki-cli-<version>`.tar.gz contains an example script in the folder xipki/client-script.
   It can be executed in the CLI as follows:  
