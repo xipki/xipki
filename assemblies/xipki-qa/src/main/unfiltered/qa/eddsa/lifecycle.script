@@ -60,6 +60,20 @@ if { $printUsage equals "true" } then {
 
   source file:./qa/eddsa/prepare-keys.script
 
+  ## Prepare OCSP responder configuration
+  xi:copy-file -f \
+    xipki/etc/ocsp/template.ocsp-responder.json \
+    xipki/etc/ocsp/ocsp-responder.json
+
+  xi:replace --old "REPLACEME-TOKENTYPE" --new "$TOKEN_TYPE" \
+    xipki/etc/ocsp/ocsp-responder.json
+
+  xi:replace --old "REPLACEME-TOKENKEY" --new "$OCSP_KEYCONF" \
+    xipki/etc/ocsp/ocsp-responder.json
+
+  xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
+    xipki/etc/ocsp/ocsp-responder.json
+
   ## CA client configuration
   xi:copy-file -f qa/eddsa/cmpclient.json \
     xipki/cmpclient/cmpclient.json
@@ -74,6 +88,26 @@ if { $printUsage equals "true" } then {
   echo "#################################################################"
 
   source file:./qa/eddsa/ra.script
+
+  cmp-enroll-cagenkey --subject "CN=ocsp99,O=example org,C=DE" --profile ocsp \
+    --p12-out output/ocsp99.p12 --cert-out output/ocsp99.crt --password 1234
+
+  # Copy the configuration of OCSP responder
+  xi:copy-file -f \
+    xipki/etc/ocsp/ocsp-responder.json \
+    ${XIPKI_DIR}/etc/ocsp/ocsp-responder.json
+
+  if { "$TOKEN_TYPE" equals "pkcs12" } then {
+    xi:copy-file -f output/ocsp99.p12 \
+      ${XIPKI_DIR}/keycerts/ocsp99.p12
+  }
+
+  if { $TOKEN_TYPE equals "pkcs11" } then {
+    ocsp:refresh-token --type pkcs11
+  }
+
+  # Restart OCSP server
+  ocsp:restart-server
 
   echo "Sleeping 1 second"
   sleep 1
