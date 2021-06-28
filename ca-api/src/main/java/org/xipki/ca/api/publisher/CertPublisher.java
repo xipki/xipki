@@ -63,6 +63,11 @@ public abstract class CertPublisher implements Closeable {
 
   public abstract boolean publishsGoodCert();
 
+  /**
+   * Will not be considered.
+   * @return whether data will be published asynchronously.
+   */
+  @Deprecated
   public abstract boolean isAsyn();
 
   /**
