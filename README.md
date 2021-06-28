@@ -64,9 +64,9 @@ JRE/JDK, and the steps to reproduce the bug.
 | EC            | NIST P-256    | 470   |
 |               | NIST P-384    | 290   |
 |               | NIST P-521    | 220   |
-|           | Brainpool P-256R1 | 401   |
-|           | Brainpool P-384R1 | 240   |
-|           | Brainpool P-512R1 | 140   |
+|            | Brainpool P256R1 | 401   |
+|            | Brainpool P384R1 | 240   |
+|            | Brainpool P512R1 | 140   |
 | SM2           | SM2P256V1     | 500   |
 | EdDSA         | Ed25519       | 1,200 |
 |               | Ed448         | 800   |
@@ -79,15 +79,15 @@ JRE/JDK, and the steps to reproduce the bug.
 |:-------------:|:-------------:|-------------:|
 | RSA           | 2048          | 880   |
 |               | 3072          | 350   |
-|               | 3072          | 160   |
+|               | 4096          | 160   |
 | DSA           | 2048          | 2,000 |
 |               | 3072          | 1,000 |
 | EC            | NIST P-256    | 3,600 |
 |               | NIST P-384    | 2,400 |
 |               | NIST P-521    | 1,400 |
-|           | Brainpool P-256R1 | 1,500 |
-|           | Brainpool P-384R1 | 850   |
-|           | Brainpool P-512R1 | 500   |
+|            | Brainpool P256R1 | 1,500 |
+|            | Brainpool P384R1 | 850   |
+|            | Brainpool P512R1 | 500   |
 | SM2           | SM2P256V1     | 4,000 |
 | EdDSA         | Ed25519       | 5,000 |
 |               | Ed448         | 3,300 |
