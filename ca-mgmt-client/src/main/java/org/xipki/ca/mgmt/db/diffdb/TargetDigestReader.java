@@ -208,9 +208,7 @@ class TargetDigestReader implements Closeable {
         }
         arrayBuffer.append(")");
         break;
-      case XIPKI_CA_v4:
-      case XIPKI_CA_v5:
-      case XIPKI_CA_v6:
+      default:
         String hashOrCertColumn;
         if (certHashAlgo == HashAlgo.SHA1) {
           hashOrCertColumn = "SHA1";
@@ -229,8 +227,6 @@ class TargetDigestReader implements Closeable {
         }
         arrayBuffer.append(")");
         break;
-      default:
-        throw new IllegalStateException("unknown dbType " + dbType);
     }
 
     singleCertSql = datasource.buildSelectFirstSql(1, singleSql);
@@ -388,17 +384,13 @@ class TargetDigestReader implements Closeable {
     switch (dbType) {
       case XIPKI_OCSP_v4:
         return rs.getString("HASH");
-      case XIPKI_CA_v4:
-      case XIPKI_CA_v5:
-      case XIPKI_CA_v6:
+      default:
         if (certhashAlgo == HashAlgo.SHA1) {
           return rs.getString("SHA1");
         } else {
           byte[] encodedCert = Base64.decodeFast(rs.getString("CERT"));
           return certhashAlgo.base64Hash(encodedCert);
         }
-      default:
-        throw new IllegalStateException("unknown dbType " + dbType);
     }
   } // method getBase64HashValue
 }
