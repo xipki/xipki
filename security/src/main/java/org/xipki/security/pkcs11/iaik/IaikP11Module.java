@@ -65,10 +65,9 @@ public class IaikP11Module extends P11Module {
           "\n\tManufacturerID: ", info.getManufacturerID(),
           "\n\tLibrary Description: ", info.getLibraryDescription(),
           "\n\tLibrary Version: ", info.getLibraryVersion());
-
     } catch (TokenException ex) {
       this.description = StringUtil.concatObjects("PKCS#11 IAIK",
-          "\n\tPath", moduleConf.getNativeLibrary());
+          "\n\tPath ", moduleConf.getNativeLibrary());
     }
 
     Slot[] slotList;

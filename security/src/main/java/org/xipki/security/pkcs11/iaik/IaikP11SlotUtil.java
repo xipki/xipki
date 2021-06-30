@@ -43,6 +43,7 @@ import org.xipki.security.pkcs11.P11Slot.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11TokenException;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Hex;
 import org.xipki.util.LogUtil;
 
 import java.math.BigInteger;
@@ -268,7 +269,29 @@ class IaikP11SlotUtil {
       ECPublicKey ecP11Key = (ECPublicKey) p11Key;
       long keyType = ecP11Key.getKeyType().getLongValue();
       byte[] ecParameters = value(ecP11Key.getEcdsaParams());
-      byte[] encodedPoint = DEROctetString.getInstance(value(ecP11Key.getEcPoint())).getOctets();
+      byte[] ecPoint = value(ecP11Key.getEcPoint());
+
+      byte[] encodedPoint = null;
+      if (keyType == KeyType.VENDOR_SM2) {
+        if (ecParameters == null) {
+          // some implementation does not return ECParameters
+          // GMObjectIdentifiers.sm2p256v1.getEncoded()
+          ecParameters = Hex.decode("06082a811ccf5501822d");
+        }
+
+        if (ecPoint.length == 64) {
+          // some implementation just return x_coord. || y_coord.
+          encodedPoint = new byte[65];
+          encodedPoint[0] = 4;
+          System.arraycopy(ecPoint, 0, encodedPoint, 1, ecPoint.length);
+        } else if (ecPoint.length == 65) {
+          encodedPoint = ecPoint;
+        }
+      }
+
+      if (encodedPoint == null) {
+        encodedPoint = DEROctetString.getInstance(ecPoint).getOctets();
+      }
 
       if (keyType == KeyType.EC_EDWARDS || keyType == KeyType.EC_MONTGOMERY) {
         ASN1ObjectIdentifier algOid = ASN1ObjectIdentifier.getInstance(ecParameters);
