@@ -68,7 +68,9 @@ public abstract class CertPublisher implements Closeable {
    * @return whether data will be published asynchronously.
    */
   @Deprecated
-  public abstract boolean isAsyn();
+  public boolean isAsyn() {
+    return false;
+  }
 
   /**
    * Publishes the certificate of the CA.
