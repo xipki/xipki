@@ -44,7 +44,7 @@ JRE/JDK, and the steps to reproduce the bug.
 - Disk: SanDisk SD8SN8U (SSD)
 - Memory: 8GB
 - Cryptograhic Token: PKCS#12 keystore
-- Database: postgresql 12 (with default configuration)
+- Database: PostgreSQL 9.5
 - Database, CA server, OCSP server and test clients on the same machine.
 - Server: Apache Tomcat/8.5.34
 - Server JDK: 11.0.11+9-Ubuntu-0ubuntu2.20.04
@@ -52,27 +52,29 @@ JRE/JDK, and the steps to reproduce the bug.
 
 ### CA
 
+- PostgreSQL is tuned by setting shared_buffers = 2GB and commit_delay = 1000.
 - Certificate Enrollment
 
 | Key type      | Key size / Curve | Certificates per second |
 |:-------------:|-------------:|-------------:|
-| RSA           | 2048          | 450   |
-|               | 3072          | 210   |
-|               | 4096          | 120   |
-| DSA           | 2048          | 470   |
+| RSA           | 2048          | 630   |
 |               | 3072          | 300   |
-| EC            | NIST P-256    | 470   |
-|               | NIST P-384    | 290   |
-|               | NIST P-521    | 220   |
-|            | Brainpool P256R1 | 401   |
-|            | Brainpool P384R1 | 240   |
-|            | Brainpool P512R1 | 140   |
-| SM2           | SM2P256V1     | 500   |
+|               | 4096          | 150   |
+| DSA           | 2048          | 580   |
+|               | 3072          | 330   |
+| EC            | NIST P-256    | 880   |
+|               | NIST P-384    | 700   |
+|               | NIST P-521    | 530   |
+|            | Brainpool P256R1 | 560   |
+|            | Brainpool P384R1 | 350   |
+|            | Brainpool P512R1 | 210   |
+| SM2           | SM2P256V1     | 800   |
 | EdDSA         | Ed25519       | 1,200 |
-|               | Ed448         | 800   |
+|               | Ed448         | 900   |
 
 ### OCSP
 
+- Default PostgreSQL configuration
 - OCSP Cache Disabled
 
 | Key type      | Key size / Curve | Responses per second |
