@@ -35,6 +35,7 @@ import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.*;
 import org.xipki.security.pkcs11.P11ModuleConf.P11MechanismFilter;
 import org.xipki.security.pkcs11.P11ModuleConf.P11NewObjectConf;
+import org.xipki.security.util.SignerUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.LogUtil;
 import org.xipki.util.concurrent.ConcurrentBag;
@@ -375,9 +376,6 @@ class IaikP11Slot extends P11Slot {
       expectedSignatureLen = 48;
     } else if (mech == PKCS11Constants.CKM_SHA512_HMAC || mech == PKCS11Constants.CKM_SHA3_512) {
       expectedSignatureLen = 64;
-    } else if (mech == PKCS11Constants.CKM_VENDOR_SM2
-        || mech == PKCS11Constants.CKM_VENDOR_SM2_SM3) {
-      expectedSignatureLen = 32;
     } else {
       expectedSignatureLen = identity.getExpectedSignatureLen();
     }
@@ -410,21 +408,43 @@ class IaikP11Slot extends P11Slot {
   private byte[] sign0(Session session, int expectedSignatureLen, Mechanism mechanism,
       byte[] content, Key signingKey)
           throws TokenException {
+    long keytype = signingKey.getKeyType().getLongValue();
+    boolean weierstrausKey = false;
+    if (KeyType.EC == keytype || KeyType.VENDOR_SM2 == keytype) {
+      weierstrausKey = true;
+    }
+
     int len = content.length;
 
+    byte[] sigvalue;
     if (len <= maxMessageSize) {
-      return singleSign(session, mechanism, content, signingKey);
+      sigvalue = singleSign(session, mechanism, content, signingKey);
+    } else {
+      LOG.debug("sign (init, update, then finish)");
+      session.signInit(mechanism, signingKey);
+
+      for (int i = 0; i < len; i += maxMessageSize) {
+        int blockLen = Math.min(maxMessageSize, len - i);
+        session.signUpdate(content, i, blockLen);
+      }
+
+      // some HSM vendor return not the EC plain signature (r || s), but the X.962 encoded
+      // so we need to increase the expectedSignatureLen
+      int maxSignatureLen = weierstrausKey ? expectedSignatureLen + 20 : expectedSignatureLen;
+      sigvalue = session.signFinal(maxSignatureLen);
     }
 
-    LOG.debug("sign (init, update, then finish)");
-    session.signInit(mechanism, signingKey);
-
-    for (int i = 0; i < len; i += maxMessageSize) {
-      int blockLen = Math.min(maxMessageSize, len - i);
-      session.signUpdate(content, i, blockLen);
+    if (sigvalue.length > expectedSignatureLen) {
+      if (sigvalue[0] == 0x30) {
+        try {
+          sigvalue = SignerUtil.dsaSigX962ToPlain(sigvalue, expectedSignatureLen * 4);
+        } catch (XiSecurityException e) {
+          throw new TokenException(e);
+        }
+      }
     }
 
-    return session.signFinal(expectedSignatureLen);
+    return sigvalue;
   } // method sign0
 
   private byte[] singleSign(Session session, Mechanism mechanism, byte[] content,
