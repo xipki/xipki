@@ -45,8 +45,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -87,11 +86,13 @@ class IaikP11Slot extends P11Slot {
 
   private final ConcurrentBag<ConcurrentBagEntry<Session>> sessions = new ConcurrentBag<>();
 
-  IaikP11Slot(String moduleName, P11SlotIdentifier slotId, Slot slot, boolean readOnly,
-      long userType, List<char[]> password, int maxMessageSize, P11MechanismFilter mechanismFilter,
-      P11NewObjectConf newObjectConf)
+  IaikP11Slot(
+          String moduleName, P11SlotIdentifier slotId, Slot slot, boolean readOnly,
+          long userType, List<char[]> password, int maxMessageSize, P11MechanismFilter mechanismFilter,
+          P11NewObjectConf newObjectConf, Integer numSessions,
+          List<Long> secretKeyTypes, List<Long> keyPairTypes)
           throws P11TokenException {
-    super(moduleName, slotId, readOnly, mechanismFilter);
+    super(moduleName, slotId, readOnly, mechanismFilter, numSessions, secretKeyTypes, keyPairTypes);
 
     this.newObjectConf = notNull(newObjectConf, "newObjectConf");
     this.slot = notNull(slot, "slot");
@@ -139,6 +140,11 @@ class IaikP11Slot extends P11Slot {
         // 2 sessions as buffer, they may be used elsewhere.
         maxSessionCount2 = (maxSessionCount2 < 3) ? 1 : maxSessionCount2 - 2;
       }
+
+      if (numSessions != null) {
+        maxSessionCount2 = Math.min(numSessions, maxSessionCount2);
+      }
+
       this.maxSessionCount = (int) maxSessionCount2;
       LOG.info("maxSessionCount: {}", this.maxSessionCount);
 
@@ -178,7 +184,20 @@ class IaikP11Slot extends P11Slot {
     try {
       Session session = bagEntry.value();
       // secret keys
-      List<Storage> secretKeys = getObjects(session, new SecretKey());
+      List<Storage> secretKeys;
+      if (secretKeyTypes == null) {
+        SecretKey template = new SecretKey();
+        secretKeys = getObjects(session, template);
+      } else if (secretKeyTypes.isEmpty()) {
+        secretKeys = Collections.emptyList();
+      } else {
+        secretKeys = new LinkedList<>();
+        for (Long keyType : secretKeyTypes) {
+          SecretKey template = new ValuedSecretKey(keyType);
+          secretKeys.addAll(getObjects(session, template));
+        }
+      }
+
       LOG.info("found {} secret keys", secretKeys.size());
       for (Storage m : secretKeys) {
         SecretKey secKey = (SecretKey) m;
@@ -201,7 +220,38 @@ class IaikP11Slot extends P11Slot {
         }
       }
 
-      List<Storage> privKeys = getObjects(session, new PrivateKey());
+      List<Storage> privKeys;
+      if (keyPairTypes == null) {
+        PrivateKey template = new PrivateKey();
+        privKeys = getObjects(session, template);
+      } else if (keyPairTypes.isEmpty()) {
+        privKeys = Collections.emptyList();
+      } else {
+        privKeys = new LinkedList<>();
+        for (long keyType : keyPairTypes) {
+          PrivateKey template;
+
+          if (keyType == KeyType.RSA) {
+            template = new RSAPrivateKey();
+          } else if (keyType == KeyType.DSA) {
+            template = new DSAPrivateKey();
+          } else if (keyType == KeyType.EC) {
+            template = new ECPrivateKey();
+          } else if (keyType == KeyType.VENDOR_SM2) {
+            template = new ECPrivateKey(KeyType.VENDOR_SM2);
+          } else if (keyType == KeyType.EC_EDWARDS) {
+            template = new ECPrivateKey(KeyType.EC_EDWARDS);
+          } else if (keyType == KeyType.EC_MONTGOMERY) {
+            template = new ECPrivateKey(KeyType.EC_MONTGOMERY);
+          } else {
+            LOG.error("unknown KeyPair keyType " + keyType);
+            continue;
+          }
+
+          privKeys.addAll(getObjects(session, template));
+        }
+      }
+
       LOG.info("found {} private keys", privKeys.size());
       for (Storage m : privKeys) {
         PrivateKey privKey = (PrivateKey) m;

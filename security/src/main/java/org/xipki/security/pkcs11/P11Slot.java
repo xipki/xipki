@@ -221,13 +221,22 @@ public abstract class P11Slot implements Closeable {
 
   private final P11MechanismFilter mechanismFilter;
 
-  protected P11Slot(String moduleName, P11SlotIdentifier slotId, boolean readOnly,
-      P11MechanismFilter mechanismFilter)
+  protected final Integer numSessions;
+  protected final List<Long> secretKeyTypes;
+  protected final List<Long> keyPairTypes;
+
+  protected P11Slot(
+          String moduleName, P11SlotIdentifier slotId, boolean readOnly,
+          P11MechanismFilter mechanismFilter, Integer numSessions,
+          List<Long> secretKeyTypes, List<Long> keyPairTypes)
           throws P11TokenException {
     this.mechanismFilter = notNull(mechanismFilter, "mechanismFilter");
     this.moduleName = notBlank(moduleName, "moduleName");
     this.slotId = notNull(slotId, "slotId");
     this.readOnly = readOnly;
+    this.numSessions = numSessions;
+    this.secretKeyTypes = secretKeyTypes;
+    this.keyPairTypes = keyPairTypes;
   }
 
   /**
@@ -971,6 +980,7 @@ public abstract class P11Slot implements Closeable {
     assertWritable("generateSecretKey");
     notNull(control, "control");
     assertNoIdentityAndCert(control.getId(), control.getLabel());
+    assertSecretKeyAllowed(keyType);
 
     P11Identity identity = generateSecretKey0(keyType, keysize, control);
     addIdentity(identity);
@@ -1000,6 +1010,7 @@ public abstract class P11Slot implements Closeable {
     notNull(control, "control");
     assertWritable("createSecretKey");
     assertNoIdentityAndCert(control.getId(), control.getLabel());
+    assertSecretKeyAllowed(keyType);
 
     P11Identity identity = importSecretKey0(keyType, keyValue, control);
     addIdentity(identity);
@@ -1008,6 +1019,16 @@ public abstract class P11Slot implements Closeable {
     LOG.info("created secret key {}", objId);
     return objId;
   } // method importSecretKey
+
+  private void assertSecretKeyAllowed(long keyType) throws P11TokenException {
+    if (secretKeyTypes == null) {
+      return;
+    }
+
+    if (!secretKeyTypes.contains(keyType)) {
+      throw new P11TokenException("secret key type 0x" + Long.toHexString(keyType) + "unsupported");
+    }
+  }
 
   /**
    * Generates an RSA keypair.
@@ -1031,7 +1052,6 @@ public abstract class P11Slot implements Closeable {
       throw new IllegalArgumentException("key size is not multiple of 1024: " + keysize);
     }
     assertCanGenKeypair("generateRSAKeypair", PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN, control);
-
     BigInteger tmpPublicExponent = publicExponent;
     if (tmpPublicExponent == null) {
       tmpPublicExponent = BigInteger.valueOf(65537);
@@ -1065,7 +1085,6 @@ public abstract class P11Slot implements Closeable {
       throw new IllegalArgumentException("key size is not multiple of 1024: " + plength);
     }
     assertCanGenKeypair("generateDSAKeypair", PKCS11Constants.CKM_DSA_KEY_PAIR_GEN, control);
-
     DSAParameterSpec dsaParams = DSAParameterCache.getDSAParameterSpec(plength, qlength, random);
     P11Identity identity = generateDSAKeypair0(dsaParams.getP(), dsaParams.getQ(), dsaParams.getG(),
         control);
@@ -1098,7 +1117,6 @@ public abstract class P11Slot implements Closeable {
     notNull(q, "q");
     notNull(g, "g");
     assertCanGenKeypair("generateDSAKeypair", PKCS11Constants.CKM_DSA_KEY_PAIR_GEN, control);
-
     P11Identity identity = generateDSAKeypair0(p, q, g, control);
     addIdentity(identity);
     P11IdentityId id = identity.getId();
@@ -1207,7 +1225,6 @@ public abstract class P11Slot implements Closeable {
   public P11IdentityId generateSM2Keypair(P11NewKeyControl control)
       throws P11TokenException {
     assertCanGenKeypair("generateSM2Keypair", PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN, control);
-
     P11Identity identity = generateSM2Keypair0(control);
     addIdentity(identity);
     P11IdentityId id = identity.getId();
@@ -1221,6 +1238,32 @@ public abstract class P11Slot implements Closeable {
     assertWritable(methodName);
     assertMechanismSupported(mechanism);
     assertNoIdentityAndCert(control.getId(), control.getLabel());
+
+    if (keyPairTypes == null) {
+      return;
+    }
+
+    long keyType;
+    if (PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN == mechanism) {
+      keyType = PKCS11Constants.CKK_RSA;
+    } else if (PKCS11Constants.CKM_EC_KEY_PAIR_GEN == mechanism) {
+      keyType = PKCS11Constants.CKK_EC;
+    } else if (PKCS11Constants.CKM_EC_EDWARDS_KEY_PAIR_GEN == mechanism) {
+      keyType = PKCS11Constants.CKK_EC_EDWARDS;
+    } else if (PKCS11Constants.CKM_EC_MONTGOMERY_KEY_PAIR_GEN == mechanism) {
+      keyType = PKCS11Constants.CKK_EC_MONTGOMERY;
+    } else if (PKCS11Constants.CKM_DSA_KEY_PAIR_GEN == mechanism) {
+      keyType = PKCS11Constants.CKK_DSA;
+    } else if (PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN == mechanism) {
+      keyType = PKCS11Constants.CKK_VENDOR_SM2;
+    } else {
+      throw new IllegalStateException("unknown KeyPair generation mechanism " + mechanism);
+    }
+
+    if (!keyPairTypes.contains(keyType)) {
+      LOG.error("Keypair of key type 0x{} unsupported", Long.toHexString(keyType));
+      throw new P11UnsupportedMechanismException(mechanism, slotId);
+    }
   } // method assertCanGenKeypair
 
   /**

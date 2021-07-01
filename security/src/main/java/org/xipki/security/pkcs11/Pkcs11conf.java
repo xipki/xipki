@@ -132,6 +132,12 @@ public class Pkcs11conf extends ValidatableConf {
 
     private boolean readonly;
 
+    private List<String> secretKeyTypes;
+
+    private List<String> keyPairTypes;
+
+    private Integer numSessions;
+
     /**
      * specify the user type, use either the long value or identifier as
      * defined in the PKCS#11 standards. In version up to 2.40 the
@@ -253,6 +259,30 @@ public class Pkcs11conf extends ValidatableConf {
 
     public int getMaxMessageSize() {
       return maxMessageSize == null ? 16384 : maxMessageSize;
+    }
+
+    public List<String> getSecretKeyTypes() {
+      return secretKeyTypes;
+    }
+
+    public void setSecretKeyTypes(List<String> secretKeyTypes) {
+      this.secretKeyTypes = secretKeyTypes;
+    }
+
+    public List<String> getKeyPairTypes() {
+      return keyPairTypes;
+    }
+
+    public void setKeyPairTypes(List<String> keyPairTypes) {
+      this.keyPairTypes = keyPairTypes;
+    }
+
+    public Integer getNumSessions() {
+      return numSessions;
+    }
+
+    public void setNumSessions(Integer numSessions) {
+      this.numSessions = numSessions;
     }
 
     @Override

@@ -134,7 +134,8 @@ public class IaikP11Module extends P11Module {
       }
       P11Slot p11Slot = new IaikP11Slot(moduleConf.getName(), slotId, slot,
           moduleConf.isReadOnly(), moduleConf.getUserType(), pwd, moduleConf.getMaxMessageSize(),
-          moduleConf.getP11MechanismFilter(), moduleConf.getP11NewObjectConf());
+          moduleConf.getP11MechanismFilter(), moduleConf.getP11NewObjectConf(),
+          moduleConf.getNumSessions(), moduleConf.getSecretKeyTypes(), moduleConf.getKeyPairTypes());
 
       slots.add(p11Slot);
     }

@@ -54,9 +54,11 @@ public class ProxyP11Slot extends P11Slot {
   private final SlotIdentifier asn1SlotId;
 
   ProxyP11Slot(ProxyP11Module module, P11SlotIdentifier slotId, boolean readOnly,
-      P11MechanismFilter mechanismFilter)
+      P11MechanismFilter mechanismFilter, Integer numSessions,
+      List<Long> secretKeyTypes, List<Long> keypairTypes)
           throws P11TokenException {
-    super(module.getName(), slotId, readOnly, mechanismFilter);
+    super(module.getName(), slotId, readOnly, mechanismFilter,
+            numSessions, secretKeyTypes, keypairTypes);
     this.module = module;
     this.slotId = slotId;
     this.asn1SlotId = new SlotIdentifier(slotId);

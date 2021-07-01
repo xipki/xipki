@@ -229,15 +229,21 @@ class EmulatorP11Slot extends P11Slot {
 
   EmulatorP11Slot(String moduleName, File slotDir, P11SlotIdentifier slotId, boolean readOnly,
                   char[] password, KeyCryptor keyCryptor, P11MechanismFilter mechanismFilter,
-                  P11NewObjectConf newObjectConf, int maxSessions)
+                  P11NewObjectConf newObjectConf, Integer numSessions,
+                  List<Long> secretKeyTypes, List<Long> keypairTypes)
           throws P11TokenException {
-    super(moduleName, slotId, readOnly, mechanismFilter);
+    super(moduleName, slotId, readOnly, mechanismFilter, numSessions, secretKeyTypes, keypairTypes);
 
     this.newObjectConf = notNull(newObjectConf, "newObjectConf");
     this.slotDir = notNull(slotDir, "slotDir");
     this.password = notNull(password, "password");
     this.keyCryptor = notNull(keyCryptor, "privateKeyCryptor");
-    this.maxSessions = positive(maxSessions, "maxSessions");
+
+    if (numSessions != null) {
+      this.maxSessions = positive(numSessions, "numSessions");
+    } else {
+      this.maxSessions = 20;
+    }
 
     this.privKeyDir = new File(slotDir, DIR_PRIV_KEY);
     if (!this.privKeyDir.exists()) {

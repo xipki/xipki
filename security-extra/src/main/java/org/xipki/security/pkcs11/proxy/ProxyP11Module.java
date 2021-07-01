@@ -247,7 +247,8 @@ public class ProxyP11Module extends P11Module {
       }
 
       P11Slot slot = new ProxyP11Slot(this, slotId, conf.isReadOnly(),
-          conf.getP11MechanismFilter());
+          conf.getP11MechanismFilter(), conf.getNumSessions(),
+          conf.getSecretKeyTypes(), conf.getKeyPairTypes());
       slots.add(slot);
     }
     setSlots(slots);
