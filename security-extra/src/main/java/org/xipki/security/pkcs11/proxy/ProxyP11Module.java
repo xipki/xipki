@@ -115,7 +115,6 @@ public class ProxyP11Module extends P11Module {
     }
     this.description = StringUtil.concat("PKCS#11 proxy", "\nPath: ", noPasswordConf.getEncoded());
 
-
     String urlStr = confPairs.value(PROP_URL);
     try {
       serverUrl = new URL(urlStr);

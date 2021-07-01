@@ -45,7 +45,10 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -88,7 +91,8 @@ class IaikP11Slot extends P11Slot {
 
   IaikP11Slot(
           String moduleName, P11SlotIdentifier slotId, Slot slot, boolean readOnly,
-          long userType, List<char[]> password, int maxMessageSize, P11MechanismFilter mechanismFilter,
+          long userType, List<char[]> password, int maxMessageSize,
+          P11MechanismFilter mechanismFilter,
           P11NewObjectConf newObjectConf, Integer numSessions,
           List<Long> secretKeyTypes, List<Long> keyPairTypes)
           throws P11TokenException {
