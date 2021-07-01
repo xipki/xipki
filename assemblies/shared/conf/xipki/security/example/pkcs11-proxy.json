@@ -24,7 +24,7 @@
 // hostnameVerifier: no_op, default or java:class-name
 		"nativeLibraries":[
 			{
-				"path":"url=https://localhost:9443/p11proxy/,module=0x7505,ssl.storeType=PKCS12,ssl.keystore=keycerts/tlskeys/client/tls-client.p12,ssl.keystorePassword=1234,ssl.truststore=xipki/keycerts/tlskeys/ca/tls-ca-cert.p12,ssl.truststorePassword=1234,ssl.hostnameVerifier=default"
+				"path":"url=https://localhost:9443/p11proxy/,module=0x7505,ssl.storeType=PKCS12,ssl.keystore=keycerts/tlskeys/client/tls-client.p12,ssl.keystorePassword=1234,ssl.truststore=keycerts/tlskeys/ca/tls-ca-cert.p12,ssl.truststorePassword=1234,ssl.hostnameVerifier=default"
 			}
 		]
 	}],
