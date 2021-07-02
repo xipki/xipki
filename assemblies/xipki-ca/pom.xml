@@ -11,6 +11,9 @@
   <artifactId>xipki-ca</artifactId>
   <packaging>pom</packaging>
   <name>XiPKI :: assembly :: ${project.artifactId}</name>
+  <properties>
+    <shared.dir>${project.basedir}/../shared</shared.dir>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xipki</groupId>
@@ -36,7 +39,7 @@
         </includes>
       </resource>
       <resource>
-        <directory>../shared/conf</directory>
+        <directory>${shared.dir}/conf</directory>
         <filtering>false</filtering>
         <includes>
           <include>xipki/**</include>

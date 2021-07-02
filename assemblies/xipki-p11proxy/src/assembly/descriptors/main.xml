@@ -8,6 +8,12 @@
   </formats>
   <fileSets>
     <fileSet>
+      <directory>${shared.dir}/license</directory>
+      <outputDirectory>license</outputDirectory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
       <directory>${project.build.directory}</directory>
       <includes>
         <include>lib/**</include>
