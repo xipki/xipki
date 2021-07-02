@@ -28,6 +28,7 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x9.ECNamedCurveTable;
 import org.bouncycastle.asn1.x9.X9ECParameters;
+import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.X509Cert;
@@ -493,7 +494,15 @@ class IaikP11Slot extends P11Slot {
         try {
           sigvalue = SignerUtil.dsaSigX962ToPlain(sigvalue, expectedSignatureLen * 4);
         } catch (XiSecurityException e) {
+          LOG.error(
+                  String.format("ERROR: sigvalue (%d): %s", sigvalue.length, Hex.toHexString(sigvalue)),
+                  e);
           throw new TokenException(e);
+        } catch (RuntimeException e) {
+          LOG.error(
+                  String.format("ERROR: sigvalue (%d): %s", sigvalue.length, Hex.toHexString(sigvalue)),
+                  e);
+          throw e;
         }
       }
     }

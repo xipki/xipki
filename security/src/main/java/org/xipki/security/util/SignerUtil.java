@@ -19,7 +19,6 @@ package org.xipki.security.util;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.crypto.AsymmetricBlockCipher;
 import org.bouncycastle.crypto.Digest;
@@ -40,12 +39,15 @@ import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.XiSecurityException;
+import org.xipki.security.asn1.Asn1StreamParser;
 import org.xipki.security.bc.XiECContentVerifierProviderBuilder;
 import org.xipki.security.bc.XiEdDSAContentVerifierProvider;
 import org.xipki.security.bc.XiRSAContentVerifierProviderBuilder;
 import org.xipki.security.bc.XiXDHContentVerifierProvider;
 import org.xipki.util.Hex;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
@@ -341,13 +343,25 @@ public class SignerUtil {
   public static byte[] dsaSigX962ToPlain(byte[] x962Signature, int keyBitLen)
       throws XiSecurityException {
     notNull(x962Signature, "x962Signature");
-    ASN1Sequence seq = ASN1Sequence.getInstance(x962Signature);
-    if (seq.size() != 2) {
-      throw new IllegalArgumentException("invalid X962Signature");
+    try {
+      BufferedInputStream is = new BufferedInputStream(new ByteArrayInputStream(x962Signature));
+      int tag = Asn1StreamParser.markAndReadTag(is);
+      Asn1StreamParser.assertTag(Asn1StreamParser.TAG_CONSTRUCTED_SEQUENCE, tag, "X962Signature");
+      Asn1StreamParser.MyInt lenBytesLen = new Asn1StreamParser.MyInt();
+      int len = Asn1StreamParser.readLength(lenBytesLen, is);
+      if (1 + lenBytesLen.get() + len != x962Signature.length) {
+        throw new XiSecurityException("invalid length");
+      }
+
+      // r
+      byte[] r = Asn1StreamParser.readValue(0x02, is, "r");
+
+      // s
+      byte[] s = Asn1StreamParser.readValue(0x02, is, "s");
+      return dsaSigToPlain(new BigInteger(1, r), new BigInteger(1, s), keyBitLen);
+    } catch (IOException ex) {
+      throw new XiSecurityException("error parsing X509Signature", ex);
     }
-    BigInteger sigR = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue();
-    BigInteger sigS = ASN1Integer.getInstance(seq.getObjectAt(1)).getPositiveValue();
-    return dsaSigToPlain(sigR, sigS, keyBitLen);
   } // method dsaSigX962ToPlain
 
   public static byte[] dsaSigToPlain(BigInteger sigR, BigInteger sigS, int keyBitLen)
