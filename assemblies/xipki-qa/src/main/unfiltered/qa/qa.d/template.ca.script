@@ -57,25 +57,6 @@ ca:profile-add \
   --name rootca \
   --conf-file qa/certprofile/certprofile-rootca.json
 
-## Create the CSR for the command caqa:check-cert in QA
-if { $TOKEN_TYPE equals "pkcs11" } then {
-  xi:csr-p11 \
-    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
-    --slot $SLOT \
-    --label rootca1 \
-    --out output/rootca1.csr \
-    --subject "CN=rootca1,O=myorg,C=DE" \
-    --keyusage cRLSign
-} else {
-  xi:csr-p12 \
-    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
-    --p12 output/rootca1.p12 \
-    --password 1234 \
-    --out output/rootca1.csr \
-    --subject "CN=rootca1,O=myorg,C=DE" \
-    --keyusage cRLSign
-}
-
 ## Generate selfsigned rootca
 
 if { $TOKEN_TYPE equals "pkcs11" } then {
@@ -88,7 +69,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
 
 ca:gen-rootca \
   --name rootca1 \
-  --csr output/rootca1.csr \
+  --subject "CN=rootca1,O=myorg,C=DE" \
   --profile rootca \
   --serial 1 \
   --outform $OUTFORM \

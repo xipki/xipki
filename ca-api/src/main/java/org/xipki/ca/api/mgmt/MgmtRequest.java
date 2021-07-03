@@ -394,7 +394,7 @@ public abstract class MgmtRequest extends MgmtMessage {
 
     private String certprofileName;
 
-    private byte[] encodedCsr;
+    private String subject;
 
     private String serialNumber;
 
@@ -414,12 +414,12 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.certprofileName = certprofileName;
     }
 
-    public byte[] getEncodedCsr() {
-      return encodedCsr;
+    public String getSubject() {
+      return subject;
     }
 
-    public void setEncodedCsr(byte[] encodedCsr) {
-      this.encodedCsr = encodedCsr;
+    public void setSubject(String subject) {
+      this.subject = subject;
     }
 
     public String getSerialNumber() {

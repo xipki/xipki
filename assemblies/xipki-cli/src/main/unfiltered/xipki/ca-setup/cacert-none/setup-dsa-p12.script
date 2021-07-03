@@ -12,14 +12,14 @@ echo "#################################################################"
 
 xi:dsa-p12 --password 1234 --out ${KEYCERTS_DIR}/myca1.p12 --plen  2048
 
-xi:csr-p12 --hash ${HASH} --p12 ${KEYCERTS_DIR}/myca1.p12 --password 1234 \
-  --out ${KEYCERTS_DIR}/myca1.csr --subject "${CA_SUBJECT}"
-
 echo "#################################################################"
 echo "#                       Load ca-conf.json                       #"
 echo "#################################################################"
 
 xi:copy-file -f xipki/ca-setup/cacert-none/template.ca-conf.json \
+  xipki/ca-setup/cacert-none/ca-conf.json
+
+xi:replace --old "REPLACEME-SUBJECT" --new "${CA_SUBJECT}" \
   xipki/ca-setup/cacert-none/ca-conf.json
 
 xi:replace --old "REPLACEME-TOKEN_TYPE" --new "pkcs12" \

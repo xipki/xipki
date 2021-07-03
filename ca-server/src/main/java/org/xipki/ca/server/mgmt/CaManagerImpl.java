@@ -1082,9 +1082,9 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public X509Cert generateRootCa(CaEntry caEntry, String profileName, byte[] encodedCsr,
+  public X509Cert generateRootCa(CaEntry caEntry, String profileName, String subject,
       String serialNumber) throws CaMgmtException {
-    return ca2Manager.generateRootCa(caEntry, profileName, encodedCsr, serialNumber);
+    return ca2Manager.generateRootCa(caEntry, profileName, subject, serialNumber);
   }
 
   void assertMasterModeAndSetuped() throws CaMgmtException {

@@ -125,11 +125,6 @@ if { $printUsage equals "true" } then {
 
   caqa:init
 
-  ## rootca
-
-  caqa:check-cert --issuer rootca --profile cab-rootca \
-    --csr output/rootca1.csr --cert output/rootca1.crt
-
   caqa:check-cert --issuer rootca --profile cab-subca \
     --csr output/subca1.csr --cert output/subca1.crt
 

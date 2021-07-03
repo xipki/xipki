@@ -65,10 +65,10 @@ if { $printUsage equals "true" } then {
     xipki/etc/ocsp/template.ocsp-responder.json \
     xipki/etc/ocsp/ocsp-responder.json
 
-  xi:replace --old "REPLACEME-TOKENTYPE" --new "$TOKEN_TYPE" \
+  xi:replace --old "REPLACEME-TOKENTYPE" --new "PKCS12" \
     xipki/etc/ocsp/ocsp-responder.json
 
-  xi:replace --old "REPLACEME-TOKENKEY" --new "$OCSP_KEYCONF" \
+  xi:replace --old "REPLACEME-TOKENKEY" --new "password=1234,keystore=file:keycerts/ocsp99.p12" \
     xipki/etc/ocsp/ocsp-responder.json
 
   xi:replace --old "REPLACEME-SIGALGO" --new "$SIGALGO" \

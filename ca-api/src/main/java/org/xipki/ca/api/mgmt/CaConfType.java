@@ -737,18 +737,18 @@ public class CaConfType {
 
   public static class GenSelfIssued extends ValidatableConf {
 
-    private FileOrBinary csr;
+    private String subject;
 
     private String profile;
 
     private String serialNumber;
 
-    public FileOrBinary getCsr() {
-      return csr;
+    public String getSubject() {
+      return subject;
     }
 
-    public void setCsr(FileOrBinary csr) {
-      this.csr = csr;
+    public void setSubject(String subject) {
+      this.subject = subject;
     }
 
     public String getProfile() {
@@ -770,8 +770,7 @@ public class CaConfType {
     @Override
     public void validate()
         throws InvalidConfException {
-      notNull(csr, "csr");
-      validate(csr);
+      notBlank(subject, "subject");
     }
 
   } // class GenSelfIssued

@@ -18,10 +18,6 @@
 package org.xipki.ca.server.mgmt;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.pkcs.Attribute;
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -48,6 +44,7 @@ import org.xipki.util.*;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.InvalidKeyException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
@@ -93,12 +90,12 @@ class SelfSignedCertBuilder {
 
   public static GenerateSelfSignedResult generateSelfSigned(SecurityFactory securityFactory,
       String signerType, String signerConf, IdentifiedCertprofile certprofile,
-      CertificationRequest csr, BigInteger serialNumber, CaUris caUris, ConfPairs extraControl)
+      String subject, BigInteger serialNumber, CaUris caUris, ConfPairs extraControl)
           throws OperationException, InvalidConfException {
     notNull(securityFactory, "securityFactory");
     notBlank(signerType, "signerType");
     notNull(certprofile, "certprofile");
-    notNull(csr, "csr");
+    notBlank(subject, "subject");
     notNull(serialNumber, "serialNumber");
     if (serialNumber.signum() != 1) {
       throw new IllegalArgumentException(
@@ -109,10 +106,6 @@ class SelfSignedCertBuilder {
     if (Certprofile.CertLevel.RootCA != level) {
       throw new IllegalArgumentException(
           "certprofile is not of level " + Certprofile.CertLevel.RootCA);
-    }
-
-    if (!securityFactory.verifyPopo(csr, null)) {
-      throw new InvalidConfException("could not validate POP for the CSR");
     }
 
     if ("PKCS12".equalsIgnoreCase(signerType) || "JCEKS".equalsIgnoreCase(signerType)) {
@@ -158,21 +151,26 @@ class SelfSignedCertBuilder {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
     }
 
-    X509Cert newCert = generateCertificate(signer, certprofile, csr, serialNumber,
+    X509Cert newCert = generateCertificate(signer, certprofile, subject, serialNumber,
         caUris, extraControl);
 
     return new GenerateSelfSignedResult(signerConf, newCert);
   } // method generateSelfSigned
 
   private static X509Cert generateCertificate(ConcurrentContentSigner signer,
-      IdentifiedCertprofile certprofile, CertificationRequest csr, BigInteger serialNumber,
+      IdentifiedCertprofile certprofile, String subject, BigInteger serialNumber,
       CaUris caUris, ConfPairs extraControl)
       throws OperationException {
-
     SubjectPublicKeyInfo publicKeyInfo;
     try {
-      publicKeyInfo = X509Util.toRfc3279Style(
-          csr.getCertificationRequestInfo().getSubjectPublicKeyInfo());
+      publicKeyInfo = KeyUtil.createSubjectPublicKeyInfo(signer.getPublicKey());
+    } catch (InvalidKeyException ex) {
+      LOG.warn("KeyUtil.createSubjectPublicKeyInfo", ex);
+      throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
+    }
+
+    try {
+      publicKeyInfo = X509Util.toRfc3279Style(publicKeyInfo);
     } catch (InvalidKeySpecException ex) {
       LOG.warn("SecurityUtil.toRfc3279Style", ex);
       throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);
@@ -202,7 +200,7 @@ class SelfSignedCertBuilder {
       throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);
     }
 
-    X500Name requestedSubject = csr.getCertificationRequestInfo().getSubject();
+    X500Name requestedSubject = new X500Name(subject);
 
     Certprofile.SubjectInfo subjectInfo;
     // subject
@@ -237,17 +235,8 @@ class SelfSignedCertBuilder {
     PublicCaInfo publicCaInfo = new PublicCaInfo(grantedSubject, grantedSubject, serialNumber,
         null, null, caUris, extraControl);
 
-    Extensions extensions = null;
-    ASN1Set attrs = csr.getCertificationRequestInfo().getAttributes();
-    for (int i = 0; i < attrs.size(); i++) {
-      Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
-      if (PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType())) {
-        extensions = Extensions.getInstance(attr.getAttributeValues()[0]);
-      }
-    }
-
     try {
-      addExtensions(certBuilder, certprofile, requestedSubject, grantedSubject, extensions,
+      addExtensions(certBuilder, certprofile, requestedSubject, grantedSubject, null,
           publicKeyInfo, publicCaInfo, notBefore, notAfter);
 
       ConcurrentBagEntrySigner signer0 = signer.borrowSigner();

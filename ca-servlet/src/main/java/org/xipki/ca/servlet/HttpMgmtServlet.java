@@ -265,7 +265,7 @@ public class HttpMgmtServlet extends HttpServlet {
           }
 
           X509Cert cert = caManager.generateRootCa(caEntry,
-              req.getCertprofileName(), req.getEncodedCsr(), req.getSerialNumber());
+              req.getCertprofileName(), req.getSubject(), req.getSerialNumber());
           resp = toByteArray(cert);
           break;
         }

@@ -13,9 +13,6 @@ caqa:init
 
 ## rootca
 
-caqa:check-cert --issuer rootca --profile rootca \
-  --csr output/rootca1.csr --cert output/rootca1.crt
-
 caqa:check-cert --issuer rootca --profile cross \
   --csr output/cross1.csr --cert output/cross1.crt
 

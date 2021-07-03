@@ -1,11 +1,3 @@
-if { "${CA_TYPE}" equals "SM2" } then {
-  xi:csr-p12 --hash SM3 --gm --p12 ${OUT_DIR}/ca/tls-ca.p12 --password 1234 --out output/tls-ca.csr \
-    --subject "CN=TLS Demo CA,OU=${CA_TYPE},O=myorg,C=DE"
-} else {
-  xi:csr-p12 --p12 ${OUT_DIR}/ca/tls-ca.p12 --password 1234 --out output/tls-ca.csr \
-    --subject "CN=TLS Demo CA,OU=${CA_TYPE},O=myorg,C=DE"
-}
-
 sleep 1
 
 OS_NAME = $(osinfo --name)
@@ -23,13 +15,13 @@ ca:restart
 
 xi:copy-file -f qa/tools/template.ca-conf.json qa/tools/ca-conf.json
 
+xi:replace --old "REPLACEME-SUBJECT" --new "CN=TLS Demo CA,OU=${CA_TYPE},O=myorg,C=DE" qa/tools/ca-conf.json
+
 xi:replace --old "REPLACEME-CA_SIGNERCONF" --new "${SIGNER_CONF}" qa/tools/ca-conf.json
 
 xi:replace --old "REPLACEME-TLS_PROFILE" --new "${TLS_PROFILE}" qa/tools/ca-conf.json
 
 ca:load-conf --conf-file qa/tools/ca-conf.json --out-dir ${OUT_DIR}/ca
-
-xi:rm -f output/tls-ca.csr
 
 xi:move-file -f ${OUT_DIR}/ca/ca-tls-ca.crt ${OUT_DIR}/ca/tls-ca-cert.der
 
