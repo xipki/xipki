@@ -51,6 +51,7 @@ import java.util.Enumeration;
 import java.util.concurrent.TimeUnit;
 
 import static org.xipki.util.Args.notNull;
+import static org.xipki.util.Args.positive;
 
 /**
  * Benchmark HTTP client.
@@ -273,7 +274,7 @@ public class BenchmarkHttpClient {
 
   private final CountLatch latch = new CountLatch(0, 0);
 
-  private int queueSize = 1000;
+  private final int queueSize;
 
   private final ResponseHandler responseHandler;
 
@@ -327,9 +328,7 @@ public class BenchmarkHttpClient {
   public BenchmarkHttpClient(String host, int port, SslContext sslContext,
       ResponseHandler responseHandler, int queueSize) {
     this.sslContext = sslContext;
-    if (queueSize > 0) {
-      this.queueSize = queueSize;
-    }
+    this.queueSize = positive(queueSize, "queueSize");
     this.responseHandler = notNull(responseHandler, "responseHandler");
     this.workerGroup = new NioEventLoopGroup(1);
     this.host = host;

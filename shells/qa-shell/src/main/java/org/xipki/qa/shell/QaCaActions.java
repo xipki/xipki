@@ -251,9 +251,8 @@ public class QaCaActions {
     protected Integer maxRequests = 0;
 
     @Option(name = "--queue-size",
-            description = "Number of maximal HTTP requests in the sending queue\n"
-                    + "0 for implemention default")
-    protected Integer queueSize = 0;
+            description = "Number of maximal HTTP requests in the sending queue")
+    protected Integer queueSize = 50;
   }
 
   @Command(scope = "xiqa", name = "cmp-benchmark-cagen-enroll",
