@@ -494,14 +494,12 @@ class IaikP11Slot extends P11Slot {
         try {
           sigvalue = SignerUtil.dsaSigX962ToPlain(sigvalue, expectedSignatureLen * 4);
         } catch (XiSecurityException e) {
-          LOG.error(
-                  String.format("ERROR: sigvalue (%d): %s", sigvalue.length, Hex.toHexString(sigvalue)),
-                  e);
+          LOG.error(String.format("ERROR: sigvalue (%d): %s", sigvalue.length,
+                  Hex.toHexString(sigvalue)), e);
           throw new TokenException(e);
         } catch (RuntimeException e) {
-          LOG.error(
-                  String.format("ERROR: sigvalue (%d): %s", sigvalue.length, Hex.toHexString(sigvalue)),
-                  e);
+          LOG.error(String.format("ERROR: sigvalue (%d): %s", sigvalue.length,
+                  Hex.toHexString(sigvalue)), e);
           throw e;
         }
       }
