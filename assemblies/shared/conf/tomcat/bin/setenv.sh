@@ -1,1 +1,1 @@
-export JAVA_OPTS="${JAVA_OPTS} -DXIPKI_BASE=xipki"
+export JAVA_OPTS="${JAVA_OPTS} -DXIPKI_BASE=${CATALINA_HOME}/xipki"
