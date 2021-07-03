@@ -177,10 +177,18 @@ class IaikP11Slot extends P11Slot {
       throw new P11TokenException("could not getMechanismList: " + ex.getMessage(), ex);
     }
 
+    VendorCodeConverter vendorCodeConverter = slot.getModule().getVendorCodeConverter();
+
     P11SlotRefreshResult ret = new P11SlotRefreshResult();
     if (mechanisms != null) {
       for (Mechanism mech : mechanisms) {
-        ret.addMechanism(mech.getMechanismCode());
+        long mechCode = mech.getMechanismCode();
+        if ((mechCode & PKCS11Constants.CKM_VENDOR_DEFINED) != 0
+                && vendorCodeConverter != null) {
+          mechCode = vendorCodeConverter.vendorToGenericCKM(mechCode);
+        }
+
+        ret.addMechanism(mechCode);
       }
     }
 

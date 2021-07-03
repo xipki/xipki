@@ -23,6 +23,7 @@ import org.xipki.util.ValidatableConf;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Configuration of PKCS#11.
@@ -158,6 +159,8 @@ public class Pkcs11conf extends ValidatableConf {
 
     private List<MechanimFilter> mechanismFilters;
 
+    private Map<String, String> vendorCodes;
+
     public String getName() {
       return name;
     }
@@ -283,6 +286,14 @@ public class Pkcs11conf extends ValidatableConf {
 
     public void setNumSessions(Integer numSessions) {
       this.numSessions = numSessions;
+    }
+
+    public Map<String, String> getVendorCodes() {
+      return vendorCodes;
+    }
+
+    public void setVendorCodes(Map<String, String> vendorCodes) {
+      this.vendorCodes = vendorCodes;
     }
 
     @Override
