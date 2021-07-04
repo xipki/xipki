@@ -37,6 +37,7 @@ import org.xipki.qa.BenchmarkHttpClient;
 import org.xipki.qa.BenchmarkHttpClient.HttpClientException;
 import org.xipki.qa.BenchmarkHttpClient.ResponseHandler;
 import org.xipki.qa.BenchmarkHttpClient.SslConf;
+import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.cmp.CmpUtf8Pairs;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.BenchmarkExecutor;
@@ -310,11 +311,9 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
       CertTemplate certTemplate = certTempBuilder.build();
       CertRequest certRequest = new CertRequest(new ASN1Integer(i + 1), certTemplate, null);
 
-      String utf8pairs = CmpUtf8Pairs.KEY_CERTPROFILE + "?" + benchmarkEntry.getCertprofile() + "%";
-
       AttributeTypeAndValue certprofileInfo =
-          new AttributeTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
-              new DERUTF8String(utf8pairs));
+          new AttributeTypeAndValue(ObjectIdentifiers.CMP.id_it_certProfile,
+              new DERUTF8String(benchmarkEntry.getCertprofile()));
       AttributeTypeAndValue[] atvs = new AttributeTypeAndValue[]{certprofileInfo};
 
       certReqMsgs[i] = new CertReqMsg(certRequest, RA_VERIFIED, atvs);

@@ -332,6 +332,10 @@ class CmpAgent {
       CmpUtf8Pairs utf8Pairs, InfoTypeAndValue... additionalGeneralInfos) {
     if (additionalGeneralInfos != null) {
       for (InfoTypeAndValue itv : additionalGeneralInfos) {
+        if (itv == null) {
+          continue;
+        }
+
         ASN1ObjectIdentifier type = itv.getInfoType();
         if (CMPObjectIdentifiers.it_implicitConfirm.equals(type)) {
           throw new IllegalArgumentException(
@@ -854,18 +858,27 @@ class CmpAgent {
   } // method buildUnrevokeOrRemoveCertRequest
 
   private PKIMessage buildPkiMessage(CsrEnrollCertRequest csr, Date notBefore, Date notAfter) {
-    CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERTPROFILE, csr.getCertprofile());
-
+    CmpUtf8Pairs utf8Pairs = null;
     if (notBefore != null) {
+      utf8Pairs = new CmpUtf8Pairs();
       utf8Pairs.putUtf8Pair(CmpUtf8Pairs.KEY_NOTBEFORE,
           DateUtil.toUtcTimeyyyyMMddhhmmss(notBefore));
     }
 
     if (notAfter != null) {
+      if (utf8Pairs == null) {
+        utf8Pairs = new CmpUtf8Pairs();
+      }
       utf8Pairs.putUtf8Pair(CmpUtf8Pairs.KEY_NOTAFTER, DateUtil.toUtcTimeyyyyMMddhhmmss(notAfter));
     }
 
-    PKIHeader header = buildPkiHeader(implicitConfirm, null, utf8Pairs);
+    InfoTypeAndValue certProfileItv = null;
+    if (csr.getCertprofile() != null) {
+      certProfileItv = new InfoTypeAndValue(
+              ObjectIdentifiers.CMP.id_it_certProfile, new DERUTF8String(csr.getCertprofile()));
+    }
+
+    PKIHeader header = buildPkiHeader(implicitConfirm, null, utf8Pairs, certProfileItv);
     PKIBody body = new PKIBody(PKIBody.TYPE_P10_CERT_REQ, csr.getCsr());
 
     return new PKIMessage(header, body);
@@ -882,15 +895,13 @@ class CmpAgent {
 
       AttributeTypeAndValue[] reginfo = null;
 
-      CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs();
       if (reqEntry.getCertprofile() != null) {
-        utf8Pairs.putUtf8Pair(CmpUtf8Pairs.KEY_CERTPROFILE, reqEntry.getCertprofile());
+        reginfo = new AttributeTypeAndValue[] {
+                new AttributeTypeAndValue(
+                        ObjectIdentifiers.CMP.id_it_certProfile,
+                        new DERUTF8String(reqEntry.getCertprofile()))};
       }
 
-      if (!utf8Pairs.names().isEmpty()) {
-        AttributeTypeAndValue atv = CmpUtil.buildAttributeTypeAndValue(utf8Pairs);
-        reginfo = new AttributeTypeAndValue[]{atv};
-      }
       certReqMsgs[i] = new CertReqMsg(reqEntry.getCertReq(), reqEntry.getPopo(), reginfo);
     }
 

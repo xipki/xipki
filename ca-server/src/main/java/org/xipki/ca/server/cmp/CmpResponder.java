@@ -75,6 +75,12 @@ public class CmpResponder extends BaseCmpResponder {
 
   private static final Logger LOG = LoggerFactory.getLogger(BaseCmpResponder.class);
 
+  /**
+   * Used by XiPKI CA till 5.3.13.
+   */
+  @Deprecated
+  private static final String KEY_CERTPROFILE = "certprofile";
+
   private class PendingPoolCleaner implements Runnable {
 
     @Override
@@ -134,14 +140,19 @@ public class CmpResponder extends BaseCmpResponder {
       CertificateRequestMessage req = new CertificateRequestMessage(reqMsg);
       CertTemplate certTemp = req.getCertTemplate();
 
-      CmpUtf8Pairs keyvalues = CmpUtil.extract(reqMsg.getRegInfo());
-
       SubjectPublicKeyInfo publicKey = certTemp.getPublicKey();
       X500Name subject = certTemp.getSubject();
       Extensions extensions = certTemp.getExtensions();
 
-      String certprofileName = (keyvalues == null)
-          ? null : keyvalues.value(CmpUtf8Pairs.KEY_CERTPROFILE);
+      AttributeTypeAndValue[] regInfo = reqMsg.getRegInfo();
+      String certprofileName = CmpUtil.extractCertProfile(regInfo);
+      if (certprofileName == null) {
+        CmpUtf8Pairs keyvalues = CmpUtil.extractUtf8Pairs(reqMsg.getRegInfo());
+        if (keyvalues != null) {
+          certprofileName = keyvalues.value(KEY_CERTPROFILE);
+        }
+      }
+
       if (certprofileName == null) {
         certprofileName = dfltCertprofileName;
       }
@@ -411,13 +422,22 @@ public class CmpResponder extends BaseCmpResponder {
         X500Name subject = certTemp.getSubject();
         SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
 
-        CmpUtf8Pairs keyvalues = CmpUtil.extract(reqHeader.getGeneralInfo());
+        InfoTypeAndValue[] generalInfo = reqHeader.getGeneralInfo();
+        CmpUtf8Pairs keyvalues = CmpUtil.extractUtf8Pairs(generalInfo);
+
+        // CertProfile name
+        String certprofileName = CmpUtil.extractCertProfile(generalInfo);
+        if (certprofileName == null) {
+          if (keyvalues != null) {
+            certprofileName = keyvalues.value(KEY_CERTPROFILE);
+          }
+        }
+
+        // NotBefore and NotAfter
         Date notBefore = null;
         Date notAfter = null;
-        String certprofileName = null;
-        if (keyvalues != null) {
-          certprofileName = keyvalues.value(CmpUtf8Pairs.KEY_CERTPROFILE);
 
+        if (keyvalues != null) {
           String str = keyvalues.value(CmpUtf8Pairs.KEY_NOTBEFORE);
           if (str != null) {
             notBefore = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);

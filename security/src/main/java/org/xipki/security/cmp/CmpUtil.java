@@ -35,6 +35,7 @@ import org.bouncycastle.cert.crmf.jcajce.JcePKMACValuesCalculator;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.NoIdleSignerException;
+import org.xipki.security.ObjectIdentifiers;
 
 import java.util.Date;
 
@@ -171,11 +172,11 @@ public class CmpUtil {
     return new InfoTypeAndValue(CMPObjectIdentifiers.it_implicitConfirm, DERNull.INSTANCE);
   }
 
-  public static CmpUtf8Pairs extract(InfoTypeAndValue[] regInfos) {
-    if (regInfos != null) {
-      for (InfoTypeAndValue regInfo : regInfos) {
-        if (CMPObjectIdentifiers.regInfo_utf8Pairs.equals(regInfo.getInfoType())) {
-          String regInfoValue = ((ASN1String) regInfo.getInfoValue()).getString();
+  public static CmpUtf8Pairs extractUtf8Pairs(InfoTypeAndValue[] generalInfo) {
+    if (generalInfo != null) {
+      for (InfoTypeAndValue itv : generalInfo) {
+        if (CMPObjectIdentifiers.regInfo_utf8Pairs.equals(itv.getInfoType())) {
+          String regInfoValue = ((ASN1String) itv.getInfoValue()).getString();
           return new CmpUtf8Pairs(regInfoValue);
         }
       }
@@ -184,12 +185,36 @@ public class CmpUtil {
     return null;
   }
 
-  public static CmpUtf8Pairs extract(AttributeTypeAndValue[] atvs) {
+  public static String extractCertProfile(InfoTypeAndValue[] generalInfo) {
+    if (generalInfo != null) {
+      for (InfoTypeAndValue itv : generalInfo) {
+        if (ObjectIdentifiers.CMP.id_it_certProfile.equals(itv.getInfoType())) {
+          return ((ASN1String) itv.getInfoValue()).getString();
+        }
+      }
+    }
+
+    return null;
+  }
+
+  public static CmpUtf8Pairs extractUtf8Pairs(AttributeTypeAndValue[] atvs) {
     if (atvs != null) {
       for (AttributeTypeAndValue atv : atvs) {
         if (CMPObjectIdentifiers.regInfo_utf8Pairs.equals(atv.getType())) {
           String regInfoValue = ((ASN1String) atv.getValue()).getString();
           return new CmpUtf8Pairs(regInfoValue);
+        }
+      }
+    }
+
+    return null;
+  }
+
+  public static String extractCertProfile(AttributeTypeAndValue[] atvs) {
+    if (atvs != null) {
+      for (AttributeTypeAndValue atv : atvs) {
+        if (ObjectIdentifiers.CMP.id_it_certProfile.equals(atv.getType())) {
+          return ((ASN1String) atv.getValue()).getString();
         }
       }
     }

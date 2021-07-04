@@ -306,8 +306,7 @@ public abstract class CmpCaClient implements Closeable {
     return keycerts;
   } // method parseEnrollCertResult
 
-  public X509Certificate enrollCertViaCsr(String certprofile, CertificationRequest csr,
-      boolean profileInUri)
+  public X509Certificate enrollCertViaCsr(String certprofile, CertificationRequest csr)
           throws Exception {
     ProtectedPKIMessageBuilder builder = new ProtectedPKIMessageBuilder(
         PKIHeader.CMP_2000, requestorSubject, responderSubject);
@@ -316,19 +315,16 @@ public abstract class CmpCaClient implements Closeable {
     builder.setSenderNonce(randomSenderNonce());
 
     builder.addGeneralInfo(
-        new InfoTypeAndValue(CMPObjectIdentifiers.it_implicitConfirm, DERNull.INSTANCE));
-    String uri = null;
-    if (profileInUri) {
-      uri = caUri + "?certprofile=" + certprofile.toLowerCase();
-    } else {
-      builder.addGeneralInfo(
-          new InfoTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
-              new DERUTF8String("certprofile?" + certprofile + "%")));
-    }
+        new InfoTypeAndValue(CMPObjectIdentifiers.it_implicitConfirm,
+                DERNull.INSTANCE));
+    builder.addGeneralInfo(
+        new InfoTypeAndValue(ObjectIdentifiers.id_it_certProfile,
+                new DERUTF8String(certprofile)));
+
     builder.setBody(new PKIBody(PKIBody.TYPE_P10_CERT_REQ, csr));
     ProtectedPKIMessage request = build(builder);
 
-    PKIMessage response = transmit(request, uri);
+    PKIMessage response = transmit(request, null);
     return parseEnrollCertResult(response, PKIBody.TYPE_CERT_REP, 1)
             .values().iterator().next().getCert();
   } // method enrollCertViaCsr
@@ -374,28 +370,16 @@ public abstract class CmpCaClient implements Closeable {
   } // method parseRevocationResult
 
   public X509Certificate enrollCertViaCrmf(String certprofile, PrivateKey privateKey,
-      SubjectPublicKeyInfo publicKeyInfo, String subject, boolean profileInUri)
+      SubjectPublicKeyInfo publicKeyInfo, String subject)
           throws Exception {
     return enrollCertsViaCrmf(new String[]{certprofile}, new PrivateKey[]{privateKey},
-        new SubjectPublicKeyInfo[] {publicKeyInfo}, new String[] {subject}, profileInUri)[0];
+        new SubjectPublicKeyInfo[] {publicKeyInfo}, new String[] {subject})[0];
   } // method enrollCertViaCrmf
 
   public X509Certificate[] enrollCertsViaCrmf(String[] certprofiles, PrivateKey[] privateKey,
-      SubjectPublicKeyInfo[] publicKeyInfo, String[] subject, boolean profileInUri)
+      SubjectPublicKeyInfo[] publicKeyInfo, String[] subject)
           throws Exception {
     final int n = certprofiles.length;
-
-    String uri = null;
-    if (profileInUri) {
-      if (n > 1) {
-        for (int i = 1; i < n; i++) {
-          if (!certprofiles[0].equalsIgnoreCase(certprofiles[i])) {
-            throw new IllegalArgumentException("not all certprofiles are of the same");
-          }
-        }
-      }
-      uri = caUri + "?certprofile=" + certprofiles[0];
-    }
 
     CertReqMsg[] certReqMsgs = new CertReqMsg[n];
     BigInteger[] certReqIds = new BigInteger[n];
@@ -414,13 +398,9 @@ public abstract class CmpCaClient implements Closeable {
       POPOSigningKey popoSk = popoBuilder.build(popoSigner);
       ProofOfPossession popo = new ProofOfPossession(popoSk);
 
-      AttributeTypeAndValue[] atvs = null;
-      if (uri == null) {
-        AttributeTypeAndValue certprofileInfo =
-            new AttributeTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
-                new DERUTF8String("certprofile?" + certprofiles[i] + "%"));
-        atvs = new AttributeTypeAndValue[]{certprofileInfo};
-      }
+      AttributeTypeAndValue[] atvs = new AttributeTypeAndValue[]{
+              new AttributeTypeAndValue(
+                ObjectIdentifiers.id_it_certProfile, new DERUTF8String(certprofiles[i]))};
       certReqMsgs[i] = new CertReqMsg(certReq, popo, atvs);
     }
 
@@ -436,7 +416,7 @@ public abstract class CmpCaClient implements Closeable {
     builder.setBody(body);
 
     ProtectedPKIMessage request = build(builder);
-    PKIMessage response = transmit(request, uri);
+    PKIMessage response = transmit(request, null);
     Map<BigInteger, KeyAndCert> keyCerts =
         parseEnrollCertResult(response, PKIBody.TYPE_CERT_REP, n);
 
@@ -449,30 +429,18 @@ public abstract class CmpCaClient implements Closeable {
     return ret;
   } // method enrollCertsViaCrmf
 
-  public KeyAndCert enrollCertViaCrmfCaGenKeypair(String certprofile, String subject,
-      boolean profileAndMetaInUri)
+  public KeyAndCert enrollCertViaCrmfCaGenKeypair(String certprofile, String subject)
           throws Exception {
     return enrollCertsViaCrmfCaGenKeypair(new String[]{certprofile},
-        new String[] {subject}, profileAndMetaInUri)[0];
+        new String[] {subject})[0];
   } // method enrollCertViaCrmfCaGenKeypair
 
   public KeyAndCert[] enrollCertsViaCrmfCaGenKeypair(String[] certprofiles,
-      String[] subject, boolean profileInUri)
+      String[] subject)
           throws Exception {
     final int n = certprofiles.length;
 
     String uri = null;
-    if (profileInUri) {
-      if (n > 1) {
-        for (int i = 1; i < n; i++) {
-          if (!certprofiles[0].equalsIgnoreCase(certprofiles[i])) {
-            throw new IllegalArgumentException("not all certprofiles are of the same");
-          }
-        }
-      }
-
-      uri = caUri + "?certprofile=" + certprofiles[0];
-    }
 
     CertReqMsg[] certReqMsgs = new CertReqMsg[n];
     BigInteger[] certReqIds = new BigInteger[n];
