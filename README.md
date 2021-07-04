@@ -29,13 +29,12 @@ JRE/JDK, and the steps to reproduce the bug.
 * Hardware: Any available hardware (tested on Raspberry Pi 2 Model B with 900MHz quad-core ARM CPU and 1 GB Memory)
 
 ## Tested PKCS#11 Devices
-* [Softhsm v1 & v2](https://www.opendnssec.org/download/packages/),
-* [Nitrokey HSM 2](https://www.nitrokey.com/#comparison),
-* [Smartcard HSM EA+](http://www.smartcard-hsm.com/features.html#usbstick),
-* [nCipher Connect](https://www.ncipher.com/products/general-purpose-hsms/nshield-connect),
-* [nCipher Solo](https://www.ncipher.com/products/general-purpose-hsms/nshield-solo),
+* [Softhsm v1 & v2](https://www.opendnssec.org/download/packages/)
+* [Nitrokey HSM 2](https://www.nitrokey.com/#comparison) / [Smartcard HSM EA+](http://www.smartcard-hsm.com/features.html#usbstick)
+* [nCipher Connect](https://www.ncipher.com/products/general-purpose-hsms/nshield-connect)
+* [nCipher Solo](https://www.ncipher.com/products/general-purpose-hsms/nshield-solo)
 * [Utimaco Se](https://hsm.utimaco.com/products-hardware-security-modules/general-purpose-hsm/)
-* [SM2 of SanSec HSM (三未信安服务器密码机)](https://en.sansec.com.cn/product/HSM-52.html)
+* [Sansec HSM](https://en.sansec.com.cn/product/HSM-52.html) / [三未信安服务器密码机](www.sansec.com.cn/product/4.html): tested SM2
 
 ## Performance
 
