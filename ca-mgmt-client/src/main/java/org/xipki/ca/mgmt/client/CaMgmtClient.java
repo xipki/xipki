@@ -788,6 +788,15 @@ public class CaMgmtClient implements CaManager {
   } // method getSupportedPublisherTypes
 
   @Override
+  public String getTokenInfoP11(String module, Integer slotIndex, boolean verbose)
+          throws CaMgmtException {
+    MgmtRequest.TokenInfoP11 req = new MgmtRequest.TokenInfoP11(module, slotIndex, verbose);
+    byte[] respBytes = transmit(MgmtAction.tokenInfoP11, req);
+    MgmtResponse.StringResponse resp = parse(respBytes, MgmtResponse.StringResponse.class);
+    return resp.getResult();
+  }
+
+  @Override
   public void refreshTokenForSignerType(String signerType)
       throws CaMgmtException {
     MgmtRequest.Name req = new MgmtRequest.Name(signerType);

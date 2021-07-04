@@ -43,12 +43,10 @@ import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.*;
+import org.xipki.security.pkcs11.*;
 import org.xipki.util.*;
 
-import java.io.Closeable;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.math.BigInteger;
 import java.net.SocketException;
 import java.sql.Connection;
@@ -112,7 +110,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
     } // method run
 
-  } // class UnreferencedRequstCleaner
+  } // class UnreferencedRequestCleaner
 
   private class CaRestarter implements Runnable {
 
@@ -210,6 +208,8 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   SecurityFactory securityFactory;
 
+  P11CryptServiceFactory p11CryptServiceFactory;
+
   CaManagerQueryExecutor queryExecutor;
 
   private DataSourceWrapper datasource;
@@ -303,6 +303,14 @@ public class CaManagerImpl implements CaManager, Closeable {
     this.securityFactory = securityFactory;
   }
 
+  public P11CryptServiceFactory getP11CryptServiceFactory() {
+    return p11CryptServiceFactory;
+  }
+
+  public void setP11CryptServiceFactory(P11CryptServiceFactory p11CryptServiceFactory) {
+    this.p11CryptServiceFactory = p11CryptServiceFactory;
+  }
+
   public boolean isMasterMode() {
     return masterMode;
   }
@@ -320,6 +328,12 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public Set<String> getSupportedPublisherTypes() {
     return certPublisherFactoryRegister.getSupportedTypes();
+  }
+
+  @Override
+  public String getTokenInfoP11(String moduleName, Integer slotIndex, boolean verbose)
+          throws CaMgmtException {
+    return signerManager.getTokenInfoP11(moduleName, slotIndex, verbose);
   }
 
   private void init()

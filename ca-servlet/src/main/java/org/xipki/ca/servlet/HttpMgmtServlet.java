@@ -610,6 +610,13 @@ public class HttpMgmtServlet extends HttpServlet {
           resp = null;
           break;
         }
+        case tokenInfoP11: {
+          MgmtRequest.TokenInfoP11 req = parse(in, MgmtRequest.TokenInfoP11.class);
+          String info = caManager.getTokenInfoP11(req.getModuleName(),
+                  req.getSlotIndex(), req.isVerbose());
+          resp = new MgmtResponse.StringResponse(info);
+          break;
+        }
         case unlockCa: {
           caManager.unlockCa();
           resp = null;

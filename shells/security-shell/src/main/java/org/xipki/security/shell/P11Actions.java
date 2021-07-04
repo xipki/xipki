@@ -790,8 +790,8 @@ public class P11Actions {
       P11Slot slot = module.getSlot(slotId);
       println("Details of slot");
       slot.showDetails(System.out, verbose);
-      System.out.println();
       System.out.flush();
+      System.out.println();
       return null;
     }
 

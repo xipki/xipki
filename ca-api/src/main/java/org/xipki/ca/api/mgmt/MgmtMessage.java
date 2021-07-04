@@ -112,6 +112,7 @@ public abstract class MgmtMessage {
     restartCaSystem,
     revokeCa,
     revokeCertficate,
+    tokenInfoP11,
     unlockCa,
     unrevokeCa,
     unrevokeCertificate;

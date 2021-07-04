@@ -713,4 +713,43 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class UnrevokeCertificate
 
+  public static class TokenInfoP11 extends MgmtRequest {
+
+    private boolean verbose;
+
+    private String moduleName;
+
+    private Integer slotIndex;
+
+    public TokenInfoP11(String moduleName, Integer slotIndex, boolean verbose) {
+      this.moduleName = moduleName;
+      this.slotIndex = slotIndex;
+      this.verbose = verbose;
+    }
+
+    public boolean isVerbose() {
+      return verbose;
+    }
+
+    public void setVerbose(boolean verbose) {
+      this.verbose = verbose;
+    }
+
+    public String getModuleName() {
+      return moduleName;
+    }
+
+    public void setModuleName(String moduleName) {
+      this.moduleName = moduleName;
+    }
+
+    public Integer getSlotIndex() {
+      return slotIndex;
+    }
+
+    public void setSlotIndex(Integer slotIndex) {
+      this.slotIndex = slotIndex;
+    }
+  }
+
 }

@@ -465,6 +465,10 @@ CA Management Commands
 
      update signer
 
+   * `ca:ca-token-info-p11`
+
+     list objects in PKCS#11 device of the CA
+
    * `ca:unrevoke-cert`
 
      unrevoke certificate
