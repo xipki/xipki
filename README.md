@@ -35,6 +35,7 @@ JRE/JDK, and the steps to reproduce the bug.
 * [nCipher Connect](https://www.ncipher.com/products/general-purpose-hsms/nshield-connect),
 * [nCipher Solo](https://www.ncipher.com/products/general-purpose-hsms/nshield-solo),
 * [Utimaco Se](https://hsm.utimaco.com/products-hardware-security-modules/general-purpose-hsm/)
+* [SM2 of SanSec HSM (三未信安服务器密码机)](https://en.sansec.com.cn/product/HSM-52.html)
 
 ## Performance
 
