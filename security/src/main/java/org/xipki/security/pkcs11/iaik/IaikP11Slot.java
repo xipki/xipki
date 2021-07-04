@@ -182,13 +182,7 @@ class IaikP11Slot extends P11Slot {
     P11SlotRefreshResult ret = new P11SlotRefreshResult();
     if (mechanisms != null) {
       for (Mechanism mech : mechanisms) {
-        long mechCode = mech.getMechanismCode();
-        if ((mechCode & PKCS11Constants.CKM_VENDOR_DEFINED) != 0
-                && vendorCodeConverter != null) {
-          mechCode = vendorCodeConverter.vendorToGenericCKM(mechCode);
-        }
-
-        ret.addMechanism(mechCode);
+        ret.addMechanism(mech.getMechanismCode());
       }
     }
 
