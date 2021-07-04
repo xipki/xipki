@@ -17,6 +17,8 @@
 
 package org.xipki.security.pkcs11;
 
+import iaik.pkcs.pkcs11.MapVendorCodeConverter;
+import iaik.pkcs.pkcs11.VendorCodeConverter;
 import iaik.pkcs.pkcs11.wrapper.Functions;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import org.slf4j.Logger;
@@ -307,6 +309,8 @@ public class P11ModuleConf {
 
   private final List<Long> keyPairTypes;
 
+  private final VendorCodeConverter vendorCodeConverter;
+
   public P11ModuleConf(Pkcs11conf.Module moduleType, List<Pkcs11conf.MechanismSet> mechanismSets,
       PasswordResolver passwordResolver)
           throws InvalidConfException {
@@ -487,6 +491,10 @@ public class P11ModuleConf {
 
     this.newObjectConf = (moduleType.getNewObjectConf() == null) ? new P11NewObjectConf()
         : new P11NewObjectConf(moduleType.getNewObjectConf());
+
+    Map<String, String> vendorCodes = moduleType.getVendorCodes();
+    this.vendorCodeConverter = (vendorCodes == null)
+            ? null : MapVendorCodeConverter.getInstance(vendorCodes);
   } // constructor
 
   public String getName() {
@@ -527,6 +535,10 @@ public class P11ModuleConf {
 
   public List<Long> getKeyPairTypes() {
     return keyPairTypes;
+  }
+
+  public VendorCodeConverter getVendorCodeConverter() {
+    return vendorCodeConverter;
   }
 
   public boolean isSlotIncluded(P11SlotIdentifier slotId) {

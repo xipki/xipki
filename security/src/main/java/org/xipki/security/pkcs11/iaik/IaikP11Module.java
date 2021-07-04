@@ -184,6 +184,10 @@ public class IaikP11Module extends P11Module {
       throw new P11TokenException(th.getMessage());
     }
 
+    if (null != moduleConf.getVendorCodeConverter()) {
+      module.setVendorCodeConverter(moduleConf.getVendorCodeConverter());
+    }
+
     return new IaikP11Module(module, moduleConf);
   } // method getInstance
 
