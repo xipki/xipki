@@ -196,7 +196,7 @@ abstract class BaseCmpResponder {
     this.aesKeyGen = KeyGenerator.getInstance("AES");
   }
 
-  protected abstract PKIBody cmpEnrollCert(String dfltCertprofileName, Boolean dfltCaGenKeypair,
+  protected abstract PKIBody cmpEnrollCert(String dfltCertprofileName,
       PKIMessage request, PKIHeaderBuilder respHeader, CmpControl cmpControl, PKIHeader reqHeader,
       PKIBody reqBody, CmpRequestorInfo requestor, ASN1OctetString tid, String msgId,
       AuditEvent event) throws InsufficientPermissionException;
@@ -387,16 +387,10 @@ abstract class BaseCmpResponder {
         event.addEventType(eventType);
 
         String dfltCertprofileName = null;
-        Boolean dfltCaGenerateKeypair = null;
         if (parameters != null) {
           dfltCertprofileName = parameters.get("certprofile");
-
-          String str = parameters.get("ca-generate-keypair");
-          if (str != null) {
-            dfltCaGenerateKeypair = "true".equalsIgnoreCase(str);
-          }
         }
-        respBody = cmpEnrollCert(dfltCertprofileName, dfltCaGenerateKeypair, request, respHeader,
+        respBody = cmpEnrollCert(dfltCertprofileName, request, respHeader,
             cmpControl, reqHeader, reqBody, cmpRequestor, tid, msgId, event);
       } else if (type == PKIBody.TYPE_CERT_CONFIRM) {
         event.addEventType(CaAuditConstants.Cmp.TYPE_certConf);

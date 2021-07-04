@@ -311,9 +311,6 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
       CertRequest certRequest = new CertRequest(new ASN1Integer(i + 1), certTemplate, null);
 
       String utf8pairs = CmpUtf8Pairs.KEY_CERTPROFILE + "?" + benchmarkEntry.getCertprofile() + "%";
-      if (caGenKeyPair) {
-        utf8pairs += CmpUtf8Pairs.KEY_CA_GENERATE_KEYPAIR + "?true%";
-      }
 
       AttributeTypeAndValue certprofileInfo =
           new AttributeTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,

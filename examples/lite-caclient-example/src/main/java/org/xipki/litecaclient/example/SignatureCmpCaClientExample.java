@@ -149,8 +149,7 @@ public class SignatureCmpCaClientExample extends CaClientExample {
       printCert("===== Update RSA via CRMF (CMP) =====", cert);
 
       // Update certificate via CRMF - RSA (CA generate key pair)
-      KeyAndCert keyAndCert = client.updateCertViaCrmfCaGenKeypair(issuer, cert.getSerialNumber(),
-          profileAndKeyTypeInUri);
+      KeyAndCert keyAndCert = client.updateCertViaCrmfCaGenKeypair(issuer, cert.getSerialNumber());
       printKeyAndCert("===== Update via CRMF (CMP, CA generate keypair) =====", keyAndCert);
 
       // Enroll certificate via CRMF - EC

@@ -177,8 +177,6 @@ class IaikP11Slot extends P11Slot {
       throw new P11TokenException("could not getMechanismList: " + ex.getMessage(), ex);
     }
 
-    VendorCodeConverter vendorCodeConverter = slot.getModule().getVendorCodeConverter();
-
     P11SlotRefreshResult ret = new P11SlotRefreshResult();
     if (mechanisms != null) {
       for (Mechanism mech : mechanisms) {

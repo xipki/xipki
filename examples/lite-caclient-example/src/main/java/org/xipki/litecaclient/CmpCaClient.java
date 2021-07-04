@@ -457,12 +457,12 @@ public abstract class CmpCaClient implements Closeable {
   } // method enrollCertViaCrmfCaGenKeypair
 
   public KeyAndCert[] enrollCertsViaCrmfCaGenKeypair(String[] certprofiles,
-      String[] subject, boolean profileAndMetaInUri)
+      String[] subject, boolean profileInUri)
           throws Exception {
     final int n = certprofiles.length;
 
     String uri = null;
-    if (profileAndMetaInUri) {
+    if (profileInUri) {
       if (n > 1) {
         for (int i = 1; i < n; i++) {
           if (!certprofiles[0].equalsIgnoreCase(certprofiles[i])) {
@@ -471,7 +471,7 @@ public abstract class CmpCaClient implements Closeable {
         }
       }
 
-      uri = caUri + "?certprofile=" + certprofiles[0] + "&ca-generate-keypair=true";
+      uri = caUri + "?certprofile=" + certprofiles[0];
     }
 
     CertReqMsg[] certReqMsgs = new CertReqMsg[n];
@@ -487,8 +487,7 @@ public abstract class CmpCaClient implements Closeable {
 
       AttributeTypeAndValue[] atvs = null;
       if (uri == null) {
-        String utf8pairs = "certprofile?" + certprofiles[i] + "%"
-            + "ca-generate-keypair?true%";
+        String utf8pairs = "certprofile?" + certprofiles[i] + "%";
 
         AttributeTypeAndValue certprofileInfo =
             new AttributeTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
@@ -582,15 +581,13 @@ public abstract class CmpCaClient implements Closeable {
     return ret;
   } // method updateCertsViaCrmf
 
-  public KeyAndCert updateCertViaCrmfCaGenKeypair(X500Name issuer, BigInteger oldCertSerialNumber,
-      boolean profileAndMetaInUri)
+  public KeyAndCert updateCertViaCrmfCaGenKeypair(X500Name issuer, BigInteger oldCertSerialNumber)
           throws Exception {
-    return updateCertsViaCrmfCaGenKeypair(issuer, new BigInteger[] {oldCertSerialNumber},
-        profileAndMetaInUri)[0];
+    return updateCertsViaCrmfCaGenKeypair(issuer, new BigInteger[] {oldCertSerialNumber})[0];
   }
 
   public KeyAndCert[] updateCertsViaCrmfCaGenKeypair(X500Name issuer,
-      BigInteger[] oldCertSerialNumbers, boolean profileAndMetaInUri)
+      BigInteger[] oldCertSerialNumbers)
           throws Exception {
     final int n = oldCertSerialNumbers.length;
 
@@ -608,17 +605,7 @@ public abstract class CmpCaClient implements Closeable {
       CertRequest certReq = new CertRequest(new ASN1Integer(certReqIds[i]),
           certTemplateBuilder.build(), controls);
 
-      AttributeTypeAndValue[] atvs = null;
-      if (!profileAndMetaInUri) {
-        String utf8pairs = "ca-generate-keypair?true%";
-
-        AttributeTypeAndValue certprofileInfo =
-            new AttributeTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
-                new DERUTF8String(utf8pairs));
-        atvs = new AttributeTypeAndValue[]{certprofileInfo};
-      }
-
-      certReqMsgs[i] = new CertReqMsg(certReq, null, atvs);
+      certReqMsgs[i] = new CertReqMsg(certReq, null, null);
     }
 
     PKIBody body = new PKIBody(PKIBody.TYPE_KEY_UPDATE_REQ, new CertReqMessages(certReqMsgs));
@@ -634,8 +621,7 @@ public abstract class CmpCaClient implements Closeable {
 
     ProtectedPKIMessage request = build(builder);
 
-    String uri = profileAndMetaInUri ? caUri + "?ca-generate-keypair=true" : caUri;
-    PKIMessage response = transmit(request, uri);
+    PKIMessage response = transmit(request, caUri);
 
     Map<BigInteger, KeyAndCert> keyCerts =
         parseEnrollCertResult(response, PKIBody.TYPE_KEY_UPDATE_REP, n);

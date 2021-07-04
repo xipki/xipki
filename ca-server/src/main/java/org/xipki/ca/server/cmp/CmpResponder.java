@@ -111,7 +111,7 @@ public class CmpResponder extends BaseCmpResponder {
   }
 
   private CertRepMessage processCertReqMessages(String dfltCertprofileName,
-      Boolean dfltCaGenKeypair, PKIMessage request, CmpRequestorInfo requestor, ASN1OctetString tid,
+      PKIMessage request, CmpRequestorInfo requestor, ASN1OctetString tid,
       CertReqMessages cr, boolean allowKeyGen, CmpControl cmpControl,
       String msgId, AuditEvent event) throws InsufficientPermissionException {
     CertReqMsg[] certReqMsgs = cr.toCertReqMsgArray();
@@ -148,15 +148,6 @@ public class CmpResponder extends BaseCmpResponder {
 
       if (certprofileName != null) {
         certprofileName = certprofileName.toLowerCase();
-      }
-
-      String tmpStr = (keyvalues == null) ? null
-          : keyvalues.value(CmpUtf8Pairs.KEY_CA_GENERATE_KEYPAIR);
-      boolean caGenerateKeypair;
-      if (dfltCaGenKeypair == null) {
-        caGenerateKeypair = "true".equalsIgnoreCase(tmpStr);
-      } else {
-        caGenerateKeypair = (tmpStr == null) ? dfltCaGenKeypair : "true".equalsIgnoreCase(tmpStr);
       }
 
       if (kup) {
@@ -232,10 +223,6 @@ public class CmpResponder extends BaseCmpResponder {
           subject = oldCert.getCert().getCert().getSubject();
         }
 
-        if (publicKey == null && !caGenerateKeypair) {
-          publicKey = oldCert.getCert().getCert().getSubjectPublicKeyInfo();
-        }
-
         // extensions
         Map<String, Extension> extns = new HashMap<>();
         if (extensions != null) {
@@ -282,7 +269,7 @@ public class CmpResponder extends BaseCmpResponder {
           addErrCertResp(resps, certReqId, badPOP, "invalid POP");
           continue;
         }
-      } else if (caGenerateKeypair) {
+      } else {
         if (allowKeyGen) {
           checkPermission(requestor, PermissionConstants.GEN_KEYPAIR);
         } else {
@@ -291,11 +278,9 @@ public class CmpResponder extends BaseCmpResponder {
           addErrCertResp(resps, certReqId, badCertTemplate, "no public key");
           continue;
         }
-      } else {
-        LOG.warn("no public key is specified {}", certReqId.getValue());
-        addErrCertResp(resps, certReqId, badCertTemplate, "no public key");
-        continue;
       }
+
+      boolean caGenerateKeypair = publicKey == null;
 
       OptionalValidity validity = certTemp.getValidity();
 
@@ -874,7 +859,7 @@ public class CmpResponder extends BaseCmpResponder {
   } // method revokePendingCertificates
 
   @Override
-  protected PKIBody cmpEnrollCert(String dfltCertprofileName, Boolean dfltCaGenKeypair,
+  protected PKIBody cmpEnrollCert(String dfltCertprofileName,
       PKIMessage request, PKIHeaderBuilder respHeader, CmpControl cmpControl, PKIHeader reqHeader,
       PKIBody reqBody, CmpRequestorInfo requestor, ASN1OctetString tid, String msgId,
       AuditEvent event) throws InsufficientPermissionException {
@@ -890,19 +875,19 @@ public class CmpResponder extends BaseCmpResponder {
     if (type == PKIBody.TYPE_INIT_REQ) {
       checkPermission(requestor, PermissionConstants.ENROLL_CERT);
       CertReqMessages cr = CertReqMessages.getInstance(reqBody.getContent());
-      CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName, dfltCaGenKeypair,
+      CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName,
           request, requestor, tid, cr, true, cmpControl, msgId, event);
       return new PKIBody(PKIBody.TYPE_INIT_REP, repMessage);
     } else if (type == PKIBody.TYPE_CERT_REQ) {
       checkPermission(requestor, PermissionConstants.ENROLL_CERT);
       CertReqMessages cr = CertReqMessages.getInstance(reqBody.getContent());
-      CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName, dfltCaGenKeypair,
+      CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName,
           request, requestor, tid, cr, true, cmpControl, msgId, event);
       respBody = new PKIBody(PKIBody.TYPE_CERT_REP, repMessage);
     } else if (type == PKIBody.TYPE_KEY_UPDATE_REQ) {
       checkPermission(requestor, PermissionConstants.KEY_UPDATE);
       CertReqMessages kur = CertReqMessages.getInstance(reqBody.getContent());
-      CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName, dfltCaGenKeypair,
+      CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName,
           request, requestor, tid, kur, true, cmpControl, msgId, event);
       return new PKIBody(PKIBody.TYPE_KEY_UPDATE_REP, repMessage);
     } else if (type == PKIBody.TYPE_P10_CERT_REQ) {
@@ -912,7 +897,7 @@ public class CmpResponder extends BaseCmpResponder {
     } else if (type == PKIBody.TYPE_CROSS_CERT_REQ) {
       checkPermission(requestor, PermissionConstants.ENROLL_CROSS);
       CertReqMessages cr = CertReqMessages.getInstance(reqBody.getContent());
-      CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName, Boolean.FALSE,
+      CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName,
           request, requestor, tid, cr, false, cmpControl, msgId, event);
       return new PKIBody(PKIBody.TYPE_CROSS_CERT_REP, repMessage);
     } else {

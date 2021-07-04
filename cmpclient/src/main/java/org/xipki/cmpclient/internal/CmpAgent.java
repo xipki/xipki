@@ -887,10 +887,6 @@ class CmpAgent {
         utf8Pairs.putUtf8Pair(CmpUtf8Pairs.KEY_CERTPROFILE, reqEntry.getCertprofile());
       }
 
-      if (reqEntry.isCaGenerateKeypair()) {
-        utf8Pairs.putUtf8Pair(CmpUtf8Pairs.KEY_CA_GENERATE_KEYPAIR, "true");
-      }
-
       if (!utf8Pairs.names().isEmpty()) {
         AttributeTypeAndValue atv = CmpUtil.buildAttributeTypeAndValue(utf8Pairs);
         reginfo = new AttributeTypeAndValue[]{atv};
