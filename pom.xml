@@ -35,7 +35,7 @@
     <karaf.bc.version>1.66</karaf.bc.version>
     <bc.version>1.69</bc.version>
     <slf4j.version>1.7.25</slf4j.version>
-    <pkcs11-wrapper.version>1.4.8-SNAPSHOT</pkcs11-wrapper.version>
+    <pkcs11-wrapper.version>1.4.8</pkcs11-wrapper.version>
     <hikaricp.version>4.0.3</hikaricp.version>
     <fastjson.version>1.2.76</fastjson.version>
     <liquibase.version>3.10.3</liquibase.version>
