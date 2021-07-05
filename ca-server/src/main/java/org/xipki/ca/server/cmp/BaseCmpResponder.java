@@ -386,12 +386,9 @@ abstract class BaseCmpResponder {
 
         event.addEventType(eventType);
 
-        String dfltCertprofileName =
-                CmpUtil.extractCertProfile(request.getHeader().getGeneralInfo());
-        if (dfltCertprofileName == null) {
-          if (parameters != null) {
-            dfltCertprofileName = parameters.get("certprofile");
-          }
+        String dfltCertprofileName = null;
+        if (parameters != null) {
+          dfltCertprofileName = parameters.get("certprofile");
         }
 
         respBody = cmpEnrollCert(dfltCertprofileName, request, respHeader,

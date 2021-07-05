@@ -19,7 +19,6 @@ package org.xipki.cmpclient.internal;
 
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.cmp.*;
-import org.bouncycastle.asn1.crmf.AttributeTypeAndValue;
 import org.bouncycastle.asn1.crmf.CertReqMessages;
 import org.bouncycastle.asn1.crmf.CertReqMsg;
 import org.bouncycastle.asn1.crmf.CertTemplateBuilder;
@@ -875,7 +874,8 @@ class CmpAgent {
     InfoTypeAndValue certProfileItv = null;
     if (csr.getCertprofile() != null) {
       certProfileItv = new InfoTypeAndValue(
-              ObjectIdentifiers.CMP.id_it_certProfile, new DERUTF8String(csr.getCertprofile()));
+              ObjectIdentifiers.CMP.id_it_certProfile,
+              new DERSequence(new DERUTF8String(csr.getCertprofile())));
     }
 
     PKIHeader header = buildPkiHeader(implicitConfirm, null, utf8Pairs, certProfileItv);
@@ -885,25 +885,28 @@ class CmpAgent {
   } // method buildPkiMessage
 
   private PKIMessage buildPkiMessage(EnrollCertRequest req) {
-    PKIHeader header = buildPkiHeader(implicitConfirm, null);
-
     List<EnrollCertRequest.Entry> reqEntries = req.getRequestEntries();
     CertReqMsg[] certReqMsgs = new CertReqMsg[reqEntries.size()];
+
+    ASN1EncodableVector vec = new ASN1EncodableVector();
 
     for (int i = 0; i < reqEntries.size(); i++) {
       EnrollCertRequest.Entry reqEntry = reqEntries.get(i);
 
-      AttributeTypeAndValue[] reginfo = null;
-
       if (reqEntry.getCertprofile() != null) {
-        reginfo = new AttributeTypeAndValue[] {
-                new AttributeTypeAndValue(
-                        ObjectIdentifiers.CMP.id_it_certProfile,
-                        new DERUTF8String(reqEntry.getCertprofile()))};
+        vec.add(new DERUTF8String(reqEntry.getCertprofile()));
       }
 
-      certReqMsgs[i] = new CertReqMsg(reqEntry.getCertReq(), reqEntry.getPopo(), reginfo);
+      certReqMsgs[i] = new CertReqMsg(reqEntry.getCertReq(), reqEntry.getPopo(), null);
     }
+
+    if (vec.size() != 0 && vec.size() != reqEntries.size()) {
+      throw new IllegalStateException("either not all reqEntries have CertProfile or all not" );
+    }
+
+    InfoTypeAndValue certProfile = new InfoTypeAndValue(
+                    ObjectIdentifiers.CMP.id_it_certProfile, new DERSequence(vec));
+    PKIHeader header = buildPkiHeader(implicitConfirm, null, null, certProfile);
 
     int bodyType;
     switch (req.getType()) {

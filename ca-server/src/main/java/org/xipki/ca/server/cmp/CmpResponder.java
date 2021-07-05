@@ -123,10 +123,35 @@ public class CmpResponder extends BaseCmpResponder {
     CertReqMsg[] certReqMsgs = cr.toCertReqMsgArray();
     final int n = certReqMsgs.length;
 
-    List<CertTemplateData> certTemplateDatas = new ArrayList<>(n);
     List<CertResponse> resps = new ArrayList<>(1);
 
+    String[] certprofileNames = CmpUtil.extractCertProfile(request.getHeader().getGeneralInfo());
+    if (certprofileNames == null) {
+      if (dfltCertprofileName != null) {
+        certprofileNames = new String[n];
+
+        for (int i = 0; i < n; i++) {
+          certprofileNames[i] = dfltCertprofileName;
+        }
+      }
+    }
+
     boolean kup = (request.getBody().getType() == PKIBody.TYPE_KEY_UPDATE_REQ);
+    int numCertprofileNames = (certprofileNames == null) ? 0 : certprofileNames.length;
+    if (!kup && (numCertprofileNames != n)) {
+      CertResponse[] certResps = new CertResponse[n];
+      for (int i = 0; i < n; i++) {
+        ASN1Integer certReqId = certReqMsgs[i].getCertReq().getCertReqId();
+        String msg = "expected " + n + ", but " + numCertprofileNames
+                + " CertProfile names are specified";
+        certResps[i] = new CertResponse(certReqId, generateRejectionStatus(badCertTemplate, msg));
+      }
+
+      event.setStatus(AuditStatus.FAILED);
+      return new CertRepMessage(null, certResps);
+    }
+
+    List<CertTemplateData> certTemplateDatas = new ArrayList<>(n);
 
     // pre-process requests
     for (int i = 0; i < n; i++) {
@@ -144,22 +169,7 @@ public class CmpResponder extends BaseCmpResponder {
       X500Name subject = certTemp.getSubject();
       Extensions extensions = certTemp.getExtensions();
 
-      AttributeTypeAndValue[] regInfo = reqMsg.getRegInfo();
-      String certprofileName = CmpUtil.extractCertProfile(regInfo);
-      if (certprofileName == null) {
-        CmpUtf8Pairs keyvalues = CmpUtil.extractUtf8Pairs(reqMsg.getRegInfo());
-        if (keyvalues != null) {
-          certprofileName = keyvalues.value(KEY_CERTPROFILE);
-        }
-      }
-
-      if (certprofileName == null) {
-        certprofileName = dfltCertprofileName;
-      }
-
-      if (certprofileName != null) {
-        certprofileName = certprofileName.toLowerCase();
-      }
+      String certprofileName = certprofileNames == null ? null : certprofileNames[i];
 
       if (kup) {
         // Till BC v1.60, the regCtl-oldCertID will be ignored by calling
@@ -224,11 +234,6 @@ public class CmpResponder extends BaseCmpResponder {
         if (certprofileName == null) {
           certprofileName = oldCert.getCertprofile();
         }
-        if (certprofileName == null) {
-          LOG.warn("no certprofile is specified");
-          addErrCertResp(resps, certReqId, badCertTemplate, "no certificate profile");
-          continue;
-        }
 
         if (subject == null) {
           subject = oldCert.getCert().getCert().getSubject();
@@ -255,12 +260,6 @@ public class CmpResponder extends BaseCmpResponder {
         }
 
         extensions = new Extensions(extns.values().toArray(new Extension[0]));
-      } else {
-        if (certprofileName == null) {
-          LOG.warn("no certprofile is specified");
-          addErrCertResp(resps, certReqId, badCertTemplate, "no certificate profile");
-          continue;
-        }
       }
 
       if (!requestor.isCertprofilePermitted(certprofileName)) {
@@ -426,8 +425,11 @@ public class CmpResponder extends BaseCmpResponder {
         CmpUtf8Pairs keyvalues = CmpUtil.extractUtf8Pairs(generalInfo);
 
         // CertProfile name
-        String certprofileName = CmpUtil.extractCertProfile(generalInfo);
-        if (certprofileName == null) {
+        String certprofileName = null;
+        String[] list = CmpUtil.extractCertProfile(generalInfo);
+        if (list != null && list.length > 0) {
+          certprofileName = list[0];
+        } else {
           if (keyvalues != null) {
             certprofileName = keyvalues.value(KEY_CERTPROFILE);
           }
@@ -883,6 +885,10 @@ public class CmpResponder extends BaseCmpResponder {
       PKIMessage request, PKIHeaderBuilder respHeader, CmpControl cmpControl, PKIHeader reqHeader,
       PKIBody reqBody, CmpRequestorInfo requestor, ASN1OctetString tid, String msgId,
       AuditEvent event) throws InsufficientPermissionException {
+    if (dfltCertprofileName != null) {
+      dfltCertprofileName = dfltCertprofileName.toLowerCase(Locale.ROOT);
+    }
+
     long confirmWaitTime = cmpControl.getConfirmWaitTime();
     if (confirmWaitTime < 0) {
       confirmWaitTime *= -1;

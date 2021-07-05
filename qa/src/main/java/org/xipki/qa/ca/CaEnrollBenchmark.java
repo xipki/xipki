@@ -22,10 +22,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.ssl.SslContext;
-import org.bouncycastle.asn1.ASN1GeneralizedTime;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DERUTF8String;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.cmp.*;
 import org.bouncycastle.asn1.crmf.*;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -310,13 +307,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
 
       CertTemplate certTemplate = certTempBuilder.build();
       CertRequest certRequest = new CertRequest(new ASN1Integer(i + 1), certTemplate, null);
-
-      AttributeTypeAndValue certprofileInfo =
-          new AttributeTypeAndValue(ObjectIdentifiers.CMP.id_it_certProfile,
-              new DERUTF8String(benchmarkEntry.getCertprofile()));
-      AttributeTypeAndValue[] atvs = new AttributeTypeAndValue[]{certprofileInfo};
-
-      certReqMsgs[i] = new CertReqMsg(certRequest, RA_VERIFIED, atvs);
+      certReqMsgs[i] = new CertReqMsg(certRequest, RA_VERIFIED, null);
     }
 
     PKIHeaderBuilder builder = new PKIHeaderBuilder(
@@ -324,7 +315,11 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
     builder.setMessageTime(new ASN1GeneralizedTime(new Date()));
     builder.setTransactionID(randomBytes(8));
     builder.setSenderNonce(randomBytes(8));
-    builder.setGeneralInfo(IMPLICIT_CONFIRM);
+
+    InfoTypeAndValue certprofileInfo =
+            new InfoTypeAndValue(ObjectIdentifiers.CMP.id_it_certProfile,
+                    new DERSequence(new DERUTF8String(benchmarkEntry.getCertprofile())));
+    builder.setGeneralInfo(new InfoTypeAndValue[]{IMPLICIT_CONFIRM, certprofileInfo});
 
     PKIBody body = new PKIBody(PKIBody.TYPE_CERT_REQ, new CertReqMessages(certReqMsgs));
     return new PKIMessage(builder.build(), body);

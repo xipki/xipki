@@ -319,7 +319,7 @@ public abstract class CmpCaClient implements Closeable {
                 DERNull.INSTANCE));
     builder.addGeneralInfo(
         new InfoTypeAndValue(ObjectIdentifiers.id_it_certProfile,
-                new DERUTF8String(certprofile)));
+                new DERSequence(new DERUTF8String(certprofile))));
 
     builder.setBody(new PKIBody(PKIBody.TYPE_P10_CERT_REQ, csr));
     ProtectedPKIMessage request = build(builder);
@@ -397,11 +397,7 @@ public abstract class CmpCaClient implements Closeable {
       ContentSigner popoSigner = buildSigner(privateKey[i]);
       POPOSigningKey popoSk = popoBuilder.build(popoSigner);
       ProofOfPossession popo = new ProofOfPossession(popoSk);
-
-      AttributeTypeAndValue[] atvs = new AttributeTypeAndValue[]{
-              new AttributeTypeAndValue(
-                ObjectIdentifiers.id_it_certProfile, new DERUTF8String(certprofiles[i]))};
-      certReqMsgs[i] = new CertReqMsg(certReq, popo, atvs);
+      certReqMsgs[i] = new CertReqMsg(certReq, popo, null);
     }
 
     PKIBody body = new PKIBody(PKIBody.TYPE_CERT_REQ, new CertReqMessages(certReqMsgs));
@@ -413,6 +409,14 @@ public abstract class CmpCaClient implements Closeable {
 
     builder.addGeneralInfo(
         new InfoTypeAndValue(CMPObjectIdentifiers.it_implicitConfirm, DERNull.INSTANCE));
+
+    ASN1EncodableVector vec = new ASN1EncodableVector();
+    for (String cp : certprofiles) {
+      vec.add(new DERUTF8String(cp));
+    }
+    builder.addGeneralInfo(
+        new InfoTypeAndValue(ObjectIdentifiers.id_it_certProfile, new DERSequence(vec)));
+
     builder.setBody(body);
 
     ProtectedPKIMessage request = build(builder);
