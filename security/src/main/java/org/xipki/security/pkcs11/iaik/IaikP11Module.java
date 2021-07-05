@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.pkcs11.*;
+import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 
@@ -152,11 +153,15 @@ public class IaikP11Module extends P11Module {
       throws P11TokenException {
     notNull(moduleConf, "moduleConf");
 
+    String path = moduleConf.getNativeLibrary();
+    path = IoUtil.expandFilepath(path, false);
+
     iaik.pkcs.pkcs11.Module module;
     try {
-      module = iaik.pkcs.pkcs11.Module.getInstance(moduleConf.getNativeLibrary());
+      module = iaik.pkcs.pkcs11.Module.getInstance(path);
     } catch (IOException ex) {
-      final String msg = "could not load the PKCS#11 module " + moduleConf.getName();
+      final String msg = "could not load the PKCS#11 module "
+              + moduleConf.getName() + ": " + path;
       LogUtil.error(LOG, ex, msg);
       throw new P11TokenException(msg, ex);
     }
