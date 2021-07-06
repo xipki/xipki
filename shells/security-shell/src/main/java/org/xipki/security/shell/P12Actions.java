@@ -259,9 +259,9 @@ public class P12Actions {
     }
 
     @Override
-    protected ConcurrentContentSigner getSigner(SignatureAlgoControl signatureAlgoControl)
+    protected ConcurrentContentSigner getSigner()
         throws ObjectCreationException {
-      Args.notNull(signatureAlgoControl, "signatureAlgoControl");
+      SignatureAlgoControl signatureAlgoControl = getSignatureAlgoControl();
       char[] pwd;
       try {
         pwd = getPassword();

@@ -23,16 +23,14 @@ import org.xipki.qa.ca.CaQaSystemManager;
 import org.xipki.qa.ocsp.OcspCertStatus;
 import org.xipki.qa.ocsp.OcspError;
 import org.xipki.security.EdECConstants;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.shell.DynamicEnumCompleter;
 import org.xipki.shell.EnumCompleter;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.TripleState;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Completers for QA shells.
@@ -208,4 +206,21 @@ public class QaCompleters {
     }
 
   } // class RSASigAlgCompleter
+
+  @Service
+  public static class SignAlgoCompleter extends EnumCompleter {
+
+    private static Set<String> algos = new HashSet<>();
+
+    static {
+      for (SignAlgo m : SignAlgo.values()) {
+        algos.add(m.getJceName());
+      }
+    }
+
+    public SignAlgoCompleter() {
+      setTokens(algos);
+    }
+  }
+
 }

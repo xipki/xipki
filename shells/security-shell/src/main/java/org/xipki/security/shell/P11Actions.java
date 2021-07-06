@@ -216,9 +216,9 @@ public class P11Actions {
     private String moduleName = "default";
 
     @Override
-    protected ConcurrentContentSigner getSigner(SignatureAlgoControl signatureAlgoControl)
+    protected ConcurrentContentSigner getSigner()
         throws Exception {
-      Args.notNull(signatureAlgoControl, "signatureAlgoControl");
+      SignatureAlgoControl signatureAlgoControl = getSignatureAlgoControl();
 
       byte[] idBytes = null;
       if (id != null) {
