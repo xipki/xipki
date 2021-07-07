@@ -1104,15 +1104,15 @@ public class QaSecurityActions {
             description = "alias of the key in the JCE device")
     private String alias;
 
-    @Option(name = "--sig-algo", required = true, description = "signature algorithm")
+    @Option(name = "--algo", required = true, description = "signature algorithm")
     @Completion(QaCompleters.SignAlgoCompleter.class)
-    private String signAlgo;
+    private String algo;
 
     @Override
     protected BenchmarkExecutor getTester()
             throws Exception {
-      return new JceSignSpeed(securityFactory, type, alias, signAlgo,
-              "alias-" + alias + "_algo-" + signAlgo, getNumThreads());
+      return new JceSignSpeed(securityFactory, type, alias, algo,
+              "alias-" + alias + "_algo-" + algo, getNumThreads());
     }
 
   } // class SpeedEcSignP11

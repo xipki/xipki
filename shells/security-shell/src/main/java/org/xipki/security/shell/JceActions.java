@@ -46,15 +46,14 @@ public class JceActions {
         description = "alias of the key in the JCE device")
     private String alias;
 
-    @Option(name = "--sig-algo", required = true, description = "signature algorithm")
+    @Option(name = "--algo", required = true, description = "signature algorithm")
     @Completion(SecurityCompleters.SignAlgoCompleter.class)
-    private String signAlgo;
+    private String algo;
 
     @Override
     protected ConcurrentContentSigner getSigner()
         throws Exception {
-      SignAlgo algo = SignAlgo.getInstance(signAlgo);
-      SignerConf conf = getJceSignerConf(alias, 1, algo);
+      SignerConf conf = getJceSignerConf(alias, 1, SignAlgo.getInstance(algo));
       return securityFactory.createSigner(type, conf, (X509Cert[]) null);
     }
 
