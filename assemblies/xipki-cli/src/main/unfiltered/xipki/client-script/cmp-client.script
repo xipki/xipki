@@ -1,6 +1,6 @@
 echo "#################################################################"
 echo "# Reset CMP client (only required if CA changed the             #"
-echo "# configuration since last reset / initialization               #"
+echo "# configuration since last reset / initialization)              #"
 echo "#################################################################"
 
 xi:cmp-init

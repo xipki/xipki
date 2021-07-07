@@ -181,7 +181,7 @@ public class CmpResponder extends BaseCmpResponder {
       }
 
       if (kup) {
-        // Till BC v1.60, the regCtl-oldCertID will be ignored by calling
+        // The regCtl-oldCertID will be ignored by calling
         // req.getControl(CMPObjectIdentifiers.regCtrl_oldCertID);
         Controls controls = reqMsg.getCertReq().getControls();
         AttributeTypeAndValue oldCertIdAtv = null;
