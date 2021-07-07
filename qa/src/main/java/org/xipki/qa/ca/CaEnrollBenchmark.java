@@ -315,9 +315,12 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
     builder.setTransactionID(randomBytes(8));
     builder.setSenderNonce(randomBytes(8));
 
+    ASN1EncodableVector vec = new ASN1EncodableVector(num);
+    for (int i = 0; i < num; i++) {
+      vec.add(new DERUTF8String(benchmarkEntry.getCertprofile()));
+    }
     InfoTypeAndValue certprofileInfo =
-            new InfoTypeAndValue(ObjectIdentifiers.CMP.id_it_certProfile,
-                    new DERSequence(new DERUTF8String(benchmarkEntry.getCertprofile())));
+            new InfoTypeAndValue(ObjectIdentifiers.CMP.id_it_certProfile, new DERSequence(vec));
     builder.setGeneralInfo(new InfoTypeAndValue[]{IMPLICIT_CONFIRM, certprofileInfo});
 
     PKIBody body = new PKIBody(PKIBody.TYPE_CERT_REQ, new CertReqMessages(certReqMsgs));

@@ -461,9 +461,9 @@ abstract class BaseCmpResponder {
     event.addEventData(CaAuditConstants.NAME_tid, tidStr);
 
     int reqPvno = reqHeader.getPvno().getValue().intValue();
-    if (reqPvno != PVNO_CMP2000) {
+    if (reqPvno < PVNO_CMP2000) {
       event.update(AuditLevel.INFO, AuditStatus.FAILED);
-      event.addEventData(CaAuditConstants.NAME_message, "unsupproted version " + reqPvno);
+      event.addEventData(CaAuditConstants.NAME_message, "unsupported version " + reqPvno);
       return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.unsupportedVersion, null);
     }
 

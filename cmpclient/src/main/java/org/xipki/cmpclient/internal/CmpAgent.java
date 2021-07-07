@@ -323,10 +323,6 @@ class CmpAgent {
     return buildPkiHeader(false, tid, null, (InfoTypeAndValue[]) null);
   }
 
-  private PKIHeader buildPkiHeader(boolean addImplictConfirm, ASN1OctetString tid) {
-    return buildPkiHeader(addImplictConfirm, tid, null, (InfoTypeAndValue[]) null);
-  }
-
   private PKIHeader buildPkiHeader(boolean addImplictConfirm, ASN1OctetString tid,
       CmpUtf8Pairs utf8Pairs, InfoTypeAndValue... additionalGeneralInfos) {
     if (additionalGeneralInfos != null) {

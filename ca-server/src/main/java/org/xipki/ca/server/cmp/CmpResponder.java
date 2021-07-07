@@ -169,7 +169,16 @@ public class CmpResponder extends BaseCmpResponder {
       X500Name subject = certTemp.getSubject();
       Extensions extensions = certTemp.getExtensions();
 
-      String certprofileName = certprofileNames == null ? null : certprofileNames[i];
+      // till version 5.3.13, UTF8Pairs is used to specify the CertProfile
+      CmpUtf8Pairs utf8Pairs = CmpUtil.extractUtf8Pairs(reqMsg.getRegInfo());
+      String certprofileName = null;
+      if (utf8Pairs != null) {
+        certprofileName = utf8Pairs.value(CmpUtf8Pairs.KEY_NOTAFTER);
+      }
+
+      if (certprofileName == null && certprofileNames != null) {
+        certprofileName = certprofileNames[i];
+      }
 
       if (kup) {
         // Till BC v1.60, the regCtl-oldCertID will be ignored by calling
