@@ -17,28 +17,20 @@
 
 package org.xipki.qa.security;
 
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.*;
-import org.xipki.security.pkcs11.P11IdentityId;
-import org.xipki.security.pkcs11.P11ObjectIdentifier;
-import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.security.pkcs11.P11Slot.P11NewKeyControl;
-import org.xipki.security.pkcs11.P11SlotIdentifier;
-import org.xipki.security.util.AlgorithmUtil;
-import org.xipki.util.*;
+import org.xipki.util.BenchmarkExecutor;
+import org.xipki.util.ConfPairs;
+import org.xipki.util.ObjectCreationException;
 
-import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 import static org.xipki.util.Args.notBlank;
-import static org.xipki.util.Args.notNull;
 
 /**
- * Speed test of PKCS#11 signature creation.
+ * Speed test of signature creation for JCE based Token.
  *
  * @author Lijun Liao
  */

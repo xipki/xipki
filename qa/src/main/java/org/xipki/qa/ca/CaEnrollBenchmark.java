@@ -35,7 +35,6 @@ import org.xipki.qa.BenchmarkHttpClient.HttpClientException;
 import org.xipki.qa.BenchmarkHttpClient.ResponseHandler;
 import org.xipki.qa.BenchmarkHttpClient.SslConf;
 import org.xipki.security.ObjectIdentifiers;
-import org.xipki.security.cmp.CmpUtf8Pairs;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.BenchmarkExecutor;
 import org.xipki.util.InvalidConfException;
