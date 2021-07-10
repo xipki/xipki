@@ -8,6 +8,7 @@
 	"certLevel":"EndEntity",
 	"maxSize":4500,
 	"validity":"5y",
+	"notAfterMode": "BY_CA",
 	"notBeforeTime":"midnight",
 	"serialNumberInReq":false,
 	"keypairGeneration":{

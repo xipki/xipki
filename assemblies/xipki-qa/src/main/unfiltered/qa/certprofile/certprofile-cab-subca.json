@@ -8,6 +8,7 @@
 	"certLevel":"SubCA",
 	"maxSize":4500,
 	"validity":"8y",
+	"notAfterMode": "BY_CA",
 	"notBeforeTime":"current",
 	"serialNumberInReq":false,
 	"signatureAlgorithms":[
