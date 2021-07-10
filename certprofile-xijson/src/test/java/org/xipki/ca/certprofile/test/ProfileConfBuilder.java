@@ -30,6 +30,7 @@ import org.xipki.ca.api.profile.Certprofile.CertDomain;
 import org.xipki.ca.api.profile.Certprofile.CertLevel;
 import org.xipki.ca.api.profile.Certprofile.GeneralNameTag;
 import org.xipki.ca.api.profile.Certprofile.X509CertVersion;
+import org.xipki.ca.api.profile.NotAfterMode;
 import org.xipki.ca.api.profile.Range;
 import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
 import org.xipki.ca.certprofile.xijson.conf.*;
@@ -110,6 +111,8 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
 
   protected static X509ProfileType getBaseCabSubscriberProfile(String desc) {
     X509ProfileType profile = getBaseCabProfile(desc, CertLevel.EndEntity, "2y");
+
+    profile.setNotAfterMode(NotAfterMode.BY_CA);
 
     // SubjectToSubjectAltName
     SubjectToSubjectAltNameType s2sType = new SubjectToSubjectAltNameType();

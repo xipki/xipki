@@ -40,6 +40,7 @@ import org.xipki.ca.api.mgmt.ValidityMode;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.KeypairGenControl;
+import org.xipki.ca.api.profile.NotAfterMode;
 import org.xipki.ca.server.X509Ca.GrantedCertTemplate;
 import org.xipki.ca.server.db.CertStore;
 import org.xipki.security.ConcurrentContentSigner;
@@ -399,6 +400,7 @@ class GrandCertTemplateBuilder {
     }
 
     Date maxNotAfter = validity.add(grantedNotBefore);
+    // maxNotAfter not after 99991231-235959
     if (maxNotAfter.getTime() > MAX_CERT_TIME_MS) {
       maxNotAfter = new Date(MAX_CERT_TIME_MS);
     }
@@ -414,16 +416,31 @@ class GrandCertTemplateBuilder {
     }
 
     if (grantedNotAfter.after(caInfo.getNotAfter())) {
-      ValidityMode mode = caInfo.getValidityMode();
-      if (mode == ValidityMode.CUTOFF) {
-        grantedNotAfter = caInfo.getNotAfter();
-      } else if (mode == ValidityMode.STRICT) {
+      ValidityMode caMode = caInfo.getValidityMode();
+      NotAfterMode profileMode = certprofile.getNotAfterMode();
+      if (profileMode == null) {
+        profileMode = NotAfterMode.STRICT;
+      }
+
+      if (profileMode == NotAfterMode.STRICT) {
         throw new OperationException(NOT_PERMITTED,
-            "notAfter outside of CA's validity is not permitted");
-      } else if (mode == ValidityMode.LAX) {
-        // permitted
+                "notAfter outside of CA's validity is not permitted by the CertProfile");
+      }
+
+      if (caMode == ValidityMode.STRICT) {
+        throw new OperationException(NOT_PERMITTED,
+                "notAfter outside of CA's validity is not permitted by the CA");
+      }
+
+      if (caMode == ValidityMode.CUTOFF) {
+        grantedNotAfter = caInfo.getNotAfter();
+      } else if (caMode == ValidityMode.LAX) {
+        if (profileMode == NotAfterMode.CUTOFF) {
+          grantedNotAfter = caInfo.getNotAfter();
+        }
       } else {
-        throw new IllegalStateException("should not reach here, unknown CA ValidityMode " + mode);
+        throw new IllegalStateException("should not reach here, CA ValidityMode " + caMode
+                + " CertProfile NotAfterMode " + profileMode);
       } // end if (mode)
     } // end if (notAfter)
 

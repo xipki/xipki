@@ -90,6 +90,10 @@ public class IdentifiedCertprofile implements Closeable {
     return certprofile.getValidity();
   }
 
+  public NotAfterMode getNotAfterMode() {
+    return certprofile.getNotAfterMode();
+  }
+
   public SubjectInfo getSubject(X500Name requestedSubject, SubjectPublicKeyInfo publicKeyInfo)
       throws CertprofileException, BadCertTemplateException {
     SubjectInfo subjectInfo = certprofile.getSubject(requestedSubject, publicKeyInfo);

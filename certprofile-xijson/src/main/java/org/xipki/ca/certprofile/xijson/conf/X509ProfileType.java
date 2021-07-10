@@ -31,6 +31,7 @@ import org.xipki.ca.api.profile.Certprofile.X509CertVersion;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.KeyParametersOption;
+import org.xipki.ca.api.profile.NotAfterMode;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.util.Args;
@@ -83,6 +84,13 @@ public class X509ProfileType extends ValidatableConf {
    */
   @JSONField(ordinal = 6)
   private String validity;
+
+  /**
+   * How CA assigns the notAfter field in the certificate if the requested notAfter is
+   * after CA's validity.
+   */
+  @JSONField(ordinal = 6)
+  private NotAfterMode notAfterMode;
 
   /**
    * Value of the notBefore field.
@@ -214,6 +222,14 @@ public class X509ProfileType extends ValidatableConf {
 
   public void setValidity(String validity) {
     this.validity = validity;
+  }
+
+  public NotAfterMode getNotAfterMode() {
+    return notAfterMode;
+  }
+
+  public void setNotAfterMode(NotAfterMode notAfterMode) {
+    this.notAfterMode = notAfterMode;
   }
 
   public String getNotBeforeTime() {
