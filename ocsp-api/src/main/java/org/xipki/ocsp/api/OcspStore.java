@@ -56,6 +56,8 @@ public abstract class OcspStore implements Closeable {
 
   protected Validity minNextUpdatePeriod;
 
+  protected Validity maxNextUpdatePeriod;
+
   protected Validity updateInterval;
 
   public OcspStore() {
@@ -113,18 +115,23 @@ public abstract class OcspStore implements Closeable {
     CertStatusInfo info = getCertStatus0(time, reqIssuer, serialNumber,
         includeCertHash, includeRit, inheritCaRevocation);
 
-    if (info != null && minNextUpdatePeriod != null && !isIgnoreExpiredCrls()) {
+    if (info != null && !isIgnoreExpiredCrls()) {
       if (unknownCertBehaviour == UnknownCertBehaviour.good
           || unknownCertBehaviour == UnknownCertBehaviour.unknown) {
         Date nextUpdate = info.getNextUpdate();
-        Date minNextUpdate = minNextUpdatePeriod.add(time);
 
-        if (nextUpdate != null) {
-          if (minNextUpdate.after(nextUpdate)) {
+        if (minNextUpdatePeriod != null) {
+          Date minNextUpdate = minNextUpdatePeriod.add(time);
+          if (nextUpdate == null || minNextUpdate.after(nextUpdate)) {
             info.setNextUpdate(minNextUpdate);
           }
-        } else {
-          info.setNextUpdate(minNextUpdate);
+        }
+
+        if (maxNextUpdatePeriod != null) {
+          Date maxNextUpdate = maxNextUpdatePeriod.add(time);
+          if (nextUpdate == null || nextUpdate.after(maxNextUpdate)) {
+            info.setNextUpdate(maxNextUpdate);
+          }
         }
       }
     }
@@ -231,8 +238,22 @@ public abstract class OcspStore implements Closeable {
     return minNextUpdatePeriod;
   }
 
-  public void setMinNextUpdatePeriod(Validity minNextUpdatePeriod) {
+  public void setNextUpdatePeriodLimit(
+          Validity minNextUpdatePeriod, Validity maxNextUpdatePeriod) {
+    if (minNextUpdatePeriod != null && maxNextUpdatePeriod != null) {
+      if (minNextUpdatePeriod.compareTo(maxNextUpdatePeriod) > 0) {
+        throw new IllegalArgumentException(String.format(
+                "minNextUpdatePeriod (%s) > maxNextUpdatePeriod (%s) is not allowed",
+                minNextUpdatePeriod, maxNextUpdatePeriod));
+      }
+    }
+
     this.minNextUpdatePeriod = minNextUpdatePeriod;
+    this.maxNextUpdatePeriod = maxNextUpdatePeriod;
+  }
+
+  public Validity getMaxNextUpdatePeriod() {
+    return maxNextUpdatePeriod;
   }
 
   public Validity getUpdateInterval() {

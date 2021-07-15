@@ -624,6 +624,8 @@ public class OcspServerConf extends ValidatableConf {
 
     private String minNextUpdatePeriod;
 
+    private String maxNextUpdatePeriod;
+
     private String name;
 
     public Source getSource() {
@@ -674,6 +676,14 @@ public class OcspServerConf extends ValidatableConf {
       return minNextUpdatePeriod;
     }
 
+    public String getMaxNextUpdatePeriod() {
+      return maxNextUpdatePeriod;
+    }
+
+    public void setMaxNextUpdatePeriod(String maxNextUpdatePeriod) {
+      this.maxNextUpdatePeriod = maxNextUpdatePeriod;
+    }
+
     public Boolean getIncludeArchiveCutoff() {
       return includeArchiveCutoff;
     }
@@ -711,6 +721,14 @@ public class OcspServerConf extends ValidatableConf {
         throws InvalidConfException {
       notBlank(name, "name");
       notNull(source, "source");
+
+      if (minNextUpdatePeriod != null && maxNextUpdatePeriod != null) {
+        if (minNextUpdatePeriod.compareTo(maxNextUpdatePeriod) > 0) {
+          throw new InvalidConfException(String.format(
+                  "minNextUpdatePeriod (%s) > maxNextUpdatePeriod (%s) is not allowed",
+                  minNextUpdatePeriod, maxNextUpdatePeriod));
+        }
+      }
     }
 
   } // class Store

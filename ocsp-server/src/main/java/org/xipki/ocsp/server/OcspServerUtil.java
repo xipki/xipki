@@ -161,11 +161,12 @@ public class OcspServerUtil {
 
     store.setIgnoreExpiredCert(getBoolean(conf.getIgnoreExpiredCert(), true));
     store.setIgnoreNotYetValidCert(getBoolean(conf.getIgnoreNotYetValidCert(), true));
-    if (conf.getMinNextUpdatePeriod() != null) {
-      store.setMinNextUpdatePeriod(Validity.getInstance(conf.getMinNextUpdatePeriod()));
-    } else {
-      store.setMinNextUpdatePeriod(null);
-    }
+
+    Validity minPeriod = conf.getMinNextUpdatePeriod() == null
+            ? null : Validity.getInstance(conf.getMinNextUpdatePeriod());
+    Validity maxPeriod = conf.getMaxNextUpdatePeriod() == null
+            ? null : Validity.getInstance(conf.getMaxNextUpdatePeriod());
+    store.setNextUpdatePeriodLimit(minPeriod, maxPeriod);
 
     if ("NEVER".equalsIgnoreCase(conf.getUpdateInterval())) {
       store.setUpdateInterval(null);
