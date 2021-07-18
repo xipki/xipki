@@ -723,10 +723,16 @@ public class OcspServerConf extends ValidatableConf {
       notNull(source, "source");
 
       if (minNextUpdatePeriod != null && maxNextUpdatePeriod != null) {
-        if (minNextUpdatePeriod.compareTo(maxNextUpdatePeriod) > 0) {
-          throw new InvalidConfException(String.format(
-                  "minNextUpdatePeriod (%s) > maxNextUpdatePeriod (%s) is not allowed",
-                  minNextUpdatePeriod, maxNextUpdatePeriod));
+        try {
+          Validity min = Validity.getInstance(minNextUpdatePeriod);
+          Validity max = Validity.getInstance(maxNextUpdatePeriod);
+          if (min.compareTo(max) > 0) {
+            throw new InvalidConfException(String.format(
+                    "minNextUpdatePeriod (%s) > maxNextUpdatePeriod (%s) is not allowed",
+                    minNextUpdatePeriod, maxNextUpdatePeriod));
+          }
+        } catch (IllegalArgumentException ex) {
+          throw new InvalidConfException(ex.getMessage());
         }
       }
     }
