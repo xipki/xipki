@@ -29,6 +29,7 @@ import org.xipki.security.SignAlgo;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.GMUtil;
+import org.xipki.security.util.PKCS1Util;
 import org.xipki.security.util.SignerUtil;
 import org.xipki.util.LogUtil;
 
@@ -460,7 +461,7 @@ abstract class P11ContentSigner implements XiContentSigner {
 
       if (mechanism == PKCS11Constants.CKM_RSA_PKCS
           || mechanism == PKCS11Constants.CKM_RSA_X_509) {
-        this.digestPkcsPrefix = SignerUtil.getDigestPkcsPrefix(hashAlgo);
+        this.digestPkcsPrefix = PKCS1Util.getDigestPkcsPrefix(hashAlgo);
         this.outputStream = new DigestOutputStream(hashAlgo.createDigest());
       } else {
         this.digestPkcsPrefix = null;
@@ -497,7 +498,7 @@ abstract class P11ContentSigner implements XiContentSigner {
 
       try {
         if (mechanism == PKCS11Constants.CKM_RSA_X_509) {
-          dataToSign = SignerUtil.EMSA_PKCS1_v1_5_encoding(dataToSign, modulusBitLen);
+          dataToSign = PKCS1Util.EMSA_PKCS1_v1_5_encoding(dataToSign, modulusBitLen);
         }
 
         return cryptService.getIdentity(identityId).sign(mechanism, null, dataToSign);
