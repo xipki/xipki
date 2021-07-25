@@ -90,14 +90,20 @@ public class JceSigner implements XiContentSigner {
 
     } // class SignerOutputStream
 
-    public JceSigner(PrivateKey signKey, SignAlgo signAlgo, String providerName)
+    public JceSigner(PrivateKey signKey, SignAlgo signAlgo, String providerName,
+                      Provider provider)
             throws XiSecurityException {
         this.signKey = signKey;
         this.signAlgo = signAlgo;
+        String jceName = signAlgo.getJceName();
         try {
-            this.signature = providerName == null
-                    ? Signature.getInstance(signAlgo.getJceName())
-                    : Signature.getInstance(signAlgo.getJceName(), providerName);
+            if (providerName == null && provider == null) {
+                this.signature = Signature.getInstance(jceName);
+            } else if (provider != null) {
+                this.signature = Signature.getInstance(jceName, provider);
+            } else {
+                this.signature = Signature.getInstance(signAlgo.getJceName(), providerName);
+            }
         } catch (NoSuchAlgorithmException | NoSuchProviderException exception) {
             throw new XiSecurityException(exception);
         }
