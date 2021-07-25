@@ -344,7 +344,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   @Override
   public NotAfterMode getNotAfterMode() {
-    return notAfterMode;
+    return notAfterMode != null ? notAfterMode : super.getNotAfterMode();
   }
 
   @Override

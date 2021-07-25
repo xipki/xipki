@@ -419,7 +419,7 @@ class GrandCertTemplateBuilder {
       ValidityMode caMode = caInfo.getValidityMode();
       NotAfterMode profileMode = certprofile.getNotAfterMode();
       if (profileMode == null) {
-        profileMode = NotAfterMode.STRICT;
+        profileMode = NotAfterMode.BY_CA;
       }
 
       if (profileMode == NotAfterMode.STRICT) {

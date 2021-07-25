@@ -112,7 +112,7 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
   protected static X509ProfileType getBaseCabSubscriberProfile(String desc) {
     X509ProfileType profile = getBaseCabProfile(desc, CertLevel.EndEntity, "2y");
 
-    profile.setNotAfterMode(NotAfterMode.BY_CA);
+    //profile.setNotAfterMode(NotAfterMode.BY_CA);
 
     // SubjectToSubjectAltName
     SubjectToSubjectAltNameType s2sType = new SubjectToSubjectAltNameType();

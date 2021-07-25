@@ -8,7 +8,6 @@
 	"certLevel":"RootCA",
 	"maxSize":4500,
 	"validity":"10y",
-	"notAfterMode": "BY_CA",
 	"notBeforeTime":"current",
 	"serialNumberInReq":false,
 	"signatureAlgorithms":[
