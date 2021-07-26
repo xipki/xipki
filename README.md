@@ -29,12 +29,12 @@ JRE/JDK, and the steps to reproduce the bug.
 * Hardware: Any available hardware (tested on Raspberry Pi 2 Model B with 900MHz quad-core ARM CPU and 1 GB Memory)
 
 ## Tested PKCS#11 Devices
-* [Softhsm v1 & v2](https://www.opendnssec.org/download/packages/),
-* [Nitrokey HSM 2](https://www.nitrokey.com/#comparison),
-* [Smartcard HSM EA+](http://www.smartcard-hsm.com/features.html#usbstick),
-* [nCipher Connect](https://www.ncipher.com/products/general-purpose-hsms/nshield-connect),
-* [nCipher Solo](https://www.ncipher.com/products/general-purpose-hsms/nshield-solo),
+* [Softhsm v1 & v2](https://www.opendnssec.org/download/packages/)
+* [Nitrokey HSM 2](https://www.nitrokey.com/#comparison) / [Smartcard HSM EA+](http://www.smartcard-hsm.com/features.html#usbstick)
+* [nCipher Connect](https://www.ncipher.com/products/general-purpose-hsms/nshield-connect)
+* [nCipher Solo](https://www.ncipher.com/products/general-purpose-hsms/nshield-solo)
 * [Utimaco Se](https://hsm.utimaco.com/products-hardware-security-modules/general-purpose-hsm/)
+* [Sansec HSM](https://en.sansec.com.cn/product/HSM-52.html) / [三未信安服务器密码机](http://www.sansec.com.cn/product/4.html): tested SM2
 
 ## Performance
 
@@ -43,31 +43,60 @@ JRE/JDK, and the steps to reproduce the bug.
 - CPU: Intel Core i3-7100U CPU @ 2.40GHz, 4 Core
 - Disk: SanDisk SD8SN8U (SSD)
 - Memory: 8GB
-- Database: mysql  Ver 8.0.25-0ubuntu0.20.04.1 for Linux on x86_64 ((Ubuntu))
-- Communication: database, CA, OCSP and test clients on the same machine.
 - Cryptograhic Token: PKCS#12 keystore
+- Database: PostgreSQL 9.5
+- Database, CA server, OCSP server and test clients on the same machine.
+- Server: Apache Tomcat/8.5.34
+- Server JDK: 11.0.11+9-Ubuntu-0ubuntu2.20.04
+- Test Client: XiPKI QA, tested with 5 threads for 60 seconds.
 
 ### CA
 
+- PostgreSQL is tuned by setting shared_buffers = 2GB and commit_delay = 1000.
 - Certificate Enrollment
 
-| Key Type      | Certificates per econd |
-|:-------------:|:-------------:|
-| RSA 2048      | 220 |
-| DSA 2048      | 240 |
-| EC NIST P-256 | 240 |
-| SM2           | 240 |
+| Key type      | Key size / Curve | Certificates per second |
+|:-------------:|-------------:|-------------:|
+| RSA           | 2048          | 630   |
+|               | 3072          | 300   |
+|               | 4096          | 150   |
+| DSA           | 2048          | 580   |
+|               | 3072          | 330   |
+| EC            | NIST P-256    | 880   |
+|               | NIST P-384    | 700   |
+|               | NIST P-521    | 530   |
+|            | Brainpool P256R1 | 560   |
+|            | Brainpool P384R1 | 350   |
+|            | Brainpool P512R1 | 210   |
+| SM2           | SM2P256V1     | 800   |
+| EdDSA         | Ed25519       | 1,200 |
+|               | Ed448         | 900   |
 
 ### OCSP
 
+- Default PostgreSQL configuration
 - OCSP Cache Disabled
 
-| Key Type      | Responses per second |
-|:-------------:|:-------------:|
-| RSA 2048      | 880  |
-| DSA 2048      | 2000 |
-| EC NIST P-256 | 3600 |
-| SM2           | 4000 |
+| Key type      | Key size / Curve | Responses per second |
+|:-------------:|:-------------:|-------------:|
+| RSA           | 2048          | 880   |
+|               | 3072          | 350   |
+|               | 4096          | 160   |
+| DSA           | 2048          | 2,000 |
+|               | 3072          | 1,000 |
+| EC            | NIST P-256    | 3,600 |
+|               | NIST P-384    | 2,400 |
+|               | NIST P-521    | 1,400 |
+|            | Brainpool P256R1 | 1,500 |
+|            | Brainpool P384R1 | 850   |
+|            | Brainpool P512R1 | 500   |
+| SM2           | SM2P256V1     | 4,000 |
+| EdDSA         | Ed25519       | 5,000 |
+|               | Ed448         | 3,300 |
+
+- OCSP Cache enabled
+  - If the OCSP requests contain nonce: same as without cache (see above).
+  - Otherwise, (much) better than without cache.
 
 ## Get Started
 
@@ -104,7 +133,7 @@ follows.
 ## Install DB Tool
 
 1. Unpack the binary `xipki-dbtool-<version>.zip`.
-2. If you use database other than MariaDB and MySQL, you need to get the JDBC driver and
+2. If you use database other than PostgreSQL, MariaDB and MySQL, you need to get the JDBC driver and
    copy it to the directory `lib/jdbc`.
  
 ## Install CA Server
@@ -210,8 +239,7 @@ preload <start script>
   - `source xipki/client-script/scep-client.script`
 
 * XiPKI CLI
-  XiPKI CLI provides both the full-featured client and the lite version to enroll and
-  revoke certificates via CMP.
+  XiPKI CLI provides commands to enroll and revoke certificates via CMP.
 
   The binary `xipki-cli-<version>`.tar.gz contains an example script in the folder xipki/client-script.
   It can be executed in the CLI as follows:  

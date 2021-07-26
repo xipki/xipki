@@ -121,7 +121,7 @@ public class HttpRestServlet extends HttpServlet {
       event.setStatus(AuditStatus.FAILED);
       event.setLevel(AuditLevel.ERROR);
       LOG.error("RuntimeException thrown, this should not happen!", ex);
-      throw ex;
+      resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     } finally {
       event.finish();
       auditService.logEvent(event);

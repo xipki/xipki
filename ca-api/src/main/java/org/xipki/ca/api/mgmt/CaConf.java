@@ -33,7 +33,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.cert.CertificateException;
@@ -54,13 +53,13 @@ public class CaConf {
 
     private final String profile;
 
-    private final byte[] csr;
+    private final String subject;
 
     private final String serialNumber;
 
-    public GenSelfIssued(String profile, byte[] csr, String serialNumber) {
+    public GenSelfIssued(String profile, String subject, String serialNumber) {
       this.profile = Args.notBlank(profile, "profile");
-      this.csr = Args.notNull(csr, "csr");
+      this.subject = Args.notBlank(subject, "subject");
       this.serialNumber = serialNumber;
     }
 
@@ -68,8 +67,8 @@ public class CaConf {
       return profile;
     }
 
-    public byte[] getCsr() {
-      return csr;
+    public String getSubject() {
+      return subject;
     }
 
     public String getSerialNumber() {
@@ -298,11 +297,11 @@ public class CaConf {
             if (ci.getCert() != null) {
               throw new InvalidConfException("cert.file of CA " + name + " may not be set");
             }
-            byte[] csr = getBinary(ci.getGenSelfIssued().getCsr(), zipEntries);
+            String subject = ci.getGenSelfIssued().getSubject();
             String serialNumber = ci.getGenSelfIssued().getSerialNumber();
 
             genSelfIssued = new GenSelfIssued(ci.getGenSelfIssued().getProfile(),
-                csr, serialNumber);
+                subject, serialNumber);
           }
 
           CaUris caUris;

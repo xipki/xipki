@@ -17,10 +17,7 @@
 
 package org.xipki.security.cmp;
 
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.ASN1String;
-import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DERUTF8String;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.cmp.*;
 import org.bouncycastle.asn1.crmf.AttributeTypeAndValue;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -35,8 +32,12 @@ import org.bouncycastle.cert.crmf.jcajce.JcePKMACValuesCalculator;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.NoIdleSignerException;
+import org.xipki.security.ObjectIdentifiers;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 import static org.xipki.util.Args.notNull;
 
@@ -171,11 +172,11 @@ public class CmpUtil {
     return new InfoTypeAndValue(CMPObjectIdentifiers.it_implicitConfirm, DERNull.INSTANCE);
   }
 
-  public static CmpUtf8Pairs extract(InfoTypeAndValue[] regInfos) {
-    if (regInfos != null) {
-      for (InfoTypeAndValue regInfo : regInfos) {
-        if (CMPObjectIdentifiers.regInfo_utf8Pairs.equals(regInfo.getInfoType())) {
-          String regInfoValue = ((ASN1String) regInfo.getInfoValue()).getString();
+  public static CmpUtf8Pairs extractUtf8Pairs(InfoTypeAndValue[] generalInfo) {
+    if (generalInfo != null) {
+      for (InfoTypeAndValue itv : generalInfo) {
+        if (CMPObjectIdentifiers.regInfo_utf8Pairs.equals(itv.getInfoType())) {
+          String regInfoValue = ((ASN1String) itv.getInfoValue()).getString();
           return new CmpUtf8Pairs(regInfoValue);
         }
       }
@@ -184,12 +185,29 @@ public class CmpUtil {
     return null;
   }
 
-  public static CmpUtf8Pairs extract(AttributeTypeAndValue[] atvs) {
+  public static String[] extractCertProfile(InfoTypeAndValue[] generalInfo) {
+    if (generalInfo != null) {
+      for (InfoTypeAndValue itv : generalInfo) {
+        if (ObjectIdentifiers.CMP.id_it_certProfile.equals(itv.getInfoType())) {
+          ASN1Sequence seq = ASN1Sequence.getInstance(itv.getInfoValue());
+          List<String> list = new ArrayList<>(seq.size());
+          for (int i = 0; i < seq.size(); i++) {
+            list.add(((ASN1String) seq.getObjectAt(i)).getString().toLowerCase(Locale.ROOT));
+          }
+          return list.isEmpty() ? null : list.toArray(new String[0]);
+        }
+      }
+    }
+
+    return null;
+  }
+
+  public static CmpUtf8Pairs extractUtf8Pairs(AttributeTypeAndValue[] atvs) {
     if (atvs != null) {
       for (AttributeTypeAndValue atv : atvs) {
         if (CMPObjectIdentifiers.regInfo_utf8Pairs.equals(atv.getType())) {
           String regInfoValue = ((ASN1String) atv.getValue()).getString();
-          return new CmpUtf8Pairs(regInfoValue);
+            return new CmpUtf8Pairs(regInfoValue);
         }
       }
     }

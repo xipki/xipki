@@ -101,9 +101,19 @@ public class ProxyP11Module extends P11Module {
 
     final String modulePath = moduleConf.getNativeLibrary();
 
-    this.description = StringUtil.concat("PKCS#11 proxy", "\nPath: ", modulePath);
-
     ConfPairs confPairs = new ConfPairs(modulePath);
+
+    ConfPairs noPasswordConf = new ConfPairs();
+    for (String name : confPairs.names()) {
+      String value;
+      if (name.toLowerCase().contains("password")) {
+        value = "******";
+      } else {
+        value = confPairs.value(name);
+      }
+      noPasswordConf.putPair(name, value);
+    }
+    this.description = StringUtil.concat("PKCS#11 proxy", "\nPath: ", noPasswordConf.getEncoded());
 
     String urlStr = confPairs.value(PROP_URL);
     try {
@@ -141,7 +151,7 @@ public class ProxyP11Module extends P11Module {
     }
 
     if (sslKeystore != null) {
-      sslKeystore = IoUtil.expandFilepath(sslKeystore);
+      sslKeystore = IoUtil.expandFilepath(sslKeystore, true);
 
       char[] pwd = sslKeystorePassword == null ? null : sslKeystorePassword.toCharArray();
       try {
@@ -153,7 +163,7 @@ public class ProxyP11Module extends P11Module {
     }
 
     if (sslTruststore != null) {
-      sslTruststore = IoUtil.expandFilepath(sslTruststore);
+      sslTruststore = IoUtil.expandFilepath(sslTruststore, true);
       char[] pwd = sslTruststorePassword == null ? null : sslTruststorePassword.toCharArray();
       try {
         builder.loadTrustMaterial(new File(sslTruststore), pwd);
@@ -236,7 +246,8 @@ public class ProxyP11Module extends P11Module {
       }
 
       P11Slot slot = new ProxyP11Slot(this, slotId, conf.isReadOnly(),
-          conf.getP11MechanismFilter());
+          conf.getP11MechanismFilter(), conf.getNumSessions(),
+          conf.getSecretKeyTypes(), conf.getKeyPairTypes());
       slots.add(slot);
     }
     setSlots(slots);

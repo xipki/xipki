@@ -86,20 +86,18 @@ class X509PublisherModule extends X509CaModule {
     }
 
     for (IdentifiedCertPublisher publisher : publishers()) {
-      if (!publisher.isAsyn()) {
-        boolean successful;
-        try {
-          successful = publisher.certificateAdded(certInfo);
-        } catch (RuntimeException ex) {
-          successful = false;
-          LogUtil.warn(LOG, ex, "could not publish certificate to the publisher "
-              + publisher.getIdent());
-        }
+      boolean successful;
+      try {
+        successful = publisher.certificateAdded(certInfo);
+      } catch (RuntimeException ex) {
+        successful = false;
+        LogUtil.warn(LOG, ex, "could not publish certificate to the publisher "
+                + publisher.getIdent());
+      }
 
-        if (successful) {
-          continue;
-        }
-      } // end if
+      if (successful) {
+        continue;
+      }
 
       Long certId = certInfo.getCert().getCertId();
       try {
@@ -322,21 +320,19 @@ class X509PublisherModule extends X509CaModule {
 
   void publishCertRevoked(CertWithRevocationInfo revokedCert) {
     for (IdentifiedCertPublisher publisher : publishers()) {
-      if (!publisher.isAsyn()) {
-        boolean successful;
-        try {
-          successful = publisher.certificateRevoked(caCert, revokedCert.getCert(),
-              revokedCert.getCertprofile(), revokedCert.getRevInfo());
-        } catch (RuntimeException ex) {
-          successful = false;
-          LogUtil.error(LOG, ex, "could not publish revocation of certificate to the publisher "
-              + publisher.getIdent());
-        }
+      boolean successful;
+      try {
+        successful = publisher.certificateRevoked(caCert, revokedCert.getCert(),
+                revokedCert.getCertprofile(), revokedCert.getRevInfo());
+      } catch (RuntimeException ex) {
+        successful = false;
+        LogUtil.error(LOG, ex, "could not publish revocation of certificate to the publisher "
+                + publisher.getIdent());
+      }
 
-        if (successful) {
-          continue;
-        }
-      } // end if
+      if (successful) {
+        continue;
+      }
 
       Long certId = revokedCert.getCert().getCertId();
       try {
@@ -349,20 +345,18 @@ class X509PublisherModule extends X509CaModule {
 
   void publishCertUnrevoked(CertWithDbId unrevokedCert) {
     for (IdentifiedCertPublisher publisher : publishers()) {
-      if (!publisher.isAsyn()) {
-        boolean successful;
-        try {
-          successful = publisher.certificateUnrevoked(caCert, unrevokedCert);
-        } catch (RuntimeException ex) {
-          successful = false;
-          LogUtil.error(LOG, ex, "could not publish unrevocation of certificate to the publisher "
-                                    + publisher.getIdent().getName());
-        }
+      boolean successful;
+      try {
+        successful = publisher.certificateUnrevoked(caCert, unrevokedCert);
+      } catch (RuntimeException ex) {
+        successful = false;
+        LogUtil.error(LOG, ex, "could not publish unrevocation of certificate to the publisher "
+                + publisher.getIdent().getName());
+      }
 
-        if (successful) {
-          continue;
-        }
-      } // end if
+      if (successful) {
+        continue;
+      }
 
       Long certId = unrevokedCert.getCertId();
       try {

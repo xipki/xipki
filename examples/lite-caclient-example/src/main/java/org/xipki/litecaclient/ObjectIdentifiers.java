@@ -41,4 +41,7 @@ public class ObjectIdentifiers {
 
   public static final ASN1ObjectIdentifier id_sha1 = new ASN1ObjectIdentifier("1.3.14.3.2.26");
 
+  public static final ASN1ObjectIdentifier id_it_certProfile =
+          new ASN1ObjectIdentifier("1.3.6.1.5.5.7.4.21");
+
 }

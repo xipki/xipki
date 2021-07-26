@@ -75,6 +75,12 @@ public class CmpResponder extends BaseCmpResponder {
 
   private static final Logger LOG = LoggerFactory.getLogger(BaseCmpResponder.class);
 
+  /**
+   * Used by XiPKI CA till 5.3.13.
+   */
+  @Deprecated
+  private static final String KEY_CERTPROFILE = "certprofile";
+
   private class PendingPoolCleaner implements Runnable {
 
     @Override
@@ -111,16 +117,41 @@ public class CmpResponder extends BaseCmpResponder {
   }
 
   private CertRepMessage processCertReqMessages(String dfltCertprofileName,
-      Boolean dfltCaGenKeypair, PKIMessage request, CmpRequestorInfo requestor, ASN1OctetString tid,
+      PKIMessage request, CmpRequestorInfo requestor, ASN1OctetString tid,
       CertReqMessages cr, boolean allowKeyGen, CmpControl cmpControl,
       String msgId, AuditEvent event) throws InsufficientPermissionException {
     CertReqMsg[] certReqMsgs = cr.toCertReqMsgArray();
     final int n = certReqMsgs.length;
 
-    List<CertTemplateData> certTemplateDatas = new ArrayList<>(n);
     List<CertResponse> resps = new ArrayList<>(1);
 
+    String[] certprofileNames = CmpUtil.extractCertProfile(request.getHeader().getGeneralInfo());
+    if (certprofileNames == null) {
+      if (dfltCertprofileName != null) {
+        certprofileNames = new String[n];
+
+        for (int i = 0; i < n; i++) {
+          certprofileNames[i] = dfltCertprofileName;
+        }
+      }
+    }
+
     boolean kup = (request.getBody().getType() == PKIBody.TYPE_KEY_UPDATE_REQ);
+    int numCertprofileNames = (certprofileNames == null) ? 0 : certprofileNames.length;
+    if (!kup && (numCertprofileNames != n)) {
+      CertResponse[] certResps = new CertResponse[n];
+      for (int i = 0; i < n; i++) {
+        ASN1Integer certReqId = certReqMsgs[i].getCertReq().getCertReqId();
+        String msg = "expected " + n + ", but " + numCertprofileNames
+                + " CertProfile names are specified";
+        certResps[i] = new CertResponse(certReqId, generateRejectionStatus(badCertTemplate, msg));
+      }
+
+      event.setStatus(AuditStatus.FAILED);
+      return new CertRepMessage(null, certResps);
+    }
+
+    List<CertTemplateData> certTemplateDatas = new ArrayList<>(n);
 
     // pre-process requests
     for (int i = 0; i < n; i++) {
@@ -134,33 +165,23 @@ public class CmpResponder extends BaseCmpResponder {
       CertificateRequestMessage req = new CertificateRequestMessage(reqMsg);
       CertTemplate certTemp = req.getCertTemplate();
 
-      CmpUtf8Pairs keyvalues = CmpUtil.extract(reqMsg.getRegInfo());
-
       SubjectPublicKeyInfo publicKey = certTemp.getPublicKey();
       X500Name subject = certTemp.getSubject();
       Extensions extensions = certTemp.getExtensions();
 
-      String certprofileName = (keyvalues == null)
-          ? null : keyvalues.value(CmpUtf8Pairs.KEY_CERTPROFILE);
-      if (certprofileName == null) {
-        certprofileName = dfltCertprofileName;
+      // till version 5.3.13, UTF8Pairs is used to specify the CertProfile
+      CmpUtf8Pairs utf8Pairs = CmpUtil.extractUtf8Pairs(reqMsg.getRegInfo());
+      String certprofileName = null;
+      if (utf8Pairs != null) {
+        certprofileName = utf8Pairs.value(CmpUtf8Pairs.KEY_NOTAFTER);
       }
 
-      if (certprofileName != null) {
-        certprofileName = certprofileName.toLowerCase();
-      }
-
-      String tmpStr = (keyvalues == null) ? null
-          : keyvalues.value(CmpUtf8Pairs.KEY_CA_GENERATE_KEYPAIR);
-      boolean caGenerateKeypair;
-      if (dfltCaGenKeypair == null) {
-        caGenerateKeypair = "true".equalsIgnoreCase(tmpStr);
-      } else {
-        caGenerateKeypair = (tmpStr == null) ? dfltCaGenKeypair : "true".equalsIgnoreCase(tmpStr);
+      if (certprofileName == null && certprofileNames != null) {
+        certprofileName = certprofileNames[i];
       }
 
       if (kup) {
-        // Till BC v1.60, the regCtl-oldCertID will be ignored by calling
+        // The regCtl-oldCertID will be ignored by calling
         // req.getControl(CMPObjectIdentifiers.regCtrl_oldCertID);
         Controls controls = reqMsg.getCertReq().getControls();
         AttributeTypeAndValue oldCertIdAtv = null;
@@ -222,18 +243,9 @@ public class CmpResponder extends BaseCmpResponder {
         if (certprofileName == null) {
           certprofileName = oldCert.getCertprofile();
         }
-        if (certprofileName == null) {
-          LOG.warn("no certprofile is specified");
-          addErrCertResp(resps, certReqId, badCertTemplate, "no certificate profile");
-          continue;
-        }
 
         if (subject == null) {
           subject = oldCert.getCert().getCert().getSubject();
-        }
-
-        if (publicKey == null && !caGenerateKeypair) {
-          publicKey = oldCert.getCert().getCert().getSubjectPublicKeyInfo();
         }
 
         // extensions
@@ -257,12 +269,6 @@ public class CmpResponder extends BaseCmpResponder {
         }
 
         extensions = new Extensions(extns.values().toArray(new Extension[0]));
-      } else {
-        if (certprofileName == null) {
-          LOG.warn("no certprofile is specified");
-          addErrCertResp(resps, certReqId, badCertTemplate, "no certificate profile");
-          continue;
-        }
       }
 
       if (!requestor.isCertprofilePermitted(certprofileName)) {
@@ -282,7 +288,7 @@ public class CmpResponder extends BaseCmpResponder {
           addErrCertResp(resps, certReqId, badPOP, "invalid POP");
           continue;
         }
-      } else if (caGenerateKeypair) {
+      } else {
         if (allowKeyGen) {
           checkPermission(requestor, PermissionConstants.GEN_KEYPAIR);
         } else {
@@ -291,11 +297,9 @@ public class CmpResponder extends BaseCmpResponder {
           addErrCertResp(resps, certReqId, badCertTemplate, "no public key");
           continue;
         }
-      } else {
-        LOG.warn("no public key is specified {}", certReqId.getValue());
-        addErrCertResp(resps, certReqId, badCertTemplate, "no public key");
-        continue;
       }
+
+      boolean caGenerateKeypair = publicKey == null;
 
       OptionalValidity validity = certTemp.getValidity();
 
@@ -426,13 +430,25 @@ public class CmpResponder extends BaseCmpResponder {
         X500Name subject = certTemp.getSubject();
         SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
 
-        CmpUtf8Pairs keyvalues = CmpUtil.extract(reqHeader.getGeneralInfo());
+        InfoTypeAndValue[] generalInfo = reqHeader.getGeneralInfo();
+        CmpUtf8Pairs keyvalues = CmpUtil.extractUtf8Pairs(generalInfo);
+
+        // CertProfile name
+        String certprofileName = null;
+        String[] list = CmpUtil.extractCertProfile(generalInfo);
+        if (list != null && list.length > 0) {
+          certprofileName = list[0];
+        } else {
+          if (keyvalues != null) {
+            certprofileName = keyvalues.value(KEY_CERTPROFILE);
+          }
+        }
+
+        // NotBefore and NotAfter
         Date notBefore = null;
         Date notAfter = null;
-        String certprofileName = null;
-        if (keyvalues != null) {
-          certprofileName = keyvalues.value(CmpUtf8Pairs.KEY_CERTPROFILE);
 
+        if (keyvalues != null) {
           String str = keyvalues.value(CmpUtf8Pairs.KEY_NOTBEFORE);
           if (str != null) {
             notBefore = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
@@ -874,10 +890,14 @@ public class CmpResponder extends BaseCmpResponder {
   } // method revokePendingCertificates
 
   @Override
-  protected PKIBody cmpEnrollCert(String dfltCertprofileName, Boolean dfltCaGenKeypair,
+  protected PKIBody cmpEnrollCert(String dfltCertprofileName,
       PKIMessage request, PKIHeaderBuilder respHeader, CmpControl cmpControl, PKIHeader reqHeader,
       PKIBody reqBody, CmpRequestorInfo requestor, ASN1OctetString tid, String msgId,
       AuditEvent event) throws InsufficientPermissionException {
+    if (dfltCertprofileName != null) {
+      dfltCertprofileName = dfltCertprofileName.toLowerCase(Locale.ROOT);
+    }
+
     long confirmWaitTime = cmpControl.getConfirmWaitTime();
     if (confirmWaitTime < 0) {
       confirmWaitTime *= -1;
@@ -890,19 +910,19 @@ public class CmpResponder extends BaseCmpResponder {
     if (type == PKIBody.TYPE_INIT_REQ) {
       checkPermission(requestor, PermissionConstants.ENROLL_CERT);
       CertReqMessages cr = CertReqMessages.getInstance(reqBody.getContent());
-      CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName, dfltCaGenKeypair,
+      CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName,
           request, requestor, tid, cr, true, cmpControl, msgId, event);
       return new PKIBody(PKIBody.TYPE_INIT_REP, repMessage);
     } else if (type == PKIBody.TYPE_CERT_REQ) {
       checkPermission(requestor, PermissionConstants.ENROLL_CERT);
       CertReqMessages cr = CertReqMessages.getInstance(reqBody.getContent());
-      CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName, dfltCaGenKeypair,
+      CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName,
           request, requestor, tid, cr, true, cmpControl, msgId, event);
       respBody = new PKIBody(PKIBody.TYPE_CERT_REP, repMessage);
     } else if (type == PKIBody.TYPE_KEY_UPDATE_REQ) {
       checkPermission(requestor, PermissionConstants.KEY_UPDATE);
       CertReqMessages kur = CertReqMessages.getInstance(reqBody.getContent());
-      CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName, dfltCaGenKeypair,
+      CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName,
           request, requestor, tid, kur, true, cmpControl, msgId, event);
       return new PKIBody(PKIBody.TYPE_KEY_UPDATE_REP, repMessage);
     } else if (type == PKIBody.TYPE_P10_CERT_REQ) {
@@ -912,7 +932,7 @@ public class CmpResponder extends BaseCmpResponder {
     } else if (type == PKIBody.TYPE_CROSS_CERT_REQ) {
       checkPermission(requestor, PermissionConstants.ENROLL_CROSS);
       CertReqMessages cr = CertReqMessages.getInstance(reqBody.getContent());
-      CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName, Boolean.FALSE,
+      CertRepMessage repMessage = processCertReqMessages(dfltCertprofileName,
           request, requestor, tid, cr, false, cmpControl, msgId, event);
       return new PKIBody(PKIBody.TYPE_CROSS_CERT_REP, repMessage);
     } else {

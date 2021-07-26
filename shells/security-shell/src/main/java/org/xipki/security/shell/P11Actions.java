@@ -216,9 +216,9 @@ public class P11Actions {
     private String moduleName = "default";
 
     @Override
-    protected ConcurrentContentSigner getSigner(SignatureAlgoControl signatureAlgoControl)
+    protected ConcurrentContentSigner getSigner()
         throws Exception {
-      Args.notNull(signatureAlgoControl, "signatureAlgoControl");
+      SignatureAlgoControl signatureAlgoControl = getSignatureAlgoControl();
 
       byte[] idBytes = null;
       if (id != null) {
@@ -790,8 +790,8 @@ public class P11Actions {
       P11Slot slot = module.getSlot(slotId);
       println("Details of slot");
       slot.showDetails(System.out, verbose);
-      System.out.println();
       System.out.flush();
+      System.out.println();
       return null;
     }
 

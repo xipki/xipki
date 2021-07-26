@@ -36,6 +36,7 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.*;
 import org.xipki.security.util.GMUtil;
+import org.xipki.security.util.PKCS1Util;
 import org.xipki.security.util.SignerUtil;
 import org.xipki.util.concurrent.ConcurrentBag;
 import org.xipki.util.concurrent.ConcurrentBagEntry;
@@ -313,7 +314,7 @@ public class EmulatorP11Identity extends P11Identity {
         || mechanism == PKCS11Constants.CKM_ECDSA_SHA3_512) {
       return dsaAndEcdsaSign(content, hashAlgo);
     } else if (mechanism == PKCS11Constants.CKM_VENDOR_SM2_SM3) {
-      return sm2Sign(parameters, content, hashAlgo);
+      return sm2Sign(parameters, content);
     } else if (mechanism == PKCS11Constants.CKM_DSA_SHA1
         || mechanism == PKCS11Constants.CKM_DSA_SHA224
         || mechanism == PKCS11Constants.CKM_DSA_SHA256
@@ -415,7 +416,7 @@ public class EmulatorP11Identity extends P11Identity {
     byte[] hashValue = (hashAlgo == null) ? contentToSign : hashAlgo.hash(contentToSign);
     byte[] encodedHashValue;
     try {
-      encodedHashValue = SignerUtil.EMSA_PSS_ENCODE(contentHash, hashValue, mgfHash,
+      encodedHashValue = PKCS1Util.EMSA_PSS_ENCODE(contentHash, hashValue, mgfHash,
           (int) pssParam.getSaltLength(), getSignatureKeyBitLength(), random);
     } catch (XiSecurityException ex) {
       throw new P11TokenException("XiSecurityException: " + ex.getMessage(), ex);
@@ -429,10 +430,10 @@ public class EmulatorP11Identity extends P11Identity {
     byte[] paddedHash;
     try {
       if (hashAlgo == null) {
-        paddedHash = SignerUtil.EMSA_PKCS1_v1_5_encoding(contentToSign, modulusBitLen);
+        paddedHash = PKCS1Util.EMSA_PKCS1_v1_5_encoding(contentToSign, modulusBitLen);
       } else {
         byte[] hash = hashAlgo.hash(contentToSign);
-        paddedHash = SignerUtil.EMSA_PKCS1_v1_5_encoding(hash, modulusBitLen, hashAlgo);
+        paddedHash = PKCS1Util.EMSA_PKCS1_v1_5_encoding(hash, modulusBitLen, hashAlgo);
       }
     } catch (XiSecurityException ex) {
       throw new P11TokenException("XiSecurityException: " + ex.getMessage(), ex);
@@ -548,7 +549,7 @@ public class EmulatorP11Identity extends P11Identity {
     }
   } // method sm2SignHash
 
-  private byte[] sm2Sign(P11Params params, byte[] dataToSign, HashAlgo hash)
+  private byte[] sm2Sign(P11Params params, byte[] dataToSign)
       throws P11TokenException {
     if (params == null) {
       throw new P11TokenException("userId may not be null");
@@ -585,9 +586,5 @@ public class EmulatorP11Identity extends P11Identity {
       sm2Signers.requite(sig0);
     }
   } // method sm2Sign
-
-  Key getSigningKey() {
-    return signingKey;
-  }
 
 }

@@ -21,6 +21,7 @@ import org.xipki.security.pkcs11.P11Module;
 import org.xipki.security.pkcs11.P11ModuleConf;
 import org.xipki.security.pkcs11.P11ModuleFactory;
 import org.xipki.security.pkcs11.P11TokenException;
+import org.xipki.util.XipkiBaseDir;
 
 /**
  * {@link P11ModuleFactory} to create {@link P11Module} of type "proxy".
@@ -31,6 +32,7 @@ import org.xipki.security.pkcs11.P11TokenException;
 public class ProxyP11ModuleFactory implements P11ModuleFactory {
 
   public ProxyP11ModuleFactory() {
+    XipkiBaseDir.init();
   }
 
   @Override

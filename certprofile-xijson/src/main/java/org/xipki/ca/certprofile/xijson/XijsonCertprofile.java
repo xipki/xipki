@@ -84,6 +84,8 @@ public class XijsonCertprofile extends BaseCertprofile {
 
   private Validity validity;
 
+  private NotAfterMode notAfterMode;
+
   private X509CertVersion version;
 
   private XijsonExtensions extensions;
@@ -101,6 +103,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     notBeforeOption = null;
     subjectControl = null;
     validity = null;
+    notAfterMode = null;
     version = null;
     extensions = null;
     extraReset();
@@ -172,6 +175,7 @@ public class XijsonCertprofile extends BaseCertprofile {
     this.maxSize = conf.getMaxSize();
 
     this.validity = Validity.getInstance(conf.getValidity());
+    this.notAfterMode = conf.getNotAfterMode();
     this.certLevel = conf.getCertLevel();
     if (this.certLevel == null) {
       throw new CertprofileException("invalid CertLevel");
@@ -336,6 +340,11 @@ public class XijsonCertprofile extends BaseCertprofile {
   @Override
   public Validity getValidity() {
     return validity;
+  }
+
+  @Override
+  public NotAfterMode getNotAfterMode() {
+    return notAfterMode != null ? notAfterMode : super.getNotAfterMode();
   }
 
   @Override

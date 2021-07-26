@@ -12,7 +12,6 @@
   <packaging>pom</packaging>
   <name>XiPKI :: assembly :: ${project.artifactId}</name>
   <properties>
-    <jdbc.postgresql.version>42.2.14</jdbc.postgresql.version>
     <app.name>QA</app.name>
     <shared.dir>${project.basedir}/../shared</shared.dir>
     <patchkaraf.repos>mvn:org.xipki.feature/qa/${project.version}/xml/features</patchkaraf.repos>
@@ -109,18 +108,17 @@
             </goals>
             <configuration>
               <stripVersion>false</stripVersion>
+              <outputDirectory>${project.build.directory}/classes/lib/ext</outputDirectory>
               <artifactItems>
                 <artifactItem>
                   <groupId>org.mariadb.jdbc</groupId>
                   <artifactId>mariadb-java-client</artifactId>
                   <version>${jdbc.mariadb.version}</version>
-                  <outputDirectory>${project.build.directory}/classes/lib/ext</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.postgresql</groupId>
                   <artifactId>postgresql</artifactId>
                   <version>${jdbc.postgresql.version}</version>
-                  <outputDirectory>${project.build.directory}/classes/lib/ext</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>

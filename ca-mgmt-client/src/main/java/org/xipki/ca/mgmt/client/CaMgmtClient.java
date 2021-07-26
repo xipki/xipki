@@ -593,12 +593,12 @@ public class CaMgmtClient implements CaManager {
 
   @Override
   public X509Cert generateRootCa(CaEntry caEntry, String certprofileName,
-      byte[] encodedCsr, String serialNumber)
+      String subject, String serialNumber)
           throws CaMgmtException {
     MgmtRequest.GenerateRootCa req = new MgmtRequest.GenerateRootCa();
     req.setCaEntry(new CaEntryWrapper(caEntry));
     req.setCertprofileName(certprofileName);
-    req.setEncodedCsr(encodedCsr);
+    req.setSubject(subject);
     req.setSerialNumber(serialNumber);
 
     byte[] respBytes = transmit(MgmtAction.generateRootCa, req);
@@ -786,6 +786,15 @@ public class CaMgmtClient implements CaManager {
     MgmtResponse.StringSet resp = parse(respBytes, MgmtResponse.StringSet.class);
     return resp.getResult();
   } // method getSupportedPublisherTypes
+
+  @Override
+  public String getTokenInfoP11(String module, Integer slotIndex, boolean verbose)
+          throws CaMgmtException {
+    MgmtRequest.TokenInfoP11 req = new MgmtRequest.TokenInfoP11(module, slotIndex, verbose);
+    byte[] respBytes = transmit(MgmtAction.tokenInfoP11, req);
+    MgmtResponse.StringResponse resp = parse(respBytes, MgmtResponse.StringResponse.class);
+    return resp.getResult();
+  }
 
   @Override
   public void refreshTokenForSignerType(String signerType)

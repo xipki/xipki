@@ -73,51 +73,7 @@ util-*.jar
 ```
 
 - Start tomcat
-  <span style="color:red">**In the tomcat root folder ${CATALINA_HOME}** (Otherwise the file path
-  cannot be interpreted correctly.)</span>
 
 ```sh
   bin/start.sh
-```
-
-  Note that the start script of tomcat does not set the working directory to the tomcat root
-  directory, you have to start tomcat as above so that the XiPKI can retrieve files correctly.
-
-Deployment in Jetty 9
-----
-1. Copy the sub-folder `webapps` to the jetty root folder, and the files in sub-folder
-  `${JETTY_BASE}lib` to the sub-folder `${JETTY_BASE}lib/ext` of jetty.
-   The folder `xipki` can be moved to other location, in this case a new property `XIPKI_BASE`
-   pointing to point to the new position must be added to the file `start.ini`.
-2. Download the `bcprov-jdk15on-<version>.jar` and `bcpkix-jdk15on-<version>.jar` from
-  [BouncyCastle Latest Release](https://www.bouncycastle.org/latest_releases.html) to
-  the folder `${JETTY_HOME}/lib/ext`. The cryptographic libraries are not included since we need the latest release.
-3. Configure the TLS listener by adding the following block to the file `start.ini`. Please configure
-  XIPKI_BASE correctly.
-
-```sh
---module=https
-XIPKI_BASE=<path/to/folder/xipki>
-jetty.sslContext.keyStorePath=${XIPKI_BASE}/keycerts/tlskeys/server/tls-server.p12
-jetty.sslContext.keyStorePassword=1234
-jetty.sslContext.keyStoreType=PKCS12
-jetty.sslContext.keyManagerPassword=1234
-jetty.sslContext.trustStorePath=${XIPKI_BASE}/keycerts/tlskeys/ca/tls-ca-cert.p12
-jetty.sslContext.trustStorePassword=1234
-jetty.sslContext.trustStoreType=PKCS12
-jetty.sslContext.needClientAuth=false
-jetty.sslContext.wantClientAuth=true
-```
-
-- For jetty 9.4.15 - 9.4.18
-  There is a bug in these versions, you need to remove the `default="HTTPS"` block from the 
-  line `EndpointIdentificationAlgorithm` in the file `etc/jetty-ssl-context.xml`, namely from
-
-```
- <Set name="EndpointIdentificationAlgorithm"><Property name="jetty.sslContext.endpointIdentificationAlgorithm" default="HTTPS"/></Set>
-```
-to
-
-```
- <Set name="EndpointIdentificationAlgorithm"><Property name="jetty.sslContext.endpointIdentificationAlgorithm"/></Set>
 ```

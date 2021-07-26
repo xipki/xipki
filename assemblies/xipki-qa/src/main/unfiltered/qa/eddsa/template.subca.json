@@ -62,7 +62,8 @@
 			"ed25519",
 			"ed448",
 			"x25519",
-			"x448"
+			"x448",
+			"ocsp"
 		],
 		"publishers":[
 			"ocsp-publisher"

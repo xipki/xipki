@@ -166,10 +166,10 @@ public class EmulatorP11Module extends P11Module {
       char[] firstPwd = pwd.get(0);
       KeyCryptor privateKeyCryptor = new KeyCryptor(firstPwd);
 
-      int maxSessions = 20;
       P11Slot slot = new EmulatorP11Slot(moduleConf.getName(), slotDir, slotId,
           moduleConf.isReadOnly(), firstPwd, privateKeyCryptor, moduleConf.getP11MechanismFilter(),
-          moduleConf.getP11NewObjectConf(), maxSessions);
+          moduleConf.getP11NewObjectConf(), moduleConf.getNumSessions(),
+          moduleConf.getSecretKeyTypes(), moduleConf.getKeyPairTypes());
       slots.add(slot);
     }
 

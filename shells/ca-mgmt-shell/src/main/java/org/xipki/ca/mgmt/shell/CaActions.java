@@ -466,9 +466,8 @@ public class CaActions {
   @Service
   public static class GenRootca extends CaAddOrGenAction {
 
-    @Option(name = "--csr", required = true, description = "CSR of the Root CA")
-    @Completion(FileCompleter.class)
-    private String csrFile;
+    @Option(name = "--subject", required = true, description = "subject of the Root CA")
+    private String subject;
 
     @Option(name = "--profile", required = true, description = "profile of the Root CA")
     private String rootcaProfile;
@@ -489,8 +488,7 @@ public class CaActions {
     protected Object execute0()
         throws Exception {
       CaEntry caEntry = getCaEntry();
-      byte[] csr = IoUtil.read(csrFile);
-      X509Cert rootcaCert = caManager.generateRootCa(caEntry, rootcaProfile, csr, serialS);
+      X509Cert rootcaCert = caManager.generateRootCa(caEntry, rootcaProfile, subject, serialS);
       if (rootcaCertOutFile != null) {
         saveVerbose("saved root certificate to file", rootcaCertOutFile,
             encodeCert(rootcaCert.getEncoded(), outform));

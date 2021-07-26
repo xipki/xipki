@@ -22,10 +22,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.ssl.SslContext;
-import org.bouncycastle.asn1.ASN1GeneralizedTime;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DERUTF8String;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.cmp.*;
 import org.bouncycastle.asn1.crmf.*;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -37,7 +34,7 @@ import org.xipki.qa.BenchmarkHttpClient;
 import org.xipki.qa.BenchmarkHttpClient.HttpClientException;
 import org.xipki.qa.BenchmarkHttpClient.ResponseHandler;
 import org.xipki.qa.BenchmarkHttpClient.SslConf;
-import org.xipki.security.cmp.CmpUtf8Pairs;
+import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.BenchmarkExecutor;
 import org.xipki.util.InvalidConfException;
@@ -309,18 +306,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
 
       CertTemplate certTemplate = certTempBuilder.build();
       CertRequest certRequest = new CertRequest(new ASN1Integer(i + 1), certTemplate, null);
-
-      String utf8pairs = CmpUtf8Pairs.KEY_CERTPROFILE + "?" + benchmarkEntry.getCertprofile() + "%";
-      if (caGenKeyPair) {
-        utf8pairs += CmpUtf8Pairs.KEY_CA_GENERATE_KEYPAIR + "?true%";
-      }
-
-      AttributeTypeAndValue certprofileInfo =
-          new AttributeTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
-              new DERUTF8String(utf8pairs));
-      AttributeTypeAndValue[] atvs = new AttributeTypeAndValue[]{certprofileInfo};
-
-      certReqMsgs[i] = new CertReqMsg(certRequest, RA_VERIFIED, atvs);
+      certReqMsgs[i] = new CertReqMsg(certRequest, RA_VERIFIED, null);
     }
 
     PKIHeaderBuilder builder = new PKIHeaderBuilder(
@@ -328,7 +314,14 @@ public class CaEnrollBenchmark extends BenchmarkExecutor implements ResponseHand
     builder.setMessageTime(new ASN1GeneralizedTime(new Date()));
     builder.setTransactionID(randomBytes(8));
     builder.setSenderNonce(randomBytes(8));
-    builder.setGeneralInfo(IMPLICIT_CONFIRM);
+
+    ASN1EncodableVector vec = new ASN1EncodableVector(num);
+    for (int i = 0; i < num; i++) {
+      vec.add(new DERUTF8String(benchmarkEntry.getCertprofile()));
+    }
+    InfoTypeAndValue certprofileInfo =
+            new InfoTypeAndValue(ObjectIdentifiers.CMP.id_it_certProfile, new DERSequence(vec));
+    builder.setGeneralInfo(new InfoTypeAndValue[]{IMPLICIT_CONFIRM, certprofileInfo});
 
     PKIBody body = new PKIBody(PKIBody.TYPE_CERT_REQ, new CertReqMessages(certReqMsgs));
     return new PKIMessage(builder.build(), body);

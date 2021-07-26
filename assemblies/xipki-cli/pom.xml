@@ -85,12 +85,17 @@
             </goals>
             <configuration>
               <stripVersion>false</stripVersion>
+              <outputDirectory>${project.build.directory}/classes/lib/ext</outputDirectory>
               <artifactItems>
                 <artifactItem>
                   <groupId>org.mariadb.jdbc</groupId>
                   <artifactId>mariadb-java-client</artifactId>
                   <version>${jdbc.mariadb.version}</version>
-                  <outputDirectory>${project.build.directory}/classes/lib/ext</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.postgresql</groupId>
+                  <artifactId>postgresql</artifactId>
+                  <version>${jdbc.postgresql.version}</version>
                 </artifactItem>
               </artifactItems>
             </configuration>

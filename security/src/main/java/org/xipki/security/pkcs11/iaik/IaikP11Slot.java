@@ -28,6 +28,7 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x9.ECNamedCurveTable;
 import org.bouncycastle.asn1.x9.X9ECParameters;
+import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.X509Cert;
@@ -35,6 +36,7 @@ import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.*;
 import org.xipki.security.pkcs11.P11ModuleConf.P11MechanismFilter;
 import org.xipki.security.pkcs11.P11ModuleConf.P11NewObjectConf;
+import org.xipki.security.util.SignerUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.LogUtil;
 import org.xipki.util.concurrent.ConcurrentBag;
@@ -44,6 +46,8 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -86,11 +90,14 @@ class IaikP11Slot extends P11Slot {
 
   private final ConcurrentBag<ConcurrentBagEntry<Session>> sessions = new ConcurrentBag<>();
 
-  IaikP11Slot(String moduleName, P11SlotIdentifier slotId, Slot slot, boolean readOnly,
-      long userType, List<char[]> password, int maxMessageSize, P11MechanismFilter mechanismFilter,
-      P11NewObjectConf newObjectConf)
+  IaikP11Slot(
+          String moduleName, P11SlotIdentifier slotId, Slot slot, boolean readOnly,
+          long userType, List<char[]> password, int maxMessageSize,
+          P11MechanismFilter mechanismFilter,
+          P11NewObjectConf newObjectConf, Integer numSessions,
+          List<Long> secretKeyTypes, List<Long> keyPairTypes)
           throws P11TokenException {
-    super(moduleName, slotId, readOnly, mechanismFilter);
+    super(moduleName, slotId, readOnly, mechanismFilter, numSessions, secretKeyTypes, keyPairTypes);
 
     this.newObjectConf = notNull(newObjectConf, "newObjectConf");
     this.slot = notNull(slot, "slot");
@@ -138,6 +145,11 @@ class IaikP11Slot extends P11Slot {
         // 2 sessions as buffer, they may be used elsewhere.
         maxSessionCount2 = (maxSessionCount2 < 3) ? 1 : maxSessionCount2 - 2;
       }
+
+      if (numSessions != null) {
+        maxSessionCount2 = Math.min(numSessions, maxSessionCount2);
+      }
+
       this.maxSessionCount = (int) maxSessionCount2;
       LOG.info("maxSessionCount: {}", this.maxSessionCount);
 
@@ -177,7 +189,20 @@ class IaikP11Slot extends P11Slot {
     try {
       Session session = bagEntry.value();
       // secret keys
-      List<Storage> secretKeys = getObjects(session, new SecretKey());
+      List<Storage> secretKeys;
+      if (secretKeyTypes == null) {
+        SecretKey template = new SecretKey();
+        secretKeys = getObjects(session, template);
+      } else if (secretKeyTypes.isEmpty()) {
+        secretKeys = Collections.emptyList();
+      } else {
+        secretKeys = new LinkedList<>();
+        for (Long keyType : secretKeyTypes) {
+          SecretKey template = new ValuedSecretKey(keyType);
+          secretKeys.addAll(getObjects(session, template));
+        }
+      }
+
       LOG.info("found {} secret keys", secretKeys.size());
       for (Storage m : secretKeys) {
         SecretKey secKey = (SecretKey) m;
@@ -200,7 +225,38 @@ class IaikP11Slot extends P11Slot {
         }
       }
 
-      List<Storage> privKeys = getObjects(session, new PrivateKey());
+      List<Storage> privKeys;
+      if (keyPairTypes == null) {
+        PrivateKey template = new PrivateKey();
+        privKeys = getObjects(session, template);
+      } else if (keyPairTypes.isEmpty()) {
+        privKeys = Collections.emptyList();
+      } else {
+        privKeys = new LinkedList<>();
+        for (long keyType : keyPairTypes) {
+          PrivateKey template;
+
+          if (keyType == KeyType.RSA) {
+            template = new RSAPrivateKey();
+          } else if (keyType == KeyType.DSA) {
+            template = new DSAPrivateKey();
+          } else if (keyType == KeyType.EC) {
+            template = new ECPrivateKey();
+          } else if (keyType == KeyType.VENDOR_SM2) {
+            template = new ECPrivateKey(KeyType.VENDOR_SM2);
+          } else if (keyType == KeyType.EC_EDWARDS) {
+            template = new ECPrivateKey(KeyType.EC_EDWARDS);
+          } else if (keyType == KeyType.EC_MONTGOMERY) {
+            template = new ECPrivateKey(KeyType.EC_MONTGOMERY);
+          } else {
+            LOG.error("unknown KeyPair keyType " + keyType);
+            continue;
+          }
+
+          privKeys.addAll(getObjects(session, template));
+        }
+      }
+
       LOG.info("found {} private keys", privKeys.size());
       for (Storage m : privKeys) {
         PrivateKey privKey = (PrivateKey) m;
@@ -375,9 +431,6 @@ class IaikP11Slot extends P11Slot {
       expectedSignatureLen = 48;
     } else if (mech == PKCS11Constants.CKM_SHA512_HMAC || mech == PKCS11Constants.CKM_SHA3_512) {
       expectedSignatureLen = 64;
-    } else if (mech == PKCS11Constants.CKM_VENDOR_SM2
-        || mech == PKCS11Constants.CKM_VENDOR_SM2_SM3) {
-      expectedSignatureLen = 32;
     } else {
       expectedSignatureLen = identity.getExpectedSignatureLen();
     }
@@ -410,21 +463,49 @@ class IaikP11Slot extends P11Slot {
   private byte[] sign0(Session session, int expectedSignatureLen, Mechanism mechanism,
       byte[] content, Key signingKey)
           throws TokenException {
+    long keytype = signingKey.getKeyType().getLongValue();
+    boolean weierstrausKey = false;
+    if (KeyType.EC == keytype || KeyType.VENDOR_SM2 == keytype) {
+      weierstrausKey = true;
+    }
+
     int len = content.length;
 
+    byte[] sigvalue;
     if (len <= maxMessageSize) {
-      return singleSign(session, mechanism, content, signingKey);
+      sigvalue = singleSign(session, mechanism, content, signingKey);
+    } else {
+      LOG.debug("sign (init, update, then finish)");
+      session.signInit(mechanism, signingKey);
+
+      for (int i = 0; i < len; i += maxMessageSize) {
+        int blockLen = Math.min(maxMessageSize, len - i);
+        session.signUpdate(content, i, blockLen);
+      }
+
+      // some HSM vendor return not the EC plain signature (r || s), but the X.962 encoded
+      // so we need to increase the expectedSignatureLen
+      int maxSignatureLen = weierstrausKey ? expectedSignatureLen + 20 : expectedSignatureLen;
+      sigvalue = session.signFinal(maxSignatureLen);
     }
 
-    LOG.debug("sign (init, update, then finish)");
-    session.signInit(mechanism, signingKey);
-
-    for (int i = 0; i < len; i += maxMessageSize) {
-      int blockLen = Math.min(maxMessageSize, len - i);
-      session.signUpdate(content, i, blockLen);
+    if (sigvalue.length > expectedSignatureLen) {
+      if (sigvalue[0] == 0x30) {
+        try {
+          sigvalue = SignerUtil.dsaSigX962ToPlain(sigvalue, expectedSignatureLen * 4);
+        } catch (XiSecurityException e) {
+          LOG.error(String.format("ERROR: sigvalue (%d): %s", sigvalue.length,
+                  Hex.toHexString(sigvalue)), e);
+          throw new TokenException(e);
+        } catch (RuntimeException e) {
+          LOG.error(String.format("ERROR: sigvalue (%d): %s", sigvalue.length,
+                  Hex.toHexString(sigvalue)), e);
+          throw e;
+        }
+      }
     }
 
-    return session.signFinal(expectedSignatureLen);
+    return sigvalue;
   } // method sign0
 
   private byte[] singleSign(Session session, Mechanism mechanism, byte[] content,

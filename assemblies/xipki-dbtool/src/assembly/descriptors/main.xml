@@ -24,6 +24,12 @@
   </dependencySets>
   <fileSets>
     <fileSet>
+      <directory>${shared.dir}/license</directory>
+      <outputDirectory>license</outputDirectory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
       <directory>src/assembly/unfiltered</directory>
       <includes>
         <include>bin/*.sh</include>

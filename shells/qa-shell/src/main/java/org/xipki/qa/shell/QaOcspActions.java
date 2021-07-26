@@ -480,9 +480,8 @@ public class QaOcspActions {
     private Integer maxRequests = 0;
 
     @Option(name = "--queue-size",
-        description = "Number of maximal HTTP requests in the sending queue\n"
-            + "0 for implemention default")
-    private Integer queueSize = 0;
+        description = "Number of maximal HTTP requests in the sending queue")
+    private Integer queueSize = 50;
 
     @Override
     protected Object execute0()

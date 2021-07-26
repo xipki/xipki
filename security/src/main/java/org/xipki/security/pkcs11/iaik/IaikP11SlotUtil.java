@@ -29,6 +29,9 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
+import org.bouncycastle.asn1.sec.SECObjectIdentifiers;
+import org.bouncycastle.asn1.teletrust.TeleTrusTObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
@@ -43,6 +46,7 @@ import org.xipki.security.pkcs11.P11Slot.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11TokenException;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Hex;
 import org.xipki.util.LogUtil;
 
 import java.math.BigInteger;
@@ -268,20 +272,63 @@ class IaikP11SlotUtil {
       ECPublicKey ecP11Key = (ECPublicKey) p11Key;
       long keyType = ecP11Key.getKeyType().getLongValue();
       byte[] ecParameters = value(ecP11Key.getEcdsaParams());
-      byte[] encodedPoint = DEROctetString.getInstance(value(ecP11Key.getEcPoint())).getOctets();
+      byte[] ecPoint = value(ecP11Key.getEcPoint());
+
+      byte[] encodedPoint = null;
+      if (keyType == KeyType.VENDOR_SM2) {
+        if (ecParameters == null) {
+          // some HSM does not return ECParameters
+          // GMObjectIdentifiers.sm2p256v1.getEncoded()
+          ecParameters = Hex.decode("06082a811ccf5501822d");
+        }
+      }
+
+      ASN1ObjectIdentifier curveOid = ASN1ObjectIdentifier.getInstance(ecParameters);
+
+      // some HSM does not return the standard conform ECPoint
+      if (keyType == KeyType.VENDOR_SM2
+        || keyType == KeyType.EC) {
+        int coordSize;
+        if (GMObjectIdentifiers.sm2p256v1.equals(curveOid)
+                || SECObjectIdentifiers.secp256r1.equals(curveOid)
+                || TeleTrusTObjectIdentifiers.brainpoolP256r1.equals(curveOid)) {
+          coordSize = 32;
+        } else if (SECObjectIdentifiers.secp384r1.equals(curveOid)
+                || TeleTrusTObjectIdentifiers.brainpoolP384r1.equals(curveOid)) {
+          coordSize = 48;
+        } else if (SECObjectIdentifiers.secp521r1.equals(curveOid)) {
+          coordSize = 66;
+        } else if (TeleTrusTObjectIdentifiers.brainpoolP512r1.equals(curveOid)) {
+          coordSize = 64;
+        } else {
+          throw new XiSecurityException("unknown curve " + curveOid.getId());
+        }
+
+        if (ecPoint.length == 2 * coordSize) {
+          // just return x_coord. || y_coord.
+          encodedPoint = new byte[1 + 2 * coordSize];
+          encodedPoint[0] = 4;
+          System.arraycopy(ecPoint, 0, encodedPoint, 1, ecPoint.length);
+        } else if (ecPoint.length == 1 + 2 * coordSize) {
+          encodedPoint = ecPoint;
+        }
+      }
+
+      if (encodedPoint == null) {
+        encodedPoint = DEROctetString.getInstance(ecPoint).getOctets();
+      }
 
       if (keyType == KeyType.EC_EDWARDS || keyType == KeyType.EC_MONTGOMERY) {
-        ASN1ObjectIdentifier algOid = ASN1ObjectIdentifier.getInstance(ecParameters);
         if (keyType == KeyType.EC_EDWARDS) {
-          if (!EdECConstants.isEdwardsCurve(algOid)) {
-            throw new XiSecurityException("unknown Edwards curve OID " + algOid);
+          if (!EdECConstants.isEdwardsCurve(curveOid)) {
+            throw new XiSecurityException("unknown Edwards curve OID " + curveOid);
           }
         } else {
-          if (!EdECConstants.isMontgomeryCurve(algOid)) {
-            throw new XiSecurityException("unknown Montgomery curve OID " + algOid);
+          if (!EdECConstants.isMontgomeryCurve(curveOid)) {
+            throw new XiSecurityException("unknown Montgomery curve OID " + curveOid);
           }
         }
-        SubjectPublicKeyInfo pkInfo = new SubjectPublicKeyInfo(new AlgorithmIdentifier(algOid),
+        SubjectPublicKeyInfo pkInfo = new SubjectPublicKeyInfo(new AlgorithmIdentifier(curveOid),
             encodedPoint);
         try {
           return KeyUtil.generatePublicKey(pkInfo);

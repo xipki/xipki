@@ -547,6 +547,10 @@ public abstract class Certprofile implements Closeable {
     return false;
   }
 
+  public NotAfterMode getNotAfterMode() {
+    return NotAfterMode.BY_CA;
+  }
+
   protected Certprofile() {
   }
 

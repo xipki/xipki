@@ -17,6 +17,8 @@
 
 package org.xipki.security.pkcs11;
 
+import iaik.pkcs.pkcs11.MapVendorCodeConverter;
+import iaik.pkcs.pkcs11.VendorCodeConverter;
 import iaik.pkcs.pkcs11.wrapper.Functions;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import org.slf4j.Logger;
@@ -301,6 +303,14 @@ public class P11ModuleConf {
 
   private final P11NewObjectConf newObjectConf;
 
+  private final Integer numSessions;
+
+  private final List<Long> secretKeyTypes;
+
+  private final List<Long> keyPairTypes;
+
+  private final VendorCodeConverter vendorCodeConverter;
+
   public P11ModuleConf(Pkcs11conf.Module moduleType, List<Pkcs11conf.MechanismSet> mechanismSets,
       PasswordResolver passwordResolver)
           throws InvalidConfException {
@@ -337,6 +347,36 @@ public class P11ModuleConf {
     this.type = moduleType.getType();
     if (maxMessageSize < 128) {
       throw new InvalidConfException("invalid maxMessageSize (< 128): " + maxMessageSize);
+    }
+
+    this.numSessions = moduleType.getNumSessions();
+
+    List<String> list = moduleType.getSecretKeyTypes();
+    if (list == null) {
+      this.secretKeyTypes = null;
+    } else {
+      List<Long> ll = new ArrayList<>(list.size());
+      for (String s : list) {
+        Long l = toKeyType(s);
+        if (l != null) {
+          ll.add(l);
+        }
+      }
+      this.secretKeyTypes = Collections.unmodifiableList(ll);
+    }
+
+    list = moduleType.getKeyPairTypes();
+    if (list == null) {
+      this.keyPairTypes = null;
+    } else {
+      List<Long> ll = new ArrayList<>(list.size());
+      for (String s : list) {
+        Long l = toKeyType(s);
+        if (l != null) {
+          ll.add(l);
+        }
+      }
+      this.keyPairTypes = Collections.unmodifiableList(ll);
     }
 
     // parse mechanismSets
@@ -451,6 +491,10 @@ public class P11ModuleConf {
 
     this.newObjectConf = (moduleType.getNewObjectConf() == null) ? new P11NewObjectConf()
         : new P11NewObjectConf(moduleType.getNewObjectConf());
+
+    Map<String, String> vendorCodes = moduleType.getVendorCodes();
+    this.vendorCodeConverter = (vendorCodes == null)
+            ? null : MapVendorCodeConverter.getInstance(vendorCodes);
   } // constructor
 
   public String getName() {
@@ -479,6 +523,22 @@ public class P11ModuleConf {
 
   public P11PasswordsRetriever getPasswordRetriever() {
     return passwordRetriever;
+  }
+
+  public Integer getNumSessions() {
+    return numSessions;
+  }
+
+  public List<Long> getSecretKeyTypes() {
+    return secretKeyTypes;
+  }
+
+  public List<Long> getKeyPairTypes() {
+    return keyPairTypes;
+  }
+
+  public VendorCodeConverter getVendorCodeConverter() {
+    return vendorCodeConverter;
   }
 
   public boolean isSlotIncluded(P11SlotIdentifier slotId) {
@@ -546,6 +606,50 @@ public class P11ModuleConf {
 
     return filters;
   } // method getSlotIdFilters
+
+  private static Long toKeyType(String str) {
+    Long mech = null;
+    if (str.startsWith("CKK_")) {
+      switch (str) {
+        case "CKK_DSA":
+          return PKCS11Constants.CKK_DSA;
+        case "CKK_RSA":
+          return PKCS11Constants.CKK_RSA;
+        case "CKK_EC":
+          return PKCS11Constants.CKK_EC;
+        case "CKK_EC_EDWARDS":
+          return PKCS11Constants.CKK_EC_EDWARDS;
+        case "CKK_EC_MONTGOMERY":
+          return PKCS11Constants.CKK_EC_MONTGOMERY;
+        case "CKK_VENDOR_SM2":
+          return PKCS11Constants.CKK_VENDOR_SM2;
+        case "CKK_AES":
+          return PKCS11Constants.CKK_AES;
+        case "CKK_GENERIC_SECRET":
+          return PKCS11Constants.CKK_GENERIC_SECRET;
+        default:
+          return null;
+      }
+    } else {
+      int radix = 10;
+      if (str.startsWith("0X")) {
+        radix = 16;
+        str = str.substring(2);
+      }
+
+      if (str.endsWith("UL")) {
+        str = str.substring(0, str.length() - 2);
+      } else if (str.endsWith("L")) {
+        str = str.substring(0, str.length() - 1);
+      }
+
+      try {
+        return Long.parseLong(str, radix);
+      } catch (NumberFormatException ex) {// CHECKSTYLE:
+        return null;
+      }
+    }
+  }
 
 }
 

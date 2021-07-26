@@ -131,9 +131,7 @@ class RefDigestReader implements Closeable {
             case XIPKI_OCSP_v4:
               hash = rs.getString("HASH");
               break;
-            case XIPKI_CA_v4:
-            case XIPKI_CA_v5:
-            case XIPKI_CA_v6:
+            default:
               if (certhashAlgo == HashAlgo.SHA1) {
                 hash = rs.getString("SHA1");
               } else {
@@ -141,8 +139,6 @@ class RefDigestReader implements Closeable {
                 hash = certhashAlgo.base64Hash(encodedCert);
               }
               break;
-            default:
-              throw new IllegalStateException("unknown dbType " + dbType);
           }
 
           BigInteger serial = new BigInteger(rs.getString("SN"), 16);
@@ -215,15 +211,11 @@ class RefDigestReader implements Closeable {
         coreSql = StringUtil.concat("ID,SN,REV,RR,RT,RIT,HASH FROM CERT WHERE IID=",
             Integer.toString(caId), " AND ID>=?");
         break;
-      case XIPKI_CA_v4:
-      case XIPKI_CA_v5:
-      case XIPKI_CA_v6:
+      default:
         coreSql = StringUtil.concat("ID,SN,REV,RR,RT,RIT,",
             (certhashAlgo == HashAlgo.SHA1 ? "SHA1" : "CERT"),
             " FROM CERT WHERE CA_ID=", Integer.toString(caId), " AND ID>=?");
         break;
-      default:
-        throw new IllegalStateException("unknown dbType " + dbType);
     }
 
     this.selectCertSql = datasource.buildSelectFirstSql(numPerSelect, "ID ASC", coreSql);
@@ -268,14 +260,10 @@ class RefDigestReader implements Closeable {
           tblCa = "ISSUER";
           colCaId = "IID";
           break;
-        case XIPKI_CA_v4:
-        case XIPKI_CA_v5:
-        case XIPKI_CA_v6:
+        default:
           tblCa = "CA";
           colCaId = "CA_ID";
           break;
-        default:
-          throw new IllegalStateException("unknown dbType " + dbType);
       }
 
       sql = "SELECT CERT FROM " + tblCa + " WHERE ID=" + caId;

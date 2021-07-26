@@ -75,6 +75,12 @@
 		"conf":{
 			"file":"${profiles.dir}/certprofile-subca.json"
 		}
+	},{
+		"name":"ocsp",
+		"type":"xijson",
+		"conf":{
+			"file":"${profiles.dir}/certprofile-ocsp.json"
+		}
 	}],
 	"cas":[{
 		"name":"rootca1",
@@ -106,9 +112,7 @@
 			"duplicateSubject":true,
 			"expirationPeriod":365,
 			"genSelfIssued":{
-				"csr":{
-					"file":"${output.dir}/rootca1.csr"
-				},
+				"subject":"REPLACEME-SUBJECT",
 				"profile":"rootca",
 				"serialNumber":"1"
 			},

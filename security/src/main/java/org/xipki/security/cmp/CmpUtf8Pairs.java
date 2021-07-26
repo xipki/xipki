@@ -31,13 +31,9 @@ import static org.xipki.util.Args.notNull;
 
 public class CmpUtf8Pairs {
 
-  public static final String KEY_CERTPROFILE = "certprofile";
-
   public static final String KEY_NOTBEFORE = "notbefore";
 
   public static final String KEY_NOTAFTER = "notafter";
-
-  public static final String KEY_CA_GENERATE_KEYPAIR = "ca-generate-keypair";
 
   private static final char NAME_TERM = '?';
 

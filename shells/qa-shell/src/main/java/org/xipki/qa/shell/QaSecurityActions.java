@@ -26,10 +26,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.qa.security.P11KeyGenSpeed;
-import org.xipki.qa.security.P11SignSpeed;
-import org.xipki.qa.security.P12KeyGenSpeed;
-import org.xipki.qa.security.P12SignSpeed;
+import org.xipki.qa.security.*;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.XiSecurityException;
@@ -1096,6 +1093,31 @@ public class QaSecurityActions {
     }
 
   } // class SpeedSm2SignP12
+
+  @Command(scope = "xi", name = "speed-sign-jce",
+          description = "performance test of JCE signature creation")
+  @Service
+  public static class SpeedSignJce extends SingleSpeedAction {
+
+    @Option(name = "--type", required = true, description = "JCE signer type")
+    private String type;
+
+    @Option(name = "--alias", required = true,
+            description = "alias of the key in the JCE device")
+    private String alias;
+
+    @Option(name = "--algo", required = true, description = "signature algorithm")
+    @Completion(QaCompleters.SignAlgoCompleter.class)
+    private String algo;
+
+    @Override
+    protected BenchmarkExecutor getTester()
+            throws Exception {
+      return new JceSignSpeed(securityFactory, type, alias, algo,
+              "alias-" + alias + "_algo-" + algo, getNumThreads());
+    }
+
+  } // class SpeedEcSignP11
 
   private static ASN1ObjectIdentifier getCurveOid(String curveName) {
     ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(curveName);

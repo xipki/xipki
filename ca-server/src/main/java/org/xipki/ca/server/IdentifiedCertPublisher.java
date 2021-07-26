@@ -103,10 +103,6 @@ public class IdentifiedCertPublisher implements Closeable {
     return certPublisher.certificateRemoved(caCert, cert);
   }
 
-  public boolean isAsyn() {
-    return certPublisher.isAsyn();
-  }
-
   @Override
   public void close() {
     certPublisher.close();

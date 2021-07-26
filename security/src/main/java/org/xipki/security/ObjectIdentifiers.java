@@ -53,6 +53,11 @@ public class ObjectIdentifiers {
 
   private static final ASN1ObjectIdentifier id_microsoft = id_pen.branch("311");
 
+  public static final class CMP {
+    public static final ASN1ObjectIdentifier id_it_certProfile =
+            new ASN1ObjectIdentifier("1.3.6.1.5.5.7.4.21");
+  }
+
   public static final class Xipki {
 
     // id_xipki_ext := id_xipki ext{1}

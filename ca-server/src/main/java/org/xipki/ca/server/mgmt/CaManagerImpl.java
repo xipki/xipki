@@ -43,6 +43,7 @@ import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.*;
+import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.util.*;
 
 import java.io.Closeable;
@@ -112,7 +113,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
     } // method run
 
-  } // class UnreferencedRequstCleaner
+  } // class UnreferencedRequestCleaner
 
   private class CaRestarter implements Runnable {
 
@@ -210,6 +211,8 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   SecurityFactory securityFactory;
 
+  P11CryptServiceFactory p11CryptServiceFactory;
+
   CaManagerQueryExecutor queryExecutor;
 
   private DataSourceWrapper datasource;
@@ -303,6 +306,14 @@ public class CaManagerImpl implements CaManager, Closeable {
     this.securityFactory = securityFactory;
   }
 
+  public P11CryptServiceFactory getP11CryptServiceFactory() {
+    return p11CryptServiceFactory;
+  }
+
+  public void setP11CryptServiceFactory(P11CryptServiceFactory p11CryptServiceFactory) {
+    this.p11CryptServiceFactory = p11CryptServiceFactory;
+  }
+
   public boolean isMasterMode() {
     return masterMode;
   }
@@ -320,6 +331,12 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public Set<String> getSupportedPublisherTypes() {
     return certPublisherFactoryRegister.getSupportedTypes();
+  }
+
+  @Override
+  public String getTokenInfoP11(String moduleName, Integer slotIndex, boolean verbose)
+          throws CaMgmtException {
+    return signerManager.getTokenInfoP11(moduleName, slotIndex, verbose);
   }
 
   private void init()
@@ -1082,9 +1099,9 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public X509Cert generateRootCa(CaEntry caEntry, String profileName, byte[] encodedCsr,
+  public X509Cert generateRootCa(CaEntry caEntry, String profileName, String subject,
       String serialNumber) throws CaMgmtException {
-    return ca2Manager.generateRootCa(caEntry, profileName, encodedCsr, serialNumber);
+    return ca2Manager.generateRootCa(caEntry, profileName, subject, serialNumber);
   }
 
   void assertMasterModeAndSetuped() throws CaMgmtException {

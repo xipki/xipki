@@ -19,6 +19,7 @@ package org.xipki.security.shell;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.security.pkcs11.P11Slot.P11KeyUsage;
 import org.xipki.shell.DynamicEnumCompleter;
@@ -94,5 +95,21 @@ public class SecurityCompleters {
     }
 
   } // class SecretKeyTypeCompleter
+
+  @Service
+  public static class SignAlgoCompleter extends EnumCompleter {
+
+    private static Set<String> algos = new HashSet<>();
+
+    static {
+      for (SignAlgo m : SignAlgo.values()) {
+        algos.add(m.getJceName());
+      }
+    }
+
+    public SignAlgoCompleter() {
+      setTokens(algos);
+    }
+  }
 
 }

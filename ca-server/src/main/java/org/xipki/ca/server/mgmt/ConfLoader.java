@@ -246,7 +246,7 @@ class ConfLoader {
         } else {
           if (genSelfIssued != null) {
             X509Cert cert = manager.generateRootCa(caEntry, genSelfIssued.getProfile(),
-                genSelfIssued.getCsr(), genSelfIssued.getSerialNumber());
+                genSelfIssued.getSubject(), genSelfIssued.getSerialNumber());
             LOG.info("generated root CA {}", caName);
             generatedRootCerts.put(caName, cert);
           } else {

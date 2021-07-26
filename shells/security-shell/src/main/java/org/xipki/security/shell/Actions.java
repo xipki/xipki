@@ -282,39 +282,62 @@ public class Actions {
 
   } // class CrlInfo
 
-  public abstract static class CsrGenAction extends SecurityAction {
-
-    private static final long _12_HOURS_MS = 12L * 60 * 60 * 1000;
-
+  public abstract static class CsrGenAction extends BaseCsrGenAction {
     @Option(name = "--hash", description = "hash algorithm name (will be ignored in some keys, "
-        + "e.g. edwards curve based keys)")
+            + "e.g. edwards curve based keys)")
     @Completion(Completers.HashAlgCompleter.class)
     protected String hashAlgo = "SHA256";
 
+    @Option(name = "--rsa-pss",
+            description = "whether to use the RSAPSS for the POPO computation\n"
+                    + "(only applied to RSA key)")
+    private Boolean rsaPss = Boolean.FALSE;
+
+    @Option(name = "--dsa-plain",
+            description = "whether to use the Plain DSA for the POPO computation")
+    private Boolean dsaPlain = Boolean.FALSE;
+
+    @Option(name = "--gm",
+            description = "whether to use the chinese GM algorithm for the POPO computation\n"
+                    + "(only applied to EC key with GM curves)")
+    private Boolean gm = Boolean.FALSE;
+
+    protected SignatureAlgoControl getSignatureAlgoControl() {
+      hashAlgo = hashAlgo.trim().toUpperCase();
+      if (hashAlgo.indexOf('-') != -1) {
+        hashAlgo = hashAlgo.replaceAll("-", "");
+      }
+      return new SignatureAlgoControl(rsaPss, dsaPlain, gm);
+    }
+  }
+
+  public abstract static class BaseCsrGenAction extends SecurityAction {
+    private static final long _12_HOURS_MS = 12L * 60 * 60 * 1000;
+
     @Option(name = "--subject-alt-name", aliases = "--san", multiValued = true,
-        description = "subjectAltName, in the form of [tagNo]value or [tagText]value. "
-            + "Valid tagNo/tagText/value: '0'/'othername'/OID=value, '1'/'email'/text,"
-            + " '2'/'dns'/text, '4'/'dirName'/X500 name e.g. CN=abc,"
-            + "'5'/'edi'/key=value, '6'/'uri'/text,"
-            + " '7'/'ip'/IP address,'8'/'rid'/OID")
+            description = "subjectAltName, in the form of [tagNo]value or [tagText]value. "
+                    + "Valid tagNo/tagText/value: '0'/'othername'/OID=value, '1'/'email'/text,"
+                    + " '2'/'dns'/text, '4'/'dirName'/X500 name e.g. CN=abc,"
+                    + "'5'/'edi'/key=value, '6'/'uri'/text,"
+                    + " '7'/'ip'/IP address,'8'/'rid'/OID")
     protected List<String> subjectAltNames;
 
     @Option(name = "--subject-info-access", aliases = "--sia", multiValued = true,
-        description = "subjectInfoAccess")
+            description = "subjectInfoAccess")
     protected List<String> subjectInfoAccesses;
 
     @Option(name = "--peer-cert",
-        description = "Peer certificate file, only for the Diffie-Hellman keys")
+            description = "Peer certificate file, only for the Diffie-Hellman keys")
     @Completion(FileCompleter.class)
     private String peerCertFile;
 
     @Option(name = "--peer-certs", description = "Peer certificates file "
-        + "(A PEM file containing certificates, only for the Diffie-Hellman keys")
+            + "(A PEM file containing certificates, only for the Diffie-Hellman keys")
     @Completion(FileCompleter.class)
     private String peerCertsFile;
 
     @Option(name = "--subject", aliases = "-s", description = "subject in the CSR, "
-        + "if not set, use the subject in the signer's certificate ")
+            + "if not set, use the subject in the signer's certificate ")
     private String subject;
 
     @Option(name = "--dateOfBirth", description = "Date of birth YYYYMMdd in subject")
@@ -322,20 +345,6 @@ public class Actions {
 
     @Option(name = "--postalAddress", multiValued = true, description = "postal address in subject")
     private List<String> postalAddress;
-
-    @Option(name = "--rsa-pss",
-        description = "whether to use the RSAPSS for the POPO computation\n"
-            + "(only applied to RSA key)")
-    private Boolean rsaPss = Boolean.FALSE;
-
-    @Option(name = "--dsa-plain",
-        description = "whether to use the Plain DSA for the POPO computation")
-    private Boolean dsaPlain = Boolean.FALSE;
-
-    @Option(name = "--gm",
-        description = "whether to use the chinese GM algorithm for the POPO computation\n"
-            + "(only applied to EC key with GM curves)")
-    private Boolean gm = Boolean.FALSE;
 
     @Option(name = "--outform", description = "output format of the CSR")
     @Completion(Completers.DerPemCompleter.class)
@@ -353,12 +362,12 @@ public class Actions {
     private List<String> keyusages;
 
     @Option(name = "--ext-keyusage", multiValued = true,
-        description = "extended keyusage (name or OID)")
+            description = "extended keyusage (name or OID)")
     @Completion(Completers.ExtKeyusageCompleter.class)
     private List<String> extkeyusages;
 
     @Option(name = "--qc-eu-limit", multiValued = true,
-        description = "QC EuLimitValue of format <currency>:<amount>:<exponent>")
+            description = "QC EuLimitValue of format <currency>:<amount>:<exponent>")
     private List<String> qcEuLimits;
 
     @Option(name = "--biometric-type", description = "Biometric type")
@@ -376,24 +385,21 @@ public class Actions {
     private String biometricUri;
 
     @Option(name = "--extra-extensions-file",
-        description = "Configuration file for extral extensions")
+            description = "Configuration file for extral extensions")
     @Completion(FileCompleter.class)
     private String extraExtensionsFile;
 
     /**
      * Gets the signer for the give signatureAlgoControl.
-     * @param signatureAlgoControl
-     *          The signature control. Must not be {@code null}.
      * @return the signer
      * @throws Exception
      *           If getting signer failed.
      */
-    protected abstract ConcurrentContentSigner getSigner(
-         SignatureAlgoControl signatureAlgoControl)
-             throws Exception;
+    protected abstract ConcurrentContentSigner getSigner()
+            throws Exception;
 
     protected List<X509Cert> getPeerCertificates()
-        throws CertificateException, IOException {
+            throws CertificateException, IOException {
       if (StringUtil.isNotBlank(peerCertsFile)) {
         try (PemReader pemReader = new PemReader(new FileReader(peerCertsFile))) {
           List<X509Cert> certs = new LinkedList<>();
@@ -417,12 +423,7 @@ public class Actions {
 
     @Override
     protected Object execute0()
-        throws Exception {
-      hashAlgo = hashAlgo.trim().toUpperCase();
-      if (hashAlgo.indexOf('-') != -1) {
-        hashAlgo = hashAlgo.replaceAll("-", "");
-      }
-
+            throws Exception {
       if (extkeyusages != null) {
         List<String> list = new ArrayList<>(extkeyusages.size());
         for (String m : extkeyusages) {
@@ -443,7 +444,7 @@ public class Actions {
       List<Extension> extensions = new LinkedList<>();
 
       ASN1OctetString extnValue = isEmpty(subjectAltNames) ? null
-          : X509Util.createExtnSubjectAltName(subjectAltNames, false).getExtnValue();
+              : X509Util.createExtnSubjectAltName(subjectAltNames, false).getExtnValue();
       if (extnValue != null) {
         ASN1ObjectIdentifier oid = Extension.subjectAlternativeName;
         extensions.add(new Extension(oid, false, extnValue));
@@ -451,7 +452,7 @@ public class Actions {
 
       // SubjectInfoAccess
       extnValue = isEmpty(subjectInfoAccesses) ? null
-          : X509Util.createExtnSubjectInfoAccess(subjectInfoAccesses, false).getExtnValue();
+              : X509Util.createExtnSubjectInfoAccess(subjectInfoAccesses, false).getExtnValue();
 
       if (extnValue != null) {
         ASN1ObjectIdentifier oid = Extension.subjectInfoAccess;
@@ -472,7 +473,7 @@ public class Actions {
       // ExtendedKeyusage
       if (isNotEmpty(extkeyusages)) {
         ExtendedKeyUsage extValue = X509Util.createExtendedUsage(
-            textToAsn1ObjectIdentifers(extkeyusages));
+                textToAsn1ObjectIdentifers(extkeyusages));
         ASN1ObjectIdentifier extType = Extension.extendedKeyUsage;
         extensions.add(new Extension(extType, false, extValue.getEncoded()));
       }
@@ -500,7 +501,7 @@ public class Actions {
 
             MonetaryValue monterayValue = new MonetaryValue(currency, amount, exponent);
             QCStatement statment = new QCStatement(
-                ObjectIdentifiers.Extn.id_etsi_qcs_QcLimitValue, monterayValue);
+                    ObjectIdentifiers.Extn.id_etsi_qcs_QcLimitValue, monterayValue);
             vec.add(statment);
           } catch (Exception ex) {
             throw new Exception("invalid qc-eu-limit '" + m + "'");
@@ -515,8 +516,8 @@ public class Actions {
       // biometricInfo
       if (biometricType != null && biometricHashAlgo != null && biometricFile != null) {
         TypeOfBiometricData tmpBiometricType = StringUtil.isNumber(biometricType)
-            ? new TypeOfBiometricData(Integer.parseInt(biometricType))
-            : new TypeOfBiometricData(new ASN1ObjectIdentifier(biometricType));
+                ? new TypeOfBiometricData(Integer.parseInt(biometricType))
+                : new TypeOfBiometricData(new ASN1ObjectIdentifier(biometricType));
 
         HashAlgo tmpBiometricHashAlgo = HashAlgo.getInstance(biometricHashAlgo);
         byte[] biometricBytes = IoUtil.read(biometricFile);
@@ -529,8 +530,8 @@ public class Actions {
           tmpSourceDataUri = new DERIA5String(biometricUri);
         }
         BiometricData biometricData = new BiometricData(tmpBiometricType,
-            tmpBiometricHashAlgo.getAlgorithmIdentifier(),
-            new DEROctetString(tmpBiometricDataHash), tmpSourceDataUri);
+                tmpBiometricHashAlgo.getAlgorithmIdentifier(),
+                new DEROctetString(tmpBiometricDataHash), tmpSourceDataUri);
 
         ASN1EncodableVector vec = new ASN1EncodableVector();
         vec.add(biometricData);
@@ -542,7 +543,7 @@ public class Actions {
         // Do nothing
       } else {
         throw new Exception("either all of biometric triples (type, hash algo, file)"
-            + " must be set or none of them should be set");
+                + " must be set or none of them should be set");
       }
 
       // extra extensions
@@ -554,27 +555,27 @@ public class Actions {
         List<X509ExtensionType> extnConfs = extraExtensions.getExtensions();
         if (CollectionUtil.isNotEmpty(extnConfs)) {
           for (X509ExtensionType m : extnConfs) {
-            byte[] encodedExtnValue =
-                m.getConstant().toASN1Encodable().toASN1Primitive().getEncoded(ASN1Encoding.DER);
+            byte[] encodedExtnValue = m.getConstant().toASN1Encodable().toASN1Primitive()
+                            .getEncoded(ASN1Encoding.DER);
             extensions.add(new Extension(
-                new ASN1ObjectIdentifier(m.getType().getOid()), false, encodedExtnValue));
+                    new ASN1ObjectIdentifier(m.getType().getOid()), false, encodedExtnValue));
           }
         }
       }
 
       extensions.addAll(getAdditionalExtensions());
 
-      ConcurrentContentSigner signer = getSigner(new SignatureAlgoControl(rsaPss, dsaPlain, gm));
+      ConcurrentContentSigner signer = getSigner();
 
       Map<ASN1ObjectIdentifier, ASN1Encodable> attributes = new HashMap<>();
       if (CollectionUtil.isNotEmpty(extensions)) {
         attributes.put(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest,
-            new Extensions(extensions.toArray(new Extension[0])));
+                new Extensions(extensions.toArray(new Extension[0])));
       }
 
       if (StringUtil.isNotBlank(challengePassword)) {
         attributes.put(PKCSObjectIdentifiers.pkcs_9_at_challengePassword,
-            new DERPrintableString(challengePassword));
+                new DERPrintableString(challengePassword));
       }
 
       SubjectPublicKeyInfo subjectPublicKeyInfo;
@@ -613,7 +614,7 @@ public class Actions {
             Date date = DateUtil.parseUtcTimeyyyyMMdd(dateOfBirth);
             date = new Date(date.getTime() + _12_HOURS_MS);
             ASN1Encodable atvValue = new DERGeneralizedTime(
-                DateUtil.toUtcTimeyyyyMMddhhmmss(date) + "Z");
+                    DateUtil.toUtcTimeyyyyMMddhhmmss(date) + "Z");
             RDN rdn = new RDN(id, atvValue);
             list.add(rdn);
           }
@@ -645,7 +646,7 @@ public class Actions {
       }
 
       PKCS10CertificationRequest csr = generateRequest(signer, subjectPublicKeyInfo, subjectDn,
-          attributes);
+              attributes);
 
       saveVerbose("saved CSR to file", outputFilename, encodeCsr(csr.getEncoded(), outform));
       return null;
@@ -664,7 +665,7 @@ public class Actions {
     }
 
     protected List<Extension> getAdditionalExtensions()
-        throws BadInputException {
+            throws BadInputException {
       return Collections.emptyList();
     }
 
@@ -687,15 +688,16 @@ public class Actions {
       return ret;
     } // method textToAsn1ObjectIdentifers
 
-    private PKCS10CertificationRequest generateRequest(ConcurrentContentSigner signer,
-        SubjectPublicKeyInfo subjectPublicKeyInfo, X500Name subjectDn,
-        Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
+    private PKCS10CertificationRequest generateRequest(
+            ConcurrentContentSigner signer,
+            SubjectPublicKeyInfo subjectPublicKeyInfo, X500Name subjectDn,
+            Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
             throws XiSecurityException {
       Args.notNull(signer, "signer");
       Args.notNull(subjectPublicKeyInfo, "subjectPublicKeyInfo");
       Args.notNull(subjectDn, "subjectDn");
       PKCS10CertificationRequestBuilder csrBuilder =
-          new PKCS10CertificationRequestBuilder(subjectDn, subjectPublicKeyInfo);
+              new PKCS10CertificationRequestBuilder(subjectDn, subjectPublicKeyInfo);
       if (CollectionUtil.isNotEmpty(attributes)) {
         for (ASN1ObjectIdentifier attrType : attributes.keySet()) {
           csrBuilder.addAttribute(attrType, attributes.get(attrType));
@@ -716,7 +718,7 @@ public class Actions {
       }
     } // method generateRequest
 
-  } // class CsrGenAction
+  } // class BaseCsrGenAction
 
   @Command(scope = "xi", name = "validate-csr", description = "validate CSR")
   @Service

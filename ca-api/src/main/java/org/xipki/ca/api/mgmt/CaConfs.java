@@ -65,7 +65,7 @@ public class CaConfs {
     zipStream.setLevel(Deflater.BEST_SPEED);
 
     File confFile = new File(confFilename);
-    confFile = IoUtil.expandFilepath(confFile, true);
+    confFile = IoUtil.expandFilepath(confFile, false);
 
     InputStream caConfStream = null;
     String baseDir;
@@ -224,14 +224,6 @@ public class CaConfs {
             } else {
               if (ci.getCert() != null) {
                 throw new InvalidConfException("cert of CA " + name + " may not be set");
-              }
-
-              FileOrBinary csrFb = ci.getGenSelfIssued().getCsr();
-              if (csrFb != null && csrFb.getFile() != null) {
-                String zipEntryName = "files/ca-" + name + "-csr.p10";
-                byte[] value = getBinary(csrFb.getFile(), properties, baseDir);
-                createFileOrBinary(zipStream, value, zipEntryName);
-                csrFb.setFile(zipEntryName);
               }
             }
           }

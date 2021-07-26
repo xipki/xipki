@@ -375,10 +375,10 @@ public class X509Cert {
       throws SignatureException, InvalidKeyException, CertificateException,
       NoSuchAlgorithmException, NoSuchProviderException {
     if (jceInstance != null) {
-      jceInstance.verify(key);
+      jceInstance.verify(key, "BC");
     } else {
       SignAlgo signAlgo = SignAlgo.getInstance(bcInstance.getSignatureAlgorithm());
-      Signature signature = signAlgo.newSignature();
+      Signature signature = signAlgo.newSignature("BC");
       checkBcSignature(key, signature);
     }
   }

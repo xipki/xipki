@@ -23,8 +23,13 @@ import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.server.CaInfo;
 import org.xipki.ca.server.SignerEntryWrapper;
+import org.xipki.security.XiSecurityException;
+import org.xipki.security.pkcs11.*;
 import org.xipki.util.ObjectCreationException;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.xipki.ca.server.CaUtil.canonicalizeSignerConf;
@@ -181,5 +186,55 @@ class SignerManager {
     }
     return ret;
   } // method createSigner
+
+  String getTokenInfoP11(String moduleName, Integer slotIndex, boolean verbose)
+          throws CaMgmtException {
+    StringBuilder sb = new StringBuilder();
+    final String NL = "\n";
+    try {
+      P11CryptService p11Service = manager.p11CryptServiceFactory.getP11CryptService(moduleName);
+      if (p11Service == null) {
+        throw new CaMgmtException("undefined module " + moduleName);
+      }
+
+      P11Module module = p11Service.getModule();
+      sb.append("module: ").append(moduleName).append(NL);
+      sb.append(module.getDescription()).append(NL);
+
+      List<P11SlotIdentifier> slots = module.getSlotIds();
+      if (slotIndex == null) {
+        output(sb, slots);
+      } else {
+        P11SlotIdentifier slotId = module.getSlotIdForIndex(slotIndex);
+        P11Slot slot = module.getSlot(slotId);
+        sb.append("Details of slot\n");
+
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        slot.showDetails(bout, verbose);
+        bout.flush();
+        sb.append(new String(bout.toByteArray(), StandardCharsets.UTF_8)).append(NL);
+      }
+    } catch (P11TokenException | IOException | XiSecurityException ex) {
+      throw new CaMgmtException(ex);
+    }
+
+    return sb.toString();
+  }
+
+  private void output(StringBuilder sb, List<P11SlotIdentifier> slots) {
+    // list all slots
+    final int n = slots.size();
+
+    if (n == 0 || n == 1) {
+      String numText = (n == 0) ? "no" : "1";
+      sb.append(numText).append(" slot is configured\n");
+    } else {
+      sb.append(n).append(" slots are configured\n");
+    }
+
+    for (P11SlotIdentifier slotId : slots) {
+      sb.append("\tslot[" + slotId.getIndex() + "]: " + slotId.getId()).append("\n");
+    }
+  }
 
 }

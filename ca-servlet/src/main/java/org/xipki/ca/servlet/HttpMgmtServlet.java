@@ -265,7 +265,7 @@ public class HttpMgmtServlet extends HttpServlet {
           }
 
           X509Cert cert = caManager.generateRootCa(caEntry,
-              req.getCertprofileName(), req.getEncodedCsr(), req.getSerialNumber());
+              req.getCertprofileName(), req.getSubject(), req.getSerialNumber());
           resp = toByteArray(cert);
           break;
         }
@@ -608,6 +608,13 @@ public class HttpMgmtServlet extends HttpServlet {
           caManager.revokeCertificate(req.getCaName(),req.getSerialNumber(),
               req.getReason(), req.getInvalidityTime());
           resp = null;
+          break;
+        }
+        case tokenInfoP11: {
+          MgmtRequest.TokenInfoP11 req = parse(in, MgmtRequest.TokenInfoP11.class);
+          String info = caManager.getTokenInfoP11(req.getModuleName(),
+                  req.getSlotIndex(), req.isVerbose());
+          resp = new MgmtResponse.StringResponse(info);
           break;
         }
         case unlockCa: {

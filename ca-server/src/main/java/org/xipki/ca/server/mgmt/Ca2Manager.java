@@ -553,13 +553,13 @@ class Ca2Manager {
     return ca;
   } // method getX509Ca
 
-  X509Cert generateRootCa(CaEntry caEntry, String profileName, byte[] encodedCsr,
+  X509Cert generateRootCa(CaEntry caEntry, String profileName, String subject,
       String serialNumber) throws CaMgmtException {
     assertMasterModeAndSetuped();
 
     notNull(caEntry, "caEntry");
     profileName = toNonBlankLower(profileName, "profileName");
-    notNull(encodedCsr, "encodedCsr");
+    notBlank(subject, "subject");
 
     int numCrls = caEntry.getNumCrls();
     String signerType = caEntry.getSignerType();
@@ -572,14 +572,6 @@ class Ca2Manager {
     int expirationPeriod = caEntry.getExpirationPeriod();
     if (expirationPeriod < 0) {
       System.err.println("invalid expirationPeriod: " + expirationPeriod);
-      return null;
-    }
-
-    CertificationRequest csr;
-    try {
-      csr = X509Util.parseCsr(encodedCsr);
-    } catch (Exception ex) {
-      System.err.println("invalid encodedCsr");
       return null;
     }
 
@@ -620,7 +612,7 @@ class Ca2Manager {
     GenerateSelfSignedResult result;
     try {
       result = SelfSignedCertBuilder.generateSelfSigned(manager.securityFactory, signerType,
-          caEntry.getSignerConf(), certprofile, csr, serialOfThisCert, caEntry.getCaUris(),
+          caEntry.getSignerConf(), certprofile, subject, serialOfThisCert, caEntry.getCaUris(),
           caEntry.getExtraControl());
     } catch (OperationException | InvalidConfException ex) {
       throw new CaMgmtException(concat(ex.getClass().getName(), ": ", ex.getMessage()), ex);

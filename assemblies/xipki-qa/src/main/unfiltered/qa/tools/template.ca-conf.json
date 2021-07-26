@@ -67,9 +67,7 @@
 			"expirationPeriod":365,
 			"genSelfIssued":{
 				"certOutform":"der",
-				"csr":{
-					"file":"output/tls-ca.csr"
-				},
+				"subject":"REPLACEME-SUBJECT",
 				"profile":"rootca",
 				"serialNumber":"1"
 			},

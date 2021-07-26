@@ -96,13 +96,8 @@ class DigestDiff {
         }
         this.certhashAlgo = refAlgo;
         break;
-      case XIPKI_CA_v4:
-      case XIPKI_CA_v5:
-      case XIPKI_CA_v6:
-        this.certhashAlgo = HashAlgo.SHA1;
-        break;
       default:
-        throw new IllegalStateException("unknown refDbType " + refDbType);
+        this.certhashAlgo = HashAlgo.SHA1;
     }
 
     // number of threads
@@ -133,13 +128,9 @@ class DigestDiff {
       case XIPKI_OCSP_v4:
         refSql = "SELECT ID FROM ISSUER";
         break;
-      case XIPKI_CA_v4:
-      case XIPKI_CA_v5:
-      case XIPKI_CA_v6:
+      default:
         refSql = "SELECT ID FROM CA";
         break;
-      default:
-        throw new IllegalStateException("unknown refDbType " + refDbType);
     }
 
     Statement refStmt = null;
@@ -248,13 +239,9 @@ class DigestDiff {
       case XIPKI_OCSP_v4:
         sql += "ISSUER";
         break;
-      case XIPKI_CA_v4:
-      case XIPKI_CA_v5:
-      case XIPKI_CA_v6:
+      default:
         sql += "CA";
         break;
-      default:
-        throw new IllegalStateException("unknown dbType " + dbType);
     }
 
     Statement stmt = datasource.createStatement();

@@ -101,9 +101,7 @@
 			"duplicateSubject":true,
 			"expirationPeriod":365,
 			"genSelfIssued":{
-				"csr":{
-					"file":"${output.dir}/rootca1.csr"
-				},
+				"subject":"REPLACEME-SUBJECT",
 				"profile":"cab-rootca",
 				"serialNumber":"1"
 			},

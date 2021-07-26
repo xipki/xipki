@@ -167,6 +167,8 @@ public class HttpCmpServlet extends HttpServlet {
       if (auditMessage != null) {
         event.addEventData(CaAuditConstants.NAME_message, auditMessage);
       }
+
+      resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     } finally {
       resp.flushBuffer();
       event.finish();

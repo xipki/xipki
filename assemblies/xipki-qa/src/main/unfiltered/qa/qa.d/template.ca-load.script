@@ -5,21 +5,6 @@ sleep 1
 
 ca:restart
 
-## Create the CSR for the command caqa:check-cert in QA
-if { $TOKEN_TYPE equals "pkcs11" } then {
-  xi:csr-p11 \
-    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
-    --slot $SLOT --label rootca1 --out output/rootca1.csr \
-    --subject "CN=rootca1,O=myorg,C=DE" --keyusage cRLSign
-} else {
-  xi:csr-p12 \
-    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-GM REPLACEME-RSAPSS \
-    --p12 output/rootca1.p12 --password 1234 \
-    --out output/rootca1.csr \
-    --subject "CN=rootca1,O=myorg,C=DE" \
-    --keyusage cRLSign
-}
-
 echo "#################################################################"
 echo "#                        Load rootca.json                       #"
 echo "#################################################################"
@@ -31,6 +16,9 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
 }
 
 xi:copy-file -f qa/qa.d/template.rootca.json qa/qa.d/rootca.json
+
+xi:replace --old "REPLACEME-SUBJECT" --new "CN=rootca1,O=myorg,C=DE" \
+  qa/qa.d/rootca.json
 
 xi:replace --old "REPLACEME-CMP_SIGALGO" --new "$CMP_SIGALGO" \
   qa/qa.d/rootca.json

@@ -649,8 +649,8 @@ public interface CaManager {
    *          CA entry. Must not be {@code null}.
    * @param certprofileName
    *          Profile name of the root CA certificate. Must not be {@code null}.
-   * @param encodedCsr
-   *          CSR. Must not be {@code null}.
+   * @param subject
+   *          Subject. Must not be {@code null}.
    * @param serialNumber
    *          Serial number. {@code null}: lets CA choose the serial number;
    *          fixed serialnumber: decimal or heximal (beginning with 0x) number;
@@ -660,7 +660,7 @@ public interface CaManager {
    *          if error occurs.
    */
   X509Cert generateRootCa(CaEntry caEntry, String certprofileName,
-      byte[] encodedCsr, String serialNumber)
+      String subject, String serialNumber)
           throws CaMgmtException;
 
   /**
@@ -853,6 +853,9 @@ public interface CaManager {
    *          if error occurs.
    */
   Set<String> getSupportedPublisherTypes()
+      throws CaMgmtException;
+
+  String getTokenInfoP11(String moduleName, Integer slotIndex, boolean verbose)
       throws CaMgmtException;
 
 }

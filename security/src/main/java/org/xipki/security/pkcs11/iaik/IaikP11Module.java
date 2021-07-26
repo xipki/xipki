@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.pkcs11.*;
+import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.StringUtil;
 
@@ -65,10 +66,9 @@ public class IaikP11Module extends P11Module {
           "\n\tManufacturerID: ", info.getManufacturerID(),
           "\n\tLibrary Description: ", info.getLibraryDescription(),
           "\n\tLibrary Version: ", info.getLibraryVersion());
-
     } catch (TokenException ex) {
       this.description = StringUtil.concatObjects("PKCS#11 IAIK",
-          "\n\tPath", moduleConf.getNativeLibrary());
+          "\n\tPath ", moduleConf.getNativeLibrary());
     }
 
     Slot[] slotList;
@@ -135,7 +135,9 @@ public class IaikP11Module extends P11Module {
       }
       P11Slot p11Slot = new IaikP11Slot(moduleConf.getName(), slotId, slot,
           moduleConf.isReadOnly(), moduleConf.getUserType(), pwd, moduleConf.getMaxMessageSize(),
-          moduleConf.getP11MechanismFilter(), moduleConf.getP11NewObjectConf());
+          moduleConf.getP11MechanismFilter(), moduleConf.getP11NewObjectConf(),
+          moduleConf.getNumSessions(), moduleConf.getSecretKeyTypes(),
+          moduleConf.getKeyPairTypes());
 
       slots.add(p11Slot);
     }
@@ -151,11 +153,15 @@ public class IaikP11Module extends P11Module {
       throws P11TokenException {
     notNull(moduleConf, "moduleConf");
 
+    String path = moduleConf.getNativeLibrary();
+    path = IoUtil.expandFilepath(path, false);
+
     iaik.pkcs.pkcs11.Module module;
     try {
-      module = iaik.pkcs.pkcs11.Module.getInstance(moduleConf.getNativeLibrary());
+      module = iaik.pkcs.pkcs11.Module.getInstance(path);
     } catch (IOException ex) {
-      final String msg = "could not load the PKCS#11 module " + moduleConf.getName();
+      final String msg = "could not load the PKCS#11 module "
+              + moduleConf.getName() + ": " + path;
       LogUtil.error(LOG, ex, msg);
       throw new P11TokenException(msg, ex);
     }
@@ -181,6 +187,10 @@ public class IaikP11Module extends P11Module {
       LOG.error("unexpected Exception", th);
       close(moduleConf.getName(), module);
       throw new P11TokenException(th.getMessage());
+    }
+
+    if (null != moduleConf.getVendorCodeConverter()) {
+      module.setVendorCodeConverter(moduleConf.getVendorCodeConverter());
     }
 
     return new IaikP11Module(module, moduleConf);

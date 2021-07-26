@@ -377,7 +377,7 @@ if { $printUsage equals "true" } then {
 
   caqa:neg-gen-rootca \
     --name rootca1 \
-    --csr output/rootca1.csr \
+    --subject "CN=root cA,O=example.org,C=DE" \
     --profile rootca \
     --outform $OUTFORM \
     --out output/rootca1-2.crt \
