@@ -30,6 +30,7 @@ import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.security.X509Cert;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.InvalidConfException;
+import org.xipki.util.OpRuntimeException;
 import org.xipki.util.IoUtil;
 
 import javax.servlet.ServletException;
@@ -656,6 +657,10 @@ public class HttpMgmtServlet extends HttpServlet {
       LOG.error("CaMgmtException", ex);
       response.setHeader(HttpConstants.HEADER_XIPKI_ERROR, ex.getMessage());
       response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    } catch (OpRuntimeException ex) {
+      LOG.error("OpRuntimeException", ex);
+      response.setHeader(HttpConstants.HEADER_XIPKI_ERROR, ex.getMessage());
+      response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
     } catch (Throwable th) {
       LOG.error("Throwable thrown, this should not happen!", th);
       response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
