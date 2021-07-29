@@ -129,7 +129,7 @@ public class MiscCaActions {
   @Service
   public static class LoadConf extends CaAction {
 
-    @Option(name = "--conf-file", description = "CA system configuration file (XML or zip file")
+    @Option(name = "--conf-file", required = true, description = "CA system configuration file (JSON or zip file)")
     @Completion(FileCompleter.class)
     private String confFile;
 
@@ -137,8 +137,7 @@ public class MiscCaActions {
     @Completion(Completers.DerPemCompleter.class)
     protected String outform = "der";
 
-    @Option(name = "--out-dir",
-        description = "directory to save the root certificates")
+    @Option(name = "--out-dir", description = "directory to save the root certificates")
     @Completion(FileCompleter.class)
     private String outDir = ".";
 
