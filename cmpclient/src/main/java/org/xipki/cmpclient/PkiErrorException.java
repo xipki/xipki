@@ -52,12 +52,6 @@ public class PkiErrorException extends Exception {
     this.statusMessage = statusMessage;
   }
 
-  public PkiErrorException(int status) {
-    this.status = status;
-    this.pkiFailureInfo = 0;
-    this.statusMessage = null;
-  }
-
   public int getStatus() {
     return status;
   }

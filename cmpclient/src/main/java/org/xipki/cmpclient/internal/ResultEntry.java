@@ -46,11 +46,6 @@ abstract class ResultEntry extends IdentifiedObject {
 
     private final PkiStatusInfo statusInfo;
 
-    public Error(String id, PkiStatusInfo statusInfo) {
-      super(id);
-      this.statusInfo = notNull(statusInfo, "statusInfo");
-    }
-
     public Error(String id, int status, int pkiFailureInfo, String statusMessage) {
       super(id);
       this.statusInfo = new PkiStatusInfo(status, pkiFailureInfo, statusMessage);
@@ -74,10 +69,6 @@ abstract class ResultEntry extends IdentifiedObject {
     private final PrivateKeyInfo privateKeyInfo;
 
     private final int status;
-
-    public EnrollCert(String id, CMPCertificate cert, PrivateKeyInfo privateKeyInfo) {
-      this(id, cert, privateKeyInfo, PKIStatus.GRANTED);
-    }
 
     public EnrollCert(String id, CMPCertificate cert, PrivateKeyInfo privateKeyInfo, int status) {
       super(id);

@@ -121,7 +121,7 @@ class CmpAgent {
     notBlank(serverUrl, "serverUrl");
 
     boolean bothSignatureBased = (requestor instanceof Requestor.SignatureCmpRequestor)
-        && (responder instanceof Responder.SignaturetCmpResponder);
+        && (responder instanceof Responder.SignatureCmpResponder);
     boolean bothMacBased = (requestor instanceof Requestor.PbmMacCmpRequestor
         && responder instanceof Responder.PbmMacCmpResponder);
     if (!(bothSignatureBased || bothMacBased)) {
@@ -459,7 +459,7 @@ class CmpAgent {
         }
       }
 
-      Responder.SignaturetCmpResponder sigResponder = (Responder.SignaturetCmpResponder) responder;
+      Responder.SignatureCmpResponder sigResponder = (Responder.SignatureCmpResponder) responder;
       SignAlgo protectionAlgo;
       try {
         protectionAlgo = SignAlgo.getInstance(protectedMsg.getHeader().getProtectionAlg());

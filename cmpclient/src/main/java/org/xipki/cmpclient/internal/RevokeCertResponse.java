@@ -50,6 +50,6 @@ class RevokeCertResponse {
     }
 
     resultEntries.add(resultEntry);
-  } // class addResultEntry
+  }
 
 }

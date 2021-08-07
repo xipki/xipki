@@ -39,12 +39,7 @@ abstract class Requestor {
 
   private final boolean signRequest;
 
-  protected Requestor(boolean signRequest, GeneralName name) {
-    this.signRequest = signRequest;
-    this.name = notNull(name, "name");
-  }
-
-  protected Requestor(boolean signRequest, X500Name name) {
+  private Requestor(boolean signRequest, X500Name name) {
     this.signRequest = signRequest;
     this.name = new GeneralName(notNull(name, "name"));
   }
@@ -97,18 +92,6 @@ abstract class Requestor {
           iterationCount, mac.getAlgorithmIdentifier());
     }
 
-    public HashAlgo getOwf() {
-      return owf;
-    }
-
-    public int getIterationCount() {
-      return iterationCount;
-    }
-
-    public SignAlgo getMac() {
-      return mac;
-    }
-
     private byte[] randomSalt() {
       byte[] bytes = new byte[64];
       random.nextBytes(bytes);
@@ -125,8 +108,7 @@ abstract class Requestor {
       this.signer = null;
     }
 
-    public SignatureCmpRequestor(boolean signRequest, ConcurrentContentSigner signer,
-        SecurityFactory securityFactory) {
+    public SignatureCmpRequestor(boolean signRequest, ConcurrentContentSigner signer) {
       super(signRequest, getSignerSubject(signer));
       this.signer = signer;
     }

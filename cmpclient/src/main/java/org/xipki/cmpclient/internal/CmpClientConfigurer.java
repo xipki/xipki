@@ -297,7 +297,7 @@ final class CmpClientConfigurer {
           return false;
         }
 
-        responder = new Responder.SignaturetCmpResponder(cert, sigAlgoValidator);
+        responder = new Responder.SignatureCmpResponder(cert, sigAlgoValidator);
       } else { // if (m.getPbmMac() != null)
         CmpClientConf.Responder.PbmMac mac = m.getPbmMac();
         X500Name subject = cert.getSubject();
@@ -462,8 +462,7 @@ final class CmpClientConfigurer {
             SignerConf signerConf = new SignerConf(cf.getSignerConf());
             ConcurrentContentSigner requestorSigner = securityFactory.createSigner(
                 cf.getSignerType(), signerConf, requestorCert);
-            requestor = new SignatureCmpRequestor(
-                signRequest, requestorSigner, securityFactory);
+            requestor = new SignatureCmpRequestor(signRequest, requestorSigner);
           } catch (ObjectCreationException ex) {
             LogUtil.error(LOG, ex, "could not create rquestor " + requestorConf.getName());
             return false;

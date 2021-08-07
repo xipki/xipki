@@ -28,15 +28,8 @@ public class CmpClientException extends Exception {
 
   private static final long serialVersionUID = 1L;
 
-  public CmpClientException() {
-  }
-
   public CmpClientException(String message) {
     super(message);
-  }
-
-  public CmpClientException(Throwable cause) {
-    super(cause);
   }
 
   public CmpClientException(String message, Throwable cause) {

@@ -32,27 +32,6 @@ import static org.xipki.util.Args.notNull;
 
 class CsrEnrollCertRequest extends IdentifiedObject {
 
-  public static class Entry {
-
-    private final CertificationRequest csr;
-
-    private final String profile;
-
-    public Entry(CertificationRequest csr, String profile) {
-      this.csr = notNull(csr, "csr");
-      this.profile = notNull(profile, "profile");
-    }
-
-    public CertificationRequest getCsr() {
-      return csr;
-    }
-
-    public String getProfile() {
-      return profile;
-    }
-
-  } // class Entry
-
   private final String certprofile;
 
   private final CertificationRequest csr;
