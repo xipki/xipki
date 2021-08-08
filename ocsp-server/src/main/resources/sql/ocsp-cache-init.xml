@@ -44,7 +44,7 @@
           remarks="next update, seconds since January 1, 1970, 00:00:00 GMT">
         <constraints nullable="false"/>
       </column>
-      <column name="RESP" type="VARCHAR(4000)"
+      <column name="RESP" type="VARCHAR(1000)"
           remarks="Base64 DER-encoded OCSP response">
         <constraints nullable="false"/>
       </column>
