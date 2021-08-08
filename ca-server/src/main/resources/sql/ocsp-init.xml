@@ -111,7 +111,7 @@
           remarks="revocation invalidity time, seconds since January 1, 1970, 00:00:00 GMT"/>
       <!-- For maximal 512 bit hash value -->
       <column name="HASH" type="CHAR(86)"
-          remarks="base64 enoded hash value of the DER encoded certificate. Algorithm is defined by CERTHASH_ALGO in table DBSchema">
+          remarks="base64 encoded hash value of the DER encoded certificate. Algorithm is defined by CERTHASH_ALGO in table DBSchema">
       </column>
       <column name="SUBJECT" type="${x500name.type}"
           remarks="subject of the certificate">

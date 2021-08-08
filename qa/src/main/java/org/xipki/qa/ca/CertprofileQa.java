@@ -135,7 +135,7 @@ public class CertprofileQa {
     // syntax version
     issue = new ValidationIssue("X509.VERSION", "certificate version");
     resultIssues.add(issue);
-    int versionNumber = tbsCert.getVersionNumber();
+    int versionNumber = tbsCert.getVersion().intPositiveValueExact();
 
     X509CertVersion expVersion = certprofile.getVersion();
     if (versionNumber != expVersion.getVersionNumber()) {
