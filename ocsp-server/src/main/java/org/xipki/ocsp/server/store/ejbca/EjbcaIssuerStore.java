@@ -32,7 +32,7 @@ class EjbcaIssuerStore {
 
   private final List<EjbcaIssuerEntry> entries;
 
-  private Set<String> ids;
+  private final Set<String> ids;
 
   public EjbcaIssuerStore(Collection<EjbcaIssuerEntry> entries) {
     this.entries = new ArrayList<>(entries.size());
@@ -60,11 +60,6 @@ class EjbcaIssuerStore {
     return ids;
   }
 
-  public String getIssuerIdForFp(RequestIssuer reqIssuer) {
-    EjbcaIssuerEntry issuerEntry = getIssuerForFp(reqIssuer);
-    return (issuerEntry == null) ? null : issuerEntry.getId();
-  }
-
   public EjbcaIssuerEntry getIssuerForId(String id) {
     for (EjbcaIssuerEntry entry : entries) {
       if (entry.getId().contentEquals(id)) {
@@ -83,13 +78,6 @@ class EjbcaIssuerStore {
     }
 
     return null;
-  }
-
-  public void addIssuer(EjbcaIssuerEntry issuer) {
-    this.entries.add(issuer);
-    Set<String> newIds = new HashSet<>(this.ids);
-    newIds.add(issuer.getId());
-    this.ids = Collections.unmodifiableSet(newIds);
   }
 
 }

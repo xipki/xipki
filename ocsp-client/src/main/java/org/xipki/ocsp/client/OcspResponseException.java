@@ -34,20 +34,12 @@ public abstract class OcspResponseException extends Exception {
 
   public static class InvalidResponse extends OcspResponseException {
 
-    public InvalidResponse() {
-      super();
-    }
-
     public InvalidResponse(String message, Throwable cause) {
       super(message, cause);
     }
 
     public InvalidResponse(String message) {
       super(message);
-    }
-
-    public InvalidResponse(Throwable cause) {
-      super(cause);
     }
 
   }
@@ -68,10 +60,6 @@ public abstract class OcspResponseException extends Exception {
 
   public static class OcspTargetUnmatched extends OcspResponseException {
 
-    public OcspTargetUnmatched() {
-      super();
-    }
-
     public OcspTargetUnmatched(String message, Throwable cause) {
       super(message, cause);
     }
@@ -80,17 +68,9 @@ public abstract class OcspResponseException extends Exception {
       super(message);
     }
 
-    public OcspTargetUnmatched(Throwable cause) {
-      super(cause);
-    }
-
   }
 
   public static class ResponderUnreachable extends OcspResponseException {
-
-    public ResponderUnreachable() {
-      super();
-    }
 
     public ResponderUnreachable(String message, Throwable cause) {
       super(message, cause);
@@ -98,10 +78,6 @@ public abstract class OcspResponseException extends Exception {
 
     public ResponderUnreachable(String message) {
       super(message);
-    }
-
-    public ResponderUnreachable(Throwable cause) {
-      super(cause);
     }
 
   }
@@ -141,15 +117,8 @@ public abstract class OcspResponseException extends Exception {
 
   }
 
-  public OcspResponseException() {
-  }
-
   public OcspResponseException(String message) {
     super(message);
-  }
-
-  public OcspResponseException(Throwable cause) {
-    super(cause);
   }
 
   public OcspResponseException(String message, Throwable cause) {

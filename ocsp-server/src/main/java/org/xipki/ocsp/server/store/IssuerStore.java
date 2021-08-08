@@ -64,11 +64,6 @@ class IssuerStore {
     return ids;
   }
 
-  public Integer getIssuerIdForFp(RequestIssuer reqIssuer) {
-    IssuerEntry issuerEntry = getIssuerForFp(reqIssuer);
-    return (issuerEntry == null) ? null : issuerEntry.getId();
-  }
-
   public IssuerEntry getIssuerForId(int id) {
     for (IssuerEntry entry : issuers) {
       if (entry.getId() == id) {
@@ -106,7 +101,4 @@ class IssuerStore {
     return crlInfos.get(crlInfoId);
   }
 
-  public Set<Integer> getCrlIds() {
-    return Collections.unmodifiableSet(crlInfos.keySet());
-  }
 }

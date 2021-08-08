@@ -72,10 +72,6 @@ public class ResponseCacher implements Closeable {
 
   private static final String SQL_SELECT_ISSUER_ID = "SELECT ID FROM ISSUER";
 
-  private static final String SQL_DELETE_ISSUER = "DELETE FROM ISSUER WHERE ID=?";
-
-  private static final String SQL_SELECT_ISSUER = "SELECT ID,CERT FROM ISSUER";
-
   private static final String SQL_DELETE_EXPIRED_RESP
       = "DELETE FROM OCSP WHERE GENERATED_AT<? OR NEXT_UPDATE<?";
 
@@ -498,60 +494,6 @@ public class ResponseCacher implements Closeable {
 
     return true;
   } // method updateCacheStore0
-
-  private boolean initIssuerStore()
-      throws DataAccessException, CertificateException {
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-
-    try {
-      ps = datasource.prepareStatement(SQL_SELECT_ISSUER);
-      rs = ps.executeQuery();
-      List<IssuerEntry> caInfos = new LinkedList<>();
-
-      PreparedStatement deleteIssuerStmt = null;
-
-      while (rs.next()) {
-        int id = rs.getInt("ID");
-        X509Cert cert = X509Util.parseCert(StringUtil.toUtf8Bytes(rs.getString("CERT")));
-        IssuerEntry caInfoEntry = new IssuerEntry(id, cert);
-        RequestIssuer reqIssuer = new RequestIssuer(HashAlgo.SHA1,
-            caInfoEntry.getEncodedHash(HashAlgo.SHA1));
-
-        boolean duplicated = false;
-        for (IssuerEntry existingIssuer : caInfos) {
-          if (existingIssuer.matchHash(reqIssuer)) {
-            duplicated = true;
-            break;
-          }
-        }
-
-        String subject = cert.getSubject().toString();
-        if (duplicated) {
-          if (deleteIssuerStmt == null) {
-            deleteIssuerStmt = datasource.prepareStatement(SQL_DELETE_ISSUER);
-          }
-
-          deleteIssuerStmt.setInt(1, id);
-          deleteIssuerStmt.executeUpdate();
-
-          LOG.warn("Delete duplicated issuer {}: {}", id, subject);
-        } else {
-          LOG.info("added issuer {}: {}", id, subject);
-          caInfos.add(caInfoEntry);
-        }
-      } // end while (rs.next())
-
-      this.issuerStore.setIssuers(caInfos);
-      LOG.info("Updated issuers");
-    } catch (SQLException ex) {
-      throw datasource.translate(SQL_SELECT_ISSUER, ex);
-    } finally {
-      datasource.releaseResources(ps, rs, false);
-    }
-
-    return true;
-  } // method initIssuerStore
 
   private static byte[] buildIdent(BigInteger serialNumber, SignAlgo sigAlgo) {
     byte[] snBytes = serialNumber.toByteArray();

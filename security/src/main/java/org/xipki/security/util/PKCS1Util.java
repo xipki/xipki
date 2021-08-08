@@ -1,3 +1,20 @@
+/*
+ *
+ * Copyright (c) 2013 - 2020 Lijun Liao
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.xipki.security.util;
 
 import org.bouncycastle.crypto.Xof;
@@ -13,6 +30,12 @@ import java.util.Map;
 import static org.xipki.util.Args.notNull;
 import static org.xipki.util.Args.range;
 
+/**
+ * PKCS#1 utility class.
+ *
+ * @author Lijun Liao
+ * @since 5.3.14
+ */
 public class PKCS1Util {
 
     private static final Map<HashAlgo, byte[]> digestPkcsPrefix = new HashMap<>();
@@ -101,8 +124,9 @@ public class PKCS1Util {
     } // method EMSA_PKCS1_v1_5_encoding
 
     // CHECKSTYLE:SKIP
-    public static byte[] EMSA_PSS_ENCODE(HashAlgo contentDigest, byte[] hashValue, HashAlgo mgfDigest,
-                                         int saltLen, int modulusBitLength, SecureRandom random)
+    public static byte[] EMSA_PSS_ENCODE(
+            HashAlgo contentDigest, byte[] hashValue, HashAlgo mgfDigest,
+            int saltLen, int modulusBitLength, SecureRandom random)
             throws XiSecurityException {
         switch (contentDigest) {
             case SHAKE128:
@@ -112,7 +136,8 @@ public class PKCS1Util {
                 }
 
                 if (saltLen != contentDigest.getLength()) {
-                    throw new XiSecurityException("saltLen != " + contentDigest.getLength() + ": " + saltLen);
+                    throw new XiSecurityException(
+                            "saltLen != " + contentDigest.getLength() + ": " + saltLen);
                 }
                 break;
             default:

@@ -129,7 +129,8 @@ public class MiscCaActions {
   @Service
   public static class LoadConf extends CaAction {
 
-    @Option(name = "--conf-file", required = true, description = "CA system configuration file (JSON or zip file)")
+    @Option(name = "--conf-file", required = true,
+            description = "CA system configuration file (JSON or zip file)")
     @Completion(FileCompleter.class)
     private String confFile;
 
