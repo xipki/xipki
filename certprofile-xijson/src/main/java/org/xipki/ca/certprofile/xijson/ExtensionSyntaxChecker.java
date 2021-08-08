@@ -120,14 +120,10 @@ public class ExtensionSyntaxChecker {
           case RAW:
             break;
           case SEQUENCE:
-            extnValue = ASN1Sequence.getInstance(extnValue);
-            break;
           case SEQUENCE_OF:
             extnValue = ASN1Sequence.getInstance(extnValue);
             break;
           case SET:
-            extnValue = ASN1Set.getInstance(extnValue);
-            break;
           case SET_OF:
             extnValue = ASN1Set.getInstance(extnValue);
             break;

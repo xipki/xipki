@@ -158,7 +158,7 @@ public abstract class BaseCertprofile extends Certprofile {
             try {
               ha = HashAlgo.getInstance(hashAlgName);
             } catch (NoSuchAlgorithmException e) {
-              throw new CertprofileException("Unsupported Hash algorithm " + hashAlgName);
+              throw new CertprofileException("Unsupported hash algorithm " + hashAlgName);
             }
             byte[] pkData = publicKeyInfo.getPublicKeyData().getOctets();
             rdn = createSubjectRdn(ha.hexHash(pkData), type, control);
@@ -600,12 +600,39 @@ public abstract class BaseCertprofile extends Certprofile {
       }
     }
 
+    tmpText = tmpText.trim();
+
+    Boolean isPrintableString = null;
     if (stringType == null) {
-      stringType = StringType.utf8String;
+      isPrintableString = isPrintableString(tmpText);
+      if (isPrintableString) {
+        stringType = StringType.printableString;
+      } else {
+        stringType = StringType.utf8String;
+      }
+    } else if (stringType == StringType.printableString) {
+      isPrintableString = isPrintableString(tmpText);
     }
 
-    return stringType.createString(tmpText.trim());
+    if (stringType == StringType.printableString && !isPrintableString) {
+      throw new BadCertTemplateException("'" + tmpText + "' contains non-printableString chars.");
+    }
+
+    return stringType.createString(tmpText);
   } // method createRdnValue
+
+  private static boolean isPrintableString(String text) {
+    // PrintableString does not include the at sign (@), ampersand (&), or asterisk (*).
+    for (int i = text.length() - 1; i >= 0; i--) {
+      char c = text.charAt(i);
+      if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')
+              || c == ' ' || c == '\'' || c == '(' || c == ')' || c == '+' || c == ','
+              || c == '-' || c == '.' || c == '/' || c == ':' || c == '=' || c == '?')) {
+        return false;
+      }
+    }
+    return true;
+  }
 
   private static void checkEcSubjectPublicKeyInfo(ASN1ObjectIdentifier curveOid, byte[] encoded)
       throws BadCertTemplateException {
@@ -621,6 +648,14 @@ public abstract class BaseCertprofile extends Certprofile {
       ecCurveFieldSizes.put(curveOid, expectedLength);
     }
 
+    /*
+     RFC 5480, Section 2.2
+     ...
+     Implementations of Elliptic Curve Cryptography according to this
+     document MUST support the uncompressed form and MAY support the
+     compressed form of the ECC public key.  The hybrid form of the ECC
+     public key from [X9.62] MUST NOT be used.
+     */
     switch (encoded[0]) {
       case 0x02: // compressed
       case 0x03: // compressed
@@ -629,8 +664,6 @@ public abstract class BaseCertprofile extends Certprofile {
         }
         break;
       case 0x04: // uncompressed
-      case 0x06: // hybrid
-      case 0x07: // hybrid
         if (encoded.length != (2 * expectedLength + 1)) {
           throw new BadCertTemplateException("incorrect length for uncompressed/hybrid encoding");
         }

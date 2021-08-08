@@ -1153,10 +1153,6 @@ public class XijsonCertprofile extends BaseCertprofile {
     return maxSize;
   }
 
-  public boolean isRaOnly() {
-    return raOnly;
-  }
-
   @Override
   public org.bouncycastle.asn1.x509.CertificatePolicies getCertificatePolicies() {
     return extensions.getCertificatePolicies();

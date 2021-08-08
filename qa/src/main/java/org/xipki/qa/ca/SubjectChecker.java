@@ -178,10 +178,6 @@ public class SubjectChecker {
       stringType = rdnControl.getStringType();
     }
 
-    if (stringType == null) {
-      stringType = StringType.utf8String;
-    }
-
     for (int i = 0; i < rdns.length; i++) {
       RDN rdn = rdns[i];
       AttributeTypeAndValue[] atvs = rdn.getTypesAndValues();
@@ -358,6 +354,11 @@ public class SubjectChecker {
   } // method checkAttributeTypeAndValue
 
   private static boolean matchStringType(ASN1Encodable atvValue, StringType stringType) {
+    if (stringType == null) {
+      // both PrintableString and UTF8String are allowed.
+      return (atvValue instanceof DERPrintableString || atvValue instanceof DERUTF8String);
+    }
+
     boolean correctStringType = true;
     switch (stringType) {
       case bmpString:

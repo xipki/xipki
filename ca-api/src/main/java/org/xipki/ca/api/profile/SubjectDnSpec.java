@@ -183,127 +183,124 @@ public class SubjectDnSpec {
     Set<ASN1ObjectIdentifier> ids = new HashSet<>();
 
     // businessCategory
-    conf(ids, DN.businessCategory, RANGE_128, DIRECTORY_STRINGS, StringType.utf8String);
+    conf(ids, DN.businessCategory, RANGE_128, DIRECTORY_STRINGS);
 
     // countryName, countryOfCitizenship, countryOfResidence, jurisdictionOfIncorporationCountryName
     ASN1ObjectIdentifier[] idList = new ASN1ObjectIdentifier[] {DN.C, DN.countryOfCitizenship,
         DN.countryOfResidence, DN.jurisdictionOfIncorporationCountryName};
     for (ASN1ObjectIdentifier m : idList) {
-      conf(ids, m, RANGE_COUNTRY_NAME, PRINTABLE_STRING_ONLY, StringType.printableString);
+      conf(ids, m, RANGE_COUNTRY_NAME, PRINTABLE_STRING_ONLY);
     }
 
     // commonName
-    conf(ids, DN.CN, RANGE_64, DIRECTORY_STRINGS, StringType.utf8String);
+    conf(ids, DN.CN, RANGE_64, DIRECTORY_STRINGS);
 
     // emailAddress
-    conf(ids, DN.emailAddress, RANGE_255, IA5_STRING_ONLY, StringType.ia5String);
+    conf(ids, DN.emailAddress, RANGE_255, IA5_STRING_ONLY);
 
     // DATE_OF_BIRTH
-    conf(ids, DN.dateOfBirth, RANGE_DATE_OF_BIRTH, null, null);
+    conf(ids, DN.dateOfBirth, RANGE_DATE_OF_BIRTH, null);
     PATTERNS.put(DN.dateOfBirth, TextVadidator.DATE_OF_BIRTH);
 
     // domainComponent
-    conf(ids, DN.DC, null, IA5_STRING_ONLY, StringType.ia5String);
+    conf(ids, DN.DC, null, IA5_STRING_ONLY);
 
     // RFC 2256 dmdName
-    conf(ids, DN.dmdName, null, DIRECTORY_STRINGS, StringType.utf8String);
+    conf(ids, DN.dmdName, null, DIRECTORY_STRINGS);
 
     // gender
-    conf(ids, DN.gender, RANGE_GENDER, PRINTABLE_STRING_ONLY, StringType.printableString);
+    conf(ids, DN.gender, RANGE_GENDER, PRINTABLE_STRING_ONLY);
     PATTERNS.put(DN.gender, TextVadidator.GENDER);
 
     // generation qualifier
-    conf(ids, DN.generationQualifier, RANGE_64, DIRECTORY_STRINGS, StringType.utf8String);
+    conf(ids, DN.generationQualifier, RANGE_64, DIRECTORY_STRINGS);
 
     // givenName
-    conf(ids, DN.givenName, RANGE_64, DIRECTORY_STRINGS, StringType.utf8String);
+    conf(ids, DN.givenName, RANGE_64, DIRECTORY_STRINGS);
 
     // initials
-    conf(ids, DN.initials, RANGE_64, DIRECTORY_STRINGS, StringType.utf8String);
+    conf(ids, DN.initials, RANGE_64, DIRECTORY_STRINGS);
 
     // LDAP user ID
-    conf(ids, DN.userid, null, DIRECTORY_STRINGS, StringType.utf8String);
+    conf(ids, DN.userid, null, DIRECTORY_STRINGS);
 
     // localityName, jurisdictionOfIncorporationLocalityName
     idList = new ASN1ObjectIdentifier[] {
         DN.localityName,
         DN.jurisdictionOfIncorporationLocalityName};
     for (ASN1ObjectIdentifier m : idList) {
-      conf(ids, m, RANGE_128, DIRECTORY_STRINGS, StringType.utf8String);
+      conf(ids, m, RANGE_128, DIRECTORY_STRINGS);
     }
 
     // name
-    conf(ids, DN.name, RANGE_NAME, DIRECTORY_STRINGS, StringType.utf8String);
+    conf(ids, DN.name, RANGE_NAME, DIRECTORY_STRINGS);
 
     // nameOfBirth
-    conf(ids, DN.nameAtBirth, RANGE_64, DIRECTORY_STRINGS, StringType.utf8String);
+    conf(ids, DN.nameAtBirth, RANGE_64, DIRECTORY_STRINGS);
 
     // organizationName
-    conf(ids, DN.O, RANGE_64, DIRECTORY_STRINGS, StringType.utf8String);
+    conf(ids, DN.O, RANGE_64, DIRECTORY_STRINGS);
 
     // organizationIdentifier
-    conf(ids, DN.organizationIdentifier, RANGE_64, DIRECTORY_STRINGS, StringType.utf8String);
+    conf(ids, DN.organizationIdentifier, RANGE_64, DIRECTORY_STRINGS);
 
     // NIF
-    conf(ids, DN.NIF, RANGE_64, DIRECTORY_STRINGS, StringType.utf8String);
+    conf(ids, DN.NIF, RANGE_64, DIRECTORY_STRINGS);
 
     // CIF
-    conf(ids, DN.CIF, RANGE_64, DIRECTORY_STRINGS, StringType.utf8String);
+    conf(ids, DN.CIF, RANGE_64, DIRECTORY_STRINGS);
 
     // organizationalUnitName
-    conf(ids, DN.OU, RANGE_64, DIRECTORY_STRINGS, StringType.utf8String);
+    conf(ids, DN.OU, RANGE_64, DIRECTORY_STRINGS);
 
     // placeOfBirth
-    conf(ids, DN.placeOfBirth, RANGE_128, DIRECTORY_STRINGS, StringType.utf8String);
+    conf(ids, DN.placeOfBirth, RANGE_128, DIRECTORY_STRINGS);
 
     // postalAddress
-    conf(ids, DN.postalAddress, RANGE_POSTAL_ADDRESS, DIRECTORY_STRINGS, StringType.utf8String);
+    conf(ids, DN.postalAddress, RANGE_POSTAL_ADDRESS, DIRECTORY_STRINGS);
 
     // postalCode
-    conf(ids, DN.postalCode, RANGE_POSTAL_CODE, DIRECTORY_STRINGS, StringType.utf8String);
+    conf(ids, DN.postalCode, RANGE_POSTAL_CODE, DIRECTORY_STRINGS);
 
     // pseudonym
-    conf(ids, DN.pseudonym, RANGE_64, DIRECTORY_STRINGS, StringType.utf8String);
+    conf(ids, DN.pseudonym, RANGE_64, DIRECTORY_STRINGS);
 
     // distinguishedNameQualifier
-    conf(ids, DN.dnQualifier, RANGE_64, PRINTABLE_STRING_ONLY, StringType.printableString);
+    conf(ids, DN.dnQualifier, RANGE_64, PRINTABLE_STRING_ONLY);
 
     // serialNumber
-    conf(ids, DN.serialNumber, RANGE_64, PRINTABLE_STRING_ONLY, StringType.printableString);
+    conf(ids, DN.serialNumber, RANGE_64, PRINTABLE_STRING_ONLY);
 
     // stateOrProvinceName, jurisdictionOfIncorporationStateOrProvinceName
     idList = new ASN1ObjectIdentifier[] {
         DN.ST, DN.jurisdictionOfIncorporationStateOrProvinceName};
     for (ASN1ObjectIdentifier m : idList) {
-      conf(ids, m, RANGE_128, DIRECTORY_STRINGS, StringType.utf8String);
+      conf(ids, m, RANGE_128, DIRECTORY_STRINGS);
     }
 
     // streetAddress
-    conf(ids, DN.street, RANGE_128, DIRECTORY_STRINGS, StringType.utf8String);
+    conf(ids, DN.street, RANGE_128, DIRECTORY_STRINGS);
 
     // surName
-    conf(ids, DN.surname, RANGE_64, DIRECTORY_STRINGS, StringType.utf8String);
+    conf(ids, DN.surname, RANGE_64, DIRECTORY_STRINGS);
 
     // title
-    conf(ids, DN.T, RANGE_64,DIRECTORY_STRINGS, StringType.utf8String);
+    conf(ids, DN.T, RANGE_64,DIRECTORY_STRINGS);
 
     // telefonNumber
-    conf(ids, DN.telephoneNumber, null, DIRECTORY_STRINGS, StringType.utf8String);
+    conf(ids, DN.telephoneNumber, null, DIRECTORY_STRINGS);
 
     // unique Identifier
-    conf(ids, DN.uniqueIdentifier, null, DIRECTORY_STRINGS, StringType.utf8String);
+    conf(ids, DN.uniqueIdentifier, null, DIRECTORY_STRINGS);
 
     // unstructedAddress
-    conf(ids, DN.unstructuredAddress, null, DIRECTORY_STRINGS, StringType.utf8String);
+    conf(ids, DN.unstructuredAddress, null, DIRECTORY_STRINGS);
 
     // unstructedName
-    conf(ids, DN.unstructuredName, null, DIRECTORY_STRINGS, StringType.utf8String);
+    conf(ids, DN.unstructuredName, null, DIRECTORY_STRINGS);
 
     for (ASN1ObjectIdentifier type : ids) {
       StringType stringType = DFLT_STRING_TYPES.get(type);
-      if (stringType == null) {
-        stringType = StringType.utf8String;
-      }
       RdnControl control = new RdnControl(type,
           0, // minOccurs
           9 //maxOccurs
@@ -322,19 +319,16 @@ public class SubjectDnSpec {
   }
 
   private static void conf(Set<ASN1ObjectIdentifier> types, ASN1ObjectIdentifier type,
-      Range range, Set<StringType> stringTypes, StringType dfltStringType) {
+      Range range, Set<StringType> stringTypes) {
     types.add(type);
     if (range != null) {
       RANGES.put(type, range);
     }
     if (stringTypes != null) {
       STRING_TYPE_SET.put(type, stringTypes);
-    }
-    if (dfltStringType != null) {
-      if (stringTypes != null && !stringTypes.contains(dfltStringType)) {
-        throw new IllegalArgumentException("stringTypes does not contain dfltStringType");
+      if (stringTypes.size() == 1) {
+        DFLT_STRING_TYPES.put(type, stringTypes.iterator().next());
       }
-      DFLT_STRING_TYPES.put(type, dfltStringType);
     }
   }
 
