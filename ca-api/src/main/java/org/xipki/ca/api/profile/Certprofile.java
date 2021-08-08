@@ -829,8 +829,8 @@ public abstract class Certprofile implements Closeable {
    *         null, empty or 'CA': CA generates serial number
    *         'PROFILE': The function
    *           {@link #generateSerialNumber(X500Name, SubjectPublicKeyInfo, X500Name,
-   *           SubjectPublicKeyInfo, ConfPairs)} will
-   *           be called to generate the serial number. The list is case-sensitive.
+   *           SubjectPublicKeyInfo, ConfPairs)} will be called to generate the serial number.
+   *           The ConfPairs is case-sensitive.
    */
   public String getSerialNumberMode() {
     return null;

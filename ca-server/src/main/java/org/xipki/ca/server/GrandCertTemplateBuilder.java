@@ -74,6 +74,8 @@ class GrandCertTemplateBuilder {
 
   private static final long MAX_CERT_TIME_MS = 253402300799982L; //9999-12-31-23-59-59
 
+  private static final Date MAX_CERT_TIME = new Date(MAX_CERT_TIME_MS);
+
   private static final long MS_PER_10MINUTES = 300000L;
 
   // CHECKSTYLE:SKIP
@@ -402,7 +404,7 @@ class GrandCertTemplateBuilder {
     Date maxNotAfter = validity.add(grantedNotBefore);
     // maxNotAfter not after 99991231-235959
     if (maxNotAfter.getTime() > MAX_CERT_TIME_MS) {
-      maxNotAfter = new Date(MAX_CERT_TIME_MS);
+      maxNotAfter = MAX_CERT_TIME;
     }
 
     Date grantedNotAfter = certTemplate.getNotAfter();

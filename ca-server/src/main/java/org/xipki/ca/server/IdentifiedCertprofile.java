@@ -594,16 +594,14 @@ public class IdentifiedCertprofile implements Closeable {
                 for (int i = 0; i < 8; i++) {
                   String block = blocks[i];
                   int blen = block.length();
-                  if (blen == 0) {
-                    continue;
-                  } else if (blen == 1 | blen == 2) {
+                  if (blen == 1 | blen == 2) {
                     commonNameBytes[i * 2 + 1] = (byte) Integer.parseInt(block, 16);
                   } else if (blen == 3 | blen == 4) {
                     commonNameBytes[i * 2] =
                         (byte) Integer.parseInt(block.substring(0, blen - 2), 16);
                     commonNameBytes[i * 2 + 1] =
                         (byte) Integer.parseInt(block.substring(blen - 2), 16);
-                  } else {
+                  } else if(blen != 0) {
                     throw new BadCertTemplateException(
                         "invalid IP address in commonName " + commonName);
                   }
@@ -669,15 +667,6 @@ public class IdentifiedCertprofile implements Closeable {
     }
   }
 
-  public boolean useIssuerAndSerialInAki() {
-    return certprofile.useIssuerAndSerialInAki();
-  }
-
-  public String incSerialNumber(String currentSerialNumber)
-      throws BadFormatException {
-    return certprofile.incSerialNumber(currentSerialNumber);
-  }
-
   public boolean isSerialNumberInReqPermitted() {
     return certprofile.isSerialNumberInReqPermitted();
   }
@@ -686,25 +675,12 @@ public class IdentifiedCertprofile implements Closeable {
     return certprofile.getExtensionControls();
   }
 
-  public Set<KeyUsageControl> getKeyUsage() {
-    return certprofile.getKeyUsage();
-  }
-
   public Integer getPathLenBasicConstraint() {
     return certprofile.getPathLenBasicConstraint();
-  }
-
-  public Set<ExtKeyUsageControl> getExtendedKeyUsages() {
-    return certprofile.getExtendedKeyUsages();
   }
 
   public int getMaxCertSize() {
     return certprofile.getMaxCertSize();
   }
-
-  public void validate()
-      throws CertprofileException {
-    CertprofileUtil.validate(certprofile);
-  } // method validate
 
 }
