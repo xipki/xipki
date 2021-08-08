@@ -33,11 +33,11 @@ class RevokeCertResponse {
 
   private List<ResultEntry> resultEntries;
 
-  public List<ResultEntry> getResultEntries() {
+  List<ResultEntry> getResultEntries() {
     return resultEntries;
   }
 
-  public void addResultEntry(ResultEntry resultEntry) {
+  void addResultEntry(ResultEntry resultEntry) {
     Args.notNull(resultEntry, "resultEntry");
     if (!(resultEntry instanceof ResultEntry.RevokeCert
         || resultEntry instanceof ResultEntry.Error)) {

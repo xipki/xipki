@@ -160,7 +160,7 @@ class CmpAgent {
 
     httpUrlConnection.setRequestMethod("POST");
     httpUrlConnection.setRequestProperty("Content-Type", CMP_REQUEST_MIMETYPE);
-    httpUrlConnection.setRequestProperty("Content-Length", java.lang.Integer.toString(size));
+    httpUrlConnection.setRequestProperty("Content-Length", Integer.toString(size));
     OutputStream outputstream;
 
     // try max. 3 times
@@ -515,15 +515,15 @@ class CmpAgent {
     return new PKIMessage(header, body);
   } // method buildMessageWithGeneralMsgContent
 
-  public boolean isSendRequestorCert() {
+  boolean isSendRequestorCert() {
     return sendRequestorCert;
   }
 
-  public void setSendRequestorCert(boolean sendRequestorCert) {
+  void setSendRequestorCert(boolean sendRequestorCert) {
     this.sendRequestorCert = sendRequestorCert;
   }
 
-  public X509CRLHolder generateCrl(ReqRespDebug debug)
+  X509CRLHolder generateCrl(ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     int action = XiSecurityConstants.CMP_ACTION_GEN_CRL;
     PKIMessage request = buildMessageWithXipkiAction(action, null);
@@ -531,12 +531,12 @@ class CmpAgent {
     return evaluateCrlResponse(response, action);
   } // method generateCrl
 
-  public X509CRLHolder downloadCurrentCrl(ReqRespDebug debug)
+  X509CRLHolder downloadCurrentCrl(ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     return downloadCrl(null, debug);
   } // method downloadCurrentCrl
 
-  public X509CRLHolder downloadCrl(BigInteger crlNumber, ReqRespDebug debug)
+  X509CRLHolder downloadCrl(BigInteger crlNumber, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     Integer action = null;
     PKIMessage request;
@@ -552,7 +552,7 @@ class CmpAgent {
     return evaluateCrlResponse(response, action);
   } // method downloadCrl
 
-  public RevokeCertResponse revokeCertificate(RevokeCertRequest request,
+  RevokeCertResponse revokeCertificate(RevokeCertRequest request,
       ReqRespDebug debug)
           throws CmpClientException, PkiErrorException {
     PKIMessage reqMessage = buildRevokeCertRequest(notNull(request, "request"));
@@ -560,7 +560,7 @@ class CmpAgent {
     return parse(response, request.getRequestEntries());
   } // method revokeCertificate
 
-  public RevokeCertResponse unrevokeCertificate(UnrevokeOrRemoveCertRequest request,
+  RevokeCertResponse unrevokeCertificate(UnrevokeOrRemoveCertRequest request,
       ReqRespDebug debug)
           throws CmpClientException, PkiErrorException {
     PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(notNull(request, "request"),
@@ -569,7 +569,7 @@ class CmpAgent {
     return parse(response, request.getRequestEntries());
   } // method unrevokeCertificate
 
-  public RevokeCertResponse removeCertificate(UnrevokeOrRemoveCertRequest request,
+  RevokeCertResponse removeCertificate(UnrevokeOrRemoveCertRequest request,
       ReqRespDebug debug)
           throws CmpClientException, PkiErrorException {
     PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(notNull(request, "request"),
@@ -578,7 +578,7 @@ class CmpAgent {
     return parse(response, request.getRequestEntries());
   } // method removeCertificate
 
-  public EnrollCertResponse requestCertificate(CsrEnrollCertRequest csr, Date notBefore,
+  EnrollCertResponse requestCertificate(CsrEnrollCertRequest csr, Date notBefore,
       Date notAfter, ReqRespDebug debug)
           throws CmpClientException, PkiErrorException {
     PKIMessage request = buildPkiMessage(notNull(csr, "csr"), notBefore, notAfter);
@@ -587,7 +587,7 @@ class CmpAgent {
     return requestCertificate0(request, reqIdIdMap, PKIBody.TYPE_CERT_REP, debug);
   } // method requestCertificate
 
-  public EnrollCertResponse requestCertificate(EnrollCertRequest req, ReqRespDebug debug)
+  EnrollCertResponse requestCertificate(EnrollCertRequest req, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     PKIMessage request = buildPkiMessage(notNull(req, "req"));
     Map<BigInteger, String> reqIdIdMap = new HashMap<>();
@@ -926,7 +926,7 @@ class CmpAgent {
     return new PKIMessage(header, body);
   } // method buildPkiMessage
 
-  public CaConf.CaInfo retrieveCaInfo(String caName, ReqRespDebug debug)
+  CaConf.CaInfo retrieveCaInfo(String caName, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     notBlank(caName, "caName");
 

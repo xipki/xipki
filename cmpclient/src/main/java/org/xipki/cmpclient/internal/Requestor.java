@@ -44,11 +44,11 @@ abstract class Requestor {
     this.name = new GeneralName(notNull(name, "name"));
   }
 
-  public boolean signRequest() {
+  boolean signRequest() {
     return signRequest;
   }
 
-  public GeneralName getName() {
+  GeneralName getName() {
     return name;
   }
 
@@ -78,16 +78,16 @@ abstract class Requestor {
       this.mac = mac;
     }
 
-    public char[] getPassword() {
+    char[] getPassword() {
       return password;
     }
 
     // CHECKSTYLE:SKIP
-    public byte[] getSenderKID() {
+    byte[] getSenderKID() {
       return senderKID;
     }
 
-    public PBMParameter getParameter() {
+    PBMParameter getParameter() {
       return new PBMParameter(randomSalt(), owf.getAlgorithmIdentifier(),
           iterationCount, mac.getAlgorithmIdentifier());
     }
@@ -108,12 +108,12 @@ abstract class Requestor {
       this.signer = null;
     }
 
-    public SignatureCmpRequestor(boolean signRequest, ConcurrentContentSigner signer) {
+    SignatureCmpRequestor(boolean signRequest, ConcurrentContentSigner signer) {
       super(signRequest, getSignerSubject(signer));
       this.signer = signer;
     }
 
-    public ConcurrentContentSigner getSigner() {
+    ConcurrentContentSigner getSigner() {
       return signer;
     }
 

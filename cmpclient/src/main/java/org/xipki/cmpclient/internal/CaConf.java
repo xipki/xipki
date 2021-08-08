@@ -118,9 +118,9 @@ class CaConf {
 
   private CmpControl cmpControl;
 
-  private SSLSocketFactory sslSocketFactory;
+  private final SSLSocketFactory sslSocketFactory;
 
-  private HostnameVerifier hostnameVerifier;
+  private final HostnameVerifier hostnameVerifier;
 
   private Map<String, CertprofileInfo> profiles = Collections.emptyMap();
 
@@ -141,15 +141,15 @@ class CaConf {
     return name;
   }
 
-  public String getUrl() {
+  String getUrl() {
     return url;
   }
 
-  public String getHealthUrl() {
+  String getHealthUrl() {
     return healthUrl;
   }
 
-  public void setCertchain(List<X509Cert> certchain)
+  void setCertchain(List<X509Cert> certchain)
       throws CertificateEncodingException {
     notEmpty(certchain, "certchain");
     this.certchain = certchain;
@@ -158,7 +158,7 @@ class CaConf {
     this.subjectKeyIdentifier = cert.getSubjectKeyId();
   }
 
-  public void setCertprofiles(Set<CertprofileInfo> certprofiles) {
+  void setCertprofiles(Set<CertprofileInfo> certprofiles) {
     if (profiles == null) {
       this.profiles = Collections.emptyMap();
     } else {
@@ -169,117 +169,109 @@ class CaConf {
     }
   }
 
-  public X509Cert getCert() {
+  X509Cert getCert() {
     return cert;
   }
 
-  public List<X509Cert> getCertchain() {
+  List<X509Cert> getCertchain() {
     return certchain;
   }
 
-  public boolean isDhpocAutoconf() {
+  boolean isDhpocAutoconf() {
     return dhpocAutoconf;
   }
 
-  public void setDhpocAutoconf(boolean dhpocAutoconf) {
+  void setDhpocAutoconf(boolean dhpocAutoconf) {
     this.dhpocAutoconf = dhpocAutoconf;
   }
 
-  public List<X509Cert> getDhpocs() {
+  List<X509Cert> getDhpocs() {
     return dhpocs;
   }
 
-  public void setDhpocs(List<X509Cert> dhpocs) {
+  void setDhpocs(List<X509Cert> dhpocs) {
     this.dhpocs = dhpocs;
   }
 
-  public X500Name getSubject() {
+  X500Name getSubject() {
     return subject;
   }
 
-  public boolean isCertAutoconf() {
+  boolean isCertAutoconf() {
     return certAutoconf;
   }
 
-  public Set<String> getProfileNames() {
+  Set<String> getProfileNames() {
     return profiles.keySet();
   }
 
-  public boolean supportsProfile(String profileName) {
+  boolean supportsProfile(String profileName) {
     return profiles.containsKey(toNonBlankLower(profileName, "profileName"));
   }
 
-  public CertprofileInfo getProfile(String profileName) {
+  CertprofileInfo getProfile(String profileName) {
     return profiles.get(toNonBlankLower(profileName, "profileName"));
   }
 
-  public boolean isCaInfoConfigured() {
+  boolean isCaInfoConfigured() {
     return cert != null;
   }
 
-  public Responder getResponder() {
+  Responder getResponder() {
     return responder;
   }
 
-  public void setCertAutoconf(boolean autoconf) {
+  void setCertAutoconf(boolean autoconf) {
     this.certAutoconf = autoconf;
   }
 
-  public boolean isCertprofilesAutoconf() {
+  boolean isCertprofilesAutoconf() {
     return certprofilesAutoconf;
   }
 
-  public void setCertprofilesAutoconf(boolean autoconf) {
+  void setCertprofilesAutoconf(boolean autoconf) {
     this.certprofilesAutoconf = autoconf;
   }
 
-  public void setAgent(CmpAgent agent) {
+  void setAgent(CmpAgent agent) {
     this.agent = agent;
   }
 
-  public String getRequestorName() {
+  String getRequestorName() {
     return requestorName;
   }
 
-  public CmpAgent getAgent() {
+  CmpAgent getAgent() {
     return agent;
   }
 
-  public void setCmpControlAutoconf(boolean autoconf) {
+  void setCmpControlAutoconf(boolean autoconf) {
     this.cmpControlAutoconf = autoconf;
   }
 
-  public boolean isCmpControlAutoconf() {
+  boolean isCmpControlAutoconf() {
     return cmpControlAutoconf;
   }
 
-  public void setCmpControl(CmpControl cmpControl) {
+  void setCmpControl(CmpControl cmpControl) {
     this.cmpControl = cmpControl;
   }
 
-  public CmpControl getCmpControl() {
+  CmpControl getCmpControl() {
     return cmpControl;
   }
 
-  public byte[] getSubjectKeyIdentifier() {
+  byte[] getSubjectKeyIdentifier() {
     return (subjectKeyIdentifier == null) ? null
         : Arrays.copyOf(subjectKeyIdentifier, subjectKeyIdentifier.length);
   }
 
-  public SSLSocketFactory getSslSocketFactory() {
+  SSLSocketFactory getSslSocketFactory() {
     return sslSocketFactory;
   }
 
-  public void setSslSocketFactory(SSLSocketFactory sslSocketFactory) {
-    this.sslSocketFactory = sslSocketFactory;
-  }
-
-  public HostnameVerifier getHostnameVerifier() {
+  HostnameVerifier getHostnameVerifier() {
     return hostnameVerifier;
-  }
-
-  public void setHostnameVerifier(HostnameVerifier hostnameVerifier) {
-    this.hostnameVerifier = hostnameVerifier;
   }
 
 }

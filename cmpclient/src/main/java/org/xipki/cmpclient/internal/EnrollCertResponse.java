@@ -36,17 +36,17 @@ class EnrollCertResponse {
 
   private List<ResultEntry> resultEntries;
 
-  public EnrollCertResponse() {
+  EnrollCertResponse() {
   }
 
-  public void addCaCertificate(CMPCertificate caCertificate) {
+  void addCaCertificate(CMPCertificate caCertificate) {
     if (caCertificates == null) {
       caCertificates = new ArrayList<>(1);
     }
     caCertificates.add(caCertificate);
   }
 
-  public void addResultEntry(ResultEntry resultEntry) {
+  void addResultEntry(ResultEntry resultEntry) {
     Args.notNull(resultEntry, "resultEntry");
 
     if (!(resultEntry instanceof ResultEntry.EnrollCert
@@ -62,11 +62,11 @@ class EnrollCertResponse {
     resultEntries.add(resultEntry);
   }
 
-  public List<CMPCertificate> getCaCertificates() {
+  List<CMPCertificate> getCaCertificates() {
     return caCertificates;
   }
 
-  public List<ResultEntry> getResultEntries() {
+  List<ResultEntry> getResultEntries() {
     return resultEntries;
   }
 

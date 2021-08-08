@@ -589,7 +589,7 @@ class CmpAgentUtil {
     return new Extensions(extAki);
   } // method getCertTempExtensions
 
-  public static CaConf.CaInfo retrieveCaInfo(VerifiedPkiMessage response, String caName)
+  static CaConf.CaInfo retrieveCaInfo(VerifiedPkiMessage response, String caName)
       throws CmpClientException, PkiErrorException {
     ASN1Encodable itvValue = extractXipkiActionRepContent(response);
     DERUTF8String utf8Str = DERUTF8String.getInstance(itvValue);

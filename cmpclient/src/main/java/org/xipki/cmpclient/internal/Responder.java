@@ -45,7 +45,7 @@ abstract class Responder {
     this.name = new GeneralName(notNull(name, "name"));
   }
 
-  public GeneralName getName() {
+  GeneralName getName() {
     return name;
   }
 
@@ -94,11 +94,11 @@ abstract class Responder {
       this.sigAlgoValidator = notNull(sigAlgoValidator, "sigAlgoValidator");
     }
 
-    public X509Cert getCert() {
+    X509Cert getCert() {
       return cert;
     }
 
-    public AlgorithmValidator getSigAlgoValidator() {
+    AlgorithmValidator getSigAlgoValidator() {
       return sigAlgoValidator;
     }
 

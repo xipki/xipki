@@ -116,14 +116,6 @@ final class CmpClientConfigurer {
       this.hostnameVerifier = hostnameVerifier;
     }
 
-    public SSLSocketFactory getSslSocketFactory() {
-      return sslSocketFactory;
-    }
-
-    public HostnameVerifier getHostnameVerifier() {
-      return hostnameVerifier;
-    }
-
   } // class SslConf
 
   private static final Logger LOG = LoggerFactory.getLogger(CmpClientConfigurer.class);
@@ -333,8 +325,8 @@ final class CmpClientConfigurer {
             LOG.error("no ssl named {} is configured", caType.getSsl());
             return false;
           } else {
-            sslSocketFactory = sslConf.getSslSocketFactory();
-            hostnameVerifier = sslConf.getHostnameVerifier();
+            sslSocketFactory = sslConf.sslSocketFactory;
+            hostnameVerifier = sslConf.hostnameVerifier;
           }
         }
 
@@ -552,10 +544,6 @@ final class CmpClientConfigurer {
     LOG.info("initialized");
     return true;
   } // method init
-
-  String getConfFile() {
-    return confFile;
-  }
 
   void setConfFile(String confFile) {
     this.confFile = notBlank(confFile, "confFile");

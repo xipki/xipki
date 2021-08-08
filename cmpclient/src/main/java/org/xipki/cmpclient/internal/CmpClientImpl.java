@@ -28,6 +28,7 @@ import org.bouncycastle.cert.X509CRLHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.cmpclient.*;
+import org.xipki.security.SecurityFactory;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
@@ -63,6 +64,14 @@ public final class CmpClientImpl implements CmpClient {
 
   public CmpClientImpl() {
     configurer = new CmpClientConfigurer();
+  }
+
+  public void setSecurityFactory(SecurityFactory securityFactory) {
+    configurer.setSecurityFactory(securityFactory);
+  }
+
+  public void setConfFile(String confFile) {
+    configurer.setConfFile(confFile);
   }
 
   private void initIfNotInitialized()

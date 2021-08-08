@@ -18,7 +18,6 @@
 package org.xipki.cmpclient.internal;
 
 import org.bouncycastle.asn1.cmp.CMPCertificate;
-import org.bouncycastle.asn1.cmp.PKIStatus;
 import org.bouncycastle.asn1.crmf.CertId;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -38,31 +37,31 @@ import static org.xipki.util.Args.notNull;
 
 abstract class ResultEntry extends IdentifiedObject {
 
-  public ResultEntry(String id) {
+  ResultEntry(String id) {
     super(id);
   }
 
-  public static class Error extends ResultEntry {
+  static class Error extends ResultEntry {
 
     private final PkiStatusInfo statusInfo;
 
-    public Error(String id, int status, int pkiFailureInfo, String statusMessage) {
+    Error(String id, int status, int pkiFailureInfo, String statusMessage) {
       super(id);
       this.statusInfo = new PkiStatusInfo(status, pkiFailureInfo, statusMessage);
     }
 
-    public Error(String id, int status) {
+    Error(String id, int status) {
       super(id);
       this.statusInfo = new PkiStatusInfo(status);
     }
 
-    public PkiStatusInfo getStatusInfo() {
+    PkiStatusInfo getStatusInfo() {
       return statusInfo;
     }
 
   } // class Error
 
-  public static class EnrollCert extends ResultEntry {
+  static class EnrollCert extends ResultEntry {
 
     private final CMPCertificate cert;
 
@@ -70,43 +69,43 @@ abstract class ResultEntry extends IdentifiedObject {
 
     private final int status;
 
-    public EnrollCert(String id, CMPCertificate cert, PrivateKeyInfo privateKeyInfo, int status) {
+    EnrollCert(String id, CMPCertificate cert, PrivateKeyInfo privateKeyInfo, int status) {
       super(id);
       this.cert = cert;
       this.privateKeyInfo = privateKeyInfo;
       this.status = status;
     }
 
-    public CMPCertificate getCert() {
+    CMPCertificate getCert() {
       return cert;
     }
 
-    public PrivateKeyInfo getPrivateKeyInfo() {
+    PrivateKeyInfo getPrivateKeyInfo() {
       return privateKeyInfo;
     }
 
-    public int getStatus() {
+    int getStatus() {
       return status;
     }
 
   } // class EnrollCert
 
-  public static class RevokeCert extends ResultEntry {
+  static class RevokeCert extends ResultEntry {
 
     private final CertId certId;
 
-    public RevokeCert(String id, CertId certId) {
+    RevokeCert(String id, CertId certId) {
       super(id);
       this.certId = certId;
     }
 
-    public CertId getCertId() {
+    CertId getCertId() {
       return certId;
     }
 
   } // class RevokeCert
 
-  public static class UnrevokeOrRemoveCert extends ResultEntry {
+  static class UnrevokeOrRemoveCert extends ResultEntry {
 
     private final X500Name issuer;
 
@@ -114,25 +113,25 @@ abstract class ResultEntry extends IdentifiedObject {
 
     private byte[] authorityKeyIdentifier;
 
-    public UnrevokeOrRemoveCert(String id, X500Name issuer, BigInteger serialNumber) {
+    UnrevokeOrRemoveCert(String id, X500Name issuer, BigInteger serialNumber) {
       super(id);
       this.serialNumber = notNull(serialNumber, "serialNumber");
       this.issuer = notNull(issuer, "issuer");
     }
 
-    public X500Name getIssuer() {
+    X500Name getIssuer() {
       return issuer;
     }
 
-    public BigInteger getSerialNumber() {
+    BigInteger getSerialNumber() {
       return serialNumber;
     }
 
-    public byte[] getAuthorityKeyIdentifier() {
+    byte[] getAuthorityKeyIdentifier() {
       return authorityKeyIdentifier;
     }
 
-    public void setAuthorityKeyIdentifier(byte[] authorityKeyIdentifier) {
+    void setAuthorityKeyIdentifier(byte[] authorityKeyIdentifier) {
       this.authorityKeyIdentifier = authorityKeyIdentifier;
     }
 
