@@ -12,12 +12,8 @@ a highly scalable and high-performance open source PKI (CA and OCSP responder).
 ## License
 * The Apache Software License, Version 2.0
 
-## Owner
-Lijun Liao, [LinkedIn](https://www.linkedin.com/in/lijun-liao-644696b8), wechat `xipki9`
-
 ## Support
-Just create [issues](https://github.com/xipki/xipki/issues), 
-or via wechat.
+Just create [issues](https://github.com/xipki/xipki/issues). 
 
 For bug-report please upload the testdata and log files, describe the version of XiPKI, OS and
 JRE/JDK, and the steps to reproduce the bug.
