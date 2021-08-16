@@ -44,23 +44,12 @@ class RandomSerialNumberGenerator {
    */
   public BigInteger nextSerialNumber(int byteLen) {
     final byte[] rndBytes = new byte[byteLen];
-    final int minWeight = byteLen * 2;
-
-    while (true) {
-      random.nextBytes(rndBytes);
-      // set the first bit to 0.
-      rndBytes[0] &= 0x7F;
-
-      // check NAF weight
-      BigInteger bi = new BigInteger(rndBytes);
-
-      BigInteger threeBi = bi.shiftLeft(1).add(bi);
-      BigInteger diff = threeBi.xor(bi);
-      int nafWeight = diff.bitCount();
-      if (nafWeight >= minWeight) {
-        return bi;
-      }
-    }
+    random.nextBytes(rndBytes);
+    // clear the highest bit.
+    rndBytes[0] &= 0x7F;
+    // set the second highest bit
+    rndBytes[0] |= 0x40;
+    return new BigInteger(rndBytes);
 
   } // method nextSerialNumber
 
