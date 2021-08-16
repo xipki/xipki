@@ -483,27 +483,40 @@ public class X509Ca extends X509CaModule implements Closeable {
 
     String serialNumberMode = certprofile.getSerialNumberMode();
 
-    BigInteger serialNumber;
-    if (StringUtil.isBlank(serialNumberMode) || "CA".equalsIgnoreCase(serialNumberMode)) {
-      serialNumber = caInfo.nextSerial();
-    } else if ("PROFILE".equalsIgnoreCase(serialNumberMode)) {
-      try {
-        ConfPairs extraControl = caInfo.getExtraControl();
+    BigInteger serialNumber = null;
+    while (true) {
+      if (StringUtil.isBlank(serialNumberMode) || "CA".equalsIgnoreCase(serialNumberMode)) {
+        serialNumber = caInfo.nextSerial();
+      } else if ("PROFILE".equalsIgnoreCase(serialNumberMode)) {
+        try {
+          BigInteger previousSerialNumber = serialNumber;
 
-        serialNumber = certprofile.generateSerialNumber(
-                caInfo.getCert().getSubject(),
-                caInfo.getCert().getSubjectPublicKeyInfo(),
-                gct.requestedSubject,
-                gct.grantedPublicKey,
-                extraControl == null ? null : extraControl.unmodifiable());
-      } catch (CertprofileException ex) {
-        LogUtil.error(LOG, ex, "error generateSerialNumber");
-        throw new OperationException(SYSTEM_FAILURE,
+          ConfPairs extraControl = caInfo.getExtraControl();
+          serialNumber = certprofile.generateSerialNumber(
+                  caInfo.getCert().getSubject(),
+                  caInfo.getCert().getSubjectPublicKeyInfo(),
+                  gct.requestedSubject,
+                  gct.grantedPublicKey,
+                  extraControl == null ? null : extraControl.unmodifiable());
+
+          // if the CertProfile generates always the serial number for fixed input,
+          // do not repeat this process.
+          if (serialNumber.equals(previousSerialNumber)) {
+            break;
+          }
+        } catch (CertprofileException ex) {
+          LogUtil.error(LOG, ex, "error generateSerialNumber");
+          throw new OperationException(SYSTEM_FAILURE,
+                  "unknown SerialNumberMode '" + serialNumberMode + "'");
+        }
+      } else {
+        throw new OperationException(BAD_CERT_TEMPLATE,
                 "unknown SerialNumberMode '" + serialNumberMode + "'");
       }
-    } else {
-      throw new OperationException(BAD_CERT_TEMPLATE,
-              "unknown SerialNumberMode '" + serialNumberMode + "'");
+
+      if (certstore.getCertId(caIdent, serialNumber) == 0) {
+          break;
+      }
     }
 
     X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
