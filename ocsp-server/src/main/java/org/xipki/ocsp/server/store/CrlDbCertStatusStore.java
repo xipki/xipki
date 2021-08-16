@@ -93,7 +93,37 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
       throws OcspStoreException {
     notNull(sourceConf, "sourceConf");
 
+    // check the dir
     this.dir = IoUtil.expandFilepath(getStrValue(sourceConf, "dir", true), true);
+    File dirObj = new File(this.dir);
+    if (!dirObj.exists()) {
+      throw new OcspStoreException("the dir " + this.dir + " does not exist");
+    }
+
+    if (!dirObj.isDirectory()) {
+      throw new OcspStoreException(this.dir + " is not a directory");
+    }
+
+    File[] subDirs = new File(dir).listFiles();
+    boolean foundCrlDir = false;
+    if (subDirs != null) {
+      for (File subDir : subDirs) {
+        if (!subDir.isDirectory()) {
+          continue;
+        }
+
+        String dirName = subDir.getName();
+        if (dirName.startsWith("crl-")) {
+          foundCrlDir = true;
+          break;
+        }
+      }
+    }
+
+    if (!foundCrlDir) {
+      LOG.warn("Found no sub-directory starting with 'crl-' in " + dir);
+    }
+
     String value = getStrValue(sourceConf, "sqlBatchCommit", false);
     this.sqlBatchCommit = StringUtil.isBlank(value) ? 1000 : Integer.parseInt(value);
 
