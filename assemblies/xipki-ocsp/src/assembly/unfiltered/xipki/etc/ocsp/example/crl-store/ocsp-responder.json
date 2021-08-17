@@ -72,6 +72,8 @@
 			"datasource":"datasource1",
 			"type":"crl",
 			"conf":{
+				// please copy the folder crls/template to a new folder, e.g. crls/example-crlstore,
+				// and configure it in the following property "dir".
 				"dir":"crls/example-crls",
 				"ignoreExpiredCrls":true,
 				"sqlBatchCommit":1000
@@ -79,4 +81,3 @@
 		}
 	}]
 }
-

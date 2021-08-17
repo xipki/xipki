@@ -75,10 +75,6 @@ public class CaIdNameMap {
     return nameCertprofileMap.get(name.toLowerCase());
   }
 
-  public NameId getPublisher(int id) {
-    return idPublisherMap.get(id);
-  }
-
   public NameId getPublisher(String name) {
     return namePublisherMap.get(name.toLowerCase());
   }
@@ -106,11 +102,6 @@ public class CaIdNameMap {
 
   public String getPublisherName(int id) {
     NameId nid = idPublisherMap.get(id);
-    return (nid == null) ? null : nid.getName();
-  }
-
-  public String getRequestorName(int id) {
-    NameId nid = idRequestorMap.get(id);
     return (nid == null) ? null : nid.getName();
   }
 
@@ -147,30 +138,6 @@ public class CaIdNameMap {
     return ident;
   } // method removeCertprofile
 
-  public NameId removeCertprofile(String name) {
-    NameId ident = nameCertprofileMap.remove(name.toLowerCase());
-    if (ident != null) {
-      idCertprofileMap.remove(ident.getId());
-    }
-    return ident;
-  } // method removeCertprofile
-
-  public NameId removePublisher(int id) {
-    NameId ident = idPublisherMap.remove(id);
-    if (ident != null) {
-      namePublisherMap.remove(ident.getName());
-    }
-    return ident;
-  } // method removePublisher
-
-  public NameId removePublisher(String name) {
-    NameId ident = namePublisherMap.remove(name.toLowerCase());
-    if (ident != null) {
-      idPublisherMap.remove(ident.getId());
-    }
-    return ident;
-  } // method removePublisher
-
   public NameId removeRequestor(int id) {
     NameId ident = idRequestorMap.remove(id);
     if (ident != null) {
@@ -178,22 +145,6 @@ public class CaIdNameMap {
     }
     return ident;
   } // method removeRequestor
-
-  public NameId removeRequestor(String name) {
-    NameId ident = nameRequestorMap.remove(name.toLowerCase());
-    if (ident != null) {
-      idRequestorMap.remove(ident.getId());
-    }
-    return ident;
-  } // method removeRequestor
-
-  public NameId removeCa(int id) {
-    NameId ident = idCaMap.remove(id);
-    if (ident != null) {
-      nameCaMap.remove(ident.getName());
-    }
-    return ident;
-  } // method removeCa
 
   public NameId removeCa(String name) {
     NameId ident = nameCaMap.remove(name.toLowerCase());

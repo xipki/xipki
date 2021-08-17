@@ -24,6 +24,7 @@ import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileException;
+import org.xipki.ca.server.CertprofileUtil;
 import org.xipki.ca.server.IdentifiedCertprofile;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
@@ -249,7 +250,9 @@ class CertprofileManager {
 
     try {
       Certprofile profile = manager.certprofileFactoryRegister.newCertprofile(type);
-      return new IdentifiedCertprofile(entry, profile);
+      IdentifiedCertprofile identifiedCertprofile = new IdentifiedCertprofile(entry, profile);
+      //CertprofileUtil.validate(profile);
+      return identifiedCertprofile;
     } catch (ObjectCreationException | CertprofileException ex) {
       String msg = "could not initialize Certprofile " + entry.getIdent();
       LogUtil.error(LOG, ex, msg);

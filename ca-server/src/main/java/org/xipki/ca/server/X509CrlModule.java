@@ -51,6 +51,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.xipki.ca.api.OperationException.ErrorCode.*;
+import static org.xipki.ca.server.CaAuditConstants.*;
 import static org.xipki.util.Args.notNull;
 
 /**
@@ -144,7 +145,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
               + (intervals + control.getOverlapDays()) * MS_PER_DAY);
 
       try {
-        generateCrl(createDeltaCrlNow, now, nextUpdate, CaAuditConstants.MSGID_ca_routine);
+        generateCrl(createDeltaCrlNow, now, nextUpdate, MSGID_ca_routine);
       } catch (Throwable th) {
         LogUtil.error(LOG, th);
       }
@@ -208,13 +209,19 @@ public class X509CrlModule extends X509CaModule implements Closeable {
     }
   }
 
-  public X509CRLHolder getCurrentCrl() throws OperationException {
-    return getCrl(null);
+  public X509CRLHolder getCurrentCrl(String msgId) throws OperationException {
+    return getCrl(null, msgId);
   }
 
-  public X509CRLHolder getCrl(BigInteger crlNumber) throws OperationException {
+  public X509CRLHolder getCrl(BigInteger crlNumber, String msgId) throws OperationException {
     LOG.info("     START getCrl: ca={}, crlNumber={}", caIdent.getName(), crlNumber);
     boolean successful = false;
+
+    AuditEvent event0 = newPerfAuditEvent(
+            crlNumber == null ? TYPE_download_crl : TYPE_downlaod_crl4number, msgId);
+    if (crlNumber != null) {
+      event0.addEventData(NAME_crl_number, crlNumber);
+    }
 
     try {
       byte[] encodedCrl = certstore.getEncodedCrl(caIdent, crlNumber);
@@ -237,16 +244,23 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       if (!successful) {
         LOG.info("    FAILED getCrl: ca={}", caIdent.getName());
       }
+      finish(event0, successful);
     }
   } // method getCrl
 
-  public CertificateList getBcCurrentCrl() throws OperationException {
-    return getBcCrl(null);
+  public CertificateList getBcCurrentCrl(String msgId) throws OperationException {
+    return getBcCrl(null, msgId);
   }
 
-  public CertificateList getBcCrl(BigInteger crlNumber) throws OperationException {
+  public CertificateList getBcCrl(BigInteger crlNumber, String msgId) throws OperationException {
     LOG.info("     START getCrl: ca={}, crlNumber={}", caIdent.getName(), crlNumber);
     boolean successful = false;
+
+    AuditEvent event0 = newPerfAuditEvent(
+            crlNumber == null ? TYPE_download_crl : TYPE_downlaod_crl4number, msgId);
+    if (crlNumber != null) {
+      event0.addEventData(NAME_crl_number, crlNumber);
+    }
 
     try {
       byte[] encodedCrl = certstore.getEncodedCrl(caIdent, crlNumber);
@@ -269,6 +283,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       if (!successful) {
         LOG.info("    FAILED getCrl: ca={}", caIdent.getName());
       }
+      finish(event0, successful);
     }
   } // method getCrl
 
@@ -278,12 +293,12 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       LOG.info("     START cleanupCrls: ca={}, numCrls={}", caIdent.getName(), numCrls);
 
       boolean succ = false;
-      AuditEvent event0 = newPerfAuditEvent(CaAuditConstants.TYPE_cleanup_crl, msgId);
+      AuditEvent event0 = newPerfAuditEvent(TYPE_cleanup_crl, msgId);
 
       try {
         int num = (numCrls <= 0) ? 0 : certstore.cleanupCrls(caIdent, caInfo.getNumCrls());
         succ = true;
-        event0.addEventData(CaAuditConstants.NAME_num, num);
+        event0.addEventData(NAME_num, num);
         LOG.info("SUCCESSFUL cleanupCrls: ca={}, num={}", caIdent.getName(), num);
       } catch (RuntimeException ex) {
         throw new OperationException(SYSTEM_FAILURE, ex);
@@ -332,7 +347,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
   private X509CRLHolder generateCrl(boolean deltaCrl, Date thisUpdate, Date nextUpdate,
       String msgId) throws OperationException {
     boolean successful = false;
-    AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_gen_crl, msgId);
+    AuditEvent event = newPerfAuditEvent(TYPE_gen_crl, msgId);
     try {
       X509CRLHolder crl = generateCrl0(deltaCrl, thisUpdate, nextUpdate, event, msgId);
       successful = true;
@@ -360,12 +375,12 @@ public class X509CrlModule extends X509CaModule implements Closeable {
 
     LOG.info("     START generateCrl: ca={}, deltaCRL={}, nextUpdate={}, baseCRLNumber={}",
         caIdent.getName(), deltaCrl, nextUpdate, deltaCrl ? baseCrlNumber : "-");
-    event.addEventData(CaAuditConstants.NAME_crl_type, (deltaCrl ? "DELTA_CRL" : "FULL_CRL"));
+    event.addEventData(NAME_crl_type, (deltaCrl ? "DELTA_CRL" : "FULL_CRL"));
 
     if (nextUpdate == null) {
-      event.addEventData(CaAuditConstants.NAME_next_update, "null");
+      event.addEventData(NAME_next_update, "null");
     } else {
-      event.addEventData(CaAuditConstants.NAME_next_update,
+      event.addEventData(NAME_next_update,
           DateUtil.toUtcTimeyyyyMMddhhmmss(nextUpdate));
       if (nextUpdate.getTime() - thisUpdate.getTime() < 10 * 60 * MS_PER_SECOND) {
         // less than 10 minutes
@@ -493,9 +508,9 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       }
 
       BigInteger crlNumber = caInfo.nextCrlNumber();
-      event.addEventData(CaAuditConstants.NAME_crl_number, crlNumber);
+      event.addEventData(NAME_crl_number, crlNumber);
       if (baseCrlNumber != null) {
-        event.addEventData(CaAuditConstants.NAME_basecrl_number, baseCrlNumber);
+        event.addEventData(NAME_basecrl_number, baseCrlNumber);
       }
 
       try {
@@ -516,7 +531,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
               false, // onlyContainsUserCerts,
               false, // onlyContainsCACerts,
               null, // onlySomeReasons,
-              indirectCrl, // indirectCRL,
+              true, // indirectCRL,
               false); // onlyContainsAttributeCerts
 
           crlBuilder.addExtension(Extension.issuingDistributionPoint, true, idp);

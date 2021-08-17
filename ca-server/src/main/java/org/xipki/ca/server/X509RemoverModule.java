@@ -72,7 +72,7 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
         AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_remove_expired_certs, msgId);
         boolean successful = false;
         try {
-          int num = removeExpirtedCerts0(expiredAt, event, msgId);
+          int num = removeExpiredCerts0(expiredAt, event, msgId);
           LOG.info("removed {} certificates expired at {} of CA {}", num, expiredAt, caIdent);
           successful = true;
         } finally {
@@ -159,7 +159,7 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
     }
   } // method removeCertificate
 
-  private int removeExpirtedCerts0(Date expiredAtTime, AuditEvent event, String msgId)
+  private int removeExpiredCerts0(Date expiredAtTime, AuditEvent event, String msgId)
       throws OperationException {
     notNull(expiredAtTime, "expiredtime");
     if (!masterMode) {

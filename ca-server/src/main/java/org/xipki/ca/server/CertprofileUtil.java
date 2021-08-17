@@ -49,7 +49,7 @@ import java.util.*;
  * @since 2.0.0
  */
 
-class CertprofileUtil {
+public class CertprofileUtil {
 
   private static final Validity maxCabEeValidity = new Validity(397, Unit.DAY);
 

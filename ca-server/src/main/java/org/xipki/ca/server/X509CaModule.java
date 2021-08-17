@@ -71,16 +71,15 @@ public abstract class X509CaModule {
   }
 
   protected AuditEvent newPerfAuditEvent(String eventType, String msgId) {
-    return newAuditEvent(CaAuditConstants.NAME_perf, eventType, msgId);
+    return newAuditEvent(eventType, msgId);
   }
 
-  protected AuditEvent newAuditEvent(String name, String eventType, String msgId) {
-    notNull(name, "name");
+  protected AuditEvent newAuditEvent(String eventType, String msgId) {
     notNull(eventType, "eventType");
     notNull(msgId, "msgId");
     AuditEvent event = new AuditEvent(new Date());
     event.setApplicationName(CaAuditConstants.APPNAME);
-    event.setName(name);
+    event.setName(CaAuditConstants.NAME_perf);
     event.addEventData(CaAuditConstants.NAME_ca, caIdent.getName());
     event.addEventType(eventType);
     event.addEventData(CaAuditConstants.NAME_mid, msgId);

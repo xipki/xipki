@@ -418,7 +418,6 @@ class ConfLoader {
       Set<String> includeRequestorNames = new HashSet<>();
       Set<String> includeProfileNames = new HashSet<>();
       Set<String> includePublisherNames = new HashSet<>();
-      Set<String> includeCrlSignerNames = new HashSet<>();
       Set<String> includeUserNames = new HashSet<>();
 
       // users
@@ -554,7 +553,7 @@ class ConfLoader {
           }
 
           if (entry.getCrlSignerName() != null) {
-            includeCrlSignerNames.add(entry.getCrlSignerName());
+            includeSignerNames.add(entry.getCrlSignerName());
             caInfoType.setCrlSignerName(entry.getCrlSignerName());
           }
 

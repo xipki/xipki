@@ -194,11 +194,6 @@ class OcspStoreQueryExecutor {
     }
   } // method initIssuerStore
 
-  void addCert(X509Cert issuer, CertWithDbId certificate)
-      throws DataAccessException, OperationException {
-    addCert(issuer, certificate, null);
-  }
-
   void addCert(X509Cert issuer, CertWithDbId certificate, CertRevocationInfo revInfo)
       throws DataAccessException, OperationException {
     addOrUpdateCert(issuer, certificate, revInfo);

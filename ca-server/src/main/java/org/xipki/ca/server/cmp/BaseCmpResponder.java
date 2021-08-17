@@ -80,6 +80,7 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static org.xipki.ca.server.CaAuditConstants.*;
 import static org.xipki.util.Args.notNull;
 
 /**
@@ -349,7 +350,7 @@ abstract class BaseCmpResponder {
     }
 
     CmpRequestorInfo cmpRequestor = (CmpRequestorInfo) requestor;
-    event.addEventData(CaAuditConstants.NAME_requestor, cmpRequestor.getIdent().getName());
+    event.addEventData(NAME_requestor, cmpRequestor.getIdent().getName());
 
     PKIHeader reqHeader = message.getHeader();
     PKIHeaderBuilder respHeader = new PKIHeaderBuilder(
@@ -373,15 +374,15 @@ abstract class BaseCmpResponder {
         String eventType;
 
         if (PKIBody.TYPE_CERT_REQ == type) {
-          eventType = CaAuditConstants.Cmp.TYPE_cr;
+          eventType = Cmp.TYPE_cr;
         } else if (PKIBody.TYPE_INIT_REQ == type) {
-          eventType = CaAuditConstants.Cmp.TYPE_ir;
+          eventType = Cmp.TYPE_ir;
         } else if (PKIBody.TYPE_KEY_UPDATE_REQ == type) {
-          eventType = CaAuditConstants.Cmp.TYPE_kur;
+          eventType = Cmp.TYPE_kur;
         } else if (PKIBody.TYPE_P10_CERT_REQ == type) {
-          eventType = CaAuditConstants.Cmp.TYPE_p10cr;
+          eventType = Cmp.TYPE_p10cr;
         } else {// if (PKIBody.TYPE_CROSS_CERT_REQ == type) {
-          eventType = CaAuditConstants.Cmp.TYPE_ccr;
+          eventType = Cmp.TYPE_ccr;
         }
 
         event.addEventType(eventType);
@@ -394,20 +395,20 @@ abstract class BaseCmpResponder {
         respBody = cmpEnrollCert(dfltCertprofileName, request, respHeader,
             cmpControl, reqHeader, reqBody, cmpRequestor, tid, msgId, event);
       } else if (type == PKIBody.TYPE_CERT_CONFIRM) {
-        event.addEventType(CaAuditConstants.Cmp.TYPE_certConf);
+        event.addEventType(Cmp.TYPE_certConf);
         CertConfirmContent certConf = (CertConfirmContent) reqBody.getContent();
         respBody = confirmCertificates(tid, certConf, msgId);
       } else if (type == PKIBody.TYPE_REVOCATION_REQ) {
         respBody = cmpUnRevokeRemoveCertificates(request, respHeader, cmpControl, reqHeader,
             reqBody, cmpRequestor, msgId, event);
       } else if (type == PKIBody.TYPE_CONFIRM) {
-        event.addEventType(CaAuditConstants.Cmp.TYPE_pkiconf);
+        event.addEventType(Cmp.TYPE_pkiconf);
         respBody = new PKIBody(PKIBody.TYPE_CONFIRM, DERNull.INSTANCE);
       } else if (type == PKIBody.TYPE_GEN_MSG) {
         respBody = cmpGeneralMsg(respHeader, cmpControl, reqHeader, reqBody, cmpRequestor,
             tid, msgId, event);
       } else if (type == PKIBody.TYPE_ERROR) {
-        event.addEventType(CaAuditConstants.Cmp.TYPE_error);
+        event.addEventType(Cmp.TYPE_error);
         revokePendingCertificates(tid, msgId);
         respBody = new PKIBody(PKIBody.TYPE_CONFIRM, DERNull.INSTANCE);
       } else {
@@ -432,7 +433,7 @@ abstract class BaseCmpResponder {
       event.setStatus(AuditStatus.FAILED);
       String statusString = pkiStatus.statusMessage();
       if (statusString != null) {
-        event.addEventData(CaAuditConstants.NAME_message, statusString);
+        event.addEventData(NAME_message, statusString);
       }
     } else if (event.getStatus() == null) {
       event.setStatus(AuditStatus.SUCCESSFUL);
@@ -451,19 +452,19 @@ abstract class BaseCmpResponder {
     ASN1OctetString tid = reqHeader.getTransactionID();
 
     String msgId = RandomUtil.nextHexLong();
-    event.addEventData(CaAuditConstants.NAME_mid, msgId);
+    event.addEventData(NAME_mid, msgId);
 
     if (tid == null) {
       byte[] randomBytes = randomTransactionId();
       tid = new DEROctetString(randomBytes);
     }
     String tidStr = Base64.encodeToString(tid.getOctets());
-    event.addEventData(CaAuditConstants.NAME_tid, tidStr);
+    event.addEventData(NAME_tid, tidStr);
 
     int reqPvno = reqHeader.getPvno().getValue().intValue();
     if (reqPvno < PVNO_CMP2000) {
       event.update(AuditLevel.INFO, AuditStatus.FAILED);
-      event.addEventData(CaAuditConstants.NAME_message, "unsupported version " + reqPvno);
+      event.addEventData(NAME_message, "unsupported version " + reqPvno);
       return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.unsupportedVersion, null);
     }
 
@@ -512,7 +513,7 @@ abstract class BaseCmpResponder {
 
     if (failureCode != null) {
       event.update(AuditLevel.INFO, AuditStatus.FAILED);
-      event.addEventData(CaAuditConstants.NAME_message, statusText);
+      event.addEventData(NAME_message, statusText);
       return buildErrorPkiMessage(tid, reqHeader, failureCode, statusText);
     }
 
@@ -573,7 +574,7 @@ abstract class BaseCmpResponder {
 
     if (errorStatus != null) {
       event.update(AuditLevel.INFO, AuditStatus.FAILED);
-      event.addEventData(CaAuditConstants.NAME_message, errorStatus);
+      event.addEventData(NAME_message, errorStatus);
       return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.badMessageCheck, errorStatus);
     }
 
@@ -714,7 +715,7 @@ abstract class BaseCmpResponder {
           PKIFailureInfo.systemFailure, "could not sign the PKIMessage");
 
       event.update(AuditLevel.ERROR, AuditStatus.FAILED);
-      event.addEventData(CaAuditConstants.NAME_message, "could not sign the PKIMessage");
+      event.addEventData(NAME_message, "could not sign the PKIMessage");
       PKIBody body = new PKIBody(PKIBody.TYPE_ERROR, new ErrorMsgContent(status));
       return new PKIMessage(pkiMessage.getHeader(), body);
     }

@@ -64,10 +64,6 @@ class X509PublisherModule extends X509CaModule {
     }
   } // constructor
 
-  boolean publishCert(CertificateInfo certInfo) {
-    return publishCert0(certInfo) == 0;
-  }
-
   /**
    * Publish certificate.
    *
@@ -75,7 +71,7 @@ class X509PublisherModule extends X509CaModule {
    * @return 0 for published successfully, 1 if could not be published to CA certstore and
    *     any publishers, 2 if could be published to CA certstore but not to all publishers.
    */
-  int publishCert0(CertificateInfo certInfo) {
+  int publishCert(CertificateInfo certInfo) {
     notNull(certInfo, "certInfo");
     if (certInfo.isAlreadyIssued()) {
       return 0;
@@ -269,14 +265,14 @@ class X509PublisherModule extends X509CaModule {
     return true;
   } // method publishCertsInQueue
 
-  boolean publishCrl(X509CRLHolder crl) {
+  void publishCrl(X509CRLHolder crl) {
     try {
       certstore.addCrl(caIdent, crl);
     } catch (Exception ex) {
       LOG.error("could not add CRL ca={}, thisUpdate={}: {}, ",
           caIdent.getName(), crl.getThisUpdate(), ex.getMessage());
       LOG.debug("Exception", ex);
-      return false;
+      return;
     }
 
     for (IdentifiedCertPublisher publisher : publishers()) {
@@ -286,8 +282,6 @@ class X509PublisherModule extends X509CaModule {
         LogUtil.error(LOG, ex, "could not publish CRL to the publisher " + publisher.getIdent());
       }
     } // end for
-
-    return true;
   } // method publishCrl
 
   boolean publishCertRemoved(CertWithDbId certToRemove) {

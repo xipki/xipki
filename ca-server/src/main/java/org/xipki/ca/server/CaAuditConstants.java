@@ -86,6 +86,8 @@ public class CaAuditConstants {
 
   public static final String MSGID_ca_mgmt = "ca_mgmt";
 
+  public static final String MSGID_scep = "scep";
+
   public static final String NAME_ca = "ca";
 
   public static final String NAME_certprofile = "certprofile";
@@ -97,8 +99,6 @@ public class CaAuditConstants {
   public static final String NAME_crl_type = "crl_type";
 
   public static final String NAME_expired_at = "expired_at";
-
-  public static final String NAME_id = "id";
 
   public static final String NAME_invalidity_time = "invalidity_time";
 
@@ -128,11 +128,7 @@ public class CaAuditConstants {
 
   public static final String NAME_serial = "serial";
 
-  public static final String NAME_this_update = "this_update";
-
   public static final String NAME_tid = "tid";
-
-  public static final String NAME_user = "user";
 
   public static final String NAME_subject = "subject";
 
@@ -147,19 +143,11 @@ public class CaAuditConstants {
 
   public static final String TYPE_gen_crl = "gen_crl";
 
-  public static final String TYPE_get_systeminfo = "get_systeminfo";
-
-  public static final String TYPE_regen_cert = "regenerate_cert";
-
-  public static final String TYPE_unrevoke_ca = "unrevoke_ca";
-
   public static final String TYPE_unrevoke_cert = "unrevoke_cert";
 
   public static final String TYPE_remove_cert = "remove_cert";
 
   public static final String TYPE_remove_expired_certs = "remove_expired_certs";
-
-  public static final String TYPE_revoke_ca = "revoke_ca";
 
   public static final String TYPE_revoke_cert = "revoke_cert";
 

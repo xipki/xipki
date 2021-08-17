@@ -58,8 +58,6 @@ public class OcspCertPublisher extends CertPublisher {
 
   private OcspStoreQueryExecutor queryExecutor;
 
-  private boolean asyn;
-
   private boolean publishsGoodCert = true;
 
   private DataSourceWrapper datasource;

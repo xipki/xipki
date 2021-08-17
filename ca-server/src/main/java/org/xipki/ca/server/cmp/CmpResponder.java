@@ -1057,11 +1057,11 @@ public class CmpResponder extends BaseCmpResponder {
         CertificateList crl;
 
         if (itv.getInfoValue() == null) { // as defined in RFC 4210
-          crl = ca.getBcCurrentCrl();
+          crl = ca.getBcCurrentCrl(msgId);
         } else {
           // xipki extension
           ASN1Integer crlNumber = ASN1Integer.getInstance(itv.getInfoValue());
-          crl = ca.getBcCrl(crlNumber.getPositiveValue());
+          crl = ca.getBcCrl(crlNumber.getPositiveValue(), msgId);
         }
 
         if (crl == null) {
@@ -1102,7 +1102,7 @@ public class CmpResponder extends BaseCmpResponder {
           event.addEventType(CaAuditConstants.Cmp.TYPE_genm_crl4number);
           checkPermission(requestor, PermissionConstants.GET_CRL);
 
-          respValue = ca.getBcCrl(ASN1Integer.getInstance(reqValue).getPositiveValue());
+          respValue = ca.getBcCrl(ASN1Integer.getInstance(reqValue).getPositiveValue(), msgId);
           if (respValue == null) {
             return buildErrorMsgPkiBody(rejection, systemFailure, "no CRL is available");
           }

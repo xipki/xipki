@@ -16,7 +16,7 @@
     |
     +-- REVOCATION (file, optional)
     |     If present, it specifies the revocation information of the CA.
-    |     An example file is the folder template.
+    |     An example file is in the folder template.
     |     If there are multiple CRLs for the same CA certificate, only one of
     |     the REVOCATION file of revoked CA certificate will be considered.
     |

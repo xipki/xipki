@@ -159,13 +159,13 @@ public class CaUtil {
 
   public static X500Name sortX509Name(X500Name name) {
     notNull(name, "name");
-    RDN[] requstedRdns = name.getRDNs();
+    RDN[] requestedRdns = name.getRDNs();
 
     List<RDN> rdns = new LinkedList<>();
 
     List<ASN1ObjectIdentifier> sortedDNs = SubjectDnSpec.getForwardDNs();
     for (ASN1ObjectIdentifier type : sortedDNs) {
-      RDN[] thisRdns = getRdns(requstedRdns, type);
+      RDN[] thisRdns = getRdns(requestedRdns, type);
       if (thisRdns == null) {
         continue;
       }
