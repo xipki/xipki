@@ -17,23 +17,22 @@
 
 package org.xipki.ca.api;
 
-import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.sec.SECObjectIdentifiers;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.style.IETFUtils;
-import org.bouncycastle.asn1.x509.*;
+import org.bouncycastle.asn1.x509.CertificatePolicies;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
-import org.xipki.ca.api.profile.*;
+import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.Certprofile.*;
+import org.xipki.ca.api.profile.CertprofileException;
+import org.xipki.ca.api.profile.ExtensionSpec;
+import org.xipki.ca.api.profile.KeyParametersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.DSAParametersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.ECParamatersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.RSAParametersOption;
-import org.xipki.security.KeyUsage;
 import org.xipki.security.*;
-import org.xipki.security.ObjectIdentifiers.BaseRequirements;
-import org.xipki.security.ObjectIdentifiers.DN;
 import org.xipki.security.ObjectIdentifiers.XKU;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.Validity;

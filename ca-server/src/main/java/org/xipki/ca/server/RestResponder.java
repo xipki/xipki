@@ -51,9 +51,9 @@ import java.util.*;
 import static org.xipki.audit.AuditLevel.ERROR;
 import static org.xipki.audit.AuditLevel.INFO;
 import static org.xipki.audit.AuditStatus.FAILED;
+import static org.xipki.ca.api.OperationException.ErrorCode.*;
 import static org.xipki.ca.api.RestAPIConstants.*;
 import static org.xipki.ca.server.CaAuditConstants.*;
-import static org.xipki.ca.api.OperationException.ErrorCode.*;
 
 /**
  * REST API responder.

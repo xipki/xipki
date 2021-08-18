@@ -56,7 +56,6 @@ import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.RequestorInfo.CmpRequestorInfo;
 import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
-import org.xipki.ca.server.CaAuditConstants;
 import org.xipki.ca.server.CaInfo;
 import org.xipki.ca.server.DhpocControl;
 import org.xipki.ca.server.X509Ca;

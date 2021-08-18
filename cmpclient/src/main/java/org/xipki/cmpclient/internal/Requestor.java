@@ -20,7 +20,10 @@ package org.xipki.cmpclient.internal;
 import org.bouncycastle.asn1.cmp.PBMParameter;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.GeneralName;
-import org.xipki.security.*;
+import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.SignAlgo;
+import org.xipki.security.X509Cert;
 
 import java.security.SecureRandom;
 

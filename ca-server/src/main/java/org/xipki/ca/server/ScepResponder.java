@@ -36,7 +36,6 @@ import org.xipki.audit.AuditStatus;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
-import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.RequestType;
 import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
@@ -62,9 +61,9 @@ import java.security.cert.CertificateException;
 import java.security.interfaces.RSAPublicKey;
 import java.util.*;
 
-import static org.xipki.util.Args.notNull;
-import static org.xipki.ca.server.CaAuditConstants.*;
 import static org.xipki.ca.api.OperationException.ErrorCode.*;
+import static org.xipki.ca.server.CaAuditConstants.*;
+import static org.xipki.util.Args.notNull;
 
 /**
  * SCEP responder.

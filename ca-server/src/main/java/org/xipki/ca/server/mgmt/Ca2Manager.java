@@ -55,8 +55,8 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.util.*;
 
-import static org.xipki.ca.server.CaUtil.canonicalizeSignerConf;
 import static org.xipki.ca.server.CaAuditConstants.*;
+import static org.xipki.ca.server.CaUtil.canonicalizeSignerConf;
 import static org.xipki.util.Args.*;
 import static org.xipki.util.StringUtil.concat;
 

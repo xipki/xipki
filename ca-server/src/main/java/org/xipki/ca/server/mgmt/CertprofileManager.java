@@ -25,7 +25,6 @@ import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileException;
-import org.xipki.ca.server.CertprofileUtil;
 import org.xipki.ca.server.IdentifiedCertprofile;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
