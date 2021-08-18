@@ -26,11 +26,11 @@ import org.bouncycastle.asn1.sec.SECObjectIdentifiers;
 import org.bouncycastle.asn1.teletrust.TeleTrusTObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
+import org.xipki.ca.api.CertprofileValidator;
 import org.xipki.ca.api.profile.Certprofile.CertDomain;
 import org.xipki.ca.api.profile.Certprofile.CertLevel;
 import org.xipki.ca.api.profile.Certprofile.GeneralNameTag;
 import org.xipki.ca.api.profile.Certprofile.X509CertVersion;
-import org.xipki.ca.api.profile.NotAfterMode;
 import org.xipki.ca.api.profile.Range;
 import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
 import org.xipki.ca.certprofile.xijson.conf.*;
@@ -100,6 +100,8 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
         XijsonCertprofile profileObj = new XijsonCertprofile();
         profileObj.initialize(profileConf);
         profileObj.close();
+
+        CertprofileValidator.validate(profileObj);
         System.out.println("Generated certprofile in " + filename);
       }
     } catch (Exception ex) {
@@ -110,7 +112,7 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
   } // method marshal
 
   protected static X509ProfileType getBaseCabSubscriberProfile(String desc) {
-    X509ProfileType profile = getBaseCabProfile(desc, CertLevel.EndEntity, "2y");
+    X509ProfileType profile = getBaseCabProfile(desc, CertLevel.EndEntity, "397d");
 
     //profile.setNotAfterMode(NotAfterMode.BY_CA);
 
@@ -279,12 +281,17 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
   } // method getBaseCabProfile
 
   protected static X509ProfileType getBaseProfile(String description, CertLevel certLevel,
-      String validity) {
-    return getBaseProfile(description, certLevel, validity, false);
+                                                   String validity) {
+    return  getBaseProfile(description, certLevel, validity, true);
   }
 
   protected static X509ProfileType getBaseProfile(String description, CertLevel certLevel,
-      String validity, boolean useMidnightNotBefore) {
+      String validity, boolean withEddsa) {
+    return getBaseProfile(description, certLevel, validity, false, withEddsa);
+  }
+
+  protected static X509ProfileType getBaseProfile(String description, CertLevel certLevel,
+      String validity, boolean useMidnightNotBefore, boolean withEddsa) {
     X509ProfileType profile = new X509ProfileType();
 
     profile.setMetadata(createDescription(description));
@@ -348,7 +355,7 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
               GMObjectIdentifiers.sm2p256v1};
 
     // Key
-    profile.setKeyAlgorithms(createKeyAlgorithms(curveIds, certLevel));
+    profile.setKeyAlgorithms(createKeyAlgorithms(curveIds, certLevel, withEddsa));
 
     return profile;
   } // method getBaseProfile
@@ -461,7 +468,7 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
   } // method createCabKeyAlgorithms
 
   protected static List<AlgorithmType> createKeyAlgorithms(
-      ASN1ObjectIdentifier[] curveIds, CertLevel certLevel) {
+      ASN1ObjectIdentifier[] curveIds, CertLevel certLevel, boolean withEddsa) {
     List<AlgorithmType> list = new LinkedList<>();
 
     // RSA
@@ -509,20 +516,9 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
 
     ecParams.setPointEncodings(Collections.singletonList(((byte) 4)));
 
-    // EdDSA / XDH
-    if (certLevel == CertLevel.RootCA || certLevel == CertLevel.SubCA) {
+    // EdDSA
+    if (withEddsa) {
       list.addAll(createEdwardsOrMontgomeryKeyAlgorithms(true, true, true));
-    } else {
-      List<ASN1ObjectIdentifier> oids = new LinkedList<>();
-      oids.add(EdECConstants.id_ED25519);
-      oids.add(EdECConstants.id_ED448);
-      oids.add(EdECConstants.id_X25519);
-      oids.add(EdECConstants.id_X448);
-
-      for (ASN1ObjectIdentifier oid : oids) {
-        list.add(new AlgorithmType());
-        last(list).getAlgorithms().add(createOidType(oid));
-      }
     }
 
     return list;

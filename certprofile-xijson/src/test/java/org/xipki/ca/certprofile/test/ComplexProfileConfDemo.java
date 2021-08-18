@@ -325,7 +325,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
   private static void certprofileEeComplex(String destFilename)
       throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile ee-complex", CertLevel.EndEntity,
-        "5y", true);
+        "5y", true, false);
 
     // Subject
     Subject subject = profile.getSubject();
@@ -520,7 +520,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
       Tag tag)
           throws Exception {
     X509ProfileType profile = getBaseProfile("certprofile constant-extension", CertLevel.EndEntity,
-        "5y", true);
+        "5y", true, false);
 
     // Subject
     Subject subject = profile.getSubject();
@@ -584,7 +584,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
   private static void certprofileSyntaxExt(String destFilename,
       ASN1ObjectIdentifier oidPrefix, Tag tag) {
     X509ProfileType profile = getBaseProfile("certprofile syntax-extension", CertLevel.EndEntity,
-        "5y", true);
+        "5y", true, false);
 
     // Subject
     Subject subject = profile.getSubject();
@@ -635,7 +635,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
 
   private static void certprofileFixedPartialSubject(String destFilename) {
     X509ProfileType profile = getBaseProfile("certprofile fixed subject O and C",
-        CertLevel.EndEntity, "365d");
+        CertLevel.EndEntity, "365d", false);
 
     // Subject
     Subject subject = profile.getSubject();

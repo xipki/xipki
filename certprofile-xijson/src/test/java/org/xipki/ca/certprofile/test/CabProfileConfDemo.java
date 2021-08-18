@@ -80,7 +80,7 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
     last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign},
         null));
 
-    marshall(profile, destFilename, true);
+      marshall(profile, destFilename, true);
   } // method certprofileCabRootCa
 
   private static void certprofileCabSubCa(String destFilename) {
@@ -102,7 +102,7 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
 
     // Extensions - controls
     list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
-    list.add(createExtension(Extension.cRLDistributionPoints, false, false));
+    list.add(createExtension(Extension.cRLDistributionPoints, true, false));
     last(list).setCrlDistributionPoints(createCrlDistibutoionPoints());
 
     // Extensions - basicConstraints

@@ -121,7 +121,8 @@ public class ProfileConfDemo extends ProfileConfBuilder {
 
     // Extensions - keyUsage
     list.add(createExtension(Extension.keyUsage, true, true));
-    last(list).setKeyUsage(createKeyUsage(new KeyUsage[]{KeyUsage.keyCertSign}, null));
+    last(list).setKeyUsage(createKeyUsage(
+            new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign}, null));
 
     marshall(profile, destFilename, true);
   } // method certprofileCross
@@ -168,7 +169,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
 
   private static void certprofileOcsp(String destFilename) {
     X509ProfileType profile = getBaseProfile("certprofile ocsp", CertLevel.EndEntity, "5y",
-        false);
+        true);
 
     // Subject
     Subject subject = profile.getSubject();
@@ -255,7 +256,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
 
   private static void certprofileSmime(String destFilename, boolean legacy) {
     String desc = legacy ? "certprofile s/mime legacy" : "certprofile s/mime";
-    X509ProfileType profile = getBaseProfile(desc, CertLevel.EndEntity, "5y", true);
+    X509ProfileType profile = getBaseProfile(desc, CertLevel.EndEntity, "5y", true, false);
 
     // Subject
     Subject subject = profile.getSubject();
@@ -380,7 +381,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
 
   private static void certprofileTls(String destFilename) {
     String desc = "certprofile tls";
-    X509ProfileType profile = getBaseProfile(desc, CertLevel.EndEntity, "5y", true);
+    X509ProfileType profile = getBaseProfile(desc, CertLevel.EndEntity, "5y", true, false);
 
     // Subject
     Subject subject = profile.getSubject();
@@ -438,7 +439,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
   } // method certprofileTls
 
   private static void certprofileTlsC(String destFilename) {
-    X509ProfileType profile = getBaseProfile("certprofile tls-c", CertLevel.EndEntity, "5y");
+    X509ProfileType profile = getBaseProfile("certprofile tls-c", CertLevel.EndEntity, "5y", false);
 
     // Subject
     Subject subject = profile.getSubject();
@@ -485,7 +486,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
 
   private static void certprofileMaxTime(String destFilename) {
     X509ProfileType profile = getBaseProfile("certprofile max-time", CertLevel.EndEntity,
-        "9999y");
+        "9999y", false);
 
     // Subject
     Subject subject = profile.getSubject();
@@ -526,7 +527,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
 
   private static void certprofileGmt0015(String destFilename) {
     String desc = "certprofile GMT 0015";
-    X509ProfileType profile = getBaseProfile(desc, CertLevel.EndEntity, "5y");
+    X509ProfileType profile = getBaseProfile(desc, CertLevel.EndEntity, "5y", false);
 
     // Subject
     Subject subject = profile.getSubject();
