@@ -387,7 +387,9 @@ public class XijsonExtensions {
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
       AuthorityInfoAccess extConf = getExtension(type, extensions).getAuthorityInfoAccess();
-      if (extConf != null) {
+      if (extConf == null) {
+        this.aiaControl = new AuthorityInfoAccessControl(false, true, null, null);
+      } else {
         this.aiaControl = new AuthorityInfoAccessControl(extConf.isIncludeCaIssuers(),
             extConf.isIncludeOcsp(), extConf.getCaIssuersProtocols(), extConf.getOcspProtocols());
       }
@@ -460,9 +462,8 @@ public class XijsonExtensions {
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
       CrlDistributionPoints extConf = getExtension(type, extensions).getCrlDistributionPoints();
-      if (extConf != null) {
-        crlDpControl = new CrlDistributionPointsControl(extConf.getProtocols());
-      }
+      crlDpControl = new CrlDistributionPointsControl(
+                      extConf == null ? null : extConf.getProtocols());
     }
   } // method initCrlDistributionPoints
 
@@ -484,9 +485,8 @@ public class XijsonExtensions {
     if (extensionControls.containsKey(type)) {
       extnIds.remove(type);
       CrlDistributionPoints extConf = getExtension(type, extensions).getFreshestCrl();
-      if (extConf != null) {
-        freshestCrlControl = new CrlDistributionPointsControl(extConf.getProtocols());
-      }
+      freshestCrlControl = new CrlDistributionPointsControl(
+                            extConf == null ? null : extConf.getProtocols());
     }
   } // method initFreshestCrl
 

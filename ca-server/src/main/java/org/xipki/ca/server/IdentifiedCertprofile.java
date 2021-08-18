@@ -371,11 +371,13 @@ public class IdentifiedCertprofile implements Closeable {
       List<String> caIssuers = null;
       if (aiaControl == null || aiaControl.isIncludesCaIssuers()) {
         caIssuers = caUris.getCacertUris();
+        assertAllUrisHasProtocol(caIssuers, aiaControl.getCaIssuersProtocols());
       }
 
       List<String> ocspUris = null;
       if (aiaControl == null || aiaControl.isIncludesOcsp()) {
         ocspUris = caUris.getOcspUris();
+        assertAllUrisHasProtocol(ocspUris, aiaControl.getOcspProtocols());
       }
 
       AuthorityInformationAccess value = null;
@@ -396,8 +398,12 @@ public class IdentifiedCertprofile implements Closeable {
       extControl = controls.remove(extType);
       if (extControl != null) {
         CRLDistPoint value = null;
-        if (CollectionUtil.isNotEmpty(caUris.getCrlUris())) {
-          value = CaUtil.createCrlDistributionPoints(caUris.getCrlUris(),
+        List<String> uris = caUris.getCrlUris();
+        if (CollectionUtil.isNotEmpty(uris)) {
+          CrlDistributionPointsControl control = certprofile.getCrlDpControl();
+          Set<String> protocols = control == null ? null : control.getProtocols();
+          assertAllUrisHasProtocol(uris, protocols);
+          value = CaUtil.createCrlDistributionPoints(uris,
               x500CaPrincipal, crlSignerSubject);
         }
         addExtension(values, extType, value, extControl);
@@ -408,7 +414,11 @@ public class IdentifiedCertprofile implements Closeable {
       extControl = controls.remove(extType);
       if (extControl != null) {
         CRLDistPoint value = null;
-        if (CollectionUtil.isNotEmpty(caUris.getDeltaCrlUris())) {
+        List<String> uris = caUris.getDeltaCrlUris();
+        if (CollectionUtil.isNotEmpty(uris)) {
+          CrlDistributionPointsControl control = certprofile.getFreshestCrlControl();
+          Set<String> protocols = control == null ? null : control.getProtocols();
+          assertAllUrisHasProtocol(uris, protocols);
           value = CaUtil.createCrlDistributionPoints(caUris.getDeltaCrlUris(),
               x500CaPrincipal, crlSignerSubject);
         }
@@ -627,6 +637,28 @@ public class IdentifiedCertprofile implements Closeable {
 
     return values;
   } // method getExtensions
+
+  private static void assertAllUrisHasProtocol(List<String> uris, Set<String> protocols)
+          throws CertprofileException {
+    if (protocols == null) {
+      return;
+    }
+
+    for (String uri : uris) {
+      boolean validUri = false;
+      for (String protocol : protocols) {
+        if (uri.startsWith(protocol + ":")) {
+          validUri = true;
+          break;
+        }
+      }
+
+      if (!validUri) {
+        throw new CertprofileException(
+                "URL '" + uri + "' does not have any of protocols " + protocols);
+      }
+    }
+  }
 
   public CertLevel getCertLevel() {
     return certprofile.getCertLevel();
