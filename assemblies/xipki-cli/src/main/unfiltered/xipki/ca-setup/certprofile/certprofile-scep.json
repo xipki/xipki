@@ -36,7 +36,6 @@
 		}
 	}],
 	"subject":{
-		"incSerialNumber":false,
 		"keepRdnOrder":false,
 		"rdns":[{
 			"type":{

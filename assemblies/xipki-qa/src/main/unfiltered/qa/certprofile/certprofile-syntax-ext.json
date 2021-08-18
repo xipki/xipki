@@ -100,26 +100,6 @@
 				]
 			}
 		}
-	},{
-		"algorithms":[{
-			"oid":"1.3.101.112",
-			"description":"ED25519"
-		}]
-	},{
-		"algorithms":[{
-			"oid":"1.3.101.113",
-			"description":"ED448"
-		}]
-	},{
-		"algorithms":[{
-			"oid":"1.3.101.110",
-			"description":"X25519"
-		}]
-	},{
-		"algorithms":[{
-			"oid":"1.3.101.111",
-			"description":"X448"
-		}]
 	}],
 	"subject":{
 		"keepRdnOrder":true,

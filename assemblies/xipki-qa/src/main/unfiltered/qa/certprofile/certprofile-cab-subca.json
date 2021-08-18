@@ -10,20 +10,7 @@
 	"validity":"8y",
 	"notBeforeTime":"current",
 	"serialNumberInReq":false,
-	"signatureAlgorithms":[
-		"SHA512withRSA",
-		"SHA384withRSA",
-		"SHA256withRSA",
-		"SHA512withDSA",
-		"SHA384withDSA",
-		"SHA256withDSA",
-		"SHA512withECDSA",
-		"SHA384withECDSA",
-		"SHA256withECDSA",
-		"SHA512withRSAPSS",
-		"SHA384withRSAPSS",
-		"SHA256withRSAPSS"
-	],
+	"signatureAlgorithms":["SHA512withRSA","SHA384withRSA","SHA256withRSA","SHA512withDSA","SHA384withDSA","SHA256withDSA","SHA512withECDSA","SHA384withECDSA","SHA256withECDSA","SHA512withRSAandMGF1","SHA384withRSAandMGF1","SHA256withRSAandMGF1"],
 	"keyAlgorithms":[{
 		"algorithms":[{
 			"oid":"1.2.840.113549.1.1.1",
@@ -75,13 +62,13 @@
 			"ec":{
 				"curves":[{
 					"oid":"1.2.840.10045.3.1.7",
-					"description":"prime256v1"
+					"description":"P-256"
 				},{
 					"oid":"1.3.132.0.34",
-					"description":"secp384r1"
+					"description":"P-384"
 				},{
 					"oid":"1.3.132.0.35",
-					"description":"secp521r1"
+					"description":"P-521"
 				}],
 				"pointEncodings":[
 					4
@@ -90,7 +77,6 @@
 		}
 	}],
 	"subject":{
-		"incSerialNumber":false,
 		"keepRdnOrder":false,
 		"rdns":[{
 			"type":{
@@ -144,7 +130,7 @@
 			"description":"cRLDistributionPoints"
 		},
 		"critical":false,
-		"required":false,
+		"required":true,
 		"permittedInRequest":false,
 		"crlDistributionPoints":{
 			"protocols":["http"]

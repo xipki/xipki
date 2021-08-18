@@ -190,6 +190,9 @@
 			"usages":[{
 				"required":true,
 				"value":"keyCertSign"
+			},{
+				"required":true,
+				"value":"cRLSign"
 			}]
 		}
 	}]
