@@ -14,22 +14,22 @@
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>${project.build.directory}</directory>
+      <directory>${project.build.directory}/bin</directory>
+      <outputDirectory>bin</outputDirectory>
       <includes>
-        <include>tomcat/**/*.sh</include>
+        <include>*.sh</include>
       </includes>
-      <outputDirectory>.</outputDirectory>
       <fileMode>0755</fileMode>
       <directoryMode>0755</directoryMode>
       <lineEnding>unix</lineEnding>
     </fileSet>
     <fileSet>
-      <directory>${project.build.directory}</directory>
+      <directory>${project.build.directory}/bin</directory>
+      <outputDirectory>bin</outputDirectory>
       <includes>
-        <include>tomcat/**/*.bat</include>
-        <include>tomcat/**/*.cmd</include>
+        <include>*.bat</include>
+        <include>*.cmd</include>
       </includes>
-      <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
       <lineEnding>dos</lineEnding>
@@ -37,16 +37,13 @@
     <fileSet>
       <directory>${project.build.directory}</directory>
       <includes>
+        <include>README.md</include>
         <include>xipki/**</include>
         <include>lib/**</include>
-        <include>README.md</include>
       </includes>
-      <excludes>
-        <exclude>**/*.sh</exclude>
-        <exclude>**/*.bat</exclude>
-        <exclude>**/*.cmd</exclude>
-      </excludes>
       <outputDirectory>.</outputDirectory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
     </fileSet>
   </fileSets>
   <files>

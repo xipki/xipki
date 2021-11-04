@@ -33,21 +33,19 @@ By default, the OCSP responder is reachable under `http://<host>:<port>/ocsp/<pa
 
 Deployment in Tomcat 8 and 9
 ----
-1. Copy the files `setenv.sh` and `setenv.bat` in the folder `tomcat/bin` to the folder
-  `${CATALINA_HOME}/bin`.
-2. Copy the sub-folders `webapps`, `xipki` and `lib ` to the folder `${CATALINA_HOME}`.
+1. Copy the sub-folders `bin`, `webapps`, `xipki` and `lib ` to the folder `${CATALINA_HOME}`.
   The folder `xipki` can be moved to other location, in this case the java property `XIPKI_BASE` in
   `setenv.sh` and `setenv.bat` must be adapted to point to the new position.
-3. Download the `bcutil-jdk15on-<version>.jar`, `bcprov-jdk15on-<version>.jar` and `bcpkix-jdk15on-<version>.jar` from
+2. Download the `bcutil-jdk15on-<version>.jar`, `bcprov-jdk15on-<version>.jar` and `bcpkix-jdk15on-<version>.jar` from
   [BouncyCastle Latest Release](https://www.bouncycastle.org/latest_releases.html) to the folder
   `${CATALINA_HOME}/lib`. The cryptographic libraries are not included since we need the latest release.
-4. (Optional) If you use database other than PostgreSQL, MariaDB and MySQL, you need to download
+3. (Optional) If you use database other than PostgreSQL, MariaDB and MySQL, you need to download
    the JDBC driver to the folder `${CATALINA_HOME}/lib`.
-5. (Optional) If you use database other than MariaDB and MySQL, you need to overwrite the
+4. (Optional) If you use database other than MariaDB and MySQL, you need to overwrite the
    configuration templates with those in the corresponding sub folder in `${CONTAINER_ROOT}/xipki/etc/ocsp/database`.
-6. Add the line `org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true`
+5. Add the line `org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true`
    to the file `conf/catalina.properties` if OCSP over HTTP supported is activated.
-7. (optional) To accelerate the start process, append the following block to the property
+6. (optional) To accelerate the start process, append the following block to the property
 `tomcat.util.scan.StandardJarScanFilter.jarsToSkip` in the file `conf/catalina.properties`.
 
 ```
