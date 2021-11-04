@@ -12,7 +12,7 @@
   <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <properties>
-    <netty.version>4.1.32.Final</netty.version>
+    <netty.version>4.1.59.Final</netty.version>
     <netty-tcnative.version>2.0.20.Final</netty-tcnative.version>
     <Import-Package>*,io.netty.channel.epoll;resolution:=optional;version="[4.1,5)",io.netty.channel.kqueue;resolution:=optional;version="[4.1,5)"</Import-Package>
   </properties>
