@@ -57,8 +57,6 @@ import static org.xipki.util.CollectionUtil.isNotEmpty;
 
 class A2gChecker extends ExtensionChecker {
 
-  private static final byte[] DER_NULL = new byte[] {5, 0};
-
   A2gChecker(ExtensionsChecker parent) {
     super(parent);
   }

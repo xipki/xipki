@@ -75,9 +75,6 @@ public class JceSigner implements XiContentSigner {
             }
         }
 
-        public void reset() {
-        }
-
         @Override
         public void flush()
                 throws IOException {

@@ -608,7 +608,6 @@ public class P11ModuleConf {
   } // method getSlotIdFilters
 
   private static Long toKeyType(String str) {
-    Long mech = null;
     if (str.startsWith("CKK_")) {
       switch (str) {
         case "CKK_DSA":

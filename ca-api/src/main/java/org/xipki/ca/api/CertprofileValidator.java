@@ -20,8 +20,6 @@ package org.xipki.ca.api;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.sec.SECObjectIdentifiers;
-import org.bouncycastle.asn1.x500.RDN;
-import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.CertificatePolicies;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.xipki.ca.api.profile.Certprofile;
@@ -429,11 +427,6 @@ public class CertprofileValidator {
     }
 
   } // method validateCABForumBR
-
-  private static boolean containsRdn(X500Name name, ASN1ObjectIdentifier rdnType) {
-    RDN[] rdns = name.getRDNs(rdnType);
-    return rdns != null && rdns.length > 0;
-  } // method containsRdn
 
   private static boolean containsKeyusage(Set<KeyUsageControl> usageControls, KeyUsage usage) {
     for (KeyUsageControl entry : usageControls) {

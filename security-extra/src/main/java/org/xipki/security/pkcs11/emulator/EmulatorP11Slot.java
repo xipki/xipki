@@ -220,8 +220,6 @@ class EmulatorP11Slot extends P11Slot {
 
   private final File certDir;
 
-  private final char[] password;
-
   private final KeyCryptor keyCryptor;
 
   private final SecureRandom random = new SecureRandom();
@@ -239,7 +237,6 @@ class EmulatorP11Slot extends P11Slot {
 
     this.newObjectConf = notNull(newObjectConf, "newObjectConf");
     this.slotDir = notNull(slotDir, "slotDir");
-    this.password = notNull(password, "password");
     this.keyCryptor = notNull(keyCryptor, "privateKeyCryptor");
 
     if (numSessions != null) {
