@@ -403,7 +403,19 @@ public class EnrollCertActions {
     @Completion(Completers.ExtKeyusageCompleter.class)
     private List<String> extkeyusages;
 
-    @Option(name = "--subject-alt-name", multiValued = true, description = "subjectAltName")
+    @Option(name = "--subject-alt-name", aliases = "--san", multiValued = true,
+    description = "subjectAltName, in the form of [tagNo]value or [tagText]value. "
+            + "Valid tagNo/tagText/value:\n"
+            + " '0'/'othername'/OID=[DirectoryStringChoice:]value,\n"
+            + "    valid DirectoryStringChoices are printableString and utf8String,\n"
+            + "    default to utf8Sring"
+            + " '1'/'email'/text,\n"
+            + " '2'/'dns'/text,\n"
+            + " '4'/'dirName'/X500 name e.g. CN=abc,\n"
+            + " '5'/'edi'/key=value,\n"
+            + " '6'/'uri'/text,\n"
+            + " '7'/'ip'/IP address,\n"
+            + " '8'/'rid'/OID")
     private List<String> subjectAltNames;
 
     @Option(name = "--subject-info-access", multiValued = true, description = "subjectInfoAccess")

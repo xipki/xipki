@@ -786,7 +786,17 @@ public class X509Util {
         String otherValue = value.substring(idxSep + 1);
         ASN1EncodableVector vector = new ASN1EncodableVector();
         vector.add(type);
-        vector.add(new DERTaggedObject(true, 0, new DERUTF8String(otherValue)));
+        
+        ASN1Encodable asn1Value;
+        if (StringUtil.startsWithIgnoreCase(otherValue, "printablestring:")) {
+          asn1Value = new DERPrintableString(otherValue.substring("printablestring:".length()));
+        } else if (StringUtil.startsWithIgnoreCase(otherValue, "utf8string:")) {
+          asn1Value = new DERUTF8String(otherValue.substring("utf8string:".length()));
+        } else {
+          asn1Value = new DERUTF8String(otherValue);
+        }
+        
+        vector.add(new DERTaggedObject(true, 0, asn1Value));
         DERSequence seq = new DERSequence(vector);
         return new GeneralName(tag, seq);
       case GeneralName.rfc822Name:
