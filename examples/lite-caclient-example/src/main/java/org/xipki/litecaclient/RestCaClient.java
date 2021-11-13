@@ -96,7 +96,8 @@ public class RestCaClient implements Closeable {
     // Get CA certificate chain
     byte[] bytes = httpGet(caUrl + "/cacertchain", CT_PEM_FILE);
     try (PemReader pemReader =
-        new PemReader(new InputStreamReader(new ByteArrayInputStream(bytes)))) {
+        new PemReader(new InputStreamReader(
+            new ByteArrayInputStream(bytes), StandardCharsets.UTF_8))) {
       PemObject pemObject;
       while ((pemObject = pemReader.readPemObject()) != null) {
         if ("CERTIFICATE".contentEquals(pemObject.getType())) {

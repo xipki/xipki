@@ -49,6 +49,7 @@ import org.xipki.util.*;
 
 import java.io.*;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.Key;
@@ -409,7 +410,8 @@ public class Actions {
     protected List<X509Cert> getPeerCertificates()
             throws CertificateException, IOException {
       if (StringUtil.isNotBlank(peerCertsFile)) {
-        try (PemReader pemReader = new PemReader(new FileReader(peerCertsFile))) {
+        try (PemReader pemReader = new PemReader(
+            new InputStreamReader(new FileInputStream(peerCertsFile), StandardCharsets.UTF_8))) {
           List<X509Cert> certs = new LinkedList<>();
           PemObject pemObj;
           while ((pemObj = pemReader.readPemObject()) != null) {
