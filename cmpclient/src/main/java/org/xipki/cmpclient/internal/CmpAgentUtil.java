@@ -67,6 +67,7 @@ import org.xipki.security.cmp.VerifiedPkiMessage;
 import org.xipki.security.util.CmpFailureUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.LogUtil;
+import org.xipki.util.StringUtil;
 
 import javax.crypto.*;
 import javax.crypto.spec.GCMParameterSpec;
@@ -614,7 +615,7 @@ class CmpAgentUtil {
         String base64Cert = array.getString(i);
         X509Cert caCert;
         try {
-          caCert = X509Util.parseCert(base64Cert.getBytes());
+          caCert = X509Util.parseCert(StringUtil.toUtf8Bytes(base64Cert));
         } catch (CertificateException ex) {
           throw new CmpClientException("could no parse the CA certificate chain", ex);
         }
@@ -630,7 +631,7 @@ class CmpAgentUtil {
           String base64Cert = array.getString(i);
           X509Cert caCert;
           try {
-            caCert = X509Util.parseCert(base64Cert.getBytes());
+            caCert = X509Util.parseCert(StringUtil.toUtf8Bytes(base64Cert));
           } catch (CertificateException ex) {
             throw new CmpClientException("could no parse the DHPoc (certificate)", ex);
           }

@@ -54,6 +54,7 @@ import java.math.BigInteger;
 import java.net.SocketException;
 import java.sql.Connection;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
@@ -250,7 +251,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   static {
     String ver;
     try {
-      ver = new String(IoUtil.read(CaManagerImpl.class.getResourceAsStream("/version"))).trim();
+      ver = StringUtil.toUtf8String(
+              IoUtil.read(CaManagerImpl.class.getResourceAsStream("/version"))).trim();
     } catch (Exception ex) {
       ver = "UNKNOWN";
     }
@@ -265,7 +267,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     File calockFile = new File("calock");
     if (calockFile.exists()) {
       try {
-        calockId = new String(IoUtil.read(calockFile));
+        calockId = StringUtil.toUtf8String(IoUtil.read(calockFile));
       } catch (IOException ex) {
         LOG.error("could not read {}: {}", calockFile.getName(), ex.getMessage());
       }
@@ -592,8 +594,9 @@ public class CaManagerImpl implements CaManager, Closeable {
       List<String> failedCaNames = new LinkedList<>();
 
       // Add the CAs to the store
-      for (String caName : caInfos.keySet()) {
-        CaStatus status = caInfos.get(caName).getCaEntry().getStatus();
+      for (Entry<String, CaInfo> entry : caInfos.entrySet()) {
+        String caName = entry.getKey();
+        CaStatus status = entry.getValue().getCaEntry().getStatus();
         if (CaStatus.ACTIVE != status) {
           continue;
         }

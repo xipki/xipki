@@ -669,7 +669,7 @@ public class QaCaActions {
       }
 
       if (conf == null && confFile != null) {
-        conf = new String(IoUtil.read(confFile));
+        conf = StringUtil.toUtf8String(IoUtil.read(confFile));
       }
 
       CertprofileEntry cp = caManager.getCertprofile(name);

@@ -268,7 +268,7 @@ public class RestResponder {
           }
 
           if (idx != -1 && idx < userPwd.length - 1) {
-            user = new String(Arrays.copyOfRange(userPwd, 0, idx));
+            user = StringUtil.toUtf8String(Arrays.copyOfRange(userPwd, 0, idx));
             password = Arrays.copyOfRange(userPwd, idx + 1, userPwd.length);
           }
         }

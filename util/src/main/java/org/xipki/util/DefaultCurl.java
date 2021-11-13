@@ -153,10 +153,9 @@ public class DefaultCurl implements Curl {
       if (verbose) {
         println("=====request=====");
         println("  HTTP method: " + httpConn.getRequestMethod());
-        for (String key : properties.keySet()) {
-          List<String> values = properties.get(key);
-          for (String value : values) {
-            println("  " + key + ": " + value);
+        for (Entry<String, List<String>> entry : properties.entrySet()) {
+          for (String value : entry.getValue()) {
+            println("  " + entry.getKey() + ": " + value);
           }
         }
       }
@@ -167,11 +166,12 @@ public class DefaultCurl implements Curl {
         println("=====response=====");
         println("  response code: " + respCode + " " + httpConn.getResponseMessage());
         properties = httpConn.getHeaderFields();
-        for (String key : properties.keySet()) {
+        for (Entry<String, List<String>> entry : properties.entrySet()) {
+          String key = entry.getKey();
           if (key == null) {
             continue;
           }
-          List<String> values = properties.get(key);
+          List<String> values = entry.getValue();
           for (String value : values) {
             println("  " + key + ": " + value);
           }

@@ -33,6 +33,7 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.ObjectCreationException;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import static org.xipki.util.Args.*;
 import static org.xipki.util.StringUtil.concat;
@@ -63,8 +64,8 @@ class PublisherManager {
   void close() {
     Map<String, IdentifiedCertPublisher> publishers = manager.publishers;
     if (publishers != null) {
-      for (String name : publishers.keySet()) {
-        IdentifiedCertPublisher publisher = publishers.get(name);
+      for (Entry<String, IdentifiedCertPublisher> entry : publishers.entrySet()) {
+        IdentifiedCertPublisher publisher = entry.getValue();
         shutdownPublisher(publisher);
       }
     }
@@ -77,8 +78,8 @@ class PublisherManager {
 
     Map<String, IdentifiedCertPublisher> publishers = manager.publishers;
 
-    for (String name : publishers.keySet()) {
-      shutdownPublisher(publishers.get(name));
+    for (Entry<String, IdentifiedCertPublisher> entry: publishers.entrySet()) {
+      shutdownPublisher(entry.getValue());
     }
     publishers.clear();
     manager.publisherDbEntries.clear();

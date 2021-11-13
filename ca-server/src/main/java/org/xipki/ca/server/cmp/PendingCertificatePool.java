@@ -24,6 +24,7 @@ import org.xipki.util.Hex;
 
 import java.math.BigInteger;
 import java.util.*;
+import java.util.Map.Entry;
 
 import static org.xipki.util.Args.notNull;
 
@@ -159,8 +160,8 @@ class PendingCertificatePool {
 
       Set<CertificateInfo> ret = new HashSet<>();
 
-      for (String tid : map.keySet()) {
-        Set<PendingCertificatePool.MyEntry> entries = map.get(tid);
+      for (Entry<String, Set<MyEntry>> entry0 : map.entrySet()) {
+        Set<PendingCertificatePool.MyEntry> entries = entry0.getValue();
         for (PendingCertificatePool.MyEntry entry : entries) {
           if (entry.waitForConfirmTill < now) {
             ret.add(entry.certInfo);

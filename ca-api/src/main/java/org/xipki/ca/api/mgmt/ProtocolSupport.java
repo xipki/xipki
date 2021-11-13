@@ -17,6 +17,8 @@
 
 package org.xipki.ca.api.mgmt;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.util.StringUtil;
 
 import java.util.Set;
@@ -30,6 +32,8 @@ import java.util.StringTokenizer;
  */
 
 public class ProtocolSupport {
+  
+  private static final Logger LOG = LoggerFactory.getLogger(ProtocolSupport.class);
 
   private static final String CMP = "cmp";
 
@@ -65,6 +69,8 @@ public class ProtocolSupport {
         case SCEP:
           scep = true;
           break;
+        default:
+          LOG.warn("unknown protocol {}", protocol);
       }
     }
   }
@@ -87,6 +93,8 @@ public class ProtocolSupport {
         case SCEP:
           scep = true;
           break;
+        default:
+          LOG.warn("unknown protocol {}", protocol);
       }
     }
   } // constructor

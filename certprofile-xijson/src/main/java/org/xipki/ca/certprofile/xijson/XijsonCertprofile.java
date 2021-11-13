@@ -976,12 +976,13 @@ public class XijsonCertprofile extends BaseCertprofile {
     Map<ASN1ObjectIdentifier, ExtensionValue> constantExtensions =
         extensions.getConstantExtensions();
     if (constantExtensions != null) {
-      for (ASN1ObjectIdentifier m : constantExtensions.keySet()) {
+      for (Entry<ASN1ObjectIdentifier, ExtensionValue> entry : constantExtensions.entrySet()) {
+        ASN1ObjectIdentifier m = entry.getKey();
         if (!occurences.remove(m)) {
           continue;
         }
 
-        ExtensionValue extensionValue = constantExtensions.get(m);
+        ExtensionValue extensionValue = entry.getValue();
         if (extensionValue != null) {
           values.addExtension(m, extensionValue);
         }

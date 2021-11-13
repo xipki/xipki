@@ -77,7 +77,7 @@ public class X509Util {
 
   private static final String END_CERTIFICATE = "-----END CERTIFICATE-----";
 
-  private static final byte[] PEM_PREFIX = "-----BEGIN".getBytes(StandardCharsets.UTF_8);
+  private static final byte[] PEM_PREFIX = StringUtil.toUtf8Bytes("-----BEGIN");
 
   private static CertificateFactory certFact;
 
@@ -138,7 +138,8 @@ public class X509Util {
     byte[] certBytes = null;
     if (CompareUtil.areEqual(bytes, 0, PEM_PREFIX, 0, PEM_PREFIX.length)) {
       try {
-        try (PemReader r = new PemReader(new InputStreamReader(new ByteArrayInputStream(bytes)))) {
+        try (PemReader r = new PemReader(
+            new InputStreamReader(new ByteArrayInputStream(bytes), StandardCharsets.UTF_8))) {
           PemObject obj;
           while (true) {
             obj = r.readPemObject();
@@ -253,7 +254,8 @@ public class X509Util {
 
   public static String toPemCert(X509Cert cert) {
     notNull(cert, "cert");
-    return new String(PemEncoder.encode(cert.getEncoded(), PemLabel.CERTIFICATE));
+    return StringUtil.toUtf8String(
+            PemEncoder.encode(cert.getEncoded(), PemLabel.CERTIFICATE));
   }
 
   public static X509Certificate parseX509Certificate(InputStream crlStream)
@@ -509,7 +511,8 @@ public class X509Util {
       if (i != 0) {
         sb.append("\r\n");
       }
-      sb.append(new String(PemEncoder.encode(m.getEncoded(), PemLabel.CERTIFICATE)));
+      sb.append(StringUtil.toUtf8String(
+          PemEncoder.encode(m.getEncoded(), PemLabel.CERTIFICATE)));
     }
     return sb.toString();
   }

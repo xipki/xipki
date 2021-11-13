@@ -32,6 +32,7 @@ import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
 import org.xipki.util.ProcessLog;
+import org.xipki.util.StringUtil;
 
 import java.io.File;
 import java.io.InputStream;
@@ -118,7 +119,7 @@ class CaCertstoreDbImporter extends DbPorter {
       if (processLogFile.exists()) {
         byte[] content = IoUtil.read(processLogFile);
         if (content != null && content.length > 5) {
-          String str = new String(content);
+          String str = StringUtil.toUtf8String(content);
           StringTokenizer st = new StringTokenizer(str, ":");
           String type = st.nextToken();
           typeProcessedInLastProcess = CaDbEntryType.valueOf(type);

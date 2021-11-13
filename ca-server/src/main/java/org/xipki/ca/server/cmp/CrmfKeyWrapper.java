@@ -89,11 +89,11 @@ abstract class CrmfKeyWrapper {
 
     private final AlgorithmIdentifier algorithmIdentifier;
 
-    private final int ephemeralPublicKeyLen = 65; // 1 (04)+ 32 (Qx) + 32 (Qy)
+    private static final int ephemeralPublicKeyLen = 65; // 1 (04)+ 32 (Qx) + 32 (Qy)
 
-    private final int macLen = 20; // SHA1
+    private static final int macLen = 20; // SHA1
 
-    private final int aesKeySize = 128;
+    private static final int aesKeySize = 128;
 
     private final PublicKey publicKey;
 

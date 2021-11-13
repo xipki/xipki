@@ -65,7 +65,7 @@ public class PasswordActions {
       }
 
       if (passwordHint == null) {
-        passwordHint = new String(IoUtil.read(passwordFile));
+        passwordHint = StringUtil.toUtf8String(IoUtil.read(passwordFile));
       }
 
       if (!StringUtil.startsWithIgnoreCase(passwordHint, "OBF:")) {
@@ -158,7 +158,7 @@ public class PasswordActions {
       }
 
       if (passwordHint == null) {
-        passwordHint = new String(IoUtil.read(passwordFile));
+        passwordHint = StringUtil.toUtf8String(IoUtil.read(passwordFile));
       }
 
       if (!StringUtil.startsWithIgnoreCase(passwordHint, "PBE:")) {
@@ -168,7 +168,7 @@ public class PasswordActions {
 
       char[] masterPassword;
       if (masterPasswordFile != null) {
-        String str = new String(IoUtil.read(masterPasswordFile));
+        String str = StringUtil.toUtf8String(IoUtil.read(masterPasswordFile));
         if (str.startsWith("OBF:") || str.startsWith("obf:")) {
           str = OBFPasswordService.deobfuscate(str);
         }
@@ -229,7 +229,7 @@ public class PasswordActions {
 
       char[] masterPassword;
       if (masterPasswordFile != null) {
-        String str = new String(IoUtil.read(masterPasswordFile));
+        String str = StringUtil.toUtf8String(IoUtil.read(masterPasswordFile));
         if (str.startsWith("OBF:") || str.startsWith("obf:")) {
           str = OBFPasswordService.deobfuscate(str);
         }

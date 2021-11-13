@@ -167,7 +167,7 @@ public class ProfileCaActions {
     protected Object execute0()
         throws Exception {
       if (conf == null && confFile != null) {
-        conf = new String(IoUtil.read(confFile));
+        conf = StringUtil.toUtf8String(IoUtil.read(confFile));
       }
 
       CertprofileEntry entry = new CertprofileEntry(new NameId(null, name), type, conf);
@@ -321,7 +321,7 @@ public class ProfileCaActions {
       }
 
       if (conf == null && confFile != null) {
-        conf = new String(IoUtil.read(confFile));
+        conf = StringUtil.toUtf8String(IoUtil.read(confFile));
       }
 
       String msg = "certificate profile " + name;

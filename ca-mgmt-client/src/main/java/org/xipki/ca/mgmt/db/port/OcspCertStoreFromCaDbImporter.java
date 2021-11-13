@@ -256,7 +256,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
     if (processLogFile.exists()) {
       byte[] content = IoUtil.read(processLogFile);
       if (content != null && content.length > 2) {
-        String str = new String(content);
+        String str = StringUtil.toUtf8String(content);
         if (str.trim().equalsIgnoreCase(MSG_CERTS_FINISHED)) {
           return;
         }

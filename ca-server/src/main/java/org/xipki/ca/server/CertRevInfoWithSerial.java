@@ -17,9 +17,10 @@
 
 package org.xipki.ca.server;
 
-import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.util.Args;
+
+import static org.xipki.util.Args.notNull;
 
 import java.math.BigInteger;
 import java.util.Date;
@@ -31,25 +32,30 @@ import java.util.Date;
  * @since 2.0.0
  */
 
-public class CertRevInfoWithSerial extends CertRevocationInfo
-    implements Comparable<CertRevInfoWithSerial> {
+public class CertRevInfoWithSerial implements Comparable<CertRevInfoWithSerial> {
 
   private final long id;
 
   private final BigInteger serial;
+  
+  private CrlReason reason;
+
+  private Date revocationTime;
+
+  private Date invalidityTime;
 
   public CertRevInfoWithSerial(long id, BigInteger serial, CrlReason reason,
       Date revocationTime, Date invalidityTime) {
-    super(reason, revocationTime, invalidityTime);
+    this.reason = notNull(reason, "reason");
+    this.revocationTime = notNull(revocationTime, "revocationTime");
+    this.invalidityTime = invalidityTime;
     this.id = id;
     this.serial = Args.notNull(serial, "serial");
   } // method constructor
 
   public CertRevInfoWithSerial(long id, BigInteger serial, int reasonCode,
       Date revocationTime, Date invalidityTime) {
-    super(reasonCode, revocationTime, invalidityTime);
-    this.id = id;
-    this.serial = Args.notNull(serial, "serial");
+    this(id, serial, CrlReason.forReasonCode(reasonCode), revocationTime, invalidityTime);
   } // method constructor
 
   public BigInteger getSerial() {
@@ -58,6 +64,30 @@ public class CertRevInfoWithSerial extends CertRevocationInfo
 
   public long getId() {
     return id;
+  }
+  
+
+  public CrlReason getReason() {
+    return reason;
+  }
+  
+  /**
+   * Gets the revocation time.
+   * @return revocation time, never be null
+   */
+  public Date getRevocationTime() {
+    if (revocationTime == null) {
+      revocationTime = new Date();
+    }
+    return revocationTime;
+  }
+
+  /**
+   * Get the invalidity time.
+   * @return invalidity time, may be null
+   */
+  public Date getInvalidityTime() {
+    return invalidityTime;
   }
 
   @Override
@@ -74,5 +104,10 @@ public class CertRevInfoWithSerial extends CertRevocationInfo
     CertRevInfoWithSerial o = (CertRevInfoWithSerial) obj;
     return id == o.id && serial.equals(o.serial);
   }
-  
+
+  @Override
+  public int hashCode() {
+    return serial.intValue() + 37 * (int) id;
+  }
+
 }

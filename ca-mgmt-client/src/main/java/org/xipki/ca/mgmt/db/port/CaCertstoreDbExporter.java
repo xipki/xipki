@@ -107,7 +107,7 @@ class CaCertstoreDbExporter extends DbPorter {
       if (processLogFile.exists()) {
         byte[] content = IoUtil.read(processLogFile);
         if (content != null && content.length > 0) {
-          String str = new String(content);
+          String str = StringUtil.toUtf8String(content);
           int idx = str.indexOf(':');
           String typeName = str.substring(0, idx).trim();
           typeProcessedInLastProcess = CaDbEntryType.valueOf(typeName);

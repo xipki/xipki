@@ -174,7 +174,7 @@ public class OcspQa {
       issue.setFailureMessage("response is not signed");
     }
 
-    if (hasSignature & !noSigVerify) {
+    if (hasSignature && !noSigVerify) {
       // signature algorithm
       issue = new ValidationIssue("OCSP.SIG.ALG", "signature algorithm");
       resultIssues.add(issue);

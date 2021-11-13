@@ -232,7 +232,7 @@ class OcspCertstoreDbExporter extends DbPorter {
     if (processLogFile.exists()) {
       byte[] content = IoUtil.read(processLogFile);
       if (content != null && content.length > 0) {
-        minId = Long.parseLong(new String(content).trim());
+        minId = Long.parseLong(StringUtil.toUtf8String(content).trim());
         minId++;
       }
     }

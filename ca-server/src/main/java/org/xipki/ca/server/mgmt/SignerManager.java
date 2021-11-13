@@ -26,10 +26,10 @@ import org.xipki.ca.server.SignerEntryWrapper;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.*;
 import org.xipki.util.ObjectCreationException;
+import org.xipki.util.StringUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.xipki.ca.server.CaUtil.canonicalizeSignerConf;
@@ -203,7 +203,7 @@ class SignerManager {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         slot.showDetails(bout, verbose);
         bout.flush();
-        sb.append(new String(bout.toByteArray(), StandardCharsets.UTF_8)).append(NL);
+        sb.append(StringUtil.toUtf8String(bout.toByteArray())).append(NL);
       }
     } catch (P11TokenException | IOException | XiSecurityException ex) {
       throw new CaMgmtException(ex);

@@ -54,6 +54,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.util.*;
+import java.util.Map.Entry;
 
 import static org.xipki.ca.server.CaAuditConstants.*;
 import static org.xipki.ca.server.CaUtil.canonicalizeSignerConf;
@@ -223,8 +224,8 @@ class Ca2Manager {
 
     Map<String, Integer> map = manager.queryExecutor.createCaAliases();
     manager.caAliases.clear();
-    for (String aliasName : map.keySet()) {
-      manager.caAliases.put(aliasName, map.get(aliasName));
+    for (Entry<String, Integer> entry : map.entrySet()) {
+      manager.caAliases.put(entry.getKey(), entry.getValue());
     }
 
     LOG.info("caAliases: {}", manager.caAliases);

@@ -639,7 +639,7 @@ public final class CmpClientImpl implements CmpClient {
         } catch (RuntimeException ex) {
           LogUtil.error(LOG, ex, "IOException while parsing the health json message");
           if (LOG.isDebugEnabled()) {
-            LOG.debug("json message: {}", new String(responseBytes));
+            LOG.debug("json message: {}", StringUtil.toUtf8String(responseBytes));
           }
           healthCheckResult.setHealthy(false);
         }

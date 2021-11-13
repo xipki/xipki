@@ -25,13 +25,13 @@ import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.crypto.generators.SCrypt;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.pkcs11.P11TokenException;
+import org.xipki.util.StringUtil;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
@@ -76,7 +76,7 @@ class KeyCryptor {
      *              <code>Integer.MAX_VALUE / (128 * r * 8)</code>.
      * @param dkLen the length of the key to generate.
      */
-    byte[] P = new String(password).getBytes(StandardCharsets.UTF_8); // password
+    byte[] P = StringUtil.toUtf8Bytes(new String(password)); // password
     byte[] S = new byte[8];
     int N = 16384;
     int r = 8;

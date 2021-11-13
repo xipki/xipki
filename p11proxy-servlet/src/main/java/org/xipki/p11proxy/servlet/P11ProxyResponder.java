@@ -32,6 +32,7 @@ import org.xipki.security.util.KeyUtil;
 import org.xipki.util.Hex;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
+import org.xipki.util.StringUtil;
 
 import java.io.IOException;
 import java.security.PublicKey;
@@ -90,7 +91,8 @@ public class P11ProxyResponder {
 
     String ver;
     try {
-      ver = new String(IoUtil.read(P11ProxyResponder.class.getResourceAsStream("/version"))).trim();
+      ver = StringUtil.toUtf8String(
+              IoUtil.read(P11ProxyResponder.class.getResourceAsStream("/version"))).trim();
     } catch (Exception ex) {
       ver = "UNKNOWN";
     }

@@ -40,9 +40,11 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Args;
 import org.xipki.util.Base64;
+import org.xipki.util.StringUtil;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.CRLException;
@@ -186,7 +188,8 @@ public abstract class Client {
       throws ScepClientException {
     // getCACaps
     ScepHttpResponse getCaCapsResp = httpSend(Operation.GetCACaps);
-    this.caCaps = CaCaps.getInstance(new String(getCaCapsResp.getContentBytes()));
+    this.caCaps = CaCaps.getInstance(
+                    StringUtil.toUtf8String(getCaCapsResp.getContentBytes()));
 
     // getCACert
     ScepHttpResponse getCaCertResp = httpSend(Operation.GetCACert);

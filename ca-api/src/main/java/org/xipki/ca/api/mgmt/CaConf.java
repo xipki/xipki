@@ -33,7 +33,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.cert.CertificateException;
 import java.util.*;
@@ -575,7 +574,7 @@ public class CaConf {
       throw new IOException("could not find ZIP entry " + fileName);
     }
 
-    return expandConf(new String(binary, StandardCharsets.UTF_8));
+    return expandConf(StringUtil.toUtf8String(binary));
   } // method getValue
 
   private String getBase64Binary(FileOrBinary fileOrBinary, Map<String, byte[]> zipEntries)

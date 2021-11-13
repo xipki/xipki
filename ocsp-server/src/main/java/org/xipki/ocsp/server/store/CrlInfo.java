@@ -142,6 +142,11 @@ public class CrlInfo {
   }
 
   @Override
+  public int hashCode() {
+    return encoded.hashCode();
+  }
+  
+  @Override
   public boolean equals(Object obj) {
     if (!(obj instanceof CrlInfo)) {
       return false;

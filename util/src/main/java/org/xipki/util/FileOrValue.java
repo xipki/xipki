@@ -18,7 +18,6 @@
 package org.xipki.util;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Configuration consisting either file path or the text content.
@@ -72,7 +71,7 @@ public class FileOrValue extends ValidatableConf {
       return value;
     }
 
-    return new String(IoUtil.read(IoUtil.detectPath(file)), StandardCharsets.UTF_8);
+    return StringUtil.toUtf8String(IoUtil.read(IoUtil.detectPath(file)));
   }
 
 }

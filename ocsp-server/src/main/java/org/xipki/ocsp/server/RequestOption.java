@@ -259,13 +259,13 @@ public class RequestOption {
       KeyStore trustStore = KeyUtil.getKeyStore(ksConf.getType());
 
       String fileName = ksConf.getKeystore().getFile();
-      InputStream is = (fileName != null)
+      try (InputStream is = (fileName != null)
           ? Files.newInputStream(Paths.get(IoUtil.expandFilepath(fileName, true)))
-          : new ByteArrayInputStream(ksConf.getKeystore().getBinary());
-
-      char[] password = (ksConf.getPassword() == null)  ? null
-          : ksConf.getPassword().toCharArray();
-      trustStore.load(is, password);
+          : new ByteArrayInputStream(ksConf.getKeystore().getBinary())) {
+        char[] password = (ksConf.getPassword() == null)  ? null
+            : ksConf.getPassword().toCharArray();
+        trustStore.load(is, password);
+      }
 
       Enumeration<String> aliases = trustStore.aliases();
       while (aliases.hasMoreElements()) {

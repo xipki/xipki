@@ -45,6 +45,7 @@ import org.xipki.util.Validity;
 import java.io.Closeable;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.Map.Entry;
 
 import static org.xipki.ca.server.CertprofileUtil.*;
 import static org.xipki.util.Args.notNull;
@@ -532,9 +533,9 @@ public class IdentifiedCertprofile implements Closeable {
     }
 
     Set<ASN1ObjectIdentifier> unprocessedExtTypes = new HashSet<>();
-    for (ASN1ObjectIdentifier type : controls.keySet()) {
-      if (controls.get(type).isRequired()) {
-        unprocessedExtTypes.add(type);
+    for (Entry<ASN1ObjectIdentifier, ExtensionControl> entry : controls.entrySet()) {
+      if (entry.getValue().isRequired()) {
+        unprocessedExtTypes.add(entry.getKey());
       }
     }
 

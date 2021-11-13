@@ -406,7 +406,7 @@ final class CmpClientConfigurer {
             if (m.getConf() != null) {
               conf0 = m.getConf().getValue();
               if (conf0 == null) {
-                conf0 = new String(IoUtil.read(m.getConf().getFile()));
+                conf0 = StringUtil.toUtf8String(IoUtil.read(m.getConf().getFile()));
               }
             }
 

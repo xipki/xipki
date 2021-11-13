@@ -167,7 +167,7 @@ public class PublisherCaActions {
     protected Object execute0()
         throws Exception {
       if (conf == null && confFile != null) {
-        conf = new String(IoUtil.read(confFile));
+        conf = StringUtil.toUtf8String(IoUtil.read(confFile));
       }
 
       PublisherEntry entry = new PublisherEntry(new NameId(null, name), type, conf);
@@ -314,7 +314,7 @@ public class PublisherCaActions {
       }
 
       if (conf == null && confFile != null) {
-        conf = new String(IoUtil.read(confFile));
+        conf = StringUtil.toUtf8String(IoUtil.read(confFile));
       }
 
       String msg = "publisher " + name;

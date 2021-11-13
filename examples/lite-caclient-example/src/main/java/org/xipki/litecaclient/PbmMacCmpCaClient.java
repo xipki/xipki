@@ -73,6 +73,8 @@ public class PbmMacCmpCaClient extends CmpCaClient {
   protected byte[] kid;
 
   protected char[] password;
+  
+  private static final SecureRandom random = new SecureRandom();
 
   private Set<ASN1ObjectIdentifier> trustedOwfOids = new HashSet<>();
 
@@ -248,7 +250,7 @@ public class PbmMacCmpCaClient extends CmpCaClient {
       throws Exception {
     builder.setSenderKID(kid);
     byte[] salt = new byte[64];
-    new SecureRandom().nextBytes(salt);
+    random.nextBytes(salt);
     PBMParameter pbmParameter = new PBMParameter(salt, requestOwf,
         requestInterationCount, requestMac);
 

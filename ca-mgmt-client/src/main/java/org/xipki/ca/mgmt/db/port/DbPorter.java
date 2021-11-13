@@ -29,7 +29,6 @@ import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Iterator;
@@ -274,7 +273,7 @@ public class DbPorter extends DbToolBase {
     }
 
     File file = new File(baseDir, fileOrValue.getFile());
-    return new String(IoUtil.read(file), StandardCharsets.UTF_8);
+    return StringUtil.toUtf8String(IoUtil.read(file));
   } // method readContent
 
   public static void echoToFile(String content, File file)

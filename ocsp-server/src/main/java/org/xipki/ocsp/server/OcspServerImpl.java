@@ -76,6 +76,14 @@ public class OcspServerImpl implements OcspServer {
     public SizeComparableString(String str) {
       this.str = notNull(str, "str");
     }
+    
+    @Override
+    public boolean equals(Object obj) {
+      if (!(obj instanceof SizeComparableString)) {
+        return false;
+      }
+      return str.contentEquals(((SizeComparableString) obj).str);
+    }
 
     @Override
     public int compareTo(SizeComparableString obj) {
@@ -174,7 +182,8 @@ public class OcspServerImpl implements OcspServer {
 
     String ver;
     try {
-      ver = new String(IoUtil.read(OcspServerImpl.class.getResourceAsStream("/version"))).trim();
+      ver = StringUtil.toUtf8String(
+              IoUtil.read(OcspServerImpl.class.getResourceAsStream("/version"))).trim();
     } catch (Exception ex) {
       ver = "UNKNOWN";
     }
@@ -484,8 +493,9 @@ public class OcspServerImpl implements OcspServer {
     }
 
     // responders
-    for (String name : responderOptions.keySet()) {
-      ResponderOption option = responderOptions.get(name);
+    for (Entry<String, ResponderOption> entry : responderOptions.entrySet()) {
+      String name = entry.getKey();
+      ResponderOption option = entry.getValue();
 
       List<OcspStore> statusStores = new ArrayList<>(option.getStoreNames().size());
       for (String storeName : option.getStoreNames()) {

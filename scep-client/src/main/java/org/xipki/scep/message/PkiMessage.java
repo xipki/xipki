@@ -206,8 +206,8 @@ public class PkiMessage {
     }
     ASN1EncodableVector vec = new ASN1EncodableVector();
 
-    for (ASN1ObjectIdentifier type : unsignedAttributes.keySet()) {
-      addAttribute(vec, type, unsignedAttributes.get(type));
+    for (Entry<ASN1ObjectIdentifier, ASN1Encodable> entry : unsignedAttributes.entrySet()) {
+      addAttribute(vec, entry.getKey(), entry.getValue());
     }
     return new AttributeTable(vec);
   }

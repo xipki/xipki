@@ -119,7 +119,7 @@ public class CaCaps {
 
   private void refresh() {
     if (capabilities != null) {
-      this.bytes = toString().getBytes();
+      this.bytes = StringUtil.toUtf8Bytes(toString());
     }
   }
 

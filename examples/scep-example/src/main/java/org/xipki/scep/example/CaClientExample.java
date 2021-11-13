@@ -33,6 +33,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.xipki.security.X509Cert;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -236,14 +237,14 @@ public class CaClientExample {
     int offset = 0;
     for (int i = 0; i < numBlock - 1; i++) {
       System.arraycopy(base64Data, offset, lineBytes, 0, PEM_LINE_LENGTH);
-      sb.append(new String(lineBytes)).append("\n");
+      sb.append(new String(lineBytes, StandardCharsets.UTF_8)).append("\n");
       offset += PEM_LINE_LENGTH;
     }
 
     // print the last block
     lineBytes = new byte[base64Data.length - offset];
     System.arraycopy(base64Data, offset, lineBytes, 0, lineBytes.length);
-    sb.append(new String(lineBytes)).append("\n");
+    sb.append(new String(lineBytes, StandardCharsets.UTF_8)).append("\n");
 
     sb.append("-----END ").append(type).append("-----");
     return sb.toString();

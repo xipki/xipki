@@ -286,7 +286,7 @@ public class CaConfs {
   private static String getValue(String fileName, Map<String, String> properties, String baseDir)
       throws IOException {
     byte[] binary = getBinary(fileName, properties, baseDir);
-    return new String(binary, StandardCharsets.UTF_8);
+    return StringUtil.toUtf8String(binary);
   } // method getValue
 
   private static byte[] getBinary(String fileName, Map<String, String> properties, String baseDir)

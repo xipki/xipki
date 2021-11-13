@@ -31,6 +31,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -439,7 +440,7 @@ public class SubjectDnSpec {
             "could not access non-existing resource " + fallbackResource);
       }
       LOG.info("read from resource " + fallbackResource);
-      return new BufferedReader(new InputStreamReader(confStream));
+      return new BufferedReader(new InputStreamReader(confStream, StandardCharsets.UTF_8));
     }
   } // method getReader
 
