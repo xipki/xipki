@@ -35,6 +35,7 @@ import org.xipki.security.*;
 import org.xipki.security.util.GMUtil;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.RandomUtil;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -161,12 +162,14 @@ public class P12KeyGenerator {
     }
 
     SecureRandom random = params.getRandom();
+    byte[] keyValue;
     if (random == null) {
-      random = new SecureRandom();
+      keyValue = RandomUtil.nextBytes(keyBitLen / 8);
+    } else {
+      keyValue = new byte[keyBitLen / 8];
+      random.nextBytes(keyValue);
     }
 
-    byte[] keyValue = new byte[keyBitLen / 8];
-    random.nextBytes(keyValue);
     SecretKey secretKey = new SecretKeySpec(keyValue, algorithm);
 
     KeyStore ks = KeyUtil.getKeyStore("JCEKS");

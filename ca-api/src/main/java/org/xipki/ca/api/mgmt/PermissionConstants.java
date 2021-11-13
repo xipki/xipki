@@ -20,6 +20,7 @@ package org.xipki.ca.api.mgmt;
 import org.xipki.util.StringUtil;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * CA permission constants.
@@ -58,8 +59,8 @@ public class PermissionConstants {
     codeTextMap.put(ENROLL_CROSS, "enroll_cross");
     codeTextMap.put(GEN_KEYPAIR, "gen_keypair");
 
-    for (Integer code : codeTextMap.keySet()) {
-      textCodeMap.put(codeTextMap.get(code), code);
+    for (Entry<Integer, String> entry : codeTextMap.entrySet()) {
+      textCodeMap.put(entry.getValue(), entry.getKey());
     }
 
     List<Integer> tmpPermissions = new ArrayList<>(codeTextMap.keySet());
@@ -97,9 +98,10 @@ public class PermissionConstants {
 
   public static String permissionToString(int permission) {
     StringBuilder sb = new StringBuilder();
-    for (Integer code : codeTextMap.keySet()) {
+    for (Entry<Integer, String> entry : codeTextMap.entrySet()) {
+      Integer code = entry.getKey();
       if ((permission & code) != 0) {
-        sb.append(codeTextMap.get(code)).append("|");
+        sb.append(entry.getValue()).append("|");
       }
     }
     if (sb.length() > 0) {
@@ -112,9 +114,10 @@ public class PermissionConstants {
 
   public static List<String> permissionToStringSet(int permission) {
     List<String> list = new ArrayList<>(10);
-    for (Integer code : codeTextMap.keySet()) {
+    for (Entry<Integer, String> entry : codeTextMap.entrySet()) {
+      Integer code = entry.getKey();
       if ((permission & code) != 0) {
-        list.add(codeTextMap.get(code));
+        list.add(entry.getValue());
       }
     }
     Collections.sort(list);

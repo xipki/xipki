@@ -46,6 +46,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.DSAParameterSpec;
 import java.security.spec.ECParameterSpec;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.xipki.util.Args.*;
@@ -106,9 +107,10 @@ public abstract class P11Slot implements Closeable {
      * @return the certificate of the given identifier.
      */
     public X509Cert getCertForId(byte[] id) {
-      for (P11ObjectIdentifier objId : certificates.keySet()) {
+      for (Entry<P11ObjectIdentifier, X509Cert> entry : certificates.entrySet()) {
+        P11ObjectIdentifier objId = entry.getKey();
         if (objId.matchesId(id)) {
-          return certificates.get(objId);
+          return entry.getValue();
         }
       }
       return null;

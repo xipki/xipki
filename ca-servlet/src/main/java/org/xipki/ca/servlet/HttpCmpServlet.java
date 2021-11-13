@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * CMP servlet.
@@ -124,8 +125,8 @@ public class HttpCmpServlet extends HttpServlet {
 
       Map<String, String[]> map = req.getParameterMap();
       Map<String, String> parameters = new HashMap<>();
-      for (String name : map.keySet()) {
-        parameters.put(name, map.get(name)[0]);
+      for (Entry<String, String[]> entry : map.entrySet()) {
+        parameters.put(entry.getKey(), entry.getValue()[0]);
       }
 
       PKIMessage pkiResp = responder.processPkiMessage(pkiReq, clientCert, parameters, event);

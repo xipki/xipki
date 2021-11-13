@@ -29,6 +29,7 @@ import org.xipki.util.Base64;
 import org.xipki.util.BenchmarkExecutor;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.IoUtil;
+import org.xipki.util.RandomUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -238,7 +239,7 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
 
     public Testor() {
       for (int i = 0; i < data.length; i++) {
-        new SecureRandom().nextBytes(data[i]);
+        data[i] = RandomUtil.nextBytes(data[i].length);
       }
     }
 

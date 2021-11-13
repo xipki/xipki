@@ -65,4 +65,14 @@ public class CertRevInfoWithSerial extends CertRevocationInfo
     return serial.compareTo(other.serial);
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof CertRevInfoWithSerial)) {
+      return false;
+    }
+    
+    CertRevInfoWithSerial o = (CertRevInfoWithSerial) obj;
+    return id == o.id && serial.equals(o.serial);
+  }
+  
 }

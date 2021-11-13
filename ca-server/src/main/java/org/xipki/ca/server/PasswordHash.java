@@ -21,10 +21,10 @@ import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.xipki.util.Args;
+import org.xipki.util.RandomUtil;
 import org.xipki.util.StringUtil;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
 
 /**
  * PBKDF2 salted password hashing.
@@ -87,9 +87,7 @@ public class PasswordHash {
   public static String createHash(byte[] password, int saltSize, int iterations, int dkSize) {
     Args.notNull(password, "password");
     // Generate a random salt
-    SecureRandom random = new SecureRandom();
-    byte[] salt = new byte[saltSize];
-    random.nextBytes(salt);
+    byte[] salt = RandomUtil.nextBytes(saltSize);
 
     // Hash the password
     byte[] hash = pbkdf2(password, salt, iterations, dkSize);

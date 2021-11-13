@@ -18,6 +18,7 @@
 package org.xipki.security.cmp;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import static org.xipki.util.Args.notBlank;
 import static org.xipki.util.Args.notNull;
@@ -118,10 +119,10 @@ public class CmpUtf8Pairs {
   public String encoded() {
     StringBuilder sb = new StringBuilder();
     List<String> names = new LinkedList<>();
-    for (String name : pairs.keySet()) {
-      String value = pairs.get(name);
+    for (Entry<String, String> entry : pairs.entrySet()) {
+      String value = entry.getValue();
       if (value.length() <= 100) {
-        names.add(name);
+        names.add(entry.getKey());
       }
     }
     Collections.sort(names);

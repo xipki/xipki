@@ -23,6 +23,7 @@ import org.xipki.security.*;
 import org.xipki.util.BenchmarkExecutor;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.ObjectCreationException;
+import org.xipki.util.RandomUtil;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -45,7 +46,7 @@ public class JceSignSpeed extends BenchmarkExecutor {
 
     public Testor() {
       for (int i = 0; i < data.length; i++) {
-        new SecureRandom().nextBytes(data[i]);
+        data[i] = RandomUtil.nextBytes(data[i].length);
       }
     }
 

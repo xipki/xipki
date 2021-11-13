@@ -17,7 +17,7 @@
 
 package org.xipki.util;
 
-import java.util.Random;
+import java.security.SecureRandom;
 
 /**
  * Random utility class.
@@ -28,10 +28,28 @@ import java.util.Random;
  */
 
 public class RandomUtil {
-  private static final Random random = new Random();
+  private static final SecureRandom random = new SecureRandom();
 
   public static String nextHexLong() {
     return Long.toHexString(random.nextLong());
+  }
+  
+  public static long nextLong() {
+    return random.nextLong();
+  }
+
+  public static int nextInt() {
+    return random.nextInt();
+  }
+
+  public static int nextInt(int bound) {
+    return random.nextInt(bound);
+  }
+
+  public static byte[] nextBytes(int num) {
+    byte[] bytes = new byte[num];
+    random.nextBytes(bytes);
+    return bytes;
   }
 
 }

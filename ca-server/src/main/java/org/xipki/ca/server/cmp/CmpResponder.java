@@ -1092,12 +1092,7 @@ public class CmpResponder extends BaseCmpResponder {
           event.addEventType(CaAuditConstants.Cmp.TYPE_genm_gen_crl);
           checkPermission(requestor, PermissionConstants.GEN_CRL);
           X509CRLHolder tmpCrl = ca.generateCrlOnDemand(msgId);
-          if (tmpCrl == null) {
-            return buildErrorMsgPkiBody(rejection, systemFailure,
-                    "CRL generation is not activated");
-          } else {
-            respValue = tmpCrl.toASN1Structure();
-          }
+          respValue = tmpCrl.toASN1Structure();
         } else if (action == XiSecurityConstants.CMP_ACTION_GET_CRL_WITH_SN) {
           event.addEventType(CaAuditConstants.Cmp.TYPE_genm_crl4number);
           checkPermission(requestor, PermissionConstants.GET_CRL);

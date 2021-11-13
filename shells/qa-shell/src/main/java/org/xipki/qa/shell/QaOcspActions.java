@@ -259,9 +259,7 @@ public class QaOcspActions {
 
         // unknown serial number
         lineNo++;
-        SecureRandom random = new SecureRandom();
-        byte[] bytes = new byte[16];
-        random.nextBytes(bytes);
+        byte[] bytes = RandomUtil.nextBytes(16);
         bytes[0] = (byte) (0x7F & bytes[0]);
         BigInteger serialNumber = new BigInteger(bytes);
 

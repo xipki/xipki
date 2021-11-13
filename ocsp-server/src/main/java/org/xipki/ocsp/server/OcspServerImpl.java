@@ -53,6 +53,7 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.xipki.ocsp.server.OcspServerUtil.*;
@@ -262,12 +263,12 @@ public class OcspServerImpl implements OcspServer {
 
     requestOptions.clear();
     responseOptions.clear();
-    for (String name : stores.keySet()) {
-      OcspStore store = stores.get(name);
+    for (Entry<String, OcspStore> entry : stores.entrySet()) {
+      OcspStore store = entry.getValue();
       try {
         store.close();
       } catch (IOException ex) {
-        throw new OcspStoreException("could not close OCSP store " + name, ex);
+        throw new OcspStoreException("could not close OCSP store " + entry.getKey(), ex);
       }
     }
     stores.clear();
@@ -514,9 +515,10 @@ public class OcspServerImpl implements OcspServer {
 
     // servlet paths
     List<SizeComparableString> tmpList = new LinkedList<>();
-    for (String name : responderOptions.keySet()) {
+    for (Entry<String, ResponderOption> entry : responderOptions.entrySet()) {
+      String name = entry.getKey();
       ResponderImpl responder = responders.get(name);
-      ResponderOption option = responderOptions.get(name);
+      ResponderOption option = entry.getValue();
       List<String> strs = option.getServletPaths();
       for (String path : strs) {
         tmpList.add(new SizeComparableString(path));

@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -67,9 +68,8 @@ public class NewKeyControl extends ProxyMessage {
     valueToUsageMap.put(4, P11KeyUsage.UNWRAP);
 
     usageToValueMap = new HashMap<>(10);
-    for (Integer value : valueToUsageMap.keySet()) {
-      P11KeyUsage usage = valueToUsageMap.get(value);
-      usageToValueMap.put(usage, value);
+    for (Entry<Integer, P11KeyUsage> entry : valueToUsageMap.entrySet()) {
+      usageToValueMap.put(entry.getValue(), entry.getKey());
     }
   } // method static
 

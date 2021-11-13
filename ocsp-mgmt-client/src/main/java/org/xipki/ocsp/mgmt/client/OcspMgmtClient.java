@@ -54,7 +54,7 @@ public class OcspMgmtClient implements OcspManager {
 
   private String serverUrl;
 
-  private SslContextConf sslContextConf;
+  private final SslContextConf sslContextConf;
 
   private SSLSocketFactory sslSocketFactory;
 
@@ -64,7 +64,8 @@ public class OcspMgmtClient implements OcspManager {
 
   private OcspMgmtException initException;
 
-  public OcspMgmtClient() {
+  public OcspMgmtClient(SslContextConf sslContextConf) {
+    this.sslContextConf = sslContextConf;
   }
 
   public void setServerUrl(String serverUrl)
@@ -75,10 +76,6 @@ public class OcspMgmtClient implements OcspManager {
     for (MgmtAction action : MgmtAction.values()) {
       actionUrlMap.put(action, new URL(this.serverUrl + action));
     }
-  }
-
-  public void setSslContextConf(SslContextConf sslContextConf) {
-    this.sslContextConf = sslContextConf;
   }
 
   public synchronized void initIfNotDone()

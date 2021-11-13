@@ -32,6 +32,7 @@ import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Properties;
@@ -96,14 +97,18 @@ public class Actions {
     protected LiquibaseMain.DatabaseConf getDatabaseConf()
         throws IOException, PasswordResolverException {
       Properties props = new Properties();
-      props.load(Files.newInputStream(Paths.get(IoUtil.expandFilepath(dbConfFile))));
+      try (InputStream is = Files.newInputStream(Paths.get(IoUtil.expandFilepath(dbConfFile)))) {
+        props.load(is);
+      }
       return LiquibaseMain.DatabaseConf.getInstance(props, passwordResolver);
     }
 
     protected static Properties getPropertiesFromFile(String propFile)
         throws IOException {
       Properties props = new Properties();
-      props.load(Files.newInputStream(Paths.get(IoUtil.expandFilepath(propFile))));
+      try (InputStream is = Files.newInputStream(Paths.get(IoUtil.expandFilepath(propFile)))) {
+        props.load(is);
+      }
       return props;
     }
 

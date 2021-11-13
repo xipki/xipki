@@ -18,11 +18,11 @@
 package org.xipki.password;
 
 import org.xipki.util.Base64;
+import org.xipki.util.RandomUtil;
 import org.xipki.util.StringUtil;
 
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
-import java.security.SecureRandom;
 import java.util.Arrays;
 
 import static org.xipki.util.Args.notNull;
@@ -99,9 +99,7 @@ public class PBEPasswordService {
     iterationCountBytes[0] = (byte) (iterationCount >>> 8);
     iterationCountBytes[1] = (byte) (iterationCount & 0xFF);
 
-    SecureRandom random = new SecureRandom();
-    byte[] salt = new byte[16];
-    random.nextBytes(salt);
+    byte[] salt = RandomUtil.nextBytes(16);
     byte[] encrypted;
     try {
       encrypted = PasswordBasedEncryption.encrypt(algo,

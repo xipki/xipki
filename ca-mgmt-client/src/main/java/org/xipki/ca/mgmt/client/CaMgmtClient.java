@@ -46,6 +46,7 @@ import java.net.URL;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
 import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * CA management client via REST API.
@@ -67,13 +68,14 @@ public class CaMgmtClient implements CaManager {
 
   private HostnameVerifier hostnameVerifier;
 
-  private SslContextConf sslContextConf;
+  private final SslContextConf sslContextConf;
 
   private boolean initialized;
 
   private CaMgmtException initException;
 
-  public CaMgmtClient() {
+  public CaMgmtClient(SslContextConf sslContextConf) {
+    this.sslContextConf = sslContextConf;
   }
 
   public synchronized void initIfNotDone()
@@ -109,10 +111,6 @@ public class CaMgmtClient implements CaManager {
       actionUrlMap.put(action, new URL(this.serverUrl + action));
     }
   } // method setServerUrl
-
-  public void setSslContextConf(SslContextConf sslContextConf) {
-    this.sslContextConf = sslContextConf;
-  } // method setSslContextConf
 
   @Override
   public CaSystemStatus getCaSystemStatus()
@@ -711,8 +709,8 @@ public class CaMgmtClient implements CaManager {
       return null;
     } else {
       Map<String, X509Cert> result = new HashMap<>(nameCertMap.size());
-      for (String caname : nameCertMap.keySet()) {
-        result.put(caname, parseCert(nameCertMap.get(caname)));
+      for (Entry<String, byte[]> entry : nameCertMap.entrySet()) {
+        result.put(entry.getKey(), parseCert(entry.getValue()));
       }
       return result;
     }

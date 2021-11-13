@@ -70,22 +70,13 @@ class SignerManager {
     List<String> names = manager.queryExecutor.namesFromTable("SIGNER");
     for (String name : names) {
       SignerEntry entry = manager.queryExecutor.createSigner(name);
-      if (entry == null) {
-        LOG.error("could not initialize signer '{}'", name);
-        continue;
-      }
-
       entry.setConfFaulty(true);
       manager.signerDbEntries.put(name, entry);
 
       SignerEntryWrapper signer = createSigner(entry);
-      if (signer != null) {
-        entry.setConfFaulty(false);
-        manager.signers.put(name, signer);
-        LOG.info("loaded signer {}", name);
-      } else {
-        LOG.error("could not load signer {}", name);
-      }
+      entry.setConfFaulty(false);
+      manager.signers.put(name, signer);
+      LOG.info("loaded signer {}", name);
     }
     signerInitialized = true;
   } // method initSigners

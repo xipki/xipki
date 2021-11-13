@@ -18,6 +18,7 @@
 package org.xipki.util;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import static org.xipki.util.Args.notBlank;
 import static org.xipki.util.Args.notNull;
@@ -72,8 +73,10 @@ public class ConfPairs {
         return true;
       } else if (obj instanceof Unmodifiable) {
         return underlying.equals(((Unmodifiable) obj).underlying);
+      } else if (obj instanceof ConfPairs){
+        return underlying.equals((ConfPairs) obj);
       } else {
-        return underlying.equals(obj);
+        return false;
       }
     }
 
@@ -112,9 +115,9 @@ public class ConfPairs {
   }
 
   public ConfPairs(Map<String, ?> pairs) {
-    for (String name : pairs.keySet()) {
-      Object value = pairs.get(name);
-      putPair(name, value == null ? null : value.toString());
+    for (Entry<String, ?> entry : pairs.entrySet()) {
+      Object value = entry.getValue();
+      putPair(entry.getKey(), value == null ? null : value.toString());
     }
   }
 
@@ -253,10 +256,10 @@ public class ConfPairs {
   public String getEncoded() {
     StringBuilder sb = new StringBuilder();
     List<String> names = new LinkedList<>();
-    for (String name : pairs.keySet()) {
-      String value = pairs.get(name);
+    for (Entry<String, String> entry : pairs.entrySet()) {
+      String value = entry.getValue();
       if (value.length() <= 100) {
-        names.add(name);
+        names.add(entry.getKey());
       }
     }
     Collections.sort(names);

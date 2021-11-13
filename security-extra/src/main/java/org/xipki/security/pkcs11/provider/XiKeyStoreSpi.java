@@ -32,6 +32,7 @@ import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Construction of alias is as follows.
@@ -261,9 +262,9 @@ public class XiKeyStoreSpi extends KeyStoreSpi {
 
   @Override
   public String engineGetCertificateAlias(Certificate cert) {
-    for (String alias : keyCerts.keySet()) {
-      if (keyCerts.get(alias).getCertificate().equals(cert)) {
-        return alias;
+    for (Entry<String, KeyCertEntry> entry : keyCerts.entrySet()) {
+      if (entry.getValue().getCertificate().equals(cert)) {
+        return entry.getKey();
       }
     }
 

@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.cert.CertificateException;
 import java.util.*;
+import java.util.Map.Entry;
 
 import static org.xipki.util.Args.notEmpty;
 import static org.xipki.util.Args.notNull;
@@ -486,9 +487,9 @@ public class HttpMgmtServlet extends HttpServlet {
             resp = new MgmtResponse.LoadConf(null);
           } else {
             Map<String, byte[]> result = new HashMap<>(rootcaNameCertMap.size());
-            for (String name : rootcaNameCertMap.keySet()) {
-              byte[] encodedCert = rootcaNameCertMap.get(name).getEncoded();
-              result.put(name, encodedCert);
+            for (Entry<String, X509Cert> entry : rootcaNameCertMap.entrySet()) {
+              byte[] encodedCert = entry.getValue().getEncoded();
+              result.put(entry.getKey(), encodedCert);
             }
             resp = new MgmtResponse.LoadConf(result);
           }

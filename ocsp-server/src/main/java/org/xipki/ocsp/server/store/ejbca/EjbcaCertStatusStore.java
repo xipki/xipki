@@ -38,6 +38,7 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.Hex;
 import org.xipki.util.LogUtil;
+import org.xipki.util.RandomUtil;
 import org.xipki.util.StringUtil;
 
 import java.io.File;
@@ -469,14 +470,13 @@ public class EjbcaCertStatusStore extends OcspStore {
 
     if (updateInterval != null) {
       List<Runnable> scheduledServices = getScheduledServices();
-      int size = scheduledServices == null ? 0 : scheduledServices.size();
+      int size = scheduledServices.size();
       if (size > 0) {
         this.scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(size);
-        Random random = new Random();
         long intervalSeconds = updateInterval.approxMinutes() * 60;
         for (Runnable service : scheduledServices) {
           this.scheduledThreadPoolExecutor.scheduleAtFixedRate(service,
-              intervalSeconds + random.nextInt(60), intervalSeconds,
+              intervalSeconds + RandomUtil.nextInt(60), intervalSeconds,
               TimeUnit.SECONDS);
         }
       }

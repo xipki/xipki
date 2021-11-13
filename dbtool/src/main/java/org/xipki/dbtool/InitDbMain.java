@@ -24,6 +24,7 @@ import org.xipki.password.SinglePasswordResolver;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Connection;
@@ -100,7 +101,11 @@ public class InitDbMain {
   private static void exec(String dbConfFile, String dbSchemaFile, boolean force)
       throws Exception {
     Properties props = new Properties();
-    props.load(Files.newInputStream(Paths.get(IoUtil.expandFilepath(dbConfFile))));
+    try (InputStream is = Files.newInputStream(
+                            Paths.get(IoUtil.expandFilepath(dbConfFile)))) {
+      props.load(is);
+    }
+
     LiquibaseMain.DatabaseConf dbConf = LiquibaseMain.DatabaseConf.getInstance(props, null);
     String password = dbConf.getPassword();
     if (password != null) {
@@ -190,7 +195,7 @@ public class InitDbMain {
     List<String> tables = Arrays.asList("DATABASECHANGELOG", "DATABASECHANGELOGLOCK");
 
     Connection conn = null;
-    Statement stmt;
+    Statement stmt = null;
 
     try {
       try {
@@ -216,6 +221,13 @@ public class InitDbMain {
         }
       }
     } finally {
+      if (stmt != null) {
+        try {
+          stmt.close();
+        } catch (SQLException ex) {
+        }
+      }
+      
       if (conn != null) {
         try {
           conn.close();

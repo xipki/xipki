@@ -208,7 +208,7 @@ public class P12Actions {
       } else {
         ConfPairs pairs = new ConfPairs("keystore", "file:" + p12File);
         if (password != null) {
-          pairs.putPair("password", new String(password));
+          pairs.putPair("password", password);
         }
 
         HashAlgo hashAlgo = HashAlgo.SHA256;

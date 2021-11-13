@@ -43,6 +43,7 @@ import org.xipki.security.X509Cert;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.Map.Entry;
 
 import static org.xipki.qa.ca.extn.CheckerUtil.*;
 import static org.xipki.util.Args.notNull;
@@ -460,8 +461,10 @@ public class ExtensionsChecker {
     // profile required extension types
     Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls =
         certprofile.getExtensionControls();
-    for (ASN1ObjectIdentifier oid : extensionControls.keySet()) {
-      if (extensionControls.get(oid).isRequired()) {
+    
+    for (Entry<ASN1ObjectIdentifier, ExtensionControl> entry : extensionControls.entrySet()) {
+      ASN1ObjectIdentifier oid = entry.getKey();
+      if (entry.getValue().isRequired()) {
         types.add(oid);
       } else if ((requestedExtns != null && requestedExtns.getExtension(oid) != null)
           && (extensionSyntaxes != null && extensionSyntaxes.containsKey(oid))) {

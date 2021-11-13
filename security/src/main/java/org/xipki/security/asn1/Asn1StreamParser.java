@@ -113,7 +113,9 @@ public class Asn1StreamParser {
       }
       lenBytesSize.set(1 + lengthBytes.length);
 
-      instream.read(lengthBytes);
+      if (lengthBytes.length > instream.read(lengthBytes)) {
+        throw new IOException("not enough data to read");
+      }
 
       int length = 0xFF & lengthBytes[0];
       for (int i = 1; i < lengthBytes.length; i++) {

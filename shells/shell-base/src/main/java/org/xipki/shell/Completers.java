@@ -22,6 +22,7 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 
 import java.nio.file.Path;
 import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Completers for actions.
@@ -115,8 +116,8 @@ public class Completers {
 
       tokens = new HashSet<>(map.keySet());
 
-      for (String name : map.keySet()) {
-        nameToIdMap.put(name.toLowerCase(), map.get(name));
+      for (Entry<String, String> entry : map.entrySet()) {
+        nameToIdMap.put(entry.getKey().toLowerCase(), entry.getValue());
       }
     }
 

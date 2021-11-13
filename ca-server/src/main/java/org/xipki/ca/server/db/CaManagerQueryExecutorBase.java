@@ -175,7 +175,7 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
     buf.deleteCharAt(buf.length() - 1); // delete the last ','
     buf.append(" WHERE ").append(whereColumn.name()).append("=?");
 
-    String sql = buf.toString();
+    final String sql = buf.toString();
 
     PreparedStatement ps = null;
     try {

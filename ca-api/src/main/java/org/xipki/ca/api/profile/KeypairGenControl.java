@@ -137,7 +137,7 @@ public class KeypairGenControl {
 
     // CHECKSTYLE:SKIP
     public DSAKeypairGenControl(int pLength, int qLength, ASN1ObjectIdentifier keyAlgorithmOid) {
-      if (pLength < 1024 | pLength % 1024 != 0) {
+      if (pLength < 1024 || pLength % 1024 != 0) {
         throw new IllegalArgumentException("invalid pLength " + pLength);
       }
 

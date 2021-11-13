@@ -84,14 +84,12 @@ public class P11CryptService {
 
   public P11Identity getIdentity(P11SlotIdentifier slotId, P11ObjectIdentifier keyId)
       throws P11TokenException {
-    P11Slot slot = module.getSlot(slotId);
-    return (slot == null) ? null : slot.getIdentity(keyId);
+    return module.getSlot(slotId).getIdentity(keyId);
   }
 
   public X509Cert getCert(P11SlotIdentifier slotId, P11ObjectIdentifier certId)
       throws P11TokenException {
-    P11Slot slot = module.getSlot(slotId);
-    return slot == null ? null : slot.getCert(certId);
+    return module.getSlot(slotId).getCert(certId);
   }
 
   @Override

@@ -25,6 +25,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -146,15 +147,17 @@ public class SslContextConf {
       try {
         if (sslKeystore != null) {
           char[] password = sslKeystorePassword == null ? null : sslKeystorePassword.toCharArray();
-          builder.loadKeyMaterial(
-              new ByteArrayInputStream(sslKeystore.readContent()), password, password);
+          try (InputStream is = new ByteArrayInputStream(sslKeystore.readContent())) {
+            builder.loadKeyMaterial(is, password, password);
+          }
         }
 
         if (sslTruststore != null) {
           char[] password = sslTruststorePassword == null
               ? null : sslTruststorePassword.toCharArray();
-          builder.loadTrustMaterial(
-              new ByteArrayInputStream(sslTruststore.readContent()), password);
+          try (InputStream is = new ByteArrayInputStream(sslTruststore.readContent())) {
+            builder.loadTrustMaterial(is, password);
+          }
         }
 
         sslContext = builder.build();

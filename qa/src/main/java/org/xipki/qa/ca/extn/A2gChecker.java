@@ -83,7 +83,7 @@ class A2gChecker extends ExtensionChecker {
     if (requestedSubject != null && conf.isInputFromRequestRequired()) {
 
       RDN[] admissionRdns = requestedSubject.getRDNs(type);
-      if (admissionRdns != null && admissionRdns.length == 0) {
+      if (admissionRdns == null || admissionRdns.length == 0) {
         failureMsg.append("no subject RDN Admission is contained in the request;");
         return;
       }
@@ -593,11 +593,13 @@ class A2gChecker extends ExtensionChecker {
           }
         }
       } else {
-        String str = null;
+        String str;
         // extract from the subject
         RDN[] rdns = requestedSubject.getRDNs(oid);
         if (rdns != null && rdns.length > 0) {
           str = X509Util.rdnValueToString(rdns[0].getFirst().getValue());
+        } else {
+          str = "";
         }
 
         // [tag]value where tag is only one digit 0, 1 or 2

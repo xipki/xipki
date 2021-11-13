@@ -31,6 +31,7 @@ import org.xipki.util.InvalidConfException;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.Map.Entry;
 
 import static org.xipki.util.CollectionUtil.isEmpty;
 import static org.xipki.util.CollectionUtil.isNotEmpty;
@@ -59,8 +60,9 @@ public class CheckerUtil {
 
     Map<ASN1ObjectIdentifier, QaExtensionValue> map = new HashMap<>();
 
-    for (String type : extensions.keySet()) {
-      ExtensionType extn = extensions.get(type);
+    for (Entry<String, ExtensionType> entry : extensions.entrySet()) {
+      String type = entry.getKey();
+      ExtensionType extn = entry.getValue();
       if (extn.getConstant() == null) {
         continue;
       }
@@ -100,8 +102,8 @@ public class CheckerUtil {
 
     Map<ASN1ObjectIdentifier, ExtnSyntax> map = new HashMap<>();
 
-    for (String type : extensions.keySet()) {
-      ExtensionType extn = extensions.get(type);
+    for (Entry<String, ExtensionType> entry : extensions.entrySet()) {
+      ExtensionType extn = entry.getValue();
       if (extn.getSyntax() != null) {
         map.put(extn.getType().toXiOid(), extn.getSyntax());
       }

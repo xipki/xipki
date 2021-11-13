@@ -37,6 +37,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.cert.CertificateException;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -619,10 +620,11 @@ public class CaConf {
       return confStr;
     }
 
-    for (String name : properties.keySet()) {
+    for (Entry<String, String> entry : properties.entrySet()) {
+      String name = entry.getKey();
       String placeHolder = "${" + name + "}";
       while (confStr.contains(placeHolder)) {
-        confStr = confStr.replace(placeHolder, properties.get(name));
+        confStr = confStr.replace(placeHolder, entry.getValue());
       }
     }
 

@@ -56,4 +56,12 @@ public class TlsExtensionType implements Comparable<TlsExtensionType> {
     return Integer.compare(code, obj.code);
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof TlsExtensionType) {
+      return code == ((TlsExtensionType) obj).code;
+    } else {
+      return false;
+    }
+  }
 }

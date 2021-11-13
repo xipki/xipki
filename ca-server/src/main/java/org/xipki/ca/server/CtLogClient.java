@@ -54,9 +54,7 @@ public class CtLogClient {
   public CtLogClient(List<String> serverUrls, SslContextConf sslContextConf) {
     Args.notEmpty(serverUrls, "serverUrls");
 
-    DefaultCurl dfltCurl  = new DefaultCurl();
-    dfltCurl.setSslContextConf(sslContextConf);
-    this.curl = dfltCurl;
+    this.curl  = new DefaultCurl(sslContextConf);
     this.addPreChainUrls = new ArrayList<>(serverUrls.size());
     for (String m : serverUrls) {
       String addPreChainUrl = m.endsWith("/")

@@ -261,9 +261,6 @@ class SelfSignedCertBuilder {
       throws CertprofileException, IOException, BadCertTemplateException {
     ExtensionValues extensionTuples = profile.getExtensions(requestedSubject, grantedSubject,
         extensions, requestedPublicKeyInfo, publicCaInfo, null, notBefore, notAfter);
-    if (extensionTuples == null) {
-      return;
-    }
 
     for (ASN1ObjectIdentifier extType : extensionTuples.getExtensionTypes()) {
       ExtensionValue extValue = extensionTuples.getExtensionValue(extType);

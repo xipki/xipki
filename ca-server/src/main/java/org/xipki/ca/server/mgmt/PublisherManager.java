@@ -87,23 +87,15 @@ class PublisherManager {
     List<String> names = manager.queryExecutor.namesFromTable("PUBLISHER");
     for (String name : names) {
       PublisherEntry dbEntry = manager.queryExecutor.createPublisher(name);
-      if (dbEntry == null) {
-        LOG.error("could not initialize publisher '{}'", name);
-        continue;
-      }
 
       manager.idNameMap.addPublisher(dbEntry.getIdent());
       dbEntry.setFaulty(true);
       manager.publisherDbEntries.put(name, dbEntry);
 
       IdentifiedCertPublisher publisher = createPublisher(dbEntry);
-      if (publisher != null) {
-        dbEntry.setFaulty(false);
-        publishers.put(name, publisher);
-        LOG.info("loaded publisher {}", name);
-      } else {
-        LOG.error("could not load publisher {}", name);
-      }
+      dbEntry.setFaulty(false);
+      publishers.put(name, publisher);
+      LOG.info("loaded publisher {}", name);
     }
 
     publishersInitialized = true;

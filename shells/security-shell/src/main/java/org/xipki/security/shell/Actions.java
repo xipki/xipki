@@ -58,6 +58,7 @@ import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Security actions.
@@ -706,8 +707,8 @@ public class Actions {
       PKCS10CertificationRequestBuilder csrBuilder =
               new PKCS10CertificationRequestBuilder(subjectDn, subjectPublicKeyInfo);
       if (CollectionUtil.isNotEmpty(attributes)) {
-        for (ASN1ObjectIdentifier attrType : attributes.keySet()) {
-          csrBuilder.addAttribute(attrType, attributes.get(attrType));
+        for (Entry<ASN1ObjectIdentifier, ASN1Encodable> entry : attributes.entrySet()) {
+          csrBuilder.addAttribute(entry.getKey(), entry.getValue());
         }
       }
 

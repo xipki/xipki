@@ -451,7 +451,7 @@ class ImportCrl {
       CrlStreamParser crl = null;
       CrlInfo crlInfo = null;
 
-      if (!crlDirInfo.deleteMe & crlDirInfo.revocationinfo == null) {
+      if (!crlDirInfo.deleteMe && crlDirInfo.revocationinfo == null) {
         crl = new CrlStreamParser(new File(crlDir, "ca.crl"));
         Date now = new Date();
         if (crl.getNextUpdate() != null && crl.getNextUpdate().before(now)) {
@@ -1102,7 +1102,7 @@ class ImportCrl {
         ps.setInt(offset++, crlInfoId);
         ps.setString(offset, null);
       } else {
-        if (existingCertInfo.revoked | existingCertInfo.crlId != crlInfoId) {
+        if (existingCertInfo.revoked || existingCertInfo.crlId != crlInfoId) {
           sql = SQL_UPDATE_CERT;
           ps = psUpdateCert;
 

@@ -39,6 +39,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Misc actions to manage CA.
@@ -159,11 +160,12 @@ public class MiscCaActions {
           println("loaded " + msg);
         } else {
           println("loaded " + msg);
-          for (String caname : rootCerts.keySet()) {
+          for (Entry<String, X509Cert> entry : rootCerts.entrySet()) {
+            String caname = entry.getKey();
             String filename = "ca-" + caname + ".crt";
             saveVerbose("saved certificate of root CA " + caname + " to",
                 new File(outDir, filename),
-                encodeCert(rootCerts.get(caname).getEncoded(), outform));
+                encodeCert(entry.getValue().getEncoded(), outform));
           }
         }
         return null;

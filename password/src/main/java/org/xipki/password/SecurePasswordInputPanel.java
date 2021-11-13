@@ -18,8 +18,10 @@
 package org.xipki.password;
 
 import javax.swing.*;
+
+import org.xipki.util.RandomUtil;
+
 import java.awt.*;
-import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -76,9 +78,8 @@ public class SecurePasswordInputPanel extends Panel {
     Set<Integer> rows = new HashSet<>(KEYS_MAP.keySet());
     final int n = rows.size();
 
-    SecureRandom random = new SecureRandom();
     while (!rows.isEmpty()) {
-      int row = random.nextInt() % n;
+      int row = RandomUtil.nextInt(n);
       if (!rows.contains(row)) {
         continue;
       }

@@ -135,8 +135,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
       }
 
       int keysize = getKeysize(signatureAlgorithm);
-      byte[] keyBytes = new byte[keysize / 8];
-      new SecureRandom().nextBytes(keyBytes);
+      byte[] keyBytes = RandomUtil.nextBytes(keysize / 8);
       return slot.importSecretKey(PKCS11Constants.CKK_GENERIC_SECRET, keyBytes,
           getNewKeyControl(keyId, keyLabel));
     }
@@ -235,7 +234,7 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
 
     public Testor() {
       for (int i = 0; i < data.length; i++) {
-        new SecureRandom().nextBytes(data[i]);
+        data[i] = RandomUtil.nextBytes(data[i].length);
       }
     }
 

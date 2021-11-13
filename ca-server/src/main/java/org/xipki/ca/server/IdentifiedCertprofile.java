@@ -372,13 +372,13 @@ public class IdentifiedCertprofile implements Closeable {
       AuthorityInfoAccessControl aiaControl = certprofile.getAiaControl();
 
       List<String> caIssuers = null;
-      if (aiaControl == null || aiaControl.isIncludesCaIssuers()) {
+      if (aiaControl != null && aiaControl.isIncludesCaIssuers()) {
         caIssuers = caUris.getCacertUris();
         assertAllUrisHasProtocol(caIssuers, aiaControl.getCaIssuersProtocols());
       }
 
       List<String> ocspUris = null;
-      if (aiaControl == null || aiaControl.isIncludesOcsp()) {
+      if (aiaControl != null && aiaControl.isIncludesOcsp()) {
         ocspUris = caUris.getOcspUris();
         assertAllUrisHasProtocol(ocspUris, aiaControl.getOcspProtocols());
       }

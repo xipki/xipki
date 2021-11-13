@@ -596,9 +596,7 @@ class Ca2Manager {
         throw new CaMgmtException(concat("invalid SerialNumber for SelfSigned " + serialNumber,
                 profileName));
       }
-      byte[] bytes = new byte[numBytes];
-      SecureRandom rnd = new SecureRandom();
-      rnd.nextBytes(bytes);
+      byte[] bytes = RandomUtil.nextBytes(numBytes);
       // clear the highest bit
       bytes[0] &= 0x7F;
       serialOfThisCert = new BigInteger(bytes);
@@ -755,9 +753,6 @@ class Ca2Manager {
     caName = toNonBlankLower(caName, "caName");
     notNull(serialNumber, "serialNumber");
     X509Ca ca = getX509Ca(caName);
-    if (ca == null) {
-      throw manager.logAndCreateException(concat("unknown CA ", caName));
-    }
 
     try {
       if (ca.removeCert(serialNumber, MSGID_ca_mgmt) == null) {

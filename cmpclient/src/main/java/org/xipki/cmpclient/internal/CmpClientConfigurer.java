@@ -223,15 +223,17 @@ final class CmpClientConfigurer {
           if (ssl.getKeystore() != null) {
             char[] pwd = ssl.getKeystorePassword() == null
                 ? null : ssl.getKeystorePassword().toCharArray();
-            builder.loadKeyMaterial(
-                new ByteArrayInputStream(ssl.getKeystore().readContent()), pwd, pwd);
+            try (InputStream is = new ByteArrayInputStream(ssl.getKeystore().readContent())) {
+              builder.loadKeyMaterial(is, pwd, pwd);
+            }
           }
 
           if (ssl.getTruststore() != null) {
             char[] pwd = ssl.getTruststorePassword() == null
                 ? null : ssl.getTruststorePassword().toCharArray();
-            builder.loadTrustMaterial(
-                new ByteArrayInputStream(ssl.getTruststore().readContent()), pwd);
+            try (InputStream is = new ByteArrayInputStream(ssl.getTruststore().readContent())) {
+              builder.loadTrustMaterial(is, pwd);
+            }
           }
 
           SSLSocketFactory socketFactory = builder.build().getSocketFactory();

@@ -34,6 +34,7 @@ import org.xipki.shell.CmdFailure;
 import org.xipki.shell.IllegalCmdParamException;
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -167,12 +168,12 @@ public class UserCaActions {
       sb.append(userEntry);
 
       Map<String, CaHasUserEntry> caHasUsers = caManager.getCaHasUsersForUser(name);
-      for (String ca : caHasUsers.keySet()) {
-        CaHasUserEntry entry = caHasUsers.get(ca);
+      for (Entry<String, CaHasUserEntry> entry : caHasUsers.entrySet()) {
+        String ca = entry.getKey();
         sb.append("\n----- CA ").append(ca).append("-----");
-        sb.append("\nprofiles: ").append(entry.getProfiles());
+        sb.append("\nprofiles: ").append(entry.getValue().getProfiles());
         sb.append("\npermission: ").append(
-            PermissionConstants.permissionToString(entry.getPermission()));
+            PermissionConstants.permissionToString(entry.getValue().getPermission()));
       }
       println(sb.toString());
       return null;

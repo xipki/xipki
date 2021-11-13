@@ -59,6 +59,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.util.*;
+import java.util.Map.Entry;
 
 import static org.xipki.cmpclient.internal.CmpAgentUtil.*;
 import static org.xipki.util.Args.notBlank;
@@ -737,9 +738,8 @@ class CmpAgent {
     }
 
     if (CollectionUtil.isNotEmpty(reqIdIdMap)) {
-      for (BigInteger reqId : reqIdIdMap.keySet()) {
-        ResultEntry.Error ere = new ResultEntry.Error(reqIdIdMap.get(reqId), PKISTATUS_NO_ANSWER);
-        result.addResultEntry(ere);
+      for (Entry<BigInteger, String> entry : reqIdIdMap.entrySet()) {
+        result.addResultEntry(new ResultEntry.Error(entry.getValue(), PKISTATUS_NO_ANSWER));
       }
     }
 

@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.Map.Entry;
 
 import static org.xipki.util.Args.notNull;
 
@@ -296,8 +297,9 @@ public class CertprofileQa {
 
     Map<ASN1ObjectIdentifier, QaExtensionValue> map = new HashMap<>();
 
-    for (String type : extensionsType.keySet()) {
-      ExtensionType extn = extensionsType.get(type);
+    for (Entry<String, ExtensionType> entry : extensionsType.entrySet()) {
+      String type = entry.getKey();
+      ExtensionType extn = entry.getValue();
       if (extn.getConstant() == null) {
         continue;
       }

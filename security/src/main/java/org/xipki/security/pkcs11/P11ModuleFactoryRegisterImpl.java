@@ -23,6 +23,7 @@ import org.xipki.util.LogUtil;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
@@ -99,11 +100,11 @@ public class P11ModuleFactoryRegisterImpl implements P11ModuleFactoryRegister {
 
   @Override
   public void close() {
-    for (String pk11Lib : modules.keySet()) {
+    for (Entry<String, P11Module> entry : modules.entrySet()) {
       try {
-        modules.get(pk11Lib).close();
+        entry.getValue().close();
       } catch (Throwable th) {
-        LogUtil.error(LOG, th, "could not close PKCS11 Module " + pk11Lib);
+        LogUtil.error(LOG, th, "could not close PKCS11 Module " + entry.getKey());
       }
     }
     modules.clear();

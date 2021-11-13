@@ -50,6 +50,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.Map.Entry;
 
 import static org.xipki.util.Args.notNull;
 
@@ -267,8 +268,9 @@ public class XijsonExtensions {
       }
 
       if (subjectAltNameModes != null) {
-        for (ASN1ObjectIdentifier attrType : subjectToSubjectAltNameModes.keySet()) {
-          GeneralNameTag nameTag = subjectToSubjectAltNameModes.get(attrType);
+        for (Entry<ASN1ObjectIdentifier, GeneralNameTag> entry
+            : subjectToSubjectAltNameModes.entrySet()) {
+          GeneralNameTag nameTag = entry.getValue();
 
           boolean allowed = false;
           for (GeneralNameMode m : subjectAltNameModes) {
@@ -870,8 +872,10 @@ public class XijsonExtensions {
     List<GeneralName> grantedNames = new LinkedList<>();
     // copy the required attributes of Subject
     if (subjectToSubjectAltNameModes != null) {
-      for (ASN1ObjectIdentifier attrType : subjectToSubjectAltNameModes.keySet()) {
-        GeneralNameTag tag = subjectToSubjectAltNameModes.get(attrType);
+      for (Entry<ASN1ObjectIdentifier, GeneralNameTag> entry
+          : subjectToSubjectAltNameModes.entrySet()) {
+        ASN1ObjectIdentifier attrType = entry.getKey();
+        GeneralNameTag tag = entry.getValue();
 
         RDN[] rdns = grantedSubject.getRDNs(attrType);
         if (rdns == null || rdns.length == 0) {

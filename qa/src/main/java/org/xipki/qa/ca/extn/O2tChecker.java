@@ -49,6 +49,7 @@ import org.xipki.util.Validity;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.Map.Entry;
 
 import static org.xipki.qa.ca.extn.CheckerUtil.*;
 import static org.xipki.util.CollectionUtil.isNotEmpty;
@@ -367,8 +368,7 @@ class O2tChecker extends ExtensionChecker {
       ExtensionControl extnControl) {
     byte[] expected = caller.getSmimeCapabilities().getValue();
     if (!Arrays.equals(expected, extnValue)) {
-      addViolation(failureMsg, "extension valus", hex(extnValue),
-          (expected == null) ? "not present" : hex(expected));
+      addViolation(failureMsg, "extension valus", hex(extnValue), hex(expected));
     }
   } // method checkSmimeCapabilities
 
@@ -457,8 +457,10 @@ class O2tChecker extends ExtensionChecker {
     if (subjectToSubjectAltNameModes != null) {
       X500Name grantedSubject = certprofile.getSubject(requestedSubject).getGrantedSubject();
 
-      for (ASN1ObjectIdentifier attrType : subjectToSubjectAltNameModes.keySet()) {
-        GeneralNameTag tag = subjectToSubjectAltNameModes.get(attrType);
+      for (Entry<ASN1ObjectIdentifier, GeneralNameTag> entry
+          : subjectToSubjectAltNameModes.entrySet()) {
+        ASN1ObjectIdentifier attrType = entry.getKey();
+        GeneralNameTag tag = entry.getValue();
 
         RDN[] rdns = grantedSubject.getRDNs(attrType);
         if (rdns == null || rdns.length == 0) {
@@ -696,8 +698,9 @@ class O2tChecker extends ExtensionChecker {
     }
 
     if (!otherAttrs.isEmpty()) {
-      for (ASN1ObjectIdentifier attrType : otherAttrs.keySet()) {
-        Set<ASN1Encodable> expAttrValues = expOtherAttrs.get(attrType);
+      for(Entry<ASN1ObjectIdentifier, Set<ASN1Encodable>> entry : otherAttrs.entrySet()) {
+        ASN1ObjectIdentifier attrType = entry.getKey();
+        Set<ASN1Encodable> expAttrValues = entry.getValue();
         if (expAttrValues == null) {
           failureMsg.append("attribute of type ").append(attrType.getId())
               .append(" is present but not requested; ");

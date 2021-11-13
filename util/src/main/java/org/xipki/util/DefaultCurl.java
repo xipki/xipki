@@ -29,6 +29,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * An implementation of {@link Curl}.
@@ -42,13 +43,13 @@ public class DefaultCurl implements Curl {
 
   private HostnameVerifier hostnameVerifier;
 
-  private SslContextConf sslContextConf;
+  private final SslContextConf sslContextConf;
 
   private boolean initialized;
 
   private ObjectCreationException initException;
 
-  public void setSslContextConf(SslContextConf sslContextConf) {
+  public DefaultCurl(SslContextConf sslContextConf) {
     this.sslContextConf = sslContextConf;
   }
 
@@ -123,9 +124,9 @@ public class DefaultCurl implements Curl {
       httpConn.setUseCaches(false);
 
       if (headers != null) {
-        for (String headerName : headers.keySet()) {
-          String value = headers.get(headerName);
-          httpConn.setRequestProperty(headerName, value);
+        for(Entry<String, String> entry : headers.entrySet()) {
+          String value = entry.getValue();
+          httpConn.setRequestProperty(entry.getKey(), value);
         }
       }
 

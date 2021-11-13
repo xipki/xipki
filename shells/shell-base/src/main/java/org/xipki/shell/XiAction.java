@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.security.SecureRandom;
 import java.util.Collection;
 import java.util.List;
 
@@ -200,9 +199,7 @@ public abstract class XiAction implements Action {
   } // method save
 
   private static String randomHex(int numOfBytes) {
-    SecureRandom random = new SecureRandom();
-    byte[] bytes = new byte[numOfBytes];
-    random.nextBytes(bytes);
+    byte[] bytes = RandomUtil.nextBytes(numOfBytes);
     return Hex.encode(bytes);
   }
 

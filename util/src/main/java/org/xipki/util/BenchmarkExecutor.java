@@ -17,7 +17,6 @@
 
 package org.xipki.util;
 
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -236,9 +235,8 @@ public abstract class BenchmarkExecutor {
   }
 
   protected static long getSecureIndex() {
-    SecureRandom random = new SecureRandom();
     while (true) {
-      long nextLong = random.nextLong();
+      long nextLong = RandomUtil.nextLong();
       if (nextLong > 0) {
         return nextLong;
       }

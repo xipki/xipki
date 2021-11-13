@@ -162,6 +162,11 @@ public interface ClockSource {
     StringBuilder sb = new StringBuilder(elapsedNanos < 0 ? "-" : "");
     elapsedNanos = Math.abs(elapsedNanos);
 
+
+    TimeUnit[] TIMEUNITS_DESCENDING = {DAYS, HOURS, MINUTES, SECONDS, MILLISECONDS, MICROSECONDS,
+        NANOSECONDS};
+    String[] TIMEUNIT_DISPLAY_VALUES = {"ns", "µs", "ms", "s", "m", "h", "d"};
+
     for (TimeUnit unit : TIMEUNITS_DESCENDING) {
       long converted = unit.convert(elapsedNanos, NANOSECONDS);
       if (converted > 0) {
@@ -172,11 +177,6 @@ public interface ClockSource {
 
     return sb.toString();
   }
-
-  TimeUnit[] TIMEUNITS_DESCENDING = {DAYS, HOURS, MINUTES, SECONDS, MILLISECONDS, MICROSECONDS,
-      NANOSECONDS};
-
-  String[] TIMEUNIT_DISPLAY_VALUES = {"ns", "µs", "ms", "s", "m", "h", "d"};
 
   /**
    * Factory class used to create a platform-specific ClockSource.

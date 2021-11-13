@@ -77,7 +77,7 @@ public class PasswordActions {
       if (outFile != null) {
         saveVerbose("saved the password to file", outFile, StringUtil.toUtf8Bytes(password));
       } else {
-        println("the password is: '" + new String(password) + "'");
+        println("the password is: '" + password + "'");
       }
       return null;
     }

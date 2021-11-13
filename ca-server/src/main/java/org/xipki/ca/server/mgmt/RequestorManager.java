@@ -80,11 +80,6 @@ class RequestorManager {
         manager.idNameMap.addRequestor(manager.byUserRequestorId);
       } else {
         RequestorEntry requestorDbEntry = manager.queryExecutor.createRequestor(name);
-        if (requestorDbEntry == null) {
-          LOG.error("could not load requestor {}", name);
-          continue;
-        }
-
         manager.idNameMap.addRequestor(requestorDbEntry.getIdent());
         manager.requestorDbEntries.put(name, requestorDbEntry);
         RequestorEntryWrapper requestor = new RequestorEntryWrapper();

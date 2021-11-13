@@ -37,6 +37,7 @@ import org.xipki.util.Validity;
 import org.xipki.util.Validity.Unit;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * CertProfile with identifier.
@@ -284,8 +285,10 @@ public class CertprofileValidator {
     if (CollectionUtil.isEmpty(keyAlgorithms)) {
       msg.append("keyAlgorithms is not configured, ");
     } else {
-      for (ASN1ObjectIdentifier m : keyAlgorithms.keySet()) {
-        KeyParametersOption opt = keyAlgorithms.get(m);
+      for (Entry<ASN1ObjectIdentifier, KeyParametersOption> entry : keyAlgorithms.entrySet()) {
+        ASN1ObjectIdentifier m = entry.getKey();
+        KeyParametersOption opt = entry.getValue();
+
         if (m.equals(PKCSObjectIdentifiers.rsaEncryption)) {
           if (opt instanceof RSAParametersOption) {
             if (((RSAParametersOption) opt).allowsModulusLength(2048 - 1)) {

@@ -36,6 +36,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -189,9 +190,9 @@ class DigestDiff {
     DigestDiffReporter reporter = new DigestDiffReporter(caReportDir.getPath(), caCertBytes);
 
     Integer caId = null;
-    for (Integer i : caIdCertBytesMap.keySet()) {
-      if (Arrays.equals(caCertBytes, caIdCertBytesMap.get(i))) {
-        caId = i;
+    for (Entry<Integer, byte[]> entry : caIdCertBytesMap.entrySet()) {
+      if (Arrays.equals(caCertBytes, entry.getValue())) {
+        caId = entry.getKey();
       }
     }
 

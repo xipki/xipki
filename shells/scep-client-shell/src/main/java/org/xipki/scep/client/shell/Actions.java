@@ -40,6 +40,7 @@ import org.xipki.util.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -160,7 +161,9 @@ public class Actions {
       char[] pwd = readPasswordIfNotSet(password);
 
       KeyStore ks = KeyUtil.getKeyStore("PKCS12");
-      ks.load(Files.newInputStream(Paths.get(p12File)), pwd);
+      try (InputStream is = Files.newInputStream(Paths.get(p12File))) {
+        ks.load(is, pwd);
+      }
 
       String keyname = null;
       Enumeration<String> aliases = ks.aliases();

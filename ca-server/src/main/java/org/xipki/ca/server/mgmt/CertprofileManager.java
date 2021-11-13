@@ -81,23 +81,14 @@ class CertprofileManager {
     List<String> names = manager.queryExecutor.namesFromTable("PROFILE");
     for (String name : names) {
       CertprofileEntry dbEntry = manager.queryExecutor.createCertprofile(name);
-      if (dbEntry == null) {
-        LOG.error("could not initialize Certprofile '{}'", name);
-        continue;
-      }
-
       manager.idNameMap.addCertprofile(dbEntry.getIdent());
       dbEntry.setFaulty(true);
       manager.certprofileDbEntries.put(name, dbEntry);
 
       IdentifiedCertprofile profile = createCertprofile(dbEntry);
-      if (profile != null) {
-        dbEntry.setFaulty(false);
-        manager.certprofiles.put(name, profile);
-        LOG.info("loaded certprofile {}", name);
-      } else {
-        LOG.error("could not load certprofile {}", name);
-      }
+      dbEntry.setFaulty(false);
+      manager.certprofiles.put(name, profile);
+      LOG.info("loaded certprofile {}", name);
     }
 
     certprofilesInitialized = true;

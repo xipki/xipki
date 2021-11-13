@@ -45,6 +45,7 @@ import java.security.cert.CertPathBuilderException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.util.*;
+import java.util.Map.Entry;
 
 import static org.xipki.util.Args.notNull;
 import static org.xipki.util.Args.toNonBlankLower;
@@ -343,14 +344,14 @@ public final class CmpClientImpl implements CmpClient {
     initIfNotInitialized();
 
     Map<String, CaConf> casMap = configurer.getCasMap();
-    for (String name : casMap.keySet()) {
-      final CaConf ca = casMap.get(name);
+    for (Entry<String, CaConf> entry : casMap.entrySet()) {
+      final CaConf ca = entry.getValue();
       if (!ca.isCaInfoConfigured()) {
         continue;
       }
 
       if (CompareUtil.equalsObject(ca.getSubject(), issuer)) {
-        return name;
+        return entry.getKey();
       }
     }
 

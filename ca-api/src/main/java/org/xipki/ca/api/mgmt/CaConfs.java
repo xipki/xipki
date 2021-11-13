@@ -29,6 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -302,10 +303,11 @@ public class CaConfs {
       return confStr;
     }
 
-    for (String name : properties.keySet()) {
+    for (Entry<String, String> entry : properties.entrySet()) {
+      String name = entry.getKey();
       String placeHolder = "${" + name + "}";
       while (confStr.contains(placeHolder)) {
-        confStr = confStr.replace(placeHolder, properties.get(name));
+        confStr = confStr.replace(placeHolder, entry.getValue());
       }
     }
 

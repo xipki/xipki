@@ -55,7 +55,11 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
 
   private Pkcs11conf pkcs11Conf;
 
-  private P11ModuleFactoryRegister p11ModuleFactoryRegister;
+  private final P11ModuleFactoryRegister p11ModuleFactoryRegister;
+
+  public P11CryptServiceFactoryImpl(P11ModuleFactoryRegister p11ModuleFactoryRegister) {
+    this.p11ModuleFactoryRegister = p11ModuleFactoryRegister;
+  }
 
   public synchronized void init()
       throws InvalidConfException {
@@ -97,10 +101,6 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
       throw new InvalidConfException("could not create P11Conf: " + ex.getMessage(), ex);
     }
   } // method init
-
-  public void setP11ModuleFactoryRegister(P11ModuleFactoryRegister p11ModuleFactoryRegister) {
-    this.p11ModuleFactoryRegister = p11ModuleFactoryRegister;
-  }
 
   public synchronized P11CryptService getP11CryptService(String moduleName)
       throws XiSecurityException, P11TokenException {

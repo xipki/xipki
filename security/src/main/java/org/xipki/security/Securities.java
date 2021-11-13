@@ -317,8 +317,7 @@ public class Securities implements Closeable {
       p11ModuleFactoryRegister.registFactory(m);
     }
 
-    p11CryptServiceFactory = new P11CryptServiceFactoryImpl();
-    p11CryptServiceFactory.setP11ModuleFactoryRegister(p11ModuleFactoryRegister);
+    p11CryptServiceFactory = new P11CryptServiceFactoryImpl(p11ModuleFactoryRegister);
     p11CryptServiceFactory.setPasswordResolver(passwordResolver);
 
     Pkcs11conf pkcs11ConfObj;

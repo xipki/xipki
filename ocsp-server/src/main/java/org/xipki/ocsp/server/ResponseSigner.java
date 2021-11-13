@@ -34,6 +34,7 @@ import java.security.cert.CertificateException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import static org.xipki.util.Args.notEmpty;
 
@@ -139,9 +140,10 @@ class ResponseSigner {
         // return any RSAPSS with MGF1 algorithms
         ASN1Encodable params = sigAlgId.getParameters();
         if (params == null) {
-          for (SignAlgo m : algoSignerMap.keySet()) {
+          for (Entry<SignAlgo, ConcurrentContentSigner> entry : algoSignerMap.entrySet()) {
+            SignAlgo m = entry.getKey();
             if (m.isRSAPSSMGF1SigAlgo()) {
-              return algoSignerMap.get(m);
+              return entry.getValue();
             }
           }
         }

@@ -553,12 +553,6 @@ public class RestResponder {
           }
 
           X509CRLHolder crl = ca.generateCrlOnDemand(msgId);
-          if (crl == null) {
-            String message = "could not generate CRL";
-            LOG.warn(message);
-            throw new HttpRespAuditException(INTERNAL_SERVER_ERROR, message, INFO, FAILED);
-          }
-
           respCt = CT_pkix_crl;
           respBytes = crl.getEncoded();
           break;

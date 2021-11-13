@@ -154,10 +154,6 @@ public class CaActions {
     @Completion(CaCompleters.CaStatusCompleter.class)
     private String caStatus = "active";
 
-    @Option(name = "--rest-status", description = "REST API status")
-    @Completion(CaCompleters.CaStatusCompleter.class)
-    private String restStatus = "inactive";
-
     @Option(name = "--ca-cert-uri", multiValued = true, description = "CA certificate URI")
     private List<String> caCertUris;
 

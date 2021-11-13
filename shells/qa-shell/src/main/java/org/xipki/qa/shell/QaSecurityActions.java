@@ -777,7 +777,7 @@ public class QaSecurityActions {
         throws Exception {
       KeyControl.EC control = queue.poll();
       ASN1ObjectIdentifier curveOid = getCurveOid(control.curveName());
-      return (control == null) ? null : new P12KeyGenSpeed.EC(curveOid, securityFactory);
+      return new P12KeyGenSpeed.EC(curveOid, securityFactory);
     }
 
   } // class BspeedEcGenP12

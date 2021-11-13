@@ -202,7 +202,9 @@ public class SSLContextBuilder {
       final char[] storePassword)
           throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
     notNull(file, "Truststore file");
-    return loadTrustMaterial(new FileInputStream(file), storePassword);
+    try (InputStream is = new FileInputStream(file)) {
+      return loadTrustMaterial(is, storePassword);
+    }
   }
 
   public SSLContextBuilder loadTrustMaterial(
@@ -211,11 +213,7 @@ public class SSLContextBuilder {
           throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
     notNull(instream, "Truststore instream");
     final KeyStore trustStore = KeyStore.getInstance(keyStoreType);
-    try {
-      trustStore.load(instream, storePassword);
-    } finally {
-      instream.close();
-    }
+    trustStore.load(instream, storePassword);
     return loadTrustMaterial(trustStore);
   }
 
@@ -242,7 +240,9 @@ public class SSLContextBuilder {
           throws NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException,
           CertificateException, IOException {
     notNull(file, "Keystore file");
-    return loadKeyMaterial(new FileInputStream(file), storePassword, keyPassword);
+    try (InputStream is = new FileInputStream(file)) {
+      return loadKeyMaterial(is, storePassword, keyPassword);
+    }
   }
 
   public SSLContextBuilder loadKeyMaterial(
@@ -253,11 +253,7 @@ public class SSLContextBuilder {
           CertificateException, IOException {
     notNull(instream, "Keystore instream");
     final KeyStore identityStore = KeyStore.getInstance(keyStoreType);
-    try {
-      identityStore.load(instream, storePassword);
-    } finally {
-      instream.close();
-    }
+    identityStore.load(instream, storePassword);
     return loadKeyMaterial(identityStore, keyPassword);
   }
 

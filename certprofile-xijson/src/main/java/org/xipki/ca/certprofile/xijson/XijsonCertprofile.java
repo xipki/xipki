@@ -45,6 +45,7 @@ import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.Map.Entry;
 
 import static org.xipki.util.Args.notBlank;
 import static org.xipki.util.Args.notNull;
@@ -991,7 +992,8 @@ public class XijsonCertprofile extends BaseCertprofile {
     Map<ASN1ObjectIdentifier, ExtnSyntax> extensionsWithSyntax =
         extensions.getExtensionsWithSyntax();
     if (extensionsWithSyntax != null) {
-      for (ASN1ObjectIdentifier m : extensionsWithSyntax.keySet()) {
+      for (Entry<ASN1ObjectIdentifier, ExtnSyntax> entry : extensionsWithSyntax.entrySet()) {
+        ASN1ObjectIdentifier m = entry.getKey();
         if (!occurences.remove(m)) {
           continue;
         }
@@ -1003,7 +1005,7 @@ public class XijsonCertprofile extends BaseCertprofile {
         }
 
         ASN1Encodable reqExtValue = extension.getParsedValue();
-        ExtensionSyntaxChecker.checkExtension(extnName, reqExtValue, extensionsWithSyntax.get(m));
+        ExtensionSyntaxChecker.checkExtension(extnName, reqExtValue, entry.getValue());
       }
     }
 

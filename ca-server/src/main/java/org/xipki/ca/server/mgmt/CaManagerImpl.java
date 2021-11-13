@@ -589,7 +589,6 @@ public class CaManagerImpl implements CaManager, Closeable {
       scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(10);
       scheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
 
-      List<String> startedCaNames = new LinkedList<>();
       List<String> failedCaNames = new LinkedList<>();
 
       // Add the CAs to the store
@@ -600,7 +599,6 @@ public class CaManagerImpl implements CaManager, Closeable {
         }
 
         if (ca2Manager.startCa(caName)) {
-          startedCaNames.add(caName);
           LOG.info("started CA {}", caName);
         } else {
           failedCaNames.add(caName);

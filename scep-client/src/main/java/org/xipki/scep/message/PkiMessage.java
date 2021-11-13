@@ -39,6 +39,7 @@ import java.security.PrivateKey;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -193,8 +194,8 @@ public class PkiMessage {
           new DEROctetString(recipientNonce.getBytes()));
     }
 
-    for (ASN1ObjectIdentifier type : signedAttributes.keySet()) {
-      addAttribute(vec, type, signedAttributes.get(type));
+    for (Entry<ASN1ObjectIdentifier, ASN1Encodable> entry : signedAttributes.entrySet()) {
+      addAttribute(vec, entry.getKey(), entry.getValue());
     }
     return new AttributeTable(vec);
   } // method getSignedAttributes
