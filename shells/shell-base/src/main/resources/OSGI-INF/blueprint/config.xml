@@ -24,7 +24,7 @@
   </bean>
 
   <bean id="curl" class="org.xipki.util.DefaultCurl">
-    <property name="sslContextConf" ref="sslContextConf"/>
+    <argument ref="sslContextConf"/>
   </bean>
 
   <service ref="curl" interface="org.xipki.util.Curl"/>
