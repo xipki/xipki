@@ -491,7 +491,12 @@ public class RestResponder {
                     "unknown " + PARAM_ca_sha1, INFO, FAILED);
           }
 
-          BigInteger serialNumber = toBigInt(strSerialNumber);
+          BigInteger serialNumber;
+          try {
+            serialNumber = toBigInt(strSerialNumber);
+          } catch (NumberFormatException ex) {
+            throw new OperationException(ErrorCode.BAD_REQUEST, ex.getMessage());
+          }
 
           if (CMD_revoke_cert.equals(command)) {
             String strReason = httpRetriever.getParameter(PARAM_reason);

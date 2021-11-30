@@ -644,7 +644,7 @@ public class IdentifiedCertprofile implements Closeable {
 
   private static void assertAllUrisHasProtocol(List<String> uris, Set<String> protocols)
           throws CertprofileException {
-    if (protocols == null) {
+    if (protocols == null || uris == null) {
       return;
     }
 
