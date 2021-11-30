@@ -680,7 +680,8 @@ public class CertStore extends CertStoreBase {
     }
 
     long crlNumber = crlNumbers.get(numCrlsToDelete - 1);
-    execUpdatePrepStmt0("DELETE FROM CRL WHERE CA_ID=? AND CRL_NO<?", col2Long(crlNumber + 1));
+    execUpdatePrepStmt0("DELETE FROM CRL WHERE CA_ID=? AND CRL_NO<?", col2Int(ca.getId()),
+        col2Long(crlNumber + 1));
 
     return numCrlsToDelete;
   } // method cleanupCrls
