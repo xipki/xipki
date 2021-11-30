@@ -155,5 +155,5 @@ echo "get CRL for given CRL number"
 CRLNUMBER=`openssl crl -inform der -in ${OUT_DIR}/crl.crl -crlnumber -noout | cut -d '=' -f 2`
 
 curl ${OPTS} \
-    --output ${OUT_DIR}/crl-${CRLNUMBER}.crl \
-    "${CA_URL}/crl?crl-number=${CRLNUMBER}"
+    --output ${OUT_DIR}/crl-0x${CRLNUMBER}.crl \
+    "${CA_URL}/crl?crl-number=0x${CRLNUMBER}"
