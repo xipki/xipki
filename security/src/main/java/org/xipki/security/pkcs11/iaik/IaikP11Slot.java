@@ -531,6 +531,25 @@ class IaikP11Slot extends P11Slot {
 
   private ConcurrentBagEntry<Session> borrowSession()
       throws P11TokenException {
+    for (int i = 0; i < Math.min(DEFAULT_MAX_COUNT_SESSION, maxSessionCount); i++) {
+      try {
+        return borrowSession0();
+      } catch (P11TokenException ex) {
+        Throwable cause = ex.getCause();
+        if (cause instanceof PKCS11Exception) {
+          long ckr = ((PKCS11Exception) cause).getErrorCode();
+          if (ckr == PKCS11Constants.CKR_SESSION_HANDLE_INVALID
+              || ckr == PKCS11Constants.CKR_SESSION_CLOSED) {
+            continue;
+          }
+        }
+      }
+    }
+    throw new P11TokenException("could not borrow valid session");
+  } // method borrowSession
+
+  private ConcurrentBagEntry<Session> borrowSession0()
+      throws P11TokenException {
     ConcurrentBagEntry<Session> session = null;
     synchronized (sessions) {
       if (countSessions.get() < maxSessionCount) {
@@ -598,7 +617,7 @@ class IaikP11Slot extends P11Slot {
     try {
       loginRequired = session.getToken().getTokenInfo().isLoginRequired();
     } catch (TokenException ex) {
-      LogUtil.error(LOG, ex, "could not check whether LoginRequired of token");
+      LogUtil.error(LOG, ex, "could not check isLoginRequired of token");
       loginRequired = true;
     }
 
