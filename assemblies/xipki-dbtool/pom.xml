@@ -89,7 +89,7 @@
                 <descriptor>src/assembly/descriptors/main.xml</descriptor>
               </descriptors>
               <appendAssemblyId>false</appendAssemblyId>
-              <attach>true</attach>
+              <attach>false</attach>
             </configuration>
           </execution>
         </executions>

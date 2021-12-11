@@ -134,6 +134,16 @@
       </excludes>
       <outputDirectory>dbtool</outputDirectory>
     </fileSet>
+    <!-- Copy xipki-ca -->
+    <fileSet>
+      <directory>${project.build.directory}/xipki-ca-${project.version}/</directory>
+      <outputDirectory>xipki-ca</outputDirectory>
+    </fileSet>
+    <!-- Copy xipki-ocsp -->
+    <fileSet>
+      <directory>${project.build.directory}/xipki-ocsp-${project.version}/</directory>
+      <outputDirectory>xipki-ocsp</outputDirectory>
+    </fileSet>
   </fileSets>
   <files>
     <file>

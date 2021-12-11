@@ -32,12 +32,6 @@
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
-    <dependency>
-      <groupId>org.xipki.assembly</groupId>
-      <artifactId>xipki-dbtool</artifactId>
-      <version>${project.version}</version>
-      <type>pom</type>
-    </dependency>
   </dependencies>
   <build>
     <resources>
@@ -124,6 +118,35 @@
             </configuration>
           </execution>
           <execution>
+            <!-- Copy the bouncycastle jars -->
+            <id>bclib</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <stripVersion>false</stripVersion>
+              <outputDirectory>${project.build.directory}/xipki-ca-${project.version}/lib</outputDirectory>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.bouncycastle</groupId>
+                  <artifactId>bcprov-jdk15on</artifactId>
+                  <version>${bc.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.bouncycastle</groupId>
+                  <artifactId>bcpkix-jdk15on</artifactId>
+                  <version>${bc.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.bouncycastle</groupId>
+                  <artifactId>bcutil-jdk15on</artifactId>
+                  <version>${bc.version}</version>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+          <execution>
             <!-- Uncompress the standard Karaf distribution -->
             <id>unpack</id>
             <phase>generate-resources</phase>
@@ -189,24 +212,6 @@
               </artifactItems>
             </configuration>
           </execution>
-          <execution>
-            <id>copy-dbtool</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}</outputDirectory>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.xipki.assembly</groupId>
-                  <artifactId>xipki-dbtool</artifactId>
-                  <version>${project.version}</version>
-                  <type>zip</type>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
         </executions>
       </plugin>
       <plugin>
@@ -250,6 +255,13 @@
             <phase>prepare-package</phase>
             <configuration>
               <target>
+                <unzip failOnEmptyArchive="true"
+                   src="../xipki-dbtool/target/xipki-dbtool-${project.version}.zip"
+                   dest="${project.build.directory}"/>
+                <unzip src="../xipki-ca/target/xipki-ca-${project.version}.zip"
+                   dest="${project.build.directory}"/>
+                <unzip src="../xipki-ocsp/target/xipki-ocsp-${project.version}.zip"
+                   dest="${project.build.directory}"/>
                 <java failonerror="true" classname="org.xipki.patchkaraf.PatchFeature">
                   <arg value="--file"/>
                   <arg file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/org.apache.karaf.features.cfg"/>
