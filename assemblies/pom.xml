@@ -16,9 +16,9 @@
     <module>features</module>
     <module>xipki-dbtool</module>
     <module>xipki-cli</module>
-    <module>xipki-qa</module>
     <module>xipki-ocsp</module>
     <module>xipki-ca</module>
     <module>xipki-p11proxy</module>
+    <module>xipki-qa</module>
   </modules>
 </project>
