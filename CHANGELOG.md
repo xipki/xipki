@@ -2,8 +2,8 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
-## 5.3.14
-- Release date: N/A
+## 5.3.15
+- Release date: -
 - CA
   - N/A
 - OCSP
@@ -14,6 +14,27 @@ See also <https://github.com/xipki/xipki/releases>
   - N/A
 - Dependencies
   - N/A
+
+## 5.3.14
+- Release date: December 24, 2021
+- CA
+  - Feature: Include postgres jdbc driver in the binary. 
+  - Feature: Deprecate the use of CertPublisher.isAsyn().
+  - Feature: Add support of SM2 in unprofessional HSMs.
+  - Feature: Generating self-signed certificate requires now only subject instead of CSR.
+  - Feature: Allow the per-HSM configuration of the vendor mechanisms.
+  - Feature: Use id-certProfile defined in CMPv3 instead of xipki's customized method to specify the certificate profile.
+  - Feature: Extend the certificate profile to specify the behaviour of notAfter (STRICT, CutOff, BY_CA).
+- OCSP
+  - Feature: Allow the per-HSM configuration of the vendor mechanisms.
+  - Feature: Add option to control maxNextUpdatePeriod in OCSP response.
+  - Feature: Reduce the column size of OCSP response in the OCSP cache database.
+- CLI
+  - Feature: Allow the per-HSM configuration of the vendor mechanisms.
+- DB Tool
+  - N/A
+- Dependencies
+  - Update karaf 4.2.11 to 4.2.14, bouncycastle 1.69 to 1.70, slf4j from 1.7.25 to 1.7.32, pkcs11-wrapper from 1.4.7 to 1.4.8, fastjson 1.2.76 to 1.2.79
 
 ## 5.3.13
 - Release date: June 20, 2021
