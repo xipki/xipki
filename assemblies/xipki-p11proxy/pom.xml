@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki.assembly</groupId>
     <artifactId>assemblies</artifactId>
-    <version>5.3.14-SNAPSHOT</version>
+    <version>5.3.14</version>
   </parent>
   <artifactId>xipki-p11proxy</artifactId>
   <packaging>pom</packaging>
