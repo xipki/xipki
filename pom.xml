@@ -31,13 +31,13 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <xipki.tools.version>1.0.5</xipki.tools.version>
     <servlet.version>3.1.0</servlet.version>
-    <karaf.version>4.2.12</karaf.version>
+    <karaf.version>4.2.14</karaf.version>
     <karaf.bc.version>1.69</karaf.bc.version>
     <bc.version>1.70</bc.version>
-    <slf4j.version>1.7.25</slf4j.version>
+    <slf4j.version>1.7.32</slf4j.version>
     <pkcs11-wrapper.version>1.4.8</pkcs11-wrapper.version>
     <hikaricp.version>4.0.3</hikaricp.version>
-    <fastjson.version>1.2.78</fastjson.version>
+    <fastjson.version>1.2.79</fastjson.version>
     <liquibase.version>3.10.3</liquibase.version>
     <!-- only for runtime -->
     <tinylog.version>2.3.2</tinylog.version>
