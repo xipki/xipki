@@ -155,7 +155,7 @@ public class CertprofileValidator {
         }
       }
 
-      if (CollectionUtil.isNotEmpty(set)) {
+      if (CollectionUtil.isNotEmpty(setUsages)) {
         msg.append("EndEntity profile must not contain CA-only keyUsage ").append(setUsages)
           .append(", ");
       }
