@@ -189,7 +189,7 @@ Note that CA and OCSP can be installed in the same servlet container.
     * [Jetty: Tricks to do client certificate authentications behind a reverse proxy](http://www.zeitoun.net/articles/client-certificate-x509-authentication-behind-reverse-proxy/start)
     * [Apache Module mod_ssl](http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#envvars)
 
-## Setup CA Server and OCSP Responder
+## Setup CA Server
 
 1. Start the servlet container  
 HSM devices of Thales, e.g. nCipher, can use Thales preload to manage the
