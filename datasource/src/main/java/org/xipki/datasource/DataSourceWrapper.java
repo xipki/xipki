@@ -28,6 +28,7 @@ import org.xipki.util.LruCache;
 import java.io.Closeable;
 import java.io.PrintWriter;
 import java.sql.*;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -1180,11 +1181,41 @@ public abstract class DataSourceWrapper implements Closeable {
       }
     } // end if
 
+    HikariConfig conf = new HikariConfig(props);
+
+    String sqlType = props.getProperty("sql.type");
+    if (databaseType == DatabaseType.UNKNOWN) {
+      // map UNKNOWN to a pre-defined database type
+      if (sqlType != null) {
+        sqlType = sqlType.trim().toUpperCase(Locale.getDefault());
+        switch (sqlType) {
+          case "DB2":
+            return new DB2(name, new HikariDataSource(conf));
+          case "H2":
+            return new H2(name, new HikariDataSource(conf));
+          case "HSQL":
+            return new HSQL(name, new HikariDataSource(conf));
+          case "MYSQL":
+            return new MySQL(name, new HikariDataSource(conf));
+          case "MARIADB":
+            return new MariaDB(name, new HikariDataSource(conf));
+          case "ORACLE":
+            return new Oracle(name, new HikariDataSource(conf));
+          case "PGSQL":
+          case "POSTGRESQL":
+            return new PostgreSQL(name, new HikariDataSource(conf));
+          default:
+            throw new IllegalArgumentException("unknown sql.type " + databaseType);
+        }
+      }
+    } else if (sqlType != null) {
+      LOG.info("ignore sql.type {}", databaseType);
+    }
+
     if (databaseType == DatabaseType.DB2 || databaseType == DatabaseType.H2
         || databaseType == DatabaseType.HSQL || databaseType == DatabaseType.MYSQL
         || databaseType == DatabaseType.MARIADB || databaseType == DatabaseType.ORACLE
         || databaseType == DatabaseType.POSTGRES) {
-      HikariConfig conf = new HikariConfig(props);
       HikariDataSource service = new HikariDataSource(conf);
       switch (databaseType) {
         case DB2:
