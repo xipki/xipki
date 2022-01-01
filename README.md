@@ -13,7 +13,7 @@ a highly scalable and high-performance open source PKI (CA and OCSP responder).
 * The Apache Software License, Version 2.0
 
 ## Support
-Just create [issues](https://github.com/xipki/xipki/issues) or new discussion (https://github.com/xipki/xipki/discussions).
+Just [create issue](https://github.com/xipki/xipki/issues) or [new discussion](https://github.com/xipki/xipki/discussions).
 
 For bug-report please upload the testdata and log files, describe the version of XiPKI, OS and
 JRE/JDK, and the steps to reproduce the bug.
