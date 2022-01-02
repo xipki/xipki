@@ -190,7 +190,20 @@ public class EjbcaCertStatusStore extends OcspStore {
 
           initialized = false;
           this.issuerStore = new EjbcaIssuerStore(newIssuers.values());
-          LOG.info("Updated issuers: {}", name);
+
+          if (LOG.isInfoEnabled()) {
+            StringBuilder sb = new StringBuilder();
+            for (Map.Entry<String, EjbcaIssuerEntry> m : newIssuers.entrySet()) {
+              sb.append(overviewString(m.getValue().getCert()));
+              sb.append("\n");
+            }
+            if (sb.length() > 1) {
+              sb.deleteCharAt(sb.length() - 1);
+            }
+            LOG.info("Updated store {} with issuers {}", name, sb);
+          }
+
+          LOG.info("Updated issuers of store {}", name);
           initializationFailed = false;
           initialized = true;
         } finally {

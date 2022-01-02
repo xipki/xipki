@@ -201,7 +201,17 @@ public class CaDbCertStatusStore extends OcspStore {
           } // end while (rs.next())
 
           this.issuerStore.setIssuers(caInfos);
-          LOG.info("Updated issuers: {}", name);
+          if (LOG.isInfoEnabled()) {
+            StringBuilder sb = new StringBuilder();
+            for (IssuerEntry m : caInfos) {
+              sb.append(overviewString(m.getCert()));
+              sb.append("\n");
+            }
+            if (sb.length() > 1) {
+              sb.deleteCharAt(sb.length() - 1);
+            }
+            LOG.info("Updated store {} with issuers {}", name, sb);
+          }
         } finally {
           releaseDbResources(ps, rs);
         }
