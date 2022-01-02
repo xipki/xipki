@@ -30,7 +30,15 @@
 		"active":true,
 		"password":"password1"
 	}],
-	"publishers":[],
+	"publishers":[
+//	      {
+//	        "name":"ocsp-publisher",
+//	        "type":"ocsp",
+//	        "conf":{
+//	            "value":"datasource=ocsp,publish.goodcerts=true"
+//	        }
+//        }
+	],
 	"profiles":[{
 		"name":"scep",
 		"type":"xijson",
@@ -125,7 +133,9 @@
 			"tls",
 			"tls-c"
 		],
-		"publishers":[],
+		"publishers":[
+//	        "ocsp-publisher"
+		],
 		"requestors":[{
 			"ra":true,
 			"requestorName":"requestor1",
