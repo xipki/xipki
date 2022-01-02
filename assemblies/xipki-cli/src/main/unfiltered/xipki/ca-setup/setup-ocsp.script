@@ -9,5 +9,4 @@ xi:cmp-enroll-cagenkey \
 
 echo "Please"
 echo "  1. Copy ${KEYCERTS_DIR}/ocsp1.p12 to replace the <tomcat.dir>/xipki/keycerts/ocsp1.p12"
-echo "  1. Copy ${KEYCERTS_DIR}/ocsp1.p12 to replace the <tomcat.dir>/xipki/keycerts/ocsp1.p12"
-echo "  3. Restart tomcat."
+echo "  2. Restart tomcat."
