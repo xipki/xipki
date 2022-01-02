@@ -44,7 +44,7 @@
 	"signers":[{
 		"name":"signer1",
 		"type":"pkcs12",
-		"algorithms":["SHA256withECDSA"],
+		"algorithms":["SHA256withECDSA","SHA256withRSA","ED25519","ED449","SM3withSM2","SHA256withDSA"],
 		"caCerts":[],
 		"key":"password=1234,keystore=file:keycerts/ocsp1.p12"
 	}],

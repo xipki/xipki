@@ -1,3 +1,21 @@
+printUsage = "false"
+ocsp = "false"
+
+if { "$1" equals "" } then {
+  printUsage = "false"
+} elif { "$1" equals "help" } then {
+  printUsage = "true"
+} elif { "$1" equals "ocsp" } then {
+  ocsp = "true"
+}
+
+if { $printUsage equals "true" } then {
+  echo "Usage: "
+  echo ""
+  echo "source file:./xipki/client-script/rest-client.script [help|ocsp]"
+  echo "    help:      Print this usage"
+  echo "    ocsp:      Also test the OCSP status"
+} else {
 HASH = SHA256
 BASE_URL = https://localhost:8443/ca/rest/myca
 
@@ -7,7 +25,7 @@ echo "#################################################################"
 
 CUR_TIME = $(date '+%Y%m%d-%H%M%S')
 
-OUT_DIR=output/rest-${CUR_TIME}
+OUT_DIR = output/rest-${CUR_TIME}
 
 CACERT = ${OUT_DIR}/cacert.der
 
@@ -62,32 +80,41 @@ xi:curl --out ${OUT_DIR}/${CN}.der --data-file ${OUT_DIR}/${CN}.csr \
 
 SERIAL = $(xi:cert-info --serial --hex --in ${OUT_DIR}/${CN}.der)
 
-#echo "Current OCSP status"
-#xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
+if { "$ocsp" equals "true" } then {
+  echo "Current OCSP status"
+  xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
+}
 
 echo "=====REST: Suspend====="
 
 xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=certificateHold"
 
-#echo "Current OCSP status"
-#xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
+if { "$ocsp" equals "true" } then {
+  echo "Current OCSP status"
+  xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
+}
 
 echo "=====REST: Unsuspend====="
 
 xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=removeFromCRL"
 
-#echo "Current OCSP status"
-#xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
+if { "$ocsp" equals "true" } then {
+  echo "Current OCSP status"
+  xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
+}
 
 echo "=====REST: Revoke====="
 
 xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=keyCompromise"
 
-#echo "Current OCSP Status"
-#xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
+if { "$ocsp" equals "true" } then {
+  echo "Current OCSP Status"
+  xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
+}
 
 echo "=====CMP: Generate CRL====="
 
 xi:curl --out ${OUT_DIR}/rest-myca-gen.crl $BASE_URL/new-crl
 
 xi:curl --out ${OUT_DIR}/rest-myca-get.crl $BASE_URL/crl
+}

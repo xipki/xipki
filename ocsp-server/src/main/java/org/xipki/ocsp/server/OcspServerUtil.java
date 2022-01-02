@@ -94,15 +94,33 @@ public class OcspServerUtil {
 
     List<String> sigAlgos = signerType.getAlgorithms();
     List<ConcurrentContentSigner> singleSigners = new ArrayList<>(sigAlgos.size());
-    for (String signAlgo : sigAlgos) {
+
+    String name = signerType.getName();
+    List<String> succSigAlgos = new LinkedList<String>();
+    List<String> failSigAlgos = new LinkedList<String>();
+    for (String sigAlgo : sigAlgos) {
       try {
         ConcurrentContentSigner requestorSigner = securityFactory.createSigner(
-            responderSignerType, new SignerConf("algo=" + signAlgo + "," + responderKeyConf),
+            responderSignerType, new SignerConf("algo=" + sigAlgo + "," + responderKeyConf),
             explicitCertificateChain);
         singleSigners.add(requestorSigner);
-      } catch (ObjectCreationException ex) {
-        throw new InvalidConfException(ex.getMessage(), ex);
+        succSigAlgos.add(sigAlgo);
+      } catch (Exception ex) {
+        failSigAlgos.add(sigAlgo);
+        LOG.debug("could not create OCSP responder " + name, ex);
+        //throw new InvalidConfException(ex.getMessage(), ex);
       }
+    }
+
+    if (singleSigners.isEmpty()) {
+      throw new InvalidConfException("could not create any signer for OCSP responder " + name);
+    } else {
+      LOG.info("Create signers of sign algorithms {} for the OCSP responder {}",
+          succSigAlgos, name);
+    }
+
+    if (!failSigAlgos.isEmpty()) {
+      LOG.info("ignore sign algorithms {} for the OCSP responder {}", failSigAlgos, name);
     }
 
     try {

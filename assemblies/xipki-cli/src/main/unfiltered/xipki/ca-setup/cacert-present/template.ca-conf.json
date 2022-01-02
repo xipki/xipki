@@ -70,10 +70,10 @@
 		"caInfo":{
 			"caUris":{
 				"crlUris":[
-					"http://ca.myorg.org/crl"
+					"http://ca.myorg.org/crl/myca1"
 				],
 				"ocspUris":[
-					"http://localhost:8080/ocsp"
+					"http://localhost:8080/ocsp/"
 				]
 			},
 			"cmpControl":{

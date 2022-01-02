@@ -1,3 +1,21 @@
+printUsage = "false"
+ocsp = "false"
+
+if { "$1" equals "" } then {
+  printUsage = "false"
+} elif { "$1" equals "help" } then {
+  printUsage = "true"
+} elif { "$1" equals "ocsp" } then {
+  ocsp = "true"
+}
+
+if { $printUsage equals "true" } then {
+  echo "Usage: "
+  echo ""
+  echo "source file:./xipki/client-script/cmp-client.script [help|ocsp]"
+  echo "    help:      Print this usage"
+  echo "    ocsp:      Also test the OCSP status"
+} else {
 echo "#################################################################"
 echo "# Reset CMP client (only required if CA changed the             #"
 echo "# configuration since last reset / initialization)              #"
@@ -13,7 +31,7 @@ echo "#################################################################"
 
 CUR_TIME = $(date '+%Y%m%d-%H%M%S')
 
-OUT_DIR=output/cmp-${CUR_TIME}
+OUT_DIR = output/cmp-${CUR_TIME}
 
 CACERT = ${OUT_DIR}/cacert.der
 
@@ -107,29 +125,37 @@ xi:cmp-csr-enroll --csr ${OUT_DIR}/${CN}.csr --out ${OUT_DIR}/${CN}.der --profil
 xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --cert ${OUT_DIR}/${CN}.der
 
-#echo "Current OCSP Status"
-#xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der
+if { "$ocsp" equals "true" } then {
+  echo "Current OCSP Status"
+  xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der
+}
 
 echo "=====CMP: Suspend certificate====="
 
 xi:cmp-revoke --ca myca --cert ${OUT_DIR}/${CN}.der --reason certificateHold
 
-#echo "Current OCSP Status"
-#xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der
+if { "$ocsp" equals "true" } then {
+  echo "Current OCSP Status"
+  xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der
+}
 
 echo "=====CMP: Unsuspend certificate====="
 
 xi:cmp-unrevoke --ca myca --cert ${OUT_DIR}/${CN}.der
 
-#echo "Current OCSP Status"
-#xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der
+if { "$ocsp" equals "true" } then {
+  echo "Current OCSP Status"
+  xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der
+}
 
 echo "=====CMP: Revocate certificate====="
 
 xi:cmp-revoke --ca myca --cert ${OUT_DIR}/${CN}.der --reason affiliationChanged
 
-#echo "Current OCSP Status"
-#xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der
+if { "$ocsp" equals "true" } then {
+  echo "Current OCSP Status"
+  xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der
+}
 
 echo "=====CMP: Generate CRL====="
 
@@ -137,3 +163,4 @@ xi:cmp-gen-crl --ca myca --out ${OUT_DIR}/cmp-myca-gen.crl
 
 echo "=====CMP: Get CRL===="
 xi:cmp-get-crl --ca myca --out ${OUT_DIR}/cmp-myca-get.crl
+}
