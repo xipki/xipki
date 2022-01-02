@@ -61,10 +61,6 @@ public class P12ContentSignerBuilder {
     private RSAContentSignerBuilder(SignAlgo signAlgo)
         throws NoSuchAlgorithmException {
       super(signAlgo.getAlgorithmIdentifier(), signAlgo.getHashAlgo().getAlgorithmIdentifier());
-      if (!(signAlgo.isRSAPSSSigAlgo() || signAlgo.isRSAPkcs1SigAlgo())) {
-        throw new NoSuchAlgorithmException("the given algorithm is not a valid RSA signature "
-            + "algorithm '" + signAlgo + "'");
-      }
       this.signAlgo = signAlgo;
     }
 
@@ -93,10 +89,6 @@ public class P12ContentSignerBuilder {
     private DSAContentSignerBuilder(SignAlgo signAlgo)
         throws NoSuchAlgorithmException {
       super(signAlgo.getAlgorithmIdentifier(), signAlgo.getHashAlgo().getAlgorithmIdentifier());
-      if (!signAlgo.isDSASigAlgo()) {
-        throw new NoSuchAlgorithmException("the given algorithm is not a valid DSA signature "
-            + "algirthm " + signAlgo);
-      }
       this.signAlgo = signAlgo;
     }
 
@@ -117,10 +109,6 @@ public class P12ContentSignerBuilder {
     private ECDSAContentSignerBuilder(SignAlgo signAlgo)
         throws NoSuchAlgorithmException {
       super(signAlgo.getAlgorithmIdentifier(), signAlgo.getHashAlgo().getAlgorithmIdentifier());
-      if (!signAlgo.isECDSASigAlgo()) {
-        throw new NoSuchAlgorithmException("the given algorithm is not a valid ECDSA signature "
-            + "algirthm " + signAlgo);
-      }
       this.signAlgo = signAlgo;
     }
 
@@ -146,10 +134,6 @@ public class P12ContentSignerBuilder {
     private SM2ContentSignerBuilder(SignAlgo signAlgo)
         throws NoSuchAlgorithmException {
       super(signAlgo.getAlgorithmIdentifier(), signAlgo.getHashAlgo().getAlgorithmIdentifier());
-      if (!signAlgo.isSM2SigAlgo()) {
-        throw new NoSuchAlgorithmException("the given algorithm is not a valid SM2 signature "
-            + "algirthm " + signAlgo);
-      }
       this.signAlgo = signAlgo;
     }
 
@@ -306,26 +290,42 @@ public class P12ContentSignerBuilder {
     AsymmetricKeyParameter keyparam;
     try {
       if (key instanceof RSAPrivateKey) {
+        if (!(signAlgo.isRSAPSSSigAlgo() || signAlgo.isRSAPkcs1SigAlgo())) {
+          throw new NoSuchAlgorithmException("the given algorithm is not a valid RSA signature "
+              + "algorithm '" + signAlgo + "'");
+        }
         keyparam = SignerUtil.generateRSAPrivateKeyParameter((RSAPrivateKey) key);
         signerBuilder = new RSAContentSignerBuilder(signAlgo);
       } else if (key instanceof DSAPrivateKey) {
+        if (!signAlgo.isDSASigAlgo()) {
+          throw new NoSuchAlgorithmException("the given algorithm is not a valid DSA signature "
+              + "algirthm " + signAlgo);
+        }
         keyparam = DSAUtil.generatePrivateKeyParameter(key);
         signerBuilder = new DSAContentSignerBuilder(signAlgo);
       } else if (key instanceof ECPrivateKey) {
         keyparam = ECUtil.generatePrivateKeyParameter(key);
         EllipticCurve curve = ((ECPrivateKey) key).getParams().getCurve();
         if (GMUtil.isSm2primev2Curve(curve)) {
+          if (!signAlgo.isSM2SigAlgo()) {
+            throw new NoSuchAlgorithmException("the given algorithm is not a valid SM2 signature "
+                + "algirthm " + signAlgo);
+          }
           signerBuilder = new SM2ContentSignerBuilder(signAlgo);
         } else {
+          if (!signAlgo.isECDSASigAlgo()) {
+            throw new NoSuchAlgorithmException("the given algorithm is not a valid ECDSA signature "
+                + "algirthm " + signAlgo);
+          }
           signerBuilder = new ECDSAContentSignerBuilder(signAlgo);
         }
       } else {
         throw new XiSecurityException("unsupported key " + key.getClass().getName());
       }
     } catch (InvalidKeyException ex) {
-      throw new XiSecurityException("invalid key", ex);
+      throw new XiSecurityException("invalid key: " + ex.getMessage(), ex);
     } catch (NoSuchAlgorithmException ex) {
-      throw new XiSecurityException("no such algorithm", ex);
+      throw new XiSecurityException("no such algorithm: " + ex.getMessage(), ex);
     }
 
     if (random != null) {
