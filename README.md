@@ -211,6 +211,9 @@ preload <start script>
         `source xipki/ca-setup/cacert-present/setup-*.script`
          where * is place holder.
 
+      * If you wish to generate the siging key and certificate for the OCSP responder, in CLI:  
+         `source xipki/ca-setup/setup-ocsp.script`.
+
       * If you wish to add the SCEP support, in CLI:  
          `source xipki/ca-setup/setup-scep.script`.
 
@@ -219,8 +222,9 @@ preload <start script>
 
 ## Enroll/Revoke Certificate and Get CRL via Shell (optional)
 
-- The following shell script demonstrates how to enroll and revoke certificates, and how to get the current CRL:
-  `<CLI_ROOT>/xipki/client-script/rest.sh`
+- The following shell script demonstrates how to enroll and revoke certificates, and how to get
+  the current CRL:    
+  `<CLI_ROOT>/xipki/client-script/rest.sh` (use argument 'help' to print the usage)
 
   Note that this script tells CA to generate real certificates. DO NOT use it in the production environment.
 
@@ -238,7 +242,7 @@ preload <start script>
 
   The binary `xipki-cli-<version>`.tar.gz contains an example script in the folder xipki/client-script.
   It can be executed in the CLI as follows:  
-  - `source xipki/client-script/cmp-client.script`
+  - `source xipki/client-script/cmp-client.script` (use argument 'help' to print the usage)
 
 * REST API  
   The shell script `xipki/client-script/rest.sh` of the `xipki-cli` demonstrates
@@ -246,7 +250,7 @@ preload <start script>
 
   The binary `xipki-cli-<version>`.tar.gz contains an example script in the folder xipki/client-script.
   It can be executed in the CLI as follows:  
-  - `source xipki/client-script/rest-client.script`
+  - `source xipki/client-script/rest-client.script` (use argument 'help' to print the usage)
  
 CLI Commands
 -----
