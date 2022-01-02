@@ -1,0 +1,13 @@
+KEYCERTS_DIR = xipki/ca-setup/keycerts
+
+echo "# Generate key and certificate for OCSP Responder"
+
+xi:cmp-enroll-cagenkey \
+  --p12-out ${KEYCERTS_DIR}/ocsp1.p12 --password 1234 \
+  --cert-out ${KEYCERTS_DIR}/ocsp1.der --profile ocsp \
+  --subject "CN=OCSP Responder 1,O=myorg,C=DE"
+
+echo "Please"
+echo "  1. Copy ${KEYCERTS_DIR}/ocsp1.p12 to replace the <tomcat.dir>/xipki/keycerts/ocsp1.p12"
+echo "  1. Copy ${KEYCERTS_DIR}/ocsp1.p12 to replace the <tomcat.dir>/xipki/keycerts/ocsp1.p12"
+echo "  3. Restart tomcat."
