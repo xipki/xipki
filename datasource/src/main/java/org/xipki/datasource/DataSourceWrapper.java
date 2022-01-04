@@ -1181,9 +1181,8 @@ public abstract class DataSourceWrapper implements Closeable {
       }
     } // end if
 
-    HikariConfig conf = new HikariConfig(props);
-
     String sqlType = (String) props.remove("sql.type");
+    HikariConfig conf = new HikariConfig(props);
 
     if (databaseType == DatabaseType.UNKNOWN) {
       // map UNKNOWN to a pre-defined database type
