@@ -41,6 +41,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import static org.xipki.util.Args.notBlank;
@@ -226,6 +227,12 @@ public class LiquibaseMain implements Closeable {
 
   }
 
+  private static class MyFileSystemResourceAccessor extends FileSystemResourceAccessor {
+    public void addWorkingDir() {
+      super.addRootPath(new File(".").getAbsoluteFile().toPath());
+    }
+  }
+
   private static final Logger LOG = LoggerFactory.getLogger(LiquibaseMain.class);
 
   private final DatabaseConf dbConf;
@@ -243,23 +250,7 @@ public class LiquibaseMain implements Closeable {
 
   public void init()
       throws Exception {
-
-    ResourceAccessor fsOpener = new FileSystemResourceAccessor() {
-      @Override
-      protected void addRootPath(URL path) {
-        try {
-          new File(path.toURI());
-        } catch (URISyntaxException e) {
-          //add like normal
-        } catch (IllegalArgumentException e) {
-          // this line is added to avoid the IllegalArgumentException: URI is not
-          // hierarchical in java 10+.
-          return;
-        }
-
-        super.addRootPath(path);
-      }
-    };
+    org.tinylog.jul.JulTinylogBridge.activate();
 
     ClassLoader classLoader = getClass().getClassLoader();
     ResourceAccessor clOpener = new CommandLineResourceAccessor(classLoader);
@@ -280,6 +271,9 @@ public class LiquibaseMain implements Closeable {
       null); // databaseChangeLogLockTableName
 
     try {
+      MyFileSystemResourceAccessor fsOpener = new MyFileSystemResourceAccessor();
+      fsOpener.addWorkingDir();
+
       CompositeResourceAccessor fileOpener = new CompositeResourceAccessor(fsOpener, clOpener);
 
       DiffOutputControl diffOutputControl = new DiffOutputControl(false, // includeCatalog

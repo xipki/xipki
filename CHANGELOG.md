@@ -13,7 +13,7 @@ See also <https://github.com/xipki/xipki/releases>
 - DB Tool
   - N/A
 - Dependencies
-  - N/A
+  - Update liquibase 3.10.3 to 4.6.2
 
 ## 5.3.14
 - Release date: December 24, 2021
