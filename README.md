@@ -30,7 +30,7 @@ JRE/JDK, and the steps to reproduce the bug.
 * [nCipher Connect](https://www.ncipher.com/products/general-purpose-hsms/nshield-connect)
 * [nCipher Solo](https://www.ncipher.com/products/general-purpose-hsms/nshield-solo)
 * [Utimaco Se](https://hsm.utimaco.com/products-hardware-security-modules/general-purpose-hsm/)
-* [Sansec HSM](https://en.sansec.com.cn/product/HSM-52.html) / [三未信安服务器密码机](http://www.sansec.com.cn/product/4.html): tested SM2
+* [Sansec HSM](https://en.sansec.com.cn/product/HSM-52.html) / [三未信安服务器密码机](http://www.sansec.com.cn/product/4.html): tested SM2, ECDSA and RSA.
 
 ## Performance
 
@@ -344,8 +344,6 @@ Features
  - API to manage CA. This allows one to implement proprietary CLI, e.g. Website, to manage CA.
  - Database tool (export and import CA database) simplifies the switch of
    databases, upgrade of XiPKi and switch from other CA system to XiPKI CA
- - Client to enroll, revoke, unrevoke and remove certificates, to generate and
-   download CRLs
  - All configuration of CA except those of databases is saved in database
 
 - OCSP Responder
@@ -363,28 +361,30 @@ Features
   - Supported databases: DB2, MariaDB, MySQL, Oracle, PostgreSQL, H2, HSQLDB
   - Database tool (export and import OCSP database) simplifies the switch of
     databases, upgrade of XiPKi and switch from other OCSP system to XiPKI OCSP.
-  - Client to send OCSP request
+  - High performance
+  - Support of health check
 
 - SCEP
   - Supported SCEP versions
     - draft-gutmann-scep-00
     - draft-nourse-scep-23
 
-- Toolkit (for both PKCS#12 and PKCS#11 tokens)
+- CLI
+  - Configurating CA
+  - Client to enroll, revoke, unrevoke and remove certificates, to generate and download CRLs
+  - Client to send OCSP request
   - Generating keypairs of RSA, EC and DSA in token
   - Deleting keypairs and certificates from token
   - Updating certificates in token
   - Generating CSR (PKCS#10 request)
   - Exporting certificate from token
-
-- For both CA and OCSP Responder
-  - Support of PKCS#12 and JCEKS keystore
-  - Support of PKCS#11 devices, e.g. HSM
-  - API to use customized key types, e.g. smartcard
   - High performance
   - Support of health check
 
-- For CA, OCSP Responder and Toolkit
+- For CA, OCSP Responder, and CLI
+  - Support of PKCS#12 and JCEKS keystore
+  - Support of PKCS#11 devices, e.g. HSM
+  - API to use customized key types, e.g. smartcard
   - API to resolve password
   - Support of PBE (password based encryption) password resolver
      - All passwords can be encrypted by the master password
