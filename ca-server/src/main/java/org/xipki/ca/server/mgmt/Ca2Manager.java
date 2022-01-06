@@ -51,7 +51,6 @@ import org.xipki.util.http.SslContextConf;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.util.*;
 import java.util.Map.Entry;

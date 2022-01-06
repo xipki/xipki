@@ -17,10 +17,9 @@
 
 package org.xipki.password;
 
-import javax.swing.*;
-
 import org.xipki.util.RandomUtil;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.HashSet;

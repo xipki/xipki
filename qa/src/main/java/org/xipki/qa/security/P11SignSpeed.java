@@ -34,7 +34,6 @@ import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.*;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
 
 import static org.xipki.util.Args.notBlank;
 import static org.xipki.util.Args.notNull;

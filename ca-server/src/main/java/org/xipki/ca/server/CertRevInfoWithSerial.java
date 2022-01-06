@@ -20,10 +20,10 @@ package org.xipki.ca.server;
 import org.xipki.security.CrlReason;
 import org.xipki.util.Args;
 
-import static org.xipki.util.Args.notNull;
-
 import java.math.BigInteger;
 import java.util.Date;
+
+import static org.xipki.util.Args.notNull;
 
 /**
  * Certificate revocation information with serial number and database table id.

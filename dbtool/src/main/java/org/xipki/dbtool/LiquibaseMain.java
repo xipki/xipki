@@ -39,9 +39,6 @@ import org.xipki.util.StringUtil;
 
 import java.io.Closeable;
 import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Path;
 import java.util.Properties;
 
 import static org.xipki.util.Args.notBlank;

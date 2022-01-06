@@ -26,7 +26,6 @@ import org.xipki.util.ObjectCreationException;
 import org.xipki.util.RandomUtil;
 
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 
 import static org.xipki.util.Args.notBlank;
 
