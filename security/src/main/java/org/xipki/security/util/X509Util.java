@@ -789,7 +789,7 @@ public class X509Util {
         String otherValue = value.substring(idxSep + 1);
         ASN1EncodableVector vector = new ASN1EncodableVector();
         vector.add(type);
-        
+
         ASN1Encodable asn1Value;
         if (StringUtil.startsWithIgnoreCase(otherValue, "printablestring:")) {
           asn1Value = new DERPrintableString(otherValue.substring("printablestring:".length()));
@@ -798,7 +798,7 @@ public class X509Util {
         } else {
           asn1Value = new DERUTF8String(otherValue);
         }
-        
+
         vector.add(new DERTaggedObject(true, 0, asn1Value));
         DERSequence seq = new DERSequence(vector);
         return new GeneralName(tag, seq);

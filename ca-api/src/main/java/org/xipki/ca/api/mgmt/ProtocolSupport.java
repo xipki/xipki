@@ -32,7 +32,7 @@ import java.util.StringTokenizer;
  */
 
 public class ProtocolSupport {
-  
+
   private static final Logger LOG = LoggerFactory.getLogger(ProtocolSupport.class);
 
   private static final String CMP = "cmp";

@@ -60,7 +60,7 @@ public class TlsExtensionType implements Comparable<TlsExtensionType> {
   public int hashCode() {
     return code;
   }
-  
+
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof TlsExtensionType) {

@@ -33,7 +33,7 @@ public class RandomUtil {
   public static String nextHexLong() {
     return Long.toHexString(random.nextLong());
   }
-  
+
   public static long nextLong() {
     return random.nextLong();
   }

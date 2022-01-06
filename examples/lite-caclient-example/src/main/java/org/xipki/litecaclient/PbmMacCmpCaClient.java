@@ -73,7 +73,7 @@ public class PbmMacCmpCaClient extends CmpCaClient {
   protected byte[] kid;
 
   protected char[] password;
-  
+
   private static final SecureRandom random = new SecureRandom();
 
   private Set<ASN1ObjectIdentifier> trustedOwfOids = new HashSet<>();

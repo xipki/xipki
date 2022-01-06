@@ -227,7 +227,7 @@ public class InitDbMain {
         } catch (SQLException ex) {
         }
       }
-      
+
       if (conn != null) {
         try {
           conn.close();

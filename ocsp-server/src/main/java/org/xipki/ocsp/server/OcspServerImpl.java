@@ -76,7 +76,7 @@ public class OcspServerImpl implements OcspServer {
     public SizeComparableString(String str) {
       this.str = notNull(str, "str");
     }
-    
+
     @Override
     public boolean equals(Object obj) {
       if (!(obj instanceof SizeComparableString)) {

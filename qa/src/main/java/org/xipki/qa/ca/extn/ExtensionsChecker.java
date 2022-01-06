@@ -461,7 +461,7 @@ public class ExtensionsChecker {
     // profile required extension types
     Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls =
         certprofile.getExtensionControls();
-    
+
     for (Entry<ASN1ObjectIdentifier, ExtensionControl> entry : extensionControls.entrySet()) {
       ASN1ObjectIdentifier oid = entry.getKey();
       if (entry.getValue().isRequired()) {

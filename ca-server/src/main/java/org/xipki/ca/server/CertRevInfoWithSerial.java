@@ -37,7 +37,7 @@ public class CertRevInfoWithSerial implements Comparable<CertRevInfoWithSerial> 
   private final long id;
 
   private final BigInteger serial;
-  
+
   private CrlReason reason;
 
   private Date revocationTime;
@@ -65,12 +65,11 @@ public class CertRevInfoWithSerial implements Comparable<CertRevInfoWithSerial> 
   public long getId() {
     return id;
   }
-  
 
   public CrlReason getReason() {
     return reason;
   }
-  
+
   /**
    * Gets the revocation time.
    * @return revocation time, never be null
@@ -100,7 +99,7 @@ public class CertRevInfoWithSerial implements Comparable<CertRevInfoWithSerial> 
     if (!(obj instanceof CertRevInfoWithSerial)) {
       return false;
     }
-    
+
     CertRevInfoWithSerial o = (CertRevInfoWithSerial) obj;
     return id == o.id && serial.equals(o.serial);
   }
