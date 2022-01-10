@@ -199,20 +199,24 @@ preload <start script>
 ```
 
 2. Setup CA in CLI
+    * _(If error like "Identity or Certificate with label=mylabel already exists" occurs,
+      you need to comment the line which generate the key (e.g. dsa-p11 ec-p11, rsa-p11, sm2-p12)
+      or delete the existing key using command `delete-key-p11`)_.
+
    * Start CLI.
       `bin/karaf`
  
-   * Setup CA
+   * Setup CA (choose p11 if the key is saved in PKCS#11 device, p12 in PKCS#12 device.
       * In case of using new keys and certificates, in CLI:  
-        `source xipki/ca-setup/cacert-none/setup-*.script`
+        `source xipki/ca-setup/cacert-none/setup-*-*.script`
          where * is place holder.
 
       * In case of using existing keys and certificates, in CLI:  
-        `source xipki/ca-setup/cacert-present/setup-*.script`
+        `source xipki/ca-setup/cacert-present/setup-*-*.script`
          where * is place holder.
 
       * If you wish to generate the siging key and certificate for the OCSP responder, in CLI:  
-         `source xipki/ca-setup/setup-ocsp.script`.
+         `source xipki/ca-setup/setup-ocsp-*.script`.
 
       * If you wish to add the SCEP support, in CLI:  
          `source xipki/ca-setup/setup-scep.script`.

@@ -1,6 +1,6 @@
-KEYCERTS_DIR = xipki/ca-setup/keycerts
+KEYCERTS_DIR = xipki/ocsp-setup/keycerts
 
-echo "# Generate key and certificate for OCSP Responder"
+echo "# Generate PKCS#12 key and certificate for OCSP Responder"
 
 xi:cmp-enroll-cagenkey \
   --p12-out ${KEYCERTS_DIR}/ocsp1.p12 --password 1234 \
