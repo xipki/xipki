@@ -10,13 +10,15 @@ CURVE = secp256r1
 # Please adapt me
 P11_LABEL = myca1-ec
 
+SLOT = 0
+
 KEYCERTS_DIR = xipki/ca-setup/keycerts
 
 echo "#################################################################"
 echo "#                     Generate Key and CSR                      #"
 echo "#################################################################"
 
-xi:ec-p11  --slot 0 --label ${P11_LABEL} --curve ${CURVE}
+xi:ec-p11  --slot ${SLOT} --label ${P11_LABEL} --curve ${CURVE}
 
 ca:refresh-token --type pkcs11
 
@@ -45,4 +47,4 @@ ca:profile-rm --force rootca
 xi:move-file ${KEYCERTS_DIR}/ca-myca1.crt ${KEYCERTS_DIR}/myca1.der
 
 echo "# Update the certificate in the device"
-xi:update-cert-p11 --slot 0 --label ${P11_LABEL} --cert ${KEYCERTS_DIR}/myca1.der
+xi:update-cert-p11 --slot ${SLOT} --label ${P11_LABEL} --cert ${KEYCERTS_DIR}/myca1.der

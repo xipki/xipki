@@ -4,13 +4,15 @@ CA_SUBJECT="CN=myca1,O=myorg,C=DE"
 # Please adapt me
 P11_LABEL = myca1-sm2
 
+SLOT = 0
+
 KEYCERTS_DIR = xipki/ca-setup/keycerts
 
 echo "#################################################################"
 echo "#                     Generate Key and CSR                      #"
 echo "#################################################################"
 
-xi:sm2-p11 --slot 0 --label ${P11_LABEL}
+xi:sm2-p11 --slot ${SLOT} --label ${P11_LABEL}
 
 ca:refresh-token --type pkcs11
 
@@ -39,4 +41,4 @@ ca:profile-rm --force rootca
 xi:move-file ${KEYCERTS_DIR}/ca-myca1.crt ${KEYCERTS_DIR}/myca1.der
 
 echo "# Update the certificate in the device"
-xi:update-cert-p11 --slot 0 --label ${P11_LABEL} --cert ${KEYCERTS_DIR}/myca1.der
+xi:update-cert-p11 --slot ${SLOT} --label ${P11_LABEL} --cert ${KEYCERTS_DIR}/myca1.der

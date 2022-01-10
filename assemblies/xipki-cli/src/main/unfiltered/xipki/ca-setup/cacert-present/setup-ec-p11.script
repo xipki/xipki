@@ -4,6 +4,7 @@ echo "To reduce the risk, please set user to CKU_USERs"
 HASH = SHA256
 
 P11_LABEL = myca1-ec
+SLOT = 0
 
 echo "#################################################################"
 echo "#                       Load ca-conf.json                       #"
@@ -16,7 +17,7 @@ xi:replace --old "REPLACEME-TOKEN_TYPE" --new "PKCS11" \
   xipki/ca-setup/cacert-present/ca-conf.json
 
 xi:replace --old "REPLACEME-CA_SIGNERCONF" \
-  --new "algo=${HASH}withECDSA,slot=0,key-label=${P11_LABEL}" \
+  --new "algo=${HASH}withECDSA,slot=${SLOT},key-label=${P11_LABEL}" \
   xipki/ca-setup/cacert-present/ca-conf.json
 
 ca:load-conf --conf-file xipki/ca-setup/cacert-present/ca-conf.json

@@ -7,13 +7,15 @@ HASH = SHA256
 # Please adapt me
 P11_LABEL = myca1-dsa
 
+SLOT = 0
+
 KEYCERTS_DIR = xipki/ca-setup/keycerts
 
 echo "#################################################################"
 echo "#                     Generate Key and CSR                      #"
 echo "#################################################################"
 
-xi:dsa-p11  --slot 0 --label ${P11_LABEL} --plen 2048
+xi:dsa-p11  --slot ${SLOT} --label ${P11_LABEL} --plen 2048
 
 ca:refresh-token --type pkcs11
 
@@ -42,4 +44,4 @@ ca:profile-rm --force rootca
 xi:move-file ${KEYCERTS_DIR}/ca-myca1.crt ${KEYCERTS_DIR}/myca1.der
 
 echo "# Update the certificate in the device"
-xi:update-cert-p11 --slot 0 --label ${P11_LABEL} --cert ${KEYCERTS_DIR}/myca1.der
+xi:update-cert-p11 --slot ${SLOT} --label ${P11_LABEL} --cert ${KEYCERTS_DIR}/myca1.der
