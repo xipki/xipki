@@ -9,7 +9,7 @@
       <cm:property name="sslKeystore" value="" />
       <cm:property name="sslKeystorePassword" value="" />
       <cm:property name="sslTruststore" value="" />
-      <cm:property name="sslKeystorePassword" value="" />
+      <cm:property name="sslTruststorePassword" value="" />
       <cm:property name="sslHostnameVerifier" value="default" />
     </cm:default-properties>
   </cm:property-placeholder>
