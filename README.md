@@ -153,7 +153,7 @@ Note that CA and OCSP can be installed in the same servlet container.
 ## Configure PKCS#11 device (optional)
 
    This step is only required if the real PKCS#11 device instead of the emulator
-   is used.
+   is used. **Note that this step should be applied to both tomcat and xipki-cli**.
 
   * Copy `xipki/security/example/pkcs11-hsm.json` to `xipki/security/pkcs11.json`, and adapt the PKCS#11 configuration.
 
@@ -204,7 +204,14 @@ preload <start script>
       or delete the existing key using command `delete-key-p11`)_.
 
    * Start CLI.
-      `bin/karaf`
+
+     `bin/karaf`
+
+     HSM devices of Thales, e.g. nCipher, can use Thales preload to manage the
+     PKCS#11 sessions. In this case, the cli should be started as follows
+     ```sh
+     preload bin/karaf
+     ```
  
    * Setup CA (choose p11 if the key is saved in PKCS#11 device, p12 in PKCS#12 device.
       * In case of using new keys and certificates, in CLI:  
