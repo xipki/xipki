@@ -175,7 +175,7 @@ Security Commands
 
      encrypt password with master password
 
-   * `pkcs12`
+   * `xi:pkcs12`
 
      export PKCS#12 key store, like the 'openssl pkcs12' command
 
