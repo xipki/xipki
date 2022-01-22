@@ -100,7 +100,7 @@ JRE/JDK, and the steps to reproduce the bug.
   Set the environment variable `JAVA_HOME` to point to root directory of the to
   the JRE/JDK installation.
 
-### CA Server and OCSP Responder
+### Binaries
 
 Download the binaries `xipki-ca-<version>.zip`, `xipki-ocsp-<version>.zip` and
 `xipki-cli-<version>.tar.gz` from
