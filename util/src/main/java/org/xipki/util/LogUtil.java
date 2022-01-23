@@ -20,6 +20,8 @@ package org.xipki.util;
 import org.slf4j.Logger;
 
 import java.math.BigInteger;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * LOG utility class.
@@ -30,7 +32,28 @@ import java.math.BigInteger;
 
 public class LogUtil {
 
+  private static boolean systemInfoLogged = false;
+
   private LogUtil() {
+  }
+
+  public static void logSystemInfo(Logger log) {
+    if (!systemInfoLogged) {
+      String[] prefixes = {"java.", "jdk.", "os.", "user."};
+      StringBuilder sb = new StringBuilder(1000);
+      Properties props = System.getProperties();
+      Set<String> propNames = props.stringPropertyNames();
+      for (String prefix : prefixes) {
+        for (String propName : propNames) {
+          if (propName.startsWith(prefix)) {
+            sb.append(propName).append(": ").append(props.getProperty(propName)).append("\n");
+          }
+        }
+      }
+      sb.deleteCharAt(sb.length() - 1);
+      log.info(sb.toString());
+      systemInfoLogged = true;
+    }
   }
 
   public static void error(Logger log, Throwable th) {

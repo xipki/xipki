@@ -61,6 +61,11 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
   private boolean strongRandom4SignEnabled;
 
+  static {
+    // Log the System Information
+    LogUtil.logSystemInfo(LOG);
+  }
+
   public SecurityFactoryImpl() {
   }
 
