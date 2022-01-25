@@ -90,6 +90,10 @@ class IaikP11Slot extends P11Slot {
 
   private final ConcurrentBag<ConcurrentBagEntry<Session>> sessions = new ConcurrentBag<>();
 
+  private String libDesc;
+
+  private boolean omitDateAttrsInCertObject;
+
   IaikP11Slot(
           String moduleName, P11SlotIdentifier slotId, Slot slot, boolean readOnly,
           long userType, List<char[]> password, int maxMessageSize,
@@ -107,6 +111,17 @@ class IaikP11Slot extends P11Slot {
     this.password = password;
 
     boolean successful = false;
+
+    try {
+      Info moduleInfo = slot.getModule().getInfo();
+      libDesc = moduleInfo.getLibraryDescription();
+      if (libDesc == null) {
+        libDesc = "";
+      }
+    } catch (TokenException ex) {
+      LogUtil.error(LOG, ex, "Module.getInfo()");
+      throw new P11TokenException("could not get Module Info: " + ex.getMessage(), ex);
+    }
 
     try {
       Session session;
@@ -178,9 +193,34 @@ class IaikP11Slot extends P11Slot {
     }
 
     P11SlotRefreshResult ret = new P11SlotRefreshResult();
+
     if (mechanisms != null) {
+      StringBuilder ignoreMechs = new StringBuilder();
+      boolean smartcard = libDesc.toLowerCase().contains("smartcard");
       for (Mechanism mech : mechanisms) {
-        ret.addMechanism(mech.getMechanismCode());
+        long code = mech.getMechanismCode();
+        if (smartcard) {
+          if (code == PKCS11Constants.CKM_ECDSA_SHA1 ||
+              code == PKCS11Constants.CKM_ECDSA_SHA224 ||
+              code == PKCS11Constants.CKM_ECDSA_SHA256 ||
+              code == PKCS11Constants.CKM_ECDSA_SHA384 ||
+              code == PKCS11Constants.CKM_ECDSA_SHA512 ||
+              code == PKCS11Constants.CKM_ECDSA_SHA3_224 ||
+              code == PKCS11Constants.CKM_ECDSA_SHA3_256 ||
+              code == PKCS11Constants.CKM_ECDSA_SHA3_384 ||
+              code == PKCS11Constants.CKM_ECDSA_SHA3_512) {
+            ignoreMechs.append(Functions.getMechanismDescription(code)).append(", ");
+          } else {
+            ret.addMechanism(code);
+          }
+        } else {
+          ret.addMechanism(code);
+        }
+      }
+
+      if (ignoreMechs.length() > 0) {
+        LOG.info("This is a smartcard-based HSM, ignore the mechanisms {}",
+            ignoreMechs.substring(0, ignoreMechs.length() - 2));
       }
     }
 
@@ -739,11 +779,27 @@ class IaikP11Slot extends P11Slot {
   protected P11ObjectIdentifier addCert0(X509Cert cert, P11NewObjectControl control)
       throws P11TokenException {
     ConcurrentBagEntry<Session> bagEntry = borrowSession();
+
     try {
       Session session = bagEntry.value();
-      X509PublicKeyCertificate newCertTemp = createPkcs11Template(session, cert, control);
-      X509PublicKeyCertificate newCert =
-          (X509PublicKeyCertificate) session.createObject(newCertTemp);
+      // get a local copy
+      boolean omit = omitDateAttrsInCertObject;
+      X509PublicKeyCertificate newCertTemp = createPkcs11Template(session, cert, control, omit);
+      X509PublicKeyCertificate newCert;
+      try {
+        newCert = (X509PublicKeyCertificate) session.createObject(newCertTemp);
+      } catch (PKCS11Exception ex) {
+         long errCode = ((PKCS11Exception) ex).getErrorCode();
+         if (!omit && PKCS11Constants.CKR_TEMPLATE_INCONSISTENT == errCode) {
+           // some HSMs like NFAST does not like the attributes CKA_START_DATE and CKA_END_DATE
+           // try without them.
+           newCertTemp = createPkcs11Template(session, cert, control, true);
+           newCert = (X509PublicKeyCertificate) session.createObject(newCertTemp);
+           omitDateAttrsInCertObject = true;
+         } else {
+           throw ex;
+         }
+      }
 
       return new P11ObjectIdentifier(value(newCert.getId()), valueStr(newCert.getLabel()));
     } catch (TokenException ex) {
@@ -1079,7 +1135,7 @@ class IaikP11Slot extends P11Slot {
   } // method generateKeyPair
 
   private X509PublicKeyCertificate createPkcs11Template(Session session, X509Cert cert,
-      P11NewObjectControl control)
+      P11NewObjectControl control, boolean omitDateAttrs)
           throws P11TokenException {
     X509PublicKeyCertificate newCertTemp = new X509PublicKeyCertificate();
     byte[] id = control.getId();
@@ -1118,12 +1174,14 @@ class IaikP11Slot extends P11Slot {
       newCertTemp.getSerialNumber().setByteArrayValue(cert.getSerialNumber().toByteArray());
     }
 
-    if (setCertAttributes.contains(PKCS11Constants.CKA_START_DATE)) {
-      newCertTemp.getStartDate().setDateValue(cert.getNotBefore());
-    }
+    if (!omitDateAttrs) {
+      if (setCertAttributes.contains(PKCS11Constants.CKA_START_DATE)) {
+        newCertTemp.getStartDate().setDateValue(cert.getNotBefore());
+      }
 
-    if (setCertAttributes.contains(PKCS11Constants.CKA_END_DATE)) {
-      newCertTemp.getStartDate().setDateValue(cert.getNotAfter());
+      if (setCertAttributes.contains(PKCS11Constants.CKA_END_DATE)) {
+        newCertTemp.getStartDate().setDateValue(cert.getNotAfter());
+      }
     }
 
     newCertTemp.getValue().setByteArrayValue(cert.getEncoded());
@@ -1146,16 +1204,7 @@ class IaikP11Slot extends P11Slot {
     }
 
     P11NewObjectControl control = new P11NewObjectControl(keyId.getId(), keyId.getLabel());
-    ConcurrentBagEntry<Session> bagEntry = borrowSession();
-    try {
-      Session session = bagEntry.value();
-      X509PublicKeyCertificate newCertTemp = createPkcs11Template(session, newCert, control);
-      session.createObject(newCertTemp);
-    } catch (TokenException ex) {
-      throw new P11TokenException("could not createObject: " + ex.getMessage(), ex);
-    } finally {
-      sessions.requite(bagEntry);
-    }
+    addCert0(newCert, control);
   } // method updateCertificate0
 
   @Override
