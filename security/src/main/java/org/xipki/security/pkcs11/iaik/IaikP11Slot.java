@@ -796,6 +796,8 @@ class IaikP11Slot extends P11Slot {
            newCertTemp = createPkcs11Template(session, cert, control, true);
            newCert = (X509PublicKeyCertificate) session.createObject(newCertTemp);
            omitDateAttrsInCertObject = true;
+           LOG.warn("The HSM does not accept certificate object with attributes "
+               + "CKA_START_DATE and CKA_END_DATE, ignore them");
          } else {
            throw ex;
          }
