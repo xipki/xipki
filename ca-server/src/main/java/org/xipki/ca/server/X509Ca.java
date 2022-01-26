@@ -145,6 +145,8 @@ public class X509Ca extends X509CaModule implements Closeable {
 
   private final X509RemoverModule removerModule;
 
+  private final boolean saveCert;
+
   public X509Ca(CaManagerImpl caManager, CaInfo caInfo, CertStore certstore,
       CtLogClient ctlogClient) throws OperationException {
     super(caInfo);
@@ -176,6 +178,26 @@ public class X509Ca extends X509CaModule implements Closeable {
     this.revokerModule = new X509RevokerModule(caManager, caInfo, certstore, publisherModule);
     this.removerModule = new X509RemoverModule(caManager, caInfo, certstore, publisherModule);
 
+    // saveCert: default to true
+    boolean b = true;
+    String caName = caInfo.getCaEntry().getIdent().getName();
+    if (caInfo.getExtraControl() != null) {
+      if ("false".equalsIgnoreCase(caInfo.getExtraControl().value("SAVE_CERT"))) {
+        // only explicit specified to 'false'
+        b = false;
+        LOG.warn("CA {}: Certificates will not be saved in the database and will not be "
+            + "published!", caName);
+      }
+    }
+
+    saveCert = b;
+    if (!saveCert) {
+      if (caInfo.isSaveRequest()) {
+        // Request cannot be saved if SAVE_CERT (in EXTRA_CONTROL) is set to false.
+        caInfo.setSaveRequest(false);
+        LOG.warn("CA {}: SAVE_REQ is configured to true, ignore it, use 'false' instead");
+      }
+    }
   } // constructor
 
   public NameId getCaIdent() {
@@ -613,7 +635,7 @@ public class X509Ca extends X509CaModule implements Closeable {
       ret.setTransactionId(transactionId);
       ret.setRequestedSubject(gct.requestedSubject);
 
-      if (publisherModule.publishCert(ret) == 1) {
+      if (saveCert && publisherModule.publishCert(ret) == 1) {
         throw new OperationException(SYSTEM_FAILURE, "could not save certificate");
       }
     } catch (BadCertTemplateException ex) {
