@@ -17,6 +17,8 @@
     <bundle>mvn:io.netty/netty-transport/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-buffer/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-handler/${netty.version}</bundle>
+    <bundle>mvn:io.netty/netty-tcnative-classes/${netty-tcnative.version}</bundle>
+    <bundle>mvn:io.netty/netty-transport-classes-epoll/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-transport-native-unix-common/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-transport-native-epoll/${netty.version}/jar/linux-x86_64</bundle>
     <bundle>mvn:org.xipki/certprofile-xijson/${project.version}</bundle>
