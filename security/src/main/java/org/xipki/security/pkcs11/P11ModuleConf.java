@@ -330,6 +330,9 @@ public class P11ModuleConf {
       case "CKU_CONTEXT_SPECIFIC":
         this.userType = PKCS11Constants.CKU_CONTEXT_SPECIFIC;
         break;
+      case "CKU_CS_GENERIC": // Utimaco Crypto Server's vendor user
+        this.userType = 0x83;
+        break;
       default:
         try {
           if (userTypeStr.startsWith("0X")) {
