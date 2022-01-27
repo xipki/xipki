@@ -12,7 +12,7 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <packaging>bundle</packaging>
   <properties>
-    <jetty.version>9.4.29.v20200521</jetty.version>
+    <jetty.version>9.4.44.v20210927</jetty.version>
   </properties>
   <dependencies>
     <dependency>
