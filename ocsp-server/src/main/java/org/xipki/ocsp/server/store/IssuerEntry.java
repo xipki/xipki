@@ -41,7 +41,7 @@ import static org.xipki.util.Args.notNull;
  * @since 2.0.0
  */
 
-class IssuerEntry {
+public class IssuerEntry {
 
   private final int id;
 

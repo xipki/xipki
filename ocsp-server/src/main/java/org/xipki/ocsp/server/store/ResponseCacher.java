@@ -222,20 +222,21 @@ public class ResponseCacher implements Closeable {
     }
   } // method close
 
-  public Integer getIssuerId(RequestIssuer reqIssuer) {
+  public IssuerEntry getIssuer(RequestIssuer reqIssuer) {
     IssuerEntry issuer = issuerStore.getIssuerForFp(reqIssuer);
-    return (issuer == null) ? null : issuer.getId();
+    return (issuer == null) ? null : issuer;
   }
 
-  public synchronized Integer storeIssuer(X509Cert issuerCert)
+  public synchronized IssuerEntry storeIssuer(X509Cert issuerCert)
       throws CertificateException, DataAccessException {
     if (!master) {
       throw new IllegalStateException("storeIssuer is not permitted in slave mode");
     }
 
     for (Integer id : issuerStore.getIds()) {
-      if (issuerStore.getIssuerForId(id).getCert().equals(issuerCert)) {
-        return id;
+      IssuerEntry issuer = issuerStore.getIssuerForId(id);
+      if (issuer.getCert().equals(issuerCert)) {
+        return issuer;
       }
     }
 
@@ -260,7 +261,7 @@ public class ResponseCacher implements Closeable {
 
         IssuerEntry newInfo = new IssuerEntry(id, issuerCert);
         issuerStore.addIssuer(newInfo);
-        return id;
+        return newInfo;
       } catch (SQLException ex) {
         throw datasource.translate(sql, ex);
       } finally {
@@ -268,7 +269,7 @@ public class ResponseCacher implements Closeable {
       }
     } catch (DataAccessException ex) {
       if (ex.getReason().isDescendantOrSelfOf(Reason.DuplicateKey)) {
-        return id;
+        return issuerStore.getIssuerForId(id);
       }
       throw ex;
     }

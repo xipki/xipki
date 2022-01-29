@@ -20,6 +20,7 @@ package org.xipki.ocsp.servlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataAccessException;
+import org.xipki.license.api.LicenseFactory;
 import org.xipki.ocsp.server.OcspServerImpl;
 import org.xipki.ocsp.servlet.OcspConf.RemoteMgmt;
 import org.xipki.password.PasswordResolverException;
@@ -49,6 +50,8 @@ public class OcspServletFilter implements Filter {
   private static final String DFLT_CONF_FILE = "etc/ocsp/ocsp.json";
 
   private Securities securities;
+
+  private LicenseFactory licenseFactory;
 
   private OcspServerImpl server;
 
@@ -88,7 +91,15 @@ public class OcspServletFilter implements Filter {
       return;
     }
 
-    OcspServerImpl ocspServer = new OcspServerImpl();
+    str = filterConfig.getInitParameter("licenseFactory");
+    LOG.info("Use licenseFactory: {}", str);
+    try {
+      licenseFactory = (LicenseFactory) Class.forName(str).newInstance();
+    } catch (InstantiationException | IllegalAccessException | ClassNotFoundException ex) {
+      throw new ServletException("could not initialize LicenseFactory", ex);
+    }
+
+    OcspServerImpl ocspServer = new OcspServerImpl(licenseFactory.createOcspLicense());
     ocspServer.setSecurityFactory(securities.getSecurityFactory());
     ocspServer.setConfFile(conf.getServerConf());
 
@@ -146,6 +157,10 @@ public class OcspServletFilter implements Filter {
 
     if (server != null) {
       server.close();
+    }
+
+    if (licenseFactory != null) {
+      licenseFactory.close();
     }
   }
 

@@ -29,6 +29,7 @@ import org.xipki.ca.server.CaServerConf;
 import org.xipki.ca.server.CaServerConf.RemoteMgmt;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.ca.server.publisher.OcspCertPublisherFactory;
+import org.xipki.license.api.LicenseFactory;
 import org.xipki.security.Securities;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
@@ -55,6 +56,8 @@ public class CaServletFilter implements Filter {
   private static final String DFLT_CA_SERVER_CFG = "etc/ca/ca.json";
 
   private Securities securities;
+
+  private LicenseFactory licenseFactory;
 
   private CaManagerImpl caManager;
 
@@ -105,7 +108,15 @@ public class CaServletFilter implements Filter {
       throw new ServletException("could not initialize Securites", ex);
     }
 
-    caManager = new CaManagerImpl();
+    str = filterConfig.getInitParameter("licenseFactory");
+    LOG.info("Use licenseFactory: {}", str);
+    try {
+      licenseFactory = (LicenseFactory) Class.forName(str).newInstance();
+    } catch (InstantiationException | IllegalAccessException | ClassNotFoundException ex) {
+      throw new ServletException("could not initialize LicenseFactory", ex);
+    }
+
+    caManager = new CaManagerImpl(licenseFactory.createCmLicense());
     caManager.setSecurityFactory(securities.getSecurityFactory());
     caManager.setP11CryptServiceFactory(securities.getP11CryptServiceFactory());
 
@@ -179,6 +190,10 @@ public class CaServletFilter implements Filter {
 
     if (caManager != null) {
       caManager.close();
+    }
+
+    if (licenseFactory != null) {
+      licenseFactory.close();
     }
   } // method destroy
 

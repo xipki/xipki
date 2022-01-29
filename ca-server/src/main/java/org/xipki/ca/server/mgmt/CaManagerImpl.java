@@ -41,6 +41,7 @@ import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceConf;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.license.api.CmLicense;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.*;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
@@ -216,6 +217,8 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   CaManagerQueryExecutor queryExecutor;
 
+  private CmLicense license;
+
   private DataSourceWrapper datasource;
 
   private final String lockInstanceId;
@@ -259,9 +262,10 @@ public class CaManagerImpl implements CaManager, Closeable {
     version = ver;
   }
 
-  public CaManagerImpl() {
+  public CaManagerImpl(CmLicense license) {
     LOG.info("XiPKI CA version {}", version);
 
+    this.license = Args.notNull(license, "license");
     this.datasourceFactory = new DataSourceFactory();
     String calockId = null;
     File calockFile = new File("calock");
@@ -1229,6 +1233,10 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   public RestResponder getRestResponder() {
     return restResponder;
+  }
+
+  public CmLicense getLicense() {
+    return license;
   }
 
   CaMgmtException logAndCreateException(String msg) {

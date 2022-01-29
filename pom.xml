@@ -50,6 +50,7 @@
     <!-- Base components -->
     <module>util</module>
     <module>audit</module>
+    <module>license-api</module>
     <module>datasource</module>
     <module>dbtool</module>
     <module>password</module>

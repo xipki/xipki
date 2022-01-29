@@ -46,6 +46,7 @@ import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.server.db.CertStore;
 import org.xipki.ca.server.db.CertStore.KnowCertResult;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
+import org.xipki.license.api.CmLicense;
 import org.xipki.security.*;
 import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.ctlog.CtLog.SignedCertificateTimestampList;
@@ -367,6 +368,15 @@ public class X509Ca extends X509CaModule implements Closeable {
       RequestorInfo requestor, boolean update, RequestType reqType, byte[] transactionId,
       String msgId) throws OperationExceptionWithIndex {
     notEmpty(certTemplates, "certTemplates");
+
+    CmLicense license = caManager.getLicense();
+    if (!license.isValid()) {
+      LOG.error("License not valid yet or expired, need new license");
+      throw new OperationExceptionWithIndex(0, // we have to specify a index, use 0.
+          new OperationException(
+              SYSTEM_FAILURE, "License not valid yet or expired"));
+    }
+
     final int n = certTemplates.size();
     List<GrantedCertTemplate> gcts = new ArrayList<>(n);
 
@@ -403,6 +413,29 @@ public class X509Ca extends X509CaModule implements Closeable {
 
       boolean successful = false;
       try {
+        //-----begin license-----
+        // check CA
+        String caSubject = caInfo.getCert().getSubjectRfc4519Text();
+        if (!(license.grantAllCAs() || license.grant(caSubject))) {
+          LOG.error("Not granted for CA {}, need new license", caSubject);
+          throw new OperationException(SYSTEM_FAILURE, "new license needed");
+        }
+
+        // check number of certificate
+        long maxNumOfCerts = license.getMaxNumberOfCerts();
+        if (maxNumOfCerts >= 0) {
+          long numOfCerts = certstore.getCountOfCerts(0);
+          if (numOfCerts >= maxNumOfCerts) {
+            LOG.error("Maximal {} certificates is allowed, {} already issued, need new license",
+                maxNumOfCerts, numOfCerts);
+            throw new OperationException(SYSTEM_FAILURE, "new license needed");
+          }
+        }
+
+        // regulate speed
+        license.regulateSpeed();
+        //-----end license-----
+
         CertificateInfo certInfo = generateCert(gct, requestor, reqType, transactionId, msgId);
         successful = true;
         certInfos.add(certInfo);

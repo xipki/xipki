@@ -34,6 +34,7 @@ import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceConf;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.license.api.OcspLicense;
 import org.xipki.ocsp.api.*;
 import org.xipki.ocsp.api.CertStatusInfo.CertStatus;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownIssuerBehaviour;
@@ -41,6 +42,7 @@ import org.xipki.ocsp.api.OcspRespWithCacheInfo.ResponseCacheInfo;
 import org.xipki.ocsp.server.OcspServerConf.EmbedCertsMode;
 import org.xipki.ocsp.server.OcspServerConf.Source;
 import org.xipki.ocsp.server.ResponderOption.OcspMode;
+import org.xipki.ocsp.server.store.IssuerEntry;
 import org.xipki.ocsp.server.store.ResponseCacher;
 import org.xipki.ocsp.server.type.*;
 import org.xipki.password.PasswordResolverException;
@@ -134,6 +136,8 @@ public class OcspServerImpl implements OcspServer {
 
   private boolean master;
 
+  private OcspLicense license;
+
   private UnknownIssuerBehaviour unknownIssuerBehaviour = UnknownIssuerBehaviour.unknown;
 
   private ResponseCacher responseCacher;
@@ -190,9 +194,10 @@ public class OcspServerImpl implements OcspServer {
     version = ver;
   } // method static
 
-  public OcspServerImpl() {
+  public OcspServerImpl(OcspLicense license) {
     LOG.info("XiPKI OCSP Responder version {}", version);
     this.datasourceFactory = new DataSourceFactory();
+    this.license = Args.notNull(license, "license");
   }
 
   public void setSecurityFactory(SecurityFactory securityFactory) {
@@ -604,6 +609,33 @@ public class OcspServerImpl implements OcspServer {
         return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
       }
 
+      //-----begin license -----
+      if (!license.isValid()) {
+        LOG.error("License not valid, need new license");
+        return unsuccesfulOCSPRespMap.get(OcspResponseStatus.internalError);
+      }
+
+      if (!license.grantAllCAs()) {
+        for (CertID cid : requestList) {
+          for (OcspStore store : responder.getStores()) {
+            X509Cert caCert = store.getIssuerCert(cid.getIssuer());
+            if (caCert == null) {
+              continue;
+            }
+
+            String issuerSubject = caCert.getSubjectRfc4519Text();
+            boolean granted = license.grant(issuerSubject);
+            if (!granted) {
+              LOG.error("Not granted for CA {}, need new license", issuerSubject);
+              return unsuccesfulOCSPRespMap.get(OcspResponseStatus.internalError);
+            }
+          }
+        }
+      }
+
+      license.regulateSpeed();
+      //-----end license-----
+
       OcspRespControl repControl = new OcspRespControl();
       repControl.canCacheInfo = true;
 
@@ -718,7 +750,7 @@ public class OcspServerImpl implements OcspServer {
 
       SignAlgo cacheDbSigAlg = null;
       BigInteger cacheDbSerialNumber = null;
-      Integer cacheDbIssuerId = null;
+      IssuerEntry cacheDbIssuer = null;
 
       boolean canCacheDb = (requestsSize == 1) && (responseCacher != null)
           && (nonceExtn == null) && responseCacher.isOnService();
@@ -734,14 +766,20 @@ public class OcspServerImpl implements OcspServer {
 
         cacheDbSigAlg = concurrentSigner.getAlgorithm();
 
-        cacheDbIssuerId = responseCacher.getIssuerId(certId.getIssuer());
+        cacheDbIssuer = responseCacher.getIssuer(certId.getIssuer());
         cacheDbSerialNumber = certId.getSerialNumber();
 
-        if (cacheDbIssuerId != null) {
+        if (cacheDbIssuer != null) {
           OcspRespWithCacheInfo cachedResp = responseCacher.getOcspResponse(
-              cacheDbIssuerId, cacheDbSerialNumber, cacheDbSigAlg);
+              cacheDbIssuer.getId(), cacheDbSerialNumber, cacheDbSigAlg);
           if (cachedResp != null) {
-            return cachedResp;
+            boolean granted = license.grant(cacheDbIssuer.getCert().getSubjectRfc4519Text());
+            if (granted) {
+              return cachedResp;
+            } else {
+              LOG.error("Not granted, new license needed");
+              return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
+            }
           }
         } else if (master) {
           // store the issuer certificate in cache database.
@@ -754,11 +792,11 @@ public class OcspServerImpl implements OcspServer {
           }
 
           if (issuerCert != null) {
-            cacheDbIssuerId = responseCacher.storeIssuer(issuerCert);
+            cacheDbIssuer = responseCacher.storeIssuer(issuerCert);
           }
         }
 
-        if (cacheDbIssuerId == null) {
+        if (cacheDbIssuer == null) {
           canCacheDb = false;
         }
       }
@@ -817,7 +855,7 @@ public class OcspServerImpl implements OcspServer {
       if (canCacheDb && repControl.canCacheInfo) {
         // Don't cache the response with status UNKNOWN, since this may result in DDoS
         // of storage
-        responseCacher.storeOcspResponse(cacheDbIssuerId, cacheDbSerialNumber,
+        responseCacher.storeOcspResponse(cacheDbIssuer.getId(), cacheDbSerialNumber,
             producedAtSeconds, repControl.cacheNextUpdate, cacheDbSigAlg, encodeOcspResponse);
       }
 
@@ -862,6 +900,7 @@ public class OcspServerImpl implements OcspServer {
         certStatusInfo = store.getCertStatus(now, certId.getIssuer(), serial,
             repOpt.isIncludeCerthash(), repOpt.isIncludeInvalidityDate(),
             responder.getResponderOption().isInheritCaRevocation());
+
         if (certStatusInfo != null) {
           CertStatus status = certStatusInfo.getCertStatus();
           if (status == CertStatus.UNKNOWN || status == CertStatus.IGNORE) {
