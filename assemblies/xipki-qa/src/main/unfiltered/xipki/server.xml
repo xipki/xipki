@@ -68,7 +68,7 @@
     -->
     <Connector port="8080" protocol="HTTP/1.1"
                connectionTimeout="20000"
-               redirectPort="8443" />
+               redirectPort="8443" maxKeepAliveRequests="-1"/>
     <!-- A "Connector" using the shared thread pool-->
     <!--
     <Connector executor="tomcatThreadPool"
@@ -113,7 +113,7 @@
     -->
     <Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"
                maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
-               connectionTimeout="4000">
+               connectionTimeout="4000" maxKeepAliveRequests="-1">
         <SSLHostConfig
                 certificateVerification="optional"
                 protocols="TLSv1.2"

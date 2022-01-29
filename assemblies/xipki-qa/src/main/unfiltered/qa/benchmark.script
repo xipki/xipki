@@ -48,11 +48,6 @@ if { $printUsage equals "true" } then {
     }
   }
 
-  echo "###########################################################"
-  echo "# Make sure maxKeepAliveRequests="-1" is added to the       #"
-  echo "# connectors, in tomcat, listening on port 8080 and 8443. #"
-  echo "###########################################################"
-
   if { "$action" equals "enroll" } then {
 
     echo "Sleeping 1 second"
