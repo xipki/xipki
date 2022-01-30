@@ -17,7 +17,7 @@
     </init-param>
     <init-param>
       <param-name>licenseFactory</param-name>
-      <param-value>org.xipki.ocsp.servlet.UnlimitedLicenseFactory</param-value>
+      <param-value>org.xipki.license.example.ExampleLicenseFactory</param-value>
     </init-param>
   </filter>
   <filter-mapping>

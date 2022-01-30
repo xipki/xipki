@@ -44,6 +44,12 @@
       <version>${fastjson.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xipki.example</groupId>
+      <artifactId>license-example</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
       <groupId>org.tinylog</groupId>
       <artifactId>slf4j-tinylog</artifactId>
       <version>${tinylog.version}</version>

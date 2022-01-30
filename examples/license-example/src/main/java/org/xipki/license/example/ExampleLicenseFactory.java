@@ -15,20 +15,20 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.servlet;
+package org.xipki.license.example;
 
 import org.xipki.license.api.CmLicense;
 import org.xipki.license.api.LicenseFactory;
 import org.xipki.license.api.OcspLicense;
 
 /**
- * Unlimited license factory.
+ * Example license factory.
  * @author Lijun Liao
  *
  */
-public class UnlimitedLicenseFactory implements LicenseFactory {
+public class ExampleLicenseFactory implements LicenseFactory {
 
-  private class UnlimitedCmLicense implements CmLicense {
+  private class ExampleCmLicense implements CmLicense {
 
     @Override
     public boolean isValid() {
@@ -54,19 +54,42 @@ public class UnlimitedLicenseFactory implements LicenseFactory {
       return -1;
     }
 
-  } // class UnlimitedLicense
+  } // class ExampleCmLicense
 
-  public UnlimitedLicenseFactory() {
+  private class ExampleOcspLicense implements OcspLicense {
+
+    @Override
+    public boolean isValid() {
+      return true;
+    }
+
+    @Override
+    public boolean grantAllCAs() {
+      return true;
+    }
+
+    @Override
+    public boolean grant(String caSubject) {
+      return true;
+    }
+
+    @Override
+    public void regulateSpeed() {
+    }
+
+  } // class ExampleOcspLicense
+
+  public ExampleLicenseFactory() {
   }
 
   @Override
   public CmLicense createCmLicense() {
-    return new UnlimitedCmLicense();
+    return new ExampleCmLicense();
   }
 
   @Override
   public OcspLicense createOcspLicense() {
-    throw new UnsupportedOperationException("createOcspLicense unsupported.");
+    return new ExampleOcspLicense();
   }
 
   @Override
