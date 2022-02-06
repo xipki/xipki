@@ -107,6 +107,35 @@
               <includes>ca/tls-ca-cert.p12,server/tls-server.p12,ca/tls-ca-cert.pem,server/tls-server-*.pem</includes>
             </configuration>
           </execution>
+          <execution>
+            <!-- Copy the BouncyCastle jars -->
+            <id>jdbc-bc</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <stripVersion>false</stripVersion>
+              <outputDirectory>${project.build.directory}/lib</outputDirectory>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.bouncycastle</groupId>
+                  <artifactId>bcpkix-jdk15on</artifactId>
+                  <version>${bc.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.bouncycastle</groupId>
+                  <artifactId>bcprov-jdk15on</artifactId>
+                  <version>${bc.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.bouncycastle</groupId>
+                  <artifactId>bcutil-jdk15on</artifactId>
+                  <version>${bc.version}</version>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>

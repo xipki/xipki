@@ -9,10 +9,7 @@ Deployment in Tomcat 8 and 9
 1. Copy the sub-folders `bin`, `webapps` and `xipki` to the tomcat root folder
   The folder `xipki` can be moved to other location, in this case the java property `XIPKI_BASE` in
   `setenv.sh` and `setenv.bat` must be adapted to point to the new position.
-2. Download the `bcutil-jdk15on-<version>.jar`, `bcprov-jdk15on-<version>.jar` and `bcpkix-jdk15on-<version>.jar` from
-  [BouncyCastle Latest Release](https://www.bouncycastle.org/latest_releases.html) to the folder
-  `${CATALINA_HOME}/lib`. The cryptographic libraries are not included since we need the latest release.
-3. Configure the TLS listener in the file `conf/server.xml`
+2. Configure the TLS listener in the file `conf/server.xml`
     - Use NIO connector
 
 ```sh

@@ -9,16 +9,6 @@ Prepare
 - The `xipki/etc/ocsp/ocsp-responder.json` is for the OCSP store type `xipki-ca-db`. If you use
   other type (namely `xipki-db`, `ejbca-db`, and `crl`), please copy the `ocsp-responder.json` from
   the corresponding sub-folder in `xipki/etc/ocsp/example` to replace it.
-- If you use CRL as OCSP store
-    - Initialize the database which will be used to import the CRLs.
-      In dbtool, call
-      `bin/initdb.sh --db-schema sql/ocsp-init.xml --db-conf /path/to/ocsp-crl-db.properties`
-
-- If you cache the OCSP responses
-    - Initialize the database which will be used to store the cached OCSP responses.
-      In dbtool, call
-      `bin/initdb.sh --db-schema sql/ocsp-cache-init.xml --db-conf /path/to/ocsp-cache-db.properties`
-
 - Adapt the configuration file `xipki/etc/ocsp-responder.json`.
 
 Access URL
@@ -36,16 +26,22 @@ Deployment in Tomcat 8 and 9
 1. Copy the sub-folders `bin`, `webapps`, `xipki` and `lib ` to the folder `${CATALINA_HOME}`.
   The folder `xipki` can be moved to other location, in this case the java property `XIPKI_BASE` in
   `setenv.sh` and `setenv.bat` must be adapted to point to the new position.
-2. Download the `bcutil-jdk15on-<version>.jar`, `bcprov-jdk15on-<version>.jar` and `bcpkix-jdk15on-<version>.jar` from
-  [BouncyCastle Latest Release](https://www.bouncycastle.org/latest_releases.html) to the folder
-  `${CATALINA_HOME}/lib`. The cryptographic libraries are not included since we need the latest release.
-3. (Optional) If you use database other than PostgreSQL, MariaDB and MySQL, you need to download
+2. (Optional) If you use database other than H2, PostgreSQL, MariaDB and MySQL, you need to download
    the JDBC driver to the folder `${CATALINA_HOME}/lib`.
-4. (Optional) If you use database other than MariaDB and MySQL, you need to overwrite the
-   configuration templates with those in the corresponding sub folder in `${CONTAINER_ROOT}/xipki/etc/ocsp/database`.
-5. Add the line `org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true`
+3. (Optional) If you use database other than MariaDB and MySQL, you need to overwrite the
+   configuration files `ca-db.properties`, `ocsp-db.properties` with those in the corresponding sub
+   folder in `${CONTAINER_ROOT}/xipki/etc/ocsp/database`. Adapt the configuration.
+4. (Optional, required only when OCSP cache will be activated) 
+   To activate the OCSP cache:
+   1) Uncomment the `responseCache` block in the configuration file `ocsp-responder.json`;
+   2) In xipki-dbtool, call
+      `bin/initdb.sh --db-schema sql/ocsp-cache-init.xml --db-conf /path/to/ocsp-cache-db.json`.
+5. (Optional, required only when CRL is used as OCSPSore) 
+   1) In xipki-dbtool, call 
+      `bin/initdb.sh --db-schema sql/ocsp-crl-init.xml --db-conf /path/to/ocsp-crl-db.json`.
+6. Add the line `org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true`
    to the file `conf/catalina.properties` if OCSP over HTTP supported is activated.
-6. (optional) To accelerate the start process, append the following block to the property
+7. (optional) To accelerate the start process, append the following block to the property
 `tomcat.util.scan.StandardJarScanFilter.jarsToSkip` in the file `conf/catalina.properties`.
 
 ```

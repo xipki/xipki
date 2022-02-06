@@ -113,6 +113,21 @@
                   <artifactId>postgresql</artifactId>
                   <version>${jdbc.postgresql.version}</version>
                 </artifactItem>
+                <artifactItem>
+                  <groupId>org.bouncycastle</groupId>
+                  <artifactId>bcpkix-jdk15on</artifactId>
+                  <version>${bc.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.bouncycastle</groupId>
+                  <artifactId>bcprov-jdk15on</artifactId>
+                  <version>${bc.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.bouncycastle</groupId>
+                  <artifactId>bcutil-jdk15on</artifactId>
+                  <version>${bc.version}</version>
+                </artifactItem>
               </artifactItems>
             </configuration>
           </execution>
