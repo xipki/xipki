@@ -104,6 +104,11 @@
                   <version>${jdbc.mariadb.version}</version>
                 </artifactItem>
                 <artifactItem>
+                  <groupId>com.h2database</groupId>
+                  <artifactId>h2</artifactId>
+                  <version>${jdbc.h2.version}</version>
+                </artifactItem>
+                <artifactItem>
                   <groupId>org.postgresql</groupId>
                   <artifactId>postgresql</artifactId>
                   <version>${jdbc.postgresql.version}</version>

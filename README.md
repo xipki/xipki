@@ -269,7 +269,7 @@ Please refer to [commands.md](commands.md) for more details.
 
 Docker container
 -----
-See discussion in [issue #205](https://github.com/xipki/xipki/issues/205).
+See discussion in [discussion #205](https://github.com/xipki/xipki/discussions/249).
 
 Features
 -----

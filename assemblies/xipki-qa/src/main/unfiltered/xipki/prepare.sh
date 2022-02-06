@@ -9,7 +9,10 @@ echo "working dir: ${DIR}"
 
 rm -rf ${TOMCAT_DIR}/webapps/* ${TOMCAT_DIR}/logs/* ${TOMCAT_DIR}/xipki
 
-rm -rf ${TOMCAT_DIR}/lib/bc*.jar ${TOMCAT_DIR}/lib/mariadb*.jar ${TOMCAT_DIR}/lib/postgres*.jar
+rm -rf ${TOMCAT_DIR}/lib/bc*.jar \
+    ${TOMCAT_DIR}/lib/mariadb-java-client-*.jar \
+    ${TOMCAT_DIR}/lib/postgresql-*.jar \
+    ${TOMCAT_DIR}/lib/h2-*.jar
 
 cp -r xipki-ca/* ${TOMCAT_DIR}/
 
@@ -22,6 +25,10 @@ cp -r ${DIR}/etc/* ${XIPKI_DIR}/etc
 cp ${XIPKI_DIR}/etc/ca/database/mariadb/*.properties ${XIPKI_DIR}/etc/ca/database/
 
 cp ${XIPKI_DIR}/etc/ocsp/database/mariadb/*.properties ${XIPKI_DIR}/etc/ocsp/database/
+
+# Use H2 database for the CRL and cache
+cp ${XIPKI_DIR}/etc/ocsp/database/h2/ocsp-crl-db.properties ${XIPKI_DIR}/etc/ocsp/database/
+cp ${XIPKI_DIR}/etc/ocsp/database/h2/ocsp-cache-db.properties ${XIPKI_DIR}/etc/ocsp/database/
 
 cp ${DIR}/server.xml ${TOMCAT_DIR}/conf
 
