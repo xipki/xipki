@@ -10,10 +10,10 @@ Deployment in Tomcat 8 and 9
   The folder `xipki` can be moved to other location, in this case the java property `XIPKI_BASE` in
   `setenv.sh` and `setenv.bat` must be adapted to point to the new position.
 2. Configure the TLS listener in the file `conf/server.xml`
-    - Use NIO connector
+   - Use NIO connector
 
-```sh
-    <Connector port="9443" protocol="org.apache.coyote.http11.Http11NioProtocol"
+   ```sh
+   <Connector port="9443" protocol="org.apache.coyote.http11.Http11NioProtocol"
                maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
                connectionTimeout="4000">
         <SSLHostConfig
@@ -28,13 +28,12 @@ Deployment in Tomcat 8 and 9
                          certificateKeystorePassword="1234"
                          certificateKeystoreType="PKCS12"/>
         </SSLHostConfig>
-    </Connector>
-```
+   </Connector>
+   ```
+   - Use APR connector (fast). See https://tomcat.apache.org/tomcat-8.0-doc/apr.html for more details.
 
-     - Use APR connector (fast)
-
-```sh
-    <Connector port="9443" protocol="org.apache.coyote.http11.Http11AprProtocol"
+   ```sh
+   <Connector port="9443" protocol="org.apache.coyote.http11.Http11AprProtocol"
                maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
                connectionTimeout="4000">
         <SSLHostConfig
@@ -47,7 +46,7 @@ Deployment in Tomcat 8 and 9
                          certificateFile="xipki/keycerts/tlskeys/server/tls-server-cert.pem"/>
         </SSLHostConfig>
     </Connector>
-```
+   ```
 
 - (optional) To accelerate the start process, append the following block to the property
 `tomcat.util.scan.StandardJarScanFilter.jarsToSkip` in the file `conf/catalina.properties`.
