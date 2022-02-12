@@ -32,6 +32,7 @@
     <xipki.tools.version>1.0.5</xipki.tools.version>
     <servlet.version>3.1.0</servlet.version>
     <karaf.version>4.2.15</karaf.version>
+    <jdk11on.karaf.version>4.3.6</jdk11on.karaf.version>
     <karaf.bc.version>1.69</karaf.bc.version>
     <bc.version>1.70</bc.version>
     <slf4j.version>1.7.32</slf4j.version>
@@ -268,6 +269,10 @@
         <plugin>
           <artifactId>maven-source-plugin</artifactId>
           <version>3.0.1</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-war-plugin</artifactId>
+          <version>3.3.2</version>
         </plugin>
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>

@@ -15,7 +15,7 @@
     <app.name>QA</app.name>
     <shared.dir>${project.basedir}/../shared</shared.dir>
     <patchkaraf.repos>mvn:org.xipki.feature/qa/${project.version}/xml/features</patchkaraf.repos>
-    <patchkaraf.features>(-jaas,-ssh,-config,aries-blueprint/${karaf.version},wrap,netty-tcnative),xipki-security,xipki-caclient,xipki-scepclient,xipki-ocspclient,xipki-camgmt,xipki-ocspmgmt,xipki-dbtool,xipki-qa</patchkaraf.features>
+    <patchkaraf.features>(-jaas,-ssh,-config,aries-blueprint,wrap,netty-tcnative),xipki-security,xipki-caclient,xipki-scepclient,xipki-ocspclient,xipki-camgmt,xipki-ocspmgmt,xipki-dbtool,xipki-qa</patchkaraf.features>
   </properties>
   <dependencies>
     <dependency>
@@ -154,13 +154,19 @@
               <goal>unpack</goal>
             </goals>
             <configuration>
+              <outputDirectory>${project.build.directory}</outputDirectory>
               <artifactItems>
                 <artifactItem>
                   <groupId>org.apache.karaf</groupId>
                   <artifactId>apache-karaf-minimal</artifactId>
                   <version>${karaf.version}</version>
                   <type>tar.gz</type>
-                  <outputDirectory>${project.build.directory}</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.apache.karaf</groupId>
+                  <artifactId>apache-karaf-minimal</artifactId>
+                  <version>${jdk11on.karaf.version}</version>
+                  <type>tar.gz</type>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -226,10 +232,37 @@
               <goal>features-add-to-repository</goal>
             </goals>
             <configuration>
-              <repository>${project.build.directory}/classes/system</repository>
+              <repository>${project.build.directory}/standard/system</repository>
               <descriptors>
                 <descriptor>mvn:org.xipki.feature/qa/${project.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
+              </descriptors>
+              <features>
+                <feature>aries-blueprint</feature>
+                <feature>wrap</feature>
+                <!-- project-core features -->
+                <feature>xipki-security</feature>
+                <feature>xipki-caclient</feature>
+                <feature>xipki-ocspclient</feature>
+                <feature>xipki-scepclient</feature>
+                <feature>xipki-camgmt</feature>
+                <feature>xipki-ocspmgmt</feature>
+                <feature>netty-tcnative</feature>
+                <feature>xipki-qa</feature>
+              </features>
+            </configuration>
+          </execution>
+          <execution>
+            <id>add-features-to-repo-jdk11on</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>features-add-to-repository</goal>
+            </goals>
+            <configuration>
+              <repository>${project.build.directory}/jdk11on/system</repository>
+              <descriptors>
+                <descriptor>mvn:org.xipki.feature/qa/${project.version}/xml/features</descriptor>
+                <descriptor>mvn:org.apache.karaf.features/standard/${jdk11on.karaf.version}/xml/features</descriptor>
               </descriptors>
               <features>
                 <feature>aries-blueprint</feature>
@@ -255,6 +288,7 @@
             <phase>prepare-package</phase>
             <configuration>
               <target>
+                <!-- karaf.version -->
                 <unzip failOnEmptyArchive="true"
                    src="../xipki-dbtool/target/xipki-dbtool-${project.version}.zip"
                    dest="${project.build.directory}"/>
@@ -287,25 +321,93 @@
                   <arg file="../xipki-cli/src/main/patchkaraf/org.ops4j.pax.logging.cfg.patch"/>
                 </java>
                 <replace
-                    file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/bin/inc"
-                    token="-Dcom.sun.management.jmxremote"
-                    value=""/>
+                  file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/bin/inc"
+                  token="-Dcom.sun.management.jmxremote"
+                  value=""/>
                 <replace
-                        file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/jre.properties"
-                        token="org.xml.sax.helpers"
-                        value="org.xml.sax.helpers, com.ibm.db2.jcc, org.h2.jdbcx, org.hsqldb.jdbc, org.mariadb.jdbc, com.mysql.jdbc.jdbc2.optional, oracle.jdbc.pool, org.postgresql.ds"/>
+                  file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/jre.properties"
+                  token="org.xml.sax.helpers"
+                  value="org.xml.sax.helpers, sun.misc, com.ibm.db2.jcc, org.h2.jdbcx, org.hsqldb.jdbc, org.mariadb.jdbc, com.mysql.jdbc.jdbc2.optional, oracle.jdbc.pool, org.postgresql.ds"/>
                 <replace
-                        file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/system/org/apache/karaf/features/standard/${karaf.version}/standard-${karaf.version}-features.xml"
-                        token="bcutil-jdk15on/${karaf.bc.version}"
-                        value="bcutil-jdk15on/${bc.version}"/>
+                  file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/system/org/apache/karaf/features/standard/${karaf.version}/standard-${karaf.version}-features.xml"
+                  token="bcutil-jdk15on/${karaf.bc.version}"
+                  value="bcutil-jdk15on/${bc.version}"/>
                 <replace
-                        file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/system/org/apache/karaf/features/standard/${karaf.version}/standard-${karaf.version}-features.xml"
-                        token="bcprov-jdk15on/${karaf.bc.version}"
-                        value="bcprov-jdk15on/${bc.version}"/>
+                  file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/system/org/apache/karaf/features/standard/${karaf.version}/standard-${karaf.version}-features.xml"
+                  token="bcprov-jdk15on/${karaf.bc.version}"
+                  value="bcprov-jdk15on/${bc.version}"/>
                 <replace
-                        file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/system/org/apache/karaf/features/standard/${karaf.version}/standard-${karaf.version}-features.xml"
-                        token="bcpkix-jdk15on/${karaf.bc.version}"
-                        value="bcpkix-jdk15on/${bc.version}"/>
+                  file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/system/org/apache/karaf/features/standard/${karaf.version}/standard-${karaf.version}-features.xml"
+                  token="bcpkix-jdk15on/${karaf.bc.version}"
+                  value="bcpkix-jdk15on/${bc.version}"/>
+                <!-- jdk15on.karaf.version -->
+                <unzip failOnEmptyArchive="true"
+                  src="../xipki-dbtool/target/xipki-dbtool-${project.version}.zip"
+                  dest="${project.build.directory}"/>
+                <unzip src="../xipki-ca/target/xipki-ca-${project.version}.zip"
+                  dest="${project.build.directory}"/>
+                <unzip src="../xipki-ocsp/target/xipki-ocsp-${project.version}.zip"
+                  dest="${project.build.directory}"/>
+                <java failonerror="true" classname="org.xipki.patchkaraf.PatchFeature">
+                  <arg value="--file"/>
+                  <arg file="${project.build.directory}/apache-karaf-minimal-${jdk11on.karaf.version}/etc/org.apache.karaf.features.cfg"/>
+                  <arg value="--repos"/>
+                  <arg value="${patchkaraf.repos}"/>
+                  <arg value="--features"/>
+                  <arg value="${patchkaraf.features}"/>
+                </java>
+                <java failonerror="true" classname="org.xipki.patchkaraf.PatchPaxUrlMvn">
+                  <arg value="--file"/>
+                  <arg file="${project.build.directory}/apache-karaf-minimal-${jdk11on.karaf.version}/etc/org.ops4j.pax.url.mvn.cfg"/>
+                </java>
+                <java failonerror="true" classname="org.xipki.patchkaraf.PatchPaxLogging">
+                  <arg value="--file"/>
+                  <arg file="${project.build.directory}/apache-karaf-minimal-${jdk11on.karaf.version}/etc/org.ops4j.pax.logging.cfg"/>
+                </java>
+                <java failonerror="true" classname="org.xipki.patchkaraf.PatchAppend">
+                  <arg value="--backup"/>
+                  <arg value="no"/>
+                  <arg value="--file"/>
+                  <arg file="${project.build.directory}/apache-karaf-minimal-${jdk11on.karaf.version}/etc/org.ops4j.pax.logging.cfg"/>
+                  <arg value="--value-file"/>
+                  <arg file="../xipki-cli/src/main/patchkaraf/org.ops4j.pax.logging.cfg.patch"/>
+                </java>
+                <java failonerror="true" classname="org.xipki.patchkaraf.PatchAppend">
+                  <arg value="--backup"/>
+                  <arg value="no"/>
+                  <arg value="--file"/>
+                  <arg file="${project.build.directory}/apache-karaf-minimal-${jdk11on.karaf.version}/bin/setenv"/>
+                  <arg value="--value"/>
+                  <arg value="export JAVA_OPTS=&quot;${JAVA_OPTS} --add-exports=jdk.crypto.cryptoki/sun.security.pkcs11.wrapper=ALL-UNNAMED&quot;"/>
+                </java>
+                <java failonerror="true" classname="org.xipki.patchkaraf.PatchAppend">
+                  <arg value="--backup"/>
+                  <arg value="no"/>
+                  <arg value="--file"/>
+                  <arg file="${project.build.directory}/apache-karaf-minimal-${jdk11on.karaf.version}/bin/setenv.bat"/>
+                  <arg value="--value"/>
+                  <arg value="set JAVA_OPTS=%JAVA_OPTS% --add-exports=jdk.crypto.cryptoki/sun.security.pkcs11.wrapper=ALL-UNNAMED"/>
+                </java>
+                <replace
+                  file="${project.build.directory}/apache-karaf-minimal-${jdk11on.karaf.version}/bin/inc"
+                  token="-Dcom.sun.management.jmxremote"
+                  value=""/>
+                <replace
+                  file="${project.build.directory}/apache-karaf-minimal-${jdk11on.karaf.version}/etc/jre.properties"
+                  token="java.applet,"
+                  value="java.applet, sun.misc, com.ibm.db2.jcc, org.h2.jdbcx, org.hsqldb.jdbc, org.mariadb.jdbc, com.mysql.jdbc.jdbc2.optional, oracle.jdbc.pool, org.postgresql.ds,"/>
+                <replace
+                  file="${project.build.directory}/apache-karaf-minimal-${jdk11on.karaf.version}/system/org/apache/karaf/features/standard/${jdk11on.karaf.version}/standard-${jdk11on.karaf.version}-features.xml"
+                  token="bcutil-jdk15on/${karaf.bc.version}"
+                  value="bcutil-jdk15on/${bc.version}"/>
+                <replace
+                  file="${project.build.directory}/apache-karaf-minimal-${jdk11on.karaf.version}/system/org/apache/karaf/features/standard/${jdk11on.karaf.version}/standard-${jdk11on.karaf.version}-features.xml"
+                  token="bcprov-jdk15on/${karaf.bc.version}"
+                  value="bcprov-jdk15on/${bc.version}"/>
+                <replace
+                  file="${project.build.directory}/apache-karaf-minimal-${jdk11on.karaf.version}/system/org/apache/karaf/features/standard/${jdk11on.karaf.version}/standard-${jdk11on.karaf.version}-features.xml"
+                  token="bcpkix-jdk15on/${karaf.bc.version}"
+                  value="bcpkix-jdk15on/${bc.version}"/>
               </target>
             </configuration>
             <goals>
@@ -326,7 +428,23 @@
             </goals>
             <configuration>
               <descriptors>
-                <descriptor>src/main/descriptors/main.xml</descriptor>
+                <descriptor>src/main/descriptors/jdk8.xml</descriptor>
+              </descriptors>
+              <appendAssemblyId>true</appendAssemblyId>
+              <tarLongFileMode>posix</tarLongFileMode>
+              <!-- Don't install/publish the result -->
+              <attach>false</attach>
+            </configuration>
+          </execution>
+          <execution>
+            <id>jdk11on</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>src/main/descriptors/jdk11on.xml</descriptor>
               </descriptors>
               <appendAssemblyId>false</appendAssemblyId>
               <tarLongFileMode>posix</tarLongFileMode>

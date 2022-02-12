@@ -20,7 +20,7 @@ JRE/JDK, and the steps to reproduce the bug.
 
 ## Prerequisite
 * OS: Linux, Windows, MacOS
-* JRE / JDK 8 (build 162+), 9, 10, 11, 12, 13
+* JRE / JDK 8 (build 162+), 11, 17
 * Database: DB2, MariaDB, MySQL, Oracle, PostgreSQL, H2, HSQLDB
 * Hardware: Any available hardware (tested on Raspberry Pi 2 Model B with 900MHz quad-core ARM CPU and 1 GB Memory)
 
@@ -103,7 +103,7 @@ JRE/JDK, and the steps to reproduce the bug.
 ### Binaries
 
 Download the binaries `xipki-ca-<version>.zip`, `xipki-ocsp-<version>.zip` and
-`xipki-cli-<version>.tar.gz` from
+`xipki-cli-<version>.tar.gz` (or `xipki-cli-<version>-jdk8.tar.gz` for JDK 8) from
 [releases](https://github.com/xipki/xipki/releases).
 
 Only if you want to use the development version, build it from source code as
@@ -124,7 +124,7 @@ follows.
    - DB Tool: `assembles/xipki-dbtool/target/xipki-dbtool-<version>.zip`
    - CA: `assembles/xipki-ca/target/xipki-ca-<version>.zip`
    - OCSP: `assembles/xipki-ocsp/target/xipki-ocsp-<version>.zip`
-   - CLI (Command Line Interface): `assembles/xipki-cli/target/xipki-cli-<version>.tar.gz`
+   - CLI (Command Line Interface): `assembles/xipki-cli/target/xipki-cli-<version>.tar.gz` ((or `xipki-cli-<version>-jdk8.tar.gz` for JDK 8))
 
 ## Install DB Tool
 
@@ -146,7 +146,7 @@ Note that CA and OCSP can be installed in the same servlet container.
 
 ## Install Command Line Interface
 
-1. Unpack the binary `xipki-cli-<version>.tar.gz`
+1. Unpack the binary `xipki-cli-<version>.tar.gz` (or `xipki-cli-<version>-jdk8.tar.gz` for JDK 8)
 2. Adapt the CMP client configuration `xipki/cmpclient/cmpclient.json`
 3. If you get "java.lang.ClassNotFoundException: &lt;jdbc class&gt;", please copy the missing JDBC driver jar to the directory `lib/ext`.
 
@@ -244,14 +244,14 @@ preload <start script>
 * SCEP  
   Using any SCEP client. XiPKI provides also a SCEP client.
 
-  The binary `xipki-cli-<version>`.tar.gz contains an example script in the folder xipki/client-script.
+  The binary `xipki-cli-<version>`.tar.gz (or `xipki-cli-<version>-jdk8.tar.gz` for JDK 8) contains an example script in the folder xipki/client-script.
   It can be executed in the CLI as follows:  
   - `source xipki/client-script/scep-client.script`
 
 * XiPKI CLI
   XiPKI CLI provides commands to enroll and revoke certificates via CMP.
 
-  The binary `xipki-cli-<version>`.tar.gz contains an example script in the folder xipki/client-script.
+  The binary `xipki-cli-<version>`.tar.gz (or `xipki-cli-<version>-jdk8.tar.gz` for JDK 8) contains an example script in the folder xipki/client-script.
   It can be executed in the CLI as follows:  
   - `source xipki/client-script/cmp-client.script` (use argument 'help' to print the usage)
 
@@ -259,7 +259,7 @@ preload <start script>
   The shell script `xipki/client-script/rest.sh` of the `xipki-cli` demonstrates
   the use of REST API.
 
-  The binary `xipki-cli-<version>`.tar.gz contains an example script in the folder xipki/client-script.
+  The binary `xipki-cli-<version>`.tar.gz (or `xipki-cli-<version>-jdk8.tar.gz` for JDK 8) contains an example script in the folder xipki/client-script.
   It can be executed in the CLI as follows:  
   - `source xipki/client-script/rest-client.script` (use argument 'help' to print the usage)
  
