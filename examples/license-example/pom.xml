@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki.example</groupId>
     <artifactId>examples</artifactId>
-    <version>5.3.15</version>
+    <version>5.3.16-SNAPSHOT</version>
   </parent>
   <artifactId>license-example</artifactId>
   <packaging>bundle</packaging>
