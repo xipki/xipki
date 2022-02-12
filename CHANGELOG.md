@@ -5,6 +5,7 @@ See also <https://github.com/xipki/xipki/releases>
 ## 5.3.15
 - Release date: February 12, 2022
 - CA
+  - Add support of JDK 17
   - Add option to control whether to save certificates in the database.
   - Add option sql.type to use database other than pre-defined types
   - Customize behavour for ncipher HSM and smartcard-based HSM
@@ -12,6 +13,7 @@ See also <https://github.com/xipki/xipki/releases>
   - Add license mechanism
   - Embed the bouncycastle jars in the installation binary
 - OCSP
+  - Add support of JDK 17
   - Allow configuration of sign algorithms not matching keys
   - Add option sql.type to use database other than pre-defined types
   - Customize behavour for ncipher HSM and smartcard-based HSM
@@ -20,10 +22,12 @@ See also <https://github.com/xipki/xipki/releases>
   - Embed the bouncycastle jars in the installation binary
   - Use h2-database for OCSP cache and CRL by default (can be configured to other database type)
 - CLI
+  - Add support of JDK 17
   - Correct the configuration of sslTruststorePassword
   - Customize behavour for ncipher HSM and smartcard-based HSM
   - Allow the specification of Utimaco's vendor user `CKU_CS_GENERIC`
 - DB Tool
+  - Add support of JDK 17
   - Add option sql.type to use database other than pre-defined types
 - Dependencies
   - Update liquibase 3.10.3 to 4.7.1, pkcs11-wrapper from 1.4.8 to 1.4.9
