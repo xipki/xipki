@@ -1,6 +1,7 @@
 #!/bin/sh
 
 TOMCAT_DIR=~/tools/tomcat
+
 XIPKI_DIR=${TOMCAT_DIR}/xipki
 
 DIR=`dirname $0`
@@ -26,9 +27,7 @@ cp ${XIPKI_DIR}/etc/ca/database/mariadb/*.properties ${XIPKI_DIR}/etc/ca/databas
 
 cp ${XIPKI_DIR}/etc/ocsp/database/mariadb/*.properties ${XIPKI_DIR}/etc/ocsp/database/
 
-# Use H2 database for the CRL and cache
-cp ${XIPKI_DIR}/etc/ocsp/database/h2/ocsp-crl-db.properties ${XIPKI_DIR}/etc/ocsp/database/
+# Use H2 database for the cache
 cp ${XIPKI_DIR}/etc/ocsp/database/h2/ocsp-cache-db.properties ${XIPKI_DIR}/etc/ocsp/database/
 
 cp ${DIR}/server.xml ${TOMCAT_DIR}/conf
-
