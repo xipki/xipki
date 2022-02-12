@@ -2,6 +2,19 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
+## 5.3.16
+- Release date: -
+- CA
+  - N/A
+- OCSP
+  - N/A
+- CLI
+  - N/A
+ - DB Tool
+  - N/A
+- Dependencies
+  - N/A
+
 ## 5.3.15
 - Release date: February 12, 2022
 - CA
@@ -30,7 +43,7 @@ See also <https://github.com/xipki/xipki/releases>
   - Add support of JDK 17
   - Add option sql.type to use database other than pre-defined types
 - Dependencies
-  - Update liquibase 3.10.3 to 4.7.1, pkcs11-wrapper from 1.4.8 to 1.4.9
+  - Update liquibase 3.10.3 to 4.7.1, pkcs11-wrapper from 1.4.8 to 1.4.9, karaf from 4.2.14 to 4.2.15 (jdk8) and 4.3.6.
 
 ## 5.3.14
 - Release date: December 24, 2021
