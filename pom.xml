@@ -38,10 +38,10 @@
     <pkcs11-wrapper.version>1.4.9</pkcs11-wrapper.version>
     <hikaricp.version>4.0.3</hikaricp.version>
     <fastjson.version>1.2.79</fastjson.version>
-    <liquibase.version>4.6.2</liquibase.version>
+    <liquibase.version>4.7.1</liquibase.version>
     <!-- only for runtime -->
     <tinylog.version>2.3.2</tinylog.version>
-    <jdbc.mariadb.version>2.7.4</jdbc.mariadb.version>
+    <jdbc.mariadb.version>2.7.5</jdbc.mariadb.version>
     <jdbc.postgresql.version>42.2.24</jdbc.postgresql.version>
     <jdbc.h2.version>1.4.200</jdbc.h2.version>
     <!-- Only for test purpose -->
