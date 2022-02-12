@@ -34,6 +34,7 @@
     <karaf.version>4.2.15</karaf.version>
     <jdk11on.karaf.version>4.3.6</jdk11on.karaf.version>
     <karaf.bc.version>1.69</karaf.bc.version>
+    <jdk11on.karaf.bc.version>1.69</jdk11on.karaf.bc.version>
     <bc.version>1.70</bc.version>
     <slf4j.version>1.7.32</slf4j.version>
     <pkcs11-wrapper.version>1.4.9</pkcs11-wrapper.version>

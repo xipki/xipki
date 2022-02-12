@@ -141,7 +141,7 @@
               <goal>features-add-to-repository</goal>
             </goals>
             <configuration>
-              <repository>${project.build.directory}/standard/system</repository>
+              <repository>${project.build.directory}/jdk8/system</repository>
               <descriptors>
                 <descriptor>mvn:org.xipki.feature/cli/${project.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
@@ -302,15 +302,15 @@
                   value="java.applet, sun.misc, com.ibm.db2.jcc, org.h2.jdbcx, org.hsqldb.jdbc, org.mariadb.jdbc, com.mysql.jdbc.jdbc2.optional, oracle.jdbc.pool, org.postgresql.ds,"/>
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${jdk11on.karaf.version}/system/org/apache/karaf/features/standard/${jdk11on.karaf.version}/standard-${jdk11on.karaf.version}-features.xml"
-                  token="bcutil-jdk15on/${karaf.bc.version}"
+                  token="bcutil-jdk15on/${jdk15on.karaf.bc.version}"
                   value="bcutil-jdk15on/${bc.version}"/>
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${jdk11on.karaf.version}/system/org/apache/karaf/features/standard/${jdk11on.karaf.version}/standard-${jdk11on.karaf.version}-features.xml"
-                  token="bcprov-jdk15on/${karaf.bc.version}"
+                  token="bcprov-jdk15on/${jdk15on.karaf.bc.version}"
                   value="bcprov-jdk15on/${bc.version}"/>
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${jdk11on.karaf.version}/system/org/apache/karaf/features/standard/${jdk11on.karaf.version}/standard-${jdk11on.karaf.version}-features.xml"
-                  token="bcpkix-jdk15on/${karaf.bc.version}"
+                  token="bcpkix-jdk15on/${jdk15on.karaf.bc.version}"
                   value="bcpkix-jdk15on/${bc.version}"/>
               </target>
             </configuration>

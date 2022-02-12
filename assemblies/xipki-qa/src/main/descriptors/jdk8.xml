@@ -24,7 +24,7 @@
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>${project.build.directory}/standard</directory>
+      <directory>${project.build.directory}/jdk8</directory>
       <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
