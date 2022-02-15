@@ -38,7 +38,7 @@ Deployment in Tomcat 8 and 9
       `bin/initdb.sh --db-schema sql/ocsp-cache-init.xml --db-conf /path/to/ocsp-cache-db.json`.
 5. (Optional, required only when CRL is used as OCSPSore) 
    1) In xipki-dbtool, call 
-      `bin/initdb.sh --db-schema sql/ocsp-crl-init.xml --db-conf /path/to/ocsp-crl-db.json`.
+      `bin/initdb.sh --db-schema sql/ocsp-init.xml --db-conf /path/to/ocsp-crl-db.json`.
 6. Add the line `org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true`
    to the file `conf/catalina.properties` if OCSP over HTTP supported is activated.
 7. (optional) To accelerate the start process, append the following block to the property
