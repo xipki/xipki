@@ -40,7 +40,7 @@ Deployment in Tomcat 8 and 9
    1) In xipki-dbtool, call 
       `bin/initdb.sh --db-schema sql/ocsp-init.xml --db-conf /path/to/ocsp-crl-db.json`.
 6. Add the line `org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true`
-   to the file `conf/catalina.properties` if OCSP over HTTP supported is activated.
+   to the file `conf/catalina.properties` if OCSP over HTTP GET support is activated.
 7. (optional) To accelerate the start process, append the following block to the property
 `tomcat.util.scan.StandardJarScanFilter.jarsToSkip` in the file `conf/catalina.properties`.
 
