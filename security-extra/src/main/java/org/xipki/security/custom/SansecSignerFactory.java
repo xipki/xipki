@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2013 - 2020 Lijun Liao
+ * Copyright (c) 2013 - 2022 Lijun Liao
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.security.sansec;
+package org.xipki.security.custom;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +34,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * The Signer Factory uses SANSEC (三未信安) HSM via the vendor's java SDK.
+ * The Signer Factory uses SANSEC HSM via the vendor's java SDK.
  * This is an example to show how to create signature using vendors's JCE provider.
  *
  * <p>
@@ -52,7 +52,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * and <code>ocsp.json</code> respectively as follows:
  * <pre>
  *      "signerFactories": [
- *          "org.xipki.security.sansec.SansecSignerFactory"
+ *          "org.xipki.security.custom.SansecSignerFactory"
  *      ]
  * </pre>
  *
