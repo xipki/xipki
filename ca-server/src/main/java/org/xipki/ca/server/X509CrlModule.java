@@ -100,7 +100,8 @@ public class X509CrlModule extends X509CaModule implements Closeable {
         Date nearestScheduledCrlIssueTime = getScheduledCrlGenTimeNotAfter(
             new Date(lastIssueTimeOfFullCrl * 1000));
         Date nextScheduledCrlIssueTime = new Date(
-            nearestScheduledCrlIssueTime.getTime() + control.getFullCrlIntervals() * MS_PER_DAY);
+                    nearestScheduledCrlIssueTime.getTime()
+                    + control.getFullCrlIntervals() * control.getIntervalMillis());
         if (!nextScheduledCrlIssueTime.after(now)) {
           // at least one interval was skipped
           createFullCrlNow = true;
@@ -117,7 +118,8 @@ public class X509CrlModule extends X509CaModule implements Closeable {
         Date nearestScheduledCrlIssueTime = getScheduledCrlGenTimeNotAfter(
             new Date(lastIssueTime * 1000));
         Date nextScheduledCrlIssueTime = new Date(
-            nearestScheduledCrlIssueTime.getTime() + control.getDeltaCrlIntervals() * MS_PER_DAY);
+                    nearestScheduledCrlIssueTime.getTime()
+                    + control.getDeltaCrlIntervals() * control.getIntervalMillis());
         if (!nextScheduledCrlIssueTime.after(now)) {
           // at least one interval was skipped
           createDeltaCrlNow = true;
@@ -140,9 +142,11 @@ public class X509CrlModule extends X509CaModule implements Closeable {
         }
       }
 
-      Date nextUpdate =
-          new Date(getScheduledCrlGenTimeNotAfter(now).getTime()
-              + (intervals + control.getOverlapDays()) * MS_PER_DAY);
+      Date scheduledCrlGenTime = getScheduledCrlGenTimeNotAfter(now);
+      Date nextUpdate = new Date(scheduledCrlGenTime.getTime()
+                        + intervals * control.getIntervalMillis());
+      // add overlap
+      nextUpdate = control.getOverlap().add(nextUpdate);
 
       try {
         generateCrl(createDeltaCrlNow, now, nextUpdate, MSGID_ca_routine);
@@ -336,7 +340,9 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       }
 
       Date nextUpdate = new Date(nearestScheduledIssueTime.getTime()
-          + (intervals + control.getOverlapDays()) * MS_PER_DAY);
+                        + intervals * control.getIntervalMillis());
+      // add overlap
+      nextUpdate = control.getOverlap().add(nextUpdate);
 
       return generateCrl(false, thisUpdate, nextUpdate, msgId);
     } finally {
@@ -600,21 +606,36 @@ public class X509CrlModule extends X509CaModule implements Closeable {
 
   /**
    * Gets the nearest scheduled CRL generation time which is not after the given {@code time}.
-   * @param time the reference time
+   *
+   * @param date the reference time
    * @return the nearest scheduled time
    */
-  private Date getScheduledCrlGenTimeNotAfter(Date time) {
-    Calendar cal = Calendar.getInstance(TIMEZONE_UTC);
-    cal.setTime(time);
-    HourMinute hm =  caInfo.getCrlControl().getIntervalDayTime();
-    cal.set(Calendar.HOUR_OF_DAY, hm.getHour());
-    cal.set(Calendar.MINUTE, hm.getMinute());
-    cal.set(Calendar.SECOND, 0);
-    cal.set(Calendar.MILLISECOND, 0);
+  private Date getScheduledCrlGenTimeNotAfter(Date date) {
+    long time = date.getTime();
+    long epochDaysInMillis = time / MS_PER_DAY * MS_PER_DAY;
 
-    long t1 = time.getTime() / 1000;
-    long tcal = cal.getTimeInMillis() / 1000;
-    return (t1 >= tcal) ? cal.getTime() : new Date(cal.getTimeInMillis() - MS_PER_DAY);
+    // time less than one day
+    long minutesInDay = (time - epochDaysInMillis) / MS_PER_MINUTE;
+
+    int intervalMinutes = caInfo.getCrlControl().getIntervalHours() * 60;
+
+    HourMinute hm = caInfo.getCrlControl().getIntervalDayTime();
+    int hmInMinutes = hm.getHour() * 60 + hm.getMinute();
+
+    if (minutesInDay == hmInMinutes) {
+      // If time if == hm
+      return new Date(epochDaysInMillis + hmInMinutes * MS_PER_MINUTE);
+    } else if (minutesInDay < hmInMinutes) {
+      // If time is before hm, use the previous interval
+      return new Date(epochDaysInMillis + (hmInMinutes - intervalMinutes) * MS_PER_MINUTE);
+    } else {
+      // If time is after hm, use the nearest interval before reference time
+      for (int i = 0;; i++) {
+        if (minutesInDay < (hmInMinutes + (i + 1) * intervalMinutes)) {
+          return new Date(epochDaysInMillis + (hmInMinutes + i * intervalMinutes) * MS_PER_MINUTE);
+        }
+      }
+    }
   }
 
   SignerEntryWrapper getCrlSigner() {

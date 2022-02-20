@@ -124,7 +124,7 @@ follows.
    - DB Tool: `assembles/xipki-dbtool/target/xipki-dbtool-<version>.zip`
    - CA: `assembles/xipki-ca/target/xipki-ca-<version>.zip`
    - OCSP: `assembles/xipki-ocsp/target/xipki-ocsp-<version>.zip`
-   - CLI (Command Line Interface): `assembles/xipki-cli/target/xipki-cli-<version>.tar.gz` ((or `xipki-cli-<version>-jdk8.tar.gz` for JDK 8))
+   - CLI (Command Line Interface): `assembles/xipki-cli/target/xipki-cli-<version>.tar.gz` (or `xipki-cli-<version>-jdk8.tar.gz` for JDK 8)
 
 ## Install DB Tool
 

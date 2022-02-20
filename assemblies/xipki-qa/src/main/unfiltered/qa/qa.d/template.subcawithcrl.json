@@ -37,9 +37,9 @@
 				"popo.sigalgo":"REPLACEME-SIGALGO:REPLACEME-HASHwithRSA:REPLACEME-HASHwithECDSA:REPLACEME-HASHwithDSA:SM3withSM2"
 			},
 			"crlControl":{
-				"update.mode":"interval",
+				"interval.hours": 24,
 				"fullcrl.intervals":7,
-				"overlap.days":3,
+				"overlap":"3d",
 				"interval.time":"02:00"
 			},
 			"cmpResponderName":"responder1",

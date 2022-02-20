@@ -376,7 +376,7 @@ ca:ca-add \
   --crl-uri http://subcawithcrl.myorg.org/crl \
   --deltacrl-uri http://subcawithcrl.myorg.org/deltacrl \
   --cmp-control "send.ca=true,send.certchain=false,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA:SM3withSM2" \
-  --crl-control "update.mode=interval,fullcrl.intervals=7,overlap.days=3,interval.time=02:00" \
+  --crl-control "interval.hours=24,fullcrl.intervals=7,overlap=3d,interval.time=02:00" \
   --scep-control "cacert.included=true,certchain.included=false,signercert.included=true,support.getcrl=true" \
   --cmp-responder responder1 \
   --validity-mode lax \

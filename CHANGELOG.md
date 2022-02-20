@@ -5,7 +5,7 @@ See also <https://github.com/xipki/xipki/releases>
 ## 5.3.16
 - Release date: -
 - CA
-  - N/A
+  - Reduce the minimal interval to generate CRL from 1 day to 1 hour
 - OCSP
   - N/A
 - CLI

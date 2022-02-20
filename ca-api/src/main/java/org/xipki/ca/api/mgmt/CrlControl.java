@@ -17,37 +17,36 @@
 
 package org.xipki.ca.api.mgmt;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.util.*;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 /**
  * CRL control.
  *<pre>
  * Example configuration
  *
- * # List of OIDs of extensions to be embedded in CRL,
- * # Unspecified or empty extensions indicates that the CA decides.
- * extensions=&lt;comma delimited OIDs of extensions&gt;
- *
  * # The following settings are only for updateMode 'interval'
  *
- * # Days between two full CRLs. Default is 1.
+ * # Intervals between two full CRLs. Default is 1.
  * # Should be greater than 0
  * fullcrl.intervals=&lt;integer&gt;
  *
- * # Elapsed days before a deltaCRL is generated since the last CRL or deltaCRL.
+ * # Elapsed intervals before a deltaCRL is generated since the last CRL or deltaCRL.
  * # Should be 0 or a positive integer less than fullcrl.intervals. Default is 0.
  * # 0 indicates that no deltaCRL will be generated
  * deltacrl.intervals=&lt;integer&gt;
  *
- * # Overlap days. At least 1 day
- * overlap.days=&lt;days of overlap&gt;
+ * # Overlap time, unit is m (minutes), h (hour), d (day), w (week), y (year).
+ * overlap=&lt;integer&gt;&lt;unit&gt;
  *
- * # UTC time of generation of CRL, one interval covers 1 day. Default is 01:00
+ * # Interval period in hours, valid values are 1, 2, 3, 4, 6, 8, 12 and 24.
+ * #
+ * # Default is 24.
+ * interval.hours=&lt;integer&gt;
+ *
+ * # UTC time at which CRL is generated, Default is 01:00.
+ * # If day.intervals is greater than 1, this specifies only one of the generation times.
  * interval.time=&lt;update time (hh:mm of UTC time)&gt;
  *
  * # If set to true, the nextUpdate of a fullCRL is set to the update time of the next fullCRL.
@@ -60,7 +59,7 @@ import java.util.Set;
  * exclude.reason=&lt;'true'|'false'&gt;
  *
  * # How the CRL entry extension invalidityDate is considered in CRL
- * # Default is false
+ * # Default is optional
  * invalidity.date=&lt;'required'|'optional'|'forbidden'&gt;
  *
  * # Whether to include the expired certificates
@@ -118,19 +117,28 @@ public class CrlControl {
 
   } // class HourMinute
 
-  public static final String KEY_EYTENSIONS = "extensions";
-
   public static final String KEY_FULLCRL_INTERVALS = "fullcrl.intervals";
 
   public static final String KEY_DELTACRL_INTERVALS = "deltacrl.intervals";
 
   /**
    * Overlap in minutes.
-   * @deprecated use {@link #KEY_OVERLAP_DAYS} instead.
+   * @deprecated use {@link #KEY_OVERLAP} instead.
    */
   public static final String KEY_OVERLAP_MINUTES = "overlap.minutes";
 
+  /**
+   * Overlap in days.
+   * @deprecated use {@link #KEY_OVERLAP} instead.
+   */
   public static final String KEY_OVERLAP_DAYS = "overlap.days";
+
+  /**
+   * Overlap.
+   */
+  public static final String KEY_OVERLAP = "overlap";
+
+  public static final String KEY_INTERVAL_HOURS = "interval.hours";
 
   public static final String KEY_INTERVAL_TIME = "interval.time";
 
@@ -146,7 +154,11 @@ public class CrlControl {
 
   private final int deltaCrlIntervals;
 
-  private int overlapDays = 3;
+  private final int intervalHours;
+
+  private final long intervalMillis;
+
+  private final Validity overlap;
 
   private final boolean extendedNextUpdate;
 
@@ -157,8 +169,6 @@ public class CrlControl {
   private final boolean includeExpiredCerts;
 
   private TripleState invalidityDateMode = TripleState.optional;
-
-  private final Set<String> extensionOids;
 
   public CrlControl(String conf)
       throws InvalidConfException {
@@ -174,22 +184,6 @@ public class CrlControl {
       this.invalidityDateMode = TripleState.valueOf(str);
     }
 
-    str = props.value(KEY_EYTENSIONS);
-    if (str == null) {
-      this.extensionOids = Collections.emptySet();
-    } else {
-      Set<String> oids = StringUtil.splitAsSet(str, ", ");
-      // check the OID
-      for (String oid : oids) {
-        try {
-          new ASN1ObjectIdentifier(oid);
-        } catch (IllegalArgumentException ex) {
-          throw new InvalidConfException(oid + " is not a valid OID");
-        }
-      }
-      this.extensionOids = oids;
-    }
-
     this.excludeReason = getBoolean(props, KEY_EXCLUDE_REASON, false);
     this.includeExpiredCerts = getBoolean(props, KEY_INCLUDE_EXPIREDCERTS, false);
 
@@ -198,22 +192,38 @@ public class CrlControl {
     this.deltaCrlIntervals = getInteger(props, KEY_DELTACRL_INTERVALS, 0);
     this.extendedNextUpdate = getBoolean(props, KEY_FULLCRL_EXTENDED_NEXTUPDATE, false);
 
+    Validity ov;
     if (props.value(KEY_OVERLAP_DAYS) != null) {
-      this.overlapDays = getInteger(props, KEY_OVERLAP_DAYS, 1);
+      ov = new Validity(getInteger(props, KEY_OVERLAP_DAYS, 1), Validity.Unit.DAY);
     } else if (props.value(KEY_OVERLAP_MINUTES) != null) {
-      int minutes = getInteger(props, KEY_OVERLAP_MINUTES, 1);
-      // convert minutes to days.
-      this.overlapDays = (minutes + 24 * 60 - 1) / (24 * 60);
+      ov = new Validity(getInteger(props, KEY_OVERLAP_MINUTES, 24 * 60), Validity.Unit.MINUTE);
+    } else if (props.value(KEY_OVERLAP) != null) {
+      ov = Validity.getInstance(props.value(KEY_OVERLAP));
+    } else {
+      ov = new Validity(1, Validity.Unit.DAY);
     }
 
-    if (this.overlapDays < 1) {
+    if (ov.getValidity() < 1) {
       // Maximal overlap allowed by CA/Browser Forum's Baseline Requirements
-      this.overlapDays = 3;
+      this.overlap = new Validity(3, Validity.Unit.DAY);
+    } else {
+      this.overlap = ov;
     }
+
+    int hours = getInteger(props, KEY_INTERVAL_HOURS, 24);
+    if (!(hours >= 1 && hours <= 24
+            && (24 - 24 / hours * hours == 0))) {
+      throw new InvalidConfException(
+              KEY_INTERVAL_HOURS + " " + hours + " not in [1,2,3,4,6,8,12,24]");
+    }
+    this.intervalHours = hours;
+    this.intervalMillis = hours * 60L * 60 * 1000;
 
     str = props.value(KEY_INTERVAL_TIME);
+
+    HourMinute hm;
     if (str == null) {
-      this.intervalDayTime = new HourMinute(1, 0);
+      hm = new HourMinute(1, 0);
     } else {
       List<String> tokens = StringUtil.split(str.trim(), ":");
       if (tokens.size() != 2) {
@@ -224,11 +234,22 @@ public class CrlControl {
       try {
         int hour = Integer.parseInt(tokens.get(0));
         int minute = Integer.parseInt(tokens.get(1));
-        this.intervalDayTime = new HourMinute(hour, minute);
+        hm = new HourMinute(hour, minute);
       } catch (IllegalArgumentException ex) {
         throw new InvalidConfException("invalid " + KEY_INTERVAL_TIME + ": '" + str + "'");
       }
     }
+
+    int i = 0;
+    while (true) {
+      if (hm.hour - (i + 1) * intervalHours < 0) {
+        break;
+      }
+
+      i++;
+    }
+
+    this.intervalDayTime = i == 0 ? hm : new HourMinute(hm.hour - i * intervalHours, hm.minute);
 
     validate();
   } // constructor
@@ -240,18 +261,10 @@ public class CrlControl {
     pairs.putPair(KEY_INCLUDE_EXPIREDCERTS, Boolean.toString(includeExpiredCerts));
     pairs.putPair(KEY_FULLCRL_EXTENDED_NEXTUPDATE, Boolean.toString(extendedNextUpdate));
     pairs.putPair(KEY_FULLCRL_INTERVALS, Integer.toString(fullCrlIntervals));
+    pairs.putPair(KEY_INTERVAL_HOURS, Integer.toString(intervalHours));
     pairs.putPair(KEY_INTERVAL_TIME, intervalDayTime.toString());
     pairs.putPair(KEY_INVALIDITY_DATE, invalidityDateMode.name());
-    pairs.putPair(KEY_OVERLAP_DAYS, Integer.toString(overlapDays));
-
-    if (CollectionUtil.isNotEmpty(extensionOids)) {
-      StringBuilder extensionsSb = new StringBuilder(200);
-      for (String oid : extensionOids) {
-        extensionsSb.append(oid).append(",");
-      }
-      extensionsSb.deleteCharAt(extensionsSb.length() - 1);
-      pairs.putPair(KEY_EYTENSIONS, extensionsSb.toString());
-    }
+    pairs.putPair(KEY_OVERLAP, overlap.toString());
 
     return pairs.getEncoded();
   } // method getConf
@@ -263,14 +276,15 @@ public class CrlControl {
 
   public String toString(boolean verbose) {
     return StringUtil.concatObjects(
-        "  full CRL intervals: ", fullCrlIntervals,
+        "  interval unit: ", intervalHours, " hours",
+        "\n  full CRL intervals: ", fullCrlIntervals,
         "\n  delta CRL intervals: ", deltaCrlIntervals,
-        "\n  overlap: ", overlapDays, " days",
+        "\n  overlap: ", overlap,
         "\n  use extended nextUpdate: ", extendedNextUpdate,
         "\n  exclude reason: ", excludeReason,
         "\n  include expired certs: ", includeExpiredCerts,
         "\n  invalidity date mode: ", invalidityDateMode,
-        "\n  intervalDayTime: ", "generate CRL at " + intervalDayTime,
+        "\n  intervalDayTime: ", "generate CRL at " + intervalDayTime, " UTC",
         (verbose ? "\n  encoded: " : ""), (verbose ? getConf() : ""));
   } // method toString(boolean)
 
@@ -282,16 +296,12 @@ public class CrlControl {
     return deltaCrlIntervals;
   }
 
-  public int getOverlapDays() {
-    return overlapDays;
+  public Validity getOverlap() {
+    return overlap;
   }
 
   public HourMinute getIntervalDayTime() {
     return intervalDayTime;
-  }
-
-  public Set<String> getExtensionOids() {
-    return extensionOids;
   }
 
   public boolean isExtendedNextUpdate() {
@@ -308,6 +318,14 @@ public class CrlControl {
 
   public TripleState getInvalidityDateMode() {
     return invalidityDateMode;
+  }
+
+  public int getIntervalHours() {
+    return intervalHours;
+  }
+
+  public long getIntervalMillis() {
+    return intervalMillis;
   }
 
   public final void validate()
@@ -327,6 +345,7 @@ public class CrlControl {
       throw new InvalidConfException(
           "deltaCRLIntervals may not be less than 0: " + deltaCrlIntervals);
     }
+
   } // method validate
 
   @Override
@@ -343,22 +362,15 @@ public class CrlControl {
     }
 
     CrlControl obj2 = (CrlControl) obj;
-    if (deltaCrlIntervals != obj2.deltaCrlIntervals
-        || extendedNextUpdate != obj2.extendedNextUpdate
-        || fullCrlIntervals != obj2.fullCrlIntervals
-        || includeExpiredCerts != obj2.includeExpiredCerts) {
-      return false;
-    }
-
-    if (extensionOids == null) {
-      if (obj2.extensionOids != null) {
-        return false;
-      }
-    } else if (!extensionOids.equals(obj2.extensionOids)) {
-      return false;
-    }
-
-    return intervalDayTime.equals(obj2.intervalDayTime);
+    return deltaCrlIntervals == obj2.deltaCrlIntervals
+            && excludeReason == obj2.excludeReason
+            && extendedNextUpdate == obj2.extendedNextUpdate
+            && fullCrlIntervals == obj2.fullCrlIntervals
+            && includeExpiredCerts == obj2.includeExpiredCerts
+            && intervalDayTime.equals(obj2.intervalDayTime)
+            && intervalHours == obj2.intervalHours
+            && invalidityDateMode.equals(obj2.invalidityDateMode)
+            && overlap.equals(obj2.overlap);
   } // method equals
 
   private static int getInteger(ConfPairs props, String propKey, int dfltValue)

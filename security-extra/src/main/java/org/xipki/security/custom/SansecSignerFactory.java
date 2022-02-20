@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2013 - 2022 Lijun Liao
+ * Copyright (c) 2013 - 2020 Lijun Liao
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,10 +38,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  * This is an example to show how to create signature using vendors's JCE provider.
  *
  * <p>
- * The configuration files must be put in the folder <code>$XIPKI_BASEDIR/security/sansec-jce</code>.
- * Each HSM has one configuration file, which is either <code>swsds.ini</code> or 
+ * The configuration files must be put in the folder
+ * <code>$XIPKI_BASEDIR/security/sansec-jce</code>.
+ * Each HSM has one configuration file, which is either <code>swsds.ini</code> or
  * <code>swsds-&lt;name&gt;.ini</code>.
- * Signer for HSM with configuration file <code>swsds.ini</code> or <code>swsds-&lt;name&gt;.ini</code>
+ * Signer for HSM with configuration file <code>swsds.ini</code> or
+ * <code>swsds-&lt;name&gt;.ini</code>
  * has the signer-type <code>sansec</code> or <code>sansec-&lt;name&gt;</code> respectively.
  *
  * <p>
