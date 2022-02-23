@@ -1,0 +1,8 @@
+#
+# When CA certificate is revoked. UTC DateTime yyyyMMddhhmmss, e.g. 20160418165058
+# optional, but required if CA is revoked.
+# ca.revocation.time = 201604181650
+
+# When CA certificate is invalidated. UTC DateTime yyyyMMddhhmmss, e.g. 20160418165058
+# optional.
+# ca.invalidity.time = 201604181650
