@@ -5,19 +5,19 @@
     xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
     version="2.4">
 
-    <display-name>ctlog-dummy-sserver</display-name>
+    <display-name>ctlog-dummy-server</display-name>
     <description>
         CtLog Dummy Server
     </description>
 
     <servlet>
         <servlet-name>ctlogrsa</servlet-name>
-        <servlet-class>org.xipki.ctlog.dummyserver.CtLogServletRSA</servlet-class>
+        <servlet-class>org.xipki.example.ctlog.CtLogServletRSA</servlet-class>
     </servlet>
 
     <servlet>
         <servlet-name>ctlogec</servlet-name>
-        <servlet-class>org.xipki.ctlog.dummyserver.CtLogServletEC</servlet-class>
+        <servlet-class>org.xipki.example.ctlog.CtLogServletEC</servlet-class>
     </servlet>
 
     <servlet-mapping>

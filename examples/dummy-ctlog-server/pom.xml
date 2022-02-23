@@ -33,5 +33,17 @@
       <version>${servlet.version}</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.tinylog</groupId>
+      <artifactId>slf4j-tinylog</artifactId>
+      <version>${tinylog.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.tinylog</groupId>
+      <artifactId>tinylog-impl</artifactId>
+      <version>${tinylog.version}</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 </project>

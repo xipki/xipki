@@ -15,4 +15,4 @@
  * limitations under the License.
  */
 
-package org.xipki.ctlog.dummyserver;
+package org.xipki.example.ctlog;

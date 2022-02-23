@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ctlog.dummyserver;
+package org.xipki.example.ctlog;
 
 import com.alibaba.fastjson.JSON;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -23,6 +23,8 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.ctlog.CtLog;
 import org.xipki.security.ctlog.CtLog.DigitallySigned;
@@ -31,6 +33,7 @@ import org.xipki.security.ctlog.CtLog.SignatureAlgorithm;
 import org.xipki.security.ctlog.CtLog.SignatureAndHashAlgorithm;
 import org.xipki.security.ctlog.CtLogMessages.AddPreChainRequest;
 import org.xipki.security.ctlog.CtLogMessages.AddPreChainResponse;
+import org.xipki.util.LogUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -54,6 +57,8 @@ import java.util.List;
 @SuppressWarnings("serial")
 public class CtLogServlet extends HttpServlet {
 
+  private static final Logger LOG = LoggerFactory.getLogger(CtLogServlet.class);
+
   private final PrivateKey signingKey;
 
   private final byte[] logId;
@@ -68,7 +73,9 @@ public class CtLogServlet extends HttpServlet {
     try {
       canonicalizedBytes = publicKeyInfo.getEncoded();
     } catch (IOException ex) {
-      throw new IllegalStateException("invalid public key");
+      String msg = "invalid public key";
+      LogUtil.error(LOG, ex, msg);
+      throw new IllegalStateException(msg);
     }
     this.logId = HashAlgo.SHA256.hash(canonicalizedBytes);
 
@@ -85,7 +92,9 @@ public class CtLogServlet extends HttpServlet {
       this.signatureAlgo = "SHA256withECDSA";
       signatureAlgorithm = SignatureAlgorithm.ecdsa;
     } else {
-      throw new IllegalStateException("unknown key type " + keyAlgId.getId());
+      String msg = "unknown key type " + keyAlgId.getId();
+      LOG.error(msg);
+      throw new IllegalStateException(msg);
     }
 
     this.signatureAndHashAlgorithm = new SignatureAndHashAlgorithm(
@@ -95,7 +104,9 @@ public class CtLogServlet extends HttpServlet {
       KeyFactory kf = KeyFactory.getInstance(keyType);
       this.signingKey = kf.generatePrivate(new PKCS8EncodedKeySpec(pkcs8PrivateKeyBytes));
     } catch (InvalidKeySpecException | NoSuchAlgorithmException ex) {
-      throw new IllegalStateException("error creating private key: " + ex.getMessage());
+      String msg = "error creating private key";
+      LogUtil.error(LOG, ex, msg);
+      throw new IllegalStateException(msg + ": " + ex.getMessage());
     }
   }
 
@@ -106,7 +117,9 @@ public class CtLogServlet extends HttpServlet {
       AddPreChainRequest req0 = parse(req.getInputStream(), AddPreChainRequest.class);
       List<byte[]> chain = req0.getChain();
       if (chain == null || chain.size() < 2) {
-        resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "chain has less than two certificates");
+        String msg = "chain has less than two certificates";
+        LOG.warn(msg);
+        resp.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
         return;
       }
 
@@ -139,6 +152,7 @@ public class CtLogServlet extends HttpServlet {
       resp.getOutputStream().write(respContent);
       resp.setStatus(HttpServletResponse.SC_OK);
     } catch (Exception ex) {
+      LogUtil.error(LOG, ex);
       throw new ServletException(ex.getMessage(), ex);
     }
   } // method doPost
