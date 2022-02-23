@@ -149,33 +149,9 @@ public class CanonicalizeCode {
 
     try {
       String line;
-      boolean skip = true;
       boolean lastLineEmpty = false;
-      boolean licenseTextAdded = false;
-      boolean thirdparty = false;
-      int lineNumber = 0;
 
       while ((line = reader.readLine()) != null) {
-        if (lineNumber == 0 && line.startsWith("// #THIRDPARTY#")) {
-          thirdparty = true;
-          skip = false;
-        }
-        lineNumber++;
-
-        if (line.trim().startsWith("package ") || line.trim().startsWith("import ")) {
-          if (!licenseTextAdded) {
-            if (!thirdparty) {
-              writeLicenseHeader(writer, newLine);
-            }
-            licenseTextAdded = true;
-          }
-          skip = false;
-        }
-
-        if (skip) {
-          continue;
-        }
-
         String canonicalizedLine = canonicalizeLine(line);
         boolean addThisLine = true;
         if (canonicalizedLine.isEmpty()) {
@@ -398,17 +374,6 @@ public class CanonicalizeCode {
     }
 
     return new byte[]{'\n'};
-  }
-
-  private static void writeLicenseHeader(OutputStream out, byte[] newLine)
-      throws IOException {
-    for (byte[] line : headerLines) {
-      if (line.length > 0) {
-        out.write(line);
-      }
-      out.write(newLine);
-    }
-    out.write(newLine);
   }
 
   private static void writeLine(OutputStream out, byte[] newLine, String line)
