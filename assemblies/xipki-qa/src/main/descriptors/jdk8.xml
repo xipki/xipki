@@ -187,6 +187,12 @@
       <destName>ctlog.war</destName>
       <fileMode>0644</fileMode>
     </file>
+    <file>
+      <source>${project.build.directory}/webapps/dummy-crl-server.war</source>
+      <outputDirectory>xipki/webapps</outputDirectory>
+      <destName>crl.war</destName>
+      <fileMode>0644</fileMode>
+    </file>
   </files>
 
 </assembly>

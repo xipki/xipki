@@ -87,18 +87,31 @@ public class DefaultCurl implements Curl {
           throws Exception {
     checkUserPassword(userPassword);
 
-    return curl(false, url, verbose, headers, userPassword, null);
+    return curlGet(url, null, verbose, headers, userPassword);
+  }
+
+  @Override
+  public CurlResult curlGet(String url, OutputStream respContentStream,
+      boolean verbose, Map<String, String> headers, String userPassword) throws Exception {
+    return curl(false, url, respContentStream, verbose, headers, userPassword, null);
   }
 
   @Override
   public CurlResult curlPost(String url, boolean verbose, Map<String, String> headers,
       String userPassword, byte[] content)
           throws Exception {
-    return curl(true, url, verbose, headers, userPassword, content);
+    return curlPost(url, null, verbose, headers, userPassword, content);
   }
 
-  private CurlResult curl(boolean post, String url, boolean verbose, Map<String, String> headers,
-      String userPassword, byte[] content)
+  @Override
+  public CurlResult curlPost(String url, OutputStream respContentStream,
+      boolean verbose, Map<String, String> headers, String userPassword, byte[] content)
+          throws Exception {
+    return curl(true, url, respContentStream, verbose, headers, userPassword, content);
+  }
+
+  private CurlResult curl(boolean post, String url, OutputStream respContentStream,
+      boolean verbose, Map<String, String> headers, String userPassword, byte[] content)
           throws Exception {
     if (!post && content != null) {
       throw new IllegalArgumentException("method GET cannot be used to transfer non-empty content");
@@ -196,7 +209,18 @@ public class DefaultCurl implements Curl {
       CurlResult result = new CurlResult();
       result.setContentType(httpConn.getHeaderField("Content-Type"));
       if (inputStream != null) {
-        result.setContent(IoUtil.read(inputStream));
+        if (respContentStream == null) {
+          result.setContent(IoUtil.read(inputStream));
+        } else {
+          byte[] buffer = new byte[8192];
+          int read;
+          int contentLength = 0;
+          while ((read = inputStream.read(buffer)) != -1) {
+            contentLength += read;
+            respContentStream.write(buffer, 0, read);
+          }
+          result.setContentLength(contentLength);
+        }
       } else if (errorStream != null) {
         result.setErrorContent(IoUtil.read(errorStream));
       }

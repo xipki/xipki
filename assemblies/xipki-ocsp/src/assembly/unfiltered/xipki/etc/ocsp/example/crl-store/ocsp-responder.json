@@ -68,6 +68,7 @@
 		"minNextUpdatePeriod":"1d",
 		"unknownCertBehaviour":"good",
 		"updateInterval":"10m",
+		"startupDelay":5,
 		"source":{
 			"datasource":"datasource1",
 			"type":"crl",

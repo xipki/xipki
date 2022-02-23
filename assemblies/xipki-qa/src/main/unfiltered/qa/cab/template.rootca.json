@@ -81,7 +81,7 @@
 					"http://myorg.org/rootca1.der"
 				],
 				"crlUris":[
-					"http://rootca.myorg.org/crl"
+					"http://localhost:8080/crl/?type=crl&name=rootca1"
 				],
 				"ocspUris":[
 					"http://localhost:8080/ocsp/responder1"

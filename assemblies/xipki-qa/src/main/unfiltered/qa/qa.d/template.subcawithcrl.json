@@ -15,10 +15,10 @@
 					"http://myorg.org/subcawithcrl1.der"
 				],
 				"crlUris":[
-					"http://subcawithcrl.myorg.org/crl"
+					"http://localhost:8080/crl/?type=crl&name=subcawithcrl1"
 				],
 				"deltaCrlUris":[
-					"http://subcawithcrl.myorg.org/deltacrl"
+					"http://localhost:8080/crl/?type=deltacrl&name=subcawithcrl1"
 				],
 				"ocspUris":[
 					"http://localhost:8080/ocsp/responder2"

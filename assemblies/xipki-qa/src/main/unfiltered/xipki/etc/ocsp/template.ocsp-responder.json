@@ -134,6 +134,7 @@
 		"retentionInterval":0,
 		"minNextUpdatePeriod":"1d",
 		"updateInterval":"10m",
+		"startupDelay":1,
 		"source":{
 			"datasource":"datasource-crl",
 			"type":"crl",

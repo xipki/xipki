@@ -82,8 +82,9 @@ ca:gen-rootca \
   --signer-conf "$CA_SIGNER_CONF" \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://myorg.org/rootca1.der \
-  --crl-uri http://rootca.myorg.org/crl \
+  --crl-uri "http://localhost:8080/crl/?type=crl&name=rootca1" \
   --cmp-control "send.ca=true,send.certchain=false,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA:SM3withSM2" \
+  --crl-control "interval.hours=24,fullcrl.intervals=90,overlap=90d,interval.time=02:00" \
   --cmp-responder responder1 \
   --validity-mode cutoff \
   --support-cmp yes --support-rest yes \
@@ -373,8 +374,8 @@ ca:ca-add \
   --signer-conf "$CA_SIGNER_CONF" \
   --ocsp-uri http://localhost:8080/ocsp/responder2 \
   --ca-cert-uri http://myorg.org/subcawithcrl1.der \
-  --crl-uri http://subcawithcrl.myorg.org/crl \
-  --deltacrl-uri http://subcawithcrl.myorg.org/deltacrl \
+  --crl-uri "http://localhost:8080/crl/?type=crl&name=subcawithcrl1" \
+  --deltacrl-uri "http://localhost:8080/crl/?type=deltacrl&name=subcawithcrl1" \
   --cmp-control "send.ca=true,send.certchain=false,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA:SM3withSM2" \
   --crl-control "interval.hours=24,fullcrl.intervals=7,overlap=3d,interval.time=02:00" \
   --scep-control "cacert.included=true,certchain.included=false,signercert.included=true,support.getcrl=true" \

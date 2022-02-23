@@ -39,7 +39,7 @@ import org.xipki.util.*;
 
 import java.io.*;
 import java.math.BigInteger;
-import java.nio.file.Files;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.sql.*;
@@ -103,9 +103,11 @@ class ImportCrl {
 
     private final File crlDir;
 
+    private final boolean crlDownloded;
+
     private final boolean updateMe;
 
-    private String base64Sha1Fp;
+    private String cacertFp;
 
     private CertRevocationInfo revocationinfo;
 
@@ -113,12 +115,20 @@ class ImportCrl {
 
     private final boolean deleteMe;
 
-    CrlDirInfo(int crlId, String crlName, File crlDir, boolean updateMe, boolean deleteMe) {
+    private final File updatemeFile;
+
+    private final File crlFile;
+
+    CrlDirInfo(int crlId, String crlName, File crlDir, boolean updateMe, boolean deleteMe,
+               boolean crlDownloaded, File updatemeFile, File crlFile) {
       this.crlId = crlId;
       this.crlName = crlName;
       this.crlDir = crlDir;
       this.updateMe = updateMe;
       this.deleteMe = deleteMe;
+      this.crlDownloded = crlDownloaded;
+      this.updatemeFile = updatemeFile;
+      this.crlFile = crlFile;
     }
 
   } // class CrlDirInfo
@@ -270,7 +280,13 @@ class ImportCrl {
         return false;
       }
 
-      File updatemeFile = new File(crlDir, "UPDATEME");
+      boolean crlDownloaded = new File(crlDir, "crl.download").exists();
+      File generatedDir = new File(crlDir, ".generated");
+      File updatemeFile = new File(crlDownloaded ? generatedDir : crlDir,
+              "UPDATEME");
+      File crlFile = crlDownloaded ? new File(generatedDir, "new-ca.crl")
+              : new File(crlDir, "ca.crl");
+
       if (!updatemeFile.exists()) {
         // no change
         continue;
@@ -285,11 +301,9 @@ class ImportCrl {
       CertRevocationInfo caRevInfo = null;
       File revFile = new File(crlDir, "REVOCATION");
       if (revFile.exists()) {
-        Properties props = new Properties();
+        Properties props;
         try {
-          try (InputStream is = Files.newInputStream(revFile.toPath())) {
-            props.load(is);
-          }
+          props = CrlDbCertStatusStore.loadProperties(revFile);
         } catch (IOException ex) {
           LOG.error("error reading " + revFile.getPath(), ex);
           return false;
@@ -310,19 +324,19 @@ class ImportCrl {
         }
       }
 
-      String base64Sha1Fp;
+      String cacertFp;
       try {
         byte[] derCertBytes = X509Util.toDerEncoded(IoUtil.read(caCertFile));
-        base64Sha1Fp = HashAlgo.SHA1.base64Hash(derCertBytes);
+        cacertFp = HashAlgo.SHA1.hexHash(derCertBytes);
       } catch (IOException ex) {
         LOG.error("error reading " + caCertFile.getPath(), ex);
         return false;
       }
 
-      boolean updateMe = new File(crlDir, "UPDATEME").exists();
       boolean deleteMe = new File(crlDir, "DELETEME").exists();
-      CrlDirInfo crlDirInfo = new CrlDirInfo(crlId, crlName, crlDir, updateMe, deleteMe);
-      crlDirInfo.base64Sha1Fp = base64Sha1Fp;
+      CrlDirInfo crlDirInfo = new CrlDirInfo(crlId, crlName, crlDir, true, deleteMe,
+              crlDownloaded, updatemeFile, crlFile);
+      crlDirInfo.cacertFp = cacertFp;
       crlDirInfo.revocationinfo = caRevInfo;
       crlDirInfos.add(crlDirInfo);
     }
@@ -333,8 +347,8 @@ class ImportCrl {
       if (m.deleteMe || m.revocationinfo != null) {
         // make sure that CA to be deleted or revoked CA is not specified in two different folders
         for (CrlDirInfo n : crlDirInfos) {
-          if (m != n && m.base64Sha1Fp.equals(n.base64Sha1Fp)) {
-            LOG.error("{} and {} specify duplicatedly a revoked CA certificate.",
+          if (m != n && m.cacertFp.equals(n.cacertFp)) {
+            LOG.error("{} and {} specify repeatedly a revoked CA certificate.",
                 crlDir.getPath(), n.crlDir.getPath());
             return false;
           }
@@ -342,9 +356,8 @@ class ImportCrl {
       } else {
         // make sure that unrevoked CA to be updated has the file ca.crl.
         if (m.updateMe) {
-          File crlFile = new File(crlDir, "ca.crl");
-          if (!(crlFile.exists() && crlFile.isFile())) {
-            LOG.error("{} has UPDATEME but no ca.crl", crlDir.getPath());
+          if (!(m.crlFile.exists() && m.crlFile.isFile())) {
+            LOG.error("{} has UPDATEME but no " + m.crlFile.getName(), crlDir.getPath());
             return false;
           }
         }
@@ -352,7 +365,7 @@ class ImportCrl {
 
       boolean shareCaWithOtherCrl = false;
       for (CrlDirInfo n : crlDirInfos) {
-        if (m != n && m.base64Sha1Fp.equals(n.base64Sha1Fp)) {
+        if (m != n && m.cacertFp.equals(n.cacertFp)) {
           shareCaWithOtherCrl = true;
           break;
         }
@@ -422,15 +435,18 @@ class ImportCrl {
   } // method importCrlToOcspDb
 
   private void importCrl(Connection conn, CrlDirInfo crlDirInfo) {
+    File crlDir = crlDirInfo.crlDir;
+    File generatedDir = new File(crlDir, ".generated");
+    generatedDir.mkdirs();
+
     // Delete the files UPDATE.SUCC and UPDATE.FAIL
-    IoUtil.deleteFile(new File(crlDirInfo.crlDir, "UPDATEME.SUCC"));
-    IoUtil.deleteFile(new File(crlDirInfo.crlDir, "UPDATEME.FAIL"));
+    IoUtil.deleteFile(new File(generatedDir, "UPDATEME.SUCC"));
+    IoUtil.deleteFile(new File(generatedDir, "UPDATEME.FAIL"));
 
     long startTimeSec = System.currentTimeMillis() / 1000;
 
     int id = crlDirInfo.crlId;
     String crlName = crlDirInfo.crlName;
-    File crlDir = crlDirInfo.crlDir;
 
     boolean updateSucc = false;
     CertWrapper caCert = null;
@@ -439,7 +455,7 @@ class ImportCrl {
       LOG.info("Importing CRL (id={}, name={}) in the folder {}",
           id, crlName, crlDir.getPath());
 
-      File caCertFile = new File(crlDirInfo.crlDir, "ca.crt");
+      File caCertFile = new File(crlDir, "ca.crt");
       try {
         X509Cert cert = X509Util.parseCert(caCertFile);
         caCert = new CertWrapper(cert);
@@ -452,7 +468,7 @@ class ImportCrl {
       CrlInfo crlInfo = null;
 
       if (!crlDirInfo.deleteMe && crlDirInfo.revocationinfo == null) {
-        crl = new CrlStreamParser(new File(crlDir, "ca.crl"));
+        crl = new CrlStreamParser(crlDirInfo.crlFile);
         Date now = new Date();
         if (crl.getNextUpdate() != null && crl.getNextUpdate().before(now)) {
           if (ignoreExpiredCrls) {
@@ -495,14 +511,26 @@ class ImportCrl {
         }
 
         LOG.info("The CRL is a {}", crl.isDeltaCrl() ? "DeltaCRL" : "FullCRL");
-
+        File urlFile = new File(basedir, "crl.url");
         // Construct CrlID
         ASN1EncodableVector vec = new ASN1EncodableVector();
-        File urlFile = new File(basedir, "crl.url");
-        if (urlFile.exists()) {
-          String crlUrl = StringUtil.toUtf8String(IoUtil.read(urlFile)).trim();
-          if (StringUtil.isNotBlank(crlUrl)) {
-            vec.add(new DERTaggedObject(true, 0, new DERIA5String(crlUrl, true)));
+        if (crlDirInfo.crlDownloded) {
+          File crlDownloadFile = new File(basedir, "crl.download");
+          Properties props = CrlDbCertStatusStore.loadProperties(crlDownloadFile);
+          String crldp = props.getProperty("crldp");
+          if (StringUtil.isNotBlank(crldp)) {
+            vec.add(new DERTaggedObject(true, 0, new DERIA5String(crldp, true)));
+          }
+
+          if (urlFile.exists()) {
+            LOG.warn("use {} only, ignore {}", crlDownloadFile.getPath(), urlFile.getPath());
+          }
+        } else {
+          if (urlFile.exists()) {
+            String crlUrl = StringUtil.toUtf8String(IoUtil.read(urlFile)).trim();
+            if (StringUtil.isNotBlank(crlUrl)) {
+              vec.add(new DERTaggedObject(true, 0, new DERIA5String(crlUrl, true)));
+            }
           }
         }
 
@@ -527,8 +555,8 @@ class ImportCrl {
         } else {
           CrlInfo oldCrlInfo = new CrlInfo(str);
           if (crlNumber.compareTo(oldCrlInfo.getCrlNumber()) < 0) {
-            // It is permitted if the CRL number equals to the one in Database,
-            // which enables the resume of importing process if error occurred.
+            // It is permitted if the CRL number equals to the one in Database.
+            // This enables the resume of importing process if error occurred.
             LOG.error("Given CRL is older than existing CRL, ignore it");
             return;
           }
@@ -583,6 +611,18 @@ class ImportCrl {
         }
       }
 
+      if (crlDirInfo.crlDownloded) {
+        crlDirInfo.crlFile.renameTo(new File(generatedDir, "ca.crl"));
+        File newCrlFpFile = new File(generatedDir, "new-ca.crl.fp");
+        String hashInfo = new String(IoUtil.read(newCrlFpFile));
+        String info = "crlnumber=" + crlInfo.getCrlNumber().toString()
+                + "\nnextupdate=" + DateUtil.toUtcTimeyyyyMMddhhmmss(crlInfo.getNextUpdate())
+                + "\nhash=" + hashInfo;
+        IoUtil.save(new File(generatedDir, "ca.crl.info"),
+                info.getBytes(StandardCharsets.UTF_8));
+        newCrlFpFile.delete();
+      }
+
       updateSucc = true;
       LOG.info("Imported CRL (id={}) in the folder {}", id, crlDir.getPath());
     } catch (Throwable th) {
@@ -597,18 +637,22 @@ class ImportCrl {
             id, crlDir.getPath()), th);
       }
 
-      File updatemeFile = new File(crlDirInfo.crlDir, "UPDATEME");
-      updatemeFile.setLastModified(System.currentTimeMillis());
-      updatemeFile.renameTo(new File(updatemeFile.getPath() + (updateSucc ? ".SUCC" : ".FAIL")));
+      crlDirInfo.updatemeFile.setLastModified(System.currentTimeMillis());
+      crlDirInfo.updatemeFile.renameTo(
+              new File(generatedDir, "UPDATEME." + (updateSucc ? "SUCC" : "FAIL")));
       if (!updateSucc && caCert != null) {
         if (!crlDirInfo.shareCaWithOtherCrl && caCert.databaseId != null) {
-          // try to delete the issuer if there is not certificate associated with it
+          // try to delete the issuer if no certificate is associated with it
           try {
             datasource.deleteFromTableWithException(conn, "ISSUER", "ID", caCert.databaseId);
           } catch (Throwable th) {
             LOG.warn("error deleting from table ISSUER for ID {}", caCert.databaseId);
           }
         }
+      }
+
+      if (!updateSucc && crlDirInfo.crlDownloded & crlDirInfo.crlFile.exists()) {
+        crlDirInfo.crlFile.renameTo(new File(generatedDir, "INVALID-new-ca.crl"));
       }
     }
   } // method importCrl

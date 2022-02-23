@@ -67,8 +67,10 @@ certprofile-*.jar,\
 datasource-*.jar,\
 fastjson-*.jar,\
 HikariCP-*.jar,\
+license-*,jar,\
 log4j-*.jar,\
 mariadb-java-client-*.jar,\
+ocsp-*.jar,\
 password-*.jar,\
 postgresql-*.jar,\
 scep-client-*.jar,\

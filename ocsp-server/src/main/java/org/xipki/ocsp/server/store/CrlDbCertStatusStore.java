@@ -17,18 +17,23 @@
 
 package org.xipki.ocsp.server.store;
 
+import org.bouncycastle.crypto.ExtendedDigest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.ocsp.api.OcspStoreException;
-import org.xipki.util.IoUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.StringUtil;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.asn1.CrlStreamParser;
+import org.xipki.util.*;
+import org.xipki.util.http.SslContextConf;
 
-import java.io.File;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.xipki.util.Args.notNull;
@@ -47,7 +52,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     @Override
     public void run() {
       try {
-        updateStore(false);
+        updateStore();
       } catch (Throwable th) {
         LogUtil.error(LOG, th, "error while calling initializeStore() for store " + name);
       }
@@ -55,13 +60,79 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
 
   } // class CrlUpdateService
 
+  private static class CompositeOutputStream extends OutputStream {
+
+    private final ExtendedDigest digest;
+
+    private byte[] hashValue;
+
+    private final OutputStream outputStream;
+
+    public CompositeOutputStream(HashAlgo hashAlgo, OutputStream outputStream) {
+      this.digest = hashAlgo == null ? null : hashAlgo.createDigest();
+      this.outputStream = outputStream;
+    }
+
+    @Override
+    public void write(byte[] b) throws IOException {
+      if (digest != null) {
+        digest.update(b, 0, b.length);
+      }
+      outputStream.write(b);
+    }
+
+    @Override
+    public void write(byte[] b, int off, int len) throws IOException {
+      if (digest != null) {
+        digest.update(b, off, len);
+      }
+      outputStream.write(b, off, len);
+    }
+
+    @Override
+    public void flush() throws IOException {
+      outputStream.flush();
+    }
+
+    @Override
+    public void close() throws IOException {
+      outputStream.close();
+    }
+
+    @Override
+    public void write(int i) throws IOException {
+      if (digest != null) {
+        digest.update((byte) i);
+      }
+      outputStream.write(i);
+    }
+
+    public byte[] getHashValue() {
+      if (digest == null) {
+        return null;
+      }
+      if (hashValue == null) {
+        byte[] t = new byte[digest.getDigestSize()];
+        digest.doFinal(t, 0);
+        this.hashValue = t;
+      }
+      return hashValue;
+    }
+  }
+
   private static final Logger LOG = LoggerFactory.getLogger(CrlDbCertStatusStore.class);
+
+  private static final String CT_PKIX_CRL = "application/pkix-crl";
 
   private final CrlUpdateService storeUpdateService = new CrlUpdateService();
 
   private final Object lock = new Object();
 
   private final AtomicBoolean crlUpdateInProcess = new AtomicBoolean(false);
+
+  private final ConcurrentHashMap<String, Curl> curls = new ConcurrentHashMap<>();
+
+  private final ConcurrentHashMap<String, Long> curlsConfLastModified = new ConcurrentHashMap<>();
 
   private String dir;
 
@@ -70,6 +141,10 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
   private boolean ignoreExpiredCrls;
 
   private boolean crlUpdated;
+
+  private boolean firstTime = true;
+
+  private Map<String, ?> sourceConf;
 
   /**
    * Initialize the store.
@@ -91,7 +166,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
    */
   public void init(Map<String, ?> sourceConf, DataSourceWrapper datasource)
       throws OcspStoreException {
-    notNull(sourceConf, "sourceConf");
+    this.sourceConf = notNull(sourceConf, "sourceConf");
 
     // check the dir
     this.dir = IoUtil.expandFilepath(getStrValue(sourceConf, "dir", true), true);
@@ -131,8 +206,14 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     this.ignoreExpiredCrls = StringUtil.isBlank(value) || Boolean.parseBoolean(value);
 
     super.datasource = datasource;
-    updateStore(true);
-    super.init(sourceConf, datasource);
+
+    value = getStrValue(sourceConf, "startupDelay", false);
+    int startupDelaySeconds = value == null ? 5 : Integer.parseInt(value);
+    // so that the ocsp service (tomcat) can start without blocking.
+    Runnable runnable = () -> updateStore();
+    ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
+    executor.schedule(runnable, startupDelaySeconds, TimeUnit.SECONDS);
+    executor.shutdown();
   } // method init
 
   private static String getStrValue(Map<String, ?> sourceConf,
@@ -169,7 +250,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     return crlUpdated && super.isInitialized();
   }
 
-  private void updateStore(boolean firstTime) {
+  private void updateStore() {
     if (crlUpdateInProcess.get()) {
       return;
     }
@@ -178,20 +259,51 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
       crlUpdateInProcess.set(true);
       try {
         File[] subDirs = new File(dir).listFiles();
-        boolean updateMe = false;
+        boolean withValidSubDirs = false;
         if (subDirs != null) {
           for (File subDir : subDirs) {
-            if (!subDir.isDirectory()) {
-              continue;
+            if (subDir.isDirectory() && subDir.getName().startsWith("crl-")) {
+              new File(subDir, ".generated").mkdirs();
+              withValidSubDirs = true;
             }
+          }
+        }
 
-            String dirName = subDir.getName();
-            if (dirName.startsWith("crl-")) {
-              if (new File(subDir, "UPDATEME").exists()) {
-                updateMe = true;
-                break;
-              }
-            }
+        if (!withValidSubDirs) {
+          return;
+        }
+
+        // Download CRL
+        List<File> downloadDirs = new ArrayList<>();
+        for (File subDir : subDirs) {
+          if (!(subDir.isDirectory() && subDir.getName().startsWith("crl-"))) {
+            continue;
+          }
+
+          // CRL will not be download by OCSP responder.
+          if (!new File(subDir, "crl.download").exists()) {
+            continue;
+          }
+
+          downloadDirs.add(subDir);
+          try {
+            downloadCrl(subDir);
+          } catch (Exception ex) {
+            LogUtil.error(LOG, ex, "error downloading CRL for path " + subDir.getPath());
+          }
+        }
+
+        boolean updateMe = false;
+        for (File subDir : subDirs) {
+          if (!(subDir.isDirectory() && subDir.getName().startsWith("crl-"))) {
+            continue;
+          }
+
+          boolean isDownloadDir = downloadDirs.contains(subDir);
+          File dir = isDownloadDir ? new File(subDir, ".generated") : subDir;
+          if (new File(dir, "UPDATEME").exists()) {
+            updateMe = true;
+            break;
           }
         }
 
@@ -208,7 +320,10 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
           LOG.error("updating CertStore {} failed", name);
         }
 
-        if (!firstTime) {
+        if (firstTime) {
+          super.init(sourceConf, datasource);
+          firstTime = false;
+        } else {
           super.updateIssuerStore(true);
         }
       } catch (Throwable th) {
@@ -219,5 +334,196 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
       }
     } // end lock
   } // method updateStore
+
+  // Download CRL
+  private void downloadCrl(File subDir) throws Exception {
+    if (new File(subDir, "REMOVEME").exists()) {
+      // CA is removed, no download will be processed.
+      return;
+    }
+
+    Properties revocationProps = loadProperties(new File(subDir, "REVOCATION"));
+    if (null != revocationProps.getProperty("ca.revocation.time")) {
+      // CA is revoked, no download will be processed.
+      return;
+    }
+
+    File generatedDir = new File(subDir, ".generated");
+
+    File updatemeFile = new File(generatedDir, "UPDATEME");
+    if (updatemeFile.exists()) {
+      // the last CRL is waiting for the processing
+      return;
+    }
+
+    File crlInfoFile = new File(generatedDir, "ca.crl.info");
+    Date nextUpdate;
+    BigInteger crlNumber = null;
+
+    File crlDownloadFile = new File(subDir, "crl.download");
+    File updateMeNowFile = new File(subDir, "UPDATEME_NOW");
+
+    boolean downloadCrl = false;
+    String hashAlgo = null;
+    byte[] hashValue = null;
+    if (!crlInfoFile.exists()) {
+      // no CRL is available
+      downloadCrl = true;
+    } else if (updateMeNowFile.exists()) {
+      // force download
+      downloadCrl = true;
+    } else {
+      // Check if there exists fresher CRL
+      Properties props = loadProperties(crlInfoFile);
+      nextUpdate = DateUtil.parseUtcTimeyyyyMMddhhmmss(props.getProperty("nextupdate"));
+      crlNumber = new BigInteger(props.getProperty("crlnumber"));
+      String[] tokens = props.getProperty("hash").split(" ");
+      hashAlgo = tokens[0];
+      hashValue = Hex.decode(tokens[1]);
+
+      props = loadProperties(crlDownloadFile);
+      Validity validity = Validity.getInstance(props.getProperty("download.before.nextupdate"));
+      if (validity.getValidity() < 1) {
+        LOG.error("invalid download.before.nextupdate {}", validity);
+      } else {
+        if (validity.add(new Date()).after(nextUpdate)) {
+          downloadCrl = true;
+        }
+      }
+    }
+
+    if (!downloadCrl) {
+      return;
+    }
+
+    Properties props = loadProperties(crlDownloadFile);
+    String downloadUrl = props.getProperty("download.url");
+    if (downloadUrl == null) {
+      downloadUrl = props.getProperty("crldp");
+    }
+
+    if (StringUtil.isBlank(downloadUrl)) {
+      LOG.error("Neither download.url nor crldp in {} is specified, skip it",
+              crlDownloadFile.getPath());
+      return;
+    }
+
+    String str = props.getProperty("download.fp.url");
+
+    String hashUrl = null;
+    if (str != null) {
+      String[] tokens = str.split(" ");
+      if (hashValue != null && !hashAlgo.equalsIgnoreCase(tokens[0])) {
+        // ignore the stored hash value
+        hashValue = null;
+      }
+      hashAlgo = tokens[0];
+      hashUrl = tokens[1];
+    }
+
+    String subDirPath = subDir.getPath();
+    Curl curl = curls.get(subDirPath);
+
+    File truststoreFile = new File(subDir, "tls-truststore.p12");
+    if (truststoreFile.exists()) {
+      if (curl != null) {
+        long lastModified = curlsConfLastModified.get(subDirPath);
+        if (truststoreFile.lastModified() != lastModified) {
+          curl = null;
+          curlsConfLastModified.remove(subDirPath);
+          curls.remove(subDirPath);
+        }
+      }
+
+      if (curl == null) {
+        SslContextConf sslContextConf = new SslContextConf();
+        sslContextConf.setSslTruststore(truststoreFile.getPath());
+        sslContextConf.setSslTruststorePassword(props.getProperty("truststore.password"));
+        curl = new DefaultCurl(sslContextConf);
+        curls.put(subDirPath, curl);
+        curlsConfLastModified.put(subDirPath, truststoreFile.lastModified());
+      }
+    } else {
+      if (curl == null) {
+        curl = new DefaultCurl(null);
+        curls.put(subDirPath, curl);
+        curlsConfLastModified.put(subDirPath, 0L);
+      }
+    }
+
+    // download the fingerprint if download.fp.url is specified
+    if (hashUrl != null) {
+      Curl.CurlResult downResult = curl.curlGet(hashUrl, false, null, null);
+      if (downResult.getContentLength() > 0 && Arrays.equals(hashValue, downResult.getContent())) {
+        LOG.info("Fingerprint of the CRL has not changed, skip downloading CRL");
+        return;
+      }
+    }
+
+    File tmpCrlFile = new File(generatedDir, "tmp-ca.crl");
+
+    CompositeOutputStream crlStream = new CompositeOutputStream(
+            hashAlgo == null ? null : HashAlgo.getInstance(hashAlgo),
+            new FileOutputStream(tmpCrlFile));
+
+    Curl.CurlResult downResult;
+    try {
+      downResult = curl.curlGet(downloadUrl, crlStream, false, null, null);
+    } finally {
+      crlStream.close();
+    }
+    String contentType = downResult.getContentType();
+
+    if (!CT_PKIX_CRL.equals(contentType)) {
+      LOG.error("Downloading CRL failed, expected content type {}, but received {}",
+              CT_PKIX_CRL, contentType);
+      return;
+    }
+
+    if (downResult.getContentLength() < 10) {
+      byte[] errorContent = downResult.getErrorContent();
+      if (errorContent == null) {
+        LOG.error("Downloading CRL failed, CRL too short (len={}): ",
+                downResult.getContentLength());
+      } else {
+        LOG.error("Downloading CRL failed with error: {}", new String(errorContent));
+      }
+      return;
+    }
+
+    // Extract CRLNumber from the CRL
+    CrlStreamParser newCrlStreamParser = new CrlStreamParser(tmpCrlFile);
+    BigInteger newCrlNumber = newCrlStreamParser.getCrlNumber();
+
+    boolean useNewCrl = crlNumber == null || newCrlNumber.compareTo(crlNumber) > 0;
+    if (useNewCrl) {
+      String hashProp = hashAlgo + " " + Hex.encode(crlStream.getHashValue());
+      IoUtil.save(new File(generatedDir, "new-ca.crl.fp"),
+              hashProp.getBytes(StandardCharsets.UTF_8));
+      tmpCrlFile.renameTo(new File(generatedDir, "new-ca.crl"));
+      if (crlNumber == null) {
+        LOG.info("Downloaded CRL at first time");
+      } else {
+        LOG.info("Downloaded CRL is newer than existing one");
+      }
+      // notify the change
+      updatemeFile.createNewFile();
+    } else {
+      tmpCrlFile.delete();
+      LOG.info("Downloaded CRL is not newer than existing one");
+    }
+
+    updateMeNowFile.delete();
+  }
+
+  static Properties loadProperties(File file) throws IOException {
+    Properties props = new Properties();
+    if (file.exists() && file.isFile()) {
+      try (InputStream is = new FileInputStream(file)) {
+        props.load(is);
+      }
+    }
+    return props;
+  }
 
 }

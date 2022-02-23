@@ -20,3 +20,7 @@
 1. Choose the project
 2. Right click and choose 'Checkstyle'
 3. Choose 'Actvate Checkstyle'
+
+===== GUI ======
+Example of RedHat Certificate System
+https://access.redhat.com/documentation/en-us/red_hat_certificate_system/10

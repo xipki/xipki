@@ -32,6 +32,12 @@
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
+    <dependency>
+      <groupId>org.xipki.example</groupId>
+      <artifactId>dummy-crl-server</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
   </dependencies>
   <build>
     <resources>
@@ -87,6 +93,12 @@
                 <artifactItem>
                   <groupId>org.xipki.example</groupId>
                   <artifactId>dummy-ctlog-server</artifactId>
+                  <version>${project.version}</version>
+                  <type>war</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki.example</groupId>
+                  <artifactId>dummy-crl-server</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                 </artifactItem>

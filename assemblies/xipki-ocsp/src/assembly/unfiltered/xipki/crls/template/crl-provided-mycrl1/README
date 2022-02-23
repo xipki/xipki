@@ -1,15 +1,10 @@
-- File system structure
+- File system structure for CRL which is provided via out-of-band mechanism.
     |
     +-- UPDATEME (file, required for first time and on every change)
     |     If present, it indicates that content of this folder is changed.
-    |
-    +-- ca.crt (file, required)
-    |     CA certificate. Either DER or PEM encoded.
-    |
-    +-- crl.url (file, optional)
-    |     If present, contains a line of the URL of the CRL.
-    |     Note that it will only be used to construct the CrlID in the OCSP
-    |     response, not to download the CRL.
+    |     - If the CRL will be downloaded, this file will be created
+    |       automatically when the download has been finished;
+    |     - Otherwise this file must be created via other method.
     |
     +-- REMOVEME (file, optional)
     |     Indicates that the CA shall be removed from the database.
@@ -20,12 +15,22 @@
     |     If there are multiple CRLs for the same CA certificate, only one of
     |     the REVOCATION file of revoked CA certificate will be considered.
     |
-    +-- issuer.crt (file, required for indirect CRL)
-    |     If present, it specifies the CRL's issuer certificate.
+    +-- ca.crt (file, required)
+    |     CA certificate. Either DER or PEM encoded.
     |
     +-- ca.crl (file, optional)
     |     DER encoded CRL file.
-    |     Will be ignored if the CA is revoked, otherwise required.
+    |     - Will be ignored if the CA is revoked, otherwise required.
+    |
+    +-- ca.crl.info (file, will be generated automatically)
+    |     Meta data of the CRL contained in the file ca.crl.
+    |
+    +-- issuer.crt (file, required for indirect CRL)
+    |     If present, it specifies the CRL's issuer certificate.
+    |
+    +-- crl.url (file, optional)
+    |     - If present, contains a line of the URL of the CRL.
+    |     - It will be used to construct the CrlID in the OCSP response.
     |
     +-- certs (directory, optional)
         Contains all certificates that are valid at current time

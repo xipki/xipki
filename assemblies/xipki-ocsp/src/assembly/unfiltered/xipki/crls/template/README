@@ -4,3 +4,8 @@
    |     This file, just for information.
    |
    +-- crl-<name> (folder, e.g. crl-mycrl1, one for each CRL)
+       Two examples are contained.
+       - Folder crl-download-mycrl2 (name is download-mycrl2)
+         CRL will be downloaded automatically.
+       - Folder crl-provided-mycrl1 (name is download-mycrl1)
+         CRL will be provided via out-of-band mechanism.

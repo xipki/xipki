@@ -3,8 +3,8 @@ echo "#                              OCSP                             #"
 echo "#################################################################"
 URL_CRL = http://localhost:8080/ocsp/responder2
 
-echo "Sleeping 1 second"
-sleep 1
+echo "Sleeping 5 seconds"
+sleep 5
 
 list = [http://localhost:8080/ocsp/responder1 http://localhost:8080/ocsp/responder3]; each ($list) {
 
@@ -378,6 +378,17 @@ xiqa:qa-ocsp-status \
   --issuer output/subcawithcrl1.crt \
   --cert output/ocsp2.crt --sign \
   --exp-status keyCompromise \
+  --exp-certhash forbidden \
+  --exp-sig-alg $SIGALGO \
+  --url $URL_CRL \
+  --nonce \
+  --resp-issuer output/rootca1.crt
+
+echo "QA: Good (POST, downloaded CRL)"
+xiqa:qa-ocsp-status \
+  --issuer output/rootca1.crt \
+  --cert output/subca1.crt \
+  --exp-status good \
   --exp-certhash forbidden \
   --exp-sig-alg $SIGALGO \
   --url $URL_CRL \

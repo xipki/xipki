@@ -46,17 +46,22 @@ Deployment in Tomcat 8 and 9
 
 ```
 animal-sniffer-annotations*.jar,\
+audit-*.jar,\
 bcpkix-*.jar,\
 bcprov-*.jar,\
 bcutil-*.jar,\
+ca-*.jar,\
+certprofile-*.jar,\
 datasource-*.jar,\
 fastjson-*.jar,\
 HikariCP-*.jar,\
+license-*,jar,\
 log4j-*.jar,\
 mariadb-java-client-*.jar,\
 ocsp-*.jar,\
 password-*.jar,\
 postgresql-*.jar,\
+scep-client-*.jar,\
 security-*.jar,\
 slf4j-*.jar,\
 sunpkcs11-wrapper-*.jar,\

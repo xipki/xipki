@@ -266,13 +266,24 @@ if { $printUsage equals "true" } then {
   xi:copy-dir ${XIPKI_DIR}/crls/template \
     ${XIPKI_DIR}/crls/example-crls
 
-  xi:rm -f ${XIPKI_DIR}/crls/example-crls/crl-mycrl1/REVOCATION
+  # CRL will be provided via out-of-band mechanism
+
+  xi:rm -f ${XIPKI_DIR}/crls/example-crls/crl-provided-mycrl1/REVOCATION
 
   xi:copy-file -f output/subcawithcrl1.crt \
-    ${XIPKI_DIR}/crls/example-crls/crl-mycrl1/ca.crt
+    ${XIPKI_DIR}/crls/example-crls/crl-provided-mycrl1/ca.crt
 
   xi:copy-file -f output/subcawithcrl1.crl \
-    ${XIPKI_DIR}/crls/example-crls/crl-mycrl1/ca.crl
+    ${XIPKI_DIR}/crls/example-crls/crl-provided-mycrl1/ca.crl
+
+  # CRL will be downloaded by the OCSP responder
+  xi:rm -f ${XIPKI_DIR}/crls/example-crls/crl-download-mycrl2/REVOCATION
+
+  xi:copy-file -f output/rootca1.crt \
+    ${XIPKI_DIR}/crls/example-crls/crl-download-mycrl2/ca.crt
+
+  xi:copy-file -f qa/qa.d/rootca.crl.download \
+    ${XIPKI_DIR}/crls/example-crls/crl-download-mycrl2/crl.download
 
   if { $TOKEN_TYPE equals "pkcs11" } then {
     ocsp:refresh-token --type pkcs11
