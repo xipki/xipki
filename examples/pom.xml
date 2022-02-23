@@ -20,5 +20,6 @@
     <module>scep-example</module>
     <module>license-example</module>
     <module>dummy-ctlog-server</module>
+    <module>dummy-crl-server</module>
   </modules>
 </project>
