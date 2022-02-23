@@ -67,6 +67,7 @@
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
     <bundle>mvn:org.xipki/security-extra/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ca-mgmt-api/${project.version}</bundle>
     <bundle>mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
     <bundle>mvn:org.xipki/datasource/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-mgmt-client/${project.version}</bundle>

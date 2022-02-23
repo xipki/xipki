@@ -14,7 +14,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>ca-api</artifactId>
+      <artifactId>ca-mgmt-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

@@ -8,24 +8,19 @@
     <artifactId>xipki-parent</artifactId>
     <version>5.3.16-SNAPSHOT</version>
   </parent>
-  <artifactId>ca-mgmt-client</artifactId>
+  <artifactId>ca-mgmt-api</artifactId>
   <name>XiPKI :: ${project.artifactId}</name>
   <packaging>bundle</packaging>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>ca-mgmt-api</artifactId>
+      <artifactId>ca-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.alibaba</groupId>
-      <artifactId>fastjson</artifactId>
-      <version>${fastjson.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>datasource</artifactId>
-      <version>${project.version}</version>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>
