@@ -20,7 +20,6 @@
     <module>scep-client-shell</module>
     <module>ca-mgmt-shell</module>
     <module>ocsp-mgmt-shell</module>
-    <module>dbtool-shell</module>
     <module>qa-shell</module>
   </modules>
 </project>
