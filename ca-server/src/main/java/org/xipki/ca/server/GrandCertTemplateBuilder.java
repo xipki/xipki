@@ -191,7 +191,7 @@ class GrandCertTemplateBuilder {
     long time = caInfo.getNoNewCertificateAfter();
     if (grantedNotBefore.getTime() > time) {
       throw new OperationException(NOT_PERMITTED,
-          "CA is not permitted to issue certifate after " + new Date(time));
+          "CA is not permitted to issue certificate after " + new Date(time));
     }
 
     if (grantedNotBefore.before(caInfo.getNotBefore())) {
