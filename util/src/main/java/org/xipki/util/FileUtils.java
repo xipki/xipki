@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.shell;
+package org.xipki.util;
 
 import javax.security.auth.login.Configuration;
 import java.io.File;
@@ -33,7 +33,7 @@ import java.util.List;
  * @since 2.2.0
  */
 
-class FileUtils {
+public class FileUtils {
 
   private FileUtils() {
   }

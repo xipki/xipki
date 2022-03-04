@@ -194,6 +194,21 @@ public class IoUtil {
     return true;
   }
 
+  public static boolean deleteDir(File dir) {
+    return deleteDir(dir, false);
+  }
+
+  public static boolean deleteDir(File dir, boolean prependBaseDir) {
+    dir = expandFilepath(dir, prependBaseDir);
+    try {
+      FileUtils.deleteDirectory(dir);
+      return true;
+    } catch (IOException e) {
+      LogUtil.error(LOG, e);
+      return false;
+    }
+  }
+
   public static String expandFilepath(String path) {
     return expandFilepath(path, false);
   }

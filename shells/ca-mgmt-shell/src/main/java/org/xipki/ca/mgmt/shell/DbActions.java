@@ -23,6 +23,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
+import org.xipki.ca.mgmt.db.DbWorker;
 import org.xipki.ca.mgmt.db.diffdb.DigestDiffWorker;
 import org.xipki.ca.mgmt.db.port.DbPortWorker;
 import org.xipki.datasource.DataSourceFactory;
@@ -30,8 +31,11 @@ import org.xipki.password.PasswordResolver;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.Completers;
 import org.xipki.shell.XiAction;
+import org.xipki.util.Args;
+import org.xipki.util.StringUtil;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -47,24 +51,24 @@ import java.util.concurrent.TimeUnit;
  */
 public class DbActions {
 
-  public abstract static class DbPortAction extends XiAction {
+  public abstract static class DbAction extends XiAction {
 
     protected DataSourceFactory datasourceFactory;
 
     @Reference
     protected PasswordResolver passwordResolver;
 
-    public DbPortAction() {
+    public DbAction() {
       datasourceFactory = new DataSourceFactory();
     }
 
-    protected abstract DbPortWorker getDbPortWorker()
+    protected abstract DbWorker getDbWorker()
         throws Exception;
 
     protected Object execute0()
         throws Exception {
       ExecutorService executor = Executors.newFixedThreadPool(1);
-      DbPortWorker myRun = getDbPortWorker();
+      DbWorker myRun = getDbWorker();
       executor.execute(myRun);
 
       executor.shutdown();
@@ -87,11 +91,33 @@ public class DbActions {
       }
     } // method execute0
 
-  } // class DbPortAction
+  } // class DbAction
+
+  public abstract static class DbPortAction extends DbAction {
+
+    @Option(name = "--quorum", aliases = "-q", description = "quorum of the password parts, " +
+            "valid value is 0..10 (inclusive). 0 indicates no password will be applied.")
+    private Integer quorum = 0;
+
+    protected char[] readPassword() throws IOException {
+      Args.range(quorum, "mk", 0, 10);
+      if (quorum == 0) {
+        return null;
+      } else if (quorum == 1) {
+        return readPassword("Master password");
+      } else {
+        char[][] parts = new char[quorum][];
+        for (int i = 0; i < quorum; i++) {
+          parts[i] = readPassword("Master password (part " + (i + 1) + "/" + quorum + ")");
+        }
+        return StringUtil.merge(parts);
+      }
+    }
+  } // class DbAction
 
   @Command(scope = "ca", name = "diff-digest", description = "diff digest XiPKI database")
   @Service
-  public static class DiffDigest extends DbPortAction {
+  public static class DiffDigest extends DbAction {
 
     @Option(name = "--ref-db", required = true,
         description = "database configuration file of the reference system")
@@ -122,7 +148,8 @@ public class DbActions {
     @Completion(FileCompleter.class)
     private List<String> caCertFiles;
 
-    protected DbPortWorker getDbPortWorker()
+    @Override
+    protected DbWorker getDbWorker()
         throws Exception {
       Set<byte[]> caCerts = null;
       if (caCertFiles != null && !caCertFiles.isEmpty()) {
@@ -161,10 +188,10 @@ public class DbActions {
     private Boolean resume = Boolean.FALSE;
 
     @Override
-    protected DbPortWorker getDbPortWorker()
+    protected DbPortWorker getDbWorker()
         throws Exception {
       return new DbPortWorker.ExportCaDb(datasourceFactory, passwordResolver, dbconfFile, outdir,
-          resume, numCertsInBundle, numCertsPerCommit);
+          resume, numCertsInBundle, numCertsPerCommit, readPassword());
     }
 
   } // class ExportCa
@@ -191,10 +218,10 @@ public class DbActions {
     private Boolean resume = Boolean.FALSE;
 
     @Override
-    protected DbPortWorker getDbPortWorker()
+    protected DbPortWorker getDbWorker()
         throws Exception {
       return new DbPortWorker.ExportOcspDb(datasourceFactory, passwordResolver, dbconfFile, outdir,
-          resume, numCertsInBundle, numCertsPerSelect);
+          resume, numCertsInBundle, numCertsPerSelect, readPassword());
     }
 
   } // class ExportOcsp
@@ -218,10 +245,10 @@ public class DbActions {
     private Boolean resume = Boolean.FALSE;
 
     @Override
-    protected DbPortWorker getDbPortWorker()
+    protected DbPortWorker getDbWorker()
         throws Exception {
       return new DbPortWorker.ImportCaDb(datasourceFactory, passwordResolver, dbconfFile, resume,
-          indir, numCertsPerCommit);
+          indir, numCertsPerCommit, readPassword());
     }
 
   } // class ImportCa
@@ -245,10 +272,10 @@ public class DbActions {
     private Boolean resume = Boolean.FALSE;
 
     @Override
-    protected DbPortWorker getDbPortWorker()
+    protected DbPortWorker getDbWorker()
         throws Exception {
       return new DbPortWorker.ImportOcspDb(datasourceFactory, passwordResolver, dbconfFile, resume,
-          indir, numCertsPerCommit);
+          indir, numCertsPerCommit, readPassword());
     }
 
   } // class ImportOcsp
@@ -278,10 +305,10 @@ public class DbActions {
     private Boolean resume = Boolean.FALSE;
 
     @Override
-    protected DbPortWorker getDbPortWorker()
+    protected DbPortWorker getDbWorker()
         throws Exception {
       return new DbPortWorker.ImportOcspFromCaDb(datasourceFactory, passwordResolver, dbconfFile,
-          publisherName, resume, indir, numCertsPerCommit);
+          publisherName, resume, indir, numCertsPerCommit, readPassword());
     }
 
   } // class ImportOcspfromca

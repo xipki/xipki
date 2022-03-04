@@ -19,6 +19,7 @@ package org.xipki.ca.mgmt.db.diffdb;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.mgmt.db.DbWorker;
 import org.xipki.ca.mgmt.db.port.DbPortWorker;
 import org.xipki.ca.mgmt.db.port.DbPorter;
 import org.xipki.datasource.DataSourceFactory;
@@ -43,7 +44,7 @@ import java.util.Set;
  * @since 2.0.0
  */
 
-public class DigestDiffWorker extends DbPortWorker {
+public class DigestDiffWorker extends DbWorker {
 
   private static final Logger LOG = LoggerFactory.getLogger(DigestDiffWorker.class);
 
