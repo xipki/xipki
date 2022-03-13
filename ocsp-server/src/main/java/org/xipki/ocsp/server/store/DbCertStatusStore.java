@@ -647,8 +647,8 @@ public class DbCertStatusStore extends OcspStore {
   public static HashAlgo getCertHashAlgo(DataSourceWrapper datasource)
       throws DataAccessException, NoSuchAlgorithmException {
     // analyze the database
-    String certHashAlgoStr = datasource.getFirstValue(null, "DBSCHEMA", "VALUE2",
-        "NAME='CERTHASH_ALGO'", String.class);
+    String certHashAlgoStr = datasource.getFirstStringValue(null, "DBSCHEMA", "VALUE2",
+        "NAME='CERTHASH_ALGO'");
 
     if (certHashAlgoStr == null) {
       throw new DataAccessException(

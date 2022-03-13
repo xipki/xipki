@@ -178,8 +178,8 @@ class TargetDigestReader implements Closeable {
     this.certhashAlgo = Args.notNull(certHashAlgo, "certhashAlgo");
 
     if (dbType == DbType.XIPKI_OCSP_v4) {
-      String certHashAlgoInDb = datasource.getFirstValue(
-          null, "DBSCHEMA", "VALUE2", "NAME='CERTHASH_ALGO'", String.class);
+      String certHashAlgoInDb = datasource.getFirstStringValue(
+          null, "DBSCHEMA", "VALUE2", "NAME='CERTHASH_ALGO'");
       HashAlgo ha;
       try {
         ha = HashAlgo.getInstance(certHashAlgoInDb);

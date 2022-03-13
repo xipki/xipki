@@ -266,8 +266,8 @@ class DigestDiff {
       throws DataAccessException {
     Connection conn = datasource.getConnection();
     try {
-      String dbSchemaVersion = datasource.getFirstValue(
-          null, "DBSCHEMA", "VALUE2", "WHERE NAME='VERSION'", String.class);
+      String dbSchemaVersion = datasource.getFirstStringValue(
+          null, "DBSCHEMA", "VALUE2", "WHERE NAME='VERSION'");
 
       if (datasource.tableExists(conn, "CA")) {
         if ("4".equals(dbSchemaVersion)) {
@@ -295,8 +295,8 @@ class DigestDiff {
 
   public static HashAlgo detectOcspDbCerthashAlgo(DataSourceWrapper datasource)
       throws DataAccessException {
-    String str = datasource.getFirstValue(null, "DBSCHEMA", "VALUE2", "NAME='CERTHASH_ALGO'",
-        String.class);
+    String str = datasource.getFirstStringValue(
+                null, "DBSCHEMA", "VALUE2", "NAME='CERTHASH_ALGO'");
     try {
       return HashAlgo.getInstance(str);
     } catch (NoSuchAlgorithmException ex) {

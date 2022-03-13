@@ -200,8 +200,8 @@ class RefDigestReader implements Closeable {
     String coreSql;
     switch (dbType) {
       case XIPKI_OCSP_v4:
-        String certHashAlgoInDb = datasource.getFirstValue(
-            null, "DBSCHEMA", "VALUE2", "NAME='CERTHASH_ALGO'", String.class);
+        String certHashAlgoInDb = datasource.getFirstStringValue(
+            null, "DBSCHEMA", "VALUE2", "NAME='CERTHASH_ALGO'");
         if (certhashAlgo != HashAlgo.getInstance(certHashAlgoInDb)) {
           throw new IllegalArgumentException(
               "certHashAlgo in parameter (" + certhashAlgo + ") != in DB ("

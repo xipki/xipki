@@ -559,8 +559,7 @@ public abstract class DataSourceWrapper implements Closeable {
 
   public abstract String buildSelectFirstSql(int rows, String orderBy, String coreSql);
 
-  public <T> T getFirstValue(Connection conn, String table, String column, String criteria,
-      Class<T> type)
+  public String getFirstStringValue(Connection conn, String table, String column, String criteria)
           throws DataAccessException {
     final String sql = "SELECT " + column + " FROM " + table + " WHERE " + criteria;
     Statement stmt = null;
@@ -569,7 +568,7 @@ public abstract class DataSourceWrapper implements Closeable {
       stmt = conn == null ? createStatement() : createStatement(conn);
       rs = stmt.executeQuery(sql);
       if (rs.next()) {
-        return rs.getObject(column, type);
+        return rs.getString(column);
       } else {
         return null;
       }
@@ -578,7 +577,27 @@ public abstract class DataSourceWrapper implements Closeable {
     } finally {
       releaseResources(stmt, rs, conn == null);
     }
-  } // method getFirstValue
+  } // method getFirstStringValue
+
+  public long getFirstLongValue(Connection conn, String table, String column, String criteria)
+          throws DataAccessException {
+    final String sql = "SELECT " + column + " FROM " + table + " WHERE " + criteria;
+    Statement stmt = null;
+    ResultSet rs = null;
+    try {
+      stmt = conn == null ? createStatement() : createStatement(conn);
+      rs = stmt.executeQuery(sql);
+      if (rs.next()) {
+        return rs.getLong(column);
+      } else {
+        return 0;
+      }
+    } catch (SQLException ex) {
+      throw translate(sql, ex);
+    } finally {
+      releaseResources(stmt, rs, conn == null);
+    }
+  } // method getFirstLongValue
 
   public long getMin(Connection conn, String table, String column)
       throws DataAccessException {
