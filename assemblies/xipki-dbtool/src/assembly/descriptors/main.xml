@@ -53,9 +53,7 @@
     <fileSet>
       <directory>${project.build.directory}</directory>
       <includes>
-        <include>sql/ca-init.xml</include>
-        <include>sql/ocsp-cache-init.xml</include>
-        <include>sql/ocsp-init.xml</include>
+        <include>sql/*</include>
       </includes>
       <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>

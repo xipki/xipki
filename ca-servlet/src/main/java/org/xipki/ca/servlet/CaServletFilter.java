@@ -98,9 +98,6 @@ public class CaServletFilter implements Filter {
       auditType = "embed";
     }
 
-    String auditConf = audit.getConf();
-    Audits.init(auditType, auditConf);
-
     securities = new Securities();
     try {
       securities.init(conf.getSecurity());
@@ -108,11 +105,24 @@ public class CaServletFilter implements Filter {
       throw new ServletException("could not initialize Securites", ex);
     }
 
+    int shardId = conf.getShardId();
+    String auditConf = audit.getConf();
+    if ("file-mac".equals(auditType) || "database-mac".equals(auditType)) {
+      ConfPairs cp = new ConfPairs(auditConf);
+      cp.putPair("shard-id", Integer.toString(shardId));
+      auditConf = cp.getEncoded();
+    }
+
+    Audits.init(auditType, auditConf, securities.getSecurityFactory().getPasswordResolver());
+    if (Audits.getAuditService() == null) {
+      throw new ServletException("could not AuditService");
+    }
+
     str = filterConfig.getInitParameter("licenseFactory");
     LOG.info("Use licenseFactory: {}", str);
     try {
-      licenseFactory = (LicenseFactory) Class.forName(str).newInstance();
-    } catch (InstantiationException | IllegalAccessException | ClassNotFoundException ex) {
+      licenseFactory = (LicenseFactory) Class.forName(str).getDeclaredConstructor().newInstance();
+    } catch (Exception ex) {
       throw new ServletException("could not initialize LicenseFactory", ex);
     }
 
@@ -194,6 +204,14 @@ public class CaServletFilter implements Filter {
 
     if (licenseFactory != null) {
       licenseFactory.close();
+    }
+
+    if (Audits.getAuditService() != null) {
+      try {
+        Audits.getAuditService().close();
+      } catch (Exception ex) {
+        LogUtil.error(LOG, ex);
+      }
     }
   } // method destroy
 

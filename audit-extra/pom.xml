@@ -9,15 +9,17 @@
     <version>5.3.16-SNAPSHOT</version>
   </parent>
   <packaging>bundle</packaging>
-  <artifactId>audit</artifactId>
+  <artifactId>audit-extra</artifactId>
   <name>XiPKI :: ${project.artifactId}</name>
-  <properties>
-    <DynamicImport-Package>*</DynamicImport-Package>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>password</artifactId>
+      <artifactId>audit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>datasource</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

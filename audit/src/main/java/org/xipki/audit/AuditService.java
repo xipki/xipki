@@ -17,6 +17,9 @@
 
 package org.xipki.audit;
 
+import org.xipki.password.PasswordResolver;
+import org.xipki.password.PasswordResolverException;
+
 /**
  * Audit service interface.
  *
@@ -24,9 +27,19 @@ package org.xipki.audit;
  * @since 2.0.0
  */
 
-public interface AuditService {
+public interface AuditService extends AutoCloseable {
+
+  int AUDIT_EVENT = 1;
+
+  int PCI_AUDIT_EVENT = 2;
 
   void init(String conf);
+
+  /**
+   * @since 5.3.16
+   */
+  void init(String conf, PasswordResolver passwordResolver)
+          throws PasswordResolverException;
 
   /**
    * Log audit event.

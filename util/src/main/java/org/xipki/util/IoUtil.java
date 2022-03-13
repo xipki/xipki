@@ -376,4 +376,44 @@ public class IoUtil {
     }
   }
 
+  // Read last line of the file
+  public static String readLastNonBlankLine(File file) throws IOException  {
+    StringBuilder builder = new StringBuilder();
+    try (RandomAccessFile raf = new RandomAccessFile(file, "r")) {
+      long fileLength = file.length() - 1;
+      if (fileLength < 1) {
+        return null;
+      }
+
+      // Set the pointer at the last of the file
+      raf.seek(fileLength);
+      long pointer = fileLength;
+
+      while (true) {
+        while (pointer >= 0) {
+          raf.seek(pointer--);
+
+          char c;
+          // read from the last one char at the time
+          c = (char) raf.read();
+          // break when end of the line
+          if (c == '\n') {
+            break;
+          }
+          builder.append(c);
+        }
+
+        if (builder.length() > 0) {
+          break;
+        }
+      }
+
+      // Since line is read from the last so it
+      // is in reverse so use reverse method to make it right
+      builder.reverse();
+
+      return builder.toString();
+    }
+  }
+
 }

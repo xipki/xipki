@@ -1,0 +1,171 @@
+/*
+ *
+ * Copyright (c) 2013 - 2022 Lijun Liao
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.xipki.audit.extra;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.audit.services.FileMacAuditService;
+import org.xipki.audit.services.MacAuditService;
+import org.xipki.datasource.DataAccessException;
+import org.xipki.datasource.DataSourceFactory;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.password.PasswordResolver;
+import org.xipki.password.PasswordResolverException;
+import org.xipki.util.ConfPairs;
+import org.xipki.util.IoUtil;
+import org.xipki.util.LogUtil;
+import org.xipki.util.StringUtil;
+
+import java.io.*;
+import java.sql.*;
+import java.time.Instant;
+
+/**
+ * Database-based MAC protected audit service.
+ *
+ * @author Lijun Liao
+ * @since 5.3.16
+ */
+
+public class DatabaseMacAuditService extends MacAuditService {
+
+  private static Logger LOG = LoggerFactory.getLogger(FileMacAuditService.class);
+
+  public static final String KEY_DATASOURCE = "datasource";
+
+  private static final String SQL_ADD_AUDIT =
+          "INSERT INTO AUDIT (SHARDID,ID,TIME,LEVEL,EVENT_TYPE,PREVIOUS_ID,MESSAGE,TAG) " +
+                  "VALUES (?,?,?,?,?,?,?,?)";
+
+  private static final String SQL_UPDATE_INTEGRITY =
+          "UPDATE INTEGRITY SET TEXT=? WHERE ID=1";
+
+  private DataSourceWrapper datasource;
+
+  public DatabaseMacAuditService() {
+  }
+
+  @Override
+  protected void storeIntegrity(String integrityText) {
+    PreparedStatement ps = null;
+    try {
+      ps = datasource.prepareStatement(SQL_UPDATE_INTEGRITY);
+      ps.setString(1, integrityText);
+      ps.executeUpdate();
+    } catch (SQLException ex) {
+      throw new IllegalStateException(
+              datasource.translate(SQL_UPDATE_INTEGRITY, ex));
+    } catch (DataAccessException ex) {
+      throw new IllegalStateException(ex);
+    } finally {
+      datasource.releaseResources(ps, null);
+    }
+  }
+
+  @Override
+  protected void doClose() throws Exception {
+  }
+
+  @Override
+  protected void storeLog(
+          Instant date, long thisId, int eventType, String levelText,
+          long previousId, String message, String thisTag) {
+    try {
+      PreparedStatement ps = datasource.prepareStatement(SQL_ADD_AUDIT);
+      try {
+        int idx = 1;
+        ps.setInt   (idx++, shardId);
+        ps.setLong  (idx++, thisId);
+        ps.setString(idx++, formatDate(date));
+        ps.setString(idx++, levelText);
+        ps.setInt   (idx++, eventType);
+        ps.setLong  (idx++, previousId);
+        ps.setString(idx++, message);
+        ps.setString(idx++, thisTag);
+        ps.executeUpdate();
+      } catch (SQLException ex) {
+        throw datasource.translate(SQL_ADD_AUDIT, ex);
+      } finally {
+        datasource.releaseResources(ps, null);
+      }
+    } catch (Exception ex) {
+      LogUtil.error(LOG, ex);
+    }
+  }
+
+  @Override
+  protected void doExtraInit(ConfPairs confPairs, PasswordResolver passwordResolver)
+          throws PasswordResolverException {
+    String dataSourceFile = confPairs.value(KEY_DATASOURCE);
+    if (StringUtil.isBlank(dataSourceFile)) {
+      throw new IllegalArgumentException("property " + KEY_DATASOURCE + " not defined");
+    }
+
+    Connection conn = null;
+    try {
+      try (InputStream is = new FileInputStream(IoUtil.expandFilepath(dataSourceFile, true))) {
+        datasource = new DataSourceFactory().createDataSource("audit", is, passwordResolver);
+      }
+
+      conn = datasource.getConnection();
+      long maxId = datasource.getMax(conn, "AUDIT", "ID", "SHARDID=" + shardId);
+      if (maxId < 1) {
+        id.set(0);
+        previousTag = null;
+      } else {
+        String sql = datasource.buildSelectFirstSql(1,
+                "TAG FROM AUDIT WHERE SHARDID=" + shardId + " AND ID=" + maxId);
+        ResultSet rs = null;
+        Statement stmt = null;
+
+        try {
+          stmt = datasource.createStatement(conn);
+          rs = stmt.executeQuery(sql);
+          rs.next();
+
+          id.set(maxId);
+          previousTag = rs.getString("TAG");
+        } catch (SQLException ex) {
+          throw datasource.translate(sql, ex);
+        } finally {
+          datasource.releaseResources(stmt, rs, false);
+        }
+      }
+
+      String integrityText = datasource.getFirstStringValue(
+                              conn, "INTEGRITY", "TEXT", "ID=1");
+      if (integrityText == null) {
+        String sql = "INSERT INTO INTEGRITY (ID,TEXT) VALUES(1,'')";
+        try {
+          datasource.createStatement(conn).executeUpdate(sql);
+        } catch (SQLException ex) {
+          throw datasource.translate(sql, ex);
+        }
+      }
+
+      verify(id.get(), previousTag, integrityText, confPairs);
+    } catch (IOException | DataAccessException ex) {
+      throw new IllegalStateException(ex);
+    } finally {
+      if (conn != null) {
+        datasource.returnConnection(conn);
+      }
+    }
+  }
+
+}

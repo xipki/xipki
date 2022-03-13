@@ -18,6 +18,9 @@
 package org.xipki.audit;
 
 import org.xipki.audit.services.EmbedAuditService;
+import org.xipki.audit.services.FileMacAuditService;
+import org.xipki.audit.services.Slf4jAuditService;
+import org.xipki.password.PasswordResolver;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -79,33 +82,44 @@ public class Audits {
     }
   } // method getAuditService
 
-  public static void init(String auditType, String auditConf)  {
+  public static void init(String auditType, String auditConf, PasswordResolver passwordResolver) {
     try {
       AuditService service;
       if ("embed".equalsIgnoreCase(auditType)) {
         service = new EmbedAuditService();
-      } else  if (auditType.startsWith("java:")) {
-        String className = auditType.substring("java:".length());
+      } else if ("slf4j".equals(auditType)) {
+        service = new Slf4jAuditService();
+      } else if ("file-mac".equals(auditType)) {
+        service = new FileMacAuditService();
+      } else {
+        String className;
+
+        if (auditType.startsWith("java:")) {
+          className = auditType.substring("java:".length());
+        } else if ("database-mac".equals(auditType)) {
+          className = "org.xipki.audit.extra.DatabaseMacAuditService";
+        } else {
+          throw new AuditServiceRuntimeException("invalid Audit.Type '" + auditType
+                  + "'. Valid values are 'embed' or java:<name of class that implements "
+                  + AuditService.class.getName() + ">");
+        }
+
         try {
           Class<?> clazz = Class.forName(className);
           service = (AuditService) clazz.getDeclaredConstructor().newInstance();
         } catch (ClassCastException | ClassNotFoundException | NoSuchMethodException
-            | IllegalAccessException | InstantiationException | InvocationTargetException ex) {
+                | IllegalAccessException | InstantiationException | InvocationTargetException ex) {
           throw new AuditServiceRuntimeException(
-              "error caught while initializing AuditService " + auditType
-              + ": " + ex.getClass().getName() + ": " + ex.getMessage(), ex);
+                  "error caught while initializing AuditService " + auditType
+                          + ": " + ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
-      } else {
-        throw new AuditServiceRuntimeException("invalid Audit.Type '" + auditType
-            + "'. Valid values are 'embed' or java:<name of class that implements "
-            + AuditService.class.getName() + ">");
       }
 
-      service.init(auditConf);
+      service.init(auditConf, passwordResolver);
       auditService = service;
     } catch (AuditServiceRuntimeException ex) {
       initializationException = ex;
-    } catch (RuntimeException ex) {
+    } catch (Exception ex) {
       initializationException = new AuditServiceRuntimeException(ex.getMessage(), ex);
     }
   } // method init

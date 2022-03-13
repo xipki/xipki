@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -92,6 +93,19 @@ public class DateUtil {
 
   public static String toUtcTimeyyyyMMdd(Date utcTime) {
     return SDF2.format(utcTime.toInstant().atZone(ZONE_UTC));
+  }
+
+  public static long getLastMsOfDay(Calendar calendar) {
+    calendar.set(Calendar.HOUR_OF_DAY, 23);
+    calendar.set(Calendar.MINUTE, 59);
+    calendar.set(Calendar.SECOND, 59);
+    calendar.set(Calendar.MILLISECOND, 999);
+    return calendar.getTimeInMillis();
+  }
+
+  public static int getYyyyMMdd(Calendar calendar) {
+    return calendar.get(Calendar.YEAR) * 10000 + (1 + calendar.get(Calendar.MONTH)) * 100
+            + calendar.get(Calendar.DAY_OF_MONTH);
   }
 
 }

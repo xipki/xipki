@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2013 - 2020 Lijun Liao
+ * Copyright (c) 2013 - 2022 Lijun Liao
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,23 @@ package org.xipki.audit.services;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
 import org.xipki.audit.*;
-import org.xipki.util.Args;
+import org.xipki.password.PasswordResolver;
+import org.xipki.password.PasswordResolverException;
+import org.xipki.util.ConfPairs;
+import org.xipki.util.DateUtil;
+import org.xipki.util.LogUtil;
+import org.xipki.util.StringUtil;
 
-import java.io.CharArrayWriter;
-import java.util.List;
+import java.io.*;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 /**
- * The embedded audit service. It uses Log4j logger xipki.audit.sl4fj.
+ * The embedded audit service.
  *
  * @author Lijun Liao
  * @since 2.0.0
@@ -36,85 +43,134 @@ import java.util.List;
 
 public class EmbedAuditService implements AuditService {
 
-  private static final Logger LOG = LoggerFactory.getLogger("xipki.audit.slf4j");
+  public static final String KEY_FILE = "file";
 
-  private static final Marker MARKER =  MarkerFactory.getMarker("xiaudit");
+  private static final String DELIM = " | ";
+
+  private static Logger LOG = LoggerFactory.getLogger(EmbedAuditService.class);
+
+  private static final DateTimeFormatter DTF =
+          DateTimeFormatter.ofPattern("yyyy.MM.dd-HH:mm:ss.SSS");
+
+  private final ZoneId timeZone = ZoneId.systemDefault();
+
+  private File logDir;
+
+  private String logFileNamePrefix;
+
+  private String logFileNameSuffix;
+
+  private long lastMsOfToday;
+
+  private OutputStreamWriter writer;
 
   public EmbedAuditService() {
   }
 
   @Override
   public void init(String conf) {
+    try {
+      init(conf, null);
+    } catch (PasswordResolverException ex) {
+      throw new IllegalStateException(ex);
+    }
+  }
+
+  @Override
+  public void init(String conf, PasswordResolver passwordResolver)
+          throws PasswordResolverException {
+    ConfPairs confPairs = new ConfPairs(conf);
+    String logFilePath = confPairs.value(KEY_FILE);
+
+    if (StringUtil.isBlank(logFilePath)) {
+      logFilePath = "logs/audit.log";
+    }
+
+    File logFile = new File(logFilePath).getAbsoluteFile();
+    this.logDir = logFile.getParentFile();
+    this.logDir.mkdirs();
+
+    String fileName = logFile.getName();
+    int idx = fileName.lastIndexOf('.');
+    logFileNameSuffix = idx == -1 ? "" : fileName.substring(idx);
+
+    String prefix = idx == -1 ? fileName : fileName.substring(0, idx);
+    this.logFileNamePrefix = prefix + "_";
+
+    // analyze the existing log files
+    Calendar now = Calendar.getInstance(TimeZone.getDefault());
+
+    int yyyyMMddNow = DateUtil.getYyyyMMdd(now);
+    this.lastMsOfToday = DateUtil.getLastMsOfDay(now);
+
+    this.writer = buildWriter(yyyyMMddNow);
   }
 
   @Override
   public void logEvent(AuditEvent event) {
-    if (event.getLevel() == AuditLevel.DEBUG) {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug(MARKER, "{}", createMessage(event));
-      }
-    } else {
-      if (LOG.isInfoEnabled()) {
-        LOG.info(MARKER, "{}", createMessage(event));
-      }
-    }
+    storeLog(AuditService.AUDIT_EVENT, event.getLevel(), event.toTextMessage());
   } // method logEvent
 
   @Override
   public void logEvent(PciAuditEvent event) {
-    CharArrayWriter msg = event.toCharArrayWriter("");
-    AuditLevel al = event.getLevel();
-    if (al == AuditLevel.DEBUG) {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug(MARKER, "{} | {}", al.getAlignedText(), msg);
+    storeLog(AuditService.PCI_AUDIT_EVENT, event.getLevel(), event.toTextMessage());
+  }
+
+  protected void storeLog(int eventType, AuditLevel level, String message) {
+    Instant date = Instant.now();
+    StringBuilder sb = new StringBuilder(message.length());
+
+    sb.append(DTF.format(date.atZone(timeZone)))
+            .append(DELIM).append(level.getText())
+            .append(DELIM).append(eventType)
+            .append(DELIM).append(message);
+
+    String payload = sb.toString();
+
+    long ms = date.toEpochMilli();
+    try {
+      if (ms > lastMsOfToday) {
+        Calendar now = Calendar.getInstance(TimeZone.getDefault());
+        now.setTimeInMillis(ms);
+        int yyyyMMddNow = DateUtil.getYyyyMMdd(now);
+        lastMsOfToday = DateUtil.getLastMsOfDay(now);
+        writer.close();
+        writer = buildWriter(yyyyMMddNow);
       }
-    } else {
-      if (LOG.isInfoEnabled()) {
-        LOG.info(MARKER, "{} | {}", al.getAlignedText(), msg);
-      }
+
+      writer.write(payload);
+      writer.write('\n');
+      writer.flush(); // TODO do not flush every time
+    } catch (Exception ex) {
+      LogUtil.error(LOG, ex);
     }
-  } // method logEvent
+  }
 
-  protected static String createMessage(AuditEvent event) {
-    Args.notNull(event, "event");
-    String applicationName = event.getApplicationName();
-    if (applicationName == null) {
-      applicationName = "undefined";
-    }
-
-    String name = event.getName();
-    if (name == null) {
-      name = "undefined";
-    }
-
-    StringBuilder sb = new StringBuilder(150);
-
-    sb.append(event.getLevel().getAlignedText()).append(" | ");
-    sb.append(applicationName).append(" - ").append(name);
-
-    AuditStatus status = event.getStatus();
-    if (status == null) {
-      status = AuditStatus.UNDEFINED;
-    }
-    sb.append(":\tstatus: ").append(status.name());
-    List<AuditEventData> eventDataArray = event.getEventDatas();
-
-    long duration = event.getDuration();
-    if (duration >= 0) {
-      sb.append("\tduration: ").append(duration);
+  private OutputStreamWriter buildWriter(int yyyyMMdd) {
+    File currentLogFile = new File(logDir, buildFilename(yyyyMMdd));
+    OutputStream fw;
+    try {
+      fw = new FileOutputStream(currentLogFile, true);
+    } catch (IOException ex) {
+      throw new IllegalStateException("error opening file " + currentLogFile.getPath());
     }
 
-    if ((eventDataArray != null) && (eventDataArray.size() > 0)) {
-      for (AuditEventData m : eventDataArray) {
-        if (duration >= 0 && "duration".equalsIgnoreCase(m.getName())) {
-          continue;
-        }
+    return new OutputStreamWriter(fw);
+  }
 
-        sb.append("\t").append(m.getName()).append(": ").append(m.getValue());
-      }
-    }
+  private String buildFilename(int yyyyMMdd) {
+    int year = yyyyMMdd / 10000;
+    int month = yyyyMMdd % 10000 / 100;
+    int day = yyyyMMdd % 100;
+    String dateStr = year + "." + (month < 10 ? "0" + month : month)
+            + "." + (day < 10 ? "0" + day : day);
+    return logFileNamePrefix + dateStr + logFileNameSuffix;
+  }
 
-    return sb.toString();
-  } // method createMessage
+  @Override
+  public void close() throws Exception {
+    writer.flush();
+    writer.close();
+  }
 
 }

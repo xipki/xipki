@@ -29,17 +29,16 @@ import org.xipki.util.Args;
 public enum AuditLevel {
 
   ERROR(3, "ERROR"),
-  WARN(4,  "WARN "),
-  INFO(6,  "INFO "),
-  DEBUG(7, "DEBUG");
+  WARN(4,  "WARN"),
+  INFO(6,  "INFO");
 
   private final int value;
 
-  private final String alignedText;
+  private final String text;
 
-  AuditLevel(int value, String alignedText) {
+  AuditLevel(int value, String text) {
     this.value = value;
-    this.alignedText = alignedText;
+    this.text = text;
   }
 
   public int getValue() {
@@ -65,8 +64,8 @@ public enum AuditLevel {
     throw new IllegalArgumentException("invalid AuditLevel code " + value);
   }
 
-  public String getAlignedText() {
-    return alignedText;
+  public String getText() {
+    return text;
   }
 
 }

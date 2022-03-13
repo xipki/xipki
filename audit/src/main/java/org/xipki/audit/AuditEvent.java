@@ -169,4 +169,44 @@ public class AuditEvent {
     return duration;
   }
 
+  public String toTextMessage() {
+    String applicationName = getApplicationName();
+    if (applicationName == null) {
+      applicationName = "undefined";
+    }
+
+    String name = getName();
+    if (name == null) {
+      name = "undefined";
+    }
+
+    StringBuilder sb = new StringBuilder(150);
+
+    sb.append(applicationName).append(" - ").append(name);
+
+    AuditStatus status = getStatus();
+    if (status == null) {
+      status = AuditStatus.UNDEFINED;
+    }
+    sb.append(";\tstatus: ").append(status.name());
+    List<AuditEventData> eventDataArray = getEventDatas();
+
+    long duration = getDuration();
+    if (duration >= 0) {
+      sb.append("\tduration: ").append(duration);
+    }
+
+    if ((eventDataArray != null) && (eventDataArray.size() > 0)) {
+      for (AuditEventData m : eventDataArray) {
+        if (duration >= 0 && "duration".equalsIgnoreCase(m.getName())) {
+          continue;
+        }
+
+        sb.append("\t").append(m.getName()).append(": ").append(m.getValue());
+      }
+    }
+
+    return sb.toString();
+  } // method toTextMessage
+
 }

@@ -159,6 +159,10 @@ public class PciAuditEvent {
     this.affectedResource = affectedResource;
   }
 
+  public String toTextMessage() {
+    return toCharArrayWriter("").toString();
+  }
+
   public CharArrayWriter toCharArrayWriter(String prefix) {
     CharArrayWriter buffer = new CharArrayWriter(100);
 

@@ -74,6 +74,12 @@
                   <version>${project.version}</version>
                   <includes>sql/*-init.xml</includes>
                 </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki</groupId>
+                  <artifactId>audit-extra</artifactId>
+                  <version>${project.version}</version>
+                  <includes>sql/*-init.xml</includes>
+                </artifactItem>
               </artifactItems>
             </configuration>
           </execution>
