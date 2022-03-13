@@ -39,7 +39,7 @@ import java.time.Instant;
  * Database-based MAC protected audit service.
  *
  * @author Lijun Liao
- * @since 5.3.16
+ * @since 5.4.0
  */
 
 public class DatabaseMacAuditService extends MacAuditService {

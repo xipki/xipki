@@ -36,7 +36,7 @@ public interface AuditService extends AutoCloseable {
   void init(String conf);
 
   /**
-   * @since 5.3.16
+   * @since 5.4.0
    */
   void init(String conf, PasswordResolver passwordResolver)
           throws PasswordResolverException;

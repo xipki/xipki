@@ -36,7 +36,7 @@ import java.util.TimeZone;
  * File-based MAC protected audit service.
  *
  * @author Lijun Liao
- * @since 5.3.16
+ * @since 5.4.0
  */
 
 public class FileMacAuditService extends MacAuditService {
