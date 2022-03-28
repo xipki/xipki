@@ -307,24 +307,25 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
           }
         }
 
-        if (!updateMe) {
-          LOG.info("CertStore {} not changed", name);
-          return;
-        }
+        if (updateMe) {
+          ImportCrl importCrl = new ImportCrl(datasource, dir, sqlBatchCommit, ignoreExpiredCrls);
 
-        ImportCrl importCrl = new ImportCrl(datasource, dir, sqlBatchCommit, ignoreExpiredCrls);
-
-        if (importCrl.importCrlToOcspDb()) {
-          LOG.info("updated CertStore {} successfully", name);
+          if (importCrl.importCrlToOcspDb()) {
+            LOG.info("updated CertStore {} successfully", name);
+          } else {
+            LOG.error("updating CertStore {} failed", name);
+          }
         } else {
-          LOG.error("updating CertStore {} failed", name);
+          LOG.info("CertStore {} not changed", name);
         }
 
         if (firstTime) {
           super.init(sourceConf, datasource);
           firstTime = false;
         } else {
-          super.updateIssuerStore(true);
+          if (updateMe) {
+            super.updateIssuerStore(true);
+          }
         }
       } catch (Throwable th) {
         LogUtil.error(LOG, th, "error while executing updateStore()");
