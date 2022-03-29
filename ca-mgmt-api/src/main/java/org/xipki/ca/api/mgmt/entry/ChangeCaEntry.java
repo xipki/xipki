@@ -328,4 +328,4 @@ public class ChangeCaEntry extends MgmtEntry {
     this.numCrls = numCrls;
   }
 
-} // class ChangeCa
+}

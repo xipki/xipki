@@ -102,4 +102,4 @@ public class UserEntry extends MgmtEntry {
         "\nactive: ", active, "\npassword: *****\n");
   }
 
-} // class User
+}

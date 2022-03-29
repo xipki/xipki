@@ -127,4 +127,4 @@ public class CertprofileEntry extends MgmtEntry {
     return ident.hashCode();
   }
 
-} // class Certprofile
+}

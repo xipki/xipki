@@ -67,4 +67,4 @@ public class ChangeUserEntry extends MgmtEntry {
     this.password = password;
   }
 
-} // class ChangeUser
+}

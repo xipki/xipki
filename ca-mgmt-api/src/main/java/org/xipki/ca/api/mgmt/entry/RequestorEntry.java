@@ -164,4 +164,4 @@ public class RequestorEntry extends MgmtEntry {
     return ident.hashCode();
   }
 
-} // class Requestor
+}

@@ -110,4 +110,4 @@ public class PublisherEntry extends MgmtEntry {
     return ident.hashCode();
   }
 
-} // class Publisher
+}

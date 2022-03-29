@@ -175,4 +175,4 @@ public class SignerEntry extends MgmtEntry {
     }
   } // method signerConfToString
 
-} // class Signer
+}

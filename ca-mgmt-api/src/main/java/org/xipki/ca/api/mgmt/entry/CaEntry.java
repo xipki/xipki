@@ -555,4 +555,4 @@ public class CaEntry extends MgmtEntry {
     return hexSha1OfCert;
   }
 
-} // class Ca
+}

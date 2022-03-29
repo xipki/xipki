@@ -102,4 +102,4 @@ public class CaHasUserEntry extends MgmtEntry {
     return userIdent.hashCode();
   }
 
-} // method CaHasUser
+}
