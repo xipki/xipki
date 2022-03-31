@@ -16,8 +16,8 @@
   <!-- CA configuration :: create table -->
   <changeSet author="xipki" id="1">
     <!-- table DBSCHEMAINFO -->
-    <createTable tableName="DBSCHEMA"
-        remarks="database schema information">
+    <createTable tableName="DBSCHEMA">
+      <!--remarks="database schema information"-->
       <column name="NAME" type="VARCHAR(45)">
         <constraints primaryKey="true" nullable="false"/>
       </column>
@@ -43,8 +43,8 @@
       <column name="NAME" type="VARCHAR(45)">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="EVENT_TIME" type="BIGINT"
-          remarks="seconds since January 1, 1970, 00:00:00 GMT">
+      <column name="EVENT_TIME" type="BIGINT">
+        <!--remarks="seconds since January 1, 1970, 00:00:00 GMT"-->
         <constraints nullable="false"/>
       </column>
       <column name="EVENT_TIME2" type="TIMESTAMP"/>
@@ -68,7 +68,9 @@
       <column name="ID" type="SMALLINT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="NAME" type="VARCHAR(45)" remarks="duplication is not permitted"/>
+      <column name="NAME" type="VARCHAR(45)">
+        <!--remarks="duplication is not permitted"-->
+      </column>
       <column name="TYPE" type="VARCHAR(100)">
         <constraints nullable="false"/>
       </column>
@@ -80,7 +82,9 @@
       <column name="ID" type="SMALLINT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="NAME" type="VARCHAR(45)" remarks="duplication is not permitted"/>
+      <column name="NAME" type="VARCHAR(45)">
+        <!--remarks="duplication is not permitted"-->
+      </column>
       <column name="TYPE" type="VARCHAR(100)">
         <constraints nullable="false"/>
       </column>
@@ -92,11 +96,15 @@
       <column name="ID" type="SMALLINT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="NAME" type="VARCHAR(45)" remarks="duplication is not permitted"/>
+      <column name="NAME" type="VARCHAR(45)">
+        <!--remarks="duplication is not permitted"-->
+      </column>
       <column name="TYPE" type="VARCHAR(100)">
         <constraints nullable="false"/>
       </column>
-      <column name="CONF" type="CLOB" remarks="profile data, depends on the type"/>
+      <column name="CONF" type="CLOB">
+        <!--remarks="profile data, depends on the type"-->
+      </column>
     </createTable>
     <addUniqueConstraint tableName="PROFILE" columnNames="NAME" constraintName="CONST_PROFILE_NAME"/>
     <!-- table TUSER -->
@@ -107,10 +115,12 @@
       <column name="NAME" type="VARCHAR(100)">
         <constraints nullable="false"/>
       </column>
-      <column name="ACTIVE" type="SMALLINT" remarks="whether the user is activated">
+      <column name="ACTIVE" type="SMALLINT">
+        <!--remarks="whether the user is activated"-->
         <constraints nullable="false"/>
       </column>
-      <column name="PASSWORD" type="VARCHAR(150)" remarks="salted hashed password in hex">
+      <column name="PASSWORD" type="VARCHAR(150)">
+        <!--remarks="salted hashed password in hex"-->
         <constraints nullable="false"/>
         <!-- iterations:salt:derived key (algorithm is PBKDF2)-->
       </column>
@@ -121,12 +131,15 @@
       <column name="ID" type="SMALLINT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="NAME" type="VARCHAR(45)" remarks="duplication is not permitted"/>
-      <column name="SN_SIZE" type="SMALLINT"
-          remarks="number of octets of the serial number"/>
+      <column name="NAME" type="VARCHAR(45)">
+        <!--remarks="duplication is not permitted"-->
+      </column>
+      <column name="SN_SIZE" type="SMALLINT">
+        <!--remarks="number of octets of the serial number"-->
+      </column>
       <column name="NEXT_CRLNO" type="BIGINT"/>
-      <column name="STATUS" type="VARCHAR(10)"
-          remarks="valid values: active, inactive">
+      <column name="STATUS" type="VARCHAR(10)">
+        <!--remarks="valid values: active, inactive"-->
         <constraints nullable="false"/>
       </column>
       <column name="SUBJECT" type="${x500name.type}">
@@ -139,39 +152,47 @@
       <column name="CRL_CONTROL" type="VARCHAR(1000)"/>
       <column name="CMP_CONTROL" type="VARCHAR(1000)"/>
       <column name="SCEP_CONTROL" type="VARCHAR(500)"/>
-      <column name="CTLOG_CONTROL" type="VARCHAR(1000)" remarks="Certificate Transparency Log Control"/>
+      <column name="CTLOG_CONTROL" type="VARCHAR(1000)">
+        <!--remarks="Certificate Transparency Log Control"-->
+      </column>
       <column name="REVOKE_SUSPENDED_CONTROL" type="VARCHAR(500)"/>
       <column name="CRL_SIGNER_NAME" type="VARCHAR(45)"/>
       <column name="CMP_RESPONDER_NAME" type="VARCHAR(45)"/>
       <column name="SCEP_RESPONDER_NAME" type="VARCHAR(45)"/>
-      <column name="PROTOCOL_SUPPORT" type="VARCHAR(200)" defaultValueNumeric="0"
-          remarks="Whether REST API is supported, default is false (0)">
-        <constraints nullable="false"/>
+      <column name="PROTOCOL_SUPPORT" type="VARCHAR(200)" defaultValueNumeric="0">
+        <!--remarks="Whether REST API is supported, default is false (0)"-->
       </column>
-      <column name="SAVE_REQ" type="SMALLINT" defaultValueNumeric="0"
-          remarks="Whether requests should be saved, default is false (0)">
-        <constraints nullable="false"/>
+      <column name="SAVE_REQ" type="SMALLINT" defaultValueNumeric="0">
+        <!--remarks="Whether requests should be saved, default is false (0)"-->
       </column>
       <column name="VALIDITY_MODE" type="varchar(100)"/>
       <column name="PERMISSION" type="INT">
         <constraints nullable="false"/>
       </column>
       <column name="NUM_CRLS" type="SMALLINT" defaultValueNumeric="30">
-        <constraints nullable="false"/>
       </column>
       <column name="EXPIRATION_PERIOD" type="SMALLINT" defaultValueNumeric="365" />
-      <column name="REV_INFO" type="varchar(200)" remarks="CA revocation information"/>
+      <column name="REV_INFO" type="varchar(200)">
+        <!--remarks="CA revocation information"-->
+      </column>
       <column name="SIGNER_TYPE" type="VARCHAR(100)">
         <constraints nullable="false"/>
       </column>
-      <column name="KEEP_EXPIRED_CERT_DAYS" type="SMALLINT" defaultValueNumeric="-1"
-          remarks="How long in days should certificates be kept after the expiration. Negative value for kept-for-ever"/>
+      <column name="KEEP_EXPIRED_CERT_DAYS" type="SMALLINT" defaultValueNumeric="-1">
+        <!--remarks="How long in days should certificates be kept after the expiration. Negative value for kept-for-ever"-->
+      </column>
       <column name="CERT" type="VARCHAR(6000)">
         <constraints nullable="false"/>
       </column>
-      <column name="DHPOC_CONTROL" type="CLOB" remarks="Diffie-Hellman Key Agreement PoC Control"/>
-      <column name="EXTRA_CONTROL" type="CLOB" remarks="extra control"/>
-      <column name="CERTCHAIN" type="CLOB" remarks="Certificate chain without CA's certificate"/>
+      <column name="DHPOC_CONTROL" type="CLOB">
+        <!--remarks="Diffie-Hellman Key Agreement PoC Control"-->
+      </column>
+      <column name="EXTRA_CONTROL" type="CLOB">
+        <!--remarks="extra control"-->
+      </column>
+      <column name="CERTCHAIN" type="CLOB">
+        <!--remarks="Certificate chain without CA's certificate"-->
+      </column>
       <column name="SIGNER_CONF" type="CLOB">
         <constraints nullable="false"/>
       </column>
@@ -246,7 +267,8 @@
       <column name="CA_ID" type="SMALLINT">
         <constraints nullable="false"/>
       </column>
-      <column name="CRL_SCOPE" type="SMALLINT" remarks="CRL scope, reserved for future use">
+      <column name="CRL_SCOPE" type="SMALLINT">
+        <!--remarks="CRL scope, reserved for future use"-->
         <constraints nullable="false"/>
       </column>
       <column name="CRL_NO" type="BIGINT">
@@ -270,72 +292,81 @@
       <column name="ID" type="BIGINT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="CA_ID" type="SMALLINT"
-          remarks="Issuer (CA) id">
+      <column name="CA_ID" type="SMALLINT">
+        <!--remarks="Issuer (CA) id"-->
         <constraints nullable="false"/>
       </column>
-      <column name="SN" type="VARCHAR(40)"
-          remarks="serial number">
+      <column name="SN" type="VARCHAR(40)">
+        <!--remarks="serial number"-->
         <constraints nullable="false"/>
       </column>
-      <column name="PID" type="SMALLINT"
-          remarks="certificate profile id">
+      <column name="PID" type="SMALLINT">
+        <!--remarks="certificate profile id"-->
         <constraints nullable="false"/>
       </column>
-      <column name="RID" type="SMALLINT"
-          remarks="requestor id"/>
-      <column name="FP_S" type="BIGINT"
-          remarks="first 8 bytes of the SHA1 sum of the subject">
+      <column name="RID" type="SMALLINT">
+        <!--remarks="requestor id"-->
+      </column>
+      <column name="FP_S" type="BIGINT">
+        <!--remarks="first 8 bytes of the SHA1 sum of the subject"-->
         <constraints nullable="false"/>
       </column>
-      <column name="FP_RS" type="BIGINT"
-          remarks="first 8 bytes of the SHA1 sum of the requested subject"/>
-      <column name="LUPDATE" type="BIGINT"
-          remarks="last update, seconds since January 1, 1970, 00:00:00 GMT">
+      <column name="FP_RS" type="BIGINT">
+        <!--remarks="first 8 bytes of the SHA1 sum of the requested subject"-->
+      </column>
+      <column name="LUPDATE" type="BIGINT">
+        <!--remarks="last update, seconds since January 1, 1970, 00:00:00 GMT"-->
         <constraints nullable="false"/>
       </column>
-      <column name="NBEFORE" type="BIGINT"
-          remarks="notBefore, seconds since January 1, 1970, 00:00:00 GMT">
+      <column name="NBEFORE" type="BIGINT">
+        <!--remarks="notBefore, seconds since January 1, 1970, 00:00:00 GMT"-->
         <constraints nullable="false"/>
       </column>
-      <column name="NAFTER" type="BIGINT"
-          remarks="notAfter, seconds since January 1, 1970, 00:00:00 GMT">
+      <column name="NAFTER" type="BIGINT">
+        <!--remarks="notAfter, seconds since January 1, 1970, 00:00:00 GMT"-->
         <constraints nullable="false"/>
       </column>
-      <column name="REV" type="SMALLINT"
-          remarks="whether the certificate is revoked">
+      <column name="REV" type="SMALLINT">
+        <!--remarks="whether the certificate is revoked"-->
         <constraints nullable="false"/>
       </column>
-      <column name="RR" type="SMALLINT"
-          remarks="revocation reason"/>
-      <column name="RT"  type="BIGINT"
-          remarks="revocation time, seconds since January 1, 1970, 00:00:00 GMT"/>
-      <column name="RIT" type="BIGINT"
-          remarks="revocation invalidity time, seconds since January 1, 1970, 00:00:00 GMT"/>
-      <column name="EE" type="SMALLINT"
-          remarks="whether it is an end entity cert">
+      <column name="RR" type="SMALLINT">
+        <!--remarks="revocation reason"-->
+      </column>
+      <column name="RT"  type="BIGINT">
+        <!--remarks="revocation time, seconds since January 1, 1970, 00:00:00 GMT"-->
+      </column>
+      <column name="RIT" type="BIGINT">
+        <!--remarks="revocation invalidity time, seconds since January 1, 1970, 00:00:00 GMT"-->
+      </column>
+      <column name="EE" type="SMALLINT">
+        <!--remarks="whether it is an end entity cert"-->
         <constraints nullable="false"/>
       </column>
-      <column name="UID" type="INT" remarks="user id"/>
-      <column name="RTYPE" type="SMALLINT"
-         remarks="request type, 1 for direct via CA command, 2 for CMP, 3 for SCEP, 4 for REST">
+      <column name="UID" type="INT">
+        <!--remarks="user id"-->
+      </column>
+      <column name="RTYPE" type="SMALLINT">
+        <!--remarks="request type, 1 for direct via CA command, 2 for CMP, 3 for SCEP, 4 for REST"-->
         <constraints nullable="false"/>
       </column>
       <column name="SUBJECT" type="${x500name.type}">
         <constraints nullable="false"/>
       </column>
-      <column name="TID" type="VARCHAR(43)"
-          remarks="base64 encoded transactionId, maximal 256 bit"/>
-      <column name="CRL_SCOPE" type="SMALLINT" remarks="CRL scope, reserved for future use">
+      <column name="TID" type="VARCHAR(43)">
+        <!--remarks="base64 encoded transactionId, maximal 256 bit"-->
+      </column>
+      <column name="CRL_SCOPE" type="SMALLINT">
+        <!--remarks="CRL scope, reserved for future use"-->
         <constraints nullable="false"/>
       </column>
-      <column name="SHA1" type="CHAR(28)"
-          remarks="base64 encoded SHA1 fingerprint of the certificate">
+      <column name="SHA1" type="CHAR(28)">
+        <!--remarks="base64 encoded SHA1 fingerprint of the certificate"-->
         <constraints nullable="false"/>
       </column>
       <column name="REQ_SUBJECT" type="${x500name.type}"/>
-      <column name="CERT" type="VARCHAR(6000)"
-          remarks="Base64 encoded certificate">
+      <column name="CERT" type="VARCHAR(6000)">
+        <!--remarks="Base64 encoded certificate"-->
         <constraints nullable="false"/>
       </column>
     </createTable>
@@ -343,8 +374,8 @@
       <column name="ID" type="BIGINT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="LUPDATE" type="BIGINT"
-          remarks="time at which the request is added to database, seconds since January 1, 1970, 00:00:00 GMT">
+      <column name="LUPDATE" type="BIGINT">
+        <!--remarks="time at which the request is added to database, seconds since January 1, 1970, 00:00:00 GMT"-->
         <constraints nullable="false"/>
       </column>
       <column name="DATA" type="CLOB"/>
@@ -354,10 +385,12 @@
       <column name="ID" type="BIGINT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="RID" type="BIGINT" remarks="request id">
+      <column name="RID" type="BIGINT">
+        <!--remarks="request id"-->
         <constraints nullable="false"/>
       </column>
-      <column name="CID" type="BIGINT" remarks="cert id">
+      <column name="CID" type="BIGINT">
+        <!--remarks="cert id"-->
         <constraints nullable="false"/>
       </column>
     </createTable>
