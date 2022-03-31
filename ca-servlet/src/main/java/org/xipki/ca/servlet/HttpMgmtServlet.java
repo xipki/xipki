@@ -353,7 +353,7 @@ public class HttpMgmtServlet extends HttpServlet {
           byte[] result = caManager.getCertRequest(req.getCaName(), req.getSerialNumber());
           if (result == null) {
             throw new CaMgmtException("Found no CertRequest for CA " + req.getCaName()
-                        + " and serialNumber " + req.getSerialNumber());
+                        + " and serialNumber 0x" + req.getSerialNumber().toString(16));
           }
           resp = new MgmtResponse.ByteArray(result);
           break;
@@ -363,7 +363,7 @@ public class HttpMgmtServlet extends HttpServlet {
           X509CRLHolder crl = caManager.getCrl(req.getCaName(), req.getCrlNumber());
           if (crl == null) {
             throw new CaMgmtException("Found no CRL for CA " + req.getCaName()
-                        + " with CRL number " + req.getCrlNumber());
+                        + " with CRL number 0x" + req.getCrlNumber().toString(16));
           }
           resp = toByteArray(action, crl);
           break;

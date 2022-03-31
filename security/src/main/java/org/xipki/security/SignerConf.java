@@ -140,16 +140,7 @@ public class SignerConf {
     }
 
     try {
-      ConfPairs pairs = new ConfPairs(conf);
-      for (String name : pairs.names()) {
-        if (name.toLowerCase().contains("password")) {
-          String value = pairs.value(name);
-          if (value != null && !StringUtil.startsWithIgnoreCase(value, "PBE:")) {
-            pairs.putPair(name, "<sensitive>");
-          }
-        }
-      }
-      return pairs.getEncoded();
+      return new ConfPairs(conf).toStringOmitSensitive("password");
     } catch (Exception ex) {
       return conf;
     }
