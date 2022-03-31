@@ -196,7 +196,7 @@ public class CertStore extends CertStoreBase {
 
   private final AtomicInteger cachedCrlId = new AtomicInteger(0);
 
-  private long earlistNotBefore = 0;
+  private long earliestNotBefore = 0;
 
   public CertStore(DataSourceWrapper datasource, UniqueIdGenerator idGenerator)
       throws DataAccessException, CaMgmtException {
@@ -226,7 +226,7 @@ public class CertStore extends CertStoreBase {
     this.sqlSelectUnrevokedSn = buildSelectFirstSql("LUPDATE FROM CERT WHERE REV=0 AND SN=?");
     final String prefix = "SN,LUPDATE FROM CERT WHERE REV=0 AND SN";
     this.sqlSelectUnrevokedSn100 = buildArraySql(datasource, prefix, 100);
-    this.earlistNotBefore = datasource.getMin(null, "CERT", "NBEFORE");
+    this.earliestNotBefore = datasource.getMin(null, "CERT", "NBEFORE");
   } // constructor
 
   public boolean addCert(CertificateInfo certInfo) {
@@ -553,7 +553,7 @@ public class CertStore extends CertStoreBase {
   } // method getCountOfCerts
 
   public long getCountOfCerts(long notBeforeSince) throws OperationException {
-    if (notBeforeSince <= earlistNotBefore) {
+    if (notBeforeSince <= earliestNotBefore) {
       final String sql = "SELECT COUNT(*) FROM CERT";
       return execQueryLongPrepStmt(sql);
     } else {

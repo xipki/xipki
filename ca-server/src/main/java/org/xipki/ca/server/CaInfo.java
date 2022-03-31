@@ -387,6 +387,7 @@ public class CaInfo {
         }
         tmpSigners.put(m.getAlgo(), signer);
       } catch (Throwable th) {
+        LogUtil.error(LOG, th, "could not initialize the CA signer for CA " + caEntry.getIdent().getName());
         for (ConcurrentContentSigner ccs : tmpSigners.values()) {
           try {
             ccs.close();

@@ -92,7 +92,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   } // class CertsInQueuePublisher
 
-  private class UnreferencedRequstCleaner implements Runnable {
+  private class UnreferencedRequestCleaner implements Runnable {
 
     private boolean inProcess;
 
@@ -640,7 +640,7 @@ public class CaManagerImpl implements CaManager, Closeable {
         scheduledThreadPoolExecutor.scheduleAtFixedRate(
             new CertsInQueuePublisher(), 120, 120, SECONDS);
         scheduledThreadPoolExecutor.scheduleAtFixedRate(
-            new UnreferencedRequstCleaner(), 60, 24L * 60 * 60, SECONDS); // 1 DAY
+            new UnreferencedRequestCleaner(), 60, 24L * 60 * 60, SECONDS); // 1 DAY
       } else {
         sb.append(": no CA is configured");
       }

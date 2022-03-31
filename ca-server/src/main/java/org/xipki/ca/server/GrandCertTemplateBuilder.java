@@ -340,7 +340,7 @@ class GrandCertTemplateBuilder {
       }
     } else {
       // show not reach here
-      throw new OperationException(BAD_CERT_TEMPLATE, "no public key is specified  genkey");
+      throw new OperationException(BAD_CERT_TEMPLATE, "no public key is specified");
     }
 
     // public key
