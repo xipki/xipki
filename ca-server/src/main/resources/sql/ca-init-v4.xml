@@ -14,7 +14,7 @@
   <property name="crl.data.type" value="CLOB" dbms="oracle,postgresql,mysql,mariadb,h2,hsqldb"/>
   <!-- CA configuration :: create table -->
   <changeSet author="xipki" id="1">
-    <!-- table DBSCHEMAINFO -->
+    <!-- table DBSCHEMA -->
     <createTable tableName="DBSCHEMA"
         remarks="database schema information">
       <column name="NAME" type="VARCHAR(45)">

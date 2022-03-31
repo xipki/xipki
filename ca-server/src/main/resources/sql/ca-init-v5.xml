@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!--
- XiPKI version 5.3.8
+ v5: introduced in XiPKI version 5.3.8, change compared to v4
+   - Delete columns DUPLICATE_KEY and DUPLICATE_SUBJECT from table CA
+   - Delete column FP_K from table CERT
+
  Maximal column size: 4k
   - DB2: PAGESIZE 4 k
 -->
@@ -14,7 +17,7 @@
   <property name="crl.data.type" value="CLOB" dbms="oracle,postgresql,mysql,mariadb,h2,hsqldb"/>
   <!-- CA configuration :: create table -->
   <changeSet author="xipki" id="1">
-    <!-- table DBSCHEMAINFO -->
+    <!-- table DBSCHEMA -->
     <createTable tableName="DBSCHEMA"
         remarks="database schema information">
       <column name="NAME" type="VARCHAR(45)">
