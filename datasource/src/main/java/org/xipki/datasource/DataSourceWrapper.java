@@ -579,7 +579,13 @@ public abstract class DataSourceWrapper implements Closeable {
     }
   } // method getFirstStringValue
 
-  public long getFirstLongValue(Connection conn, String table, String column, String criteria)
+  public Integer getFirstIntValue(Connection conn, String table, String column, String criteria)
+          throws DataAccessException {
+    Long lv = getFirstLongValue(conn, table, column, criteria);
+    return lv == null ? null : lv.intValue();
+  }
+
+  public Long getFirstLongValue(Connection conn, String table, String column, String criteria)
           throws DataAccessException {
     final String sql = "SELECT " + column + " FROM " + table + " WHERE " + criteria;
     Statement stmt = null;
@@ -590,7 +596,7 @@ public abstract class DataSourceWrapper implements Closeable {
       if (rs.next()) {
         return rs.getLong(column);
       } else {
-        return 0;
+        return null;
       }
     } catch (SQLException ex) {
       throw translate(sql, ex);
