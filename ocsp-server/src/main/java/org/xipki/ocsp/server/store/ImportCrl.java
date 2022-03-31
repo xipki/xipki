@@ -667,7 +667,7 @@ class ImportCrl {
    */
   private void deleteCa(Connection conn, CrlDirInfo crlDirInfo, CertWrapper caCert)
       throws DataAccessException {
-    Integer issuerId = (int) datasource.getFirstLongValue(conn, "ISSUER", "ID",
+    Integer issuerId = datasource.getFirstIntValue(conn, "ISSUER", "ID",
         "S1C='" + caCert.base64Sha1Fp + "'");
     if (issuerId == null) {
       LOG.info("No issuer for CRL {} in the folder {} found in database",
@@ -694,7 +694,7 @@ class ImportCrl {
       throws DataAccessException {
     CertRevocationInfo revInfo = crlDirInfo.revocationinfo;
 
-    Integer issuerId = (int) datasource.getFirstLongValue(conn, "ISSUER", "ID",
+    Integer issuerId = datasource.getFirstIntValue(conn, "ISSUER", "ID",
         "S1C='" + caCert.base64Sha1Fp + "'");
 
     PreparedStatement ps = null;

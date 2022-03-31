@@ -280,7 +280,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
             continue;
           }
 
-          // CRL will not be download by OCSP responder.
+          // CRL will not be downloaded by OCSP responder.
           if (!new File(subDir, "crl.download").exists()) {
             continue;
           }
