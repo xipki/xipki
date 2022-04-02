@@ -414,10 +414,6 @@ class ConfLoader {
     CaManagerQueryExecutor queryExecutor = manager.queryExecutor;
 
     try {
-      Set<String> includeSignerNames = new HashSet<>();
-      Set<String> includeRequestorNames = new HashSet<>();
-      Set<String> includeProfileNames = new HashSet<>();
-      Set<String> includePublisherNames = new HashSet<>();
       Set<String> includeUserNames = new HashSet<>();
 
       // users
@@ -448,8 +444,6 @@ class ConfLoader {
 
             for (CaHasRequestorEntry m : requestors) {
               String requestorName = m.getRequestorIdent().getName();
-              includeRequestorNames.add(requestorName);
-
               CaConfType.CaHasRequestor chr = new CaConfType.CaHasRequestor();
               chr.setRequestorName(requestorName);
               chr.setRa(m.isRa());
@@ -494,13 +488,11 @@ class ConfLoader {
 
           strs = manager.caHasProfiles.get(name);
           if (CollectionUtil.isNotEmpty(strs)) {
-            includeProfileNames.addAll(strs);
             ca.setProfiles(new ArrayList<>(strs));
           }
 
           strs = manager.caHasPublishers.get(name);
           if (CollectionUtil.isNotEmpty(strs)) {
-            includePublisherNames.addAll(strs);
             ca.setPublishers(new ArrayList<>(strs));
           }
 
@@ -543,7 +535,6 @@ class ConfLoader {
           }
 
           if (entry.getCmpResponderName() != null) {
-            includeSignerNames.add(entry.getCmpResponderName());
             caInfoType.setCmpResponderName(entry.getCmpResponderName());
           }
 
@@ -553,7 +544,6 @@ class ConfLoader {
           }
 
           if (entry.getCrlSignerName() != null) {
-            includeSignerNames.add(entry.getCrlSignerName());
             caInfoType.setCrlSignerName(entry.getCrlSignerName());
           }
 
@@ -594,7 +584,6 @@ class ConfLoader {
           }
 
           if (entry.getScepResponderName() != null) {
-            includeSignerNames.add(entry.getScepResponderName());
             caInfoType.setScepResponderName(entry.getScepResponderName());
           }
 
@@ -624,10 +613,6 @@ class ConfLoader {
         List<CaConfType.Requestor> list = new LinkedList<>();
 
         for (String name : manager.requestorDbEntries.keySet()) {
-          if (!includeRequestorNames.contains(name)) {
-            continue;
-          }
-
           RequestorEntry entry = manager.requestorDbEntries.get(name);
           CaConfType.Requestor type = new CaConfType.Requestor();
           type.setName(name);
@@ -656,9 +641,6 @@ class ConfLoader {
         List<NameTypeConf> list = new LinkedList<>();
 
         for (String name : manager.publisherDbEntries.keySet()) {
-          if (!includePublisherNames.contains(name)) {
-            continue;
-          }
           PublisherEntry entry = manager.publisherDbEntries.get(name);
           NameTypeConf conf = new NameTypeConf();
           conf.setName(name);
@@ -677,9 +659,6 @@ class ConfLoader {
       if (CollectionUtil.isNotEmpty(manager.certprofileDbEntries)) {
         List<NameTypeConf> list = new LinkedList<>();
         for (String name : manager.certprofileDbEntries.keySet()) {
-          if (!includeProfileNames.contains(name)) {
-            continue;
-          }
           CertprofileEntry entry = manager.certprofileDbEntries.get(name);
           NameTypeConf conf = new NameTypeConf();
           conf.setName(name);
@@ -699,10 +678,6 @@ class ConfLoader {
         List<CaConfType.Signer> list = new LinkedList<>();
 
         for (String name : manager.signerDbEntries.keySet()) {
-          if (!includeSignerNames.contains(name)) {
-            continue;
-          }
-
           SignerEntry entry = manager.signerDbEntries.get(name);
           CaConfType.Signer conf = new CaConfType.Signer();
           conf.setName(name);

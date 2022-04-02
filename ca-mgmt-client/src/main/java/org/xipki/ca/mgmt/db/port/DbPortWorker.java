@@ -113,25 +113,30 @@ public abstract class DbPortWorker extends DbWorker {
       return;
     }
 
+    File mainFile = new File(dir, "encrypted");
+    if (!mainFile.exists()) {
+      return;
+    }
+
     for (File f : files) {
       // delete all files and sub-dirs except 'encrypted'.
-        if (f.getName().equals("encrypted")) {
-          continue;
-        }
+      if (f.getName().equals("encrypted")) {
+        continue;
+      }
 
-        List<File> failedList = new LinkedList<>();
-        if (f.isFile()) {
-          if (!IoUtil.deleteFile(f)) {
-            failedList.add(f);
-          }
-        } else if (f.isDirectory()) {
-          if (!IoUtil.deleteDir(f)) {
-            failedList.add(f);
-          }
+      List<File> failedList = new LinkedList<>();
+      if (f.isFile()) {
+        if (!IoUtil.deleteFile(f)) {
+          failedList.add(f);
         }
+      } else if (f.isDirectory()) {
+        if (!IoUtil.deleteDir(f)) {
+          failedList.add(f);
+        }
+      }
 
-        if (!failedList.isEmpty()) {
-          LOG.error("error deleting files & folders: {}", failedList);
+      if (!failedList.isEmpty()) {
+        LOG.error("error deleting files & folders: {}", failedList);
       }
     }
   }
