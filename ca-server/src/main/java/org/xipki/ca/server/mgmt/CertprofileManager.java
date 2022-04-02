@@ -95,7 +95,7 @@ class CertprofileManager {
   } // method initCertprofiles
 
   void removeCertprofileFromCa(String profileName, String caName) throws CaMgmtException {
-    manager.assertMasterModeAndSetuped();
+    manager.assertMasterMode();
 
     profileName = toNonBlankLower(profileName, "profileName");
     caName = toNonBlankLower(caName, "caName");
@@ -111,7 +111,7 @@ class CertprofileManager {
   } // method removeCertprofileFromCa
 
   void addCertprofileToCa(String profileName, String caName) throws CaMgmtException {
-    manager.assertMasterModeAndSetuped();
+    manager.assertMasterMode();
 
     profileName = toNonBlankLower(profileName, "profileName");
     caName = toNonBlankLower(caName, "caName");
@@ -146,7 +146,7 @@ class CertprofileManager {
   } // method addCertprofileToCa
 
   void removeCertprofile(String name) throws CaMgmtException {
-    manager.assertMasterModeAndSetuped();
+    manager.assertMasterMode();
 
     name = toNonBlankLower(name, "name");
 
@@ -169,7 +169,7 @@ class CertprofileManager {
   } // method removeCertprofile
 
   void changeCertprofile(String name, String type, String conf) throws CaMgmtException {
-    manager.assertMasterModeAndSetuped();
+    manager.assertMasterMode();
 
     name = toNonBlankLower(name, "name");
     if (type == null && conf == null) {
@@ -198,7 +198,7 @@ class CertprofileManager {
   } // method changeCertprofile
 
   void addCertprofile(CertprofileEntry certprofileEntry) throws CaMgmtException {
-    manager.assertMasterModeAndSetuped();
+    manager.assertMasterMode();
 
     notNull(certprofileEntry, "certprofileEntry");
     String name = certprofileEntry.getIdent().getName();

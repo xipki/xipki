@@ -93,7 +93,7 @@ class RequestorManager {
   } // method initRequestors
 
   void addRequestor(RequestorEntry requestorEntry) throws CaMgmtException {
-    manager.assertMasterModeAndSetuped();
+    manager.assertMasterMode();
 
     notNull(requestorEntry, "requestorEntry");
     String name = requestorEntry.getIdent().getName();
@@ -127,7 +127,7 @@ class RequestorManager {
   } // method addRequestor
 
   void removeRequestor(String name) throws CaMgmtException {
-    manager.assertMasterModeAndSetuped();
+    manager.assertMasterMode();
 
     name = toNonBlankLower(name, "name");
 
@@ -156,7 +156,7 @@ class RequestorManager {
   } // method removeRequestor
 
   void changeRequestor(String name, String type, String conf) throws CaMgmtException {
-    manager.assertMasterModeAndSetuped();
+    manager.assertMasterMode();
 
     name = toNonBlankLower(name, "name");
     notBlank(type, "type");
@@ -178,7 +178,7 @@ class RequestorManager {
   } // method changeRequestor
 
   void removeRequestorFromCa(String requestorName, String caName) throws CaMgmtException {
-    manager.assertMasterModeAndSetuped();
+    manager.assertMasterMode();
 
     requestorName = toNonBlankLower(requestorName, "requestorName");
     caName = toNonBlankLower(caName, "caName");
@@ -202,7 +202,7 @@ class RequestorManager {
   } // method removeRequestorFromCa
 
   void addRequestorToCa(CaHasRequestorEntry requestor, String caName) throws CaMgmtException {
-    manager.assertMasterModeAndSetuped();
+    manager.assertMasterMode();
 
     notNull(requestor, "requestor");
     caName = toNonBlankLower(caName, "caName");

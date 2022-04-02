@@ -424,18 +424,76 @@ public class CaManagerImpl implements CaManager, Closeable {
     final long epoch = DateUtil.parseUtcTimeyyyyMMdd("20100101").getTime();
     UniqueIdGenerator idGen = new UniqueIdGenerator(epoch, shardId);
 
+    CaMgmtException ex0 = null;
     try {
       this.certstore = new CertStore(datasource, idGen);
     } catch (DataAccessException ex) {
-      throw new CaMgmtException(ex.getMessage(), ex);
+      ex0 = new CaMgmtException(ex.getMessage(), ex);
     }
 
-    ca2Manager.initCaAliases();
-    certprofileManager.initCertprofiles();
-    publisherManager.initPublishers();
-    requestorManager.initRequestors();
-    signerManager.initSigners();
-    ca2Manager.initCas();
+    try {
+      ca2Manager.initCaAliases();
+    } catch (CaMgmtException ex) {
+      if (ex0 == null) {
+        ex0 = ex;
+      } else {
+        LogUtil.error(LOG, ex, "error initCaAliases");
+      }
+    }
+
+    try {
+      certprofileManager.initCertprofiles();
+    } catch (CaMgmtException ex) {
+      if (ex0 == null) {
+        ex0 = ex;
+      } else {
+        LogUtil.error(LOG, ex, "error initCertprofiles");
+      }
+    }
+
+    try {
+      publisherManager.initPublishers();
+    } catch (CaMgmtException ex) {
+      if (ex0 == null) {
+        ex0 = ex;
+      } else {
+        LogUtil.error(LOG, ex, "error initPublishers");
+      }
+    }
+
+    try {
+      requestorManager.initRequestors();
+    } catch (CaMgmtException ex) {
+      if (ex0 == null) {
+        ex0 = ex;
+      } else {
+        LogUtil.error(LOG, ex, "error initRequestors");
+      }
+    }
+
+    try {
+      signerManager.initSigners();
+    } catch (CaMgmtException ex) {
+      if (ex0 == null) {
+        ex0 = ex;
+      } else {
+        LogUtil.error(LOG, ex, "error initSigners");
+      }
+    }
+
+    try {
+      ca2Manager.initCas();
+    } catch (CaMgmtException ex) {
+      if (ex0 == null) {
+        ex0 = ex;
+      } else {
+        LogUtil.error(LOG, ex, "error initCas");
+      }
+    }
+
+    if (ex0 != null) {
+      throw ex0;
+    }
   } // method init
 
   private DataSourceWrapper loadDatasource(String datasourceName, FileOrValue datasourceConf)
@@ -870,7 +928,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   public void removeUserFromCa(String userName, String caName) throws CaMgmtException {
     userName = toNonBlankLower(userName, "userName");
     caName = toNonBlankLower(caName, "caName");
-    assertMasterModeAndSetuped();
+    assertMasterMode();
 
     queryExecutor.removeUserFromCa(userName, caName);
   } // method removeUserFromCa
@@ -878,7 +936,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void addUserToCa(CaHasUserEntry user, String caName) throws CaMgmtException {
     caName = toNonBlankLower(caName, "caName");
-    assertMasterModeAndSetuped();
+    assertMasterMode();
 
     X509Ca ca = getX509Ca(caName);
     if (ca == null) {
@@ -1109,11 +1167,14 @@ public class CaManagerImpl implements CaManager, Closeable {
     return ca2Manager.generateRootCa(caEntry, profileName, subject, serialNumber);
   }
 
-  void assertMasterModeAndSetuped() throws CaMgmtException {
+  void assertMasterMode() throws CaMgmtException {
     if (!masterMode) {
       throw new CaMgmtException("operation not allowed in slave mode");
     }
+  }
 
+  void assertMasterModeAndSetuped() throws CaMgmtException {
+    assertMasterMode();
     if (!caSystemSetuped) {
       throw new CaMgmtException("CA system is not initialized yet.");
     }
@@ -1133,20 +1194,20 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   @Override
   public void addUser(AddUserEntry addUserEntry) throws CaMgmtException {
-    assertMasterModeAndSetuped();
+    assertMasterMode();
     queryExecutor.addUser(addUserEntry);
   }
 
   @Override
   public void changeUser(ChangeUserEntry changeUserEntry) throws CaMgmtException {
-    assertMasterModeAndSetuped();
+    assertMasterMode();
     queryExecutor.changeUser(changeUserEntry);
   }
 
   @Override
   public void removeUser(String username) throws CaMgmtException {
     username = toNonBlankLower(username, "username");
-    assertMasterModeAndSetuped();
+    assertMasterMode();
     if (!queryExecutor.deleteRowWithName(username, "TUSER")) {
       throw new CaMgmtException("unknown user " + username);
     }

@@ -262,11 +262,12 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     }
 
     String cmpcontrol = rs.getString("CMP_CONTROL");
-    // null or blank value is allowed
-    try {
-      entry.setCmpControl(new CmpControl(cmpcontrol));
-    } catch (InvalidConfException ex) {
-      throw new CaMgmtException("invalid CMP_CONTROL: " + cmpcontrol);
+    if (StringUtil.isNotBlank(cmpcontrol)) {
+      try {
+        entry.setCmpControl(new CmpControl(cmpcontrol));
+      } catch (InvalidConfException ex) {
+        throw new CaMgmtException("invalid CMP_CONTROL: " + cmpcontrol);
+      }
     }
 
     String crlcontrol = rs.getString("CRL_CONTROL");
@@ -295,7 +296,16 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       }
     }
 
-    entry.setProtocolSupport(new ProtocolSupport(rs.getString("PROTOCOL_SUPPORT")));
+    ProtocolSupport protocolSupport = new ProtocolSupport(rs.getString("PROTOCOL_SUPPORT"));
+    if (protocolSupport.isCmp()) {
+      if (entry.getCmpControl() == null) {
+        LOG.warn("CA {}: CMP is supported but CMP_CONTROL is not set, disable the CMP support",
+                name);
+        protocolSupport.setCmp(false);
+      }
+    }
+    entry.setProtocolSupport(protocolSupport);
+
     entry.setSaveRequest((getInt(rs, "SAVE_REQ") != 0));
     entry.setPermission(getInt(rs, "PERMISSION"));
 

@@ -82,7 +82,7 @@ class SignerManager {
   } // method initSigners
 
   void addSigner(SignerEntry signerEntry) throws CaMgmtException {
-    manager.assertMasterModeAndSetuped();
+    manager.assertMasterMode();
 
     notNull(signerEntry, "signerEntry");
     String name = signerEntry.getName();
@@ -106,7 +106,7 @@ class SignerManager {
   } // method addSigner
 
   void removeSigner(String name) throws CaMgmtException {
-    manager.assertMasterModeAndSetuped();
+    manager.assertMasterMode();
 
     name = toNonBlankLower(name, "name");
     boolean bo = manager.queryExecutor.deleteRowWithName(name, "SIGNER");
@@ -137,7 +137,7 @@ class SignerManager {
 
   void changeSigner(String name, String type, String conf, String base64Cert)
       throws CaMgmtException {
-    manager.assertMasterModeAndSetuped();
+    manager.assertMasterMode();
 
     name = toNonBlankLower(name, "name");
     if (type == null && conf == null && base64Cert == null) {

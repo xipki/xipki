@@ -97,7 +97,7 @@ class Ca2Manager {
   }
 
   void restartCa(String name) throws CaMgmtException {
-    assertMasterModeAndSetuped();
+    assertMasterMode();
 
     name = toNonBlankLower(name, "name");
 
@@ -298,7 +298,7 @@ class Ca2Manager {
   } // method createCa
 
   void addCa(CaEntry caEntry) throws CaMgmtException {
-    assertMasterModeAndSetuped();
+    assertMasterMode();
 
     notNull(caEntry, "caEntry");
 
@@ -354,7 +354,7 @@ class Ca2Manager {
   } // method getCa
 
   void changeCa(ChangeCaEntry entry) throws CaMgmtException {
-    assertMasterModeAndSetuped();
+    assertMasterMode();
 
     notNull(entry, "entry");
 
@@ -386,7 +386,7 @@ class Ca2Manager {
   } // method changeCa
 
   void addCaAlias(String aliasName, String caName) throws CaMgmtException {
-    assertMasterModeAndSetuped();
+    assertMasterMode();
 
     aliasName = toNonBlankLower(aliasName, "aliasName");
     caName = toNonBlankLower(caName, "caName");
@@ -405,7 +405,7 @@ class Ca2Manager {
   } // method addCaAlias
 
   void removeCaAlias(String name) throws CaMgmtException {
-    assertMasterModeAndSetuped();
+    assertMasterMode();
 
     name = toNonBlankLower(name, "name");
     manager.queryExecutor.removeCaAlias(name);
@@ -457,7 +457,7 @@ class Ca2Manager {
   } // method getCaCertchain
 
   void removeCa(String name) throws CaMgmtException {
-    assertMasterModeAndSetuped();
+    assertMasterMode();
 
     name = toNonBlankLower(name, "name");
 
@@ -929,6 +929,10 @@ class Ca2Manager {
 
     ca.clearPublishQueue(publisherNames);
   } // method clearPublishQueue
+
+  private void assertMasterMode() throws CaMgmtException {
+    manager.assertMasterMode();
+  }
 
   private void assertMasterModeAndSetuped() throws CaMgmtException {
     manager.assertMasterModeAndSetuped();
