@@ -103,7 +103,7 @@ class PublisherManager {
   } // method initPublishers
 
   void removePublisherFromCa(String publisherName, String caName) throws CaMgmtException {
-    manager.assertMasterModeAndSetuped();
+    manager.assertMasterMode();
 
     publisherName = toNonBlankLower(publisherName, "publisherName");
     caName = toNonBlankLower(caName, "caName");
@@ -117,7 +117,7 @@ class PublisherManager {
   } // method removePublisherFromCa
 
   void addPublisherToCa(String publisherName, String caName) throws CaMgmtException {
-    manager.assertMasterModeAndSetuped();
+    manager.assertMasterMode();
 
     publisherName = toNonBlankLower(publisherName, "publisherName");
     caName = toNonBlankLower(caName, "caName");
@@ -158,7 +158,7 @@ class PublisherManager {
   } // method addPublisherToCa
 
   void addPublisher(PublisherEntry entry) throws CaMgmtException {
-    manager.assertMasterModeAndSetuped();
+    manager.assertMasterMode();
 
     notNull(entry, "entry");
 
@@ -199,7 +199,7 @@ class PublisherManager {
   }
 
   void removePublisher(String name) throws CaMgmtException {
-    manager.assertMasterModeAndSetuped();
+    manager.assertMasterMode();
 
     name = toNonBlankLower(name, "name");
 
@@ -221,7 +221,7 @@ class PublisherManager {
   } // method removePublisher
 
   void changePublisher(String name, String type, String conf) throws CaMgmtException {
-    manager.assertMasterModeAndSetuped();
+    manager.assertMasterMode();
 
     name = toNonBlankLower(name, "name");
 
@@ -244,7 +244,7 @@ class PublisherManager {
 
   void republishCertificates(String caName, List<String> publisherNames, int numThreads)
       throws CaMgmtException {
-    manager.assertMasterModeAndSetuped();
+    manager.assertMasterMode();
 
     caName = toNonBlankLower(caName, "caName");
     positive(numThreads, "numThreads");

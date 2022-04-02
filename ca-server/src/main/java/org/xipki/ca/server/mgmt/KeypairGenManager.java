@@ -82,7 +82,7 @@ class KeypairGenManager {
       throw new CaMgmtException("Addition of keypair generation 'software' is not allowed");
     }
 
-    manager.assertMasterModeAndSetuped();
+    manager.assertMasterMode();
 
     notNull(keypairGenEntry, "keypairGenEntry");
     String name = keypairGenEntry.getName();
@@ -101,7 +101,7 @@ class KeypairGenManager {
       throw new CaMgmtException("Modification of keypair generation 'software' is not allowed");
     }
 
-    manager.assertMasterModeAndSetuped();
+    manager.assertMasterMode();
 
     name = toNonBlankLower(name, "name");
     boolean bo = manager.queryExecutor.deleteRowWithName(name, "KEYPAIR_GEN");
@@ -134,7 +134,7 @@ class KeypairGenManager {
       throw new CaMgmtException("Addition of keypair generation 'software' is not allowed");
     }
 
-    manager.assertMasterModeAndSetuped();
+    manager.assertMasterMode();
 
     name = toNonBlankLower(name, "name");
     if (type == null && conf == null) {
