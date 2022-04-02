@@ -92,11 +92,33 @@ public class CollectionUtil {
       return null;
     }
 
-    Set<String> upperSet = new HashSet<>();
+    Set<String> lowerSet = new HashSet<>();
     for (String s : set) {
-      upperSet.add(s.toLowerCase());
+      lowerSet.add(s.toLowerCase());
     }
-    return upperSet;
+    return lowerSet;
+  }
+
+  public static String toString(List<String> list, String delimiter) {
+    if (list == null) {
+      return null;
+    }
+
+    if (list.isEmpty()) {
+      return "";
+    }
+
+    int n = list.size();
+    if (n == 1) {
+      return list.get(0);
+    }
+
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < n - 1; i++) {
+        sb.append(list.get(i)).append(delimiter);
+    }
+    sb.append(list.get(n - 1));
+    return sb.toString();
   }
 
   public static <T> Set<T> unmodifiableSet(Set<? extends T> set) {

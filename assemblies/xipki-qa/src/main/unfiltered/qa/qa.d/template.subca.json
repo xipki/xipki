@@ -36,6 +36,7 @@
 				"servers":"https://localhost/ctlog/"
 			},
 			"cmpResponderName":"responder1",
+			"keypairGenNames": ["software"],
 			"duplicateKey":true,
 			"duplicateSubject":true,
 			"expirationPeriod":365,
@@ -49,7 +50,9 @@
 				"targetReason":"cessationOfOperation",
 				"unchangedSince":"15d"
 			},
+			"saveCert": true,
 			"saveReq":true,
+			"saveKeypair":true,
 			"signerType":"${token.type}",
 			"signerConf":{
 				"value":"${ca.signerConf}"

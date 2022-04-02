@@ -584,8 +584,8 @@ public class X509CrlModule extends X509CaModule implements Closeable {
         concurrentSigner.requiteSigner(signer0);
       }
 
-      caInfo.getCaEntry().setNextCrlNumber(crlNumber.longValue() + 1);
-      caManager.commitNextCrlNo(caIdent, caInfo.getCaEntry().getNextCrlNumber());
+      caInfo.setNextCrlNumber(crlNumber.longValue() + 1);
+      caManager.commitNextCrlNo(caIdent, caInfo.getNextCrlNumber());
       publisher.publishCrl(crl);
 
       successful = true;

@@ -63,6 +63,8 @@ public class CaCertstore extends ValidatableConf {
 
     private String scepResponderName;
 
+    private String keypairGenNames;
+
     private String cmpControl;
 
     private String scepControl;
@@ -77,7 +79,11 @@ public class CaCertstore extends ValidatableConf {
 
     private String protocolSupport;
 
+    private int saveCert;
+
     private int saveReq;
+
+    private int saveKeypair;
 
     private int permission;
 
@@ -205,6 +211,14 @@ public class CaCertstore extends ValidatableConf {
       this.scepResponderName = scepResponderName;
     }
 
+    public String getKeypairGenNames() {
+      return keypairGenNames;
+    }
+
+    public void setKeypairGenNames(String keypairGenNames) {
+      this.keypairGenNames = keypairGenNames;
+    }
+
     public String getCmpControl() {
       return cmpControl;
     }
@@ -261,12 +275,28 @@ public class CaCertstore extends ValidatableConf {
       this.protocolSupport = protocolSupport;
     }
 
+    public int getSaveCert() {
+      return saveCert;
+    }
+
+    public void setSaveCert(int saveCert) {
+      this.saveCert = saveCert;
+    }
+
     public int getSaveReq() {
       return saveReq;
     }
 
     public void setSaveReq(int saveReq) {
       this.saveReq = saveReq;
+    }
+
+    public int getSaveKeypair() {
+      return saveKeypair;
+    }
+
+    public void setSaveKeypair(int saveKeypair) {
+      this.saveKeypair = saveKeypair;
     }
 
     public int getPermission() {
@@ -379,7 +409,11 @@ public class CaCertstore extends ValidatableConf {
 
     private int version;
 
+    private List<DbSchemaEntry> dbSchemas;
+
     private List<Signer> signers;
+
+    private List<NameTypeConf> keypairGens;
 
     private List<IdNameTypeConf> requestors;
 
@@ -407,6 +441,17 @@ public class CaCertstore extends ValidatableConf {
 
     public void setVersion(int version) {
       this.version = version;
+    }
+
+    public List<DbSchemaEntry> getDbSchemas() {
+      if (dbSchemas == null) {
+        dbSchemas = new LinkedList<>();
+      }
+      return dbSchemas;
+    }
+
+    public void setDbSchemas(List<DbSchemaEntry> dbSchemas) {
+      this.dbSchemas = dbSchemas;
     }
 
     public List<Signer> getSigners() {
@@ -530,6 +575,14 @@ public class CaCertstore extends ValidatableConf {
       this.caHasUsers = caHasUsers;
     }
 
+    public List<NameTypeConf> getKeypairGens() {
+      return keypairGens;
+    }
+
+    public void setKeypairGens(List<NameTypeConf> keypairGens) {
+      this.keypairGens = keypairGens;
+    }
+
     @Override
     public void validate()
         throws InvalidConfException {
@@ -543,6 +596,7 @@ public class CaCertstore extends ValidatableConf {
       validate(caHasRequestors);
       validate(caHasPublishers);
       validate(caHasProfiles);
+      validate(keypairGens);
     }
 
   } // class Caconf
@@ -710,6 +764,8 @@ public class CaCertstore extends ValidatableConf {
   public static class Cert extends IdentifidDbObject {
 
     private String file;
+
+    private String privateKeyFile;
 
     private Integer caId;
 
@@ -893,6 +949,14 @@ public class CaCertstore extends ValidatableConf {
       this.file = file;
     }
 
+    public String getPrivateKeyFile() {
+      return privateKeyFile;
+    }
+
+    public void setPrivateKeyFile(String privateKeyFile) {
+      this.privateKeyFile = privateKeyFile;
+    }
+
     public Integer getUid() {
       return uid;
     }
@@ -1040,6 +1104,34 @@ public class CaCertstore extends ValidatableConf {
 
   } // class Crls
 
+  public static class DbSchemaEntry extends ValidatableConf {
+
+    private String name;
+    private String value;
+
+    public String getName() {
+      return name;
+    }
+
+    public void setName(String name) {
+      this.name = name;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    public void setValue(String value) {
+      this.value = value;
+    }
+
+    @Override
+    public void validate() throws InvalidConfException {
+      notBlank(name, "name");
+      notNull(value, "value");
+    }
+  }
+
   public static class DeltaCrlCacheEntry extends ValidatableConf {
 
     private String serial;
@@ -1070,23 +1162,13 @@ public class CaCertstore extends ValidatableConf {
 
   } // class DeltaCrlCacheEntry
 
-  public static class IdNameTypeConf extends ValidatableConf {
-
-    private int id;
+  public static class NameTypeConf extends ValidatableConf {
 
     private String name;
 
     private String type;
 
     private FileOrValue conf;
-
-    public int getId() {
-      return id;
-    }
-
-    public void setId(int id) {
-      this.id = id;
-    }
 
     public String getName() {
       return name;
@@ -1114,11 +1196,25 @@ public class CaCertstore extends ValidatableConf {
 
     @Override
     public void validate()
-        throws InvalidConfException {
+            throws InvalidConfException {
       notBlank(name, "name");
       notBlank(type, "type");
       notNull(conf, "conf");
       conf.validate();
+    }
+
+  } // class IdNameTypeConf
+
+  public static class IdNameTypeConf extends NameTypeConf {
+
+    private int id;
+
+    public int getId() {
+      return id;
+    }
+
+    public void setId(int id) {
+      this.id = id;
     }
 
   } // class IdNameTypeConf

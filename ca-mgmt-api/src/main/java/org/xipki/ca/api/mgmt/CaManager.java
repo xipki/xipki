@@ -64,6 +64,18 @@ public interface CaManager {
   void notifyCaChange()
       throws CaMgmtException;
 
+  void addDbSchema(String name, String value)
+          throws CaMgmtException;
+
+  void changeDbSchema(String name, String value)
+          throws CaMgmtException;
+
+  void removeDbSchema(String name)
+          throws CaMgmtException;
+
+  Map<String, String> getDbSchemas()
+          throws CaMgmtException;
+
   /**
    * Republishes certificates of the CA {@code caName} to the publishers {@code publisherNames}.
    *
@@ -177,6 +189,9 @@ public interface CaManager {
       throws CaMgmtException;
 
   Set<String> getCertprofileNames()
+      throws CaMgmtException;
+
+  Set<String> getKeypairGenNames()
       throws CaMgmtException;
 
   Set<String> getPublisherNames()
@@ -450,6 +465,51 @@ public interface CaManager {
    */
   void addCertprofile(CertprofileEntry certprofileEntry)
       throws CaMgmtException;
+
+  /**
+   * Returns the keypair generation entry named {@code profileName}.
+   * @param name
+   *          keypair generation name. Must not be {@code null}.
+   * @return the keypair generation entry
+   * @throws CaMgmtException
+   *          if error occurs.
+   */
+  KeypairGenEntry getKeypairGen(String name)
+          throws CaMgmtException;
+
+  /**
+   * Removes the keypair generation entry {@code name}.
+   * @param name
+   *          keypair generation name. Must not be {@code null}.
+   * @throws CaMgmtException
+   *          if error occurs.
+   */
+  void removeKeypairGen(String name)
+          throws CaMgmtException;
+
+  /**
+   * Changes the keypair generation entry {@code name}.
+   * @param name
+   *          name of the keypair generation entry to be changed. Must not be {@code null}.
+   * @param type
+   *          Type to be changed. {@code null} indicates no change.
+   * @param conf
+   *          Configuration to be changed. {@code null} indicates no change.
+   * @throws CaMgmtException
+   *          if error occurs.
+   */
+  void changeKeypairGen(String name, String type, String conf)
+          throws CaMgmtException;
+
+  /**
+   * Adds a keypair generation entry.
+   * @param keypairGenEntry
+   *          Keypair generation entry. Must not be {@code null}.
+   * @throws CaMgmtException
+   *          if error occurs.
+   */
+  void addKeypairGen(KeypairGenEntry keypairGenEntry)
+          throws CaMgmtException;
 
   /**
    * Adds a signer.

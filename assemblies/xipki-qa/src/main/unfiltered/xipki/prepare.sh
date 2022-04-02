@@ -7,6 +7,7 @@ XIPKI_DIR=${TOMCAT_DIR}/xipki
 DIR=`dirname $0`
 
 echo "working dir: ${DIR}"
+echo "tomcat dir: ${TOMCAT_DIR}"
 
 rm -rf ${TOMCAT_DIR}/webapps/* ${TOMCAT_DIR}/logs/* ${TOMCAT_DIR}/xipki
 

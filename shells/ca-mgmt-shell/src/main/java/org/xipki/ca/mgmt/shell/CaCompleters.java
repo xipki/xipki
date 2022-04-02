@@ -123,6 +123,44 @@ public class CaCompleters {
   } // class
 
   @Service
+  public static class KeypairGenNameCompleter extends CaMgmtCompleter {
+
+    @Override
+    protected Set<String> getEnums() {
+      try {
+        return caManager.getKeypairGenNames();
+      } catch (CaMgmtException ex) {
+        return Collections.emptySet();
+      }
+    }
+
+  } // class ProfileNameCompleter
+
+  @Service
+  public static class KeypairGenNameOmitSoftwareCompleter extends CaMgmtCompleter {
+
+    @Override
+    protected Set<String> getEnums() {
+      try {
+        Set<String> enums = new HashSet<>(caManager.getKeypairGenNames());
+        enums.remove("software");
+        return enums;
+      } catch (CaMgmtException ex) {
+        return Collections.emptySet();
+      }
+    }
+
+  } // class ProfileNameCompleter
+
+  @Service
+  public static class KeypairGenTypeCompleter extends EnumCompleter {
+
+    public KeypairGenTypeCompleter() {
+      setTokens("PKCS11", "DATABASE");
+    }
+  } // class KeypairGenTypeCompleter
+
+  @Service
   public static class PermissionCompleter extends EnumCompleter {
 
     public PermissionCompleter() {

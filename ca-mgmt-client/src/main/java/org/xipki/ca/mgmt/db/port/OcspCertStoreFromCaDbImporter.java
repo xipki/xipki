@@ -92,8 +92,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
     }
     certstore.validate();
 
-    if (certstore.getVersion() > VERSION) {
-      throw new Exception("could not import CertStore greater than " + VERSION + ": "
+    if (certstore.getVersion() > VERSION_V2) {
+      throw new Exception("could not import CertStore greater than " + VERSION_V2 + ": "
           + certstore.getVersion());
     }
 
@@ -103,9 +103,9 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
     }
     caconf.validate();
 
-    if (caconf.getVersion() > VERSION) {
+    if (caconf.getVersion() > VERSION_V2) {
       throw new Exception("could not import CA configuration greater than "
-          + VERSION + ": " + certstore.getVersion());
+          + VERSION_V2 + ": " + certstore.getVersion());
     }
 
     System.out.println("importing CA certstore to OCSP database");

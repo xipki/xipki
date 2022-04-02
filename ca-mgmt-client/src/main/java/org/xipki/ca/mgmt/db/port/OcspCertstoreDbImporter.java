@@ -85,8 +85,8 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
     }
     certstore.validate();
 
-    if (certstore.getVersion() > VERSION) {
-      throw new Exception("could not import Certstore greater than " + VERSION + ": "
+    if (certstore.getVersion() > VERSION_V2) {
+      throw new Exception("could not import Certstore greater than " + VERSION_V2 + ": "
           + certstore.getVersion());
     }
 

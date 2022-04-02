@@ -94,6 +94,7 @@
 				"popo.sigalgo":"SHA256withRSA:SHA256withECDSA:SHA256withDSA:SM3withSM2:ED25519:ED448:DHPOP-X25519:DHPOP-X448"
 			},
 			"cmpResponderName":"responder1",
+			"keypairGenNames": ["software"],
 			"crlControl":{
 				"interval.hours": 24,
 				"fullcrl.intervals":7,
@@ -111,7 +112,9 @@
 			"nextCrlNo":2,
 			"permissions":["all"],
 			"protocolSupport":["cmp","rest","scep"],
+			"saveCert": true,
 			"saveReq":false,
+			"saveKeypair":false,
 			"scepControl":{
 				"cacert.included":true,
 				"certchain.included":false,

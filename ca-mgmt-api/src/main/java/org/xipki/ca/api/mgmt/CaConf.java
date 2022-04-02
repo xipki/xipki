@@ -158,6 +158,8 @@ public class CaConf {
 
   private final Map<String, String> properties = new HashMap<>();
 
+  private Map<String, String> dbSchemas = new HashMap<>();
+
   private final Map<String, SignerEntry> signers = new HashMap<>();
 
   private final Map<String, RequestorEntry> requestors = new HashMap<>();
@@ -167,6 +169,8 @@ public class CaConf {
   private final Map<String, PublisherEntry> publishers = new HashMap<>();
 
   private final Map<String, CertprofileEntry> certprofiles = new HashMap<>();
+
+  private final Map<String, KeypairGenEntry> keypairgens = new HashMap<>();
 
   private final Map<String, SingleCa> cas = new HashMap<>();
 
@@ -222,6 +226,10 @@ public class CaConf {
       throws IOException, InvalidConfException, CaMgmtException {
     if (root.getProperties() != null) {
       properties.putAll(root.getProperties());
+    }
+
+    if (root.getDbSchemas() != null) {
+      dbSchemas.putAll(root.getDbSchemas());
     }
 
     // Signers
@@ -281,6 +289,15 @@ public class CaConf {
         CertprofileEntry en = new CertprofileEntry(new NameId(null, m.getName()),
             expandConf(m.getType()), getValue(m.getConf(), zipEntries));
         addProfile(en);
+      }
+    }
+
+    // KeypairGens
+    if (root.getKeypairGens() != null) {
+      for (CaConfType.NameTypeConf m : root.getKeypairGens()) {
+        KeypairGenEntry en = new KeypairGenEntry(m.getName(), m.getType(),
+                getValue(m.getConf(), zipEntries));
+        addKeypairGen(en);
       }
     }
 
@@ -345,6 +362,7 @@ public class CaConf {
           caEntry.setCmpResponderName(ci.getCmpResponderName());
           caEntry.setScepResponderName(ci.getScepResponderName());
           caEntry.setCrlSignerName(ci.getCrlSignerName());
+          caEntry.setKeypairGenNames(ci.getKeypairGenNames());
 
           if (ci.getExtraControl() != null) {
             caEntry.setExtraControl(new ConfPairs(ci.getExtraControl()).unmodifiable());
@@ -372,6 +390,8 @@ public class CaConf {
           }
 
           caEntry.setSaveRequest(ci.isSaveReq());
+          caEntry.setSaveCert(ci.isSaveCert());
+          caEntry.setSaveKeypair(ci.isSaveKeyPair());
           caEntry.setStatus(CaStatus.forName(ci.getStatus()));
 
           if (ci.getValidityMode() != null) {
@@ -545,9 +565,30 @@ public class CaConf {
     return certprofiles.get(Args.notNull(name, "name"));
   }
 
+  public void addKeypairGen(KeypairGenEntry keypairgen) {
+    Args.notNull(keypairgen, "keypairgen");
+    this.keypairgens.put(keypairgen.getName(), keypairgen);
+  }
+
+  public Set<String> getKeypairGenNames() {
+    return Collections.unmodifiableSet(keypairgens.keySet());
+  }
+
+  public KeypairGenEntry getKeypairGen(String name) {
+    return keypairgens.get(Args.notNull(name, "name"));
+  }
+
   public void addSingleCa(SingleCa singleCa) {
     Args.notNull(singleCa, "singleCa");
     this.cas.put(singleCa.getName(), singleCa);
+  }
+
+  public Set<String> getDbSchemaNames() {
+    return Collections.unmodifiableSet(dbSchemas.keySet());
+  }
+
+  public String getDbSchema(String name) {
+    return dbSchemas.get(name);
   }
 
   public Set<String> getCaNames() {

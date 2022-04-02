@@ -65,6 +65,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   private final String sqlSelectRequestorId;
   private final String sqlSelectRequestor;
   private final String sqlSelectSigner;
+  private final String sqlSelectKeypairGen;
   private final String sqlSelectCaId;
   private final String sqlSelectCa;
   private final String sqlNextSelectCrlNo;
@@ -91,11 +92,13 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     this.sqlSelectPublisher   = buildSelectFirstSql("ID,TYPE,CONF FROM PUBLISHER WHERE NAME=?");
     this.sqlSelectRequestor   = buildSelectFirstSql("ID,TYPE,CONF FROM REQUESTOR WHERE NAME=?");
     this.sqlSelectSigner      = buildSelectFirstSql("TYPE,CERT,CONF FROM SIGNER WHERE NAME=?");
+    this.sqlSelectKeypairGen  = buildSelectFirstSql("TYPE,CONF FROM KEYPAIR_GEN WHERE NAME=?");
 
-    this.sqlSelectCa = buildSelectFirstSql("ID,SN_SIZE,NEXT_CRLNO,STATUS,MAX_VALIDITY,CERT,"
-        + "CERTCHAIN,SIGNER_TYPE,CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,CRL_SIGNER_NAME,"
-        + "CMP_CONTROL,CRL_CONTROL,SCEP_CONTROL,CTLOG_CONTROL,"
-        + "PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION,NUM_CRLS,KEEP_EXPIRED_CERT_DAYS,"
+    this.sqlSelectCa = buildSelectFirstSql(
+        "ID,SN_SIZE,NEXT_CRLNO,STATUS,MAX_VALIDITY,CERT,CERTCHAIN,SIGNER_TYPE,"
+        + "CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,CRL_SIGNER_NAME,KEYPAIR_GEN_NAMES,"
+        + "CMP_CONTROL,CRL_CONTROL,SCEP_CONTROL,CTLOG_CONTROL,PROTOCOL_SUPPORT,"
+        + "SAVE_CERT,SAVE_REQ,SAVE_KEYPAIR,PERMISSION,NUM_CRLS,KEEP_EXPIRED_CERT_DAYS,"
         + "EXPIRATION_PERIOD,REV_INFO,VALIDITY_MODE,CA_URIS,EXTRA_CONTROL,SIGNER_CONF,"
         + "DHPOC_CONTROL,REVOKE_SUSPENDED_CONTROL FROM CA WHERE NAME=?");
 
@@ -203,11 +206,21 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     return new SignerEntry(name, rs.getString("TYPE"), rs.getString("CONF"), rs.getString("CERT"));
   } // method createSigner
 
+  public KeypairGenEntry createKeypairGen(String name) throws CaMgmtException {
+    ResultRow rs = execQuery1PrepStmt0(sqlSelectKeypairGen, col2Str(name));
+
+    if (rs == null) {
+      throw new CaMgmtException("unknown keypair generation " + name);
+    }
+
+    return new KeypairGenEntry(name, rs.getString("TYPE"), rs.getString("CONF"));
+  } // method createSigner
+
   public CaInfo createCaInfo(String name, CertStore certstore)
       throws CaMgmtException {
     ResultRow rs = execQuery1PrepStmt0(sqlSelectCa, col2Str(name));
     if (rs == null) {
-      throw new CaMgmtException("uknown CA " + name);
+      throw new CaMgmtException("unknown CA " + name);
     }
 
     String caUrisText = rs.getString("CA_URIS");
@@ -256,6 +269,11 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       entry.setScepResponderName(scepResponderName);
     }
 
+    String keypairGenNames = rs.getString("KEYPAIR_GEN_NAMES");
+    if (StringUtil.isNotBlank(keypairGenNames)) {
+      entry.setKeypairGenNames(Arrays.asList(keypairGenNames.split(",")));
+    }
+
     String extraControl = rs.getString("EXTRA_CONTROL");
     if (StringUtil.isNotBlank(extraControl)) {
       entry.setExtraControl(new ConfPairs(extraControl).unmodifiable());
@@ -296,7 +314,9 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     }
 
     entry.setProtocolSupport(new ProtocolSupport(rs.getString("PROTOCOL_SUPPORT")));
+    entry.setSaveCert((getInt(rs, "SAVE_CERT") != 0));
     entry.setSaveRequest((getInt(rs, "SAVE_REQ") != 0));
+    entry.setSaveKeypair((getInt(rs, "SAVE_KEYPAIR") != 0));
     entry.setPermission(getInt(rs, "PERMISSION"));
 
     String revInfo = rs.getString("REV_INFO");
@@ -380,13 +400,14 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
 
     caEntry.getIdent().setId((int) getNextId(Table.CA));
 
-    final String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CA_URIS,"//7
-        + "MAX_VALIDITY,CERT,CERTCHAIN,SIGNER_TYPE,CRL_SIGNER_NAME,"//5
-        + "CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,CRL_CONTROL,CMP_CONTROL,SCEP_CONTROL,"//5
-        + "CTLOG_CONTROL,PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION,"//6
-        + "NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL,"//5
+    final String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CA_URIS,"
+        + "MAX_VALIDITY,CERT,CERTCHAIN,SIGNER_TYPE,CRL_SIGNER_NAME,"
+        + "CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,KEYPAIR_GEN_NAMES,"
+        + "CRL_CONTROL,CMP_CONTROL,SCEP_CONTROL,CTLOG_CONTROL,"
+        + "PROTOCOL_SUPPORT,SAVE_CERT,SAVE_REQ,SAVE_KEYPAIR,PERMISSION,"
+        + "NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL,"
         + "SIGNER_CONF,DHPOC_CONTROL,REVOKE_SUSPENDED_CONTROL) "
-        + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     CaUris caUris = caEntry.getCaUris();
     byte[] encodedCert = caEntry.getCert().getEncoded();
@@ -413,6 +434,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         col2Str(Base64.encodeToString(encodedCert)), col2Str(certchainStr),
         col2Str(caEntry.getSignerType()),            col2Str(caEntry.getCrlSignerName()),
         col2Str(caEntry.getCmpResponderName()),      col2Str(caEntry.getScepResponderName()),
+        col2Str(CollectionUtil.toString(caEntry.getKeypairGenNames(), ",")),
 
         col2Str((crlControl == null      ? null : crlControl.getConf())),
         col2Str((cmpControl == null      ? null : cmpControl.getConf())),
@@ -420,10 +442,13 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         col2Str((ctlogControl == null    ? null : ctlogControl.getConf())),
         col2Str((protocolSupport == null ? null : protocolSupport.getEncoded())),
 
-        col2Bool(caEntry.isSaveRequest()),           col2Int(caEntry.getPermission()),
+        col2Bool(caEntry.isSaveCert()),              col2Bool(caEntry.isSaveRequest()),
+        col2Bool(caEntry.isSaveKeypair()),           col2Int(caEntry.getPermission()),
+
         col2Int(caEntry.getNumCrls()),               col2Int(caEntry.getExpirationPeriod()),
         col2Int(caEntry.getKeepExpiredCertInDays()), col2Str(caEntry.getValidityMode().name()),
         col2Str(StringUtil.isBlank(encodedExtraCtrl) ? null : encodedExtraCtrl),
+
         col2Str(caEntry.getSignerConf()),            col2Str(caEntry.getDhpocControl()),
         col2Str(revokeSuspended == null ? null : revokeSuspended.getConf()));
 
@@ -521,7 +546,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       throw new CaMgmtException("could not add requestor " + requestorName);
     }
     LOG.info("added requestor '{}'", requestorName);
-  } // method addRequestorIfNeeded
+  } // method addEmbeddedRequestor
 
   public void addRequestorToCa(CaHasRequestorEntry requestor, NameId ca) throws CaMgmtException {
     notNulls(requestor, "requestor", ca, "ca");
@@ -725,6 +750,18 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       }
     }
 
+    String kpgNames;
+    List<String> names = changeCaEntry.getKeypairGenNames();
+    if (CollectionUtil.isEmpty(names)) {
+      kpgNames = null;
+    } else {
+      if (names.get(0).equalsIgnoreCase("NULL")) { // TODO
+        kpgNames = ""; // clear the names
+      } else {
+        kpgNames = CollectionUtil.toString(names, ",");
+      }
+    }
+
     changeIfNotNull("CA", colInt("ID", changeCaEntry.getIdent().getId()),
         colInt("SN_SIZE", changeCaEntry.getSerialNoLen()), colStr("STATUS", status),
         colStr("SUBJECT", subject),          colStr("CERT", base64Cert),
@@ -733,12 +770,15 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         colStr("CRL_SIGNER_NAME", changeCaEntry.getCrlSignerName()),
         colStr("CMP_RESPONDER_NAME", changeCaEntry.getCmpResponderName()),
         colStr("SCEP_RESPONDER_NAME", changeCaEntry.getScepResponderName()),
+        colStr("KEYPAIR_GEN_NAMES", kpgNames),
         colStr("CMP_CONTROL", changeCaEntry.getCmpControl()),
         colStr("CRL_CONTROL", changeCaEntry.getCrlControl()),
         colStr("SCEP_CONTROL", changeCaEntry.getScepControl()),
         colStr("CTLOG_CONTROL", changeCaEntry.getCtlogControl()),
         colStr("PROTOCOL_SUPPORT", protocolSupportStr),
+        colBool("SAVE_CERT", changeCaEntry.getSaveCert()),
         colBool("SAVE_REQ", changeCaEntry.getSaveRequest()),
+        colBool("SAVE_KEYPAIR", changeCaEntry.getSaveKeypair()),
         colInt("PERMISSION", changeCaEntry.getPermission()),
         colInt("NUM_CRLS", changeCaEntry.getNumCrls()),
         colInt("EXPIRATION_PERIOD", changeCaEntry.getExpirationPeriod()),
@@ -824,12 +864,32 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     SignerEntry newDbEntry = new SignerEntry(name, tmpType,
         (conf == null ? dbEntry.getConf() : conf),
         (base64Cert == null ? dbEntry.getBase64Cert() : base64Cert));
-    SignerEntryWrapper responder = signerManager.createSigner(newDbEntry);
+    SignerEntryWrapper signer = signerManager.createSigner(newDbEntry);
 
     changeIfNotNull("SIGNER", colStr("NAME", name), colStr("TYPE", type),
         colStr("CERT", base64Cert), colStr("CONF", conf, false, true));
-    return responder;
+    return signer;
   } // method changeSigner
+
+  public KeypairGenEntryWrapper changeKeypairGen(
+          String name, String type, String conf,
+          CaManagerImpl manager, SecurityFactory securityFactory) throws CaMgmtException {
+    notBlank(name, "name");
+    notNull(manager, "manager");
+
+    KeypairGenEntry dbEntry = createKeypairGen(name);
+    String tmpType = (type == null ? dbEntry.getType() : type);
+
+    KeypairGenEntry newDbEntry = new KeypairGenEntry(name, tmpType,
+            (conf == null ? dbEntry.getConf() : conf));
+    KeypairGenEntryWrapper wrapper = new KeypairGenEntryWrapper();
+      //manager.createSigner(newDbEntry);
+    wrapper.setDbEntry(newDbEntry);
+
+    changeIfNotNull("KEYPAIR_GEN", colStr("NAME", name), colStr("TYPE", type),
+            colStr("CONF", conf, true, false));
+    return wrapper;
+  } // method changeKeypairGen
 
   public IdentifiedCertPublisher changePublisher(String name, String type, String conf,
       CaManagerImpl publisherManager) throws CaMgmtException {
@@ -853,7 +913,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
 
     int num = execUpdatePrepStmt0(sql, col2Str(caName));
     if (num == 0) {
-      throw new CaMgmtException("could not delelted CA " + caName);
+      throw new CaMgmtException("could not delete CA " + caName);
     }
   } // method removeCa
 
@@ -897,6 +957,16 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         "DELETE FROM CA_HAS_USER WHERE CA_ID=? AND USER_ID=?");
   } // method removeUserFromCa
 
+  public void removeDbSchema(String name) throws CaMgmtException {
+    notBlank(name, "name");
+    final String sql = "DELETE FROM DBSCHEMA WHERE NAME=?";
+
+    int num = execUpdatePrepStmt0(sql, col2Str(name));
+    if (num == 0) {
+      throw new CaMgmtException("could not delete DBSCHEMA " + name);
+    }
+  }
+
   private void removeEntityFromCa(String desc, String name, String caName,
       String sqlSelectId, String sqlRemove) throws CaMgmtException {
     Integer id = getIdForName(sqlSelectId, name);
@@ -921,6 +991,21 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       throw new CaMgmtException("could not revoke CA " + caName);
     }
   } // method revokeCa
+
+  public void addKeypairGen(KeypairGenEntry dbEntry) throws CaMgmtException {
+    notNull(dbEntry, "dbEntry");
+
+    int num = execUpdatePrepStmt0(
+            "INSERT INTO KEYPAIR_GEN (NAME,TYPE,CONF) VALUES (?,?,?)",
+            col2Str(dbEntry.getName()),       col2Str(dbEntry.getType()),
+            col2Str(dbEntry.getConf()));
+
+    if (num == 0) {
+      throw new CaMgmtException("could not add keypair generation " + dbEntry.getName());
+    }
+
+    LOG.info("added keypair generation: {}", dbEntry.toString(false, true));
+  } // method addSigner
 
   public void addSigner(SignerEntry dbEntry) throws CaMgmtException {
     notNull(dbEntry, "dbEntry");
@@ -1079,6 +1164,40 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     }
     return ret;
   } // method getCaHasUsersForCa
+
+  public void addDbSchema(String name, String value) throws CaMgmtException {
+    String sql = "INSERT INTO DBSCHEMA (NAME,VALUE2) VALUES (?,?)";
+    int num = execUpdatePrepStmt0(sql, col2Str(name), col2Str(value));
+    if (num == 0) {
+      throw new CaMgmtException("could not add DBSCHEMA " + name);
+    }
+    LOG.info("added DBSCHEMA '{}'", name);
+  }
+
+  public void changeDbSchema(String name, String value) throws CaMgmtException {
+    String sql = "UPDATE DBSCHEMA SET VALUE2=? WHERE NAME=?";
+    int num = execUpdatePrepStmt0(sql, col2Str(value), col2Str(name));
+
+    if (num == 0) {
+      throw new CaMgmtException("could not update DBSCHEMA " + name);
+    }
+    LOG.info("added DBSCHEMA '{}'", name);
+  }
+
+  public Map<String, String> getDbSchemas() throws CaMgmtException {
+    DbSchemaInfo dbi;
+    try {
+      dbi = new DbSchemaInfo(datasource);
+    } catch (DataAccessException ex) {
+      throw new CaMgmtException(ex);
+    }
+    Set<String> names = dbi.getVariableNames();
+    Map<String, String> ret = new HashMap<>();
+    for (String name : names) {
+      ret.put(name, dbi.variableValue(name));
+    }
+    return ret;
+  }
 
   public UserEntry getUser(String username) throws CaMgmtException {
     return getUser(username, false);

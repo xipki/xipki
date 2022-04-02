@@ -84,6 +84,35 @@ class ConfLoader {
 
     Map<String, X509Cert> generatedRootCerts = new HashMap<>(2);
 
+    // DBSCHEMA
+    for (String dbSchemaName : conf.getDbSchemaNames()) {
+      manager.addDbSchema(dbSchemaName, conf.getDbSchema(dbSchemaName));
+    }
+
+    // KeypairGen
+    for (String name : conf.getKeypairGenNames()) {
+      KeypairGenEntry entry = conf.getKeypairGen(name);
+      KeypairGenEntry entryB = manager.keypairGenDbEntries.get(name);
+      if (entryB != null) {
+        if (entry.equals(entryB)) {
+          LOG.info("ignore existed keypairGen {}", name);
+          continue;
+        } else {
+          throw logAndCreateException(
+                  concat("keypairGen ", name, " existed, could not re-added it"));
+        }
+      }
+
+      try {
+        manager.addKeypairGen(entry);
+        LOG.info("added keypairGen {}", name);
+      } catch (CaMgmtException ex) {
+        String msg = concat("could not add keypairGen ", name);
+        LogUtil.error(LOG, ex, msg);
+        throw new CaMgmtException(msg);
+      }
+    }
+
     // Responder
     for (String name : conf.getSignerNames()) {
       SignerEntry entry = conf.getSigner(name);
@@ -414,11 +443,10 @@ class ConfLoader {
     CaManagerQueryExecutor queryExecutor = manager.queryExecutor;
 
     try {
-      Set<String> includeSignerNames = new HashSet<>();
-      Set<String> includeRequestorNames = new HashSet<>();
-      Set<String> includeProfileNames = new HashSet<>();
-      Set<String> includePublisherNames = new HashSet<>();
       Set<String> includeUserNames = new HashSet<>();
+
+      // DBSchema
+      root.setDbSchemas(manager.getDbSchemas());
 
       // users
       List<CaConfType.User> users = new LinkedList<>();
@@ -448,7 +476,6 @@ class ConfLoader {
 
             for (CaHasRequestorEntry m : requestors) {
               String requestorName = m.getRequestorIdent().getName();
-              includeRequestorNames.add(requestorName);
 
               CaConfType.CaHasRequestor chr = new CaConfType.CaHasRequestor();
               chr.setRequestorName(requestorName);
@@ -494,13 +521,11 @@ class ConfLoader {
 
           strs = manager.caHasProfiles.get(name);
           if (CollectionUtil.isNotEmpty(strs)) {
-            includeProfileNames.addAll(strs);
             ca.setProfiles(new ArrayList<>(strs));
           }
 
           strs = manager.caHasPublishers.get(name);
           if (CollectionUtil.isNotEmpty(strs)) {
-            includePublisherNames.addAll(strs);
             ca.setPublishers(new ArrayList<>(strs));
           }
 
@@ -543,7 +568,6 @@ class ConfLoader {
           }
 
           if (entry.getCmpResponderName() != null) {
-            includeSignerNames.add(entry.getCmpResponderName());
             caInfoType.setCmpResponderName(entry.getCmpResponderName());
           }
 
@@ -553,7 +577,6 @@ class ConfLoader {
           }
 
           if (entry.getCrlSignerName() != null) {
-            includeSignerNames.add(entry.getCrlSignerName());
             caInfoType.setCrlSignerName(entry.getCrlSignerName());
           }
 
@@ -587,15 +610,21 @@ class ConfLoader {
                 new HashMap<>(new ConfPairs(entry.getRevokeSuspendedControl().getConf()).asMap()));
           }
 
+          caInfoType.setSaveCert(entry.isSaveCert());
           caInfoType.setSaveReq(entry.isSaveRequest());
+          caInfoType.setSaveKeyPair(entry.isSaveKeypair());
+
           if (entry.getScepControl() != null) {
             caInfoType.setScepControl(
                 new HashMap<>(new ConfPairs(entry.getScepControl().getConf()).asMap()));
           }
 
           if (entry.getScepResponderName() != null) {
-            includeSignerNames.add(entry.getScepResponderName());
             caInfoType.setScepResponderName(entry.getScepResponderName());
+          }
+
+          if (entry.getKeypairGenNames() != null) {
+            caInfoType.setKeypairGenNames(entry.getKeypairGenNames());
           }
 
           caInfoType.setSignerConf(createFileOrValue(zipStream, entry.getSignerConf(),
@@ -624,10 +653,6 @@ class ConfLoader {
         List<CaConfType.Requestor> list = new LinkedList<>();
 
         for (String name : manager.requestorDbEntries.keySet()) {
-          if (!includeRequestorNames.contains(name)) {
-            continue;
-          }
-
           RequestorEntry entry = manager.requestorDbEntries.get(name);
           CaConfType.Requestor type = new CaConfType.Requestor();
           type.setName(name);
@@ -656,9 +681,6 @@ class ConfLoader {
         List<NameTypeConf> list = new LinkedList<>();
 
         for (String name : manager.publisherDbEntries.keySet()) {
-          if (!includePublisherNames.contains(name)) {
-            continue;
-          }
           PublisherEntry entry = manager.publisherDbEntries.get(name);
           NameTypeConf conf = new NameTypeConf();
           conf.setName(name);
@@ -677,9 +699,6 @@ class ConfLoader {
       if (CollectionUtil.isNotEmpty(manager.certprofileDbEntries)) {
         List<NameTypeConf> list = new LinkedList<>();
         for (String name : manager.certprofileDbEntries.keySet()) {
-          if (!includeProfileNames.contains(name)) {
-            continue;
-          }
           CertprofileEntry entry = manager.certprofileDbEntries.get(name);
           NameTypeConf conf = new NameTypeConf();
           conf.setName(name);
@@ -699,10 +718,6 @@ class ConfLoader {
         List<CaConfType.Signer> list = new LinkedList<>();
 
         for (String name : manager.signerDbEntries.keySet()) {
-          if (!includeSignerNames.contains(name)) {
-            continue;
-          }
-
           SignerEntry entry = manager.signerDbEntries.get(name);
           CaConfType.Signer conf = new CaConfType.Signer();
           conf.setName(name);
@@ -717,6 +732,28 @@ class ConfLoader {
 
         if (!list.isEmpty()) {
           root.setSigners(list);
+        }
+      }
+
+      if (CollectionUtil.isNotEmpty(manager.keypairGenDbEntries)) {
+        List<CaConfType.NameTypeConf> list = new LinkedList<>();
+
+        for (String name : manager.keypairGenDbEntries.keySet()) {
+          KeypairGenEntry entry = manager.keypairGenDbEntries.get(name);
+          CaConfType.NameTypeConf conf = new CaConfType.NameTypeConf();
+          conf.setName(name);
+          conf.setType(entry.getType());
+          if (entry.getConf() != null) {
+            FileOrValue fv = new FileOrValue();
+            fv.setValue(entry.getConf());
+            conf.setConf(fv);
+          }
+
+          list.add(conf);
+        }
+
+        if (!list.isEmpty()) {
+          root.setKeypairGens(list);
         }
       }
 

@@ -18,6 +18,7 @@
 package org.xipki.ca.server.db;
 
 import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.CertificateList;
@@ -25,20 +26,20 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.TBSCertList.CRLEntry;
 import org.bouncycastle.cert.X509CRLHolder;
+import org.bouncycastle.util.BigIntegers;
+import org.bouncycastle.util.Pack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
-import org.xipki.ca.api.mgmt.CaMgmtException;
-import org.xipki.ca.api.mgmt.CertListInfo;
-import org.xipki.ca.api.mgmt.CertListOrderBy;
-import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
+import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.CaHasUserEntry;
 import org.xipki.ca.server.*;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.password.PasswordResolver;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
@@ -49,6 +50,8 @@ import org.xipki.util.LogUtil;
 import org.xipki.util.LruCache;
 import org.xipki.util.StringUtil;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.GCMParameterSpec;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CRLException;
@@ -196,11 +199,12 @@ public class CertStore extends CertStoreBase {
 
   private final AtomicInteger cachedCrlId = new AtomicInteger(0);
 
-  private long earlistNotBefore = 0;
+  private long earliestNotBefore = 0;
 
-  public CertStore(DataSourceWrapper datasource, UniqueIdGenerator idGenerator)
+  public CertStore(DataSourceWrapper datasource, UniqueIdGenerator idGenerator,
+                   PasswordResolver passwordResolver)
       throws DataAccessException, CaMgmtException {
-    super(datasource);
+    super(datasource, passwordResolver);
 
     this.idGenerator = notNull(idGenerator, "idGenerator");
 
@@ -226,20 +230,41 @@ public class CertStore extends CertStoreBase {
     this.sqlSelectUnrevokedSn = buildSelectFirstSql("LUPDATE FROM CERT WHERE REV=0 AND SN=?");
     final String prefix = "SN,LUPDATE FROM CERT WHERE REV=0 AND SN";
     this.sqlSelectUnrevokedSn100 = buildArraySql(datasource, prefix, 100);
-    this.earlistNotBefore = datasource.getMin(null, "CERT", "NBEFORE");
+    this.earliestNotBefore = datasource.getMin(null, "CERT", "NBEFORE");
   } // constructor
 
-  public boolean addCert(CertificateInfo certInfo) {
+  public boolean addCert(CertificateInfo certInfo, boolean saveKeypair) {
+    if (saveKeypair && certInfo.getPrivateKey() != null) {
+      if (keypairEncKey == null) {
+        LOG.error("no keypair encryption key is configured");
+        // no key encryption is configured
+        return false;
+      }
+    }
+
     notNull(certInfo, "certInfo");
 
     byte[] encodedCert = null;
 
     try {
+      String privateKeyInfo = null;
       CertWithDbId cert = certInfo.getCert();
       byte[] transactionId = certInfo.getTransactionId();
       X500Name reqSubject = certInfo.getRequestedSubject();
 
-      long certId = idGenerator.nextId();
+      final long certId = idGenerator.nextId();
+      if (saveKeypair && certInfo.getPrivateKey() != null) {
+        // we use certId as the nonce
+        byte[] nonce = new byte[12];
+        Pack.longToBigEndian(certId, nonce, 4);
+        byte[] encodedPrivateKey = certInfo.getPrivateKey().getEncoded();
+        Cipher cipher = Cipher.getInstance(keypairEncAlg, keypairEncProvider);
+        GCMParameterSpec spec = new GCMParameterSpec(96, nonce);
+        cipher.init(Cipher.ENCRYPT_MODE, keypairEncKey, spec);
+        byte[] encrypted = cipher.doFinal(encodedPrivateKey);
+        privateKeyInfo = keypairEncAlgId + ":" + keypairEncKeyId + ":"
+                + Base64.encodeToString(nonce) + ":" + Base64.encodeToString(encrypted);
+      }
 
       String subjectText = X509Util.cutText(cert.getCert().getSubjectRfc4519Text(), maxX500nameLen);
       long fpSubject = X509Util.fpCanonicalizedName(cert.getCert().getSubject());
@@ -262,7 +287,7 @@ public class CertStore extends CertStoreBase {
       X509Cert cert0 = cert.getCert();
       boolean isEeCert = cert0.getBasicConstraints() == -1;
 
-      execUpdatePrepStmt0(dbSchemaVersion < 5 ? SQL_ADD_CERT_V4 : SQL_ADD_CERT,
+      execUpdatePrepStmt0(SQL_ADD_CERT,
           col2Long(certId), col2Long(System.currentTimeMillis() / 1000), // currentTimeSeconds
           col2Str(cert0.getSerialNumber().toString(16)),
           col2Str(subjectText),  col2Long(fpSubject), col2Long(fpReqSubject),
@@ -274,7 +299,8 @@ public class CertStore extends CertStoreBase {
           col2Int(certInfo.getReqType().getCode()),
           col2Str(tid), col2Str(b64FpCert), col2Str(reqSubjectText),
           col2Int(0), // in this version we set CRL_SCOPE to fixed value 0
-          col2Str(Base64.encodeToString(encodedCert)));
+          col2Str(Base64.encodeToString(encodedCert)),
+          col2Str(privateKeyInfo));
 
       cert.setCertId(certId);
     } catch (Exception ex) {
@@ -364,18 +390,21 @@ public class CertStore extends CertStoreBase {
     int crlId = Math.max(cachedCrlId.get(), currentMaxCrlId) + 1;
     cachedCrlId.set(crlId);
 
-    String b64Crl;
+    byte[] encodedCrl;
     try {
-      b64Crl = Base64.encodeToString(crl.getEncoded());
+      encodedCrl = crl.getEncoded();
     } catch (IOException ex) {
       throw new CRLException(ex.getMessage(), ex);
     }
+
+    String b64Sha1 = HashAlgo.SHA1.base64Hash(encodedCrl);
+    String b64Crl = Base64.encodeToString(encodedCrl);
 
     execUpdatePrepStmt0(SQL_ADD_CRL, col2Int(crlId), col2Int(ca.getId()), col2Long(crlNumber),
         col2Long(crl.getThisUpdate().getTime() / 1000),
         col2Long(getDateSeconds(crl.getNextUpdate())), col2Bool((baseCrlNumber != null)),
         // in this version we set CRL_SCOPE to fixed value 0
-        col2Long(baseCrlNumber), col2Int(0), col2Str(b64Crl));
+        col2Long(baseCrlNumber), col2Int(0), col2Str(b64Sha1), col2Str(b64Crl));
   } // method addCrl
 
   public CertWithRevocationInfo revokeCert(NameId ca, BigInteger serialNumber,
@@ -553,7 +582,7 @@ public class CertStore extends CertStoreBase {
   } // method getCountOfCerts
 
   public long getCountOfCerts(long notBeforeSince) throws OperationException {
-    if (notBeforeSince <= earlistNotBefore) {
+    if (notBeforeSince <= earliestNotBefore) {
       final String sql = "SELECT COUNT(*) FROM CERT";
       return execQueryLongPrepStmt(sql);
     } else {

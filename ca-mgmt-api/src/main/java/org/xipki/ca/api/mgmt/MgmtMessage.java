@@ -44,6 +44,8 @@ public abstract class MgmtMessage {
     addCaAlias,
     addCertprofile,
     addCertprofileToCa,
+    addDbSchema,
+    addKeypairGen,
     addPublisher,
     addPublisherToCa,
     addRequestor,
@@ -53,6 +55,8 @@ public abstract class MgmtMessage {
     addUserToCa,
     changeCa,
     changeCertprofile,
+    changeDbSchema,
+    changeKeypairGen,
     changePublisher,
     changeRequestor,
     changeSigner,
@@ -76,8 +80,11 @@ public abstract class MgmtMessage {
     getCertRequest,
     getCrl,
     getCurrentCrl,
+    getDbSchemas,
     getFailedCaNames,
     getInactiveCaNames,
+    getKeypairGen,
+    getKeypairGenNames,
     getPublisher,
     getPublisherNames,
     getPublishersForCa,
@@ -100,6 +107,8 @@ public abstract class MgmtMessage {
     removeCertificate,
     removeCertprofile,
     removeCertprofileFromCa,
+    removeDbSchema,
+    removeKeypairGen,
     removePublisher,
     removePublisherFromCa,
     removeRequestor,
@@ -111,7 +120,9 @@ public abstract class MgmtMessage {
     restartCa,
     restartCaSystem,
     revokeCa,
+    @Deprecated
     revokeCertficate,
+    revokeCertificate,
     tokenInfoP11,
     unlockCa,
     unrevokeCa,
@@ -236,9 +247,15 @@ public abstract class MgmtMessage {
 
     private String scepResponderName;
 
+    private List<String> keypairGenNames;
+
     private ProtocolSupport protocolSupport;
 
+    private boolean saveCert;
+
     private boolean saveRequest;
+
+    private boolean saveKeypair;
 
     private ValidityMode validityMode = ValidityMode.STRICT;
 
@@ -314,11 +331,16 @@ public abstract class MgmtMessage {
       if (caEntry.getRevokeSuspendedControl() != null) {
         revokeSuspended = caEntry.getRevokeSuspendedControl().getConf();
       }
+
+      saveCert = caEntry.isSaveCert();
       saveRequest = caEntry.isSaveRequest();
+      saveKeypair = caEntry.isSaveKeypair();
+
       if (caEntry.getScepControl() != null) {
         scepControl = caEntry.getScepControl().getConf();
       }
       scepResponderName = caEntry.getScepResponderName();
+      keypairGenNames = caEntry.getKeypairGenNames();
 
       serialNoLen = caEntry.getSerialNoLen();
       signerConf = caEntry.getSignerConf();
@@ -401,6 +423,14 @@ public abstract class MgmtMessage {
       this.crlSignerName = crlSignerName;
     }
 
+    public List<String> getKeypairGenNames() {
+      return keypairGenNames;
+    }
+
+    public void setKeypairGenNames(List<String> keypairGenNames) {
+      this.keypairGenNames = keypairGenNames;
+    }
+
     public String getCmpControl() {
       return cmpControl;
     }
@@ -447,6 +477,22 @@ public abstract class MgmtMessage {
 
     public void setProtocolSupport(ProtocolSupport protocolSupport) {
       this.protocolSupport = protocolSupport;
+    }
+
+    public boolean isSaveCert() {
+      return saveCert;
+    }
+
+    public void setSaveCert(boolean saveCert) {
+      this.saveCert = saveCert;
+    }
+
+    public boolean isSaveKeypair() {
+      return saveKeypair;
+    }
+
+    public void setSaveKeypair(boolean saveKeypair) {
+      this.saveKeypair = saveKeypair;
     }
 
     public boolean isSaveRequest() {
@@ -584,6 +630,7 @@ public abstract class MgmtMessage {
       }
 
       rv.setCrlSignerName(crlSignerName);
+      rv.setKeypairGenNames(keypairGenNames);
 
       if (extraControl != null) {
         rv.setExtraControl(new ConfPairs(extraControl));
@@ -597,7 +644,9 @@ public abstract class MgmtMessage {
       rv.setPermission(permission);
       rv.setProtocolSupport(protocolSupport);
       rv.setRevocationInfo(revocationInfo);
+      rv.setSaveCert(saveCert);
       rv.setSaveRequest(saveRequest);
+      rv.setSaveKeypair(saveKeypair);
       if (scepControl != null) {
         rv.setScepControl(new ScepControl(scepControl));
       }

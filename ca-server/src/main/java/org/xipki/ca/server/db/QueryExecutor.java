@@ -17,14 +17,12 @@
 
 package org.xipki.ca.server.db;
 
+import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 
 import java.sql.*;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.xipki.util.Args.notNull;
 
@@ -136,6 +134,10 @@ class QueryExecutor {
         datasource.releaseResources(stmt, rs);
       }
     } // constructor
+
+    public Set<String> getVariableNames() {
+      return Collections.unmodifiableSet(variables.keySet());
+    }
 
     public String variableValue(String variableName) {
       return variables.get(notNull(variableName, "variableName"));

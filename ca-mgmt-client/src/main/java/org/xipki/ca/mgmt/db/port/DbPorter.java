@@ -179,7 +179,15 @@ public class DbPorter extends DbToolBase {
 
   public static final String IMPORT_TO_OCSP_PROCESS_LOG_FILENAME = "import-to-ocsp.process";
 
-  public static final int VERSION = 1;
+  /**
+   * For XiPKI Version 5.3.x
+   */
+  public static final int VERSION_V1 = 1;
+
+  /**
+   * For XiPKI Version 5.4.x
+   */
+  public static final int VERSION_V2 = 2;
 
   protected final int dbSchemaVersion;
 

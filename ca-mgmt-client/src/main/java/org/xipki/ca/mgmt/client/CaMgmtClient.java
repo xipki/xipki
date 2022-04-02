@@ -133,6 +133,37 @@ public class CaMgmtClient implements CaManager {
   } // method notifyCaChange
 
   @Override
+  public void addDbSchema(String name, String value)
+          throws CaMgmtException {
+    MgmtRequest.AddOrChangeDbSchema req = new MgmtRequest.AddOrChangeDbSchema();
+    req.setName(name);
+    req.setValue(value);
+    voidTransmit(MgmtAction.addDbSchema, req);
+  }
+
+  @Override
+  public void changeDbSchema(String name, String value)
+          throws CaMgmtException {
+    MgmtRequest.AddOrChangeDbSchema req = new MgmtRequest.AddOrChangeDbSchema();
+    req.setName(name);
+    req.setValue(value);
+    voidTransmit(MgmtAction.changeDbSchema, req);
+  }
+
+  public void removeDbSchema(String name) throws CaMgmtException {
+    removeEntity(MgmtAction.removeDbSchema, name);
+  }
+
+  @Override
+  public Map<String, String> getDbSchemas()
+          throws CaMgmtException {
+    byte[] respBytes = transmit(MgmtAction.getDbSchemas, null);
+    MgmtResponse.GetDbSchemas resp =
+            parse(respBytes, MgmtResponse.GetDbSchemas.class);
+    return resp.getResult();
+  }
+
+  @Override
   public void republishCertificates(String caName, List<String> publisherNames, int numThreads)
       throws CaMgmtException {
     MgmtRequest.RepublishCertificates req = new MgmtRequest.RepublishCertificates();
@@ -213,6 +244,12 @@ public class CaMgmtClient implements CaManager {
   public Set<String> getCertprofileNames()
       throws CaMgmtException {
     return getNames(MgmtAction.getCertprofileNames);
+  }
+
+  @Override
+  public Set<String> getKeypairGenNames()
+          throws CaMgmtException {
+    return getNames(MgmtAction.getKeypairGenNames);
   }
 
   @Override
@@ -424,6 +461,36 @@ public class CaMgmtClient implements CaManager {
   } // method getCaHasUsersForUser
 
   @Override
+  public KeypairGenEntry getKeypairGen(String name)
+          throws CaMgmtException {
+    MgmtRequest.Name req = new MgmtRequest.Name(name);
+    byte[] respBytes = transmit(MgmtAction.getKeypairGen, req);
+    MgmtResponse.GetKeypairGen resp = parse(respBytes, MgmtResponse.GetKeypairGen.class);
+    return resp.getResult();
+  }
+
+  @Override
+  public void removeKeypairGen(String name)
+          throws CaMgmtException {
+    removeEntity(MgmtAction.removeKeypairGen, name);
+  }
+
+  @Override
+  public void changeKeypairGen(String name, String type, String conf)
+          throws CaMgmtException {
+    MgmtRequest.ChangeTypeConfEntity req = new MgmtRequest.ChangeTypeConfEntity(name, type, conf);
+    voidTransmit(MgmtAction.changeKeypairGen, req);
+  }
+
+  @Override
+  public void addKeypairGen(KeypairGenEntry keypairGenEntry)
+          throws CaMgmtException {
+    MgmtRequest.AddKeypairGen req = new MgmtRequest.AddKeypairGen();
+    req.setEntry(keypairGenEntry);
+    voidTransmit(MgmtAction.addKeypairGen, req);
+  }
+
+  @Override
   public CertprofileEntry getCertprofile(String profileName)
       throws CaMgmtException {
     MgmtRequest.Name req = new MgmtRequest.Name(profileName);
@@ -552,7 +619,7 @@ public class CaMgmtClient implements CaManager {
     req.setSerialNumber(serialNumber);
     req.setReason(reason);
     req.setInvalidityTime(invalidityTime);
-    voidTransmit(MgmtAction.revokeCertficate, req);
+    voidTransmit(MgmtAction.revokeCertificate, req);
   } // method revokeCertificate
 
   @Override

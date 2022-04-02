@@ -59,12 +59,13 @@ class CaCertstoreDbImporter extends DbPorter {
 
   private static final String SQL_ADD_CERT =
       "INSERT INTO CERT (ID,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,RR,RT,RIT,"
-      + "PID,CA_ID,RID,UID,EE,RTYPE,TID,SHA1,REQ_SUBJECT,CRL_SCOPE,CERT)"
-      + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+      + "PID,CA_ID,RID,UID,EE,RTYPE,TID,SHA1,REQ_SUBJECT,CRL_SCOPE,CERT,PRIVATE_KEY)"
+      + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
   private static final String SQL_ADD_CRL =
-      "INSERT INTO CRL (ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE,DELTACRL,BASECRL_NO,CRL_SCOPE,CRL)"
-      + " VALUES (?,?,?,?,?,?,?,?,?)";
+      "INSERT INTO CRL (ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE,DELTACRL,BASECRL_NO,"
+      + "CRL_SCOPE,SHA1,CRL)"
+      + " VALUES (?,?,?,?,?,?,?,?,?,?)";
 
   private static final String SQL_ADD_REQUEST =
       "INSERT INTO REQUEST (ID,LUPDATE,DATA) VALUES (?,?,?)";
@@ -101,8 +102,8 @@ class CaCertstoreDbImporter extends DbPorter {
     }
     certstore.validate();
 
-    if (certstore.getVersion() > VERSION) {
-      throw new Exception("could not import Certstore greater than " + VERSION + ": "
+    if (certstore.getVersion() > VERSION_V2) {
+      throw new Exception("could not import Certstore greater than " + VERSION_V2 + ": "
           + certstore.getVersion());
     }
 
@@ -382,7 +383,6 @@ class CaCertstoreDbImporter extends DbPorter {
         String filename = cert.getFile();
         // rawcert
         ZipEntry certZipEnty = zipFile.getEntry(filename);
-        // rawcert
         byte[] encodedCert = IoUtil.read(zipFile.getInputStream(certZipEnty));
 
         TBSCertificate tbsCert;
@@ -397,8 +397,17 @@ class CaCertstoreDbImporter extends DbPorter {
 
         String b64Sha1FpCert = HashAlgo.SHA1.base64Hash(encodedCert);
 
-        // cert
+        // cert's subject
         String subjectText = X509Util.cutX500Name(tbsCert.getSubject(), maxX500nameLen);
+
+        // private key
+        String privateKey = null;
+        if (cert.getPrivateKeyFile() != null) {
+          ZipEntry keyZipEnty = zipFile.getEntry(cert.getPrivateKeyFile());
+          if (keyZipEnty != null) {
+            privateKey = new String(IoUtil.read(zipFile.getInputStream(keyZipEnty)));
+          }
+        }
 
         try {
           int idx = 1;
@@ -445,7 +454,8 @@ class CaCertstoreDbImporter extends DbPorter {
           stmt.setString(idx++, b64Sha1FpCert);
           stmt.setString(idx++, cert.getRs());
           stmt.setInt(idx++, cert.getCrlScope());
-          stmt.setString(idx, Base64.encodeToString(encodedCert));
+          stmt.setString(idx++, Base64.encodeToString(encodedCert));
+          stmt.setString(idx, privateKey);
           stmt.addBatch();
         } catch (SQLException ex) {
           throw translate(sql, ex);
@@ -537,6 +547,7 @@ class CaCertstoreDbImporter extends DbPorter {
 
         // rawcert
         byte[] encodedCrl = IoUtil.read(zipFile.getInputStream(zipEnty));
+        String b64Sha1 = HashAlgo.SHA1.base64Hash(encodedCrl);
 
         X509CRLHolder x509crl;
         try {
@@ -587,6 +598,7 @@ class CaCertstoreDbImporter extends DbPorter {
           }
 
           stmt.setInt(idx++, crl.getCrlScope());
+          stmt.setString(idx++, b64Sha1);
           stmt.setString(idx, Base64.encodeToString(encodedCrl));
 
           stmt.addBatch();

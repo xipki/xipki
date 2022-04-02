@@ -84,13 +84,13 @@ class CaCertstoreDbExporter extends DbPorter {
       }
       certstore.validate();
 
-      if (certstore.getVersion() > VERSION) {
+      if (certstore.getVersion() > VERSION_V2) {
         throw new Exception("could not continue with CertStore greater than "
-            + VERSION + ": " + certstore.getVersion());
+            + VERSION_V2 + ": " + certstore.getVersion());
       }
     } else {
       certstore = new CaCertstore();
-      certstore.setVersion(VERSION);
+      certstore.setVersion(VERSION_V2);
     }
 
     Exception exception = null;
@@ -191,7 +191,7 @@ class CaCertstoreDbExporter extends DbPorter {
       case CERT:
         numProcessedBefore = certstore.getCountCerts();
         coreSql = "ID,SN,CA_ID,PID,RID,RTYPE,TID,UID,EE,LUPDATE,REV,RR,RT,RIT,FP_RS,"
-            + "REQ_SUBJECT,CRL_SCOPE,CERT FROM CERT WHERE ID>=?";
+            + "REQ_SUBJECT,CRL_SCOPE,CERT,PRIVATE_KEY FROM CERT WHERE ID>=?";
         break;
       case CRL:
         numProcessedBefore = certstore.getCountCrls();
@@ -279,8 +279,10 @@ class CaCertstoreDbExporter extends DbPorter {
 
           if (CaDbEntryType.CERT == type) {
             byte[] certBytes = Base64.decodeFast(rs.getString("CERT"));
+            String privateKey = rs.getString("PRIVATE_KEY");
 
             String sha1 = HashAlgo.SHA1.hexHash(certBytes);
+
             String certFileName = sha1 + ".der";
             ZipEntry certZipEntry = new ZipEntry(certFileName);
             currentEntriesZip.putNextEntry(certZipEntry);
@@ -290,11 +292,25 @@ class CaCertstoreDbExporter extends DbPorter {
               currentEntriesZip.closeEntry();
             }
 
+            String privateKeyFileName = sha1 + "-key.bin";
+            if (privateKey != null) {
+              ZipEntry keyZipEntry = new ZipEntry(privateKeyFileName);
+              currentEntriesZip.putNextEntry(keyZipEntry);
+              try {
+                currentEntriesZip.write(privateKey.getBytes(StandardCharsets.UTF_8));
+              } finally {
+                currentEntriesZip.closeEntry();
+              }
+            }
+
             CaCertstore.Cert cert = new CaCertstore.Cert();
             cert.setId(id);
             cert.setCaId(rs.getInt("CA_ID"));
             cert.setEe(rs.getBoolean("EE"));
             cert.setFile(certFileName);
+            if (privateKey != null) {
+              cert.setPrivateKeyFile(privateKeyFileName);
+            }
 
             long fpReqSubject = rs.getLong("FP_RS");
             if (fpReqSubject != 0) {

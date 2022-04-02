@@ -148,6 +148,8 @@ public class X509Ca extends X509CaModule implements Closeable {
 
   private final boolean saveCert;
 
+  private final boolean saveKeypair;
+
   public X509Ca(CaManagerImpl caManager, CaInfo caInfo, CertStore certstore,
       CtLogClient ctlogClient) throws OperationException {
     super(caInfo);
@@ -178,21 +180,14 @@ public class X509Ca extends X509CaModule implements Closeable {
     this.grandCertTemplateBuilder = new GrandCertTemplateBuilder(caInfo, certstore);
     this.revokerModule = new X509RevokerModule(caManager, caInfo, certstore, publisherModule);
     this.removerModule = new X509RemoverModule(caManager, caInfo, certstore, publisherModule);
-
-    // saveCert: default to true
-    boolean b = true;
-    String caName = caInfo.getCaEntry().getIdent().getName();
-    if (caInfo.getExtraControl() != null) {
-      if ("false".equalsIgnoreCase(caInfo.getExtraControl().value("SAVE_CERT"))) {
-        // only explicit specified to 'false'
-        b = false;
-        LOG.warn("CA {}: Certificates will not be saved in the database and will not be "
-            + "published!", caName);
-      }
+    this.saveKeypair = caInfo.isSaveKeypair();
+    this.saveCert = caInfo.isSaveCert();
+    if (!this.saveCert) {
+      LOG.warn("CA {}: Certificates will not be saved in the database and will not be "
+              + "published!", caInfo.getIdent().getName());
     }
 
-    saveCert = b;
-    if (!saveCert) {
+    if (!this.saveCert) {
       if (caInfo.isSaveRequest()) {
         // Request cannot be saved if SAVE_CERT (in EXTRA_CONTROL) is set to false.
         caInfo.setSaveRequest(false);
@@ -261,7 +256,8 @@ public class X509Ca extends X509CaModule implements Closeable {
   public boolean verifyCsr(CertificationRequest csr) {
     notNull(csr, "csr");
     return CaUtil.verifyCsr(csr, caManager.getSecurityFactory(),
-        caInfo.getCmpControl().getPopoAlgoValidator(), caInfo.getDhpocControl());
+            caInfo.getCmpControl().getPopoAlgoValidator(),
+            caInfo.getDhpocControl());
   }
 
   public List<CertListInfo> listCerts(X500Name subjectPattern, Date validFrom,
@@ -515,7 +511,8 @@ public class X509Ca extends X509CaModule implements Closeable {
     IdentifiedCertprofile certprofile = gct.certprofile;
 
     ExtensionControl extnSctCtrl = certprofile.getExtensionControls().get(Extn.id_SCTs);
-    boolean ctlogEnabled = caInfo.getCtlogControl() != null && caInfo.getCtlogControl().isEnabled();
+    boolean ctlogEnabled = caInfo.getCtlogControl() != null
+            && caInfo.getCtlogControl().isEnabled();
 
     if (!ctlogEnabled) {
       if (extnSctCtrl != null && extnSctCtrl.isRequired()) {
@@ -668,7 +665,7 @@ public class X509Ca extends X509CaModule implements Closeable {
       ret.setTransactionId(transactionId);
       ret.setRequestedSubject(gct.requestedSubject);
 
-      if (saveCert && publisherModule.publishCert(ret) == 1) {
+      if (saveCert && publisherModule.publishCert(ret, saveKeypair) == 1) {
         throw new OperationException(SYSTEM_FAILURE, "could not save certificate");
       }
     } catch (BadCertTemplateException ex) {
@@ -802,7 +799,7 @@ public class X509Ca extends X509CaModule implements Closeable {
   } // method healthCheck
 
   public String getHexSha1OfCert() {
-    return caInfo.getCaEntry().getHexSha1OfCert();
+    return caInfo.getHexSha1OfCert();
   }
 
   @Override

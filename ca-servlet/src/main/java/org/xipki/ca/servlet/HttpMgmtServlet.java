@@ -353,7 +353,7 @@ public class HttpMgmtServlet extends HttpServlet {
           byte[] result = caManager.getCertRequest(req.getCaName(), req.getSerialNumber());
           if (result == null) {
             throw new CaMgmtException("Found no CertRequest for CA " + req.getCaName()
-                        + " and serialNumber " + req.getSerialNumber());
+                        + " and serialNumber 0x" + req.getSerialNumber().toString(16));
           }
           resp = new MgmtResponse.ByteArray(result);
           break;
@@ -363,7 +363,7 @@ public class HttpMgmtServlet extends HttpServlet {
           X509CRLHolder crl = caManager.getCrl(req.getCaName(), req.getCrlNumber());
           if (crl == null) {
             throw new CaMgmtException("Found no CRL for CA " + req.getCaName()
-                        + " with CRL number " + req.getCrlNumber());
+                        + " with CRL number 0x" + req.getCrlNumber().toString(16));
           }
           resp = toByteArray(action, crl);
           break;
@@ -604,9 +604,10 @@ public class HttpMgmtServlet extends HttpServlet {
           resp = null;
           break;
         }
-        case revokeCertficate: {
+        case revokeCertficate:
+        case revokeCertificate: {
           MgmtRequest.RevokeCertificate req = parse(in, MgmtRequest.RevokeCertificate.class);
-          caManager.revokeCertificate(req.getCaName(),req.getSerialNumber(),
+          caManager.revokeCertificate(req.getCaName(), req.getSerialNumber(),
               req.getReason(), req.getInvalidityTime());
           resp = null;
           break;
@@ -633,6 +634,60 @@ public class HttpMgmtServlet extends HttpServlet {
           MgmtRequest.UnrevokeCertificate req = parse(in, MgmtRequest.UnrevokeCertificate.class);
           caManager.unrevokeCertificate(req.getCaName(), req.getSerialNumber());
           resp = null;
+          break;
+        }
+        case addDbSchema: {
+          MgmtRequest.AddOrChangeDbSchema req = parse(in, MgmtRequest.AddOrChangeDbSchema.class);
+          caManager.addDbSchema(req.getName(), req.getValue());
+          resp = null;
+          break;
+        }
+        case changeDbSchema: {
+          MgmtRequest.AddOrChangeDbSchema req = parse(in, MgmtRequest.AddOrChangeDbSchema.class);
+          caManager.changeDbSchema(req.getName(), req.getValue());
+          resp = null;
+          break;
+        }
+        case removeDbSchema: {
+          String name = getNameFromRequest(in);
+          caManager.removeDbSchema(name);
+          resp = null;
+          break;
+        }
+        case getDbSchemas: {
+          resp = new MgmtResponse.GetDbSchemas(caManager.getDbSchemas());
+          break;
+        }
+        case addKeypairGen: {
+          MgmtRequest.AddKeypairGen req = parse(in, MgmtRequest.AddKeypairGen.class);
+          caManager.addKeypairGen(req.getEntry());
+          resp = null;
+          break;
+        }
+        case changeKeypairGen: {
+          MgmtRequest.ChangeTypeConfEntity req = parse(in, MgmtRequest.ChangeTypeConfEntity.class);
+          caManager.changeKeypairGen(req.getName(), req.getType(), req.getConf());
+          resp = null;
+          break;
+        }
+        case removeKeypairGen: {
+          String name = getNameFromRequest(in);
+          caManager.removeKeypairGen(name);
+          resp = null;
+          break;
+        }
+        case getKeypairGenNames: {
+          Set<String> result = caManager.getKeypairGenNames();
+          resp = new MgmtResponse.StringSet(result);
+          break;
+        }
+        case getKeypairGen: {
+          String name = getNameFromRequest(in);
+          KeypairGenEntry result = caManager.getKeypairGen(name);
+          if (result == null) {
+            throw new CaMgmtException("Unknown KeypairGen " + name);
+          }
+          resp = new MgmtResponse.GetKeypairGen(result);
           break;
         }
         default: {

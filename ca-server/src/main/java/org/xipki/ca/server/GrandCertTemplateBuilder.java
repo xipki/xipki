@@ -91,7 +91,7 @@ class GrandCertTemplateBuilder {
     this.caInfo = caInfo;
     this.certstore = certstore;
 
-    X509Cert caCert = caInfo.getCaEntry().getCert();
+    X509Cert caCert = caInfo.getCert();
     SubjectPublicKeyInfo caSpki = caCert.getSubjectPublicKeyInfo();
     ASN1ObjectIdentifier caSpkiAlgId = caSpki.getAlgorithm().getAlgorithm();
 
@@ -340,7 +340,7 @@ class GrandCertTemplateBuilder {
       }
     } else {
       // show not reach here
-      throw new OperationException(BAD_CERT_TEMPLATE, "no public key is specified  genkey");
+      throw new OperationException(BAD_CERT_TEMPLATE, "no public key is specified");
     }
 
     // public key

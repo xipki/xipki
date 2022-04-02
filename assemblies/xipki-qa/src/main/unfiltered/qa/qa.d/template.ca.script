@@ -9,6 +9,9 @@ echo "#################################################################"
 echo "#                       Prepare environment                    #"
 echo "#################################################################"
 
+## DBSchema entries
+ca:dbschema-add --name KEYPAIR_ENC_KEY --value 00112233445566778899AABBCCDDEEFF
+
 ## Certificate Profiles
 
 list = [ cross subca subca-complex ocsp scep multiple-ous multi-valued-rdn \
@@ -88,7 +91,10 @@ ca:gen-rootca \
   --cmp-responder responder1 \
   --validity-mode cutoff \
   --support-cmp yes --support-rest yes \
-  --save-req yes
+  --save-cert yes \
+  --save-req yes \
+  --save-keypair yes \
+  --keypair-gen software
 
 ## Remove the profile rootca
 ca:profile-rm -f rootca
@@ -304,7 +310,10 @@ ca:ca-add \
   --cmp-control "send.ca=true,send.certchain=false,messagetime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=$SIGALGO:${STDHASH}withRSA:${STDHASH}withECDSA:${STDHASH}withDSA:SM3withSM2" \
   --cmp-responder responder1 \
   --support-cmp yes --support-rest yes \
-  --save-req no \
+  --save-cert yes \
+  --save-req yes \
+  --save-keypair yes \
+  --keypair-gen software \
   --revoke-suspended-control enabled=true,targetReason=cessationOfOperation,unchangedSince=15d \
   --certchain output/rootca1.crt \
   --ctlog-control "enabled=true,sslcontext.name=localhost,servers=https://localhost/ctlog/"
@@ -382,7 +391,10 @@ ca:ca-add \
   --cmp-responder responder1 \
   --validity-mode lax \
   --support-cmp yes --support-rest yes --support-scep yes \
+  --save-cert yes \
   --save-req yes \
+  --save-keypair yes \
+  --keypair-gen software \
   --certchain output/rootca1.crt
 
 ca:caalias-add \

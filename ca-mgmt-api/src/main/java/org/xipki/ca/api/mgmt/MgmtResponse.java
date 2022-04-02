@@ -35,6 +35,27 @@ import java.util.Set;
 
 public abstract class MgmtResponse extends MgmtMessage {
 
+  public static class GetDbSchemas extends MgmtResponse {
+
+    private Map<String, String> result;
+
+    public GetDbSchemas() {
+    }
+
+    public GetDbSchemas(Map<String, String> result) {
+      this.result = result;
+    }
+
+    public Map<String, String> getResult() {
+      return result;
+    }
+
+    public void setResult(Map<String, String> result) {
+      this.result = result;
+    }
+
+  }
+
   public static class CertWithDbIdWrapper {
 
     private byte[] cert;
@@ -313,6 +334,27 @@ public abstract class MgmtResponse extends MgmtMessage {
     }
 
   } // class GetCert
+
+  public static class GetKeypairGen extends MgmtResponse {
+
+    private KeypairGenEntry result;
+
+    public GetKeypairGen() {
+    }
+
+    public GetKeypairGen(KeypairGenEntry result) {
+      this.result = result;
+    }
+
+    public KeypairGenEntry getResult() {
+      return result;
+    }
+
+    public void setResult(KeypairGenEntry result) {
+      this.result = result;
+    }
+
+  } // class GetCertprofile
 
   public static class GetPublischersForCa extends MgmtResponse {
 

@@ -22,14 +22,26 @@ import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.password.PasswordResolver;
+import org.xipki.password.PasswordResolverException;
 import org.xipki.security.CertRevocationInfo;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
+import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.Hex;
 
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -45,11 +57,8 @@ public class CertStoreBase extends QueryExecutor {
 
   protected static final String SQL_ADD_CERT =
       "INSERT INTO CERT (ID,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,PID,"
-      + "CA_ID,RID,UID,EE,RTYPE,TID,SHA1,REQ_SUBJECT,CRL_SCOPE,CERT)"
-      + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-
-  protected static final String SQL_ADD_CERT_V4 =
-      SQL_ADD_CERT.replace("CERT)", "CERT,FP_K)").replace(",?)", ",?,0)");
+      + "CA_ID,RID,UID,EE,RTYPE,TID,SHA1,REQ_SUBJECT,CRL_SCOPE,CERT,PRIVATE_KEY)"
+      + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
   protected static final String SQL_REVOKE_CERT =
       "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
@@ -72,8 +81,9 @@ public class CertStoreBase extends QueryExecutor {
       "SELECT MAX(THISUPDATE) FROM CRL WHERE CA_ID=? AND DELTACRL=?";
 
   protected static final String SQL_ADD_CRL =
-      "INSERT INTO CRL (ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE,DELTACRL,BASECRL_NO,CRL_SCOPE,CRL)"
-      + " VALUES (?,?,?,?,?,?,?,?,?)";
+      "INSERT INTO CRL (ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE,DELTACRL,BASECRL_NO,"
+      + "CRL_SCOPE,SHA1,CRL)"
+      + " VALUES (?,?,?,?,?,?,?,?,?,?)";
 
   protected static final String SQL_REMOVE_CERT_FOR_ID = "DELETE FROM CERT WHERE ID=?";
 
@@ -85,14 +95,28 @@ public class CertStoreBase extends QueryExecutor {
 
   protected static final String SQL_ADD_REQCERT = "INSERT INTO REQCERT (ID,RID,CID) VALUES(?,?,?)";
 
-  protected final int dbSchemaVersion;
+  protected int dbSchemaVersion;
 
-  protected final int maxX500nameLen;
+  protected int maxX500nameLen;
 
-  protected CertStoreBase(DataSourceWrapper datasource)
+  protected final String keypairEncAlg = "AES/GCM/NoPadding";
+
+  protected final int keypairEncAlgId = 1;
+
+  protected String keypairEncProvider;
+
+  protected String keypairEncKeyId;
+
+  protected SecretKey keypairEncKey;
+
+  protected CertStoreBase(DataSourceWrapper datasource, PasswordResolver passwordResolver)
       throws DataAccessException, CaMgmtException {
     super(datasource);
+    updateDbInfo(passwordResolver);
+  } // constructor
 
+  public void updateDbInfo(PasswordResolver passwordResolver)
+          throws DataAccessException, CaMgmtException {
     DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
     String vendor = dbSchemaInfo.variableValue("VENDOR");
     if (vendor != null && !vendor.equalsIgnoreCase("XIPKI")) {
@@ -101,7 +125,41 @@ public class CertStoreBase extends QueryExecutor {
 
     this.dbSchemaVersion = Integer.parseInt(dbSchemaInfo.variableValue("VERSION"));
     this.maxX500nameLen = Integer.parseInt(dbSchemaInfo.variableValue("X500NAME_MAXLEN"));
-  } // constructor
+
+    if (dbSchemaVersion < 7) {
+      throw new CaMgmtException("Please update the database schema to version 7+");
+    }
+
+    // Save keypair control
+    String str = dbSchemaInfo.variableValue("KEYPAIR_ENC_KEY");
+    if (str != null) {
+      try {
+        char[] keyChars = passwordResolver.resolvePassword(str);
+        byte[] encodedEncKey = Hex.decode(keyChars);
+        int n = encodedEncKey.length;
+        if (n != 16 && n != 24 && n != 32) {
+          throw new CaMgmtException("error resolving KEYPAIR_ENC_KEY");
+        }
+        this.keypairEncKey = new SecretKeySpec(encodedEncKey, "AES");
+        byte[] keyIdBytes = Arrays.copyOf(HashAlgo.SHA1.hash(encodedEncKey), 8);
+        this.keypairEncKeyId = Hex.encode(keyIdBytes);
+      } catch (PasswordResolverException ex) {
+        throw new CaMgmtException("error resolving KEYPAIR_ENC_KEY", ex);
+      }
+
+      try {
+        Cipher.getInstance(keypairEncAlg, "SunJCE");
+        keypairEncProvider = "SunJCE";
+      } catch (NoSuchProviderException | NoSuchAlgorithmException | NoSuchPaddingException ex) {
+        try {
+          Cipher cipher = Cipher.getInstance(keypairEncAlg);
+          keypairEncProvider = cipher.getProvider().getName();
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException ex2) {
+          throw new IllegalStateException("Unsupported cipher " + keypairEncAlg);
+        }
+      }
+    }
+  }
 
   protected static CertRevocationInfo buildCertRevInfo(ResultRow rs) {
     boolean revoked = rs.getBoolean("REV");

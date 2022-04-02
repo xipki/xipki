@@ -51,10 +51,11 @@ class CaconfDbExporter extends DbPorter {
   public void export()
       throws Exception {
     CaCertstore.Caconf caconf = new CaCertstore.Caconf();
-    caconf.setVersion(VERSION);
+    caconf.setVersion(VERSION_V2);
 
     System.out.println("exporting CA configuration from database");
 
+    exportDbSchema(caconf);
     exportSigner(caconf);
     exportRequestor(caconf);
     exportUser(caconf);
@@ -66,6 +67,9 @@ class CaconfDbExporter extends DbPorter {
     exportCaHasUser(caconf);
     exportCaHasPublisher(caconf);
     exportCaHasProfile(caconf);
+    if (dbSchemaVersion >= 7) {
+      exportKeypairGen(caconf);
+    }
 
     caconf.validate();
     try (OutputStream os = Files.newOutputStream(Paths.get(baseDir, FILENAME_CA_CONFIGURATION))) {
@@ -171,6 +175,35 @@ class CaconfDbExporter extends DbPorter {
     System.out.println(" exported table TUSER");
   } // method exportUser
 
+  private void exportDbSchema(CaCertstore.Caconf caconf)
+          throws DataAccessException, InvalidConfException {
+    System.out.println("exporting table DBSCHEMA");
+    List<CaCertstore.DbSchemaEntry> entries = new LinkedList<>();
+    final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
+
+    Statement stmt = null;
+    ResultSet rs = null;
+    try {
+      stmt = createStatement();
+      rs = stmt.executeQuery(sql);
+
+      while (rs.next()) {
+        CaCertstore.DbSchemaEntry entry = new CaCertstore.DbSchemaEntry();
+        entry.setName(rs.getString("NAME"));
+        entry.setValue(rs.getString("VALUE2"));
+        entry.validate();
+        entries.add(entry);
+      }
+    } catch (SQLException ex) {
+      throw translate(sql, ex);
+    } finally {
+      releaseResources(stmt, rs);
+    }
+
+    caconf.setDbSchemas(entries);
+    System.out.println(" exported table DBSCHEMA");
+  } // method exportDbSchema
+
   private void exportSigner(CaCertstore.Caconf caconf)
       throws DataAccessException, IOException, InvalidConfException {
     System.out.println("exporting table SIGNER");
@@ -205,6 +238,43 @@ class CaconfDbExporter extends DbPorter {
     caconf.setSigners(signers);
     System.out.println(" exported table SIGNER");
   } // method exportSigner
+
+  private void exportKeypairGen(CaCertstore.Caconf caconf)
+          throws DataAccessException, IOException, InvalidConfException {
+    System.out.println("exporting table KEYPAIR_GEN");
+    List<CaCertstore.NameTypeConf> keypairGens = new LinkedList<>();
+    final String sql = "SELECT NAME,TYPE,CONF FROM KEYPAIR_GEN";
+
+    Statement stmt = null;
+    ResultSet rs = null;
+    try {
+      stmt = createStatement();
+      rs = stmt.executeQuery(sql);
+
+      while (rs.next()) {
+        String name = rs.getString("NAME");
+        if ("software".equalsIgnoreCase(name)) {
+          // will be added during the database initialization
+          continue;
+        }
+
+        CaCertstore.NameTypeConf entry = new CaCertstore.NameTypeConf();
+        entry.setName(name);
+        entry.setType(rs.getString("TYPE"));
+        entry.setConf(buildFileOrValue(rs.getString("CONF"), "ca-conf/conf-publisher-" + name));
+
+        entry.validate();
+        keypairGens.add(entry);
+      }
+    } catch (SQLException ex) {
+      throw translate(sql, ex);
+    } finally {
+      releaseResources(stmt, rs);
+    }
+
+    caconf.setKeypairGens(keypairGens);
+    System.out.println(" exported table KEYPAIR_GEN");
+  } // method exportKeypairGen
 
   private void exportPublisher(CaCertstore.Caconf caconf)
       throws DataAccessException, IOException, InvalidConfException {
@@ -279,12 +349,17 @@ class CaconfDbExporter extends DbPorter {
     System.out.println("exporting table CA");
     List<CaCertstore.Ca> cas = new LinkedList<>();
 
-    final String sql = "SELECT ID,NAME,SN_SIZE,NEXT_CRLNO,STATUS,CA_URIS," // 6
-        + "MAX_VALIDITY,CERT,CERTCHAIN,SIGNER_TYPE,CRL_SIGNER_NAME," // 5
-        + "CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,CRL_CONTROL,CMP_CONTROL,SCEP_CONTROL," // 5
-        + "CTLOG_CONTROL,PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION," // 6
-        + "NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL," // 5
-        + "SIGNER_CONF,REV_INFO,DHPOC_CONTROL,REVOKE_SUSPENDED_CONTROL FROM CA"; // 4
+    String columns = "SELECT ID,NAME,SN_SIZE,NEXT_CRLNO,STATUS,CA_URIS,"
+        + "MAX_VALIDITY,CERT,CERTCHAIN,SIGNER_TYPE,CRL_SIGNER_NAME,"
+        + "CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,CRL_CONTROL,CMP_CONTROL,SCEP_CONTROL,"
+        + "CTLOG_CONTROL,PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION,"
+        + "NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL,"
+        + "SIGNER_CONF,REV_INFO,DHPOC_CONTROL,REVOKE_SUSPENDED_CONTROL";
+    if (dbSchemaVersion >= 7) {
+      columns += ",KEYPAIR_GEN_NAMES,SAVE_CERT,SAVE_KEYPAIR";
+    }
+
+    final String sql = columns + " FROM CA";
 
     Statement stmt = null;
     ResultSet rs = null;
@@ -327,6 +402,17 @@ class CaconfDbExporter extends DbPorter {
         ca.setRevInfo(rs.getString("REV_INFO"));
         ca.setDhpocControl(rs.getString("DHPOC_CONTROL"));
         ca.setRevokeSuspendedControl(rs.getString("REVOKE_SUSPENDED_CONTROL"));
+
+        if (dbSchemaVersion >= 7) {
+          ca.setKeypairGenNames(rs.getString("KEYPAIR_GEN_NAMES"));
+          ca.setSaveCert(rs.getInt("SAVE_CERT"));
+          ca.setSaveKeypair(rs.getInt("SAVE_KEYPAIR"));
+        } else {
+          // Util version 6
+          ca.setKeypairGenNames("software");
+          ca.setSaveCert(1);
+          ca.setSaveKeypair(0);
+        }
 
         ca.validate();
         cas.add(ca);

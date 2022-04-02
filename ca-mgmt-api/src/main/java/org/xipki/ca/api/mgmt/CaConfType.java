@@ -52,6 +52,8 @@ public class CaConfType {
      */
     private Map<String, String> properties;
 
+    private Map<String, String> dbSchemas;
+
     private List<Signer> signers;
 
     private List<Requestor> requestors;
@@ -59,6 +61,8 @@ public class CaConfType {
     private List<NameTypeConf> publishers;
 
     private List<NameTypeConf> profiles;
+
+    private List<NameTypeConf> keypairGens;
 
     private List<Ca> cas;
 
@@ -81,6 +85,17 @@ public class CaConfType {
 
     public void setProperties(Map<String, String> properties) {
       this.properties = properties;
+    }
+
+    public Map<String, String> getDbSchemas() {
+      if (dbSchemas == null) {
+        dbSchemas = new HashMap<>();
+      }
+      return dbSchemas;
+    }
+
+    public void setDbSchemas(Map<String, String> dbSchemas) {
+      this.dbSchemas = dbSchemas;
     }
 
     public List<Signer> getSigners() {
@@ -125,6 +140,17 @@ public class CaConfType {
 
     public void setProfiles(List<NameTypeConf> profiles) {
       this.profiles = profiles;
+    }
+
+    public List<NameTypeConf> getKeypairGens() {
+      if (keypairGens == null) {
+        keypairGens = new LinkedList<>();
+      }
+      return keypairGens;
+    }
+
+    public void setKeypairGens(List<NameTypeConf> keypairGens) {
+      this.keypairGens = keypairGens;
     }
 
     public List<Ca> getCas() {
@@ -311,9 +337,15 @@ public class CaConfType {
 
     private String crlSignerName;
 
+    private List<String> keypairGenNames;
+
     private Set<String> protocolSupport;
 
+    private boolean saveCert;
+
     private boolean saveReq;
+
+    private boolean saveKeyPair;
 
     private String signerType;
 
@@ -473,6 +505,14 @@ public class CaConfType {
       this.crlSignerName = crlSignerName;
     }
 
+    public List<String> getKeypairGenNames() {
+      return keypairGenNames;
+    }
+
+    public void setKeypairGenNames(List<String> keypairGenNames) {
+      this.keypairGenNames = keypairGenNames;
+    }
+
     public Set<String> getProtocolSupport() {
       return protocolSupport;
     }
@@ -487,6 +527,22 @@ public class CaConfType {
 
     public void setSaveReq(boolean saveReq) {
       this.saveReq = saveReq;
+    }
+
+    public boolean isSaveCert() {
+      return saveCert;
+    }
+
+    public void setSaveCert(boolean saveCert) {
+      this.saveCert = saveCert;
+    }
+
+    public boolean isSaveKeyPair() {
+      return saveKeyPair;
+    }
+
+    public void setSaveKeyPair(boolean saveKeyPair) {
+      this.saveKeyPair = saveKeyPair;
     }
 
     public String getSignerType() {

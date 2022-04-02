@@ -245,6 +245,12 @@ public class ConfPairs {
     return pairs.get(name);
   }
 
+  public String value(String name, String defaultValue) {
+    notBlank(name, "name");
+    String value = pairs.get(name);
+    return value == null ? defaultValue : value;
+  }
+
   public Set<String> names() {
     return Collections.unmodifiableSet(pairs.keySet());
   }
@@ -294,6 +300,35 @@ public class ConfPairs {
   @Override
   public int hashCode() {
     return getEncoded().hashCode();
+  }
+
+  public String toStringOmitSensitive(String... nameKeywords) {
+    Set<String> names = new HashSet<>();
+    for (Entry<String, String> entry : pairs.entrySet()) {
+      String lname = entry.getKey().toLowerCase();
+      for (String nameKeyword : nameKeywords) {
+        if (lname.contains(nameKeyword)) {
+          names.add(entry.getKey());
+          break;
+        }
+      }
+    }
+
+    if (names.isEmpty()) {
+      return getEncoded();
+    }
+
+    try {
+      for (Entry<String, String> entry : pairs.entrySet()) {
+        String name = entry.getKey();
+        if (names.contains(name)) {
+          pairs.put(name, "<sensitive>");
+        }
+      }
+      return new ConfPairs(pairs).getEncoded();
+    } catch (Exception ex) {
+      return getEncoded();
+    }
   }
 
   @Override

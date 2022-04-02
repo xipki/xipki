@@ -33,6 +33,27 @@ import java.util.List;
 
 public abstract class MgmtRequest extends MgmtMessage {
 
+  public static class AddOrChangeDbSchema extends MgmtRequest {
+    private String name;
+    private String value;
+
+    public String getName() {
+      return name;
+    }
+
+    public void setName(String name) {
+      this.name = name;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    public void setValue(String value) {
+      this.value = value;
+    }
+  }
+
   public static class AddCaAlias extends CaNameRequest {
 
     private String aliasName;
@@ -88,6 +109,20 @@ public abstract class MgmtRequest extends MgmtMessage {
     }
 
   } // class AddCertprofileToCa
+
+  public static class AddKeypairGen extends MgmtRequest {
+
+    private KeypairGenEntry entry;
+
+    public KeypairGenEntry getEntry() {
+      return entry;
+    }
+
+    public void setEntry(KeypairGenEntry entry) {
+      this.entry = entry;
+    }
+
+  } // class AddKeypairGen
 
   public static class AddPublisher extends MgmtRequest {
 

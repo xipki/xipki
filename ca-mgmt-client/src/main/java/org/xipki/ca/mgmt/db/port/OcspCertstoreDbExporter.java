@@ -90,13 +90,13 @@ class OcspCertstoreDbExporter extends DbPorter {
       }
       certstore.validate();
 
-      if (certstore.getVersion() > VERSION) {
-        throw new Exception("could not continue with Certstore greater than " + VERSION
+      if (certstore.getVersion() > VERSION_V2) {
+        throw new Exception("could not continue with Certstore greater than " + VERSION_V2
             + ": " + certstore.getVersion());
       }
     } else {
       certstore = new OcspCertstore();
-      certstore.setVersion(VERSION);
+      certstore.setVersion(VERSION_V2);
     }
     System.out.println("exporting OCSP certstore from database");
 

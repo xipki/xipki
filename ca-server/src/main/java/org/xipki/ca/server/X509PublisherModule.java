@@ -71,13 +71,13 @@ class X509PublisherModule extends X509CaModule {
    * @return 0 for published successfully, 1 if could not be published to CA certstore and
    *     any publishers, 2 if could be published to CA certstore but not to all publishers.
    */
-  int publishCert(CertificateInfo certInfo) {
+  int publishCert(CertificateInfo certInfo, boolean saveKeypair) {
     notNull(certInfo, "certInfo");
     if (certInfo.isAlreadyIssued()) {
       return 0;
     }
 
-    if (!certstore.addCert(certInfo)) {
+    if (!certstore.addCert(certInfo, saveKeypair)) {
       return 1;
     }
 

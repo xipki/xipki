@@ -4,7 +4,7 @@
    - Table CRL:  add column SHA1
    - Table CA:   add column SAVE_CERT
    - Table CA:   add column SAVE_KEYPAIR
-   - Table CA:   add column KEYPAIR_GEN_NAME
+   - Table CA:   add column KEYPAIR_GEN_NAMES
    - Table CERT: add column PRIVATE_KEY
    - Add table KEYPAIR_GEN
 
@@ -69,6 +69,10 @@
       </column>
       <column name="CONF" type="CLOB"/>
     </createTable>
+    <insert tableName="KEYPAIR_GEN">
+      <column name="NAME" value="software"/>
+      <column name="TYPE" value="SOFTWARE"/>
+    </insert>
     <!-- table SIGNER -->
     <createTable tableName="SIGNER">
       <column name="NAME" type="VARCHAR(45)">
@@ -180,7 +184,7 @@
       <column name="CRL_SIGNER_NAME" type="VARCHAR(45)"/>
       <column name="CMP_RESPONDER_NAME" type="VARCHAR(45)"/>
       <column name="SCEP_RESPONDER_NAME" type="VARCHAR(45)"/>
-      <column name="KEYPAIR_GEN_NAME" type="VARCHAR(45)"/>
+      <column name="KEYPAIR_GEN_NAMES" type="VARCHAR(200)"/>
       <column name="PROTOCOL_SUPPORT" type="VARCHAR(200)"/>
       <column name="SAVE_CERT" type="SMALLINT" defaultValueNumeric="1"/>
       <column name="SAVE_KEYPAIR" type="SMALLINT" defaultValueNumeric="0">
@@ -472,11 +476,6 @@
       onDelete="CASCADE" onUpdate="NO ACTION"
       baseColumnNames="CA_ID" baseTableName="CAALIAS"
       referencedColumnNames="ID" referencedTableName="CA"/>
-    <addForeignKeyConstraint constraintName="FK_CA_KEYPAIR_GEN1"
-      deferrable="false" initiallyDeferred="false"
-      onDelete="NO ACTION" onUpdate="NO ACTION"
-      baseColumnNames="KEYPAIR_GEN_NAME" baseTableName="CA"
-      referencedColumnNames="NAME" referencedTableName="KEYPAIR_GEN"/>
     <!-- ca_has_requestor -->
     <addForeignKeyConstraint constraintName="FK_CA_HAS_REQUESTOR_REQUESTOR1"
       deferrable="false" initiallyDeferred="false"

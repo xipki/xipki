@@ -325,6 +325,22 @@ CA Management Commands
 
      clear publish queue
 
+   * `ca:dbschema-add`
+
+     add a DB schema entry
+
+   * `ca:dbschema-info`
+
+     list DB schema entries
+
+   * `ca:dbschema-rm`
+
+     remove a DB schema entry
+
+   * `ca:dbschema-up`
+
+     change a DB schema entry
+
    * `ca:enroll-cert`
 
      enroll certificate
@@ -360,6 +376,22 @@ CA Management Commands
    * `ca:load-conf`
 
      load configuration
+
+   * `ca:keypairgen-add`
+
+     add keypair generation
+
+   * `ca:keypairgen-info`
+
+     show information of keypair generation
+
+   * `ca:keypairgen-rm`
+
+     remove keypair generation
+
+   * `ca:keypairgen-up`
+
+     change keypair generation
 
    * `ca:notify-change`
 

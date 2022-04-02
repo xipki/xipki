@@ -92,7 +92,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   } // class CertsInQueuePublisher
 
-  private class UnreferencedRequstCleaner implements Runnable {
+  private class UnreferencedRequestCleaner implements Runnable {
 
     private boolean inProcess;
 
@@ -178,6 +178,10 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   final Map<String, RequestorEntry> requestorDbEntries = new ConcurrentHashMap<>();
 
+  final Map<String, KeypairGenEntryWrapper> keypairGens = new ConcurrentHashMap<>();
+
+  final Map<String, KeypairGenEntry> keypairGenDbEntries = new ConcurrentHashMap<>();
+
   final Map<String, Set<String>> caHasProfiles = new ConcurrentHashMap<>();
 
   final Map<String, Set<String>> caHasPublishers = new ConcurrentHashMap<>();
@@ -251,6 +255,8 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   private final SignerManager signerManager;
 
+  private final KeypairGenManager keypairGenManager;
+
   static {
     String ver;
     try {
@@ -302,6 +308,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     this.publisherManager = new PublisherManager(this);
     this.requestorManager = new RequestorManager(this);
     this.signerManager = new SignerManager(this);
+    this.keypairGenManager = new KeypairGenManager(this);
   } // constructor
 
   public SecurityFactory getSecurityFactory() {
@@ -425,7 +432,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     UniqueIdGenerator idGen = new UniqueIdGenerator(epoch, shardId);
 
     try {
-      this.certstore = new CertStore(datasource, idGen);
+      this.certstore = new CertStore(datasource, idGen, securityFactory.getPasswordResolver());
     } catch (DataAccessException ex) {
       throw new CaMgmtException(ex.getMessage(), ex);
     }
@@ -436,6 +443,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     requestorManager.initRequestors();
     signerManager.initSigners();
     ca2Manager.initCas();
+    keypairGenManager.initKeypairGens();
   } // method init
 
   private DataSourceWrapper loadDatasource(String datasourceName, FileOrValue datasourceConf)
@@ -521,6 +529,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     ca2Manager.reset();
     certprofileManager.reset();
     publisherManager.reset();
+    keypairGenManager.reset();
 
     shutdownScheduledThreadPoolExecutor();
   } // method reset
@@ -553,6 +562,63 @@ public class CaManagerImpl implements CaManager, Closeable {
       throw ex;
     }
   } // method notifyCaChange
+
+  @Override
+  public void addDbSchema(String name, String value) throws CaMgmtException {
+    checkModificationOfDbSchema(name);
+    queryExecutor.addDbSchema(name, value);
+    try {
+      certstore.updateDbInfo(securityFactory.getPasswordResolver());
+    } catch (DataAccessException ex) {
+      throw new CaMgmtException(ex);
+    }
+  }
+
+  @Override
+  public void changeDbSchema(String name, String value) throws CaMgmtException {
+    checkModificationOfDbSchema(name);
+    queryExecutor.changeDbSchema(name, value);
+    try {
+      certstore.updateDbInfo(securityFactory.getPasswordResolver());
+    } catch (DataAccessException ex) {
+      throw new CaMgmtException(ex);
+    }
+  }
+
+  @Override
+  public void removeDbSchema(String name) throws CaMgmtException {
+    checkModificationOfDbSchema(name);
+    queryExecutor.removeDbSchema(name);
+    try {
+      certstore.updateDbInfo(securityFactory.getPasswordResolver());
+    } catch (DataAccessException ex) {
+      throw new CaMgmtException(ex);
+    }
+  }
+
+  @Override
+  public Map<String, String> getDbSchemas() throws CaMgmtException {
+    Map<String, String> all = queryExecutor.getDbSchemas();
+    Map<String, String> noReserved = new HashMap<>(all.size() * 5 / 4);
+    for (Entry<String, String> entry : all.entrySet()) {
+      switch (entry.getKey()) {
+        case "VERSION":
+        case "VENDOR":
+        case "X500NAME_MAXLEN":
+          break;
+        default:
+          noReserved.put(entry.getKey(), entry.getValue());
+      }
+    }
+    return noReserved;
+  }
+
+  private static void checkModificationOfDbSchema(String name) throws CaMgmtException {
+    if ("VERSION".equalsIgnoreCase(name) || "VENDOR".equalsIgnoreCase(name)
+        || "X500NAME_MAXLEN".equalsIgnoreCase(name)) {
+      throw new CaMgmtException("modification of reserved DBSCHEMA " + name + " is not allowed");
+    }
+  }
 
   public void startCaSystem() {
     boolean caSystemStarted = false;
@@ -600,7 +666,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       // Add the CAs to the store
       for (Entry<String, CaInfo> entry : caInfos.entrySet()) {
         String caName = entry.getKey();
-        CaStatus status = entry.getValue().getCaEntry().getStatus();
+        CaStatus status = entry.getValue().getStatus();
         if (CaStatus.ACTIVE != status) {
           continue;
         }
@@ -640,7 +706,7 @@ public class CaManagerImpl implements CaManager, Closeable {
         scheduledThreadPoolExecutor.scheduleAtFixedRate(
             new CertsInQueuePublisher(), 120, 120, SECONDS);
         scheduledThreadPoolExecutor.scheduleAtFixedRate(
-            new UnreferencedRequstCleaner(), 60, 24L * 60 * 60, SECONDS); // 1 DAY
+            new UnreferencedRequestCleaner(), 60, 24L * 60 * 60, SECONDS); // 1 DAY
       } else {
         sb.append(": no CA is configured");
       }
@@ -735,6 +801,11 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public Set<String> getCertprofileNames() {
     return certprofileDbEntries.keySet();
+  }
+
+  @Override
+  public Set<String> getKeypairGenNames() {
+    return keypairGenDbEntries.keySet();
   }
 
   @Override
@@ -911,6 +982,30 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void addCertprofile(CertprofileEntry certprofileEntry) throws CaMgmtException {
     certprofileManager.addCertprofile(certprofileEntry);
+  }
+
+  @Override
+  public KeypairGenEntry getKeypairGen(String name)
+          throws CaMgmtException {
+    return keypairGenDbEntries.get(name);
+  }
+
+  @Override
+  public void removeKeypairGen(String name)
+          throws CaMgmtException {
+    keypairGenManager.removeKeypairGen(name);
+  }
+
+  @Override
+  public void changeKeypairGen(String name, String type, String conf)
+          throws CaMgmtException {
+    keypairGenManager.changeKeypairGen(name, type, conf);
+  }
+
+  @Override
+  public void addKeypairGen(KeypairGenEntry keypairGenEntry)
+          throws CaMgmtException {
+    keypairGenManager.addKeypairGen(keypairGenEntry);
   }
 
   @Override

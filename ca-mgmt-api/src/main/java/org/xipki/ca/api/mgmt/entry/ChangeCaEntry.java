@@ -23,6 +23,7 @@ import org.xipki.ca.api.mgmt.CaManager;
 import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.ValidityMode;
 import org.xipki.util.Args;
+import org.xipki.util.CollectionUtil;
 import org.xipki.util.Validity;
 
 import java.util.List;
@@ -63,13 +64,19 @@ public class ChangeCaEntry extends MgmtEntry {
 
   private String crlSignerName;
 
+  private List<String> keypairGenNames;
+
   private Boolean supportCmp;
 
   private Boolean supportRest;
 
   private Boolean supportScep;
 
+  private Boolean saveCert;
+
   private Boolean saveRequest;
+
+  private Boolean saveKeypair;
 
   private ValidityMode validityMode;
 
@@ -212,6 +219,15 @@ public class ChangeCaEntry extends MgmtEntry {
     this.crlSignerName = (crlSignerName == null) ? null : crlSignerName.toLowerCase();
   }
 
+  public List<String> getKeypairGenNames() {
+    return keypairGenNames;
+  }
+
+  public void setKeypairGenNames(List<String> keypairGenNames) {
+    this.keypairGenNames = (keypairGenNames == null)
+            ? null : CollectionUtil.toLowerCaseList(keypairGenNames);
+  }
+
   public ValidityMode getValidityMode() {
     return validityMode;
   }
@@ -244,12 +260,28 @@ public class ChangeCaEntry extends MgmtEntry {
     this.supportScep = supportScep;
   }
 
+  public Boolean getSaveCert() {
+    return saveCert;
+  }
+
+  public void setSaveCert(Boolean saveCert) {
+    this.saveCert = saveCert;
+  }
+
   public Boolean getSaveRequest() {
     return saveRequest;
   }
 
   public void setSaveRequest(Boolean saveRequest) {
     this.saveRequest = saveRequest;
+  }
+
+  public Boolean getSaveKeypair() {
+    return saveKeypair;
+  }
+
+  public void setSaveKeypair(Boolean saveKeypair) {
+    this.saveKeypair = saveKeypair;
   }
 
   public Integer getPermission() {

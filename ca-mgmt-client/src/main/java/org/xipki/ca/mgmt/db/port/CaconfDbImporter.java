@@ -18,6 +18,7 @@
 package org.xipki.ca.mgmt.db.port;
 
 import com.alibaba.fastjson.JSON;
+import org.xipki.ca.mgmt.db.DbSchemaInfo;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.X509Cert;
@@ -32,6 +33,7 @@ import java.security.cert.CertificateException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -56,24 +58,26 @@ class CaconfDbImporter extends DbPorter {
     }
     caconf.validate();
 
-    if (caconf.getVersion() > VERSION) {
+    if (caconf.getVersion() > VERSION_V2) {
       throw new Exception("could not import CA configuration greater than "
-          + VERSION + ": " + caconf.getVersion());
+          + VERSION_V2 + ": " + caconf.getVersion());
     }
 
     System.out.println("importing CA configuration to database");
     try {
+      importDbSchema(caconf.getDbSchemas());
       importSigner(caconf.getSigners());
       importRequestor(caconf.getRequestors());
       importUser(caconf.getUsers());
       importPublisher(caconf.getPublishers());
       importProfile(caconf.getProfiles());
-      importCa(caconf.getCas());
+      importCa(caconf.getCas(), caconf.getVersion());
       importCaalias(caconf.getCaaliases());
       importCaHasRequestor(caconf.getCaHasRequestors());
       importCaHasUser(caconf.getCaHasUsers());
       importCaHasPublisher(caconf.getCaHasPublishers());
       importCaHasCertprofile(caconf.getCaHasProfiles());
+      importKeypairGen(caconf.getKeypairGens());
     } catch (Exception ex) {
       System.err.println("could not import CA configuration to database. message: "
           + ex.getMessage());
@@ -81,6 +85,45 @@ class CaconfDbImporter extends DbPorter {
     }
     System.out.println(" imported CA configuration to database");
   } // method importToDb
+
+  private void importDbSchema(List<CaCertstore.DbSchemaEntry> entries)
+          throws DataAccessException {
+    System.out.println("importing table DBSCHEMA");
+    if (entries == null) {
+      System.out.println(" imported table DBSCHEMA: nothing to import");
+      return;
+    }
+
+    DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
+    Set<String> dbSchemaNames = dbSchemaInfo.getVariableNames();
+
+    final String sql = "INSERT INTO DBSCHEMA (NAME,VALUE2) VALUES (?,?)";
+    PreparedStatement ps = null;
+    try {
+      ps = prepareStatement(sql);
+
+      for (CaCertstore.DbSchemaEntry entry : entries) {
+        String name = entry.getName();
+        if (dbSchemaNames.contains(name)) {
+          // do not import existing entry (with the same name)
+          continue;
+        }
+
+        try {
+          ps.setString(1, name);
+          ps.setString(2, entry.getValue());
+
+          ps.executeUpdate();
+        } catch (SQLException ex) {
+          System.err.println("could not import DBSCHEMA with NAME=" + name);
+          throw translate(sql, ex);
+        }
+      }
+    } finally {
+      releaseResources(ps, null);
+    }
+    System.out.println(" imported table DBSCHEMA");
+  } // method importDbSchema
 
   private void importSigner(List<CaCertstore.Signer> signers)
       throws DataAccessException, IOException {
@@ -229,17 +272,50 @@ class CaconfDbImporter extends DbPorter {
     System.out.println(" imported table PROFILE");
   } // method importProfile
 
-  private void importCa(List<CaCertstore.Ca> cas)
+  private void importKeypairGen(List<CaCertstore.NameTypeConf> keypairGens)
+          throws DataAccessException, IOException {
+    System.out.println("importing table KEYPAIR_GEN");
+    if (keypairGens == null) {
+      System.out.println(" imported table KEYPAIR_GEN: nothing to import");
+      return;
+    }
+    final String sql = "INSERT INTO KEYPAIR_GEN (NAME,TYPE,CONF) VALUES (?,?,?)";
+
+    PreparedStatement ps = null;
+    try {
+      ps = prepareStatement(sql);
+
+      for (CaCertstore.NameTypeConf entry : keypairGens) {
+        try {
+          ps.setString(1, entry.getName());
+          ps.setString(2, entry.getType());
+          ps.setString(3, readContent(entry.getConf()));
+
+          ps.executeUpdate();
+        } catch (SQLException ex) {
+          System.err.println("could not import KEYPAIR_GEN with NAME=" + entry.getName());
+          throw translate(sql, ex);
+        }
+      }
+    } finally {
+      releaseResources(ps, null);
+    }
+
+    System.out.println(" imported table SIGNER");
+  } // method importKeypairGen
+
+  private void importCa(List<CaCertstore.Ca> cas, int confVersion)
       throws DataAccessException, CertificateException, IOException {
     System.out.println("importing table CA");
 
-    final String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CA_URIS," // 7
-        + "MAX_VALIDITY,CERT,CERTCHAIN,SIGNER_TYPE,CRL_SIGNER_NAME," // 5
-        + "CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,CRL_CONTROL,CMP_CONTROL,SCEP_CONTROL," // 5
-        + "CTLOG_CONTROL,PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION," // 6
-        + "NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL," // 5
-        + "SIGNER_CONF,REV_INFO,DHPOC_CONTROL,REVOKE_SUSPENDED_CONTROL) " // 4
-        + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    final String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CA_URIS,"
+        + "MAX_VALIDITY,CERT,CERTCHAIN,SIGNER_TYPE,CRL_SIGNER_NAME,"
+        + "CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,KEYPAIR_GEN_NAMES,"
+        + "CRL_CONTROL,CMP_CONTROL,SCEP_CONTROL,CTLOG_CONTROL,PROTOCOL_SUPPORT,"
+        + "SAVE_CERT,SAVE_REQ,SAVE_KEYPAIR,PERMISSION,"
+        + "NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL,"
+        + "SIGNER_CONF,REV_INFO,DHPOC_CONTROL,REVOKE_SUSPENDED_CONTROL) "
+        + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     PreparedStatement ps = null;
     try {
@@ -266,12 +342,23 @@ class CaconfDbImporter extends DbPorter {
           ps.setString(idx++, ca.getCrlSignerName());
           ps.setString(idx++, ca.getCmpResponderName());
           ps.setString(idx++, ca.getScepResponderName());
+
+          String keypairGenNames;
+          if(confVersion == VERSION_V1) {
+            keypairGenNames = "software";
+          } else {
+            keypairGenNames = ca.getKeypairGenNames();
+          }
+          ps.setString(idx++, keypairGenNames);
+
           ps.setString(idx++, ca.getCrlControl());
           ps.setString(idx++, ca.getCmpControl());
           ps.setString(idx++, ca.getScepControl());
           ps.setString(idx++, ca.getCtlogControl());
           ps.setString(idx++, ca.getProtocolSupport());
+          ps.setInt(idx++, ca.getSaveCert());
           ps.setInt(idx++, ca.getSaveReq());
+          ps.setInt(idx++, ca.getSaveKeypair());
           ps.setInt(idx++, ca.getPermission());
           ps.setInt(idx++, ca.getNumCrls());
           ps.setInt(idx++, ca.getExpirationPeriod());

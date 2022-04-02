@@ -108,7 +108,7 @@ class Ca2Manager {
 
     if (createCa(name)) {
       CaInfo caInfo = manager.caInfos.get(name);
-      if (CaStatus.ACTIVE != caInfo.getCaEntry().getStatus()) {
+      if (CaStatus.ACTIVE != caInfo.getStatus()) {
         return;
       }
 
@@ -125,7 +125,7 @@ class Ca2Manager {
   boolean startCa(String caName) {
     CaInfo caEntry = manager.caInfos.get(caName);
 
-    CtlogControl ctlogControl = caEntry.getCaEntry().getCtlogControl();
+    CtlogControl ctlogControl = caEntry.getCtlogControl();
     CtLogClient ctlogClient = null;
     if (ctlogControl != null && ctlogControl.isEnabled()) {
       String name = ctlogControl.getSslContextName();
@@ -371,7 +371,7 @@ class Ca2Manager {
 
     if (createCa(name)) {
       CaInfo caInfo = manager.caInfos.get(name);
-      if (CaStatus.ACTIVE != caInfo.getCaEntry().getStatus()) {
+      if (CaStatus.ACTIVE != caInfo.getStatus()) {
         return;
       }
 
@@ -646,7 +646,9 @@ class Ca2Manager {
     entry.setMaxValidity(caEntry.getMaxValidity());
     entry.setPermission(caEntry.getPermission());
     entry.setProtocolSupport(caEntry.getProtocoSupport());
+    entry.setSaveCert(caEntry.isSaveCert());
     entry.setSaveRequest(caEntry.isSaveRequest());
+    entry.setSaveKeypair(caEntry.isSaveKeypair());
     entry.setStatus(caEntry.getStatus());
     entry.setValidityMode(caEntry.getValidityMode());
 

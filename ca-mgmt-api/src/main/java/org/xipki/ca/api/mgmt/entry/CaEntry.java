@@ -86,9 +86,15 @@ public class CaEntry extends MgmtEntry {
 
   private String scepResponderName;
 
+  private List<String> keypairGenNames;
+
   private ProtocolSupport protocolSupport;
 
   private boolean saveRequest;
+
+  private boolean saveKeypair;
+
+  private boolean saveCert;
 
   private ValidityMode validityMode = ValidityMode.STRICT;
 
@@ -283,6 +289,15 @@ public class CaEntry extends MgmtEntry {
     this.crlSignerName = (crlSignerName == null) ? null : crlSignerName.toLowerCase();
   }
 
+  public List<String> getKeypairGenNames() {
+    return keypairGenNames;
+  }
+
+  public void setKeypairGenNames(List<String> keypairGenNames) {
+    this.keypairGenNames = (keypairGenNames == null)
+            ? null : CollectionUtil.toLowerCaseList(keypairGenNames);
+  }
+
   public ProtocolSupport getProtocoSupport() {
     return protocolSupport;
   }
@@ -297,6 +312,22 @@ public class CaEntry extends MgmtEntry {
 
   public void setSaveRequest(boolean saveRequest) {
     this.saveRequest = saveRequest;
+  }
+
+  public boolean isSaveKeypair() {
+    return saveKeypair;
+  }
+
+  public void setSaveKeypair(boolean saveKeypair) {
+    this.saveKeypair = saveKeypair;
+  }
+
+  public boolean isSaveCert() {
+    return saveCert;
+  }
+
+  public void setSaveCert(boolean saveCert) {
+    this.saveCert = saveCert;
   }
 
   public ValidityMode getValidityMode() {
@@ -392,8 +423,11 @@ public class CaEntry extends MgmtEntry {
         "\nCMP responder name: ", cmpResponderName,
         "\nSCEP responder name: ", scepResponderName,
         "\nCRL signer name: ", crlSignerName,
+        "\nKeyPair generation names: ", keypairGenNames,
         "\n", protocolSupport,
+        "\nsave certificate: ", saveCert,
         "\nsave request: ", saveRequest,
+        "\nsave keypair: ", saveKeypair,
         "\nvalidity mode: ", validityMode,
         "\npermission:", permissionText,
         "\nkeep expired certs: ",
@@ -462,9 +496,12 @@ public class CaEntry extends MgmtEntry {
         && CompareUtil.equalsObject(protocolSupport, obj.protocolSupport)
         && CompareUtil.equalsObject(revocationInfo, obj.revocationInfo)
         && CompareUtil.equalsObject(revokeSuspendedControl, obj.revokeSuspendedControl)
+        && (saveCert == obj.saveCert)
         && (saveRequest == obj.saveRequest)
+        && (saveKeypair == obj.saveKeypair)
         && CompareUtil.equalsObject(scepControl, obj.scepControl)
         && CompareUtil.equalsObject(scepResponderName, obj.scepResponderName)
+        && CompareUtil.equalsObject(keypairGenNames, obj.keypairGenNames)
         && (serialNoLen == obj.serialNoLen)
         && signerType.equals(obj.signerType)
         && CompareUtil.equalsObject(signerConf, obj.signerConf)

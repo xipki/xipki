@@ -110,6 +110,14 @@ public class CaInfo {
     this.extraControl = caEntry.getExtraControl();
   } // constructor
 
+  public long getNextCrlNumber() {
+    return caEntry.getNextCrlNumber();
+  }
+
+  public void setNextCrlNumber(long crlNumber) {
+    caEntry.setNextCrlNumber(crlNumber);
+  }
+
   public PublicCaInfo getPublicCaInfo() {
     return publicCaInfo;
   }
@@ -230,6 +238,14 @@ public class CaInfo {
     caEntry.setScepResponderName(name);
   }
 
+  public List<String> getKeypairGenNames() {
+    return caEntry.getKeypairGenNames();
+  }
+
+  public void setKeypairGenNames(List<String> names) {
+    caEntry.setKeypairGenNames(names);
+  }
+
   public ScepControl getSCepControl() {
     return caEntry.getScepControl();
   }
@@ -287,12 +303,32 @@ public class CaInfo {
     caEntry.setProtocolSupport(protocolSupport);
   }
 
+  public boolean isSaveCert() {
+    return caEntry.isSaveCert();
+  }
+
+  public void setSaveCert(boolean saveCert) {
+    caEntry.setSaveCert(saveCert);
+  }
+
   public boolean isSaveRequest() {
     return caEntry.isSaveRequest();
   }
 
   public void setSaveRequest(boolean saveRequest) {
     caEntry.setSaveRequest(saveRequest);
+  }
+
+  public boolean isSaveKeypair() {
+    return caEntry.isSaveKeypair();
+  }
+
+  public void setSaveKeypair(boolean saveKeypair) {
+    caEntry.setSaveKeypair(saveKeypair);
+  }
+
+  public String getHexSha1OfCert() {
+    return caEntry.getHexSha1OfCert();
   }
 
   public ValidityMode getValidityMode() {
@@ -387,6 +423,8 @@ public class CaInfo {
         }
         tmpSigners.put(m.getAlgo(), signer);
       } catch (Throwable th) {
+        LogUtil.error(LOG, th,
+                "could not initialize the CA signer for CA " + caEntry.getIdent().getName());
         for (ConcurrentContentSigner ccs : tmpSigners.values()) {
           try {
             ccs.close();
