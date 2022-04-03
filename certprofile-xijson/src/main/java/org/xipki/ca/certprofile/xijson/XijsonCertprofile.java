@@ -200,15 +200,7 @@ public class XijsonCertprofile extends BaseCertprofile {
 
       if (keyType == KeyType.rsa) {
         int keySize = Integer.parseInt(params.get(KeypairGenerationType.PARAM_keysize));
-        BigInteger publicExponent = null;
-        String tmp = kg.getParameters().get(KeypairGenerationType.PARAM_publicExponent);
-        if (tmp != null) {
-          publicExponent = StringUtil.startsWithIgnoreCase(tmp, "0x")
-              ? new BigInteger(tmp.substring(2), 16) : new BigInteger(tmp);
-        }
-
-        this.keypairGenControl = new KeypairGenControl.RSAKeypairGenControl(
-                                    keySize, publicExponent, keyAlgOid);
+        this.keypairGenControl = new KeypairGenControl.RSAKeypairGenControl(keySize, keyAlgOid);
       } else if (keyType == KeyType.ec) {
         ASN1ObjectIdentifier curveOid =
             new ASN1ObjectIdentifier(params.get(KeypairGenerationType.PARAM_curve));

@@ -127,11 +127,7 @@ public class CaInfo {
     if (caKeyAlgOid.equals(PKCSObjectIdentifiers.rsaEncryption)) {
       java.security.interfaces.RSAPublicKey pubKey =
           (java.security.interfaces.RSAPublicKey) cert.getPublicKey();
-      String keyspec = "RSA/" + pubKey.getModulus().bitLength();
-      if (!pubKey.getPublicExponent().equals(BigInteger.valueOf(0x10001))) {
-        keyspec += "/0x" + pubKey.getPublicExponent().toString(16);
-      }
-      caKeyspec = keyspec;
+      caKeyspec = "RSA/" + pubKey.getModulus().bitLength();
     } else if (caKeyAlgOid.equals(X9ObjectIdentifiers.id_ecPublicKey)) {
       ASN1ObjectIdentifier curveOid = ASN1ObjectIdentifier.getInstance(caKeyAlgId.getParameters());
       caKeyspec = "EC/" + curveOid.getId();
@@ -139,9 +135,7 @@ public class CaInfo {
       ASN1Sequence seq = DERSequence.getInstance(caKeyAlgId.getParameters());
       BigInteger p = ASN1Integer.getInstance(seq.getObjectAt(0)).getValue();
       BigInteger q = ASN1Integer.getInstance(seq.getObjectAt(1)).getValue();
-      BigInteger g = ASN1Integer.getInstance(seq.getObjectAt(2)).getValue();
-      caKeyspec =
-          "DSA/0x" + p.toString(16) + "/0x" + q.toString(16) + "/0x" + g.toString(16);
+      caKeyspec = "DSA/" + p.bitLength() + "/" + q.bitLength();
     } else if (caKeyAlgOid.equals(EdECConstants.id_ED25519)) {
       caKeyspec = "ED25519";
     } else if (caKeyAlgOid.equals(EdECConstants.id_ED448)) {

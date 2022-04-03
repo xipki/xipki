@@ -25,8 +25,6 @@ import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.xipki.security.EdECConstants;
 import org.xipki.util.Args;
 
-import java.math.BigInteger;
-
 /**
  * Control of how the CA generate keypair for the new certificate.
  *
@@ -66,40 +64,27 @@ public abstract class KeypairGenControl {
 
     private final int keysize;
 
-    private final BigInteger publicExponent;
-
     private final AlgorithmIdentifier keyAlgorithm;
 
     public RSAKeypairGenControl(int keysize) {
-      this(keysize, null, null);
+      this(keysize, null);
     }
 
-    public RSAKeypairGenControl(int keysize, BigInteger publicExponent,
-        ASN1ObjectIdentifier keyAlgorithmOid) {
+    public RSAKeypairGenControl(int keysize, ASN1ObjectIdentifier keyAlgorithmOid) {
       if (keysize < 1024 || keysize % 512 != 0) {
         throw new IllegalArgumentException("invalid keysize " + keysize);
       }
 
       this.keysize = keysize;
-      this.publicExponent = (publicExponent != null) ? publicExponent
-          : BigInteger.valueOf(0x10001);
       this.keyAlgorithm = new AlgorithmIdentifier(
           (keyAlgorithmOid != null) ? keyAlgorithmOid : PKCSObjectIdentifiers.rsaEncryption,
           DERNull.INSTANCE);
 
-      String spec = "RSA/" + keysize;
-      if (publicExponent != null) {
-        spec += "/0x" + publicExponent.toString(16);
-      }
-      this.keyspec = spec;
+      this.keyspec = "RSA/" + keysize;
     } // constructor
 
     public int getKeysize() {
       return keysize;
-    }
-
-    public BigInteger getPublicExponent() {
-      return publicExponent;
     }
 
     public AlgorithmIdentifier getKeyAlgorithm() {

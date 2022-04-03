@@ -79,7 +79,7 @@ class KeypairGenManager {
   void addKeypairGen(KeypairGenEntry keypairGenEntry) throws CaMgmtException {
     notNull(keypairGenEntry, "keypairGenEntry");
     if ("software".equalsIgnoreCase(keypairGenEntry.getName())) {
-      throw new CaMgmtException("Addition of keypair generation 'software' is not allowed");
+      throw new CaMgmtException("Adding keypair generation 'software' is not allowed");
     }
 
     manager.assertMasterMode();
@@ -98,7 +98,7 @@ class KeypairGenManager {
 
   void removeKeypairGen(String name) throws CaMgmtException {
     if ("software".equalsIgnoreCase(name)) {
-      throw new CaMgmtException("Modification of keypair generation 'software' is not allowed");
+      throw new CaMgmtException("Removing keypair generation 'software' is not allowed");
     }
 
     manager.assertMasterMode();
@@ -131,7 +131,10 @@ class KeypairGenManager {
   void changeKeypairGen(String name, String type, String conf)
       throws CaMgmtException {
     if ("software".equalsIgnoreCase(name)) {
-      throw new CaMgmtException("modification of keypair generation 'software' is not allowed");
+      if (type != null && !type.equalsIgnoreCase("software")) {
+        throw new CaMgmtException(
+            "Changing the type of keypair generation 'software' is not allowed");
+      }
     }
 
     manager.assertMasterMode();

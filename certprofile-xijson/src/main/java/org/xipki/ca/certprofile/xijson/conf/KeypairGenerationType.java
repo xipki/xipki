@@ -36,8 +36,6 @@ public class KeypairGenerationType extends ValidatableConf {
 
   public static final String PARAM_keysize = "keysize";
 
-  public static final String PARAM_publicExponent = "publicExponent";
-
   public static final String PARAM_curve = "curve";
 
   public static final String PARAM_plength = "plength";
@@ -64,7 +62,6 @@ public class KeypairGenerationType extends ValidatableConf {
    *   <li>For RSA key
    *     <ul>
    *       <li>keysize (required)</li>
-   *       <li>publicExponent (optional)</li>
    *     </ul>
    *   </li>
    *   <li>For EC key

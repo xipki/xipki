@@ -163,7 +163,7 @@ public class KeypairGenActions {
 
     @Option(name = "--name", aliases = "-n", required = true,
             description = "keypair generation name")
-    @Completion(CaCompleters.KeypairGenNameOmitSoftwareCompleter.class)
+    @Completion(CaCompleters.KeypairGenNameCompleter.class)
     protected String name;
 
     @Option(name = "--type", description = "keypair generation type")
