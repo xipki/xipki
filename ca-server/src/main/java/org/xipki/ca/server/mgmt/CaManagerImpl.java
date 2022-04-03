@@ -424,75 +424,58 @@ public class CaManagerImpl implements CaManager, Closeable {
     final long epoch = DateUtil.parseUtcTimeyyyyMMdd("20100101").getTime();
     UniqueIdGenerator idGen = new UniqueIdGenerator(epoch, shardId);
 
-    CaMgmtException ex0 = null;
+    boolean initSucc = true;
     try {
       this.certstore = new CertStore(datasource, idGen);
     } catch (DataAccessException ex) {
-      ex0 = new CaMgmtException(ex.getMessage(), ex);
+      initSucc = false;
+      LogUtil.error(LOG, ex, "error constructing CertStore");
     }
 
     try {
       ca2Manager.initCaAliases();
     } catch (CaMgmtException ex) {
-      if (ex0 == null) {
-        ex0 = ex;
-      } else {
-        LogUtil.error(LOG, ex, "error initCaAliases");
-      }
+      initSucc = false;
+      LogUtil.error(LOG, ex, "error initCaAliases");
     }
 
     try {
       certprofileManager.initCertprofiles();
     } catch (CaMgmtException ex) {
-      if (ex0 == null) {
-        ex0 = ex;
-      } else {
-        LogUtil.error(LOG, ex, "error initCertprofiles");
-      }
+      initSucc = false;
+      LogUtil.error(LOG, ex, "error initCertprofiles");
     }
 
     try {
       publisherManager.initPublishers();
     } catch (CaMgmtException ex) {
-      if (ex0 == null) {
-        ex0 = ex;
-      } else {
-        LogUtil.error(LOG, ex, "error initPublishers");
-      }
+      initSucc = false;
+      LogUtil.error(LOG, ex, "error initPublishers");
     }
 
     try {
       requestorManager.initRequestors();
     } catch (CaMgmtException ex) {
-      if (ex0 == null) {
-        ex0 = ex;
-      } else {
-        LogUtil.error(LOG, ex, "error initRequestors");
-      }
+      initSucc = false;
+      LogUtil.error(LOG, ex, "error initRequestors");
     }
 
     try {
       signerManager.initSigners();
     } catch (CaMgmtException ex) {
-      if (ex0 == null) {
-        ex0 = ex;
-      } else {
-        LogUtil.error(LOG, ex, "error initSigners");
-      }
+      initSucc = false;
+      LogUtil.error(LOG, ex, "error initSigners");
     }
 
     try {
       ca2Manager.initCas();
     } catch (CaMgmtException ex) {
-      if (ex0 == null) {
-        ex0 = ex;
-      } else {
-        LogUtil.error(LOG, ex, "error initCas");
-      }
+      initSucc = false;
+      LogUtil.error(LOG, ex, "error initCas");
     }
 
-    if (ex0 != null) {
-      throw ex0;
+    if (!initSucc) {
+      throw new CaMgmtException("error initializing CA system");
     }
   } // method init
 
