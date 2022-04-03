@@ -892,9 +892,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
 
     KeypairGenEntry newDbEntry = new KeypairGenEntry(name, tmpType,
             (conf == null ? dbEntry.getConf() : conf));
-    KeypairGenEntryWrapper wrapper = new KeypairGenEntryWrapper();
-      //manager.createSigner(newDbEntry);
-    wrapper.setDbEntry(newDbEntry);
+    KeypairGenEntryWrapper wrapper = manager.createKeypairGenerator(newDbEntry);
 
     changeIfNotNull("KEYPAIR_GEN", colStr("NAME", name), colStr("TYPE", type),
             colStr("CONF", conf, true, false));

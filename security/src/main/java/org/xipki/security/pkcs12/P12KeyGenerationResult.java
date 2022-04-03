@@ -17,7 +17,6 @@
 
 package org.xipki.security.pkcs12;
 
-import org.xipki.security.KeypairGenerationResult;
 import org.xipki.util.Args;
 
 import java.security.KeyStore;
@@ -29,7 +28,7 @@ import java.security.KeyStore;
  * @since 2.0.0
  */
 
-public class P12KeyGenerationResult extends KeypairGenerationResult {
+public class P12KeyGenerationResult {
 
   private final byte[] keystore;
 

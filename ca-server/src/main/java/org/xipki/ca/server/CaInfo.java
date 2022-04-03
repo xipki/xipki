@@ -17,7 +17,14 @@
 
 package org.xipki.ca.server;
 
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.cmp.CMPCertificate;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CaUris;
@@ -72,6 +79,10 @@ public class CaInfo {
 
   private final RandomSerialNumberGenerator randomSnGenerator;
 
+  private final String caKeyspec;
+
+  private final AlgorithmIdentifier caKeyAlgId;
+
   private DhpocControl dhpocControl;
 
   private Map<SignAlgo, ConcurrentContentSigner> signers;
@@ -108,7 +119,45 @@ public class CaInfo {
     this.noNewCertificateAfter = notAfter.getTime() - MS_PER_DAY * caEntry.getExpirationPeriod();
     this.randomSnGenerator = RandomSerialNumberGenerator.getInstance();
     this.extraControl = caEntry.getExtraControl();
+
+    // keyspec
+    caKeyAlgId = cert.toBcCert().getSubjectPublicKeyInfo().getAlgorithm();
+    ASN1ObjectIdentifier caKeyAlgOid = caKeyAlgId.getAlgorithm();
+
+    if (caKeyAlgOid.equals(PKCSObjectIdentifiers.rsaEncryption)) {
+      java.security.interfaces.RSAPublicKey pubKey =
+          (java.security.interfaces.RSAPublicKey) cert.getPublicKey();
+      String keyspec = "RSA/" + pubKey.getModulus().bitLength();
+      if (!pubKey.getPublicExponent().equals(BigInteger.valueOf(0x10001))) {
+        keyspec += "/0x" + pubKey.getPublicExponent().toString(16);
+      }
+      caKeyspec = keyspec;
+    } else if (caKeyAlgOid.equals(X9ObjectIdentifiers.id_ecPublicKey)) {
+      ASN1ObjectIdentifier curveOid = ASN1ObjectIdentifier.getInstance(caKeyAlgId.getParameters());
+      caKeyspec = "EC/" + curveOid.getId();
+    } else if (caKeyAlgOid.equals(X9ObjectIdentifiers.id_dsa)) {
+      ASN1Sequence seq = DERSequence.getInstance(caKeyAlgId.getParameters());
+      BigInteger p = ASN1Integer.getInstance(seq.getObjectAt(0)).getValue();
+      BigInteger q = ASN1Integer.getInstance(seq.getObjectAt(1)).getValue();
+      BigInteger g = ASN1Integer.getInstance(seq.getObjectAt(2)).getValue();
+      caKeyspec =
+          "DSA/0x" + p.toString(16) + "/0x" + q.toString(16) + "/0x" + g.toString(16);
+    } else if (caKeyAlgOid.equals(EdECConstants.id_ED25519)) {
+      caKeyspec = "ED25519";
+    } else if (caKeyAlgOid.equals(EdECConstants.id_ED448)) {
+      caKeyspec ="ED448";
+    } else {
+      throw new IllegalStateException("unknown key algorithm " + caKeyAlgOid.getId());
+    }
   } // constructor
+
+  public String getCaKeyspec() {
+    return caKeyspec;
+  }
+
+  public AlgorithmIdentifier getCaKeyAlgId() {
+    return caKeyAlgId;
+  }
 
   public long getNextCrlNumber() {
     return caEntry.getNextCrlNumber();

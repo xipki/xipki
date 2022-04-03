@@ -171,7 +171,7 @@ class SignerManager {
     try {
       ret.initSigner(manager.securityFactory);
     } catch (ObjectCreationException ex) {
-      final String message = "createSigner";
+      final String message = "error createSigner";
       LOG.debug(message, ex);
       throw new CaMgmtException(ex.getMessage());
     }

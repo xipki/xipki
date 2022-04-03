@@ -37,6 +37,7 @@ import static org.xipki.util.StringUtil.concat;
  * Manages the keypair generation.
  *
  * @author Lijun Liao
+ * @since  5.4.0
  */
 
 class KeypairGenManager {
@@ -66,11 +67,9 @@ class KeypairGenManager {
     List<String> names = manager.queryExecutor.namesFromTable("KEYPAIR_GEN");
     for (String name : names) {
       KeypairGenEntry entry = manager.queryExecutor.createKeypairGen(name);
-      entry.setFaulty(true);
       manager.keypairGenDbEntries.put(name, entry);
 
       KeypairGenEntryWrapper gen = createKeypairGen(entry);
-      entry.setFaulty(false);
       manager.keypairGens.put(name, gen);
       LOG.info("loaded keypair generation {}", name);
     }
@@ -78,21 +77,22 @@ class KeypairGenManager {
   } // method initSigners
 
   void addKeypairGen(KeypairGenEntry keypairGenEntry) throws CaMgmtException {
+    notNull(keypairGenEntry, "keypairGenEntry");
     if ("software".equalsIgnoreCase(keypairGenEntry.getName())) {
       throw new CaMgmtException("Addition of keypair generation 'software' is not allowed");
     }
 
     manager.assertMasterMode();
 
-    notNull(keypairGenEntry, "keypairGenEntry");
     String name = keypairGenEntry.getName();
     if (manager.keypairGenDbEntries.containsKey(name)) {
       throw new CaMgmtException(concat("keypair generation named ", name, " exists"));
     }
 
-    // TODO: KeypairGenEntryWrapper gen = createSigner(signerEntry);
+    KeypairGenEntryWrapper gen = createKeypairGen(keypairGenEntry);
+
     manager.queryExecutor.addKeypairGen(keypairGenEntry);
-    //manager.keypairGens.put(name, gen);
+    manager.keypairGens.put(name, gen);
     manager.keypairGenDbEntries.put(name, keypairGenEntry);
   } // method addKeypairGen
 
@@ -131,7 +131,7 @@ class KeypairGenManager {
   void changeKeypairGen(String name, String type, String conf)
       throws CaMgmtException {
     if ("software".equalsIgnoreCase(name)) {
-      throw new CaMgmtException("Addition of keypair generation 'software' is not allowed");
+      throw new CaMgmtException("modification of keypair generation 'software' is not allowed");
     }
 
     manager.assertMasterMode();
@@ -145,12 +145,12 @@ class KeypairGenManager {
       type = type.toLowerCase();
     }
 
-    // TODO
     KeypairGenEntryWrapper newKeypairGen = manager.queryExecutor.changeKeypairGen(name, type, conf,
         manager, manager.securityFactory);
 
     manager.keypairGens.remove(name);
     manager.keypairGenDbEntries.remove(name);
+
     manager.keypairGenDbEntries.put(name, newKeypairGen.getDbEntry());
     manager.keypairGens.put(name, newKeypairGen);
   } // method changeKeypairGen
@@ -158,12 +158,13 @@ class KeypairGenManager {
   KeypairGenEntryWrapper createKeypairGen(KeypairGenEntry entry) throws CaMgmtException {
     notNull(entry, "entry");
     KeypairGenEntryWrapper ret = new KeypairGenEntryWrapper();
+
     ret.setDbEntry(entry);
 
     try {
       ret.init(manager.securityFactory);
     } catch (ObjectCreationException ex) {
-      final String message = "createSigner";
+      final String message = "error createKeypairGen";
       LOG.debug(message, ex);
       throw new CaMgmtException(ex.getMessage());
     }

@@ -27,6 +27,7 @@ import org.xipki.password.Passwords.PasswordConf;
 import org.xipki.security.pkcs11.*;
 import org.xipki.security.pkcs11.iaik.IaikP11ModuleFactory;
 import org.xipki.security.pkcs12.P12SignerFactory;
+import org.xipki.security.pkcs12.SoftwareKeypairGeneratorFactory;
 import org.xipki.util.*;
 
 import java.io.Closeable;
@@ -98,9 +99,14 @@ public class Securities implements Closeable {
     private PasswordConf password;
 
     /**
-     * list of classes that implement org.xipki.security.SignerFactory
+     * list of classes that implement {@link SignerFactory}
      */
     private List<String> signerFactories;
+
+    /**
+     * list of classes that implement {@link KeypairGeneratorFactory}
+     */
+    private List<String> keypairGeneratorFactories;
 
     public static final SecurityConf DEFAULT;
 
@@ -154,6 +160,14 @@ public class Securities implements Closeable {
 
     public void setSignerFactories(List<String> signerFactories) {
       this.signerFactories = signerFactories;
+    }
+
+    public List<String> getKeypairGeneratorFactories() {
+      return keypairGeneratorFactories;
+    }
+
+    public void setKeypairGeneratorFactories(List<String> keypairGeneratorFactories) {
+      this.keypairGeneratorFactories = keypairGeneratorFactories;
     }
 
     @Override
@@ -273,17 +287,30 @@ public class Securities implements Closeable {
     securityFactory.setStrongRandom4KeyEnabled(conf.isKeyStrongrandomEnabled());
     securityFactory.setDefaultSignerParallelism(conf.getDefaultSignerParallelism());
 
-    SignerFactoryRegisterImpl signerFactoryRegister = new SignerFactoryRegisterImpl();
-    securityFactory.setSignerFactoryRegister(signerFactoryRegister);
     securityFactory.setPasswordResolver(passwords.getPasswordResolver());
 
-    // PKCS#12
-    initSecurityPkcs12(signerFactoryRegister);
+    //----- Factories
+    SignerFactoryRegisterImpl signerFactoryRegister = new SignerFactoryRegisterImpl();
+    securityFactory.setSignerFactoryRegister(signerFactoryRegister);
+
+    KeypairGeneratorFactoryRegisterImpl keypairFactoryRegister =
+        new KeypairGeneratorFactoryRegisterImpl();
+    securityFactory.setKeypairGeneratorFactoryRegister(keypairFactoryRegister);
+
+    // PKCS#12 (software)
+    P12SignerFactory p12SignerFactory = new P12SignerFactory();
+    p12SignerFactory.setSecurityFactory(securityFactory);
+    signerFactoryRegister.registFactory(p12SignerFactory);
+
+    SoftwareKeypairGeneratorFactory softwareKeypairGeneratorFactory =
+        new SoftwareKeypairGeneratorFactory();
+    softwareKeypairGeneratorFactory.setSecurityFactory(securityFactory);
+    keypairFactoryRegister.registFactory(softwareKeypairGeneratorFactory);
 
     // PKCS#11
     if (conf.getPkcs11Conf() != null) {
       initSecurityPkcs11(conf.getPkcs11Conf(), signerFactoryRegister,
-          passwords.getPasswordResolver());
+          keypairFactoryRegister, passwords.getPasswordResolver());
     }
 
     // register additional SignerFactories
@@ -301,17 +328,28 @@ public class Securities implements Closeable {
       }
     }
 
+    // register additional KeypairGeneratorFactories
+    if (CollectionUtil.isNotEmpty(conf.getKeypairGeneratorFactories())) {
+      for (String className : conf.getKeypairGeneratorFactories()) {
+        try {
+          Class<?> clazz = Class.forName(className);
+          KeypairGeneratorFactory factory = (KeypairGeneratorFactory) clazz.newInstance();
+          keypairFactoryRegister.registFactory(factory);
+        } catch (ClassCastException | ClassNotFoundException | IllegalAccessException
+            | InstantiationException ex) {
+          throw new InvalidConfException("error caught while initializing KeypairGeneratorFactory "
+              + className + ": " + ex.getClass().getName() + ": " + ex.getMessage(), ex);
+        }
+      }
+    }
   } // method initSecurityFactory
 
-  private void initSecurityPkcs12(SignerFactoryRegisterImpl signerFactoryRegister) {
-    P12SignerFactory p12SignerFactory = new P12SignerFactory();
-    p12SignerFactory.setSecurityFactory(securityFactory);
-    signerFactoryRegister.registFactory(p12SignerFactory);
-  } // method initSecurityPkcs12
-
-  private void initSecurityPkcs11(FileOrValue pkcs11Conf,
-      SignerFactoryRegisterImpl signerFactoryRegister, PasswordResolver passwordResolver)
-          throws InvalidConfException {
+  private void initSecurityPkcs11(
+      FileOrValue pkcs11Conf,
+      SignerFactoryRegisterImpl signerFactoryRegister,
+      KeypairGeneratorFactoryRegisterImpl keypairGeneratorFactoryRegister,
+      PasswordResolver passwordResolver)
+      throws InvalidConfException {
     p11ModuleFactoryRegister = new P11ModuleFactoryRegisterImpl();
     for (P11ModuleFactory m : p11ModuleFactories) {
       p11ModuleFactoryRegister.registFactory(m);

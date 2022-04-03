@@ -144,7 +144,6 @@ public class KeyUtil {
     }
   }
 
-  // CHECKSTYLE:SKIP
   public static KeyPair generateEdECKeypair(ASN1ObjectIdentifier curveId, SecureRandom random)
       throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
     notNull(curveId, "curveId");

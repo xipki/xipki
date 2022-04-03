@@ -21,13 +21,11 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.DSAParameter;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
-import org.xipki.security.util.DSAParameterCache;
+import org.xipki.security.EdECConstants;
 import org.xipki.util.Args;
 
 import java.math.BigInteger;
-import java.security.spec.DSAParameterSpec;
 
 /**
  * Control of how the CA generate keypair for the new certificate.
@@ -36,7 +34,17 @@ import java.security.spec.DSAParameterSpec;
  *
  */
 
-public class KeypairGenControl {
+public abstract class KeypairGenControl {
+
+  protected String keyspec;
+
+  public ASN1ObjectIdentifier getKeyAlgorithmOid() {
+    return null;
+  }
+
+  public final String getKeyspec() {
+    return keyspec;
+  }
 
   public static class ForbiddenKeypairGenControl extends KeypairGenControl {
     public static final ForbiddenKeypairGenControl INSTANCE = new ForbiddenKeypairGenControl();
@@ -78,6 +86,12 @@ public class KeypairGenControl {
       this.keyAlgorithm = new AlgorithmIdentifier(
           (keyAlgorithmOid != null) ? keyAlgorithmOid : PKCSObjectIdentifiers.rsaEncryption,
           DERNull.INSTANCE);
+
+      String spec = "RSA/" + keysize;
+      if (publicExponent != null) {
+        spec += "/0x" + publicExponent.toString(16);
+      }
+      this.keyspec = spec;
     } // constructor
 
     public int getKeysize() {
@@ -92,6 +106,10 @@ public class KeypairGenControl {
       return keyAlgorithm;
     }
 
+    @Override
+    public ASN1ObjectIdentifier getKeyAlgorithmOid() {
+      return keyAlgorithm.getAlgorithm();
+    }
   } // class RSAKeypairGenControl
 
   // CHECKSTYLE:SKIP
@@ -100,6 +118,8 @@ public class KeypairGenControl {
     private final ASN1ObjectIdentifier curveOid;
 
     private final AlgorithmIdentifier keyAlgorithm;
+
+    private final String keyspec;
 
     public ECKeypairGenControl(ASN1ObjectIdentifier curveOid) {
       this(curveOid, null);
@@ -111,6 +131,7 @@ public class KeypairGenControl {
       this.keyAlgorithm = new AlgorithmIdentifier(
           (keyAlgorithmOid != null) ? keyAlgorithmOid : X9ObjectIdentifiers.id_ecPublicKey,
            curveOid);
+      keyspec = "EC/" + curveOid.getId();
     }
 
     public ASN1ObjectIdentifier getCurveOid() {
@@ -121,14 +142,21 @@ public class KeypairGenControl {
       return keyAlgorithm;
     }
 
+    @Override
+    public ASN1ObjectIdentifier getKeyAlgorithmOid() {
+      return keyAlgorithm.getAlgorithm();
+    }
+
   } // class ECKeypairGenControl
 
   // CHECKSTYLE:SKIP
   public static class DSAKeypairGenControl extends KeypairGenControl {
 
-    private final DSAParameterSpec parameterSpec;
+    private final int plength;
 
-    private final AlgorithmIdentifier keyAlgorithm;
+    private final int qlength;
+
+    private final ASN1ObjectIdentifier keyAlgorithmOid;
 
     // CHECKSTYLE:SKIP
     public DSAKeypairGenControl(int pLength) {
@@ -151,27 +179,24 @@ public class KeypairGenControl {
         }
       }
 
-      this.parameterSpec = DSAParameterCache.getDSAParameterSpec(pLength, qLength, null);
-      this.keyAlgorithm = new AlgorithmIdentifier(
-          (keyAlgorithmOid != null) ? keyAlgorithmOid : X9ObjectIdentifiers.id_dsa,
-          new DSAParameter(parameterSpec.getP(), parameterSpec.getQ(), parameterSpec.getG()));
+      this.plength = pLength;
+      this.qlength = qLength;
+      this.keyAlgorithmOid = (keyAlgorithmOid != null)
+              ? keyAlgorithmOid : X9ObjectIdentifiers.id_dsa;
+      keyspec = "DSA/" + pLength + "/" + qLength;
     }
 
-    public DSAKeypairGenControl(BigInteger p, BigInteger q, BigInteger g,
-        ASN1ObjectIdentifier keyAlgorithmOid) {
-      this.parameterSpec = new DSAParameterSpec(p, q, g);
-
-      this.keyAlgorithm = new AlgorithmIdentifier(
-          (keyAlgorithmOid != null) ? keyAlgorithmOid : X9ObjectIdentifiers.id_dsa,
-          new DSAParameter(p, q, g));
+    public int getPlength() {
+      return plength;
     }
 
-    public DSAParameterSpec getParameterSpec() {
-      return parameterSpec;
+    public int getQlength() {
+      return qlength;
     }
 
-    public AlgorithmIdentifier getKeyAlgorithm() {
-      return keyAlgorithm;
+    @Override
+    public ASN1ObjectIdentifier getKeyAlgorithmOid() {
+      return keyAlgorithmOid;
     }
 
   } // class DSAKeypairGenControl
@@ -183,10 +208,20 @@ public class KeypairGenControl {
 
     public EDDSAKeypairGenControl(ASN1ObjectIdentifier keyAlgorithmOid) {
       this.keyAlgorithm = new AlgorithmIdentifier(Args.notNull(keyAlgorithmOid, "keyAlgorithmOid"));
+      this.keyspec = EdECConstants.getName(keyAlgorithmOid);
+      if (this.keyspec == null) {
+        throw new IllegalArgumentException(
+            "invalid EdDSA keyAlgorithmOid " + keyAlgorithmOid.getId());
+      }
     }
 
     public AlgorithmIdentifier getKeyAlgorithm() {
       return keyAlgorithm;
+    }
+
+    @Override
+    public ASN1ObjectIdentifier getKeyAlgorithmOid() {
+      return keyAlgorithm.getAlgorithm();
     }
 
   } // class EDDSAKeypairGenControl

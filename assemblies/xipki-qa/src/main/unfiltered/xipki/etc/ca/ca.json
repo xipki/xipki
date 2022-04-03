@@ -33,7 +33,9 @@
 		},
 		"password":{
 			"masterPasswordCallback":"FILE file=security/masterpassword.secret"
-		}
+		},
+		"signerFactories": [],
+		"keypairGeneratorFactories": []
 	},
 	"audit":{
 		// embed: use the embedded slf4j logging

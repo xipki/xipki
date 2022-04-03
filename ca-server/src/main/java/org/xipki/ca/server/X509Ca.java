@@ -376,6 +376,18 @@ public class X509Ca extends X509CaModule implements Closeable {
     final int n = certTemplates.size();
     List<GrantedCertTemplate> gcts = new ArrayList<>(n);
 
+    List<String> keypairGenNames = caInfo.getKeypairGenNames();
+    List<KeypairGenerator> keypairGenerators = null;
+    if (CollectionUtil.isNotEmpty(keypairGenNames)) {
+      keypairGenerators = new ArrayList<>(keypairGenNames.size());
+      for (String name : keypairGenNames) {
+        KeypairGenerator keypairGen = caManager.getKeypairGenerator(name);
+        if (keypairGen != null) {
+          keypairGenerators.add(keypairGen);
+        }
+      }
+    }
+
     for (int i = 0; i < n; i++) {
       CertTemplateData certTemplate = certTemplates.get(i);
       try {
@@ -386,7 +398,8 @@ public class X509Ca extends X509CaModule implements Closeable {
               "unknown cert profile " + certTemplate.getCertprofileName());
         }
 
-        gcts.add(grandCertTemplateBuilder.create(certprofile, certTemplate, requestor, update));
+        gcts.add(grandCertTemplateBuilder.create(certprofile, certTemplate, requestor,
+            keypairGenerators, update));
       } catch (OperationException ex) {
         LOG.error("     FAILED createGrantedCertTemplate: CA={}, profile={}, subject='{}'",
             caIdent.getName(), certTemplate.getCertprofileName(), certTemplate.getSubject());

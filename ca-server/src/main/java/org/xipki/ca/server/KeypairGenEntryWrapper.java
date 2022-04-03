@@ -18,6 +18,7 @@
 package org.xipki.ca.server;
 
 import org.xipki.ca.api.mgmt.entry.KeypairGenEntry;
+import org.xipki.security.KeypairGenerator;
 import org.xipki.security.SecurityFactory;
 import org.xipki.util.ObjectCreationException;
 
@@ -29,10 +30,11 @@ import static org.xipki.util.Args.notNull;
  * @author Lijun Liao
  * @since 5.4.0
  */
-// TODO: see SignerEntryWrapper for the real implementation
 public class KeypairGenEntryWrapper {
 
   private KeypairGenEntry dbEntry;
+
+  private KeypairGenerator generator;
 
   public KeypairGenEntryWrapper() {
   }
@@ -44,15 +46,22 @@ public class KeypairGenEntryWrapper {
   public void init(SecurityFactory securityFactory)
       throws ObjectCreationException {
     notNull(securityFactory, "securityFactory");
+    dbEntry.setFaulty(true);
+    generator = securityFactory.createKeypairGenerator(dbEntry.getType(), dbEntry.getConf());
+    generator.setName(dbEntry.getName());
+    dbEntry.setFaulty(false);
   }
 
   public KeypairGenEntry getDbEntry() {
     return dbEntry;
   }
 
+  public KeypairGenerator getGenerator() {
+    return generator;
+  }
+
   public boolean isHealthy() {
-    return true;
-    // TODO: return signer != null && signer.isHealthy();
+    return generator != null && generator.isHealthy();
   }
 
 }

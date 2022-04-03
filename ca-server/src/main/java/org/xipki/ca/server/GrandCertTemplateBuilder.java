@@ -17,19 +17,13 @@
 
 package org.xipki.ca.server;
 
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
-import org.bouncycastle.asn1.pkcs.RSAPublicKey;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
-import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.BadCertTemplateException;
@@ -43,11 +37,7 @@ import org.xipki.ca.api.profile.KeypairGenControl;
 import org.xipki.ca.api.profile.NotAfterMode;
 import org.xipki.ca.server.X509Ca.GrantedCertTemplate;
 import org.xipki.ca.server.db.CertStore;
-import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.EdECConstants;
-import org.xipki.security.ObjectIdentifiers;
-import org.xipki.security.X509Cert;
-import org.xipki.security.util.KeyUtil;
+import org.xipki.security.*;
 import org.xipki.security.util.RSABrokenKey;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.LogUtil;
@@ -55,10 +45,9 @@ import org.xipki.util.Validity;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.*;
-import java.security.interfaces.*;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
+import java.util.List;
 
 import static org.xipki.ca.api.OperationException.ErrorCode.*;
 
@@ -78,51 +67,28 @@ class GrandCertTemplateBuilder {
 
   private static final long MS_PER_10MINUTES = 300000L;
 
-  // CHECKSTYLE:SKIP
-  private final KeypairGenControl keypairGenControlByImplictCA;
+  private final ASN1ObjectIdentifier keyAlgOidByImplicitCA;
+  private final String keyspecByImplictCA;
 
   private final CertStore certstore;
 
   private final CaInfo caInfo;
 
-  private final SecureRandom random = new SecureRandom();
-
   GrandCertTemplateBuilder(CaInfo caInfo, CertStore certstore) {
     this.caInfo = caInfo;
     this.certstore = certstore;
 
-    X509Cert caCert = caInfo.getCert();
-    SubjectPublicKeyInfo caSpki = caCert.getSubjectPublicKeyInfo();
-    ASN1ObjectIdentifier caSpkiAlgId = caSpki.getAlgorithm().getAlgorithm();
-
-    if (caSpkiAlgId.equals(PKCSObjectIdentifiers.rsaEncryption)) {
-      java.security.interfaces.RSAPublicKey pubKey =
-          (java.security.interfaces.RSAPublicKey) caCert.getPublicKey();
-      this.keypairGenControlByImplictCA = new KeypairGenControl.RSAKeypairGenControl(
-          pubKey.getModulus().bitLength(), pubKey.getPublicExponent(), caSpkiAlgId);
-    } else if (caSpkiAlgId.equals(X9ObjectIdentifiers.id_ecPublicKey)) {
-      ASN1ObjectIdentifier curveOid =
-          ASN1ObjectIdentifier.getInstance(caSpki.getAlgorithm().getParameters());
-      this.keypairGenControlByImplictCA = new KeypairGenControl.ECKeypairGenControl(curveOid,
-          caSpkiAlgId);
-    } else if (caSpkiAlgId.equals(X9ObjectIdentifiers.id_dsa)) {
-      ASN1Sequence seq = DERSequence.getInstance(caSpki.getAlgorithm().getParameters());
-      BigInteger p = ASN1Integer.getInstance(seq.getObjectAt(0)).getValue();
-      BigInteger q = ASN1Integer.getInstance(seq.getObjectAt(1)).getValue();
-      BigInteger g = ASN1Integer.getInstance(seq.getObjectAt(2)).getValue();
-      this.keypairGenControlByImplictCA = new KeypairGenControl.DSAKeypairGenControl(
-          p, q, g, caSpkiAlgId);
-    } else if (caSpkiAlgId.equals(EdECConstants.id_ED25519)
-        || caSpkiAlgId.equals(EdECConstants.id_ED448)) {
-      this.keypairGenControlByImplictCA = new KeypairGenControl.EDDSAKeypairGenControl(caSpkiAlgId);
-    } else {
-      this.keypairGenControlByImplictCA = null;
-    }
+    this.keyspecByImplictCA = caInfo.getCaKeyspec();
+    this.keyAlgOidByImplicitCA = caInfo.getCaKeyAlgId().getAlgorithm();
   }
 
-  GrantedCertTemplate create(IdentifiedCertprofile certprofile,
-      CertTemplateData certTemplate, RequestorInfo requestor, boolean update)
-          throws OperationException {
+  GrantedCertTemplate create(
+      IdentifiedCertprofile certprofile,
+      CertTemplateData certTemplate,
+      RequestorInfo requestor,
+      List<KeypairGenerator> keypairGenerators,
+      boolean update)
+      throws OperationException {
     if (caInfo.getRevocationInfo() != null) {
       throw new OperationException(NOT_PERMITTED, "CA is revoked");
     }
@@ -161,8 +127,7 @@ class GrandCertTemplateBuilder {
         boolean allowed = (reqPathlen == null && caPathLen == Integer.MAX_VALUE)
                             || (reqPathlen != null && reqPathlen < caPathLen);
         if (!allowed) {
-          throw new OperationException(NOT_PERMITTED,
-              "invalid BasicConstraint.pathLenConstraint");
+          throw new OperationException(NOT_PERMITTED, "invalid BasicConstraint.pathLenConstraint");
         }
         break;
       default:
@@ -199,12 +164,10 @@ class GrandCertTemplateBuilder {
       grantedNotBefore = caInfo.getNotBefore();
     }
 
-    PrivateKeyInfo privateKey;
+    PrivateKeyInfo privateKey = null;
     SubjectPublicKeyInfo grantedPublicKeyInfo = certTemplate.getPublicKeyInfo();
 
     if (grantedPublicKeyInfo != null) {
-      privateKey = null;
-
       try {
         grantedPublicKeyInfo = X509Util.toRfc3279Style(certTemplate.getPublicKeyInfo());
       } catch (InvalidKeySpecException ex) {
@@ -233,110 +196,63 @@ class GrandCertTemplateBuilder {
     } else if (certTemplate.isCaGenerateKeypair()) {
       KeypairGenControl kg = certprofile.getKeypairGenControl();
 
+      ASN1ObjectIdentifier keyAlgOid;
+      String keyspec;
+
+      if (kg == null || kg instanceof KeypairGenControl.ForbiddenKeypairGenControl) {
+        throw new OperationException(BAD_CERT_TEMPLATE, "no public key is specified");
+      } else if (kg instanceof KeypairGenControl.InheritCAKeypairGenControl) {
+        keyspec = keyspecByImplictCA;
+        keyAlgOid = keyAlgOidByImplicitCA;
+      } else {
+        keyspec = kg.getKeyspec();
+        keyAlgOid = kg.getKeyAlgorithmOid();
+      }
+
+      KeypairGenerator keypairGenerator = null;
+      if (keypairGenerators != null) {
+        for (KeypairGenerator m : keypairGenerators) {
+          if (m.supports(keyspec)) {
+            keypairGenerator = m;
+            break;
+          }
+        }
+      }
+
+      if (keypairGenerator == null) {
+        throw new OperationException(SYSTEM_FAILURE, "cannot generate keypair " + keyspec);
+      }
+
+      KeypairGenResult keypair = null;
       try {
-        if (kg instanceof KeypairGenControl.InheritCAKeypairGenControl) {
-          kg = keypairGenControlByImplictCA;
+        keypair = keypairGenerator.generateKeypair(keyspec);
+      } catch (XiSecurityException ex) {
+        String msg = "error generating keypair " + keyspec;
+        LogUtil.error(LOG, ex, msg);
+        throw new OperationException(SYSTEM_FAILURE, msg);
+      }
+
+      // adapt the algorithm identifier in private key and public key
+      privateKey = keypair.getPrivateKey();
+      grantedPublicKeyInfo = keypair.getPublicKey();
+      if (!privateKey.getPrivateKeyAlgorithm().getAlgorithm().equals(keyAlgOid)) {
+        ASN1BitString asn1PublicKeyData = privateKey.getPublicKeyData();
+        try {
+          privateKey = new PrivateKeyInfo(
+              new AlgorithmIdentifier(keyAlgOid,
+                  privateKey.getPrivateKeyAlgorithm().getParameters()),
+              privateKey.getPrivateKey().toASN1Primitive(),
+              privateKey.getAttributes(),
+              asn1PublicKeyData == null ? null : asn1PublicKeyData.getOctets());
+        } catch (IOException ex) {
+          throw new OperationException(SYSTEM_FAILURE, ex);
         }
+      }
 
-        if (kg == null || kg instanceof KeypairGenControl.ForbiddenKeypairGenControl) {
-          throw new OperationException(BAD_CERT_TEMPLATE, "no public key is specified");
-        }
-
-        if (kg instanceof KeypairGenControl.RSAKeypairGenControl) {
-          KeypairGenControl.RSAKeypairGenControl tkg = (KeypairGenControl.RSAKeypairGenControl) kg;
-
-          int keysize = tkg.getKeysize();
-          if (keysize > 4096) {
-            throw new OperationException(BAD_CERT_TEMPLATE, "keysize too large");
-          }
-
-          BigInteger publicExponent = tkg.getPublicExponent();
-
-          KeyPair kp = KeyUtil.generateRSAKeypair(keysize, publicExponent, random);
-          java.security.interfaces.RSAPublicKey rsaPubKey =
-              (java.security.interfaces.RSAPublicKey) kp.getPublic();
-
-          grantedPublicKeyInfo = new SubjectPublicKeyInfo(tkg.getKeyAlgorithm(),
-              new RSAPublicKey(rsaPubKey.getModulus(), rsaPubKey.getPublicExponent()));
-
-          /*
-           * RSA private keys are BER-encoded according to PKCS #1’s RSAPrivateKey ASN.1 type.
-           *
-           * RSAPrivateKey ::= SEQUENCE {
-           *   version           Version,
-           *   modulus           INTEGER,  -- n
-           *   publicExponent    INTEGER,  -- e
-           *   privateExponent   INTEGER,  -- d
-           *   prime1            INTEGER,  -- p
-           *   prime2            INTEGER,  -- q
-           *   exponent1         INTEGER,  -- d mod (p-1)
-           *   exponent2         INTEGER,  -- d mod (q-1)
-           *   coefficient       INTEGER,  -- (inverse of q) mod p
-           *   otherPrimeInfos   OtherPrimeInfos OPTIONAL.
-           * }
-           */
-          RSAPrivateCrtKey priv = (RSAPrivateCrtKey) kp.getPrivate();
-          privateKey = new PrivateKeyInfo(tkg.getKeyAlgorithm(),
-             new RSAPrivateKey(priv.getModulus(),
-                 priv.getPublicExponent(), priv.getPrivateExponent(),
-                 priv.getPrimeP(), priv.getPrimeQ(),
-                 priv.getPrimeExponentP(), priv.getPrimeExponentQ(),
-                 priv.getCrtCoefficient()));
-        } else if (kg instanceof KeypairGenControl.ECKeypairGenControl) {
-          KeypairGenControl.ECKeypairGenControl tkg = (KeypairGenControl.ECKeypairGenControl) kg;
-          ASN1ObjectIdentifier curveOid = tkg.getCurveOid();
-          KeyPair kp = KeyUtil.generateECKeypair(curveOid, random);
-          ECPublicKey pub = (ECPublicKey) kp.getPublic();
-          int orderBitLength = pub.getParams().getOrder().bitLength();
-
-          byte[] keyData = KeyUtil.getUncompressedEncodedECPoint(pub.getW(), orderBitLength);
-          grantedPublicKeyInfo = new SubjectPublicKeyInfo(tkg.getKeyAlgorithm(), keyData);
-
-          /*
-           * ECPrivateKey ::= SEQUENCE {
-           *   Version INTEGER { ecPrivkeyVer1(1) }
-           *                   (ecPrivkeyVer1),
-           *   privateKey      OCTET STRING,
-           *   parameters [0]  Parameters OPTIONAL,
-           *   publicKey  [1]  BIT STRING OPTIONAL
-           * }
-           *
-           * Since the EC domain parameters are placed in the PKCS #8’s privateKeyAlgorithm field,
-           * the optional parameters field in an ECPrivateKey must be omitted. A Cryptoki
-           * application must be able to unwrap an ECPrivateKey that contains the optional publicKey
-           * field; however, what is done with this publicKey field is outside the scope of
-           * Cryptoki.
-           */
-          ECPrivateKey priv = (ECPrivateKey) kp.getPrivate();
-          privateKey = new PrivateKeyInfo(tkg.getKeyAlgorithm(),
-              new org.bouncycastle.asn1.sec.ECPrivateKey(orderBitLength, priv.getS()));
-        } else if (kg instanceof KeypairGenControl.DSAKeypairGenControl) {
-          KeypairGenControl.DSAKeypairGenControl tkg = (KeypairGenControl.DSAKeypairGenControl) kg;
-          KeyPair kp = KeyUtil.generateDSAKeypair(tkg.getParameterSpec(), random);
-
-          grantedPublicKeyInfo = new SubjectPublicKeyInfo(tkg.getKeyAlgorithm(),
-              new ASN1Integer(((DSAPublicKey) kp.getPublic()).getY()));
-
-          // DSA private keys are represented as BER-encoded ASN.1 type INTEGER.
-          DSAPrivateKey priv = (DSAPrivateKey) kp.getPrivate();
-          privateKey = new PrivateKeyInfo(grantedPublicKeyInfo.getAlgorithm(),
-              new ASN1Integer(priv.getX()));
-        } else if (kg instanceof KeypairGenControl.EDDSAKeypairGenControl) {
-          KeypairGenControl.EDDSAKeypairGenControl tkg =
-              (KeypairGenControl.EDDSAKeypairGenControl) kg;
-          KeyPair kp = KeyUtil.generateEdECKeypair(tkg.getKeyAlgorithm().getAlgorithm(), random);
-          grantedPublicKeyInfo = KeyUtil.createSubjectPublicKeyInfo(kp.getPublic());
-          // make sure that the algorithm match
-          if (!grantedPublicKeyInfo.getAlgorithm().equals(tkg.getKeyAlgorithm())) {
-            throw new OperationException(SYSTEM_FAILURE, "invalid SubjectPublicKeyInfo.algorithm");
-          }
-          privateKey = PrivateKeyInfo.getInstance(kp.getPrivate().getEncoded());
-        } else {
-          throw new RuntimeCryptoException("unknown KeyPairGenControl " + kg);
-        }
-      } catch (InvalidAlgorithmParameterException | NoSuchAlgorithmException
-          | NoSuchProviderException | InvalidKeyException | IOException ex) {
-        throw new OperationException(SYSTEM_FAILURE, ex);
+      if (!grantedPublicKeyInfo.getAlgorithm().getAlgorithm().equals(keyAlgOid)) {
+        grantedPublicKeyInfo = new SubjectPublicKeyInfo(
+            new AlgorithmIdentifier(keyAlgOid, grantedPublicKeyInfo.getAlgorithm().getParameters()),
+            grantedPublicKeyInfo.getPublicKeyData().getBytes());
       }
     } else {
       // show not reach here

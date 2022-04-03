@@ -100,6 +100,26 @@ public interface SecurityFactory {
       throws ObjectCreationException;
 
   /**
+   * Retrieves the types of supported keypair generators.
+   * @return lower-case types of supported keypair generators, never {@code null}.
+   */
+  Set<String> getSupportedKeypairGeneratorTypes();
+
+  /**
+   * Creates keypair generator.
+   *
+   * @param type
+   *          Type of the generator. Must not be {@code null}.
+   * @param conf
+   *          Configuration of the generator. Could be {@code null}.
+   * @return the new keypair generator
+   * @throws ObjectCreationException
+   *         if could not create the keypair generator
+   */
+  KeypairGenerator createKeypairGenerator(String type, String conf)
+      throws ObjectCreationException;
+
+  /**
    * Gets the ContentVerifierProvider from the public key.
    *
    * @param publicKey

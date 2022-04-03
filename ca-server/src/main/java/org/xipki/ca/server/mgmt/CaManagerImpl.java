@@ -431,85 +431,65 @@ public class CaManagerImpl implements CaManager, Closeable {
     final long epoch = DateUtil.parseUtcTimeyyyyMMdd("20100101").getTime();
     UniqueIdGenerator idGen = new UniqueIdGenerator(epoch, shardId);
 
-    CaMgmtException ex0 = null;
+    boolean initSucc = true;
     try {
       this.certstore = new CertStore(datasource, idGen, securityFactory.getPasswordResolver());
     } catch (DataAccessException ex) {
-      ex0 = new CaMgmtException(ex.getMessage(), ex);
+      initSucc = false;
+      LogUtil.error(LOG, ex, "error constructing CertStore");
     }
 
     try {
       ca2Manager.initCaAliases();
     } catch (CaMgmtException ex) {
-      if (ex0 == null) {
-        ex0 = ex;
-      } else {
-        LogUtil.error(LOG, ex, "error initCaAliases");
-      }
+      initSucc = false;
+      LogUtil.error(LOG, ex, "error initCaAliases");
     }
 
     try {
       certprofileManager.initCertprofiles();
     } catch (CaMgmtException ex) {
-      if (ex0 == null) {
-        ex0 = ex;
-      } else {
-        LogUtil.error(LOG, ex, "error initCertprofiles");
-      }
+      initSucc = false;
+      LogUtil.error(LOG, ex, "error initCertprofiles");
     }
 
     try {
       publisherManager.initPublishers();
     } catch (CaMgmtException ex) {
-      if (ex0 == null) {
-        ex0 = ex;
-      } else {
-        LogUtil.error(LOG, ex, "error initPublishers");
-      }
+      initSucc = false;
+      LogUtil.error(LOG, ex, "error initPublishers");
     }
 
     try {
       requestorManager.initRequestors();
     } catch (CaMgmtException ex) {
-      if (ex0 == null) {
-        ex0 = ex;
-      } else {
-        LogUtil.error(LOG, ex, "error initRequestors");
-      }
+      initSucc = false;
+      LogUtil.error(LOG, ex, "error initRequestors");
     }
 
     try {
       signerManager.initSigners();
     } catch (CaMgmtException ex) {
-      if (ex0 == null) {
-        ex0 = ex;
-      } else {
-        LogUtil.error(LOG, ex, "error initSigners");
-      }
+      initSucc = false;
+      LogUtil.error(LOG, ex, "error initSigners");
     }
 
     try {
       keypairGenManager.initKeypairGens();
     } catch (CaMgmtException ex) {
-      if (ex0 == null) {
-        ex0 = ex;
-      } else {
-        LogUtil.error(LOG, ex, "error initKeypairGens");
-      }
+      initSucc = false;
+      LogUtil.error(LOG, ex, "error initKeypairGens");
     }
 
     try {
       ca2Manager.initCas();
     } catch (CaMgmtException ex) {
-      if (ex0 == null) {
-        ex0 = ex;
-      } else {
-        LogUtil.error(LOG, ex, "error initCas");
-      }
+      initSucc = false;
+      LogUtil.error(LOG, ex, "error initCas");
     }
 
-    if (ex0 != null) {
-      throw ex0;
+    if (!initSucc) {
+      throw new CaMgmtException("error initializing CA system");
     }
   } // method init
 
@@ -1256,6 +1236,12 @@ public class CaManagerImpl implements CaManager, Closeable {
     return ca2Manager.getX509Ca(ident);
   }
 
+  public KeypairGenerator getKeypairGenerator(String keypairGenName) {
+    keypairGenName = toNonBlankLower(keypairGenName, "keypairGenName");
+    KeypairGenEntryWrapper keypairGen = keypairGens.get(keypairGenName);
+    return keypairGen == null ? null : keypairGen.getGenerator();
+  }
+
   public IdentifiedCertprofile getIdentifiedCertprofile(String profileName) {
     profileName = toNonBlankLower(profileName, "profileName");
     return certprofiles.get(profileName);
@@ -1294,6 +1280,11 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   public IdentifiedCertPublisher createPublisher(PublisherEntry entry) throws CaMgmtException {
     return publisherManager.createPublisher(entry);
+  }
+
+  public KeypairGenEntryWrapper createKeypairGenerator(KeypairGenEntry entry)
+      throws CaMgmtException {
+    return keypairGenManager.createKeypairGen(entry);
   }
 
   @Override
