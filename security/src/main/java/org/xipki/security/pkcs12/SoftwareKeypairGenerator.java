@@ -1,3 +1,20 @@
+/*
+ *
+ * Copyright (c) 2013 - 2022 Lijun Liao
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.xipki.security.pkcs12;
 
 import org.bouncycastle.asn1.ASN1Integer;
@@ -18,6 +35,7 @@ import org.xipki.security.KeypairGenResult;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.DSAParameterCache;
 import org.xipki.security.util.KeyUtil;
+import org.xipki.util.StringUtil;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -105,7 +123,7 @@ public class SoftwareKeypairGenerator implements KeypairGenerator {
 
         BigInteger publicExponent = null;
         if (tokens.length > 2) {
-          publicExponent = new BigInteger(tokens[2].substring("0x".length()), 16);
+          publicExponent = StringUtil.toBigInt(tokens[2]);
         }
 
         KeyPair kp = KeyUtil.generateRSAKeypair(keysize, publicExponent, random);
@@ -173,9 +191,17 @@ public class SoftwareKeypairGenerator implements KeypairGenerator {
           break;
       }
       case "DSA": {
-        int pLength = Integer.parseInt(tokens[1]);
-        int qLength = Integer.parseInt(tokens[2]);
-        DSAParameterSpec spec = DSAParameterCache.getDSAParameterSpec(pLength, qLength, null);
+        DSAParameterSpec spec;
+        if (tokens.length == 3) {
+          int pLength = Integer.parseInt(tokens[1]);
+          int qLength = Integer.parseInt(tokens[2]);
+          spec = DSAParameterCache.getDSAParameterSpec(pLength, qLength, null);
+        } else {
+          spec = new DSAParameterSpec(
+              StringUtil.toBigInt(tokens[1]),  // P
+              StringUtil.toBigInt(tokens[2]),  // Q
+              StringUtil.toBigInt(tokens[3])); // G
+        }
         KeyPair kp = KeyUtil.generateDSAKeypair(spec, random);
         DSAParameter parameter = new DSAParameter(spec.getP(), spec.getQ(), spec.getG());
         AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_dsa, parameter);

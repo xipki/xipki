@@ -223,11 +223,13 @@ class GrandCertTemplateBuilder {
         throw new OperationException(SYSTEM_FAILURE, "cannot generate keypair " + keyspec);
       }
 
-      KeypairGenResult keypair = null;
+      String name = keypairGenerator.getName();
+      KeypairGenResult keypair;
       try {
         keypair = keypairGenerator.generateKeypair(keyspec);
+        LOG.info("generate keypair with generator {}", name);
       } catch (XiSecurityException ex) {
-        String msg = "error generating keypair " + keyspec;
+        String msg = "error generating keypair " + keyspec + " using generator " + name;
         LogUtil.error(LOG, ex, msg);
         throw new OperationException(SYSTEM_FAILURE, msg);
       }
