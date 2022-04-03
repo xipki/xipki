@@ -28,10 +28,8 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Dummy CRL ServletFilter.
@@ -40,13 +38,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class CrlServletFilter implements Filter {
 
-  private static class CrlWrapper {
-    String caName;
-    long crlNo;
-    byte[] sha1Fp;
-    byte[] crl;
-  }
-
   private static final Logger LOG = LoggerFactory.getLogger(CrlServletFilter.class);
 
   private static final String RESP_CONTENT_TYPE = "application/pkix-crl";
@@ -54,8 +45,6 @@ public class CrlServletFilter implements Filter {
   private static final String DFLT_CA_SERVER_CFG = "xipki/etc/ca/database/ca-db.properties";
 
   private DataSourceWrapper dataSource;
-
-  private final ConcurrentLinkedQueue<CrlWrapper> crls = new ConcurrentLinkedQueue<>();
 
   @Override
   public void init(FilterConfig filterConfig)
@@ -133,46 +122,21 @@ public class CrlServletFilter implements Filter {
         return;
       }
 
-      // Get the cached CRL
-      CrlWrapper cachedCrl = null;
-      for (CrlWrapper crl : crls) {
-        if (crl.caName.equals(caName)) {
-          cachedCrl = crl;
-          break;
-        }
+      // retrieve the CRL from the database
+      String columnName = hashalgo == null ? "CRL" : "SHA1";
+      sql = dataSource.buildSelectFirstSql(1,
+          columnName + " FROM CRL WHERE CA_ID=" + id + " AND CRL_NO=" + crlNo);
+      rs = dataSource.prepareStatement(sql).executeQuery();
+
+      byte[] respContent;
+      try {
+        rs.next();
+        String b64 = rs.getString(columnName);
+        respContent = Base64.decodeFast(b64);
+      } finally {
+        dataSource.releaseResources(null, rs);
       }
 
-      if (cachedCrl != null) {
-        // the cached CRL is not the latest, remove it from cache
-        if (cachedCrl.crlNo != crlNo) {
-          crls.remove(cachedCrl);
-          cachedCrl = null;
-        }
-      }
-
-      if (cachedCrl == null) {
-        // retrieve the CRL from the database
-        sql = dataSource.buildSelectFirstSql(1,
-                "CRL FROM CRL WHERE CA_ID=" + id + " AND CRL_NO=" + crlNo);
-        rs = dataSource.prepareStatement(sql).executeQuery();
-        try {
-          if (rs.next()) {
-            String b64Crl = rs.getString("CRL");
-            byte[] encodedCrl = Base64.decodeFast(b64Crl);
-            cachedCrl = new CrlWrapper();
-            cachedCrl.crlNo = crlNo;
-            cachedCrl.caName = caName;
-            cachedCrl.crl = encodedCrl;
-            MessageDigest sha1 = MessageDigest.getInstance("SHA1");
-            cachedCrl.sha1Fp = sha1.digest(encodedCrl);
-            crls.add(cachedCrl);
-          }
-        } finally {
-          dataSource.releaseResources(null, rs);
-        }
-      }
-
-      byte[] respContent = hashalgo == null ? cachedCrl.crl : cachedCrl.sha1Fp;
       resp.setContentType(hashalgo == null ? RESP_CONTENT_TYPE : "application/octet-stream");
       resp.setContentLengthLong(respContent.length);
       resp.getOutputStream().write(respContent);
