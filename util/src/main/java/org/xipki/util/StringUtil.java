@@ -18,6 +18,7 @@
 package org.xipki.util;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -274,6 +275,23 @@ public class StringUtil {
 
   public static String toUtf8String(byte[] bytes) {
     return new String(bytes, StandardCharsets.UTF_8);
+  }
+
+  public static BigInteger toBigInt(String str) {
+    return toBigInt(str, false);
+  }
+
+  public static BigInteger toBigInt(String str, boolean defaultHex) {
+    String tmpStr = str.trim();
+
+    if (tmpStr.startsWith("0x") || tmpStr.startsWith("0X")) {
+      if (tmpStr.length() > 2) {
+        return new BigInteger(tmpStr.substring(2), 16);
+      } else {
+        throw new NumberFormatException("invalid integer '" + tmpStr + "'");
+      }
+    }
+    return new BigInteger(tmpStr, defaultHex ? 16 : 10);
   }
 
 }

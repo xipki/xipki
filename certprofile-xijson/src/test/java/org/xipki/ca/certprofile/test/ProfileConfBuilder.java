@@ -379,10 +379,10 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     KeyType keyType;
     ASN1ObjectIdentifier algorithm;
     if (edwards) {
-      keyType = curve25519 ? KeyType.ed25519 : KeyType.ed448;
+      keyType = curve25519 ? KeyType.ED25519 : KeyType.ED448;
       algorithm = curve25519 ? EdECConstants.id_ED25519 : EdECConstants.id_ED448;
     } else {
-      keyType = curve25519 ? KeyType.x25519 : KeyType.x448;
+      keyType = curve25519 ? KeyType.X25519 : KeyType.X448;
       algorithm = curve25519 ? EdECConstants.id_X25519 : EdECConstants.id_X448;
     }
     kpGen.setAlgorithm(createOidType(algorithm));
