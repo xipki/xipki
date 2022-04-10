@@ -36,7 +36,7 @@ public interface P11CryptServiceFactory extends Closeable {
   /**
    * Gets the {@link P11CryptService} of the given module {@code moduleName}.
    * @param moduleName
-   *          Module name. Must not be {@code null}.
+   *          Module name. {@code null} for default module name.
    * @return the {@link P11CryptService} of the given module.
    * @throws P11TokenException
    *         if PKCS#11 token error occurs.

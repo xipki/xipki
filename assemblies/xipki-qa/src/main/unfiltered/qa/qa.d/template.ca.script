@@ -17,7 +17,8 @@ ca:dbschema-add --name KEYPAIR_ENC_KEY --value 00112233445566778899AABBCCDDEEFF
 list = [ cross subca subca-complex ocsp scep multiple-ous multi-valued-rdn \
   qc ee-complex smime smime-legacy tls tls-c max-time fixed-partial-subject \
   constant-ext constant-ext-implicit-tag constant-ext-explicit-tag \
-  syntax-ext syntax-ext-implicit-tag syntax-ext-explicit-tag apple-wwdr gmt0015 ]
+  syntax-ext syntax-ext-implicit-tag syntax-ext-explicit-tag apple-wwdr gmt0015 \
+  tls-dsa tls-ec tls-ed25519 tls-rsa tls-sm2]
 
 each ($list) {
   ca:profile-add --name ${it} \
@@ -39,6 +40,12 @@ ca:signer-add \
   --name responder1 \
   --type pkcs12 \
   --conf password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=REPLACEME-CMP_SIGALGO
+
+# Keypair Generation
+ca:keypairgen-add \
+  --name pkcs11 \
+  --type pkcs11 \
+  --conf slot=0,keyspecs=RSA:DSA:EC:SM2:ED25519:ED448:X25519:X448
 
 # CMP Requestors
 ca:requestor-add \
@@ -337,7 +344,12 @@ ca:caprofile-add \
   --profile smime-legacy \
   --profile tls \
   --profile tls-c \
-  --profile fixed-partial-subject
+  --profile fixed-partial-subject \
+  --profile tls-dsa \
+  --profile tls-ec \
+  --profile tls-ed25519 \
+  --profile tls-rsa \
+  --profile tls-sm2
 
 ## Add publisher
 ca:capub-add \

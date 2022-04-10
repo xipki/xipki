@@ -1199,7 +1199,6 @@ public class CaCertstore extends ValidatableConf {
             throws InvalidConfException {
       notBlank(name, "name");
       notBlank(type, "type");
-      notNull(conf, "conf");
       conf.validate();
     }
 

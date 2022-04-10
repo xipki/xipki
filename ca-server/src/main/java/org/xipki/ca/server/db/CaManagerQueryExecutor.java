@@ -444,7 +444,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         col2Str(Base64.encodeToString(encodedCert)), col2Str(certchainStr),
         col2Str(caEntry.getSignerType()),            col2Str(caEntry.getCrlSignerName()),
         col2Str(caEntry.getCmpResponderName()),      col2Str(caEntry.getScepResponderName()),
-        col2Str(CollectionUtil.toString(caEntry.getKeypairGenNames(), ",")),
+        col2Str(StringUtil.collectionAsString(caEntry.getKeypairGenNames(), ",")),
 
         col2Str((crlControl == null      ? null : crlControl.getConf())),
         col2Str((cmpControl == null      ? null : cmpControl.getConf())),
@@ -765,10 +765,10 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     if (CollectionUtil.isEmpty(names)) {
       kpgNames = null;
     } else {
-      if (names.get(0).equalsIgnoreCase("NULL")) { // TODO
+      if (names.get(0).equalsIgnoreCase(CaManager.NULL)) {
         kpgNames = ""; // clear the names
       } else {
-        kpgNames = CollectionUtil.toString(names, ",");
+        kpgNames = StringUtil.collectionAsString(names, ",");
       }
     }
 
@@ -1012,7 +1012,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       throw new CaMgmtException("could not add keypair generation " + dbEntry.getName());
     }
 
-    LOG.info("added keypair generation: {}", dbEntry.toString(false, true));
+    LOG.info("added keypair generation: {}", dbEntry.toString(true));
   } // method addSigner
 
   public void addSigner(SignerEntry dbEntry) throws CaMgmtException {

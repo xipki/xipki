@@ -50,7 +50,7 @@ public class KeypairGenActions {
 
     @Option(name = "--name", aliases = "-n", required = true,
             description = "keypair generation name")
-    @Completion(CaCompleters.KeypairGenNameOmitSoftwareCompleter.class)
+    @Completion(CaCompleters.KeypairGenNameCompleter.class)
     private String name;
 
     @Option(name = "--type", required = true, description = "keypair generation type")
@@ -134,7 +134,7 @@ public class KeypairGenActions {
   public static class KeypairGenRm extends CaAction {
 
     @Argument(index = 0, name = "name", required = true, description = "keypair generation name")
-    @Completion(CaCompleters.KeypairGenNameOmitSoftwareCompleter.class)
+    @Completion(CaCompleters.KeypairGenNameCompleter.class)
     private String name;
 
     @Option(name = "--force", aliases = "-f", description = "without prompt")

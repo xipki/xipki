@@ -27,7 +27,6 @@ import org.xipki.password.Passwords.PasswordConf;
 import org.xipki.security.pkcs11.*;
 import org.xipki.security.pkcs11.iaik.IaikP11ModuleFactory;
 import org.xipki.security.pkcs12.P12SignerFactory;
-import org.xipki.security.pkcs12.SoftwareKeypairGeneratorFactory;
 import org.xipki.util.*;
 
 import java.io.Closeable;
@@ -302,15 +301,14 @@ public class Securities implements Closeable {
     p12SignerFactory.setSecurityFactory(securityFactory);
     signerFactoryRegister.registFactory(p12SignerFactory);
 
-    SoftwareKeypairGeneratorFactory softwareKeypairGeneratorFactory =
-        new SoftwareKeypairGeneratorFactory();
-    softwareKeypairGeneratorFactory.setSecurityFactory(securityFactory);
-    keypairFactoryRegister.registFactory(softwareKeypairGeneratorFactory);
+    DfltKeypairGeneratorFactory dfltKeypairGeneratorFactory = new DfltKeypairGeneratorFactory();
+    dfltKeypairGeneratorFactory.setSecurityFactory(securityFactory);
+    keypairFactoryRegister.registFactory(dfltKeypairGeneratorFactory);
 
     // PKCS#11
     if (conf.getPkcs11Conf() != null) {
-      initSecurityPkcs11(conf.getPkcs11Conf(), signerFactoryRegister,
-          keypairFactoryRegister, passwords.getPasswordResolver());
+      initSecurityPkcs11(conf.getPkcs11Conf(), signerFactoryRegister, dfltKeypairGeneratorFactory,
+          passwords.getPasswordResolver());
     }
 
     // register additional SignerFactories
@@ -347,7 +345,7 @@ public class Securities implements Closeable {
   private void initSecurityPkcs11(
       FileOrValue pkcs11Conf,
       SignerFactoryRegisterImpl signerFactoryRegister,
-      KeypairGeneratorFactoryRegisterImpl keypairGeneratorFactoryRegister,
+      DfltKeypairGeneratorFactory dfltKeypairGeneratorFactory,
       PasswordResolver passwordResolver)
       throws InvalidConfException {
     p11ModuleFactoryRegister = new P11ModuleFactoryRegisterImpl();
@@ -373,6 +371,8 @@ public class Securities implements Closeable {
     p11SignerFactory.setP11CryptServiceFactory(p11CryptServiceFactory);
 
     signerFactoryRegister.registFactory(p11SignerFactory);
+
+    dfltKeypairGeneratorFactory.setP11CryptServiceFactory(p11CryptServiceFactory);
   } // method initSecurityPkcs11
 
 }

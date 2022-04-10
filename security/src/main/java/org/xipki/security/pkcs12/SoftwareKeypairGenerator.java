@@ -19,28 +19,22 @@ package org.xipki.security.pkcs12;
 
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
-import org.bouncycastle.asn1.pkcs.RSAPublicKey;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.DSAParameter;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.xipki.password.PasswordResolver;
-import org.xipki.security.KeypairGenerator;
 import org.xipki.security.EdECConstants;
-import org.xipki.security.KeypairGenResult;
+import org.xipki.security.KeypairGenerator;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.DSAParameterCache;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.ConfPairs;
-import org.xipki.util.StringUtil;
 
 import java.io.IOException;
-import java.math.BigInteger;
-import java.security.*;
+import java.security.KeyPair;
+import java.security.SecureRandom;
 import java.security.interfaces.*;
 import java.security.spec.DSAParameterSpec;
 import java.util.Locale;
@@ -50,67 +44,26 @@ import java.util.Locale;
  * @author Lijun Liao
  * @since 5.4.0
  */
-public class SoftwareKeypairGenerator implements KeypairGenerator {
-
-  private static final AlgorithmIdentifier ALGID_RSA = new AlgorithmIdentifier(
-      PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE);
+public class SoftwareKeypairGenerator extends KeypairGenerator {
 
   private final SecureRandom random;
-
-  private String name;
-
-  private BigInteger rsaE;
 
   public SoftwareKeypairGenerator(SecureRandom random) {
     this.random = random == null ? new SecureRandom() : random;
   }
 
   @Override
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  @Override
-  public void initialize(String conf, PasswordResolver passwordResolver)
+  public void initialize0(ConfPairs conf, PasswordResolver passwordResolver)
       throws XiSecurityException {
-    if (conf == null) {
-      return;
-    }
-
-    ConfPairs pairs = new ConfPairs(conf);
-    String str = pairs.value("RSA.E");
-    if (StringUtil.isNotBlank(str)) {
-      rsaE = StringUtil.toBigInt(str);
-    }
   }
 
   @Override
-  public boolean supports(String keyspec) {
-    String[] tokens = keyspec.toUpperCase(Locale.ROOT).split("/");
-    if (tokens.length == 0) {
-      return false;
-    }
-    switch (tokens[0]) {
-      case "RSA":
-      case "DSA":
-      case "EC":
-      case "ED25519":
-      case "ED448":
-      case "X25519":
-      case "X448":
-        return true;
-    }
-
-    return false;
-  }
-
-  @Override
-  public KeypairGenResult generateKeypair(String keyspec)
+  public PrivateKeyInfo generateKeypair(String keyspec)
       throws XiSecurityException {
+    if (!supports(keyspec)) {
+      throw new XiSecurityException(name + " cannot generate keypair of keyspec " + keyspec);
+    }
+
     try {
       return generateKeypair0(keyspec);
     } catch (XiSecurityException ex) {
@@ -120,13 +73,11 @@ public class SoftwareKeypairGenerator implements KeypairGenerator {
     }
   }
 
-  private KeypairGenResult generateKeypair0(String keyspec) throws Exception {
-    String[] tokens = keyspec.toUpperCase(Locale.ROOT).split("/");
+  private PrivateKeyInfo generateKeypair0(String keyspec) throws Exception {
+    String[] tokens = keyspec.split("/");
+    String type = tokens[0].toUpperCase(Locale.ROOT);
 
-    PrivateKeyInfo privateKey;
-    SubjectPublicKeyInfo publicKeyInfo;
-
-    switch (tokens[0]) {
+    switch (type) {
       case "RSA": {
         int keysize = Integer.parseInt(tokens[1]);
         if (keysize > 4096) {
@@ -136,46 +87,16 @@ public class SoftwareKeypairGenerator implements KeypairGenerator {
         KeyPair kp = KeyUtil.generateRSAKeypair(keysize, rsaE, random);
         java.security.interfaces.RSAPublicKey rsaPubKey =
             (java.security.interfaces.RSAPublicKey) kp.getPublic();
-
-        publicKeyInfo = new SubjectPublicKeyInfo(ALGID_RSA,
-            new RSAPublicKey(rsaPubKey.getModulus(), rsaPubKey.getPublicExponent()));
-
-        /*
-         * RSA private keys are BER-encoded according to PKCS #1’s RSAPrivateKey ASN.1 type.
-         *
-         * RSAPrivateKey ::= SEQUENCE {
-         *   version           Version,
-         *   modulus           INTEGER,  -- n
-         *   publicExponent    INTEGER,  -- e
-         *   privateExponent   INTEGER,  -- d
-         *   prime1            INTEGER,  -- p
-         *   prime2            INTEGER,  -- q
-         *   exponent1         INTEGER,  -- d mod (p-1)
-         *   exponent2         INTEGER,  -- d mod (q-1)
-         *   coefficient       INTEGER,  -- (inverse of q) mod p
-         *   otherPrimeInfos   OtherPrimeInfos OPTIONAL.
-         * }
-         */
-        RSAPrivateCrtKey priv = (RSAPrivateCrtKey) kp.getPrivate();
-        privateKey = new PrivateKeyInfo(ALGID_RSA,
-            new RSAPrivateKey(priv.getModulus(),
-                    priv.getPublicExponent(), priv.getPrivateExponent(),
-                    priv.getPrimeP(), priv.getPrimeQ(),
-                    priv.getPrimeExponentP(), priv.getPrimeExponentQ(),
-                    priv.getCrtCoefficient()));
-          break;
+        return KeyUtil.toPrivateKeyInfo((RSAPrivateCrtKey) kp.getPrivate());
       }
       case "EC": {
         ASN1ObjectIdentifier curveOid = new ASN1ObjectIdentifier(tokens[1]);
-        AlgorithmIdentifier keyAlgId =
-                new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, curveOid);
 
         KeyPair kp = KeyUtil.generateECKeypair(curveOid, random);
         ECPublicKey pub = (ECPublicKey) kp.getPublic();
         int orderBitLength = pub.getParams().getOrder().bitLength();
 
-        byte[] keyData = KeyUtil.getUncompressedEncodedECPoint(pub.getW(), orderBitLength);
-        publicKeyInfo = new SubjectPublicKeyInfo(keyAlgId, keyData);
+        byte[] publicKey = KeyUtil.getUncompressedEncodedECPoint(pub.getW(), orderBitLength);
 
         /*
          * ECPrivateKey ::= SEQUENCE {
@@ -186,16 +107,17 @@ public class SoftwareKeypairGenerator implements KeypairGenerator {
          *   publicKey  [1]  BIT STRING OPTIONAL
          * }
          *
-         * Since the EC domain parameters are placed in the PKCS #8’s privateKeyAlgorithm field,
+         * Since the EC domain parameters are placed in the PKCS#8’s privateKeyAlgorithm field,
          * the optional parameters field in an ECPrivateKey must be omitted. A Cryptoki
          * application must be able to unwrap an ECPrivateKey that contains the optional publicKey
          * field; however, what is done with this publicKey field is outside the scope of
          * Cryptoki.
          */
          ECPrivateKey priv = (ECPrivateKey) kp.getPrivate();
-         privateKey = new PrivateKeyInfo(keyAlgId,
-                 new org.bouncycastle.asn1.sec.ECPrivateKey(orderBitLength, priv.getS()));
-          break;
+         return new PrivateKeyInfo(
+             new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, curveOid),
+             new org.bouncycastle.asn1.sec.ECPrivateKey(
+                 orderBitLength, priv.getS(), new DERBitString(publicKey), null));
       }
       case "DSA": {
         int pLength = Integer.parseInt(tokens[1]);
@@ -204,13 +126,12 @@ public class SoftwareKeypairGenerator implements KeypairGenerator {
         KeyPair kp = KeyUtil.generateDSAKeypair(spec, random);
         DSAParameter parameter = new DSAParameter(spec.getP(), spec.getQ(), spec.getG());
         AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_dsa, parameter);
-        publicKeyInfo = new SubjectPublicKeyInfo(algId,
-                new ASN1Integer(((DSAPublicKey) kp.getPublic()).getY()));
+
+        byte[] publicKey = new ASN1Integer(((DSAPublicKey) kp.getPublic()).getY()).getEncoded();
 
         // DSA private keys are represented as BER-encoded ASN.1 type INTEGER.
         DSAPrivateKey priv = (DSAPrivateKey) kp.getPrivate();
-        privateKey = new PrivateKeyInfo(publicKeyInfo.getAlgorithm(), new ASN1Integer(priv.getX()));
-        break;
+        return new PrivateKeyInfo(algId, new ASN1Integer(priv.getX()), null, publicKey);
       }
       case "ED25519":
       case "ED448":
@@ -218,20 +139,12 @@ public class SoftwareKeypairGenerator implements KeypairGenerator {
       case "X448": {
         ASN1ObjectIdentifier curveId = EdECConstants.getCurveOid(keyspec);
         KeyPair kp = KeyUtil.generateEdECKeypair(curveId, random);
-        publicKeyInfo = KeyUtil.createSubjectPublicKeyInfo(kp.getPublic());
-        // make sure that the algorithm match
-        if (!curveId.equals(publicKeyInfo.getAlgorithm().getAlgorithm())) {
-          throw new XiSecurityException("invalid SubjectPublicKeyInfo.algorithm");
-        }
-        privateKey = PrivateKeyInfo.getInstance(kp.getPrivate().getEncoded());
-          break;
+        return PrivateKeyInfo.getInstance(kp.getPrivate().getEncoded());
       }
       default: {
         throw new IllegalArgumentException("unknown keyspec " + keyspec);
       }
     }
-
-    return new KeypairGenResult(privateKey, publicKeyInfo);
   }
 
   @Override

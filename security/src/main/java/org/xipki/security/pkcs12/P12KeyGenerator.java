@@ -105,7 +105,7 @@ public class P12KeyGenerator {
   }
 
   // CHECKSTYLE:SKIP
-  public P12KeyGenerationResult generateRSAKeypair(int keysize, BigInteger publicExponent,
+  public KeyStoreWrapper generateRSAKeypair(int keysize, BigInteger publicExponent,
       KeystoreGenerationParameters params, String selfSignedCertSubject)
           throws Exception {
     KeyPairWithSubjectPublicKeyInfo kp = genRSAKeypair(keysize, publicExponent, params.getRandom());
@@ -113,7 +113,7 @@ public class P12KeyGenerator {
   }
 
   // CHECKSTYLE:SKIP
-  public P12KeyGenerationResult generateDSAKeypair(int plength, int qlength,
+  public KeyStoreWrapper generateDSAKeypair(int plength, int qlength,
       KeystoreGenerationParameters params, String selfSignedCertSubject)
           throws Exception {
     KeyPairWithSubjectPublicKeyInfo kp = genDSAKeypair(plength, qlength, params.getRandom());
@@ -121,7 +121,7 @@ public class P12KeyGenerator {
   }
 
   // CHECKSTYLE:SKIP
-  public P12KeyGenerationResult generateECKeypair(ASN1ObjectIdentifier curveOid,
+  public KeyStoreWrapper generateECKeypair(ASN1ObjectIdentifier curveOid,
       KeystoreGenerationParameters params, String selfSignedCertSubject)
           throws Exception {
     notNull(curveOid, "curveOid");
@@ -139,7 +139,7 @@ public class P12KeyGenerator {
   } // method generateECKeypair
 
   // CHECKSTYLE:SKIP
-  public P12KeyGenerationResult generateEdECKeypair(ASN1ObjectIdentifier curveOid,
+  public KeyStoreWrapper generateEdECKeypair(ASN1ObjectIdentifier curveOid,
       KeystoreGenerationParameters params, String selfSignedCertSubject)
           throws Exception {
     notNull(curveOid, "curveOid");
@@ -154,7 +154,7 @@ public class P12KeyGenerator {
         params, selfSignedCertSubject);
   } // method generateEdECKeypair
 
-  public P12KeyGenerationResult generateSecretKey(String algorithm, int keyBitLen,
+  public KeyStoreWrapper generateSecretKey(String algorithm, int keyBitLen,
       KeystoreGenerationParameters params)
           throws Exception {
     if (keyBitLen % 8 != 0) {
@@ -184,7 +184,7 @@ public class P12KeyGenerator {
       ksStream.flush();
     }
 
-    P12KeyGenerationResult result = new P12KeyGenerationResult(ksStream.toByteArray());
+    KeyStoreWrapper result = new KeyStoreWrapper(ksStream.toByteArray());
     result.setKeystoreObject(ks);
     return result;
   } // method generateSecretKey
@@ -212,7 +212,7 @@ public class P12KeyGenerator {
     return new KeyPairWithSubjectPublicKeyInfo(kp, spki);
   }
 
-  private static P12KeyGenerationResult generateIdentity(KeyPairWithSubjectPublicKeyInfo kp,
+  private static KeyStoreWrapper generateIdentity(KeyPairWithSubjectPublicKeyInfo kp,
       KeystoreGenerationParameters params, String selfSignedCertSubject)
           throws Exception {
     Date now = new Date();
@@ -251,7 +251,7 @@ public class P12KeyGenerator {
       ksStream.flush();
     }
 
-    P12KeyGenerationResult result = new P12KeyGenerationResult(ksStream.toByteArray());
+    KeyStoreWrapper result = new KeyStoreWrapper(ksStream.toByteArray());
     result.setKeystoreObject(ks);
     return result;
   } // method generateIdentity

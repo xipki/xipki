@@ -34,13 +34,12 @@
 				"popo.sigalgo":"REPLACEME-SIGALGO:REPLACEME-HASHwithRSA:REPLACEME-HASHwithECDSA:REPLACEME-HASHwithDSA:SM3withSM2"
 			},
 			"cmpResponderName":"responder1",
+			"keypairGenNames":["software"],
 			"ctlogControl":{
 				"enabled":true,
 				"servers":"https://localhost:8443/ctlog/ctlogrsa;https://localhost:8443/ctlog/ctlogec",
 				"sslcontext.name":"localhost"
 			},
-			"duplicateKey":true,
-			"duplicateSubject":true,
 			"expirationPeriod":365,
 			"revokeSuspendedControl":{
 				"enabled":true,
@@ -52,7 +51,7 @@
 			"nextCrlNo":2,
 			"permissions":["all"],
 			"protocolSupport":["cmp","rest"],
-			"saveReq":false,
+			"saveRequest":false,
 			"signerType":"${token.type}",
 			"signerConf":{
 				"value":"${ca.signerConf}"

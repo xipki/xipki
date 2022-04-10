@@ -27,9 +27,9 @@ import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.xipki.security.*;
+import org.xipki.security.pkcs12.KeyStoreWrapper;
 import org.xipki.security.pkcs12.KeypairWithCert;
 import org.xipki.security.pkcs12.KeystoreGenerationParameters;
-import org.xipki.security.pkcs12.P12KeyGenerationResult;
 import org.xipki.security.pkcs12.P12KeyGenerator;
 import org.xipki.security.shell.Actions.CsrGenAction;
 import org.xipki.security.shell.Actions.SecurityAction;
@@ -83,7 +83,7 @@ public class P12Actions {
         throw new IllegalCmdParamException("invalid keyType " + keyType);
       }
 
-      P12KeyGenerationResult key = new P12KeyGenerator().generateSecretKey(
+      KeyStoreWrapper key = new P12KeyGenerator().generateSecretKey(
           keyType.toUpperCase(), keysize, getKeyGenParameters());
       saveKey(key);
 
@@ -322,7 +322,7 @@ public class P12Actions {
         }
       }
 
-      P12KeyGenerationResult keypair = new P12KeyGenerator().generateDSAKeypair(plen,
+      KeyStoreWrapper keypair = new P12KeyGenerator().generateDSAKeypair(plen,
           qlen, getKeyGenParameters(), subject);
       saveKey(keypair);
 
@@ -348,7 +348,7 @@ public class P12Actions {
         throws Exception {
       P12KeyGenerator keyGen = new P12KeyGenerator();
       KeystoreGenerationParameters keyGenParams = getKeyGenParameters();
-      P12KeyGenerationResult keypair;
+      KeyStoreWrapper keypair;
 
       ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(curveName);
       if (curveOid != null) {
@@ -373,7 +373,7 @@ public class P12Actions {
     @Option(name = "--password", description = "password of the keystore file")
     protected String password;
 
-    protected void saveKey(P12KeyGenerationResult keyGenerationResult)
+    protected void saveKey(KeyStoreWrapper keyGenerationResult)
         throws IOException {
       Args.notNull(keyGenerationResult, "keyGenerationResult");
       saveVerbose("saved PKCS#12 keystore to file", keyOutFile, keyGenerationResult.keystore());
@@ -423,7 +423,7 @@ public class P12Actions {
         throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
       }
 
-      P12KeyGenerationResult keypair = new P12KeyGenerator().generateRSAKeypair(keysize,
+      KeyStoreWrapper keypair = new P12KeyGenerator().generateRSAKeypair(keysize,
           toBigInt(publicExponent), getKeyGenParameters(), subject);
       saveKey(keypair);
 
@@ -475,7 +475,7 @@ public class P12Actions {
     @Override
     protected Object execute0()
         throws Exception {
-      P12KeyGenerationResult keypair = new P12KeyGenerator().generateECKeypair(
+      KeyStoreWrapper keypair = new P12KeyGenerator().generateECKeypair(
           GMObjectIdentifiers.sm2p256v1, getKeyGenParameters(), subject);
       saveKey(keypair);
 

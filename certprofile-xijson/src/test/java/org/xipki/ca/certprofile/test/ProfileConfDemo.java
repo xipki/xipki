@@ -18,17 +18,24 @@
 package org.xipki.ca.certprofile.test;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.sec.SECObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.xipki.ca.api.profile.Certprofile.CertLevel;
 import org.xipki.ca.api.profile.Certprofile.GeneralNameTag;
 import org.xipki.ca.certprofile.xijson.conf.*;
 import org.xipki.ca.certprofile.xijson.conf.Subject.RdnType;
+import org.xipki.security.EdECConstants;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.ObjectIdentifiers.DN;
 import org.xipki.security.ObjectIdentifiers.Extn;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Demo the creation of xijson configuration.
@@ -47,10 +54,15 @@ public class ProfileConfDemo extends ProfileConfBuilder {
       certprofileScep("certprofile-scep.json");
       certprofileSmime("certprofile-smime.json", false);
       certprofileSmime("certprofile-smime-legacy.json", true);
-      certprofileTls("certprofile-tls.json");
+      certprofileTls("certprofile-tls.json", null, false);
       certprofileTlsC("certprofile-tls-c.json");
       certprofileMaxTime("certprofile-max-time.json");
       certprofileGmt0015("certprofile-gmt0015.json");
+
+      certprofileTls("certprofile-tls-rsa.json", KeypairGenerationType.KeyType.RSA, false);
+      certprofileTls("certprofile-tls-dsa.json", KeypairGenerationType.KeyType.DSA, false);
+      certprofileTls("certprofile-tls-ec.json", KeypairGenerationType.KeyType.EC, false);
+      certprofileTls("certprofile-tls-sm2.json", KeypairGenerationType.KeyType.EC, true);
 
       certprofileTlsEdwardsOrMontgomery("certprofile-ed25519.json", true,  true);
       certprofileTlsEdwardsOrMontgomery("certprofile-ed448.json",   true,  false);
@@ -379,9 +391,55 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     marshall(profile, destFilename, true);
   } // method certprofileTlsEdwardsOrMontgomery
 
-  private static void certprofileTls(String destFilename) {
+  private static void certprofileTls(String destFilename,
+                                     KeypairGenerationType.KeyType kpgKeyType, boolean sm2) {
     String desc = "certprofile tls";
     X509ProfileType profile = getBaseProfile(desc, CertLevel.EndEntity, "5y", true, false);
+
+    if (kpgKeyType != null) {
+      KeypairGenerationType kpg = profile.getKeypairGeneration();
+      kpg.setInheritCA(false);
+      kpg.setKeyType(kpgKeyType);
+
+      Describable.DescribableOid algo;
+      Map<String, String> parameters = new HashMap<>();
+
+      switch (kpgKeyType) {
+        case DSA:
+          algo = createOidType(X9ObjectIdentifiers.id_dsa, "OID");
+          parameters.put("plength", "2048");
+          parameters.put("qlength", "256");
+          break;
+        case RSA:
+          algo = createOidType(PKCSObjectIdentifiers.rsaEncryption, "RSA");
+          parameters.put("keysize", "2048");
+          break;
+        case EC:
+          algo = createOidType(X9ObjectIdentifiers.id_ecPublicKey, "EC");
+
+          parameters.put("curve",
+              (sm2 ? GMObjectIdentifiers.sm2p256v1 : SECObjectIdentifiers.secp256r1).getId());
+          break;
+        case ED448:
+          algo = createOidType(EdECConstants.id_ED448, "ED448");
+          parameters = null;
+          break;
+        case ED25519:
+          algo = createOidType(EdECConstants.id_ED25519, "ED25519");
+          break;
+        case X448:
+          algo = createOidType(EdECConstants.id_X448, "X448");
+          break;
+        case X25519:
+          algo = createOidType(EdECConstants.id_X25519, "X25519");
+          break;
+        default:
+          throw new IllegalStateException("unknown KeyType " + kpgKeyType);
+      }
+
+      kpg.setAlgorithm(algo);
+      kpg.setParameters(parameters);
+    }
 
     // Subject
     Subject subject = profile.getSubject();

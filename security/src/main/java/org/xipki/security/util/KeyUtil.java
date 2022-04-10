@@ -57,6 +57,9 @@ import static org.xipki.util.Args.notNull;
 
 public class KeyUtil {
 
+  public static final AlgorithmIdentifier ALGID_RSA = new AlgorithmIdentifier(
+      PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE);
+
   private static final byte[]  x25519Prefix = Hex.decode("302a300506032b656e032100");
   private static final byte[] Ed25519Prefix = Hex.decode("302a300506032b6570032100");
   private static final byte[]    x448Prefix = Hex.decode("3042300506032b656f033900");
@@ -102,6 +105,32 @@ public class KeyUtil {
       }
       return kpGen.generateKeyPair();
     }
+  }
+
+  public static PrivateKeyInfo toPrivateKeyInfo(RSAPrivateCrtKey priv)
+      throws IOException {
+    /*
+     * RSA private keys are BER-encoded according to PKCS #1’s RSAPrivateKey ASN.1 type.
+     *
+     * RSAPrivateKey ::= SEQUENCE {
+     *   version           Version,
+     *   modulus           INTEGER,  -- n
+     *   publicExponent    INTEGER,  -- e
+     *   privateExponent   INTEGER,  -- d
+     *   prime1            INTEGER,  -- p
+     *   prime2            INTEGER,  -- q
+     *   exponent1         INTEGER,  -- d mod (p-1)
+     *   exponent2         INTEGER,  -- d mod (q-1)
+     *   coefficient       INTEGER,  -- (inverse of q) mod p
+     *   otherPrimeInfos   OtherPrimeInfos OPTIONAL.
+     * }
+     */
+    return new PrivateKeyInfo(ALGID_RSA,
+        new org.bouncycastle.asn1.pkcs.RSAPrivateKey(priv.getModulus(),
+            priv.getPublicExponent(), priv.getPrivateExponent(),
+            priv.getPrimeP(), priv.getPrimeQ(),
+            priv.getPrimeExponentP(), priv.getPrimeExponentQ(),
+            priv.getCrtCoefficient()));
   }
 
   // CHECKSTYLE:SKIP

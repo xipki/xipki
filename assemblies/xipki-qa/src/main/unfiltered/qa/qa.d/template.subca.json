@@ -36,9 +36,7 @@
 				"servers":"https://localhost/ctlog/"
 			},
 			"cmpResponderName":"responder1",
-			"keypairGenNames": ["software"],
-			"duplicateKey":true,
-			"duplicateSubject":true,
+			"keypairGenNames":["software"],
 			"expirationPeriod":365,
 			"keepExpiredCertDays":-1,
 			"maxValidity":"5y",
@@ -50,8 +48,7 @@
 				"targetReason":"cessationOfOperation",
 				"unchangedSince":"15d"
 			},
-			"saveCert": true,
-			"saveReq":true,
+			"saveRequest":true,
 			"saveKeypair":true,
 			"signerType":"${token.type}",
 			"signerConf":{
@@ -70,7 +67,8 @@
 			"smime-legacy",
 			"tls",
 			"tls-c",
-			"fixed-partial-subject"
+			"fixed-partial-subject",
+			"tls-dsa", "tls-ec", "tls-ed25519", "tls-rsa", "tls-sm2"
 		],
 		"publishers":[
 			"ocsp-publisher"

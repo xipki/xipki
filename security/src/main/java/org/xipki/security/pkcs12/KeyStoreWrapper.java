@@ -22,19 +22,19 @@ import org.xipki.util.Args;
 import java.security.KeyStore;
 
 /**
- * Result of the KeyStore generation.
+ * Keystore wrapper (containing the keystore object and its encoded form).
  *
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 5.4.0
  */
 
-public class P12KeyGenerationResult {
+public class KeyStoreWrapper {
 
   private final byte[] keystore;
 
   private KeyStore keystoreObject;
 
-  public P12KeyGenerationResult(byte[] keystore) {
+  public KeyStoreWrapper(byte[] keystore) {
     this.keystore = Args.notNull(keystore, "keystore");
   }
 

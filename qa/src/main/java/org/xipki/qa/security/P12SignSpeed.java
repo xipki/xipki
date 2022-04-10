@@ -22,8 +22,8 @@ import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.*;
+import org.xipki.security.pkcs12.KeyStoreWrapper;
 import org.xipki.security.pkcs12.KeystoreGenerationParameters;
-import org.xipki.security.pkcs12.P12KeyGenerationResult;
 import org.xipki.security.pkcs12.P12KeyGenerator;
 import org.xipki.util.*;
 
@@ -58,7 +58,7 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
     private static byte[] generateKeystore(String signatureAlgorithm)
         throws Exception {
       int keysize = getKeysize(signatureAlgorithm);
-      P12KeyGenerationResult identity = new P12KeyGenerator().generateSecretKey(
+      KeyStoreWrapper identity = new P12KeyGenerator().generateSecretKey(
           "AES", keysize, new KeystoreGenerationParameters(PASSWORD.toCharArray()));
       return identity.keystore();
     }
@@ -98,7 +98,7 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
         KeystoreGenerationParameters params = new KeystoreGenerationParameters(
             PASSWORD.toCharArray());
         params.setRandom(new SecureRandom());
-        P12KeyGenerationResult identity = new P12KeyGenerator().generateDSAKeypair(
+        KeyStoreWrapper identity = new P12KeyGenerator().generateDSAKeypair(
             plength, qlength, params, null);
         keystoreBytes = identity.keystore();
       }
@@ -124,7 +124,7 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
         KeystoreGenerationParameters params = new KeystoreGenerationParameters(
             PASSWORD.toCharArray());
         params.setRandom(new SecureRandom());
-        P12KeyGenerationResult identity;
+        KeyStoreWrapper identity;
         if (EdECConstants.isEdwardsOrMontgomeryCurve(curveOid)) {
           identity = new P12KeyGenerator().generateEdECKeypair(curveOid, params, null);
         } else {
@@ -149,7 +149,7 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
     private static byte[] generateKeystore(String signatureAlgorithm)
         throws Exception {
       int keysize = getKeysize(signatureAlgorithm);
-      P12KeyGenerationResult identity = new P12KeyGenerator().generateSecretKey(
+      KeyStoreWrapper identity = new P12KeyGenerator().generateSecretKey(
           "GENERIC", keysize, new KeystoreGenerationParameters(PASSWORD.toCharArray()));
       return identity.keystore();
     }
@@ -193,7 +193,7 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
         KeystoreGenerationParameters params = new KeystoreGenerationParameters(
             PASSWORD.toCharArray());
         params.setRandom(new SecureRandom());
-        P12KeyGenerationResult identity = new P12KeyGenerator().generateRSAKeypair(
+        KeyStoreWrapper identity = new P12KeyGenerator().generateRSAKeypair(
             keysize, publicExponent, params, null);
         keystoreBytes = identity.keystore();
       }
@@ -218,7 +218,7 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
         KeystoreGenerationParameters params = new KeystoreGenerationParameters(
             PASSWORD.toCharArray());
         params.setRandom(new SecureRandom());
-        P12KeyGenerationResult identity = new P12KeyGenerator().generateECKeypair(
+        KeyStoreWrapper identity = new P12KeyGenerator().generateECKeypair(
             curveNOid, params, null);
         keystoreBytes = identity.keystore();
       }

@@ -32,7 +32,7 @@ import java.math.BigInteger;
  * <pre>
  * GenRSAKeypairParams ::= SEQUENCE {
  *     slotId               P11SlotIdentifier,
- *     control              NewKeyControl,
+ *     control              NewKeyControl OPTIONAL,
  *     p                    INTEGER,
  *     q                    INTEGER,
  *     g                    INTEGER}
@@ -56,7 +56,7 @@ public class GenDSAKeypairParams extends ProxyMessage {
   public GenDSAKeypairParams(P11SlotIdentifier slotId, P11NewKeyControl control,
       BigInteger p, BigInteger q, BigInteger g) {
     this.slotId = Args.notNull(slotId, "slotId");
-    this.control = Args.notNull(control, "control");
+    this.control = control;
     this.p = Args.notNull(p, "p");
     this.q = Args.notNull(q, "q");
     this.g = Args.notNull(g, "g");
@@ -64,11 +64,24 @@ public class GenDSAKeypairParams extends ProxyMessage {
 
   private GenDSAKeypairParams(ASN1Sequence seq)
       throws BadAsn1ObjectException {
-    requireRange(seq, 5, 5);
+    requireRange(seq, 4, 5);
     int idx = 0;
     slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getValue();
-    control = NewKeyControl.getInstance(seq.getObjectAt(idx++)).getControl();
-    p = getInteger(seq.getObjectAt(idx++));
+
+    ASN1Primitive asn1 = seq.getObjectAt(idx++).toASN1Primitive();
+    BigInteger bn = null;
+    if (asn1 instanceof ASN1Sequence) {
+      control = NewKeyControl.getInstance(asn1).getControl();
+    } else {
+      bn = getInteger(asn1);
+      control = null;
+    }
+
+    if (control != null) {
+      bn = getInteger(seq.getObjectAt(idx++));
+    }
+
+    p = bn;
     q = getInteger(seq.getObjectAt(idx++));
     g = getInteger(seq.getObjectAt(idx++));
   }
@@ -96,7 +109,9 @@ public class GenDSAKeypairParams extends ProxyMessage {
   public ASN1Primitive toASN1Primitive() {
     ASN1EncodableVector vector = new ASN1EncodableVector();
     vector.add(new SlotIdentifier(slotId));
-    vector.add(new NewKeyControl(control));
+    if (control != null) {
+      vector.add(new NewKeyControl(control));
+    }
     vector.add(new ASN1Integer(p));
     vector.add(new ASN1Integer(q));
     vector.add(new ASN1Integer(g));

@@ -25,9 +25,15 @@ import iaik.pkcs.pkcs11.objects.Key.KeyType;
 import iaik.pkcs.pkcs11.wrapper.Functions;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.DSAParameter;
 import org.bouncycastle.asn1.x9.ECNamedCurveTable;
 import org.bouncycastle.asn1.x9.X9ECParameters;
+import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +44,7 @@ import org.xipki.security.pkcs11.P11ModuleConf.P11MechanismFilter;
 import org.xipki.security.pkcs11.P11ModuleConf.P11NewObjectConf;
 import org.xipki.security.util.SignerUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
 import org.xipki.util.concurrent.ConcurrentBag;
 import org.xipki.util.concurrent.ConcurrentBagEntry;
@@ -65,6 +72,9 @@ import static org.xipki.util.CollectionUtil.isEmpty;
  * @since 2.0.0
  */
 class IaikP11Slot extends P11Slot {
+
+  public static final AlgorithmIdentifier ALGID_RSA = new AlgorithmIdentifier(
+      PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE);
 
   private static final Logger LOG = LoggerFactory.getLogger(IaikP11Slot.class);
 
@@ -956,6 +966,54 @@ class IaikP11Slot extends P11Slot {
   } // method generateRSAKeypair0
 
   @Override
+  protected PrivateKeyInfo generateRSAKeypairOtf0(int keysize, BigInteger publicExponent)
+      throws P11TokenException {
+    RSAPublicKey publicKeyTemplate = new RSAPublicKey();
+    publicKeyTemplate.getModulusBits().setLongValue(Long.valueOf(keysize));
+    if (publicExponent != null) {
+      publicKeyTemplate.getPublicExponent().setByteArrayValue(publicExponent.toByteArray());
+    }
+
+    RSAPrivateKey privateKeyTemplate = new RSAPrivateKey();
+    setPrivateKeyAttrsOtf(privateKeyTemplate);
+
+    long mech = PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN;
+    ConcurrentBagEntry<Session> bagEntry = borrowSession();
+    try {
+      Session session = bagEntry.value();
+
+      KeyPair keypair = null;
+      try {
+        keypair = session.generateKeyPair(Mechanism.get(mech),
+            publicKeyTemplate, privateKeyTemplate);
+        RSAPrivateKey sk = (RSAPrivateKey) keypair.getPrivateKey();
+
+        return new PrivateKeyInfo(ALGID_RSA,
+            new org.bouncycastle.asn1.pkcs.RSAPrivateKey(
+                toBigInt(sk.getModulus()),
+                toBigInt(sk.getPublicExponent()),
+                toBigInt(sk.getPrivateExponent()),
+                toBigInt(sk.getPrime1()),
+                toBigInt(sk.getPrime2()),
+                toBigInt(sk.getExponent1()),
+                toBigInt(sk.getExponent2()),
+                toBigInt(sk.getCoefficient())));
+
+      } catch (TokenException | IOException ex) {
+        throw new P11TokenException("could not generate keypair "
+            + Functions.mechanismCodeToString(mech), ex);
+      } finally {
+        if (keypair != null) {
+          destroyObject(session, keypair.getPrivateKey());
+          destroyObject(session, keypair.getPublicKey());
+        }
+      }
+    } finally {
+      sessions.requite(bagEntry);
+    }
+  } // method generateRSAKeypairOtf0
+
+  @Override
   // CHECKSTYLE:SKIP
   protected P11Identity generateDSAKeypair0(BigInteger p, BigInteger q, BigInteger g,
       P11NewKeyControl control)
@@ -971,6 +1029,52 @@ class IaikP11Slot extends P11Slot {
     return generateKeyPair(PKCS11Constants.CKM_DSA_KEY_PAIR_GEN,
         control.getId(), privateKey, publicKey);
   } // method generateDSAKeypair0
+
+  @Override
+  protected PrivateKeyInfo generateDSAKeypairOtf0(BigInteger p, BigInteger q, BigInteger g)
+      throws P11TokenException {
+    DSAPublicKey publicKeyTemplate = new DSAPublicKey();
+    publicKeyTemplate.getPrime().setByteArrayValue(Util.unsignedBigIntergerToByteArray(p));
+    publicKeyTemplate.getSubprime().setByteArrayValue(Util.unsignedBigIntergerToByteArray(q));
+    publicKeyTemplate.getBase().setByteArrayValue(Util.unsignedBigIntergerToByteArray(g));
+
+    DSAPrivateKey privateKeyTemplate = new DSAPrivateKey();
+    setPrivateKeyAttrsOtf(privateKeyTemplate);
+
+    long mech = PKCS11Constants.CKM_DSA_KEY_PAIR_GEN;
+    ConcurrentBagEntry<Session> bagEntry = borrowSession();
+    try {
+      Session session = bagEntry.value();
+
+      KeyPair keypair = null;
+      try {
+        DSAParameter parameter = new DSAParameter(p, q, g);
+        AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_dsa, parameter);
+
+        keypair = session.generateKeyPair(Mechanism.get(mech),
+            publicKeyTemplate, privateKeyTemplate);
+        DSAPrivateKey sk = (DSAPrivateKey) keypair.getPrivateKey();
+        DSAPublicKey pk = (DSAPublicKey) keypair.getPublicKey();
+
+        BigInteger value = toBigInt(pk.getValue()); // y
+        byte[] publicKey = new ASN1Integer(value).getEncoded();
+
+        return new PrivateKeyInfo(algId,
+            new ASN1Integer(toBigInt(sk.getValue())), // x
+            null, publicKey);
+      } catch (TokenException | IOException ex) {
+        throw new P11TokenException("could not generate keypair "
+            + Functions.mechanismCodeToString(mech), ex);
+      } finally {
+        if (keypair != null) {
+          destroyObject(session, keypair.getPrivateKey());
+          destroyObject(session, keypair.getPublicKey());
+        }
+      }
+    } finally {
+      sessions.requite(bagEntry);
+    }
+  } // method generateDSAKeypairOtf0
 
   @Override
   protected P11Identity generateECEdwardsKeypair0(ASN1ObjectIdentifier curveId,
@@ -991,6 +1095,13 @@ class IaikP11Slot extends P11Slot {
   } // method generateECEdwardsKeypair0
 
   @Override
+  protected PrivateKeyInfo generateECEdwardsKeypairOtf0(ASN1ObjectIdentifier curveId)
+      throws P11TokenException {
+    return generateECKeypairOtf0(KeyType.EC_EDWARDS, PKCS11Constants.CKM_EC_EDWARDS_KEY_PAIR_GEN,
+        curveId);
+  }
+
+  @Override
   protected P11Identity generateECMontgomeryKeypair0(ASN1ObjectIdentifier curveId,
       P11NewKeyControl control)
           throws P11TokenException {
@@ -1006,6 +1117,13 @@ class IaikP11Slot extends P11Slot {
     return generateKeyPair(PKCS11Constants.CKM_EC_MONTGOMERY_KEY_PAIR_GEN,
         control.getId(), privateKey, publicKey);
   } // method generateECMontgomeryKeypair0
+
+  @Override
+  protected PrivateKeyInfo generateECMontgomeryKeypairOtf0(ASN1ObjectIdentifier curveId)
+      throws P11TokenException {
+    return generateECKeypairOtf0(KeyType.EC_MONTGOMERY,
+        PKCS11Constants.CKM_EC_MONTGOMERY_KEY_PAIR_GEN, curveId);
+  }
 
   @Override
   protected P11Identity generateECKeypair0(ASN1ObjectIdentifier curveId, P11NewKeyControl control)
@@ -1040,6 +1158,84 @@ class IaikP11Slot extends P11Slot {
   } // method generateECKeypair0
 
   @Override
+  protected PrivateKeyInfo generateECKeypairOtf0(ASN1ObjectIdentifier curveId)
+      throws P11TokenException {
+    return generateECKeypairOtf0(KeyType.EC, PKCS11Constants.CKM_EC_KEY_PAIR_GEN,
+        curveId);
+  }
+
+  private PrivateKeyInfo generateECKeypairOtf0(
+      long keyType, long mech, ASN1ObjectIdentifier curveId)
+      throws P11TokenException {
+    ECPrivateKey privateKeyTemplate = new ECPrivateKey(keyType);
+    ECPublicKey publicKeyTemplate = new ECPublicKey(keyType);
+    setPrivateKeyAttrsOtf(privateKeyTemplate);
+
+    if (!GMObjectIdentifiers.sm2p256v1.equals(curveId)) {
+      byte[] encodedCurveId;
+      try {
+        encodedCurveId = curveId.getEncoded();
+      } catch (IOException ex) {
+        throw new P11TokenException(ex.getMessage(), ex);
+      }
+      publicKeyTemplate.getEcdsaParams().setByteArrayValue(encodedCurveId);
+    }
+
+    ConcurrentBagEntry<Session> bagEntry = borrowSession();
+    try {
+      Session session = bagEntry.value();
+
+      KeyPair keypair = null;
+      try {
+        keypair = session.generateKeyPair(Mechanism.get(mech),
+            publicKeyTemplate, privateKeyTemplate);
+        ECPrivateKey sk = (ECPrivateKey) keypair.getPrivateKey();
+        ECPublicKey pk = (ECPublicKey) keypair.getPublicKey();
+
+        if (KeyType.EC_EDWARDS == keyType || KeyType.EC_MONTGOMERY == keyType) {
+          AlgorithmIdentifier algId = new AlgorithmIdentifier(curveId);
+          byte[] encodedPublicPoint =
+              ASN1OctetString.getInstance(pk.getEcPoint().getByteArrayValue()).getOctets();
+          byte[] privValue = sk.getValue().getByteArrayValue();
+          IoUtil.save("logs/ed25519-prikey.bin", privValue);
+          PrivateKeyInfo pki = new PrivateKeyInfo(algId, new DEROctetString(privValue),
+              null, encodedPublicPoint);
+          IoUtil.save("logs/ed25519.der", pki.getEncoded());
+          return pki;
+        } else {
+          AlgorithmIdentifier algId =
+              new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, curveId);
+
+          byte[] encodedPublicPoint =
+              ASN1OctetString.getInstance(pk.getEcPoint().getByteArrayValue()).getOctets();
+          if (encodedPublicPoint[0] != 4) {
+            throw new P11TokenException("EcPoint does not start with 0x04");
+          }
+
+          int orderBigLen = (encodedPublicPoint.length - 1) / 2 * 8;
+          return new PrivateKeyInfo(algId,
+              new org.bouncycastle.asn1.sec.ECPrivateKey(
+                  orderBigLen,
+                  new BigInteger(1, sk.getValue().getByteArrayValue()),
+                  new DERBitString(encodedPublicPoint),
+                  null));
+        }
+      } catch (TokenException | IOException ex) {
+        throw new P11TokenException("could not generate keypair "
+            + Functions.mechanismCodeToString(mech), ex);
+      } finally {
+        if (keypair != null) {
+          destroyObject(session, keypair.getPrivateKey());
+          destroyObject(session, keypair.getPublicKey());
+        }
+      }
+    } finally {
+      sessions.requite(bagEntry);
+    }
+
+  }
+
+  @Override
   protected P11Identity generateSM2Keypair0(P11NewKeyControl control)
       throws P11TokenException {
     ECPrivateKey privateKey = new ECPrivateKey(KeyType.VENDOR_SM2);
@@ -1049,6 +1245,14 @@ class IaikP11Slot extends P11Slot {
     return generateKeyPair(PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN,
         control.getId(), privateKey, publicKey);
   } // method generateSM2Keypair0
+
+  @Override
+  protected PrivateKeyInfo generateSM2KeypairOtf0()
+      throws P11TokenException {
+    return generateECKeypairOtf0(KeyType.VENDOR_SM2,
+            PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN,
+            GMObjectIdentifiers.sm2p256v1);
+  }
 
   private P11Identity generateKeyPair(long mech, byte[] id, PrivateKey privateKeyTemplate,
       PublicKey publicKeyTemplate)
@@ -1114,7 +1318,7 @@ class IaikP11Slot extends P11Slot {
           try {
             certs[0] = X509Util.parseCert(value(cert2.getValue()));
           } catch (CertificateException ex) {
-            throw new P11TokenException("coult not parse certifcate", ex);
+            throw new P11TokenException("could not parse certifcate", ex);
           }
         }
 
@@ -1327,5 +1531,23 @@ class IaikP11Slot extends P11Slot {
     cert.getLabel().setCharArrayValue(keyLabel);
     return !isEmpty(getObjects(session, cert, 1));
   } // method labelExists
+
+  private static void setPrivateKeyAttrsOtf(PrivateKey privateKeyTemplate) {
+    privateKeyTemplate.getToken().setBooleanValue(false);
+    privateKeyTemplate.getSensitive().setBooleanValue(false);
+    privateKeyTemplate.getExtractable().setBooleanValue(true);
+  }
+
+  private static void destroyObject(Session session, PKCS11Object object) {
+    try {
+      session.destroyObject(object);
+    } catch (TokenException ex) {
+      LogUtil.warn(LOG, ex, "error destroying object");
+    }
+  }
+
+  private static BigInteger toBigInt(ByteArrayAttribute attr) {
+    return new BigInteger(1, attr.getByteArrayValue());
+  }
 
 }

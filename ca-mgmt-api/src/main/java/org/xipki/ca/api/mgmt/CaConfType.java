@@ -341,9 +341,9 @@ public class CaConfType {
 
     private Set<String> protocolSupport;
 
-    private boolean saveCert;
+    private boolean saveCert = true;
 
-    private boolean saveReq;
+    private boolean saveRequest;
 
     private boolean saveKeyPair;
 
@@ -521,12 +521,12 @@ public class CaConfType {
       this.protocolSupport = protocolSupport;
     }
 
-    public boolean isSaveReq() {
-      return saveReq;
+    public boolean isSaveRequest() {
+      return saveRequest;
     }
 
-    public void setSaveReq(boolean saveReq) {
-      this.saveReq = saveReq;
+    public void setSaveRequest(boolean saveRequest) {
+      this.saveRequest = saveRequest;
     }
 
     public boolean isSaveCert() {

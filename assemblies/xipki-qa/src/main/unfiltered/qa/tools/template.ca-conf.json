@@ -62,8 +62,6 @@
 				"overlap":"3d",
 				"interval.time":"02:00"
 			},
-			"duplicateKey":true,
-			"duplicateSubject":true,
 			"expirationPeriod":365,
 			"genSelfIssued":{
 				"certOutform":"der",
@@ -76,7 +74,7 @@
 			"nextCrlNo":2,
 			"permissions":["all"],
 			"protocolSupport":["cmp"],
-			"saveReq":false,
+			"saveRequest":false,
 			"scepControl":{
 				"cacert.included":true,
 				"certchain.included":false,

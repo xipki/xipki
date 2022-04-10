@@ -294,5 +294,4 @@ public class StringUtil {
     return new BigInteger(tmpStr, defaultHex ? 16 : 10);
   }
 
-
 }

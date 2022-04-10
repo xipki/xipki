@@ -31,7 +31,7 @@ import java.io.IOException;
  * <pre>
  * GenECKeypairParams ::= SEQUENCE {
  *     slotId               P11SlotIdentifier,
- *     control              NewKeyControl,
+ *     control              NewKeyControl OPTIONAL,
  *     curveId              OBJECT IDENTIFIER }
  * </pre>
  *
@@ -49,17 +49,30 @@ public class GenECKeypairParams extends ProxyMessage {
   public GenECKeypairParams(P11SlotIdentifier slotId,
       P11NewKeyControl control, ASN1ObjectIdentifier curveId) {
     this.slotId = Args.notNull(slotId, "slotId");
-    this.control = Args.notNull(control, "control");
+    this.control = control;
     this.curveId = Args.notNull(curveId, "curveId");
   }
 
   private GenECKeypairParams(ASN1Sequence seq)
       throws BadAsn1ObjectException {
-    requireRange(seq, 3, 3);
+    requireRange(seq, 2, 3);
     int idx = 0;
     slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getValue();
-    control = NewKeyControl.getInstance(seq.getObjectAt(idx++)).getControl();
-    curveId = getObjectIdentifier(seq.getObjectAt(idx++));
+
+    ASN1Primitive asn1 = seq.getObjectAt(idx++).toASN1Primitive();
+    ASN1ObjectIdentifier oid = null;
+    if (asn1 instanceof ASN1Sequence) {
+      control = NewKeyControl.getInstance(asn1).getControl();
+    } else {
+      control = null;
+      oid = getObjectIdentifier(seq.getObjectAt(idx++));
+    }
+
+    if (control != null) {
+      oid = getObjectIdentifier(seq.getObjectAt(idx++));
+    }
+
+    curveId = oid;
   }
 
   public static GenECKeypairParams getInstance(Object obj)
@@ -85,7 +98,9 @@ public class GenECKeypairParams extends ProxyMessage {
   public ASN1Primitive toASN1Primitive() {
     ASN1EncodableVector vector = new ASN1EncodableVector();
     vector.add(new SlotIdentifier(slotId));
-    vector.add(new NewKeyControl(control));
+    if (control != null) {
+      vector.add(new NewKeyControl(control));
+    }
     vector.add(curveId);
     return new DERSequence(vector);
   }

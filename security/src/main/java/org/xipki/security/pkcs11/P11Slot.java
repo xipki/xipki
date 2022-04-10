@@ -20,6 +20,7 @@ package org.xipki.security.pkcs11;
 import iaik.pkcs.pkcs11.wrapper.Functions;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.EdECConstants;
@@ -352,7 +353,7 @@ public abstract class P11Slot implements Closeable {
           throws P11TokenException;
 
   /**
-   * Generates a DSA keypair.
+   * Generates a DSA keypair on-the-fly.
    *
    * @param p
    *          p of DSA. Must not be {@code null}.
@@ -388,6 +389,19 @@ public abstract class P11Slot implements Closeable {
           throws P11TokenException;
 
   /**
+   * Generates an EC Edwards keypair on-the-fly.
+   *
+   * @param curveId
+   *         Object Identifier of the curve. Must not be {@code null}.
+   * @return the ASN.1 keypair.
+   * @throws P11TokenException
+   *         if PKCS#11 token exception occurs.
+   */
+  // CHECKSTYLE:SKIP
+  protected abstract PrivateKeyInfo generateECEdwardsKeypairOtf0(ASN1ObjectIdentifier curveId)
+      throws P11TokenException;
+
+  /**
    * Generates an EC Montgomery keypair.
    *
    * @param curveId
@@ -402,6 +416,19 @@ public abstract class P11Slot implements Closeable {
   protected abstract P11Identity generateECMontgomeryKeypair0(ASN1ObjectIdentifier curveId,
       P11NewKeyControl control)
           throws P11TokenException;
+
+  /**
+   * Generates an EC Montgomery keypair on-the-fly.
+   *
+   * @param curveId
+   *         Object Identifier of the curve. Must not be {@code null}.
+   * @return the ASN.1 keypair.
+   * @throws P11TokenException
+   *         if PKCS#11 token exception occurs.
+   */
+  // CHECKSTYLE:SKIP
+  protected abstract PrivateKeyInfo generateECMontgomeryKeypairOtf0(ASN1ObjectIdentifier curveId)
+      throws P11TokenException;
 
   /**
    * Generates an EC keypair.
@@ -420,6 +447,19 @@ public abstract class P11Slot implements Closeable {
           throws P11TokenException;
 
   /**
+   * Generates an EC keypair over-the-air.
+   *
+   * @param curveId
+   *         Object identifier of the EC curve. Must not be {@code null}.
+   * @return the ASN.1 encoded keypair.
+   * @throws P11TokenException
+   *         if PKCS#11 token exception occurs.
+   */
+  // CHECKSTYLE:SKIP
+  protected abstract PrivateKeyInfo generateECKeypairOtf0(ASN1ObjectIdentifier curveId)
+      throws P11TokenException;
+
+  /**
    * Generates an SM2p256v1 keypair.
    *
    * @param control
@@ -430,6 +470,17 @@ public abstract class P11Slot implements Closeable {
    */
   // CHECKSTYLE:SKIP
   protected abstract P11Identity generateSM2Keypair0(P11NewKeyControl control)
+      throws P11TokenException;
+
+  /**
+   * Generates an SM2p256v1 keypair on-the-fly.
+   *
+   * @return the ASN.1 encoded keypair.
+   * @throws P11TokenException
+   *         if PKCS#11 token exception occurs.
+   */
+  // CHECKSTYLE:SKIP
+  protected abstract PrivateKeyInfo generateSM2KeypairOtf0()
       throws P11TokenException;
 
   /**
@@ -1033,6 +1084,32 @@ public abstract class P11Slot implements Closeable {
   }
 
   /**
+   * Generates an RSA keypair on the fly.
+   *
+   * @param keysize
+   *          key size in bit
+   * @param publicExponent
+   *          RSA public exponent. Could be {@code null}.
+   * @return the ASN.1 keypair.
+   * @throws P11TokenException
+   *         if PKCS#11 token exception occurs.
+   */
+  // CHECKSTYLE:SKIP
+  public PrivateKeyInfo generateRSAKeypairOtf(int keysize, BigInteger publicExponent)
+      throws P11TokenException {
+    min(keysize, "keysize", 1024);
+    if (keysize % 1024 != 0) {
+      throw new IllegalArgumentException("key size is not multiple of 1024: " + keysize);
+    }
+
+    assertMechanismSupported(PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN);
+    return generateRSAKeypairOtf0(keysize, publicExponent);
+  }
+
+  protected abstract PrivateKeyInfo generateRSAKeypairOtf0(int keysize, BigInteger publicExponent)
+      throws P11TokenException;
+
+  /**
    * Generates an RSA keypair.
    *
    * @param keysize
@@ -1067,6 +1144,33 @@ public abstract class P11Slot implements Closeable {
   } // method generateRSAKeypair
 
   /**
+   * Generates a DSA keypair on-the-fly.
+   *
+   * @param p
+   *          p of DSA. Must not be {@code null}.
+   * @param q
+   *          q of DSA. Must not be {@code null}.
+   * @param g
+   *          g of DSA. Must not be {@code null}.
+   * @return the ASN.1 keypair.
+   * @throws P11TokenException
+   *         if PKCS#11 token exception occurs.
+   */
+  // CHECKSTYLE:SKIP
+  public PrivateKeyInfo generateDSAKeypairOtf(BigInteger p, BigInteger q, BigInteger g)
+      throws P11TokenException {
+    notNull(p, "p");
+    notNull(q, "q");
+    notNull(g, "g");
+    assertMechanismSupported(PKCS11Constants.CKM_DSA_KEY_PAIR_GEN);
+    return generateDSAKeypairOtf0(p, q, g);
+  } // method generateDSAKeypairOtf
+
+  protected abstract PrivateKeyInfo generateDSAKeypairOtf0(
+      BigInteger p, BigInteger q, BigInteger g)
+      throws P11TokenException;
+
+  /**
    * Generates a DSA keypair.
    *
    * @param plength
@@ -1086,14 +1190,8 @@ public abstract class P11Slot implements Closeable {
     if (plength % 1024 != 0) {
       throw new IllegalArgumentException("key size is not multiple of 1024: " + plength);
     }
-    assertCanGenKeypair("generateDSAKeypair", PKCS11Constants.CKM_DSA_KEY_PAIR_GEN, control);
     DSAParameterSpec dsaParams = DSAParameterCache.getDSAParameterSpec(plength, qlength, random);
-    P11Identity identity = generateDSAKeypair0(dsaParams.getP(), dsaParams.getQ(), dsaParams.getG(),
-        control);
-    addIdentity(identity);
-    P11IdentityId id = identity.getId();
-    LOG.info("generated DSA keypair {}", id);
-    return id;
+    return generateDSAKeypair(dsaParams.getP(), dsaParams.getQ(), dsaParams.getG(), control);
   } // method generateDSAKeypair
 
   /**
@@ -1125,6 +1223,32 @@ public abstract class P11Slot implements Closeable {
     LOG.info("generated DSA keypair {}", id);
     return id;
   } // method generateDSAKeypair
+
+  /**
+   * Generates an EC keypair on-the-fly.
+   *
+   * @param curveOid
+   *         Object identifier of the EC curve. Must not be {@code null}.
+   * @return the ASN.1 keypair.
+   * @throws P11TokenException
+   *         if PKCS#11 token exception occurs.
+   */
+  // CHECKSTYLE:SKIP
+  public PrivateKeyInfo generateECKeypairOtf(ASN1ObjectIdentifier curveOid)
+      throws P11TokenException {
+    notNull(curveOid, "curveOid");
+
+    if (EdECConstants.isEdwardsCurve(curveOid)) {
+      assertMechanismSupported(PKCS11Constants.CKM_EC_EDWARDS_KEY_PAIR_GEN);
+      return generateECEdwardsKeypairOtf0(curveOid);
+    } else if (EdECConstants.isMontgomeryCurve(curveOid)) {
+      assertMechanismSupported(PKCS11Constants.CKM_EC_MONTGOMERY_KEY_PAIR_GEN);
+      return generateECMontgomeryKeypairOtf0(curveOid);
+    } else {
+      assertMechanismSupported(PKCS11Constants.CKM_EC_KEY_PAIR_GEN);
+      return generateECKeypairOtf0(curveOid);
+    }
+  }
 
   /**
    * Generates an EC keypair.
@@ -1163,56 +1287,18 @@ public abstract class P11Slot implements Closeable {
   } // method generateECKeypair
 
   /**
-   * Generates an EC Edwards keypair.
+   * Generates an SM2 keypair on the fly.
    *
-   * @param curveOid
-   *         Object Identifier of the EdEC curve as defined in RFC 8410. Must not be {@code null}.
-   * @param control
-   *          Control of the key generation process. Must not be {@code null}.
-   * @return the identifier of the identity within the PKCS#P11 token.
+   * @return the ASN.1 keypair.
    * @throws P11TokenException
    *         if PKCS#11 token exception occurs.
    */
   // CHECKSTYLE:SKIP
-  public P11IdentityId generateECEdwardsKeypair(ASN1ObjectIdentifier curveOid,
-      P11NewKeyControl control)
-          throws P11TokenException {
-    notNull(curveOid, "curveOid");
-
-    assertCanGenKeypair("generateECEdwardsKeypair0",
-        PKCS11Constants.CKM_EC_EDWARDS_KEY_PAIR_GEN, control);
-    P11Identity identity = generateECEdwardsKeypair0(curveOid, control);
-    addIdentity(identity);
-    P11IdentityId id = identity.getId();
-    LOG.info("generated EC Edwards keypair {}", id);
-    return id;
-  } // method generateECEdwardsKeypair
-
-  /**
-   * Generates an EC Montgomery keypair.
-   *
-   * @param curveOid
-   *         Object Identifier of the EdEC curve as defined in RFC 8410. Must not be {@code null}.
-   * @param control
-   *          Control of the key generation process. Must not be {@code null}.
-   * @return the identifier of the identity within the PKCS#P11 token.
-   * @throws P11TokenException
-   *         if PKCS#11 token exception occurs.
-   */
-  // CHECKSTYLE:SKIP
-  public P11IdentityId generateECMontgomeryKeypair(ASN1ObjectIdentifier curveOid,
-      P11NewKeyControl control)
-          throws P11TokenException {
-    notNull(curveOid, "curveOid");
-
-    assertCanGenKeypair("generateECMontgomeryKeypair",
-        PKCS11Constants.CKM_EC_MONTGOMERY_KEY_PAIR_GEN, control);
-    P11Identity identity = generateECMontgomeryKeypair0(curveOid, control);
-    addIdentity(identity);
-    P11IdentityId id = identity.getId();
-    LOG.info("generated EC Montgomery keypair {}", id);
-    return id;
-  } // method generateECMontgomeryKeypair
+  public PrivateKeyInfo generateSM2KeypairOtf()
+      throws P11TokenException {
+    assertMechanismSupported(PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN);
+    return generateSM2KeypairOtf0();
+  }
 
   /**
    * Generates an SM2 keypair.

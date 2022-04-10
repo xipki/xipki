@@ -72,7 +72,7 @@ public class KeypairGenEntry extends MgmtEntry {
 
   private final String type;
 
-  private String conf;
+  private final String conf;
 
   private boolean faulty;
 
@@ -90,10 +90,6 @@ public class KeypairGenEntry extends MgmtEntry {
     return type;
   }
 
-  public void setConf(String conf) {
-    this.conf = conf;
-  }
-
   public String getConf() {
     return conf;
   }
@@ -108,14 +104,10 @@ public class KeypairGenEntry extends MgmtEntry {
 
   @Override
   public String toString() {
-    return toString(false);
+    return toString(true);
   }
 
-  public String toString(boolean verbose) {
-    return toString(verbose, true);
-  }
-
-  public String toString(boolean verbose, boolean ignoreSensitiveInfo) {
+  public String toString(boolean ignoreSensitiveInfo) {
     StringBuilder sb = new StringBuilder(1000);
     sb.append("name: ").append(name).append('\n');
     sb.append("faulty: ").append(isFaulty()).append('\n');

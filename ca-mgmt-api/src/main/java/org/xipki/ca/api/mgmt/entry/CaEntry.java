@@ -94,7 +94,7 @@ public class CaEntry extends MgmtEntry {
 
   private boolean saveKeypair;
 
-  private boolean saveCert;
+  private boolean saveCert = true;
 
   private ValidityMode validityMode = ValidityMode.STRICT;
 

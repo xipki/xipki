@@ -17,6 +17,13 @@
 			"value":"password=1234,keystore=file:${keycerts.dir}/tlskeys/server/tls-server.p12,algo=REPLACEME-CMP_SIGALGO"
 		}
 	}],
+	"keypairGens":[{
+		"name":"pkcs11",
+		"type":"pkcs11",
+		"conf":{
+			"value":"slot=0,keyspecs=RSA:DSA:EC:SM2:ED25519:ED448:X25519:X448"
+		}
+	}],
 	"requestors":[{
 		"name":"requestor1",
 		"type":"cert",
@@ -157,6 +164,36 @@
 			"file":"${profiles.dir}/certprofile-tls.json"
 		}
 	},{
+		"name":"tls-dsa",
+		"type":"xijson",
+		"conf":{
+			"file":"${profiles.dir}/certprofile-tls-dsa.json"
+		}
+	},{
+		"name":"tls-ec",
+		"type":"xijson",
+		"conf":{
+			"file":"${profiles.dir}/certprofile-tls-ec.json"
+		}
+	},{
+		"name":"tls-ed25519",
+		"type":"xijson",
+		"conf":{
+			"file":"${profiles.dir}/certprofile-tls-ed25519.json"
+		}
+	},{
+		"name":"tls-rsa",
+		"type":"xijson",
+		"conf":{
+			"file":"${profiles.dir}/certprofile-tls-rsa.json"
+		}
+	},{
+		"name":"tls-sm2",
+		"type":"xijson",
+		"conf":{
+			"file":"${profiles.dir}/certprofile-tls-sm2.json"
+		}
+	},{
 		"name":"tlsa",
 		"type":"xijson",
 		"conf":{
@@ -227,8 +264,6 @@
 			},
 			"cmpResponderName":"responder1",
 			"keypairGenNames": ["software"],
-			"duplicateKey":true,
-			"duplicateSubject":true,
 			"expirationPeriod":365,
 			"genSelfIssued":{
 				"certOutform":"REPLACEME-OUTFORM",
@@ -241,8 +276,7 @@
 			"nextCrlNo":2,
 			"permissions":["all"],
 			"protocolSupport":["cmp","rest"],
-			"saveCert": true,
-			"saveReq":true,
+			"saveRequest":true,
 			"saveKeypair": true,
 			"signerType":"${token.type}",
 			"signerConf":{

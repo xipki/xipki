@@ -19,11 +19,15 @@ package org.xipki.security.pkcs11.emulator;
 
 import iaik.pkcs.pkcs11.wrapper.Functions;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.DSAParameter;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.ECNamedCurveTable;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
@@ -37,9 +41,11 @@ import org.slf4j.LoggerFactory;
 import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
+import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.*;
 import org.xipki.security.pkcs11.P11ModuleConf.P11MechanismFilter;
 import org.xipki.security.pkcs11.P11ModuleConf.P11NewObjectConf;
+import org.xipki.security.util.DSAParameterCache;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.LogUtil;
@@ -55,13 +61,8 @@ import java.math.BigInteger;
 import java.nio.file.Files;
 import java.security.*;
 import java.security.cert.CertificateException;
-import java.security.interfaces.DSAPublicKey;
-import java.security.interfaces.ECPublicKey;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.DSAPublicKeySpec;
-import java.security.spec.ECParameterSpec;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.RSAPublicKeySpec;
+import java.security.interfaces.*;
+import java.security.spec.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -890,6 +891,18 @@ class EmulatorP11Slot extends P11Slot {
   } // method generateRSAKeypair0
 
   @Override
+  protected PrivateKeyInfo generateRSAKeypairOtf0(int keysize, BigInteger publicExponent)
+      throws P11TokenException {
+    try {
+      KeyPair kp = KeyUtil.generateRSAKeypair(keysize, publicExponent, random);
+      return KeyUtil.toPrivateKeyInfo((RSAPrivateCrtKey) kp.getPrivate());
+    } catch (NoSuchAlgorithmException | NoSuchProviderException
+        | InvalidAlgorithmParameterException | IOException ex) {
+      throw new P11TokenException(ex.getMessage(), ex);
+    }
+  }
+
+  @Override
   // CHECKSTYLE:SKIP
   protected P11Identity generateDSAKeypair0(BigInteger p, BigInteger q, BigInteger g,
       P11NewKeyControl control)
@@ -906,9 +919,35 @@ class EmulatorP11Slot extends P11Slot {
   } // method generateDSAKeypair0
 
   @Override
+  protected PrivateKeyInfo generateDSAKeypairOtf0(BigInteger p, BigInteger q, BigInteger g)
+      throws P11TokenException {
+    DSAParameters spec = new DSAParameters(p, q, g);
+    try {
+      KeyPair kp = KeyUtil.generateDSAKeypair(spec, random);
+      DSAParameter parameter = new DSAParameter(spec.getP(), spec.getQ(), spec.getG());
+      AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_dsa, parameter);
+
+      byte[] publicKey = new ASN1Integer(((DSAPublicKey) kp.getPublic()).getY()).getEncoded();
+
+      // DSA private keys are represented as BER-encoded ASN.1 type INTEGER.
+      DSAPrivateKey priv = (DSAPrivateKey) kp.getPrivate();
+      return new PrivateKeyInfo(algId, new ASN1Integer(priv.getX()), null, publicKey);
+    } catch (NoSuchAlgorithmException | NoSuchProviderException
+        | InvalidAlgorithmParameterException | IOException ex) {
+      throw new P11TokenException(ex.getMessage(), ex);
+    }
+  }
+
+  @Override
   protected P11Identity generateSM2Keypair0(P11NewKeyControl control)
       throws P11TokenException {
     return generateECKeypair0(GMObjectIdentifiers.sm2p256v1, control);
+  }
+
+  @Override
+  protected PrivateKeyInfo generateSM2KeypairOtf0()
+      throws P11TokenException {
+    return generateECKeypairOtf0(GMObjectIdentifiers.sm2p256v1);
   }
 
   @Override
@@ -930,6 +969,18 @@ class EmulatorP11Slot extends P11Slot {
   } // method generateECEdwardsKeypair0
 
   @Override
+  protected PrivateKeyInfo generateECEdwardsKeypairOtf0(ASN1ObjectIdentifier curveId)
+      throws P11TokenException {
+    try {
+      KeyPair kp = KeyUtil.generateEdECKeypair(curveId, random);
+      return PrivateKeyInfo.getInstance(kp.getPrivate().getEncoded());
+    } catch (NoSuchAlgorithmException | NoSuchProviderException
+        | InvalidAlgorithmParameterException ex) {
+      throw new P11TokenException(ex.getMessage(), ex);
+    }
+  }
+
+  @Override
   protected P11Identity generateECMontgomeryKeypair0(ASN1ObjectIdentifier curveOid,
       P11NewKeyControl control)
           throws P11TokenException {
@@ -948,6 +999,18 @@ class EmulatorP11Slot extends P11Slot {
   } // method generateECMontgomeryKeypair0
 
   @Override
+  protected PrivateKeyInfo generateECMontgomeryKeypairOtf0(ASN1ObjectIdentifier curveId)
+      throws P11TokenException {
+    try {
+      KeyPair kp = KeyUtil.generateEdECKeypair(curveId, random);
+      return PrivateKeyInfo.getInstance(kp.getPrivate().getEncoded());
+    } catch (NoSuchAlgorithmException | NoSuchProviderException
+        | InvalidAlgorithmParameterException ex) {
+      throw new P11TokenException(ex.getMessage(), ex);
+    }
+  }
+
+  @Override
   protected P11Identity generateECKeypair0(ASN1ObjectIdentifier curveId,
       P11NewKeyControl control)
           throws P11TokenException {
@@ -960,6 +1023,29 @@ class EmulatorP11Slot extends P11Slot {
     }
     return saveP11Entity(keypair, control);
   } // method generateECKeypair0
+
+  @Override
+  protected PrivateKeyInfo generateECKeypairOtf0(ASN1ObjectIdentifier curveId)
+      throws P11TokenException {
+    try {
+      AlgorithmIdentifier keyAlgId =
+          new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, curveId);
+
+      KeyPair kp = KeyUtil.generateECKeypair(curveId, random);
+      ECPublicKey pub = (ECPublicKey) kp.getPublic();
+      int orderBitLength = pub.getParams().getOrder().bitLength();
+
+      byte[] publicKey = KeyUtil.getUncompressedEncodedECPoint(pub.getW(), orderBitLength);
+
+      ECPrivateKey priv = (ECPrivateKey) kp.getPrivate();
+      return new PrivateKeyInfo(keyAlgId,
+          new org.bouncycastle.asn1.sec.ECPrivateKey(
+              orderBitLength, priv.getS(), new DERBitString(publicKey), null));
+    } catch (IOException | NoSuchAlgorithmException | NoSuchProviderException
+        | InvalidAlgorithmParameterException ex) {
+      throw new P11TokenException(ex.getMessage(), ex);
+    }
+  }
 
   private P11Identity saveP11Entity(KeyPair keypair, P11NewObjectControl control)
       throws P11TokenException {

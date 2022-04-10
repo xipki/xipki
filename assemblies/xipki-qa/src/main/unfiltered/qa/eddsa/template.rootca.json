@@ -108,8 +108,7 @@
 				"popo.sigalgo":"Ed25519:Ed448:DHPOP-X25519:DHPOP-X448"
 			},
 			"cmpResponderName":"responder1",
-			"duplicateKey":true,
-			"duplicateSubject":true,
+			"keypairGenNames":["software"],
 			"expirationPeriod":365,
 			"genSelfIssued":{
 				"subject":"REPLACEME-SUBJECT",
@@ -121,7 +120,7 @@
 			"nextCrlNo":2,
 			"permissions":["all"],
 			"protocolSupport":["cmp","rest"],
-			"saveReq":true,
+			"saveRequest":true,
 			"signerType":"${token.type}",
 			"signerConf":{
 				"value":"${ca.signerConf}"

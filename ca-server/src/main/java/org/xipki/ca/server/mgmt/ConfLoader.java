@@ -611,7 +611,7 @@ class ConfLoader {
           }
 
           caInfoType.setSaveCert(entry.isSaveCert());
-          caInfoType.setSaveReq(entry.isSaveRequest());
+          caInfoType.setSaveRequest(entry.isSaveRequest());
           caInfoType.setSaveKeyPair(entry.isSaveKeypair());
 
           if (entry.getScepControl() != null) {

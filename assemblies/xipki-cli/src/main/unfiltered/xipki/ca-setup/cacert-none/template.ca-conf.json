@@ -12,6 +12,7 @@
 			"value":"password=1234,keystore=file:xipki/keycerts/tlskeys/server/tls-server.p12,algo=SHA256withECDSA"
 		}
 	}],
+	"keypairGens":[],
 	"requestors":[{
 		"name":"requestor1",
 		"type":"cert",
@@ -107,8 +108,6 @@
 				"overlap":"3d",
 				"interval.time":"02:00"
 			},
-			"duplicateKey":true,
-			"duplicateSubject":true,
 			"expirationPeriod":365,
 			"genSelfIssued":{
 				"certOutform":"der",
@@ -122,7 +121,7 @@
 			"permissions":["all"],
 			"protocolSupport":["cmp","rest","scep"],
 			"saveCert": true,
-			"saveReq":false,
+			"saveRequest":false,
 			"saveKeypair":false,
 			"scepControl":{
 				"cacert.included":true,

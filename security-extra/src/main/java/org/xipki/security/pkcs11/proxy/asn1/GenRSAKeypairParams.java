@@ -32,7 +32,7 @@ import java.math.BigInteger;
  * <pre>
  * GenRSAKeypairParams ::= SEQUENCE {
  *     slotId               P11SlotIdentifier,
- *     control              NewKeyControl,
+ *     control              NewKeyControl OPTIONAL,
  *     keysize              INTEGER,
  *     publicExponent       INTEGER OPTIONAL }
  * </pre>
@@ -53,22 +53,33 @@ public class GenRSAKeypairParams extends ProxyMessage {
   public GenRSAKeypairParams(P11SlotIdentifier slotId,
       P11NewKeyControl control, int keysize, BigInteger publicExponent) {
     this.slotId = Args.notNull(slotId, "slotId");
-    this.control = Args.notNull(control, "control");
+    this.control = control;
     this.keysize = Args.min(keysize, "keysize", 1);
     this.publicExponent = publicExponent;
   }
 
   private GenRSAKeypairParams(ASN1Sequence seq)
       throws BadAsn1ObjectException {
-    requireRange(seq, 3, 4);
+    requireRange(seq, 2, 4);
     final int size = seq.size();
     int idx = 0;
     slotId = SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getValue();
-    control = NewKeyControl.getInstance(seq.getObjectAt(idx++)).getControl();
-    keysize = getInteger(seq.getObjectAt(idx++)).intValue();
-    Args.min(keysize, "keysize", 1);
 
-    publicExponent = (size > 3) ? getInteger(seq.getObjectAt(idx++)) : null;
+    ASN1Primitive asn1 = seq.getObjectAt(idx++).toASN1Primitive();
+    int ksize = 0;
+    if (asn1 instanceof ASN1Sequence) {
+      control = NewKeyControl.getInstance(asn1).getControl();
+    } else {
+      ksize = getInteger(asn1).intValue();
+      control = null;
+    }
+
+    if (control != null) {
+      ksize = getInteger(seq.getObjectAt(idx++)).intValue();
+    }
+    keysize = Args.min(ksize, "keysize", 1);
+
+    publicExponent = (size > idx) ? getInteger(seq.getObjectAt(idx++)) : null;
   }
 
   public static GenRSAKeypairParams getInstance(Object obj)
@@ -94,7 +105,9 @@ public class GenRSAKeypairParams extends ProxyMessage {
   public ASN1Primitive toASN1Primitive() {
     ASN1EncodableVector vector = new ASN1EncodableVector();
     vector.add(new SlotIdentifier(slotId));
-    vector.add(new NewKeyControl(control));
+    if (control != null) {
+      vector.add(new NewKeyControl(control));
+    }
     vector.add(new ASN1Integer(keysize));
     if (publicExponent != null) {
       vector.add(new ASN1Integer(publicExponent));

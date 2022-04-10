@@ -17,9 +17,19 @@
 
 package org.xipki.security;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.xipki.password.PasswordResolver;
+import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.util.ConfPairs;
+import org.xipki.util.StringUtil;
 
 import java.io.Closeable;
+import java.math.BigInteger;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 /**
  * Concurrent keypair generator.
@@ -28,11 +38,21 @@ import java.io.Closeable;
  * @since 5.4.0
  */
 
-public interface KeypairGenerator extends Closeable {
+public abstract class KeypairGenerator implements Closeable {
 
-  String getName();
+  protected String name;
 
-  void setName(String name);
+  protected BigInteger rsaE;
+
+  protected Set<String> keyspecs;
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
 
   /**
    * Initializes me.
@@ -43,21 +63,79 @@ public interface KeypairGenerator extends Closeable {
    * @throws XiSecurityException
    *         if error during the initialization occurs.
    */
-  void initialize(String conf, PasswordResolver passwordResolver)
+  protected void initialize(String conf, PasswordResolver passwordResolver)
+      throws XiSecurityException {
+    ConfPairs pairs = (conf == null) ? null : new ConfPairs(conf);
+    if (pairs != null) {
+      String str = pairs.value("RSA.E");
+      if (StringUtil.isNotBlank(str)) {
+        rsaE = StringUtil.toBigInt(str);
+      }
+    }
+
+    if (rsaE == null) {
+      rsaE = BigInteger.valueOf(0x10001);
+    }
+
+    if (pairs != null) {
+      String str = pairs.value("keyspecs");
+      if (StringUtil.isNotBlank(str)) {
+        Set<String> tokens = StringUtil.splitAsSet(str.toUpperCase(Locale.ROOT), ": \t");
+        keyspecs = new HashSet<>();
+        for (String token : tokens) {
+          if (token.indexOf('/') != -1) {
+            keyspecs.add(token);
+          } else {
+            switch (token) {
+              case "RSA":
+                for (int i = 2; i < 9; i++) {
+                  keyspecs.add("RSA/" + (i * 1024));
+                }
+                break;
+              case "DSA":
+                keyspecs.add("DSA/1024/160");
+                keyspecs.add("DSA/2048/224");
+                keyspecs.add("DSA/2048/256");
+                keyspecs.add("DSA/3072/256");
+                break;
+              case "EC":
+                List<String> curveNames = AlgorithmUtil.getECCurveNames();
+                for (String curveName : curveNames) {
+                  ASN1ObjectIdentifier curveId =
+                      AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName);
+                  if (curveId != null) {
+                    String keyspec = "EC/" + curveId.getId();
+                    keyspecs.add(keyspec);
+                  }
+                }
+                break;
+              default:
+                keyspecs.add(token);
+            }
+          }
+        }
+      }
+    }
+
+    initialize0(pairs, passwordResolver);
+  }
+
+  protected abstract void initialize0(ConfPairs conf, PasswordResolver passwordResolver)
       throws XiSecurityException;
 
-  boolean supports(String keyspec);
+  public boolean supports(String keyspec) {
+    return keyspec != null
+        && (keyspecs == null || keyspecs.contains(keyspec.toUpperCase(Locale.ROOT)));
+  }
 
   /**
-   * Generate keypair for the given keyspec.
+   * Generate keypair for the given keyspec as defined in RFC 5958.
    *
    * @param keyspec
    *         Key specification. It has the following format:
    *         <ul>
-   *         <li>RSA:   'RSA/'&lt;bit-length&gt; or 'RSA/'&lt;bit-length&gt;'/0x'
-   *                    &lt;public exponent in hex&gt;</li>
-   *         <li>DSA:   'DSA/'&lt;bit-lenth of P&gt;'/'&lt;bit-lenth of Q&gt;, or
-   *                  'DSA/0x'&lt;P in hex&gt;'/0x'&lt;Q in hex&gt;'/0x'&lt;G in hex&gt;</li>
+   *         <li>RSA:   'RSA/'&lt;bit-length&gt; or 'RSA/'&lt;bit-length&gt;</li>
+   *         <li>DSA:   'DSA/'&lt;bit-lenth of P&gt;'/'&lt;bit-lenth of Q&gt;</li>
    *         <li>EC:    'EC/'&lt;curve OID&gt;</li>
    *         <li>EdDSA: 'ED25519' or 'ED448'</li>
    *         <li>XDH:   'X25519' or 'X448'</li>
@@ -66,9 +144,9 @@ public interface KeypairGenerator extends Closeable {
    * @throws XiSecurityException
    *         if could not generated keypair.
    */
-  KeypairGenResult generateKeypair(String keyspec)
+  public abstract PrivateKeyInfo generateKeypair(String keyspec)
       throws XiSecurityException;
 
-  boolean isHealthy();
+  public abstract boolean isHealthy();
 
 }

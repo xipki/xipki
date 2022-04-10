@@ -21,6 +21,7 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.security.BadAsn1ObjectException;
 import org.xipki.security.X509Cert;
@@ -185,6 +186,23 @@ public class ProxyP11Slot extends P11Slot {
   }
 
   @Override
+  protected PrivateKeyInfo generateRSAKeypairOtf0(int keysize, BigInteger publicExponent)
+      throws P11TokenException {
+    GenRSAKeypairParams asn1 = new GenRSAKeypairParams(
+        slotId, null, keysize, publicExponent);
+    byte[] resp = module.send(P11ProxyConstants.ACTION_GEN_KEYPAIR_RSA_OTF, asn1);
+    return parseGenerateKeypairOtfResult(resp);
+  }
+
+  @Override
+  protected PrivateKeyInfo generateDSAKeypairOtf0(BigInteger p, BigInteger q, BigInteger g)
+      throws P11TokenException {
+    GenDSAKeypairParams asn1 = new GenDSAKeypairParams(slotId, null, p, q, g);
+    byte[] resp = module.send(P11ProxyConstants.ACTION_GEN_KEYPAIR_DSA_OTF, asn1);
+    return parseGenerateKeypairOtfResult(resp);
+  }
+
+  @Override
   protected void removeIdentity0(P11IdentityId identityId)
       throws P11TokenException {
     ASN1Object req =  new SlotIdAndObjectId(asn1SlotId,
@@ -266,37 +284,70 @@ public class ProxyP11Slot extends P11Slot {
   }
 
   @Override
+  protected PrivateKeyInfo generateECKeypairOtf0(ASN1ObjectIdentifier curveId)
+      throws P11TokenException {
+    GenECKeypairParams asn1 = new GenECKeypairParams(slotId, null, curveId);
+    byte[] resp = module.send(P11ProxyConstants.ACTION_GEN_KEYPAIR_EC_OTF, asn1);
+    return parseGenerateKeypairOtfResult(resp);
+  }
+
+  @Override
   protected P11Identity generateECEdwardsKeypair0(ASN1ObjectIdentifier curveOid,
       P11NewKeyControl control)
           throws P11TokenException {
-    GenECEdwardsOrMontgomeryKeypairParams asn1 =
-        new GenECEdwardsOrMontgomeryKeypairParams(slotId, control, curveOid);
+    GenECKeypairParams asn1 = new GenECKeypairParams(slotId, control, curveOid);
     byte[] resp = module.send(P11ProxyConstants.ACTION_GEN_KEYPAIR_EC_EDWARDS, asn1);
     return parseGenerateKeypairResult(resp);
+  }
+
+  @Override
+  protected PrivateKeyInfo generateECEdwardsKeypairOtf0(ASN1ObjectIdentifier curveId)
+      throws P11TokenException {
+    GenECKeypairParams asn1 = new GenECKeypairParams(slotId, null, curveId);
+    byte[] resp = module.send(P11ProxyConstants.ACTION_GEN_KEYPAIR_EC_EDWARDS_OTF, asn1);
+    return parseGenerateKeypairOtfResult(resp);
   }
 
   @Override
   protected P11Identity generateECMontgomeryKeypair0(ASN1ObjectIdentifier curveOid,
       P11NewKeyControl control)
           throws P11TokenException {
-    GenECEdwardsOrMontgomeryKeypairParams asn1 =
-        new GenECEdwardsOrMontgomeryKeypairParams(slotId, control, curveOid);
-    byte[] resp = module.send(P11ProxyConstants.ACTION_GEN_KEYPAIR_EC, asn1);
+    GenECKeypairParams asn1 = new GenECKeypairParams(slotId, control, curveOid);
+    byte[] resp = module.send(P11ProxyConstants.ACTION_GEN_KEYPAIR_EC_MONTGOMERY, asn1);
     return parseGenerateKeypairResult(resp);
+  }
+
+  @Override
+  protected PrivateKeyInfo generateECMontgomeryKeypairOtf0(ASN1ObjectIdentifier curveId)
+      throws P11TokenException {
+    GenECKeypairParams asn1 = new GenECKeypairParams(slotId, null, curveId);
+    byte[] resp = module.send(P11ProxyConstants.ACTION_GEN_KEYPAIR_EC_MONTGOMERY_OTF, asn1);
+    return parseGenerateKeypairOtfResult(resp);
   }
 
   @Override
   protected P11Identity generateSM2Keypair0(P11NewKeyControl control)
       throws P11TokenException {
-    GenSM2KeypairParams asn1 =
-        new GenSM2KeypairParams(slotId, control);
+    GenSM2KeypairParams asn1 = new GenSM2KeypairParams(slotId, control);
     byte[] resp = module.send(P11ProxyConstants.ACTION_GEN_KEYPAIR_SM2, asn1);
     return parseGenerateKeypairResult(resp);
+  }
+
+  @Override
+  protected PrivateKeyInfo generateSM2KeypairOtf0() throws P11TokenException {
+    GenSM2KeypairParams asn1 = new GenSM2KeypairParams(slotId, null);
+    byte[] resp = module.send(P11ProxyConstants.ACTION_GEN_KEYPAIR_SM2, asn1);
+    return parseGenerateKeypairOtfResult(resp);
   }
 
   private P11Identity parseGenerateKeypairResult(byte[] resp)
       throws P11TokenException {
     return parseGenerateKeyResult(resp, true);
+  }
+
+  private PrivateKeyInfo parseGenerateKeypairOtfResult(byte[] resp)
+      throws P11TokenException {
+    return PrivateKeyInfo.getInstance(resp);
   }
 
   private P11Identity parseGenerateSecretKeyResult(byte[] resp)

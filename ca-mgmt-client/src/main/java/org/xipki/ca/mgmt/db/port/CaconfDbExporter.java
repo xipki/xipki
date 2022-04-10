@@ -253,11 +253,6 @@ class CaconfDbExporter extends DbPorter {
 
       while (rs.next()) {
         String name = rs.getString("NAME");
-        if ("software".equalsIgnoreCase(name)) {
-          // will be added during the database initialization
-          continue;
-        }
-
         CaCertstore.NameTypeConf entry = new CaCertstore.NameTypeConf();
         entry.setName(name);
         entry.setType(rs.getString("TYPE"));

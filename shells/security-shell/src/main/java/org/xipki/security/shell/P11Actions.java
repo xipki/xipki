@@ -35,6 +35,7 @@ import org.xipki.security.pkcs11.P11Slot.P11NewObjectControl;
 import org.xipki.security.shell.Actions.CsrGenAction;
 import org.xipki.security.shell.Actions.SecurityAction;
 import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.security.util.DSAParameterCache;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
@@ -314,18 +315,15 @@ public class P11Actions {
       P11IdentityId identityId;
 
       ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(curveName);
-      if (curveOid != null) {
-        if (EdECConstants.isEdwardsCurve(curveOid)) {
-          identityId = slot.generateECEdwardsKeypair(curveOid, control);
-        } else {
-          // Montegomery Curve
-          identityId = slot.generateECMontgomeryKeypair(curveOid, control);
-        }
-      } else {
+      if (curveOid == null) {
         curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName);
-        identityId = slot.generateECKeypair(curveOid, control);
       }
 
+      if (curveOid == null) {
+        throw new Exception("unknown curve " + curveName);
+      }
+
+      identityId = slot.generateECKeypair(curveOid, control);
       finalize("EC", identityId);
       return null;
     }

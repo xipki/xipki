@@ -137,22 +137,6 @@ public class CaCompleters {
   } // class ProfileNameCompleter
 
   @Service
-  public static class KeypairGenNameOmitSoftwareCompleter extends CaMgmtCompleter {
-
-    @Override
-    protected Set<String> getEnums() {
-      try {
-        Set<String> enums = new HashSet<>(caManager.getKeypairGenNames());
-        enums.remove("software");
-        return enums;
-      } catch (CaMgmtException ex) {
-        return Collections.emptySet();
-      }
-    }
-
-  } // class ProfileNameCompleter
-
-  @Service
   public static class KeypairGenTypeCompleter extends EnumCompleter {
 
     public KeypairGenTypeCompleter() {

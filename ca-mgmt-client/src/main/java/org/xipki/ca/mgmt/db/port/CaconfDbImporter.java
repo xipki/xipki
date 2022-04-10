@@ -279,13 +279,32 @@ class CaconfDbImporter extends DbPorter {
       System.out.println(" imported table KEYPAIR_GEN: nothing to import");
       return;
     }
+    final String deleteSql = "DELETE FROM KEYPAIR_GEN WHERE NAME=?";
     final String sql = "INSERT INTO KEYPAIR_GEN (NAME,TYPE,CONF) VALUES (?,?,?)";
 
     PreparedStatement ps = null;
     try {
+      ps = prepareStatement(deleteSql);
+      for (CaCertstore.NameTypeConf entry : keypairGens) {
+        String name = entry.getName();
+        try {
+          ps.setString(1, name);
+          ps.executeUpdate();
+        } catch (SQLException ex) {
+          System.err.println("could not delete KEYPAIR_GEN with NAME=" + name);
+          throw translate(deleteSql, ex);
+        }
+      }
+    } finally {
+        releaseResources(ps, null);
+    }
+
+    ps = null;
+    try {
       ps = prepareStatement(sql);
 
       for (CaCertstore.NameTypeConf entry : keypairGens) {
+        String name = entry.getName();
         try {
           ps.setString(1, entry.getName());
           ps.setString(2, entry.getType());
@@ -293,7 +312,7 @@ class CaconfDbImporter extends DbPorter {
 
           ps.executeUpdate();
         } catch (SQLException ex) {
-          System.err.println("could not import KEYPAIR_GEN with NAME=" + entry.getName());
+          System.err.println("could not import KEYPAIR_GEN with NAME=" + name);
           throw translate(sql, ex);
         }
       }

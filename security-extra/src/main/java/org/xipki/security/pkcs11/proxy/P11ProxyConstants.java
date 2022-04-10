@@ -104,6 +104,18 @@ public class P11ProxyConstants {
 
   public static final short ACTION_GEN_KEYPAIR_EC_MONTGOMERY = 0x0147;
 
+  public static final short ACTION_GEN_KEYPAIR_RSA_OTF  = 0x0150;
+
+  public static final short ACTION_GEN_KEYPAIR_DSA_OTF   = 0x0151;
+
+  public static final short ACTION_GEN_KEYPAIR_EC_OTF    = 0x0152;
+
+  public static final short ACTION_GEN_KEYPAIR_SM2_OTF   = 0x0153;
+
+  public static final short ACTION_GEN_KEYPAIR_EC_EDWARDS_OTF    = 0x0154;
+
+  public static final short ACTION_GEN_KEYPAIR_EC_MONTGOMERY_OTF = 0x0155;
+
   private static final Map<Short, String> rcMap;
 
   private static final Map<Short, String> actionMap;
@@ -145,6 +157,15 @@ public class P11ProxyConstants {
     actionMap.put(ACTION_UPDATE_CERT,       "ACTION_UPDATE_CERT");
     actionMap.put(ACTION_REMOVE_OBJECTS,    "ACTION_REMOVE_OBJECTS");
     actionMap.put(ACTION_GEN_KEYPAIR_SM2,   "ACTION_GEN_KEYPAIR_SM2");
+    actionMap.put(ACTION_GEN_KEYPAIR_EC_EDWARDS,    "ACTION_GEN_KEYPAIR_EC_EDWARDS");
+    actionMap.put(ACTION_GEN_KEYPAIR_EC_MONTGOMERY, "ACTION_GEN_KEYPAIR_EC_MONTGOMERY");
+
+    actionMap.put(ACTION_GEN_KEYPAIR_RSA_OTF,  "ACTION_GEN_KEYPAIR_RSA_OTF");
+    actionMap.put(ACTION_GEN_KEYPAIR_DSA_OTF,  "ACTION_GEN_KEYPAIR_DSA_OTF");
+    actionMap.put(ACTION_GEN_KEYPAIR_EC_OTF,   "ACTION_GEN_KEYPAIR_EC_OTF");
+    actionMap.put(ACTION_GEN_KEYPAIR_SM2_OTF,  "ACTION_GEN_KEYPAIR_SM2_OTF");
+    actionMap.put(ACTION_GEN_KEYPAIR_EC_EDWARDS_OTF,    "ACTION_GEN_KEYPAIR_EC_EDWARDS_OTF");
+    actionMap.put(ACTION_GEN_KEYPAIR_EC_MONTGOMERY_OTF, "ACTION_GEN_KEYPAIR_EC_MONTGOMERY_OTF");
 
   } // method static
 

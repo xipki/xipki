@@ -15,9 +15,11 @@
  * limitations under the License.
  */
 
-package org.xipki.security.pkcs12;
+package org.xipki.security;
 
-import org.xipki.security.*;
+import org.xipki.security.pkcs11.P11CryptServiceFactory;
+import org.xipki.security.pkcs11.P11KeypairGenerator;
+import org.xipki.security.pkcs12.SoftwareKeypairGenerator;
 import org.xipki.util.ObjectCreationException;
 
 import java.util.*;
@@ -29,14 +31,22 @@ import java.util.*;
  * @since 5.4.0
  */
 
-public class SoftwareKeypairGeneratorFactory implements KeypairGeneratorFactory {
+public class DfltKeypairGeneratorFactory implements KeypairGeneratorFactory {
 
   private static final String TYPE_SOFTWARE = "software";
 
+  private static final String TYPE_PKCS11 = "pkcs11";
+
   private static final Set<String> types = Collections.unmodifiableSet(
-      new HashSet<>(Arrays.asList(TYPE_SOFTWARE)));
+      new HashSet<>(Arrays.asList(TYPE_SOFTWARE, TYPE_PKCS11)));
+
+  private P11CryptServiceFactory p11CryptServiceFactory;
 
   private SecurityFactory securityFactory;
+
+  public void setP11CryptServiceFactory(P11CryptServiceFactory p11CryptServiceFactory) {
+    this.p11CryptServiceFactory = p11CryptServiceFactory;
+  }
 
   public void setSecurityFactory(SecurityFactory securityFactory) {
     this.securityFactory = securityFactory;
@@ -59,7 +69,19 @@ public class SoftwareKeypairGeneratorFactory implements KeypairGeneratorFactory 
     if (!canCreateKeypairGenerator(type)) {
       throw new ObjectCreationException("unknown keypair generator type " + type);
     }
-    return new SoftwareKeypairGenerator(securityFactory.getRandom4Key());
+
+    KeypairGenerator kpGen;
+    if (TYPE_SOFTWARE.equalsIgnoreCase(type)) {
+      kpGen = new SoftwareKeypairGenerator(securityFactory.getRandom4Key());
+    } else { //if (TYPE_PKCS11.equalsIgnoreCase(type)) {
+      kpGen = new P11KeypairGenerator(p11CryptServiceFactory);
+    }
+    try {
+      kpGen.initialize(conf, securityFactory.getPasswordResolver());
+    } catch (XiSecurityException ex) {
+      throw new ObjectCreationException("error initializing keypairGen", ex);
+    }
+    return kpGen;
   }
 
 }

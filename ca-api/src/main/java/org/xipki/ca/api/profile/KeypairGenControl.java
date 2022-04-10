@@ -104,8 +104,6 @@ public abstract class KeypairGenControl {
 
     private final AlgorithmIdentifier keyAlgorithm;
 
-    private final String keyspec;
-
     public ECKeypairGenControl(ASN1ObjectIdentifier curveOid) {
       this(curveOid, null);
     }

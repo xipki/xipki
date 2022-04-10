@@ -77,8 +77,7 @@ public class NewKeyControl extends ProxyMessage {
     this.control = Args.notNull(control, "control");
   }
 
-  private NewKeyControl(ASN1Sequence seq)
-      throws BadAsn1ObjectException {
+  private NewKeyControl(ASN1Sequence seq) {
     final int size = seq.size();
     Args.min(size, "seq.size", 1);
     String label = DERUTF8String.getInstance(seq.getObjectAt(0)).getString();

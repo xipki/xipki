@@ -174,12 +174,12 @@
       <column name="MAX_VALIDITY" type="VARCHAR(45)">
         <constraints nullable="false"/>
       </column>
-      <column name="CRL_CONTROL" type="VARCHAR(1000)"/>
+      <column name="CRL_CONTROL" type="VARCHAR(500)"/>
       <column name="CMP_CONTROL" type="VARCHAR(1000)"/>
       <column name="SCEP_CONTROL" type="VARCHAR(500)"/>
-      <column name="EST_CONTROL" type="VARCHAR(1000)"/>
-      <column name="ACME_CONTROL" type="VARCHAR(1000)"/>
-      <column name="CTLOG_CONTROL" type="VARCHAR(1000)">
+      <column name="EST_CONTROL" type="VARCHAR(500)"/>
+      <column name="ACME_CONTROL" type="VARCHAR(500)"/>
+      <column name="CTLOG_CONTROL" type="VARCHAR(500)">
         <!--remarks="Certificate Transparency Log Control"-->
       </column>
       <column name="REVOKE_SUSPENDED_CONTROL" type="VARCHAR(500)"/>
@@ -213,7 +213,7 @@
       <column name="CERT" type="VARCHAR(6000)">
         <constraints nullable="false"/>
       </column>
-      <column name="DHPOC_CONTROL" type="CLOB">
+      <column name="DHPOC_CONTROL" type="CLOB"><!--TODO: change it to POPO_CONTROL-->
         <!--remarks="Diffie-Hellman Key Agreement PoC Control"-->
       </column>
       <column name="EXTRA_CONTROL" type="CLOB">

@@ -20,6 +20,9 @@ package org.xipki.ca.server;
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
+import org.bouncycastle.asn1.pkcs.RSAPublicKey;
+import org.bouncycastle.asn1.sec.ECPrivateKey;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -48,6 +51,7 @@ import java.math.BigInteger;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import static org.xipki.ca.api.OperationException.ErrorCode.*;
 
@@ -68,7 +72,7 @@ class GrandCertTemplateBuilder {
   private static final long MS_PER_10MINUTES = 300000L;
 
   private final ASN1ObjectIdentifier keyAlgOidByImplicitCA;
-  private final String keyspecByImplictCA;
+  private final String keyspecByImplicitCA;
 
   private final CertStore certstore;
 
@@ -78,7 +82,7 @@ class GrandCertTemplateBuilder {
     this.caInfo = caInfo;
     this.certstore = certstore;
 
-    this.keyspecByImplictCA = caInfo.getCaKeyspec();
+    this.keyspecByImplicitCA = caInfo.getCaKeyspec();
     this.keyAlgOidByImplicitCA = caInfo.getCaKeyAlgId().getAlgorithm();
   }
 
@@ -201,8 +205,10 @@ class GrandCertTemplateBuilder {
 
       if (kg == null || kg instanceof KeypairGenControl.ForbiddenKeypairGenControl) {
         throw new OperationException(BAD_CERT_TEMPLATE, "no public key is specified");
-      } else if (kg instanceof KeypairGenControl.InheritCAKeypairGenControl) {
-        keyspec = keyspecByImplictCA;
+      }
+
+      if (kg instanceof KeypairGenControl.InheritCAKeypairGenControl) {
+        keyspec = keyspecByImplicitCA;
         keyAlgOid = keyAlgOidByImplicitCA;
       } else {
         keyspec = kg.getKeyspec();
@@ -220,14 +226,14 @@ class GrandCertTemplateBuilder {
       }
 
       if (keypairGenerator == null) {
-        throw new OperationException(SYSTEM_FAILURE, "cannot generate keypair " + keyspec);
+        throw new OperationException(SYSTEM_FAILURE,
+            "found no keypair generator for keyspec " + keyspec);
       }
 
       String name = keypairGenerator.getName();
-      KeypairGenResult keypair;
       try {
-        keypair = keypairGenerator.generateKeypair(keyspec);
-        LOG.info("generate keypair with generator {}", name);
+        privateKey = keypairGenerator.generateKeypair(keyspec);
+        LOG.info("generated keypair {} with generator {}", keyspec, name);
       } catch (XiSecurityException ex) {
         String msg = "error generating keypair " + keyspec + " using generator " + name;
         LogUtil.error(LOG, ex, msg);
@@ -235,8 +241,6 @@ class GrandCertTemplateBuilder {
       }
 
       // adapt the algorithm identifier in private key and public key
-      privateKey = keypair.getPrivateKey();
-      grantedPublicKeyInfo = keypair.getPublicKey();
       if (!privateKey.getPrivateKeyAlgorithm().getAlgorithm().equals(keyAlgOid)) {
         ASN1BitString asn1PublicKeyData = privateKey.getPublicKeyData();
         try {
@@ -251,10 +255,52 @@ class GrandCertTemplateBuilder {
         }
       }
 
-      if (!grantedPublicKeyInfo.getAlgorithm().getAlgorithm().equals(keyAlgOid)) {
-        grantedPublicKeyInfo = new SubjectPublicKeyInfo(
-            new AlgorithmIdentifier(keyAlgOid, grantedPublicKeyInfo.getAlgorithm().getParameters()),
-            grantedPublicKeyInfo.getPublicKeyData().getBytes());
+      // construct SubjectPublicKeyInfo
+      String keyType = keyspec.split("/")[0].toUpperCase(Locale.ROOT);
+      byte[] publicKeyData;
+      switch (keyType) {
+        case "RSA": {
+          RSAPrivateKey sk = RSAPrivateKey.getInstance(privateKey.getPrivateKey().getOctets());
+          try {
+            publicKeyData = new RSAPublicKey(sk.getModulus(), sk.getPublicExponent()).getEncoded();
+          } catch (IOException ex) {
+            throw new OperationException(SYSTEM_FAILURE, ex);
+          }
+          break;
+        }
+        case "EC": {
+          ECPrivateKey sk = ECPrivateKey.getInstance(privateKey.getPrivateKey().getOctets());
+          publicKeyData = sk.getPublicKey().getBytes();
+          break;
+        }
+        case "DSA": {
+          publicKeyData = privateKey.getPublicKeyData().getBytes();
+          break;
+        }
+        case "ED25519":
+        case "ED448":
+        case "X25519":
+        case "X448": {
+          ASN1Sequence seq = ASN1Sequence.getInstance(privateKey.getPrivateKey());
+          ASN1TaggedObject taggedObject = ASN1TaggedObject.getInstance(seq.getObjectAt(2));
+          if (taggedObject.getTagNo() == 0) {
+            taggedObject = ASN1TaggedObject.getInstance(seq.getObjectAt(3));
+          }
+
+          publicKeyData = ASN1BitString.getInstance(
+                            taggedObject.getExplicitBaseObject()).getOctets();
+          break;
+        }
+        default:
+          throw new IllegalStateException("unknown key type " + keyType);
+      }
+
+      grantedPublicKeyInfo = new SubjectPublicKeyInfo(privateKey.getPrivateKeyAlgorithm(),
+                              publicKeyData);
+      try {
+        grantedPublicKeyInfo = X509Util.toRfc3279Style(grantedPublicKeyInfo);
+      } catch (InvalidKeySpecException ex) {
+        throw new OperationException(SYSTEM_FAILURE, ex);
       }
     } else {
       // show not reach here
