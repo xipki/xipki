@@ -17,7 +17,7 @@
 			"oid":"1.3.101.113",
 			"description":"ED448"
 		},
-		"keyType":"ed448"
+		"keyType":"ED448"
 	},
 	"signatureAlgorithms":["Ed25519","Ed448"],
 	"keyAlgorithms":[{

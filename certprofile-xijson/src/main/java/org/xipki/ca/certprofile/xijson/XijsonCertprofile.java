@@ -198,7 +198,7 @@ public class XijsonCertprofile extends BaseCertprofile {
       ASN1ObjectIdentifier keyAlgOid = new ASN1ObjectIdentifier(kg.getAlgorithm().getOid());
       Map<String, String> params = kg.getParameters();
 
-      if (keyType == KeyType.rsa) {
+      if (keyType == KeyType.RSA) {
         int keySize = Integer.parseInt(params.get(KeypairGenerationType.PARAM_keysize));
         BigInteger publicExponent = null;
         String tmp = kg.getParameters().get(KeypairGenerationType.PARAM_publicExponent);
@@ -209,17 +209,17 @@ public class XijsonCertprofile extends BaseCertprofile {
 
         this.keypairGenControl = new KeypairGenControl.RSAKeypairGenControl(
                                     keySize, publicExponent, keyAlgOid);
-      } else if (keyType == KeyType.ec) {
+      } else if (keyType == KeyType.EC) {
         ASN1ObjectIdentifier curveOid =
             new ASN1ObjectIdentifier(params.get(KeypairGenerationType.PARAM_curve));
         this.keypairGenControl = new KeypairGenControl.ECKeypairGenControl(curveOid, keyAlgOid);
-      } else if (keyType == KeyType.dsa) {
+      } else if (keyType == KeyType.DSA) {
         int plen = Integer.parseInt(params.get(KeypairGenerationType.PARAM_plength));
         String tmp = params.get(KeypairGenerationType.PARAM_qlength);
         int qlen = tmp == null ? 0 : Integer.parseInt(tmp);
         this.keypairGenControl = new KeypairGenControl.DSAKeypairGenControl(plen, qlen, keyAlgOid);
-      } else if (keyType == KeyType.ed25519 || keyType == KeyType.ed448
-          || keyType == KeyType.x25519 || keyType == KeyType.x448) {
+      } else if (keyType == KeyType.ED25519 || keyType == KeyType.ED448
+          || keyType == KeyType.X25519 || keyType == KeyType.X448) {
         this.keypairGenControl = new KeypairGenControl.EDDSAKeypairGenControl(keyAlgOid);
       } else {
         throw new CertprofileException("unknown KeypairGeneration type " + keyType);

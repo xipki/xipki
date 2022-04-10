@@ -142,40 +142,40 @@ public class KeypairGenerationType extends ValidatableConf {
     notNull(keyType, "keyType");
 
     switch (keyType) {
-      case rsa:
+      case RSA:
         notNull(parameters, "parameters");
         if (!parameters.containsKey(PARAM_keysize)) {
           throw new InvalidConfException("parameters " + PARAM_keysize + " may not be null");
         }
         break;
-      case dsa:
+      case DSA:
         notNull(parameters, "parameters");
         if (!parameters.containsKey(PARAM_plength)) {
           throw new InvalidConfException("parameters " + PARAM_plength + " may not be null");
         }
         break;
-      case ec:
+      case EC:
         notNull(parameters, "parameters");
         if (!parameters.containsKey(PARAM_curve)) {
           throw new InvalidConfException("parameters " + PARAM_curve + " may not be null");
         }
         break;
-      case ed25519:
+      case ED25519:
         if (!EdECConstants.id_ED25519.getId().equals(algorithm.getOid())) {
           throw new InvalidConfException("keyType and algorithm not match");
         }
         break;
-      case ed448:
+      case ED448:
         if (!EdECConstants.id_ED448.getId().equals(algorithm.getOid())) {
           throw new InvalidConfException("keyType and algorithm not match");
         }
         break;
-      case x25519:
+      case X25519:
         if (!EdECConstants.id_X25519.getId().equals(algorithm.getOid())) {
           throw new InvalidConfException("keyType and algorithm not match");
         }
         break;
-      case x448:
+      case X448:
         if (!EdECConstants.id_X448.getId().equals(algorithm.getOid())) {
           throw new InvalidConfException("keyType and algorithm not match");
         }
@@ -186,13 +186,13 @@ public class KeypairGenerationType extends ValidatableConf {
   } // method validate
 
   public enum KeyType {
-    rsa,
-    ec,
-    dsa,
-    ed25519,
-    ed448,
-    x25519,
-    x448
+    RSA,
+    EC,
+    DSA,
+    ED25519,
+    ED448,
+    X25519,
+    X448
   } // class KeyType
 
 }

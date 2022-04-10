@@ -20,10 +20,7 @@ package org.xipki.security;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static org.xipki.util.Args.notNull;
 
@@ -37,9 +34,21 @@ import static org.xipki.util.Args.notNull;
 
 public class CollectionAlgorithmValidator implements AlgorithmValidator {
 
+  public static final CollectionAlgorithmValidator INSTANCE;
+
   private final Set<SignAlgo> algos;
 
   private final Set<String> algoNames;
+
+  static {
+    List<SignAlgo> secureAlgos = new ArrayList<>(SignAlgo.values().length);
+    for (SignAlgo m : SignAlgo.values()) {
+      if (m.getHashAlgo() != HashAlgo.SHA1) {
+        secureAlgos.add(m);
+      }
+    }
+    INSTANCE = new CollectionAlgorithmValidator(secureAlgos);
+  }
 
   /**
    * constructor.

@@ -260,8 +260,10 @@ public class X509Ca extends X509CaModule implements Closeable {
 
   public boolean verifyCsr(CertificationRequest csr) {
     notNull(csr, "csr");
-    return CaUtil.verifyCsr(csr, caManager.getSecurityFactory(),
-        caInfo.getCmpControl().getPopoAlgoValidator(), caInfo.getDhpocControl());
+    AlgorithmValidator algorithmValidator = caInfo.getCmpControl() == null
+        ? CollectionAlgorithmValidator.INSTANCE : caInfo.getCmpControl().getPopoAlgoValidator();
+    return CaUtil.verifyCsr(csr, caManager.getSecurityFactory(), algorithmValidator,
+        caInfo.getDhpocControl());
   }
 
   public List<CertListInfo> listCerts(X500Name subjectPattern, Date validFrom,

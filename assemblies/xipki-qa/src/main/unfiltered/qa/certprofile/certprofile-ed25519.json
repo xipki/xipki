@@ -17,7 +17,7 @@
 			"oid":"1.3.101.112",
 			"description":"ED25519"
 		},
-		"keyType":"ed25519"
+		"keyType":"ED25519"
 	},
 	"signatureAlgorithms":["Ed25519","Ed448"],
 	"keyAlgorithms":[{
