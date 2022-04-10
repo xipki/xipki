@@ -110,7 +110,7 @@ public abstract class XiAction implements Action {
             answer = readPrompt("A file named '" + saveTo.getPath()
               + "' already exists. Do you want to replace it [Yes/No]? ");
           } else {
-            answer = session.readLine(null, null);
+            answer = readPrompt("Please answer with Yer or No: ");
           }
 
           if (answer == null) {
@@ -120,6 +120,7 @@ public abstract class XiAction implements Action {
           if ("yes".equalsIgnoreCase(answer) || "y".equalsIgnoreCase(answer)) {
             break;
           } else if ("no".equalsIgnoreCase(answer) || "n".equalsIgnoreCase(answer)) {
+            bo = true;
             String newFn;
             while (true) {
               newFn = readPrompt("Enter new path to save to ... ");
@@ -130,7 +131,6 @@ public abstract class XiAction implements Action {
 
             saveTo = new File(newFn);
           } else {
-            readPrompt("Please answer with Yes or No. ");
             bo = false;
           }
         } // end while
