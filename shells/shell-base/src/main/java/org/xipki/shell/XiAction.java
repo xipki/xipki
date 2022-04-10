@@ -110,7 +110,7 @@ public abstract class XiAction implements Action {
             answer = readPrompt("A file named '" + saveTo.getPath()
               + "' already exists. Do you want to replace it [Yes/No]? ");
           } else {
-            answer = session.readLine(null, null);
+            answer = readPrompt("Please answer with Yer or No: ");
           }
 
           if (answer == null) {
@@ -120,6 +120,7 @@ public abstract class XiAction implements Action {
           if ("yes".equalsIgnoreCase(answer) || "y".equalsIgnoreCase(answer)) {
             break;
           } else if ("no".equalsIgnoreCase(answer) || "n".equalsIgnoreCase(answer)) {
+            bo = true;
             String newFn;
             while (true) {
               newFn = readPrompt("Enter new path to save to ... ");
@@ -130,7 +131,6 @@ public abstract class XiAction implements Action {
 
             saveTo = new File(newFn);
           } else {
-            readPrompt("Please answer with Yes or No. ");
             bo = false;
           }
         } // end while
@@ -315,16 +315,7 @@ public abstract class XiAction implements Action {
   }
 
   protected static BigInteger toBigInt(String str, boolean defaultHex) {
-    String tmpStr = str.trim();
-
-    if (tmpStr.startsWith("0x") || tmpStr.startsWith("0X")) {
-      if (tmpStr.length() > 2) {
-        return new BigInteger(tmpStr.substring(2), 16);
-      } else {
-        throw new NumberFormatException("invalid integer '" + tmpStr + "'");
-      }
-    }
-    return new BigInteger(tmpStr, defaultHex ? 16 : 10);
+    return StringUtil.toBigInt(str, defaultHex);
   }
 
   protected static byte[] encodeCert(byte[] data, String encodeForm) {
