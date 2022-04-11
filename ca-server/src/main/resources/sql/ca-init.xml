@@ -213,8 +213,8 @@
       <column name="CERT" type="VARCHAR(6000)">
         <constraints nullable="false"/>
       </column>
-      <column name="DHPOC_CONTROL" type="CLOB"><!--TODO: change it to POPO_CONTROL-->
-        <!--remarks="Diffie-Hellman Key Agreement PoC Control"-->
+      <column name="POPO_CONTROL" type="CLOB">
+        <!--remarks="Proof-of-Possession Control"-->
       </column>
       <column name="EXTRA_CONTROL" type="CLOB">
         <!--remarks="extra control"-->

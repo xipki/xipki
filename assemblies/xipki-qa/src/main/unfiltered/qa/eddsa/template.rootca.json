@@ -104,8 +104,10 @@
 				"messagetime.bias":300,
 				"rr.aki.required":true,
 				"group.enroll":true,
-				"protection.sigalgo":"SHA256withECDSA",
-				"popo.sigalgo":"Ed25519:Ed448:DHPOP-X25519:DHPOP-X448"
+				"protection.sigalgo":"SHA256withECDSA"
+			},
+			"popoControl":{
+				"value":"sigalgo=Ed25519:Ed448:DHPOP-X25519:DHPOP-X448"
 			},
 			"cmpResponderName":"responder1",
 			"keypairGenNames":["software"],

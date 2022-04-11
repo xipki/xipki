@@ -363,22 +363,22 @@ final class CmpClientConfigurer {
           }
         }
 
-        // DHPoc
-        Certs dhpocCerts = caType.getDhpocCerts();
-        if (dhpocCerts == null || dhpocCerts.isAutoconf()) {
-          ca.setDhpocAutoconf(true);
+        // DHPopo
+        Certs dhpopoCerts = caType.getDhpopoCerts();
+        if (dhpopoCerts == null || dhpopoCerts.isAutoconf()) {
+          ca.setDhpopoAutoconf(true);
         } else {
-          ca.setDhpocAutoconf(false);
-          List<X509Cert> dhpocs = new LinkedList<>();
+          ca.setDhpopoAutoconf(false);
+          List<X509Cert> certs = new LinkedList<>();
 
-          List<FileOrBinary> list = dhpocCerts.getCertificates();
+          List<FileOrBinary> list = dhpopoCerts.getCertificates();
           if (list != null) {
             for (FileOrBinary m : list) {
               X509Cert cert = X509Util.parseCert(m.readContent());
-              dhpocs.add(cert);
+              certs.add(cert);
             }
           }
-          ca.setDhpocs(dhpocs);
+          ca.setDhpopoCerts(certs);
         }
 
         // CMPControl
@@ -418,7 +418,7 @@ final class CmpClientConfigurer {
 
         cas.add(ca);
         if (ca.isCertAutoconf() || ca.isCertprofilesAutoconf() || ca.isCmpControlAutoconf()
-            || ca.isDhpocAutoconf()) {
+            || ca.isDhpopoAutoconf()) {
           autoConfCaNames.add(caName);
         }
       } catch (IOException | CertificateException
@@ -611,8 +611,8 @@ final class CmpClientConfigurer {
         if (ca.isCmpControlAutoconf()) {
           ca.setCmpControl(caInfo.getCmpControl());
         }
-        if (ca.isDhpocAutoconf()) {
-          ca.setDhpocs(caInfo.getDhpocs());
+        if (ca.isDhpopoAutoconf()) {
+          ca.setDhpopoCerts(caInfo.getDhpopoCerts());
         }
         LOG.info("retrieved CAInfo for CA " + name);
       } catch (CmpClientException | PkiErrorException | CertificateEncodingException

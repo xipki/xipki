@@ -155,9 +155,9 @@ public class X509Ca extends X509CaModule implements Closeable {
     super(caInfo);
 
     try {
-      caInfo.initDhpocControl(caManager.getSecurityFactory());
-    } catch (XiSecurityException ex) {
-      LogUtil.error(LOG, ex, "initDhpocControl for CA " + caIdent);
+      caInfo.initPopoControl();
+    } catch (XiSecurityException | InvalidConfException ex) {
+      LogUtil.error(LOG, ex, "initPopoControl for CA " + caIdent);
       throw new OperationException(SYSTEM_FAILURE, ex);
     }
 
@@ -212,6 +212,12 @@ public class X509Ca extends X509CaModule implements Closeable {
     return caInfo.getCmpControl();
   }
 
+  public AlgorithmValidator getPopoAlgoValidator() {
+    return caInfo.getPopoControl() == null
+        ? CollectionAlgorithmValidator.INSTANCE
+        : caInfo.getPopoControl().getPopoAlgoValidator();
+  }
+
   public X509Cert getCert(BigInteger serialNumber)
       throws CertificateException, OperationException {
     CertificateInfo certInfo = certstore.getCertInfo(caIdent, caCert, serialNumber, caIdNameMap);
@@ -256,8 +262,7 @@ public class X509Ca extends X509CaModule implements Closeable {
   public boolean verifyCsr(CertificationRequest csr) {
     notNull(csr, "csr");
     return CaUtil.verifyCsr(csr, caManager.getSecurityFactory(),
-            caInfo.getCmpControl().getPopoAlgoValidator(),
-            caInfo.getDhpocControl());
+            caInfo.getPopoControl());
   }
 
   public List<CertListInfo> listCerts(X500Name subjectPattern, Date validFrom,

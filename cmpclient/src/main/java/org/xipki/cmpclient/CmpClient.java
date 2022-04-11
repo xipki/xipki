@@ -375,7 +375,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  List<X509Cert> getDhPocPeerCertificates(String caName)
+  List<X509Cert> getDhPopoPeerCertificates(String caName)
       throws CmpClientException;
 
   /**

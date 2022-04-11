@@ -253,8 +253,10 @@
 				"messagetime.bias":300,
 				"rr.aki.required":true,
 				"group.enroll":true,
-				"protection.sigalgo":"REPLACEME-CMP_SIGALGO",
-				"popo.sigalgo":"REPLACEME-SIGALGO:REPLACEME-HASHwithRSA:REPLACEME-HASHwithECDSA:REPLACEME-HASHwithDSA:SM3withSM2"
+				"protection.sigalgo":"REPLACEME-CMP_SIGALGO"
+			},
+			"popoControl":{
+				"value":"sigalgo=REPLACEME-SIGALGO:REPLACEME-HASHwithRSA:REPLACEME-HASHwithECDSA:REPLACEME-HASHwithDSA:SM3withSM2"
 			},
 			"crlControl":{
 				"interval.hours": 24,

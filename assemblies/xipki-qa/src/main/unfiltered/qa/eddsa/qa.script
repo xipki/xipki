@@ -28,13 +28,13 @@ each ($list) {
   xi:csr-p12 \
     --p12 output/${type}-1.p12 --password 1234 \
     --subject "CN=${type}-1.myorg.org,C=DE" \
-    --peer-certs output/dhpoc-certs.pem \
+    --peer-certs output/dhpopo-certs.pem \
     --out output/${type}-1.csr
 
   xi:csr-p12 \
     --p12 output/${type}-2.p12 --password 1234 \
     --subject "CN=${type}-2.myorg.org,C=DE" \
-    --peer-certs output/dhpoc-certs.pem \
+    --peer-certs output/dhpopo-certs.pem \
     --out output/${type}-2.csr
 }
 

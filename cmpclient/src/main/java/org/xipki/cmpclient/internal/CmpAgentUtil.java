@@ -593,7 +593,7 @@ class CmpAgentUtil {
   static CaConf.CaInfo retrieveCaInfo(VerifiedPkiMessage response, String caName)
       throws CmpClientException, PkiErrorException {
     ASN1Encodable itvValue = extractXipkiActionRepContent(response);
-    DERUTF8String utf8Str = DERUTF8String.getInstance(itvValue);
+    ASN1UTF8String utf8Str = ASN1UTF8String.getInstance(itvValue);
     String systemInfoStr = utf8Str.getString();
 
     LOG.debug("CAInfo for CA {}: {}", caName, systemInfoStr);
@@ -622,20 +622,20 @@ class CmpAgentUtil {
         caCertchain.add(caCert);
       }
 
-      // DHPocs
-      array = root.getJSONArray("dhpocs");
-      List<X509Cert> dhpocs = null;
+      // DHPopos
+      array = root.getJSONArray("dhpopos");
+      List<X509Cert> dhpopos = null;
       if (array != null) {
-        dhpocs = new LinkedList<>();
+        dhpopos = new LinkedList<>();
         for (int i = 0; i < array.size(); i++) {
           String base64Cert = array.getString(i);
           X509Cert caCert;
           try {
             caCert = X509Util.parseCert(StringUtil.toUtf8Bytes(base64Cert));
           } catch (CertificateException ex) {
-            throw new CmpClientException("could no parse the DHPoc (certificate)", ex);
+            throw new CmpClientException("could no parse the DHPopo (certificate)", ex);
           }
-          dhpocs.add(caCert);
+          dhpopos.add(caCert);
         }
       }
 
@@ -668,7 +668,7 @@ class CmpAgentUtil {
       }
 
       LOG.info("CA {} supports profiles {}", caName, profileNames);
-      return new CaConf.CaInfo(caCertchain, cmpControl, profiles, dhpocs);
+      return new CaConf.CaInfo(caCertchain, cmpControl, profiles, dhpopos);
     } else {
       throw new CmpClientException("unknown CAInfo version " + version);
     }

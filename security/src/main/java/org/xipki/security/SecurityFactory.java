@@ -250,6 +250,7 @@ public interface SecurityFactory {
    * @throws KeyStoreException
    *          If case 3 occurs.
    */
+  // TODO: remove this method
   byte[] extractMinimalKeyStore(String keystoreType, byte[] keystoreBytes, String keyname,
       char[] password, X509Cert[] newCertChain)
           throws KeyStoreException;

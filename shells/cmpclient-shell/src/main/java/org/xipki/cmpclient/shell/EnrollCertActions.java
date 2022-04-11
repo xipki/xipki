@@ -356,7 +356,7 @@ public class EnrollCertActions {
             getHashAlgo(hashAlgo), getSignatureAlgoControl());
 
         String caName = getCaName().toLowerCase();
-        List<X509Cert> peerCerts = client.getDhPocPeerCertificates(caName);
+        List<X509Cert> peerCerts = client.getDhPopoPeerCertificates(caName);
         if (CollectionUtil.isNotEmpty(peerCerts)) {
           signerConf.setPeerCertificates(peerCerts);
         }

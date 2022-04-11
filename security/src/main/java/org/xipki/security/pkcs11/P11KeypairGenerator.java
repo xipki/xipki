@@ -121,7 +121,8 @@ public class P11KeypairGenerator extends KeypairGenerator {
             break;
         }
       }
-      super.keyspecs = set;
+      super.keyspecs.clear();
+      super.keyspecs.addAll(set);
     } catch (P11TokenException ex) {
       throw new XiSecurityException("cannot get the slot", ex);
     }

@@ -239,7 +239,7 @@ public abstract class MgmtMessage {
 
     private String ctlogControl;
 
-    private String dhpocControl;
+    private String popoControl;
 
     private String revokeSuspended;
 
@@ -314,7 +314,9 @@ public abstract class MgmtMessage {
         ctlogControl = caEntry.getCtlogControl().getConf();
       }
 
-      dhpocControl = caEntry.getDhpocControl();
+      if (caEntry.getPopoControl() != null) {
+        popoControl = caEntry.getPopoControl();
+      }
       expirationPeriod = caEntry.getExpirationPeriod();
       if (caEntry.getExtraControl() != null) {
         extraControl = caEntry.getExtraControl().getEncoded();
@@ -447,12 +449,12 @@ public abstract class MgmtMessage {
       this.ctlogControl = ctlogControl;
     }
 
-    public String getDhpocControl() {
-      return dhpocControl;
+    public String getPopoControl() {
+      return popoControl;
     }
 
-    public void setDhpocControl(String dhpocControl) {
-      this.dhpocControl = dhpocControl;
+    public void setPopoControl(String popoControl) {
+      this.popoControl = popoControl;
     }
 
     public String getCmpResponderName() {
@@ -660,8 +662,7 @@ public abstract class MgmtMessage {
       rv.setSignerConf(signerConf);
       rv.setStatus(status);
       rv.setValidityMode(validityMode);
-
-      rv.setDhpocControl(dhpocControl);
+      rv.setPopoControl(popoControl);
 
       return rv; // method toCaEntry
     }

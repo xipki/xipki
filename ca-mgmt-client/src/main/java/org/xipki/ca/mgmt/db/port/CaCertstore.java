@@ -73,7 +73,7 @@ public class CaCertstore extends ValidatableConf {
 
     private String ctlogControl;
 
-    private String dhpocControl;
+    private String popoControl;
 
     private String revokeSuspendedControl;
 
@@ -259,12 +259,12 @@ public class CaCertstore extends ValidatableConf {
       this.revokeSuspendedControl = revokeSuspendedControl;
     }
 
-    public String getDhpocControl() {
-      return dhpocControl;
+    public String getPopoControl() {
+      return popoControl;
     }
 
-    public void setDhpocControl(String dhpocControl) {
-      this.dhpocControl = dhpocControl;
+    public void setPopoControl(String popoControl) {
+      this.popoControl = popoControl;
     }
 
     public String getProtocolSupport() {
@@ -1199,7 +1199,9 @@ public class CaCertstore extends ValidatableConf {
             throws InvalidConfException {
       notBlank(name, "name");
       notBlank(type, "type");
-      conf.validate();
+      if (conf != null) {
+        conf.validate();
+      }
     }
 
   } // class IdNameTypeConf

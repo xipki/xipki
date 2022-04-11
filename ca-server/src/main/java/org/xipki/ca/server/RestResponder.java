@@ -306,14 +306,17 @@ public class RestResponder {
           respBytes = ca.getCaInfo().getCert().getEncoded();
           break;
         }
-        case CMD_dhpoc_certs: {
-          DhpocControl control = responderManager.getX509Ca(caName).getCaInfo().getDhpocControl();
-          if (control == null) {
-            respBytes = new byte[0];
-          } else {
-            respCt = CT_pem_file;
-            respBytes = StringUtil.toUtf8Bytes(
-                    X509Util.encodeCertificates(control.getCertificates()));
+        case CMD_popo_dh_certs: {
+          PopoControl control = responderManager.getX509Ca(caName).getCaInfo().getPopoControl();
+          respBytes = new byte[0];
+
+          if (control != null) {
+            X509Cert[] dhCerts = control.getDhCertificates();
+            if (dhCerts != null) {
+              respCt = CT_pem_file;
+              respBytes = StringUtil.toUtf8Bytes(
+                  X509Util.encodeCertificates(dhCerts));
+            }
           }
           break;
         }

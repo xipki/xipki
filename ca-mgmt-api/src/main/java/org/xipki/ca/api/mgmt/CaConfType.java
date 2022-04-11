@@ -329,7 +329,7 @@ public class CaConfType {
 
     private Map<String, Object> revokeSuspendedControl;
 
-    private FileOrValue dhpocControl;
+    private FileOrValue popoControl;
 
     private String cmpResponderName;
 
@@ -473,12 +473,12 @@ public class CaConfType {
       this.revokeSuspendedControl = revokeSuspendedControl;
     }
 
-    public FileOrValue getDhpocControl() {
-      return dhpocControl;
+    public FileOrValue getPopoControl() {
+      return popoControl;
     }
 
-    public void setDhpocControl(FileOrValue dhpocControl) {
-      this.dhpocControl = dhpocControl;
+    public void setPopoControl(FileOrValue popoControl) {
+      this.popoControl = popoControl;
     }
 
     public String getCmpResponderName() {

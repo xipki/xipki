@@ -636,6 +636,7 @@ class Ca2Manager {
         nextCrlNumber, signerType, signerConf, caEntry.getCaUris(), numCrls, expirationPeriod);
     entry.setCert(caCert);
     entry.setCmpControl(caEntry.getCmpControl());
+    entry.setPopoControl(caEntry.getPopoControl());
     entry.setCrlControl(caEntry.getCrlControl());
     entry.setScepControl(caEntry.getScepControl());
     entry.setCmpResponderName(caEntry.getCmpResponderName());

@@ -379,8 +379,8 @@ public class CaConf {
             caEntry.setProtocolSupport(new ProtocolSupport(ci.getProtocolSupport()));
           }
 
-          if (ci.getDhpocControl() != null) {
-            caEntry.setDhpocControl(getValue(ci.getDhpocControl(), zipEntries));
+          if (ci.getPopoControl() != null) {
+            caEntry.setPopoControl(getValue(ci.getPopoControl(), zipEntries));
           }
 
           if (ci.getRevokeSuspendedControl() != null) {

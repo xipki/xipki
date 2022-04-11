@@ -224,6 +224,10 @@ public class ConfPairs {
     }
   } // constructor
 
+  public boolean isEmpty() {
+    return pairs.isEmpty();
+  }
+
   public void putPair(String name, String value) {
     notBlank(name, "name");
     notNull(value, "value");

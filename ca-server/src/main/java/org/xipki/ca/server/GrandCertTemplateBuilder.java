@@ -273,22 +273,12 @@ class GrandCertTemplateBuilder {
           publicKeyData = sk.getPublicKey().getBytes();
           break;
         }
-        case "DSA": {
-          publicKeyData = privateKey.getPublicKeyData().getBytes();
-          break;
-        }
+        case "DSA":
         case "ED25519":
         case "ED448":
         case "X25519":
         case "X448": {
-          ASN1Sequence seq = ASN1Sequence.getInstance(privateKey.getPrivateKey());
-          ASN1TaggedObject taggedObject = ASN1TaggedObject.getInstance(seq.getObjectAt(2));
-          if (taggedObject.getTagNo() == 0) {
-            taggedObject = ASN1TaggedObject.getInstance(seq.getObjectAt(3));
-          }
-
-          publicKeyData = ASN1BitString.getInstance(
-                            taggedObject.getExplicitBaseObject()).getOctets();
+          publicKeyData = privateKey.getPublicKeyData().getBytes();
           break;
         }
         default:

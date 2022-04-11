@@ -68,7 +68,7 @@ public class CaEntry extends MgmtEntry {
 
   private String signerConf;
 
-  private String dhpocControl;
+  private String popoControl;
 
   private ScepControl scepControl;
 
@@ -233,12 +233,12 @@ public class CaEntry extends MgmtEntry {
     return crlControl;
   }
 
-  public String getDhpocControl() {
-    return dhpocControl;
+  public String getPopoControl() {
+    return popoControl;
   }
 
-  public void setDhpocControl(String dhpocControl) {
-    this.dhpocControl = dhpocControl;
+  public void setPopoControl(String popoControl) {
+    this.popoControl = popoControl;
   }
 
   public void setScepControl(ScepControl scepControl) {
@@ -412,8 +412,8 @@ public class CaEntry extends MgmtEntry {
         "\nsigner type: ", signerType,
         "\nsigner conf: ", (signerConf == null ? "null"
             : SignerEntry.signerConfToString(signerConf, verbose, ignoreSensitiveInfo)),
-        "\nDHPoc control: ", (dhpocControl == null ? "null"
-            : SignerEntry.signerConfToString(dhpocControl, verbose, ignoreSensitiveInfo)),
+        "\nPOPO control: ", (popoControl == null ? "null"
+            : SignerEntry.signerConfToString(popoControl, verbose, ignoreSensitiveInfo)),
         "\nCMP control:\n", (cmpControl == null ? "  null" : cmpControl.toString(verbose)),
         "\nCRL control:\n", (crlControl == null ? "  null" : crlControl.toString(verbose)),
         "\nSCEP control: \n", (scepControl == null ? "  null" : scepControl.toString(verbose)),
@@ -484,7 +484,7 @@ public class CaEntry extends MgmtEntry {
         && CompareUtil.equalsObject(crlControl, obj.crlControl)
         && CompareUtil.equalsObject(crlSignerName, obj.crlSignerName)
         && CompareUtil.equalsObject(ctlogControl, obj.ctlogControl)
-        && CompareUtil.equalsObject(dhpocControl, obj.dhpocControl)
+        && CompareUtil.equalsObject(popoControl, obj.popoControl)
         && (expirationPeriod == obj.expirationPeriod)
         && CompareUtil.equalsObject(extraControl, obj.extraControl)
         && ident.equals(obj.ident, ignoreId)

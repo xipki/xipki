@@ -21,6 +21,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.util.ConfPairs;
 import org.xipki.util.InvalidConfException;
 
 import java.io.IOException;
@@ -349,9 +350,11 @@ class CaconfDbExporter extends DbPorter {
         + "CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,CRL_CONTROL,CMP_CONTROL,SCEP_CONTROL,"
         + "CTLOG_CONTROL,PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION,"
         + "NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL,"
-        + "SIGNER_CONF,REV_INFO,DHPOC_CONTROL,REVOKE_SUSPENDED_CONTROL";
+        + "SIGNER_CONF,REV_INFO,REVOKE_SUSPENDED_CONTROL";
     if (dbSchemaVersion >= 7) {
-      columns += ",KEYPAIR_GEN_NAMES,SAVE_CERT,SAVE_KEYPAIR";
+      columns += ",POPO_CONTROL,KEYPAIR_GEN_NAMES,SAVE_CERT,SAVE_KEYPAIR";
+    } else {
+      columns += ",DHPOC_CONTROL";
     }
 
     final String sql = columns + " FROM CA";
@@ -382,7 +385,6 @@ class CaconfDbExporter extends DbPorter {
         ca.setCmpResponderName(rs.getString("CMP_RESPONDER_NAME"));
         ca.setScepResponderName(rs.getString("SCEP_RESPONDER_NAME"));
         ca.setCrlSignerName(rs.getString("CRL_SIGNER_NAME"));
-        ca.setCmpControl(rs.getString("CMP_CONTROL"));
         ca.setScepControl(rs.getString("SCEP_CONTROL"));
         ca.setCrlControl(rs.getString("CRL_CONTROL"));
         ca.setCtlogControl(rs.getString("CTLOG_CONTROL"));
@@ -395,15 +397,48 @@ class CaconfDbExporter extends DbPorter {
         ca.setExtraControl(rs.getString("EXTRA_CONTROL"));
         ca.setNumCrls(rs.getInt("NUM_CRLS"));
         ca.setRevInfo(rs.getString("REV_INFO"));
-        ca.setDhpocControl(rs.getString("DHPOC_CONTROL"));
         ca.setRevokeSuspendedControl(rs.getString("REVOKE_SUSPENDED_CONTROL"));
 
+        String cmpControl = rs.getString("CMP_CONTROL");
         if (dbSchemaVersion >= 7) {
+          ca.setCmpControl(cmpControl);
+          ca.setPopoControl(rs.getString("POPO_CONTROL"));
           ca.setKeypairGenNames(rs.getString("KEYPAIR_GEN_NAMES"));
           ca.setSaveCert(rs.getInt("SAVE_CERT"));
           ca.setSaveKeypair(rs.getInt("SAVE_KEYPAIR"));
         } else {
           // Util version 6
+          ConfPairs cmpCtrlPairs = new ConfPairs();
+          ConfPairs popoCtrlPairs = new ConfPairs();
+
+          // adapt the configuration
+          if (cmpControl != null) {
+            ConfPairs pairs = new ConfPairs(cmpControl);
+            for (String n : pairs.names()) {
+              if ("popo.sigalgo".equals(n)) {
+                popoCtrlPairs.putPair("sigalgo", pairs.value(n));
+              } else {
+                cmpCtrlPairs.putPair(n, pairs.value(n));
+              }
+            }
+          }
+
+          String str = rs.getString("DHPOC_CONTROL");
+          if (str != null) {
+            ConfPairs pairs = new ConfPairs(cmpControl);
+            for (String n : pairs.names()) {
+              popoCtrlPairs.putPair("dh." + n, pairs.value(n));
+            }
+          }
+
+          if (!cmpCtrlPairs.isEmpty()) {
+            ca.setCmpControl(cmpCtrlPairs.getEncoded());
+          }
+
+          if (!popoCtrlPairs.isEmpty()) {
+            ca.setPopoControl(popoCtrlPairs.getEncoded());
+          }
+
           ca.setKeypairGenNames("software");
           ca.setSaveCert(1);
           ca.setSaveKeypair(0);

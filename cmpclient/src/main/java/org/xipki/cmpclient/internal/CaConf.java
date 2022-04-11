@@ -56,26 +56,26 @@ class CaConf {
 
     private final List<X509Cert> certchain;
 
-    private final List<X509Cert> dhpocs;
+    private final List<X509Cert> dhpopoCerts;
 
     private final Set<CertprofileInfo> certprofiles;
 
     private final CmpControl cmpControl;
 
     CaInfo(List<X509Cert> certchain, CmpControl cmpControl,
-        Set<CertprofileInfo> certprofiles, List<X509Cert> dhpocs) {
+        Set<CertprofileInfo> certprofiles, List<X509Cert> dhpopoCerts) {
       this.certchain = certchain;
       this.cmpControl = cmpControl;
       this.certprofiles = certprofiles;
-      this.dhpocs = dhpocs;
+      this.dhpopoCerts = dhpopoCerts;
     }
 
     List<X509Cert> getCertchain() {
       return certchain;
     }
 
-    List<X509Cert> getDhpocs() {
-      return dhpocs;
+    List<X509Cert> getDhpopoCerts() {
+      return dhpopoCerts;
     }
 
     CmpControl getCmpControl() {
@@ -106,7 +106,7 @@ class CaConf {
 
   private boolean cmpControlAutoconf;
 
-  private boolean dhpocAutoconf;
+  private boolean dhpopoAutoconf;
 
   private X509Cert cert;
 
@@ -124,7 +124,7 @@ class CaConf {
 
   private Map<String, CertprofileInfo> profiles = Collections.emptyMap();
 
-  private List<X509Cert> dhpocs;
+  private List<X509Cert> dhpopoCerts;
 
   CaConf(String name, String url, String healthUrl, String requestorName, Responder responder,
       SSLSocketFactory sslSocketFactory, HostnameVerifier hostnameVerifier) {
@@ -177,20 +177,20 @@ class CaConf {
     return certchain;
   }
 
-  boolean isDhpocAutoconf() {
-    return dhpocAutoconf;
+  boolean isDhpopoAutoconf() {
+    return dhpopoAutoconf;
   }
 
-  void setDhpocAutoconf(boolean dhpocAutoconf) {
-    this.dhpocAutoconf = dhpocAutoconf;
+  void setDhpopoAutoconf(boolean dhpopoAutoconf) {
+    this.dhpopoAutoconf = dhpopoAutoconf;
   }
 
-  List<X509Cert> getDhpocs() {
-    return dhpocs;
+  public List<X509Cert> getDhpopoCerts() {
+    return dhpopoCerts;
   }
 
-  void setDhpocs(List<X509Cert> dhpocs) {
-    this.dhpocs = dhpocs;
+  public void setDhpopoCerts(List<X509Cert> dhpopoCerts) {
+    this.dhpopoCerts = dhpopoCerts;
   }
 
   X500Name getSubject() {

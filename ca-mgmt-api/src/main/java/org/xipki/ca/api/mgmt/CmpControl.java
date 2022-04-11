@@ -17,8 +17,6 @@
 
 package org.xipki.ca.api.mgmt;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xipki.security.AlgorithmValidator;
 import org.xipki.security.CollectionAlgorithmValidator;
 import org.xipki.security.HashAlgo;
@@ -61,8 +59,6 @@ public class CmpControl {
 
   public static final String KEY_PROTECTION_PBM_IC = "protection.pbm.ic";
 
-  public static final String KEY_POPO_SIGALGO = "popo.sigalgo";
-
   public static final String KEY_GROUP_ENROLL = "group.enroll";
 
   public static final String KEY_RR_AKI_REQUIRED = "rr.aki.required";
@@ -72,8 +68,6 @@ public class CmpControl {
   private static final int DFLT_CONFIRM_WAIT_TIME = 300; // 300 seconds
 
   private static final int DFLT_PBM_ITERATIONCOUNT = 10240;
-
-  private static final Logger LOG = LoggerFactory.getLogger(CmpControl.class);
 
   private final String conf;
 
@@ -109,8 +103,6 @@ public class CmpControl {
 
   private final CollectionAlgorithmValidator sigAlgoValidator;
 
-  private final CollectionAlgorithmValidator popoAlgoValidator;
-
   public CmpControl(String conf)
       throws InvalidConfException {
     ConfPairs pairs = new ConfPairs(conf);
@@ -136,27 +128,12 @@ public class CmpControl {
     }
     Set<String> algos = splitAlgos(str);
     try {
-      this.sigAlgoValidator = buildAlgorithmValidator(algos);
+      this.sigAlgoValidator = CollectionAlgorithmValidator.buildAlgorithmValidator(algos);
     } catch (NoSuchAlgorithmException ex) {
       throw new InvalidConfException("invalid " + key + ": " + str, ex);
     }
 
     algos = this.sigAlgoValidator.getAlgoNames();
-    pairs.putPair(key, algosAsString(algos));
-
-    // popo algorithms
-    key = KEY_POPO_SIGALGO;
-    str = pairs.value(key);
-    if (str == null) {
-      throw new InvalidConfException(key + " is not set");
-    }
-    algos = splitAlgos(str);
-    try {
-      this.popoAlgoValidator = buildAlgorithmValidator(algos);
-    } catch (NoSuchAlgorithmException ex) {
-      throw new InvalidConfException("invalid " + key + ": " + str, ex);
-    }
-    algos = this.popoAlgoValidator.getAlgoNames();
     pairs.putPair(key, algosAsString(algos));
 
     // PasswordBasedMac
@@ -181,8 +158,7 @@ public class CmpControl {
   public CmpControl(Boolean confirmCert, Boolean sendCaCert, Boolean sendCertChain,
       Boolean messageTimeRequired, Boolean sendResponderCert, Boolean rrAkiRequired,
       Integer messageTimeBias, Integer confirmWaitTime, Boolean groupEnroll,
-      List<String> sigAlgos, List<String> popoAlgos,
-      List<String> pbmOwfs, List<String> pbmMacs, Integer pbmIterationCount)
+      List<String> sigAlgos, List<String> pbmOwfs, List<String> pbmMacs, Integer pbmIterationCount)
       throws InvalidConfException {
     if (confirmWaitTime != null) {
       Args.notNegative(confirmWaitTime, "confirmWaitTime");
@@ -218,23 +194,13 @@ public class CmpControl {
 
     this.groupEnroll = groupEnroll != null && groupEnroll;
     try {
-      this.sigAlgoValidator = buildAlgorithmValidator(sigAlgos);
+      this.sigAlgoValidator = CollectionAlgorithmValidator.buildAlgorithmValidator(sigAlgos);
     } catch (NoSuchAlgorithmException ex) {
       throw new InvalidConfException("invalid sigAlgos", ex);
     }
 
     if (CollectionUtil.isNotEmpty(sigAlgos)) {
       pairs.putPair(KEY_PROTECTION_SIGALGO, algosAsString(this.sigAlgoValidator.getAlgoNames()));
-    }
-
-    try {
-      this.popoAlgoValidator = buildAlgorithmValidator(popoAlgos);
-    } catch (NoSuchAlgorithmException ex) {
-      throw new InvalidConfException("invalid popoAlgos", ex);
-    }
-
-    if (CollectionUtil.isNotEmpty(popoAlgos)) {
-      pairs.putPair(KEY_POPO_SIGALGO, algosAsString(this.popoAlgoValidator.getAlgoNames()));
     }
 
     // PasswordBasedMac
@@ -359,10 +325,6 @@ public class CmpControl {
     return sigAlgoValidator;
   }
 
-  public AlgorithmValidator getPopoAlgoValidator() {
-    return popoAlgoValidator;
-  }
-
   public HashAlgo getResponsePbmOwf() {
     return responsePbmOwf;
   }
@@ -410,8 +372,6 @@ public class CmpControl {
         "\n  AKI in revocation request required: ", rrAkiRequired,
         "\n  signature algorithms: ",
             CollectionUtil.sort(sigAlgoValidator.getAlgoNames()),
-        "\n  POPO algorithms: ",
-            CollectionUtil.sort(popoAlgoValidator.getAlgoNames()),
         (verbose ? "\n  encoded: " : ""), (verbose ? conf : ""));
   } // method toString
 
@@ -446,30 +406,6 @@ public class CmpControl {
 
   private static Set<String> splitAlgos(String encoded) {
     return StringUtil.splitAsSet(encoded, ALGO_DELIMITER);
-  }
-
-  private CollectionAlgorithmValidator buildAlgorithmValidator(
-      Collection<String> algoNames)
-      throws NoSuchAlgorithmException {
-    Set<SignAlgo> algos = new HashSet<>();
-    for (String algoName : algoNames) {
-      SignAlgo sa;
-      try {
-        sa = SignAlgo.getInstance(algoName);
-      } catch (NoSuchAlgorithmException ex) {
-        LOG.warn("algorithm is not supported {}, ignore it", algoName);
-        continue;
-      }
-
-      algos.add(sa);
-    }
-
-    if (algos.isEmpty()) {
-      throw new NoSuchAlgorithmException("none of the signature algorithms "
-          + algoNames + " are supported");
-    }
-
-    return new CollectionAlgorithmValidator(algos);
   }
 
 }

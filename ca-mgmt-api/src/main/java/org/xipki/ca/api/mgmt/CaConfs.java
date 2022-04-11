@@ -187,12 +187,12 @@ public class CaConfs {
               }
             }
 
-            // DHPoc Control
-            if (ci.getDhpocControl() != null) {
-              FileOrValue fv = ci.getDhpocControl();
+            // POPO Control
+            if (ci.getPopoControl() != null) {
+              FileOrValue fv = ci.getPopoControl();
               String conf = convertSignerConf(fv, properties, baseDir);
               if (conf.length() > 200) {
-                String zipEntryName = "files/ca-" + name + "-dhpoc.conf";
+                String zipEntryName = "files/ca-" + name + "-popo.conf";
                 createFileOrValue(zipStream, conf, zipEntryName);
                 fv.setFile(zipEntryName);
                 fv.setValue(null);

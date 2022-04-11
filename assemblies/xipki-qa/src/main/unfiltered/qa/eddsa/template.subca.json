@@ -29,8 +29,10 @@
 				"messagetime.bias":300,
 				"rr.aki.required":true,
 				"group.enroll":true,
-				"protection.sigalgo":"SHA256withECDSA",
-				"popo.sigalgo":"Ed25519:Ed448:DHPOP-X25519:DHPOP-X448"
+				"protection.sigalgo":"SHA256withECDSA"
+			},
+			"popoControl":{
+				"value":"sigalgo=Ed25519:Ed448:DHPOP-X25519:DHPOP-X448,dh.type=pkcs12,dh.password=1234,dh.keystore=file:qa/keys/dhpopo.p12"
 			},
 			"cmpResponderName":"responder1",
 			"keypairGenNames":["software"],
@@ -39,9 +41,6 @@
 				"enabled":true,
 				"targetReason":"cessationOfOperation",
 				"unchangedSince":"15d"
-			},
-			"dhpocControl":{
-				"value":"type=pkcs12,password=1234,keystore=file:qa/keys/dhpoc.p12"
 			},
 			"keepExpiredCertDays":-1,
 			"maxValidity":"5y",

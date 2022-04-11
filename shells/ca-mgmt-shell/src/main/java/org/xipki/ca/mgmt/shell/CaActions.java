@@ -214,8 +214,8 @@ public class CaActions {
     @Option(name = "--ctlog-control", description = "CT log control")
     private String ctlogControl;
 
-    @Option(name = "--dhpoc-control", description = "DHPoc control")
-    private String dhpocControl;
+    @Option(name = "--popo-control", description = "POPO control")
+    private String popoControl;
 
     @Option(name = "--revoke-suspended-control",
         description = "Revoke suspended certificates control")
@@ -328,13 +328,13 @@ public class CaActions {
         entry.setCtlogControl(new CtlogControl(ctlogControl));
       }
 
-      if (dhpocControl != null) {
-        String conf = dhpocControl;
+      if (popoControl != null) {
+        String conf = popoControl;
         if (conf.contains("file:")) {
           ConfPairs confPairs = new ConfPairs(conf);
-          entry.setDhpocControl(embedFileContent(confPairs).getEncoded());
+          entry.setPopoControl(embedFileContent(confPairs).getEncoded());
         } else {
-          entry.setDhpocControl(dhpocControl);
+          entry.setPopoControl(popoControl);
         }
       }
 
@@ -749,8 +749,8 @@ public class CaActions {
     @Option(name = "--ctlog-control", description = "CT log control")
     private String ctlogControl;
 
-    @Option(name = "--dhpoc-control", description = "DHPoc control")
-    private String dhpocControl;
+    @Option(name = "--popo-control", description = "POPO control")
+    private String popoControl;
 
     @Option(name = "--revoke-suspended-control",
         description = "Revoke suspended certificates control")
@@ -924,10 +924,11 @@ public class CaActions {
         entry.setCtlogControl(ctlogControl);
       }
 
-      if (dhpocControl != null) {
-        String tmp = ShellUtil.canonicalizeSignerConf("PKCS12", dhpocControl,
+      if (popoControl != null) {
+        // TODO: consider the prefix dh.
+        String tmp = ShellUtil.canonicalizeSignerConf("PKCS12", popoControl,
             passwordResolver, securityFactory);
-        entry.setDhpocControl(tmp);
+        entry.setPopoControl(tmp);
       }
 
       if (revokeSuspendedControl != null) {

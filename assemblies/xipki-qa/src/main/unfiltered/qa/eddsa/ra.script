@@ -74,7 +74,7 @@ each ($list) {
   xi:csr-p12 \
     --p12 output/${type}-3.p12 --password 1234 \
     --subject "CN=${type}-3.myorg.org,C=DE" \
-    --peer-certs qa/keys/dhpoc_certs.pem \
+    --peer-certs qa/keys/dhpopo_certs.pem \
     --out output/${type}-3.csr
 }
 
@@ -102,7 +102,7 @@ sleep 1
 
 echo "REST DH POC certificates"
 
-xi:curl --out output/dhpoc-certs.pem $BASE_URL/dhpoc-certs
+xi:curl --out output/dhpopo-certs.pem $BASE_URL/dh-popo-certs
 
 list = [ ed25519 ed448 ]
 each ($list) {
@@ -121,7 +121,7 @@ each ($list) {
   xi:csr-p12 \
     --p12 output/${type}-4.p12 --password 1234 \
     --subject "CN=${type}-4.myorg.org,C=DE" \
-    --peer-certs output/dhpoc-certs.pem \
+    --peer-certs output/dhpopo-certs.pem \
     --out output/${type}-4.csr
 }
 

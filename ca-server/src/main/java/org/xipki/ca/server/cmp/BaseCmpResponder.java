@@ -57,7 +57,7 @@ import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.RequestorInfo.CmpRequestorInfo;
 import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
 import org.xipki.ca.server.CaInfo;
-import org.xipki.ca.server.DhpocControl;
+import org.xipki.ca.server.PopoControl;
 import org.xipki.ca.server.X509Ca;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.security.*;
@@ -813,15 +813,16 @@ abstract class BaseCmpResponder {
       }
     }
 
-    // DHPocs
-    DhpocControl dhpocControl = ca.getCaInfo().getDhpocControl();
-    if (dhpocControl != null) {
-      X509Cert[] certs = dhpocControl.getCertificates();
-      List<byte[]> dhpocCerts = new LinkedList<>();
-      for (X509Cert m : certs) {
-        dhpocCerts.add(m.getEncoded());
+    PopoControl popoControl = ca.getCaInfo().getPopoControl();
+    if (popoControl != null) {
+      X509Cert[] certs = popoControl.getDhCertificates();
+      if (certs != null) {
+        List<byte[]> popoDhCerts = new LinkedList<>();
+        for (X509Cert m : certs) {
+          popoDhCerts.add(m.getEncoded());
+        }
+        root.put("dhpopos", popoDhCerts);
       }
-      root.put("dhpocs", dhpocCerts);
     }
 
     return JSON.toJSONString(root, false);
@@ -880,7 +881,7 @@ abstract class BaseCmpResponder {
       return false;
     }
 
-    AlgorithmValidator algoValidator = getCmpControl().getPopoAlgoValidator();
+    AlgorithmValidator algoValidator = getCa().getPopoAlgoValidator();
     if (!algoValidator.isAlgorithmPermitted(popoAlg)) {
       LOG.error("POPO signature algorithm {} not permitted", popoAlg.getJceName());
       return false;
@@ -888,16 +889,16 @@ abstract class BaseCmpResponder {
 
     try {
       PublicKey publicKey = securityFactory.generatePublicKey(spki);
-      DhpocControl dhpocControl = getCa().getCaInfo().getDhpocControl();
+      PopoControl popoControl = getCa().getCaInfo().getPopoControl();
 
       DHSigStaticKeyCertPair kaKeyAndCert = null;
       if (SignAlgo.DHPOP_X25519 == popoAlg || SignAlgo.DHPOP_X448 == popoAlg) {
-        if (dhpocControl != null) {
+        if (popoControl != null) {
           DhSigStatic dhSigStatic = DhSigStatic.getInstance(popoSign.getSignature().getBytes());
           IssuerAndSerialNumber isn = dhSigStatic.getIssuerAndSerial();
 
           ASN1ObjectIdentifier keyAlgOid = spki.getAlgorithm().getAlgorithm();
-          kaKeyAndCert = dhpocControl.getKeyCertPair(isn.getName(),
+          kaKeyAndCert = popoControl.getDhKeyCertPair(isn.getName(),
               isn.getSerialNumber().getValue(), EdECConstants.getName(keyAlgOid));
         }
 

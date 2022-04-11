@@ -26,10 +26,7 @@ import org.xipki.util.StringUtil;
 
 import java.io.Closeable;
 import java.math.BigInteger;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Concurrent keypair generator.
@@ -44,7 +41,7 @@ public abstract class KeypairGenerator implements Closeable {
 
   protected BigInteger rsaE;
 
-  protected Set<String> keyspecs;
+  protected final Set<String> keyspecs = new HashSet<>();
 
   public String getName() {
     return name;
@@ -77,43 +74,50 @@ public abstract class KeypairGenerator implements Closeable {
       rsaE = BigInteger.valueOf(0x10001);
     }
 
+    Set<String> tokens = null;
     if (pairs != null) {
       String str = pairs.value("keyspecs");
       if (StringUtil.isNotBlank(str)) {
-        Set<String> tokens = StringUtil.splitAsSet(str.toUpperCase(Locale.ROOT), ": \t");
-        keyspecs = new HashSet<>();
-        for (String token : tokens) {
-          if (token.indexOf('/') != -1) {
-            keyspecs.add(token);
-          } else {
-            switch (token) {
-              case "RSA":
-                for (int i = 2; i < 9; i++) {
-                  keyspecs.add("RSA/" + (i * 1024));
-                }
-                break;
-              case "DSA":
-                keyspecs.add("DSA/1024/160");
-                keyspecs.add("DSA/2048/224");
-                keyspecs.add("DSA/2048/256");
-                keyspecs.add("DSA/3072/256");
-                break;
-              case "EC":
-                List<String> curveNames = AlgorithmUtil.getECCurveNames();
-                for (String curveName : curveNames) {
-                  ASN1ObjectIdentifier curveId =
-                      AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName);
-                  if (curveId != null) {
-                    String keyspec = "EC/" + curveId.getId();
-                    keyspecs.add(keyspec);
-                  }
-                }
-                break;
-              default:
-                keyspecs.add(token);
+        tokens = StringUtil.splitAsSet(str.toUpperCase(Locale.ROOT), ": \t");
+      }
+    }
+
+    if (tokens == null) {
+      tokens = new HashSet<>(
+          Arrays.asList("RSA", "EC", "DSA", "ED25519", "ED448", "X25519", "X448"));
+    }
+
+    for (String token : tokens) {
+      if (token.indexOf('/') != -1) {
+        keyspecs.add(token);
+        continue;
+      }
+
+      switch (token) {
+        case "RSA":
+          for (int i = 2; i < 9; i++) {
+            keyspecs.add("RSA/" + (i * 1024));
+          }
+          break;
+        case "DSA":
+          keyspecs.add("DSA/1024/160");
+          keyspecs.add("DSA/2048/224");
+          keyspecs.add("DSA/2048/256");
+          keyspecs.add("DSA/3072/256");
+          break;
+        case "EC":
+          List<String> curveNames = AlgorithmUtil.getECCurveNames();
+          for (String curveName : curveNames) {
+            ASN1ObjectIdentifier curveId =
+                AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName);
+            if (curveId != null) {
+              String keyspec = "EC/" + curveId.getId();
+              keyspecs.add(keyspec);
             }
           }
-        }
+          break;
+        default:
+          keyspecs.add(token);
       }
     }
 
@@ -124,8 +128,7 @@ public abstract class KeypairGenerator implements Closeable {
       throws XiSecurityException;
 
   public boolean supports(String keyspec) {
-    return keyspec != null
-        && (keyspecs == null || keyspecs.contains(keyspec.toUpperCase(Locale.ROOT)));
+    return keyspec != null && keyspecs.contains(keyspec.toUpperCase(Locale.ROOT));
   }
 
   /**

@@ -83,7 +83,7 @@ public class CaInfo {
 
   private final AlgorithmIdentifier caKeyAlgId;
 
-  private DhpocControl dhpocControl;
+  private PopoControl popoControl;
 
   private Map<SignAlgo, ConcurrentContentSigner> signers;
 
@@ -269,8 +269,8 @@ public class CaInfo {
     return caEntry.getCtlogControl();
   }
 
-  public DhpocControl getDhpocControl() {
-    return dhpocControl;
+  public PopoControl getPopoControl() {
+    return popoControl;
   }
 
   public String getScepResponderName() {
@@ -484,19 +484,13 @@ public class CaInfo {
     return true;
   } // method initSigner
 
-  public boolean initDhpocControl(SecurityFactory securityFactory)
-      throws XiSecurityException {
-    if (dhpocControl != null) {
-      return true;
-    }
-
-    if (caEntry.getDhpocControl() != null) {
-      this.dhpocControl = new DhpocControl(caEntry.getDhpocControl());
-    } else {
-      this.dhpocControl = null;
+  public boolean initPopoControl()
+      throws XiSecurityException, InvalidConfException {
+    if (popoControl == null) {
+      this.popoControl = new PopoControl(caEntry.getPopoControl());
     }
     return true;
-  } // method initDhpocControl
+  } // method initPopoControl
 
   public boolean isSignerRequired() {
     int permission = caEntry.getPermission();
