@@ -18,7 +18,6 @@
 package org.xipki.ca.server.db;
 
 import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.CertificateList;
@@ -26,7 +25,6 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.TBSCertList.CRLEntry;
 import org.bouncycastle.cert.X509CRLHolder;
-import org.bouncycastle.util.BigIntegers;
 import org.bouncycastle.util.Pack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +32,10 @@ import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
-import org.xipki.ca.api.mgmt.*;
+import org.xipki.ca.api.mgmt.CaMgmtException;
+import org.xipki.ca.api.mgmt.CertListInfo;
+import org.xipki.ca.api.mgmt.CertListOrderBy;
+import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.api.mgmt.entry.CaHasUserEntry;
 import org.xipki.ca.server.*;
 import org.xipki.datasource.DataAccessException;

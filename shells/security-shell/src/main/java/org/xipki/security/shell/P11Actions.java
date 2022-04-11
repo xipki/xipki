@@ -35,7 +35,6 @@ import org.xipki.security.pkcs11.P11Slot.P11NewObjectControl;
 import org.xipki.security.shell.Actions.CsrGenAction;
 import org.xipki.security.shell.Actions.SecurityAction;
 import org.xipki.security.util.AlgorithmUtil;
-import org.xipki.security.util.DSAParameterCache;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;

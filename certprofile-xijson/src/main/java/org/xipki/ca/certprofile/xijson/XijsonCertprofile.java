@@ -42,7 +42,6 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
 
 import java.io.ByteArrayInputStream;
-import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.Map.Entry;

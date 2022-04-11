@@ -20,7 +20,6 @@ package org.xipki.ca.mgmt.db.diffdb;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.mgmt.db.DbWorker;
-import org.xipki.ca.mgmt.db.port.DbPortWorker;
 import org.xipki.ca.mgmt.db.port.DbPorter;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;

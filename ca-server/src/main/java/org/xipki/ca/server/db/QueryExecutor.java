@@ -17,7 +17,6 @@
 
 package org.xipki.ca.server.db;
 
-import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 

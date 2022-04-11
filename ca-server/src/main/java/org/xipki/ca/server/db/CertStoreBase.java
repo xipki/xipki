@@ -27,7 +27,6 @@ import org.xipki.password.PasswordResolverException;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
-import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Hex;
 

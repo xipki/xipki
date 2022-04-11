@@ -19,16 +19,13 @@ package org.xipki.ca.mgmt.db;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.mgmt.db.port.*;
+import org.xipki.ca.mgmt.db.port.DbPorter;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
-import org.xipki.util.Args;
 import org.xipki.util.IoUtil;
-import org.xipki.util.StringUtil;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;

@@ -22,7 +22,10 @@ import org.xipki.security.pkcs11.P11KeypairGenerator;
 import org.xipki.security.pkcs12.SoftwareKeypairGenerator;
 import org.xipki.util.ObjectCreationException;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * {@link KeypairGeneratorFactory} for the type software.

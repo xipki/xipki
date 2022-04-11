@@ -20,7 +20,6 @@ package org.xipki.security;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.ConfPairs;
-import org.xipki.util.StringUtil;
 
 import java.util.List;
 
