@@ -142,17 +142,17 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.bouncycastle</groupId>
-                  <artifactId>bcprov-jdk15on</artifactId>
+                  <artifactId>bcprov-jdk18on</artifactId>
                   <version>${bc.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.bouncycastle</groupId>
-                  <artifactId>bcpkix-jdk15on</artifactId>
+                  <artifactId>bcpkix-jdk18on</artifactId>
                   <version>${bc.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.bouncycastle</groupId>
-                  <artifactId>bcutil-jdk15on</artifactId>
+                  <artifactId>bcutil-jdk18on</artifactId>
                   <version>${bc.version}</version>
                 </artifactItem>
               </artifactItems>
@@ -343,15 +343,15 @@
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/system/org/apache/karaf/features/standard/${karaf.version}/standard-${karaf.version}-features.xml"
                   token="bcutil-jdk15on/${karaf.bc.version}"
-                  value="bcutil-jdk15on/${bc.version}"/>
+                  value="bcutil-jdk18on/${bc.version}"/>
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/system/org/apache/karaf/features/standard/${karaf.version}/standard-${karaf.version}-features.xml"
                   token="bcprov-jdk15on/${karaf.bc.version}"
-                  value="bcprov-jdk15on/${bc.version}"/>
+                  value="bcprov-jdk18on/${bc.version}"/>
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/system/org/apache/karaf/features/standard/${karaf.version}/standard-${karaf.version}-features.xml"
                   token="bcpkix-jdk15on/${karaf.bc.version}"
-                  value="bcpkix-jdk15on/${bc.version}"/>
+                  value="bcpkix-jdk18on/${bc.version}"/>
                 <!-- jdk15on.karaf.version -->
                 <unzip failOnEmptyArchive="true"
                   src="../xipki-dbtool/target/xipki-dbtool-${project.version}.zip"
@@ -411,15 +411,15 @@
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${jdk11on.karaf.version}/system/org/apache/karaf/features/standard/${jdk11on.karaf.version}/standard-${jdk11on.karaf.version}-features.xml"
                   token="bcutil-jdk15on/${jdk15on.karaf.bc.version}"
-                  value="bcutil-jdk15on/${bc.version}"/>
+                  value="bcutil-jdk18on/${bc.version}"/>
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${jdk11on.karaf.version}/system/org/apache/karaf/features/standard/${jdk11on.karaf.version}/standard-${jdk11on.karaf.version}-features.xml"
                   token="bcprov-jdk15on/${jdk15on.karaf.bc.version}"
-                  value="bcprov-jdk15on/${bc.version}"/>
+                  value="bcprov-jdk18on/${bc.version}"/>
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${jdk11on.karaf.version}/system/org/apache/karaf/features/standard/${jdk11on.karaf.version}/standard-${jdk11on.karaf.version}-features.xml"
                   token="bcpkix-jdk15on/${jdk15on.karaf.bc.version}"
-                  value="bcpkix-jdk15on/${bc.version}"/>
+                  value="bcpkix-jdk18on/${bc.version}"/>
               </target>
             </configuration>
             <goals>

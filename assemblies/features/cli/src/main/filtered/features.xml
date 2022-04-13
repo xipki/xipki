@@ -5,8 +5,8 @@
   <feature name="xipki-security" version="${project.version}" description="security shell">
     <bundle>mvn:org.xipki/util/${project.version}</bundle>
     <bundle>mvn:org.xipki/password/${project.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
@@ -17,9 +17,9 @@
   <feature name="xipki-caclient" version="${project.version}" description="CA client">
     <bundle>mvn:org.xipki/util/${project.version}</bundle>
     <bundle>mvn:org.xipki/password/${project.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcutil-jdk15on/${bc.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
@@ -32,9 +32,9 @@
       description="SCEP client shell">
     <bundle>mvn:org.xipki/util/${project.version}</bundle>
     <bundle>mvn:org.xipki/password/${project.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcutil-jdk15on/${bc.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}</bundle>
     <bundle><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
     <bundle>mvn:org.xipki/security-extra/${project.version}</bundle>
@@ -45,9 +45,9 @@
   <feature name="xipki-ocspclient" version="${project.version}" description="OCSP client shell">
     <bundle>mvn:org.xipki/util/${project.version}</bundle>
     <bundle>mvn:org.xipki/password/${project.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcutil-jdk15on/${bc.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
@@ -60,9 +60,9 @@
     <bundle>mvn:org.osgi/org.osgi.service.jdbc/1.0.0</bundle>
     <bundle>mvn:org.xipki/util/${project.version}</bundle>
     <bundle>mvn:org.xipki/password/${project.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcutil-jdk15on/${bc.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}</bundle>
     <bundle><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
     <bundle>mvn:org.xipki/security-extra/${project.version}</bundle>
@@ -78,9 +78,9 @@
   <feature name="xipki-ocspmgmt" version="${project.version}" description="OCSP management">
     <bundle>mvn:org.xipki/util/${project.version}</bundle>
     <bundle>mvn:org.xipki/password/${project.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcutil-jdk15on/${bc.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}</bundle>
     <bundle><![CDATA[wrap:mvn:com.alibaba/fastjson/${fastjson.version}/$Bundle-SymbolicName=fastjson&Bundle-Version=${fastjson.version}]]></bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
     <bundle>mvn:org.xipki/security-extra/${project.version}</bundle>
