@@ -47,6 +47,11 @@ ca:keypairgen-add \
   --type pkcs11 \
   --conf slot=0,keyspecs=RSA:DSA:EC:SM2:ED25519:ED448:X25519:X448
 
+ca:keypairgen-add \
+  --name keypool \
+  --type keypool \
+  --conf datasource=keypool,keyspecs=RSA:DSA:EC:SM2:ED25519:ED448:X25519:X448
+
 # CMP Requestors
 ca:requestor-add \
   --name requestor1 \

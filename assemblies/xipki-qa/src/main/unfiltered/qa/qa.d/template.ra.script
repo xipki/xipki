@@ -85,18 +85,14 @@ xi:update-cert-p12 --p12 output/ocsp2.p12 --password 1234 \
   --ca-cert output/rootca1.crt
 
 # CMP: Enroll (CA generate key pair) via CRMF
+CN = cmp-crmf-ca-genkey-tls
 
-list = [ tls tls-dsa tls-ec tls-ed25519 tls-rsa tls-sm2]
+xi:cmp-enroll-cagenkey \
+  --p12-out output/${CN}.p12 --password 1234 \
+  --cert-outform $OUTFORM --cert-out output/${CN}.crt \
+  --profile tls --subject "CN=${CN}.myorg.org,O=myorg,C=DE"
 
-each ($list) {
-  profilename = $it
-  CN = cmp-crmf-ca-genkey-${profilename}
-
-  xi:cmp-enroll-cagenkey \
-    --p12-out output/${CN}.p12 --password 1234 \
-    --cert-outform $OUTFORM --cert-out output/${CN}.crt \
-    --profile ${profilename} --subject "CN=${CN}.myorg.org,O=myorg,C=DE"
-}
+source qa/qa.d/ra-cagenkey.script
 
 ## Revocate certificates
 xi:cmp-revoke --ca subcawithcrl1 --cert output/ocsp2.crt --reason keyCompromise

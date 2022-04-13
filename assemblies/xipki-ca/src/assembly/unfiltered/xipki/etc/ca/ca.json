@@ -15,6 +15,12 @@
 	//		"file":"etc/ca/database/ocsp-db.properties"
 	//	}
 	//}
+	//,{
+	//	"name":"keypool",
+	//	"conf":{
+	//		"file":"etc/ca/database/keypool-db.properties"
+	//	}
+	//}
 	],
 	"remoteMgmt":{
 		"enabled":true,

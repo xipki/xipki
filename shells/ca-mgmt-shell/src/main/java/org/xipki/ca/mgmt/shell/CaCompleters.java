@@ -140,7 +140,7 @@ public class CaCompleters {
   public static class KeypairGenTypeCompleter extends EnumCompleter {
 
     public KeypairGenTypeCompleter() {
-      setTokens("PKCS11", "DATABASE");
+      setTokens("SOFTWARE", "PKCS11", "KEYPOOL");
     }
   } // class KeypairGenTypeCompleter
 

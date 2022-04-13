@@ -205,6 +205,8 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   boolean masterMode;
 
+  int shardId;
+
   Map<String, FileOrValue> datasourceNameConfFileMap;
 
   CaServerConf caServerConf;
@@ -373,7 +375,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     masterMode = caServerConf.isMaster();
     LOG.info("ca.masterMode: {}", masterMode);
 
-    int shardId = caServerConf.getShardId();
+    shardId = caServerConf.getShardId();
     LOG.info("ca.shardId: {}", shardId);
 
     if (caServerConf.getCtLog() != null) {

@@ -23,6 +23,12 @@
 		"conf":{
 			"value":"slot=0,keyspecs=RSA:DSA:EC:SM2:ED25519:ED448:X25519:X448"
 		}
+	},{
+		"name":"keypool",
+		"type":"keypool",
+		"conf":{
+			"value":"datasource=keypool,keyspecs=RSA:DSA:EC:SM2:ED25519:ED448:X25519:X448"
+		}
 	}],
 	"requestors":[{
 		"name":"requestor1",

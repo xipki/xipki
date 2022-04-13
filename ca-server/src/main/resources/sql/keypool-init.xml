@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ XiPKI version 5.4.0
+ Maximal column size: 4k
+  - DB2: PAGESIZE 4 k
+-->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+  logicalFilePath="keypool-init.xml">
+  <changeSet author="xipki" id="1">
+    <!-- table DBSCHEMA -->
+    <createTable tableName="DBSCHEMA">
+      <!--remarks="database schema information"-->
+      <column name="NAME" type="VARCHAR(45)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="VALUE2" type="VARCHAR(100)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <insert tableName="DBSCHEMA">
+      <column name="NAME" value="VENDOR"/>
+      <column name="VALUE2" value="XIPKI"/>
+    </insert>
+    <insert tableName="DBSCHEMA">
+      <column name="NAME" value="VERSION"/>
+      <column name="VALUE2" value="7"/>
+    </insert>
+    <!-- table ISSUER -->
+    <createTable tableName="KEYSPEC">
+      <column name="ID" type="SMALLINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="KEYSPEC" type="VARCHAR(100)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <createTable tableName="KEYPOOL">
+      <column name="ID" type="BIGINT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="SHARD_ID" type="SMALLINT">
+        <!-- Shard id, match the shard id of the CA software instance-->
+        <constraints nullable="false"/>
+      </column>
+      <column name="KID" type="SMALLINT">
+        <!-- KEYSPEC ID-->
+        <constraints nullable="false"/>
+      </column>
+      <column name="DATA" type="VARCHAR(3300)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+  <!-- foreign key -->
+  <!--changeSet author="xipki" id="2">
+    <addForeignKeyConstraint constraintName="FK_KEYPOOL_SPEC1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="NO ACTION" onUpdate="NO ACTION"
+      baseColumnNames="KEYSPEC_ID" baseTableName="KEYPOOL"
+      referencedColumnNames="ID" referencedTableName="KEYSPEC"/>
+  </changeSet-->
+</databaseChangeLog>

@@ -190,8 +190,12 @@ class CaCertstoreDbExporter extends DbPorter {
     switch (type) {
       case CERT:
         numProcessedBefore = certstore.getCountCerts();
-        coreSql = "ID,SN,CA_ID,PID,RID,RTYPE,TID,UID,EE,LUPDATE,REV,RR,RT,RIT,FP_RS,"
-            + "REQ_SUBJECT,CRL_SCOPE,CERT,PRIVATE_KEY FROM CERT WHERE ID>=?";
+        String columns = "ID,SN,CA_ID,PID,RID,RTYPE,TID,UID,EE,LUPDATE,REV,RR,RT,RIT,FP_RS,"
+            + "REQ_SUBJECT,CRL_SCOPE,CERT";
+        if (dbSchemaVersion >= 7) {
+          columns += ",PRIVATE_KEY";
+        }
+        coreSql = columns + " FROM CERT WHERE ID>=?";
         break;
       case CRL:
         numProcessedBefore = certstore.getCountCrls();
@@ -279,7 +283,10 @@ class CaCertstoreDbExporter extends DbPorter {
 
           if (CaDbEntryType.CERT == type) {
             byte[] certBytes = Base64.decodeFast(rs.getString("CERT"));
-            String privateKey = rs.getString("PRIVATE_KEY");
+            String privateKey = null;
+            if (dbSchemaVersion >= 7) {
+              rs.getString("PRIVATE_KEY");
+            }
 
             String sha1 = HashAlgo.SHA1.hexHash(certBytes);
 
