@@ -51,7 +51,7 @@ public class DatabaseMacAuditService extends MacAuditService {
   public static final String KEY_DATASOURCE = "datasource";
 
   private static final String SQL_ADD_AUDIT =
-          "INSERT INTO AUDIT (SHARDID,ID,TIME,LEVEL,EVENT_TYPE,PREVIOUS_ID,MESSAGE,TAG) " +
+          "INSERT INTO AUDIT (SHARD_ID,ID,TIME,LEVEL,EVENT_TYPE,PREVIOUS_ID,MESSAGE,TAG) " +
                   "VALUES (?,?,?,?,?,?,?,?)";
 
   private static final String SQL_UPDATE_INTEGRITY =
@@ -125,13 +125,13 @@ public class DatabaseMacAuditService extends MacAuditService {
       }
 
       conn = datasource.getConnection();
-      long maxId = datasource.getMax(conn, "AUDIT", "ID", "SHARDID=" + shardId);
+      long maxId = datasource.getMax(conn, "AUDIT", "ID", "SHARD_ID=" + shardId);
       if (maxId < 1) {
         id.set(0);
         previousTag = null;
       } else {
         String sql = datasource.buildSelectFirstSql(1,
-                "TAG FROM AUDIT WHERE SHARDID=" + shardId + " AND ID=" + maxId);
+                "TAG FROM AUDIT WHERE SHARD_ID=" + shardId + " AND ID=" + maxId);
         ResultSet rs = null;
         Statement stmt = null;
 

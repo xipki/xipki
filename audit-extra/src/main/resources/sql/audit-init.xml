@@ -27,7 +27,7 @@
     </insert>
     <!-- table AUDIT -->
     <createTable tableName="AUDIT">
-      <column name="SHARDID" type="SMALLINT">
+      <column name="SHARD_ID" type="SMALLINT">
         <constraints nullable="false"/>
       </column>
       <column name="ID" type="BIGINT">
