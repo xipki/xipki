@@ -22,9 +22,6 @@
     |     DER encoded CRL file.
     |     - Will be ignored if the CA is revoked, otherwise required.
     |
-    +-- ca.crl.info (file, will be generated automatically)
-    |     Meta data of the CRL contained in the file ca.crl.
-    |
     +-- issuer.crt (file, required for indirect CRL)
     |     If present, it specifies the CRL's issuer certificate.
     |
