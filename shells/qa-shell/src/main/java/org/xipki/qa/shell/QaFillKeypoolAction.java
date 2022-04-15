@@ -32,6 +32,15 @@ public class QaFillKeypoolAction extends XiAction {
       description = "number of keypairs for each keyspec")
   private int num = 10;
 
+  @Option(name = "--enc-algo",
+      description = "algorithm to encrypt the generated keypair." +
+          "Valid values are AES128/GCM, AES192/GCM and AES256/GCM")
+  private String encAlg = "AES128/GCM";
+
+  @Option(name = "--password",
+      description = "password to encrypt the generated keypair")
+  private String password;
+
   private DataSourceFactory datasourceFactory;
 
   @Reference
@@ -47,8 +56,15 @@ public class QaFillKeypoolAction extends XiAction {
       throw new IllegalCmdParamException("invalid num " + num);
     }
 
+    char[] passwordChars;
+    if (password == null) {
+      passwordChars = readPassword();
+    } else {
+      passwordChars = password.toCharArray();
+    }
+
     FillKeytool fillKeytool = new FillKeytool(datasourceFactory, passwordResolver, dbconfFile);
-    fillKeytool.execute(num);
+    fillKeytool.execute(num, encAlg, passwordChars);
     return null;
   }
 }

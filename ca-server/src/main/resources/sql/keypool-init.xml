@@ -48,17 +48,17 @@
         <!-- KEYSPEC ID-->
         <constraints nullable="false"/>
       </column>
+      <column name="ENC_ALG" type="SMALLINT">
+        <!-- Encryption algorithm: 1 for AES128/GCM, 2 for AES192/GCM, 3 for AES256/GCM-->
+        <constraints nullable="false"/>
+      </column>
+      <column name="ENC_META" type="VARCHAR(100)">
+        <!-- For ENC_ALG 1, 2, 3: base64(nonce) -->
+      </column>
       <column name="DATA" type="VARCHAR(3300)">
+        <!-- base64(encrypted PrivateKeyInfo) -->
         <constraints nullable="false"/>
       </column>
     </createTable>
   </changeSet>
-  <!-- foreign key -->
-  <!--changeSet author="xipki" id="2">
-    <addForeignKeyConstraint constraintName="FK_KEYPOOL_SPEC1"
-      deferrable="false" initiallyDeferred="false"
-      onDelete="NO ACTION" onUpdate="NO ACTION"
-      baseColumnNames="KEYSPEC_ID" baseTableName="KEYPOOL"
-      referencedColumnNames="ID" referencedTableName="KEYSPEC"/>
-  </changeSet-->
 </databaseChangeLog>

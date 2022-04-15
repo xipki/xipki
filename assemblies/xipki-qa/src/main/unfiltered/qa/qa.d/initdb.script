@@ -64,4 +64,4 @@ if { "${OS_NAME}" equals "windows" } then {
   shell:exec dbtool/bin/initdb.sh --force --db-conf "${DB_CONF}" --db-schema ${DB_SCHEMA}
 }
 
-qa:fill-keypool --db-conf "${DB_CONF}"
+qa:fill-keypool --db-conf "${DB_CONF}" --password CHANGEME

@@ -50,7 +50,7 @@ ca:keypairgen-add \
 ca:keypairgen-add \
   --name keypool \
   --type keypool \
-  --conf datasource=keypool,keyspecs=RSA:DSA:EC:SM2:ED25519:ED448:X25519:X448
+  --conf datasource=keypool,password=CHANGEME,keyspecs=RSA:DSA:EC:SM2:ED25519:ED448:X25519:X448
 
 # CMP Requestors
 ca:requestor-add \

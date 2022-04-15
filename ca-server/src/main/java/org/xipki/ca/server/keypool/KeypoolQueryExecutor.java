@@ -55,7 +55,7 @@ class KeypoolQueryExecutor {
       throws DataAccessException {
     this.datasource = notNull(datasource, "datasource");
     this.sqlGetKeyData = datasource.buildSelectFirstSql(1,
-        "ID,DATA FROM KEYPOOL WHERE SHARD_ID=" + shardId + " AND KID=?");
+        "ID,ENC_ALG,ENC_META,DATA FROM KEYPOOL WHERE SHARD_ID=" + shardId + " AND KID=?");
   } // constructor
 
   void close() {
@@ -86,7 +86,7 @@ class KeypoolQueryExecutor {
     }
   } // method initIssuerStore
 
-  byte[] nextKeyData(int keyspecId)
+  KeypoolKeypairGenerator.CipherData nextKeyData(int keyspecId)
       throws DataAccessException {
     final String sql = sqlGetKeyData;
     PreparedStatement ps = datasource.prepareStatement(sql);
@@ -100,7 +100,10 @@ class KeypoolQueryExecutor {
       }
 
       int id = rs.getInt("ID");
-      byte[] key = Base64.decodeFast(rs.getString("DATA"));
+      KeypoolKeypairGenerator.CipherData cd = new KeypoolKeypairGenerator.CipherData();
+      cd.encAlg = rs.getInt("ENC_ALG");
+      cd.encMeta = Base64.decodeFast(rs.getString("ENC_META"));
+      cd.cipherText = Base64.decodeFast(rs.getString("DATA"));
       datasource.releaseResources(ps, rs);
       ps = null;
       rs = null;
@@ -108,7 +111,7 @@ class KeypoolQueryExecutor {
       ps = datasource.prepareStatement(sqlDeleteKeyData);
       ps.setInt(1, id);
       ps.executeUpdate();
-      return key;
+      return cd;
     } catch (SQLException ex) {
       throw datasource.translate(sql, ex);
     } finally {

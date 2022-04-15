@@ -19,15 +19,24 @@ import org.xipki.security.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.DSAParameterCache;
 import org.xipki.security.util.KeyUtil;
+import org.xipki.util.Args;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.security.SecureRandom;
 import java.security.interfaces.*;
 import java.security.spec.DSAParameterSpec;
+import java.security.spec.KeySpec;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -42,19 +51,51 @@ import java.util.*;
 
 public class FillKeytool {
 
+  private static final int ENCALG_AES128GCM = 1;
+
+  private static final int ENCALG_AES192GCM = 2;
+
+  private static final int ENCALG_AES256GCM = 3;
+
   protected final DataSourceWrapper datasource;
+
+  private final PasswordResolver passwordResolver;
 
   public FillKeytool(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
                      String dbConfFile)
       throws PasswordResolverException, IOException {
+    this.passwordResolver = passwordResolver;
     try (InputStream dbConfStream = new FileInputStream(IoUtil.expandFilepath(dbConfFile))) {
       this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, dbConfStream,
           passwordResolver);
     }
   }
 
-  public void execute(int numKeypairs)
+  public void execute(int numKeypairs, String encAlg, char[] password)
       throws Exception {
+    Args.notNull(password, "password");
+
+    int encAlgCode;
+    int keyLength;
+    if (encAlg == null || "AES128/GCM".equalsIgnoreCase(encAlg)) {
+      encAlgCode = ENCALG_AES128GCM;
+      keyLength = 128;
+    } else if ("AES192/GCM".equalsIgnoreCase(encAlg)) {
+      encAlgCode = ENCALG_AES192GCM;
+      keyLength = 192;
+    } else if ("AES256/GCM".equalsIgnoreCase(encAlg)) {
+      encAlgCode = ENCALG_AES256GCM;
+      keyLength = 256;
+    } else {
+      throw new IllegalArgumentException("invalid encAlg " + encAlg);
+    }
+
+    KeySpec spec = new PBEKeySpec(password, "ENC".getBytes(StandardCharsets.UTF_8),
+        10000, keyLength);
+    SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+    SecretKey key = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
+    Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+
     Connection conn = datasource.getConnection();
 
     PreparedStatement ps = null;
@@ -119,7 +160,7 @@ public class FillKeytool {
 
       ps = null;
 
-      sql = "INSERT INTO KEYPOOL (ID,KID,SHARD_ID,DATA) VALUES(?,?,?,?)";
+      sql = "INSERT INTO KEYPOOL (ID,KID,SHARD_ID,ENC_ALG,ENC_META,DATA) VALUES(?,?,?,?,?,?)";
 
       SecureRandom rnd = new SecureRandom();
       ps = datasource.prepareStatement(sql);
@@ -171,10 +212,21 @@ public class FillKeytool {
           } else {
             keyInfo = generateKeypair(keyspec, rnd).getEncoded();
           }
-          ps.setInt(1, id++);
-          ps.setInt(2, kid);
-          ps.setInt(3, 0);
-          ps.setString(4, Base64.encodeToString(keyInfo));
+
+          byte[] nonce = new byte[12];
+          rnd.nextBytes(nonce);
+          GCMParameterSpec gcmSpec = new GCMParameterSpec(128, nonce);
+
+          cipher.init(Cipher.ENCRYPT_MODE, key, gcmSpec);
+          byte[] encryptedData = cipher.doFinal(keyInfo);
+
+          int idx = 1;
+          ps.setInt(idx++, id++);
+          ps.setInt(idx++, kid);
+          ps.setInt(idx++, 0); // SHARD_ID
+          ps.setInt(idx++, encAlgCode); // AES128/GCM
+          ps.setString(idx++, Base64.encodeToString(nonce));
+          ps.setString(idx++, Base64.encodeToString(encryptedData));
           ps.addBatch();
 
           if ((i == numKeypairs - 1) || (i % 100 == 0)) {

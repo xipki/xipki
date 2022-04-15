@@ -13,8 +13,17 @@ import org.xipki.security.XiSecurityException;
 import org.xipki.util.Args;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.FileOrValue;
+import org.xipki.util.StringUtil;
 
+import javax.crypto.*;
+import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.spec.KeySpec;
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,11 +39,25 @@ import java.util.Set;
 
 public class KeypoolKeypairGenerator extends KeypairGenerator {
 
+  static class CipherData {
+    int encAlg;
+    byte[] encMeta;
+    byte[] cipherText;
+  }
+
   private static final Logger LOG = LoggerFactory.getLogger(KeypoolKeypairGenerator.class);
 
   private int shardId;
 
   private KeypoolQueryExecutor queryExecutor;
+
+  private SecretKey aes128key;
+
+  private SecretKey aes192key;
+
+  private SecretKey aes256key;
+
+  private Cipher cipher;
 
   private Map<String, FileOrValue> datasourceConfs;
 
@@ -98,30 +121,80 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
     } catch (DataAccessException ex) {
       throw new XiSecurityException(ex.getMessage(), ex);
     }
+
+    String password = conf.value("password");
+    if (StringUtil.isBlank(password)) {
+      throw new IllegalArgumentException("property password not defined");
+    }
+
+    try {
+      SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+      char[] passwordChars = password.toCharArray();
+
+      int[] keyLengths = {128, 192, 256};
+      for (int keyLength : keyLengths) {
+        KeySpec spec = new PBEKeySpec(passwordChars, "ENC".getBytes(StandardCharsets.UTF_8),
+            10000, keyLength);
+        SecretKey key = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
+        if (keyLength == 128) {
+          aes128key = key;
+        } else if (keyLength == 192) {
+          aes192key = key;
+        } else {
+          aes256key = key;
+        }
+      }
+
+      cipher = Cipher.getInstance("AES/GCM/NoPadding");
+    } catch (Exception ex) {
+      throw new IllegalStateException("could not initialize Cipher", ex);
+    }
+
   }
 
   @Override
-  public PrivateKeyInfo generateKeypair(String keyspec)
+  public synchronized PrivateKeyInfo generateKeypair(String keyspec)
       throws XiSecurityException {
     Integer keyspecId = keyspecToId.get(keyspec);
     if (keyspecId == null) {
       return null;
     }
 
-    byte[] bytes ;
+    CipherData cd ;
     synchronized (keyspecId) {
       // need to synchronize to prevent from the reuse of the same keypair.
       try {
-        bytes = queryExecutor.nextKeyData(keyspecId);
+        cd = queryExecutor.nextKeyData(keyspecId);
       } catch (DataAccessException ex) {
         throw new XiSecurityException(ex);
       }
     }
 
-    if (bytes == null) {
+    if (cd == null) {
       throw new XiSecurityException("found no keypair of spec " + keyspec + "in the keypool");
     }
-    return PrivateKeyInfo.getInstance(bytes);
+
+    GCMParameterSpec spec = new GCMParameterSpec(128, cd.encMeta);
+    SecretKey key;
+    if (cd.encAlg == 1) {
+      key = aes128key;
+    } else if (cd.encAlg == 2) {
+      key = aes192key;
+    } else if (cd.encAlg == 3) {
+      key = aes256key;
+    } else {
+      throw new XiSecurityException("unknown encryption algorithm " + cd.encAlg);
+    }
+
+    byte[] plain;
+    try {
+      cipher.init(Cipher.DECRYPT_MODE, key, spec);
+      plain = cipher.doFinal(cd.cipherText);
+    } catch (IllegalBlockSizeException | BadPaddingException | InvalidKeyException
+        | InvalidAlgorithmParameterException ex) {
+      throw new XiSecurityException("error decrypting ciphertext", ex);
+    }
+    return PrivateKeyInfo.getInstance(plain);
   }
 
   @Override
