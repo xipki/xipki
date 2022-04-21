@@ -111,7 +111,7 @@ public class CaUtil {
       throw new IllegalArgumentException("caIssuerUris and ospUris may not be both empty");
     }
 
-    List<AccessDescription> accessDescriptions = new ArrayList<>(ocspUris.size());
+    List<AccessDescription> accessDescriptions = new ArrayList<>();
 
     if (CollectionUtil.isNotEmpty(caIssuerUris)) {
       for (String uri : caIssuerUris) {
