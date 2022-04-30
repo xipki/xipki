@@ -185,7 +185,7 @@ public class P12Actions {
 
       ks.setKeyEntry(keyname, key, pwd, jceCertChain);
 
-      try (OutputStream out = Files.newOutputStream(Paths.get(p12File))) {
+      try (OutputStream out = Files.newOutputStream(Paths.get(expandFilepath(p12File)))) {
         ks.store(out, pwd);
         println("updated certificate");
         return null;
@@ -206,7 +206,7 @@ public class P12Actions {
           throw new XiSecurityException("the certificate and private do not match");
         }
       } else {
-        ConfPairs pairs = new ConfPairs("keystore", "file:" + p12File);
+        ConfPairs pairs = new ConfPairs("keystore", "file:" + expandFilepath(p12File));
         if (password != null) {
           pairs.putPair("password", password);
         }
@@ -271,7 +271,7 @@ public class P12Actions {
 
       ConfPairs conf = new ConfPairs("password", new String(pwd));
       conf.putPair("parallelism", Integer.toString(1));
-      conf.putPair("keystore", "file:" + p12File);
+      conf.putPair("keystore", "file:" + expandFilepath(p12File));
 
       HashAlgo ha;
       try {
@@ -501,7 +501,7 @@ public class P12Actions {
     protected Object execute0()
         throws Exception {
       char[] password = getPassword();
-      try (InputStream keystoreStream = new FileInputStream(p12File)) {
+      try (InputStream keystoreStream = new FileInputStream(expandFilepath(p12File))) {
         KeypairWithCert kp = KeypairWithCert.fromKeystore("PKCS12",
                               keystoreStream, password, null, password, (X509Cert) null);
         byte[] encodedKey = PemEncoder.encode(kp.getKey().getEncoded(), PemLabel.PRIVATE_KEY);
