@@ -14,7 +14,7 @@ See also <https://github.com/xipki/xipki/releases>
  - DB Tool
   - N/A
 - Dependencies
-  - N/A
+  - Update bouncycastle from 1.70 to 1.71
 
 ## 5.3.15
 - Release date: February 12, 2022

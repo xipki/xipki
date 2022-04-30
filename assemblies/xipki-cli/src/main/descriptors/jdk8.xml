@@ -120,6 +120,9 @@
         <exclude>system/org/bouncycastle/bcutil-jdk15on/**</exclude>
         <exclude>system/org/bouncycastle/bcprov-jdk15on/**</exclude>
         <exclude>system/org/bouncycastle/bcpkix-jdk15on/**</exclude>
+        <exclude>system/org/bouncycastle/bcutil-jdk18on/**</exclude>
+        <exclude>system/org/bouncycastle/bcprov-jdk18on/**</exclude>
+        <exclude>system/org/bouncycastle/bcpkix-jdk18on/**</exclude>
       </excludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
