@@ -189,7 +189,7 @@
 			"description":"pkix-ocsp-nocheck"
 		},
 		"critical":false,
-		"required":false,
+		"required":true,
 		"permittedInRequest":false
 	},{
 		"type":{
