@@ -439,10 +439,11 @@
               <goal>single</goal>
             </goals>
             <configuration>
+	          <finalName>${project.artifactId}-jdk8-${project.version}</finalName>
               <descriptors>
                 <descriptor>src/main/descriptors/jdk8.xml</descriptor>
               </descriptors>
-              <appendAssemblyId>true</appendAssemblyId>
+              <appendAssemblyId>false</appendAssemblyId>
               <tarLongFileMode>posix</tarLongFileMode>
               <!-- Don't install/publish the result -->
               <attach>false</attach>
