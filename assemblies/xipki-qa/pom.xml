@@ -114,7 +114,7 @@
             </goals>
             <configuration>
               <stripVersion>false</stripVersion>
-              <outputDirectory>${project.build.directory}/classes/lib/ext</outputDirectory>
+              <outputDirectory>${project.build.directory}/extern-jars</outputDirectory>
               <artifactItems>
                 <artifactItem>
                   <groupId>org.mariadb.jdbc</groupId>
@@ -125,35 +125,6 @@
                   <groupId>org.postgresql</groupId>
                   <artifactId>postgresql</artifactId>
                   <version>${jdbc.postgresql.version}</version>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-          <execution>
-            <!-- Copy the bouncycastle jars -->
-            <id>bclib</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <stripVersion>false</stripVersion>
-              <outputDirectory>${project.build.directory}/xipki-ca-${project.version}/lib</outputDirectory>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.bouncycastle</groupId>
-                  <artifactId>bcprov-jdk18on</artifactId>
-                  <version>${bc.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.bouncycastle</groupId>
-                  <artifactId>bcpkix-jdk18on</artifactId>
-                  <version>${bc.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.bouncycastle</groupId>
-                  <artifactId>bcutil-jdk18on</artifactId>
-                  <version>${bc.version}</version>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -439,7 +410,7 @@
               <goal>single</goal>
             </goals>
             <configuration>
-              <finalName>${project.artifactId}-jdk8-${project.version}</finalName>
+	          <finalName>${project.artifactId}-jdk8-${project.version}</finalName>
               <descriptors>
                 <descriptor>src/main/descriptors/jdk8.xml</descriptor>
               </descriptors>
