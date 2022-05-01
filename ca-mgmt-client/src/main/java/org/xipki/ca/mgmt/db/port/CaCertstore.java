@@ -340,7 +340,7 @@ public class CaCertstore extends ValidatableConf {
       notNull(signerConf, "signerConf");
       signerConf.validate();
 
-      notBlank(protocolSupport, "protocolSupport");
+      //notBlank(protocolSupport, "protocolSupport");
     }
 
   } // class Ca

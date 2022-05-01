@@ -159,9 +159,7 @@
       <column name="CRL_SIGNER_NAME" type="VARCHAR(45)"/>
       <column name="CMP_RESPONDER_NAME" type="VARCHAR(45)"/>
       <column name="SCEP_RESPONDER_NAME" type="VARCHAR(45)"/>
-      <column name="PROTOCOL_SUPPORT" type="VARCHAR(200)" defaultValueNumeric="0">
-        <!--remarks="Whether REST API is supported, default is false (0)"-->
-      </column>
+      <column name="PROTOCOL_SUPPORT" type="VARCHAR(200)" />
       <column name="SAVE_REQ" type="SMALLINT" defaultValueNumeric="0">
         <!--remarks="Whether requests should be saved, default is false (0)"-->
       </column>
