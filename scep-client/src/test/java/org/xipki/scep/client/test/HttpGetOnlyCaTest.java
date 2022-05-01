@@ -29,7 +29,7 @@ public class HttpGetOnlyCaTest extends AbstractCaTest {
 
   @Override
   protected CaCapability[] getExcludedCaCaps() {
-    return new CaCapability[]{CaCapability.POSTPKIOperation};
+    return new CaCapability[]{CaCapability.POSTPKIOperation, CaCapability.SCEPStandard};
   }
 
 }

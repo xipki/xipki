@@ -17,10 +17,7 @@
 
 package org.xipki.scep.message;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.DERPrintableString;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.cms.*;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -44,6 +41,7 @@ import org.xipki.util.StringUtil;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
+import java.security.interfaces.RSAPrivateKey;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -290,6 +288,18 @@ public class DecodedPkiMessage extends PkiMessage {
         }
 
         ret.setFailInfo(failInfo);
+
+        // failInfoText
+        ASN1Encodable value = ScepUtil.getFirstAttrValue(signedAttrs,
+            ScepObjectIdentifiers.ID_SCEP_FAILINFOTEXT);
+        if (value != null) {
+          if (value instanceof ASN1UTF8String) {
+            ret.setFailInfoText(((ASN1UTF8String) value).getString());
+          } else if (value != null) {
+            throw new MessageDecodingException("the value of attribute failInfoText "
+                + " is not UTF8String");
+          }
+        }
       } // end if(pkiStatus == PkiStatus.FAILURE)
     } // end if (MessageType.CertRep == messageType)
 
@@ -411,8 +421,7 @@ public class DecodedPkiMessage extends PkiMessage {
     ret.setDecryptionSuccessful(true);
 
     try {
-      if (MessageType.PKCSReq == messageType || MessageType.RenewalReq == messageType
-          || MessageType.UpdateReq == messageType) {
+      if (MessageType.PKCSReq == messageType || MessageType.RenewalReq == messageType) {
         CertificationRequest messageData = CertificationRequest.getInstance(encodedMessageData);
         ret.setMessageData(messageData);
       } else if (MessageType.CertPoll == messageType) {
@@ -443,8 +452,8 @@ public class DecodedPkiMessage extends PkiMessage {
       ASN1ObjectIdentifier type)
           throws MessageDecodingException {
     ASN1Encodable value = ScepUtil.getFirstAttrValue(attrs, type);
-    if (value instanceof DERPrintableString) {
-      return ((DERPrintableString) value).getString();
+    if (value instanceof ASN1PrintableString) {
+      return ((ASN1PrintableString) value).getString();
     } else if (value != null) {
       throw new MessageDecodingException("the value of attribute " + type.getId()
         + " is not PrintableString");

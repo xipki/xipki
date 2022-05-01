@@ -35,7 +35,8 @@ public enum CaCapability {
   SHA1("SHA-1"),
   SHA256("SHA-256"),
   SHA512("SHA-512"),
-  Update("Update");
+  // SCEPStandard: AES, SHA-256, POSTPKIOperation, GetCACaps, GetCACert, PKCSReq
+  SCEPStandard("SCEPStandard");
 
   private final String text;
 

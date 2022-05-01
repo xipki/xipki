@@ -90,7 +90,7 @@ public class ScepServlet extends HttpServlet {
 
     try {
       CaCaps caCaps = responder.getCaCaps();
-      if (post && !caCaps.containsCapability(CaCapability.POSTPKIOperation)) {
+      if (post && !caCaps.supportsPost()) {
         auditMessage = "HTTP POST is not supported";
         auditLevel = AuditLevel.ERROR;
         resp.sendError(HttpServletResponse.SC_BAD_REQUEST);

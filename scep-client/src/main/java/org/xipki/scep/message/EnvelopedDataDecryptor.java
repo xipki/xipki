@@ -23,6 +23,7 @@ import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 
 import java.security.PrivateKey;
+import java.security.interfaces.RSAPrivateKey;
 import java.util.ArrayList;
 import java.util.List;
 

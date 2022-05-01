@@ -108,6 +108,13 @@ public final class EnrolmentResponse {
     throw new IllegalStateException();
   }
 
+  public String getFailInfoText() {
+    if (isFailure()) {
+      return pkcsRep.getFailInfoText();
+    }
+    throw new IllegalStateException();
+  }
+
   public PkiMessage getPkcsRep() {
     return pkcsRep;
   }

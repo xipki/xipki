@@ -70,10 +70,6 @@ public abstract class AbstractCaTest {
     return true;
   }
 
-  protected boolean useInsecureAlgorithms() {
-    return false;
-  }
-
   protected boolean isWithNextCa() {
     return true;
   }
@@ -97,7 +93,7 @@ public abstract class AbstractCaTest {
   protected CaCaps getDefaultCaCaps() {
     final CaCaps caCaps = new CaCaps();
     caCaps.addCapabilities(CaCapability.DES3, CaCapability.AES, CaCapability.SHA1,
-        CaCapability.SHA256, CaCapability.POSTPKIOperation);
+        CaCapability.SHA256, CaCapability.POSTPKIOperation, CaCapability.SCEPStandard);
     return caCaps;
   }
 
@@ -108,7 +104,7 @@ public abstract class AbstractCaTest {
       CaCaps caCaps = getExpectedCaCaps();
 
       ScepControl control = new ScepControl(isSendCaCert(), isPendingCert(), sendSignerCert(),
-          useInsecureAlgorithms(), secret);
+          secret);
 
       this.scepServer = new ScepServer("scep", caCaps, isWithRa(), isWithNextCa(), isGenerateCrl(),
           control);
@@ -133,7 +129,6 @@ public abstract class AbstractCaTest {
     CaCertValidator caCertValidator = new CaCertValidator.PreprovisionedCaCertValidator(
             scepServer.getCaCert());
     ScepClient client = new ScepClient(caId, caCertValidator);
-    client.setUseInsecureAlgorithms(useInsecureAlgorithms());
 
     client.refresh();
 
@@ -278,7 +273,7 @@ public abstract class AbstractCaTest {
     }
 
     if (isWithNextCa()) {
-      if (!caCaps.containsCapability(CaCapability.GetNextCACert)) {
+      if (!caCaps.supportsGetNextCACert()) {
         caCaps.addCapabilities(CaCapability.GetNextCACert);
       }
     } else {

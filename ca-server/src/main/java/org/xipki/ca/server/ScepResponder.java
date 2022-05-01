@@ -128,8 +128,6 @@ public class ScepResponder {
 
   private static final long DFLT_MAX_SIGNINGTIME_BIAS = 5L * 60 * 1000; // 5 minutes
 
-  private static final Set<ASN1ObjectIdentifier> AES_ENC_ALGOS = new HashSet<>();
-
   private final NameId caIdent;
 
   private final ScepControl control;
@@ -152,18 +150,6 @@ public class ScepResponder {
 
   private long maxSigningTimeBiasInMs = DFLT_MAX_SIGNINGTIME_BIAS;
 
-  static {
-    AES_ENC_ALGOS.add(CMSAlgorithm.AES128_CBC);
-    AES_ENC_ALGOS.add(CMSAlgorithm.AES128_CCM);
-    AES_ENC_ALGOS.add(CMSAlgorithm.AES128_GCM);
-    AES_ENC_ALGOS.add(CMSAlgorithm.AES192_CBC);
-    AES_ENC_ALGOS.add(CMSAlgorithm.AES192_CCM);
-    AES_ENC_ALGOS.add(CMSAlgorithm.AES192_GCM);
-    AES_ENC_ALGOS.add(CMSAlgorithm.AES256_CBC);
-    AES_ENC_ALGOS.add(CMSAlgorithm.AES256_CCM);
-    AES_ENC_ALGOS.add(CMSAlgorithm.AES256_GCM);
-  }
-
   public ScepResponder(CaManagerImpl caManager, CaEntry caEntry)
       throws CaMgmtException {
     this.caManager = notNull(caManager, "caManager");
@@ -178,7 +164,8 @@ public class ScepResponder {
 
     // CACaps
     CaCaps caps = new CaCaps();
-    caps.addCapabilities(CaCapability.AES, CaCapability.DES3, CaCapability.POSTPKIOperation,
+    caps.addCapabilities(CaCapability.SCEPStandard,
+        CaCapability.AES, CaCapability.DES3, CaCapability.POSTPKIOperation,
         CaCapability.Renewal, CaCapability.SHA1, CaCapability.SHA256, CaCapability.SHA512);
     this.caCaps = caps;
 
@@ -345,15 +332,15 @@ public class ScepResponder {
     HashAlgo hashAlgo = req.getDigestAlgorithm();
     boolean supported = false;
     if (hashAlgo == HashAlgo.SHA1) {
-      if (caCaps.containsCapability(CaCapability.SHA1)) {
+      if (caCaps.supportsSHA1()) {
         supported = true;
       }
     } else if (hashAlgo == HashAlgo.SHA256) {
-      if (caCaps.containsCapability(CaCapability.SHA256)) {
+      if (caCaps.supportsSHA256()) {
         supported = true;
       }
     } else if (hashAlgo == HashAlgo.SHA512) {
-      if (caCaps.containsCapability(CaCapability.SHA512)) {
+      if (caCaps.supportsSHA512()) {
         supported = true;
       }
     }
@@ -368,14 +355,14 @@ public class ScepResponder {
     // check the content encryption algorithm
     ASN1ObjectIdentifier encOid = req.getContentEncryptionAlgorithm();
     if (CMSAlgorithm.DES_EDE3_CBC.equals(encOid)) {
-      if (!caCaps.containsCapability(CaCapability.DES3)) {
+      if (!caCaps.supportsDES3()) {
         LOG.warn("tid={}: encryption with DES3 algorithm {} is not permitted", tid, encOid);
         rep.setPkiStatus(PkiStatus.FAILURE);
         rep.setFailInfo(FailInfo.badAlg);
         return rep;
       }
-    } else if (AES_ENC_ALGOS.contains(encOid)) {
-      if (!caCaps.containsCapability(CaCapability.AES)) {
+    } else if (CMSAlgorithm.AES128_CBC.equals(encOid)) {
+      if (!caCaps.supportsAES()) {
         LOG.warn("tid={}: encryption with AES algorithm {} is not permitted", tid, encOid);
         rep.setPkiStatus(PkiStatus.FAILURE);
         rep.setFailInfo(FailInfo.badAlg);
@@ -407,7 +394,6 @@ public class ScepResponder {
       switch (mt) {
         case PKCSReq:
         case RenewalReq:
-        case UpdateReq:
           CertificationRequest csr = CertificationRequest.getInstance(req.getMessageData());
           X500Name reqSubject = csr.getCertificationRequestInfo().getSubject();
           if (LOG.isInfoEnabled()) {

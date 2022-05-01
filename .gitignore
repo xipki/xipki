@@ -70,6 +70,7 @@ local.properties
 .buildpath
 # Intellij 
 .idea/
+*.ipr 
 *.iml 
 *.iws
 #netbeans

@@ -37,12 +37,6 @@ public enum MessageType {
   RenewalReq(17),
 
   /**
-   * PKCS #10 certificate request for update of a certificate issued by a different CA.
-   * Since draft-gutman-scep version 0
-   */
-  UpdateReq(18),
-
-  /**
    * PKCS #10 certificate request.
    */
   PKCSReq(19),
