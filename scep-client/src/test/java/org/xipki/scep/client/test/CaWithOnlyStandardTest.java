@@ -20,21 +20,28 @@ package org.xipki.scep.client.test;
 import org.xipki.scep.transaction.CaCapability;
 
 /**
- * Test CA with only DES encryption support.
+ * Test CA with only the CACapability SCEPStandard.
  *
  * @author Lijun Liao
  */
 
-// CHECKSTYLE:SKIP
-public class DESOnlyCaTest extends AbstractCaTest {
+public class CaWithOnlyStandardTest extends AbstractCaTest {
 
-  protected boolean useInsecureAlgorithms() {
-    return true;
+  @Override
+  protected boolean isWithRa() {
+    return false;
   }
 
   @Override
   protected CaCapability[] getExcludedCaCaps() {
-    return new CaCapability[]{CaCapability.AES, CaCapability.DES3};
+    CaCapability[] rv = new CaCapability[CaCapability.values().length - 1];
+    int i = 0;
+    for (CaCapability c : CaCapability.values()) {
+      if (c != CaCapability.SCEPStandard) {
+        rv[i++] = c;
+      }
+    }
+    return rv;
   }
 
 }

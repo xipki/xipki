@@ -68,6 +68,8 @@ public class PkiMessage {
 
   private FailInfo failInfo;
 
+  private String failInfoText;
+
   private ASN1Encodable messageData;
 
   static {
@@ -77,6 +79,7 @@ public class PkiMessage {
     SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_RECIPIENT_NONCE);
     SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_SENDER_NONCE);
     SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_TRANSACTION_ID);
+    SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_SCEP_FAILINFOTEXT);
     SCEP_ATTR_TYPES.add(CMSAttributes.signingTime);
   }
 
@@ -124,6 +127,14 @@ public class PkiMessage {
 
   public void setFailInfo(FailInfo failInfo) {
     this.failInfo = failInfo;
+  }
+
+  public String getFailInfoText() {
+    return failInfoText;
+  }
+
+  public void setFailInfoText(String failInfoText) {
+    this.failInfoText = failInfoText;
   }
 
   public ASN1Encodable getMessageData() {
@@ -180,6 +191,12 @@ public class PkiMessage {
     if (failInfo != null) {
       addAttribute(vec, ScepObjectIdentifiers.ID_FAILINFO,
           new DERPrintableString(Integer.toString(failInfo.getCode())));
+    }
+
+    // failInfoText
+    if (failInfoText != null && !failInfoText.isEmpty()) {
+      addAttribute(vec, ScepObjectIdentifiers.ID_SCEP_FAILINFOTEXT,
+          new DERUTF8String(failInfoText));
     }
 
     // pkiStatus
@@ -284,6 +301,7 @@ public class PkiMessage {
     }
   } // method encode
 
+  // TODO: use password based encryption for not-encryptable public key.
   private CMSEnvelopedData encrypt(X509Cert recipient, ASN1ObjectIdentifier encAlgId)
       throws MessageEncodingException {
     Args.notNull(recipient, "recipient");

@@ -45,6 +45,12 @@ public class ScepObjectIdentifiers {
 
   public static final ASN1ObjectIdentifier ID_RECIPIENT_NONCE = ID_ATTRIBUTES.branch("6");
 
+  public static final ASN1ObjectIdentifier ID_SMI_PKIX = new ASN1ObjectIdentifier("1.3.6.1.5.5.7");
+
+  public static final ASN1ObjectIdentifier ID_SCEP = ID_SMI_PKIX.branch("24");
+
+  public static final ASN1ObjectIdentifier ID_SCEP_FAILINFOTEXT = ID_SCEP.branch("1");
+
   private ScepObjectIdentifiers() {
   }
 }

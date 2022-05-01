@@ -279,7 +279,7 @@ Features
   - EdDSA Certificates (RFC 8410, RFC 8032)
   - SHAKE Certificates (RFC 8692)
   - Diffie-Hellman Proof-of-Possession Algorithms (RFC 6955)
-  - SCEP (draft-gutmann-scep-00, draft-nourse-scep-23)
+  - SCEP (RFC 8894)
   - EN 319 411 (eIDAS)
   - EN 319 412 (eIDAS)
   - Supported databases: DB2, MariaDB, MySQL, Oracle, PostgreSQL, H2, HSQLDB
@@ -377,8 +377,7 @@ Features
 
 - SCEP
   - Supported SCEP versions
-    - draft-gutmann-scep-00
-    - draft-nourse-scep-23
+    - RFC 8894
 
 - CLI
   - Configurating CA

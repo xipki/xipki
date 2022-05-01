@@ -27,6 +27,8 @@ import org.xipki.util.StringUtil;
 
 import java.util.*;
 
+import static org.xipki.scep.transaction.CaCapability.*;
+
 /**
  * CA caps.
  *
@@ -75,9 +77,37 @@ public class CaCaps {
     refresh();
   }
 
-  public boolean containsCapability(CaCapability cap) {
+  private boolean containsCapability(CaCapability cap) {
     Args.notNull(cap, "cap");
     return capabilities.contains(cap);
+  }
+
+  public boolean supportsSHA1() {
+    return containsCapability(SHA1);
+  }
+
+  public boolean supportsSHA512() {
+    return containsCapability(SHA512);
+  }
+
+  public boolean supportsSHA256() {
+    return containsCapability(SHA256) || containsCapability(SCEPStandard);
+  }
+
+  public boolean supportsAES() {
+    return containsCapability(AES) || containsCapability(SCEPStandard);
+  }
+
+  public boolean supportsDES3() {
+    return containsCapability(DES3);
+  }
+
+  public boolean supportsRenewal() {
+    return containsCapability(Renewal);
+  }
+
+  public boolean supportsGetNextCACert() {
+    return containsCapability(GetNextCACert);
   }
 
   @Override
@@ -104,13 +134,14 @@ public class CaCaps {
   }
 
   public boolean supportsPost() {
-    return capabilities.contains(CaCapability.POSTPKIOperation);
+    return containsCapability(POSTPKIOperation)
+        || containsCapability(SCEPStandard);
   }
 
   public HashAlgo mostSecureHashAlgo() {
-    if (capabilities.contains(CaCapability.SHA512)) {
+    if (supportsSHA512()) {
       return HashAlgo.SHA512;
-    } else if (capabilities.contains(CaCapability.SHA256)) {
+    } else if (supportsSHA256()) {
       return HashAlgo.SHA256;
     } else {
       return HashAlgo.SHA1;

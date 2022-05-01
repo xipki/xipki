@@ -203,7 +203,7 @@ public class Actions {
     private String outputFile;
 
     @Option(name = "--method", description = "method to enroll the certificate.")
-    @Completion(value = StringsCompleter.class, values = {"pkcs", "renewal", "update"})
+    @Completion(value = StringsCompleter.class, values = {"pkcs", "renewal"})
     private String method;
 
     @Override
@@ -222,8 +222,6 @@ public class Actions {
         resp = client.scepPkcsReq(csr, key0, cert0);
       } else if ("renewal".equalsIgnoreCase(method)) {
         resp = client.scepRenewalReq(csr, key0, cert0);
-      } else if ("update".equalsIgnoreCase(method)) {
-        resp = client.scepUpdateReq(csr, key0, cert0);
       } else {
         throw new CmdFailure("invalid enroll method");
       }

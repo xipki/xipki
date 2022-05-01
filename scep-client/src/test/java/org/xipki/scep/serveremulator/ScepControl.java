@@ -31,19 +31,16 @@ public class ScepControl {
 
   private final boolean pendingCert;
 
-  private final boolean useInsecureAlg;
-
   private final boolean sendSignerCert;
 
   private final String secret;
 
   public ScepControl(boolean sendCaCert, boolean pendingCert, boolean sendSignerCert,
-      boolean useInsecureAlg, String secret) {
+      String secret) {
     this.secret = Args.notBlank(secret, "secret");
     this.sendCaCert = sendCaCert;
     this.pendingCert = pendingCert;
     this.sendSignerCert = sendSignerCert;
-    this.useInsecureAlg = useInsecureAlg;
   }
 
   public boolean isSendCaCert() {
@@ -52,10 +49,6 @@ public class ScepControl {
 
   public boolean isPendingCert() {
     return pendingCert;
-  }
-
-  public boolean isUseInsecureAlg() {
-    return useInsecureAlg;
   }
 
   public boolean isSendSignerCert() {

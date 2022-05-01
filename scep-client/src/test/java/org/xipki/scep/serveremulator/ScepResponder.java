@@ -59,8 +59,6 @@ public class ScepResponder {
 
   private static final long DFLT_MAX_SIGNINGTIME_BIAS = 5L * 60 * 1000; // 5 minutes
 
-  private static final Set<ASN1ObjectIdentifier> AES_ENC_ALGS = new HashSet<>();
-
   private final CaCaps caCaps;
 
   private final CaEmulator caEmulator;
@@ -72,18 +70,6 @@ public class ScepResponder {
   private final ScepControl control;
 
   private long maxSigningTimeBiasInMs = DFLT_MAX_SIGNINGTIME_BIAS;
-
-  static {
-    AES_ENC_ALGS.add(CMSAlgorithm.AES128_CBC);
-    AES_ENC_ALGS.add(CMSAlgorithm.AES128_CCM);
-    AES_ENC_ALGS.add(CMSAlgorithm.AES128_GCM);
-    AES_ENC_ALGS.add(CMSAlgorithm.AES192_CBC);
-    AES_ENC_ALGS.add(CMSAlgorithm.AES192_CCM);
-    AES_ENC_ALGS.add(CMSAlgorithm.AES192_GCM);
-    AES_ENC_ALGS.add(CMSAlgorithm.AES256_CBC);
-    AES_ENC_ALGS.add(CMSAlgorithm.AES256_CCM);
-    AES_ENC_ALGS.add(CMSAlgorithm.AES256_GCM);
-  }
 
   public ScepResponder(CaCaps caCaps, CaEmulator caEmulator, RaEmulator raEmulator,
       NextCaAndRa nextCaAndRa, ScepControl control) {
@@ -123,7 +109,7 @@ public class ScepResponder {
 
     DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent, recipient, null);
 
-    PkiMessage rep = servicePkiOperation0(req, event);
+    PkiMessage rep = servicePkiOperation0(req);
     event.putEventData(AuditEvent.NAME_pkiStatus, rep.getPkiStatus());
     if (rep.getPkiStatus() == PkiStatus.FAILURE) {
       event.setLevel(AuditLevel.ERROR);
@@ -161,7 +147,7 @@ public class ScepResponder {
     }
   }
 
-  private PkiMessage servicePkiOperation0(DecodedPkiMessage req, AuditEvent event)
+  private PkiMessage servicePkiOperation0(DecodedPkiMessage req)
       throws CaException {
     TransactionId tid = req.getTransactionId();
     PkiMessage rep = new PkiMessage(tid, MessageType.CertRep, Nonce.randomNonce());
@@ -206,15 +192,15 @@ public class ScepResponder {
 
     boolean supported = false;
     if (hashAlgo == HashAlgo.SHA1) {
-      if (caCaps.containsCapability(CaCapability.SHA1)) {
+      if (caCaps.supportsSHA1()) {
         supported = true;
       }
     } else if (hashAlgo == HashAlgo.SHA256) {
-      if (caCaps.containsCapability(CaCapability.SHA256)) {
+      if (caCaps.supportsSHA256()) {
         supported = true;
       }
     } else if (hashAlgo == HashAlgo.SHA512) {
-      if (caCaps.containsCapability(CaCapability.SHA512)) {
+      if (caCaps.supportsSHA512()) {
         supported = true;
       }
     }
@@ -227,18 +213,13 @@ public class ScepResponder {
     // check the content encryption algorithm
     ASN1ObjectIdentifier encOid = req.getContentEncryptionAlgorithm();
     if (CMSAlgorithm.DES_EDE3_CBC.equals(encOid)) {
-      if (!caCaps.containsCapability(CaCapability.DES3)) {
+      if (!caCaps.supportsDES3()) {
         LOG.warn("tid={}: encryption with DES3 algorithm {} is not permitted", tid, encOid);
         return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badAlg);
       }
-    } else if (AES_ENC_ALGS.contains(encOid)) {
-      if (!caCaps.containsCapability(CaCapability.AES)) {
+    } else if (CMSAlgorithm.AES128_CBC.equals(encOid)) {
+      if (!caCaps.supportsAES()) {
         LOG.warn("tid={}: encryption with AES algorithm {} is not permitted", tid, encOid);
-        return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badAlg);
-      }
-    } else if (CMSAlgorithm.DES_CBC.equals(encOid)) {
-      if (!control.isUseInsecureAlg()) {
-        LOG.warn("tid={}: encryption with DES algorithm {} is not permitted", tid, encOid);
         return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badAlg);
       }
     } else {
@@ -311,7 +292,7 @@ public class ScepResponder {
 
         break;
       case RenewalReq:
-        if (!caCaps.containsCapability(CaCapability.Renewal)) {
+        if (!caCaps.supportsRenewal()) {
           buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
         } else {
           csr = CertificationRequest.getInstance(req.getMessageData());
@@ -326,23 +307,6 @@ public class ScepResponder {
           } else {
             rep.setPkiStatus(PkiStatus.FAILURE);
             rep.setFailInfo(FailInfo.badCertId);
-          }
-        }
-        break;
-      case UpdateReq:
-        if (!caCaps.containsCapability(CaCapability.Update)) {
-          buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
-        } else {
-          csr = CertificationRequest.getInstance(req.getMessageData());
-          try {
-            cert = caEmulator.generateCert(csr);
-          } catch (Exception ex) {
-            throw new CaException("system failure: " + ex.getMessage(), ex);
-          }
-          if (cert != null) {
-            rep.setMessageData(createSignedData(cert));
-          } else {
-            buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badCertId);
           }
         }
         break;

@@ -82,8 +82,6 @@ public abstract class Client {
 
   private boolean httpGetOnly;
 
-  private boolean useInsecureAlgorithms;
-
   public Client(CaIdentifier caId, CaCertValidator caCertValidator) {
     this.caId = Args.notNull(caId, "caId");
     this.caCertValidator = Args.notNull(caCertValidator, "caCertValidator");
@@ -126,14 +124,6 @@ public abstract class Client {
     this.httpGetOnly = httpGetOnly;
   }
 
-  public boolean isUseInsecureAlgorithms() {
-    return useInsecureAlgorithms;
-  }
-
-  public void setUseInsecureAlgorithms(boolean useInsecureAlgorithms) {
-    this.useInsecureAlgorithms = useInsecureAlgorithms;
-  }
-
   public long getMaxSigningTimeBiasInMs() {
     return maxSigningTimeBiasInMs;
   }
@@ -162,7 +152,7 @@ public abstract class Client {
       String url = caId.buildGetUrl(operation, caId.getProfile());
       return httpGet(url);
     } else {
-      if (!httpGetOnly && caCaps.containsCapability(CaCapability.POSTPKIOperation)) {
+      if (!httpGetOnly && caCaps.supportsPost()) {
         String url = caId.buildPostUrl(operation);
         return httpPost(url, REQ_CONTENT_TYPE, request);
       } else {
@@ -342,22 +332,9 @@ public abstract class Client {
 
     initIfNotInited();
 
-    // draft-nourse-scep
-    if (!isGutmannScep()) {
-      return scepPkcsReq(csr, identityKey, identityCert);
-    }
-
-    // draft-gutmann-scep
     if (!identityCert.isSelfSigned()) {
-      X509Cert caCert = authorityCertStore.getCaCert();
-      if (identityCert.getIssuer().equals(caCert.getSubject())) {
-        if (caCaps.containsCapability(CaCapability.Renewal)) {
-          return scepRenewalReq(csr, identityKey, identityCert);
-        }
-      } else {
-        if (caCaps.containsCapability(CaCapability.Update)) {
-          return scepUpdateReq(csr, identityKey, identityCert);
-        }
+      if (caCaps.supportsRenewal()) {
+        return scepRenewalReq(csr, identityKey, identityCert);
       }
     } // end if
 
@@ -385,7 +362,7 @@ public abstract class Client {
           throws ScepClientException {
     initIfNotInited();
 
-    if (!caCaps.containsCapability(CaCapability.Renewal)) {
+    if (!caCaps.supportsRenewal()) {
       throw new OperationNotSupportedException(
           "unsupported messageType '" + MessageType.RenewalReq + "'");
     }
@@ -396,23 +373,6 @@ public abstract class Client {
 
     return enroll(MessageType.RenewalReq, csr, identityKey, identityCert);
   } // method scepRenewalReq
-
-  public EnrolmentResponse scepUpdateReq(CertificationRequest csr, PrivateKey identityKey,
-      X509Cert identityCert)
-          throws ScepClientException {
-    initIfNotInited();
-
-    if (!caCaps.containsCapability(CaCapability.Update)) {
-      throw new OperationNotSupportedException(
-          "unsupported messageType '" + MessageType.UpdateReq + "'");
-    }
-
-    if (identityCert.isSelfSigned()) {
-      throw new IllegalArgumentException("identityCert must not be self-signed");
-    }
-
-    return enroll(MessageType.UpdateReq, csr, identityKey, identityCert);
-  } // method scepUpdateReq
 
   private EnrolmentResponse enroll(MessageType messageType, CertificationRequest csr,
       PrivateKey identityKey, X509Cert identityCert)
@@ -440,7 +400,7 @@ public abstract class Client {
       throws ScepClientException {
     initIfNotInited();
 
-    if (!this.caCaps.containsCapability(CaCapability.GetNextCACert)) {
+    if (!this.caCaps.supportsGetNextCACert()) {
       throw new OperationNotSupportedException(
               "unsupported operation '" + Operation.GetNextCACert.getCode() + "'");
     }
@@ -454,13 +414,11 @@ public abstract class Client {
           throws ScepClientException {
     HashAlgo hashAlgo = caCaps.mostSecureHashAlgo();
     ASN1ObjectIdentifier encAlgId;
-    if (caCaps.containsCapability(CaCapability.AES)) {
+    if (caCaps.supportsAES()) {
       encAlgId = CMSAlgorithm.AES128_CBC;
-    } else if (caCaps.containsCapability(CaCapability.DES3)) {
+    } else if (caCaps.supportsDES3()) {
       encAlgId = CMSAlgorithm.DES_EDE3_CBC;
-    } else if (useInsecureAlgorithms) {
-      encAlgId = CMSAlgorithm.DES_CBC;
-    } else { // no support of DES
+    } else {
       throw new ScepClientException("DES will not be supported by this client");
     }
 
@@ -585,11 +543,6 @@ public abstract class Client {
     }
     return resp;
   } // method decode
-
-  private boolean isGutmannScep() {
-    return caCaps.containsCapability(CaCapability.AES)
-        || caCaps.containsCapability(CaCapability.Update);
-  }
 
   private static CMSSignedData parsePkiMessage(byte[] messageBytes)
       throws ScepClientException {
