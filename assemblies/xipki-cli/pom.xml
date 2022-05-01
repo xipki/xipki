@@ -91,7 +91,7 @@
             </goals>
             <configuration>
               <stripVersion>false</stripVersion>
-              <outputDirectory>${project.build.directory}/classes/lib/ext</outputDirectory>
+              <outputDirectory>${project.build.directory}/extern-jars</outputDirectory>
               <artifactItems>
                 <artifactItem>
                   <groupId>org.mariadb.jdbc</groupId>

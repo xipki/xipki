@@ -59,9 +59,14 @@
       <excludes>
         <exclude>bin/**</exclude>
         <exclude>**/*.sh</exclude>
-        <exclude>system/org/apache/karaf/features/**</exclude>
       </excludes>
       <outputDirectory>.</outputDirectory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>${project.build.directory}/extern-jars</directory>
+      <outputDirectory>lib/ext</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
