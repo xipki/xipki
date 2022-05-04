@@ -23,7 +23,6 @@ import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.pkcs.RSAPublicKey;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.CertIOException;
@@ -38,12 +37,13 @@ import org.xipki.scep.serveremulator.CaEmulator;
 import org.xipki.scep.util.ScepUtil;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
+import org.xipki.security.util.KeyUtil;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.StringUtil;
 
-import java.io.IOException;
 import java.math.BigInteger;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -122,7 +122,8 @@ public class MyUtil {
       throw new OperatorCreationException(ex.getMessage(), ex);
     }
 
-    ContentSigner contentSigner = new JcaContentSignerBuilder(sigAlgName).build(privatekey);
+    ContentSigner contentSigner = new JcaContentSignerBuilder(sigAlgName)
+        .setProvider("BC").build(privatekey);
     return csrBuilder.build(contentSigner);
   } // method generateRequest
 
@@ -159,7 +160,8 @@ public class MyUtil {
     ContentSigner contentSigner;
     try {
       String sigAlgorithm = ScepUtil.getSignatureAlgName(identityKey, HashAlgo.SHA1);
-      contentSigner = new JcaContentSignerBuilder(sigAlgorithm).build(identityKey);
+      contentSigner = new JcaContentSignerBuilder(sigAlgorithm)
+          .setProvider("BC").build(identityKey);
     } catch (OperatorCreationException | NoSuchAlgorithmException ex) {
       throw new CertificateException("error while creating signer", ex);
     }
@@ -168,16 +170,8 @@ public class MyUtil {
   } // method generateSelfsignedCert
 
   public static SubjectPublicKeyInfo createSubjectPublicKeyInfo(PublicKey publicKey)
-      throws IOException {
-    Args.notNull(publicKey, "publicKey");
-    if (publicKey instanceof java.security.interfaces.RSAPublicKey) {
-      java.security.interfaces.RSAPublicKey rsaPubKey =
-          (java.security.interfaces.RSAPublicKey) publicKey;
-      return new SubjectPublicKeyInfo(ALGID_RSA,
-          new RSAPublicKey(rsaPubKey.getModulus(), rsaPubKey.getPublicExponent()));
-    } else {
-      throw new IllegalArgumentException("unsupported public key " + publicKey);
-    }
+      throws InvalidKeyException {
+    return KeyUtil.createSubjectPublicKeyInfo(publicKey);
   } // method createSubjectPublicKeyInfo
 
 }

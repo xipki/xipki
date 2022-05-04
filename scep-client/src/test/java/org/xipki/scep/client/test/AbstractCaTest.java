@@ -125,6 +125,14 @@ public abstract class AbstractCaTest {
   @Test
   public void test()
       throws Exception {
+    KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA");
+    kpGen.initialize(2048);
+    KeyPair keypair = kpGen.generateKeyPair();
+    doTest(keypair);
+  }
+
+  private void doTest(KeyPair keypair)
+      throws Exception {
     CaIdentifier caId = new CaIdentifier("http://localhost:" + port + "/scep/pkiclient.exe", null);
     CaCertValidator caCertValidator = new CaCertValidator.PreprovisionedCaCertValidator(
             scepServer.getCaCert());
@@ -188,9 +196,6 @@ public abstract class AbstractCaTest {
 
     CertificationRequest csr;
     {
-      KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA");
-      kpGen.initialize(2048);
-      KeyPair keypair = kpGen.generateKeyPair();
       privKey = keypair.getPrivate();
       SubjectPublicKeyInfo subjectPublicKeyInfo = MyUtil.createSubjectPublicKeyInfo(
               keypair.getPublic());
@@ -199,8 +204,7 @@ public abstract class AbstractCaTest {
       // first try without secret
       PKCS10CertificationRequest p10Req = MyUtil.generateRequest(privKey, subjectPublicKeyInfo,
           subject, null, null);
-      p10Req.toASN1Structure();
-
+/*
       selfSignedCert = MyUtil.generateSelfsignedCert(p10Req.toASN1Structure(), privKey);
       EnrolmentResponse enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey,
           selfSignedCert);
@@ -210,19 +214,17 @@ public abstract class AbstractCaTest {
       // then try invalid secret
       p10Req = MyUtil.generateRequest(privKey, subjectPublicKeyInfo, subject,
           "invalid-" + secret, null);
-      p10Req.toASN1Structure();
 
       selfSignedCert = MyUtil.generateSelfsignedCert(p10Req.toASN1Structure(), privKey);
       enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey, selfSignedCert);
       status = enrolResp.getPkcsRep().getPkiStatus();
       Assert.assertEquals("PkiStatus with invalid secret", PkiStatus.FAILURE, status);
-
+*/
       // try with valid secret
       p10Req = MyUtil.generateRequest(privKey, subjectPublicKeyInfo, subject, secret, null);
-      p10Req.toASN1Structure();
 
       selfSignedCert = MyUtil.generateSelfsignedCert(p10Req.toASN1Structure(), privKey);
-      enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey, selfSignedCert);
+      EnrolmentResponse enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey, selfSignedCert);
 
       List<X509Cert> certs = enrolResp.getCertificates();
       Assert.assertTrue("number of received certificates", certs.size() > 0);
@@ -237,7 +239,7 @@ public abstract class AbstractCaTest {
       selfSignedCert = MyUtil.generateSelfsignedCert(new X500Name("CN=dummy"),
           csr.getCertificationRequestInfo().getSubjectPublicKeyInfo(), privKey);
       enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey, selfSignedCert);
-      status = enrolResp.getPkcsRep().getPkiStatus();
+      PkiStatus status = enrolResp.getPkcsRep().getPkiStatus();
       Assert.assertEquals("PkiStatus with invalid secret", PkiStatus.FAILURE, status);
     }
 

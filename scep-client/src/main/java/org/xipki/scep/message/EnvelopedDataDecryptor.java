@@ -23,7 +23,6 @@ import org.xipki.security.X509Cert;
 import org.xipki.util.Args;
 
 import java.security.PrivateKey;
-import java.security.interfaces.RSAPrivateKey;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +38,7 @@ public final class EnvelopedDataDecryptor {
 
     private final RecipientId recipientId;
 
-    private final KeyTransRecipient recipient;
+    private final Recipient recipient;
 
     public EnvelopedDataDecryptorInstance(X509Cert recipientCert, PrivateKey privKey) {
       Args.notNull(recipientCert, "recipientCert");
@@ -51,7 +50,7 @@ public final class EnvelopedDataDecryptor {
       this.recipient = new JceKeyTransEnvelopedRecipient(privKey);
     }
 
-    public KeyTransRecipient getRecipient() {
+    public Recipient getRecipient() {
       return recipient;
     }
 

@@ -124,6 +124,7 @@ public class ScepServlet extends HttpServlet {
           resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
           return;
         } catch (CaException ex) {
+          ex.printStackTrace();
           auditMessage = "system internal error";
           auditLevel = AuditLevel.ERROR;
           resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -155,6 +156,7 @@ public class ScepServlet extends HttpServlet {
                 new CMSAbsentContent());
             respBytes = degenerateSignedData.getEncoded();
           } catch (CMSException ex) {
+            ex.printStackTrace();
             auditMessage = "system internal error";
             auditLevel = AuditLevel.ERROR;
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -183,6 +185,7 @@ public class ScepServlet extends HttpServlet {
           byte[] respBytes = signedData.getEncoded();
           sendToResponse(resp, ScepConstants.CT_X509_NEXT_CA_CERT, respBytes);
         } catch (Exception ex) {
+          ex.printStackTrace();
           auditMessage = "system internal error";
           auditLevel = AuditLevel.ERROR;
           resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

@@ -41,7 +41,6 @@ import org.xipki.util.StringUtil;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
-import java.security.interfaces.RSAPrivateKey;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
