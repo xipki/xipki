@@ -413,7 +413,9 @@ public class QaOcspActions {
       responseOption.setCerthashOccurrence(expectedCerthashOccurrence);
       responseOption.setNonceOccurrence(expectedNonceOccurrence);
       responseOption.setRespIssuer(respIssuer);
-      responseOption.setSignatureAlg(SignAlgo.getInstance(sigAlgo));
+      if(isNotBlank(sigAlgo)) {
+        responseOption.setSignatureAlg(SignAlgo.getInstance(sigAlgo));
+      }
       if (isNotBlank(certhashAlg)) {
         responseOption.setCerthashAlg(HashAlgo.getInstance(certhashAlg));
       }
