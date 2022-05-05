@@ -256,36 +256,9 @@ public class QaOcspActions {
           }
         }
 
-        // unknown serial number
-        lineNo++;
-        byte[] bytes = RandomUtil.nextBytes(16);
-        bytes[0] = (byte) (0x7F & bytes[0]);
-        BigInteger serialNumber = new BigInteger(bytes);
-
-        String resultText = lineNo + ": " + serialNumber.toString(16) + ",unknown: ";
-        try {
-          ValidationResult result = processOcspQuery(ocspQa, serialNumber, OcspCertStatus.unknown,
-              null, messageDir, detailsDir, serverUrl, respIssuer, issuerCert, issuerHash,
-              requestOptions);
-          if (result.isAllSuccessful()) {
-            numSucc++;
-            resultText += "valid";
-          } else {
-            numFail++;
-            resultText += "invalid";
-          }
-        } catch (Throwable th) {
-          LogUtil.error(LOG, th);
-          numFail++;
-          resultText += "error - " + th.getMessage();
-        }
-
-        sum++;
         print("\rProcessed " + sum + " requests in "
             + StringUtil.formatTime((System.currentTimeMillis() - startDate) / 1000, false));
         println("");
-
-        println(resultText, resultOut);
 
         String message = StringUtil.concatObjectsCap(200, "=====BEGIN SUMMARY=====",
             "\n       url: ", serverUrlStr, "\n       sum: ", numFail + numSucc,
