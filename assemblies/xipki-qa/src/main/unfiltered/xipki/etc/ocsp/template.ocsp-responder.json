@@ -164,7 +164,7 @@
 //				}
 			}
 		},
-		"unknownCertBehaviour":"malformedRequest"
+		"unknownCertBehaviour":"unknown"
 	}]
 }
 
