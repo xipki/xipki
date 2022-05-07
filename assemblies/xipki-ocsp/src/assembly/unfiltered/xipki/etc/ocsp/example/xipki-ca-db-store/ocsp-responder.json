@@ -66,7 +66,7 @@
 		"includeCrlId":false,
 		"retentionInterval":-1,
 		"minNextUpdatePeriod":"1d",
-		"unknownCertBehaviour":"malformedRequest",
+		"unknownCertBehaviour":"unknown",
 		"updateInterval":"10m",
 		"source":{
 			"datasource":"datasource1",

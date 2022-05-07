@@ -49,7 +49,7 @@
 		"includeCrlId":false,
 		"retentionInterval":-1,
 		"minNextUpdatePeriod":"1d",
-		"unknownSerialAsGood":false,
+		"unknownCertBehaviour":"unknown",
 		"updateInterval":"10m",
 		"source":{
 			"type":"java:org.xipki.ocsp.server.store.example.DummyStore",
