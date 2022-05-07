@@ -96,9 +96,10 @@ public class QaOcspActions {
     @Option(name = "--save-resp", description = "where to save the request")
     private Boolean saveResp = Boolean.FALSE;
 
-    @Option(name = "--unknown-as-good",
-        description = "where to expect the status good for unknown certificate")
-    private Boolean unknownAsGood = Boolean.FALSE;
+    @Option(name = "--unknown-as",
+        description = "expected status for unknown certificate")
+    @Completion(QaCompleters.CertStatusCompleter.class)
+    private String unknownAs;
 
     @Option(name = "--no-sig-verify", description = "where to verify the signature")
     private Boolean noSigVerify = Boolean.FALSE;
@@ -281,6 +282,7 @@ public class QaOcspActions {
         }
 
         sum++;
+
         print("\rProcessed " + sum + " requests in "
             + StringUtil.formatTime((System.currentTimeMillis() - startDate) / 1000, false));
         println("");
@@ -374,8 +376,10 @@ public class QaOcspActions {
         URL serverUrl, X509Cert respIssuer, X509Cert issuerCert,
         IssuerHash issuerHash, RequestOptions requestOptions)
             throws Exception {
-      if (unknownAsGood && status == OcspCertStatus.unknown) {
-        status = OcspCertStatus.good;
+      if (status == OcspCertStatus.unknown) {
+        if (isNotBlank(unknownAs)) {
+          status = OcspCertStatus.forName(unknownAs);
+        }
       }
 
       ReqRespDebug debug = null;
@@ -413,7 +417,9 @@ public class QaOcspActions {
       responseOption.setCerthashOccurrence(expectedCerthashOccurrence);
       responseOption.setNonceOccurrence(expectedNonceOccurrence);
       responseOption.setRespIssuer(respIssuer);
-      responseOption.setSignatureAlg(SignAlgo.getInstance(sigAlgo));
+      if(isNotBlank(sigAlgo)) {
+        responseOption.setSignatureAlg(SignAlgo.getInstance(sigAlgo));
+      }
       if (isNotBlank(certhashAlg)) {
         responseOption.setCerthashAlg(HashAlgo.getInstance(certhashAlg));
       }

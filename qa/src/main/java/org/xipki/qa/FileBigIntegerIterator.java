@@ -17,6 +17,8 @@
 
 package org.xipki.qa;
 
+import org.xipki.util.StringUtil;
+
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
@@ -100,11 +102,11 @@ public class FileBigIntegerIterator implements Iterator<BigInteger>, Closeable {
     }
 
     if (line.indexOf(',') == -1) {
-      nextNumbers.add(new BigInteger(line.trim(), hex ? 16 : 10));
+      nextNumbers.add(StringUtil.toBigInt(line.trim(), hex));
     } else {
       StringTokenizer st = new StringTokenizer(line.trim(), ", ");
       while (st.hasMoreTokens()) {
-        nextNumbers.add(new BigInteger(st.nextToken(), hex ? 16 : 10));
+        nextNumbers.add(StringUtil.toBigInt(st.nextToken(), hex));
       }
     }
 
