@@ -64,12 +64,6 @@
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
-    <fileSet>
-      <directory>${project.build.directory}/extern-jars</directory>
-      <outputDirectory>lib/boot</outputDirectory>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
     <!-- QA -->
     <fileSet>
       <directory>src/qa/unfiltered</directory>
