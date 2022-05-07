@@ -587,7 +587,8 @@ class ConfLoader {
 
           if (entry.getPopoControl() != null) {
             FileOrValue fv = createFileOrValue(
-                zipStream, entry.getPopoControl(), concat("files/ca-", name, "-popo.conf"));
+                zipStream, entry.getPopoControl().getConf(),
+                concat("files/ca-", name, "-popo.conf"));
             caInfoType.setPopoControl(fv);
           }
 

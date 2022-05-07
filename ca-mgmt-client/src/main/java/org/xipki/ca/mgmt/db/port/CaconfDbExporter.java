@@ -19,10 +19,14 @@ package org.xipki.ca.mgmt.db.port;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import org.xipki.ca.api.CaUris;
+import org.xipki.ca.api.mgmt.ProtocolSupport;
+import org.xipki.ca.api.mgmt.entry.CaConfColumn;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.InvalidConfException;
+import org.xipki.util.StringUtil;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -31,6 +35,7 @@ import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -345,16 +350,19 @@ class CaconfDbExporter extends DbPorter {
     System.out.println("exporting table CA");
     List<CaCertstore.Ca> cas = new LinkedList<>();
 
-    String columns = "SELECT ID,NAME,SN_SIZE,NEXT_CRLNO,STATUS,CA_URIS,"
-        + "MAX_VALIDITY,CERT,CERTCHAIN,SIGNER_TYPE,CRL_SIGNER_NAME,"
-        + "CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,CRL_CONTROL,CMP_CONTROL,SCEP_CONTROL,"
-        + "CTLOG_CONTROL,PROTOCOL_SUPPORT,SAVE_REQ,PERMISSION,"
-        + "NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL,"
-        + "SIGNER_CONF,REV_INFO,REVOKE_SUSPENDED_CONTROL";
+    //String columns =
+    //    "ID,NAME,STATUS,NEXT_CRLNO,CRL_SIGNER_NAME,CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,"
+    //    + "SUBJECT,REV_INFO,SIGNER_TYPE,SIGNER_CONF,CERT,CERTCHAIN,CONF "
+    //
+    String columns =
+        "SELECT ID,NAME,STATUS,NEXT_CRLNO,CRL_SIGNER_NAME,CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,"
+        + "REV_INFO,SIGNER_TYPE,SIGNER_CONF,CERT,CERTCHAIN";
     if (dbSchemaVersion >= 7) {
-      columns += ",POPO_CONTROL,KEYPAIR_GEN_NAMES,SAVE_CERT,SAVE_KEYPAIR";
+      columns += ",CONF";
     } else {
-      columns += ",DHPOC_CONTROL";
+      columns += ",SN_SIZE,CA_URIS,MAX_VALIDITY,SAVE_REQ,PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,"
+          + "VALIDITY_MODE,CRL_CONTROL,CMP_CONTROL,SCEP_CONTROL,CTLOG_CONTROL,PROTOCOL_SUPPORT,"
+          + "REVOKE_SUSPENDED_CONTROL,KEEP_EXPIRED_CERT_DAYS,EXTRA_CONTROL,DHPOC_CONTROL";
     }
 
     final String sql = columns + " FROM CA";
@@ -370,11 +378,8 @@ class CaconfDbExporter extends DbPorter {
         ca.setId(rs.getInt("ID"));
         String name = rs.getString("NAME");
         ca.setName(name);
-        ca.setSnSize(rs.getInt("SN_SIZE"));
         ca.setNextCrlNo(rs.getLong("NEXT_CRLNO"));
         ca.setStatus(rs.getString("STATUS"));
-        ca.setCaUris(rs.getString("CA_URIS"));
-        ca.setMaxValidity(rs.getString("MAX_VALIDITY"));
         ca.setCert(buildFileOrBase64Binary(
             rs.getString("CERT"), "ca-conf/cert-ca-" + name + ".der"));
         ca.setCertchain(buildFileOrValue(
@@ -382,31 +387,69 @@ class CaconfDbExporter extends DbPorter {
         ca.setSignerType(rs.getString("SIGNER_TYPE"));
         ca.setSignerConf(buildFileOrValue(
             rs.getString("SIGNER_CONF"), "ca-conf/signerconf-ca-" + name));
+        ca.setRevInfo(rs.getString("REV_INFO"));
         ca.setCmpResponderName(rs.getString("CMP_RESPONDER_NAME"));
         ca.setScepResponderName(rs.getString("SCEP_RESPONDER_NAME"));
         ca.setCrlSignerName(rs.getString("CRL_SIGNER_NAME"));
-        ca.setScepControl(rs.getString("SCEP_CONTROL"));
-        ca.setCrlControl(rs.getString("CRL_CONTROL"));
-        ca.setCtlogControl(rs.getString("CTLOG_CONTROL"));
-        ca.setProtocolSupport(rs.getString("PROTOCOL_SUPPORT"));
-        ca.setSaveReq(rs.getInt("SAVE_REQ"));
-        ca.setPermission(rs.getInt("PERMISSION"));
-        ca.setExpirationPeriod(rs.getInt("EXPIRATION_PERIOD"));
-        ca.setKeepExpiredCertDays(rs.getInt("KEEP_EXPIRED_CERT_DAYS"));
-        ca.setValidityMode(rs.getString("VALIDITY_MODE"));
-        ca.setExtraControl(rs.getString("EXTRA_CONTROL"));
-        ca.setNumCrls(rs.getInt("NUM_CRLS"));
-        ca.setRevInfo(rs.getString("REV_INFO"));
-        ca.setRevokeSuspendedControl(rs.getString("REVOKE_SUSPENDED_CONTROL"));
 
-        String cmpControl = rs.getString("CMP_CONTROL");
+        String confColumn;
         if (dbSchemaVersion >= 7) {
-          ca.setCmpControl(cmpControl);
-          ca.setPopoControl(rs.getString("POPO_CONTROL"));
-          ca.setKeypairGenNames(rs.getString("KEYPAIR_GEN_NAMES"));
-          ca.setSaveCert(rs.getInt("SAVE_CERT"));
-          ca.setSaveKeypair(rs.getInt("SAVE_KEYPAIR"));
+          confColumn = rs.getString("CONF");
+          CaConfColumn.decode(confColumn); // validate the confColumn
         } else {
+          CaConfColumn ccc = new CaConfColumn();
+          ccc.setSnSize(rs.getInt("SN_SIZE"));
+
+          String str = rs.getString("CA_URIS");
+          if (StringUtil.isNotBlank(str)) {
+            CaUris caUris = CaUris.decode(str);
+            ccc.setCacertUris(caUris.getCacertUris());
+            ccc.setCrlUris(caUris.getCrlUris());
+            ccc.setDeltaCrlUris(caUris.getDeltaCrlUris());
+            ccc.setOcspUris(caUris.getOcspUris());
+          }
+
+          ccc.setMaxValidity(rs.getString("MAX_VALIDITY"));
+
+          str = rs.getString("SCEP_CONTROL");
+          if (StringUtil.isNotBlank(str)) {
+            ccc.setScepControl(new ConfPairs(str).asMap());
+          }
+
+          str = rs.getString("CRL_CONTROL");
+          if (StringUtil.isNotBlank(str)) {
+            ccc.setCrlControl(new ConfPairs(str).asMap());
+          }
+
+          str = rs.getString("CTLOG_CONTROL");
+          if (StringUtil.isNotBlank(str)) {
+            ccc.setCtlogControl(new ConfPairs(str).asMap());
+          }
+
+          str = rs.getString("PROTOCOL_SUPPORT");
+          if (StringUtil.isNotBlank(str)) {
+            ccc.setProtocolSupport(new ProtocolSupport(str).getProtocols());
+          }
+
+          ccc.setSaveRequest(rs.getInt("SAVE_REQ") != 0);
+          ccc.setPermission(rs.getInt("PERMISSION"));
+          ccc.setExpirationPeriod(rs.getInt("EXPIRATION_PERIOD"));
+          ccc.setKeepExpiredCertDays(rs.getInt("KEEP_EXPIRED_CERT_DAYS"));
+          ccc.setValidityMode(rs.getString("VALIDITY_MODE"));
+
+          str = rs.getString("EXTRA_CONTROL");
+          if (StringUtil.isNotBlank(str)) {
+            ccc.setExtraControl(new ConfPairs(str).asMap());
+          }
+
+          ccc.setNumCrls(rs.getInt("NUM_CRLS"));
+
+          str = rs.getString("REVOKE_SUSPENDED_CONTROL");
+          if (StringUtil.isNotBlank(str)) {
+            ccc.setRevokeSuspendedControl(new ConfPairs(str).asMap());
+          }
+
+          String cmpControl = rs.getString("CMP_CONTROL");
           // Util version 6
           ConfPairs cmpCtrlPairs = new ConfPairs();
           ConfPairs popoCtrlPairs = new ConfPairs();
@@ -423,8 +466,8 @@ class CaconfDbExporter extends DbPorter {
             }
           }
 
-          String str = rs.getString("DHPOC_CONTROL");
-          if (str != null) {
+          str = rs.getString("DHPOC_CONTROL");
+          if (StringUtil.isNotBlank(str)) {
             ConfPairs pairs = new ConfPairs(cmpControl);
             for (String n : pairs.names()) {
               popoCtrlPairs.putPair("dh." + n, pairs.value(n));
@@ -432,19 +475,25 @@ class CaconfDbExporter extends DbPorter {
           }
 
           if (!cmpCtrlPairs.isEmpty()) {
-            ca.setCmpControl(cmpCtrlPairs.getEncoded());
+            ccc.setCmpControl(cmpCtrlPairs.asMap());
           }
 
           if (!popoCtrlPairs.isEmpty()) {
-            ca.setPopoControl(popoCtrlPairs.getEncoded());
+            ccc.setPopoControl(popoCtrlPairs.asMap());
           }
 
-          ca.setKeypairGenNames("software");
-          ca.setSaveCert(1);
-          ca.setSaveKeypair(0);
+          ccc.setKeypairGenNames(Arrays.asList("software"));
+          ccc.setSaveCert(true);
+          ccc.setSaveKeypair(false);
+
+          confColumn = ccc.encode();
         }
 
         ca.validate();
+
+        ca.setConfColumn(buildFileOrValue(
+            confColumn, "ca-conf/" + name + ".conf"));
+
         cas.add(ca);
       }
     } catch (SQLException ex) {
@@ -456,6 +505,50 @@ class CaconfDbExporter extends DbPorter {
     caconf.setCas(cas);
     System.out.println(" exported table CA");
   } // method exportCa
+
+/*
+    private int snSize;
+
+    private String caUris;
+
+    private String maxValidity;
+
+    private String keypairGenNames;
+
+    private String cmpControl;
+
+    private String scepControl;
+
+    private String crlControl;
+
+    private String ctlogControl;
+
+    private String popoControl;
+
+    private String revokeSuspendedControl;
+
+    private String protocolSupport;
+
+    private int saveCert;
+
+    private int saveReq;
+
+    private int saveKeypair;
+
+    private int permission;
+
+    private int numCrls;
+
+    private int expirationPeriod;
+
+    private int keepExpiredCertDays;
+
+    private String validityMode;
+
+    private String extraControl;
+
+      notBlank(maxValidity, "maxValidity");
+ */
 
   private void exportCaHasRequestor(CaCertstore.Caconf caconf)
       throws DataAccessException, InvalidConfException {

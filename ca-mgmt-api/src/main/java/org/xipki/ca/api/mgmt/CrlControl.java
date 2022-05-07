@@ -128,12 +128,21 @@ public class CrlControl {
 
   public CrlControl(String conf)
       throws InvalidConfException {
-    ConfPairs props;
+    this(toConfPairs(conf));
+  }
+
+  private static ConfPairs toConfPairs(String conf)
+      throws InvalidConfException {
     try {
-      props = new ConfPairs(conf);
+      return new ConfPairs(conf);
     } catch (RuntimeException ex) {
       throw new InvalidConfException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
     }
+  }
+
+  public CrlControl(ConfPairs props)
+      throws InvalidConfException {
+    Args.notNull(props, "props");
 
     String str = props.value(KEY_INVALIDITY_DATE);
     if (str != null) {
@@ -212,6 +221,10 @@ public class CrlControl {
   } // constructor
 
   public String getConf() {
+    return getConfPairs().getEncoded();
+  }
+
+  public ConfPairs getConfPairs() {
     ConfPairs pairs = new ConfPairs();
     pairs.putPair(KEY_DELTACRL_INTERVALS, Integer.toString(deltaCrlIntervals));
     pairs.putPair(KEY_EXCLUDE_REASON, Boolean.toString(excludeReason));
@@ -222,8 +235,7 @@ public class CrlControl {
     pairs.putPair(KEY_INTERVAL_TIME, intervalDayTime.toString());
     pairs.putPair(KEY_INVALIDITY_DATE, invalidityDateMode.name());
     pairs.putPair(KEY_OVERLAP, overlap.toString());
-
-    return pairs.getEncoded();
+    return pairs;
   } // method getConf
 
   @Override

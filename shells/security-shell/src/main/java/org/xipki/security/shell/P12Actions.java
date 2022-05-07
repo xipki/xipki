@@ -185,7 +185,6 @@ public class P12Actions {
 
       ks.setKeyEntry(keyname, key, pwd, jceCertChain);
 
-
       try (OutputStream out = Files.newOutputStream(
           Paths.get(expandFilepath(p12File)))) {
         ks.store(out, pwd);

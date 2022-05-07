@@ -49,7 +49,6 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Base64;
 import org.xipki.util.*;
 
 import java.io.IOException;
@@ -59,7 +58,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.interfaces.RSAPublicKey;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 import static org.xipki.ca.api.OperationException.ErrorCode.*;
 import static org.xipki.ca.server.CaAuditConstants.*;

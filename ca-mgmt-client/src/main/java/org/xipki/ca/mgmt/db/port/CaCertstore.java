@@ -39,15 +39,9 @@ public class CaCertstore extends ValidatableConf {
 
     private String name;
 
-    private int snSize;
-
     private long nextCrlNo;
 
     private String status;
-
-    private String caUris;
-
-    private String maxValidity;
 
     private FileOrBinary cert;
 
@@ -57,47 +51,15 @@ public class CaCertstore extends ValidatableConf {
 
     private FileOrValue signerConf;
 
+    private String revInfo;
+
     private String crlSignerName;
 
     private String cmpResponderName;
 
     private String scepResponderName;
 
-    private String keypairGenNames;
-
-    private String cmpControl;
-
-    private String scepControl;
-
-    private String crlControl;
-
-    private String ctlogControl;
-
-    private String popoControl;
-
-    private String revokeSuspendedControl;
-
-    private String protocolSupport;
-
-    private int saveCert;
-
-    private int saveReq;
-
-    private int saveKeypair;
-
-    private int permission;
-
-    private int numCrls;
-
-    private int expirationPeriod;
-
-    private int keepExpiredCertDays;
-
-    private String revInfo;
-
-    private String validityMode;
-
-    private String extraControl;
+    private FileOrValue confColumn;
 
     public int getId() {
       return id;
@@ -115,14 +77,6 @@ public class CaCertstore extends ValidatableConf {
       this.name = name;
     }
 
-    public int getSnSize() {
-      return snSize;
-    }
-
-    public void setSnSize(int snSize) {
-      this.snSize = snSize;
-    }
-
     public long getNextCrlNo() {
       return nextCrlNo;
     }
@@ -137,22 +91,6 @@ public class CaCertstore extends ValidatableConf {
 
     public void setStatus(String status) {
       this.status = status;
-    }
-
-    public String getCaUris() {
-      return caUris;
-    }
-
-    public void setCaUris(String caUris) {
-      this.caUris = caUris;
-    }
-
-    public String getMaxValidity() {
-      return maxValidity;
-    }
-
-    public void setMaxValidity(String maxValidity) {
-      this.maxValidity = maxValidity;
     }
 
     public FileOrBinary getCert() {
@@ -187,6 +125,14 @@ public class CaCertstore extends ValidatableConf {
       this.signerConf = signerConf;
     }
 
+    public String getRevInfo() {
+      return revInfo;
+    }
+
+    public void setRevInfo(String revInfo) {
+      this.revInfo = revInfo;
+    }
+
     public String getCrlSignerName() {
       return crlSignerName;
     }
@@ -211,148 +157,12 @@ public class CaCertstore extends ValidatableConf {
       this.scepResponderName = scepResponderName;
     }
 
-    public String getKeypairGenNames() {
-      return keypairGenNames;
+    public FileOrValue getConfColumn() {
+      return confColumn;
     }
 
-    public void setKeypairGenNames(String keypairGenNames) {
-      this.keypairGenNames = keypairGenNames;
-    }
-
-    public String getCmpControl() {
-      return cmpControl;
-    }
-
-    public void setCmpControl(String cmpControl) {
-      this.cmpControl = cmpControl;
-    }
-
-    public String getScepControl() {
-      return scepControl;
-    }
-
-    public void setScepControl(String scepControl) {
-      this.scepControl = scepControl;
-    }
-
-    public String getCrlControl() {
-      return crlControl;
-    }
-
-    public void setCrlControl(String crlControl) {
-      this.crlControl = crlControl;
-    }
-
-    public String getCtlogControl() {
-      return ctlogControl;
-    }
-
-    public void setCtlogControl(String ctlogControl) {
-      this.ctlogControl = ctlogControl;
-    }
-
-    public String getRevokeSuspendedControl() {
-      return revokeSuspendedControl;
-    }
-
-    public void setRevokeSuspendedControl(String revokeSuspendedControl) {
-      this.revokeSuspendedControl = revokeSuspendedControl;
-    }
-
-    public String getPopoControl() {
-      return popoControl;
-    }
-
-    public void setPopoControl(String popoControl) {
-      this.popoControl = popoControl;
-    }
-
-    public String getProtocolSupport() {
-      return protocolSupport;
-    }
-
-    public void setProtocolSupport(String protocolSupport) {
-      this.protocolSupport = protocolSupport;
-    }
-
-    public int getSaveCert() {
-      return saveCert;
-    }
-
-    public void setSaveCert(int saveCert) {
-      this.saveCert = saveCert;
-    }
-
-    public int getSaveReq() {
-      return saveReq;
-    }
-
-    public void setSaveReq(int saveReq) {
-      this.saveReq = saveReq;
-    }
-
-    public int getSaveKeypair() {
-      return saveKeypair;
-    }
-
-    public void setSaveKeypair(int saveKeypair) {
-      this.saveKeypair = saveKeypair;
-    }
-
-    public int getPermission() {
-      return permission;
-    }
-
-    public void setPermission(int permission) {
-      this.permission = permission;
-    }
-
-    public int getNumCrls() {
-      return numCrls;
-    }
-
-    public void setNumCrls(int numCrls) {
-      this.numCrls = numCrls;
-    }
-
-    public int getExpirationPeriod() {
-      return expirationPeriod;
-    }
-
-    public void setExpirationPeriod(int expirationPeriod) {
-      this.expirationPeriod = expirationPeriod;
-    }
-
-    public int getKeepExpiredCertDays() {
-      return keepExpiredCertDays;
-    }
-
-    public void setKeepExpiredCertDays(int keepExpiredCertDays) {
-      this.keepExpiredCertDays = keepExpiredCertDays;
-    }
-
-    public String getRevInfo() {
-      return revInfo;
-    }
-
-    public void setRevInfo(String revInfo) {
-      this.revInfo = revInfo;
-    }
-
-    public String getValidityMode() {
-      return validityMode;
-    }
-
-    public void setValidityMode(String validityMode) {
-      this.validityMode = validityMode;
-    }
-
-    public String getExtraControl() {
-      return extraControl;
-    }
-
-    public void setExtraControl(String extraControl) {
-      this.extraControl = extraControl;
+    public void setConfColumn(FileOrValue confColumn) {
+      this.confColumn = confColumn;
     }
 
     @Override
@@ -360,7 +170,6 @@ public class CaCertstore extends ValidatableConf {
         throws InvalidConfException {
       notBlank(name, "name");
       notBlank(status, "status");
-      notBlank(maxValidity, "maxValidity");
 
       notNull(cert, "cert");
       cert.validate();
@@ -369,8 +178,6 @@ public class CaCertstore extends ValidatableConf {
 
       notNull(signerConf, "signerConf");
       signerConf.validate();
-
-      //notBlank(protocolSupport, "protocolSupport");
     }
 
   } // class Ca

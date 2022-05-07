@@ -288,20 +288,39 @@ public class CertStore extends CertStoreBase {
       X509Cert cert0 = cert.getCert();
       boolean isEeCert = cert0.getBasicConstraints() == -1;
 
-      execUpdatePrepStmt0(SQL_ADD_CERT,
-          col2Long(certId), col2Long(System.currentTimeMillis() / 1000), // currentTimeSeconds
-          col2Str(cert0.getSerialNumber().toString(16)),
-          col2Str(subjectText),  col2Long(fpSubject), col2Long(fpReqSubject),
-          col2Long(cert0.getNotBefore().getTime() / 1000), // notBeforeSeconds
-          col2Long(cert0.getNotAfter().getTime() / 1000), // notAfterSeconds
-          col2Bool(false), col2Int(certInfo.getProfile().getId()),
-          col2Int(certInfo.getIssuer().getId()), col2Int(certInfo.getRequestor().getId()),
-          col2Int(certInfo.getUser()), col2Int(isEeCert ? 1 : 0),
-          col2Int(certInfo.getReqType().getCode()),
-          col2Str(tid), col2Str(b64FpCert), col2Str(reqSubjectText),
-          col2Int(0), // in this version we set CRL_SCOPE to fixed value 0
-          col2Str(Base64.encodeToString(encodedCert)),
-          col2Str(privateKeyInfo));
+      boolean withPrivateKey = dbSchemaVersion >= 7;
+
+      List<SqlColumn2> columns = new ArrayList<>(20);
+
+      columns.add(col2Long(certId));
+      // currentTimeSeconds
+      columns.add(col2Long(System.currentTimeMillis() / 1000));
+      columns.add(col2Str(cert0.getSerialNumber().toString(16)));
+      columns.add(col2Str(subjectText));
+      columns.add(col2Long(fpSubject));
+      columns.add(col2Long(fpReqSubject));
+      // notBeforeSeconds
+      columns.add(col2Long(cert0.getNotBefore().getTime() / 1000));
+      // notAfterSeconds
+      columns.add(col2Long(cert0.getNotAfter().getTime() / 1000));
+      columns.add(col2Bool(false));
+      columns.add(col2Int(certInfo.getProfile().getId()));
+      columns.add(col2Int(certInfo.getIssuer().getId()));
+      columns.add(col2Int(certInfo.getRequestor().getId()));
+      columns.add(col2Int(certInfo.getUser()));
+      columns.add(col2Int(isEeCert ? 1 : 0));
+      columns.add(col2Int(certInfo.getReqType().getCode()));
+      columns.add(col2Str(tid));
+      columns.add(col2Str(b64FpCert));
+      columns.add(col2Str(reqSubjectText));
+      // in this version we set CRL_SCOPE to fixed value 0
+      columns.add(col2Int(0));
+      columns.add(col2Str(Base64.encodeToString(encodedCert)));
+      if (withPrivateKey) {
+        columns.add(col2Str(privateKeyInfo));
+      }
+
+      execUpdatePrepStmt0(SQL_ADD_CERT, columns.toArray(new SqlColumn2[0]));
 
       cert.setCertId(certId);
     } catch (Exception ex) {
@@ -398,14 +417,26 @@ public class CertStore extends CertStoreBase {
       throw new CRLException(ex.getMessage(), ex);
     }
 
-    String b64Sha1 = HashAlgo.SHA1.base64Hash(encodedCrl);
+    boolean withSha1Column = dbSchemaVersion >= 7;
+    String b64Sha1 = withSha1Column ? HashAlgo.SHA1.base64Hash(encodedCrl) : null;
     String b64Crl = Base64.encodeToString(encodedCrl);
 
-    execUpdatePrepStmt0(SQL_ADD_CRL, col2Int(crlId), col2Int(ca.getId()), col2Long(crlNumber),
-        col2Long(crl.getThisUpdate().getTime() / 1000),
-        col2Long(getDateSeconds(crl.getNextUpdate())), col2Bool((baseCrlNumber != null)),
-        // in this version we set CRL_SCOPE to fixed value 0
-        col2Long(baseCrlNumber), col2Int(0), col2Str(b64Sha1), col2Str(b64Crl));
+    List<SqlColumn2> columns = new ArrayList<>(10);
+    columns.add(col2Int(crlId));
+    columns.add(col2Int(ca.getId()));
+    columns.add(col2Long(crlNumber));
+    columns.add(col2Long(crl.getThisUpdate().getTime() / 1000));
+    columns.add(col2Long(getDateSeconds(crl.getNextUpdate())));
+    columns.add(col2Bool((baseCrlNumber != null)));
+    columns.add(col2Long(baseCrlNumber));
+    // in this version we set CRL_SCOPE to fixed value 0
+    columns.add(col2Int(0));
+    if (withSha1Column) {
+      columns.add(col2Str(b64Sha1));
+    }
+    columns.add(col2Str(b64Crl));
+
+    execUpdatePrepStmt0(SQL_ADD_CRL, columns.toArray(new SqlColumn2[0]));
   } // method addCrl
 
   public CertWithRevocationInfo revokeCert(NameId ca, BigInteger serialNumber,

@@ -327,14 +327,10 @@ class CaconfDbImporter extends DbPorter {
       throws DataAccessException, CertificateException, IOException {
     System.out.println("importing table CA");
 
-    final String sql = "INSERT INTO CA (ID,NAME,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CA_URIS,"
-        + "MAX_VALIDITY,CERT,CERTCHAIN,SIGNER_TYPE,CRL_SIGNER_NAME,"
-        + "CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,KEYPAIR_GEN_NAMES,"
-        + "CRL_CONTROL,CMP_CONTROL,SCEP_CONTROL,CTLOG_CONTROL,PROTOCOL_SUPPORT,"
-        + "SAVE_CERT,SAVE_REQ,SAVE_KEYPAIR,PERMISSION,"
-        + "NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL,"
-        + "SIGNER_CONF,REV_INFO,POPO_CONTROL,REVOKE_SUSPENDED_CONTROL) "
-        + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    final String sql = "INSERT INTO CA " +
+        "(ID,NAME,STATUS,NEXT_CRLNO,CRL_SIGNER_NAME,CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME," +
+        "SUBJECT,REV_INFO,SIGNER_TYPE,SIGNER_CONF,CERT,CERTCHAIN,CONF) " +
+        "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     PreparedStatement ps = null;
     try {
@@ -348,46 +344,20 @@ class CaconfDbImporter extends DbPorter {
           int idx = 1;
           ps.setInt(idx++, ca.getId());
           ps.setString(idx++, ca.getName().toLowerCase());
-          ps.setString(idx++, X509Util.cutX500Name(cert.getSubject(), maxX500nameLen));
-          ps.setInt(idx++, ca.getSnSize());
-          ps.setLong(idx++, ca.getNextCrlNo());
           ps.setString(idx++, ca.getStatus());
-          ps.setString(idx++, ca.getCaUris());
-          ps.setString(idx++, ca.getMaxValidity());
-          ps.setString(idx++, Base64.encodeToString(certBytes));
-
-          ps.setString(idx++, readContent(ca.getCertchain()));
-          ps.setString(idx++, ca.getSignerType());
+          ps.setLong(idx++, ca.getNextCrlNo());
           ps.setString(idx++, ca.getCrlSignerName());
           ps.setString(idx++, ca.getCmpResponderName());
           ps.setString(idx++, ca.getScepResponderName());
-
-          String keypairGenNames;
-          if(confVersion == VERSION_V1) {
-            keypairGenNames = "software";
-          } else {
-            keypairGenNames = ca.getKeypairGenNames();
-          }
-          ps.setString(idx++, keypairGenNames);
-
-          ps.setString(idx++, ca.getCrlControl());
-          ps.setString(idx++, ca.getCmpControl());
-          ps.setString(idx++, ca.getScepControl());
-          ps.setString(idx++, ca.getCtlogControl());
-          ps.setString(idx++, ca.getProtocolSupport());
-          ps.setInt(idx++, ca.getSaveCert());
-          ps.setInt(idx++, ca.getSaveReq());
-          ps.setInt(idx++, ca.getSaveKeypair());
-          ps.setInt(idx++, ca.getPermission());
-          ps.setInt(idx++, ca.getNumCrls());
-          ps.setInt(idx++, ca.getExpirationPeriod());
-          ps.setInt(idx++, ca.getKeepExpiredCertDays());
-          ps.setString(idx++, ca.getValidityMode());
-          ps.setString(idx++, ca.getExtraControl());
-          ps.setString(idx++, readContent(ca.getSignerConf()));
+          ps.setString(idx++, X509Util.cutX500Name(cert.getSubject(), maxX500nameLen));
           ps.setString(idx++, ca.getRevInfo());
-          ps.setString(idx++, ca.getPopoControl());
-          ps.setString(idx, ca.getRevokeSuspendedControl());
+          ps.setString(idx++, ca.getSignerType());
+          ps.setString(idx++, readContent(ca.getSignerConf()));
+          ps.setString(idx++, Base64.encodeToString(certBytes));
+          ps.setString(idx++, readContent(ca.getCertchain()));
+
+          String confColumn = readContent(ca.getConfColumn());
+          ps.setString(idx++, confColumn);
 
           ps.executeUpdate();
         } catch (SQLException ex) {

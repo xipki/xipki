@@ -21,7 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.util.StringUtil;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.StringTokenizer;
 
 /**
@@ -52,7 +54,7 @@ public class ProtocolSupport {
   private ProtocolSupport() {
   }
 
-  public ProtocolSupport(Set<String> protocols) {
+  public ProtocolSupport(Collection<String> protocols) {
     if (protocols == null) {
       return;
     }
@@ -155,6 +157,22 @@ public class ProtocolSupport {
     sb.append("\n  REST: ").append(rest);
     sb.append("\n  SCEP: ").append(scep);
     return sb.toString();
+  }
+
+  public List<String> getProtocols() {
+    List<String> rv = new ArrayList<>(3);
+    if (cmp) {
+      rv.add(CMP);
+    }
+
+    if (rest) {
+      rv.add(REST);
+    }
+
+    if (scep) {
+      rv.add(SCEP);
+    }
+    return rv;
   }
 
   public String getEncoded() {

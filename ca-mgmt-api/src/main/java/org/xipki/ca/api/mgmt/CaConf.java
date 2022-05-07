@@ -379,9 +379,13 @@ public class CaConf {
             caEntry.setProtocolSupport(new ProtocolSupport(ci.getProtocolSupport()));
           }
 
+          PopoControl popoControl;
           if (ci.getPopoControl() != null) {
-            caEntry.setPopoControl(getValue(ci.getPopoControl(), zipEntries));
+            popoControl = new PopoControl(getValue(ci.getPopoControl(), zipEntries));
+          } else {
+            popoControl = new PopoControl("");
           }
+          caEntry.setPopoControl(popoControl);
 
           if (ci.getRevokeSuspendedControl() != null) {
             caEntry.setRevokeSuspendedControl(

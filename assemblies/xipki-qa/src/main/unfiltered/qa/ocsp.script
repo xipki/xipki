@@ -228,7 +228,7 @@ echo "QA: Unknown (now is before notBefore) (POST, DB)"
 xiqa:qa-ocsp-status \
   --issuer output/subca1.crt \
   --cert output/ee-complex1.crt \
-  --exp-error malformedRequest \
+  --exp-status unknown \
   --url $URL \
   --nonce
 
@@ -236,7 +236,7 @@ echo "QA: Unknown (RFC6960) (POST, DB)"
 xiqa:qa-ocsp-status \
   --issuer output/subca1.crt \
   --serial 99999 \
-  --exp-error malformedRequest \
+  --exp-status unknown \
   --url $URL \
   --nonce
 
@@ -245,7 +245,7 @@ xiqa:qa-ocsp-status \
   --issuer output/subca1.crt \
   --cert output/ee-complex1.crt \
   --http-get \
-  --exp-error malformedRequest \
+  --exp-status unknown \
   --url $URL \
   --nonce
 
@@ -254,7 +254,7 @@ xiqa:qa-ocsp-status \
   --issuer output/subca1.crt \
   --serial 99999 \
   --http-get \
-  --exp-error malformedRequest \
+  --exp-status unknown \
   --url $URL \
   --nonce
 
@@ -263,7 +263,7 @@ xiqa:qa-ocsp-status \
   --issuer output/subca1.crt \
   --cert output/ee-complex1.crt \
   --sign \
-  --exp-error malformedRequest \
+  --exp-status unknown \
   --url $URL \
   --nonce
 
@@ -272,7 +272,7 @@ xiqa:qa-ocsp-status \
   --issuer output/subca1.crt \
   --serial 99999 \
   --sign \
-  --exp-error malformedRequest \
+  --exp-status unknown \
   --url $URL \
   --nonce
 

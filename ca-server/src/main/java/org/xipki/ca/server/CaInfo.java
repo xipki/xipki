@@ -32,6 +32,7 @@ import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.mgmt.*;
+import org.xipki.ca.api.mgmt.entry.CaConfColumn;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.api.mgmt.entry.CaEntry.CaSignerConf;
 import org.xipki.ca.server.db.CertStore;
@@ -56,6 +57,8 @@ public class CaInfo {
   private static final long MS_PER_DAY = 24L * 60 * 60 * 1000;
 
   private final CaEntry caEntry;
+
+  private final CaConfColumn caConfColumn;
 
   private final long noNewCertificateAfter;
 
@@ -83,19 +86,16 @@ public class CaInfo {
 
   private final AlgorithmIdentifier caKeyAlgId;
 
-  private PopoControl popoControl;
-
   private Map<SignAlgo, ConcurrentContentSigner> signers;
 
   private ConcurrentContentSigner dfltSigner;
 
-  private RevokeSuspendedControl revokeSuspendedCertsControl;
-
   private ConfPairs extraControl;
 
-  public CaInfo(CaEntry caEntry, CertStore certStore)
+  public CaInfo(CaEntry caEntry, CaConfColumn caConfColumn, CertStore certStore)
       throws OperationException {
     this.caEntry = Args.notNull(caEntry, "caEntry");
+    this.caConfColumn = Args.notNull(caConfColumn, "caConfColumn");
     this.certStore = Args.notNull(certStore, "certStore");
 
     X509Cert cert = caEntry.getCert();
@@ -197,6 +197,10 @@ public class CaInfo {
     return caEntry;
   }
 
+  public CaConfColumn getCaConfColumn() {
+    return caConfColumn;
+  }
+
   public int getPathLenConstraint() {
     return caEntry.getPathLenConstraint();
   }
@@ -213,10 +217,6 @@ public class CaInfo {
     return caEntry.getMaxValidity();
   }
 
-  public void setMaxValidity(Validity maxValidity) {
-    caEntry.setMaxValidity(maxValidity);
-  }
-
   public X509Cert getCert() {
     return publicCaInfo.getCaCert();
   }
@@ -227,10 +227,6 @@ public class CaInfo {
 
   public List<CMPCertificate> getCertchainInCmpFormat() {
     return certchainInCmpFormat;
-  }
-
-  public String getSignerConf() {
-    return caEntry.getSignerConf();
   }
 
   public String getCrlSignerName() {
@@ -245,10 +241,6 @@ public class CaInfo {
     return caEntry.getCrlControl();
   }
 
-  public void setCrlControl(CrlControl crlControl) {
-    caEntry.setCrlControl(crlControl);
-  }
-
   public String getCmpResponderName() {
     return caEntry.getCmpResponderName();
   }
@@ -261,16 +253,12 @@ public class CaInfo {
     return caEntry.getCmpControl();
   }
 
-  public void setCmpControl(CmpControl cmpControl) {
-    caEntry.setCmpControl(cmpControl);
-  }
-
   public CtlogControl getCtlogControl() {
     return caEntry.getCtlogControl();
   }
 
   public PopoControl getPopoControl() {
-    return popoControl;
+    return caEntry.getPopoControl();
   }
 
   public String getScepResponderName() {
@@ -285,24 +273,8 @@ public class CaInfo {
     return caEntry.getKeypairGenNames();
   }
 
-  public void setKeypairGenNames(List<String> names) {
-    caEntry.setKeypairGenNames(names);
-  }
-
-  public ScepControl getSCepControl() {
-    return caEntry.getScepControl();
-  }
-
-  public void setScepControl(ScepControl control) {
-    caEntry.setScepControl(control);
-  }
-
   public ConfPairs getExtraControl() {
     return extraControl;
-  }
-
-  public void setExtraControl(ConfPairs extraControl) {
-    this.extraControl = extraControl;
   }
 
   public int getNumCrls() {
@@ -315,10 +287,6 @@ public class CaInfo {
 
   public void setStatus(CaStatus status) {
     caEntry.setStatus(status);
-  }
-
-  public String getSignerType() {
-    return caEntry.getSignerType();
   }
 
   @Override
@@ -342,16 +310,8 @@ public class CaInfo {
     return caEntry.getProtocoSupport().isScep();
   }
 
-  public void setProtocolSupport(ProtocolSupport protocolSupport) {
-    caEntry.setProtocolSupport(protocolSupport);
-  }
-
   public boolean isSaveCert() {
     return caEntry.isSaveCert();
-  }
-
-  public void setSaveCert(boolean saveCert) {
-    caEntry.setSaveCert(saveCert);
   }
 
   public boolean isSaveRequest() {
@@ -366,20 +326,12 @@ public class CaInfo {
     return caEntry.isSaveKeypair();
   }
 
-  public void setSaveKeypair(boolean saveKeypair) {
-    caEntry.setSaveKeypair(saveKeypair);
-  }
-
   public String getHexSha1OfCert() {
     return caEntry.getHexSha1OfCert();
   }
 
   public ValidityMode getValidityMode() {
     return caEntry.getValidityMode();
-  }
-
-  public void setValidityMode(ValidityMode mode) {
-    caEntry.setValidityMode(mode);
   }
 
   public int getPermission() {
@@ -396,14 +348,6 @@ public class CaInfo {
 
   public void setRevocationInfo(CertRevocationInfo revocationInfo) {
     caEntry.setRevocationInfo(revocationInfo);
-  }
-
-  public int getExpirationPeriod() {
-    return caEntry.getExpirationPeriod();
-  }
-
-  public void setKeepExpiredCertInDays(int days) {
-    caEntry.setKeepExpiredCertInDays(days);
   }
 
   public int getKeepExpiredCertInDays() {
@@ -484,14 +428,6 @@ public class CaInfo {
     return true;
   } // method initSigner
 
-  public boolean initPopoControl()
-      throws XiSecurityException, InvalidConfException {
-    if (popoControl == null) {
-      this.popoControl = new PopoControl(caEntry.getPopoControl());
-    }
-    return true;
-  } // method initPopoControl
-
   public boolean isSignerRequired() {
     int permission = caEntry.getPermission();
     return PermissionConstants.contains(permission, PermissionConstants.ENROLL_CROSS)
@@ -501,12 +437,7 @@ public class CaInfo {
   } // method isSignerRequired
 
   public RevokeSuspendedControl revokeSuspendedCertsControl() {
-    return revokeSuspendedCertsControl;
-  }
-
-  public void setRevokeSuspendedCertsControl(
-      RevokeSuspendedControl revokeSuspendedCertsControl) {
-    this.revokeSuspendedCertsControl = revokeSuspendedCertsControl;
+    return caEntry.getRevokeSuspendedControl();
   }
 
 }

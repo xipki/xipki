@@ -495,6 +495,10 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
   } // method init
 
+  public int getDbSchemaVersion() {
+    return queryExecutor.getDbSchemaVersion();
+  }
+
   private DataSourceWrapper loadDatasource(String datasourceName, FileOrValue datasourceConf)
       throws CaMgmtException {
     try {
@@ -1402,4 +1406,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     return new CaMgmtException(msg);
   }
 
+  public void assertDbSchemaVersion7on(String action)
+      throws CaMgmtException {
+    queryExecutor.assertDbSchemaVersion7on(action);
+  }
 }

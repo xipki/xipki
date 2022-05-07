@@ -315,7 +315,7 @@ public abstract class MgmtMessage {
       }
 
       if (caEntry.getPopoControl() != null) {
-        popoControl = caEntry.getPopoControl();
+        popoControl = caEntry.getPopoControl().getConf();
       }
       expirationPeriod = caEntry.getExpirationPeriod();
       if (caEntry.getExtraControl() != null) {
@@ -662,7 +662,10 @@ public abstract class MgmtMessage {
       rv.setSignerConf(signerConf);
       rv.setStatus(status);
       rv.setValidityMode(validityMode);
-      rv.setPopoControl(popoControl);
+
+      if (popoControl != null) {
+        rv.setPopoControl(new PopoControl(popoControl));
+      }
 
       return rv; // method toCaEntry
     }

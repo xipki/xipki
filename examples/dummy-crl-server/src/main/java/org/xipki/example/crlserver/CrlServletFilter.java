@@ -19,6 +19,7 @@ package org.xipki.example.crlserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolverException;
@@ -30,6 +31,7 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.ResultSet;
 
@@ -48,6 +50,8 @@ public class CrlServletFilter implements Filter {
 
   private DataSourceWrapper dataSource;
 
+  private boolean hasSha1Column;
+
   @Override
   public void init(FilterConfig filterConfig)
           throws ServletException {
@@ -55,7 +59,8 @@ public class CrlServletFilter implements Filter {
     try {
       this.dataSource = new DataSourceFactory().createDataSourceForFile(
               "ca", DFLT_CA_SERVER_CFG, null);
-    } catch (PasswordResolverException | IOException ex) {
+      this.hasSha1Column = dataSource.tableHasColumn(null, "CRL", "SHA1");
+    } catch (PasswordResolverException | IOException | DataAccessException ex) {
       LOG.error("error initializing datasource", ex);
     }
   } // method init
@@ -125,18 +130,29 @@ public class CrlServletFilter implements Filter {
       }
 
       // retrieve the CRL from the database
-      String columnName = hashalgo == null ? "CRL" : "SHA1";
+      String columnName = "CRL";
+      if (hasSha1Column && hashalgo != null) {
+        columnName = "SHA1";
+      }
       sql = dataSource.buildSelectFirstSql(1,
           columnName + " FROM CRL WHERE CA_ID=" + id + " AND CRL_NO=" + crlNo);
       rs = dataSource.prepareStatement(sql).executeQuery();
 
-      byte[] respContent;
+      byte[] dbContent;
       try {
         rs.next();
         String b64 = rs.getString(columnName);
-        respContent = Base64.decodeFast(b64);
+        dbContent = Base64.decodeFast(b64);
       } finally {
         dataSource.releaseResources(null, rs);
+      }
+
+      byte[] respContent;
+      if (hashalgo != null && columnName.equals("CRL")) {
+        MessageDigest sha1 = MessageDigest.getInstance("SHA1");
+        respContent = sha1.digest(dbContent);
+      } else {
+        respContent = dbContent;
       }
 
       resp.setContentType(hashalgo == null ? RESP_CONTENT_TYPE : "application/octet-stream");

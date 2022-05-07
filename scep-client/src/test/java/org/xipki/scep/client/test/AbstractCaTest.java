@@ -224,7 +224,8 @@ public abstract class AbstractCaTest {
       p10Req = MyUtil.generateRequest(privKey, subjectPublicKeyInfo, subject, secret, null);
 
       selfSignedCert = MyUtil.generateSelfsignedCert(p10Req.toASN1Structure(), privKey);
-      EnrolmentResponse enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey, selfSignedCert);
+      EnrolmentResponse enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(),
+          privKey, selfSignedCert);
 
       List<X509Cert> certs = enrolResp.getCertificates();
       Assert.assertTrue("number of received certificates", certs.size() > 0);

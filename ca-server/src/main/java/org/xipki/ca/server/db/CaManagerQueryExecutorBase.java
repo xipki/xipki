@@ -55,8 +55,21 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
 
   private static final Logger LOG = LoggerFactory.getLogger(QueryExecutor.class);
 
-  CaManagerQueryExecutorBase(DataSourceWrapper datasource) {
+  protected int dbSchemaVersion;
+
+  CaManagerQueryExecutorBase(DataSourceWrapper datasource)
+      throws CaMgmtException {
     super(datasource);
+    try {
+      DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
+      this.dbSchemaVersion = Integer.parseInt(dbSchemaInfo.variableValue("VERSION"));
+    } catch (DataAccessException ex) {
+      throw new CaMgmtException(ex);
+    }
+  }
+
+  public int getDbSchemaVersion() {
+    return dbSchemaVersion;
   }
 
   protected String buildSelectFirstSql(String coreSql) {

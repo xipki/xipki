@@ -43,7 +43,7 @@ public enum OcspCertStatus {
 
   public static OcspCertStatus forName(String name) {
     for (OcspCertStatus entry : values()) {
-      if (entry.name().equals(name)) {
+      if (entry.name().equalsIgnoreCase(name)) {
         return entry;
       }
     }

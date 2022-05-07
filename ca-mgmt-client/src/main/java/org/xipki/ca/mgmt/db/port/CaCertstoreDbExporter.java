@@ -285,7 +285,7 @@ class CaCertstoreDbExporter extends DbPorter {
             byte[] certBytes = Base64.decodeFast(rs.getString("CERT"));
             String privateKey = null;
             if (dbSchemaVersion >= 7) {
-              rs.getString("PRIVATE_KEY");
+              privateKey = rs.getString("PRIVATE_KEY");
             }
 
             String sha1 = HashAlgo.SHA1.hexHash(certBytes);

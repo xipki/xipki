@@ -33,6 +33,7 @@ import org.xipki.ca.api.*;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.PermissionConstants;
+import org.xipki.ca.api.mgmt.PopoControl;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.server.cmp.CmpResponder;
 import org.xipki.ca.server.mgmt.CaManagerImpl;

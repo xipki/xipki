@@ -69,7 +69,7 @@ public class CmpControl {
 
   private static final int DFLT_PBM_ITERATIONCOUNT = 10240;
 
-  private final String conf;
+  private final ConfPairs confPairs;
 
   private final boolean confirmCert;
 
@@ -105,7 +105,13 @@ public class CmpControl {
 
   public CmpControl(String conf)
       throws InvalidConfException {
-    ConfPairs pairs = new ConfPairs(conf);
+    this(new ConfPairs(conf));
+  }
+
+  public CmpControl(ConfPairs pairs)
+      throws InvalidConfException {
+    this.confPairs = Args.notNull(pairs, "confPairs");
+
     this.confirmCert = getBoolean(pairs, KEY_CONFIRM_CERT, false);
     this.sendCaCert = getBoolean(pairs, KEY_SEND_CA, false);
     this.sendCertChain = getBoolean(pairs, KEY_SEND_CERTCHAIN, false);
@@ -151,8 +157,6 @@ public class CmpControl {
     Integer pbmIterationCount = (str == null) ? null : Integer.parseInt(str);
 
     initPbm(pairs, listOwfAlgos, listMacAlgos, pbmIterationCount);
-
-    this.conf = pairs.getEncoded();
   } // constructor
 
   public CmpControl(Boolean confirmCert, Boolean sendCaCert, Boolean sendCertChain,
@@ -216,7 +220,7 @@ public class CmpControl {
 
     pairs.putPair(KEY_PROTECTION_PBM_IC, Integer.toString(this.responsePbmIterationCount));
 
-    this.conf = pairs.getEncoded();
+    this.confPairs = pairs;
   } // constructor
 
   private void initPbm(ConfPairs pairs, List<String> pbmOwfs, List<String> pbmMacs,
@@ -346,12 +350,16 @@ public class CmpControl {
   }
 
   public String getConf() {
-    return conf;
+    return confPairs.getEncoded();
+  }
+
+  public ConfPairs getConfPairs() {
+    return confPairs;
   }
 
   @Override
   public int hashCode() {
-    return conf.hashCode();
+    return getConf().hashCode();
   }
 
   @Override
@@ -372,7 +380,7 @@ public class CmpControl {
         "\n  AKI in revocation request required: ", rrAkiRequired,
         "\n  signature algorithms: ",
             CollectionUtil.sort(sigAlgoValidator.getAlgoNames()),
-        (verbose ? "\n  encoded: " : ""), (verbose ? conf : ""));
+        (verbose ? "\n  encoded: " : ""), (verbose ? getConf() : ""));
   } // method toString
 
   @Override
@@ -383,7 +391,7 @@ public class CmpControl {
       return false;
     }
 
-    return conf.equals(((CmpControl) obj).conf);
+    return confPairs.equals(((CmpControl) obj).confPairs);
   } // method equals
 
   private static boolean getBoolean(ConfPairs pairs, String key, boolean defaultValue) {

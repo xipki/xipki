@@ -36,13 +36,13 @@ public class CaUris {
 
   public static final CaUris EMPTY_INSTANCE = new CaUris(null, null, null, null);
 
-  private static final String NAME_CACERT_URIS = "cacert.uris";
+  public static final String NAME_CACERT_URIS = "cacert.uris";
 
-  private static final String NAME_OCSP_URIS = "ocsp.uris";
+  public static final String NAME_OCSP_URIS = "ocsp.uris";
 
-  private static final String NAME_CRL_URIS = "crl.uris";
+  public static final String NAME_CRL_URIS = "crl.uris";
 
-  private static final String NAME_DELTACRL_URIS = "deltacrl.uris";
+  public static final String NAME_DELTACRL_URIS = "deltacrl.uris";
 
   private List<String> cacertUris;
   private List<String> ocspUris;

@@ -27,6 +27,7 @@ import org.xipki.ca.server.KeypairGenEntryWrapper;
 import org.xipki.util.ObjectCreationException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.xipki.util.Args.notNull;
@@ -64,15 +65,30 @@ class KeypairGenManager {
     manager.keypairGenDbEntries.clear();
     manager.keypairGens.clear();
 
-    List<String> names = manager.queryExecutor.namesFromTable("KEYPAIR_GEN");
-    for (String name : names) {
-      KeypairGenEntry entry = manager.queryExecutor.createKeypairGen(name);
+    int dbSchemaVersion = manager.getDbSchemaVersion();
+
+    List<KeypairGenEntry> entries;
+    if (dbSchemaVersion <= 6) {
+      KeypairGenEntry entry = new KeypairGenEntry("software", "SOFTWARE", null);
+      entries = Collections.singletonList(entry);
+    } else {
+      List<String> names = manager.queryExecutor.namesFromTable("KEYPAIR_GEN");
+      entries = new ArrayList<>(names.size());
+      for (String name : names) {
+        KeypairGenEntry entry = manager.queryExecutor.createKeypairGen(name);
+        entries.add(entry);
+      }
+    }
+
+    for (KeypairGenEntry entry : entries) {
+      String name = entry.getName();
       manager.keypairGenDbEntries.put(name, entry);
 
       KeypairGenEntryWrapper gen = createKeypairGen(entry);
       manager.keypairGens.put(name, gen);
       LOG.info("loaded keypair generation {}", name);
     }
+
     keypairGenInitialized = true;
   } // method initSigners
 
@@ -98,6 +114,7 @@ class KeypairGenManager {
 
   void removeKeypairGen(String name) throws CaMgmtException {
     manager.assertMasterMode();
+    manager.assertDbSchemaVersion7on("Removing keypair generation");
 
     name = toNonBlankLower(name, "name");
     boolean bo = manager.queryExecutor.deleteRowWithName(name, "KEYPAIR_GEN");
@@ -113,7 +130,8 @@ class KeypairGenManager {
         List<String> newNames = new ArrayList<>(names);
         newNames.remove(name);
         changeCaEntry.setKeypairGenNames(newNames);
-        manager.queryExecutor.changeCa(changeCaEntry, caInfo.getCaEntry(), manager.securityFactory);
+        manager.queryExecutor.changeCa(changeCaEntry, caInfo.getCaEntry(),
+            caInfo.getCaConfColumn(), manager.securityFactory);
 
         caInfo.getKeypairGenNames().remove(name);
       }
@@ -127,6 +145,7 @@ class KeypairGenManager {
   void changeKeypairGen(String name, String type, String conf)
       throws CaMgmtException {
     manager.assertMasterMode();
+    manager.assertDbSchemaVersion7on("Changing keypair generation");
 
     name = toNonBlankLower(name, "name");
     if (type == null && conf == null) {
@@ -137,8 +156,8 @@ class KeypairGenManager {
       type = type.toLowerCase();
     }
 
-    KeypairGenEntryWrapper newKeypairGen = manager.queryExecutor.changeKeypairGen(name, type, conf,
-        manager, manager.securityFactory);
+    KeypairGenEntryWrapper newKeypairGen = manager.queryExecutor.changeKeypairGen(
+        name, type, conf, manager);
 
     manager.keypairGens.remove(name);
     manager.keypairGenDbEntries.remove(name);

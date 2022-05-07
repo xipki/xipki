@@ -32,6 +32,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.*;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.PermissionConstants;
+import org.xipki.ca.api.mgmt.PopoControl;
 import org.xipki.ca.api.profile.Certprofile.CertLevel;
 import org.xipki.ca.api.profile.SubjectDnSpec;
 import org.xipki.password.PasswordResolverException;
@@ -65,6 +66,30 @@ import static org.xipki.util.Args.notNull;
 public class CaUtil {
 
   private CaUtil() {
+  }
+
+  public static <T> List<T> asModifiableList(T... a) {
+    List<T> list = new ArrayList<>(a.length);
+    for (T element : a) {
+      list.add(element);
+    }
+    return list;
+  }
+
+  public static String buildInsertSql(String table, String... columns) {
+    StringBuilder sb = new StringBuilder(100);
+    sb.append("INSERT INTO ").append(table).append(" (");
+    for (String c : columns) {
+      sb.append(c).append(",");
+    }
+    sb.deleteCharAt(sb.length() - 1);
+    sb.append(") VALUES (");
+    for (int i = 0; i < columns.length; i++) {
+      sb.append("?,");
+    }
+    sb.deleteCharAt(sb.length() - 1);
+    sb.append(")");
+    return sb.toString();
   }
 
   public static Extensions getExtensions(CertificationRequestInfo csr) {

@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki.assembly</groupId>
     <artifactId>assemblies</artifactId>
-    <version>5.4.0-SNAPSHOT</version>
+    <version>6.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xipki-cli</artifactId>
   <packaging>pom</packaging>
@@ -91,7 +91,7 @@
             </goals>
             <configuration>
               <stripVersion>false</stripVersion>
-              <outputDirectory>${project.build.directory}/extern-jars</outputDirectory>
+        <outputDirectory>${project.build.directory}/classes/lib/boot</outputDirectory>
               <artifactItems>
                 <artifactItem>
                   <groupId>org.mariadb.jdbc</groupId>

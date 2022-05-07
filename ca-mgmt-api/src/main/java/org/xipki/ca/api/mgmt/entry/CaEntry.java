@@ -68,7 +68,7 @@ public class CaEntry extends MgmtEntry {
 
   private String signerConf;
 
-  private String popoControl;
+  private PopoControl popoControl;
 
   private ScepControl scepControl;
 
@@ -233,11 +233,11 @@ public class CaEntry extends MgmtEntry {
     return crlControl;
   }
 
-  public String getPopoControl() {
+  public synchronized PopoControl getPopoControl() {
     return popoControl;
   }
 
-  public void setPopoControl(String popoControl) {
+  public void setPopoControl(PopoControl popoControl) {
     this.popoControl = popoControl;
   }
 
@@ -413,7 +413,8 @@ public class CaEntry extends MgmtEntry {
         "\nsigner conf: ", (signerConf == null ? "null"
             : SignerEntry.signerConfToString(signerConf, verbose, ignoreSensitiveInfo)),
         "\nPOPO control: ", (popoControl == null ? "null"
-            : SignerEntry.signerConfToString(popoControl, verbose, ignoreSensitiveInfo)),
+            : SignerEntry.signerConfToString(popoControl.getConf(),
+                verbose, ignoreSensitiveInfo)),
         "\nCMP control:\n", (cmpControl == null ? "  null" : cmpControl.toString(verbose)),
         "\nCRL control:\n", (crlControl == null ? "  null" : crlControl.toString(verbose)),
         "\nSCEP control: \n", (scepControl == null ? "  null" : scepControl.toString(verbose)),

@@ -72,7 +72,19 @@ public class ScepControl {
     } catch (RuntimeException ex) {
       throw new InvalidConfException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
     }
+    init(props);
+  }
 
+  public ScepControl(ConfPairs conf)
+      throws InvalidConfException {
+    if (conf == null) {
+      return;
+    }
+    init(conf);
+  }
+
+  private void init(ConfPairs props)
+      throws InvalidConfException {
     this.includeCaCert = getBoolean(props, KEY_CACERT_INCLUDED, true);
     this.includeCertChain = getBoolean(props, KEY_CERTCHAIN_INCLUDED, false);
     this.includeSignerCert = getBoolean(props, KEY_SIGNERCERT_INCLUDED, true);
@@ -80,13 +92,16 @@ public class ScepControl {
   } // constructor
 
   public String getConf() {
+    return getConfPairs().getEncoded();
+  }
+
+  public ConfPairs getConfPairs() {
     ConfPairs pairs = new ConfPairs();
     pairs.putPair(KEY_CACERT_INCLUDED, Boolean.toString(includeCaCert));
     pairs.putPair(KEY_CERTCHAIN_INCLUDED, Boolean.toString(includeCertChain));
     pairs.putPair(KEY_SIGNERCERT_INCLUDED, Boolean.toString(includeSignerCert));
     pairs.putPair(KEY_SUPPORT_GETCRL, Boolean.toString(supportGetCrl));
-
-    return pairs.getEncoded();
+    return pairs;
   }
 
   public boolean isIncludeCaCert() {

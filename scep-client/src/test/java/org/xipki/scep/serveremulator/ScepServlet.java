@@ -30,7 +30,6 @@ import org.xipki.scep.message.CaCaps;
 import org.xipki.scep.message.MessageDecodingException;
 import org.xipki.scep.message.NextCaMessage;
 import org.xipki.scep.serveremulator.AuditEvent.AuditLevel;
-import org.xipki.scep.transaction.CaCapability;
 import org.xipki.scep.transaction.Operation;
 import org.xipki.scep.util.ScepConstants;
 import org.xipki.security.X509Cert;

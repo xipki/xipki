@@ -20,6 +20,7 @@ package org.xipki.ca.server.db;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.mgmt.CaMgmtException;
+import org.xipki.ca.server.CaUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
@@ -54,10 +55,7 @@ import static org.xipki.ca.api.OperationException.ErrorCode.SYSTEM_FAILURE;
  */
 public class CertStoreBase extends QueryExecutor {
 
-  protected static final String SQL_ADD_CERT =
-      "INSERT INTO CERT (ID,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,PID,"
-      + "CA_ID,RID,UID,EE,RTYPE,TID,SHA1,REQ_SUBJECT,CRL_SCOPE,CERT,PRIVATE_KEY)"
-      + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+  protected final String SQL_ADD_CERT;
 
   protected static final String SQL_REVOKE_CERT =
       "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
@@ -66,7 +64,7 @@ public class CertStoreBase extends QueryExecutor {
       "UPDATE CERT SET LUPDATE=?,RR=? WHERE ID=?";
 
   protected static final String SQL_INSERT_PUBLISHQUEUE =
-      "INSERT INTO PUBLISHQUEUE (PID,CA_ID,CID) VALUES (?,?,?)";
+      CaUtil.buildInsertSql("PUBLISHQUEUE", "PID", "CA_ID", "CID");
 
   protected static final String SQL_REMOVE_PUBLISHQUEUE =
       "DELETE FROM PUBLISHQUEUE WHERE PID=? AND CID=?";
@@ -79,10 +77,7 @@ public class CertStoreBase extends QueryExecutor {
   protected static final String SQL_MAX_THISUPDAATE_CRL =
       "SELECT MAX(THISUPDATE) FROM CRL WHERE CA_ID=? AND DELTACRL=?";
 
-  protected static final String SQL_ADD_CRL =
-      "INSERT INTO CRL (ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE,DELTACRL,BASECRL_NO,"
-      + "CRL_SCOPE,SHA1,CRL)"
-      + " VALUES (?,?,?,?,?,?,?,?,?,?)";
+  protected final String SQL_ADD_CRL;
 
   protected static final String SQL_REMOVE_CERT_FOR_ID = "DELETE FROM CERT WHERE ID=?";
 
@@ -90,13 +85,14 @@ public class CertStoreBase extends QueryExecutor {
       "DELETE FROM REQUEST WHERE ID NOT IN (SELECT req.RID FROM REQCERT req)";
 
   protected static final String SQL_ADD_REQUEST =
-      "INSERT INTO REQUEST (ID,LUPDATE,DATA) VALUES(?,?,?)";
+      CaUtil.buildInsertSql("REQUEST", "ID", "LUPDATE", "DATA");
 
-  protected static final String SQL_ADD_REQCERT = "INSERT INTO REQCERT (ID,RID,CID) VALUES(?,?,?)";
+  protected static final String SQL_ADD_REQCERT =
+      CaUtil.buildInsertSql("REQCERT", "ID", "RID", "CID");
 
-  protected int dbSchemaVersion;
+  protected final int dbSchemaVersion;
 
-  protected int maxX500nameLen;
+  protected final int maxX500nameLen;
 
   protected final String keypairEncAlg = "AES/GCM/NoPadding";
 
@@ -111,11 +107,7 @@ public class CertStoreBase extends QueryExecutor {
   protected CertStoreBase(DataSourceWrapper datasource, PasswordResolver passwordResolver)
       throws DataAccessException, CaMgmtException {
     super(datasource);
-    updateDbInfo(passwordResolver);
-  } // constructor
 
-  public void updateDbInfo(PasswordResolver passwordResolver)
-          throws DataAccessException, CaMgmtException {
     DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
     String vendor = dbSchemaInfo.variableValue("VENDOR");
     if (vendor != null && !vendor.equalsIgnoreCase("XIPKI")) {
@@ -125,9 +117,30 @@ public class CertStoreBase extends QueryExecutor {
     this.dbSchemaVersion = Integer.parseInt(dbSchemaInfo.variableValue("VERSION"));
     this.maxX500nameLen = Integer.parseInt(dbSchemaInfo.variableValue("X500NAME_MAXLEN"));
 
-    if (dbSchemaVersion < 7) {
-      throw new CaMgmtException("Please update the database schema to version 7+");
+    List<String> columns = CaUtil.asModifiableList("ID", "LUPDATE", "SN", "SUBJECT",
+        "FP_S", "FP_RS", "NBEFORE", "NAFTER", "REV", "PID", "CA_ID", "RID", "UID", "EE",
+        "RTYPE", "TID", "SHA1", "REQ_SUBJECT", "CRL_SCOPE", "CERT");
+    if (dbSchemaVersion >= 7) {
+      columns.add("PRIVATE_KEY");
     }
+
+    this.SQL_ADD_CERT = CaUtil.buildInsertSql("CERT", columns.toArray(new String[0]));
+
+    columns = CaUtil.asModifiableList("ID","CA_ID","CRL_NO", "THISUPDATE", "NEXTUPDATE", "DELTACRL",
+        "BASECRL_NO", "CRL_SCOPE");
+    if (dbSchemaVersion >= 7) {
+      columns.add("SHA1");
+    }
+    columns.add("CRL");
+    this.SQL_ADD_CRL = CaUtil.buildInsertSql("CRL", columns.toArray(new String[0]));
+
+    // INSERT INTO CRL
+    updateDbInfo(passwordResolver);
+  } // constructor
+
+  public void updateDbInfo(PasswordResolver passwordResolver)
+          throws DataAccessException, CaMgmtException {
+    DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
 
     // Save keypair control
     String str = dbSchemaInfo.variableValue("KEYPAIR_ENC_KEY");

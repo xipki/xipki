@@ -154,13 +154,6 @@ public class X509Ca extends X509CaModule implements Closeable {
       CtLogClient ctlogClient) throws OperationException {
     super(caInfo);
 
-    try {
-      caInfo.initPopoControl();
-    } catch (XiSecurityException | InvalidConfException ex) {
-      LogUtil.error(LOG, ex, "initPopoControl for CA " + caIdent);
-      throw new OperationException(SYSTEM_FAILURE, ex);
-    }
-
     if (caInfo.isSignerRequired()) {
       try {
         caInfo.initSigner(caManager.getSecurityFactory());
@@ -381,8 +374,8 @@ public class X509Ca extends X509CaModule implements Closeable {
     final int n = certTemplates.size();
     List<GrantedCertTemplate> gcts = new ArrayList<>(n);
 
-    List<String> keypairGenNames = caInfo.getKeypairGenNames();
     List<KeypairGenerator> keypairGenerators = null;
+    List<String> keypairGenNames = caInfo.getKeypairGenNames();
     if (CollectionUtil.isNotEmpty(keypairGenNames)) {
       keypairGenerators = new ArrayList<>(keypairGenNames.size());
       for (String name : keypairGenNames) {

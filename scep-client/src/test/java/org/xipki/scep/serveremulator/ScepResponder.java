@@ -44,8 +44,6 @@ import org.xipki.util.Args;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * SCEP responder.

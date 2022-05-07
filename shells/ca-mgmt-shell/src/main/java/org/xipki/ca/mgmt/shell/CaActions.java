@@ -329,13 +329,13 @@ public class CaActions {
       }
 
       if (popoControl != null) {
-        String conf = popoControl;
-        if (conf.contains("file:")) {
-          ConfPairs confPairs = new ConfPairs(conf);
-          entry.setPopoControl(embedFileContent(confPairs).getEncoded());
+        PopoControl pc;
+        if (popoControl.contains("file:")) {
+          pc = new PopoControl(embedFileContent(new ConfPairs(popoControl)));
         } else {
-          entry.setPopoControl(popoControl);
+          pc = new PopoControl(popoControl);
         }
+        entry.setPopoControl(pc);
       }
 
       if (revokeSuspendedControl != null) {

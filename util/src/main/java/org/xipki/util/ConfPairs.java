@@ -115,6 +115,10 @@ public class ConfPairs {
   }
 
   public ConfPairs(Map<String, ?> pairs) {
+    if (pairs == null) {
+      return;
+    }
+
     for (Entry<String, ?> entry : pairs.entrySet()) {
       Object value = entry.getValue();
       putPair(entry.getKey(), value == null ? null : value.toString());

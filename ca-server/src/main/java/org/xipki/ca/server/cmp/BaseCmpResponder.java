@@ -57,7 +57,6 @@ import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.RequestorInfo.CmpRequestorInfo;
 import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
 import org.xipki.ca.server.CaInfo;
-import org.xipki.ca.server.PopoControl;
 import org.xipki.ca.server.X509Ca;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.security.*;

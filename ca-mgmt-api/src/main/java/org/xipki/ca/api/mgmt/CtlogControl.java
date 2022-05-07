@@ -54,11 +54,17 @@ public class CtlogControl {
 
   private List<String> servers;
 
-  private String conf;
+  private ConfPairs confPairs;
 
   public CtlogControl(String conf)
       throws InvalidConfException {
-    ConfPairs pairs = new ConfPairs(Args.notNull(conf, "conf"));
+    this(new ConfPairs(Args.notNull(conf, "conf")));
+  }
+
+  public CtlogControl(ConfPairs pairs)
+      throws InvalidConfException {
+    Args.notNull(pairs, "pairs");
+
     enabled = getBoolean(pairs, KEY_ENABLED, false);
     // normalize the pairs
     pairs.putPair(KEY_ENABLED, Boolean.toString(enabled));
@@ -71,7 +77,7 @@ public class CtlogControl {
       throw new InvalidConfException(KEY_SERVERS + " is not specified");
     }
 
-    this.conf = pairs.getEncoded();
+    this.confPairs = pairs;
   } // constructor
 
   public CtlogControl(Boolean enabled, List<String> servers, String sslContextName) {
@@ -89,7 +95,7 @@ public class CtlogControl {
       pairs.putPair(KEY_SSLCONTEXT_NAME, sslContextName);
     }
 
-    this.conf = pairs.getEncoded();
+    this.confPairs = pairs;
   } // constructor
 
   public boolean isEnabled() {
@@ -97,7 +103,11 @@ public class CtlogControl {
   }
 
   public String getConf() {
-    return conf;
+    return getConfPairs().getEncoded();
+  }
+
+  public ConfPairs getConfPairs() {
+    return confPairs;
   }
 
   public String getSslContextName() {
@@ -120,13 +130,13 @@ public class CtlogControl {
     this.enabled = enabled;
   }
 
-  public void setConf(String conf) {
-    this.conf = conf;
+  public void setConf(ConfPairs confPairs) {
+    this.confPairs = confPairs;
   }
 
   @Override
   public int hashCode() {
-    return conf.hashCode();
+    return getConf().hashCode();
   }
 
   @Override
@@ -145,7 +155,7 @@ public class CtlogControl {
       return false;
     }
 
-    return conf.equals(((CtlogControl) obj).conf);
+    return confPairs.equals(((CtlogControl) obj).confPairs);
   }
 
   private static boolean getBoolean(ConfPairs pairs, String key, boolean defaultValue) {
