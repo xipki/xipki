@@ -26,7 +26,6 @@ import org.xipki.security.SignAlgo;
  * @author Lijun Liao
  * @since 2.0.0
  */
-// CHECKSTYLE:SKIP
 public class Pkcs12SHA256withRSATest extends Pkcs12SignVerifyTest {
 
   @Override

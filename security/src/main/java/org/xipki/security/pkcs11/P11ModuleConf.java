@@ -416,7 +416,7 @@ public class P11ModuleConf {
 
           try {
             mech = Long.parseLong(mechStr, radix);
-          } catch (NumberFormatException ex) {// CHECKSTYLE:SKIP
+          } catch (NumberFormatException ex) {
           }
         }
 
@@ -647,7 +647,7 @@ public class P11ModuleConf {
 
       try {
         return Long.parseLong(str, radix);
-      } catch (NumberFormatException ex) {// CHECKSTYLE:
+      } catch (NumberFormatException ex) {
         return null;
       }
     }

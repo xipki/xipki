@@ -37,7 +37,6 @@ import java.util.List;
 
 public class ExtensionSyntaxChecker {
 
-  // CHECKSTYLE:SKIP
   private static class ASN1ObjectHolder {
     private ASN1Encodable object;
   }

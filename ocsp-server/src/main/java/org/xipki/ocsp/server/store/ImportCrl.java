@@ -1013,7 +1013,6 @@ class ImportCrl {
   private void addCertificate(AtomicLong maxId, int crlInfoId, CertWrapper caCert, X509Cert cert,
       String certLogId)
           throws DataAccessException {
-    // CHECKSTYLE:SKIP
     int caId = caCert.databaseId;
 
     // not issued by the given issuer

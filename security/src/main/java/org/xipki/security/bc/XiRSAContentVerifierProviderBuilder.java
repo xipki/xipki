@@ -39,7 +39,6 @@ import java.security.NoSuchAlgorithmException;
  * @since 2.1.0
  */
 
-// CHECKSTYLE:SKIP
 public class XiRSAContentVerifierProviderBuilder extends BcRSAContentVerifierProviderBuilder {
   private static final DigestAlgorithmIdentifierFinder digestAlgorithmFinder
       = new DefaultDigestAlgorithmIdentifierFinder();

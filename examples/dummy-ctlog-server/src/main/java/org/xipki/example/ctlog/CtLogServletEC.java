@@ -24,7 +24,6 @@ import org.xipki.util.Base64;
  *
  * @author Lijun Liao
  */
-//CHECKSTYLE:SKIP
 public class CtLogServletEC extends CtLogServlet {
 
   private static final String privateKey =

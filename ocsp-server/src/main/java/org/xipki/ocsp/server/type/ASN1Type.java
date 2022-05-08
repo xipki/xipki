@@ -28,7 +28,6 @@ import java.util.Date;
  * @since 2.2.0
  */
 
-// CHECKSTYLE:SKIP
 public abstract class ASN1Type {
 
   public abstract int getEncodedLength();

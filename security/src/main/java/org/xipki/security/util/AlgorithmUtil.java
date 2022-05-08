@@ -149,7 +149,6 @@ public class AlgorithmUtil {
     return curveNameToOidMap.get(toNonBlankLower(curveName, "curveName"));
   } // method getCurveOidForName
 
-  // CHECKSTYLE:SKIP
   public static List<String> getECCurveNames() {
     return curveNames;
   }

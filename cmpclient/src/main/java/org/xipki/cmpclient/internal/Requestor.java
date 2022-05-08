@@ -61,7 +61,6 @@ abstract class Requestor {
 
     private final char[] password;
 
-    // CHECKSTYLE:SKIP
     private final byte[] senderKID;
 
     private final HashAlgo owf;
@@ -71,7 +70,6 @@ abstract class Requestor {
     private final SignAlgo mac;
 
     PbmMacCmpRequestor(boolean signRequest, X500Name x500name, char[] password,
-        // CHECKSTYLE:SKIP
         byte[] senderKID, HashAlgo owf, int iterationCount, SignAlgo mac) {
       super(signRequest, x500name);
       this.password = password;
@@ -85,7 +83,6 @@ abstract class Requestor {
       return password;
     }
 
-    // CHECKSTYLE:SKIP
     byte[] getSenderKID() {
       return senderKID;
     }

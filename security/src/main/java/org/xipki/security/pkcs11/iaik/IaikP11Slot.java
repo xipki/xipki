@@ -595,7 +595,7 @@ class IaikP11Slot extends P11Slot {
       if (countSessions.get() < maxSessionCount) {
         try {
           session = sessions.borrow(1, TimeUnit.NANOSECONDS);
-        } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
+        } catch (InterruptedException ex) {
         }
 
         if (session == null) {
@@ -608,7 +608,7 @@ class IaikP11Slot extends P11Slot {
     if (session == null) {
       try {
         session = sessions.borrow(timeOutWaitNewSession, TimeUnit.MILLISECONDS);
-      } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
+      } catch (InterruptedException ex) {
       }
     }
 
@@ -956,7 +956,6 @@ class IaikP11Slot extends P11Slot {
   } // method generateRSAKeypair0
 
   @Override
-  // CHECKSTYLE:SKIP
   protected P11Identity generateDSAKeypair0(BigInteger p, BigInteger q, BigInteger g,
       P11NewKeyControl control)
           throws P11TokenException {
@@ -1088,7 +1087,6 @@ class IaikP11Slot extends P11Slot {
           throw new P11TokenException("Label of the generated PrivateKey is not set");
         }
 
-        // CHECKSTYLE:SKIP
         String pubKeyLabel = valueStr(keypair.getPublicKey().getLabel());
 
         P11ObjectIdentifier objId = new P11ObjectIdentifier(id, new String(labelChars));
@@ -1196,13 +1194,12 @@ class IaikP11Slot extends P11Slot {
     try {
       removeCerts(keyId);
     } catch (P11UnknownEntityException ex) {
-      // CHECKSTYLE: certificates do not exist, do nothing
+      // certificates do not exist, do nothing
     }
 
     try {
       Thread.sleep(1000);
     } catch (InterruptedException ex) {
-      // CHECKSTYLE:SKIP
     }
 
     P11NewObjectControl control = new P11NewObjectControl(keyId.getId(), keyId.getLabel());

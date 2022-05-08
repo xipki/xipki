@@ -34,7 +34,6 @@ import static org.xipki.util.Args.range;
  * @author Lijun Liao
  * @since 2.0.0
  */
-// CHECKSTYLE:SKIP
 public class PBEPasswordService {
 
   public PBEPasswordService() {

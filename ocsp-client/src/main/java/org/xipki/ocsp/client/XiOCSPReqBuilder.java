@@ -41,7 +41,6 @@ import java.util.List;
  * @author Lijun Liao
  *
  */
-// CHECKSTYLE:SKIP
 public class XiOCSPReqBuilder {
   private final List<RequestObject> list = new ArrayList<>();
   private GeneralName requestorName = null;
@@ -134,7 +133,6 @@ public class XiOCSPReqBuilder {
       }
 
       try {
-        // CHECKSTYLE:SKIP
         OutputStream sOut = contentSigner.getOutputStream();
         sOut.write(tbsReq.getEncoded(ASN1Encoding.DER));
         sOut.close();

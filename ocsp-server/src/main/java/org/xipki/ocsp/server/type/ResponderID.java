@@ -28,7 +28,6 @@ import java.io.IOException;
  * @author Lijun Liao
  * @since 2.2.0
  */
-// CHECKSTYLE:SKIP
 public class ResponderID extends ASN1Type {
 
   private final byte[] encoded;

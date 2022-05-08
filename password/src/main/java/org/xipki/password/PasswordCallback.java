@@ -198,7 +198,6 @@ public interface PasswordCallback {
 
   }
 
-  // CHECKSTYLE:SKIP
   class OBF implements PasswordCallback {
 
     private char[] password;
@@ -222,7 +221,6 @@ public interface PasswordCallback {
 
   }
 
-  // CHECKSTYLE:SKIP
   class PBEGui extends Gui {
 
     @Override

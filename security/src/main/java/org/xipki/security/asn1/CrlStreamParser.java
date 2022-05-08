@@ -308,10 +308,8 @@ public class CrlStreamParser extends Asn1StreamParser {
       assertTag(TAG_CONSTRUCTED_SEQUENCE, tag, "tbsCertList");
       offset++;
 
-      // CHECKSTYLE:SKIP
       int tbsCertListLength = readLength(lenBytesSize, instream);
       offset += lenBytesSize.get();
-      // CHECKSTYLE:SKIP
       tbsCertListEndIndex = offset + tbsCertListLength;
 
       // parse the tbsCert except revokedCertificates
@@ -337,7 +335,6 @@ public class CrlStreamParser extends Asn1StreamParser {
       bytes = readBlock(instream, "tbsCertList.signature");
       offset += bytes.length;
 
-      // CHECKSTYLE:SKIP
       AlgorithmIdentifier tbsSignature = AlgorithmIdentifier.getInstance(bytes);
 
       //       issuer                  Name,

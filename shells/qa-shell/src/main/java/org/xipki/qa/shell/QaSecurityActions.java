@@ -51,7 +51,6 @@ public class QaSecurityActions {
 
   public static class KeyControl {
 
-    //CHECKSTYLE:SKIP
     public static class DSA extends KeyControl {
       private final int plen;
       private final int qlen;
@@ -71,7 +70,6 @@ public class QaSecurityActions {
 
     } // class KeyControl
 
-    //CHECKSTYLE:SKIP
     public static class EC extends KeyControl {
       private final String curveName;
 
@@ -85,7 +83,6 @@ public class QaSecurityActions {
 
     } // class EC
 
-    //CHECKSTYLE:SKIP
     public static class RSA extends KeyControl {
       private final int modulusLen;
 
@@ -178,7 +175,6 @@ public class QaSecurityActions {
       return null;
     }
 
-    // CHECKSTYLE:SKIP
     protected List<String> getECCurveNames() {
       return AlgorithmUtil.getECCurveNames();
     }
@@ -864,7 +860,6 @@ public class QaSecurityActions {
   @Command(scope = "xi", name = "speed-gmac-sign-p12",
       description = "performance test of PKCS#12 AES GMAC signature creation")
   @Service
-  // CHECKSTYLE:SKIP
   public static class SpeedP12AESGmacSignAction extends SpeedP12SignAction {
 
     @Option(name = "--sig-algo", required = true, description = "signature algorithm")

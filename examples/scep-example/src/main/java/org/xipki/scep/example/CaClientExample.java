@@ -224,7 +224,6 @@ public class CaClientExample {
     }
   }
 
-  // CHECKSTYLE:SKIP
   private static String toPEM(String  type, byte[] data) {
     byte[] base64Data = Base64.encode(data);
 

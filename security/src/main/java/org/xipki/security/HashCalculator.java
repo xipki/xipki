@@ -139,7 +139,7 @@ class HashCalculator {
       try {
         md0 = mds.borrow(10, TimeUnit.SECONDS);
         break;
-      } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
+      } catch (InterruptedException ex) {
       }
     }
 
@@ -183,7 +183,7 @@ class HashCalculator {
       try {
         md0 = mds.borrow(10, TimeUnit.SECONDS);
         break;
-      } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
+      } catch (InterruptedException ex) {
       }
     }
 

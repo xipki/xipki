@@ -99,7 +99,6 @@ public class KeypairWithCert {
       try {
         keystoreStream.close();
       } catch (IOException ex) {
-        // CHECKSTYLE:SKIP
       }
     }
   }

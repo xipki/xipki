@@ -140,7 +140,7 @@ public class SecurePasswordInputPanel extends Panel {
     LookAndFeel currentLookAndFeel = UIManager.getLookAndFeel();
     try {
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-    } catch (Exception ex) { // CHECKSTYLE:SKIP
+    } catch (Exception ex) {
     }
 
     try {
@@ -163,7 +163,7 @@ public class SecurePasswordInputPanel extends Panel {
     } finally {
       try {
         UIManager.setLookAndFeel(currentLookAndFeel);
-      } catch (UnsupportedLookAndFeelException ex) { // CHECKSTYLE:SKIP
+      } catch (UnsupportedLookAndFeelException ex) {
       }
     }
   } // method readPassword

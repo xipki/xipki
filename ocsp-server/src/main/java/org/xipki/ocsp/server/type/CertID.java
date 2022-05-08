@@ -28,7 +28,6 @@ import java.math.BigInteger;
  * @since 2.2.0
  */
 
-// CHECKSTYLE:SKIP
 public class CertID extends ASN1Type {
 
   private final RequestIssuer issuer;

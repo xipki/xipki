@@ -37,7 +37,6 @@ import java.util.Set;
  * @since 2.0.0
  */
 
-// CHECKSTYLE:SKIP
 public class P11SignerFactory implements SignerFactory {
 
   private static final Logger LOG = LoggerFactory.getLogger(P11SignerFactory.class);

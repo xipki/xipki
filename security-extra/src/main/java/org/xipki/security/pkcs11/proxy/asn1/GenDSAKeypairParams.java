@@ -40,18 +40,17 @@ import java.math.BigInteger;
  *
  * @author Lijun Liao
  */
-// CHECKSTYLE:SKIP
 public class GenDSAKeypairParams extends ProxyMessage {
 
   private final P11SlotIdentifier slotId;
 
   private final P11NewKeyControl control;
 
-  private final BigInteger p; // CHECKSTYLE:SKIP
+  private final BigInteger p;
 
-  private final BigInteger q; // CHECKSTYLE:SKIP
+  private final BigInteger q;
 
-  private final BigInteger g; // CHECKSTYLE:SKIP
+  private final BigInteger g;
 
   public GenDSAKeypairParams(P11SlotIdentifier slotId, P11NewKeyControl control,
       BigInteger p, BigInteger q, BigInteger g) {

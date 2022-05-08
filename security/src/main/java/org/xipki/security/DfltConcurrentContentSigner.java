@@ -151,7 +151,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
     ConcurrentBagEntrySigner signer = null;
     try {
       signer = signers.borrow(soTimeout, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
+    } catch (InterruptedException ex) {
     }
 
     if (signer == null) {

@@ -40,7 +40,6 @@ import java.security.NoSuchAlgorithmException;
  * @since 2.1.0
  */
 
-// CHECKSTYLE:SKIP
 public class XiECContentVerifierProviderBuilder extends BcECContentVerifierProviderBuilder {
 
   private static final DigestAlgorithmIdentifierFinder digestAlgorithmFinder

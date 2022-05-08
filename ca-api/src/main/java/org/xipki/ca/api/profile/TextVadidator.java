@@ -49,7 +49,6 @@ public abstract class TextVadidator {
 
   } // class RegexValidator
 
-  // CHECKSTYLE:SKIP
   private static class FQDNValidator extends TextVadidator {
 
     @Override

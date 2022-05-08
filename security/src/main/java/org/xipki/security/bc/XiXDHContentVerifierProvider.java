@@ -51,10 +51,8 @@ import static org.xipki.util.Args.notNull;
  * @author Lijun Liao
  */
 
-// CHECKSTYLE:SKIP
 public class XiXDHContentVerifierProvider implements ContentVerifierProvider {
 
-  //CHECKSTYLE:SKIP
   private static class XDHContentVerifier implements ContentVerifier {
 
     private class HmacOutputStream extends OutputStream {

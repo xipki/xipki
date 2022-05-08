@@ -315,7 +315,6 @@ public class HttpScepServlet extends HttpServlet {
     resp.setContentLength(0);
   } // method sendError
 
-  // CHECKSTYLE:SKIP
   private static void sendOKResponse(HttpServletResponse resp, String contentType, byte[] content)
       throws IOException {
     resp.setStatus(HttpServletResponse.SC_OK);

@@ -37,7 +37,6 @@ public interface SinglePasswordResolver {
   String protectPassword(char[] password)
       throws PasswordResolverException;
 
-  // CHECKSTYLE:SKIP
   class OBF implements SinglePasswordResolver {
 
     public OBF() {
@@ -62,7 +61,6 @@ public interface SinglePasswordResolver {
 
   } // class OBF
 
-  // CHECKSTYLE:SKIP
   class PBE implements SinglePasswordResolver {
 
     private char[] masterPassword;

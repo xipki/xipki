@@ -78,7 +78,6 @@ class GrandCertTemplateBuilder {
 
   private static final long MS_PER_10MINUTES = 300000L;
 
-  // CHECKSTYLE:SKIP
   private final KeypairGenControl keypairGenControlByImplictCA;
 
   private final CertStore certstore;
@@ -212,7 +211,7 @@ class GrandCertTemplateBuilder {
         throw new OperationException(BAD_CERT_TEMPLATE, "invalid SubjectPublicKeyInfo");
       }
 
-      // CHECK weak public key, like RSA key (ROCA)
+      // Check weak public key, like RSA key (ROCA)
       if (grantedPublicKeyInfo.getAlgorithm().getAlgorithm().equals(
           PKCSObjectIdentifiers.rsaEncryption)) {
         try {

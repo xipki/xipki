@@ -88,7 +88,6 @@ public class ObjectIdentifiers {
         new ASN1ObjectIdentifier("2.23.140.1.2.3");
   }
 
-  // CHECKSTYLE:SKIP
   public static class DN {
     /**
      * country code - StringType(SIZE(2)).
@@ -312,7 +311,6 @@ public class ObjectIdentifiers {
   }
 
   // extended key usage
-  // CHECKSTYLE:SKIP
   public static final class XKU {
 
     public static final ASN1ObjectIdentifier id_kp_anyExtendedKeyUsage =
@@ -802,7 +800,7 @@ public class ObjectIdentifiers {
     if (StringUtil.isBlank(name)) {
       try {
         name = RFC4519Style.INSTANCE.oidToDisplayName(type);
-      } catch (IllegalArgumentException ex) { // CHECKSTYLE:SKIP
+      } catch (IllegalArgumentException ex) {
       }
     }
     return name;

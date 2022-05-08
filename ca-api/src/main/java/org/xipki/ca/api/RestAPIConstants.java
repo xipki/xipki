@@ -23,8 +23,6 @@ package org.xipki.ca.api;
  * @author Lijun Liao
  * @since 2.1.0
  */
-
-// CHECKSTYLE:SKIP
 public class RestAPIConstants {
 
   public static final String CT_pkcs10 = "application/pkcs10";

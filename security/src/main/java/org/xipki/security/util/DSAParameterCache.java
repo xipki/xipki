@@ -41,7 +41,6 @@ import java.util.Map;
  * @author Lijun Liao
  * @since 2.0.0
  */
-// CHECKSTYLE:SKIP
 public final class DSAParameterCache {
   private static final Logger LOG = LoggerFactory.getLogger(DSAParameterCache.class);
 
@@ -95,7 +94,6 @@ public final class DSAParameterCache {
       try {
         reader.close();
       } catch (IOException ex) {
-        // CHECKSTYLE:SKIP
       }
     }
   }
@@ -103,7 +101,6 @@ public final class DSAParameterCache {
   private DSAParameterCache() {
   }
 
-  // CHECKSTYLE:SKIP
   private static void addDSAParamSpec(
       int plen, int qlen, BigInteger p, BigInteger q, BigInteger g) {
     DSAParameterSpec spec = new DSAParameterSpec(p, q, g);
@@ -124,7 +121,6 @@ public final class DSAParameterCache {
     }
   }
 
-  // CHECKSTYLE:SKIP
   public static DSAParameterSpec getDSAParameterSpec(int plength, int qlength,
       SecureRandom random) {
     DSAParameterSpec spec = cache.get(plength + "-" + qlength);
@@ -135,7 +131,6 @@ public final class DSAParameterCache {
     return getNewDSAParameterSpec(plength, qlength, random);
   }
 
-  // CHECKSTYLE:SKIP
   public static DSAParameterSpec getNewDSAParameterSpec(int plength, int qlength,
       SecureRandom random) {
     final int certainty = 80;

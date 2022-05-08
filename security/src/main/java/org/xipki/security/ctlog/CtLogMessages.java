@@ -43,7 +43,6 @@ public class CtLogMessages {
   // Do not change the variable name, and the get- and set-methods.
   public static class AddPreChainResponse {
 
-    // CHECKSTYLE:SKIP
     private byte sct_version;
 
     private byte[] id;
@@ -58,7 +57,6 @@ public class CtLogMessages {
       return sct_version;
     }
 
-    // CHECKSTYLE:SKIP
     public void setSct_version(byte sct_version) {
       this.sct_version = sct_version;
     }

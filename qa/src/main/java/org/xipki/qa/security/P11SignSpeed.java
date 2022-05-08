@@ -47,7 +47,6 @@ import static org.xipki.util.Args.notNull;
 
 public abstract class P11SignSpeed extends BenchmarkExecutor {
 
-  //CHECKSTYLE:SKIP
   public static class DSA extends P11SignSpeed {
 
     public DSA(SecurityFactory securityFactory, P11Slot slot, byte[] keyId,
@@ -79,7 +78,6 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
 
   } // class DSA
 
-  //CHECKSTYLE:SKIP
   public static class EC extends P11SignSpeed {
 
     public EC(SecurityFactory securityFactory, P11Slot slot, byte[] keyId,
@@ -109,7 +107,6 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
 
   } // class EC
 
-  //CHECKSTYLE:SKIP
   public static class HMAC extends P11SignSpeed {
 
     public HMAC(SecurityFactory securityFactory, P11Slot slot, byte[] keyId,
@@ -164,7 +161,6 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
 
   } // class HMAC
 
-  // CHECKSTYLE:SKIP
   public static class RSA extends P11SignSpeed {
 
     public RSA(SecurityFactory securityFactory, P11Slot slot, byte[] keyId,
@@ -197,7 +193,6 @@ public abstract class P11SignSpeed extends BenchmarkExecutor {
 
   } // class RSA
 
-  //CHECKSTYLE:SKIP
   public static class SM2 extends P11SignSpeed {
 
     public SM2(SecurityFactory securityFactory, P11Slot slot, byte[] keyId, int threads)

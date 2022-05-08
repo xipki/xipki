@@ -103,7 +103,6 @@ public class CmpUtil {
     return signedMessage.toASN1Structure();
   } // method addProtection
 
-  // CHECKSTYLE:SKIP
   private static ProtectedPKIMessageBuilder newProtectedPKIMessageBuilder(PKIMessage pkiMessage,
       GeneralName sender, byte[] senderKid) {
     PKIHeader header = pkiMessage.getHeader();

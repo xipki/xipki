@@ -17,8 +17,6 @@
 
 package org.xipki.security;
 
-// CHECKSTYLE:OFF
-
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -300,7 +298,6 @@ public enum SignAlgo {
     return Signature.getInstance(jceName, provider);
   }
 
-  // CHECKSTYLE:SKIP
   public boolean isDSASigAlgo() {
     switch (this) {
       case DSA_SHA1:
@@ -318,7 +315,6 @@ public enum SignAlgo {
     }
   } // method isDSASigAlg
 
-  // CHECKSTYLE:SKIP
   public boolean isECDSASigAlgo() {
     switch (this) {
       case ECDSA_SHA1:
@@ -338,7 +334,6 @@ public enum SignAlgo {
     }
   } // method isECDSASigAlg
 
-  // CHECKSTYLE:SKIP
   public boolean isEDDSASigAlgo() {
     switch (this) {
       case ED25519:
@@ -349,7 +344,6 @@ public enum SignAlgo {
     }
   } // method isEDDSASigAlg
 
-  // CHECKSTYLE:SKIP
   public boolean isPlainECDSASigAlgo() {
     switch (this) {
       case PLAINECDSA_SHA1:
@@ -363,7 +357,6 @@ public enum SignAlgo {
     }
   } // method isPlainECDSASigAlg
 
-  // CHECKSTYLE:SKIP
   public boolean isSM2SigAlgo() {
     ASN1ObjectIdentifier oid = notNull(algId, "algId").getAlgorithm();
     return GMObjectIdentifiers.sm2sign_with_sm3.equals(oid);
@@ -371,7 +364,6 @@ public enum SignAlgo {
     // other algorithms not supported yet.
   } // method isSM2SigAlg
 
-  // CHECKSTYLE:SKIP
   public boolean isRSAPkcs1SigAlgo() {
     switch (this) {
       case RSA_SHA1:
@@ -389,7 +381,6 @@ public enum SignAlgo {
     }
   } // method isRSASigAlgo
 
-  // CHECKSTYLE:SKIP
   public boolean isRSAPSSSigAlgo() {
     if (isRSAPSSMGF1SigAlgo()) {
       return true;
@@ -404,7 +395,6 @@ public enum SignAlgo {
     }
   } // method isRSAPSSSigAlgo
 
-  // CHECKSTYLE:SKIP
   public boolean isRSAPSSMGF1SigAlgo() {
     switch (this) {
       case RSAPSS_SHA1:
@@ -582,7 +572,6 @@ public enum SignAlgo {
     }
   } // method getInstance
 
-  // CHECKSTYLE:SKIP
   private static SignAlgo getRSAInstance(HashAlgo hashAlgo, boolean rsaPss)
       throws NoSuchAlgorithmException {
     notNull(hashAlgo, "hashAlgo");
@@ -614,7 +603,6 @@ public enum SignAlgo {
     }
   } // method getRSAInstance
 
-  // CHECKSTYLE:SKIP
   private static SignAlgo getDSASigAlgo(HashAlgo hashAlgo)
       throws NoSuchAlgorithmException {
     notNull(hashAlgo, "hashAlgo");
@@ -646,7 +634,6 @@ public enum SignAlgo {
     }
   } // method getDSASigAlgo
 
-  // CHECKSTYLE:SKIP
   private static SignAlgo getECSigAlgo(HashAlgo hashAlgo, boolean plainSignature,
       boolean gm)
           throws NoSuchAlgorithmException {

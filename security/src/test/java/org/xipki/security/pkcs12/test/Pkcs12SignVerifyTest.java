@@ -42,7 +42,6 @@ import java.security.Signature;
  * @author Lijun Liao
  * @since 2.0.0
  */
-// CHECKSTYLE:SKIP
 public abstract class Pkcs12SignVerifyTest {
 
   private ConcurrentContentSigner signer;

@@ -31,7 +31,6 @@ import static org.xipki.util.Args.notNull;
  * @author Lijun Liao
  * @since 2.0.0
  */
-// CHECKSTYLE:SKIP
 public class P11RSAKeyParameter extends RSAKeyParameters {
 
   private final P11CryptService p11CryptService;

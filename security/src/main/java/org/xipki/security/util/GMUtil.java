@@ -36,7 +36,6 @@ import java.security.spec.EllipticCurve;
  * @author Lijun Liao
  *
  */
-// CHECKSTYLE:SKIP
 public class GMUtil {
 
   private static final byte[] defaultIDA =
@@ -63,12 +62,10 @@ public class GMUtil {
     return getSM2Z(defaultIDA, curveOid, pubPointX, pubPointY);
   }
 
-  // CHECKSTYLE:SKIP
   public static byte[] getDefaultIDA() {
     return defaultIDA.clone();
   }
 
-  // CHECKSTYLE:SKIP
   public static byte[] getSM2Z(byte[] userID, ASN1ObjectIdentifier curveOid,
       BigInteger pubPointX, BigInteger pubPointY) {
     SM3Digest digest = new SM3Digest();

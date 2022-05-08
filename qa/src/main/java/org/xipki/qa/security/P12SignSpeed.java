@@ -45,7 +45,6 @@ import static org.xipki.util.Args.notNull;
 
 public abstract class P12SignSpeed extends BenchmarkExecutor {
 
-  // CHECKSTYLE:SKIP
   public static class AESGmac extends P12SignSpeed {
 
     public AESGmac(SecurityFactory securityFactory, String signatureAlgorithm,
@@ -80,7 +79,6 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
 
   } // class AESGmac
 
-  // CHECKSTYLE:SKIP
   public static class DSA extends P12SignSpeed {
 
     public DSA(SecurityFactory securityFactory, String signatureAlgorithm, int threads,
@@ -107,7 +105,6 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
 
   } // class DSA
 
-  // CHECKSTYLE:SKIP
   public static class EC extends P12SignSpeed {
 
     public EC(SecurityFactory securityFactory, String signatureAlgorithm, int threads,
@@ -137,7 +134,6 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
 
   } // class EC
 
-  // CHECKSTYLE:SKIP
   public static class HMAC extends P12SignSpeed {
 
     public HMAC(SecurityFactory securityFactory, String signatureAlgorithm, int threads)
@@ -175,7 +171,6 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
 
   } // class HMAC
 
-  // CHECKSTYLE:SKIP
   public static class RSA extends P12SignSpeed {
 
     public RSA(SecurityFactory securityFactory, String signatureAlgorithm, int threads,
@@ -202,7 +197,6 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
 
   } // class RSA
 
-  // CHECKSTYLE:SKIP
   public static class SM2 extends P12SignSpeed {
 
     public SM2(SecurityFactory securityFactory, int threads)
@@ -286,20 +280,17 @@ public abstract class P12SignSpeed extends BenchmarkExecutor {
     return new Testor();
   }
 
-  // CHECKSTYLE:SKIP
   protected static byte[] getPrecomputedRSAKeystore(int keysize, BigInteger publicExponent)
       throws IOException {
     return getPrecomputedKeystore("rsa-" + keysize + "-0x" + publicExponent.toString(16)
       + ".p12");
   }
 
-  // CHECKSTYLE:SKIP
   protected static byte[] getPrecomputedDSAKeystore(int plength, int qlength)
       throws IOException {
     return getPrecomputedKeystore("dsa-" + plength + "-" + qlength + ".p12");
   }
 
-  // CHECKSTYLE:SKIP
   protected static byte[] getPrecomputedECKeystore(ASN1ObjectIdentifier curveOid)
       throws IOException {
     return getPrecomputedKeystore("ec-" + curveOid.getId() + ".p12");

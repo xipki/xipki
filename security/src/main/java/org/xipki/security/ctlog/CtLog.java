@@ -59,7 +59,6 @@ public class CtLog {
     public static DigitallySigned getInstance(byte[] encoded, AtomicInteger offsetObj) {
       int offset = offsetObj.get();
 
-      // CHECKSTYLE:SKIP
       SignatureAndHashAlgorithm algorithm =
           SignatureAndHashAlgorithm.getInstance(copyOf(encoded, offset, 2));
       offset += 2;
@@ -121,7 +120,6 @@ public class CtLog {
    * opaque SerializedSCT&lt;1..2^16-1&gt;;
    * </pre>
    */
-  // CHECKSTYLE:SKIP
   public static class SerializedSCT {
 
     private final List<SignedCertificateTimestamp> scts;
@@ -348,13 +346,10 @@ public class CtLog {
         int len) {
       int startOffset = offsetObj.get();
       int offset = startOffset;
-      // CHECKSTYLE:SKIP
       byte version = encoded[offset++];
-      // CHECKSTYLE:SKIP
       byte[] logID = copyOf(encoded, offset, 32);
       offset += 32;
 
-      // CHECKSTYLE:SKIP
       long timestamp = Pack.bigEndianToLong(encoded, offset);
       offset += 8;
 

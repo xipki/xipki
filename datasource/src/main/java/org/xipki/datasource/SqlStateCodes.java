@@ -52,7 +52,6 @@ public class SqlStateCodes {
 
   } // class H2
 
-  // CHECKSTYLE:SKIP
   private static class HSQL extends SqlStateCodes {
 
     HSQL() {
@@ -60,13 +59,11 @@ public class SqlStateCodes {
 
   } // class HSQL
 
-  // CHECKSTYLE:SKIP
   private static class MySQL extends SqlStateCodes {
     MySQL() {
     }
   }
 
-  // CHECKSTYLE:SKIP
   private static class MariaDB extends MySQL {
     MariaDB() {
     }
@@ -83,7 +80,6 @@ public class SqlStateCodes {
 
   } // class Oracle
 
-  // CHECKSTYLE:SKIP
   private static class PostgreSQL extends SqlStateCodes {
 
     PostgreSQL() {

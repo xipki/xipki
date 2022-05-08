@@ -45,7 +45,6 @@ public class KeypairGenControl {
     }
   } // class class
 
-  // CHECKSTYLE:SKIP
   public static class InheritCAKeypairGenControl extends KeypairGenControl {
     public static final InheritCAKeypairGenControl INSTANCE = new InheritCAKeypairGenControl();
 
@@ -53,7 +52,6 @@ public class KeypairGenControl {
     }
   } // class InheritCAKeypairGenControl
 
-  // CHECKSTYLE:SKIP
   public static class RSAKeypairGenControl extends KeypairGenControl {
 
     private final int keysize;
@@ -94,7 +92,6 @@ public class KeypairGenControl {
 
   } // class RSAKeypairGenControl
 
-  // CHECKSTYLE:SKIP
   public static class ECKeypairGenControl extends KeypairGenControl {
 
     private final ASN1ObjectIdentifier curveOid;
@@ -123,19 +120,16 @@ public class KeypairGenControl {
 
   } // class ECKeypairGenControl
 
-  // CHECKSTYLE:SKIP
   public static class DSAKeypairGenControl extends KeypairGenControl {
 
     private final DSAParameterSpec parameterSpec;
 
     private final AlgorithmIdentifier keyAlgorithm;
 
-    // CHECKSTYLE:SKIP
     public DSAKeypairGenControl(int pLength) {
       this(pLength, 0, null);
     }
 
-    // CHECKSTYLE:SKIP
     public DSAKeypairGenControl(int pLength, int qLength, ASN1ObjectIdentifier keyAlgorithmOid) {
       if (pLength < 1024 || pLength % 1024 != 0) {
         throw new IllegalArgumentException("invalid pLength " + pLength);
@@ -176,7 +170,6 @@ public class KeypairGenControl {
 
   } // class DSAKeypairGenControl
 
-  // CHECKSTYLE:SKIP
   public static class EDDSAKeypairGenControl extends KeypairGenControl {
 
     private final AlgorithmIdentifier keyAlgorithm;

@@ -240,7 +240,6 @@ public class CertprofileValidator {
 
   } // method validate
 
-  // CHECKSTYLE:SKIP
   private static void validateCABForumBR(Certprofile certprofile, StringBuilder msg) {
     // Subject only one entries in a RDN is allowed
     SubjectControl subjectCtl = certprofile.getSubjectControl();

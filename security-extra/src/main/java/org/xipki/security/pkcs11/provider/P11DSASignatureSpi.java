@@ -37,10 +37,8 @@ import java.security.spec.AlgorithmParameterSpec;
  * @author Lijun Liao
  * @since 2.0.0
  */
-// CHECKSTYLE:SKIP
 public abstract class P11DSASignatureSpi extends SignatureSpi {
 
-  // CHECKSTYLE:SKIP
   public static class NONE extends P11DSASignatureSpi {
 
     public NONE() {
@@ -49,7 +47,6 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
 
   } // class NONE
 
-  // CHECKSTYLE:SKIP
   public static class SHA1 extends P11DSASignatureSpi {
 
     public SHA1() {
@@ -58,7 +55,6 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
 
   } // class SHA1
 
-  // CHECKSTYLE:SKIP
   public static class SHA224 extends P11DSASignatureSpi {
 
     public SHA224() {
@@ -67,7 +63,6 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
 
   } // class SHA224
 
-  // CHECKSTYLE:SKIP
   public static class SHA256 extends P11DSASignatureSpi {
 
     public SHA256() {
@@ -76,7 +71,6 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
 
   } // class SHA256
 
-  // CHECKSTYLE:SKIP
   public static class SHA384 extends P11DSASignatureSpi {
 
     public SHA384() {
@@ -85,7 +79,6 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
 
   } // class SHA384
 
-  // CHECKSTYLE:SKIP
   public static class SHA512 extends P11DSASignatureSpi {
 
     public SHA512() {
@@ -94,7 +87,6 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
 
   } // class SHA512
 
-  // CHECKSTYLE:SKIP
   public static class SHA3_224 extends P11DSASignatureSpi {
 
     public SHA3_224() {
@@ -103,7 +95,6 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
 
   } // class SHA3_224
 
-  // CHECKSTYLE:SKIP
   public static class SHA3_256 extends P11DSASignatureSpi {
 
     public SHA3_256() {
@@ -112,7 +103,6 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
 
   } // class SHA3_256
 
-  // CHECKSTYLE:SKIP
   public static class SHA3_384 extends P11DSASignatureSpi {
 
     public SHA3_384() {
@@ -121,7 +111,6 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
 
   } // class SHA3_384
 
-  // CHECKSTYLE:SKIP
   public static class SHA3_512 extends P11DSASignatureSpi {
 
     public SHA3_512() {

@@ -23,8 +23,6 @@ package org.xipki.password;
  * @author Lijun Liao
  * @since 2.2.0
  */
-
-// CHECKSTYLE:SKIP
 public enum PBEAlgo {
 
   PBEWithHmacSHA256AndAES_256(1, "PBEWithHmacSHA256AndAES_256");

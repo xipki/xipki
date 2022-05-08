@@ -101,7 +101,6 @@ public class Foo {
     Request request2 = new Request(certId2,
         new Extensions(new Extension(ObjectIdentifiers.Extn.id_ad_timeStamping,
             false, newBytes(30, (byte) 0x33))));
-    // CHECKSTYLE:SKIP
     ASN1Sequence requestList = new DERSequence(new ASN1Encodable[]{request1, request2});
 
     Extensions requestExtensions = null;

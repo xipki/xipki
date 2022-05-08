@@ -67,7 +67,6 @@ public class QaCompleters {
   } // class CertStatusCompleter
 
   @Service
-  //CHECKSTYLE:SKIP
   public static class DSASigAlgCompleter extends EnumCompleter {
 
     public DSASigAlgCompleter() {
@@ -83,7 +82,6 @@ public class QaCompleters {
   } // class DSASigAlgCompleter
 
   @Service
-  //CHECKSTYLE:SKIP
   public static class ECDSASigAlgCompleter extends EnumCompleter {
 
     public ECDSASigAlgCompleter() {
@@ -103,7 +101,6 @@ public class QaCompleters {
   } // class ECDSASigAlgCompleter
 
   @Service
-  //CHECKSTYLE:SKIP
   public static class EDDSASigAlgCompleter extends EnumCompleter {
 
     public EDDSASigAlgCompleter() {
@@ -114,7 +111,6 @@ public class QaCompleters {
   } // class EDDSASigAlgCompleter
 
   @Service
-  //CHECKSTYLE:SKIP
   public static class GMACSigAlgCompleter extends EnumCompleter {
 
     public GMACSigAlgCompleter() {
@@ -137,7 +133,6 @@ public class QaCompleters {
   } // class IssuerNameCompleter
 
   @Service
-  //CHECKSTYLE:SKIP
   public static class HMACSigAlgCompleter extends EnumCompleter {
 
     public HMACSigAlgCompleter() {
@@ -191,7 +186,6 @@ public class QaCompleters {
   } // class P11ModuleNameCompleter
 
   @Service
-  //CHECKSTYLE:SKIP
   public static class RSASigAlgCompleter extends EnumCompleter {
 
     public RSASigAlgCompleter() {

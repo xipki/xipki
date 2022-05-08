@@ -202,7 +202,6 @@ public class PublicKeyChecker {
     throw new BadCertTemplateException("the given publicKey is not permitted");
   } // method checkPublicKey
 
-  // CHECKSTYLE:SKIP
   private static void checkECSubjectPublicKeyInfo(ASN1ObjectIdentifier curveOid, byte[] encoded)
       throws BadCertTemplateException {
     Integer expectedLength = EC_CURVEFIELD_SIZES.get(curveOid);

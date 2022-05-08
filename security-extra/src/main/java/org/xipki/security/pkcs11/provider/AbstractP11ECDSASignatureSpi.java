@@ -37,7 +37,6 @@ import java.security.spec.AlgorithmParameterSpec;
  * @author Lijun Liao
  * @since 2.0.0
  */
-// CHECKSTYLE:SKIP
 abstract class AbstractP11ECDSASignatureSpi extends SignatureSpi {
 
   private final HashAlgo hashAlgo;

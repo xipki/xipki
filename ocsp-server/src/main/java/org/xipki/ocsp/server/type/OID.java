@@ -32,8 +32,6 @@ import java.io.IOException;
  * @author Lijun Liao
  * @since 2.2.0
  */
-
-// CHECKSTYLE:SKIP
 public enum OID {
   ID_PKIX_OCSP_NONCE(OCSPObjectIdentifiers.id_pkix_ocsp_nonce),
   ID_PKIX_OCSP_PREFSIGALGS(ObjectIdentifiers.Extn.id_pkix_ocsp_prefSigAlgs),

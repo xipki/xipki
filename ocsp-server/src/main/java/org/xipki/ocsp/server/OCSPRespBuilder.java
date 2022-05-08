@@ -38,7 +38,6 @@ import java.util.List;
  * @since 2.0.0
  */
 
-// CHECKSTYLE:SKIP
 public class OCSPRespBuilder {
   private static final byte[] successfulStatus = Hex.decode("0a0100");
   private static final byte[] responseTypeBasic = Hex.decode("06092b0601050507300101");
@@ -80,7 +79,6 @@ public class OCSPRespBuilder {
     this.responseExtensions = responseExtensions;
   }
 
-  // CHECKSTYLE:SKIP
   public byte[] buildOCSPResponse(ConcurrentContentSigner signer,
       TaggedCertSequence taggedCertSequence, Date producedAt)
       throws OCSPException, NoIdleSignerException {

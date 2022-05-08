@@ -655,15 +655,11 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       }
     }
 
-    // CHECKSTYLE:SKIP
     String status = (changeCaEntry.getStatus() == null) ? null : changeCaEntry.getStatus().name();
-    // CHECKSTYLE:SKIP
     String maxValidity = (changeCaEntry.getMaxValidity() == null) ? null
         : changeCaEntry.getMaxValidity().toString();
-    // CHECKSTYLE:SKIP
     String extraControl = (changeCaEntry.getExtraControl() == null) ? null
         : new ConfPairs(changeCaEntry.getExtraControl()).getEncoded(); // check also the validity
-    // CHECKSTYLE:SKIP
     String validityMode = (changeCaEntry.getValidityMode() == null) ? null
         : changeCaEntry.getValidityMode().name();
 
@@ -677,7 +673,6 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       CaUris oldCaUris = currentCaEntry.getCaUris();
 
       List<String> uris = changeUris.getCacertUris();
-      // CHECKSTYLE:SKIP
       List<String> cacertUris = (uris == null) ? oldCaUris.getCacertUris() : uris;
 
       uris = changeUris.getOcspUris();

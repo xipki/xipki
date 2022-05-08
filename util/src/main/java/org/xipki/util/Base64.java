@@ -80,8 +80,6 @@ import java.util.Arrays;
  *         Date: 2004-aug-02
  *         Time: 11:31:11
  */
-
-// CHECKSTYLE:OFF
 public class Base64 {
   private static final String CA_TEXT =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";

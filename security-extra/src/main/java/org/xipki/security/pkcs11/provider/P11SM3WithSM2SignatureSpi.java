@@ -44,7 +44,6 @@ import java.security.spec.ECPoint;
  * @author Lijun Liao
  * @since 2.0.0
  */
-// CHECKSTYLE:SKIP
 public class P11SM3WithSM2SignatureSpi extends SignatureSpi {
 
   private long mechanism;

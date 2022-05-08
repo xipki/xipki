@@ -91,7 +91,7 @@
             </goals>
             <configuration>
               <stripVersion>false</stripVersion>
-	      <outputDirectory>${project.build.directory}/classes/lib/boot</outputDirectory>
+              <outputDirectory>${project.build.directory}/classes/lib/boot</outputDirectory>
               <artifactItems>
                 <artifactItem>
                   <groupId>org.mariadb.jdbc</groupId>
