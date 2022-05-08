@@ -6,7 +6,6 @@ See also <https://github.com/xipki/xipki/releases>
 - Release date: -
 - CA
   - Reduce the minimal interval to generate CRL from 1 day to 1 hour
-  - Add integrity protection of the audit entries
 - OCSP
   - N/A
 - CLI

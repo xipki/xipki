@@ -54,7 +54,6 @@
     <!-- Base components -->
     <module>util</module>
     <module>audit</module>
-    <module>audit-extra</module>
     <module>license-api</module>
     <module>datasource</module>
     <module>dbtool</module>

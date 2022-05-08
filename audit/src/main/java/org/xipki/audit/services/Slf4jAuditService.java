@@ -22,8 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 import org.xipki.audit.*;
-import org.xipki.password.PasswordResolver;
-import org.xipki.password.PasswordResolverException;
 
 /**
  * The embedded audit service. It uses Log4j logger xipki.audit.sl4fj.
@@ -44,11 +42,6 @@ public class Slf4jAuditService implements AuditService {
 
   @Override
   public void init(String conf) {
-  }
-
-  @Override
-  public void init(String conf, PasswordResolver passwordResolver)
-          throws PasswordResolverException {
   }
 
   @Override

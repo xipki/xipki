@@ -20,8 +20,6 @@ package org.xipki.audit.services;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.*;
-import org.xipki.password.PasswordResolver;
-import org.xipki.password.PasswordResolverException;
 import org.xipki.util.ConfPairs;
 import org.xipki.util.DateUtil;
 import org.xipki.util.LogUtil;
@@ -69,16 +67,6 @@ public class EmbedAuditService implements AuditService {
 
   @Override
   public void init(String conf) {
-    try {
-      init(conf, null);
-    } catch (PasswordResolverException ex) {
-      throw new IllegalStateException(ex);
-    }
-  }
-
-  @Override
-  public void init(String conf, PasswordResolver passwordResolver)
-          throws PasswordResolverException {
     ConfPairs confPairs = new ConfPairs(conf);
     String logFilePath = confPairs.value(KEY_FILE);
 
