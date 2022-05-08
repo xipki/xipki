@@ -1042,11 +1042,15 @@ class IaikP11Slot extends P11Slot {
   @Override
   protected P11Identity generateSM2Keypair0(P11NewKeyControl control)
       throws P11TokenException {
-    ECPrivateKey privateKey = new ECPrivateKey(KeyType.VENDOR_SM2);
-    ECPublicKey publicKey = new ECPublicKey(KeyType.VENDOR_SM2);
-    setKeyAttributes(control, publicKey, privateKey, newObjectConf);
-    return generateKeyPair(CKM_VENDOR_SM2_KEY_PAIR_GEN,
-        control.getId(), privateKey, publicKey);
+    long ckm = CKM_VENDOR_SM2_KEY_PAIR_GEN;
+    if (supportsMechanism(ckm)) {
+      ECPrivateKey privateKey = new ECPrivateKey(KeyType.VENDOR_SM2);
+      ECPublicKey publicKey = new ECPublicKey(KeyType.VENDOR_SM2);
+      setKeyAttributes(control, publicKey, privateKey, newObjectConf);
+      return generateKeyPair(ckm, control.getId(), privateKey, publicKey);
+    } else {
+      return generateECKeypair0(GMObjectIdentifiers.sm2p256v1, control);
+    }
   } // method generateSM2Keypair0
 
   private P11Identity generateKeyPair(long mech, byte[] id, PrivateKey privateKeyTemplate,
