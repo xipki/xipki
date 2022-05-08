@@ -314,7 +314,6 @@ class O2tChecker extends ExtensionChecker {
               .append("'; ");
             return;
           }
-          // CHECKSTYLE:SKIP
           String expAmount = Integer.toString(value);
 
           range = euLimitConf.getExponent();

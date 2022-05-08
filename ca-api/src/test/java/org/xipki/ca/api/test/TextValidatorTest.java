@@ -30,7 +30,6 @@ import static org.junit.Assert.assertTrue;
 public class TextValidatorTest {
 
   @Test
-  // CHECKSTYLE:SKIP
   public void testFQDN() {
     TextVadidator tv = TextVadidator.compile(":FQDN");
 

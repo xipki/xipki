@@ -36,7 +36,6 @@ import java.io.IOException;
  *
  * @author Lijun Liao
  */
-// CHECKSTYLE:SKIP
 public class RSAPkcsPssParams extends ProxyMessage {
 
   private final P11RSAPkcsPssParams pkcsPssParams;

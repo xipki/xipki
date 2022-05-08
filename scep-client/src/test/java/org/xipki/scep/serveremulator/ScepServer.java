@@ -96,7 +96,6 @@ public class ScepServer {
     X500Name rcaSubject;
     kpGen.initialize(2048);
     KeyPair keypair = kpGen.generateKeyPair();
-    // CHECKSTYLE:SKIP
     PrivateKey rcaKey = keypair.getPrivate();
     rcaSubject = new X500Name("CN=RCA1, OU=emulator, O=myorg.org, C=DE");
 

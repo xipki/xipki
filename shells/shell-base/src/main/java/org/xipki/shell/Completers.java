@@ -61,7 +61,6 @@ public class Completers {
   } // class DirCompleter
 
   @Service
-  //CHECKSTYLE:SKIP
   public static class ECCurveNameCompleter extends EnumCompleter {
 
     public ECCurveNameCompleter() {
@@ -88,7 +87,6 @@ public class Completers {
   } // class ECCurveNameCompleter
 
   @Service
-  //CHECKSTYLE:SKIP
   public static class EdCurveNameCompleter extends EnumCompleter {
 
     public EdCurveNameCompleter() {

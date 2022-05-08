@@ -8,7 +8,6 @@ import java.util.Arrays;
  * This is an implementation of Base64Url based on the fast Base64
  * implementation of Mikael Grev.
  */
-// CHECKSTYLE:OFF
 public class Base64Url {
   private static final String CA_TEXT =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";

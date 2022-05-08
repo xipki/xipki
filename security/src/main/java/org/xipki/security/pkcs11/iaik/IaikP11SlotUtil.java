@@ -406,7 +406,6 @@ class IaikP11SlotUtil {
       }
 
       Set<P11KeyUsage> usages = control.getUsages();
-      // CHECKSTYLE:SKIP
       final Boolean TRUE = Boolean.TRUE;
       if (isNotEmpty(usages)) {
         for (P11KeyUsage usage : usages) {
@@ -464,7 +463,6 @@ class IaikP11SlotUtil {
     }
 
     Set<P11KeyUsage> usages = control.getUsages();
-    // CHECKSTYLE:SKIP
     final Boolean TRUE = Boolean.TRUE;
     if (isNotEmpty(usages)) {
       for (P11KeyUsage usage : usages) {

@@ -116,7 +116,6 @@ public class SubjectDnSpec {
       try {
         reader.close();
       } catch (IOException ex) {
-        // CHECKSTYLE:SKIP
       }
     }
 
@@ -176,7 +175,6 @@ public class SubjectDnSpec {
       try {
         reader.close();
       } catch (IOException ex) {
-        // CHECKSTYLE:SKIP
       }
     }
 

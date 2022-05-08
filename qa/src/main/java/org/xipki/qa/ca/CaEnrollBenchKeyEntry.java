@@ -49,7 +49,6 @@ import static org.xipki.util.Args.notNull;
 
 public abstract class CaEnrollBenchKeyEntry {
 
-  // CHECKSTYLE:SKIP
   public static final class RSAKeyEntry extends CaEnrollBenchKeyEntry {
 
     private static final String N_1024 =
@@ -137,7 +136,6 @@ public abstract class CaEnrollBenchKeyEntry {
 
   } // class RSAKeyEntry
 
-  // CHECKSTYLE:SKIP
   public static final class DSAKeyEntry extends CaEnrollBenchKeyEntry {
 
     private static final String P_1024 =
@@ -266,7 +264,6 @@ public abstract class CaEnrollBenchKeyEntry {
 
   } // class DSAKeyEntry
 
-//CHECKSTYLE:SKIP
 public static final class ECKeyEntry extends CaEnrollBenchKeyEntry {
 
     private final SubjectPublicKeyInfo spki;

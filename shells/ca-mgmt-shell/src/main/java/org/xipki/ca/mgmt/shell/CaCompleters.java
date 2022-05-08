@@ -284,7 +284,6 @@ public class CaCompleters {
       try {
         names.addAll(caManager.getRequestorNames());
       } catch (CaMgmtException ex) {
-        // CHECKSTYLE:SKIP
       }
       names.remove(RequestorInfo.NAME_BY_CA);
       names.remove(RequestorInfo.NAME_BY_USER);
@@ -317,7 +316,6 @@ public class CaCompleters {
       try {
         ret.addAll(caManager.getSignerNames());
       } catch (CaMgmtException ex) {
-        // CHECKSTYLE:SKIP
       }
       ret.add(CaManager.NULL);
       return ret;

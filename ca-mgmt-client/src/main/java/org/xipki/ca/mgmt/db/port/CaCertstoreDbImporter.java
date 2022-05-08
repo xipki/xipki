@@ -569,7 +569,6 @@ class CaCertstoreDbImporter extends DbPorter {
             LOG.warn("CRL without CRL number, ignore it");
             continue;
           }
-          // CHECKSTYLE:SKIP
           BigInteger crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
 
           BigInteger baseCrlNumber = null;

@@ -178,7 +178,6 @@ class CaCertstoreDbExporter extends DbPorter {
   private void exportEntries(CaDbEntryType type, CaCertstore certstore, File processLogFile,
       OutputStream filenameListOs, Long idProcessedInLastProcess)
           throws Exception {
-    // CHECKSTYLE:SKIP
     int numEntriesPerSelect = Math.max(1, Math.round(type.getSqlBatchFactor() * numCertsPerSelect));
     int numEntriesPerZip = Math.max(1, Math.round(type.getSqlBatchFactor() * numCertsInBundle));
     File entriesDir = new File(baseDir, type.getDirName());

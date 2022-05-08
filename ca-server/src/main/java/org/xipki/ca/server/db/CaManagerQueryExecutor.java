@@ -460,11 +460,10 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         "CRL_SIGNER_NAME", "CMP_RESPONDER_NAME", "SCEP_RESPONDER_NAME",
         "SUBJECT", "SIGNER_TYPE", "SIGNER_CONF", "CERT", "CERTCHAIN");
     if (dbSchemaVersion <= 6) {
-      List<String> cs = CaUtil.asModifiableList("SN_SIZE", "CA_URIS", "MAX_VALIDITY",
+      CaUtil.addAll(colNames, "SN_SIZE", "CA_URIS", "MAX_VALIDITY",
           "CRL_CONTROL", "CMP_CONTROL", "SCEP_CONTROL", "CTLOG_CONTROL", "PROTOCOL_SUPPORT",
           "SAVE_REQ", "PERMISSION", "NUM_CRLS", "EXPIRATION_PERIOD", "KEEP_EXPIRED_CERT_DAYS",
           "VALIDITY_MODE", "EXTRA_CONTROL", "DHPOC_CONTROL", "REVOKE_SUSPENDED_CONTROL");
-      colNames.addAll(cs);
     } else {
       colNames.add("CONF");
     }
@@ -537,7 +536,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         }
       }
 
-      List<SqlColumn2> list = CaUtil.asModifiableList(
+      CaUtil.addAll(cols,
           col2Int(caEntry.getSerialNoLen()),
           col2Str(caUris == null ? null : caEntry.getCaUris().getEncoded()),
           col2Str(caEntry.getMaxValidity().toString()),
@@ -555,7 +554,6 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
           col2Str(StringUtil.isBlank(encodedExtraCtrl) ? null : encodedExtraCtrl),
           col2Str(dhPopCtrlText),
           col2Str(revokeSuspended == null ? null : revokeSuspended.getConf()));
-      cols.addAll(list);
       // END DB Schema Version 6
     } else {
       // START DB Schema Version 7
@@ -915,7 +913,6 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         CaUris oldCaUris = currentCaEntry.getCaUris();
 
         List<String> uris = changeUris.getCacertUris();
-        // CHECKSTYLE:SKIP
         List<String> cacertUris = (uris == null) ? oldCaUris.getCacertUris() : uris;
 
         uris = changeUris.getOcspUris();
@@ -991,7 +988,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         dhpopCtrlText = dhpopPairs.getEncoded();
       }
 
-      List<SqlColumn> cs = CaUtil.asModifiableList(
+      CaUtil.addAll(cols,
           colInt("SN_SIZE", changeCaEntry.getSerialNoLen()),
           colStr("CA_URIS", caUrisStr),
           colStr("MAX_VALIDITY", maxValidity),
@@ -1008,7 +1005,6 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
           colStr("VALIDITY_MODE", validityMode), colStr("EXTRA_CONTROL", extraControl),
           colStr("DHPOC_CONTROL", dhpopCtrlText, false, true),
           colStr("REVOKE_SUSPENDED_CONTROL", changeCaEntry.getRevokeSuspendedControl()));
-      cols.addAll(cs);
     } else {
       cols.add(buildChangeCaConfColumn(changeCaEntry, currentCaEntry, currentCaConfColumn));
     }

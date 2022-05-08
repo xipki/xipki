@@ -39,7 +39,6 @@ import static org.xipki.util.Args.notNull;
 
 public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
 
-  // CHECKSTYLE:SKIP
   public static class DSA extends P11KeyGenSpeed {
 
     private final int plength;
@@ -62,7 +61,6 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
 
   } // class DSA
 
-  //CHECKSTYLE:SKIP
   public static class EC extends P11KeyGenSpeed {
 
     private final ASN1ObjectIdentifier curveOid;
@@ -82,7 +80,6 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
 
   } // class EC
 
-  //CHECKSTYLE:SKIP
   public static class RSA extends P11KeyGenSpeed {
 
     private final int keysize;
@@ -106,7 +103,6 @@ public abstract class P11KeyGenSpeed extends BenchmarkExecutor {
 
   } // class RSA
 
-  //CHECKSTYLE:SKIP
   public static class SM2 extends P11KeyGenSpeed {
     public SM2(P11Slot slot, byte[] id)
         throws Exception {

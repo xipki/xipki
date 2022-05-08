@@ -904,7 +904,6 @@ class EmulatorP11Slot extends P11Slot {
   }
 
   @Override
-  // CHECKSTYLE:SKIP
   protected P11Identity generateDSAKeypair0(BigInteger p, BigInteger q, BigInteger g,
       P11NewKeyControl control)
           throws P11TokenException {

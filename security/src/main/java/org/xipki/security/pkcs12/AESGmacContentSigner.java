@@ -39,10 +39,8 @@ import static org.xipki.util.Args.notNull;
  * @since 2.2.0
  */
 
-// CHECKSTYLE:SKIP
 public class AESGmacContentSigner implements XiContentSigner {
 
-  // CHECKSTYLE:SKIP
   private class AESGmacOutputStream extends OutputStream {
 
     @Override

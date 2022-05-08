@@ -76,7 +76,6 @@ public class SignerUtil {
   private SignerUtil() {
   }
 
-  // CHECKSTYLE:SKIP
   public static RSAKeyParameters generateRSAPrivateKeyParameter(RSAPrivateKey key) {
     notNull(key, "key");
     if (key instanceof RSAPrivateCrtKey) {
@@ -90,13 +89,11 @@ public class SignerUtil {
     }
   }
 
-  // CHECKSTYLE:SKIP
   public static Signer createPSSRSASigner(SignAlgo sigAlgo)
       throws XiSecurityException {
     return createPSSRSASigner(sigAlgo, null);
   }
 
-  // CHECKSTYLE:SKIP
   public static Signer createPSSRSASigner(SignAlgo sigAlgo, AsymmetricBlockCipher cipher)
       throws XiSecurityException {
     notNull(sigAlgo, "sigAlgo");
@@ -115,7 +112,6 @@ public class SignerUtil {
         org.bouncycastle.crypto.signers.PSSSigner.TRAILER_IMPLICIT);
   } // method createPSSRSASigner
 
-  // CHECKSTYLE:SKIP
   public static byte[] dsaSigPlainToX962(byte[] signature)
       throws XiSecurityException {
     notNull(signature, "signature");
@@ -139,7 +135,6 @@ public class SignerUtil {
     }
   } // method dsaSigPlainToX962
 
-  // CHECKSTYLE:SKIP
   public static byte[] dsaSigX962ToPlain(byte[] x962Signature, int keyBitLen)
       throws XiSecurityException {
     notNull(x962Signature, "x962Signature");

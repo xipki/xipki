@@ -43,7 +43,6 @@ public interface P11Params {
 
   }
 
-  // CHECKSTYLE:SKIP
   class P11IVParams implements P11Params {
 
     private final byte[] iv;
@@ -52,14 +51,12 @@ public interface P11Params {
       this.iv = iv;
     }
 
-    // CHECKSTYLE:SKIP
     public byte[] getIV() {
       return iv;
     }
 
   }
 
-  //CHECKSTYLE:SKIP
   class P11RSAPkcsPssParams implements P11Params {
 
     private final long hashAlgorithm;

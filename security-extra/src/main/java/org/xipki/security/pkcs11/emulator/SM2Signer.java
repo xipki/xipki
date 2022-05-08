@@ -49,7 +49,6 @@ import java.security.SecureRandom;
  *
  */
 class SM2Signer {
-  // CHECKSTYLE:SKIP
   private final DSAKCalculator kCalculator = new RandomDSAKCalculator();
 
   private final Digest digest;
@@ -85,7 +84,6 @@ class SM2Signer {
 
   public byte[] generateSignatureForMessage(byte[] userId, byte[] message)
       throws CryptoException {
-    // CHECKSTYLE:SKIP
     byte[] z;
     if (userId == null) {
       // use default userId
@@ -105,7 +103,6 @@ class SM2Signer {
     return generateSignatureForHash(hash);
   } // method generateSignatureForMessage
 
-  // CHECKSTYLE:SKIP
   public byte[] generateSignatureForHash(byte[] eHash)
       throws CryptoException {
     BigInteger n = ecParams.getN();
@@ -132,7 +129,6 @@ class SM2Signer {
       } while (r.equals(ECConstants.ZERO) || r.add(k).equals(n));
 
       // A6
-      // CHECKSTYLE:SKIP
       BigInteger dPlus1ModN = d.add(ECConstants.ONE).modInverse(n);
 
       s = k.subtract(r.multiply(d)).mod(n);
@@ -149,6 +145,5 @@ class SM2Signer {
       throw new CryptoException("unable to encode signature: " + ex.getMessage(), ex);
     }
   } // method generateSignatureForHash
-  // CHECKSTYLE:ON
 
 }

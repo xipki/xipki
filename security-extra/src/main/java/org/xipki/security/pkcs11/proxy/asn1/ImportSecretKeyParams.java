@@ -39,7 +39,6 @@ import java.io.IOException;
  *
  * @author Lijun Liao
  */
-// CHECKSTYLE:SKIP
 public class ImportSecretKeyParams extends ProxyMessage {
 
   private final P11SlotIdentifier slotId;

@@ -73,7 +73,7 @@ public class QaP11Actions {
 
       byte[] data = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
       sig.update(data);
-      byte[] signature = sig.sign(); // CHECKSTYLE:SKIP
+      byte[] signature = sig.sign();
       println("signature created successfully");
 
       Signature ver = Signature.getInstance(signAlgo, "BC");
@@ -126,7 +126,7 @@ public class QaP11Actions {
 
       byte[] data = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
       sig.update(data);
-      byte[] signature = sig.sign(); // CHECKSTYLE:SKIP
+      byte[] signature = sig.sign();
       println("signature created successfully");
 
       String provName = "BC";

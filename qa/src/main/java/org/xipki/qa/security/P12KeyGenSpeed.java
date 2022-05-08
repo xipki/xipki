@@ -39,7 +39,6 @@ import static org.xipki.util.Args.notNull;
 
 public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
 
-  // CHECKSTYLE:SKIP
   public static class DSA extends P12KeyGenSpeed {
     private final int plength;
     private final int qlength;
@@ -61,7 +60,6 @@ public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
 
   } // class DSA
 
-  // CHECKSTYLE:SKIP
   public static class EC extends P12KeyGenSpeed {
 
     private final ASN1ObjectIdentifier curveOid;
@@ -84,7 +82,6 @@ public abstract class P12KeyGenSpeed extends BenchmarkExecutor {
 
   } // class EC
 
-  // CHECKSTYLE:SKIP
   public static class RSA extends P12KeyGenSpeed {
 
     private final int keysize;

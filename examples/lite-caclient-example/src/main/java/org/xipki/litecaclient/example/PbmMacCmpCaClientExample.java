@@ -75,7 +75,6 @@ public class PbmMacCmpCaClientExample extends CaClientExample {
     Security.addProvider(new BouncyCastleProvider());
 
     try {
-      // CHECKSTYLE:SKIP
       X509Certificate responderCert = SdkUtil.parseCert(new File(expandPath(RESPONDER_CERT_FILE)));
 
       X500Name requestorSubject = new X500Name("CN=PBMMAC");
@@ -104,7 +103,6 @@ public class PbmMacCmpCaClientExample extends CaClientExample {
 
       client.init();
       X509Certificate caCert = client.getCaCert();
-      // CHECKSTYLE:SKIP
       X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
 
       // retrieve CA certificate

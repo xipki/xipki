@@ -118,7 +118,6 @@ public class FileBigIntegerIterator implements Iterator<BigInteger>, Closeable {
     try {
       reader.close();
     } catch (Throwable th) {
-      // STYLECHECK: SKIPTEST
     }
   }
 

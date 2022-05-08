@@ -145,7 +145,6 @@ public class ExtensionsConfCreatorDemo {
     ConstantExtnValue sdaSyntax = new ConstantExtnValue(FieldType.SEQUENCE_OF);
     sdaExt.setConstant(sdaSyntax);
 
-    // CHECKSTYLE:SKIP
     List<ConstantExtnValue> sdaSyntax_values = new LinkedList<>();
     sdaSyntax.setListValue(sdaSyntax_values);
 
@@ -186,7 +185,6 @@ public class ExtensionsConfCreatorDemo {
       ConstantExtnValue attribute = new ConstantExtnValue(FieldType.SEQUENCE);
       sdaSyntax_values.add(attribute);
 
-      // CHECKSTYLE:SKIP
       List<ConstantExtnValue> attribute_values = new LinkedList<>();
       attribute.setListValue(attribute_values);
 
@@ -201,7 +199,6 @@ public class ExtensionsConfCreatorDemo {
       ConstantExtnValue values = new ConstantExtnValue(FieldType.SET);
       attribute_values.add(values);
 
-      // CHECKSTYLE:SKIP
       List<ConstantExtnValue> values_values = new LinkedList<>();
       values.setListValue(values_values);
 

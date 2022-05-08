@@ -39,7 +39,6 @@ import java.math.BigInteger;
  *
  * @author Lijun Liao
  */
-// CHECKSTYLE:SKIP
 public class GenRSAKeypairParams extends ProxyMessage {
 
   private final P11SlotIdentifier slotId;

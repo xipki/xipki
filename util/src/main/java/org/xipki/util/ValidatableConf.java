@@ -70,7 +70,6 @@ public abstract class ValidatableConf {
     }
   }
 
-  // CHECKSTYLE:SKIP
   protected static void _null(Object value, String name)
       throws InvalidConfException {
     if (value != null) {
@@ -87,7 +86,6 @@ public abstract class ValidatableConf {
     }
   }
 
-  // CHECKSTYLE:SKIP
   public abstract void validate()
       throws InvalidConfException;
 

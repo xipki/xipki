@@ -1,5 +1,4 @@
 // #THIRDPARTY# Apache HttpComponents httpcore v4.4.10 / org.apache.http.ssl
-// CHECKSTYLE:OFF
 
 /*
  * ====================================================================

@@ -32,7 +32,6 @@ import java.util.Set;
  */
 class SqlErrorCodes {
 
-  // CHECKSTYLE:SKIP
   private static class DB2 extends SqlErrorCodes {
 
     DB2() {
@@ -60,7 +59,6 @@ class SqlErrorCodes {
 
   } // class H2
 
-  // CHECKSTYLE:SKIP
   private static class HSQL extends SqlErrorCodes {
 
     HSQL() {
@@ -72,7 +70,6 @@ class SqlErrorCodes {
 
   } // class HSQL
 
-  // CHECKSTYLE:SKIP
   private static class MySQL extends SqlErrorCodes {
 
     MySQL() {
@@ -87,7 +84,6 @@ class SqlErrorCodes {
 
   } // class MySQL
 
-  // CHECKSTYLE:SKIP
   private static class MariaDB extends MySQL {
 
     MariaDB() {
@@ -110,7 +106,6 @@ class SqlErrorCodes {
 
   } // class Oracle
 
-  // CHECKSTYLE:SKIP
   private static class PostgreSQL extends SqlErrorCodes {
 
     PostgreSQL() {

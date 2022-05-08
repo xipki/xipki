@@ -76,6 +76,12 @@ public class CaUtil {
     return list;
   }
 
+  public static <T> void addAll(List<T> list, T... a) {
+    for (T element : a) {
+      list.add(element);
+    }
+  }
+
   public static String buildInsertSql(String table, String... columns) {
     StringBuilder sb = new StringBuilder(100);
     sb.append("INSERT INTO ").append(table).append(" (");

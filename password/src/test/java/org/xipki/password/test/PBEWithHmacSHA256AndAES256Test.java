@@ -30,7 +30,6 @@ import org.xipki.util.StringUtil;
  * @since 2.2.0
  */
 
-// CHECKSTYLE:SKIP
 public class PBEWithHmacSHA256AndAES256Test {
 
   private static PBEAlgo algo = PBEAlgo.PBEWithHmacSHA256AndAES_256;

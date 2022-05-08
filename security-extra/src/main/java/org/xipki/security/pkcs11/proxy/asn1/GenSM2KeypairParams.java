@@ -39,7 +39,6 @@ import java.io.IOException;
  *
  * @author Lijun Liao
  */
-// CHECKSTYLE:SKIP
 public class GenSM2KeypairParams extends ProxyMessage {
 
   private final P11SlotIdentifier slotId;

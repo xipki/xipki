@@ -53,7 +53,6 @@ abstract class CrmfKeyWrapper {
   abstract byte[] generateWrappedKey(byte[] encryptionKey)
       throws OperatorException;
 
-  // CHECKSTYLE:SKIP
   static class RSAOAEPAsymmetricKeyWrapper extends CrmfKeyWrapper {
 
     private static final AlgorithmIdentifier OAEP_DFLT = new AlgorithmIdentifier(
@@ -84,7 +83,6 @@ abstract class CrmfKeyWrapper {
 
   } // class RSAOAEPAsymmetricKeyWrapper
 
-  // CHECKSTYLE:SKIP
   static class ECIESAsymmetricKeyWrapper extends CrmfKeyWrapper {
 
     private final AlgorithmIdentifier algorithmIdentifier;
@@ -213,7 +211,6 @@ abstract class CrmfKeyWrapper {
      * }
      * </pre>
      */
-    // CHECKSTYLE:SKIP
     private ASN1Sequence buildECIESParameters() {
       ASN1EncodableVector vec = new ASN1EncodableVector();
       // KeyDerivationFunction

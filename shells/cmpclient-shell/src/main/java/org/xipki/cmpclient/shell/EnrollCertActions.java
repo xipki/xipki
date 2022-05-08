@@ -471,7 +471,6 @@ public class EnrollCertActions {
 
     protected EnrollCertResult enroll()
         throws Exception {
-      // CHECKSTYLE:SKIP
       EnrollCertRequest.EnrollType type = getCmpReqType();
 
       if (extkeyusages != null) {

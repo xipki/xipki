@@ -202,7 +202,6 @@ public class ProcessLog {
     lastPrintTimeMs.set(nowMs);
 
     int numMeasurePoints = measureDeque.size();
-    // CHECKSTYLE:SKIP
     MeasurePoint referenceMeasurePoint = (numMeasurePoints > 10) ? measureDeque.removeFirst()
         : measureDeque.getFirst();
 

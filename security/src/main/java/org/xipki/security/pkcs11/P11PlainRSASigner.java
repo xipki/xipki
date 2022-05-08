@@ -29,7 +29,6 @@ import org.bouncycastle.crypto.RuntimeCryptoException;
  * @author Lijun Liao
  * @since 2.0.0
  */
-//CHECKSTYLE:SKIP
 public class P11PlainRSASigner implements AsymmetricBlockCipher {
 
   private P11RSAKeyParameter param;

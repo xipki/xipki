@@ -493,7 +493,6 @@ public class ExtensionConfBuilder {
     return extValue;
   } // method createKeyUsage
 
-  // CHECKSTYLE:SKIP
   public static AuthorityKeyIdentifier createAKIwithSerialAndSerial() {
     AuthorityKeyIdentifier akiType = new AuthorityKeyIdentifier();
     akiType.setUseIssuerAndSerial(true);

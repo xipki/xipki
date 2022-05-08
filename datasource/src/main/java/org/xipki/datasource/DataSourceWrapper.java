@@ -45,7 +45,6 @@ import static org.xipki.util.StringUtil.*;
 
 public abstract class DataSourceWrapper implements Closeable {
 
-  // CHECKSTYLE:SKIP
   private static class MySQL extends DataSourceWrapper {
 
     MySQL(String name, HikariDataSource service) {
@@ -130,7 +129,6 @@ public abstract class DataSourceWrapper implements Closeable {
 
   } // class MySQL
 
-  // CHECKSTYLE:SKIP
   private static class MariaDB extends MySQL {
 
     MariaDB(String name, HikariDataSource service) {
@@ -139,7 +137,6 @@ public abstract class DataSourceWrapper implements Closeable {
 
   }
 
-  // CHECKSTYLE:SKIP
   private static class DB2 extends DataSourceWrapper {
 
     DB2(String name, HikariDataSource service) {
@@ -171,7 +168,6 @@ public abstract class DataSourceWrapper implements Closeable {
 
   } // class DB2
 
-  // CHECKSTYLE:SKIP
   private static class PostgreSQL extends DataSourceWrapper {
 
     PostgreSQL(String name, HikariDataSource service) {
@@ -330,7 +326,6 @@ public abstract class DataSourceWrapper implements Closeable {
 
   } // class H2
 
-  // CHECKSTYLE:SKIP
   private static class HSQL extends DataSourceWrapper {
 
     HSQL(String name, HikariDataSource service) {

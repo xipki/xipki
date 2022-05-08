@@ -53,7 +53,6 @@ public class IssuerAndSubject extends ASN1Object {
   }
 
   @Override
-  // CHECKSTYLE:SKIP
   public ASN1Primitive toASN1Primitive() {
     ASN1EncodableVector vec = new ASN1EncodableVector();
     vec.add(issuer);

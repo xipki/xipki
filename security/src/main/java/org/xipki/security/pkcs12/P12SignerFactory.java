@@ -43,7 +43,6 @@ import java.util.*;
  * @since 2.0.0
  */
 
-// CHECKSTYLE:SKIP
 public class P12SignerFactory implements SignerFactory {
 
   private static final String TYPE_PKCS12 = "pkcs12";

@@ -86,7 +86,6 @@ public class KeyUtil {
     }
   }
 
-  // CHECKSTYLE:SKIP
   public static KeyPair generateRSAKeypair(int keysize, BigInteger publicExponent,
       SecureRandom random)
           throws NoSuchAlgorithmException, NoSuchProviderException,
@@ -133,7 +132,6 @@ public class KeyUtil {
             priv.getCrtCoefficient()));
   }
 
-  // CHECKSTYLE:SKIP
   public static KeyPair generateDSAKeypair(int plength, int qlength, SecureRandom random)
       throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
     DSAParameterSpec dsaParamSpec = DSAParameterCache.getDSAParameterSpec(plength, qlength,
@@ -145,7 +143,6 @@ public class KeyUtil {
     }
   }
 
-  // CHECKSTYLE:SKIP
   public static KeyPair generateDSAKeypair(DSAParameters dsaParams, SecureRandom random)
       throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
     DSAParameterSpec dsaParamSpec = new DSAParameterSpec(dsaParams.getP(), dsaParams.getQ(),
@@ -153,7 +150,6 @@ public class KeyUtil {
     return generateDSAKeypair(dsaParamSpec, random);
   }
 
-  // CHECKSTYLE:SKIP
   public static KeyPair generateDSAKeypair(DSAParameterSpec dsaParamSpec, SecureRandom random)
       throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
     KeyPairGenerator kpGen = getKeyPairGenerator("DSA");
@@ -163,7 +159,6 @@ public class KeyUtil {
     }
   }
 
-  // CHECKSTYLE:SKIP
   public static DSAPublicKey generateDSAPublicKey(DSAPublicKeySpec keySpec)
       throws InvalidKeySpecException {
     notNull(keySpec, "keySpec");
@@ -186,7 +181,6 @@ public class KeyUtil {
     }
   }
 
-  // CHECKSTYLE:SKIP
   public static KeyPair generateECKeypair(ASN1ObjectIdentifier curveId, SecureRandom random)
       throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
     notNull(curveId, "curveId");
@@ -212,7 +206,6 @@ public class KeyUtil {
    * @throws InvalidKeySpecException
    *           If key is invalid.
    */
-  // CHECKSTYLE:SKIP
   public static PrivateKey convertXDHToDummyEdDSAPrivateKey(PrivateKey key)
       throws InvalidKeySpecException {
     if (key instanceof XDHKey) {
@@ -321,7 +314,6 @@ public class KeyUtil {
     }
   } // method generatePublicKey
 
-  // CHECKSTYLE:SKIP
   public static RSAPublicKey generateRSAPublicKey(RSAPublicKeySpec keySpec)
       throws InvalidKeySpecException {
     notNull(keySpec, "keySpec");
@@ -498,7 +490,6 @@ public class KeyUtil {
     }
   } // method createSubjectPublicKeyInfo
 
-  // CHECKSTYLE:SKIP
   public static ECPublicKey createECPublicKey(byte[] encodedAlgorithmIdParameters,
       byte[] encodedPoint)
           throws InvalidKeySpecException {
@@ -536,7 +527,6 @@ public class KeyUtil {
     return ECUtil.getNamedCurveOid(bcParamSpec);
   }
 
-  // CHECKSTYLE:SKIP
   public static byte[] getUncompressedEncodedECPoint(ECPoint point, int orderBitLength) {
     int orderByteLength = (orderBitLength + 7) / 8;
     byte[] keyData = new byte[1 + orderByteLength * 2];

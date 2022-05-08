@@ -303,7 +303,6 @@ abstract class BaseCmpResponder {
     return getCa().getCmpControl();
   }
 
-  // CHECKSTYLE:SKIP
   private CmpRequestorInfo getMacRequestor(byte[] senderKID) {
     return getCa().getMacRequestor(senderKID);
   }
@@ -649,7 +648,6 @@ abstract class BaseCmpResponder {
       }
 
       ASN1OctetString asn1 = header.getSenderKID();
-      // CHECKSTYLE:SKIP
       byte[] senderKID = (asn1 == null) ? null : asn1.getOctets();
       PKMACBuilder pkMacBuilder = new PKMACBuilder(new JcePKMACValuesCalculator());
 
@@ -995,7 +993,7 @@ abstract class BaseCmpResponder {
         if (aesGcm_ciphers_initialized) {
           try {
             cipher0 = aesGcm_ciphers.borrow(5, TimeUnit.SECONDS);
-          } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
+          } catch (InterruptedException ex) {
           }
         }
 
@@ -1040,7 +1038,7 @@ abstract class BaseCmpResponder {
         if (pbkdf2_kdfs_initialized) {
           try {
             keyFact0 = pbkdf2_kdfs.borrow(5, TimeUnit.SECONDS);
-          } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
+          } catch (InterruptedException ex) {
           }
         }
 
@@ -1065,7 +1063,7 @@ abstract class BaseCmpResponder {
         if (aesGcm_ciphers_initialized) {
           try {
             cipher0 = aesGcm_ciphers.borrow(5, TimeUnit.SECONDS);
-          } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
+          } catch (InterruptedException ex) {
           }
         }
 

@@ -51,7 +51,6 @@ public abstract class X509CaModule {
 
   protected static final long MS_PER_WEEK = 7 * MS_PER_DAY;
 
-  // CHECKSTYLE:SKIP
   protected final Logger LOG = LoggerFactory.getLogger(getClass());
 
   protected final NameId caIdent;

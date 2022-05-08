@@ -144,7 +144,6 @@ public class CmpControl {
 
     // PasswordBasedMac
     str = pairs.value(KEY_PROTECTION_PBM_OWF);
-    // CHECKSTYLE:SKIP
     List<String> listOwfAlgos = StringUtil.isBlank(str) ? null
         : StringUtil.split(str, ALGO_DELIMITER);
 

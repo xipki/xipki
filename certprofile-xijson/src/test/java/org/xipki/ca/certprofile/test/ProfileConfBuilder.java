@@ -555,7 +555,6 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     return list;
   } // method createEdwardsOrMontgomeryKeyAlgorithms
 
-  // CHECKSTYLE:SKIP
   protected static List<AlgorithmType> createRSAKeyAlgorithms() {
     List<AlgorithmType> list = new LinkedList<>();
 

@@ -29,7 +29,6 @@ import static org.xipki.util.Args.notNull;
  * @author Lijun Liao
  * @since 2.0.0
  */
-// CHECKSTYLE:SKIP
 public class OBFPasswordService {
 
   public static final String OBFUSCATE = "OBF:";

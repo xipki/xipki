@@ -56,7 +56,6 @@ public class PKCS1Util {
         digestPkcsPrefix.put(algo, Hex.decode(prefix));
     }
 
-    // CHECKSTYLE:SKIP
     public static byte[] EMSA_PKCS1_v1_5_encoding(byte[] hashValue, int modulusBigLength,
                                                   HashAlgo hashAlgo)
             throws XiSecurityException {
@@ -93,7 +92,6 @@ public class PKCS1Util {
         return block;
     } // method EMSA_PKCS1_v1_5_encoding
 
-    // CHECKSTYLE:SKIP
     public static byte[] EMSA_PKCS1_v1_5_encoding(byte[] encodedDigestInfo, int modulusBigLength)
             throws XiSecurityException {
         notNull(encodedDigestInfo, "encodedDigestInfo");
@@ -123,7 +121,6 @@ public class PKCS1Util {
         return block;
     } // method EMSA_PKCS1_v1_5_encoding
 
-    // CHECKSTYLE:SKIP
     public static byte[] EMSA_PSS_ENCODE(
             HashAlgo contentDigest, byte[] hashValue, HashAlgo mgfDigest,
             int saltLen, int modulusBitLength, SecureRandom random)
@@ -296,7 +293,6 @@ public class PKCS1Util {
     /**
      * mask generator function, as described in PKCS1v2.
      */
-    // CHECKSTYLE:SKIP
     private static byte[] mgf1(HashAlgo mgfDigest, byte[] Z, int length) {
         int mgfhLen = mgfDigest.getLength();
         byte[] mask = new byte[length];
@@ -325,7 +321,7 @@ public class PKCS1Util {
     /**
      * int to octet string.
      */
-    private static void ItoOSP(int i, byte[] sp, int spOffset) { // CHECKSTYLE:SKIP
+    private static void ItoOSP(int i, byte[] sp, int spOffset) {
         sp[spOffset    ] = (byte)(i >>> 24);
         sp[spOffset + 1] = (byte)(i >>> 16);
         sp[spOffset + 2] = (byte)(i >>> 8);

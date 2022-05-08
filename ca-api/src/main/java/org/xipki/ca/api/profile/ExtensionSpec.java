@@ -177,7 +177,6 @@ public abstract class ExtensionSpec {
 
   } // class Rfc5280
 
-  // CHECKSTYLE:SKIP
   private static class Rfc5280RootCA extends Rfc5280 {
 
     private static final Set<ASN1ObjectIdentifier> REQUIRED_EXTENSIONS =
@@ -207,7 +206,6 @@ public abstract class ExtensionSpec {
 
     private final Set<ASN1ObjectIdentifier> requiredExtensions;
 
-    // CHECKSTYLE:SKIP
     private Rfc5280RootCA() {
       Set<ASN1ObjectIdentifier> set = new HashSet<>();
       set.addAll(REQUIRED_EXTENSIONS);
@@ -237,7 +235,6 @@ public abstract class ExtensionSpec {
 
   } // class Rfc5280RootCA
 
-  // CHECKSTYLE:SKIP
   private static class Rfc5280SubCA extends Rfc5280 {
 
     private static final Set<ASN1ObjectIdentifier> REQUIRED_EXTENSIONS =
@@ -295,7 +292,6 @@ public abstract class ExtensionSpec {
 
   } // class Rfc5280SubCA
 
-  // CHECKSTYLE:SKIP
   private static class Rfc5280EndEntity extends Rfc5280 {
 
     private static final Set<ASN1ObjectIdentifier> REQUIRED_EXTENSIONS =
@@ -338,12 +334,10 @@ public abstract class ExtensionSpec {
 
   } // class Rfc5280EndEntity
 
-  // CHECKSTYLE:SKIP
   private static class BrowserForumBRRootCA extends Rfc5280RootCA {
 
   } // class BrowserForumBRRootCA
 
-  // CHECKSTYLE:SKIP
   private static class BrowserForumBRSubCA extends Rfc5280SubCA {
 
     private static final Set<ASN1ObjectIdentifier> REQUIRED_EXTENSIONS =
@@ -404,7 +398,6 @@ public abstract class ExtensionSpec {
 
   } // class BrowserForumBRSubCA
 
-  // CHECKSTYLE:SKIP
   private static class BrowserForumBREndEntity extends Rfc5280EndEntity {
 
     private static final Set<ASN1ObjectIdentifier> REQUIRED_EXTENSIONS =

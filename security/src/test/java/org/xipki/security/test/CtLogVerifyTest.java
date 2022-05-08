@@ -67,9 +67,7 @@ public class CtLogVerifyTest {
     X509Cert cert = X509Util.parseCert(read(certFile));
     X509Cert caCert = X509Util.parseCert(read(caCertFile));
 
-    // CHECKSTYLE:SKIP
     byte[] issuerKeyHash = HashAlgo.SHA256.hash(caCert.getSubjectPublicKeyInfo().getEncoded());
-    // CHECKSTYLE:SKIP
     byte[] preCertTbsCert = CtLog.getPreCertTbsCert(
                               cert.toBcCert().toASN1Structure().getTBSCertificate());
 

@@ -157,7 +157,6 @@ public class P11ContentSignerBuilder {
     return concurrentSigner;
   } // method createSigner
 
-  // CHECKSTYLE:SKIP
   private XiContentSigner createRSAContentSigner(SignAlgo signAlgo)
       throws XiSecurityException, P11TokenException {
     if (signAlgo.isRSAPSSSigAlgo()) {
@@ -168,13 +167,11 @@ public class P11ContentSignerBuilder {
     }
   }
 
-  // CHECKSTYLE:SKIP
   private XiContentSigner createECContentSigner(SignAlgo signAlgo)
       throws XiSecurityException, P11TokenException {
     return new P11ContentSigner.ECDSA(cryptService, identityId, signAlgo);
   }
 
-  // CHECKSTYLE:SKIP
   private XiContentSigner createSM2ContentSigner(SignAlgo signAlgo,
       ASN1ObjectIdentifier curveOid, BigInteger pubPointX, BigInteger pubPointy)
       throws XiSecurityException, P11TokenException {
@@ -182,13 +179,11 @@ public class P11ContentSignerBuilder {
         curveOid, pubPointX, pubPointy);
   }
 
-  // CHECKSTYLE:SKIP
   private XiContentSigner createDSAContentSigner(SignAlgo signAlgo)
       throws XiSecurityException, P11TokenException {
     return new P11ContentSigner.DSA(cryptService, identityId, signAlgo);
   }
 
-  // CHECKSTYLE:SKIP
   private XiContentSigner createEdDSAContentSigner(SignAlgo signAlgo)
       throws XiSecurityException, P11TokenException {
     return new P11ContentSigner.EdDSA(cryptService, identityId, signAlgo);

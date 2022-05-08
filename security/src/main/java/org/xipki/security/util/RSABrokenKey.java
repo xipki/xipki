@@ -33,7 +33,6 @@ import java.math.BigInteger;
  * @author Lijun Liao
  * @since 2.1.0
  */
-// CHECKSTYLE:SKIP
 public class RSABrokenKey {
 
   private static final BigInteger ONE = BigInteger.ONE;

@@ -27,10 +27,8 @@ import java.security.SignatureSpi;
  * @author Lijun Liao
  * @since 2.0.0
  */
-// CHECKSTYLE:SKIP
 public class P11PlainECDSASignatureSpi extends AbstractP11ECDSASignatureSpi {
 
-  // CHECKSTYLE:SKIP
   public static class SHA1 extends P11PlainECDSASignatureSpi {
 
     public SHA1() {
@@ -39,7 +37,6 @@ public class P11PlainECDSASignatureSpi extends AbstractP11ECDSASignatureSpi {
 
   } // class SHA1
 
-  // CHECKSTYLE:SKIP
   public static class NONE extends P11PlainECDSASignatureSpi {
 
     public NONE() {
@@ -48,7 +45,6 @@ public class P11PlainECDSASignatureSpi extends AbstractP11ECDSASignatureSpi {
 
   } // class NONE
 
-  // CHECKSTYLE:SKIP
   public static class SHA224 extends P11PlainECDSASignatureSpi {
 
     public SHA224() {
@@ -57,7 +53,6 @@ public class P11PlainECDSASignatureSpi extends AbstractP11ECDSASignatureSpi {
 
   } // class SHA224
 
-  // CHECKSTYLE:SKIP
   public static class SHA256 extends P11PlainECDSASignatureSpi {
 
     public SHA256() {
@@ -66,7 +61,6 @@ public class P11PlainECDSASignatureSpi extends AbstractP11ECDSASignatureSpi {
 
   } // class SHA256
 
-  // CHECKSTYLE:SKIP
   static class SHA384 extends P11PlainECDSASignatureSpi {
 
     SHA384() {
@@ -75,7 +69,6 @@ public class P11PlainECDSASignatureSpi extends AbstractP11ECDSASignatureSpi {
 
   } // class SHA384
 
-  // CHECKSTYLE:SKIP
   public static class SHA512 extends P11PlainECDSASignatureSpi {
 
     public SHA512() {

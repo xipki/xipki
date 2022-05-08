@@ -24,7 +24,6 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
  *
  * @author Lijun Liao
  */
-// CHECKSTYLE:OFF
 public class EdECConstants {
 
   private static final ASN1ObjectIdentifier id_edwards_curve_algs =

@@ -38,10 +38,8 @@ import static org.xipki.util.Args.notNull;
  * @since 2.1.0
  */
 
-// CHECKSTYLE:SKIP
 public class XiEdDSAContentVerifierProvider implements ContentVerifierProvider {
 
-  //CHECKSTYLE:SKIP
   private static class EdDSAContentVerifier implements ContentVerifier {
 
     private final String algorithm;
