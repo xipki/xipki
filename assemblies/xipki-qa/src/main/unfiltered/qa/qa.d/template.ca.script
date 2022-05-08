@@ -14,8 +14,7 @@ echo "#################################################################"
 list = [ cross subca subca-complex ocsp scep multiple-ous multi-valued-rdn \
   qc ee-complex smime smime-legacy tls tls-c max-time fixed-partial-subject \
   constant-ext constant-ext-implicit-tag constant-ext-explicit-tag \
-  syntax-ext syntax-ext-implicit-tag syntax-ext-explicit-tag apple-wwdr gmt0015 \
-  tls-dsa tls-rsa tls-ec tls-sm2]
+  syntax-ext syntax-ext-implicit-tag syntax-ext-explicit-tag apple-wwdr gmt0015]
 
 each ($list) {
   ca:profile-add --name ${it} \
@@ -329,11 +328,7 @@ ca:caprofile-add \
   --profile smime-legacy \
   --profile tls \
   --profile tls-c \
-  --profile fixed-partial-subject \
-  --profile tls-dsa \
-  --profile tls-ec \
-  --profile tls-rsa \
-  --profile tls-sm2
+  --profile fixed-partial-subject
 
 ## Add publisher
 ca:capub-add \
