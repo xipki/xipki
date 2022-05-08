@@ -275,7 +275,7 @@ class Ca2Manager {
       for (CaHasRequestorEntry entry : caReqEntries) {
         sb.append("\n    ").append(entry);
       }
-      LOG.info("CA {} is associated requestorst:{}", name, sb);
+      LOG.info("CA {} is associated requestors:{}", name, sb);
     }
 
     Set<Integer> profileIds = queryExecutor.createCaHasProfiles(ca.getIdent());

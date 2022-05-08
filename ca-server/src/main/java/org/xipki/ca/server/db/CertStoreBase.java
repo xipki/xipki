@@ -104,7 +104,7 @@ public class CertStoreBase extends QueryExecutor {
 
     if (dbSchemaVersion > 6) {
       throw new CaMgmtException("Database schema with version " + dbSchemaVersion
-          + " is not supported. Please either update the XiPKI software to version 5.4+ or"
+          + " is not supported. Please either update the XiPKI software to version 6+ or"
           + " initialize the database with schema version 6.");
     }
   } // constructor

@@ -109,7 +109,7 @@ public class CmpControl {
 
   private final CollectionAlgorithmValidator sigAlgoValidator;
 
-  private final CollectionAlgorithmValidator popoAlgoValidator;
+  private final CollectionAlgorithmValidator popAlgoValidator;
 
   public CmpControl(String conf)
       throws InvalidConfException {
@@ -144,7 +144,7 @@ public class CmpControl {
     algos = this.sigAlgoValidator.getAlgoNames();
     pairs.putPair(key, algosAsString(algos));
 
-    // popo algorithms
+    // pop algorithms
     key = KEY_POPO_SIGALGO;
     str = pairs.value(key);
     if (str == null) {
@@ -152,11 +152,11 @@ public class CmpControl {
     }
     algos = splitAlgos(str);
     try {
-      this.popoAlgoValidator = buildAlgorithmValidator(algos);
+      this.popAlgoValidator = buildAlgorithmValidator(algos);
     } catch (NoSuchAlgorithmException ex) {
       throw new InvalidConfException("invalid " + key + ": " + str, ex);
     }
-    algos = this.popoAlgoValidator.getAlgoNames();
+    algos = this.popAlgoValidator.getAlgoNames();
     pairs.putPair(key, algosAsString(algos));
 
     // PasswordBasedMac
@@ -181,7 +181,7 @@ public class CmpControl {
   public CmpControl(Boolean confirmCert, Boolean sendCaCert, Boolean sendCertChain,
       Boolean messageTimeRequired, Boolean sendResponderCert, Boolean rrAkiRequired,
       Integer messageTimeBias, Integer confirmWaitTime, Boolean groupEnroll,
-      List<String> sigAlgos, List<String> popoAlgos,
+      List<String> sigAlgos, List<String> popAlgos,
       List<String> pbmOwfs, List<String> pbmMacs, Integer pbmIterationCount)
       throws InvalidConfException {
     if (confirmWaitTime != null) {
@@ -228,13 +228,13 @@ public class CmpControl {
     }
 
     try {
-      this.popoAlgoValidator = buildAlgorithmValidator(popoAlgos);
+      this.popAlgoValidator = buildAlgorithmValidator(popAlgos);
     } catch (NoSuchAlgorithmException ex) {
-      throw new InvalidConfException("invalid popoAlgos", ex);
+      throw new InvalidConfException("invalid popAlgos", ex);
     }
 
-    if (CollectionUtil.isNotEmpty(popoAlgos)) {
-      pairs.putPair(KEY_POPO_SIGALGO, algosAsString(this.popoAlgoValidator.getAlgoNames()));
+    if (CollectionUtil.isNotEmpty(popAlgos)) {
+      pairs.putPair(KEY_POPO_SIGALGO, algosAsString(this.popAlgoValidator.getAlgoNames()));
     }
 
     // PasswordBasedMac
@@ -359,8 +359,8 @@ public class CmpControl {
     return sigAlgoValidator;
   }
 
-  public AlgorithmValidator getPopoAlgoValidator() {
-    return popoAlgoValidator;
+  public AlgorithmValidator getPopAlgoValidator() {
+    return popAlgoValidator;
   }
 
   public HashAlgo getResponsePbmOwf() {
@@ -410,8 +410,8 @@ public class CmpControl {
         "\n  AKI in revocation request required: ", rrAkiRequired,
         "\n  signature algorithms: ",
             CollectionUtil.sort(sigAlgoValidator.getAlgoNames()),
-        "\n  POPO algorithms: ",
-            CollectionUtil.sort(popoAlgoValidator.getAlgoNames()),
+        "\n  POP algorithms: ",
+            CollectionUtil.sort(popAlgoValidator.getAlgoNames()),
         (verbose ? "\n  encoded: " : ""), (verbose ? conf : ""));
   } // method toString
 

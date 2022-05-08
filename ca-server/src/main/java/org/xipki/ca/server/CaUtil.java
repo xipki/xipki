@@ -203,7 +203,7 @@ public class CaUtil {
       }
     }
 
-    return securityFactory.verifyPopo(csr, algorithmValidator, kaKeyAndCert);
+    return securityFactory.verifyPop(csr, algorithmValidator, kaKeyAndCert);
   } // method verifyCsr
 
   private static RDN[] getRdns(RDN[] rdns, ASN1ObjectIdentifier type) {

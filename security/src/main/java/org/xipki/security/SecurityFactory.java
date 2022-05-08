@@ -33,7 +33,7 @@ import java.util.Set;
 /**
  * This is the core interface. It specifies the method to create
  * {@link ConcurrentContentSigner}, {@link ContentVerifierProvider},
- * to verify POPO, to the random, etc.
+ * to verify POP, to the random, etc.
  *
  * @author Lijun Liao
  * @since 2.0.0
@@ -148,7 +148,7 @@ public interface SecurityFactory {
    * @return <code>true</code> if the signature is valid and the signature algorithm is accepted,
    *         <code>false</code> otherwise.
    */
-  boolean verifyPopo(PKCS10CertificationRequest csr, AlgorithmValidator algoValidator);
+  boolean verifyPop(PKCS10CertificationRequest csr, AlgorithmValidator algoValidator);
 
   /**
    * Verifies the signature of CSR.
@@ -163,7 +163,7 @@ public interface SecurityFactory {
    * @return <code>true</code> if the signature is valid and the signature algorithm is accepted,
    *         <code>false</code> otherwise.
    */
-  boolean verifyPopo(PKCS10CertificationRequest csr, AlgorithmValidator algoValidator,
+  boolean verifyPop(PKCS10CertificationRequest csr, AlgorithmValidator algoValidator,
       DHSigStaticKeyCertPair ownerKeyAndCert);
 
   /**
@@ -176,7 +176,7 @@ public interface SecurityFactory {
    * @return <code>true</code> if the signature is valid and the signature algorithm is accepted,
    *         <code>false</code> otherwise.
    */
-  boolean verifyPopo(CertificationRequest csr, AlgorithmValidator algoValidator);
+  boolean verifyPop(CertificationRequest csr, AlgorithmValidator algoValidator);
 
   /**
    * Verifies the signature of CSR.
@@ -191,7 +191,7 @@ public interface SecurityFactory {
    * @return <code>true</code> if the signature is valid and the signature algorithm is accepted,
    *         <code>false</code> otherwise.
    */
-  boolean verifyPopo(CertificationRequest csr, AlgorithmValidator algoValidator,
+  boolean verifyPop(CertificationRequest csr, AlgorithmValidator algoValidator,
       DHSigStaticKeyCertPair ownerKeyAndCert);
 
   /**

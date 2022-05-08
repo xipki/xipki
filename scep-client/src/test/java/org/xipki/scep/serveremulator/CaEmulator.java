@@ -129,7 +129,7 @@ public class CaEmulator {
 
   public X509Cert generateCert(CertificationRequest csr)
       throws Exception {
-    if (!verifyPopo(csr)) {
+    if (!verifyPop(csr)) {
       throw new Exception("CSR invalid");
     }
     CertificationRequestInfo reqInfo = csr.getCertificationRequestInfo();
@@ -207,7 +207,7 @@ public class CaEmulator {
     return crl.toASN1Structure();
   } // method getCrl
 
-  private boolean verifyPopo(CertificationRequest csr) {
+  private boolean verifyPop(CertificationRequest csr) {
     Args.notNull(csr, "csr");
     try {
       PKCS10CertificationRequest p10Req = new PKCS10CertificationRequest(csr);
@@ -217,10 +217,10 @@ public class CaEmulator {
       ContentVerifierProvider cvp = getContentVerifierProvider(pk);
       return p10Req.isSignatureValid(cvp);
     } catch (InvalidKeyException | PKCSException | InvalidKeySpecException ex) {
-      LOG.error("could not validate POPO of CSR", ex);
+      LOG.error("could not validate POP of CSR", ex);
       return false;
     }
-  } // method verifyPopo
+  } // method verifyPop
 
   public ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey)
       throws InvalidKeyException {

@@ -401,7 +401,7 @@ public class ScepResponder {
           }
 
           if (!ca.verifyCsr(csr)) {
-            LOG.warn("tid={} POPO verification failed",tid);
+            LOG.warn("tid={} POP verification failed",tid);
             throw FailInfoException.BAD_MESSAGE_CHECK;
           }
 

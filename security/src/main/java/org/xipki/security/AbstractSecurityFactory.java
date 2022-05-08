@@ -57,19 +57,19 @@ public abstract class AbstractSecurityFactory implements SecurityFactory {
   }
 
   @Override
-  public boolean verifyPopo(CertificationRequest csr, AlgorithmValidator algoValidator) {
-    return verifyPopo(new PKCS10CertificationRequest(csr), algoValidator, null);
+  public boolean verifyPop(CertificationRequest csr, AlgorithmValidator algoValidator) {
+    return verifyPop(new PKCS10CertificationRequest(csr), algoValidator, null);
   }
 
   @Override
-  public boolean verifyPopo(CertificationRequest csr, AlgorithmValidator algoValidator,
+  public boolean verifyPop(CertificationRequest csr, AlgorithmValidator algoValidator,
       DHSigStaticKeyCertPair ownerKeyAndCert) {
-    return verifyPopo(new PKCS10CertificationRequest(csr), algoValidator, ownerKeyAndCert);
+    return verifyPop(new PKCS10CertificationRequest(csr), algoValidator, ownerKeyAndCert);
   }
 
   @Override
-  public boolean verifyPopo(PKCS10CertificationRequest csr, AlgorithmValidator algoValidator) {
-    return verifyPopo(csr, algoValidator, null);
+  public boolean verifyPop(PKCS10CertificationRequest csr, AlgorithmValidator algoValidator) {
+    return verifyPop(csr, algoValidator, null);
   }
 
 }
