@@ -893,7 +893,7 @@ class CmpAgent {
         vec.add(new DERUTF8String(reqEntry.getCertprofile()));
       }
 
-      certReqMsgs[i] = new CertReqMsg(reqEntry.getCertReq(), reqEntry.getPopo(), null);
+      certReqMsgs[i] = new CertReqMsg(reqEntry.getCertReq(), reqEntry.getPop(), null);
     }
 
     if (vec.size() != 0 && vec.size() != reqEntries.size()) {

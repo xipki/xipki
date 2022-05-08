@@ -291,16 +291,16 @@ public class Actions {
     protected String hashAlgo = "SHA256";
 
     @Option(name = "--rsa-pss",
-            description = "whether to use the RSAPSS for the POPO computation\n"
+            description = "whether to use the RSAPSS for the POP computation\n"
                     + "(only applied to RSA key)")
     private Boolean rsaPss = Boolean.FALSE;
 
     @Option(name = "--dsa-plain",
-            description = "whether to use the Plain DSA for the POPO computation")
+            description = "whether to use the Plain DSA for the POP computation")
     private Boolean dsaPlain = Boolean.FALSE;
 
     @Option(name = "--gm",
-            description = "whether to use the chinese GM algorithm for the POPO computation\n"
+            description = "whether to use the chinese GM algorithm for the POP computation\n"
                     + "(only applied to EC key with GM curves)")
     private Boolean gm = Boolean.FALSE;
 
@@ -801,7 +801,7 @@ public class Actions {
 
       }
 
-      boolean bo = securityFactory.verifyPopo(csr, null, peerKeyAndCert);
+      boolean bo = securityFactory.verifyPop(csr, null, peerKeyAndCert);
       String txt = bo ? "valid" : "invalid";
       SignAlgo signAlgo = SignAlgo.getInstance(csr.getSignatureAlgorithm());
       println("The POP is " + txt + " (signature algorithm " + signAlgo.getJceName() + ").");

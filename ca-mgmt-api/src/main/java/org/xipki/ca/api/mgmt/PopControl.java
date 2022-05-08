@@ -37,11 +37,11 @@ import java.security.cert.X509Certificate;
 import java.util.*;
 
 /**
- * Popo (proof-of-possession) control.
+ * POP (proof-of-possession) control.
  *
  * @author Lijun Liao
  */
-public class PopoControl {
+public class PopControl {
 
   public static final String KEY_SIGALGO = "sigalgo";
 
@@ -53,35 +53,35 @@ public class PopoControl {
 
   private final ConfPairs confPairs;
 
-  private final CollectionAlgorithmValidator popoAlgoValidator;
+  private final CollectionAlgorithmValidator popAlgoValidator;
 
   private final List<DHSigStaticKeyCertPair> dhKeyAndCerts = new ArrayList<>(1);
 
   private final X509Cert[] dhCerts;
 
-  public PopoControl(String conf)
+  public PopControl(String conf)
       throws InvalidConfException {
     this(new ConfPairs(conf));
   }
 
-  public PopoControl(ConfPairs pairs)
+  public PopControl(ConfPairs pairs)
       throws InvalidConfException {
     this.confPairs = Args.notNull(pairs, "pairs");
-    // popo signature algorithms
+    // pop signature algorithms
     String name = KEY_SIGALGO;
     String str = confPairs.value(name);
     if (str == null) {
-      this.popoAlgoValidator = CollectionAlgorithmValidator.INSTANCE;
+      this.popAlgoValidator = CollectionAlgorithmValidator.INSTANCE;
     } else {
       try {
         Set<String> algos = StringUtil.splitAsSet(str, ":");
-        this.popoAlgoValidator = CollectionAlgorithmValidator.buildAlgorithmValidator(algos);
+        this.popAlgoValidator = CollectionAlgorithmValidator.buildAlgorithmValidator(algos);
       } catch (NoSuchAlgorithmException ex) {
         throw new InvalidConfException("invalid " + name + ": " + str, ex);
       }
     }
 
-    // Diffie-Hellman based Popo
+    // Diffie-Hellman based POP
     String type = pairs.value(KEY_DH_TYPE);
     String passwordStr = pairs.value(KEY_DH_PASSWORD);
     String keystoreStr = pairs.value(KEY_DH_KEYSTORE);
@@ -136,7 +136,7 @@ public class PopoControl {
         this.dhCerts = certs.toArray(new X509Cert[0]);
       } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException
           | UnrecoverableKeyException | ClassCastException ex) {
-        throw new InvalidConfException("invalid dhStatic popo configuration", ex);
+        throw new InvalidConfException("invalid dhStatic pop configuration", ex);
       }
     }
   } // constructor
@@ -174,14 +174,14 @@ public class PopoControl {
     return confPairs;
   }
 
-  public AlgorithmValidator getPopoAlgoValidator() {
-    return popoAlgoValidator;
+  public AlgorithmValidator getPopAlgoValidator() {
+    return popAlgoValidator;
   }
 
   public String toString(boolean verbose) {
     // TODO: remove sensitive data
     return StringUtil.concatObjects(
-        "signature algorithms: ", CollectionUtil.sort(popoAlgoValidator.getAlgoNames()),
+        "signature algorithms: ", CollectionUtil.sort(popAlgoValidator.getAlgoNames()),
         (verbose ? "\n  encoded: " : ""), (verbose ? getConf() : ""));
   } // method toString
 
@@ -189,11 +189,11 @@ public class PopoControl {
   public boolean equals(Object obj) {
     if (this == obj) {
       return true;
-    } else if (!(obj instanceof PopoControl)) {
+    } else if (!(obj instanceof PopControl)) {
       return false;
     }
 
-    return confPairs.equals(((PopoControl) obj).confPairs);
+    return confPairs.equals(((PopControl) obj).confPairs);
   }
 
 }

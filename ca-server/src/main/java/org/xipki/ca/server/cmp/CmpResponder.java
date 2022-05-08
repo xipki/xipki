@@ -283,7 +283,7 @@ public class CmpResponder extends BaseCmpResponder {
           continue;
         }
 
-        if (!verifyPopo(req, publicKey, requestor.isRa())) {
+        if (!verifyPop(req, publicKey, requestor.isRa())) {
           LOG.warn("could not validate POP for request {}", certReqId.getValue());
           addErrCertResp(resps, certReqId, badPOP, "invalid POP");
           continue;

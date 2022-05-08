@@ -214,8 +214,8 @@ public class CaActions {
     @Option(name = "--ctlog-control", description = "CT log control")
     private String ctlogControl;
 
-    @Option(name = "--popo-control", description = "POPO control")
-    private String popoControl;
+    @Option(name = "--pop-control", description = "POP control")
+    private String popControl;
 
     @Option(name = "--revoke-suspended-control",
         description = "Revoke suspended certificates control")
@@ -328,14 +328,14 @@ public class CaActions {
         entry.setCtlogControl(new CtlogControl(ctlogControl));
       }
 
-      if (popoControl != null) {
-        PopoControl pc;
-        if (popoControl.contains("file:")) {
-          pc = new PopoControl(embedFileContent(new ConfPairs(popoControl)));
+      if (popControl != null) {
+        PopControl pc;
+        if (popControl.contains("file:")) {
+          pc = new PopControl(embedFileContent(new ConfPairs(popControl)));
         } else {
-          pc = new PopoControl(popoControl);
+          pc = new PopControl(popControl);
         }
-        entry.setPopoControl(pc);
+        entry.setPopControl(pc);
       }
 
       if (revokeSuspendedControl != null) {
@@ -749,8 +749,8 @@ public class CaActions {
     @Option(name = "--ctlog-control", description = "CT log control")
     private String ctlogControl;
 
-    @Option(name = "--popo-control", description = "POPO control")
-    private String popoControl;
+    @Option(name = "--pop-control", description = "POP control")
+    private String popControl;
 
     @Option(name = "--revoke-suspended-control",
         description = "Revoke suspended certificates control")
@@ -924,11 +924,11 @@ public class CaActions {
         entry.setCtlogControl(ctlogControl);
       }
 
-      if (popoControl != null) {
+      if (popControl != null) {
         // TODO: consider the prefix dh.
-        String tmp = ShellUtil.canonicalizeSignerConf("PKCS12", popoControl,
+        String tmp = ShellUtil.canonicalizeSignerConf("PKCS12", popControl,
             passwordResolver, securityFactory);
-        entry.setPopoControl(tmp);
+        entry.setPopControl(tmp);
       }
 
       if (revokeSuspendedControl != null) {

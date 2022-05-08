@@ -290,14 +290,14 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       String cmpControl = rs.getString("CMP_CONTROL");
       // Util version 6
       ConfPairs cmpCtrlPairs = new ConfPairs();
-      ConfPairs popoCtrlPairs = new ConfPairs();
+      ConfPairs popCtrlPairs = new ConfPairs();
 
       // adapt the configuration
       if (cmpControl != null) {
         ConfPairs pairs = new ConfPairs(cmpControl);
         for (String n : pairs.names()) {
-          if ("popo.sigalgo".equals(n)) {
-            popoCtrlPairs.putPair("sigalgo", pairs.value(n));
+          if ("popo.sigalgo".equals(n)) { // xipki till 5.3 uses "popo".
+            popCtrlPairs.putPair("sigalgo", pairs.value(n));
           } else {
             cmpCtrlPairs.putPair(n, pairs.value(n));
           }
@@ -308,7 +308,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       if (StringUtil.isNotBlank(str)) {
         ConfPairs pairs = new ConfPairs(cmpControl);
         for (String n : pairs.names()) {
-          popoCtrlPairs.putPair("dh." + n, pairs.value(n));
+          popCtrlPairs.putPair("dh." + n, pairs.value(n));
         }
       }
 
@@ -316,8 +316,8 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         conf.setCmpControl(cmpCtrlPairs.asMap());
       }
 
-      if (!popoCtrlPairs.isEmpty()) {
-        conf.setPopoControl(popoCtrlPairs.asMap());
+      if (!popCtrlPairs.isEmpty()) {
+        conf.setPopControl(popCtrlPairs.asMap());
       }
     } else {
       String encodedConf = rs.getString("CONF");
@@ -500,15 +500,14 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       String encodedExtraCtrl = (extraControl == null) ? null : extraControl.getEncoded();
       RevokeSuspendedControl revokeSuspended = caEntry.getRevokeSuspendedControl();
 
-      // handle the CMP contol an DHPOC_CONTROL
       // adapt the configuration
-      PopoControl popoCtrl = caEntry.getPopoControl();
+      PopControl popCtrl = caEntry.getPopControl();
 
       String cmpCtrlText = null;
       String dhPopCtrlText = null;
 
-      if (popoCtrl != null) {
-        ConfPairs pairs = popoCtrl.getConfPairs();
+      if (popCtrl != null) {
+        ConfPairs pairs = popCtrl.getConfPairs();
 
         CmpControl cmpControl = caEntry.getCmpControl();
         ConfPairs cmpPairs = cmpControl == null ? new ConfPairs() : cmpControl.getConfPairs();
@@ -521,7 +520,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
           } else if (n.startsWith("dh.")) {
             dhpopPairs.putPair(n.substring(3), pairs.value(n));
           } else {
-            LOG.warn("unsupported POPO_CONTROL entry {}: {}", n, pairs.value(n));
+            LOG.warn("unsupported POP control entry {}: {}", n, pairs.value(n));
           }
         }
 
@@ -627,8 +626,8 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         cc.setValidityMode(caEntry.getValidityMode().name());
       }
 
-      if (caEntry.getPopoControl() != null) {
-        cc.setPopoControl(caEntry.getPopoControl().getConfPairs().asMap());
+      if (caEntry.getPopControl() != null) {
+        cc.setPopControl(caEntry.getPopControl().getConfPairs().asMap());
       }
 
       // add to cols
@@ -960,25 +959,25 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
 
       // Dapt: CMP Control and DHPOP Control
       String cmpCtrlText = changeCaEntry.getCmpControl();
-      String popoCtrlText = changeCaEntry.getPopoControl();
+      String popCtrlText = changeCaEntry.getPopControl();
 
-      ConfPairs popoCtrlPairs = null;
-      if (StringUtil.isNotBlank(popoCtrlText)) {
-        popoCtrlPairs = new ConfPairs(changeCaEntry.getPopoControl());
+      ConfPairs popCtrlPairs = null;
+      if (StringUtil.isNotBlank(popCtrlText)) {
+        popCtrlPairs = new ConfPairs(changeCaEntry.getPopControl());
       }
 
       ConfPairs cmpPairs = new ConfPairs(CaManager.NULL.equals(cmpCtrlText) ? null : cmpCtrlText);
       ConfPairs dhpopPairs = new ConfPairs();
 
       // adapt CMP control
-      if (popoCtrlPairs != null) {
-        for (String n : popoCtrlPairs.names()) {
+      if (popCtrlPairs != null) {
+        for (String n : popCtrlPairs.names()) {
           if ("sigalgo".equals(n)) {
-            cmpPairs.putPair("popo.sigalgo", popoCtrlPairs.value(n));
+            cmpPairs.putPair("popo.sigalgo", popCtrlPairs.value(n));
           } else if (n.startsWith("dh.")) {
-            dhpopPairs.putPair(n.substring(3), popoCtrlPairs.value(n));
+            dhpopPairs.putPair(n.substring(3), popCtrlPairs.value(n));
           } else {
-            LOG.warn("unsupported POPO_CONTROL entry {}: {}", n, popoCtrlPairs.value(n));
+            LOG.warn("unsupported POP entry {}: {}", n, popCtrlPairs.value(n));
           }
         }
       }
@@ -1210,12 +1209,12 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       }
     }
 
-    str = changeCaEntry.getPopoControl();
+    str = changeCaEntry.getPopControl();
     if (str != null) {
       if (CaManager.NULL.equalsIgnoreCase(str)) {
-        newCC.setPopoControl(null);
+        newCC.setPopControl(null);
       } else {
-        newCC.setPopoControl(new ConfPairs(str).asMap());
+        newCC.setPopControl(new ConfPairs(str).asMap());
       }
     }
 

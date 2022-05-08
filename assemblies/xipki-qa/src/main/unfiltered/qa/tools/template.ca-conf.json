@@ -52,9 +52,11 @@
 				"messagetime.bias":300,
 				"rr.aki.required":true,
 				"group.enroll":true,
-				"protection.sigalgo":"SHA256withRSA:SHA256withECDSA",
-				"popo.sigalgo":"SHA256withRSA:SHA256withECDSA:SHA256withDSA:SM3withSM2:ED25519:ED448:DHPOP-X25519"
+				"protection.sigalgo":"SHA256withRSA:SHA256withECDSA"
 			},
+                        "popControl":{
+                                "value":"sigalgo=SHA256withRSA:SHA256withECDSA:SHA256withDSA:SM3withSM2:ED25519:ED448:DHPOP-X25519"
+                        },
 			"cmpResponderName":"responder1",
 			"crlControl":{
 				"interval.hours": 24,

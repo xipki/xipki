@@ -527,7 +527,7 @@ public class CrlStreamParser extends Asn1StreamParser {
 
       return verifier.verify(this.getSignature());
     } catch (InvalidKeyException | OperatorCreationException ex) {
-      LogUtil.error(LOG, ex, "could not validate POPO of CSR");
+      LogUtil.error(LOG, ex, "could not validate POP of CSR");
       return false;
     }
   } // method verifySignature

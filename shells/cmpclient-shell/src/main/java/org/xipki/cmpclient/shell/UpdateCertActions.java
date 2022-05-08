@@ -370,7 +370,7 @@ public class UpdateCertActions {
 
   public abstract static class UpdateCertAction extends UpdateAction {
 
-    @Option(name = "--hash", description = "hash algorithm name for the POPO computation")
+    @Option(name = "--hash", description = "hash algorithm name for the POP computation")
     protected String hashAlgo = "SHA256";
 
     @Option(name = "--outform", description = "output format of the certificate")
@@ -383,17 +383,17 @@ public class UpdateCertActions {
     private String outputFile;
 
     @Option(name = "--rsa-pss",
-        description = "whether to use the RSAPSS for the POPO computation\n"
+        description = "whether to use the RSAPSS for the POP computation\n"
             + "(only applied to RSA key)")
     private Boolean rsaPss = Boolean.FALSE;
 
     @Option(name = "--dsa-plain",
-        description = "whether to use the Plain DSA for the POPO computation\n"
+        description = "whether to use the Plain DSA for the POP computation\n"
             + "(only applied to DSA and ECDSA key)")
     private Boolean dsaPlain = Boolean.FALSE;
 
     @Option(name = "--gm",
-        description = "whether to use the chinese GM algorithm for the POPO computation\n"
+        description = "whether to use the chinese GM algorithm for the POP computation\n"
             + "(only applied to EC key with GM curves)")
     private Boolean gm = Boolean.FALSE;
 
@@ -425,21 +425,21 @@ public class UpdateCertActions {
             throws Exception {
       ConcurrentContentSigner signer = getSigner();
 
-      ProofOfPossessionSigningKeyBuilder popoBuilder =
+      ProofOfPossessionSigningKeyBuilder popBuilder =
           new ProofOfPossessionSigningKeyBuilder(certRequest);
       ConcurrentBagEntrySigner signer0 = signer.borrowSigner();
-      POPOSigningKey popoSk;
+      POPOSigningKey popSk;
       try {
-        popoSk = popoBuilder.build(signer0.value());
+        popSk = popBuilder.build(signer0.value());
       } finally {
         signer.requiteSigner(signer0);
       }
 
-      ProofOfPossession popo = new ProofOfPossession(popoSk);
+      ProofOfPossession pop = new ProofOfPossession(popSk);
       final boolean caGenKeypair = false;
       final boolean kup = true;
 
-      return new EnrollCertRequest.Entry(id, profile, certRequest, popo, caGenKeypair, kup);
+      return new EnrollCertRequest.Entry(id, profile, certRequest, pop, caGenKeypair, kup);
     } // method buildEnrollCertRequestEntry
 
     @Override

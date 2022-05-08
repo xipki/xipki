@@ -807,11 +807,11 @@ public final class CmpClientImpl implements CmpClient {
   }
 
   @Override
-  public List<X509Cert> getDhPopoPeerCertificates(String caName)
+  public List<X509Cert> getDhPopPeerCertificates(String caName)
       throws CmpClientException {
     initIfNotInitialized();
     CaConf ca = configurer.getCaConf(caName);
-    return ca == null ? null : ca.getDhpopoCerts();
+    return ca == null ? null : ca.getDhpopCerts();
   }
 
 }

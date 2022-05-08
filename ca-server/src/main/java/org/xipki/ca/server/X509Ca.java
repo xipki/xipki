@@ -205,10 +205,10 @@ public class X509Ca extends X509CaModule implements Closeable {
     return caInfo.getCmpControl();
   }
 
-  public AlgorithmValidator getPopoAlgoValidator() {
-    return caInfo.getPopoControl() == null
+  public AlgorithmValidator getPopAlgoValidator() {
+    return caInfo.getPopControl() == null
         ? CollectionAlgorithmValidator.INSTANCE
-        : caInfo.getPopoControl().getPopoAlgoValidator();
+        : caInfo.getPopControl().getPopAlgoValidator();
   }
 
   public X509Cert getCert(BigInteger serialNumber)
@@ -255,7 +255,7 @@ public class X509Ca extends X509CaModule implements Closeable {
   public boolean verifyCsr(CertificationRequest csr) {
     notNull(csr, "csr");
     return CaUtil.verifyCsr(csr, caManager.getSecurityFactory(),
-            caInfo.getPopoControl());
+            caInfo.getPopControl());
   }
 
   public List<CertListInfo> listCerts(X500Name subjectPattern, Date validFrom,

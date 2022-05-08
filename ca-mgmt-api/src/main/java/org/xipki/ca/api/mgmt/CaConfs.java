@@ -187,12 +187,12 @@ public class CaConfs {
               }
             }
 
-            // POPO Control
-            if (ci.getPopoControl() != null) {
-              FileOrValue fv = ci.getPopoControl();
+            // POP Control
+            if (ci.getPopControl() != null) {
+              FileOrValue fv = ci.getPopControl();
               String conf = convertSignerConf(fv, properties, baseDir);
               if (conf.length() > 200) {
-                String zipEntryName = "files/ca-" + name + "-popo.conf";
+                String zipEntryName = "files/ca-" + name + "-pop.conf";
                 createFileOrValue(zipStream, conf, zipEntryName);
                 fv.setFile(zipEntryName);
                 fv.setValue(null);

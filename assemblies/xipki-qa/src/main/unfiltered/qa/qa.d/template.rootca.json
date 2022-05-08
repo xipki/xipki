@@ -261,7 +261,7 @@
 				"group.enroll":true,
 				"protection.sigalgo":"REPLACEME-CMP_SIGALGO"
 			},
-			"popoControl":{
+			"popControl":{
 				"value":"sigalgo=REPLACEME-SIGALGO:REPLACEME-HASHwithRSA:REPLACEME-HASHwithECDSA:REPLACEME-HASHwithDSA:SM3withSM2"
 			},
 			"crlControl":{

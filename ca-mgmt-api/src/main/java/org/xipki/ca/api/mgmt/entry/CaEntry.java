@@ -68,7 +68,7 @@ public class CaEntry extends MgmtEntry {
 
   private String signerConf;
 
-  private PopoControl popoControl;
+  private PopControl popControl;
 
   private ScepControl scepControl;
 
@@ -233,12 +233,12 @@ public class CaEntry extends MgmtEntry {
     return crlControl;
   }
 
-  public synchronized PopoControl getPopoControl() {
-    return popoControl;
+  public synchronized PopControl getPopControl() {
+    return popControl;
   }
 
-  public void setPopoControl(PopoControl popoControl) {
-    this.popoControl = popoControl;
+  public void setPopControl(PopControl popControl) {
+    this.popControl = popControl;
   }
 
   public void setScepControl(ScepControl scepControl) {
@@ -412,8 +412,8 @@ public class CaEntry extends MgmtEntry {
         "\nsigner type: ", signerType,
         "\nsigner conf: ", (signerConf == null ? "null"
             : SignerEntry.signerConfToString(signerConf, verbose, ignoreSensitiveInfo)),
-        "\nPOPO control: ", (popoControl == null ? "null"
-            : SignerEntry.signerConfToString(popoControl.getConf(),
+        "\nPOP control: ", (popControl == null ? "null"
+            : SignerEntry.signerConfToString(popControl.getConf(),
                 verbose, ignoreSensitiveInfo)),
         "\nCMP control:\n", (cmpControl == null ? "  null" : cmpControl.toString(verbose)),
         "\nCRL control:\n", (crlControl == null ? "  null" : crlControl.toString(verbose)),
@@ -485,7 +485,7 @@ public class CaEntry extends MgmtEntry {
         && CompareUtil.equalsObject(crlControl, obj.crlControl)
         && CompareUtil.equalsObject(crlSignerName, obj.crlSignerName)
         && CompareUtil.equalsObject(ctlogControl, obj.ctlogControl)
-        && CompareUtil.equalsObject(popoControl, obj.popoControl)
+        && CompareUtil.equalsObject(popControl, obj.popControl)
         && (expirationPeriod == obj.expirationPeriod)
         && CompareUtil.equalsObject(extraControl, obj.extraControl)
         && ident.equals(obj.ident, ignoreId)

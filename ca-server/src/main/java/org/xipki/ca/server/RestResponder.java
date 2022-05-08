@@ -33,7 +33,7 @@ import org.xipki.ca.api.*;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.PermissionConstants;
-import org.xipki.ca.api.mgmt.PopoControl;
+import org.xipki.ca.api.mgmt.PopControl;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.server.cmp.CmpResponder;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
@@ -307,8 +307,8 @@ public class RestResponder {
           respBytes = ca.getCaInfo().getCert().getEncoded();
           break;
         }
-        case CMD_popo_dh_certs: {
-          PopoControl control = responderManager.getX509Ca(caName).getCaInfo().getPopoControl();
+        case CMD_pop_dh_certs: {
+          PopControl control = responderManager.getX509Ca(caName).getCaInfo().getPopControl();
           respBytes = new byte[0];
 
           if (control != null) {
@@ -390,7 +390,7 @@ public class RestResponder {
               request = X509Util.toDerEncoded(request);
 
               // The PKCS#10 will only be used for transport of subject and extensions.
-              // The associated key will not be used, so the verification of POPO is skipped.
+              // The associated key will not be used, so the verification of POP is skipped.
               CertificationRequestInfo certTemp =
                       CertificationRequest.getInstance(request).getCertificationRequestInfo();
               subject = certTemp.getSubject();

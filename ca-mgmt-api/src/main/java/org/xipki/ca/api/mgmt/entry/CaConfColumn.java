@@ -120,7 +120,7 @@ public class CaConfColumn {
    * Proof-of-Possession Control
    */
   @JSONField(ordinal = 49)
-  private Map<String, String> popoControl;
+  private Map<String, String> popControl;
 
   /**
    * Extra control.
@@ -320,12 +320,12 @@ public class CaConfColumn {
     this.keepExpiredCertDays = keepExpiredCertDays;
   }
 
-  public Map<String, String> getPopoControl() {
-    return popoControl;
+  public Map<String, String> getPopControl() {
+    return popControl;
   }
 
-  public void setPopoControl(Map<String, String> popoControl) {
-    this.popoControl = popoControl;
+  public void setPopControl(Map<String, String> popControl) {
+    this.popControl = popControl;
   }
 
   public Map<String, String> getExtraControl() {
@@ -346,7 +346,7 @@ public class CaConfColumn {
   }
 
   public void fillCaEntry(CaEntry entry) throws CaMgmtException {
-    entry.setPopoControl(popoControl());
+    entry.setPopControl(popControl());
     entry.setRevokeSuspendedControl(revokeSuspendedControl());
     entry.setMaxValidity(maxValidity());
     entry.setKeepExpiredCertInDays(keepExpiredCertDays);
@@ -437,12 +437,12 @@ public class CaConfColumn {
     }
   }
 
-  private PopoControl popoControl() throws CaMgmtException {
-    ConfPairs pairs = new ConfPairs(popoControl);
+  private PopControl popControl() throws CaMgmtException {
+    ConfPairs pairs = new ConfPairs(popControl);
     try {
-      return new PopoControl(pairs);
+      return new PopControl(pairs);
     } catch (InvalidConfException ex) {
-      throw new CaMgmtException("invalid POPO_CONTROL: " + pairs.getEncoded(), ex);
+      throw new CaMgmtException("invalid POP_CONTROL: " + pairs.getEncoded(), ex);
     }
   }
 

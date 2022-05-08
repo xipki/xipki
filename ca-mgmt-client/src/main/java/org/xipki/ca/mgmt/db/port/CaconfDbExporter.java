@@ -452,14 +452,14 @@ class CaconfDbExporter extends DbPorter {
           String cmpControl = rs.getString("CMP_CONTROL");
           // Util version 6
           ConfPairs cmpCtrlPairs = new ConfPairs();
-          ConfPairs popoCtrlPairs = new ConfPairs();
+          ConfPairs popCtrlPairs = new ConfPairs();
 
           // adapt the configuration
           if (cmpControl != null) {
             ConfPairs pairs = new ConfPairs(cmpControl);
             for (String n : pairs.names()) {
               if ("popo.sigalgo".equals(n)) {
-                popoCtrlPairs.putPair("sigalgo", pairs.value(n));
+                popCtrlPairs.putPair("sigalgo", pairs.value(n));
               } else {
                 cmpCtrlPairs.putPair(n, pairs.value(n));
               }
@@ -470,7 +470,7 @@ class CaconfDbExporter extends DbPorter {
           if (StringUtil.isNotBlank(str)) {
             ConfPairs pairs = new ConfPairs(cmpControl);
             for (String n : pairs.names()) {
-              popoCtrlPairs.putPair("dh." + n, pairs.value(n));
+              popCtrlPairs.putPair("dh." + n, pairs.value(n));
             }
           }
 
@@ -478,8 +478,8 @@ class CaconfDbExporter extends DbPorter {
             ccc.setCmpControl(cmpCtrlPairs.asMap());
           }
 
-          if (!popoCtrlPairs.isEmpty()) {
-            ccc.setPopoControl(popoCtrlPairs.asMap());
+          if (!popCtrlPairs.isEmpty()) {
+            ccc.setPopControl(popCtrlPairs.asMap());
           }
 
           ccc.setKeypairGenNames(Arrays.asList("software"));
@@ -523,7 +523,7 @@ class CaconfDbExporter extends DbPorter {
 
     private String ctlogControl;
 
-    private String popoControl;
+    private String popControl;
 
     private String revokeSuspendedControl;
 

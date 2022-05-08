@@ -257,8 +257,8 @@ public class CaInfo {
     return caEntry.getCtlogControl();
   }
 
-  public PopoControl getPopoControl() {
-    return caEntry.getPopoControl();
+  public PopControl getPopControl() {
+    return caEntry.getPopControl();
   }
 
   public String getScepResponderName() {

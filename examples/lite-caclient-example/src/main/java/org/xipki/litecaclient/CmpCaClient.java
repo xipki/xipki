@@ -392,12 +392,12 @@ public abstract class CmpCaClient implements Closeable {
       certTemplateBuilder.setPublicKey(publicKeyInfo[i]);
       CertRequest certReq = new CertRequest(new ASN1Integer(certReqIds[i]),
           certTemplateBuilder.build(), null);
-      ProofOfPossessionSigningKeyBuilder popoBuilder
+      ProofOfPossessionSigningKeyBuilder popBuilder
           = new ProofOfPossessionSigningKeyBuilder(certReq);
-      ContentSigner popoSigner = buildSigner(privateKey[i]);
-      POPOSigningKey popoSk = popoBuilder.build(popoSigner);
-      ProofOfPossession popo = new ProofOfPossession(popoSk);
-      certReqMsgs[i] = new CertReqMsg(certReq, popo, null);
+      ContentSigner popSigner = buildSigner(privateKey[i]);
+      POPOSigningKey popSk = popBuilder.build(popSigner);
+      ProofOfPossession pop = new ProofOfPossession(popSk);
+      certReqMsgs[i] = new CertReqMsg(certReq, pop, null);
     }
 
     PKIBody body = new PKIBody(PKIBody.TYPE_CERT_REQ, new CertReqMessages(certReqMsgs));
@@ -519,13 +519,13 @@ public abstract class CmpCaClient implements Closeable {
           new AttributeTypeAndValue(CMPObjectIdentifiers.regCtrl_oldCertID, certId));
       CertRequest certReq = new CertRequest(new ASN1Integer(certReqIds[i]),
           certTemplateBuilder.build(), controls);
-      ProofOfPossessionSigningKeyBuilder popoBuilder
+      ProofOfPossessionSigningKeyBuilder popBuilder
           = new ProofOfPossessionSigningKeyBuilder(certReq);
-      ContentSigner popoSigner = buildSigner(privateKey[i]);
-      POPOSigningKey popoSk = popoBuilder.build(popoSigner);
-      ProofOfPossession popo = new ProofOfPossession(popoSk);
+      ContentSigner popSigner = buildSigner(privateKey[i]);
+      POPOSigningKey popSk = popBuilder.build(popSigner);
+      ProofOfPossession pop = new ProofOfPossession(popSk);
 
-      certReqMsgs[i] = new CertReqMsg(certReq, popo, null);
+      certReqMsgs[i] = new CertReqMsg(certReq, pop, null);
     }
 
     PKIBody body = new PKIBody(PKIBody.TYPE_KEY_UPDATE_REQ, new CertReqMessages(certReqMsgs));

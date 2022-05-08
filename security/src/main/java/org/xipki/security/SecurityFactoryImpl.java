@@ -134,7 +134,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
   }
 
   @Override
-  public boolean verifyPopo(PKCS10CertificationRequest csr, AlgorithmValidator algoValidator,
+  public boolean verifyPop(PKCS10CertificationRequest csr, AlgorithmValidator algoValidator,
       DHSigStaticKeyCertPair ownerKeyAndCert) {
     if (algoValidator == null) {
       algoValidator = CollectionAlgorithmValidator.INSTANCE;
@@ -150,7 +150,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         algoName = algId.getAlgorithm().getId();
       }
 
-      LOG.error("POPO signature algorithm {} not permitted", algoName);
+      LOG.error("POP signature algorithm {} not permitted", algoName);
       return false;
     }
 
@@ -161,10 +161,10 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
       ContentVerifierProvider cvp = getContentVerifierProvider(pk, ownerKeyAndCert);
       return csr.isSignatureValid(cvp);
     } catch (InvalidKeyException | PKCSException | InvalidKeySpecException ex) {
-      LogUtil.error(LOG, ex, "could not validate POPO of CSR");
+      LogUtil.error(LOG, ex, "could not validate POP of CSR");
       return false;
     }
-  } // method verifyPopo
+  } // method verifyPop
 
   @Override
   public int getDfltSignerParallelism() {

@@ -50,27 +50,27 @@ public class EnrollCertRequest {
 
     private final CertRequest certReq;
 
-    private final ProofOfPossession popo;
+    private final ProofOfPossession pop;
 
     public Entry(String id, String certprofile, CertRequest certReq,
-        ProofOfPossession popo) {
+        ProofOfPossession pop) {
       super(id);
 
       this.certprofile = Args.notBlank(certprofile, "certprofile");
       this.certReq = Args.notNull(certReq, "certReq");
-      this.popo = Args.notNull(popo, "popo");
+      this.pop = Args.notNull(pop, "pop");
     }
 
     public Entry(String id, String certprofile, CertRequest certReq,
-        ProofOfPossession popo, boolean caGenerateKeypair, boolean kup) {
+        ProofOfPossession pop, boolean caGenerateKeypair, boolean kup) {
       super(id);
 
       this.certprofile = kup ? certprofile : Args.notBlank(certprofile, "certprofile");
       this.certReq = Args.notNull(certReq, "certReq");
       if (!caGenerateKeypair) {
-        Args.notNull(popo, "popo");
+        Args.notNull(pop, "pop");
       }
-      this.popo = popo;
+      this.pop = pop;
     }
 
     public String getCertprofile() {
@@ -81,8 +81,8 @@ public class EnrollCertRequest {
       return certReq;
     }
 
-    public ProofOfPossession getPopo() {
-      return popo;
+    public ProofOfPossession getPop() {
+      return pop;
     }
 
   } // class Entry

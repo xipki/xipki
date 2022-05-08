@@ -622,20 +622,20 @@ class CmpAgentUtil {
         caCertchain.add(caCert);
       }
 
-      // DHPopos
-      array = root.getJSONArray("dhpopos");
-      List<X509Cert> dhpopos = null;
+      // DHPops
+      array = root.getJSONArray("dhpops");
+      List<X509Cert> dhpops = null;
       if (array != null) {
-        dhpopos = new LinkedList<>();
+        dhpops = new LinkedList<>();
         for (int i = 0; i < array.size(); i++) {
           String base64Cert = array.getString(i);
           X509Cert caCert;
           try {
             caCert = X509Util.parseCert(StringUtil.toUtf8Bytes(base64Cert));
           } catch (CertificateException ex) {
-            throw new CmpClientException("could no parse the DHPopo (certificate)", ex);
+            throw new CmpClientException("could no parse the DHPop (certificate)", ex);
           }
-          dhpopos.add(caCert);
+          dhpops.add(caCert);
         }
       }
 
@@ -668,7 +668,7 @@ class CmpAgentUtil {
       }
 
       LOG.info("CA {} supports profiles {}", caName, profileNames);
-      return new CaConf.CaInfo(caCertchain, cmpControl, profiles, dhpopos);
+      return new CaConf.CaInfo(caCertchain, cmpControl, profiles, dhpops);
     } else {
       throw new CmpClientException("unknown CAInfo version " + version);
     }

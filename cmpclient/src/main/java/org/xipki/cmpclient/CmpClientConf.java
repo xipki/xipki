@@ -52,7 +52,7 @@ public class CmpClientConf extends ValidatableConf {
 
     private Certs caCertchain;
 
-    private Certs dhpopoCerts;
+    private Certs dhpopCerts;
 
     private Certprofiles certprofiles;
 
@@ -120,12 +120,12 @@ public class CmpClientConf extends ValidatableConf {
       this.caCertchain = caCertchain;
     }
 
-    public Certs getDhpopoCerts() {
-      return dhpopoCerts;
+    public Certs getDhpopCerts() {
+      return dhpopCerts;
     }
 
-    public void setDhpopoCerts(Certs dhpopoCerts) {
-      this.dhpopoCerts = dhpopoCerts;
+    public void setDhpopCerts(Certs dhpopCerts) {
+      this.dhpopCerts = dhpopCerts;
     }
 
     public Certprofiles getCertprofiles() {
@@ -146,7 +146,7 @@ public class CmpClientConf extends ValidatableConf {
       validate(cmpcontrol);
       validate(caCertchain);
       validate(certprofiles);
-      validate(dhpopoCerts);
+      validate(dhpopCerts);
     }
 
   } // class Ca

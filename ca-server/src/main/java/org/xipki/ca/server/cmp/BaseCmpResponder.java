@@ -812,15 +812,15 @@ abstract class BaseCmpResponder {
       }
     }
 
-    PopoControl popoControl = ca.getCaInfo().getPopoControl();
-    if (popoControl != null) {
-      X509Cert[] certs = popoControl.getDhCertificates();
+    PopControl popControl = ca.getCaInfo().getPopControl();
+    if (popControl != null) {
+      X509Cert[] certs = popControl.getDhCertificates();
       if (certs != null) {
-        List<byte[]> popoDhCerts = new LinkedList<>();
+        List<byte[]> popDhCerts = new LinkedList<>();
         for (X509Cert m : certs) {
-          popoDhCerts.add(m.getEncoded());
+          popDhCerts.add(m.getEncoded());
         }
-        root.put("dhpopos", popoDhCerts);
+        root.put("dhpops", popDhCerts);
       }
     }
 
@@ -857,10 +857,10 @@ abstract class BaseCmpResponder {
     resps.add(new CertResponse(certReqId, generateRejectionStatus(pkiFailureInfo, pkiStatusText)));
   }
 
-  protected boolean verifyPopo(CertificateRequestMessage certRequest, SubjectPublicKeyInfo spki,
-      boolean allowRaPopo) {
+  protected boolean verifyPop(CertificateRequestMessage certRequest, SubjectPublicKeyInfo spki,
+      boolean allowRaPop) {
     int popType = certRequest.getProofOfPossessionType();
-    if (popType == CertificateRequestMessage.popRaVerified && allowRaPopo) {
+    if (popType == CertificateRequestMessage.popRaVerified && allowRaPop) {
       return true;
     }
 
@@ -870,34 +870,34 @@ abstract class BaseCmpResponder {
     }
 
     // check the POP signature algorithm
-    ProofOfPossession pop = certRequest.toASN1Structure().getPopo();
-    POPOSigningKey popoSign = POPOSigningKey.getInstance(pop.getObject());
-    SignAlgo popoAlg;
+    ProofOfPossession pop = certRequest.toASN1Structure().getPop();
+    POPOSigningKey popSign = POPOSigningKey.getInstance(pop.getObject());
+    SignAlgo popAlg;
     try {
-      popoAlg = SignAlgo.getInstance(popoSign.getAlgorithmIdentifier());
+      popAlg = SignAlgo.getInstance(popSign.getAlgorithmIdentifier());
     } catch (NoSuchAlgorithmException ex) {
-      LogUtil.error(LOG, ex, "Cannot parse POPO signature algorithm");
+      LogUtil.error(LOG, ex, "Cannot parse POP signature algorithm");
       return false;
     }
 
-    AlgorithmValidator algoValidator = getCa().getPopoAlgoValidator();
-    if (!algoValidator.isAlgorithmPermitted(popoAlg)) {
-      LOG.error("POPO signature algorithm {} not permitted", popoAlg.getJceName());
+    AlgorithmValidator algoValidator = getCa().getPopAlgoValidator();
+    if (!algoValidator.isAlgorithmPermitted(popAlg)) {
+      LOG.error("POP signature algorithm {} not permitted", popAlg.getJceName());
       return false;
     }
 
     try {
       PublicKey publicKey = securityFactory.generatePublicKey(spki);
-      PopoControl popoControl = getCa().getCaInfo().getPopoControl();
+      PopControl popControl = getCa().getCaInfo().getPopControl();
 
       DHSigStaticKeyCertPair kaKeyAndCert = null;
-      if (SignAlgo.DHPOP_X25519 == popoAlg || SignAlgo.DHPOP_X448 == popoAlg) {
-        if (popoControl != null) {
-          DhSigStatic dhSigStatic = DhSigStatic.getInstance(popoSign.getSignature().getBytes());
+      if (SignAlgo.DHPOP_X25519 == popAlg || SignAlgo.DHPOP_X448 == popAlg) {
+        if (popControl != null) {
+          DhSigStatic dhSigStatic = DhSigStatic.getInstance(popSign.getSignature().getBytes());
           IssuerAndSerialNumber isn = dhSigStatic.getIssuerAndSerial();
 
           ASN1ObjectIdentifier keyAlgOid = spki.getAlgorithm().getAlgorithm();
-          kaKeyAndCert = popoControl.getDhKeyCertPair(isn.getName(),
+          kaKeyAndCert = popControl.getDhKeyCertPair(isn.getName(),
               isn.getSerialNumber().getValue(), EdECConstants.getName(keyAlgOid));
         }
 
@@ -913,7 +913,7 @@ abstract class BaseCmpResponder {
       LogUtil.error(LOG, ex);
     }
     return false;
-  } // method verifyPopo
+  } // method verifyPop
 
   protected static CertResponse postProcessException(ASN1Integer certReqId, OperationException ex) {
     ErrorCode code = ex.getErrorCode();

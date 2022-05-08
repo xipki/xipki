@@ -585,11 +585,11 @@ class ConfLoader {
                 new HashMap<>(new ConfPairs(entry.getCtlogControl().getConf()).asMap()));
           }
 
-          if (entry.getPopoControl() != null) {
+          if (entry.getPopControl() != null) {
             FileOrValue fv = createFileOrValue(
-                zipStream, entry.getPopoControl().getConf(),
-                concat("files/ca-", name, "-popo.conf"));
-            caInfoType.setPopoControl(fv);
+                zipStream, entry.getPopControl().getConf(),
+                concat("files/ca-", name, "-pop.conf"));
+            caInfoType.setPopControl(fv);
           }
 
           caInfoType.setExpirationPeriod(entry.getExpirationPeriod());

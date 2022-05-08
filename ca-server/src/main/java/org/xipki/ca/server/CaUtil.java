@@ -32,7 +32,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.*;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.PermissionConstants;
-import org.xipki.ca.api.mgmt.PopoControl;
+import org.xipki.ca.api.mgmt.PopControl;
 import org.xipki.ca.api.profile.Certprofile.CertLevel;
 import org.xipki.ca.api.profile.SubjectDnSpec;
 import org.xipki.password.PasswordResolverException;
@@ -205,9 +205,9 @@ public class CaUtil {
   } // method sortX509Name
 
   public static boolean verifyCsr(CertificationRequest csr, SecurityFactory securityFactory,
-      PopoControl popoControl) {
+      PopControl popControl) {
     notNull(csr, "csr");
-    notNull(popoControl, "popoControl");
+    notNull(popControl, "popControl");
 
     ASN1ObjectIdentifier algOid = csr.getSignatureAlgorithm().getAlgorithm();
 
@@ -219,7 +219,7 @@ public class CaUtil {
 
       ASN1ObjectIdentifier keyOid = csr.getCertificationRequestInfo().getSubjectPublicKeyInfo()
           .getAlgorithm().getAlgorithm();
-      kaKeyAndCert = popoControl.getDhKeyCertPair(isn.getName(), isn.getSerialNumber().getValue(),
+      kaKeyAndCert = popControl.getDhKeyCertPair(isn.getName(), isn.getSerialNumber().getValue(),
           EdECConstants.getName(keyOid));
 
       if (kaKeyAndCert == null) {
@@ -227,9 +227,9 @@ public class CaUtil {
       }
     }
 
-    AlgorithmValidator popoValidator = popoControl.getPopoAlgoValidator();
+    AlgorithmValidator popValidator = popControl.getPopAlgoValidator();
 
-    return securityFactory.verifyPopo(csr, popoValidator, kaKeyAndCert);
+    return securityFactory.verifyPop(csr, popValidator, kaKeyAndCert);
   } // method verifyCsr
 
   private static RDN[] getRdns(RDN[] rdns, ASN1ObjectIdentifier type) {
