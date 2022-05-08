@@ -23,9 +23,9 @@ import iaik.pkcs.pkcs11.objects.Certificate.CertificateType;
 import iaik.pkcs.pkcs11.objects.*;
 import iaik.pkcs.pkcs11.objects.Key.KeyType;
 import iaik.pkcs.pkcs11.wrapper.Functions;
-import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.x9.ECNamedCurveTable;
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.util.encoders.Hex;
@@ -57,6 +57,7 @@ import static org.xipki.security.pkcs11.iaik.IaikP11SlotUtil.*;
 import static org.xipki.util.Args.notNull;
 import static org.xipki.util.Args.positive;
 import static org.xipki.util.CollectionUtil.isEmpty;
+import static iaik.pkcs.pkcs11.wrapper.PKCS11Constants.*;
 
 /**
  * {@link P11Slot} based on the IAIK PKCS#11 wrapper.
@@ -200,15 +201,15 @@ class IaikP11Slot extends P11Slot {
       for (Mechanism mech : mechanisms) {
         long code = mech.getMechanismCode();
         if (smartcard) {
-          if (code == PKCS11Constants.CKM_ECDSA_SHA1 ||
-              code == PKCS11Constants.CKM_ECDSA_SHA224 ||
-              code == PKCS11Constants.CKM_ECDSA_SHA256 ||
-              code == PKCS11Constants.CKM_ECDSA_SHA384 ||
-              code == PKCS11Constants.CKM_ECDSA_SHA512 ||
-              code == PKCS11Constants.CKM_ECDSA_SHA3_224 ||
-              code == PKCS11Constants.CKM_ECDSA_SHA3_256 ||
-              code == PKCS11Constants.CKM_ECDSA_SHA3_384 ||
-              code == PKCS11Constants.CKM_ECDSA_SHA3_512) {
+          if (code == CKM_ECDSA_SHA1 ||
+              code == CKM_ECDSA_SHA224 ||
+              code == CKM_ECDSA_SHA256 ||
+              code == CKM_ECDSA_SHA384 ||
+              code == CKM_ECDSA_SHA512 ||
+              code == CKM_ECDSA_SHA3_224 ||
+              code == CKM_ECDSA_SHA3_256 ||
+              code == CKM_ECDSA_SHA3_384 ||
+              code == CKM_ECDSA_SHA3_512) {
             ignoreMechs.append(Functions.getMechanismDescription(code)).append(", ");
           } else {
             ret.addMechanism(code);
@@ -413,15 +414,15 @@ class IaikP11Slot extends P11Slot {
     }
 
     int digestLen;
-    if (PKCS11Constants.CKM_SHA_1 == mech) {
+    if (CKM_SHA_1 == mech) {
       digestLen = 20;
-    } else if (PKCS11Constants.CKM_SHA224 == mech || PKCS11Constants.CKM_SHA3_224 == mech) {
+    } else if (CKM_SHA224 == mech || CKM_SHA3_224 == mech) {
       digestLen = 28;
-    } else if (PKCS11Constants.CKM_SHA256 == mech || PKCS11Constants.CKM_SHA3_256 == mech) {
+    } else if (CKM_SHA256 == mech || CKM_SHA3_256 == mech) {
       digestLen = 32;
-    } else if (PKCS11Constants.CKM_SHA384 == mech || PKCS11Constants.CKM_SHA3_384 == mech) {
+    } else if (CKM_SHA384 == mech || CKM_SHA3_384 == mech) {
       digestLen = 48;
-    } else if (PKCS11Constants.CKM_SHA512 == mech || PKCS11Constants.CKM_SHA3_512 == mech) {
+    } else if (CKM_SHA512 == mech || CKM_SHA3_512 == mech) {
       digestLen = 64;
     } else {
       throw new P11TokenException("unsupported mechnism " + mech);
@@ -435,7 +436,7 @@ class IaikP11Slot extends P11Slot {
       try {
         return IaikP11SlotUtil.digestKey(session, digestLen, mechanismObj, (SecretKey) key);
       } catch (PKCS11Exception ex) {
-        if (ex.getErrorCode() != PKCS11Constants.CKR_USER_NOT_LOGGED_IN) {
+        if (ex.getErrorCode() != CKR_USER_NOT_LOGGED_IN) {
           throw new P11TokenException(ex.getMessage(), ex);
         }
 
@@ -461,15 +462,15 @@ class IaikP11Slot extends P11Slot {
     assertMechanismSupported(mech);
 
     int expectedSignatureLen;
-    if (mech == PKCS11Constants.CKM_SHA_1_HMAC) {
+    if (mech == CKM_SHA_1_HMAC) {
       expectedSignatureLen = 20;
-    } else if (mech == PKCS11Constants.CKM_SHA224_HMAC || mech == PKCS11Constants.CKM_SHA3_224) {
+    } else if (mech == CKM_SHA224_HMAC || mech == CKM_SHA3_224) {
       expectedSignatureLen = 28;
-    } else if (mech == PKCS11Constants.CKM_SHA256_HMAC || mech == PKCS11Constants.CKM_SHA3_256) {
+    } else if (mech == CKM_SHA256_HMAC || mech == CKM_SHA3_256) {
       expectedSignatureLen = 32;
-    } else if (mech == PKCS11Constants.CKM_SHA384_HMAC || mech == PKCS11Constants.CKM_SHA3_384) {
+    } else if (mech == CKM_SHA384_HMAC || mech == CKM_SHA3_384) {
       expectedSignatureLen = 48;
-    } else if (mech == PKCS11Constants.CKM_SHA512_HMAC || mech == PKCS11Constants.CKM_SHA3_512) {
+    } else if (mech == CKM_SHA512_HMAC || mech == CKM_SHA3_512) {
       expectedSignatureLen = 64;
     } else {
       expectedSignatureLen = identity.getExpectedSignatureLen();
@@ -484,7 +485,7 @@ class IaikP11Slot extends P11Slot {
       try {
         return sign0(session, expectedSignatureLen, mechanismObj, content, signingKey);
       } catch (PKCS11Exception ex) {
-        if (ex.getErrorCode() == PKCS11Constants.CKR_USER_NOT_LOGGED_IN) {
+        if (ex.getErrorCode() == CKR_USER_NOT_LOGGED_IN) {
           LOG.info("sign ended with ERROR CKR_USER_NOT_LOGGED_IN, login and then retry it");
           // force the login
           forceLogin(session);
@@ -578,8 +579,8 @@ class IaikP11Slot extends P11Slot {
         Throwable cause = ex.getCause();
         if (cause instanceof PKCS11Exception) {
           long ckr = ((PKCS11Exception) cause).getErrorCode();
-          if (ckr == PKCS11Constants.CKR_SESSION_HANDLE_INVALID
-              || ckr == PKCS11Constants.CKR_SESSION_CLOSED) {
+          if (ckr == CKR_SESSION_HANDLE_INVALID
+              || ckr == CKR_SESSION_CLOSED) {
             continue;
           }
         }
@@ -790,7 +791,7 @@ class IaikP11Slot extends P11Slot {
         newCert = (X509PublicKeyCertificate) session.createObject(newCertTemp);
       } catch (PKCS11Exception ex) {
          long errCode = ((PKCS11Exception) ex).getErrorCode();
-         if (!omit && PKCS11Constants.CKR_TEMPLATE_INCONSISTENT == errCode) {
+         if (!omit && CKR_TEMPLATE_INCONSISTENT == errCode) {
            // some HSMs like NFAST does not like the attributes CKA_START_DATE and CKA_END_DATE
            // try without them.
            newCertTemp = createPkcs11Template(session, cert, control, true);
@@ -819,22 +820,22 @@ class IaikP11Slot extends P11Slot {
     }
 
     long mech;
-    if (PKCS11Constants.CKK_AES == keyType) {
-      mech = PKCS11Constants.CKM_AES_KEY_GEN;
-    } else if (PKCS11Constants.CKK_DES3 == keyType) {
-      mech = PKCS11Constants.CKM_DES3_KEY_GEN;
-    } else if (PKCS11Constants.CKK_GENERIC_SECRET == keyType) {
-      mech = PKCS11Constants.CKM_GENERIC_SECRET_KEY_GEN;
-    } else if (PKCS11Constants.CKK_SHA_1_HMAC == keyType
-        || PKCS11Constants.CKK_SHA224_HMAC == keyType
-        || PKCS11Constants.CKK_SHA256_HMAC == keyType
-        || PKCS11Constants.CKK_SHA384_HMAC == keyType
-        || PKCS11Constants.CKK_SHA512_HMAC == keyType
-        || PKCS11Constants.CKK_SHA3_224_HMAC == keyType
-        || PKCS11Constants.CKK_SHA3_256_HMAC == keyType
-        || PKCS11Constants.CKK_SHA3_384_HMAC == keyType
-        || PKCS11Constants.CKK_SHA3_512_HMAC == keyType) {
-      mech = PKCS11Constants.CKM_GENERIC_SECRET_KEY_GEN;
+    if (CKK_AES == keyType) {
+      mech = CKM_AES_KEY_GEN;
+    } else if (CKK_DES3 == keyType) {
+      mech = CKM_DES3_KEY_GEN;
+    } else if (CKK_GENERIC_SECRET == keyType) {
+      mech = CKM_GENERIC_SECRET_KEY_GEN;
+    } else if (CKK_SHA_1_HMAC == keyType
+        || CKK_SHA224_HMAC == keyType
+        || CKK_SHA256_HMAC == keyType
+        || CKK_SHA384_HMAC == keyType
+        || CKK_SHA512_HMAC == keyType
+        || CKK_SHA3_224_HMAC == keyType
+        || CKK_SHA3_256_HMAC == keyType
+        || CKK_SHA3_384_HMAC == keyType
+        || CKK_SHA3_512_HMAC == keyType) {
+      mech = CKM_GENERIC_SECRET_KEY_GEN;
     } else {
       throw new IllegalArgumentException(
           "unsupported key type 0x" + Functions.toFullHex((int)keyType));
@@ -951,7 +952,7 @@ class IaikP11Slot extends P11Slot {
       publicKey.getPublicExponent().setByteArrayValue(publicExponent.toByteArray());
     }
 
-    return generateKeyPair(PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN,
+    return generateKeyPair(CKM_RSA_PKCS_KEY_PAIR_GEN,
         control.getId(), privateKey, publicKey);
   } // method generateRSAKeypair0
 
@@ -967,7 +968,7 @@ class IaikP11Slot extends P11Slot {
     publicKey.getSubprime().setByteArrayValue(Util.unsignedBigIntergerToByteArray(q));
     publicKey.getBase().setByteArrayValue(Util.unsignedBigIntergerToByteArray(g));
 
-    return generateKeyPair(PKCS11Constants.CKM_DSA_KEY_PAIR_GEN,
+    return generateKeyPair(CKM_DSA_KEY_PAIR_GEN,
         control.getId(), privateKey, publicKey);
   } // method generateDSAKeypair0
 
@@ -985,7 +986,7 @@ class IaikP11Slot extends P11Slot {
       throw new P11TokenException(ex.getMessage(), ex);
     }
     publicKey.getEcdsaParams().setByteArrayValue(encodedCurveId);
-    return generateKeyPair(PKCS11Constants.CKM_EC_EDWARDS_KEY_PAIR_GEN,
+    return generateKeyPair(CKM_EC_EDWARDS_KEY_PAIR_GEN,
         control.getId(), privateKey, publicKey);
   } // method generateECEdwardsKeypair0
 
@@ -1002,7 +1003,7 @@ class IaikP11Slot extends P11Slot {
       throw new P11TokenException(ex.getMessage(), ex);
     }
 
-    return generateKeyPair(PKCS11Constants.CKM_EC_MONTGOMERY_KEY_PAIR_GEN,
+    return generateKeyPair(CKM_EC_MONTGOMERY_KEY_PAIR_GEN,
         control.getId(), privateKey, publicKey);
   } // method generateECMontgomeryKeypair0
 
@@ -1019,7 +1020,7 @@ class IaikP11Slot extends P11Slot {
       throw new P11TokenException(ex.getMessage(), ex);
     }
 
-    long mech = PKCS11Constants.CKM_EC_KEY_PAIR_GEN;
+    long mech = CKM_EC_KEY_PAIR_GEN;
     try {
       publicKey.getEcdsaParams().setByteArrayValue(encodedCurveId);
       return generateKeyPair(mech, control.getId(), privateKey, publicKey);
@@ -1044,8 +1045,7 @@ class IaikP11Slot extends P11Slot {
     ECPrivateKey privateKey = new ECPrivateKey(KeyType.VENDOR_SM2);
     ECPublicKey publicKey = new ECPublicKey(KeyType.VENDOR_SM2);
     setKeyAttributes(control, publicKey, privateKey, newObjectConf);
-
-    return generateKeyPair(PKCS11Constants.CKM_VENDOR_SM2_KEY_PAIR_GEN,
+    return generateKeyPair(CKM_VENDOR_SM2_KEY_PAIR_GEN,
         control.getId(), privateKey, publicKey);
   } // method generateSM2Keypair0
 
@@ -1159,27 +1159,27 @@ class IaikP11Slot extends P11Slot {
     Set<Long> setCertAttributes = newObjectConf.getSetCertObjectAttributes();
 
     try {
-      if (setCertAttributes.contains(PKCS11Constants.CKA_SUBJECT)) {
+      if (setCertAttributes.contains(CKA_SUBJECT)) {
         newCertTemp.getSubject().setByteArrayValue(cert.getSubject().getEncoded());
       }
 
-      if (setCertAttributes.contains(PKCS11Constants.CKA_ISSUER)) {
+      if (setCertAttributes.contains(CKA_ISSUER)) {
         newCertTemp.getIssuer().setByteArrayValue(cert.getIssuer().getEncoded());
       }
     } catch (IOException ex) {
       throw new P11TokenException("error encoding certificate: " + ex.getMessage(), ex);
     }
 
-    if (setCertAttributes.contains(PKCS11Constants.CKA_SERIAL_NUMBER)) {
+    if (setCertAttributes.contains(CKA_SERIAL_NUMBER)) {
       newCertTemp.getSerialNumber().setByteArrayValue(cert.getSerialNumber().toByteArray());
     }
 
     if (!omitDateAttrs) {
-      if (setCertAttributes.contains(PKCS11Constants.CKA_START_DATE)) {
+      if (setCertAttributes.contains(CKA_START_DATE)) {
         newCertTemp.getStartDate().setDateValue(cert.getNotBefore());
       }
 
-      if (setCertAttributes.contains(PKCS11Constants.CKA_END_DATE)) {
+      if (setCertAttributes.contains(CKA_END_DATE)) {
         newCertTemp.getStartDate().setDateValue(cert.getNotAfter());
       }
     }
