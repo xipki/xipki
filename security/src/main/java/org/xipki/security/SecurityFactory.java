@@ -137,7 +137,7 @@ public interface SecurityFactory {
    * @param publicKey
    *          Signature verification key. Must not be {@code null}.
    * @param ownerKeyAndCert
-   *          The owner's key and certificate for the CSR with Diffie-Hellman PoC.
+   *          The owner's key and certificate for the CSR with Diffie-Hellman PoP.
    *          May be {@code null}.
    * @return the ContentVerifierProvider
    * @throws InvalidKeyException
@@ -178,7 +178,7 @@ public interface SecurityFactory {
    * @param algoValidator
    *          Signature algorithms validator. <code>null</code> to accept all algorithms
    * @param ownerKeyAndCert
-   *          The owner's key and certificate for the CSR with Diffie-Hellman PoC.
+   *          The owner's key and certificate for the CSR with Diffie-Hellman PoP.
    *          May be {@code null}.
    * @return <code>true</code> if the signature is valid and the signature algorithm is accepted,
    *         <code>false</code> otherwise.
@@ -206,7 +206,7 @@ public interface SecurityFactory {
    * @param algoValidator
    *          Signature algorithms validator. <code>null</code> to accept all algorithms
    * @param ownerKeyAndCert
-   *          The owner's key and certificate for the CSR with Diffie-Hellman PoC.
+   *          The owner's key and certificate for the CSR with Diffie-Hellman PoP.
    *          May be {@code null}.
    * @return <code>true</code> if the signature is valid and the signature algorithm is accepted,
    *         <code>false</code> otherwise.

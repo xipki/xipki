@@ -100,7 +100,7 @@ BASE_URL = https://localhost:8443/ca/rest/subca
 echo "Sleeping 1 second"
 sleep 1
 
-echo "REST DH POC certificates"
+echo "REST DH POP certificates"
 
 xi:curl --out output/dhpop-certs.pem $BASE_URL/dh-pop-certs
 
