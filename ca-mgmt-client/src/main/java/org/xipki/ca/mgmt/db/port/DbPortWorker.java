@@ -17,27 +17,22 @@
 
 package org.xipki.ca.mgmt.db.port;
 
-import net.lingala.zip4j.ZipFile;
-import net.lingala.zip4j.model.ExcludeFileFilter;
-import net.lingala.zip4j.model.FileHeader;
-import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.model.enums.AesKeyStrength;
-import net.lingala.zip4j.model.enums.EncryptionMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.mgmt.db.DbWorker;
 import org.xipki.datasource.DataSourceFactory;
+import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.util.Args;
-import org.xipki.util.FileUtils;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Worker for database export / import.
@@ -46,100 +41,45 @@ import java.util.List;
  * @since 2.0.0
  */
 
-public abstract class DbPortWorker extends DbWorker {
+public abstract class DbPortWorker implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(DbPortWorker.class);
 
-  protected char[] password;
+  protected final AtomicBoolean stopMe = new AtomicBoolean(false);
+
+  protected final DataSourceWrapper datasource;
+
+  private Exception exception;
 
   public DbPortWorker(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
-      String dbConfFile, char[] password)
+      String dbConfFile)
           throws PasswordResolverException, IOException {
-    super(datasourceFactory, passwordResolver, dbConfFile);
-    this.password = password;
+    Properties props = DbPorter.getDbConfProperties(
+        Files.newInputStream(Paths.get(IoUtil.expandFilepath(dbConfFile))));
+    this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, props,
+        passwordResolver);
   }
 
-  private static ZipParameters getZipParameters() {
-    ExcludeFileFilter excludeFileFilter =
-            file -> file.isDirectory() && file.getName().equals("encrypted");
-
-    ZipParameters zipParameters = new ZipParameters();
-    zipParameters.setEncryptFiles(true);
-    zipParameters.setIncludeRootFolder(false);
-    zipParameters.setEncryptionMethod(EncryptionMethod.AES);
-    zipParameters.setAesKeyStrength(AesKeyStrength.KEY_STRENGTH_256);
-    zipParameters.setExcludeFileFilter(excludeFileFilter);
-    return zipParameters;
+  public final Exception exception() {
+    return exception;
   }
 
-  protected void encrypt(File dir) throws IOException {
-    File zipDir = new File(dir, "encrypted");
-    // delete all contents
-    if (zipDir.exists()) {
-      FileUtils.deleteDirectory(zipDir);
-    }
-    zipDir.mkdirs();
-
-    ZipFile zipFile = new ZipFile(new File(zipDir, "main.zip"), password);
-    // split length: 64M Byte
-    zipFile.createSplitZipFileFromFolder(dir, getZipParameters(), true, 64L * 1024 * 1024);
-
-    deleteDecryptedFiles(dir.getPath());
+  public void setStopMe(boolean stopMe) {
+    this.stopMe.set(stopMe);
   }
 
-  protected void decrypt(String dir) throws IOException {
-    ZipFile zipFile = new ZipFile(new File(dir, "encrypted/main.zip"), password);
-
-    boolean alreadyUnzipped = false;
-    for (FileHeader fh : zipFile.getFileHeaders()) {
-      if (fh.isDirectory()) {
-        continue;
-      }
-
-      alreadyUnzipped = new File(dir, fh.getFileName()).exists();
-      break;
+  @Override
+  public void run() {
+    try {
+      run0();
+    } catch (Exception ex) {
+      LOG.error("exception thrown", ex);
+      exception = ex;
     }
+  } // method run
 
-    if (alreadyUnzipped) {
-      return;
-    }
-
-    zipFile.extractAll(dir);
-  }
-
-  protected void deleteDecryptedFiles(String dir) throws IOException {
-    File[] files = new File(dir).listFiles();
-    if (files == null) {
-      return;
-    }
-
-    File mainFile = new File(dir, "encrypted");
-    if (!mainFile.exists()) {
-      return;
-    }
-
-    for (File f : files) {
-      // delete all files and sub-dirs except 'encrypted'.
-      if (f.getName().equals("encrypted")) {
-        continue;
-      }
-
-      List<File> failedList = new LinkedList<>();
-      if (f.isFile()) {
-        if (!IoUtil.deleteFile(f)) {
-          failedList.add(f);
-        }
-      } else if (f.isDirectory()) {
-        if (!IoUtil.deleteDir(f)) {
-          failedList.add(f);
-        }
-      }
-
-      if (!failedList.isEmpty()) {
-        LOG.error("error deleting files & folders: {}", failedList);
-      }
-    }
-  }
+  protected abstract void run0()
+      throws Exception;
 
   public static class ImportCaDb extends DbPortWorker {
 
@@ -150,10 +90,9 @@ public abstract class DbPortWorker extends DbWorker {
     private final int batchEntriesPerCommit;
 
     public ImportCaDb(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
-        String dbConfFile, boolean resume, String srcFolder, int batchEntriesPerCommit,
-        char[] password)
+        String dbConfFile, boolean resume, String srcFolder, int batchEntriesPerCommit)
         throws PasswordResolverException, IOException {
-      super(datasourceFactory, passwordResolver, dbConfFile, password);
+      super(datasourceFactory, passwordResolver, dbConfFile);
       this.resume = resume;
       this.srcFolder = IoUtil.expandFilepath(srcFolder);
       this.batchEntriesPerCommit = batchEntriesPerCommit;
@@ -162,24 +101,16 @@ public abstract class DbPortWorker extends DbWorker {
     @Override
     protected void run0()
         throws Exception {
-      if (password != null) {
-        decrypt(srcFolder);
-      }
-
-      try {
-        File processLogFile = new File(srcFolder, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
-        if (resume) {
-          if (!processLogFile.exists()) {
-            throw new Exception("could not process with '--resume' option");
-          }
-        } else {
-          if (processLogFile.exists()) {
-            throw new Exception("please either specify '--resume' option or delete the file "
-                    + processLogFile.getPath() + " first");
-          }
+      File processLogFile = new File(srcFolder, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
+      if (resume) {
+        if (!processLogFile.exists()) {
+          throw new Exception("could not process with '--resume' option");
         }
-      } finally {
-        deleteDecryptedFiles(srcFolder);
+      } else {
+        if (processLogFile.exists()) {
+          throw new Exception("please either specify '--resume' option or delete the file "
+              + processLogFile.getPath() + " first");
+        }
       }
 
       long start = System.currentTimeMillis();
@@ -193,7 +124,7 @@ public abstract class DbPortWorker extends DbWorker {
 
         // CertStore
         CaCertstoreDbImporter certStoreImporter = new CaCertstoreDbImporter(datasource,
-                srcFolder, batchEntriesPerCommit, resume, stopMe);
+            srcFolder, batchEntriesPerCommit, resume, stopMe);
         certStoreImporter.importToDb();
         certStoreImporter.close();
       } finally {
@@ -202,7 +133,6 @@ public abstract class DbPortWorker extends DbWorker {
         } catch (Throwable th) {
           LOG.error("datasource.close()", th);
         }
-        deleteDecryptedFiles(srcFolder);
         long end = System.currentTimeMillis();
         System.out.println("Finished in " + StringUtil.formatTime((end - start) / 1000, false));
       }
@@ -222,9 +152,9 @@ public abstract class DbPortWorker extends DbWorker {
 
     public ExportCaDb(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
         String dbConfFile, String destFolder, boolean resume, int numCertsInBundle,
-        int numCertsPerSelect, char[] password)
+        int numCertsPerSelect)
             throws PasswordResolverException, IOException {
-      super(datasourceFactory, passwordResolver, dbConfFile, password);
+      super(datasourceFactory, passwordResolver, dbConfFile);
       this.destFolder = IoUtil.expandFilepath(destFolder);
       this.resume = resume;
       this.numCertsInBundle = numCertsInBundle;
@@ -277,10 +207,6 @@ public abstract class DbPortWorker extends DbWorker {
             numCertsInBundle, numCertsPerSelect, resume, stopMe);
         certStoreExporter.export();
         certStoreExporter.close();
-
-        if (password != null) {
-          encrypt(new File(destFolder));
-        }
       } finally {
         try {
           datasource.close();
@@ -306,9 +232,9 @@ public abstract class DbPortWorker extends DbWorker {
 
     public ExportOcspDb(DataSourceFactory datasourceFactory, PasswordResolver passwordResolver,
         String dbConfFile, String destFolder, boolean resume, int numCertsInBundle,
-        int numCertsPerSelect, char[] password)
+        int numCertsPerSelect)
             throws PasswordResolverException, IOException {
-      super(datasourceFactory, passwordResolver, dbConfFile, password);
+      super(datasourceFactory, passwordResolver, dbConfFile);
 
       this.destFolder = Args.notBlank(destFolder, destFolder);
 
@@ -346,10 +272,6 @@ public abstract class DbPortWorker extends DbWorker {
             destFolder, numCertsInBundle, numCertsPerSelect, resume, stopMe);
         certStoreExporter.export();
         certStoreExporter.close();
-
-        if (password != null) {
-          encrypt(new File(destFolder));
-        }
       } finally {
         try {
           datasource.close();
@@ -373,9 +295,9 @@ public abstract class DbPortWorker extends DbWorker {
 
     public ImportOcspDb(DataSourceFactory datasourceFactory,
         PasswordResolver passwordResolver, String dbConfFile, boolean resume, String srcFolder,
-        int batchEntriesPerCommit, char[] password)
+        int batchEntriesPerCommit)
             throws PasswordResolverException, IOException {
-      super(datasourceFactory, passwordResolver, dbConfFile, password);
+      super(datasourceFactory, passwordResolver, dbConfFile);
       this.resume = resume;
       this.srcFolder = IoUtil.expandFilepath(srcFolder);
       this.batchEntriesPerCommit = batchEntriesPerCommit;
@@ -385,14 +307,10 @@ public abstract class DbPortWorker extends DbWorker {
     protected void run0()
         throws Exception {
       long start = System.currentTimeMillis();
-      if (password != null) {
-        decrypt(srcFolder);
-      }
-
       // CertStore
       try {
         OcspCertstoreDbImporter certStoreImporter = new OcspCertstoreDbImporter(datasource,
-                srcFolder, batchEntriesPerCommit, resume, stopMe);
+            srcFolder, batchEntriesPerCommit, resume, stopMe);
         certStoreImporter.importToDb();
         certStoreImporter.close();
       } finally {
@@ -401,7 +319,6 @@ public abstract class DbPortWorker extends DbWorker {
         } catch (Throwable th) {
           LOG.error("datasource.close()", th);
         }
-        deleteDecryptedFiles(srcFolder);
         long end = System.currentTimeMillis();
         System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));
       }
@@ -421,9 +338,9 @@ public abstract class DbPortWorker extends DbWorker {
 
     public ImportOcspFromCaDb(DataSourceFactory datasourceFactory,
         PasswordResolver passwordResolver, String dbConfFile, String publisherName,
-        boolean resume, String srcFolder, int batchEntriesPerCommit, char[] password)
+        boolean resume, String srcFolder, int batchEntriesPerCommit)
         throws PasswordResolverException, IOException {
-      super(datasourceFactory, passwordResolver, dbConfFile, password);
+      super(datasourceFactory, passwordResolver, dbConfFile);
       this.publisherName = publisherName;
       this.resume = resume;
       this.srcFolder = IoUtil.expandFilepath(srcFolder);
@@ -434,14 +351,10 @@ public abstract class DbPortWorker extends DbWorker {
     protected void run0()
         throws Exception {
       long start = System.currentTimeMillis();
-      if (password != null) {
-        decrypt(srcFolder);
-      }
-
       // CertStore
       try {
         OcspCertStoreFromCaDbImporter certStoreImporter = new OcspCertStoreFromCaDbImporter(
-                datasource, srcFolder, publisherName, batchEntriesPerCommit, resume, stopMe);
+            datasource, srcFolder, publisherName, batchEntriesPerCommit, resume, stopMe);
         certStoreImporter.importToDb();
         certStoreImporter.close();
       } finally {
@@ -450,8 +363,6 @@ public abstract class DbPortWorker extends DbWorker {
         } catch (Throwable th) {
           LOG.error("datasource.close()", th);
         }
-
-        deleteDecryptedFiles(srcFolder);
         long end = System.currentTimeMillis();
         System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));
       }

@@ -9,7 +9,7 @@ See also <https://github.com/xipki/xipki/releases>
 - OCSP
   - N/A
 - CLI
-  - Add option to encrypt the database export result.
+  - N/A
  - DB Tool
   - N/A
 - Dependencies
