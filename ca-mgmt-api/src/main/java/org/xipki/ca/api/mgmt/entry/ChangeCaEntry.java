@@ -53,7 +53,7 @@ public class ChangeCaEntry extends MgmtEntry {
 
   private String ctlogControl;
 
-  private String dhpocControl;
+  private String dhpopControl;
 
   private String revokeSuspendedControl;
 
@@ -180,12 +180,12 @@ public class ChangeCaEntry extends MgmtEntry {
     this.revokeSuspendedControl = revokeSuspendedControl;
   }
 
-  public String getDhpocControl() {
-    return dhpocControl;
+  public String getDhpopControl() {
+    return dhpopControl;
   }
 
-  public void setDhpocControl(String dhpocControl) {
-    this.dhpocControl = dhpocControl;
+  public void setDhpopControl(String dhpopControl) {
+    this.dhpopControl = dhpopControl;
   }
 
   public String getCmpResponderName() {

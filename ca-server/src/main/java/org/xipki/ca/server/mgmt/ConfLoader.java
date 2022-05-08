@@ -552,10 +552,10 @@ class ConfLoader {
                 new HashMap<>(new ConfPairs(entry.getCtlogControl().getConf()).asMap()));
           }
 
-          if (entry.getDhpocControl() != null) {
+          if (entry.getDhpopControl() != null) {
             FileOrValue fv = createFileOrValue(
-                zipStream, entry.getDhpocControl(), concat("files/ca-", name, "-dhpoc.conf"));
-            caInfoType.setDhpocControl(fv);
+                zipStream, entry.getDhpopControl(), concat("files/ca-", name, "-dhpop.conf"));
+            caInfoType.setDhpopControl(fv);
           }
 
           caInfoType.setExpirationPeriod(entry.getExpirationPeriod());

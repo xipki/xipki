@@ -325,7 +325,7 @@ class CaconfDbExporter extends DbPorter {
         ca.setExtraControl(rs.getString("EXTRA_CONTROL"));
         ca.setNumCrls(rs.getInt("NUM_CRLS"));
         ca.setRevInfo(rs.getString("REV_INFO"));
-        ca.setDhpocControl(rs.getString("DHPOC_CONTROL"));
+        ca.setDhpopControl(rs.getString("DHPOC_CONTROL"));
         ca.setRevokeSuspendedControl(rs.getString("REVOKE_SUSPENDED_CONTROL"));
 
         ca.validate();

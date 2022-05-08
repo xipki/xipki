@@ -224,7 +224,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         caUris, getInt(rs, "NUM_CRLS"), getInt(rs, "EXPIRATION_PERIOD"));
 
     entry.setCert(generateCert(rs.getString("CERT")));
-    entry.setDhpocControl(rs.getString("DHPOC_CONTROL"));
+    entry.setDhpopControl(rs.getString("DHPOC_CONTROL"));
     String str = rs.getString("REVOKE_SUSPENDED_CONTROL");
     RevokeSuspendedControl revokeSuspended = str == null
         ? new RevokeSuspendedControl(false) : new RevokeSuspendedControl(str);
@@ -434,7 +434,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         col2Int(caEntry.getNumCrls()),               col2Int(caEntry.getExpirationPeriod()),
         col2Int(caEntry.getKeepExpiredCertInDays()), col2Str(caEntry.getValidityMode().name()),
         col2Str(StringUtil.isBlank(encodedExtraCtrl) ? null : encodedExtraCtrl),
-        col2Str(caEntry.getSignerConf()),            col2Str(caEntry.getDhpocControl()),
+        col2Str(caEntry.getSignerConf()),            col2Str(caEntry.getDhpopControl()),
         col2Str(revokeSuspended == null ? null : revokeSuspended.getConf()));
 
     if (num == 0) {
@@ -755,7 +755,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         colInt("KEEP_EXPIRED_CERT_DAYS", changeCaEntry.getKeepExpiredCertInDays()),
         colStr("VALIDITY_MODE", validityMode), colStr("EXTRA_CONTROL", extraControl),
         colStr("SIGNER_CONF", signerConf, false, true),
-        colStr("DHPOC_CONTROL", changeCaEntry.getDhpocControl(), false, true),
+        colStr("DHPOC_CONTROL", changeCaEntry.getDhpopControl(), false, true),
         colStr("REVOKE_SUSPENDED_CONTROL", changeCaEntry.getRevokeSuspendedControl()));
   } // method changeCa
 

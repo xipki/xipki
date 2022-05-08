@@ -72,7 +72,7 @@ public class CaInfo {
 
   private final RandomSerialNumberGenerator randomSnGenerator;
 
-  private DhpocControl dhpocControl;
+  private DhpopControl dhpopControl;
 
   private Map<SignAlgo, ConcurrentContentSigner> signers;
 
@@ -218,8 +218,8 @@ public class CaInfo {
     return caEntry.getCtlogControl();
   }
 
-  public DhpocControl getDhpocControl() {
-    return dhpocControl;
+  public DhpopControl getDhpopControl() {
+    return dhpopControl;
   }
 
   public String getScepResponderName() {
@@ -405,19 +405,19 @@ public class CaInfo {
     return true;
   } // method initSigner
 
-  public boolean initDhpocControl(SecurityFactory securityFactory)
+  public boolean initDhpopControl(SecurityFactory securityFactory)
       throws XiSecurityException {
-    if (dhpocControl != null) {
+    if (dhpopControl != null) {
       return true;
     }
 
-    if (caEntry.getDhpocControl() != null) {
-      this.dhpocControl = new DhpocControl(caEntry.getDhpocControl());
+    if (caEntry.getDhpopControl() != null) {
+      this.dhpopControl = new DhpopControl(caEntry.getDhpopControl());
     } else {
-      this.dhpocControl = null;
+      this.dhpopControl = null;
     }
     return true;
-  } // method initDhpocControl
+  } // method initDhpopControl
 
   public boolean isSignerRequired() {
     int permission = caEntry.getPermission();

@@ -153,9 +153,9 @@ public class X509Ca extends X509CaModule implements Closeable {
     super(caInfo);
 
     try {
-      caInfo.initDhpocControl(caManager.getSecurityFactory());
+      caInfo.initDhpopControl(caManager.getSecurityFactory());
     } catch (XiSecurityException ex) {
-      LogUtil.error(LOG, ex, "initDhpocControl for CA " + caIdent);
+      LogUtil.error(LOG, ex, "initDhpopControl for CA " + caIdent);
       throw new OperationException(SYSTEM_FAILURE, ex);
     }
 
@@ -263,7 +263,7 @@ public class X509Ca extends X509CaModule implements Closeable {
     AlgorithmValidator algorithmValidator = caInfo.getCmpControl() == null
         ? CollectionAlgorithmValidator.INSTANCE : caInfo.getCmpControl().getPopAlgoValidator();
     return CaUtil.verifyCsr(csr, caManager.getSecurityFactory(), algorithmValidator,
-        caInfo.getDhpocControl());
+        caInfo.getDhpopControl());
   }
 
   public List<CertListInfo> listCerts(X500Name subjectPattern, Date validFrom,

@@ -56,26 +56,26 @@ class CaConf {
 
     private final List<X509Cert> certchain;
 
-    private final List<X509Cert> dhpocs;
+    private final List<X509Cert> dhpops;
 
     private final Set<CertprofileInfo> certprofiles;
 
     private final CmpControl cmpControl;
 
     CaInfo(List<X509Cert> certchain, CmpControl cmpControl,
-        Set<CertprofileInfo> certprofiles, List<X509Cert> dhpocs) {
+        Set<CertprofileInfo> certprofiles, List<X509Cert> dhpops) {
       this.certchain = certchain;
       this.cmpControl = cmpControl;
       this.certprofiles = certprofiles;
-      this.dhpocs = dhpocs;
+      this.dhpops = dhpops;
     }
 
     List<X509Cert> getCertchain() {
       return certchain;
     }
 
-    List<X509Cert> getDhpocs() {
-      return dhpocs;
+    List<X509Cert> getDhpops() {
+      return dhpops;
     }
 
     CmpControl getCmpControl() {
@@ -106,7 +106,7 @@ class CaConf {
 
   private boolean cmpControlAutoconf;
 
-  private boolean dhpocAutoconf;
+  private boolean dhpopAutoconf;
 
   private X509Cert cert;
 
@@ -124,7 +124,7 @@ class CaConf {
 
   private Map<String, CertprofileInfo> profiles = Collections.emptyMap();
 
-  private List<X509Cert> dhpocs;
+  private List<X509Cert> dhpops;
 
   CaConf(String name, String url, String healthUrl, String requestorName, Responder responder,
       SSLSocketFactory sslSocketFactory, HostnameVerifier hostnameVerifier) {
@@ -177,20 +177,20 @@ class CaConf {
     return certchain;
   }
 
-  boolean isDhpocAutoconf() {
-    return dhpocAutoconf;
+  boolean isDhpopAutoconf() {
+    return dhpopAutoconf;
   }
 
-  void setDhpocAutoconf(boolean dhpocAutoconf) {
-    this.dhpocAutoconf = dhpocAutoconf;
+  void setDhpopAutoconf(boolean dhpopAutoconf) {
+    this.dhpopAutoconf = dhpopAutoconf;
   }
 
-  List<X509Cert> getDhpocs() {
-    return dhpocs;
+  List<X509Cert> getDhpops() {
+    return dhpops;
   }
 
-  void setDhpocs(List<X509Cert> dhpocs) {
-    this.dhpocs = dhpocs;
+  void setDhpops(List<X509Cert> dhpops) {
+    this.dhpops = dhpops;
   }
 
   X500Name getSubject() {

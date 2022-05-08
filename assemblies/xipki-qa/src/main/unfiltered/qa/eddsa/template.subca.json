@@ -41,8 +41,8 @@
 				"targetReason":"cessationOfOperation",
 				"unchangedSince":"15d"
 			},
-			"dhpocControl":{
-				"value":"type=pkcs12,password=1234,keystore=file:qa/keys/dhpoc.p12"
+			"dhpopControl":{
+				"value":"type=pkcs12,password=1234,keystore=file:qa/keys/dhpop.p12"
 			},
 			"keepExpiredCertDays":-1,
 			"maxValidity":"5y",

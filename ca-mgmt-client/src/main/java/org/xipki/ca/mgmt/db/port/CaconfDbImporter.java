@@ -280,7 +280,7 @@ class CaconfDbImporter extends DbPorter {
           ps.setString(idx++, ca.getExtraControl());
           ps.setString(idx++, readContent(ca.getSignerConf()));
           ps.setString(idx++, ca.getRevInfo());
-          ps.setString(idx++, ca.getDhpocControl());
+          ps.setString(idx++, ca.getDhpopControl());
           ps.setString(idx, ca.getRevokeSuspendedControl());
 
           ps.executeUpdate();

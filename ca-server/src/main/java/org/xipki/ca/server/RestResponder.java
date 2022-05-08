@@ -306,8 +306,8 @@ public class RestResponder {
           respBytes = ca.getCaInfo().getCert().getEncoded();
           break;
         }
-        case CMD_dhpoc_certs: {
-          DhpocControl control = responderManager.getX509Ca(caName).getCaInfo().getDhpocControl();
+        case CMD_dhpop_certs: {
+          DhpopControl control = responderManager.getX509Ca(caName).getCaInfo().getDhpopControl();
           if (control == null) {
             respBytes = new byte[0];
           } else {

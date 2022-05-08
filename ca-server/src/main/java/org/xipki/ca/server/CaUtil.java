@@ -180,7 +180,7 @@ public class CaUtil {
   } // method sortX509Name
 
   public static boolean verifyCsr(CertificationRequest csr, SecurityFactory securityFactory,
-      AlgorithmValidator algorithmValidator, DhpocControl dhpocControl) {
+      AlgorithmValidator algorithmValidator, DhpopControl dhpopControl) {
     notNull(csr, "csr");
 
     ASN1ObjectIdentifier algOid = csr.getSignatureAlgorithm().getAlgorithm();
@@ -188,13 +188,13 @@ public class CaUtil {
     DHSigStaticKeyCertPair kaKeyAndCert = null;
     if (Xipki.id_alg_dhPop_x25519.equals(algOid)
             || Xipki.id_alg_dhPop_x448.equals(algOid)) {
-      if (dhpocControl != null) {
+      if (dhpopControl != null) {
         DhSigStatic dhSigStatic = DhSigStatic.getInstance(csr.getSignature().getBytes());
         IssuerAndSerialNumber isn = dhSigStatic.getIssuerAndSerial();
 
         ASN1ObjectIdentifier keyOid = csr.getCertificationRequestInfo().getSubjectPublicKeyInfo()
                                         .getAlgorithm().getAlgorithm();
-        kaKeyAndCert = dhpocControl.getKeyCertPair(isn.getName(), isn.getSerialNumber().getValue(),
+        kaKeyAndCert = dhpopControl.getKeyCertPair(isn.getName(), isn.getSerialNumber().getValue(),
             EdECConstants.getName(keyOid));
       }
 

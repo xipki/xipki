@@ -209,8 +209,8 @@ public class CaActions {
     @Option(name = "--ctlog-control", description = "CT log control")
     private String ctlogControl;
 
-    @Option(name = "--dhpoc-control", description = "DHPoc control")
-    private String dhpocControl;
+    @Option(name = "--dhpop-control", description = "DHPop control")
+    private String dhpopControl;
 
     @Option(name = "--revoke-suspended-control",
         description = "Revoke suspended certificates control")
@@ -312,13 +312,13 @@ public class CaActions {
         entry.setCtlogControl(new CtlogControl(ctlogControl));
       }
 
-      if (dhpocControl != null) {
-        String conf = dhpocControl;
+      if (dhpopControl != null) {
+        String conf = dhpopControl;
         if (conf.contains("file:")) {
           ConfPairs confPairs = new ConfPairs(conf);
-          entry.setDhpocControl(embedFileContent(confPairs).getEncoded());
+          entry.setDhpopControl(embedFileContent(confPairs).getEncoded());
         } else {
-          entry.setDhpocControl(dhpocControl);
+          entry.setDhpopControl(dhpopControl);
         }
       }
 
@@ -726,8 +726,8 @@ public class CaActions {
     @Option(name = "--ctlog-control", description = "CT log control")
     private String ctlogControl;
 
-    @Option(name = "--dhpoc-control", description = "DHPoc control")
-    private String dhpocControl;
+    @Option(name = "--dhpop-control", description = "DHPop control")
+    private String dhpopControl;
 
     @Option(name = "--revoke-suspended-control",
         description = "Revoke suspended certificates control")
@@ -884,10 +884,10 @@ public class CaActions {
         entry.setCtlogControl(ctlogControl);
       }
 
-      if (dhpocControl != null) {
-        String tmp = ShellUtil.canonicalizeSignerConf("PKCS12", dhpocControl,
+      if (dhpopControl != null) {
+        String tmp = ShellUtil.canonicalizeSignerConf("PKCS12", dhpopControl,
             passwordResolver, securityFactory);
-        entry.setDhpocControl(tmp);
+        entry.setDhpopControl(tmp);
       }
 
       if (revokeSuspendedControl != null) {

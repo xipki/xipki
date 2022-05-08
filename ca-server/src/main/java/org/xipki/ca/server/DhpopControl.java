@@ -37,17 +37,17 @@ import java.security.cert.X509Certificate;
 import java.util.*;
 
 /**
- * DHPoc control.
+ * DHPop control.
  *
  * @author Lijun Liao
  */
-public class DhpocControl {
+public class DhpopControl {
 
   private final List<DHSigStaticKeyCertPair> keyAndCerts = new ArrayList<>(1);
 
   private final X509Cert[] certs;
 
-  public DhpocControl(String conf)
+  public DhpopControl(String conf)
       throws XiSecurityException {
     ConfPairs pairs = new ConfPairs(conf);
     String type = pairs.value("type");
