@@ -150,10 +150,13 @@ public class ProtocolSupport {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("supported protocols:");
-    sb.append("\n  CMP: ").append(cmp);
-    sb.append("\n  REST: ").append(rest);
-    sb.append("\n  SCEP: ").append(scep);
+    sb.append("supported protocols: ")
+        .append(cmp ? "" : "CMP, ")
+        .append(rest ? "" : "REST, ")
+        .append(scep ? "" : "SCEP, ");
+    if (cmp || rest || scep) {
+      sb.delete(sb.length() - 2, sb.length());
+    }
     return sb.toString();
   }
 

@@ -367,11 +367,14 @@ public class CaEntry extends MgmtEntry {
     }
 
     List<String> permissionList = PermissionConstants.permissionToStringSet(permission);
-    StringBuilder buffer = new StringBuilder();
-    for (String m : permissionList) {
-      buffer.append("\n  ").append(m);
+    String permissionText = "";
+    if (!permissionList.isEmpty()) {
+      StringBuilder buffer = new StringBuilder();
+      for (String m : permissionList) {
+        buffer.append(m).append(", ");
+      }
+      permissionText = buffer.substring(0, buffer.length() - 2);
     }
-    String permissionText = buffer.toString();
 
     return StringUtil.concatObjectsCap(1500,
         "id: ", ident.getId(), "\nname: ", ident.getName(),
@@ -395,7 +398,7 @@ public class CaEntry extends MgmtEntry {
         "\n", protocolSupport,
         "\nsave request: ", saveRequest,
         "\nvalidity mode: ", validityMode,
-        "\npermission:", permissionText,
+        "\npermission: ", permissionText,
         "\nkeep expired certs: ",
             (keepExpiredCertInDays < 0 ? "forever" : keepExpiredCertInDays + " days"),
         "\nextra control: ", extraCtrlText,
