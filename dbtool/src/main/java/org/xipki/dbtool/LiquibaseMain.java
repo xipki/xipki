@@ -32,8 +32,10 @@ import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.resource.ResourceAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.password.PBEPasswordService;
 import org.xipki.password.PasswordResolver;
 import org.xipki.password.PasswordResolverException;
+import org.xipki.password.SinglePasswordResolver;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 
@@ -218,6 +220,21 @@ public class LiquibaseMain implements Closeable {
       }
 
       url = urlBuilder.toString();
+
+      if (password != null) {
+        char[] newPassword = null;
+        if (StringUtil.startsWithIgnoreCase(password, "OBF:")) {
+          SinglePasswordResolver.OBF resolver = new SinglePasswordResolver.OBF();
+          newPassword = resolver.resolvePassword(password);
+        } else if (StringUtil.startsWithIgnoreCase(password, "PBE:")) {
+          char[] masterPassword = IoUtil.readPasswordFromConsole("Enter the master password");
+          newPassword = PBEPasswordService.decryptPassword(masterPassword, password);
+        }
+
+        if (newPassword != null) {
+          password = new String(newPassword);
+        }
+      }
 
       return new DatabaseConf(driverClassName, user, password, url, schema);
     } // method getInstance
