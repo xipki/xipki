@@ -359,6 +359,7 @@ Features
 
 - OCSP Responder
   - OCSP Responder (RFC 2560 and RFC 6960)
+  - Configurable Length of Nonce (RFC 8954)
   - Support of Common PKI 2.0
   - Management of multiple certificate status sources
   - Support of certificate status source based on the database of XiPKI CA
