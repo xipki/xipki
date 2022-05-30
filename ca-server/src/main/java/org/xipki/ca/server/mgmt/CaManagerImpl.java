@@ -378,6 +378,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     shardId = caServerConf.getShardId();
     LOG.info("ca.shardId: {}", shardId);
 
+    caServerConf.initSsl();
+
     if (caServerConf.getCtLog() != null) {
       try {
         ctLogPublicKeyFinder = new CtLogPublicKeyFinder(caServerConf.getCtLog());

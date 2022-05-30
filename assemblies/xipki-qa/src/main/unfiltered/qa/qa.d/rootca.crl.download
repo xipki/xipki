@@ -14,6 +14,3 @@ download.fp.url=SHA1 http://localhost:8080/crl/?hashalgo=sha1&type=crl&name=root
 # Once a new CRL is downloaded, the remaining scheduled downloads will be
 # skipped.
 download.before.nextupdate=3d
-
-# Password of the PKCs#12 keystore tls-truststore.p12.
-#truststore.password=1234

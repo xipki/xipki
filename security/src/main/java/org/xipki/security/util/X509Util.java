@@ -447,17 +447,17 @@ public class X509Util {
   }
 
   public static X509Cert[] buildCertPath(X509Cert targetCert,
-      Collection<X509Cert> certs, Collection<X509Cert> trustAnchors,
+      Collection<X509Cert> certs, Collection<X509Cert> trustanchors,
       boolean includeTargetCert) {
     notNull(targetCert, "cert");
 
-    if (trustAnchors == null) {
-      trustAnchors = Collections.emptySet();
+    if (trustanchors == null) {
+      trustanchors = Collections.emptySet();
     }
 
-    if (!trustAnchors.isEmpty()) {
+    if (!trustanchors.isEmpty()) {
       Set<X509Cert> coll = new HashSet<>(certs);
-      coll.addAll(trustAnchors);
+      coll.addAll(trustanchors);
       certs = coll;
     }
 
@@ -471,7 +471,7 @@ public class X509Util {
             break;
           }
           certChain.add(caCert);
-          if (caCert.isSelfSigned() || trustAnchors.contains(caCert)) {
+          if (caCert.isSelfSigned() || trustanchors.contains(caCert)) {
             // reaches root self-signed certificate or trustanchor
             break;
           }
@@ -481,8 +481,8 @@ public class X509Util {
       LOG.warn("CertificateEncodingException: {}", ex.getMessage());
     }
 
-    if (!trustAnchors.isEmpty()) {
-      if (!trustAnchors.contains(certChain.get(certChain.size() - 1))) {
+    if (!trustanchors.isEmpty()) {
+      if (!trustanchors.contains(certChain.get(certChain.size() - 1))) {
         return null;
       }
     }

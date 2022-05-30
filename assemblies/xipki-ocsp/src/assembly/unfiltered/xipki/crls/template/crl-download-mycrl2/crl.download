@@ -14,6 +14,3 @@ crldp=http://ca.myorg.org/crl/myca1
 # Once a new CRL is downloaded, the remaining scheduled downloads will be
 # skipped.
 download.before.nextupdate=3d
-
-# Password of the PKCs#12 keystore tls-truststore.p12.
-#truststore.password=1234

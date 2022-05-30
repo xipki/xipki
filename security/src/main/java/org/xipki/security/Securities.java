@@ -44,47 +44,6 @@ import java.util.List;
 
 public class Securities implements Closeable {
 
-  public static class KeystoreConf extends ValidatableConf {
-
-    private String type;
-
-    private FileOrBinary keystore;
-
-    private String password;
-
-    public String getType() {
-      return type;
-    }
-
-    public void setType(String value) {
-      this.type = value;
-    }
-
-    public FileOrBinary getKeystore() {
-      return keystore;
-    }
-
-    public void setKeystore(FileOrBinary value) {
-      this.keystore = value;
-    }
-
-    public String getPassword() {
-      return password;
-    }
-
-    public void setPassword(String value) {
-      this.password = value;
-    }
-
-    @Override
-    public void validate()
-        throws InvalidConfException {
-      notBlank(type, "type");
-      validate(keystore);
-    }
-
-  } // class KeystoreConf
-
   public static class SecurityConf extends ValidatableConf {
 
     private boolean keyStrongrandomEnabled;

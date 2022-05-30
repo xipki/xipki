@@ -52,18 +52,12 @@
 		"type":"embed"
 		//,"conf":"..."
 	},
-	"sslContexts":[
-		{
-			"name":"localhost",
-			"truststore":{
-				"keystore":{
-					"file":"keycerts/tlskeys/ca/tls-ca-cert.p12"
-				},
-				"password":"1234",
-				"type":"PKCS12"
-			}
-		}
-	],
+	"sslContexts":[{
+		"name":"localhost",
+		"trustanchors":[{
+			"file":"keycerts/tlskeys/ca/tls-ca-cert.pem"
+		}]
+	}],
 	"ctLog":{
 	    "keydir":"ctlog"
 	}

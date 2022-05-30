@@ -6,8 +6,7 @@
 		"storeType":"PKCS12",
 		"keystore":"xipki/keycerts/tlskeys/client/tls-client.p12",
 		"keystorePassword":"1234",
-		"truststore":"xipki/keycerts/tlskeys/server/tls-server-cert.p12",
-		"truststorePassword":"1234"
+		"trustanchors":["xipki/keycerts/tlskeys/server/tls-server-cert.der"]
 	}
 }
 

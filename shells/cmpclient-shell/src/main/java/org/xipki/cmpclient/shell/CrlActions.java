@@ -162,7 +162,7 @@ public class CrlActions {
 
   } // class CmpGetCrl
 
-  @Command(scope = "xi", name = "cmp-health", description = "check healty status of CA")
+  @Command(scope = "xi", name = "cmp-health", description = "check healthy status of CA")
   @Service
   public static class CmpHealth extends ClientAction {
 

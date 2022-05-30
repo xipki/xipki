@@ -96,8 +96,8 @@ public class OcspServerUtil {
     List<ConcurrentContentSigner> singleSigners = new ArrayList<>(sigAlgos.size());
 
     String name = signerType.getName();
-    List<String> succSigAlgos = new LinkedList<String>();
-    List<String> failSigAlgos = new LinkedList<String>();
+    List<String> succSigAlgos = new LinkedList<>();
+    List<String> failSigAlgos = new LinkedList<>();
     for (String sigAlgo : sigAlgos) {
       try {
         ConcurrentContentSigner requestorSigner = securityFactory.createSigner(
@@ -217,8 +217,8 @@ public class OcspServerUtil {
       RequestOption requestOption, Date referenceTime) {
     X509Cert target = certsInReq[0];
 
-    Set<X509Cert> trustAnchors = requestOption.getTrustAnchors();
-    Set<X509Cert> certstore = new HashSet<>(trustAnchors);
+    Set<X509Cert> trustanchors = requestOption.getTrustanchors();
+    Set<X509Cert> certstore = new HashSet<>(trustanchors);
 
     Set<X509Cert> configuredCerts = requestOption.getCerts();
     if (CollectionUtil.isNotEmpty(configuredCerts)) {
@@ -250,7 +250,7 @@ public class OcspServerUtil {
 
     for (int i = certpath.length - 1; i >= 0; i--) {
       X509Cert targetCert = certpath[i];
-      for (X509Cert m : trustAnchors) {
+      for (X509Cert m : trustanchors) {
         if (m.equals(targetCert)) {
           return true;
         }

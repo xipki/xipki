@@ -575,9 +575,7 @@ public class CmpClientConf extends ValidatableConf {
 
     private String keystorePassword;
 
-    private FileOrBinary truststore;
-
-    private String truststorePassword;
+    private FileOrBinary[] trustanchors;
 
     /**
      * Valid values are {@code null}, no_op, default, or java:{qualified class name}
@@ -617,20 +615,12 @@ public class CmpClientConf extends ValidatableConf {
       this.keystorePassword = keystorePassword;
     }
 
-    public FileOrBinary getTruststore() {
-      return truststore;
+    public FileOrBinary[] getTrustanchors() {
+      return trustanchors;
     }
 
-    public void setTruststore(FileOrBinary truststore) {
-      this.truststore = truststore;
-    }
-
-    public String getTruststorePassword() {
-      return truststorePassword;
-    }
-
-    public void setTruststorePassword(String truststorePassword) {
-      this.truststorePassword = truststorePassword;
+    public void setTrustanchors(FileOrBinary[] trustanchors) {
+      this.trustanchors = trustanchors;
     }
 
     public String getHostnameVerifier() {

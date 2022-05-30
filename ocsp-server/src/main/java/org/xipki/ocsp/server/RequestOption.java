@@ -19,26 +19,17 @@ package org.xipki.ocsp.server;
 
 import org.xipki.security.CertpathValidationModel;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.Securities.KeystoreConf;
 import org.xipki.security.X509Cert;
-import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.FileOrBinary;
 import org.xipki.util.InvalidConfException;
-import org.xipki.util.IoUtil;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -90,7 +81,7 @@ public class RequestOption {
 
   private final Set<HashAlgo> hashAlgos;
 
-  private final Set<X509Cert> trustAnchors;
+  private final Set<X509Cert> trustanchors;
 
   private final Set<X509Cert> certs;
 
@@ -168,7 +159,7 @@ public class RequestOption {
       if (validateSignature) {
         throw new InvalidConfException("certpathValidation is not specified");
       }
-      trustAnchors = null;
+      trustanchors = null;
       certs = null;
       certpathValidationModel = CertpathValidationModel.PKIX;
       return;
@@ -177,12 +168,12 @@ public class RequestOption {
     certpathValidationModel = certpathConf.getValidationModel();
 
     try {
-      Set<X509Cert> tmpCerts = getCerts(certpathConf.getTrustAnchors());
-      trustAnchors = new HashSet<>(tmpCerts.size());
-      trustAnchors.addAll(tmpCerts);
+      Set<X509Cert> tmpCerts = getCerts(certpathConf.getTrustanchors());
+      trustanchors = new HashSet<>(tmpCerts.size());
+      trustanchors.addAll(tmpCerts);
     } catch (Exception ex) {
       throw new InvalidConfException(
-          "could not initialize the trustAnchors: " + ex.getMessage(), ex);
+          "could not initialize the trustanchors: " + ex.getMessage(), ex);
     }
 
     OcspServerConf.CertCollection certsType = certpathConf.getCerts();
@@ -237,8 +228,8 @@ public class RequestOption {
     return certpathValidationModel;
   }
 
-  public Set<X509Cert> getTrustAnchors() {
-    return trustAnchors;
+  public Set<X509Cert> getTrustanchors() {
+    return trustanchors;
   }
 
   public boolean isVersionAllowed(Integer version) {
@@ -254,27 +245,9 @@ public class RequestOption {
     notNull(conf, "conf");
     Set<X509Cert> tmpCerts = new HashSet<>();
 
-    if (conf.getKeystore() != null) {
-      KeystoreConf ksConf = conf.getKeystore();
-      KeyStore trustStore = KeyUtil.getKeyStore(ksConf.getType());
-
-      String fileName = ksConf.getKeystore().getFile();
-      try (InputStream is = (fileName != null)
-          ? Files.newInputStream(Paths.get(IoUtil.expandFilepath(fileName, true)))
-          : new ByteArrayInputStream(ksConf.getKeystore().getBinary())) {
-        char[] password = (ksConf.getPassword() == null)  ? null
-            : ksConf.getPassword().toCharArray();
-        trustStore.load(is, password);
-      }
-
-      Enumeration<String> aliases = trustStore.aliases();
-      while (aliases.hasMoreElements()) {
-        String alias = aliases.nextElement();
-        if (trustStore.isCertificateEntry(alias)) {
-          tmpCerts.add(
-              new X509Cert(
-                  (X509Certificate) trustStore.getCertificate(alias)));
-        }
+    if (conf.getCerts() != null) {
+      for (FileOrBinary fn : conf.getCerts()) {
+        tmpCerts.add(X509Util.parseCert(fn.readContent()));
       }
     } else if (conf.getDir() != null) {
       File dir = new File(conf.getDir());

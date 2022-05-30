@@ -17,18 +17,12 @@
 
 package org.xipki.scep.client;
 
-import org.xipki.util.Args;
-import org.xipki.util.StringUtil;
+import org.xipki.util.http.HttpRespContent;
+import org.xipki.util.http.XiHttpClient;
+import org.xipki.util.http.XiHttpClientException;
 
 import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
 
 /**
  * A concrete SCEP client.
@@ -38,9 +32,7 @@ import java.net.URLConnection;
 
 public class ScepClient extends Client {
 
-  private final SSLSocketFactory sslSocketFactory;
-
-  private final HostnameVerifier hostnameVerifier;
+  private final XiHttpClient httpClient;
 
   public ScepClient(CaIdentifier caId, CaCertValidator caCertValidator) {
     this(caId, caCertValidator, null, null);
@@ -49,93 +41,31 @@ public class ScepClient extends Client {
   public ScepClient(CaIdentifier caId, CaCertValidator caCertValidator,
       SSLSocketFactory sslSocketFactory, HostnameVerifier hostnameVerifier) {
     super(caId, caCertValidator);
-    this.sslSocketFactory = sslSocketFactory;
-    this.hostnameVerifier = hostnameVerifier;
+    this.httpClient = new XiHttpClient(sslSocketFactory, hostnameVerifier);
   }
 
   @Override
   protected ScepHttpResponse httpGet(String url)
       throws ScepClientException {
-    Args.notNull(url, "url");
+    HttpRespContent resp;
     try {
-      HttpURLConnection httpConn = openHttpConn(new URL(url));
-      if (httpConn instanceof HttpsURLConnection) {
-        if (sslSocketFactory != null) {
-          ((HttpsURLConnection) httpConn).setSSLSocketFactory(sslSocketFactory);
-        }
-        if (hostnameVerifier != null) {
-          ((HttpsURLConnection) httpConn).setHostnameVerifier(hostnameVerifier);
-        }
-      }
-
-      httpConn.setRequestMethod("GET");
-      return parseResponse(httpConn);
-    } catch (IOException ex) {
+      resp = httpClient.httpGet(url);
+    } catch (XiHttpClientException ex) {
       throw new ScepClientException(ex);
     }
+    return new ScepHttpResponse(resp.getContentType(), resp.getContent());
   } // method httpGet
 
   @Override
   protected ScepHttpResponse httpPost(String url, String requestContentType, byte[] request)
       throws ScepClientException {
-    Args.notNull(url, "url");
+    HttpRespContent resp;
     try {
-      HttpURLConnection httpConn = openHttpConn(new URL(url));
-      httpConn.setDoOutput(true);
-      httpConn.setUseCaches(false);
-
-      httpConn.setRequestMethod("POST");
-      if (request != null) {
-        if (requestContentType != null) {
-          httpConn.setRequestProperty("Content-Type", requestContentType);
-        }
-
-        httpConn.setRequestProperty("Content-Length", Integer.toString(request.length));
-        OutputStream outputstream = httpConn.getOutputStream();
-        outputstream.write(request);
-        outputstream.flush();
-      }
-
-      return parseResponse(httpConn);
-    } catch (IOException ex) {
-      throw new ScepClientException(ex.getMessage(), ex);
-    }
-  } // method httpPost
-
-  protected ScepHttpResponse parseResponse(HttpURLConnection conn)
-      throws ScepClientException {
-    Args.notNull(conn, "conn");
-
-    try {
-      InputStream inputstream = conn.getInputStream();
-      if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-        inputstream.close();
-        throw new ScepClientException("bad response: " + conn.getResponseCode() + "    "
-                + conn.getResponseMessage());
-      }
-      String contentType = conn.getContentType();
-      int contentLength = conn.getContentLength();
-
-      ScepHttpResponse resp = new ScepHttpResponse(contentType, contentLength, inputstream);
-      String contentEncoding = conn.getContentEncoding();
-      if (StringUtil.isNotBlank(contentEncoding)) {
-        resp.setContentEncoding(contentEncoding);
-      }
-      return resp;
-    } catch (IOException ex) {
+      resp = httpClient.httpPost(url, requestContentType, request);
+    } catch (XiHttpClientException ex) {
       throw new ScepClientException(ex);
     }
-  } // method parseResponse
-
-  private static HttpURLConnection openHttpConn(URL url)
-      throws IOException {
-    Args.notNull(url, "url");
-    URLConnection conn = url.openConnection();
-    if (conn instanceof HttpURLConnection) {
-      return (HttpURLConnection) conn;
-    }
-
-    throw new IOException(url.toString() + " is not of protocol HTTP: " + url.getProtocol());
-  }
+    return new ScepHttpResponse(resp.getContentType(), resp.getContent());
+  } // method httpPost
 
 }

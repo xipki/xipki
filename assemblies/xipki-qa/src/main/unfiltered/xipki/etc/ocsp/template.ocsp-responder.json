@@ -29,15 +29,9 @@
 	"requestOptions":[{
 		"name":"request1",
 //		"certpathValidation":{
-//			"trustAnchors":{
-//				"keystore":{
-//					"keystore":{
-//						"file":"keycerts/tlskeys/ca/tls-ca-cert.p12"
-//					},
-//					"password":"1234",
-//					"type":"pkcs12"
-//				}
-//			},
+//			"trustanchors":[{
+//				"file":"keycerts/tlskeys/ca/tls-ca-cert.der"
+//			}],
 //			"validationModel":"PKIX"
 //		},
 		"hashAlgorithms":["SHA1","SHA256","SHA384","SHA512"],

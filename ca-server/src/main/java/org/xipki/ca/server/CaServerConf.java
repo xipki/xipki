@@ -20,13 +20,10 @@ package org.xipki.ca.server;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
 import org.xipki.audit.Audits.AuditConf;
+import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.datasource.DataSourceConf;
-import org.xipki.security.Securities.KeystoreConf;
 import org.xipki.security.Securities.SecurityConf;
-import org.xipki.util.Args;
-import org.xipki.util.FileOrBinary;
-import org.xipki.util.InvalidConfException;
-import org.xipki.util.ValidatableConf;
+import org.xipki.util.*;
 import org.xipki.util.http.SslContextConf;
 
 import java.io.IOException;
@@ -48,7 +45,7 @@ public class CaServerConf extends ValidatableConf {
 
     private String name;
 
-    private KeystoreConf truststore;
+    private FileOrBinary[] trustanchors;
 
     private String hostverifier;
 
@@ -60,12 +57,12 @@ public class CaServerConf extends ValidatableConf {
       this.name = name;
     }
 
-    public KeystoreConf getTruststore() {
-      return truststore;
+    public FileOrBinary[] getTrustanchors() {
+      return trustanchors;
     }
 
-    public void setTruststore(KeystoreConf truststore) {
-      this.truststore = truststore;
+    public void setTrustanchors(FileOrBinary[] trustanchors) {
+      this.trustanchors = trustanchors;
     }
 
     public String getHostverifier() {
@@ -255,24 +252,27 @@ public class CaServerConf extends ValidatableConf {
     this.ctLog = ctLog;
   }
 
-  public synchronized SslContextConf getSslContextConf(String name) {
+  public void initSsl() throws CaMgmtException {
     if (sslContexts == null || sslContexts.isEmpty()) {
-      return null;
+      return;
     }
 
     if (sslContextConfMap.isEmpty()) {
       for (SslContext m : sslContexts) {
         SslContextConf conf = new SslContextConf();
         conf.setSslHostnameVerifier(m.getHostverifier());
-
-        KeystoreConf truststore = m.getTruststore();
-        conf.setSslTruststore(truststore.getKeystore());
-        conf.setSslTruststorePassword(truststore.getPassword());
-        conf.setSslStoreType(truststore.getType());
-
+        conf.setSslTrustanchors(m.trustanchors);
+        try {
+          conf.getSslContext();
+        } catch (ObjectCreationException e) {
+          throw new RuntimeException(e);
+        }
         sslContextConfMap.put(m.getName(), conf);
       }
     }
+  }
+
+  public SslContextConf getSslContextConf(String name) {
     return sslContextConfMap.get(name);
   } // method getSslContextConf
 

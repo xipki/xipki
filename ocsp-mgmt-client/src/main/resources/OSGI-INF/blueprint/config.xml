@@ -8,8 +8,7 @@
       <cm:property name="sslStoreType" value="" />
       <cm:property name="sslKeystore" value="" />
       <cm:property name="sslKeystorePassword" value="" />
-      <cm:property name="sslTruststore" value="" />
-      <cm:property name="sslTruststorePassword" value="" />
+      <cm:property name="sslTrustanchors" value="" />
       <cm:property name="sslHostnameVerifier" value="default" />
     </cm:default-properties>
   </cm:property-placeholder>
@@ -19,8 +18,7 @@
     <property name="sslStoreType" value="${sslStoreType}"/>
     <property name="sslKeystore" value="${sslKeystore}"/>
     <property name="sslKeystorePassword" value="${sslKeystorePassword}"/>
-    <property name="sslTruststore" value="${sslTruststore}"/>
-    <property name="sslTruststorePassword" value="${sslTruststorePassword}"/>
+    <property name="sslTrustanchors" value="${sslTrustanchors}"/>
     <property name="sslHostnameVerifier" value="${sslHostnameVerifier}"/>
   </bean>
 

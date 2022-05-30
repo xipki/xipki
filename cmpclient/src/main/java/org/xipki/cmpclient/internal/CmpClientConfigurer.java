@@ -32,20 +32,15 @@ import org.xipki.cmpclient.internal.Requestor.SignatureCmpRequestor;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
-import org.xipki.util.http.HostnameVerifiers;
-import org.xipki.util.http.SSLContextBuilder;
+import org.xipki.util.http.SslContextConf;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.CertPathBuilderException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -214,35 +209,25 @@ final class CmpClientConfigurer {
     Map<String, SslConf> sslConfs = new HashMap<>();
     if (conf.getSsls() != null) {
       for (CmpClientConf.Ssl ssl : conf.getSsls()) {
-        SSLContextBuilder builder = new SSLContextBuilder();
-        if (ssl.getStoreType() != null) {
-          builder.setKeyStoreType(ssl.getStoreType());
-        }
+        SslContextConf sslCc = new SslContextConf();
+        sslCc.setSslStoreType(ssl.getStoreType());
 
         try {
           if (ssl.getKeystore() != null) {
-            char[] pwd = ssl.getKeystorePassword() == null
-                ? null : ssl.getKeystorePassword().toCharArray();
-            try (InputStream is = new ByteArrayInputStream(ssl.getKeystore().readContent())) {
-              builder.loadKeyMaterial(is, pwd, pwd);
-            }
+            sslCc.setSslKeystore(ssl.getKeystore());
+            sslCc.setSslKeystorePassword(ssl.getKeystorePassword());
           }
 
-          if (ssl.getTruststore() != null) {
-            char[] pwd = ssl.getTruststorePassword() == null
-                ? null : ssl.getTruststorePassword().toCharArray();
-            try (InputStream is = new ByteArrayInputStream(ssl.getTruststore().readContent())) {
-              builder.loadTrustMaterial(is, pwd);
-            }
+          if (ssl.getTrustanchors() != null) {
+            sslCc.setSslTrustanchors(ssl.getTrustanchors());
           }
 
-          SSLSocketFactory socketFactory = builder.build().getSocketFactory();
-          HostnameVerifier hostnameVerifier =
-              HostnameVerifiers.createHostnameVerifier(ssl.getHostnameVerifier());
+          sslCc.setSslHostnameVerifier(ssl.getHostnameVerifier());
+
+          SSLSocketFactory socketFactory = sslCc.getSslSocketFactory();
+          HostnameVerifier hostnameVerifier = sslCc.buildHostnameVerifier();
           sslConfs.put(ssl.getName(), new SslConf(socketFactory, hostnameVerifier));
-        } catch (IOException | UnrecoverableKeyException | NoSuchAlgorithmException
-            | KeyStoreException | CertificateException | KeyManagementException
-            | ObjectCreationException ex) {
+        } catch (ObjectCreationException ex) {
           LOG.error("could not initialize SSL configuration " + ssl.getName()
               + ": " + ex.getMessage(), ex);
           return false;

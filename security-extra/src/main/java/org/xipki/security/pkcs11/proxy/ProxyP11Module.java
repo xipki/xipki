@@ -27,8 +27,7 @@ import org.xipki.security.pkcs11.*;
 import org.xipki.security.pkcs11.proxy.asn1.ServerCaps;
 import org.xipki.security.pkcs11.proxy.asn1.SlotIdentifier;
 import org.xipki.util.*;
-import org.xipki.util.http.HostnameVerifiers;
-import org.xipki.util.http.SSLContextBuilder;
+import org.xipki.util.http.SslContextConf;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -37,11 +36,6 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -67,11 +61,9 @@ public class ProxyP11Module extends P11Module {
 
   private static final String PROP_SSL_KEYSTOREPASSWORD = "ssl.keystorePassword";
 
-  private static final String PROP_SSL_TRUSTSTORE = "ssl.truststore";
+  private static final String PROP_SSL_TRUSTANCHORS = "ssl.trustanchors";
 
-  private static final String PROP_SSL_TRUSTOREPASSWORD = "ssl.truststorePassword";
-
-  private static final String PROP_SSL_HOStNAMEVERIFIER = "ssl.hostnameVerifier";
+  private static final String PROP_SSL_HOSTNAMEVERIFIER = "ssl.hostnameVerifier";
 
   private static final Logger LOG = LoggerFactory.getLogger(ProxyP11Module.class);
 
@@ -141,45 +133,34 @@ public class ProxyP11Module extends P11Module {
     String sslStoreType = confPairs.value(PROP_SSL_STORETYPE);
     String sslKeystore = confPairs.value(PROP_SSL_KEYSTORE);
     String sslKeystorePassword = confPairs.value(PROP_SSL_KEYSTOREPASSWORD);
-    String sslTruststore = confPairs.value(PROP_SSL_TRUSTSTORE);
-    String sslTruststorePassword = confPairs.value(PROP_SSL_TRUSTOREPASSWORD);
-    String sslHostnameVerifier = confPairs.value(PROP_SSL_HOStNAMEVERIFIER);
+    String sslTrustanchors = confPairs.value(PROP_SSL_TRUSTANCHORS);
+    String sslHostnameVerifier = confPairs.value(PROP_SSL_HOSTNAMEVERIFIER);
 
-    SSLContextBuilder builder = new SSLContextBuilder();
+    SslContextConf sslConf = new SslContextConf();
     if (sslStoreType != null) {
-      builder.setKeyStoreType(sslStoreType);
+      sslConf.setSslStoreType(sslStoreType);
     }
 
     if (sslKeystore != null) {
-      sslKeystore = IoUtil.expandFilepath(sslKeystore, true);
-
-      char[] pwd = sslKeystorePassword == null ? null : sslKeystorePassword.toCharArray();
-      try {
-        builder.loadKeyMaterial(new File(sslKeystore), pwd, pwd);
-      } catch (UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException
-          | CertificateException | IOException ex) {
-        throw new P11TokenException("could not load key material", ex);
-      }
+      sslConf.setSslKeystore(sslKeystore);
+      sslConf.setSslKeystorePassword(sslKeystorePassword);
     }
 
-    if (sslTruststore != null) {
-      sslTruststore = IoUtil.expandFilepath(sslTruststore, true);
-      char[] pwd = sslTruststorePassword == null ? null : sslTruststorePassword.toCharArray();
-      try {
-        builder.loadTrustMaterial(new File(sslTruststore), pwd);
-      } catch (NoSuchAlgorithmException | KeyStoreException | CertificateException
-          | IOException ex) {
-        throw new P11TokenException("could not load trust material", ex);
-      }
+    if (sslTrustanchors != null) {
+      sslConf.setSslTrustanchors(sslTrustanchors);
+    }
+
+    if (sslHostnameVerifier != null) {
+      sslConf.setSslHostnameVerifier(sslHostnameVerifier);
     }
 
     try {
-      this.sslSocketFactory = builder.build().getSocketFactory();
-    } catch (KeyManagementException | NoSuchAlgorithmException ex) {
+      this.sslSocketFactory = sslConf.getSslSocketFactory();
+    } catch (ObjectCreationException ex) {
       throw new P11TokenException("could not build SSLSocketFactroy", ex);
     }
     try {
-      this.hostnameVerifier = HostnameVerifiers.createHostnameVerifier(sslHostnameVerifier);
+      this.hostnameVerifier = sslConf.buildHostnameVerifier();
     } catch (ObjectCreationException ex) {
       throw new P11TokenException("could not create HostnameVerifier", ex);
     }

@@ -31,11 +31,13 @@ import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.security.util.X509Util;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ValidatableConf;
 import org.xipki.util.concurrent.CountLatch;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -69,9 +71,7 @@ public class BenchmarkHttpClient {
 
     private String keystorePassword;
 
-    private String truststore;
-
-    private String truststorePassword;
+    private String[] trustanchors;
 
     private SslContext sslContext;
 
@@ -99,20 +99,12 @@ public class BenchmarkHttpClient {
       this.keystorePassword = keystorePassword;
     }
 
-    public String getTruststore() {
-      return truststore;
+    public String[] getTrustanchors() {
+      return trustanchors;
     }
 
-    public void setTruststore(String truststore) {
-      this.truststore = truststore;
-    }
-
-    public String getTruststorePassword() {
-      return truststorePassword;
-    }
-
-    public void setTruststorePassword(String truststorePassword) {
-      this.truststorePassword = truststorePassword;
+    public void setTrustanchors(String[] trustanchors) {
+      this.trustanchors = trustanchors;
     }
 
     @Override
@@ -157,18 +149,14 @@ public class BenchmarkHttpClient {
         }
       }
 
-      if (truststore != null) {
-        char[] pwd = truststorePassword == null ? null : truststorePassword.toCharArray();
-        KeyStore ks = loadKeyStore(storeType, truststore, pwd);
-        Enumeration<String> aliases = ks.aliases();
-
-        while (aliases.hasMoreElements()) {
-          String alias = aliases.nextElement();
-          Certificate cert = ks.getCertificate(alias);
-          if (cert instanceof X509Certificate) {
-            builder.trustManager((X509Certificate) cert);
-          }
+      if (trustanchors != null) {
+        X509Certificate[] certs = new X509Certificate[trustanchors.length];
+        int idx = 0;
+        for (String certFile : trustanchors) {
+          certs[idx++] = X509Util.parseCert(new File(certFile)).toJceCert();
         }
+
+        builder.trustManager(certs);
       }
 
       // providers

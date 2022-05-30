@@ -138,14 +138,6 @@ class Ca2Manager {
           LOG.error(concat("getSslContextConf (ca=", caName,
               "): found no SslContext named " + name));
           return false;
-        } else {
-          try {
-            ctxConf.getSslContext();
-          } catch (ObjectCreationException ex) {
-            LOG.error(concat("startCa (ca=", caName,
-                        "): could not initialize SslContext named " + name));
-            return false;
-          }
         }
       }
       ctlogClient = new CtLogClient(ctlogControl.getServers(), ctxConf);

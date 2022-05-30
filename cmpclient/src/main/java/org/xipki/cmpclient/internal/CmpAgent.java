@@ -162,27 +162,7 @@ class CmpAgent {
     httpUrlConnection.setRequestMethod("POST");
     httpUrlConnection.setRequestProperty("Content-Type", CMP_REQUEST_MIMETYPE);
     httpUrlConnection.setRequestProperty("Content-Length", Integer.toString(size));
-    OutputStream outputstream;
-
-    // try max. 3 times
-    for (int i = 0; ;i++) {
-      try {
-        outputstream = httpUrlConnection.getOutputStream();
-        break;
-      } catch (EOFException ex) {
-        if (i == 2) {
-          throw ex;
-        } else {
-          // wait for 200 ms
-          try {
-            Thread.sleep(200);
-          } catch (InterruptedException ex2) {
-            // do nothing
-          }
-        }
-      }
-    }
-
+    OutputStream outputstream = httpUrlConnection.getOutputStream();
     outputstream.write(request);
     outputstream.flush();
 

@@ -21,10 +21,9 @@
     +-- crl.download (file, required)
     |     Specify the URL and time to download the CRL.
     |
-    |-- tls-truststore.p12 (file, optional)
-    |     PKCS#12 keystore that contains all trust anchor certificates for the
-    |     TLS connection to download the CRLs. The password is specified in
-    |     the file crl.download
+    |-- tls-trustanchor.pem (file, optional)
+    |     File that contains the trust anchor certificates for the
+    |     TLS connection to download the CRLs.
     |
     +-- certs (directory, optional)
         Contains all certificates that are valid at current time

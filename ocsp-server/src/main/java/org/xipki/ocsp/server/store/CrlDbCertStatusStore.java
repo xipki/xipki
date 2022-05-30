@@ -425,11 +425,11 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     String subDirPath = subDir.getPath();
     Curl curl = curls.get(subDirPath);
 
-    File truststoreFile = new File(subDir, "tls-truststore.p12");
-    if (truststoreFile.exists()) {
+    File trustanchorFile = new File(subDir, "tls-trustanchor.pem");
+    if (trustanchorFile.exists()) {
       if (curl != null) {
         long lastModified = curlsConfLastModified.get(subDirPath);
-        if (truststoreFile.lastModified() != lastModified) {
+        if (trustanchorFile.lastModified() != lastModified) {
           curl = null;
           curlsConfLastModified.remove(subDirPath);
           curls.remove(subDirPath);
@@ -438,11 +438,10 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
 
       if (curl == null) {
         SslContextConf sslContextConf = new SslContextConf();
-        sslContextConf.setSslTruststore(truststoreFile.getPath());
-        sslContextConf.setSslTruststorePassword(props.getProperty("truststore.password"));
+        sslContextConf.setSslTrustanchors(trustanchorFile.getPath());
         curl = new DefaultCurl(sslContextConf);
         curls.put(subDirPath, curl);
-        curlsConfLastModified.put(subDirPath, truststoreFile.lastModified());
+        curlsConfLastModified.put(subDirPath, trustanchorFile.lastModified());
       }
     } else {
       if (curl == null) {

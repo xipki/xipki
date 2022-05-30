@@ -22,7 +22,6 @@ import org.xipki.datasource.DataSourceConf;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownIssuerBehaviour;
 import org.xipki.security.CertpathValidationModel;
-import org.xipki.security.Securities.KeystoreConf;
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.InvalidConfException;
 import org.xipki.util.ValidatableConf;
@@ -54,7 +53,7 @@ public class OcspServerConf extends ValidatableConf {
 
     private String dir;
 
-    private KeystoreConf keystore;
+    private FileOrBinary[] certs;
 
     public String getDir() {
       return dir;
@@ -64,19 +63,18 @@ public class OcspServerConf extends ValidatableConf {
       this.dir = value;
     }
 
-    public KeystoreConf getKeystore() {
-      return keystore;
+    public FileOrBinary[] getCerts() {
+      return certs;
     }
 
-    public void setKeystore(KeystoreConf value) {
-      this.keystore = value;
+    public void setCerts(FileOrBinary[] certs) {
+      this.certs = certs;
     }
 
     @Override
     public void validate()
         throws InvalidConfException {
-      exactOne(keystore, "keystore", dir, "dir");
-      validate(keystore);
+      exactOne(certs, "certs", dir, "dir");
     }
 
   } // class CertCollection
@@ -257,7 +255,7 @@ public class OcspServerConf extends ValidatableConf {
 
     private CertpathValidationModel validationModel;
 
-    private CertCollection trustAnchors;
+    private CertCollection trustanchors;
 
     private CertCollection certs;
 
@@ -269,12 +267,12 @@ public class OcspServerConf extends ValidatableConf {
       this.validationModel = validationModel;
     }
 
-    public CertCollection getTrustAnchors() {
-      return trustAnchors;
+    public CertCollection getTrustanchors() {
+      return trustanchors;
     }
 
-    public void setTrustAnchors(CertCollection trustAnchors) {
-      this.trustAnchors = trustAnchors;
+    public void setTrustanchors(CertCollection trustanchors) {
+      this.trustanchors = trustanchors;
     }
 
     public CertCollection getCerts() {
@@ -289,8 +287,8 @@ public class OcspServerConf extends ValidatableConf {
     public void validate()
         throws InvalidConfException {
       notNull(validationModel, "validationModel");
-      notNull(trustAnchors, "trustAnchors");
-      validate(trustAnchors);
+      notNull(trustanchors, "trustanchors");
+      validate(trustanchors);
       validate(certs);
     }
 

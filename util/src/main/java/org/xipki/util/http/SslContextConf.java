@@ -17,20 +17,17 @@
 
 package org.xipki.util.http;
 
-import org.xipki.util.FileOrBinary;
-import org.xipki.util.ObjectCreationException;
+import org.xipki.util.*;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
+import java.io.*;
+import java.security.*;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.util.StringTokenizer;
 
 /**
  * Configuration of SSL context.
@@ -40,6 +37,8 @@ import java.security.cert.CertificateException;
 
 public class SslContextConf {
 
+  private static final byte[] PEM_PREFIX = StringUtil.toUtf8Bytes("-----BEGIN");
+
   private boolean useSslConf = true;
 
   private String sslStoreType;
@@ -48,9 +47,7 @@ public class SslContextConf {
 
   private String sslKeystorePassword;
 
-  private FileOrBinary sslTruststore;
-
-  private String sslTruststorePassword;
+  private FileOrBinary[] sslTrustanchors;
 
   private String sslHostnameVerifier;
 
@@ -99,29 +96,27 @@ public class SslContextConf {
     this.sslKeystorePassword = emptyAsNull(sslKeystorePassword);
   }
 
-  public FileOrBinary getSslTruststore() {
-    return sslTruststore;
+  public FileOrBinary[] getSslTrustanchors() {
+    return sslTrustanchors;
   }
 
-  public void setSslTruststore(String sslTruststore) {
-    String storeFile = emptyAsNull(sslTruststore);
-    if (storeFile == null) {
-      this.sslTruststore = null;
-    } else {
-      setSslTruststore(FileOrBinary.ofFile(storeFile));
+  public void setSslTrustanchors(String sslTrustanchors) {
+    sslTrustanchors = emptyAsNull(sslTrustanchors);
+    if (sslTrustanchors == null) {
+      this.sslTrustanchors = null;
+      return;
     }
+
+    StringTokenizer tokens = new StringTokenizer(sslTrustanchors, ",;:");
+    FileOrBinary[] fbs = new FileOrBinary[tokens.countTokens()];
+    for (int i = 0; i < fbs.length; i++) {
+      fbs[i] = FileOrBinary.ofFile(tokens.nextToken());
+    }
+    setSslTrustanchors(fbs);
   }
 
-  public void setSslTruststore(FileOrBinary sslTruststore) {
-    this.sslTruststore = sslTruststore;
-  }
-
-  public String getSslTruststorePassword() {
-    return sslTruststorePassword;
-  }
-
-  public void setSslTruststorePassword(String sslTruststorePassword) {
-    this.sslTruststorePassword = emptyAsNull(sslTruststorePassword);
+  public void setSslTrustanchors(FileOrBinary[] sslTrustanchors) {
+    this.sslTrustanchors = sslTrustanchors;
   }
 
   public String getSslHostnameVerifier() {
@@ -152,12 +147,39 @@ public class SslContextConf {
           }
         }
 
-        if (sslTruststore != null) {
-          char[] password = sslTruststorePassword == null
-              ? null : sslTruststorePassword.toCharArray();
-          try (InputStream is = new ByteArrayInputStream(sslTruststore.readContent())) {
-            builder.loadTrustMaterial(is, password);
+        if (sslTrustanchors != null && sslTrustanchors.length != 0) {
+          KeyStore ks = KeyStore.getInstance("JKS");
+          ks.load(null, "any".toCharArray());
+          CertificateFactory cf = CertificateFactory.getInstance("X.509");
+
+          int idx = 1;
+          for (FileOrBinary fb : sslTrustanchors) {
+            byte[] bytes = fb.readContent();
+            if (CompareUtil.areEqual(bytes, 0, PEM_PREFIX, 0, PEM_PREFIX.length)) {
+              BufferedReader reader = new BufferedReader(
+                  new InputStreamReader(new ByteArrayInputStream(bytes)));
+              StringBuilder sb = null;
+              String line;
+              while ((line = reader.readLine()) != null) {
+                if (line.equals("-----BEGIN CERTIFICATE-----")) {
+                  sb = new StringBuilder(1000);
+                } else if (line.equals("-----END CERTIFICATE-----")) {
+                  if (sb != null) {
+                    byte[] certBytes = Base64.decode(sb.toString());
+                    sb = null;
+                    ks.setCertificateEntry("cert-" + (idx++), parseCert(cf, certBytes));
+                  }
+                } else {
+                  if (sb != null) {
+                    sb.append(line);
+                  }
+                }
+              }
+            } else {
+              ks.setCertificateEntry("cert-" + (idx++), parseCert(cf, bytes));
+            }
           }
+          builder.loadTrustMaterial(ks);
         }
 
         sslContext = builder.build();
@@ -169,6 +191,13 @@ public class SslContextConf {
 
     return sslContext;
   } // method getSslContext
+
+  private static Certificate parseCert(CertificateFactory fact, byte[] certBytes)
+      throws CertificateException, IOException {
+    try (InputStream certIs = new ByteArrayInputStream(certBytes)) {
+      return fact.generateCertificate(certIs);
+    }
+  }
 
   public SSLSocketFactory getSslSocketFactory()
       throws ObjectCreationException {
