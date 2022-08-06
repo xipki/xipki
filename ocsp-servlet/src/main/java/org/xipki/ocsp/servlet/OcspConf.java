@@ -20,7 +20,7 @@ package org.xipki.ocsp.servlet;
 import com.alibaba.fastjson.JSON;
 import org.xipki.security.Securities.SecurityConf;
 import org.xipki.util.FileOrBinary;
-import org.xipki.util.InvalidConfException;
+import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.ValidatableConf;
 
@@ -68,6 +68,8 @@ public class OcspConf extends ValidatableConf {
 
   public static final String DFLT_SERVER_CONF = "ocsp/etc/ocsp-responder.json";
 
+  private boolean logReqResp;
+
   private String serverConf;
 
   private RemoteMgmt remoteMgmt;
@@ -84,6 +86,14 @@ public class OcspConf extends ValidatableConf {
 
       return conf;
     }
+  }
+
+  public boolean isLogReqResp() {
+    return logReqResp;
+  }
+
+  public void setLogReqResp(boolean logReqResp) {
+    this.logReqResp = logReqResp;
   }
 
   public String getServerConf() {

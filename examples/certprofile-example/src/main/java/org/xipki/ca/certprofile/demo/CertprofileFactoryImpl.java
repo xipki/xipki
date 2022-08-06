@@ -19,7 +19,7 @@ package org.xipki.ca.certprofile.demo;
 
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileFactory;
-import org.xipki.util.ObjectCreationException;
+import org.xipki.util.exception.ObjectCreationException;
 
 import java.util.Arrays;
 import java.util.Collections;

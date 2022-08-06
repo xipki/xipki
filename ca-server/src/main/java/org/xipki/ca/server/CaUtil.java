@@ -18,31 +18,24 @@
 package org.xipki.ca.server;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
 import org.bouncycastle.asn1.crmf.DhSigStatic;
-import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.*;
 import org.xipki.ca.api.mgmt.CaMgmtException;
-import org.xipki.ca.api.mgmt.PermissionConstants;
+import org.xipki.util.PermissionConstants;
 import org.xipki.ca.api.mgmt.PopControl;
 import org.xipki.ca.api.profile.Certprofile.CertLevel;
 import org.xipki.ca.api.profile.SubjectDnSpec;
-import org.xipki.password.PasswordResolverException;
 import org.xipki.security.*;
 import org.xipki.security.ObjectIdentifiers.Xipki;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
 
 import java.io.IOException;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertPathBuilderException;
 import java.security.cert.CertificateException;
@@ -81,47 +74,6 @@ public class CaUtil {
       list.add(element);
     }
   }
-
-  public static String buildInsertSql(String table, String... columns) {
-    StringBuilder sb = new StringBuilder(100);
-    sb.append("INSERT INTO ").append(table).append(" (");
-    for (String c : columns) {
-      sb.append(c).append(",");
-    }
-    sb.deleteCharAt(sb.length() - 1);
-    sb.append(") VALUES (");
-    for (int i = 0; i < columns.length; i++) {
-      sb.append("?,");
-    }
-    sb.deleteCharAt(sb.length() - 1);
-    sb.append(")");
-    return sb.toString();
-  }
-
-  public static Extensions getExtensions(CertificationRequestInfo csr) {
-    notNull(csr, "csr");
-    ASN1Set attrs = csr.getAttributes();
-    for (int i = 0; i < attrs.size(); i++) {
-      Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
-      if (PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType())) {
-        return Extensions.getInstance(attr.getAttributeValues()[0]);
-      }
-    }
-    return null;
-  } // method getExtensions
-
-  public static String getChallengePassword(CertificationRequestInfo csr) {
-    notNull(csr, "csr");
-    ASN1Set attrs = csr.getAttributes();
-    for (int i = 0; i < attrs.size(); i++) {
-      Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
-      if (PKCSObjectIdentifiers.pkcs_9_at_challengePassword.equals(attr.getAttrType())) {
-        ASN1String str = (ASN1String) attr.getAttributeValues()[0];
-        return str.getString();
-      }
-    }
-    return null;
-  } // method getChallengePassword
 
   public static BasicConstraints createBasicConstraints(CertLevel level, Integer pathLen) {
     BasicConstraints basicConstraints;
@@ -271,8 +223,6 @@ public class CaUtil {
     }
 
     String keystoreConf = pairs.value("keystore");
-    String passwordHint = pairs.value("password");
-    String keyLabel = pairs.value("key-label");
 
     byte[] ksBytes;
     if (StringUtil.startsWithIgnoreCase(keystoreConf, "file:")) {
@@ -288,15 +238,6 @@ public class CaUtil {
       return signerConf;
     }
 
-    try {
-      char[] password = securityFactory.getPasswordResolver().resolvePassword(passwordHint);
-      ksBytes = securityFactory.extractMinimalKeyStore(keystoreType, ksBytes, keyLabel,
-          password, certChain);
-    } catch (KeyStoreException ex) {
-      throw new CaMgmtException("KeyStoreException: " + ex.getMessage(), ex);
-    } catch (PasswordResolverException ex) {
-      throw new CaMgmtException("PasswordResolverException: " + ex.getMessage(), ex);
-    }
     pairs.putPair("keystore", "base64:" + Base64.encodeToString(ksBytes));
     return pairs.getEncoded();
   } // method canonicalizeSignerConf

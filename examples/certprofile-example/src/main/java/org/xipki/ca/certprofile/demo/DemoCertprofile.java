@@ -25,7 +25,7 @@ import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
-import org.xipki.ca.api.BadCertTemplateException;
+import org.xipki.util.exception.BadCertTemplateException;
 import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;

@@ -18,6 +18,7 @@
 package org.xipki.util.http;
 
 import org.xipki.util.*;
+import org.xipki.util.exception.ObjectCreationException;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -54,6 +55,23 @@ public class SslContextConf {
   private SSLContext sslContext;
 
   private SSLSocketFactory sslSocketFactory;
+
+  public static SslContextConf ofSslConf(SslConf ssl) {
+    SslContextConf sslCc = new SslContextConf();
+    sslCc.setSslStoreType(ssl.getStoreType());
+
+    if (ssl.getKeystore() != null) {
+      sslCc.setSslKeystore(ssl.getKeystore());
+      sslCc.setSslKeystorePassword(ssl.getKeystorePassword());
+    }
+
+    if (ssl.getTrustanchors() != null) {
+      sslCc.setSslTrustanchors(ssl.getTrustanchors());
+    }
+
+    sslCc.setSslHostnameVerifier(ssl.getHostnameVerifier());
+    return sslCc;
+  }
 
   public boolean isUseSslConf() {
     return useSslConf;

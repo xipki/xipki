@@ -18,6 +18,7 @@
 package org.xipki.ca.api.mgmt;
 
 import org.xipki.util.*;
+import org.xipki.util.exception.InvalidConfException;
 
 import java.util.List;
 

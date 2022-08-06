@@ -20,7 +20,7 @@ package org.xipki.ca.api.publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.util.Args;
-import org.xipki.util.ObjectCreationException;
+import org.xipki.util.exception.ObjectCreationException;
 
 import java.util.Collections;
 import java.util.HashSet;

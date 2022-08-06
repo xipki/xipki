@@ -28,6 +28,8 @@ import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
 import org.xipki.util.*;
+import org.xipki.util.exception.InvalidConfException;
+import org.xipki.util.exception.ObjectCreationException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -91,13 +93,11 @@ public class CaConf {
 
     private final List<CaHasRequestorEntry> requestors;
 
-    private final List<CaHasUserEntry> users;
-
     private final List<String> publisherNames;
 
     public SingleCa(String name, GenSelfIssued genSelfIssued, CaEntry caEntry,
         List<String> aliases, List<String> profileNames, List<CaHasRequestorEntry> requestors,
-        List<CaHasUserEntry> users, List<String> publisherNames) {
+        List<String> publisherNames) {
       this.name = Args.notBlank(name, "name");
       if (genSelfIssued != null) {
         if (caEntry == null) {
@@ -116,7 +116,6 @@ public class CaConf {
       this.aliases = aliases;
       this.profileNames = profileNames;
       this.requestors = requestors;
-      this.users = users;
       this.publisherNames = publisherNames;
     } // constructor
 
@@ -144,10 +143,6 @@ public class CaConf {
       return requestors;
     }
 
-    public List<CaHasUserEntry> getUsers() {
-      return users;
-    }
-
     public List<String> getPublisherNames() {
       return publisherNames;
     }
@@ -163,8 +158,6 @@ public class CaConf {
   private final Map<String, SignerEntry> signers = new HashMap<>();
 
   private final Map<String, RequestorEntry> requestors = new HashMap<>();
-
-  private final Map<String, Object> users = new HashMap<>();
 
   private final Map<String, PublisherEntry> publishers = new HashMap<>();
 
@@ -257,23 +250,6 @@ public class CaConf {
       }
     }
 
-    // Users
-    if (root.getUsers() != null) {
-      for (CaConfType.User m : root.getUsers()) {
-        boolean active = m.isActive();
-        String password = m.getPassword();
-        if (password != null) {
-          AddUserEntry en =
-              new AddUserEntry(new NameId(null, m.getName()), active, password);
-          addUser(en);
-        } else {
-          UserEntry en = new UserEntry(new NameId(null, m.getName()), active,
-              m.getHashedPassword());
-          addUser(en);
-        }
-      }
-    }
-
     // Publishers
     if (root.getPublishers() != null) {
       for (CaConfType.NameTypeConf m : root.getPublishers()) {
@@ -339,19 +315,9 @@ public class CaConf {
               expandConf(ci.getSignerType()), getValue(ci.getSignerConf(), zipEntries), caUris,
               numCrls, exprirationPeriod);
 
-          if (CollectionUtil.isNotEmpty(ci.getCmpControl())) {
-            caEntry.setCmpControl(new CmpControl(
-                    new ConfPairs(ci.getCmpControl()).getEncoded()));
-          }
-
           if (ci.getCrlControl() != null) {
             caEntry.setCrlControl(new CrlControl(
                 new ConfPairs(ci.getCrlControl()).getEncoded()));
-          }
-
-          if (ci.getScepControl() != null) {
-            caEntry.setScepControl(new ScepControl(
-                new ConfPairs(ci.getScepControl()).getEncoded()));
           }
 
           if (ci.getCtlogControl() != null) {
@@ -359,8 +325,6 @@ public class CaConf {
                 new ConfPairs(ci.getCtlogControl()).getEncoded()));
           }
 
-          caEntry.setCmpResponderName(ci.getCmpResponderName());
-          caEntry.setScepResponderName(ci.getScepResponderName());
           caEntry.setCrlSignerName(ci.getCrlSignerName());
           caEntry.setKeypairGenNames(ci.getKeypairGenNames());
 
@@ -374,18 +338,6 @@ public class CaConf {
 
           caEntry.setMaxValidity(Validity.getInstance(ci.getMaxValidity()));
           caEntry.setPermission(getIntPermission(ci.getPermissions()));
-
-          if (ci.getProtocolSupport() != null) {
-            caEntry.setProtocolSupport(new ProtocolSupport(ci.getProtocolSupport()));
-          }
-
-          PopControl popControl;
-          if (ci.getPopControl() != null) {
-            popControl = new PopControl(getValue(ci.getPopControl(), zipEntries));
-          } else {
-            popControl = new PopControl("");
-          }
-          caEntry.setPopControl(popControl);
 
           if (ci.getRevokeSuspendedControl() != null) {
             caEntry.setRevokeSuspendedControl(
@@ -453,7 +405,6 @@ public class CaConf {
           for (CaConfType.CaHasRequestor req : m.getRequestors()) {
             CaHasRequestorEntry en =
                 new CaHasRequestorEntry(new NameId(null, req.getRequestorName()));
-            en.setRa(req.isRa());
 
             if (req.getProfiles() != null && !req.getProfiles().isEmpty()) {
               en.setProfiles(new HashSet<>(req.getProfiles()));
@@ -461,19 +412,6 @@ public class CaConf {
 
             en.setPermission(getIntPermission(req.getPermissions()));
             caHasRequestors.add(en);
-          }
-        }
-
-        List<CaHasUserEntry> caHasUsers = null;
-        if (m.getUsers() != null) {
-          caHasUsers = new LinkedList<>();
-          for (CaConfType.CaHasUser req : m.getUsers()) {
-            CaHasUserEntry en = new CaHasUserEntry(new NameId(null, req.getUserName()));
-            en.setPermission(getIntPermission(req.getPermissions()));
-            if (req.getProfiles() != null && !req.getProfiles().isEmpty()) {
-              en.setProfiles(new HashSet<>(req.getProfiles()));
-            }
-            caHasUsers.add(en);
           }
         }
 
@@ -492,7 +430,7 @@ public class CaConf {
         }
 
         SingleCa singleCa = new SingleCa(name, genSelfIssued, caEntry, aliases,
-            profileNames, caHasRequestors, caHasUsers, publisherNames);
+            profileNames, caHasRequestors, publisherNames);
         addSingleCa(singleCa);
       }
     }
@@ -517,30 +455,12 @@ public class CaConf {
     this.requestors.put(requestor.getIdent().getName(), requestor);
   }
 
-  public void addUser(UserEntry user) {
-    Args.notNull(user, "user");
-    this.users.put(user.getIdent().getName(), user);
-  }
-
-  public void addUser(AddUserEntry user) {
-    Args.notNull(user, "user");
-    this.users.put(user.getIdent().getName(), user);
-  }
-
   public Set<String> getRequestorNames() {
     return Collections.unmodifiableSet(requestors.keySet());
   }
 
   public RequestorEntry getRequestor(String name) {
     return requestors.get(Args.notNull(name, "name"));
-  }
-
-  public Set<String> getUserNames() {
-    return Collections.unmodifiableSet(users.keySet());
-  }
-
-  public Object getUser(String name) {
-    return users.get(Args.notNull(name, "name"));
   }
 
   public void addPublisher(PublisherEntry publisher) {

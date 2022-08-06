@@ -46,6 +46,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import static org.xipki.util.SqlUtil.buildInsertSql;
+
 /**
  * Database importer of CA CertStore.
  *
@@ -57,20 +59,18 @@ class CaCertstoreDbImporter extends DbPorter {
 
   private static final Logger LOG = LoggerFactory.getLogger(CaCertstoreDbImporter.class);
 
-  private static final String SQL_ADD_CERT =
-      "INSERT INTO CERT (ID,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,RR,RT,RIT,"
-      + "PID,CA_ID,RID,UID,EE,RTYPE,TID,SHA1,REQ_SUBJECT,CRL_SCOPE,CERT,PRIVATE_KEY)"
-      + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+  private static final String SQL_ADD_CERT = buildInsertSql("CERT",
+      "ID,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,RR,RT,RIT,"
+      + "PID,CA_ID,RID,EE,TID,SHA1,REQ_SUBJECT,CRL_SCOPE,CERT,PRIVATE_KEY");
 
-  private static final String SQL_ADD_CRL =
-      "INSERT INTO CRL (ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE,DELTACRL,BASECRL_NO,"
-      + "CRL_SCOPE,SHA1,CRL)"
-      + " VALUES (?,?,?,?,?,?,?,?,?,?)";
+  private static final String SQL_ADD_CRL = buildInsertSql("CRL",
+      "ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE,DELTACRL,BASECRL_NO,CRL_SCOPE,SHA1,CRL");
 
-  private static final String SQL_ADD_REQUEST =
-      "INSERT INTO REQUEST (ID,LUPDATE,DATA) VALUES (?,?,?)";
+  private static final String SQL_ADD_REQUEST = buildInsertSql("REQUEST",
+      "ID,LUPDATE,DATA");
 
-  private static final String SQL_ADD_REQCERT = "INSERT INTO REQCERT (ID,RID,CID) VALUES (?,?,?)";
+  private static final String SQL_ADD_REQCERT = buildInsertSql("REQCERT",
+      "ID,RID,CID");
 
   private final int numCertsPerCommit;
 
@@ -188,7 +188,7 @@ class CaCertstoreDbImporter extends DbPorter {
 
   private void importPublishQueue(List<CaCertstore.ToPublish> publishQueue)
       throws DataAccessException {
-    final String sql = "INSERT INTO PUBLISHQUEUE (CID,PID,CA_ID) VALUES (?,?,?)";
+    final String sql = buildInsertSql("PUBLISHQUEUE", "CID,PID,CA_ID");
     System.out.println("importing table PUBLISHQUEUE");
     PreparedStatement ps = prepareStatement(sql);
 
@@ -436,7 +436,6 @@ class CaCertstoreDbImporter extends DbPorter {
           setInt(stmt, idx++, cert.getCaId());
 
           setInt(stmt, idx++, cert.getRid());
-          setInt(stmt, idx++, cert.getUid());
           Extension extension = tbsCert.getExtensions().getExtension(Extension.basicConstraints);
           boolean ee = true;
           if (extension != null) {
@@ -445,7 +444,6 @@ class CaCertstoreDbImporter extends DbPorter {
           }
 
           stmt.setInt(idx++, ee ? 1 : 0);
-          stmt.setInt(idx++, cert.getReqType());
           String tidS = null;
           if (cert.getTid() != null) {
             tidS = cert.getTid();

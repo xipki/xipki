@@ -20,14 +20,14 @@ package org.xipki.qa.ca.extn;
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x509.*;
-import org.xipki.ca.api.BadCertTemplateException;
+import org.xipki.util.exception.BadCertTemplateException;
 import org.xipki.ca.api.profile.Certprofile.GeneralNameMode;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
 import org.xipki.ca.certprofile.xijson.conf.ExtnSyntax;
 import org.xipki.security.KeyUsage;
 import org.xipki.util.Hex;
-import org.xipki.util.InvalidConfException;
+import org.xipki.util.exception.InvalidConfException;
 
 import java.io.IOException;
 import java.util.*;

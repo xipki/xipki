@@ -24,6 +24,8 @@ import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.datasource.DataSourceConf;
 import org.xipki.security.Securities.SecurityConf;
 import org.xipki.util.*;
+import org.xipki.util.exception.InvalidConfException;
+import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.http.SslContextConf;
 
 import java.io.IOException;
@@ -141,6 +143,8 @@ public class CaServerConf extends ValidatableConf {
    */
   private int shardId = 0;
 
+  private boolean logReqResp;
+
   private List<DataSourceConf> datasources;
 
   private List<SslContext> sslContexts;
@@ -172,6 +176,14 @@ public class CaServerConf extends ValidatableConf {
 
   public void setMaster(boolean master) {
     this.master = master;
+  }
+
+  public boolean isLogReqResp() {
+    return logReqResp;
+  }
+
+  public void setLogReqResp(boolean logReqResp) {
+    this.logReqResp = logReqResp;
   }
 
   public int getShardId() {

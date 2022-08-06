@@ -30,6 +30,8 @@ import org.xipki.security.CrlReason;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
+import org.xipki.util.exception.InvalidConfException;
+import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.http.SslContextConf;
 
 import javax.net.ssl.HostnameVerifier;
@@ -433,34 +435,6 @@ public class CaMgmtClient implements CaManager {
   } // method addRequestorToCa
 
   @Override
-  public void removeUserFromCa(String userName, String caName)
-      throws CaMgmtException {
-    MgmtRequest.RemoveEntityFromCa req = new MgmtRequest.RemoveEntityFromCa();
-    req.setEntityName(userName);
-    req.setCaName(caName);
-    voidTransmit(MgmtAction.removeUserFromCa, req);
-  } // method removeUserFromCa
-
-  @Override
-  public void addUserToCa(CaHasUserEntry user, String caName)
-      throws CaMgmtException {
-    MgmtRequest.AddUserToCa req = new MgmtRequest.AddUserToCa();
-    req.setCaName(caName);
-    req.setUser(user);
-    voidTransmit(MgmtAction.addUserToCa, req);
-  } // method addUserToCa
-
-  @Override
-  public Map<String, CaHasUserEntry> getCaHasUsersForUser(String user)
-      throws CaMgmtException {
-    MgmtRequest.Name req = new MgmtRequest.Name(user);
-    byte[] respBytes = transmit(MgmtAction.getCaHasUsersForUser, req);
-    MgmtResponse.GetCaHasUsersForUser resp =
-        parse(respBytes, MgmtResponse.GetCaHasUsersForUser.class);
-    return resp.getResult();
-  } // method getCaHasUsersForUser
-
-  @Override
   public KeypairGenEntry getKeypairGen(String name)
           throws CaMgmtException {
     MgmtRequest.Name req = new MgmtRequest.Name(name);
@@ -670,37 +644,6 @@ public class CaMgmtClient implements CaManager {
     MgmtResponse.ByteArray resp = parse(respBytes, MgmtResponse.ByteArray.class);
     return parseCert(resp.getResult());
   } // method generateRootCa
-
-  @Override
-  public void addUser(AddUserEntry addUserEntry)
-      throws CaMgmtException {
-    MgmtRequest.AddUser req = new MgmtRequest.AddUser();
-    req.setAddUserEntry(addUserEntry);
-    voidTransmit(MgmtAction.addUser, req);
-  } // method addUser
-
-  @Override
-  public void changeUser(ChangeUserEntry changeUserEntry)
-      throws CaMgmtException {
-    MgmtRequest.ChangeUser req = new MgmtRequest.ChangeUser();
-    req.setChangeUserEntry(changeUserEntry);
-    voidTransmit(MgmtAction.changeUser, req);
-  } // method changeUser
-
-  @Override
-  public void removeUser(String username)
-      throws CaMgmtException {
-    removeEntity(MgmtAction.removeUser, username);
-  } // method removeUser
-
-  @Override
-  public UserEntry getUser(String username)
-      throws CaMgmtException {
-    MgmtRequest.Name req = new MgmtRequest.Name(username);
-    byte[] respBytes = transmit(MgmtAction.getUser, req);
-    MgmtResponse.GetUser resp = parse(respBytes, MgmtResponse.GetUser.class);
-    return resp.getResult();
-  } // method getUser
 
   @Override
   public X509CRLHolder generateCrlOnDemand(String caName)

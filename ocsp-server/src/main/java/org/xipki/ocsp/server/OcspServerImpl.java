@@ -48,6 +48,7 @@ import org.xipki.ocsp.server.type.*;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.*;
 import org.xipki.util.*;
+import org.xipki.util.exception.InvalidConfException;
 
 import java.io.File;
 import java.io.IOException;
@@ -1057,32 +1058,21 @@ public class OcspServerImpl implements OcspServer {
   } // method processCertReq
 
   @Override
-  public HealthCheckResult healthCheck(Responder responder2) {
+  public boolean healthCheck(Responder responder2) {
     ResponderImpl responder = (ResponderImpl) responder2;
-    HealthCheckResult result = new HealthCheckResult();
-    result.setName("OCSPResponder");
-    boolean healthy = true;
 
     for (OcspStore store : responder.getStores()) {
       boolean storeHealthy = store.isHealthy();
-      healthy &= storeHealthy;
-
-      HealthCheckResult storeHealth = new HealthCheckResult();
-      storeHealth.setName("CertStatusStore." + store.getName());
-      storeHealth.setHealthy(storeHealthy);
-      result.addChildCheck(storeHealth);
+      if (storeHealthy) {
+        return false;
+      }
     }
 
-    boolean signerHealthy = responder.getSigner().isHealthy();
-    healthy &= signerHealthy;
+    if (!responder.getSigner().isHealthy()) {
+      return false;
+    }
 
-    HealthCheckResult signerHealth = new HealthCheckResult();
-    signerHealth.setName("Signer");
-    signerHealth.setHealthy(signerHealthy);
-    result.addChildCheck(signerHealth);
-
-    result.setHealthy(healthy);
-    return result;
+    return true;
   } // method healthCheck
 
   public void refreshTokenForSignerType(String signerType)

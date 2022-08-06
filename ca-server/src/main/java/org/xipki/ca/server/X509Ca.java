@@ -20,7 +20,6 @@ package org.xipki.ca.server;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.CertificateList;
@@ -37,12 +36,12 @@ import org.xipki.audit.AuditEvent;
 import org.xipki.ca.api.*;
 import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
-import org.xipki.ca.api.mgmt.entry.CaHasUserEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.api.profile.Certprofile.ExtensionControl;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
+import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.server.db.CertStore;
 import org.xipki.ca.server.db.CertStore.KnowCertResult;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
@@ -52,6 +51,8 @@ import org.xipki.security.ObjectIdentifiers.Extn;
 import org.xipki.security.ctlog.CtLog.SignedCertificateTimestampList;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
+import org.xipki.util.exception.BadCertTemplateException;
+import org.xipki.util.exception.OperationException;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -60,7 +61,7 @@ import java.security.cert.CertificateException;
 import java.util.*;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
-import static org.xipki.ca.api.OperationException.ErrorCode.*;
+import static org.xipki.util.exception.OperationException.ErrorCode.*;
 import static org.xipki.util.Args.notEmpty;
 import static org.xipki.util.Args.notNull;
 
@@ -184,7 +185,8 @@ public class X509Ca extends X509CaModule implements Closeable {
       if (caInfo.isSaveRequest()) {
         // Request cannot be saved if SAVE_CERT (in EXTRA_CONTROL) is set to false.
         caInfo.setSaveRequest(false);
-        LOG.warn("CA {}: SAVE_REQ is configured to true, ignore it, use 'false' instead");
+        LOG.warn("CA {}: SAVE_REQ is configured to true, ignore it, use 'false' instead",
+            caInfo.getIdent().getName());
       }
     }
   } // constructor
@@ -201,14 +203,8 @@ public class X509Ca extends X509CaModule implements Closeable {
     return caCert;
   }
 
-  public CmpControl getCmpControl() {
-    return caInfo.getCmpControl();
-  }
-
-  public AlgorithmValidator getPopAlgoValidator() {
-    return caInfo.getPopControl() == null
-        ? CollectionAlgorithmValidator.INSTANCE
-        : caInfo.getPopControl().getPopAlgoValidator();
+  public List<byte[]> getEncodedCaCertChain() {
+    return encodedCaCertChain;
   }
 
   public X509Cert getCert(BigInteger serialNumber)
@@ -252,30 +248,9 @@ public class X509Ca extends X509CaModule implements Closeable {
     return certstore.getCertRequest(caIdent, serialNumber);
   }
 
-  public boolean verifyCsr(CertificationRequest csr) {
-    notNull(csr, "csr");
-    return CaUtil.verifyCsr(csr, caManager.getSecurityFactory(),
-            caInfo.getPopControl());
-  }
-
   public List<CertListInfo> listCerts(X500Name subjectPattern, Date validFrom,
       Date validTo, CertListOrderBy orderBy, int numEntries) throws OperationException {
     return certstore.listCerts(caIdent, subjectPattern, validFrom, validTo, orderBy, numEntries);
-  }
-
-  public NameId authenticateUser(String user, byte[] password) throws OperationException {
-    return certstore.authenticateUser(user.toLowerCase(), password);
-  }
-
-  public NameId getUserIdent(int userId) throws OperationException {
-    String name = certstore.getUsername(userId);
-    return (name == null) ? null : new NameId(userId, name);
-  }
-
-  public RequestorInfo.ByUserRequestorInfo getByUserRequestor(NameId userIdent)
-      throws OperationException {
-    CaHasUserEntry caHasUser = certstore.getCaHasUser(caIdent, userIdent);
-    return (caHasUser == null) ? null : caManager.createByUserRequestor(caHasUser);
   }
 
   public X509CRLHolder getCurrentCrl(String msgId) throws OperationException {
@@ -299,15 +274,15 @@ public class X509Ca extends X509CaModule implements Closeable {
   }
 
   public CertificateInfo regenerateCert(CertTemplateData certTemplate, RequestorInfo requestor,
-      RequestType reqType, byte[] transactionId, String msgId) throws OperationException {
-    return regenerateCerts(Collections.singletonList(certTemplate), requestor, reqType,
+      String transactionId, String msgId) throws OperationException {
+    return regenerateCerts(Collections.singletonList(certTemplate), requestor,
         transactionId, msgId).get(0);
   }
 
   public List<CertificateInfo> regenerateCerts(List<CertTemplateData> certTemplates,
-      RequestorInfo requestor, RequestType reqType, byte[] transactionId, String msgId)
+      RequestorInfo requestor, String transactionId, String msgId)
       throws OperationException {
-    return generateCerts(certTemplates, requestor, true, reqType, transactionId, msgId);
+    return generateCerts(certTemplates, requestor, true, transactionId, msgId);
   }
 
   public boolean republishCerts(List<String> publisherNames, int numThreads) {
@@ -353,13 +328,13 @@ public class X509Ca extends X509CaModule implements Closeable {
   }
 
   public List<CertificateInfo> generateCerts(List<CertTemplateData> certTemplates,
-      RequestorInfo requestor, RequestType reqType, byte[] transactionId, String msgId)
+      RequestorInfo requestor, String transactionId, String msgId)
       throws OperationException {
-    return generateCerts(certTemplates, requestor, false, reqType, transactionId, msgId);
+    return generateCerts(certTemplates, requestor, false, transactionId, msgId);
   }
 
   private List<CertificateInfo> generateCerts(List<CertTemplateData> certTemplates,
-      RequestorInfo requestor, boolean update, RequestType reqType, byte[] transactionId,
+      RequestorInfo requestor, boolean update, String transactionId,
       String msgId) throws OperationExceptionWithIndex {
     notEmpty(certTemplates, "certTemplates");
 
@@ -396,7 +371,7 @@ public class X509Ca extends X509CaModule implements Closeable {
               "unknown cert profile " + certTemplate.getCertprofileName());
         }
 
-        gcts.add(grandCertTemplateBuilder.create(certprofile, certTemplate, requestor,
+        gcts.add(grandCertTemplateBuilder.create(certprofile, certTemplate,
             keypairGenerators, update));
       } catch (OperationException ex) {
         LOG.error("     FAILED createGrantedCertTemplate: CA={}, profile={}, subject='{}'",
@@ -443,7 +418,7 @@ public class X509Ca extends X509CaModule implements Closeable {
         license.regulateSpeed();
         //-----end license-----
 
-        CertificateInfo certInfo = generateCert(gct, requestor, reqType, transactionId, msgId);
+        CertificateInfo certInfo = generateCert(gct, requestor, transactionId, msgId);
         successful = true;
         certInfos.add(certInfo);
 
@@ -487,19 +462,19 @@ public class X509Ca extends X509CaModule implements Closeable {
   }
 
   public CertificateInfo generateCert(CertTemplateData certTemplate, RequestorInfo requestor,
-      RequestType reqType, byte[] transactionId, String msgId) throws OperationException {
+      String transactionId, String msgId) throws OperationException {
     notNull(certTemplate, "certTemplate");
     return generateCerts(Collections.singletonList(certTemplate), requestor,
-        reqType, transactionId, msgId).get(0);
+        transactionId, msgId).get(0);
   }
 
   private CertificateInfo generateCert(GrantedCertTemplate gct, RequestorInfo requestor,
-      RequestType reqType, byte[] transactionId, String msgId) throws OperationException {
+      String transactionId, String msgId) throws OperationException {
     AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_gen_cert, msgId);
 
     boolean successful = false;
     try {
-      CertificateInfo ret = generateCert0(gct, requestor, reqType, transactionId, event);
+      CertificateInfo ret = generateCert0(gct, requestor, transactionId, event);
       successful = (ret != null);
       return ret;
     } finally {
@@ -508,7 +483,7 @@ public class X509Ca extends X509CaModule implements Closeable {
   }
 
   private CertificateInfo generateCert0(GrantedCertTemplate gct, RequestorInfo requestor,
-      RequestType reqType, byte[] transactionId, AuditEvent event) throws OperationException {
+      String transactionId, AuditEvent event) throws OperationException {
     notNull(gct, "gct");
 
     event.addEventData(CaAuditConstants.NAME_req_subject,
@@ -669,10 +644,6 @@ public class X509Ca extends X509CaModule implements Closeable {
       CertWithDbId certWithMeta = new CertWithDbId(cert);
       ret = new CertificateInfo(certWithMeta, gct.privateKey, caIdent, caCert,
               gct.certprofile.getIdent(), requestor.getIdent());
-      if (requestor instanceof RequestorInfo.ByUserRequestorInfo) {
-        ret.setUser((((RequestorInfo.ByUserRequestorInfo) requestor).getUserId()));
-      }
-      ret.setReqType(reqType);
       ret.setTransactionId(transactionId);
       ret.setRequestedSubject(gct.requestedSubject);
 
@@ -705,7 +676,7 @@ public class X509Ca extends X509CaModule implements Closeable {
         ? null : caManager.getIdentifiedCertprofile(certprofileName);
   } // method getX509Certprofile
 
-  public RequestorInfo.CmpRequestorInfo getRequestor(X500Name requestorSender) {
+  public RequestorInfo.CertRequestorInfo getRequestor(X500Name requestorSender) {
     Set<CaHasRequestorEntry> requestorEntries = caManager.getRequestorsForCa(caIdent.getName());
     if (CollectionUtil.isEmpty(requestorEntries)) {
       return null;
@@ -723,14 +694,14 @@ public class X509Ca extends X509CaModule implements Closeable {
       }
 
       if (entry.getCert().getCert().getSubject().equals(requestorSender)) {
-        return new RequestorInfo.CmpRequestorInfo(m, entry.getCert());
+        return new RequestorInfo.CertRequestorInfo(m, entry.getCert());
       }
     }
 
     return null;
   } // method getRequestor
 
-  public RequestorInfo.CmpRequestorInfo getRequestor(X509Cert requestorCert) {
+  public RequestorInfo.CertRequestorInfo getRequestor(X509Cert requestorCert) {
     Set<CaHasRequestorEntry> requestorEntries = caManager.getRequestorsForCa(caIdent.getName());
     if (CollectionUtil.isEmpty(requestorEntries)) {
       return null;
@@ -743,28 +714,7 @@ public class X509Ca extends X509CaModule implements Closeable {
       }
 
       if (entry.getCert().getCert().equals(requestorCert)) {
-        return new RequestorInfo.CmpRequestorInfo(m, entry.getCert());
-      }
-    }
-
-    return null;
-  }
-
-  public RequestorInfo.CmpRequestorInfo getMacRequestor(byte[] senderKID) {
-    Set<CaHasRequestorEntry> requestorEntries = caManager.getRequestorsForCa(caIdent.getName());
-    if (CollectionUtil.isEmpty(requestorEntries)) {
-      return null;
-    }
-
-    for (CaHasRequestorEntry m : requestorEntries) {
-      RequestorEntryWrapper entry =
-          caManager.getRequestorWrapper(m.getRequestorIdent().getName());
-      if (!RequestorEntry.TYPE_PBM.equals(entry.getDbEntry().getType())) {
-        continue;
-      }
-
-      if (entry.matchKeyId(senderKID)) {
-        return new RequestorInfo.CmpRequestorInfo(m, entry.getPassword(), senderKID);
+        return new RequestorInfo.CertRequestorInfo(m, entry.getCert());
       }
     }
 
@@ -775,37 +725,23 @@ public class X509Ca extends X509CaModule implements Closeable {
     return caManager;
   }
 
-  public HealthCheckResult healthCheck() {
-    HealthCheckResult result = new HealthCheckResult();
-    result.setName("X509CA");
+  public boolean healthy() {
+    ConcurrentContentSigner signer = caInfo.getSigner(null);
 
     boolean healthy = true;
-
-    ConcurrentContentSigner signer = caInfo.getSigner(null);
     if (signer != null) {
-      boolean caSignerHealthy = signer.isHealthy();
-      healthy = caSignerHealthy;
-
-      HealthCheckResult signerHealth = new HealthCheckResult();
-      signerHealth.setName("Signer");
-      signerHealth.setHealthy(caSignerHealthy);
-      result.addChildCheck(signerHealth);
+      healthy = signer.isHealthy();
     }
 
-    boolean databaseHealthy = certstore.isHealthy();
-    healthy &= databaseHealthy;
+    if (healthy) {
+      healthy = certstore.isHealthy();
+    }
 
-    HealthCheckResult databaseHealth = new HealthCheckResult();
-    databaseHealth.setName("Database");
-    databaseHealth.setHealthy(databaseHealthy);
-    result.addChildCheck(databaseHealth);
+    if (healthy) {
+      healthy = crlModule.healthy();
+    }
 
-    healthy &= crlModule.healthCheck(result);
-    healthy &= publisherModule.healthCheck(result);
-
-    result.setHealthy(healthy);
-
-    return result;
+    return healthy;
   } // method healthCheck
 
   public String getHexSha1OfCert() {

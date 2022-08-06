@@ -32,6 +32,7 @@ import org.xipki.security.pkcs11.P11Slot.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11SlotIdentifier;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.util.*;
+import org.xipki.util.exception.ObjectCreationException;
 
 import java.math.BigInteger;
 

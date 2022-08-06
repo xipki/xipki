@@ -24,7 +24,7 @@ import org.bouncycastle.asn1.isismtt.x509.NamingAuthority;
 import org.bouncycastle.asn1.isismtt.x509.ProfessionInfo;
 import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x509.GeneralName;
-import org.xipki.ca.api.BadCertTemplateException;
+import org.xipki.util.exception.BadCertTemplateException;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;

@@ -29,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.OperationException;
+import org.xipki.util.exception.OperationException;
 import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.CaConfColumn;
@@ -241,32 +241,8 @@ public class CaInfo {
     return caEntry.getCrlControl();
   }
 
-  public String getCmpResponderName() {
-    return caEntry.getCmpResponderName();
-  }
-
-  public void setCmpResponderName(String name) {
-    caEntry.setCmpResponderName(name);
-  }
-
-  public CmpControl getCmpControl() {
-    return caEntry.getCmpControl();
-  }
-
   public CtlogControl getCtlogControl() {
     return caEntry.getCtlogControl();
-  }
-
-  public PopControl getPopControl() {
-    return caEntry.getPopControl();
-  }
-
-  public String getScepResponderName() {
-    return caEntry.getScepResponderName();
-  }
-
-  public void setScepResponderName(String name) {
-    caEntry.setScepResponderName(name);
   }
 
   public List<String> getKeypairGenNames() {
@@ -296,18 +272,6 @@ public class CaInfo {
 
   public String toString(boolean verbose) {
     return caEntry.toString(verbose);
-  }
-
-  public boolean supportsCmp() {
-    return caEntry.getProtocoSupport().isCmp();
-  }
-
-  public boolean supportsRest() {
-    return caEntry.getProtocoSupport().isRest();
-  }
-
-  public boolean supportsScep() {
-    return caEntry.getProtocoSupport().isScep();
   }
 
   public boolean isSaveCert() {

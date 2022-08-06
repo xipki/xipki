@@ -286,9 +286,7 @@ public class CaCompleters {
       } catch (CaMgmtException ex) {
       }
       names.remove(RequestorInfo.NAME_BY_CA);
-      names.remove(RequestorInfo.NAME_BY_USER);
       names.remove(RequestorInfo.NAME_BY_CA.toUpperCase());
-      names.remove(RequestorInfo.NAME_BY_USER.toUpperCase());
       return names;
     }
 

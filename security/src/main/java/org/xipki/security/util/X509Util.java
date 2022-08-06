@@ -18,7 +18,9 @@
 package org.xipki.security.util;
 
 import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
+import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
 import org.bouncycastle.asn1.x500.DirectoryString;
@@ -40,6 +42,7 @@ import org.xipki.security.*;
 import org.xipki.util.Base64;
 import org.xipki.util.*;
 import org.xipki.util.PemEncoder.PemLabel;
+import org.xipki.util.exception.InvalidConfException;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -505,14 +508,25 @@ public class X509Util {
       return null;
     }
 
+    byte[][] certchainBytes = new byte[certchain.length][];
+    for (int i = 0; i < certchain.length; i++) {
+      certchainBytes[i] = certchain[i].getEncoded();
+    }
+    return encodeCertificates(certchainBytes);
+  }
+
+  public static String encodeCertificates(byte[][] certchain) {
+    if (isEmpty(certchain)) {
+      return null;
+    }
+
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < certchain.length; i++) {
-      X509Cert m = certchain[i];
       if (i != 0) {
         sb.append("\r\n");
       }
       sb.append(StringUtil.toUtf8String(
-          PemEncoder.encode(m.getEncoded(), PemLabel.CERTIFICATE)));
+          PemEncoder.encode(certchain[i], PemLabel.CERTIFICATE)));
     }
     return sb.toString();
   }
@@ -851,5 +865,42 @@ public class X509Util {
 
     return sb.toString();
   } // method formatCert
+
+
+  public static Extensions getExtensions(CertificationRequestInfo csr) {
+    notNull(csr, "csr");
+    ASN1Set attrs = csr.getAttributes();
+    for (int i = 0; i < attrs.size(); i++) {
+      org.bouncycastle.asn1.pkcs.Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
+      if (PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType())) {
+        return Extensions.getInstance(attr.getAttributeValues()[0]);
+      }
+    }
+    return null;
+  } // method getExtensions
+
+  public static List<X509Cert> parseCerts(List<FileOrBinary> certsConf)
+      throws InvalidConfException {
+    if (CollectionUtil.isEmpty(certsConf)) {
+      return Collections.emptyList();
+    }
+
+    List<X509Cert> certs = new ArrayList<>(certsConf.size());
+
+    for (FileOrBinary m : certsConf) {
+      try {
+        X509Cert cert = X509Util.parseCert(m.readContent());
+        certs.add(cert);
+      } catch (CertificateException | IOException ex) {
+        String msg = "could not parse the certificate";
+        if (m.getFile() != null) {
+          msg += " " + m.getFile();
+        }
+        throw new InvalidConfException(msg, ex);
+      }
+    }
+
+    return certs;
+  }
 
 }

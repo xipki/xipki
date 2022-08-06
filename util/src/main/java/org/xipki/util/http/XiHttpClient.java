@@ -19,7 +19,7 @@ package org.xipki.util.http;
 
 import org.xipki.util.Args;
 import org.xipki.util.IoUtil;
-import org.xipki.util.ObjectCreationException;
+import org.xipki.util.exception.ObjectCreationException;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -81,8 +81,33 @@ public class XiHttpClient {
     }
   } // method httpGet
 
+
+  public byte[] httpPost(String url, String requestContentType, byte[] request,
+                         String expectedRespContentType)
+      throws IOException {
+    HttpRespContent resp = httpPost(url, requestContentType, request);
+    byte[] body = resp.getContent();
+    if (body == null) {
+      return null;
+    }
+
+    String responseContentType = resp.getContentType();
+    boolean isValidContentType = false;
+    if (responseContentType != null) {
+      if (responseContentType.equalsIgnoreCase(expectedRespContentType)) {
+        isValidContentType = true;
+      }
+    }
+
+    if (!isValidContentType) {
+      throw new IOException("bad response: mime type " + responseContentType + " not supported!");
+    }
+
+    return body;
+  }
+
   public HttpRespContent httpPost(String url, String requestContentType, byte[] request)
-      throws XiHttpClientException {
+      throws IOException {
     Args.notNull(url, "url");
     try {
       HttpURLConnection httpConn = openHttpConn(new URL(url));
@@ -102,8 +127,8 @@ public class XiHttpClient {
       }
 
       return parseResponse(httpConn);
-    } catch (IOException ex) {
-      throw new XiHttpClientException(ex.getMessage(), ex);
+    } catch (XiHttpClientException ex) {
+      throw new IOException(ex.getMessage(), ex);
     }
   } // method httpPost
 

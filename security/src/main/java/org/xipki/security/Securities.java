@@ -28,6 +28,7 @@ import org.xipki.security.pkcs11.*;
 import org.xipki.security.pkcs11.iaik.IaikP11ModuleFactory;
 import org.xipki.security.pkcs12.P12SignerFactory;
 import org.xipki.util.*;
+import org.xipki.util.exception.InvalidConfException;
 
 import java.io.Closeable;
 import java.io.IOException;

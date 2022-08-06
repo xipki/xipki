@@ -63,13 +63,14 @@
     <module>security-extra</module>
     <module>p11proxy-servlet</module>
     <!-- PKI SDK/Client -->
-    <module>cmpclient</module>
-    <module>scep-client</module>
     <module>ocsp-client</module>
     <!-- PKI -->
+    <module>ca-sdk</module>
     <module>ca-api</module>
     <module>ca-mgmt-api</module>
     <module>ca-server</module>
+    <module>ca-protocol</module>
+    <!--module>ca-protocol-servlet</module-->
     <module>ca-servlet</module>
     <module>ca-mgmt-client</module>
     <module>certprofile-xijson</module>
@@ -77,6 +78,7 @@
     <module>ocsp-server</module>
     <module>ocsp-servlet</module>
     <module>ocsp-mgmt-client</module>
+    <!--module>proxies</module-->
     <module>shells</module>
     <module>examples</module>
     <module>qa</module>

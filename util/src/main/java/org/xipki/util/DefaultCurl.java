@@ -17,6 +17,7 @@
 
 package org.xipki.util;
 
+import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.http.SslContextConf;
 
 import javax.net.ssl.HostnameVerifier;

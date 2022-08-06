@@ -27,6 +27,7 @@ import org.xipki.security.pkcs11.*;
 import org.xipki.security.pkcs11.proxy.asn1.ServerCaps;
 import org.xipki.security.pkcs11.proxy.asn1.SlotIdentifier;
 import org.xipki.util.*;
+import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.http.SslContextConf;
 
 import javax.net.ssl.HostnameVerifier;

@@ -21,7 +21,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import org.xipki.ca.api.profile.SubjectKeyIdentifierControl;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.security.X509ExtensionType.ConstantExtnValue;
-import org.xipki.util.InvalidConfException;
+import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 
 /**

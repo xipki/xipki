@@ -1,0 +1,27 @@
+{
+	"responder":{
+		"url":"https://localhost:8443/ca/cmp/myca",
+		"pbmMac": {
+			"macAlgos":["HMAC-SHA256"],
+			"owfAlgos":["SHA256"]
+		},
+		"signature":{
+			"signatureAlgos":["SHA256WITHECDSA"],
+			"cert":{
+				"file":"xipki/keycerts/tlskeys/server/tls-server-cert.der"
+			}
+		}
+	},
+	"ssl":{
+		"name":"ssl1",
+		"hostnameVerifier":"default",
+		"storeType":"pkcs12",
+		"keystore":{
+			"file":"xipki/keycerts/tlskeys/client/tls-client.p12"
+		},
+		"keystorePassword":"1234",
+		"trustanchors":[{
+			"file":"xipki/keycerts/tlskeys/server/tls-server-cert.der"
+		}]
+	}
+}

@@ -47,10 +47,7 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
     REQUESTOR,
     PUBLISHER,
     PROFILE,
-    TUSER,
-    CA,
-    // BigInt
-    CA_HAS_USER
+    CA
   }
 
   private static final Logger LOG = LoggerFactory.getLogger(QueryExecutor.class);
@@ -65,6 +62,10 @@ class CaManagerQueryExecutorBase extends QueryExecutor {
       this.dbSchemaVersion = Integer.parseInt(dbSchemaInfo.variableValue("VERSION"));
     } catch (DataAccessException ex) {
       throw new CaMgmtException(ex);
+    }
+
+    if (dbSchemaVersion < 7) {
+      throw new CaMgmtException("DB version < 7 is not supported: " + dbSchemaVersion);
     }
   }
 

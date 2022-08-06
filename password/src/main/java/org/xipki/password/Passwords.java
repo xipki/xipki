@@ -18,7 +18,7 @@
 package org.xipki.password;
 
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.InvalidConfException;
+import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.StringUtil;
 import org.xipki.util.ValidatableConf;
 

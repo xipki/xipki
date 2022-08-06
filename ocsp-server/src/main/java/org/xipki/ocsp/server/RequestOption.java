@@ -22,7 +22,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.FileOrBinary;
-import org.xipki.util.InvalidConfException;
+import org.xipki.util.exception.InvalidConfException;
 
 import java.io.File;
 import java.io.IOException;

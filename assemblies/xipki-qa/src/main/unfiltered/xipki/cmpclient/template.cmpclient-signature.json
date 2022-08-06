@@ -23,11 +23,6 @@
 		"name":"requestor1",
 		"signRequest":false,
 		"signature":{
-			// Can be commented if the certificate can be retrieved from the signerType and signerConf
-			//"cert":{
-			//	"file":"xipki/keycerts/tlskeys/client/tls-client-cert.der"
-			//},
-			// signerType and signerConf are required if signRequest is true and/or you wish the CA to generate private key
 			"signerType":"PKCS12",
 			"signerConf":"password=1234,algo=REPLACEME-CMP_SIGALGO,keystore=file:xipki/keycerts/tlskeys/client/tls-client.p12"
 		}

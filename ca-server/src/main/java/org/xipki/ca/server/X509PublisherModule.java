@@ -21,7 +21,7 @@ import org.bouncycastle.cert.X509CRLHolder;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.OperationException;
+import org.xipki.util.exception.OperationException;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
@@ -30,7 +30,6 @@ import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.HealthCheckResult;
 import org.xipki.util.LogUtil;
 
 import java.util.ArrayList;
@@ -395,20 +394,6 @@ class X509PublisherModule extends X509CaModule {
     }
 
     return succ;
-  }
-
-  boolean healthCheck(HealthCheckResult parentResult) {
-    boolean healthy = true;
-    for (IdentifiedCertPublisher publisher : publishers()) {
-      boolean ph = publisher.isHealthy();
-      healthy &= ph;
-
-      HealthCheckResult publisherHealth = new HealthCheckResult();
-      publisherHealth.setName("Publisher");
-      publisherHealth.setHealthy(publisher.isHealthy());
-      parentResult.addChildCheck(publisherHealth);
-    }
-    return healthy;
   }
 
   private List<IdentifiedCertPublisher> publishers() {

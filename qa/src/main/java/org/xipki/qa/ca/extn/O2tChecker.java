@@ -25,7 +25,7 @@ import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
 import org.bouncycastle.asn1.x509.qualified.MonetaryValue;
 import org.bouncycastle.asn1.x509.qualified.QCStatement;
-import org.xipki.ca.api.BadCertTemplateException;
+import org.xipki.util.exception.BadCertTemplateException;
 import org.xipki.ca.api.profile.Certprofile.ExtensionControl;
 import org.xipki.ca.api.profile.Certprofile.GeneralNameMode;
 import org.xipki.ca.api.profile.Certprofile.GeneralNameTag;

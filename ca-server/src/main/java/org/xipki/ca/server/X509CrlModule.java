@@ -26,7 +26,7 @@ import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509v2CRLBuilder;
 import org.xipki.audit.AuditEvent;
-import org.xipki.ca.api.OperationException;
+import org.xipki.util.exception.OperationException;
 import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.mgmt.CrlControl;
 import org.xipki.ca.server.db.CertStore;
@@ -46,8 +46,8 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.xipki.ca.api.OperationException.ErrorCode.*;
-import static org.xipki.ca.server.CaAuditConstants.*;
+import static org.xipki.util.exception.OperationException.ErrorCode.*;
+import static org.xipki.ca.sdk.CaAuditConstants.*;
 import static org.xipki.util.Args.notNull;
 
 /**
@@ -647,19 +647,12 @@ public class X509CrlModule extends X509CaModule implements Closeable {
     return caManager.getSignerWrapper(crlSignerName);
   }
 
-  boolean healthCheck(HealthCheckResult parentResult) {
-    boolean healthy = true;
+  boolean healthy() {
     SignerEntryWrapper signer = getCrlSigner();
     if (signer != null && signer.getSigner() != null) {
-      boolean crlSignerHealthy = signer.isHealthy();
-      healthy = crlSignerHealthy;
-
-      HealthCheckResult crlSignerHealth = new HealthCheckResult();
-      crlSignerHealth.setName("CRLSigner");
-      crlSignerHealth.setHealthy(crlSignerHealthy);
-      parentResult.addChildCheck(crlSignerHealth);
+      return signer.isHealthy();
     }
-    return healthy;
+    return true;
   }
 
   private static Extension createReasonExtension(int reasonCode) {

@@ -21,10 +21,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.*;
 import org.xipki.ca.api.NameId;
+import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.security.X509Cert;
 
 import java.security.PublicKey;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
 import static org.xipki.util.Args.notNull;
@@ -59,10 +62,19 @@ public abstract class X509CaModule {
 
   protected final X509Cert caCert;
 
+  protected final List<byte[]> encodedCaCertChain;
+
   public X509CaModule(CaInfo caInfo) {
     this.caInfo = notNull(caInfo, "caInfo");
     this.caIdent = caInfo.getIdent();
     this.caCert = caInfo.getCert();
+    this.encodedCaCertChain = new ArrayList<>(2);
+    this.encodedCaCertChain.add(caCert.getEncoded());
+    if (caInfo.getCertchain() != null) {
+      for (X509Cert c : caInfo.getCertchain()) {
+        this.encodedCaCertChain.add(c.getEncoded());
+      }
+    }
   } // constructor
 
   protected static AuditService auditService() {

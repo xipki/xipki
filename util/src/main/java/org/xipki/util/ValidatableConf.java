@@ -17,6 +17,8 @@
 
 package org.xipki.util;
 
+import org.xipki.util.exception.InvalidConfException;
+
 import java.util.Collection;
 
 /**

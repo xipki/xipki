@@ -22,7 +22,7 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.xipki.password.PasswordResolver;
-import org.xipki.util.ObjectCreationException;
+import org.xipki.util.exception.ObjectCreationException;
 
 import java.security.InvalidKeyException;
 import java.security.KeyStoreException;
@@ -224,36 +224,6 @@ public interface SecurityFactory {
    */
   PublicKey generatePublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo)
       throws InvalidKeyException;
-
-  /**
-   * Extracts the keystore with minimal required information.
-   * <ol>
-   *   <li>If {@code keyname} is set, and its associated entry is a key entry, then only this
-   *   entry is remained.</li>
-   *   <li>if {@code keyname} is {@code null} and there exists at least one key entry, then only
-   *   the first entry is remained.</li>
-   *   <li>otherwise, {@link KeyStoreException} will be thrown.</li>
-   * </ol>
-   *
-   * @param keystoreType
-   *          Type of the keystore. Must not be {@code null}.
-   * @param keystoreBytes
-   *          Content of the keystpre. Must not be {@code null}.
-   * @param keyname
-   *          Name (alias) of the key. Could be {@code null}.
-   * @param password
-   *          Password of the keystore and key. Must not be {@code null}.
-   * @param newCertChain
-   *          New certificates. If not {@code null}, the certificates in the keystore will be
-   *          replaced.
-   * @return the minimal keystore
-   * @throws KeyStoreException
-   *          If case 3 occurs.
-   */
-  // TODO: remove this method
-  byte[] extractMinimalKeyStore(String keystoreType, byte[] keystoreBytes, String keyname,
-      char[] password, X509Cert[] newCertChain)
-          throws KeyStoreException;
 
   SecureRandom getRandom4Sign();
 

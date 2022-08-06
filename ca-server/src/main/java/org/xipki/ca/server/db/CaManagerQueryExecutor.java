@@ -21,7 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.OperationException;
+import org.xipki.util.exception.ObjectCreationException;
+import org.xipki.util.exception.OperationException;
 import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.ca.api.mgmt.entry.CaEntry.CaSignerConf;
@@ -31,7 +32,6 @@ import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
-import org.xipki.password.PasswordResolverException;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Base64;
@@ -46,7 +46,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import static org.xipki.ca.server.CaUtil.*;
 import static org.xipki.util.Args.notBlank;
 import static org.xipki.util.Args.notNull;
-import static org.xipki.util.StringUtil.concat;
 
 /**
  * Execute the database queries to manage CA system.
@@ -70,9 +69,6 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   private final String sqlSelectCa;
   private final String sqlNextSelectCrlNo;
   private final String sqlSelectSystemEvent;
-  private final String sqlSelectUserId;
-  private final String sqlSelectUser;
-
   private final Map<Table, AtomicLong> cachedIdMap = new HashMap<>();
 
   public CaManagerQueryExecutor(DataSourceWrapper datasource)
@@ -87,7 +83,6 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     this.sqlSelectCaId        = buildSelectFirstSql("ID FROM CA WHERE NAME=?");
     this.sqlSelectPublisherId = buildSelectFirstSql("ID FROM PUBLISHER WHERE NAME=?");
     this.sqlSelectRequestorId = buildSelectFirstSql("ID FROM REQUESTOR WHERE NAME=?");
-    this.sqlSelectUserId      = buildSelectFirstSql("ID FROM TUSER WHERE NAME=?");
 
     this.sqlSelectProfile     = buildSelectFirstSql("ID,TYPE,CONF FROM PROFILE WHERE NAME=?");
     this.sqlSelectPublisher   = buildSelectFirstSql("ID,TYPE,CONF FROM PUBLISHER WHERE NAME=?");
@@ -95,15 +90,8 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     this.sqlSelectSigner      = buildSelectFirstSql("TYPE,CERT,CONF FROM SIGNER WHERE NAME=?");
     this.sqlSelectKeypairGen  = buildSelectFirstSql("TYPE,CONF FROM KEYPAIR_GEN WHERE NAME=?");
 
-    String columns = "ID,STATUS,NEXT_CRLNO,CRL_SIGNER_NAME,CMP_RESPONDER_NAME,SCEP_RESPONDER_NAME,"
-        + "SUBJECT,REV_INFO,SIGNER_TYPE,SIGNER_CONF,CERT,CERTCHAIN";
-    if (dbSchemaVersion <= 6) {
-      columns += ",SN_SIZE,CA_URIS,MAX_VALIDITY,SAVE_REQ,PERMISSION,NUM_CRLS,EXPIRATION_PERIOD,"
-          + "VALIDITY_MODE,CRL_CONTROL,CMP_CONTROL,SCEP_CONTROL,CTLOG_CONTROL,PROTOCOL_SUPPORT,"
-          + "REVOKE_SUSPENDED_CONTROL,KEEP_EXPIRED_CERT_DAYS,EXTRA_CONTROL,DHPOC_CONTROL";
-    } else {
-      columns += ",CONF";
-    }
+    String columns = "ID,STATUS,NEXT_CRLNO,CRL_SIGNER_NAME,"
+        + "SUBJECT,REV_INFO,SIGNER_TYPE,SIGNER_CONF,CERT,CERTCHAIN,CONF";
 
     this.sqlSelectCa = buildSelectFirstSql(columns + " FROM CA WHERE NAME=?");
 
@@ -111,8 +99,6 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
 
     this.sqlSelectSystemEvent = buildSelectFirstSql(
         "EVENT_TIME,EVENT_OWNER FROM SYSTEM_EVENT WHERE NAME=?");
-
-    this.sqlSelectUser = buildSelectFirstSql("ID,ACTIVE,PASSWORD FROM TUSER WHERE NAME=?");
   } // constructor
 
   /**
@@ -133,8 +119,8 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   } // method deleteSystemEvent
 
   private void addSystemEvent(SystemEvent systemEvent) throws CaMgmtException {
-    final String sql = buildInsertSql("SYSTEM_EVENT",
-        "NAME", "EVENT_TIME", "EVENT_TIME2", "EVENT_OWNER");
+    final String sql = SqlUtil.buildInsertSql("SYSTEM_EVENT",
+        "NAME,EVENT_TIME,EVENT_TIME2,EVENT_OWNER");
 
     int num = execUpdatePrepStmt0(sql,
         col2Str(systemEvent.getName()), col2Long(systemEvent.getEventTime()),
@@ -228,101 +214,8 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       throw new CaMgmtException("unknown CA " + name);
     }
 
-    CaConfColumn conf;
-    if (dbSchemaVersion <= 6) {
-      conf = new CaConfColumn();
-
-      conf.setSaveCert(true);
-      conf.setSaveKeypair(false);
-      conf.setKeypairGenNames(Collections.singletonList("software"));
-
-      conf.setSnSize(rs.getInt("SN_SIZE"));
-
-      String str = rs.getString("CA_URIS");
-      if (StringUtil.isNotBlank(str)) {
-        CaUris caUris = CaUris.decode(str);
-        conf.setCacertUris(caUris.getCacertUris());
-        conf.setCrlUris(caUris.getCrlUris());
-        conf.setDeltaCrlUris(caUris.getDeltaCrlUris());
-        conf.setOcspUris(caUris.getOcspUris());
-      }
-
-      conf.setMaxValidity(rs.getString("MAX_VALIDITY"));
-
-      str = rs.getString("SCEP_CONTROL");
-      if (StringUtil.isNotBlank(str)) {
-        conf.setScepControl(new ConfPairs(str).asMap());
-      }
-
-      str = rs.getString("CRL_CONTROL");
-      if (StringUtil.isNotBlank(str)) {
-        conf.setCrlControl(new ConfPairs(str).asMap());
-      }
-
-      str = rs.getString("CTLOG_CONTROL");
-      if (StringUtil.isNotBlank(str)) {
-        conf.setCtlogControl(new ConfPairs(str).asMap());
-      }
-
-      str = rs.getString("PROTOCOL_SUPPORT");
-      if (StringUtil.isNotBlank(str)) {
-        conf.setProtocolSupport(new ProtocolSupport(str).getProtocols());
-      }
-
-      conf.setSaveRequest(rs.getInt("SAVE_REQ") != 0);
-      conf.setPermission(rs.getInt("PERMISSION"));
-      conf.setExpirationPeriod(rs.getInt("EXPIRATION_PERIOD"));
-      conf.setKeepExpiredCertDays(rs.getInt("KEEP_EXPIRED_CERT_DAYS"));
-      conf.setValidityMode(rs.getString("VALIDITY_MODE"));
-
-      str = rs.getString("EXTRA_CONTROL");
-      if (StringUtil.isNotBlank(str)) {
-        conf.setExtraControl(new ConfPairs(str).asMap());
-      }
-
-      conf.setNumCrls(rs.getInt("NUM_CRLS"));
-
-      str = rs.getString("REVOKE_SUSPENDED_CONTROL");
-      if (StringUtil.isNotBlank(str)) {
-        conf.setRevokeSuspendedControl(new ConfPairs(str).asMap());
-      }
-
-      String cmpControl = rs.getString("CMP_CONTROL");
-      // Util version 6
-      ConfPairs cmpCtrlPairs = new ConfPairs();
-      ConfPairs popCtrlPairs = new ConfPairs();
-
-      // adapt the configuration
-      if (cmpControl != null) {
-        ConfPairs pairs = new ConfPairs(cmpControl);
-        for (String n : pairs.names()) {
-          if ("popo.sigalgo".equals(n)) { // xipki till 5.3 uses "popo".
-            popCtrlPairs.putPair("sigalgo", pairs.value(n));
-          } else {
-            cmpCtrlPairs.putPair(n, pairs.value(n));
-          }
-        }
-      }
-
-      str = rs.getString("DHPOC_CONTROL");
-      if (StringUtil.isNotBlank(str)) {
-        ConfPairs pairs = new ConfPairs(cmpControl);
-        for (String n : pairs.names()) {
-          popCtrlPairs.putPair("dh." + n, pairs.value(n));
-        }
-      }
-
-      if (!cmpCtrlPairs.isEmpty()) {
-        conf.setCmpControl(cmpCtrlPairs.asMap());
-      }
-
-      if (!popCtrlPairs.isEmpty()) {
-        conf.setPopControl(popCtrlPairs.asMap());
-      }
-    } else {
-      String encodedConf = rs.getString("CONF");
-      conf = CaConfColumn.decode(encodedConf);
-    }
+    String encodedConf = rs.getString("CONF");
+    CaConfColumn conf = CaConfColumn.decode(encodedConf);
 
     CaEntry entry = new CaEntry(new NameId(getInt(rs, "ID"), name), conf.snSize(),
         getLong(rs, "NEXT_CRLNO"), rs.getString("SIGNER_TYPE"), rs.getString("SIGNER_CONF"),
@@ -343,30 +236,12 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       entry.setCrlSignerName(crlsignerName);
     }
 
-    String cmpResponderName = rs.getString("CMP_RESPONDER_NAME");
-    if (StringUtil.isNotBlank(cmpResponderName)) {
-      entry.setCmpResponderName(cmpResponderName);
-    }
-
-    String scepResponderName = rs.getString("SCEP_RESPONDER_NAME");
-    if (StringUtil.isNotBlank(scepResponderName)) {
-      entry.setScepResponderName(scepResponderName);
-    }
     String revInfo = rs.getString("REV_INFO");
     CertRevocationInfo revocationInfo = (revInfo == null)
         ? null : CertRevocationInfo.fromEncoded(revInfo);
     entry.setRevocationInfo(revocationInfo);
 
     conf.fillCaEntry(entry);
-
-    ProtocolSupport protocolSupport = entry.getProtocoSupport();
-    if (protocolSupport.isCmp()) {
-      if (entry.getCmpControl() == null) {
-        LOG.warn("CA {}: CMP is supported but CMP_CONTROL is not set, disable the CMP support",
-            name);
-        protocolSupport.setCmp(false);
-      }
-    }
 
     try {
       return new CaInfo(entry, conf, certstore);
@@ -379,7 +254,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     Map<Integer, String> idNameMap = getIdNameMap("REQUESTOR");
 
     final String sql =
-        "SELECT REQUESTOR_ID,RA,PERMISSION,PROFILES FROM CA_HAS_REQUESTOR WHERE CA_ID=?";
+        "SELECT REQUESTOR_ID,PERMISSION,PROFILES FROM CA_HAS_REQUESTOR WHERE CA_ID=?";
 
     List<ResultRow> rows = execQueryPrepStmt0(sql, col2Int(ca.getId()));
 
@@ -391,7 +266,6 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       List<String> list = StringUtil.split(rs.getString("PROFILES"), ",");
       Set<String> profiles = (list == null) ? null : new HashSet<>(list);
       CaHasRequestorEntry entry = new CaHasRequestorEntry(new NameId(id, name));
-      entry.setRa(getBoolean(rs, "RA"));
       entry.setPermission(getInt(rs, "PERMISSION"));
       entry.setProfiles(profiles);
 
@@ -438,37 +312,12 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   public void addCa(CaEntry caEntry) throws CaMgmtException {
     notNull(caEntry, "caEntry");
 
-    if (dbSchemaVersion <= 6) {
-      if (caEntry.isSaveKeypair()) {
-        assertDbSchemaVersion7on("Saving keypair");
-      }
-
-      List<String> keypairGenNames = caEntry.getKeypairGenNames();
-      if (CollectionUtil.isNotEmpty(keypairGenNames)) {
-        for (String n : keypairGenNames) {
-          if (!"software".equalsIgnoreCase(n)) {
-            assertDbSchemaVersion7on("Keypair generation name (" + n
-                + ") different than 'software'");
-          }
-        }
-      }
-    }
-
     caEntry.getIdent().setId((int) getNextId(Table.CA));
 
-    List<String> colNames = CaUtil.asModifiableList("ID", "NAME", "STATUS", "NEXT_CRLNO",
-        "CRL_SIGNER_NAME", "CMP_RESPONDER_NAME", "SCEP_RESPONDER_NAME",
-        "SUBJECT", "SIGNER_TYPE", "SIGNER_CONF", "CERT", "CERTCHAIN");
-    if (dbSchemaVersion <= 6) {
-      CaUtil.addAll(colNames, "SN_SIZE", "CA_URIS", "MAX_VALIDITY",
-          "CRL_CONTROL", "CMP_CONTROL", "SCEP_CONTROL", "CTLOG_CONTROL", "PROTOCOL_SUPPORT",
-          "SAVE_REQ", "PERMISSION", "NUM_CRLS", "EXPIRATION_PERIOD", "KEEP_EXPIRED_CERT_DAYS",
-          "VALIDITY_MODE", "EXTRA_CONTROL", "DHPOC_CONTROL", "REVOKE_SUSPENDED_CONTROL");
-    } else {
-      colNames.add("CONF");
-    }
+    String colNames ="ID,NAME,STATUS,NEXT_CRLNO,CRL_SIGNER_NAME,SUBJECT," +
+        "SIGNER_TYPE,SIGNER_CONF,CERT,CERTCHAIN,CONF";
 
-    String sql = buildInsertSql("CA", colNames.toArray(new String[0]));
+    String sql = SqlUtil.buildInsertSql("CA", colNames);
 
     byte[] encodedCert = caEntry.getCert().getEncoded();
     List<X509Cert> certchain = caEntry.getCertchain();
@@ -481,156 +330,65 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         col2Str(caEntry.getStatus().getStatus()), // STATUS
         col2Long(caEntry.getNextCrlNumber()), // NEXT_CRLNO
         col2Str(caEntry.getCrlSignerName()), // CRL_SIGNER_NAME
-        col2Str(caEntry.getCmpResponderName()), // CMP_RESPONDER_NAME
-        col2Str(caEntry.getScepResponderName()), // SCEP_RESPONDER_NAME
         col2Str(caEntry.getSubject()), // SUBJECT
         col2Str(caEntry.getSignerType()), // SIGNER_TYPE
         col2Str(caEntry.getSignerConf()),  // SIGNER_CONF
         col2Str(Base64.encodeToString(encodedCert)), // CERT
         col2Str(certchainStr)); // CERTCHAIN
 
-    if (dbSchemaVersion <= 6) {
-      CaUris caUris = caEntry.getCaUris();
-      CrlControl crlControl = caEntry.getCrlControl();
-      ScepControl scepControl = caEntry.getScepControl();
-      CtlogControl ctlogControl = caEntry.getCtlogControl();
-      ProtocolSupport protocolSupport = caEntry.getProtocoSupport();
-      ConfPairs extraControl = caEntry.getExtraControl();
-      String encodedExtraCtrl = (extraControl == null) ? null : extraControl.getEncoded();
-      RevokeSuspendedControl revokeSuspended = caEntry.getRevokeSuspendedControl();
+    // START DB Schema Version 7
+    CaConfColumn cc = new CaConfColumn();
 
-      // adapt the configuration
-      PopControl popCtrl = caEntry.getPopControl();
-
-      String cmpCtrlText = null;
-      String dhPopCtrlText = null;
-
-      if (popCtrl != null) {
-        ConfPairs pairs = popCtrl.getConfPairs();
-
-        CmpControl cmpControl = caEntry.getCmpControl();
-        ConfPairs cmpPairs = cmpControl == null ? new ConfPairs() : cmpControl.getConfPairs();
-
-        ConfPairs dhpopPairs = new ConfPairs();
-
-        for (String n : pairs.names()) {
-          if ("sigalgo".equals(n)) {
-            cmpPairs.putPair("popo.sigalgo", pairs.value(n));
-          } else if (n.startsWith("dh.")) {
-            dhpopPairs.putPair(n.substring(3), pairs.value(n));
-          } else {
-            LOG.warn("unsupported POP control entry {}: {}", n, pairs.value(n));
-          }
-        }
-
-        if (!cmpPairs.isEmpty()) {
-          cmpCtrlText = cmpPairs.getEncoded();
-        }
-
-        if (!dhpopPairs.isEmpty()) {
-          dhPopCtrlText = dhpopPairs.getEncoded();
-        }
-      } else {
-        if (caEntry.getCmpControl() != null) {
-          cmpCtrlText = caEntry.getCmpControl().getConf();
-        }
-      }
-
-      CaUtil.addAll(cols,
-          col2Int(caEntry.getSerialNoLen()),
-          col2Str(caUris == null ? null : caEntry.getCaUris().getEncoded()),
-          col2Str(caEntry.getMaxValidity().toString()),
-          col2Str(crlControl == null ? null : crlControl.getConf()),
-          col2Str(cmpCtrlText),
-          col2Str(scepControl == null ? null : scepControl.getConf()),
-          col2Str(ctlogControl == null ? null : ctlogControl.getConf()),
-          col2Str(protocolSupport == null ? null : protocolSupport.getEncoded()),
-          col2Bool(caEntry.isSaveRequest()),
-          col2Int(caEntry.getPermission()),
-          col2Int(caEntry.getNumCrls()),
-          col2Int(caEntry.getExpirationPeriod()),
-          col2Int(caEntry.getKeepExpiredCertInDays()),
-          col2Str(caEntry.getValidityMode().name()),
-          col2Str(StringUtil.isBlank(encodedExtraCtrl) ? null : encodedExtraCtrl),
-          col2Str(dhPopCtrlText),
-          col2Str(revokeSuspended == null ? null : revokeSuspended.getConf()));
-      // END DB Schema Version 6
-    } else {
-      // START DB Schema Version 7
-      CaConfColumn cc = new CaConfColumn();
-
-      // CA URIS
-      CaUris caUris = caEntry.getCaUris();
-      if (caUris != null) {
-        cc.setCacertUris(caUris.getCacertUris());
-        cc.setCrlUris(caUris.getCrlUris());
-        cc.setDeltaCrlUris(caUris.getDeltaCrlUris());
-        cc.setOcspUris(caUris.getOcspUris());
-      }
-
-      // CRL Control
-      CrlControl crlControl = caEntry.getCrlControl();
-      if (crlControl != null) {
-        cc.setCrlControl(crlControl.getConfPairs().asMap());
-      }
-
-      // CMP Control
-      CmpControl cmpControl = caEntry.getCmpControl();
-      if (cmpControl != null) {
-        cc.setCmpControl(cmpControl.getConfPairs().asMap());
-      }
-
-      // SCEP Control
-      ScepControl scepControl = caEntry.getScepControl();
-      if (scepControl != null) {
-        cc.setScepControl(scepControl.getConfPairs().asMap());
-      }
-
-      // CTLog Control
-      CtlogControl ctlogControl = caEntry.getCtlogControl();
-      if (ctlogControl != null) {
-        cc.setCtlogControl(ctlogControl.getConfPairs().asMap());
-      }
-
-      ProtocolSupport protocolSupport = caEntry.getProtocoSupport();
-      if (protocolSupport != null) {
-        cc.setProtocolSupport(protocolSupport.getProtocols());
-      }
-
-      ConfPairs extraControl = caEntry.getExtraControl();
-      if (extraControl != null) {
-        cc.setExtraControl(extraControl.asMap());
-      }
-
-      RevokeSuspendedControl revokeSuspended = caEntry.getRevokeSuspendedControl();
-      if (revokeSuspended != null) {
-        cc.setRevokeSuspendedControl(revokeSuspended.getConfPairs().asMap());
-      }
-
-      cc.setSnSize(caEntry.getSerialNoLen());
-      if (caEntry.getMaxValidity() != null) {
-        cc.setMaxValidity(caEntry.getMaxValidity().toString());
-      }
-      cc.setKeypairGenNames(caEntry.getKeypairGenNames());
-
-      cc.setSaveCert(caEntry.isSaveCert());
-      cc.setSaveRequest(caEntry.isSaveRequest());
-      cc.setSaveKeypair(caEntry.isSaveKeypair());
-      cc.setPermission(caEntry.getPermission());
-      cc.setNumCrls(caEntry.getNumCrls());
-      cc.setExpirationPeriod(caEntry.getExpirationPeriod());
-      cc.setKeepExpiredCertDays(caEntry.getKeepExpiredCertInDays());
-      if (caEntry.getValidityMode() != null) {
-        cc.setValidityMode(caEntry.getValidityMode().name());
-      }
-
-      if (caEntry.getPopControl() != null) {
-        cc.setPopControl(caEntry.getPopControl().getConfPairs().asMap());
-      }
-
-      // add to cols
-      cols.add(col2Str(cc.encode()));
+    // CA URIS
+    CaUris caUris = caEntry.getCaUris();
+    if (caUris != null) {
+      cc.setCacertUris(caUris.getCacertUris());
+      cc.setCrlUris(caUris.getCrlUris());
+      cc.setDeltaCrlUris(caUris.getDeltaCrlUris());
+      cc.setOcspUris(caUris.getOcspUris());
     }
+
+    // CRL Control
+    CrlControl crlControl = caEntry.getCrlControl();
+    if (crlControl != null) {
+      cc.setCrlControl(crlControl.getConfPairs().asMap());
+    }
+
+    // CTLog Control
+    CtlogControl ctlogControl = caEntry.getCtlogControl();
+    if (ctlogControl != null) {
+      cc.setCtlogControl(ctlogControl.getConfPairs().asMap());
+    }
+
+    ConfPairs extraControl = caEntry.getExtraControl();
+    if (extraControl != null) {
+      cc.setExtraControl(extraControl.asMap());
+    }
+
+    RevokeSuspendedControl revokeSuspended = caEntry.getRevokeSuspendedControl();
+    if (revokeSuspended != null) {
+      cc.setRevokeSuspendedControl(revokeSuspended.getConfPairs().asMap());
+    }
+
+    cc.setSnSize(caEntry.getSerialNoLen());
+    if (caEntry.getMaxValidity() != null) {
+      cc.setMaxValidity(caEntry.getMaxValidity().toString());
+    }
+    cc.setKeypairGenNames(caEntry.getKeypairGenNames());
+
+    cc.setSaveCert(caEntry.isSaveCert());
+    cc.setSaveRequest(caEntry.isSaveRequest());
+    cc.setSaveKeypair(caEntry.isSaveKeypair());
+    cc.setPermission(caEntry.getPermission());
+    cc.setNumCrls(caEntry.getNumCrls());
+    cc.setExpirationPeriod(caEntry.getExpirationPeriod());
+    cc.setKeepExpiredCertDays(caEntry.getKeepExpiredCertInDays());
+    if (caEntry.getValidityMode() != null) {
+      cc.setValidityMode(caEntry.getValidityMode().name());
+    }
+
+    // add to cols
+    cols.add(col2Str(cc.encode()));
 
     // insert to table ca
     int num = execUpdatePrepStmt0(sql, cols.toArray(new SqlColumn2[0]));
@@ -646,7 +404,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
 
   public void addCaAlias(String aliasName, NameId ca) throws CaMgmtException {
     notNulls(aliasName, "aliasName", ca, "ca");
-    final String sql = buildInsertSql("CAALIAS", "NAME", "CA_ID");
+    final String sql = SqlUtil.buildInsertSql("CAALIAS", "NAME,CA_ID");
     int num = execUpdatePrepStmt0(sql, col2Str(aliasName), col2Int(ca.getId()));
 
     if (num == 0) {
@@ -657,7 +415,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
 
   public void addCertprofile(CertprofileEntry dbEntry) throws CaMgmtException {
     notNull(dbEntry, "dbEntry");
-    final String sql = buildInsertSql("PROFILE", "ID", "NAME", "TYPE", "CONF");
+    final String sql = SqlUtil.buildInsertSql("PROFILE", "ID,NAME,TYPE,CONF");
 
     dbEntry.getIdent().setId((int) getNextId(Table.PROFILE));
 
@@ -675,14 +433,14 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   public void addCertprofileToCa(NameId profile, NameId ca) throws CaMgmtException {
     notNulls(profile, "profile", ca, "ca");
 
-    final String sql = buildInsertSql("CA_HAS_PROFILE", "CA_ID", "PROFILE_ID");
+    final String sql = SqlUtil.buildInsertSql("CA_HAS_PROFILE", "CA_ID,PROFILE_ID");
     addEntityToCa("profile", profile, ca, sql);
   } // method addCertprofileToCa
 
   public void addPublisherToCa(NameId publisher, NameId ca) throws CaMgmtException {
     notNulls(publisher, "publisher", ca, "ca");
 
-    final String sql = buildInsertSql("CA_HAS_PUBLISHER", "CA_ID", "PUBLISHER_ID");
+    final String sql = SqlUtil.buildInsertSql("CA_HAS_PUBLISHER", "CA_ID,PUBLISHER_ID");
     addEntityToCa("publisher", publisher, ca, sql);
   } // method addPublisherToCa
 
@@ -701,7 +459,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
 
     dbEntry.getIdent().setId((int) getNextId(Table.REQUESTOR));
 
-    final String sql = buildInsertSql("REQUESTOR", "ID", "NAME", "TYPE", "CONF");
+    final String sql = SqlUtil.buildInsertSql("REQUESTOR", "ID,NAME,TYPE,CONF");
     int num = execUpdatePrepStmt0(sql,
         col2Int(dbEntry.getIdent().getId()), col2Str(dbEntry.getIdent().getName()),
         col2Str(dbEntry.getType()),          col2Str(dbEntry.getConf()));
@@ -718,7 +476,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   public void addEmbeddedRequestor(String requestorName) throws CaMgmtException {
     requestorName = requestorName.toLowerCase();
 
-    final String sql = buildInsertSql("REQUESTOR", "ID", "NAME", "TYPE", "CONF");
+    final String sql = SqlUtil.buildInsertSql("REQUESTOR", "ID,NAME,TYPE,CONF");
     int nextId = (int) getNextId(Table.REQUESTOR);
 
     int num = execUpdatePrepStmt0(sql,
@@ -733,27 +491,27 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
   public void addRequestorToCa(CaHasRequestorEntry requestor, NameId ca) throws CaMgmtException {
     notNulls(requestor, "requestor", ca, "ca");
 
-    final String sql = buildInsertSql("CA_HAS_REQUESTOR",
-        "CA_ID", "REQUESTOR_ID", "RA", "PERMISSION", "PROFILES");
+    final String sql = SqlUtil.buildInsertSql("CA_HAS_REQUESTOR",
+        "CA_ID,REQUESTOR_ID,PERMISSION,PROFILES");
 
     String profilesText = StringUtil.collectionAsString(requestor.getProfiles(), ",");
     final NameId requestorIdent = requestor.getRequestorIdent();
 
     int num = execUpdatePrepStmt0(sql,
-          col2Int(ca.getId()), col2Int(requestorIdent.getId()), col2Bool(requestor.isRa()),
+          col2Int(ca.getId()), col2Int(requestorIdent.getId()),
           col2Int(requestor.getPermission()), col2Str(profilesText));
 
     if (num == 0) {
       throw new CaMgmtException("could not add requestor " + requestorIdent + " to CA " + ca);
     }
 
-    LOG.info("added requestor '{}' to CA '{}': ra: {}; permission: {}; profile: {}",
-        requestorIdent, ca, requestor.isRa(), requestor.getPermission(), profilesText);
+    LOG.info("added requestor '{}' to CA '{}': ermission: {}; profile: {}",
+        requestorIdent, ca, requestor.getPermission(), profilesText);
   } // method addRequestorToCa
 
   public void addPublisher(PublisherEntry dbEntry) throws CaMgmtException {
     notNull(dbEntry, "dbEntry");
-    final String sql = buildInsertSql("PUBLISHER", "ID", "NAME", "TYPE", "CONF");
+    final String sql = SqlUtil.buildInsertSql("PUBLISHER", "ID,NAME,TYPE,CONF");
 
     dbEntry.getIdent().setId((int) getNextId(Table.PUBLISHER));
     String name = dbEntry.getIdent().getName();
@@ -772,19 +530,6 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
                        CaConfColumn currentCaConfColumn, SecurityFactory securityFactory)
       throws CaMgmtException {
     notNulls(changeCaEntry, "changeCaEntry", securityFactory, "securityFactory");
-
-    if (changeCaEntry.getSaveKeypair() != null && changeCaEntry.getSaveKeypair()) {
-      assertDbSchemaVersion7on("Saving keypair");
-    }
-
-    List<String> keypairGenNames = changeCaEntry.getKeypairGenNames();
-    if (CollectionUtil.isNotEmpty(keypairGenNames)) {
-      for (String n : keypairGenNames) {
-        if (!"software".equalsIgnoreCase(n)) {
-          assertDbSchemaVersion7on("Keypair generation name " + n + ") different than 'sofware'");
-        }
-      }
-    }
 
     byte[] encodedCert = changeCaEntry.getEncodedCert();
     if (encodedCert != null) {
@@ -887,127 +632,13 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     List<SqlColumn> cols = CaUtil.asModifiableList(
         colStr("STATUS", status),
         colStr("CRL_SIGNER_NAME", changeCaEntry.getCrlSignerName()),
-        colStr("CMP_RESPONDER_NAME", changeCaEntry.getCmpResponderName()),
-        colStr("SCEP_RESPONDER_NAME", changeCaEntry.getScepResponderName()),
         colStr("SUBJECT", subject),
         colStr("SIGNER_TYPE", signerType),
         colStr("SIGNER_CONF", signerConf, false, true),
         colStr("CERT", base64Cert),
         colStr("CERTCHAIN", certchainStr));
 
-    if (dbSchemaVersion <= 6) {
-      String maxValidity = (changeCaEntry.getMaxValidity() == null) ? null
-          : changeCaEntry.getMaxValidity().toString();
-      String extraControl = (changeCaEntry.getExtraControl() == null) ? null
-          : new ConfPairs(changeCaEntry.getExtraControl()).getEncoded(); // check also the validity
-      String validityMode = (changeCaEntry.getValidityMode() == null) ? null
-          : changeCaEntry.getValidityMode().name();
-
-      String caUrisStr = null;
-      CaUris changeUris = changeCaEntry.getCaUris();
-      if (changeUris != null
-          && (changeUris.getCacertUris() != null
-          || changeUris.getCrlUris() != null
-          || changeUris.getDeltaCrlUris() != null
-          || changeUris.getOcspUris() != null)) {
-        CaUris oldCaUris = currentCaEntry.getCaUris();
-
-        List<String> uris = changeUris.getCacertUris();
-        List<String> cacertUris = (uris == null) ? oldCaUris.getCacertUris() : uris;
-
-        uris = changeUris.getOcspUris();
-        List<String> ocspUris = (uris == null) ? oldCaUris.getOcspUris() : uris;
-
-        uris = changeUris.getCrlUris();
-        List<String> crlUris = (uris == null) ? oldCaUris.getCrlUris() : uris;
-
-        uris = changeUris.getDeltaCrlUris();
-        List<String> deltaCrlUris = (uris == null) ? oldCaUris.getDeltaCrlUris() : uris;
-        CaUris newCaUris = new CaUris(cacertUris, ocspUris, crlUris, deltaCrlUris);
-        caUrisStr = newCaUris.getEncoded();
-        if (caUrisStr.isEmpty()) {
-          caUrisStr = CaManager.NULL;
-        }
-      }
-
-      String protocolSupportStr = null;
-      Boolean supportCmp = changeCaEntry.getSupportCmp();
-      Boolean supportRest = changeCaEntry.getSupportRest();
-      Boolean supportScep = changeCaEntry.getSupportScep();
-      if (supportCmp != null || supportRest != null || supportScep != null) {
-        ProtocolSupport oldSupport = currentCaEntry.getProtocoSupport();
-        ProtocolSupport support = new ProtocolSupport(oldSupport.isCmp(),
-            oldSupport.isRest(), oldSupport.isScep());
-
-        if (supportCmp != null) {
-          support.setCmp(supportCmp);
-        }
-
-        if (supportRest != null) {
-          support.setRest(supportRest);
-        }
-
-        if (supportScep != null) {
-          support.setScep(supportScep);
-        }
-
-        protocolSupportStr = support.getEncoded();
-      }
-
-      // Dapt: CMP Control and DHPOP Control
-      String cmpCtrlText = changeCaEntry.getCmpControl();
-      String popCtrlText = changeCaEntry.getPopControl();
-
-      ConfPairs popCtrlPairs = null;
-      if (StringUtil.isNotBlank(popCtrlText)) {
-        popCtrlPairs = new ConfPairs(changeCaEntry.getPopControl());
-      }
-
-      ConfPairs cmpPairs = new ConfPairs(CaManager.NULL.equals(cmpCtrlText) ? null : cmpCtrlText);
-      ConfPairs dhpopPairs = new ConfPairs();
-
-      // adapt CMP control
-      if (popCtrlPairs != null) {
-        for (String n : popCtrlPairs.names()) {
-          if ("sigalgo".equals(n)) {
-            cmpPairs.putPair("popo.sigalgo", popCtrlPairs.value(n));
-          } else if (n.startsWith("dh.")) {
-            dhpopPairs.putPair(n.substring(3), popCtrlPairs.value(n));
-          } else {
-            LOG.warn("unsupported POP entry {}: {}", n, popCtrlPairs.value(n));
-          }
-        }
-      }
-
-      if (!cmpPairs.isEmpty()) {
-        cmpCtrlText = cmpPairs.getEncoded();
-      }
-
-      String dhpopCtrlText = null;
-      if (!dhpopPairs.isEmpty()) {
-        dhpopCtrlText = dhpopPairs.getEncoded();
-      }
-
-      CaUtil.addAll(cols,
-          colInt("SN_SIZE", changeCaEntry.getSerialNoLen()),
-          colStr("CA_URIS", caUrisStr),
-          colStr("MAX_VALIDITY", maxValidity),
-          colStr("CMP_CONTROL", cmpCtrlText),
-          colStr("CRL_CONTROL", changeCaEntry.getCrlControl()),
-          colStr("SCEP_CONTROL", changeCaEntry.getScepControl()),
-          colStr("CTLOG_CONTROL", changeCaEntry.getCtlogControl()),
-          colStr("PROTOCOL_SUPPORT", protocolSupportStr),
-          colBool("SAVE_REQ", changeCaEntry.getSaveRequest()),
-          colInt("PERMISSION", changeCaEntry.getPermission()),
-          colInt("NUM_CRLS", changeCaEntry.getNumCrls()),
-          colInt("EXPIRATION_PERIOD", changeCaEntry.getExpirationPeriod()),
-          colInt("KEEP_EXPIRED_CERT_DAYS", changeCaEntry.getKeepExpiredCertInDays()),
-          colStr("VALIDITY_MODE", validityMode), colStr("EXTRA_CONTROL", extraControl),
-          colStr("DHPOC_CONTROL", dhpopCtrlText, false, true),
-          colStr("REVOKE_SUSPENDED_CONTROL", changeCaEntry.getRevokeSuspendedControl()));
-    } else {
-      cols.add(buildChangeCaConfColumn(changeCaEntry, currentCaEntry, currentCaConfColumn));
-    }
+    cols.add(buildChangeCaConfColumn(changeCaEntry, currentCaEntry, currentCaConfColumn));
 
     changeIfNotNull("CA", colInt("ID", changeCaEntry.getIdent().getId()), // where column
         cols.toArray(new SqlColumn[0]));
@@ -1082,30 +713,6 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       }
     }
 
-    // protocol support
-    Boolean supportCmp = changeCaEntry.getSupportCmp();
-    Boolean supportRest = changeCaEntry.getSupportRest();
-    Boolean supportScep = changeCaEntry.getSupportScep();
-    if (supportCmp != null || supportRest != null || supportScep != null) {
-      ProtocolSupport oldSupport = currentCaEntry.getProtocoSupport();
-      ProtocolSupport support = new ProtocolSupport(oldSupport.isCmp(),
-          oldSupport.isRest(), oldSupport.isScep());
-
-      if (supportCmp != null) {
-        support.setCmp(supportCmp);
-      }
-
-      if (supportRest != null) {
-        support.setRest(supportRest);
-      }
-
-      if (supportScep != null) {
-        support.setScep(supportScep);
-      }
-
-      newCC.setProtocolSupport(support.getProtocols());
-    }
-
     // Keypair generation names
     List<String> names = changeCaEntry.getKeypairGenNames();
     if (names != null) {
@@ -1121,16 +728,6 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       newCC.setSnSize(changeCaEntry.getSerialNoLen());
     }
 
-    // CMP control
-    str = changeCaEntry.getCmpControl();
-    if (str != null) {
-      if (CaManager.NULL.equalsIgnoreCase(str)) {
-        newCC.setCmpControl(null);
-      } else {
-        newCC.setCmpControl(new ConfPairs(str).asMap());
-      }
-    }
-
     // CRL control
     str = changeCaEntry.getCrlControl();
     if (str != null) {
@@ -1138,16 +735,6 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         newCC.setCrlControl(null);
       } else {
         newCC.setCrlControl(new ConfPairs(str).asMap());
-      }
-    }
-
-    // SCEP control
-    str = changeCaEntry.getScepControl();
-    if (str != null) {
-      if (CaManager.NULL.equalsIgnoreCase(str)) {
-        newCC.setScepControl(null);
-      } else {
-        newCC.setScepControl(new ConfPairs(str).asMap());
       }
     }
 
@@ -1205,15 +792,6 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       }
     }
 
-    str = changeCaEntry.getPopControl();
-    if (str != null) {
-      if (CaManager.NULL.equalsIgnoreCase(str)) {
-        newCC.setPopControl(null);
-      } else {
-        newCC.setPopControl(new ConfPairs(str).asMap());
-      }
-    }
-
     String encodedConf = newCC.encode();
     boolean confIsSensitive = false;
     String encodedOrigConf = currentCaConfColumn.encode();
@@ -1264,17 +842,6 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
       PasswordResolver passwordResolver) throws CaMgmtException {
     notNull(nameId, "nameId");
     RequestorEntryWrapper requestor = new RequestorEntryWrapper();
-
-    if (RequestorEntry.TYPE_PBM.equalsIgnoreCase(type)) {
-      if (!StringUtil.startsWithIgnoreCase(conf, "PBE:")) {
-        try {
-          conf = passwordResolver.protectPassword("PBE", conf.toCharArray());
-        } catch (PasswordResolverException ex) {
-          throw new CaMgmtException(
-              "could not encrypt password of requestor " + nameId.getName(), ex);
-        }
-      }
-    }
 
     requestor.setDbEntry(new RequestorEntry(nameId, type, conf), passwordResolver);
 
@@ -1384,14 +951,6 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
         "DELETE FROM CA_HAS_PUBLISHER WHERE CA_ID=? AND PUBLISHER_ID=?");
   } // method removePublisherFromCa
 
-  public void removeUserFromCa(String username, String caName) throws CaMgmtException {
-    notBlank(username, "username");
-    notBlank(caName, "caName");
-
-    removeEntityFromCa("user", username, caName, sqlSelectUserId,
-        "DELETE FROM CA_HAS_USER WHERE CA_ID=? AND USER_ID=?");
-  } // method removeUserFromCa
-
   public void removeDbSchema(String name) throws CaMgmtException {
     notBlank(name, "name");
     final String sql = "DELETE FROM DBSCHEMA WHERE NAME=?";
@@ -1415,7 +974,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     if (num == 0) {
       throw new CaMgmtException(String.format("could not remove %s from CA %s", name, caName));
     }
-  } // method removeUserFromCa
+  } // method removeEntityFromCa
 
   public void revokeCa(String caName, CertRevocationInfo revocationInfo) throws CaMgmtException {
     notBlank(caName, "caName");
@@ -1429,8 +988,6 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
 
   public void addKeypairGen(KeypairGenEntry dbEntry) throws CaMgmtException {
     notNull(dbEntry, "dbEntry");
-
-    assertDbSchemaVersion7on("Customizing keypair generation");
 
     int num = execUpdatePrepStmt0(
             "INSERT INTO KEYPAIR_GEN (NAME,TYPE,CONF) VALUES (?,?,?)",
@@ -1448,7 +1005,7 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     notNull(dbEntry, "dbEntry");
 
     int num = execUpdatePrepStmt0(
-            buildInsertSql("SIGNER", "NAME", "TYPE", "CERT", "CONF"),
+            SqlUtil.buildInsertSql("SIGNER", "NAME,TYPE,CERT,CONF"),
             col2Str(dbEntry.getName()),       col2Str(dbEntry.getType()),
             col2Str(dbEntry.getBase64Cert()), col2Str(dbEntry.getConf()));
 
@@ -1477,133 +1034,8 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     }
   } // method unrevokeCa
 
-  public void addUser(AddUserEntry userEntry) throws CaMgmtException {
-    notNull(userEntry, "userEntry");
-    String hashedPassword = PasswordHash.createHash(userEntry.getPassword());
-    addUser(userEntry.getIdent().getName(), userEntry.isActive(), hashedPassword);
-  } // method addUser
-
-  public void addUser(UserEntry userEntry) throws CaMgmtException {
-    notNull(userEntry, "userEntry");
-    addUser(userEntry.getIdent().getName(), userEntry.isActive(), userEntry.getHashedPassword());
-  }
-
-  private void addUser(String name, boolean active, String hashedPassword) throws CaMgmtException {
-    Integer existingId = getIdForName(sqlSelectUserId, name);
-    if (existingId != null) {
-      throw new CaMgmtException(concat("user named '", name, " ' already exists"));
-    }
-
-    long id = getNextId(Table.TUSER);
-
-    int num = execUpdatePrepStmt0(buildInsertSql("TUSER", "ID", "NAME", "ACTIVE", "PASSWORD"),
-            col2Long(id), col2Str(name), col2Bool(active), col2Str(hashedPassword));
-    if (num == 0) {
-      throw new CaMgmtException("could not add user " + name);
-    }
-    LOG.info("added user '{}'", name);
-  } // method addUser
-
-  public void changeUser(ChangeUserEntry userEntry) throws CaMgmtException {
-    String username = userEntry.getIdent().getName();
-
-    Integer existingId = getIdForName(sqlSelectUserId, username);
-    if (existingId == null) {
-      throw new CaMgmtException(concat("user '", username, " ' does not exist"));
-    }
-    userEntry.getIdent().setId(existingId);
-
-    String password = userEntry.getPassword();
-    String hashedPassword = null;
-    if (password != null) {
-      hashedPassword = PasswordHash.createHash(password);
-    }
-
-    changeIfNotNull("TUSER", colInt("ID", existingId), colBool("ACTIVE", userEntry.getActive()),
-        colStr("PASSWORD", hashedPassword, true, false));
-  } // method changeUser
-
-  public void addUserToCa(CaHasUserEntry user, NameId ca) throws CaMgmtException {
-    notNulls(user, "user", ca, "ca");
-
-    final NameId userIdent = user.getUserIdent();
-    Integer existingId = getIdForName(sqlSelectUserId, userIdent.getName());
-    if (existingId == null) {
-      throw new CaMgmtException(concat("user '", userIdent.getName(), " ' does not exist"));
-    }
-    userIdent.setId(existingId);
-
-    long id = getNextId(Table.CA_HAS_USER);
-    String profilesText = StringUtil.collectionAsString(user.getProfiles(), ",");
-
-    int num = execUpdatePrepStmt0(
-            buildInsertSql("CA_HAS_USER", "ID", "CA_ID", "USER_ID", "PERMISSION", "PROFILES"),
-            col2Long(id), col2Int(ca.getId()), col2Int(userIdent.getId()),
-            col2Int(user.getPermission()), col2Str(profilesText));
-
-    if (num == 0) {
-      throw new CaMgmtException("could not add user " + userIdent + " to CA " + ca);
-    }
-
-    LOG.info("added user '{}' to CA '{}': permission: {}; profile: {}",
-        userIdent, ca, user.getPermission(), profilesText);
-  } // method addUserToCa
-
-  public Map<String, CaHasUserEntry> getCaHasUsersForUser(String user, CaIdNameMap idNameMap)
-      throws CaMgmtException {
-    Integer existingId = getIdForName(sqlSelectUserId, user);
-    if (existingId == null) {
-      throw new CaMgmtException(concat("user '", user, " ' does not exist"));
-    }
-
-    final String sql = "SELECT CA_ID,PERMISSION,PROFILES FROM CA_HAS_USER WHERE USER_ID=?";
-
-    List<ResultRow> rows = execQueryPrepStmt0(sql, col2Int(existingId));
-
-    Map<String, CaHasUserEntry> ret = new HashMap<>();
-    for (ResultRow rs : rows) {
-      List<String> list = StringUtil.split(rs.getString("PROFILES"), ",");
-      Set<String> profiles = (list == null) ? null : new HashSet<>(list);
-      CaHasUserEntry caHasUser = new CaHasUserEntry(new NameId(existingId, user));
-      caHasUser.setPermission(getInt(rs, "PERMISSION"));
-      caHasUser.setProfiles(profiles);
-
-      int caId = getInt(rs, "CA_ID");
-      String caName = idNameMap.getCaName(caId);
-
-      ret.put(caName, caHasUser);
-    }
-
-    return ret;
-  }  // method getCaHasUsersForUser
-
-  public List<CaHasUserEntry> getCaHasUsersForCa(String caName, CaIdNameMap idNameMap)
-      throws CaMgmtException {
-    NameId caIdent = idNameMap.getCa(caName);
-    if (caIdent == null) {
-      throw new CaMgmtException("unknown CA " + caName);
-    }
-
-    final String sql = "SELECT NAME,PERMISSION,PROFILES FROM CA_HAS_USER INNER JOIN TUSER"
-        + " ON CA_ID=? AND TUSER.ID=CA_HAS_USER.USER_ID";
-
-    List<ResultRow> rows = execQueryPrepStmt0(sql, col2Int(caIdent.getId()));
-
-    List<CaHasUserEntry> ret = new LinkedList<>();
-    for (ResultRow rs : rows) {
-      List<String> list = StringUtil.split(rs.getString("PROFILES"), ",");
-      Set<String> profiles = (list == null) ? null : new HashSet<>(list);
-      CaHasUserEntry caHasUser = new CaHasUserEntry(new NameId(null, rs.getString("NAME")));
-      caHasUser.setPermission(getInt(rs, "PERMISSION"));
-      caHasUser.setProfiles(profiles);
-
-      ret.add(caHasUser);
-    }
-    return ret;
-  } // method getCaHasUsersForCa
-
   public void addDbSchema(String name, String value) throws CaMgmtException {
-    final String sql = buildInsertSql("DBSCHEMA", "NAME", "VALUE2");
+    final String sql = SqlUtil.buildInsertSql("DBSCHEMA", "NAME,VALUE2");
     int num = execUpdatePrepStmt0(sql, col2Str(name), col2Str(value));
     if (num == 0) {
       throw new CaMgmtException("could not add DBSCHEMA " + name);
@@ -1636,27 +1068,6 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
     return ret;
   }
 
-  public UserEntry getUser(String username) throws CaMgmtException {
-    return getUser(username, false);
-  }
-
-  public UserEntry getUser(String username, boolean nullable) throws CaMgmtException {
-    notBlank(username, "username");
-    NameId ident = new NameId(null, username);
-
-    ResultRow rs = execQuery1PrepStmt0(sqlSelectUser, col2Str(ident.getName()));
-    if (rs == null) {
-      if (nullable) {
-        return null;
-      } else {
-        throw new CaMgmtException("unknown user " + username);
-      }
-    }
-
-    ident.setId(getInt(rs, "ID"));
-    return new UserEntry(ident, getBoolean(rs, "ACTIVE"), rs.getString("PASSWORD"));
-  } // method getUser
-
   private static X509Cert generateCert(String b64Cert) throws CaMgmtException {
     return (b64Cert == null) ? null : parseCert(Base64.decode(b64Cert));
   } // method generateCert
@@ -1684,14 +1095,6 @@ public class CaManagerQueryExecutor extends CaManagerQueryExecutorBase {
 
   private static long getLong(ResultRow rs, String label) {
     return rs.getLong(label);
-  }
-
-  public void assertDbSchemaVersion7on(String action)
-      throws CaMgmtException {
-    if (dbSchemaVersion <= 6) {
-      throw new CaMgmtException(action + " is not supported in the DB schema version "
-          + dbSchemaVersion + ", please update it to version 7 or above.");
-    }
   }
 
 }

@@ -2,9 +2,12 @@
 <!--
  v7: XiPKI version 6.0.0, changes compared to v6
    - Table CRL:  add column SHA1
-   - Table CA:   merge columns to a new column CONF
-   - Table CERT: add column PRIVATE_KEY
+   - Table CA:   merge columns to a new column CONF, remove columns
+   -             CMP_SIGNER_NAME, SCEP_SIGNER_NAME, PROTOCOL_SUPPORT
+   - Table CERT: add column PRIVATE_KEY, remove columns UID, RTYPE
+   - Table CA_HAS_REQUESTOR: remove column RA
    - Add table KEYPAIR_GEN
+   - Remove tables TUSER, CA_HAS_USER
 
  Maximal column size: 4k
   - DB2: PAGESIZE 4 k
@@ -129,25 +132,6 @@
       </column>
     </createTable>
     <addUniqueConstraint tableName="PROFILE" columnNames="NAME" constraintName="CONST_PROFILE_NAME"/>
-    <!-- table TUSER -->
-    <createTable tableName="TUSER">
-      <column name="ID" type="INT">
-        <constraints primaryKey="true" nullable="false"/>
-      </column>
-      <column name="NAME" type="VARCHAR(100)">
-        <constraints nullable="false"/>
-      </column>
-      <column name="ACTIVE" type="SMALLINT">
-        <!--remarks="whether the user is activated"-->
-        <constraints nullable="false"/>
-      </column>
-      <column name="PASSWORD" type="VARCHAR(150)">
-        <!--remarks="salted hashed password in hex"-->
-        <constraints nullable="false"/>
-        <!-- iterations:salt:derived key (algorithm is PBKDF2)-->
-      </column>
-    </createTable>
-    <addUniqueConstraint tableName="TUSER" columnNames="NAME" constraintName="CONST_USER_NAME"/>
     <!-- table CA -->
     <createTable tableName="CA">
       <column name="ID" type="SMALLINT">
@@ -163,8 +147,6 @@
       </column>
       <column name="NEXT_CRLNO" type="BIGINT"/>
       <column name="CRL_SIGNER_NAME" type="VARCHAR(45)"/>
-      <column name="CMP_RESPONDER_NAME" type="VARCHAR(45)"/>
-      <column name="SCEP_RESPONDER_NAME" type="VARCHAR(45)"/>
       <column name="SUBJECT" type="${x500name.type}">
         <constraints nullable="false"/>
       </column>
@@ -205,9 +187,6 @@
       <column name="REQUESTOR_ID" type="SMALLINT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="RA" type="SMALLINT">
-        <constraints nullable="false"/>
-      </column>
       <column name="PERMISSION" type="INT"/>
       <column name="PROFILES" type="VARCHAR(200)"/>
     </createTable>
@@ -229,24 +208,6 @@
         <constraints primaryKey="true" nullable="false"/>
       </column>
     </createTable>
-    <!-- table CA_HAS_USER -->
-    <createTable tableName="CA_HAS_USER">
-      <column name="ID" type="BIGINT">
-        <constraints primaryKey="true" nullable="false"/>
-      </column>
-      <column name="CA_ID" type="SMALLINT">
-        <constraints nullable="false"/>
-      </column>
-      <column name="USER_ID" type="INT">
-        <constraints nullable="false"/>
-      </column>
-      <column name="PERMISSION" type="INT">
-        <constraints nullable="false"/>
-      </column>
-      <column name="PROFILES" type="VARCHAR(200)"/>
-    </createTable>
-    <addUniqueConstraint tableName="CA_HAS_USER" columnNames="CA_ID, USER_ID"
-        constraintName="CONST_CA_USER"/>
   </changeSet>
   <changeSet author="xipki" id="2">
     <!-- table CRL -->
@@ -337,13 +298,6 @@
         <!--remarks="whether it is an end entity cert"-->
         <constraints nullable="false"/>
       </column>
-      <column name="UID" type="INT">
-        <!--remarks="user id"-->
-      </column>
-      <column name="RTYPE" type="SMALLINT">
-        <!--remarks="request type, 1 for direct via CA command, 2 for CMP, 3 for SCEP, 4 for REST"-->
-        <constraints nullable="false"/>
-      </column>
       <column name="SUBJECT" type="${x500name.type}">
         <constraints nullable="false"/>
       </column>
@@ -424,16 +378,6 @@
       onDelete="NO ACTION" onUpdate="NO ACTION"
       baseColumnNames="CRL_SIGNER_NAME" baseTableName="CA"
       referencedColumnNames="NAME" referencedTableName="SIGNER"/>
-    <addForeignKeyConstraint constraintName="FK_CA_CMP_SIGNER1"
-      deferrable="false" initiallyDeferred="false"
-      onDelete="NO ACTION" onUpdate="NO ACTION"
-      baseColumnNames="CMP_RESPONDER_NAME" baseTableName="CA"
-      referencedColumnNames="NAME" referencedTableName="SIGNER"/>
-    <addForeignKeyConstraint constraintName="FK_CA_SCEP_SIGNER1"
-      deferrable="false" initiallyDeferred="false"
-      onDelete="NO ACTION" onUpdate="NO ACTION"
-      baseColumnNames="SCEP_RESPONDER_NAME" baseTableName="CA"
-      referencedColumnNames="NAME" referencedTableName="SIGNER"/>
     <addForeignKeyConstraint constraintName="FK_CAALIAS_CA1"
       deferrable="false" initiallyDeferred="false"
       onDelete="CASCADE" onUpdate="NO ACTION"
@@ -449,17 +393,6 @@
       deferrable="false" initiallyDeferred="false"
       onDelete="CASCADE" onUpdate="NO ACTION"
       baseColumnNames="CA_ID" baseTableName="CA_HAS_REQUESTOR"
-      referencedColumnNames="ID" referencedTableName="CA"/>
-    <!-- ca_has_user -->
-    <addForeignKeyConstraint constraintName="FK_CA_HAS_USER_USER1"
-      deferrable="false" initiallyDeferred="false"
-      onDelete="NO ACTION" onUpdate="NO ACTION"
-      baseColumnNames="USER_ID" baseTableName="CA_HAS_USER"
-      referencedColumnNames="ID" referencedTableName="TUSER"/>
-    <addForeignKeyConstraint constraintName="FK_CA_HAS_USER_CA1"
-      deferrable="false" initiallyDeferred="false"
-      onDelete="NO ACTION" onUpdate="NO ACTION"
-      baseColumnNames="CA_ID" baseTableName="CA_HAS_USER"
       referencedColumnNames="ID" referencedTableName="CA"/>
     <!-- ca_has_publisher -->
     <addForeignKeyConstraint constraintName="FK_CA_HAS_PUBLISHER_PUBLISHER1"
@@ -501,11 +434,6 @@
       onDelete="NO ACTION" onUpdate="NO ACTION"
       baseColumnNames="RID" baseTableName="CERT"
       referencedColumnNames="ID" referencedTableName="REQUESTOR"/>
-    <addForeignKeyConstraint constraintName="FK_CERT_USER1"
-      deferrable="false" initiallyDeferred="false"
-      onDelete="NO ACTION" onUpdate="NO ACTION"
-      baseColumnNames="UID" baseTableName="CERT"
-      referencedColumnNames="ID" referencedTableName="TUSER"/>
     <addForeignKeyConstraint constraintName="FK_CERT_PROFILE1"
       deferrable="false" initiallyDeferred="false"
       onDelete="NO ACTION" onUpdate="NO ACTION"

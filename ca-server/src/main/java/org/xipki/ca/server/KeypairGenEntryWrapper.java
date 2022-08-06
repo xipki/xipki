@@ -23,7 +23,7 @@ import org.xipki.security.KeypairGenerator;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.XiSecurityException;
 import org.xipki.util.FileOrValue;
-import org.xipki.util.ObjectCreationException;
+import org.xipki.util.exception.ObjectCreationException;
 
 import java.util.Map;
 

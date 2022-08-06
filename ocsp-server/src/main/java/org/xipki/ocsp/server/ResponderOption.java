@@ -17,7 +17,7 @@
 
 package org.xipki.ocsp.server;
 
-import org.xipki.util.InvalidConfException;
+import org.xipki.util.exception.InvalidConfException;
 
 import java.util.ArrayList;
 import java.util.Collections;

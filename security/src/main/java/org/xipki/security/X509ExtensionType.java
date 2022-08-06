@@ -22,6 +22,7 @@ import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
+import org.xipki.util.exception.InvalidConfException;
 
 import java.io.IOException;
 import java.math.BigInteger;

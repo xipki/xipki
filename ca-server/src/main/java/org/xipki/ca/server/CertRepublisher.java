@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.OperationException;
+import org.xipki.util.exception.OperationException;
 import org.xipki.ca.server.db.CertStore;
 import org.xipki.ca.server.db.CertStore.SerialWithId;
 import org.xipki.security.X509Cert;

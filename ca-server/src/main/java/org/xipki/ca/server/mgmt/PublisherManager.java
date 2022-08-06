@@ -20,7 +20,7 @@ package org.xipki.ca.server.mgmt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.OperationException;
+import org.xipki.util.exception.OperationException;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.entry.PublisherEntry;
 import org.xipki.ca.api.publisher.CertPublisher;
@@ -30,7 +30,7 @@ import org.xipki.ca.server.IdentifiedCertPublisher;
 import org.xipki.ca.server.X509Ca;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ObjectCreationException;
+import org.xipki.util.exception.ObjectCreationException;
 
 import java.util.*;
 import java.util.Map.Entry;

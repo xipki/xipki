@@ -20,7 +20,7 @@ package org.xipki.ca.certprofile.xijson.conf;
 import com.alibaba.fastjson.annotation.JSONField;
 import org.bouncycastle.asn1.*;
 import org.xipki.ca.api.profile.CertprofileException;
-import org.xipki.util.InvalidConfException;
+import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 
 import java.math.BigInteger;

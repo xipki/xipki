@@ -189,33 +189,16 @@ public class CaActions {
     @Completion(CaCompleters.SignerNameCompleter.class)
     private String crlSignerName;
 
-    @Option(name = "--cmp-responder", description = "CMP responder name")
-    @Completion(CaCompleters.SignerNameCompleter.class)
-    private String cmpResponderName;
-
-    @Option(name = "--scep-responder", description = "SCEP responder name")
-    @Completion(CaCompleters.SignerNameCompleter.class)
-    private String scepResponderName;
-
     @Option(name = "--keypair-gen", multiValued = true,
             description = "(ordered) keypair generation names")
     @Completion(CaCompleters.KeypairGenNameCompleter.class)
     private List<String> keypairGenNames;
 
-    @Option(name = "--cmp-control", description = "CMP control")
-    private String cmpControl;
-
     @Option(name = "--crl-control", description = "CRL control")
     private String crlControl;
 
-    @Option(name = "--scep-control", description = "SCEP control")
-    private String scepControl;
-
     @Option(name = "--ctlog-control", description = "CT log control")
     private String ctlogControl;
-
-    @Option(name = "--pop-control", description = "POP control")
-    private String popControl;
 
     @Option(name = "--revoke-suspended-control",
         description = "Revoke suspended certificates control")
@@ -234,18 +217,6 @@ public class CaActions {
 
     @Option(name = "--signer-conf", required = true, description = "CA signer configuration")
     private String signerConf;
-
-    @Option(name = "--support-cmp", description = "whether the CMP protocol is supported")
-    @Completion(Completers.YesNoCompleter.class)
-    private String supportCmpS = "no";
-
-    @Option(name = "--support-rest", description = "whether the REST protocol is supported")
-    @Completion(Completers.YesNoCompleter.class)
-    private String supportRestS = "no";
-
-    @Option(name = "--support-scep", description = "whether the SCEP protocol is supported")
-    @Completion(Completers.YesNoCompleter.class)
-    private String supportScepS = "no";
 
     @Option(name = "--save-cert", description = "whether to save the certificate")
     @Completion(Completers.YesNoCompleter.class)
@@ -298,11 +269,6 @@ public class CaActions {
 
       entry.setKeepExpiredCertInDays(keepExpiredCertInDays);
 
-      ProtocolSupport protocolSupport = new ProtocolSupport(
-          isEnabled(supportCmpS, false, "support-cmp"),
-          isEnabled(supportRestS, false, "support-rest"),
-          isEnabled(supportScepS, false, "support-scep"));
-      entry.setProtocolSupport(protocolSupport);
       entry.setSaveCert(isEnabled(saveCertS, false, "save-cert"));
       entry.setSaveRequest(isEnabled(saveReqS, false, "save-req"));
       entry.setSaveKeypair(isEnabled(saveKeypairS, false, "save-keypair"));
@@ -312,43 +278,17 @@ public class CaActions {
 
       entry.setStatus(CaStatus.forName(caStatus));
 
-      if (cmpControl != null) {
-        entry.setCmpControl(new CmpControl(cmpControl));
-      }
-
       if (crlControl != null) {
         entry.setCrlControl(new CrlControl(crlControl));
-      }
-
-      if (scepControl != null) {
-        entry.setScepControl(new ScepControl(scepControl));
       }
 
       if (ctlogControl != null) {
         entry.setCtlogControl(new CtlogControl(ctlogControl));
       }
 
-      if (popControl != null) {
-        PopControl pc;
-        if (popControl.contains("file:")) {
-          pc = new PopControl(embedFileContent(new ConfPairs(popControl)));
-        } else {
-          pc = new PopControl(popControl);
-        }
-        entry.setPopControl(pc);
-      }
-
       if (revokeSuspendedControl != null) {
         entry.setRevokeSuspendedControl(
             new RevokeSuspendedControl(new ConfPairs(revokeSuspendedControl)));
-      }
-
-      if (cmpResponderName != null) {
-        entry.setCmpResponderName(cmpResponderName);
-      }
-
-      if (scepResponderName != null) {
-        entry.setCmpResponderName(scepResponderName);
       }
 
       if (crlSignerName != null) {
@@ -724,33 +664,16 @@ public class CaActions {
     @Completion(CaCompleters.SignerNamePlusNullCompleter.class)
     private String crlSignerName;
 
-    @Option(name = "--cmp-responder", description = "CMP responder name or 'null'")
-    @Completion(CaCompleters.SignerNamePlusNullCompleter.class)
-    private String cmpResponderName;
-
-    @Option(name = "--scep-responder", description = "SCEP responder name or 'null'")
-    @Completion(CaCompleters.SignerNamePlusNullCompleter.class)
-    private String scepResponderName;
-
     @Option(name = "--keypair-gen", multiValued = true,
             description = "(ordered) Keypair generation name or 'null")
     @Completion(CaCompleters.KeypairGenNameCompleter.class)
     private List<String> keypairGenNames;
 
-    @Option(name = "--cmp-control", description = "CMP control or 'null'")
-    private String cmpControl;
-
     @Option(name = "--crl-control", description = "CRL control or 'null'")
     private String crlControl;
 
-    @Option(name = "--scep-control", description = "SCEP control or 'null'")
-    private String scepControl;
-
     @Option(name = "--ctlog-control", description = "CT log control")
     private String ctlogControl;
-
-    @Option(name = "--pop-control", description = "POP control")
-    private String popControl;
 
     @Option(name = "--revoke-suspended-control",
         description = "Revoke suspended certificates control")
@@ -774,18 +697,6 @@ public class CaActions {
 
     @Option(name = "--signer-conf", description = "CA signer configuration or 'null'")
     private String signerConf;
-
-    @Option(name = "--support-cmp", description = "whether the CMP protocol is supported")
-    @Completion(Completers.YesNoCompleter.class)
-    private String supportCmpS;
-
-    @Option(name = "--support-rest", description = "whether the REST protocol is supported")
-    @Completion(Completers.YesNoCompleter.class)
-    private String supportRestS;
-
-    @Option(name = "--support-scep", description = "whether the SCEP protocol is supported")
-    @Completion(Completers.YesNoCompleter.class)
-    private String supportScepS;
 
     @Option(name = "--save-cert", description = "whether to save the certificate")
     @Completion(Completers.YesNoCompleter.class)
@@ -866,18 +777,6 @@ public class CaActions {
         entry.setSignerConf(signerConf);
       }
 
-      if (supportCmpS != null) {
-        entry.setSupportCmp(isEnabled(supportCmpS, false, "support-cmp"));
-      }
-
-      if (supportRestS != null) {
-        entry.setSupportRest(isEnabled(supportRestS, false, "support-rest"));
-      }
-
-      if (supportScepS != null) {
-        entry.setSupportScep(isEnabled(supportScepS, false, "support-scep"));
-      }
-
       if (saveCertS != null) {
         entry.setSaveCert(isEnabled(saveCertS, true, "save-cert"));
       }
@@ -908,39 +807,16 @@ public class CaActions {
         entry.setMaxValidity(Validity.getInstance(maxValidity));
       }
 
-      if (cmpControl != null) {
-        entry.setCmpControl(cmpControl);
-      }
-
       if (crlControl != null) {
         entry.setCrlControl(crlControl);
-      }
-
-      if (scepControl != null) {
-        entry.setScepControl(scepControl);
       }
 
       if (ctlogControl != null) {
         entry.setCtlogControl(ctlogControl);
       }
 
-      if (popControl != null) {
-        // TODO: consider the prefix dh.
-        String tmp = ShellUtil.canonicalizeSignerConf("PKCS12", popControl,
-            passwordResolver, securityFactory);
-        entry.setPopControl(tmp);
-      }
-
       if (revokeSuspendedControl != null) {
         entry.setRevokeSuspendedControl(revokeSuspendedControl);
-      }
-
-      if (cmpResponderName != null) {
-        entry.setCmpResponderName(cmpResponderName);
-      }
-
-      if (scepResponderName != null) {
-        entry.setScepResponderName(scepResponderName);
       }
 
       if (crlSignerName != null) {

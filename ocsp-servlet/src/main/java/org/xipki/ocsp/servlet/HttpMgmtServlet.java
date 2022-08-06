@@ -28,7 +28,7 @@ import org.xipki.password.PasswordResolverException;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiSecurityException;
 import org.xipki.util.HttpConstants;
-import org.xipki.util.InvalidConfException;
+import org.xipki.util.exception.InvalidConfException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;

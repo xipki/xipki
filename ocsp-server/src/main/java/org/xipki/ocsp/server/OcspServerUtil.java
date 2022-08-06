@@ -33,6 +33,8 @@ import org.xipki.ocsp.server.type.OID;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
+import org.xipki.util.exception.InvalidConfException;
+import org.xipki.util.exception.ObjectCreationException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

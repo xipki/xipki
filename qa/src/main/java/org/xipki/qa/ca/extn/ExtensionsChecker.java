@@ -24,7 +24,7 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.BadCertTemplateException;
+import org.xipki.util.exception.BadCertTemplateException;
 import org.xipki.ca.api.profile.Certprofile.ExtKeyUsageControl;
 import org.xipki.ca.api.profile.Certprofile.ExtensionControl;
 import org.xipki.ca.api.profile.Certprofile.KeyUsageControl;

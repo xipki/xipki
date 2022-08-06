@@ -68,14 +68,6 @@ public class RequestorEntryWrapper {
       } catch (CertificateException ex) {
         LogUtil.error(LOG, ex, "error while parsing certificate of requestor" + dbEntry.getIdent());
       }
-    } else if (RequestorEntry.TYPE_PBM.equalsIgnoreCase(type)) {
-      try {
-        this.keyId = HashAlgo.SHA1.hash(StringUtil.toUtf8Bytes(dbEntry.getIdent().getName()));
-        this.password = passwordResolver.resolvePassword(conf);
-        dbEntry.setFaulty(false);
-      } catch (PasswordResolverException ex) {
-        LogUtil.error(LOG, ex, "error while resolve password of requestor" + dbEntry.getIdent());
-      }
     }
   } // method setDbEntry
 

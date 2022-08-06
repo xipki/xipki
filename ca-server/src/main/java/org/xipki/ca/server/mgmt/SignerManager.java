@@ -25,7 +25,7 @@ import org.xipki.ca.server.CaInfo;
 import org.xipki.ca.server.SignerEntryWrapper;
 import org.xipki.security.XiSecurityException;
 import org.xipki.security.pkcs11.*;
-import org.xipki.util.ObjectCreationException;
+import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.StringUtil;
 
 import java.io.ByteArrayOutputStream;
@@ -116,14 +116,6 @@ class SignerManager {
 
     for (String caName : manager.caInfos.keySet()) {
       CaInfo caInfo = manager.caInfos.get(caName);
-      if (name.equals(caInfo.getCmpResponderName())) {
-        caInfo.setCmpResponderName(null);
-      }
-
-      if (name.equals(caInfo.getScepResponderName())) {
-        caInfo.setScepResponderName(null);
-      }
-
       if (name.equals(caInfo.getCrlSignerName())) {
         caInfo.setCrlSignerName(null);
       }
@@ -155,13 +147,6 @@ class SignerManager {
     manager.signerDbEntries.remove(name);
     manager.signerDbEntries.put(name, newResponder.getDbEntry());
     manager.signers.put(name, newResponder);
-
-    for (String caName : manager.scepResponders.keySet()) {
-      if (manager.getCa(caName).getScepResponderName().equals(name)) {
-        // update the SCEP responder
-        manager.scepResponders.get(caName).setResponder(newResponder);
-      }
-    }
   } // method changeSigner
 
   SignerEntryWrapper createSigner(SignerEntry entry) throws CaMgmtException {

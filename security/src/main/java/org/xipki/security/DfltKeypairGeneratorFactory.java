@@ -20,7 +20,7 @@ package org.xipki.security;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.security.pkcs11.P11KeypairGenerator;
 import org.xipki.security.pkcs12.SoftwareKeypairGenerator;
-import org.xipki.util.ObjectCreationException;
+import org.xipki.util.exception.ObjectCreationException;
 
 import java.util.Arrays;
 import java.util.Collections;

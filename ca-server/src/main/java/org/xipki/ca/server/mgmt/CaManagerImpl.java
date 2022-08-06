@@ -26,14 +26,12 @@ import org.xipki.audit.AuditStatus;
 import org.xipki.audit.Audits;
 import org.xipki.audit.PciAuditEvent;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.OperationException;
-import org.xipki.ca.api.OperationException.ErrorCode;
+import org.xipki.util.exception.OperationException;
 import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.ca.api.profile.CertprofileFactoryRegister;
 import org.xipki.ca.api.publisher.CertPublisherFactoryRegister;
 import org.xipki.ca.server.*;
-import org.xipki.ca.server.cmp.CmpResponder;
 import org.xipki.ca.server.db.CaManagerQueryExecutor;
 import org.xipki.ca.server.db.CertStore;
 import org.xipki.ca.server.db.CertStore.SystemEvent;
@@ -191,13 +189,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   final Map<String, Integer> caAliases = new ConcurrentHashMap<>();
 
-  final Map<String, CmpResponder> cmpResponders = new ConcurrentHashMap<>();
-
-  final Map<String, ScepResponder> scepResponders = new ConcurrentHashMap<>();
-
   final Map<String, X509Ca> x509cas = new ConcurrentHashMap<>();
-
-  final RestResponder restResponder;
 
   RequestorInfo byCaRequestor;
 
@@ -302,7 +294,6 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
 
     this.lockInstanceId = (hostAddress == null) ? calockId : hostAddress + "/" + calockId;
-    this.restResponder = new RestResponder(this);
 
     this.ca2Manager = new Ca2Manager(this);
     this.certprofileManager = new CertprofileManager(this);
@@ -416,7 +407,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       lockCa(true);
 
       List<String> names = queryExecutor.namesFromTable("REQUESTOR");
-      final String[] embeddedNames = {RequestorInfo.NAME_BY_CA, RequestorInfo.NAME_BY_USER};
+      final String[] embeddedNames = {RequestorInfo.NAME_BY_CA};
       for (String embeddedName : embeddedNames) {
         boolean contained = false;
         for (String name : names) {
@@ -710,8 +701,6 @@ public class CaManagerImpl implements CaManager, Closeable {
       this.lastStartTime = new Date();
 
       x509cas.clear();
-      cmpResponders.clear();
-      scepResponders.clear();
 
       scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(10);
       scheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
@@ -845,10 +834,6 @@ public class CaManagerImpl implements CaManager, Closeable {
     LOG.info("stopped CA system");
   } // method close
 
-  public CmpResponder getX509CaResponder(String name) {
-    return cmpResponders.get(toNonBlankLower(name, "name"));
-  }
-
   public ScheduledThreadPoolExecutor getScheduledThreadPoolExecutor() {
     return scheduledThreadPoolExecutor;
   }
@@ -900,15 +885,6 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   public void commitNextCrlNo(NameId ca, long nextCrlNo) throws OperationException {
     ca2Manager.commitNextCrlNo(ca, nextCrlNo);
-  }
-
-  public RequestorInfo.ByUserRequestorInfo createByUserRequestor(CaHasUserEntry caHasUser)
-      throws OperationException {
-    if (byUserRequestorId == null) {
-      throw new OperationException(ErrorCode.SYSTEM_UNAVAILABLE,
-          "CA system has not been initialized yet");
-    }
-    return new RequestorInfo.ByUserRequestorInfo(byUserRequestorId, caHasUser);
   }
 
   @Override
@@ -990,33 +966,6 @@ public class CaManagerImpl implements CaManager, Closeable {
   public void addRequestorToCa(CaHasRequestorEntry requestor, String caName)
       throws CaMgmtException {
     requestorManager.addRequestorToCa(requestor, caName);
-  }
-
-  @Override
-  public void removeUserFromCa(String userName, String caName) throws CaMgmtException {
-    userName = toNonBlankLower(userName, "userName");
-    caName = toNonBlankLower(caName, "caName");
-    assertMasterMode();
-
-    queryExecutor.removeUserFromCa(userName, caName);
-  } // method removeUserFromCa
-
-  @Override
-  public void addUserToCa(CaHasUserEntry user, String caName) throws CaMgmtException {
-    caName = toNonBlankLower(caName, "caName");
-    assertMasterMode();
-
-    X509Ca ca = getX509Ca(caName);
-    if (ca == null) {
-      throw logAndCreateException(concat("unknown CA ", caName));
-    }
-
-    queryExecutor.addUserToCa(user, ca.getCaIdent());
-  } // method addUserToCa
-
-  @Override
-  public Map<String, CaHasUserEntry> getCaHasUsersForUser(String user) throws CaMgmtException {
-    return queryExecutor.getCaHasUsersForUser(notBlank(user, "user"), idNameMap);
   }
 
   @Override
@@ -1295,32 +1244,6 @@ public class CaManagerImpl implements CaManager, Closeable {
     return keypairGenManager.createKeypairGen(entry);
   }
 
-  @Override
-  public void addUser(AddUserEntry addUserEntry) throws CaMgmtException {
-    assertMasterMode();
-    queryExecutor.addUser(addUserEntry);
-  }
-
-  @Override
-  public void changeUser(ChangeUserEntry changeUserEntry) throws CaMgmtException {
-    assertMasterMode();
-    queryExecutor.changeUser(changeUserEntry);
-  }
-
-  @Override
-  public void removeUser(String username) throws CaMgmtException {
-    username = toNonBlankLower(username, "username");
-    assertMasterMode();
-    if (!queryExecutor.deleteRowWithName(username, "TUSER")) {
-      throw new CaMgmtException("unknown user " + username);
-    }
-  } // method removeUser
-
-  @Override
-  public UserEntry getUser(String username) throws CaMgmtException {
-    return queryExecutor.getUser(username.toLowerCase());
-  }
-
   public CaIdNameMap idNameMap() {
     return idNameMap;
   }
@@ -1339,11 +1262,6 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public X509CRLHolder getCurrentCrl(String caName) throws CaMgmtException {
     return ca2Manager.getCurrentCrl(caName);
-  }
-
-  public ScepResponder getScepResponder(String name) {
-    name = toNonBlankLower(name, "name");
-    return scepResponders.get(name);
   }
 
   @Override
@@ -1395,10 +1313,6 @@ public class CaManagerImpl implements CaManager, Closeable {
     return ctLogPublicKeyFinder;
   }
 
-  public RestResponder getRestResponder() {
-    return restResponder;
-  }
-
   public CmLicense getLicense() {
     return license;
   }
@@ -1408,8 +1322,4 @@ public class CaManagerImpl implements CaManager, Closeable {
     return new CaMgmtException(msg);
   }
 
-  public void assertDbSchemaVersion7on(String action)
-      throws CaMgmtException {
-    queryExecutor.assertDbSchemaVersion7on(action);
-  }
 }

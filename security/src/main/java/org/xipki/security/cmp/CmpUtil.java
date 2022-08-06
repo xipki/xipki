@@ -152,7 +152,7 @@ public class CmpUtil {
     return builder;
   } // method newProtectedPKIMessageBuilder
 
-  public static boolean isImplictConfirm(PKIHeader header) {
+  public static boolean isImplicitConfirm(PKIHeader header) {
     notNull(header, "header");
 
     InfoTypeAndValue[] regInfos = header.getGeneralInfo();
@@ -165,9 +165,9 @@ public class CmpUtil {
     }
 
     return false;
-  } // method isImplictConfirm
+  } // method isImplicitConfirm
 
-  public static InfoTypeAndValue getImplictConfirmGeneralInfo() {
+  public static InfoTypeAndValue getImplicitConfirmGeneralInfo() {
     return new InfoTypeAndValue(CMPObjectIdentifiers.it_implicitConfirm, DERNull.INSTANCE);
   }
 

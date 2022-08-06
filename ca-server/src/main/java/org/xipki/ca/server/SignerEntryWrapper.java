@@ -24,7 +24,7 @@ import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
-import org.xipki.util.ObjectCreationException;
+import org.xipki.util.exception.ObjectCreationException;
 
 import static org.xipki.util.Args.notNull;
 

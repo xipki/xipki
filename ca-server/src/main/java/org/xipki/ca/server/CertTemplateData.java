@@ -23,6 +23,7 @@ import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.util.Args;
 
+import java.math.BigInteger;
 import java.util.Date;
 
 /**
@@ -48,16 +49,17 @@ public class CertTemplateData {
 
   private final Extensions extensions;
 
-  private final ASN1Integer certReqId;
+  private final BigInteger certReqId;
 
   public CertTemplateData(X500Name subject, SubjectPublicKeyInfo publicKeyInfo, Date notBefore,
       Date notAfter, Extensions extensions, String certprofileName) {
     this(subject, publicKeyInfo, notBefore, notAfter, extensions, certprofileName, null, false);
   }
 
-  public CertTemplateData(X500Name subject, SubjectPublicKeyInfo publicKeyInfo,
+  public CertTemplateData(
+      X500Name subject, SubjectPublicKeyInfo publicKeyInfo,
       Date notBefore, Date notAfter, Extensions extensions, String certprofileName,
-      ASN1Integer certReqId, boolean caGenerateKeypair) {
+      BigInteger certReqId, boolean caGenerateKeypair) {
     this.publicKeyInfo = publicKeyInfo;
     this.subject = Args.notNull(subject, "subject");
     this.certprofileName = Args.toNonBlankLower(certprofileName, "certprofileName");
@@ -96,7 +98,7 @@ public class CertTemplateData {
     return extensions;
   }
 
-  public ASN1Integer getCertReqId() {
+  public BigInteger getCertReqId() {
     return certReqId;
   }
 

@@ -29,7 +29,7 @@ import org.xipki.password.PasswordResolver;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.SignerUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ObjectCreationException;
+import org.xipki.util.exception.ObjectCreationException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -219,76 +219,6 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
   public SecureRandom getRandom4Sign() {
     return getSecureRandom(strongRandom4SignEnabled);
   }
-
-  @Override
-  public byte[] extractMinimalKeyStore(String keystoreType, byte[] keystoreBytes, String keyname,
-      char[] password, X509Cert[] newCertChain)
-          throws KeyStoreException {
-    notBlank(keystoreType, "keystoreType");
-    notNull(keystoreBytes, "keystoreBytes");
-
-    try {
-      KeyStore ks = KeyUtil.getKeyStore(keystoreType);
-      ks.load(new ByteArrayInputStream(keystoreBytes), password);
-
-      String tmpKeyname = keyname;
-      if (tmpKeyname == null) {
-        Enumeration<String> aliases = ks.aliases();
-        while (aliases.hasMoreElements()) {
-          String alias = aliases.nextElement();
-          if (ks.isKeyEntry(alias)) {
-            tmpKeyname = alias;
-            break;
-          }
-        }
-      } else {
-        if (!ks.isKeyEntry(tmpKeyname)) {
-          throw new KeyStoreException("unknown key named " + tmpKeyname);
-        }
-      }
-
-      Enumeration<String> aliases = ks.aliases();
-      int numAliases = 0;
-      while (aliases.hasMoreElements()) {
-        aliases.nextElement();
-        numAliases++;
-      }
-
-      if (tmpKeyname == null) {
-        throw new KeyStoreException("no key entry is contained in the keystore");
-      }
-
-      java.security.cert.Certificate[] certs;
-      if (newCertChain == null || newCertChain.length < 1) {
-        if (numAliases == 1) {
-          return keystoreBytes;
-        }
-        certs = ks.getCertificateChain(tmpKeyname);
-      } else {
-        certs = new java.security.cert.Certificate[newCertChain.length];
-        for (int i = 0; i < newCertChain.length; i++) {
-          certs[i] = newCertChain[i].toJceCert();
-        }
-      }
-
-      KeyStore newKs = KeyUtil.getKeyStore(keystoreType);
-      newKs.load(null, password);
-
-      PrivateKey key = (PrivateKey) ks.getKey(tmpKeyname, password);
-      newKs.setKeyEntry(tmpKeyname, key, password, certs);
-      ByteArrayOutputStream bout = new ByteArrayOutputStream();
-      newKs.store(bout, password);
-      byte[] bytes = bout.toByteArray();
-      bout.close();
-      return bytes;
-    } catch (Exception ex) {
-      if (ex instanceof KeyStoreException) {
-        throw (KeyStoreException) ex;
-      } else {
-        throw new KeyStoreException(ex.getMessage(), ex);
-      }
-    }
-  } // method extractMinimalKeyStore
 
   private static SecureRandom getSecureRandom(boolean strong) {
     if (!strong) {

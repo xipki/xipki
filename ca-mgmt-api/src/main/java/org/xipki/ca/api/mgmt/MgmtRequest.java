@@ -194,34 +194,6 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class AddSigner
 
-  public static class AddUser extends MgmtRequest {
-
-    private AddUserEntry addUserEntry;
-
-    public AddUserEntry getAddUserEntry() {
-      return addUserEntry;
-    }
-
-    public void setAddUserEntry(AddUserEntry addUserEntry) {
-      this.addUserEntry = addUserEntry;
-    }
-
-  } // class AddUser
-
-  public static class AddUserToCa extends CaNameRequest {
-
-    private CaHasUserEntry user;
-
-    public CaHasUserEntry getUser() {
-      return user;
-    }
-
-    public void setUser(CaHasUserEntry user) {
-      this.user = user;
-    }
-
-  } // class AddUserToCa
-
   public abstract static class CaNameRequest extends MgmtRequest {
 
     private String caName;
@@ -336,20 +308,6 @@ public abstract class MgmtRequest extends MgmtMessage {
     }
 
   } // class ChangeTypeConfEntity
-
-  public static class ChangeUser extends MgmtRequest {
-
-    private ChangeUserEntry changeUserEntry;
-
-    public ChangeUserEntry getChangeUserEntry() {
-      return changeUserEntry;
-    }
-
-    public void setChangeUserEntry(ChangeUserEntry changeUserEntry) {
-      this.changeUserEntry = changeUserEntry;
-    }
-
-  } // class ChangeUser
 
   public static class ClearPublishQueue extends CaNameRequest {
 

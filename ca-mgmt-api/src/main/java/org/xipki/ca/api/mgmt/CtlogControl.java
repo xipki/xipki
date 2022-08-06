@@ -19,7 +19,7 @@ package org.xipki.ca.api.mgmt;
 
 import org.xipki.util.Args;
 import org.xipki.util.ConfPairs;
-import org.xipki.util.InvalidConfException;
+import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.StringUtil;
 
 import java.util.Arrays;

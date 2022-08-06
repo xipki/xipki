@@ -29,7 +29,7 @@ import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.math.ec.ECCurve;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.BadCertTemplateException;
+import org.xipki.util.exception.BadCertTemplateException;
 import org.xipki.ca.api.profile.KeyParametersOption.AllowAllParametersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.DSAParametersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.ECParamatersOption;

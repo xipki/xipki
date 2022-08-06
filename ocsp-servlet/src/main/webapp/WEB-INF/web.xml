@@ -8,14 +8,6 @@
     <filter-name>ocsp-filter</filter-name>
     <filter-class>org.xipki.ocsp.servlet.OcspServletFilter</filter-class>
     <init-param>
-      <param-name>logReqResp</param-name>
-      <!--
-        If set to true, please also set writer.level to debug
-        in the file META-INF/classes/tinylog.properties.
-      -->
-      <param-value>false</param-value>
-    </init-param>
-    <init-param>
       <param-name>licenseFactory</param-name>
       <param-value>org.xipki.license.example.ExampleLicenseFactory</param-value>
     </init-param>

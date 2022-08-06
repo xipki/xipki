@@ -17,10 +17,8 @@
 
 package org.xipki.ca.server.db;
 
-import org.xipki.ca.api.OperationException;
-import org.xipki.ca.api.OperationException.ErrorCode;
+import org.xipki.util.exception.OperationException.ErrorCode;
 import org.xipki.ca.api.mgmt.CaMgmtException;
-import org.xipki.ca.server.CaUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
@@ -30,6 +28,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.Hex;
+import org.xipki.util.exception.OperationException;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
@@ -45,8 +44,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import static org.xipki.ca.api.OperationException.ErrorCode.DATABASE_FAILURE;
-import static org.xipki.ca.api.OperationException.ErrorCode.SYSTEM_FAILURE;
+import static org.xipki.util.exception.OperationException.ErrorCode.DATABASE_FAILURE;
+import static org.xipki.util.exception.OperationException.ErrorCode.SYSTEM_FAILURE;
+import static org.xipki.util.SqlUtil.buildInsertSql;
 
 /**
  * Base class to exec the database queries to manage CA system.
@@ -64,7 +64,7 @@ public class CertStoreBase extends QueryExecutor {
       "UPDATE CERT SET LUPDATE=?,RR=? WHERE ID=?";
 
   protected static final String SQL_INSERT_PUBLISHQUEUE =
-      CaUtil.buildInsertSql("PUBLISHQUEUE", "PID", "CA_ID", "CID");
+      buildInsertSql("PUBLISHQUEUE", "PID,CA_ID,CID");
 
   protected static final String SQL_REMOVE_PUBLISHQUEUE =
       "DELETE FROM PUBLISHQUEUE WHERE PID=? AND CID=?";
@@ -85,10 +85,10 @@ public class CertStoreBase extends QueryExecutor {
       "DELETE FROM REQUEST WHERE ID NOT IN (SELECT req.RID FROM REQCERT req)";
 
   protected static final String SQL_ADD_REQUEST =
-      CaUtil.buildInsertSql("REQUEST", "ID", "LUPDATE", "DATA");
+      buildInsertSql("REQUEST", "ID,LUPDATE,DATA");
 
   protected static final String SQL_ADD_REQCERT =
-      CaUtil.buildInsertSql("REQCERT", "ID", "RID", "CID");
+      buildInsertSql("REQCERT", "ID,RID,CID");
 
   protected final int dbSchemaVersion;
 
@@ -115,24 +115,16 @@ public class CertStoreBase extends QueryExecutor {
     }
 
     this.dbSchemaVersion = Integer.parseInt(dbSchemaInfo.variableValue("VERSION"));
+    if (this.dbSchemaVersion < 7) {
+      throw new CaMgmtException("dbSchemaVersion < 7 unsupported: " + dbSchemaVersion);
+    }
     this.maxX500nameLen = Integer.parseInt(dbSchemaInfo.variableValue("X500NAME_MAXLEN"));
 
-    List<String> columns = CaUtil.asModifiableList("ID", "LUPDATE", "SN", "SUBJECT",
-        "FP_S", "FP_RS", "NBEFORE", "NAFTER", "REV", "PID", "CA_ID", "RID", "UID", "EE",
-        "RTYPE", "TID", "SHA1", "REQ_SUBJECT", "CRL_SCOPE", "CERT");
-    if (dbSchemaVersion >= 7) {
-      columns.add("PRIVATE_KEY");
-    }
+    this.SQL_ADD_CERT = buildInsertSql("CERT", "ID,LUPDATE,SN,SUBJECT,FP_S,FP_RS," +
+        "NBEFORE,NAFTER,REV,PID,CA_ID,RID,EE,TID,SHA1,REQ_SUBJECT,CRL_SCOPE,CERT, PRIVATE_KEY");
 
-    this.SQL_ADD_CERT = CaUtil.buildInsertSql("CERT", columns.toArray(new String[0]));
-
-    columns = CaUtil.asModifiableList("ID","CA_ID","CRL_NO", "THISUPDATE", "NEXTUPDATE", "DELTACRL",
-        "BASECRL_NO", "CRL_SCOPE");
-    if (dbSchemaVersion >= 7) {
-      columns.add("SHA1");
-    }
-    columns.add("CRL");
-    this.SQL_ADD_CRL = CaUtil.buildInsertSql("CRL", columns.toArray(new String[0]));
+    this.SQL_ADD_CRL = buildInsertSql("CRL", "ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE," +
+        "DELTACRL,BASECRL_NO,CRL_SCOPE,SHA1,CRL");
 
     // INSERT INTO CRL
     updateDbInfo(passwordResolver);

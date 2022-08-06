@@ -17,7 +17,7 @@
 
 package org.xipki.ca.servlet;
 
-import org.xipki.ca.server.HttpRequestMetadataRetriever;
+import org.xipki.security.util.HttpRequestMetadataRetriever;
 import org.xipki.security.X509Cert;
 
 import javax.servlet.http.HttpServletRequest;

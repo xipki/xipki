@@ -17,12 +17,10 @@
 
 package org.xipki.ocsp.servlet;
 
-import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ocsp.api.OcspServer;
 import org.xipki.ocsp.api.ResponderAndPath;
-import org.xipki.util.HealthCheckResult;
 import org.xipki.util.HttpConstants;
 import org.xipki.util.LogUtil;
 
@@ -48,8 +46,6 @@ public class HealthCheckServlet extends HttpServlet {
 
   private static final long serialVersionUID = 1L;
 
-  private static final String CT_RESPONSE = "application/json";
-
   private OcspServer server;
 
   public void setServer(OcspServer server) {
@@ -71,15 +67,11 @@ public class HealthCheckServlet extends HttpServlet {
         return;
       }
 
-      HealthCheckResult healthResult = server.healthCheck(responderAndPath.getResponder());
-      int status = healthResult.isHealthy()
+      boolean healthy = server.healthCheck(responderAndPath.getResponder());
+      int status = healthy
           ? HttpServletResponse.SC_OK : HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
-      byte[] respBytes = JSON.toJSONBytes(healthResult);
       resp.setStatus(status);
-      resp.setContentType(HealthCheckServlet.CT_RESPONSE);
-      resp.setContentLength(respBytes.length);
-      resp.getOutputStream().write(respBytes);
     } catch (Throwable th) {
       if (th instanceof EOFException) {
         LogUtil.warn(LOG, th, "connection reset by peer");

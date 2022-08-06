@@ -17,7 +17,7 @@
 
 package org.xipki.ca.api.publisher;
 
-import org.xipki.util.ObjectCreationException;
+import org.xipki.util.exception.ObjectCreationException;
 
 import java.util.Set;
 

@@ -17,7 +17,7 @@
 
 package org.xipki.ca.api.profile;
 
-import org.xipki.util.InvalidConfException;
+import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 
 /**

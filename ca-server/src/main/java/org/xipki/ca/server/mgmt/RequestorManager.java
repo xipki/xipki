@@ -26,8 +26,6 @@ import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.server.RequestorEntryWrapper;
 import org.xipki.password.PasswordResolver;
-import org.xipki.password.PasswordResolverException;
-import org.xipki.util.StringUtil;
 
 import java.util.HashSet;
 import java.util.List;
@@ -74,10 +72,6 @@ class RequestorManager {
         NameId ident = new NameId(id, name);
         manager.byCaRequestor = new RequestorInfo.ByCaRequestorInfo(ident);
         manager.idNameMap.addRequestor(ident);
-      } else if (RequestorInfo.NAME_BY_USER.equalsIgnoreCase(name)) {
-        Integer id = manager.queryExecutor.getRequestorId(name);
-        manager.byUserRequestorId = new NameId(id, name);
-        manager.idNameMap.addRequestor(manager.byUserRequestorId);
       } else {
         RequestorEntry requestorDbEntry = manager.queryExecutor.createRequestor(name);
         manager.idNameMap.addRequestor(requestorDbEntry.getIdent());
@@ -101,22 +95,7 @@ class RequestorManager {
       throw new CaMgmtException(concat("Requestor named ", name, " exists"));
     }
 
-    // encrypt the password
     PasswordResolver pwdResolver = manager.securityFactory.getPasswordResolver();
-    if (RequestorEntry.TYPE_PBM.equalsIgnoreCase(requestorEntry.getType())) {
-      String conf = requestorEntry.getConf();
-      if (!StringUtil.startsWithIgnoreCase(conf, "PBE:")) {
-        String encryptedPassword;
-        try {
-          encryptedPassword = pwdResolver.protectPassword("PBE", conf.toCharArray());
-        } catch (PasswordResolverException ex) {
-          throw new CaMgmtException("could not encrypt requestor " + name, ex);
-        }
-        requestorEntry = new RequestorEntry(requestorEntry.getIdent(),
-                            requestorEntry.getType(), encryptedPassword);
-      }
-    }
-
     RequestorEntryWrapper requestor = new RequestorEntryWrapper();
     requestor.setDbEntry(requestorEntry, pwdResolver);
 
@@ -183,8 +162,7 @@ class RequestorManager {
     requestorName = toNonBlankLower(requestorName, "requestorName");
     caName = toNonBlankLower(caName, "caName");
 
-    if (requestorName.equals(RequestorInfo.NAME_BY_CA)
-        || requestorName.equals(RequestorInfo.NAME_BY_USER)) {
+    if (requestorName.equals(RequestorInfo.NAME_BY_CA)) {
       throw new CaMgmtException(concat("removing requestor ", requestorName, " is not permitted"));
     }
 

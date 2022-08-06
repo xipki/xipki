@@ -19,7 +19,7 @@ package org.xipki.ca.server.publisher;
 
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherFactory;
-import org.xipki.util.ObjectCreationException;
+import org.xipki.util.exception.ObjectCreationException;
 
 import java.util.Collections;
 import java.util.HashSet;

@@ -6,7 +6,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.mgmt.*;
 import org.xipki.util.ConfPairs;
-import org.xipki.util.InvalidConfException;
+import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.Validity;
 
 import java.util.List;
@@ -52,18 +52,6 @@ public class CaConfColumn {
   @JSONField(ordinal = 15)
   private Map<String,String> crlControl;
 
-  @JSONField(ordinal = 17)
-  private Map<String,String> cmpControl;
-
-  @JSONField(ordinal = 19)
-  private Map<String,String> scepControl;
-
-  @JSONField(ordinal = 21)
-  private Map<String,String> estControl;
-
-  @JSONField(ordinal = 23)
-  private Map<String,String> acmeControl;
-
   /**
    * Certificate Transparency Log Control.
    */
@@ -75,9 +63,6 @@ public class CaConfColumn {
 
   @JSONField(ordinal = 29)
   private List<String> keypairGenNames;
-
-  @JSONField(ordinal = 31)
-  private List<String> protocolSupport;
 
   /**
    * Whether to save the certificate, default is true.
@@ -115,12 +100,6 @@ public class CaConfColumn {
    */
   @JSONField(ordinal = 47)
   private int keepExpiredCertDays = -1;
-
-  /**
-   * Proof-of-Possession Control
-   */
-  @JSONField(ordinal = 49)
-  private Map<String, String> popControl;
 
   /**
    * Extra control.
@@ -192,38 +171,6 @@ public class CaConfColumn {
     this.crlControl = crlControl;
   }
 
-  public Map<String, String> getCmpControl() {
-    return cmpControl;
-  }
-
-  public void setCmpControl(Map<String, String> cmpControl) {
-    this.cmpControl = cmpControl;
-  }
-
-  public Map<String, String> getScepControl() {
-    return scepControl;
-  }
-
-  public void setScepControl(Map<String, String> scepControl) {
-    this.scepControl = scepControl;
-  }
-
-  public Map<String, String> getEstControl() {
-    return estControl;
-  }
-
-  public void setEstControl(Map<String, String> estControl) {
-    this.estControl = estControl;
-  }
-
-  public Map<String, String> getAcmeControl() {
-    return acmeControl;
-  }
-
-  public void setAcmeControl(Map<String, String> acmeControl) {
-    this.acmeControl = acmeControl;
-  }
-
   public Map<String, String> getCtlogControl() {
     return ctlogControl;
   }
@@ -246,14 +193,6 @@ public class CaConfColumn {
 
   public void setKeypairGenNames(List<String> keypairGenNames) {
     this.keypairGenNames = keypairGenNames;
-  }
-
-  public List<String> getProtocolSupport() {
-    return protocolSupport;
-  }
-
-  public void setProtocolSupport(List<String> protocolSupport) {
-    this.protocolSupport = protocolSupport;
   }
 
   public boolean isSaveCert() {
@@ -320,14 +259,6 @@ public class CaConfColumn {
     this.keepExpiredCertDays = keepExpiredCertDays;
   }
 
-  public Map<String, String> getPopControl() {
-    return popControl;
-  }
-
-  public void setPopControl(Map<String, String> popControl) {
-    this.popControl = popControl;
-  }
-
   public Map<String, String> getExtraControl() {
     return extraControl;
   }
@@ -346,22 +277,18 @@ public class CaConfColumn {
   }
 
   public void fillCaEntry(CaEntry entry) throws CaMgmtException {
-    entry.setPopControl(popControl());
     entry.setRevokeSuspendedControl(revokeSuspendedControl());
     entry.setMaxValidity(maxValidity());
     entry.setKeepExpiredCertInDays(keepExpiredCertDays);
     entry.setKeypairGenNames(keypairGenNames);
     entry.setExtraControl(extraControl());
-    entry.setCmpControl(cmpControl());
     entry.setCrlControl(crlControl());
-    entry.setScepControl(scepControl());
     entry.setCtlogControl(ctlogControl());
     entry.setSaveCert((isSaveCert()));
     entry.setSaveRequest(isSaveRequest());
     entry.setSaveKeypair(isSaveKeypair());
     entry.setPermission(permission);
     entry.setValidityMode(validityMode());
-    entry.setProtocolSupport(protocolSupport());
   }
 
   public String encode() {
@@ -393,34 +320,12 @@ public class CaConfColumn {
     return maxValidity == null ? null : Validity.getInstance(maxValidity);
   }
 
-  private CmpControl cmpControl() throws CaMgmtException {
-    if (cmpControl == null) {
-      return null;
-    }
-
-    ConfPairs pairs = new ConfPairs(cmpControl);
-    try {
-      return new CmpControl(pairs);
-    } catch (InvalidConfException ex) {
-      throw new CaMgmtException("invalid CMP_CONTROL: " + pairs.getEncoded());
-    }
-  }
-
   private CrlControl crlControl() throws CaMgmtException {
     ConfPairs pairs = new ConfPairs(crlControl);
     try {
       return new CrlControl(pairs);
     } catch (InvalidConfException ex) {
       throw new CaMgmtException("invalid CRL_CONTROL: " + pairs, ex);
-    }
-  }
-
-  private ScepControl scepControl() throws CaMgmtException {
-    ConfPairs pairs = new ConfPairs(scepControl);
-    try {
-      return new ScepControl(pairs);
-    } catch (InvalidConfException ex) {
-      throw new CaMgmtException("invalid SCEP_CONTROL: " + pairs.getEncoded(), ex);
     }
   }
 
@@ -437,21 +342,8 @@ public class CaConfColumn {
     }
   }
 
-  private PopControl popControl() throws CaMgmtException {
-    ConfPairs pairs = new ConfPairs(popControl);
-    try {
-      return new PopControl(pairs);
-    } catch (InvalidConfException ex) {
-      throw new CaMgmtException("invalid POP_CONTROL: " + pairs.getEncoded(), ex);
-    }
-  }
-
   private ConfPairs extraControl() {
     return extraControl == null ? null : new ConfPairs(extraControl).unmodifiable();
-  }
-
-  private ProtocolSupport protocolSupport() {
-    return new ProtocolSupport(protocolSupport);
   }
 
   private ValidityMode validityMode() {

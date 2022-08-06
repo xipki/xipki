@@ -19,7 +19,7 @@ package org.xipki.ca.certprofile.xijson;
 
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.ca.api.BadCertTemplateException;
+import org.xipki.util.exception.BadCertTemplateException;
 import org.xipki.ca.api.profile.TextVadidator;
 import org.xipki.ca.certprofile.xijson.conf.ExtnSyntax;
 import org.xipki.ca.certprofile.xijson.conf.ExtnSyntax.SubFieldSyntax;

@@ -24,6 +24,7 @@ import org.xipki.ocsp.api.mgmt.MgmtResponse;
 import org.xipki.ocsp.api.mgmt.OcspManager;
 import org.xipki.ocsp.api.mgmt.OcspMgmtException;
 import org.xipki.util.*;
+import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.http.SslContextConf;
 
 import javax.net.ssl.HostnameVerifier;

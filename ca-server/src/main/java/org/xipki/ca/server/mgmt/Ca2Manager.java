@@ -31,31 +31,30 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.OperationException;
-import org.xipki.ca.api.OperationException.ErrorCode;
-import org.xipki.ca.api.RequestType;
+import org.xipki.util.exception.ObjectCreationException;
+import org.xipki.util.exception.OperationException;
+import org.xipki.util.exception.OperationException.ErrorCode;
 import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.api.mgmt.entry.CaEntry.CaSignerConf;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.ChangeCaEntry;
 import org.xipki.ca.server.*;
-import org.xipki.ca.server.cmp.CmpResponder;
 import org.xipki.ca.server.db.CaManagerQueryExecutor;
 import org.xipki.ca.server.mgmt.SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
+import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.http.SslContextConf;
 
 import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.util.*;
 import java.util.Map.Entry;
 
-import static org.xipki.ca.server.CaAuditConstants.*;
+import static org.xipki.ca.sdk.CaAuditConstants.*;
 import static org.xipki.ca.server.CaUtil.canonicalizeSignerConf;
 import static org.xipki.util.Args.*;
 import static org.xipki.util.StringUtil.concat;
@@ -152,24 +151,7 @@ class Ca2Manager {
     }
 
     manager.x509cas.put(caName, ca);
-    CmpResponder caResponder;
-    try {
-      caResponder = new CmpResponder(manager, caName);
-    } catch (NoSuchAlgorithmException ex) {
-      LogUtil.error(LOG, ex, concat("CmpResponder.<init> (ca=", caName, ")"));
-      return false;
-    }
 
-    manager.cmpResponders.put(caName, caResponder);
-
-    if (caEntry.getScepResponderName() != null) {
-      try {
-        manager.scepResponders.put(caName, new ScepResponder(manager, caEntry.getCaEntry()));
-      } catch (CaMgmtException ex) {
-        LogUtil.error(LOG, ex, concat("ScepResponder.<init> (ca=", caName, ")"));
-        return false;
-      }
-    }
     return true;
   } // method startCa
 
@@ -248,8 +230,6 @@ class Ca2Manager {
     manager.caHasPublishers.remove(name);
     manager.caHasRequestors.remove(name);
     X509Ca oldCa = manager.x509cas.remove(name);
-    manager.cmpResponders.remove(name);
-    manager.scepResponders.remove(name);
     if (oldCa != null) {
       oldCa.close();
     }
@@ -464,8 +444,6 @@ class Ca2Manager {
     manager.caHasPublishers.remove(name);
     manager.caHasRequestors.remove(name);
     X509Ca ca = manager.x509cas.remove(name);
-    manager.cmpResponders.remove(name);
-    manager.scepResponders.remove(name);
     if (ca != null) {
       ca.close();
     }
@@ -628,18 +606,12 @@ class Ca2Manager {
     CaEntry entry = new CaEntry(new NameId(null, name), caEntry.getSerialNoLen(),
         nextCrlNumber, signerType, signerConf, caEntry.getCaUris(), numCrls, expirationPeriod);
     entry.setCert(caCert);
-    entry.setCmpControl(caEntry.getCmpControl());
-    entry.setPopControl(caEntry.getPopControl());
     entry.setCrlControl(caEntry.getCrlControl());
-    entry.setScepControl(caEntry.getScepControl());
-    entry.setCmpResponderName(caEntry.getCmpResponderName());
-    entry.setScepResponderName(caEntry.getScepResponderName());
     entry.setCrlSignerName(caEntry.getCrlSignerName());
     entry.setExtraControl(caEntry.getExtraControl());
     entry.setKeepExpiredCertInDays(caEntry.getKeepExpiredCertInDays());
     entry.setMaxValidity(caEntry.getMaxValidity());
     entry.setPermission(caEntry.getPermission());
-    entry.setProtocolSupport(caEntry.getProtocoSupport());
     entry.setSaveCert(caEntry.isSaveCert());
     entry.setSaveRequest(caEntry.isSaveRequest());
     entry.setSaveKeypair(caEntry.isSaveKeypair());
@@ -669,7 +641,8 @@ class Ca2Manager {
       throw new CaMgmtException(concat("invalid CSR request. ERROR: ", ex.getMessage()));
     }
 
-    if (!ca.verifyCsr(csr)) {
+    boolean popValid = manager.getSecurityFactory().verifyPop(csr, null, null);
+    if (!popValid) {
       throw new CaMgmtException("could not validate POP for the CSR");
     }
 
@@ -691,8 +664,7 @@ class Ca2Manager {
 
     CertificateInfo certInfo;
     try {
-      certInfo = ca.generateCert(certTemplateData, manager.byCaRequestor, RequestType.CA,
-              null, MSGID_ca_mgmt);
+      certInfo = ca.generateCert(certTemplateData, manager.byCaRequestor,null, MSGID_ca_mgmt);
     } catch (OperationException ex) {
       throw new CaMgmtException(ex.getMessage(), ex);
     }
@@ -800,11 +772,6 @@ class Ca2Manager {
       throw new CaMgmtException(ex.getMessage(), ex);
     }
   } // method getCurrentCrl
-
-  ScepResponder getScepResponder(String name) {
-    name = toNonBlankLower(name, "name");
-    return manager.scepResponders.get(name);
-  }
 
   CertWithRevocationInfo getCert(String caName, BigInteger serialNumber)
       throws CaMgmtException {

@@ -17,7 +17,7 @@
 
 package org.xipki.ca.mgmt.shell;
 
-import org.xipki.ca.api.mgmt.PermissionConstants;
+import org.xipki.util.PermissionConstants;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.SecurityFactory;
 import org.xipki.shell.IllegalCmdParamException;
@@ -66,17 +66,6 @@ public class ShellUtil {
     } else {
       return signerConf;
     }
-
-    char[] password;
-    if (passwordResolver == null) {
-      password = passwordHint.toCharArray();
-    } else {
-      password = passwordResolver.resolvePassword(passwordHint);
-    }
-
-    String keyLabel = pairs.value("key-label");
-    keystoreBytes = securityFactory.extractMinimalKeyStore(keystoreType, keystoreBytes,
-        keyLabel, password, null);
 
     pairs.putPair("keystore", "base64:" + Base64.encodeToString(keystoreBytes));
     return pairs.getEncoded();

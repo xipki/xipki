@@ -230,48 +230,6 @@ public abstract class MgmtResponse extends MgmtMessage {
 
   } // class GetCa
 
-  public static class GetCaHasUserForUser extends MgmtResponse {
-
-    private Map<String, CaHasUserEntry> result;
-
-    public GetCaHasUserForUser() {
-    }
-
-    public GetCaHasUserForUser(Map<String, CaHasUserEntry> result) {
-      this.result = result;
-    }
-
-    public Map<String, CaHasUserEntry> getResult() {
-      return result;
-    }
-
-    public void setResult(Map<String, CaHasUserEntry> result) {
-      this.result = result;
-    }
-
-  } // class GetCaHasUserForUser
-
-  public static class GetCaHasUsersForUser extends MgmtResponse {
-
-    private Map<String, CaHasUserEntry> result;
-
-    public GetCaHasUsersForUser() {
-    }
-
-    public GetCaHasUsersForUser(Map<String, CaHasUserEntry> result) {
-      this.result = result;
-    }
-
-    public Map<String, CaHasUserEntry> getResult() {
-      return result;
-    }
-
-    public void setResult(Map<String, CaHasUserEntry> result) {
-      this.result = result;
-    }
-
-  } // class GetCaHasUsersForUser
-
   public static class GetCaSystemStatus extends MgmtResponse {
 
     private CaSystemStatus result;
@@ -460,27 +418,6 @@ public abstract class MgmtResponse extends MgmtMessage {
     }
 
   } // class GetSigner
-
-  public static class GetUser extends MgmtResponse {
-
-    private UserEntry result;
-
-    public GetUser() {
-    }
-
-    public GetUser(UserEntry result) {
-      this.result = result;
-    }
-
-    public UserEntry getResult() {
-      return result;
-    }
-
-    public void setResult(UserEntry result) {
-      this.result = result;
-    }
-
-  } // class GetUser
 
   public static class ListCertificates extends MgmtResponse {
 

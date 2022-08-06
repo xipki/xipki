@@ -24,10 +24,9 @@ import org.xipki.ca.api.mgmt.entry.ChangeCaEntry;
 import org.xipki.ca.api.mgmt.entry.KeypairGenEntry;
 import org.xipki.ca.server.CaInfo;
 import org.xipki.ca.server.KeypairGenEntryWrapper;
-import org.xipki.util.ObjectCreationException;
+import org.xipki.util.exception.ObjectCreationException;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.xipki.util.Args.notNull;
@@ -68,16 +67,15 @@ class KeypairGenManager {
     int dbSchemaVersion = manager.getDbSchemaVersion();
 
     List<KeypairGenEntry> entries;
-    if (dbSchemaVersion <= 6) {
-      KeypairGenEntry entry = new KeypairGenEntry("software", "SOFTWARE", null);
-      entries = Collections.singletonList(entry);
-    } else {
-      List<String> names = manager.queryExecutor.namesFromTable("KEYPAIR_GEN");
-      entries = new ArrayList<>(names.size());
-      for (String name : names) {
-        KeypairGenEntry entry = manager.queryExecutor.createKeypairGen(name);
-        entries.add(entry);
-      }
+    if (dbSchemaVersion < 7) {
+      throw new CaMgmtException("dbSchemaVersion < 7 unsupported: " + dbSchemaVersion);
+    }
+
+    List<String> names = manager.queryExecutor.namesFromTable("KEYPAIR_GEN");
+    entries = new ArrayList<>(names.size());
+    for (String name : names) {
+      KeypairGenEntry entry = manager.queryExecutor.createKeypairGen(name);
+      entries.add(entry);
     }
 
     for (KeypairGenEntry entry : entries) {
@@ -114,7 +112,6 @@ class KeypairGenManager {
 
   void removeKeypairGen(String name) throws CaMgmtException {
     manager.assertMasterMode();
-    manager.assertDbSchemaVersion7on("Removing keypair generation");
 
     name = toNonBlankLower(name, "name");
     boolean bo = manager.queryExecutor.deleteRowWithName(name, "KEYPAIR_GEN");
@@ -145,7 +142,6 @@ class KeypairGenManager {
   void changeKeypairGen(String name, String type, String conf)
       throws CaMgmtException {
     manager.assertMasterMode();
-    manager.assertDbSchemaVersion7on("Changing keypair generation");
 
     name = toNonBlankLower(name, "name");
     if (type == null && conf == null) {

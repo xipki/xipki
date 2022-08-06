@@ -28,6 +28,7 @@ import org.xipki.security.Securities;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
+import org.xipki.util.exception.InvalidConfException;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -35,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -79,8 +81,7 @@ public class OcspServletFilter implements Filter {
       throw new IllegalArgumentException("could not parse OCSP configuration file " + confFile, ex);
     }
 
-    String str = filterConfig.getInitParameter("logReqResp");
-    logReqResp = Boolean.parseBoolean(str);
+    logReqResp = conf.isLogReqResp();
     LOG.info("logReqResp: {}", logReqResp);
 
     securities = new Securities();
@@ -91,7 +92,7 @@ public class OcspServletFilter implements Filter {
       return;
     }
 
-    str = filterConfig.getInitParameter("licenseFactory");
+    String str = filterConfig.getInitParameter("licenseFactory");
     LOG.info("Use licenseFactory: {}", str);
     try {
       licenseFactory = (LicenseFactory) Class.forName(str).newInstance();
@@ -123,26 +124,19 @@ public class OcspServletFilter implements Filter {
 
     if (remoteMgmtEnabled) {
       if (CollectionUtil.isNotEmpty(remoteMgmt.getCerts())) {
-        Set<X509Cert> certs = new HashSet<>();
-
-        for (FileOrBinary m : remoteMgmt.getCerts()) {
-          try {
-            X509Cert cert = X509Util.parseCert(m.readContent());
-            certs.add(cert);
-          } catch (CertificateException | IOException ex) {
-            String msg = "could not parse the client certificate";
-            if (m.getFile() != null) {
-              msg += " " + m.getFile();
-            }
-            LogUtil.error(LOG, ex, msg);
-          }
+        List<X509Cert> certs = null;
+        try {
+          certs = X509Util.parseCerts(remoteMgmt.getCerts());
+        } catch (InvalidConfException ex) {
+          LogUtil.error(LOG, ex,
+              "could not parse client certificates, disable the remote management");
         }
 
-        if (certs.isEmpty()) {
+        if (CollectionUtil.isEmpty(certs)) {
           LOG.error("could not find any valid client certificates, disable the remote management");
         } else {
           mgmtServlet = new HttpMgmtServlet();
-          mgmtServlet.setMgmtCerts(certs);
+          mgmtServlet.setMgmtCerts(CollectionUtil.listToSet(certs));
           mgmtServlet.setOcspServer(server);
         }
       }

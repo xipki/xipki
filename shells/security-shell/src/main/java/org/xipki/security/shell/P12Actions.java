@@ -41,6 +41,7 @@ import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.*;
 import org.xipki.util.PemEncoder.PemLabel;
+import org.xipki.util.exception.ObjectCreationException;
 
 import java.io.*;
 import java.nio.file.Files;

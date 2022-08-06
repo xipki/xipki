@@ -23,7 +23,7 @@ import org.xipki.security.*;
 import org.xipki.security.jce.JceSignerBuilder;
 import org.xipki.util.IoUtil;
 import org.xipki.util.LogUtil;
-import org.xipki.util.ObjectCreationException;
+import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.XipkiBaseDir;
 
 import java.io.File;

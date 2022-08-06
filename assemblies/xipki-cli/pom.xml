@@ -15,7 +15,7 @@
     <app.name>cli</app.name>
     <shared.dir>${project.basedir}/../shared</shared.dir>
     <patchkaraf.repos>mvn:org.xipki.feature/cli/${project.version}/xml/features</patchkaraf.repos>
-    <patchkaraf.features>(-jaas,-ssh,-config,aries-blueprint,wrap),xipki-security,xipki-caclient,xipki-scepclient,xipki-ocspclient,xipki-camgmt,xipki-ocspmgmt</patchkaraf.features>
+    <patchkaraf.features>(-jaas,-ssh,-config,aries-blueprint,wrap),xipki-cmp-client,xipki-scep-client,xipki-ocsp-client</patchkaraf.features>
   </properties>
   <dependencies>
     <dependency>
@@ -83,30 +83,6 @@
             </configuration>
           </execution>
           <execution>
-            <!-- Copy the JDBC jars -->
-            <id>jdbc</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <stripVersion>false</stripVersion>
-        <outputDirectory>${project.build.directory}/classes/lib/boot</outputDirectory>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.mariadb.jdbc</groupId>
-                  <artifactId>mariadb-java-client</artifactId>
-                  <version>${jdbc.mariadb.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.postgresql</groupId>
-                  <artifactId>postgresql</artifactId>
-                  <version>${jdbc.postgresql.version}</version>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-          <execution>
             <!-- Extract the TLS keys -->
             <id>unpack-tlskeys</id>
             <phase>generate-resources</phase>
@@ -150,12 +126,9 @@
                 <feature>aries-blueprint</feature>
                 <feature>wrap</feature>
                 <!-- project-core features -->
-                <feature>xipki-security</feature>
-                <feature>xipki-caclient</feature>
-                <feature>xipki-ocspclient</feature>
-                <feature>xipki-scepclient</feature>
-                <feature>xipki-camgmt</feature>
-                <feature>xipki-ocspmgmt</feature>
+                <feature>xipki-cmp-client</feature>
+                <feature>xipki-ocsp-client</feature>
+                <feature>xipki-scep-client</feature>
               </features>
             </configuration>
           </execution>
@@ -175,12 +148,9 @@
                 <feature>aries-blueprint</feature>
                 <feature>wrap</feature>
                 <!-- project-core features -->
-                <feature>xipki-security</feature>
-                <feature>xipki-caclient</feature>
-                <feature>xipki-ocspclient</feature>
-                <feature>xipki-scepclient</feature>
-                <feature>xipki-camgmt</feature>
-                <feature>xipki-ocspmgmt</feature>
+                <feature>xipki-cmp-client</feature>
+                <feature>xipki-ocsp-client</feature>
+                <feature>xipki-scep-client</feature>
               </features>
             </configuration>
           </execution>

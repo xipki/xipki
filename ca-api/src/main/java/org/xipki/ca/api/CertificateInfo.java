@@ -44,11 +44,7 @@ public class CertificateInfo {
 
   private final NameId requestor;
 
-  private RequestType reqType;
-
-  private byte[] transactionId;
-
-  private Integer user;
+  private String transactionId;
 
   private String warningMessage;
 
@@ -100,13 +96,6 @@ public class CertificateInfo {
     return requestor;
   }
 
-  public Integer getUser() {
-    return user;
-  }
-
-  public void setUser(Integer user) {
-    this.user = user;
-  }
 
   public boolean isRevoked() {
     return revocationInfo != null;
@@ -128,19 +117,11 @@ public class CertificateInfo {
     this.alreadyIssued = alreadyIssued;
   }
 
-  public RequestType getReqType() {
-    return reqType;
-  }
-
-  public void setReqType(RequestType reqType) {
-    this.reqType = reqType;
-  }
-
-  public byte[] getTransactionId() {
+  public String getTransactionId() {
     return transactionId;
   }
 
-  public void setTransactionId(byte[] transactionId) {
+  public void setTransactionId(String transactionId) {
     this.transactionId = transactionId;
   }
 

@@ -388,40 +388,6 @@ public interface CaManager {
       throws CaMgmtException;
 
   /**
-   * Removes the user {@code userName} from the CA {@code caName}.
-   * @param userName
-   *          User name. Must not be {@code null}.
-   * @param caName
-   *          CA name. Must not be {@code null}.
-   * @throws CaMgmtException
-   *          if error occurs.
-   */
-  void removeUserFromCa(String userName, String caName)
-      throws CaMgmtException;
-
-  /**
-   * Adds the user {@code userName} from the CA {@code caName}.
-   * @param user
-   *          User entry. Must not be {@code null}.
-   * @param caName
-   *          CA name. Must not be {@code null}.
-   * @throws CaMgmtException
-   *          if error occurs.
-   */
-  void addUserToCa(CaHasUserEntry user, String caName)
-      throws CaMgmtException;
-
-  /**
-   * Returns map between CA name an CaHasUserEntry for given user.
-   * @param user User
-   * @return map between CA name and CaHasUserEntry for given user.
-   * @throws CaMgmtException
-   *          if error occurs.
-   */
-  Map<String, CaHasUserEntry> getCaHasUsersForUser(String user)
-      throws CaMgmtException;
-
-  /**
    * Returns the certificate profile named {@code profileName}.
    * @param profileName
    *          certificate profile name. Must not be {@code null}.
@@ -722,47 +688,6 @@ public interface CaManager {
   X509Cert generateRootCa(CaEntry caEntry, String certprofileName,
       String subject, String serialNumber)
           throws CaMgmtException;
-
-  /**
-   * Adds a user.
-   * @param addUserEntry
-   *          AddUser entry. Must not be {@code null}.
-   * @throws CaMgmtException
-   *          if error occurs.
-   */
-  void addUser(AddUserEntry addUserEntry)
-      throws CaMgmtException;
-
-  /**
-   * Change the user.
-   * @param changeUserEntry
-   *          User change entry. Must not be {@code null}.
-   * @throws CaMgmtException
-   *          if error occurs.
-   */
-  void changeUser(ChangeUserEntry changeUserEntry)
-      throws CaMgmtException;
-
-  /**
-   * Remove the name {@code username}.
-   * @param username
-   *          User name. Must not be {@code null}.
-   * @throws CaMgmtException
-   *          if error occurs.
-   */
-  void removeUser(String username)
-      throws CaMgmtException;
-
-  /**
-   * Returns the user {@code username}.
-   * @param username
-   *          User name. Must not be {@code null}.
-   * @return the user
-   * @throws CaMgmtException
-   *          if error occurs.
-   */
-  UserEntry getUser(String username)
-      throws CaMgmtException;
 
   /**
    * Generates a new CRL for CA {@code caName}.

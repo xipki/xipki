@@ -36,7 +36,7 @@ import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.InvalidConfException;
+import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 
 import java.io.IOException;

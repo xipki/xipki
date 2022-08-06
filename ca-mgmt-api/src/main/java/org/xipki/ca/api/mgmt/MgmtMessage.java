@@ -25,6 +25,7 @@ import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
+import org.xipki.util.exception.InvalidConfException;
 
 import java.security.cert.CertificateException;
 import java.util.LinkedList;
@@ -51,8 +52,6 @@ public abstract class MgmtMessage {
     addRequestor,
     addRequestorToCa,
     addSigner,
-    addUser,
-    addUserToCa,
     changeCa,
     changeCertprofile,
     changeDbSchema,
@@ -60,7 +59,6 @@ public abstract class MgmtMessage {
     changePublisher,
     changeRequestor,
     changeSigner,
-    changeUser,
     clearPublishQueue,
     exportConf,
     generateCertificate,
@@ -69,7 +67,6 @@ public abstract class MgmtMessage {
     getAliasesForCa,
     getCa,
     getCaAliasNames,
-    getCaHasUsersForUser,
     getCaNameForAlias,
     getCaNames,
     getCaSystemStatus,
@@ -97,7 +94,6 @@ public abstract class MgmtMessage {
     getSupportedCertprofileTypes,
     getSupportedPublisherTypes,
     getSupportedSignerTypes,
-    getUser,
     listCertificates,
     loadConf,
     notifyCaChange,
@@ -114,8 +110,6 @@ public abstract class MgmtMessage {
     removeRequestor,
     removeRequestorFromCa,
     removeSigner,
-    removeUser,
-    removeUserFromCa,
     republishCertificates,
     restartCa,
     restartCaSystem,
@@ -229,27 +223,15 @@ public abstract class MgmtMessage {
 
     private String signerConf;
 
-    private String scepControl;
-
     private String crlControl;
 
     private String crlSignerName;
 
-    private String cmpControl;
-
     private String ctlogControl;
-
-    private String popControl;
 
     private String revokeSuspended;
 
-    private String cmpResponderName;
-
-    private String scepResponderName;
-
     private List<String> keypairGenNames;
-
-    private ProtocolSupport protocolSupport;
 
     private boolean saveCert;
 
@@ -298,12 +280,6 @@ public abstract class MgmtMessage {
         }
       }
 
-      if (caEntry.getCmpControl() != null) {
-        cmpControl = caEntry.getCmpControl().getConf();
-      }
-
-      cmpResponderName = caEntry.getCmpResponderName();
-
       if (caEntry.getCrlControl() != null) {
         crlControl = caEntry.getCrlControl().getConf();
       }
@@ -314,9 +290,6 @@ public abstract class MgmtMessage {
         ctlogControl = caEntry.getCtlogControl().getConf();
       }
 
-      if (caEntry.getPopControl() != null) {
-        popControl = caEntry.getPopControl().getConf();
-      }
       expirationPeriod = caEntry.getExpirationPeriod();
       if (caEntry.getExtraControl() != null) {
         extraControl = caEntry.getExtraControl().getEncoded();
@@ -328,7 +301,6 @@ public abstract class MgmtMessage {
       nextCrlNumber = caEntry.getNextCrlNumber();
       numCrls = caEntry.getNumCrls();
       permission = caEntry.getPermission();
-      protocolSupport = caEntry.getProtocoSupport();
       revocationInfo = caEntry.getRevocationInfo();
       if (caEntry.getRevokeSuspendedControl() != null) {
         revokeSuspended = caEntry.getRevokeSuspendedControl().getConf();
@@ -337,11 +309,6 @@ public abstract class MgmtMessage {
       saveCert = caEntry.isSaveCert();
       saveRequest = caEntry.isSaveRequest();
       saveKeypair = caEntry.isSaveKeypair();
-
-      if (caEntry.getScepControl() != null) {
-        scepControl = caEntry.getScepControl().getConf();
-      }
-      scepResponderName = caEntry.getScepResponderName();
       keypairGenNames = caEntry.getKeypairGenNames();
 
       serialNoLen = caEntry.getSerialNoLen();
@@ -393,14 +360,6 @@ public abstract class MgmtMessage {
       this.signerConf = signerConf;
     }
 
-    public String getScepControl() {
-      return scepControl;
-    }
-
-    public void setScepControl(String scepControl) {
-      this.scepControl = scepControl;
-    }
-
     public String getCrlControl() {
       return crlControl;
     }
@@ -433,52 +392,12 @@ public abstract class MgmtMessage {
       this.keypairGenNames = keypairGenNames;
     }
 
-    public String getCmpControl() {
-      return cmpControl;
-    }
-
-    public void setCmpControl(String cmpControl) {
-      this.cmpControl = cmpControl;
-    }
-
     public String getCtlogControl() {
       return ctlogControl;
     }
 
     public void setCtlogControl(String ctlogControl) {
       this.ctlogControl = ctlogControl;
-    }
-
-    public String getPopControl() {
-      return popControl;
-    }
-
-    public void setPopControl(String popControl) {
-      this.popControl = popControl;
-    }
-
-    public String getCmpResponderName() {
-      return cmpResponderName;
-    }
-
-    public void setCmpResponderName(String cmpResponderName) {
-      this.cmpResponderName = cmpResponderName;
-    }
-
-    public String getScepResponderName() {
-      return scepResponderName;
-    }
-
-    public void setScepResponderName(String scepResponderName) {
-      this.scepResponderName = scepResponderName;
-    }
-
-    public ProtocolSupport getProtocolSupport() {
-      return protocolSupport;
-    }
-
-    public void setProtocolSupport(ProtocolSupport protocolSupport) {
-      this.protocolSupport = protocolSupport;
     }
 
     public boolean isSaveCert() {
@@ -617,12 +536,6 @@ public abstract class MgmtMessage {
         rv.setCertchain(certchain);
       }
 
-      if (cmpControl != null) {
-        rv.setCmpControl(new CmpControl(cmpControl));
-      }
-
-      rv.setCmpResponderName(cmpResponderName);
-
       if (crlControl != null) {
         rv.setCrlControl(new CrlControl(crlControl));
       }
@@ -644,28 +557,19 @@ public abstract class MgmtMessage {
 
       rv.setNextCrlNumber(nextCrlNumber);
       rv.setPermission(permission);
-      rv.setProtocolSupport(protocolSupport);
       rv.setRevocationInfo(revocationInfo);
       rv.setSaveCert(saveCert);
       rv.setSaveRequest(saveRequest);
       rv.setSaveKeypair(saveKeypair);
-      if (scepControl != null) {
-        rv.setScepControl(new ScepControl(scepControl));
-      }
 
       if (revokeSuspended != null) {
         rv.setRevokeSuspendedControl(new RevokeSuspendedControl(revokeSuspended));
       }
 
-      rv.setScepResponderName(scepResponderName);
       rv.setSerialNoLen(serialNoLen);
       rv.setSignerConf(signerConf);
       rv.setStatus(status);
       rv.setValidityMode(validityMode);
-
-      if (popControl != null) {
-        rv.setPopControl(new PopControl(popControl));
-      }
 
       return rv; // method toCaEntry
     }

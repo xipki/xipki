@@ -22,6 +22,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.util.*;
+import org.xipki.util.exception.InvalidConfException;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -178,21 +179,6 @@ public class CaConfs {
               String conf = convertSignerConf(fv, properties, baseDir);
               if (conf.length() > 200) {
                 String zipEntryName = "files/ca-" + name + "-signer.conf";
-                createFileOrValue(zipStream, conf, zipEntryName);
-                fv.setFile(zipEntryName);
-                fv.setValue(null);
-              } else {
-                fv.setFile(null);
-                fv.setValue(conf);
-              }
-            }
-
-            // POP Control
-            if (ci.getPopControl() != null) {
-              FileOrValue fv = ci.getPopControl();
-              String conf = convertSignerConf(fv, properties, baseDir);
-              if (conf.length() > 200) {
-                String zipEntryName = "files/ca-" + name + "-pop.conf";
                 createFileOrValue(zipStream, conf, zipEntryName);
                 fv.setFile(zipEntryName);
                 fv.setValue(null);

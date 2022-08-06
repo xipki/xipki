@@ -20,7 +20,7 @@ package org.xipki.ca.certprofile.xijson.conf;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.ca.api.profile.Certprofile.ExtKeyUsageControl;
 import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
-import org.xipki.util.InvalidConfException;
+import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 
 import java.util.*;

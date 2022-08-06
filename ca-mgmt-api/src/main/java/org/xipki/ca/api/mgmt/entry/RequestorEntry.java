@@ -39,11 +39,6 @@ public class RequestorEntry extends MgmtEntry {
    */
   public static final String TYPE_CERT = "cert";
 
-  /**
-   * Password based MAC.
-   */
-  public static final String TYPE_PBM = "pbm";
-
   private NameId ident;
 
   private String type;
@@ -60,8 +55,7 @@ public class RequestorEntry extends MgmtEntry {
   public RequestorEntry(NameId ident, String type, String conf) {
     this.ident = Args.notNull(ident, "ident");
     String name = ident.getName();
-    if (RequestorInfo.NAME_BY_USER.equals(name)
-        || RequestorInfo.NAME_BY_CA.equals(name)) {
+    if (RequestorInfo.NAME_BY_CA.equals(name)) {
       throw new IllegalArgumentException("Requestor name could not be " + name);
     }
 
@@ -72,8 +66,7 @@ public class RequestorEntry extends MgmtEntry {
   public void setIdent(NameId ident) {
     this.ident = Args.notNull(ident, "ident");
     String name = ident.getName();
-    if (RequestorInfo.NAME_BY_USER.equals(name)
-        || RequestorInfo.NAME_BY_CA.equals(name)) {
+    if (RequestorInfo.NAME_BY_CA.equals(name)) {
       throw new IllegalArgumentException("Requestor name could not be " + name);
     }
   }

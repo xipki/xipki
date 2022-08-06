@@ -33,7 +33,7 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.mgmt.CaManager;
-import org.xipki.ca.api.mgmt.CmpControl;
+import org.xipki.ca.api.mgmt.CrlControl;
 import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.ca.mgmt.shell.*;
 import org.xipki.ca.mgmt.shell.CaActions.CaAction;
@@ -412,26 +412,9 @@ public class QaCaActions {
         assertObjEquals("serial number length", ey.getSerialNoLen(), ca.getSerialNoLen());
       }
 
-      // CMP control name
-      if (ey.getCmpControl() != null) {
-        assertObjEquals("CMP control", new CmpControl(ey.getCmpControl()), ca.getCmpControl());
-      }
-
       // CRL control name
       if (ey.getCrlControl() != null) {
-        assertObjEquals("CRL control", new CmpControl(ey.getCrlControl()), ca.getCrlControl());
-      }
-
-      // CMP responder name
-      if (ey.getCmpResponderName() != null) {
-        assertEquals("CMP responder name",
-            ey.getCmpResponderName(), ca.getCmpResponderName());
-      }
-
-      // SCEP responder name
-      if (ey.getScepResponderName() != null) {
-        assertEquals("SCEP responder name",
-            ey.getScepResponderName(), ca.getScepResponderName());
+        assertObjEquals("CRL control", new CrlControl(ey.getCrlControl()), ca.getCrlControl());
       }
 
       // CRL signer name
@@ -583,10 +566,6 @@ public class QaCaActions {
     @Completion(CaCompleters.RequestorNameCompleter.class)
     private String requestorName;
 
-    @Option(name = "--ra", description = "whether as RA")
-    @Completion(Completers.YesNoCompleter.class)
-    private String raS = "no";
-
     @Option(name = "--permission", multiValued = true, description = "permission")
     @Completion(CaCompleters.PermissionCompleter.class)
     private Set<String> permissions;
@@ -617,12 +596,6 @@ public class QaCaActions {
 
       if (entry == null) {
         throw new CmdFailure("CA is not associated with requestor '" + requestorName + "'");
-      }
-
-      boolean ra = isEnabled(raS, false, "ra");
-      boolean bo = entry.isRa();
-      if (ra != bo) {
-        throw new CmdFailure("ra: is '" + bo + "', expected '" + ra + "'");
       }
 
       if (permissions != null) {
@@ -733,32 +706,19 @@ public class QaCaActions {
         throw new CmdFailure("requestor named '" + name + "' is not configured");
       }
 
-      if (certFile != null) {
-        byte[] ex = IoUtil.read(certFile);
-        String expType = RequestorEntry.TYPE_CERT;
-        if (!cr.getType().equals(expType)) {
-          throw new CmdFailure("IdNameTypeConf type is not " + expType);
-        }
+      byte[] ex = IoUtil.read(certFile);
+      String expType = RequestorEntry.TYPE_CERT;
+      if (!cr.getType().equals(expType)) {
+        throw new CmdFailure("IdNameTypeConf type is not " + expType);
+      }
 
-        String conf = cr.getConf();
-        if (conf == null) {
-          throw new CmdFailure("CaCert: is not configured explicitly as expected");
-        }
+      String conf = cr.getConf();
+      if (conf == null) {
+        throw new CmdFailure("CaCert: is not configured explicitly as expected");
+      }
 
-        if (!certEquals(ex, Base64.decode(conf))) {
-          throw new CmdFailure("CaCert: the expected one and the actual one differ");
-        }
-      } else {
-        String expType = RequestorEntry.TYPE_PBM;
-        if (!cr.getType().equals(expType)) {
-          throw new CmdFailure("IdNameTypeConf type is not " + expType);
-        }
-
-        char[] ex = password.toCharArray();
-        char[] is = securityFactory.getPasswordResolver().resolvePassword(cr.getConf());
-        if (Arrays.equals(ex, is)) {
-          throw new CmdFailure("PBM: the expected one and the actual one differ");
-        }
+      if (!certEquals(ex, Base64.decode(conf))) {
+        throw new CmdFailure("CaCert: the expected one and the actual one differ");
       }
 
       println(" checked requestor " + name);

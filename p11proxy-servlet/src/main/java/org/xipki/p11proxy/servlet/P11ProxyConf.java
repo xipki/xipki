@@ -19,7 +19,7 @@ package org.xipki.p11proxy.servlet;
 
 import com.alibaba.fastjson.JSON;
 import org.xipki.security.Securities.SecurityConf;
-import org.xipki.util.InvalidConfException;
+import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 
 import java.io.IOException;

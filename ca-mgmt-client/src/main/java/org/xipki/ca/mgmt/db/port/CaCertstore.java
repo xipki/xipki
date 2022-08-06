@@ -19,7 +19,7 @@ package org.xipki.ca.mgmt.db.port;
 
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.FileOrValue;
-import org.xipki.util.InvalidConfException;
+import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 
 import java.util.LinkedList;
@@ -54,10 +54,6 @@ public class CaCertstore extends ValidatableConf {
     private String revInfo;
 
     private String crlSignerName;
-
-    private String cmpResponderName;
-
-    private String scepResponderName;
 
     private FileOrValue confColumn;
 
@@ -141,22 +137,6 @@ public class CaCertstore extends ValidatableConf {
       this.crlSignerName = crlSignerName;
     }
 
-    public String getCmpResponderName() {
-      return cmpResponderName;
-    }
-
-    public void setCmpResponderName(String cmpResponderName) {
-      this.cmpResponderName = cmpResponderName;
-    }
-
-    public String getScepResponderName() {
-      return scepResponderName;
-    }
-
-    public void setScepResponderName(String scepResponderName) {
-      this.scepResponderName = scepResponderName;
-    }
-
     public FileOrValue getConfColumn() {
       return confColumn;
     }
@@ -232,15 +212,11 @@ public class CaCertstore extends ValidatableConf {
 
     private List<Caalias> caaliases;
 
-    private List<User> users;
-
     private List<CaHasRequestor> caHasRequestors;
 
     private List<CaHasPublisher> caHasPublishers;
 
     private List<CaHasProfile> caHasProfiles;
-
-    private List<CaHasUser> caHasUsers;
 
     public int getVersion() {
       return version;
@@ -327,17 +303,6 @@ public class CaCertstore extends ValidatableConf {
       this.caaliases = caaliases;
     }
 
-    public List<User> getUsers() {
-      if (users == null) {
-        users = new LinkedList<>();
-      }
-      return users;
-    }
-
-    public void setUsers(List<User> users) {
-      this.users = users;
-    }
-
     public List<CaHasRequestor> getCaHasRequestors() {
       if (caHasRequestors == null) {
         caHasRequestors = new LinkedList<>();
@@ -371,17 +336,6 @@ public class CaCertstore extends ValidatableConf {
       this.caHasProfiles = caHasProfiles;
     }
 
-    public List<CaHasUser> getCaHasUsers() {
-      if (caHasUsers == null) {
-        caHasUsers = new LinkedList<>();
-      }
-      return caHasUsers;
-    }
-
-    public void setCaHasUsers(List<CaHasUser> caHasUsers) {
-      this.caHasUsers = caHasUsers;
-    }
-
     public List<NameTypeConf> getKeypairGens() {
       return keypairGens;
     }
@@ -399,7 +353,6 @@ public class CaCertstore extends ValidatableConf {
       validate(profiles);
       validate(cas);
       validate(caaliases);
-      validate(users);
       validate(caHasRequestors);
       validate(caHasPublishers);
       validate(caHasProfiles);
@@ -464,8 +417,6 @@ public class CaCertstore extends ValidatableConf {
 
     private int requestorId;
 
-    private int ra;
-
     private int permission;
 
     private String profiles;
@@ -476,14 +427,6 @@ public class CaCertstore extends ValidatableConf {
 
     public void setRequestorId(int requestorId) {
       this.requestorId = requestorId;
-    }
-
-    public int getRa() {
-      return ra;
-    }
-
-    public void setRa(int ra) {
-      this.ra = ra;
     }
 
     public int getPermission() {
@@ -615,14 +558,10 @@ public class CaCertstore extends ValidatableConf {
      */
     private Long rit;
 
-    private Integer uid;
-
     /**
      * base64 encoded transaction id.
      */
     private String tid;
-
-    private Integer reqType;
 
     /**
      * first 8 bytes of the SHA1 sum of the requested subject.
@@ -724,14 +663,6 @@ public class CaCertstore extends ValidatableConf {
       this.tid = tid;
     }
 
-    public Integer getReqType() {
-      return reqType;
-    }
-
-    public void setReqType(Integer reqType) {
-      this.reqType = reqType;
-    }
-
     public Long getFpRs() {
       return fpRs;
     }
@@ -764,14 +695,6 @@ public class CaCertstore extends ValidatableConf {
       this.privateKeyFile = privateKeyFile;
     }
 
-    public Integer getUid() {
-      return uid;
-    }
-
-    public void setUid(Integer uid) {
-      this.uid = uid;
-    }
-
     public Integer getCrlScope() {
       return crlScope;
     }
@@ -789,7 +712,6 @@ public class CaCertstore extends ValidatableConf {
       notNull(ee, "ee");
       notBlank(file, "file");
       notNull(pid, "pid");
-      notNull(reqType, "reqType");
       notNull(rev, "rev");
       notNull(rid, "rid");
       notBlank(sn, "sn");
@@ -1243,57 +1165,6 @@ public class CaCertstore extends ValidatableConf {
     }
 
   } // class ToPublish
-
-  public static class User extends ValidatableConf {
-
-    private int id;
-
-    private String name;
-
-    private int active;
-
-    private String password;
-
-    public int getId() {
-      return id;
-    }
-
-    public void setId(int id) {
-      this.id = id;
-    }
-
-    public String getName() {
-      return name;
-    }
-
-    public void setName(String name) {
-      this.name = name;
-    }
-
-    public int getActive() {
-      return active;
-    }
-
-    public void setActive(int active) {
-      this.active = active;
-    }
-
-    public String getPassword() {
-      return password;
-    }
-
-    public void setPassword(String password) {
-      this.password = password;
-    }
-
-    @Override
-    public void validate()
-        throws InvalidConfException {
-      notBlank(name, "name");
-      notBlank(password, "password");
-    }
-
-  } // class User
 
   private int version;
 

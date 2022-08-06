@@ -32,9 +32,9 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.BadCertTemplateException;
+import org.xipki.util.exception.BadCertTemplateException;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.OperationException;
+import org.xipki.util.exception.OperationException;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.mgmt.ValidityMode;
 import org.xipki.ca.api.profile.Certprofile;
@@ -59,7 +59,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import static org.xipki.ca.api.OperationException.ErrorCode.*;
+import static org.xipki.util.exception.OperationException.ErrorCode.*;
 
 /**
  * X509CA GrandCertTemplate builder.
@@ -95,7 +95,6 @@ class GrandCertTemplateBuilder {
   GrantedCertTemplate create(
       IdentifiedCertprofile certprofile,
       CertTemplateData certTemplate,
-      RequestorInfo requestor,
       List<KeypairGenerator> keypairGenerators,
       boolean update)
       throws OperationException {
@@ -118,13 +117,6 @@ class GrandCertTemplateBuilder {
     if (certprofile.getVersion() != Certprofile.X509CertVersion.v3) {
       throw new OperationException(SYSTEM_FAILURE,
           "unknown cert version " + certprofile.getVersion());
-    }
-
-    if (certprofile.isOnlyForRa()) {
-      if (requestor == null || !requestor.isRa()) {
-        throw new OperationException(NOT_PERMITTED,
-            "profile " + certprofileIdent + " not applied to non-RA");
-      }
     }
 
     switch (certprofile.getCertLevel()) {

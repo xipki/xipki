@@ -40,7 +40,7 @@ import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.util.DateUtil;
-import org.xipki.util.InvalidConfException;
+import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.IoUtil;
 import org.xipki.util.StringUtil;
 

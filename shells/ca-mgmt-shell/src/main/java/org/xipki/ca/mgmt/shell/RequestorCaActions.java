@@ -28,14 +28,11 @@ import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.mgmt.shell.CaActions.CaAction;
-import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
-import org.xipki.shell.Completers;
 import org.xipki.util.Base64;
 import org.xipki.util.IoUtil;
-import org.xipki.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -62,10 +59,6 @@ public class RequestorCaActions {
     @Completion(CaCompleters.RequestorNameCompleter.class)
     private String requestorName;
 
-    @Option(name = "--ra", description = "whether as RA")
-    @Completion(Completers.YesNoCompleter.class)
-    private String raS = "no";
-
     @Option(name = "--permission", required = true, multiValued = true, description = "permission")
     @Completion(CaCompleters.PermissionCompleter.class)
     private Set<String> permissions;
@@ -78,11 +71,8 @@ public class RequestorCaActions {
     @Override
     protected Object execute0()
         throws Exception {
-      boolean ra = isEnabled(raS, false, "ra");
-
       CaHasRequestorEntry entry =
           new CaHasRequestorEntry(new NameId(null, requestorName));
-      entry.setRa(ra);
       entry.setProfiles(profiles);
       int intPermission = ShellUtil.getPermission(permissions);
       entry.setPermission(intPermission);
@@ -174,32 +164,17 @@ public class RequestorCaActions {
     @Option(name = "--name", aliases = "-n", required = true, description = "requestor name")
     private String name;
 
-    @Option(name = "--cert", description = "requestor certificate file"
+    @Option(name = "--cert", required = true, description = "requestor certificate file"
         + "(exactly one of cert and password must be specified).")
     @Completion(FileCompleter.class)
     private String certFile;
 
-    @Option(name = "--password", description = "Passord for PBM (Password based MAC)")
-    private String password;
-
     @Override
     protected Object execute0()
         throws Exception {
-      if (!(certFile == null ^ password == null)) {
-        throw new CmdFailure("exactly one of cert and password must be specified");
-      }
-
-      RequestorEntry entry;
-      if (certFile != null) {
-        X509Cert cert = X509Util.parseCert(IoUtil.read(certFile));
-        entry = new RequestorEntry(new NameId(null, name), RequestorEntry.TYPE_CERT,
+      X509Cert cert = X509Util.parseCert(IoUtil.read(certFile));
+      RequestorEntry entry = new RequestorEntry(new NameId(null, name), RequestorEntry.TYPE_CERT,
             Base64.encodeToString(cert.getEncoded()));
-      } else {
-        entry = new RequestorEntry(
-                  new NameId(null, name), RequestorEntry.TYPE_PBM, password);
-        String keyId = HashAlgo.SHA1.hexHash(StringUtil.toUtf8Bytes(entry.getIdent().getName()));
-        println("The key ID is " + keyId);
-      }
 
       String msg = "CMP requestor " + name;
 
@@ -299,13 +274,9 @@ public class RequestorCaActions {
     @Completion(CaCompleters.RequestorNameCompleter.class)
     protected String name;
 
-    @Option(name = "--cert", description = "requestor certificate file\n"
-        + "(exactly one of cert and password must be specified).")
+    @Option(name = "--cert", required = true, description = "requestor certificate file")
     @Completion(FileCompleter.class)
     protected String certFile;
-
-    @Option(name = "--password", description = "Passord for PBM (Password based MAC)")
-    protected String password;
 
     @Override
     protected Object execute0()
@@ -313,16 +284,8 @@ public class RequestorCaActions {
       // check if the certificate is valid
       String msg = "CMP requestor " + name;
 
-      String type;
-      String conf;
-      if (certFile != null) {
-        type = RequestorEntry.TYPE_CERT;
-        X509Cert cert = X509Util.parseCert(IoUtil.read(certFile));
-        conf = Base64.encodeToString(cert.getEncoded());
-      } else {
-        type = RequestorEntry.TYPE_PBM;
-        conf = password;
-      }
+      String type = RequestorEntry.TYPE_CERT;
+      String conf = Base64.encodeToString(X509Util.parseCert(IoUtil.read(certFile)).getEncoded());
 
       try {
         caManager.changeRequestor(name, type, conf);

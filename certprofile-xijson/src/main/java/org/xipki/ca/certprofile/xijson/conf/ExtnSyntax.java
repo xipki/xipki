@@ -22,7 +22,7 @@ import org.xipki.security.X509ExtensionType.FieldType;
 import org.xipki.security.X509ExtensionType.Tag;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
-import org.xipki.util.InvalidConfException;
+import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.StringUtil;
 
 import java.util.HashSet;

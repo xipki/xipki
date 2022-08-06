@@ -23,7 +23,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.asn1.x509.qualified.BiometricData;
 import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
-import org.xipki.ca.api.BadCertTemplateException;
+import org.xipki.util.exception.BadCertTemplateException;
 import org.xipki.ca.api.profile.Certprofile.AuthorityInfoAccessControl;
 import org.xipki.ca.api.profile.Certprofile.CertLevel;
 import org.xipki.ca.api.profile.Certprofile.ExtKeyUsageControl;

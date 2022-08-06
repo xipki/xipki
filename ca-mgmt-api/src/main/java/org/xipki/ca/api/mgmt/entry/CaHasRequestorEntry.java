@@ -18,7 +18,7 @@
 package org.xipki.ca.api.mgmt.entry;
 
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.mgmt.PermissionConstants;
+import org.xipki.util.PermissionConstants;
 import org.xipki.util.Args;
 import org.xipki.util.CollectionUtil;
 import org.xipki.util.CompareUtil;
@@ -37,8 +37,6 @@ public class CaHasRequestorEntry extends MgmtEntry {
 
   private NameId requestorIdent;
 
-  private boolean ra;
-
   private int permission;
 
   private Set<String> profiles;
@@ -50,14 +48,6 @@ public class CaHasRequestorEntry extends MgmtEntry {
 
   public CaHasRequestorEntry(NameId requestorIdent) {
     this.requestorIdent = Args.notNull(requestorIdent, "requestorIdent");
-  }
-
-  public boolean isRa() {
-    return ra;
-  }
-
-  public void setRa(boolean ra) {
-    this.ra = ra;
   }
 
   public int getPermission() {
@@ -103,7 +93,7 @@ public class CaHasRequestorEntry extends MgmtEntry {
   @Override
   public String toString() {
     return StringUtil.concatObjectsCap(200, "requestor: ", requestorIdent,
-        "\nra: ", ra, "\nprofiles: ", profiles,
+        "\nprofiles: ", profiles,
         "\npermission: ", PermissionConstants.permissionToString(permission));
   }
 
@@ -120,7 +110,6 @@ public class CaHasRequestorEntry extends MgmtEntry {
 
   public boolean equals(CaHasRequestorEntry obj, boolean ignoreId) {
     return (obj != null)
-        && (ra == obj.ra)
         && requestorIdent.equals(obj.requestorIdent, ignoreId)
         && (permission == obj.permission)
         && CompareUtil.equalsObject(profiles, obj.profiles);

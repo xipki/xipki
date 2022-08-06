@@ -29,7 +29,7 @@ import org.xipki.ca.api.mgmt.MgmtMessage.SignerEntryWrapper;
 import org.xipki.ca.api.mgmt.entry.*;
 import org.xipki.security.X509Cert;
 import org.xipki.util.HttpConstants;
-import org.xipki.util.InvalidConfException;
+import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.IoUtil;
 
 import javax.servlet.ServletException;
@@ -180,18 +180,6 @@ public class HttpMgmtServlet extends HttpServlet {
           resp = null;
           break;
         }
-        case addUser: {
-          MgmtRequest.AddUser req = parse(in, MgmtRequest.AddUser.class);
-          caManager.addUser(req.getAddUserEntry());
-          resp = null;
-          break;
-        }
-        case addUserToCa: {
-          MgmtRequest.AddUserToCa req = parse(in, MgmtRequest.AddUserToCa.class);
-          caManager.addUserToCa(req.getUser(), req.getCaName());
-          resp = null;
-          break;
-        }
         case changeCa: {
           MgmtRequest.ChangeCa req = parse(in, MgmtRequest.ChangeCa.class);
           caManager.changeCa(req.getChangeCaEntry());
@@ -219,12 +207,6 @@ public class HttpMgmtServlet extends HttpServlet {
         case changeSigner: {
           MgmtRequest.ChangeSigner req = parse(in, MgmtRequest.ChangeSigner.class);
           caManager.changeSigner(req.getName(), req.getType(), req.getConf(), req.getBase64Cert());
-          resp = null;
-          break;
-        }
-        case changeUser: {
-          MgmtRequest.ChangeUser req = parse(in, MgmtRequest.ChangeUser.class);
-          caManager.changeUser(req.getChangeUserEntry());
           resp = null;
           break;
         }
@@ -288,15 +270,6 @@ public class HttpMgmtServlet extends HttpServlet {
         case getCaAliasNames: {
           Set<String> result = caManager.getCaAliasNames();
           resp = new MgmtResponse.StringSet(result);
-          break;
-        }
-        case getCaHasUsersForUser: {
-          String userName = getNameFromRequest(in);
-          Map<String, CaHasUserEntry> result = caManager.getCaHasUsersForUser(userName);
-          if (result == null) {
-            throw new CaMgmtException("Unknown user " + userName);
-          }
-          resp = new MgmtResponse.GetCaHasUsersForUser(result);
           break;
         }
         case getCaNameForAlias: {
@@ -461,15 +434,6 @@ public class HttpMgmtServlet extends HttpServlet {
           resp = new MgmtResponse.StringSet(result);
           break;
         }
-        case getUser: {
-          String name = getNameFromRequest(in);
-          UserEntry result = caManager.getUser(name);
-          if (result == null) {
-            throw new CaMgmtException("Unknown user " + name);
-          }
-          resp = new MgmtResponse.GetUser(result);
-          break;
-        }
         case listCertificates: {
           MgmtRequest.ListCertificates req = parse(in, MgmtRequest.ListCertificates.class);
           X500Name subjectPattern = X500Name.getInstance(req.getEncodedSubjectDnPattern());
@@ -564,18 +528,6 @@ public class HttpMgmtServlet extends HttpServlet {
         case removeSigner: {
           String name = getNameFromRequest(in);
           caManager.removeSigner(name);
-          resp = null;
-          break;
-        }
-        case removeUser: {
-          String name = getNameFromRequest(in);
-          caManager.removeUser(name);
-          resp = null;
-          break;
-        }
-        case removeUserFromCa: {
-          MgmtRequest.RemoveEntityFromCa req = parse(in, MgmtRequest.RemoveEntityFromCa.class);
-          caManager.removeUserFromCa(req.getEntityName(), req.getCaName());
           resp = null;
           break;
         }

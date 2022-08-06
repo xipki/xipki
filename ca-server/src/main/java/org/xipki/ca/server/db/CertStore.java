@@ -31,12 +31,10 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CertListInfo;
 import org.xipki.ca.api.mgmt.CertListOrderBy;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
-import org.xipki.ca.api.mgmt.entry.CaHasUserEntry;
 import org.xipki.ca.server.*;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
@@ -46,10 +44,9 @@ import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
+import org.xipki.util.*;
 import org.xipki.util.Base64;
-import org.xipki.util.LogUtil;
-import org.xipki.util.LruCache;
-import org.xipki.util.StringUtil;
+import org.xipki.util.exception.OperationException;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
@@ -62,7 +59,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.xipki.ca.api.OperationException.ErrorCode.*;
+import static org.xipki.util.exception.OperationException.ErrorCode.*;
 import static org.xipki.util.Args.*;
 
 /**
@@ -133,23 +130,16 @@ public class CertStore extends CertStoreBase {
 
   public static class KnowCertResult {
 
-    public static final KnowCertResult UNKNOWN = new KnowCertResult(false, null);
+    public static final KnowCertResult UNKNOWN = new KnowCertResult(false);
 
     private final boolean known;
 
-    private final Integer userId;
-
-    public KnowCertResult(boolean known, Integer userId) {
+    public KnowCertResult(boolean known) {
       this.known = known;
-      this.userId = userId;
     }
 
     public boolean isKnown() {
       return known;
-    }
-
-    public Integer getUserId() {
-      return userId;
     }
 
   }
@@ -161,12 +151,6 @@ public class CertStore extends CertStoreBase {
   private final String sqlCertWithRevInfo;
 
   private final String sqlCertInfo;
-
-  private final String sqlActiveUserInfoForName;
-
-  private final String sqlActiveUserNameForId;
-
-  private final String sqlCaHasUser;
 
   private final String sqlKnowsCertForSerial;
 
@@ -200,7 +184,7 @@ public class CertStore extends CertStoreBase {
 
   private final AtomicInteger cachedCrlId = new AtomicInteger(0);
 
-  private long earliestNotBefore = 0;
+  private long earliestNotBefore;
 
   public CertStore(DataSourceWrapper datasource, UniqueIdGenerator idGenerator,
                    PasswordResolver passwordResolver)
@@ -214,12 +198,7 @@ public class CertStore extends CertStoreBase {
         "ID,REV,RR,RT,RIT,PID,CERT FROM CERT WHERE CA_ID=? AND SN=?");
     this.sqlCertInfo = buildSelectFirstSql(
         "PID,RID,REV,RR,RT,RIT,CERT FROM CERT WHERE CA_ID=? AND SN=?");
-    this.sqlActiveUserInfoForName = buildSelectFirstSql(
-        "ID,PASSWORD FROM TUSER WHERE NAME=? AND ACTIVE=1");
-    this.sqlActiveUserNameForId = buildSelectFirstSql("NAME FROM TUSER WHERE ID=? AND ACTIVE=1");
-    this.sqlCaHasUser = buildSelectFirstSql(
-        "PERMISSION,PROFILES FROM CA_HAS_USER WHERE CA_ID=? AND USER_ID=?");
-    this.sqlKnowsCertForSerial = buildSelectFirstSql("UID FROM CERT WHERE SN=? AND CA_ID=?");
+    this.sqlKnowsCertForSerial = buildSelectFirstSql("ID FROM CERT WHERE SN=? AND CA_ID=?");
     this.sqlCertStatusForSubjectFp = buildSelectFirstSql("REV FROM CERT WHERE FP_S=? AND CA_ID=?");
     this.sqlReqIdForSerial = buildSelectFirstSql("REQCERT.RID as REQ_ID FROM REQCERT INNER JOIN "
         + "CERT ON CERT.CA_ID=? AND CERT.SN=? AND REQCERT.CID=CERT.ID");
@@ -250,7 +229,7 @@ public class CertStore extends CertStoreBase {
     try {
       String privateKeyInfo = null;
       CertWithDbId cert = certInfo.getCert();
-      byte[] transactionId = certInfo.getTransactionId();
+      String tid = certInfo.getTransactionId();
       X500Name reqSubject = certInfo.getRequestedSubject();
 
       final long certId = idGenerator.nextId();
@@ -283,7 +262,6 @@ public class CertStore extends CertStoreBase {
 
       encodedCert = cert.getCert().getEncoded();
       String b64FpCert = HashAlgo.SHA1.base64Hash(encodedCert);
-      String tid = (transactionId == null) ? null : Base64.encodeToString(transactionId);
 
       X509Cert cert0 = cert.getCert();
       boolean isEeCert = cert0.getBasicConstraints() == -1;
@@ -307,9 +285,7 @@ public class CertStore extends CertStoreBase {
       columns.add(col2Int(certInfo.getProfile().getId()));
       columns.add(col2Int(certInfo.getIssuer().getId()));
       columns.add(col2Int(certInfo.getRequestor().getId()));
-      columns.add(col2Int(certInfo.getUser()));
       columns.add(col2Int(isEeCert ? 1 : 0));
-      columns.add(col2Int(certInfo.getReqType().getCode()));
       columns.add(col2Str(tid));
       columns.add(col2Str(b64FpCert));
       columns.add(col2Str(reqSubjectText));
@@ -966,49 +942,12 @@ public class CertStore extends CertStoreBase {
     return ret;
   } // method listCerts
 
-  public NameId authenticateUser(String user, byte[] password) throws OperationException {
-    ResultRow rs = execQuery1PrepStmt0(sqlActiveUserInfoForName, col2Str(user));
-    if (rs == null) {
-      return null;
-    }
-
-    int id = rs.getInt("ID");
-    String expPasswordText = rs.getString("PASSWORD");
-
-    if (StringUtil.isBlank(expPasswordText)) {
-      return null;
-    }
-
-    boolean valid = PasswordHash.validatePassword(password, expPasswordText);
-    return valid ? new NameId(id, user) : null;
-  } // method authenticateUser
-
-  public String getUsername(int id) throws OperationException {
-    ResultRow rs = execQuery1PrepStmt0(sqlActiveUserNameForId, col2Int(id));
-    return rs == null ? null : rs.getString("NAME");
-  } // method getUsername
-
-  public CaHasUserEntry getCaHasUser(NameId ca, NameId user) throws OperationException {
-    ResultRow rs = execQuery1PrepStmt0(sqlCaHasUser, col2Int(ca.getId()), col2Int(user.getId()));
-    if (rs == null) {
-      return null;
-    }
-
-    List<String> list = StringUtil.split(rs.getString("PROFILES"), ",");
-    Set<String> profiles = (list == null) ? null : new HashSet<>(list);
-
-    CaHasUserEntry entry = new CaHasUserEntry(user);
-    entry.setPermission(rs.getInt("PERMISSION"));
-    entry.setProfiles(profiles);
-    return entry;
-  } // method getCaHasUser
-
   public KnowCertResult knowsCertForSerial(NameId ca, BigInteger serial) throws OperationException {
     notNull(serial, "serial");
 
     ResultRow rs = execQuery1PrepStmt0(sqlKnowsCertForSerial,
                     col2Str(serial.toString(16)), col2Int(ca.getId()));
-    return rs == null ? KnowCertResult.UNKNOWN : new KnowCertResult(true, rs.getInt("UID"));
+    return rs == null ? KnowCertResult.UNKNOWN : new KnowCertResult(true);
   } // method knowsCertForSerial
 
   public List<CertRevInfoWithSerial> getRevokedCerts(NameId ca, Date notExpiredAt, long startId,

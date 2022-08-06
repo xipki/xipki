@@ -27,14 +27,14 @@ import org.xipki.ca.api.mgmt.CaConfType;
 import org.xipki.ca.api.mgmt.CaConfType.NameTypeConf;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.entry.*;
-import org.xipki.ca.server.PasswordHash;
-import org.xipki.ca.server.db.CaManagerQueryExecutor;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
 import org.xipki.util.Base64;
 import org.xipki.util.*;
+import org.xipki.util.exception.InvalidConfException;
+import org.xipki.util.exception.ObjectCreationException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -71,7 +71,6 @@ class ConfLoader {
     notNull(zippedConfStream, "zippedConfStream");
 
     SecurityFactory securityFactory = manager.securityFactory;
-    CaManagerQueryExecutor queryExecutor = manager.queryExecutor;
 
     CaConf conf;
     try {
@@ -144,19 +143,19 @@ class ConfLoader {
       RequestorEntry entryB = manager.getRequestor(name);
       if (entryB != null) {
         if (entry.equals(entryB, ignoreId)) {
-          LOG.info("ignore existed CMP requestor {}", name);
+          LOG.info("ignore existed cert-based requestor {}", name);
           continue;
         } else {
           throw logAndCreateException(
-              concat("CMP requestor ", name, " existed, could not re-added it"));
+              concat("cert-based requestor ", name, " existed, could not re-added it"));
         }
       }
 
       try {
         manager.addRequestor(entry);
-        LOG.info("added CMP requestor {}", name);
+        LOG.info("added cert-based requestor {}", name);
       } catch (CaMgmtException ex) {
-        String msg = concat("could not add CMP requestor ", name);
+        String msg = concat("could not add cert-based requestor ", name);
         LogUtil.error(LOG, ex, msg);
         throw new CaMgmtException(msg);
       }
@@ -205,43 +204,6 @@ class ConfLoader {
         LOG.info("added certprofile {}", name);
       } catch (CaMgmtException ex) {
         String msg = concat("could not add certprofile ", name);
-        LogUtil.error(LOG, ex, msg);
-        throw new CaMgmtException(msg);
-      }
-    }
-
-    // User
-    for (String name : conf.getUserNames()) {
-      Object obj = conf.getUser(name);
-      UserEntry entryB = queryExecutor.getUser(name, true);
-
-      if (entryB != null) {
-        boolean equals;
-        if (obj instanceof UserEntry) {
-          UserEntry entry = (UserEntry) obj;
-          equals = entry.equals(entryB, ignoreId);
-        } else {
-          AddUserEntry entry = (AddUserEntry) obj;
-          equals = PasswordHash.validatePassword(entry.getPassword(), entryB.getHashedPassword());
-        }
-
-        if (equals) {
-          LOG.info("ignore existed user {}", name);
-          continue;
-        } else {
-          throw logAndCreateException(concat("user ", name, " existed, could not re-added it"));
-        }
-      }
-
-      try {
-        if (obj instanceof UserEntry) {
-          queryExecutor.addUser((UserEntry) obj);
-        } else {
-          queryExecutor.addUser((AddUserEntry) obj);
-        }
-        LOG.info("added user {}", name);
-      } catch (CaMgmtException ex) {
-        String msg = concat("could not add user ", name);
         LogUtil.error(LOG, ex, msg);
         throw new CaMgmtException(msg);
       }
@@ -379,41 +341,6 @@ class ConfLoader {
           }
         }
       } // scc.getRequestors()
-
-      if (scc.getUsers() != null) {
-        List<CaHasUserEntry> usersB = queryExecutor.getCaHasUsersForCa(caName, manager.idNameMap);
-
-        for (CaHasUserEntry user : scc.getUsers()) {
-          String userName = user.getUserIdent().getName();
-          CaHasUserEntry userB = null;
-          if (usersB != null) {
-            for (CaHasUserEntry m : usersB) {
-              if (m.getUserIdent().getName().equals(userName)) {
-                userB = m;
-                break;
-              }
-            }
-          }
-
-          if (userB != null) {
-            if (user.equals(userB, ignoreId)) {
-              LOG.info("ignored adding user {} to CA {}", userName, caName);
-            } else {
-              throw logAndCreateException(
-                  concat("could not add user ", userName, " to CA", caName));
-            }
-          } else {
-            try {
-              manager.addUserToCa(user, caName);
-              LOG.info("added user {} to CA {}", userName, caName);
-            } catch (CaMgmtException ex) {
-              String msg = concat("could not add user ", userName, " to CA ", caName);
-              LogUtil.error(LOG, ex, msg);
-              throw new CaMgmtException(msg);
-            }
-          }
-        }
-      } // scc.getUsers()
     } // cas
 
     return generatedRootCerts.isEmpty() ? null : generatedRootCerts;
@@ -440,17 +367,10 @@ class ConfLoader {
     zipStream.setLevel(Deflater.BEST_SPEED);
 
     CaConfType.CaSystem root = new CaConfType.CaSystem();
-    CaManagerQueryExecutor queryExecutor = manager.queryExecutor;
 
     try {
-      Set<String> includeUserNames = new HashSet<>();
-
       // DBSchema
       root.setDbSchemas(manager.getDbSchemas());
-
-      // users
-      List<CaConfType.User> users = new LinkedList<>();
-      root.setUsers(users);
 
       // cas
       if (CollectionUtil.isNotEmpty(caNames)) {
@@ -479,43 +399,10 @@ class ConfLoader {
 
               CaConfType.CaHasRequestor chr = new CaConfType.CaHasRequestor();
               chr.setRequestorName(requestorName);
-              chr.setRa(m.isRa());
               chr.setProfiles(new ArrayList<>(m.getProfiles()));
               chr.setPermissions(getPermissions(m.getPermission()));
 
               ca.getRequestors().add(chr);
-            }
-          }
-
-          // CaHasUsers
-          List<CaHasUserEntry> caHasUsers = queryExecutor.getCaHasUsersForCa(name,
-              manager.idNameMap);
-          if (CollectionUtil.isNotEmpty(caHasUsers)) {
-            ca.setUsers(new ArrayList<>());
-
-            for (CaHasUserEntry m : caHasUsers) {
-              String username = m.getUserIdent().getName();
-              CaConfType.CaHasUser chu = new CaConfType.CaHasUser();
-              chu.setUserName(username);
-              chu.setProfiles(new ArrayList<>(m.getProfiles()));
-              chu.setPermissions(getPermissions(m.getPermission()));
-              ca.getUsers().add(chu);
-
-              if (includeUserNames.contains(username)) {
-                continue;
-              }
-
-              // add also the user to the users
-              UserEntry userEntry = queryExecutor.getUser(username);
-              CaConfType.User userType = new CaConfType.User();
-              if (!userEntry.isActive()) {
-                userType.setActive(Boolean.FALSE);
-              }
-              userType.setName(username);
-              userType.setHashedPassword(userEntry.getHashedPassword());
-              users.add(userType);
-
-              includeUserNames.add(username);
             }
           }
 
@@ -562,15 +449,6 @@ class ConfLoader {
             caInfoType.setCertchain(ccList);
           }
 
-          if (entry.getCmpControl() != null) {
-            caInfoType.setCmpControl(
-                new HashMap<>(new ConfPairs(entry.getCmpControl().getConf()).asMap()));
-          }
-
-          if (entry.getCmpResponderName() != null) {
-            caInfoType.setCmpResponderName(entry.getCmpResponderName());
-          }
-
           if (entry.getCrlControl() != null) {
             caInfoType.setCrlControl(
                 new HashMap<>(new ConfPairs(entry.getCrlControl().getConf()).asMap()));
@@ -585,13 +463,6 @@ class ConfLoader {
                 new HashMap<>(new ConfPairs(entry.getCtlogControl().getConf()).asMap()));
           }
 
-          if (entry.getPopControl() != null) {
-            FileOrValue fv = createFileOrValue(
-                zipStream, entry.getPopControl().getConf(),
-                concat("files/ca-", name, "-pop.conf"));
-            caInfoType.setPopControl(fv);
-          }
-
           caInfoType.setExpirationPeriod(entry.getExpirationPeriod());
           if (entry.getExtraControl() != null) {
             caInfoType.setExtraControl(entry.getExtraControl().asMap());
@@ -603,9 +474,6 @@ class ConfLoader {
           caInfoType.setNumCrls(entry.getNumCrls());
           caInfoType.setPermissions(getPermissions(entry.getPermission()));
 
-          caInfoType.setProtocolSupport(
-              StringUtil.splitAsSet(entry.getProtocoSupport().getEncoded(), ","));
-
           if (entry.getRevokeSuspendedControl() != null) {
             caInfoType.setRevokeSuspendedControl(
                 new HashMap<>(new ConfPairs(entry.getRevokeSuspendedControl().getConf()).asMap()));
@@ -614,15 +482,6 @@ class ConfLoader {
           caInfoType.setSaveCert(entry.isSaveCert());
           caInfoType.setSaveRequest(entry.isSaveRequest());
           caInfoType.setSaveKeyPair(entry.isSaveKeypair());
-
-          if (entry.getScepControl() != null) {
-            caInfoType.setScepControl(
-                new HashMap<>(new ConfPairs(entry.getScepControl().getConf()).asMap()));
-          }
-
-          if (entry.getScepResponderName() != null) {
-            caInfoType.setScepResponderName(entry.getScepResponderName());
-          }
 
           if (entry.getKeypairGenNames() != null) {
             caInfoType.setKeypairGenNames(entry.getKeypairGenNames());
@@ -642,11 +501,6 @@ class ConfLoader {
         if (!list.isEmpty()) {
           root.setCas(list);
         }
-      }
-
-      // clear the users if the list is empty
-      if (users.isEmpty()) {
-        root.setUsers(null);
       }
 
       // requestors

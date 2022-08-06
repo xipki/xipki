@@ -19,7 +19,7 @@ package org.xipki.qa.ca;
 
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.FileOrValue;
-import org.xipki.util.InvalidConfException;
+import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 
 import java.util.LinkedList;

@@ -28,6 +28,7 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
+import org.xipki.util.exception.InvalidConfException;
 
 import java.io.File;
 import java.io.IOException;
@@ -189,7 +190,7 @@ class CaCertstoreDbExporter extends DbPorter {
     switch (type) {
       case CERT:
         numProcessedBefore = certstore.getCountCerts();
-        String columns = "ID,SN,CA_ID,PID,RID,RTYPE,TID,UID,EE,LUPDATE,REV,RR,RT,RIT,FP_RS,"
+        String columns = "ID,SN,CA_ID,PID,RID,TID,EE,LUPDATE,REV,RR,RT,RIT,FP_RS,"
             + "REQ_SUBJECT,CRL_SCOPE,CERT";
         if (dbSchemaVersion >= 7) {
           columns += ",PRIVATE_KEY";
@@ -325,7 +326,6 @@ class CaCertstoreDbExporter extends DbPorter {
             }
 
             cert.setPid(rs.getInt("PID"));
-            cert.setReqType(rs.getInt("RTYPE"));
             cert.setRid(rs.getInt("RID"));
             cert.setSn(rs.getString("SN"));
 
@@ -334,10 +334,6 @@ class CaCertstoreDbExporter extends DbPorter {
               cert.setTid(str);
             }
 
-            int userId = rs.getInt("UID");
-            if (userId != 0) {
-              cert.setUid(userId);
-            }
             cert.setUpdate(rs.getLong("LUPDATE"));
 
             int revoked = rs.getInt("REV");

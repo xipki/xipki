@@ -23,8 +23,8 @@ import org.bouncycastle.asn1.x509.CertificatePolicies;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.xipki.ca.api.BadCertTemplateException;
-import org.xipki.ca.api.BadFormatException;
+import org.xipki.util.exception.BadCertTemplateException;
+import org.xipki.util.exception.BadFormatException;
 import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.KeyUsage;
@@ -534,6 +534,7 @@ public abstract class Certprofile implements Closeable {
 
   } // class SubjectInfo
 
+  @Deprecated
   public boolean isOnlyForRa() {
     return false;
   }

@@ -32,7 +32,7 @@ import io.netty.handler.timeout.WriteTimeoutHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.InvalidConfException;
+import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.LogUtil;
 import org.xipki.util.ValidatableConf;
 import org.xipki.util.concurrent.CountLatch;

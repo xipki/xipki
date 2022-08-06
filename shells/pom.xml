@@ -15,7 +15,7 @@
   <modules>
     <module>shell-base</module>
     <module>security-shell</module>
-    <module>cmpclient-shell</module>
+    <module>cmp-client-shell</module>
     <module>ocsp-client-shell</module>
     <module>scep-client-shell</module>
     <module>ca-mgmt-shell</module>

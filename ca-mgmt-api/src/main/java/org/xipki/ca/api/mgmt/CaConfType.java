@@ -19,7 +19,7 @@ package org.xipki.ca.api.mgmt;
 
 import org.xipki.util.FileOrBinary;
 import org.xipki.util.FileOrValue;
-import org.xipki.util.InvalidConfException;
+import org.xipki.util.exception.InvalidConfException;
 import org.xipki.util.ValidatableConf;
 
 import java.util.*;
@@ -65,8 +65,6 @@ public class CaConfType {
     private List<NameTypeConf> keypairGens;
 
     private List<Ca> cas;
-
-    private List<User> users;
 
     public String getBasedir() {
       return basedir;
@@ -164,17 +162,6 @@ public class CaConfType {
       this.cas = cas;
     }
 
-    public List<User> getUsers() {
-      if (users == null) {
-        users = new LinkedList<>();
-      }
-      return users;
-    }
-
-    public void setUsers(List<User> users) {
-      this.users = users;
-    }
-
     @Override
     public void validate()
         throws InvalidConfException {
@@ -183,7 +170,6 @@ public class CaConfType {
       validate(publishers);
       validate(profiles);
       validate(cas);
-      validate(users);
     } // methdo validate
 
   } // class CaSystem
@@ -191,8 +177,6 @@ public class CaConfType {
   public static class CaHasRequestor extends ValidatableConf {
 
     private String requestorName;
-
-    private boolean ra;
 
     private List<String> permissions;
 
@@ -204,14 +188,6 @@ public class CaConfType {
 
     public void setRequestorName(String requestorName) {
       this.requestorName = requestorName;
-    }
-
-    public boolean isRa() {
-      return ra;
-    }
-
-    public void setRa(boolean ra) {
-      this.ra = ra;
     }
 
     public List<String> getPermissions() {
@@ -245,53 +221,6 @@ public class CaConfType {
 
   } // class CaHasRequestor
 
-  public static class CaHasUser extends ValidatableConf {
-
-    private String userName;
-
-    private List<String> permissions;
-
-    private List<String> profiles;
-
-    public String getUserName() {
-      return userName;
-    }
-
-    public void setUserName(String userName) {
-      this.userName = userName;
-    }
-
-    public List<String> getPermissions() {
-      if (permissions == null) {
-        permissions = new LinkedList<>();
-      }
-      return permissions;
-    }
-
-    public void setPermissions(List<String> permissions) {
-      this.permissions = permissions;
-    }
-
-    public List<String> getProfiles() {
-      if (profiles == null) {
-        profiles = new LinkedList<>();
-      }
-      return profiles;
-    }
-
-    public void setProfiles(List<String> profiles) {
-      this.profiles = profiles;
-    }
-
-    @Override
-    public void validate()
-        throws InvalidConfException {
-      notBlank(userName, "userName");
-      notEmpty(permissions, "permissions");
-    }
-
-  } // class CaHasUser
-
   public static class CaInfo extends ValidatableConf {
 
     /**
@@ -319,27 +248,15 @@ public class CaConfType {
 
     private String maxValidity;
 
-    private Map<String, Object> cmpControl;
-
     private Map<String, Object> crlControl;
-
-    private Map<String, Object> scepControl;
 
     private Map<String, Object> ctlogControl;
 
     private Map<String, Object> revokeSuspendedControl;
 
-    private FileOrValue popControl;
-
-    private String cmpResponderName;
-
-    private String scepResponderName;
-
     private String crlSignerName;
 
     private List<String> keypairGenNames;
-
-    private Set<String> protocolSupport;
 
     private boolean saveCert = true;
 
@@ -433,28 +350,12 @@ public class CaConfType {
       this.maxValidity = maxValidity;
     }
 
-    public Map<String, Object> getCmpControl() {
-      return cmpControl;
-    }
-
-    public void setCmpControl(Map<String, Object> cmpControl) {
-      this.cmpControl = cmpControl;
-    }
-
     public Map<String, Object> getCrlControl() {
       return crlControl;
     }
 
     public void setCrlControl(Map<String, Object> crlControl) {
       this.crlControl = crlControl;
-    }
-
-    public Map<String, Object> getScepControl() {
-      return scepControl;
-    }
-
-    public void setScepControl(Map<String, Object> scepControl) {
-      this.scepControl = scepControl;
     }
 
     public Map<String, Object> getCtlogControl() {
@@ -473,30 +374,6 @@ public class CaConfType {
       this.revokeSuspendedControl = revokeSuspendedControl;
     }
 
-    public FileOrValue getPopControl() {
-      return popControl;
-    }
-
-    public void setPopControl(FileOrValue popControl) {
-      this.popControl = popControl;
-    }
-
-    public String getCmpResponderName() {
-      return cmpResponderName;
-    }
-
-    public void setCmpResponderName(String cmpResponderName) {
-      this.cmpResponderName = cmpResponderName;
-    }
-
-    public String getScepResponderName() {
-      return scepResponderName;
-    }
-
-    public void setScepResponderName(String scepResponderName) {
-      this.scepResponderName = scepResponderName;
-    }
-
     public String getCrlSignerName() {
       return crlSignerName;
     }
@@ -511,14 +388,6 @@ public class CaConfType {
 
     public void setKeypairGenNames(List<String> keypairGenNames) {
       this.keypairGenNames = keypairGenNames;
-    }
-
-    public Set<String> getProtocolSupport() {
-      return protocolSupport;
-    }
-
-    public void setProtocolSupport(Set<String> protocolSupport) {
-      this.protocolSupport = protocolSupport;
     }
 
     public boolean isSaveRequest() {
@@ -622,7 +491,6 @@ public class CaConfType {
       validate(genSelfIssued);
       validate(cert);
       notBlank(maxValidity, "maxValidity");
-      notEmpty(protocolSupport, "protocolSupport");
       notBlank(signerType, "signerType");
       notNull(signerConf, "signerConf");
       validate(signerConf);
@@ -643,8 +511,6 @@ public class CaConfType {
     private List<String> profiles;
 
     private List<CaHasRequestor> requestors;
-
-    private List<CaHasUser> users;
 
     private List<String> publishers;
 
@@ -697,17 +563,6 @@ public class CaConfType {
       this.requestors = requestors;
     }
 
-    public List<CaHasUser> getUsers() {
-      if (users == null) {
-        users = new LinkedList<>();
-      }
-      return users;
-    }
-
-    public void setUsers(List<CaHasUser> users) {
-      this.users = users;
-    }
-
     public List<String> getPublishers() {
       if (publishers == null) {
         publishers = new LinkedList<>();
@@ -725,7 +580,6 @@ public class CaConfType {
       notBlank(name, "name");
       validate(caInfo);
       validate(requestors);
-      validate(users);
     }
 
   } // class Ca
@@ -980,57 +834,5 @@ public class CaConfType {
     }
 
   } // class Signer
-
-  public static class User extends ValidatableConf {
-
-    private String name;
-
-    // Default to true
-    private Boolean active;
-
-    private String password;
-
-    private String hashedPassword;
-
-    public boolean isActive() {
-      return active == null || active;
-    }
-
-    public String getName() {
-      return name;
-    }
-
-    public void setName(String name) {
-      this.name = name;
-    }
-
-    public void setActive(Boolean active) {
-      this.active = active;
-    }
-
-    public String getPassword() {
-      return password;
-    }
-
-    public void setPassword(String password) {
-      this.password = password;
-    }
-
-    public String getHashedPassword() {
-      return hashedPassword;
-    }
-
-    public void setHashedPassword(String hashedPassword) {
-      this.hashedPassword = hashedPassword;
-    }
-
-    @Override
-    public void validate()
-        throws InvalidConfException {
-      notBlank(name, "name");
-      exactOne(password, "password", hashedPassword, "hashedPassword");
-    }
-
-  } // class User
 
 }

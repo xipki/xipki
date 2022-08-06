@@ -2,14 +2,15 @@
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="pki-${project.version}"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
+  <repository>mvn:org.xipki.feature/mgmt-cli/${project.version}/xml/features</repository>
   <repository>mvn:org.xipki.feature/cli/${project.version}/xml/features</repository>
   <feature name="netty-tcnative" version="${netty-tcnative.version}" description="netty-tcnative">
     <bundle>mvn:io.netty/netty-tcnative-boringssl-static/${netty-tcnative.version}</bundle>
   </feature>
   <feature name="xipki-qa" version="${project.version}" description="QA">
-    <feature>xipki-camgmt</feature>
-    <feature>xipki-ocspclient</feature>
-    <feature>xipki-caclient</feature>
+    <feature>xipki-ca-mgmt</feature>
+    <feature>xipki-ocsp-client</feature>
+    <feature>xipki-cmp-client</feature>
     <bundle>mvn:io.netty/netty-common/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-codec/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-codec-http/${netty.version}</bundle>

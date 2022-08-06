@@ -68,27 +68,15 @@ public class CaEntry extends MgmtEntry {
 
   private String signerConf;
 
-  private PopControl popControl;
-
-  private ScepControl scepControl;
-
   private CrlControl crlControl;
 
   private String crlSignerName;
-
-  private CmpControl cmpControl;
 
   private CtlogControl ctlogControl;
 
   private RevokeSuspendedControl revokeSuspendedControl;
 
-  private String cmpResponderName;
-
-  private String scepResponderName;
-
   private List<String> keypairGenNames;
-
-  private ProtocolSupport protocolSupport;
 
   private boolean saveRequest;
 
@@ -217,36 +205,12 @@ public class CaEntry extends MgmtEntry {
     return signerType;
   }
 
-  public void setCmpControl(CmpControl cmpControl) {
-    this.cmpControl = cmpControl;
-  }
-
-  public CmpControl getCmpControl() {
-    return cmpControl;
-  }
-
   public void setCrlControl(CrlControl crlControl) {
     this.crlControl = crlControl;
   }
 
   public CrlControl getCrlControl() {
     return crlControl;
-  }
-
-  public synchronized PopControl getPopControl() {
-    return popControl;
-  }
-
-  public void setPopControl(PopControl popControl) {
-    this.popControl = popControl;
-  }
-
-  public void setScepControl(ScepControl scepControl) {
-    this.scepControl = scepControl;
-  }
-
-  public ScepControl getScepControl() {
-    return scepControl;
   }
 
   public CtlogControl getCtlogControl() {
@@ -265,22 +229,6 @@ public class CaEntry extends MgmtEntry {
     this.revokeSuspendedControl = revokeSuspendedControl;
   }
 
-  public String getCmpResponderName() {
-    return cmpResponderName;
-  }
-
-  public void setCmpResponderName(String cmpResponderName) {
-    this.cmpResponderName = (cmpResponderName == null) ? null : cmpResponderName.toLowerCase();
-  }
-
-  public String getScepResponderName() {
-    return scepResponderName;
-  }
-
-  public void setScepResponderName(String scepResponderName) {
-    this.scepResponderName = (scepResponderName == null) ? null : scepResponderName.toLowerCase();
-  }
-
   public String getCrlSignerName() {
     return crlSignerName;
   }
@@ -296,14 +244,6 @@ public class CaEntry extends MgmtEntry {
   public void setKeypairGenNames(List<String> keypairGenNames) {
     this.keypairGenNames = (keypairGenNames == null)
             ? null : CollectionUtil.toLowerCaseList(keypairGenNames);
-  }
-
-  public ProtocolSupport getProtocoSupport() {
-    return protocolSupport;
-  }
-
-  public void setProtocolSupport(ProtocolSupport protocolSupport) {
-    this.protocolSupport = protocolSupport;
   }
 
   public boolean isSaveRequest() {
@@ -416,20 +356,12 @@ public class CaEntry extends MgmtEntry {
         "\nsigner type: ", signerType,
         "\nsigner conf: ", (signerConf == null ? "null"
             : SignerEntry.signerConfToString(signerConf, verbose, ignoreSensitiveInfo)),
-        "\nPOP control: ", (popControl == null ? "null"
-            : SignerEntry.signerConfToString(popControl.getConf(),
-                verbose, ignoreSensitiveInfo)),
-        "\nCMP control:\n", (cmpControl == null ? "  null" : cmpControl.toString(verbose)),
         "\nCRL control:\n", (crlControl == null ? "  null" : crlControl.toString(verbose)),
-        "\nSCEP control: \n", (scepControl == null ? "  null" : scepControl.toString(verbose)),
-        "\nCTLog control: \n", (ctlogControl == null ? "  null" : ctlogControl.toString()),
+        "\nCTLog control:\n", (ctlogControl == null ? "  null" : ctlogControl.toString()),
         "\nrevoke suspended certificates control: \n",
             (revokeSuspendedControl == null ? "  null" : revokeSuspendedControl.toString()),
-        "\nCMP responder name: ", cmpResponderName,
-        "\nSCEP responder name: ", scepResponderName,
         "\nCRL signer name: ", crlSignerName,
         "\nKeyPair generation names: ", keypairGenNames,
-        "\n", protocolSupport,
         "\nsave certificate: ", saveCert,
         "\nsave request: ", saveRequest,
         "\nsave keypair: ", saveKeypair,
@@ -484,12 +416,9 @@ public class CaEntry extends MgmtEntry {
     return CompareUtil.equalsObject(caUris, obj.caUris)
         && CompareUtil.equalsObject(cert, obj.cert)
         && CompareUtil.equalsObject(certchain, obj.certchain)
-        && CompareUtil.equalsObject(cmpControl, obj.cmpControl)
-        && CompareUtil.equalsObject(cmpResponderName, obj.cmpResponderName)
         && CompareUtil.equalsObject(crlControl, obj.crlControl)
         && CompareUtil.equalsObject(crlSignerName, obj.crlSignerName)
         && CompareUtil.equalsObject(ctlogControl, obj.ctlogControl)
-        && CompareUtil.equalsObject(popControl, obj.popControl)
         && (expirationPeriod == obj.expirationPeriod)
         && CompareUtil.equalsObject(extraControl, obj.extraControl)
         && ident.equals(obj.ident, ignoreId)
@@ -498,14 +427,11 @@ public class CaEntry extends MgmtEntry {
         // ignore dynamic field nextCrlNumber
         && (numCrls == obj.numCrls)
         && (permission == obj.permission)
-        && CompareUtil.equalsObject(protocolSupport, obj.protocolSupport)
         && CompareUtil.equalsObject(revocationInfo, obj.revocationInfo)
         && CompareUtil.equalsObject(revokeSuspendedControl, obj.revokeSuspendedControl)
         && (saveCert == obj.saveCert)
         && (saveRequest == obj.saveRequest)
         && (saveKeypair == obj.saveKeypair)
-        && CompareUtil.equalsObject(scepControl, obj.scepControl)
-        && CompareUtil.equalsObject(scepResponderName, obj.scepResponderName)
         && CompareUtil.equalsObject(keypairGenNames, obj.keypairGenNames)
         && (serialNoLen == obj.serialNoLen)
         && signerType.equals(obj.signerType)

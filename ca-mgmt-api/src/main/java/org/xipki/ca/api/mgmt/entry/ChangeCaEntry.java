@@ -46,31 +46,15 @@ public class ChangeCaEntry extends MgmtEntry {
 
   private String signerConf;
 
-  private String cmpControl;
-
   private String crlControl;
-
-  private String scepControl;
 
   private String ctlogControl;
 
-  private String popControl;
-
   private String revokeSuspendedControl;
-
-  private String cmpResponderName;
-
-  private String scepResponderName;
 
   private String crlSignerName;
 
   private List<String> keypairGenNames;
-
-  private Boolean supportCmp;
-
-  private Boolean supportRest;
-
-  private Boolean supportScep;
 
   private Boolean saveCert;
 
@@ -147,28 +131,12 @@ public class ChangeCaEntry extends MgmtEntry {
     this.signerConf = signerConf;
   }
 
-  public String getCmpControl() {
-    return cmpControl;
-  }
-
-  public void setCmpControl(String cmpControl) {
-    this.cmpControl = cmpControl;
-  }
-
   public String getCrlControl() {
     return crlControl;
   }
 
   public void setCrlControl(String crlControl) {
     this.crlControl = crlControl;
-  }
-
-  public String getScepControl() {
-    return scepControl;
-  }
-
-  public void setScepControl(String scepControl) {
-    this.scepControl = scepControl;
   }
 
   public String getCtlogControl() {
@@ -185,30 +153,6 @@ public class ChangeCaEntry extends MgmtEntry {
 
   public void setRevokeSuspendedControl(String revokeSuspendedControl) {
     this.revokeSuspendedControl = revokeSuspendedControl;
-  }
-
-  public String getPopControl() {
-    return popControl;
-  }
-
-  public void setPopControl(String popControl) {
-    this.popControl = popControl;
-  }
-
-  public String getCmpResponderName() {
-    return cmpResponderName;
-  }
-
-  public void setCmpResponderName(String responderName) {
-    this.cmpResponderName = (responderName == null) ? null : responderName.toLowerCase();
-  }
-
-  public String getScepResponderName() {
-    return scepResponderName;
-  }
-
-  public void setScepResponderName(String responderName) {
-    this.scepResponderName = (responderName == null) ? null : responderName.toLowerCase();
   }
 
   public String getCrlSignerName() {
@@ -234,30 +178,6 @@ public class ChangeCaEntry extends MgmtEntry {
 
   public void setValidityMode(ValidityMode validityMode) {
     this.validityMode = validityMode;
-  }
-
-  public Boolean getSupportCmp() {
-    return supportCmp;
-  }
-
-  public void setSupportCmp(Boolean supportCmp) {
-    this.supportCmp = supportCmp;
-  }
-
-  public Boolean getSupportRest() {
-    return supportRest;
-  }
-
-  public void setSupportRest(Boolean supportRest) {
-    this.supportRest = supportRest;
-  }
-
-  public Boolean getSupportScep() {
-    return supportScep;
-  }
-
-  public void setSupportScep(Boolean supportScep) {
-    this.supportScep = supportScep;
   }
 
   public Boolean getSaveCert() {

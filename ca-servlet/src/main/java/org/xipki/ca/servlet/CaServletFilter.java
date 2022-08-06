@@ -27,6 +27,7 @@ import org.xipki.ca.api.publisher.CertPublisherFactoryRegister;
 import org.xipki.ca.certprofile.xijson.CertprofileFactoryImpl;
 import org.xipki.ca.server.CaServerConf;
 import org.xipki.ca.server.CaServerConf.RemoteMgmt;
+import org.xipki.ca.server.SdkResponder;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.ca.server.publisher.OcspCertPublisherFactory;
 import org.xipki.license.api.LicenseFactory;
@@ -34,6 +35,7 @@ import org.xipki.security.Securities;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.*;
+import org.xipki.util.exception.InvalidConfException;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -61,13 +63,7 @@ public class CaServletFilter implements Filter {
 
   private CaManagerImpl caManager;
 
-  private HealthCheckServlet healthServlet;
-
-  private HttpCmpServlet cmpServlet;
-
-  private HttpRestServlet restServlet;
-
-  private HttpScepServlet scepServlet;
+  private HttpRaServlet raServlet;
 
   private boolean remoteMgmtEnabled;
 
@@ -88,8 +84,7 @@ public class CaServletFilter implements Filter {
           "could not parse CA configuration file " + DFLT_CA_SERVER_CFG, ex);
     }
 
-    String str = filterConfig.getInitParameter("logReqResp");
-    logReqResp = Boolean.parseBoolean(str);
+    logReqResp = conf.isLogReqResp();
     LOG.info("logReqResp: {}", logReqResp);
 
     AuditConf audit = conf.getAudit();
@@ -102,7 +97,7 @@ public class CaServletFilter implements Filter {
     try {
       securities.init(conf.getSecurity());
     } catch (IOException | InvalidConfException ex) {
-      throw new ServletException("could not initialize Securites", ex);
+      throw new ServletException("could not initialize Securities", ex);
     }
 
     int shardId = conf.getShardId();
@@ -118,7 +113,7 @@ public class CaServletFilter implements Filter {
       throw new ServletException("could not AuditService");
     }
 
-    str = filterConfig.getInitParameter("licenseFactory");
+    String str = filterConfig.getInitParameter("licenseFactory");
     LOG.info("Use licenseFactory: {}", str);
     try {
       licenseFactory = (LicenseFactory) Class.forName(str).getDeclaredConstructor().newInstance();
@@ -142,20 +137,10 @@ public class CaServletFilter implements Filter {
 
     caManager.startCaSystem();
 
-    this.cmpServlet = new HttpCmpServlet();
-    this.cmpServlet.setResponderManager(caManager);
-    this.cmpServlet.setLogReqResp(logReqResp);
-
-    this.healthServlet = new HealthCheckServlet();
-    this.healthServlet.setResponderManager(caManager);
-
-    this.restServlet = new HttpRestServlet();
-    this.restServlet.setResponderManager(caManager);
-    this.restServlet.setLogReqResp(logReqResp);
-
-    this.scepServlet = new HttpScepServlet();
-    this.scepServlet.setResponderManager(caManager);
-    this.scepServlet.setLogReqResp(logReqResp);
+    SdkResponder responder = new SdkResponder(caManager);
+    this.raServlet = new HttpRaServlet();
+    this.raServlet.setResponder(responder);
+    this.raServlet.setLogReqResp(logReqResp);
 
     RemoteMgmt remoteMgmt = conf.getRemoteMgmt();
     this.remoteMgmtEnabled = remoteMgmt != null && remoteMgmt.isEnabled();
@@ -226,18 +211,9 @@ public class CaServletFilter implements Filter {
     HttpServletResponse res = (HttpServletResponse) response;
 
     String path = req.getServletPath();
-    if (path.startsWith("/cmp/")) {
-      req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(4)); // 4 = "/cmp".length()
-      cmpServlet.service(req, res);
-    } else if (path.startsWith("/rest/")) {
-      req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(5)); // 5 = "/rest".length()
-      restServlet.service(req, res);
-    } else if (path.startsWith("/scep/")) {
-      req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(5)); // 5 = "/scep".length()
-      scepServlet.service(req, res);
-    } else if (path.startsWith("/health/")) {
-      req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(7)); // 7 = "/health".length()
-      healthServlet.service(req, res);
+    if (path.startsWith("/ra/")) {
+      req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(3)); // 3 = "/ra".length()
+      raServlet.service(req, res);
     } else if (path.startsWith("/mgmt/")) {
       if (remoteMgmtEnabled) {
         req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(5)); // 5 = "/mgmt".length()
@@ -264,10 +240,9 @@ public class CaServletFilter implements Filter {
       for (String className : factories) {
         try {
           Class<?> clazz = Class.forName(className);
-          CertprofileFactory factory = (CertprofileFactory) clazz.newInstance();
+          CertprofileFactory factory = (CertprofileFactory) clazz.getConstructor().newInstance();
           certprofileFactoryRegister.registFactory(factory);
-        } catch (ClassCastException | ClassNotFoundException | IllegalAccessException
-            | InstantiationException ex) {
+        } catch (Exception ex) {
           LOG.error("error caught while initializing CertprofileFactory "
               + className + ": " + ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }

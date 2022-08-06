@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.security.*;
 import org.xipki.util.BenchmarkExecutor;
 import org.xipki.util.ConfPairs;
-import org.xipki.util.ObjectCreationException;
+import org.xipki.util.exception.ObjectCreationException;
 import org.xipki.util.RandomUtil;
 
 import java.security.NoSuchAlgorithmException;

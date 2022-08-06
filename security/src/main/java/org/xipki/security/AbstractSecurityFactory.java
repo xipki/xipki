@@ -21,7 +21,7 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.xipki.util.Args;
-import org.xipki.util.ObjectCreationException;
+import org.xipki.util.exception.ObjectCreationException;
 
 import java.security.InvalidKeyException;
 import java.security.PublicKey;

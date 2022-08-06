@@ -17,8 +17,6 @@
 
 package org.xipki.ocsp.api;
 
-import org.xipki.util.HealthCheckResult;
-
 import java.io.Closeable;
 
 /**
@@ -34,5 +32,5 @@ public interface OcspServer extends Closeable {
 
   OcspRespWithCacheInfo answer(Responder responder, byte[] request, boolean viaGet);
 
-  HealthCheckResult healthCheck(Responder responder);
+  boolean healthCheck(Responder responder);
 }
