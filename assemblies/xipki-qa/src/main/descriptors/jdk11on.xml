@@ -149,17 +149,26 @@
       <directory>${project.build.directory}/xipki-ocsp-${project.version}/</directory>
       <outputDirectory>xipki-ocsp</outputDirectory>
     </fileSet>
+    <!-- Copy xipki-cmp-gateway -->
+    <fileSet>
+      <directory>${project.build.directory}/xipki-cmp-gateway-${project.version}/</directory>
+      <outputDirectory>xipki-cmp-gateway</outputDirectory>
+    </fileSet>
+    <!-- Copy xipki-scep-gateway -->
+    <fileSet>
+      <directory>${project.build.directory}/xipki-scep-gateway-${project.version}/</directory>
+      <outputDirectory>xipki-scep-gateway</outputDirectory>
+    </fileSet>
+    <!-- Copy xipki-rest-gateway -->
+    <fileSet>
+      <directory>${project.build.directory}/xipki-rest-gateway-${project.version}/</directory>
+      <outputDirectory>xipki-rest-gateway</outputDirectory>
+    </fileSet>
   </fileSets>
   <files>
     <file>
       <source>README.md</source>
       <outputDirectory>.</outputDirectory>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
-      <source>src/main/unfiltered/xipki/cmpclient/template.cmpclient-signature.json</source>
-      <outputDirectory>xipki/cmpclient</outputDirectory>
-      <destName>template.cmpclient.json</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>

@@ -16,7 +16,7 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.xipki.protocol</groupId>
+      <groupId>org.xipki.gateway</groupId>
       <artifactId>scep-gateway</artifactId>
       <version>${project.version}</version>
       <type>war</type>
@@ -79,7 +79,7 @@
               <stripVersion>true</stripVersion>
               <artifactItems>
                 <artifactItem>
-                  <groupId>org.xipki.protocol</groupId>
+                  <groupId>org.xipki.gateway</groupId>
                   <artifactId>scep-gateway</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>

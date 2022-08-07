@@ -1,7 +1,7 @@
 {
 	// If set to true, please set writer.level to debug in the file META-INF/classes/tinylog.properties.
 	"logReqResp": false,
-	"authenticator":"org.xipki.ca.protocol.dummy.DummyRequestorAuthenticator",
+	"authenticator":"org.xipki.ca.gateway.dummy.DummyRequestorAuthenticator",
 	"pop":{
 		"sigAlgos":[
 			"SHA256withRSA", "SHA256withECDSA", "SHA256withDSA",
@@ -9,7 +9,7 @@
 		]
 	},
 	"sdkClient": {
-		"serverUrl":"https://localhost:8443/ca/",
+		"serverUrl":"https://localhost:8444/ca/ra/",
 		"ssl":{
 			"storeType":"pkcs12",
 			"keystorePassword":"1234",

@@ -65,15 +65,6 @@ public class XiHttpClient {
     Args.notNull(url, "url");
     try {
       HttpURLConnection httpConn = openHttpConn(new URL(url));
-      if (httpConn instanceof HttpsURLConnection) {
-        if (sslSocketFactory != null) {
-          ((HttpsURLConnection) httpConn).setSSLSocketFactory(sslSocketFactory);
-        }
-        if (hostnameVerifier != null) {
-          ((HttpsURLConnection) httpConn).setHostnameVerifier(hostnameVerifier);
-        }
-      }
-
       httpConn.setRequestMethod("GET");
       return parseResponse(httpConn);
     } catch (IOException ex) {
@@ -110,10 +101,10 @@ public class XiHttpClient {
     Args.notNull(url, "url");
     try {
       HttpURLConnection httpConn = openHttpConn(new URL(url));
+      httpConn.setRequestMethod("POST");
       httpConn.setDoOutput(true);
       httpConn.setUseCaches(false);
 
-      httpConn.setRequestMethod("POST");
       if (request != null) {
         if (requestContentType != null) {
           httpConn.setRequestProperty("Content-Type", requestContentType);
@@ -152,15 +143,24 @@ public class XiHttpClient {
     }
   } // method parseResponse
 
-  private static HttpURLConnection openHttpConn(URL url)
+  private HttpURLConnection openHttpConn(URL url)
       throws IOException {
     Args.notNull(url, "url");
     URLConnection conn = url.openConnection();
-    if (conn instanceof HttpURLConnection) {
-      return (HttpURLConnection) conn;
+    if (!(conn instanceof HttpURLConnection)) {
+      throw new IOException(url.toString() + " is not of protocol HTTP: " + url.getProtocol());
     }
 
-    throw new IOException(url.toString() + " is not of protocol HTTP: " + url.getProtocol());
+    if (conn instanceof HttpsURLConnection) {
+      if (sslSocketFactory != null) {
+        ((HttpsURLConnection) conn).setSSLSocketFactory(sslSocketFactory);
+      }
+      if (hostnameVerifier != null) {
+        ((HttpsURLConnection) conn).setHostnameVerifier(hostnameVerifier);
+      }
+    }
+
+    return (HttpURLConnection) conn;
   }
 
 }

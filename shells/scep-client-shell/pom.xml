@@ -16,7 +16,7 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.xipki</groupId>
+      <groupId>org.xipki.gateway</groupId>
       <artifactId>scep-client</artifactId>
       <version>${project.version}</version>
     </dependency>

@@ -10,7 +10,7 @@ import com.alibaba.fastjson.JSON;
 
 public abstract class SdkMessage {
 
-  public byte[] getEncoded() {
+  public byte[] encode() {
     return JSON.toJSONBytes(this);
   }
 

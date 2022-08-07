@@ -6,7 +6,7 @@ Migration
 
 Deployment in Tomcat 8 and 9
 ----
-1. Copy the sub-folders `bin`, `webapps` and `xipki` to the tomcat root folder
+1. Copy the sub-folders `bin`, `webapps`, `xipki` and `lib` to the tomcat root folder
   The folder `xipki` can be moved to other location, in this case the java property `XIPKI_BASE` in
   `setenv.sh` and `setenv.bat` must be adapted to point to the new position.
 2. Configure the TLS listener in the file `conf/server.xml`

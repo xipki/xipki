@@ -1,6 +1,6 @@
 {
 	"responder":{
-		"url":"https://localhost:8443/ca/cmp/myca",
+		"url":"https://localhost:8445/cmp/",
 		"pbmMac": {
 			"macAlgos":["HMAC-SHA256"],
 			"owfAlgos":["SHA256"]

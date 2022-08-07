@@ -13,7 +13,7 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>org.xipki</groupId>
+      <groupId>org.xipki.gateway</groupId>
       <artifactId>scep-client</artifactId>
       <version>${project.version}</version>
     </dependency>

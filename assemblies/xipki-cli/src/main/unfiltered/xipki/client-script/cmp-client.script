@@ -1,5 +1,6 @@
 printUsage = "false"
 ocsp = "false"
+CA = "myca"
 
 if { "$1" equals "" } then {
   printUsage = "false"
@@ -21,8 +22,6 @@ echo "# Reset CMP client (only required if CA changed the             #"
 echo "# configuration since last reset / initialization)              #"
 echo "#################################################################"
 
-xi:cmp-init
-
 HASH = SHA256
 
 echo "#################################################################"
@@ -37,10 +36,10 @@ CACERT = ${OUT_DIR}/cacert.der
 
 echo "# Get CA certificate"
 
-xi:cmp-cacert \
+xi:cmp-cacert -ca ${CA} \
   --out ${CACERT}
 
-xi:cmp-cacertchain \
+xi:cmp-cacertchain -ca ${CA} \
   --out ${OUT_DIR}/cacertchain.pem
 
 ## Enroll certificates (profile smime)
@@ -52,11 +51,13 @@ CN = cmp-crmf-smime
 xi:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}.p12" \
   --subject "CN=${CN}-${CUR_TIME}"
 
-xi:cmp-enroll-p12 --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+xi:cmp-enroll-p12 -ca ${CA} \
+  --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --out ${OUT_DIR}/${CN}.der --profile smime \
   --subject "CN=${CN}-${CUR_TIME},E=info@myorg.com,O=myorg,C=DE"
 
-xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+xi:update-cert-p12 -ca ${CA} \
+  --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
   --cert ${OUT_DIR}/${CN}.der
 
 echo "=====CMP: Enroll (CA generate key pair) via CRMF====="

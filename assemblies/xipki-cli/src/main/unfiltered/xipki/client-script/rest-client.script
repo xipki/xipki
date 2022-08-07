@@ -17,7 +17,7 @@ if { $printUsage equals "true" } then {
   echo "    ocsp:      Also test the OCSP status"
 } else {
 HASH = SHA256
-BASE_URL = https://localhost:8443/ca/rest/myca
+BASE_URL = https://localhost:8446/rest/myca
 
 echo "#################################################################"
 echo "#               Manage certificate via REST API                 #"

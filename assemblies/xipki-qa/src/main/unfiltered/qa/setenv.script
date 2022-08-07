@@ -1,1 +1,3 @@
-XIPKI_DIR=~/tools/tomcat/xipki
+CA_XIPKI_DIR=~/tools/xipki/tomcat-ca/xipki
+OCSP_XIPKI_DIR=~/tools/xipki/tomcat-ocsp/xipki
+

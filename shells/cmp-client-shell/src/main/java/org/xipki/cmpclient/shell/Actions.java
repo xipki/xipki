@@ -69,40 +69,53 @@ public class Actions {
     @Completion(FileCompleter.class)
     private String respout;
 
-    @Option(name = "--signer-type", description = "Signer type")
-    @Completion(Completers.SignerTypeCompleter.class)
-    private String signerType;
+    @Option(name = "--signer-p12", description = "Signer PKCS#12 file")
+    @Completion(FileCompleter.class)
+    private String signerP12File;
 
-    @Option(name = "--signer-conf", description = "Signer conf")
-    private String signerConf;
-
-    @Option(name = "--signer-cert", multiValued = true, description = "Signer certificates")
-    private List<String> signerCerts;
+    @Option(name = "--signer-p12-algo", description = "Signature algorithm of the PKCS#12 signer")
+    @Completion(Completers.SigAlgCompleter.class)
+    private String signerP12SigAlgo;
 
     @Option(name = "--signer-keyid", multiValued = true,
-        description = "Key ID, add prefix 0x for hex-encoded value")
+        description = "User, text key ID, or prefix 0x for hex-encoded key ID")
     private String signerKeyId;
 
-    @Option(name = "--signer-password", description = "Password")
+    @Option(name = "--signer-password", description = "Signer password")
     private String signerPassword;
 
     protected Requestor getRequestor()
-        throws IllegalCmdParamException, ObjectCreationException {
-      if (!(signerType == null ^ signerKeyId == null)) {
-        throw new IllegalCmdParamException("Exactly one of signer-type and user must be specified");
+        throws IllegalCmdParamException, ObjectCreationException, IOException {
+      if (!(signerP12File == null ^ signerKeyId == null)) {
+        throw new IllegalCmdParamException(
+            "Exactly one of signer-p12 and signer-keyid must be specified");
       }
 
-      if (signerType != null) {
-        if (signerConf == null) {
-          throw new IllegalCmdParamException("signer-conf is not specified");
+      if (signerP12File != null) {
+        if (signerPassword == null) {
+          char[] pwd = readPassword("Enter the password for " + signerP12File);
+          signerPassword = new String(pwd);
         }
-        X509Cert[] certs = parseCerts(signerCerts);
+
+        ConfPairs cp = new ConfPairs();
+        cp.putPair("password", signerPassword);
+        cp.putPair("keystore", "file:" + signerP12File);
+
+        SignerConf sc;
+        if (signerP12SigAlgo == null) {
+          sc = new SignerConf(cp.getEncoded(), HashAlgo.SHA256, new SignatureAlgoControl());
+        } else {
+          cp.putPair("algo", signerP12SigAlgo);
+          sc = new SignerConf(cp.getEncoded());
+        }
+
         ConcurrentContentSigner signer = securityFactory.createSigner(
-            signerType, new SignerConf(signerConf), certs);
+            "PKCS12", sc, (X509Cert)  null);
         return new Requestor.SignatureCmpRequestor(signer);
       } else {
         if (signerPassword == null) {
-          throw new IllegalCmdParamException("signer-password is not specified");
+          char[] pwd = readPassword("Enter the password for the user/keyID " + signerKeyId);
+          signerPassword = new String(pwd);
         }
         byte[] senderKID = StringUtil.startsWithIgnoreCase(signerKeyId, "0x")
             ? Hex.decode(signerKeyId) : signerKeyId.getBytes(StandardCharsets.UTF_8);
@@ -265,23 +278,5 @@ public class Actions {
     } // method execute0
 
   } // class CmpCacertchain
-
-  @Command(scope = "xi", name = "cmp-init", description = "initialize CMP client")
-  @Service
-  public static class CmpInit extends ClientAction {
-
-    @Override
-    protected Object execute0()
-        throws Exception {
-      boolean succ = client.init();
-      if (succ) {
-        println("CA client initialized successfully");
-      } else {
-        println("CA client initialization failed");
-      }
-      return null;
-    }
-
-  } // class CmpInit
 
 }

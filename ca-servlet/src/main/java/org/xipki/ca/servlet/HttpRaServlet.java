@@ -82,7 +82,7 @@ public class HttpRaServlet extends HttpServlet {
       byte[] requestBytes = IoUtil.read(req.getInputStream());
 
       SdkResponse response = responder.service(path, event, requestBytes, httpRetriever);
-      byte[] respBody = response == null ? null : response.getEncoded();
+      byte[] respBody = response == null ? null : response.encode();
       int httpStatus = HttpServletResponse.SC_OK;
       if (response instanceof ErrorResponse) {
         OperationException.ErrorCode errCode = ((ErrorResponse) response).getCode();

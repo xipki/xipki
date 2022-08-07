@@ -17,14 +17,15 @@ Deployment in Tomcat 8 and 9
 5. Create new databases configured in Step 4.
 6. Initialize the databases configured in Step 4.
    In xipki-dbtool, call `bin/initdb.sh --db-schema sql/ca-init.xml --db-conf /path/to/ca-db.properties`
-7. Configure the TLS listener in the file `${CATALINA_HOME}conf/server.xml`
+7. Disable the HTTP listener, and configure the TLS listener in the file 
+   `${CATALINA_HOME}conf/server.xml` (we use here the port 8444, can be changed to any other port)
   - Use NIO connector
    ```sh
-    <Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"
+    <Connector port="8444" protocol="org.apache.coyote.http11.Http11NioProtocol"
                maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
                connectionTimeout="4000">
         <SSLHostConfig
-                certificateVerification="optional"
+                certificateVerification="required"
                 protocols="TLSv1.2"
                 ciphers="TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
                 truststoreFile="${XIPKI_BASE}/keycerts/tlskeys/ca/tls-ca-cert.p12"
@@ -39,11 +40,11 @@ Deployment in Tomcat 8 and 9
   ```
   - Use APR connector (fast). See https://tomcat.apache.org/tomcat-8.0-doc/apr.html for more details.
   ```sh
-    <Connector port="8443" protocol="org.apache.coyote.http11.Http11AprProtocol"
+    <Connector port="8444" protocol="org.apache.coyote.http11.Http11AprProtocol"
                maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
                connectionTimeout="4000">
         <SSLHostConfig
-                certificateVerification="optional"
+                certificateVerification="required"
                 protocols="TLSv1.2"
                 ciphers="TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
                 caCertificateFile="${XIPKI_BASE}/keycerts/tlskeys/ca/tls-ca-cert.pem">

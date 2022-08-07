@@ -28,11 +28,6 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki</groupId>
-      <artifactId>scep-client</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>datasource</artifactId>
       <version>${project.version}</version>

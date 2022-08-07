@@ -60,6 +60,17 @@
           <exclude>xipki/**</exclude>
         </excludes>
       </resource>
+      <resource>
+        <directory>../xipki-mgmt-cli/src/main/filtered</directory>
+        <filtering>true</filtering>
+      </resource>
+      <resource>
+        <directory>../xipki-mgmt-cli/src/main/unfiltered</directory>
+        <filtering>false</filtering>
+        <excludes>
+          <exclude>xipki/**</exclude>
+        </excludes>
+      </resource>
     </resources>
     <plugins>
       <plugin>
@@ -269,7 +280,6 @@
             <phase>prepare-package</phase>
             <configuration>
               <target>
-                <!-- karaf.version -->
                 <unzip failOnEmptyArchive="true"
                    src="../xipki-dbtool/target/xipki-dbtool-${project.version}.zip"
                    dest="${project.build.directory}"/>
@@ -277,6 +287,12 @@
                    dest="${project.build.directory}"/>
                 <unzip src="../xipki-ocsp/target/xipki-ocsp-${project.version}.zip"
                    dest="${project.build.directory}"/>
+                <unzip src="../xipki-cmp-gateway/target/xipki-cmp-gateway-${project.version}.zip"
+                       dest="${project.build.directory}"/>
+                <unzip src="../xipki-scep-gateway/target/xipki-scep-gateway-${project.version}.zip"
+                       dest="${project.build.directory}"/>
+                <unzip src="../xipki-rest-gateway/target/xipki-rest-gateway-${project.version}.zip"
+                       dest="${project.build.directory}"/>
                 <java failonerror="true" classname="org.xipki.patchkaraf.PatchFeature">
                   <arg value="--file"/>
                   <arg file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/org.apache.karaf.features.cfg"/>
@@ -321,14 +337,6 @@
                   file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/system/org/apache/karaf/features/standard/${karaf.version}/standard-${karaf.version}-features.xml"
                   token="bcpkix-jdk15on/${karaf.bc.version}"
                   value="bcpkix-jdk18on/${bc.version}"/>
-                <!-- jdk15on.karaf.version -->
-                <unzip failOnEmptyArchive="true"
-                  src="../xipki-dbtool/target/xipki-dbtool-${project.version}.zip"
-                  dest="${project.build.directory}"/>
-                <unzip src="../xipki-ca/target/xipki-ca-${project.version}.zip"
-                  dest="${project.build.directory}"/>
-                <unzip src="../xipki-ocsp/target/xipki-ocsp-${project.version}.zip"
-                  dest="${project.build.directory}"/>
                 <java failonerror="true" classname="org.xipki.patchkaraf.PatchFeature">
                   <arg value="--file"/>
                   <arg file="${project.build.directory}/apache-karaf-minimal-${jdk11on.karaf.version}/etc/org.apache.karaf.features.cfg"/>
