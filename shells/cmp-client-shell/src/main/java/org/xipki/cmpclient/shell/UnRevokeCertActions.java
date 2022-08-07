@@ -24,7 +24,6 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.cmpclient.CertIdOrError;
 import org.xipki.cmpclient.Requestor;
-import org.xipki.cmpclient.shell.Actions.ClientAction;
 import org.xipki.security.CrlReason;
 import org.xipki.security.X509Cert;
 import org.xipki.security.cmp.PkiStatusInfo;
@@ -146,7 +145,7 @@ public class UnRevokeCertActions {
 
   } // class CmpUnrevoke
 
-  public abstract static class UnRevokeCertAction extends ClientAction {
+  public abstract static class UnRevokeCertAction extends Actions.AuthClientAction {
 
     @Option(name = "--ca-cert", required = true,
         description = "certificate file")

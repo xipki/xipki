@@ -40,7 +40,6 @@ import org.xipki.cmpclient.EnrollCertRequest;
 import org.xipki.cmpclient.EnrollCertRequest.EnrollType;
 import org.xipki.cmpclient.EnrollCertResult;
 import org.xipki.cmpclient.EnrollCertResult.CertifiedKeyPairOrError;
-import org.xipki.cmpclient.shell.Actions.ClientAction;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.*;
 import org.xipki.security.X509ExtensionType.ExtensionsType;
@@ -70,7 +69,7 @@ public class EnrollCertActions {
 
   @Command(scope = "xi", name = "cmp-csr-enroll", description = "enroll certificate via CSR")
   @Service
-  public static class CmpCsrEnroll extends ClientAction {
+  public static class CmpCsrEnroll extends Actions.AuthClientAction {
 
     @Option(name = "--csr", required = true, description = "CSR file")
     @Completion(FileCompleter.class)
@@ -360,7 +359,7 @@ public class EnrollCertActions {
 
   } // class CmpEnrollP12
 
-  public abstract static class EnrollAction extends ClientAction {
+  public abstract static class EnrollAction extends Actions.AuthClientAction {
 
     private static final long _12_HOURS_MS = 12L * 60 * 60 * 1000;
 

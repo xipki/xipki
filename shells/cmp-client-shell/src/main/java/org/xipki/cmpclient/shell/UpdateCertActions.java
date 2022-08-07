@@ -33,7 +33,6 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.xipki.cmpclient.EnrollCertRequest;
 import org.xipki.cmpclient.EnrollCertResult;
 import org.xipki.cmpclient.EnrollCertResult.CertifiedKeyPairOrError;
-import org.xipki.cmpclient.shell.Actions.ClientAction;
 import org.xipki.security.*;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
@@ -254,7 +253,7 @@ public class UpdateCertActions {
 
   }
 
-  public abstract static class UpdateAction extends ClientAction {
+  public abstract static class UpdateAction extends Actions.AuthClientAction {
 
     @Reference
     protected SecurityFactory securityFactory;

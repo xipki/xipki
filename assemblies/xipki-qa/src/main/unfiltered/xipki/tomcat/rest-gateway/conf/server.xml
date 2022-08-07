@@ -115,7 +115,7 @@
                maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
                connectionTimeout="4000" maxKeepAliveRequests="-1">
         <SSLHostConfig
-                certificateVerification="required"
+                certificateVerification="optional"
                 protocols="TLSv1.2"
                 ciphers="TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
                 truststoreFile="${XIPKI_BASE}/keycerts/tlskeys/ca/tls-ca-cert.p12"

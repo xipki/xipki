@@ -25,7 +25,6 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.xipki.cmpclient.CmpClientException;
 import org.xipki.cmpclient.PkiErrorException;
-import org.xipki.cmpclient.Requestor;
 import org.xipki.cmpclient.shell.Actions.ClientAction;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
@@ -44,11 +43,11 @@ public class CrlActions {
   public static class CmpGetCrl extends CrlAction {
 
     @Override
-    protected X509CRLHolder retrieveCrl(Requestor requestor)
+    protected X509CRLHolder retrieveCrl()
         throws CmpClientException, PkiErrorException {
       ReqRespDebug debug = getReqRespDebug();
       try {
-        return client.downloadCrl(caName, requestor, debug);
+        return client.downloadCrl(caName, debug);
       } finally {
         saveRequestResponse(debug);
       }
@@ -59,7 +58,7 @@ public class CrlActions {
         throws Exception {
       X509CRLHolder crl;
       try {
-        crl = retrieveCrl(getRequestor());
+        crl = retrieveCrl();
       } catch (PkiErrorException ex) {
         throw new CmdFailure("received no CRL from server: " + ex.getMessage());
       }
@@ -84,7 +83,7 @@ public class CrlActions {
     @Completion(FileCompleter.class)
     protected String outFile;
 
-    protected abstract X509CRLHolder retrieveCrl(Requestor requestor)
+    protected abstract X509CRLHolder retrieveCrl()
         throws CmpClientException, PkiErrorException;
 
     @Override
@@ -92,7 +91,7 @@ public class CrlActions {
         throws Exception {
       X509CRLHolder crl;
       try {
-        crl = retrieveCrl(getRequestor());
+        crl = retrieveCrl();
       } catch (PkiErrorException ex) {
         throw new CmdFailure("received no CRL from server: " + ex.getMessage());
       }

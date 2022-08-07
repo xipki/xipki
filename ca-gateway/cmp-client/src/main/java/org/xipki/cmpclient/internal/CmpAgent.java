@@ -125,7 +125,7 @@ class CmpAgent {
 
   private final Responder signatureResponder;
 
-  private boolean sendRequestorCert;
+  private final boolean sendRequestorCert;
 
   private final boolean implicitConfirm = true;
 
@@ -197,14 +197,45 @@ class CmpAgent {
       String caName, Requestor requestor, Responder responder,
       PKIMessage request, ReqRespDebug debug)
       throws CmpClientException {
+    ASN1OctetString tid = request.getHeader().getTransactionID();
     notNull(request, "request");
     PKIMessage tmpRequest = sign(requestor, request);
+    GeneralPKIMessage response = send(caName, tmpRequest, debug);
+    PKIHeader respHeader = response.getHeader();
 
+    GeneralName rec = respHeader.getRecipient();
+    if (!requestor.getName().equals(rec)) {
+      LOG.warn("tid={}: unknown CMP requestor '{}'", tid, rec);
+    }
+
+    VerifiedPkiMessage ret = new VerifiedPkiMessage(response);
+    if (response.hasProtection()) {
+      try {
+        ProtectionVerificationResult verifyProtection = verifyProtection(requestor,
+            responder, Hex.encode(tid.getOctets()), response);
+        ret.setProtectionVerificationResult(verifyProtection);
+      } catch (InvalidKeyException | CMPException ex) {
+        throw new CmpClientException(ex.getMessage(), ex);
+      }
+    } else {
+      PKIBody respBody = response.getBody();
+      int bodyType = respBody.getType();
+      if (bodyType != PKIBody.TYPE_ERROR) {
+        throw new CmpClientException("response is not signed");
+      }
+    }
+
+    return ret;
+  }
+
+  private GeneralPKIMessage send(
+      String caName, PKIMessage request, ReqRespDebug debug)
+      throws CmpClientException {
     byte[] encodedRequest;
     try {
-      encodedRequest = tmpRequest.getEncoded();
+      encodedRequest = request.getEncoded();
     } catch (IOException ex) {
-      LOG.error("could not encode the PKI request {}", tmpRequest);
+      LOG.error("could not encode the PKI request {}", request);
       throw new CmpClientException(ex.getMessage(), ex);
     }
 
@@ -255,30 +286,8 @@ class CmpAgent {
       throw new CmpClientException("Response contains differnt tid than the request");
     }
 
-    GeneralName rec = respHeader.getRecipient();
-    if (!requestor.getName().equals(rec)) {
-      LOG.warn("tid={}: unknown CMP requestor '{}'", tid, rec);
-    }
-
-    VerifiedPkiMessage ret = new VerifiedPkiMessage(response);
-    if (response.hasProtection()) {
-      try {
-        ProtectionVerificationResult verifyProtection = verifyProtection(requestor,
-            responder, Hex.encode(tid.getOctets()), response);
-        ret.setProtectionVerificationResult(verifyProtection);
-      } catch (InvalidKeyException | CMPException ex) {
-        throw new CmpClientException(ex.getMessage(), ex);
-      }
-    } else {
-      PKIBody respBody = response.getBody();
-      int bodyType = respBody.getType();
-      if (bodyType != PKIBody.TYPE_ERROR) {
-        throw new CmpClientException("response is not signed");
-      }
-    }
-
-    return ret;
-  } // method signAndSend
+    return response;
+  } // method send
 
   private PKIHeader buildPkiHeader(Requestor requestor, Responder responder, ASN1OctetString tid) {
     return buildPkiHeader(requestor, responder,  false, tid, null, (InfoTypeAndValue[]) null);
@@ -307,8 +316,12 @@ class CmpAgent {
       }
     }
 
-    PKIHeaderBuilder hdrBuilder =
-        new PKIHeaderBuilder(PKIHeader.CMP_2000, requestor.getName(), responder.getName());
+    GeneralName sender = requestor != null ? requestor.getName()
+        : new GeneralName(new X500Name(""));
+    GeneralName recipient = responder != null ? responder.getName()
+        : new GeneralName(new X500Name(""));
+
+    PKIHeaderBuilder hdrBuilder = new PKIHeaderBuilder(PKIHeader.CMP_2000, sender, recipient);
     hdrBuilder.setMessageTime(new ASN1GeneralizedTime(new Date()));
 
     ASN1OctetString tmpTid = (tid == null) ? new DEROctetString(randomTransactionId()) : tid;
@@ -450,10 +463,10 @@ class CmpAgent {
   } // method verifyProtection
 
   private PKIMessage buildMessageWithGeneralMsgContent(
-      Requestor requestor, Responder responder, ASN1ObjectIdentifier type, ASN1Encodable value) {
+      ASN1ObjectIdentifier type, ASN1Encodable value) {
     notNull(type, "type");
 
-    PKIHeader header = buildPkiHeader(requestor, responder, null);
+    PKIHeader header = buildPkiHeader(null, null, null);
     InfoTypeAndValue itv = (value != null) ? new InfoTypeAndValue(type, value)
         : new InfoTypeAndValue(type);
     GenMsgContent genMsgContent = new GenMsgContent(itv);
@@ -461,26 +474,23 @@ class CmpAgent {
     return new PKIMessage(header, body);
   } // method buildMessageWithGeneralMsgContent
 
-  X509CRLHolder downloadCurrentCrl(String caName, Requestor requestor, ReqRespDebug debug)
+  X509CRLHolder downloadCurrentCrl(String caName, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     ASN1ObjectIdentifier type = CMPObjectIdentifiers.it_currentCRL;
-    Responder responder = getResponder(requestor);
-    PKIMessage request = buildMessageWithGeneralMsgContent(requestor, responder, type, null);
+    PKIMessage request = buildMessageWithGeneralMsgContent(type, null);
 
-    VerifiedPkiMessage response = signAndSend(caName, requestor, responder, request, debug);
+    GeneralPKIMessage response = send(caName, request, debug);
     ASN1Encodable itvValue = parseGenRep(response, type);
     CertificateList certList = CertificateList.getInstance(itvValue);
     return new X509CRLHolder(certList);
   } // method downloadCrl
 
-  List<X509Cert> caCerts(
-      String caName, Requestor requestor, int maxNumCerts, ReqRespDebug debug)
+  List<X509Cert> caCerts(String caName, int maxNumCerts, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     ASN1ObjectIdentifier type = CMPObjectIdentifiers.id_it_caCerts;
-    Responder responder = getResponder(requestor);
-    PKIMessage request = buildMessageWithGeneralMsgContent(requestor, responder, type, null);
+    PKIMessage request = buildMessageWithGeneralMsgContent(type, null);
 
-    VerifiedPkiMessage response = signAndSend(caName, requestor, responder, request, debug);
+    GeneralPKIMessage response = send(caName, request, debug);
     ASN1Encodable itvValue = parseGenRep(response, type);
     ASN1Sequence seq = ASN1Sequence.getInstance(itvValue);
     int retSize = Math.min(maxNumCerts, seq.size());
@@ -1161,8 +1171,13 @@ class CmpAgent {
       VerifiedPkiMessage response, ASN1ObjectIdentifier expectedType)
       throws CmpClientException, PkiErrorException {
     checkProtection(notNull(response, "response"));
+    return parseGenRep(response.getPkiMessage(), expectedType);
+  }
 
-    PKIBody respBody = response.getPkiMessage().getBody();
+  private static ASN1Encodable parseGenRep(
+      GeneralPKIMessage response, ASN1ObjectIdentifier expectedType)
+      throws CmpClientException, PkiErrorException {
+    PKIBody respBody = response.getBody();
     int bodyType = respBody.getType();
 
     if (PKIBody.TYPE_ERROR == bodyType) {

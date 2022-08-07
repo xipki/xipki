@@ -35,11 +35,9 @@ import org.xipki.util.*;
 import org.xipki.util.ReqRespDebug.ReqRespPair;
 import org.xipki.util.exception.ObjectCreationException;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 import java.util.List;
 
 /**
@@ -50,24 +48,10 @@ import java.util.List;
  */
 public class Actions {
 
-  public abstract static class ClientAction extends XiAction {
+  public abstract static class AuthClientAction extends ClientAction {
 
     @Reference
     protected SecurityFactory securityFactory;
-
-    @Reference
-    protected CmpClient client;
-
-    @Option(name = "--ca", required = true, description = "CA name")
-    protected String caName;
-
-    @Option(name = "--req-out", description = "where to save the request")
-    @Completion(FileCompleter.class)
-    private String reqout;
-
-    @Option(name = "--resp-out", description = "where to save the response")
-    @Completion(FileCompleter.class)
-    private String respout;
 
     @Option(name = "--signer-p12", description = "Signer PKCS#12 file")
     @Completion(FileCompleter.class)
@@ -125,23 +109,26 @@ public class Actions {
       }
     }
 
-    private static X509Cert[] parseCerts(List<String> certFiles)
-        throws IllegalCmdParamException {
-      if (CollectionUtil.isEmpty(certFiles)) {
-        return null;
-      }
+  }
 
-      X509Cert[] certs = new X509Cert[certFiles.size()];
-      for (int i = 0; i < certFiles.size(); i++) {
-        String m = certFiles.get(i);
-        try {
-          certs[i] = X509Util.parseCert(new File(m));
-        } catch (CertificateException | IOException ex) {
-          throw new IllegalCmdParamException("could not parse the certificate " + m, ex);
-        }
-      }
-      return certs;
-    }
+  public abstract static class ClientAction extends XiAction {
+
+    @Reference
+    protected SecurityFactory securityFactory;
+
+    @Reference
+    protected CmpClient client;
+
+    @Option(name = "--ca", required = true, description = "CA name")
+    protected String caName;
+
+    @Option(name = "--req-out", description = "where to save the request")
+    @Completion(FileCompleter.class)
+    private String reqout;
+
+    @Option(name = "--resp-out", description = "where to save the response")
+    @Completion(FileCompleter.class)
+    private String respout;
 
     protected static HashAlgo getHashAlgo(String algoStr)
         throws ObjectCreationException {
@@ -233,7 +220,7 @@ public class Actions {
         throws Exception {
       X509Cert caCert;
       try {
-        caCert = client.caCert(caName, getRequestor(), getReqRespDebug());
+        caCert = client.caCert(caName, getReqRespDebug());
       } catch (Exception ex) {
         throw new CmdFailure("Error while retrieving CA certificate: " + ex.getMessage());
       }
@@ -263,7 +250,7 @@ public class Actions {
         throws Exception {
       List<X509Cert> caCertChain;
       try {
-        caCertChain = client.caCerts(caName, getRequestor(), getReqRespDebug());
+        caCertChain = client.caCerts(caName, getReqRespDebug());
       } catch (Exception ex) {
         throw new CmdFailure("Error while retrieving CA certificate chain: " + ex.getMessage());
       }

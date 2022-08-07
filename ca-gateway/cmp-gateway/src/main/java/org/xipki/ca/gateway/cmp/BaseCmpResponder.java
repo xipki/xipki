@@ -27,11 +27,10 @@ import org.bouncycastle.asn1.crmf.POPOSigningKey;
 import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.*;
+import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.cmp.CMPException;
 import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessage;
@@ -65,6 +64,7 @@ import org.xipki.util.exception.OperationException.ErrorCode;
 import javax.crypto.*;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.IOException;
 import java.security.*;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
@@ -75,6 +75,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static org.bouncycastle.asn1.cmp.PKIFailureInfo.badRequest;
+import static org.bouncycastle.asn1.cmp.PKIFailureInfo.systemFailure;
+import static org.bouncycastle.asn1.cmp.PKIStatus.rejection;
 import static org.xipki.ca.sdk.CaAuditConstants.*;
 import static org.xipki.util.Args.notNull;
 
@@ -229,11 +232,6 @@ abstract class BaseCmpResponder {
       String caName, PKIMessage request, PKIHeaderBuilder respHeader, PKIHeader reqHeader,
       PKIBody reqBody, Requestor requestor, String msgId, AuditEvent event);
 
-  protected abstract PKIBody cmpGeneralMsg(
-      String caName, PKIHeaderBuilder respHeader, PKIHeader reqHeader, PKIBody reqBody,
-      Requestor requestor, ASN1OctetString tid, String msgId, AuditEvent event)
-      throws InsufficientPermissionException;
-
   protected abstract PKIBody confirmCertificates(String caName, ASN1OctetString transactionId,
       CertConfirmContent certConf, String msgId);
 
@@ -300,10 +298,10 @@ abstract class BaseCmpResponder {
       String caName, PKIMessage request, Requestor requestor,
       ASN1OctetString tid, GeneralPKIMessage message, String msgId,
       Map<String, String> parameters, AuditEvent event) {
-    event.addEventData(NAME_requestor, requestor.getName());
+    event.addEventData(NAME_requestor, requestor == null ? "null" : requestor.getName());
 
     PKIHeader reqHeader = message.getHeader();
-    GeneralName sender = reqHeader.getRecipient(); //TODO
+    GeneralName sender = reqHeader.getRecipient();
 
     PKIHeaderBuilder respHeader = new PKIHeaderBuilder(
         reqHeader.getPvno().getValue().intValue(), sender, reqHeader.getSender());
@@ -314,6 +312,7 @@ abstract class BaseCmpResponder {
     }
 
     PKIBody respBody;
+
     PKIBody reqBody = message.getBody();
     final int type = reqBody.getType();
 
@@ -358,8 +357,7 @@ abstract class BaseCmpResponder {
         event.addEventType(TYPE_pkiconf);
         respBody = new PKIBody(PKIBody.TYPE_CONFIRM, DERNull.INSTANCE);
       } else if (type == PKIBody.TYPE_GEN_MSG) {
-        respBody = cmpGeneralMsg(caName, respHeader, reqHeader, reqBody, requestor,
-            tid, msgId, event);
+        respBody = cmpGeneralMsg(caName, reqBody, event);
       } else if (type == PKIBody.TYPE_ERROR) {
         event.addEventType(TYPE_error);
         respBody = revokePendingCertificates(caName, tid);
@@ -438,7 +436,10 @@ abstract class BaseCmpResponder {
     GeneralName recipient = reqHeader.getRecipient();
     X500Name x500Name = getX500Name(recipient);
     if (x500Name != null) {
-      if (!signer.getCertificate().getSubject().equals(x500Name)) {
+      RDN[] rdns = x500Name.getRDNs();
+      // consider the empty DN
+      if ((rdns != null && rdns.length > 0) // Not an empty DN
+          && !signer.getCertificate().getSubject().equals(x500Name)) {
         LOG.warn("tid={}: I am not the intended recipient, but '{}'",
             tid, reqHeader.getRecipient());
         failureCode = PKIFailureInfo.badRequest;
@@ -527,8 +528,14 @@ abstract class BaseCmpResponder {
         errorStatus = "requestor (TLS client certificate) is not authorized";
       }
     } else {
-      errorStatus = "request has no protection";
       requestor = null;
+      final int type = message.getBody().getType();
+      if (type != PKIBody.TYPE_GEN_MSG) {
+        LOG.warn("tid={}: nmessage is not protected", tid);
+        errorStatus = "message is not protected";
+      } else {
+        errorStatus = null;
+      }
     }
 
     if (errorStatus != null) {
@@ -967,5 +974,64 @@ abstract class BaseCmpResponder {
 
     return new CertResponse(certReqId, statusInfo, new CertifiedKeyPair(cec, encKey, null), null);
   }
+
+  protected PKIBody cmpGeneralMsg(String caName, PKIBody reqBody, AuditEvent event)
+      throws InsufficientPermissionException {
+    GenMsgContent genMsgBody = GenMsgContent.getInstance(reqBody.getContent());
+    InfoTypeAndValue[] itvs = genMsgBody.toInfoTypeAndValueArray();
+
+    InfoTypeAndValue itv = null;
+    if (itvs != null && itvs.length > 0) {
+      for (InfoTypeAndValue entry : itvs) {
+        String itvType = entry.getInfoType().getId();
+        if (CMPObjectIdentifiers.id_it_caCerts.getId().equals(itvType)
+            || CMPObjectIdentifiers.it_currentCRL.getId().equals(itvType)) {
+          itv = entry;
+          break;
+        }
+      }
+    }
+
+    if (itv == null) {
+      String statusMessage = "PKIBody type " + PKIBody.TYPE_GEN_MSG
+          + " with given sub-type is not supported";
+      return buildErrorMsgPkiBody(rejection, badRequest, statusMessage);
+    }
+
+    InfoTypeAndValue itvResp;
+    ASN1ObjectIdentifier infoType = itv.getInfoType();
+
+    try {
+      if (CMPObjectIdentifiers.it_currentCRL.equals(infoType)) {
+        event.addEventType(TYPE_genm_current_crl);
+        byte[] encodedCrl = sdk.currentCrl(caName);
+        if (encodedCrl == null) {
+          return buildErrorMsgPkiBody(rejection, systemFailure, "no CRL is available");
+        }
+
+        CertificateList crl = CertificateList.getInstance(encodedCrl);
+        itvResp = new InfoTypeAndValue(infoType, crl);
+      } else { // if (CMPObjectIdentifiers.id_it_caCerts.equals(infoType)) {
+        event.addEventType(TYPE_genm_cacertchain);
+        byte[][] certchain = sdk.cacertchain(caName);
+        if (certchain == null || certchain.length == 0) {
+          return buildErrorMsgPkiBody(rejection, systemFailure, "no certchain is available");
+        }
+
+        ASN1EncodableVector vec = new ASN1EncodableVector();
+        for (byte[] cert : certchain) {
+          vec.add(new CMPCertificate(Certificate.getInstance(cert)));
+        }
+        itvResp = new InfoTypeAndValue(infoType, new DERSequence(vec));
+      }
+    } catch (IOException e) {
+      LogUtil.error(LOG, e);
+      return new PKIBody(PKIBody.TYPE_ERROR,
+          buildErrorMsgPkiBody(rejection, systemFailure, null));
+    }
+
+    GenRepContent genRepContent = new GenRepContent(itvResp);
+    return new PKIBody(PKIBody.TYPE_GEN_REP, genRepContent);
+  } // method cmpGeneralMsg
 
 }

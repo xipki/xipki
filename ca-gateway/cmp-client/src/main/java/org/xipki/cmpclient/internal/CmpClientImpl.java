@@ -291,11 +291,10 @@ public final class CmpClientImpl implements CmpClient {
 
   @Override
   public X509CRLHolder downloadCrl(
-      String caName, Requestor requestor, ReqRespDebug debug)
+      String caName, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     caName = toNonBlankLower(caName, "caName");
-    caName = toNonBlankLower(caName, "caName");
-    return agent.downloadCurrentCrl(caName, requestor, debug);
+    return agent.downloadCurrentCrl(caName, debug);
   } // method downloadCrl
 
   private static X509Cert getCertificate(CMPCertificate cmpCert)
@@ -491,15 +490,15 @@ public final class CmpClientImpl implements CmpClient {
   } // method assertIssuedByCa
 
   @Override
-  public X509Cert caCert(String caName, Requestor requestor, ReqRespDebug debug)
+  public X509Cert caCert(String caName, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
-    return agent.caCerts(caName, requestor, 1, debug).get(0);
+    return agent.caCerts(caName, 1, debug).get(0);
   }
 
   @Override
-  public List<X509Cert> caCerts(String caName, Requestor requestor, ReqRespDebug debug)
+  public List<X509Cert> caCerts(String caName, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
-    return agent.caCerts(caName, requestor, 99, debug);
+    return agent.caCerts(caName, 99, debug);
   }
 
   @Override

@@ -164,7 +164,7 @@ public interface CmpClient extends Closeable {
    *          if client error occurs.
    */
   X509CRLHolder downloadCrl(
-      String caName, Requestor requestor, ReqRespDebug debug)
+      String caName, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException;
 
   /**
@@ -238,7 +238,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  X509Cert caCert(String caName, Requestor requestor, ReqRespDebug debug)
+  X509Cert caCert(String caName, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException;
 
   /**
@@ -249,7 +249,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  List<X509Cert> caCerts(String caName, Requestor requestor, ReqRespDebug debug)
+  List<X509Cert> caCerts(String caName, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException;
 
   /**
