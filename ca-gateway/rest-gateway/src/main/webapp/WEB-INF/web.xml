@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app>
+  <display-name>XiPKI CA Web Application</display-name>
+  <session-config>
+    <session-timeout>60</session-timeout>
+  </session-config>
+  <filter>
+    <filter-name>protocol-filter</filter-name>
+    <filter-class>org.xipki.ca.gateway.rest.servlet.ProtocolServletFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>protocol-filter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+</web-app>
